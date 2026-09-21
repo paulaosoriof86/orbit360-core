@@ -1,0 +1,323 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { chromium } from 'playwright';
+import { initializeApp, cert, deleteApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
+
+const PROJECT='ays-orbit-360-lab';
+const TENANT=String(process.env.TENANT_HINT||'').trim();
+const TARGET=String(process.env.TARGET_URL||'').replace(/\/$/,'');
+const OUT=process.env.B2_AUTH_PROOF_FILE||path.join(process.env.RUNNER_TEMP||process.cwd(),'b2-authenticated-preview.json');
+const RUN=String(process.env.GITHUB_RUN_ID||Date.now());
+const clean=(v,m=500)=>String(v==null?'':v).trim().slice(0,m);
+const norm=v=>clean(v,180).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+const need=(v,c)=>{if(!v)throw new Error(c);};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const uniq=a=>[...new Set([].concat(a||[]).map(x=>clean(x,180)).filter(Boolean))];
+const hash=v=>crypto.createHash('sha256').update(String(v||'')).digest('hex');
+const evidence={status:'RUNNING',target:TARGET,runId:RUN,scope:{},crud:{},renewal:{},cleanup:{},errors:[],writes:{synthetic:0,cleanup:0}};
+fs.mkdirSync(path.dirname(OUT),{recursive:true});
+need(TENANT,'B2_AUTH_TENANT_REQUIRED');
+need(/^https:\/\/.+\.web\.app$/.test(TARGET),'B2_AUTH_TARGET_INVALID');
+
+function sa(){
+  for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
+    try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===PROJECT&&x?.private_key)return x;}catch{}
+  }
+  if(process.env.GOOGLE_APPLICATION_CREDENTIALS){
+    const x=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS,'utf8'));
+    if(x?.type==='service_account'&&x?.project_id===PROJECT&&x?.private_key)return x;
+  }
+  throw new Error('B2_AUTH_SERVICE_ACCOUNT');
+}
+function roles(m){return uniq([...(m?.roles||[]),...(m?.rolesAsignados||[]),...(m?.assignedRoles||[]),m?.role,m?.rol,m?.rolDefault,m?.defaultRole,m?.activeRole]);}
+async function waitFor(fn,label,timeout=25000,interval=300){
+  const end=Date.now()+timeout;let last;
+  while(Date.now()<end){
+    try{const v=await fn();if(v)return v;last=v;}catch(e){last=e;}
+    await sleep(interval);
+  }
+  throw new Error(label+':'+clean(last&&last.message||last||'timeout',800));
+}
+async function acceptLegalGate(page,timeout=2500){
+  const gate=page.locator('[data-legal-gate]').last();
+  const visible=await gate.waitFor({state:'visible',timeout}).then(()=>true).catch(()=>false);
+  if(!visible)return false;
+  await gate.locator('#lg-chk').check();
+  await gate.locator('#lg-ok').click();
+  await gate.waitFor({state:'detached',timeout:10000});
+  return true;
+}
+async function pickMultiRoleActor(db,auth){
+  const snap=await db.collection('tenants').doc(TENANT).collection('members').get();
+  const out=[];
+  for(const d of snap.docs){
+    const m=d.data()||{}, rr=roles(m), rn=rr.map(norm), st=norm(m.status||m.estado||'active');
+    if(m.active===false||m.activo===false||['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(st))continue;
+    if(!rn.includes('operativo')||!rn.some(x=>x==='asesor'||x.startsWith('asesor_')))continue;
+    const advisorId=clean(m.advisorId||m.asesorId,180); if(!advisorId)continue;
+    for(const uid of uniq([m.uid,d.id])){
+      try{
+        const u=await auth.getUser(uid);if(u.disabled)continue;
+        out.push({uid:u.uid,advisorId,roles:rr,emailVerified:u.emailVerified===true,score:(u.emailVerified?10:0)+rr.length});
+        break;
+      }catch{}
+    }
+  }
+  out.sort((a,b)=>b.score-a.score);
+  need(out.length,'B2_AUTH_NO_OPERATIVO_ASESOR_ACTOR');
+  return out[0];
+}
+async function activate(page,auth,a){
+  const token=await auth.createCustomToken(a.uid,{b2PreviewQa:true});
+  await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:20000});
+  const st=await page.evaluate(async t=>{
+    const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
+    if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,t);
+    return Orbit.productAppP0.status?.().started?Orbit.productAppP0.status():Orbit.productAppP0.activate();
+  },token);
+  need(st?.started,'B2_AUTH_APP_START_FAILED');
+  await page.waitForFunction(()=>{
+    const s=window.Orbit?.store?._productStatus?.();
+    return !!s&&s.ready===true&&window.Orbit?.store?.__productOperationalWriteP0===true;
+  },null,{timeout:30000});
+  await acceptLegalGate(page,5000);
+}
+async function setRole(page,role){
+  const ok=await page.evaluate(r=>Orbit.session&&Orbit.session.set&&Orbit.session.set(r),role);
+  need(ok===true,'B2_AUTH_ROLE_SET_FAILED:'+role);
+  await sleep(500);
+  await page.waitForFunction(r=>window.Orbit?.session?.rol?.()===r,role,{timeout:7000});
+}
+async function scopeSnapshot(page){
+  return page.evaluate(()=>{
+    const S=Orbit.access.scopedStore('inicio'),own=String(Orbit.session.asesorId()||'');
+    const clients=S.all('clientes'),policies=S.all('polizas'),receipts=S.all('recibosEsperados'),portfolio=S.all('carteraPrimas'),advisors=S.all('asesores'),metas=S.all('metas');
+    const clientAdvisor=new Map(clients.map(x=>[String(x.id),String(x.asesorId||'')]));
+    const policyAdvisor=new Map(policies.map(x=>[String(x.id),String(x.asesorId||clientAdvisor.get(String(x.clienteId))||'')]));
+    const advisorOf=(collection,row)=>{
+      if(collection==='clientes')return String(row.asesorId||'');
+      if(collection==='polizas')return String(row.asesorId||clientAdvisor.get(String(row.clienteId))||'');
+      if(collection==='asesores')return String(row.id||row.asesorId||'');
+      if(row.asesorId)return String(row.asesorId);
+      if(row.clienteId)return String(clientAdvisor.get(String(row.clienteId))||'');
+      if(row.polizaId)return String(policyAdvisor.get(String(row.polizaId))||'');
+      return '';
+    };
+    const leaks=[];
+    for(const [c,arr] of [['clientes',clients],['polizas',policies],['recibosEsperados',receipts],['carteraPrimas',portfolio],['asesores',advisors],['metas',metas]]){
+      for(const row of arr){const a=advisorOf(c,row);if(a&&a!==own)leaks.push(c+':'+String(row.id||'')+':'+a);}
+    }
+    return{
+      role:String(Orbit.session.rol()||''),advisorId:own,scope:String(Orbit.access.dataScope('inicio')||''),
+      counts:{clientes:clients.length,polizas:policies.length,recibosEsperados:receipts.length,carteraPrimas:portfolio.length,asesores:advisors.length,metas:metas.length},
+      advisorIds:advisors.map(x=>String(x.id||x.asesorId||'')).sort(),leakCount:leaks.length,leaks:leaks.slice(0,10),
+      inicioText:String(document.getElementById('host')?.innerText||'').slice(0,3000)
+    };
+  });
+}
+function dataCol(db,name){return db.collection('tenants').doc(TENANT).collection('data').doc(name).collection('items');}
+async function oneBy(db,col,field,value){
+  const s=await dataCol(db,col).where(field,'==',value).limit(2).get();
+  return s.empty?null:{id:s.docs[0].id,...s.docs[0].data()};
+}
+async function rowsBy(db,col,field,value){
+  const s=await dataCol(db,col).where(field,'==',value).get();
+  return s.docs.map(d=>({id:d.id,...d.data()}));
+}
+async function deleteRowsBy(db,col,field,value){
+  const s=await dataCol(db,col).where(field,'==',value).get();let n=0;
+  for(const d of s.docs){await d.ref.delete();n++;}
+  return n;
+}
+async function cleanupSynthetic(db,state){
+  let n=0;
+  const clientId=state.clientId||'',policyIds=uniq([state.policyId,state.renewedPolicyId].filter(Boolean));
+  if(clientId){
+    for(const col of ['actividades','gestiones','cobros','carteraPrimas','recibosEsperados','vehiculos','polizas'])n+=await deleteRowsBy(db,col,'clienteId',clientId).catch(()=>0);
+    const cr=dataCol(db,'clientes').doc(clientId);const cs=await cr.get();if(cs.exists){await cr.delete();n++;}
+  }
+  for(const id of uniq([clientId,...policyIds,state.requestId].filter(Boolean))){
+    n+=await deleteRowsBy(db,'auditLog','registroId',id).catch(()=>0);
+  }
+  return n;
+}
+
+let app,browser,context,page,state={};
+try{
+  app=initializeApp({credential:cert(sa()),projectId:PROJECT},'b2-auth-preview-'+RUN);
+  const db=getFirestore(app),auth=getAuth(app),actor=await pickMultiRoleActor(db,auth);
+  evidence.actor={uidHash:hash(actor.uid),advisorIdHash:hash(actor.advisorId),roles:actor.roles,emailVerified:actor.emailVerified};
+
+  browser=await chromium.launch({headless:true});
+  context=await browser.newContext({viewport:{width:1500,height:1000}});
+  page=await context.newPage();
+  const pageErrors=[];page.on('pageerror',e=>pageErrors.push(clean(e?.message||e,1000)));
+  await page.goto(TARGET+'/?b2auth='+Date.now()+'#/inicio',{waitUntil:'domcontentloaded',timeout:30000});
+  await activate(page,auth,actor);
+
+  await setRole(page,'Operativo');
+  await page.evaluate(()=>{location.hash='#/inicio';});
+  await sleep(500);
+  const oper=await scopeSnapshot(page);
+  await setRole(page,'Asesor');
+  await sleep(500);
+  const asesor=await scopeSnapshot(page);
+  need(oper.scope==='all','B2_AUTH_OPERATIVO_SCOPE_NOT_ALL:'+JSON.stringify(oper));
+  need(asesor.scope==='own','B2_AUTH_ASESOR_SCOPE_NOT_OWN:'+JSON.stringify(asesor));
+  need(asesor.leakCount===0,'B2_AUTH_ASESOR_SCOPE_LEAK:'+JSON.stringify(asesor));
+  need(asesor.advisorIds.length<=1&&(!asesor.advisorIds.length||asesor.advisorIds[0]===asesor.advisorId),'B2_AUTH_ASESOR_ADVISOR_AGGREGATE_LEAK');
+  need(oper.counts.polizas>=asesor.counts.polizas&&oper.counts.recibosEsperados>=asesor.counts.recibosEsperados&&oper.counts.carteraPrimas>=asesor.counts.carteraPrimas,'B2_AUTH_ROLE_SCOPE_COUNTS_INVALID');
+  evidence.scope={operativo:oper,asesor};
+  await setRole(page,'Operativo');
+
+  const stamp=RUN.replace(/[^0-9A-Za-z]/g,'').slice(-12);
+  const clientName='B2 QA '+stamp,ident='B2QA-'+stamp,policyNo='B2-POL-'+stamp,renewNo='B2-REN-'+stamp;
+  state={clientName,policyNo,renewNo};
+
+  await page.evaluate(()=>{location.hash='#/cliente360';});
+  await sleep(500);
+  await page.evaluate(()=>Orbit.modules.cliente360.nuevoCliente());
+  await page.waitForSelector('#cli-nuevo #nc-ok',{timeout:8000});
+  await page.fill('#nc-nombre',clientName);
+  await page.fill('#nc-id',ident);
+  await page.fill('#nc-tel','+502 5555 0202');
+  await page.selectOption('#nc-pais','GT');
+  await page.selectOption('#nc-ase',actor.advisorId);
+  await page.evaluate(()=>document.getElementById('cli-nuevo').dispatchEvent(new MouseEvent('click',{bubbles:true})));
+  need(await page.locator('#cli-nuevo').count()===1,'B2_AUTH_CLIENT_CREATE_BACKDROP_CLOSED');
+  await page.click('#nc-ok');
+  await page.waitForSelector('#cli-nuevo',{state:'detached',timeout:25000});
+  const client=await waitFor(()=>oneBy(db,'clientes','nombre',clientName),'B2_AUTH_CLIENT_CREATE_READBACK');
+  state.clientId=client.id;evidence.writes.synthetic+=2;
+  need(client.asesorId===actor.advisorId,'B2_AUTH_CLIENT_ADVISOR_MISMATCH');
+
+  await page.waitForFunction(id=>!!Orbit.store.get('clientes',id),client.id,{timeout:15000});
+  await page.evaluate(id=>Orbit.modules.cliente360.edit(id),client.id);
+  await page.waitForSelector('#c360-edit #ce-save',{timeout:8000});
+  await page.fill('#ce-notas','B2 QA edit '+stamp);
+  await page.evaluate(()=>document.getElementById('c360-edit').dispatchEvent(new MouseEvent('click',{bubbles:true})));
+  need(await page.locator('#c360-edit').count()===1,'B2_AUTH_CLIENT_EDIT_BACKDROP_CLOSED');
+  await page.click('#ce-save');
+  await page.waitForSelector('#c360-edit',{state:'detached',timeout:25000});
+  const edited=await waitFor(async()=>{const x=await dataCol(db,'clientes').doc(client.id).get();const d=x.data()||{};return d.notas==='B2 QA edit '+stamp?d:null;},'B2_AUTH_CLIENT_EDIT_READBACK');
+  need(!!edited,'B2_AUTH_CLIENT_EDIT_NOT_DURABLE');evidence.writes.synthetic+=2;
+
+  await page.waitForFunction(id=>!!Orbit.store.get('clientes',id),client.id,{timeout:15000});
+  await page.evaluate(id=>Orbit.modules.cliente360.nuevaPoliza(id),client.id);
+  await page.waitForSelector('#policy-v1199 [data-save]',{timeout:10000});
+  await page.evaluate(()=>document.getElementById('policy-v1199').dispatchEvent(new MouseEvent('click',{bubbles:true})));
+  need(await page.locator('#policy-v1199').count()===1,'B2_AUTH_POLICY_BACKDROP_CLOSED');
+  await page.selectOption('#policy-v1199 [data-advisor]',actor.advisorId);
+  const insurerValue=await page.locator('#policy-v1199 [data-insurer] option').first().getAttribute('value');
+  need(insurerValue,'B2_AUTH_NO_LINKED_INSURER');
+  const autoRamo=await page.evaluate(()=>{
+    const s=document.querySelector('#policy-v1199 [data-ramo]');if(!s)return'';
+    const o=[...s.options].find(x=>/auto|veh/i.test(x.textContent||x.value||''));if(!o)return'';
+    s.value=o.value;s.dispatchEvent(new Event('change',{bubbles:true}));return o.value;
+  });
+  need(autoRamo,'B2_AUTH_NO_AUTO_RAMO_FOR_VEHICLE_PROOF');
+  await sleep(250);
+  need(await page.locator('#policy-v1199 [data-product] option').count()>0,'B2_AUTH_AUTO_PRODUCT_EMPTY');
+  await page.fill('#policy-v1199 [data-number]',policyNo);
+  const freqOptions=await page.locator('#policy-v1199 [data-frequency] option').allTextContents();
+  if(freqOptions.includes('Semestral'))await page.selectOption('#policy-v1199 [data-frequency]',{label:'Semestral'});
+  await page.fill('#policy-v1199 [data-installments]','2');
+  await page.fill('#policy-v1199 [data-net]','1000');
+  await page.fill('#policy-v1199 [data-issue]','50');
+  await page.fill('#policy-v1199 [data-sum]','100000');
+  await page.fill('#policy-v1199 [data-vbrand]','Toyota');
+  await page.fill('#policy-v1199 [data-vline]','Corolla');
+  await page.fill('#policy-v1199 [data-vplate]','B2'+stamp.slice(-5));
+  await page.fill('#policy-v1199 [data-vyear]','2026');
+  await page.fill('#policy-v1199 [data-vcolor]','Blanco');
+  await page.fill('#policy-v1199 [data-vvin]','VIN'+stamp);
+  await page.fill('#policy-v1199 [data-vchasis]','CH'+stamp);
+  await page.fill('#policy-v1199 [data-vmotor]','MO'+stamp);
+  await page.click('#policy-v1199 [data-save]');
+  await page.waitForSelector('#policy-v1199',{state:'detached',timeout:30000});
+  const policy=await waitFor(()=>oneBy(db,'polizas','numero',policyNo),'B2_AUTH_POLICY_CREATE_READBACK',30000);
+  state.policyId=policy.id;
+  need(policy.asesorId===actor.advisorId,'B2_AUTH_POLICY_SELLER_MISMATCH');
+  const vehicleRows=await waitFor(async()=>{const x=await rowsBy(db,'vehiculos','polizaId',policy.id);return x.length===1?x:null;},'B2_AUTH_VEHICLE_CREATE_READBACK');
+  const vehicle=vehicleRows[0];state.vehicleId=vehicle.id;
+  need(vehicle.linea==='Corolla'&&vehicle.color==='Blanco'&&vehicle.vin==='VIN'+stamp&&vehicle.chasis==='CH'+stamp&&vehicle.motor==='MO'+stamp,'B2_AUTH_VEHICLE_COMPLETE_FIELDS_MISMATCH');
+  const receipts=await rowsBy(db,'recibosEsperados','polizaId',policy.id),portfolio=await rowsBy(db,'carteraPrimas','polizaId',policy.id),cobros=await rowsBy(db,'cobros','polizaId',policy.id);
+  need(receipts.length>0&&portfolio.filter(x=>x.carteraActiva!==false).length>0,'B2_AUTH_POLICY_RECEIPTS_PORTFOLIO_MISSING');
+  need(cobros.length===0,'B2_AUTH_POLICY_CREATED_CONFIRMED_COBRO');
+  evidence.writes.synthetic+=2+receipts.length+portfolio.length+1;
+
+  await page.waitForFunction(id=>!!Orbit.store.get('polizas',id),policy.id,{timeout:15000});
+  await page.evaluate(id=>Orbit.modules.cliente360.editarPoliza(id),policy.id);
+  await page.waitForSelector('#policy-v1199 [data-save]',{timeout:10000});
+  need(await page.inputValue('#policy-v1199 [data-vcolor]')==='Blanco','B2_AUTH_VEHICLE_EDIT_PREFILL_MISSING');
+  await page.fill('#policy-v1199 [data-vcolor]','Azul');
+  await page.fill('#policy-v1199 [data-reason]','B2 QA actualización controlada');
+  await page.click('#policy-v1199 [data-save]');
+  await page.waitForSelector('#policy-v1199',{state:'detached',timeout:30000});
+  const vehicleEdited=await waitFor(async()=>{const s=await dataCol(db,'vehiculos').doc(vehicle.id).get();const d=s.data()||{};return d.color==='Azul'?d:null;},'B2_AUTH_VEHICLE_EDIT_READBACK',30000);
+  need(!!vehicleEdited,'B2_AUTH_VEHICLE_EDIT_NOT_DURABLE');
+  const vehicleCount=(await rowsBy(db,'vehiculos','polizaId',policy.id)).length;
+  need(vehicleCount===1,'B2_AUTH_VEHICLE_EDIT_DUPLICATED:'+vehicleCount);
+
+  const renewal=await page.evaluate(async ({policyId,stamp,renewNo})=>{
+    const p=Orbit.store.get('polizas',policyId),c=Orbit.store.get('clientes',p.clienteId);
+    const total=(+p.primaTotal||+p.primaNeta||1000)*1.05;
+    const req=Orbit.issuance.createRequest({
+      tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,aseguradoraId:p.aseguradoraId,
+      pais:p.pais||c.pais,moneda:p.moneda||c.moneda,ramo:p.ramo,producto:p.producto||p.subramo,
+      sourcePolicyId:p.id,acceptedConfirmed:true,primaNeta:1100,primaTotal:total,cuotas:2,frecuencia:'Semestral',
+      formaPago:p.formaPago||'Transferencia',acceptedOffer:{aseguradoraId:p.aseguradoraId,pais:p.pais||c.pais,moneda:p.moneda||c.moneda,ramo:p.ramo,producto:p.producto||p.subramo,primaNeta:1100,primaTotal:total,cuotas:2,frecuencia:'Semestral',formaPago:p.formaPago||'Transferencia',conducto:p.conducto||'Cobro directo del intermediario',sourceRef:'b2qa-'+stamp,documentRef:'quote-b2qa-'+stamp}
+    },{operationId:'b2qa_req_'+stamp,motivo:'B2 QA renovación controlada'});
+    if(!req.ok)return{ok:false,phase:'request',errors:req.errors||[]};
+    const issued=await Orbit.issuance.issueRequest(req.request.id,{
+      numero:renewNo,documentRef:'policy-b2qa-'+stamp,vigenciaInicio:p.vigenciaFin||'2027-09-20',vigenciaFin:'2028-09-20',
+      frecuencia:'Semestral',cuotas:2,formaPago:p.formaPago||'Transferencia',conducto:p.conducto||'Cobro directo del intermediario',
+      primaNeta:1100,gastosEmision:55,sourceRef:'b2qa-'+stamp
+    },{operationId:'b2qa_emit_'+stamp,motivo:'B2 QA emisión real de renovación'});
+    return{ok:!!issued.ok,phase:'issue',errors:issued.errors||[],requestId:req.request.id,policyId:issued.policy&&issued.policy.id};
+  },{policyId:policy.id,stamp,renewNo});
+  need(renewal.ok,'B2_AUTH_RENEWAL_RUNTIME_FAILED:'+JSON.stringify(renewal));
+  state.requestId=renewal.requestId;state.renewedPolicyId=renewal.policyId;
+  const renewed=await waitFor(()=>oneBy(db,'polizas','numero',renewNo),'B2_AUTH_RENEWED_POLICY_READBACK',30000);
+  need(renewed.renuevaDe===policy.id,'B2_AUTH_RENEWED_POLICY_SOURCE_LINK_MISSING');
+  const sourceAfter=await dataCol(db,'polizas').doc(policy.id).get();
+  need(sourceAfter.data()?.renovadaPor===renewed.id,'B2_AUTH_SOURCE_RENOVADA_POR_MISSING');
+  const renewalReceipts=await rowsBy(db,'recibosEsperados','polizaId',renewed.id),renewalPortfolio=await rowsBy(db,'carteraPrimas','polizaId',renewed.id),renewalCobros=await rowsBy(db,'cobros','polizaId',renewed.id);
+  need(renewalReceipts.length>0&&renewalPortfolio.filter(x=>x.carteraActiva!==false).length>0,'B2_AUTH_RENEWAL_RECEIPTS_PORTFOLIO_MISSING');
+  need(renewalCobros.length===0,'B2_AUTH_RENEWAL_CREATED_CONFIRMED_COBRO');
+  evidence.crud={clientIdHash:hash(client.id),policyIdHash:hash(policy.id),vehicleIdHash:hash(vehicle.id),clientCreateReadback:true,clientEditReadback:true,policyCreateReadback:true,advisorSellerReadback:true,vehicleCreateReadback:true,vehicleEditSameId:true,receipts:receipts.length,portfolio:portfolio.length,cobros:0,dirtyBackdropProtected:true};
+  evidence.renewal={requestIdHash:hash(renewal.requestId),newPolicyIdHash:hash(renewed.id),sourceLink:true,receipts:renewalReceipts.length,portfolio:renewalPortfolio.length,cobros:0,awaitedRuntime:true};
+  need(pageErrors.length===0,'B2_AUTH_PAGE_ERRORS:'+JSON.stringify(pageErrors.slice(0,5)));
+  evidence.pageErrors=[];evidence.status='PASS';
+}catch(error){
+  evidence.status='FAIL';evidence.errors.push(clean(error?.stack||error?.message||error,6000));throw error;
+}finally{
+  try{
+    if(app){
+      const db=getFirestore(app);
+      evidence.cleanup.deleted=await cleanupSynthetic(db,state);
+      evidence.writes.cleanup=evidence.cleanup.deleted;
+      if(state.clientId){
+        const still=await dataCol(db,'clientes').doc(state.clientId).get();
+        evidence.cleanup.clientAbsent=!still.exists;
+      }
+    }
+  }catch(e){evidence.cleanup.error=clean(e?.message||e,1200);}
+  try{if(context)await context.close();}catch{}
+  try{if(browser)await browser.close();}catch{}
+  try{if(app)await deleteApp(app);}catch{}
+  fs.writeFileSync(OUT,JSON.stringify(evidence,null,2)+'\n');
+}
+need(evidence.status==='PASS','B2_AUTH_NOT_PASS');
+need(evidence.cleanup.clientAbsent===true,'B2_AUTH_CLEANUP_CLIENT_REMAINS');
+console.log('I65_B2_AUTHENTICATED_PREVIEW=PASS');
+console.log('I65_B2_ACTIVE_ROLE_SCOPE=PASS');
+console.log('I65_B2_CLIENT_CREATE_EDIT=PASS');
+console.log('I65_B2_POLICY_SELLER=PASS');
+console.log('I65_B2_VEHICLE_CREATE_EDIT=PASS');
+console.log('I65_B2_RENEWAL_REAL_POLICY=PASS');
+console.log('I65_B2_CONFIRMED_COBRO_CREATED=0');
+console.log('I65_B2_SYNTHETIC_CLEANUP=PASS');
