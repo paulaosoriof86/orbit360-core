@@ -140,7 +140,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PAUSED_FOR_CLEANUP",
+    "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "629ff964a0f28e912c826ff7da05f1a145ed5a18",
     "exactPreviewBuildId": "gi-i65-b2-629ff964a0f2-57f234755dc1",
@@ -171,7 +171,23 @@
     "lastTimedOutAt": "2026-09-20T21:30:44-06:00",
     "retryPolicy": "ONLY_AFTER_ORPHAN_SYNTHETIC_CLEANUP_PASS",
     "failureClassification": "HARNESS_TIMEOUT_CAUSE_NOT_YET_LOCALIZED",
-    "productRegressionDeclared": false
+    "productRegressionDeclared": false,
+    "retryAttempt": 2,
+    "instrumented": true,
+    "instrumentedProofBlobSha": "3bdc60899eb8125b5e25858381ccd328bbe7baed",
+    "retryAuthorizedAfterCleanup": {
+      "currentRun": 35558851618,
+      "currentTarget": 35557909667,
+      "history": [
+        {
+          "cleanupRunId": 35558678312,
+          "orphanRunId": 35556007094,
+          "status": "PASS"
+        }
+      ]
+    },
+    "maxExpectedRuntimeMinutes": 10,
+    "timeoutFailureMayNotBeDeclaredProductFailure": true
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",

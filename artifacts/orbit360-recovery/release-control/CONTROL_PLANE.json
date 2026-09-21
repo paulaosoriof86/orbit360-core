@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_DUPLICATE_RUN_CLEANUP_PENDING_AUTH_PROOF_PAUSED",
+    "mechanismSyncStatus": "B2_AUTHENTICATED_PREVIEW_RETRY_2_PENDING",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2008,7 +2008,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "5359ec415605be48f15bac5a4fcbb1e4e44f7e85",
+    "b2ExecutionLockBlobSha": "a2d24facd3653ec9324034e1b4ea315eb6cb9d76",
     "b2": {
       "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
@@ -2033,14 +2033,16 @@
       "artifactId": 10619780376,
       "exactReadback": true,
       "functionalPass": true,
-      "authenticatedPreviewProof": "PAUSED_FOR_CLEANUP",
+      "authenticatedPreviewProof": "AUTHORIZED_PENDING_RUN_RETRY_2",
       "authenticatedPreviewProofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "orphanSyntheticCleanup": "PASS",
       "timedOutAuthenticatedRunId": 35556007094,
       "authenticatedPreviewTimedOutRunId": 35556007094,
       "authenticatedPreviewFailureClassification": "HARNESS_TIMEOUT_CAUSE_NOT_YET_LOCALIZED",
       "orphanSyntheticCleanupRunId": 35558851618,
-      "orphanSyntheticCleanupTargetRunId": 35557909667
+      "orphanSyntheticCleanupTargetRunId": 35557909667,
+      "authenticatedPreviewRetryAttempt": 2,
+      "allTimedOutSyntheticMarkersClean": true
     }
   }
 }
