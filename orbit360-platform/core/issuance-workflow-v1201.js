@@ -185,7 +185,7 @@ Orbit.issuance = (function () {
     return { ok: true, request: after };
   }
 
-  function issueRequest(id, policyInput, options) {
+  async function issueRequest(id, policyInput, options) {
     policyInput = policyInput || {}; options = options || {};
     if (!canManage()) return { ok: false, errors: ['permiso_emision_denegado'] };
     const request = S().get('gestiones', id);
@@ -225,7 +225,7 @@ Orbit.issuance = (function () {
     if (!raw.vigenciaInicio || !raw.vigenciaFin) return { ok: false, errors: ['vigencia_real_requerida'] };
     if (!raw.documentRef) return { ok: false, errors: ['documento_poliza_emitida_requerido'] };
     const opId = options.operationId || operationId('emit');
-    const created = P().createPolicy(raw, { operationId: opId, motivo: options.motivo || 'Conversión de solicitud de emisión con número real' });
+    const created = await P().createPolicy(raw, { operationId: opId, motivo: options.motivo || 'Conversión de solicitud de emisión con número real' });
     if (!created.ok) return created;
     const policy = created.policy;
     S().update('polizas', policy.id, {
