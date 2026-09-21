@@ -2008,7 +2008,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "33c739d4f6ee44014bd3ef9d7f6e2c8cf28533aa",
+    "b2ExecutionLockBlobSha": "2f7523b560c61c4b482c7801cae03e96f6b277e9",
     "b2": {
       "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
@@ -2035,10 +2035,11 @@
       "functionalPass": true,
       "authenticatedPreviewProof": "PAUSED_FOR_CLEANUP",
       "authenticatedPreviewProofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-      "orphanSyntheticCleanup": "AUTHORIZED_PENDING_RUN",
+      "orphanSyntheticCleanup": "PASS",
       "timedOutAuthenticatedRunId": 35556007094,
       "authenticatedPreviewTimedOutRunId": 35556007094,
-      "authenticatedPreviewFailureClassification": "HARNESS_TIMEOUT_CAUSE_NOT_YET_LOCALIZED"
+      "authenticatedPreviewFailureClassification": "HARNESS_TIMEOUT_CAUSE_NOT_YET_LOCALIZED",
+      "orphanSyntheticCleanupRunId": 35558678312
     }
   }
 }

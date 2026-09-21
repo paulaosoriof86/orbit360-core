@@ -174,7 +174,7 @@
     "productRegressionDeclared": false
   },
   "orphanSyntheticCleanup": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PASS",
     "orphanRunId": 35556007094,
     "cleanupScript": "tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs",
     "markerSet": {
@@ -189,6 +189,34 @@
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
       "emailSendAuthorized": false
+    },
+    "runId": 35558678312,
+    "before": {
+      "clients": [],
+      "policies": [],
+      "counts": {
+        "actividades": 0,
+        "gestiones": 0,
+        "cobros": 0,
+        "carteraPrimas": 0,
+        "recibosEsperados": 0,
+        "vehiculos": 0,
+        "polizas": 0
+      }
+    },
+    "deleted": {
+      "actividades": 0,
+      "gestiones": 0,
+      "cobros": 0,
+      "carteraPrimas": 0,
+      "recibosEsperados": 0,
+      "vehiculos": 0,
+      "polizas": 0,
+      "clientes": 0
+    },
+    "after": {
+      "clients": 0,
+      "policies": 0
     }
   }
 }
