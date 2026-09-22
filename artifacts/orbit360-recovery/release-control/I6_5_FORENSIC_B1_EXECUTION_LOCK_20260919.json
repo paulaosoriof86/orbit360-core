@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "VISUAL_REJECTED_R4_MOBILE_SHELL_ROOT_CAUSE_DEMONSTRATED",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1356,5 +1356,99 @@
     "live": false,
     "brandingTouched": false,
     "emailTransportChanged": false
+  },
+  "visualRejection20260921R13": {
+    "status": "FORMALLY_RECORDED",
+    "exactPreview": {
+      "sourceSha": "c1477d05450eb7a60162b8c1fcb48a4bca8b89e4",
+      "buildId": "gi-i65-b1-c1477d05450e-57f234755dc1",
+      "channelId": "gi-i65-b1-35455766715",
+      "url": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
+      "runId": 35656921823,
+      "artifactId": 10666101952,
+      "artifactDigest": "e1e6806245ac8d6fd0330a0aef004830a1ac4b37d5525de5058c9f1024714829",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false
+    },
+    "observedByPaula": {
+      "mobileHamburger": "NOT_VISIBLE",
+      "mobileRoleSelector": "NOT_VISIBLE_CANNOT_SWITCH_ACTIVE_ROLE",
+      "mobileGlobalSearch": "PERSISTENT_FIXED_CHROME_OVER_CONTENT",
+      "pwaInstallCta": "FIXED_OVERLAY_COVERS_MODULE_CONTENT",
+      "cobrosResponsive": "TABLE_CONTENT_COMPRESSED_OR_FRAGMENTED",
+      "productBrand": "GRAVICENTRA_INSURANCE_NOT_VISIBLE_WHILE_TENANT_LOGO_VISIBLE",
+      "moduleRuntime": "CLIENTE360_POLICY_DETAIL_AND_COBROS_LOAD;PRIOR_WHITE_SCREEN_NOT_REPRODUCED"
+    },
+    "additionalImagesRequired": false
+  },
+  "mobileRootCauseAudit20260921": {
+    "status": "ROOT_CAUSES_DEMONSTRATED_FROM_CURRENT_SOURCE_AND_USER_RUNTIME",
+    "productCauses": {
+      "roleSelector": {
+        "owner": [
+          "orbit360-platform/styles/base.css",
+          "orbit360-platform/styles/infra.css"
+        ],
+        "cause": "The current responsive rules explicitly set .tb-rol{display:none} below mobile/tablet breakpoints, so active-role switching is intentionally removed from the mobile UI."
+      },
+      "shellRowsHamburgerAndBrand": {
+        "owner": [
+          "orbit360-platform/styles/base.css",
+          "orbit360-platform/core/public-tenant-branding.js"
+        ],
+        "cause": "The mobile shell is dimensioned as a two-row 104px topbar and forces search to a full-width second row, but public branding applies inline display:flex/min-width:120px to .tb-logo, overriding the responsive rule that intended to hide the tenant logo. The remaining visible controls (burger, product brand, tenant logo, country, icons, user) cannot fit one 390px row, so they wrap before the full-width search and create at least three effective rows inside a two-row height contract. This displaces/clips the hamburger/product brand and breaks the canonical shell composition."
+      },
+      "persistentSearch": {
+        "owner": [
+          "orbit360-platform/styles/base.css"
+        ],
+        "cause": "At <=560px .tb-search is explicitly re-enabled as display:flex, order:99, flex:0 0 100% inside a position:fixed topbar. It therefore remains persistent while content scrolls; there is no collapse/dismiss state."
+      },
+      "pwaOverlay": {
+        "owner": [
+          "orbit360-platform/core/pwa.js"
+        ],
+        "cause": "showInstall() creates #pwa-install with position:fixed, bottom:18px and z-index:300 and keeps it present for the installable state. It does not reserve viewport/content space or collapse after the initial prompt, so it overlays live module content."
+      },
+      "cobrosResponsive": {
+        "owner": [
+          "orbit360-platform/styles/base.css",
+          "orbit360-platform/modules/cobros.js"
+        ],
+        "cause": "The global mobile table strategy only changes .tbl to overflow-x:auto; it does not provide a mobile semantic/card layout or non-wrapping column contract. Dense reconciliation columns therefore wrap/fragment inside the viewport and remain difficult to operate."
+      }
+    },
+    "qaRootCause": {
+      "historicalShellValidator": {
+        "evidenceFiles": [
+          "tools/orbit360-validar-shell-mobile-visual-v20260803.mjs",
+          "orbit360-platform/docs/evidence/SHELL-MOBILE-RC1-FOCUSED-LOCAL-20260803.json"
+        ],
+        "cause": "The historical 390x844 shell fixture contained only hamburger, product brand and search. It did not model tenant logo, country selector, role selector, theme/mail/notifications/user or PWA install CTA, so PASS proved topbar offset but not the real production shell composition."
+      },
+      "b1R12Gap": {
+        "evidenceFile": "tools/gravicentra-i6-5-b1-r12-role-route-readonly.mjs",
+        "cause": "R12 proved active-role routing and module responsiveness at desktop viewport, but did not include a real mobile 390x844 shell matrix. B1 therefore reached technical PASS without testing the viewport that later failed visually."
+      }
+    },
+    "nonCauses": [
+      "Not a browser-specific failure: the defects are encoded in current CSS/JS owners.",
+      "Not a Firestore/data/import problem.",
+      "Not the prior Cliente360 recursion: mobile screenshots demonstrate Cliente360/policy/cobros content now loads."
+    ],
+    "patchRule": "ONE_CROSS_SHELL_FIX_PLUS_TARGETED_COBROS_MOBILE_PRESENTATION;NO_MODULE_BY_MODULE_OFFSETS;NO_REIMPORT;NO_B2;NO_LIVE",
+    "mandatoryProofBeforeVisualRetry": [
+      "390x844 and 430x932 real full-shell runtime",
+      "hamburger visible and opens/closes sidebar",
+      "active role switch Operativo-Asesor-Operativo accessible on mobile",
+      "Gravicentra Insurance product identity visible without tenant-logo collision",
+      "global search does not permanently obscure content",
+      "PWA install CTA does not cover interactive/content area",
+      "Cliente360 Polizas Cobros Inicio routes render under mobile shell",
+      "Cobros reconciliation content readable/operable without broken text fragmentation",
+      "F5 preserves session and selected role",
+      "zero page errors and zero operational writes"
+    ]
   }
 }
