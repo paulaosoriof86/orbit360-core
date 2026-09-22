@@ -413,7 +413,20 @@ button.kpi-click:active{transform:translateY(0)}
   }
   #shell{padding-top:var(--topbar-h)}
   #sidebar{top:var(--topbar-h);height:calc(100vh - var(--topbar-h));max-height:none}
-  .sb-overlay{top:var(--topbar-h)}
+  .sb-overlay{
+    position:fixed!important;
+    top:var(--topbar-h)!important;
+    right:0!important;
+    bottom:0!important;
+    left:0!important;
+    width:auto!important;
+    height:auto!important;
+    pointer-events:none;
+  }
+  .sb-overlay.show{
+    display:block!important;
+    pointer-events:auto!important;
+  }
 }
 
 

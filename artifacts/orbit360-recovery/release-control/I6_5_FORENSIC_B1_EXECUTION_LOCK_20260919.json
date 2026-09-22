@@ -1526,6 +1526,33 @@
       "status": "AUTHORIZED",
       "productSourceUnchanged": true,
       "backendSourceUnchanged": true
+    },
+    "proofAttempt4": {
+      "runId": 35678977351,
+      "status": "PRODUCT_MOBILE_OVERLAY_GEOMETRY_FAILURE",
+      "failure": "Sidebar opened, but .sb-overlay.show had bounding rect 0x0 and could not receive outside tap.",
+      "precedingProof": [
+        "source contracts PASS",
+        "exact Preview readback PASS",
+        "B1 functional PASS",
+        "R12 active-role/routes PASS",
+        "burger visible/tappable and sidebar opened"
+      ],
+      "operationalWrites": 0
+    },
+    "r15OverlayFix": {
+      "status": "SOURCE_READY_PENDING_PREVIEW",
+      "cause": "Overlay geometry depended on distributed responsive rules and allowed show-state without guaranteed viewport surface.",
+      "fix": "Explicit fixed top/right/bottom/left geometry and pointer-events contract for .sb-overlay/.show.",
+      "cacheBust": "base.css/router.js/pwa.js b1r15 + service worker generation b1r15",
+      "productFiles": [
+        "orbit360-platform/styles/base.css",
+        "orbit360-platform/index.html",
+        "orbit360-platform/sw.js"
+      ],
+      "noDataWrites": true,
+      "noLive": true,
+      "noB2": true
     }
   }
 }

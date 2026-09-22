@@ -1942,7 +1942,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B1_R14_RETRY_4_BACKEND_UNCHANGED",
+    "mechanismSyncStatus": "B1_R15_OVERLAY_GEOMETRY_CANDIDATE_PENDING_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "95b7a07babdd1ea85eaf23da7cebff282a13a784",
+    "b1ExecutionLockBlobSha": "dd8d77fff42f10fde44c19c264a885e64fec97ef",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "c1477d05450eb7a60162b8c1fcb48a4bca8b89e4",
@@ -1964,7 +1964,7 @@
       "mobileShell": "PATCHED_PENDING_PREVIEW",
       "qaCoverageGap": "DEMONSTRATED",
       "desktopRoleRouteR12": "PASS_PRESERVED",
-      "r14MobileProof": "RETRY_4_BACKEND_UNCHANGED_REUSE"
+      "r14MobileProof": "RETRY_5_AFTER_OVERLAY_GEOMETRY_FIX"
     },
     "lastVisualRejection": {
       "recordedAt": "2026-09-20T19:17:00-06:00",
