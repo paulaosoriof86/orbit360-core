@@ -1508,6 +1508,24 @@
       "status": "AUTHORIZED",
       "method": "elementFromPoint hit-target assertion + touchscreen coordinate tap",
       "productSourceUnchanged": true
+    },
+    "backendReuse": {
+      "status": "VERIFIED_UNCHANGED_REUSE_AUTHORIZED",
+      "verifiedSource": "38d768ccad183a19aae59c10968dfa347a56e58d",
+      "verifiedRunId": 35671498724,
+      "verifiedFunctions": [
+        "orbit360TenantBranding",
+        "orbit360ProductOperationalCommand",
+        "orbit360ProvisionTeamAccess",
+        "orbit360TenantDomainConfig"
+      ],
+      "evidence": "Run 35671498724 reported Successful update operation for all four functions; compare 38d768cc..cc11b9c1 changes only CONTROL_PLANE, B1 lock and R14 proof.",
+      "rule": "Skip backend redeploy when backend owner paths are byte-unchanged; branding config readback remains mandatory."
+    },
+    "proofRetry4": {
+      "status": "AUTHORIZED",
+      "productSourceUnchanged": true,
+      "backendSourceUnchanged": true
     }
   }
 }

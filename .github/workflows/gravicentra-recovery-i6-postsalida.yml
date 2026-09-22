@@ -3019,19 +3019,31 @@ jobs:
           set -euo pipefail
           node tools/gravicentra-i6-5-b1-advisor-normalize.mjs "$RUNNER_TEMP/b1-advisor-normalization.json"
           cp "$RUNNER_TEMP/b1-advisor-normalization.json" "$RUNNER_TEMP/b1-package/evidence/b1-advisor-normalization.json"
-      - name: Deploy B1 backend owners and verify canonical branding config
+      - name: Deploy B1 backend only when backend source changed; verify branding config
         if: steps.mode.outputs.mode == 'preview'
         run: |
           set -euo pipefail
           E="$RUNNER_TEMP/b1-package/evidence";mkdir -p "$E"
-          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b1-functions-before.json"
-          FROOT="$RUNNER_TEMP/b1-functions";mkdir -p "$FROOT";cp -a "$RUNNER_TEMP/b1-package/bundle/backend" "$FROOT/backend";(cd "$FROOT/backend"&&npm ci --ignore-scripts --no-audit --no-fund >/dev/null);echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantBranding,functions:orbit360ProductOperationalCommand,functions:orbit360ProvisionTeamAccess,functions:orbit360TenantDomainConfig --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          BACKEND_VERIFIED_SOURCE="38d768ccad183a19aae59c10968dfa347a56e58d"
+          BACKEND_PATHS=(functions/tenant-branding.js functions/user-onboarding.js functions/product-operational-domain.js functions/tenant-domain-config.js functions/bootstrap.js functions/package.json functions/package-lock.json)
+          if git diff --quiet "$BACKEND_VERIFIED_SOURCE" "$GITHUB_SHA" -- "${BACKEND_PATHS[@]}"; then
+            printf '{"status":"SKIPPED_UNCHANGED","verifiedSource":"%s","verifiedRunId":35671498724,"functions":["orbit360TenantBranding","orbit360ProductOperationalCommand","orbit360ProvisionTeamAccess","orbit360TenantDomainConfig"]}\n' "$BACKEND_VERIFIED_SOURCE" > "$E/b1-backend-deploy.json"
+            echo "B1_BACKEND_DEPLOY=SKIPPED_UNCHANGED"
+          else
+            FROOT="$RUNNER_TEMP/b1-functions";mkdir -p "$FROOT";cp -a "$RUNNER_TEMP/b1-package/bundle/backend" "$FROOT/backend";(cd "$FROOT/backend"&&npm ci --ignore-scripts --no-audit --no-fund >/dev/null);echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
+            for attempt in 1 2 3; do
+              if node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantBranding,functions:orbit360ProductOperationalCommand,functions:orbit360ProvisionTeamAccess,functions:orbit360TenantDomainConfig --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive; then
+                printf '{"status":"DEPLOYED","attempt":%s,"source":"%s"}\n' "$attempt" "$GITHUB_SHA" > "$E/b1-backend-deploy.json"
+                break
+              fi
+              test "$attempt" -lt 3 || exit 1
+              sleep $((attempt*10))
+            done
+          fi
           export E TENANT_HINT
-          (cd "$FROOT/backend" && node - <<'NODE'
+          node - <<'NODE'
           const fs=require('fs');const {initializeApp,cert}=require('firebase-admin/app');const {getFirestore}=require('firebase-admin/firestore');const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));initializeApp({credential:cert(sa),projectId:process.env.PROJECT_ID});(async()=>{const s=await getFirestore().collection('tenants').doc(process.env.TENANT_HINT).collection('config').doc('branding').get();if(!s.exists)throw Error('B1_BRANDING_CONFIG_MISSING');const b=s.data()||{};if(!String(b.displayName||'').trim()||!String(b.logo||'').trim()||!String(b.favicon||'').trim())throw Error('B1_BRANDING_CONFIG_INVALID');fs.writeFileSync(process.env.E+'/b1-branding-readback.json',JSON.stringify({exists:true,writeExecuted:false,logo:String(b.logo),favicon:String(b.favicon)},null,2)+'\n')})().catch(e=>{console.error(e);process.exit(1)});
           NODE
-          )
       - name: Deploy exact B1 package to isolated Preview
         if: steps.mode.outputs.mode == 'preview'
         id: preview
