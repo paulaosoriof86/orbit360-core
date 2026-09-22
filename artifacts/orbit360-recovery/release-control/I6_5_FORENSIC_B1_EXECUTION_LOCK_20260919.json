@@ -1482,6 +1482,19 @@
     "dataWrites": 0,
     "reimport": false,
     "live": false,
-    "b2": false
+    "b2": false,
+    "proofAttempt1": {
+      "runId": 35671498724,
+      "status": "VALIDATOR_PRECONDITION_FAILURE",
+      "productAssertionsBeforeFailure": "PASSED_TO_BURGER_CLICK",
+      "cause": "Fresh authenticated runner opened mandatory legal gate overlay; overlay intercepted pointer input before shell interaction.",
+      "productRegressionDeclared": false,
+      "operationalWrites": 0
+    },
+    "proofRetry2": {
+      "status": "AUTHORIZED",
+      "treatment": "Remove fresh-session legal gate only from ephemeral browser DOM; do not accept terms, do not persist, do not call writers.",
+      "productSourceUnchanged": true
+    }
   }
 }
