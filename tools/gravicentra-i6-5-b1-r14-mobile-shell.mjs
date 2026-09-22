@@ -34,7 +34,7 @@ async function route(page,r){await page.evaluate(x=>{location.hash='#/'+x;},r);a
 const ev={status:'RUNNING',writes:0,viewports:[],errors:[]};let app,browser;
 try{
  need(PROJECT&&TENANT&&TARGET,'B1_R14_ENV');
- const sw=fs.readFileSync('orbit360-platform/sw.js','utf8');need(sw.includes('orbit360-v20260921-b1r14-mobile-shell-1'),'B1_R14_SW_GENERATION');
+ const sw=fs.readFileSync('orbit360-platform/sw.js','utf8');need(sw.includes('orbit360-v20260921-b1r15-mobile-shell-1'),'B1_R14_SW_GENERATION');
  app=initializeApp({credential:cert(sa()),projectId:PROJECT},'b1-r14-'+Date.now());const db=getFirestore(app),auth=getAuth(app),a=await actor(db,auth);
  browser=await chromium.launch({headless:true});
  for(const vp of [{width:390,height:844},{width:430,height:932}]){

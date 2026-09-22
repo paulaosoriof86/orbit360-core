@@ -1553,6 +1553,23 @@
       "noDataWrites": true,
       "noLive": true,
       "noB2": true
+    },
+    "proofAttempt5": {
+      "runId": 35682586046,
+      "status": "VALIDATOR_STALE_EXPECTATION",
+      "productAssertionsBeforeFailure": [
+        "Exact Preview readback PASS",
+        "B1 functional PASS",
+        "R12 PASS"
+      ],
+      "cause": "R14 validator still required SW generation b1r14 after product intentionally advanced to b1r15 to invalidate stale mobile shell cache.",
+      "productRegressionDeclared": false,
+      "operationalWrites": 0
+    },
+    "proofRetry6": {
+      "status": "AUTHORIZED",
+      "productSourceUnchanged": true,
+      "expectedSwGeneration": "orbit360-v20260921-b1r15-mobile-shell-1"
     }
   }
 }
