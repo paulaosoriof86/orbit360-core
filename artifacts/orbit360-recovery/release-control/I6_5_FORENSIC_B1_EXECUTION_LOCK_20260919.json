@@ -1495,6 +1495,19 @@
       "status": "AUTHORIZED",
       "treatment": "Remove fresh-session legal gate only from ephemeral browser DOM; do not accept terms, do not persist, do not call writers.",
       "productSourceUnchanged": true
+    },
+    "proofAttempt2": {
+      "runId": 35672256555,
+      "status": "VALIDATOR_INPUT_METHOD_FAILURE",
+      "productAssertionsBeforeFailure": "BURGER_VISIBLE_ENABLED_STABLE",
+      "cause": "Playwright locator.click auto-wait stalled under touch emulation without a product exception or pointer-interceptor finding.",
+      "productRegressionDeclared": false,
+      "operationalWrites": 0
+    },
+    "proofRetry3": {
+      "status": "AUTHORIZED",
+      "method": "elementFromPoint hit-target assertion + touchscreen coordinate tap",
+      "productSourceUnchanged": true
     }
   }
 }

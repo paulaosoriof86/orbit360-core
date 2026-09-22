@@ -13,6 +13,12 @@ function sa(){for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']
 function roles(m){return uniq([...(m?.roles||[]),...(m?.rolesAsignados||[]),m?.role,m?.rol]);}
 async function actor(db,auth){const s=await db.collection('tenants').doc(TENANT).collection('members').get(),a=[];for(const d of s.docs){const m=d.data()||{},r=roles(m).map(rn).sort(),active=!(m.active===false||m.activo===false);if(!active||r.length!==2||r[0]!=='asesor'||r[1]!=='operativo')continue;try{const u=await auth.getUser(m.uid||d.id);if(!u.disabled)a.push({uid:u.uid});}catch{}}need(a.length===1,'B1_R14_ACTOR_CARDINALITY:'+a.length);return a[0];}
 async function activate(page,auth,uid){const t=await auth.createCustomToken(uid,{b1R14ReadOnly:true});await page.waitForFunction(()=>!!Orbit?.productRuntimeBrowserProvidersP0&&!!Orbit?.productAppP0,null,{timeout:20000});await page.evaluate(async x=>{const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,x);if(!Orbit.productAppP0.status?.().started)await Orbit.productAppP0.activate();},t);await page.waitForFunction(()=>Orbit.store?._productStatus?.().ready===true,null,{timeout:30000});}
+async function tapReal(page,selector){
+  const hit=await page.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return{ok:false,reason:'MISSING'};const r=e.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,t=document.elementFromPoint(x,y);return{ok:!!t&&(t===e||e.contains(t)),x,y,top:t?{id:t.id||'',cls:String(t.className||''),tag:t.tagName}:null,rect:{x:r.x,y:r.y,width:r.width,height:r.height}};},selector);
+  need(hit.ok,'B1_R14_HIT_TARGET:'+selector+':'+JSON.stringify(hit));
+  await page.touchscreen.tap(hit.x,hit.y);
+  return hit;
+}
 async function neutralizeFreshSessionLegalGate(page){
   return page.evaluate(()=>{
     const gates=[...document.querySelectorAll('[data-legal-gate]')];
@@ -41,12 +47,12 @@ try{
    need(layout.topbar.rect.height<=108,'B1_R14_TOPBAR_TOO_TALL:'+layout.topbar.rect.height);
    for(const k of ['burger','brand','country','role','searchToggle','theme','mail','bell','user'])need(layout[k].rect.right<=vp.width+1&&layout[k].rect.x>=-1&&layout[k].rect.bottom<=layout.topbar.rect.bottom+1,'B1_R14_CONTROL_OUTSIDE:'+k+':'+vp.width);
 
-   await page.locator('#burger').click({timeout:5000});await page.waitForFunction(()=>document.querySelector('#sidebar')?.classList.contains('open')&&document.querySelector('.sb-overlay')?.classList.contains('show'),null,{timeout:3000});await page.locator('.sb-overlay').click();await page.waitForFunction(()=>!document.querySelector('#sidebar')?.classList.contains('open'),null,{timeout:3000});
+   const burgerHit=await tapReal(page,'#burger');await page.waitForFunction(()=>document.querySelector('#sidebar')?.classList.contains('open')&&document.querySelector('.sb-overlay')?.classList.contains('show'),null,{timeout:3000});await tapReal(page,'.sb-overlay');await page.waitForFunction(()=>!document.querySelector('#sidebar')?.classList.contains('open'),null,{timeout:3000});
 
    const options=await page.locator('#rol-sel option').allTextContents();need(options.some(x=>x.trim()==='Asesor')&&options.some(x=>x.trim()==='Operativo'),'B1_R14_ROLE_OPTIONS:'+options.join('|'));
    await chooseRole(page,'Asesor');await chooseRole(page,'Operativo');
 
-   await page.locator('#tb-search-toggle').click();await page.waitForFunction(()=>getComputedStyle(document.querySelector('.tb-search')).display!=='none'&&document.querySelector('.tb-search').classList.contains('mobile-open'),null,{timeout:3000});need(await page.locator('.tb-search input').evaluate(e=>document.activeElement===e),'B1_R14_SEARCH_FOCUS');await page.locator('#tb-search-toggle').click();await page.waitForFunction(()=>getComputedStyle(document.querySelector('.tb-search')).display==='none',null,{timeout:3000});
+   const searchHit=await tapReal(page,'#tb-search-toggle');await page.waitForFunction(()=>getComputedStyle(document.querySelector('.tb-search')).display!=='none'&&document.querySelector('.tb-search').classList.contains('mobile-open'),null,{timeout:3000});need(await page.locator('.tb-search input').evaluate(e=>document.activeElement===e),'B1_R14_SEARCH_FOCUS');await tapReal(page,'#tb-search-toggle');await page.waitForFunction(()=>getComputedStyle(document.querySelector('.tb-search')).display==='none',null,{timeout:3000});
 
    await page.waitForFunction(()=>!!Orbit?.pwa?.install,null,{timeout:10000});await page.evaluate(()=>Orbit.pwa.install('instalar'));await page.waitForSelector('#pwa-install',{timeout:3000});
    const install=await page.locator('#pwa-install').evaluate(e=>{const r=e.getBoundingClientRect(),h=document.querySelector('#host')?.getBoundingClientRect(),c=getComputedStyle(e);return{parent:e.parentElement?.id||'',position:c.position,bottom:r.bottom,hostTop:h?.top||0};});
@@ -58,7 +64,7 @@ try{
 
    await chooseRole(page,'Asesor');await page.reload({waitUntil:'domcontentloaded',timeout:30000});await page.waitForFunction(()=>Orbit.store?._productStatus?.().ready===true,null,{timeout:30000});await neutralizeFreshSessionLegalGate(page);need(await page.evaluate(()=>Orbit.session?.rol?.())==='Asesor','B1_R14_F5_ROLE_LOST');await chooseRole(page,'Operativo');
    need(pageErrors.length===0,'B1_R14_PAGEERROR:'+pageErrors.join('|'));
-   ev.viewports.push({vp,layout,install,table,pageErrors,roleAfterF5:'Asesor',freshSessionLegalGateRemoved:legalGateRemoved});await context.close();
+   ev.viewports.push({vp,layout,install,table,pageErrors,roleAfterF5:'Asesor',freshSessionLegalGateRemoved:legalGateRemoved,burgerHit,searchHit});await context.close();
  }
  ev.status='PASS';
 }catch(e){ev.status='FAIL';ev.errors.push(clean(e?.stack||e?.message||e,5000));}
