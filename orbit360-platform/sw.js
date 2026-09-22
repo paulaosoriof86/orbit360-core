@@ -1,8 +1,8 @@
 /* Orbit 360 · Service Worker — red primero con fallback offline y CSS esencial.
    El shell nunca debe quedar sin estilos por caché incompleta o respuesta MIME inválida. */
-var CACHE = 'orbit360-v20260905-recovery-i2-canonical-role-owner-1';
-var BUILD = '20260905-recovery-i2-canonical-role-owner-1';
-var CRITICAL_RELEASE = 'recovery-i2-canonical-role-owner-20260905-1';
+var CACHE = 'orbit360-v20260921-b1r14-mobile-shell-1';
+var BUILD = '20260921-b1r14-mobile-shell-1';
+var CRITICAL_RELEASE = 'b1r14-mobile-shell-20260921-1';
 var RUNTIME_CONTRACT_TIMEOUT_MS = 8000;
 var RUNTIME_CONTRACT_CACHE_STRATEGY = 'network-first-bounded-fallback';
 var RUNTIME_CONTRACT_PATHS = [

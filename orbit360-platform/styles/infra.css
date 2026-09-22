@@ -552,7 +552,7 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 /* ---------- TOPBAR: ver como (rol) ---------- */
 .tb-rol{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:5px 10px 5px 11px;font-size:12.5px}
 .tb-rol select{border:none;background:none;font-family:var(--f-display);font-weight:700;font-size:12.5px;color:var(--ink);cursor:pointer;outline:none}
-@media(max-width:880px){.tb-rol{display:none}}
+@media(min-width:561px) and (max-width:880px){.tb-rol{display:none}}
 
 /* ---------- FICHA TABS: affordance "hay más" ---------- */
 .ficha-tabs-wrap{position:relative;margin:18px 0 16px}

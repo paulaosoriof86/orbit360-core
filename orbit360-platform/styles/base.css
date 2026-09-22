@@ -415,3 +415,66 @@ button.kpi-click:active{transform:translateY(0)}
   #sidebar{top:var(--topbar-h);height:calc(100vh - var(--topbar-h));max-height:none}
   .sb-overlay{top:var(--topbar-h)}
 }
+
+
+/* ---------- B1 R14 · SHELL MÓVIL CANÓNICO ----------
+   El shell real usa dos filas. Tenant logo no compite con producto en móvil;
+   rol y navegación siguen operables; búsqueda se abre bajo demanda. */
+.tb-search-toggle{display:none}
+#pwa-mobile-slot{display:none}
+@media(max-width:560px){
+  :root{--topbar-h:104px}
+  .topbar{
+    display:grid;
+    grid-template-columns:36px minmax(70px,1fr) repeat(5,36px);
+    grid-template-rows:40px 40px;
+    column-gap:6px;
+    row-gap:6px;
+    align-items:center;
+    align-content:center;
+    height:var(--topbar-h);
+    min-height:var(--topbar-h);
+    padding:6px 10px;
+    overflow:visible;
+    flex-wrap:initial;
+  }
+  .tb-burger{grid-column:1;grid-row:1;display:grid!important;place-items:center;position:relative;z-index:2}
+  .brand{grid-column:2 / span 3;grid-row:1;min-width:0;overflow:hidden;gap:6px}
+  .brand-mark{width:20px;height:20px}
+  .brand-name{font-size:11.5px;white-space:nowrap}
+  .brand-sub{display:none}
+  .tb-logo{display:none!important}
+  .tb-spacer{display:none}
+  #sw-pais{grid-column:5 / span 3;grid-row:1;justify-self:stretch;min-width:0;max-width:none;padding:4px 7px;gap:4px}
+  #sw-pais select{min-width:0;width:100%;max-width:100%;font-size:11.5px;text-overflow:ellipsis}
+  .topbar .tb-rol{grid-column:1 / span 2;grid-row:2;display:flex!important;min-width:0;max-width:none;padding:4px 6px;gap:3px;margin:0;overflow:hidden}
+  .topbar .tb-rol select{min-width:0;width:100%;max-width:100%;font-size:11.5px}
+  .tb-search-toggle{grid-column:3;grid-row:2;display:grid}
+  #sw-theme{grid-column:4;grid-row:2}
+  #tb-mail{grid-column:5;grid-row:2}
+  #nov-bell{grid-column:6;grid-row:2}
+  #tb-user{grid-column:7;grid-row:2;padding-left:0;gap:0}
+  .tb-ico,.tb-user .av{width:34px;height:34px}
+  .tb-search{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:10px;
+    right:10px;
+    width:auto;
+    min-width:0;
+    margin:0;
+    padding:8px 12px;
+    z-index:75;
+    box-shadow:var(--sh-2);
+    background:var(--card);
+  }
+  .tb-search.mobile-open{display:flex}
+  #shell{padding-top:var(--topbar-h)}
+  #sidebar{top:var(--topbar-h);height:calc(100vh - var(--topbar-h));max-height:none}
+  .sb-overlay{top:var(--topbar-h)}
+  #pwa-mobile-slot{display:block}
+  #pwa-mobile-slot:empty{display:none}
+  #pwa-mobile-slot #pwa-install{width:calc(100% - 24px);margin:10px 12px 0;position:static!important;display:block}
+  .tbl th,.tbl td{white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important}
+}

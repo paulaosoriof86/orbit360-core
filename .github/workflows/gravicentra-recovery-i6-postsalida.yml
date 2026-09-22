@@ -60,6 +60,10 @@ on:
       - 'tools/gravicentra-i6-5-b1-r10-rootcause-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r11-route-trace-readonly.mjs'
       - 'tools/gravicentra-i6-5-b1-r12-role-route-readonly.mjs'
+      - 'tools/gravicentra-i6-5-b1-r14-mobile-shell.mjs'
+      - 'orbit360-platform/styles/base.css'
+      - 'orbit360-platform/styles/infra.css'
+      - 'orbit360-platform/sw.js'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json'
       - 'tools/gravicentra-i6-5-b2-functional.mjs'
       - 'tools/gravicentra-i6-5-b2-authenticated-preview.mjs'
@@ -2937,6 +2941,9 @@ jobs:
           node --check orbit360-platform/core/access-scope.js
           node --check orbit360-platform/modules/crm-v1198-operational-bridge.js
           node --check tools/gravicentra-i6-5-b1-r12-role-route-readonly.mjs
+          node --check orbit360-platform/core/pwa.js
+          node --check orbit360-platform/sw.js
+          node --check tools/gravicentra-i6-5-b1-r14-mobile-shell.mjs
           node --check orbit360-platform/core/router.js
           node --check orbit360-platform/core/tenant-domain-config-client.js
           node --check functions/tenant-domain-config.js
@@ -3083,6 +3090,13 @@ jobs:
           TARGET_URL: ${{ steps.preview.outputs.preview_url }}
           B1_R12_OUT: ${{ runner.temp }}/b1-package/evidence/b1-r12-role-route-readonly.json
         run: node tools/gravicentra-i6-5-b1-r12-role-route-readonly.mjs
+
+      - name: Authenticated B1 R14 real mobile shell proof
+        if: steps.mode.outputs.mode == 'preview'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          B1_R14_OUT: ${{ runner.temp }}/b1-package/evidence/b1-r14-mobile-shell.json
+        run: node tools/gravicentra-i6-5-b1-r14-mobile-shell.mjs
 
       - name: Upload accumulated B1 Preview artifact
         if: steps.mode.outputs.mode == 'preview'

@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "VISUAL_REJECTED_R4_MOBILE_SHELL_ROOT_CAUSE_DEMONSTRATED",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -42,7 +42,10 @@
     "orbit360-platform/core/tenant-domain-config-client.js",
     "functions/tenant-domain-config.js",
     "orbit360-platform/core/tenant-access-policy-contract-p0.js",
-    "orbit360-platform/modules/crm-v1198-operational-bridge.js"
+    "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+    "orbit360-platform/styles/base.css",
+    "orbit360-platform/core/pwa.js",
+    "orbit360-platform/sw.js"
   ],
   "backend": {
     "deployTargets": [
@@ -1383,7 +1386,7 @@
     "additionalImagesRequired": false
   },
   "mobileRootCauseAudit20260921": {
-    "status": "ROOT_CAUSES_DEMONSTRATED_FROM_CURRENT_SOURCE_AND_USER_RUNTIME",
+    "status": "PATCHED_PENDING_PREVIEW",
     "productCauses": {
       "roleSelector": {
         "owner": [
@@ -1450,5 +1453,35 @@
       "F5 preserves session and selected role",
       "zero page errors and zero operational writes"
     ]
+  },
+  "r14MobileShellPatch": {
+    "status": "SOURCE_READY_PENDING_PREVIEW",
+    "productFiles": [
+      "orbit360-platform/index.html",
+      "orbit360-platform/styles/base.css",
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/core/public-tenant-branding.js",
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/core/pwa.js",
+      "orbit360-platform/sw.js"
+    ],
+    "fixes": [
+      "REAL_TWO_ROW_MOBILE_GRID_WITH_ALL_REQUIRED_CONTROLS",
+      "TENANT_LOGO_NO_LONGER_OVERRIDES_MOBILE_DISPLAY_RULE",
+      "ACTIVE_ROLE_SELECTOR_VISIBLE_ON_PHONE",
+      "GLOBAL_SEARCH_COLLAPSED_UNTIL_EXPLICIT_MOBILE_TOGGLE",
+      "PWA_INSTALL_CTA_MOVED_TO_NORMAL_MOBILE_DOCUMENT_FLOW",
+      "MOBILE_TABLE_TEXT_NO_LONGER_BREAKS_INTO_FRAGMENTS",
+      "NEW_SERVICE_WORKER_GENERATION_FOR_CHANGED_SHELL_BYTES"
+    ],
+    "proof": "tools/gravicentra-i6-5-b1-r14-mobile-shell.mjs",
+    "viewports": [
+      "390x844",
+      "430x932"
+    ],
+    "dataWrites": 0,
+    "reimport": false,
+    "live": false,
+    "b2": false
   }
 }

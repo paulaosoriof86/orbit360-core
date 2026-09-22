@@ -22,7 +22,7 @@
     if(name){name.textContent='';name.style.display='none';}
     if(bottom)bottom.style.cssText='display:none!important;visibility:hidden!important';
     var top=document.querySelector('.tb-logo'),topSlot=document.getElementById('client-logo'),topName=top&&top.querySelector('.cn');
-    if(top)top.style.cssText='visibility:hidden;display:flex;align-items:center;justify-content:center;gap:0;min-width:120px;max-width:120px;height:40px;overflow:visible';
+    if(top)top.style.cssText='visibility:hidden;align-items:center;justify-content:center;gap:0;min-width:120px;max-width:120px;height:40px;overflow:visible';
     if(topSlot){topSlot.innerHTML='';topSlot.style.cssText='width:116px;height:auto;display:flex;align-items:center;justify-content:center;overflow:visible;border:0;background:transparent';if(b.logo)topSlot.appendChild(img(b.logo,'data-company-brand-logo','width:112px;height:auto;max-width:112px;object-fit:contain;object-position:center;display:block'));}
     if(topName){topName.textContent='';topName.style.display='none';}if(top)top.setAttribute('aria-label',b.displayName);show(top);
     var form=document.getElementById('login-form');
