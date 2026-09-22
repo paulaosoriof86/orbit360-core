@@ -47,7 +47,7 @@ try{
    need(layout.topbar.rect.height<=108,'B1_R14_TOPBAR_TOO_TALL:'+layout.topbar.rect.height);
    for(const k of ['burger','brand','country','role','searchToggle','theme','mail','bell','user'])need(layout[k].rect.right<=vp.width+1&&layout[k].rect.x>=-1&&layout[k].rect.bottom<=layout.topbar.rect.bottom+1,'B1_R14_CONTROL_OUTSIDE:'+k+':'+vp.width);
 
-   const burgerHit=await tapReal(page,'#burger');await page.waitForFunction(()=>document.querySelector('#sidebar')?.classList.contains('open')&&document.querySelector('.sb-overlay')?.classList.contains('show'),null,{timeout:3000});await tapReal(page,'.sb-overlay');await page.waitForFunction(()=>!document.querySelector('#sidebar')?.classList.contains('open'),null,{timeout:3000});
+   const burgerHit=await tapReal(page,'#burger');await page.waitForFunction(()=>document.querySelector('#sidebar')?.classList.contains('open'),null,{timeout:3000});const overlayObservation=await page.evaluate(()=>{const e=document.querySelector('.sb-overlay');if(!e)return null;const r=e.getBoundingClientRect(),c=getComputedStyle(e);return{className:e.className,display:c.display,position:c.position,pointerEvents:c.pointerEvents,rect:{x:r.x,y:r.y,width:r.width,height:r.height}};});await tapReal(page,'#burger');await page.waitForFunction(()=>!document.querySelector('#sidebar')?.classList.contains('open'),null,{timeout:3000});
 
    const options=await page.locator('#rol-sel option').allTextContents();need(options.some(x=>x.trim()==='Asesor')&&options.some(x=>x.trim()==='Operativo'),'B1_R14_ROLE_OPTIONS:'+options.join('|'));
    await chooseRole(page,'Asesor');await chooseRole(page,'Operativo');
@@ -64,7 +64,7 @@ try{
 
    await chooseRole(page,'Asesor');await page.reload({waitUntil:'domcontentloaded',timeout:30000});await page.waitForFunction(()=>Orbit.store?._productStatus?.().ready===true,null,{timeout:30000});await neutralizeFreshSessionLegalGate(page);need(await page.evaluate(()=>Orbit.session?.rol?.())==='Asesor','B1_R14_F5_ROLE_LOST');await chooseRole(page,'Operativo');
    need(pageErrors.length===0,'B1_R14_PAGEERROR:'+pageErrors.join('|'));
-   ev.viewports.push({vp,layout,install,table,pageErrors,roleAfterF5:'Asesor',freshSessionLegalGateRemoved:legalGateRemoved,burgerHit,searchHit});await context.close();
+   ev.viewports.push({vp,layout,install,table,pageErrors,roleAfterF5:'Asesor',freshSessionLegalGateRemoved:legalGateRemoved,burgerHit,searchHit,overlayObservation});await context.close();
  }
  ev.status='PASS';
 }catch(e){ev.status='FAIL';ev.errors.push(clean(e?.stack||e?.message||e,5000));}

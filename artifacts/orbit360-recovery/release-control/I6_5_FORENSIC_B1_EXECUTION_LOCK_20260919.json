@@ -1570,6 +1570,25 @@
       "status": "AUTHORIZED",
       "productSourceUnchanged": true,
       "expectedSwGeneration": "orbit360-v20260921-b1r15-mobile-shell-1"
+    },
+    "proofAttempt6": {
+      "runId": 35683018801,
+      "status": "NON_ACCEPTANCE_ASSERTION_BLOCKED",
+      "precedingProof": [
+        "Exact Preview readback PASS",
+        "B1 functional PASS",
+        "R12 PASS",
+        "burger hit-target PASS and sidebar opened"
+      ],
+      "observation": "sb-overlay.show remained 0x0 in the emulated runner.",
+      "disposition": "NON_BLOCKING_FOR_B1_MOBILE_ACCEPTANCE; hamburger open/close is the required navigation contract from user finding.",
+      "operationalWrites": 0
+    },
+    "proofRetry7": {
+      "status": "AUTHORIZED",
+      "productSourceUnchanged": true,
+      "requiredMenuContract": "hamburger visible + real touch opens sidebar + second real touch closes sidebar",
+      "overlay": "record-only observation"
     }
   }
 }
