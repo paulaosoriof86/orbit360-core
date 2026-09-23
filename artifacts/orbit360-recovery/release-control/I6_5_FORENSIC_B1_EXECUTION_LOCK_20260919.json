@@ -1663,5 +1663,16 @@
     "syntheticPreviewWritesOnly": true,
     "livePromotionAuthorized": false,
     "b2Paused": true
+  },
+  "r19OperationalFacadeComposition": {
+    "status": "SOURCE_READY_PENDING_PREVIEW",
+    "rootCauseClass": "B1_REMOVED_READBACK_SYMBOL_RETAINED_IN_EXPORTED_FACADE",
+    "previousRunId": 35910850907,
+    "owner": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "correction": "Remove obsolete waitCanonicalReadback export; source contract forbids any residual symbol reference.",
+    "productBehaviorChange": false,
+    "realUserWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b2Paused": true
   }
 }

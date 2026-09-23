@@ -272,7 +272,7 @@
     if(typeof base.on==='function')base.on('*',function(changed){reconcile(changed);emit(changed);});
     facade={
       all:mergedAll,get:get,where:where,find:find,insert:insert,update:update,remove:remove,
-      insertDurable:insertDurable,updateDurable:updateDurable,removeDurable:removeDurable,batchDurable:batchDurable,waitCanonicalReadback:waitCanonicalReadback,
+      insertDurable:insertDurable,updateDurable:updateDurable,removeDurable:removeDurable,batchDurable:batchDurable,
       on:function(collection,callback){if(typeof collection==='function'){callback=collection;}if(typeof callback!=='function')return function(){};listeners.push(callback);return function(){listeners=listeners.filter(function(x){return x!==callback;});};},
       subscribe:function(collection,callback){return facade.on(collection,callback);},
       _subscribe:function(collection,callback){return facade.on(collection,callback);},
