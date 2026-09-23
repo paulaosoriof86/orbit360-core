@@ -509,9 +509,14 @@ try{
   await page.evaluate(()=>{
     window.__b1NativeCalls=[];
     window.__b1OperationalFailures=[];
+    window.__b1OperationalCommits=[];
     window.addEventListener('orbit:operational-write:failed',event=>{
       const d=event&&event.detail||{};
       window.__b1OperationalFailures.push({collection:String(d.collection||''),id:String(d.id||''),action:String(d.action||''),error:String(d.error||''),batch:d.batch===true,serverCommitted:d.serverCommitted===true});
+    });
+    window.addEventListener('orbit:operational-write:committed',event=>{
+      const d=event&&event.detail||{};
+      window.__b1OperationalCommits.push({collection:String(d.collection||''),id:String(d.id||''),action:String(d.action||''),batch:d.batch===true,canonicalReadback:d.canonicalReadback===true});
     });
     window.prompt=function(){window.__b1NativeCalls.push('prompt');throw new Error('B1_NATIVE_PROMPT_USED');};
     window.alert=function(){window.__b1NativeCalls.push('alert');throw new Error('B1_NATIVE_ALERT_USED');};
@@ -634,10 +639,23 @@ try{
   await metaInput.waitFor({state:'visible',timeout:10000});
   const metaPeriodoActual=await page.inputValue('#meta-periodo'),metaPaisActual=await page.inputValue('#meta-pais');
   const metaId='meta-equipo-'+slug(synthetic.id)+'-'+metaPeriodoActual.replace(/[^0-9-]/g,'')+'-'+slug(metaPaisActual)+'-nueva';
+  const metaCommitBaseline=await page.evaluate(()=>Array.isArray(window.__b1OperationalCommits)?window.__b1OperationalCommits.length:0);
   await metaInput.evaluate(el=>{el.value='12345';el.dispatchEvent(new Event('change',{bubbles:true}));});
   const metaRef=db.collection('tenants').doc(TENANT).collection('data').doc('metas').collection('items').doc(metaId);
   await waitFor(async()=>{const x=await metaRef.get();return x.exists&&Number(x.data()?.valor||0)===12345?x:null;},'B1_META_CANONICAL_READBACK',20000,300);
-  await waitFor(async()=>{const q=await db.collection('tenants').doc(TENANT).collection('data').doc('auditoria').collection('items').get();return q.docs.some(d=>{const x=d.data()||{};return x.accion==='editar_meta'&&String(x.after?.asesorId||'')===synthetic.id;})?true:null;},'B1_META_AUDIT_READBACK',20000,300);
+  const metaAudit=await waitFor(async()=>{
+    const commits=await page.evaluate(start=>(window.__b1OperationalCommits||[]).slice(start),metaCommitBaseline);
+    const auditIds=commits.filter(x=>x.collection==='auditoria'&&x.action==='insert'&&x.canonicalReadback===true).map(x=>x.id).filter(Boolean);
+    for(const auditId of auditIds){
+      const snap=await db.collection('tenants').doc(TENANT).collection('data').doc('auditoria').collection('items').doc(auditId).get();
+      if(!snap.exists)continue;
+      const x=snap.data()||{};
+      if(x.accion==='editar_meta'&&String(x.after?.asesorId||'')===synthetic.id)return{id:auditId,row:x,commits};
+    }
+    return null;
+  },'B1_META_AUDIT_EXACT_READBACK',20000,250);
+  need(metaAudit&&metaAudit.row&&metaAudit.row.accion==='editar_meta','B1_META_AUDIT_EXACT_ACTION');
+  need(String(metaAudit.row.after?.asesorId||'')===synthetic.id,'B1_META_AUDIT_EXACT_ADVISOR');
   ev.writes.metaOperational++;ev.writes.auditOperational++;
   await reloadAuthenticated(page,auth,a);await renderEquipo(page);await page.locator('.tab[data-t="metas"]').click();
   need(Number(await page.locator('[data-meta="'+synthetic.id+'|nueva"]').inputValue())===12345,'B1_META_REFRESH_NOT_PERSISTED');

@@ -1674,5 +1674,17 @@
     "realUserWritesAuthorized": false,
     "livePromotionAuthorized": false,
     "b2Paused": true
+  },
+  "r20ExactAuditHarness": {
+    "status": "HARNESS_READY_PENDING_PREVIEW",
+    "rootCauseClass": "B1_META_AUDIT_PROOF_USED_FULL_COLLECTION_POLLING_INSTEAD_OF_EXACT_SERVER_RECEIPT",
+    "previousRunId": 35911353932,
+    "owner": "tools/gravicentra-i6-5-b1-functional.mjs",
+    "productChange": false,
+    "proofChange": "Capture operational-write committed receipt after meta baseline; read exact auditoria document by emitted id; assert editar_meta + synthetic advisorId.",
+    "failClosed": true,
+    "realUserWritesAuthorized": false,
+    "b2Paused": true,
+    "livePromotionAuthorized": false
   }
 }
