@@ -137,11 +137,31 @@ async function reopen(page,id){
   await acceptLegalGate(page,3000);
   await page.waitForSelector('#eu-access-panel',{timeout:5000}).catch(()=>{});
 }
+async function installOperationalInstrumentation(page){
+  await page.evaluate(()=>{
+    window.__b1NativeCalls=Array.isArray(window.__b1NativeCalls)?window.__b1NativeCalls:[];
+    window.__b1OperationalFailures=Array.isArray(window.__b1OperationalFailures)?window.__b1OperationalFailures:[];
+    window.__b1OperationalCommits=Array.isArray(window.__b1OperationalCommits)?window.__b1OperationalCommits:[];
+    if(window.__b1OperationalInstrumentationInstalled===true)return;
+    window.addEventListener('orbit:operational-write:failed',event=>{
+      const d=event&&event.detail||{};
+      window.__b1OperationalFailures.push({collection:String(d.collection||''),id:String(d.id||''),action:String(d.action||''),error:String(d.error||''),batch:d.batch===true,serverCommitted:d.serverCommitted===true});
+    });
+    window.addEventListener('orbit:operational-write:committed',event=>{
+      const d=event&&event.detail||{};
+      window.__b1OperationalCommits.push({collection:String(d.collection||''),id:String(d.id||''),action:String(d.action||''),batch:d.batch===true,canonicalReadback:d.canonicalReadback===true});
+    });
+    window.prompt=function(){window.__b1NativeCalls.push('prompt');throw new Error('B1_NATIVE_PROMPT_USED');};
+    window.alert=function(){window.__b1NativeCalls.push('alert');throw new Error('B1_NATIVE_ALERT_USED');};
+    window.__b1OperationalInstrumentationInstalled=true;
+  });
+}
 async function reloadAuthenticated(page,auth,a){
   await page.reload({waitUntil:'domcontentloaded',timeout:30000});
   await activate(page,auth,a);
   await waitAdvisorHydration(page);
   await acceptLegalGate(page,8000);
+  await installOperationalInstrumentation(page);
 }
 async function submitCustomPrompt(page,reason,label){
   const input=page.locator('.drawer-back [data-in]').last();
@@ -506,21 +526,7 @@ try{
   need(ev.team.hydration.projectionOnlyCount===0,'B1_ADVISOR_PROJECTION_STILL_ACTIVE');
   need(ev.team.hydration.canonicalIdMissingCount===0,'B1_CANONICAL_ID_MISSING');
 
-  await page.evaluate(()=>{
-    window.__b1NativeCalls=[];
-    window.__b1OperationalFailures=[];
-    window.__b1OperationalCommits=[];
-    window.addEventListener('orbit:operational-write:failed',event=>{
-      const d=event&&event.detail||{};
-      window.__b1OperationalFailures.push({collection:String(d.collection||''),id:String(d.id||''),action:String(d.action||''),error:String(d.error||''),batch:d.batch===true,serverCommitted:d.serverCommitted===true});
-    });
-    window.addEventListener('orbit:operational-write:committed',event=>{
-      const d=event&&event.detail||{};
-      window.__b1OperationalCommits.push({collection:String(d.collection||''),id:String(d.id||''),action:String(d.action||''),batch:d.batch===true,canonicalReadback:d.canonicalReadback===true});
-    });
-    window.prompt=function(){window.__b1NativeCalls.push('prompt');throw new Error('B1_NATIVE_PROMPT_USED');};
-    window.alert=function(){window.__b1NativeCalls.push('alert');throw new Error('B1_NATIVE_ALERT_USED');};
-  });
+  await installOperationalInstrumentation(page);
 
   const advisorCollection=db.collection('tenants').doc(TENANT).collection('data').doc('asesores').collection('items');
   const canonicalSnap=await advisorCollection.get();
@@ -1036,6 +1042,17 @@ try{
       if(synthetic.id){
         try{
           ev.cleanup=await cleanupSynthetic({db,auth,...synthetic});
+          ev.writes.syntheticCleanup=(ev.cleanup.advisorDeleted?1:0)+(ev.cleanup.memberDeleted?1:0)+(ev.cleanup.authDeleted?1:0)+ev.cleanup.auditDeleted+ev.cleanup.metasDeleted+ev.cleanup.onboardingDeleted+ev.cleanup.onboardingAuditDeleted;
+          const advisorGone=!(await canonical(db,synthetic.id));
+          const authGone=!(await authByEmail(auth,synthetic.email));
+          let membershipGone=true;
+          if(synthetic.uid){
+            const ms=await db.collection('tenants').doc(TENANT).collection('members').doc(synthetic.uid).get();
+            membershipGone=!ms.exists;
+          }
+          ev.team.synthetic=ev.team.synthetic||{};
+          ev.team.synthetic.cleanupPass=advisorGone&&authGone&&membershipGone;
+          if(!ev.team.synthetic.cleanupPass)ev.errors.push('B1_SYNTHETIC_CLEANUP_READBACK_FAILED');
           ev.errors.push('B1_SYNTHETIC_CLEANUP_FROM_FINALLY');
           process.exitCode=1;
         }catch(cleanupError){
