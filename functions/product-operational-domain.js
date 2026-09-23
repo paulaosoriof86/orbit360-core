@@ -7,7 +7,7 @@ const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
-const VERSION = 'gravicentra-product-operational-domain-v3-b1-canonical-access';
+const VERSION = 'gravicentra-product-operational-domain-v4-b1-server-readback';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 
@@ -236,6 +236,12 @@ function normalizeMutation(raw) {
   return { action, collection, id, payload };
 }
 
+function mutationPayloadMatches(actual,payload){
+  if(!actual||!payload)return false;
+  const ignore=new Set(['updatedAt','updatedByUid','updatedByEmail','createdAt','createdByUid','ownerUid','ownerEmail']);
+  return Object.keys(payload).filter(key=>!ignore.has(key)).every(key=>JSON.stringify(stable(actual[key]))===JSON.stringify(stable(payload[key])));
+}
+
 async function execute(request) {
   const input = request.data || {};
   const tenantId = cleanId(input.tenantId, 'tenantId');
@@ -247,7 +253,7 @@ async function execute(request) {
   const reqRef = requestRef(tenantId, requestId);
   const eventId = `opevt_${sha(`${tenantId}|${requestId}`).slice(0, 28)}`;
 
-  return db.runTransaction(async tx => {
+  const committed = await db.runTransaction(async tx => {
     const previous = await tx.get(reqRef);
     if (previous.exists) {
       const row = previous.data() || {};
@@ -324,6 +330,21 @@ async function execute(request) {
     tx.set(reqRef, { status: 'committed', payloadDigest, result, committedAt: now() }, { merge: true });
     return result;
   });
+
+  const readback=[];
+  for(const mutation of mutations){
+    const snap=await canonicalRef(tenantId,mutation.collection,mutation.id).get();
+    if(mutation.action==='remove'){
+      if(snap.exists)throw new HttpsError('internal',`Canonical delete readback mismatch for ${mutation.collection}/${mutation.id}.`);
+      readback.push({collection:mutation.collection,id:mutation.id,action:mutation.action,exists:false});
+      continue;
+    }
+    if(!snap.exists)throw new HttpsError('internal',`Canonical readback missing for ${mutation.collection}/${mutation.id}.`);
+    const actual=snap.data()||{};
+    if(!mutationPayloadMatches(actual,mutation.payload))throw new HttpsError('internal',`Canonical readback mismatch for ${mutation.collection}/${mutation.id}.`);
+    readback.push({collection:mutation.collection,id:mutation.id,action:mutation.action,exists:true});
+  }
+  return Object.assign({},committed,{canonicalReadback:true,canonicalReadbackCount:readback.length,readback});
 }
 
 exports.orbit360ProductOperationalCommand = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, execute);

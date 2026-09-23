@@ -342,7 +342,8 @@ try{
   need(!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_PROMPT_SOURCE');
   need(!/\breturn\s+alert\s*\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/\breturn\s+alert\s*\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_ALERT_SOURCE');
   need(source['orbit360-platform/data/store-firestore-product-operational-p0.js'].includes("metas:'equipo'"),'B1_METAS_OPERATIONAL_SURFACE_MISSING');
-  need(source['orbit360-platform/data/store-firestore-product-operational-p0.js'].includes('getDocFromServer')&&!source['orbit360-platform/data/store-firestore-product-operational-p0.js'].includes("var actual=base&&typeof base.get==='function'?base.get(collection,id):null"),'B1_OPERATIONAL_READBACK_MUST_BE_AUTHORITATIVE_SERVER_READ');
+  need(source['orbit360-platform/data/store-firestore-product-operational-p0.js'].includes('requireServerReadback')&&!source['orbit360-platform/data/store-firestore-product-operational-p0.js'].includes('waitCanonicalReadback('),'B1_OPERATIONAL_READBACK_MUST_USE_SERVER_RECEIPT');
+  need(source['functions/product-operational-domain.js'].includes('canonicalReadback:true')&&source['functions/product-operational-domain.js'].includes('mutationPayloadMatches'),'B1_BACKEND_CANONICAL_READBACK_RECEIPT_MISSING');
   need(source['orbit360-platform/core/comisiones-eng.js'].includes('batchDurable'),'B1_COMMISSION_CONFIRMED_WRITE_OWNER_MISSING');
   need(!source['orbit360-platform/modules/equipo.js'].includes("Orbit.cat.setList('metas'"),'B1_METAS_LOCALSTORAGE_OWNER_REMAINS');
   need((source['orbit360-platform/modules/equipo.js'].match(/Orbit\.domainConfig\.save\('access'/g)||[]).length>=2,'B1_PERMISSION_RESET_NOT_CANONICAL_SERVER_OWNED');

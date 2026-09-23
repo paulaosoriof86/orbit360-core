@@ -5,7 +5,7 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-product-operational-write-20260923.1-authoritative-readback';
+  var VERSION='fase-a-i2-product-operational-write-20260923.2-server-receipt';
   var GENERAL_COMMAND='orbit360ProductOperationalCommand';
   var WORKFLOW_COMMAND='orbit360OpsLeadsCommand';
   var SERVER_EMISSION_GUARD='__ORBIT_SERVER_EMISSION_PENDING__';
@@ -139,9 +139,10 @@
       }
       return p.callFunction(GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[{action:action,collection:collection,id:id,payload:action==='remove'?null:clone(payload)}]},'us-central1');
     }).then(function(result){
+      if(!workflow)requireServerReadback(result,[{collection:collection,id:id,action:action}]);
       state.pending=Math.max(0,state.pending-1);state.committed+=1;state.lastCommittedAt=new Date().toISOString();state.lastError='';
       if(collection==='negocios'&&result&&result.projection&&text(result.projection.clientId)&&pending[collection]&&pending[collection][id]&&pending[collection][id].clienteIdCreado===SERVER_EMISSION_GUARD){pending[collection][id].clienteIdCreado=text(result.projection.clientId);pending[collection][id].clienteId=pending[collection][id].clienteId||text(result.projection.clientId);}
-      try{window.dispatchEvent(new CustomEvent('orbit:operational-write:committed',{detail:{collection:collection,id:id,action:action,version:VERSION,serverOwned:true}}));}catch(e){}
+      try{window.dispatchEvent(new CustomEvent('orbit:operational-write:committed',{detail:{collection:collection,id:id,action:action,version:VERSION,serverOwned:true,canonicalReadback:!workflow}}));}catch(e){}
       return result||true;
     }).catch(function(e){
       state.pending=Math.max(0,state.pending-1);state.failed+=1;state.lastError=text(e&&e.message||e)||'PRODUCT_WRITE_FAILED';
@@ -150,30 +151,16 @@
       throw e;
     });
   }
-  function equivalentCanonical(actual,expected){
-    if(expected===null)return actual==null;
-    if(!actual||!expected)return false;
-    var ignore={updatedAt:true,updatedByUid:true,updatedByEmail:true,createdAt:true,createdByUid:true,ownerUid:true,ownerEmail:true};
-    return Object.keys(expected).filter(function(k){return !ignore[k];}).every(function(k){return JSON.stringify(actual[k])===JSON.stringify(expected[k]);});
-  }
-  function waitCanonicalReadback(collection,id,expected,timeoutMs){
-    var deadline=Date.now()+(timeoutMs||20000),m=member();
-    return provider.initialize().then(function(ctx){
-      var fs=ctx&&ctx.modules&&ctx.modules.store,db=ctx&&ctx.db;
-      if(!fs||!db||typeof fs.doc!=='function'||typeof fs.getDocFromServer!=='function')throw new Error('PRODUCT_CANONICAL_SERVER_READBACK_REQUIRED');
-      var ref=fs.doc(db,'tenants/'+text(m.tenantId)+'/data/'+collection+'/items/'+id);
-      return new Promise(function(resolve,reject){(function check(){
-        fs.getDocFromServer(ref).then(function(snap){
-          var actual=snap&&typeof snap.exists==='function'&&snap.exists()?Object.assign({},snap.data()||{},{id:id}):null;
-          if(equivalentCanonical(actual,expected)){reconcile(collection);resolve(clone(actual));return;}
-          if(Date.now()>=deadline){var e=new Error('PRODUCT_CANONICAL_READBACK_TIMEOUT:'+collection+'/'+id);e.code='PRODUCT_CANONICAL_READBACK_TIMEOUT';reject(e);return;}
-          setTimeout(check,150);
-        }).catch(function(err){
-          if(Date.now()>=deadline){var e=new Error('PRODUCT_CANONICAL_SERVER_READBACK_FAILED:'+collection+'/'+id+':'+text(err&&err.code||err&&err.message||err));e.code='PRODUCT_CANONICAL_SERVER_READBACK_FAILED';reject(e);return;}
-          setTimeout(check,250);
-        });
-      })();});
+  function requireServerReadback(result,targets){
+    targets=[].concat(targets||[]);
+    if(!result||result.canonicalReadback!==true||Number(result.canonicalReadbackCount)!==targets.length||!Array.isArray(result.readback))throw new Error('PRODUCT_SERVER_CANONICAL_READBACK_REQUIRED');
+    targets.forEach(function(target){
+      var match=result.readback.find(function(row){return text(row&&row.collection)===text(target.collection)&&text(row&&row.id)===text(target.id)&&text(row&&row.action)===text(target.action);});
+      if(!match)throw new Error('PRODUCT_SERVER_CANONICAL_READBACK_TARGET_MISSING:'+text(target.collection)+'/'+text(target.id));
+      if(target.action==='remove'&&match.exists!==false)throw new Error('PRODUCT_SERVER_CANONICAL_DELETE_NOT_CONFIRMED:'+text(target.collection)+'/'+text(target.id));
+      if(target.action!=='remove'&&match.exists!==true)throw new Error('PRODUCT_SERVER_CANONICAL_WRITE_NOT_CONFIRMED:'+text(target.collection)+'/'+text(target.id));
     });
+    return result.readback;
   }
   function batchDurable(mutations,options){
     options=options||{};
@@ -203,11 +190,11 @@
       return provider.callFunction(GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,requestId:requestId,mutations:prepared.map(function(x){return{action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(x.row)};})},'us-central1');
     }).then(function(result){
       serverCommitted=true;
-      return Promise.all(prepared.map(function(x){return waitCanonicalReadback(x.collection,x.id,x.action==='remove'?null:x.row,options.timeoutMs||20000);})).then(function(readback){
-        state.pending=Math.max(0,state.pending-prepared.length);state.committed+=prepared.length;state.lastCommittedAt=new Date().toISOString();state.lastError='';
-        prepared.forEach(function(x){try{window.dispatchEvent(new CustomEvent('orbit:operational-write:committed',{detail:{collection:x.collection,id:x.id,action:x.action,version:VERSION,serverOwned:true,batch:true,canonicalReadback:true}}));}catch(e){}});
-        return {ok:true,serverOwned:true,canonicalReadback:true,mutationCount:prepared.length,result:result||{},readback:readback};
-      });
+      var targets=prepared.map(function(x){return{collection:x.collection,id:x.id,action:x.action};});
+      var readback=requireServerReadback(result,targets);
+      state.pending=Math.max(0,state.pending-prepared.length);state.committed+=prepared.length;state.lastCommittedAt=new Date().toISOString();state.lastError='';
+      prepared.forEach(function(x){try{window.dispatchEvent(new CustomEvent('orbit:operational-write:committed',{detail:{collection:x.collection,id:x.id,action:x.action,version:VERSION,serverOwned:true,batch:true,canonicalReadback:true}}));}catch(e){}});
+      return {ok:true,serverOwned:true,canonicalReadback:true,mutationCount:prepared.length,result:result||{},readback:readback};
     }).catch(function(e){
       state.pending=Math.max(0,state.pending-prepared.length);state.failed+=1;state.lastError=text(e&&e.message||e)||'PRODUCT_BATCH_FAILED';
       if(!serverCommitted){backups.forEach(function(b){var pb=pendingBucket(b.collection),db=deletedBucket(b.collection);if(b.pendingHad)pb[b.id]=clone(b.pendingValue);else delete pb[b.id];if(b.deletedHad)db[b.id]=b.deletedValue;else delete db[b.id];});[...new Set(prepared.map(function(x){return x.collection;}))].forEach(emit);}
@@ -254,20 +241,20 @@
     if(!row.id)row.id=collection+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
     row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);
     authorize(collection,'insert',row);pendingBucket(collection)[row.id]=clone(row);delete deletedBucket(collection)[row.id];emit(collection);
-    return callDurable('insert',collection,row.id,row,null).then(function(){return waitCanonicalReadback(collection,row.id,row,20000);}).then(function(){return clone(row);});
+    return callDurable('insert',collection,row.id,row,null).then(function(){return clone(row);});
   }
   function updateDurable(collection,id,patch){
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
     var m=member(),row=Object.assign({},prior,clone(patch)||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});
     authorize(collection,'update',row);pendingBucket(collection)[id]=clone(row);delete deletedBucket(collection)[id];emit(collection);
-    return callDurable('update',collection,id,row,prior).then(function(){return waitCanonicalReadback(collection,id,row,20000);}).then(function(){return clone(row);});
+    return callDurable('update',collection,id,row,prior).then(function(){return clone(row);});
   }
   function removeDurable(collection,id){
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
     authorize(collection,'remove',prior);deletedBucket(collection)[id]=true;delete pendingBucket(collection)[id];emit(collection);
-    return callDurable('remove',collection,id,null,prior).then(function(){return waitCanonicalReadback(collection,id,null,20000);}).then(function(){return true;});
+    return callDurable('remove',collection,id,null,prior).then(function(){return true;});
   }
   function status(){
     var bs=base&&typeof base._productStatus==='function'?base._productStatus():{};

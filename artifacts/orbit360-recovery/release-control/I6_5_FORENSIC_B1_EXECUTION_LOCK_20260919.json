@@ -1644,5 +1644,24 @@
     "syntheticPreviewWritesOnly": true,
     "livePromotionAuthorized": false,
     "b2Paused": true
+  },
+  "r18ServerOwnedCanonicalReadbackReceipt": {
+    "status": "SOURCE_READY_PENDING_PREVIEW",
+    "rootCauseClass": "B1_BROWSER_READBACK_BLOCKED_UI_AFTER_SERVER_COMMIT",
+    "evidence": {
+      "syntheticAdvisorCanonicalExists": true,
+      "createAuditCanonicalExists": true,
+      "operationalFailureEventCount": 0,
+      "uiState": "SAVE_BUTTON_STILL_BUSY_WAITING_BROWSER_READBACK"
+    },
+    "owners": [
+      "functions/product-operational-domain.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js"
+    ],
+    "correction": "Backend performs post-transaction Admin SDK readback and returns canonicalReadback receipt; frontend requires receipt and never uses UI cache/browser Firestore as durability evidence.",
+    "realUserWritesAuthorized": false,
+    "syntheticPreviewWritesOnly": true,
+    "livePromotionAuthorized": false,
+    "b2Paused": true
   }
 }

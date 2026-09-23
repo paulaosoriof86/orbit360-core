@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "a9ba074bfb120e2103156aa76d0b667db95589cc",
+    "b1ExecutionLockBlobSha": "ff7d7848473fe2c1a536af1240639fb0692a9da6",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "bb5055e31931139568135da51bd879132640c2df",
@@ -2067,6 +2067,18 @@
       "b2Status": "PAUSED_PENDING_B1_REACCEPTANCE",
       "livePromotionAuthorized": false,
       "b1ExecutionLockBlobSha": "a9ba074bfb120e2103156aa76d0b667db95589cc"
+    },
+    "b1R18ServerOwnedCanonicalReadbackReceipt": {
+      "status": "SOURCE_READY_PENDING_PREVIEW",
+      "previousDiagnosticRunId": 35910047052,
+      "owners": [
+        "functions/product-operational-domain.js",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js"
+      ],
+      "correction": "POST_COMMIT_ADMIN_READBACK_RECEIPT",
+      "b2Status": "PAUSED_PENDING_B1_REACCEPTANCE",
+      "livePromotionAuthorized": false,
+      "b1ExecutionLockBlobSha": "ff7d7848473fe2c1a536af1240639fb0692a9da6"
     }
   }
 }
