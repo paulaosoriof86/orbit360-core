@@ -809,7 +809,7 @@ Orbit.modules.cliente360 = (function () {
     </div>`;
     document.body.appendChild(back);
     const closeM = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) closeM(); });
+    back.addEventListener('click', e => { if (e.target === back) { e.preventDefault(); e.stopPropagation(); c360toast('Usa Guardar cambios o Cancelar para cerrar este formulario.'); } });
     back.querySelector('#ce-x').addEventListener('click', closeM);
     back.querySelector('#ce-cancel').addEventListener('click', closeM);
     // contacto alterno toggle
@@ -1490,7 +1490,7 @@ Orbit.modules.cliente360 = (function () {
     document.body.appendChild(back);
     const $ = s => back.querySelector(s);
     const close = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.addEventListener('click', e => { if (e.target === back) { e.preventDefault(); e.stopPropagation(); c360toast('Usa Crear cliente o Cancelar para cerrar este formulario.'); } });
     $('#nc-x').addEventListener('click', close); $('#nc-cancel').addEventListener('click', close);
     back.querySelectorAll('.seg-b').forEach(b => b.addEventListener('click', () => {
       back.querySelectorAll('.seg-b').forEach(x => x.classList.remove('active')); b.classList.add('active');
