@@ -264,10 +264,16 @@ Orbit.modules.equipo = (function () {
     if (!st || st.__productOperationalWriteP0 !== true || typeof st.batchDurable !== 'function') throw new Error('META_DURABLE_OWNER_REQUIRED');
     const current=metaRow(aseId,periodo,pais,campo),id=current&&current.id?current.id:metaKey(aseId,periodo,pais,campo);
     const patch={mes:periodo,periodo,pais,moneda:currencyForCountry(pais),tipo:campo,asesorId:aseId,valor:+val||0};
-    const result=await st.batchDurable([{action:current?'update':'insert',collection:'metas',id,payload:patch}],{timeoutMs:20000});
-    const confirmed=result&&result.readback&&result.readback[0]?result.readback[0]:null;
-    if(!confirmed||Number(confirmed.valor||0)!==Number(patch.valor||0)) throw new Error('META_CANONICAL_READBACK_MISMATCH');
-    return confirmed;
+    const action=current?'update':'insert';
+    const result=await st.batchDurable([{action,collection:'metas',id,payload:patch}],{timeoutMs:20000});
+    const confirmed=(result&&Array.isArray(result.readback)?result.readback:[]).find(row =>
+      String(row&&row.collection||'')==='metas' &&
+      String(row&&row.id||'')===id &&
+      String(row&&row.action||'')===action &&
+      row&&row.exists===true
+    );
+    if(!result||result.canonicalReadback!==true||!confirmed) throw new Error('META_CANONICAL_READBACK_MISMATCH');
+    return Object.assign({id},patch);
   }
   function normalizePeriodo(value) {
     if (typeof value === 'number') return `${now.getFullYear()}-${String(value + 1).padStart(2, '0')}`;
