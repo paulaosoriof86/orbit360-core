@@ -10,9 +10,10 @@
 
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p0-effective-20260919.b1r3.2';
+  var VERSION = 'p0-effective-20260923.b1r17.1';
   var PRODUCT_COLLECTION_POLICY_OVERRIDE = Object.freeze({
     negocios: { module: 'leads', scoped: true, advisorRead: true, advisorWrite: false },
+    metas: { module: 'inicio', scoped: true, advisorRead: true, advisorWrite: false },
     asesores: { module: 'equipo', scoped: false, advisorRead: false, advisorWrite: false },
     auditoria: { module: 'equipo', scoped: false, advisorRead: false, advisorWrite: false, restricted: true, audit: true }
   });

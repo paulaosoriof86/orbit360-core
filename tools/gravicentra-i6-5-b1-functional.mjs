@@ -357,6 +357,7 @@ try{
   need(source['orbit360-platform/core/access-scope.js'].includes("ac.rolePermissions"),'B1_RUNTIME_CANONICAL_ROLE_MATRIX_MISSING');
   need(source['orbit360-platform/core/access-scope.js'].includes("recibosEsperados: 'cobros'")&&source['orbit360-platform/core/access-scope.js'].includes("carteraPrimas: 'cobros'"),'B1_R9_FINANCIAL_READ_MODELS_NOT_SCOPED');
   need(source['orbit360-platform/core/access-scope.js'].includes("asesores: 'inicio'")&&source['orbit360-platform/core/access-scope.js'].includes("metas: 'inicio'"),'B1_R9_INICIO_AGGREGATE_SOURCES_NOT_SCOPED');
+  need(/metas:\s*\{\s*module:\s*'inicio',\s*scoped:\s*true/.test(source['orbit360-platform/core/tenant-access-policy-effective-p0.js']),'B1_METAS_EFFECTIVE_READ_POLICY_MISSING');
   need(source['orbit360-platform/core/router.js'].includes("Orbit.access.withScope(route"),'B1_ROUTER_SCOPED_RENDER_MISSING');
   need(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js'].includes('la entrega al buzón no está confirmada'),'B1_EMAIL_DELIVERY_WORDING_NOT_FAIL_CLOSED');
   need(!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_PROMPT_SOURCE');
