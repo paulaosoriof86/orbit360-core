@@ -1628,5 +1628,21 @@
       "orbit360-platform/data/store-firestore-product-operational-p0.js",
       "orbit360-platform/core/comisiones-eng.js"
     ]
+  },
+  "r17AuthoritativeOperationalReadback": {
+    "status": "SOURCE_READY_PENDING_PREVIEW",
+    "rootCauseClass": "B1_FALSE_NEGATIVE_DURABILITY_FROM_UI_CACHE_READBACK",
+    "demonstratedBy": {
+      "serverMetaWriteObserved": true,
+      "auditReadbackTimedOut": true,
+      "causalSequence": "batchDurable server commit -> UI-cache readback timeout on deferred metas -> setMeta rejects -> audit step never executes"
+    },
+    "owner": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "correction": "All durable operational writes confirm against direct Firestore server readback; UI cache is no longer release evidence.",
+    "affectsAllCollections": true,
+    "realUserWritesAuthorized": false,
+    "syntheticPreviewWritesOnly": true,
+    "livePromotionAuthorized": false,
+    "b2Paused": true
   }
 }

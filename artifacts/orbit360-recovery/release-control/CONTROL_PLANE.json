@@ -1951,7 +1951,7 @@
       "livePromotion": false
     },
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
-    "b1ExecutionLockBlobSha": "4ae9593c0e996d2b2585a597e88131b6bc71f30a",
+    "b1ExecutionLockBlobSha": "a9ba074bfb120e2103156aa76d0b667db95589cc",
     "b1": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "bb5055e31931139568135da51bd879132640c2df",
@@ -2057,6 +2057,16 @@
       "b2Status": "PAUSED_PENDING_B1_REACCEPTANCE",
       "allowedProductOwnersBoundToB1Lock": true,
       "b1ExecutionLockBlobSha": "4ae9593c0e996d2b2585a597e88131b6bc71f30a"
+    },
+    "b1R17AuthoritativeOperationalReadback": {
+      "status": "SOURCE_READY_PENDING_PREVIEW",
+      "owner": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "previousFailureRunId": 35811106345,
+      "previousFailure": "B1_META_AUDIT_READBACK_TIMEOUT_AFTER_META_SERVER_COMMIT",
+      "correction": "DIRECT_GET_DOC_FROM_SERVER_READBACK_FOR_DURABLE_WRITES",
+      "b2Status": "PAUSED_PENDING_B1_REACCEPTANCE",
+      "livePromotionAuthorized": false,
+      "b1ExecutionLockBlobSha": "a9ba074bfb120e2103156aa76d0b667db95589cc"
     }
   }
 }

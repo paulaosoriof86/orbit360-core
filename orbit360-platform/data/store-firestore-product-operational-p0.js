@@ -5,7 +5,7 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-product-operational-write-20260918.3-batch-readback';
+  var VERSION='fase-a-i2-product-operational-write-20260923.1-authoritative-readback';
   var GENERAL_COMMAND='orbit360ProductOperationalCommand';
   var WORKFLOW_COMMAND='orbit360OpsLeadsCommand';
   var SERVER_EMISSION_GUARD='__ORBIT_SERVER_EMISSION_PENDING__';
@@ -157,13 +157,23 @@
     return Object.keys(expected).filter(function(k){return !ignore[k];}).every(function(k){return JSON.stringify(actual[k])===JSON.stringify(expected[k]);});
   }
   function waitCanonicalReadback(collection,id,expected,timeoutMs){
-    var deadline=Date.now()+(timeoutMs||20000);
-    return new Promise(function(resolve,reject){(function check(){
-      var actual=base&&typeof base.get==='function'?base.get(collection,id):null;
-      if(equivalentCanonical(actual,expected)){reconcile(collection);resolve(clone(actual));return;}
-      if(Date.now()>=deadline){var e=new Error('PRODUCT_CANONICAL_READBACK_TIMEOUT:'+collection+'/'+id);e.code='PRODUCT_CANONICAL_READBACK_TIMEOUT';reject(e);return;}
-      setTimeout(check,100);
-    })();});
+    var deadline=Date.now()+(timeoutMs||20000),m=member();
+    return provider.initialize().then(function(ctx){
+      var fs=ctx&&ctx.modules&&ctx.modules.store,db=ctx&&ctx.db;
+      if(!fs||!db||typeof fs.doc!=='function'||typeof fs.getDocFromServer!=='function')throw new Error('PRODUCT_CANONICAL_SERVER_READBACK_REQUIRED');
+      var ref=fs.doc(db,'tenants/'+text(m.tenantId)+'/data/'+collection+'/items/'+id);
+      return new Promise(function(resolve,reject){(function check(){
+        fs.getDocFromServer(ref).then(function(snap){
+          var actual=snap&&typeof snap.exists==='function'&&snap.exists()?Object.assign({},snap.data()||{},{id:id}):null;
+          if(equivalentCanonical(actual,expected)){reconcile(collection);resolve(clone(actual));return;}
+          if(Date.now()>=deadline){var e=new Error('PRODUCT_CANONICAL_READBACK_TIMEOUT:'+collection+'/'+id);e.code='PRODUCT_CANONICAL_READBACK_TIMEOUT';reject(e);return;}
+          setTimeout(check,150);
+        }).catch(function(err){
+          if(Date.now()>=deadline){var e=new Error('PRODUCT_CANONICAL_SERVER_READBACK_FAILED:'+collection+'/'+id+':'+text(err&&err.code||err&&err.message||err));e.code='PRODUCT_CANONICAL_SERVER_READBACK_FAILED';reject(e);return;}
+          setTimeout(check,250);
+        });
+      })();});
+    });
   }
   function batchDurable(mutations,options){
     options=options||{};
@@ -244,20 +254,20 @@
     if(!row.id)row.id=collection+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
     row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);
     authorize(collection,'insert',row);pendingBucket(collection)[row.id]=clone(row);delete deletedBucket(collection)[row.id];emit(collection);
-    return callDurable('insert',collection,row.id,row,null).then(function(){return clone(row);});
+    return callDurable('insert',collection,row.id,row,null).then(function(){return waitCanonicalReadback(collection,row.id,row,20000);}).then(function(){return clone(row);});
   }
   function updateDurable(collection,id,patch){
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
     var m=member(),row=Object.assign({},prior,clone(patch)||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});
     authorize(collection,'update',row);pendingBucket(collection)[id]=clone(row);delete deletedBucket(collection)[id];emit(collection);
-    return callDurable('update',collection,id,row,prior).then(function(){return clone(row);});
+    return callDurable('update',collection,id,row,prior).then(function(){return waitCanonicalReadback(collection,id,row,20000);}).then(function(){return clone(row);});
   }
   function removeDurable(collection,id){
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
     authorize(collection,'remove',prior);deletedBucket(collection)[id]=true;delete pendingBucket(collection)[id];emit(collection);
-    return callDurable('remove',collection,id,null,prior).then(function(){return true;});
+    return callDurable('remove',collection,id,null,prior).then(function(){return waitCanonicalReadback(collection,id,null,20000);}).then(function(){return true;});
   }
   function status(){
     var bs=base&&typeof base._productStatus==='function'?base._productStatus():{};
