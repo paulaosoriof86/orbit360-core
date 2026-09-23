@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "ACCEPTED_FOR_B2_EMAIL_DEFERRED",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1595,7 +1595,7 @@
     }
   },
   "r16AdministrativeDurabilityAndAuthorization": {
-    "status": "SOURCE_READY_PENDING_PREVIEW",
+    "status": "PREVIEW_PASS",
     "rootCauseClass": "B1_ADMIN_UI_DURABILITY_AND_SERVER_AUTHORIZATION_DIVERGENCE",
     "generalConditions": [
       "EQUIPO_METAS_WROTE_LOCAL_CATALOG_WHILE_CANONICAL_CONSUMERS_READ_FIRESTORE_METAS",
@@ -1627,7 +1627,10 @@
     "newlyBoundOwners": [
       "orbit360-platform/data/store-firestore-product-operational-p0.js",
       "orbit360-platform/core/comisiones-eng.js"
-    ]
+    ],
+    "runId": 35919848120,
+    "sourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
+    "buildId": "gi-i65-b1-7e96cf419c08-57f234755dc1"
   },
   "r17AuthoritativeOperationalReadback": {
     "status": "SOURCE_READY_PENDING_PREVIEW",
@@ -1696,5 +1699,23 @@
     "realUserWritesAuthorized": false,
     "b2Paused": true,
     "livePromotionAuthorized": false
+  },
+  "acceptance": {
+    "status": "ACCEPTED",
+    "acceptedAt": "2026-09-23",
+    "acceptanceMode": "AUTOMATED_PREVIEW_AUDIT_PER_OWNER_DIRECTIVE",
+    "manualModuleRetestRequired": false,
+    "exactReadback": true,
+    "functionalPass": true,
+    "activeRoleRouteR12": true,
+    "mobileShellR14": true,
+    "syntheticCleanupPass": true,
+    "livePromoted": false,
+    "emailDelivery": "DEFERRED_NON_BLOCKING",
+    "sourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
+    "buildId": "gi-i65-b1-7e96cf419c08-57f234755dc1",
+    "runId": 35919848120,
+    "artifactId": 10776852615,
+    "artifactDigest": "d30cd9ae57840663c9291c155fc06342d9083c13a03a41b11103e224d9bcac4a"
   }
 }

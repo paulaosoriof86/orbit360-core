@@ -1,18 +1,19 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PAUSED_PENDING_B1_REACCEPTANCE",
+  "status": "READ_ONLY_DIAGNOSTIC_ACTIVE",
   "recordedAt": "2026-09-20T19:55:00-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "parentB1Preview": {
-    "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
-    "runId": 35551713416,
-    "buildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
-    "artifactId": 10619180286,
-    "artifactDigest": "40eed43501e3d2d762cd0e05998d4bfec08dc0325af06fef0323089b19602793",
+    "sourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
+    "runId": 35919848120,
+    "buildId": "gi-i65-b1-7e96cf419c08-57f234755dc1",
+    "artifactId": 10776852615,
+    "artifactDigest": "d30cd9ae57840663c9291c155fc06342d9083c13a03a41b11103e224d9bcac4a",
     "exactReadback": true,
-    "functionalPass": true
+    "functionalPass": true,
+    "accepted": true
   },
   "scope": [
     "CLIENT_CREATE_EDIT_DURABLE_READBACK",
@@ -291,5 +292,34 @@
       "strategy": "TEMPORARILY_RESTORE_B1_SOURCE_FOR_EXACT_B1_CERTIFICATION_THEN_REAPPLY_B2_FROM_CANDIDATE_SOURCE_AFTER_B1_ACCEPTANCE",
       "noWorkLost": true
     }
+  },
+  "parentB1PreviewHistory": [
+    {
+      "sourceSha": "a763f6a991418cba2c59eac475edf3eb57fd1320",
+      "runId": 35551713416,
+      "buildId": "gi-i65-b1-a763f6a99141-57f234755dc1",
+      "artifactId": 10619180286,
+      "artifactDigest": "40eed43501e3d2d762cd0e05998d4bfec08dc0325af06fef0323089b19602793",
+      "exactReadback": true,
+      "functionalPass": true
+    }
+  ],
+  "resume20260923": {
+    "status": "B1_ACCEPTED_REAPPLY_PRESERVED_B2_NEXT",
+    "preservationCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f",
+    "productFixCommits": [
+      "6af01bd02686ef7e756baefc3c5c009c99f491b9",
+      "1feee37836b240b098aef4b99b2ee5f3c4d13f4b",
+      "a8bbb0b1c389c8bfffda9a9369cbc8f42a32cf6d",
+      "44a5dd0bea7a396fdc08900448b841a7d5f92b33",
+      "b3464ea9c068820de9462c7fcf631d302f6042f9",
+      "89077038f966b916fdacf3abcbaedb89ac595fb0",
+      "5fcafdfb59c2742cb64ff02c487b66354ed265a3",
+      "0b00ca6b6ba0a102a33d253ee0b0221a744684e3"
+    ],
+    "broadAuditRepeated": false,
+    "reimportAuthorized": false,
+    "dataMutationAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }
