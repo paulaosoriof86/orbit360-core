@@ -507,6 +507,11 @@ try{
 
   await page.evaluate(()=>{
     window.__b1NativeCalls=[];
+    window.__b1OperationalFailures=[];
+    window.addEventListener('orbit:operational-write:failed',event=>{
+      const d=event&&event.detail||{};
+      window.__b1OperationalFailures.push({collection:String(d.collection||''),id:String(d.id||''),action:String(d.action||''),error:String(d.error||''),batch:d.batch===true,serverCommitted:d.serverCommitted===true});
+    });
     window.prompt=function(){window.__b1NativeCalls.push('prompt');throw new Error('B1_NATIVE_PROMPT_USED');};
     window.alert=function(){window.__b1NativeCalls.push('alert');throw new Error('B1_NATIVE_ALERT_USED');};
   });
@@ -560,7 +565,22 @@ try{
   await page.selectOption('#eu-scope','propios');
   if(await page.locator('#eu-sync-access').count())await page.locator('#eu-sync-access').uncheck();
   await page.click('#eu-ok');
-  await page.waitForSelector('#eq-edit',{state:'detached',timeout:15000});
+  try{
+    await page.waitForSelector('#eq-edit',{state:'detached',timeout:15000});
+  }catch(error){
+    const ui=await page.evaluate(()=>({
+      buttonText:String(document.querySelector('#eu-ok')?.textContent||''),
+      buttonBusy:String(document.querySelector('#eu-ok')?.dataset?.busy||''),
+      buttonDisabled:document.querySelector('#eu-ok')?.disabled===true,
+      toasts:[...document.querySelectorAll('.ciclo-toast')].slice(-4).map(x=>String(x.textContent||'')),
+      failures:(window.__b1OperationalFailures||[]).slice(-8),
+      productWriteStatus:window.Orbit?.store?._productOperationalWriteStatus?.()||null
+    })).catch(e=>({diagnosticError:String(e?.message||e)}));
+    const actual=await canonical(db,synthetic.id);
+    const aq=await db.collection('tenants').doc(TENANT).collection('data').doc('auditoria').collection('items').get();
+    const related=aq.docs.map(d=>d.data()||{}).filter(x=>String(x.after?.email||'').toLowerCase()===synthetic.email||String(x.after?.asesorId||x.after?.id||'')===synthetic.id).map(x=>({accion:String(x.accion||''),motivo:String(x.motivo||'').slice(0,120)}));
+    throw new Error('B1_SYNTHETIC_CREATE_UI_NOT_COMMITTED:'+JSON.stringify({ui,canonicalExists:!!actual,canonical:actual?semanticAdvisor(actual):null,relatedAudit:related.slice(-6)}));
+  }
   const created=await waitFor(async()=>await canonical(db,synthetic.id),'B1_SYNTHETIC_CREATE_READBACK');
   ev.writes.advisorOperational++;ev.writes.auditOperational++;
   need(!(await authByEmail(auth,synthetic.email)),'B1_AUTH_CREATED_WITHOUT_EXPLICIT_ACCESS');
