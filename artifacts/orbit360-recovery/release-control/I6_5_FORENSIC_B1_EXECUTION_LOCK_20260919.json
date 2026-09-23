@@ -45,7 +45,9 @@
     "orbit360-platform/modules/crm-v1198-operational-bridge.js",
     "orbit360-platform/styles/base.css",
     "orbit360-platform/core/pwa.js",
-    "orbit360-platform/sw.js"
+    "orbit360-platform/sw.js",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "orbit360-platform/core/comisiones-eng.js"
   ],
   "backend": {
     "deployTargets": [
@@ -1620,6 +1622,11 @@
     ],
     "livePromotionAuthorized": false,
     "dataReimportAuthorized": false,
-    "b2Paused": true
+    "b2Paused": true,
+    "allowedProductFilesBound": true,
+    "newlyBoundOwners": [
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/core/comisiones-eng.js"
+    ]
   }
 }
