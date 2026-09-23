@@ -29,7 +29,7 @@ need(files.issuanceBridge.includes("onclick = async"),'B2_ISSUANCE_UI_NOT_ASYNC'
 need(files.issuanceBridge.includes('await I.issueRequest'),'B2_ISSUANCE_UI_NOT_AWAITED');
 need(files.receiptsProjection.includes('Orbit.receiptsPortfolioProjection=Orbit.receiptsPortfolioProjectionV920'),'B2_RECEIPTS_CANONICAL_PROJECTION_MISSING');
 need(files.detail.includes('Editar vehículo'),'B2_VEHICLE_EDIT_ACTION_MISSING');
-for(const marker of ['core/access-scope.js?v=20260920-b1r9','core/policy-receipts-engine.js?v=20260920-b2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/policy-receipts-v1199-bridge.js?v=20260920-b2','modules/policy-receipts-v1199-detail-guard.js?v=20260920-b2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+for(const marker of ['core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260920-b2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/policy-receipts-v1199-bridge.js?v=20260920-b2','modules/policy-receipts-v1199-detail-guard.js?v=20260920-b2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={
