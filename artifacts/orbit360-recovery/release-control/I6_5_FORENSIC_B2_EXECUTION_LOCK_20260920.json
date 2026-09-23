@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-20T19:55:00-06:00",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -132,13 +132,13 @@
     "preservationCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f"
   },
   "preview": {
-    "sourceSha": "629ff964a0f28e912c826ff7da05f1a145ed5a18",
-    "buildId": "gi-i65-b2-629ff964a0f2-57f234755dc1",
-    "channelId": "gi-i65-b2-35553166849",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-35553166849-ghr6m0hz.web.app",
-    "runId": 35553166849,
-    "artifactId": 10619780376,
-    "artifactDigest": "82ddf8b8e7e42042010afe38dddcc670085ef8eb8841bd87abc72d27d4bf3cd1",
+    "sourceSha": "9eccb654e3de94d9b75d81d7b55475a3c8f0bb95",
+    "buildId": "gi-i65-b2-9eccb654e3de-57f234755dc1",
+    "channelId": "gi-i65-b2-35929105665",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-35929105665-pezi28fi.web.app",
+    "runId": 35929105665,
+    "artifactId": 10780635506,
+    "artifactDigest": "f0ec8d86c4efad54dbd9ebe086ec836ecf3f06da8ee3a96fcb8883ba66ad07bb",
     "exactReadback": true,
     "functionalPass": true,
     "livePromoted": false
