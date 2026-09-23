@@ -1686,5 +1686,15 @@
     "realUserWritesAuthorized": false,
     "b2Paused": true,
     "livePromotionAuthorized": false
+  },
+  "r21MetaAuditDiscriminant": {
+    "status": "DIAGNOSTIC_READY_PENDING_PREVIEW",
+    "previousRunId": 35912289270,
+    "owner": "tools/gravicentra-i6-5-b1-functional.mjs",
+    "purpose": "Distinguish handler-not-reaching-audit from audit-write-failure using post-meta commit/failure events plus one directed after.asesorId query.",
+    "productChange": false,
+    "realUserWritesAuthorized": false,
+    "b2Paused": true,
+    "livePromotionAuthorized": false
   }
 }

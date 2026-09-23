@@ -643,17 +643,33 @@ try{
   await metaInput.evaluate(el=>{el.value='12345';el.dispatchEvent(new Event('change',{bubbles:true}));});
   const metaRef=db.collection('tenants').doc(TENANT).collection('data').doc('metas').collection('items').doc(metaId);
   await waitFor(async()=>{const x=await metaRef.get();return x.exists&&Number(x.data()?.valor||0)===12345?x:null;},'B1_META_CANONICAL_READBACK',20000,300);
-  const metaAudit=await waitFor(async()=>{
-    const commits=await page.evaluate(start=>(window.__b1OperationalCommits||[]).slice(start),metaCommitBaseline);
-    const auditIds=commits.filter(x=>x.collection==='auditoria'&&x.action==='insert'&&x.canonicalReadback===true).map(x=>x.id).filter(Boolean);
-    for(const auditId of auditIds){
-      const snap=await db.collection('tenants').doc(TENANT).collection('data').doc('auditoria').collection('items').doc(auditId).get();
-      if(!snap.exists)continue;
-      const x=snap.data()||{};
-      if(x.accion==='editar_meta'&&String(x.after?.asesorId||'')===synthetic.id)return{id:auditId,row:x,commits};
-    }
-    return null;
-  },'B1_META_AUDIT_EXACT_READBACK',20000,250);
+  let metaAudit=null;
+  try{
+    metaAudit=await waitFor(async()=>{
+      const commits=await page.evaluate(start=>(window.__b1OperationalCommits||[]).slice(start),metaCommitBaseline);
+      const auditIds=commits.filter(x=>x.collection==='auditoria'&&x.action==='insert'&&x.canonicalReadback===true).map(x=>x.id).filter(Boolean);
+      for(const auditId of auditIds){
+        const snap=await db.collection('tenants').doc(TENANT).collection('data').doc('auditoria').collection('items').doc(auditId).get();
+        if(!snap.exists)continue;
+        const x=snap.data()||{};
+        if(x.accion==='editar_meta'&&String(x.after?.asesorId||'')===synthetic.id)return{id:auditId,row:x,commits};
+      }
+      return null;
+    },'B1_META_AUDIT_EXACT_READBACK',20000,250);
+  }catch(error){
+    const runtime=await page.evaluate(start=>({
+      commits:(window.__b1OperationalCommits||[]).slice(start),
+      failures:(window.__b1OperationalFailures||[]).slice(-12),
+      toasts:[...document.querySelectorAll('.ciclo-toast')].slice(-6).map(x=>String(x.textContent||'')),
+      metaInputValue:String(document.querySelector('[data-meta]')?.value||'')
+    }),metaCommitBaseline).catch(e=>({diagnosticError:String(e?.message||e)}));
+    let directed=[],directedError='';
+    try{
+      const q=await db.collection('tenants').doc(TENANT).collection('data').doc('auditoria').collection('items').where('after.asesorId','==',synthetic.id).get();
+      directed=q.docs.map(d=>({id:d.id,accion:String(d.data()?.accion||''),motivo:String(d.data()?.motivo||'').slice(0,120),afterAdvisorId:String(d.data()?.after?.asesorId||'')}));
+    }catch(queryError){directedError=String(queryError?.message||queryError);}
+    throw new Error('B1_META_AUDIT_DIAGNOSTIC:'+JSON.stringify({runtime,directed:directed.slice(-12),directedError}));
+  }
   need(metaAudit&&metaAudit.row&&metaAudit.row.accion==='editar_meta','B1_META_AUDIT_EXACT_ACTION');
   need(String(metaAudit.row.after?.asesorId||'')===synthetic.id,'B1_META_AUDIT_EXACT_ADVISOR');
   ev.writes.metaOperational++;ev.writes.auditOperational++;
