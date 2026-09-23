@@ -135,6 +135,7 @@ Orbit.modules.equipo = (function () {
     document.getElementById('eq-body').innerHTML = ({ usuarios, permisos, comisiones, metas, auditoria: auditoriaView }[tab] || usuarios)();
     if(tab==='permisos')ensureAccessConfig().then(()=>{if(tab==='permisos'&&document.getElementById('eq-body')){document.getElementById('eq-body').innerHTML=permisos();wire(host);}}).catch(()=>{});
     bindAuditRefresh(host);
+    bindMetaRefresh(host);
     wire(host);
   }
 
@@ -319,7 +320,7 @@ Orbit.modules.equipo = (function () {
     </table></div></div>`;
   }
 
-  let auditStoreRef = null, auditUnsubscribe = null;
+  let auditStoreRef = null, auditUnsubscribe = null, metaStoreRef = null, metaUnsubscribe = null;
   function bindAuditRefresh(host) {
     const st=S();
     if (!st || typeof st.on !== 'function' || auditStoreRef === st) return;
@@ -329,6 +330,17 @@ Orbit.modules.equipo = (function () {
       if (tab !== 'auditoria') return;
       const body=(host&&host.querySelector&&host.querySelector('#eq-body'))||document.getElementById('eq-body');
       if (body) body.innerHTML=auditoriaView();
+    });
+  }
+  function bindMetaRefresh(host) {
+    const st=S();
+    if (!st || typeof st.on !== 'function' || metaStoreRef === st) return;
+    if (typeof metaUnsubscribe === 'function') { try { metaUnsubscribe(); } catch (e) {} }
+    metaStoreRef=st;
+    metaUnsubscribe=st.on('metas', () => {
+      if (tab !== 'metas') return;
+      const body=(host&&host.querySelector&&host.querySelector('#eq-body'))||document.getElementById('eq-body');
+      if (body) { body.innerHTML=metas(); wire(host); }
     });
   }
   function auditoriaView() {

@@ -680,8 +680,16 @@ try{
   need(String(metaAudit.row.after?.asesorId||'')===synthetic.id,'B1_META_AUDIT_EXACT_ADVISOR');
   ev.writes.metaOperational++;ev.writes.auditOperational++;
   await reloadAuthenticated(page,auth,a);await renderEquipo(page);await page.locator('.tab[data-t="metas"]').click();
+  await waitFor(async()=>{
+    const state=await page.evaluate(()=>Orbit.store?._productStatus?.()||{});
+    return Array.isArray(state.serverConfirmedCollections)&&state.serverConfirmedCollections.includes('metas')?state:null;
+  },'B1_META_SERVER_SNAPSHOT_NOT_CONFIRMED',20000,250);
+  await page.waitForFunction(({id,value})=>{
+    const input=document.querySelector('[data-meta="'+id+'|nueva"]');
+    return !!input&&Number(input.value)===value;
+  },{id:synthetic.id,value:12345},{timeout:10000});
   need(Number(await page.locator('[data-meta="'+synthetic.id+'|nueva"]').inputValue())===12345,'B1_META_REFRESH_NOT_PERSISTED');
-  ev.team.synthetic.adminPersistence={commissionCanonical:true,commissionRefresh:true,metaCanonical:true,metaRefresh:true,audit:true};
+  ev.team.synthetic.adminPersistence={commissionCanonical:true,commissionRefresh:true,metaCanonical:true,metaServerSnapshot:true,metaRefresh:true,audit:true};
 
   await renderEquipo(page);
   await page.evaluate(v=>Orbit.modules.equipo.editar(v),synthetic.id);
