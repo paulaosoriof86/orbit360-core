@@ -713,7 +713,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B1_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1953,7 +1953,7 @@
     "b1ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json",
     "b1ExecutionLockBlobSha": "edc10c7a1be1425228b7b66d09adaf99ee1cfab3",
     "b1": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "sourceSha": "bb5055e31931139568135da51bd879132640c2df",
       "buildId": "gi-i65-b1-bb5055e31931-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b1-35455766715-ylc10xr5.web.app",
@@ -2047,6 +2047,14 @@
       "status": "OPEN",
       "assignment": "B2_B3_CROSS_GATE_WITH_FINAL_CLOSURE_BEFORE_B4_PROMOTION",
       "noReimport": true
+    },
+    "b1R16AdministrativeDurabilityAndAuthorization": {
+      "status": "SOURCE_READY_PENDING_PREVIEW",
+      "ownerGeneral": "ROLE_SCOPE_TENANT_POLICY_AND_CANONICAL_OPERATIONAL_WRITER",
+      "realUserWritesAuthorized": false,
+      "syntheticPreviewWritesOnly": true,
+      "livePromotionAuthorized": false,
+      "b2Status": "PAUSED_PENDING_B1_REACCEPTANCE"
     }
   }
 }

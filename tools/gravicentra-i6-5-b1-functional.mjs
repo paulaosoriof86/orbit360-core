@@ -250,7 +250,7 @@ async function proveVerifiedActiveCompatibility(db,auth,browser){
   };
 }
 async function cleanupSynthetic({db,auth,id,email,uid}){
-  const receipt={advisorDeleted:false,memberDeleted:false,authDeleted:false,auditDeleted:0,onboardingDeleted:0,onboardingAuditDeleted:0};
+  const receipt={advisorDeleted:false,memberDeleted:false,authDeleted:false,auditDeleted:0,metasDeleted:0,onboardingDeleted:0,onboardingAuditDeleted:0};
   const tenant=db.collection('tenants').doc(TENANT);
   const advisor=tenant.collection('data').doc('asesores').collection('items').doc(id);
   if((await advisor.get()).exists){await advisor.delete();receipt.advisorDeleted=true;}
@@ -264,9 +264,11 @@ async function cleanupSynthetic({db,auth,id,email,uid}){
 
   const aud=await tenant.collection('data').doc('auditoria').collection('items').get();
   for(const d of aud.docs){
-    const x=d.data()||{},be=String(x.before?.email||'').toLowerCase(),ae=String(x.after?.email||'').toLowerCase();
-    if(be===email||ae===email){await d.ref.delete();receipt.auditDeleted++;}
+    const x=d.data()||{},be=String(x.before?.email||'').toLowerCase(),ae=String(x.after?.email||'').toLowerCase(),bi=String(x.before?.advisorId||x.before?.asesorId||x.before?.id||''),ai=String(x.after?.advisorId||x.after?.asesorId||x.after?.id||'');
+    if(be===email||ae===email||bi===id||ai===id){await d.ref.delete();receipt.auditDeleted++;}
   }
+  const metas=await tenant.collection('data').doc('metas').collection('items').where('asesorId','==',id).get().catch(()=>null);
+  for(const d of metas?.docs||[]){await d.ref.delete();receipt.metasDeleted++;}
   const req=await tenant.collection('onboardingRequests').where('advisorId','==',id).get().catch(()=>null);
   for(const d of req?.docs||[]){await d.ref.delete();receipt.onboardingDeleted++;}
   const hash=crypto.createHash('sha256').update(id).digest('hex');
@@ -284,6 +286,8 @@ const sourceFiles=[
   'orbit360-platform/core/tenant-access-policy-product-p0.js',
   'orbit360-platform/core/auth-product-runtime-p0.js',
   'orbit360-platform/data/store-firestore-product-readonly-p0.js',
+  'orbit360-platform/data/store-firestore-product-operational-p0.js',
+  'orbit360-platform/core/comisiones-eng.js',
   'orbit360-platform/modules/equipo.js',
   'orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js',
   'orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js',
@@ -300,7 +304,7 @@ const ev={
   schema:'GRAVICENTRA_I6_5_B1_PREVIEW_PROOF_V3',
   status:'FAIL',
   target:TARGET,
-  writes:{advisorOperational:0,auditOperational:0,normalizationExcludedFromThisProof:true,syntheticCleanup:0,authSynthetic:0,membershipSynthetic:0},
+  writes:{advisorOperational:0,metaOperational:0,auditOperational:0,normalizationExcludedFromThisProof:true,syntheticCleanup:0,authSynthetic:0,membershipSynthetic:0},
   branding:{},
   team:{},
   auth:{},
@@ -337,6 +341,12 @@ try{
   need(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js'].includes('la entrega al buzón no está confirmada'),'B1_EMAIL_DELIVERY_WORDING_NOT_FAIL_CLOSED');
   need(!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/window\.prompt\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_PROMPT_SOURCE');
   need(!/\breturn\s+alert\s*\(/.test(source['orbit360-platform/modules/equipo.js'])&&!/\breturn\s+alert\s*\(/.test(source['orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js']),'B1_NATIVE_ALERT_SOURCE');
+  need(source['orbit360-platform/data/store-firestore-product-operational-p0.js'].includes("metas:'equipo'"),'B1_METAS_OPERATIONAL_SURFACE_MISSING');
+  need(source['orbit360-platform/core/comisiones-eng.js'].includes('batchDurable'),'B1_COMMISSION_CONFIRMED_WRITE_OWNER_MISSING');
+  need(!source['orbit360-platform/modules/equipo.js'].includes("Orbit.cat.setList('metas'"),'B1_METAS_LOCALSTORAGE_OWNER_REMAINS');
+  need((source['orbit360-platform/modules/equipo.js'].match(/Orbit\.domainConfig\.save\('access'/g)||[]).length>=2,'B1_PERMISSION_RESET_NOT_CANONICAL_SERVER_OWNED');
+  need(source['functions/product-operational-domain.js'].includes("metas: 'equipo'")&&source['functions/product-operational-domain.js'].includes('function matrixPermission(')&&source['functions/product-operational-domain.js'].includes('function withinScope('),'B1_BACKEND_CANONICAL_ACCESS_POLICY_MISSING');
+  need(source['functions/product-operational-domain.js'].includes('roleVisibleAdvisorIds'),'B1_MEMBERSHIP_VISIBILITY_SYNC_MISSING');
 
   browser=await chromium.launch({headless:true});
 
@@ -582,6 +592,38 @@ try{
   await reopen(page,synthetic.id);
   need((await page.inputValue('#eu-tel'))==='','B1_SYNTHETIC_RESTORE_REFRESH_NOT_PERSISTED');
   ev.team.synthetic.harmlessEditRestore={editReadback:true,refresh:true,restoreReadback:true,restoreRefresh:true};
+
+  // B1 R16: Equipo administrative tabs must commit through the canonical
+  // server-owned writer and survive a real authenticated reload. Only the
+  // synthetic advisor created by this proof is mutated, then fully cleaned.
+  await page.click('#eu-cancel');
+  await page.locator('.tab[data-t="comisiones"]').click();
+  const commissionInput=page.locator('[data-vend="'+synthetic.id+'"]');
+  await commissionInput.waitFor({state:'visible',timeout:10000});
+  await commissionInput.evaluate(el=>{el.value='37';el.dispatchEvent(new Event('change',{bubbles:true}));});
+  await waitFor(async()=>{const x=await canonical(db,synthetic.id);return x&&Number(x.shareCom)===37?x:null;},'B1_COMMISSION_CANONICAL_READBACK',20000,300);
+  await waitFor(async()=>{const q=await db.collection('tenants').doc(TENANT).collection('data').doc('auditoria').collection('items').get();return q.docs.some(d=>{const x=d.data()||{};return x.accion==='editar_comision'&&String(x.after?.asesorId||'')===synthetic.id;})?true:null;},'B1_COMMISSION_AUDIT_READBACK',20000,300);
+  ev.writes.advisorOperational++;ev.writes.auditOperational++;
+  await reloadAuthenticated(page,auth,a);await renderEquipo(page);await page.locator('.tab[data-t="comisiones"]').click();
+  need(Number(await page.locator('[data-vend="'+synthetic.id+'"]').inputValue())===37,'B1_COMMISSION_REFRESH_NOT_PERSISTED');
+
+  await page.locator('.tab[data-t="metas"]').click();
+  const metaInput=page.locator('[data-meta="'+synthetic.id+'|nueva"]');
+  await metaInput.waitFor({state:'visible',timeout:10000});
+  const metaPeriodoActual=await page.inputValue('#meta-periodo'),metaPaisActual=await page.inputValue('#meta-pais');
+  const metaId='meta-equipo-'+slug(synthetic.id)+'-'+metaPeriodoActual.replace(/[^0-9-]/g,'')+'-'+slug(metaPaisActual)+'-nueva';
+  await metaInput.evaluate(el=>{el.value='12345';el.dispatchEvent(new Event('change',{bubbles:true}));});
+  const metaRef=db.collection('tenants').doc(TENANT).collection('data').doc('metas').collection('items').doc(metaId);
+  await waitFor(async()=>{const x=await metaRef.get();return x.exists&&Number(x.data()?.valor||0)===12345?x:null;},'B1_META_CANONICAL_READBACK',20000,300);
+  await waitFor(async()=>{const q=await db.collection('tenants').doc(TENANT).collection('data').doc('auditoria').collection('items').get();return q.docs.some(d=>{const x=d.data()||{};return x.accion==='editar_meta'&&String(x.after?.asesorId||'')===synthetic.id;})?true:null;},'B1_META_AUDIT_READBACK',20000,300);
+  ev.writes.metaOperational++;ev.writes.auditOperational++;
+  await reloadAuthenticated(page,auth,a);await renderEquipo(page);await page.locator('.tab[data-t="metas"]').click();
+  need(Number(await page.locator('[data-meta="'+synthetic.id+'|nueva"]').inputValue())===12345,'B1_META_REFRESH_NOT_PERSISTED');
+  ev.team.synthetic.adminPersistence={commissionCanonical:true,commissionRefresh:true,metaCanonical:true,metaRefresh:true,audit:true};
+
+  await renderEquipo(page);
+  await page.evaluate(v=>Orbit.modules.equipo.editar(v),synthetic.id);
+  await page.waitForSelector('#eq-edit #eu-ok',{timeout:10000});
 
   await page.locator('.eu-role[value="Operativo"]').check();
   await page.locator('.eu-pais[value="CO"]').check();
@@ -906,7 +948,7 @@ try{
   };
 
   ev.cleanup=await cleanupSynthetic({db,auth,...synthetic});
-  ev.writes.syntheticCleanup=(ev.cleanup.advisorDeleted?1:0)+(ev.cleanup.memberDeleted?1:0)+(ev.cleanup.authDeleted?1:0)+ev.cleanup.auditDeleted+ev.cleanup.onboardingDeleted+ev.cleanup.onboardingAuditDeleted;
+  ev.writes.syntheticCleanup=(ev.cleanup.advisorDeleted?1:0)+(ev.cleanup.memberDeleted?1:0)+(ev.cleanup.authDeleted?1:0)+ev.cleanup.auditDeleted+ev.cleanup.metasDeleted+ev.cleanup.onboardingDeleted+ev.cleanup.onboardingAuditDeleted;
   need(!(await canonical(db,synthetic.id)),'B1_SYNTHETIC_ADVISOR_REMAINS');
   need(!(await authByEmail(auth,synthetic.email)),'B1_SYNTHETIC_AUTH_REMAINS');
   if(synthetic.uid){
@@ -955,7 +997,7 @@ try{
   if(app)await deleteApp(app).catch(()=>{});
   fs.writeFileSync(OUT,JSON.stringify(ev,null,2)+'\n');
   console.log('I65_B1_PREVIEW_PROOF='+ev.status);
-  console.log('I65_B1_OPERATIONAL_WRITES='+(ev.writes.advisorOperational+ev.writes.auditOperational));
+  console.log('I65_B1_OPERATIONAL_WRITES='+(ev.writes.advisorOperational+ev.writes.metaOperational+ev.writes.auditOperational));
   console.log('I65_B1_AUTH_SYNTHETIC_WRITES='+ev.writes.authSynthetic);
   console.log('I65_B1_MEMBERSHIP_SYNTHETIC_WRITES='+ev.writes.membershipSynthetic);
   console.log('I65_B1_SYNTHETIC_CLEANUP_WRITES='+ev.writes.syntheticCleanup);

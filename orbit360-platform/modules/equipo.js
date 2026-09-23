@@ -254,12 +254,20 @@ Orbit.modules.equipo = (function () {
     </table></div></div>`;
   }
 
-  function metasStore() { const c = Orbit.cat.all(); return c.metas || {}; }
-  function metaKey(aseId, periodo, pais) { return `${aseId}|${periodo}|${pais}`; }
-  function setMeta(aseId, periodo, pais, campo, val) {
-    const c = Orbit.cat.all(); c.metas = c.metas || {};
-    const k = metaKey(aseId, periodo, pais); c.metas[k] = c.metas[k] || { periodo, pais, moneda: currencyForCountry(pais) };
-    c.metas[k][campo] = +val || 0; Orbit.cat.setList('metas', c.metas);
+  function metasStore() { return (S().all('metas') || []).slice(); }
+  function metaKey(aseId, periodo, pais, campo) { return `meta-equipo-${slug(aseId)}-${String(periodo || '').replace(/[^0-9-]/g, '')}-${slug(pais)}-${slug(campo)}`; }
+  function metaRow(aseId, periodo, pais, campo) {
+    return metasStore().find(m => String(m.asesorId || '') === String(aseId || '') && String(m.mes || m.periodo || '') === String(periodo || '') && String(m.pais || '') === String(pais || '') && String(m.tipo || '') === String(campo || ''));
+  }
+  async function setMeta(aseId, periodo, pais, campo, val) {
+    const st=S();
+    if (!st || st.__productOperationalWriteP0 !== true || typeof st.batchDurable !== 'function') throw new Error('META_DURABLE_OWNER_REQUIRED');
+    const current=metaRow(aseId,periodo,pais,campo),id=current&&current.id?current.id:metaKey(aseId,periodo,pais,campo);
+    const patch={mes:periodo,periodo,pais,moneda:currencyForCountry(pais),tipo:campo,asesorId:aseId,valor:+val||0};
+    const result=await st.batchDurable([{action:current?'update':'insert',collection:'metas',id,payload:patch}],{timeoutMs:20000});
+    const confirmed=result&&result.readback&&result.readback[0]?result.readback[0]:null;
+    if(!confirmed||Number(confirmed.valor||0)!==Number(patch.valor||0)) throw new Error('META_CANONICAL_READBACK_MISMATCH');
+    return confirmed;
   }
   function normalizePeriodo(value) {
     if (typeof value === 'number') return `${now.getFullYear()}-${String(value + 1).padStart(2, '0')}`;
@@ -268,8 +276,12 @@ Orbit.modules.equipo = (function () {
   function metaDe(aseId, periodo, pais) {
     const p = pais || metaPais || 'GT';
     const per = normalizePeriodo(periodo);
-    const current = metasStore()[metaKey(aseId, per, p)];
-    if (current) return Object.assign({ nueva: 0, renovada: 0, recaudo: 0, pais: p, moneda: currencyForCountry(p), periodo: per }, current);
+    const rows = metasStore().filter(m => String(m.asesorId || '') === String(aseId || '') && String(m.mes || m.periodo || '') === per && String(m.pais || '') === p);
+    if (rows.length) {
+      const current={nueva:0,renovada:0,recaudo:0,pais:p,moneda:currencyForCountry(p),periodo:per};
+      rows.forEach(m=>{if(['nueva','renovada','recaudo'].includes(String(m.tipo||'')))current[m.tipo]=+m.valor||0;});
+      return current;
+    }
     const a = S().get('asesores', aseId) || {};
     return {
       nueva: Math.round((a.metaPrima || 0) * 0.45), renovada: Math.round((a.metaPrima || 0) * 0.55),
@@ -543,13 +555,29 @@ Orbit.modules.equipo = (function () {
     if (pr) pr.addEventListener('click', async () => {
       const ok = Orbit.ui && Orbit.ui.confirm ? await Orbit.ui.confirm('¿Deseas restablecer la matriz a los permisos estándar?', { title: 'Restablecer permisos', danger: true }) : false; if (!ok) return;
       const motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del restablecimiento:', { title: 'Motivo del restablecimiento' }) : ''; if (String(motivo || '').trim().length < 5) return inform('Indica un motivo claro.', 'Motivo requerido');
-      const before = getPermisos(), next = defaultPermissions(); Orbit.cat.setList('permisos', next); audit('restablecer_permisos', motivo, before, next); render(host);
+      if(!Orbit.domainConfig||typeof Orbit.domainConfig.save!=='function')return inform('La configuración canónica de acceso no está disponible.','No guardado');
+      const before=getAccessConfig(),next=defaultPermissions(),roleScopes=defaultRoleScopes();
+      try{
+        const out=await Orbit.domainConfig.save('access',{rolePermissions:next,roleScopes},motivo);
+        if(!out||out.ok!==true||!out.config)throw new Error('ACCESS_CONFIG_SERVER_CONFIRMATION_MISSING');
+        accessConfigCache=out.config;Orbit.cat.setList('permisos',next);
+        await audit('restablecer_permisos',motivo,before,{rolePermissions:next,roleScopes});
+        if(Orbit.router&&Orbit.router.rebuildSidebar)Orbit.router.rebuildSidebar();
+        toast('✓ Permisos restablecidos y confirmados por servidor');render(host);
+      }catch(error){inform('No fue posible confirmar el restablecimiento en el servidor. No se declaró guardado.','No guardado');}
     });
-    host.querySelectorAll('[data-modo]').forEach(sel => sel.addEventListener('change', () => { Orbit.comeng.setVendModo(sel.dataset.modo, sel.value); render(host); }));
-    host.querySelectorAll('[data-vend]').forEach(inp => inp.addEventListener('change', () => Orbit.comeng.setVendShare(inp.dataset.vend, inp.value)));
-    host.querySelectorAll('[data-vval]').forEach(inp => inp.addEventListener('change', () => Orbit.comeng.setVendValor(inp.dataset.vval, inp.value)));
-    host.querySelectorAll('[data-meta]').forEach(inp => inp.addEventListener('change', () => {
-      const [aid, campo] = inp.dataset.meta.split('|'); setMeta(aid, metaPeriodo, metaPais, campo, inp.value); render(host);
+    host.querySelectorAll('[data-modo]').forEach(sel => sel.addEventListener('change', async () => {
+      try{await Orbit.comeng.setVendModo(sel.dataset.modo,sel.value);await audit('editar_comision','Modelo de comisión actualizado',null,{asesorId:sel.dataset.modo,comModo:sel.value});toast('✓ Comisión guardada y confirmada');render(host);}catch(error){inform('No fue posible confirmar la comisión en el servidor.','No guardado');}
+    }));
+    host.querySelectorAll('[data-vend]').forEach(inp => inp.addEventListener('change', async () => {
+      try{await Orbit.comeng.setVendShare(inp.dataset.vend,inp.value);await audit('editar_comision','Participación de comisión actualizada',null,{asesorId:inp.dataset.vend,shareCom:+inp.value||0});toast('✓ Comisión guardada y confirmada');}catch(error){inform('No fue posible confirmar la comisión en el servidor.','No guardado');}
+    }));
+    host.querySelectorAll('[data-vval]').forEach(inp => inp.addEventListener('change', async () => {
+      try{await Orbit.comeng.setVendValor(inp.dataset.vval,inp.value);await audit('editar_comision','Valor de comisión actualizado',null,{asesorId:inp.dataset.vval,comValor:+inp.value||0});toast('✓ Comisión guardada y confirmada');}catch(error){inform('No fue posible confirmar la comisión en el servidor.','No guardado');}
+    }));
+    host.querySelectorAll('[data-meta]').forEach(inp => inp.addEventListener('change', async () => {
+      const [aid,campo]=inp.dataset.meta.split('|');
+      try{const before=Object.assign({asesorId:aid},metaDe(aid,metaPeriodo,metaPais));await setMeta(aid,metaPeriodo,metaPais,campo,inp.value);await audit('editar_meta','Meta actualizada desde Equipo',before,Object.assign({asesorId:aid},metaDe(aid,metaPeriodo,metaPais)));toast('✓ Meta guardada y confirmada');render(host);}catch(error){inform('No fue posible confirmar la meta en el servidor.','No guardado');}
     }));
     const mp = host.querySelector('#meta-periodo'); if (mp) mp.addEventListener('change', () => { metaPeriodo = mp.value || metaPeriodo; render(host); });
     const mc = host.querySelector('#meta-pais'); if (mc) mc.addEventListener('change', () => { metaPais = mc.value || metaPais; render(host); });

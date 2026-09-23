@@ -28,6 +28,7 @@
     comisiones:'comisiones',
     actividades:'cliente360',
     asesores:'equipo',
+    metas:'equipo',
     auditoria:'equipo'
   });
 

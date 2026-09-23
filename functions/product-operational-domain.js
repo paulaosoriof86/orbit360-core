@@ -7,7 +7,7 @@ const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
-const VERSION = 'gravicentra-product-operational-domain-v2';
+const VERSION = 'gravicentra-product-operational-domain-v3-b1-canonical-access';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 
@@ -24,6 +24,7 @@ const COLLECTION_MODULE = Object.freeze({
   comisiones: 'comisiones',
   actividades: 'cliente360',
   asesores: 'equipo',
+  metas: 'equipo',
   auditoria: 'equipo',
   auditoriaAsegExterna: 'aseguradoras'
 });
@@ -145,36 +146,79 @@ function membershipPatchFromAdvisor(row, current) {
     ),
     modulesExtra: unique(row.modulosExtra || row.modulesExtra),
     modulesRestricted: unique(row.modulosRestringidos || row.modulesRestricted),
+    teamId: text(row.teamId || row.equipoId, 160),
+    equipoId: text(row.teamId || row.equipoId, 160),
+    roleVisibleAdvisorIds: row.roleVisibleAdvisorIds && typeof row.roleVisibleAdvisorIds === 'object' ? row.roleVisibleAdvisorIds : {},
     updatedAt: now(),
     schemaVersion: 'orbit360-tenant-membership-v2'
   };
 }
+function accessConfigRef(tenantId) { return db.collection('tenants').doc(tenantId).collection('config').doc('access'); }
+function roleConfig(accessConfig, role) {
+  const all = accessConfig && accessConfig.rolePermissions && typeof accessConfig.rolePermissions === 'object' ? accessConfig.rolePermissions : {};
+  const key = Object.keys(all).find(k => norm(k) === norm(role));
+  return key ? all[key] : null;
+}
+function matrixPermission(accessConfig, role, moduleKey, action) {
+  const rc = roleConfig(accessConfig, role); if (!rc || typeof rc !== 'object') return null;
+  const key = Object.keys(rc).find(k => norm(k) === norm(moduleKey)), cell = key ? rc[key] : null;
+  return cell && cell[action] != null ? cell[action] === true : null;
+}
+function normalizedScope(value) { const s=norm(value); if(['own','propios','propio','mios'].includes(s))return'own'; if(['team','equipo'].includes(s))return'team'; if(['all','todos','todo','global'].includes(s))return'all'; if(['none','ninguno','sinacceso','sin_acceso'].includes(s))return'none'; return''; }
+const MODULE_SCOPE_ALIASES=Object.freeze({cliente360:['cliente360','clientes'],clientes:['clientes','cliente360'],ops:['ops','gestiones'],gestiones:['gestiones','ops']});
+function moduleScopeValue(modules,moduleKey){const source=modules&&typeof modules==='object'?modules:{},keys=MODULE_SCOPE_ALIASES[moduleKey]||[moduleKey];for(const key of keys){const found=Object.keys(source).find(k=>norm(k)===norm(key));if(found)return source[found];}return undefined;}
+function roleScope(accessConfig,role){
+  const rs=accessConfig&&accessConfig.roleScopes&&typeof accessConfig.roleScopes==='object'?accessConfig.roleScopes:{};
+  const key=Object.keys(rs).find(k=>norm(k)===norm(role)),configured=key?normalizedScope(rs[key]):''; if(configured)return configured;
+  const r=norm(role); if(['direccion','superadmin','super_admin','admintenant','admin_tenant','admin','finanzas','finance','operativo'].includes(r))return'all'; if(['marketing','asistente'].includes(r))return'team'; if(r.includes('asesor')||r==='comercial')return'own'; return'none';
+}
+function scopeRank(v){return{none:0,own:1,team:2,all:3}[v]||0;}
+function effectiveScope(member,accessConfig,role,moduleKey){
+  const ds=member&&member.dataScopes&&typeof member.dataScopes==='object'?member.dataScopes:{},mods=ds.modules&&typeof ds.modules==='object'?ds.modules:{};
+  let requested=normalizedScope(moduleScopeValue(mods,moduleKey)); if(!requested)requested=normalizedScope(ds.default||member.scopeDatos||member.dataScope);
+  const ceiling=roleScope(accessConfig,role); if(!requested)return ceiling; return scopeRank(requested)<=scopeRank(ceiling)?requested:ceiling;
+}
+function listHas(values,moduleKey){return unique(values).map(norm).includes(norm(moduleKey));}
+function moduleVisibleForWrite(member,accessConfig,role,moduleKey){
+  if(listHas(member&&(member.modulesRestricted||member.modulosRestringidos),moduleKey))return false;
+  if(listHas(member&&(member.modulesExtra||member.modulosExtra),moduleKey))return true;
+  const visible=matrixPermission(accessConfig,role,moduleKey,'ver'); return visible==null?true:visible;
+}
+function legacyWriteAllowed(member,role,moduleKey,collection){
+  let allowed=ADMIN_ROLES.has(role); if(collection==='asesores'||collection==='metas'||collection==='auditoria')allowed=TEAM_ROLES.has(role); if(['cobros','comisiones','recibosEsperados','carteraPrimas'].includes(collection)&&FINANCE_ROLES.has(role))allowed=true;
+  if(allowed)return true; const permissions=permissionsOf(member),keys=[`${moduleKey}_manage`,`${moduleKey}_edit`,`${moduleKey}_editar`,`${moduleKey}_create`,`${moduleKey}_crear`].map(norm); return permissions.some(p=>keys.includes(p));
+}
+function canWrite(member,accessConfig,role,moduleKey,collection){
+  if(!moduleVisibleForWrite(member,accessConfig,role,moduleKey))return false;
+  const permissions=permissionsOf(member),extraKeys=[`${moduleKey}_manage`,`${moduleKey}_edit`,`${moduleKey}_editar`,`${moduleKey}_create`,`${moduleKey}_crear`].map(norm); if(permissions.some(p=>extraKeys.includes(p)))return true;
+  const configured=matrixPermission(accessConfig,role,moduleKey,'editar'); return configured==null?legacyWriteAllowed(member,role,moduleKey,collection):configured;
+}
+function countryAllowed(member,row){const allowed=unique(member&&member.countries).map(v=>text(v,8).toUpperCase());if(!allowed.length)return true;const p=text(row&&row.pais,8).toUpperCase();return !p||['REQUIERE_VALIDACION','POR_VALIDAR','PENDIENTE'].includes(p)||allowed.includes(p);}
+function rowAdvisorId(collection,row){if(collection==='asesores')return text(row&&row.id,180);return text(row&&(row.asesorId||row.advisorId||row.ownerAdvisorId),180);}
+const UNSCOPED_COLLECTIONS=new Set(['aseguradoras','auditoria','auditoriaAsegExterna']);
+function withinScope(actor,collection,moduleKey,row){
+  if(UNSCOPED_COLLECTIONS.has(collection))return true; if(!countryAllowed(actor.member,row))return false;
+  const scope=effectiveScope(actor.member,actor.accessConfig,actor.activeRole,moduleKey); if(scope==='none')return false; if(scope==='all')return true;
+  const target=rowAdvisorId(collection,row); if(!target)return false; if(scope==='own')return target===text(actor.member.advisorId,180); if(scope==='team')return actor.teamAdvisorIds.has(target); return false;
+}
 async function authorize(request, tenantId, mutations) {
   if (!request.auth || !request.auth.uid) throw new HttpsError('unauthenticated', 'Se requiere sesión activa.');
-  const snap = await memberRef(tenantId, request.auth.uid).get();
-  const member = snap.exists ? snap.data() : null;
-  if (!activeMember(member) || text(member.tenantId, 160) !== tenantId) throw new HttpsError('permission-denied', 'Membresía activa requerida.');
+  const [snap,accessSnap]=await Promise.all([memberRef(tenantId,request.auth.uid).get(),accessConfigRef(tenantId).get()]);
+  const member=snap.exists?snap.data():null;
+  if(!activeMember(member)||text(member.tenantId,160)!==tenantId)throw new HttpsError('permission-denied','Membresía activa requerida.');
   let requestedRole;
-  try {
-    requestedRole = resolveProductActiveRole(member, request.data && request.data.activeRole).activeRole;
-  } catch (error) {
-    throw new HttpsError('permission-denied', error && error.code === 'PRODUCT_ASSIGNED_ROLES_MISSING' ? 'La membresía no tiene roles asignados.' : 'El rol activo no está asignado.');
+  try{requestedRole=resolveProductActiveRole(member,request.data&&request.data.activeRole).activeRole;}
+  catch(error){throw new HttpsError('permission-denied',error&&error.code==='PRODUCT_ASSIGNED_ROLES_MISSING'?'La membresía no tiene roles asignados.':'El rol activo no está asignado.');}
+  const accessConfig=accessSnap.exists?accessSnap.data()||{}:{}; let needsTeam=false;
+  for(const mutation of mutations){
+    const collection=text(mutation.collection,80),moduleKey=COLLECTION_MODULE[collection]; if(!moduleKey)throw new HttpsError('permission-denied','Colección fuera del contrato operativo.');
+    if(!canWrite(member,accessConfig,requestedRole,moduleKey,collection))throw new HttpsError('permission-denied',`El rol activo no puede escribir ${collection}.`);
+    if(!UNSCOPED_COLLECTIONS.has(collection)&&effectiveScope(member,accessConfig,requestedRole,moduleKey)==='team')needsTeam=true;
   }
-  const permissions = permissionsOf(member);
-  for (const mutation of mutations) {
-    const collection = text(mutation.collection, 80);
-    const moduleKey = COLLECTION_MODULE[collection];
-    if (!moduleKey) throw new HttpsError('permission-denied', 'Colección fuera del contrato operativo.');
-    let allowed = ADMIN_ROLES.has(requestedRole);
-    if (collection === 'asesores' || collection === 'auditoria') allowed = TEAM_ROLES.has(requestedRole);
-    if (['cobros','comisiones','recibosEsperados','carteraPrimas'].includes(collection) && FINANCE_ROLES.has(requestedRole)) allowed = true;
-    if (!allowed) {
-      const keys = [`${moduleKey}_manage`, `${moduleKey}_edit`, `${moduleKey}_editar`, `${moduleKey}_create`, `${moduleKey}_crear`].map(norm);
-      allowed = permissions.some(p => keys.includes(p));
-    }
-    if (!allowed) throw new HttpsError('permission-denied', `El rol activo no puede escribir ${collection}.`);
-  }
-  return { uid: request.auth.uid, activeRole: requestedRole, member };
+  const own=text(member.advisorId,180),teamAdvisorIds=new Set(own?[own]:[]),roleMap=member.roleVisibleAdvisorIds&&typeof member.roleVisibleAdvisorIds==='object'?member.roleVisibleAdvisorIds:{};
+  const roleMapKey=Object.keys(roleMap).find(k=>norm(k)===norm(requestedRole)); unique(roleMapKey?roleMap[roleMapKey]:[]).forEach(id=>teamAdvisorIds.add(id)); unique(member.teamAdvisorIds||member.asesoresEquipo||[]).forEach(id=>teamAdvisorIds.add(id));
+  if(needsTeam){const teamId=text(member.teamId||member.equipoId,160); if(teamId||own){const advisorSnap=await db.collection('tenants').doc(tenantId).collection('data').doc('asesores').collection('items').get(); advisorSnap.docs.forEach(doc=>{const row=doc.data()||{},id=text(row.id||doc.id,180);if(teamId&&text(row.teamId||row.equipoId,160)===teamId)teamAdvisorIds.add(id);if(own&&text(row.supervisorId,180)===own)teamAdvisorIds.add(id);});}}
+  return{uid:request.auth.uid,activeRole:requestedRole,member,accessConfig,teamAdvisorIds};
 }
 function normalizeMutation(raw) {
   const mutation = raw || {};
@@ -233,6 +277,8 @@ async function execute(request) {
       const before = snap.exists ? snap.data() : null;
       if (mutation.action === 'insert' && before) throw new HttpsError('already-exists', `${mutation.collection}/${mutation.id} ya existe.`);
       if ((mutation.action === 'update' || mutation.action === 'remove') && !before) throw new HttpsError('not-found', `${mutation.collection}/${mutation.id} no existe.`);
+      const scopeRow=Object.assign({},before||{},mutation.payload||{},{id:mutation.id,tenantId});
+      if(!withinScope(actor,mutation.collection,COLLECTION_MODULE[mutation.collection],scopeRow))throw new HttpsError('permission-denied',`El alcance activo no autoriza ${mutation.collection}/${mutation.id}.`);
       if (mutation.action === 'remove') {
         if (mutation.collection === 'aseguradoras') {
           const linked = db.collection('tenants').doc(tenantId).collection('data').doc('polizas').collection('items').where('aseguradoraId','==',mutation.id).limit(1);

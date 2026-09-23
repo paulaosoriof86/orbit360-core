@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B1_EXECUTION_LOCK_V1",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "date": "2026-09-19",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -126,7 +126,8 @@
         "auditoria",
         "members",
         "onboardingRequests",
-        "auditEvents"
+        "auditEvents",
+        "metas"
       ],
       "operationalRequestAndEventEvidenceMayRemain": true,
       "realUserAuthMutationForbidden": true,
@@ -1590,5 +1591,35 @@
       "requiredMenuContract": "hamburger visible + real touch opens sidebar + second real touch closes sidebar",
       "overlay": "record-only observation"
     }
+  },
+  "r16AdministrativeDurabilityAndAuthorization": {
+    "status": "SOURCE_READY_PENDING_PREVIEW",
+    "rootCauseClass": "B1_ADMIN_UI_DURABILITY_AND_SERVER_AUTHORIZATION_DIVERGENCE",
+    "generalConditions": [
+      "EQUIPO_METAS_WROTE_LOCAL_CATALOG_WHILE_CANONICAL_CONSUMERS_READ_FIRESTORE_METAS",
+      "EQUIPO_COMMISSION_WRITES_DID_NOT_AWAIT_SERVER_CONFIRMATION_OR_CANONICAL_READBACK",
+      "PERMISSION_RESET_MUTATED_ONLY_LOCAL_CATALOG_INSTEAD_OF_CANONICAL_ACCESS_CONFIG",
+      "PRODUCT_OPERATIONAL_BACKEND_USED_STATIC_ROLE_SETS_INSTEAD_OF_CANONICAL_ROLE_PERMISSIONS_AND_DID_NOT_ENFORCE_SCOPE_COUNTRY",
+      "ADVISOR_TO_MEMBERSHIP_SYNC_DROPPED_TEAM_VISIBILITY_RELATION_FIELDS"
+    ],
+    "ownerChain": [
+      "orbit360-platform/modules/equipo.js",
+      "orbit360-platform/core/comisiones-eng.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "functions/product-operational-domain.js",
+      "tools/gravicentra-i6-5-b1-functional.mjs"
+    ],
+    "correctionContract": [
+      "NO_USER_SPECIFIC_BRANCHING",
+      "METAS_USE_CANONICAL_FIRESTORE_OPERATIONAL_WRITER",
+      "COMMISSIONS_REQUIRE_SERVER_CONFIRMATION_AND_CANONICAL_READBACK",
+      "PERMISSION_RESET_SAVES_CANONICAL_ACCESS_CONFIG",
+      "SERVER_WRITE_AUTHORIZATION_USES_ROLE_PERMISSIONS_MODULE_RESTRICTIONS_DATA_SCOPE_COUNTRY_AND_TEAM_RELATIONS",
+      "MEMBERSHIP_SYNC_PRESERVES_TEAM_VISIBILITY_FIELDS",
+      "SYNTHETIC_PREVIEW_ONLY_PERSISTENCE_PROOF_WITH_CLEANUP"
+    ],
+    "livePromotionAuthorized": false,
+    "dataReimportAuthorized": false,
+    "b2Paused": true
   }
 }

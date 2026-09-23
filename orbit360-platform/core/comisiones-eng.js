@@ -80,9 +80,14 @@ Orbit.comeng = (function () {
     if (pct === '' || pct == null) delete c[producto]; else c[producto] = +pct || 0;
     S().update('aseguradoras', asgId, { comisionesProd: c });
   }
-  function setVendShare(aseId, pct) { S().update('asesores', aseId, { shareCom: +pct || 0 }); }
-  function setVendModo(aseId, modo) { S().update('asesores', aseId, { comModo: modo }); }
-  function setVendValor(aseId, valor) { S().update('asesores', aseId, { comValor: +valor || 0 }); }
+  function durableAdvisorPatch(aseId, patch) {
+    const st = S();
+    if (!st || st.__productOperationalWriteP0 !== true || typeof st.batchDurable !== 'function') return Promise.reject(new Error('COMMISSION_ADVISOR_DURABLE_OWNER_REQUIRED'));
+    return st.batchDurable([{ action: 'update', collection: 'asesores', id: aseId, payload: patch }], { timeoutMs: 20000 });
+  }
+  function setVendShare(aseId, pct) { return durableAdvisorPatch(aseId, { shareCom: +pct || 0 }); }
+  function setVendModo(aseId, modo) { return durableAdvisorPatch(aseId, { comModo: modo }); }
+  function setVendValor(aseId, valor) { return durableAdvisorPatch(aseId, { comValor: +valor || 0 }); }
 
   /* Aplica filas de una planilla importada al matriz de tarifas.
      filas: [{ aseguradoraId, producto, ramo, pct }] */
