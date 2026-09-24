@@ -10,6 +10,7 @@ const PROJECT='ays-orbit-360-lab';
 const TENANT=String(process.env.TENANT_HINT||'').trim();
 const TARGET=String(process.env.TARGET_URL||'').replace(/\/$/,'');
 const OUT=process.env.B2_AUTH_PROOF_FILE||path.join(process.env.RUNNER_TEMP||process.cwd(),'b2-authenticated-preview.json');
+const VISUAL_DIR=process.env.B2_VISUAL_DIR||path.join(process.env.RUNNER_TEMP||process.cwd(),'b2-visual');
 const RUN=String(process.env.GITHUB_RUN_ID||Date.now());
 const clean=(v,m=500)=>String(v==null?'':v).trim().slice(0,m);
 const norm=v=>clean(v,180).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
@@ -21,6 +22,7 @@ const uniq=a=>[...new Set([].concat(a||[]).map(x=>clean(x,180)).filter(Boolean))
 const hash=v=>crypto.createHash('sha256').update(String(v||'')).digest('hex');
 const evidence={status:'RUNNING',target:TARGET,runId:RUN,scope:{},crud:{},renewal:{},cleanup:{},errors:[],writes:{synthetic:0,cleanup:0}};
 fs.mkdirSync(path.dirname(OUT),{recursive:true});
+fs.mkdirSync(VISUAL_DIR,{recursive:true});
 need(TENANT,'B2_AUTH_TENANT_REQUIRED');
 need(/^https:\/\/.+\.web\.app$/.test(TARGET),'B2_AUTH_TARGET_INVALID');
 
@@ -43,6 +45,75 @@ async function waitFor(fn,label,timeout=25000,interval=300){
   }
   throw new Error(label+':'+clean(last&&last.message||last||'timeout',800));
 }
+async function captureVisualAudit(page){
+  const out={files:[],desktop:{},mobile:{},readOnly:true};
+  const shot=async(name)=>{
+    const file=path.join(VISUAL_DIR,name+'.png');
+    await page.screenshot({path:file,fullPage:true});
+    out.files.push(path.basename(file));
+  };
+  const go=async(key)=>{
+    await page.evaluate(k=>{if(window.Orbit?.router?.go)Orbit.router.go(k);else location.hash='#/'+k;},key);
+    await sleep(900);
+    return page.evaluate(()=>({hash:String(location.hash||''),routeKey:String(Orbit.route?.key||''),body:String(document.body?.innerText||'').slice(0,4000)}));
+  };
+  await page.setViewportSize({width:1500,height:1000});
+  out.desktop.inicio=await go('inicio'); await shot('01-inicio-desktop');
+  out.desktop.academia=await go('academia'); await shot('02-academia-desktop');
+  out.desktop.aseguradoras=await go('aseguradoras'); await shot('03-aseguradoras-desktop');
+  out.desktop.cliente360=await go('cliente360'); await shot('04-cliente360-desktop');
+
+  const sample=await page.evaluate(()=>{
+    const polizas=(Orbit.store?.all?.('polizas')||[]).filter(Boolean);
+    const vehiculos=(Orbit.store?.all?.('vehiculos')||[]).filter(Boolean);
+    const cobros=(Orbit.store?.all?.('cobros')||[]).filter(Boolean);
+    let policy=polizas.find(p=>vehiculos.some(v=>String(v.polizaId||'')===String(p.id||'')))||polizas[0]||null;
+    let vehicle=policy?vehiculos.find(v=>String(v.polizaId||'')===String(policy.id||'')):vehiculos[0]||null;
+    let client=policy?Orbit.store.get('clientes',policy.clienteId):null;
+    let receipt=policy?cobros.find(c=>String(c.polizaId||'')===String(policy.id||'')):cobros[0]||null;
+    return{clientId:String(client?.id||''),policyId:String(policy?.id||''),vehicleId:String(vehicle?.id||''),receiptId:String(receipt?.id||'')};
+  });
+  out.sample=sample;
+
+  if(sample.clientId){
+    await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id);},sample.clientId);
+    await sleep(900); await shot('05-cliente360-detail-desktop');
+  }
+  if(sample.policyId){
+    await page.evaluate(id=>Orbit.modules?.cliente360?.verPoliza?.(id),sample.policyId);
+    await page.waitForSelector('#c360-edit',{timeout:10000});
+    await shot('06-policy-detail-desktop');
+    await page.evaluate(()=>document.getElementById('c360-edit')?.remove());
+  }
+  if(sample.vehicleId){
+    await page.evaluate(id=>Orbit.modules?.cliente360?.verVehiculo?.(id),sample.vehicleId);
+    await page.waitForSelector('#c360-veh',{timeout:10000});
+    await shot('07-vehicle-detail-desktop');
+    await page.evaluate(()=>document.getElementById('c360-veh')?.remove());
+  }
+  if(sample.receiptId){
+    await page.evaluate(id=>Orbit.modules?.cobros?.detalle?.(id),sample.receiptId);
+    await page.waitForSelector('#cob-det',{timeout:10000});
+    await shot('08-receipt-detail-desktop');
+    await page.evaluate(()=>document.getElementById('cob-det')?.remove());
+  }
+
+  await page.setViewportSize({width:390,height:844});
+  out.mobile.academia=await go('academia'); await shot('09-academia-mobile');
+  if(sample.policyId){
+    await page.evaluate(id=>Orbit.modules?.cliente360?.verPoliza?.(id),sample.policyId);
+    await page.waitForSelector('#c360-edit',{timeout:10000});
+    await shot('10-policy-detail-mobile');
+    await page.evaluate(()=>document.getElementById('c360-edit')?.remove());
+  }
+  await page.setViewportSize({width:1500,height:1000});
+
+  const visibleOrbit=await page.evaluate(()=>/\bOrbit 360\b/.test(String(document.body?.innerText||'')));
+  out.visibleOrbit360=visibleOrbit;
+  out.gravicentraVisible=await page.evaluate(()=>String(document.body?.innerText||'').includes('Gravicentra'));
+  return out;
+}
+
 async function acceptLegalGate(page,timeout=2500){
   const gate=page.locator('[data-legal-gate]').last();
   const visible=await gate.waitFor({state:'visible',timeout}).then(()=>true).catch(()=>false);
@@ -247,6 +318,11 @@ try{
   evidence.academia={operativo:academiaOper,asesor:academiaAsesor,automaticWrites:false,pass:true};
   milestone('ACADEMIA_ROLE_ROUTES',{operativo:academiaOper.catalogCount,asesor:academiaAsesor.catalogCount});
   await setRole(page,'Operativo');
+  const visualAudit=await bounded(captureVisualAudit(page),'B2_AUTH_VISUAL_AUDIT_TIMEOUT',90000);
+  evidence.visualAudit=visualAudit;
+  milestone('VISUAL_AUDIT_CAPTURED',{files:visualAudit.files,visibleOrbit360:visualAudit.visibleOrbit360,gravicentraVisible:visualAudit.gravicentraVisible,sample:visualAudit.sample});
+  need(visualAudit.gravicentraVisible===true,'B2_AUTH_VISUAL_GRAVICENTRA_BRAND_MISSING');
+  need(visualAudit.visibleOrbit360===false,'B2_AUTH_VISUAL_ORBIT360_BRAND_REMAINS');
 
   const stamp=RUN.replace(/[^0-9A-Za-z]/g,'').slice(-12);
   const clientName='B2 QA '+stamp,ident='B2QA-'+stamp,policyNo='B2-POL-'+stamp,renewNo='B2-REN-'+stamp;
