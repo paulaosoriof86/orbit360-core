@@ -564,7 +564,9 @@ Orbit.modules.cliente360 = (function () {
             ${vrow('Chasis (VIN)', v.chasis)}${vrow('Motor', v.motor)}
             ${vrow('Suma asegurada', U.money(v.sumaAsegurada, p ? p.moneda : 'GTQ'))}${vrow('Póliza', p ? p.numero : '—')}
           </div>
-          <div style="margin-top:12px;display:flex;gap:8px">
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${v.id}')">Ver vehículo</button>
+            <button class="btn ghost sm" onclick="Orbit.modules.cliente360.editarVehiculo&&Orbit.modules.cliente360.editarVehiculo('${v.id}')">Editar vehículo</button>
             <button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${v.polizaId}')">Ver póliza</button>
             <button class="btn ghost sm" onclick="Orbit.importa.open('polizas')">Importar documentos</button>
           </div>
@@ -572,7 +574,7 @@ Orbit.modules.cliente360 = (function () {
       }).join('')}
     </div>`;
   }
-  function vrow(k, v) { return `<div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">${k}</div><div style="font-weight:600;margin-top:1px">${U.esc(v)}</div></div>`; }
+  function vrow(k, v) { const t=v==null?'':String(v).trim(), shown=(!t||/^(undefined|null)$/i.test(t))?'—':t; return `<div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">${k}</div><div style="font-weight:500;margin-top:1px">${U.esc(shown)}</div></div>`; }
 
   /* ---- Recibos y cobros (filtro por póliza + confirmar cobro) ---- */
   let recPolFiltro = {};  // por cliente: polizaId seleccionada
@@ -585,7 +587,7 @@ Orbit.modules.cliente360 = (function () {
     const cobrado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + (+c.monto || 0), 0);
     const ident = (p) => {
       const v = S().where('vehiculos', x => x.polizaId === p.id)[0];
-      return v ? (v.marca + ' ' + v.linea + (v.placa ? ' · ' + v.placa : '')) : (p.concepto || p.subramo || p.ramo);
+      return v ? ([v.marca,v.linea].filter(x=>x && !/^(undefined|null)$/i.test(String(x).trim())).join(' ') + (v.placa && !/^(undefined|null)$/i.test(String(v.placa).trim()) ? ' · ' + v.placa : '')) : (p.concepto || p.subramo || p.ramo);
     };
     const opts = `<option value="todas" ${sel === 'todas' ? 'selected' : ''}>Todas las pólizas (${cobAll.length})</option>` +
       polis.map(p => `<option value="${p.id}" ${sel === p.id ? 'selected' : ''}>${p.numero} · ${(q.aseguradora(p.aseguradoraId) || {}).nombre || ''} · ${U.esc(ident(p))}</option>`).join('');
