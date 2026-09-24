@@ -25,6 +25,8 @@ const files={
   config:read('orbit360-platform/core/config.js'),
   router:read('orbit360-platform/core/router.js'),
   productApp:read('orbit360-platform/core/product-app-p0.js'),
+  credentialProvider:read('orbit360-platform/core/product-insurer-credential-provider-p0.js'),
+  credentialBackend:read('functions/product-insurer-credentials.js'),
   index:read('orbit360-platform/index.html')
 };
 
@@ -71,6 +73,16 @@ need(files.issuanceBridge.includes("onclick = async"),'B2_ISSUANCE_UI_NOT_ASYNC'
 need(files.issuanceBridge.includes('await I.issueRequest'),'B2_ISSUANCE_UI_NOT_AWAITED');
 need(files.receiptsProjection.includes('Orbit.receiptsPortfolioProjection=Orbit.receiptsPortfolioProjectionV920'),'B2_RECEIPTS_CANONICAL_PROJECTION_MISSING');
 need(files.detail.includes('Editar vehículo'),'B2_VEHICLE_EDIT_ACTION_MISSING');
+need(files.bridge.includes('function openVehicleForm(vehicleId)')&&files.bridge.includes('clientMod.editarVehiculo=function(vehicleId)'),'B2_DEDICATED_VEHICLE_EDITOR_MISSING');
+need(files.bridge.includes("if (existing && !reason)")&&files.engine.includes("if(!clean(options.motivo))return{ok:false,errors:['motivo_requerido']"),'B2_POLICY_REASON_FAIL_CLOSED_MISSING');
+need(files.detail.includes("out.formaPago = first(p.formaPago, p.metodoPago)")&&files.detail.includes("out.conducto = first(p.conducto, p.conductoPago)")&&!files.detail.includes("out.formaPago = first(p.formaPago, p.conductoPago"),'B2_PAYMENT_CONDUCT_CROSS_FALLBACK_REMAINS');
+need(files.detail.includes('Base imponible para IVA')&&!files.detail.includes("['Base gravable', pb.taxable]"),'B2_TAXABLE_BASE_UI_SEMANTIC_NOT_FIXED');
+need(files.receiptsProjection.includes("clientWrapper=function(host){var out=cr(host);patchClient(host);return out;}")&&!files.receiptsProjection.includes("setTimeout(function(){patchHeader(cid)"),'B2_RECEIPT_DOUBLE_RENDER_RACE_REMAINS');
+need(files.receiptsProjection.includes('Datos actualizados al')&&files.receiptsProjection.includes('Documento de origen')&&!files.receiptsProjection.includes("cell('Fuente autoridad'")&&!files.receiptsProjection.includes("cell('Calidad de match'"),'B2_RECEIPT_DETAIL_TECHNICAL_UI_REMAINS');
+need(files.insurers.includes('id="af-logo"')&&files.insurers.includes("'nombre', 'logo', 'nit'"),'B2_INSURER_LOGO_NOT_ADMINISTRABLE');
+need(files.credentialBackend.includes("'operativo']")&&files.credentialBackend.includes("previewSecretPattern:'orbit360-insurer-credentials-preview-{tenantId}'")&&files.credentialBackend.includes("importEnabled:true")&&!files.credentialBackend.includes("Importación deshabilitada en Preview"),'B2_INSURER_CREDENTIAL_PREVIEW_CONTRACT_INVALID');
+need(files.credentialProvider.includes('previewCleanup:function')&&files.credentialProvider.includes("operation === 'delete_preview'"),'B2_INSURER_CREDENTIAL_SYNTHETIC_CLEANUP_MISSING');
+need(files.academia.includes("['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin'].includes(rol)"),'B2_ACADEMIA_PRIVILEGED_ROLE_ALIAS_MISSING');
 need(files.runtimeConfig.includes("'cursos'")&&files.runtimeConfig.includes("'academyProgress'"),'B2_ACADEMIA_RUNTIME_HYDRATION_MISSING');
 need(files.accessPolicy.includes("cursos: { module: 'academia'")&&files.accessPolicy.includes("academyProgress: { module: 'academia'")&&files.accessPolicy.includes("field: 'uid'"),'B2_ACADEMIA_READ_POLICY_MISSING');
 need(files.academiaCatalog.includes("cur_p_clientes")&&files.academiaCatalog.includes("cur_p_aseg_cotiz")&&files.academiaCatalog.includes("automaticWrites:false"),'B2_ACADEMIA_APPROVED_CATALOG_MISSING');
@@ -183,6 +195,12 @@ need(createCollections.filter(x=>x==='recibosEsperados').length===2,'B2_EXPECTED
 need(createCollections.filter(x=>x==='carteraPrimas').length===2,'B2_PORTFOLIO_COUNT_INVALID');
 need(!createCollections.includes('cobros')&&rows.cobros.length===0,'B2_POLICY_CREATED_CONFIRMED_COBRO');
 need(rows.vehiculos[0]?.color==='Blanco'&&rows.vehiculos[0]?.chasis==='CH-B2'&&rows.vehiculos[0]?.motor==='MO-B2','B2_COMPLETE_VEHICLE_CREATE_FAILED');
+
+const blockedNoReason=await Orbit.policyReceipts.updatePolicy('pol-b2-a',{sumaAsegurada:115000},{motivo:'',operationId:'b2-no-reason'});
+need(blockedNoReason.ok===false&&blockedNoReason.errors.includes('motivo_requerido'),'B2_POLICY_EMPTY_REASON_NOT_BLOCKED');
+need(Number(rows.polizas.find(x=>x.id==='pol-b2-a')?.sumaAsegurada||0)!==115000,'B2_POLICY_EMPTY_REASON_MUTATED_RECORD');
+const policyEdit=await Orbit.policyReceipts.updatePolicy('pol-b2-a',{sumaAsegurada:115000},{motivo:'B2 controlled policy edit',operationId:'b2-policy-edit'});
+need(policyEdit.ok===true&&Number(rows.polizas.find(x=>x.id==='pol-b2-a')?.sumaAsegurada)===115000,'B2_POLICY_EXISTING_FIELD_UPDATE_FAILED');
 
 const update=await Orbit.policyReceipts.updatePolicy('pol-b2-a',{
   vehiculo:{id:rows.vehiculos[0].id,marca:'Toyota',linea:'Corolla',placa:'B2TEST',anio:'2026',uso:'Particular',color:'Azul',vin:'VIN-B2',chasis:'CH-B2',motor:'MO-B2'}
