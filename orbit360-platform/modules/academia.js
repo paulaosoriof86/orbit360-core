@@ -66,7 +66,7 @@ Orbit.modules.academia = (function () {
       if (d === 'equipo') return true;
       if (d === rol) return true;
       // Dirección/Admin ven todos los cursos de equipo
-      if (['Dirección', 'Admin'].includes(rol)) return true;
+      if (['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin'].includes(rol)) return true;
       return false;
     });
   }
