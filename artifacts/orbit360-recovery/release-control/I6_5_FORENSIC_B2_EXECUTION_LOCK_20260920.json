@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -37,7 +37,13 @@
       "orbit360-platform/core/policy-receipts-engine.js",
       "orbit360-platform/core/issuance-workflow-v1201.js",
       "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
-      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/product-runtime-config.js",
+      "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+      "orbit360-platform/data/academia-product-catalog-v1.js",
+      "orbit360-platform/core/academia-product-catalog-p0.js",
+      "orbit360-platform/core/product-app-p0.js",
+      "orbit360-platform/modules/academia.js"
     ],
     "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
@@ -65,7 +71,11 @@
     "previewExact": false,
     "functionalPass": false,
     "paulaVisual": false,
-    "approvedVisualHierarchy": false
+    "approvedVisualHierarchy": false,
+    "academiaCatalog": false,
+    "academiaRoleRoutes": false,
+    "academiaBrand": false,
+    "academiaNoAutomaticWriters": false
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "REQUIRED_IN_FIRST_B2_PREVIEW_BEFORE_B3",
@@ -134,24 +144,19 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "01514b480313f3669f718f3ef575333ce7176cc9",
-    "buildId": "gi-i65-b2-01514b480313-57f234755dc1",
-    "channelId": "gi-i65-b2-35942283175",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-35942283175-t80vva4r.web.app",
-    "runId": 35942283175,
-    "artifactId": 10785572262,
-    "artifactDigest": "e69a4db1adc7f285dca10103c94b1505de214b3a37bafc0b8f3cc509605e4ea0",
-    "exactReadback": true,
-    "functionalPass": true,
+    "status": "PENDING_NEW_PREVIEW_AFTER_PRODUCT_SOURCE_CHANGE",
+    "supersedesRunId": 35942283175,
+    "exactReadback": false,
+    "functionalPass": false,
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "01514b480313f3669f718f3ef575333ce7176cc9",
-    "exactPreviewBuildId": "gi-i65-b2-01514b480313-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35942283175-t80vva4r.web.app",
-    "exactPreviewArtifactId": 10785572262,
+    "exactPreviewSourceSha": "",
+    "exactPreviewBuildId": "",
+    "exactPreviewUrl": "",
+    "exactPreviewArtifactId": null,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
@@ -193,7 +198,9 @@
       ]
     },
     "maxExpectedRuntimeMinutes": 10,
-    "timeoutFailureMayNotBeDeclaredProductFailure": true
+    "timeoutFailureMayNotBeDeclaredProductFailure": true,
+    "lastFailedRunId": 35943086864,
+    "lastFailure": "B2_AUTH_CLIENT_CREATE_BACKDROP_CLOSED"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -364,6 +371,19 @@
       "exactReadback": true,
       "functionalPass": true,
       "livePromoted": false
+    },
+    {
+      "sourceSha": "01514b480313f3669f718f3ef575333ce7176cc9",
+      "buildId": "gi-i65-b2-01514b480313-57f234755dc1",
+      "channelId": "gi-i65-b2-35942283175",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-35942283175-t80vva4r.web.app",
+      "runId": 35942283175,
+      "artifactId": 10785572262,
+      "artifactDigest": "e69a4db1adc7f285dca10103c94b1505de214b3a37bafc0b8f3cc509605e4ea0",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false,
+      "status": "SUPERSEDED_BY_B2_ACADEMIA_SOURCE_CHANGE_AND_ACTIVE_CLIENT_OWNER_FIX"
     }
   ],
   "previousAuthenticatedPreviewProofHistory": [
@@ -416,6 +436,21 @@
       },
       "maxExpectedRuntimeMinutes": 10,
       "timeoutFailureMayNotBeDeclaredProductFailure": true
+    },
+    {
+      "status": "FAIL",
+      "runId": 35943086864,
+      "exactPreviewSourceSha": "01514b480313f3669f718f3ef575333ce7176cc9",
+      "exactPreviewBuildId": "gi-i65-b2-01514b480313-57f234755dc1",
+      "exactPreviewArtifactId": 10785572262,
+      "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35942283175-t80vva4r.web.app",
+      "failure": "B2_AUTH_CLIENT_CREATE_BACKDROP_CLOSED",
+      "classification": "OLD_PREVIEW_STALE_RELATIVE_TO_ACTIVE_CLIENT_OWNER_FIX",
+      "cleanup": {
+        "syntheticCreated": false,
+        "deleted": 0,
+        "orphanExpected": false
+      }
     }
   ],
   "visualReview20260923": {
@@ -464,5 +499,35 @@
     "functionalPass": true,
     "livePromoted": false
   },
-  "postproductionFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923.json"
+  "postproductionFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923.json",
+  "academiaRemediation": {
+    "status": "SOURCE_FIX_READY_FOR_NEW_PREVIEW",
+    "classification": "CODE_DEFECT_RELEASE_DEPLOY",
+    "rootCause": "ACADEMIA_MODULE_LOADED_BUT_CURSOS_NOT_COMPOSED_OR_HYDRATED_WHILE_LAB_WRITERS_SEEDS_WERE_CORRECTLY_EXCLUDED",
+    "moduleOwner": "orbit360-platform/modules/academia.js",
+    "pureCatalogOwner": "orbit360-platform/data/academia-product-catalog-v1.js",
+    "composerOwner": "orbit360-platform/core/academia-product-catalog-p0.js",
+    "approvedContentSource": "orbit360-platform/data/academia-plus.js",
+    "contentExtraction": "PURE_DATA_ONLY_NO_APPLY_NO_SEED_NO_TIMERS_NO_DOM_HOOKS",
+    "runtimeHydration": [
+      "cursos",
+      "academyProgress"
+    ],
+    "minimumRequiredCourses": [
+      "cur_p_clientes",
+      "cur_p_aseg_cotiz"
+    ],
+    "preserveRealCourses": true,
+    "preserveExistingProgressRead": true,
+    "newProgressPersistence": "SESSION_OVERLAY_IN_PREVIEW_UNTIL_SERVER_OWNED_PROGRESS_WRITE_IS_RELEASED",
+    "automaticWrites": false,
+    "labSeedReactivated": false,
+    "brandingVisible": "Gravicentra Insurance / Academia de Gravicentra",
+    "noOperationalDataApply": true,
+    "noReimport": true,
+    "requiredRoleProof": [
+      "Operativo",
+      "Asesor"
+    ]
+  }
 }

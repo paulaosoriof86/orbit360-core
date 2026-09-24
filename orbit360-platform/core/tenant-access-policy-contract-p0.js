@@ -61,6 +61,7 @@
     movimientosBanco: { module: 'conciliaciones', scoped: false, finance: true, controlledWriteOnly: true },
     conciliacionBancaria: { module: 'conciliaciones', scoped: false, finance: true, controlledWriteOnly: true },
     configuracionTenant: { module: 'configuracion', scoped: false, restricted: true },
+    cursos: { module: 'academia', scoped: false, advisorRead: true, advisorWrite: false, globalContent: true },
     academyProgress: { module: 'academia', scoped: false, selfProgress: true }
   });
 
@@ -303,7 +304,8 @@
     var m = normalizeMembership(membershipInput);
     var p = policyFor(collection, context.collectionPolicy);
     var constraints = [{ field: 'tenantId', op: '==', value: m.tenantId }];
-    var queryCountries = m.countries.slice(0, 10);
+    var queryCountries = (p.globalContent || p.selfProgress) ? [] : m.countries.slice(0, 10);
+    if (p.selfProgress) constraints.push({ field: 'uid', op: '==', value: m.uid });
     if (collection === 'clientes' && queryCountries.length && queryCountries.indexOf('REQUIERE_VALIDACION') < 0 && queryCountries.length < 10) queryCountries.push('REQUIERE_VALIDACION');
     if (queryCountries.length === 1) constraints.push({ field: 'country', op: '==', value: queryCountries[0] });
     if (queryCountries.length > 1) constraints.push({ field: 'country', op: 'in', value: queryCountries });

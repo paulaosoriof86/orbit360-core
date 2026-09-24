@@ -93,6 +93,27 @@ async function setRole(page,role){
   await sleep(500);
   await page.waitForFunction(r=>window.Orbit?.session?.rol?.()===r,role,{timeout:7000});
 }
+async function academiaSnapshot(page,role){
+  await setRole(page,role);
+  await page.evaluate(()=>{location.hash='#/academia';});
+  await page.waitForFunction(()=>window.Orbit?.academiaProductCatalogP0?.status?.().ready===true&&window.Orbit?.store?.all('cursos')?.length>=2,null,{timeout:15000});
+  await page.waitForFunction(()=>String(document.getElementById('host')?.innerText||'').includes('Academia de Gravicentra'),null,{timeout:10000});
+  await page.locator('[data-vista="ruta"]').click();
+  await page.waitForSelector('#ruta-rol',{timeout:8000});
+  return page.evaluate(()=>{
+    const st=Orbit.academiaProductCatalogP0.status(),rows=Orbit.store.all('cursos')||[],host=String(document.getElementById('host')?.innerText||'');
+    const ids=rows.map(x=>String(x.id||''));
+    return{
+      role:String(Orbit.session?.rol?.()||''),catalogCount:rows.length,
+      hasClient360:ids.includes('cur_p_clientes'),hasInsurerDirectory:ids.includes('cur_p_aseg_cotiz'),
+      brandOk:host.includes('Academia de Gravicentra')&&!host.includes('Orbit Academia')&&!host.includes('Academia Orbit 360'),
+      routeSelector:!!document.getElementById('ruta-rol'),
+      forbiddenVisible:/\bLAB\b|\bSHA\b|validator|release gate|release mechanics|bridge owner|seed writer|hardcod/i.test(host),
+      automaticWrites:st.automaticWrites,catalogManagementDurable:st.catalogManagementDurable,
+      staticCourseCount:st.staticCourseCount,realCourseCount:st.realCourseCount,progressRowsRead:st.progressRowsRead
+    };
+  });
+}
 async function scopeSnapshot(page){
   return page.evaluate(()=>{
     const S=Orbit.access.scopedStore('inicio'),own=String(Orbit.session.asesorId()||'');
@@ -179,6 +200,13 @@ try{
   need(asesor.advisorIds.length<=1&&(!asesor.advisorIds.length||asesor.advisorIds[0]===asesor.advisorId),'B2_AUTH_ASESOR_ADVISOR_AGGREGATE_LEAK');
   need(oper.counts.polizas>=asesor.counts.polizas&&oper.counts.recibosEsperados>=asesor.counts.recibosEsperados&&oper.counts.carteraPrimas>=asesor.counts.carteraPrimas,'B2_AUTH_ROLE_SCOPE_COUNTS_INVALID');
   evidence.scope={operativo:oper,asesor};
+  const academiaOper=await bounded(academiaSnapshot(page,'Operativo'),'B2_AUTH_ACADEMIA_OPERATIVO_TIMEOUT',25000);
+  need(academiaOper.hasClient360&&academiaOper.hasInsurerDirectory&&academiaOper.brandOk&&academiaOper.routeSelector&&!academiaOper.forbiddenVisible,'B2_AUTH_ACADEMIA_OPERATIVO_INVALID:'+JSON.stringify(academiaOper));
+  need(academiaOper.automaticWrites===false&&academiaOper.catalogManagementDurable===false,'B2_AUTH_ACADEMIA_AUTOMATIC_WRITER_PRESENT');
+  const academiaAsesor=await bounded(academiaSnapshot(page,'Asesor'),'B2_AUTH_ACADEMIA_ASESOR_TIMEOUT',25000);
+  need(academiaAsesor.hasClient360&&academiaAsesor.hasInsurerDirectory&&academiaAsesor.brandOk&&academiaAsesor.routeSelector&&!academiaAsesor.forbiddenVisible,'B2_AUTH_ACADEMIA_ASESOR_INVALID:'+JSON.stringify(academiaAsesor));
+  evidence.academia={operativo:academiaOper,asesor:academiaAsesor,automaticWrites:false,pass:true};
+  milestone('ACADEMIA_ROLE_ROUTES',{operativo:academiaOper.catalogCount,asesor:academiaAsesor.catalogCount});
   await setRole(page,'Operativo');
 
   const stamp=RUN.replace(/[^0-9A-Za-z]/g,'').slice(-12);

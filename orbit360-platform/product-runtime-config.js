@@ -5,7 +5,7 @@ window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze({
   enabled: false,
   environmentRef: 'unconfigured',
   tenantHint: '',
-  hydrationContractVersion: 'fase-a-i2-20260919.5-team-canonical-required',
+  hydrationContractVersion: 'fase-a-i2-20260923.6-academia-deferred-readonly',
   hydrationContractSource: 'recovery/fase-a-clean-20260831',
   requiredCollections: Object.freeze(['clientes','polizas','cobros','aseguradoras','vehiculos','recibosEsperados','carteraPrimas','asesores']),
   optionalCollections: Object.freeze([
@@ -18,6 +18,8 @@ window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze({
     'gestiones',
     'comisiones',
     'cancelaciones',
-    'auditoria'
+    'auditoria',
+    'cursos',
+    'academyProgress'
   ])
 });

@@ -9,6 +9,13 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.academia = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   let host, filtro = 'todas', vista = 'catalogo', rutaRol = null;
+  function activeRole(){ return (Orbit.session && Orbit.session.rol && Orbit.session.rol()) || (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección'; }
+  function catalogManageAllowed(){ const st=Orbit.academiaProductCatalogP0&&Orbit.academiaProductCatalogP0.status&&Orbit.academiaProductCatalogP0.status(); return !!(st&&st.catalogManagementDurable===true); }
+  function routeRoles(){
+    const active=activeRole(),p=Orbit.auth&&Orbit.auth.productUser||{},assigned=Array.isArray(p.roles)?p.roles.filter(Boolean):[active];
+    if(['Dirección','SuperAdmin','AdminTenant','Admin'].includes(active)&&Orbit.ROLES)return Object.keys(Orbit.ROLES);
+    return [...new Set(assigned.length?assigned:[active])];
+  }
   const TIPO_ICON = { video: '🎬', lectura: '📖', quiz: '✏️', recurso: '📎' };
   // paleta para barras de color de las secciones (rota para dar ritmo visual tipo Orbit)
   const SEC_COLORS = ['#2A6FDB', '#1F8A5B', '#D97757', '#7A5Bd9', '#C5162E', '#0E7C86'];
@@ -50,7 +57,7 @@ Orbit.modules.academia = (function () {
   async function iaQuizFromDoc(text) { if (Orbit.ia.disponible() && text) { try { const out = await Orbit.ia.complete('A partir de este documento genera 4 preguntas de opción múltiple. Formato: enunciado, opciones en líneas (correcta con [x], otras con [ ]), preguntas separadas por línea en blanco. Documento:\n' + String(text).slice(0, 4000)); return String(out).trim(); } catch (e) {} } return '¿Pregunta basada en el documento?\n[x] Correcta\n[ ] Incorrecta\n[ ] Otra'; }
 
   function cursosPorRol(rol) {
-    rol = rol || (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+    rol = rol || activeRole();
     return S().all('cursos').filter(c => {
       if (!c) return false;
       const d = c.destinatarios || 'equipo';
@@ -79,11 +86,12 @@ Orbit.modules.academia = (function () {
     const certs = arr.filter(c => c.certificado).length;
     const avg = arr.length ? Math.round(arr.reduce((s, c) => s + c.progreso, 0) / arr.length) : 0;
 
-    const actions = '<button class="btn ghost" id="ac-ia" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Crear con IA</button>'
-      + '<button class="btn ghost" id="ac-man" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">📖 Manuales</button>'
+    const canManage = catalogManageAllowed();
+    const actions = '<button class="btn ghost" id="ac-man" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">📖 Manuales</button>'
+      + (canManage ? '<button class="btn ghost" id="ac-ia" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Crear con IA</button>'
       + '<button class="btn ghost" id="ac-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬆ Cargar recurso</button>'
       + '<button class="btn ghost" id="ac-cat" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">+ Categoría</button>'
-      + '<button class="btn primary" id="ac-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Curso</button>';
+      + '<button class="btn primary" id="ac-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Curso</button>' : '');
 
     const catEmoji = { 'todas':'📚','Inducción':'🚀','Técnico':'⚙️','Comercial':'💼','Producto':'📦','Finanzas':'💰','Marketing':'📣','Servicio':'🤝','Cumplimiento':'🛡️','Liderazgo':'🌟','Clientes':'👥' };
     const tabsHtml = cats.map(function(c){
@@ -105,7 +113,7 @@ Orbit.modules.academia = (function () {
       ? rutaView()
       : ('<div class="tabs" style="max-width:640px;margin-bottom:16px">' + tabsHtml + '</div><div class="ac-grid">' + lista.map(card).join('') + '</div>');
     host.innerHTML = '<div class="page">'
-      + K.banner({ icon: '🎓', title: 'Orbit Academia', sub: 'Capacitación, certificaciones y recursos del equipo', features: [], actions: actions })
+      + K.banner({ icon: '🎓', title: 'Academia de Gravicentra', sub: 'Capacitación, certificaciones y recursos del equipo', features: [], actions: actions })
       + '<div class="kpi-row">' + kpisHtml + '</div>'
       + viewToggle
       + bodyHtml
@@ -132,7 +140,7 @@ Orbit.modules.academia = (function () {
 
   /* ---- Lector de manuales in-app (iframe, sin descarga) ---- */
   function verManuales() {
-    const rol = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+    const rol = activeRole();
     const manuales = [
       { t: 'Manual maestro (todos los módulos)', src: 'docs/manual-maestro.html', ico: '📘', sub: 'Super Admin · visión completa', roles: ['Dirección', 'Admin'] },
       { t: 'Capacitación técnica interna', src: 'docs/capacitacion-tecnica-interna.html', ico: '🛠', sub: 'Demo, backend, migración, soporte', roles: ['Dirección', 'Admin'] },
@@ -156,7 +164,7 @@ Orbit.modules.academia = (function () {
     const lista = () => {
       body.style.cssText = 'flex:1;overflow:auto;padding:24px';
       body.innerHTML = '<div style="max-width:720px;margin:0 auto">'
-        + '<div class="muted" style="font-size:12.5px;margin-bottom:14px">📖 Manuales de Orbit 360 — se leen aquí dentro. Rol activo: <b>' + U.esc(rol) + '</b> · mostrando los que aplican a tu rol</div>'
+        + '<div class="muted" style="font-size:12.5px;margin-bottom:14px">📖 Manuales de Gravicentra Insurance — se leen aquí dentro. Rol activo: <b>' + U.esc(rol) + '</b> · mostrando los que aplican a tu rol</div>'
         + '<div style="display:grid;gap:12px">' + visibles.map((m, i) => '<button class="card pad" data-m="' + manuales.indexOf(m) + '" style="text-align:left;cursor:pointer;display:flex;align-items:center;gap:14px">'
           + '<span style="font-size:28px">' + m.ico + '</span><span><b style="font-family:var(--f-display);font-size:15px;display:block">' + U.esc(m.t) + '</b><small class="muted">' + U.esc(m.sub) + '</small></span>'
           + '<span style="margin-left:auto;color:var(--red);font-weight:700">Leer →</span></button>').join('') + '</div></div>';
@@ -164,7 +172,7 @@ Orbit.modules.academia = (function () {
     };
     back.innerHTML = '<div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);background:var(--card)">'
       + '<button class="btn ghost" id="mv-close">✕ Cerrar</button>'
-      + '<b style="font-family:var(--f-display);font-size:16px">📖 Manuales Orbit</b></div>';
+      + '<b style="font-family:var(--f-display);font-size:16px">📖 Manuales Gravicentra</b></div>';
     const body = document.createElement('div'); back.appendChild(body);
     document.body.appendChild(back);
     back.querySelector('#mv-close').onclick = () => back.remove();
@@ -178,10 +186,10 @@ Orbit.modules.academia = (function () {
         <span class="ac-emoji">${c.emoji}</span>
         <span class="badge" style="background:rgba(255,255,255,.18);color:#fff;border:none">${c.cat}</span>
         ${c.certificado ? '<span class="ac-cert">🏅 Certificado</span>' : ''}
-        <div class="ac-card-acts">
+        ${catalogManageAllowed() ? `<div class="ac-card-acts">
           <button class="ac-act" data-edit="${c.id}" title="Editar curso">✏</button>
           <button class="ac-act" data-del="${c.id}" title="Eliminar curso">🗑</button>
-        </div>
+        </div>` : ''}
       </div>
       <div class="ac-card-b">
         <b style="font-family:var(--f-display);font-size:15px">${U.esc(c.titulo)}</b>
@@ -250,6 +258,7 @@ Orbit.modules.academia = (function () {
     function paint() {
       lecs = S().get('cursos', id).lecciones || [];
       const total = lecs.length, done = doneCount(), l = lecs[idx] || lecs[0];
+      const canManage = catalogManageAllowed();
       back.innerHTML = `
         <div class="acv-top" style="background:linear-gradient(120deg,${c.color},#10141a)">
           <button class="acv-back" id="acv-back">← Volver</button>
@@ -258,11 +267,11 @@ Orbit.modules.academia = (function () {
         </div>
         <div class="acv-body">
           <aside class="acv-side">
-            ${lecs.map((le, i) => `<div class="acv-lec-wrap" style="display:flex;align-items:stretch;gap:2px"><button class="acv-lec ${i === idx ? 'active' : ''} ${i < done ? 'done' : ''}" data-go="${i}" style="flex:1"><span class="acv-lec-n">${i < done ? '✓' : (i + 1)}</span><span class="acv-lec-t">${U.esc(le.t)}<small>${TIPO_ICON[le.tipo] || '•'} ${le.tipo} · ${le.min || 0}m</small></span></button><div style="display:flex;flex-direction:column;justify-content:center;gap:1px"><button class="acv-ord" data-up="${i}" title="Subir" ${i === 0 ? 'disabled' : ''} style="border:1px solid var(--line);background:var(--surface);border-radius:5px;width:22px;height:18px;cursor:pointer;font-size:9px;opacity:${i === 0 ? '.3' : '1'}">▲</button><button class="acv-ord" data-down="${i}" title="Bajar" ${i === lecs.length - 1 ? 'disabled' : ''} style="border:1px solid var(--line);background:var(--surface);border-radius:5px;width:22px;height:18px;cursor:pointer;font-size:9px;opacity:${i === lecs.length - 1 ? '.3' : '1'}">▼</button></div></div>`).join('')}
-            <button class="acv-addlec" id="acv-addlec">+ Añadir lección</button>
+            ${lecs.map((le, i) => `<div class="acv-lec-wrap" style="display:flex;align-items:stretch;gap:2px"><button class="acv-lec ${i === idx ? 'active' : ''} ${i < done ? 'done' : ''}" data-go="${i}" style="flex:1"><span class="acv-lec-n">${i < done ? '✓' : (i + 1)}</span><span class="acv-lec-t">${U.esc(le.t)}<small>${TIPO_ICON[le.tipo] || '•'} ${le.tipo} · ${le.min || 0}m</small></span></button>${canManage ? `<div style="display:flex;flex-direction:column;justify-content:center;gap:1px"><button class="acv-ord" data-up="${i}" title="Subir" ${i === 0 ? 'disabled' : ''} style="border:1px solid var(--line);background:var(--surface);border-radius:5px;width:22px;height:18px;cursor:pointer;font-size:9px;opacity:${i === 0 ? '.3' : '1'}">▲</button><button class="acv-ord" data-down="${i}" title="Bajar" ${i === lecs.length - 1 ? 'disabled' : ''} style="border:1px solid var(--line);background:var(--surface);border-radius:5px;width:22px;height:18px;cursor:pointer;font-size:9px;opacity:${i === lecs.length - 1 ? '.3' : '1'}">▼</button></div>` : ''}</div>`).join('')}
+            ${canManage ? '<button class="acv-addlec" id="acv-addlec">+ Añadir lección</button>' : ''}
           </aside>
           <main class="acv-main">
-            ${l ? `<div class="acv-lechead"><h2>${TIPO_ICON[l.tipo] || '📖'} ${U.esc(l.t)} <span class="muted" style="font-weight:400;font-size:13px">· ${l.min || 0} min</span></h2><button class="btn ghost sm" id="acv-editlec">✏ Editar lección</button></div>
+            ${l ? `<div class="acv-lechead"><h2>${TIPO_ICON[l.tipo] || '📖'} ${U.esc(l.t)} <span class="muted" style="font-weight:400;font-size:13px">· ${l.min || 0} min</span></h2>${canManage ? '<button class="btn ghost sm" id="acv-editlec">✏ Editar lección</button>' : ''}</div>
             <div class="acv-content">${lessonBody(l)}</div>
             <div class="acv-nav"><button class="btn ghost" id="acv-prev" ${idx === 0 ? 'disabled style="opacity:.4"' : ''}>← Anterior</button><button class="btn primary" id="acv-next">${idx >= total - 1 ? '✓ Finalizar curso' : 'Siguiente →'}</button></div>` : '<div class="muted" style="padding:40px;text-align:center">Este curso aún no tiene lecciones. Usá <b>+ Añadir lección</b>.</div>'}
           </main>
@@ -276,7 +285,7 @@ Orbit.modules.academia = (function () {
       const pv = back.querySelector('#acv-prev'); if (pv) pv.onclick = () => { if (idx > 0) { idx--; paint(); } };
       const nx = back.querySelector('#acv-next'); if (nx) nx.onclick = () => {
         const total2 = lecs.length, reached = idx + 1, prog = Math.round(reached / total2 * 100);
-        if (prog > (c.progreso || 0)) { c.progreso = prog; S().update('cursos', id, { progreso: prog, certificado: prog >= 100 ? true : c.certificado }); if (prog >= 100) S().insert('actividades', { id: 'act' + Date.now(), clienteId: '', asesorId: 'ase001', tipo: 'sistema', icon: '🏅', fecha: Orbit.ui.today(), titulo: 'Curso completado: ' + c.titulo, detalle: 'Certificación obtenida.' }); }
+        if (prog > (c.progreso || 0)) { c.progreso = prog; S().update('cursos', id, { progreso: prog, certificado: prog >= 100 ? true : c.certificado }); }
         if (idx < total2 - 1) { idx++; paint(); } else { close(); }
       };
     }
@@ -397,7 +406,7 @@ Orbit.modules.academia = (function () {
       const tot = (c.lecciones || []).length; const next = Math.min(tot, done + 1);
       const prog = Math.round(next / tot * 100);
       S().update('cursos', id, { progreso: prog, certificado: prog >= 100 ? true : c.certificado });
-      if (prog >= 100) S().insert('actividades', { id: 'act' + Date.now(), clienteId: '', asesorId: 'ase001', tipo: 'sistema', icon: '🏅', fecha: Orbit.ui.today(), titulo: 'Curso completado: ' + c.titulo, detalle: 'Certificación obtenida.' });
+      if (prog >= 100) { /* certification remains in the Academia progress owner; no synthetic activity write */ }
       abrir(id);
     }
     const cont = back.querySelector('#ac-cont'); if (cont) cont.addEventListener('click', avanzar);
@@ -645,8 +654,8 @@ Orbit.modules.academia = (function () {
 
   /* ---- Ruta de aprendizaje por ROL (secuencia curada de cursos) ---- */
   function rutaView() {
-    const roles = (Orbit.ROLES ? Object.keys(Orbit.ROLES) : ['Dirección']);
-    const activo = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && Orbit.auth.user().rol) || 'Dirección';
+    const activo = activeRole();
+    const roles = routeRoles();
     const rol = rutaRol || activo;
     const ORDEN = ['Inducción', 'Técnico', 'Producto', 'Comercial', 'Servicio', 'Cumplimiento', 'Normativa', 'Finanzas', 'Marketing', 'Liderazgo'];
     const arr = cursosPorRol(rol).slice().sort((a, b) => {
@@ -687,18 +696,18 @@ Orbit.modules.academia = (function () {
     const u = (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) || {};
     const nombre = u.nombre || 'Colaborador';
     const t = (Orbit.tenant && Orbit.tenant.get) ? Orbit.tenant.get() : {};
-    const folio = 'ORB-' + cursoId.replace(/[^a-z0-9]/gi, '').slice(-5).toUpperCase() + '-' + (Orbit.ui.today() || '').replace(/-/g, '').slice(2);
+    const folio = 'GI-' + cursoId.replace(/[^a-z0-9]/gi, '').slice(-5).toUpperCase() + '-' + (Orbit.ui.today() || '').replace(/-/g, '').slice(2);
     let back = document.getElementById('ac-cert'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'ac-cert'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 260;
     back.innerHTML = `<div class="card" style="width:min(720px,96vw);padding:0;overflow:hidden">
       <div id="cert-doc" style="padding:42px 46px;background:#fff;border:9px solid ${c.color}">
         <div style="text-align:center">
-          <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:${c.color}">${U.esc(t.empresa || 'Orbit 360')} · Academia</div>
+          <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:${c.color}">${U.esc(t.empresa || 'Gravicentra Insurance')} · Academia</div>
           <div style="font-family:var(--f-display);font-weight:800;font-size:30px;margin:14px 0 6px">Certificado de finalización</div>
           <div class="muted" style="font-size:13px">Se otorga a</div>
           <div style="font-family:var(--f-display);font-weight:800;font-size:26px;margin:10px 0;color:${c.color}">${U.esc(nombre)}</div>
-          <div style="font-size:13.5px;max-width:470px;margin:0 auto;line-height:1.6">por completar satisfactoriamente el curso <b>${U.esc(c.titulo)}</b>${c.cat ? ' (' + U.esc(c.cat) + ')' : ''} de la Academia Orbit 360.</div>
+          <div style="font-size:13.5px;max-width:470px;margin:0 auto;line-height:1.6">por completar satisfactoriamente el curso <b>${U.esc(c.titulo)}</b>${c.cat ? ' (' + U.esc(c.cat) + ')' : ''} de la Academia de Gravicentra Insurance.</div>
           <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:38px;gap:20px">
             <div style="text-align:left"><div style="font-family:var(--f-mono);font-size:11px;color:var(--ink-3)">FOLIO</div><b class="mono" style="font-size:12.5px">${folio}</b></div>
             <div style="font-size:44px">${c.emoji}</div>

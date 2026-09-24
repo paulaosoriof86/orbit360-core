@@ -13,6 +13,12 @@ const files={
   issuanceBridge:read('orbit360-platform/modules/issuance-endosos-v1201-bridge.js'),
   receiptsProjection:read('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js'),
   detail:read('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'),
+  academia:read('orbit360-platform/modules/academia.js'),
+  academiaCatalog:read('orbit360-platform/data/academia-product-catalog-v1.js'),
+  academiaOwner:read('orbit360-platform/core/academia-product-catalog-p0.js'),
+  runtimeConfig:read('orbit360-platform/product-runtime-config.js'),
+  accessPolicy:read('orbit360-platform/core/tenant-access-policy-contract-p0.js'),
+  productApp:read('orbit360-platform/core/product-app-p0.js'),
   index:read('orbit360-platform/index.html')
 };
 
@@ -43,7 +49,15 @@ need(files.issuanceBridge.includes("onclick = async"),'B2_ISSUANCE_UI_NOT_ASYNC'
 need(files.issuanceBridge.includes('await I.issueRequest'),'B2_ISSUANCE_UI_NOT_AWAITED');
 need(files.receiptsProjection.includes('Orbit.receiptsPortfolioProjection=Orbit.receiptsPortfolioProjectionV920'),'B2_RECEIPTS_CANONICAL_PROJECTION_MISSING');
 need(files.detail.includes('Editar vehículo'),'B2_VEHICLE_EDIT_ACTION_MISSING');
-for(const marker of ['core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+need(files.runtimeConfig.includes("'cursos'")&&files.runtimeConfig.includes("'academyProgress'"),'B2_ACADEMIA_RUNTIME_HYDRATION_MISSING');
+need(files.accessPolicy.includes("cursos: { module: 'academia'")&&files.accessPolicy.includes("academyProgress: { module: 'academia'")&&files.accessPolicy.includes("field: 'uid'"),'B2_ACADEMIA_READ_POLICY_MISSING');
+need(files.academiaCatalog.includes("cur_p_clientes")&&files.academiaCatalog.includes("cur_p_aseg_cotiz")&&files.academiaCatalog.includes("automaticWrites:false"),'B2_ACADEMIA_APPROVED_CATALOG_MISSING');
+need(files.academiaOwner.includes("catalogManagementDurable:false")&&files.academiaOwner.includes("ACADEMIA_PRODUCT_CATALOG_READ_ONLY")&&!files.academiaOwner.includes("Orbit.store.insert"),'B2_ACADEMIA_READONLY_OWNER_INVALID');
+need(files.productApp.includes("academyOwner.install(Orbit.store)")&&files.productApp.includes("ACADEMIA_PRODUCT_CATALOG_NOT_READY"),'B2_ACADEMIA_OWNER_NOT_COMPOSED');
+need(files.academia.includes("title: 'Academia de Gravicentra'"),'B2_ACADEMIA_VISIBLE_BRAND_MISSING');
+need(!files.academia.includes("title: 'Orbit Academia'")&&!files.academia.includes("asesorId: 'ase001'")&&!files.academia.includes("Academia Orbit 360"),'B2_ACADEMIA_VISIBLE_OR_HARDCODE_REGRESSION');
+new Function(files.academiaCatalog);new Function(files.academiaOwner);new Function(files.academia);
+for(const marker of ['data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260923-b2a1','core/product-app-p0.js?v=20260923-b2a1','core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={
@@ -166,6 +180,9 @@ console.log('I65_B2_CLIENT_DURABLE=true');
 console.log('I65_B2_ACTIVE_CLIENT_MODAL_OWNER=CRM_V1198_DURABLE_PROTECTED');
 console.log('I65_B2_POLICY_ADVISOR=true');
 console.log('I65_B2_POLICY_VISUAL_HIERARCHY_SOURCE=true');
+console.log('I65_B2_ACADEMIA_SOURCE=true');
+console.log('I65_B2_ACADEMIA_REQUIRED_COURSES=true');
+console.log('I65_B2_ACADEMIA_AUTOMATIC_WRITES=0');
 console.log('I65_B2_FIXED_FREQUENCY_RECEIPTS=true');
 console.log('I65_B2_MONTHLY_CUSTOM_RECEIPTS=true');
 console.log('I65_B2_VEHICLE_CREATE_EDIT=true');

@@ -84,6 +84,11 @@
       if(!writeStatus||writeStatus.ready!==true||writeStatus.failClosed!==true)throw new Error('PRODUCT_OPERATIONAL_WRITE_NOT_READY');
       state.operationalWriteReady=true;
 
+      var academyOwner=Orbit.academiaProductCatalogP0;
+      if(!academyOwner||typeof academyOwner.install!=='function')throw new Error('ACADEMIA_PRODUCT_CATALOG_OWNER_MISSING');
+      var academyStatus=academyOwner.install(Orbit.store);
+      if(!academyStatus||academyStatus.ready!==true||academyStatus.requiredCoursesPresent!==true||academyStatus.automaticWrites!==false||academyStatus.seed!==false||academyStatus.lab!==false)throw new Error('ACADEMIA_PRODUCT_CATALOG_NOT_READY');
+
       if(!state.routerStarted){
         if(!location.hash)location.hash='#/inicio';
         if(!Orbit.router||typeof Orbit.router.init!=='function')throw new Error('PRODUCT_ROUTER_MISSING');
