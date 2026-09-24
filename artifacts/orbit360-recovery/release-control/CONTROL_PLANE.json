@@ -1944,7 +1944,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_DUPLICATE_CONTRACT_ROOTFIX_PENDING_PREVIEW",
+    "mechanismSyncStatus": "B2_DUPLICATE_ROOTFIX_PREVIEW_PASS_AUTH_PENDING",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2035,7 +2035,7 @@
       "artifactId": 10789836859,
       "exactReadback": true,
       "functionalPass": true,
-      "authenticatedPreviewProof": "PENDING_NEW_PREVIEW",
+      "authenticatedPreviewProof": "AUTHORIZED_PENDING_RUN",
       "authenticatedPreviewProofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "orphanSyntheticCleanup": "PASS",
       "timedOutAuthenticatedRunId": 35556007094,
