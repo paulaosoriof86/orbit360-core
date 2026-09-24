@@ -78,14 +78,14 @@
     "functionalPass": true,
     "paulaVisual": false,
     "approvedVisualHierarchy": false,
-    "academiaCatalog": false,
-    "academiaRoleRoutes": false,
-    "academiaBrand": false,
-    "academiaNoAutomaticWriters": false,
-    "vehicleSameIdEdit": false,
-    "visibleGravicentraBrand": false,
-    "renewalBidirectionalLink": false,
-    "renewalDurableClosure": false
+    "academiaCatalog": true,
+    "academiaRoleRoutes": true,
+    "academiaBrand": true,
+    "academiaNoAutomaticWriters": true,
+    "vehicleSameIdEdit": true,
+    "visibleGravicentraBrand": true,
+    "renewalBidirectionalLink": true,
+    "renewalDurableClosure": true
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING",
@@ -1243,5 +1243,41 @@
     "tinyFishUnavailable": "WALLET_OUT_OF_FUNDS",
     "screenshotEvidenceRunId": 35963786706,
     "noWritesDuringFailedVisualCapture": true
+  },
+  "assistantVisualAudit": {
+    "status": "PASS_READY_FOR_PAULA_VISUAL",
+    "auditedAt": "2026-09-24",
+    "evidenceRunId": 35964954339,
+    "evidenceArtifactId": 10793139076,
+    "exactPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
+    "exactPreviewBuildId": "gi-i65-b2-aff32646f1f7-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35964339112-icw0ytni.web.app",
+    "surfaces": {
+      "inicio": true,
+      "academiaDesktop": true,
+      "academiaMobile": true,
+      "aseguradoras": true,
+      "cliente360List": true,
+      "cliente360Detail": true,
+      "policyFullPageDesktop": true,
+      "policyFullPageMobile": true,
+      "vehicleFullPage": true,
+      "receiptDetail": true
+    },
+    "findings": {
+      "visibleOrbit360": false,
+      "gravicentraVisible": true,
+      "academiaCatalogUsable": true,
+      "academiaClient360Training": true,
+      "academiaInsurerTraining": true,
+      "policyHierarchy": true,
+      "vehicleHierarchy": true,
+      "receiptHierarchy": true,
+      "responsiveApplicable": true
+    },
+    "knownTechnicalErrors": [],
+    "outstandingBlockersForHumanReview": 0,
+    "paulaVisualAccepted": false,
+    "livePromoted": false
   }
 }
