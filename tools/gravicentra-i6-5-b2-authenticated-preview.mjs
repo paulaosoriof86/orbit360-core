@@ -446,6 +446,20 @@ try{
 
   milestone('RENEWAL_RUNTIME_START');
   const renewal=await bounded(page.evaluate(async ({policyId,stamp,renewNo})=>{
+    window.__b2RenewalDurableTrace=[];
+    const originalUpdateDurable=Orbit.store.updateDurable.bind(Orbit.store);
+    Orbit.store.updateDurable=async function(collection,id,patch){
+      const before=Orbit.store.get(collection,id);
+      const row={collection:String(collection||''),id:String(id||''),beforeExists:!!before,patchKeys:Object.keys(patch||{})};
+      window.__b2RenewalDurableTrace.push(row);
+      try{
+        const out=await originalUpdateDurable(collection,id,patch);
+        row.ok=true;row.afterExists=!!Orbit.store.get(collection,id);return out;
+      }catch(e){
+        row.ok=false;row.error=String(e&&e.message||e);throw e;
+      }
+    };
+    try{
     const p=Orbit.store.get('polizas',policyId),c=Orbit.store.get('clientes',p.clienteId);
     const total=(+p.primaTotal||+p.primaNeta||1000)*1.05;
     const req=Orbit.issuance.createRequest({
@@ -466,9 +480,14 @@ try{
       frecuencia:'Semestral',cuotas:2,formaPago:p.formaPago||'Transferencia',conducto:p.conducto||'Cobro directo del intermediario',
       primaNeta:1100,gastosEmision:55,sourceRef:'b2qa-'+stamp
     },{operationId:'b2qa_emit_'+stamp,motivo:'B2 QA emisión real de renovación'});
-    return{ok:!!issued.ok,phase:'issue',errors:issued.errors||[],requestId:req.request.id,policyId:issued.policy&&issued.policy.id};
+    return{ok:!!issued.ok,phase:'issue',errors:issued.errors||[],requestId:req.request.id,policyId:issued.policy&&issued.policy.id,durableTrace:window.__b2RenewalDurableTrace};
+    }catch(e){
+      return{ok:false,phase:'exception',errors:[String(e&&e.message||e)],durableTrace:window.__b2RenewalDurableTrace};
+    }finally{
+      Orbit.store.updateDurable=originalUpdateDurable;
+    }
   },{policyId:policy.id,stamp,renewNo}),'B2_AUTH_RENEWAL_EVALUATE_TIMEOUT',60000);
-  milestone('RENEWAL_RUNTIME_RETURN',{ok:renewal&&renewal.ok,phase:renewal&&renewal.phase,errors:renewal&&renewal.errors||[]});
+  milestone('RENEWAL_RUNTIME_RETURN',{ok:renewal&&renewal.ok,phase:renewal&&renewal.phase,errors:renewal&&renewal.errors||[],durableTrace:renewal&&renewal.durableTrace||[]});
   need(renewal.ok,'B2_AUTH_RENEWAL_RUNTIME_FAILED:'+JSON.stringify(renewal));
   state.requestId=renewal.requestId;state.renewedPolicyId=renewal.policyId;
   const renewed=await waitFor(()=>oneBy(db,'polizas','numero',renewNo),'B2_AUTH_RENEWED_POLICY_READBACK',30000);
