@@ -89,5 +89,7 @@
     "retainedFilesAreNotCopiedOrRewritten": true,
     "guardMustFailClosedOnBlobDriftOrPackageMismatch": true,
     "conversationCannotOverridePackage": true
-  }
+  },
+  "frozenExecutionPlan": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md",
+  "frozenPlanInterpretationAddendum": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2_ADDENDUM_EVERGREEN_20260909.md"
 }
