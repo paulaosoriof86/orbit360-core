@@ -49,7 +49,13 @@
       "orbit360-platform/core/policy-receipts-v1199-refinements.js",
       "orbit360-platform/core/router.js",
       "orbit360-platform/core/issuance-workflow-v1201-refinements.js",
-      "orbit360-platform/modules/aseguradoras.js"
+      "orbit360-platform/modules/aseguradoras.js",
+      "functions/product-insurer-credentials.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/core/product-insurer-credential-provider-p0.js",
+      "orbit360-platform/styles/base.css",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+      "tools/gravicentra-i6-5-b2-human-rejection-readonly.mjs"
     ],
     "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
@@ -57,7 +63,8 @@
     "confirmedCobroWritesAuthorized": false,
     "liveHostingPromotionAuthorized": false,
     "advanceToB3Authorized": false,
-    "noHardcodedIdentities": true
+    "noHardcodedIdentities": true,
+    "extensionReason20260924": "Causal owners demonstrated by Paula visual rejection: secure credential Preview/provider path, canonical receipts projection owner, visual tokens, and one read-only relationship diagnostic. Scope remains B2 only; no data apply, no B3, no LIVE."
   },
   "emailDebt": {
     "status": "DEFERRED_NON_BLOCKING_BY_OWNER",
