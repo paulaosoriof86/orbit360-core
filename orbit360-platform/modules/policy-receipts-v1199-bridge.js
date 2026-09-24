@@ -216,7 +216,9 @@ Orbit.modules = Orbit.modules || {};
     $('[data-import]').addEventListener('click', () => { b.remove(); Orbit.importa.open('polizas', { scope: { clienteId: selectedClient.id } }); });
     $('[data-save]').addEventListener('click', async () => {
       const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
-      const err = $('[data-error]'), originalText = save.textContent; save.disabled = true; save.textContent = 'Guardando…';
+      const err = $('[data-error]'), originalText = save.textContent;
+      if (existing && !reason) { err.style.display=''; err.textContent=ERROR_LABELS.motivo_requerido; $('[data-reason]').focus(); return; }
+      save.disabled = true; save.textContent = 'Guardando…';
       try {
         const result = existing ? await E.updatePolicy(existing.id, payload, { motivo: reason }) : await E.createPolicy(payload, { motivo: reason });
         if (!result.ok) { err.style.display = ''; err.textContent = errorText(result.errors); save.disabled = false; save.textContent = originalText; return; }
@@ -228,6 +230,67 @@ Orbit.modules = Orbit.modules || {};
       }
     });
     refreshProducts(); syncInstallments(); preview();
+  }
+
+  function openVehicleForm(vehicleId) {
+    const current = S().get('vehiculos', vehicleId);
+    if (!current) return toast('Vehículo no disponible');
+    const policy = S().get('polizas', current.polizaId);
+    const client = policy && S().get('clientes', policy.clienteId);
+    if (!policy || !client) return toast('No fue posible resolver la póliza vinculada al vehículo.');
+    if (!A.canView('clientes', client, 'cliente360')) return toast('Vehículo fuera de tu alcance');
+    if (!E.canManagePolicies()) return requestCorrection(client, policy.id, 'editar vehículo');
+    const value = v => esc(v == null || /^(undefined|null)$/i.test(String(v).trim()) ? '' : v);
+    const inner = `
+      <div style="padding:17px 20px;background:linear-gradient(135deg,#fff7f8 0%,#f7f4f0 68%,#f4f7fb 100%);border-bottom:1px solid #ebe5e0;display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div><small class="muted" style="letter-spacing:.08em;text-transform:uppercase">🚘 Riesgo asegurado</small><b style="display:block;font-family:var(--f-display);font-size:18px">Editar vehículo · póliza ${value(policy.numero)}</b></div>
+        <button class="imp-x" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <div style="padding:18px 20px;display:grid;gap:14px">
+        <div class="cfg-note">La edición actualiza el mismo vehículo y conserva su vínculo con cliente y póliza. No crea un registro nuevo.</div>
+        <div class="cgrid">
+          <label class="ce-l">Marca<input class="o-sel" data-vbrand value="${value(current.marca)}"></label>
+          <label class="ce-l">Línea / tipo<input class="o-sel" data-vline value="${value(current.linea)}"></label>
+          <label class="ce-l">Año<input type="number" class="o-sel" data-vyear value="${value(current.anio)}"></label>
+          <label class="ce-l">Placa<input class="o-sel" data-vplate value="${value(current.placa)}"></label>
+          <label class="ce-l">Uso<input class="o-sel" data-vuse value="${value(current.uso)}"></label>
+          <label class="ce-l">Color<input class="o-sel" data-vcolor value="${value(current.color)}"></label>
+          <label class="ce-l">Chasis / VIN<input class="o-sel" data-vchasis value="${value(current.chasis || current.vin)}"></label>
+          <label class="ce-l">Motor<input class="o-sel" data-vmotor value="${value(current.motor)}"></label>
+          <label class="ce-l">Inciso<input class="o-sel" data-vinciso value="${value(current.inciso)}"></label>
+          <label class="ce-l">Suma asegurada<input type="number" min="0" step="0.01" class="o-sel" data-vsum value="${value(current.sumaAsegurada)}"></label>
+        </div>
+        <label class="ce-l">Concepto / descripción<input class="o-sel" data-vconcept value="${value(current.concepto || current.descripcion)}"></label>
+        <label class="ce-l">Motivo del cambio *<textarea class="o-sel" data-vreason style="min-height:58px" placeholder="Describe por qué se actualiza el vehículo"></textarea></label>
+        <div class="hint error" data-verror style="display:none"></div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--card)"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" data-vsave>Guardar vehículo</button></div>`;
+    const b = modal('vehicle-v1199', inner, 720), q = s => b.querySelector(s);
+    q('[data-vsave]').addEventListener('click', async () => {
+      const reason = q('[data-vreason]').value.trim(), err = q('[data-verror]'), save = q('[data-vsave]'), originalText = save.textContent;
+      if (!reason) { err.style.display=''; err.textContent=ERROR_LABELS.motivo_requerido; q('[data-vreason]').focus(); return; }
+      const vehicle = {
+        id: current.id,
+        marca: q('[data-vbrand]').value.trim(), linea: q('[data-vline]').value.trim(), anio: q('[data-vyear]').value,
+        placa: q('[data-vplate]').value.trim(), uso: q('[data-vuse]').value.trim(), color: q('[data-vcolor]').value.trim(),
+        chasis: q('[data-vchasis]').value.trim(), vin: q('[data-vchasis]').value.trim(), motor: q('[data-vmotor]').value.trim(),
+        inciso: q('[data-vinciso]').value.trim(), sumaAsegurada: +q('[data-vsum]').value || 0,
+        concepto: q('[data-vconcept]').value.trim(), descripcion: q('[data-vconcept]').value.trim()
+      };
+      save.disabled=true; save.textContent='Guardando…';
+      try {
+        const result = await E.updatePolicy(policy.id, { vehiculo: vehicle }, { motivo: reason });
+        if (!result || !result.ok) { err.style.display=''; err.textContent=errorText(result && result.errors); save.disabled=false; save.textContent=originalText; return; }
+        const persisted = S().get('vehiculos', current.id);
+        if (!persisted || persisted.id !== current.id || persisted.polizaId !== policy.id) {
+          err.style.display=''; err.textContent='El servidor no confirmó el mismo vehículo vinculado a esta póliza.'; save.disabled=false; save.textContent=originalText; return;
+        }
+        err.style.display='none'; b.remove(); toast('Vehículo actualizado y vínculo confirmado.');
+        location.hash = '#/cliente360?c=' + encodeURIComponent(policy.clienteId) + '&v=' + encodeURIComponent(current.id);
+      } catch (error) {
+        err.style.display=''; err.textContent='No fue posible confirmar el guardado del vehículo. Revisa y reintenta.'; save.disabled=false; save.textContent=originalText;
+      }
+    });
   }
 
   function openPayment(receiptId) {
@@ -288,6 +351,7 @@ Orbit.modules = Orbit.modules || {};
     clientMod.__policyReceiptsV1199={nuevaPoliza:clientMod.nuevaPoliza,editarPoliza:clientMod.editarPoliza,renovar:clientMod.renovar,endoso:clientMod.endoso};
     clientMod.nuevaPoliza=function(clientId){const c=S().get('clientes',clientId)||scopedClients()[0];if(!c)return toast('No hay clientes disponibles');return openPolicyForm({clientId:c.id});};
     clientMod.editarPoliza=function(policyId){return openPolicyForm({policyId});};
+    clientMod.editarVehiculo=function(vehicleId){return openVehicleForm(vehicleId);};
     clientMod.renovar=function(policyId){const p=S().get('polizas',policyId),c=p&&S().get('clientes',p.clienteId);if(c)requestCorrection(c,policyId,'renovación; definir número y vigencia de la nueva póliza');};
     clientMod.endoso=function(policyId){const p=S().get('polizas',policyId),c=p&&S().get('clientes',p.clienteId);if(c)requestCorrection(c,policyId,'endoso; requiere tipo, fecha efectiva y documento');};
   }
