@@ -1944,7 +1944,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_CRM_V1198_SYNTAX_ROOTFIX_PENDING_PREVIEW",
+    "mechanismSyncStatus": "B2_PREVIEW_TECHNICAL_PASS_AUTHENTICATED_PROOF_PENDING",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2063,7 +2063,8 @@
       "harnessFalsePositiveClosed": true,
       "packageContractDriftClosed": true,
       "academiaPreviewSourceFunctionalPass": true,
-      "crmOwnerRegression": "ROOT_CAUSE_CONFIRMED_SOURCE_FIX_PENDING_PREVIEW"
+      "crmOwnerRegression": "ROOT_CAUSE_CONFIRMED_SOURCE_FIX_PENDING_PREVIEW",
+      "crmV1198SyntaxRootfixPreviewPass": true
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
