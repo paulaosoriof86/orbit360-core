@@ -252,8 +252,38 @@ try{
 
   await page.evaluate(()=>{location.hash='#/cliente360';});
   await sleep(500);
-  milestone('CLIENT_CREATE_OPEN');
+  const clientOpenBefore=await page.evaluate(()=>{
+    const fn=Orbit.modules?.cliente360?.nuevoCliente;
+    const src=String(fn||'');
+    return{
+      role:String(Orbit.session?.rol?.()||''),
+      hash:String(location.hash||''),
+      routeKey:String(Orbit.route?.key||''),
+      moduleVisible:Orbit.access?.puedeVerModulo?!!Orbit.access.puedeVerModulo('cliente360'):null,
+      canCreate:Orbit.access?.can?!!Orbit.access.can('cliente360','create'):null,
+      canEdit:Orbit.access?.can?!!Orbit.access.can('cliente360','edit'):null,
+      dataScope:Orbit.access?.dataScope?String(Orbit.access.dataScope('cliente360')||''):null,
+      ownerIsV1198:src.includes('crm-new-client-v1198')||src.includes('openNewClient'),
+      ownerHasBackdropGuard:src.includes('Usa Crear cliente o Cancelar'),
+      ownerPrefix:src.slice(0,260)
+    };
+  });
+  milestone('CLIENT_CREATE_OWNER',clientOpenBefore);
   await bounded(page.evaluate(()=>Orbit.modules.cliente360.nuevoCliente()),'B2_AUTH_CLIENT_OPEN_TIMEOUT',15000);
+  await sleep(350);
+  const clientOpenAfter=await page.evaluate(()=>({
+    canonicalModal:!!document.getElementById('crm-new-client-v1198'),
+    legacyModal:!!document.getElementById('cli-nuevo'),
+    canonicalSave:!!document.getElementById('v1198-save'),
+    legacySave:!!document.getElementById('nc-save'),
+    visibleDialogs:Array.from(document.querySelectorAll('.drawer-back.open,[role="dialog"]')).map(x=>String(x.id||x.className||'')).slice(0,12),
+    bodyText:String(document.body?.innerText||'').slice(-1000)
+  }));
+  milestone('CLIENT_CREATE_DOM',clientOpenAfter);
+  evidence.clientOpenDiagnostics={before:clientOpenBefore,after:clientOpenAfter};
+  need(clientOpenBefore.canCreate===true,'B2_AUTH_CLIENT_CREATE_PERMISSION_DENIED:'+JSON.stringify(clientOpenBefore));
+  need(clientOpenBefore.ownerIsV1198===true,'B2_AUTH_CLIENT_OWNER_NOT_V1198:'+JSON.stringify(clientOpenBefore));
+  need(clientOpenAfter.canonicalModal===true&&clientOpenAfter.canonicalSave===true,'B2_AUTH_CLIENT_CANONICAL_MODAL_NOT_OPEN:'+JSON.stringify(clientOpenAfter));
   await page.waitForSelector('#crm-new-client-v1198 #v1198-save',{timeout:8000});
   await page.fill('#v1198-nombre',clientName);
   await page.fill('#v1198-id',ident);
