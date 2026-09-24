@@ -336,8 +336,15 @@ try{
   await page.fill('#ce-notas','B2 QA edit '+stamp);
   await page.evaluate(()=>document.getElementById('c360-edit').dispatchEvent(new MouseEvent('click',{bubbles:true})));
   need(await page.locator('#c360-edit').count()===1,'B2_AUTH_CLIENT_EDIT_BACKDROP_CLOSED');
+  let editReasonDialogSeen=false;
+  page.once('dialog',async dialog=>{
+    editReasonDialogSeen=true;
+    need(dialog.type()==='prompt','B2_AUTH_CLIENT_EDIT_UNEXPECTED_DIALOG:'+dialog.type());
+    await dialog.accept('B2 QA edición controlada '+stamp);
+  });
   await page.click('#ce-save');
   await page.waitForSelector('#c360-edit',{state:'detached',timeout:25000});
+  need(editReasonDialogSeen===true,'B2_AUTH_CLIENT_EDIT_REASON_DIALOG_NOT_SEEN');
   const edited=await waitFor(async()=>{const x=await dataCol(db,'clientes').doc(client.id).get();const d=x.data()||{};return d.notas==='B2 QA edit '+stamp?d:null;},'B2_AUTH_CLIENT_EDIT_READBACK');
   need(!!edited,'B2_AUTH_CLIENT_EDIT_NOT_DURABLE');evidence.writes.synthetic+=2;
   milestone('CLIENT_EDIT_READBACK');
