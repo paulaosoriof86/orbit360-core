@@ -158,7 +158,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "BLOCKED_CLEANUP_PENDING",
+    "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "0f23de1b4cf6ccfc73d33338748172617eaba705",
     "exactPreviewBuildId": "gi-i65-b2-0f23de1b4cf6-57f234755dc1",
@@ -207,7 +207,10 @@
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
     "lastFailedRunId": 35953423069,
-    "lastFailure": "B2_AUTH_CLIENT_CREATE_SAVE_DID_NOT_CONFIRM"
+    "lastFailure": "B2_AUTH_CLIENT_CREATE_SAVE_DID_NOT_CONFIRM",
+    "lastCleanupRunId": 35953693091,
+    "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
+    "productSourceMutationAuthorized": false
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -665,7 +668,7 @@
     "noReimport": true
   },
   "authRetryConcurrencyGuard": {
-    "status": "SOURCE_FIX_PENDING",
+    "status": "PASS_ENFORCED_IN_WORKFLOW",
     "requiresCleanupPass": true,
     "reason": "AUTH_AND_CLEANUP_MUST_NOT_RUN_IN_PARALLEL"
   }
