@@ -103,5 +103,10 @@
     "newRepoOrFirebaseAuthorized": false,
     "parallelMethodologyAuthorized": false,
     "b3AdvanceAuthorized": false
+  },
+  "authenticatedProofDispatch": {
+    "requested": true,
+    "reason": "New corrected Preview is frozen and exact-bound; run authenticated reversible B2 regression before Paula visual acceptance.",
+    "previewRunId": 35942283175
   }
 }
