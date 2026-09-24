@@ -265,6 +265,11 @@ try{
       dataScope:Orbit.access?.dataScope?String(Orbit.access.dataScope('cliente360')||''):null,
       ownerIsV1198:src.includes('crm-new-client-v1198')||src.includes('openNewClient'),
       ownerHasBackdropGuard:src.includes('Usa Crear cliente o Cancelar'),
+      crmFlag:Orbit.__crmV1198===true,
+      actionsFlag:!!Orbit.modules?.cliente360?.__actionsV1198,
+      actionKeys:Object.keys(Orbit.modules?.cliente360?.__actionsV1198||{}),
+      crmGuardDiagnostics:[].concat(Orbit.__crmV1198GuardDiagnostics||[]).slice(-20),
+      renderWrapped:!!Orbit.modules?.cliente360?.__scopeV1198,
       ownerPrefix:src.slice(0,260)
     };
   });
