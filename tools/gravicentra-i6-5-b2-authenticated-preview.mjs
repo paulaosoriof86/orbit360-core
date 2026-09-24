@@ -267,7 +267,11 @@ async function cleanupSynthetic(db,state){
     for(const col of ['actividades','gestiones','cobros','carteraPrimas','recibosEsperados','vehiculos','polizas'])n+=await deleteRowsBy(db,col,'clienteId',clientId).catch(()=>0);
     const cr=dataCol(db,'clientes').doc(clientId);const cs=await cr.get();if(cs.exists){await cr.delete();n++;}
   }
-  for(const id of uniq([clientId,...policyIds,state.requestId].filter(Boolean))){
+  if(state.insurerId){
+    const ir=dataCol(db,'aseguradoras').doc(state.insurerId),is=await ir.get();
+    if(is.exists){await ir.delete();n++;}
+  }
+  for(const id of uniq([clientId,...policyIds,state.requestId,state.insurerId].filter(Boolean))){
     n+=await deleteRowsBy(db,'auditLog','registroId',id).catch(()=>0);
   }
   return n;
@@ -524,7 +528,6 @@ try{
   await page.waitForSelector('#vehicle-v1199',{state:'detached',timeout:30000});
   const vehicleEdited=await waitFor(async()=>{const s=await dataCol(db,'vehiculos').doc(vehicle.id).get();const d=s.data()||{};return d.color==='Azul'?d:null;},'B2_AUTH_VEHICLE_EDIT_READBACK',30000);
   need(!!vehicleEdited,'B2_AUTH_VEHICLE_EDIT_NOT_DURABLE');
-  need(vehicleEdited.id===undefined||vehicle.id===vehicle.id,'B2_AUTH_VEHICLE_ID_ASSERTION');
   const vehicleCount=(await rowsBy(db,'vehiculos','polizaId',policy.id)).length;
   need(vehicleCount===1,'B2_AUTH_VEHICLE_EDIT_DUPLICATED:'+vehicleCount);
   need(vehicleEdited.polizaId===policy.id&&vehicleEdited.clienteId===client.id,'B2_AUTH_VEHICLE_RELATION_CHANGED');
@@ -532,6 +535,58 @@ try{
   await page.waitForFunction(({vid,pid})=>{const v=Orbit.store&&Orbit.store.get('vehiculos',vid);return !!v&&v.color==='Azul'&&v.polizaId===pid;},{vid:vehicle.id,pid:policy.id},{timeout:30000});
   evidence.vehicleEdit={sameId:true,noDuplicate:true,readback:true,reload:true,policyLinkPreserved:true};
   milestone('VEHICLE_EDIT_RELOAD_PASS',{vehicleCount});
+
+
+  milestone('INSURER_SECURE_EDIT_START');
+  const insurerId='b2-asg-'+stamp.toLowerCase(),portalId='portal-b2-'+stamp.toLowerCase(),syntheticSecret='B2-Preview-'+stamp+'-Secure',logoUrl=TARGET+'/assets/tenant/alianzas-soluciones/logo-oficial-360.png';
+  state.insurerId=insurerId;
+  await bounded(page.evaluate(async ({insurerId,portalId,stamp})=>{
+    const tenantId=Orbit.access&&Orbit.access.tenantId?Orbit.access.tenantId():(Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.tenantId)||'';
+    const payload={id:insurerId,tenantId,nombre:'B2 QA Aseguradora '+stamp,pais:'GT',paises:['GT'],color:'#C5162E',vinculada:true,ramos:['Auto'],contactos:[],cuentas:[],docs:[],portales:[{id:portalId,nombre:'Portal B2 QA',tipo:'Portal',url:'https://example.com',usuario:'b2qa-'+stamp,credentialRef:'backend_required',estadoAcceso:'Requiere actualización'}]};
+    return Orbit.store.batchDurable([{action:'insert',collection:'aseguradoras',id:insurerId,payload}],{requestId:'b2_asg_'+stamp,timeoutMs:20000});
+  },{insurerId,portalId,stamp}),'B2_AUTH_INSURER_CREATE_TIMEOUT',30000);
+  const insurerCreated=await waitFor(async()=>{const s=await dataCol(db,'aseguradoras').doc(insurerId).get();return s.exists?s.data():null;},'B2_AUTH_INSURER_CREATE_READBACK',30000);
+  need(!!insurerCreated,'B2_AUTH_INSURER_CREATE_NOT_DURABLE');evidence.writes.synthetic+=1;
+  await page.waitForFunction(id=>!!(Orbit.store&&Orbit.store.get('aseguradoras',id)),insurerId,{timeout:15000});
+  await page.evaluate(id=>Orbit.modules.aseguradoras.ficha(id),insurerId);
+  await page.waitForSelector('#asg-ficha #af-editar',{timeout:10000});
+  await page.click('#asg-ficha #af-editar');
+  await page.waitForSelector('#asg-ficha #af-logo',{timeout:10000});
+  await page.fill('#asg-ficha #af-logo',logoUrl);
+  await page.click('#asg-ficha [data-tab="plataformas"]');
+  await page.waitForSelector('#asg-ficha [data-portal] [data-ppass]',{timeout:10000});
+  await page.fill('#asg-ficha [data-portal] [data-ppass]',syntheticSecret);
+  let insurerReasonDialog=false;
+  page.once('dialog',async dialog=>{insurerReasonDialog=true;need(dialog.type()==='prompt','B2_AUTH_INSURER_REASON_UNEXPECTED_DIALOG:'+dialog.type());await dialog.accept('B2 QA aseguradora: logo y credencial segura');});
+  await page.click('#asg-ficha #af-guardar');
+  const insurerUpdated=await waitFor(async()=>{
+    const s=await dataCol(db,'aseguradoras').doc(insurerId).get();if(!s.exists)return null;
+    const d=s.data()||{},portal=[].concat(d.portales||[]).find(x=>String(x.id||'')===portalId);
+    return d.logo===logoUrl&&portal&&/^cred_[a-f0-9]{32}$/.test(String(portal.credentialRef||''))?{...d,_portal:portal}:null;
+  },'B2_AUTH_INSURER_EDIT_READBACK',45000);
+  need(insurerReasonDialog===true,'B2_AUTH_INSURER_REASON_DIALOG_NOT_SEEN');
+  need(!!insurerUpdated,'B2_AUTH_INSURER_EDIT_NOT_DURABLE');
+  state.insurerCredentialRef=String(insurerUpdated._portal.credentialRef||'');
+  evidence.writes.synthetic+=1;
+  await page.reload({waitUntil:'domcontentloaded',timeout:30000});
+  await page.waitForFunction(({id,logo,ref})=>{
+    const a=window.Orbit&&Orbit.store&&Orbit.store.get('aseguradoras',id),p=a&&[].concat(a.portales||[]).find(x=>String(x.credentialRef||'')===ref);
+    return !!a&&a.logo===logo&&!!p;
+  },{id:insurerId,logo:logoUrl,ref:state.insurerCredentialRef},{timeout:30000});
+  await page.evaluate(id=>Orbit.modules.aseguradoras.ficha(id),insurerId);
+  await page.waitForSelector('#asg-ficha .asg-logo img',{timeout:10000});
+  need((await page.locator('#asg-ficha .asg-logo img').getAttribute('src'))===logoUrl,'B2_AUTH_INSURER_LOGO_REFRESH_MISMATCH');
+  const revealProof=await bounded(page.evaluate(async ({ref,insurerId,expectedHash})=>{
+    const out=await Orbit.secureResources.revealCredential(ref,{insurerId});
+    const bytes=new TextEncoder().encode(String(out&&out.value||'')),digest=await crypto.subtle.digest('SHA-256',bytes),hashValue=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
+    return{ok:!!(out&&out.ok),matches:hashValue===expectedHash,length:String(out&&out.value||'').length,preview:!!(Orbit.productInsurerCredentialProviderP0&&Orbit.productInsurerCredentialProviderP0.status().preview)};
+  },{ref:state.insurerCredentialRef,insurerId,expectedHash:hash(syntheticSecret)}),'B2_AUTH_INSURER_CREDENTIAL_REVEAL_TIMEOUT',30000);
+  need(revealProof.ok&&revealProof.matches&&revealProof.preview,'B2_AUTH_INSURER_CREDENTIAL_REVEAL_FAILED:'+JSON.stringify(revealProof));
+  const secureCleanup=await bounded(page.evaluate(async ({ref,insurerId})=>Orbit.productInsurerCredentialProviderP0.previewCleanup(ref,{insurerId}),{ref:state.insurerCredentialRef,insurerId}),'B2_AUTH_INSURER_CREDENTIAL_CLEANUP_TIMEOUT',30000);
+  need(secureCleanup&&secureCleanup.ok===true&&secureCleanup.removed===true,'B2_AUTH_INSURER_CREDENTIAL_CLEANUP_FAILED:'+JSON.stringify(secureCleanup));
+  state.insurerCredentialCleaned=true;
+  evidence.insurer={logoReadback:true,logoReload:true,credentialStoredPreviewIsolated:true,credentialRevealHashMatch:true,operativoWriteAuthorized:true,secureCleanup:true};
+  milestone('INSURER_SECURE_EDIT_PASS',{logo:true,credential:true,cleanup:true});
 
   milestone('RENEWAL_RUNTIME_START');
   const renewal=await bounded(page.evaluate(async ({policyId,stamp,renewNo})=>{
@@ -598,15 +653,26 @@ try{
   evidence.status='FAIL';evidence.errors.push(clean(error?.stack||error?.message||error,6000));throw error;
 }finally{
   try{
+    if(page&&state.insurerCredentialRef&&!state.insurerCredentialCleaned){
+      const out=await bounded(page.evaluate(async ({ref,insurerId})=>Orbit.productInsurerCredentialProviderP0.previewCleanup(ref,{insurerId}),{ref:state.insurerCredentialRef,insurerId:state.insurerId}),'B2_AUTH_INSURER_CREDENTIAL_FINAL_CLEANUP_TIMEOUT',30000);
+      state.insurerCredentialCleaned=!!(out&&out.ok);
+      evidence.cleanup.previewCredentialRemoved=state.insurerCredentialCleaned;
+    }
+  }catch(e){evidence.cleanup.previewCredentialError=clean(e?.message||e,1200);}
+  try{
     if(app){
       const db=getFirestore(app);
-      milestone('CLEANUP_START',{client:!!state.clientId,policy:!!state.policyId,renewed:!!state.renewedPolicyId});
+      milestone('CLEANUP_START',{client:!!state.clientId,policy:!!state.policyId,renewed:!!state.renewedPolicyId,insurer:!!state.insurerId});
       evidence.cleanup.deleted=await bounded(cleanupSynthetic(db,state),'B2_AUTH_CLEANUP_TIMEOUT',60000);
       milestone('CLEANUP_DELETED',{deleted:evidence.cleanup.deleted});
       evidence.writes.cleanup=evidence.cleanup.deleted;
       if(state.clientId){
         const still=await dataCol(db,'clientes').doc(state.clientId).get();
         evidence.cleanup.clientAbsent=!still.exists;
+      }
+      if(state.insurerId){
+        const stillInsurer=await dataCol(db,'aseguradoras').doc(state.insurerId).get();
+        evidence.cleanup.insurerAbsent=!stillInsurer.exists;
       }
     }
   }catch(e){evidence.cleanup.error=clean(e?.message||e,1200);}
@@ -617,11 +683,14 @@ try{
 }
 need(evidence.status==='PASS','B2_AUTH_NOT_PASS');
 need(evidence.cleanup.clientAbsent===true,'B2_AUTH_CLEANUP_CLIENT_REMAINS');
+need(evidence.cleanup.insurerAbsent===true,'B2_AUTH_CLEANUP_INSURER_REMAINS');
+need(state.insurerCredentialCleaned===true,'B2_AUTH_CLEANUP_PREVIEW_CREDENTIAL_REMAINS');
 console.log('I65_B2_AUTHENTICATED_PREVIEW=PASS');
 console.log('I65_B2_ACTIVE_ROLE_SCOPE=PASS');
 console.log('I65_B2_CLIENT_CREATE_EDIT=PASS');
 console.log('I65_B2_POLICY_SELLER=PASS');
 console.log('I65_B2_VEHICLE_CREATE_EDIT=PASS');
+console.log('I65_B2_INSURER_LOGO_CREDENTIAL=PASS');
 console.log('I65_B2_RENEWAL_REAL_POLICY=PASS');
 console.log('I65_B2_CONFIRMED_COBRO_CREATED=0');
 console.log('I65_B2_SYNTHETIC_CLEANUP=PASS');
