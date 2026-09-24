@@ -70,7 +70,7 @@ async function captureVisualAudit(page){
     let policy=polizas.find(p=>vehiculos.some(v=>String(v.polizaId||'')===String(p.id||'')))||polizas[0]||null;
     let vehicle=policy?vehiculos.find(v=>String(v.polizaId||'')===String(policy.id||'')):vehiculos[0]||null;
     let client=policy?Orbit.store.get('clientes',policy.clienteId):null;
-    let receipt=policy?cobros.find(c=>String(c.polizaId||'')===String(policy.id||'')):cobros[0]||null;
+    let receipt=(policy?cobros.find(c=>String(c.polizaId||'')===String(policy.id||'')):null)||cobros[0]||null;
     return{clientId:String(client?.id||''),policyId:String(policy?.id||''),vehicleId:String(vehicle?.id||''),receiptId:String(receipt?.id||'')};
   });
   out.sample=sample;
