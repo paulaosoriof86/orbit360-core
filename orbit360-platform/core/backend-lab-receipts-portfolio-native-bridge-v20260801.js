@@ -216,7 +216,7 @@
     var cid=activeClientId();if(!cid||!host)return;patchHeader(cid);
     host.querySelectorAll('.ftab').forEach(function(el){
       if(el.dataset.rpNative==='1')return;el.dataset.rpNative='1';
-      el.addEventListener('click',function(){setTimeout(function(){patchHeader(cid);if(el.dataset.tab==='recibos')renderReceipts(cid);else if(el.dataset.tab==='cobros')patchCobros(cid);},0);});
+      el.addEventListener('click',function(){patchHeader(cid);if(el.dataset.tab==='recibos')renderReceipts(cid);else if(el.dataset.tab==='cobros')patchCobros(cid);});
     });
     var active=host.querySelector('.ftab.active');
     if(active&&active.dataset.tab==='recibos')renderReceipts(cid);else if(active&&active.dataset.tab==='cobros')patchCobros(cid);
@@ -239,7 +239,7 @@
     if(!wrappedQuery)return false;
     var mod=Orbit.modules&&Orbit.modules.cliente360;
     if(mod&&typeof mod.render==='function'){
-      if(mod.__rpNativeRenderOwner!==mod.render){var cr=mod.render.bind(mod),clientWrapper=function(host){var out=cr(host);setTimeout(function(){patchClient(host);},0);return out;};mod.render=clientWrapper;mod.__rpNativeRenderOwner=clientWrapper;}
+      if(mod.__rpNativeRenderOwner!==mod.render){var cr=mod.render.bind(mod),clientWrapper=function(host){var out=cr(host);patchClient(host);return out;};mod.render=clientWrapper;mod.__rpNativeRenderOwner=clientWrapper;}
       wrappedClient=mod.__rpNativeRenderOwner===mod.render;
     }else wrappedClient=false;
     var pol=Orbit.modules&&Orbit.modules.polizas;
