@@ -26,6 +26,7 @@ const files={
   router:read('orbit360-platform/core/router.js'),
   productApp:read('orbit360-platform/core/product-app-p0.js'),
   credentialProvider:read('orbit360-platform/core/product-insurer-credential-provider-p0.js'),
+  domainConfig:read('orbit360-platform/core/tenant-domain-config-client.js'),
   credentialBackend:read('functions/product-insurer-credentials.js'),
   index:read('orbit360-platform/index.html')
 };
@@ -56,7 +57,7 @@ need(files.engine.includes('function installmentsForFrequency'),'B2_POLICY_FREQU
 need(files.detail.includes('gi-policy-hero')&&files.detail.includes('gi-detail-kpis'),'B2_POLICY_FULLPAGE_VISUAL_HIERARCHY_MISSING');
 need(files.detail.includes('gi-receipt-detail'),'B2_RECEIPT_DETAIL_VISUAL_HIERARCHY_MISSING');
 need(files.detail.includes('✏️ Editar póliza'),'B2_POLICY_EDIT_ACTION_MISSING');
-need(files.detail.includes('Completar vehículo'),'B2_MISSING_VEHICLE_REPAIR_ACTION_MISSING');
+need(files.detail.includes('Vehículo pendiente de vincular a esta póliza')&&files.detail.includes('No se vinculará automáticamente')&&files.detail.includes('Revisar vehículos del cliente'),'B2_MISSING_VEHICLE_RELATION_TRUTHFUL_ACTION_MISSING');
 for(const marker of ['data-vbrand','data-vline','data-vplate','data-vyear','data-vuse','data-vcolor','data-vvin','data-vchasis','data-vmotor'])need(files.bridge.includes(marker),'B2_VEHICLE_FIELD_MISSING:'+marker);
 need(files.bridge.includes("save.textContent = 'Guardando…'"),'B2_POLICY_SAVE_PENDING_STATE_MISSING');
 need(!files.bridge.includes("if (e.target === b) close();"),'B2_POLICY_BACKDROP_CLOSE_STILL_PRESENT');
@@ -81,7 +82,9 @@ need(files.receiptsProjection.includes("clientWrapper=function(host){var out=cr(
 need(files.receiptsProjection.includes('Datos actualizados al')&&files.receiptsProjection.includes('Documento de origen')&&!files.receiptsProjection.includes("cell('Fuente autoridad'")&&!files.receiptsProjection.includes("cell('Calidad de match'"),'B2_RECEIPT_DETAIL_TECHNICAL_UI_REMAINS');
 need(files.insurers.includes('id="af-logo"')&&files.insurers.includes("'nombre', 'logo', 'nit'"),'B2_INSURER_LOGO_NOT_ADMINISTRABLE');
 need(files.credentialBackend.includes("'operativo']")&&files.credentialBackend.includes("previewSecretPattern:'orbit360-insurer-credentials-preview-{tenantId}'")&&files.credentialBackend.includes("importEnabled:true")&&!files.credentialBackend.includes("Importación deshabilitada en Preview"),'B2_INSURER_CREDENTIAL_PREVIEW_CONTRACT_INVALID');
-need(files.credentialProvider.includes('previewCleanup:function')&&files.credentialProvider.includes("operation === 'delete_preview'"),'B2_INSURER_CREDENTIAL_SYNTHETIC_CLEANUP_MISSING');
+need(files.credentialProvider.includes('importCredentials')&&files.credentialProvider.includes('previewCleanup:cleanupPreview')&&files.credentialProvider.includes("operation:'delete_preview'"),'B2_INSURER_CREDENTIAL_PRODUCT_PROVIDER_CONTRACT_MISSING');
+need(files.insurers.includes('provider.importCredentials'),'B2_INSURER_DIRECT_CREDENTIAL_IMPORT_MISSING');
+need(files.domainConfig.includes("tenant-domain-config-client-v3")&&files.domainConfig.includes("dispatchEvent(new CustomEvent('orbit:domain-config'")&&files.accessScope.includes("Orbit.domainConfig.peek('access')")&&files.router.includes("hydrateAccessAuthority"),'B2_ACCESS_MATRIX_PROTECTED_HYDRATION_MISSING');
 need(files.academia.includes("['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin'].includes(rol)"),'B2_ACADEMIA_PRIVILEGED_ROLE_ALIAS_MISSING');
 need(files.runtimeConfig.includes("'cursos'")&&files.runtimeConfig.includes("'academyProgress'"),'B2_ACADEMIA_RUNTIME_HYDRATION_MISSING');
 need(files.accessPolicy.includes("cursos: { module: 'academia'")&&files.accessPolicy.includes("academyProgress: { module: 'academia'")&&files.accessPolicy.includes("field: 'uid'"),'B2_ACADEMIA_READ_POLICY_MISSING');
@@ -104,7 +107,7 @@ for(const role of ['Dirección','Admin','Comercial','Finanzas','Marketing','Oper
   need(slice.includes("'academia'"),'B2_ACADEMIA_ALL_ROLE_DEFAULT_MISSING:'+role);
 }
 new Function(files.academiaCatalog);new Function(files.academiaOwner);new Function(files.academia);
-for(const marker of ['core/config.js?v=20260923-b2a3','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260924-b2r1','core/product-app-p0.js?v=20260923-b2a1','core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260924-b2r1','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260924-b2a6','modules/cliente360.js?v=20260924-b2r1','modules/aseguradoras.js?v=20260924-b2r1','modules/crm-v1198-operational-bridge.js?v=20260923-b2v4','modules/policy-receipts-v1199-bridge.js?v=20260924-b2r1','modules/policy-receipts-v1199-detail-guard.js?v=20260924-b2r1','core/product-insurer-credential-provider-p0.js?v=20260924-b2r1','core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260924-b2r1','modules/issuance-endosos-v1201-bridge.js?v=20260924-b2a6'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+for(const marker of ['core/config.js?v=20260923-b2a3','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260924-b2r1','core/product-app-p0.js?v=20260923-b2a1','core/tenant-domain-config-client.js?v=20260924-b2r2','core/access-scope.js?v=20260924-b2r2','core/policy-receipts-engine.js?v=20260924-b2r1','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260924-b2r2','modules/cliente360.js?v=20260924-b2r1','modules/aseguradoras.js?v=20260924-b2r2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v4','modules/policy-receipts-v1199-bridge.js?v=20260924-b2r2','modules/policy-receipts-v1199-detail-guard.js?v=20260924-b2r2','core/product-insurer-credential-provider-p0.js?v=20260924-b2r2','core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260924-b2r2','modules/issuance-endosos-v1201-bridge.js?v=20260924-b2a6'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={
@@ -229,6 +232,9 @@ need(rows.polizas.find(x=>x.id==='pol-b2-a')?.renovadaPor===issued.policy.id,'B2
 need(rows.recibosEsperados.filter(x=>x.polizaId===issued.policy.id&&String(x.estado).toLowerCase()!=='anulado').length===2,'B2_RENEWAL_RECEIPTS_MISSING');
 need(rows.carteraPrimas.filter(x=>x.polizaId===issued.policy.id&&x.carteraActiva!==false).length===2,'B2_RENEWAL_PORTFOLIO_MISSING');
 need(rows.cobros.length===0,'B2_RENEWAL_CREATED_CONFIRMED_COBRO');
+const issuedVehicles=rows.vehiculos.filter(x=>x.polizaId===issued.policy.id);
+need(issuedVehicles.length===1&&issuedVehicles[0].id!==rows.vehiculos.find(x=>x.polizaId==='pol-b2-a')?.id,'B2_RENEWAL_VEHICLE_SNAPSHOT_MISSING_OR_REUSED');
+need(issuedVehicles[0].marca==='Toyota'&&issuedVehicles[0].linea==='Corolla'&&issuedVehicles[0].placa==='B2TEST','B2_RENEWAL_VEHICLE_SNAPSHOT_FIELDS_INVALID');
 
 console.log('I65_B2_FUNCTIONAL=PASS');
 console.log('I65_B2_CLIENT_DURABLE=true');
