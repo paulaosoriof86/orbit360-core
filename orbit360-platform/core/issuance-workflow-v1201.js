@@ -187,6 +187,14 @@ Orbit.issuance = (function () {
     return { ok: true, request: after };
   }
 
+  function renewalVehicleSnapshot(source) {
+    if(!source||!source.id||!S()||typeof S().all!=='function')return null;
+    const rows=(S().all('vehiculos')||[]).filter(v=>v&&v.polizaId===source.id&&String(v.estado||'').toLowerCase()!=='historico');
+    if(rows.length!==1)return null;
+    const v=rows[0],out={};['marca','linea','placa','anio','uso','color','vin','chasis','motor','inciso','concepto','descripcion','comentarios','sumaAsegurada'].forEach(k=>{if(v[k]!=null&&clean(v[k])!=='')out[k]=v[k];});
+    return Object.keys(out).length?out:null;
+  }
+
   async function issueRequest(id, policyInput, options) {
     policyInput = policyInput || {}; options = options || {};
     if (!canManage()) return { ok: false, errors: ['permiso_emision_denegado'] };
@@ -223,7 +231,7 @@ Orbit.issuance = (function () {
       propuestaAceptadaRef: clean(offer.sourceRef || offer.documentRef),
       renuevaDe: source ? source.id : '', gestionRenovacionId: request.renewalManagementId || '',
       emissionOperationId: '',
-      vehiculo: policyInput.vehiculo || null
+      vehiculo: policyInput.vehiculo || (source ? renewalVehicleSnapshot(source) : null)
     };
     if (!raw.numero) return { ok: false, errors: ['numero_poliza_real_requerido'] };
     if (!raw.vigenciaInicio || !raw.vigenciaFin) return { ok: false, errors: ['vigencia_real_requerida'] };

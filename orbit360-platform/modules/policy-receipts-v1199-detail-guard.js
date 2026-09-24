@@ -182,11 +182,11 @@ Orbit.modules = Orbit.modules || {};
   }
 
   function section(title, body, cls) {
-    return `<section class="card pad ${cls || ''}" style="min-width:0"><div style="font-family:var(--f-display);font-size:15px;font-weight:800;margin-bottom:12px">${title}</div>${body}</section>`;
+    return `<section class="card pad ${cls || ''}" style="min-width:0"><div style="font-family:var(--f-display);font-size:17px;font-weight:800;line-height:1.25;margin-bottom:12px">${title}</div>${body}</section>`;
   }
   function field(label, value, opts) {
     const o = opts || {};
-    return `<div style="min-width:0"><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.045em">${esc(label)}</div><div style="font-weight:500;margin-top:2px;line-height:1.42;overflow-wrap:anywhere;${o.mono ? 'font-family:var(--f-mono);font-weight:500;' : ''}">${o.html ? value : esc(shown(value))}</div></div>`;
+    return `<div style="min-width:0"><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.045em">${esc(label)}</div><div style="font-size:13.5px;font-weight:500;margin-top:3px;line-height:1.42;overflow-wrap:anywhere;${o.mono ? 'font-family:var(--f-mono);font-weight:500;' : ''}">${o.html ? value : esc(shown(value))}</div></div>`;
   }
   function grid(items, cols) {
     return `<div class="orbit-detail-grid" style="display:grid;grid-template-columns:repeat(${cols || 3},minmax(0,1fr));gap:13px 18px">${items.join('')}</div>`;
@@ -249,8 +249,15 @@ Orbit.modules = Orbit.modules || {};
       return `<tr class="${rid?'clickable':''}" ${rid?`onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${esc(rid)}','${esc(r.clienteId||'')}')"`:''}><td>${esc(first(r.serie, r.numero, r.cuota, i + 1))}</td><td>${esc(fmtDate(due))}</td><td class="num">${esc(moneyDetail(r.primaNeta, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosExpedicion, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosFinanciamiento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.descuento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.impuestosIVA, r.moneda || cur))}</td><td class="num"><b>${esc(moneyDetail(total, r.moneda || cur))}</b></td><td>${badge(state)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
   }
-  function vehicleCard(v, cur, policyId) {
-    if (!v) return '<div class="gi-integrity-warning"><div><b>🚘 Falta vincular el vehículo</b><span>Esta póliza es vehicular y necesita completar el riesgo para que el expediente quede íntegro.</span></div>' + (policyId ? '<button class="btn primary sm" onclick="Orbit.modules.cliente360.editarPoliza(\''+esc(policyId)+'\')">Completar vehículo</button>' : '') + '</div>';
+  function vehicleCard(v, cur, policyId, clientId) {
+    if (!v) {
+      const clientVehicles=clientId&&idx().vehiclesByClient?(idx().vehiclesByClient.get(clientId)||[]):[];
+      if(clientVehicles.length){
+        const links=clientVehicles.slice(0,3).map(item=>'<a class="btn ghost sm" href="#/cliente360?c='+encodeURIComponent(clientId)+'&v='+encodeURIComponent(item.id)+'">🚘 '+esc([item.marca,item.linea,item.placa].filter(Boolean).join(' ')||'Ver vehículo')+'</a>').join('');
+        return '<div class="gi-integrity-warning"><div><b>🚘 Vehículo pendiente de vincular a esta póliza</b><span>El cliente tiene '+clientVehicles.length+' vehículo(s) registrado(s), pero ninguno está vinculado físicamente a esta póliza. No se vinculará automáticamente para no alterar contratos históricos.</span><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+links+'</div></div><a class="btn primary sm" href="#/cliente360?c='+encodeURIComponent(clientId)+'&t=vehiculos">Revisar vehículos del cliente</a></div>';
+      }
+      return '<div class="gi-integrity-warning"><div><b>🚘 Falta vincular el vehículo</b><span>Esta póliza vehicular no tiene un vehículo vinculado en la fuente canónica.</span></div>'+(policyId?'<button class="btn primary sm" onclick="Orbit.modules.cliente360.editarPoliza(\''+esc(policyId)+'\')">Completar riesgo</button>':'')+'</div>';
+    }
     const V = vehicleVisual(v);
     return grid([
       field('Marca', V.marca), field('Línea / tipo', V.linea), field('Modelo / año', V.anio),
@@ -299,7 +306,7 @@ Orbit.modules = Orbit.modules || {};
           ].map(([k,v])=>`<div style="display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px solid var(--line)"><span style="color:var(--ink-2)">${esc(k)}</span><span style="font-weight:${k==='Prima total de póliza'?'700':'500'}">${esc(moneyDetail(v,cur))}</span></div>`).join('')}</div>${scheduleDelta!=null&&Math.abs(scheduleDelta)>=0.005?`<div class="badge warn" style="margin-top:10px">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · requiere conciliación de fuente</div>`:''}${grid([
             field('Frecuencia', first(p.frecuencia, p.forma)), field('Forma de pago', p.formaPago), field('Conducto', p.conducto)
           ],3)}`)}
-          ${section('🚘 Riesgo asegurado / vehículo', vehicleCard(vehicle, cur, p.id))}
+          ${section('🚘 Riesgo asegurado / vehículo', vehicleCard(vehicle, cur, p.id, p.clienteId))}
           ${section('🧾 Recibos y cartera', receiptRows(p.id, cur))}
         </div>
         <div style="display:grid;gap:16px;min-width:0">
@@ -322,7 +329,7 @@ Orbit.modules = Orbit.modules || {};
       <div class="crumb" style="margin-bottom:14px"><a href="${back}" style="color:var(--red)">‹ ${esc(cli.nombre || 'Cliente 360')}</a> / Vehículo</div>
       <div class="card gi-vehicle-hero" style="overflow:hidden;margin-bottom:16px"><div style="padding:20px 22px;background:linear-gradient(120deg,#1f3a5f,#142840);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap"><div style="display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">🚘</div><div><div style="color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.12em;font-size:11px">Vehículo asegurado</div><h2 style="color:#fff;margin:4px 0;font-family:var(--f-display)">${esc(shown(v.marca))} ${esc(shown(v.linea))} ${esc(shown(v.anio))}</h2><div class="mono" style="color:rgba(255,255,255,.85)">${esc(shown(v.placa))}${p.numero?' · póliza '+esc(p.numero):''}</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap">${canEditVehicle() ? `<button class="btn primary" onclick="Orbit.modules.cliente360.editarVehiculo('${esc(v.id)}')">✏️ Editar vehículo</button>` : ''}<a class="btn ghost" href="${back}">👤 Cliente 360</a></div></div></div>
       <div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:16px;align-items:start">
-        ${section('🚘 Detalle completo del vehículo', vehicleCard(v, cur))}
+        ${section('🚘 Detalle completo del vehículo', vehicleCard(v, cur, v.polizaId, v.clienteId))}
         <div style="display:grid;gap:16px">${section('📑 Póliza vinculada', grid([field('Póliza', p.numero || '—',{mono:true}),field('Aseguradora',asg.nombre || '—'),field('Estado',p.estado || '—'),field('Vigencia',`${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`),field('Prima total',moneyDetail(first(p.primaTotal,p.prima),cur)),field('Suma asegurada',moneyDetail(first(v.sumaAsegurada,p.sumaAsegurada),cur))],2)+`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn primary" href="#/cliente360?c=${encodeURIComponent(v.clienteId)}&p=${encodeURIComponent(v.polizaId)}">Abrir póliza completa</a>${canEditVehicle() ? `<button class="btn ghost" onclick="Orbit.modules.cliente360.editarVehiculo('${esc(v.id)}')">Editar vehículo</button>` : ''}</div>`)}</div>
       </div>
     </div>`;
@@ -365,26 +372,7 @@ Orbit.modules = Orbit.modules || {};
 
   function patchLegacyCards() {
     applyVisualAliasesInPlace();
-    const root = document.getElementById('host');
-    if (!root) return;
-    root.querySelectorAll('button').forEach(btn => {
-      if (btn.dataset.fullVehicleV1199c) return;
-      if (/^Ver póliza$/i.test(safe(btn.textContent))) {
-        const onclick = btn.getAttribute('onclick') || '';
-        const m = onclick.match(/verPoliza\('([^']+)'\)/);
-        if (m) {
-          const v = (S().all('vehiculos') || []).find(x => x.polizaId === m[1]);
-          if (v) {
-            const extra = document.createElement('button');
-            extra.className = 'btn primary sm';
-            extra.textContent = 'Ver vehículo completo';
-            extra.dataset.fullVehicleV1199c = '1';
-            extra.addEventListener('click', () => Orbit.modules.cliente360.verVehiculo(v.id));
-            btn.parentElement && btn.parentElement.insertBefore(extra, btn.nextSibling);
-          }
-        }
-      }
-    });
+    // Cliente 360 already owns contextual vehicle actions; do not duplicate them per policy card.
     patchClientPremiumLabels();
   }
 

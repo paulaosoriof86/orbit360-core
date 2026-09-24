@@ -12,7 +12,7 @@
   window.Orbit = window.Orbit || {};
   if (Orbit.productInsurerCredentialProviderP0) return;
 
-  const VERSION = 'gravicentra-product-insurer-credential-provider-p0-v6';
+  const VERSION = 'gravicentra-product-insurer-credential-provider-p0-v7';
   const PROD_CALLABLE = 'orbit360ProductInsurerCredentialCommand';
   const PROD_REGION = 'us-central1';
   const PREVIEW_CALLABLE = 'orbit360ProductInsurerCredentialCommandPreview';
@@ -65,7 +65,7 @@
   function isCertifiedPreviewHost() {
     let host = '';
     try { host = text(window.location && window.location.hostname, 255).toLowerCase(); } catch (e) {}
-    return /^ays-orbit-360-lab--gi-i(?:3|61)-[a-z0-9-]+\.web\.app$/.test(host);
+    return /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/.test(host);
   }
 
   function callableTarget() {
@@ -136,6 +136,23 @@
     return { ok:true, status:'disponible', value, expiresInMs:Number(out.expiresInMs) || 6000, containsSecrets:true };
   }
 
+  async function importCredentials(items, extra) {
+    const a=access(),rows=[].concat(items||[]),ctx=extra||{};
+    if(!a.canViewCredentials())return{ok:false,status:'restringido',message:'El rol activo no permite administrar credenciales'};
+    if(!rows.length||rows.length>100)return{ok:false,status:'invalido',message:'No hay credenciales válidas para guardar'};
+    const normalized=rows.map(item=>({insurerId:text(item&&item.insurerId,160),portalId:text(item&&(item.portalId||item.resourceId),160),resourceId:text(item&&(item.resourceId||item.portalId),160),credentialRef:text(item&&item.credentialRef,80),username:text(item&&item.username,320),password:text(item&&item.password,512)}));
+    if(normalized.some(item=>!item.insurerId||!item.portalId||(!item.username&&!item.password)))return{ok:false,status:'invalido',message:'La credencial está incompleta'};
+    const role=activeRole();if(!role)return{ok:false,status:'restringido',message:'Rol activo no disponible'};
+    const endpoint=callableTarget(),result=await runtime().callFunction(endpoint.callable,{operation:'import',tenantId:tenantId(),activeRole:role,sourceHash:text(ctx.sourceHash,80),items:normalized},endpoint.region);
+    return result&&result.data?result.data:(result||{});
+  }
+  async function cleanupPreview(ref,extra){
+    if(!isCertifiedPreviewHost())return{ok:false,removed:false,containsSecrets:false};
+    const r=text(ref,80),insurerId=text(extra&&extra.insurerId,160),role=activeRole();if(!REF_RE.test(r)||!insurerId||!role)return{ok:false,removed:false,containsSecrets:false};
+    const endpoint=callableTarget(),result=await runtime().callFunction(endpoint.callable,{operation:'delete_preview',tenantId:tenantId(),activeRole:role,credentialRef:r,insurerId},endpoint.region),out=result&&result.data?result.data:(result||{});
+    return{ok:!!(out&&out.ok===true),removed:!!(out&&out.removed),containsSecrets:false};
+  }
+
   const provider = Object.freeze({
     status: localStatus,
     reveal: (ref, extra) => command('reveal', ref, extra),
@@ -153,7 +170,8 @@
     legacyCredentialEnvelopeNormalization:true,
     directFirestoreWrites:false,
     serverAuditAuthoritative:true,
-    previewCleanup:function(ref,extra){ if(!isCertifiedPreviewHost())return Promise.resolve({ok:false,removed:false,containsSecrets:false}); return command('delete_preview',ref,extra); },
+    importCredentials,
+    previewCleanup:cleanupPreview,
     status:function () {
       let secure = {};
       try { secure = Orbit.secureResources.selfTest ? Orbit.secureResources.selfTest() : {}; } catch (e) {}

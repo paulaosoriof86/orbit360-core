@@ -19,11 +19,71 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 41,
+    "total": 45,
     "b2HumanFindings": 13,
-    "currentBlocking": 16
+    "currentBlocking": 14
   },
   "findings": [
+    {
+      "id": "B2-R17-RENEWAL_VEHICLE_CONTINUITY",
+      "block": "B2",
+      "source": "FORENSIC_SOURCE_REVIEW_20260924_R2",
+      "finding": "RENEWAL_CAN_CREATE_NEW_VEHICLE_POLICY_WITHOUT_CARRYING_UNAMBIGUOUS_SOURCE_VEHICLE_RISK",
+      "owner": [
+        "orbit360-platform/core/issuance-workflow-v1201.js",
+        "tools/gravicentra-i6-5-b2-authenticated-preview.mjs"
+      ],
+      "rootCause": "issueRequest used only policyInput.vehiculo. If the renewal caller omitted it, the new policy could be emitted without snapshotting the single source-policy vehicle.",
+      "remediation": "If exactly one current source vehicle exists, clone its business risk fields into a new vehicle linked to the renewal policy with a new ID. Never guess when source relation is missing or ambiguous.",
+      "status": "SOURCE_FIXED_EXACT_AUTHENTICATED_PROOF_PENDING",
+      "blocking": true,
+      "closureProof": "Exact authenticated renewal creates one new linked vehicle with new ID and preserves the source relationship."
+    },
+    {
+      "id": "B2-R16-RECEIPT_PLAN_EDIT_DISCOVERABILITY",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924_R2",
+      "finding": "RECEIPT_DETAIL_HAS_NO_CLEAR_EDIT_PATH_AND_POLICY_EDITOR_DID_NOT_SHOW_RECEIPT_SCHEDULE",
+      "owner": [
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+      ],
+      "rootCause": "Expected receipts are derived from policy payment terms, but receipt detail had no canonical edit path and policy preview exposed only a receipt count.",
+      "remediation": "Receipt detail opens Editar plan de recibos through the canonical policy editor; the policy preview shows the exact generated receipt schedule. No detached individual receipt mutation is introduced.",
+      "status": "SOURCE_FIXED_EXACT_PREVIEW_VISUAL_PENDING",
+      "blocking": true,
+      "closureProof": "Human Preview shows the canonical edit action and generated schedule."
+    },
+    {
+      "id": "B2-R15-DUPLICATE_VEHICLE_ACTIONS",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924_R2",
+      "finding": "CLIENTE360_SHOWS_MULTIPLE_GENERIC_VER_VEHICULO_COMPLETO_BUTTONS",
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "rootCause": "patchLegacyCards injected one generic vehicle button after every policy card with a vehicle, duplicating Cliente360's dedicated vehicle actions.",
+      "remediation": "Remove the generic injection and retain only contextual Cliente360/policy/vehicle actions.",
+      "status": "SOURCE_FIXED_EXACT_PREVIEW_VISUAL_PENDING",
+      "blocking": true,
+      "closureProof": "No repeated generic Ver vehículo completo buttons in Cliente360."
+    },
+    {
+      "id": "B2-R14-ACCESS-MATRIX-HYDRATION",
+      "block": "B2",
+      "source": "PAULA_SCREENSHOT_REVIEW_20260924_R2",
+      "finding": "OPERATIVO_LOSES_CONFIGURED_COTIZADOR_COMPARATIVO_ON_NEW_PREVIEW_ORIGIN",
+      "owner": [
+        "orbit360-platform/core/tenant-domain-config-client.js",
+        "orbit360-platform/core/access-scope.js",
+        "orbit360-platform/core/router.js"
+      ],
+      "rootCause": "The server-owned access matrix was not hydrated into the fresh Preview origin before/after sidebar construction. access-scope therefore fell back to hardcoded role defaults; those defaults exactly reproduce the screenshots: Dirección has Cotizador+Comparativo, Operativo has neither, Asesor has Cotizador only.",
+      "remediation": "Hydrate protected access config nonblockingly; access-scope reads the hydrated authority; router rebuilds on the access-config event. No module permission is hardcoded on.",
+      "status": "SOURCE_FIXED_EXACT_AUTHENTICATED_PROOF_PENDING",
+      "blocking": true,
+      "closureProof": "Exact Preview proves configured Operativo Cotizador+Comparativo in both access engine and sidebar."
+    },
     {
       "id": "MECH-WF-004",
       "block": "B2",
@@ -34,7 +94,7 @@
       ],
       "rootCause": "The initial quota-cleanup patch accidentally duplicated the remainder of the B2 workflow, including Exact B2 Preview readback and the authenticated-preview job; later edits only repaired the first visible malformed segment and left duplicate YAML keys.",
       "remediation": "Restore workflow bytes from last known-good executable commit 7f55a407..., then apply only one minimal call to the versioned Preview GC tool; assert critical job/step cardinality=1 before commit.",
-      "status": "SOURCE_FIXED_PENDING_GITHUB_PARSE_AND_RUN",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "GitHub accepts workflow syntax, central guard passes and B2 deploy job starts.",
       "mayDisappearWithoutDisposition": false
@@ -50,7 +110,7 @@
       ],
       "rootCause": "Preview channels were created repeatedly during recovery but the active B2 executor had no safe garbage collection for obsolete unreferenced B2 channels.",
       "remediation": "On quota-only failure, invoke versioned safe GC tool: delete only unreferenced recovery gi-* Preview channels, preserve every versioned reference/live, then retry exact deploy once.",
-      "status": "SOURCE_FIX_COMMITTED_RUNTIME_PROOF_PENDING",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "B2 Hosting Preview deploy succeeds after scoped cleanup; exact readback follows; live/data remain untouched.",
       "mayDisappearWithoutDisposition": false
@@ -81,7 +141,7 @@
       ],
       "rootCause": "The project required one accumulative candidate, but physical product composition authorization was distributed across Control Plane, B1/B2 locks, historical successor scopes and hardcoded status lists in the guard/workflow. A legitimate new remediation state could therefore make the guard ignore already-authorized product owners and report false source drift. This also made preservation of prior improvements dependent on multiple consumers staying manually synchronized.",
       "remediation": "Create exact-set/blob-bound canonical composition lock and make central guard consume it independent of block status strings.",
-      "status": "SOURCE_FIX_COMMITTED_RUNTIME_GUARD_PROOF_PENDING",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "Central guard PASS and B2 Preview executor reaches build/proof on the same HEAD without product-source drift.",
       "mayDisappearWithoutDisposition": false
@@ -138,7 +198,7 @@
       "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js + core/policy-receipts-engine.js",
       "rootCause": "Canonical model supports taxable base, but summary rendered the missing value as a completion warning and used ambiguous label.",
       "remediation": "Model retained; UI renders 'Base imponible para IVA' only when authoritative value exists.",
-      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "status": "PAULA_VISUAL_PASS_20260924_R2",
       "blocking": true,
       "closureProof": "Policy with base and policy without base; no invented value and no empty summary noise.",
       "mayDisappearWithoutDisposition": false
@@ -166,7 +226,7 @@
       "owner": "policy-receipts-v1199-bridge.js + policy-receipts-engine.js + authenticated harness",
       "rootCause": "Prior authenticated PASS never edited a policy field; it edited only vehicle color. Engine also required motivo only for a subset of critical fields, while UI declared motive mandatory. Exact human-field failure remains runtime-discriminant pending.",
       "remediation": "Every existing-policy update now requires motive; UI validates clearly before submit; authenticated proof now edits sumaAsegurada, asserts empty-motive zero write, valid-motive backend readback and reload.",
-      "status": "SOURCE_FIXED_DISCRIMINANT_RUNTIME_PENDING",
+      "status": "PAULA_HUMAN_DURABILITY_PASS_20260924_R2",
       "blocking": true,
       "closureProof": "Synthetic existing policy same ID: empty motive block -> valid save -> Firestore readback -> reload.",
       "mayDisappearWithoutDisposition": false
@@ -178,9 +238,9 @@
       "finding": "POLICY_VEHICLE_RELATIONSHIP_AMBIGUOUS_FOR_OBSERVED_CLIENT",
       "surface": "Vehiculos/Polizas",
       "owner": "canonical Firestore read models + relationship audit tool",
-      "rootCause": "Not assumed. Human evidence can represent distinct historical/current contracts plus an incomplete active vehicle link; physical IDs must decide.",
-      "remediation": "No data mutation. Read-only forensic script added for exact client and reported policy numbers.",
-      "status": "READONLY_RUNTIME_AUDIT_PENDING",
+      "rootCause": "Policy detail resolves a vehicle by exact vehicle.polizaId while Cliente360 lists vehicles by clienteId. A client can therefore have vehicle records while one specific policy has no physical vehicle link.",
+      "remediation": "Do not auto-merge or relink historical data. Show the distinction explicitly and link to client vehicles; prevent future renewal gaps by snapshotting one unambiguous source vehicle into the new renewal policy.",
+      "status": "ROOT_CAUSE_AND_RELATION_DEMONSTRATED_NO_AUTO_MUTATION",
       "blocking": true,
       "closureProof": "Artifact evidence with hashed IDs, states, links, receipt/portfolio counts and classification; no merge/delete.",
       "mayDisappearWithoutDisposition": false
@@ -194,7 +254,7 @@
       "owner": "policy-receipts-v1199-detail-guard.js + policy-receipts-v1199-bridge.js + cliente360.js",
       "rootCause": "Buttons labeled 'Editar vehículo' called editarPoliza(polizaId); no dedicated vehicle editor owner existed.",
       "remediation": "Dedicated openVehicleForm(vehicleId) added; actions call editarVehiculo(vehicleId); engine performs same-ID vehicle update through policy atomic write plan.",
-      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "status": "PAULA_HUMAN_SAME_VEHICLE_EDIT_PASS_20260924_R2",
       "blocking": true,
       "closureProof": "Authenticated edit -> exact vehicle doc readback -> one vehicle for policy -> reload -> policy/client link preserved.",
       "mayDisappearWithoutDisposition": false
@@ -236,7 +296,7 @@
       "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "rootCause": "UI printed raw provenance fields/codes and separate state/reconciliation badges even when semantically identical; hero used unrelated dark treatment.",
       "remediation": "Soft mature-family hero; medium body typography; deduplicated badges; raw authority/match codes suppressed; operational labels for update date/document/match.",
-      "status": "SOURCE_FIXED_RUNTIME_VISUAL_PENDING",
+      "status": "TECHNICAL_TERMS_PAULA_PASS_VISUAL_HIERARCHY_REMEDIATION_PENDING",
       "blocking": true,
       "closureProof": "Authenticated receipt detail desktop/mobile; no release/gate/validator/internal codes or duplicate payment status.",
       "mayDisappearWithoutDisposition": false
@@ -248,9 +308,9 @@
       "finding": "LOGO_NOT_ADMINISTRABLE",
       "surface": "Aseguradoras",
       "owner": "modules/aseguradoras.js",
-      "rootCause": "Ficha rendered a.logo, but edit form/snapshot/diff did not expose or track logo.",
-      "remediation": "Logo added to editable/diff contract as HTTPS URL only; Data URL/browser persistence is rejected; readback/reload proof added.",
-      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "rootCause": "Logo URL editing existed in source but was buried inside the Resumen edit form and was not discoverable in the human flow.",
+      "remediation": "Expose an explicit Cambiar logo action while preserving the HTTPS-only durable logo contract.",
+      "status": "SOURCE_REFINED_EXACT_PREVIEW_VISUAL_PENDING",
       "blocking": true,
       "closureProof": "Synthetic insurer logo URL save -> canonical backend readback -> reload -> image rendered.",
       "mayDisappearWithoutDisposition": false
@@ -262,9 +322,9 @@
       "finding": "SECURE_CREDENTIAL_PASSWORD_UPDATE_FAILS",
       "surface": "Aseguradoras",
       "owner": "functions/product-insurer-credentials.js + product-insurer-credential-provider-p0.js + aseguradoras.js",
-      "rootCause": "Backend MANAGE_ROLES omitted Operativo although approved policy grants it; Preview callable explicitly rejected credential import.",
-      "remediation": "Operativo restored to server manage roles. Preview writes use isolated Secret Manager vault overlay, production vault remains unchanged. Preview-only synthetic cleanup added. Workflow deploys only Preview callable.",
-      "status": "SOURCE_FIXED_RUNTIME_SECURITY_PENDING",
+      "rootCause": "The B2 Preview host gi-i65-b2-* was not recognized as a certified Preview by the product credential provider, so the human flow selected the production callable rather than the isolated Preview callable. Aseguradoras also depended indirectly on the directory-import abstraction.",
+      "remediation": "Recognize i65 B1-B4 Preview hosts; route password updates through direct product-owned importCredentials; keep Preview secrets isolated and cleanup mandatory.",
+      "status": "ROOT_CAUSE_REFINED_SOURCE_FIXED_EXACT_PREVIEW_PROOF_PENDING",
       "blocking": true,
       "closureProof": "Authenticated Operativo synthetic insurer password update -> credentialRef readback -> refresh/reveal hash match -> Preview secret cleanup; no plaintext/log/artifact.",
       "mayDisappearWithoutDisposition": false
@@ -512,5 +572,23 @@
       "status": "FROZEN_BACKLOG_CONDITIONAL",
       "finding": "Further company Finance evolution may move to Phase B if not required for CRM/Cliente360/Recibos/Cobros closure."
     }
-  ]
+  ],
+  "lastHumanReview": {
+    "date": "2026-09-24",
+    "source": "Paula R2 screenshots + real human writes",
+    "confirmedPass": [
+      "B2-H02",
+      "B2-H04",
+      "B2-H06",
+      "technical-language portion of B2-H09"
+    ],
+    "newFindings": [
+      "B2-R14-ACCESS-MATRIX-HYDRATION",
+      "B2-R15-DUPLICATE_VEHICLE_ACTIONS",
+      "B2-R16-RECEIPT_PLAN_EDIT_DISCOVERABILITY",
+      "B2-R17-RENEWAL_VEHICLE_CONTINUITY"
+    ],
+    "realDataEvidence": "Byron Contreras client and policy advisor changes persisted after refresh; vehicle color edit persisted on the same linked vehicle.",
+    "noBroadReimport": true
+  }
 }

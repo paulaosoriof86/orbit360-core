@@ -405,7 +405,7 @@ Orbit.modules.aseguradoras = (function () {
               <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'}${st.editing ? ' · <b>Editando</b>' : ''}</div></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
-            ${canEdit() ? (st.editing ? '' : `<button class="btn ghost sm" id="af-editar" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff">✏ Editar</button>`) : '<span class="badge neutral" style="background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)">Solo lectura</span>'}
+            ${canEdit() ? (st.editing ? `<button class="btn ghost sm" id="af-logo-focus" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff">🖼 Cambiar logo</button>` : `<button class="btn ghost sm" id="af-editar" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff">✏ Editar</button>`) : '<span class="badge neutral" style="background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)">Solo lectura</span>'}
           </div>
         </div>
         <div class="asg-tabbar" role="tablist">${TABS.map(([k, l]) => `<button class="asg-tab ${k === st.tab ? 'active' : ''}" role="tab" aria-selected="${k === st.tab}" data-tab="${k}">${l}</button>`).join('')}</div>
@@ -422,6 +422,7 @@ Orbit.modules.aseguradoras = (function () {
     Orbit.vault.wire(back);
     back.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
     if (back.querySelector('#af-editar')) back.querySelector('#af-editar').addEventListener('click', () => ficha(id, true));
+    if (back.querySelector('#af-logo-focus')) back.querySelector('#af-logo-focus').addEventListener('click', () => { selectTab('resumen'); setTimeout(() => { const input=document.getElementById('af-logo'); if(input){ input.focus(); input.scrollIntoView({block:'center'}); } }, 0); });
     if (back.querySelector('#af-guardar')) back.querySelector('#af-guardar').addEventListener('click', () => guardarDraft(id, back));
     if (back.querySelector('#af-cancelar')) back.querySelector('#af-cancelar').addEventListener('click', () => { fichaState[id].editing = false; fichaState[id].draft = null; fichaState[id].credentialDrafts = {}; ficha(id); });
     if (back.querySelector('#af-del')) back.querySelector('#af-del').addEventListener('click', () => borrarOdesactivar(id, back));
@@ -441,12 +442,14 @@ Orbit.modules.aseguradoras = (function () {
     const changes = credentialChanges(st, st.draft);
     if (!changes.length) return 0;
     if (!canManageCredentials()) throw new Error('CREDENTIAL_PERMISSION_DENIED');
-    if (!Orbit.secureImport || typeof Orbit.secureImport.importInsurerDirectory !== 'function') throw new Error('SECURE_CREDENTIAL_PROVIDER_UNAVAILABLE');
+    const provider = Orbit.productInsurerCredentialProviderP0;
+    if (!provider || typeof provider.importCredentials !== 'function') throw new Error('SECURE_CREDENTIAL_PROVIDER_UNAVAILABLE');
     const sourceHash = await secureSourceHash(insurerId + ':' + Date.now());
-    const result = await Orbit.secureImport.importInsurerDirectory({
-      sourceHash,
-      items: changes.map(item => ({ type: 'credential', insurerId, portalId: item.portalId, resourceId: item.portalId, credentialRef: item.credentialRef || '', username: item.username || '', password: item.password }))
-    });
+    const result = await provider.importCredentials(
+      changes.map(item => ({ insurerId, portalId: item.portalId, resourceId: item.portalId, credentialRef: item.credentialRef || '', username: item.username || '', password: item.password })),
+      { sourceHash }
+    );
+    if (!result || result.ok !== true) throw new Error('SECURE_CREDENTIAL_SAVE_NOT_CONFIRMED');
     const mappings = [].concat(result && result.mappings || []);
     if (mappings.length < changes.length) throw new Error('SECURE_CREDENTIAL_MAPPING_INCOMPLETE');
     mappings.forEach(mapping => {
@@ -504,7 +507,8 @@ Orbit.modules.aseguradoras = (function () {
     } catch (error) {
       st.saving = false;
       if (saveButton) { saveButton.disabled = false; saveButton.textContent = '💾 Guardar cambios'; }
-      U.toast('No fue posible guardar. La edición continúa abierta para corregir o reintentar.');
+      const code = String(error && (error.code || error.message) || '');
+      U.toast(/CREDENTIAL|SECURE_/i.test(code) ? 'No fue posible guardar la contraseña de forma segura. La edición continúa abierta para reintentar.' : 'No fue posible guardar. La edición continúa abierta para corregir o reintentar.');
       try { console.warn('[Orbit Aseguradoras] SAVE_FAILED', error && (error.code || error.message) || error); } catch (e) {}
     }
   }
@@ -578,7 +582,7 @@ Orbit.modules.aseguradoras = (function () {
         <label class="ce-l">NIT / identificación fiscal<input id="af-nit" class="o-sel" value="${U.esc(a.nit || '')}" ${ro}></label>
         <label class="ce-l">Código de intermediario<input id="af-cod" class="o-sel" value="${U.esc(a.codigoIntermediario || '')}" ${ro}></label>
         <label class="ce-l">Sitio web / app<input id="af-web" class="o-sel" value="${U.esc(a.web || '')}" ${ro}></label>
-        <label class="ce-l">Logo (URL HTTPS segura)<input id="af-logo" class="o-sel" type="url" placeholder="https://…" value="${U.esc(a.logo || '')}" ${ro}><small class="muted">Se conserva como referencia segura; no se guarda el archivo ni una Data URL en el navegador.</small></label>
+        <label class="ce-l">🖼 Cambiar logo · URL HTTPS<input id="af-logo" class="o-sel" type="url" placeholder="https://…" value="${U.esc(a.logo || '')}" ${ro}><small class="muted">Se conserva como referencia segura; no se guarda el archivo ni una Data URL en el navegador.</small></label>
         <label class="ce-l">Responsable interno<input id="af-resp" class="o-sel" value="${U.esc(a.responsable || '')}" ${ro}></label>
       </div>
       <div class="cgrid" style="margin-top:10px">

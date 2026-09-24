@@ -119,8 +119,12 @@ Orbit.access = (function () {
     return Object.prototype.hasOwnProperty.call(SCOPE_LEVEL, normalized) ? SCOPE_LEVEL[normalized] : 0;
   }
   function accessConfig() {
-    try { var cfg=tenantConfig(),dc=cfg&&cfg.domainConfig&&cfg.domainConfig.access;return dc&&typeof dc==='object'?dc:{}; }
-    catch(e){return {};}
+    try {
+      var live=Orbit.domainConfig&&typeof Orbit.domainConfig.peek==='function'?Orbit.domainConfig.peek('access'):null;
+      if(live&&typeof live==='object')return live;
+      var cfg=tenantConfig(),dc=cfg&&cfg.domainConfig&&cfg.domainConfig.access;
+      return dc&&typeof dc==='object'?dc:{};
+    } catch(e){return {};}
   }
   function roleScopeCeiling(moduleKey) {
     var role = activeRole();

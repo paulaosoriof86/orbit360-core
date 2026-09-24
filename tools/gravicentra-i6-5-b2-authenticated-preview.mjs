@@ -337,7 +337,11 @@ try{
 
   await setRole(page,'Operativo');
   await page.evaluate(()=>{location.hash='#/inicio';});
-  await sleep(500);
+  await page.waitForFunction(()=>window.Orbit&&Orbit.domainConfig&&Orbit.domainConfig.status&&Orbit.domainConfig.status().available===true,{timeout:15000});
+  await bounded(page.evaluate(()=>Orbit.domainConfig.ensure('access')),'B2_AUTH_ACCESS_CONFIG_HYDRATE_TIMEOUT',20000);
+  await page.waitForFunction(()=>Orbit.access&&Orbit.access.puedeVerModulo&&Orbit.access.puedeVerModulo('cotizador')===true&&Orbit.access.puedeVerModulo('comparativo')===true,{timeout:15000});
+  const operativoModules=await page.evaluate(()=>({cotizador:Orbit.access.puedeVerModulo('cotizador'),comparativo:Orbit.access.puedeVerModulo('comparativo'),configured:Orbit.domainConfig.peek('access')?.rolePermissions?.Operativo||null,sidebar:Array.from(document.querySelectorAll('#sidebar [data-route]')).map(x=>x.getAttribute('data-route'))}));
+  need(operativoModules.cotizador===true&&operativoModules.comparativo===true&&operativoModules.sidebar.includes('cotizador')&&operativoModules.sidebar.includes('comparativo'),'B2_AUTH_OPERATIVO_CONFIGURED_MODULES_NOT_VISIBLE:'+JSON.stringify(operativoModules));
   const oper=await bounded(scopeSnapshot(page),'B2_AUTH_SCOPE_OPERATIVO_TIMEOUT',20000);
   milestone('SCOPE_OPERATIVO',{counts:oper.counts});
   await setRole(page,'Asesor');
@@ -349,7 +353,7 @@ try{
   need(asesor.leakCount===0,'B2_AUTH_ASESOR_SCOPE_LEAK:'+JSON.stringify(asesor));
   need(asesor.advisorIds.length<=1&&(!asesor.advisorIds.length||asesor.advisorIds[0]===asesor.advisorId),'B2_AUTH_ASESOR_ADVISOR_AGGREGATE_LEAK');
   need(oper.counts.polizas>=asesor.counts.polizas&&oper.counts.recibosEsperados>=asesor.counts.recibosEsperados&&oper.counts.carteraPrimas>=asesor.counts.carteraPrimas,'B2_AUTH_ROLE_SCOPE_COUNTS_INVALID');
-  evidence.scope={operativo:oper,asesor};
+  evidence.scope={operativo:oper,asesor};evidence.modulePermissions={operativo:operativoModules};
   const academiaOper=await bounded(academiaSnapshot(page,'Operativo'),'B2_AUTH_ACADEMIA_OPERATIVO_TIMEOUT',25000);
   need(academiaOper.hasClient360&&academiaOper.hasInsurerDirectory&&academiaOper.brandOk&&academiaOper.routeSelector&&!academiaOper.forbiddenVisible,'B2_AUTH_ACADEMIA_OPERATIVO_INVALID:'+JSON.stringify(academiaOper));
   need(academiaOper.automaticWrites===false&&academiaOper.catalogManagementDurable===false,'B2_AUTH_ACADEMIA_AUTOMATIC_WRITER_PRESENT');
@@ -689,11 +693,14 @@ try{
     return snap.exists&&snap.data()?.renovadaPor===renewed.id?snap.data():null;
   },'B2_AUTH_SOURCE_RENOVADA_POR_READBACK',30000);
   need(sourceAfter.renovadaPor===renewed.id,'B2_AUTH_SOURCE_RENOVADA_POR_MISSING');
-  const renewalReceipts=await rowsBy(db,'recibosEsperados','polizaId',renewed.id),renewalPortfolio=await rowsBy(db,'carteraPrimas','polizaId',renewed.id),renewalCobros=await rowsBy(db,'cobros','polizaId',renewed.id);
+  const renewalReceipts=await rowsBy(db,'recibosEsperados','polizaId',renewed.id),renewalPortfolio=await rowsBy(db,'carteraPrimas','polizaId',renewed.id),renewalCobros=await rowsBy(db,'cobros','polizaId',renewed.id),renewalVehicles=await rowsBy(db,'vehiculos','polizaId',renewed.id);
   need(renewalReceipts.length>0&&renewalPortfolio.filter(x=>x.carteraActiva!==false).length>0,'B2_AUTH_RENEWAL_RECEIPTS_PORTFOLIO_MISSING');
   need(renewalCobros.length===0,'B2_AUTH_RENEWAL_CREATED_CONFIRMED_COBRO');
+  need(renewalVehicles.length===1,'B2_AUTH_RENEWAL_VEHICLE_SNAPSHOT_MISSING:'+renewalVehicles.length);
+  need(renewalVehicles[0].id!==vehicle.id&&renewalVehicles[0].clienteId===client.id&&renewalVehicles[0].polizaId===renewed.id,'B2_AUTH_RENEWAL_VEHICLE_RELATION_INVALID');
+  need(renewalVehicles[0].marca===vehicleEdited.marca&&renewalVehicles[0].linea===vehicleEdited.linea&&renewalVehicles[0].placa===vehicleEdited.placa,'B2_AUTH_RENEWAL_VEHICLE_SNAPSHOT_FIELDS_INVALID');
   evidence.crud={clientIdHash:hash(client.id),policyIdHash:hash(policy.id),vehicleIdHash:hash(vehicle.id),clientCreateReadback:true,clientEditReadback:true,policyCreateReadback:true,policyEditReadback:true,policyEditReload:true,advisorSellerReadback:true,vehicleCreateReadback:true,vehicleEditSameId:true,vehicleEditReload:true,receipts:receipts.length,portfolio:portfolio.length,cobros:0,dirtyBackdropProtected:true};
-  evidence.renewal={requestIdHash:hash(renewal.requestId),newPolicyIdHash:hash(renewed.id),sourceLink:true,receipts:renewalReceipts.length,portfolio:renewalPortfolio.length,cobros:0,awaitedRuntime:true};
+  evidence.renewal={requestIdHash:hash(renewal.requestId),newPolicyIdHash:hash(renewed.id),sourceLink:true,receipts:renewalReceipts.length,portfolio:renewalPortfolio.length,cobros:0,vehicleSnapshot:true,vehicleNewId:true,awaitedRuntime:true};
   milestone('RENEWAL_READBACK',{receipts:renewalReceipts.length,portfolio:renewalPortfolio.length});
   need(pageErrors.length===0,'B2_AUTH_PAGE_ERRORS:'+JSON.stringify(pageErrors.slice(0,5)));
   evidence.pageErrors=[];evidence.status='PASS';

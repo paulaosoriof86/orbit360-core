@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -31,30 +31,33 @@
   "boundaries": {
     "diagnosticReadOnly": false,
     "allowedProductFiles": [
-      "orbit360-platform/index.html",
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
-      "orbit360-platform/core/policy-receipts-engine.js",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+      "functions/product-insurer-credentials.js",
+      "orbit360-platform/core/academia-product-catalog-p0.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/core/config.js",
+      "orbit360-platform/core/issuance-workflow-v1201-refinements.js",
       "orbit360-platform/core/issuance-workflow-v1201.js",
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/core/policy-receipts-v1199-refinements.js",
+      "orbit360-platform/core/product-app-p0.js",
+      "orbit360-platform/core/product-insurer-credential-provider-p0.js",
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+      "orbit360-platform/core/tenant-domain-config-client.js",
+      "orbit360-platform/data/academia-product-catalog-v1.js",
+      "orbit360-platform/index.html",
+      "orbit360-platform/modules/academia.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js",
       "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "orbit360-platform/product-runtime-config.js",
-      "orbit360-platform/core/tenant-access-policy-contract-p0.js",
-      "orbit360-platform/data/academia-product-catalog-v1.js",
-      "orbit360-platform/core/academia-product-catalog-p0.js",
-      "orbit360-platform/core/product-app-p0.js",
-      "orbit360-platform/modules/academia.js",
-      "orbit360-platform/core/config.js",
-      "orbit360-platform/modules/crm-v1198-operational-bridge.js",
-      "orbit360-platform/core/policy-receipts-v1199-refinements.js",
-      "orbit360-platform/core/router.js",
-      "orbit360-platform/core/issuance-workflow-v1201-refinements.js",
-      "orbit360-platform/modules/aseguradoras.js",
-      "functions/product-insurer-credentials.js",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/core/product-insurer-credential-provider-p0.js",
       "orbit360-platform/styles/base.css",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "tools/gravicentra-i6-5-b2-human-rejection-readonly.mjs"
     ],
     "productMutationAuthorized": true,
@@ -160,25 +163,14 @@
     "preservationCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f",
     "visualCorrectionDate": "2026-09-23"
   },
-  "preview": {
-    "sourceSha": "efef5bd6d5e339ede3cf90952756e7bbe23f8d3b",
-    "buildId": "gi-i65-b2-efef5bd6d5e3-57f234755dc1",
-    "channelId": "gi-i65-b2-36005619944",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36005619944-asple6gy.web.app",
-    "runId": 36005619944,
-    "artifactId": 10809933934,
-    "artifactDigest": "4ea11257688c5f6f5de626cda8cd57165f8cb8e499a1c4056d8dc689ec5022f5",
-    "exactReadback": true,
-    "functionalPass": true,
-    "livePromoted": false
-  },
+  "preview": null,
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "AUTHORIZED_PENDING_NEW_EXACT_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "efef5bd6d5e339ede3cf90952756e7bbe23f8d3b",
-    "exactPreviewBuildId": "gi-i65-b2-efef5bd6d5e3-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36005619944-asple6gy.web.app",
-    "exactPreviewArtifactId": 10809933934,
+    "exactPreviewSourceSha": null,
+    "exactPreviewBuildId": null,
+    "exactPreviewUrl": null,
+    "exactPreviewArtifactId": null,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
@@ -1310,8 +1302,8 @@
     "definitiveFix": "EXACT_PRODUCT_DIFF_AND_BLOB_BOUND_SINGLE_COMPOSITION_AUTHORITY",
     "productSourceReadyForPreview": true,
     "broadRediscoveryRequired": false,
-    "authorityBlobSha": "4262186fe1a011052568ff8fa657e0d37027a9e3",
-    "findingsLedgerBlobSha": "b843a3a5e61eec14a8291917d17225af5e69b54d"
+    "authorityBlobSha": "2250d63fc5dd2fb824e30b5493e7e6a611fc02d4",
+    "findingsLedgerBlobSha": "6912bfbecfc963c3c57c64a058e192ee18173b68"
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
   "lastPreviewFailure": {
@@ -1349,5 +1341,52 @@
     "liveTouched": false,
     "dataTouched": false,
     "definitiveFix": "RESTORE_LAST_KNOWN_GOOD_WORKFLOW_THEN_APPLY_MINIMAL_VERSIONED_GC_CALL"
-  }
+  },
+  "previousHumanReviewedPreview": {
+    "sourceSha": "efef5bd6d5e339ede3cf90952756e7bbe23f8d3b",
+    "buildId": "gi-i65-b2-efef5bd6d5e3-57f234755dc1",
+    "channelId": "gi-i65-b2-36005619944",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36005619944-asple6gy.web.app",
+    "runId": 36005619944,
+    "artifactId": 10809933934,
+    "artifactDigest": "4ea11257688c5f6f5de626cda8cd57165f8cb8e499a1c4056d8dc689ec5022f5",
+    "exactReadback": true,
+    "functionalPass": true,
+    "livePromoted": false
+  },
+  "paulaVisualReviewR2": {
+    "decision": "PARTIAL_PASS_REMEDIATION_REQUIRED",
+    "reviewedPreviewSourceSha": "efef5bd6d5e339ede3cf90952756e7bbe23f8d3b",
+    "reviewedPreviewRunId": 36005619944,
+    "evidence": {
+      "inicioRoleScreenshots": true,
+      "baseTaxNoiseGone": true,
+      "realClientPolicyAdvisorEditPersisted": true,
+      "realVehicleEditSameRelationPersisted": true,
+      "receiptTechnicalTermsGone": true
+    },
+    "open": [
+      "Operativo configured modules hydration",
+      "policy/client vehicle relation clarity",
+      "duplicate vehicle actions",
+      "policy/receipt hierarchy",
+      "receipt plan edit path",
+      "insurer logo discoverability",
+      "insurer credential save",
+      "renewal vehicle continuity"
+    ],
+    "b3Status": "NOT_STARTED",
+    "livePromoted": false
+  },
+  "nextRequiredProof": [
+    "CONTROL_GUARD_PASS_EXACT_COMPOSITION",
+    "PREVIEW_EXACT_READBACK",
+    "AUTH_OPERATIVO_CONFIGURED_COTIZADOR_COMPARATIVO",
+    "AUTH_POLICY_EDIT_DURABLE",
+    "AUTH_VEHICLE_SAME_ID",
+    "AUTH_RENEWAL_NEW_VEHICLE_SNAPSHOT",
+    "AUTH_INSURER_LOGO_AND_PASSWORD_PREVIEW_ISOLATED",
+    "PAULA_VISUAL_POLICY_RECEIPT_HIERARCHY",
+    "PAULA_VISUAL_NO_DUPLICATE_VEHICLE_ACTIONS"
+  ]
 }
