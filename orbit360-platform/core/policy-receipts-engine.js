@@ -84,6 +84,14 @@ Orbit.policyReceipts = (function () {
   function receiptId(policyId, sequence) { return 'cob_' + clean(policyId) + '_' + String(sequence).padStart(3, '0'); }
   function operationId(prefix) { return (prefix || 'op') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7); }
 
+  function installmentsForFrequency(frequency, requested) {
+    const f = clean(frequency || 'Contado');
+    const monthly = norm(f) === 'mensual';
+    const configured = Orbit.primas && Orbit.primas.cuotasDe ? +Orbit.primas.cuotasDe(f) : 1;
+    if (monthly) return Math.max(1, Math.min(24, +requested || configured || 12));
+    return Math.max(1, configured || 1);
+  }
+
   function validatePolicy(input, currentId) {
     const p = input || {};
     const errors = [], warnings = [];
@@ -126,7 +134,7 @@ Orbit.policyReceipts = (function () {
 
   function premiumBreakdown(raw, country) {
     const frequency = clean(raw.frecuencia || raw.forma || 'Contado');
-    const installments = Math.max(1, +raw.cuotas || (Orbit.primas ? Orbit.primas.cuotasDe(frequency) : 1));
+    const installments = installmentsForFrequency(frequency, raw.cuotas);
     let recargoPct = raw.recargoFinPct;
     if (recargoPct == null && +raw.primaNeta > 0 && +raw.gastosFinan >= 0) recargoPct = (+raw.gastosFinan / +raw.primaNeta) * 100;
     return Orbit.primas.desglose(+raw.primaNeta || 0, country, {
@@ -149,7 +157,7 @@ Orbit.policyReceipts = (function () {
     base.producto = clean(base.producto || base.subramo);
     base.frecuencia = clean(base.frecuencia || base.forma || 'Contado');
     base.forma = base.frecuencia;
-    base.cuotas = Math.max(1, +base.cuotas || Orbit.primas.cuotasDe(base.frecuencia));
+    base.cuotas = installmentsForFrequency(base.frecuencia, base.cuotas);
     base.estado = clean(base.estado || 'Vigente');
     const d = premiumBreakdown(base, base.pais);
     base.primaNeta = d.neta;
@@ -442,6 +450,6 @@ Orbit.policyReceipts = (function () {
     ACTIVE, isActiveState, isPaidReceipt, canManagePolicies, canApplyPayments,
     canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, expectedReceipts, syncReceipts, syncPortfolio, buildAtomicWritePlan,
     createPolicy, updatePolicy, applyPayment, createReconciliationProposal, updateClientState,
-    receiptId, sequenceOf
+    receiptId, sequenceOf, installmentsForFrequency
   };
 })();
