@@ -715,7 +715,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1944,7 +1944,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_PREVIEW_TECHNICAL_PASS_AUTHENTICATED_PROOF_PENDING",
+    "mechanismSyncStatus": "B2_RENEWAL_DURABLE_CLOSURE_SOURCE_FIX_PENDING_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2010,9 +2010,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "0ccd8df506099c344fe791a9c6c1f68447935e0b",
+    "b2ExecutionLockBlobSha": "fc2f7c419ef6583ec13207eb62063e68ac3584f9",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2033,8 +2033,8 @@
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35957754799-oi0tvmv5.web.app",
       "runId": 35957754799,
       "artifactId": 10790822310,
-      "exactReadback": true,
-      "functionalPass": true,
+      "exactReadback": false,
+      "functionalPass": false,
       "authenticatedPreviewProof": "AUTHORIZED_PENDING_RUN",
       "authenticatedPreviewProofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "orphanSyntheticCleanup": "PASS",
@@ -2058,7 +2058,7 @@
       "visualCorrectionFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923.json",
       "authenticatedPreviewPass": false,
       "academiaRegression": "ROLE_ACCESS_ROOT_CAUSE_CONFIRMED_SOURCE_FIX_PENDING_PREVIEW",
-      "oldPreviewRunId": 35954425275,
+      "oldPreviewRunId": 35957754799,
       "oldPreviewSuperseded": true,
       "harnessFalsePositiveClosed": true,
       "packageContractDriftClosed": true,
@@ -2068,7 +2068,8 @@
       "authRetryConcurrencyGuard": "PASS_ENFORCED_IN_WORKFLOW",
       "duplicateContractRootCause": "CLOSED_IN_SOURCE_PENDING_PREVIEW",
       "vehicleSameIdEditRootCauseClosedPendingPreview": true,
-      "visibleBrandingRootCauseClosedPendingPreview": true
+      "visibleBrandingRootCauseClosedPendingPreview": true,
+      "renewalDurableClosureRootCauseClosedPendingPreview": true
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",

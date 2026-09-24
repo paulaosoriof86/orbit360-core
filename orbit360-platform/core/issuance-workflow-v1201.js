@@ -218,40 +218,50 @@ Orbit.issuance = (function () {
       comVendedorPct: +(policyInput.comVendedorPct || offer.comVendedorPct) || 0,
       fuente: 'solicitud_emision_aceptada', sourceRef: clean(policyInput.sourceRef || offer.sourceRef),
       documentRef: clean(policyInput.documentRef || offer.documentRef), solicitudEmisionId: request.id,
+      propuestaAceptadaRef: clean(offer.sourceRef || offer.documentRef),
       renuevaDe: source ? source.id : '', gestionRenovacionId: request.renewalManagementId || '',
+      emissionOperationId: '',
       vehiculo: policyInput.vehiculo || null
     };
     if (!raw.numero) return { ok: false, errors: ['numero_poliza_real_requerido'] };
     if (!raw.vigenciaInicio || !raw.vigenciaFin) return { ok: false, errors: ['vigencia_real_requerida'] };
     if (!raw.documentRef) return { ok: false, errors: ['documento_poliza_emitida_requerido'] };
     const opId = options.operationId || operationId('emit');
+    raw.emissionOperationId = opId;
     const created = await P().createPolicy(raw, { operationId: opId, motivo: options.motivo || 'Conversión de solicitud de emisión con número real' });
     if (!created.ok) return created;
     const policy = created.policy;
-    S().update('polizas', policy.id, {
-      solicitudEmisionId: request.id, renuevaDe: source ? source.id : '', propuestaAceptadaRef: clean(offer.sourceRef || offer.documentRef),
-      gestionRenovacionId: request.renewalManagementId || '', emissionOperationId: opId
-    });
-    if (source) {
-      const hist = [].concat(source.historial || [], [{ icon: '🔄', fecha: today(), t: 'Renovación emitida', d: 'Nueva póliza ' + policy.numero + ' · vínculo ' + policy.id }]);
-      S().update('polizas', source.id, {
-        renovadaPor: policy.id, renovacionEstado: 'Renovada', renovacionFechaEfectiva: policy.vigenciaInicio,
-        renovacionSolicitudId: request.id, historial: hist
-      });
-      if (request.renewalManagementId) {
-        const rg = S().get('gestiones', request.renewalManagementId);
-        if (rg) S().update('gestiones', rg.id, { estado: 'Resuelta', nuevaPolizaId: policy.id, emisionGestionId: request.id, proximaAccion: 'Cerrada', actualizado: today() });
-      }
-    }
     const checklist = [].concat(request.checklist || []).map(x => {
       if (/Número real|Póliza emitida/.test(x.t || '')) return Object.assign({}, x, { done: true });
       return x;
     });
-    S().update('gestiones', request.id, {
-      emissionStage: 'EMITIDA', estado: 'Resuelta', policyCreatedId: policy.id, policyNumber: policy.numero,
-      documentRef: raw.documentRef, checklist, resultado: 'Póliza emitida ' + policy.numero,
-      proximaAccion: 'Cerrada', resueltaAt: now(), actualizado: today()
-    });
+    const closureMutations = [{
+      action: 'update', collection: 'gestiones', id: request.id, payload: {
+        emissionStage: 'EMITIDA', estado: 'Resuelta', policyCreatedId: policy.id, policyNumber: policy.numero,
+        documentRef: raw.documentRef, checklist, resultado: 'Póliza emitida ' + policy.numero,
+        proximaAccion: 'Cerrada', resueltaAt: now(), actualizado: today()
+      }
+    }];
+    if (source) {
+      const hist = [].concat(source.historial || [], [{ icon: '🔄', fecha: today(), t: 'Renovación emitida', d: 'Nueva póliza ' + policy.numero + ' · vínculo ' + policy.id }]);
+      closureMutations.push({
+        action: 'update', collection: 'polizas', id: source.id, payload: {
+          renovadaPor: policy.id, renovacionEstado: 'Renovada', renovacionFechaEfectiva: policy.vigenciaInicio,
+          renovacionSolicitudId: request.id, historial: hist
+        }
+      });
+      if (request.renewalManagementId) {
+        const rg = S().get('gestiones', request.renewalManagementId);
+        if (rg) closureMutations.push({
+          action: 'update', collection: 'gestiones', id: rg.id, payload: {
+            estado: 'Resuelta', nuevaPolizaId: policy.id, emisionGestionId: request.id,
+            proximaAccion: 'Cerrada', actualizado: today()
+          }
+        });
+      }
+    }
+    if (!S().batchDurable) return { ok: false, errors: ['escritura_durable_emision_no_disponible'] };
+    await S().batchDurable(closureMutations, { requestId: opId + '_closure' });
     try {
       S().insert('actividades', {
         id: 'act_' + Date.now().toString(36), tenantId: request.tenantId, clienteId: request.clienteId,
