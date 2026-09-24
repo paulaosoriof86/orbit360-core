@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -152,24 +152,19 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "017f9e32b6e17383c89014819569a5c06e17cae6",
-    "buildId": "gi-i65-b2-017f9e32b6e1-57f234755dc1",
-    "channelId": "gi-i65-b2-35960419900",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-35960419900-ba0ccobi.web.app",
-    "runId": 35960419900,
-    "artifactId": 10791804440,
-    "artifactDigest": "f2f56524734edc1a901757162426ed8fce3472e8a6e4b0ac9da72d97c62591fb",
-    "exactReadback": true,
-    "functionalPass": true,
+    "status": "PENDING_NEW_PREVIEW_AFTER_RENEWAL_DOMAIN_SPLIT_DURABLE_FIX",
+    "supersedesRunId": 35960419900,
+    "exactReadback": false,
+    "functionalPass": false,
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "017f9e32b6e17383c89014819569a5c06e17cae6",
-    "exactPreviewBuildId": "gi-i65-b2-017f9e32b6e1-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35960419900-ba0ccobi.web.app",
-    "exactPreviewArtifactId": 10791804440,
+    "exactPreviewSourceSha": "",
+    "exactPreviewBuildId": "",
+    "exactPreviewUrl": "",
+    "exactPreviewArtifactId": null,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
@@ -212,8 +207,8 @@
     },
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
-    "lastFailedRunId": 35958396098,
-    "lastFailure": "PRODUCT_WRITE_RECORD_NOT_FOUND",
+    "lastFailedRunId": 35960553237,
+    "lastFailure": "COLLECTION_OPERATIVA_INVALIDA",
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false
@@ -465,6 +460,19 @@
       "functionalPass": true,
       "livePromoted": false,
       "status": "SUPERSEDED_BY_RENEWAL_DURABLE_CLOSURE_FIX"
+    },
+    {
+      "sourceSha": "017f9e32b6e17383c89014819569a5c06e17cae6",
+      "buildId": "gi-i65-b2-017f9e32b6e1-57f234755dc1",
+      "channelId": "gi-i65-b2-35960419900",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-35960419900-ba0ccobi.web.app",
+      "runId": 35960419900,
+      "artifactId": 10791804440,
+      "artifactDigest": "f2f56524734edc1a901757162426ed8fce3472e8a6e4b0ac9da72d97c62591fb",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false,
+      "status": "SUPERSEDED_BY_RENEWAL_DOMAIN_SPLIT_DURABLE_FIX"
     }
   ],
   "previousAuthenticatedPreviewProofHistory": [
@@ -689,6 +697,21 @@
         "deleted": 19,
         "orphanExpected": false
       }
+    },
+    {
+      "status": "FAIL",
+      "runId": 35960553237,
+      "exactPreviewSourceSha": "017f9e32b6e17383c89014819569a5c06e17cae6",
+      "exactPreviewBuildId": "gi-i65-b2-017f9e32b6e1-57f234755dc1",
+      "exactPreviewArtifactId": 10791804440,
+      "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35960419900-ba0ccobi.web.app",
+      "failure": "COLLECTION_OPERATIVA_INVALIDA",
+      "classification": "PRODUCT_FIX_USED_GENERAL_BATCH_ACROSS_WORKFLOW_OWNED_GESTIONES_BOUNDARY",
+      "cleanup": {
+        "syntheticCleanupConfirmed": true,
+        "deleted": 19,
+        "orphanExpected": false
+      }
     }
   ],
   "visualReview20260923": {
@@ -861,6 +884,9 @@
       35958115914,
       35958396098
     ],
-    "noConfirmedCobroCreation": true
+    "noConfirmedCobroCreation": true,
+    "durabilityRouting": "POLIZAS_GENERAL_COMMAND_GESTIONES_WORKFLOW_COMMAND",
+    "crossDomainGeneralBatchForbidden": true,
+    "issueSuccessAfterAllDurableOwners": true
   }
 }
