@@ -3715,11 +3715,12 @@ jobs:
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           node - <<'NODE'
           const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK));
-          const q=b.authenticatedPreviewProof||{},x=q.boundaries||{},p=b.preview||{};
+          const q=b.authenticatedPreviewProof||{},x=q.boundaries||{},p=b.preview||{},cleanup=b.orphanSyntheticCleanup||{};
           const run=b.status==='PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL'
             && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
             && c.i65ForensicRemediationPlan?.currentBlock==='B2'
-            && q.status==='AUTHORIZED_PENDING_RUN';
+            && q.status==='AUTHORIZED_PENDING_RUN'
+            && cleanup.status==='PASS';
           if(run){
             if(!x.syntheticQaWritesAuthorized||!x.syntheticQaOnly||!x.cleanupMandatory||x.businessDataMutationAuthorized!==false||x.reimportAuthorized!==false||x.emailSendAuthorized!==false||x.liveHostingPromotionAuthorized!==false||x.productSourceMutationAuthorized!==false)throw Error('B2_AUTH_PROOF_BOUNDARY_INVALID');
             if(!p.url||p.exactReadback!==true||p.functionalPass!==true||p.livePromoted!==false)throw Error('B2_AUTH_PREVIEW_NOT_CERTIFIED');
