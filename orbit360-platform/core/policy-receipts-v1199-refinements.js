@@ -30,8 +30,12 @@ window.Orbit = window.Orbit || {};
     const after = E.preparePolicy(Object.assign({}, current, patch, { id }), current, 'compare_after');
     const reduced = {};
     Object.keys(patch).forEach(k => {
+      if (k === 'vehiculo') return;
       if (JSON.stringify(before[k]) !== JSON.stringify(after[k])) reduced[k] = patch[k];
     });
+    // preparePolicy removes vehiculo from the policy document. Preserve an explicit
+    // linked-risk patch so the canonical engine can update the same vehicle id.
+    if (Object.prototype.hasOwnProperty.call(patch, 'vehiculo')) reduced.vehiculo = clone(patch.vehiculo);
     return updatePolicy(id, reduced, options);
   };
 

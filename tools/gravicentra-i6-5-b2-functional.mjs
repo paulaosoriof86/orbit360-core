@@ -10,6 +10,7 @@ const files={
   accessScope:read('orbit360-platform/core/access-scope.js'),
   bridge:read('orbit360-platform/modules/policy-receipts-v1199-bridge.js'),
   engine:read('orbit360-platform/core/policy-receipts-engine.js'),
+  refinements:read('orbit360-platform/core/policy-receipts-v1199-refinements.js'),
   issuance:read('orbit360-platform/core/issuance-workflow-v1201.js'),
   issuanceBridge:read('orbit360-platform/modules/issuance-endosos-v1201-bridge.js'),
   receiptsProjection:read('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js'),
@@ -20,6 +21,7 @@ const files={
   runtimeConfig:read('orbit360-platform/product-runtime-config.js'),
   accessPolicy:read('orbit360-platform/core/tenant-access-policy-contract-p0.js'),
   config:read('orbit360-platform/core/config.js'),
+  router:read('orbit360-platform/core/router.js'),
   productApp:read('orbit360-platform/core/product-app-p0.js'),
   index:read('orbit360-platform/index.html')
 };
@@ -71,8 +73,16 @@ const asesorRole=(files.config.match(/'Asesor':\s*\{[\s\S]*?\n\s*'Asistente':/)|
 need(operativoRole.includes("'academia'"),'B2_ACADEMIA_OPERATIVO_ROLE_DEFAULT_MISSING');
 need(asesorRole.includes("'academia'"),'B2_ACADEMIA_ASESOR_ROLE_DEFAULT_MISSING');
 need(files.config.includes("label: 'Academia'")&&files.config.includes("title: 'Academia de Gravicentra'")&&!files.config.includes("label: 'Orbit Academia'")&&!files.config.includes("title: 'Orbit Academia'"),'B2_ACADEMIA_CONFIG_BRAND_MISSING');
+need(!/label: 'Orbit |title: 'Orbit |label: 'Orbit CRM'/.test(files.config),'B2_VISIBLE_ORBIT_CONFIG_BRANDING_REMAINS');
+need(files.router.includes('Gravicentra Insurance')&&!files.router.includes('Marca de producto <b style="color:#fff">Orbit 360</b>'),'B2_VISIBLE_ORBIT_SHELL_BRANDING_REMAINS');
+for(const role of ['Dirección','Admin','Comercial','Finanzas','Marketing','Operativo','Asesor','Asistente']){
+  const pos=files.config.indexOf("'"+role+"':");
+  const next=files.config.indexOf("\n  '",pos+3);
+  const slice=files.config.slice(pos,next>pos?next:files.config.indexOf("\n};",pos));
+  need(slice.includes("'academia'"),'B2_ACADEMIA_ALL_ROLE_DEFAULT_MISSING:'+role);
+}
 new Function(files.academiaCatalog);new Function(files.academiaOwner);new Function(files.academia);
-for(const marker of ['core/config.js?v=20260923-b2a2','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260923-b2a1','core/product-app-p0.js?v=20260923-b2a1','core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v4','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+for(const marker of ['core/config.js?v=20260923-b2a3','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260923-b2a1','core/product-app-p0.js?v=20260923-b2a1','core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v4','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={
