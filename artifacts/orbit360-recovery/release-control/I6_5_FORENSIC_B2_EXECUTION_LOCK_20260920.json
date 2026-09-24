@@ -144,7 +144,7 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "status": "PENDING_NEW_PREVIEW_AFTER_PRODUCT_SOURCE_CHANGE",
+    "status": "PENDING_NEW_PREVIEW_AFTER_HARNESS_CORRECTIONS",
     "supersedesRunId": 35942283175,
     "exactReadback": false,
     "functionalPass": false,
@@ -528,6 +528,32 @@
     "requiredRoleProof": [
       "Operativo",
       "Asesor"
-    ]
-  }
+    ],
+    "sourceReadyCommit": "1a97ba53794b15ccf1d35cc5cfd2ee2910aa4aae",
+    "harnessCorrectionsClosed": true
+  },
+  "candidateFailureHistory": [
+    {
+      "runId": 35950416351,
+      "stage": "SOURCE_CONTRACTS",
+      "failure": "B2_ACTIVE_CLIENT_CREATE_BACKDROP_CLOSE_STILL_PRESENT",
+      "classification": "HARNESS_FALSE_POSITIVE_GLOBAL_STRING_MATCH",
+      "productRegression": false,
+      "cause": "The active openNewClient owner already blocks backdrop close; the harness matched an unrelated closable modal in the same bridge.",
+      "fixCommit": "364a05946744ebb1b73fe74c9d813b791a09065b",
+      "liveChanged": false,
+      "dataWrites": 0
+    },
+    {
+      "runId": 35950518786,
+      "stage": "IMMUTABLE_PACKAGE",
+      "failure": "HYDRATION_CONTRACT_VERSION_DRIFT",
+      "classification": "PACKAGE_CONTRACT_LABEL_DRIFT",
+      "productRegression": false,
+      "cause": "Optional deferred Academia collections do not change the existing required/startup hydration contract version.",
+      "fixCommit": "1a97ba53794b15ccf1d35cc5cfd2ee2910aa4aae",
+      "liveChanged": false,
+      "dataWrites": 0
+    }
+  ]
 }
