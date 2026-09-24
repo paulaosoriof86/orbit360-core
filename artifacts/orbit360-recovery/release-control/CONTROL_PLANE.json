@@ -2010,7 +2010,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "51f16435d84633a809a6538ec1fe3ee6c208fdc3",
+    "b2ExecutionLockBlobSha": "8a4e24ff66c257f0fbd138d739ca2e86d6687c0d",
     "b2": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
