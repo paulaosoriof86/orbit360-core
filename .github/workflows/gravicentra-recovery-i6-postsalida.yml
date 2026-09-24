@@ -3672,6 +3672,7 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),cpPath=process.env.CONTROL,lockPath=process.env.B2_LOCK,c=JSON.parse(fs.readFileSync(cpPath)),b=JSON.parse(fs.readFileSync(lockPath));
           b.status='PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL';b.preview={sourceSha:process.env.GITHUB_SHA,buildId:process.env.B2_BUILD_ID,channelId:process.env.B2_CHANNEL_ID,url:process.env.B2_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B2_ARTIFACT_ID),artifactDigest:process.env.B2_ARTIFACT_DIGEST||'',exactReadback:true,functionalPass:true,livePromoted:false};
+          b.authenticatedPreviewProof={...(b.authenticatedPreviewProof||{}),status:'AUTHORIZED_PENDING_RUN',exactPreviewSourceSha:process.env.GITHUB_SHA,exactPreviewBuildId:process.env.B2_BUILD_ID,exactPreviewUrl:process.env.B2_PREVIEW_URL,exactPreviewArtifactId:Number(process.env.B2_ARTIFACT_ID)};
           fs.writeFileSync(lockPath,JSON.stringify(b,null,2)+'\n');c.nextAction='I6_5_FORENSIC_REMEDIATION_B2_VISUAL';c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),status:b.status,sourceSha:process.env.GITHUB_SHA,buildId:process.env.B2_BUILD_ID,previewUrl:process.env.B2_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B2_ARTIFACT_ID),livePromoted:false,exactReadback:true,functionalPass:true};fs.writeFileSync(cpPath,JSON.stringify(c,null,2)+'\n');
           NODE
           git add "$B2_LOCK";BLOB=$(git hash-object "$B2_LOCK");export BLOB;node - <<'NODE'
