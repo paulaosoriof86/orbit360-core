@@ -2012,7 +2012,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "8e088334bd4f3c3fc05679eaad10de33402ba4ae",
+    "b2ExecutionLockBlobSha": "f90af30d30d8077d51b40d26465b03ab0108fcc9",
     "b2": {
       "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2104,7 +2104,8 @@
       "previewGcTool": "tools/gravicentra-preview-channel-gc.mjs",
       "humanReviewR2": "PARTIAL_PASS_REMEDIATION_REQUIRED",
       "accessMatrixRootCause": "PROTECTED_ACCESS_CONFIG_ROLE_PERMISSIONS_EMPTY_AFTER_B1_MIGRATION",
-      "accessConfigRecoveryAuthorized": true
+      "accessConfigRecoveryAuthorized": true,
+      "accessConfigRecoveryState": "AUTHORIZED_PENDING_AUTHENTICATED_RUN_ON_EXACT_PREVIEW"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
