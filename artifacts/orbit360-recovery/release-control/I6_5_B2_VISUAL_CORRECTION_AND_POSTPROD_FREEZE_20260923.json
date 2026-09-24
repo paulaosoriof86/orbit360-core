@@ -1,0 +1,107 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_V1",
+  "recordedAt": "2026-09-23",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "status": "FROZEN_WITH_B2_CORRECTION_IN_PROGRESS",
+  "authority": {
+    "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "b2Lock": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
+    "prevalentAddendum": "GRAVICENTRA_ADDENDUM_PREVALENTE_CIERRE_Y_ANTI_REGRESION_20260919.md"
+  },
+  "b2VisualDecision": {
+    "decision": "B2_VISUAL_NOT_ACCEPTED",
+    "rejectedPreview": {
+      "sourceSha": "9eccb654e3de94d9b75d81d7b55475a3c8f0bb95",
+      "buildId": "gi-i65-b2-9eccb654e3de-57f234755dc1",
+      "channelId": "gi-i65-b2-35929105665",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-35929105665-pezi28fi.web.app",
+      "runId": 35929105665,
+      "artifactId": 10780635506,
+      "artifactDigest": "f0ec8d86c4efad54dbd9ebe086ec836ecf3f06da8ee3a96fcb8883ba66ad07bb",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false
+    },
+    "reason": "Functional enrichment is preserved, but it is not accepted as visual hierarchy work. Policy, vehicle, receipt and policy create/edit surfaces must use the mature Gravicentra visual family already visible in Cliente 360 and Aseguradoras.",
+    "referenceFamily": [
+      "Cliente 360",
+      "Aseguradoras",
+      "Ops/Leads"
+    ],
+    "required": [
+      "soft visual hierarchy",
+      "visible iconography/emojis",
+      "clear identity header",
+      "KPI/action band",
+      "section hierarchy",
+      "clear edit actions",
+      "readable receipt detail",
+      "responsive preservation"
+    ]
+  },
+  "b2BlockingCorrections": [
+    "policy full-page visual hierarchy and edit action",
+    "vehicle full-page visual hierarchy and edit action",
+    "receipt detail visual hierarchy",
+    "policy create/edit modal visual hierarchy and visible Import/Close controls",
+    "client search inside policy create/edit",
+    "fixed frequency to receipt count canonical rule; Mensual remains adjustable",
+    "GT VAT 12 and CO VAT 19 capture rule",
+    "vehicle integrity completion CTA when a vehicle policy lacks a linked risk",
+    "retest client-create and policy modal backdrop protection",
+    "preserve durable readback for client advisor/Drive and insurer editing"
+  ],
+  "b3FrozenNotLost": [
+    "Dashboard Inicio monthly/advisor/KPI reality reconciliation before B4",
+    "Cobros detail including reconciliation date/method/evidence and canonical payment command",
+    "controlled intelligent import proof for policy -> expected receipts -> portfolio plus B3 source types",
+    "search/performance/aging requirements from canonical B3"
+  ],
+  "b4FrozenNotLost": [
+    "bidirectional canonical management flow Cliente360/Portal/Leads/Ops with history and notifications",
+    "renewal routing/E2E regression",
+    "Cancelaciones data/regression",
+    "Siniestros and Cronograma regression",
+    "authenticated transversal role/module/viewport matrix and final same-artifact promotion"
+  ],
+  "postproductionFrozen": [
+    {
+      "id": "POST_ADVANCED_RENEWAL_COMPARATOR",
+      "scope": "Replace/basic deterministic renewal comparison with richer real quotation/comparison workflow after production unless B4 proves a required pre-production regression."
+    },
+    {
+      "id": "POST_VEHICLE_CATALOG_REUSE",
+      "scope": "Reuse Cotizador make/line/model catalogs as dropdowns in vehicle manual capture to reduce typing error; manual create/edit remains production fallback."
+    },
+    {
+      "id": "POST_INSURER_ASSISTANCE_INTELLIGENCE",
+      "scope": "Configurable insurer-specific assistance values/pattern inference; manual Otros/asistencias remains available for production."
+    },
+    {
+      "id": "POST_GT_ISSUANCE_EXPENSE_INTELLIGENCE",
+      "scope": "Insurer-specific automatic Guatemala issue-expense defaults including usual 5% and verified exceptions such as Columna only after authoritative configuration; manual field remains available."
+    },
+    {
+      "id": "POST_FRACTIONATION_FINE_RULES",
+      "scope": "Recover/parameterize insurer/payment-method-specific Guatemala fractionation rules beyond the canonical receipt-count rule if not already authoritative; manual surcharge remains available."
+    },
+    {
+      "id": "POST_SAFE_DELETE_ARCHIVE_UX",
+      "scope": "Client/policy/vehicle delete/archive lifecycle with referential-integrity safeguards. No destructive delete is added merely to satisfy B2 create/edit."
+    },
+    {
+      "id": "POST_IMPORTER_INTELLIGENCE_BEYOND_B3_MINIMUM",
+      "scope": "Advanced extraction/enrichment beyond the mandatory B3 controlled import proof."
+    }
+  ],
+  "boundaries": {
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "newRepoOrFirebaseAuthorized": false,
+    "parallelMethodologyAuthorized": false,
+    "b3AdvanceAuthorized": false
+  }
+}
