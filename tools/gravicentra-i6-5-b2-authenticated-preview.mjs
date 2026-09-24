@@ -377,6 +377,62 @@ try{
   need(visualAudit.technicalLeak.length===0,'B2_AUTH_VISUAL_TECHNICAL_LEAK:'+JSON.stringify(visualAudit.technicalLeak));
   need(visualAudit.pass===true,'B2_AUTH_VISUAL_AUDIT_NOT_PASS');
 
+  // R2 human-review discriminants: prove the remediations in the exact certified Preview.
+  const r2Ui=await bounded(page.evaluate(async sample=>{
+    const result={};
+    const wait=ms=>new Promise(r=>setTimeout(r,ms));
+    if(sample.clientId){
+      location.hash='#/cliente360?c='+encodeURIComponent(sample.clientId);
+      await wait(700);
+      result.clientVehicleFullDuplicateCount=Array.from(document.querySelectorAll('button,a')).filter(x=>String(x.textContent||'').trim()==='Ver vehículo completo').length;
+      result.injectedLegacyVehicleButtons=document.querySelectorAll('[data-full-vehicle-v1199c],[data-fullvehiclev1199c],[data-full-vehicle]').length;
+    }
+    if(sample.policyId){
+      Orbit.modules?.cliente360?.verPoliza?.(sample.policyId);
+      await wait(700);
+      const root=document.querySelector('[data-policy-fullpage="1"]');
+      const h2=root?.querySelector('.gi-policy-hero h2');
+      const sectionTitle=root?.querySelector('section.card.pad > div');
+      const h2s=h2?getComputedStyle(h2):null, ss=sectionTitle?getComputedStyle(sectionTitle):null;
+      result.policyHierarchy={h2Size:h2s?parseFloat(h2s.fontSize):0,h2Weight:h2s?parseInt(h2s.fontWeight,10):0,sectionSize:ss?parseFloat(ss.fontSize):0,sectionWeight:ss?parseInt(ss.fontWeight,10):0};
+      result.policyHasVehicleWarning=!!root?.querySelector('.gi-integrity-warning');
+      result.policyWarningText=String(root?.querySelector('.gi-integrity-warning')?.innerText||'');
+    }
+    if(sample.receiptId){
+      Orbit.receiptsPortfolioProjection?.openReceiptDetail?.(sample.receiptId,sample.clientId);
+      await wait(700);
+      const root=document.querySelector('[data-rp-receipt-detail="1"]');
+      const h2=root?.querySelector('[data-rp-receipt-hero="1"] h2');
+      const h3=root?.querySelector('section.card.pad h3');
+      const h2s=h2?getComputedStyle(h2):null, h3s=h3?getComputedStyle(h3):null;
+      result.receiptHierarchy={h2Size:h2s?parseFloat(h2s.fontSize):0,h2Weight:h2s?parseInt(h2s.fontWeight,10):0,sectionSize:h3s?parseFloat(h3s.fontSize):0,sectionWeight:h3s?parseInt(h3s.fontWeight,10):0};
+      result.receiptEditPlan=Array.from(root?.querySelectorAll('button')||[]).some(x=>/Editar plan de recibos/i.test(String(x.textContent||'')));
+      result.receiptHasEmoji=/🧾/.test(String(root?.innerText||''))&&/🔎/.test(String(root?.innerText||''))&&/📎/.test(String(root?.innerText||''));
+    }
+    const policies=(Orbit.store?.all?.('polizas')||[]).filter(Boolean),vehicles=(Orbit.store?.all?.('vehiculos')||[]).filter(Boolean);
+    const candidate=policies.find(p=>{
+      const vehicleLike=/vehicul|auto/i.test(String(p.ramo||'')+' '+String(p.subramo||'')+' '+String(p.producto||''));
+      if(!vehicleLike)return false;
+      const linked=vehicles.some(v=>String(v.polizaId||'')===String(p.id||''));
+      const clientHas=vehicles.some(v=>String(v.clienteId||'')===String(p.clienteId||''));
+      return !linked&&clientHas;
+    });
+    if(candidate){
+      Orbit.modules?.cliente360?.verPoliza?.(candidate.id);
+      await wait(700);
+      const warning=String(document.querySelector('[data-policy-fullpage="1"] .gi-integrity-warning')?.innerText||'');
+      result.unlinkedVehicleCase={applicable:true,policyId:String(candidate.id||''),warning,truthful:/pendiente de vincular a esta póliza/i.test(warning)&&/No se vinculará automáticamente/i.test(warning)&&/Revisar vehículos del cliente/i.test(warning)};
+    }else result.unlinkedVehicleCase={applicable:false};
+    return result;
+  },visualAudit.sample),'B2_AUTH_R2_UI_DISCRIMINANTS_TIMEOUT',30000);
+  need(r2Ui.clientVehicleFullDuplicateCount===0&&r2Ui.injectedLegacyVehicleButtons===0,'B2_AUTH_DUPLICATE_VEHICLE_ACTIONS_REMAIN:'+JSON.stringify(r2Ui));
+  need(r2Ui.policyHierarchy?.h2Size>=22&&r2Ui.policyHierarchy?.h2Weight>=700&&r2Ui.policyHierarchy?.sectionSize>=15&&r2Ui.policyHierarchy?.sectionWeight>=700,'B2_AUTH_POLICY_HIERARCHY_WEAK:'+JSON.stringify(r2Ui.policyHierarchy));
+  need(r2Ui.receiptHierarchy?.h2Size>=22&&r2Ui.receiptHierarchy?.h2Weight>=700&&r2Ui.receiptHierarchy?.sectionSize>=16&&r2Ui.receiptHierarchy?.sectionWeight>=700,'B2_AUTH_RECEIPT_HIERARCHY_WEAK:'+JSON.stringify(r2Ui.receiptHierarchy));
+  need(r2Ui.receiptEditPlan===true&&r2Ui.receiptHasEmoji===true,'B2_AUTH_RECEIPT_EDIT_OR_VISUAL_CUES_MISSING:'+JSON.stringify(r2Ui));
+  if(r2Ui.unlinkedVehicleCase?.applicable)need(r2Ui.unlinkedVehicleCase.truthful===true,'B2_AUTH_UNLINKED_VEHICLE_RELATION_NOT_TRUTHFUL:'+JSON.stringify(r2Ui.unlinkedVehicleCase));
+  evidence.r2Ui=r2Ui;
+  milestone('R2_UI_DISCRIMINANTS_PASS',r2Ui);
+
   const stamp=RUN.replace(/[^0-9A-Za-z]/g,'').slice(-12);
   const clientName='B2 QA '+stamp,ident='B2QA-'+stamp,policyNo='B2-POL-'+stamp,renewNo='B2-REN-'+stamp;
   state={clientName,policyNo,renewNo};
