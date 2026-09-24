@@ -1315,9 +1315,11 @@
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
   "lastPreviewFailure": {
-    "runId": 36003423424,
-    "sourceSha": "5757992ff98b303388536167a2134691743f2bc9",
+    "runId": 36003922764,
+    "sourceSha": "7f55a4076c2421530ae13f32deeb5a7b2b46ce23",
     "stage": "DEPLOY_EXACT_B2_PACKAGE_TO_ISOLATED_PREVIEW",
+    "classification": "PREVIEW_INFRA_QUOTA_NOT_PRODUCT_REGRESSION",
+    "firebaseError": "HTTP_429_CHANNEL_QUOTA_REACHED",
     "productContractsPass": true,
     "canonicalCompositionGuardPass": true,
     "brandingSnapshotPass": true,
@@ -1326,9 +1328,14 @@
     "previewCredentialCallableDeployPass": true,
     "hostingPreviewDeployPass": false,
     "operationalDataTouched": false,
-    "liveTouched": false,
-    "cause": "FIREBASE_ERROR_OUTPUT_HIDDEN_BY_SET_E_BEFORE_CAT",
-    "classification": "EXECUTOR_OBSERVABILITY_DEFECT_NOT_PRODUCT_REGRESSION"
+    "liveTouched": false
   },
-  "observabilityFix": "CAPTURE_AND_PRINT_HOSTING_DEPLOY_FAILURE_BEFORE_FAIL_CLOSED"
+  "observabilityFix": "CAPTURE_AND_PRINT_HOSTING_DEPLOY_FAILURE_BEFORE_FAIL_CLOSED",
+  "previewChannelLifecycle": {
+    "status": "SCOPED_SAFE_CLEANUP_READY",
+    "cleanupScope": "UNREFERENCED_GI_I65_B2_CHANNELS_ONLY",
+    "preserveAnyVersionedReference": true,
+    "preserveLive": true,
+    "retryCount": 1
+  }
 }

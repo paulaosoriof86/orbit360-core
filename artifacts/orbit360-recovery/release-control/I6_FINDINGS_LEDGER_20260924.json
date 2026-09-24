@@ -19,11 +19,27 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 39,
+    "total": 40,
     "b2HumanFindings": 13,
     "currentBlocking": 15
   },
   "findings": [
+    {
+      "id": "MECH-PREVIEW-003",
+      "block": "B2",
+      "source": "WORKFLOW_RUN_36003922764",
+      "finding": "Firebase Hosting Preview channel quota reached after repeated recovery previews.",
+      "owner": [
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+        "Firebase Hosting preview-channel lifecycle"
+      ],
+      "rootCause": "Preview channels were created repeatedly during recovery but the active B2 executor had no safe garbage collection for obsolete unreferenced B2 channels.",
+      "remediation": "On quota-only failure, list channels, delete only gi-i65-b2-* channels that are not referenced anywhere in the versioned repository, never delete live or referenced rollback/evidence channels, then retry the same exact B2 deploy once.",
+      "status": "SOURCE_FIX_COMMITTED_RUNTIME_PROOF_PENDING",
+      "blocking": true,
+      "closureProof": "B2 Hosting Preview deploy succeeds after scoped cleanup; exact readback follows; live/data remain untouched.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "MECH-OBS-002",
       "block": "B2",
@@ -34,7 +50,7 @@
       ],
       "rootCause": "Executor observability defect: failing command redirected stdout/stderr to b2-preview.json and shell exited before cat.",
       "remediation": "Capture deploy return code under set +e, print the complete Firebase response, then fail closed with the same return code.",
-      "status": "SOURCE_FIX_COMMITTED_RUNTIME_PROOF_PENDING",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "Next B2 Preview run either deploys successfully or surfaces the exact Firebase failure; no hidden deploy error.",
       "mayDisappearWithoutDisposition": false
