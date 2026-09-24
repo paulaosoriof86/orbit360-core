@@ -507,7 +507,7 @@ Orbit.modules.cliente360 = (function () {
       }).join('')}${cob.length === 0 ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:28px">Sin cobros.</td></tr>' : ''}</tbody>
     </table></div>
     <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3);display:flex;align-items:center;gap:8px">
-      <span style="color:var(--ok)">✓</span> conciliado &nbsp;·&nbsp; <span style="color:var(--warn)">◷</span> por conciliar — la <b>doble conciliación</b> (pago ↔ póliza) vive en <b>Orbit Finanzas</b>.
+      <span style="color:var(--ok)">✓</span> conciliado &nbsp;·&nbsp; <span style="color:var(--warn)">◷</span> por conciliar — la <b>doble conciliación</b> (pago ↔ póliza) vive en <b>Finanzas</b>.
     </div></div>`;
   }
   function miniStat(label, val, tone) {
@@ -617,7 +617,7 @@ Orbit.modules.cliente360 = (function () {
           </tr>`;
         }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">Sin recibos para esta póliza.</td></tr>'}</tbody>
       </table></div>
-      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Filtra por póliza para no mezclar recibos. <b>Confirmar cobro</b> concilia el recibo con su póliza; clic en la fila abre el detalle. Los estados de cuenta se cargan en <b>Orbit Finanzas</b>.</div>
+      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Filtra por póliza para no mezclar recibos. <b>Confirmar cobro</b> concilia el recibo con su póliza; clic en la fila abre el detalle. Los estados de cuenta se cargan en <b>Finanzas</b>.</div>
     </div>`;
   }
   function wireRecibos(cid) {

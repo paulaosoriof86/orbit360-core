@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -48,7 +48,8 @@
       "orbit360-platform/modules/crm-v1198-operational-bridge.js",
       "orbit360-platform/core/policy-receipts-v1199-refinements.js",
       "orbit360-platform/core/router.js",
-      "orbit360-platform/core/issuance-workflow-v1201-refinements.js"
+      "orbit360-platform/core/issuance-workflow-v1201-refinements.js",
+      "orbit360-platform/modules/aseguradoras.js"
     ],
     "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
@@ -73,8 +74,8 @@
     "singleReceiptProjection": true,
     "dirtyFormsProtected": true,
     "dashboardRealityReconciled": false,
-    "previewExact": true,
-    "functionalPass": true,
+    "previewExact": false,
+    "functionalPass": false,
     "paulaVisual": false,
     "approvedVisualHierarchy": false,
     "academiaCatalog": false,
@@ -153,24 +154,19 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "247c83982cad8126215cacff86eb3976a3b97506",
-    "buildId": "gi-i65-b2-247c83982cad-57f234755dc1",
-    "channelId": "gi-i65-b2-35961983479",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-35961983479-jx2om3d7.web.app",
-    "runId": 35961983479,
-    "artifactId": 10792204041,
-    "artifactDigest": "b70693712427ae2fe0fae2b5ef9ece2ec6832f77debc2a936656c713a615148d",
-    "exactReadback": true,
-    "functionalPass": true,
+    "status": "PENDING_NEW_PREVIEW_AFTER_VISUAL_AUDIT_BRANDING_FIX",
+    "supersedesRunId": 35961983479,
+    "exactReadback": false,
+    "functionalPass": false,
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "247c83982cad8126215cacff86eb3976a3b97506",
-    "exactPreviewBuildId": "gi-i65-b2-247c83982cad-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35961983479-jx2om3d7.web.app",
-    "exactPreviewArtifactId": 10792204041,
+    "exactPreviewSourceSha": "",
+    "exactPreviewBuildId": "",
+    "exactPreviewUrl": "",
+    "exactPreviewArtifactId": null,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
@@ -214,7 +210,7 @@
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
     "lastFailedRunId": 35961205964,
-    "lastFailure": "PRODUCT_WRITE_RECORD_NOT_FOUND",
+    "lastFailure": "VISUAL_AUDIT_BRANDING_SOURCE_CHANGE",
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
@@ -545,6 +541,19 @@
       "functionalPass": true,
       "livePromoted": false,
       "status": "SUPERSEDED_BY_CANONICAL_ISSUANCE_CREATE_ADVANCE_DURABILITY_FIX"
+    },
+    {
+      "sourceSha": "247c83982cad8126215cacff86eb3976a3b97506",
+      "buildId": "gi-i65-b2-247c83982cad-57f234755dc1",
+      "channelId": "gi-i65-b2-35961983479",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-35961983479-jx2om3d7.web.app",
+      "runId": 35961983479,
+      "artifactId": 10792204041,
+      "artifactDigest": "b70693712427ae2fe0fae2b5ef9ece2ec6832f77debc2a936656c713a615148d",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false,
+      "status": "SUPERSEDED_BY_VISUAL_AUDIT_BRANDING_FIX"
     }
   ],
   "previousAuthenticatedPreviewProofHistory": [
@@ -1094,5 +1103,31 @@
     "issueOwner": "issueRequest -> awaited durable source policy and workflow closures",
     "uiAwaited": true,
     "parallelApiCreated": false
+  },
+  "visualAuditRemediation": {
+    "status": "SOURCE_FIX_READY_FOR_NEW_PREVIEW",
+    "findings": [
+      {
+        "surface": "Aseguradoras",
+        "finding": "VISIBLE_ORBIT_ASEGURADORAS_TITLE",
+        "owner": "orbit360-platform/modules/aseguradoras.js",
+        "fix": "Aseguradoras"
+      },
+      {
+        "surface": "Cliente 360 / Recibos",
+        "finding": "VISIBLE_ORBIT_FINANZAS_TEXT",
+        "owner": "orbit360-platform/modules/cliente360.js",
+        "fix": "Finanzas"
+      },
+      {
+        "surface": "Visual harness",
+        "finding": "LEGACY_MODAL_SELECTOR_FOR_FULLPAGE_OWNER",
+        "owner": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+        "fix": "DATA_POLICY_AND_VEHICLE_FULLPAGE_SELECTORS"
+      }
+    ],
+    "tinyFishUnavailable": "WALLET_OUT_OF_FUNDS",
+    "screenshotEvidenceRunId": 35963786706,
+    "noWritesDuringFailedVisualCapture": true
   }
 }

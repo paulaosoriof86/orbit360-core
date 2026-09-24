@@ -6,6 +6,7 @@ const read=p=>fs.readFileSync(p,'utf8');
 
 const files={
   client:read('orbit360-platform/modules/cliente360.js'),
+  insurers:read('orbit360-platform/modules/aseguradoras.js'),
   crmBridge:read('orbit360-platform/modules/crm-v1198-operational-bridge.js'),
   accessScope:read('orbit360-platform/core/access-scope.js'),
   bridge:read('orbit360-platform/modules/policy-receipts-v1199-bridge.js'),
@@ -28,6 +29,8 @@ const files={
 };
 
 need(files.client.includes("Usa Guardar cambios o Cancelar"),'B2_CLIENT_EDIT_BACKDROP_GUARD_MISSING');
+need(!files.insurers.includes("title: 'Orbit Aseguradoras'")&&files.insurers.includes("title: 'Aseguradoras'"),'B2_ASEGURADORAS_VISIBLE_ORBIT_BRAND_REMAINS');
+need(!files.client.includes('<b>Orbit Finanzas</b>'),'B2_CLIENT360_VISIBLE_ORBIT_FINANZAS_REMAINS');
 need(files.client.includes("Usa Crear cliente o Cancelar"),'B2_CLIENT_CREATE_BACKDROP_GUARD_MISSING');
 need(files.client.includes("await S().batchDurable"),'B2_CLIENT_DURABLE_SAVE_MISSING');
 new Function(files.crmBridge);
@@ -89,7 +92,7 @@ for(const role of ['Dirección','Admin','Comercial','Finanzas','Marketing','Oper
   need(slice.includes("'academia'"),'B2_ACADEMIA_ALL_ROLE_DEFAULT_MISSING:'+role);
 }
 new Function(files.academiaCatalog);new Function(files.academiaOwner);new Function(files.academia);
-for(const marker of ['core/config.js?v=20260923-b2a3','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260923-b2a1','core/product-app-p0.js?v=20260923-b2a1','core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260924-b2a6','modules/cliente360.js?v=20260920-b2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v4','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260924-b2a6'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+for(const marker of ['core/config.js?v=20260923-b2a3','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260923-b2a1','core/product-app-p0.js?v=20260923-b2a1','core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260924-b2a6','modules/cliente360.js?v=20260924-b2a7','modules/aseguradoras.js?v=20260924-b2a7','modules/crm-v1198-operational-bridge.js?v=20260923-b2v4','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260924-b2a6'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={

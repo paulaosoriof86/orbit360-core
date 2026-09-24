@@ -81,15 +81,13 @@ async function captureVisualAudit(page){
   }
   if(sample.policyId){
     await page.evaluate(id=>Orbit.modules?.cliente360?.verPoliza?.(id),sample.policyId);
-    await page.waitForSelector('#c360-edit',{timeout:10000});
+    await page.waitForSelector('[data-policy-fullpage="1"]',{timeout:10000});
     await shot('06-policy-detail-desktop');
-    await page.evaluate(()=>document.getElementById('c360-edit')?.remove());
   }
   if(sample.vehicleId){
     await page.evaluate(id=>Orbit.modules?.cliente360?.verVehiculo?.(id),sample.vehicleId);
-    await page.waitForSelector('#c360-veh',{timeout:10000});
+    await page.waitForSelector('[data-vehicle-fullpage="1"]',{timeout:10000});
     await shot('07-vehicle-detail-desktop');
-    await page.evaluate(()=>document.getElementById('c360-veh')?.remove());
   }
   if(sample.receiptId){
     await page.evaluate(id=>Orbit.modules?.cobros?.detalle?.(id),sample.receiptId);
@@ -102,9 +100,8 @@ async function captureVisualAudit(page){
   out.mobile.academia=await go('academia'); await shot('09-academia-mobile');
   if(sample.policyId){
     await page.evaluate(id=>Orbit.modules?.cliente360?.verPoliza?.(id),sample.policyId);
-    await page.waitForSelector('#c360-edit',{timeout:10000});
+    await page.waitForSelector('[data-policy-fullpage="1"]',{timeout:10000});
     await shot('10-policy-detail-mobile');
-    await page.evaluate(()=>document.getElementById('c360-edit')?.remove());
   }
   await page.setViewportSize({width:1500,height:1000});
 

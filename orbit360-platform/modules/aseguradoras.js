@@ -272,7 +272,7 @@ Orbit.modules.aseguradoras = (function () {
     const puedeEditar = canEdit();
 
     host.innerHTML = `<div class="page">
-      ${K.banner({ icon: '🏢', title: 'Orbit Aseguradoras', sub: 'Directorio de aseguradoras vinculadas', features: [], actions: `${puedeEditar ? `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button>` : ''}${puedeEditar ? '<button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>' : ''}` })}
+      ${K.banner({ icon: '🏢', title: 'Aseguradoras', sub: 'Directorio de aseguradoras vinculadas', features: [], actions: `${puedeEditar ? `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button>` : ''}${puedeEditar ? '<button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>' : ''}` })}
       ${K.kpis([
         { label: 'Activas', val: vinc.length, color: 'var(--ok)', foot: 'de ' + base.length + ' en directorio', footTone: 'up', onclick: "Orbit.modules.aseguradoras.kpi('activas')" },
         { label: 'Con contacto principal', val: conContactoPpal.length, color: 'var(--red)', foot: 'marcado como principal', onclick: "Orbit.modules.aseguradoras.kpi('contacto')" },
