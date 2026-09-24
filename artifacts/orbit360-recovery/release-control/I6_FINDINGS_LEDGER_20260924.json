@@ -19,11 +19,28 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 46,
+    "total": 47,
     "b2HumanFindings": 13,
-    "currentBlocking": 18
+    "currentBlocking": 19
   },
   "findings": [
+    {
+      "id": "B2-R19-ACCESS-PHYSICAL-SCOPE-OMISSION",
+      "block": "B2",
+      "source": "CONTROLLED_ACCESS_RECOVERY_RUN_36072858956",
+      "finding": "PROTECTED_ACCESS_CALLABLE_EXPOSED_EFFECTIVE_SCOPE_DEFAULTS_BUT_PHYSICAL_ACCESS_DOCUMENT_DID_NOT_CONTAIN_FULL_FROZEN_ROLE_SCOPES",
+      "owner": [
+        "orbit360-platform/core/tenant-domain-config-client.js",
+        "tenants/alianzas-soluciones/config/access",
+        "tools/gravicentra-i6-5-b2-access-config-recover.mjs"
+      ],
+      "rootCause": "tenant-domain-config-client publish() shallow-merges defaultAccess() with protected server config, so missing physical roleScopes can look valid in browser. B1 tests asserted effective runtime values rather than physical config completeness.",
+      "remediation": "Materialize only missing frozen approved scopes; fail on any explicit conflict; require direct Admin readback before browser proof.",
+      "status": "RECOVERY_V2_AUTHORIZED_PENDING_EXACT_RUN",
+      "blocking": true,
+      "closureProof": "Direct protected-document readback contains all frozen roleScopes plus Operativo Cotizador/Comparativo; exact Preview runtime consumes them; no business-data writes.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "B2-R18-ACCESS-CONFIG-MIGRATION-GAP",
       "block": "B2",
@@ -35,12 +52,18 @@
         "functions/tenant-domain-config.js",
         "tools/gravicentra-i6-5-b2-access-config-recover.mjs"
       ],
-      "rootCause": "B1 R8 verified matrix semantics with window.__accessCfg synthetic data and source-contract assertions, while the real protected access document was not asserted to contain the approved rolePermissions. The transition removed reliance on origin-local storage without migrating that state.",
-      "remediation": "One controlled protected-config recovery restores only proven overrides; sparse server overrides become intentional; UI merges sparse overrides over defaults; exact authenticated proof is mandatory.",
-      "status": "SOURCE_FIX_AND_CONTROLLED_RECOVERY_PREPARED_PENDING_EXACT_PREVIEW",
+      "rootCause": "B1 R8 verified matrix semantics with window.__accessCfg synthetic data and source-contract assertions, while the real protected access document was not asserted to contain the approved rolePermissions. The transition removed reliance on origin-local storage without migrating that state. The first controlled recovery then proved a second facet: the browser's protected config exposed effective scope defaults, while the physical protected document did not contain the full frozen roleScopes set.",
+      "remediation": "Materialize only missing frozen approved roleScopes and the already-proven Operativo Cotizador/Comparativo overrides. Any explicit conflicting stored scope or deny fails closed. Then rerun exact authenticated Preview proof.",
+      "status": "PHYSICAL_SCOPE_OMISSION_DEMONSTRATED_RECOVERY_V2_AUTHORIZED",
       "blocking": true,
       "closureProof": "Protected config readback contains Operativo cotizador/comparativo; exact Preview sidebar and runtime expose both; Asesor scope remains own; no business data writes.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "evidence": {
+        "recoveryRunId": 36072858956,
+        "recoveryFailure": "B2_ACCESS_RECOVERY_SCOPE_REGRESSION",
+        "businessDataWrites": 0,
+        "liveTouched": false
+      }
     },
     {
       "id": "B2-R17-RENEWAL_VEHICLE_CONTINUITY",

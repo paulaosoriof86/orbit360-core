@@ -19,7 +19,8 @@ const app=initializeApp({credential:cert(sa()),projectId:PROJECT},'b2-access-rec
 const db=getFirestore(app),ref=db.collection('tenants').doc(TENANT).collection('config').doc('access');
 const eventId='cfg_recovery_'+crypto.createHash('sha256').update(TENANT+'|Operativo|cotizador|comparativo|2026-09-24').digest('hex').slice(0,24);
 const eventRef=db.collection('tenants').doc(TENANT).collection('configEvents').doc(eventId);
-const proof={schema:'GRAVICENTRA_B2_ACCESS_CONFIG_RECOVERY_V1',status:'FAIL',tenantId:TENANT,configPath:auth.configPath,eventId,writes:0};
+const APPROVED_SCOPES=Object.freeze({'Dirección':'all','SuperAdmin':'all','AdminTenant':'all','Admin':'all','Finanzas':'all','Operativo':'all','Marketing':'team','Asesor':'own','Asistente':'team','Comercial':'own'});
+const proof={schema:'GRAVICENTRA_B2_ACCESS_CONFIG_RECOVERY_V2',status:'FAIL',tenantId:TENANT,configPath:auth.configPath,eventId,writes:0};
 try{
   await db.runTransaction(async tx=>{
     const snap=await tx.get(ref),before=snap.exists?(snap.data()||{}):{};
@@ -32,9 +33,14 @@ try{
       cotizador:Object.assign({},oper.cotizador||{},{ver:true,editar:true}),
       comparativo:Object.assign({},oper.comparativo||{},{ver:true,editar:true})
     });
+    const existingScopes=before.roleScopes&&typeof before.roleScopes==='object'?Object.assign({},before.roleScopes):{};
+    const scopeConflicts=Object.entries(existingScopes).filter(([role,value])=>APPROVED_SCOPES[role]&&String(value)!==APPROVED_SCOPES[role]);
+    need(scopeConflicts.length===0,'B2_ACCESS_RECOVERY_EXPLICIT_SCOPE_CONFLICT:'+JSON.stringify(scopeConflicts));
+    const recoveredScopes=Object.assign({},APPROVED_SCOPES,existingScopes);
     const next=Object.assign({},before,{
       schemaVersion:'gravicentra-access-policy-v1',
       rolePermissions:rp,
+      roleScopes:recoveredScopes,
       updatedAt:FieldValue.serverTimestamp(),
       updatedByUid:'gravicentra-recovery-b2'
     });
@@ -50,8 +56,8 @@ try{
   });
   const afterSnap=await ref.get(),after=afterSnap.data()||{},op=after.rolePermissions?.Operativo||{};
   need(op.cotizador?.ver===true&&op.cotizador?.editar===true&&op.comparativo?.ver===true&&op.comparativo?.editar===true,'B2_ACCESS_RECOVERY_READBACK_MISMATCH');
-  need(after.roleScopes?.Operativo==='all'&&after.roleScopes?.Asesor==='own','B2_ACCESS_RECOVERY_SCOPE_REGRESSION');
-  proof.status='PASS';proof.writes=2;proof.rolePermissionRoles=Object.keys(after.rolePermissions||{});proof.operativo={cotizador:op.cotizador,comparativo:op.comparativo};proof.roleScopes={Operativo:after.roleScopes?.Operativo,Asesor:after.roleScopes?.Asesor};proof.afterDigest=digest(after);
+  need(Object.entries(APPROVED_SCOPES).every(([role,value])=>after.roleScopes?.[role]===value),'B2_ACCESS_RECOVERY_SCOPE_REGRESSION:'+JSON.stringify(after.roleScopes||{}));
+  proof.status='PASS';proof.writes=2;proof.rolePermissionRoles=Object.keys(after.rolePermissions||{});proof.operativo={cotizador:op.cotizador,comparativo:op.comparativo};proof.roleScopes=after.roleScopes||{};proof.afterDigest=digest(after);
   fs.writeFileSync(OUT,JSON.stringify(proof,null,2)+'\n');
   console.log('B2_ACCESS_CONFIG_RECOVERY=PASS '+JSON.stringify({eventId,writes:proof.writes,operativo:proof.operativo}));
 }catch(e){proof.error=String(e?.message||e);fs.writeFileSync(OUT,JSON.stringify(proof,null,2)+'\n');throw e;}finally{await deleteApp(app).catch(()=>{});}

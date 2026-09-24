@@ -92,7 +92,25 @@
       "membershipMutationAuthorized": false,
       "liveHostingPromotionAuthorized": false,
       "auditEventRequired": true,
-      "canonicalReadbackRequired": true
+      "canonicalReadbackRequired": true,
+      "physicalScopeRecovery": {
+        "authorized": true,
+        "mode": "MATERIALIZE_ONLY_MISSING_FROZEN_APPROVED_SCOPES_FAIL_ON_CONFLICT",
+        "approvedScopes": {
+          "Dirección": "all",
+          "SuperAdmin": "all",
+          "AdminTenant": "all",
+          "Admin": "all",
+          "Finanzas": "all",
+          "Operativo": "all",
+          "Marketing": "team",
+          "Asesor": "own",
+          "Asistente": "team",
+          "Comercial": "own"
+        },
+        "evidence": "B1 accepted role-scope matrix + runtime effective defaults",
+        "overwriteExplicitDifferentScope": false
+      }
     }
   },
   "emailDebt": {
@@ -1463,5 +1481,14 @@
     "cleanupWrites": 0,
     "liveHostingPromotion": false
   },
-  "accessConfigRecoveryState": "AUTHORIZED_PENDING_AUTHENTICATED_RUN_ON_EXACT_PREVIEW"
+  "accessConfigRecoveryState": "RETRY_AUTHORIZED_AFTER_PHYSICAL_SCOPE_OMISSION_DEMONSTRATED",
+  "lastAccessRecoveryAttempt": {
+    "runId": 36072858956,
+    "status": "FAIL_AFTER_CONFIG_OVERRIDE_WRITE_BEFORE_AUTHENTICATED_BROWSER_PROOF",
+    "failure": "B2_ACCESS_RECOVERY_SCOPE_REGRESSION",
+    "interpretation": "Protected callable had exposed default-effective roleScopes, but the physical config document lacked one or more required scope fields. The first recovery did persist Operativo Cotizador/Comparativo before failing its physical scope assertion.",
+    "businessDataWrites": 0,
+    "syntheticBusinessWrites": 0,
+    "liveHostingTouched": false
+  }
 }
