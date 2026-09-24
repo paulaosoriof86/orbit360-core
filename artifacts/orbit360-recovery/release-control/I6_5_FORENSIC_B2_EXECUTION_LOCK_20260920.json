@@ -1,8 +1,8 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "OPEN_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
-  "recordedAt": "2026-09-23",
+  "status": "CANDIDATE_PENDING_PREVIEW",
+  "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "parentB1Preview": {
@@ -1289,7 +1289,7 @@
     "humanReviewSupersedesReadiness": true
   },
   "paulaVisualReview20260924": {
-    "decision": "REJECTED",
+    "decision": "REJECTED_SUPERSEDED_BY_CAUSAL_REMEDIATION_CANDIDATE_PENDING_NEW_PREVIEW",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
     "receiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
     "rejectedPreviewRunId": 35964339112,
@@ -1300,6 +1300,18 @@
     "outstandingFindings": 13,
     "b2Status": "OPEN",
     "b3Status": "NOT_STARTED",
-    "livePromoted": false
-  }
+    "livePromoted": false,
+    "reReviewRequired": true
+  },
+  "canonicalComposition": {
+    "authorityPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "findingsLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "mechanismRootCause": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
+    "definitiveFix": "EXACT_PRODUCT_DIFF_AND_BLOB_BOUND_SINGLE_COMPOSITION_AUTHORITY",
+    "productSourceReadyForPreview": true,
+    "broadRediscoveryRequired": false,
+    "authorityBlobSha": "4262186fe1a011052568ff8fa657e0d37027a9e3",
+    "findingsLedgerBlobSha": "b843a3a5e61eec14a8291917d17225af5e69b54d"
+  },
+  "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json"
 }

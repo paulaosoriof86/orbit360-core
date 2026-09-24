@@ -1,0 +1,470 @@
+{
+  "schema": "GRAVICENTRA_I6_FINDINGS_LEDGER_V1",
+  "status": "FROZEN_ACTIVE",
+  "date": "2026-09-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "purpose": "Prevent any visual, functional, data, permission, release or deferred finding from being lost between iterations.",
+  "activeBlock": "B2",
+  "rules": {
+    "stableIdRequired": true,
+    "ownerRequired": true,
+    "blockRequired": true,
+    "statusRequired": true,
+    "closureProofRequiredForPass": true,
+    "deletionForbidden": true,
+    "carryForwardRequiresExplicitStatus": true,
+    "nextBlockForbiddenWhileCurrentBlockingFindingsOpen": true,
+    "deferredFindingRequiresExplicitAuthorityAndFinalDisposition": true,
+    "conversationIsNotAuthority": true
+  },
+  "counts": {
+    "total": 38,
+    "b2HumanFindings": 13,
+    "currentBlocking": 15
+  },
+  "findings": [
+    {
+      "id": "MECH-COMP-001",
+      "block": "B2",
+      "source": "FORENSIC_MECHANISM_AUDIT_20260924",
+      "finding": "Single-candidate rule existed semantically but not as one machine-authoritative physical composition; guard/workflow/locks duplicated composition/state knowledge.",
+      "owner": [
+        "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+        "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json"
+      ],
+      "rootCause": "The project required one accumulative candidate, but physical product composition authorization was distributed across Control Plane, B1/B2 locks, historical successor scopes and hardcoded status lists in the guard/workflow. A legitimate new remediation state could therefore make the guard ignore already-authorized product owners and report false source drift. This also made preservation of prior improvements dependent on multiple consumers staying manually synchronized.",
+      "remediation": "Create exact-set/blob-bound canonical composition lock and make central guard consume it independent of block status strings.",
+      "status": "SOURCE_FIX_COMMITTED_RUNTIME_GUARD_PROOF_PENDING",
+      "blocking": true,
+      "closureProof": "Central guard PASS and B2 Preview executor reaches build/proof on the same HEAD without product-source drift.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B1-EMAIL-DELIVERY-001",
+      "block": "B1_CARRY_FORWARD",
+      "source": "PAULA_REVIEW_20260920",
+      "finding": "Access/synchronization email reported sent but Fernando did not receive it in any mailbox.",
+      "owner": [
+        "PLATFORM_TRANSACTIONAL_EMAIL_CONFIGURATION"
+      ],
+      "rootCause": "Not yet proven end-to-end; provider/request acceptance is not delivery proof.",
+      "remediation": "Preserve as explicit debt; verify transactional sender/domain/provider/delivery telemetry and real receipt without weakening public emailVerified requirement.",
+      "status": "OPEN_DEFERRED_NON_BLOCKING_CURRENT_B2",
+      "blocking": false,
+      "finalDispositionRequiredBeforeB4Exit": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "DASHBOARD-INICIO-001",
+      "block": "B2_B3_CARRY_FORWARD",
+      "source": "B1_SCOPE_REVIEW",
+      "finding": "Inicio/Dashboard must reconcile KPI/advisor/monthly reality with active-role scoped canonical data.",
+      "owner": [
+        "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED"
+      ],
+      "rootCause": "Mixed-scope aggregation was previously demonstrated; active-role scope fix passed but final dashboard reality closure remains open.",
+      "remediation": "Close before B4 promotion; no reimport.",
+      "status": "OPEN_BLOCKING_FINAL_PROMOTION",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H01",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "BODY_TYPOGRAPHY_TOO_HEAVY",
+      "surface": "Polizas",
+      "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "rootCause": "Inline field values used font-weight 650 almost universally and premium rows used generalized <b>, flattening hierarchy.",
+      "remediation": "Body values reduced to medium weight; premium rows use ordinary values with strong total only; title/KPI hierarchy preserved.",
+      "status": "SOURCE_FIXED_RUNTIME_VISUAL_PENDING",
+      "blocking": true,
+      "closureProof": "Authenticated side-by-side desktop/mobile Cliente360-Aseguradoras-Poliza-Vehiculo-Recibo visual audit.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H02",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "BASE_GRAVABLE_SEMANTICS_AND_SUMMARY_NOISE",
+      "surface": "Polizas",
+      "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js + core/policy-receipts-engine.js",
+      "rootCause": "Canonical model supports taxable base, but summary rendered the missing value as a completion warning and used ambiguous label.",
+      "remediation": "Model retained; UI renders 'Base imponible para IVA' only when authoritative value exists.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "blocking": true,
+      "closureProof": "Policy with base and policy without base; no invented value and no empty summary noise.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H03",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "FORMA_PAGO_CONDUCTO_CROSS_FALLBACK_DUPLICATION",
+      "surface": "Polizas",
+      "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "rootCause": "Read normalizer cross-fell back formaPago<-conductoPago and conducto<-formaPago; I6.4 source contract imports them separately.",
+      "remediation": "Cross-fallback removed. formaPago reads formaPago/metodoPago; conducto reads conducto/conductoPago; frequency stays separate.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "blocking": true,
+      "closureProof": "Runtime records with distinct values and legacy missing values; write/readback stays distinct.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H04",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "EDIT_EXISTING_POLICY_DOES_NOT_PERSIST_IN_HUMAN_FLOW",
+      "surface": "Polizas",
+      "owner": "policy-receipts-v1199-bridge.js + policy-receipts-engine.js + authenticated harness",
+      "rootCause": "Prior authenticated PASS never edited a policy field; it edited only vehicle color. Engine also required motivo only for a subset of critical fields, while UI declared motive mandatory. Exact human-field failure remains runtime-discriminant pending.",
+      "remediation": "Every existing-policy update now requires motive; UI validates clearly before submit; authenticated proof now edits sumaAsegurada, asserts empty-motive zero write, valid-motive backend readback and reload.",
+      "status": "SOURCE_FIXED_DISCRIMINANT_RUNTIME_PENDING",
+      "blocking": true,
+      "closureProof": "Synthetic existing policy same ID: empty motive block -> valid save -> Firestore readback -> reload.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H05",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "POLICY_VEHICLE_RELATIONSHIP_AMBIGUOUS_FOR_OBSERVED_CLIENT",
+      "surface": "Vehiculos/Polizas",
+      "owner": "canonical Firestore read models + relationship audit tool",
+      "rootCause": "Not assumed. Human evidence can represent distinct historical/current contracts plus an incomplete active vehicle link; physical IDs must decide.",
+      "remediation": "No data mutation. Read-only forensic script added for exact client and reported policy numbers.",
+      "status": "READONLY_RUNTIME_AUDIT_PENDING",
+      "blocking": true,
+      "closureProof": "Artifact evidence with hashed IDs, states, links, receipt/portfolio counts and classification; no merge/delete.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H06",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "NO_CLEAR_EDIT_VEHICLE_ACTION",
+      "surface": "Vehiculos",
+      "owner": "policy-receipts-v1199-detail-guard.js + policy-receipts-v1199-bridge.js + cliente360.js",
+      "rootCause": "Buttons labeled 'Editar vehículo' called editarPoliza(polizaId); no dedicated vehicle editor owner existed.",
+      "remediation": "Dedicated openVehicleForm(vehicleId) added; actions call editarVehiculo(vehicleId); engine performs same-ID vehicle update through policy atomic write plan.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "blocking": true,
+      "closureProof": "Authenticated edit -> exact vehicle doc readback -> one vehicle for policy -> reload -> policy/client link preserved.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H07",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "VISIBLE_UNDEFINED_TEXT",
+      "surface": "Vehiculos",
+      "owner": "cliente360.js + policy-receipts-v1199-detail-guard.js",
+      "rootCause": "Legacy row/identity renderers allowed literal string 'undefined'/'null' to pass through.",
+      "remediation": "Vehicle labels and row values normalize null/undefined literals to neutral display values; identity concatenation filters invalid literals.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "blocking": true,
+      "closureProof": "Authenticated vehicle cards/detail no literal undefined/null.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H08",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "PARTIAL_FIRST_RENDER_THEN_FULL_12_RECEIPTS",
+      "surface": "Recibos",
+      "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "rootCause": "Cliente360 rendered legacy receipts first; canonical bridge replaced it in setTimeout(0), creating a visible partial-state race.",
+      "remediation": "Canonical patch/render now executes synchronously after the original tab/render handler; canonical owner keeps stable loading state until both receipt and portfolio collections are server-confirmed.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "blocking": true,
+      "closureProof": "Authenticated cold route/tab/reload; no partial row count before canonical dataset.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H09",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "TECHNICAL_TERMS_AND_HARSH_VISUAL_HIERARCHY",
+      "surface": "DetalleRecibo",
+      "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "rootCause": "UI printed raw provenance fields/codes and separate state/reconciliation badges even when semantically identical; hero used unrelated dark treatment.",
+      "remediation": "Soft mature-family hero; medium body typography; deduplicated badges; raw authority/match codes suppressed; operational labels for update date/document/match.",
+      "status": "SOURCE_FIXED_RUNTIME_VISUAL_PENDING",
+      "blocking": true,
+      "closureProof": "Authenticated receipt detail desktop/mobile; no release/gate/validator/internal codes or duplicate payment status.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H10",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "LOGO_NOT_ADMINISTRABLE",
+      "surface": "Aseguradoras",
+      "owner": "modules/aseguradoras.js",
+      "rootCause": "Ficha rendered a.logo, but edit form/snapshot/diff did not expose or track logo.",
+      "remediation": "Logo added to editable/diff contract as HTTPS URL only; Data URL/browser persistence is rejected; readback/reload proof added.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "blocking": true,
+      "closureProof": "Synthetic insurer logo URL save -> canonical backend readback -> reload -> image rendered.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H11",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "SECURE_CREDENTIAL_PASSWORD_UPDATE_FAILS",
+      "surface": "Aseguradoras",
+      "owner": "functions/product-insurer-credentials.js + product-insurer-credential-provider-p0.js + aseguradoras.js",
+      "rootCause": "Backend MANAGE_ROLES omitted Operativo although approved policy grants it; Preview callable explicitly rejected credential import.",
+      "remediation": "Operativo restored to server manage roles. Preview writes use isolated Secret Manager vault overlay, production vault remains unchanged. Preview-only synthetic cleanup added. Workflow deploys only Preview callable.",
+      "status": "SOURCE_FIXED_RUNTIME_SECURITY_PENDING",
+      "blocking": true,
+      "closureProof": "Authenticated Operativo synthetic insurer password update -> credentialRef readback -> refresh/reveal hash match -> Preview secret cleanup; no plaintext/log/artifact.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H12",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "VISIBLE_CATALOG_COUNT_DISCREPANCY_25_VS_RUNTIME_LARGER",
+      "surface": "Academia",
+      "owner": "modules/academia.js",
+      "rootCause": "Session owner returns canonical role SuperAdmin while visual label is Dirección; Academia privileged filter recognized Dirección/Admin only. SuperAdmin therefore received exactly the Operativo subset.",
+      "remediation": "Privileged filter now recognizes Dirección, SuperAdmin, AdminTenant and Admin consistently.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "blocking": true,
+      "closureProof": "Authenticated privileged role and Operativo/Asesor counts/routes; CRM/Cliente360 and Aseguradoras courses present; no technical/LAB visible to normal roles.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-H13",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
+      "finding": "MATURE_VISUAL_FAMILY_NOT_YET_CONSISTENT",
+      "surface": "TransversalVisual",
+      "owner": "detail guard + receipt projection + Cliente360 + Aseguradoras",
+      "rootCause": "Policy/receipt/vehicle surfaces used independent inline weights and receipt-specific dark hero instead of mature family hierarchy.",
+      "remediation": "Targeted typography/hero/value-weight changes applied without reverting macro policy hierarchy.",
+      "status": "SOURCE_FIXED_RUNTIME_VISUAL_PENDING",
+      "blocking": true,
+      "closureProof": "Own visual audit desktop/mobile across Cliente360, Aseguradoras, Policy, Vehicle, Receipt, Academia; new Paula review afterward.",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B3-001",
+      "block": "B3",
+      "source": "FROZEN_PLAN",
+      "finding": "Restore approved Cobros y cartera shell; bridge is projection adapter, not renderer replacement.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B3-002",
+      "block": "B3",
+      "source": "FROZEN_PLAN",
+      "finding": "Search/performance: indexing, debounce and pagination/virtualization; no page freeze.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B3-003",
+      "block": "B3",
+      "source": "FROZEN_PLAN",
+      "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B3-004",
+      "block": "B3",
+      "source": "FROZEN_PLAN",
+      "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B3-005",
+      "block": "B3",
+      "source": "FROZEN_PLAN",
+      "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B3-006",
+      "block": "B3",
+      "source": "FROZEN_PLAN",
+      "finding": "Controlled policy import creates policy + expected receipts + portfolio, never confirmed cobro without evidence.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B3-007",
+      "block": "B3",
+      "source": "FROZEN_PLAN",
+      "finding": "Cronograma consumes real pending obligations from receipts/portfolio.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B3-008",
+      "block": "B3",
+      "source": "FROZEN_PLAN",
+      "finding": "Dashboard Inicio reality reconciliation closed before B4.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-001",
+      "block": "B4",
+      "source": "FROZEN_PLAN",
+      "finding": "Ops/Leads/Cliente360/Portal gestiones converge to one canonical record with role scopes.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-002",
+      "block": "B4",
+      "source": "FROZEN_PLAN",
+      "finding": "Notifications/automation occur only after committed domain events with retry/failure visibility.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003",
+      "block": "B4",
+      "source": "FROZEN_PLAN",
+      "finding": "Targeted regression closure for Renovaciones and Cancelaciones.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-004",
+      "block": "B4",
+      "source": "FROZEN_PLAN",
+      "finding": "Targeted regression closure for Siniestros and Cronograma.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-005",
+      "block": "B4",
+      "source": "FROZEN_PLAN",
+      "finding": "Authenticated module × role × viewport E2E matrix; zero relevant page/console/request errors.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-006",
+      "block": "B4",
+      "source": "FROZEN_PLAN",
+      "finding": "Paula visual acceptance on exact final Preview.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-007",
+      "block": "B4",
+      "source": "FROZEN_PLAN",
+      "finding": "Promote same immutable accepted artifact to LIVE; exact readback or rollback.",
+      "status": "NOT_STARTED",
+      "blocking": true,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "POST-001",
+      "block": "POSTPRODUCTION_FROZEN",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
+      "finding": "Advanced renewal comparator / richer real quotation-comparison workflow.",
+      "status": "FROZEN_DEFERRED_AFTER_PRODUCTION",
+      "blocking": false,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "POST-002",
+      "block": "POSTPRODUCTION_FROZEN",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
+      "finding": "Vehicle catalog reuse from Cotizador for make/line/model dropdowns.",
+      "status": "FROZEN_DEFERRED_AFTER_PRODUCTION",
+      "blocking": false,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "POST-003",
+      "block": "POSTPRODUCTION_FROZEN",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
+      "finding": "Insurer-specific assistance intelligence/configuration.",
+      "status": "FROZEN_DEFERRED_AFTER_PRODUCTION",
+      "blocking": false,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "POST-004",
+      "block": "POSTPRODUCTION_FROZEN",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
+      "finding": "Guatemala insurer-specific issuance expense intelligence/defaults.",
+      "status": "FROZEN_DEFERRED_AFTER_PRODUCTION",
+      "blocking": false,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "POST-005",
+      "block": "POSTPRODUCTION_FROZEN",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
+      "finding": "Fine-grained insurer/payment-method fractionation rules.",
+      "status": "FROZEN_DEFERRED_AFTER_PRODUCTION",
+      "blocking": false,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "POST-006",
+      "block": "POSTPRODUCTION_FROZEN",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
+      "finding": "Safe delete/archive UX with referential integrity.",
+      "status": "FROZEN_DEFERRED_AFTER_PRODUCTION",
+      "blocking": false,
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "POST-007",
+      "block": "POSTPRODUCTION_FROZEN",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
+      "finding": "Importer intelligence beyond B3 minimum controlled proof.",
+      "status": "FROZEN_DEFERRED_AFTER_PRODUCTION",
+      "blocking": false,
+      "mayDisappearWithoutDisposition": false
+    }
+  ],
+  "phaseBBacklog": [
+    {
+      "id": "PHASEB-DATA-IMPORTER-01",
+      "status": "FROZEN_BACKLOG_NOT_ACTIVE",
+      "finding": "Evolve existing importer only after Phase A post-salida closure; reuse canonical contracts, delta-first/idempotency/provenance/rollback."
+    },
+    {
+      "id": "PHASEB-INTEGRATION-MAIL-01",
+      "status": "FROZEN_BACKLOG_NOT_ACTIVE",
+      "finding": "Personal email integration per user belongs to Phase B; distinct from unresolved platform transactional delivery debt."
+    },
+    {
+      "id": "PHASEB-FINANCE-01",
+      "status": "FROZEN_BACKLOG_CONDITIONAL",
+      "finding": "Further company Finance evolution may move to Phase B if not required for CRM/Cliente360/Recibos/Cobros closure."
+    }
+  ]
+}

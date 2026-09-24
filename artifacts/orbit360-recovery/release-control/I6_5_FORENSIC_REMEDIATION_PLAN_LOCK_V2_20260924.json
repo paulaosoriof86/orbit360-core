@@ -1,0 +1,280 @@
+{
+  "schema": "GRAVICENTRA_I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2",
+  "status": "FROZEN_ACTIVE",
+  "date": "2026-09-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "purpose": "Close the current single cumulative candidate rapidly while mechanically preventing composition drift, owner regression, lost findings and repeated rediscovery.",
+  "authority": {
+    "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "forensicAudit": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_AUDIT_20260919.json",
+    "priorMiniPlan": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
+    "selfAdministrationLock": "artifacts/orbit360-recovery/release-control/I6_5_BLOCK_A_D_SELF_ADMINISTRATION_LOCK_20260918.json",
+    "antiDesync": "artifacts/orbit360-recovery/release-control/I6_RELEASE_MECHANISM_ANTI_DESYNC_LOCK_20260918.json",
+    "addendum": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_ADDENDUM_20260919.md",
+    "b2ExecutionLock": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
+    "b2ExecutionLockBlobSha": "31d83fbfbc48a40ad1ed47967e80611c079716f8"
+  },
+  "candidateRule": "ONE_PHYSICAL_ACCUMULATIVE_INCREMENTAL_CANDIDATE_WITH_MACHINE_AUTHORITATIVE_COMPOSITION",
+  "executionRule": "SEARCH_CURRENT_REPO_FOR_APPROVED_EXISTING_CAPABILITY_FIRST; IF THE FINAL APPROVED OWNER/IMPLEMENTATION IS LOCATED, CONNECT/REUSE IT; IF SEARCH COST EXCEEDS DIRECT CAUSAL REIMPLEMENTATION, FIX THE CURRENT CANONICAL OWNER DIRECTLY WITHOUT OPENING A PARALLEL OWNER. NEVER SUBSTITUTE AN OLDER MODULE PACKAGE.",
+  "visualizationRule": "EVERY_BLOCK_BUILDS_ONE_PREVIEW_FROM_CURRENT_ACCUMULATIVE_HEAD; PAULA_VISUALIZES_AND_ACCEPTS_OR_REPORTS_FINDINGS BEFORE NEXT_BLOCK; SAME_BLOCK_FINDINGS_ARE_FIXED_IN_PLACE, NOT MOVED TO A NEW PLAN.",
+  "releaseReadiness": {
+    "metric": "FORENSIC_RELEASE_READINESS_NOT_FORMAL_GATE_PERCENT",
+    "baselinePercent": 70,
+    "blocks": [
+      {
+        "id": "B1",
+        "name": "AUTORIDAD_BRANDING_USUARIOS_Y_SEGURIDAD_DE_INTERACCION",
+        "incrementPercent": 10,
+        "targetPercent": 80
+      },
+      {
+        "id": "B2",
+        "name": "AUTADMIN_CORE_Y_JERARQUIA_VISUAL_CLIENTE_POLIZA_VEHICULO_ASEGURADORA_RECIBO",
+        "incrementPercent": 10,
+        "targetPercent": 90
+      },
+      {
+        "id": "B3",
+        "name": "PAGOS_CONCILIACION_COBROS_IMPORTACION_Y_RENDIMIENTO",
+        "incrementPercent": 6,
+        "targetPercent": 96
+      },
+      {
+        "id": "B4",
+        "name": "TRANSVERSAL_OPS_LEADS_PORTAL_NOTIFICACIONES_E2E_Y_RELEASE",
+        "incrementPercent": 4,
+        "targetPercent": 100
+      }
+    ]
+  },
+  "canonicalBusinessRules": {
+    "policyCreationOrImport": [
+      "Creating or importing a policy creates/updates the policy, its expected receipts according to payment frequency and the corresponding premium portfolio state.",
+      "Creating/importing a policy does NOT by itself prove a payment and therefore must not create a confirmed payment/cobro event."
+    ],
+    "renewal": [
+      "A renewal creates a new renewal policy/version according to the approved renewal workflow and generates the new expected receipts and premium portfolio according to its payment terms.",
+      "Only when a payment is applied/confirmed or real payment evidence is reconciled is the corresponding confirmed cobro/payment materialized."
+    ],
+    "paymentEvidence": [
+      "Real evidence may come from a policy/insurer invoice, bank statement, commission statement/planilla, uploaded payment support, or explicit manual confirmation.",
+      "Inference is allowed to MATCH real evidence to policy/receipt/client; inference may never invent that a payment occurred merely because a receipt is due or exists.",
+      "Manual/explicit reconciliation remains available from Cliente 360 and Cobros."
+    ],
+    "paymentApplicationSurfaces": [
+      "Cliente 360 > Recibos y pagos must allow apply/confirm payment with payment date and optional invoice/evidence.",
+      "Cobros y cartera list/detail must allow the same canonical payment action.",
+      "Both surfaces call the same server-owned payment/reconciliation command and produce the same audit/readback result."
+    ],
+    "rolesAndFlows": [
+      "Comercial and Asesor see and manage only their own authorized leads/gestiones and related customer/policy scope.",
+      "Operativo, Admin and Dirección can create/manage Ops items according to their configured scope.",
+      "A gestion can originate from Cliente 360, Client Portal, Leads, or Ops and must become one canonical gestion visible in every authorized projection.",
+      "Ops and Leads are projections of the same canonical process, not parallel records."
+    ],
+    "selfAdministration": [
+      "Users, roles, countries, scopes, module permissions, tenant branding, insurers, clients, policies, vehicles, receipts/payment methods and allowed catalogs must be administrable from product UI where already approved.",
+      "No person identity or tenant-specific business value may be hardcoded when it belongs to tenant data/configuration.",
+      "The current objective is production-safe self-administration of approved capabilities; future generic SaaS/no-code expansion remains incremental after production and must reuse these same authorities."
+    ]
+  },
+  "blocks": {
+    "B1": {
+      "targetPercent": 80,
+      "scope": [
+        "Single pre-auth branding authority; remove technical Tenant wording and first-paint brand swap.",
+        "Tenant live configuration for display/legal names and logo roles; full A&S logo for login/header, approved bolita for favicon.",
+        "Equipo create/edit persistence; normalize legacy user records; remove scope confirmation loop.",
+        "Complete email verification/activation and first-login password-change path using modular Auth.",
+        "Remove hardcoded operational identity defaults in paths touched by this block.",
+        "Introduce/standardize protected dirty-state behavior for shared modal/drawer close."
+      ],
+      "acceptance": [
+        "Preview first-paint has no brand flash and correct logo/favicon.",
+        "Create/edit one test team user using non-default role/country/scope; refresh and readback persist.",
+        "Real login of an activated test user succeeds; unauthorized scope remains blocked.",
+        "No data mutation outside controlled test records."
+      ]
+    },
+    "B2": {
+      "targetPercent": 90,
+      "scope": [
+        "Cliente 360 list + full ficha: create/edit client from list and ficha; durable save/readback; no silent close.",
+        "Policy create/edit uses one canonical owner and identical business schema from list and Cliente 360; includes seller/advisor.",
+        "Renewal uses approved workflow and generates expected receipts/portfolio for the renewed policy, never a confirmed cobro without payment evidence.",
+        "Vehicle create/edit includes approved complete identity fields and is available from list/ficha where applicable.",
+        "Aseguradoras preserves approved full-page/tabbed hierarchy and durable edits.",
+        "Receipts and payment methods are visible/editable from Cliente 360/list surfaces through the canonical receipts projection.",
+        "Apply approved visual hierarchy consistently: header/identity, KPIs, primary actions, tabs/sections, edit/save/cancel, audit/status feedback."
+      ],
+      "acceptance": [
+        "Create and edit client, policy and vehicle; refresh and reopen from both list and Cliente 360.",
+        "Renew one controlled policy in Preview/test path and prove new expected receipts+portfolio with zero confirmed cobro until payment.",
+        "No backdrop data loss on dirty forms.",
+        "All saves show pending/success/error and canonical readback."
+      ],
+      "additionalRequiredClosure": [
+        "B2-H01",
+        "B2-H02",
+        "B2-H03",
+        "B2-H04",
+        "B2-H05",
+        "B2-H06",
+        "B2-H07",
+        "B2-H08",
+        "B2-H09",
+        "B2-H10",
+        "B2-H11",
+        "B2-H12",
+        "B2-H13"
+      ],
+      "mechanismPrecondition": "MECH-COMP-001_CLOSED_BY_GUARD_PASS_BEFORE_PREVIEW"
+    },
+    "B3": {
+      "targetPercent": 96,
+      "scope": [
+        "Restore approved Cobros y cartera visual shell; bridge is data/projection adapter, not full renderer replacement.",
+        "Optimize search with pre-indexing, debounce and pagination/virtualization; no per-row full vehicle scans.",
+        "KPIs/aging remain live and separated by currency/country; no synthetic cross-currency total.",
+        "One canonical Apply/Confirm Payment action from Cliente 360 and Cobros list/detail with payment date and optional invoice/evidence.",
+        "Reconciliation supports invoice, bank statement, commission statement/planilla and payment support; explicit matching and evidence-based inference share the same canonical engine.",
+        "Policy import and renewal generate expected receipts+portfolio according to payment terms; imported payment evidence reconciles actual payments.",
+        "Cronograma reads expected receipts/portfolio for due obligations instead of legacy pending cobros."
+      ],
+      "acceptance": [
+        "Search responds within agreed interactive threshold on full portfolio and never freezes the page.",
+        "Apply payment from Cliente 360 and Cobros produces one confirmed cobro, updates receipt/portfolio, audit and reconciliation consistently.",
+        "Import a controlled policy fixture -> receipts+portfolio generated; import controlled payment evidence -> correct match/reconciliation.",
+        "No duplicate payment on retry/double-submit."
+      ],
+      "pendingBusinessDecision": "AUTO_COMMIT_HIGH_CONFIDENCE_INFERRED_MATCH_VS_PROPOSE_FOR_HUMAN_CONFIRMATION",
+      "entryCondition": "B2 Paula visual accepted + all B2 blocking findings CLOSED_PASS + composition manifest exact."
+    },
+    "B4": {
+      "targetPercent": 100,
+      "scope": [
+        "Ops/Leads canonical synchronization and role scoping; remove touched hardcoded advisor defaults and optimistic-only critical transitions.",
+        "Gestiones created from Cliente 360, Client Portal, Leads and Ops converge to one canonical record.",
+        "Portal consumes same client/policy/receipt/payment state; no alternate persistence owner.",
+        "Notifications/automation execute only after committed domain events with retry/failure visibility and no duplicate records.",
+        "Targeted production-critical review of Renovaciones, Cancelaciones, Siniestros and Cronograma for direct-write regressions exposed by forensic audit; correct directly where needed for current production workflows.",
+        "Authenticated E2E matrix across Inicio, Cronograma, Ops, Leads, Aseguradoras, Cotizador, Comparativo, Cliente360, Polizas, Cobros, Conciliaciones, Renovaciones, Cancelaciones, Siniestros, Equipo.",
+        "Same immutable accumulated artifact Preview -> Paula visual acceptance -> LIVE -> exact readback -> freeze/rollback."
+      ],
+      "acceptance": [
+        "Role matrix proves Comercial/Asesor own-scope and Operativo/Admin/Dirección configured-scope behavior.",
+        "Cross-entry gestion appears once across all authorized projections.",
+        "No console/page/same-origin request errors in production-critical paths.",
+        "Paula visual acceptance is performed on the exact artifact to be promoted."
+      ],
+      "entryCondition": "B3 accepted at 96% + Dashboard reality closed + finding ledger has no unresolved B2/B3 blockers."
+    }
+  },
+  "antiRegressionRules": [
+    "No new top-level methodology, repo, branch, Firebase project, importer or parallel persistence owner.",
+    "Do not reconstruct approved modules; fix current accumulated candidate directly when the business rule is known.",
+    "Every code change is additive/incremental from the current accumulated candidate; never replace it with an older module package.",
+    "Before editing a module, identify the current effective runtime owner; after editing, prove that no older owner still overrides it.",
+    "A module cannot be declared PASS because a button exists; PASS requires authenticated UI action, server commit when applicable, canonical readback, visual refresh and audit.",
+    "No silent optimistic success for production-critical writes.",
+    "No destructive reimport to fix UI, routing, permissions, caching or hierarchy.",
+    "No policy/renewal/import may synthesize a confirmed payment without real payment evidence.",
+    "Evidence-based inference may match a real payment artifact; it may not infer payment from obligation existence.",
+    "Every block must expose a Preview for immediate visual review before the next block starts.",
+    "Findings discovered inside a block are fixed inside that block unless they require a genuinely new business decision.",
+    "If a business rule is unclear, execution stops only for that rule and asks Paula; unaffected work continues.",
+    "All decisions in this lock and addendum are repository authority and do not depend on conversation memory.",
+    "No hardcoded people. No hardcoded tenant business configuration where UI/configuration is the approved owner.",
+    "Final LIVE promotion must use the same immutable artifact visually accepted in Preview."
+  ],
+  "stopConditions": [
+    "genuinely ambiguous business rule",
+    "destructive mutation not already authorized",
+    "need to alter a previously approved business rule rather than implement it",
+    "authority mismatch that would risk writing to a parallel namespace"
+  ],
+  "onlyOpenBusinessQuestion": "When real payment evidence has one unique high-confidence inferred match, should the system auto-commit the reconciliation/payment, or create a proposed match that requires one human confirmation click?",
+  "predecessor": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_20260919.json",
+    "blobSha": "54461ef14f5226aa6b633303a51c5a31e16ece6c",
+    "status": "SUPERSEDED_BY_V2_FOR_ACTIVE_EXECUTION_BUT_RETAINED_AS_HISTORY"
+  },
+  "mechanismCorrection": {
+    "status": "FROZEN_ACTIVE",
+    "rootCauseClass": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
+    "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "rule": "The physical product diff and current blob identities are governed by one composition lock, not by duplicated block-status enums.",
+    "buildPrecondition": "CENTRAL_GUARD_PASS_ON_EXACT_COMPOSITION",
+    "futureChangeRule": "Every product-source change and its composition manifest update must land atomically; otherwise no build/Preview.",
+    "ownerRule": "Every modified capability declares the effective runtime owner; after change, prove no older owner shadows it.",
+    "findingRule": "A finding can leave the active ledger only as CLOSED_PASS or explicitly authorized DEFERRED/NOT_APPLICABLE with evidence.",
+    "compositionLockBlobSha": "4262186fe1a011052568ff8fa657e0d37027a9e3",
+    "findingLedgerBlobSha": "b843a3a5e61eec14a8291917d17225af5e69b54d"
+  },
+  "findingControl": {
+    "ledgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "b2HumanFindingIds": [
+      "B2-H01",
+      "B2-H02",
+      "B2-H03",
+      "B2-H04",
+      "B2-H05",
+      "B2-H06",
+      "B2-H07",
+      "B2-H08",
+      "B2-H09",
+      "B2-H10",
+      "B2-H11",
+      "B2-H12",
+      "B2-H13"
+    ],
+    "b2HumanFindingCount": 13,
+    "b3MayStartOnlyWhen": "ALL_B2_BLOCKING_FINDINGS_CLOSED_PASS_OR_EXPLICIT_NONBLOCKING_DISPOSITION",
+    "finalPromotionMayStartOnlyWhen": "NO_OPEN_PRODUCTION_BLOCKERS_AND_ALL_CARRY_FORWARD_ITEMS_HAVE_EXPLICIT_FINAL_DISPOSITION"
+  },
+  "currentExecution": {
+    "block": "B2",
+    "readinessPercent": 80,
+    "targetPercent": 90,
+    "step": "CANONICAL_COMPOSITION_BOUND_AND_SOURCE_REMEDIATION_READY_FOR_NEW_PREVIEW",
+    "noBroadRediscovery": true,
+    "noReimport": true,
+    "noLive": true,
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW"
+  },
+  "dataUpdateCompletion": {
+    "preservedPass": [
+      "I6.2 Aseguradoras/Directorio",
+      "I6.3 Clientes",
+      "I6.4 Pólizas/Vehículos/Riesgos",
+      "I6.5 deterministic receipts/portfolio apply + integrity readback"
+    ],
+    "doNotRepeat": [
+      "14 Directorio mutations",
+      "Clientes deterministic updates/inserts",
+      "I6.4 908 operational write targets",
+      "I6.4 320 visual/data corrections",
+      "I6.5 2227 receipts/portfolio writes"
+    ],
+    "pending": [
+      "Close B2 product acceptance",
+      "B3 payment/cobros/reconciliation/import proof",
+      "I6.6 Cobros/Conciliación",
+      "I6.7 Comisiones",
+      "I6.8 Historial/Academia/enablement final closure",
+      "I6.9 final post-salida production acceptance"
+    ],
+    "newPolicyBacklogRule": "New operational policies received after the pinned update remain queued; do not mix them into product-remediation writes. Resume delta intake immediately after the active product block is certified."
+  },
+  "rapidExecution": {
+    "objective": "Do not start another multi-day rediscovery loop.",
+    "normalCyclesPerBlock": 2,
+    "cycle1": "Causal source + exact composition + build/Preview + automated authenticated proof.",
+    "cycle2": "Paula visual review + only observed causal corrections + reproof/freeze.",
+    "extraCycleOnlyFor": "A concrete reproducible discrepancy from readback or human review.",
+    "broadAuditRepeatForbidden": true,
+    "historicalPassPreservedUnlessCausallyInvalidated": true
+  }
+}

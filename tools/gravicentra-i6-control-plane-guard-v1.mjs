@@ -27,6 +27,11 @@ const I65_FORENSIC_ADDENDUM='artifacts/orbit360-recovery/release-control/I6_5_FO
 const I65_PAYMENT_INFERENCE='artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_20260919.json';
 const I65_FORENSIC_B1='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json';
 const I65_FORENSIC_B2='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json';
+const I6_CANONICAL_COMPOSITION='artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json';
+const I6_FINDINGS_LEDGER='artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json';
+const I65_FORENSIC_PLAN_V2='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json';
+const I65_B2_REJECTION='artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json';
+const I65_B2_ROOT_CAUSE='artifacts/orbit360-recovery/release-control/I6_5_B2_REJECTION_ROOT_CAUSE_MATRIX_20260924.json';
 const I65_SYNC='artifacts/orbit360-recovery/release-control/I6_5_SYNC_COMPOSITION_PREFLIGHT_20260918.json';
 const I65_DIFF='artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_DIFF_20260918.json';
 const I65_APPLY_ENC='artifacts/orbit360-recovery/release-control/I6_5_DETERMINISTIC_APPLY_PAYLOAD_20260918.enc.json';
@@ -40,13 +45,25 @@ const stable=v=>{if(v===null||typeof v!=='object')return v;if(Array.isArray(v))r
 const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
-for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
+for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2,I6_CANONICAL_COMPOSITION,I6_FINDINGS_LEDGER,I65_FORENSIC_PLAN_V2,I65_B2_REJECTION,I65_B2_ROOT_CAUSE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
 const C=readJson(CONTROL),S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M=readJson(V5_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2);
+const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);
 need(C.schemaVersion==='gravicentra-control-plane-v2','I6_CONTROL_SCHEMA_INVALID');
 need(C.controlPlaneId==='GRAVICENTRA-INSURANCE-FASE-A','I6_CONTROL_ID_INVALID');
 need(C.repository==='paulaosoriof86/orbit360-core','I6_REPOSITORY_INVALID');
 need(C.branch==='recovery/fase-a-clean-20260831','I6_BRANCH_INVALID');
+need(C.i65ForensicRemediationPlan?.activePlanPath===I65_FORENSIC_PLAN_V2,'I6_ACTIVE_FORENSIC_PLAN_V2_MISMATCH');
+need(C.canonicalAccumulationControl?.compositionLockPath===I6_CANONICAL_COMPOSITION,'I6_CANONICAL_COMPOSITION_PATH_MISMATCH');
+need(C.canonicalAccumulationControl?.findingLedgerPath===I6_FINDINGS_LEDGER,'I6_FINDINGS_LEDGER_PATH_MISMATCH');
+need(FRP2.schema==='GRAVICENTRA_I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2'&&FRP2.status==='FROZEN_ACTIVE','I6_FORENSIC_PLAN_V2_INVALID');
+need(COMP.schema==='GRAVICENTRA_I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_V1'&&COMP.status==='FROZEN_ACTIVE','I6_CANONICAL_COMPOSITION_INVALID');
+need(FIND.schema==='GRAVICENTRA_I6_FINDINGS_LEDGER_V1'&&FIND.status==='FROZEN_ACTIVE','I6_FINDINGS_LEDGER_INVALID');
+const findingIds=(FIND.findings||[]).map(x=>x.id);
+need(new Set(findingIds).size===findingIds.length,'I6_FINDINGS_LEDGER_DUPLICATE_ID');
+const rejectionFindingIds=(REJ.findings||[]).map(x=>x.id);
+need(rejectionFindingIds.length===13&&rejectionFindingIds.every(id=>findingIds.includes(id)),'I6_FINDINGS_LEDGER_MISSING_B2_REJECTION_FINDING');
+need((RCM.findings||[]).every(x=>findingIds.includes(x.id)),'I6_FINDINGS_LEDGER_MISSING_ROOT_CAUSE_FINDING');
 need(C.status==='PRODUCTION_ACCEPTED','I6_BASELINE_PRODUCTION_STATUS_INVALID');
 need(C.environmentState?.productionAccepted===true,'I6_PRODUCTION_NOT_ACCEPTED');
 need(C.environmentState?.dataCutoff==='2026-07-31','I6_BASELINE_DATA_CUTOFF_DRIFT');
@@ -396,14 +413,29 @@ const allowedI65Product=new Set((i65SyncDefectPending||i65SyncDefectLive)&&Array
 const allowedI65HydrationProduct=new Set((i65HydrationDefectPending||i65HydrationDefectLive)&&Array.isArray(i65HydrationDefect.allowedProductFiles)?i65HydrationDefect.allowedProductFiles:[]);
 const allowedI65OperationalProduct=new Set((i65OperationalClosurePending||i65OperationalClosureLive)&&Array.isArray(i65OperationalClosure.allowedProductFiles)?i65OperationalClosure.allowedProductFiles:[]);
 const forensicActiveBlock=String(C.i65ForensicRemediationPlan?.currentBlock||'');
+const canonicalCompositionActive=activeI65&&COMP.status==='FROZEN_ACTIVE'&&COMP.currentBlock===forensicActiveBlock;
+const canonicalCompositionProduct=new Set(canonicalCompositionActive&&Array.isArray(COMP.productFiles)?COMP.productFiles:[]);
+if(canonicalCompositionActive){
+ need(COMP.baselineCertifiedSourceSha===R.sourceSha,'I6_CANONICAL_COMPOSITION_BASELINE_MISMATCH');
+ need(COMP.definitiveSolution?.compositionAuthority==='THIS_FILE'&&COMP.definitiveSolution?.diffContract==='EXACT_PRODUCT_DIFF_SET_AND_EXACT_BLOB_BINDING_FROM_CERTIFIED_BASELINE','I6_CANONICAL_COMPOSITION_CONTRACT_INVALID');
+ const actualProduct=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))).sort();
+ const declared=[...(COMP.productFiles||[])].sort();
+ need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
+ need(declared.every(p=>COMP.productFileBlobs?.[p]&&git('hash-object',p)===COMP.productFileBlobs[p]),'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
+ need(COMP.productFileCount===declared.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
+}
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);
 const b1Active=activeI65&&forensicActiveBlock==='B1'&&['PREPARED_FOR_CANDIDATE','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED','VISUAL_REJECTED_R3_PERFORMANCE_AND_UNIVERSE_ROOT_CAUSE_REQUIRED','ACCEPTED_FOR_B2_EMAIL_DEFERRED'].includes(String(B1.status||''));
 const b2PausedRetained=activeI65&&forensicActiveBlock==='B1'&&String(B2.status||'')==='PAUSED_PENDING_B1_REACCEPTANCE'&&Array.isArray(B2.boundaries?.allowedProductFiles);
-const b2Active=activeI65&&forensicActiveBlock==='B2'&&['READ_ONLY_DIAGNOSTIC_ACTIVE','CAUSE_DEMONSTRATED_PATCH_AUTHORIZED','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL','ACCEPTED_FOR_B3'].includes(String(B2.status||''));
+const b2Active=activeI65&&forensicActiveBlock==='B2'&&['READ_ONLY_DIAGNOSTIC_ACTIVE','CAUSE_DEMONSTRATED_PATCH_AUTHORIZED','OPEN_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL','ACCEPTED_FOR_B3'].includes(String(B2.status||''));
 const allowedI65ForensicB1Product=new Set(b1Retained?B1.allowedProductFiles:[]);
 const allowedI65ForensicB2Product=new Set((b2Active||b2PausedRetained)&&Array.isArray(B2.boundaries?.allowedProductFiles)?B2.boundaries.allowedProductFiles:[]);
-const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p)&&!allowedI65ForensicB2Product.has(p));
+const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!canonicalCompositionProduct.has(p)&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p)&&!allowedI65ForensicB2Product.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));
+if(forensicActiveBlock==='B3'||forensicActiveBlock==='B4'){
+ const openB2=(FIND.findings||[]).filter(x=>x.block==='B2'&&x.blocking===true&&!['CLOSED_PASS','DEFERRED_NON_BLOCKING_WITH_EXPLICIT_AUTHORITY','NOT_APPLICABLE_WITH_EVIDENCE'].includes(x.status));
+ need(openB2.length===0,'I6_B2_FINDINGS_STILL_OPEN:'+openB2.map(x=>x.id).join(','));
+}
 if(i63DefectPending||i63DefectLive){
  need(i63CodeDefect.classification==='CODE_DEFECT','I6_3_DEFECT_CLASS_INVALID');
  need(i63CodeDefect.parentCertifiedSourceSha===C.i61LiveSeal?.sourceSha,'I6_3_DEFECT_PARENT_INVALID');
