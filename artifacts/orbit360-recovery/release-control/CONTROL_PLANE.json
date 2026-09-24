@@ -25,26 +25,28 @@
     "latestBlobSha": "7b7a14d834c31f5e6f1d5142dc92532119b9f437"
   },
   "projectSources": {
-    "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
-    "activeVersion": 5,
-    "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v5",
-    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v5/08_MANIFIESTO_FUENTES_EVERGREEN_V5.json",
-    "manifestBlobSha": "d1a0cc69ded3d38911e5e5504360228d7bcc05e1",
+    "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V6",
+    "activeVersion": 6,
+    "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v6",
+    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v6/10_MANIFIESTO_FUENTES_EVERGREEN_V6.json",
+    "manifestBlobSha": "2df32d1fb8064408847a4e387f99b5213f910fff",
     "deltaAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
     "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
-    "staticSourceUpdateRequired": false,
-    "reason": null,
+    "staticSourceUpdateRequired": true,
+    "reason": "Permanent normative architecture change: canonical accumulative composition and findings ledger are now machine-authoritative to prevent regression/lost improvements.",
     "operationalStateChangesDoNotRequireReplacement": true,
     "notificationRequiredWhenFlagTrue": true,
-    "compositionModel": "IMMUTABLE_RETAINED_V4_PLUS_V5_ADDENDUM",
-    "retainedPreviousSources": 6,
+    "compositionModel": "IMMUTABLE_RETAINED_V5_PLUS_V6_ADDENDUM",
+    "retainedPreviousSources": 7,
     "addedSources": 1,
     "lastTransition": {
-      "fromPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V4",
-      "toPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
-      "cause": "Permanent postproduction method correction: ordinary operational refresh is incremental DATA_UPDATE delta-first work, not a new implementation or release unless source code changes.",
-      "userAction": "KEEP_6_EXISTING_SOURCES_AND_ADD_ONLY_V5_INCREMENTAL_DELTA_ADDENDUM"
-    }
+      "fromPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
+      "toPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V6",
+      "cause": "Freeze single machine-authoritative cumulative composition + mandatory findings ledger after demonstrated composition-authority split.",
+      "userAction": "KEEP_7_EXISTING_SOURCES_AND_ADD_ONLY_V6_CANONICAL_COMPOSITION_FINDINGS_ADDENDUM"
+    },
+    "normativeAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v6/09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
+    "normativeAddendumBlobSha": "40b57682f89fc134bc95c5806b71a34bc4119882"
   },
   "deprecatedMutableAuthorities": {
     "artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json": "DEPRECATED_NON_AUTHORITATIVE_TOMBSTONE",
