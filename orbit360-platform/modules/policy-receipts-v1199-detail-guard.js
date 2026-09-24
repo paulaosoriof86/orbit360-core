@@ -8,6 +8,7 @@ Orbit.modules = Orbit.modules || {};
 
   const U = Orbit.ui || {};
   const S = () => Orbit.store;
+  const canEditVehicle = () => !!(Orbit.policyReceipts && Orbit.policyReceipts.canManagePolicies && Orbit.policyReceipts.canManagePolicies());
   const safe = v => String(v == null ? '' : v).trim();
   const esc = v => U.esc ? U.esc(safe(v)) : safe(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function numberOrNull(v) {
@@ -30,7 +31,7 @@ Orbit.modules = Orbit.modules || {};
     return `${symbol} ${n.toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2})}`.trim();
   }
   const fmtDate = v => safe(v) ? (U.fmtDate ? U.fmtDate(v) : safe(v)) : 'Pendiente de completar';
-  const shown = v => safe(v) || 'Pendiente de completar';
+  const shown = v => { const t=safe(v); return (!t || /^(undefined|null)$/i.test(t)) ? 'Pendiente de completar' : t; };
   const badge = status => U.estadoBadge ? U.estadoBadge(status || 'Requiere validación') : `<span class="badge neutral">${esc(status || 'Requiere validación')}</span>`;
   const activePolicy = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');
   const renewabilityState = p => {
@@ -61,9 +62,9 @@ Orbit.modules = Orbit.modules || {};
     out.primaNeta = net;
     out.primaTotal = total;
     out.prima = total;
-    out.formaPago = first(p.formaPago, p.conductoPago, p.metodoPago, p.forma);
-    out.forma = first(p.forma, p.formaPago, p.frecuencia, p.conductoPago);
-    out.conducto = first(p.conducto, p.conductoPago, p.formaPago);
+    out.formaPago = first(p.formaPago, p.metodoPago);
+    out.forma = first(p.forma, p.frecuencia);
+    out.conducto = first(p.conducto, p.conductoPago);
     out.gastosEmision = numberOrNull(first(p.gastosEmision, p.gastosExpedicion, p.gastos, p.emision));
     out.gastosFinan = numberOrNull(first(p.gastosFinan, p.gastosFinancieros, p.gastosFinanciamiento, p.recargoFinanciero));
     out.otros = numberOrNull(first(p.otros, p.asistencias, p.otrosGastos));
@@ -185,7 +186,7 @@ Orbit.modules = Orbit.modules || {};
   }
   function field(label, value, opts) {
     const o = opts || {};
-    return `<div style="min-width:0"><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.045em">${esc(label)}</div><div style="font-weight:650;margin-top:2px;overflow-wrap:anywhere;${o.mono ? 'font-family:var(--f-mono);' : ''}">${o.html ? value : esc(shown(value))}</div></div>`;
+    return `<div style="min-width:0"><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.045em">${esc(label)}</div><div style="font-weight:500;margin-top:2px;line-height:1.42;overflow-wrap:anywhere;${o.mono ? 'font-family:var(--f-mono);font-weight:500;' : ''}">${o.html ? value : esc(shown(value))}</div></div>`;
   }
   function grid(items, cols) {
     return `<div class="orbit-detail-grid" style="display:grid;grid-template-columns:repeat(${cols || 3},minmax(0,1fr));gap:13px 18px">${items.join('')}</div>`;
@@ -294,15 +295,15 @@ Orbit.modules = Orbit.modules || {};
             field('Suma asegurada', moneyDetail(p.sumaAsegurada, cur)), field('Concepto / riesgo', p.concepto), field('Calidad de información', qualityBlock(p, vehicle), {html:true})
           ], 3))}
           ${section('💰 Prima y condiciones de pago', `<div class="orbit-premium-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px">${[
-            ['Prima neta', pb.net], ['Gastos de expedición', pb.expedition], ['Gastos financieros', pb.finance], ['Descuento / ajuste (campo fuente)', pb.sourceAdjustment], ['Otros / asistencias', pb.other], ['Base gravable', pb.taxable], [ivaLabel, pb.iva], ['Prima total de póliza', pb.total], ['Total calendario de recibos', pb.scheduleTotal]
-          ].map(([k,v],i)=>`<div style="display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px solid var(--line);${i===7?'font-weight:800;':''}"><span>${esc(k)}</span><b>${esc(moneyDetail(v,cur))}</b></div>`).join('')}</div>${scheduleDelta!=null&&Math.abs(scheduleDelta)>=0.005?`<div class="badge warn" style="margin-top:10px">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · requiere conciliación de fuente</div>`:''}${grid([
+            ['Prima neta', pb.net], ['Gastos de expedición', pb.expedition], ['Gastos financieros', pb.finance], ['Descuento / ajuste', pb.sourceAdjustment], ['Otros / asistencias', pb.other], ...(pb.taxable == null ? [] : [['Base imponible para IVA', pb.taxable]]), [ivaLabel, pb.iva], ['Prima total de póliza', pb.total], ['Total calendario de recibos', pb.scheduleTotal]
+          ].map(([k,v])=>`<div style="display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px solid var(--line)"><span style="color:var(--ink-2)">${esc(k)}</span><span style="font-weight:${k==='Prima total de póliza'?'700':'500'}">${esc(moneyDetail(v,cur))}</span></div>`).join('')}</div>${scheduleDelta!=null&&Math.abs(scheduleDelta)>=0.005?`<div class="badge warn" style="margin-top:10px">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · requiere conciliación de fuente</div>`:''}${grid([
             field('Frecuencia', first(p.frecuencia, p.forma)), field('Forma de pago', p.formaPago), field('Conducto', p.conducto)
           ],3)}`)}
           ${section('🚘 Riesgo asegurado / vehículo', vehicleCard(vehicle, cur, p.id))}
           ${section('🧾 Recibos y cartera', receiptRows(p.id, cur))}
         </div>
         <div style="display:grid;gap:16px;min-width:0">
-          ${section('📌 Resumen', `<div style="display:grid;gap:10px">${field('Prima total', moneyDetail(pb.total,cur))}${field('Vigencia', `${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`)}${field('Forma de pago', first(p.formaPago,p.frecuencia))}${field('Estado', p.estado)}</div>`)}
+          ${section('📌 Resumen', `<div style="display:grid;gap:10px">${field('Prima total', moneyDetail(pb.total,cur))}${field('Vigencia', `${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`)}${field('Forma de pago', p.formaPago)}${field('Estado', p.estado)}</div>`)}
           ${section('🕘 Historial y endosos', (p.historial || []).length ? `<div style="display:grid;gap:10px">${(p.historial || []).slice().reverse().map(e=>`<div style="border-left:2px solid var(--line);padding-left:10px"><b>${esc(first(e.t,e.tipo,'Actualización'))}</b><div class="muted" style="font-size:12px">${esc(fmtDate(e.fecha))}${e.d?' · '+esc(e.d):''}</div></div>`).join('')}</div>` : '<div class="muted">Sin movimientos adicionales registrados.</div>')}
           ${section('⚡ Acciones', `<div style="display:grid;gap:8px"><a class="btn ghost" href="${back}">Abrir ficha del cliente</a>${vehicle ? `<a class="btn ghost" href="#/cliente360?c=${encodeURIComponent(p.clienteId)}&v=${encodeURIComponent(vehicle.id)}">Ver vehículo completo</a>` : ''}</div>`)}
         </div>
@@ -319,10 +320,10 @@ Orbit.modules = Orbit.modules || {};
     const back = `#/cliente360?c=${encodeURIComponent(v.clienteId)}&t=vehiculos`;
     host.innerHTML = `<div class="page orbit-vehicle-fullpage" data-vehicle-fullpage="1">
       <div class="crumb" style="margin-bottom:14px"><a href="${back}" style="color:var(--red)">‹ ${esc(cli.nombre || 'Cliente 360')}</a> / Vehículo</div>
-      <div class="card gi-vehicle-hero" style="overflow:hidden;margin-bottom:16px"><div style="padding:20px 22px;background:linear-gradient(120deg,#1f3a5f,#142840);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap"><div style="display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">🚘</div><div><div style="color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.12em;font-size:11px">Vehículo asegurado</div><h2 style="color:#fff;margin:4px 0;font-family:var(--f-display)">${esc(shown(v.marca))} ${esc(shown(v.linea))} ${esc(shown(v.anio))}</h2><div class="mono" style="color:rgba(255,255,255,.85)">${esc(shown(v.placa))}${p.numero?' · póliza '+esc(p.numero):''}</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="Orbit.modules.cliente360.editarPoliza('${esc(v.polizaId)}')">✏️ Editar vehículo</button><a class="btn ghost" href="${back}">👤 Cliente 360</a></div></div></div>
+      <div class="card gi-vehicle-hero" style="overflow:hidden;margin-bottom:16px"><div style="padding:20px 22px;background:linear-gradient(120deg,#1f3a5f,#142840);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap"><div style="display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">🚘</div><div><div style="color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.12em;font-size:11px">Vehículo asegurado</div><h2 style="color:#fff;margin:4px 0;font-family:var(--f-display)">${esc(shown(v.marca))} ${esc(shown(v.linea))} ${esc(shown(v.anio))}</h2><div class="mono" style="color:rgba(255,255,255,.85)">${esc(shown(v.placa))}${p.numero?' · póliza '+esc(p.numero):''}</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap">${canEditVehicle() ? `<button class="btn primary" onclick="Orbit.modules.cliente360.editarVehiculo('${esc(v.id)}')">✏️ Editar vehículo</button>` : ''}<a class="btn ghost" href="${back}">👤 Cliente 360</a></div></div></div>
       <div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:16px;align-items:start">
         ${section('🚘 Detalle completo del vehículo', vehicleCard(v, cur))}
-        <div style="display:grid;gap:16px">${section('📑 Póliza vinculada', grid([field('Póliza', p.numero || '—',{mono:true}),field('Aseguradora',asg.nombre || '—'),field('Estado',p.estado || '—'),field('Vigencia',`${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`),field('Prima total',moneyDetail(first(p.primaTotal,p.prima),cur)),field('Suma asegurada',moneyDetail(first(v.sumaAsegurada,p.sumaAsegurada),cur))],2)+`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn primary" href="#/cliente360?c=${encodeURIComponent(v.clienteId)}&p=${encodeURIComponent(v.polizaId)}">Abrir póliza completa</a><button class="btn ghost" onclick="Orbit.modules.cliente360.editarPoliza('${esc(v.polizaId)}')">Editar vehículo</button></div>`)}</div>
+        <div style="display:grid;gap:16px">${section('📑 Póliza vinculada', grid([field('Póliza', p.numero || '—',{mono:true}),field('Aseguradora',asg.nombre || '—'),field('Estado',p.estado || '—'),field('Vigencia',`${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`),field('Prima total',moneyDetail(first(p.primaTotal,p.prima),cur)),field('Suma asegurada',moneyDetail(first(v.sumaAsegurada,p.sumaAsegurada),cur))],2)+`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn primary" href="#/cliente360?c=${encodeURIComponent(v.clienteId)}&p=${encodeURIComponent(v.polizaId)}">Abrir póliza completa</a>${canEditVehicle() ? `<button class="btn ghost" onclick="Orbit.modules.cliente360.editarVehiculo('${esc(v.id)}')">Editar vehículo</button>` : ''}</div>`)}</div>
       </div>
     </div>`;
   }
