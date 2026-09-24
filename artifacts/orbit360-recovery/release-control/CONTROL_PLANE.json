@@ -1944,7 +1944,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_RECEIPT_VISUAL_EVIDENCE_RECAPTURE_AUTHORIZED",
+    "mechanismSyncStatus": "B2_AUTHENTICATED_PREVIEW_PASS_PENDING_VISUAL",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2010,9 +2010,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "4f6e2f9680ee8252f2ded3d982d06df5657cfaad",
+    "b2ExecutionLockBlobSha": "981b2409b7aa7e839f566af8ea86e638ce0e8082",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2056,7 +2056,7 @@
       },
       "visualHierarchyAccepted": false,
       "visualCorrectionFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923.json",
-      "authenticatedPreviewPass": false,
+      "authenticatedPreviewPass": true,
       "academiaRegression": "ROLE_ACCESS_ROOT_CAUSE_CONFIRMED_SOURCE_FIX_PENDING_PREVIEW",
       "oldPreviewRunId": 35961983479,
       "oldPreviewSuperseded": true,
@@ -2072,7 +2072,7 @@
       "renewalDurableClosureRootCauseClosedPendingPreview": true,
       "renewalDomainSplitDurabilityClosedPendingPreview": true,
       "issuanceCreateAdvanceDurableRootCauseClosedPendingPreview": true,
-      "authenticatedPreviewRunId": 35964591059,
+      "authenticatedPreviewRunId": 35964954339,
       "activeRoleScopeRuntimePass": true,
       "clientCreateEditRuntimePass": true,
       "policyVehicleRuntimePass": true,
