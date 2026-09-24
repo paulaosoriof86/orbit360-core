@@ -128,16 +128,18 @@ async function pickMultiRoleActor(db,auth){
     if(m.active===false||m.activo===false||['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(st))continue;
     if(!rn.includes('operativo')||!rn.some(x=>x==='asesor'||x.startsWith('asesor_')))continue;
     const advisorId=clean(m.advisorId||m.asesorId,180); if(!advisorId)continue;
+    const privileged=rn.some(x=>['direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(x));
     for(const uid of uniq([m.uid,d.id])){
       try{
         const u=await auth.getUser(uid);if(u.disabled)continue;
-        out.push({uid:u.uid,advisorId,roles:rr,emailVerified:u.emailVerified===true,score:(u.emailVerified?10:0)+rr.length});
+        out.push({uid:u.uid,advisorId,roles:rr,emailVerified:u.emailVerified===true,privileged,score:(privileged?100:0)+(u.emailVerified?10:0)+rr.length});
         break;
       }catch{}
     }
   }
   out.sort((a,b)=>b.score-a.score);
   need(out.length,'B2_AUTH_NO_OPERATIVO_ASESOR_ACTOR');
+  need(out[0].privileged===true,'B2_AUTH_NO_OPERATIVO_ASESOR_PRIVILEGED_ACTOR');
   return out[0];
 }
 async function activate(page,auth,a){
@@ -210,6 +212,8 @@ async function academiaSnapshot(page,role){
     const ids=rows.map(x=>String(x.id||''));
     return{
       role:String(Orbit.session?.rol?.()||''),catalogCount:rows.length,
+      visibleCourseCount:(()=>{const role=String(Orbit.session?.rol?.()||'');return rows.filter(c=>{const d=c.destinatarios||'equipo';if(d==='clientes')return false;if(d==='ambos'||d==='equipo'||d===role)return true;return ['Dirección','SuperAdmin','AdminTenant','Admin'].includes(role);}).length;})(),
+      visibleLessonCount:(()=>{const role=String(Orbit.session?.rol?.()||'');return rows.filter(c=>{const d=c.destinatarios||'equipo';if(d==='clientes')return false;if(d==='ambos'||d==='equipo'||d===role)return true;return ['Dirección','SuperAdmin','AdminTenant','Admin'].includes(role);}).reduce((s,c)=>s+(c.lecciones||[]).length,0);})(),
       hasClient360:ids.includes('cur_p_clientes'),hasInsurerDirectory:ids.includes('cur_p_aseg_cotiz'),
       brandOk:host.includes('Academia de Gravicentra')&&!host.includes('Orbit Academia')&&!host.includes('Academia Orbit 360'),
       routeSelector:!!document.getElementById('ruta-rol'),
@@ -316,8 +320,14 @@ try{
   need(academiaOper.automaticWrites===false&&academiaOper.catalogManagementDurable===false,'B2_AUTH_ACADEMIA_AUTOMATIC_WRITER_PRESENT');
   const academiaAsesor=await bounded(academiaSnapshot(page,'Asesor'),'B2_AUTH_ACADEMIA_ASESOR_TIMEOUT',25000);
   need(academiaAsesor.hasClient360&&academiaAsesor.hasInsurerDirectory&&academiaAsesor.brandOk&&academiaAsesor.routeSelector&&!academiaAsesor.forbiddenVisible,'B2_AUTH_ACADEMIA_ASESOR_INVALID:'+JSON.stringify(academiaAsesor));
-  evidence.academia={operativo:academiaOper,asesor:academiaAsesor,automaticWrites:false,pass:true};
-  milestone('ACADEMIA_ROLE_ROUTES',{operativo:academiaOper.catalogCount,asesor:academiaAsesor.catalogCount});
+  const privilegedRole=actor.roles.find(r=>['direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(norm(r)));
+  need(!!privilegedRole,'B2_AUTH_ACADEMIA_PRIVILEGED_ROLE_NOT_ASSIGNED');
+  const academiaPriv=await bounded(academiaSnapshot(page,privilegedRole),'B2_AUTH_ACADEMIA_PRIVILEGED_TIMEOUT',25000);
+  need(academiaPriv.hasClient360&&academiaPriv.hasInsurerDirectory&&academiaPriv.brandOk&&academiaPriv.routeSelector&&!academiaPriv.forbiddenVisible,'B2_AUTH_ACADEMIA_PRIVILEGED_INVALID:'+JSON.stringify(academiaPriv));
+  need(academiaPriv.visibleCourseCount===28&&academiaPriv.visibleLessonCount===102,'B2_AUTH_ACADEMIA_PRIVILEGED_COUNT_MISMATCH:'+JSON.stringify(academiaPriv));
+  need(academiaOper.visibleCourseCount===25&&academiaOper.visibleLessonCount===90,'B2_AUTH_ACADEMIA_OPERATIVO_COUNT_MISMATCH:'+JSON.stringify(academiaOper));
+  evidence.academia={operativo:academiaOper,asesor:academiaAsesor,privileged:academiaPriv,automaticWrites:false,pass:true};
+  milestone('ACADEMIA_ROLE_ROUTES',{operativo:academiaOper.visibleCourseCount,asesor:academiaAsesor.visibleCourseCount,privileged:academiaPriv.visibleCourseCount});
   await setRole(page,'Operativo');
   const visualAudit=await bounded(captureVisualAudit(page),'B2_AUTH_VISUAL_AUDIT_TIMEOUT',90000);
   evidence.visualAudit=visualAudit;
