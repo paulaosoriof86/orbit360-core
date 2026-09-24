@@ -19,6 +19,14 @@ need(files.client.includes("Usa Guardar cambios o Cancelar"),'B2_CLIENT_EDIT_BAC
 need(files.client.includes("Usa Crear cliente o Cancelar"),'B2_CLIENT_CREATE_BACKDROP_GUARD_MISSING');
 need(files.client.includes("await S().batchDurable"),'B2_CLIENT_DURABLE_SAVE_MISSING');
 need(files.bridge.includes('data-advisor'),'B2_POLICY_ADVISOR_SELECTOR_MISSING');
+need(files.bridge.includes('gi-form-section-title')&&files.bridge.includes('gi-policy-preview'),'B2_POLICY_EDITOR_VISUAL_HIERARCHY_MISSING');
+need(files.bridge.includes('data-client-search'),'B2_POLICY_CLIENT_SEARCH_MISSING');
+need(files.bridge.includes('syncInstallments'),'B2_POLICY_FREQUENCY_UI_SYNC_MISSING');
+need(files.engine.includes('function installmentsForFrequency'),'B2_POLICY_FREQUENCY_ENGINE_RULE_MISSING');
+need(files.detail.includes('gi-policy-hero')&&files.detail.includes('gi-detail-kpis'),'B2_POLICY_FULLPAGE_VISUAL_HIERARCHY_MISSING');
+need(files.detail.includes('gi-receipt-detail'),'B2_RECEIPT_DETAIL_VISUAL_HIERARCHY_MISSING');
+need(files.detail.includes('✏️ Editar póliza'),'B2_POLICY_EDIT_ACTION_MISSING');
+need(files.detail.includes('Completar vehículo'),'B2_MISSING_VEHICLE_REPAIR_ACTION_MISSING');
 for(const marker of ['data-vbrand','data-vline','data-vplate','data-vyear','data-vuse','data-vcolor','data-vvin','data-vchasis','data-vmotor'])need(files.bridge.includes(marker),'B2_VEHICLE_FIELD_MISSING:'+marker);
 need(files.bridge.includes("save.textContent = 'Guardando…'"),'B2_POLICY_SAVE_PENDING_STATE_MISSING');
 need(!files.bridge.includes("if (e.target === b) close();"),'B2_POLICY_BACKDROP_CLOSE_STILL_PRESENT');
@@ -29,7 +37,7 @@ need(files.issuanceBridge.includes("onclick = async"),'B2_ISSUANCE_UI_NOT_ASYNC'
 need(files.issuanceBridge.includes('await I.issueRequest'),'B2_ISSUANCE_UI_NOT_AWAITED');
 need(files.receiptsProjection.includes('Orbit.receiptsPortfolioProjection=Orbit.receiptsPortfolioProjectionV920'),'B2_RECEIPTS_CANONICAL_PROJECTION_MISSING');
 need(files.detail.includes('Editar vehículo'),'B2_VEHICLE_EDIT_ACTION_MISSING');
-for(const marker of ['core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260920-b2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/policy-receipts-v1199-bridge.js?v=20260920-b2','modules/policy-receipts-v1199-detail-guard.js?v=20260920-b2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+for(const marker of ['core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={
@@ -104,10 +112,13 @@ need(!!Orbit.policyReceipts,'B2_ENGINE_LOAD_FAILED');
 const create=await Orbit.policyReceipts.createPolicy({
   id:'pol-b2-a',numero:'B2-001',clienteId:'cli-b2',asesorId:'ase-b2',aseguradoraId:'asg-b2',pais:'GT',moneda:'GTQ',
   ramo:'Autos',subramo:'Auto individual',producto:'Auto individual',estado:'Vigente',vigenciaInicio:'2026-09-20',vigenciaFin:'2027-09-20',
-  frecuencia:'Semestral',formaPago:'Transferencia',conducto:'Cobro directo del intermediario',cuotas:2,primaNeta:1000,gastosEmision:50,otros:0,
+  frecuencia:'Semestral',formaPago:'Transferencia',conducto:'Cobro directo del intermediario',cuotas:10,primaNeta:1000,gastosEmision:50,otros:0,
   vehiculo:{marca:'Toyota',linea:'Corolla',placa:'B2TEST',anio:'2026',uso:'Particular',color:'Blanco',vin:'VIN-B2',chasis:'CH-B2',motor:'MO-B2'}
 },{motivo:'B2 controlled proof',operationId:'b2-create'});
 need(create.ok===true,'B2_POLICY_CREATE_FAILED:'+JSON.stringify(create.errors||[]));
+need(create.policy.cuotas===2,'B2_FIXED_FREQUENCY_DID_NOT_OVERRIDE_INCONSISTENT_RECEIPT_COUNT:'+create.policy.cuotas);
+const monthlyPrepared=Orbit.policyReceipts.preparePolicy({clienteId:'cli-b2',asesorId:'ase-b2',aseguradoraId:'asg-b2',pais:'GT',moneda:'GTQ',numero:'B2-MONTHLY',ramo:'Autos',producto:'Auto individual',estado:'Vigente',vigenciaInicio:'2026-09-20',vigenciaFin:'2027-09-20',frecuencia:'Mensual',cuotas:7,primaNeta:1000},null,'b2-monthly');
+need(monthlyPrepared.cuotas===7,'B2_MONTHLY_CUSTOM_RECEIPT_COUNT_NOT_PRESERVED:'+monthlyPrepared.cuotas);
 const createCollections=lastBatch.map(x=>x.collection);
 need(createCollections.includes('polizas'),'B2_POLICY_MUTATION_MISSING');
 need(createCollections.includes('vehiculos'),'B2_VEHICLE_INSERT_MISSING');
@@ -147,6 +158,9 @@ need(rows.cobros.length===0,'B2_RENEWAL_CREATED_CONFIRMED_COBRO');
 console.log('I65_B2_FUNCTIONAL=PASS');
 console.log('I65_B2_CLIENT_DURABLE=true');
 console.log('I65_B2_POLICY_ADVISOR=true');
+console.log('I65_B2_POLICY_VISUAL_HIERARCHY_SOURCE=true');
+console.log('I65_B2_FIXED_FREQUENCY_RECEIPTS=true');
+console.log('I65_B2_MONTHLY_CUSTOM_RECEIPTS=true');
 console.log('I65_B2_VEHICLE_CREATE_EDIT=true');
 console.log('I65_B2_RECEIPTS_PROJECTION=V920');
 console.log('I65_B2_RENEWAL_ASYNC_AWAIT=true');
