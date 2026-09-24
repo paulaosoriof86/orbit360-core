@@ -338,10 +338,36 @@ try{
   await setRole(page,'Operativo');
   await page.evaluate(()=>{location.hash='#/inicio';});
   await page.waitForFunction(()=>window.Orbit&&Orbit.domainConfig&&Orbit.domainConfig.status&&Orbit.domainConfig.status().available===true,{timeout:15000});
-  await bounded(page.evaluate(()=>Orbit.domainConfig.ensure('access')),'B2_AUTH_ACCESS_CONFIG_HYDRATE_TIMEOUT',20000);
-  await page.waitForFunction(()=>Orbit.access&&Orbit.access.puedeVerModulo&&Orbit.access.puedeVerModulo('cotizador')===true&&Orbit.access.puedeVerModulo('comparativo')===true,{timeout:15000});
-  const operativoModules=await page.evaluate(()=>({cotizador:Orbit.access.puedeVerModulo('cotizador'),comparativo:Orbit.access.puedeVerModulo('comparativo'),configured:Orbit.domainConfig.peek('access')?.rolePermissions?.Operativo||null,sidebar:Array.from(document.querySelectorAll('#sidebar [data-route]')).map(x=>x.getAttribute('data-route'))}));
-  need(operativoModules.cotizador===true&&operativoModules.comparativo===true&&operativoModules.sidebar.includes('cotizador')&&operativoModules.sidebar.includes('comparativo'),'B2_AUTH_OPERATIVO_CONFIGURED_MODULES_NOT_VISIBLE:'+JSON.stringify(operativoModules));
+  const accessHydration=await bounded(page.evaluate(()=>Orbit.domainConfig.ensure('access')),'B2_AUTH_ACCESS_CONFIG_HYDRATE_TIMEOUT',20000);
+  const operativoModules=await page.evaluate(hydration=>{
+    const role=String(Orbit.session?.rol?.()||''),advisor=Orbit.access?.actorAdvisor?.()||{},cfg=Orbit.domainConfig?.peek?.('access')||{},tenant=Orbit.tenant?.get?.()||{},def=Orbit.ROLES?.[role]||{};
+    const inspect=m=>({
+      visible:!!Orbit.access?.puedeVerModulo?.(m),
+      matrix:Orbit.access?.matrixPermission?.(m,'ver'),
+      configured:cfg?.rolePermissions?.[role]?.[m]||null,
+      tenantActive:Orbit.tenant?.isActive?!!Orbit.tenant.isActive(m):null,
+      base:Array.isArray(def.modulos)?def.modulos.includes(m):null,
+      sessionCanSee:Orbit.session?.canSee?!!Orbit.session.canSee(m):null,
+      extras:[].concat(advisor.modulesExtra||advisor.modulosExtra||advisor.modulosExtras||[]).includes(m),
+      restricted:[].concat(advisor.modulesRestricted||advisor.modulosRestringidos||advisor.restriccionesModulos||[]).includes(m)
+    });
+    return{
+      hydration,
+      role,
+      assigned:[].concat(Orbit.session?.rolesAsignados?.()||[]),
+      domainStatus:Orbit.domainConfig?.status?.()||null,
+      configSchema:cfg.schemaVersion||'',
+      configRoleKeys:Object.keys(cfg.rolePermissions||{}),
+      configuredRole:cfg.rolePermissions?.[role]||null,
+      roleScope:cfg.roleScopes?.[role]||null,
+      tenantDomainAccess:tenant?.domainConfig?.access||null,
+      cotizador:inspect('cotizador'),
+      comparativo:inspect('comparativo'),
+      sidebar:Array.from(document.querySelectorAll('#sidebar [data-route]')).map(x=>x.getAttribute('data-route'))
+    };
+  },accessHydration);
+  milestone('OPERATIVO_ACCESS_AUTHORITY',operativoModules);
+  need(operativoModules.cotizador.visible===true&&operativoModules.comparativo.visible===true&&operativoModules.sidebar.includes('cotizador')&&operativoModules.sidebar.includes('comparativo'),'B2_AUTH_OPERATIVO_CONFIGURED_MODULES_NOT_VISIBLE:'+JSON.stringify(operativoModules));
   const oper=await bounded(scopeSnapshot(page),'B2_AUTH_SCOPE_OPERATIVO_TIMEOUT',20000);
   milestone('SCOPE_OPERATIVO',{counts:oper.counts});
   await setRole(page,'Asesor');
