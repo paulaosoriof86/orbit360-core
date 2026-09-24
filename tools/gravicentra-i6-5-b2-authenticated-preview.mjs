@@ -683,8 +683,7 @@ try{
   need(!!insurerCreated,'B2_AUTH_INSURER_CREATE_NOT_DURABLE');evidence.writes.synthetic+=1;
   await page.waitForFunction(id=>!!(Orbit.store&&Orbit.store.get('aseguradoras',id)),insurerId,{timeout:15000});
   await page.evaluate(()=>{ if(window.Orbit?.router?.go) Orbit.router.go('aseguradoras'); else location.hash='#/aseguradoras'; });
-  await page.waitForFunction(()=>Orbit.route?.key==='aseguradoras'&&!!document.querySelector('#host .page'),null,{timeout:10000});
-  await page.waitForTimeout(500);
+  await page.waitForFunction(()=>Orbit.route?.key==='aseguradoras'&&!!document.querySelector('#asg-q'),null,{timeout:10000});
   await page.evaluate(id=>Orbit.modules.aseguradoras.ficha(id),insurerId);
   await page.waitForSelector('#asg-ficha #af-editar',{timeout:10000});
   await page.click('#asg-ficha #af-editar');
@@ -711,8 +710,7 @@ try{
     return !!a&&a.logo===logo&&!!p;
   },{id:insurerId,logo:logoUrl,ref:state.insurerCredentialRef},{timeout:30000});
   await page.evaluate(()=>{ if(window.Orbit?.router?.go) Orbit.router.go('aseguradoras'); else location.hash='#/aseguradoras'; });
-  await page.waitForFunction(()=>Orbit.route?.key==='aseguradoras'&&!!document.querySelector('#host .page'),null,{timeout:10000});
-  await page.waitForTimeout(500);
+  await page.waitForFunction(()=>Orbit.route?.key==='aseguradoras'&&!!document.querySelector('#asg-q'),null,{timeout:10000});
   await page.evaluate(id=>Orbit.modules.aseguradoras.ficha(id),insurerId);
   await page.waitForSelector('#asg-ficha .asg-logo img',{timeout:10000});
   need((await page.locator('#asg-ficha .asg-logo img').getAttribute('src'))===logoUrl,'B2_AUTH_INSURER_LOGO_REFRESH_MISMATCH');

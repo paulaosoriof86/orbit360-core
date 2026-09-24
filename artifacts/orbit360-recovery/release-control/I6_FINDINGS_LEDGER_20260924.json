@@ -19,11 +19,26 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 47,
+    "total": 48,
     "b2HumanFindings": 13,
-    "currentBlocking": 19
+    "currentBlocking": 20
   },
   "findings": [
+    {
+      "id": "B2-QA-20-ASEGURADORAS-HOST",
+      "block": "B2",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36073128460",
+      "finding": "HARNESS_GENERIC_PAGE_WAIT_CAN_PASS_BEFORE_ASEGURADORAS_RENDER_BINDS_MODULE_HOST",
+      "owner": [
+        "tools/gravicentra-i6-5-b2-authenticated-preview.mjs"
+      ],
+      "rootCause": "Router transition is asynchronous. Waiting for generic #host .page can match the stale Cliente360 page; Aseguradoras ficha() then runs before Aseguradoras.render(host) has assigned its module-scoped host.",
+      "remediation": "Wait for #asg-q, a route-specific marker emitted only by Aseguradoras.render(host), before invoking ficha() initially and after reload.",
+      "status": "HARNESS_FIXED_PENDING_RERUN",
+      "blocking": true,
+      "closureProof": "Exact same Preview completes insurer logo/credential proof and all later renewal/cleanup assertions.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "B2-R19-ACCESS-PHYSICAL-SCOPE-OMISSION",
       "block": "B2",

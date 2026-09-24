@@ -1450,36 +1450,20 @@
     "PAULA_VISUAL_NO_DUPLICATE_VEHICLE_ACTIONS"
   ],
   "lastAuthenticatedFailure": {
-    "runId": 36071653541,
-    "status": "FAIL_BEFORE_SYNTHETIC_WRITES",
-    "finding": "OPERATIVO_CONFIGURED_MODULES_NOT_VISIBLE",
-    "demonstratedRootCause": "PROTECTED_ACCESS_CONFIG_ROLE_PERMISSIONS_EMPTY",
-    "hydrationSource": "protected",
-    "hydrationSyncPending": false,
-    "rolePermissionsRoleKeys": [],
-    "roleScopesPreserved": {
-      "Operativo": "all",
-      "Asesor": "own"
-    },
-    "cotizador": {
-      "matrix": null,
-      "tenantActive": true,
-      "base": false,
-      "sessionCanSee": false,
-      "extras": false,
-      "restricted": false
-    },
-    "comparativo": {
-      "matrix": null,
-      "tenantActive": true,
-      "base": false,
-      "sessionCanSee": false,
-      "extras": false,
-      "restricted": false
-    },
-    "syntheticWrites": 0,
-    "cleanupWrites": 0,
-    "liveHostingPromotion": false
+    "runId": 36073128460,
+    "classification": "HARNESS_ROUTE_RACE_NOT_PRODUCT_REGRESSION",
+    "cause": "GENERIC_HOST_PAGE_MARKER_MATCHED_STALE_CLIENTE360_BEFORE_ASEGURADORAS_RENDER",
+    "passedBeforeFailure": [
+      "ACCESS_RECOVERY_PASS",
+      "OPERATIVO_COTIZADOR_COMPARATIVO_PASS",
+      "R2_UI_DISCRIMINANTS_PASS",
+      "POLICY_EDIT_RELOAD_PASS",
+      "VEHICLE_EDIT_RELOAD_PASS"
+    ],
+    "cleanupDeleted": 13,
+    "productRegressionDeclared": false,
+    "liveHostingTouched": false,
+    "reimport": false
   },
   "accessConfigRecoveryState": "RETRY_AUTHORIZED_AFTER_PHYSICAL_SCOPE_OMISSION_DEMONSTRATED",
   "lastAccessRecoveryAttempt": {
