@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "OPEN_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
   "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -66,12 +66,12 @@
   },
   "acceptance": {
     "clientCreateEditRefreshReadback": true,
-    "policyCreateEditRefreshReadback": true,
+    "policyCreateEditRefreshReadback": "TECHNICAL_SYNTHETIC_PASS_HISTORICAL_HUMAN_EXISTING_EDIT_REGRESSION_OPEN",
     "sellerAdvisorCreateEdit": true,
     "renewalReceiptsPortfolioZeroCobro": true,
-    "vehicleCreateEdit": true,
-    "insurerStableEdit": "PRESERVED_CURRENT_OWNER_PENDING_VISUAL",
-    "singleReceiptProjection": true,
+    "vehicleCreateEdit": "TECHNICAL_SYNTHETIC_PASS_HISTORICAL_HUMAN_UI_RELATION_REGRESSION_OPEN",
+    "insurerStableEdit": "B1_PRESERVATION_NOT_DEMONSTRATED_CREDENTIAL_AND_LOGO_REGRESSION_OPEN",
+    "singleReceiptProjection": "TECHNICAL_PASS_HISTORICAL_VISIBLE_DOUBLE_RENDER_REGRESSION_OPEN",
     "dirtyFormsProtected": true,
     "dashboardRealityReconciled": false,
     "previewExact": true,
@@ -1245,7 +1245,7 @@
     "noWritesDuringFailedVisualCapture": true
   },
   "assistantVisualAudit": {
-    "status": "PASS_READY_FOR_PAULA_VISUAL",
+    "status": "PASS_HISTORICAL_SUPERSEDED_BY_PAULA_VISUAL_REJECTION",
     "auditedAt": "2026-09-24",
     "evidenceRunId": 35964954339,
     "evidenceArtifactId": 10793139076,
@@ -1276,8 +1276,23 @@
       "responsiveApplicable": true
     },
     "knownTechnicalErrors": [],
-    "outstandingBlockersForHumanReview": 0,
+    "outstandingBlockersForHumanReview": 13,
     "paulaVisualAccepted": false,
+    "livePromoted": false,
+    "humanReviewSupersedesReadiness": true
+  },
+  "paulaVisualReview20260924": {
+    "decision": "REJECTED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
+    "receiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
+    "rejectedPreviewRunId": 35964339112,
+    "rejectedSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
+    "technicalProofPreserved": true,
+    "authenticatedProofPreserved": true,
+    "cleanupPreserved": true,
+    "outstandingFindings": 13,
+    "b2Status": "OPEN",
+    "b3Status": "NOT_STARTED",
     "livePromoted": false
   }
 }
