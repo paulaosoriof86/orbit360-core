@@ -210,7 +210,7 @@
     "lastFailure": "B2_AUTH_CLIENT_CREATE_SAVE_DID_NOT_CONFIRM"
   },
   "orphanSyntheticCleanup": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PASS",
     "orphanRunId": 35953423069,
     "cleanupScript": "tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs",
     "markerSet": {
@@ -225,6 +225,34 @@
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
       "emailSendAuthorized": false
+    },
+    "runId": 35953693091,
+    "before": {
+      "clients": [],
+      "policies": [],
+      "counts": {
+        "actividades": 0,
+        "gestiones": 0,
+        "cobros": 0,
+        "carteraPrimas": 0,
+        "recibosEsperados": 0,
+        "vehiculos": 0,
+        "polizas": 0
+      }
+    },
+    "deleted": {
+      "actividades": 0,
+      "gestiones": 0,
+      "cobros": 0,
+      "carteraPrimas": 0,
+      "recibosEsperados": 0,
+      "vehiculos": 0,
+      "polizas": 0,
+      "clientes": 0
+    },
+    "after": {
+      "clients": 0,
+      "policies": 0
     }
   },
   "orphanSyntheticCleanupHistory": [
