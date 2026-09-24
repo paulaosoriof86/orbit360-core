@@ -1,0 +1,135 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_REJECTION_ROOT_CAUSE_MATRIX_V1",
+  "block": "B2",
+  "rejectedRunId": 35964339112,
+  "rejectedSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
+  "matrixState": "SOURCE_REMEDIATION_IN_PROGRESS_RUNTIME_PROOF_PENDING",
+  "sourceHeadAtFreeze": "11a634fe23ba713225af8335f75edfbcd4330396",
+  "findings": [
+    {
+      "id": "B2-H01",
+      "finding": "Policy body typography too heavy",
+      "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "rootCause": "Inline field values used font-weight 650 almost universally and premium rows used generalized <b>, flattening hierarchy.",
+      "mutation": "Body values reduced to medium weight; premium rows use ordinary values with strong total only; title/KPI hierarchy preserved.",
+      "proofRequired": "Authenticated side-by-side desktop/mobile Cliente360-Aseguradoras-Poliza-Vehiculo-Recibo visual audit.",
+      "status": "SOURCE_FIXED_RUNTIME_VISUAL_PENDING"
+    },
+    {
+      "id": "B2-H02",
+      "finding": "Base gravable empty noise",
+      "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js + core/policy-receipts-engine.js",
+      "rootCause": "Canonical model supports taxable base, but summary rendered the missing value as a completion warning and used ambiguous label.",
+      "mutation": "Model retained; UI renders 'Base imponible para IVA' only when authoritative value exists.",
+      "proofRequired": "Policy with base and policy without base; no invented value and no empty summary noise.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING"
+    },
+    {
+      "id": "B2-H03",
+      "finding": "Forma de pago and Conducto duplicated",
+      "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "rootCause": "Read normalizer cross-fell back formaPago<-conductoPago and conducto<-formaPago; I6.4 source contract imports them separately.",
+      "mutation": "Cross-fallback removed. formaPago reads formaPago/metodoPago; conducto reads conducto/conductoPago; frequency stays separate.",
+      "proofRequired": "Runtime records with distinct values and legacy missing values; write/readback stays distinct.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING"
+    },
+    {
+      "id": "B2-H04",
+      "finding": "Existing policy edit did not persist in human flow",
+      "owner": "policy-receipts-v1199-bridge.js + policy-receipts-engine.js + authenticated harness",
+      "rootCause": "Prior authenticated PASS never edited a policy field; it edited only vehicle color. Engine also required motivo only for a subset of critical fields, while UI declared motive mandatory. Exact human-field failure remains runtime-discriminant pending.",
+      "mutation": "Every existing-policy update now requires motive; UI validates clearly before submit; authenticated proof now edits sumaAsegurada, asserts empty-motive zero write, valid-motive backend readback and reload.",
+      "proofRequired": "Synthetic existing policy same ID: empty motive block -> valid save -> Firestore readback -> reload.",
+      "status": "SOURCE_FIXED_DISCRIMINANT_RUNTIME_PENDING"
+    },
+    {
+      "id": "B2-H05",
+      "finding": "Policy/vehicle relationship ambiguous for reported client",
+      "owner": "canonical Firestore read models + relationship audit tool",
+      "rootCause": "Not assumed. Human evidence can represent distinct historical/current contracts plus an incomplete active vehicle link; physical IDs must decide.",
+      "mutation": "No data mutation. Read-only forensic script added for exact client and reported policy numbers.",
+      "proofRequired": "Artifact evidence with hashed IDs, states, links, receipt/portfolio counts and classification; no merge/delete.",
+      "status": "READONLY_RUNTIME_AUDIT_PENDING"
+    },
+    {
+      "id": "B2-H06",
+      "finding": "No real Edit vehicle action",
+      "owner": "policy-receipts-v1199-detail-guard.js + policy-receipts-v1199-bridge.js + cliente360.js",
+      "rootCause": "Buttons labeled 'Editar vehículo' called editarPoliza(polizaId); no dedicated vehicle editor owner existed.",
+      "mutation": "Dedicated openVehicleForm(vehicleId) added; actions call editarVehiculo(vehicleId); engine performs same-ID vehicle update through policy atomic write plan.",
+      "proofRequired": "Authenticated edit -> exact vehicle doc readback -> one vehicle for policy -> reload -> policy/client link preserved.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING"
+    },
+    {
+      "id": "B2-H07",
+      "finding": "Visible undefined on vehicle UI",
+      "owner": "cliente360.js + policy-receipts-v1199-detail-guard.js",
+      "rootCause": "Legacy row/identity renderers allowed literal string 'undefined'/'null' to pass through.",
+      "mutation": "Vehicle labels and row values normalize null/undefined literals to neutral display values; identity concatenation filters invalid literals.",
+      "proofRequired": "Authenticated vehicle cards/detail no literal undefined/null.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING"
+    },
+    {
+      "id": "B2-H08",
+      "finding": "Receipts partial render then full list",
+      "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "rootCause": "Cliente360 rendered legacy receipts first; canonical bridge replaced it in setTimeout(0), creating a visible partial-state race.",
+      "mutation": "Canonical patch/render now executes synchronously after the original tab/render handler; canonical owner keeps stable loading state until both receipt and portfolio collections are server-confirmed.",
+      "proofRequired": "Authenticated cold route/tab/reload; no partial row count before canonical dataset.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING"
+    },
+    {
+      "id": "B2-H09",
+      "finding": "Receipt detail technical language/harsh hierarchy/duplicate status",
+      "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "rootCause": "UI printed raw provenance fields/codes and separate state/reconciliation badges even when semantically identical; hero used unrelated dark treatment.",
+      "mutation": "Soft mature-family hero; medium body typography; deduplicated badges; raw authority/match codes suppressed; operational labels for update date/document/match.",
+      "proofRequired": "Authenticated receipt detail desktop/mobile; no release/gate/validator/internal codes or duplicate payment status.",
+      "status": "SOURCE_FIXED_RUNTIME_VISUAL_PENDING"
+    },
+    {
+      "id": "B2-H10",
+      "finding": "Insurer logo not administrable",
+      "owner": "modules/aseguradoras.js",
+      "rootCause": "Ficha rendered a.logo, but edit form/snapshot/diff did not expose or track logo.",
+      "mutation": "Logo added to editable/diff contract as HTTPS URL only; Data URL/browser persistence is rejected; readback/reload proof added.",
+      "proofRequired": "Synthetic insurer logo URL save -> canonical backend readback -> reload -> image rendered.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING"
+    },
+    {
+      "id": "B2-H11",
+      "finding": "Insurer password update failed",
+      "owner": "functions/product-insurer-credentials.js + product-insurer-credential-provider-p0.js + aseguradoras.js",
+      "rootCause": "Backend MANAGE_ROLES omitted Operativo although approved policy grants it; Preview callable explicitly rejected credential import.",
+      "mutation": "Operativo restored to server manage roles. Preview writes use isolated Secret Manager vault overlay, production vault remains unchanged. Preview-only synthetic cleanup added. Workflow deploys only Preview callable.",
+      "proofRequired": "Authenticated Operativo synthetic insurer password update -> credentialRef readback -> refresh/reveal hash match -> Preview secret cleanup; no plaintext/log/artifact.",
+      "status": "SOURCE_FIXED_RUNTIME_SECURITY_PENDING"
+    },
+    {
+      "id": "B2-H12",
+      "finding": "Academia Dirección showed 25 courses / 90 lessons",
+      "owner": "modules/academia.js",
+      "rootCause": "Session owner returns canonical role SuperAdmin while visual label is Dirección; Academia privileged filter recognized Dirección/Admin only. SuperAdmin therefore received exactly the Operativo subset.",
+      "mutation": "Privileged filter now recognizes Dirección, SuperAdmin, AdminTenant and Admin consistently.",
+      "proofRequired": "Authenticated privileged role and Operativo/Asesor counts/routes; CRM/Cliente360 and Aseguradoras courses present; no technical/LAB visible to normal roles.",
+      "status": "SOURCE_FIXED_RUNTIME_PENDING"
+    },
+    {
+      "id": "B2-H13",
+      "finding": "Cross-module visual family inconsistent",
+      "owner": "detail guard + receipt projection + Cliente360 + Aseguradoras",
+      "rootCause": "Policy/receipt/vehicle surfaces used independent inline weights and receipt-specific dark hero instead of mature family hierarchy.",
+      "mutation": "Targeted typography/hero/value-weight changes applied without reverting macro policy hierarchy.",
+      "proofRequired": "Own visual audit desktop/mobile across Cliente360, Aseguradoras, Policy, Vehicle, Receipt, Academia; new Paula review afterward.",
+      "status": "SOURCE_FIXED_RUNTIME_VISUAL_PENDING"
+    }
+  ],
+  "invariant": {
+    "noB3": true,
+    "noLive": true,
+    "noReimport": true,
+    "noOperationalDataWritesBeforeSyntheticProof": true,
+    "preserveHistoricalTechnicalPass": true,
+    "newCandidateRequiredAfterSourceChange": true
+  }
+}
