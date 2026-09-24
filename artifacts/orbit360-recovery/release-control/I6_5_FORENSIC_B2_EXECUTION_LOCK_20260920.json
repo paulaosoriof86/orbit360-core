@@ -1,8 +1,8 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
-  "recordedAt": "2026-09-20T19:55:00-06:00",
+  "status": "CANDIDATE_PENDING_PREVIEW",
+  "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "parentB1Preview": {
@@ -64,7 +64,8 @@
     "dashboardRealityReconciled": false,
     "previewExact": false,
     "functionalPass": false,
-    "paulaVisual": false
+    "paulaVisual": false,
+    "approvedVisualHierarchy": false
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "REQUIRED_IN_FIRST_B2_PREVIEW_BEFORE_B3",
@@ -106,7 +107,7 @@
     "noHardcodedIdentities": true
   },
   "candidate": {
-    "status": "REAPPLIED_PENDING_SINGLE_BUILD_PREVIEW",
+    "status": "B2_VISUAL_CORRECTION_PENDING_PREVIEW",
     "sourceBeforeGovernanceSeal": "84870177ecacd4776ba844495afa99b1b2b10a6f",
     "productFixCommits": [
       "6af01bd02686ef7e756baefc3c5c009c99f491b9",
@@ -129,22 +130,15 @@
     "preservesB1": true,
     "preservedSourceSha": "629ff964a0f28e912c826ff7da05f1a145ed5a18",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
-    "preservationCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f"
+    "preservationCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f",
+    "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "9eccb654e3de94d9b75d81d7b55475a3c8f0bb95",
-    "buildId": "gi-i65-b2-9eccb654e3de-57f234755dc1",
-    "channelId": "gi-i65-b2-35929105665",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-35929105665-pezi28fi.web.app",
-    "runId": 35929105665,
-    "artifactId": 10780635506,
-    "artifactDigest": "f0ec8d86c4efad54dbd9ebe086ec836ecf3f06da8ee3a96fcb8883ba66ad07bb",
-    "exactReadback": true,
-    "functionalPass": true,
+    "status": "PENDING_CORRECTED_PREVIEW",
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "WAITING_FOR_NEW_PREVIEW_BINDING",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "629ff964a0f28e912c826ff7da05f1a145ed5a18",
     "exactPreviewBuildId": "gi-i65-b2-629ff964a0f2-57f234755dc1",
@@ -415,5 +409,52 @@
       "maxExpectedRuntimeMinutes": 10,
       "timeoutFailureMayNotBeDeclaredProductFailure": true
     }
-  ]
+  ],
+  "visualReview20260923": {
+    "status": "REJECTED_REMEDIATION_AUTHORIZED",
+    "finding": "POLICY_RECEIPT_MODAL_HIERARCHY_NOT_IMPLEMENTED_IN_REJECTED_PREVIEW",
+    "clarification": "Functional enrichment is preserved, but it is not accepted as visual hierarchy work. Policy, vehicle, receipt and policy create/edit surfaces must use the mature Gravicentra visual family already visible in Cliente 360 and Aseguradoras: softer hierarchy, iconography, color accents, clear headers, KPI/action bands and readable sections.",
+    "previousPreview": {
+      "sourceSha": "9eccb654e3de94d9b75d81d7b55475a3c8f0bb95",
+      "buildId": "gi-i65-b2-9eccb654e3de-57f234755dc1",
+      "channelId": "gi-i65-b2-35929105665",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-35929105665-pezi28fi.web.app",
+      "runId": 35929105665,
+      "artifactId": 10780635506,
+      "artifactDigest": "f0ec8d86c4efad54dbd9ebe086ec836ecf3f06da8ee3a96fcb8883ba66ad07bb",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false
+    },
+    "blockingCorrections": [
+      "REAL_VISUAL_HIERARCHY_POLICY_FULLPAGE",
+      "REAL_VISUAL_HIERARCHY_VEHICLE_FULLPAGE",
+      "REAL_VISUAL_HIERARCHY_RECEIPT_DETAIL",
+      "REAL_VISUAL_HIERARCHY_POLICY_CREATE_EDIT_MODAL",
+      "VISIBLE_POLICY_EDIT_ACTION",
+      "VISIBLE_VEHICLE_EDIT_ACTION",
+      "MISSING_VEHICLE_INTEGRITY_CTA",
+      "POLICY_CLIENT_SEARCH",
+      "FIX_HEADER_IMPORT_AND_CLOSE_CONTRAST",
+      "FIXED_FREQUENCY_CANONICAL_RECEIPT_COUNT_WITH_MONTHLY_CUSTOM",
+      "COUNTRY_VAT_GT12_CO19_IN_POLICY_CAPTURE",
+      "CLIENT_CREATE_BACKDROP_REGRESSION_RETEST",
+      "POLICY_BACKDROP_PROTECTION_RETEST",
+      "PRESERVE_DURABLE_INSURER_EDIT",
+      "PRESERVE_CLIENT_ADVISOR_AND_DRIVE_DURABLE_READBACK"
+    ]
+  },
+  "previousRejectedPreview": {
+    "sourceSha": "9eccb654e3de94d9b75d81d7b55475a3c8f0bb95",
+    "buildId": "gi-i65-b2-9eccb654e3de-57f234755dc1",
+    "channelId": "gi-i65-b2-35929105665",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-35929105665-pezi28fi.web.app",
+    "runId": 35929105665,
+    "artifactId": 10780635506,
+    "artifactDigest": "f0ec8d86c4efad54dbd9ebe086ec836ecf3f06da8ee3a96fcb8883ba66ad07bb",
+    "exactReadback": true,
+    "functionalPass": true,
+    "livePromoted": false
+  },
+  "postproductionFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923.json"
 }
