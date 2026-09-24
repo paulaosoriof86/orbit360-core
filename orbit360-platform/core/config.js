@@ -87,9 +87,9 @@ Orbit.ROLES = {
   'Marketing':   { nivel: 2, desc: 'Marketing, Academia, Reportes, CRM básico.', color: '#6b4ea0',
     modulos: ['inicio','cronograma','marketing','academia','cliente360','correo','reportes'] },
   'Operativo':   { nivel: 2, desc: 'Ops + CRM operativo. Sin Finanzas ni Config.', color: '#0f766e',
-    modulos: ['inicio','cronograma','ops','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo'] },
+    modulos: ['inicio','cronograma','ops','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo','academia'] },
   'Asesor':      { nivel: 2, desc: 'Su cartera; ve solo su comisión. Sin Ops ni Config.', color: '#2563a8',
-    modulos: ['inicio','cronograma','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','cotizador','correo'] },
+    modulos: ['inicio','cronograma','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','cotizador','correo','academia'] },
   'Asistente':   { nivel: 1, desc: 'Captura y gestión básica. Sin comisiones ni finanzas.', color: '#7a818e',
     modulos: ['inicio','cronograma','cliente360','polizas','cobros','renovaciones','historial','importar','correo'] }
 };
@@ -332,7 +332,7 @@ Orbit.NAV = [
   {
     type: 'group', label: 'Gestión y recursos', open: false, items: [
       { route: 'ia', icon: '🤖', label: 'Orbit IA', estado: 'beta' },
-      { route: 'academia', icon: '🎓', label: 'Orbit Academia', estado: 'beta' }
+      { route: 'academia', icon: '🎓', label: 'Academia', estado: 'beta' }
     ]
   },
   {
@@ -366,7 +366,7 @@ Orbit.MODULE_META = {
   comparativo: { icon: '📋', title: 'Comparativo IA', estado: 'road', desc: 'Extrae coberturas de PDFs y genera una recomendación consultiva — mucho más que una tabla.', scope: ['Lectura de coberturas desde PDF (IA)', 'Tabla visual lado a lado', 'Recomendación consultiva argumentada', 'Imprimir / enviar por WhatsApp'] },
   aseguradoras: { icon: '🏢', title: 'Orbit Aseguradoras', estado: 'beta', desc: 'Directorio + repositorio por aseguradora (contactos, logos, cotizadores, clausulados, pólizas ejemplo) que además alimenta a Orbit IA.', scope: ['Directorio con contactos y accesos', 'Repositorio de clausulados y cotizadores', 'Pólizas ejemplo por ramo', 'Fuente de conocimiento para Orbit IA'] },
   ia: { icon: '🤖', title: 'Orbit IA', estado: 'beta', desc: 'Un cerebro, tres usuarios: asesora al equipo interno, a los asesores (mejores argumentos de venta) y a los clientes, usando el repositorio y la biblioteca de conocimiento.', scope: ['Asesoría según tipo de usuario', 'Argumentos de venta por propuesta', 'Responde sobre una propuesta puntual', 'Usa repositorio de aseguradoras + biblioteca'] },
-  academia: { icon: '🎓', title: 'Orbit Academia', estado: 'road', desc: 'Centro de formación: certificación, inducción, capacitación técnica/comercial/blandas y piezas comerciales.', scope: ['Rutas de certificación e inducción', 'Capacitación técnica, comercial y habilidades blandas', 'Biblioteca de piezas comerciales', 'Progreso por asesor'] },
+  academia: { icon: '🎓', title: 'Academia de Gravicentra', estado: 'road', desc: 'Centro de formación: certificación, inducción, capacitación técnica/comercial/blandas y piezas comerciales.', scope: ['Rutas de certificación e inducción', 'Capacitación técnica, comercial y habilidades blandas', 'Biblioteca de piezas comerciales', 'Progreso por asesor'] },
   insights: { icon: '📊', title: 'Orbit Insights', estado: 'beta', desc: 'Analítica integral en 9 vistas sobre los datos del CRM.', scope: ['Resumen · Metas · Cumplimiento', 'Recaudo · Cartera · Devengado', 'Top clientes · Vencidas s/renovar · Análisis crítico', 'Se alimenta de Cliente 360, Cobros y Comisiones'] },
   notificaciones: { icon: '💬', title: 'Notificaciones WhatsApp', estado: 'road', desc: 'Mensajería transaccional y de seguimiento por WhatsApp, automatizada por cadencia.', scope: ['Recordatorios de pago y renovación', 'Cadencias automáticas de seguimiento', 'Encuestas de satisfacción', 'Plantillas configurables'] },
   marketing: { icon: '📣', title: 'Orbit Marketing', estado: 'beta', desc: 'Calendario real (cada día con sus piezas), creación/automatización de contenidos y segmentación desde la cartera real → campañas inteligentes.', scope: ['Calendario por día con piezas', 'Automatización de creación de piezas', 'Segmentación desde info real de clientes', 'Campañas inteligentes medibles'] },

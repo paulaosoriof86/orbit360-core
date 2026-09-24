@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -43,7 +43,8 @@
       "orbit360-platform/data/academia-product-catalog-v1.js",
       "orbit360-platform/core/academia-product-catalog-p0.js",
       "orbit360-platform/core/product-app-p0.js",
-      "orbit360-platform/modules/academia.js"
+      "orbit360-platform/modules/academia.js",
+      "orbit360-platform/core/config.js"
     ],
     "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
@@ -144,24 +145,19 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "8a83f87b9b0593e06f07629e9a8a721c1a7380dd",
-    "buildId": "gi-i65-b2-8a83f87b9b05-57f234755dc1",
-    "channelId": "gi-i65-b2-35950719925",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-35950719925-5ihksbf7.web.app",
-    "runId": 35950719925,
-    "artifactId": 10788538229,
-    "artifactDigest": "d553de9b7859579bf24b8bf29f182ec222441fcfbf36d03e9055def0f8ab5d84",
-    "exactReadback": true,
-    "functionalPass": true,
+    "status": "PENDING_NEW_PREVIEW_AFTER_ACADEMIA_ROLE_ACCESS_SOURCE_CHANGE",
+    "supersedesRunId": 35950719925,
+    "exactReadback": false,
+    "functionalPass": false,
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "8a83f87b9b0593e06f07629e9a8a721c1a7380dd",
-    "exactPreviewBuildId": "gi-i65-b2-8a83f87b9b05-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35950719925-5ihksbf7.web.app",
-    "exactPreviewArtifactId": 10788538229,
+    "exactPreviewSourceSha": "",
+    "exactPreviewBuildId": "",
+    "exactPreviewUrl": "",
+    "exactPreviewArtifactId": null,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
@@ -204,8 +200,8 @@
     },
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
-    "lastFailedRunId": 35943086864,
-    "lastFailure": "B2_AUTH_CLIENT_CREATE_BACKDROP_CLOSED"
+    "lastFailedRunId": 35951302733,
+    "lastFailure": "B2_AUTH_ACADEMIA_ACCESS_DENIED"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -389,6 +385,19 @@
       "functionalPass": true,
       "livePromoted": false,
       "status": "SUPERSEDED_BY_B2_ACADEMIA_SOURCE_CHANGE_AND_ACTIVE_CLIENT_OWNER_FIX"
+    },
+    {
+      "sourceSha": "8a83f87b9b0593e06f07629e9a8a721c1a7380dd",
+      "buildId": "gi-i65-b2-8a83f87b9b05-57f234755dc1",
+      "channelId": "gi-i65-b2-35950719925",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-35950719925-5ihksbf7.web.app",
+      "runId": 35950719925,
+      "artifactId": 10788538229,
+      "artifactDigest": "d553de9b7859579bf24b8bf29f182ec222441fcfbf36d03e9055def0f8ab5d84",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false,
+      "status": "SUPERSEDED_BY_ACADEMIA_ROLE_ACCESS_SOURCE_FIX"
     }
   ],
   "previousAuthenticatedPreviewProofHistory": [
@@ -456,6 +465,33 @@
         "deleted": 0,
         "orphanExpected": false
       }
+    },
+    {
+      "status": "FAIL",
+      "runId": 35951302733,
+      "exactPreviewSourceSha": "8a83f87b9b0593e06f07629e9a8a721c1a7380dd",
+      "exactPreviewBuildId": "gi-i65-b2-8a83f87b9b05-57f234755dc1",
+      "exactPreviewArtifactId": 10788538229,
+      "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35950719925-5ihksbf7.web.app",
+      "failure": "B2_AUTH_ACADEMIA_ACCESS_DENIED",
+      "classification": "PRODUCT_ROLE_COMPOSITION_REGRESSION",
+      "evidence": {
+        "role": "Operativo",
+        "tenantActive": true,
+        "moduleLoaded": true,
+        "catalogReady": true,
+        "catalogCount": 29,
+        "matrixView": null,
+        "dataScope": "all",
+        "moduleVisible": false,
+        "canView": false,
+        "sessionCanSee": false
+      },
+      "cleanup": {
+        "syntheticCreated": false,
+        "deleted": 0,
+        "orphanExpected": false
+      }
     }
   ],
   "visualReview20260923": {
@@ -506,7 +542,7 @@
   },
   "postproductionFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923.json",
   "academiaRemediation": {
-    "status": "SOURCE_FIX_READY_FOR_NEW_PREVIEW",
+    "status": "ROLE_ACCESS_SOURCE_FIX_READY_FOR_NEW_PREVIEW",
     "classification": "CODE_DEFECT_RELEASE_DEPLOY",
     "rootCause": "ACADEMIA_MODULE_LOADED_BUT_CURSOS_NOT_COMPOSED_OR_HYDRATED_WHILE_LAB_WRITERS_SEEDS_WERE_CORRECTLY_EXCLUDED",
     "moduleOwner": "orbit360-platform/modules/academia.js",
@@ -535,7 +571,15 @@
       "Asesor"
     ],
     "sourceReadyCommit": "1a97ba53794b15ccf1d35cc5cfd2ee2910aa4aae",
-    "harnessCorrectionsClosed": true
+    "harnessCorrectionsClosed": true,
+    "authenticatedRootCause": "DEFAULT_ROLE_COMPOSITION_DENIED_ACADEMIA_FOR_OPERATIVO_AND_ASESOR",
+    "catalogReadyObserved": true,
+    "catalogCountObserved": 29,
+    "roleAccessFix": [
+      "Operativo",
+      "Asesor"
+    ],
+    "brandingConfigFix": true
   },
   "candidateFailureHistory": [
     {
