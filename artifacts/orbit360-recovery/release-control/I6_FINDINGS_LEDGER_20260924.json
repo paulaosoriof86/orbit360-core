@@ -19,11 +19,26 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 40,
+    "total": 41,
     "b2HumanFindings": 13,
-    "currentBlocking": 15
+    "currentBlocking": 16
   },
   "findings": [
+    {
+      "id": "MECH-WF-004",
+      "block": "B2",
+      "source": "WORKFLOW_RUN_36004467901",
+      "finding": "The first scoped channel-cleanup patch made the workflow YAML invalid because an embedded heredoc body escaped the run-block indentation.",
+      "owner": [
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      ],
+      "rootCause": "YAML authoring defect in the executor-only remediation; no job executed and no Firebase/data mutation occurred.",
+      "remediation": "Replace embedded heredoc with indentation-safe Node one-liners and reconstruct the complete B2 deploy step.",
+      "status": "SOURCE_FIXED_PENDING_GITHUB_PARSE_AND_RUN",
+      "blocking": true,
+      "closureProof": "GitHub accepts workflow syntax, central guard passes and B2 deploy job starts.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "MECH-PREVIEW-003",
       "block": "B2",

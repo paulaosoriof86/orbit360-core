@@ -1337,5 +1337,14 @@
     "preserveAnyVersionedReference": true,
     "preserveLive": true,
     "retryCount": 1
+  },
+  "lastExecutorSyntaxFailure": {
+    "runId": 36004467901,
+    "head": "9a20d5de0cfe18bb04ad8b66a9b77e72d8ecaf86",
+    "classification": "WORKFLOW_YAML_PARSE_FAILURE",
+    "firebaseTouched": false,
+    "liveTouched": false,
+    "dataTouched": false,
+    "fix": "RECONSTRUCT_B2_DEPLOY_STEP_WITHOUT_HEREDOC"
   }
 }
