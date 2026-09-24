@@ -401,6 +401,19 @@ try{
   evidence.writes.synthetic+=2+receipts.length+portfolio.length+1;
 
   await page.waitForFunction(id=>!!Orbit.store.get('polizas',id),policy.id,{timeout:15000});
+  await page.evaluate(()=>{
+    window.__b2VehicleUpdateTrace=null;
+    const engine=Orbit.policyReceipts;
+    if(!engine||typeof engine.updatePolicy!=='function')throw new Error('B2_AUTH_POLICY_ENGINE_UPDATE_MISSING');
+    if(!engine.__b2OriginalUpdatePolicy)engine.__b2OriginalUpdatePolicy=engine.updatePolicy;
+    engine.updatePolicy=async function(id,patch,options){
+      const trace={id:String(id||''),payloadVehicle:patch&&patch.vehiculo?JSON.parse(JSON.stringify(patch.vehiculo)):null,options:options?JSON.parse(JSON.stringify(options)):null};
+      const out=await engine.__b2OriginalUpdatePolicy.call(engine,id,patch,options);
+      trace.result={ok:!!out?.ok,errors:[].concat(out?.errors||[]),vehicle:out?.vehicle?JSON.parse(JSON.stringify(out.vehicle)):null,operationId:String(out?.operationId||'')};
+      window.__b2VehicleUpdateTrace=trace;
+      return out;
+    };
+  });
   await page.evaluate(id=>Orbit.modules.cliente360.editarPoliza(id),policy.id);
   await page.waitForSelector('#policy-v1199 [data-save]',{timeout:10000});
   need(await page.inputValue('#policy-v1199 [data-vcolor]')==='Blanco','B2_AUTH_VEHICLE_EDIT_PREFILL_MISSING');
@@ -410,11 +423,17 @@ try{
   await page.waitForSelector('#policy-v1199',{state:'detached',timeout:30000});
   const vehicleEditDiag=await bounded((async()=>{
     const dbRows=await rowsBy(db,'vehiculos','polizaId',policy.id);
-    const storeRows=await page.evaluate(pid=>(Orbit.store.all('vehiculos')||[]).filter(v=>String(v.polizaId||'')===String(pid)).map(v=>({id:String(v.id||''),color:String(v.color||''),operationId:String(v.operationId||''),updatedAt:String(v.updatedAt||v.actualizado||'')})),policy.id);
+    const browser=await page.evaluate(pid=>({
+      trace:window.__b2VehicleUpdateTrace?JSON.parse(JSON.stringify(window.__b2VehicleUpdateTrace)):null,
+      storeRows:(Orbit.store.all('vehiculos')||[]).filter(v=>String(v.polizaId||'')===String(pid)).map(v=>({id:String(v.id||''),color:String(v.color||''),operationId:String(v.operationId||''),updatedAt:String(v.updatedAt||v.actualizado||'')})),
+      policy:Orbit.store.get('polizas',pid)?{id:String(Orbit.store.get('polizas',pid).id||''),operationId:String(Orbit.store.get('polizas',pid).operationId||''),updatedAt:String(Orbit.store.get('polizas',pid).updatedAt||Orbit.store.get('polizas',pid).actualizado||'')}:null
+    }),policy.id);
     return{
       originalVehicleId:vehicle.id,
+      trace:browser.trace,
+      policy:browser.policy,
       dbRows:dbRows.map(v=>({id:String(v.id||''),color:String(v.color||''),operationId:String(v.operationId||''),updatedAt:String(v.updatedAt||v.actualizado||''),estado:String(v.estado||'')})),
-      storeRows
+      storeRows:browser.storeRows
     };
   })(),'B2_AUTH_VEHICLE_EDIT_DIAGNOSTIC_TIMEOUT',15000);
   evidence.vehicleEditDiagnostics=vehicleEditDiag;
