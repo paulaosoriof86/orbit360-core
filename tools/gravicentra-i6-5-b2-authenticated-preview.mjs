@@ -473,8 +473,11 @@ try{
   state.requestId=renewal.requestId;state.renewedPolicyId=renewal.policyId;
   const renewed=await waitFor(()=>oneBy(db,'polizas','numero',renewNo),'B2_AUTH_RENEWED_POLICY_READBACK',30000);
   need(renewed.renuevaDe===policy.id,'B2_AUTH_RENEWED_POLICY_SOURCE_LINK_MISSING');
-  const sourceAfter=await dataCol(db,'polizas').doc(policy.id).get();
-  need(sourceAfter.data()?.renovadaPor===renewed.id,'B2_AUTH_SOURCE_RENOVADA_POR_MISSING');
+  const sourceAfter=await waitFor(async()=>{
+    const snap=await dataCol(db,'polizas').doc(policy.id).get();
+    return snap.exists&&snap.data()?.renovadaPor===renewed.id?snap.data():null;
+  },'B2_AUTH_SOURCE_RENOVADA_POR_READBACK',30000);
+  need(sourceAfter.renovadaPor===renewed.id,'B2_AUTH_SOURCE_RENOVADA_POR_MISSING');
   const renewalReceipts=await rowsBy(db,'recibosEsperados','polizaId',renewed.id),renewalPortfolio=await rowsBy(db,'carteraPrimas','polizaId',renewed.id),renewalCobros=await rowsBy(db,'cobros','polizaId',renewed.id);
   need(renewalReceipts.length>0&&renewalPortfolio.filter(x=>x.carteraActiva!==false).length>0,'B2_AUTH_RENEWAL_RECEIPTS_PORTFOLIO_MISSING');
   need(renewalCobros.length===0,'B2_AUTH_RENEWAL_CREATED_CONFIRMED_COBRO');
