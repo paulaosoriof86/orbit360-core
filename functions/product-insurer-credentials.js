@@ -98,8 +98,9 @@ async function audit(t,actor,action,detail,mode){
 }
 async function execute(request,auditMode){
   const d=request.data||{},t=tenantId(d.tenantId),op=norm(d.operation),scope=scopeFor(auditMode);
-  if(!['import','status','reveal','copy'].includes(op))throw new HttpsError('invalid-argument','Operación segura inválida.');
-  const actor=await authorize(request,t,op==='import');
+  if(!['import','status','reveal','copy','delete_preview'].includes(op))throw new HttpsError('invalid-argument','Operación segura inválida.');
+  if(op==='delete_preview'&&scope!=='preview')throw new HttpsError('permission-denied','La limpieza sintética solo está disponible en Preview.');
+  const actor=await authorize(request,t,op==='import'||op==='delete_preview');
   if(op==='import'){
     const items=[].concat(d.items||[]);
     if(!items.length||items.length>100)throw new HttpsError('invalid-argument','Cantidad de credenciales inválida.');
@@ -117,6 +118,13 @@ async function execute(request,auditMode){
   }
   const ref=text(d.credentialRef,80),insurerId=text(d.insurerId,160);
   if(!REF_RE.test(ref))throw new HttpsError('invalid-argument','Referencia de credencial inválida.');
+  if(op==='delete_preview'){
+    const previewVault=await readVaultScope(t,'preview'),record=previewVault.records[ref],match=!!(record&&(!insurerId||record.insurerId===insurerId));
+    if(match)delete previewVault.records[ref];
+    await writeVault(t,previewVault,'preview');
+    await audit(t,actor,'credential.preview_cleanup',{insurerId,credentialRef:ref,outcome:match?'removed':'not_found'},auditMode);
+    return{ok:true,removed:match,containsSecrets:false,previewIsolated:true};
+  }
   const vault=await readEffectiveVault(t,scope),record=vault.records[ref],match=!!(record&&(!insurerId||record.insurerId===insurerId));
   if(op==='status'){
     await audit(t,actor,'credential.status',{insurerId,credentialRef:ref,outcome:match?'available':'not_found'},auditMode);
