@@ -1944,7 +1944,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_AUTHENTICATED_PREVIEW_PASS_PENDING_VISUAL",
+    "mechanismSyncStatus": "B2_AUTHENTICATED_VISUAL_EVIDENCE_RECAPTURE_PENDING",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2056,7 +2056,7 @@
       },
       "visualHierarchyAccepted": false,
       "visualCorrectionFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923.json",
-      "authenticatedPreviewPass": true,
+      "authenticatedPreviewPass": false,
       "academiaRegression": "ROLE_ACCESS_ROOT_CAUSE_CONFIRMED_SOURCE_FIX_PENDING_PREVIEW",
       "oldPreviewRunId": 35960854008,
       "oldPreviewSuperseded": true,
@@ -2078,7 +2078,8 @@
       "policyVehicleRuntimePass": true,
       "renewalRuntimePass": true,
       "zeroConfirmedCobroWithoutEvidence": true,
-      "syntheticCleanupPass": true
+      "syntheticCleanupPass": true,
+      "visualEvidenceRecapture": true
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
