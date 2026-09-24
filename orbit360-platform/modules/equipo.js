@@ -204,11 +204,24 @@ Orbit.modules.equipo = (function () {
     try { const tenant=Orbit.tenant&&Orbit.tenant.get?Orbit.tenant.get():{},canonical=tenant&&tenant.domainConfig&&tenant.domainConfig.access;if(canonical&&typeof canonical==='object')return canonical; } catch(e){}
     return accessConfigCache||{};
   }
+  function mergePermissionMatrix(base, overrides) {
+    const out=JSON.parse(JSON.stringify(base||{}));
+    Object.entries(overrides&&typeof overrides==='object'?overrides:{}).forEach(([role,mods])=>{
+      out[role]=out[role]||{};
+      Object.entries(mods&&typeof mods==='object'?mods:{}).forEach(([moduleKey,actions])=>{
+        out[role][moduleKey]=Object.assign({},out[role][moduleKey]||{},actions&&typeof actions==='object'?actions:{});
+      });
+    });
+    return out;
+  }
   function getPermisos() {
+    const base=defaultPermissions();
+    const cfg=Orbit.cat.all();
+    const legacy=cfg&&cfg.permisos&&typeof cfg.permisos==='object'?cfg.permisos:{};
     const canonical=getAccessConfig().rolePermissions;
-    if(canonical&&Object.keys(canonical).length)return canonical;
-    const cfg = Orbit.cat.all();
-    return cfg.permisos || defaultPermissions();
+    // The protected access document is a sparse override authority. Never let an
+    // empty/partial server matrix erase the complete role matrix shown in Equipo.
+    return mergePermissionMatrix(mergePermissionMatrix(base,legacy),canonical||{});
   }
   function getRoleScopes(){ return Object.assign({},defaultRoleScopes(),getAccessConfig().roleScopes||{}); }
   function ensureAccessConfig(){

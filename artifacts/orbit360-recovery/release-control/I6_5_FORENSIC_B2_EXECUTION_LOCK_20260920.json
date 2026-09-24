@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "REMEDIATION_R2_ACCESS_CONFIG_RECOVERY_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -52,6 +52,7 @@
       "orbit360-platform/modules/aseguradoras.js",
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+      "orbit360-platform/modules/equipo.js",
       "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
       "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -67,7 +68,32 @@
     "liveHostingPromotionAuthorized": false,
     "advanceToB3Authorized": false,
     "noHardcodedIdentities": true,
-    "extensionReason20260924": "Causal owners demonstrated by Paula visual rejection: secure credential Preview/provider path, canonical receipts projection owner, visual tokens, and one read-only relationship diagnostic. Scope remains B2 only; no data apply, no B3, no LIVE."
+    "extensionReason20260924": "Causal owners demonstrated by Paula visual rejection: secure credential Preview/provider path, canonical receipts projection owner, visual tokens, and one read-only relationship diagnostic. Scope remains B2 only; no data apply, no B3, no LIVE.",
+    "accessConfigRecovery": {
+      "authorized": true,
+      "tenantId": "alianzas-soluciones",
+      "configPath": "tenants/alianzas-soluciones/config/access",
+      "scope": "RESTORE_ONLY_PREVIOUSLY_APPROVED_OPERATIVO_COTIZADOR_COMPARATIVO_OVERRIDES",
+      "allowedRole": "Operativo",
+      "allowedModules": [
+        "cotizador",
+        "comparativo"
+      ],
+      "allowedActions": [
+        "ver",
+        "editar"
+      ],
+      "requiredValues": true,
+      "preserveRoleScopes": true,
+      "explicitFalseConflictFailClosed": true,
+      "businessDataMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "authUserMutationAuthorized": false,
+      "membershipMutationAuthorized": false,
+      "liveHostingPromotionAuthorized": false,
+      "auditEventRequired": true,
+      "canonicalReadbackRequired": true
+    }
   },
   "emailDebt": {
     "status": "DEFERRED_NON_BLOCKING_BY_OWNER",
@@ -1399,5 +1425,37 @@
     "AUTH_INSURER_LOGO_AND_PASSWORD_PREVIEW_ISOLATED",
     "PAULA_VISUAL_POLICY_RECEIPT_HIERARCHY",
     "PAULA_VISUAL_NO_DUPLICATE_VEHICLE_ACTIONS"
-  ]
+  ],
+  "lastAuthenticatedFailure": {
+    "runId": 36071653541,
+    "status": "FAIL_BEFORE_SYNTHETIC_WRITES",
+    "finding": "OPERATIVO_CONFIGURED_MODULES_NOT_VISIBLE",
+    "demonstratedRootCause": "PROTECTED_ACCESS_CONFIG_ROLE_PERMISSIONS_EMPTY",
+    "hydrationSource": "protected",
+    "hydrationSyncPending": false,
+    "rolePermissionsRoleKeys": [],
+    "roleScopesPreserved": {
+      "Operativo": "all",
+      "Asesor": "own"
+    },
+    "cotizador": {
+      "matrix": null,
+      "tenantActive": true,
+      "base": false,
+      "sessionCanSee": false,
+      "extras": false,
+      "restricted": false
+    },
+    "comparativo": {
+      "matrix": null,
+      "tenantActive": true,
+      "base": false,
+      "sessionCanSee": false,
+      "extras": false,
+      "restricted": false
+    },
+    "syntheticWrites": 0,
+    "cleanupWrites": 0,
+    "liveHostingPromotion": false
+  }
 }

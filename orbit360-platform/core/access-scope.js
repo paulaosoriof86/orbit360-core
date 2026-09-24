@@ -271,7 +271,10 @@ Orbit.access = (function () {
     var full = moduleKey + '_' + action;
     if (isRestricted(moduleKey) || isRestricted(full) || isRestricted(action)) return false;
     if (hasExtra(full) || hasExtra(action) || hasExtra(moduleKey)) return true;
-    var matrix = matrixPermission(moduleKey, action === 'create' ? 'editar' : action);
+    var policyAction = (action === 'view' || action === 'read') ? 'ver'
+      : (action === 'edit' || action === 'update' || action === 'create' || action === 'delete') ? 'editar'
+      : action;
+    var matrix = matrixPermission(moduleKey, policyAction);
     if (matrix != null) return matrix;
     var role = activeRole();
     if (action === 'view' || action === 'read') return dataScope(moduleKey) !== 'none';

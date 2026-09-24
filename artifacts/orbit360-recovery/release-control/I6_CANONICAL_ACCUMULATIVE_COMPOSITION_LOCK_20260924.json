@@ -103,7 +103,7 @@
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png": "9e16fae65f366556f55398309eb7bb3f398bf072",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png": "726da844034b98f3132788920a1b8111f4d1764a",
     "orbit360-platform/core/academia-product-catalog-p0.js": "c4974b8734dbe384d4fe4b53394d015ec24e36da",
-    "orbit360-platform/core/access-scope.js": "c986e606c6e384324bf3b419b83ab1ece397c65b",
+    "orbit360-platform/core/access-scope.js": "55531bfe185ddae98c4fcc4c5ac6561fc944490c",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "6decc66566ca6b6fe1761fb0d2db5a108e9d1033",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "e0526992c7ab55df6799e2663940b1b1869e5f59",
@@ -138,7 +138,7 @@
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "6fbb880480f726e537f93650119af3265cf97bbd",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
-    "orbit360-platform/modules/equipo.js": "ae8cd34708776dceda104860c4fcf110f14209f1",
+    "orbit360-platform/modules/equipo.js": "105b869445919802fb6e07d6120ace6a0772ec57",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "a9dc395a0764bca3ff8f04d1d211acc5f3d0b085",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "88d6a611d3b443099ee7b2c3c7014791b6dbf770",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "084782281c51cede6fa3ded9c7338294531f459c",
@@ -180,6 +180,15 @@
     ],
     "noOperationalDataMutation": true,
     "noReimport": true,
-    "livePromotion": false
+    "livePromotion": false,
+    "recordedAt": "2026-09-24",
+    "rootCauseExtension": "B1_ACCESS_CONFIG_MIGRATION_OMISSION",
+    "accessAuthorityFixes": [
+      "PROTECTED_CONFIG_HYDRATION_PROVEN_WORKING",
+      "SPARSE_ROLE_PERMISSION_OVERRIDES_ARE_MERGED_OVER_COMPLETE_UI_DEFAULT_MATRIX",
+      "FRONTEND_ACTION_NAMES_MAP_TO_CANONICAL_VER_EDITAR_KEYS",
+      "APPROVED_OPERATIVO_COTIZADOR_COMPARATIVO_OVERRIDES_RECOVERED_BY_CONTROLLED_CONFIG_WRITE",
+      "AUTHENTICATED_PROOF_MUST_ASSERT_REAL_PROTECTED_CONFIG_NOT_SYNTHETIC_MATRIX"
+    ]
   }
 }

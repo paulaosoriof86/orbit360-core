@@ -19,11 +19,29 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 45,
+    "total": 46,
     "b2HumanFindings": 13,
-    "currentBlocking": 14
+    "currentBlocking": 18
   },
   "findings": [
+    {
+      "id": "B2-R18-ACCESS-CONFIG-MIGRATION-GAP",
+      "block": "B2",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36071653541_PLUS_B1_R8_PROOF_AUDIT",
+      "finding": "B1_SERVER_OWNED_ACCESS_MIGRATION_PRESERVED_SCOPES_BUT_DID_NOT_MATERIALIZE_APPROVED_ROLE_PERMISSION_MATRIX",
+      "owner": [
+        "orbit360-platform/core/access-scope.js",
+        "orbit360-platform/modules/equipo.js",
+        "functions/tenant-domain-config.js",
+        "tools/gravicentra-i6-5-b2-access-config-recover.mjs"
+      ],
+      "rootCause": "B1 R8 verified matrix semantics with window.__accessCfg synthetic data and source-contract assertions, while the real protected access document was not asserted to contain the approved rolePermissions. The transition removed reliance on origin-local storage without migrating that state.",
+      "remediation": "One controlled protected-config recovery restores only proven overrides; sparse server overrides become intentional; UI merges sparse overrides over defaults; exact authenticated proof is mandatory.",
+      "status": "SOURCE_FIX_AND_CONTROLLED_RECOVERY_PREPARED_PENDING_EXACT_PREVIEW",
+      "blocking": true,
+      "closureProof": "Protected config readback contains Operativo cotizador/comparativo; exact Preview sidebar and runtime expose both; Asesor scope remains own; no business data writes.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "B2-R17-RENEWAL_VEHICLE_CONTINUITY",
       "block": "B2",
@@ -72,17 +90,29 @@
       "id": "B2-R14-ACCESS-MATRIX-HYDRATION",
       "block": "B2",
       "source": "PAULA_SCREENSHOT_REVIEW_20260924_R2",
-      "finding": "OPERATIVO_LOSES_CONFIGURED_COTIZADOR_COMPARATIVO_ON_NEW_PREVIEW_ORIGIN",
+      "finding": "OPERATIVO_LOSES_APPROVED_COTIZADOR_COMPARATIVO_BECAUSE_PROTECTED_ACCESS_CONFIG_HAS_EMPTY_ROLE_PERMISSIONS",
       "owner": [
         "orbit360-platform/core/tenant-domain-config-client.js",
         "orbit360-platform/core/access-scope.js",
         "orbit360-platform/core/router.js"
       ],
-      "rootCause": "The server-owned access matrix was not hydrated into the fresh Preview origin before/after sidebar construction. access-scope therefore fell back to hardcoded role defaults; those defaults exactly reproduce the screenshots: Dirección has Cotizador+Comparativo, Operativo has neither, Asesor has Cotizador only.",
-      "remediation": "Hydrate protected access config nonblockingly; access-scope reads the hydrated authority; router rebuilds on the access-config event. No module permission is hardcoded on.",
-      "status": "SOURCE_FIXED_EXACT_AUTHENTICATED_PROOF_PENDING",
+      "rootCause": "Hydration is working and returns source=protected, syncPending=false. The protected access document preserves roleScopes but contains rolePermissions={}. B1 migrated access authority to the server without materializing the already-approved module matrix; its R8 proof used a synthetic in-memory matrix and therefore did not prove the protected document. A fresh Preview origin has no legacy localStorage matrix, so access-scope correctly falls back to the base Operativo role, where Cotizador and Comparativo are absent.",
+      "remediation": "Recover only the previously approved Operativo→Cotizador/Comparativo overrides into the protected config with before/after audit and canonical readback; keep scopes unchanged. Equipo merges sparse canonical overrides over the complete default matrix. Authenticated B2 must prove protected config + sidebar + direct runtime access on the exact Preview.",
+      "status": "ROOT_CAUSE_DEMONSTRATED_RECOVERY_AUTHORIZED",
       "blocking": true,
-      "closureProof": "Exact Preview proves configured Operativo Cotizador+Comparativo in both access engine and sidebar."
+      "closureProof": "Exact Preview proves configured Operativo Cotizador+Comparativo in both access engine and sidebar.",
+      "evidence": {
+        "runId": 36071653541,
+        "artifactId": 10838865715,
+        "protectedSource": true,
+        "syncPending": false,
+        "rolePermissionKeys": [],
+        "roleScopes": {
+          "Operativo": "all",
+          "Asesor": "own"
+        },
+        "syntheticWrites": 0
+      }
     },
     {
       "id": "MECH-WF-004",
