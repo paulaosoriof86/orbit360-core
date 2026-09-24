@@ -216,7 +216,9 @@ try{
   context=await browser.newContext({viewport:{width:1500,height:1000}});
   page=await context.newPage();
   page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(30000);
-  const pageErrors=[];page.on('pageerror',e=>pageErrors.push(clean(e?.message||e,1000)));
+  const pageErrors=[],consoleErrors=[];
+  page.on('pageerror',e=>pageErrors.push(clean(e?.message||e,1000)));
+  page.on('console',msg=>{if(msg.type()==='error')consoleErrors.push(clean(msg.text(),1200));});
   milestone('PREVIEW_NAV_START');
   await page.goto(TARGET+'/?b2auth='+Date.now()+'#/inicio',{waitUntil:'domcontentloaded',timeout:30000});
   await bounded(activate(page,auth,actor),'B2_AUTH_ACTIVATE_TIMEOUT',45000);
@@ -297,8 +299,32 @@ try{
   await page.selectOption('#v1198-ase',actor.advisorId);
   await page.evaluate(()=>document.getElementById('crm-new-client-v1198').dispatchEvent(new MouseEvent('click',{bubbles:true})));
   need(await page.locator('#crm-new-client-v1198').count()===1,'B2_AUTH_CLIENT_CREATE_BACKDROP_CLOSED');
+  await page.evaluate(()=>{
+    window.__b2OperationalWriteFailures=[];
+    document.addEventListener('orbit:operational-write:failed',function h(e){
+      try{window.__b2OperationalWriteFailures.push(e&&e.detail?JSON.parse(JSON.stringify(e.detail)):{});}catch(_e){}
+    });
+  });
   await page.click('#v1198-save');
-  await page.waitForSelector('#crm-new-client-v1198',{state:'detached',timeout:25000});
+  const clientSaveOutcome=await Promise.race([
+    page.waitForSelector('#crm-new-client-v1198',{state:'detached',timeout:24000}).then(()=>({closed:true})).catch(()=>null),
+    page.waitForFunction(()=>{
+      const b=document.getElementById('v1198-save'),m=document.getElementById('crm-new-client-v1198');
+      return !!(m&&b&&!b.disabled&&String(b.textContent||'').includes('Crear cliente'));
+    },null,{timeout:24000}).then(()=>({closed:false,failedVisible:true})).catch(()=>null)
+  ]);
+  const clientSaveDiag=await page.evaluate(()=>({
+    modalPresent:!!document.getElementById('crm-new-client-v1198'),
+    savePresent:!!document.getElementById('v1198-save'),
+    saveDisabled:!!document.getElementById('v1198-save')?.disabled,
+    saveText:String(document.getElementById('v1198-save')?.textContent||''),
+    writeStatus:Orbit.store?._operationalWriteStatus?.()||null,
+    failures:[].concat(window.__b2OperationalWriteFailures||[]).slice(-10),
+    visibleText:String(document.body?.innerText||'').slice(-1800)
+  }));
+  evidence.clientSaveDiagnostics={outcome:clientSaveOutcome,diag:clientSaveDiag,pageErrors:pageErrors.slice(-10),consoleErrors:consoleErrors.slice(-10)};
+  milestone('CLIENT_CREATE_SAVE',evidence.clientSaveDiagnostics);
+  need(clientSaveOutcome&&clientSaveOutcome.closed===true,'B2_AUTH_CLIENT_CREATE_SAVE_FAILED:'+JSON.stringify(evidence.clientSaveDiagnostics));
   const client=await waitFor(()=>oneBy(db,'clientes','nombre',clientName),'B2_AUTH_CLIENT_CREATE_READBACK');
   milestone('CLIENT_CREATE_READBACK',{id:hash(client.id)});
   state.clientId=client.id;evidence.writes.synthetic+=2;
