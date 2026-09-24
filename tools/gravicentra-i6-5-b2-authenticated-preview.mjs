@@ -368,8 +368,13 @@ try{
   need(await page.locator('#policy-v1199 [data-product] option').count()>0,'B2_AUTH_AUTO_PRODUCT_EMPTY');
   await page.fill('#policy-v1199 [data-number]',policyNo);
   const freqOptions=await page.locator('#policy-v1199 [data-frequency] option').allTextContents();
-  if(freqOptions.includes('Semestral'))await page.selectOption('#policy-v1199 [data-frequency]',{label:'Semestral'});
-  await page.fill('#policy-v1199 [data-installments]','2');
+  if(freqOptions.includes('Semestral')){
+    await page.selectOption('#policy-v1199 [data-frequency]',{label:'Semestral'});
+    const installmentContract=await page.locator('#policy-v1199 [data-installments]').evaluate(el=>({value:String(el.value||''),readOnly:!!el.readOnly}));
+    need(installmentContract.value==='2'&&installmentContract.readOnly===true,'B2_AUTH_SEMESTRAL_INSTALLMENTS_CONTRACT_INVALID:'+JSON.stringify(installmentContract));
+  }else{
+    await page.fill('#policy-v1199 [data-installments]','2');
+  }
   await page.fill('#policy-v1199 [data-net]','1000');
   await page.fill('#policy-v1199 [data-issue]','50');
   await page.fill('#policy-v1199 [data-sum]','100000');
