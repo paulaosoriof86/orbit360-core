@@ -248,8 +248,8 @@ Orbit.modules = Orbit.modules || {};
       return `<tr class="${rid?'clickable':''}" ${rid?`onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${esc(rid)}','${esc(r.clienteId||'')}')"`:''}><td>${esc(first(r.serie, r.numero, r.cuota, i + 1))}</td><td>${esc(fmtDate(due))}</td><td class="num">${esc(moneyDetail(r.primaNeta, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosExpedicion, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosFinanciamiento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.descuento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.impuestosIVA, r.moneda || cur))}</td><td class="num"><b>${esc(moneyDetail(total, r.moneda || cur))}</b></td><td>${badge(state)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
   }
-  function vehicleCard(v, cur) {
-    if (!v) return '<div class="muted">No hay riesgo vehicular vinculado a esta póliza. Requiere validar la fuente de vehículo antes de completar el expediente.</div>';
+  function vehicleCard(v, cur, policyId) {
+    if (!v) return '<div class="gi-integrity-warning"><div><b>🚘 Falta vincular el vehículo</b><span>Esta póliza es vehicular y necesita completar el riesgo para que el expediente quede íntegro.</span></div>' + (policyId ? '<button class="btn primary sm" onclick="Orbit.modules.cliente360.editarPoliza(\''+esc(policyId)+'\')">Completar vehículo</button>' : '') + '</div>';
     const V = vehicleVisual(v);
     return grid([
       field('Marca', V.marca), field('Línea / tipo', V.linea), field('Modelo / año', V.anio),
@@ -272,33 +272,39 @@ Orbit.modules = Orbit.modules || {};
     const scheduleDelta = pb.total != null && pb.scheduleTotal != null ? pb.scheduleTotal - pb.total : null;
     host.innerHTML = `<div class="page orbit-policy-fullpage" data-policy-fullpage="1">
       <div class="crumb" style="margin-bottom:14px"><a style="cursor:pointer;color:var(--red)" href="${back}">‹ ${esc(cli.nombre || 'Cliente 360')}</a> / Póliza ${esc(p.numero || '')}</div>
-      <div class="card" style="overflow:hidden;margin-bottom:16px">
+      <div class="card gi-policy-hero" style="overflow:hidden;margin-bottom:16px">
         <div style="padding:20px 22px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;align-items:flex-start;gap:18px;justify-content:space-between;flex-wrap:wrap">
-          <div style="min-width:0"><div class="muted" style="color:rgba(255,255,255,.7);font-size:11px;text-transform:uppercase;letter-spacing:.12em">Póliza · ${esc(p.tipoPoliza)}</div><h2 style="color:#fff;margin:4px 0 3px;font-family:var(--f-display);font-size:24px;overflow-wrap:anywhere">${esc(p.ramo || 'Póliza')} · ${esc(p.producto || p.subramo || 'Detalle')}</h2><div class="mono" style="color:rgba(255,255,255,.86)">${esc(p.numero || 'Número pendiente')} · ${esc(asg.nombre || 'Aseguradora pendiente')}</div></div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${badge(p.estado)}<a class="btn ghost" href="${back}" style="color:#fff;border-color:rgba(255,255,255,.35);background:transparent">Volver al cliente</a></div>
+          <div style="min-width:0;display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">📑</div><div><div class="muted" style="color:rgba(255,255,255,.7);font-size:11px;text-transform:uppercase;letter-spacing:.12em">Póliza · ${esc(p.tipoPoliza)}</div><h2 style="color:#fff;margin:4px 0 3px;font-family:var(--f-display);font-size:24px;overflow-wrap:anywhere">${esc(p.ramo || 'Póliza')} · ${esc(p.producto || p.subramo || 'Detalle')}</h2><div class="mono" style="color:rgba(255,255,255,.86)">${esc(p.numero || 'Número pendiente')} · ${esc(asg.nombre || 'Aseguradora pendiente')}</div></div></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${badge(p.estado)}<button class="btn primary" onclick="Orbit.modules.cliente360.editarPoliza('${esc(p.id)}')">✏️ Editar póliza</button><a class="btn ghost" href="${back}">👤 Cliente 360</a></div>
         </div>
+      </div>
+      <div class="gi-detail-kpis">
+        <div><span>💰 Prima total</span><b>${esc(moneyDetail(pb.total,cur))}</b></div>
+        <div><span>🧾 Prima neta</span><b>${esc(moneyDetail(pb.net,cur))}</b></div>
+        <div><span>📆 Vigencia</span><b>${esc(fmtDate(p.vigenciaFin))}</b></div>
+        <div><span>📚 Recibos</span><b>${pb.receipts.length}</b></div>
       </div>
       <div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:16px;align-items:start">
         <div style="display:grid;gap:16px;min-width:0">
-          ${section('Datos de la póliza', grid([
+          ${section('📋 Datos de la póliza', grid([
             field('Cliente / asegurado', cli.nombre || p.aseguradoNombreFuente), field('Aseguradora', asg.nombre || p.aseguradoraFuenteNombre), field('Asesor', ase.nombre || p.asesorFuenteNombre),
             field('N.º de póliza', p.numero, {mono:true}), field('Estado', p.estado), field('País / moneda', `${p.pais || cli.pais || '—'} · ${cur || '—'}`),
             field('Ramo', p.ramo), field('Subramo / producto', p.subramo || p.producto), field('Tipo de póliza', p.tipoPoliza),
             field('Inicio de vigencia', fmtDate(p.vigenciaInicio)), field('Fin de vigencia', fmtDate(p.vigenciaFin)), field('Renovación', renewabilityHtml(p), {html:true}),
             field('Suma asegurada', moneyDetail(p.sumaAsegurada, cur)), field('Concepto / riesgo', p.concepto), field('Calidad de información', qualityBlock(p, vehicle), {html:true})
           ], 3))}
-          ${section('Prima y condiciones de pago', `<div class="orbit-premium-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px">${[
+          ${section('💰 Prima y condiciones de pago', `<div class="orbit-premium-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px">${[
             ['Prima neta', pb.net], ['Gastos de expedición', pb.expedition], ['Gastos financieros', pb.finance], ['Descuento / ajuste (campo fuente)', pb.sourceAdjustment], ['Otros / asistencias', pb.other], ['Base gravable', pb.taxable], [ivaLabel, pb.iva], ['Prima total de póliza', pb.total], ['Total calendario de recibos', pb.scheduleTotal]
           ].map(([k,v],i)=>`<div style="display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px solid var(--line);${i===7?'font-weight:800;':''}"><span>${esc(k)}</span><b>${esc(moneyDetail(v,cur))}</b></div>`).join('')}</div>${scheduleDelta!=null&&Math.abs(scheduleDelta)>=0.005?`<div class="badge warn" style="margin-top:10px">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · requiere conciliación de fuente</div>`:''}${grid([
             field('Frecuencia', first(p.frecuencia, p.forma)), field('Forma de pago', p.formaPago), field('Conducto', p.conducto)
           ],3)}`)}
-          ${section('Riesgo asegurado / vehículo', vehicleCard(vehicle, cur))}
-          ${section('Recibos y cartera', receiptRows(p.id, cur))}
+          ${section('🚘 Riesgo asegurado / vehículo', vehicleCard(vehicle, cur, p.id))}
+          ${section('🧾 Recibos y cartera', receiptRows(p.id, cur))}
         </div>
         <div style="display:grid;gap:16px;min-width:0">
-          ${section('Resumen', `<div style="display:grid;gap:10px">${field('Prima total', moneyDetail(pb.total,cur))}${field('Vigencia', `${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`)}${field('Forma de pago', first(p.formaPago,p.frecuencia))}${field('Estado', p.estado)}</div>`)}
-          ${section('Historial y endosos', (p.historial || []).length ? `<div style="display:grid;gap:10px">${(p.historial || []).slice().reverse().map(e=>`<div style="border-left:2px solid var(--line);padding-left:10px"><b>${esc(first(e.t,e.tipo,'Actualización'))}</b><div class="muted" style="font-size:12px">${esc(fmtDate(e.fecha))}${e.d?' · '+esc(e.d):''}</div></div>`).join('')}</div>` : '<div class="muted">Sin movimientos adicionales registrados.</div>')}
-          ${section('Acciones', `<div style="display:grid;gap:8px"><a class="btn ghost" href="${back}">Abrir ficha del cliente</a>${vehicle ? `<a class="btn ghost" href="#/cliente360?c=${encodeURIComponent(p.clienteId)}&v=${encodeURIComponent(vehicle.id)}">Ver vehículo completo</a>` : ''}</div>`)}
+          ${section('📌 Resumen', `<div style="display:grid;gap:10px">${field('Prima total', moneyDetail(pb.total,cur))}${field('Vigencia', `${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`)}${field('Forma de pago', first(p.formaPago,p.frecuencia))}${field('Estado', p.estado)}</div>`)}
+          ${section('🕘 Historial y endosos', (p.historial || []).length ? `<div style="display:grid;gap:10px">${(p.historial || []).slice().reverse().map(e=>`<div style="border-left:2px solid var(--line);padding-left:10px"><b>${esc(first(e.t,e.tipo,'Actualización'))}</b><div class="muted" style="font-size:12px">${esc(fmtDate(e.fecha))}${e.d?' · '+esc(e.d):''}</div></div>`).join('')}</div>` : '<div class="muted">Sin movimientos adicionales registrados.</div>')}
+          ${section('⚡ Acciones', `<div style="display:grid;gap:8px"><a class="btn ghost" href="${back}">Abrir ficha del cliente</a>${vehicle ? `<a class="btn ghost" href="#/cliente360?c=${encodeURIComponent(p.clienteId)}&v=${encodeURIComponent(vehicle.id)}">Ver vehículo completo</a>` : ''}</div>`)}
         </div>
       </div>
     </div>`;
@@ -313,10 +319,10 @@ Orbit.modules = Orbit.modules || {};
     const back = `#/cliente360?c=${encodeURIComponent(v.clienteId)}&t=vehiculos`;
     host.innerHTML = `<div class="page orbit-vehicle-fullpage" data-vehicle-fullpage="1">
       <div class="crumb" style="margin-bottom:14px"><a href="${back}" style="color:var(--red)">‹ ${esc(cli.nombre || 'Cliente 360')}</a> / Vehículo</div>
-      <div class="card" style="overflow:hidden;margin-bottom:16px"><div style="padding:20px 22px;background:linear-gradient(120deg,#1f3a5f,#142840);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap"><div><div style="color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.12em;font-size:11px">Vehículo asegurado</div><h2 style="color:#fff;margin:4px 0;font-family:var(--f-display)">${esc(shown(v.marca))} ${esc(shown(v.linea))} ${esc(shown(v.anio))}</h2><div class="mono" style="color:rgba(255,255,255,.85)">${esc(shown(v.placa))}${p.numero?' · póliza '+esc(p.numero):''}</div></div><a class="btn ghost" href="${back}" style="color:#fff;border-color:rgba(255,255,255,.35);background:transparent">Volver al cliente</a></div></div>
+      <div class="card gi-vehicle-hero" style="overflow:hidden;margin-bottom:16px"><div style="padding:20px 22px;background:linear-gradient(120deg,#1f3a5f,#142840);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap"><div style="display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">🚘</div><div><div style="color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.12em;font-size:11px">Vehículo asegurado</div><h2 style="color:#fff;margin:4px 0;font-family:var(--f-display)">${esc(shown(v.marca))} ${esc(shown(v.linea))} ${esc(shown(v.anio))}</h2><div class="mono" style="color:rgba(255,255,255,.85)">${esc(shown(v.placa))}${p.numero?' · póliza '+esc(p.numero):''}</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="Orbit.modules.cliente360.editarPoliza('${esc(v.polizaId)}')">✏️ Editar vehículo</button><a class="btn ghost" href="${back}">👤 Cliente 360</a></div></div></div>
       <div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:16px;align-items:start">
-        ${section('Detalle completo del vehículo', vehicleCard(v, cur))}
-        <div style="display:grid;gap:16px">${section('Póliza vinculada', grid([field('Póliza', p.numero || '—',{mono:true}),field('Aseguradora',asg.nombre || '—'),field('Estado',p.estado || '—'),field('Vigencia',`${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`),field('Prima total',moneyDetail(first(p.primaTotal,p.prima),cur)),field('Suma asegurada',moneyDetail(first(v.sumaAsegurada,p.sumaAsegurada),cur))],2)+`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn primary" href="#/cliente360?c=${encodeURIComponent(v.clienteId)}&p=${encodeURIComponent(v.polizaId)}">Abrir póliza completa</a><button class="btn ghost" onclick="Orbit.modules.cliente360.editarPoliza('${esc(v.polizaId)}')">Editar vehículo</button></div>`)}</div>
+        ${section('🚘 Detalle completo del vehículo', vehicleCard(v, cur))}
+        <div style="display:grid;gap:16px">${section('📑 Póliza vinculada', grid([field('Póliza', p.numero || '—',{mono:true}),field('Aseguradora',asg.nombre || '—'),field('Estado',p.estado || '—'),field('Vigencia',`${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`),field('Prima total',moneyDetail(first(p.primaTotal,p.prima),cur)),field('Suma asegurada',moneyDetail(first(v.sumaAsegurada,p.sumaAsegurada),cur))],2)+`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn primary" href="#/cliente360?c=${encodeURIComponent(v.clienteId)}&p=${encodeURIComponent(v.polizaId)}">Abrir póliza completa</a><button class="btn ghost" onclick="Orbit.modules.cliente360.editarPoliza('${esc(v.polizaId)}')">Editar vehículo</button></div>`)}</div>
       </div>
     </div>`;
   }
@@ -390,6 +396,7 @@ Orbit.modules = Orbit.modules || {};
       setTimeout(() => {
         const back = document.getElementById('cob-det');
         if (!back) return;
+        back.classList.add('gi-receipt-detail');
         const val = back.querySelector('#cd-val');
         if (!val) return;
         const next = val.cloneNode(true);
@@ -406,7 +413,31 @@ Orbit.modules = Orbit.modules || {};
     if (document.getElementById('orbit-policy-vehicle-responsive-v1199c')) return;
     const style = document.createElement('style');
     style.id = 'orbit-policy-vehicle-responsive-v1199c';
-    style.textContent = '@media(max-width:1050px){.orbit-detail-layout{grid-template-columns:1fr!important}.orbit-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}@media(max-width:680px){.orbit-detail-grid,.orbit-premium-grid{grid-template-columns:1fr!important}.orbit-policy-fullpage h2,.orbit-vehicle-fullpage h2{font-size:20px!important}.fichahdr h2{font-size:20px!important;line-height:1.15}.vp-head{position:relative}.page{padding-left:12px!important;padding-right:12px!important}}';
+    style.textContent = [
+      '.gi-policy-hero,.gi-vehicle-hero{border:1px solid #e7e2de!important;border-radius:20px!important;box-shadow:0 10px 34px rgba(24,28,34,.08)!important}',
+      '.gi-policy-hero>div:first-child,.gi-vehicle-hero>div:first-child{background:linear-gradient(135deg,#fff8f8 0%,#f6f3ef 58%,#f2f6fb 100%)!important;color:var(--ink)!important}',
+      '.gi-policy-hero h2,.gi-vehicle-hero h2{color:var(--ink)!important;letter-spacing:-.02em}',
+      '.gi-policy-hero .muted,.gi-policy-hero .mono,.gi-vehicle-hero .mono,.gi-vehicle-hero>div:first-child>div>div:first-child{color:var(--ink-3)!important}',
+      '.gi-policy-hero .btn.ghost,.gi-vehicle-hero .btn.ghost{color:var(--ink)!important;border-color:#ddd7d2!important;background:#fff!important}',
+      '.gi-hero-icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:#fff;border:1px solid #eadfe1;box-shadow:0 6px 18px rgba(197,22,46,.08);font-size:23px;flex:0 0 auto}',
+      '.gi-detail-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:-4px 0 16px}',
+      '.gi-detail-kpis>div{position:relative;padding:13px 15px;border:1px solid #e8e3de;border-radius:15px;background:#fff;box-shadow:0 5px 18px rgba(24,28,34,.04)}',
+      '.gi-detail-kpis>div:before{content:"";position:absolute;left:0;top:13px;bottom:13px;width:3px;border-radius:4px;background:var(--red)}',
+      '.gi-detail-kpis span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.055em;color:var(--ink-3);font-weight:700}',
+      '.gi-detail-kpis b{display:block;margin-top:5px;font-size:17px;font-family:var(--f-display)}',
+      '.orbit-policy-fullpage section.card,.orbit-vehicle-fullpage section.card{border-radius:17px!important;border:1px solid #e9e4df!important;box-shadow:0 4px 18px rgba(24,28,34,.035)!important;background:#fff!important}',
+      '.orbit-policy-fullpage .tbl thead th{background:#f8f6f3;color:#555d66;font-size:10.5px;letter-spacing:.055em;text-transform:uppercase}',
+      '.orbit-policy-fullpage .tbl tbody tr:hover{background:#fff8f8}',
+      '.gi-integrity-warning{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:14px;border:1px solid #edd7b5;border-radius:14px;background:#fff9ef}',
+      '.gi-integrity-warning b{display:block;color:#805315}.gi-integrity-warning span{display:block;color:var(--ink-3);font-size:12px;margin-top:3px}',
+      '#cob-det.gi-receipt-detail>.card{border-radius:20px!important;border:1px solid #e8e3de!important;box-shadow:0 22px 65px rgba(24,28,34,.18)!important;overflow:hidden}',
+      '#cob-det.gi-receipt-detail>.card>div:first-child{background:linear-gradient(135deg,#fff8f8,#f6f3ef)!important;border-bottom:1px solid #e8e3de}',
+      '#cob-det.gi-receipt-detail>.card>div:first-child .crumb,#cob-det.gi-receipt-detail>.card>div:first-child b,#cob-det.gi-receipt-detail>.card>div:first-child .mono{color:var(--ink)!important}',
+      '#cob-det.gi-receipt-detail #cd-x{background:#fff!important;border-color:#ddd7d2!important;color:var(--ink)!important}',
+      '#cob-det.gi-receipt-detail .vp-grid{background:#faf8f5;border-radius:14px;padding:12px}',
+      '@media(max-width:1050px){.orbit-detail-layout{grid-template-columns:1fr!important}.orbit-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.gi-detail-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}',
+      '@media(max-width:680px){.orbit-detail-grid,.orbit-premium-grid,.gi-detail-kpis{grid-template-columns:1fr!important}.orbit-policy-fullpage h2,.orbit-vehicle-fullpage h2{font-size:20px!important}.fichahdr h2{font-size:20px!important;line-height:1.15}.vp-head{position:relative}.page{padding-left:12px!important;padding-right:12px!important}.gi-integrity-warning{align-items:flex-start;flex-direction:column}}'
+    ].join('');
     document.head.appendChild(style);
   }
 
