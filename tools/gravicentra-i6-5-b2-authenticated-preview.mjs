@@ -455,6 +455,12 @@ try{
       formaPago:p.formaPago||'Transferencia',acceptedOffer:{aseguradoraId:p.aseguradoraId,pais:p.pais||c.pais,moneda:p.moneda||c.moneda,ramo:p.ramo,producto:p.producto||p.subramo,primaNeta:1100,primaTotal:total,cuotas:2,frecuencia:'Semestral',formaPago:p.formaPago||'Transferencia',conducto:p.conducto||'Cobro directo del intermediario',sourceRef:'b2qa-'+stamp,documentRef:'quote-b2qa-'+stamp}
     },{operationId:'b2qa_req_'+stamp,motivo:'B2 QA renovación controlada'});
     if(!req.ok)return{ok:false,phase:'request',errors:req.errors||[]};
+    const ready=Orbit.issuance.advanceRequest(req.request.id,'PENDIENTE_EMISION',{
+      documentosCompletos:true,
+      inspeccionAprobada:true,
+      proximaAccion:'Recibir número real y póliza emitida'
+    },{motivo:'B2 QA requisitos de emisión completados'});
+    if(!ready.ok)return{ok:false,phase:'advance',errors:ready.errors||[]};
     const issued=await Orbit.issuance.issueRequest(req.request.id,{
       numero:renewNo,documentRef:'policy-b2qa-'+stamp,vigenciaInicio:p.vigenciaFin||'2027-09-20',vigenciaFin:'2028-09-20',
       frecuencia:'Semestral',cuotas:2,formaPago:p.formaPago||'Transferencia',conducto:p.conducto||'Cobro directo del intermediario',
@@ -462,7 +468,7 @@ try{
     },{operationId:'b2qa_emit_'+stamp,motivo:'B2 QA emisión real de renovación'});
     return{ok:!!issued.ok,phase:'issue',errors:issued.errors||[],requestId:req.request.id,policyId:issued.policy&&issued.policy.id};
   },{policyId:policy.id,stamp,renewNo}),'B2_AUTH_RENEWAL_EVALUATE_TIMEOUT',60000);
-  milestone('RENEWAL_RUNTIME_RETURN',{ok:renewal&&renewal.ok,phase:renewal&&renewal.phase});
+  milestone('RENEWAL_RUNTIME_RETURN',{ok:renewal&&renewal.ok,phase:renewal&&renewal.phase,errors:renewal&&renewal.errors||[]});
   need(renewal.ok,'B2_AUTH_RENEWAL_RUNTIME_FAILED:'+JSON.stringify(renewal));
   state.requestId=renewal.requestId;state.renewedPolicyId=renewal.policyId;
   const renewed=await waitFor(()=>oneBy(db,'polizas','numero',renewNo),'B2_AUTH_RENEWED_POLICY_READBACK',30000);
