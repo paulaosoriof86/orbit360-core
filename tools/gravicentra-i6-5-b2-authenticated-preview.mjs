@@ -46,8 +46,14 @@ async function waitFor(fn,label,timeout=25000,interval=300){
   throw new Error(label+':'+clean(last&&last.message||last||'timeout',800));
 }
 async function captureVisualAudit(page){
-  const out={files:[],desktop:{},mobile:{},readOnly:true};
+  const out={files:[],desktop:{},mobile:{},readOnly:true,visibleInvalid:[],technicalLeak:[]};
+  const scan=async(name)=>{
+    const state=await page.evaluate(()=>String(document.body?.innerText||''));
+    if(/\bundefined\b|\bnull\b/i.test(state))out.visibleInvalid.push(name);
+    if(/I6_5_|release gate|validator|bridge owner|seed writer|owner revision|source sha|artifact id/i.test(state))out.technicalLeak.push(name);
+  };
   const shot=async(name)=>{
+    await scan(name);
     const file=path.join(VISUAL_DIR,name+'.png');
     await page.screenshot({path:file,fullPage:true});
     out.files.push(path.basename(file));
@@ -66,12 +72,15 @@ async function captureVisualAudit(page){
   const sample=await page.evaluate(()=>{
     const polizas=(Orbit.store?.all?.('polizas')||[]).filter(Boolean);
     const vehiculos=(Orbit.store?.all?.('vehiculos')||[]).filter(Boolean);
-    const cobros=(Orbit.store?.all?.('cobros')||[]).filter(Boolean);
+    const receipts=(Orbit.store?.all?.('recibosEsperados')||[]).filter(Boolean);
+    const insurers=(Orbit.store?.all?.('aseguradoras')||[]).filter(Boolean);
     let policy=polizas.find(p=>vehiculos.some(v=>String(v.polizaId||'')===String(p.id||'')))||polizas[0]||null;
     let vehicle=policy?vehiculos.find(v=>String(v.polizaId||'')===String(policy.id||'')):vehiculos[0]||null;
     let client=policy?Orbit.store.get('clientes',policy.clienteId):null;
-    let receipt=(policy?cobros.find(c=>String(c.polizaId||'')===String(policy.id||'')):null)||cobros[0]||null;
-    return{clientId:String(client?.id||''),policyId:String(policy?.id||''),vehicleId:String(vehicle?.id||''),receiptId:String(receipt?.id||'')};
+    let receipt=(policy?receipts.find(r=>String(r.polizaId||'')===String(policy.id||'')):null)||receipts[0]||null;
+    let insurer=policy?Orbit.store.get('aseguradoras',policy.aseguradoraId):null;
+    if(!insurer)insurer=insurers[0]||null;
+    return{clientId:String(client?.id||''),policyId:String(policy?.id||''),vehicleId:String(vehicle?.id||''),receiptId:String(receipt?.id||''),insurerId:String(insurer?.id||'')};
   });
   out.sample=sample;
 
@@ -79,35 +88,61 @@ async function captureVisualAudit(page){
     await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id);},sample.clientId);
     await sleep(900); await shot('05-cliente360-detail-desktop');
   }
+  if(sample.insurerId){
+    await page.evaluate(id=>Orbit.modules?.aseguradoras?.ficha?.(id),sample.insurerId);
+    await page.waitForSelector('#asg-ficha',{timeout:10000});
+    await shot('06-aseguradora-detail-desktop');
+    await page.evaluate(()=>document.getElementById('asg-ficha')?.remove());
+  }
   if(sample.policyId){
     await page.evaluate(id=>Orbit.modules?.cliente360?.verPoliza?.(id),sample.policyId);
     await page.waitForSelector('[data-policy-fullpage="1"]',{timeout:10000});
-    await shot('06-policy-detail-desktop');
+    await shot('07-policy-detail-desktop');
   }
   if(sample.vehicleId){
     await page.evaluate(id=>Orbit.modules?.cliente360?.verVehiculo?.(id),sample.vehicleId);
     await page.waitForSelector('[data-vehicle-fullpage="1"]',{timeout:10000});
-    await shot('07-vehicle-detail-desktop');
+    await shot('08-vehicle-detail-desktop');
   }
   if(sample.receiptId){
-    await page.evaluate(id=>Orbit.modules?.cobros?.detalle?.(id),sample.receiptId);
-    await page.waitForSelector('#cob-det',{timeout:10000});
-    await shot('08-receipt-detail-desktop');
-    await page.evaluate(()=>document.getElementById('cob-det')?.remove());
+    await page.evaluate(({id,cid})=>Orbit.receiptsPortfolioProjection?.openReceiptDetail?.(id,cid),{id:sample.receiptId,cid:sample.clientId});
+    await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:10000});
+    await shot('09-receipt-detail-desktop');
   }
 
   await page.setViewportSize({width:390,height:844});
-  out.mobile.academia=await go('academia'); await shot('09-academia-mobile');
+  out.mobile.academia=await go('academia'); await shot('10-academia-mobile');
+  out.mobile.aseguradoras=await go('aseguradoras'); await shot('11-aseguradoras-mobile');
+  if(sample.insurerId){
+    await page.evaluate(id=>Orbit.modules?.aseguradoras?.ficha?.(id),sample.insurerId);
+    await page.waitForSelector('#asg-ficha',{timeout:10000});
+    await shot('12-aseguradora-detail-mobile');
+    await page.evaluate(()=>document.getElementById('asg-ficha')?.remove());
+  }
+  if(sample.clientId){
+    await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id);},sample.clientId);
+    await sleep(900); await shot('13-cliente360-detail-mobile');
+  }
   if(sample.policyId){
     await page.evaluate(id=>Orbit.modules?.cliente360?.verPoliza?.(id),sample.policyId);
     await page.waitForSelector('[data-policy-fullpage="1"]',{timeout:10000});
-    await shot('10-policy-detail-mobile');
+    await shot('14-policy-detail-mobile');
+  }
+  if(sample.vehicleId){
+    await page.evaluate(id=>Orbit.modules?.cliente360?.verVehiculo?.(id),sample.vehicleId);
+    await page.waitForSelector('[data-vehicle-fullpage="1"]',{timeout:10000});
+    await shot('15-vehicle-detail-mobile');
+  }
+  if(sample.receiptId){
+    await page.evaluate(({id,cid})=>Orbit.receiptsPortfolioProjection?.openReceiptDetail?.(id,cid),{id:sample.receiptId,cid:sample.clientId});
+    await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:10000});
+    await shot('16-receipt-detail-mobile');
   }
   await page.setViewportSize({width:1500,height:1000});
 
-  const visibleOrbit=await page.evaluate(()=>/\bOrbit 360\b/.test(String(document.body?.innerText||'')));
-  out.visibleOrbit360=visibleOrbit;
+  out.visibleOrbit360=await page.evaluate(()=>/\bOrbit 360\b/.test(String(document.body?.innerText||'')));
   out.gravicentraVisible=await page.evaluate(()=>String(document.body?.innerText||'').includes('Gravicentra'));
+  out.pass=out.visibleInvalid.length===0&&out.technicalLeak.length===0&&out.visibleOrbit360===false&&out.gravicentraVisible===true;
   return out;
 }
 
@@ -334,6 +369,9 @@ try{
   milestone('VISUAL_AUDIT_CAPTURED',{files:visualAudit.files,visibleOrbit360:visualAudit.visibleOrbit360,gravicentraVisible:visualAudit.gravicentraVisible,sample:visualAudit.sample});
   need(visualAudit.gravicentraVisible===true,'B2_AUTH_VISUAL_GRAVICENTRA_BRAND_MISSING');
   need(visualAudit.visibleOrbit360===false,'B2_AUTH_VISUAL_ORBIT360_BRAND_REMAINS');
+  need(visualAudit.visibleInvalid.length===0,'B2_AUTH_VISUAL_INVALID_LITERAL:'+JSON.stringify(visualAudit.visibleInvalid));
+  need(visualAudit.technicalLeak.length===0,'B2_AUTH_VISUAL_TECHNICAL_LEAK:'+JSON.stringify(visualAudit.technicalLeak));
+  need(visualAudit.pass===true,'B2_AUTH_VISUAL_AUDIT_NOT_PASS');
 
   const stamp=RUN.replace(/[^0-9A-Za-z]/g,'').slice(-12);
   const clientName='B2 QA '+stamp,ident='B2QA-'+stamp,policyNo='B2-POL-'+stamp,renewNo='B2-REN-'+stamp;
