@@ -33,7 +33,7 @@
         ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
       ],
       "rootCause": "YAML authoring defect in the executor-only remediation; no job executed and no Firebase/data mutation occurred.",
-      "remediation": "Replace embedded heredoc with indentation-safe Node one-liners and reconstruct the complete B2 deploy step.",
+      "remediation": "Moved Preview garbage-collection logic to versioned tools/gravicentra-preview-channel-gc.mjs and restored a minimal indentation-safe workflow step.",
       "status": "SOURCE_FIXED_PENDING_GITHUB_PARSE_AND_RUN",
       "blocking": true,
       "closureProof": "GitHub accepts workflow syntax, central guard passes and B2 deploy job starts.",
@@ -49,7 +49,7 @@
         "Firebase Hosting preview-channel lifecycle"
       ],
       "rootCause": "Preview channels were created repeatedly during recovery but the active B2 executor had no safe garbage collection for obsolete unreferenced B2 channels.",
-      "remediation": "On quota-only failure, list channels, delete only gi-i65-b2-* channels that are not referenced anywhere in the versioned repository, never delete live or referenced rollback/evidence channels, then retry the same exact B2 deploy once.",
+      "remediation": "On quota-only failure, invoke versioned safe GC tool: delete only unreferenced recovery gi-* Preview channels, preserve every versioned reference/live, then retry exact deploy once.",
       "status": "SOURCE_FIX_COMMITTED_RUNTIME_PROOF_PENDING",
       "blocking": true,
       "closureProof": "B2 Hosting Preview deploy succeeds after scoped cleanup; exact readback follows; live/data remain untouched.",

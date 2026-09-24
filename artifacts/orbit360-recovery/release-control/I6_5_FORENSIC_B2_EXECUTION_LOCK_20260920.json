@@ -1332,8 +1332,9 @@
   },
   "observabilityFix": "CAPTURE_AND_PRINT_HOSTING_DEPLOY_FAILURE_BEFORE_FAIL_CLOSED",
   "previewChannelLifecycle": {
-    "status": "SCOPED_SAFE_CLEANUP_READY",
-    "cleanupScope": "UNREFERENCED_GI_I65_B2_CHANNELS_ONLY",
+    "status": "VERSIONED_SAFE_GC_TOOL_READY",
+    "tool": "tools/gravicentra-preview-channel-gc.mjs",
+    "cleanupScope": "UNREFERENCED_GI_RECOVERY_CHANNELS_ONLY",
     "preserveAnyVersionedReference": true,
     "preserveLive": true,
     "retryCount": 1
@@ -1345,6 +1346,6 @@
     "firebaseTouched": false,
     "liveTouched": false,
     "dataTouched": false,
-    "fix": "RECONSTRUCT_B2_DEPLOY_STEP_WITHOUT_HEREDOC"
+    "fix": "MOVE_COMPLEX_GC_TO_VERSIONED_TOOL_AND_RESTORE_MINIMAL_YAML_STEP"
   }
 }

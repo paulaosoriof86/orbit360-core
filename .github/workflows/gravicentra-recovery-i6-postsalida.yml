@@ -3648,27 +3648,7 @@ jobs:
           if ! deploy_b2_channel; then
             if grep -Fq "channel quota reached" "$RUNNER_TEMP/b2-preview.json"; then
               echo "B2_PREVIEW_CHANNEL_QUOTA_REACHED=1"
-              node "$FIREBASE_CLI_BIN" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b2-channels.json"
-              export B2_CHANNEL_LIST="$RUNNER_TEMP/b2-channels.json"
-              node -e 'const fs=require("fs"),d=JSON.parse(fs.readFileSync(process.env.B2_CHANNEL_LIST,"utf8")),ids=new Set();function w(x){if(Array.isArray(x)){for(const v of x)w(v);return;}if(!x||typeof x!=="object")return;let c=x.id||x.channelId;if(!c&&typeof x.name==="string"&&x.name.includes("/channels/"))c=x.name.split("/channels/")[1].split("/")[0];if(typeof c==="string")ids.add(c);for(const v of Object.values(x))w(v);}w(d);for(const id of [...ids].sort())if(/^gi-i65-b2-[0-9]+$/.test(id))console.log(id);' > "$RUNNER_TEMP/b2-channel-ids.txt"
-              DELETED=0
-              while IFS= read -r OLD_CHANNEL; do
-                [ -n "$OLD_CHANNEL" ] || continue
-                [ "$OLD_CHANNEL" != "$CHANNEL_ID" ] || continue
-                if git -C "$GITHUB_WORKSPACE" grep -Fq -- "$OLD_CHANNEL" -- .; then
-                  echo "B2_CHANNEL_KEEP_REFERENCED=$OLD_CHANNEL"
-                  continue
-                fi
-                echo "B2_CHANNEL_DELETE_UNREFERENCED=$OLD_CHANNEL"
-                if node "$FIREBASE_CLI_BIN" hosting:channel:delete "$OLD_CHANNEL" --project "$PROJECT_ID" --force --non-interactive; then
-                  DELETED=$((DELETED+1))
-                fi
-              done < "$RUNNER_TEMP/b2-channel-ids.txt"
-              echo "B2_CHANNELS_DELETED=$DELETED"
-              if [ "$DELETED" -lt 1 ]; then
-                echo "B2_CHANNEL_QUOTA_NO_SAFE_CLEANUP_CANDIDATE"
-                exit 1
-              fi
+              node "$GITHUB_WORKSPACE/tools/gravicentra-preview-channel-gc.mjs" "$FIREBASE_CLI_BIN" "$PROJECT_ID" "$CHANNEL_ID" "$GITHUB_WORKSPACE" "gi-"
               deploy_b2_channel
             else
               echo "B2_HOSTING_PREVIEW_DEPLOY_FAILED_NON_QUOTA"
@@ -3676,7 +3656,13 @@ jobs:
             fi
           fi
           export DEPLOY="$RUNNER_TEMP/b2-preview.json"
-          PREVIEW_URL=$(node -e 'const fs=require("fs"),raw=fs.readFileSync(process.env.DEPLOY,"utf8"),prod="https://"+process.env.HOSTING_SITE+".web.app",m=[...raw.matchAll(/https:\/\/[A-Za-z0-9._-]+\.web\.app/g)].map(x=>x[0].replace(/\/$/,"")).filter(x=>x!==prod);if(!m.length)process.exit(2);process.stdout.write(m[m.length-1]);')
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['DEPLOY']).read();prod='https://'+os.environ['HOSTING_SITE']+'.web.app';urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
+          if not urls:raise SystemExit('B2_PREVIEW_URL_NOT_FOUND')
+          print(urls[-1])
+          PY
+          )
           echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
       - name: Exact B2 Preview readback
