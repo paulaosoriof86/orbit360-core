@@ -96,7 +96,7 @@ Orbit.issuance = (function () {
     return { ok: !errors.length, errors, warnings, client, sourcePolicy, insurer, insurerId, country, currency };
   }
 
-  function createRequest(input, options) {
+  async function createRequest(input, options) {
     input = input || {}; options = options || {};
     if (!canManage()) return { ok: false, errors: ['permiso_emision_denegado'] };
     const check = validateRequest(input);
@@ -152,7 +152,8 @@ Orbit.issuance = (function () {
       bitacora: [{ ts: now(), user: actor().nombre || activeRole(), campo: 'Creación', de: '', a: 'Solicitud de emisión creada', origen: 'manual' }],
       creado: today(), actualizado: today(), archivado: false
     };
-    S().insert('gestiones', request);
+    if (!S().insertDurable) return { ok: false, errors: ['escritura_durable_emision_no_disponible'] };
+    await S().insertDurable('gestiones', request);
     try {
       S().insert('actividades', {
         id: 'act_' + Date.now().toString(36), tenantId: request.tenantId, clienteId: request.clienteId,
@@ -165,7 +166,7 @@ Orbit.issuance = (function () {
     return { ok: true, request, warnings: check.warnings, operationId: opId };
   }
 
-  function advanceRequest(id, nextStage, patch, options) {
+  async function advanceRequest(id, nextStage, patch, options) {
     patch = patch || {}; options = options || {};
     if (!canManage()) return { ok: false, errors: ['permiso_emision_denegado'] };
     const current = S().get('gestiones', id);
@@ -179,7 +180,8 @@ Orbit.issuance = (function () {
       emissionStage: nextStage, estado: opsState(nextStage), bitacora, actualizado: today(),
       proximaAccion: patch.proximaAccion || (nextStage === 'PENDIENTE_DOCUMENTOS' ? 'Completar documentos' : nextStage === 'PENDIENTE_INSPECCION' ? 'Completar inspección' : nextStage === 'PENDIENTE_EMISION' ? 'Recibir número real y póliza emitida' : nextStage === 'EMITIDA' ? 'Cerrada' : 'Cerrar gestión')
     });
-    S().update('gestiones', id, next);
+    if (!S().updateDurable) return { ok: false, errors: ['escritura_durable_emision_no_disponible'] };
+    await S().updateDurable('gestiones', id, next);
     const after = S().get('gestiones', id);
     if (A() && A().audit) A().audit('cambiar_etapa_emision', 'gestiones', id, before, after, options.motivo || ('Etapa ' + stageLabel(nextStage)));
     return { ok: true, request: after };

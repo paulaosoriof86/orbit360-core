@@ -462,14 +462,14 @@ try{
     try{
     const p=Orbit.store.get('polizas',policyId),c=Orbit.store.get('clientes',p.clienteId);
     const total=(+p.primaTotal||+p.primaNeta||1000)*1.05;
-    const req=Orbit.issuance.createRequest({
+    const req=await Orbit.issuance.createRequest({
       tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,aseguradoraId:p.aseguradoraId,
       pais:p.pais||c.pais,moneda:p.moneda||c.moneda,ramo:p.ramo,producto:p.producto||p.subramo,
       sourcePolicyId:p.id,acceptedConfirmed:true,primaNeta:1100,primaTotal:total,cuotas:2,frecuencia:'Semestral',
       formaPago:p.formaPago||'Transferencia',acceptedOffer:{aseguradoraId:p.aseguradoraId,pais:p.pais||c.pais,moneda:p.moneda||c.moneda,ramo:p.ramo,producto:p.producto||p.subramo,primaNeta:1100,primaTotal:total,cuotas:2,frecuencia:'Semestral',formaPago:p.formaPago||'Transferencia',conducto:p.conducto||'Cobro directo del intermediario',sourceRef:'b2qa-'+stamp,documentRef:'quote-b2qa-'+stamp}
     },{operationId:'b2qa_req_'+stamp,motivo:'B2 QA renovación controlada'});
     if(!req.ok)return{ok:false,phase:'request',errors:req.errors||[]};
-    const ready=Orbit.issuance.advanceRequest(req.request.id,'PENDIENTE_EMISION',{
+    const ready=await Orbit.issuance.advanceRequest(req.request.id,'PENDIENTE_EMISION',{
       documentosCompletos:true,
       inspeccionAprobada:true,
       proximaAccion:'Recibir número real y póliza emitida'

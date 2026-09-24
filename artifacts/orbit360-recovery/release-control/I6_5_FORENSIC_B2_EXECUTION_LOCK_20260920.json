@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -47,7 +47,8 @@
       "orbit360-platform/core/config.js",
       "orbit360-platform/modules/crm-v1198-operational-bridge.js",
       "orbit360-platform/core/policy-receipts-v1199-refinements.js",
-      "orbit360-platform/core/router.js"
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/core/issuance-workflow-v1201-refinements.js"
     ],
     "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
@@ -152,24 +153,19 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "d6dbc855ad937b227c9f8a75f60f4ce8e474ede1",
-    "buildId": "gi-i65-b2-d6dbc855ad93-57f234755dc1",
-    "channelId": "gi-i65-b2-35960854008",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-35960854008-og119w48.web.app",
-    "runId": 35960854008,
-    "artifactId": 10792216240,
-    "artifactDigest": "24862e97e56089ae6d408b13e66c6c47b3b7159dd9d4dcfb4faa209f188291bb",
-    "exactReadback": true,
-    "functionalPass": true,
+    "status": "PENDING_NEW_PREVIEW_AFTER_CANONICAL_ISSUANCE_CREATE_ADVANCE_DURABILITY_FIX",
+    "supersedesRunId": 35960854008,
+    "exactReadback": false,
+    "functionalPass": false,
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "d6dbc855ad937b227c9f8a75f60f4ce8e474ede1",
-    "exactPreviewBuildId": "gi-i65-b2-d6dbc855ad93-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35960854008-og119w48.web.app",
-    "exactPreviewArtifactId": 10792216240,
+    "exactPreviewSourceSha": "",
+    "exactPreviewBuildId": "",
+    "exactPreviewUrl": "",
+    "exactPreviewArtifactId": null,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
@@ -212,8 +208,8 @@
     },
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
-    "lastFailedRunId": 35960553237,
-    "lastFailure": "COLLECTION_OPERATIVA_INVALIDA",
+    "lastFailedRunId": 35961205964,
+    "lastFailure": "PRODUCT_WRITE_RECORD_NOT_FOUND",
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false
@@ -478,6 +474,19 @@
       "functionalPass": true,
       "livePromoted": false,
       "status": "SUPERSEDED_BY_RENEWAL_DOMAIN_SPLIT_DURABLE_FIX"
+    },
+    {
+      "sourceSha": "d6dbc855ad937b227c9f8a75f60f4ce8e474ede1",
+      "buildId": "gi-i65-b2-d6dbc855ad93-57f234755dc1",
+      "channelId": "gi-i65-b2-35960854008",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-35960854008-og119w48.web.app",
+      "runId": 35960854008,
+      "artifactId": 10792216240,
+      "artifactDigest": "24862e97e56089ae6d408b13e66c6c47b3b7159dd9d4dcfb4faa209f188291bb",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false,
+      "status": "SUPERSEDED_BY_CANONICAL_ISSUANCE_CREATE_ADVANCE_DURABILITY_FIX"
     }
   ],
   "previousAuthenticatedPreviewProofHistory": [
@@ -717,6 +726,27 @@
         "deleted": 19,
         "orphanExpected": false
       }
+    },
+    {
+      "status": "FAIL",
+      "runId": 35961205964,
+      "exactPreviewSourceSha": "d6dbc855ad937b227c9f8a75f60f4ce8e474ede1",
+      "exactPreviewBuildId": "gi-i65-b2-d6dbc855ad93-57f234755dc1",
+      "exactPreviewArtifactId": 10792216240,
+      "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35960854008-og119w48.web.app",
+      "failure": "PRODUCT_WRITE_RECORD_NOT_FOUND",
+      "classification": "PRODUCT_DEFECT_ISSUANCE_REQUEST_CREATE_ADVANCE_FIRE_AND_FORGET_READ_MODEL_GAP",
+      "evidence": {
+        "sourcePolicyDurableBacklinkPass": true,
+        "requestManagementBeforeExists": false,
+        "failedOwner": "gestiones",
+        "phase": "issue_closure"
+      },
+      "cleanup": {
+        "syntheticCleanupConfirmed": true,
+        "deleted": 19,
+        "orphanExpected": false
+      }
     }
   ],
   "visualReview20260923": {
@@ -882,7 +912,7 @@
   },
   "renewalDurabilityRemediation": {
     "status": "SOURCE_FIX_READY_FOR_NEW_PREVIEW",
-    "rootCause": "ISSUE_REQUEST_USED_FIRE_AND_FORGET_POST_CREATE_UPDATES_FOR_CRITICAL_REQUEST_AND_SOURCE_POLICY_LINKS",
+    "rootCause": "CREATE_REQUEST_AND_ADVANCE_REQUEST_USED_FIRE_AND_FORGET_GESTIONES_WRITES_CAUSING_LOCAL_READ_MODEL_GAP_BEFORE_ISSUE_CLOSURE",
     "owner": "orbit360-platform/core/issuance-workflow-v1201.js",
     "requiredInvariant": "ISSUE_SUCCESS_ONLY_AFTER_DURABLE_REQUEST_CLOSURE_AND_SOURCE_RENOVADA_POR_READBACK",
     "confirmedFailures": [
@@ -892,6 +922,12 @@
     "noConfirmedCobroCreation": true,
     "durabilityRouting": "POLIZAS_GENERAL_COMMAND_GESTIONES_WORKFLOW_COMMAND",
     "crossDomainGeneralBatchForbidden": true,
-    "issueSuccessAfterAllDurableOwners": true
+    "issueSuccessAfterAllDurableOwners": true,
+    "canonicalLifecycleDurable": true,
+    "createOwner": "createRequest -> insertDurable(gestiones)",
+    "advanceOwner": "advanceRequest -> updateDurable(gestiones)",
+    "issueOwner": "issueRequest -> awaited durable source policy and workflow closures",
+    "uiAwaited": true,
+    "parallelApiCreated": false
   }
 }

@@ -12,6 +12,7 @@ const files={
   engine:read('orbit360-platform/core/policy-receipts-engine.js'),
   refinements:read('orbit360-platform/core/policy-receipts-v1199-refinements.js'),
   issuance:read('orbit360-platform/core/issuance-workflow-v1201.js'),
+  issuanceRefinements:read('orbit360-platform/core/issuance-workflow-v1201-refinements.js'),
   issuanceBridge:read('orbit360-platform/modules/issuance-endosos-v1201-bridge.js'),
   receiptsProjection:read('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js'),
   detail:read('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'),
@@ -55,6 +56,10 @@ for(const marker of ['data-vbrand','data-vline','data-vplate','data-vyear','data
 need(files.bridge.includes("save.textContent = 'Guardando…'"),'B2_POLICY_SAVE_PENDING_STATE_MISSING');
 need(!files.bridge.includes("if (e.target === b) close();"),'B2_POLICY_BACKDROP_CLOSE_STILL_PRESENT');
 need(files.engine.includes("action:prior?'update':'insert',collection:'vehiculos'"),'B2_VEHICLE_UPSERT_MISSING');
+need(files.issuance.includes('async function createRequest')&&files.issuance.includes("await S().insertDurable('gestiones', request)"),'B2_ISSUANCE_CREATE_NOT_DURABLE');
+need(files.issuance.includes('async function advanceRequest')&&files.issuance.includes("await S().updateDurable('gestiones', id, next)"),'B2_ISSUANCE_ADVANCE_NOT_DURABLE');
+need(files.issuanceRefinements.includes('I.advanceRequest = async function')&&files.issuanceRefinements.includes('return await originalAdvance')&&files.issuanceRefinements.includes('I.issueRequest = async function')&&files.issuanceRefinements.includes('return await originalIssue'),'B2_ISSUANCE_REFINEMENTS_NOT_ASYNC');
+need(files.issuanceBridge.includes('await I.createRequest')&&files.issuanceBridge.includes('await I.advanceRequest'),'B2_ISSUANCE_UI_CREATE_ADVANCE_NOT_AWAITED');
 need(files.issuance.includes('async function issueRequest'),'B2_ISSUANCE_NOT_ASYNC');
 need(files.issuance.includes('await P().createPolicy'),'B2_ISSUANCE_CREATE_NOT_AWAITED');
 need(files.issuance.includes("await S().updateDurable('polizas', source.id")&&files.issuance.includes("await S().updateDurable('gestiones', request.id")&&files.issuance.includes("renovadaPor: policy.id")&&files.issuance.includes("policyCreatedId: policy.id"),'B2_RENEWAL_DURABLE_CLOSURE_MISSING');
@@ -84,7 +89,7 @@ for(const role of ['Dirección','Admin','Comercial','Finanzas','Marketing','Oper
   need(slice.includes("'academia'"),'B2_ACADEMIA_ALL_ROLE_DEFAULT_MISSING:'+role);
 }
 new Function(files.academiaCatalog);new Function(files.academiaOwner);new Function(files.academia);
-for(const marker of ['core/config.js?v=20260923-b2a3','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260923-b2a1','core/product-app-p0.js?v=20260923-b2a1','core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260924-b2a5','modules/cliente360.js?v=20260920-b2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v4','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+for(const marker of ['core/config.js?v=20260923-b2a3','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260923-b2a1','core/product-app-p0.js?v=20260923-b2a1','core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260924-b2a6','modules/cliente360.js?v=20260920-b2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v4','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260924-b2a6'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={
@@ -114,6 +119,7 @@ const store={
   where:(c,p)=>(rows[c]||[]).filter(p),
   find:(c,p)=>(rows[c]||[]).find(p),
   insert:(c,row)=>{rows[c]=rows[c]||[];const x=clone(row);rows[c].push(x);return x;},
+  insertDurable:async(c,row)=>{rows[c]=rows[c]||[];const x=clone(row);if(!x.id)throw new Error('INSERT_DURABLE_ID_REQUIRED:'+c);if(find(c,x.id))throw new Error('INSERT_DURABLE_DUPLICATE:'+c+':'+x.id);rows[c].push(x);return clone(x);},
   update:(c,id,patch)=>{const x=find(c,id);if(!x)return false;Object.assign(x,clone(patch));return true;},
   updateDurable:async(c,id,patch)=>{const x=find(c,id);if(!x)throw new Error('UPDATE_DURABLE_MISSING:'+c+':'+id);Object.assign(x,clone(patch));return clone(x);},
   remove:(c,id)=>{const a=rows[c]||[],i=a.findIndex(x=>x.id===id);if(i<0)return false;a.splice(i,1);return true;},

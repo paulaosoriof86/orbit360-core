@@ -101,10 +101,12 @@ Orbit.modules = Orbit.modules || {};
     const $ = s => b.querySelector(s);
     const country = $('#emi-pais'), currency = $('#emi-mon');
     country.onchange = () => { currency.value = country.value === 'CO' ? 'COP' : 'GTQ'; };
-    b.querySelector('[data-save]').onclick = () => {
+    b.querySelector('[data-save]').onclick = async () => {
+      const saveBtn = b.querySelector('[data-save]'), originalSaveText = saveBtn.textContent;
+      saveBtn.disabled = true; saveBtn.textContent = 'Guardando…';
       const clientId = $('#emi-cli').value, client = S().get('clientes', clientId);
       const cuotaN = Math.max(1, +$('#emi-cuotas').value || 1);
-      const result = I.createRequest({
+      const result = await I.createRequest({
         clienteId, asesorId: client && client.asesorId || context.asesorId, aseguradoraId: $('#emi-asg').value,
         sourcePolicyId: context.sourcePolicyId || '', renewalManagementId: context.renewalManagementId || context.gestionId || '',
         pais: country.value, moneda: currency.value, ramo: $('#emi-ramo').value.trim(), producto: $('#emi-prod').value.trim(),
@@ -121,7 +123,7 @@ Orbit.modules = Orbit.modules || {};
           riskContext: window.__orbitQuoteContext && window.__orbitQuoteContext.riesgo || {}
         }
       }, { motivo: 'Opción aceptada desde Comparativo' });
-      if (!result.ok) return toast('No se creó: ' + (result.errors || []).join(', '));
+      if (!result.ok) { saveBtn.disabled = false; saveBtn.textContent = originalSaveText; return toast('No se creó: ' + (result.errors || []).join(', ')); }
       b.remove(); toast(result.reused ? 'La solicitud de emisión ya estaba activa.' : 'Solicitud de emisión creada en Ops.');
       location.hash = '#/ops'; window.__orbitOpenGestion = result.request.id;
     };
@@ -232,7 +234,12 @@ Orbit.modules = Orbit.modules || {};
     if (g.workflowType === 'issuance_request') {
       const o = g.acceptedOffer || {}, policy = g.policyCreatedId && S().get('polizas', g.policyCreatedId);
       panel.innerHTML = `<div class="ciclo-sec-t">📝 Solicitud de emisión</div><div class="vp-tags"><span class="badge info">${esc(I.stageLabel(g.emissionStage))}</span>${g.requiereValidacion ? '<span class="badge warn">Requiere validación</span>' : '<span class="badge ok">Oferta referenciada</span>'}</div><div class="vp-grid" style="margin-top:10px"><div class="vp-row"><span class="vp-l">Prima aceptada</span><span class="vp-v">${esc(g.moneda)} ${Number(o.primaTotal || 0).toLocaleString('es-GT')}</span></div><div class="vp-row"><span class="vp-l">Fuente</span><span class="vp-v">${esc(o.sourceRef || o.sourceType || 'Pendiente')}</span></div><div class="vp-row"><span class="vp-l">Póliza origen</span><span class="vp-v">${esc((S().get('polizas', g.sourcePolicyId) || {}).numero || 'Nueva emisión')}</span></div><div class="vp-row"><span class="vp-l">Resultado</span><span class="vp-v">${policy ? esc(policy.numero) : 'Aún no crea póliza'}</span></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px">${g.emissionStage === 'PROPUESTA_ACEPTADA' ? '<button class="btn ghost sm" data-stage="PENDIENTE_DOCUMENTOS">Pendiente documentos</button>' : ''}${g.requiereInspeccion && ['PROPUESTA_ACEPTADA','PENDIENTE_DOCUMENTOS'].includes(g.emissionStage) ? '<button class="btn ghost sm" data-stage="PENDIENTE_INSPECCION">Pasar a inspección</button>' : ''}${['PROPUESTA_ACEPTADA','PENDIENTE_DOCUMENTOS','PENDIENTE_INSPECCION'].includes(g.emissionStage) ? '<button class="btn ghost sm" data-stage="PENDIENTE_EMISION">Lista para emisión</button>' : ''}${!policy && !['CANCELADA','RECHAZADA'].includes(g.emissionStage) && I.canManage() ? '<button class="btn primary sm" data-issue>Registrar emisión real</button>' : ''}${policy ? '<button class="btn primary sm" data-policy>Ver póliza emitida</button>' : ''}</div>`;
-      panel.querySelectorAll('[data-stage]').forEach(x => x.onclick = () => { const r = I.advanceRequest(g.id, x.dataset.stage, {}, { motivo: 'Avance operativo desde Ops' }); if (!r.ok) return toast((r.errors || []).join(', ')); Orbit.ciclo.openGestion(g.id); });
+      panel.querySelectorAll('[data-stage]').forEach(x => x.onclick = async () => {
+        const originalText = x.textContent; x.disabled = true; x.textContent = 'Guardando…';
+        const r = await I.advanceRequest(g.id, x.dataset.stage, {}, { motivo: 'Avance operativo desde Ops' });
+        if (!r.ok) { x.disabled = false; x.textContent = originalText; return toast((r.errors || []).join(', ')); }
+        Orbit.ciclo.openGestion(g.id);
+      });
       const issue = panel.querySelector('[data-issue]'); if (issue) issue.onclick = () => openIssueModal(g);
       const policyBtn = panel.querySelector('[data-policy]'); if (policyBtn) policyBtn.onclick = () => { back.remove(); Orbit.modules.cliente360.verPoliza(g.policyCreatedId); };
     } else if (g.workflowType === 'endorsement_request') {

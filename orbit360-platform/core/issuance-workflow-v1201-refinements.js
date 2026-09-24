@@ -6,7 +6,7 @@ window.Orbit = window.Orbit || {};
   const originalAdvance = I.advanceRequest.bind(I);
   const originalIssue = I.issueRequest.bind(I);
 
-  I.advanceRequest = function (id, nextStage, patch, options) {
+  I.advanceRequest = async function (id, nextStage, patch, options) {
     patch = patch || {};
     const request = Orbit.store && Orbit.store.get ? Orbit.store.get('gestiones', id) : null;
     if (request && nextStage === 'PENDIENTE_EMISION') {
@@ -21,14 +21,14 @@ window.Orbit = window.Orbit || {};
       });
       patch = Object.assign({}, patch, { documentosCompletos: true, inspeccionAprobada: inspectionReady, checklist });
     }
-    return originalAdvance(id, nextStage, patch, options);
+    return await originalAdvance(id, nextStage, patch, options);
   };
 
-  I.issueRequest = function (id, policyInput, options) {
+  I.issueRequest = async function (id, policyInput, options) {
     policyInput = policyInput || {};
     const request = Orbit.store && Orbit.store.get ? Orbit.store.get('gestiones', id) : null;
     if (!request) return { ok: false, errors: ['solicitud_emision_no_encontrada'] };
-    if (request.policyCreatedId) return originalIssue(id, policyInput, options);
+    if (request.policyCreatedId) return await originalIssue(id, policyInput, options);
     if (request.emissionStage !== 'PENDIENTE_EMISION') return { ok: false, errors: ['solicitud_no_lista_para_emision'] };
     if (!request.documentosCompletos) return { ok: false, errors: ['documentos_emision_incompletos'] };
     if (request.requiereInspeccion && !request.inspeccionAprobada) return { ok: false, errors: ['inspeccion_pendiente'] };
@@ -36,7 +36,7 @@ window.Orbit = window.Orbit || {};
     if (source && source.vigenciaFin && policyInput.vigenciaInicio && String(policyInput.vigenciaInicio) < String(source.vigenciaFin)) {
       return { ok: false, errors: ['traslape_requiere_regla_tenant'], sourceEnd: source.vigenciaFin, newStart: policyInput.vigenciaInicio };
     }
-    return originalIssue(id, policyInput, options);
+    return await originalIssue(id, policyInput, options);
   };
 
   I.__refinementsV1201 = { originalAdvance, originalIssue };
