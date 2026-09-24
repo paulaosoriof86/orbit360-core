@@ -192,39 +192,60 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
     let back = document.getElementById('crm-new-client-v1198'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'crm-new-client-v1198'; back.className = 'drawer-back open';
     back.style.cssText = 'display:grid;place-items:center;z-index:215';
-    back.innerHTML = `<div class="card" style="width:min(760px,95vw);max-height:92vh;overflow:auto;padding:0">
-      <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center"><div><small style="color:rgba(255,255,255,.65)">Clientes 360</small><b style="display:block;font-family:var(--f-display);font-size:17px;color:#fff">Nuevo cliente</b></div><button class="imp-x" data-close style="color:#fff">✕</button></div>
+    back.innerHTML = \`<div class="card" style="width:min(760px,95vw);max-height:92vh;overflow:auto;padding:0;border-radius:22px;border:1px solid #e8e3de;box-shadow:0 24px 70px rgba(24,28,34,.18);background:#fffdfb">
+      <div style="padding:17px 20px;background:linear-gradient(135deg,#fff7f8 0%,#f7f4f0 68%,#f4f7fb 100%);border-bottom:1px solid #ebe5e0;display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:12px;align-items:center">
+          <span style="width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:#fff;border:1px solid #eadfe1;font-size:21px">👤</span>
+          <div><small style="color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-weight:700">Clientes 360</small><b style="display:block;font-family:var(--f-display);font-size:18px;color:var(--ink)">Nuevo cliente</b></div>
+        </div>
+        <button class="imp-x" data-close style="color:var(--ink);background:#fff;border:1px solid #ddd7d2" aria-label="Cerrar">✕</button>
+      </div>
       <div style="padding:18px 20px;display:grid;gap:13px">
+        <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:14px;background:#f8f6f3;border-left:3px solid var(--red);font-family:var(--f-display);font-weight:800;font-size:14px">
+          <span>🪪</span><div>Identidad y contacto<div style="font-family:var(--f-body);font-size:11.5px;font-weight:500;color:var(--ink-3);margin-top:2px">Datos básicos para crear el expediente del cliente.</div></div>
+        </div>
         <div class="cgrid">
           <label class="ce-l">Nombre / razón social *<input id="v1198-nombre" class="o-sel"></label>
           <label class="ce-l">Tipo<select id="v1198-tipo" class="o-sel"><option>Persona</option><option>Empresa</option></select></label>
-          <label class="ce-l">País *<select id="v1198-pais" class="o-sel">${countries.map(p => `<option value="${esc(p.id)}">${esc(p.label)}</option>`).join('')}</select></label>
+          <label class="ce-l">País *<select id="v1198-pais" class="o-sel">\${countries.map(p => \`<option value="\${esc(p.id)}">\${esc(p.label)}</option>\`).join('')}</select></label>
           <label class="ce-l">Identificación<input id="v1198-id" class="o-sel"></label>
           <label class="ce-l">Teléfono / WhatsApp<input id="v1198-tel" class="o-sel"></label>
           <label class="ce-l">Correo<input id="v1198-email" type="email" class="o-sel"></label>
           <label class="ce-l">Departamento<select id="v1198-dep" class="o-sel"></select></label>
           <label class="ce-l">Ciudad / municipio<select id="v1198-ciu" class="o-sel"></select></label>
           <label class="ce-l">Dirección<input id="v1198-dir" class="o-sel"></label>
-          <label class="ce-l">Canal<select id="v1198-canal" class="o-sel">${((Orbit.cat && Orbit.cat.get && Orbit.cat.get('canales')) || ['Referido']).map(x => `<option>${esc(x)}</option>`).join('')}</select></label>
-          <label class="ce-l">Asesor responsable *<select id="v1198-ase" class="o-sel">${advisors.map(a => `<option value="${esc(a.id)}">${esc(a.nombre)}</option>`).join('')}</select></label>
+          <label class="ce-l">Canal<select id="v1198-canal" class="o-sel">\${((Orbit.cat && Orbit.cat.get && Orbit.cat.get('canales')) || ['Referido']).map(x => \`<option>\${esc(x)}</option>\`).join('')}</select></label>
+          <label class="ce-l">Asesor responsable *<select id="v1198-ase" class="o-sel">\${advisors.map(a => \`<option value="\${esc(a.id)}">\${esc(a.nombre)}</option>\`).join('')}</select></label>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:14px;background:#f5f8fb;border-left:3px solid #2a6fdb;font-family:var(--f-display);font-weight:800;font-size:14px">
+          <span>📝</span><div>Contexto y seguimiento<div style="font-family:var(--f-body);font-size:11.5px;font-weight:500;color:var(--ink-3);margin-top:2px">Asigna responsable, canal y observaciones útiles para la gestión.</div></div>
         </div>
         <label class="ce-l">Notas<textarea id="v1198-notas" class="o-sel" style="min-height:64px"></textarea></label>
-        <div class="cfg-note">El cliente inicia como <b>Pendiente de pólizas</b>. Los datos faltantes quedan en Calidad de datos y no se completan automáticamente.</div>
+        <div class="cfg-note">💡 El cliente inicia como <b>Pendiente de pólizas</b>. Los datos faltantes quedan en Calidad de datos y no se completan automáticamente.</div>
       </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="v1198-save">Crear cliente</button></div></div>`;
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="v1198-save">Crear cliente</button>
+      </div>
+    </div>\`;
     document.body.appendChild(back);
     const $ = s => back.querySelector(s);
     const close = () => back.remove();
     back.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', close));
-    back.addEventListener('click', e => { if (e.target === back) close(); });
+    back.addEventListener('click', e => {
+      if (e.target === back) {
+        e.preventDefault();
+        e.stopPropagation();
+        toast('Usa Crear cliente o Cancelar para cerrar este formulario.');
+      }
+    });
     const pais = $('#v1198-pais'), dep = $('#v1198-dep'), city = $('#v1198-ciu');
     function fillCities(selected) {
       const rows = (((Orbit.GEO || {})[pais.value] || {})[dep.value] || []);
-      city.innerHTML = '<option value="">— Seleccionar —</option>' + rows.map(x => `<option ${x === selected ? 'selected' : ''}>${esc(x)}</option>`).join('');
+      city.innerHTML = '<option value="">— Seleccionar —</option>' + rows.map(x => \`<option \${x === selected ? 'selected' : ''}>\${esc(x)}</option>\`).join('');
     }
     function fillDeps() {
       const rows = Object.keys((Orbit.GEO || {})[pais.value] || {});
-      dep.innerHTML = '<option value="">— Seleccionar —</option>' + rows.map(x => `<option>${esc(x)}</option>`).join(''); fillCities();
+      dep.innerHTML = '<option value="">— Seleccionar —</option>' + rows.map(x => \`<option>\${esc(x)}</option>\`).join(''); fillCities();
     }
     pais.addEventListener('change', fillDeps); dep.addEventListener('change', () => fillCities()); fillDeps();
     $('#v1198-save').addEventListener('click', async () => {
@@ -251,14 +272,29 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
       }
       const row = A.prepareManual('clientes', raw);
       row.estadoOperativo = 'pendiente_polizas'; row.estado = 'pendiente_polizas';
-      const inserted = baseStore().insert('clientes', row);
-      baseStore().insert('actividades', {
-        id: 'act_' + Date.now().toString(36), tenantId: row.tenantId, clienteId: row.id, asesorId: row.asesorId,
+      const opId = 'crm_client_create_' + row.id + '_' + Date.now().toString(36);
+      const activity = {
+        id: 'act_' + opId, tenantId: row.tenantId, clienteId: row.id, asesorId: row.asesorId,
         tipo: 'sistema', icon: '🧑‍💼', fecha: row.fechaAlta, titulo: 'Cliente creado',
-        detalle: 'Ingreso manual en plataforma · estado inicial: pendiente de pólizas', fuente: 'ingreso_manual_plataforma'
-      });
-      A.audit('crear', 'clientes', row.id, null, inserted || row, 'Alta manual desde Clientes 360');
-      close(); location.hash = '#/cliente360?c=' + encodeURIComponent(row.id);
+        detalle: 'Ingreso manual en plataforma · estado inicial: pendiente de pólizas', fuente: 'ingreso_manual_plataforma',
+        operacionId: opId
+      };
+      const store = baseStore(), save = $('#v1198-save');
+      if (!store.batchDurable) { toast('Guardado server-owned no disponible; no se creó el cliente.'); return; }
+      save.disabled = true; save.textContent = 'Guardando…';
+      try {
+        await store.batchDurable([
+          { action: 'insert', collection: 'clientes', id: row.id, payload: row },
+          { action: 'insert', collection: 'actividades', id: activity.id, payload: activity }
+        ], { requestId: opId, timeoutMs: 20000 });
+        const inserted = store.get('clientes', row.id) || row;
+        A.audit('crear', 'clientes', row.id, null, inserted, 'Alta manual desde Clientes 360');
+        close(); location.hash = '#/cliente360?c=' + encodeURIComponent(row.id);
+        toast('✓ Cliente creado y confirmado.');
+      } catch (error) {
+        save.disabled = false; save.textContent = 'Crear cliente';
+        toast('No fue posible confirmar la creación; el formulario permanece abierto.');
+      }
     });
   }
 
