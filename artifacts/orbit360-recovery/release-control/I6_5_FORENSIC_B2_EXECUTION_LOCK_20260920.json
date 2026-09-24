@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -146,24 +146,19 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "0f23de1b4cf6ccfc73d33338748172617eaba705",
-    "buildId": "gi-i65-b2-0f23de1b4cf6-57f234755dc1",
-    "channelId": "gi-i65-b2-35952977830",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-35952977830-cvkaoje5.web.app",
-    "runId": 35952977830,
-    "artifactId": 10789386274,
-    "artifactDigest": "ad1d018555d98c62f7a87ad4958e28051fd6182eaf79ce6557495602b07b2cac",
-    "exactReadback": true,
-    "functionalPass": true,
+    "status": "PENDING_NEW_PREVIEW_AFTER_DUPLICATE_CONTRACT_ROOTFIX",
+    "supersedesRunId": 35952977830,
+    "exactReadback": false,
+    "functionalPass": false,
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "BLOCKED_CLEANUP_PENDING",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "0f23de1b4cf6ccfc73d33338748172617eaba705",
-    "exactPreviewBuildId": "gi-i65-b2-0f23de1b4cf6-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35952977830-cvkaoje5.web.app",
-    "exactPreviewArtifactId": 10789386274,
+    "exactPreviewSourceSha": "",
+    "exactPreviewBuildId": "",
+    "exactPreviewUrl": "",
+    "exactPreviewArtifactId": null,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
@@ -420,6 +415,19 @@
       "functionalPass": true,
       "livePromoted": false,
       "status": "SUPERSEDED_BY_CRM_V1198_SYNTAX_ROOTFIX"
+    },
+    {
+      "sourceSha": "0f23de1b4cf6ccfc73d33338748172617eaba705",
+      "buildId": "gi-i65-b2-0f23de1b4cf6-57f234755dc1",
+      "channelId": "gi-i65-b2-35952977830",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-35952977830-cvkaoje5.web.app",
+      "runId": 35952977830,
+      "artifactId": 10789386274,
+      "artifactDigest": "ad1d018555d98c62f7a87ad4958e28051fd6182eaf79ce6557495602b07b2cac",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false,
+      "status": "SUPERSEDED_BY_DUPLICATE_CONTRACT_ROOTFIX"
     }
   ],
   "previousAuthenticatedPreviewProofHistory": [
@@ -540,6 +548,34 @@
         "syntheticCreated": false,
         "deleted": 0,
         "orphanExpected": false
+      }
+    },
+    {
+      "status": "FAIL",
+      "runId": 35953849511,
+      "exactPreviewSourceSha": "0f23de1b4cf6ccfc73d33338748172617eaba705",
+      "exactPreviewBuildId": "gi-i65-b2-0f23de1b4cf6-57f234755dc1",
+      "exactPreviewArtifactId": 10789386274,
+      "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35952977830-cvkaoje5.web.app",
+      "failure": "B2_AUTH_DUPLICATE_CONTRACT_TYPE_ERROR",
+      "classification": "PRODUCT_FRONTEND_CONTRACT_MISMATCH",
+      "rootCause": "ACCESS_SCOPE_DUPLICATE_CANDIDATES_RETURNS_OBJECT_BUT_CRM_V1198_CONSUMED_ARRAY",
+      "observedPageError": "dup.filter is not a function",
+      "operationalWriteStatus": {
+        "pending": 0,
+        "committed": 0,
+        "failed": 0,
+        "lastError": ""
+      },
+      "backendCalled": false,
+      "cleanup": {
+        "runId": 35954229397,
+        "status": "PASS",
+        "beforeClients": 0,
+        "beforePolicies": 0,
+        "deleted": 0,
+        "afterClients": 0,
+        "afterPolicies": 0
       }
     }
   ],
@@ -673,12 +709,17 @@
     "reason": "AUTH_AND_CLEANUP_MUST_NOT_RUN_IN_PARALLEL"
   },
   "duplicateContractRemediation": {
-    "status": "ROOT_CAUSE_CONFIRMED_CLEANUP_BEFORE_SOURCE_FIX",
+    "status": "SOURCE_ROOTFIX_READY_FOR_NEW_PREVIEW",
     "producer": "orbit360-platform/core/access-scope.js::duplicateCandidates",
     "producerShape": "{exact:Array,probable:Array}",
-    "brokenConsumer": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
-    "brokenExpression": "dup.filter(x => x.exact)",
-    "observedPageError": "dup.filter is not a function",
-    "backendCalled": false
+    "consumer": "orbit360-platform/modules/crm-v1198-operational-bridge.js::openNewClient",
+    "failClosedOnInvalidShape": true,
+    "oldConsumer": "dup.filter / dup.length",
+    "newConsumer": "dup.exact / dup.probable",
+    "cacheKey": "20260923-b2v4",
+    "regressionGateAdded": true,
+    "cleanupBeforeFixRunId": 35954229397,
+    "noOperationalDataApply": true,
+    "noReimport": true
   }
 }

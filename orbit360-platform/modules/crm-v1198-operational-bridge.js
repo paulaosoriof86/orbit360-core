@@ -259,12 +259,17 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
         segmento: 'Nuevo', etiquetas: ['Nuevo'], encuestasActivas: true
       };
       const dup = A.duplicateCandidates(raw);
-      const exact = dup.filter(x => x.exact);
+      if (!dup || !Array.isArray(dup.exact) || !Array.isArray(dup.probable)) {
+        toast('No fue posible validar duplicados; no se creó el cliente.');
+        return;
+      }
+      const exact = dup.exact;
+      const probable = dup.probable;
       if (exact.length) {
         toast('No se creó: existe un cliente con identificación o correo coincidente.');
         return;
       }
-      if (dup.length) {
+      if (probable.length) {
         const ok = await U.confirm('Se detectó un posible duplicado por nombre/país. ¿Crear como Requiere validación?', { title: 'Posible duplicado', ok: 'Crear para revisión' });
         if (!ok) return;
         raw.requiereValidacion = true;

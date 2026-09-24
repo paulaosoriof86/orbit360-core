@@ -7,6 +7,7 @@ const read=p=>fs.readFileSync(p,'utf8');
 const files={
   client:read('orbit360-platform/modules/cliente360.js'),
   crmBridge:read('orbit360-platform/modules/crm-v1198-operational-bridge.js'),
+  accessScope:read('orbit360-platform/core/access-scope.js'),
   bridge:read('orbit360-platform/modules/policy-receipts-v1199-bridge.js'),
   engine:read('orbit360-platform/core/policy-receipts-engine.js'),
   issuance:read('orbit360-platform/core/issuance-workflow-v1201.js'),
@@ -28,6 +29,10 @@ need(files.client.includes("Usa Crear cliente o Cancelar"),'B2_CLIENT_CREATE_BAC
 need(files.client.includes("await S().batchDurable"),'B2_CLIENT_DURABLE_SAVE_MISSING');
 new Function(files.crmBridge);
 need(!files.crmBridge.includes("\\`")&&!files.crmBridge.includes("\\${"),'B2_CRM_V1198_ESCAPED_TEMPLATE_LITERAL_REGRESSION');
+need(files.accessScope.includes("return { exact: exact, probable: probable };"),'B2_DUPLICATE_PRODUCER_CONTRACT_MISSING');
+need(!files.crmBridge.includes("dup.filter(")&&!files.crmBridge.includes("if (dup.length)"),'B2_DUPLICATE_ARRAY_CONSUMER_REGRESSION');
+need(files.crmBridge.includes("Array.isArray(dup.exact)")&&files.crmBridge.includes("Array.isArray(dup.probable)")&&files.crmBridge.includes("const probable = dup.probable;"),'B2_DUPLICATE_CONSUMER_CONTRACT_MISSING');
+need(files.crmBridge.includes("No fue posible validar duplicados; no se creó el cliente."),'B2_DUPLICATE_CONTRACT_FAIL_CLOSED_MISSING');
 need(files.crmBridge.includes("mod.nuevoCliente = openNewClient"),'B2_ACTIVE_CLIENT_MODAL_OWNER_MISSING');
 const activeClientOwner=(files.crmBridge.match(/function openNewClient\(\)\s*\{[\s\S]*?\n  function [A-Za-z0-9_]+\(/)||[])[0]||'';
 need(activeClientOwner,'B2_ACTIVE_CLIENT_OWNER_SLICE_MISSING');
@@ -67,7 +72,7 @@ need(operativoRole.includes("'academia'"),'B2_ACADEMIA_OPERATIVO_ROLE_DEFAULT_MI
 need(asesorRole.includes("'academia'"),'B2_ACADEMIA_ASESOR_ROLE_DEFAULT_MISSING');
 need(files.config.includes("label: 'Academia'")&&files.config.includes("title: 'Academia de Gravicentra'")&&!files.config.includes("label: 'Orbit Academia'")&&!files.config.includes("title: 'Orbit Academia'"),'B2_ACADEMIA_CONFIG_BRAND_MISSING');
 new Function(files.academiaCatalog);new Function(files.academiaOwner);new Function(files.academia);
-for(const marker of ['core/config.js?v=20260923-b2a2','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260923-b2a1','core/product-app-p0.js?v=20260923-b2a1','core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v3','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+for(const marker of ['core/config.js?v=20260923-b2a2','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260923-b2a1','core/product-app-p0.js?v=20260923-b2a1','core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v4','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={

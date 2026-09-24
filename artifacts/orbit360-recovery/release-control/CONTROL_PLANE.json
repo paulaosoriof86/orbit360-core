@@ -715,7 +715,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1944,7 +1944,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_CLEANUP_35953849511_PENDING_DUPLICATE_CONTRACT_ROOTFIX",
+    "mechanismSyncStatus": "B2_DUPLICATE_CONTRACT_ROOTFIX_PENDING_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2010,9 +2010,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "54b682393c7a4e5d0858ee41f5ea329d74ba256d",
+    "b2ExecutionLockBlobSha": "32906f0ccd73b68979b869d093fa885bf2a4487b",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2028,14 +2028,14 @@
       ],
       "productMutationAuthorized": true,
       "sourcePendingFromHead": "83e148d48ac546b3bde1c73852c95d38062d98f4",
-      "sourceSha": "0f23de1b4cf6ccfc73d33338748172617eaba705",
-      "buildId": "gi-i65-b2-0f23de1b4cf6-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35952977830-cvkaoje5.web.app",
-      "runId": 35952977830,
-      "artifactId": 10789386274,
-      "exactReadback": true,
-      "functionalPass": true,
-      "authenticatedPreviewProof": "BLOCKED_CLEANUP_PENDING",
+      "sourceSha": null,
+      "buildId": null,
+      "previewUrl": null,
+      "runId": null,
+      "artifactId": null,
+      "exactReadback": false,
+      "functionalPass": false,
+      "authenticatedPreviewProof": "PENDING_NEW_PREVIEW",
       "authenticatedPreviewProofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "orphanSyntheticCleanup": "PASS",
       "timedOutAuthenticatedRunId": 35556007094,
@@ -2058,7 +2058,7 @@
       "visualCorrectionFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923.json",
       "authenticatedPreviewPass": false,
       "academiaRegression": "ROLE_ACCESS_ROOT_CAUSE_CONFIRMED_SOURCE_FIX_PENDING_PREVIEW",
-      "oldPreviewRunId": 35951894630,
+      "oldPreviewRunId": 35952977830,
       "oldPreviewSuperseded": true,
       "harnessFalsePositiveClosed": true,
       "packageContractDriftClosed": true,
@@ -2066,7 +2066,7 @@
       "crmOwnerRegression": "ROOT_CAUSE_CONFIRMED_SOURCE_FIX_PENDING_PREVIEW",
       "crmV1198SyntaxRootfixPreviewPass": true,
       "authRetryConcurrencyGuard": "PASS_ENFORCED_IN_WORKFLOW",
-      "duplicateContractRootCause": "CONFIRMED_DUP_FILTER_ON_OBJECT"
+      "duplicateContractRootCause": "CLOSED_IN_SOURCE_PENDING_PREVIEW"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
