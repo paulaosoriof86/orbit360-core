@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -165,7 +165,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PASS",
+    "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "247c83982cad8126215cacff86eb3976a3b97506",
     "exactPreviewBuildId": "gi-i65-b2-247c83982cad-57f234755dc1",
@@ -269,7 +269,8 @@
       "clientAbsent": true
     },
     "syntheticWrites": 11,
-    "cleanupWrites": 20
+    "cleanupWrites": 20,
+    "visualEvidenceRecapture": true
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -804,6 +805,113 @@
         "deleted": 19,
         "orphanExpected": false
       }
+    },
+    {
+      "status": "PASS_PRESERVED_BEFORE_VISUAL_EVIDENCE_RECAPTURE",
+      "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+      "exactPreviewSourceSha": "247c83982cad8126215cacff86eb3976a3b97506",
+      "exactPreviewBuildId": "gi-i65-b2-247c83982cad-57f234755dc1",
+      "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35961983479-jx2om3d7.web.app",
+      "exactPreviewArtifactId": 10792204041,
+      "boundaries": {
+        "syntheticQaWritesAuthorized": true,
+        "syntheticQaOnly": true,
+        "cleanupMandatory": true,
+        "businessDataMutationAuthorized": false,
+        "reimportAuthorized": false,
+        "emailSendAuthorized": false,
+        "liveHostingPromotionAuthorized": false,
+        "productSourceMutationAuthorized": false
+      },
+      "requiredAssertions": [
+        "OPERATIVO_ALL_TO_ASESOR_OWN_RUNTIME",
+        "CLIENT_CREATE_EDIT_DURABLE_READBACK",
+        "CLIENT_AND_POLICY_BACKDROP_PROTECTED",
+        "POLICY_EXPLICIT_SELLER_DURABLE_READBACK",
+        "VEHICLE_COMPLETE_CREATE_EDIT_SAME_ID",
+        "RENEWAL_REAL_POLICY_LINKED",
+        "RENEWAL_RECEIPTS_AND_PORTFOLIO_CREATED",
+        "ZERO_CONFIRMED_COBRO_WITHOUT_PAYMENT_EVIDENCE",
+        "SYNTHETIC_CLEANUP_CONFIRMED"
+      ],
+      "lastTimedOutRunId": 35556007094,
+      "lastTimedOutAt": "2026-09-20T21:30:44-06:00",
+      "retryPolicy": "ONLY_AFTER_ORPHAN_SYNTHETIC_CLEANUP_PASS",
+      "failureClassification": "HARNESS_TIMEOUT_CAUSE_NOT_YET_LOCALIZED",
+      "productRegressionDeclared": false,
+      "retryAttempt": 2,
+      "instrumented": true,
+      "instrumentedProofBlobSha": "3bdc60899eb8125b5e25858381ccd328bbe7baed",
+      "retryAuthorizedAfterCleanup": {
+        "currentRun": 35558851618,
+        "currentTarget": 35557909667,
+        "history": [
+          {
+            "cleanupRunId": 35558678312,
+            "orphanRunId": 35556007094,
+            "status": "PASS"
+          }
+        ]
+      },
+      "maxExpectedRuntimeMinutes": 10,
+      "timeoutFailureMayNotBeDeclaredProductFailure": true,
+      "lastFailedRunId": 35961205964,
+      "lastFailure": "PRODUCT_WRITE_RECORD_NOT_FOUND",
+      "lastCleanupRunId": 35953693091,
+      "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
+      "productSourceMutationAuthorized": false,
+      "runId": 35962127761,
+      "scope": {
+        "operativo": "all",
+        "asesor": "own",
+        "asesorLeakCount": 0,
+        "operativoCounts": {
+          "clientes": 439,
+          "polizas": 1415,
+          "recibosEsperados": 1843,
+          "carteraPrimas": 1284,
+          "asesores": 7,
+          "metas": 3
+        },
+        "asesorCounts": {
+          "clientes": 394,
+          "polizas": 1239,
+          "recibosEsperados": 1650,
+          "carteraPrimas": 1155,
+          "asesores": 1,
+          "metas": 3
+        }
+      },
+      "crud": {
+        "clientIdHash": "74eaa31fe50b84d2a024c0ff55a6846164f93f6d06ab8f298df1fe0dd4e03a85",
+        "policyIdHash": "5e3279fcc37dfb5e281feb8bbca022278e0c14571f7f61eb1feed77414f17d54",
+        "vehicleIdHash": "c1b005a2103bdab82ea6e8405a1a700c07b47f7610300e4370d9b9f5d67f1cda",
+        "clientCreateReadback": true,
+        "clientEditReadback": true,
+        "policyCreateReadback": true,
+        "advisorSellerReadback": true,
+        "vehicleCreateReadback": true,
+        "vehicleEditSameId": true,
+        "receipts": 2,
+        "portfolio": 2,
+        "cobros": 0,
+        "dirtyBackdropProtected": true
+      },
+      "renewal": {
+        "requestIdHash": "beef4d59468f9737d86b9efb95e8d9d1bee4817252699dfcfb89b8d5dca51372",
+        "newPolicyIdHash": "993cb4cd2771242780e1346d7d9399aec12575d3a58ffa78941e7f49c7a5b979",
+        "sourceLink": true,
+        "receipts": 2,
+        "portfolio": 2,
+        "cobros": 0,
+        "awaitedRuntime": true
+      },
+      "cleanup": {
+        "deleted": 20,
+        "clientAbsent": true
+      },
+      "syntheticWrites": 11,
+      "cleanupWrites": 20
     }
   ],
   "visualReview20260923": {
