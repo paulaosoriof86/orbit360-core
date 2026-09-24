@@ -95,9 +95,46 @@ async function setRole(page,role){
 }
 async function academiaSnapshot(page,role){
   await setRole(page,role);
-  await page.evaluate(()=>{location.hash='#/academia';});
-  await page.waitForFunction(()=>window.Orbit?.academiaProductCatalogP0?.status?.().ready===true&&window.Orbit?.store?.all('cursos')?.length>=2,null,{timeout:15000});
-  await page.waitForFunction(()=>String(document.getElementById('host')?.innerText||'').includes('Academia de Gravicentra'),null,{timeout:10000});
+  const access=await page.evaluate(()=>{
+    const tenant=Orbit.tenant&&Orbit.tenant.get?Orbit.tenant.get():{};
+    const def=Orbit.ROLES&&Orbit.ROLES[Orbit.session?.rol?.()]||{};
+    return{
+      role:String(Orbit.session?.rol?.()||''),
+      assignedRoles:[].concat(Orbit.session?.rolesAsignados?.()||Orbit.auth?.productUser?.roles||[]),
+      roleModules:[].concat(def.modulos||def.modules||[]),
+      tenantActive:!!(Orbit.tenant&&Orbit.tenant.isActive&&Orbit.tenant.isActive('academia')),
+      tenantModules:[].concat(tenant.modulosActivos||[]),
+      tenantDisabled:[].concat(tenant.modulosDesactivados||[]),
+      matrixView:Orbit.access?.matrixPermission?.('academia','ver'),
+      sessionCanSee:Orbit.session&&Orbit.session.canSee?!!Orbit.session.canSee('academia'):null,
+      moduleVisible:Orbit.access&&Orbit.access.puedeVerModulo?!!Orbit.access.puedeVerModulo('academia'):null,
+      canView:Orbit.access&&Orbit.access.can?!!Orbit.access.can('academia','view'):null,
+      dataScope:Orbit.access&&Orbit.access.dataScope?String(Orbit.access.dataScope('academia')||''):null,
+      moduleLoaded:!!(Orbit.modules?.academia&&typeof Orbit.modules.academia.render==='function'),
+      catalogReady:!!Orbit.academiaProductCatalogP0?.status?.().ready,
+      catalogCount:(Orbit.store?.all?.('cursos')||[]).length,
+      hash:String(location.hash||''),
+      routeKey:String(Orbit.route?.key||'')
+    };
+  });
+  evidence.academiaDiagnostics=evidence.academiaDiagnostics||{};
+  evidence.academiaDiagnostics[role]={access};
+  milestone('ACADEMIA_ACCESS_'+norm(role),access);
+  need(access.catalogReady&&access.catalogCount>=2,'B2_AUTH_ACADEMIA_CATALOG_NOT_READY:'+JSON.stringify(access));
+  need(access.moduleLoaded,'B2_AUTH_ACADEMIA_MODULE_NOT_LOADED:'+JSON.stringify(access));
+  need(access.tenantActive,'B2_AUTH_ACADEMIA_TENANT_INACTIVE:'+JSON.stringify(access));
+  need(access.canView===true,'B2_AUTH_ACADEMIA_ACCESS_DENIED:'+JSON.stringify(access));
+  await page.evaluate(()=>{if(Orbit.router&&typeof Orbit.router.go==='function')Orbit.router.go('academia');else location.hash='#/academia';});
+  await sleep(600);
+  const rendered=await page.evaluate(()=>({
+    hash:String(location.hash||''),routeKey:String(Orbit.route?.key||''),
+    hostText:String(document.getElementById('host')?.innerText||'').slice(0,1600),
+    brand: String(document.getElementById('host')?.innerText||'').includes('Academia de Gravicentra'),
+    locked:String(document.getElementById('host')?.innerText||'').includes('No tienes acceso con el rol activo')
+  }));
+  evidence.academiaDiagnostics[role].rendered=rendered;
+  milestone('ACADEMIA_RENDER_'+norm(role),rendered);
+  need(rendered.brand===true&&!rendered.locked,'B2_AUTH_ACADEMIA_RENDER_BLOCKED:'+JSON.stringify({access,rendered}));
   await page.locator('[data-vista="ruta"]').click();
   await page.waitForSelector('#ruta-rol',{timeout:8000});
   return page.evaluate(()=>{
