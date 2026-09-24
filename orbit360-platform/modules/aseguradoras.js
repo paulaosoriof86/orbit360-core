@@ -467,7 +467,7 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ---- diff simple (top-level) para trazabilidad antes/después ---- */
   function diffResumen(before, after) {
-    const claves = ['nombre', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada', 'cotTasas', 'cotTasasValidadas'];
+    const claves = ['nombre', 'logo', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada', 'cotTasas', 'cotTasasValidadas'];
     const cambios = [];
     claves.forEach(k => { const b = JSON.stringify(before[k]), a2 = JSON.stringify(after[k]); if (b !== a2) cambios.push(k); });
     return cambios;
@@ -477,6 +477,8 @@ Orbit.modules.aseguradoras = (function () {
     const st = fichaState[id]; if (!st || !st.draft || st.saving) return;
     if (typeof st.snapshotCurrent === 'function') st.snapshotCurrent();
     const before = S().get('aseguradoras', id); if (!before) return;
+    const logoUrl = clean(st.draft.logo);
+    if (logoUrl && !/^https:\/\//i.test(logoUrl)) { U.toast('El logo debe usar una URL HTTPS segura.'); return; }
     let cambios = diffResumen(before, st.draft);
     const secureCount = credentialChanges(st, st.draft).length;
     if (!cambios.length && !secureCount) { st.editing = false; st.draft = null; st.credentialDrafts = {}; ficha(id); return; }
@@ -576,6 +578,7 @@ Orbit.modules.aseguradoras = (function () {
         <label class="ce-l">NIT / identificación fiscal<input id="af-nit" class="o-sel" value="${U.esc(a.nit || '')}" ${ro}></label>
         <label class="ce-l">Código de intermediario<input id="af-cod" class="o-sel" value="${U.esc(a.codigoIntermediario || '')}" ${ro}></label>
         <label class="ce-l">Sitio web / app<input id="af-web" class="o-sel" value="${U.esc(a.web || '')}" ${ro}></label>
+        <label class="ce-l">Logo (URL HTTPS segura)<input id="af-logo" class="o-sel" type="url" placeholder="https://…" value="${U.esc(a.logo || '')}" ${ro}><small class="muted">Se conserva como referencia segura; no se guarda el archivo ni una Data URL en el navegador.</small></label>
         <label class="ce-l">Responsable interno<input id="af-resp" class="o-sel" value="${U.esc(a.responsable || '')}" ${ro}></label>
       </div>
       <div class="cgrid" style="margin-top:10px">
@@ -827,7 +830,7 @@ Orbit.modules.aseguradoras = (function () {
       // vuelca lo que hay en el DOM de esta pestaña hacia el draft ANTES de repintar/cambiar de tab
       if (t === 'resumen') {
         const g = s => (body.querySelector(s) || {}).value || '';
-        Object.assign(draft, { nombre: g('#af-nombre') || draft.nombre, nit: g('#af-nit'), codigoIntermediario: g('#af-cod'), web: g('#af-web'), responsable: g('#af-resp'), telGeneral: g('#af-tel'), emergencia: g('#af-emer'), ultimaRevision: g('#af-rev'), observaciones: g('#af-obs') });
+        Object.assign(draft, { nombre: g('#af-nombre') || draft.nombre, logo: g('#af-logo') || draft.logo || '', nit: g('#af-nit'), codigoIntermediario: g('#af-cod'), web: g('#af-web'), responsable: g('#af-resp'), telGeneral: g('#af-tel'), emergencia: g('#af-emer'), ultimaRevision: g('#af-rev'), observaciones: g('#af-obs') });
         draft.facturacion = Object.assign({}, draft.facturacion, { razonSocial: g('#af-rs'), dirFiscal: g('#af-dir') });
       }
       if (t === 'contactos') {
