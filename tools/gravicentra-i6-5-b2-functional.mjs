@@ -26,9 +26,11 @@ need(files.client.includes("Usa Guardar cambios o Cancelar"),'B2_CLIENT_EDIT_BAC
 need(files.client.includes("Usa Crear cliente o Cancelar"),'B2_CLIENT_CREATE_BACKDROP_GUARD_MISSING');
 need(files.client.includes("await S().batchDurable"),'B2_CLIENT_DURABLE_SAVE_MISSING');
 need(files.crmBridge.includes("mod.nuevoCliente = openNewClient"),'B2_ACTIVE_CLIENT_MODAL_OWNER_MISSING');
-need(files.crmBridge.includes("await store.batchDurable"),'B2_ACTIVE_CLIENT_CREATE_DURABLE_SAVE_MISSING');
-need(files.crmBridge.includes("Usa Crear cliente o Cancelar"),'B2_ACTIVE_CLIENT_CREATE_BACKDROP_GUARD_MISSING');
-need(!files.crmBridge.includes("if (e.target === back) close();"),'B2_ACTIVE_CLIENT_CREATE_BACKDROP_CLOSE_STILL_PRESENT');
+const activeClientOwner=(files.crmBridge.match(/function openNewClient\(\)\s*\{[\s\S]*?\n  function [A-Za-z0-9_]+\(/)||[])[0]||'';
+need(activeClientOwner,'B2_ACTIVE_CLIENT_OWNER_SLICE_MISSING');
+need(activeClientOwner.includes("await store.batchDurable"),'B2_ACTIVE_CLIENT_CREATE_DURABLE_SAVE_MISSING');
+need(activeClientOwner.includes("Usa Crear cliente o Cancelar"),'B2_ACTIVE_CLIENT_CREATE_BACKDROP_GUARD_MISSING');
+need(!activeClientOwner.includes("if (e.target === back) close();"),'B2_ACTIVE_CLIENT_CREATE_BACKDROP_CLOSE_STILL_PRESENT');
 need(files.crmBridge.includes("Identidad y contacto")&&files.crmBridge.includes("Contexto y seguimiento"),'B2_ACTIVE_CLIENT_MODAL_VISUAL_HIERARCHY_MISSING');
 need(files.bridge.includes('data-advisor'),'B2_POLICY_ADVISOR_SELECTOR_MISSING');
 need(files.bridge.includes('gi-form-section-title')&&files.bridge.includes('gi-policy-preview'),'B2_POLICY_EDITOR_VISUAL_HIERARCHY_MISSING');
