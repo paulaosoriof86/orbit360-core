@@ -6,6 +6,7 @@ const read=p=>fs.readFileSync(p,'utf8');
 
 const files={
   client:read('orbit360-platform/modules/cliente360.js'),
+  crmBridge:read('orbit360-platform/modules/crm-v1198-operational-bridge.js'),
   bridge:read('orbit360-platform/modules/policy-receipts-v1199-bridge.js'),
   engine:read('orbit360-platform/core/policy-receipts-engine.js'),
   issuance:read('orbit360-platform/core/issuance-workflow-v1201.js'),
@@ -18,6 +19,11 @@ const files={
 need(files.client.includes("Usa Guardar cambios o Cancelar"),'B2_CLIENT_EDIT_BACKDROP_GUARD_MISSING');
 need(files.client.includes("Usa Crear cliente o Cancelar"),'B2_CLIENT_CREATE_BACKDROP_GUARD_MISSING');
 need(files.client.includes("await S().batchDurable"),'B2_CLIENT_DURABLE_SAVE_MISSING');
+need(files.crmBridge.includes("mod.nuevoCliente = openNewClient"),'B2_ACTIVE_CLIENT_MODAL_OWNER_MISSING');
+need(files.crmBridge.includes("await store.batchDurable"),'B2_ACTIVE_CLIENT_CREATE_DURABLE_SAVE_MISSING');
+need(files.crmBridge.includes("Usa Crear cliente o Cancelar"),'B2_ACTIVE_CLIENT_CREATE_BACKDROP_GUARD_MISSING');
+need(!files.crmBridge.includes("if (e.target === back) close();"),'B2_ACTIVE_CLIENT_CREATE_BACKDROP_CLOSE_STILL_PRESENT');
+need(files.crmBridge.includes("Identidad y contacto")&&files.crmBridge.includes("Contexto y seguimiento"),'B2_ACTIVE_CLIENT_MODAL_VISUAL_HIERARCHY_MISSING');
 need(files.bridge.includes('data-advisor'),'B2_POLICY_ADVISOR_SELECTOR_MISSING');
 need(files.bridge.includes('gi-form-section-title')&&files.bridge.includes('gi-policy-preview'),'B2_POLICY_EDITOR_VISUAL_HIERARCHY_MISSING');
 need(files.bridge.includes('data-client-search'),'B2_POLICY_CLIENT_SEARCH_MISSING');
@@ -37,7 +43,7 @@ need(files.issuanceBridge.includes("onclick = async"),'B2_ISSUANCE_UI_NOT_ASYNC'
 need(files.issuanceBridge.includes('await I.issueRequest'),'B2_ISSUANCE_UI_NOT_AWAITED');
 need(files.receiptsProjection.includes('Orbit.receiptsPortfolioProjection=Orbit.receiptsPortfolioProjectionV920'),'B2_RECEIPTS_CANONICAL_PROJECTION_MISSING');
 need(files.detail.includes('Editar vehículo'),'B2_VEHICLE_EDIT_ACTION_MISSING');
-for(const marker of ['core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+for(const marker of ['core/access-scope.js?v=20260921-b1r12','core/policy-receipts-engine.js?v=20260923-b2v2','core/issuance-workflow-v1201.js?v=20260920-b2','modules/cliente360.js?v=20260920-b2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-bridge.js?v=20260923-b2v2','modules/policy-receipts-v1199-detail-guard.js?v=20260923-b2v2','modules/issuance-endosos-v1201-bridge.js?v=20260920-b2'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={
@@ -157,6 +163,7 @@ need(rows.cobros.length===0,'B2_RENEWAL_CREATED_CONFIRMED_COBRO');
 
 console.log('I65_B2_FUNCTIONAL=PASS');
 console.log('I65_B2_CLIENT_DURABLE=true');
+console.log('I65_B2_ACTIVE_CLIENT_MODAL_OWNER=CRM_V1198_DURABLE_PROTECTED');
 console.log('I65_B2_POLICY_ADVISOR=true');
 console.log('I65_B2_POLICY_VISUAL_HIERARCHY_SOURCE=true');
 console.log('I65_B2_FIXED_FREQUENCY_RECEIPTS=true');
