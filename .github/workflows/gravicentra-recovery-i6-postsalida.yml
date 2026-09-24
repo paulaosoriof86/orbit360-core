@@ -1,5 +1,6 @@
 name: Gravicentra I6 Post-Salida
 # I6.5 operational closure proof lineage trigger: policy-linked client resolution
+# B2 corrected Preview authenticated regression dispatch: 2026-09-23
 
 on:
   workflow_dispatch:
