@@ -3550,6 +3550,11 @@ jobs:
         run: |
           set -euo pipefail
           node --check orbit360-platform/modules/cliente360.js
+          node --check orbit360-platform/modules/crm-v1198-operational-bridge.js
+          node --check orbit360-platform/modules/academia.js
+          node --check orbit360-platform/data/academia-product-catalog-v1.js
+          node --check orbit360-platform/core/academia-product-catalog-p0.js
+          node --check orbit360-platform/core/config.js
           node --check orbit360-platform/modules/policy-receipts-v1199-bridge.js
           node --check orbit360-platform/core/policy-receipts-engine.js
           node --check orbit360-platform/core/issuance-workflow-v1201.js

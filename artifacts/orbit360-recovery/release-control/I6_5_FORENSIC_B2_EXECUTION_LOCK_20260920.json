@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -44,7 +44,8 @@
       "orbit360-platform/core/academia-product-catalog-p0.js",
       "orbit360-platform/core/product-app-p0.js",
       "orbit360-platform/modules/academia.js",
-      "orbit360-platform/core/config.js"
+      "orbit360-platform/core/config.js",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js"
     ],
     "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
@@ -145,24 +146,19 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "c0d3769c77fa2b57fdd5f2ff361d73291df7a175",
-    "buildId": "gi-i65-b2-c0d3769c77fa-57f234755dc1",
-    "channelId": "gi-i65-b2-35951894630",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-35951894630-1chj7ijo.web.app",
-    "runId": 35951894630,
-    "artifactId": 10788009456,
-    "artifactDigest": "dc1ab846edfc2015405af7816110d263308d9ba489b0fc93ed3c005276376331",
-    "exactReadback": true,
-    "functionalPass": true,
+    "status": "PENDING_NEW_PREVIEW_AFTER_CRM_V1198_SYNTAX_ROOTFIX",
+    "supersedesRunId": 35951894630,
+    "exactReadback": false,
+    "functionalPass": false,
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "c0d3769c77fa2b57fdd5f2ff361d73291df7a175",
-    "exactPreviewBuildId": "gi-i65-b2-c0d3769c77fa-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35951894630-1chj7ijo.web.app",
-    "exactPreviewArtifactId": 10788009456,
+    "exactPreviewSourceSha": "",
+    "exactPreviewBuildId": "",
+    "exactPreviewUrl": "",
+    "exactPreviewArtifactId": null,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
@@ -205,8 +201,8 @@
     },
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
-    "lastFailedRunId": 35951302733,
-    "lastFailure": "B2_AUTH_ACADEMIA_ACCESS_DENIED"
+    "lastFailedRunId": 35952621146,
+    "lastFailure": "B2_AUTH_CLIENT_OWNER_NOT_V1198"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -403,6 +399,19 @@
       "functionalPass": true,
       "livePromoted": false,
       "status": "SUPERSEDED_BY_ACADEMIA_ROLE_ACCESS_SOURCE_FIX"
+    },
+    {
+      "sourceSha": "c0d3769c77fa2b57fdd5f2ff361d73291df7a175",
+      "buildId": "gi-i65-b2-c0d3769c77fa-57f234755dc1",
+      "channelId": "gi-i65-b2-35951894630",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-35951894630-1chj7ijo.web.app",
+      "runId": 35951894630,
+      "artifactId": 10788009456,
+      "artifactDigest": "dc1ab846edfc2015405af7816110d263308d9ba489b0fc93ed3c005276376331",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false,
+      "status": "SUPERSEDED_BY_CRM_V1198_SYNTAX_ROOTFIX"
     }
   ],
   "previousAuthenticatedPreviewProofHistory": [
@@ -491,6 +500,33 @@
         "moduleVisible": false,
         "canView": false,
         "sessionCanSee": false
+      },
+      "cleanup": {
+        "syntheticCreated": false,
+        "deleted": 0,
+        "orphanExpected": false
+      }
+    },
+    {
+      "status": "FAIL",
+      "runId": 35952621146,
+      "exactPreviewSourceSha": "c0d3769c77fa2b57fdd5f2ff361d73291df7a175",
+      "exactPreviewBuildId": "gi-i65-b2-c0d3769c77fa-57f234755dc1",
+      "exactPreviewArtifactId": 10788009456,
+      "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-35951894630-1chj7ijo.web.app",
+      "failure": "B2_AUTH_CLIENT_OWNER_NOT_V1198",
+      "classification": "PRODUCT_SOURCE_SYNTAX_DEFECT",
+      "rootCause": "CRM_V1198_BRIDGE_CONTAINED_ESCAPED_TEMPLATE_LITERAL_TOKENS_AND_DID_NOT_PARSE_IN_BROWSER",
+      "artifactNodeCheck": "FAIL",
+      "invalidEscapedBackticks": 12,
+      "invalidEscapedInterpolations": 11,
+      "runtimeEvidence": {
+        "crmFlag": false,
+        "actionsFlag": false,
+        "renderWrapped": false,
+        "legacyModal": true,
+        "canonicalModal": false,
+        "canCreate": true
       },
       "cleanup": {
         "syntheticCreated": false,
@@ -609,5 +645,18 @@
       "liveChanged": false,
       "dataWrites": 0
     }
-  ]
+  ],
+  "crmOwnerRemediation": {
+    "status": "SOURCE_ROOTFIX_READY_FOR_NEW_PREVIEW",
+    "rootCause": "CRM_V1198_INVALID_ESCAPED_TEMPLATE_LITERALS",
+    "invalidEscapedBackticks": 12,
+    "invalidEscapedInterpolations": 11,
+    "correctedEscapedBackticks": 12,
+    "correctedEscapedInterpolations": 11,
+    "syntaxGateAdded": true,
+    "cacheKey": "20260923-b2v3",
+    "expectedRuntimeOwner": "crm-new-client-v1198",
+    "automaticBusinessWrites": false,
+    "noReimport": true
+  }
 }

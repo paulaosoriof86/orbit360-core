@@ -192,7 +192,7 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
     let back = document.getElementById('crm-new-client-v1198'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'crm-new-client-v1198'; back.className = 'drawer-back open';
     back.style.cssText = 'display:grid;place-items:center;z-index:215';
-    back.innerHTML = \`<div class="card" style="width:min(760px,95vw);max-height:92vh;overflow:auto;padding:0;border-radius:22px;border:1px solid #e8e3de;box-shadow:0 24px 70px rgba(24,28,34,.18);background:#fffdfb">
+    back.innerHTML = `<div class="card" style="width:min(760px,95vw);max-height:92vh;overflow:auto;padding:0;border-radius:22px;border:1px solid #e8e3de;box-shadow:0 24px 70px rgba(24,28,34,.18);background:#fffdfb">
       <div style="padding:17px 20px;background:linear-gradient(135deg,#fff7f8 0%,#f7f4f0 68%,#f4f7fb 100%);border-bottom:1px solid #ebe5e0;display:flex;justify-content:space-between;align-items:center">
         <div style="display:flex;gap:12px;align-items:center">
           <span style="width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:#fff;border:1px solid #eadfe1;font-size:21px">👤</span>
@@ -207,15 +207,15 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
         <div class="cgrid">
           <label class="ce-l">Nombre / razón social *<input id="v1198-nombre" class="o-sel"></label>
           <label class="ce-l">Tipo<select id="v1198-tipo" class="o-sel"><option>Persona</option><option>Empresa</option></select></label>
-          <label class="ce-l">País *<select id="v1198-pais" class="o-sel">\${countries.map(p => \`<option value="\${esc(p.id)}">\${esc(p.label)}</option>\`).join('')}</select></label>
+          <label class="ce-l">País *<select id="v1198-pais" class="o-sel">${countries.map(p => `<option value="${esc(p.id)}">${esc(p.label)}</option>`).join('')}</select></label>
           <label class="ce-l">Identificación<input id="v1198-id" class="o-sel"></label>
           <label class="ce-l">Teléfono / WhatsApp<input id="v1198-tel" class="o-sel"></label>
           <label class="ce-l">Correo<input id="v1198-email" type="email" class="o-sel"></label>
           <label class="ce-l">Departamento<select id="v1198-dep" class="o-sel"></select></label>
           <label class="ce-l">Ciudad / municipio<select id="v1198-ciu" class="o-sel"></select></label>
           <label class="ce-l">Dirección<input id="v1198-dir" class="o-sel"></label>
-          <label class="ce-l">Canal<select id="v1198-canal" class="o-sel">\${((Orbit.cat && Orbit.cat.get && Orbit.cat.get('canales')) || ['Referido']).map(x => \`<option>\${esc(x)}</option>\`).join('')}</select></label>
-          <label class="ce-l">Asesor responsable *<select id="v1198-ase" class="o-sel">\${advisors.map(a => \`<option value="\${esc(a.id)}">\${esc(a.nombre)}</option>\`).join('')}</select></label>
+          <label class="ce-l">Canal<select id="v1198-canal" class="o-sel">${((Orbit.cat && Orbit.cat.get && Orbit.cat.get('canales')) || ['Referido']).map(x => `<option>${esc(x)}</option>`).join('')}</select></label>
+          <label class="ce-l">Asesor responsable *<select id="v1198-ase" class="o-sel">${advisors.map(a => `<option value="${esc(a.id)}">${esc(a.nombre)}</option>`).join('')}</select></label>
         </div>
         <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:14px;background:#f5f8fb;border-left:3px solid #2a6fdb;font-family:var(--f-display);font-weight:800;font-size:14px">
           <span>📝</span><div>Contexto y seguimiento<div style="font-family:var(--f-body);font-size:11.5px;font-weight:500;color:var(--ink-3);margin-top:2px">Asigna responsable, canal y observaciones útiles para la gestión.</div></div>
@@ -226,7 +226,7 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
         <button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="v1198-save">Crear cliente</button>
       </div>
-    </div>\`;
+    </div>`;
     document.body.appendChild(back);
     const $ = s => back.querySelector(s);
     const close = () => back.remove();
@@ -241,11 +241,11 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
     const pais = $('#v1198-pais'), dep = $('#v1198-dep'), city = $('#v1198-ciu');
     function fillCities(selected) {
       const rows = (((Orbit.GEO || {})[pais.value] || {})[dep.value] || []);
-      city.innerHTML = '<option value="">— Seleccionar —</option>' + rows.map(x => \`<option \${x === selected ? 'selected' : ''}>\${esc(x)}</option>\`).join('');
+      city.innerHTML = '<option value="">— Seleccionar —</option>' + rows.map(x => `<option ${x === selected ? 'selected' : ''}>${esc(x)}</option>`).join('');
     }
     function fillDeps() {
       const rows = Object.keys((Orbit.GEO || {})[pais.value] || {});
-      dep.innerHTML = '<option value="">— Seleccionar —</option>' + rows.map(x => \`<option>\${esc(x)}</option>\`).join(''); fillCities();
+      dep.innerHTML = '<option value="">— Seleccionar —</option>' + rows.map(x => `<option>${esc(x)}</option>`).join(''); fillCities();
     }
     pais.addEventListener('change', fillDeps); dep.addEventListener('change', () => fillCities()); fillDeps();
     $('#v1198-save').addEventListener('click', async () => {
