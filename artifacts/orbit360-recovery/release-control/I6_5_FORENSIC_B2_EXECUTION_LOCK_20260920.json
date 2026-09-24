@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -190,13 +190,13 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "194fa8fb7c224631f806377e05d59c82915bf579",
-    "buildId": "gi-i65-b2-194fa8fb7c22-57f234755dc1",
-    "channelId": "gi-i65-b2-36053406480",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36053406480-z9of5rwb.web.app",
-    "runId": 36053406480,
-    "artifactId": 10831317630,
-    "artifactDigest": "7eaffa2e4da892c9b14876d63e6ea220f401583604a509a214a90d86c9e99b36",
+    "sourceSha": "dbb79d6b2672d71f9c727ab7d2833a62222f0168",
+    "buildId": "gi-i65-b2-dbb79d6b2672-57f234755dc1",
+    "channelId": "gi-i65-b2-36072542051",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36072542051-7y4o63gi.web.app",
+    "runId": 36072542051,
+    "artifactId": 10838549357,
+    "artifactDigest": "d037453f72be14f0d532aa438535c273a4e6230a93bec6803fe4c5c83a961369",
     "exactReadback": true,
     "functionalPass": true,
     "livePromoted": false
@@ -204,10 +204,10 @@
   "authenticatedPreviewProof": {
     "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "194fa8fb7c224631f806377e05d59c82915bf579",
-    "exactPreviewBuildId": "gi-i65-b2-194fa8fb7c22-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36053406480-z9of5rwb.web.app",
-    "exactPreviewArtifactId": 10831317630,
+    "exactPreviewSourceSha": "dbb79d6b2672d71f9c727ab7d2833a62222f0168",
+    "exactPreviewBuildId": "gi-i65-b2-dbb79d6b2672-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36072542051-7y4o63gi.web.app",
+    "exactPreviewArtifactId": 10838549357,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
