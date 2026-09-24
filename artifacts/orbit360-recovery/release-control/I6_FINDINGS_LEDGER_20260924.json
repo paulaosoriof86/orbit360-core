@@ -32,8 +32,8 @@
       "owner": [
         ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
       ],
-      "rootCause": "YAML authoring defect in the executor-only remediation; no job executed and no Firebase/data mutation occurred.",
-      "remediation": "Moved Preview garbage-collection logic to versioned tools/gravicentra-preview-channel-gc.mjs and restored a minimal indentation-safe workflow step.",
+      "rootCause": "The initial quota-cleanup patch accidentally duplicated the remainder of the B2 workflow, including Exact B2 Preview readback and the authenticated-preview job; later edits only repaired the first visible malformed segment and left duplicate YAML keys.",
+      "remediation": "Restore workflow bytes from last known-good executable commit 7f55a407..., then apply only one minimal call to the versioned Preview GC tool; assert critical job/step cardinality=1 before commit.",
       "status": "SOURCE_FIXED_PENDING_GITHUB_PARSE_AND_RUN",
       "blocking": true,
       "closureProof": "GitHub accepts workflow syntax, central guard passes and B2 deploy job starts.",

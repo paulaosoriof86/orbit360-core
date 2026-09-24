@@ -1340,12 +1340,14 @@
     "retryCount": 1
   },
   "lastExecutorSyntaxFailure": {
-    "runId": 36004467901,
-    "head": "9a20d5de0cfe18bb04ad8b66a9b77e72d8ecaf86",
-    "classification": "WORKFLOW_YAML_PARSE_FAILURE",
+    "runId": 36005170683,
+    "head": "7cc0d496c35638c2bf7951963b123b44990029f6",
+    "classification": "DUPLICATED_WORKFLOW_KEYS_FROM_PRIOR_MALFORMED_PATCH",
+    "duplicatedAuthenticatedJobCountBefore": 2,
+    "duplicatedReadbackStepCountBefore": 2,
     "firebaseTouched": false,
     "liveTouched": false,
     "dataTouched": false,
-    "fix": "MOVE_COMPLEX_GC_TO_VERSIONED_TOOL_AND_RESTORE_MINIMAL_YAML_STEP"
+    "definitiveFix": "RESTORE_LAST_KNOWN_GOOD_WORKFLOW_THEN_APPLY_MINIMAL_VERSIONED_GC_CALL"
   }
 }
