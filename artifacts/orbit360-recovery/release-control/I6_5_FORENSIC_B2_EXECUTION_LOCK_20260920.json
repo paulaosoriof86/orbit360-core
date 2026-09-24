@@ -158,7 +158,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "BLOCKED_CLEANUP_PENDING",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "0f23de1b4cf6ccfc73d33338748172617eaba705",
     "exactPreviewBuildId": "gi-i65-b2-0f23de1b4cf6-57f234755dc1",
@@ -206,18 +206,18 @@
     },
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
-    "lastFailedRunId": 35952621146,
-    "lastFailure": "B2_AUTH_CLIENT_OWNER_NOT_V1198"
+    "lastFailedRunId": 35953423069,
+    "lastFailure": "B2_AUTH_CLIENT_CREATE_SAVE_DID_NOT_CONFIRM"
   },
   "orphanSyntheticCleanup": {
-    "status": "PASS",
-    "orphanRunId": 35953083835,
+    "status": "AUTHORIZED_PENDING_RUN",
+    "orphanRunId": 35953423069,
     "cleanupScript": "tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs",
     "markerSet": {
-      "clientName": "B2 QA 35953083835",
-      "identification": "B2QA-35953083835",
-      "policyNumber": "B2-POL-35953083835",
-      "renewalPolicyNumber": "B2-REN-35953083835"
+      "clientName": "B2 QA 35953423069",
+      "identification": "B2QA-35953423069",
+      "policyNumber": "B2-POL-35953423069",
+      "renewalPolicyNumber": "B2-REN-35953423069"
     },
     "boundaries": {
       "deleteOnlyMatchingSyntheticRows": true,
@@ -225,34 +225,6 @@
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
       "emailSendAuthorized": false
-    },
-    "runId": 35953423069,
-    "before": {
-      "clients": [],
-      "policies": [],
-      "counts": {
-        "actividades": 0,
-        "gestiones": 0,
-        "cobros": 0,
-        "carteraPrimas": 0,
-        "recibosEsperados": 0,
-        "vehiculos": 0,
-        "polizas": 0
-      }
-    },
-    "deleted": {
-      "actividades": 0,
-      "gestiones": 0,
-      "cobros": 0,
-      "carteraPrimas": 0,
-      "recibosEsperados": 0,
-      "vehiculos": 0,
-      "polizas": 0,
-      "clientes": 0
-    },
-    "after": {
-      "clients": 0,
-      "policies": 0
     }
   },
   "orphanSyntheticCleanupHistory": [
@@ -663,5 +635,10 @@
     "expectedRuntimeOwner": "crm-new-client-v1198",
     "automaticBusinessWrites": false,
     "noReimport": true
+  },
+  "authRetryConcurrencyGuard": {
+    "status": "SOURCE_FIX_PENDING",
+    "requiresCleanupPass": true,
+    "reason": "AUTH_AND_CLEANUP_MUST_NOT_RUN_IN_PARALLEL"
   }
 }
