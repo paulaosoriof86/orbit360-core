@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-23",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -64,17 +64,17 @@
     "mustRemainOpen": true
   },
   "acceptance": {
-    "clientCreateEditRefreshReadback": "PENDING_NEW_PREVIEW",
-    "policyCreateEditRefreshReadback": "PENDING_NEW_PREVIEW",
-    "sellerAdvisorCreateEdit": "PENDING_NEW_PREVIEW",
-    "renewalReceiptsPortfolioZeroCobro": "PENDING_NEW_PREVIEW",
-    "vehicleCreateEdit": "PENDING_NEW_PREVIEW",
+    "clientCreateEditRefreshReadback": true,
+    "policyCreateEditRefreshReadback": true,
+    "sellerAdvisorCreateEdit": true,
+    "renewalReceiptsPortfolioZeroCobro": true,
+    "vehicleCreateEdit": true,
     "insurerStableEdit": "PRESERVED_CURRENT_OWNER_PENDING_VISUAL",
-    "singleReceiptProjection": "CANONICAL_V920_PRESERVED_PENDING_PREVIEW",
-    "dirtyFormsProtected": "SOURCE_REAPPLIED_PENDING_NEW_PREVIEW",
+    "singleReceiptProjection": true,
+    "dirtyFormsProtected": true,
     "dashboardRealityReconciled": false,
-    "previewExact": false,
-    "functionalPass": false,
+    "previewExact": true,
+    "functionalPass": true,
     "paulaVisual": false,
     "approvedVisualHierarchy": false,
     "academiaCatalog": false,
@@ -87,7 +87,7 @@
     "renewalDurableClosure": false
   },
   "carryForward": {
-    "activeRoleScopeVisualSpotCheck": "REQUIRED_IN_FIRST_B2_PREVIEW_BEFORE_B3",
+    "activeRoleScopeVisualSpotCheck": "AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING",
     "dashboardReality": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED"
   },
   "conversationDependent": false,
@@ -165,7 +165,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PASS",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "247c83982cad8126215cacff86eb3976a3b97506",
     "exactPreviewBuildId": "gi-i65-b2-247c83982cad-57f234755dc1",
@@ -217,7 +217,59 @@
     "lastFailure": "PRODUCT_WRITE_RECORD_NOT_FOUND",
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
-    "productSourceMutationAuthorized": false
+    "productSourceMutationAuthorized": false,
+    "runId": 35962127761,
+    "scope": {
+      "operativo": "all",
+      "asesor": "own",
+      "asesorLeakCount": 0,
+      "operativoCounts": {
+        "clientes": 439,
+        "polizas": 1415,
+        "recibosEsperados": 1843,
+        "carteraPrimas": 1284,
+        "asesores": 7,
+        "metas": 3
+      },
+      "asesorCounts": {
+        "clientes": 394,
+        "polizas": 1239,
+        "recibosEsperados": 1650,
+        "carteraPrimas": 1155,
+        "asesores": 1,
+        "metas": 3
+      }
+    },
+    "crud": {
+      "clientIdHash": "74eaa31fe50b84d2a024c0ff55a6846164f93f6d06ab8f298df1fe0dd4e03a85",
+      "policyIdHash": "5e3279fcc37dfb5e281feb8bbca022278e0c14571f7f61eb1feed77414f17d54",
+      "vehicleIdHash": "c1b005a2103bdab82ea6e8405a1a700c07b47f7610300e4370d9b9f5d67f1cda",
+      "clientCreateReadback": true,
+      "clientEditReadback": true,
+      "policyCreateReadback": true,
+      "advisorSellerReadback": true,
+      "vehicleCreateReadback": true,
+      "vehicleEditSameId": true,
+      "receipts": 2,
+      "portfolio": 2,
+      "cobros": 0,
+      "dirtyBackdropProtected": true
+    },
+    "renewal": {
+      "requestIdHash": "beef4d59468f9737d86b9efb95e8d9d1bee4817252699dfcfb89b8d5dca51372",
+      "newPolicyIdHash": "993cb4cd2771242780e1346d7d9399aec12575d3a58ffa78941e7f49c7a5b979",
+      "sourceLink": true,
+      "receipts": 2,
+      "portfolio": 2,
+      "cobros": 0,
+      "awaitedRuntime": true
+    },
+    "cleanup": {
+      "deleted": 20,
+      "clientAbsent": true
+    },
+    "syntheticWrites": 11,
+    "cleanupWrites": 20
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
