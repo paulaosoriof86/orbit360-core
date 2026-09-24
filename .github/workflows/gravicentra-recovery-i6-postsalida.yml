@@ -3563,6 +3563,8 @@ jobs:
           node --check orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js
           node --check orbit360-platform/modules/aseguradoras.js
           node --check functions/product-insurer-credentials.js
+          node --check tools/gravicentra-i6-5-b2-human-rejection-readonly.mjs
+          node --check tools/gravicentra-i6-5-b2-authenticated-preview.mjs
           node --check tools/gravicentra-i6-5-b2-functional.mjs
           node tools/gravicentra-i6-5-b2-functional.mjs
       - name: Install Firebase CLI
@@ -3613,6 +3615,11 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b2-package-output.json'));for(const[k,v]of Object.entries({build_id:d.buildId,hosted_payload_digest:d.hostedPayloadDigest,backend_source_digest:d.backendSourceDigest,bundle_digest:d.bundleDigest}))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
           NODE
+      - name: Read-only audit of human policy/vehicle relationship finding
+        if: steps.mode.outputs.mode == 'preview'
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b2-human-rejection-readonly.mjs "$RUNNER_TEMP/b2-package/evidence/b2-human-rejection-readonly.json"
       - name: Deploy isolated B2 credential Preview callable
         if: steps.mode.outputs.mode == 'preview'
         run: |
