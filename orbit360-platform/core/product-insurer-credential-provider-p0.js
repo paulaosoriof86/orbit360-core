@@ -130,6 +130,7 @@
       insurerId
     }, endpoint.region);
     const out = result && result.data ? result.data : (result || {});
+    if (operation === 'delete_preview') return { ok:!!(out && out.ok === true), removed:!!(out && out.removed), containsSecrets:false };
     const value = out && out.ok === true ? passwordOnly(out.value) : '';
     if (!out || out.ok !== true || !value) return { ok:false, status:text(out && out.status, 80) || 'no_disponible', message:'No fue posible recuperar el acceso' };
     return { ok:true, status:'disponible', value, expiresInMs:Number(out.expiresInMs) || 6000, containsSecrets:true };
@@ -152,6 +153,7 @@
     legacyCredentialEnvelopeNormalization:true,
     directFirestoreWrites:false,
     serverAuditAuthoritative:true,
+    previewCleanup:function(ref,extra){ if(!isCertifiedPreviewHost())return Promise.resolve({ok:false,removed:false,containsSecrets:false}); return command('delete_preview',ref,extra); },
     status:function () {
       let secure = {};
       try { secure = Orbit.secureResources.selfTest ? Orbit.secureResources.selfTest() : {}; } catch (e) {}
