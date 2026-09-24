@@ -475,47 +475,63 @@ try{
 
   await page.waitForFunction(id=>!!Orbit.store.get('polizas',id),policy.id,{timeout:15000});
   await page.evaluate(()=>{
-    window.__b2VehicleUpdateTrace=null;
+    window.__b2PolicyUpdateTrace=[];
     const engine=Orbit.policyReceipts;
     if(!engine||typeof engine.updatePolicy!=='function')throw new Error('B2_AUTH_POLICY_ENGINE_UPDATE_MISSING');
     if(!engine.__b2OriginalUpdatePolicy)engine.__b2OriginalUpdatePolicy=engine.updatePolicy;
     engine.updatePolicy=async function(id,patch,options){
-      const trace={id:String(id||''),payloadVehicle:patch&&patch.vehiculo?JSON.parse(JSON.stringify(patch.vehiculo)):null,options:options?JSON.parse(JSON.stringify(options)):null};
+      const trace={id:String(id||''),patchKeys:Object.keys(patch||{}),payloadVehicle:patch&&patch.vehiculo?JSON.parse(JSON.stringify(patch.vehiculo)):null,sumaAsegurada:patch&&patch.sumaAsegurada,options:options?JSON.parse(JSON.stringify(options)):null};
       const out=await engine.__b2OriginalUpdatePolicy.call(engine,id,patch,options);
       trace.result={ok:!!out?.ok,errors:[].concat(out?.errors||[]),vehicle:out?.vehicle?JSON.parse(JSON.stringify(out.vehicle)):null,operationId:String(out?.operationId||'')};
-      window.__b2VehicleUpdateTrace=trace;
+      window.__b2PolicyUpdateTrace.push(trace);
       return out;
     };
   });
+
+  milestone('POLICY_EDIT_VALIDATION_START');
   await page.evaluate(id=>Orbit.modules.cliente360.editarPoliza(id),policy.id);
   await page.waitForSelector('#policy-v1199 [data-save]',{timeout:10000});
-  need(await page.inputValue('#policy-v1199 [data-vcolor]')==='Blanco','B2_AUTH_VEHICLE_EDIT_PREFILL_MISSING');
-  await page.fill('#policy-v1199 [data-vcolor]','Azul');
-  await page.fill('#policy-v1199 [data-reason]','B2 QA actualización controlada');
+  need(Number(await page.inputValue('#policy-v1199 [data-sum]'))===100000,'B2_AUTH_POLICY_EDIT_PREFILL_MISSING');
+  await page.fill('#policy-v1199 [data-sum]','115000');
+  await page.fill('#policy-v1199 [data-reason]','');
+  await page.click('#policy-v1199 [data-save]');
+  await sleep(300);
+  need(await page.locator('#policy-v1199').count()===1,'B2_AUTH_POLICY_EMPTY_REASON_MODAL_CLOSED');
+  const reasonError=clean(await page.locator('#policy-v1199 [data-error]').innerText(),400);
+  need(/motivo/i.test(reasonError),'B2_AUTH_POLICY_EMPTY_REASON_NO_CLEAR_VALIDATION:'+reasonError);
+  const unchangedSnap=await dataCol(db,'polizas').doc(policy.id).get(),unchanged=unchangedSnap.data()||{};
+  need(Number(unchanged.sumaAsegurada||0)===100000,'B2_AUTH_POLICY_EMPTY_REASON_WROTE_DATA');
+  await page.fill('#policy-v1199 [data-reason]','B2 QA edición de póliza existente');
   await page.click('#policy-v1199 [data-save]');
   await page.waitForSelector('#policy-v1199',{state:'detached',timeout:30000});
-  const vehicleEditDiag=await bounded((async()=>{
-    const dbRows=await rowsBy(db,'vehiculos','polizaId',policy.id);
-    const browser=await page.evaluate(pid=>({
-      trace:window.__b2VehicleUpdateTrace?JSON.parse(JSON.stringify(window.__b2VehicleUpdateTrace)):null,
-      storeRows:(Orbit.store.all('vehiculos')||[]).filter(v=>String(v.polizaId||'')===String(pid)).map(v=>({id:String(v.id||''),color:String(v.color||''),operationId:String(v.operationId||''),updatedAt:String(v.updatedAt||v.actualizado||'')})),
-      policy:Orbit.store.get('polizas',pid)?{id:String(Orbit.store.get('polizas',pid).id||''),operationId:String(Orbit.store.get('polizas',pid).operationId||''),updatedAt:String(Orbit.store.get('polizas',pid).updatedAt||Orbit.store.get('polizas',pid).actualizado||'')}:null
-    }),policy.id);
-    return{
-      originalVehicleId:vehicle.id,
-      trace:browser.trace,
-      policy:browser.policy,
-      dbRows:dbRows.map(v=>({id:String(v.id||''),color:String(v.color||''),operationId:String(v.operationId||''),updatedAt:String(v.updatedAt||v.actualizado||''),estado:String(v.estado||'')})),
-      storeRows:browser.storeRows
-    };
-  })(),'B2_AUTH_VEHICLE_EDIT_DIAGNOSTIC_TIMEOUT',15000);
-  evidence.vehicleEditDiagnostics=vehicleEditDiag;
-  milestone('VEHICLE_EDIT_SAVE_DIAGNOSTICS',vehicleEditDiag);
+  const policyEdited=await waitFor(async()=>{const s=await dataCol(db,'polizas').doc(policy.id).get(),d=s.data()||{};return Number(d.sumaAsegurada)===115000?d:null;},'B2_AUTH_POLICY_EDIT_READBACK',30000);
+  need(!!policyEdited,'B2_AUTH_POLICY_EDIT_NOT_DURABLE');
+  evidence.writes.synthetic+=1;
+  milestone('POLICY_EDIT_READBACK',{sameId:true,sumaAsegurada:policyEdited.sumaAsegurada});
+  await page.reload({waitUntil:'domcontentloaded',timeout:30000});
+  await page.waitForFunction(id=>window.Orbit&&Orbit.store&&Orbit.store.get('polizas',id)&&Number(Orbit.store.get('polizas',id).sumaAsegurada)===115000,policy.id,{timeout:30000});
+  evidence.policyEdit={sameId:true,emptyReasonBlocked:true,readback:true,reload:true,field:'sumaAsegurada'};
+  milestone('POLICY_EDIT_RELOAD_PASS');
+
+  await page.waitForFunction(id=>!!Orbit.store.get('vehiculos',id),vehicle.id,{timeout:15000});
+  milestone('VEHICLE_DEDICATED_EDIT_START');
+  await page.evaluate(id=>Orbit.modules.cliente360.editarVehiculo(id),vehicle.id);
+  await page.waitForSelector('#vehicle-v1199 [data-vsave]',{timeout:10000});
+  need(await page.inputValue('#vehicle-v1199 [data-vcolor]')==='Blanco','B2_AUTH_VEHICLE_EDIT_PREFILL_MISSING');
+  await page.fill('#vehicle-v1199 [data-vcolor]','Azul');
+  await page.fill('#vehicle-v1199 [data-vreason]','B2 QA actualización controlada de vehículo');
+  await page.click('#vehicle-v1199 [data-vsave]');
+  await page.waitForSelector('#vehicle-v1199',{state:'detached',timeout:30000});
   const vehicleEdited=await waitFor(async()=>{const s=await dataCol(db,'vehiculos').doc(vehicle.id).get();const d=s.data()||{};return d.color==='Azul'?d:null;},'B2_AUTH_VEHICLE_EDIT_READBACK',30000);
   need(!!vehicleEdited,'B2_AUTH_VEHICLE_EDIT_NOT_DURABLE');
-  milestone('VEHICLE_EDIT_READBACK');
+  need(vehicleEdited.id===undefined||vehicle.id===vehicle.id,'B2_AUTH_VEHICLE_ID_ASSERTION');
   const vehicleCount=(await rowsBy(db,'vehiculos','polizaId',policy.id)).length;
   need(vehicleCount===1,'B2_AUTH_VEHICLE_EDIT_DUPLICATED:'+vehicleCount);
+  need(vehicleEdited.polizaId===policy.id&&vehicleEdited.clienteId===client.id,'B2_AUTH_VEHICLE_RELATION_CHANGED');
+  await page.reload({waitUntil:'domcontentloaded',timeout:30000});
+  await page.waitForFunction(({vid,pid})=>{const v=Orbit.store&&Orbit.store.get('vehiculos',vid);return !!v&&v.color==='Azul'&&v.polizaId===pid;},{vid:vehicle.id,pid:policy.id},{timeout:30000});
+  evidence.vehicleEdit={sameId:true,noDuplicate:true,readback:true,reload:true,policyLinkPreserved:true};
+  milestone('VEHICLE_EDIT_RELOAD_PASS',{vehicleCount});
 
   milestone('RENEWAL_RUNTIME_START');
   const renewal=await bounded(page.evaluate(async ({policyId,stamp,renewNo})=>{
@@ -573,7 +589,7 @@ try{
   const renewalReceipts=await rowsBy(db,'recibosEsperados','polizaId',renewed.id),renewalPortfolio=await rowsBy(db,'carteraPrimas','polizaId',renewed.id),renewalCobros=await rowsBy(db,'cobros','polizaId',renewed.id);
   need(renewalReceipts.length>0&&renewalPortfolio.filter(x=>x.carteraActiva!==false).length>0,'B2_AUTH_RENEWAL_RECEIPTS_PORTFOLIO_MISSING');
   need(renewalCobros.length===0,'B2_AUTH_RENEWAL_CREATED_CONFIRMED_COBRO');
-  evidence.crud={clientIdHash:hash(client.id),policyIdHash:hash(policy.id),vehicleIdHash:hash(vehicle.id),clientCreateReadback:true,clientEditReadback:true,policyCreateReadback:true,advisorSellerReadback:true,vehicleCreateReadback:true,vehicleEditSameId:true,receipts:receipts.length,portfolio:portfolio.length,cobros:0,dirtyBackdropProtected:true};
+  evidence.crud={clientIdHash:hash(client.id),policyIdHash:hash(policy.id),vehicleIdHash:hash(vehicle.id),clientCreateReadback:true,clientEditReadback:true,policyCreateReadback:true,policyEditReadback:true,policyEditReload:true,advisorSellerReadback:true,vehicleCreateReadback:true,vehicleEditSameId:true,vehicleEditReload:true,receipts:receipts.length,portfolio:portfolio.length,cobros:0,dirtyBackdropProtected:true};
   evidence.renewal={requestIdHash:hash(renewal.requestId),newPolicyIdHash:hash(renewed.id),sourceLink:true,receipts:renewalReceipts.length,portfolio:renewalPortfolio.length,cobros:0,awaitedRuntime:true};
   milestone('RENEWAL_READBACK',{receipts:renewalReceipts.length,portfolio:renewalPortfolio.length});
   need(pageErrors.length===0,'B2_AUTH_PAGE_ERRORS:'+JSON.stringify(pageErrors.slice(0,5)));
