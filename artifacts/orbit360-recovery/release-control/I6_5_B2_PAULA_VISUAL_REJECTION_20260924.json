@@ -1,0 +1,219 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_PAULA_VISUAL_REJECTION_V1",
+  "recordedAt": "2026-09-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "decision": "PAULA_VISUAL_REJECTED",
+  "b2Status": "OPEN",
+  "b3Status": "NOT_STARTED",
+  "livePromoted": false,
+  "rejectedPreview": {
+    "sourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
+    "buildId": "gi-i65-b2-aff32646f1f7-57f234755dc1",
+    "runId": 35964339112,
+    "artifactId": 10793254097,
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-35964339112-icw0ytni.web.app",
+    "exactReadback": true,
+    "functionalPass": true,
+    "authenticatedPreviewProof": "PASS_HISTORICAL_PRESERVED",
+    "cleanup": "PASS_HISTORICAL_PRESERVED",
+    "humanVisual": "REJECTED",
+    "livePromoted": false
+  },
+  "preservation": [
+    "POLICY_FULLPAGE_MACRO_HIERARCHY_IMPROVEMENT",
+    "POLICY_HERO_HEADER",
+    "POLICY_KPIS",
+    "POLICY_SECTION_CARDS",
+    "VISIBLE_POLICY_EDIT_ACTION",
+    "MISSING_VEHICLE_CTA_WHEN_APPLICABLE",
+    "POLICY_FORM_ORGANIZATION",
+    "POLICY_CLIENT_SEARCH",
+    "POLICY_SELLER_ADVISOR",
+    "POLICY_FREQUENCY_RECEIPTS",
+    "POLICY_VAT",
+    "POLICY_MODAL_HEADERS",
+    "POLICY_IMPORT_DOCUMENT",
+    "POLICY_SAVE_CANCEL",
+    "ACADEMIA_VISIBLE_AND_BRANDED",
+    "ACADEMIA_CATALOG_CATEGORIES_ROLE_ROUTE",
+    "PRIOR_AUTHENTICATED_FIXES",
+    "SYNTHETIC_VEHICLE_SAME_ID_EDIT_PROOF",
+    "RENEWAL_AND_SYNTHETIC_CLEANUP_CERTIFICATION",
+    "B1_EVIDENCE_UNAFFECTED_EXCEPT_CAUSAL_ASEGURADORAS_LOGO_CREDENTIAL_REGRESSION"
+  ],
+  "findings": [
+    {
+      "id": "B2-H01",
+      "surface": "Polizas",
+      "finding": "BODY_TYPOGRAPHY_TOO_HEAVY",
+      "ownerObserved": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/styles/base.css"
+      ],
+      "causeStatus": "TO_PROVE",
+      "requiredProof": "Compare Cliente360/Aseguradoras/Poliza/Vehiculo/Recibo desktop+mobile; titles/KPIs strong, labels soft, body values medium; no generalized bold."
+    },
+    {
+      "id": "B2-H02",
+      "surface": "Polizas",
+      "finding": "BASE_GRAVABLE_SEMANTICS_AND_SUMMARY_NOISE",
+      "ownerObserved": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/core/policy-receipts-engine.js"
+      ],
+      "causeStatus": "TO_PROVE",
+      "requiredProof": "Resolve canonical meaning from source/import/write contract; never invent value; suppress non-priority empty summary without deleting model field."
+    },
+    {
+      "id": "B2-H03",
+      "surface": "Polizas",
+      "finding": "FORMA_PAGO_CONDUCTO_CROSS_FALLBACK_DUPLICATION",
+      "ownerObserved": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "causeStatus": "TO_PROVE",
+      "requiredProof": "Locate authoritative definitions and real import fields; correct read/write mapping; distinct concepts stay distinct, one concept renders once; preserve legacy data."
+    },
+    {
+      "id": "B2-H04",
+      "surface": "Polizas",
+      "finding": "EDIT_EXISTING_POLICY_DOES_NOT_PERSIST_IN_HUMAN_FLOW",
+      "ownerObserved": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/core/policy-receipts-engine.js"
+      ],
+      "causeStatus": "BLOCKING_ROOT_CAUSE_PENDING",
+      "requiredProof": "Synthetic equivalent existing policy -> edit controlled field -> valid change reason -> save+sync -> backend/store readback -> reload. Empty reason must show clear validation."
+    },
+    {
+      "id": "B2-H05",
+      "surface": "Vehiculos/Polizas",
+      "finding": "POLICY_VEHICLE_RELATIONSHIP_AMBIGUOUS_FOR_OBSERVED_CLIENT",
+      "ownerObserved": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/core/policy-receipts-v1199-refinements.js"
+      ],
+      "causeStatus": "BLOCKING_FORENSIC_READBACK_PENDING",
+      "requiredProof": "Audit canonical IDs/states/joins for policies, vehicle, expected receipts, portfolio and renewal/cancellation; do not merge/delete without proof."
+    },
+    {
+      "id": "B2-H06",
+      "surface": "Vehiculos",
+      "finding": "NO_CLEAR_EDIT_VEHICLE_ACTION",
+      "ownerObserved": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "causeStatus": "TO_PROVE",
+      "requiredProof": "Visible View/Edit actions by permission; edit updates same vehicle.id, persists, reloads and retains correct policy link."
+    },
+    {
+      "id": "B2-H07",
+      "surface": "Vehiculos",
+      "finding": "VISIBLE_UNDEFINED_TEXT",
+      "ownerObserved": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+      ],
+      "causeStatus": "TO_PROVE",
+      "requiredProof": "No literal undefined/null leakage on vehicle cards/details after canonical read-model rendering."
+    },
+    {
+      "id": "B2-H08",
+      "surface": "Recibos",
+      "finding": "PARTIAL_FIRST_RENDER_THEN_FULL_12_RECEIPTS",
+      "ownerObserved": [
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/core/product-hydration-required-optional-p0.js"
+      ],
+      "causeStatus": "BLOCKING_ROOT_CAUSE_PENDING",
+      "requiredProof": "Trace initial store/cache/render/hydration/route/bridge; show stable loading/skeleton until canonical dataset is ready; no timeout workaround."
+    },
+    {
+      "id": "B2-H09",
+      "surface": "DetalleRecibo",
+      "finding": "TECHNICAL_TERMS_AND_HARSH_VISUAL_HIERARCHY",
+      "ownerObserved": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "causeStatus": "TO_PROVE",
+      "requiredProof": "Remove internal gates/codes such as I6_5_EXACT_POLICY_TERM from normal user UI; natural business labels; remove duplicated payment-status messaging; align mature visual family."
+    },
+    {
+      "id": "B2-H10",
+      "surface": "Aseguradoras",
+      "finding": "LOGO_NOT_ADMINISTRABLE",
+      "ownerObserved": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/core/client-insurer-operational-directory-owner-v20260722.js"
+      ],
+      "causeStatus": "B1_CAUSAL_PRESERVATION_REGRESSION_TO_PROVE",
+      "requiredProof": "Use authorized Storage/Drive/secure URL architecture, not Data URL/localStorage; upload/save/readback/refresh."
+    },
+    {
+      "id": "B2-H11",
+      "surface": "Aseguradoras",
+      "finding": "SECURE_CREDENTIAL_PASSWORD_UPDATE_FAILS",
+      "ownerObserved": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/core/product-insurer-credential-provider-p0.js"
+      ],
+      "causeStatus": "B1_CAUSAL_PRESERVATION_REGRESSION_BLOCKING",
+      "requiredProof": "Capture exact secure provider/backend error; verify permission, portal/resource identity, credentialRef, username/password transport, returned mapping, estadoAcceso and refresh persistence without exposing secret."
+    },
+    {
+      "id": "B2-H12",
+      "surface": "Academia",
+      "finding": "VISIBLE_CATALOG_COUNT_DISCREPANCY_25_VS_RUNTIME_LARGER",
+      "ownerObserved": [
+        "orbit360-platform/modules/academia.js",
+        "orbit360-platform/data/academia-product-catalog-v1.js",
+        "orbit360-platform/core/academia-product-catalog-p0.js"
+      ],
+      "causeStatus": "TO_PROVE",
+      "requiredProof": "Determine intentional role filter vs hidden/lost courses; CRM/Cliente360 and Directorio/Aseguradoras training usable for Direccion/Operativo/Asesor relevant roles; no LAB/technical material."
+    },
+    {
+      "id": "B2-H13",
+      "surface": "TransversalVisual",
+      "finding": "MATURE_VISUAL_FAMILY_NOT_YET_CONSISTENT",
+      "ownerObserved": [
+        "orbit360-platform/styles/base.css",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "causeStatus": "TO_PROVE_AFTER_FUNCTIONAL_FIXES",
+      "requiredProof": "Single family for typography, weights, cards, hero, badges, buttons, labels, spacing and responsive across Cliente360/Aseguradoras/Poliza/Vehiculo/Recibo/Academia."
+    }
+  ],
+  "auditRequired": [
+    "consoleErrors",
+    "pageErrors",
+    "requestFailures",
+    "404",
+    "writes",
+    "canonicalReadback",
+    "routing",
+    "refresh",
+    "cacheHydration",
+    "owners",
+    "relationships",
+    "roles",
+    "responsive",
+    "syntheticCleanup"
+  ],
+  "constraints": {
+    "noB3": true,
+    "noLive": true,
+    "noReimport": true,
+    "noCertifiedArtifactPatch": true,
+    "noPersonHardcodes": true,
+    "sourceChangeRequiresNewCandidateBuildArtifact": true,
+    "noNewHumanReviewWhileKnownDefectExists": true
+  }
+}
