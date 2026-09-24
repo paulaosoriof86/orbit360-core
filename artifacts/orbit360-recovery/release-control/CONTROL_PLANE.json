@@ -1944,7 +1944,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_READY_FOR_PAULA_VISUAL",
+    "mechanismSyncStatus": "B2_OPEN_PAULA_VISUAL_REJECTED",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2010,9 +2010,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "31d86f20da54aefce20f6d1335e4d7c21c58ee5f",
+    "b2ExecutionLockBlobSha": "4270a6101f6dd3187c76252f1e80252876bc6f7f",
     "b2": {
-      "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+      "status": "OPEN_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2083,8 +2083,18 @@
       "visualAuditBrandingRootCauseClosedPendingPreview": true,
       "visualReceiptRecapture": true,
       "assistantVisualAudit": "PASS",
-      "outstandingBlockersForHumanReview": 0,
-      "paulaVisualAccepted": false
+      "outstandingBlockersForHumanReview": 13,
+      "paulaVisualAccepted": false,
+      "technicalPassHistoricalPreserved": true,
+      "authenticatedPassHistoricalPreserved": true,
+      "syntheticCleanupHistoricalPreserved": true,
+      "paulaVisualDecision": "REJECTED",
+      "paulaVisualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
+      "paulaVisualRejectionReceiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
+      "rejectedPreviewRunId": 35964339112,
+      "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
+      "b3Status": "NOT_STARTED",
+      "boundaryNote": "Only B2 causal remediation is authorized. No B3 and no LIVE."
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2158,6 +2168,21 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923.json",
       "source": "PAULA_VISUAL_REVIEW_20260923",
       "doesNotAdvanceB3": true
+    },
+    "paulaVisualReview20260924": {
+      "decision": "REJECTED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
+      "receiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
+      "rejectedPreviewRunId": 35964339112,
+      "rejectedSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
+      "technicalPassHistoricalPreserved": true,
+      "authenticatedPassHistoricalPreserved": true,
+      "cleanupHistoricalPreserved": true,
+      "assistantVisualAudit": "PASS_HISTORICAL_SUPERSEDED_BY_PAULA_VISUAL_REJECTION",
+      "outstandingBlockersForHumanReview": 13,
+      "b2": "OPEN",
+      "b3": "NOT_STARTED",
+      "livePromoted": false
     }
   }
 }
