@@ -19,11 +19,26 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 38,
+    "total": 39,
     "b2HumanFindings": 13,
     "currentBlocking": 15
   },
   "findings": [
+    {
+      "id": "MECH-OBS-002",
+      "block": "B2",
+      "source": "WORKFLOW_RUN_36003423424",
+      "finding": "B2 Hosting Preview deploy failed but the workflow hid Firebase's diagnostic because set -e exited before the redirected deploy output was printed.",
+      "owner": [
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      ],
+      "rootCause": "Executor observability defect: failing command redirected stdout/stderr to b2-preview.json and shell exited before cat.",
+      "remediation": "Capture deploy return code under set +e, print the complete Firebase response, then fail closed with the same return code.",
+      "status": "SOURCE_FIX_COMMITTED_RUNTIME_PROOF_PENDING",
+      "blocking": true,
+      "closureProof": "Next B2 Preview run either deploys successfully or surfaces the exact Firebase failure; no hidden deploy error.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "MECH-COMP-001",
       "block": "B2",

@@ -1313,5 +1313,22 @@
     "authorityBlobSha": "4262186fe1a011052568ff8fa657e0d37027a9e3",
     "findingsLedgerBlobSha": "b843a3a5e61eec14a8291917d17225af5e69b54d"
   },
-  "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json"
+  "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
+  "lastPreviewFailure": {
+    "runId": 36003423424,
+    "sourceSha": "5757992ff98b303388536167a2134691743f2bc9",
+    "stage": "DEPLOY_EXACT_B2_PACKAGE_TO_ISOLATED_PREVIEW",
+    "productContractsPass": true,
+    "canonicalCompositionGuardPass": true,
+    "brandingSnapshotPass": true,
+    "immutablePackagePass": true,
+    "relationshipReadOnlyAuditPass": true,
+    "previewCredentialCallableDeployPass": true,
+    "hostingPreviewDeployPass": false,
+    "operationalDataTouched": false,
+    "liveTouched": false,
+    "cause": "FIREBASE_ERROR_OUTPUT_HIDDEN_BY_SET_E_BEFORE_CAT",
+    "classification": "EXECUTOR_OBSERVABILITY_DEFECT_NOT_PRODUCT_REGRESSION"
+  },
+  "observabilityFix": "CAPTURE_AND_PRINT_HOSTING_DEPLOY_FAILURE_BEFORE_FAIL_CLOSED"
 }

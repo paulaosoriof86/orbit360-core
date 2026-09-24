@@ -3637,8 +3637,16 @@ jobs:
           set -euo pipefail
           cd "$RUNNER_TEMP/b2-package/bundle"
           CHANNEL_ID="gi-i65-b2-$GITHUB_RUN_ID"
+          set +e
           node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b2-preview.json" 2>&1
-          cat "$RUNNER_TEMP/b2-preview.json";export DEPLOY="$RUNNER_TEMP/b2-preview.json"
+          DEPLOY_RC=$?
+          set -e
+          cat "$RUNNER_TEMP/b2-preview.json"
+          if [ "$DEPLOY_RC" -ne 0 ]; then
+            echo "B2_HOSTING_PREVIEW_DEPLOY_FAILED_RC=$DEPLOY_RC"
+            exit "$DEPLOY_RC"
+          fi
+          export DEPLOY="$RUNNER_TEMP/b2-preview.json"
           PREVIEW_URL=$(python3 - <<'PY'
           import os,re
           raw=open(os.environ['DEPLOY']).read();prod='https://'+os.environ['HOSTING_SITE']+'.web.app';urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
