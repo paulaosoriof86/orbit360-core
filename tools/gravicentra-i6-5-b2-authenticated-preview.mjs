@@ -408,6 +408,17 @@ try{
   await page.fill('#policy-v1199 [data-reason]','B2 QA actualización controlada');
   await page.click('#policy-v1199 [data-save]');
   await page.waitForSelector('#policy-v1199',{state:'detached',timeout:30000});
+  const vehicleEditDiag=await bounded((async()=>{
+    const dbRows=await rowsBy(db,'vehiculos','polizaId',policy.id);
+    const storeRows=await page.evaluate(pid=>(Orbit.store.all('vehiculos')||[]).filter(v=>String(v.polizaId||'')===String(pid)).map(v=>({id:String(v.id||''),color:String(v.color||''),operationId:String(v.operationId||''),updatedAt:String(v.updatedAt||v.actualizado||'')})),policy.id);
+    return{
+      originalVehicleId:vehicle.id,
+      dbRows:dbRows.map(v=>({id:String(v.id||''),color:String(v.color||''),operationId:String(v.operationId||''),updatedAt:String(v.updatedAt||v.actualizado||''),estado:String(v.estado||'')})),
+      storeRows
+    };
+  })(),'B2_AUTH_VEHICLE_EDIT_DIAGNOSTIC_TIMEOUT',15000);
+  evidence.vehicleEditDiagnostics=vehicleEditDiag;
+  milestone('VEHICLE_EDIT_SAVE_DIAGNOSTICS',vehicleEditDiag);
   const vehicleEdited=await waitFor(async()=>{const s=await dataCol(db,'vehiculos').doc(vehicle.id).get();const d=s.data()||{};return d.color==='Azul'?d:null;},'B2_AUTH_VEHICLE_EDIT_READBACK',30000);
   need(!!vehicleEdited,'B2_AUTH_VEHICLE_EDIT_NOT_DURABLE');
   milestone('VEHICLE_EDIT_READBACK');
