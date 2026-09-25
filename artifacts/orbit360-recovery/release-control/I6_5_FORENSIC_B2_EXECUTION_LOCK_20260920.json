@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -239,10 +239,12 @@
     "artifactDigest": "1231f8b348ac77eda365eb27de2061204ddc072ed4161af20cf9022fa2a737ae",
     "exactReadback": true,
     "functionalPass": true,
-    "livePromoted": false
+    "livePromoted": false,
+    "supersededByProductSourceChange": true,
+    "supersededReason": "Vehicle same-id edit changed distinct untouched VIN through combined Chasis/VIN input; preservation fix requires new immutable Preview"
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "05c67e993d9b5e387764b1068164152472cc6a1c",
     "exactPreviewBuildId": "gi-i65-b2-05c67e993d9b-57f234755dc1",
@@ -1696,7 +1698,7 @@
   },
   "r4": {
     "status": "CANDIDATE_PENDING_PREVIEW",
-    "compositionLockBlobSha": "62d2813c16b676063fa56fe60414ede4d2bfbdc8",
-    "latestCausalFix": "B2_POLICY_FORM_HELPER_BLOCK_FULLY_RESTORED"
+    "compositionLockBlobSha": "00d192aa8afe401777d9343063ee93f4c57b73a4",
+    "latestCausalFix": "B2_VEHICLE_EDIT_PRESERVE_DISTINCT_VIN_WHEN_UNTOUCHED"
   }
 }

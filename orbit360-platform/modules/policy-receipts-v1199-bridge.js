@@ -281,10 +281,13 @@ Orbit.modules = Orbit.modules || {};
       const edited = {
         marca: q('[data-vbrand]').value.trim(), linea: q('[data-vline]').value.trim(), anio: q('[data-vyear]').value,
         placa: q('[data-vplate]').value.trim(), uso: q('[data-vuse]').value.trim(), color: q('[data-vcolor]').value.trim(),
-        chasis: q('[data-vchasis]').value.trim(), vin: q('[data-vchasis]').value.trim(), motor: q('[data-vmotor]').value.trim(),
+        chasis: q('[data-vchasis]').value.trim(), motor: q('[data-vmotor]').value.trim(),
         inciso: q('[data-vinciso]').value.trim(), sumaAsegurada: q('[data-vsum]').value === '' ? '' : +q('[data-vsum]').value,
         concepto: q('[data-vconcept]').value.trim(), descripcion: q('[data-vconcept]').value.trim()
       };
+      const displayedChassisBefore = String(initial.chasis || initial.vin || '').trim();
+      const displayedChassisAfter = q('[data-vchasis]').value.trim();
+      if (displayedChassisAfter !== displayedChassisBefore) edited.vin = displayedChassisAfter;
       const vehicle = { id: current.id };
       Object.keys(edited).forEach(key => {
         const before = initial[key] == null ? '' : String(initial[key]).trim();
