@@ -856,8 +856,8 @@ try{
   await page.click('#asg-ficha #af-guardar');
   // Bind confirmation to the exact prompt overlay created by Guardar cambios.
   // Global [data-yes].last() can target unrelated/stale dialogs and falsely leave guardarDraft awaiting its own prompt.
-  const insurerReasonOverlay=page.locator('.drawer-back').filter({has:page.locator('[data-in]')}).last();
-  await insurerReasonOverlay.waitFor({state:'visible',timeout:10000});
+  const insurerReasonOverlay=page.locator('.drawer-back').filter({has:page.locator('[data-in]')}).filter({hasText:'Guardar cambios'}).last();
+  await insurerReasonOverlay.waitFor({state:'visible',timeout:20000});
   const insurerReasonInput=insurerReasonOverlay.locator('[data-in]');
   await insurerReasonInput.fill('B2 QA aseguradora: logo y credencial segura');
   const promptSnapshot=await insurerReasonOverlay.evaluate(el=>({
