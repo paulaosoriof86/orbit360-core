@@ -759,6 +759,21 @@ try{
       };
       provider.__b2TraceWrapped=true;
     }
+    if(Orbit.ui&&typeof Orbit.ui.prompt==='function'&&!Orbit.ui.__b2PromptTraceWrapped){
+      const originalPrompt=Orbit.ui.prompt.bind(Orbit.ui);
+      Orbit.ui.prompt=async function(){
+        push('prompt-start',{message:String(arguments[0]||'').slice(0,220),title:String(arguments[1]?.title||'')});
+        try{
+          const out=await originalPrompt.apply(Orbit.ui,arguments);
+          push('prompt-resolved',{valueType:out===null?'null':typeof out,valueLength:out==null?0:String(out).length});
+          return out;
+        }catch(e){
+          push('prompt-error',{message:String(e?.message||e)});
+          throw e;
+        }
+      };
+      Orbit.ui.__b2PromptTraceWrapped=true;
+    }
     if(Orbit.store&&typeof Orbit.store.batchDurable==='function'&&!Orbit.store.__b2TraceWrapped){
       const originalBatch=Orbit.store.batchDurable.bind(Orbit.store);
       Orbit.store.batchDurable=async function(rows,opts){
