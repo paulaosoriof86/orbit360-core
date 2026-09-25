@@ -2012,7 +2012,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "428f0a0e8e2ce36a4405982ae16cc40cc3bd8817",
+    "b2ExecutionLockBlobSha": "8c303e4af3ac5e43776daac4626738e3dea9e2fb",
     "b2": {
       "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2283,5 +2283,15 @@
     "preservePassEvidence": true,
     "prohibitProductMutationForHarnessOnlyFailure": true,
     "nextAction": "R3_BUILD_PREVIEW_EXACT_READBACK_AUTHENTICATED_DISCRIMINANTS"
+  },
+  "r3AuthenticatedDispatch": {
+    "requestedAt": "2026-09-25T13:06:00-06:00",
+    "b2ExecutionLockBlobSha": "8c303e4af3ac5e43776daac4626738e3dea9e2fb",
+    "exactPreviewSourceSha": "4389e74f73945992e0170d790d64121c975da72c",
+    "exactPreviewBuildId": "gi-i65-b2-4389e74f7394-57f234755dc1",
+    "exactPreviewRunId": 36177410485,
+    "productSourceMutation": false,
+    "livePromotion": false,
+    "b3Advance": false
   }
 }
