@@ -274,7 +274,7 @@
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
     "lastFailedRunId": 35961205964,
-    "lastFailure": "ASEGURADORAS_DEEPLINK_RERENDER_DROPPED_EDIT_STATE",
+    "lastFailure": "INSURER_SAVE_NOT_REACHED_AFTER_AMBIGUOUS_GLOBAL_PROMPT_CONFIRMATION",
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
@@ -332,10 +332,10 @@
     "cleanupWrites": 20,
     "visualEvidenceRecapture": true,
     "visualReceiptRecapture": true,
-    "lastFailureRunId": 36156246656,
+    "lastFailureRunId": 36158157603,
     "requiredNewSource": true,
     "lastArmCommitParent": "def30c78c1de142dc5b045e9900bd2ba80115d34",
-    "lastArmReason": "RUN_EXACT_AUTHENTICATED_PROOF_ON_R21_FIXED_PREVIEW"
+    "lastArmReason": "RERUN_EXACT_FE140_WITH_PROMPT_SCOPED_CONFIRMATION"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",

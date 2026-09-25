@@ -19,11 +19,26 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 50,
+    "total": 51,
     "b2HumanFindings": 13,
-    "currentBlocking": 22
+    "currentBlocking": 23
   },
   "findings": [
+    {
+      "id": "B2-QA-22-INSURER-PROMPT-BINDING",
+      "block": "B2",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36158157603",
+      "finding": "INSURER_SAVE_PROOF_USED_GLOBAL_PROMPT_CONFIRM_SELECTOR_AND_DID_NOT_PROVE_THE_GUARDAR_CHANGES_PROMPT_WAS_THE_DIALOG_CONFIRMED",
+      "owner": [
+        "tools/gravicentra-i6-5-b2-authenticated-preview.mjs"
+      ],
+      "rootCause": "The harness waited for global [data-in].last() and clicked global [data-yes].last(). The product uses overlay-scoped prompts; unrelated/stale overlays can make the proof close a different dialog while guardarDraft remains awaiting its own U.prompt.",
+      "remediation": "Bind the reason input and confirmation button to the same visible .drawer-back containing [data-in], capture its title/value, click its own [data-yes], and require that exact overlay to detach before evaluating persistence.",
+      "status": "HARNESS_FIXED_PENDING_RERUN",
+      "blocking": true,
+      "closureProof": "Exact fe140 Preview reaches secure provider/batch writer or yields a product-specific save failure after the correctly-bound prompt; no ambiguous global dialog interaction.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "B2-R21-ASEGURADORAS-DEEPLINK-EDIT-LOSS",
       "block": "B2",

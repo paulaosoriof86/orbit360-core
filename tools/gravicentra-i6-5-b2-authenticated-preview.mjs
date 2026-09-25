@@ -784,10 +784,21 @@ try{
   need(passwordInjected===true,'B2_AUTH_INSURER_PASSWORD_INJECTION_FAILED');
   let insurerReasonDialog=false;
   await page.click('#asg-ficha #af-guardar');
-  const insurerReasonInput=page.locator('[data-in]').last();
-  await insurerReasonInput.waitFor({state:'visible',timeout:10000});
+  // Bind confirmation to the exact prompt overlay created by Guardar cambios.
+  // Global [data-yes].last() can target unrelated/stale dialogs and falsely leave guardarDraft awaiting its own prompt.
+  const insurerReasonOverlay=page.locator('.drawer-back').filter({has:page.locator('[data-in]')}).last();
+  await insurerReasonOverlay.waitFor({state:'visible',timeout:10000});
+  const insurerReasonInput=insurerReasonOverlay.locator('[data-in]');
   await insurerReasonInput.fill('B2 QA aseguradora: logo y credencial segura');
-  await page.locator('[data-yes]').last().click();
+  const promptSnapshot=await insurerReasonOverlay.evaluate(el=>({
+    title:String(el.querySelector('b')?.textContent||''),
+    input:String(el.querySelector('[data-in]')?.value||''),
+    yesText:String(el.querySelector('[data-yes]')?.textContent||''),
+    noText:String(el.querySelector('[data-no]')?.textContent||'')
+  }));
+  milestone('INSURER_REASON_PROMPT_BOUND',promptSnapshot);
+  await insurerReasonOverlay.locator('[data-yes]').click();
+  await insurerReasonOverlay.waitFor({state:'detached',timeout:10000});
   insurerReasonDialog=true;
   await page.waitForTimeout(5000);
   const saveDiag=await page.evaluate(()=>({
