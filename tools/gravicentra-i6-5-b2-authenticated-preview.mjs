@@ -693,8 +693,12 @@ try{
   await page.waitForSelector('#asg-ficha [data-portal] [data-ppass]',{timeout:10000});
   await page.fill('#asg-ficha [data-portal] [data-ppass]',syntheticSecret);
   let insurerReasonDialog=false;
-  page.once('dialog',async dialog=>{insurerReasonDialog=true;need(dialog.type()==='prompt','B2_AUTH_INSURER_REASON_UNEXPECTED_DIALOG:'+dialog.type());await dialog.accept('B2 QA aseguradora: logo y credencial segura');});
   await page.click('#asg-ficha #af-guardar');
+  const insurerReasonInput=page.locator('[data-in]').last();
+  await insurerReasonInput.waitFor({state:'visible',timeout:10000});
+  await insurerReasonInput.fill('B2 QA aseguradora: logo y credencial segura');
+  await page.locator('[data-yes]').last().click();
+  insurerReasonDialog=true;
   const insurerUpdated=await waitFor(async()=>{
     const s=await dataCol(db,'aseguradoras').doc(insurerId).get();if(!s.exists)return null;
     const d=s.data()||{},portal=[].concat(d.portales||[]).find(x=>String(x.id||'')===portalId);
