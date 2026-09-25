@@ -96,7 +96,7 @@
     "functions/bootstrap.js": "5b1a04617e6be3cf68d7d923862abcf0174fe8fb",
     "functions/package.json": "bfa00e1b1b0349251fe853d2fa3cea00a8ae9366",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
-    "functions/product-operational-domain.js": "83750fd2d0b10402b5ebcf646c532bf68e857cd6",
+    "functions/product-operational-domain.js": "7a7101837b323373e61b9798891d2b73f5394407",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "e4b602b4abb26fcd3d9413b1ab9bb67998be78dd",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -106,13 +106,13 @@
     "orbit360-platform/core/access-scope.js": "55531bfe185ddae98c4fcc4c5ac6561fc944490c",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "6decc66566ca6b6fe1761fb0d2db5a108e9d1033",
-    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "e0526992c7ab55df6799e2663940b1b1869e5f59",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "ca18126985689ed7846a842de48bfc7ae3c0f7a3",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "4bc1e529b8b182f844a493c66143467315e0deb9",
     "orbit360-platform/core/issuance-workflow-v1201-refinements.js": "47a9d68bef8cb60a00a057375efdf443c2ff2de2",
     "orbit360-platform/core/issuance-workflow-v1201.js": "b2a236d4759e194cca97f3672c3dcb610aef05a8",
-    "orbit360-platform/core/policy-receipts-engine.js": "fecf66f828477dd408894350739bee7c13965ff3",
+    "orbit360-platform/core/policy-receipts-engine.js": "8a9fcd6f9782794705667b1a3b9af68c1e0427b0",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
     "orbit360-platform/core/product-app-p0.js": "b6ccd725f214c666e04299574be4c1fdae3a6b83",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "fcf45f869897b205df48d17906555fc688250f83",
@@ -132,18 +132,18 @@
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "c51d13b3a38770af9cce9613a628d9e6db44a353",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
-    "orbit360-platform/modules/aseguradoras.js": "086a5d828b572b35e2fee0b5dab8cb04dc9fed53",
-    "orbit360-platform/modules/cliente360.js": "838a3306164bfddb21ef15cd79fa46ad905925c7",
+    "orbit360-platform/modules/aseguradoras.js": "106cb9ee784f0c73376c274e65e343045d07451d",
+    "orbit360-platform/modules/cliente360.js": "067dba6c242a3717bfca3519f511a4653faf6ff1",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "6fbb880480f726e537f93650119af3265cf97bbd",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "105b869445919802fb6e07d6120ace6a0772ec57",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "a9dc395a0764bca3ff8f04d1d211acc5f3d0b085",
-    "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "88d6a611d3b443099ee7b2c3c7014791b6dbf770",
-    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "084782281c51cede6fa3ded9c7338294531f459c",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "083ed145bba6b8fe48e96224408e8dc1c4af94bd",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "d31a9940ce8d70a022dda415494a986640b940cd",
     "orbit360-platform/product-runtime-config.js": "b03bd57e6c77b6204ce860b93ec4556b1cd3e4e7",
-    "orbit360-platform/styles/base.css": "e2289b0c0528e81709c06e8ac39ed88709245ef2",
+    "orbit360-platform/styles/base.css": "e12478531be5a80a8f72f1e18e59e4d1d8d9a3cd",
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b"
   },
@@ -165,43 +165,40 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "date": "2026-09-24",
+    "date": "2026-09-25",
     "block": "B2",
-    "cause": "PAULA_VISUAL_REVIEW_R2_PLUS_SCREENSHOT_REGRESSION",
+    "origin": "PAULA_VISUAL_REVIEW_20260925_R3",
+    "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
+    "cause": "R3 human visual rejection after authenticated technical pass",
     "fixes": [
-      "server-owned role permission hydration on every Preview origin",
-      "truthful policy/client vehicle relationship without automatic relink",
-      "remove duplicate generic vehicle actions",
-      "mature policy and receipt hierarchy",
-      "receipt-plan edit routed to canonical policy owner",
-      "insurer logo discoverability",
-      "B2 Preview secure credential endpoint and direct product provider",
-      "renewal vehicle risk snapshot continuity"
+      "single canonical vehicle alias normalizer shared by detail/editor",
+      "sparse same-id vehicle edit that preserves untouched fields",
+      "explicit vehicleId+policyId version-preserving relationship command",
+      "candidate dedupe by physical vehicle.id with historical policy context",
+      "receipt hydration loading gate before any empty state",
+      "receipt provenance moved to collapsed audit details",
+      "policy premium/payment hierarchy aligned to mature detail family",
+      "policy-vs-schedule warning bound to canonical reconciliation amountTolerance=0.02 default",
+      "insurer logo file upload through product operational server-owned asset owner with canonical readback"
     ],
-    "noOperationalDataMutation": true,
+    "changedProductFiles": [
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "functions/product-operational-domain.js",
+      "orbit360-platform/styles/base.css"
+    ],
     "noReimport": true,
+    "noOperationalBusinessDataMutation": true,
     "livePromotion": false,
-    "recordedAt": "2026-09-25",
-    "rootCauseExtension": "PREVIEW_CREDENTIAL_CALLABLE_READS_PRODUCTION_VAULT",
-    "accessAuthorityFixes": [
-      "PROTECTED_CONFIG_HYDRATION_PROVEN_WORKING",
-      "SPARSE_ROLE_PERMISSION_OVERRIDES_ARE_MERGED_OVER_COMPLETE_UI_DEFAULT_MATRIX",
-      "FRONTEND_ACTION_NAMES_MAP_TO_CANONICAL_VER_EDITAR_KEYS",
-      "APPROVED_OPERATIVO_COTIZADOR_COMPARATIVO_OVERRIDES_RECOVERED_BY_CONTROLLED_CONFIG_WRITE",
-      "AUTHENTICATED_PROOF_MUST_ASSERT_REAL_PROTECTED_CONFIG_NOT_SYNTHETIC_MATRIX"
-    ],
-    "insurerEditStateFixes": [
-      "KNOWLEDGE_SUMMARY_ASYNC_REFRESH_PRESERVES_EDITING_STATE",
-      "UNSAVED_DRAFT_PRESERVED_ACROSS_OWNER_REFRESH",
-      "CREDENTIAL_DRAFTS_PRESERVED_ACROSS_OWNER_REFRESH",
-      "ORDINARY_FICHA_OPEN_BEHAVIOR_UNCHANGED",
-      "MODULE_RENDER_DEEPLINK_REOPEN_PRESERVES_ACTIVE_EDIT_STATE"
-    ],
-    "insurerCredentialIsolationFix": [
-      "PREVIEW_IMPORT_NO_LONGER_READS_PRODUCTION_SECRET",
-      "PREVIEW_REVEAL_STATUS_COPY_USE_PREVIEW_VAULT_ONLY",
-      "PRODUCTION_CALLABLE_UNCHANGED",
-      "PREVIEW_SECRET_CLEANUP_REMAINS_MANDATORY"
-    ]
+    "b3Status": "NOT_STARTED",
+    "oscarReadOnlyAudit": {
+      "runId": 36169665827,
+      "artifactId": 10880077438,
+      "digest": "sha256:42e10ee44a6c7a25dd9947b0c0d7bd79720684d00240cde05c34de6bfc6fea55"
+    }
   }
 }

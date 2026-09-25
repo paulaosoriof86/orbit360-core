@@ -105,7 +105,8 @@ Orbit.modules = Orbit.modules || {};
     const rs = ramos(country), initialRamo = existing && existing.ramo || rs[0] || '';
     const initialSubs = subramos(country, initialRamo), insurers = linkedInsurers(country);
     const advisors = S().all('asesores') || [];
-    const existingVehicle = existing ? ((S().all('vehiculos') || []).find(v => v.polizaId === existing.id && String(v.estado || '').toLowerCase() !== 'histórico') || null) : null;
+    const existingVehicleRaw = existing ? ((S().all('vehiculos') || []).find(v => v.polizaId === existing.id && String(v.estado || '').toLowerCase() !== 'histórico') || null) : null;
+    const existingVehicle = existingVehicleRaw && E.normalizeVehicle ? E.normalizeVehicle(existingVehicleRaw) : existingVehicleRaw;
     const initialAdvisorId = existing && existing.asesorId || selectedClient.asesorId || '';
     const frequencies = Object.keys(Orbit.primas.FRECUENCIAS || { Contado: 1 });
     const forms = Orbit.primas.FORMAS_PAGO || ['Transferencia'];
@@ -237,6 +238,7 @@ Orbit.modules = Orbit.modules || {};
   function openVehicleForm(vehicleId) {
     const current = S().get('vehiculos', vehicleId);
     if (!current) return toast('Vehículo no disponible');
+    const initial = E.normalizeVehicle ? E.normalizeVehicle(current) : Object.assign({}, current);
     const policy = S().get('polizas', current.polizaId);
     const client = policy && S().get('clientes', policy.clienteId);
     if (!policy || !client) return toast('No fue posible resolver la póliza vinculada al vehículo.');
@@ -251,18 +253,18 @@ Orbit.modules = Orbit.modules || {};
       <div style="padding:18px 20px;display:grid;gap:14px">
         <div class="cfg-note">La edición actualiza el mismo vehículo y conserva su vínculo con cliente y póliza. No crea un registro nuevo.</div>
         <div class="cgrid">
-          <label class="ce-l">Marca<input class="o-sel" data-vbrand value="${value(current.marca)}"></label>
-          <label class="ce-l">Línea / tipo<input class="o-sel" data-vline value="${value(current.linea)}"></label>
-          <label class="ce-l">Año<input type="number" class="o-sel" data-vyear value="${value(current.anio)}"></label>
-          <label class="ce-l">Placa<input class="o-sel" data-vplate value="${value(current.placa)}"></label>
-          <label class="ce-l">Uso<input class="o-sel" data-vuse value="${value(current.uso)}"></label>
-          <label class="ce-l">Color<input class="o-sel" data-vcolor value="${value(current.color)}"></label>
-          <label class="ce-l">Chasis / VIN<input class="o-sel" data-vchasis value="${value(current.chasis || current.vin)}"></label>
-          <label class="ce-l">Motor<input class="o-sel" data-vmotor value="${value(current.motor)}"></label>
-          <label class="ce-l">Inciso<input class="o-sel" data-vinciso value="${value(current.inciso)}"></label>
-          <label class="ce-l">Suma asegurada<input type="number" min="0" step="0.01" class="o-sel" data-vsum value="${value(current.sumaAsegurada)}"></label>
+          <label class="ce-l">Marca<input class="o-sel" data-vbrand value="${value(initial.marca)}"></label>
+          <label class="ce-l">Línea / tipo<input class="o-sel" data-vline value="${value(initial.linea)}"></label>
+          <label class="ce-l">Año<input type="number" class="o-sel" data-vyear value="${value(initial.anio)}"></label>
+          <label class="ce-l">Placa<input class="o-sel" data-vplate value="${value(initial.placa)}"></label>
+          <label class="ce-l">Uso<input class="o-sel" data-vuse value="${value(initial.uso)}"></label>
+          <label class="ce-l">Color<input class="o-sel" data-vcolor value="${value(initial.color)}"></label>
+          <label class="ce-l">Chasis / VIN<input class="o-sel" data-vchasis value="${value(initial.chasis || initial.vin)}"></label>
+          <label class="ce-l">Motor<input class="o-sel" data-vmotor value="${value(initial.motor)}"></label>
+          <label class="ce-l">Inciso<input class="o-sel" data-vinciso value="${value(initial.inciso)}"></label>
+          <label class="ce-l">Suma asegurada<input type="number" min="0" step="0.01" class="o-sel" data-vsum value="${value(initial.sumaAsegurada)}"></label>
         </div>
-        <label class="ce-l">Concepto / descripción<input class="o-sel" data-vconcept value="${value(current.concepto || current.descripcion)}"></label>
+        <label class="ce-l">Concepto / descripción<input class="o-sel" data-vconcept value="${value(initial.concepto || initial.descripcion)}"></label>
         <label class="ce-l">Motivo del cambio *<textarea class="o-sel" data-vreason style="min-height:58px" placeholder="Describe por qué se actualiza el vehículo"></textarea></label>
         <div class="hint error" data-verror style="display:none"></div>
       </div>
@@ -271,14 +273,20 @@ Orbit.modules = Orbit.modules || {};
     q('[data-vsave]').addEventListener('click', async () => {
       const reason = q('[data-vreason]').value.trim(), err = q('[data-verror]'), save = q('[data-vsave]'), originalText = save.textContent;
       if (!reason) { err.style.display=''; err.textContent=ERROR_LABELS.motivo_requerido; q('[data-vreason]').focus(); return; }
-      const vehicle = {
-        id: current.id,
+      const edited = {
         marca: q('[data-vbrand]').value.trim(), linea: q('[data-vline]').value.trim(), anio: q('[data-vyear]').value,
         placa: q('[data-vplate]').value.trim(), uso: q('[data-vuse]').value.trim(), color: q('[data-vcolor]').value.trim(),
         chasis: q('[data-vchasis]').value.trim(), vin: q('[data-vchasis]').value.trim(), motor: q('[data-vmotor]').value.trim(),
-        inciso: q('[data-vinciso]').value.trim(), sumaAsegurada: +q('[data-vsum]').value || 0,
+        inciso: q('[data-vinciso]').value.trim(), sumaAsegurada: q('[data-vsum]').value === '' ? '' : +q('[data-vsum]').value,
         concepto: q('[data-vconcept]').value.trim(), descripcion: q('[data-vconcept]').value.trim()
       };
+      const vehicle = { id: current.id };
+      Object.keys(edited).forEach(key => {
+        const before = initial[key] == null ? '' : String(initial[key]).trim();
+        const after = edited[key] == null ? '' : String(edited[key]).trim();
+        if (before !== after) vehicle[key] = edited[key];
+      });
+      if (Object.keys(vehicle).length === 1) { b.remove(); toast('No hay cambios en el vehículo.'); return; }
       save.disabled=true; save.textContent='Guardando…';
       try {
         const result = await E.updatePolicy(policy.id, { vehiculo: vehicle }, { motivo: reason });

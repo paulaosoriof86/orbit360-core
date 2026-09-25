@@ -433,7 +433,7 @@ Orbit.modules.aseguradoras = (function () {
     Orbit.vault.wire(back);
     back.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
     if (back.querySelector('#af-editar')) back.querySelector('#af-editar').addEventListener('click', () => ficha(id, true));
-    if (back.querySelector('#af-logo-focus')) back.querySelector('#af-logo-focus').addEventListener('click', () => { selectTab('resumen'); setTimeout(() => { const input=document.getElementById('af-logo'); if(input){ input.focus(); input.scrollIntoView({block:'center'}); } }, 0); });
+    if (back.querySelector('#af-logo-focus')) back.querySelector('#af-logo-focus').addEventListener('click', () => { selectTab('resumen'); setTimeout(() => { const input=document.getElementById('af-logo-file') || document.getElementById('af-logo'); if(input){ input.focus(); input.scrollIntoView({block:'center'}); } }, 0); });
     if (back.querySelector('#af-guardar')) back.querySelector('#af-guardar').addEventListener('click', () => guardarDraft(id, back));
     if (back.querySelector('#af-cancelar')) back.querySelector('#af-cancelar').addEventListener('click', () => { fichaState[id].editing = false; fichaState[id].draft = null; fichaState[id].credentialDrafts = {}; ficha(id); });
     if (back.querySelector('#af-del')) back.querySelector('#af-del').addEventListener('click', () => borrarOdesactivar(id, back));
@@ -481,7 +481,7 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ---- diff simple (top-level) para trazabilidad antes/después ---- */
   function diffResumen(before, after) {
-    const claves = ['nombre', 'logo', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada', 'cotTasas', 'cotTasasValidadas'];
+    const claves = ['nombre', 'logo', 'logoAssetRef', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada', 'cotTasas', 'cotTasasValidadas'];
     const cambios = [];
     claves.forEach(k => { const b = JSON.stringify(before[k]), a2 = JSON.stringify(after[k]); if (b !== a2) cambios.push(k); });
     return cambios;
@@ -491,8 +491,18 @@ Orbit.modules.aseguradoras = (function () {
     const st = fichaState[id]; if (!st || !st.draft || st.saving) return;
     if (typeof st.snapshotCurrent === 'function') st.snapshotCurrent();
     const before = S().get('aseguradoras', id); if (!before) return;
-    const logoUrl = clean(st.draft.logo);
-    if (logoUrl && !/^https:\/\//i.test(logoUrl)) { U.toast('El logo debe usar una URL HTTPS segura.'); return; }
+    let logoUrl = clean(st.draft.logo);
+    if (st.logoFile) {
+      const provider = Orbit.productRuntimeBrowserProvidersP0;
+      if (!provider || typeof provider.callFunction !== 'function') { U.toast('No está disponible el guardado seguro del logo.'); return; }
+      if (st.logoFile.size > 2 * 1024 * 1024) { U.toast('El logo no puede superar 2 MB.'); return; }
+      const bytes = new Uint8Array(await st.logoFile.arrayBuffer());
+      let binary = ''; for (let i=0;i<bytes.length;i+=0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i,Math.min(i+0x8000,bytes.length)));
+      const uploaded = await provider.callFunction('orbit360ProductAssetUpload',{tenantId:tenantId(),activeRole:(Orbit.session&&Orbit.session.rol&&Orbit.session.rol())||'',insurerId:id,fileName:st.logoFile.name,mimeType:st.logoFile.type,base64:btoa(binary)},'us-central1');
+      if (!uploaded || uploaded.ok !== true || !uploaded.url || !uploaded.assetRef) { U.toast('No fue posible confirmar el logo en el servidor.'); return; }
+      st.draft.logo = uploaded.url; st.draft.logoAssetRef = uploaded.assetRef; st.logoFile = null; logoUrl = uploaded.url;
+    }
+    if (logoUrl && !/^https:\/\//i.test(logoUrl)) { U.toast('El logo debe usar una referencia HTTPS segura.'); return; }
     let cambios = diffResumen(before, st.draft);
     const secureCount = credentialChanges(st, st.draft).length;
     if (!cambios.length && !secureCount) { st.editing = false; st.draft = null; st.credentialDrafts = {}; ficha(id); return; }
@@ -593,7 +603,7 @@ Orbit.modules.aseguradoras = (function () {
         <label class="ce-l">NIT / identificación fiscal<input id="af-nit" class="o-sel" value="${U.esc(a.nit || '')}" ${ro}></label>
         <label class="ce-l">Código de intermediario<input id="af-cod" class="o-sel" value="${U.esc(a.codigoIntermediario || '')}" ${ro}></label>
         <label class="ce-l">Sitio web / app<input id="af-web" class="o-sel" value="${U.esc(a.web || '')}" ${ro}></label>
-        <label class="ce-l">🖼 Cambiar logo · URL HTTPS<input id="af-logo" class="o-sel" type="url" placeholder="https://…" value="${U.esc(a.logo || '')}" ${ro}><small class="muted">Se conserva como referencia segura; no se guarda el archivo ni una Data URL en el navegador.</small></label>
+        <div class="ce-l"><span>🖼 Logo</span>${editing ? '<input id="af-logo-file" class="o-sel" type="file" accept="image/png,image/jpeg,image/webp"><div id="af-logo-preview" style="margin-top:8px;min-height:72px;border:1px dashed var(--line);border-radius:12px;display:grid;place-items:center;padding:8px">'+(a.logo?'<img src="'+U.esc(a.logo)+'" alt="Vista previa del logo" style="max-width:180px;max-height:70px;object-fit:contain">':'<span class="muted">Selecciona una imagen para ver la vista previa.</span>')+'</div><details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--ink-2)">Usar URL como alternativa</summary><input id="af-logo" class="o-sel" type="url" placeholder="https://…" value="'+U.esc(a.logo || '')+'" style="margin-top:6px"></details>' : (a.logo?'<img src="'+U.esc(a.logo)+'" alt="Logo" style="max-width:180px;max-height:70px;object-fit:contain">':'<span class="muted">Sin logo cargado.</span>')}</div>
         <label class="ce-l">Responsable interno<input id="af-resp" class="o-sel" value="${U.esc(a.responsable || '')}" ${ro}></label>
       </div>
       <div class="cgrid" style="margin-top:10px">
@@ -832,6 +842,15 @@ Orbit.modules.aseguradoras = (function () {
 
     body.querySelectorAll('[data-open-portal]').forEach(b => b.addEventListener('click', () => window.open(b.dataset.openPortal.match(/^https?:/) ? b.dataset.openPortal : 'https://' + b.dataset.openPortal, '_blank', 'noopener')));
 
+    if (editing) {
+      const fileInput = body.querySelector('#af-logo-file');
+      if (fileInput) fileInput.addEventListener('change', () => {
+        const file = fileInput.files && fileInput.files[0]; st.logoFile = file || null;
+        const preview = body.querySelector('#af-logo-preview'); if (!preview) return;
+        if (!file) { preview.innerHTML = draft.logo ? '<img src="'+U.esc(draft.logo)+'" alt="Vista previa del logo" style="max-width:180px;max-height:70px;object-fit:contain">' : '<span class="muted">Selecciona una imagen para ver la vista previa.</span>'; return; }
+        const url = URL.createObjectURL(file); preview.innerHTML = '<img src="'+url+'" alt="Vista previa del logo" style="max-width:180px;max-height:70px;object-fit:contain">'; const img=preview.querySelector('img'); if(img)img.addEventListener('load',()=>URL.revokeObjectURL(url),{once:true});
+      });
+    }
     if (!editing) return; // en modo vista no hay nada que mutar
 
     body.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {

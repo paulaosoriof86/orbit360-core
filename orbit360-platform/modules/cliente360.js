@@ -390,7 +390,19 @@ Orbit.modules.cliente360 = (function () {
     if (tab === 'resumen') body.innerHTML = tabResumen(cid, r);
     else if (tab === 'polizas') body.innerHTML = tabPolizas(cid, r);
     else if (tab === 'vehiculos') body.innerHTML = tabVehiculos(cid, r);
-    else if (tab === 'recibos') { body.innerHTML = tabRecibos(cid, r); wireRecibos(cid); }
+    else if (tab === 'recibos') {
+      const ps = S() && typeof S()._productStatus === 'function' ? S()._productStatus() : {};
+      const confirmed = ps.serverConfirmedCollections || [];
+      if (confirmed.indexOf('recibosEsperados') < 0 || confirmed.indexOf('carteraPrimas') < 0) {
+        body.setAttribute('data-c360-receipts-loading','1');
+        body.innerHTML = '<div class="card pad" data-c360-receipts-pending="1"><b>Cargando recibos…</b><div class="muted" style="margin-top:5px">Estamos validando el calendario y la cartera.</div></div>';
+      } else {
+        body.removeAttribute('data-c360-receipts-loading');
+        const projection = Orbit.receiptsPortfolioProjection;
+        if (projection && typeof projection.renderReceipts === 'function') projection.renderReceipts(cid);
+        else { body.innerHTML = tabRecibos(cid, r); wireRecibos(cid); }
+      }
+    }
     else if (tab === 'cobros') { body.innerHTML = tabCobros(cid, r); const pf = body.querySelector('#cob-pol-fil'); if (pf) pf.addEventListener('change', () => { window._cobFilPol = window._cobFilPol || {}; window._cobFilPol[cid] = pf.value; body.innerHTML = tabCobros(cid, r); const pf2 = body.querySelector('#cob-pol-fil'); if (pf2) pf2.addEventListener('change', () => { window._cobFilPol[cid] = pf2.value; body.innerHTML = tabCobros(cid, r); }); }); }
     else if (tab === 'renovaciones') body.innerHTML = tabRenov(cid, r);
     else if (tab === 'comisiones') body.innerHTML = tabComis(cid, r);

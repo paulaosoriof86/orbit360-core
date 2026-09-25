@@ -491,3 +491,6 @@ button.kpi-click:active{transform:translateY(0)}
   #pwa-mobile-slot #pwa-install{width:calc(100% - 24px);margin:10px 12px 0;position:static!important;display:block}
   .tbl th,.tbl td{white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important}
 }
+
+/* Gravicentra B2 R3 · policy/payment hierarchy aligned to mature detail family */
+.gi-premium-contract{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}.gi-premium-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}.gi-premium-row>span{font-size:12.5px;line-height:1.4;color:var(--ink-2);font-weight:500}.gi-premium-row>b{font-family:var(--f-display);font-size:14px;line-height:1.35;font-weight:700;color:var(--ink)}.gi-premium-row.is-total>span{font-weight:700;color:var(--ink)}.gi-premium-row.is-total>b{font-size:15px;font-weight:800}.gi-schedule-delta{margin-top:12px;white-space:normal;line-height:1.4}.gi-technical-origin summary{cursor:pointer;font-size:12px;font-weight:700;color:var(--ink-2)}@media(max-width:680px){.gi-premium-contract{grid-template-columns:1fr}.gi-premium-row>b{text-align:right}}

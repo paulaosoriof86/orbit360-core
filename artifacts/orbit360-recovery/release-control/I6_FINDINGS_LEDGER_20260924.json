@@ -876,11 +876,12 @@
       "owner": [
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
       ],
-      "rootCause": "PENDING_CAUSAL_OWNER_REVIEW_R3",
+      "rootCause": "Independent inline premium grid/value weights were outside the mature detail hierarchy; fixed by the existing detail owner plus base.css contract.",
       "remediation": "Unify full 'Prima y condiciones de pago' hierarchy with mature Cliente360/Aseguradoras family without a second CSS family.",
-      "status": "OPEN_ROOT_CAUSE_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "requiredProof": "Exact Preview: labels/body/dividers/weights in Datos de póliza and Prima/condiciones share canonical hierarchy; automated DOM discriminant + Paula visual pass."
+      "requiredProof": "Exact Preview: labels/body/dividers/weights in Datos de póliza and Prima/condiciones share canonical hierarchy; automated DOM discriminant + Paula visual pass.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R25-POLICY-CALENDAR-Q006-TOLERANCE-R3",
@@ -891,11 +892,12 @@
         "orbit360-platform/core/policy-receipts-engine.js",
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
       ],
-      "rootCause": "PENDING_APPROVED_TOLERANCE_CONTRACT_LOOKUP",
+      "rootCause": "Renderer hardcoded 0.005; protected reconciliation config defines amountTolerance with canonical default 0.02, so Q0.06 remains a real warning.",
       "remediation": "Do not hide Q0.06. Determine approved rounding tolerance; only suppress reconciliation when contract proves difference is within tolerance.",
-      "status": "OPEN_READONLY_CONTRACT_REVIEW",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "requiredProof": "Source/contract evidence for tolerance + deterministic fixture around threshold + exact Preview rendering."
+      "requiredProof": "Source/contract evidence for tolerance + deterministic fixture around threshold + exact Preview rendering.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R26-VEHICLE-EDITOR-PREFILL-DESTRUCTIVE-WRITE-R3",
@@ -906,11 +908,12 @@
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
         "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
       ],
-      "rootCause": "PENDING_MAPPING_AUDIT_DETAIL_VS_EDITOR",
+      "rootCause": "Detail normalized legacy aliases while editor read raw canonical keys and rebuilt a full subset; fixed by shared normalizeVehicle plus sparse changed-fields write.",
       "remediation": "Make editor hydrate every existing canonical/authorized alias field and preserve untouched fields on partial edit.",
-      "status": "OPEN_CRITICAL",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "requiredProof": "P853FFX: detail values == editor initial values; edit one innocuous field; server commit/readback/reload preserves every other value and same vehicle.id."
+      "requiredProof": "P853FFX: detail values == editor initial values; edit one innocuous field; server commit/readback/reload preserves every other value and same vehicle.id.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R27-POLICY-VEHICLE-RENEWAL-PHYSICAL-ID-R3",
@@ -922,11 +925,12 @@
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
         "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
       ],
-      "rootCause": "PENDING_READONLY_OSCAR_POLICY_GENEALOGY_AUDIT",
+      "rootCause": "Physical audit proved multiple policy versions and historical same-plate vehicle IDs; existing issuance owner already snapshots risk on renewal and links genealogy by physical IDs. Manual reconciliation now preserves the historical source and creates an idempotent versioned relation.",
       "remediation": "Resolve relationship by physical policyId/vehicleId and approved renewal genealogy; never by visible policy number or client alone. Add explicit idempotent link action when eligible.",
-      "status": "OPEN_READONLY_CAUSAL_AUDIT",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "requiredProof": "Oscar/91-0169567 read-only physical genealogy; explicit vehicleId→policyId linking contract; historical relation preserved; readback/reload idempotent."
+      "requiredProof": "Oscar/91-0169567 read-only physical genealogy; explicit vehicleId→policyId linking contract; historical relation preserved; readback/reload idempotent.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R28-VEHICLE-IDENTITY-CANDIDATE-DEDUP-R3",
@@ -937,11 +941,12 @@
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
         "orbit360-platform/modules/cliente360.js"
       ],
-      "rootCause": "PENDING_PHYSICAL_ID_AUDIT",
+      "rootCause": "Candidate projection did not distinguish physical identity/history strongly enough; fixed by dedupe on vehicle.id and policy-context labels.",
       "remediation": "Deduplicate link candidates by vehicle.id only; same-label distinct IDs must show distinguishing context and remain unmerged pending integrity evidence.",
-      "status": "OPEN_READONLY_CAUSAL_AUDIT",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "requiredProof": "Oscar's five physical vehicle IDs classified; zero repeated candidate for same vehicle.id; distinct same-plate IDs remain distinguishable; no delete/merge writes."
+      "requiredProof": "Oscar's five physical vehicle IDs classified; zero repeated candidate for same vehicle.id; distinct same-plate IDs remain distinguishable; no delete/merge writes.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R29-LITERAL-INVALID-VEHICLE-VALUE-R3",
@@ -952,11 +957,12 @@
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
         "orbit360-platform/modules/cliente360.js"
       ],
-      "rootCause": "REPRODUCED_BY_PAULA_R3_AFTER_PRIOR_STATIC_GUARD_PASS",
+      "rootCause": "Raw candidate/editor projections could surface alias gaps; fixed by the canonical vehicle normalizer and shown-value guard.",
       "remediation": "Eliminate literal undefined/null/[object Object] across all vehicle cards/details using canonical display sanitizer without hiding source integrity issues.",
-      "status": "OPEN_REGRESSION",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "requiredProof": "Automatic scan + visual proof across all five Oscar vehicles: zero literal undefined/null/[object Object]."
+      "requiredProof": "Automatic scan + visual proof across all five Oscar vehicles: zero literal undefined/null/[object Object].",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R30-RECEIPTS-FALSE-ZERO-HYDRATION-R3",
@@ -966,11 +972,12 @@
       "owner": [
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
       ],
-      "rootCause": "REPRODUCED_HUMAN_VISIBLE_FALSE_EMPTY_BEFORE_CANONICAL_HYDRATION_READY",
+      "rootCause": "Cliente360 legacy receipt tab could paint its cobros-based empty state before receiptsPortfolioProjection became owner; fixed by readiness gate on serverConfirmedCollections.",
       "remediation": "Use explicit pending/skeleton state until canonical hydration completes; never render final empty state/count 0 before ready.",
-      "status": "OPEN_REGRESSION",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "requiredProof": "Cold load, hard refresh, Cliente360→Recibos and role change: first paint/state transitions show loading until ready; no false empty; final count stable."
+      "requiredProof": "Cold load, hard refresh, Cliente360→Recibos and role change: first paint/state transitions show loading until ready; no false empty; final count stable.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R31-RECEIPT-PROVENANCE-OPERATIONAL-UI-R3",
@@ -981,11 +988,12 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
       ],
-      "rootCause": "RAW_PROVENANCE_STILL_RENDERED_AS_PRIMARY_OPERATIONAL_COPY",
+      "rootCause": "Technical source/match metadata was rendered as a primary card; moved to collapsed audit details while operational as-of remains primary.",
       "remediation": "Preserve provenance physically but move filename/row/match validation to collapsed audit/technical details; use natural operational labels such as Descuento / ajuste where semantically correct.",
-      "status": "OPEN_VISUAL_OPERATIONAL_LANGUAGE",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "requiredProof": "Exact Preview main operational view has no filename#row/raw provenance labels; audit detail retains provenance; business information preserved."
+      "requiredProof": "Exact Preview main operational view has no filename#row/raw provenance labels; audit detail retains provenance; business information preserved.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R32-INSURER-LOGO-FILE-UPLOAD-R3",
@@ -996,11 +1004,12 @@
         "orbit360-platform/modules/aseguradoras.js",
         "functions/tenant-branding.js"
       ],
-      "rootCause": "CURRENT_UI_EXPOSES_HTTPS_URL_AS_ONLY_DISCOVERABLE_LOGO_MECHANISM",
+      "rootCause": "No real upload owner existed; Storage was read-only client-side. Extended the existing product operational server owner with authenticated insurer-logo upload and canonical Firestore readback.",
       "remediation": "Reuse approved storage/asset owner for local file select→preview→server commit→persisted asset ref/URL→reload; HTTPS URL remains advanced alternative.",
-      "status": "OPEN_CAUSAL_IMPLEMENTATION_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "requiredProof": "File upload→preview→server commit→persisted URL/asset ref→reload same logo→replace; no Data URL/localStorage authority; password/reveal regression PASS."
+      "requiredProof": "File upload→preview→server commit→persisted URL/asset ref→reload same logo→replace; no Data URL/localStorage authority; password/reveal regression PASS.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R3-001-POLICY-PREMIUM-HIERARCHY",
@@ -1011,11 +1020,12 @@
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
         "orbit360-platform/styles/base.css"
       ],
-      "rootCause": "The premium/payment block still owns an independent inline grid, divider and value-weight treatment; changing isolated headings did not reconcile the complete section with the mature visual hierarchy used by Cliente360/Aseguradoras.",
+      "rootCause": "Independent inline premium grid/value weights were outside the mature detail hierarchy; fixed by the existing detail owner plus base.css contract.",
       "remediation": "Normalize the entire section with existing mature-family tokens: strong section/subsection labels, lighter body/value hierarchy, consistent spacing/dividers, without introducing a parallel CSS family.",
-      "status": "OPEN_BLOCKING_ROOT_CAUSE_SOURCE_CONFIRMED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "closureProof": "Authenticated exact Preview desktop/mobile comparison against Cliente360 and mature Aseguradoras modal; titles/subtitles clearly stronger than body, values no longer dominate, no new CSS family."
+      "closureProof": "Authenticated exact Preview desktop/mobile comparison against Cliente360 and mature Aseguradoras modal; titles/subtitles clearly stronger than body, values no longer dominate, no new CSS family.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R3-002-POLICY-SCHEDULE-ROUNDING-TOLERANCE",
@@ -1026,11 +1036,12 @@
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
         "orbit360-platform/core/policy-receipts-engine.js"
       ],
-      "rootCause": "The current renderer flags any absolute policy-vs-schedule delta >= 0.005, a display-level hardcoded threshold not yet bound to a documented business/currency reconciliation tolerance.",
+      "rootCause": "Renderer hardcoded 0.005; protected reconciliation config defines amountTolerance with canonical default 0.02, so Q0.06 remains a real warning.",
       "remediation": "Locate the approved monetary rounding/reconciliation contract. Keep the warning fail-closed unless the approved tolerance proves the delta is rounding-only; never suppress it by intuition.",
-      "status": "OPEN_BLOCKING_CONTRACT_LOOKUP_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "closureProof": "Physical approved tolerance/rounding contract identified and discriminant cases below/at/above tolerance pass on exact Preview; Q0.06 classified by that contract."
+      "closureProof": "Physical approved tolerance/rounding contract identified and discriminant cases below/at/above tolerance pass on exact Preview; Q0.06 classified by that contract.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R3-003-VEHICLE-EDITOR-READWRITE-SCHEMA",
@@ -1042,11 +1053,12 @@
         "orbit360-platform/core/policy-receipts-engine.js",
         "canonical vehicle read normalizer"
       ],
-      "rootCause": "The vehicle editor hydrates only canonical field names such as placa/concepto/descripcion while detail/read projections can expose legacy aliases; save reconstructs a vehicle object from form values, so an alias-backed existing value can become blank on write.",
+      "rootCause": "Detail normalized legacy aliases while editor read raw canonical keys and rebuilt a full subset; fixed by shared normalizeVehicle plus sparse changed-fields write.",
       "remediation": "Create one canonical vehicle read/write normalizer for editor hydration and merge-preserving same-ID update. Existing values not explicitly changed must survive semantically unchanged.",
-      "status": "OPEN_CRITICAL_ROOT_CAUSE_SOURCE_CONFIRMED_RUNTIME_DISCRIMINANT_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "closureProof": "Authenticated synthetic/controlled vehicle with every supported field: detail === initial editor values; edit one innocuous field; server readback + reload preserve every other field and same vehicle.id."
+      "closureProof": "Authenticated synthetic/controlled vehicle with every supported field: detail === initial editor values; edit one innocuous field; server readback + reload preserve every other field and same vehicle.id.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R3-004-POLICY-VEHICLE-VERSIONED-RELATIONSHIP",
@@ -1058,11 +1070,12 @@
         "orbit360-platform/core/policy-receipts-engine.js",
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
       ],
-      "rootCause": "Read-only physical audit proves six policy documents for the same commercial number across 2021-2027 and four distinct same-plate KIA vehicle documents linked to historical versions; the current 2026-2027 policy has receipts/portfolio but zero directly linked vehicle. Imported historical versions lack usable renuevaDe/renovadaPor genealogy.",
+      "rootCause": "Read-only audit proved versioned physical policy and vehicle records; existing renewal implementation snapshots vehicle risk rather than moving the historical vehicle. Explicit manual linking now creates a versioned relation when source already belongs to a historical policy.",
       "remediation": "Preserve all historical IDs. Relationship UI and commands must use explicit physical policyId + vehicleId. Renewal behavior follows the approved snapshot/versioning contract; no linking, merging or deleting by policy number, client, label or plate.",
-      "status": "READ_ONLY_AUDIT_PASS_FIX_REQUIRED_NO_BUSINESS_WRITE_AUTHORIZED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "closureProof": "Exact physical-ID discriminant plus synthetic Preview link/versioning test: explicit before-confirmation identities, server-owned idempotent write, audit/readback/reload, history preserved; Oscar production/business records remain read-only in B2."
+      "closureProof": "Exact physical-ID discriminant plus synthetic Preview link/versioning test: explicit before-confirmation identities, server-owned idempotent write, audit/readback/reload, history preserved; Oscar production/business records remain read-only in B2.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R3-005-VEHICLE-CANDIDATE-IDENTITY-DEDUP",
@@ -1073,11 +1086,12 @@
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
         "orbit360-platform/modules/cliente360.js"
       ],
-      "rootCause": "The client has five physical vehicle IDs, including four historical KIA records sharing one plate. Label/plate-based candidate presentation can make distinct history look duplicated, while repeated projections can also surface the same physical ID more than once.",
+      "rootCause": "Five physical vehicle IDs include four same-plate historical KIA records; candidates now dedupe only identical vehicle.id and show physical/history context.",
       "remediation": "Deduplicate candidate projection strictly by vehicle.id. Never fuse distinct IDs by plate/label; when same plate has multiple IDs, show policy vigency/state/context so a user can distinguish history.",
-      "status": "OPEN_BLOCKING_PHYSICAL_IDENTITY_AUDIT_PASS_RENDER_FIX_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "closureProof": "Automated and visual exact Preview: zero repeated candidate for same vehicle.id; distinct IDs sharing a plate remain separate with disambiguating context; no merge/delete."
+      "closureProof": "Automated and visual exact Preview: zero repeated candidate for same vehicle.id; distinct IDs sharing a plate remain separate with disambiguating context; no merge/delete.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R3-006-RECEIPT-HYDRATION-FALSE-ZERO",
@@ -1089,11 +1103,12 @@
         "orbit360-platform/modules/cliente360.js",
         "orbit360-platform/core/product-hydration-required-optional-p0.js"
       ],
-      "rootCause": "The canonical receipt renderer has a loading guard, but the legacy/client surface can paint its own empty/zero state before the canonical projection becomes the effective owner; SOURCE_RACE_FIX therefore did not eliminate the human-visible state transition.",
+      "rootCause": "Legacy Cliente360 empty-state raced ahead of canonical receipt hydration; readiness gate now shows loading until recibosEsperados and carteraPrimas are server-confirmed.",
       "remediation": "Make hydration readiness authoritative before any receipts empty-state/count render. First paint while canonical read is pending must be loading/skeleton, never business-empty.",
-      "status": "OPEN_BLOCKING_HUMAN_REPRODUCED_ROOT_CAUSE_OWNER_RACE_CONFIRMED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "closureProof": "Authenticated cold load, hard refresh, Cliente360→Recibos and role switch: state trace contains pending/loading→final only, never false empty; final count stable after hydration."
+      "closureProof": "Authenticated cold load, hard refresh, Cliente360→Recibos and role switch: state trace contains pending/loading→final only, never false empty; final count stable after hydration.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R3-007-RECEIPT-PROVENANCE-PRESENTATION",
@@ -1103,11 +1118,12 @@
       "owner": [
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
       ],
-      "rootCause": "renderReceiptDetail builds Documento de origen/Validación de coincidencia inside a primary 'Origen del dato' card, so file/row provenance remains in the normal operational hierarchy.",
+      "rootCause": "Technical sourceRef/matchQuality was primary UI; moved behind collapsed audit details.",
       "remediation": "Retain provenance physically but move technical source details to collapsed Audit/Detalles de origen/Información técnica. Keep useful business information in the primary view and use natural operational labels such as Descuento/ajuste where semantics match.",
-      "status": "OPEN_BLOCKING_ROOT_CAUSE_SOURCE_CONFIRMED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "closureProof": "Exact Preview receipt detail/table: no filename#row or internal provenance code in primary operational view; audit disclosure retains traceability and is role-appropriate."
+      "closureProof": "Exact Preview receipt detail/table: no filename#row or internal provenance code in primary operational view; audit disclosure retains traceability and is role-appropriate.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R3-008-INSURER-LOGO-FILE-UPLOAD",
@@ -1118,11 +1134,12 @@
         "orbit360-platform/modules/aseguradoras.js",
         "approved product asset/storage owner to be resolved before mutation"
       ],
-      "rootCause": "Aseguradoras explicitly renders 'Cambiar logo · URL HTTPS', validates only HTTPS URL and explains Data URL/browser behavior; no file-selection path is wired in this owner.",
+      "rootCause": "No existing file upload owner was wired. The existing product operational server owner now accepts validated image upload, persists Storage asset and insurer URL/ref, then performs canonical readback.",
       "remediation": "Reuse an already-approved product asset/storage owner if present. Add file selection + preview + durable server asset reference + reload/replacement; keep HTTPS URL only as advanced alternative and remove technical browser-storage copy from business UI.",
-      "status": "OPEN_BLOCKING_STORAGE_OWNER_LOOKUP_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
-      "closureProof": "Authenticated file upload→server commit→persisted HTTPS asset/ref→reload same logo→replace logo→reload; no Data URL/localStorage authority; password/reveal regression remains PASS."
+      "closureProof": "Authenticated file upload→server commit→persisted HTTPS asset/ref→reload same logo→replace logo→reload; no Data URL/localStorage authority; password/reveal regression remains PASS.",
+      "sourceFixDate": "2026-09-25"
     },
     {
       "id": "B2-R3-009-ACADEMIA-HUMAN-PASS",
@@ -1235,11 +1252,22 @@
   "lastReview": {
     "origin": "PAULA_VISUAL_REVIEW_20260925_R3",
     "recordedAt": "2026-09-25",
-    "status": "B2_VISUAL_REMEDIATION_REQUIRED",
+    "status": "B2_R3_SOURCE_FIXED_PENDING_NEW_PREVIEW",
     "advanceToB3Authorized": false,
     "livePromotionAuthorized": false,
     "oscarReadOnlyAuditRunId": 36169665827,
     "oscarReadOnlyArtifactId": 10880077438,
-    "oscarReadOnlyArtifactDigest": "sha256:42e10ee44a6c7a25dd9947b0c0d7bd79720684d00240cde05c34de6bfc6fea55"
+    "oscarReadOnlyArtifactDigest": "sha256:42e10ee44a6c7a25dd9947b0c0d7bd79720684d00240cde05c34de6bfc6fea55",
+    "sourceFixPrepared": true,
+    "changedProductFiles": [
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "functions/product-operational-domain.js",
+      "orbit360-platform/styles/base.css"
+    ]
   }
 }

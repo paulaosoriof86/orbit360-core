@@ -32,7 +32,7 @@
     "manifestBlobSha": "b27b31a6a552df6a50a3dd981f2d6e18b156e0db",
     "deltaAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
     "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
-    "staticSourceUpdateRequired": true,
+    "staticSourceUpdateRequired": false,
     "reason": "Permanent normative architecture change: canonical accumulative composition and findings ledger are now machine-authoritative to prevent regression/lost improvements. V6 retains the frozen execution-plan authorities from V5.",
     "operationalStateChangesDoNotRequireReplacement": true,
     "notificationRequiredWhenFlagTrue": true,
@@ -2012,9 +2012,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "127e706a3770d4dd3d78ceb50fe708d378f9e67c",
+    "b2ExecutionLockBlobSha": "8a907c5c9dbf0a944034e55cdc37861068b1fb71",
     "b2": {
-      "status": "OPEN_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_R3",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2026,7 +2026,11 @@
         "orbit360-platform/core/policy-receipts-engine.js",
         "orbit360-platform/core/issuance-workflow-v1201.js",
         "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
-        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "orbit360-platform/modules/aseguradoras.js",
+        "functions/product-operational-domain.js",
+        "orbit360-platform/styles/base.css"
       ],
       "productMutationAuthorized": true,
       "sourcePendingFromHead": "83e148d48ac546b3bde1c73852c95d38062d98f4",
@@ -2127,7 +2131,26 @@
         "B2-H13"
       ],
       "humanReviewOutstandingCount": 9,
-      "humanReviewR3": "REMEDIATION_REQUIRED"
+      "humanReviewR3": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
+      "r3CumulativeSourceRemediation": {
+        "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
+        "compositionLockBlobSha": "3dcd1f9b73c396de1926f2ab4fabf17fa1bcdb19",
+        "findingLedgerBlobSha": "dafe056482dab67d0df3856881afa731564b5470",
+        "b2ExecutionLockBlobSha": "8a907c5c9dbf0a944034e55cdc37861068b1fb71",
+        "changedProductFiles": [
+          "orbit360-platform/core/policy-receipts-engine.js",
+          "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "orbit360-platform/modules/cliente360.js",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "orbit360-platform/modules/aseguradoras.js",
+          "functions/product-operational-domain.js",
+          "orbit360-platform/styles/base.css"
+        ],
+        "oscarReadOnlyAuditRunId": 36169665827,
+        "noLive": true,
+        "noB3": true
+      }
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2233,9 +2256,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "947c65a4fda9a9137b8c812d7bb1c88497156396",
+    "compositionLockBlobSha": "3dcd1f9b73c396de1926f2ab4fabf17fa1bcdb19",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "fbe78c1ac64b6ba80e417ca48be81f59977a0c94",
+    "findingLedgerBlobSha": "dafe056482dab67d0df3856881afa731564b5470",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
@@ -2255,6 +2278,6 @@
     "workflowPreflightAggregationInstalled": true,
     "preservePassEvidence": true,
     "prohibitProductMutationForHarnessOnlyFailure": true,
-    "nextAction": "R3_CAUSAL_READONLY_AUDIT_THEN_SINGLE_CUMULATIVE_FIX"
+    "nextAction": "R3_BUILD_PREVIEW_EXACT_READBACK_AUTHENTICATED_DISCRIMINANTS"
   }
 }

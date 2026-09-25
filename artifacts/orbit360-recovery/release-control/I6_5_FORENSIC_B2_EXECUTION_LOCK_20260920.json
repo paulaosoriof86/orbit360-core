@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "OPEN_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+  "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_R3",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1592,6 +1592,43 @@
     "closedStillClean": [
       "B2-R15-DUPLICATE_VEHICLE_ACTIONS"
     ],
-    "next": "READ_ONLY_OSCAR_91-0169567_5_VEHICLES_CAUSAL_AUDIT_THEN_SINGLE_CUMULATIVE_FIX"
+    "next": "BUILD_NEW_CANDIDATE_PREVIEW_EXACT_READBACK_AND_AUTHENTICATED_R3_DISCRIMINANTS",
+    "sourceRemediationStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
+    "changedProductFiles": [
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "functions/product-operational-domain.js",
+      "orbit360-platform/styles/base.css"
+    ],
+    "oscarReadOnlyAudit": {
+      "runId": 36169665827,
+      "artifactId": 10880077438,
+      "digest": "sha256:42e10ee44a6c7a25dd9947b0c0d7bd79720684d00240cde05c34de6bfc6fea55"
+    },
+    "approvedRenewalVehicleContract": "PRESERVE_HISTORICAL_VEHICLE_AND_CREATE_VERSIONED_RELATION_FOR_NEW_POLICY_WHEN_NEEDED",
+    "scheduleAmountTolerance": 0.02
+  },
+  "r3CumulativeSourceRemediation": {
+    "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
+    "origin": "PAULA_VISUAL_REVIEW_20260925_R3",
+    "changedProductFiles": [
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "functions/product-operational-domain.js",
+      "orbit360-platform/styles/base.css"
+    ],
+    "compositionLockBlobSha": "3dcd1f9b73c396de1926f2ab4fabf17fa1bcdb19",
+    "findingLedgerBlobSha": "dafe056482dab67d0df3856881afa731564b5470",
+    "noReimport": true,
+    "noLive": true,
+    "noB3": true
   }
 }

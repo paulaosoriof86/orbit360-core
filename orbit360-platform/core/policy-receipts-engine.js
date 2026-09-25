@@ -146,6 +146,27 @@ Orbit.policyReceipts = (function () {
     });
   }
 
+  function normalizeVehicle(raw) {
+    raw = raw && typeof raw === 'object' ? raw : {};
+    const pick = (...values) => { for (const value of values) if (value !== undefined && value !== null && clean(value) !== '') return value; return ''; };
+    const out = Object.assign({}, raw);
+    out.placa = pick(raw.placa, raw.placaNormalizada, raw.placaFuente);
+    out.anio = pick(raw.anio, raw.anioModelo, raw.modelo);
+    out.marca = pick(raw.marca, raw.marcaFuente);
+    out.linea = pick(raw.linea, raw.tipo, raw.modeloLinea);
+    out.chasis = pick(raw.chasis, raw.chasisFuente, raw.vin);
+    out.vin = pick(raw.vin, raw.chasis, raw.chasisFuente);
+    out.motor = pick(raw.motor, raw.motorFuente);
+    out.uso = pick(raw.uso, raw.usoFuente);
+    out.color = pick(raw.color, raw.colorFuente);
+    out.inciso = pick(raw.inciso, raw.incisoFuente);
+    out.concepto = pick(raw.concepto, raw.conceptoFuente, raw.descripcion, raw.descripcionFuente);
+    out.descripcion = pick(raw.descripcion, raw.descripcionFuente, raw.concepto, raw.conceptoFuente);
+    out.comentarios = pick(raw.comentarios, raw.comentariosFuente);
+    out.sumaAsegurada = pick(raw.sumaAsegurada, raw.valorAsegurado);
+    return out;
+  }
+
   function preparePolicy(raw, existing, opId) {
     const base = Object.assign({}, existing || {}, raw || {});
     const client = S().get('clientes', base.clienteId) || {};
@@ -446,10 +467,67 @@ Orbit.policyReceipts = (function () {
     return { ok: false, errors: ['ledger_run_requerido'], contract: 'Cobros 10.10.2', cobroId: c.id };
   }
 
+  async function linkVehicleToPolicy(vehicleIdValue, policyIdValue, options) {
+    options = options || {};
+    if (!canManagePolicies()) return { ok: false, errors: ['permiso_poliza_denegado'] };
+    if (!S() || typeof S().batchDurable !== 'function') return { ok: false, errors: ['contrato_atomico_no_disponible'] };
+    const vehicleId = clean(vehicleIdValue), policyId = clean(policyIdValue);
+    const source = S().get('vehiculos', vehicleId), policy = S().get('polizas', policyId);
+    if (!source || !policy) return { ok: false, errors: [!source ? 'vehiculo_no_encontrado' : 'poliza_no_encontrada'] };
+    if (clean(source.clienteId) !== clean(policy.clienteId)) return { ok: false, errors: ['vehiculo_cliente_no_coincide'] };
+    if (clean(source.polizaId) === policyId) return { ok: true, alreadyLinked: true, vehicle: normalizeVehicle(source), vehicleId: source.id, policyId };
+    const reason = clean(options.motivo || options.reason);
+    if (!reason) return { ok: false, errors: ['motivo_requerido'] };
+    const historicalPolicyId = clean(source.polizaId);
+    const stableSuffix = (policyId + '_' + vehicleId).replace(/[^A-Za-z0-9._:-]+/g, '_').slice(0, 220);
+    const targetId = historicalPolicyId ? ('vehrel_' + stableSuffix) : vehicleId;
+    const existingTarget = S().get('vehiculos', targetId);
+    if (existingTarget && clean(existingTarget.polizaId) === policyId && clean(existingTarget.versionOfVehicleId || existingTarget.id) === clean(historicalPolicyId ? vehicleId : targetId)) {
+      return { ok: true, alreadyLinked: true, vehicle: normalizeVehicle(existingTarget), vehicleId: existingTarget.id, policyId, historyPreserved: true };
+    }
+    if (existingTarget && targetId !== vehicleId) return { ok: false, errors: ['vehicle_relation_id_conflict'] };
+    const opId = options.operationId || operationId('vehlink');
+    const normalized = normalizeVehicle(source);
+    const payload = Object.assign({}, source, normalized, {
+      id: targetId,
+      tenantId: policy.tenantId || source.tenantId,
+      clienteId: policy.clienteId,
+      polizaId: policy.id,
+      asesorId: policy.asesorId || source.asesorId,
+      aseguradoraId: policy.aseguradoraId || source.aseguradoraId,
+      pais: policy.pais || source.pais,
+      operationId: opId,
+      actualizado: now(),
+      relationKind: historicalPolicyId ? 'versioned_policy_relation' : 'direct_policy_relation',
+      versionOfVehicleId: historicalPolicyId ? vehicleId : clean(source.versionOfVehicleId),
+      relationSourcePolicyId: historicalPolicyId,
+      relationTargetPolicyId: policy.id
+    });
+    if (historicalPolicyId) payload.creado = now();
+    const mutations = [{ action: historicalPolicyId ? 'insert' : 'update', collection: 'vehiculos', id: targetId, payload }];
+    const activityId = ('act_' + opId).slice(0, 250);
+    mutations.push({ action: 'insert', collection: 'actividades', id: activityId, payload: {
+      id: activityId, tenantId: policy.tenantId, clienteId: policy.clienteId, asesorId: policy.asesorId,
+      tipo: 'vehiculo', icon: '🚘', fecha: today(), titulo: 'Vehículo vinculado a póliza',
+      detalle: 'Relación explícita por IDs físicos · vehículo ' + targetId + ' · póliza ' + policy.id,
+      polizaId: policy.id, vehiculoId: targetId, sourceVehicleId: vehicleId, sourcePolicyId: historicalPolicyId,
+      operationId: opId, motivo: reason
+    }});
+    try {
+      await S().batchDurable(mutations, { requestId: opId, timeoutMs: 25000 });
+      const persisted = S().get('vehiculos', targetId);
+      if (!persisted || clean(persisted.polizaId) !== policy.id || clean(persisted.clienteId) !== clean(policy.clienteId)) return { ok: false, errors: ['vehicle_link_readback_failed'] };
+      try { if (A() && A().audit) A().audit('vincular_vehiculo_poliza', 'vehiculos', targetId, historicalPolicyId ? null : source, persisted, reason, { operationId: opId, sourceVehicleId: vehicleId, sourcePolicyId: historicalPolicyId, targetPolicyId: policy.id, historyPreserved: true }); } catch (ignore) {}
+      return { ok: true, vehicle: normalizeVehicle(persisted), vehicleId: targetId, policyId: policy.id, sourceVehicleId: vehicleId, sourcePolicyId: historicalPolicyId, historyPreserved: true, atomicServerCommit: true, operationId: opId };
+    } catch (error) {
+      return { ok: false, errors: ['vehicle_link_commit_failed'], error: String(error && (error.code || error.message) || error), operationId: opId };
+    }
+  }
+
   return {
     ACTIVE, isActiveState, isPaidReceipt, canManagePolicies, canApplyPayments,
-    canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, expectedReceipts, syncReceipts, syncPortfolio, buildAtomicWritePlan,
-    createPolicy, updatePolicy, applyPayment, createReconciliationProposal, updateClientState,
+    canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, normalizeVehicle, expectedReceipts, syncReceipts, syncPortfolio, buildAtomicWritePlan,
+    createPolicy, updatePolicy, linkVehicleToPolicy, applyPayment, createReconciliationProposal, updateClientState,
     receiptId, sequenceOf, installmentsForFrequency
   };
 })();

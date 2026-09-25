@@ -188,8 +188,9 @@
     var asOf=(portfolio&&portfolio.fechaCorteFuente)||r.fechaCorteFuente||'';
     var sourceRef=businessSourceRef((portfolio&&portfolio.sourceRef)||r.sourceRef||'');
     var match=businessMatch((portfolio&&portfolio.matchQuality)||r.matchQuality||'');
-    var trace=[asOf?cell('Datos actualizados al',fmtDate(asOf)):'',sourceRef?cell('Documento de origen',sourceRef):'',match?cell('Validación de coincidencia',match):''].filter(Boolean).join('');
-    if(!trace)trace='<div class="muted">Sin información adicional de origen para mostrar en esta vista.</div>';
+    var operationalAsOf=asOf?cell('Datos actualizados al',fmtDate(asOf)):'';
+    var trace=[sourceRef?cell('Documento de origen',sourceRef):'',match?cell('Validación de coincidencia',match):''].filter(Boolean).join('');
+    if(!trace)trace='<div class="muted">Sin detalles técnicos adicionales.</div>';
     var vehicle=[v.marca,v.linea,v.placa].filter(function(x){return x&&!/^(undefined|null)$/i.test(clean(x));}).join(' ');var canEditPlan=!!(p&&p.id&&Orbit.policyReceipts&&typeof Orbit.policyReceipts.canManagePolicies==='function'&&Orbit.policyReceipts.canManagePolicies());
     target.innerHTML='<div class="page orbit-receipt-fullpage" data-rp-receipt-detail="1" data-rp-owner="v920">'
       +'<div class="crumb" style="margin-bottom:14px"><a href="'+back+'" style="color:var(--red)">‹ Volver a Recibos y pagos</a> / Recibo '+esc(r.serie||r.numeroReciboFuente||'')+'</div>'
@@ -198,7 +199,7 @@
       +cell('Prima neta',moneyDetail(r.primaNeta,cur))+cell('Gastos de expedición',moneyDetail(r.gastosExpedicion,cur))+cell('Gastos financieros',moneyDetail(r.gastosFinanciamiento,cur))+cell('Descuento / ajuste',moneyDetail(r.descuento,cur))+cell('IVA / impuestos',moneyDetail(r.impuestosIVA,cur))+cell('Prima total',moneyDetail(r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:r.monto),cur))+cell('Fecha límite',fmtDate(dueDate(r)))+cell('Fecha de pago reportada',r.fechaPagoReportada?fmtDate(r.fechaPagoReportada):'No reportada')
       +'</div></section><div style="display:grid;gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🔎 Estado y conciliación</h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'+badges+'</div><div class="muted" style="line-height:1.5">'+esc(receiptStateNote(r,portfolio))+'</div>'
       +(portfolio?'<div style="margin-top:10px">En cartera: <span style="font-weight:600">'+esc(moneyDetail(portfolio.primaTotal||portfolio.montoTotal||portfolio.monto||r.primaTotal||r.montoTotal||r.monto,cur))+'</span></div>':'')
-      +'</section><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">📎 Origen del dato</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px">'+trace+'</div></section></div></div></div>';
+      +'</section><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">📅 Información del registro</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px">'+(operationalAsOf||'<div class="muted">Sin fecha adicional reportada.</div>')+'</div><details class="gi-technical-origin" style="margin-top:14px"><summary>Detalles de origen y auditoría</summary><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px">'+trace+'</div></details></section></div></div></div>';
     if(canEditPlan){var statusEl=target.querySelector('[data-rp-hero-status="1"]');if(statusEl){var btn=document.createElement('button');btn.className='btn primary sm';btn.textContent='✏ Editar plan de recibos';btn.style.marginLeft='8px';btn.addEventListener('click',function(){Orbit.modules.cliente360.editarPoliza(p.id);});statusEl.parentElement&&statusEl.parentElement.appendChild(btn);}}
     return true;
   }
