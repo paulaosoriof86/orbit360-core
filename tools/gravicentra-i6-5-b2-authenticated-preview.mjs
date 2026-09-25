@@ -743,6 +743,33 @@ try{
   milestone('INSURER_PORTAL_UI_DISCRIMINANT',portalUi);
   need(portalUi.portalRows>0,'B2_AUTH_INSURER_PORTAL_ROWS_MISSING:'+JSON.stringify(portalUi));
   need(portalUi.passwordInputs>0,'B2_AUTH_INSURER_PASSWORD_INPUT_MISSING:'+JSON.stringify(portalUi));
+  await page.evaluate(()=>{
+    window.__b2InsurerSaveTrace=[];
+    const push=(stage,data)=>window.__b2InsurerSaveTrace.push({stage,at:Date.now(),data:data||null});
+    const provider=Orbit.productInsurerCredentialProviderP0;
+    if(provider&&typeof provider.importCredentials==='function'&&!provider.__b2TraceWrapped){
+      const original=provider.importCredentials.bind(provider);
+      provider.importCredentials=async function(rows,opts){
+        push('credential-import-call',{count:[].concat(rows||[]).length,refs:[].concat(rows||[]).map(x=>String(x.credentialRef||'')),hasPasswords:[].concat(rows||[]).map(x=>!!x.password)});
+        try{
+          const out=await original(rows,opts);
+          push('credential-import-result',{ok:!!out?.ok,mappingCount:[].concat(out?.mappings||[]).length,mappings:[].concat(out?.mappings||[]).map(x=>({portalId:String(x.portalId||x.resourceId||''),credentialRef:String(x.credentialRef||'')}))});
+          return out;
+        }catch(e){push('credential-import-error',{code:String(e?.code||''),message:String(e?.message||e)});throw e;}
+      };
+      provider.__b2TraceWrapped=true;
+    }
+    if(Orbit.store&&typeof Orbit.store.batchDurable==='function'&&!Orbit.store.__b2TraceWrapped){
+      const originalBatch=Orbit.store.batchDurable.bind(Orbit.store);
+      Orbit.store.batchDurable=async function(rows,opts){
+        push('batch-durable-call',{count:[].concat(rows||[]).length,collections:[].concat(rows||[]).map(x=>String(x.collection||'')),actions:[].concat(rows||[]).map(x=>String(x.action||''))});
+        try{const out=await originalBatch(rows,opts);push('batch-durable-result',{ok:out?.ok!==false,resultKeys:out&&typeof out==='object'?Object.keys(out):[]});return out;}
+        catch(e){push('batch-durable-error',{code:String(e?.code||''),message:String(e?.message||e)});throw e;}
+      };
+      Orbit.store.__b2TraceWrapped=true;
+    }
+    push('trace-installed',{role:String(Orbit.session?.rol?.()||'')});
+  });
   const passwordInjected=await page.evaluate(({portalId,secret})=>{
     const row=[...document.querySelectorAll('#asg-ficha [data-portal]')].find(x=>String(x.dataset.resourceId||'')===String(portalId));
     const input=row&&row.querySelector('[data-ppass]');
@@ -762,6 +789,33 @@ try{
   await insurerReasonInput.fill('B2 QA aseguradora: logo y credencial segura');
   await page.locator('[data-yes]').last().click();
   insurerReasonDialog=true;
+  await page.waitForTimeout(5000);
+  const saveDiag=await page.evaluate(()=>({
+    trace:[].concat(window.__b2InsurerSaveTrace||[]),
+    promptVisible:!!document.querySelector('.drawer-back [data-in]'),
+    savePresent:!!document.querySelector('#asg-ficha #af-guardar'),
+    saveDisabled:!!document.querySelector('#asg-ficha #af-guardar')?.disabled,
+    saveText:String(document.querySelector('#asg-ficha #af-guardar')?.textContent||''),
+    editPresent:!!document.querySelector('#asg-ficha #af-editar'),
+    toastText:Array.from(document.querySelectorAll('.ciclo-toast')).map(x=>String(x.textContent||'')),
+    writeStatus:Orbit.store?.writeStatus?.()||null,
+    route:String(Orbit.route?.key||''),
+    hash:String(location.hash||'')
+  }));
+  const physicalDiagSnap=await dataCol(db,'aseguradoras').doc(insurerId).get();
+  const physicalDiag=physicalDiagSnap.exists?physicalDiagSnap.data()||{}:{};
+  const physicalPortal=[].concat(physicalDiag.portales||[]).find(x=>String(x.id||'')===portalId)||null;
+  milestone('INSURER_SAVE_DIAGNOSTIC',{
+    saveDiag,
+    physical:{
+      exists:physicalDiagSnap.exists,
+      logo:String(physicalDiag.logo||''),
+      portalFound:!!physicalPortal,
+      credentialRef:String(physicalPortal?.credentialRef||''),
+      hasUsername:!!String(physicalPortal?.usuario||physicalPortal?.username||''),
+      updatedByUid:String(physicalDiag.updatedByUid||'')
+    }
+  });
   const insurerUpdated=await waitFor(async()=>{
     const s=await dataCol(db,'aseguradoras').doc(insurerId).get();if(!s.exists)return null;
     const d=s.data()||{},portal=[].concat(d.portales||[]).find(x=>String(x.id||'')===portalId);
