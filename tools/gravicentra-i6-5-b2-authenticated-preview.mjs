@@ -743,7 +743,18 @@ try{
   milestone('INSURER_PORTAL_UI_DISCRIMINANT',portalUi);
   need(portalUi.portalRows>0,'B2_AUTH_INSURER_PORTAL_ROWS_MISSING:'+JSON.stringify(portalUi));
   need(portalUi.passwordInputs>0,'B2_AUTH_INSURER_PASSWORD_INPUT_MISSING:'+JSON.stringify(portalUi));
-  await page.fill('#asg-ficha [data-portal] [data-ppass]',syntheticSecret);
+  const passwordInjected=await page.evaluate(({portalId,secret})=>{
+    const row=[...document.querySelectorAll('#asg-ficha [data-portal]')].find(x=>String(x.dataset.resourceId||'')===String(portalId));
+    const input=row&&row.querySelector('[data-ppass]');
+    if(!input)return false;
+    input.focus();
+    const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')?.set;
+    if(setter)setter.call(input,secret); else input.value=secret;
+    input.dispatchEvent(new Event('input',{bubbles:true}));
+    input.dispatchEvent(new Event('change',{bubbles:true}));
+    return input.value===secret;
+  },{portalId,secret:syntheticSecret});
+  need(passwordInjected===true,'B2_AUTH_INSURER_PASSWORD_INJECTION_FAILED');
   let insurerReasonDialog=false;
   await page.click('#asg-ficha #af-guardar');
   const insurerReasonInput=page.locator('[data-in]').last();
