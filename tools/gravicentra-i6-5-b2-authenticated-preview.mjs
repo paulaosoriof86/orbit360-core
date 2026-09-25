@@ -374,7 +374,7 @@ try{
       sidebar:Array.from(document.querySelectorAll('#sidebar [data-route]')).map(x=>x.getAttribute('data-route'))
     };
   },accessHydration);
-  // stamp is initialized before the role-scope/self-service proof because that proof uses it.
+  const stamp=RUN.replace(/[^0-9A-Za-z]/g,'').slice(-12);
   milestone('OPERATIVO_ACCESS_AUTHORITY',operativoModules);
   need(operativoModules.cotizador.visible===true&&operativoModules.comparativo.visible===true&&operativoModules.sidebar.includes('cotizador')&&operativoModules.sidebar.includes('comparativo'),'B2_AUTH_OPERATIVO_CONFIGURED_MODULES_NOT_VISIBLE:'+JSON.stringify(operativoModules));
   const oper=await bounded(scopeSnapshot(page),'B2_AUTH_SCOPE_OPERATIVO_TIMEOUT',20000);
@@ -479,7 +479,6 @@ try{
   evidence.r2Ui=r2Ui;
   milestone('R2_UI_DISCRIMINANTS_PASS',r2Ui);
 
-  const stamp=RUN.replace(/[^0-9A-Za-z]/g,'').slice(-12);
   const clientName='B2 QA '+stamp,ident='B2QA-'+stamp,policyNo='B2-POL-'+stamp,renewNo='B2-REN-'+stamp;
   state={clientName,policyNo,renewNo};
 
