@@ -19,11 +19,26 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 48,
+    "total": 49,
     "b2HumanFindings": 13,
-    "currentBlocking": 20
+    "currentBlocking": 21
   },
   "findings": [
+    {
+      "id": "B2-R20-ASEGURADORAS-ASYNC-EDIT-LOSS",
+      "block": "B2",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36155142701",
+      "finding": "ASEGURADORAS_ENTERS_EDIT_MODE_THEN_ASYNC_KNOWLEDGE_SUMMARY_LOAD_REFRESH_REOPENS_FICHA_IN_VIEW_MODE",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "rootCause": "ensureKnowledgeSummaryLoaded() invokes refreshOwnerView() on script.onload; refreshOwnerView() called ficha(id) without edit-state preservation. ficha() interpreted missing startEdit as false, discarding editing/draft/credentialDrafts.",
+      "remediation": "Async owner refresh calls ficha(id, undefined, true); ficha preserves existing editing flag, draft, credentialDrafts, snapshot and saving only for this internal refresh path. Normal open/edit/cancel/save semantics remain explicit.",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_AND_AUTHENTICATED_PASS",
+      "blocking": true,
+      "closureProof": "New exact Preview remains in edit mode after deferred knowledge load; logo + password can be entered and saved; canonical insurer readback and secure credential reveal/cleanup PASS.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "B2-QA-20-ASEGURADORAS-HOST",
       "block": "B2",

@@ -181,7 +181,7 @@ Orbit.modules.aseguradoras = (function () {
   function configuredKnowledgeSummarySrc() { return clean(tenantInsurerConfig().knowledgeSummarySrc); }
   function refreshOwnerView() {
     const open = document.getElementById('asg-ficha');
-    if (open && open.dataset.id && S().get('aseguradoras', open.dataset.id)) ficha(open.dataset.id);
+    if (open && open.dataset.id && S().get('aseguradoras', open.dataset.id)) ficha(open.dataset.id, undefined, true);
     else reload();
   }
   function ensureKnowledgeSummaryLoaded() {
@@ -385,13 +385,21 @@ Orbit.modules.aseguradoras = (function () {
     wireBody(back, data, t);
   }
 
-  function ficha(id, startEdit) {
+  function ficha(id, startEdit, preserveState) {
     ensureKnowledgeSummaryLoaded();
     const a = S().get('aseguradoras', id); if (!a) return;
-    const wantEdit = !!startEdit && canEdit();
-    if ((Orbit.route && Orbit.route.params && Orbit.route.params.ficha) !== id) { history.replaceState(null, '', '#/aseguradoras?ficha=' + id); if (Orbit.route) Orbit.route.params = Object.assign({}, Orbit.route.params, { ficha: id }); }
     const priorState = fichaState[id] || {};
-    fichaState[id] = { tab: priorState.tab || 'resumen', editing: wantEdit, draft: wantEdit ? cloneEnt(a) : null, credentialDrafts: wantEdit ? {} : (priorState.credentialDrafts || {}), snapshotCurrent: null, saving: false };
+    const preserving = preserveState === true;
+    const wantEdit = preserving ? (!!priorState.editing && canEdit()) : (!!startEdit && canEdit());
+    if ((Orbit.route && Orbit.route.params && Orbit.route.params.ficha) !== id) { history.replaceState(null, '', '#/aseguradoras?ficha=' + id); if (Orbit.route) Orbit.route.params = Object.assign({}, Orbit.route.params, { ficha: id }); }
+    fichaState[id] = {
+      tab: priorState.tab || 'resumen',
+      editing: wantEdit,
+      draft: wantEdit ? (preserving && priorState.draft ? priorState.draft : cloneEnt(a)) : null,
+      credentialDrafts: wantEdit ? (preserving ? (priorState.credentialDrafts || {}) : {}) : (priorState.credentialDrafts || {}),
+      snapshotCurrent: preserving ? priorState.snapshotCurrent || null : null,
+      saving: preserving ? !!priorState.saving : false
+    };
     const st = fichaState[id];
     const data = st.editing ? st.draft : a;
     host.innerHTML = `<div class="page" id="asg-ficha" data-id="${id}">

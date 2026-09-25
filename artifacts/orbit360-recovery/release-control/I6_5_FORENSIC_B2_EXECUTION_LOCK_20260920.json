@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -207,20 +207,9 @@
     "preservationCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f",
     "visualCorrectionDate": "2026-09-23"
   },
-  "preview": {
-    "sourceSha": "dbb79d6b2672d71f9c727ab7d2833a62222f0168",
-    "buildId": "gi-i65-b2-dbb79d6b2672-57f234755dc1",
-    "channelId": "gi-i65-b2-36072542051",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36072542051-7y4o63gi.web.app",
-    "runId": 36072542051,
-    "artifactId": 10838549357,
-    "artifactDigest": "d037453f72be14f0d532aa438535c273a4e6230a93bec6803fe4c5c83a961369",
-    "exactReadback": true,
-    "functionalPass": true,
-    "livePromoted": false
-  },
+  "preview": null,
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "BLOCKED_UNTIL_NEW_EXACT_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "dbb79d6b2672d71f9c727ab7d2833a62222f0168",
     "exactPreviewBuildId": "gi-i65-b2-dbb79d6b2672-57f234755dc1",
@@ -274,7 +263,7 @@
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
     "lastFailedRunId": 35961205964,
-    "lastFailure": "VISUAL_AUDIT_BRANDING_SOURCE_CHANGE",
+    "lastFailure": "ASEGURADORAS_ASYNC_KNOWLEDGE_REFRESH_DROPPED_EDIT_STATE",
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
@@ -331,7 +320,9 @@
     "syntheticWrites": 11,
     "cleanupWrites": 20,
     "visualEvidenceRecapture": true,
-    "visualReceiptRecapture": true
+    "visualReceiptRecapture": true,
+    "lastFailureRunId": 36155142701,
+    "requiredNewSource": true
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -1474,5 +1465,25 @@
     "businessDataWrites": 0,
     "syntheticBusinessWrites": 0,
     "liveHostingTouched": false
+  },
+  "previewSupersededBySourceChange": {
+    "sourceSha": "dbb79d6b2672d71f9c727ab7d2833a62222f0168",
+    "buildId": "gi-i65-b2-dbb79d6b2672-57f234755dc1",
+    "channelId": "gi-i65-b2-36072542051",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36072542051-7y4o63gi.web.app",
+    "runId": 36072542051,
+    "artifactId": 10838549357,
+    "artifactDigest": "d037453f72be14f0d532aa438535c273a4e6230a93bec6803fe4c5c83a961369",
+    "exactReadback": true,
+    "functionalPass": true,
+    "livePromoted": false
+  },
+  "lastProductRootCause": {
+    "id": "B2-R20-ASEGURADORAS-ASYNC-EDIT-LOSS",
+    "demonstratedRunId": 36155142701,
+    "sourceBlobBefore": "187e9728693c682e5105a886fbc0a3719a7a1edf",
+    "sourceBlobAfter": "b97825d9813ee4951d9f0d351cb2c47f54954407",
+    "liveTouched": false,
+    "reimport": false
   }
 }
