@@ -56,6 +56,11 @@ Orbit.modules = Orbit.modules || {};
     }
   }
 
+  function scopedClients() { return A.filter('clientes', S().all('clientes') || [], 'cliente360'); }
+  function linkedInsurers(country) { return (S().all('aseguradoras') || []).filter(a => a.vinculada !== false && (a.pais === country || [].concat(a.paises || []).includes(country))); }
+  function ramos(country) { try { return Orbit.cat.ramosDe(country) || []; } catch (e) { return []; } }
+  function subramos(country, ramo) { try { return Orbit.cat.subramosDe(country, ramo) || []; } catch (e) { return []; } }
+
   function countryTaxPct(country) {
     try {
       const cfg = Orbit.paisCfg ? (Orbit.paisCfg(country) || {}) : {};

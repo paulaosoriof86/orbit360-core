@@ -141,7 +141,7 @@
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "105b869445919802fb6e07d6120ace6a0772ec57",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "a9dc395a0764bca3ff8f04d1d211acc5f3d0b085",
-    "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "495c60d2103c65f031ccc1534cb3a097b87e2712",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "a054e0e1e95bf187ac4e15735d276bbd65748ddf",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "65fbd39aab601e3432798e7bcae73eb1bc60cc8a",
     "orbit360-platform/product-runtime-config.js": "b03bd57e6c77b6204ce860b93ec4556b1cd3e4e7",
     "orbit360-platform/styles/base.css": "e12478531be5a80a8f72f1e18e59e4d1d8d9a3cd",
@@ -198,6 +198,10 @@
       "orbit360ProductAssetUploadPreview",
       "orbit360OpsLeadsCommandPreview"
     ],
-    "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED"
+    "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED",
+    "latestCausalFix": "B2_POLICY_FORM_HELPER_COMPOSITION_RESTORED",
+    "latestCausalFixAt": "2026-09-25",
+    "latestCausalOwner": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+    "latestCausalBlob": "a054e0e1e95bf187ac4e15735d276bbd65748ddf"
   }
 }
