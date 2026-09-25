@@ -3798,15 +3798,49 @@ jobs:
           npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 @google-cloud/secret-manager@6.1.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
       - name: Recover approved protected access overrides
+        id: b2_access_preflight
         if: steps.mode.outputs.run == 'true'
+        continue-on-error: true
         env:
           ACCESS_RECOVERY_PROOF_FILE: ${{ runner.temp }}/b2-access-config-recovery.json
         run: node tools/gravicentra-i6-5-b2-access-config-recover.mjs
       - name: Provision exact B2 Preview credential vault IAM
+        id: b2_secret_preflight
         if: steps.mode.outputs.run == 'true'
+        continue-on-error: true
         env:
           B2_PREVIEW_SECRET_IAM_PROOF_FILE: ${{ runner.temp }}/b2-preview-secret-iam.json
         run: node tools/gravicentra-i6-5-b2-preview-secret-iam.mjs
+      - name: Aggregate authenticated infrastructure preflight
+        if: steps.mode.outputs.run == 'true'
+        env:
+          ACCESS_PREFLIGHT_CONCLUSION: ${{ steps.b2_access_preflight.conclusion }}
+          SECRET_PREFLIGHT_CONCLUSION: ${{ steps.b2_secret_preflight.conclusion }}
+          B2_AUTH_PREFLIGHT_FILE: ${{ runner.temp }}/b2-auth-infrastructure-preflight.json
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          const out={schema:'GRAVICENTRA_B2_AUTH_INFRA_PREFLIGHT_V1',status:'FAIL',errors:[],checks:{},runId:Number(process.env.GITHUB_RUN_ID)};
+          const read=p=>{try{return JSON.parse(fs.readFileSync(p,'utf8'));}catch(e){out.errors.push('READ:'+path.basename(p)+':'+String(e.message||e));return null;}};
+          const access=read(process.env.RUNNER_TEMP+'/b2-access-config-recovery.json');
+          const secret=read(process.env.RUNNER_TEMP+'/b2-preview-secret-iam.json');
+          out.checks.accessStep=process.env.ACCESS_PREFLIGHT_CONCLUSION;
+          out.checks.secretStep=process.env.SECRET_PREFLIGHT_CONCLUSION;
+          out.checks.accessStatus=access?.status||null;
+          out.checks.secretStatus=secret?.status||null;
+          out.checks.secretBindings=secret?.after||null;
+          if(process.env.ACCESS_PREFLIGHT_CONCLUSION!=='success'||access?.status!=='PASS')out.errors.push('ACCESS_AUTHORITY_PREFLIGHT_FAILED');
+          if(process.env.SECRET_PREFLIGHT_CONCLUSION!=='success'||secret?.status!=='PASS')out.errors.push('PREVIEW_SECRET_PREFLIGHT_FAILED');
+          const required=['roles/secretmanager.viewer','roles/secretmanager.secretAccessor','roles/secretmanager.secretVersionAdder'];
+          if(secret&&!required.every(r=>secret.after?.[r]===true))out.errors.push('PREVIEW_SECRET_IAM_INCOMPLETE');
+          try{require.resolve('firebase-admin');out.checks.firebaseAdmin=true;}catch{out.errors.push('FIREBASE_ADMIN_PACKAGE_MISSING');}
+          try{require.resolve('playwright');out.checks.playwright=true;}catch{out.errors.push('PLAYWRIGHT_PACKAGE_MISSING');}
+          try{require.resolve('@google-cloud/secret-manager');out.checks.secretManagerPackage=true;}catch{out.errors.push('SECRET_MANAGER_PACKAGE_MISSING');}
+          out.status=out.errors.length?'FAIL':'PASS';
+          fs.writeFileSync(process.env.B2_AUTH_PREFLIGHT_FILE,JSON.stringify(out,null,2)+'\n');
+          console.log('B2_AUTH_INFRA_PREFLIGHT='+out.status+' '+JSON.stringify({errors:out.errors,checks:out.checks}));
+          if(out.errors.length)process.exit(1);
+          NODE
 
       - name: Execute authenticated reversible B2 Preview proof
         id: proof
@@ -3824,6 +3858,7 @@ jobs:
             ${{ runner.temp }}/b2-authenticated-preview.json
             ${{ runner.temp }}/b2-access-config-recovery.json
             ${{ runner.temp }}/b2-preview-secret-iam.json
+            ${{ runner.temp }}/b2-auth-infrastructure-preflight.json
             ${{ runner.temp }}/b2-visual/*
           if-no-files-found: warn
           compression-level: 0

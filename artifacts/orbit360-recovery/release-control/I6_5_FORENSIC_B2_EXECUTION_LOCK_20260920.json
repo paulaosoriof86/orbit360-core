@@ -157,7 +157,9 @@
     "vehicleSameIdEdit": true,
     "visibleGravicentraBrand": true,
     "renewalBidirectionalLink": true,
-    "renewalDurableClosure": true
+    "renewalDurableClosure": true,
+    "authenticatedPreviewPass": true,
+    "technicalFindingsClosedByExactRun": true
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING",
@@ -1530,5 +1532,24 @@
     "previewReadsProductionVault": false,
     "productionCallableBehaviorChanged": false,
     "previewSecretCleanupRequired": true
+  },
+  "antiInterruptionControl": {
+    "status": "FROZEN_ACTIVE",
+    "cause": "MONOLITHIC_FIRST_FAILURE_DISCOVERY_PLUS_UNPREFLIGHTED_PREVIEW_INFRASTRUCTURE",
+    "currentAuthenticatedPassRunId": 36162989052,
+    "aggregateInfrastructurePreflightInstalled": true,
+    "priorPassPreservationRequired": true,
+    "productSourceMutationForHarnessFailureForbidden": true,
+    "remainingHumanReviewIds": [
+      "B2-R16-RECEIPT_PLAN_EDIT_DISCOVERABILITY",
+      "B2-H01",
+      "B2-H03",
+      "B2-H05",
+      "B2-H08",
+      "B2-H09",
+      "B2-H10",
+      "B2-H12",
+      "B2-H13"
+    ]
   }
 }

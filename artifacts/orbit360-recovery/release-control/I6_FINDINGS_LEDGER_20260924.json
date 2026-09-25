@@ -19,11 +19,28 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 53,
+    "total": 54,
     "b2HumanFindings": 13,
-    "currentBlocking": 25
+    "currentBlocking": 12
   },
   "findings": [
+    {
+      "id": "MECH-HARNESS-005",
+      "block": "B2",
+      "source": "RUN_SEQUENCE_20260924_20260925",
+      "finding": "AUTHENTICATED_B2_VALIDATION_DISCOVERED_INDEPENDENT_HARNESS_AND_PREVIEW_INFRASTRUCTURE_PREREQUISITES_SERIALIZED_ONE_PER_RUN",
+      "owner": [
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+        "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+        "tools/gravicentra-i6-5-b2-preview-secret-iam.mjs"
+      ],
+      "rootCause": "The long authenticated proof was fail-fast and external prerequisites were not aggregated before browser execution. Each run therefore stopped at the first independent missing precondition (route host, edit-state transition, prompt binding, isolated credential vault, Secret Manager IAM/package), making already-preserved product fixes appear as repeated interruption.",
+      "remediation": "Preserve fail-closed writes, but aggregate independent access/IAM/package prerequisites before the browser proof, classify failures as PRODUCT/HARNESS/INFRASTRUCTURE/DATA, preserve prior PASS evidence unless causally invalidated, and never make a product-source change for a harness-only failure.",
+      "status": "CLOSED_CURRENT_B2_PASS_ANTI_INTERRUPTION_PREFLIGHT_INSTALLED",
+      "blocking": false,
+      "closureProof": "Run 36162989052 completed authenticated B2 PASS; workflow now aggregates independent access/IAM/package prerequisites before future long browser proof.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "B2-R23-PREVIEW-SECRET-IAM",
       "block": "B2",
@@ -36,10 +53,16 @@
       ],
       "rootCause": "After removing the production-vault cross-read, the exact Preview callable still returns functions/unavailable from readVaultScope(preview). This proves the isolated preview vault itself is not usable by the runtime identity; the remaining causal surface is preview-secret existence/IAM, not Aseguradoras UI, active role, prompt binding or operational Firestore.",
       "remediation": "Idempotently ensure only the Preview secret exists and bind the runtime service account to secret-level viewer, secretAccessor and secretVersionAdder. Never read payload, never touch production secret. Then rerun the exact authenticated proof.",
-      "status": "INFRA_REPAIR_AUTHORIZED_PENDING_PROOF",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "IAM proof PASS + exact Preview credential import mapping + insurer metadata readback + password reveal hash-match + preview cleanup + LIVE untouched.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
+      }
     },
     {
       "id": "B2-R22-PREVIEW-CREDENTIAL-VAULT-CROSSREAD",
@@ -52,10 +75,16 @@
       ],
       "rootCause": "readEffectiveVault(preview) merged production+preview, and preview import used production as fallback base. The isolated Preview callable therefore required production Secret Manager read access, contradicting isolation and causing functions/unavailable before any insurer metadata write.",
       "remediation": "Preview scope reads/writes preview vault only; production scope remains production-only. Exact authenticated proof must save logo+password, receive cred_* mapping, reveal hash-match from preview vault, cleanup preview secret record, and leave LIVE untouched.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_AND_AUTHENTICATED_PASS",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "New immutable B2 Preview: credential import PASS, insurer durable update PASS, logo reload PASS, reveal hash-match PASS, preview cleanup PASS, LIVE untouched.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
+      }
     },
     {
       "id": "B2-QA-22-INSURER-PROMPT-BINDING",
@@ -67,10 +96,16 @@
       ],
       "rootCause": "The harness waited for global [data-in].last() and clicked global [data-yes].last(). The product uses overlay-scoped prompts; unrelated/stale overlays can make the proof close a different dialog while guardarDraft remains awaiting its own U.prompt.",
       "remediation": "Bind the reason input and confirmation button to the same visible .drawer-back containing [data-in], capture its title/value, click its own [data-yes], and require that exact overlay to detach before evaluating persistence.",
-      "status": "HARNESS_FIXED_PENDING_RERUN",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "Exact fe140 Preview reaches secure provider/batch writer or yields a product-specific save failure after the correctly-bound prompt; no ambiguous global dialog interaction.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
+      }
     },
     {
       "id": "B2-R21-ASEGURADORAS-DEEPLINK-EDIT-LOSS",
@@ -82,10 +117,16 @@
       ],
       "rootCause": "render(host) always processed route.params.ficha by calling ficha(deepId) with default view semantics. Any module rerender while editing therefore replaced the active draft with read-only state even after the async knowledge refresh path was fixed.",
       "remediation": "When render(host) reopens the deep-linked insurer already in editing state, call ficha(deepId, undefined, true) so edit/draft/credentialDrafts survive; normal deep-link opens remain view-only.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_AND_AUTHENTICATED_PASS",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "New exact Preview stays in edit mode through full module rerender, saves logo and password, and completes canonical + secure readback.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
+      }
     },
     {
       "id": "B2-R20-ASEGURADORAS-ASYNC-EDIT-LOSS",
@@ -97,10 +138,16 @@
       ],
       "rootCause": "ensureKnowledgeSummaryLoaded() invokes refreshOwnerView() on script.onload; refreshOwnerView() called ficha(id) without edit-state preservation. ficha() interpreted missing startEdit as false, discarding editing/draft/credentialDrafts.",
       "remediation": "Async owner refresh calls ficha(id, undefined, true); ficha preserves existing editing flag, draft, credentialDrafts, snapshot and saving only for this internal refresh path. Normal open/edit/cancel/save semantics remain explicit.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_AND_AUTHENTICATED_PASS",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "New exact Preview remains in edit mode after deferred knowledge load; logo + password can be entered and saved; canonical insurer readback and secure credential reveal/cleanup PASS.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
+      }
     },
     {
       "id": "B2-QA-20-ASEGURADORAS-HOST",
@@ -112,10 +159,16 @@
       ],
       "rootCause": "Router transition is asynchronous. Waiting for generic #host .page can match the stale Cliente360 page; Aseguradoras ficha() then runs before Aseguradoras.render(host) has assigned its module-scoped host.",
       "remediation": "Wait for #asg-q, a route-specific marker emitted only by Aseguradoras.render(host), before invoking ficha() initially and after reload.",
-      "status": "HARNESS_FIXED_PENDING_RERUN",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "Exact same Preview completes insurer logo/credential proof and all later renewal/cleanup assertions.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
+      }
     },
     {
       "id": "B2-R19-ACCESS-PHYSICAL-SCOPE-OMISSION",
@@ -129,10 +182,16 @@
       ],
       "rootCause": "tenant-domain-config-client publish() shallow-merges defaultAccess() with protected server config, so missing physical roleScopes can look valid in browser. B1 tests asserted effective runtime values rather than physical config completeness.",
       "remediation": "Materialize only missing frozen approved scopes; fail on any explicit conflict; require direct Admin readback before browser proof.",
-      "status": "RECOVERY_V2_AUTHORIZED_PENDING_EXACT_RUN",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "Direct protected-document readback contains all frozen roleScopes plus Operativo Cotizador/Comparativo; exact Preview runtime consumes them; no business-data writes.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
+      }
     },
     {
       "id": "B2-R18-ACCESS-CONFIG-MIGRATION-GAP",
@@ -147,7 +206,7 @@
       ],
       "rootCause": "B1 R8 verified matrix semantics with window.__accessCfg synthetic data and source-contract assertions, while the real protected access document was not asserted to contain the approved rolePermissions. The transition removed reliance on origin-local storage without migrating that state. The first controlled recovery then proved a second facet: the browser's protected config exposed effective scope defaults, while the physical protected document did not contain the full frozen roleScopes set.",
       "remediation": "Materialize only missing frozen approved roleScopes and the already-proven Operativo Cotizador/Comparativo overrides. Any explicit conflicting stored scope or deny fails closed. Then rerun exact authenticated Preview proof.",
-      "status": "PHYSICAL_SCOPE_OMISSION_DEMONSTRATED_RECOVERY_V2_AUTHORIZED",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "Protected config readback contains Operativo cotizador/comparativo; exact Preview sidebar and runtime expose both; Asesor scope remains own; no business data writes.",
       "mayDisappearWithoutDisposition": false,
@@ -156,6 +215,12 @@
         "recoveryFailure": "B2_ACCESS_RECOVERY_SCOPE_REGRESSION",
         "businessDataWrites": 0,
         "liveTouched": false
+      },
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
       }
     },
     {
@@ -169,9 +234,15 @@
       ],
       "rootCause": "issueRequest used only policyInput.vehiculo. If the renewal caller omitted it, the new policy could be emitted without snapshotting the single source-policy vehicle.",
       "remediation": "If exactly one current source vehicle exists, clone its business risk fields into a new vehicle linked to the renewal policy with a new ID. Never guess when source relation is missing or ambiguous.",
-      "status": "SOURCE_FIXED_EXACT_AUTHENTICATED_PROOF_PENDING",
+      "status": "CLOSED_PASS",
       "blocking": true,
-      "closureProof": "Exact authenticated renewal creates one new linked vehicle with new ID and preserves the source relationship."
+      "closureProof": "Exact authenticated renewal creates one new linked vehicle with new ID and preserves the source relationship.",
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
+      }
     },
     {
       "id": "B2-R16-RECEIPT_PLAN_EDIT_DISCOVERABILITY",
@@ -184,9 +255,14 @@
       ],
       "rootCause": "Expected receipts are derived from policy payment terms, but receipt detail had no canonical edit path and policy preview exposed only a receipt count.",
       "remediation": "Receipt detail opens Editar plan de recibos through the canonical policy editor; the policy preview shows the exact generated receipt schedule. No detached individual receipt mutation is introduced.",
-      "status": "SOURCE_FIXED_EXACT_PREVIEW_VISUAL_PENDING",
+      "status": "AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
-      "closureProof": "Human Preview shows the canonical edit action and generated schedule."
+      "closureProof": "Human Preview shows the canonical edit action and generated schedule.",
+      "technicalEvidence": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
+      }
     },
     {
       "id": "B2-R15-DUPLICATE_VEHICLE_ACTIONS",
@@ -198,9 +274,15 @@
       ],
       "rootCause": "patchLegacyCards injected one generic vehicle button after every policy card with a vehicle, duplicating Cliente360's dedicated vehicle actions.",
       "remediation": "Remove the generic injection and retain only contextual Cliente360/policy/vehicle actions.",
-      "status": "SOURCE_FIXED_EXACT_PREVIEW_VISUAL_PENDING",
+      "status": "CLOSED_PASS",
       "blocking": true,
-      "closureProof": "No repeated generic Ver vehículo completo buttons in Cliente360."
+      "closureProof": "No repeated generic Ver vehículo completo buttons in Cliente360.",
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
+      }
     },
     {
       "id": "B2-R14-ACCESS-MATRIX-HYDRATION",
@@ -214,7 +296,7 @@
       ],
       "rootCause": "Hydration is working and returns source=protected, syncPending=false. The protected access document preserves roleScopes but contains rolePermissions={}. B1 migrated access authority to the server without materializing the already-approved module matrix; its R8 proof used a synthetic in-memory matrix and therefore did not prove the protected document. A fresh Preview origin has no legacy localStorage matrix, so access-scope correctly falls back to the base Operativo role, where Cotizador and Comparativo are absent.",
       "remediation": "Recover only the previously approved Operativo→Cotizador/Comparativo overrides into the protected config with before/after audit and canonical readback; keep scopes unchanged. Equipo merges sparse canonical overrides over the complete default matrix. Authenticated B2 must prove protected config + sidebar + direct runtime access on the exact Preview.",
-      "status": "ROOT_CAUSE_DEMONSTRATED_RECOVERY_AUTHORIZED",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "Exact Preview proves configured Operativo Cotizador+Comparativo in both access engine and sidebar.",
       "evidence": {
@@ -228,6 +310,12 @@
           "Asesor": "own"
         },
         "syntheticWrites": 0
+      },
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
       }
     },
     {
@@ -330,10 +418,15 @@
       "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "rootCause": "Inline field values used font-weight 650 almost universally and premium rows used generalized <b>, flattening hierarchy.",
       "remediation": "Body values reduced to medium weight; premium rows use ordinary values with strong total only; title/KPI hierarchy preserved.",
-      "status": "SOURCE_FIXED_RUNTIME_VISUAL_PENDING",
+      "status": "AUTHENTICATED_HIERARCHY_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "closureProof": "Authenticated side-by-side desktop/mobile Cliente360-Aseguradoras-Poliza-Vehiculo-Recibo visual audit.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "technicalEvidence": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
+      }
     },
     {
       "id": "B2-H02",
@@ -358,10 +451,15 @@
       "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "rootCause": "Read normalizer cross-fell back formaPago<-conductoPago and conducto<-formaPago; I6.4 source contract imports them separately.",
       "remediation": "Cross-fallback removed. formaPago reads formaPago/metodoPago; conducto reads conducto/conductoPago; frequency stays separate.",
-      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "status": "SOURCE_CONTRACT_PASS_PENDING_PAULA_SPOTCHECK",
       "blocking": true,
       "closureProof": "Runtime records with distinct values and legacy missing values; write/readback stays distinct.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "technicalEvidence": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
+      }
     },
     {
       "id": "B2-H04",
@@ -386,10 +484,15 @@
       "owner": "canonical Firestore read models + relationship audit tool",
       "rootCause": "Policy detail resolves a vehicle by exact vehicle.polizaId while Cliente360 lists vehicles by clienteId. A client can therefore have vehicle records while one specific policy has no physical vehicle link.",
       "remediation": "Do not auto-merge or relink historical data. Show the distinction explicitly and link to client vehicles; prevent future renewal gaps by snapshotting one unambiguous source vehicle into the new renewal policy.",
-      "status": "ROOT_CAUSE_AND_RELATION_DEMONSTRATED_NO_AUTO_MUTATION",
+      "status": "AUTHENTICATED_RELATION_PASS_PENDING_PAULA_SPOTCHECK",
       "blocking": true,
       "closureProof": "Artifact evidence with hashed IDs, states, links, receipt/portfolio counts and classification; no merge/delete.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "technicalEvidence": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
+      }
     },
     {
       "id": "B2-H06",
@@ -414,10 +517,16 @@
       "owner": "cliente360.js + policy-receipts-v1199-detail-guard.js",
       "rootCause": "Legacy row/identity renderers allowed literal string 'undefined'/'null' to pass through.",
       "remediation": "Vehicle labels and row values normalize null/undefined literals to neutral display values; identity concatenation filters invalid literals.",
-      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "Authenticated vehicle cards/detail no literal undefined/null.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
+      }
     },
     {
       "id": "B2-H08",
@@ -428,10 +537,15 @@
       "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "rootCause": "Cliente360 rendered legacy receipts first; canonical bridge replaced it in setTimeout(0), creating a visible partial-state race.",
       "remediation": "Canonical patch/render now executes synchronously after the original tab/render handler; canonical owner keeps stable loading state until both receipt and portfolio collections are server-confirmed.",
-      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "status": "SOURCE_RACE_FIX_PENDING_PAULA_COLD_RENDER_SPOTCHECK",
       "blocking": true,
       "closureProof": "Authenticated cold route/tab/reload; no partial row count before canonical dataset.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "technicalEvidence": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
+      }
     },
     {
       "id": "B2-H09",
@@ -442,10 +556,15 @@
       "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "rootCause": "UI printed raw provenance fields/codes and separate state/reconciliation badges even when semantically identical; hero used unrelated dark treatment.",
       "remediation": "Soft mature-family hero; medium body typography; deduplicated badges; raw authority/match codes suppressed; operational labels for update date/document/match.",
-      "status": "TECHNICAL_TERMS_PAULA_PASS_VISUAL_HIERARCHY_REMEDIATION_PENDING",
+      "status": "AUTHENTICATED_TECHNICAL_UI_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "closureProof": "Authenticated receipt detail desktop/mobile; no release/gate/validator/internal codes or duplicate payment status.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "technicalEvidence": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
+      }
     },
     {
       "id": "B2-H10",
@@ -456,10 +575,15 @@
       "owner": "modules/aseguradoras.js",
       "rootCause": "Logo URL editing existed in source but was buried inside the Resumen edit form and was not discoverable in the human flow.",
       "remediation": "Expose an explicit Cambiar logo action while preserving the HTTPS-only durable logo contract.",
-      "status": "SOURCE_REFINED_EXACT_PREVIEW_VISUAL_PENDING",
+      "status": "AUTHENTICATED_LOGO_SAVE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "closureProof": "Synthetic insurer logo URL save -> canonical backend readback -> reload -> image rendered.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "technicalEvidence": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
+      }
     },
     {
       "id": "B2-H11",
@@ -470,7 +594,7 @@
       "owner": "functions/product-insurer-credentials.js + product-insurer-credential-provider-p0.js + aseguradoras.js",
       "rootCause": "The human flow now reaches the isolated Preview callable correctly, but the Preview callable itself read the production Secret Manager vault before importing into the preview vault. That cross-environment dependency returned functions/unavailable ('No fue posible consultar la bóveda segura') and aborted Aseguradoras save before logo/credential readback. This violated Preview isolation.",
       "remediation": "Make preview credential operations use only the preview Secret Manager vault. Production callable remains unchanged. Rebuild immutable B2 Preview, run authenticated logo+password save/reveal/cleanup, and require exact readback.",
-      "status": "ROOT_CAUSE_DEMONSTRATED_SOURCE_FIXED_PENDING_NEW_PREVIEW",
+      "status": "CLOSED_PASS",
       "blocking": true,
       "closureProof": "Authenticated Operativo synthetic insurer password update -> credentialRef readback -> refresh/reveal hash match -> Preview secret cleanup; no plaintext/log/artifact.",
       "mayDisappearWithoutDisposition": false,
@@ -482,6 +606,12 @@
         "callable": "orbit360ProductInsurerCredentialCommandPreview",
         "region": "us-east1",
         "productionTouched": false
+      },
+      "closedBy": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
+        "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
       }
     },
     {
@@ -493,10 +623,15 @@
       "owner": "modules/academia.js",
       "rootCause": "Session owner returns canonical role SuperAdmin while visual label is Dirección; Academia privileged filter recognized Dirección/Admin only. SuperAdmin therefore received exactly the Operativo subset.",
       "remediation": "Privileged filter now recognizes Dirección, SuperAdmin, AdminTenant and Admin consistently.",
-      "status": "SOURCE_FIXED_RUNTIME_PENDING",
+      "status": "AUTHENTICATED_ROLE_COUNTS_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "closureProof": "Authenticated privileged role and Operativo/Asesor counts/routes; CRM/Cliente360 and Aseguradoras courses present; no technical/LAB visible to normal roles.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "technicalEvidence": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
+      }
     },
     {
       "id": "B2-H13",
@@ -507,10 +642,15 @@
       "owner": "detail guard + receipt projection + Cliente360 + Aseguradoras",
       "rootCause": "Policy/receipt/vehicle surfaces used independent inline weights and receipt-specific dark hero instead of mature family hierarchy.",
       "remediation": "Targeted typography/hero/value-weight changes applied without reverting macro policy hierarchy.",
-      "status": "SOURCE_FIXED_RUNTIME_VISUAL_PENDING",
+      "status": "AUTHENTICATED_VISUAL_FAMILY_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "closureProof": "Own visual audit desktop/mobile across Cliente360, Aseguradoras, Policy, Vehicle, Receipt, Academia; new Paula review afterward.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "technicalEvidence": {
+        "runId": 36162989052,
+        "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+        "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
+      }
     },
     {
       "id": "B3-001",
@@ -745,5 +885,23 @@
     ],
     "realDataEvidence": "Byron Contreras client and policy advisor changes persisted after refresh; vehicle color edit persisted on the same linked vehicle.",
     "noBroadReimport": true
+  },
+  "currentHumanReview": {
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36161420776-7cgx9h30.web.app",
+    "exactSourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+    "authenticatedRunId": 36162989052,
+    "outstandingIds": [
+      "B2-R16-RECEIPT_PLAN_EDIT_DISCOVERABILITY",
+      "B2-H01",
+      "B2-H03",
+      "B2-H05",
+      "B2-H08",
+      "B2-H09",
+      "B2-H10",
+      "B2-H12",
+      "B2-H13"
+    ],
+    "count": 9,
+    "rule": "Only these human-visible items require Paula confirmation before B2 acceptance; technical findings already closed may not be reopened without reproducible causal regression."
   }
 }

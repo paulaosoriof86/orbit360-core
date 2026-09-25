@@ -238,11 +238,14 @@
     "block": "B2",
     "readinessPercent": 80,
     "targetPercent": 90,
-    "step": "CANONICAL_COMPOSITION_BOUND_AND_SOURCE_REMEDIATION_READY_FOR_NEW_PREVIEW",
+    "step": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36161420776-7cgx9h30.web.app",
+    "exactPreviewSourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+    "authenticatedRunId": 36162989052,
     "noBroadRediscovery": true,
     "noReimport": true,
     "noLive": true,
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW"
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL"
   },
   "dataUpdateCompletion": {
     "preservedPass": [
@@ -275,6 +278,51 @@
     "cycle2": "Paula visual review + only observed causal corrections + reproof/freeze.",
     "extraCycleOnlyFor": "A concrete reproducible discrepancy from readback or human review.",
     "broadAuditRepeatForbidden": true,
-    "historicalPassPreservedUnlessCausallyInvalidated": true
+    "historicalPassPreservedUnlessCausallyInvalidated": true,
+    "independentFailureAggregationRequired": true,
+    "noSerialPrerequisiteDiscovery": true,
+    "currentB2TechnicalAndAuthenticatedPass": true,
+    "currentB2OnlyHumanVisualRemaining": true
+  },
+  "antiInterruptionExecution": {
+    "status": "FROZEN_ACTIVE",
+    "rootCauseClass": "MONOLITHIC_FIRST_FAILURE_DISCOVERY_PLUS_UNPREFLIGHTED_PREVIEW_INFRASTRUCTURE",
+    "demonstratedSequence": [
+      {
+        "runId": 36073128460,
+        "class": "HARNESS_ROUTE_RACE"
+      },
+      {
+        "runId": 36160736564,
+        "class": "ASEGURADORAS_SAVE_TRACE"
+      },
+      {
+        "runId": 36161855364,
+        "class": "PREVIEW_SECRET_RUNTIME_ACCESS"
+      },
+      {
+        "runId": 36162726012,
+        "class": "SECRET_MANAGER_CLIENT_DEPENDENCY"
+      },
+      {
+        "runId": 36162989052,
+        "class": "FULL_AUTHENTICATED_PASS"
+      }
+    ],
+    "rules": [
+      "PRESERVE_ALL_PRIOR_PASS_EVIDENCE_UNLESS_CAUSALLY_INVALIDATED",
+      "CLASSIFY_EACH_FAILURE_AS_PRODUCT_HARNESS_INFRASTRUCTURE_OR_DATA_BEFORE_MUTATING_SOURCE",
+      "NO_PRODUCT_SOURCE_CHANGE_FOR_HARNESS_ONLY_OR_INFRASTRUCTURE_ONLY_FAILURE",
+      "AGGREGATE_INDEPENDENT_ACCESS_IAM_PACKAGE_PREREQUISITES_BEFORE_LONG_BROWSER_PROOF",
+      "DEPENDENT_WRITES_REMAIN_FAIL_CLOSED_AND_CLEANUP_MANDATORY",
+      "ONE_CAUSAL_FIX_COMMIT_PER_CLASS_NOT_ONE_NEW_METHODOLOGY_OR_GATE",
+      "AFTER_TECHNICAL_AND_AUTHENTICATED_PASS_MOVE_DIRECTLY_TO_HUMAN_VISUAL_NO_EXTRA_REDISCOVERY"
+    ],
+    "workflowImplementation": {
+      "accessAndSecretStepsContinueForAggregateDiagnosis": true,
+      "aggregatePreflightInstalled": true,
+      "evidenceFile": "b2-auth-infrastructure-preflight.json",
+      "browserProofRunsOnlyAfterAggregatePreflightPass": true
+    }
   }
 }
