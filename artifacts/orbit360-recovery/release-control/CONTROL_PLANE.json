@@ -717,7 +717,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2012,9 +2012,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "8a907c5c9dbf0a944034e55cdc37861068b1fb71",
+    "b2ExecutionLockBlobSha": "40df9d55bd952fbff249bee09a58cfe5192ccd26",
     "b2": {
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_R3",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2133,10 +2133,10 @@
       "humanReviewOutstandingCount": 9,
       "humanReviewR3": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
       "r3CumulativeSourceRemediation": {
-        "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
+        "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "3dcd1f9b73c396de1926f2ab4fabf17fa1bcdb19",
         "findingLedgerBlobSha": "dafe056482dab67d0df3856881afa731564b5470",
-        "b2ExecutionLockBlobSha": "8a907c5c9dbf0a944034e55cdc37861068b1fb71",
+        "b2ExecutionLockBlobSha": "40df9d55bd952fbff249bee09a58cfe5192ccd26",
         "changedProductFiles": [
           "orbit360-platform/core/policy-receipts-engine.js",
           "orbit360-platform/modules/policy-receipts-v1199-bridge.js",

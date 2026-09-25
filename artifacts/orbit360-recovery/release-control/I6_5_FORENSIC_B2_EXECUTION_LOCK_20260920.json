@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_R3",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1593,7 +1593,7 @@
       "B2-R15-DUPLICATE_VEHICLE_ACTIONS"
     ],
     "next": "BUILD_NEW_CANDIDATE_PREVIEW_EXACT_READBACK_AND_AUTHENTICATED_R3_DISCRIMINANTS",
-    "sourceRemediationStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
+    "sourceRemediationStatus": "CANDIDATE_PENDING_PREVIEW",
     "changedProductFiles": [
       "orbit360-platform/core/policy-receipts-engine.js",
       "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
@@ -1613,7 +1613,7 @@
     "scheduleAmountTolerance": 0.02
   },
   "r3CumulativeSourceRemediation": {
-    "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
+    "status": "CANDIDATE_PENDING_PREVIEW",
     "origin": "PAULA_VISUAL_REVIEW_20260925_R3",
     "changedProductFiles": [
       "orbit360-platform/core/policy-receipts-engine.js",
