@@ -1946,7 +1946,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R20_SOURCE_FIXED_NEW_EXACT_PREVIEW_REQUIRED",
+    "mechanismSyncStatus": "B2_R20_EXACT_AUTHENTICATED_PROOF_ARMED",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2012,7 +2012,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "c4fdbff1f3e3c7ceb7aa9a4654707fd7e92fbeb8",
+    "b2ExecutionLockBlobSha": "97b27b2c58e68aca0094e65bddf13d93c8a7606d",
     "b2": {
       "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2108,7 +2108,8 @@
       "accessConfigRecoveryState": "RETRY_AUTHORIZED_AFTER_PHYSICAL_SCOPE_OMISSION_DEMONSTRATED",
       "lastAuthenticatedRunId": 36073128460,
       "lastAuthenticatedFailure": "HARNESS_ASEGURADORAS_ROUTE_RACE",
-      "rootCauseR20": "ASEGURADORAS_ASYNC_KNOWLEDGE_REFRESH_DROPS_EDIT_STATE"
+      "rootCauseR20": "ASEGURADORAS_ASYNC_KNOWLEDGE_REFRESH_DROPS_EDIT_STATE",
+      "authenticatedPreviewArm": "RUN_EXACT_R20_FIXED_PREVIEW"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",

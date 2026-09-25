@@ -333,7 +333,9 @@
     "visualEvidenceRecapture": true,
     "visualReceiptRecapture": true,
     "lastFailureRunId": 36155142701,
-    "requiredNewSource": true
+    "requiredNewSource": true,
+    "lastArmCommitParent": "6313bc4a4960968457c2867bdf1ba32c3cbd8de4",
+    "lastArmReason": "RUN_EXACT_AUTHENTICATED_PROOF_ON_NEW_R20_FIXED_PREVIEW"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
