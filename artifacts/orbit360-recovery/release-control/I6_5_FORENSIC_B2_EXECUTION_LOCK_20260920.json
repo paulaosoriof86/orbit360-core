@@ -362,7 +362,15 @@
     "requiredNewSource": true,
     "lastArmCommitParent": "219bf4d02c37d785e2c6d2a811ee1b5ff42f84dd",
     "lastArmReason": "R22_PREVIEW_CREDENTIAL_ISOLATION_EXACT_AUTHENTICATED_PROOF",
-    "lastArmAt": "2026-09-25T10:35:00-06:00"
+    "lastArmAt": "2026-09-25T10:35:00-06:00",
+    "dispatchRequest": {
+      "requestedAt": "2026-09-25T13:06:00-06:00",
+      "reason": "EXECUTE_R3_AUTHENTICATED_PROOF_ON_EXACT_PREVIEW_AFTER_PREVIEW_FREEZE",
+      "expectedHeadBeforeDispatch": "56ae83e028de9071400e952acfa8cf6882104955",
+      "productSourceMutation": false,
+      "livePromotion": false,
+      "b3Advance": false
+    }
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
