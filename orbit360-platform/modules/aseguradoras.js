@@ -498,7 +498,10 @@ Orbit.modules.aseguradoras = (function () {
       if (st.logoFile.size > 2 * 1024 * 1024) { U.toast('El logo no puede superar 2 MB.'); return; }
       const bytes = new Uint8Array(await st.logoFile.arrayBuffer());
       let binary = ''; for (let i=0;i<bytes.length;i+=0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i,Math.min(i+0x8000,bytes.length)));
-      const uploaded = await provider.callFunction('orbit360ProductAssetUpload',{tenantId:tenantId(),activeRole:(Orbit.session&&Orbit.session.rol&&Orbit.session.rol())||'',insurerId:id,fileName:st.logoFile.name,mimeType:st.logoFile.type,base64:btoa(binary)},'us-central1');
+      const previewHost = /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location && location.hostname || ''));
+      const assetCallable = previewHost ? 'orbit360ProductAssetUploadPreview' : 'orbit360ProductAssetUpload';
+      const assetRegion = previewHost ? 'us-east1' : 'us-central1';
+      const uploaded = await provider.callFunction(assetCallable,{tenantId:tenantId(),activeRole:(Orbit.session&&Orbit.session.rol&&Orbit.session.rol())||'',insurerId:id,fileName:st.logoFile.name,mimeType:st.logoFile.type,base64:btoa(binary)},assetRegion);
       if (!uploaded || uploaded.ok !== true || !uploaded.url || !uploaded.assetRef) { U.toast('No fue posible confirmar el logo en el servidor.'); return; }
       st.draft.logo = uploaded.url; st.draft.logoAssetRef = uploaded.assetRef; st.logoFile = null; logoUrl = uploaded.url;
     }

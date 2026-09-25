@@ -28,6 +28,7 @@ const files={
   credentialProvider:read('orbit360-platform/core/product-insurer-credential-provider-p0.js'),
   domainConfig:read('orbit360-platform/core/tenant-domain-config-client.js'),
   credentialBackend:read('functions/product-insurer-credentials.js'),
+  operationalBackend:read('functions/product-operational-domain.js'),
   index:read('orbit360-platform/index.html')
 };
 
@@ -57,7 +58,7 @@ need(files.engine.includes('function installmentsForFrequency'),'B2_POLICY_FREQU
 need(files.detail.includes('gi-policy-hero')&&files.detail.includes('gi-detail-kpis'),'B2_POLICY_FULLPAGE_VISUAL_HIERARCHY_MISSING');
 need(files.detail.includes('gi-receipt-detail'),'B2_RECEIPT_DETAIL_VISUAL_HIERARCHY_MISSING');
 need(files.detail.includes('✏️ Editar póliza'),'B2_POLICY_EDIT_ACTION_MISSING');
-need(files.detail.includes('Vehículo pendiente de vincular a esta póliza')&&files.detail.includes('No se vinculará automáticamente')&&files.detail.includes('Revisar vehículos del cliente'),'B2_MISSING_VEHICLE_RELATION_TRUTHFUL_ACTION_MISSING');
+need(files.detail.includes('Vehículo pendiente de vincular a esta póliza')&&files.detail.includes('Vincular vehículo a esta póliza')&&files.detail.includes('vehicleCandidates')&&files.engine.includes('async function linkVehicleToPolicy'),'B2_MISSING_VEHICLE_RELATION_TRUTHFUL_ACTION_MISSING');
 for(const marker of ['data-vbrand','data-vline','data-vplate','data-vyear','data-vuse','data-vcolor','data-vvin','data-vchasis','data-vmotor'])need(files.bridge.includes(marker),'B2_VEHICLE_FIELD_MISSING:'+marker);
 need(files.bridge.includes("save.textContent = 'Guardando…'"),'B2_POLICY_SAVE_PENDING_STATE_MISSING');
 need(!files.bridge.includes("if (e.target === b) close();"),'B2_POLICY_BACKDROP_CLOSE_STILL_PRESENT');
@@ -79,8 +80,9 @@ need(files.bridge.includes("if (existing && !reason)")&&files.engine.includes("i
 need(files.detail.includes("out.formaPago = first(p.formaPago, p.metodoPago)")&&files.detail.includes("out.conducto = first(p.conducto, p.conductoPago)")&&!files.detail.includes("out.formaPago = first(p.formaPago, p.conductoPago"),'B2_PAYMENT_CONDUCT_CROSS_FALLBACK_REMAINS');
 need(files.detail.includes('Base imponible para IVA')&&!files.detail.includes("['Base gravable', pb.taxable]"),'B2_TAXABLE_BASE_UI_SEMANTIC_NOT_FIXED');
 need(files.receiptsProjection.includes("clientWrapper=function(host){var out=cr(host);patchClient(host);return out;}")&&!files.receiptsProjection.includes("setTimeout(function(){patchHeader(cid)"),'B2_RECEIPT_DOUBLE_RENDER_RACE_REMAINS');
-need(files.receiptsProjection.includes('Datos actualizados al')&&files.receiptsProjection.includes('Documento de origen')&&!files.receiptsProjection.includes("cell('Fuente autoridad'")&&!files.receiptsProjection.includes("cell('Calidad de match'"),'B2_RECEIPT_DETAIL_TECHNICAL_UI_REMAINS');
-need(files.insurers.includes('id="af-logo"')&&files.insurers.includes("'nombre', 'logo', 'nit'"),'B2_INSURER_LOGO_NOT_ADMINISTRABLE');
+need(files.receiptsProjection.includes('Datos actualizados al')&&files.receiptsProjection.includes('Detalles de origen y auditoría')&&files.receiptsProjection.includes('Documento de origen')&&!files.receiptsProjection.includes('<h3 style="margin-top:0;font-size:17px;font-weight:800">📎 Origen del dato'),'B2_RECEIPT_DETAIL_TECHNICAL_UI_REMAINS');
+need(files.insurers.includes('id="af-logo-file"')&&files.insurers.includes('orbit360ProductAssetUploadPreview')&&files.insurers.includes("'logoAssetRef'"),'B2_INSURER_LOGO_NOT_ADMINISTRABLE');
+need(files.operationalBackend.includes('exports.orbit360ProductAssetUploadPreview')&&files.operationalBackend.includes("previewOnly===true")&&files.operationalBackend.includes("getStorage"),'B2_INSURER_LOGO_SERVER_OWNER_MISSING');
 need(files.credentialBackend.includes("'operativo']")&&files.credentialBackend.includes("previewSecretPattern:'orbit360-insurer-credentials-preview-{tenantId}'")&&files.credentialBackend.includes("importEnabled:true")&&!files.credentialBackend.includes("Importación deshabilitada en Preview"),'B2_INSURER_CREDENTIAL_PREVIEW_CONTRACT_INVALID');
 need(files.credentialProvider.includes('importCredentials')&&files.credentialProvider.includes('previewCleanup:cleanupPreview')&&files.credentialProvider.includes("operation:'delete_preview'"),'B2_INSURER_CREDENTIAL_PRODUCT_PROVIDER_CONTRACT_MISSING');
 need(files.insurers.includes('provider.importCredentials'),'B2_INSURER_DIRECT_CREDENTIAL_IMPORT_MISSING');

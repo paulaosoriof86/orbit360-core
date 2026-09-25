@@ -3563,6 +3563,7 @@ jobs:
           node --check orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js
           node --check orbit360-platform/modules/aseguradoras.js
           node --check functions/product-insurer-credentials.js
+          node --check functions/product-operational-domain.js
           node --check tools/gravicentra-i6-5-b2-human-rejection-readonly.mjs
           node --check tools/gravicentra-i6-5-b2-authenticated-preview.mjs
           node --check tools/gravicentra-i6-5-b2-functional.mjs
@@ -3620,7 +3621,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b2-human-rejection-readonly.mjs "$RUNNER_TEMP/b2-package/evidence/b2-human-rejection-readonly.json"
-      - name: Deploy isolated B2 credential Preview callable
+      - name: Deploy isolated B2 credential and asset Preview callables
         if: steps.mode.outputs.mode == 'preview'
         run: |
           set -euo pipefail
@@ -3628,8 +3629,8 @@ jobs:
           cp -a "$RUNNER_TEMP/b2-package/bundle/backend" "$FROOT/backend"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","function":"orbit360ProductInsurerCredentialCommandPreview","productionFunctionDeployed":false}\n' "$GITHUB_SHA" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-credential-backend.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview"],"productionFunctionDeployed":false,"operationalBusinessWritesAuthorized":false}\n' "$GITHUB_SHA" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
       - name: Deploy exact B2 package to isolated Preview
         if: steps.mode.outputs.mode == 'preview'
         id: preview

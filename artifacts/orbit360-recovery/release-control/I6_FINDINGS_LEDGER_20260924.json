@@ -1004,7 +1004,7 @@
         "orbit360-platform/modules/aseguradoras.js",
         "functions/tenant-branding.js"
       ],
-      "rootCause": "No real upload owner existed; Storage was read-only client-side. Extended the existing product operational server owner with authenticated insurer-logo upload and canonical Firestore readback.",
+      "rootCause": "No real upload owner existed; Storage was read-only client-side. Extended the existing product operational server owner with authenticated insurer-logo upload and canonical Firestore readback. Preview isolation completed with orbit360ProductAssetUploadPreview@us-east1 restricted to synthetic B2 insurer IDs; production callable remains undeployed.",
       "remediation": "Reuse approved storage/asset owner for local file select→preview→server commit→persisted asset ref/URL→reload; HTTPS URL remains advanced alternative.",
       "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
@@ -1134,7 +1134,7 @@
         "orbit360-platform/modules/aseguradoras.js",
         "approved product asset/storage owner to be resolved before mutation"
       ],
-      "rootCause": "No existing file upload owner was wired. The existing product operational server owner now accepts validated image upload, persists Storage asset and insurer URL/ref, then performs canonical readback.",
+      "rootCause": "No existing file upload owner was wired. The existing product operational server owner now accepts validated image upload, persists Storage asset and insurer URL/ref, then performs canonical readback. Preview isolation completed with orbit360ProductAssetUploadPreview@us-east1 restricted to synthetic B2 insurer IDs; production callable remains undeployed.",
       "remediation": "Reuse an already-approved product asset/storage owner if present. Add file selection + preview + durable server asset reference + reload/replacement; keep HTTPS URL only as advanced alternative and remove technical browser-storage copy from business UI.",
       "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "blocking": true,
@@ -1268,6 +1268,8 @@
       "orbit360-platform/modules/aseguradoras.js",
       "functions/product-operational-domain.js",
       "orbit360-platform/styles/base.css"
-    ]
+    ],
+    "previewIsolation": "FIXED_PENDING_PREVIEW",
+    "validatorContract": "UPDATED_TO_R3_CONTRACT"
   }
 }

@@ -96,7 +96,7 @@
     "functions/bootstrap.js": "5b1a04617e6be3cf68d7d923862abcf0174fe8fb",
     "functions/package.json": "bfa00e1b1b0349251fe853d2fa3cea00a8ae9366",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
-    "functions/product-operational-domain.js": "7a7101837b323373e61b9798891d2b73f5394407",
+    "functions/product-operational-domain.js": "32119797a6ffb652688e506531c9b62ffd37e90e",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "e4b602b4abb26fcd3d9413b1ab9bb67998be78dd",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -132,7 +132,7 @@
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "c51d13b3a38770af9cce9613a628d9e6db44a353",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
-    "orbit360-platform/modules/aseguradoras.js": "106cb9ee784f0c73376c274e65e343045d07451d",
+    "orbit360-platform/modules/aseguradoras.js": "4e8feb95bfa013ad3d886d12c3f2590f7106848a",
     "orbit360-platform/modules/cliente360.js": "067dba6c242a3717bfca3519f511a4653faf6ff1",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "6fbb880480f726e537f93650119af3265cf97bbd",
@@ -199,6 +199,23 @@
       "runId": 36169665827,
       "artifactId": 10880077438,
       "digest": "sha256:42e10ee44a6c7a25dd9947b0c0d7bd79720684d00240cde05c34de6bfc6fea55"
+    },
+    "previewIsolationFollowup": {
+      "date": "2026-09-25",
+      "status": "FIXED_PENDING_PREVIEW",
+      "reason": "Logo upload requires isolated Preview callable; stale functional assertion updated to the new explicit-link contract.",
+      "productFiles": [
+        "functions/product-operational-domain.js",
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "qaFiles": [
+        "tools/gravicentra-i6-5-b2-functional.mjs",
+        "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      ],
+      "previewCallable": "orbit360ProductAssetUploadPreview@us-east1",
+      "productionCallableDeployed": false,
+      "livePromoted": false
     }
   }
 }

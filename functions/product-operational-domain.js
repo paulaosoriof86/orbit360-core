@@ -8,6 +8,7 @@ const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
+const PREVIEW_REGION = 'us-east1';
 const VERSION = 'gravicentra-product-operational-domain-v4-b1-server-readback';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
@@ -349,8 +350,9 @@ async function execute(request) {
   return Object.assign({},committed,{canonicalReadback:true,canonicalReadbackCount:readback.length,readback});
 }
 
-async function uploadProductAsset(request) {
+async function uploadProductAsset(request, previewOnly) {
   const input=request.data||{},tenantId=cleanId(input.tenantId,'tenantId'),insurerId=cleanId(input.insurerId,'insurerId');
+  if(previewOnly===true && !/^b2-asg-[a-z0-9-]+$/i.test(insurerId)) throw new HttpsError('permission-denied','El upload aislado de Preview solo admite fixtures sintéticos B2.');
   const actor=await authorize(request,tenantId,[{collection:'aseguradoras'}]);
   const insurerRef=canonicalRef(tenantId,'aseguradoras',insurerId),insurerSnap=await insurerRef.get();
   if(!insurerSnap.exists)throw new HttpsError('not-found','Aseguradora no encontrada.');
@@ -360,18 +362,21 @@ async function uploadProductAsset(request) {
   const encoded=String(input.base64||'').replace(/\s+/g,'');if(!encoded||encoded.length>3_000_000)throw new HttpsError('invalid-argument','Archivo de logo inválido o demasiado grande.');
   let bytes;try{bytes=Buffer.from(encoded,'base64');}catch(e){throw new HttpsError('invalid-argument','Archivo de logo inválido.');}
   if(!bytes.length||bytes.length>2*1024*1024)throw new HttpsError('invalid-argument','El logo no puede superar 2 MB.');
-  const contentHash=sha(bytes),assetRef='tenants/'+tenantId+'/assets/insurers/'+insurerId+'/logo-'+contentHash.slice(0,20)+'.'+ext;
+  const contentHash=sha(bytes),assetRef=(previewOnly===true?'preview/':'')+'tenants/'+tenantId+'/assets/insurers/'+insurerId+'/logo-'+contentHash.slice(0,20)+'.'+ext;
   const bucket=storage.bucket(),token=crypto.randomUUID(),file=bucket.file(assetRef);
   await file.save(bytes,{resumable:false,contentType:mime,metadata:{cacheControl:'public,max-age=3600',metadata:{firebaseStorageDownloadTokens:token,tenantId,insurerId,assetKind:'insurer-logo',contentHash}}});
   const url='https://firebasestorage.googleapis.com/v0/b/'+encodeURIComponent(bucket.name)+'/o/'+encodeURIComponent(assetRef)+'?alt=media&token='+encodeURIComponent(token);
   await insurerRef.set({logo:url,logoAssetRef:assetRef,logoContentHash:contentHash,logoUpdatedAt:now(),logoUpdatedByUid:actor.uid},{merge:true});
   const confirmed=await insurerRef.get(),row=confirmed.data()||{};
   if(row.logo!==url||row.logoAssetRef!==assetRef)throw new HttpsError('internal','No fue posible confirmar el logo guardado.');
-  const eventId='asset_'+sha(tenantId+'|'+insurerId+'|'+contentHash).slice(0,28);
-  await eventRef(tenantId,eventId).set({schemaVersion:VERSION,tenantId,eventId,actorUid:actor.uid,activeRole:actor.activeRole,collection:'aseguradoras',entityId:insurerId,assetKind:'insurer-logo',assetRef,contentHash,mimeType:mime,size:bytes.length,createdAt:now(),containsSecrets:false},{merge:false});
-  return{ok:true,insurerId,assetRef,url,contentHash,mimeType:mime,size:bytes.length,serverOwned:true,canonicalReadback:true};
+  if(previewOnly!==true){
+    const eventId='asset_'+sha(tenantId+'|'+insurerId+'|'+contentHash).slice(0,28);
+    await eventRef(tenantId,eventId).set({schemaVersion:VERSION,tenantId,eventId,actorUid:actor.uid,activeRole:actor.activeRole,collection:'aseguradoras',entityId:insurerId,assetKind:'insurer-logo',assetRef,contentHash,mimeType:mime,size:bytes.length,createdAt:now(),containsSecrets:false},{merge:false});
+  }
+  return{ok:true,insurerId,assetRef,url,contentHash,mimeType:mime,size:bytes.length,serverOwned:true,canonicalReadback:true,previewIsolated:previewOnly===true};
 }
 
-exports.orbit360ProductAssetUpload = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, uploadProductAsset);
+exports.orbit360ProductAssetUpload = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>uploadProductAsset(request,false));
+exports.orbit360ProductAssetUploadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>uploadProductAsset(request,true));
 exports.orbit360ProductOperationalCommand = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, execute);
 exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE });

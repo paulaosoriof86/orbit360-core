@@ -5,6 +5,7 @@ import { chromium } from 'playwright';
 import { initializeApp, cert, deleteApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
 
 const PROJECT='ays-orbit-360-lab';
 const TENANT=String(process.env.TENANT_HINT||'').trim();
@@ -310,6 +311,9 @@ async function cleanupSynthetic(db,state){
     const ir=dataCol(db,'aseguradoras').doc(state.insurerId),is=await ir.get();
     if(is.exists){await ir.delete();n++;}
   }
+  if(state.logoAssetRef){
+    try{await getStorage(app).bucket().file(state.logoAssetRef).delete({ignoreNotFound:true});n++;}catch{}
+  }
   for(const id of uniq([clientId,...policyIds,state.requestId,state.insurerId].filter(Boolean))){
     n+=await deleteRowsBy(db,'auditLog','registroId',id).catch(()=>0);
   }
@@ -381,6 +385,9 @@ try{
   need(oper.counts.polizas>=asesor.counts.polizas&&oper.counts.recibosEsperados>=asesor.counts.recibosEsperados&&oper.counts.carteraPrimas>=asesor.counts.carteraPrimas,'B2_AUTH_ROLE_SCOPE_COUNTS_INVALID');
   evidence.scope={operativo:oper,asesor};evidence.modulePermissions={operativo:operativoModules};
   const academiaOper=await bounded(academiaSnapshot(page,'Operativo'),'B2_AUTH_ACADEMIA_OPERATIVO_TIMEOUT',25000);
+  const academiaCanonical=await page.evaluate(()=>{const rows=Orbit.store?.all?.('cursos')||[];return{courses:rows.length,lessons:rows.reduce((n,c)=>n+[...(c.lecciones||[])].length,0)};});
+  need(academiaCanonical.courses===28&&academiaCanonical.lessons===102,'B2_AUTH_ACADEMIA_28_102_REGRESSION:'+JSON.stringify(academiaCanonical));
+  evidence.academiaCanonical=academiaCanonical;
   need(academiaOper.hasClient360&&academiaOper.hasInsurerDirectory&&academiaOper.brandOk&&academiaOper.routeSelector&&!academiaOper.forbiddenVisible,'B2_AUTH_ACADEMIA_OPERATIVO_INVALID:'+JSON.stringify(academiaOper));
   need(academiaOper.automaticWrites===false&&academiaOper.catalogManagementDurable===false,'B2_AUTH_ACADEMIA_AUTOMATIC_WRITER_PRESENT');
   const academiaAsesor=await bounded(academiaSnapshot(page,'Asesor'),'B2_AUTH_ACADEMIA_ASESOR_TIMEOUT',25000);
@@ -652,10 +659,14 @@ try{
   milestone('POLICY_EDIT_RELOAD_PASS');
 
   await page.waitForFunction(id=>!!Orbit.store.get('vehiculos',id),vehicle.id,{timeout:15000});
+  const vehicleBeforeEdit=await dataCol(db,'vehiculos').doc(vehicle.id).get().then(s=>s.data()||{});
+  const normalizedBefore=await page.evaluate(id=>Orbit.policyReceipts.normalizeVehicle(Orbit.store.get('vehiculos',id)),vehicle.id);
   milestone('VEHICLE_DEDICATED_EDIT_START');
   await page.evaluate(id=>Orbit.modules.cliente360.editarVehiculo(id),vehicle.id);
   await page.waitForSelector('#vehicle-v1199 [data-vsave]',{timeout:10000});
-  need(await page.inputValue('#vehicle-v1199 [data-vcolor]')==='Blanco','B2_AUTH_VEHICLE_EDIT_PREFILL_MISSING');
+  const editorInitial=await page.evaluate(()=>({marca:document.querySelector('#vehicle-v1199 [data-vbrand]')?.value||'',linea:document.querySelector('#vehicle-v1199 [data-vline]')?.value||'',placa:document.querySelector('#vehicle-v1199 [data-vplate]')?.value||'',anio:document.querySelector('#vehicle-v1199 [data-vyear]')?.value||'',color:document.querySelector('#vehicle-v1199 [data-vcolor]')?.value||'',chasis:document.querySelector('#vehicle-v1199 [data-vchasis]')?.value||'',motor:document.querySelector('#vehicle-v1199 [data-vmotor]')?.value||''}));
+  for(const key of ['marca','linea','placa','anio','color','chasis','motor']) need(String(editorInitial[key]||'')===String(normalizedBefore[key]||''),'B2_AUTH_VEHICLE_DETAIL_EDITOR_MISMATCH_'+key+':'+JSON.stringify({editorInitial,normalizedBefore}));
+  need(editorInitial.color==='Blanco','B2_AUTH_VEHICLE_EDIT_PREFILL_MISSING');
   await page.fill('#vehicle-v1199 [data-vcolor]','Azul');
   await page.fill('#vehicle-v1199 [data-vreason]','B2 QA actualización controlada de vehículo');
   await page.click('#vehicle-v1199 [data-vsave]');
@@ -665,6 +676,7 @@ try{
   const vehicleCount=(await rowsBy(db,'vehiculos','polizaId',policy.id)).length;
   need(vehicleCount===1,'B2_AUTH_VEHICLE_EDIT_DUPLICATED:'+vehicleCount);
   need(vehicleEdited.polizaId===policy.id&&vehicleEdited.clienteId===client.id,'B2_AUTH_VEHICLE_RELATION_CHANGED');
+  for(const key of ['placa','marca','linea','anio','chasis','vin','motor','clienteId','polizaId']) need(String(vehicleEdited[key]??'')===String(vehicleBeforeEdit[key]??''),'B2_AUTH_VEHICLE_UNTOUCHED_FIELD_CHANGED_'+key);
   await page.reload({waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForFunction(({vid,pid})=>{const v=Orbit.store&&Orbit.store.get('vehiculos',vid);return !!v&&v.color==='Azul'&&v.polizaId===pid;},{vid:vehicle.id,pid:policy.id},{timeout:30000});
   evidence.vehicleEdit={sameId:true,noDuplicate:true,readback:true,reload:true,policyLinkPreserved:true};
@@ -672,7 +684,7 @@ try{
 
 
   milestone('INSURER_SECURE_EDIT_START');
-  const insurerId='b2-asg-'+stamp.toLowerCase(),portalId='portal-b2-'+stamp.toLowerCase(),syntheticSecret='B2-Preview-'+stamp+'-Secure',logoUrl=TARGET+'/assets/tenant/alianzas-soluciones/logo-oficial-360.png';
+  const insurerId='b2-asg-'+stamp.toLowerCase(),portalId='portal-b2-'+stamp.toLowerCase(),syntheticSecret='B2-Preview-'+stamp+'-Secure',logoFixture=path.join(process.cwd(),'orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png');
   state.insurerId=insurerId;
   await bounded(page.evaluate(async ({insurerId,portalId,stamp})=>{
     const tenantId=Orbit.access&&Orbit.access.tenantId?Orbit.access.tenantId():(Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.tenantId)||'';
@@ -697,7 +709,7 @@ try{
   await page.waitForSelector('#asg-ficha #af-editar',{timeout:10000});
   await page.evaluate(()=>{
     window.__b2AsgEditTrace=[];
-    const snap=label=>window.__b2AsgEditTrace.push({label,t:Date.now(),hash:String(location.hash||''),route:String(Orbit.route?.key||''),editButton:!!document.querySelector('#asg-ficha #af-editar'),saveButton:!!document.querySelector('#asg-ficha #af-guardar'),cancelButton:!!document.querySelector('#asg-ficha #af-cancelar'),logoDisabled:!!document.querySelector('#asg-ficha #af-logo')?.disabled});
+    const snap=label=>window.__b2AsgEditTrace.push({label,t:Date.now(),hash:String(location.hash||''),route:String(Orbit.route?.key||''),editButton:!!document.querySelector('#asg-ficha #af-editar'),saveButton:!!document.querySelector('#asg-ficha #af-guardar'),cancelButton:!!document.querySelector('#asg-ficha #af-cancelar'),logoFilePresent:!!document.querySelector('#asg-ficha #af-logo-file')});
     snap('before-click');
     try{
       window.__b2AsgStoreUnsub=Orbit.store?.on?.('*',collection=>{snap('store:'+String(collection||'*'));});
@@ -712,7 +724,7 @@ try{
   const editEntered=await page.waitForSelector('#asg-ficha #af-guardar',{timeout:5000}).then(()=>true).catch(()=>false);
   await page.waitForTimeout(2200);
   const editTrace=await page.evaluate(()=>{
-    const out={trace:(window.__b2AsgEditTrace||[]).slice(-80),final:{editButton:!!document.querySelector('#asg-ficha #af-editar'),saveButton:!!document.querySelector('#asg-ficha #af-guardar'),cancelButton:!!document.querySelector('#asg-ficha #af-cancelar'),logoDisabled:!!document.querySelector('#asg-ficha #af-logo')?.disabled,hash:String(location.hash||''),route:String(Orbit.route?.key||'')}};
+    const out={trace:(window.__b2AsgEditTrace||[]).slice(-80),final:{editButton:!!document.querySelector('#asg-ficha #af-editar'),saveButton:!!document.querySelector('#asg-ficha #af-guardar'),cancelButton:!!document.querySelector('#asg-ficha #af-cancelar'),logoFilePresent:!!document.querySelector('#asg-ficha #af-logo-file'),hash:String(location.hash||''),route:String(Orbit.route?.key||'')}};
     try{window.__b2AsgStoreUnsub?.();}catch(e){}
     try{window.__b2AsgObserver?.disconnect();}catch(e){}
     return out;
@@ -720,7 +732,11 @@ try{
   milestone('INSURER_EDIT_TRANSITION_TRACE',{editEntered,final:editTrace.final,trace:editTrace.trace.slice(-30)});
   need(editEntered===true,'B2_AUTH_INSURER_EDIT_NEVER_ENTERED:'+JSON.stringify(editTrace));
   need(editTrace.final.saveButton===true,'B2_AUTH_INSURER_EDIT_LOST_AFTER_ENTRY:'+JSON.stringify(editTrace));
-  await page.fill('#asg-ficha #af-logo',logoUrl);
+  need(await page.locator('#asg-ficha #af-logo-file').count()===1,'B2_AUTH_INSURER_LOGO_FILE_INPUT_MISSING');
+  await page.setInputFiles('#asg-ficha #af-logo-file',logoFixture);
+  await page.waitForSelector('#asg-ficha #af-logo-preview img',{timeout:5000});
+  const logoPreviewSrc=await page.locator('#asg-ficha #af-logo-preview img').getAttribute('src');
+  need(/^blob:/i.test(String(logoPreviewSrc||'')),'B2_AUTH_INSURER_LOGO_PREVIEW_MISSING');
   await page.click('#asg-ficha [data-tab="plataformas"]');
   await page.waitForTimeout(500);
   const portalUi=await page.evaluate(({portalId})=>{
@@ -868,22 +884,26 @@ try{
   const insurerUpdated=await waitFor(async()=>{
     const s=await dataCol(db,'aseguradoras').doc(insurerId).get();if(!s.exists)return null;
     const d=s.data()||{},portal=[].concat(d.portales||[]).find(x=>String(x.id||'')===portalId);
-    return d.logo===logoUrl&&portal&&/^cred_[a-f0-9]{32}$/.test(String(portal.credentialRef||''))?{...d,_portal:portal}:null;
+    return /^https:\/\/firebasestorage\.googleapis\.com\//.test(String(d.logo||''))&&String(d.logoAssetRef||'').startsWith('preview/tenants/')&&portal&&/^cred_[a-f0-9]{32}$/.test(String(portal.credentialRef||''))?{...d,_portal:portal}:null;
   },'B2_AUTH_INSURER_EDIT_READBACK',45000);
   need(insurerReasonDialog===true,'B2_AUTH_INSURER_REASON_DIALOG_NOT_SEEN');
   need(!!insurerUpdated,'B2_AUTH_INSURER_EDIT_NOT_DURABLE');
   state.insurerCredentialRef=String(insurerUpdated._portal.credentialRef||'');
+  state.logoAssetRef=String(insurerUpdated.logoAssetRef||'');
+  const persistedLogoUrl=String(insurerUpdated.logo||'');
+  need(!/^data:/i.test(persistedLogoUrl)&&!/^blob:/i.test(persistedLogoUrl),'B2_AUTH_INSURER_LOGO_BROWSER_LOCAL_AUTHORITY');
+  evidence.insurerLogo={fileInput:true,preview:true,serverCommit:true,assetRef:state.logoAssetRef,persistedHttps:true,noDataUrl:true};
   evidence.writes.synthetic+=1;
   await page.reload({waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForFunction(({id,logo,ref})=>{
     const a=window.Orbit&&Orbit.store&&Orbit.store.get('aseguradoras',id),p=a&&[].concat(a.portales||[]).find(x=>String(x.credentialRef||'')===ref);
     return !!a&&a.logo===logo&&!!p;
-  },{id:insurerId,logo:logoUrl,ref:state.insurerCredentialRef},{timeout:30000});
+  },{id:insurerId,logo:persistedLogoUrl,ref:state.insurerCredentialRef},{timeout:30000});
   await page.evaluate(()=>{ if(window.Orbit?.router?.go) Orbit.router.go('aseguradoras'); else location.hash='#/aseguradoras'; });
   await page.waitForFunction(()=>Orbit.route?.key==='aseguradoras'&&!!document.querySelector('#asg-q'),null,{timeout:10000});
   await page.evaluate(id=>Orbit.modules.aseguradoras.ficha(id),insurerId);
   await page.waitForSelector('#asg-ficha .asg-logo img',{timeout:10000});
-  need((await page.locator('#asg-ficha .asg-logo img').getAttribute('src'))===logoUrl,'B2_AUTH_INSURER_LOGO_REFRESH_MISMATCH');
+  need((await page.locator('#asg-ficha .asg-logo img').getAttribute('src'))===persistedLogoUrl,'B2_AUTH_INSURER_LOGO_REFRESH_MISMATCH');
   const revealProof=await bounded(page.evaluate(async ({ref,insurerId,expectedHash})=>{
     const out=await Orbit.secureResources.revealCredential(ref,{insurerId});
     const bytes=new TextEncoder().encode(String(out&&out.value||'')),digest=await crypto.subtle.digest('SHA-256',bytes),hashValue=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');

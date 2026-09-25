@@ -1625,10 +1625,14 @@
       "functions/product-operational-domain.js",
       "orbit360-platform/styles/base.css"
     ],
-    "compositionLockBlobSha": "3dcd1f9b73c396de1926f2ab4fabf17fa1bcdb19",
-    "findingLedgerBlobSha": "dafe056482dab67d0df3856881afa731564b5470",
+    "compositionLockBlobSha": "79fa99882a1cf76097e704ab30cfecb2d4573805",
+    "findingLedgerBlobSha": "7e15aebf8ef5429ede6ef36bd4f459044acd8884",
     "noReimport": true,
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "previewAssetIsolation": "orbit360ProductAssetUploadPreview@us-east1",
+    "productionAssetCallableDeployed": false,
+    "authenticatedR3HarnessUpdated": true,
+    "staleValidatorFixed": true
   }
 }
