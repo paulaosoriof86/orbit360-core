@@ -681,7 +681,16 @@ try{
   },{insurerId,portalId,stamp}),'B2_AUTH_INSURER_CREATE_TIMEOUT',30000);
   const insurerCreated=await waitFor(async()=>{const s=await dataCol(db,'aseguradoras').doc(insurerId).get();return s.exists?s.data():null;},'B2_AUTH_INSURER_CREATE_READBACK',30000);
   need(!!insurerCreated,'B2_AUTH_INSURER_CREATE_NOT_DURABLE');evidence.writes.synthetic+=1;
+  const physicalPortal=[].concat(insurerCreated.portales||[]).find(x=>String(x.id||'')===portalId)||null;
+  milestone('INSURER_PHYSICAL_CREATE_READBACK',{portalCount:[].concat(insurerCreated.portales||[]).length,portalFound:!!physicalPortal,portalId:String(physicalPortal?.id||''),credentialRef:String(physicalPortal?.credentialRef||'').slice(0,80),hasUsername:!!String(physicalPortal?.usuario||physicalPortal?.username||'')});
+  need(!!physicalPortal,'B2_AUTH_INSURER_PHYSICAL_PORTAL_MISSING');
   await page.waitForFunction(id=>!!(Orbit.store&&Orbit.store.get('aseguradoras',id)),insurerId,{timeout:15000});
+  const browserInsurer=await page.evaluate(({id,portalId})=>{
+    const a=Orbit.store?.get?.('aseguradoras',id)||{},portals=[].concat(a.portales||[]),p=portals.find(x=>String(x.id||'')===portalId)||null;
+    return{portalCount:portals.length,portalFound:!!p,portalId:String(p?.id||''),credentialRef:String(p?.credentialRef||'').slice(0,80),hasUsername:!!String(p?.usuario||p?.username||''),role:String(Orbit.session?.rol?.()||''),canView:!!Orbit.access?.can?.('aseguradoras','view'),canEdit:!!Orbit.access?.can?.('aseguradoras','edit'),credentialAccess:Orbit.aseguradorasOperationalAccess?.status?.()||null};
+  },{id:insurerId,portalId});
+  milestone('INSURER_BROWSER_CREATE_READBACK',browserInsurer);
+  need(browserInsurer.portalFound===true,'B2_AUTH_INSURER_BROWSER_PORTAL_MISSING:'+JSON.stringify(browserInsurer));
   await page.evaluate(()=>{ if(window.Orbit?.router?.go) Orbit.router.go('aseguradoras'); else location.hash='#/aseguradoras'; });
   await page.waitForFunction(()=>Orbit.route?.key==='aseguradoras'&&!!document.querySelector('#asg-q'),null,{timeout:10000});
   await page.evaluate(id=>Orbit.modules.aseguradoras.ficha(id),insurerId);
@@ -690,7 +699,27 @@ try{
   await page.waitForSelector('#asg-ficha #af-logo',{timeout:10000});
   await page.fill('#asg-ficha #af-logo',logoUrl);
   await page.click('#asg-ficha [data-tab="plataformas"]');
-  await page.waitForSelector('#asg-ficha [data-portal] [data-ppass]',{timeout:10000});
+  await page.waitForTimeout(500);
+  const portalUi=await page.evaluate(({portalId})=>{
+    const root=document.querySelector('#asg-ficha'),rows=[...document.querySelectorAll('#asg-ficha [data-portal]')],pass=[...document.querySelectorAll('#asg-ficha [data-portal] [data-ppass]')],tabs=[...document.querySelectorAll('#asg-ficha [data-tab]')];
+    return{
+      ficha:!!root,
+      editing:!!document.querySelector('#asg-ficha #af-guardar'),
+      activeTab:String(tabs.find(x=>x.classList.contains('active'))?.dataset?.tab||''),
+      portalRows:rows.length,
+      portalResourceIds:rows.map(x=>String(x.dataset.resourceId||'')),
+      passwordInputs:pass.length,
+      role:String(Orbit.session?.rol?.()||''),
+      canView:!!Orbit.access?.can?.('aseguradoras','view'),
+      canEdit:!!Orbit.access?.can?.('aseguradoras','edit'),
+      credentialAccess:Orbit.aseguradorasOperationalAccess?.status?.()||null,
+      storePortalFound:[].concat(Orbit.store?.get?.('aseguradoras',root?.dataset?.id)?.portales||[]).some(x=>String(x.id||'')===portalId),
+      body:String(root?.innerText||'').slice(0,2200)
+    };
+  },{portalId});
+  milestone('INSURER_PORTAL_UI_DISCRIMINANT',portalUi);
+  need(portalUi.portalRows>0,'B2_AUTH_INSURER_PORTAL_ROWS_MISSING:'+JSON.stringify(portalUi));
+  need(portalUi.passwordInputs>0,'B2_AUTH_INSURER_PASSWORD_INPUT_MISSING:'+JSON.stringify(portalUi));
   await page.fill('#asg-ficha [data-portal] [data-ppass]',syntheticSecret);
   let insurerReasonDialog=false;
   await page.click('#asg-ficha #af-guardar');
