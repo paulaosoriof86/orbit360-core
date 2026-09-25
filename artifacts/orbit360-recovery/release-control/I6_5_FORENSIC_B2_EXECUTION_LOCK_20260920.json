@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -239,10 +239,12 @@
     "artifactDigest": "8db1f391fa43dfb769d9ec1a8a287a1b69976095f971993bec201a3b88989a9b",
     "exactReadback": true,
     "functionalPass": true,
-    "livePromoted": false
+    "livePromoted": false,
+    "supersededByProductSourceChange": true,
+    "supersededReason": "R4 policy form helpers restored after authenticated runtime ReferenceError; new immutable build/readback required"
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "a9aac78c8700491b8e370a3c7335818595477223",
     "exactPreviewBuildId": "gi-i65-b2-a9aac78c8700-57f234755dc1",
@@ -1693,5 +1695,10 @@
     "noLive": true,
     "noB3": true,
     "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED"
+  },
+  "r4": {
+    "status": "CANDIDATE_PENDING_PREVIEW",
+    "compositionLockBlobSha": "2e8e4925e97afecf414da423e5e93325bd42f4f3",
+    "latestCausalFix": "B2_POLICY_FORM_HELPER_COMPOSITION_RESTORED"
   }
 }
