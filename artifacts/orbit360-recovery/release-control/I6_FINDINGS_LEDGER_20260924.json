@@ -1222,7 +1222,7 @@
       "id": "B2-R36-POLICY-VEHICLE-ROLE-VERSION-CONTEXT-R4",
       "surface": "Póliza/Vehículo",
       "rootCause": "Asesor veía acción mutante que no podía ejecutar y faltaba contexto de vigencia física.",
-      "remediation": "Linker consciente de rol y vigencia/Policy ID visible.",
+      "remediation": "Linker now applies canLink to visible UI: Asesor receives read-only state with no save action; header exposes vigency + Policy ID; versioned relation engine remains unchanged.",
       "requiredProof": "Asesor solo consulta; rol autorizado conserva vínculo versionado.",
       "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
       "block": "B2",
@@ -1347,6 +1347,7 @@
       "orbit360-platform/modules/aseguradoras.js",
       "orbit360-platform/index.html"
     ],
-    "previewIsolation": "OPS_AND_ASSET_SYNTHETIC_ONLY"
+    "previewIsolation": "OPS_AND_ASSET_SYNTHETIC_ONLY",
+    "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED"
   }
 }

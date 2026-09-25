@@ -2012,7 +2012,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "0b494c291b6701e83356365a94ee6eaf031a73bf",
+    "b2ExecutionLockBlobSha": "702fe0c9139b6c1260e7f1b271f51769651fb92a",
     "b2": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2180,7 +2180,8 @@
         "noDataReimport": true,
         "noLive": true,
         "noB3": true
-      }
+      },
+      "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2286,9 +2287,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "e071e92ee1be4f155860e26eabe0f3fcb370843f",
+    "compositionLockBlobSha": "c6ed93b89323445dc34e704ac6e4c53d5d7282db",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "175f367740492ec3726cd1977a9ddd6a5795bb11",
+    "findingLedgerBlobSha": "79a30b13ae0f15020a762253a283d8e394537e42",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",

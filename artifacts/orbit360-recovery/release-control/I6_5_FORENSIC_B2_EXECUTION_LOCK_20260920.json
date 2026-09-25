@@ -1671,8 +1671,8 @@
   "r4CumulativeSourceRemediation": {
     "status": "CANDIDATE_PENDING_PREVIEW",
     "parentHead": "d64ea08c583e1bd99652a1b42f7fd01403274b61",
-    "compositionLockBlobSha": "e071e92ee1be4f155860e26eabe0f3fcb370843f",
-    "findingLedgerBlobSha": "175f367740492ec3726cd1977a9ddd6a5795bb11",
+    "compositionLockBlobSha": "c6ed93b89323445dc34e704ac6e4c53d5d7282db",
+    "findingLedgerBlobSha": "79a30b13ae0f15020a762253a283d8e394537e42",
     "changedProductFiles": [
       "functions/product-ops-leads-domain.js",
       "orbit360-platform/core/config.js",
@@ -1691,6 +1691,7 @@
     "reportedPaymentSemantics": "DEFER_TO_B3_NO_CONFIRMED_COBRO_FABRICATION",
     "noDataReimport": true,
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED"
   }
 }

@@ -142,7 +142,7 @@
     "orbit360-platform/modules/equipo.js": "105b869445919802fb6e07d6120ace6a0772ec57",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "a9dc395a0764bca3ff8f04d1d211acc5f3d0b085",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "495c60d2103c65f031ccc1534cb3a097b87e2712",
-    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "5e31cfe4a848c8cd666319d17cfe86c458bfa119",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "65fbd39aab601e3432798e7bcae73eb1bc60cc8a",
     "orbit360-platform/product-runtime-config.js": "b03bd57e6c77b6204ce860b93ec4556b1cd3e4e7",
     "orbit360-platform/styles/base.css": "e12478531be5a80a8f72f1e18e59e4d1d8d9a3cd",
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
@@ -168,7 +168,7 @@
   ],
   "lastRemediation": {
     "origin": "PAULA_VISUAL_REVIEW_20260925_R4",
-    "parentHead": "d64ea08c583e1bd99652a1b42f7fd01403274b61",
+    "parentHead": "949c0ffd5703d823f4e96c50e7a466247d4a26a0",
     "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
     "changedProductFiles": [
       "functions/product-ops-leads-domain.js",
@@ -197,6 +197,7 @@
     "previewIsolation": [
       "orbit360ProductAssetUploadPreview",
       "orbit360OpsLeadsCommandPreview"
-    ]
+    ],
+    "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED"
   }
 }
