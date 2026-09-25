@@ -311,6 +311,10 @@ async function cleanupSynthetic(db,state){
     const ir=dataCol(db,'aseguradoras').doc(state.insurerId),is=await ir.get();
     if(is.exists){await ir.delete();n++;}
   }
+  if(state.managementId){
+    const mr=dataCol(db,'gestiones').doc(state.managementId),ms=await mr.get();
+    if(ms.exists){await mr.delete();n++;}
+  }
   if(state.logoAssetRef){
     try{await getStorage(app).bucket().file(state.logoAssetRef).delete({ignoreNotFound:true});n++;}catch{}
   }
@@ -376,6 +380,14 @@ try{
   milestone('SCOPE_OPERATIVO',{counts:oper.counts});
   await setRole(page,'Asesor');
   await sleep(500);
+  const asesorModules=await page.evaluate(()=>({comparativoVisible:!!Orbit.access?.puedeVerModulo?.('comparativo'),sidebar:Array.from(document.querySelectorAll('#sidebar [data-route]')).map(x=>x.getAttribute('data-route'))}));
+  need(asesorModules.comparativoVisible===true&&asesorModules.sidebar.includes('comparativo'),'B2_R4_AUTH_ASESOR_COMPARATIVO_MISSING:'+JSON.stringify(asesorModules));
+  evidence.modulePermissions={...(evidence.modulePermissions||{}),asesor:asesorModules};
+  const selfServiceManagementId='b2-ges-'+stamp.toLowerCase(); state.managementId=selfServiceManagementId;
+  const selfServiceResult=await bounded(page.evaluate(async ({id,stamp})=>Orbit.access.correction({id,titulo:'B2 R4 solicitud Ops '+stamp,nota:'Prueba sintética durable de autoservicio Asesor',asesorId:Orbit.access.actorAdvisorId(),origen:'B2 QA'}),{id:selfServiceManagementId,stamp}),'B2_R4_AUTH_OPS_SELF_SERVICE_TIMEOUT',30000);
+  need(selfServiceResult&&String(selfServiceResult.id)===selfServiceManagementId,'B2_R4_AUTH_OPS_SELF_SERVICE_NO_RESULT');
+  const selfServiceReadback=await waitFor(async()=>{const z=await dataCol(db,'gestiones').doc(selfServiceManagementId).get();return z.exists?z.data():null;},'B2_R4_AUTH_OPS_SELF_SERVICE_READBACK',30000);
+  need(!!selfServiceReadback,'B2_R4_AUTH_OPS_SELF_SERVICE_NOT_DURABLE'); evidence.writes.synthetic+=1; evidence.opsSelfService={durable:true,readback:true,idHash:hash(selfServiceManagementId)};
   const asesor=await bounded(scopeSnapshot(page),'B2_AUTH_SCOPE_ASESOR_TIMEOUT',20000);
   milestone('SCOPE_ASESOR',{counts:asesor.counts,leaks:asesor.leakCount});
   need(oper.scope==='all','B2_AUTH_OPERATIVO_SCOPE_NOT_ALL:'+JSON.stringify(oper));

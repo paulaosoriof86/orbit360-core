@@ -29,9 +29,21 @@ const files={
   domainConfig:read('orbit360-platform/core/tenant-domain-config-client.js'),
   credentialBackend:read('functions/product-insurer-credentials.js'),
   operationalBackend:read('functions/product-operational-domain.js'),
+  opsBackend:read('functions/product-ops-leads-domain.js'),
+  operationalStore:read('orbit360-platform/data/store-firestore-product-operational-p0.js'),
   index:read('orbit360-platform/index.html')
 };
 
+const asesorRoleSlice=files.config.slice(files.config.indexOf("'Asesor':"),files.config.indexOf("'Asistente':"));
+need(asesorRoleSlice.includes("'comparativo'"),'B2_R4_ASESOR_COMPARATIVO_BASE_MISSING');
+need(files.accessScope.includes('async function correction')&&files.accessScope.includes("insertDurable('gestiones'"),'B2_R4_OPS_CORRECTION_NOT_DURABLE');
+need(files.crmBridge.includes('await A.correction')&&files.crmBridge.includes('Solicitud creada y confirmada en Ops'),'B2_R4_CRM_FALSE_SUCCESS_NOT_CLOSED');
+need(files.bridge.includes('await A.correction')&&files.bridge.includes('Solicitud creada y confirmada en Ops'),'B2_R4_POLICY_FALSE_SUCCESS_NOT_CLOSED');
+need(files.opsBackend.includes('SELF_SERVICE_ROLES')&&files.opsBackend.includes('orbit360OpsLeadsCommandPreview')&&files.opsBackend.includes('canonicalReadback:true'),'B2_R4_OPS_SELF_SERVICE_PREVIEW_READBACK_MISSING');
+need(files.operationalStore.includes('WORKFLOW_PREVIEW_COMMAND')&&files.operationalStore.includes("action==='insert')requireServerReadback"),'B2_R4_OPS_PREVIEW_ROUTING_READBACK_MISSING');
+need(files.client.includes('registros históricos con esta placa')&&files.client.includes('vehicleShown'),'B2_R4_VEHICLE_HISTORY_PRESENTATION_MISSING');
+need(files.detail.includes('Tu rol activo es de consulta')&&files.detail.includes('Policy ID'),'B2_R4_POLICY_VEHICLE_CONTEXT_MISSING');
+need(files.insurers.includes('Preview protege las aseguradoras reales'),'B2_R4_INSURER_PREVIEW_TRUTH_MISSING');
 need(files.client.includes("Usa Guardar cambios o Cancelar"),'B2_CLIENT_EDIT_BACKDROP_GUARD_MISSING');
 need(!files.insurers.includes("title: 'Orbit Aseguradoras'")&&files.insurers.includes("title: 'Aseguradoras'"),'B2_ASEGURADORAS_VISIBLE_ORBIT_BRAND_REMAINS');
 need(!files.client.includes('<b>Orbit Finanzas</b>'),'B2_CLIENT360_VISIBLE_ORBIT_FINANZAS_REMAINS');
@@ -109,7 +121,7 @@ for(const role of ['Dirección','Admin','Comercial','Finanzas','Marketing','Oper
   need(slice.includes("'academia'"),'B2_ACADEMIA_ALL_ROLE_DEFAULT_MISSING:'+role);
 }
 new Function(files.academiaCatalog);new Function(files.academiaOwner);new Function(files.academia);
-for(const marker of ['core/config.js?v=20260923-b2a3','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260924-b2r1','core/product-app-p0.js?v=20260923-b2a1','core/tenant-domain-config-client.js?v=20260924-b2r2','core/access-scope.js?v=20260924-b2r2','core/policy-receipts-engine.js?v=20260924-b2r1','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260924-b2r2','modules/cliente360.js?v=20260924-b2r1','modules/aseguradoras.js?v=20260924-b2r2','modules/crm-v1198-operational-bridge.js?v=20260923-b2v4','modules/policy-receipts-v1199-bridge.js?v=20260924-b2r2','modules/policy-receipts-v1199-detail-guard.js?v=20260924-b2r2','core/product-insurer-credential-provider-p0.js?v=20260924-b2r2','core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260924-b2r2','modules/issuance-endosos-v1201-bridge.js?v=20260924-b2a6'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+for(const marker of ['core/config.js?v=20260925-b2r4','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260924-b2r1','core/product-app-p0.js?v=20260923-b2a1','core/tenant-domain-config-client.js?v=20260924-b2r2','core/access-scope.js?v=20260925-b2r4','core/policy-receipts-engine.js?v=20260924-b2r1','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260924-b2r2','modules/cliente360.js?v=20260925-b2r4','modules/aseguradoras.js?v=20260925-b2r4','modules/crm-v1198-operational-bridge.js?v=20260925-b2r4','modules/policy-receipts-v1199-bridge.js?v=20260925-b2r4','modules/policy-receipts-v1199-detail-guard.js?v=20260925-b2r4','core/product-insurer-credential-provider-p0.js?v=20260924-b2r2','core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260924-b2r2','modules/issuance-endosos-v1201-bridge.js?v=20260924-b2a6'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={

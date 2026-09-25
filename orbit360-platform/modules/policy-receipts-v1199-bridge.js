@@ -46,16 +46,15 @@ Orbit.modules = Orbit.modules || {};
     operacion_incompleta: 'La operación quedó marcada para revisión; no la repitas sin verificar.'
   };
   function errorText(errors) { return (errors || []).map(x => ERROR_LABELS[String(x).split(':')[0]] || String(x).replace(/_/g, ' ')).join(' · '); }
-  function requestCorrection(client, policyId, action) {
+  async function requestCorrection(client, policyId, action) {
     if (!client) return toast('Cliente no disponible');
-    A.correction('Gestión de póliza · ' + client.nombre, 'Solicitud desde Clientes 360: ' + action, { clienteId: client.id, polizaId: policyId || '', asesorId: client.asesorId });
-    toast('Gestión creada en Ops');
+    try {
+      await A.correction('Gestión de póliza · ' + client.nombre, 'Solicitud desde Clientes 360: ' + action, { clienteId: client.id, polizaId: policyId || '', asesorId: client.asesorId });
+      toast('Solicitud creada y confirmada en Ops');
+    } catch (e) {
+      toast(/PREVIEW_SYNTHETIC_ONLY/i.test(String(e && (e.message || e.code) || '')) ? 'Preview protege los datos reales: no se creó ninguna gestión.' : 'No fue posible crear la gestión. No se registró nada.');
+    }
   }
-  function scopedClients() { return A.filter('clientes', S().all('clientes') || [], 'cliente360'); }
-  function linkedInsurers(country) { return (S().all('aseguradoras') || []).filter(a => a.vinculada !== false && (a.pais === country || [].concat(a.paises || []).includes(country))); }
-  function ramos(country) { try { return Orbit.cat.ramosDe(country) || []; } catch (e) { return []; } }
-  function subramos(country, ramo) { try { return Orbit.cat.subramosDe(country, ramo) || []; } catch (e) { return []; } }
-  function money(cur, n) { return U.money ? U.money(+n || 0, cur || '') : (cur + ' ' + (+n || 0)); }
 
   function countryTaxPct(country) {
     try {

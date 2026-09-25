@@ -3629,7 +3629,7 @@ jobs:
           cp -a "$RUNNER_TEMP/b2-package/bundle/backend" "$FROOT/backend"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
           printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview"],"productionFunctionDeployed":false,"operationalBusinessWritesAuthorized":false}\n' "$GITHUB_SHA" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
       - name: Deploy exact B2 package to isolated Preview
         if: steps.mode.outputs.mode == 'preview'
@@ -3730,6 +3730,7 @@ jobs:
 
 
   i65-b2-authenticated-preview:
+    needs: i65-forensic-b2-preview
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -3740,7 +3741,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
           persist-credentials: true
       - uses: actions/setup-node@v4

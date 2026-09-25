@@ -558,35 +558,28 @@ Orbit.modules.cliente360 = (function () {
   }
 
   /* ---- Vehículos (detalle por póliza de auto) ---- */
+  function vehicleShown(v) {
+    const t=v==null?'':String(v).trim();
+    return (!t||/^(undefined|null|\[object Object\])$/i.test(t))?'—':t;
+  }
+  function vehiclePolicySort(v) {
+    const p=S().get('polizas',v.polizaId)||{};
+    return String(p.vigenciaFin||p.vigenciaInicio||'')+'|'+String(v.id||'');
+  }
   function tabVehiculos(cid, r) {
     const vs = q.vehiculosDe(cid);
-    if (!vs.length) return `<div class="card pad"><span class="muted">Este cliente no tiene vehículos asegurados. Los datos de vehículo aparecen aquí cuando hay pólizas de ramo Auto.</span></div>`;
-    return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">
-      ${vs.map(v => {
-        const p = S().get('polizas', v.polizaId);
-        return `<div class="card pad">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-            <span style="width:46px;height:46px;border-radius:11px;background:var(--red-soft);display:grid;place-items:center;font-size:22px">🚗</span>
-            <div><b style="font-family:var(--f-display);font-size:16px">${U.esc(v.marca)} ${U.esc(v.linea)}</b>
-            <div class="muted mono" style="font-size:12px">${U.esc(v.placa)} · ${v.anio}</div></div>
-            <span class="badge ${p && p.estado === 'Vigente' ? 'ok' : p && p.estado === 'Por renovar' ? 'warn' : 'neutral'}" style="margin-left:auto">${p ? p.estado : '—'}</span>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:12.5px">
-            ${vrow('Uso', v.uso)}${vrow('Color', v.color)}
-            ${vrow('Chasis (VIN)', v.chasis)}${vrow('Motor', v.motor)}
-            ${vrow('Suma asegurada', U.money(v.sumaAsegurada, p ? p.moneda : 'GTQ'))}${vrow('Póliza', p ? p.numero : '—')}
-          </div>
-          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${v.id}')">Ver vehículo</button>
-            <button class="btn ghost sm" onclick="Orbit.modules.cliente360.editarVehiculo&&Orbit.modules.cliente360.editarVehiculo('${v.id}')">Editar vehículo</button>
-            <button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${v.polizaId}')">Ver póliza</button>
-            <button class="btn ghost sm" onclick="Orbit.importa.open('polizas')">Importar documentos</button>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
+    if (!vs.length) return `<div class="card pad"><span class="muted">Este cliente no tiene vehículos asegurados.</span></div>`;
+    const groups = new Map();
+    vs.forEach(v=>{ const plate=vehicleShown(v.placa),key=plate==='—'?('id:'+String(v.id||'')):('plate:'+plate.toUpperCase()); if(!groups.has(key))groups.set(key,[]); groups.get(key).push(v); });
+    const cards=Array.from(groups.values()).map(records=>{
+      records.sort((a,b)=>vehiclePolicySort(b).localeCompare(vehiclePolicySort(a)));
+      const v=records[0],p=S().get('polizas',v.polizaId);
+      const history=records.length>1?`<details style="margin-top:12px"><summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--ink-2)">${records.length} registros históricos con esta placa</summary><div style="display:grid;gap:7px;margin-top:9px">${records.map(h=>{const hp=S().get('polizas',h.polizaId)||{};return `<div style="padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:12px"><b>${U.esc(vehicleShown(h.marca))} ${U.esc(vehicleShown(h.linea))} · ${U.esc(vehicleShown(h.placa))}</b><div class="muted">${U.esc(vehicleShown(hp.numero))} · ${U.fmtDate(hp.vigenciaInicio)} → ${U.fmtDate(hp.vigenciaFin)} · ${U.esc(vehicleShown(hp.estado))}</div><div class="muted mono">ID físico ${U.esc(String(h.id||''))}</div><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${h.id}')">Ver registro</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${h.polizaId}')">Ver póliza</button></div></div>`;}).join('')}</div></details>`:'';
+      return `<div class="card pad"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="width:46px;height:46px;border-radius:11px;background:var(--red-soft);display:grid;place-items:center;font-size:22px">🚗</span><div><b style="font-family:var(--f-display);font-size:16px">${U.esc(vehicleShown(v.marca))} ${U.esc(vehicleShown(v.linea))}</b><div class="muted mono" style="font-size:12px">${U.esc(vehicleShown(v.placa))} · ${U.esc(vehicleShown(v.anio))}</div></div><span class="badge ${p && p.estado === 'Vigente' ? 'ok' : p && p.estado === 'Por renovar' ? 'warn' : 'neutral'}" style="margin-left:auto">${p ? U.esc(vehicleShown(p.estado)) : '—'}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:12.5px">${vrow('Uso',v.uso)}${vrow('Color',v.color)}${vrow('Chasis (VIN)',v.chasis)}${vrow('Motor',v.motor)}${vrow('Suma asegurada',U.money(v.sumaAsegurada,p?p.moneda:'GTQ'))}${vrow('Póliza',p?p.numero:'—')}</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${v.id}')">Ver vehículo</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.editarVehiculo&&Orbit.modules.cliente360.editarVehiculo('${v.id}')">Editar vehículo</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${v.polizaId}')">Ver póliza</button><button class="btn ghost sm" onclick="Orbit.importa.open('polizas')">Importar documentos</button></div>${history}</div>`;
+    });
+    return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">${cards.join('')}</div>`;
   }
-  function vrow(k, v) { const t=v==null?'':String(v).trim(), shown=(!t||/^(undefined|null)$/i.test(t))?'—':t; return `<div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">${k}</div><div style="font-weight:500;margin-top:1px">${U.esc(shown)}</div></div>`; }
+  function vrow(k,v){return `<div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">${k}</div><div style="font-weight:500;margin-top:1px">${U.esc(vehicleShown(v))}</div></div>`; }
 
   /* ---- Recibos y cobros (filtro por póliza + confirmar cobro) ---- */
   let recPolFiltro = {};  // por cliente: polizaId seleccionada

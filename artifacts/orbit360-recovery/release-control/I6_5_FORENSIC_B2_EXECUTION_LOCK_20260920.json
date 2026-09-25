@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -33,6 +33,7 @@
     "allowedProductFiles": [
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
       "functions/product-insurer-credentials.js",
+      "functions/product-ops-leads-domain.js",
       "orbit360-platform/core/academia-product-catalog-p0.js",
       "orbit360-platform/core/access-scope.js",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
@@ -47,6 +48,7 @@
       "orbit360-platform/core/tenant-access-policy-contract-p0.js",
       "orbit360-platform/core/tenant-domain-config-client.js",
       "orbit360-platform/data/academia-product-catalog-v1.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
       "orbit360-platform/index.html",
       "orbit360-platform/modules/academia.js",
       "orbit360-platform/modules/aseguradoras.js",
@@ -240,7 +242,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "4389e74f73945992e0170d790d64121c975da72c",
     "exactPreviewBuildId": "gi-i65-b2-4389e74f7394-57f234755dc1",
@@ -1642,5 +1644,53 @@
     "productionAssetCallableDeployed": false,
     "authenticatedR3HarnessUpdated": true,
     "staleValidatorFixed": true
+  },
+  "humanReviewR4": {
+    "origin": "PAULA_VISUAL_REVIEW_20260925_R4",
+    "decision": "REJECTED_REMEDIATION_REQUIRED",
+    "reviewedPreviewSourceSha": "4389e74f73945992e0170d790d64121c975da72c",
+    "reviewedPreviewRunId": 36177410485,
+    "blockingFindingIds": [
+      "B2-R33-ASESOR-COMPARATIVO-AUTHORITY-R4",
+      "B2-R34-ASESOR-OPS-FALSE-SUCCESS-R4",
+      "B2-R35-VEHICLE-HISTORY-PROJECTION-R4",
+      "B2-R36-POLICY-VEHICLE-ROLE-VERSION-CONTEXT-R4",
+      "B2-R37-INSURER-LOGO-PREVIEW-ISOLATION-TRUTH-R4",
+      "B2-R38-RECEIPTS-HYDRATION-R4"
+    ],
+    "preservedPass": [
+      "ACADEMIA_28_102",
+      "POLICY_PREMIUM_HIERARCHY",
+      "Q006_TOLERANCE_WARNING",
+      "RECEIPT_PROVENANCE_COLLAPSED",
+      "RECEIPT_PLAN_EDIT"
+    ],
+    "noLive": true,
+    "noB3": true
+  },
+  "r4CumulativeSourceRemediation": {
+    "status": "CANDIDATE_PENDING_PREVIEW",
+    "parentHead": "d64ea08c583e1bd99652a1b42f7fd01403274b61",
+    "compositionLockBlobSha": "e071e92ee1be4f155860e26eabe0f3fcb370843f",
+    "findingLedgerBlobSha": "175f367740492ec3726cd1977a9ddd6a5795bb11",
+    "changedProductFiles": [
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/config.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/index.html"
+    ],
+    "workflowAuthSequencing": "PREVIEW_JOB_THEN_AUTH_BRANCH_TIP",
+    "previewOpsIsolation": "orbit360OpsLeadsCommandPreview@us-east1 synthetic-only",
+    "previewAssetIsolation": "orbit360ProductAssetUploadPreview@us-east1 synthetic-only",
+    "reportedPaymentSemantics": "DEFER_TO_B3_NO_CONFIRMED_COBRO_FABRICATION",
+    "noDataReimport": true,
+    "noLive": true,
+    "noB3": true
   }
 }

@@ -717,7 +717,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2012,9 +2012,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "8c303e4af3ac5e43776daac4626738e3dea9e2fb",
+    "b2ExecutionLockBlobSha": "0b494c291b6701e83356365a94ee6eaf031a73bf",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2041,7 +2041,7 @@
       "artifactId": 10882458863,
       "exactReadback": true,
       "functionalPass": true,
-      "authenticatedPreviewProof": "AUTHORIZED_PENDING_RUN",
+      "authenticatedPreviewProof": "PENDING_NEW_PREVIEW",
       "authenticatedPreviewProofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "orphanSyntheticCleanup": "PASS",
       "timedOutAuthenticatedRunId": 35556007094,
@@ -2154,6 +2154,32 @@
         "productionAssetCallableDeployed": false,
         "authenticatedR3HarnessUpdated": true,
         "staleValidatorFixed": true
+      },
+      "humanReviewR4": "REJECTED_REMEDIATION_REQUIRED",
+      "r4CumulativeSourceRemediation": {
+        "status": "CANDIDATE_PENDING_PREVIEW",
+        "parentHead": "d64ea08c583e1bd99652a1b42f7fd01403274b61",
+        "compositionLockBlobSha": "e071e92ee1be4f155860e26eabe0f3fcb370843f",
+        "findingLedgerBlobSha": "175f367740492ec3726cd1977a9ddd6a5795bb11",
+        "changedProductFiles": [
+          "functions/product-ops-leads-domain.js",
+          "orbit360-platform/core/config.js",
+          "orbit360-platform/core/access-scope.js",
+          "orbit360-platform/data/store-firestore-product-operational-p0.js",
+          "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+          "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "orbit360-platform/modules/cliente360.js",
+          "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "orbit360-platform/modules/aseguradoras.js",
+          "orbit360-platform/index.html"
+        ],
+        "workflowAuthSequencing": "PREVIEW_JOB_THEN_AUTH_BRANCH_TIP",
+        "previewOpsIsolation": "orbit360OpsLeadsCommandPreview@us-east1 synthetic-only",
+        "previewAssetIsolation": "orbit360ProductAssetUploadPreview@us-east1 synthetic-only",
+        "reportedPaymentSemantics": "DEFER_TO_B3_NO_CONFIRMED_COBRO_FABRICATION",
+        "noDataReimport": true,
+        "noLive": true,
+        "noB3": true
       }
     },
     "dashboardRealityGate": {
@@ -2260,15 +2286,15 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "79fa99882a1cf76097e704ab30cfecb2d4573805",
+    "compositionLockBlobSha": "e071e92ee1be4f155860e26eabe0f3fcb370843f",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "7e15aebf8ef5429ede6ef36bd4f459044acd8884",
+    "findingLedgerBlobSha": "175f367740492ec3726cd1977a9ddd6a5795bb11",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
     "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
-    "productFileCount": 53,
+    "productFileCount": 54,
     "rootCause": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
     "definitiveFix": "SINGLE_MACHINE_AUTHORITATIVE_EXACT_SET_AND_BLOB_BOUND_COMPOSITION",
     "atomicManifestWithSourceRequired": true,
@@ -2282,7 +2308,7 @@
     "workflowPreflightAggregationInstalled": true,
     "preservePassEvidence": true,
     "prohibitProductMutationForHarnessOnlyFailure": true,
-    "nextAction": "R3_BUILD_PREVIEW_EXACT_READBACK_AUTHENTICATED_DISCRIMINANTS"
+    "nextAction": "R4_BUILD_PREVIEW_THEN_AUTHENTICATED_DISCRIMINANTS_IN_SAME_WORKFLOW_CHAIN"
   },
   "r3AuthenticatedDispatch": {
     "requestedAt": "2026-09-25T13:06:00-06:00",
@@ -2293,5 +2319,24 @@
     "productSourceMutation": false,
     "livePromotion": false,
     "b3Advance": false
+  },
+  "paulaVisualReview20260925R4": {
+    "decision": "REJECTED_REMEDIATION_REQUIRED",
+    "reviewedSourceSha": "4389e74f73945992e0170d790d64121c975da72c",
+    "reviewedRunId": 36177410485,
+    "findingIds": [
+      "B2-R33-ASESOR-COMPARATIVO-AUTHORITY-R4",
+      "B2-R34-ASESOR-OPS-FALSE-SUCCESS-R4",
+      "B2-R35-VEHICLE-HISTORY-PROJECTION-R4",
+      "B2-R36-POLICY-VEHICLE-ROLE-VERSION-CONTEXT-R4",
+      "B2-R37-INSURER-LOGO-PREVIEW-ISOLATION-TRUTH-R4",
+      "B2-R38-RECEIPTS-HYDRATION-R4"
+    ],
+    "carryToB3": [
+      "B3-CARRY-REPORTED-PAYMENT-PRESENTATION-R4"
+    ],
+    "b2": "OPEN",
+    "b3": "NOT_STARTED",
+    "livePromoted": false
   }
 }

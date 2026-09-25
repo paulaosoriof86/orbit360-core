@@ -500,10 +500,8 @@ Orbit.access = (function () {
     }
     return row;
   }
-  function correction(a, b, c) {
-    var entry = (a && typeof a === 'object' && arguments.length === 1) ? Object.assign({}, a) : {
-      titulo: a || 'Corrección de datos', nota: b || '', refs: c || {}
-    };
+  async function correction(a, b, c) {
+    var entry = (a && typeof a === 'object' && arguments.length === 1) ? Object.assign({}, a) : { titulo: a || 'Corrección de datos', nota: b || '', refs: c || {} };
     var actor = actorUser() || {};
     var g = Object.assign({
       lista: 'Gestiones Admin', tipo: 'Corrección de datos',
@@ -512,12 +510,12 @@ Orbit.access = (function () {
       origen: 'Solicitud de corrección', asesorId: actor.asesorId || '',
       solicitadoPor: actor.nombre || '', tenantId: tenantId(), creado: today()
     }, entry.refs || {}, entry);
-    try { if (Orbit.ciclo && Orbit.ciclo.crearGestion) return Orbit.ciclo.crearGestion(g); } catch (e) {}
-    try {
-      g.id = g.id || 'ges_' + Date.now().toString(36);
-      S().insert('gestiones', g);
-      return g;
-    } catch (e) { return null; }
+    g.id = g.id || 'ges_' + Date.now().toString(36);
+    var store = S();
+    if (!store || typeof store.insertDurable !== 'function') throw new Error('OPS_CORRECTION_DURABLE_OWNER_MISSING');
+    var persisted = await store.insertDurable('gestiones', g);
+    if (!persisted || clean(persisted.id) !== clean(g.id)) throw new Error('OPS_CORRECTION_DURABLE_READBACK_MISSING');
+    return persisted;
   }
 
   function scopedStore(moduleKey) {

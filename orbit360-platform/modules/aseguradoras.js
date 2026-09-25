@@ -499,6 +499,7 @@ Orbit.modules.aseguradoras = (function () {
       const bytes = new Uint8Array(await st.logoFile.arrayBuffer());
       let binary = ''; for (let i=0;i<bytes.length;i+=0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i,Math.min(i+0x8000,bytes.length)));
       const previewHost = /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location && location.hostname || ''));
+      if (previewHost && !/^b2-asg-[a-z0-9-]+$/i.test(id)) { U.toast('Preview protege las aseguradoras reales: puedes previsualizar el archivo, pero no se guardará hasta la promoción. La persistencia se valida con una aseguradora sintética B2.'); return; }
       const assetCallable = previewHost ? 'orbit360ProductAssetUploadPreview' : 'orbit360ProductAssetUpload';
       const assetRegion = previewHost ? 'us-east1' : 'us-central1';
       const uploaded = await provider.callFunction(assetCallable,{tenantId:tenantId(),activeRole:(Orbit.session&&Orbit.session.rol&&Orbit.session.rol())||'',insurerId:id,fileName:st.logoFile.name,mimeType:st.logoFile.type,base64:btoa(binary)},assetRegion);

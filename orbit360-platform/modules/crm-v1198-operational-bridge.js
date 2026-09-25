@@ -368,8 +368,14 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
         else { const p = baseStore().get('polizas', id); client = p && baseStore().get('clientes', p.clienteId); }
         if (!client || !A.canView('clientes', client, 'cliente360')) return toast('Registro fuera de tu alcance');
         if (!A.can('polizas', 'edit')) {
-          U.confirm('No puedes modificar pólizas. ¿Crear una gestión de corrección?', { title: 'Solicitar gestión', ok: 'Crear gestión' }).then(ok => {
-            if (ok) { A.correction('Gestión de póliza · ' + client.nombre, 'Solicitud desde Clientes 360: ' + name, { clienteId: client.id, polizaId: name === 'nuevaPoliza' ? '' : id, asesorId: client.asesorId }); toast('Gestión creada en Ops'); }
+          U.confirm('No puedes modificar pólizas. ¿Crear una gestión de corrección?', { title: 'Solicitar gestión', ok: 'Crear gestión' }).then(async ok => {
+            if (!ok) return;
+            try {
+              await A.correction('Gestión de póliza · ' + client.nombre, 'Solicitud desde Clientes 360: ' + name, { clienteId: client.id, polizaId: name === 'nuevaPoliza' ? '' : id, asesorId: client.asesorId });
+              toast('Solicitud creada y confirmada en Ops');
+            } catch (e) {
+              toast(/PREVIEW_SYNTHETIC_ONLY/i.test(String(e && (e.message || e.code) || '')) ? 'Preview protege los datos reales: no se creó ninguna gestión.' : 'No fue posible crear la gestión. No se registró nada.');
+            }
           });
           return;
         }

@@ -8,6 +8,7 @@
   var VERSION='fase-a-i2-product-operational-write-20260923.2-server-receipt';
   var GENERAL_COMMAND='orbit360ProductOperationalCommand';
   var WORKFLOW_COMMAND='orbit360OpsLeadsCommand';
+  var WORKFLOW_PREVIEW_COMMAND='orbit360OpsLeadsCommandPreview';
   var SERVER_EMISSION_GUARD='__ORBIT_SERVER_EMISSION_PENDING__';
   var base=null, facade=null, provider=null, installed=false;
   var listeners=[], pending={}, deleted={}, prefOverlay={};
@@ -54,8 +55,9 @@
     var moduleKey=moduleFor(collection);
     if(sensitiveInsurerPatch(collection,row))error('PRODUCT_WRITE_SECURE_INSURER_OWNER_REQUIRED');
     if(!Orbit.access||typeof Orbit.access.can!=='function')error('PRODUCT_WRITE_ACCESS_OWNER_MISSING');
-    var accessAction=action==='insert'?'create':'edit';
-    if(Orbit.access.can(moduleKey,accessAction)!==true)error('PRODUCT_WRITE_ACCESS_DENIED');
+    var accessAction=action==='insert'?'create':'edit',m=member(),activeRole=text(m.activeRole).toLowerCase();
+    var advisorSelfService=collection==='gestiones'&&action==='insert'&&/asesor|comercial/.test(activeRole)&&text(row&&row.asesorId)===text(m.advisorId);
+    if(!advisorSelfService&&Orbit.access.can(moduleKey,accessAction)!==true)error('PRODUCT_WRITE_ACCESS_DENIED');
     if(row&&typeof Orbit.access.canAccessRecord==='function'&&Orbit.access.canAccessRecord(row,moduleKey,{collection:collection})!==true)error('PRODUCT_WRITE_RECORD_SCOPE_DENIED');
     return true;
   }
@@ -115,6 +117,9 @@
     }
     return'';
   }
+  function isB2PreviewHost(){
+    try{return /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location&&location.hostname||''));}catch(e){return false;}
+  }
   function workflowReason(operation,prior,row){
     if(operation==='transition_business')return'Transición de negocio '+text(prior&&prior.etapa)+' → '+text(row&&row.etapa);
     if(operation==='create_business')return'Creación de negocio desde Orbit.store';
@@ -135,11 +140,12 @@
       if(workflow){
         var operation=workflowOperation(action,collection,prior,payload||prior||{});
         if(!operation)throw new Error('PRODUCT_WRITE_WORKFLOW_OPERATION_UNRESOLVED');
-        return p.callFunction(WORKFLOW_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,operation:operation,entityId:id,payload:clone(payload)||{},reason:workflowReason(operation,prior,payload)},'us-central1');
+        var previewWorkflow=isB2PreviewHost();
+        return p.callFunction(previewWorkflow?WORKFLOW_PREVIEW_COMMAND:WORKFLOW_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,operation:operation,entityId:id,payload:clone(payload)||{},reason:workflowReason(operation,prior,payload)},previewWorkflow?'us-east1':'us-central1');
       }
       return p.callFunction(GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[{action:action,collection:collection,id:id,payload:action==='remove'?null:clone(payload)}]},'us-central1');
     }).then(function(result){
-      if(!workflow)requireServerReadback(result,[{collection:collection,id:id,action:action}]);
+      if(!workflow||action==='insert')requireServerReadback(result,[{collection:collection,id:id,action:action}]);
       state.pending=Math.max(0,state.pending-1);state.committed+=1;state.lastCommittedAt=new Date().toISOString();state.lastError='';
       if(collection==='negocios'&&result&&result.projection&&text(result.projection.clientId)&&pending[collection]&&pending[collection][id]&&pending[collection][id].clienteIdCreado===SERVER_EMISSION_GUARD){pending[collection][id].clienteIdCreado=text(result.projection.clientId);pending[collection][id].clienteId=pending[collection][id].clienteId||text(result.projection.clientId);}
       try{window.dispatchEvent(new CustomEvent('orbit:operational-write:committed',{detail:{collection:collection,id:id,action:action,version:VERSION,serverOwned:true,canonicalReadback:!workflow}}));}catch(e){}
