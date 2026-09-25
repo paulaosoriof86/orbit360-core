@@ -374,6 +374,7 @@ try{
       sidebar:Array.from(document.querySelectorAll('#sidebar [data-route]')).map(x=>x.getAttribute('data-route'))
     };
   },accessHydration);
+  // stamp is initialized before the role-scope/self-service proof because that proof uses it.
   milestone('OPERATIVO_ACCESS_AUTHORITY',operativoModules);
   need(operativoModules.cotizador.visible===true&&operativoModules.comparativo.visible===true&&operativoModules.sidebar.includes('cotizador')&&operativoModules.sidebar.includes('comparativo'),'B2_AUTH_OPERATIVO_CONFIGURED_MODULES_NOT_VISIBLE:'+JSON.stringify(operativoModules));
   const oper=await bounded(scopeSnapshot(page),'B2_AUTH_SCOPE_OPERATIVO_TIMEOUT',20000);
