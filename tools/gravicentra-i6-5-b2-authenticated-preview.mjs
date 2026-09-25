@@ -695,8 +695,31 @@ try{
   await page.waitForFunction(()=>Orbit.route?.key==='aseguradoras'&&!!document.querySelector('#asg-q'),null,{timeout:10000});
   await page.evaluate(id=>Orbit.modules.aseguradoras.ficha(id),insurerId);
   await page.waitForSelector('#asg-ficha #af-editar',{timeout:10000});
+  await page.evaluate(()=>{
+    window.__b2AsgEditTrace=[];
+    const snap=label=>window.__b2AsgEditTrace.push({label,t:Date.now(),hash:String(location.hash||''),route:String(Orbit.route?.key||''),editButton:!!document.querySelector('#asg-ficha #af-editar'),saveButton:!!document.querySelector('#asg-ficha #af-guardar'),cancelButton:!!document.querySelector('#asg-ficha #af-cancelar'),logoDisabled:!!document.querySelector('#asg-ficha #af-logo')?.disabled});
+    snap('before-click');
+    try{
+      window.__b2AsgStoreUnsub=Orbit.store?.on?.('*',collection=>{snap('store:'+String(collection||'*'));});
+    }catch(e){}
+    const host=document.querySelector('#host');
+    if(host&&window.MutationObserver){
+      window.__b2AsgObserver=new MutationObserver(()=>snap('mutation'));
+      window.__b2AsgObserver.observe(host,{childList:true,subtree:true});
+    }
+  });
   await page.click('#asg-ficha #af-editar');
-  await page.waitForSelector('#asg-ficha #af-logo',{timeout:10000});
+  const editEntered=await page.waitForSelector('#asg-ficha #af-guardar',{timeout:5000}).then(()=>true).catch(()=>false);
+  await page.waitForTimeout(2200);
+  const editTrace=await page.evaluate(()=>{
+    const out={trace:(window.__b2AsgEditTrace||[]).slice(-80),final:{editButton:!!document.querySelector('#asg-ficha #af-editar'),saveButton:!!document.querySelector('#asg-ficha #af-guardar'),cancelButton:!!document.querySelector('#asg-ficha #af-cancelar'),logoDisabled:!!document.querySelector('#asg-ficha #af-logo')?.disabled,hash:String(location.hash||''),route:String(Orbit.route?.key||'')}};
+    try{window.__b2AsgStoreUnsub?.();}catch(e){}
+    try{window.__b2AsgObserver?.disconnect();}catch(e){}
+    return out;
+  });
+  milestone('INSURER_EDIT_TRANSITION_TRACE',{editEntered,final:editTrace.final,trace:editTrace.trace.slice(-30)});
+  need(editEntered===true,'B2_AUTH_INSURER_EDIT_NEVER_ENTERED:'+JSON.stringify(editTrace));
+  need(editTrace.final.saveButton===true,'B2_AUTH_INSURER_EDIT_LOST_AFTER_ENTRY:'+JSON.stringify(editTrace));
   await page.fill('#asg-ficha #af-logo',logoUrl);
   await page.click('#asg-ficha [data-tab="plataformas"]');
   await page.waitForTimeout(500);
