@@ -4133,3 +4133,72 @@ jobs:
           if-no-files-found: warn
           compression-level: 0
           retention-days: 30
+
+  i65-b2-r3-oscar-readonly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate R3 relationship audit
+        id: gate
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL));
+          const b=JSON.parse(fs.readFileSync(process.env.B2_LOCK));
+          const run=b.status==='OPEN_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
+            && c.i65ForensicRemediationPlan?.currentBlock==='B2'
+            && b.boundaries?.dataMutationAuthorized===false
+            && b.boundaries?.reimportAuthorized===false
+            && b.boundaries?.liveHostingPromotionAuthorized===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B2_R3_RELATIONSHIP_AUDIT_MODE='+(run?'READ_ONLY':'NOOP'));
+          NODE
+      - name: Prepare read-only Firebase authority
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+          ROOT="$RUNNER_TEMP/b2-r3-readonly"; mkdir -p "$ROOT"; export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key') and d.get('client_email'):
+                  p=pathlib.Path(os.environ['ROOT'])/'sa.json'; p.write_text(json.dumps(d)); p.chmod(0o600); break
+          else: raise SystemExit('B2_R3_NO_FIREBASE_AUTHORITY')
+          PY
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$ROOT/sa.json" >> "$GITHUB_ENV"
+      - name: Execute Oscar policy vehicle read-only audit
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B2_R3_RELATION_AUDIT_OUT: ${{ runner.temp }}/b2-r3-oscar-relationship-readonly.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b2-r3-oscar-relationship-readonly.mjs | tee "$RUNNER_TEMP/b2-r3-oscar-relationship-readonly.log"
+      - name: Upload privacy-safe R3 relationship evidence
+        if: always() && steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-r3-oscar-readonly-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b2-r3-oscar-relationship-readonly.json
+            ${{ runner.temp }}/b2-r3-oscar-relationship-readonly.log
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
