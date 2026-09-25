@@ -19,11 +19,27 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 51,
+    "total": 52,
     "b2HumanFindings": 13,
-    "currentBlocking": 23
+    "currentBlocking": 24
   },
   "findings": [
+    {
+      "id": "B2-R22-PREVIEW-CREDENTIAL-VAULT-CROSSREAD",
+      "block": "B2",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36160736564",
+      "finding": "PREVIEW_CREDENTIAL_CALLABLE_DEPENDED_ON_PRODUCTION_SECRET_VAULT",
+      "owner": [
+        "functions/product-insurer-credentials.js",
+        "orbit360-platform/core/product-insurer-credential-provider-p0.js"
+      ],
+      "rootCause": "readEffectiveVault(preview) merged production+preview, and preview import used production as fallback base. The isolated Preview callable therefore required production Secret Manager read access, contradicting isolation and causing functions/unavailable before any insurer metadata write.",
+      "remediation": "Preview scope reads/writes preview vault only; production scope remains production-only. Exact authenticated proof must save logo+password, receive cred_* mapping, reveal hash-match from preview vault, cleanup preview secret record, and leave LIVE untouched.",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_AND_AUTHENTICATED_PASS",
+      "blocking": true,
+      "closureProof": "New immutable B2 Preview: credential import PASS, insurer durable update PASS, logo reload PASS, reveal hash-match PASS, preview cleanup PASS, LIVE untouched.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "B2-QA-22-INSURER-PROMPT-BINDING",
       "block": "B2",
@@ -435,12 +451,21 @@
       "finding": "SECURE_CREDENTIAL_PASSWORD_UPDATE_FAILS",
       "surface": "Aseguradoras",
       "owner": "functions/product-insurer-credentials.js + product-insurer-credential-provider-p0.js + aseguradoras.js",
-      "rootCause": "The B2 Preview host gi-i65-b2-* was not recognized as a certified Preview by the product credential provider, so the human flow selected the production callable rather than the isolated Preview callable. Aseguradoras also depended indirectly on the directory-import abstraction.",
-      "remediation": "Recognize i65 B1-B4 Preview hosts; route password updates through direct product-owned importCredentials; keep Preview secrets isolated and cleanup mandatory.",
-      "status": "ROOT_CAUSE_REFINED_SOURCE_FIXED_EXACT_PREVIEW_PROOF_PENDING",
+      "rootCause": "The human flow now reaches the isolated Preview callable correctly, but the Preview callable itself read the production Secret Manager vault before importing into the preview vault. That cross-environment dependency returned functions/unavailable ('No fue posible consultar la bóveda segura') and aborted Aseguradoras save before logo/credential readback. This violated Preview isolation.",
+      "remediation": "Make preview credential operations use only the preview Secret Manager vault. Production callable remains unchanged. Rebuild immutable B2 Preview, run authenticated logo+password save/reveal/cleanup, and require exact readback.",
+      "status": "ROOT_CAUSE_DEMONSTRATED_SOURCE_FIXED_PENDING_NEW_PREVIEW",
       "blocking": true,
       "closureProof": "Authenticated Operativo synthetic insurer password update -> credentialRef readback -> refresh/reveal hash match -> Preview secret cleanup; no plaintext/log/artifact.",
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "evidence": {
+        "runId": 36160736564,
+        "errorCode": "functions/unavailable",
+        "errorMessage": "No fue posible consultar la bóveda segura.",
+        "operation": "import",
+        "callable": "orbit360ProductInsurerCredentialCommandPreview",
+        "region": "us-east1",
+        "productionTouched": false
+      }
     },
     {
       "id": "B2-H12",

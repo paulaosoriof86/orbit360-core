@@ -717,7 +717,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1946,7 +1946,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_EXACT_AUTH_RERUN_PROMPT_BOUND_TO_OWN_OVERLAY",
+    "mechanismSyncStatus": "B2_R22_PREVIEW_CREDENTIAL_ISOLATION_FIX_PENDING_NEW_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2012,9 +2012,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "afbc86a8f4a64614e833d8db911b3e69ff55b89f",
+    "b2ExecutionLockBlobSha": "e5ed3c3d6623d30409382add46f5c974a650700f",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2110,7 +2110,9 @@
       "lastAuthenticatedFailure": "HARNESS_ASEGURADORAS_ROUTE_RACE",
       "rootCauseR20": "ASEGURADORAS_ASYNC_KNOWLEDGE_REFRESH_DROPS_EDIT_STATE",
       "authenticatedPreviewArm": "RERUN_EXACT_FE140_PROMPT_SCOPED",
-      "rootCauseR21": "ASEGURADORAS_DEEPLINK_RERENDER_DROPS_EDIT_STATE"
+      "rootCauseR21": "ASEGURADORAS_DEEPLINK_RERENDER_DROPS_EDIT_STATE",
+      "insurerCredentialRootCause": "PREVIEW_CALLABLE_CROSS_READ_PRODUCTION_VAULT",
+      "insurerCredentialIsolationFix": "SOURCE_FIXED_PENDING_NEW_PREVIEW"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2216,9 +2218,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "8d47729e0820f8e8981b30525f5794f242136b34",
+    "compositionLockBlobSha": "947c65a4fda9a9137b8c812d7bb1c88497156396",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "2d5e6592e13e8769fc08750bd593b1298c26e6c6",
+    "findingLedgerBlobSha": "5c004168bf5012a386e620cdf05de486d57b58dd",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "c2e26b6753ea636dc20496da2eb0421d1e952fbc",
     "activeBlock": "B2",

@@ -95,7 +95,7 @@
   "productFileBlobs": {
     "functions/bootstrap.js": "5b1a04617e6be3cf68d7d923862abcf0174fe8fb",
     "functions/package.json": "bfa00e1b1b0349251fe853d2fa3cea00a8ae9366",
-    "functions/product-insurer-credentials.js": "231e1724771ba1f0f93b6807b74b061e1ea5df0b",
+    "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "83750fd2d0b10402b5ebcf646c532bf68e857cd6",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "e4b602b4abb26fcd3d9413b1ab9bb67998be78dd",
@@ -182,7 +182,7 @@
     "noReimport": true,
     "livePromotion": false,
     "recordedAt": "2026-09-25",
-    "rootCauseExtension": "ASEGURADORAS_DEEPLINK_RERENDER_DROPS_EDIT_STATE",
+    "rootCauseExtension": "PREVIEW_CREDENTIAL_CALLABLE_READS_PRODUCTION_VAULT",
     "accessAuthorityFixes": [
       "PROTECTED_CONFIG_HYDRATION_PROVEN_WORKING",
       "SPARSE_ROLE_PERMISSION_OVERRIDES_ARE_MERGED_OVER_COMPLETE_UI_DEFAULT_MATRIX",
@@ -196,6 +196,12 @@
       "CREDENTIAL_DRAFTS_PRESERVED_ACROSS_OWNER_REFRESH",
       "ORDINARY_FICHA_OPEN_BEHAVIOR_UNCHANGED",
       "MODULE_RENDER_DEEPLINK_REOPEN_PRESERVES_ACTIVE_EDIT_STATE"
+    ],
+    "insurerCredentialIsolationFix": [
+      "PREVIEW_IMPORT_NO_LONGER_READS_PRODUCTION_SECRET",
+      "PREVIEW_REVEAL_STATUS_COPY_USE_PREVIEW_VAULT_ONLY",
+      "PRODUCTION_CALLABLE_UNCHANGED",
+      "PREVIEW_SECRET_CLEANUP_REMAINS_MANDATORY"
     ]
   }
 }

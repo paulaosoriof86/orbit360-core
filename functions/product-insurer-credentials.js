@@ -48,9 +48,11 @@ async function readVaultScope(t,scope){
   }
 }
 async function readEffectiveVault(t,scope){
-  if(scope!=='preview')return readVaultScope(t,'production');
-  const rows=await Promise.all([readVaultScope(t,'production'),readVaultScope(t,'preview')]),base=rows[0],overlay=rows[1];
-  return Object.assign({},base,{schemaVersion:VERSION,tenantId:t,records:Object.assign({},base.records||{},overlay.records||{})});
+  // Preview is intentionally isolated. Never read or merge production credentials
+  // from a Preview callable; this both preserves isolation and avoids coupling the
+  // Preview proof to production Secret Manager IAM.
+  if(scope==='preview')return readVaultScope(t,'preview');
+  return readVaultScope(t,'production');
 }
 async function ensureSecret(t,scope){
   try{
@@ -104,7 +106,7 @@ async function execute(request,auditMode){
   if(op==='import'){
     const items=[].concat(d.items||[]);
     if(!items.length||items.length>100)throw new HttpsError('invalid-argument','Cantidad de credenciales inválida.');
-    const vault=await readVaultScope(t,scope),base=scope==='preview'?await readVaultScope(t,'production'):vault,mappings=[];
+    const vault=await readVaultScope(t,scope),base=vault,mappings=[];
     for(const item of items){
       const insurerId=text(item.insurerId,160),portalId=text(item.portalId||item.resourceId,160),username=text(item.username,320),password=text(item.password,512);
       if(!insurerId||!portalId||(!username&&!password))throw new HttpsError('invalid-argument','Credencial incompleta.');

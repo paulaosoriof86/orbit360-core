@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1454,20 +1454,22 @@
     "PAULA_VISUAL_NO_DUPLICATE_VEHICLE_ACTIONS"
   ],
   "lastAuthenticatedFailure": {
-    "runId": 36073128460,
-    "classification": "HARNESS_ROUTE_RACE_NOT_PRODUCT_REGRESSION",
-    "cause": "GENERIC_HOST_PAGE_MARKER_MATCHED_STALE_CLIENTE360_BEFORE_ASEGURADORAS_RENDER",
+    "runId": 36160736564,
+    "classification": "PRODUCT_BACKEND_PREVIEW_ISOLATION_DEFECT",
+    "cause": "PREVIEW_CREDENTIAL_CALLABLE_READ_PRODUCTION_SECRET_VAULT_AND_RETURNED_FUNCTIONS_UNAVAILABLE",
     "passedBeforeFailure": [
       "ACCESS_RECOVERY_PASS",
       "OPERATIVO_COTIZADOR_COMPARATIVO_PASS",
+      "ACTIVE_ROLE_SCOPE_LEAK_ZERO",
       "R2_UI_DISCRIMINANTS_PASS",
       "POLICY_EDIT_RELOAD_PASS",
-      "VEHICLE_EDIT_RELOAD_PASS"
+      "VEHICLE_EDIT_RELOAD_PASS",
+      "INSURER_EDIT_MODE_AND_PASSWORD_INPUT_PASS"
     ],
-    "cleanupDeleted": 13,
-    "productRegressionDeclared": false,
+    "productionTouched": false,
     "liveHostingTouched": false,
-    "reimport": false
+    "reimport": false,
+    "cleanupDeleted": 13
   },
   "accessConfigRecoveryState": "RETRY_AUTHORIZED_AFTER_PHYSICAL_SCOPE_OMISSION_DEMONSTRATED",
   "lastAccessRecoveryAttempt": {
@@ -1498,5 +1500,11 @@
     "sourceBlobAfter": "086a5d828b572b35e2fee0b5dab8cb04dc9fed53",
     "liveTouched": false,
     "reimport": false
+  },
+  "insurerCredentialIsolation": {
+    "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
+    "previewReadsProductionVault": false,
+    "productionCallableBehaviorChanged": false,
+    "previewSecretCleanupRequired": true
   }
 }
