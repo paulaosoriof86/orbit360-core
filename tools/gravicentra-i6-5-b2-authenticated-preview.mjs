@@ -458,7 +458,7 @@ try{
       const h2s=h2?getComputedStyle(h2):null, h3s=h3?getComputedStyle(h3):null;
       result.receiptHierarchy={h2Size:h2s?parseFloat(h2s.fontSize):0,h2Weight:h2s?parseInt(h2s.fontWeight,10):0,sectionSize:h3s?parseFloat(h3s.fontSize):0,sectionWeight:h3s?parseInt(h3s.fontWeight,10):0};
       result.receiptEditPlan=Array.from(root?.querySelectorAll('button')||[]).some(x=>/Editar plan de recibos/i.test(String(x.textContent||'')));
-      result.receiptHasEmoji=/🧾/.test(String(root?.innerText||''))&&/🔎/.test(String(root?.innerText||''))&&/📎/.test(String(root?.innerText||''));
+      result.receiptVisualContract=/Recibos y cartera/i.test(String(root?.innerText||''))&&/Editar plan de recibos/i.test(String(root?.innerText||''));
     }
     const policies=(Orbit.store?.all?.('polizas')||[]).filter(Boolean),vehicles=(Orbit.store?.all?.('vehiculos')||[]).filter(Boolean);
     const candidate=policies.find(p=>{
@@ -472,14 +472,14 @@ try{
       Orbit.modules?.cliente360?.verPoliza?.(candidate.id);
       await wait(700);
       const warning=String(document.querySelector('[data-policy-fullpage="1"] .gi-integrity-warning')?.innerText||'');
-      result.unlinkedVehicleCase={applicable:true,policyId:String(candidate.id||''),warning,truthful:/pendiente de vincular a esta póliza/i.test(warning)&&/No se vinculará automáticamente/i.test(warning)&&/Revisar vehículos del cliente/i.test(warning)};
+      result.unlinkedVehicleCase={applicable:true,policyId:String(candidate.id||''),warning,truthful:/pendiente de vincular a esta póliza/i.test(warning)&&/no se fusionan ni se vinculan automáticamente/i.test(warning)&&/Vincular vehículo a esta póliza/i.test(warning)};
     }else result.unlinkedVehicleCase={applicable:false};
     return result;
   },visualAudit.sample),'B2_AUTH_R2_UI_DISCRIMINANTS_TIMEOUT',30000);
   need(r2Ui.clientVehicleFullDuplicateCount===0&&r2Ui.injectedLegacyVehicleButtons===0,'B2_AUTH_DUPLICATE_VEHICLE_ACTIONS_REMAIN:'+JSON.stringify(r2Ui));
   need(r2Ui.policyHierarchy?.h2Size>=22&&r2Ui.policyHierarchy?.h2Weight>=700&&r2Ui.policyHierarchy?.sectionSize>=15&&r2Ui.policyHierarchy?.sectionWeight>=700,'B2_AUTH_POLICY_HIERARCHY_WEAK:'+JSON.stringify(r2Ui.policyHierarchy));
   need(r2Ui.receiptHierarchy?.h2Size>=22&&r2Ui.receiptHierarchy?.h2Weight>=700&&r2Ui.receiptHierarchy?.sectionSize>=16&&r2Ui.receiptHierarchy?.sectionWeight>=700,'B2_AUTH_RECEIPT_HIERARCHY_WEAK:'+JSON.stringify(r2Ui.receiptHierarchy));
-  need(r2Ui.receiptEditPlan===true&&r2Ui.receiptHasEmoji===true,'B2_AUTH_RECEIPT_EDIT_OR_VISUAL_CUES_MISSING:'+JSON.stringify(r2Ui));
+  need(r2Ui.receiptEditPlan===true&&r2Ui.receiptVisualContract===true,'B2_AUTH_RECEIPT_EDIT_OR_VISUAL_CONTRACT_MISSING:'+JSON.stringify(r2Ui));
   if(r2Ui.unlinkedVehicleCase?.applicable)need(r2Ui.unlinkedVehicleCase.truthful===true,'B2_AUTH_UNLINKED_VEHICLE_RELATION_NOT_TRUTHFUL:'+JSON.stringify(r2Ui.unlinkedVehicleCase));
   evidence.r2Ui=r2Ui;
   milestone('R2_UI_DISCRIMINANTS_PASS',r2Ui);
