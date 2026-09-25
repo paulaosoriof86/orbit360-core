@@ -238,14 +238,17 @@
     "block": "B2",
     "readinessPercent": 80,
     "targetPercent": 90,
-    "step": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+    "step": "OPEN_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36161420776-7cgx9h30.web.app",
     "exactPreviewSourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
     "authenticatedRunId": 36162989052,
     "noBroadRediscovery": true,
     "noReimport": true,
     "noLive": true,
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL"
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+    "r3Origin": "PAULA_VISUAL_REVIEW_20260925_R3",
+    "r3RecordedAt": "2026-09-25T11:43:00-06:00",
+    "r3ReadOnlyAuditTarget": "OSCAR_HAROLDO_RODRIGUEZ_PADILLA / 91-0169567 / 5 vehicles"
   },
   "dataUpdateCompletion": {
     "preservedPass": [
@@ -282,7 +285,9 @@
     "independentFailureAggregationRequired": true,
     "noSerialPrerequisiteDiscovery": true,
     "currentB2TechnicalAndAuthenticatedPass": true,
-    "currentB2OnlyHumanVisualRemaining": true
+    "currentB2OnlyHumanVisualRemaining": false,
+    "r3CausalReadOnlyAuditRequired": true,
+    "r3SingleCumulativeFixRequired": true
   },
   "antiInterruptionExecution": {
     "status": "FROZEN_ACTIVE",

@@ -19,9 +19,9 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 54,
-    "b2HumanFindings": 13,
-    "currentBlocking": 12
+    "total": 63,
+    "b2HumanFindings": 25,
+    "currentBlocking": 17
   },
   "findings": [
     {
@@ -255,14 +255,16 @@
       ],
       "rootCause": "Expected receipts are derived from policy payment terms, but receipt detail had no canonical edit path and policy preview exposed only a receipt count.",
       "remediation": "Receipt detail opens Editar plan de recibos through the canonical policy editor; the policy preview shows the exact generated receipt schedule. No detached individual receipt mutation is introduced.",
-      "status": "AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_20260925_R3",
+      "blocking": false,
       "closureProof": "Human Preview shows the canonical edit action and generated schedule.",
       "technicalEvidence": {
         "runId": 36162989052,
         "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
-      }
+      },
+      "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
     },
     {
       "id": "B2-R15-DUPLICATE_VEHICLE_ACTIONS",
@@ -274,15 +276,17 @@
       ],
       "rootCause": "patchLegacyCards injected one generic vehicle button after every policy card with a vehicle, duplicating Cliente360's dedicated vehicle actions.",
       "remediation": "Remove the generic injection and retain only contextual Cliente360/policy/vehicle actions.",
-      "status": "CLOSED_PASS",
-      "blocking": true,
+      "status": "CLOSED_PASS_R3_VISUAL_STILL_CLEAN",
+      "blocking": false,
       "closureProof": "No repeated generic Ver vehículo completo buttons in Cliente360.",
       "closedBy": {
         "runId": 36162989052,
         "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
         "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
-      }
+      },
+      "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
     },
     {
       "id": "B2-R14-ACCESS-MATRIX-HYDRATION",
@@ -418,7 +422,7 @@
       "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "rootCause": "Inline field values used font-weight 650 almost universally and premium rows used generalized <b>, flattening hierarchy.",
       "remediation": "Body values reduced to medium weight; premium rows use ordinary values with strong total only; title/KPI hierarchy preserved.",
-      "status": "AUTHENTICATED_HIERARCHY_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R3_HIERARCHY_STILL_OPEN",
       "blocking": true,
       "closureProof": "Authenticated side-by-side desktop/mobile Cliente360-Aseguradoras-Poliza-Vehiculo-Recibo visual audit.",
       "mayDisappearWithoutDisposition": false,
@@ -426,7 +430,9 @@
         "runId": 36162989052,
         "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
-      }
+      },
+      "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
     },
     {
       "id": "B2-H02",
@@ -484,7 +490,7 @@
       "owner": "canonical Firestore read models + relationship audit tool",
       "rootCause": "Policy detail resolves a vehicle by exact vehicle.polizaId while Cliente360 lists vehicles by clienteId. A client can therefore have vehicle records while one specific policy has no physical vehicle link.",
       "remediation": "Do not auto-merge or relink historical data. Show the distinction explicitly and link to client vehicles; prevent future renewal gaps by snapshotting one unambiguous source vehicle into the new renewal policy.",
-      "status": "AUTHENTICATED_RELATION_PASS_PENDING_PAULA_SPOTCHECK",
+      "status": "PAULA_VISUAL_REJECTED_R3_PHYSICAL_RELATION_AUDIT_REQUIRED",
       "blocking": true,
       "closureProof": "Artifact evidence with hashed IDs, states, links, receipt/portfolio counts and classification; no merge/delete.",
       "mayDisappearWithoutDisposition": false,
@@ -492,7 +498,9 @@
         "runId": 36162989052,
         "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
-      }
+      },
+      "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
     },
     {
       "id": "B2-H06",
@@ -517,7 +525,7 @@
       "owner": "cliente360.js + policy-receipts-v1199-detail-guard.js",
       "rootCause": "Legacy row/identity renderers allowed literal string 'undefined'/'null' to pass through.",
       "remediation": "Vehicle labels and row values normalize null/undefined literals to neutral display values; identity concatenation filters invalid literals.",
-      "status": "CLOSED_PASS",
+      "status": "PAULA_VISUAL_REJECTED_R3_LITERAL_INVALID_VALUE_REPRODUCED",
       "blocking": true,
       "closureProof": "Authenticated vehicle cards/detail no literal undefined/null.",
       "mayDisappearWithoutDisposition": false,
@@ -526,7 +534,9 @@
         "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1",
         "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
-      }
+      },
+      "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
     },
     {
       "id": "B2-H08",
@@ -537,7 +547,7 @@
       "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "rootCause": "Cliente360 rendered legacy receipts first; canonical bridge replaced it in setTimeout(0), creating a visible partial-state race.",
       "remediation": "Canonical patch/render now executes synchronously after the original tab/render handler; canonical owner keeps stable loading state until both receipt and portfolio collections are server-confirmed.",
-      "status": "SOURCE_RACE_FIX_PENDING_PAULA_COLD_RENDER_SPOTCHECK",
+      "status": "PAULA_VISUAL_REJECTED_R3_FALSE_ZERO_HYDRATION_REPRODUCED",
       "blocking": true,
       "closureProof": "Authenticated cold route/tab/reload; no partial row count before canonical dataset.",
       "mayDisappearWithoutDisposition": false,
@@ -545,7 +555,9 @@
         "runId": 36162989052,
         "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
-      }
+      },
+      "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
     },
     {
       "id": "B2-H09",
@@ -556,7 +568,7 @@
       "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "rootCause": "UI printed raw provenance fields/codes and separate state/reconciliation badges even when semantically identical; hero used unrelated dark treatment.",
       "remediation": "Soft mature-family hero; medium body typography; deduplicated badges; raw authority/match codes suppressed; operational labels for update date/document/match.",
-      "status": "AUTHENTICATED_TECHNICAL_UI_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R3_PROVENANCE_STILL_PRIMARY",
       "blocking": true,
       "closureProof": "Authenticated receipt detail desktop/mobile; no release/gate/validator/internal codes or duplicate payment status.",
       "mayDisappearWithoutDisposition": false,
@@ -564,7 +576,9 @@
         "runId": 36162989052,
         "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
-      }
+      },
+      "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
     },
     {
       "id": "B2-H10",
@@ -575,7 +589,7 @@
       "owner": "modules/aseguradoras.js",
       "rootCause": "Logo URL editing existed in source but was buried inside the Resumen edit form and was not discoverable in the human flow.",
       "remediation": "Expose an explicit Cambiar logo action while preserving the HTTPS-only durable logo contract.",
-      "status": "AUTHENTICATED_LOGO_SAVE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R3_FILE_UPLOAD_REQUIRED",
       "blocking": true,
       "closureProof": "Synthetic insurer logo URL save -> canonical backend readback -> reload -> image rendered.",
       "mayDisappearWithoutDisposition": false,
@@ -583,7 +597,9 @@
         "runId": 36162989052,
         "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
-      }
+      },
+      "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
     },
     {
       "id": "B2-H11",
@@ -623,15 +639,17 @@
       "owner": "modules/academia.js",
       "rootCause": "Session owner returns canonical role SuperAdmin while visual label is Dirección; Academia privileged filter recognized Dirección/Admin only. SuperAdmin therefore received exactly the Operativo subset.",
       "remediation": "Privileged filter now recognizes Dirección, SuperAdmin, AdminTenant and Admin consistently.",
-      "status": "AUTHENTICATED_ROLE_COUNTS_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_20260925_R3",
+      "blocking": false,
       "closureProof": "Authenticated privileged role and Operativo/Asesor counts/routes; CRM/Cliente360 and Aseguradoras courses present; no technical/LAB visible to normal roles.",
       "mayDisappearWithoutDisposition": false,
       "technicalEvidence": {
         "runId": 36162989052,
         "sourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
-      }
+      },
+      "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
     },
     {
       "id": "B2-H13",
@@ -849,6 +867,140 @@
       "status": "FROZEN_DEFERRED_AFTER_PRODUCTION",
       "blocking": false,
       "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B2-R24-POLICY-PAYMENT-VISUAL-HIERARCHY-R3",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "surface": "Polizas",
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "rootCause": "PENDING_CAUSAL_OWNER_REVIEW_R3",
+      "remediation": "Unify full 'Prima y condiciones de pago' hierarchy with mature Cliente360/Aseguradoras family without a second CSS family.",
+      "status": "OPEN_ROOT_CAUSE_REQUIRED",
+      "blocking": true,
+      "requiredProof": "Exact Preview: labels/body/dividers/weights in Datos de póliza and Prima/condiciones share canonical hierarchy; automated DOM discriminant + Paula visual pass."
+    },
+    {
+      "id": "B2-R25-POLICY-CALENDAR-Q006-TOLERANCE-R3",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "surface": "Polizas/Recibos",
+      "owner": [
+        "orbit360-platform/core/policy-receipts-engine.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "rootCause": "PENDING_APPROVED_TOLERANCE_CONTRACT_LOOKUP",
+      "remediation": "Do not hide Q0.06. Determine approved rounding tolerance; only suppress reconciliation when contract proves difference is within tolerance.",
+      "status": "OPEN_READONLY_CONTRACT_REVIEW",
+      "blocking": true,
+      "requiredProof": "Source/contract evidence for tolerance + deterministic fixture around threshold + exact Preview rendering."
+    },
+    {
+      "id": "B2-R26-VEHICLE-EDITOR-PREFILL-DESTRUCTIVE-WRITE-R3",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "surface": "Vehiculos",
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+      ],
+      "rootCause": "PENDING_MAPPING_AUDIT_DETAIL_VS_EDITOR",
+      "remediation": "Make editor hydrate every existing canonical/authorized alias field and preserve untouched fields on partial edit.",
+      "status": "OPEN_CRITICAL",
+      "blocking": true,
+      "requiredProof": "P853FFX: detail values == editor initial values; edit one innocuous field; server commit/readback/reload preserves every other value and same vehicle.id."
+    },
+    {
+      "id": "B2-R27-POLICY-VEHICLE-RENEWAL-PHYSICAL-ID-R3",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "surface": "Polizas/Vehiculos/Renovaciones",
+      "owner": [
+        "orbit360-platform/core/issuance-workflow-v1201.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+      ],
+      "rootCause": "PENDING_READONLY_OSCAR_POLICY_GENEALOGY_AUDIT",
+      "remediation": "Resolve relationship by physical policyId/vehicleId and approved renewal genealogy; never by visible policy number or client alone. Add explicit idempotent link action when eligible.",
+      "status": "OPEN_READONLY_CAUSAL_AUDIT",
+      "blocking": true,
+      "requiredProof": "Oscar/91-0169567 read-only physical genealogy; explicit vehicleId→policyId linking contract; historical relation preserved; readback/reload idempotent."
+    },
+    {
+      "id": "B2-R28-VEHICLE-IDENTITY-CANDIDATE-DEDUP-R3",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "surface": "Cliente360/Polizas/Vehiculos",
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "rootCause": "PENDING_PHYSICAL_ID_AUDIT",
+      "remediation": "Deduplicate link candidates by vehicle.id only; same-label distinct IDs must show distinguishing context and remain unmerged pending integrity evidence.",
+      "status": "OPEN_READONLY_CAUSAL_AUDIT",
+      "blocking": true,
+      "requiredProof": "Oscar's five physical vehicle IDs classified; zero repeated candidate for same vehicle.id; distinct same-plate IDs remain distinguishable; no delete/merge writes."
+    },
+    {
+      "id": "B2-R29-LITERAL-INVALID-VEHICLE-VALUE-R3",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "surface": "Vehiculos",
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "rootCause": "REPRODUCED_BY_PAULA_R3_AFTER_PRIOR_STATIC_GUARD_PASS",
+      "remediation": "Eliminate literal undefined/null/[object Object] across all vehicle cards/details using canonical display sanitizer without hiding source integrity issues.",
+      "status": "OPEN_REGRESSION",
+      "blocking": true,
+      "requiredProof": "Automatic scan + visual proof across all five Oscar vehicles: zero literal undefined/null/[object Object]."
+    },
+    {
+      "id": "B2-R30-RECEIPTS-FALSE-ZERO-HYDRATION-R3",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "surface": "Recibos",
+      "owner": [
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+      ],
+      "rootCause": "REPRODUCED_HUMAN_VISIBLE_FALSE_EMPTY_BEFORE_CANONICAL_HYDRATION_READY",
+      "remediation": "Use explicit pending/skeleton state until canonical hydration completes; never render final empty state/count 0 before ready.",
+      "status": "OPEN_REGRESSION",
+      "blocking": true,
+      "requiredProof": "Cold load, hard refresh, Cliente360→Recibos and role change: first paint/state transitions show loading until ready; no false empty; final count stable."
+    },
+    {
+      "id": "B2-R31-RECEIPT-PROVENANCE-OPERATIONAL-UI-R3",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "surface": "DetalleRecibo/Poliza",
+      "owner": [
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "rootCause": "RAW_PROVENANCE_STILL_RENDERED_AS_PRIMARY_OPERATIONAL_COPY",
+      "remediation": "Preserve provenance physically but move filename/row/match validation to collapsed audit/technical details; use natural operational labels such as Descuento / ajuste where semantically correct.",
+      "status": "OPEN_VISUAL_OPERATIONAL_LANGUAGE",
+      "blocking": true,
+      "requiredProof": "Exact Preview main operational view has no filename#row/raw provenance labels; audit detail retains provenance; business information preserved."
+    },
+    {
+      "id": "B2-R32-INSURER-LOGO-FILE-UPLOAD-R3",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
+      "surface": "Aseguradoras",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "functions/tenant-branding.js"
+      ],
+      "rootCause": "CURRENT_UI_EXPOSES_HTTPS_URL_AS_ONLY_DISCOVERABLE_LOGO_MECHANISM",
+      "remediation": "Reuse approved storage/asset owner for local file select→preview→server commit→persisted asset ref/URL→reload; HTTPS URL remains advanced alternative.",
+      "status": "OPEN_CAUSAL_IMPLEMENTATION_REQUIRED",
+      "blocking": true,
+      "requiredProof": "File upload→preview→server commit→persisted URL/asset ref→reload same logo→replace; no Data URL/localStorage authority; password/reveal regression PASS."
     }
   ],
   "phaseBBacklog": [
@@ -869,24 +1021,6 @@
     }
   ],
   "lastHumanReview": {
-    "date": "2026-09-24",
-    "source": "Paula R2 screenshots + real human writes",
-    "confirmedPass": [
-      "B2-H02",
-      "B2-H04",
-      "B2-H06",
-      "technical-language portion of B2-H09"
-    ],
-    "newFindings": [
-      "B2-R14-ACCESS-MATRIX-HYDRATION",
-      "B2-R15-DUPLICATE_VEHICLE_ACTIONS",
-      "B2-R16-RECEIPT_PLAN_EDIT_DISCOVERABILITY",
-      "B2-R17-RENEWAL_VEHICLE_CONTINUITY"
-    ],
-    "realDataEvidence": "Byron Contreras client and policy advisor changes persisted after refresh; vehicle color edit persisted on the same linked vehicle.",
-    "noBroadReimport": true
-  },
-  "currentHumanReview": {
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36161420776-7cgx9h30.web.app",
     "exactSourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
     "authenticatedRunId": 36162989052,
@@ -903,5 +1037,33 @@
     ],
     "count": 9,
     "rule": "Only these human-visible items require Paula confirmation before B2 acceptance; technical findings already closed may not be reopened without reproducible causal regression."
+  },
+  "currentHumanReview": {
+    "date": "2026-09-25",
+    "source": "Paula R3 visual review on exact authenticated B2 Preview",
+    "origin": "PAULA_VISUAL_REVIEW_20260925_R3",
+    "decision": "REJECTED_REMEDIATION_REQUIRED",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36161420776-7cgx9h30.web.app",
+    "exactSourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
+    "authenticatedRunId": 36162989052,
+    "confirmedPass": [
+      "B2-H12",
+      "B2-R16-RECEIPT_PLAN_EDIT_DISCOVERABILITY",
+      "B2-R15-DUPLICATE_VEHICLE_ACTIONS"
+    ],
+    "newFindingIds": [
+      "B2-R24-POLICY-PAYMENT-VISUAL-HIERARCHY-R3",
+      "B2-R25-POLICY-CALENDAR-Q006-TOLERANCE-R3",
+      "B2-R26-VEHICLE-EDITOR-PREFILL-DESTRUCTIVE-WRITE-R3",
+      "B2-R27-POLICY-VEHICLE-RENEWAL-PHYSICAL-ID-R3",
+      "B2-R28-VEHICLE-IDENTITY-CANDIDATE-DEDUP-R3",
+      "B2-R29-LITERAL-INVALID-VEHICLE-VALUE-R3",
+      "B2-R30-RECEIPTS-FALSE-ZERO-HYDRATION-R3",
+      "B2-R31-RECEIPT-PROVENANCE-OPERATIONAL-UI-R3",
+      "B2-R32-INSURER-LOGO-FILE-UPLOAD-R3"
+    ],
+    "noBroadReimport": true,
+    "noLive": true,
+    "b3": "NOT_STARTED"
   }
 }
