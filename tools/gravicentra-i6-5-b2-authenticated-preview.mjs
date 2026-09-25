@@ -804,15 +804,15 @@ try{
   }));
   const physicalDiagSnap=await dataCol(db,'aseguradoras').doc(insurerId).get();
   const physicalDiag=physicalDiagSnap.exists?physicalDiagSnap.data()||{}:{};
-  const physicalPortal=[].concat(physicalDiag.portales||[]).find(x=>String(x.id||'')===portalId)||null;
+  const physicalPortalDiag=[].concat(physicalDiag.portales||[]).find(x=>String(x.id||'')===portalId)||null;
   milestone('INSURER_SAVE_DIAGNOSTIC',{
     saveDiag,
     physical:{
       exists:physicalDiagSnap.exists,
       logo:String(physicalDiag.logo||''),
-      portalFound:!!physicalPortal,
-      credentialRef:String(physicalPortal?.credentialRef||''),
-      hasUsername:!!String(physicalPortal?.usuario||physicalPortal?.username||''),
+      portalFound:!!physicalPortalDiag,
+      credentialRef:String(physicalPortalDiag?.credentialRef||''),
+      hasUsername:!!String(physicalPortalDiag?.usuario||physicalPortalDiag?.username||''),
       updatedByUid:String(physicalDiag.updatedByUid||'')
     }
   });
