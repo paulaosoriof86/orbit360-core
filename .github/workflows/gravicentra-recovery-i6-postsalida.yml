@@ -3795,7 +3795,7 @@ jobs:
         if: steps.mode.outputs.run == 'true'
         run: |
           set -euo pipefail
-          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 @google-cloud/secret-manager@6.1.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
       - name: Recover approved protected access overrides
         if: steps.mode.outputs.run == 'true'
