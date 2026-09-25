@@ -317,7 +317,10 @@ Orbit.modules.aseguradoras = (function () {
       if (act === 'drive') { if (a.drive) window.open(a.drive.match(/^https?:/) ? a.drive : 'https://' + a.drive, '_blank', 'noopener'); }
     }));
     const deepId = Orbit.route && Orbit.route.params && Orbit.route.params.ficha;
-    if (deepId && S().get('aseguradoras', deepId)) ficha(deepId);
+    if (deepId && S().get('aseguradoras', deepId)) {
+      const preserveEditing = !!(fichaState[deepId] && fichaState[deepId].editing);
+      ficha(deepId, undefined, preserveEditing);
+    }
   }
 
   function card(a) {

@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -207,20 +207,9 @@
     "preservationCommit": "84870177ecacd4776ba844495afa99b1b2b10a6f",
     "visualCorrectionDate": "2026-09-23"
   },
-  "preview": {
-    "sourceSha": "962e236b95e9bf0cb561d915b0d17e270c671667",
-    "buildId": "gi-i65-b2-962e236b95e9-57f234755dc1",
-    "channelId": "gi-i65-b2-36155704817",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36155704817-l7cshawd.web.app",
-    "runId": 36155704817,
-    "artifactId": 10873766422,
-    "artifactDigest": "fd596e0455dd1890e15f2a061154be48505b85b5e209045c986650175dcbe1b5",
-    "exactReadback": true,
-    "functionalPass": true,
-    "livePromoted": false
-  },
+  "preview": null,
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "BLOCKED_UNTIL_NEW_EXACT_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "962e236b95e9bf0cb561d915b0d17e270c671667",
     "exactPreviewBuildId": "gi-i65-b2-962e236b95e9-57f234755dc1",
@@ -274,7 +263,7 @@
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
     "lastFailedRunId": 35961205964,
-    "lastFailure": "ASEGURADORAS_ASYNC_KNOWLEDGE_REFRESH_DROPPED_EDIT_STATE",
+    "lastFailure": "ASEGURADORAS_DEEPLINK_RERENDER_DROPPED_EDIT_STATE",
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
@@ -332,7 +321,7 @@
     "cleanupWrites": 20,
     "visualEvidenceRecapture": true,
     "visualReceiptRecapture": true,
-    "lastFailureRunId": 36155142701,
+    "lastFailureRunId": 36156246656,
     "requiredNewSource": true,
     "lastArmCommitParent": "6313bc4a4960968457c2867bdf1ba32c3cbd8de4",
     "lastArmReason": "RUN_EXACT_AUTHENTICATED_PROOF_ON_NEW_R20_FIXED_PREVIEW"
@@ -1480,22 +1469,22 @@
     "liveHostingTouched": false
   },
   "previewSupersededBySourceChange": {
-    "sourceSha": "dbb79d6b2672d71f9c727ab7d2833a62222f0168",
-    "buildId": "gi-i65-b2-dbb79d6b2672-57f234755dc1",
-    "channelId": "gi-i65-b2-36072542051",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36072542051-7y4o63gi.web.app",
-    "runId": 36072542051,
-    "artifactId": 10838549357,
-    "artifactDigest": "d037453f72be14f0d532aa438535c273a4e6230a93bec6803fe4c5c83a961369",
+    "sourceSha": "962e236b95e9bf0cb561d915b0d17e270c671667",
+    "buildId": "gi-i65-b2-962e236b95e9-57f234755dc1",
+    "channelId": "gi-i65-b2-36155704817",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36155704817-l7cshawd.web.app",
+    "runId": 36155704817,
+    "artifactId": 10873766422,
+    "artifactDigest": "fd596e0455dd1890e15f2a061154be48505b85b5e209045c986650175dcbe1b5",
     "exactReadback": true,
     "functionalPass": true,
     "livePromoted": false
   },
   "lastProductRootCause": {
-    "id": "B2-R20-ASEGURADORAS-ASYNC-EDIT-LOSS",
-    "demonstratedRunId": 36155142701,
-    "sourceBlobBefore": "187e9728693c682e5105a886fbc0a3719a7a1edf",
-    "sourceBlobAfter": "b97825d9813ee4951d9f0d351cb2c47f54954407",
+    "id": "B2-R21-ASEGURADORAS-DEEPLINK-EDIT-LOSS",
+    "demonstratedRunId": 36156246656,
+    "sourceBlobBefore": "b97825d9813ee4951d9f0d351cb2c47f54954407",
+    "sourceBlobAfter": "086a5d828b572b35e2fee0b5dab8cb04dc9fed53",
     "liveTouched": false,
     "reimport": false
   }

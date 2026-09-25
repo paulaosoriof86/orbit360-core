@@ -132,7 +132,7 @@
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "c51d13b3a38770af9cce9613a628d9e6db44a353",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
-    "orbit360-platform/modules/aseguradoras.js": "b97825d9813ee4951d9f0d351cb2c47f54954407",
+    "orbit360-platform/modules/aseguradoras.js": "086a5d828b572b35e2fee0b5dab8cb04dc9fed53",
     "orbit360-platform/modules/cliente360.js": "838a3306164bfddb21ef15cd79fa46ad905925c7",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "6fbb880480f726e537f93650119af3265cf97bbd",
@@ -182,7 +182,7 @@
     "noReimport": true,
     "livePromotion": false,
     "recordedAt": "2026-09-25",
-    "rootCauseExtension": "ASEGURADORAS_ASYNC_KNOWLEDGE_REFRESH_DROPS_EDIT_STATE",
+    "rootCauseExtension": "ASEGURADORAS_DEEPLINK_RERENDER_DROPS_EDIT_STATE",
     "accessAuthorityFixes": [
       "PROTECTED_CONFIG_HYDRATION_PROVEN_WORKING",
       "SPARSE_ROLE_PERMISSION_OVERRIDES_ARE_MERGED_OVER_COMPLETE_UI_DEFAULT_MATRIX",
@@ -194,7 +194,8 @@
       "KNOWLEDGE_SUMMARY_ASYNC_REFRESH_PRESERVES_EDITING_STATE",
       "UNSAVED_DRAFT_PRESERVED_ACROSS_OWNER_REFRESH",
       "CREDENTIAL_DRAFTS_PRESERVED_ACROSS_OWNER_REFRESH",
-      "ORDINARY_FICHA_OPEN_BEHAVIOR_UNCHANGED"
+      "ORDINARY_FICHA_OPEN_BEHAVIOR_UNCHANGED",
+      "MODULE_RENDER_DEEPLINK_REOPEN_PRESERVES_ACTIVE_EDIT_STATE"
     ]
   }
 }
