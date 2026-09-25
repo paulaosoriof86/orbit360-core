@@ -60,6 +60,7 @@ Orbit.modules = Orbit.modules || {};
   function linkedInsurers(country) { return (S().all('aseguradoras') || []).filter(a => a.vinculada !== false && (a.pais === country || [].concat(a.paises || []).includes(country))); }
   function ramos(country) { try { return Orbit.cat.ramosDe(country) || []; } catch (e) { return []; } }
   function subramos(country, ramo) { try { return Orbit.cat.subramosDe(country, ramo) || []; } catch (e) { return []; } }
+  function money(cur, n) { return U.money ? U.money(+n || 0, cur || '') : (cur + ' ' + (+n || 0)); }
 
   function countryTaxPct(country) {
     try {
