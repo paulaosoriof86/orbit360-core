@@ -334,8 +334,9 @@
     "visualReceiptRecapture": true,
     "lastFailureRunId": 36158157603,
     "requiredNewSource": true,
-    "lastArmCommitParent": "def30c78c1de142dc5b045e9900bd2ba80115d34",
-    "lastArmReason": "RERUN_EXACT_FE140_WITH_PROMPT_SCOPED_CONFIRMATION"
+    "lastArmCommitParent": "219bf4d02c37d785e2c6d2a811ee1b5ff42f84dd",
+    "lastArmReason": "R22_PREVIEW_CREDENTIAL_ISOLATION_EXACT_AUTHENTICATED_PROOF",
+    "lastArmAt": "2026-09-25T10:35:00-06:00"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
