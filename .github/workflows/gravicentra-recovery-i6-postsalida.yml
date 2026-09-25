@@ -3731,6 +3731,11 @@ jobs:
 
   i65-b2-authenticated-preview:
     needs: i65-forensic-b2-preview
+    # The technical Preview job may materialize its certified lock in a branch-tip
+    # governance commit even when that job concludes failure at the final push/freeze
+    # boundary. Always enter this dependent job, then let its fail-closed gate decide
+    # from the freshly checked-out branch tip whether authenticated proof is authorized.
+    if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
