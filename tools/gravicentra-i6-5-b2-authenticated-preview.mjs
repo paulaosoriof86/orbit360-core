@@ -404,7 +404,7 @@ try{
   evidence.scope={operativo:oper,asesor};evidence.modulePermissions={operativo:operativoModules};
   const academiaOper=await bounded(academiaSnapshot(page,'Operativo'),'B2_AUTH_ACADEMIA_OPERATIVO_TIMEOUT',25000);
   const academiaCanonical=await page.evaluate(()=>{const rows=Orbit.store?.all?.('cursos')||[];return{courses:rows.length,lessons:rows.reduce((n,c)=>n+[...(c.lecciones||[])].length,0)};});
-  need(academiaCanonical.courses===28&&academiaCanonical.lessons===102,'B2_AUTH_ACADEMIA_28_102_REGRESSION:'+JSON.stringify(academiaCanonical));
+  need(academiaCanonical.courses===29&&academiaCanonical.lessons===105,'B2_AUTH_ACADEMIA_29_105_REGRESSION:'+JSON.stringify(academiaCanonical));
   evidence.academiaCanonical=academiaCanonical;
   need(academiaOper.hasClient360&&academiaOper.hasInsurerDirectory&&academiaOper.brandOk&&academiaOper.routeSelector&&!academiaOper.forbiddenVisible,'B2_AUTH_ACADEMIA_OPERATIVO_INVALID:'+JSON.stringify(academiaOper));
   need(academiaOper.automaticWrites===false&&academiaOper.catalogManagementDurable===false,'B2_AUTH_ACADEMIA_AUTOMATIC_WRITER_PRESENT');
@@ -414,7 +414,7 @@ try{
   need(!!privilegedRole,'B2_AUTH_ACADEMIA_PRIVILEGED_ROLE_NOT_ASSIGNED');
   const academiaPriv=await bounded(academiaSnapshot(page,privilegedRole),'B2_AUTH_ACADEMIA_PRIVILEGED_TIMEOUT',25000);
   need(academiaPriv.hasClient360&&academiaPriv.hasInsurerDirectory&&academiaPriv.brandOk&&academiaPriv.routeSelector&&!academiaPriv.forbiddenVisible,'B2_AUTH_ACADEMIA_PRIVILEGED_INVALID:'+JSON.stringify(academiaPriv));
-  need(academiaPriv.visibleCourseCount===28&&academiaPriv.visibleLessonCount===102,'B2_AUTH_ACADEMIA_PRIVILEGED_COUNT_MISMATCH:'+JSON.stringify(academiaPriv));
+  need(academiaPriv.visibleCourseCount===28&&academiaPriv.visibleLessonCount===102,'B2_AUTH_ACADEMIA_PRIVILEGED_ROLE_FILTER_MISMATCH:'+JSON.stringify(academiaPriv));
   need(academiaOper.visibleCourseCount===25&&academiaOper.visibleLessonCount===90,'B2_AUTH_ACADEMIA_OPERATIVO_COUNT_MISMATCH:'+JSON.stringify(academiaOper));
   evidence.academia={operativo:academiaOper,asesor:academiaAsesor,privileged:academiaPriv,automaticWrites:false,pass:true};
   milestone('ACADEMIA_ROLE_ROUTES',{operativo:academiaOper.visibleCourseCount,asesor:academiaAsesor.visibleCourseCount,privileged:academiaPriv.visibleCourseCount});
