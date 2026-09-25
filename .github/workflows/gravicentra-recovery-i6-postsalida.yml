@@ -2216,7 +2216,7 @@ jobs:
       - name: Install read-only diagnostic dependencies
         if: steps.opdiag.outputs.run == 'true'
         run: |
-          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 @google-cloud/secret-manager@6.1.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
       - name: Diagnose users login branding and operational owners
         if: steps.opdiag.outputs.run == 'true'
@@ -3802,6 +3802,12 @@ jobs:
         env:
           ACCESS_RECOVERY_PROOF_FILE: ${{ runner.temp }}/b2-access-config-recovery.json
         run: node tools/gravicentra-i6-5-b2-access-config-recover.mjs
+      - name: Provision exact B2 Preview credential vault IAM
+        if: steps.mode.outputs.run == 'true'
+        env:
+          B2_PREVIEW_SECRET_IAM_PROOF_FILE: ${{ runner.temp }}/b2-preview-secret-iam.json
+        run: node tools/gravicentra-i6-5-b2-preview-secret-iam.mjs
+
       - name: Execute authenticated reversible B2 Preview proof
         id: proof
         if: steps.mode.outputs.run == 'true'
@@ -3817,6 +3823,7 @@ jobs:
           path: |
             ${{ runner.temp }}/b2-authenticated-preview.json
             ${{ runner.temp }}/b2-access-config-recovery.json
+            ${{ runner.temp }}/b2-preview-secret-iam.json
             ${{ runner.temp }}/b2-visual/*
           if-no-files-found: warn
           compression-level: 0

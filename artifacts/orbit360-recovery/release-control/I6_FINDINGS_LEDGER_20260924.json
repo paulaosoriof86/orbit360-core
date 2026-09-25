@@ -19,11 +19,28 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 52,
+    "total": 53,
     "b2HumanFindings": 13,
-    "currentBlocking": 24
+    "currentBlocking": 25
   },
   "findings": [
+    {
+      "id": "B2-R23-PREVIEW-SECRET-IAM",
+      "block": "B2",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36161855364",
+      "finding": "PREVIEW_CREDENTIAL_CALLABLE_CANNOT_READ_ITS_ISOLATED_SECRET_MANAGER_VAULT",
+      "owner": [
+        "functions/product-insurer-credentials.js",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+        "tools/gravicentra-i6-5-b2-preview-secret-iam.mjs"
+      ],
+      "rootCause": "After removing the production-vault cross-read, the exact Preview callable still returns functions/unavailable from readVaultScope(preview). This proves the isolated preview vault itself is not usable by the runtime identity; the remaining causal surface is preview-secret existence/IAM, not Aseguradoras UI, active role, prompt binding or operational Firestore.",
+      "remediation": "Idempotently ensure only the Preview secret exists and bind the runtime service account to secret-level viewer, secretAccessor and secretVersionAdder. Never read payload, never touch production secret. Then rerun the exact authenticated proof.",
+      "status": "INFRA_REPAIR_AUTHORIZED_PENDING_PROOF",
+      "blocking": true,
+      "closureProof": "IAM proof PASS + exact Preview credential import mapping + insurer metadata readback + password reveal hash-match + preview cleanup + LIVE untouched.",
+      "mayDisappearWithoutDisposition": false
+    },
     {
       "id": "B2-R22-PREVIEW-CREDENTIAL-VAULT-CROSSREAD",
       "block": "B2",

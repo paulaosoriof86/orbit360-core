@@ -111,6 +111,24 @@
         "evidence": "B1 accepted role-scope matrix + runtime effective defaults",
         "overwriteExplicitDifferentScope": false
       }
+    },
+    "previewCredentialSecretIamRepair": {
+      "authorized": true,
+      "projectId": "ays-orbit-360-lab",
+      "tenantId": "alianzas-soluciones",
+      "secretId": "orbit360-insurer-credentials-preview-alianzas-soluciones",
+      "runtimeServiceAccount": "orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com",
+      "allowedRoles": [
+        "roles/secretmanager.viewer",
+        "roles/secretmanager.secretAccessor",
+        "roles/secretmanager.secretVersionAdder"
+      ],
+      "productionSecretMutationAuthorized": false,
+      "productionSecretReadAuthorized": false,
+      "payloadReadAuthorized": false,
+      "operationalDataMutationAuthorized": false,
+      "liveHostingPromotionAuthorized": false,
+      "idempotentEnsureOnly": true
     }
   },
   "emailDebt": {
@@ -1455,17 +1473,16 @@
     "PAULA_VISUAL_NO_DUPLICATE_VEHICLE_ACTIONS"
   ],
   "lastAuthenticatedFailure": {
-    "runId": 36160736564,
-    "classification": "PRODUCT_BACKEND_PREVIEW_ISOLATION_DEFECT",
-    "cause": "PREVIEW_CREDENTIAL_CALLABLE_READ_PRODUCTION_SECRET_VAULT_AND_RETURNED_FUNCTIONS_UNAVAILABLE",
+    "runId": 36161855364,
+    "classification": "PREVIEW_SECRET_MANAGER_RUNTIME_ACCESS_DEFECT",
+    "cause": "PREVIEW_CALLABLE_OPERATION_IMPORT_RETURNS_FUNCTIONS_UNAVAILABLE_FROM_READVAULTSCOPE_PREVIEW",
     "passedBeforeFailure": [
       "ACCESS_RECOVERY_PASS",
       "OPERATIVO_COTIZADOR_COMPARATIVO_PASS",
-      "ACTIVE_ROLE_SCOPE_LEAK_ZERO",
       "R2_UI_DISCRIMINANTS_PASS",
       "POLICY_EDIT_RELOAD_PASS",
       "VEHICLE_EDIT_RELOAD_PASS",
-      "INSURER_EDIT_MODE_AND_PASSWORD_INPUT_PASS"
+      "INSURER_EDIT_AND_PASSWORD_INPUT_PASS"
     ],
     "productionTouched": false,
     "liveHostingTouched": false,
