@@ -857,7 +857,19 @@ try{
   // Bind confirmation to the exact prompt overlay created by Guardar cambios.
   // Global [data-yes].last() can target unrelated/stale dialogs and falsely leave guardarDraft awaiting its own prompt.
   const insurerReasonOverlay=page.locator('.drawer-back').filter({has:page.locator('[data-in]')}).filter({hasText:'Guardar cambios'}).last();
-  await insurerReasonOverlay.waitFor({state:'visible',timeout:20000});
+  try{await insurerReasonOverlay.waitFor({state:'visible',timeout:20000});}catch(waitError){
+    const diag=await page.evaluate(()=>({
+      savePresent:!!document.querySelector('#asg-ficha #af-guardar'),
+      saveDisabled:!!document.querySelector('#asg-ficha #af-guardar')?.disabled,
+      saveText:String(document.querySelector('#asg-ficha #af-guardar')?.textContent||''),
+      editPresent:!!document.querySelector('#asg-ficha #af-editar'),
+      promptCount:document.querySelectorAll('.drawer-back [data-in]').length,
+      toastText:Array.from(document.querySelectorAll('.ciclo-toast')).map(x=>String(x.textContent||'')),
+      writeStatus:Orbit.store?.writeStatus?.()||null,
+      route:String(Orbit.route?.key||''),hash:String(location.hash||'')
+    }));
+    throw new Error('B2_AUTH_INSURER_REASON_PROMPT_NOT_REACHED_AFTER_ASSET_UPLOAD:'+JSON.stringify(diag));
+  }
   const insurerReasonInput=insurerReasonOverlay.locator('[data-in]');
   await insurerReasonInput.fill('B2 QA aseguradora: logo y credencial segura');
   const promptSnapshot=await insurerReasonOverlay.evaluate(el=>({
