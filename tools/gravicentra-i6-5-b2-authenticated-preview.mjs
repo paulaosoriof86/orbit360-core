@@ -774,6 +774,29 @@ try{
       };
       Orbit.ui.__b2PromptTraceWrapped=true;
     }
+    const runtimeProvider=Orbit.productRuntimeBrowserProvidersP0;
+    if(runtimeProvider&&typeof runtimeProvider.callFunction==='function'&&!window.__b2RuntimeTraceWrapped){
+      const originalCall=runtimeProvider.callFunction.bind(runtimeProvider);
+      Orbit.productRuntimeBrowserProvidersP0=Object.freeze(Object.assign({},runtimeProvider,{
+        callFunction:async function(name,data,region){
+          push('runtime-call',{name:String(name||''),region:String(region||''),operation:String(data?.operation||''),activeRole:String(data?.activeRole||''),itemCount:[].concat(data?.items||[]).length});
+          try{
+            const out=await originalCall(name,data,region);
+            push('runtime-result',{name:String(name||''),ok:!!out?.ok,status:String(out?.status||''),mappingCount:[].concat(out?.mappings||[]).length});
+            return out;
+          }catch(e){
+            push('runtime-error',{name:String(name||''),code:String(e?.code||''),message:String(e?.message||e),details:e?.details||null});
+            throw e;
+          }
+        }
+      }));
+      window.__b2RuntimeTraceWrapped=true;
+    }
+    if(Orbit.ui&&typeof Orbit.ui.toast==='function'&&!Orbit.ui.__b2ToastTraceWrapped){
+      const originalToast=Orbit.ui.toast.bind(Orbit.ui);
+      Orbit.ui.toast=function(message){push('toast',{message:String(message||'')});return originalToast.apply(Orbit.ui,arguments);};
+      Orbit.ui.__b2ToastTraceWrapped=true;
+    }
     if(Orbit.store&&typeof Orbit.store.batchDurable==='function'&&!Orbit.store.__b2TraceWrapped){
       const originalBatch=Orbit.store.batchDurable.bind(Orbit.store);
       Orbit.store.batchDurable=async function(rows,opts){
