@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -230,26 +230,24 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "05c67e993d9b5e387764b1068164152472cc6a1c",
-    "buildId": "gi-i65-b2-05c67e993d9b-57f234755dc1",
-    "channelId": "gi-i65-b2-36201407966",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36201407966-z6svpn5o.web.app",
-    "runId": 36201407966,
-    "artifactId": 10892441346,
-    "artifactDigest": "1231f8b348ac77eda365eb27de2061204ddc072ed4161af20cf9022fa2a737ae",
+    "sourceSha": "1eb25c6cdb9251e810942def8b8a71923832a4f4",
+    "buildId": "gi-i65-b2-1eb25c6cdb92-57f234755dc1",
+    "channelId": "gi-i65-b2-36201839137",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36201839137-7tft1qwz.web.app",
+    "runId": 36201839137,
+    "artifactId": 10892352349,
+    "artifactDigest": "7ba9dded5a73e36e4018bbcc97bc61e0f240f2f2d580f9fbaf443aa4b91ef00f",
     "exactReadback": true,
     "functionalPass": true,
-    "livePromoted": false,
-    "supersededByProductSourceChange": true,
-    "supersededReason": "Vehicle same-id edit changed distinct untouched VIN through combined Chasis/VIN input; preservation fix requires new immutable Preview"
+    "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PENDING_NEW_PREVIEW",
+    "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "05c67e993d9b5e387764b1068164152472cc6a1c",
-    "exactPreviewBuildId": "gi-i65-b2-05c67e993d9b-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36201407966-z6svpn5o.web.app",
-    "exactPreviewArtifactId": 10892441346,
+    "exactPreviewSourceSha": "1eb25c6cdb9251e810942def8b8a71923832a4f4",
+    "exactPreviewBuildId": "gi-i65-b2-1eb25c6cdb92-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36201839137-7tft1qwz.web.app",
+    "exactPreviewArtifactId": 10892352349,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
