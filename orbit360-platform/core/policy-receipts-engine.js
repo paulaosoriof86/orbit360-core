@@ -451,6 +451,35 @@ Orbit.policyReceipts = (function () {
     catch(error){return{ok:false,errors:['operacion_atomica_no_confirmada'],error:String(error&&(error.code||error.message||error)),operationId:opId};}
   }
 
+  function receiptEditLocked(receipt) {
+    const op=norm(receipt&&receipt.estadoOperativo);
+    return isPaidReceipt(receipt)||!!(receipt&&receipt.conciliado)||!!(receipt&&receipt.conciliadoPago)||op==='pagoreportado'||!!clean(receipt&&receipt.fechaPagoReportada)||!!clean(receipt&&receipt.reportado);
+  }
+  async function updateReceipt(receiptIdValue, patch, options) {
+    options=options||{};patch=patch||{};
+    if(!canManagePolicies())return{ok:false,errors:['permiso_poliza_denegado']};
+    if(!S()||typeof S().batchDurable!=='function')return{ok:false,errors:['contrato_atomico_no_disponible']};
+    const id=clean(receiptIdValue),current=S().get('recibosEsperados',id);
+    if(!current)return{ok:false,errors:['recibo_no_encontrado']};
+    if(receiptEditLocked(current))return{ok:false,errors:['recibo_con_evidencia_pago_protegido']};
+    const reason=clean(options.motivo||options.reason);if(reason.length<5)return{ok:false,errors:['motivo_requerido']};
+    const policy=S().get('polizas',current.polizaId);if(!policy)return{ok:false,errors:['poliza_no_encontrada']};
+    const allowed=['serie','numeroReciboFuente','fechaLimite','primaNeta','gastosExpedicion','gastosFinanciamiento','descuento','impuestosIVA','primaTotal'],nextPatch={};
+    allowed.forEach(k=>{if(Object.prototype.hasOwnProperty.call(patch,k))nextPatch[k]=patch[k];});
+    const numeric=['primaNeta','gastosExpedicion','gastosFinanciamiento','descuento','impuestosIVA','primaTotal'];
+    for(const k of numeric){if(Object.prototype.hasOwnProperty.call(nextPatch,k)){const n=Number(nextPatch[k]);if(!Number.isFinite(n))return{ok:false,errors:['recibo_valor_invalido:'+k]};nextPatch[k]=n;}}
+    if(Object.prototype.hasOwnProperty.call(nextPatch,'fechaLimite')){const d=clean(nextPatch.fechaLimite);if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return{ok:false,errors:['recibo_fecha_invalida']};nextPatch.fechaLimite=d;nextPatch.vence=d;nextPatch.fechaVencimiento=d;}
+    if(Object.prototype.hasOwnProperty.call(nextPatch,'primaTotal')){nextPatch.montoTotal=Number(nextPatch.primaTotal);nextPatch.monto=Number(nextPatch.primaTotal);}
+    const opId=options.operationId||operationId('recedit');nextPatch.operationId=opId;nextPatch.actualizado=now();
+    const next=Object.assign({},current,nextPatch),mutations=[{action:'update',collection:'recibosEsperados',id,payload:nextPatch}];
+    const portfolio=(S().where('carteraPrimas',r=>r&&clean(r.reciboId)===id)||[])[0]||null;
+    let portfolioPatch=null;
+    if(portfolio&&portfolio.carteraActiva!==false){const st=portfolioState(next),total=next.primaTotal!=null?Number(next.primaTotal):Number(next.montoTotal!=null?next.montoTotal:next.monto)||0;portfolioPatch={fechaLimite:next.fechaLimite||next.vence,vence:next.fechaLimite||next.vence,fechaVencimiento:next.fechaLimite||next.vence,monto:total,montoTotal:total,primaTotal:total,estado:st.estado,estadoOperativo:st.estadoOperativo,exigibilidad:st.exigibilidad,operationId:opId,actualizado:now()};mutations.push({action:'update',collection:'carteraPrimas',id:portfolio.id,payload:portfolioPatch});}
+    const activityId=('act_'+opId).slice(0,250);mutations.push({action:'insert',collection:'actividades',id:activityId,payload:{id:activityId,tenantId:current.tenantId||tenantId(),clienteId:current.clienteId,asesorId:current.asesorId,tipo:'recibo',icon:'🧾',fecha:today(),titulo:'Recibo actualizado',detalle:'Edición individual controlada · '+(current.serie||current.cuota||id),polizaId:current.polizaId,reciboId:id,operationId:opId,motivo:reason}});
+    try{await S().batchDurable(mutations,{requestId:opId,timeoutMs:25000});const persisted=S().get('recibosEsperados',id);if(!persisted)return{ok:false,errors:['recibo_edit_readback_missing']};return{ok:true,receipt:clone(persisted),portfolio:portfolio?clone(S().get('carteraPrimas',portfolio.id)):null,operationId:opId,atomicServerCommit:true};}
+    catch(error){return{ok:false,errors:['recibo_edit_commit_failed'],error:String(error&&(error.code||error.message)||error),operationId:opId};}
+  }
+
   function applyPayment(receiptIdValue, payment, options) {
     options = options || {};
     if (!canApplyPayments()) return { ok: false, errors: ['permiso_cobro_denegado'] };
@@ -527,7 +556,7 @@ Orbit.policyReceipts = (function () {
   return {
     ACTIVE, isActiveState, isPaidReceipt, canManagePolicies, canApplyPayments,
     canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, normalizeVehicle, expectedReceipts, syncReceipts, syncPortfolio, buildAtomicWritePlan,
-    createPolicy, updatePolicy, linkVehicleToPolicy, applyPayment, createReconciliationProposal, updateClientState,
+    createPolicy, updatePolicy, linkVehicleToPolicy, updateReceipt, receiptEditLocked, applyPayment, createReconciliationProposal, updateClientState,
     receiptId, sequenceOf, installmentsForFrequency
   };
 })();

@@ -3920,7 +3920,7 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),cpPath=process.env.CONTROL,lockPath=process.env.B2_LOCK,proofPath=process.env.RUNNER_TEMP+'/b2-authenticated-preview.json';
           const c=JSON.parse(fs.readFileSync(cpPath)),b=JSON.parse(fs.readFileSync(lockPath)),e=JSON.parse(fs.readFileSync(proofPath));
-          if(e.status!=='PASS'||e.cleanup?.clientAbsent!==true||e.cleanup?.insurerAbsent!==true||e.cleanup?.assetAbsent!==true||e.scope?.asesor?.leakCount!==0||e.crud?.cobros!==0||e.renewal?.cobros!==0)throw Error('B2_AUTH_EVIDENCE_NOT_CLEAN_PASS');
+          if(e.status!=='PASS'||e.cleanup?.clientAbsent!==true||e.cleanup?.insurerAbsent!==true||e.cleanup?.assetAbsent!==true||e.scope?.asesor?.leakCount!==0||e.crud?.cobros!==0||e.renewal?.cobros!==0||e.crud?.vehiclePolicyContext!==true||e.crud?.individualReceiptEditReadback!==true||e.crud?.individualReceiptPortfolioSync!==true||e.crud?.reportedPaymentVisible!==true||e.crud?.reportedPaymentDoesNotFabricateCobro!==true)throw Error('B2_AUTH_EVIDENCE_NOT_CLEAN_PASS');
           b.status='PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL';
           b.authenticatedPreviewProof={
             ...(b.authenticatedPreviewProof||{}),

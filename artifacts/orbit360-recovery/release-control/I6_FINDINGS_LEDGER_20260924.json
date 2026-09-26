@@ -1258,7 +1258,7 @@
       "surface": "Cobros/Recibos",
       "rootCause": "Pago reportado pendiente de conciliación no equivale a cobro aplicado, pero Cobros no expone bien esa evidencia.",
       "remediation": "Surface payment evidence in Cobros without fabricating a confirmed cobro: distinguish Pago reportado por conciliar / Cobro confirmado / Cobro conciliado and preserve source semantics.",
-      "status": "REOPENED_IN_B2_BY_PAULA_VISUAL_R5",
+      "status": "SOURCE_FIXED_IN_B2_PENDING_NEW_PREVIEW_PROOF",
       "blocking": true,
       "requiredProof": "Cliente with reported payment evidence shows it in Cobros as non-confirmed evidence; confirmed cobro count remains unchanged unless authoritative payment confirmation exists."
     },
@@ -1359,9 +1359,10 @@
       "rootCause": "Current grouping uses plate as primary key and falls back to vehicle.id when plate is missing. Explicit versionOfVehicleId lineage is not used to collapse versioned relations, and incomplete-identity historical rows remain top-level cards.",
       "remediation": "Group only by explicit physical lineage first (versionOfVehicleId/source relation), then exact plate. Keep ambiguous incomplete rows unmerged but move them to a clearly labeled historical/incomplete-identity section with physical IDs and policy context.",
       "requiredProof": "Oscar vehicle view shows resolved current identity once; versioned records under history; ambiguous incomplete rows clearly separated; zero merge/delete writes.",
-      "status": "PAULA_VISUAL_REJECTED_SOURCE_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
       "blocking": true,
-      "noDataMerge": true
+      "noDataMerge": true,
+      "sourceFixAt": "2026-09-25"
     },
     {
       "id": "B2-R42-POLICY-FROM-VEHICLE-PHYSICAL-VERSION-CONTEXT-R5",
@@ -1373,8 +1374,9 @@
       "rootCause": "Vehicle page link passes only clientId+policyId; policy renderer selects first vehicle by policy and does not disclose same-number sibling physical versions or source vehicle context.",
       "remediation": "Carry vehicleId into policy route, prefer exact linked vehicle, expose physical version context/vigency/ID, and explicitly disclose when this physical version has no receipt calendar while sibling same-number versions exist.",
       "requiredProof": "Open from exact vehicle preserves vehicleId context and same physical policy ID; receipt section corresponds to that exact version; sibling versions are distinguishable.",
-      "status": "PAULA_VISUAL_REJECTED_SOURCE_REMEDIATION_REQUIRED",
-      "blocking": true
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
+      "blocking": true,
+      "sourceFixAt": "2026-09-25"
     },
     {
       "id": "B2-R43-INDIVIDUAL-RECEIPT-EDIT-MISSING-R5",
@@ -1386,8 +1388,9 @@
       "rootCause": "Native receipt detail delegates all changes to policy-level plan editing and has no per-receipt durable write contract.",
       "remediation": "Add controlled per-receipt edit with reason, explicit allowed fields and durable readback; paid/conciliated receipts remain protected from destructive financial edits.",
       "requiredProof": "Authorized role can edit one eligible receipt and reload same receipt; sibling receipts unchanged; paid evidence protected; portfolio row stays synchronized.",
-      "status": "PAULA_VISUAL_REJECTED_SOURCE_REMEDIATION_REQUIRED",
-      "blocking": true
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
+      "blocking": true,
+      "sourceFixAt": "2026-09-25"
     },
     {
       "id": "B2-R44-COBROS-PROJECTION-MISSES-REPORTED-PAYMENTS-R5",
@@ -1399,8 +1402,9 @@
       "rootCause": "Cobros projection reads only canonical cobros rows; receipt evidence in recibosEsperados.estadoOperativo=pago_reportado is not projected into the Cobros surface.",
       "remediation": "Add non-authoritative reported-payment rows/view to Cobros from recibosEsperados, clearly labeled as evidence pending validation; never create a confirmed cobro from that projection.",
       "requiredProof": "Same client shows reported-payment evidence in Cobros; zero fabricated confirmed cobros; validation/apply actions remain explicit.",
-      "status": "PAULA_VISUAL_REJECTED_SOURCE_REMEDIATION_REQUIRED",
-      "blocking": true
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
+      "blocking": true,
+      "sourceFixAt": "2026-09-25"
     },
     {
       "id": "B2-R45-INSURER-REAL-LOGO-SAVE-BLOCKED-BY-PREVIEW-BOUNDARY-R5",
@@ -1468,7 +1472,7 @@
   "currentHumanReview": {
     "date": "2026-09-25",
     "origin": "PAULA_VISUAL_REVIEW_20260925_R5",
-    "decision": "REJECTED_REMEDIATION_REQUIRED",
+    "decision": "R5_SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36207016351-130c1g81.web.app",
     "exactSourceSha": "2c09fb92facf917d95edeac1394c34edb146a056",
     "confirmedPass": [
@@ -1489,7 +1493,21 @@
       "B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5"
     ],
     "noLive": true,
-    "b3": "NOT_STARTED"
+    "b3": "NOT_STARTED",
+    "remediationHeadParent": "49f687519e733af736dfc8173d5b28c50f11e7fb",
+    "rootfixProductFiles": [
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/index.html"
+    ],
+    "mechanismFiles": [
+      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+    ],
+    "emailDeliveryNotClaimedResolved": true
   },
   "lastReview": {
     "origin": "PAULA_VISUAL_REVIEW_20260925_R4",

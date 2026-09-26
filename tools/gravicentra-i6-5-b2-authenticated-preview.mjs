@@ -714,6 +714,42 @@ try{
   evidence.vehicleEdit={sameId:true,noDuplicate:true,readback:true,reload:true,policyLinkPreserved:true};
   milestone('VEHICLE_EDIT_RELOAD_PASS',{vehicleCount});
 
+  milestone('VEHICLE_POLICY_CONTEXT_START');
+  await page.evaluate(({cid,vid})=>{location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&v='+encodeURIComponent(vid);},{cid:client.id,vid:vehicle.id});
+  await page.waitForSelector('.orbit-vehicle-fullpage',{timeout:10000});
+  const policyFromVehicle=page.locator('.orbit-vehicle-fullpage a.btn.primary',{hasText:'Abrir póliza completa'}).first();
+  const policyFromVehicleHref=String(await policyFromVehicle.getAttribute('href')||'');
+  need(policyFromVehicleHref.includes('p='+encodeURIComponent(policy.id))&&policyFromVehicleHref.includes('v='+encodeURIComponent(vehicle.id)),'B2_AUTH_VEHICLE_POLICY_CONTEXT_LINK_MISSING:'+policyFromVehicleHref);
+  await policyFromVehicle.click();await page.waitForSelector('.orbit-policy-fullpage',{timeout:10000});
+  const contextVehicleAttr=String(await page.locator('.orbit-policy-fullpage').getAttribute('data-policy-context-vehicle')||'');
+  need(contextVehicleAttr===vehicle.id,'B2_AUTH_VEHICLE_POLICY_CONTEXT_DROPPED:'+contextVehicleAttr);
+  evidence.crud.vehiclePolicyContext=true;milestone('VEHICLE_POLICY_CONTEXT_PASS',{samePolicy:true,sameVehicle:true});
+
+  milestone('RECEIPT_INDIVIDUAL_EDIT_START');
+  const receiptTarget=receipts.slice().sort((a,b)=>String(a.fechaLimite||a.vence||'').localeCompare(String(b.fechaLimite||b.vence||'')))[0],siblingReceipt=receipts.find(x=>x.id!==receiptTarget.id)||null;
+  const oldDue=String(receiptTarget.fechaLimite||receiptTarget.vence||receiptTarget.fechaVencimiento||'');need(/^\d{4}-\d{2}-\d{2}$/.test(oldDue),'B2_AUTH_RECEIPT_DUE_MISSING');
+  const dueObj=new Date(oldDue+'T00:00:00Z');dueObj.setUTCDate(dueObj.getUTCDate()+1);const editedDue=dueObj.toISOString().slice(0,10);
+  const siblingBefore=siblingReceipt?(await dataCol(db,'recibosEsperados').doc(siblingReceipt.id).get()).data()||{}:null;
+  await page.evaluate(({rid,cid})=>Orbit.receiptsPortfolioProjection.openReceiptDetail(rid,cid),{rid:receiptTarget.id,cid:client.id});
+  await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:10000});
+  need(await page.locator('[data-rp-edit-receipt="1"]').count()===1,'B2_AUTH_INDIVIDUAL_RECEIPT_EDIT_CONTROL_MISSING');
+  await page.click('[data-rp-edit-receipt="1"]');await page.waitForSelector('#rp-edit-receipt',{timeout:10000});
+  await page.fill('#rp-edit-receipt [data-rp-due]',editedDue);await page.fill('#rp-edit-receipt [data-rp-reason]','B2 QA edición individual de recibo');
+  await page.click('#rp-edit-receipt [data-rp-save]');await page.waitForSelector('#rp-edit-receipt',{state:'detached',timeout:30000});
+  const editedReceipt=await waitFor(async()=>{const s=await dataCol(db,'recibosEsperados').doc(receiptTarget.id).get(),d=s.data()||{};return String(d.fechaLimite||d.vence||'')===editedDue?d:null;},'B2_AUTH_INDIVIDUAL_RECEIPT_EDIT_READBACK',30000);
+  const editedPortfolio=await waitFor(async()=>{const rows=await rowsBy(db,'carteraPrimas','reciboId',receiptTarget.id);const d=rows[0]||null;return d&&String(d.fechaLimite||d.vence||'')===editedDue?d:null;},'B2_AUTH_INDIVIDUAL_RECEIPT_PORTFOLIO_SYNC',30000);
+  if(siblingReceipt){const siblingAfter=(await dataCol(db,'recibosEsperados').doc(siblingReceipt.id).get()).data()||{};for(const k of ['fechaLimite','vence','monto','montoTotal','primaTotal'])need(JSON.stringify(siblingAfter[k]??null)===JSON.stringify(siblingBefore[k]??null),'B2_AUTH_INDIVIDUAL_RECEIPT_SIBLING_CHANGED_'+k);}
+  evidence.crud.individualReceiptEditReadback=!!editedReceipt;evidence.crud.individualReceiptPortfolioSync=!!editedPortfolio;evidence.writes.synthetic+=3;
+  milestone('RECEIPT_INDIVIDUAL_EDIT_PASS',{receiptId:hash(receiptTarget.id),siblingProtected:!!siblingReceipt});
+
+  await bounded(page.evaluate(async ({rid,date})=>Orbit.store.updateDurable('recibosEsperados',rid,{estadoOperativo:'pago_reportado',fechaPagoReportada:date,reportado:date}),{rid:receiptTarget.id,date:editedDue}),'B2_AUTH_REPORTED_PAYMENT_MARK_TIMEOUT',30000);
+  evidence.writes.synthetic+=1;
+  await page.evaluate(()=>{if(window.Orbit?.router?.go)Orbit.router.go('cobros');else location.hash='#/cobros';});
+  await page.waitForSelector('[data-reported-payment-evidence="'+receiptTarget.id+'"]',{timeout:15000});
+  const reportedText=clean(await page.locator('[data-reported-payment-evidence="'+receiptTarget.id+'"]').innerText(),800);need(/Pago reportado/i.test(reportedText),'B2_AUTH_REPORTED_PAYMENT_NOT_VISIBLE:'+reportedText);
+  const cobrosAfterReported=await rowsBy(db,'cobros','polizaId',policy.id);need(cobrosAfterReported.length===0,'B2_AUTH_REPORTED_PAYMENT_FABRICATED_COBRO:'+cobrosAfterReported.length);
+  evidence.crud.reportedPaymentVisible=true;evidence.crud.reportedPaymentDoesNotFabricateCobro=true;
+  milestone('REPORTED_PAYMENT_COBROS_PROJECTION_PASS',{confirmedCobros:0});
 
   milestone('INSURER_SECURE_EDIT_START');
   const insurerId='b2-asg-'+stamp.toLowerCase(),portalId='portal-b2-'+stamp.toLowerCase(),syntheticSecret='B2-Preview-'+stamp+'-Secure',logoFixture=path.join(process.cwd(),'orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png');

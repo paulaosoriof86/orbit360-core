@@ -179,6 +179,22 @@
     if(/low|baja|conflict|ambigu/.test(s))return'Requiere revisión';
     return'';
   }
+  function receiptLockedForEdit(r){
+    var op=low(r&&r.estadoOperativo);return !!(r&&(r.fechaPago||r.conciliado===true||r.conciliadoPago===true||op==='pago_reportado'||clean(r.fechaPagoReportada)||clean(r.reportado)||low(r.estado)==='pagado'||low(r.estado)==='conciliado'));
+  }
+  function editReceipt(receiptId,cid){
+    var r=Orbit.store.get('recibosEsperados',receiptId);if(!r)return false;
+    if(receiptLockedForEdit(r)){try{Orbit.ui.toast('Este recibo tiene evidencia de pago y está protegido. Usa una gestión controlada para corregirlo.');}catch(e){}return false;}
+    if(!Orbit.policyReceipts||typeof Orbit.policyReceipts.updateReceipt!=='function')return false;
+    var cur=r.moneda||(Orbit.store.get('polizas',r.polizaId)||{}).moneda||'GTQ',old=document.getElementById('rp-edit-receipt');if(old)old.remove();
+    var back=document.createElement('div');back.id='rp-edit-receipt';back.className='drawer-back open';back.style.cssText='display:grid;place-items:center;z-index:245';
+    var val=function(v){return v==null?'':String(v);},n=function(v){var x=numberOrNull(v);return x==null?'':String(x);};
+    back.innerHTML=`<div class="card" style="width:min(760px,96vw);max-height:92vh;overflow:auto;padding:0"><div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px"><div><small class="muted">Edición individual controlada</small><b style="display:block;font-family:var(--f-display);font-size:18px">Recibo ${esc(r.serie||r.cuota||'—')}</b><small class="muted">Solo cambia este recibo; no modifica los recibos hermanos.</small></div><button class="imp-x" data-rp-close>✕</button></div><div style="padding:18px 20px;display:grid;gap:12px"><div class="cfg-note">Los recibos pagados, conciliados o con pago reportado están protegidos. Si el total deja de coincidir con la póliza, la diferencia seguirá visible para conciliación.</div><div class="cgrid"><label class="ce-l">Serie / recibo<input class="o-sel" data-rp-serie value="${esc(val(r.serie||r.numeroReciboFuente))}"></label><label class="ce-l">Fecha límite<input type="date" class="o-sel" data-rp-due value="${esc(dueDate(r))}"></label><label class="ce-l">Prima neta<input type="number" step="0.01" class="o-sel" data-rp-net value="${esc(n(r.primaNeta))}"></label><label class="ce-l">Gastos expedición<input type="number" step="0.01" class="o-sel" data-rp-exp value="${esc(n(r.gastosExpedicion))}"></label><label class="ce-l">Gastos financieros<input type="number" step="0.01" class="o-sel" data-rp-fin value="${esc(n(r.gastosFinanciamiento))}"></label><label class="ce-l">Descuento / ajuste<input type="number" step="0.01" class="o-sel" data-rp-adj value="${esc(n(r.descuento))}"></label><label class="ce-l">IVA / impuestos<input type="number" step="0.01" class="o-sel" data-rp-tax value="${esc(n(r.impuestosIVA))}"></label><label class="ce-l">Total del recibo<input type="number" step="0.01" class="o-sel" data-rp-total value="${esc(n(r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:r.monto)))}"></label></div><label class="ce-l">Motivo del cambio *<textarea class="o-sel" data-rp-reason rows="2" placeholder="Describe por qué se corrige este recibo"></textarea></label><div class="hint error" data-rp-error style="display:none"></div></div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px"><button class="btn ghost" data-rp-close>Cancelar</button><button class="btn primary" data-rp-save>Guardar recibo</button></div></div>`;
+    document.body.appendChild(back);var close=function(){back.remove();};back.querySelectorAll('[data-rp-close]').forEach(function(x){x.addEventListener('click',close);});
+    back.querySelector('[data-rp-save]').addEventListener('click',async function(){var error=back.querySelector('[data-rp-error]'),reason=clean(back.querySelector('[data-rp-reason]').value),save=back.querySelector('[data-rp-save]');if(reason.length<5){error.style.display='';error.textContent='Indica un motivo claro de al menos 5 caracteres.';return;}var numv=function(sel){var raw=clean(back.querySelector(sel).value);return raw===''?0:Number(raw);};var patch={serie:clean(back.querySelector('[data-rp-serie]').value),fechaLimite:clean(back.querySelector('[data-rp-due]').value),primaNeta:numv('[data-rp-net]'),gastosExpedicion:numv('[data-rp-exp]'),gastosFinanciamiento:numv('[data-rp-fin]'),descuento:numv('[data-rp-adj]'),impuestosIVA:numv('[data-rp-tax]'),primaTotal:numv('[data-rp-total]')};save.disabled=true;save.textContent='Guardando…';var out=await Orbit.policyReceipts.updateReceipt(receiptId,patch,{motivo:reason});if(!out||out.ok!==true){error.style.display='';error.textContent='No fue posible actualizar este recibo: '+[].concat(out&&out.errors||[]).join(', ');save.disabled=false;save.textContent='Guardar recibo';return;}close();renderReceiptDetail(receiptId,cid||r.clienteId);try{Orbit.ui.toast('Recibo actualizado y confirmado en servidor.');}catch(e){}});
+    return true;
+  }
+
   function renderReceiptDetail(receiptId,cid){
     var r=Orbit.store.get('recibosEsperados',receiptId);if(!r)return false;
     var p=Orbit.store.get('polizas',r.polizaId)||{},c=Orbit.store.get('clientes',cid||r.clienteId)||{},v=Orbit.store.where('vehiculos',function(x){return x&&x.polizaId===r.polizaId;})[0]||{},portfolio=Orbit.store.where('carteraPrimas',function(x){return x&&x.reciboId===r.id;})[0]||null,cur=r.moneda||p.moneda||c.moneda||'GTQ',st=stateLabel(r),rec=reconciliationLabel(r,portfolio),target=document.getElementById('host')||document.getElementById('c360-body');if(!target)return false;
@@ -200,7 +216,7 @@
       +'</div></section><div style="display:grid;gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🔎 Estado y conciliación</h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'+badges+'</div><div class="muted" style="line-height:1.5">'+esc(receiptStateNote(r,portfolio))+'</div>'
       +(portfolio?'<div style="margin-top:10px">En cartera: <span style="font-weight:600">'+esc(moneyDetail(portfolio.primaTotal||portfolio.montoTotal||portfolio.monto||r.primaTotal||r.montoTotal||r.monto,cur))+'</span></div>':'')
       +'</section><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">📅 Información del registro</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px">'+(operationalAsOf||'<div class="muted">Sin fecha adicional reportada.</div>')+'</div><details class="gi-technical-origin" style="margin-top:14px"><summary>Detalles de origen y auditoría</summary><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px">'+trace+'</div></details></section></div></div></div>';
-    if(canEditPlan){var statusEl=target.querySelector('[data-rp-hero-status="1"]');if(statusEl){var btn=document.createElement('button');btn.className='btn primary sm';btn.textContent='✏ Editar plan de recibos';btn.style.marginLeft='8px';btn.addEventListener('click',function(){Orbit.modules.cliente360.editarPoliza(p.id);});statusEl.parentElement&&statusEl.parentElement.appendChild(btn);}}
+    if(canEditPlan){var statusEl=target.querySelector('[data-rp-hero-status="1"]');if(statusEl){var parent=statusEl.parentElement,locked=receiptLockedForEdit(r),edit=document.createElement('button');edit.className='btn primary sm';edit.setAttribute('data-rp-edit-receipt','1');edit.textContent=locked?'🔒 Recibo protegido':'✏ Editar este recibo';edit.style.marginLeft='8px';edit.disabled=locked;if(!locked)edit.addEventListener('click',function(){editReceipt(r.id,cid||r.clienteId);});parent&&parent.appendChild(edit);var btn=document.createElement('button');btn.className='btn ghost sm';btn.textContent='Editar plan de recibos';btn.style.marginLeft='8px';btn.addEventListener('click',function(){Orbit.modules.cliente360.editarPoliza(p.id);});parent&&parent.appendChild(btn);}}
     return true;
   }
   function openReceiptDetail(receiptId,cid){return renderReceiptDetail(receiptId,cid);}
@@ -234,10 +250,13 @@
   function patchCobros(cid){
     var body=document.getElementById('c360-body');if(!body)return;
     var applied=Orbit.store.where('cobros',function(c){return c&&c.clienteId===cid;});
+    var reported=Orbit.store.where('recibosEsperados',function(r){return r&&r.clienteId===cid&&low(r.estadoOperativo)==='pago_reportado';});
     var reconciled=applied.filter(isPaymentReconciled);
     if(body.querySelector('[data-rp-native-cobros-note]'))return;
     var note=document.createElement('div');note.setAttribute('data-rp-native-cobros-note','1');note.className='card';note.style.cssText='padding:12px 14px;margin-bottom:12px';
-    note.innerHTML='<b>Cobros aplicados</b><div class="muted" style="font-size:12.5px;margin-top:3px">'+(applied.length?reconciled.length+' de '+applied.length+' cobros están conciliados.':'Aún no hay cobros aplicados para este cliente.')+' Cartera conciliada representa saldo pendiente confirmado, no pago.</div>';
+    var appliedText=applied.length?reconciled.length+' de '+applied.length+' cobros confirmados están conciliados.':'No hay cobros confirmados para este cliente.';
+    var reportedText=reported.length?' Hay '+reported.length+' pago(s) reportado(s) pendientes de validación; se muestran como evidencia y no incrementan cobros confirmados.':'';
+    note.innerHTML='<b>Cobros y evidencia de pago</b><div class="muted" style="font-size:12.5px;margin-top:3px">'+appliedText+reportedText+' Cartera conciliada representa saldo pendiente confirmado, no pago.</div>';
     body.insertBefore(note,body.firstChild);
   }
 
@@ -301,7 +320,7 @@
     amount:amount,dueDate:dueDate,stateLabel:stateLabel,isHistorical:isHistorical,isFuture:isFuture,
     isPaymentReconciled:isPaymentReconciled,isPortfolioReconciled:isPortfolioReconciled,
     reconciliationLabel:reconciliationLabel,portfolioSummary:portfolioSummary,
-    renderReceipts:renderReceipts,renderReceiptDetail:renderReceiptDetail,openReceiptDetail:openReceiptDetail,
+    renderReceipts:renderReceipts,renderReceiptDetail:renderReceiptDetail,openReceiptDetail:openReceiptDetail,editReceipt:editReceipt,
     reconcileOwners:reconcileOwners
   };
   Orbit.receiptsPortfolioProjection=Orbit.receiptsPortfolioProjectionV920;
