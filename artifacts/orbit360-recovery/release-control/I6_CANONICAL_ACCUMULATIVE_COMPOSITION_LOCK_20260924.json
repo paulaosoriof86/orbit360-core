@@ -157,7 +157,7 @@
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "cba6099ff7499c452c99f283702f27886154ae23",
     "orbit360-platform/modules/inicio.js": "bbae195ae7725ee1bcd790f1234946b31660d68e",
     "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
-    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "ed15d860eeebb9768a8eeca173c664ddc1b63dbc"
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "5b8ea91ee3d0db9398ed4298ce4b95525061ddfa"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -177,16 +177,18 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "PAULA_RENEWAL_SEMANTICS_R9",
-    "parentHead": "d6d3f0a8776b8da5c648989a07907f56e08b2839",
-    "status": "RENEWAL_SEMANTICS_REFINED_PENDING_NEW_EXACT_PREVIEW",
+    "origin": "PAULA_VISUAL_RENEWALS_DUAL_PASS_R10",
+    "parentHead": "fadd22608a4c9c53203164cd86ef82297942e841",
+    "status": "RENEWALS_SINGLE_PASS_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "changedProductFiles": [
       "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
     ],
     "productBlobs": {
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "ed15d860eeebb9768a8eeca173c664ddc1b63dbc"
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "5b8ea91ee3d0db9398ed4298ce4b95525061ddfa"
     },
-    "semanticContract": "Propuestas->Ops; Pedir renovar->Ops accepted; Cotizar separate for authorized non-advisor roles; Ops issue-or-register-firm-renewal.",
+    "rootCause": "Deferred enhance exposed base and operational renewal states sequentially.",
+    "fix": "Synchronous single-call composition before paint.",
+    "preservedSemantics": "Propuestas->Ops; Pedir renovar->Ops accepted; Cotizar separate and role-gated; Ops issue-or-register-firm-renewal.",
     "noDataReimport": true,
     "noLive": true,
     "noB3": true

@@ -1,0 +1,23 @@
+{
+  "schema": "gravicentra-i6-5-b2-r10-renewals-render-single-pass-v1",
+  "recordedAt": "2026-09-26",
+  "origin": "PAULA_VISUAL_OBSERVATION",
+  "symptom": "On entering Renovaciones the user observes values change immediately from one set to another.",
+  "rootCause": "renewals-v1200-operational-bridge wrapped the base render and deferred enhance(host) with setTimeout(...,0). The browser could paint the base renewal metrics/actions before the operational bridge replaced them with scoped operational metrics/actions.",
+  "classification": "PRODUCT_UI_COMPOSITION_DUAL_PASS",
+  "fix": {
+    "owner": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+    "beforeBlob": "ed15d860eeebb9768a8eeca173c664ddc1b63dbc",
+    "afterBlob": "5b8ea91ee3d0db9398ed4298ce4b95525061ddfa",
+    "behavior": "Run enhance(host) synchronously inside the same render call so the browser does not expose an intermediate renewal authority."
+  },
+  "dataAuthority": "No second datastore was demonstrated; the defect was two sequential UI composition passes over the same runtime store, with non-identical selection logic.",
+  "requiredProof": [
+    "Fresh load on Renovaciones shows one stable metric/action state",
+    "No visible counter/button swap after first paint",
+    "Role-gated Propuestas/Pedir renovar/Cotizar remain correct"
+  ],
+  "noLive": true,
+  "noB3": true,
+  "noReimport": true
+}

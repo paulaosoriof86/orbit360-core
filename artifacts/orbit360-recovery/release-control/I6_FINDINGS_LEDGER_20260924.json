@@ -2154,6 +2154,23 @@
       "receiptBlobSha": "112819674f4f112cc85ca0f4a85c76905977f432",
       "noReimport": true,
       "noLive": true
+    },
+    {
+      "id": "B2-R64-RENEWALS-DUAL-PASS-VISUAL-AUTHORITY-R10",
+      "block": "B2",
+      "source": "PAULA_VISUAL_20260926",
+      "surface": "Renovaciones",
+      "classification": "PRODUCT_UI_COMPOSITION",
+      "finding": "Renewals rendered base content then asynchronously enhanced it, exposing two sequential visual states and allowing metrics/actions to visibly change immediately after entry.",
+      "rootCause": "mod.render called originalRender(host) and then setTimeout(()=>enhance(host),0).",
+      "remediation": "Enhance synchronously in the same render transaction; preserve single final visual state before paint.",
+      "requiredProof": "Fresh Preview entry to Renovaciones remains visually stable and role-specific actions do not swap after first paint.",
+      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_PAULA_VISUAL",
+      "blocking": true,
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R10_RENEWALS_RENDER_SINGLE_PASS_20260926.json",
+      "receiptBlobSha": "df531173ab4cee8cab79cee0e432f8e6602cb6d6",
+      "noReimport": true,
+      "noLive": true
     }
   ],
   "phaseBBacklog": [

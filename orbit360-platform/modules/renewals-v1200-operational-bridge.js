@@ -153,7 +153,7 @@ Orbit.modules = Orbit.modules || {};
   }
 
   const originalRender=mod.render.bind(mod);
-  mod.render=function(host){const out=originalRender(host);setTimeout(()=>enhance(host),0);return out;};
+  mod.render=function(host){const out=originalRender(host);enhance(host);return out;};
   mod.campana=campana;
   mod.solicitarPropuestas=solicitarPropuestas;
   mod.cotizarDirecto=cotizarDirecto;
