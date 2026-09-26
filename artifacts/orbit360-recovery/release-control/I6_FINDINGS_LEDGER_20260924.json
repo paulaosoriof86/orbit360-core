@@ -1203,8 +1203,8 @@
       "surface": "Cliente360/Ops",
       "rootCause": "Effective current owners still used optimistic Orbit.store insert: core/ciclo.js returned before server commit, and renewal bridge immediately redirected/toasted. Backend rejection in protected Preview rolled back the pending row after UI had implied success.",
       "remediation": "Use awaited crearGestionDurable -> server-owned workflow command -> canonical readback before any success/notification. Preview real-data rejection must be explicit.",
-      "requiredProof": "Synthetic authenticated management create from Cliente360/Renovaciones -> server commit -> canonical readback -> visible exactly once in Ops -> cleanup; real Preview action never claims persistence.",
-      "status": "SOURCE_RECOMPOSED_R9_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_VISUAL",
+      "requiredProof": "Synthetic authenticated management create from Cliente360/Renovaciones -> server commit -> canonical readback -> visible exactly once in Ops -> reload -> cleanup; real Preview action must explicitly report no write.",
+      "status": "HUMAN_FAIL_CLOSED_PASS_AUTH_E2E_PENDING_R11",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "blocking": true,
@@ -1217,7 +1217,9 @@
         }
       },
       "latestRuleLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R9_RENEWAL_WORKFLOW_BUSINESS_RULE_LOCK_20260926.json",
-      "latestRuleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e"
+      "latestRuleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e",
+      "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
+      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a"
     },
     {
       "id": "B2-R35-VEHICLE-HISTORY-PROJECTION-R4",
@@ -2085,8 +2087,8 @@
       "finding": "Renewal/management action can navigate or imply success before canonical Ops management is committed; protected Preview then shows Ops with zero managements.",
       "rootCause": "renewals-v1200-operational-bridge invokes optimistic Orbit.ciclo.crearGestion; core/ciclo crearGestion uses non-awaited S().insert.",
       "remediation": "Await server-owned create_management + canonical readback before normal success. Preserve approved Renew -> Cotizador/Comparativo -> accepted offer -> Ops issuance -> real renewed policy workflow.",
-      "requiredProof": "Synthetic authenticated renewal management appears exactly once in Ops and survives reload; protected real Preview explicitly reports no write; no provisional renewed policy created by clicking Renew.",
-      "status": "SOURCE_REFINED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_VISUAL",
+      "requiredProof": "Synthetic renewal_proposals + renewal_accepted management commit/readback; each appears once in Ops after reload; accepted panel exposes issuance/direct-registration branches; cleanup.",
+      "status": "HUMAN_FAIL_CLOSED_PASS_AUTH_E2E_PENDING_R11",
       "blocking": true,
       "sourceFix": {
         "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
@@ -2098,7 +2100,9 @@
       "latestRuleLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R9_RENEWAL_WORKFLOW_BUSINESS_RULE_LOCK_20260926.json",
       "latestRuleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e",
       "businessRule": "Propuestas->Ops; Pedir renovar->renewal_accepted en Ops tras aprobación; Cotizar es acción separada y no disponible al Asesor; Ops decide solicitar emisión o registrar renovación en firme.",
-      "prevalentRuleReceipt": "artifacts/orbit360-recovery/release-control/I6_5_RENEWAL_SEMANTICS_PREVALENT_20260926.json"
+      "prevalentRuleReceipt": "artifacts/orbit360-recovery/release-control/I6_5_RENEWAL_SEMANTICS_PREVALENT_20260926.json",
+      "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
+      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a"
     },
     {
       "id": "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
@@ -2124,7 +2128,7 @@
       "rootCause": "Legacy renewal bridge encoded 'create/reuse management and open Cotizador' as one action, and Cliente360 Renovar delegated to solicitarPropuestas.",
       "remediation": "Separate proposal, direct-quote and accepted-renewal actions; make Ops the canonical decision owner; add direct firm-renewal engine and version-safe duplicate contract.",
       "requiredProof": "Exact immutable Preview functional proof + authenticated general proof + Paula visual: three renewal actions by role; Propuestas/Renovar do not auto-open Cotizador; Ops accepted panel exposes issuance/direct registration; no optimistic persistence claim in protected Preview.",
-      "status": "SOURCE_FIXED_R9_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_VISUAL",
+      "status": "HUMAN_SEMANTICS_VISIBLE_AUTH_E2E_PENDING_R11",
       "blocking": true,
       "noReimport": true,
       "noLive": true,
@@ -2139,7 +2143,9 @@
         "functions/product-ops-leads-domain.js": "01eacecdd66baf143217e9b6cf5f588902649b1c",
         "orbit360-platform/index.html": "ff7e84f91d8078dd8bc6e424920c9101afb44837",
         "tools/gravicentra-i6-5-b2-functional.mjs": "435eb9db882c14682f062bb7a2b0ac54a06ccbfd"
-      }
+      },
+      "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
+      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a"
     },
     {
       "id": "B2-R63-RENEWAL-ACTION-SEMANTICS-R9",
@@ -2148,12 +2154,14 @@
       "surface": "Renovaciones/Cliente360/Ops",
       "classification": "BUSINESS_RULE_PREVALENT",
       "finding": "Renewal actions must be semantically separated: Propuestas creates Ops proposal management; Pedir renovar creates accepted-renewal management after client approval; Cotizar is separate and advisor-forbidden; Ops handles issuance request or direct firm-renewal registration.",
-      "status": "SOURCE_IMPLEMENTED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_VISUAL",
+      "status": "HUMAN_SEMANTICS_VISIBLE_AUTH_E2E_PENDING_R11",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_RENEWAL_SEMANTICS_PREVALENT_20260926.json",
       "receiptBlobSha": "112819674f4f112cc85ca0f4a85c76905977f432",
       "noReimport": true,
-      "noLive": true
+      "noLive": true,
+      "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
+      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a"
     },
     {
       "id": "B2-R64-RENEWALS-DUAL-PASS-VISUAL-AUTHORITY-R10",
@@ -2165,12 +2173,32 @@
       "rootCause": "mod.render called originalRender(host) and then setTimeout(()=>enhance(host),0).",
       "remediation": "Enhance synchronously in the same render transaction; preserve single final visual state before paint.",
       "requiredProof": "Fresh Preview entry to Renovaciones remains visually stable and role-specific actions do not swap after first paint.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_SINGLE_PASS_OBSERVED_PENDING_FINAL_DISPOSITION",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R10_RENEWALS_RENDER_SINGLE_PASS_20260926.json",
       "receiptBlobSha": "df531173ab4cee8cab79cee0e432f8e6602cb6d6",
       "noReimport": true,
-      "noLive": true
+      "noLive": true,
+      "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
+      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a"
+    },
+    {
+      "id": "B2-R65-OPS-LEADS-AUTH-E2E-COVERAGE-GAP-R11",
+      "block": "B2",
+      "source": "FORENSIC_QA_AUDIT_R11",
+      "surface": "Ops/Leads/Cliente360/Renovaciones",
+      "classification": "QA_COVERAGE_GAP",
+      "finding": "Authenticated B2 pass did not exercise successful synthetic management persistence/projection for generic gestion, renewal proposals, accepted renewal, or Leads↔Ops same-business synchronization.",
+      "rootCause": "The harness validated source contracts and advisor Ops visibility but had no server-owned synthetic management E2E discriminant.",
+      "remediation": "Strengthen authenticated harness with b2-ges/b2-neg canonical writes, readback, one-card projection, accepted-renewal branches, reload idempotency and cleanup.",
+      "requiredProof": "New exact immutable Preview authenticated run passes OPS_LEADS_SYNTHETIC_E2E_PASS and cleanup leaves zero synthetic data/workflow residue.",
+      "status": "HARNESS_FIXED_PENDING_EXACT_PREVIEW_AUTH_PROOF",
+      "blocking": true,
+      "harnessBlobSha": "ab1fdb808fb255be3f490a500c63705a23bba32e",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
+      "receiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a",
+      "noLive": true,
+      "noB3": true
     }
   ],
   "phaseBBacklog": [

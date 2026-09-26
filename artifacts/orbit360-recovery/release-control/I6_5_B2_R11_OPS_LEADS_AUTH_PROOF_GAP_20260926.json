@@ -1,0 +1,47 @@
+{
+  "schema": "gravicentra-i6-5-b2-r11-ops-leads-auth-proof-gap-v1",
+  "recordedAt": "2026-09-26",
+  "origin": "PAULA_VISUAL_REVIEW_R11_PLUS_FORENSIC_QA_AUDIT",
+  "reviewedPreview": {
+    "sourceSha": "1b80adb5f8d3cc29e0323c8dab15d376d1b8790d",
+    "buildId": "gi-i65-b2-1b80adb5f8d3-57f234755dc1",
+    "runId": 36267823750,
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36267823750-273fjyys.web.app"
+  },
+  "humanEvidence": {
+    "proposalsRealPreview": "Explicit failure/no write; Ops remains 0.",
+    "acceptedRenewalRealPreview": "Explicit failure/no write; Ops remains 0.",
+    "client360GenericManagementRealPreview": "Explicit failure/no write; Ops remains 0.",
+    "directQuote": "Navigates to Cotizador as intended for current Dirección role.",
+    "interpretation": "Real Preview proves fail-closed truth and zero false success, but cannot prove successful persistence because operational real-data writes are intentionally blocked."
+  },
+  "qaGap": {
+    "previousAuthenticatedHarnessBlob": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
+    "strengthenedHarnessBlob": "ab1fdb808fb255be3f490a500c63705a23bba32e",
+    "priorPassInsufficientFor": [
+      "B2-R34-ASESOR-OPS-FALSE-SUCCESS-R4",
+      "B2-R62-RENEWAL-OPS-MANAGEMENT-DURABILITY-R8",
+      "B2-R63-RENEWAL-WORKFLOW-SEMANTIC-CONTRACT-R9"
+    ],
+    "missingPriorProof": "No synthetic management create/readback/one-card Ops projection/reload for generic management, renewal_proposals, renewal_accepted; no synthetic business Leads↔Ops projection.",
+    "newProof": "Synthetic canonical gestiones + negocio through real server-owned Preview workflow command, canonical readback, exact one-row store and Ops DOM projection, accepted-renewal Ops branches, Leads↔Ops same-business projection, reload idempotency, cleanup."
+  },
+  "lineageAudit": {
+    "acceptedLiveRunId": 34733712152,
+    "acceptedLiveHead": "e0b58e2c2e6cedd33217bad153d20f68edea212a",
+    "unchangedAcceptedOwners": {
+      "orbit360-platform/modules/ops.js": "c7fc79145d2cf54563ead5d68df131e009381dd5",
+      "orbit360-platform/modules/leads.js": "e25b6ea1660a415e3ebdba3c22ccfcd8e1236765",
+      "orbit360-platform/modules/ops-workflows-v1201-bridge.js": "de8af1c093edeea995b065b17295b811a9c609a0",
+      "orbit360-platform/core/ops-leads-domain-client.js": "e50225962284a0747769d0809e906cab96f2e60b"
+    },
+    "historicalBridge": "orbit360-platform/modules/ops-leads-domain-v20260804-bridge.js",
+    "historicalBridgeBlob": "571213009bba65b0af59d03675179a6a6fed3d9a",
+    "historicalBridgeLoadedInAcceptedLive": false,
+    "historicalBridgeLoadedNow": false,
+    "conclusion": "Its absence is not a new regression. Durable workflow sync is now owned by store-firestore-product-operational-p0.js + product-ops-leads-domain.js."
+  },
+  "noLive": true,
+  "noB3": true,
+  "noReimport": true
+}

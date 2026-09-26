@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -245,7 +245,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PASS",
+    "status": "PENDING_STRENGTHENED_OPS_LEADS_E2E",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "1b80adb5f8d3cc29e0323c8dab15d376d1b8790d",
     "exactPreviewBuildId": "gi-i65-b2-1b80adb5f8d3-57f234755dc1",
@@ -430,7 +430,9 @@
     "priorPassRunId": 36258221310,
     "priorPassPreserved": true,
     "proofStrengtheningReason": "R59_VISIBLE_PLATE_UNIQUENESS_AND_ACTIVE_POLICY_COVERAGE",
-    "invalidatedOldPreviewRunId": 36260454531
+    "invalidatedOldPreviewRunId": 36260454531,
+    "requiredHarnessBlob": "ab1fdb808fb255be3f490a500c63705a23bba32e",
+    "priorPassInsufficientForOpsManagement": true
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -2383,7 +2385,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "6b588cea0a1fee119cdec9c9e6b6ffd1382c3cf6",
+  "findingLedgerBlobSha": "0f612462b1bf7b6fe2392ee15792c3e606340b0d",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2574,5 +2576,13 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R10_RENEWALS_RENDER_SINGLE_PASS_20260926.json",
     "receiptBlobSha": "df531173ab4cee8cab79cee0e432f8e6602cb6d6",
     "findingId": "B2-R64-RENEWALS-DUAL-PASS-VISUAL-AUTHORITY-R10"
+  },
+  "r11OpsLeadsQa": {
+    "status": "HARNESS_FIXED_PENDING_EXACT_PREVIEW_AUTH_PROOF",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
+    "receiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a",
+    "findingId": "B2-R65-OPS-LEADS-AUTH-E2E-COVERAGE-GAP-R11",
+    "requiredMilestone": "OPS_LEADS_SYNTHETIC_E2E_PASS",
+    "preservedHumanEvidence": "REAL_PREVIEW_FAIL_CLOSED_NO_FALSE_SUCCESS"
   }
 }
