@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -385,7 +385,7 @@
     "storageAssetBucket": "gravicentra-insurance-assets-60e88ed5a1",
     "cleanupAssetProofRequired": true,
     "cleanupAssetProofStatus": "PASS",
-    "findingLedgerBlobSha": "7affdc062c7038e366c95047613ce1133393b217"
+    "findingLedgerBlobSha": "140ccefaf39a0fc826528401b92da23e2c77ccea"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -1715,7 +1715,7 @@
       "functions/product-operational-domain.js",
       "functions/product-ops-leads-domain.js"
     ],
-    "findingLedgerBlobSha": "7affdc062c7038e366c95047613ce1133393b217",
+    "findingLedgerBlobSha": "140ccefaf39a0fc826528401b92da23e2c77ccea",
     "latestQaHardening": "B2_STORAGE_ASSET_CLEANUP_EXPLICIT_READBACK"
   },
   "infrastructureBlocker": {
@@ -1748,5 +1748,31 @@
     "previewRebuildRequired": false,
     "runId": 36207874692,
     "assetAbsent": true
+  },
+  "humanReviewR5": {
+    "date": "2026-09-25",
+    "origin": "PAULA_VISUAL_REVIEW_20260925_R5",
+    "decision": "REJECTED_REMEDIATION_REQUIRED",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36207016351-130c1g81.web.app",
+    "exactSourceSha": "2c09fb92facf917d95edeac1394c34edb146a056",
+    "confirmedPass": [
+      "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN",
+      "VEHICLE_LINK_ACTION_EXECUTED",
+      "RECEIPT_PLAN_EDIT_VISIBLE",
+      "INSURER_READ_VISUAL",
+      "AUTHENTICATED_B2_RUNTIME_PASS"
+    ],
+    "blockingFindingIds": [
+      "B2-R41-VEHICLE-HISTORY-PROJECTION-INCOMPLETE-R5",
+      "B2-R42-POLICY-FROM-VEHICLE-PHYSICAL-VERSION-CONTEXT-R5",
+      "B2-R43-INDIVIDUAL-RECEIPT-EDIT-MISSING-R5",
+      "B2-R44-COBROS-PROJECTION-MISSES-REPORTED-PAYMENTS-R5"
+    ],
+    "nonBlockingObserved": [
+      "B2-R45-INSURER-REAL-LOGO-SAVE-BLOCKED-BY-PREVIEW-BOUNDARY-R5",
+      "B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5"
+    ],
+    "noLive": true,
+    "b3": "NOT_STARTED"
   }
 }
