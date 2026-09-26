@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "BLOCKED_PENDING_STORAGE_ASSET_BUCKET_AUTHORIZATION",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -244,7 +244,7 @@
     "supersededReason": "Preview asset runtime now binds physical bucket through non-reserved ORBIT360_STORAGE_BUCKET"
   },
   "authenticatedPreviewProof": {
-    "status": "PENDING_NEW_PREVIEW",
+    "status": "BLOCKED_INFRASTRUCTURE_PREREQUISITE",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "564486503a27d1fe811252e53b6464dde376ca7a",
     "exactPreviewBuildId": "gi-i65-b2-564486503a27-57f234755dc1",
@@ -297,8 +297,8 @@
     },
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
-    "lastFailedRunId": 35961205964,
-    "lastFailure": "INSURER_SAVE_NOT_REACHED_AFTER_AMBIGUOUS_GLOBAL_PROMPT_CONFIRMATION",
+    "lastFailedRunId": 36205585644,
+    "lastFailure": "FIREBASE_STORAGE_ASSET_BUCKET_MISSING",
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
@@ -1703,5 +1703,13 @@
     "changedProductFiles": [
       "functions/product-operational-domain.js"
     ]
+  },
+  "infrastructureBlocker": {
+    "id": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
+    "status": "OPEN",
+    "sameFirebaseRequired": true,
+    "newFirebaseForbidden": true,
+    "usableAssetBucketCount": 0,
+    "ownerAuthorizationRequired": true
   }
 }
