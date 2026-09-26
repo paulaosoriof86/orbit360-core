@@ -68,6 +68,7 @@ on:
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json'
       - 'tools/gravicentra-i6-5-b2-functional.mjs'
       - 'tools/gravicentra-i6-5-b2-authenticated-preview.mjs'
+      - 'tools/gravicentra-i6-5-b2-r52-human-fixture.mjs'
       - 'tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs'
       - 'orbit360-platform/core/policy-receipts-engine.js'
       - 'orbit360-platform/core/issuance-workflow-v1201.js'
@@ -4252,3 +4253,168 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 30
+
+
+  i65-b2-r52-human-fixture:
+    needs: i65-b2-authenticated-preview
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+      FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+      R52_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B2_R52_HUMAN_FIXTURE_READY_20260926.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate R52 human-safe visual fixture
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK)),l=JSON.parse(fs.readFileSync(process.env.FINDINGS));
+          const f=(l.findings||[]).find(x=>x.id==='B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6');
+          const ready=!!(b.r6&&b.r6.humanFixture&&b.r6.humanFixture.url);
+          const run=b.status==='PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL'
+            && b.authenticatedPreviewProof?.status==='PASS'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
+            && c.i65ForensicRemediationPlan?.currentBlock==='B2'
+            && f?.status==='TECHNICAL_AUTHENTICATED_PASS_HUMAN_SAFE_FIXTURE_PENDING'
+            && !ready;
+          if(run){
+            if(b.preview?.livePromoted!==false)throw Error('R52_LIVE_BOUNDARY_INVALID');
+            if(!b.preview?.sourceSha||!b.preview?.buildId||!b.preview?.url)throw Error('R52_EXACT_PREVIEW_BINDING_MISSING');
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('R52_HUMAN_FIXTURE_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Prepare isolated Firebase Preview credentials
+        if: steps.mode.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/r52-auth";mkdir -p "$ROOT";export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/'sa.json';p.write_text(json.dumps(d));p.chmod(0o600);print(p);break
+          else:raise SystemExit('R52_NO_SERVICE_ACCOUNT')
+          PY
+          test -s "$ROOT/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$ROOT/sa.json" >> "$GITHUB_ENV"
+          CROOT="$RUNNER_TEMP/r52-firebase-cli"
+          npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CROOT"
+          echo "FIREBASE_CLI_BIN=$CROOT/node_modules/firebase-tools/lib/bin/firebase.js" >> "$GITHUB_ENV"
+      - name: Generate browser-isolated synthetic insurer fixture
+        if: steps.mode.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b2-r52-human-fixture.mjs "$RUNNER_TEMP/r52-fixture"
+          node --check tools/gravicentra-i6-5-b2-r52-human-fixture.mjs
+          test -s "$RUNNER_TEMP/r52-fixture/site/index.html"
+          test -s "$RUNNER_TEMP/r52-fixture/site/fixture.json"
+      - name: Deploy R52 fixture to isolated Hosting Preview
+        if: steps.mode.outputs.run == 'true'
+        id: deploy
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/r52-fixture"
+          CHANNEL_ID="b2-r52-$GITHUB_RUN_ID"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/r52-deploy.json"
+          export DEPLOY="$RUNNER_TEMP/r52-deploy.json"
+          URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['DEPLOY']).read();prod='https://'+os.environ['HOSTING_SITE']+'.web.app'
+          urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
+          if not urls:raise SystemExit('R52_FIXTURE_URL_NOT_FOUND')
+          print(urls[-1])
+          PY
+          )
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "channel=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+      - name: Read back isolated fixture and exact candidate binding
+        if: steps.mode.outputs.run == 'true'
+        env:
+          FIXTURE_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,time,urllib.request
+          base=os.environ['FIXTURE_URL'].rstrip('/')
+          last=None
+          for i in range(8):
+              try:
+                  with urllib.request.urlopen(base+'/fixture.json?x='+str(time.time()),timeout=30) as r:d=json.loads(r.read())
+                  break
+              except Exception as e:
+                  last=e;time.sleep(2)
+          else:raise last
+          b=json.load(open(os.environ['B2_LOCK']))
+          x=d.get('exactCandidate',{})
+          if x.get('sourceSha')!=b['preview']['sourceSha'] or x.get('buildId')!=b['preview']['buildId'] or x.get('previewUrl')!=b['preview']['url']:
+              raise SystemExit('R52_FIXTURE_BINDING_DRIFT')
+          iso=d.get('isolation',{})
+          if iso.get('businessDataWrites') is not False or iso.get('firestoreWrites') is not False or iso.get('storageWrites') is not False:
+              raise SystemExit('R52_FIXTURE_NOT_ISOLATED')
+          print('R52_FIXTURE_READBACK=PASS')
+          PY
+      - name: Freeze R52 human fixture ready pending Paula visual
+        if: steps.mode.outputs.run == 'true'
+        env:
+          FIXTURE_URL: ${{ steps.deploy.outputs.url }}
+          FIXTURE_CHANNEL: ${{ steps.deploy.outputs.channel }}
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),cpPath=process.env.CONTROL,lockPath=process.env.B2_LOCK,ledgerPath=process.env.FINDINGS,receiptPath=process.env.R52_RECEIPT;
+          const c=JSON.parse(fs.readFileSync(cpPath)),b=JSON.parse(fs.readFileSync(lockPath)),l=JSON.parse(fs.readFileSync(ledgerPath));
+          const f=(l.findings||[]).find(x=>x.id==='B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6');if(!f)throw Error('R52_FINDING_MISSING');
+          const fixture={url:process.env.FIXTURE_URL,channelId:process.env.FIXTURE_CHANNEL,runId:Number(process.env.GITHUB_RUN_ID),expiresIn:'7d',exactCandidateSourceSha:b.preview.sourceSha,exactCandidateBuildId:b.preview.buildId,exactCandidatePreviewUrl:b.preview.url,isolation:'BROWSER_LOCAL_STORAGE_ONLY',firestoreWrites:false,storageWrites:false,businessDataWrites:false,livePromoted:false};
+          const receipt={schema:'gravicentra-i6-5-b2-r52-human-fixture-ready-v1',recordedAt:new Date().toISOString(),repository:'paulaosoriof86/orbit360-core',branch:process.env.GITHUB_REF_NAME,block:'B2',findingId:f.id,status:'HUMAN_SAFE_FIXTURE_READY_PENDING_PAULA_VISUAL',fixture,technicalServerProof:{status:'PASS',runId:b.authenticatedPreviewProof.runId,logoPersisted:b.authenticatedPreviewProof.insurerSecureEdit?.logoPersisted===true,cleanup:b.authenticatedPreviewProof.insurerSecureEdit?.cleanup===true},boundaries:{noLive:true,noB3:true,noReimport:true}};
+          fs.writeFileSync(receiptPath,JSON.stringify(receipt,null,2)+'\n');
+          f.status='HUMAN_SAFE_FIXTURE_READY_PENDING_PAULA_VISUAL';f.humanFixture=fixture;
+          l.currentHumanReview={...(l.currentHumanReview||{}),r6HumanFixtureReadyIds:[f.id],r6RemainingHumanFixtureIds:[],r6OverallPaulaVisualAccepted:false};
+          fs.writeFileSync(ledgerPath,JSON.stringify(l,null,2)+'\n');
+          b.r6={...(b.r6||{}),status:'EXACT_AUTHENTICATED_TECHNICAL_PASS_HUMAN_FIXTURE_READY_PENDING_PAULA_VISUAL',humanFixture:fixture,remainingHumanFixtureFindingIds:[]};
+          b.nextRequiredProof=['PAULA_VISUAL_ACCEPTANCE_ON_EXACT_PREVIEW_AND_R52_FIXTURE'];
+          fs.writeFileSync(lockPath,JSON.stringify(b,null,2)+'\n');
+          c.i65ForensicRemediationPlan.mechanismSyncStatus='B2_R6_EXACT_AUTHENTICATED_PASS_HUMAN_FIXTURE_READY_PENDING_VISUAL';
+          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),r6HumanFixtureOutstandingCount:0,r6HumanFixtureReadyCount:1,r6HumanFixtureUrl:fixture.url,paulaVisualAccepted:false,livePromoted:false,b3Status:'NOT_STARTED'};
+          c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),nextAction:'B2_PAULA_VISUAL_ON_EXACT_PREVIEW_AND_R52_FIXTURE'};
+          c.paulaVisualReview20260926R6={...(c.paulaVisualReview20260926R6||{}),remediationStatus:'R6_EXACT_AUTHENTICATED_PASS_HUMAN_FIXTURE_READY_PENDING_VISUAL',humanFixtureUrl:fixture.url};
+          fs.writeFileSync(cpPath,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$R52_RECEIPT" "$FINDINGS" "$B2_LOCK"
+          BLOB=$(git hash-object "$B2_LOCK");export BLOB
+          LEDGER_BLOB=$(git hash-object "$FINDINGS");export LEDGER_BLOB
+          RECEIPT_BLOB=$(git hash-object "$R52_RECEIPT");export RECEIPT_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p));
+          c.i65ForensicRemediationPlan.b2ExecutionLockBlobSha=process.env.BLOB;
+          c.canonicalAccumulationControl.findingLedgerBlobSha=process.env.LEDGER_BLOB;
+          c.i65ForensicRemediationPlan.b2.r52FixtureReceiptBlobSha=process.env.RECEIPT_BLOB;
+          fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5 B2): R52 human fixture ready pending visual"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: R52 fixture failure stays isolated
+        if: ${{ failure() && steps.mode.outputs.run == 'true' }}
+        continue-on-error: true
+        run: echo "R52_FIXTURE_FAILED_NO_LIVE_NO_DATA_WRITE_NO_B3"
