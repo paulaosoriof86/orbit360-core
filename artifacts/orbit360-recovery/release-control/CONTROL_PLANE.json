@@ -1946,7 +1946,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R3_VISUAL_REMEDIATION_REQUIRED_AUTHENTICATED_PASS_PRESERVED",
+    "mechanismSyncStatus": "B2_AUTHENTICATED_PREVIEW_PASS_PENDING_VISUAL",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2012,9 +2012,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "b9fb846ebf618afd04c6bcd36c2bcb625d24e0fa",
+    "b2ExecutionLockBlobSha": "21138361b6b114684ebc69e072098a9c26bf7ea8",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2078,7 +2078,7 @@
       "renewalDurableClosureRootCauseClosedPendingPreview": true,
       "renewalDomainSplitDurabilityClosedPendingPreview": true,
       "issuanceCreateAdvanceDurableRootCauseClosedPendingPreview": true,
-      "authenticatedPreviewRunId": 36162989052,
+      "authenticatedPreviewRunId": 36207016351,
       "activeRoleScopeRuntimePass": true,
       "clientCreateEditRuntimePass": true,
       "policyVehicleRuntimePass": true,
