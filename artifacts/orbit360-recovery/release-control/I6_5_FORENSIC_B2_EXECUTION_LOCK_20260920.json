@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -230,26 +230,24 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "2c09fb92facf917d95edeac1394c34edb146a056",
-    "buildId": "gi-i65-b2-2c09fb92facf-57f234755dc1",
-    "channelId": "gi-i65-b2-36207016351",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36207016351-130c1g81.web.app",
-    "runId": 36207016351,
-    "artifactId": 10894895632,
-    "artifactDigest": "89cae13388e7b6a92492da2caca10872557585f068dbce01e1815dea5187fe9b",
+    "sourceSha": "2a16434ad578d09344a649ad729c1565e956d6d2",
+    "buildId": "gi-i65-b2-2a16434ad578-57f234755dc1",
+    "channelId": "gi-i65-b2-36214002104",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36214002104-7i7excdm.web.app",
+    "runId": 36214002104,
+    "artifactId": 10896199179,
+    "artifactDigest": "e00e026a41398311fa5d39354eba8970f73a4392c157d8d2376cd60313153246",
     "exactReadback": true,
     "functionalPass": true,
-    "livePromoted": false,
-    "supersededByProductSourceChange": true,
-    "supersededReason": "Paula R5 visual blockers consolidated rootfix requires new immutable build/readback"
+    "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PENDING_NEW_PREVIEW",
+    "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "2c09fb92facf917d95edeac1394c34edb146a056",
-    "exactPreviewBuildId": "gi-i65-b2-2c09fb92facf-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36207016351-130c1g81.web.app",
-    "exactPreviewArtifactId": 10894895632,
+    "exactPreviewSourceSha": "2a16434ad578d09344a649ad729c1565e956d6d2",
+    "exactPreviewBuildId": "gi-i65-b2-2a16434ad578-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36214002104-7i7excdm.web.app",
+    "exactPreviewArtifactId": 10896199179,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
