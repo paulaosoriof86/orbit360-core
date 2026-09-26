@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "BLOCKED_PENDING_STORAGE_ASSET_BUCKET_AUTHORIZATION",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -241,10 +241,10 @@
     "functionalPass": true,
     "livePromoted": false,
     "supersededByProductSourceChange": true,
-    "supersededReason": "Preview asset runtime now binds physical bucket through non-reserved ORBIT360_STORAGE_BUCKET"
+    "supersededReason": "Same-project product asset bucket remediation requires a new exact Preview"
   },
   "authenticatedPreviewProof": {
-    "status": "BLOCKED_INFRASTRUCTURE_PREREQUISITE",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "564486503a27d1fe811252e53b6464dde376ca7a",
     "exactPreviewBuildId": "gi-i65-b2-564486503a27-57f234755dc1",
@@ -1711,5 +1711,20 @@
     "newFirebaseForbidden": true,
     "usableAssetBucketCount": 0,
     "ownerAuthorizationRequired": true
+  },
+  "storageAssetInfrastructure": {
+    "status": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
+    "projectId": "ays-orbit-360-lab",
+    "mode": "DEDICATED_PRIVATE_PRODUCT_ASSET_BUCKET_IF_FIREBASE_DEFAULT_UNAVAILABLE",
+    "allowedBucketPrefix": "gravicentra-insurance-assets-",
+    "createIfMissing": true,
+    "reuseExistingSingleProductBucket": true,
+    "noNewFirebase": true,
+    "noNewRepository": true,
+    "businessDataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "liveHostingPromotionAuthorized": false,
+    "advanceToB3Authorized": false,
+    "failClosedOnConflict": true
   }
 }

@@ -717,7 +717,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_B2_STORAGE_ASSET_BUCKET_AUTHORIZATION",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2012,9 +2012,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "01e5da860465a832f0662723358b1b8667b5d570",
+    "b2ExecutionLockBlobSha": "6dd87f638b5a52ff15b33e467331d7e16feb0ff0",
     "b2": {
-      "status": "BLOCKED_PENDING_STORAGE_ASSET_BUCKET_AUTHORIZATION",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2041,7 +2041,7 @@
       "artifactId": 10892927879,
       "exactReadback": false,
       "functionalPass": false,
-      "authenticatedPreviewProof": "BLOCKED_INFRASTRUCTURE_PREREQUISITE",
+      "authenticatedPreviewProof": "PENDING_NEW_PREVIEW",
       "authenticatedPreviewProofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "orphanSyntheticCleanup": "PASS",
       "timedOutAuthenticatedRunId": 35556007094,
@@ -2184,7 +2184,8 @@
         "latestCausalFix": "B2_RUNTIME_STORAGE_BUCKET_ENV_BINDING"
       },
       "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED",
-      "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING"
+      "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
+      "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2304,7 +2305,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "AUTHORIZE_SAME_FIREBASE_ASSET_BUCKET_OR_EQUIVALENT_APPROVED_ASSET_OWNER"
+    "nextAction": "B2_BUILD_NEW_EXACT_PREVIEW_WITH_SAME_PROJECT_ASSET_BUCKET"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
