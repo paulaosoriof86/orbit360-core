@@ -1360,7 +1360,7 @@
       "rootCause": "Current grouping uses plate as primary key and falls back to vehicle.id when plate is missing. Explicit versionOfVehicleId lineage is not used to collapse versioned relations, and incomplete-identity historical rows remain top-level cards.",
       "remediation": "Group only by explicit physical lineage first (versionOfVehicleId/source relation), then exact plate. Keep ambiguous incomplete rows unmerged but move them to a clearly labeled historical/incomplete-identity section with physical IDs and policy context.",
       "requiredProof": "Oscar vehicle view shows resolved current identity once; versioned records under history; ambiguous incomplete rows clearly separated; zero merge/delete writes.",
-      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS_PENDING_PAULA_VISUAL",
+      "status": "REOPENED_PAULA_VISUAL_FAIL_R7_SAME_PLATE_DUPLICATE",
       "blocking": false,
       "noDataMerge": true,
       "sourceFixAt": "2026-09-25",
@@ -1375,6 +1375,10 @@
         "livePromoted": false,
         "vehicleHistorySourceFixBound": true,
         "noMergeDeleteWrites": true
+      },
+      "r7VisualReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
+        "blobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df"
       }
     },
     {
@@ -1447,7 +1451,7 @@
       "rootCause": "modules/cobros.js contained the reported-payment projection, but later-loaded cobros-cartera-i65-closure-bridge.js replaced mod.render and omitted it. The effective owner dropped payment evidence even after the browser read model reached estadoOperativo=pago_reportado.",
       "remediation": "Project reported-payment evidence in the effective closure owner, keep it separate from canonical cobros, and preserve zero fabricated confirmed cobros.",
       "requiredProof": "Same client shows reported-payment evidence in Cobros; zero fabricated confirmed cobros; validation/apply actions remain explicit.",
-      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS_PENDING_PAULA_VISUAL",
+      "status": "REOPENED_PAULA_VISUAL_FAIL_R7_REPORTED_NOT_RENDERED",
       "blocking": false,
       "sourceFixAt": "2026-09-25",
       "effectiveOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
@@ -1463,6 +1467,10 @@
         "reportedPaymentVisible": true,
         "reportedPaymentDoesNotFabricateCobro": true,
         "confirmedCobrosCreated": 0
+      },
+      "r7VisualReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
+        "blobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df"
       }
     },
     {
@@ -1497,7 +1505,7 @@
       "block": "B2",
       "title": "Active vehicle tied to current policy is projected as incomplete history while detail has canonical plate/policy/vigency.",
       "classification": "CANONICAL_PROJECTION_DIVERGENCE",
-      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
+      "status": "REOPENED_PAULA_VISUAL_FAIL_R7",
       "invariant": "Any vehicle linked to a current policy is current; historical/versioned rows subordinate to the same canonical identity; ambiguous rows remain pending review, never heuristically merged/deleted.",
       "rootCauseHypothesis": "Vehicle tab may group on raw record while detail uses normalized vehicleVisual/canonical projection.",
       "proofRequired": [
@@ -1527,6 +1535,10 @@
         "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
         "runId": 36249482718,
         "authArtifactId": 10908448359
+      },
+      "r7VisualReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
+        "blobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df"
       }
     },
     {
@@ -1534,7 +1546,7 @@
       "block": "B2",
       "title": "A physical policy version visibly has two concurrent active receipt calendars after payment-plan edit.",
       "classification": "FINANCIAL_PROJECTION_INTEGRITY_BLOCKER",
-      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
+      "status": "REOPENED_PAULA_VISUAL_FAIL_R7_POLICY_DETAIL_BYPASS",
       "invariant": "One physical policy version has exactly one active contractual calendar; superseded rows do not count in current schedule/active portfolio; paid/evidenced receipts are preserved with traceability.",
       "proofRequired": [
         "GLOBAL_DOUBLE_ACTIVE_CALENDAR_DISCRIMINANT",
@@ -1560,6 +1572,10 @@
         "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
         "runId": 36249482718,
         "authArtifactId": 10908448359
+      },
+      "r7VisualReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
+        "blobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df"
       }
     },
     {
@@ -1567,7 +1583,7 @@
       "block": "B2",
       "title": "Current policy can render below renewed/historical policies.",
       "classification": "BUSINESS_ORDERING_DEFECT",
-      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_PASS_R7_REVIEWED_CLIENT",
       "invariant": "Order groups: current, renewal-due, renewed/history, cancelled/void; newest vigency first; same-number versions show current first with history subordinate.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1594,7 +1610,7 @@
       "block": "B2",
       "title": "Operational UI exposes physical IDs/version/lineage language.",
       "classification": "TECHNICAL_LANGUAGE_LEAK",
-      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_PASS_R7_REVIEWED_SURFACES",
       "invariant": "Operational UI uses business language; physical IDs and lineage remain only in audit/technical detail when needed.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1629,7 +1645,7 @@
       "block": "B2",
       "title": "Section titles/labels remain visually weak while values dominate.",
       "classification": "VISUAL_HIERARCHY_DEFECT",
-      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
+      "status": "REOPENED_PAULA_VISUAL_FAIL_R7_PAYMENT_HIERARCHY",
       "invariant": "Section titles semibold/bold; relevant labels semibold; values regular/medium; total/KPI may stand out; apply cumulatively to Cliente360/Policy/Vehicle/Receipt.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1648,6 +1664,10 @@
         "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
         "runId": 36249482718,
         "authArtifactId": 10908448359
+      },
+      "r7VisualReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
+        "blobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df"
       }
     },
     {
@@ -1655,7 +1675,7 @@
       "block": "B2",
       "title": "Human logo persistence cannot be verified safely against a real insurer in Preview.",
       "classification": "HUMAN_PROOF_FIXTURE_GAP",
-      "status": "HUMAN_SAFE_FIXTURE_READY_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_PASS_R7_ISOLATED_FIXTURE_ONLY",
       "invariant": "Provide visible synthetic insurer fixture for edit/upload/save/refresh/readback/cleanup without relaxing Preview boundary for real insurers.",
       "exactR6Proof": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
@@ -1687,7 +1707,7 @@
       "block": "B2",
       "title": "Sidebar vertical scroll/navigation defect must remain tracked and be fixed now if it blocks module access.",
       "classification": "NAVIGATION_USABILITY_DEFECT",
-      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
+      "status": "PARTIAL_VISUAL_PASS_SCROLL_VISIBLE_PERFORMANCE_BLOCKER_OPEN",
       "invariant": "Sidebar scroll is visible and usable; if non-blocking in B2 it is mandatory carry-forward to B4.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1707,6 +1727,10 @@
         "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
         "runId": 36249482718,
         "authArtifactId": 10908448359
+      },
+      "r7VisualReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
+        "blobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df"
       }
     },
     {
@@ -1769,6 +1793,160 @@
       "title": "Portal/importer/email surfaces must converge on the canonical financial and management model.",
       "classification": "TRANSVERSAL_TRACEABILITY",
       "status": "FROZEN_CARRY_FORWARD_B4"
+    },
+    {
+      "id": "B2-R54-PERFORMANCE-SLOW-NAVIGATION-PAGE-FREEZE-R7",
+      "title": "Preview is materially slow and can freeze the browser during client/receipt navigation.",
+      "status": "OPEN_ROOT_CAUSE_CONFIRMED_RUNTIME_SYMPTOM",
+      "severity": "BLOCKER",
+      "block": "B2",
+      "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
+      "exactCandidate": {
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+        "previewRunId": 36249482718,
+        "previewArtifactId": 10908113728
+      },
+      "rootCause": "Global projection/index invalidation and repeated full-collection scans remain in navigation/store event paths; runtime profiling still required to isolate dominant cost.",
+      "scope": "startup/navigation/client-detail/receipt-detail",
+      "boundaries": {
+        "noLive": true,
+        "noReimport": true,
+        "noB3": true
+      }
+    },
+    {
+      "id": "B2-R55-CLIENT-KPI-HYDRATION-FLICKER-R7",
+      "title": "Cliente 360 KPI composition changes visibly during hydration.",
+      "status": "OPEN_CODE_PATH_CONFIRMED",
+      "severity": "BLOCKER",
+      "block": "B2",
+      "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
+      "exactCandidate": {
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+        "previewRunId": 36249482718,
+        "previewArtifactId": 10908113728
+      },
+      "rootCause": "KPI footer depends on projected client type while render can occur across partial/canonical hydration states; no stable-ready barrier protects the KPI render.",
+      "scope": "cliente360-list",
+      "boundaries": {
+        "noLive": true,
+        "noReimport": true,
+        "noB3": true
+      }
+    },
+    {
+      "id": "B2-R56-POLICY-DETAIL-RECEIPT-PROJECTION-BYPASS-R7",
+      "title": "Policy detail bypasses canonical current-calendar receipt projection and renders duplicated requirements.",
+      "status": "OPEN_ROOT_CAUSE_CONFIRMED",
+      "severity": "BLOCKER",
+      "block": "B2",
+      "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
+      "exactCandidate": {
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+        "previewRunId": 36249482718,
+        "previewArtifactId": 10908113728
+      },
+      "rootCause": "receiptRows() reads raw receipt collection whereas receiptSchedule()/client receipt tab use canonical projection.",
+      "scope": "policy-fullpage/receipts",
+      "boundaries": {
+        "noLive": true,
+        "noReimport": true,
+        "noB3": true
+      }
+    },
+    {
+      "id": "B2-R57-RECEIPT-FILTER-NONCURRENT-POLICIES-R7",
+      "title": "Receipt filter lists renewed/historical policies instead of only current policies.",
+      "status": "OPEN_ROOT_CAUSE_CONFIRMED",
+      "severity": "BLOCKER",
+      "block": "B2",
+      "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
+      "exactCandidate": {
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+        "previewRunId": 36249482718,
+        "previewArtifactId": 10908113728
+      },
+      "rootCause": "renderReceipts() builds options from every client policy with no activePolicy predicate.",
+      "scope": "cliente360/receipts",
+      "boundaries": {
+        "noLive": true,
+        "noReimport": true,
+        "noB3": true
+      }
+    },
+    {
+      "id": "B2-R58-COBROS-REPORTED-PAYMENT-PRESENTATION-SPLIT-R7",
+      "title": "Cobros surface counts reported payments but does not render them as visible evidence rows.",
+      "status": "OPEN_ROOT_CAUSE_CONFIRMED",
+      "severity": "BLOCKER",
+      "block": "B2",
+      "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
+      "exactCandidate": {
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+        "previewRunId": 36249482718,
+        "previewArtifactId": 10908113728
+      },
+      "rootCause": "tabCobros() renders only cobros; patchCobros() injects an informational count but no reported-payment rows.",
+      "scope": "cliente360/cobros",
+      "boundaries": {
+        "noLive": true,
+        "noReimport": true,
+        "noB3": true
+      }
+    },
+    {
+      "id": "B2-R59-VEHICLE-SAME-PLATE-SPLIT-BY-LINEAGE-R7",
+      "title": "Same normalized plate/policy can appear as multiple vehicle cards.",
+      "status": "OPEN_ROOT_CAUSE_CONFIRMED",
+      "severity": "BLOCKER",
+      "block": "B2",
+      "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
+      "exactCandidate": {
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+        "previewRunId": 36249482718,
+        "previewArtifactId": 10908113728
+      },
+      "rootCause": "Vehicle grouping prioritizes lineage root over normalized plate; distinct lineage roots are not reconciled by plate identity.",
+      "scope": "cliente360/vehicles",
+      "boundaries": {
+        "noLive": true,
+        "noReimport": true,
+        "noB3": true
+      }
+    },
+    {
+      "id": "B2-R60-POLICY-PAYMENT-HIERARCHY-STILL-INSUFFICIENT-R7",
+      "title": "Policy payment section hierarchy remains visually insufficient in human review.",
+      "status": "OPEN_PAULA_VISUAL_FAIL",
+      "severity": "BLOCKER",
+      "block": "B2",
+      "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
+      "exactCandidate": {
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+        "previewRunId": 36249482718,
+        "previewArtifactId": 10908113728
+      },
+      "rootCause": "Section heading styling improved, but business hierarchy/scanability of payment data did not meet visual acceptance.",
+      "scope": "policy-fullpage/payment",
+      "boundaries": {
+        "noLive": true,
+        "noReimport": true,
+        "noB3": true
+      }
     }
   ],
   "phaseBBacklog": [
@@ -1809,7 +1987,7 @@
   "currentHumanReview": {
     "date": "2026-09-26",
     "recordedAt": "2026-09-26T07:30:00-06:00",
-    "origin": "PAULA_VISUAL_REVIEW_20260926_R6",
+    "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
     "decision": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
     "exactSourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
@@ -1919,7 +2097,40 @@
     "r6OverallPaulaVisualAccepted": false,
     "r6HumanFixtureReadyIds": [
       "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6"
-    ]
+    ],
+    "exactCandidate": {
+      "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+      "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+      "previewRunId": 36249482718,
+      "previewArtifactId": 10908113728
+    },
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
+    "receiptBlobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df",
+    "confirmedOpenFindingIds": [
+      "B2-R54-PERFORMANCE-SLOW-NAVIGATION-PAGE-FREEZE-R7",
+      "B2-R55-CLIENT-KPI-HYDRATION-FLICKER-R7",
+      "B2-R56-POLICY-DETAIL-RECEIPT-PROJECTION-BYPASS-R7",
+      "B2-R57-RECEIPT-FILTER-NONCURRENT-POLICIES-R7",
+      "B2-R58-COBROS-REPORTED-PAYMENT-PRESENTATION-SPLIT-R7",
+      "B2-R59-VEHICLE-SAME-PLATE-SPLIT-BY-LINEAGE-R7",
+      "B2-R60-POLICY-PAYMENT-HIERARCHY-STILL-INSUFFICIENT-R7"
+    ],
+    "reopenedFindingIds": [
+      "B2-R41-VEHICLE-HISTORY-PROJECTION-INCOMPLETE-R5",
+      "B2-R44-COBROS-PROJECTION-MISSES-REPORTED-PAYMENTS-R5",
+      "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
+      "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
+      "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
+      "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
+    ],
+    "observedPassFindingIds": [
+      "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
+      "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
+      "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6"
+    ],
+    "b2OverallAccepted": false,
+    "noB3": true
   },
   "lastReview": {
     "date": "2026-09-26",

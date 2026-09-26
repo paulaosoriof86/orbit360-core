@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1510,7 +1510,8 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "PAULA_VISUAL_ACCEPTANCE_ON_EXACT_PREVIEW_AND_R52_FIXTURE"
+    "R54_R60_ROOT_CAUSE_FIXES_ON_NEW_IMMUTABLE_PREVIEW",
+    "REPEAT_PAULA_VISUAL_REVIEW"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -1808,7 +1809,7 @@
     "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL",
     "authenticatedRunId": 36218497058
   },
-  "paulaVisualDecision": "REJECTED_R6_REMEDIATION_IN_PROGRESS",
+  "paulaVisualDecision": "REJECTED_R7_REMEDIATION_REQUIRED",
   "paulaVisualAccepted": false,
   "b3Status": "NOT_STARTED",
   "humanReviewR6": {
@@ -2351,5 +2352,35 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "270a89345dbdb32c1d84c240edae3c32b9f4b1af"
+  "findingLedgerBlobSha": "41b9c083502e13c255b6cf0ebc9f8ffe4a12a842",
+  "r7": {
+    "status": "ROOT_CAUSE_REMEDIATION_REQUIRED",
+    "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
+    "visualReceiptBlobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df",
+    "confirmedOpenFindingIds": [
+      "B2-R54-PERFORMANCE-SLOW-NAVIGATION-PAGE-FREEZE-R7",
+      "B2-R55-CLIENT-KPI-HYDRATION-FLICKER-R7",
+      "B2-R56-POLICY-DETAIL-RECEIPT-PROJECTION-BYPASS-R7",
+      "B2-R57-RECEIPT-FILTER-NONCURRENT-POLICIES-R7",
+      "B2-R58-COBROS-REPORTED-PAYMENT-PRESENTATION-SPLIT-R7",
+      "B2-R59-VEHICLE-SAME-PLATE-SPLIT-BY-LINEAGE-R7",
+      "B2-R60-POLICY-PAYMENT-HIERARCHY-STILL-INSUFFICIENT-R7"
+    ],
+    "reopenedFindingIds": [
+      "B2-R41-VEHICLE-HISTORY-PROJECTION-INCOMPLETE-R5",
+      "B2-R44-COBROS-PROJECTION-MISSES-REPORTED-PAYMENTS-R5",
+      "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
+      "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
+      "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
+      "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
+    ],
+    "preservedObservedPass": [
+      "R49_REVIEWED_CLIENT",
+      "R50_REVIEWED_SURFACES",
+      "R52_ISOLATED_FIXTURE"
+    ],
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true
+  }
 }
