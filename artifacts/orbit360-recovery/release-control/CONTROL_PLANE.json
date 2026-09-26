@@ -2012,7 +2012,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "21138361b6b114684ebc69e072098a9c26bf7ea8",
+    "b2ExecutionLockBlobSha": "5099b4754c6fcb87f9e832f7317504666169c068",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2041,7 +2041,7 @@
       "artifactId": 10894895632,
       "exactReadback": true,
       "functionalPass": true,
-      "authenticatedPreviewProof": "PENDING_NEW_PREVIEW",
+      "authenticatedPreviewProof": "PASS",
       "authenticatedPreviewProofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "orphanSyntheticCleanup": "PASS",
       "timedOutAuthenticatedRunId": 35556007094,
@@ -2185,7 +2185,8 @@
       },
       "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED",
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
-      "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY"
+      "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
+      "insurerStableEditRuntimePass": true
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",

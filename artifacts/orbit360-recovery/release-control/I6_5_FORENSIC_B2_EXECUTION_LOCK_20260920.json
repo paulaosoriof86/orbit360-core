@@ -144,7 +144,7 @@
     "sellerAdvisorCreateEdit": true,
     "renewalReceiptsPortfolioZeroCobro": true,
     "vehicleCreateEdit": true,
-    "insurerStableEdit": "B1_PRESERVATION_NOT_DEMONSTRATED_CREDENTIAL_AND_LOGO_REGRESSION_OPEN",
+    "insurerStableEdit": true,
     "singleReceiptProjection": true,
     "dirtyFormsProtected": true,
     "dashboardRealityReconciled": false,
@@ -372,7 +372,14 @@
       "productSourceMutation": false,
       "livePromotion": false,
       "b3Advance": false
-    }
+    },
+    "insurerSecureEdit": {
+      "logoPersisted": true,
+      "credentialPreviewIsolated": true,
+      "durableReadback": true,
+      "cleanup": true
+    },
+    "storageAssetBucket": "gravicentra-insurance-assets-60e88ed5a1"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
