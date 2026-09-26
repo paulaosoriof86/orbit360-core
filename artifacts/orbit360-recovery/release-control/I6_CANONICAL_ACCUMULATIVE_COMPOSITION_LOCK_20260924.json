@@ -147,7 +147,7 @@
     "orbit360-platform/styles/base.css": "e12478531be5a80a8f72f1e18e59e4d1d8d9a3cd",
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
-    "functions/product-ops-leads-domain.js": "66c32e2e0d9a26097712379e75f31fe821aac380"
+    "functions/product-ops-leads-domain.js": "2e6792d180f51377398b79d801b83c54ead39000"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -200,9 +200,9 @@
       "orbit360OpsLeadsCommandPreview"
     ],
     "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED",
-    "latestCausalFix": "B2_RUNTIME_STORAGE_BUCKET_ENV_BINDING",
+    "latestCausalFix": "B2_ISSUANCE_MANAGEMENT_CONTRACT_AND_SYNTHETIC_PREVIEW_SCOPE",
     "latestCausalFixAt": "2026-09-25",
-    "latestCausalOwner": "functions/product-operational-domain.js",
-    "latestCausalBlob": "231571a920dee7eae0e71ba12854d176ffbf0511"
+    "latestCausalOwner": "functions/product-ops-leads-domain.js",
+    "latestCausalBlob": "2e6792d180f51377398b79d801b83c54ead39000"
   }
 }
