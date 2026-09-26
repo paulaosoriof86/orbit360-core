@@ -307,7 +307,7 @@ async function cleanupSynthetic(db,state){
   let n=0;
   const clientId=state.clientId||'',policyIds=uniq([state.policyId,state.renewedPolicyId].filter(Boolean));
   if(clientId){
-    for(const col of ['actividades','gestiones','cobros','carteraPrimas','recibosEsperados','vehiculos','polizas'])n+=await deleteRowsBy(db,col,'clienteId',clientId).catch(()=>0);
+    for(const col of ['actividades','gestiones','negocios','cobros','carteraPrimas','recibosEsperados','vehiculos','polizas'])n+=await deleteRowsBy(db,col,'clienteId',clientId).catch(()=>0);
     const cr=dataCol(db,'clientes').doc(clientId);const cs=await cr.get();if(cs.exists){await cr.delete();n++;}
   }
   if(state.insurerId){
@@ -327,6 +327,13 @@ async function cleanupSynthetic(db,state){
   }
   for(const id of uniq([clientId,...policyIds,state.requestId,state.insurerId].filter(Boolean))){
     n+=await deleteRowsBy(db,'auditLog','registroId',id).catch(()=>0);
+  }
+  const workflowIds=uniq([state.businessId,state.managementId,...(state.managementIds||[]),state.requestId].filter(Boolean));
+  for(const id of workflowIds){
+    for(const [col,field] of [['workflowEvents','entityId'],['notificationOutbox','entityId'],['workflowRequests','result.entityId']]){
+      const q=await db.collection('tenants').doc(TENANT).collection(col).where(field,'==',id).get().catch(()=>null);
+      if(q)for(const d of q.docs){await d.ref.delete();n++;}
+    }
   }
   return n;
 }
@@ -910,6 +917,79 @@ try{
   const cobrosAfterReported=await rowsBy(db,'cobros','polizaId',policy.id);need(cobrosAfterReported.length===0,'B2_AUTH_REPORTED_PAYMENT_FABRICATED_COBRO:'+cobrosAfterReported.length);
   evidence.crud.reportedPaymentVisible=true;evidence.crud.reportedPaymentDoesNotFabricateCobro=true;
   milestone('REPORTED_PAYMENT_COBROS_PROJECTION_PASS',{confirmedCobros:0});
+
+  milestone('OPS_LEADS_SYNTHETIC_E2E_START');
+  const opsE2E=await bounded(page.evaluate(async ({clientId,policyId,advisorId,stamp})=>{
+    const suffix=String(stamp||'').toLowerCase();
+    const ids={
+      generic:'b2-ges-generic-'+suffix,
+      proposals:'b2-ges-proposals-'+suffix,
+      accepted:'b2-ges-accepted-'+suffix,
+      business:'b2-neg-'+suffix
+    };
+    const base={clienteId,polizaId:policyId,asesorId:advisorId,estado:'Pendiente',prioridad:'Media',origen:'B2 QA'};
+    await Orbit.ciclo.crearGestionDurable(Object.assign({},base,{id:ids.generic,lista:'Gestiones Admin',tipo:'Gestión QA',titulo:'Gestión QA durable'}));
+    await Orbit.ciclo.crearGestionDurable(Object.assign({},base,{id:ids.proposals,lista:'Renovaciones / Modif.',tipo:'Solicitar propuestas de renovación',titulo:'Propuestas B2 QA',workflowType:'renewal_proposals',renewalAction:'request_proposals',sourcePolicyId:policyId,proximaAccion:'Operaciones: solicitar propuestas a aseguradoras o cotizar'}));
+    await Orbit.ciclo.crearGestionDurable(Object.assign({},base,{id:ids.accepted,lista:'Renovaciones / Modif.',tipo:'Renovación aceptada',titulo:'Renovación aceptada B2 QA',workflowType:'renewal_accepted',renewalAction:'client_approved',sourcePolicyId:policyId,acceptedConfirmed:true,clientApprovalAt:new Date().toISOString(),clientApprovalNote:'B2 QA'}));
+    await Orbit.store.insertDurable('negocios',{id:ids.business,nombre:'Lead B2 QA '+suffix,tipo:'Empresa',clienteId,asesorId:advisorId,pais:'GT',moneda:'GTQ',canal:'B2 QA',producto:'Auto',ramo:'VEHICULOS',primaEst:1000,prioridad:'Media',origen:'Leads',etapa:'nuevo',prob:10});
+    await Orbit.store.updateDurable('negocios',ids.business,{etapa:'cotizando',prob:45});
+    const storeCounts={
+      generic:(Orbit.store.all('gestiones')||[]).filter(x=>x.id===ids.generic).length,
+      proposals:(Orbit.store.all('gestiones')||[]).filter(x=>x.id===ids.proposals).length,
+      accepted:(Orbit.store.all('gestiones')||[]).filter(x=>x.id===ids.accepted).length,
+      business:(Orbit.store.all('negocios')||[]).filter(x=>x.id===ids.business).length
+    };
+    const ops=(Orbit.ciclo.opsBoard()||[]).flatMap(c=>c.items||[]);
+    const leads=(Orbit.ciclo.leadsBoard()||[]).flatMap(c=>c.items||[]);
+    return{
+      ids,storeCounts,
+      genericOps:ops.filter(x=>x.rec?.id===ids.generic).length,
+      proposalsOps:ops.filter(x=>x.rec?.id===ids.proposals).length,
+      acceptedOps:ops.filter(x=>x.rec?.id===ids.accepted).length,
+      businessOps:ops.filter(x=>x.rec?.id===ids.business).length,
+      businessLeads:leads.filter(x=>x.rec?.id===ids.business).length,
+      businessStage:String(Orbit.store.get('negocios',ids.business)?.etapa||'')
+    };
+  },{clientId:client.id,policyId:policy.id,advisorId:actor.advisorId,stamp}),'B2_AUTH_OPS_LEADS_SYNTHETIC_CREATE_TIMEOUT',60000);
+  need(Object.values(opsE2E.storeCounts).every(n=>n===1),'B2_AUTH_OPS_LEADS_CANONICAL_DUPLICATE:'+JSON.stringify(opsE2E));
+  need(opsE2E.genericOps===1&&opsE2E.proposalsOps===1&&opsE2E.acceptedOps===1,'B2_AUTH_MANAGEMENT_NOT_VISIBLE_ONCE_IN_OPS:'+JSON.stringify(opsE2E));
+  need(opsE2E.businessOps===1&&opsE2E.businessLeads===1&&opsE2E.businessStage==='cotizando','B2_AUTH_LEADS_OPS_SYNC_FAILED:'+JSON.stringify(opsE2E));
+  state.managementId=opsE2E.ids.generic;state.managementIds=[opsE2E.ids.generic,opsE2E.ids.proposals,opsE2E.ids.accepted];state.businessId=opsE2E.ids.business;
+  evidence.writes.synthetic+=5;
+  await page.evaluate(()=>{location.hash='#/ops';});
+  await page.waitForSelector('[data-ges]',{timeout:15000});
+  const opsDom=await page.evaluate(ids=>({
+    generic:document.querySelectorAll('[data-ges="'+ids.generic+'"]').length,
+    proposals:document.querySelectorAll('[data-ges="'+ids.proposals+'"]').length,
+    accepted:document.querySelectorAll('[data-ges="'+ids.accepted+'"]').length,
+    business:document.querySelectorAll('[data-neg="'+ids.business+'"]').length
+  }),opsE2E.ids);
+  need(opsDom.generic===1&&opsDom.proposals===1&&opsDom.accepted===1&&opsDom.business===1,'B2_AUTH_OPS_DOM_PROJECTION_INVALID:'+JSON.stringify(opsDom));
+  await page.evaluate(id=>Orbit.ciclo.openGestion(id),opsE2E.ids.accepted);
+  await page.waitForSelector('[data-workflow-v1201]',{timeout:10000});
+  const acceptedPanel=await page.evaluate(()=>({
+    issuance:!!document.querySelector('[data-ren-issuance]'),
+    direct:!!document.querySelector('[data-ren-direct]'),
+    text:String(document.querySelector('[data-workflow-v1201]')?.innerText||'').slice(0,1200)
+  }));
+  need(acceptedPanel.issuance===true&&acceptedPanel.direct===true,'B2_AUTH_RENEWAL_ACCEPTED_OPS_BRANCHES_MISSING:'+JSON.stringify(acceptedPanel));
+  await page.reload({waitUntil:'domcontentloaded',timeout:30000});
+  await page.waitForFunction(ids=>window.Orbit&&Orbit.store&&ids.every(id=>!!Orbit.store.get('gestiones',id)),[opsE2E.ids.generic,opsE2E.ids.proposals,opsE2E.ids.accepted],{timeout:30000});
+  await page.evaluate(()=>{location.hash='#/ops';});
+  await page.waitForSelector('[data-ges]',{timeout:15000});
+  const afterReload=await page.evaluate(ids=>({
+    generic:(Orbit.store.all('gestiones')||[]).filter(x=>x.id===ids.generic).length,
+    proposals:(Orbit.store.all('gestiones')||[]).filter(x=>x.id===ids.proposals).length,
+    accepted:(Orbit.store.all('gestiones')||[]).filter(x=>x.id===ids.accepted).length,
+    business:(Orbit.store.all('negocios')||[]).filter(x=>x.id===ids.business).length,
+    genericDom:document.querySelectorAll('[data-ges="'+ids.generic+'"]').length,
+    proposalsDom:document.querySelectorAll('[data-ges="'+ids.proposals+'"]').length,
+    acceptedDom:document.querySelectorAll('[data-ges="'+ids.accepted+'"]').length,
+    businessDom:document.querySelectorAll('[data-neg="'+ids.business+'"]').length
+  }),opsE2E.ids);
+  need(Object.values(afterReload).every(n=>n===1),'B2_AUTH_OPS_LEADS_RELOAD_DUPLICATE_OR_MISSING:'+JSON.stringify(afterReload));
+  evidence.opsE2E={genericManagement:true,renewalProposals:true,renewalAccepted:true,acceptedBranches:true,leadsOpsBusinessSync:true,reloadIdempotent:true,opsDom,afterReload};
+  milestone('OPS_LEADS_SYNTHETIC_E2E_PASS',evidence.opsE2E);
 
   milestone('INSURER_SECURE_EDIT_START');
   const insurerId='b2-asg-'+stamp.toLowerCase(),portalId='portal-b2-'+stamp.toLowerCase(),syntheticSecret='B2-Preview-'+stamp+'-Secure',logoFixture=path.join(process.cwd(),'orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png');
