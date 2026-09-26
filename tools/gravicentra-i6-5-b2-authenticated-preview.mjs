@@ -540,9 +540,13 @@ try{
     const r7={policyDetailReceipts:{applicable:false},receiptPolicyFilter:{applicable:false},samePlateVehicle:{applicable:false},reportedPaymentRows:{applicable:false},clientKpiStable:{applicable:false},paymentHierarchy:{applicable:false},performance:{}};
     if(auto){
       const expected=project(auto,receiptsByPolicy.get(String(auto.id||''))||[]);
-      const detailStarted=performance.now();
+      const detailStarted=performance.now(),autoNumber=shown(auto.numero||auto.polizaNumero||auto.numeroPoliza);
       location.hash='#/cliente360?c='+encodeURIComponent(auto.clienteId)+'&p='+encodeURIComponent(auto.id);
-      const detailWait=await waitUntil(()=>!!document.querySelector('[data-policy-fullpage="1"]'),5000);
+      const detailWait=await waitUntil(()=>{
+        const page=document.querySelector('[data-policy-fullpage="1"]');
+        const crumb=shown(page?.querySelector('.crumb')?.textContent);
+        return !!page&&(!autoNumber||crumb.includes(autoNumber));
+      },5000);
       r7.performance.policyDetailMs=detailWait==null?null:Math.round(performance.now()-detailStarted);
       const policyPage=document.querySelector('[data-policy-fullpage="1"]');
       if(policyPage){

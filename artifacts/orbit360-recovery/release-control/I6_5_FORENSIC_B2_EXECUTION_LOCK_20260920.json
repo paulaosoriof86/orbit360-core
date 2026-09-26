@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -233,19 +233,19 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "13b2a597c090ecdfbfba1179f9d2f5470efc6050",
-    "buildId": "gi-i65-b2-13b2a597c090-57f234755dc1",
-    "channelId": "gi-i65-b2-36255705020",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36255705020-0ldq6zjl.web.app",
-    "runId": 36255705020,
-    "artifactId": 10910666921,
-    "artifactDigest": "2e0f2f620b282f7a7d51dfe7811da14d7e340efabba3e611203e883fbe875684",
-    "exactReadback": true,
-    "functionalPass": true,
+    "sourceSha": null,
+    "buildId": null,
+    "channelId": null,
+    "url": null,
+    "runId": null,
+    "artifactId": null,
+    "artifactDigest": null,
+    "exactReadback": false,
+    "functionalPass": false,
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "HISTORICAL_ATTEMPT_SUPERSEDED_BY_R7F_HARNESS_CHANGE",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "13b2a597c090ecdfbfba1179f9d2f5470efc6050",
     "exactPreviewBuildId": "gi-i65-b2-13b2a597c090-57f234755dc1",
@@ -299,7 +299,18 @@
     "maxExpectedRuntimeMinutes": 10,
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
     "lastFailedRunId": 36205585644,
-    "lastFailure": "FIREBASE_STORAGE_ASSET_BUCKET_MISSING",
+    "lastFailure": {
+      "runId": 36255705020,
+      "jobId": 108442445545,
+      "code": "B2_AUTH_R7_POLICY_DETAIL_RECEIPTS_NOT_CANONICAL_EXPECTED_10_ACTUAL_0",
+      "classification": "HARNESS_STALE_DOM_TARGETING_FALSE_NEGATIVE",
+      "cause": "R7 harness waited for any existing [data-policy-fullpage=1]. The prior R2 discriminant intentionally left another policy full page mounted, so the wait resolved before AUTO39012 finished routing.",
+      "productRegressionDemonstrated": false,
+      "syntheticWritesBeforeFailure": 0,
+      "cleanupDeleted": 0,
+      "livePromoted": false,
+      "reimported": false
+    },
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
@@ -1510,8 +1521,8 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R7_NEW_IMMUTABLE_PREVIEW",
-    "R7_FUNCTIONAL_AND_AUTHENTICATED_RUNTIME_PROOF",
+    "R7F_NEW_IMMUTABLE_PREVIEW",
+    "R7F_AUTHENTICATED_RUNTIME_PROOF",
     "PAULA_VISUAL_REVIEW_AFTER_TECHNICAL_PASS"
   ],
   "lastAuthenticatedFailure": {
@@ -2353,9 +2364,9 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "66ac2ece9740e6b8dd00288c76e43e3d9aa20920",
+  "findingLedgerBlobSha": "5c70167e35488192d474760e3b9c5c3602fe0a0e",
   "r7": {
-    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "status": "R7F_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
     "visualReceiptBlobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df",
     "confirmedOpenFindingIds": [
@@ -2385,8 +2396,8 @@
     "noReimport": true,
     "remediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
     "remediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-    "compositionLockBlobSha": "05e019a46071fc860fda47cc484dad0d4a1fd05c",
-    "findingLedgerBlobSha": "66ac2ece9740e6b8dd00288c76e43e3d9aa20920",
+    "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47",
+    "findingLedgerBlobSha": "5c70167e35488192d474760e3b9c5c3602fe0a0e",
     "productBlobs": {
       "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",
@@ -2400,6 +2411,31 @@
     "exactPreviewSourceSha": null,
     "exactPreviewBuildId": null,
     "exactPreviewUrl": null,
-    "authenticatedPreviewPass": false
+    "authenticatedPreviewPass": false,
+    "authenticatedHarnessBlobSha": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd",
+    "lastAuthenticatedFailure": {
+      "runId": 36255705020,
+      "jobId": 108442445545,
+      "code": "B2_AUTH_R7_POLICY_DETAIL_RECEIPTS_NOT_CANONICAL_EXPECTED_10_ACTUAL_0",
+      "classification": "HARNESS_STALE_DOM_TARGETING_FALSE_NEGATIVE",
+      "cause": "R7 harness waited for any existing [data-policy-fullpage=1]. The prior R2 discriminant intentionally left another policy full page mounted, so the wait resolved before AUTO39012 finished routing.",
+      "productRegressionDemonstrated": false,
+      "syntheticWritesBeforeFailure": 0,
+      "cleanupDeleted": 0,
+      "livePromoted": false,
+      "reimported": false
+    },
+    "previousTechnicalPreviewHistorical": {
+      "sourceSha": "13b2a597c090ecdfbfba1179f9d2f5470efc6050",
+      "buildId": "gi-i65-b2-13b2a597c090-57f234755dc1",
+      "channelId": "gi-i65-b2-36255705020",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36255705020-0ldq6zjl.web.app",
+      "runId": 36255705020,
+      "artifactId": 10910666921,
+      "artifactDigest": "2e0f2f620b282f7a7d51dfe7811da14d7e340efabba3e611203e883fbe875684",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false
+    }
   }
 }

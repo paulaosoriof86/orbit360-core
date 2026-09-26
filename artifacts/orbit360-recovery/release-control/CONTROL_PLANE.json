@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R7_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "mechanismSyncStatus": "B2_R7F_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "84171b42594b30a36cc0b9de0f57036270679602",
+    "b2ExecutionLockBlobSha": "38c46e8705be29d68ea42bf67e1bc4332284a95c",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2045,11 +2045,11 @@
       ],
       "productMutationAuthorized": true,
       "sourcePendingFromHead": "66aabfd6bcff98a1b153283de0d78a45fd0c281d",
-      "sourceSha": "13b2a597c090ecdfbfba1179f9d2f5470efc6050",
-      "buildId": "gi-i65-b2-13b2a597c090-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36255705020-0ldq6zjl.web.app",
-      "runId": 36255705020,
-      "artifactId": 10910666921,
+      "sourceSha": null,
+      "buildId": null,
+      "previewUrl": null,
+      "runId": null,
+      "artifactId": null,
       "exactReadback": true,
       "functionalPass": true,
       "authenticatedPreviewProof": "PASS",
@@ -2224,8 +2224,8 @@
       "r6CompositionLockBlobSha": "66f01b82a177242c62500937b9da0ec8be7bc00b",
       "r6FindingLedgerBlobSha": "ae462fc185e189916290572c66a15fc7bf04ce85",
       "r6aSourceRemediation": true,
-      "lastPreviewFailureRunId": 36249379823,
-      "lastPreviewFailureCode": "INVALID_REGEX_FLAGS",
+      "lastPreviewFailureRunId": 36255705020,
+      "lastPreviewFailureCode": "B2_AUTH_R7_POLICY_DETAIL_RECEIPTS_NOT_CANONICAL_EXPECTED_10_ACTUAL_0",
       "r6bMechanismRepair": true,
       "r6cSourceRemediation": true,
       "lastExactAuthenticatedPassRunId": 36247964139,
@@ -2235,7 +2235,7 @@
       "lastAuthenticatedFailureCode": "B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT",
       "lastAuthenticatedFailureClassification": "HARNESS_ONLY_PERFORMANCE_DEFECT",
       "r6eHarnessSyntaxRepair": true,
-      "lastPreviewFailureClassification": "HARNESS_ONLY_SYNTAX_DEFECT",
+      "lastPreviewFailureClassification": "HARNESS_STALE_DOM_TARGETING_FALSE_NEGATIVE",
       "exactR6ProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
       "exactR6ProofReceiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
       "r6TechnicalExactPassCount": 6,
@@ -2267,8 +2267,8 @@
       ],
       "r7RemediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
       "r7RemediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-      "r7CompositionLockBlobSha": "05e019a46071fc860fda47cc484dad0d4a1fd05c",
-      "r7FindingLedgerBlobSha": "66ac2ece9740e6b8dd00288c76e43e3d9aa20920",
+      "r7CompositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47",
+      "r7FindingLedgerBlobSha": "5c70167e35488192d474760e3b9c5c3602fe0a0e",
       "r7ProductBlobs": {
         "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",
@@ -2278,7 +2278,8 @@
       "r7MechanismBlobs": {
         "tools/gravicentra-i6-5-b2-functional.mjs": "e1b952ae8a66eefd800b07230367d9fd3977acdd",
         "tools/gravicentra-i6-5-b2-authenticated-preview.mjs": "c3e1d11f7d00c19fc9ddf8690e94bb840e291122"
-      }
+      },
+      "r7fAuthenticatedHarnessBlobSha": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2396,9 +2397,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "05e019a46071fc860fda47cc484dad0d4a1fd05c",
+    "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "66ac2ece9740e6b8dd00288c76e43e3d9aa20920",
+    "findingLedgerBlobSha": "5c70167e35488192d474760e3b9c5c3602fe0a0e",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
@@ -2410,7 +2411,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R7_EXACT_PREVIEW_AND_AUTHENTICATED_PROOF"
+    "nextAction": "B2_R7F_EXACT_PREVIEW_AND_AUTHENTICATED_PROOF"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
@@ -2532,8 +2533,20 @@
     ],
     "noLive": true,
     "noB3": true,
-    "remediationStatus": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "remediationStatus": "R7F_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
     "remediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
-    "remediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e"
+    "remediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
+    "lastPreviewFailure": {
+      "runId": 36255705020,
+      "jobId": 108442445545,
+      "code": "B2_AUTH_R7_POLICY_DETAIL_RECEIPTS_NOT_CANONICAL_EXPECTED_10_ACTUAL_0",
+      "classification": "HARNESS_STALE_DOM_TARGETING_FALSE_NEGATIVE",
+      "cause": "R7 harness waited for any existing [data-policy-fullpage=1]. The prior R2 discriminant intentionally left another policy full page mounted, so the wait resolved before AUTO39012 finished routing.",
+      "productRegressionDemonstrated": false,
+      "syntheticWritesBeforeFailure": 0,
+      "cleanupDeleted": 0,
+      "livePromoted": false,
+      "reimported": false
+    }
   }
 }

@@ -175,7 +175,7 @@
   "lastRemediation": {
     "origin": "PAULA_VISUAL_REJECTION_R7_ROOT_CAUSE",
     "parentHead": "35eb232add306a96d2d4640e1e7fb1c38ddcad36",
-    "status": "R7_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "status": "R7F_HARNESS_TARGET_BINDING_FIXED_PENDING_EXACT_PREVIEW",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -194,7 +194,8 @@
     ],
     "mechanismBlobs": {
       "tools/gravicentra-i6-5-b2-functional.mjs": "e1b952ae8a66eefd800b07230367d9fd3977acdd",
-      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs": "c3e1d11f7d00c19fc9ddf8690e94bb840e291122"
+      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd",
+      "authenticated": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd"
     },
     "rootCauses": {
       "R54": [
@@ -243,6 +244,21 @@
     ],
     "noDataReimport": true,
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "followupFix": "R7F_TARGET_SPECIFIC_POLICY_FULLPAGE_WAIT",
+    "followupRootCause": {
+      "runId": 36255705020,
+      "jobId": 108442445545,
+      "code": "B2_AUTH_R7_POLICY_DETAIL_RECEIPTS_NOT_CANONICAL_EXPECTED_10_ACTUAL_0",
+      "classification": "HARNESS_STALE_DOM_TARGETING_FALSE_NEGATIVE",
+      "cause": "R7 harness waited for any existing [data-policy-fullpage=1]. The prior R2 discriminant intentionally left another policy full page mounted, so the wait resolved before AUTO39012 finished routing.",
+      "productRegressionDemonstrated": false,
+      "syntheticWritesBeforeFailure": 0,
+      "cleanupDeleted": 0,
+      "livePromoted": false,
+      "reimported": false
+    },
+    "productFileBlobsChanged": false,
+    "immutableBuildRequiredAfterMechanismChange": true
   }
 }
