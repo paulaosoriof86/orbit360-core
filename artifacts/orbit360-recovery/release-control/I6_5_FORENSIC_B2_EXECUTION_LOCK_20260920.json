@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -160,7 +160,7 @@
     "visibleGravicentraBrand": true,
     "renewalBidirectionalLink": true,
     "renewalDurableClosure": true,
-    "authenticatedPreviewPass": true,
+    "authenticatedPreviewPass": false,
     "technicalFindingsClosedByExactRun": true
   },
   "carryForward": {
@@ -242,7 +242,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PASS",
+    "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "2c09fb92facf917d95edeac1394c34edb146a056",
     "exactPreviewBuildId": "gi-i65-b2-2c09fb92facf-57f234755dc1",
@@ -379,7 +379,10 @@
       "durableReadback": true,
       "cleanup": true
     },
-    "storageAssetBucket": "gravicentra-insurance-assets-60e88ed5a1"
+    "storageAssetBucket": "gravicentra-insurance-assets-60e88ed5a1",
+    "cleanupAssetProofRequired": true,
+    "cleanupAssetProofStatus": "PENDING_REPROOF",
+    "findingLedgerBlobSha": "c9deb1671ffa31cfc98c3473d2f3f80e2abe82c5"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -1708,7 +1711,9 @@
     "changedProductFiles": [
       "functions/product-operational-domain.js",
       "functions/product-ops-leads-domain.js"
-    ]
+    ],
+    "findingLedgerBlobSha": "c9deb1671ffa31cfc98c3473d2f3f80e2abe82c5",
+    "latestQaHardening": "B2_STORAGE_ASSET_CLEANUP_EXPLICIT_READBACK"
   },
   "infrastructureBlocker": {
     "id": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
@@ -1732,5 +1737,11 @@
     "liveHostingPromotionAuthorized": false,
     "advanceToB3Authorized": false,
     "failClosedOnConflict": true
+  },
+  "lastQaHardening": {
+    "findingId": "B2-R40-PREVIEW-ASSET-CLEANUP-PROOF",
+    "status": "ARMED_SAME_PREVIEW_REPROOF",
+    "productSourceChanged": false,
+    "previewRebuildRequired": false
   }
 }

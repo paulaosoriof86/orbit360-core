@@ -12,6 +12,9 @@ const TENANT=String(process.env.TENANT_HINT||'').trim();
 const TARGET=String(process.env.TARGET_URL||'').replace(/\/$/,'');
 const OUT=process.env.B2_AUTH_PROOF_FILE||path.join(process.env.RUNNER_TEMP||process.cwd(),'b2-authenticated-preview.json');
 const VISUAL_DIR=process.env.B2_VISUAL_DIR||path.join(process.env.RUNNER_TEMP||process.cwd(),'b2-visual');
+const B2_LOCK_PATH=process.env.B2_LOCK||'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json';
+let FROZEN_ASSET_BUCKET='';
+try{const lock=JSON.parse(fs.readFileSync(B2_LOCK_PATH,'utf8'));FROZEN_ASSET_BUCKET=clean(lock?.authenticatedPreviewProof?.storageAssetBucket||'',180);}catch{}
 const RUN=String(process.env.GITHUB_RUN_ID||Date.now());
 const clean=(v,m=500)=>String(v==null?'':v).trim().slice(0,m);
 const norm=v=>clean(v,180).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
@@ -315,8 +318,12 @@ async function cleanupSynthetic(db,state){
     const mr=dataCol(db,'gestiones').doc(state.managementId),ms=await mr.get();
     if(ms.exists){await mr.delete();n++;}
   }
-  if(state.logoAssetRef){
-    try{await getStorage(app).bucket().file(state.logoAssetRef).delete({ignoreNotFound:true});n++;}catch{}
+  if(state.logoAssetRef&&state.storageAssetBucket){
+    const file=getStorage(app).bucket(state.storageAssetBucket).file(state.logoAssetRef);
+    const [beforeExists]=await file.exists();
+    if(beforeExists){await file.delete({ignoreNotFound:true});n++;}
+    const [afterExists]=await file.exists();
+    state.assetAbsent=!afterExists;
   }
   for(const id of uniq([clientId,...policyIds,state.requestId,state.insurerId].filter(Boolean))){
     n+=await deleteRowsBy(db,'auditLog','registroId',id).catch(()=>0);
@@ -327,7 +334,16 @@ async function cleanupSynthetic(db,state){
 let app,browser,context,page,state={};
 try{
   app=initializeApp({credential:cert(sa()),projectId:PROJECT},'b2-auth-preview-'+RUN);
-  const db=getFirestore(app),auth=getAuth(app),actor=await bounded(pickMultiRoleActor(db,auth),'B2_AUTH_ACTOR_TIMEOUT',30000);
+  const db=getFirestore(app),auth=getAuth(app);
+  need(FROZEN_ASSET_BUCKET,'B2_AUTH_ASSET_BUCKET_BINDING_REQUIRED');
+  state.storageAssetBucket=FROZEN_ASSET_BUCKET;
+  const previewAssetPrefix='preview/tenants/'+TENANT+'/assets/insurers/b2-asg-';
+  const assetBucket=getStorage(app).bucket(FROZEN_ASSET_BUCKET);
+  const [staleAssets]=await bounded(assetBucket.getFiles({prefix:previewAssetPrefix}),'B2_AUTH_STALE_ASSET_LIST_TIMEOUT',30000);
+  for(const file of staleAssets)await file.delete({ignoreNotFound:true});
+  evidence.cleanup.preRunAssetsDeleted=staleAssets.length;
+  milestone('ASSET_PRE_CLEANUP',{bucket:FROZEN_ASSET_BUCKET,deleted:staleAssets.length});
+  const actor=await bounded(pickMultiRoleActor(db,auth),'B2_AUTH_ACTOR_TIMEOUT',30000);
   milestone('ACTOR_READY',{roles:actor.roles});
   evidence.actor={uidHash:hash(actor.uid),advisorIdHash:hash(actor.advisorId),roles:actor.roles,emailVerified:actor.emailVerified};
 
@@ -918,6 +934,10 @@ try{
   state.insurerCredentialRef=String(insurerUpdated._portal.credentialRef||'');
   state.logoAssetRef=String(insurerUpdated.logoAssetRef||'');
   const persistedLogoUrl=String(insurerUpdated.logo||'');
+  const bucketMatch=persistedLogoUrl.match(/\/v0\/b\/([^/]+)\/o\//i);
+  const persistedBucket=bucketMatch?decodeURIComponent(bucketMatch[1]):'';
+  need(persistedBucket===FROZEN_ASSET_BUCKET,'B2_AUTH_INSURER_LOGO_BUCKET_BINDING_MISMATCH:'+persistedBucket);
+  state.storageAssetBucket=persistedBucket;
   need(!/^data:/i.test(persistedLogoUrl)&&!/^blob:/i.test(persistedLogoUrl),'B2_AUTH_INSURER_LOGO_BROWSER_LOCAL_AUTHORITY');
   evidence.insurerLogo={fileInput:true,preview:true,serverCommit:true,assetRef:state.logoAssetRef,persistedHttps:true,noDataUrl:true};
   evidence.writes.synthetic+=1;
@@ -1032,6 +1052,12 @@ try{
         const stillInsurer=await dataCol(db,'aseguradoras').doc(state.insurerId).get();
         evidence.cleanup.insurerAbsent=!stillInsurer.exists;
       }
+      if(state.storageAssetBucket&&state.insurerId){
+        const prefix='preview/tenants/'+TENANT+'/assets/insurers/'+state.insurerId+'/';
+        const [remainingAssets]=await getStorage(app).bucket(state.storageAssetBucket).getFiles({prefix});
+        evidence.cleanup.assetPrefixResidual=remainingAssets.length;
+        evidence.cleanup.assetAbsent=remainingAssets.length===0&&state.assetAbsent===true;
+      }
     }
   }catch(e){evidence.cleanup.error=clean(e?.message||e,1200);}
   try{if(context)await context.close();}catch{}
@@ -1042,6 +1068,7 @@ try{
 need(evidence.status==='PASS','B2_AUTH_NOT_PASS');
 need(evidence.cleanup.clientAbsent===true,'B2_AUTH_CLEANUP_CLIENT_REMAINS');
 need(evidence.cleanup.insurerAbsent===true,'B2_AUTH_CLEANUP_INSURER_REMAINS');
+need(evidence.cleanup.assetAbsent===true,'B2_AUTH_CLEANUP_ASSET_REMAINS:'+JSON.stringify({bucket:state.storageAssetBucket,ref:state.logoAssetRef,residual:evidence.cleanup.assetPrefixResidual}));
 need(state.insurerCredentialCleaned===true,'B2_AUTH_CLEANUP_PREVIEW_CREDENTIAL_REMAINS');
 console.log('I65_B2_AUTHENTICATED_PREVIEW=PASS');
 console.log('I65_B2_ACTIVE_ROLE_SCOPE=PASS');

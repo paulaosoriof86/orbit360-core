@@ -19,7 +19,7 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 81,
+    "total": 84,
     "b2HumanFindings": 35,
     "currentBlocking": 27
   },
@@ -1281,10 +1281,51 @@
       },
       "rootCause": "Firebase SDK config advertises the default Storage bucket name, but that bucket is not provisioned. The only physical buckets belong to Cloud Functions internals and must not be repurposed.",
       "contract": "Paula visual rejection requires authorized Storage/Drive/secure URL architecture; Data URL/localStorage are forbidden. Current approved owner is Firebase Storage.",
-      "remediation": "Provision or authorize one asset bucket in the SAME Firebase/GCP project, then bind orbit360ProductAssetUploadPreview to that bucket and rerun B2. No new Firebase, no data reimport, no LIVE.",
-      "status": "BLOCKED_PENDING_OWNER_INFRASTRUCTURE_AUTHORIZATION",
+      "remediation": "Dedicated asset bucket provisioned in SAME GCP/Firebase project and bound to Preview callable. Final gate now requires explicit object cleanup readback.",
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS_PENDING_ASSET_CLEANUP_REPROOF",
       "blocking": true,
       "noDataReimport": true,
+      "noLive": true,
+      "noB3": true,
+      "resolutionEvidence": {
+        "runId": 36207016351,
+        "bucket": "gravicentra-insurance-assets-60e88ed5a1",
+        "insurerLogoCredentialPass": true,
+        "sameProject": true,
+        "livePromoted": false
+      }
+    },
+    {
+      "id": "B2-R39-ISSUANCE-MANAGEMENT-DURABLE-CONTRACT",
+      "surface": "Renovaciones/Emisión/Ops",
+      "classification": "SERVER_SANITIZER_CONTRACT_LOSS",
+      "finding": "ISSUANCE_REQUEST_FIELDS_WERE_NOT_PRESERVED_BY_CANONICAL_OPS_MANAGEMENT_SANITIZER_AND_PREVIEW_SYNTHETIC_SCOPE_REJECTED_CANONICAL_GES_EMI_IDS",
+      "rootCause": "The issuance owner writes workflowType/requestKey/operationId/issuanceMode/sourcePolicyId/acceptedOffer/emissionStage and closure fields into gestiones, while the Ops/Leads server sanitizer previously retained only generic management fields. Preview also recognized only b2-ges/b2-neg entity IDs even though the canonical issuance owner generates ges_emi_* IDs.",
+      "remediation": "Preserve the explicit issuance management field allowlist server-side. Preview remains fail-closed and accepts canonical ges_emi_* only when the persisted issuance request has the exact synthetic b2qa_req_* operation marker.",
+      "closureProof": {
+        "runId": 36207016351,
+        "renewalRuntime": true,
+        "renewalReceipts": 2,
+        "renewalPortfolio": 2,
+        "renewalCobros": 0,
+        "durableClosure": true
+      },
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
+      "blocking": false,
+      "noDataReimport": true,
+      "noLive": true,
+      "noB3": true
+    },
+    {
+      "id": "B2-R40-PREVIEW-ASSET-CLEANUP-PROOF",
+      "surface": "Aseguradoras/QA",
+      "classification": "HARNESS_CLEANUP_PROOF_GAP",
+      "finding": "AUTHENTICATED_B2_CLEANUP_CONFIRMED_FIRESTORE_AND_PREVIEW_CREDENTIAL_REMOVAL_BUT_DID_NOT_EXPLICITLY_VERIFY_DEDICATED_STORAGE_OBJECT_ABSENCE",
+      "remediation": "Delete stale/current B2 asset objects from the explicit dedicated bucket and require assetAbsent=true before authenticated freeze.",
+      "requiredProof": "Same exact Preview authenticated run ends with clientAbsent=true, insurerAbsent=true, preview credential removed, assetPrefixResidual=0 and assetAbsent=true.",
+      "status": "HARNESS_FIXED_PENDING_EXACT_AUTH_REPROOF",
+      "blocking": true,
+      "noProductSourceChange": true,
       "noLive": true,
       "noB3": true
     }
