@@ -384,8 +384,8 @@
     },
     "storageAssetBucket": "gravicentra-insurance-assets-60e88ed5a1",
     "cleanupAssetProofRequired": true,
-    "cleanupAssetProofStatus": "PENDING_REPROOF",
-    "findingLedgerBlobSha": "c9deb1671ffa31cfc98c3473d2f3f80e2abe82c5"
+    "cleanupAssetProofStatus": "PASS",
+    "findingLedgerBlobSha": "7affdc062c7038e366c95047613ce1133393b217"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -1715,7 +1715,7 @@
       "functions/product-operational-domain.js",
       "functions/product-ops-leads-domain.js"
     ],
-    "findingLedgerBlobSha": "c9deb1671ffa31cfc98c3473d2f3f80e2abe82c5",
+    "findingLedgerBlobSha": "7affdc062c7038e366c95047613ce1133393b217",
     "latestQaHardening": "B2_STORAGE_ASSET_CLEANUP_EXPLICIT_READBACK"
   },
   "infrastructureBlocker": {
@@ -1743,8 +1743,10 @@
   },
   "lastQaHardening": {
     "findingId": "B2-R40-PREVIEW-ASSET-CLEANUP-PROOF",
-    "status": "ARMED_SAME_PREVIEW_REPROOF",
+    "status": "PASS",
     "productSourceChanged": false,
-    "previewRebuildRequired": false
+    "previewRebuildRequired": false,
+    "runId": 36207874692,
+    "assetAbsent": true
   }
 }

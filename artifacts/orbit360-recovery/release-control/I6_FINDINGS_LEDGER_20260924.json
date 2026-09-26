@@ -21,7 +21,7 @@
   "counts": {
     "total": 84,
     "b2HumanFindings": 35,
-    "currentBlocking": 27
+    "currentBlocking": 25
   },
   "findings": [
     {
@@ -1282,8 +1282,8 @@
       "rootCause": "Firebase SDK config advertises the default Storage bucket name, but that bucket is not provisioned. The only physical buckets belong to Cloud Functions internals and must not be repurposed.",
       "contract": "Paula visual rejection requires authorized Storage/Drive/secure URL architecture; Data URL/localStorage are forbidden. Current approved owner is Firebase Storage.",
       "remediation": "Dedicated asset bucket provisioned in SAME GCP/Firebase project and bound to Preview callable. Final gate now requires explicit object cleanup readback.",
-      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS_PENDING_ASSET_CLEANUP_REPROOF",
-      "blocking": true,
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
+      "blocking": false,
       "noDataReimport": true,
       "noLive": true,
       "noB3": true,
@@ -1292,6 +1292,16 @@
         "bucket": "gravicentra-insurance-assets-60e88ed5a1",
         "insurerLogoCredentialPass": true,
         "sameProject": true,
+        "livePromoted": false
+      },
+      "closureProof": {
+        "runId": 36207874692,
+        "storageBucket": "gravicentra-insurance-assets-60e88ed5a1",
+        "preRunAssetsDeleted": 2,
+        "assetPrefixResidual": 0,
+        "assetAbsent": true,
+        "clientAbsent": true,
+        "insurerAbsent": true,
         "livePromoted": false
       }
     },
@@ -1323,11 +1333,21 @@
       "finding": "AUTHENTICATED_B2_CLEANUP_CONFIRMED_FIRESTORE_AND_PREVIEW_CREDENTIAL_REMOVAL_BUT_DID_NOT_EXPLICITLY_VERIFY_DEDICATED_STORAGE_OBJECT_ABSENCE",
       "remediation": "Delete stale/current B2 asset objects from the explicit dedicated bucket and require assetAbsent=true before authenticated freeze.",
       "requiredProof": "Same exact Preview authenticated run ends with clientAbsent=true, insurerAbsent=true, preview credential removed, assetPrefixResidual=0 and assetAbsent=true.",
-      "status": "HARNESS_FIXED_PENDING_EXACT_AUTH_REPROOF",
-      "blocking": true,
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
+      "blocking": false,
       "noProductSourceChange": true,
       "noLive": true,
-      "noB3": true
+      "noB3": true,
+      "closureProof": {
+        "runId": 36207874692,
+        "storageBucket": "gravicentra-insurance-assets-60e88ed5a1",
+        "preRunAssetsDeleted": 2,
+        "assetPrefixResidual": 0,
+        "assetAbsent": true,
+        "clientAbsent": true,
+        "insurerAbsent": true,
+        "livePromoted": false
+      }
     }
   ],
   "phaseBBacklog": [
@@ -1415,6 +1435,8 @@
       "orbit360-platform/index.html"
     ],
     "previewIsolation": "OPS_AND_ASSET_SYNTHETIC_ONLY",
-    "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED"
+    "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED",
+    "b2StorageAndAssetCleanup": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
+    "closureRunId": 36207874692
   }
 }

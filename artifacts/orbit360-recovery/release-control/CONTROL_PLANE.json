@@ -2012,7 +2012,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "a4c57c2e7b7f740ce690189e50d15beb125a31fe",
+    "b2ExecutionLockBlobSha": "7d69890823c0af045486cae3cbcfae5a6cc279cd",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2160,7 +2160,7 @@
         "status": "CANDIDATE_PENDING_PREVIEW",
         "parentHead": "d64ea08c583e1bd99652a1b42f7fd01403274b61",
         "compositionLockBlobSha": "7ebbc71551082d982afa62fc476c48ddb2721e6e",
-        "findingLedgerBlobSha": "c9deb1671ffa31cfc98c3473d2f3f80e2abe82c5",
+        "findingLedgerBlobSha": "7affdc062c7038e366c95047613ce1133393b217",
         "changedProductFiles": [
           "functions/product-ops-leads-domain.js",
           "orbit360-platform/core/config.js",
@@ -2294,7 +2294,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "7ebbc71551082d982afa62fc476c48ddb2721e6e",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "c9deb1671ffa31cfc98c3473d2f3f80e2abe82c5",
+    "findingLedgerBlobSha": "7affdc062c7038e366c95047613ce1133393b217",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
@@ -2306,7 +2306,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_REPROVE_AUTH_ON_SAME_EXACT_PREVIEW_WITH_ASSET_CLEANUP"
+    "nextAction": "B2_PAULA_VISUAL_REVIEW_ON_EXACT_AUTHENTICATED_PREVIEW"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
