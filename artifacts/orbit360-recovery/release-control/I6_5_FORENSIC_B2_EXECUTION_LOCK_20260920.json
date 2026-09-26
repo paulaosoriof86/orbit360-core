@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -245,7 +245,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_EXACT_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "40cb29d19191cf353708eb3a673e1903ff4d82ef",
     "exactPreviewBuildId": "gi-i65-b2-40cb29d19191-57f234755dc1",
@@ -429,7 +429,8 @@
     "requiredNewHarnessBlob": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
     "priorPassRunId": 36258221310,
     "priorPassPreserved": true,
-    "proofStrengtheningReason": "R59_VISIBLE_PLATE_UNIQUENESS_AND_ACTIVE_POLICY_COVERAGE"
+    "proofStrengtheningReason": "R59_VISIBLE_PLATE_UNIQUENESS_AND_ACTIVE_POLICY_COVERAGE",
+    "invalidatedOldPreviewRunId": 36260454531
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -2384,7 +2385,7 @@
   },
   "findingLedgerBlobSha": "61789707bfbc9a8de3b01ff401ac68284f9ef86e",
   "r7": {
-    "status": "R7N_INSURER_LOGO_ASYNC_EDIT_RERENDER_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "status": "R7N_PRODUCT_SOURCE_FIXED_CANDIDATE_PENDING_PREVIEW",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
     "visualReceiptBlobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df",
     "confirmedOpenFindingIds": [
@@ -2482,6 +2483,8 @@
     "r7mReceiptBlobSha": "fa6c55f63c584476a7e137e81019cfb458afcac6",
     "r7nReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7N_INSURER_LOGO_ASYNC_EDIT_RERENDER_FIX_20260926.json",
     "r7nReceiptBlobSha": "9af4807b378a21f8443eda9ec903248845e117ce",
-    "r7nFindingId": "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7"
+    "r7nFindingId": "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7",
+    "invalidatedOldPreviewAuthRunId": 36260454531,
+    "invalidatedOldPreviewAuthReason": "PRODUCT_SOURCE_CHANGED_BEFORE_RUN; OLD_PREVIEW_AUTH_FAILURE_IS_NONAUTHORITATIVE_FOR_NEW_CANDIDATE"
   }
 }

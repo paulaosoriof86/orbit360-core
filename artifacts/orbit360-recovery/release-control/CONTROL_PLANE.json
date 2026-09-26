@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R7N_PRODUCT_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "mechanismSyncStatus": "B2_R7N_CANDIDATE_PENDING_NEW_IMMUTABLE_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "cb086d6f157c3c4279d48cd5ffdf0fe7edb5d7d7",
+    "b2ExecutionLockBlobSha": "b6b11df97580e302b4aa1e18a07b1c60afcaf7b1",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2302,7 +2302,9 @@
       "r7nSourceRemediation": true,
       "r7nReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7N_INSURER_LOGO_ASYNC_EDIT_RERENDER_FIX_20260926.json",
       "r7nReceiptBlobSha": "9af4807b378a21f8443eda9ec903248845e117ce",
-      "r7nFindingId": "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7"
+      "r7nFindingId": "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7",
+      "previewSupersededBySourceChange": true,
+      "invalidatedOldPreviewAuthRunId": 36260454531
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
