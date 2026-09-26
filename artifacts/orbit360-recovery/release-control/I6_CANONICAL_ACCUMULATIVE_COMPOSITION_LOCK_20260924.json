@@ -134,12 +134,12 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "e49fa536b6e39514ba528c5b42d12263df93facb",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "cc1fb44fab57db6824494ca40fd2027739d62387",
+    "orbit360-platform/index.html": "2e3fa7d893f4ac31d73d61064ca3b0b562a3a1d4",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "af3af47ed2fb71c2bdf9e81775a7359eefb1c606",
     "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
-    "orbit360-platform/modules/crm-v1198-operational-bridge.js": "e93c08dcd77a8076af4d4f3f05e14f4d66a9eae4",
+    "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "105b869445919802fb6e07d6120ace6a0772ec57",
@@ -175,25 +175,27 @@
   "lastRemediation": {
     "origin": "PAULA_VISUAL_REJECTION_R7_ROOT_CAUSE",
     "parentHead": "35eb232add306a96d2d4640e1e7fb1c38ddcad36",
-    "status": "R7F_HARNESS_TARGET_BINDING_FIXED_PENDING_EXACT_PREVIEW",
+    "status": "R7G_KPI_SECOND_WRITER_FIXED_PENDING_EXACT_PREVIEW",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js"
     ],
     "productBlobs": {
       "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "81cb2db0a7b3a26387fba980d9cecaa5f8d3d4eb",
-      "orbit360-platform/index.html": "cc1fb44fab57db6824494ca40fd2027739d62387"
+      "orbit360-platform/index.html": "2e3fa7d893f4ac31d73d61064ca3b0b562a3a1d4",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8"
     },
     "mechanismFiles": [
       "tools/gravicentra-i6-5-b2-functional.mjs",
       "tools/gravicentra-i6-5-b2-authenticated-preview.mjs"
     ],
     "mechanismBlobs": {
-      "tools/gravicentra-i6-5-b2-functional.mjs": "e1b952ae8a66eefd800b07230367d9fd3977acdd",
+      "tools/gravicentra-i6-5-b2-functional.mjs": "805b26d3397b18559b825863a68d60cad9f5b006",
       "tools/gravicentra-i6-5-b2-authenticated-preview.mjs": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd",
       "authenticated": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd"
     },
@@ -245,14 +247,22 @@
     "noDataReimport": true,
     "noLive": true,
     "noB3": true,
-    "followupFix": "R7F_TARGET_SPECIFIC_POLICY_FULLPAGE_WAIT",
+    "followupFix": "R7G_CANONICALIZE_SCOPED_CLIENTS_BEFORE_CRM_KPI_PATCH",
     "followupRootCause": {
-      "runId": 36255705020,
-      "jobId": 108442445545,
-      "code": "B2_AUTH_R7_POLICY_DETAIL_RECEIPTS_NOT_CANONICAL_EXPECTED_10_ACTUAL_0",
-      "classification": "HARNESS_STALE_DOM_TARGETING_FALSE_NEGATIVE",
-      "cause": "R7 harness waited for any existing [data-policy-fullpage=1]. The prior R2 discriminant intentionally left another policy full page mounted, so the wait resolved before AUTO39012 finished routing.",
-      "productRegressionDemonstrated": false,
+      "runId": 36256111695,
+      "jobId": 108443575021,
+      "sourceSha": "21dac43f15e504c642ebfc0c8b8f0938bf0d448e",
+      "buildId": "gi-i65-b2-21dac43f15e5-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36256111695-xsev5pj5.web.app",
+      "code": "B2_AUTH_R7_CLIENT_KPI_FLICKER_OR_NOT_READY",
+      "evidence": {
+        "foot1": "23 empresas · 416 personas",
+        "foot2": "0 empresas · 0 personas",
+        "totalText": "439"
+      },
+      "classification": "PRODUCT_DEFECT_CONFIRMED_SECOND_RENDER_OWNER",
+      "rootCause": "crm-v1198-operational-bridge enhanceClientList() runs after Cliente360 render and recalculates KPI footer from scoped raw clientes. Product read-only store keeps raw tipo values, while Cliente360's canonical projection normalizes them to Persona/Empresa. The after-hook overwrote the correct canonical footer with 0/0.",
+      "productRegressionDemonstrated": true,
       "syntheticWritesBeforeFailure": 0,
       "cleanupDeleted": 0,
       "livePromoted": false,

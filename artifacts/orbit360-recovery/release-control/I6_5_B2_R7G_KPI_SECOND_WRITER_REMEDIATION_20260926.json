@@ -1,0 +1,49 @@
+{
+  "schema": "gravicentra-i6-5-b2-r7g-kpi-second-writer-remediation-v1",
+  "recordedAt": "2026-09-26T10:48:00-06:00",
+  "parentHead": "5ac36d1b358a64a2ce39df3cf02efc40a98310c3",
+  "block": "B2",
+  "findingId": "B2-R55-CLIENT-KPI-HYDRATION-FLICKER-R7",
+  "status": "SOURCE_REFIXED_PENDING_EXACT_PREVIEW",
+  "failure": {
+    "runId": 36256111695,
+    "jobId": 108443575021,
+    "sourceSha": "21dac43f15e504c642ebfc0c8b8f0938bf0d448e",
+    "buildId": "gi-i65-b2-21dac43f15e5-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36256111695-xsev5pj5.web.app",
+    "code": "B2_AUTH_R7_CLIENT_KPI_FLICKER_OR_NOT_READY",
+    "evidence": {
+      "foot1": "23 empresas · 416 personas",
+      "foot2": "0 empresas · 0 personas",
+      "totalText": "439"
+    },
+    "classification": "PRODUCT_DEFECT_CONFIRMED_SECOND_RENDER_OWNER",
+    "rootCause": "crm-v1198-operational-bridge enhanceClientList() runs after Cliente360 render and recalculates KPI footer from scoped raw clientes. Product read-only store keeps raw tipo values, while Cliente360's canonical projection normalizes them to Persona/Empresa. The after-hook overwrote the correct canonical footer with 0/0.",
+    "productRegressionDemonstrated": true,
+    "syntheticWritesBeforeFailure": 0,
+    "cleanupDeleted": 0,
+    "livePromoted": false,
+    "reimported": false
+  },
+  "sourceFix": {
+    "owner": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+    "beforeBlob": "e93c08dcd77a8076af4d4f3f05e14f4d66a9eae4",
+    "afterBlob": "3416e943f37e6306346930b8d839bf8fd8a152e8",
+    "change": "Preserve access-scope filtering on raw rows, then canonicalize the scoped client copies with Orbit.clientProjection.project() using scoped policy context before deriving KPI counts and modal rows.",
+    "indexBlob": "2e3fa7d893f4ac31d73d61064ca3b0b562a3a1d4",
+    "functionalHarnessBlob": "805b26d3397b18559b825863a68d60cad9f5b006",
+    "authenticatedHarnessBlob": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd"
+  },
+  "acceptance": [
+    "Cliente 360 authoritative KPI first stable footer equals footer after 650ms.",
+    "Footer must not become 0 empresas · 0 personas for 439 clients.",
+    "Role/data-scope filtering remains enforced before canonical projection.",
+    "New immutable Preview required because product source changed."
+  ],
+  "boundaries": {
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noBusinessDataWrites": true
+  }
+}

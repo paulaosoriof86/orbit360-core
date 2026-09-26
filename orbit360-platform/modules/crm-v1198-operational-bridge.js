@@ -113,9 +113,14 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
 
   function enhanceClientList(host) {
     if (!host || routeParams().c) return;
-    const clients = scopedRows('clientes', 'cliente360');
+    const scopedClients = scopedRows('clientes', 'cliente360');
+    const scopedPolicies = scopedRows('polizas', 'cliente360');
+    const policyClientIds = new Set(scopedPolicies.map(p => String(p && p.clienteId || '')).filter(Boolean));
+    const clients = scopedClients.map(c => Orbit.clientProjection && typeof Orbit.clientProjection.project === 'function'
+      ? Orbit.clientProjection.project(c, { policyClientIds })
+      : c);
     const clientIds = new Set(clients.map(c => c.id));
-    const policies = scopedRows('polizas', 'cliente360').filter(p => clientIds.has(p.clienteId));
+    const policies = scopedPolicies.filter(p => clientIds.has(p.clienteId));
     const active = policies.filter(p => ['vigente', 'porrenovar'].includes(A.norm(p.estado)));
     const renewals = active.filter(p => { const d = daysUntil(p.vigenciaFin); return d >= 0 && d <= 45; });
     const premiums = moneyByCurrency(active, p => p.primaNeta != null ? p.primaNeta : p.prima);

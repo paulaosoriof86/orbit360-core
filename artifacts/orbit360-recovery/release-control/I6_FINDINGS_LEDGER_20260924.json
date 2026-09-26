@@ -1383,7 +1383,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
@@ -1480,7 +1480,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
@@ -1553,7 +1553,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
@@ -1595,7 +1595,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
@@ -1692,7 +1692,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
@@ -1760,7 +1760,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
@@ -1848,13 +1848,13 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
       "id": "B2-R55-CLIENT-KPI-HYDRATION-FLICKER-R7",
       "title": "Cliente 360 KPI composition changes visibly during hydration.",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+      "status": "SOURCE_REFIXED_R7G_PENDING_EXACT_PREVIEW",
       "severity": "BLOCKER",
       "block": "B2",
       "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
@@ -1865,7 +1865,7 @@
         "previewRunId": 36249482718,
         "previewArtifactId": 10908113728
       },
-      "rootCause": "KPI footer depends on projected client type while render can occur across partial/canonical hydration states; no stable-ready barrier protects the KPI render.",
+      "rootCause": "crm-v1198-operational-bridge enhanceClientList() runs after Cliente360 render and recalculates KPI footer from scoped raw clientes. Product read-only store keeps raw tipo values, while Cliente360's canonical projection normalizes them to Persona/Empresa. The after-hook overwrote the correct canonical footer with 0/0.",
       "scope": "cliente360-list",
       "boundaries": {
         "noLive": true,
@@ -1875,7 +1875,16 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
+      },
+      "r7gRemediation": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7G_KPI_SECOND_WRITER_REMEDIATION_20260926.json",
+        "receiptBlobSha": "3c77f42b2de2c671f510b266440f18d421dfc5db",
+        "owner": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+        "ownerBlobSha": "3416e943f37e6306346930b8d839bf8fd8a152e8",
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed",
+        "failedRunId": 36256111695,
+        "failedJobId": 108443575021
       }
     },
     {
@@ -1902,7 +1911,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
@@ -1929,7 +1938,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
@@ -1956,7 +1965,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
@@ -1983,7 +1992,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     },
     {
@@ -2010,7 +2019,7 @@
       "r7Remediation": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-        "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47"
+        "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
     }
   ],
@@ -2053,7 +2062,7 @@
     "date": "2026-09-26",
     "recordedAt": "2026-09-26T07:30:00-06:00",
     "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
-    "decision": "R7F_HARNESS_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "decision": "R7G_PRODUCT_DEFECT_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
     "exactSourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
     "exactBuildId": "gi-i65-b2-2963f4140f2f-57f234755dc1",
@@ -2094,7 +2103,7 @@
     "noLive": true,
     "b3": "NOT_STARTED",
     "sourceRemediationStatus": "R6_EXACT_AUTHENTICATED_TECHNICAL_PASS_R52_FIXTURE_PENDING",
-    "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47",
+    "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed",
     "lastFailedPreviewRunId": 36247874721,
     "lastFailedPreviewJobId": 108420324309,
     "lastFailureCode": "B2_CACHE_KEY_MISSING:modules/cliente360.js?v=20260925-b2r5",
@@ -2114,14 +2123,24 @@
       "noLive": true
     },
     "lastAuthenticatedFailure": {
-      "runId": 36248865201,
-      "jobId": 108423473972,
-      "code": "B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT",
-      "classification": "HARNESS_ONLY_PERFORMANCE_DEFECT",
-      "beforeSyntheticWrites": true,
-      "productRegressionDemonstrated": false,
+      "runId": 36256111695,
+      "jobId": 108443575021,
+      "sourceSha": "21dac43f15e504c642ebfc0c8b8f0938bf0d448e",
+      "buildId": "gi-i65-b2-21dac43f15e5-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36256111695-xsev5pj5.web.app",
+      "code": "B2_AUTH_R7_CLIENT_KPI_FLICKER_OR_NOT_READY",
+      "evidence": {
+        "foot1": "23 empresas · 416 personas",
+        "foot2": "0 empresas · 0 personas",
+        "totalText": "439"
+      },
+      "classification": "PRODUCT_DEFECT_CONFIRMED_SECOND_RENDER_OWNER",
+      "rootCause": "crm-v1198-operational-bridge enhanceClientList() runs after Cliente360 render and recalculates KPI footer from scoped raw clientes. Product read-only store keeps raw tipo values, while Cliente360's canonical projection normalizes them to Persona/Empresa. The after-hook overwrote the correct canonical footer with 0/0.",
+      "productRegressionDemonstrated": true,
+      "syntheticWritesBeforeFailure": 0,
+      "cleanupDeleted": 0,
       "livePromoted": false,
-      "reimport": false
+      "reimported": false
     },
     "harnessOptimization": {
       "blobSha": "4fafa9de303f42d54ebbee5cd78c64b885fc3903",
@@ -2198,8 +2217,8 @@
     ],
     "b2OverallAccepted": false,
     "noB3": true,
-    "remediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
-    "remediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
+    "remediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7G_KPI_SECOND_WRITER_REMEDIATION_20260926.json",
+    "remediationReceiptBlobSha": "3c77f42b2de2c671f510b266440f18d421dfc5db",
     "pendingProofFindingIds": [
       "B2-R54-PERFORMANCE-SLOW-NAVIGATION-PAGE-FREEZE-R7",
       "B2-R55-CLIENT-KPI-HYDRATION-FLICKER-R7",

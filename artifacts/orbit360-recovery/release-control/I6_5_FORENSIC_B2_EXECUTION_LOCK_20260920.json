@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -233,19 +233,19 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "21dac43f15e504c642ebfc0c8b8f0938bf0d448e",
-    "buildId": "gi-i65-b2-21dac43f15e5-57f234755dc1",
-    "channelId": "gi-i65-b2-36256111695",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36256111695-xsev5pj5.web.app",
-    "runId": 36256111695,
-    "artifactId": 10910606564,
-    "artifactDigest": "6407615230f91c40c27147e52bb6243b3a8b427867321c1d3699536dcf01cc1c",
-    "exactReadback": true,
-    "functionalPass": true,
+    "sourceSha": null,
+    "buildId": null,
+    "channelId": null,
+    "url": null,
+    "runId": null,
+    "artifactId": null,
+    "artifactDigest": null,
+    "exactReadback": false,
+    "functionalPass": false,
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "HISTORICAL_ATTEMPT_FAILED_R55_PRODUCT_DEFECT",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "21dac43f15e504c642ebfc0c8b8f0938bf0d448e",
     "exactPreviewBuildId": "gi-i65-b2-21dac43f15e5-57f234755dc1",
@@ -300,12 +300,20 @@
     "timeoutFailureMayNotBeDeclaredProductFailure": true,
     "lastFailedRunId": 36205585644,
     "lastFailure": {
-      "runId": 36255705020,
-      "jobId": 108442445545,
-      "code": "B2_AUTH_R7_POLICY_DETAIL_RECEIPTS_NOT_CANONICAL_EXPECTED_10_ACTUAL_0",
-      "classification": "HARNESS_STALE_DOM_TARGETING_FALSE_NEGATIVE",
-      "cause": "R7 harness waited for any existing [data-policy-fullpage=1]. The prior R2 discriminant intentionally left another policy full page mounted, so the wait resolved before AUTO39012 finished routing.",
-      "productRegressionDemonstrated": false,
+      "runId": 36256111695,
+      "jobId": 108443575021,
+      "sourceSha": "21dac43f15e504c642ebfc0c8b8f0938bf0d448e",
+      "buildId": "gi-i65-b2-21dac43f15e5-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36256111695-xsev5pj5.web.app",
+      "code": "B2_AUTH_R7_CLIENT_KPI_FLICKER_OR_NOT_READY",
+      "evidence": {
+        "foot1": "23 empresas · 416 personas",
+        "foot2": "0 empresas · 0 personas",
+        "totalText": "439"
+      },
+      "classification": "PRODUCT_DEFECT_CONFIRMED_SECOND_RENDER_OWNER",
+      "rootCause": "crm-v1198-operational-bridge enhanceClientList() runs after Cliente360 render and recalculates KPI footer from scoped raw clientes. Product read-only store keeps raw tipo values, while Cliente360's canonical projection normalizes them to Persona/Empresa. The after-hook overwrote the correct canonical footer with 0/0.",
+      "productRegressionDemonstrated": true,
       "syntheticWritesBeforeFailure": 0,
       "cleanupDeleted": 0,
       "livePromoted": false,
@@ -1521,8 +1529,8 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R7F_NEW_IMMUTABLE_PREVIEW",
-    "R7F_AUTHENTICATED_RUNTIME_PROOF",
+    "R7G_NEW_IMMUTABLE_PREVIEW",
+    "R7G_AUTHENTICATED_RUNTIME_PROOF_INCLUDING_KPI_STABILITY",
     "PAULA_VISUAL_REVIEW_AFTER_TECHNICAL_PASS"
   ],
   "lastAuthenticatedFailure": {
@@ -2364,9 +2372,9 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "5c70167e35488192d474760e3b9c5c3602fe0a0e",
+  "findingLedgerBlobSha": "32dc114f4dd1d964976d5f78d6ce60942d7afa36",
   "r7": {
-    "status": "R7F_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
+    "status": "R7G_KPI_SECOND_WRITER_FIXED_PENDING_EXACT_PREVIEW",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
     "visualReceiptBlobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df",
     "confirmedOpenFindingIds": [
@@ -2396,17 +2404,18 @@
     "noReimport": true,
     "remediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
     "remediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-    "compositionLockBlobSha": "c9b15d7c5a9d69adf91516c452322b936f94cc47",
-    "findingLedgerBlobSha": "5c70167e35488192d474760e3b9c5c3602fe0a0e",
+    "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed",
+    "findingLedgerBlobSha": "32dc114f4dd1d964976d5f78d6ce60942d7afa36",
     "productBlobs": {
       "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "81cb2db0a7b3a26387fba980d9cecaa5f8d3d4eb",
-      "orbit360-platform/index.html": "cc1fb44fab57db6824494ca40fd2027739d62387"
+      "orbit360-platform/index.html": "2e3fa7d893f4ac31d73d61064ca3b0b562a3a1d4",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8"
     },
     "mechanismBlobs": {
-      "tools/gravicentra-i6-5-b2-functional.mjs": "e1b952ae8a66eefd800b07230367d9fd3977acdd",
-      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs": "c3e1d11f7d00c19fc9ddf8690e94bb840e291122"
+      "tools/gravicentra-i6-5-b2-functional.mjs": "805b26d3397b18559b825863a68d60cad9f5b006",
+      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd"
     },
     "exactPreviewSourceSha": null,
     "exactPreviewBuildId": null,
@@ -2414,28 +2423,38 @@
     "authenticatedPreviewPass": false,
     "authenticatedHarnessBlobSha": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd",
     "lastAuthenticatedFailure": {
-      "runId": 36255705020,
-      "jobId": 108442445545,
-      "code": "B2_AUTH_R7_POLICY_DETAIL_RECEIPTS_NOT_CANONICAL_EXPECTED_10_ACTUAL_0",
-      "classification": "HARNESS_STALE_DOM_TARGETING_FALSE_NEGATIVE",
-      "cause": "R7 harness waited for any existing [data-policy-fullpage=1]. The prior R2 discriminant intentionally left another policy full page mounted, so the wait resolved before AUTO39012 finished routing.",
-      "productRegressionDemonstrated": false,
+      "runId": 36256111695,
+      "jobId": 108443575021,
+      "sourceSha": "21dac43f15e504c642ebfc0c8b8f0938bf0d448e",
+      "buildId": "gi-i65-b2-21dac43f15e5-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36256111695-xsev5pj5.web.app",
+      "code": "B2_AUTH_R7_CLIENT_KPI_FLICKER_OR_NOT_READY",
+      "evidence": {
+        "foot1": "23 empresas · 416 personas",
+        "foot2": "0 empresas · 0 personas",
+        "totalText": "439"
+      },
+      "classification": "PRODUCT_DEFECT_CONFIRMED_SECOND_RENDER_OWNER",
+      "rootCause": "crm-v1198-operational-bridge enhanceClientList() runs after Cliente360 render and recalculates KPI footer from scoped raw clientes. Product read-only store keeps raw tipo values, while Cliente360's canonical projection normalizes them to Persona/Empresa. The after-hook overwrote the correct canonical footer with 0/0.",
+      "productRegressionDemonstrated": true,
       "syntheticWritesBeforeFailure": 0,
       "cleanupDeleted": 0,
       "livePromoted": false,
       "reimported": false
     },
     "previousTechnicalPreviewHistorical": {
-      "sourceSha": "13b2a597c090ecdfbfba1179f9d2f5470efc6050",
-      "buildId": "gi-i65-b2-13b2a597c090-57f234755dc1",
-      "channelId": "gi-i65-b2-36255705020",
-      "url": "https://ays-orbit-360-lab--gi-i65-b2-36255705020-0ldq6zjl.web.app",
-      "runId": 36255705020,
-      "artifactId": 10910666921,
-      "artifactDigest": "2e0f2f620b282f7a7d51dfe7811da14d7e340efabba3e611203e883fbe875684",
+      "sourceSha": "21dac43f15e504c642ebfc0c8b8f0938bf0d448e",
+      "buildId": "gi-i65-b2-21dac43f15e5-57f234755dc1",
+      "channelId": "gi-i65-b2-36256111695",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36256111695-xsev5pj5.web.app",
+      "runId": 36256111695,
+      "artifactId": 10910606564,
+      "artifactDigest": "6407615230f91c40c27147e52bb6243b3a8b427867321c1d3699536dcf01cc1c",
       "exactReadback": true,
       "functionalPass": true,
       "livePromoted": false
-    }
+    },
+    "r7gReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7G_KPI_SECOND_WRITER_REMEDIATION_20260926.json",
+    "r7gReceiptBlobSha": "3c77f42b2de2c671f510b266440f18d421dfc5db"
   }
 }
