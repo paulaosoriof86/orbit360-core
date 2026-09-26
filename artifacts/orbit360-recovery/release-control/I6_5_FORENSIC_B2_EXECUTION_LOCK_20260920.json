@@ -390,7 +390,7 @@
     "cleanupWrites": 25,
     "visualEvidenceRecapture": true,
     "visualReceiptRecapture": true,
-    "lastFailureRunId": 36258966880,
+    "lastFailureRunId": 36259661784,
     "requiredNewSource": true,
     "lastArmCommitParent": "219bf4d02c37d785e2c6d2a811ee1b5ff42f84dd",
     "lastArmReason": "R22_PREVIEW_CREDENTIAL_ISOLATION_EXACT_AUTHENTICATED_PROOF",
@@ -422,10 +422,10 @@
     "r5VehiclePolicyContext": true,
     "r5IndividualReceiptEdit": true,
     "r5ReportedPaymentProjection": true,
-    "lastFailureJobId": 108451031403,
-    "lastFailureCode": "B2_AUTH_RECEIPT_EDIT_CONTROL_DOM_RACE",
-    "lastFailureClassification": "HARNESS_ONLY_DOM_RERENDER_RACE",
-    "productRegressionDemonstrated": false,
+    "lastFailureJobId": 108452982186,
+    "lastFailureCode": "B2_AUTH_INSURER_LOGO_FILE_SELECTION_MISSING",
+    "lastFailureClassification": "PRODUCT_DEFECT_ASYNC_OWNER_RERENDER_DROPS_PENDING_LOGO_FILE",
+    "productRegressionDemonstrated": true,
     "requiredNewHarnessBlob": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
     "priorPassRunId": 36258221310,
     "priorPassPreserved": true,
@@ -1461,7 +1461,9 @@
     "productSourceReadyForPreview": true,
     "broadRediscoveryRequired": false,
     "authorityBlobSha": "2250d63fc5dd2fb824e30b5493e7e6a611fc02d4",
-    "findingsLedgerBlobSha": "6912bfbecfc963c3c57c64a058e192ee18173b68"
+    "findingsLedgerBlobSha": "6912bfbecfc963c3c57c64a058e192ee18173b68",
+    "compositionLockBlobSha": "b973ff3d5064d89d4e5f8290da26a7044c69f6f3",
+    "findingLedgerBlobSha": "61789707bfbc9a8de3b01ff401ac68284f9ef86e"
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
   "lastPreviewFailure": {
@@ -2380,9 +2382,9 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "32dc114f4dd1d964976d5f78d6ce60942d7afa36",
+  "findingLedgerBlobSha": "61789707bfbc9a8de3b01ff401ac68284f9ef86e",
   "r7": {
-    "status": "R7M_AUTH_DOM_RACE_FIXED_PENDING_EXACT_RETRY",
+    "status": "R7N_INSURER_LOGO_ASYNC_EDIT_RERENDER_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
     "visualReceiptBlobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df",
     "confirmedOpenFindingIds": [
@@ -2412,14 +2414,15 @@
     "noReimport": true,
     "remediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
     "remediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-    "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed",
-    "findingLedgerBlobSha": "32dc114f4dd1d964976d5f78d6ce60942d7afa36",
+    "compositionLockBlobSha": "b973ff3d5064d89d4e5f8290da26a7044c69f6f3",
+    "findingLedgerBlobSha": "61789707bfbc9a8de3b01ff401ac68284f9ef86e",
     "productBlobs": {
       "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "81cb2db0a7b3a26387fba980d9cecaa5f8d3d4eb",
       "orbit360-platform/index.html": "2e3fa7d893f4ac31d73d61064ca3b0b562a3a1d4",
-      "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8"
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
+      "orbit360-platform/modules/aseguradoras.js": "2d7db2a218459bb5a6239845f0e277db12aa5490"
     },
     "mechanismBlobs": {
       "tools/gravicentra-i6-5-b2-functional.mjs": "805b26d3397b18559b825863a68d60cad9f5b006",
@@ -2476,6 +2479,9 @@
     "r7lReceiptBlobSha": "50287a3f986c1e501a28e49d253102629530651e",
     "priorAuthenticatedPassRunId": 36258221310,
     "r7mReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7M_RECEIPT_EDITOR_DOM_RACE_FIX_20260926.json",
-    "r7mReceiptBlobSha": "fa6c55f63c584476a7e137e81019cfb458afcac6"
+    "r7mReceiptBlobSha": "fa6c55f63c584476a7e137e81019cfb458afcac6",
+    "r7nReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7N_INSURER_LOGO_ASYNC_EDIT_RERENDER_FIX_20260926.json",
+    "r7nReceiptBlobSha": "9af4807b378a21f8443eda9ec903248845e117ce",
+    "r7nFindingId": "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7"
   }
 }

@@ -2021,6 +2021,32 @@
         "receiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
         "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed"
       }
+    },
+    {
+      "id": "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7",
+      "block": "B2",
+      "source": "AUTHENTICATED_EXACT_PREVIEW_RUN_36259661784",
+      "surface": "Aseguradoras / editar logo",
+      "classification": "PRODUCT_DEFECT",
+      "finding": "ASYNC_KNOWLEDGE_OWNER_CAN_RERENDER_ACTIVE_EDIT_AND_DROP_PENDING_LOGO_FILE",
+      "rootCause": "ensureKnowledgeSummaryLoaded completion calls refreshOwnerView, which rebuilds the active ficha; preserveState omitted logoFile and DOM replacement clears FileList.",
+      "remediation": "Do not replace active insurer edit UI on async knowledge completion; preserve logoFile across preserveState reconstruction.",
+      "requiredProof": "Exact new immutable Preview: select logo on synthetic insurer -> wait across knowledge hydration window -> save -> Storage/Firestore HTTPS asset readback -> reload same logo -> credential regression -> cleanup.",
+      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_PROOF",
+      "blocking": true,
+      "noReimport": true,
+      "noLive": true,
+      "noB3": true,
+      "sourceFix": {
+        "path": "orbit360-platform/modules/aseguradoras.js",
+        "beforeBlob": "af3af47ed2fb71c2bdf9e81775a7359eefb1c606",
+        "afterBlob": "2d7db2a218459bb5a6239845f0e277db12aa5490"
+      },
+      "failure": {
+        "runId": 36259661784,
+        "jobId": 108452982186,
+        "artifactId": 10911404901
+      }
     }
   ],
   "phaseBBacklog": [

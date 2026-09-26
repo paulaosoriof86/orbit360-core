@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R7M_AUTH_DOM_RACE_FIXED_RETRY_AUTHORIZED",
+    "mechanismSyncStatus": "B2_R7N_PRODUCT_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "7bc2a1e3e7cf770f77051deacbc2c11bb84404a0",
+    "b2ExecutionLockBlobSha": "cb086d6f157c3c4279d48cd5ffdf0fe7edb5d7d7",
     "b2": {
       "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2196,7 +2196,7 @@
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
       "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
       "insurerStableEditRuntimePass": true,
-      "findingLedgerBlobSha": "984d3713814aec3419787bd440132e98d9fd7bcd",
+      "findingLedgerBlobSha": "61789707bfbc9a8de3b01ff401ac68284f9ef86e",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
@@ -2231,11 +2231,11 @@
       "lastExactAuthenticatedPassRunId": 36247964139,
       "lastExactAuthenticatedPassHistoricalPreserved": true,
       "r6dHarnessRepair": true,
-      "lastAuthenticatedFailureRunId": 36258966880,
-      "lastAuthenticatedFailureCode": "B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT",
-      "lastAuthenticatedFailureClassification": "HARNESS_ONLY_DOM_RERENDER_RACE",
+      "lastAuthenticatedFailureRunId": 36259661784,
+      "lastAuthenticatedFailureCode": "B2_AUTH_INSURER_LOGO_FILE_SELECTION_MISSING",
+      "lastAuthenticatedFailureClassification": "PRODUCT_DEFECT_ASYNC_OWNER_RERENDER_DROPS_PENDING_LOGO_FILE",
       "r6eHarnessSyntaxRepair": true,
-      "lastPreviewFailureClassification": "PRODUCT_DEFECT_CONFIRMED_SECOND_RENDER_OWNER",
+      "lastPreviewFailureClassification": "PRODUCT_DEFECT_ASYNC_OWNER_RERENDER_DROPS_PENDING_LOGO_FILE",
       "exactR6ProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
       "exactR6ProofReceiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
       "r6TechnicalExactPassCount": 6,
@@ -2267,8 +2267,8 @@
       ],
       "r7RemediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
       "r7RemediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-      "r7CompositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed",
-      "r7FindingLedgerBlobSha": "32dc114f4dd1d964976d5f78d6ce60942d7afa36",
+      "r7CompositionLockBlobSha": "b973ff3d5064d89d4e5f8290da26a7044c69f6f3",
+      "r7FindingLedgerBlobSha": "61789707bfbc9a8de3b01ff401ac68284f9ef86e",
       "r7ProductBlobs": {
         "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",
@@ -2298,7 +2298,11 @@
       "r7lTargetedProof": true,
       "r7lReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7L_VISIBLE_PLATE_UNIQUENESS_PROOF_20260926.json",
       "r7lReceiptBlobSha": "50287a3f986c1e501a28e49d253102629530651e",
-      "r7mAuthRetryAuthorized": true
+      "r7mAuthRetryAuthorized": true,
+      "r7nSourceRemediation": true,
+      "r7nReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7N_INSURER_LOGO_ASYNC_EDIT_RERENDER_FIX_20260926.json",
+      "r7nReceiptBlobSha": "9af4807b378a21f8443eda9ec903248845e117ce",
+      "r7nFindingId": "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2416,9 +2420,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "2747d54f0ae9704fceb81511b73d555a859691ed",
+    "compositionLockBlobSha": "b973ff3d5064d89d4e5f8290da26a7044c69f6f3",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "32dc114f4dd1d964976d5f78d6ce60942d7afa36",
+    "findingLedgerBlobSha": "61789707bfbc9a8de3b01ff401ac68284f9ef86e",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
@@ -2430,7 +2434,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R7M_AUTH_RETRY_ON_FROZEN_PREVIEW"
+    "nextAction": "B2_R7N_NEW_IMMUTABLE_PREVIEW_THEN_AUTHENTICATED_PROOF"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

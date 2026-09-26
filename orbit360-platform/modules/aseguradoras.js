@@ -181,8 +181,13 @@ Orbit.modules.aseguradoras = (function () {
   function configuredKnowledgeSummarySrc() { return clean(tenantInsurerConfig().knowledgeSummarySrc); }
   function refreshOwnerView() {
     const open = document.getElementById('asg-ficha');
-    if (open && open.dataset.id && S().get('aseguradoras', open.dataset.id)) ficha(open.dataset.id, undefined, true);
-    else reload();
+    if (open && open.dataset.id && S().get('aseguradoras', open.dataset.id)) {
+      const st = fichaState[open.dataset.id];
+      // Async knowledge hydration must never replace an active edit form.
+      // In particular, replacing a file input clears the browser FileList and can discard a pending logo.
+      if (st && st.editing) { st.knowledgeRefreshPending = true; return; }
+      ficha(open.dataset.id, undefined, true);
+    } else reload();
   }
   function ensureKnowledgeSummaryLoaded() {
     if (tenantKnowledgeSummary() || knowledgeSummaryLoading) return;
@@ -400,6 +405,8 @@ Orbit.modules.aseguradoras = (function () {
       editing: wantEdit,
       draft: wantEdit ? (preserving && priorState.draft ? priorState.draft : cloneEnt(a)) : null,
       credentialDrafts: wantEdit ? (preserving ? (priorState.credentialDrafts || {}) : {}) : (priorState.credentialDrafts || {}),
+      logoFile: wantEdit && preserving ? (priorState.logoFile || null) : null,
+      knowledgeRefreshPending: preserving ? !!priorState.knowledgeRefreshPending : false,
       snapshotCurrent: preserving ? priorState.snapshotCurrent || null : null,
       saving: preserving ? !!priorState.saving : false
     };

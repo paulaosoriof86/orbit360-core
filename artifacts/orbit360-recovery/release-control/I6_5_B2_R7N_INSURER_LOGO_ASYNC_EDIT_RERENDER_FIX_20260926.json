@@ -1,0 +1,46 @@
+{
+  "schema": "gravicentra-i6-5-b2-r7n-insurer-logo-async-edit-rerender-fix-v1",
+  "recordedAt": "2026-09-26T11:41:00-06:00",
+  "block": "B2",
+  "parentHead": "77b35716395ea5376e5179eeb1014c65da6aaf07",
+  "failedRunId": 36259661784,
+  "failedJobId": 108452982186,
+  "failedEvidenceArtifactId": 10911404901,
+  "classification": "PRODUCT_DEFECT_ASYNC_OWNER_RERENDER_DROPS_PENDING_LOGO_FILE",
+  "productRegressionDemonstrated": true,
+  "symptom": "After the insurer edit form was stable and the logo file input existed, the authenticated proof observed fileCount=0 immediately after file selection.",
+  "rootCause": {
+    "asyncOwner": "ensureKnowledgeSummaryLoaded -> script.onload -> refreshOwnerView",
+    "behavior": "refreshOwnerView rebuilt the open insurer ficha during editing.",
+    "stateLoss": "ficha(..., preserveState=true) preserved draft/credentialDrafts but omitted logoFile, while DOM replacement necessarily cleared the browser FileList.",
+    "userImpact": "A user can select a logo and have the pending file silently disappear before Guardar cambios if asynchronous knowledge hydration completes during the edit."
+  },
+  "fix": {
+    "owner": "orbit360-platform/modules/aseguradoras.js",
+    "beforeBlob": "af3af47ed2fb71c2bdf9e81775a7359eefb1c606",
+    "afterBlob": "2d7db2a218459bb5a6239845f0e277db12aa5490",
+    "rules": [
+      "Async knowledge hydration never replaces an actively edited insurer form.",
+      "Any legitimate preserveState reconstruction carries pending logoFile and knowledgeRefreshPending."
+    ]
+  },
+  "passedBeforeFailure": {
+    "r7PolicyDetailReceipts": "PASS_10_OF_10",
+    "r7ReceiptPolicyFilter": "PASS_ACTIVE_ONLY",
+    "r7ReportedPaymentRows": "PASS_3_VISIBLE",
+    "r7ClientKpiStable": "PASS_23_EMPRESAS_416_PERSONAS",
+    "r7PaymentHierarchy": "PASS",
+    "r7Performance": "PASS_UNDER_4S",
+    "clientPolicyVehicleReceiptCrud": "PASS",
+    "reportedPaymentDoesNotFabricateCobro": true,
+    "cleanupDeleted": 14
+  },
+  "releaseEffect": {
+    "productSourceChanged": true,
+    "immutableBuildRequired": true,
+    "priorPreviewSupersededForThisCausalOwner": true,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true
+  }
+}

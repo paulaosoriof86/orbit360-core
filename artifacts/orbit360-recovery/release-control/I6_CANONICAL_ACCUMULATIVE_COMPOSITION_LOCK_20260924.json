@@ -136,7 +136,7 @@
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "2e3fa7d893f4ac31d73d61064ca3b0b562a3a1d4",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
-    "orbit360-platform/modules/aseguradoras.js": "af3af47ed2fb71c2bdf9e81775a7359eefb1c606",
+    "orbit360-platform/modules/aseguradoras.js": "2d7db2a218459bb5a6239845f0e277db12aa5490",
     "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
@@ -173,102 +173,29 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "PAULA_VISUAL_REJECTION_R7_ROOT_CAUSE",
-    "parentHead": "35eb232add306a96d2d4640e1e7fb1c38ddcad36",
-    "status": "R7G_KPI_SECOND_WRITER_FIXED_PENDING_EXACT_PREVIEW",
+    "origin": "AUTHENTICATED_EXACT_PREVIEW_RUN_36259661784",
+    "parentHead": "77b35716395ea5376e5179eeb1014c65da6aaf07",
+    "status": "R7N_INSURER_LOGO_ASYNC_EDIT_RERENDER_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "changedProductFiles": [
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/index.html",
-      "orbit360-platform/modules/crm-v1198-operational-bridge.js"
+      "orbit360-platform/modules/aseguradoras.js"
     ],
     "productBlobs": {
-      "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
-      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "81cb2db0a7b3a26387fba980d9cecaa5f8d3d4eb",
-      "orbit360-platform/index.html": "2e3fa7d893f4ac31d73d61064ca3b0b562a3a1d4",
-      "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8"
+      "orbit360-platform/modules/aseguradoras.js": "2d7db2a218459bb5a6239845f0e277db12aa5490"
     },
-    "mechanismFiles": [
-      "tools/gravicentra-i6-5-b2-functional.mjs",
-      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs"
-    ],
-    "mechanismBlobs": {
-      "tools/gravicentra-i6-5-b2-functional.mjs": "805b26d3397b18559b825863a68d60cad9f5b006",
-      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd",
-      "authenticated": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd"
-    },
-    "rootCauses": {
-      "R54": [
-        "calendarClassReceipt performed a full recibosEsperados sibling scan for each receipt classification, creating O(n^2) work on receipt-heavy screens.",
-        "policy/vehicle visual alias application rescanned all policies and vehicles on product read-only navigation even though store.all returns copies.",
-        "receipt owner reconciliation polled every 100ms up to 100 attempts and repeated owner/status work."
-      ],
-      "R55": "Cliente 360 rendered raw/partially hydrated rows when clientProjection or authoritative clientes/polizas/cobros/asesores snapshots were not all ready.",
-      "R56": "Policy full-page receiptRows bypassed receiptSchedule() and read raw recibosEsperados directly.",
-      "R57": "Native receipt filter built options from every client policy rather than current/renewable policies.",
-      "R58": "Cobros table rendered only r.cob while pago_reportado records were reduced to an informational count.",
-      "R59": "Vehicle grouping prioritized lineage root over normalized plate, allowing one plate to render as multiple cards.",
-      "R60": "Payment section used one flat breakdown grid without clear total/schedule/conditions hierarchy."
-    },
-    "fixes": {
-      "R54": [
-        "Single-pass cached receipt calendar classification index with invalidation only on relevant store events.",
-        "Skip ineffective full policy/vehicle alias rescans on product read-only store.",
-        "Replace 100ms polling loop with coalesced event-driven reconciliation plus bounded startup retries."
-      ],
-      "R55": "Authoritative-ready barrier requires clientProjection plus server-confirmed clientes/polizas/cobros/asesores before KPI/list render.",
-      "R56": "Policy full page now consumes receiptSchedule(policyId).rows, the same canonical calendar projection used elsewhere.",
-      "R57": "Receipt policy selector now lists only Vigente/Por renovar policies and resets stale historical selections.",
-      "R58": "Reported payments now render as evidence rows in Cobros without being counted as confirmed cobros.",
-      "R59": "Normalized plate is the primary same-client vehicle identity key; lineage remains fallback/history.",
-      "R60": "Payment section now separates total, net, current schedule, breakdown and payment conditions."
-    },
-    "strengthenedProof": [
-      "R7 policy-detail receipt count must equal canonical current-calendar count",
-      "R7 receipt selector values must equal active policy ids",
-      "R7 same-plate raw records must project to one current vehicle card",
-      "R7 pago_reportado must render as visible evidence rows when present",
-      "R7 Cliente 360 KPI footer must remain stable after authoritative render",
-      "R7 payment hierarchy elements must exist",
-      "R7 measured list/detail/tab transitions must each complete within 4 seconds"
-    ],
+    "rootCause": "Async knowledge-summary completion rebuilt an active insurer edit form; the browser FileList was replaced and preserveState omitted pending logoFile.",
+    "fix": "Defer async owner refresh while editing and carry logoFile through preserveState reconstruction.",
+    "requiredProof": "new immutable Preview + exact authenticated synthetic insurer logo commit/reload/cleanup",
     "preservedPass": [
-      "R49 reviewed-client policy ordering",
-      "R50 reviewed-surface business language",
-      "R52 isolated logo persistence"
-    ],
-    "deferredUntouched": [
-      "B2-R46 invitation/reset delivery debt",
-      "B4 renewal single-owner consolidation",
-      "B3 canonical payment/conciliation/inference engine"
+      "R7 policy receipts 10/10",
+      "active-only receipt filter",
+      "reported-payment rows",
+      "Cliente KPI stability",
+      "payment hierarchy",
+      "performance under 4s",
+      "client/policy/vehicle/receipt CRUD"
     ],
     "noDataReimport": true,
     "noLive": true,
-    "noB3": true,
-    "followupFix": "R7G_CANONICALIZE_SCOPED_CLIENTS_BEFORE_CRM_KPI_PATCH",
-    "followupRootCause": {
-      "runId": 36256111695,
-      "jobId": 108443575021,
-      "sourceSha": "21dac43f15e504c642ebfc0c8b8f0938bf0d448e",
-      "buildId": "gi-i65-b2-21dac43f15e5-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36256111695-xsev5pj5.web.app",
-      "code": "B2_AUTH_R7_CLIENT_KPI_FLICKER_OR_NOT_READY",
-      "evidence": {
-        "foot1": "23 empresas · 416 personas",
-        "foot2": "0 empresas · 0 personas",
-        "totalText": "439"
-      },
-      "classification": "PRODUCT_DEFECT_CONFIRMED_SECOND_RENDER_OWNER",
-      "rootCause": "crm-v1198-operational-bridge enhanceClientList() runs after Cliente360 render and recalculates KPI footer from scoped raw clientes. Product read-only store keeps raw tipo values, while Cliente360's canonical projection normalizes them to Persona/Empresa. The after-hook overwrote the correct canonical footer with 0/0.",
-      "productRegressionDemonstrated": true,
-      "syntheticWritesBeforeFailure": 0,
-      "cleanupDeleted": 0,
-      "livePromoted": false,
-      "reimported": false
-    },
-    "productFileBlobsChanged": false,
-    "immutableBuildRequiredAfterMechanismChange": true
+    "noB3": true
   }
 }
