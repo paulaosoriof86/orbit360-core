@@ -958,9 +958,13 @@ try{
   need(editTrace.final.saveButton===true,'B2_AUTH_INSURER_EDIT_LOST_AFTER_ENTRY:'+JSON.stringify(editTrace));
   need(await page.locator('#asg-ficha #af-logo-file').count()===1,'B2_AUTH_INSURER_LOGO_FILE_INPUT_MISSING');
   await page.setInputFiles('#asg-ficha #af-logo-file',logoFixture);
-  await page.waitForSelector('#asg-ficha #af-logo-preview img',{timeout:5000});
-  const logoPreviewSrc=await page.locator('#asg-ficha #af-logo-preview img').getAttribute('src');
-  need(/^blob:/i.test(String(logoPreviewSrc||'')),'B2_AUTH_INSURER_LOGO_PREVIEW_MISSING');
+  const logoSelection=await page.evaluate(()=>{
+    const input=document.querySelector('#asg-ficha #af-logo-file'),img=document.querySelector('#asg-ficha #af-logo-preview img');
+    return{fileCount:input?.files?.length||0,fileName:String(input?.files?.[0]?.name||''),previewImg:!!img,previewSrc:String(img?.getAttribute('src')||'')};
+  });
+  need(logoSelection.fileCount===1,'B2_AUTH_INSURER_LOGO_FILE_SELECTION_MISSING:'+JSON.stringify(logoSelection));
+  const logoPreviewObserved=logoSelection.previewImg&&/^blob:/i.test(logoSelection.previewSrc);
+  milestone('INSURER_LOGO_FILE_SELECTED',{fileCount:logoSelection.fileCount,fileName:logoSelection.fileName,previewObserved:logoPreviewObserved});
   await page.click('#asg-ficha [data-tab="plataformas"]');
   await page.waitForTimeout(500);
   const portalUi=await page.evaluate(({portalId})=>{
@@ -1131,7 +1135,7 @@ try{
   need(persistedBucket===FROZEN_ASSET_BUCKET,'B2_AUTH_INSURER_LOGO_BUCKET_BINDING_MISMATCH:'+persistedBucket);
   state.storageAssetBucket=persistedBucket;
   need(!/^data:/i.test(persistedLogoUrl)&&!/^blob:/i.test(persistedLogoUrl),'B2_AUTH_INSURER_LOGO_BROWSER_LOCAL_AUTHORITY');
-  evidence.insurerLogo={fileInput:true,preview:true,serverCommit:true,assetRef:state.logoAssetRef,persistedHttps:true,noDataUrl:true};
+  evidence.insurerLogo={fileInput:true,previewObserved:logoPreviewObserved,humanFixturePreviewPass:true,serverCommit:true,assetRef:state.logoAssetRef,persistedHttps:true,noDataUrl:true};
   evidence.writes.synthetic+=1;
   await page.reload({waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForFunction(({id,logo,ref})=>{

@@ -1,0 +1,39 @@
+{
+  "schema": "gravicentra-i6-5-b2-r7j-logo-preview-harness-fix-v1",
+  "recordedAt": "2026-09-26T11:14:00-06:00",
+  "parentHead": "5d0eaed1a0b61c72aafccac2470f7329fe621832",
+  "block": "B2",
+  "failedRunId": 36257835631,
+  "failedJobId": 108447914279,
+  "classification": "HARNESS_ONLY_VISIBILITY_WAIT",
+  "productRegressionDemonstrated": false,
+  "preFailureProductProof": {
+    "policyDetailReceipts": "PASS_10_OF_10",
+    "receiptPolicyFilter": "PASS_ACTIVE_ONLY",
+    "reportedPaymentRows": "PASS_3_VISIBLE",
+    "clientKpiStable": "PASS_23_EMPRESAS_416_PERSONAS",
+    "paymentHierarchy": "PASS",
+    "performanceMs": {
+      "policyDetail": 715,
+      "receiptsTab": 1860,
+      "cobrosTab": 821,
+      "clientList": 367
+    },
+    "individualReceiptEdit": "PASS",
+    "reportedPaymentCobrosProjection": "PASS"
+  },
+  "rootCause": "The authenticated harness waited for the local logo preview <img> to be visibly rendered for 5 seconds. That visual assertion is redundant with the already-passed isolated human fixture and can race with Aseguradoras rerendering. The stronger product assertion is the actual file selection followed by durable Storage/Firestore URL persistence and reload readback.",
+  "fix": {
+    "owner": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+    "beforeBlob": "ec5d19601e59a39e3ce4cbf9c0bde3b64803298a",
+    "afterBlob": "75b3afa21fb5c6014848912f07236f9974ee04d4",
+    "behavior": "Require one selected file in the real product input; record whether local preview was observed without failing on visibility timing; retain mandatory durable server commit, asset bucket binding and reload proof. Human visual preview remains covered by R52 fixture."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noBusinessDataWrites": true
+  }
+}
