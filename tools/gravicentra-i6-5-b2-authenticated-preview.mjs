@@ -568,9 +568,11 @@ try{
       }
     }
 
+    const vehicleProjectionRows=auto&&Orbit.q?.vehiculosDe?[].concat(Orbit.q.vehiculosDe(auto.clienteId)||[]):[];
     const vehicleGroups=new Map();
-    for(const v of vehicles){
-      const plate=shown(v.placa).toUpperCase().replace(/[^A-Z0-9]/g,''),cid=String(v.clienteId||'');
+    const vehicleCandidates=vehicleProjectionRows.length?vehicleProjectionRows:vehicles;
+    for(const v of vehicleCandidates){
+      const plate=shown(v.placa).toUpperCase().replace(/[^A-Z0-9]/g,''),cid=String(v.clienteId||auto?.clienteId||'');
       if(!plate||!cid)continue;const key=cid+'|'+plate;if(!vehicleGroups.has(key))vehicleGroups.set(key,[]);vehicleGroups.get(key).push(v);
     }
     const samePlateEntry=Array.from(vehicleGroups.entries()).find(([,rows])=>rows.length>1);
@@ -580,7 +582,10 @@ try{
       const vehicleWait=await waitUntil(()=>document.querySelectorAll('[data-vehicle-current-card="1"]').length>0,5000);
       r7.performance.vehicleTabMs=vehicleWait==null?null:Math.round(performance.now()-vehicleStarted);
       const cards=Array.from(document.querySelectorAll('[data-vehicle-current-card="1"]')).filter(el=>String(el.getAttribute('data-vehicle-plate-key')||'')===plateKey);
-      r7.samePlateVehicle={applicable:true,clientId:cid,plateKey,rawRecords:rows.length,cardCount:cards.length,historyCount:cards.length?Number(cards[0].getAttribute('data-vehicle-history-count')||0):0,pass:cards.length===1&&Number(cards[0]?.getAttribute('data-vehicle-history-count')||0)>=rows.length-1};
+      const hist=cards.length?Number(cards[0].getAttribute('data-vehicle-history-count')||0):0;
+      r7.samePlateVehicle={applicable:true,clientId:cid,plateKey,projectedRecords:rows.length,cardCount:cards.length,historyCount:hist,pass:cards.length===1&&hist>=rows.length-1};
+    }else if(auto){
+      r7.samePlateVehicle={applicable:true,clientId:String(auto.clienteId||''),projectionHadDuplicatePlate:false,pass:false,reason:'AUTO_CLIENT_DUPLICATE_PLATE_FIXTURE_NOT_FOUND'};
     }
 
     const reportedReceipt=rawReceipts.find(x=>shown(x.estadoOperativo).toLowerCase()==='pago_reportado'&&policies.some(p=>String(p.id||'')===String(x.polizaId||'')&&rank(p)<=1));
@@ -638,7 +643,7 @@ try{
   need(r6Runtime.sidebarScroll.pass===true,'B2_AUTH_R6_SIDEBAR_SCROLL_INVALID:'+JSON.stringify(r6Runtime.sidebarScroll));
   need(r6Runtime.r7?.policyDetailReceipts?.applicable===true&&r6Runtime.r7.policyDetailReceipts.pass===true,'B2_AUTH_R7_POLICY_DETAIL_RECEIPTS_NOT_CANONICAL:'+JSON.stringify(r6Runtime.r7?.policyDetailReceipts));
   need(r6Runtime.r7?.receiptPolicyFilter?.applicable===true&&r6Runtime.r7.receiptPolicyFilter.pass===true,'B2_AUTH_R7_RECEIPT_POLICY_FILTER_NOT_ACTIVE_ONLY:'+JSON.stringify(r6Runtime.r7?.receiptPolicyFilter));
-  if(r6Runtime.r7?.samePlateVehicle?.applicable)need(r6Runtime.r7.samePlateVehicle.pass===true,'B2_AUTH_R7_SAME_PLATE_VEHICLE_DUPLICATE:'+JSON.stringify(r6Runtime.r7.samePlateVehicle));
+  need(r6Runtime.r7?.samePlateVehicle?.applicable===true&&r6Runtime.r7.samePlateVehicle.pass===true,'B2_AUTH_R7_SAME_PLATE_VEHICLE_DUPLICATE:'+JSON.stringify(r6Runtime.r7?.samePlateVehicle));
   if(r6Runtime.r7?.reportedPaymentRows?.applicable)need(r6Runtime.r7.reportedPaymentRows.pass===true,'B2_AUTH_R7_REPORTED_PAYMENT_ROWS_MISSING:'+JSON.stringify(r6Runtime.r7.reportedPaymentRows));
   need(r6Runtime.r7?.clientKpiStable?.pass===true,'B2_AUTH_R7_CLIENT_KPI_FLICKER_OR_NOT_READY:'+JSON.stringify(r6Runtime.r7?.clientKpiStable));
   need(r6Runtime.r7?.paymentHierarchy?.pass===true,'B2_AUTH_R7_PAYMENT_HIERARCHY_MISSING:'+JSON.stringify(r6Runtime.r7?.paymentHierarchy));

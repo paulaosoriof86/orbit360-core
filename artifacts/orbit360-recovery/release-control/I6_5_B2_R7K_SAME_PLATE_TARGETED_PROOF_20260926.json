@@ -1,0 +1,24 @@
+{
+  "schema": "gravicentra-i6-5-b2-r7k-same-plate-targeted-proof-v1",
+  "recordedAt": "2026-09-26T11:20:00-06:00",
+  "parentHead": "790ddd69b9ddac86784d0b05f63609487b4a325a",
+  "block": "B2",
+  "previousAuthenticatedRunId": 36258221310,
+  "previousAuthenticatedStatus": "PASS",
+  "reason": "Strengthen R59 proof before Paula visual review. Prior R7 same-plate discriminant inspected raw vehiculos and was not applicable, while the UI projection uses Orbit.q.vehiculosDe() and the reported regression was visible in the AUTO39012 client's projected vehicle history.",
+  "classification": "PROOF_STRENGTHENING_ONLY",
+  "productRegressionDemonstrated": false,
+  "change": {
+    "owner": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+    "beforeBlob": "75b3afa21fb5c6014848912f07236f9974ee04d4",
+    "afterBlob": "261997a90f4da84aee8cb4b7292c953164755347",
+    "behavior": "For the AUTO39012 client, inspect the same projected vehicle rows consumed by Cliente 360, require a duplicate normalized-plate fixture, then prove it renders as exactly one current card with the remaining records folded into history."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noBusinessDataWrites": true
+  }
+}
