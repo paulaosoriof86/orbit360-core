@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -233,25 +233,24 @@
     "visualCorrectionDate": "2026-09-23"
   },
   "preview": {
-    "sourceSha": "6143e9bfeb63a178635dfbd8f92bf22834d76d29",
-    "buildId": "gi-i65-b2-6143e9bfeb63-57f234755dc1",
-    "channelId": "gi-i65-b2-36247964139",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36247964139-px6k08c8.web.app",
-    "runId": 36247964139,
-    "artifactId": 10908525808,
-    "artifactDigest": "affc81b4713e75f756b929e5c112a04d2973d070e25305687f59e7dd6842bb49",
+    "sourceSha": "4e9916652603e20dbb44c2effb97faaf4972892d",
+    "buildId": "gi-i65-b2-4e9916652603-57f234755dc1",
+    "channelId": "gi-i65-b2-36248865201",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36248865201-rxvb8jx7.web.app",
+    "runId": 36248865201,
+    "artifactId": 10908073118,
+    "artifactDigest": "e0559df0da430787bad424851eb289a01c0b81600c678cbeae581566eafc30ac",
     "exactReadback": true,
     "functionalPass": true,
-    "livePromoted": false,
-    "supersededBySourceChange": true
+    "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "HISTORICAL_PASS_SUPERSEDED_BY_R6C_SOURCE_CHANGE",
+    "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "6143e9bfeb63a178635dfbd8f92bf22834d76d29",
-    "exactPreviewBuildId": "gi-i65-b2-6143e9bfeb63-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36247964139-px6k08c8.web.app",
-    "exactPreviewArtifactId": 10908525808,
+    "exactPreviewSourceSha": "4e9916652603e20dbb44c2effb97faaf4972892d",
+    "exactPreviewBuildId": "gi-i65-b2-4e9916652603-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36248865201-rxvb8jx7.web.app",
+    "exactPreviewArtifactId": 10908073118,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": true,
