@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B2",
-  "productFileCount": 54,
+  "productFileCount": 55,
   "productFiles": [
     "functions/bootstrap.js",
     "functions/package.json",
@@ -80,6 +80,7 @@
     "orbit360-platform/modules/academia.js",
     "orbit360-platform/modules/aseguradoras.js",
     "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/modules/cobros.js",
     "orbit360-platform/modules/configuracion.js",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js",
@@ -195,6 +196,9 @@
     "reportedPaymentSemantics": "VISIBLE_IN_COBROS_AS_NON_CONFIRMED_EVIDENCE",
     "emailDelivery": "UNCHANGED_UNRESOLVED_VISIBLE_DEBT",
     "latestCausalFix": "B2_R5_VISUAL_BLOCKERS_CONSOLIDATED_ROOTFIX",
-    "latestCausalFixAt": "2026-09-25"
+    "latestCausalFixAt": "2026-09-25",
+    "exactSetRebound": true,
+    "exactSetReboundAt": "2026-09-25",
+    "productFileCount": 55
   }
 }

@@ -1784,7 +1784,7 @@
   },
   "r5": {
     "status": "CANDIDATE_PENDING_PREVIEW",
-    "compositionLockBlobSha": "dab8ace0f9a0aa6de8f5b36082949a04c61b3154",
+    "compositionLockBlobSha": "5c6e9f1ba88dc9c7e9d79b5e7824917994687d5f",
     "findingLedgerBlobSha": "82895bbe77285c3af2bebc8bb8cc0ac2dfa058ca",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
@@ -1801,6 +1801,7 @@
     "noLive": true,
     "noB3": true,
     "noReimport": true,
-    "emailDeliveryStatus": "UNCHANGED_UNRESOLVED"
+    "emailDeliveryStatus": "UNCHANGED_UNRESOLVED",
+    "exactSetBound": true
   }
 }

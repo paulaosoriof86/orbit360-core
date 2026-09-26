@@ -2012,7 +2012,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "50235d4387c7e8b0cd77a5cb5c335b74271131a1",
+    "b2ExecutionLockBlobSha": "1c84da8fcb625c2a6e5582d21fb6cab62e2c46bd",
     "b2": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2191,7 +2191,7 @@
       "findingLedgerBlobSha": "82895bbe77285c3af2bebc8bb8cc0ac2dfa058ca",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
-        "compositionLockBlobSha": "dab8ace0f9a0aa6de8f5b36082949a04c61b3154",
+        "compositionLockBlobSha": "5c6e9f1ba88dc9c7e9d79b5e7824917994687d5f",
         "findingLedgerBlobSha": "82895bbe77285c3af2bebc8bb8cc0ac2dfa058ca",
         "changedProductFiles": [
           "orbit360-platform/modules/cliente360.js",
@@ -2204,7 +2204,8 @@
         "noDataReimport": true,
         "noLive": true,
         "noB3": true,
-        "emailDeliveryStatus": "UNCHANGED_UNRESOLVED"
+        "emailDeliveryStatus": "UNCHANGED_UNRESOLVED",
+        "exactSetBound": true
       }
     },
     "dashboardRealityGate": {
@@ -2311,7 +2312,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "dab8ace0f9a0aa6de8f5b36082949a04c61b3154",
+    "compositionLockBlobSha": "5c6e9f1ba88dc9c7e9d79b5e7824917994687d5f",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "82895bbe77285c3af2bebc8bb8cc0ac2dfa058ca",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -2325,7 +2326,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_BUILD_NEW_EXACT_PREVIEW_AFTER_R5_CONSOLIDATED_ROOTFIX"
+    "nextAction": "B2_BUILD_NEW_EXACT_PREVIEW_AFTER_R5_EXACT_SET_REBOUND"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
