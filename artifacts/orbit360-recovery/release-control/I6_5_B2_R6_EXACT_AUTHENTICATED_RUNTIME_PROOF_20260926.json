@@ -1,0 +1,137 @@
+{
+  "schema": "gravicentra-i6-5-b2-r6-exact-authenticated-runtime-proof-v1",
+  "recordedAt": "2026-09-26T08:58:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "freezeHeadBeforeReceipt": "ea4e715176c24cbf3d10d98eba973fb32beef3af",
+  "block": "B2",
+  "decision": "EXACT_AUTHENTICATED_PREVIEW_PASS_R6_TECHNICAL_PENDING_PAULA_VISUAL",
+  "preview": {
+    "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+    "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+    "runId": 36249482718,
+    "artifactId": 10908113728,
+    "artifactDigest": "1a98ca5a285f088a7fdfed5e3518f21d9522dc3f46061b4d5bc8d31232d34446",
+    "exactReadback": true,
+    "functionalPass": true,
+    "livePromoted": false
+  },
+  "authenticated": {
+    "status": "PASS",
+    "runId": 36249482718,
+    "artifactId": 10908448359,
+    "syntheticWrites": 18,
+    "cleanupWrites": 25,
+    "cleanup": {
+      "clientAbsent": true,
+      "insurerAbsent": true,
+      "assetPrefixResidual": 0,
+      "assetAbsent": true
+    },
+    "errors": []
+  },
+  "r6": {
+    "R47": {
+      "status": "PASS",
+      "vehicleProjection": {
+        "applicable": true,
+        "expectedCurrentPolicyCount": 2,
+        "currentPolicyCardsPresent": true,
+        "unresolvedTextEmpty": true,
+        "pass": true
+      }
+    },
+    "R48": {
+      "status": "PASS",
+      "calendarIssues": 0,
+      "auto39012": {
+        "rawCount": 25,
+        "expectedCurrentCount": 10,
+        "currentCount": 10,
+        "explicitCuotas": 10,
+        "currentDenominators": [
+          10
+        ],
+        "rawDenominators": [
+          10,
+          12
+        ],
+        "projectionMatch": true
+      }
+    },
+    "R49": {
+      "status": "PASS",
+      "policyOrder": {
+        "applicable": true,
+        "expectedEqualsActual": true,
+        "pass": true
+      }
+    },
+    "R50": {
+      "status": "PASS",
+      "technicalLeakCount": 0,
+      "visibleInvalidCount": 0,
+      "unlinkedVehicleBusinessLanguage": true
+    },
+    "R51": {
+      "status": "PASS",
+      "policyHierarchy": {
+        "h2Size": 24,
+        "h2Weight": 700,
+        "sectionSize": 17,
+        "sectionWeight": 800
+      },
+      "receiptHierarchy": {
+        "h2Size": 24,
+        "h2Weight": 800,
+        "sectionSize": 17,
+        "sectionWeight": 800
+      }
+    },
+    "R52": {
+      "status": "TECHNICAL_PASS_HUMAN_SAFE_FIXTURE_PENDING",
+      "insurerLogo": {
+        "fileInput": true,
+        "preview": true,
+        "serverCommit": true,
+        "persistedHttps": true,
+        "noDataUrl": true
+      },
+      "cleanupMandatory": true
+    },
+    "R53": {
+      "status": "PASS",
+      "sidebar": {
+        "present": true,
+        "overflowY": "auto",
+        "scrollbarWidth": "auto",
+        "nonBlocking": true
+      }
+    }
+  },
+  "preservedPass": [
+    "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN_LEAKCOUNT_0",
+    "COTIZADOR_COMPARATIVO_PERMISSION_RUNTIME",
+    "CLIENT_CRUD",
+    "POLICY_CRUD",
+    "VEHICLE_SAME_ID_EDIT",
+    "VEHICLE_TO_POLICY_PRESERVES_POLICYID_VEHICLEID",
+    "INDIVIDUAL_RECEIPT_EDIT",
+    "SYNTHETIC_INSURER_LOGO_CREDENTIAL_BACKEND",
+    "SYNTHETIC_RENEWAL_DURABLE",
+    "SYNTHETIC_CLEANUP",
+    "ZERO_CONFIRMED_COBRO_FROM_POLICY_CREATION_ONLY"
+  ],
+  "boundaries": {
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "businessDataMutationAuthorized": false
+  },
+  "remainingBeforeB2Acceptance": [
+    "B2-R52 human-safe synthetic insurer logo fixture for Paula visual verification",
+    "Paula visual acceptance of exact B2 Preview",
+    "Any previously unresolved non-R6 debt remains governed by its own ledger status"
+  ]
+}

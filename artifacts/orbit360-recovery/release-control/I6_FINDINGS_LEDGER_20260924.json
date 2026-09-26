@@ -1497,7 +1497,7 @@
       "block": "B2",
       "title": "Active vehicle tied to current policy is projected as incomplete history while detail has canonical plate/policy/vigency.",
       "classification": "CANONICAL_PROJECTION_DIVERGENCE",
-      "status": "R6C_SOURCE_FIXED_PENDING_EXACT_PREVIEW_RUNTIME",
+      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
       "invariant": "Any vehicle linked to a current policy is current; historical/versioned rows subordinate to the same canonical identity; ambiguous rows remain pending review, never heuristically merged/deleted.",
       "rootCauseHypothesis": "Vehicle tab may group on raw record while detail uses normalized vehicleVisual/canonical projection.",
       "proofRequired": [
@@ -1519,6 +1519,14 @@
         "latestBlob": "c472c72bdffc53da06effce702db8bd73435f277",
         "staleAmbiguousSortClosed": true,
         "runtimeProofAdded": true
+      },
+      "exactR6Proof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
+        "receiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "runId": 36249482718,
+        "authArtifactId": 10908448359
       }
     },
     {
@@ -1526,7 +1534,7 @@
       "block": "B2",
       "title": "A physical policy version visibly has two concurrent active receipt calendars after payment-plan edit.",
       "classification": "FINANCIAL_PROJECTION_INTEGRITY_BLOCKER",
-      "status": "R6C_PENDING_EXACT_PREVIEW_RUNTIME_DISCRIMINANT",
+      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
       "invariant": "One physical policy version has exactly one active contractual calendar; superseded rows do not count in current schedule/active portfolio; paid/evidenced receipts are preserved with traceability.",
       "proofRequired": [
         "GLOBAL_DOUBLE_ACTIVE_CALENDAR_DISCRIMINANT",
@@ -1544,6 +1552,14 @@
         ],
         "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
         "runtimeProofAdded": true
+      },
+      "exactR6Proof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
+        "receiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "runId": 36249482718,
+        "authArtifactId": 10908448359
       }
     },
     {
@@ -1551,7 +1567,7 @@
       "block": "B2",
       "title": "Current policy can render below renewed/historical policies.",
       "classification": "BUSINESS_ORDERING_DEFECT",
-      "status": "R6C_PENDING_EXACT_PREVIEW_RUNTIME_DISCRIMINANT",
+      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
       "invariant": "Order groups: current, renewal-due, renewed/history, cancelled/void; newest vigency first; same-number versions show current first with history subordinate.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1563,6 +1579,14 @@
         ],
         "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
         "runtimeProofAdded": true
+      },
+      "exactR6Proof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
+        "receiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "runId": 36249482718,
+        "authArtifactId": 10908448359
       }
     },
     {
@@ -1570,7 +1594,7 @@
       "block": "B2",
       "title": "Operational UI exposes physical IDs/version/lineage language.",
       "classification": "TECHNICAL_LANGUAGE_LEAK",
-      "status": "R6C_SOURCE_FIXED_PENDING_EXACT_PREVIEW_RUNTIME",
+      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
       "invariant": "Operational UI uses business language; physical IDs and lineage remain only in audit/technical detail when needed.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1590,6 +1614,14 @@
         "proof": "r2Ui.unlinkedVehicleCase.warning",
         "observed": "registro(s) físico(s) / ID e historial",
         "classification": "RESIDUAL_TECHNICAL_LANGUAGE"
+      },
+      "exactR6Proof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
+        "receiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "runId": 36249482718,
+        "authArtifactId": 10908448359
       }
     },
     {
@@ -1597,7 +1629,7 @@
       "block": "B2",
       "title": "Section titles/labels remain visually weak while values dominate.",
       "classification": "VISUAL_HIERARCHY_DEFECT",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
+      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
       "invariant": "Section titles semibold/bold; relevant labels semibold; values regular/medium; total/KPI may stand out; apply cumulatively to Cliente360/Policy/Vehicle/Receipt.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1608,6 +1640,14 @@
           "orbit360-platform/index.html"
         ],
         "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+      },
+      "exactR6Proof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
+        "receiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "runId": 36249482718,
+        "authArtifactId": 10908448359
       }
     },
     {
@@ -1615,15 +1655,25 @@
       "block": "B2",
       "title": "Human logo persistence cannot be verified safely against a real insurer in Preview.",
       "classification": "HUMAN_PROOF_FIXTURE_GAP",
-      "status": "TECHNICAL_FLOW_PASS_HUMAN_SAFE_FIXTURE_STILL_REQUIRED_AFTER_EXACT_PREVIEW",
-      "invariant": "Provide visible synthetic insurer fixture for edit/upload/save/refresh/readback/cleanup without relaxing Preview boundary for real insurers."
+      "status": "TECHNICAL_AUTHENTICATED_PASS_HUMAN_SAFE_FIXTURE_PENDING",
+      "invariant": "Provide visible synthetic insurer fixture for edit/upload/save/refresh/readback/cleanup without relaxing Preview boundary for real insurers.",
+      "exactR6Proof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
+        "receiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "runId": 36249482718,
+        "authArtifactId": 10908448359,
+        "technicalLogoPersistence": true,
+        "cleanupPass": true
+      }
     },
     {
       "id": "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6",
       "block": "B2",
       "title": "Sidebar vertical scroll/navigation defect must remain tracked and be fixed now if it blocks module access.",
       "classification": "NAVIGATION_USABILITY_DEFECT",
-      "status": "R6C_PENDING_EXACT_PREVIEW_RUNTIME_DISCRIMINANT",
+      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
       "invariant": "Sidebar scroll is visible and usable; if non-blocking in B2 it is mandatory carry-forward to B4.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1635,6 +1685,14 @@
         ],
         "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
         "runtimeProofAdded": true
+      },
+      "exactR6Proof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
+        "receiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
+        "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "runId": 36249482718,
+        "authArtifactId": 10908448359
       }
     },
     {
@@ -1778,7 +1836,7 @@
     ],
     "noLive": true,
     "b3": "NOT_STARTED",
-    "sourceRemediationStatus": "R6E_HARNESS_SYNTAX_FIXED_PENDING_EXACT_PREVIEW",
+    "sourceRemediationStatus": "R6_EXACT_AUTHENTICATED_TECHNICAL_PASS_R52_FIXTURE_PENDING",
     "compositionLockBlobSha": "66f01b82a177242c62500937b9da0ec8be7bc00b",
     "lastFailedPreviewRunId": 36247874721,
     "lastFailedPreviewJobId": 108420324309,
@@ -1824,7 +1882,29 @@
       "beforeBuild": true,
       "beforeSyntheticWrites": true,
       "livePromoted": false
-    }
+    },
+    "latestExactR6Proof": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
+      "receiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
+      "sourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+      "buildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+      "runId": 36249482718,
+      "authArtifactId": 10908448359
+    },
+    "r6TechnicalExactPassIds": [
+      "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
+      "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
+      "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
+      "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
+      "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
+      "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
+    ],
+    "r6TechnicalExactPassCount": 6,
+    "r6RemainingHumanFixtureIds": [
+      "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6"
+    ],
+    "r6OverallPaulaVisualAccepted": false
   },
   "lastReview": {
     "date": "2026-09-26",
