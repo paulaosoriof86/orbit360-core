@@ -492,27 +492,30 @@ Orbit.modules.aseguradoras = (function () {
     if (typeof st.snapshotCurrent === 'function') st.snapshotCurrent();
     const before = S().get('aseguradoras', id); if (!before) return;
     let logoUrl = clean(st.draft.logo);
-    if (st.logoFile) {
+    const pendingLogo = st.logoFile || null;
+    let cambios = diffResumen(before, st.draft);
+    const secureCount = credentialChanges(st, st.draft).length;
+    const pendingLogoCount = pendingLogo ? 1 : 0;
+    if (!cambios.length && !secureCount && !pendingLogoCount) { st.editing = false; st.draft = null; st.credentialDrafts = {}; ficha(id); return; }
+    const summary = cambios.concat(pendingLogoCount ? ['logo'] : [], secureCount ? ['credenciales_seguras'] : []);
+    const motivo = await U.prompt('Se detectaron cambios en: ' + summary.join(', ') + '.\n\nMotivo del cambio:', { title: 'Guardar cambios' });
+    if (motivo == null) return;
+    // Confirm intent before any server-side asset or credential side effect.
+    if (pendingLogo) {
       const provider = Orbit.productRuntimeBrowserProvidersP0;
       if (!provider || typeof provider.callFunction !== 'function') { U.toast('No está disponible el guardado seguro del logo.'); return; }
-      if (st.logoFile.size > 2 * 1024 * 1024) { U.toast('El logo no puede superar 2 MB.'); return; }
-      const bytes = new Uint8Array(await st.logoFile.arrayBuffer());
+      if (pendingLogo.size > 2 * 1024 * 1024) { U.toast('El logo no puede superar 2 MB.'); return; }
+      const bytes = new Uint8Array(await pendingLogo.arrayBuffer());
       let binary = ''; for (let i=0;i<bytes.length;i+=0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i,Math.min(i+0x8000,bytes.length)));
       const previewHost = /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location && location.hostname || ''));
       if (previewHost && !/^b2-asg-[a-z0-9-]+$/i.test(id)) { U.toast('Preview protege las aseguradoras reales: puedes previsualizar el archivo, pero no se guardará hasta la promoción. La persistencia se valida con una aseguradora sintética B2.'); return; }
       const assetCallable = previewHost ? 'orbit360ProductAssetUploadPreview' : 'orbit360ProductAssetUpload';
       const assetRegion = previewHost ? 'us-east1' : 'us-central1';
-      const uploaded = await provider.callFunction(assetCallable,{tenantId:tenantId(),activeRole:(Orbit.session&&Orbit.session.rol&&Orbit.session.rol())||'',insurerId:id,fileName:st.logoFile.name,mimeType:st.logoFile.type,base64:btoa(binary)},assetRegion);
+      const uploaded = await provider.callFunction(assetCallable,{tenantId:tenantId(),activeRole:(Orbit.session&&Orbit.session.rol&&Orbit.session.rol())||'',insurerId:id,fileName:pendingLogo.name,mimeType:pendingLogo.type,base64:btoa(binary)},assetRegion);
       if (!uploaded || uploaded.ok !== true || !uploaded.url || !uploaded.assetRef) { U.toast('No fue posible confirmar el logo en el servidor.'); return; }
       st.draft.logo = uploaded.url; st.draft.logoAssetRef = uploaded.assetRef; st.logoFile = null; logoUrl = uploaded.url;
     }
     if (logoUrl && !/^https:\/\//i.test(logoUrl)) { U.toast('El logo debe usar una referencia HTTPS segura.'); return; }
-    let cambios = diffResumen(before, st.draft);
-    const secureCount = credentialChanges(st, st.draft).length;
-    if (!cambios.length && !secureCount) { st.editing = false; st.draft = null; st.credentialDrafts = {}; ficha(id); return; }
-    const summary = cambios.concat(secureCount ? ['credenciales_seguras'] : []);
-    const motivo = await U.prompt('Se detectaron cambios en: ' + summary.join(', ') + '.\n\nMotivo del cambio:', { title: 'Guardar cambios' });
-    if (motivo == null) return;
     const saveButton = back && back.querySelector('#af-guardar');
     st.saving = true;
     if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'Guardando…'; }
