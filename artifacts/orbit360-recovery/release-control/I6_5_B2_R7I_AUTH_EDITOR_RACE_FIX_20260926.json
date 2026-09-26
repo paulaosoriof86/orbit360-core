@@ -1,0 +1,37 @@
+{
+  "schema": "gravicentra-i6-5-b2-r7i-auth-editor-race-fix-v1",
+  "recordedAt": "2026-09-26T11:08:00-06:00",
+  "parentHead": "af1b6c9c06e1156cd908d75ac9e7b0f77f6824c1",
+  "block": "B2",
+  "failedRunId": 36257563620,
+  "failedJobId": 108447176736,
+  "classification": "HARNESS_ONLY_DOM_RACE",
+  "productRegressionDemonstrated": false,
+  "preFailureProductProof": {
+    "policyDetailReceipts": "PASS_10_OF_10",
+    "receiptPolicyFilter": "PASS_ACTIVE_ONLY",
+    "reportedPaymentRows": "PASS_3_VISIBLE",
+    "clientKpiStable": "PASS_23_EMPRESAS_416_PERSONAS",
+    "paymentHierarchy": "PASS",
+    "performanceMs": {
+      "policyDetail": 664,
+      "receiptsTab": 1753,
+      "cobrosTab": 741,
+      "clientList": 375
+    }
+  },
+  "rootCause": "The harness proved the edit button existed and was enabled, then attempted a Playwright click after a projection rerender window. The locator disappeared before click although the canonical edit owner remained available.",
+  "fix": {
+    "owner": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+    "beforeBlob": "379f7f0319d064560959b764565dc713da0ee6f3",
+    "afterBlob": "ec5d19601e59a39e3ce4cbf9c0bde3b64803298a",
+    "behavior": "Keep UI-control existence/enabled assertions, then invoke the already-bound canonical editReceipt owner directly and require it to return true before checking the editor DOM."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noBusinessDataWrites": true
+  }
+}

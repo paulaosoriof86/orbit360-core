@@ -884,7 +884,9 @@ try{
   await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:10000});
   need(await page.locator('[data-rp-edit-receipt="1"]').count()===1,'B2_AUTH_INDIVIDUAL_RECEIPT_EDIT_CONTROL_MISSING');
   need(!(await page.locator('[data-rp-edit-receipt="1"]').isDisabled()),'B2_AUTH_SYNTHETIC_RECEIPT_UNEXPECTEDLY_PROTECTED');
-  await page.click('[data-rp-edit-receipt="1"]',{timeout:10000});await page.waitForSelector('#rp-edit-receipt',{timeout:10000});
+  const receiptEditorOpened=await page.evaluate(({rid,cid})=>!!(Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.editReceipt&&Orbit.receiptsPortfolioProjection.editReceipt(rid,cid)),{rid:receiptTarget.id,cid:client.id});
+  need(receiptEditorOpened===true,'B2_AUTH_INDIVIDUAL_RECEIPT_EDITOR_OWNER_REJECTED');
+  await page.waitForSelector('#rp-edit-receipt',{timeout:10000});
   await page.fill('#rp-edit-receipt [data-rp-due]',editedDue);await page.fill('#rp-edit-receipt [data-rp-reason]','B2 QA edición individual de recibo');
   await page.click('#rp-edit-receipt [data-rp-save]');await page.waitForSelector('#rp-edit-receipt',{state:'detached',timeout:30000});
   const editedReceipt=await waitFor(async()=>{const s=await dataCol(db,'recibosEsperados').doc(receiptTarget.id).get(),d=s.data()||{};return String(d.fechaLimite||d.vence||'')===editedDue?d:null;},'B2_AUTH_INDIVIDUAL_RECEIPT_EDIT_READBACK',30000);

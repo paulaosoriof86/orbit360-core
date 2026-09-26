@@ -2235,12 +2235,20 @@
       "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
     ],
     "governanceRepair": "R7_TOP_LEVEL_PRODUCT_BLOB_BINDING",
-    "authenticatedHarnessBlobSha": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd",
+    "authenticatedHarnessBlobSha": "ec5d19601e59a39e3ce4cbf9c0bde3b64803298a",
     "r7hAuthHarnessFix": {
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7H_AUTH_HARNESS_RECEIPT_TARGET_FIX_20260926.json",
       "receiptBlobSha": "62d0852c8b48b490c3c70e2f61a8d69eed9d9664",
       "failedRunId": 36256621932,
       "classification": "HARNESS_ONLY_TARGET_SELECTION_DEFECT",
+      "productRegressionDemonstrated": false
+    },
+    "r7iAuthHarnessFix": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7I_AUTH_EDITOR_RACE_FIX_20260926.json",
+      "receiptBlobSha": "d7914efd97d9833c8835a42bae46190605c60d72",
+      "failedRunId": 36257563620,
+      "failedJobId": 108447176736,
+      "classification": "HARNESS_ONLY_DOM_RACE",
       "productRegressionDemonstrated": false
     }
   },
