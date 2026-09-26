@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B2",
-  "productFileCount": 55,
+  "productFileCount": 57,
   "productFiles": [
     "functions/bootstrap.js",
     "functions/package.json",
@@ -80,12 +80,14 @@
     "orbit360-platform/modules/academia.js",
     "orbit360-platform/modules/aseguradoras.js",
     "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
     "orbit360-platform/modules/cobros.js",
     "orbit360-platform/modules/configuracion.js",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
     "orbit360-platform/modules/equipo.js",
+    "orbit360-platform/modules/inicio.js",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -132,7 +134,7 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "e49fa536b6e39514ba528c5b42d12263df93facb",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "3c1a2e127cb061124af776d0b0b788715846ee7f",
+    "orbit360-platform/index.html": "feea284ee9007b00aca6445b778d40cd7f2123ae",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "af3af47ed2fb71c2bdf9e81775a7359eefb1c606",
     "orbit360-platform/modules/cliente360.js": "0f62c9ca9d773dcee51dd5dbb5138511e606da1d",
@@ -149,7 +151,9 @@
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
     "functions/product-ops-leads-domain.js": "2e6792d180f51377398b79d801b83c54ead39000",
-    "orbit360-platform/modules/cobros.js": "5b94eb504316bfa88bac70f75d69f6ac5705b429"
+    "orbit360-platform/modules/cobros.js": "5b94eb504316bfa88bac70f75d69f6ac5705b429",
+    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "cba6099ff7499c452c99f283702f27886154ae23",
+    "orbit360-platform/modules/inicio.js": "bbae195ae7725ee1bcd790f1234946b31660d68e"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -178,7 +182,9 @@
       "orbit360-platform/core/policy-receipts-engine.js",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+      "orbit360-platform/modules/inicio.js"
     ],
     "preservedPass": [
       "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN",
@@ -195,10 +201,13 @@
     "individualReceiptEdit": "ATOMIC_RECEIPT_PLUS_PORTFOLIO_READBACK_PROTECTED_IF_PAYMENT_EVIDENCE",
     "reportedPaymentSemantics": "VISIBLE_IN_COBROS_AS_NON_CONFIRMED_EVIDENCE",
     "emailDelivery": "UNCHANGED_UNRESOLVED_VISIBLE_DEBT",
-    "latestCausalFix": "B2_R5_VISUAL_BLOCKERS_CONSOLIDATED_ROOTFIX",
+    "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL",
     "latestCausalFixAt": "2026-09-25",
     "exactSetRebound": true,
     "exactSetReboundAt": "2026-09-25",
-    "productFileCount": 55
+    "productFileCount": 55,
+    "latestCausalOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+    "latestCausalBlob": "cba6099ff7499c452c99f283702f27886154ae23",
+    "effectiveCobrosOwner": "cobros-cartera-i65-closure-bridge.js"
   }
 }

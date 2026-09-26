@@ -1258,9 +1258,10 @@
       "surface": "Cobros/Recibos",
       "rootCause": "Pago reportado pendiente de conciliación no equivale a cobro aplicado, pero Cobros no expone bien esa evidencia.",
       "remediation": "Surface payment evidence in Cobros without fabricating a confirmed cobro: distinguish Pago reportado por conciliar / Cobro confirmado / Cobro conciliado and preserve source semantics.",
-      "status": "SOURCE_FIXED_IN_B2_PENDING_NEW_PREVIEW_PROOF",
+      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
       "blocking": true,
-      "requiredProof": "Cliente with reported payment evidence shows it in Cobros as non-confirmed evidence; confirmed cobro count remains unchanged unless authoritative payment confirmation exists."
+      "requiredProof": "Cliente with reported payment evidence shows it in Cobros as non-confirmed evidence; confirmed cobro count remains unchanged unless authoritative payment confirmation exists.",
+      "effectiveOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js"
     },
     {
       "id": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
@@ -1399,12 +1400,13 @@
       "surface": "Cobros/Cliente360",
       "classification": "READ_MODEL_GAP",
       "finding": "Recibos y pagos shows Pago reportado · por conciliar while Cobros can still appear empty, so existing payment evidence disappears when switching modules.",
-      "rootCause": "Cobros projection reads only canonical cobros rows; receipt evidence in recibosEsperados.estadoOperativo=pago_reportado is not projected into the Cobros surface.",
-      "remediation": "Add non-authoritative reported-payment rows/view to Cobros from recibosEsperados, clearly labeled as evidence pending validation; never create a confirmed cobro from that projection.",
+      "rootCause": "modules/cobros.js contained the reported-payment projection, but later-loaded cobros-cartera-i65-closure-bridge.js replaced mod.render and omitted it. The effective owner dropped payment evidence even after the browser read model reached estadoOperativo=pago_reportado.",
+      "remediation": "Project reported-payment evidence in the effective closure owner, keep it separate from canonical cobros, and preserve zero fabricated confirmed cobros.",
       "requiredProof": "Same client shows reported-payment evidence in Cobros; zero fabricated confirmed cobros; validation/apply actions remain explicit.",
       "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
       "blocking": true,
-      "sourceFixAt": "2026-09-25"
+      "sourceFixAt": "2026-09-25",
+      "effectiveOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js"
     },
     {
       "id": "B2-R45-INSURER-REAL-LOGO-SAVE-BLOCKED-BY-PREVIEW-BOUNDARY-R5",
@@ -1507,7 +1509,9 @@
       "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
     ],
-    "emailDeliveryNotClaimedResolved": true
+    "emailDeliveryNotClaimedResolved": true,
+    "r5EffectiveCobrosOwnerRootCause": "CONFIRMED_AND_FIXED_PENDING_PREVIEW",
+    "dashboardLabel": "REGISTROS_VENCIDOS_EN_CARTERA_NOT_COBROS"
   },
   "lastReview": {
     "origin": "PAULA_VISUAL_REVIEW_20260925_R4",

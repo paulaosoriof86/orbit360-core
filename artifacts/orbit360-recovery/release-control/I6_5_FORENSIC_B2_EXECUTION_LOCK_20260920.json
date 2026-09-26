@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -239,10 +239,12 @@
     "artifactDigest": "e00e026a41398311fa5d39354eba8970f73a4392c157d8d2376cd60313153246",
     "exactReadback": true,
     "functionalPass": true,
-    "livePromoted": false
+    "livePromoted": false,
+    "supersededByProductSourceChange": true,
+    "supersededReason": "Effective Cobros closure owner omitted reported-payment evidence; new immutable build required"
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "2a16434ad578d09344a649ad729c1565e956d6d2",
     "exactPreviewBuildId": "gi-i65-b2-2a16434ad578-57f234755dc1",
@@ -385,7 +387,7 @@
     "storageAssetBucket": "gravicentra-insurance-assets-60e88ed5a1",
     "cleanupAssetProofRequired": true,
     "cleanupAssetProofStatus": "PASS",
-    "findingLedgerBlobSha": "82895bbe77285c3af2bebc8bb8cc0ac2dfa058ca",
+    "findingLedgerBlobSha": "8187aeebf71db0d2136d2c10cc85103faff7f148",
     "requiredR5Assertions": [
       "VEHICLE_POLICY_EXACT_CONTEXT",
       "INDIVIDUAL_RECEIPT_ATOMIC_EDIT",
@@ -1782,15 +1784,17 @@
   },
   "r5": {
     "status": "CANDIDATE_PENDING_PREVIEW",
-    "compositionLockBlobSha": "5c6e9f1ba88dc9c7e9d79b5e7824917994687d5f",
-    "findingLedgerBlobSha": "82895bbe77285c3af2bebc8bb8cc0ac2dfa058ca",
+    "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
+    "findingLedgerBlobSha": "8187aeebf71db0d2136d2c10cc85103faff7f148",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "orbit360-platform/core/policy-receipts-engine.js",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+      "orbit360-platform/modules/inicio.js"
     ],
     "mechanismFiles": [
       "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
@@ -1800,6 +1804,8 @@
     "noB3": true,
     "noReimport": true,
     "emailDeliveryStatus": "UNCHANGED_UNRESOLVED",
-    "exactSetBound": true
+    "exactSetBound": true,
+    "effectiveCobrosOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+    "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL"
   }
 }
