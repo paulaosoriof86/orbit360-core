@@ -873,14 +873,18 @@ try{
   evidence.crud.vehiclePolicyContext=true;milestone('VEHICLE_POLICY_CONTEXT_PASS',{samePolicy:true,sameVehicle:true});
 
   milestone('RECEIPT_INDIVIDUAL_EDIT_START');
-  const receiptTarget=receipts.slice().sort((a,b)=>String(a.fechaLimite||a.vence||'').localeCompare(String(b.fechaLimite||b.vence||'')))[0],siblingReceipt=receipts.find(x=>x.id!==receiptTarget.id)||null;
+  const receiptLockedData=r=>!!(r&&(r.fechaPago||r.conciliado===true||r.conciliadoPago===true||String(r.estadoOperativo||'').toLowerCase()==='pago_reportado'||String(r.fechaPagoReportada||'').trim()||String(r.reportado||'').trim()||/^(pagado|conciliado)$/i.test(String(r.estado||'').trim())));
+  const editableReceipts=receipts.filter(r=>!receiptLockedData(r)).sort((a,b)=>String(a.fechaLimite||a.vence||'').localeCompare(String(b.fechaLimite||b.vence||'')));
+  need(editableReceipts.length>0,'B2_AUTH_NO_EDITABLE_SYNTHETIC_RECEIPT');
+  const receiptTarget=editableReceipts[0],siblingReceipt=receipts.find(x=>x.id!==receiptTarget.id)||null;
   const oldDue=String(receiptTarget.fechaLimite||receiptTarget.vence||receiptTarget.fechaVencimiento||'');need(/^\d{4}-\d{2}-\d{2}$/.test(oldDue),'B2_AUTH_RECEIPT_DUE_MISSING');
   const dueObj=new Date(oldDue+'T00:00:00Z');dueObj.setUTCDate(dueObj.getUTCDate()+1);const editedDue=dueObj.toISOString().slice(0,10);
   const siblingBefore=siblingReceipt?(await dataCol(db,'recibosEsperados').doc(siblingReceipt.id).get()).data()||{}:null;
   await page.evaluate(({rid,cid})=>Orbit.receiptsPortfolioProjection.openReceiptDetail(rid,cid),{rid:receiptTarget.id,cid:client.id});
   await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:10000});
   need(await page.locator('[data-rp-edit-receipt="1"]').count()===1,'B2_AUTH_INDIVIDUAL_RECEIPT_EDIT_CONTROL_MISSING');
-  await page.click('[data-rp-edit-receipt="1"]');await page.waitForSelector('#rp-edit-receipt',{timeout:10000});
+  need(!(await page.locator('[data-rp-edit-receipt="1"]').isDisabled()),'B2_AUTH_SYNTHETIC_RECEIPT_UNEXPECTEDLY_PROTECTED');
+  await page.click('[data-rp-edit-receipt="1"]',{timeout:10000});await page.waitForSelector('#rp-edit-receipt',{timeout:10000});
   await page.fill('#rp-edit-receipt [data-rp-due]',editedDue);await page.fill('#rp-edit-receipt [data-rp-reason]','B2 QA edición individual de recibo');
   await page.click('#rp-edit-receipt [data-rp-save]');await page.waitForSelector('#rp-edit-receipt',{state:'detached',timeout:30000});
   const editedReceipt=await waitFor(async()=>{const s=await dataCol(db,'recibosEsperados').doc(receiptTarget.id).get(),d=s.data()||{};return String(d.fechaLimite||d.vence||'')===editedDue?d:null;},'B2_AUTH_INDIVIDUAL_RECEIPT_EDIT_READBACK',30000);
