@@ -1778,8 +1778,8 @@
     ],
     "noLive": true,
     "b3": "NOT_STARTED",
-    "sourceRemediationStatus": "R6D_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
-    "compositionLockBlobSha": "27903530cbe5af2a3b26ef5c3e75861b4fc7aa57",
+    "sourceRemediationStatus": "R6E_HARNESS_SYNTAX_FIXED_PENDING_EXACT_PREVIEW",
+    "compositionLockBlobSha": "66f01b82a177242c62500937b9da0ec8be7bc00b",
     "lastFailedPreviewRunId": 36247874721,
     "lastFailedPreviewJobId": 108420324309,
     "lastFailureCode": "B2_CACHE_KEY_MISSING:modules/cliente360.js?v=20260925-b2r5",
@@ -1809,10 +1809,21 @@
       "reimport": false
     },
     "harnessOptimization": {
-      "blobSha": "79d6554897a2f37cfe879ea62e0fce37b2e9349d",
+      "blobSha": "4fafa9de303f42d54ebbee5cd78c64b885fc3903",
       "algorithm": "ONE_PASS_RECEIPTS_BY_POLICY_PLUS_LOCAL_EXPECTED_PROJECTION_AND_SINGLE_TARGETED_PRODUCT_READBACK_FOR_AUTO39012",
       "complexity": "O(P+R) plus bounded DOM spot checks",
-      "timeoutMs": 30000
+      "timeoutMs": 30000,
+      "syntaxValidatedByNextWorkflowRequired": true
+    },
+    "lastPreviewFailure": {
+      "runId": 36249379823,
+      "jobId": 108424426293,
+      "code": "INVALID_REGEX_FLAGS",
+      "classification": "HARNESS_ONLY_SYNTAX_DEFECT",
+      "productRegressionDemonstrated": false,
+      "beforeBuild": true,
+      "beforeSyntheticWrites": true,
+      "livePromoted": false
     }
   },
   "lastReview": {

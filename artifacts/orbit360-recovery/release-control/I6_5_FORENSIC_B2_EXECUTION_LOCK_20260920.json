@@ -246,7 +246,7 @@
     "supersededBySourceChange": true
   },
   "authenticatedPreviewProof": {
-    "status": "HISTORICAL_ATTEMPT_SUPERSEDED_BY_R6D_MECHANISM_CHANGE",
+    "status": "HISTORICAL_ATTEMPT_SUPERSEDED_BY_R6E_MECHANISM_CHANGE",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "4e9916652603e20dbb44c2effb97faaf4972892d",
     "exactPreviewBuildId": "gi-i65-b2-4e9916652603-57f234755dc1",
@@ -1876,8 +1876,8 @@
     "noReimport": true
   },
   "r6": {
-    "status": "R6D_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
-    "findingLedgerBlobSha": "727ff72c8a3b8f86e8e8897ae86d8c4747d1f2a0",
+    "status": "R6E_HARNESS_SYNTAX_FIXED_PENDING_EXACT_PREVIEW",
+    "findingLedgerBlobSha": "ae462fc185e189916290572c66a15fc7bf04ce85",
     "blockers": [
       "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
       "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
@@ -1904,7 +1904,7 @@
     "exactReviewedPreview": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
     "noLive": true,
     "noB3": true,
-    "compositionLockBlobSha": "27903530cbe5af2a3b26ef5c3e75861b4fc7aa57",
+    "compositionLockBlobSha": "66f01b82a177242c62500937b9da0ec8be7bc00b",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -2326,7 +2326,15 @@
         "r5IndividualReceiptEdit": true,
         "r5ReportedPaymentProjection": true
       }
+    },
+    "r6e": {
+      "authenticatedHarnessBlobSha": "4fafa9de303f42d54ebbee5cd78c64b885fc3903",
+      "failedRunId": 36249379823,
+      "failedJobId": 108424426293,
+      "failureCode": "INVALID_REGEX_FLAGS",
+      "classification": "HARNESS_ONLY_SYNTAX_DEFECT",
+      "productRegressionDemonstrated": false
     }
   },
-  "findingLedgerBlobSha": "727ff72c8a3b8f86e8e8897ae86d8c4747d1f2a0"
+  "findingLedgerBlobSha": "ae462fc185e189916290572c66a15fc7bf04ce85"
 }

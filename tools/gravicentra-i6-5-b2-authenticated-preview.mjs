@@ -507,7 +507,7 @@ try{
     const shown=v=>String(v==null?'':v).trim();
     const rank=p=>{const s=shown(p&&p.estado).toLowerCase();if(/^(vigente|activa|activo)$/.test(s))return 0;if(s.includes('por renovar')||s==='renovacion pendiente')return 1;if(s.includes('cancel')||s.includes('anul'))return 3;return 2;};
     const date=p=>shown(p&&p.vigenciaFin||p&&p.vigenciaInicio);
-    const denom=r=>{const raw=[r&&r.cuota,r&&r.serie,r&&r.numeroReciboFuente].map(shown).find(Boolean)||'',m=raw.match(/(?:^|\\s)(\\d+)\\s*\\/\\s*(\\d+)(?:\\s|$)/);return m?Number(m[2]):null;};
+    const denom=r=>{const raw=[r&&r.cuota,r&&r.serie,r&&r.numeroReciboFuente].map(shown).find(Boolean)||'',m=raw.match(/(?:^|\s)(\d+)\s*\/\s*(\d+)(?:\s|$)/);return m?Number(m[2]):null;};
     const inactive=r=>{const s=shown(r&&r.estado).toLowerCase();return !!(r&&(r.superseded===true||r.calendarActive===false||s==='anulado'||s==='superseded'||s==='reemplazado'));};
     const policies=(Orbit.store?.all?.('polizas')||[]).filter(Boolean),vehicles=(Orbit.store?.all?.('vehiculos')||[]).filter(Boolean),rawReceipts=(Orbit.store?.all?.('recibosEsperados')||[]).filter(Boolean);
     const receiptsByPolicy=new Map();
