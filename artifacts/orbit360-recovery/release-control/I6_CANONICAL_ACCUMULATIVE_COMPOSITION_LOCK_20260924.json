@@ -152,7 +152,7 @@
     "orbit360-platform/styles/base.css": "bade3293a779e62c57acac12468766548bcd1a87",
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
-    "functions/product-ops-leads-domain.js": "01eacecdd66baf143217e9b6cf5f588902649b1c",
+    "functions/product-ops-leads-domain.js": "236209ce97ffa7fead2d9e0b160c747db4ec021f",
     "orbit360-platform/modules/cobros.js": "5b94eb504316bfa88bac70f75d69f6ac5705b429",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "cba6099ff7499c452c99f283702f27886154ae23",
     "orbit360-platform/modules/inicio.js": "bbae195ae7725ee1bcd790f1234946b31660d68e",
@@ -177,18 +177,16 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "PAULA_VISUAL_RENEWALS_DUAL_PASS_R10",
-    "parentHead": "fadd22608a4c9c53203164cd86ef82297942e841",
-    "status": "RENEWALS_SINGLE_PASS_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "origin": "PAULA_EXPLICIT_PREVIEW_UAT_WRITE_REQUIREMENT_R12",
+    "parentHead": "4712ea9dd5db338c7ea65a54b643902727857b13",
+    "status": "CONTROLLED_PREVIEW_UAT_WRITES_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "changedProductFiles": [
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+      "functions/product-ops-leads-domain.js"
     ],
     "productBlobs": {
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "5b8ea91ee3d0db9398ed4298ce4b95525061ddfa"
+      "functions/product-ops-leads-domain.js": "236209ce97ffa7fead2d9e0b160c747db4ec021f"
     },
-    "rootCause": "Deferred enhance exposed base and operational renewal states sequentially.",
-    "fix": "Synchronous single-call composition before paint.",
-    "preservedSemantics": "Propuestas->Ops; Pedir renovar->Ops accepted; Cotizar separate and role-gated; Ops issue-or-register-firm-renewal.",
+    "fix": "Preview workflow callable allows role-authorized create; only preview-created workflow records may be modified; external notifications suppressed; audit preserved.",
     "noDataReimport": true,
     "noLive": true,
     "noB3": true

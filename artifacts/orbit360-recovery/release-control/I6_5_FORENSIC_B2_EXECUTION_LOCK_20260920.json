@@ -1465,8 +1465,8 @@
     "broadRediscoveryRequired": false,
     "authorityBlobSha": "2250d63fc5dd2fb824e30b5493e7e6a611fc02d4",
     "findingsLedgerBlobSha": "6912bfbecfc963c3c57c64a058e192ee18173b68",
-    "compositionLockBlobSha": "a0cfad3bffc836ec4d212dec67975c43f374f955",
-    "findingLedgerBlobSha": "6b588cea0a1fee119cdec9c9e6b6ffd1382c3cf6"
+    "compositionLockBlobSha": "0cc0aae13458370c59b1a8e241300707eecdb391",
+    "findingLedgerBlobSha": "4d2ae44a19b5c21d6144343c5b1b27c29e43a833"
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
   "lastPreviewFailure": {

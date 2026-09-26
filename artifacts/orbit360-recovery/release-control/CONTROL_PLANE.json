@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "60c9f326822a06c6764201389d67cf28b70c513c",
+    "b2ExecutionLockBlobSha": "70f0ce528130d53290470fae85b53d7c810321e0",
     "b2": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2454,7 +2454,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "a0cfad3bffc836ec4d212dec67975c43f374f955",
+    "compositionLockBlobSha": "0cc0aae13458370c59b1a8e241300707eecdb391",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "4d2ae44a19b5c21d6144343c5b1b27c29e43a833",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
