@@ -134,10 +134,10 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "e49fa536b6e39514ba528c5b42d12263df93facb",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "bc605004b26aa59da7fa82aca1bb34e826247b2f",
+    "orbit360-platform/index.html": "6c23385d24cf70accfec5eeac1b685fc32214832",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "af3af47ed2fb71c2bdf9e81775a7359eefb1c606",
-    "orbit360-platform/modules/cliente360.js": "7c83658d5e91cab9bbf033f5a817da488117f6f4",
+    "orbit360-platform/modules/cliente360.js": "c472c72bdffc53da06effce702db8bd73435f277",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "e93c08dcd77a8076af4d4f3f05e14f4d66a9eae4",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
@@ -145,7 +145,7 @@
     "orbit360-platform/modules/equipo.js": "105b869445919802fb6e07d6120ace6a0772ec57",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "a9dc395a0764bca3ff8f04d1d211acc5f3d0b085",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "4fe27ba24508e193362c592c2fd4073d02b88cfc",
-    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "320cd86487581a267a165f2df6d6c1b37c497560",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "f30eb9e41fcdd29da91d2a02664943820f3b169e",
     "orbit360-platform/product-runtime-config.js": "b03bd57e6c77b6204ce860b93ec4556b1cd3e4e7",
     "orbit360-platform/styles/base.css": "bade3293a779e62c57acac12468766548bcd1a87",
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
@@ -173,14 +173,12 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "PAULA_VISUAL_REVIEW_20260926_R6",
-    "parentHead": "c42389b79069802350e11468678047deae016801",
-    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "origin": "ASSISTANT_FORENSIC_VISUAL_AUDIT_AFTER_AUTH_PASS_20260926",
+    "parentHead": "cc0e8434578838f617ae7d5b6f7682dab09455f3",
+    "status": "R6C_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/styles/base.css",
       "orbit360-platform/index.html"
     ],
     "preservedPass": [
@@ -196,12 +194,9 @@
       "ZERO_CONFIRMED_COBRO_FROM_POLICY_CREATION_ONLY"
     ],
     "rootCauses": {
-      "vehicleProjection": "CLIENTE360_USED_RAW_VEHICLE_IDENTITY_WHILE_DETAIL_USED_NORMALIZED_CANONICAL_VEHICLE",
-      "receiptCalendar": "PRIMARY_RECEIPT_AND_PORTFOLIO_RENDERERS_INCLUDED_REPLACED_OR_CONTRACT_MISMATCH_CALENDARS_AS_CURRENT",
-      "policyOrdering": "CLIENTE360_RENDERED_STORAGE_ORDER_WITHOUT_BUSINESS_STATE_AND_VIGENCY_ORDER",
-      "technicalLanguage": "PRIMARY_OPERATIONAL_UI_EXPOSED_PHYSICAL_ID_AND_LINEAGE_TERMS",
-      "visualHierarchy": "DETAIL_LABELS_WERE_MUTED_11PX_WHILE_VALUES_DOMINATED",
-      "sidebar": "VERTICAL_SCROLL_EXISTED_BUT_THUMB_WAS_LOW_VISIBILITY_4PX"
+      "residualTechnicalLanguage": "UNLINKED_POLICY_VEHICLE_WARNING_STILL_EXPOSED_PHYSICAL_RECORD_AND_ID_LANGUAGE",
+      "latentVehicleRuntimeDefect": "AMBIGUOUS_VEHICLE_PATH_REFERENCED_REMOVED_vehiclePolicySort_FUNCTION",
+      "validatorGap": "AUTHENTICATED_VISUAL_SCAN_DID_NOT_INCLUDE_PHYSICAL_ID_LANGUAGE_AND_R6_RUNTIME_INVARIANTS"
     },
     "receiptRule": "EXPLICIT_POLICY_CUOTAS_AUTHORITY_IF_PRESENT_ELSE_SINGLE_PHYSICAL_DENOMINATOR_ELSE_FAIL_CLOSED_REVIEW",
     "noFrequencyAssumption": true,
@@ -217,6 +212,23 @@
     "latestCausalOwner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
     "latestCausalBlob": "320cd86487581a267a165f2df6d6c1b37c497560",
     "mechanismFile": "tools/gravicentra-i6-5-b2-functional.mjs",
-    "mechanismBlob": "2299142218a40d59b25a518d102a7c6a49322da5"
+    "mechanismBlob": "2299142218a40d59b25a518d102a7c6a49322da5",
+    "latestCausalFix": "R6C_RESIDUAL_TECHNICAL_LANGUAGE_STALE_VEHICLE_SORT_AND_RUNTIME_DISCRIMINANTS",
+    "mechanismFiles": [
+      "tools/gravicentra-i6-5-b2-functional.mjs",
+      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs"
+    ],
+    "mechanismBlobs": {
+      "functional": "59dbbcc39914c9364b664cd40dc1adee5e9cf804",
+      "authenticated": "ea96aa6b386cc8437fb5f58811fd1aaa4dafaa51"
+    },
+    "strengthenedProof": [
+      "R47_CURRENT_VEHICLE_PROJECTION_RUNTIME",
+      "R48_GLOBAL_SINGLE_ACTIVE_CALENDAR_RUNTIME",
+      "R48_AUTO39012_RUNTIME",
+      "R49_POLICY_BUSINESS_ORDER_RUNTIME",
+      "R50_BUSINESS_LANGUAGE_RUNTIME",
+      "R53_SIDEBAR_SCROLL_RUNTIME"
+    ]
   }
 }

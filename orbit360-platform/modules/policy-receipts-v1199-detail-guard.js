@@ -302,7 +302,7 @@ Orbit.modules = Orbit.modules || {};
         const links=candidates.map(item=>'<a class="btn ghost sm" href="#/cliente360?c='+encodeURIComponent(clientId)+'&v='+encodeURIComponent(item.raw.id)+'">🚘 '+esc([item.v.marca,item.v.linea,item.v.placa].map(shown).join(' · '))+'</a>').join('');
         const canLink=Orbit.policyReceipts&&typeof Orbit.policyReceipts.canManagePolicies==='function'&&Orbit.policyReceipts.canManagePolicies();
         const action=canLink?'<button class="btn primary sm" onclick="Orbit.policyVehicleReadModelV1199c.openVehicleLinker(\''+esc(policyId)+'\',\''+esc(clientId)+'\')">Vincular vehículo a esta póliza</button>':'<span class="badge neutral">Solo consulta · cambia a un rol autorizado para vincular</span>';
-        return '<div class="gi-integrity-warning"><div><b>🚘 Vehículo pendiente de vincular a esta póliza</b><span>El cliente tiene '+candidates.length+' registro(s) físico(s) de vehículo. Se distinguen por ID e historial; no se fusionan ni se vinculan automáticamente.</span><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+links+'</div></div>'+action+'</div>';
+        return '<div class="gi-integrity-warning" data-policy-unlinked-vehicle="1"><div><b>🚘 Vehículo pendiente de vincular a esta póliza</b><span>El cliente tiene '+candidates.length+' vehículo(s) relacionado(s) en su expediente. Revísalos y selecciona el que corresponde a esta vigencia; no se vincularán automáticamente.</span><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+links+'</div></div>'+action+'</div>';
       }
       return '<div class="gi-integrity-warning"><div><b>🚘 Falta vincular el vehículo</b><span>Esta póliza vehicular no tiene un vehículo vinculado a esta vigencia.</span></div></div>';
     }

@@ -1497,7 +1497,7 @@
       "block": "B2",
       "title": "Active vehicle tied to current policy is projected as incomplete history while detail has canonical plate/policy/vigency.",
       "classification": "CANONICAL_PROJECTION_DIVERGENCE",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
+      "status": "R6C_SOURCE_FIXED_PENDING_EXACT_PREVIEW_RUNTIME",
       "invariant": "Any vehicle linked to a current policy is current; historical/versioned rows subordinate to the same canonical identity; ambiguous rows remain pending review, never heuristically merged/deleted.",
       "rootCauseHypothesis": "Vehicle tab may group on raw record while detail uses normalized vehicleVisual/canonical projection.",
       "proofRequired": [
@@ -1514,7 +1514,11 @@
           "orbit360-platform/styles/base.css",
           "orbit360-platform/index.html"
         ],
-        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+        "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
+        "latestOwner": "orbit360-platform/modules/cliente360.js",
+        "latestBlob": "c472c72bdffc53da06effce702db8bd73435f277",
+        "staleAmbiguousSortClosed": true,
+        "runtimeProofAdded": true
       }
     },
     {
@@ -1522,7 +1526,7 @@
       "block": "B2",
       "title": "A physical policy version visibly has two concurrent active receipt calendars after payment-plan edit.",
       "classification": "FINANCIAL_PROJECTION_INTEGRITY_BLOCKER",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
+      "status": "R6C_PENDING_EXACT_PREVIEW_RUNTIME_DISCRIMINANT",
       "invariant": "One physical policy version has exactly one active contractual calendar; superseded rows do not count in current schedule/active portfolio; paid/evidenced receipts are preserved with traceability.",
       "proofRequired": [
         "GLOBAL_DOUBLE_ACTIVE_CALENDAR_DISCRIMINANT",
@@ -1538,7 +1542,8 @@
           "orbit360-platform/styles/base.css",
           "orbit360-platform/index.html"
         ],
-        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+        "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
+        "runtimeProofAdded": true
       }
     },
     {
@@ -1546,7 +1551,7 @@
       "block": "B2",
       "title": "Current policy can render below renewed/historical policies.",
       "classification": "BUSINESS_ORDERING_DEFECT",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
+      "status": "R6C_PENDING_EXACT_PREVIEW_RUNTIME_DISCRIMINANT",
       "invariant": "Order groups: current, renewal-due, renewed/history, cancelled/void; newest vigency first; same-number versions show current first with history subordinate.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1556,7 +1561,8 @@
           "orbit360-platform/styles/base.css",
           "orbit360-platform/index.html"
         ],
-        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+        "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
+        "runtimeProofAdded": true
       }
     },
     {
@@ -1564,7 +1570,7 @@
       "block": "B2",
       "title": "Operational UI exposes physical IDs/version/lineage language.",
       "classification": "TECHNICAL_LANGUAGE_LEAK",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
+      "status": "R6C_SOURCE_FIXED_PENDING_EXACT_PREVIEW_RUNTIME",
       "invariant": "Operational UI uses business language; physical IDs and lineage remain only in audit/technical detail when needed.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1574,10 +1580,16 @@
           "orbit360-platform/styles/base.css",
           "orbit360-platform/index.html"
         ],
-        "compositionLockBlobSha": "e08361dfaf9d462d2d4f4b834f22c94762066c7c",
+        "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
         "latestOwner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
-        "latestBlob": "320cd86487581a267a165f2df6d6c1b37c497560",
+        "latestBlob": "f30eb9e41fcdd29da91d2a02664943820f3b169e",
         "businessLanguageNoPhysicalIds": true
+      },
+      "evidenceGap": {
+        "runId": 36247964139,
+        "proof": "r2Ui.unlinkedVehicleCase.warning",
+        "observed": "registro(s) físico(s) / ID e historial",
+        "classification": "RESIDUAL_TECHNICAL_LANGUAGE"
       }
     },
     {
@@ -1611,7 +1623,7 @@
       "block": "B2",
       "title": "Sidebar vertical scroll/navigation defect must remain tracked and be fixed now if it blocks module access.",
       "classification": "NAVIGATION_USABILITY_DEFECT",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
+      "status": "R6C_PENDING_EXACT_PREVIEW_RUNTIME_DISCRIMINANT",
       "invariant": "Sidebar scroll is visible and usable; if non-blocking in B2 it is mandatory carry-forward to B4.",
       "sourceFix": {
         "changedProductFiles": [
@@ -1621,7 +1633,8 @@
           "orbit360-platform/styles/base.css",
           "orbit360-platform/index.html"
         ],
-        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+        "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
+        "runtimeProofAdded": true
       }
     },
     {
@@ -1765,14 +1778,26 @@
     ],
     "noLive": true,
     "b3": "NOT_STARTED",
-    "sourceRemediationStatus": "R6B_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
-    "compositionLockBlobSha": "e08361dfaf9d462d2d4f4b834f22c94762066c7c",
+    "sourceRemediationStatus": "R6C_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
     "lastFailedPreviewRunId": 36247874721,
     "lastFailedPreviewJobId": 108420324309,
     "lastFailureCode": "B2_CACHE_KEY_MISSING:modules/cliente360.js?v=20260925-b2r5",
     "lastFailureClassification": "STALE_FUNCTIONAL_CACHE_KEY_DISCRIMINANT",
     "productDefectDemonstrated": false,
-    "livePromoted": false
+    "livePromoted": false,
+    "assistantForensicVisualAudit": {
+      "reviewedRunId": 36247964139,
+      "artifactId": 10908087337,
+      "result": "REMEDIATION_REQUIRED_BEFORE_PAULA_VISUAL",
+      "detected": [
+        "Residual technical language in unlinked vehicle warning",
+        "Latent undefined vehiclePolicySort reference on ambiguous vehicle path",
+        "Authenticated proof lacked explicit R47/R48/R49/R53 runtime discriminants"
+      ],
+      "preservedPass": true,
+      "noLive": true
+    }
   },
   "lastReview": {
     "date": "2026-09-26",

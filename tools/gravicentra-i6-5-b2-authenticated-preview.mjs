@@ -54,7 +54,7 @@ async function captureVisualAudit(page){
   const scan=async(name)=>{
     const state=await page.evaluate(()=>String(document.body?.innerText||''));
     if(/\bundefined\b|\bnull\b/i.test(state))out.visibleInvalid.push(name);
-    if(/I6_5_|release gate|validator|bridge owner|seed writer|owner revision|source sha|artifact id/i.test(state))out.technicalLeak.push(name);
+    if(/I6_5_|release gate|validator|bridge owner|seed writer|owner revision|source sha|artifact id|registro\(s\) físico|versión física|vehículo id|policy id|id físico|identidad física/i.test(state))out.technicalLeak.push(name);
   };
   const shot=async(name)=>{
     await scan(name);
@@ -487,7 +487,7 @@ try{
       Orbit.modules?.cliente360?.verPoliza?.(candidate.id);
       await wait(700);
       const warning=String(document.querySelector('[data-policy-fullpage="1"] .gi-integrity-warning')?.innerText||'');
-      result.unlinkedVehicleCase={applicable:true,policyId:String(candidate.id||''),warning,truthful:/pendiente de vincular a esta póliza/i.test(warning)&&/no se fusionan ni se vinculan automáticamente/i.test(warning)&&/Vincular vehículo a esta póliza/i.test(warning)};
+      result.unlinkedVehicleCase={applicable:true,policyId:String(candidate.id||''),warning,truthful:/pendiente de vincular a esta póliza/i.test(warning)&&/no se vincularán automáticamente/i.test(warning)&&/Vincular vehículo a esta póliza/i.test(warning),businessLanguage:!/(registro\(s\) físico|versión física|vehículo id|policy id|id físico|identidad física|se distinguen por id)/i.test(warning)};
     }else result.unlinkedVehicleCase={applicable:false};
     return result;
   },visualAudit.sample),'B2_AUTH_R2_UI_DISCRIMINANTS_TIMEOUT',30000);
@@ -495,9 +495,72 @@ try{
   need(r2Ui.policyHierarchy?.h2Size>=22&&r2Ui.policyHierarchy?.h2Weight>=700&&r2Ui.policyHierarchy?.sectionSize>=15&&r2Ui.policyHierarchy?.sectionWeight>=700,'B2_AUTH_POLICY_HIERARCHY_WEAK:'+JSON.stringify(r2Ui.policyHierarchy));
   need(r2Ui.receiptHierarchy?.h2Size>=22&&r2Ui.receiptHierarchy?.h2Weight>=700&&r2Ui.receiptHierarchy?.sectionSize>=16&&r2Ui.receiptHierarchy?.sectionWeight>=700,'B2_AUTH_RECEIPT_HIERARCHY_WEAK:'+JSON.stringify(r2Ui.receiptHierarchy));
   need(r2Ui.receiptEditPlan===true,'B2_AUTH_RECEIPT_EDIT_PLAN_MISSING:'+JSON.stringify(r2Ui));
-  if(r2Ui.unlinkedVehicleCase?.applicable)need(r2Ui.unlinkedVehicleCase.truthful===true,'B2_AUTH_UNLINKED_VEHICLE_RELATION_NOT_TRUTHFUL:'+JSON.stringify(r2Ui.unlinkedVehicleCase));
+  if(r2Ui.unlinkedVehicleCase?.applicable){
+    need(r2Ui.unlinkedVehicleCase.truthful===true,'B2_AUTH_UNLINKED_VEHICLE_RELATION_NOT_TRUTHFUL:'+JSON.stringify(r2Ui.unlinkedVehicleCase));
+    need(r2Ui.unlinkedVehicleCase.businessLanguage===true,'B2_AUTH_UNLINKED_VEHICLE_TECHNICAL_LANGUAGE:'+JSON.stringify(r2Ui.unlinkedVehicleCase));
+  }
   evidence.r2Ui=r2Ui;
   milestone('R2_UI_DISCRIMINANTS_PASS',r2Ui);
+
+  const r6Runtime=await bounded(page.evaluate(async ()=>{
+    const wait=ms=>new Promise(r=>setTimeout(r,ms));
+    const shown=v=>String(v==null?'':v).trim();
+    const rank=p=>{const s=shown(p&&p.estado).toLowerCase();if(/^(vigente|activa|activo)$/.test(s))return 0;if(s.includes('por renovar')||s==='renovacion pendiente')return 1;if(s.includes('cancel')||s.includes('anul'))return 3;return 2;};
+    const date=p=>shown(p&&p.vigenciaFin||p&&p.vigenciaInicio);
+    const denom=r=>{const raw=[r&&r.cuota,r&&r.serie,r&&r.numeroReciboFuente].map(shown).find(Boolean)||'',m=raw.match(/(?:^|\s)(\d+)\s*\/\s*(\d+)(?:\s|$)/);return m?Number(m[2]):null;};
+    const policies=(Orbit.store?.all?.('polizas')||[]).filter(Boolean),vehicles=(Orbit.store?.all?.('vehiculos')||[]).filter(Boolean),rawReceipts=(Orbit.store?.all?.('recibosEsperados')||[]).filter(Boolean);
+    const calendarIssues=[];
+    for(const p of policies){
+      const current=(Orbit.q?.recibosEsperadosDe?Orbit.q.recibosEsperadosDe(p.clienteId):[]).filter(r=>String(r.polizaId||'')===String(p.id||''));
+      const ds=[...new Set(current.map(denom).filter(n=>Number.isFinite(n)&&n>0))],explicit=Number(p.cuotas);
+      if(ds.length>1)calendarIssues.push({policyId:String(p.id||''),reason:'MULTIPLE_PROJECTED_DENOMINATORS',denoms:ds});
+      if(Number.isFinite(explicit)&&explicit>0&&current.length>explicit)calendarIssues.push({policyId:String(p.id||''),reason:'PROJECTED_COUNT_EXCEEDS_POLICY_CUOTAS',count:current.length,explicit});
+    }
+    const auto=policies.find(p=>/39012/.test(shown(p.numero)||shown(p.polizaNumero)||shown(p.numeroPoliza)));
+    let auto39012={found:false};
+    if(auto){
+      const raw=rawReceipts.filter(r=>String(r.polizaId||'')===String(auto.id||'')),current=(Orbit.q?.recibosEsperadosDe?Orbit.q.recibosEsperadosDe(auto.clienteId):[]).filter(r=>String(r.polizaId||'')===String(auto.id||''));
+      auto39012={found:true,policyId:String(auto.id||''),rawCount:raw.length,currentCount:current.length,explicit:Number(auto.cuotas)||null,currentDenoms:[...new Set(current.map(denom).filter(Boolean))],rawDenoms:[...new Set(raw.map(denom).filter(Boolean))]};
+    }
+
+    const byClient=new Map();
+    for(const p of policies){if(!byClient.has(String(p.clienteId||'')))byClient.set(String(p.clienteId||''),[]);byClient.get(String(p.clienteId||'')).push(p);}
+    let policyOrder={applicable:false};
+    for(const [cid,rows] of byClient.entries()){
+      if(rows.length<2||new Set(rows.map(rank)).size<2)continue;
+      const expected=rows.slice().sort((a,b)=>rank(a)-rank(b)||date(b).localeCompare(date(a))||shown(a.numero).localeCompare(shown(b.numero))).map(p=>String(p.id||''));
+      location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&t=polizas';await wait(700);
+      const actual=Array.from(document.querySelectorAll('[data-client-policy-row="1"]')).map(x=>String(x.getAttribute('data-policy-id')||''));
+      if(actual.length){policyOrder={applicable:true,clientId:cid,expected:expected.slice(0,actual.length),actual,pass:actual.every((id,i)=>id===expected[i])};break;}
+    }
+
+    let vehicleProjection={applicable:false};
+    const candidates=[];
+    for(const [cid,rows] of byClient.entries()){
+      const currentPolicies=rows.filter(p=>rank(p)<=1),vp=currentPolicies.map(p=>({p,v:vehicles.find(v=>String(v.polizaId||'')===String(p.id||''))})).filter(x=>x.v);
+      const distinctPlates=new Set(vp.map(x=>shown(x.v.placa).toUpperCase()).filter(Boolean));
+      if(vp.length>=2&&distinctPlates.size>=2)candidates.push({cid,vp});
+    }
+    if(candidates.length){
+      const x=candidates[0];location.hash='#/cliente360?c='+encodeURIComponent(x.cid)+'&t=vehiculos';await wait(700);
+      const cards=Array.from(document.querySelectorAll('[data-vehicle-current-card="1"]')).map(el=>({vehicleId:String(el.getAttribute('data-vehicle-current-id')||''),policyId:String(el.getAttribute('data-vehicle-policy-id')||''),historyCount:Number(el.getAttribute('data-vehicle-history-count')||0)}));
+      const expectedPolicyIds=x.vp.map(z=>String(z.p.id||''));
+      const unresolved=String(document.querySelector('[data-vehicle-identity-incomplete="1"]')?.innerText||'');
+      vehicleProjection={applicable:true,clientId:x.cid,expectedPolicyIds,cards,unresolved,pass:expectedPolicyIds.every(id=>cards.some(c=>c.policyId===id))};
+    }
+
+    const sidebar=document.querySelector('#sidebar'),max=sidebar?Math.max(0,sidebar.scrollHeight-sidebar.clientHeight):0;
+    if(sidebar)sidebar.scrollTop=max;
+    const sidebarScroll={present:!!sidebar,max,scrollTop:sidebar?sidebar.scrollTop:0,overflowY:sidebar?getComputedStyle(sidebar).overflowY:'',scrollbarWidth:sidebar?getComputedStyle(sidebar).scrollbarWidth:'',pass:!!sidebar&&(max===0||sidebar.scrollTop>0)};
+    return{calendarIssues,auto39012,policyOrder,vehicleProjection,sidebarScroll};
+  }),'B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT',45000);
+  need(r6Runtime.calendarIssues.length===0,'B2_AUTH_R6_ACTIVE_CALENDAR_CONFLICT:'+JSON.stringify(r6Runtime.calendarIssues.slice(0,10)));
+  need(r6Runtime.auto39012.found===true&&r6Runtime.auto39012.currentDenoms.length<=1&&(r6Runtime.auto39012.explicit==null||r6Runtime.auto39012.currentCount<=r6Runtime.auto39012.explicit),'B2_AUTH_R6_AUTO39012_CALENDAR_INVALID:'+JSON.stringify(r6Runtime.auto39012));
+  need(r6Runtime.policyOrder.applicable===true&&r6Runtime.policyOrder.pass===true,'B2_AUTH_R6_POLICY_ORDER_INVALID:'+JSON.stringify(r6Runtime.policyOrder));
+  if(r6Runtime.vehicleProjection.applicable)need(r6Runtime.vehicleProjection.pass===true,'B2_AUTH_R6_VEHICLE_CURRENT_PROJECTION_INVALID:'+JSON.stringify(r6Runtime.vehicleProjection));
+  need(r6Runtime.sidebarScroll.pass===true,'B2_AUTH_R6_SIDEBAR_SCROLL_INVALID:'+JSON.stringify(r6Runtime.sidebarScroll));
+  evidence.r6Runtime=r6Runtime;
+  milestone('R6_RUNTIME_DISCRIMINANTS_PASS',r6Runtime);
 
   const clientName='B2 QA '+stamp,ident='B2QA-'+stamp,policyNo='B2-POL-'+stamp,renewNo='B2-REN-'+stamp;
   state={clientName,policyNo,renewNo};
