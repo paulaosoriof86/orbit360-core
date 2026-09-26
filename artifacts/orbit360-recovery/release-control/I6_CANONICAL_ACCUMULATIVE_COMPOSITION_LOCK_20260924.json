@@ -133,7 +133,7 @@
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "2725b5c77cdca80433d16c6177402f76c65543e8",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
-    "orbit360-platform/modules/aseguradoras.js": "b45c69fc5bfda98c1a6f37a81913ead475d342cf",
+    "orbit360-platform/modules/aseguradoras.js": "af3af47ed2fb71c2bdf9e81775a7359eefb1c606",
     "orbit360-platform/modules/cliente360.js": "3317876371ef232836146b78db8486351aa83d47",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "e93c08dcd77a8076af4d4f3f05e14f4d66a9eae4",
@@ -199,9 +199,9 @@
       "orbit360OpsLeadsCommandPreview"
     ],
     "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED",
-    "latestCausalFix": "B2_VEHICLE_EDIT_PRESERVE_DISTINCT_VIN_WHEN_UNTOUCHED",
+    "latestCausalFix": "B2_INSURER_CONFIRM_INTENT_BEFORE_SECURE_SIDE_EFFECTS",
     "latestCausalFixAt": "2026-09-25",
-    "latestCausalOwner": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
-    "latestCausalBlob": "4fe27ba24508e193362c592c2fd4073d02b88cfc"
+    "latestCausalOwner": "orbit360-platform/modules/aseguradoras.js",
+    "latestCausalBlob": "af3af47ed2fb71c2bdf9e81775a7359eefb1c606"
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -239,10 +239,12 @@
     "artifactDigest": "7ba9dded5a73e36e4018bbcc97bc61e0f240f2f2d580f9fbaf443aa4b91ef00f",
     "exactReadback": true,
     "functionalPass": true,
-    "livePromoted": false
+    "livePromoted": false,
+    "supersededByProductSourceChange": true,
+    "supersededReason": "Aseguradoras transaction order rootfix requires new immutable build/readback"
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "1eb25c6cdb9251e810942def8b8a71923832a4f4",
     "exactPreviewBuildId": "gi-i65-b2-1eb25c6cdb92-57f234755dc1",
@@ -1696,7 +1698,7 @@
   },
   "r4": {
     "status": "CANDIDATE_PENDING_PREVIEW",
-    "compositionLockBlobSha": "00d192aa8afe401777d9343063ee93f4c57b73a4",
-    "latestCausalFix": "B2_VEHICLE_EDIT_PRESERVE_DISTINCT_VIN_WHEN_UNTOUCHED"
+    "compositionLockBlobSha": "898dbdd7c939b3a523beef2a06a270a2d0bec4d6",
+    "latestCausalFix": "B2_INSURER_CONFIRM_INTENT_BEFORE_SECURE_SIDE_EFFECTS"
   }
 }
