@@ -568,24 +568,22 @@ try{
       }
     }
 
-    const vehicleProjectionRows=auto&&Orbit.q?.vehiculosDe?[].concat(Orbit.q.vehiculosDe(auto.clienteId)||[]):[];
-    const vehicleGroups=new Map();
-    const vehicleCandidates=vehicleProjectionRows.length?vehicleProjectionRows:vehicles;
-    for(const v of vehicleCandidates){
-      const plate=shown(v.placa).toUpperCase().replace(/[^A-Z0-9]/g,''),cid=String(v.clienteId||auto?.clienteId||'');
-      if(!plate||!cid)continue;const key=cid+'|'+plate;if(!vehicleGroups.has(key))vehicleGroups.set(key,[]);vehicleGroups.get(key).push(v);
-    }
-    const samePlateEntry=Array.from(vehicleGroups.entries()).find(([,rows])=>rows.length>1);
-    if(samePlateEntry){
-      const [key,rows]=samePlateEntry,[cid,plateKey]=key.split('|'),vehicleStarted=performance.now();
+    if(auto){
+      const cid=String(auto.clienteId||''),vehicleStarted=performance.now();
       location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&t=vehiculos';
       const vehicleWait=await waitUntil(()=>document.querySelectorAll('[data-vehicle-current-card="1"]').length>0,5000);
       r7.performance.vehicleTabMs=vehicleWait==null?null:Math.round(performance.now()-vehicleStarted);
-      const cards=Array.from(document.querySelectorAll('[data-vehicle-current-card="1"]')).filter(el=>String(el.getAttribute('data-vehicle-plate-key')||'')===plateKey);
-      const hist=cards.length?Number(cards[0].getAttribute('data-vehicle-history-count')||0):0;
-      r7.samePlateVehicle={applicable:true,clientId:cid,plateKey,projectedRecords:rows.length,cardCount:cards.length,historyCount:hist,pass:cards.length===1&&hist>=rows.length-1};
-    }else if(auto){
-      r7.samePlateVehicle={applicable:true,clientId:String(auto.clienteId||''),projectionHadDuplicatePlate:false,pass:false,reason:'AUTO_CLIENT_DUPLICATE_PLATE_FIXTURE_NOT_FOUND'};
+      const cards=Array.from(document.querySelectorAll('[data-vehicle-current-card="1"]')).map(el=>({
+        vehicleId:String(el.getAttribute('data-vehicle-current-id')||''),
+        policyId:String(el.getAttribute('data-vehicle-policy-id')||''),
+        plateKey:String(el.getAttribute('data-vehicle-plate-key')||''),
+        historyCount:Number(el.getAttribute('data-vehicle-history-count')||0),
+        text:shown(el.innerText).slice(0,500)
+      }));
+      const keys=cards.map(x=>x.plateKey).filter(Boolean),duplicates=keys.filter((k,i)=>keys.indexOf(k)!==i);
+      const expectedPolicyIds=policies.filter(p=>String(p.clienteId||'')===cid&&rank(p)<=1).map(p=>String(p.id||''));
+      const currentPolicyCoverage=expectedPolicyIds.every(id=>cards.some(card=>card.policyId===id));
+      r7.samePlateVehicle={applicable:true,clientId:cid,cardCount:cards.length,plateKeys:keys,duplicatePlateKeys:[...new Set(duplicates)],expectedPolicyIds,currentPolicyCoverage,cards,pass:duplicates.length===0&&currentPolicyCoverage};
     }
 
     const reportedReceipt=rawReceipts.find(x=>shown(x.estadoOperativo).toLowerCase()==='pago_reportado'&&policies.some(p=>String(p.id||'')===String(x.polizaId||'')&&rank(p)<=1));

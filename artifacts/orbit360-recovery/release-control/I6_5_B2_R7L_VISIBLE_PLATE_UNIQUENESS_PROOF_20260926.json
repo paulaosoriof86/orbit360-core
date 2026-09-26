@@ -1,0 +1,36 @@
+{
+  "schema": "gravicentra-i6-5-b2-r7l-visible-plate-uniqueness-proof-v1",
+  "recordedAt": "2026-09-26T11:26:00-06:00",
+  "parentHead": "9bfb0b15da68561f83e9378b995e717c14515a44",
+  "block": "B2",
+  "priorAuthenticatedPassRunId": 36258221310,
+  "failedStrengtheningRunId": 36258613932,
+  "failedStrengtheningJobId": 108450066045,
+  "classification": "HARNESS_PROOF_ASSUMPTION_CORRECTED",
+  "productRegressionDemonstrated": false,
+  "failedAssumption": {
+    "code": "B2_AUTH_R7_SAME_PLATE_VEHICLE_DUPLICATE",
+    "observed": "AUTO39012 client's current q.vehiculosDe() projection did not contain duplicate normalized-plate raw rows.",
+    "reason": "R7K required a duplicate projected-row fixture that no longer exists, so it could not prove the user-visible regression boundary even though the rendered UI is the actual acceptance surface."
+  },
+  "correction": {
+    "owner": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+    "beforeBlob": "261997a90f4da84aee8cb4b7292c953164755347",
+    "afterBlob": "5022ec865498140d7129c4650402f8fe53ef5ebd",
+    "proof": "Open the AUTO39012 client Vehicles tab, collect every current vehicle card, require no duplicate normalized data-vehicle-plate-key values, and require coverage of every active client policy.",
+    "productSourceChanged": false
+  },
+  "exactFrozenCandidate": {
+    "sourceSha": "40cb29d19191cf353708eb3a673e1903ff4d82ef",
+    "buildId": "gi-i65-b2-40cb29d19191-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36256621932-759n8f1u.web.app",
+    "artifactId": 10910847994,
+    "livePromoted": false
+  },
+  "boundaries": {
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noBusinessDataWrites": true
+  }
+}

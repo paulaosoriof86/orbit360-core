@@ -2235,7 +2235,7 @@
       "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
     ],
     "governanceRepair": "R7_TOP_LEVEL_PRODUCT_BLOB_BINDING",
-    "authenticatedHarnessBlobSha": "261997a90f4da84aee8cb4b7292c953164755347",
+    "authenticatedHarnessBlobSha": "5022ec865498140d7129c4650402f8fe53ef5ebd",
     "r7hAuthHarnessFix": {
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7H_AUTH_HARNESS_RECEIPT_TARGET_FIX_20260926.json",
       "receiptBlobSha": "62d0852c8b48b490c3c70e2f61a8d69eed9d9664",
@@ -2264,6 +2264,14 @@
       "receiptBlobSha": "435f184b487386c55d3700e29e683513cf9d6ede",
       "priorPassRunId": 36258221310,
       "classification": "PROOF_STRENGTHENING_ONLY",
+      "productRegressionDemonstrated": false
+    },
+    "r7lTargetedProof": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7L_VISIBLE_PLATE_UNIQUENESS_PROOF_20260926.json",
+      "receiptBlobSha": "50287a3f986c1e501a28e49d253102629530651e",
+      "priorPassRunId": 36258221310,
+      "failedStrengtheningRunId": 36258613932,
+      "classification": "HARNESS_PROOF_ASSUMPTION_CORRECTED",
       "productRegressionDemonstrated": false
     }
   },

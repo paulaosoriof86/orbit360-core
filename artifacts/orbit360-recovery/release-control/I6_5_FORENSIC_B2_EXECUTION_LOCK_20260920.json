@@ -390,7 +390,7 @@
     "cleanupWrites": 25,
     "visualEvidenceRecapture": true,
     "visualReceiptRecapture": true,
-    "lastFailureRunId": 36257835631,
+    "lastFailureRunId": 36258613932,
     "requiredNewSource": true,
     "lastArmCommitParent": "219bf4d02c37d785e2c6d2a811ee1b5ff42f84dd",
     "lastArmReason": "R22_PREVIEW_CREDENTIAL_ISOLATION_EXACT_AUTHENTICATED_PROOF",
@@ -422,14 +422,14 @@
     "r5VehiclePolicyContext": true,
     "r5IndividualReceiptEdit": true,
     "r5ReportedPaymentProjection": true,
-    "lastFailureJobId": 108447914279,
-    "lastFailureCode": "B2_AUTH_INSURER_LOGO_PREVIEW_VISIBILITY_TIMEOUT",
-    "lastFailureClassification": "HARNESS_ONLY_VISIBILITY_WAIT",
+    "lastFailureJobId": 108450066045,
+    "lastFailureCode": "B2_AUTH_R7_SAME_PLATE_FIXTURE_NOT_FOUND",
+    "lastFailureClassification": "HARNESS_PROOF_ASSUMPTION_CORRECTED",
     "productRegressionDemonstrated": false,
-    "requiredNewHarnessBlob": "261997a90f4da84aee8cb4b7292c953164755347",
+    "requiredNewHarnessBlob": "5022ec865498140d7129c4650402f8fe53ef5ebd",
     "priorPassRunId": 36258221310,
     "priorPassPreserved": true,
-    "proofStrengtheningReason": "R59_PROJECTED_SAME_PLATE_TARGETED_PROOF"
+    "proofStrengtheningReason": "R59_VISIBLE_PLATE_UNIQUENESS_AND_ACTIVE_POLICY_COVERAGE"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -2382,7 +2382,7 @@
   },
   "findingLedgerBlobSha": "32dc114f4dd1d964976d5f78d6ce60942d7afa36",
   "r7": {
-    "status": "R7K_TARGETED_R59_PROOF_PENDING_EXACT_AUTH_RETRY",
+    "status": "R7L_VISIBLE_PLATE_UNIQUENESS_PROOF_PENDING_EXACT_AUTH_RETRY",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
     "visualReceiptBlobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df",
     "confirmedOpenFindingIds": [
@@ -2429,7 +2429,7 @@
     "exactPreviewBuildId": null,
     "exactPreviewUrl": null,
     "authenticatedPreviewPass": false,
-    "authenticatedHarnessBlobSha": "261997a90f4da84aee8cb4b7292c953164755347",
+    "authenticatedHarnessBlobSha": "5022ec865498140d7129c4650402f8fe53ef5ebd",
     "lastAuthenticatedFailure": {
       "runId": 36256111695,
       "jobId": 108443575021,
@@ -2471,6 +2471,9 @@
     "r7jReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7J_LOGO_PREVIEW_HARNESS_FIX_20260926.json",
     "r7jReceiptBlobSha": "eee205a060cfb98fd78b88dd6524a051803a717f",
     "r7kReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7K_SAME_PLATE_TARGETED_PROOF_20260926.json",
-    "r7kReceiptBlobSha": "435f184b487386c55d3700e29e683513cf9d6ede"
+    "r7kReceiptBlobSha": "435f184b487386c55d3700e29e683513cf9d6ede",
+    "r7lReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7L_VISIBLE_PLATE_UNIQUENESS_PROOF_20260926.json",
+    "r7lReceiptBlobSha": "50287a3f986c1e501a28e49d253102629530651e",
+    "priorAuthenticatedPassRunId": 36258221310
   }
 }
