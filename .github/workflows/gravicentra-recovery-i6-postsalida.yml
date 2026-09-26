@@ -3627,10 +3627,21 @@ jobs:
           set -euo pipefail
           FROOT="$RUNNER_TEMP/b2-functions";mkdir -p "$FROOT"
           cp -a "$RUNNER_TEMP/b2-package/bundle/backend" "$FROOT/backend"
+          STORAGE_BUCKET=$(node - <<'NODE'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/public-config-b2.json','utf8'));
+          let found='';
+          const walk=v=>{if(found||v==null)return;if(Array.isArray(v)){for(const x of v)walk(x);return;}if(typeof v==='object'){for(const[k,x]of Object.entries(v)){if(k==='storageBucket'&&typeof x==='string'&&x.trim()){found=x.trim();return;}walk(x);}}};
+          walk(d);
+          if(!found)throw new Error('B2_FIREBASE_SDKCONFIG_STORAGE_BUCKET_MISSING');
+          process.stdout.write(found);
+          NODE
+          )
+          printf 'FIREBASE_STORAGE_BUCKET=%s\n' "$STORAGE_BUCKET" > "$FROOT/backend/.env"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
           node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview"],"productionFunctionDeployed":false,"operationalBusinessWritesAuthorized":false}\n' "$GITHUB_SHA" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
+          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","storageBucket":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview"],"productionFunctionDeployed":false,"operationalBusinessWritesAuthorized":false}\n' "$GITHUB_SHA" "$STORAGE_BUCKET" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
       - name: Deploy exact B2 package to isolated Preview
         if: steps.mode.outputs.mode == 'preview'
         id: preview
