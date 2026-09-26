@@ -1,0 +1,65 @@
+{
+  "schema": "gravicentra-i6-5-b2-r7n-exact-authenticated-pass-v1",
+  "recordedAt": "2026-09-26",
+  "block": "B2",
+  "findingId": "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7",
+  "exactPreview": {
+    "sourceSha": "975fe97647bed9350d0af2608f4edb965893ff85",
+    "buildId": "gi-i65-b2-975fe97647be-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36260674764-22z4n1i9.web.app",
+    "runId": 36260674764,
+    "artifactId": 10912261167,
+    "artifactDigest": "sha256:616acc22991d625037f34958563492a65deea86730df2a554b7552f225be1e0e",
+    "exactReadback": true,
+    "functionalPass": true
+  },
+  "authenticatedProof": {
+    "jobId": 108456180122,
+    "artifactId": 10912800328,
+    "artifactDigest": "sha256:00c0b60703134cb00e29682424c5e6db39e419eec6c08f911f3bec36bd607a6c",
+    "status": "PASS",
+    "insurerLogoSelection": {
+      "fileCount": 1,
+      "previewObserved": true
+    },
+    "insurerSecureEdit": {
+      "logoPersisted": true,
+      "credentialPreviewIsolated": true,
+      "durableReadback": true,
+      "reloadReadback": true,
+      "cleanup": true
+    },
+    "storageBucket": "gravicentra-insurance-assets-60e88ed5a1",
+    "syntheticCleanup": {
+      "status": "PASS",
+      "deleted": 25,
+      "assetPrefixResidual": 0,
+      "clientAbsent": true,
+      "insurerAbsent": true
+    },
+    "r7": {
+      "policyDetailReceipts": "PASS_10_OF_10",
+      "receiptPolicyFilter": "PASS_ACTIVE_ONLY",
+      "reportedPaymentRows": "PASS_3_VISIBLE",
+      "clientKpiStable": "PASS_23_EMPRESAS_416_PERSONAS",
+      "paymentHierarchy": "PASS",
+      "samePlateVehicle": "PASS_NO_DUPLICATE_PLATE_KEYS",
+      "performanceMs": {
+        "policyDetail": 437,
+        "receiptsTab": 1380,
+        "vehicleTab": 545,
+        "cobrosTab": 487,
+        "clientList": 239
+      }
+    },
+    "reportedPaymentDoesNotFabricateCobro": true,
+    "renewalRuntimePass": true
+  },
+  "boundaries": {
+    "livePromoted": false,
+    "reimported": false,
+    "b3Opened": false,
+    "businessDataMutationAuthorized": false
+  },
+  "disposition": "TECHNICAL_AND_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL"
+}

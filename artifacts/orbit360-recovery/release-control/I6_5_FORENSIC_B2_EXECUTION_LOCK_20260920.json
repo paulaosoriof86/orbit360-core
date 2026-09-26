@@ -1464,7 +1464,7 @@
     "authorityBlobSha": "2250d63fc5dd2fb824e30b5493e7e6a611fc02d4",
     "findingsLedgerBlobSha": "6912bfbecfc963c3c57c64a058e192ee18173b68",
     "compositionLockBlobSha": "b973ff3d5064d89d4e5f8290da26a7044c69f6f3",
-    "findingLedgerBlobSha": "61789707bfbc9a8de3b01ff401ac68284f9ef86e"
+    "findingLedgerBlobSha": "e96c76430f88511146d82e3df969f69591e7a384"
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
   "lastPreviewFailure": {
@@ -2383,9 +2383,9 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "61789707bfbc9a8de3b01ff401ac68284f9ef86e",
+  "findingLedgerBlobSha": "e96c76430f88511146d82e3df969f69591e7a384",
   "r7": {
-    "status": "R7N_PRODUCT_SOURCE_FIXED_CANDIDATE_PENDING_PREVIEW",
+    "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
     "visualReceiptBlobSha": "ff1358197ae3261b2aa473c06763abc6c4c886df",
     "confirmedOpenFindingIds": [
@@ -2416,7 +2416,7 @@
     "remediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
     "remediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
     "compositionLockBlobSha": "b973ff3d5064d89d4e5f8290da26a7044c69f6f3",
-    "findingLedgerBlobSha": "61789707bfbc9a8de3b01ff401ac68284f9ef86e",
+    "findingLedgerBlobSha": "e96c76430f88511146d82e3df969f69591e7a384",
     "productBlobs": {
       "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",
@@ -2429,10 +2429,10 @@
       "tools/gravicentra-i6-5-b2-functional.mjs": "805b26d3397b18559b825863a68d60cad9f5b006",
       "tools/gravicentra-i6-5-b2-authenticated-preview.mjs": "ab13ac07a48d24b35be4594c8936e9f75d4bd5cd"
     },
-    "exactPreviewSourceSha": null,
-    "exactPreviewBuildId": null,
-    "exactPreviewUrl": null,
-    "authenticatedPreviewPass": false,
+    "exactPreviewSourceSha": "975fe97647bed9350d0af2608f4edb965893ff85",
+    "exactPreviewBuildId": "gi-i65-b2-975fe97647be-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36260674764-22z4n1i9.web.app",
+    "authenticatedPreviewPass": true,
     "authenticatedHarnessBlobSha": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
     "lastAuthenticatedFailure": {
       "runId": 36256111695,
@@ -2485,6 +2485,11 @@
     "r7nReceiptBlobSha": "9af4807b378a21f8443eda9ec903248845e117ce",
     "r7nFindingId": "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7",
     "invalidatedOldPreviewAuthRunId": 36260454531,
-    "invalidatedOldPreviewAuthReason": "PRODUCT_SOURCE_CHANGED_BEFORE_RUN; OLD_PREVIEW_AUTH_FAILURE_IS_NONAUTHORITATIVE_FOR_NEW_CANDIDATE"
+    "invalidatedOldPreviewAuthReason": "PRODUCT_SOURCE_CHANGED_BEFORE_RUN; OLD_PREVIEW_AUTH_FAILURE_IS_NONAUTHORITATIVE_FOR_NEW_CANDIDATE",
+    "r7nPassReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7N_EXACT_AUTHENTICATED_PASS_20260926.json",
+    "r7nPassReceiptBlobSha": "a416081c61e403f28a64f2c4f0e7b0644ad7a21f",
+    "additionalPendingVisualFindingIds": [
+      "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7"
+    ]
   }
 }

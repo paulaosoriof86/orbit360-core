@@ -2032,7 +2032,7 @@
       "rootCause": "ensureKnowledgeSummaryLoaded completion calls refreshOwnerView, which rebuilds the active ficha; preserveState omitted logoFile and DOM replacement clears FileList.",
       "remediation": "Do not replace active insurer edit UI on async knowledge completion; preserve logoFile across preserveState reconstruction.",
       "requiredProof": "Exact new immutable Preview: select logo on synthetic insurer -> wait across knowledge hydration window -> save -> Storage/Firestore HTTPS asset readback -> reload same logo -> credential regression -> cleanup.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_PROOF",
+      "status": "EXACT_AUTHENTICATED_PREVIEW_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "noReimport": true,
       "noLive": true,
@@ -2046,7 +2046,22 @@
         "runId": 36259661784,
         "jobId": 108452982186,
         "artifactId": 10911404901
-      }
+      },
+      "technicalClosureProof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7N_EXACT_AUTHENTICATED_PASS_20260926.json",
+        "receiptBlobSha": "a416081c61e403f28a64f2c4f0e7b0644ad7a21f",
+        "sourceSha": "975fe97647bed9350d0af2608f4edb965893ff85",
+        "buildId": "gi-i65-b2-975fe97647be-57f234755dc1",
+        "previewRunId": 36260674764,
+        "authenticatedJobId": 108456180122,
+        "previewArtifactId": 10912261167,
+        "authenticatedArtifactId": 10912800328,
+        "exactReadback": true,
+        "functionalPass": true,
+        "authenticatedPass": true,
+        "cleanupPass": true
+      },
+      "remainingDisposition": "PAULA_VISUAL_ON_EXACT_PREVIEW"
     }
   ],
   "phaseBBacklog": [
