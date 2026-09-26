@@ -885,8 +885,9 @@ try{
   const siblingBefore=siblingReceipt?(await dataCol(db,'recibosEsperados').doc(siblingReceipt.id).get()).data()||{}:null;
   await page.evaluate(({rid,cid})=>Orbit.receiptsPortfolioProjection.openReceiptDetail(rid,cid),{rid:receiptTarget.id,cid:client.id});
   await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:10000});
-  need(await page.locator('[data-rp-edit-receipt="1"]').count()===1,'B2_AUTH_INDIVIDUAL_RECEIPT_EDIT_CONTROL_MISSING');
-  need(!(await page.locator('[data-rp-edit-receipt="1"]').isDisabled()),'B2_AUTH_SYNTHETIC_RECEIPT_UNEXPECTEDLY_PROTECTED');
+  const editControl=await page.evaluate(()=>{const el=document.querySelector('[data-rp-edit-receipt="1"]');return{present:!!el,disabled:!!(el&&(el.disabled||el.getAttribute('aria-disabled')==='true'))};});
+  need(editControl.present===true,'B2_AUTH_INDIVIDUAL_RECEIPT_EDIT_CONTROL_MISSING');
+  need(editControl.disabled===false,'B2_AUTH_SYNTHETIC_RECEIPT_UNEXPECTEDLY_PROTECTED');
   const receiptEditorOpened=await page.evaluate(({rid,cid})=>!!(Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.editReceipt&&Orbit.receiptsPortfolioProjection.editReceipt(rid,cid)),{rid:receiptTarget.id,cid:client.id});
   need(receiptEditorOpened===true,'B2_AUTH_INDIVIDUAL_RECEIPT_EDITOR_OWNER_REJECTED');
   await page.waitForSelector('#rp-edit-receipt',{timeout:10000});

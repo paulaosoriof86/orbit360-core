@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R7L_VISIBLE_PLATE_PROOF_RETRY_AUTHORIZED",
+    "mechanismSyncStatus": "B2_R7M_AUTH_DOM_RACE_FIXED_RETRY_AUTHORIZED",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "2554e536b4ae9138a204e557cfb0a0738d6869a9",
+    "b2ExecutionLockBlobSha": "7bc2a1e3e7cf770f77051deacbc2c11bb84404a0",
     "b2": {
       "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2231,9 +2231,9 @@
       "lastExactAuthenticatedPassRunId": 36247964139,
       "lastExactAuthenticatedPassHistoricalPreserved": true,
       "r6dHarnessRepair": true,
-      "lastAuthenticatedFailureRunId": 36248865201,
+      "lastAuthenticatedFailureRunId": 36258966880,
       "lastAuthenticatedFailureCode": "B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT",
-      "lastAuthenticatedFailureClassification": "HARNESS_ONLY_TARGET_SELECTION_DEFECT",
+      "lastAuthenticatedFailureClassification": "HARNESS_ONLY_DOM_RERENDER_RACE",
       "r6eHarnessSyntaxRepair": true,
       "lastPreviewFailureClassification": "PRODUCT_DEFECT_CONFIRMED_SECOND_RENDER_OWNER",
       "exactR6ProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
@@ -2297,7 +2297,8 @@
       "r7kReceiptBlobSha": "435f184b487386c55d3700e29e683513cf9d6ede",
       "r7lTargetedProof": true,
       "r7lReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7L_VISIBLE_PLATE_UNIQUENESS_PROOF_20260926.json",
-      "r7lReceiptBlobSha": "50287a3f986c1e501a28e49d253102629530651e"
+      "r7lReceiptBlobSha": "50287a3f986c1e501a28e49d253102629530651e",
+      "r7mAuthRetryAuthorized": true
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2429,7 +2430,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R7L_AUTH_RETRY_VISIBLE_PLATE_UNIQUENESS_ON_FROZEN_PREVIEW"
+    "nextAction": "B2_R7M_AUTH_RETRY_ON_FROZEN_PREVIEW"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

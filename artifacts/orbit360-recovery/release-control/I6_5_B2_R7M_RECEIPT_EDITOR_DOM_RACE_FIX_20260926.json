@@ -1,0 +1,24 @@
+{
+  "schema": "gravicentra-i6-5-b2-r7m-receipt-editor-dom-race-fix-v1",
+  "recordedAt": "2026-09-26T11:36:00-06:00",
+  "block": "B2",
+  "parentHead": "45afaa3aa9b11df7fd6d10f6848405a7e5cf5dbd",
+  "failedRunId": 36258966880,
+  "failedJobId": 108451031403,
+  "classification": "HARNESS_ONLY_DOM_RERENDER_RACE",
+  "productRegressionDemonstrated": false,
+  "failure": "locator.isDisabled timed out after the edit control was already observed; receipt detail re-render replaced the node between separate locator calls.",
+  "fix": {
+    "owner": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+    "beforeBlob": "5022ec865498140d7129c4650402f8fe53ef5ebd",
+    "afterBlob": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
+    "behavior": "Read edit-control presence and disabled state atomically in one page.evaluate, then invoke the canonical owner directly."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noBusinessDataWrites": true
+  }
+}
