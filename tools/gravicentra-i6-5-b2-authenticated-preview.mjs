@@ -504,6 +504,7 @@ try{
 
   const r6Runtime=await bounded(page.evaluate(async ()=>{
     const wait=ms=>new Promise(r=>setTimeout(r,ms));
+    const waitUntil=async(fn,timeout=5000)=>{const started=performance.now();while(performance.now()-started<timeout){try{if(fn())return performance.now()-started;}catch(e){}await wait(50);}return null;};
     const shown=v=>String(v==null?'':v).trim();
     const rank=p=>{const s=shown(p&&p.estado).toLowerCase();if(/^(vigente|activa|activo)$/.test(s))return 0;if(s.includes('por renovar')||s==='renovacion pendiente')return 1;if(s.includes('cancel')||s.includes('anul'))return 3;return 2;};
     const date=p=>shown(p&&p.vigenciaFin||p&&p.vigenciaInicio);
@@ -536,6 +537,68 @@ try{
       auto39012={found:true,policyId:String(auto.id||''),rawCount:raw.length,expectedCurrentCount:expected.current.length,currentCount:actual.length,explicit:Number(auto.cuotas)||null,currentDenoms:[...new Set(actual.map(denom).filter(Boolean))],rawDenoms:[...new Set(raw.map(denom).filter(Boolean))],projectionMatch:expectedIds.length===actualIds.length&&expectedIds.every((id,i)=>id===actualIds[i])};
     }
 
+    const r7={policyDetailReceipts:{applicable:false},receiptPolicyFilter:{applicable:false},samePlateVehicle:{applicable:false},reportedPaymentRows:{applicable:false},clientKpiStable:{applicable:false},paymentHierarchy:{applicable:false},performance:{}};
+    if(auto){
+      const expected=project(auto,receiptsByPolicy.get(String(auto.id||''))||[]);
+      const detailStarted=performance.now();
+      location.hash='#/cliente360?c='+encodeURIComponent(auto.clienteId)+'&p='+encodeURIComponent(auto.id);
+      const detailWait=await waitUntil(()=>!!document.querySelector('[data-policy-fullpage="1"]'),5000);
+      r7.performance.policyDetailMs=detailWait==null?null:Math.round(performance.now()-detailStarted);
+      const policyPage=document.querySelector('[data-policy-fullpage="1"]');
+      if(policyPage){
+        const receiptSection=Array.from(policyPage.querySelectorAll('section.card')).find(s=>/Recibos y cartera/i.test(String(s.innerText||'')));
+        const receiptRows=receiptSection?Array.from(receiptSection.querySelectorAll('tbody tr')):[];
+        r7.policyDetailReceipts={applicable:true,expected:expected.current.length,actual:receiptRows.length,pass:receiptRows.length===expected.current.length};
+        const paymentOverview=policyPage.querySelector('.gi-payment-overview'),paymentTotal=policyPage.querySelector('.gi-payment-total'),conditions=policyPage.querySelector('.gi-payment-conditions');
+        r7.paymentHierarchy={applicable:true,overview:!!paymentOverview,total:!!paymentTotal,conditions:!!conditions,pass:!!paymentOverview&&!!paymentTotal&&!!conditions};
+      }
+      const receiptStarted=performance.now();
+      location.hash='#/cliente360?c='+encodeURIComponent(auto.clienteId)+'&t=recibos';
+      const receiptWait=await waitUntil(()=>!!document.querySelector('#rp-native-policy'),5000);
+      r7.performance.receiptsTabMs=receiptWait==null?null:Math.round(performance.now()-receiptStarted);
+      const select=document.querySelector('#rp-native-policy');
+      if(select){
+        const activeIds=new Set(policies.filter(p=>String(p.clienteId||'')===String(auto.clienteId||'')&&rank(p)<=1).map(p=>String(p.id||'')));
+        const values=Array.from(select.options).map(o=>String(o.value||'')).filter(v=>v&&v!=='todas');
+        r7.receiptPolicyFilter={applicable:true,values,activeIds:Array.from(activeIds),pass:values.every(v=>activeIds.has(v))&&values.length===activeIds.size};
+      }
+    }
+
+    const vehicleGroups=new Map();
+    for(const v of vehicles){
+      const plate=shown(v.placa).toUpperCase().replace(/[^A-Z0-9]/g,''),cid=String(v.clienteId||'');
+      if(!plate||!cid)continue;const key=cid+'|'+plate;if(!vehicleGroups.has(key))vehicleGroups.set(key,[]);vehicleGroups.get(key).push(v);
+    }
+    const samePlateEntry=Array.from(vehicleGroups.entries()).find(([,rows])=>rows.length>1);
+    if(samePlateEntry){
+      const [key,rows]=samePlateEntry,[cid,plateKey]=key.split('|'),vehicleStarted=performance.now();
+      location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&t=vehiculos';
+      const vehicleWait=await waitUntil(()=>document.querySelectorAll('[data-vehicle-current-card="1"]').length>0,5000);
+      r7.performance.vehicleTabMs=vehicleWait==null?null:Math.round(performance.now()-vehicleStarted);
+      const cards=Array.from(document.querySelectorAll('[data-vehicle-current-card="1"]')).filter(el=>String(el.getAttribute('data-vehicle-plate-key')||'')===plateKey);
+      r7.samePlateVehicle={applicable:true,clientId:cid,plateKey,rawRecords:rows.length,cardCount:cards.length,historyCount:cards.length?Number(cards[0].getAttribute('data-vehicle-history-count')||0):0,pass:cards.length===1&&Number(cards[0]?.getAttribute('data-vehicle-history-count')||0)>=rows.length-1};
+    }
+
+    const reportedReceipt=rawReceipts.find(x=>shown(x.estadoOperativo).toLowerCase()==='pago_reportado'&&policies.some(p=>String(p.id||'')===String(x.polizaId||'')&&rank(p)<=1));
+    if(reportedReceipt){
+      const p=policies.find(p=>String(p.id||'')===String(reportedReceipt.polizaId||'')),cobStarted=performance.now();
+      location.hash='#/cliente360?c='+encodeURIComponent(reportedReceipt.clienteId||p?.clienteId||'')+'&t=cobros';
+      const cobWait=await waitUntil(()=>!!document.querySelector('[data-rp-native-cobros-note="1"]'),5000);
+      r7.performance.cobrosTabMs=cobWait==null?null:Math.round(performance.now()-cobStarted);
+      const rows=Array.from(document.querySelectorAll('[data-reported-payment-evidence="1"]'));
+      r7.reportedPaymentRows={applicable:true,clientId:String(reportedReceipt.clienteId||p?.clienteId||''),rowCount:rows.length,pass:rows.length>0};
+    }
+
+    const listStarted=performance.now();
+    location.hash='#/cliente360';
+    const listWait=await waitUntil(()=>!document.querySelector('[data-c360-authoritative-loading="1"]')&&!!document.querySelector('.kpi-row .kpi'),5000);
+    r7.performance.clientListMs=listWait==null?null:Math.round(performance.now()-listStarted);
+    const foot1=shown(document.querySelector('.kpi-row .kpi .k-foot')?.textContent);
+    await wait(650);
+    const foot2=shown(document.querySelector('.kpi-row .kpi .k-foot')?.textContent);
+    const totalText=shown(document.querySelector('.kpi-row .kpi .k-val')?.textContent);
+    r7.clientKpiStable={applicable:true,foot1,foot2,totalText,pass:!!foot1&&foot1===foot2&&!/^0 empresas\s*·\s*0 personas$/i.test(foot1)};
+
     const byClient=new Map();
     for(const p of policies){if(!byClient.has(String(p.clienteId||'')))byClient.set(String(p.clienteId||''),[]);byClient.get(String(p.clienteId||'')).push(p);}
     let policyOrder={applicable:false};
@@ -561,13 +624,21 @@ try{
     const sidebar=document.querySelector('#sidebar'),max=sidebar?Math.max(0,sidebar.scrollHeight-sidebar.clientHeight):0;
     if(sidebar)sidebar.scrollTop=max;
     const sidebarScroll={present:!!sidebar,max,scrollTop:sidebar?sidebar.scrollTop:0,overflowY:sidebar?getComputedStyle(sidebar).overflowY:'',scrollbarWidth:sidebar?getComputedStyle(sidebar).scrollbarWidth:'',pass:!!sidebar&&(max===0||sidebar.scrollTop>0)};
-    return{calendarIssues,auto39012,policyOrder,vehicleProjection,sidebarScroll,counts:{policies:policies.length,receipts:rawReceipts.length}};
+    r7.performance.pass=Object.values(r7.performance).every(ms=>ms!=null&&ms<=4000);
+    return{calendarIssues,auto39012,policyOrder,vehicleProjection,sidebarScroll,r7,counts:{policies:policies.length,receipts:rawReceipts.length}};
   }),'B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT',30000);
   need(r6Runtime.calendarIssues.length===0,'B2_AUTH_R6_ACTIVE_CALENDAR_CONFLICT:'+JSON.stringify(r6Runtime.calendarIssues.slice(0,10)));
   need(r6Runtime.auto39012.found===true&&r6Runtime.auto39012.projectionMatch===true&&r6Runtime.auto39012.currentDenoms.length<=1&&(r6Runtime.auto39012.explicit==null||r6Runtime.auto39012.currentCount<=r6Runtime.auto39012.explicit),'B2_AUTH_R6_AUTO39012_CALENDAR_INVALID:'+JSON.stringify(r6Runtime.auto39012));
   need(r6Runtime.policyOrder.applicable===true&&r6Runtime.policyOrder.pass===true,'B2_AUTH_R6_POLICY_ORDER_INVALID:'+JSON.stringify(r6Runtime.policyOrder));
   if(r6Runtime.vehicleProjection.applicable)need(r6Runtime.vehicleProjection.pass===true,'B2_AUTH_R6_VEHICLE_CURRENT_PROJECTION_INVALID:'+JSON.stringify(r6Runtime.vehicleProjection));
   need(r6Runtime.sidebarScroll.pass===true,'B2_AUTH_R6_SIDEBAR_SCROLL_INVALID:'+JSON.stringify(r6Runtime.sidebarScroll));
+  need(r6Runtime.r7?.policyDetailReceipts?.applicable===true&&r6Runtime.r7.policyDetailReceipts.pass===true,'B2_AUTH_R7_POLICY_DETAIL_RECEIPTS_NOT_CANONICAL:'+JSON.stringify(r6Runtime.r7?.policyDetailReceipts));
+  need(r6Runtime.r7?.receiptPolicyFilter?.applicable===true&&r6Runtime.r7.receiptPolicyFilter.pass===true,'B2_AUTH_R7_RECEIPT_POLICY_FILTER_NOT_ACTIVE_ONLY:'+JSON.stringify(r6Runtime.r7?.receiptPolicyFilter));
+  if(r6Runtime.r7?.samePlateVehicle?.applicable)need(r6Runtime.r7.samePlateVehicle.pass===true,'B2_AUTH_R7_SAME_PLATE_VEHICLE_DUPLICATE:'+JSON.stringify(r6Runtime.r7.samePlateVehicle));
+  if(r6Runtime.r7?.reportedPaymentRows?.applicable)need(r6Runtime.r7.reportedPaymentRows.pass===true,'B2_AUTH_R7_REPORTED_PAYMENT_ROWS_MISSING:'+JSON.stringify(r6Runtime.r7.reportedPaymentRows));
+  need(r6Runtime.r7?.clientKpiStable?.pass===true,'B2_AUTH_R7_CLIENT_KPI_FLICKER_OR_NOT_READY:'+JSON.stringify(r6Runtime.r7?.clientKpiStable));
+  need(r6Runtime.r7?.paymentHierarchy?.pass===true,'B2_AUTH_R7_PAYMENT_HIERARCHY_MISSING:'+JSON.stringify(r6Runtime.r7?.paymentHierarchy));
+  need(r6Runtime.r7?.performance?.pass===true,'B2_AUTH_R7_NAVIGATION_PERFORMANCE_SLOW:'+JSON.stringify(r6Runtime.r7?.performance));
   evidence.r6Runtime=r6Runtime;
   milestone('R6_RUNTIME_DISCRIMINANTS_PASS',r6Runtime);
 

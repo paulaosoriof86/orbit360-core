@@ -20,6 +20,7 @@
 
   var wrappedQuery=false,wrappedClient=false,wrappedPolicies=false;
   var recFilter={};
+  var receiptClassIndex=null,reconcileScheduled=false;
   var status={
     version:'9.2.0-native-store',
     ownerRevision:'20260801-canonical-single-read-owner',
@@ -45,11 +46,36 @@
   var legacyHistorical=function(r){return !!(r&&((r.historicalExigible===true)||clean(r.carteraTipo)==='cartera_historica_exigible'||clean(r.exigibilidad)==='historica_exigible'));};
   function planDenominator(r){var raw=[r&&r.cuota,r&&r.serie,r&&r.numeroReciboFuente].map(clean).find(Boolean)||'',m=raw.match(/(?:^|\s)(\d+)\s*\/\s*(\d+)(?:\s|$)/);return m?Number(m[2]):null;}
   function baseReceiptInactive(r){var s=low(r&&r.estado);return !!(r&&(r.superseded===true||r.calendarActive===false||s==='anulado'||s==='superseded'||s==='reemplazado'));}
+  function rebuildReceiptClassIndex(){
+    var byPolicy=Object.create(null),policyExplicit=Object.create(null),classById=Object.create(null);
+    var policies=Orbit.store&&Orbit.store.all?Orbit.store.all('polizas')||[]:[],rows=Orbit.store&&Orbit.store.all?Orbit.store.all('recibosEsperados')||[]:[];
+    policies.forEach(function(p){var id=clean(p&&p.id);if(id)policyExplicit[id]=Number(p&&p.cuotas);});
+    rows.forEach(function(r){
+      var id=clean(r&&r.id),pid=clean(r&&r.polizaId);
+      if(baseReceiptInactive(r)){if(id)classById[id]='history';return;}
+      if(!byPolicy[pid])byPolicy[pid]=[];
+      byPolicy[pid].push(r);
+    });
+    Object.keys(byPolicy).forEach(function(pid){
+      var group=byPolicy[pid],explicit=policyExplicit[pid],denoms=[...new Set(group.map(planDenominator).filter(function(n){return Number.isFinite(n)&&n>0;}))];
+      group.forEach(function(r){
+        var id=clean(r&&r.id),d=planDenominator(r),kind;
+        if(Number.isFinite(explicit)&&explicit>0)kind=d&&d!==explicit?'history':'current';
+        else kind=denoms.length<=1?'current':(d?'review':'current');
+        if(id)classById[id]=kind;
+      });
+    });
+    receiptClassIndex={classById:classById,policyExplicit:policyExplicit,byPolicy:byPolicy};
+    return receiptClassIndex;
+  }
+  function invalidateReceiptClassIndex(){receiptClassIndex=null;}
   function calendarClassReceipt(r){
     if(!r)return'history';if(baseReceiptInactive(r))return'history';
-    var p=Orbit.store&&Orbit.store.get?Orbit.store.get('polizas',r.polizaId)||{}:{},explicit=Number(p.cuotas),d=planDenominator(r);
+    var idx=receiptClassIndex||rebuildReceiptClassIndex(),id=clean(r&&r.id);
+    if(id&&Object.prototype.hasOwnProperty.call(idx.classById,id))return idx.classById[id];
+    var pid=clean(r&&r.polizaId),explicit=idx.policyExplicit[pid],d=planDenominator(r),group=idx.byPolicy[pid]||[];
     if(Number.isFinite(explicit)&&explicit>0)return d&&d!==explicit?'history':'current';
-    var siblings=Orbit.store&&Orbit.store.where?Orbit.store.where('recibosEsperados',function(x){return x&&x.polizaId===r.polizaId&&!baseReceiptInactive(x);}):[],denoms=[...new Set(siblings.map(planDenominator).filter(function(n){return Number.isFinite(n)&&n>0;}))];
+    var denoms=[...new Set(group.map(planDenominator).filter(function(n){return Number.isFinite(n)&&n>0;}))];
     if(denoms.length<=1)return'current';return d?'review':'current';
   }
   function calendarClass(r){
@@ -110,6 +136,7 @@
     if(r&&low(r.estadoOperativo)==='requiere_validacion_estado')return{t:'Requiere validación',c:'warn'};
     return{t:'Pendiente de conciliación',c:'warn'};
   }
+  function activePolicy(p){return !!(p&&(p.estado==='Vigente'||p.estado==='Por renovar'));}
   function stateLabel(r){
     if(isPaymentReconciled(r))return{t:'Cobro conciliado',c:'ok'};
     var s=clean(r&&r.estadoOperativo);
@@ -201,7 +228,7 @@
   }
   function editReceipt(receiptId,cid){
     var r=Orbit.store.get('recibosEsperados',receiptId);if(!r)return false;
-    if(receiptLockedForEdit(r)){try{Orbit.ui.toast('Este recibo tiene evidencia de pago y está protegido. Usa una gestión controlada para corregirlo.');}catch(e){}return false;}
+    if(receiptLockedForEdit(r)){try{Orbit.ui.toast('La edición está bloqueada porque existe evidencia de pago. Usa una gestión controlada para corregirlo.');}catch(e){}return false;}
     if(!Orbit.policyReceipts||typeof Orbit.policyReceipts.updateReceipt!=='function')return false;
     var cur=r.moneda||(Orbit.store.get('polizas',r.polizaId)||{}).moneda||'GTQ',old=document.getElementById('rp-edit-receipt');if(old)old.remove();
     var back=document.createElement('div');back.id='rp-edit-receipt';back.className='drawer-back open';back.style.cssText='display:grid;place-items:center;z-index:245';
@@ -233,7 +260,7 @@
       +'</div></section><div style="display:grid;gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🔎 Estado y conciliación</h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'+badges+'</div><div class="muted" style="line-height:1.5">'+esc(receiptStateNote(r,portfolio))+'</div>'
       +(portfolio?'<div style="margin-top:10px">En cartera: <span style="font-weight:600">'+esc(moneyDetail(portfolio.primaTotal||portfolio.montoTotal||portfolio.monto||r.primaTotal||r.montoTotal||r.monto,cur))+'</span></div>':'')
       +'</section><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">📅 Información del registro</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px">'+(operationalAsOf||'<div class="muted">Sin fecha adicional reportada.</div>')+'</div><details class="gi-technical-origin" style="margin-top:14px"><summary>Detalles de origen y auditoría</summary><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px">'+trace+'</div></details></section></div></div></div>';
-    if(canEditPlan){var statusEl=target.querySelector('[data-rp-hero-status="1"]');if(statusEl){var parent=statusEl.parentElement,locked=receiptLockedForEdit(r),edit=document.createElement('button');edit.className='btn primary sm';edit.setAttribute('data-rp-edit-receipt','1');edit.textContent=locked?'🔒 Recibo protegido':'✏ Editar este recibo';edit.style.marginLeft='8px';edit.disabled=locked;if(!locked)edit.addEventListener('click',function(){editReceipt(r.id,cid||r.clienteId);});parent&&parent.appendChild(edit);var btn=document.createElement('button');btn.className='btn ghost sm';btn.textContent='Editar plan de recibos';btn.style.marginLeft='8px';btn.addEventListener('click',function(){Orbit.modules.cliente360.editarPoliza(p.id);});parent&&parent.appendChild(btn);}}
+    if(canEditPlan){var statusEl=target.querySelector('[data-rp-hero-status="1"]');if(statusEl){var parent=statusEl.parentElement,locked=receiptLockedForEdit(r),edit=document.createElement('button');edit.className='btn primary sm';edit.setAttribute('data-rp-edit-receipt','1');edit.textContent=locked?'🔒 Edición bloqueada · existe evidencia de pago':'✏ Editar este recibo';edit.style.marginLeft='8px';edit.disabled=locked;if(!locked)edit.addEventListener('click',function(){editReceipt(r.id,cid||r.clienteId);});parent&&parent.appendChild(edit);var btn=document.createElement('button');btn.className='btn ghost sm';btn.textContent='Editar plan de recibos';btn.style.marginLeft='8px';btn.addEventListener('click',function(){Orbit.modules.cliente360.editarPoliza(p.id);});parent&&parent.appendChild(btn);}}
     return true;
   }
   function openReceiptDetail(receiptId,cid){return renderReceiptDetail(receiptId,cid);}
@@ -251,8 +278,8 @@
     body.setAttribute('data-rp-receipt-history-count',String(receiptHistory.length));
     body.setAttribute('data-rp-receipt-review-count',String(receiptReview.length));
     body.setAttribute('data-rp-portfolio-count',String(portfolio.length));
-    var policies=Orbit.store.where('polizas',function(p){return p&&p.clienteId===cid;});
-    var selected=recFilter[cid]||'todas';var shown=selected==='todas'?receipts:receipts.filter(function(r){return r.polizaId===selected;});
+    var policies=Orbit.store.where('polizas',function(p){return p&&p.clienteId===cid;}).filter(activePolicy);
+    var selected=recFilter[cid]||'todas';if(selected!=='todas'&&!policies.some(function(p){return p.id===selected;})){selected='todas';recFilter[cid]='todas';}var shown=selected==='todas'?receipts:receipts.filter(function(r){return r.polizaId===selected;});
     var ps=portfolioSummary(cid),cur=(Orbit.store.get('clientes',cid)||{}).moneda||'GTQ';
     var opts='<option value="todas">Todas las pólizas</option>'+policies.map(function(p){return'<option value="'+esc(p.id)+'" '+(selected===p.id?'selected':'')+'>'+esc(policyLabel(p))+'</option>';}).join('');
     var rows=shown.map(function(r){
@@ -318,21 +345,31 @@
     return wrappedClient&&wrappedPolicies;
   }
 
-  function reconcileOwners(){installQueryProjection();installVisualBridges();refreshStatus();setTimeout(function(){try{patchClient(document.getElementById('host'));}catch(e){}},0);}
+  function reconcileOwners(){installQueryProjection();installVisualBridges();refreshStatus();setTimeout(function(){try{patchClient(document.getElementById('mod-host')||document.getElementById('host'));}catch(e){}},0);}
+  function scheduleReconcile(delay){
+    if(reconcileScheduled)return;
+    reconcileScheduled=true;
+    setTimeout(function(){reconcileScheduled=false;reconcileOwners();},Math.max(0,Number(delay)||0));
+  }
   function boot(){
-    var tries=0,t=setInterval(function(){
-      tries++;reconcileOwners();
-      if(status.ready||tries>100)clearInterval(t);
-    },100);
+    reconcileOwners();
+    setTimeout(function(){scheduleReconcile(0);},250);
+    setTimeout(function(){if(!status.ready)scheduleReconcile(0);},1000);
   }
 
-  w.addEventListener('hashchange',function(){setTimeout(reconcileOwners,0);});
-  w.addEventListener('orbit:lab:canonical-view-hydrated',function(){setTimeout(reconcileOwners,0);});
+  w.addEventListener('hashchange',function(){scheduleReconcile(0);});
+  w.addEventListener('orbit:lab:canonical-view-hydrated',function(){scheduleReconcile(0);});
   w.addEventListener('orbit:store:emit',function(event){
     var c=event&&event.detail&&event.detail.collection||'';
-    if(['recibosEsperados','carteraPrimas','polizas','vehiculos','clientes','aseguradoras','cobros','*'].indexOf(c)>=0)setTimeout(reconcileOwners,0);
+    if(c==='recibosEsperados'||c==='polizas'||c==='*')invalidateReceiptClassIndex();
+    if(['recibosEsperados','carteraPrimas','polizas','vehiculos','clientes','aseguradoras','cobros','*'].indexOf(c)>=0)scheduleReconcile(0);
   });
-  try{document.addEventListener('orbit:session',function(){setTimeout(reconcileOwners,0);});}catch(e){}
+  try{document.addEventListener('orbit:store',function(event){
+    var c=event&&event.detail&&event.detail.collection||'';
+    if(c==='recibosEsperados'||c==='polizas'||c==='*')invalidateReceiptClassIndex();
+    if(['recibosEsperados','carteraPrimas','polizas','vehiculos','clientes','aseguradoras','cobros','*'].indexOf(c)>=0)scheduleReconcile(0);
+  });}catch(e){}
+  try{document.addEventListener('orbit:session',function(){scheduleReconcile(0);});}catch(e){}
 
   Orbit.receiptsPortfolioProjectionV920={
     status:function(){refreshStatus();return clone(status);},

@@ -128,6 +128,7 @@ Orbit.modules = Orbit.modules || {};
 
   function applyVisualAliasesInPlace() {
     if (!S() || typeof S().all !== 'function') return;
+    if (S().__productReadOnlyP0 === true) return;
     (S().all('polizas') || []).forEach(p => {
       if (!p || p.__orbitVisualAliasV1199c) return;
       Object.assign(p, policyVisual(p));
@@ -253,7 +254,8 @@ Orbit.modules = Orbit.modules || {};
     };
   }
   function receiptRows(policyId, cur) {
-    const expected = (S().all('recibosEsperados') || []).filter(r => r.polizaId === policyId).slice().sort((a,b) => safe(first(a.fechaLimite,a.vence,a.fechaVencimiento)).localeCompare(safe(first(b.fechaLimite,b.vence,b.fechaVencimiento))));
+    const schedule = receiptSchedule(policyId);
+    const expected = schedule.rows.slice().sort((a,b) => safe(first(a.fechaLimite,a.vence,a.fechaVencimiento)).localeCompare(safe(first(b.fechaLimite,b.vence,b.fechaVencimiento))));
     const applied = (S().all('cobros') || []).filter(r => r.polizaId === policyId);
     const rows = expected.length ? expected : applied;
     if (!rows.length) return '<div class="muted">Histórico sin calendario de recibos disponible o fuente pendiente de completar.</div>';
@@ -357,11 +359,20 @@ Orbit.modules = Orbit.modules || {};
             field('Inicio de vigencia', fmtDate(p.vigenciaInicio)), field('Fin de vigencia', fmtDate(p.vigenciaFin)), field('Renovación', renewabilityHtml(p), {html:true}),
             field('Suma asegurada', moneyDetail(p.sumaAsegurada, cur)), field('Concepto / riesgo', p.concepto), field('Calidad de información', qualityBlock(p, vehicle), {html:true})
           ], 3))}
-          ${section('💰 Prima y condiciones de pago', `<div class="orbit-premium-grid gi-premium-contract">${[
-            ['Prima neta', pb.net], ['Gastos de expedición', pb.expedition], ['Gastos financieros', pb.finance], ['Descuento / ajuste', pb.sourceAdjustment], ['Otros / asistencias', pb.other], ...(pb.taxable == null ? [] : [['Base imponible para IVA', pb.taxable]]), [ivaLabel, pb.iva], ['Prima total de póliza', pb.total], ['Total calendario de recibos', pb.scheduleTotal]
-          ].map(([k,v])=>`<div class="gi-premium-row ${k==='Prima total de póliza'?'is-total':''}"><span>${esc(k)}</span><b>${esc(moneyDetail(v,cur))}</b></div>`).join('')}</div>${scheduleDelta!=null&&Math.abs(scheduleDelta)>scheduleTolerance?`<div class="badge warn gi-schedule-delta">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · supera tolerancia ${esc(moneyDetail(scheduleTolerance,cur))} y requiere conciliación</div>`:''}${grid([
+          ${section('💰 Prima y condiciones de pago', `<div class="gi-payment-overview">
+            <div class="gi-payment-total"><span>Prima total de póliza</span><b>${esc(moneyDetail(pb.total,cur))}</b><small>Valor contractual de la vigencia</small></div>
+            <div class="gi-payment-focus"><span>Prima neta</span><b>${esc(moneyDetail(pb.net,cur))}</b><small>Antes de cargos e impuestos</small></div>
+            <div class="gi-payment-focus"><span>Calendario vigente</span><b>${esc(moneyDetail(pb.scheduleTotal,cur))}</b><small>${pb.receipts.length} recibo(s) proyectado(s)</small></div>
+          </div>
+          <div class="gi-payment-subtitle">Desglose de prima</div>
+          <div class="orbit-premium-grid gi-premium-contract">${[
+            ['Gastos de expedición', pb.expedition], ['Gastos financieros', pb.finance], ['Descuento / ajuste', pb.sourceAdjustment], ['Otros / asistencias', pb.other], ...(pb.taxable == null ? [] : [['Base imponible para IVA', pb.taxable]]), [ivaLabel, pb.iva]
+          ].map(([k,v])=>`<div class="gi-premium-row"><span>${esc(k)}</span><b>${esc(moneyDetail(v,cur))}</b></div>`).join('')}</div>
+          ${scheduleDelta!=null&&Math.abs(scheduleDelta)>scheduleTolerance?`<div class="badge warn gi-schedule-delta">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · supera tolerancia ${esc(moneyDetail(scheduleTolerance,cur))} y requiere conciliación</div>`:''}
+          <div class="gi-payment-subtitle">Condiciones de pago</div>
+          <div class="gi-payment-conditions">${grid([
             field('Frecuencia', first(p.frecuencia, p.forma)), field('Forma de pago', p.formaPago), field('Conducto', p.conducto)
-          ],3)}`)}
+          ],3)}</div>`)}
           ${section('🚘 Riesgo asegurado / vehículo', vehicleCard(vehicle, cur, p.id, p.clienteId))}
           ${section('🧾 Recibos y cartera', receiptRows(p.id, cur))}
         </div>
@@ -470,6 +481,15 @@ Orbit.modules = Orbit.modules || {};
       '.gi-detail-kpis>div:before{content:"";position:absolute;left:0;top:13px;bottom:13px;width:3px;border-radius:4px;background:var(--red)}',
       '.gi-detail-kpis span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.055em;color:var(--ink-3);font-weight:700}',
       '.gi-detail-kpis b{display:block;margin-top:5px;font-size:17px;font-family:var(--f-display)}',
+      '.gi-payment-overview{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;margin-bottom:16px}',
+      '.gi-payment-total,.gi-payment-focus{border:1px solid #e7e2de;border-radius:14px;padding:14px 15px;background:#faf8f5;min-width:0}',
+      '.gi-payment-total{background:#fff5f6;border-color:#efc9cf;box-shadow:inset 4px 0 0 var(--red)}',
+      '.gi-payment-overview span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.055em;color:var(--ink-3);font-weight:800}',
+      '.gi-payment-overview b{display:block;margin-top:6px;font-family:var(--f-display);font-size:21px;line-height:1.15}',
+      '.gi-payment-total b{font-size:24px;color:var(--red)}',
+      '.gi-payment-overview small{display:block;margin-top:5px;color:var(--ink-3);font-size:11.5px;line-height:1.35}',
+      '.gi-payment-subtitle{font-family:var(--f-display);font-size:13.5px;font-weight:800;color:var(--ink);margin:15px 0 8px;padding-top:12px;border-top:1px solid var(--line)}',
+      '.gi-payment-conditions{background:#f8f6f3;border:1px solid #ebe6e1;border-radius:14px;padding:12px 14px}',
       '.orbit-policy-fullpage section.card,.orbit-vehicle-fullpage section.card{border-radius:17px!important;border:1px solid #e9e4df!important;box-shadow:0 4px 18px rgba(24,28,34,.035)!important;background:#fff!important}',
       '.orbit-policy-fullpage .tbl thead th{background:#f8f6f3;color:#555d66;font-size:10.5px;letter-spacing:.055em;text-transform:uppercase}',
       '.orbit-policy-fullpage .tbl tbody tr:hover{background:#fff8f8}',
@@ -480,8 +500,8 @@ Orbit.modules = Orbit.modules || {};
       '#cob-det.gi-receipt-detail>.card>div:first-child .crumb,#cob-det.gi-receipt-detail>.card>div:first-child b,#cob-det.gi-receipt-detail>.card>div:first-child .mono{color:var(--ink)!important}',
       '#cob-det.gi-receipt-detail #cd-x{background:#fff!important;border-color:#ddd7d2!important;color:var(--ink)!important}',
       '#cob-det.gi-receipt-detail .vp-grid{background:#faf8f5;border-radius:14px;padding:12px}',
-      '@media(max-width:1050px){.orbit-detail-layout{grid-template-columns:1fr!important}.orbit-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.gi-detail-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}',
-      '@media(max-width:680px){.orbit-detail-grid,.orbit-premium-grid,.gi-detail-kpis{grid-template-columns:1fr!important}.orbit-policy-fullpage h2,.orbit-vehicle-fullpage h2{font-size:20px!important}.fichahdr h2{font-size:20px!important;line-height:1.15}.vp-head{position:relative}.page{padding-left:12px!important;padding-right:12px!important}.gi-integrity-warning{align-items:flex-start;flex-direction:column}}'
+      '@media(max-width:1050px){.orbit-detail-layout{grid-template-columns:1fr!important}.orbit-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.gi-detail-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.gi-payment-overview{grid-template-columns:1fr 1fr}.gi-payment-total{grid-column:1/-1}}',
+      '@media(max-width:680px){.orbit-detail-grid,.orbit-premium-grid,.gi-detail-kpis,.gi-payment-overview{grid-template-columns:1fr!important}.gi-payment-total{grid-column:auto}.orbit-policy-fullpage h2,.orbit-vehicle-fullpage h2{font-size:20px!important}.fichahdr h2{font-size:20px!important;line-height:1.15}.vp-head{position:relative}.page{padding-left:12px!important;padding-right:12px!important}.gi-integrity-warning{align-items:flex-start;flex-direction:column}}'
     ].join('');
     document.head.appendChild(style);
   }

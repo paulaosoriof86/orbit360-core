@@ -173,68 +173,76 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "ASSISTANT_FORENSIC_VISUAL_AUDIT_AFTER_AUTH_PASS_20260926",
-    "parentHead": "cc0e8434578838f617ae7d5b6f7682dab09455f3",
-    "status": "R6E_HARNESS_SYNTAX_FIXED_PENDING_EXACT_PREVIEW",
+    "origin": "PAULA_VISUAL_REJECTION_R7_ROOT_CAUSE",
+    "parentHead": "35eb232add306a96d2d4640e1e7fb1c38ddcad36",
+    "status": "R7_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "orbit360-platform/index.html"
     ],
-    "preservedPass": [
-      "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN_LEAKCOUNT_0",
-      "COTIZADOR_COMPARATIVO_PERMISSION_RUNTIME",
-      "CLIENT_CRUD",
-      "POLICY_CRUD",
-      "VEHICLE_SAME_ID_EDIT",
-      "VEHICLE_TO_POLICY_PRESERVES_POLICYID_VEHICLEID",
-      "INDIVIDUAL_RECEIPT_EDIT",
-      "SYNTHETIC_INSURER_LOGO_CREDENTIAL_BACKEND",
-      "SYNTHETIC_RENEWAL_DURABLE",
-      "ZERO_CONFIRMED_COBRO_FROM_POLICY_CREATION_ONLY"
-    ],
-    "rootCauses": {
-      "residualTechnicalLanguage": "UNLINKED_POLICY_VEHICLE_WARNING_STILL_EXPOSED_PHYSICAL_RECORD_AND_ID_LANGUAGE",
-      "latentVehicleRuntimeDefect": "AMBIGUOUS_VEHICLE_PATH_REFERENCED_REMOVED_vehiclePolicySort_FUNCTION",
-      "validatorGap": "AUTHENTICATED_VISUAL_SCAN_DID_NOT_INCLUDE_PHYSICAL_ID_LANGUAGE_AND_R6_RUNTIME_INVARIANTS"
+    "productBlobs": {
+      "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "81cb2db0a7b3a26387fba980d9cecaa5f8d3d4eb",
+      "orbit360-platform/index.html": "cc1fb44fab57db6824494ca40fd2027739d62387"
     },
-    "receiptRule": "EXPLICIT_POLICY_CUOTAS_AUTHORITY_IF_PRESENT_ELSE_SINGLE_PHYSICAL_DENOMINATOR_ELSE_FAIL_CLOSED_REVIEW",
-    "noFrequencyAssumption": true,
-    "noDataReimport": true,
-    "noLive": true,
-    "noB3": true,
-    "exactSetRebound": true,
-    "followupFix": "R6E_REGEX_LITERAL_SYNTAX_REPAIR",
-    "followupRootCause": {
-      "classification": "HARNESS_ONLY_SYNTAX_DEFECT",
-      "failedRunId": 36249379823,
-      "failedJobId": 108424426293,
-      "error": "SyntaxError: Invalid regular expression flags",
-      "cause": "R6D generated double-escaped backslashes inside a regex literal during harness optimization.",
-      "productRegressionDemonstrated": false
-    },
-    "latestCausalOwner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
-    "latestCausalBlob": "320cd86487581a267a165f2df6d6c1b37c497560",
-    "mechanismFile": "tools/gravicentra-i6-5-b2-functional.mjs",
-    "mechanismBlob": "2299142218a40d59b25a518d102a7c6a49322da5",
-    "latestCausalFix": "R6C_RESIDUAL_TECHNICAL_LANGUAGE_STALE_VEHICLE_SORT_AND_RUNTIME_DISCRIMINANTS",
     "mechanismFiles": [
       "tools/gravicentra-i6-5-b2-functional.mjs",
       "tools/gravicentra-i6-5-b2-authenticated-preview.mjs"
     ],
     "mechanismBlobs": {
-      "functional": "59dbbcc39914c9364b664cd40dc1adee5e9cf804",
-      "authenticated": "4fafa9de303f42d54ebbee5cd78c64b885fc3903"
+      "tools/gravicentra-i6-5-b2-functional.mjs": "e1b952ae8a66eefd800b07230367d9fd3977acdd",
+      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs": "c3e1d11f7d00c19fc9ddf8690e94bb840e291122"
+    },
+    "rootCauses": {
+      "R54": [
+        "calendarClassReceipt performed a full recibosEsperados sibling scan for each receipt classification, creating O(n^2) work on receipt-heavy screens.",
+        "policy/vehicle visual alias application rescanned all policies and vehicles on product read-only navigation even though store.all returns copies.",
+        "receipt owner reconciliation polled every 100ms up to 100 attempts and repeated owner/status work."
+      ],
+      "R55": "Cliente 360 rendered raw/partially hydrated rows when clientProjection or authoritative clientes/polizas/cobros/asesores snapshots were not all ready.",
+      "R56": "Policy full-page receiptRows bypassed receiptSchedule() and read raw recibosEsperados directly.",
+      "R57": "Native receipt filter built options from every client policy rather than current/renewable policies.",
+      "R58": "Cobros table rendered only r.cob while pago_reportado records were reduced to an informational count.",
+      "R59": "Vehicle grouping prioritized lineage root over normalized plate, allowing one plate to render as multiple cards.",
+      "R60": "Payment section used one flat breakdown grid without clear total/schedule/conditions hierarchy."
+    },
+    "fixes": {
+      "R54": [
+        "Single-pass cached receipt calendar classification index with invalidation only on relevant store events.",
+        "Skip ineffective full policy/vehicle alias rescans on product read-only store.",
+        "Replace 100ms polling loop with coalesced event-driven reconciliation plus bounded startup retries."
+      ],
+      "R55": "Authoritative-ready barrier requires clientProjection plus server-confirmed clientes/polizas/cobros/asesores before KPI/list render.",
+      "R56": "Policy full page now consumes receiptSchedule(policyId).rows, the same canonical calendar projection used elsewhere.",
+      "R57": "Receipt policy selector now lists only Vigente/Por renovar policies and resets stale historical selections.",
+      "R58": "Reported payments now render as evidence rows in Cobros without being counted as confirmed cobros.",
+      "R59": "Normalized plate is the primary same-client vehicle identity key; lineage remains fallback/history.",
+      "R60": "Payment section now separates total, net, current schedule, breakdown and payment conditions."
     },
     "strengthenedProof": [
-      "R47_CURRENT_VEHICLE_PROJECTION_RUNTIME",
-      "R48_GLOBAL_SINGLE_ACTIVE_CALENDAR_RUNTIME",
-      "R48_AUTO39012_RUNTIME",
-      "R49_POLICY_BUSINESS_ORDER_RUNTIME",
-      "R50_BUSINESS_LANGUAGE_RUNTIME",
-      "R53_SIDEBAR_SCROLL_RUNTIME"
+      "R7 policy-detail receipt count must equal canonical current-calendar count",
+      "R7 receipt selector values must equal active policy ids",
+      "R7 same-plate raw records must project to one current vehicle card",
+      "R7 pago_reportado must render as visible evidence rows when present",
+      "R7 Cliente 360 KPI footer must remain stable after authoritative render",
+      "R7 payment hierarchy elements must exist",
+      "R7 measured list/detail/tab transitions must each complete within 4 seconds"
     ],
-    "productFileBlobsChanged": false,
-    "immutableBuildRequiredAfterMechanismChange": true
+    "preservedPass": [
+      "R49 reviewed-client policy ordering",
+      "R50 reviewed-surface business language",
+      "R52 isolated logo persistence"
+    ],
+    "deferredUntouched": [
+      "B2-R46 invitation/reset delivery debt",
+      "B4 renewal single-owner consolidation",
+      "B3 canonical payment/conciliation/inference engine"
+    ],
+    "noDataReimport": true,
+    "noLive": true,
+    "noB3": true
   }
 }

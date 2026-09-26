@@ -24,7 +24,29 @@ Orbit.modules.cliente360 = (function () {
   const LIST_PAGE_SIZE = 40;
   let listPage = 1;
   let listRenderSeq = 0;
+  let listWaitingForReady = false;
+  let listReadyTimer = null;
   const perfNow = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
+  function clientListDataReady() {
+    const store = S();
+    const projectionReady = !!(Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function');
+    if (!projectionReady) return false;
+    if (!store || store.__productReadOnlyP0 !== true || typeof store._productStatus !== 'function') return true;
+    const ps = store._productStatus() || {};
+    const confirmed = ps.serverConfirmedCollections || [];
+    return ['clientes','polizas','cobros','asesores'].every(name => confirmed.includes(name));
+  }
+  function scheduleClientListReadyRender(delay) {
+    if (!listWaitingForReady || listReadyTimer) return;
+    listReadyTimer = setTimeout(() => {
+      listReadyTimer = null;
+      if (!listWaitingForReady || shownCid || !host || !clientListDataReady()) return;
+      lista();
+    }, Math.max(0, Number(delay) || 0));
+  }
+  function renderClientListLoading() {
+    host.innerHTML = `<div class="page">${Orbit.kit.bannerFor('cliente360', '')}<div class="card pad" data-c360-authoritative-loading="1"><b>Cargando cartera de clientes…</b><div class="muted" style="margin-top:5px">Validando clientes, pólizas, cobros y asesores antes de mostrar indicadores.</div></div></div>`;
+  }
   function ensureClientNameCaseStyle() {
     if (document.getElementById('c360-client-name-case-style')) return;
     const style = document.createElement('style');
@@ -49,6 +71,12 @@ Orbit.modules.cliente360 = (function () {
   }
 
   const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'siniestros', 'comisiones', 'correos', 'historial'];
+  window.addEventListener('orbit:store:emit', event => {
+    if (!listWaitingForReady) return;
+    const collection = event && event.detail && event.detail.collection;
+    if (!collection || ['*','clientes','polizas','cobros','asesores'].includes(collection)) scheduleClientListReadyRender(0);
+  });
+  window.addEventListener('orbit:lab:canonical-view-hydrated', () => scheduleClientListReadyRender(0));
 
   // ---------- entry ----------
   function render(h) {
@@ -81,6 +109,13 @@ Orbit.modules.cliente360 = (function () {
      ========================================================= */
   function lista() {
     const f = filtros;
+    if (!clientListDataReady()) {
+      listWaitingForReady = true;
+      renderClientListLoading();
+      scheduleClientListReadyRender(250);
+      return;
+    }
+    listWaitingForReady = false;
     const renderStartedAt = perfNow();
     const summaryStartedAt = perfNow();
     const batchRunner = Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function' ? Orbit.clientProjection.withReadBatch : null;
@@ -509,37 +544,64 @@ Orbit.modules.cliente360 = (function () {
   /* ---- Cobros y cartera ---- */
   function tabCobros(cid, r) {
     const polFil = (window._cobFilPol && window._cobFilPol[cid]) || '';
-    const cob = r.cob.filter(c => !polFil || c.polizaId === polFil).sort((a, b) => (b.vence||'').localeCompare(a.vence||''));
-    const polOptions = '<option value="">Todas las pólizas</option>' + r.pol.map(p => {
+    const activePolicies = r.pol.filter(esRenovable);
+    const activePolicyIds = new Set(activePolicies.map(p => String(p.id)));
+    const cobAll = r.cob.filter(c => !c.polizaId || activePolicyIds.has(String(c.polizaId)));
+    const cob = cobAll.filter(c => !polFil || c.polizaId === polFil).sort((a, b) => (b.vence||'').localeCompare(a.vence||''));
+    const receiptSource = q.recibosEsperadosDe ? q.recibosEsperadosDe(cid) : S().where('recibosEsperados', x => x && x.clienteId === cid);
+    const reportedAll = (receiptSource || []).filter(x => x && String(x.estadoOperativo || '').toLowerCase() === 'pago_reportado' && activePolicyIds.has(String(x.polizaId || '')));
+    const reported = reportedAll.filter(x => !polFil || x.polizaId === polFil).sort((a,b) => String(b.fechaPagoReportada||b.fechaPago||'').localeCompare(String(a.fechaPagoReportada||a.fechaPago||'')));
+    const polOptions = '<option value="">Todas las pólizas vigentes</option>' + activePolicies.map(p => {
       const ase = S().all('aseguradoras').find(a => a && a.id === p.aseguradoraId);
       const lbl = (p.numero||'—') + ' · ' + (ase ? ase.nombre : '—') + (p.ramo ? ' · '+p.ramo : '');
       return '<option value="' + U.esc(p.id) + '" ' + (polFil === p.id ? 'selected' : '') + '>' + U.esc(lbl) + '</option>';
     }).join('');
-    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="cob-pol-fil" class="o-sel" style="max-width:320px;font-size:12.5px">${polOptions}</select></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
-      ${miniStat('Al día (pagado)', U.money(r.cobrado, r.moneda), 'ok')}
-      ${miniStat('Pendiente', U.money(r.pendiente, r.moneda), 'warn')}
-      ${miniStat('Vencido', U.money(r.vencido, r.moneda), r.vencido > 0 ? 'danger' : 'ok')}
+    const confirmedRows = cob.map(c => {
+      const p = S().get('polizas', c.polizaId);
+      return `<tr data-confirmed-cobro="1">
+        <td><span class="mono" style="font-size:12px">${p ? p.numero : '—'}</span></td>
+        <td>${c.cuota || '—'}</td>
+        <td class="num">${U.money(c.monto, c.moneda)}</td>
+        <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
+        <td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">—</span>'}</td>
+        <td style="font-size:12.5px">${c.metodo || '<span class="muted">—</span>'}</td>
+        <td>${cobBadge(c)}</td>
+        <td>${c.estado === 'Pagado' ? (c.conciliado ? '<span title="Confirmado y conciliado con la póliza" style="color:var(--ok)">✓</span>' : '<span title="Cobro confirmado pendiente de conciliación" style="color:var(--warn)">◷</span>') : '<span class="muted">—</span>'}</td>
+      </tr>`;
+    }).join('');
+    const reportedRows = reported.map(x => {
+      const p = S().get('polizas', x.polizaId);
+      const amount = U.finiteNumber(x.primaTotal != null ? x.primaTotal : (x.montoTotal != null ? x.montoTotal : x.monto));
+      const paymentDate = x.fechaPagoReportada || x.fechaPago || '';
+      const method = x.metodoPago || x.metodo || x.formaPago || '';
+      return `<tr data-reported-payment-evidence="1">
+        <td><span class="mono" style="font-size:12px">${p ? p.numero : (x.polizaNumero || '—')}</span></td>
+        <td>${U.esc(x.serie || x.cuota || x.numeroReciboFuente || '—')}</td>
+        <td class="num">${amount == null ? '<span class="muted">—</span>' : U.money(amount, x.moneda || (p && p.moneda) || r.moneda)}</td>
+        <td style="font-size:12.5px">${U.fmtDate(x.fechaLimite || x.vence || x.fechaVencimiento)}</td>
+        <td style="font-size:12.5px">${paymentDate ? U.fmtDate(paymentDate) : '<span class="muted">—</span>'}</td>
+        <td style="font-size:12.5px">${method ? U.esc(method) : '<span class="muted">—</span>'}</td>
+        <td><span class="badge info">Pago reportado · por validar</span></td>
+        <td><span class="badge warn">Pendiente</span></td>
+      </tr>`;
+    }).join('');
+    const visibleRows = confirmedRows + reportedRows;
+    const note = reported.length
+      ? `Hay <b>${reported.length}</b> pago(s) reportado(s) pendientes de validación. Se muestran como evidencia y no incrementan cobros confirmados.`
+      : 'No hay pagos reportados pendientes de validación para el filtro actual.';
+    return `<div class="card" data-rp-native-cobros-note="1" style="padding:12px 14px;margin-bottom:12px"><b>Cobros y evidencia de pago</b><div class="muted" style="font-size:12.5px;margin-top:3px">${note} Los cobros confirmados se muestran en la misma tabla y su conciliación se mantiene separada.</div></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="cob-pol-fil" class="o-sel" style="max-width:360px;font-size:12.5px">${polOptions}</select></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+      ${miniStat('Cobrado confirmado', U.money(r.cobrado, r.moneda), 'ok')}
+      ${miniStat('Cartera por vencer', U.money(r.pendiente, r.moneda), 'warn')}
+      ${miniStat('Cartera exigible', U.money(r.vencido, r.moneda), r.vencido > 0 ? 'danger' : 'ok')}
     </div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Método</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th></tr></thead>
-      <tbody>${cob.map(c => {
-        const p = S().get('polizas', c.polizaId);
-        return `<tr>
-          <td><span class="mono" style="font-size:12px">${p ? p.numero : '—'}</span></td>
-          <td>${c.cuota}</td>
-          <td class="num">${U.money(c.monto, c.moneda)}</td>
-          <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
-          <td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">—</span>'}</td>
-          <td style="font-size:12.5px">${c.metodo || '<span class="muted">—</span>'}</td>
-          <td>${cobBadge(c)}</td>
-          <td>${c.estado === 'Pagado' ? (c.conciliado ? '<span title="Confirmado y conciliado con la póliza" style="color:var(--ok)">✓</span>' : '<span title="Pendiente de conciliar (Finanzas)" style="color:var(--warn)">◷</span>') : '<span class="muted">—</span>'}</td>
-        </tr>`;
-      }).join('')}${cob.length === 0 ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:28px">Sin cobros.</td></tr>' : ''}</tbody>
+      <thead><tr><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Método</th><th>Estado</th><th>Conciliación</th></tr></thead>
+      <tbody>${visibleRows || '<tr><td colspan="8" class="muted" style="text-align:center;padding:28px">Sin cobros confirmados ni pagos reportados para el filtro actual.</td></tr>'}</tbody>
     </table></div>
-    <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3);display:flex;align-items:center;gap:8px">
-      <span style="color:var(--ok)">✓</span> conciliado &nbsp;·&nbsp; <span style="color:var(--warn)">◷</span> por conciliar — la <b>doble conciliación</b> (pago ↔ póliza) vive en <b>Finanzas</b>.
-    </div></div>`;
+    <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Pago reportado ≠ cobro confirmado. Cobro confirmado ≠ necesariamente conciliado. La conciliación no cambia la fecha real del pago.</div></div>`;
   }
+
   function miniStat(label, val, tone) {
     const col = tone === 'ok' ? 'var(--ok)' : tone === 'warn' ? 'var(--warn)' : tone === 'danger' ? 'var(--danger)' : 'var(--ink)';
     return `<div class="card" style="padding:13px 15px"><div style="font-size:11.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600">${label}</div>
@@ -600,6 +662,9 @@ Orbit.modules.cliente360 = (function () {
     while(parent&&!seen.has(parent)){seen.add(parent);root=parent;const p=byId.get(parent);parent=String(p&&p.versionOfVehicleId||'');}
     return root;
   }
+  function vehiclePlateKey(v) {
+    return String(v&&v.placa||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  }
   function tabVehiculos(cid, r) {
     const rawVs = q.vehiculosDe(cid);
     const vs = rawVs.map(canonicalVehicle);
@@ -608,10 +673,10 @@ Orbit.modules.cliente360 = (function () {
     const byId=new Map(vs.filter(v=>v&&v.id).map(v=>[String(v.id),v]));
     const referenced=new Set(vs.map(v=>String(v&&v.versionOfVehicleId||'')).filter(Boolean));
     vs.forEach(v=>{
-      const plate=vehicleShown(v.placa),root=vehicleLineageRoot(v,byId),hasLineage=!!String(v&&v.versionOfVehicleId||'')||referenced.has(String(v&&v.id||''));
+      const plate=vehicleShown(v.placa),plateKey=vehiclePlateKey(v),root=vehicleLineageRoot(v,byId),hasLineage=!!String(v&&v.versionOfVehicleId||'')||referenced.has(String(v&&v.id||''));
       const linkedPolicy=S().get('polizas',v.polizaId)||{},linkedCurrent=policyBusinessRank(linkedPolicy)<=1;
-      if(!hasLineage&&plate==='—'&&!linkedCurrent){ambiguous.push(v);return;}
-      const key=hasLineage?('lineage:'+root):(plate!=='—'?('plate:'+plate.toUpperCase()):('current:'+String(v.id||v.polizaId||'')));
+      if(!hasLineage&&!plateKey&&!linkedCurrent){ambiguous.push(v);return;}
+      const key=plateKey?('plate:'+plateKey):(hasLineage?('lineage:'+root):('current:'+String(v.id||v.polizaId||'')));
       if(!groups.has(key))groups.set(key,[]);groups.get(key).push(v);
     });
     const cards=Array.from(groups.entries()).map(([groupKey,records])=>{
@@ -619,7 +684,7 @@ Orbit.modules.cliente360 = (function () {
       const v=records[0],p=S().get('polizas',v.polizaId),historyRecords=records.filter(h=>String(h.id)!==String(v.id));
       const historyLabel='vigencia(s) anterior(es) de este vehículo';
       const history=historyRecords.length?`<details style="margin-top:12px"><summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--ink-2)">${historyRecords.length} ${historyLabel}</summary><div style="display:grid;gap:7px;margin-top:9px">${historyRecords.map(h=>{const hp=S().get('polizas',h.polizaId)||{};return `<div style="padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:12px"><b>${U.esc(vehicleShown(h.marca))} ${U.esc(vehicleShown(h.linea))} · ${U.esc(vehicleShown(h.placa))}</b><div class="muted">${U.esc(vehicleShown(hp.numero))} · ${U.fmtDate(hp.vigenciaInicio)} → ${U.fmtDate(hp.vigenciaFin)} · ${U.esc(vehicleShown(hp.estado))}</div><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${h.id}')">Ver registro</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${h.polizaId}')">Ver póliza</button></div></div>`;}).join('')}</div></details>`:'';
-      return `<div class="card pad" data-vehicle-current-card="1" data-vehicle-current-id="${U.esc(String(v.id||''))}" data-vehicle-policy-id="${U.esc(String(v.polizaId||''))}" data-vehicle-history-count="${historyRecords.length}"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="width:46px;height:46px;border-radius:11px;background:var(--red-soft);display:grid;place-items:center;font-size:22px">🚗</span><div><b style="font-family:var(--f-display);font-size:16px">${U.esc(vehicleShown(v.marca))} ${U.esc(vehicleShown(v.linea))}</b><div class="muted mono" style="font-size:12px">${U.esc(vehicleShown(v.placa))} · ${U.esc(vehicleShown(v.anio))}</div></div><span class="badge ${p && p.estado === 'Vigente' ? 'ok' : p && p.estado === 'Por renovar' ? 'warn' : 'neutral'}" style="margin-left:auto">${p ? U.esc(vehicleShown(p.estado)) : '—'}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:12.5px">${vrow('Uso',v.uso)}${vrow('Color',v.color)}${vrow('Chasis (VIN)',v.chasis)}${vrow('Motor',v.motor)}${vrow('Suma asegurada',U.money(v.sumaAsegurada,p?p.moneda:'GTQ'))}${vrow('Póliza',p?p.numero:'—')}</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${v.id}')">Ver vehículo</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.editarVehiculo&&Orbit.modules.cliente360.editarVehiculo('${v.id}')">Editar vehículo</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${v.polizaId}')">Ver póliza</button><button class="btn ghost sm" onclick="Orbit.importa.open('polizas')">Importar documentos</button></div>${history}</div>`;
+      return `<div class="card pad" data-vehicle-current-card="1" data-vehicle-current-id="${U.esc(String(v.id||''))}" data-vehicle-policy-id="${U.esc(String(v.polizaId||''))}" data-vehicle-plate-key="${U.esc(vehiclePlateKey(v))}" data-vehicle-history-count="${historyRecords.length}"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="width:46px;height:46px;border-radius:11px;background:var(--red-soft);display:grid;place-items:center;font-size:22px">🚗</span><div><b style="font-family:var(--f-display);font-size:16px">${U.esc(vehicleShown(v.marca))} ${U.esc(vehicleShown(v.linea))}</b><div class="muted mono" style="font-size:12px">${U.esc(vehicleShown(v.placa))} · ${U.esc(vehicleShown(v.anio))}</div></div><span class="badge ${p && p.estado === 'Vigente' ? 'ok' : p && p.estado === 'Por renovar' ? 'warn' : 'neutral'}" style="margin-left:auto">${p ? U.esc(vehicleShown(p.estado)) : '—'}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:12.5px">${vrow('Uso',v.uso)}${vrow('Color',v.color)}${vrow('Chasis (VIN)',v.chasis)}${vrow('Motor',v.motor)}${vrow('Suma asegurada',U.money(v.sumaAsegurada,p?p.moneda:'GTQ'))}${vrow('Póliza',p?p.numero:'—')}</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${v.id}')">Ver vehículo</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.editarVehiculo&&Orbit.modules.cliente360.editarVehiculo('${v.id}')">Editar vehículo</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${v.polizaId}')">Ver póliza</button><button class="btn ghost sm" onclick="Orbit.importa.open('polizas')">Importar documentos</button></div>${history}</div>`;
     });
     const unresolved=ambiguous.length?`<div class="card pad" data-vehicle-identity-incomplete="1" style="grid-column:1/-1;border-left:3px solid var(--warn)"><b>Pendientes de relacionar o revisar</b><div class="muted" style="margin:5px 0 10px">Estos registros conservan su historial, pero necesitan una relación o identidad suficiente antes de mostrarse como un mismo vehículo.</div><div style="display:grid;gap:7px">${ambiguous.sort(vehiclePolicyCompare).map(h=>{const hp=S().get('polizas',h.polizaId)||{};return `<div style="padding:8px 10px;border:1px solid var(--line);border-radius:10px"><b>${U.esc(vehicleShown(h.marca))} ${U.esc(vehicleShown(h.linea))}</b><div class="muted">${U.esc(vehicleShown(hp.numero))} · ${U.fmtDate(hp.vigenciaInicio)} → ${U.fmtDate(hp.vigenciaFin)} · ${U.esc(vehicleShown(hp.estado))}</div><div style="margin-top:6px;display:flex;gap:6px"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${h.id}')">Ver registro</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${h.polizaId}')">Ver póliza</button></div></div>`;}).join('')}</div></div>`:'';
     return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">${cards.join('')}${unresolved}</div>`;
