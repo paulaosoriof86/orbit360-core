@@ -3636,16 +3636,22 @@ jobs:
           const walk=v=>{if(sdk||v==null)return;if(Array.isArray(v)){for(const x of v)walk(x);return;}if(typeof v==='object'){for(const[k,x]of Object.entries(v)){if(k==='storageBucket'&&typeof x==='string'&&x.trim()){sdk=x.trim();return;}walk(x);}}};
           walk(d);
           (async()=>{
-            const storage=new Storage({projectId:process.env.PROJECT_ID});
-            const [buckets]=await storage.getBuckets({project:process.env.PROJECT_ID});
-            const names=buckets.map(b=>String(b.name||'').trim()).filter(Boolean).sort();
-            let selected='';
-            if(sdk&&names.includes(sdk))selected=sdk;
-            else if(names.length===1)selected=names[0];
-            else if(names.length===0)throw new Error('B2_FIREBASE_STORAGE_NO_EXISTING_BUCKET');
-            else throw new Error('B2_FIREBASE_STORAGE_BUCKET_AMBIGUOUS:'+JSON.stringify({sdk,names}));
-            fs.writeFileSync(process.env.RUNNER_TEMP+'/b2-storage-bucket-readonly.json',JSON.stringify({status:'PASS',sdkStorageBucket:sdk||null,existingBuckets:names,selectedBucket:selected,writeExecuted:false},null,2)+'\n');
-            process.stdout.write(selected);
+            const projectId=String(process.env.PROJECT_ID||'').trim();
+            if(!sdk)throw new Error('B2_FIREBASE_SDKCONFIG_STORAGE_BUCKET_MISSING');
+            if(![projectId+'.firebasestorage.app',projectId+'.appspot.com'].includes(sdk))throw new Error('B2_FIREBASE_SDKCONFIG_STORAGE_BUCKET_UNEXPECTED:'+sdk);
+            const storage=new Storage({projectId});
+            const list=async()=>{const [buckets]=await storage.getBuckets({project:projectId});return buckets.map(b=>String(b.name||'').trim()).filter(Boolean).sort();};
+            let names=await list(),created=false;
+            if(!names.includes(sdk)){
+              const productBuckets=names.filter(n=>!/^gcf-v2-(?:sources|uploads)-/i.test(n)&&!/\.cloudfunctions\.appspot\.com$/i.test(n));
+              if(productBuckets.length)throw new Error('B2_FIREBASE_STORAGE_EXISTING_PRODUCT_BUCKET_CONFLICT:'+JSON.stringify({sdk,productBuckets}));
+              await storage.createBucket(sdk,{location:'US-CENTRAL1',uniformBucketLevelAccess:true,labels:{owner:'gravicentra-insurance',purpose:'product-assets'}});
+              created=true;
+              names=await list();
+              if(!names.includes(sdk))throw new Error('B2_FIREBASE_STORAGE_DEFAULT_BUCKET_CREATE_READBACK_FAILED');
+            }
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/b2-storage-bucket-readonly.json',JSON.stringify({status:'PASS',sdkStorageBucket:sdk,existingBuckets:names,selectedBucket:sdk,createdBucket:created,writeExecuted:created,projectId},null,2)+'\n');
+            process.stdout.write(sdk);
           })().catch(e=>{console.error(e);process.exit(1);});
           NODE
           )
