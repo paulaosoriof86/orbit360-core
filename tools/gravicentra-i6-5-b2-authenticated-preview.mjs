@@ -840,18 +840,17 @@ try{
     }
     push('trace-installed',{role:String(Orbit.session?.rol?.()||'')});
   });
-  const passwordInjected=await page.evaluate(({portalId,secret})=>{
+  const insurerEditInjected=await page.evaluate(({portalId,secret,stamp})=>{
     const row=[...document.querySelectorAll('#asg-ficha [data-portal]')].find(x=>String(x.dataset.resourceId||'')===String(portalId));
-    const input=row&&row.querySelector('[data-ppass]');
-    if(!input)return false;
-    input.focus();
-    const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')?.set;
-    if(setter)setter.call(input,secret); else input.value=secret;
-    input.dispatchEvent(new Event('input',{bubbles:true}));
-    input.dispatchEvent(new Event('change',{bubbles:true}));
-    return input.value===secret;
-  },{portalId,secret:syntheticSecret});
-  need(passwordInjected===true,'B2_AUTH_INSURER_PASSWORD_INJECTION_FAILED');
+    const input=row&&row.querySelector('[data-ppass]'),user=row&&row.querySelector('[data-puser]');
+    if(!input||!user)return{ok:false,password:false,username:false};
+    const setValue=(el,value)=>{el.focus();const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')?.set;if(setter)setter.call(el,value);else el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
+    setValue(input,secret);
+    setValue(user,'b2qa-edited-'+stamp);
+    return{ok:input.value===secret&&user.value==='b2qa-edited-'+stamp,password:input.value===secret,username:user.value==='b2qa-edited-'+stamp};
+  },{portalId,secret:syntheticSecret,stamp});
+  milestone('INSURER_EDIT_INPUTS_INJECTED',insurerEditInjected);
+  need(insurerEditInjected.ok===true,'B2_AUTH_INSURER_EDIT_INPUT_INJECTION_FAILED:'+JSON.stringify(insurerEditInjected));
   let insurerReasonDialog=false;
   await page.click('#asg-ficha #af-guardar');
   // Bind confirmation to the exact prompt overlay created by Guardar cambios.
@@ -912,8 +911,8 @@ try{
   const insurerUpdated=await waitFor(async()=>{
     const s=await dataCol(db,'aseguradoras').doc(insurerId).get();if(!s.exists)return null;
     const d=s.data()||{},portal=[].concat(d.portales||[]).find(x=>String(x.id||'')===portalId);
-    return /^https:\/\/firebasestorage\.googleapis\.com\//.test(String(d.logo||''))&&String(d.logoAssetRef||'').startsWith('preview/tenants/')&&portal&&/^cred_[a-f0-9]{32}$/.test(String(portal.credentialRef||''))?{...d,_portal:portal}:null;
-  },'B2_AUTH_INSURER_EDIT_READBACK',45000);
+    return /^https:\/\/firebasestorage\.googleapis\.com\//.test(String(d.logo||''))&&String(d.logoAssetRef||'').startsWith('preview/tenants/')&&portal&&String(portal.usuario||'')==='b2qa-edited-'+stamp&&/^cred_[a-f0-9]{32}$/.test(String(portal.credentialRef||''))?{...d,_portal:portal}:null;
+  },'B2_AUTH_INSURER_EDIT_READBACK',45000,300);
   need(insurerReasonDialog===true,'B2_AUTH_INSURER_REASON_DIALOG_NOT_SEEN');
   need(!!insurerUpdated,'B2_AUTH_INSURER_EDIT_NOT_DURABLE');
   state.insurerCredentialRef=String(insurerUpdated._portal.credentialRef||'');
