@@ -2086,7 +2086,7 @@
       "rootCause": "renewals-v1200-operational-bridge invokes optimistic Orbit.ciclo.crearGestion; core/ciclo crearGestion uses non-awaited S().insert.",
       "remediation": "Await server-owned create_management + canonical readback before normal success. Preserve approved Renew -> Cotizador/Comparativo -> accepted offer -> Ops issuance -> real renewed policy workflow.",
       "requiredProof": "Synthetic authenticated renewal management appears exactly once in Ops and survives reload; protected real Preview explicitly reports no write; no provisional renewed policy created by clicking Renew.",
-      "status": "SOURCE_RECOMPOSED_R9_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_VISUAL",
+      "status": "SOURCE_REFINED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_VISUAL",
       "blocking": true,
       "sourceFix": {
         "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
@@ -2096,7 +2096,9 @@
       "noLive": true,
       "noB3": true,
       "latestRuleLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R9_RENEWAL_WORKFLOW_BUSINESS_RULE_LOCK_20260926.json",
-      "latestRuleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e"
+      "latestRuleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e",
+      "businessRule": "Propuestas->Ops; Pedir renovar->renewal_accepted en Ops tras aprobación; Cotizar es acción separada y no disponible al Asesor; Ops decide solicitar emisión o registrar renovación en firme.",
+      "prevalentRuleReceipt": "artifacts/orbit360-recovery/release-control/I6_5_RENEWAL_SEMANTICS_PREVALENT_20260926.json"
     },
     {
       "id": "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
@@ -2138,6 +2140,20 @@
         "orbit360-platform/index.html": "ff7e84f91d8078dd8bc6e424920c9101afb44837",
         "tools/gravicentra-i6-5-b2-functional.mjs": "435eb9db882c14682f062bb7a2b0ac54a06ccbfd"
       }
+    },
+    {
+      "id": "B2-R63-RENEWAL-ACTION-SEMANTICS-R9",
+      "block": "B2",
+      "source": "PAULA_EXPLICIT_BUSINESS_RULE_20260926",
+      "surface": "Renovaciones/Cliente360/Ops",
+      "classification": "BUSINESS_RULE_PREVALENT",
+      "finding": "Renewal actions must be semantically separated: Propuestas creates Ops proposal management; Pedir renovar creates accepted-renewal management after client approval; Cotizar is separate and advisor-forbidden; Ops handles issuance request or direct firm-renewal registration.",
+      "status": "SOURCE_IMPLEMENTED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_VISUAL",
+      "blocking": true,
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_RENEWAL_SEMANTICS_PREVALENT_20260926.json",
+      "receiptBlobSha": "112819674f4f112cc85ca0f4a85c76905977f432",
+      "noReimport": true,
+      "noLive": true
     }
   ],
   "phaseBBacklog": [

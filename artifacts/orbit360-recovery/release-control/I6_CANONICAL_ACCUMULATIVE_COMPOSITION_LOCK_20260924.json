@@ -157,7 +157,7 @@
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "cba6099ff7499c452c99f283702f27886154ae23",
     "orbit360-platform/modules/inicio.js": "bbae195ae7725ee1bcd790f1234946b31660d68e",
     "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
-    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c945df58a8b7e29b18214b45ecfd039022f4f443"
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "ed15d860eeebb9768a8eeca173c664ddc1b63dbc"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -177,31 +177,16 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "PAULA_EXPLICIT_RENEWAL_RULE_R9",
-    "parentHead": "a5c351d308a23fd3b9f1bedbb4fc056f24c58499",
-    "status": "R9_RENEWAL_SEMANTICS_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "origin": "PAULA_RENEWAL_SEMANTICS_R9",
+    "parentHead": "d6d3f0a8776b8da5c648989a07907f56e08b2839",
+    "status": "RENEWAL_SEMANTICS_REFINED_PENDING_NEW_EXACT_PREVIEW",
     "changedProductFiles": [
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
-      "orbit360-platform/core/issuance-workflow-v1201.js",
-      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
-      "orbit360-platform/core/policy-receipts-engine.js",
-      "functions/product-ops-leads-domain.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
     ],
     "productBlobs": {
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c945df58a8b7e29b18214b45ecfd039022f4f443",
-      "orbit360-platform/core/issuance-workflow-v1201.js": "fc19d625431fcde54faa0d6d79309e5dff5f1722",
-      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "a4bd2f91a2fca3ab4feb7e6baa83ae418534a978",
-      "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
-      "functions/product-ops-leads-domain.js": "01eacecdd66baf143217e9b6cf5f588902649b1c",
-      "orbit360-platform/index.html": "ff7e84f91d8078dd8bc6e424920c9101afb44837"
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "ed15d860eeebb9768a8eeca173c664ddc1b63dbc"
     },
-    "ruleLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R9_RENEWAL_WORKFLOW_BUSINESS_RULE_LOCK_20260926.json",
-    "ruleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e",
-    "functionalProofBlobSha": "435eb9db882c14682f062bb7a2b0ac54a06ccbfd",
-    "rootCause": "Legacy renewal owner conflated proposals, direct quotation and accepted renewal.",
-    "fix": "Separate Propuestas -> Ops, Cotizar -> role-gated direct quote, Renovar -> accepted Ops management; Ops then requests issuance or registers firm renewal.",
-    "duplicateVersionFix": "Renewal may preserve same commercial policy number only with renuevaDe and a different policyVersionKey.",
+    "semanticContract": "Propuestas->Ops; Pedir renovar->Ops accepted; Cotizar separate for authorized non-advisor roles; Ops issue-or-register-firm-renewal.",
     "noDataReimport": true,
     "noLive": true,
     "noB3": true

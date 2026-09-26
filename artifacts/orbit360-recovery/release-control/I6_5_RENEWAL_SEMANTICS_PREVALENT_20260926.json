@@ -1,0 +1,65 @@
+{
+  "schema": "gravicentra-i6-5-renewal-semantics-prevalent-v1",
+  "recordedAt": "2026-09-26",
+  "authority": "PAULA_EXPLICIT_BUSINESS_RULE",
+  "supersedes": [
+    "RENEW_BUTTON_DIRECT_TO_COTIZADOR",
+    "ADVISOR_DIRECT_RENEWAL_QUOTING"
+  ],
+  "rules": {
+    "proposals": {
+      "uiLabel": "Propuestas",
+      "actor": "Asesor y roles habilitados",
+      "action": "Crear gestión durable en Ops para solicitar propuestas/cotizaciones de renovación.",
+      "advisorDirectQuote": false
+    },
+    "askRenew": {
+      "uiLabel": "Pedir renovar",
+      "precondition": "Cliente ya aprobó renovar.",
+      "action": "Crear gestión durable renewal_accepted en Ops.",
+      "createsPolicyImmediately": false
+    },
+    "directQuote": {
+      "uiLabel": "Cotizar",
+      "separateAction": true,
+      "allowed": "Roles autorizados por encima de Asesor según matriz/permiso vigente.",
+      "advisorAllowed": false
+    },
+    "opsAcceptedRenewal": {
+      "alternatives": [
+        "Solicitar emisión a la aseguradora y mantener gestión hasta recibir póliza real.",
+        "Registrar renovación en el sistema cuando ya existe renovación en firme."
+      ],
+      "directRegistrationInputs": [
+        "aseguradora",
+        "numeroPoliza",
+        "vigenciaInicio",
+        "vigenciaFin",
+        "productoSubramo",
+        "frecuencia",
+        "cuotas",
+        "formaPago",
+        "conducto",
+        "primaNeta",
+        "gastos",
+        "documentoRenovacion"
+      ],
+      "lineage": "La nueva póliza conserva renuevaDe/sourcePolicyId y genera sus propios recibos/cartera sin destruir la póliza origen."
+    }
+  },
+  "surfaces": [
+    "Listado Renovaciones",
+    "Cliente 360",
+    "Ops",
+    "Leads/Ops accepted-renewal path"
+  ],
+  "sourceOwners": [
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+    "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+    "orbit360-platform/core/issuance-workflow-v1201.js",
+    "orbit360-platform/core/policy-receipts-engine.js"
+  ],
+  "noLive": true,
+  "noB3": true,
+  "noReimport": true
+}

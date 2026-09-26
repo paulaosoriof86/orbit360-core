@@ -58,7 +58,7 @@ Orbit.modules = Orbit.modules || {};
       btn.textContent='📋 Propuestas';
       const m=String(btn.getAttribute('onclick')||'').match(/solicitarPropuestas\('([^']+)'\)/);if(!m)return;
       const policyId=m[1],wrap=btn.parentElement;if(!wrap||wrap.dataset.renewalActionsV2)return;wrap.dataset.renewalActionsV2='1';wrap.style.flexWrap='wrap';
-      const renew=document.createElement('button');renew.className='btn primary sm';renew.style.flex='1';renew.textContent='✅ Renovar';renew.onclick=e=>{e.stopPropagation();registrarAceptacion(policyId);};wrap.appendChild(renew);
+      const renew=document.createElement('button');renew.className='btn primary sm';renew.style.flex='1';renew.textContent='✅ Pedir renovar';renew.onclick=e=>{e.stopPropagation();registrarAceptacion(policyId);};wrap.appendChild(renew);
       if(canDirectQuote()){
         const quote=document.createElement('button');quote.className='btn ghost sm';quote.style.flex='1';quote.textContent='🧮 Cotizar';quote.onclick=e=>{e.stopPropagation();cotizarDirecto(policyId);};wrap.appendChild(quote);
       }

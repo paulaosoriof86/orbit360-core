@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -245,7 +245,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PASS",
+    "status": "PENDING_NEW_EXACT_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "10a7e7c98e4dcd54ea9c0b09949426e9700728b8",
     "exactPreviewBuildId": "gi-i65-b2-10a7e7c98e4d-57f234755dc1",
@@ -1463,8 +1463,8 @@
     "broadRediscoveryRequired": false,
     "authorityBlobSha": "2250d63fc5dd2fb824e30b5493e7e6a611fc02d4",
     "findingsLedgerBlobSha": "6912bfbecfc963c3c57c64a058e192ee18173b68",
-    "compositionLockBlobSha": "3fb858d290b1fd2da4eeba1a6a225c8012e0225b",
-    "findingLedgerBlobSha": "56614826509399eef92d0a937c6d46c47fc7d285"
+    "compositionLockBlobSha": "45d4e36d0e3e9907ea6007019d617f3337c54174",
+    "findingLedgerBlobSha": "f69e1f4bc1745d4727750b8f510c24f140508ad2"
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
   "lastPreviewFailure": {
@@ -2383,7 +2383,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "56614826509399eef92d0a937c6d46c47fc7d285",
+  "findingLedgerBlobSha": "f69e1f4bc1745d4727750b8f510c24f140508ad2",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2558,5 +2558,15 @@
     "noLive": true,
     "noB3": true,
     "noReimport": true
+  },
+  "renewalSemanticsR9": {
+    "status": "SOURCE_IMPLEMENTED_PENDING_NEW_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_RENEWAL_SEMANTICS_PREVALENT_20260926.json",
+    "receiptBlobSha": "112819674f4f112cc85ca0f4a85c76905977f432",
+    "requiredVisual": [
+      "Listado muestra Propuestas + Pedir renovar; Cotizar solo si rol autorizado",
+      "Pedir renovar exige aprobación y lleva a Ops",
+      "Ops accepted renewal muestra Solicitar emisión + Registrar renovación en sistema"
+    ]
   }
 }
