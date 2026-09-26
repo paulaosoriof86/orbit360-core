@@ -1,0 +1,135 @@
+{
+  "schema": "gravicentra-i6-5-b2-paula-visual-rejection-r6-v1",
+  "recordedAt": "2026-09-26T07:30:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "decision": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+  "b2Status": "OPEN_REMEDIATION_REQUIRED",
+  "b3Status": "NOT_STARTED",
+  "livePromoted": false,
+  "reviewedPreview": {
+    "sourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
+    "buildId": "gi-i65-b2-2963f4140f2f-57f234755dc1",
+    "runId": 36217789995,
+    "artifactId": 10897739285,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
+    "authenticatedRunId": 36218497058
+  },
+  "preservedPass": [
+    "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN_LEAKCOUNT_0",
+    "COTIZADOR_COMPARATIVO_PERMISSION_RUNTIME",
+    "CLIENT_CRUD",
+    "POLICY_CRUD",
+    "VEHICLE_SAME_ID_EDIT",
+    "VEHICLE_TO_POLICY_PRESERVES_POLICYID_VEHICLEID",
+    "INDIVIDUAL_RECEIPT_EDIT",
+    "SYNTHETIC_INSURER_LOGO_CREDENTIAL_BACKEND",
+    "SYNTHETIC_RENEWAL_DURABLE",
+    "SYNTHETIC_CLEANUP",
+    "ZERO_CONFIRMED_COBRO_FROM_POLICY_CREATION_ONLY"
+  ],
+  "blockers": [
+    {
+      "id": "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
+      "title": "Active vehicle tied to current policy is projected as incomplete history while detail has canonical plate/policy/vigency.",
+      "classification": "CANONICAL_PROJECTION_DIVERGENCE",
+      "invariant": "Any vehicle linked to a current policy is current; historical/versioned rows subordinate to the same canonical identity; ambiguous rows remain pending review, never heuristically merged/deleted."
+    },
+    {
+      "id": "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
+      "title": "A physical policy version visibly has two concurrent active receipt calendars after payment-plan edit.",
+      "classification": "FINANCIAL_PROJECTION_INTEGRITY_BLOCKER",
+      "invariant": "One physical policy version has exactly one active contractual calendar; superseded rows do not count in current schedule/active portfolio; paid/evidenced receipts are preserved with traceability."
+    },
+    {
+      "id": "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
+      "title": "Current policy can render below renewed/historical policies.",
+      "classification": "BUSINESS_ORDERING_DEFECT",
+      "invariant": "Order groups: current, renewal-due, renewed/history, cancelled/void; newest vigency first; same-number versions show current first with history subordinate."
+    },
+    {
+      "id": "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
+      "title": "Operational UI exposes physical IDs/version/lineage language.",
+      "classification": "TECHNICAL_LANGUAGE_LEAK",
+      "invariant": "Operational UI uses business language; physical IDs and lineage remain only in audit/technical detail when needed."
+    },
+    {
+      "id": "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
+      "title": "Section titles/labels remain visually weak while values dominate.",
+      "classification": "VISUAL_HIERARCHY_DEFECT",
+      "invariant": "Section titles semibold/bold; relevant labels semibold; values regular/medium; total/KPI may stand out; apply cumulatively to Cliente360/Policy/Vehicle/Receipt."
+    },
+    {
+      "id": "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6",
+      "title": "Human logo persistence cannot be verified safely against a real insurer in Preview.",
+      "classification": "HUMAN_PROOF_FIXTURE_GAP",
+      "invariant": "Provide visible synthetic insurer fixture for edit/upload/save/refresh/readback/cleanup without relaxing Preview boundary for real insurers."
+    },
+    {
+      "id": "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6",
+      "title": "Sidebar vertical scroll/navigation defect must remain tracked and be fixed now if it blocks module access.",
+      "classification": "NAVIGATION_USABILITY_DEFECT",
+      "invariant": "Sidebar scroll is visible and usable; if non-blocking in B2 it is mandatory carry-forward to B4."
+    }
+  ],
+  "carryForward": [
+    {
+      "id": "B3-CARRY-PAYMENT-CONFIRMED-NOT-CONCILIATED-R6",
+      "block": "B3",
+      "title": "An authorized applied/confirmed payment is a confirmed cobro even before reconciliation.",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS"
+    },
+    {
+      "id": "B3-CARRY-INFERRED-PAYMENT-EFFECTIVE-DATE-R6",
+      "block": "B3",
+      "title": "Inferred payment must not inflate the discovery/reconciliation month.",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS"
+    },
+    {
+      "id": "B3-CARRY-INVOICE-APPLICATION-SEPARATE-DATES-R6",
+      "block": "B3",
+      "title": "Payment date, reconciliation date, insurer application date, invoice date are separate fields.",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS"
+    },
+    {
+      "id": "B3-CARRY-REPORTED-PAYMENT-HISTORICAL-AUDIT-R6",
+      "block": "B3",
+      "title": "Existing reported payments require deterministic classification before projection as confirmed cobros.",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS"
+    },
+    {
+      "id": "B3-CARRY-SURCHARGE-ISSUANCE-RULE-CONFIG-R6",
+      "block": "B3",
+      "title": "Issuance expenses/surcharges need insurer + product/line + payment-frequency configuration with policy override.",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS"
+    },
+    {
+      "id": "B3-CARRY-DASHBOARD-REALITY-RECONCILIATION-R6",
+      "block": "B3",
+      "title": "Dashboard must reconcile real portfolio, confirmed cobros, pending payments, reconciliation, currency/country and aging.",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS"
+    },
+    {
+      "id": "B4-CARRY-RENEWAL-SINGLE-OWNER-R6",
+      "block": "B4",
+      "title": "Renewal flow has competing legacy and operational owners and must be consolidated into one canonical end-to-end owner.",
+      "status": "FROZEN_CARRY_FORWARD_B4"
+    },
+    {
+      "id": "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6",
+      "block": "B4",
+      "title": "Portal/importer/email surfaces must converge on the canonical financial and management model.",
+      "status": "FROZEN_CARRY_FORWARD_B4"
+    }
+  ],
+  "constraints": {
+    "noReimport": true,
+    "noLive": true,
+    "noB3UntilB2MaterialPass": true,
+    "noClientSpecificFixes": true,
+    "noInsurerSpecificHardcodes": true,
+    "preserveHistoricalPassUnlessCausalRegression": true,
+    "singleCanonicalCumulativeCandidate": true
+  }
+}

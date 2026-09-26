@@ -19,9 +19,9 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 90,
-    "b2HumanFindings": 35,
-    "currentBlocking": 25
+    "total": 105,
+    "b2HumanFindings": 42,
+    "currentBlocking": 32
   },
   "findings": [
     {
@@ -1485,6 +1485,136 @@
       "status": "UNRESOLVED_DELIVERY_DEBT_DO_NOT_DECLARE_PASS",
       "blocking": false,
       "preLiveRecheckRequired": true
+    },
+    {
+      "id": "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
+      "block": "B2",
+      "title": "Active vehicle tied to current policy is projected as incomplete history while detail has canonical plate/policy/vigency.",
+      "classification": "CANONICAL_PROJECTION_DIVERGENCE",
+      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "invariant": "Any vehicle linked to a current policy is current; historical/versioned rows subordinate to the same canonical identity; ambiguous rows remain pending review, never heuristically merged/deleted.",
+      "rootCauseHypothesis": "Vehicle tab may group on raw record while detail uses normalized vehicleVisual/canonical projection.",
+      "proofRequired": [
+        "SAME_CANONICAL_PROJECTION_LIST_AND_DETAIL",
+        "TWO_CURRENT_POLICIES_SHOW_THEIR_CURRENT_VEHICLES",
+        "HISTORY_SUBORDINATE_NOT_TOP_LEVEL",
+        "NO_HEURISTIC_MERGE_DELETE"
+      ]
+    },
+    {
+      "id": "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
+      "block": "B2",
+      "title": "A physical policy version visibly has two concurrent active receipt calendars after payment-plan edit.",
+      "classification": "FINANCIAL_PROJECTION_INTEGRITY_BLOCKER",
+      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "invariant": "One physical policy version has exactly one active contractual calendar; superseded rows do not count in current schedule/active portfolio; paid/evidenced receipts are preserved with traceability.",
+      "proofRequired": [
+        "GLOBAL_DOUBLE_ACTIVE_CALENDAR_DISCRIMINANT",
+        "AUTO39012_SINGLE_ACTIVE_CALENDAR",
+        "PAID_EVIDENCE_PRESERVED",
+        "NO_BLIND_10_TO_12_REGENERATION"
+      ]
+    },
+    {
+      "id": "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
+      "block": "B2",
+      "title": "Current policy can render below renewed/historical policies.",
+      "classification": "BUSINESS_ORDERING_DEFECT",
+      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "invariant": "Order groups: current, renewal-due, renewed/history, cancelled/void; newest vigency first; same-number versions show current first with history subordinate."
+    },
+    {
+      "id": "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
+      "block": "B2",
+      "title": "Operational UI exposes physical IDs/version/lineage language.",
+      "classification": "TECHNICAL_LANGUAGE_LEAK",
+      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "invariant": "Operational UI uses business language; physical IDs and lineage remain only in audit/technical detail when needed."
+    },
+    {
+      "id": "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
+      "block": "B2",
+      "title": "Section titles/labels remain visually weak while values dominate.",
+      "classification": "VISUAL_HIERARCHY_DEFECT",
+      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "invariant": "Section titles semibold/bold; relevant labels semibold; values regular/medium; total/KPI may stand out; apply cumulatively to Cliente360/Policy/Vehicle/Receipt."
+    },
+    {
+      "id": "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6",
+      "block": "B2",
+      "title": "Human logo persistence cannot be verified safely against a real insurer in Preview.",
+      "classification": "HUMAN_PROOF_FIXTURE_GAP",
+      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "invariant": "Provide visible synthetic insurer fixture for edit/upload/save/refresh/readback/cleanup without relaxing Preview boundary for real insurers."
+    },
+    {
+      "id": "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6",
+      "block": "B2",
+      "title": "Sidebar vertical scroll/navigation defect must remain tracked and be fixed now if it blocks module access.",
+      "classification": "NAVIGATION_USABILITY_DEFECT",
+      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "invariant": "Sidebar scroll is visible and usable; if non-blocking in B2 it is mandatory carry-forward to B4."
+    },
+    {
+      "id": "B3-CARRY-PAYMENT-CONFIRMED-NOT-CONCILIATED-R6",
+      "block": "B3",
+      "title": "An authorized applied/confirmed payment is a confirmed cobro even before reconciliation.",
+      "classification": "CANONICAL_PAYMENT_SEMANTICS",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "invariant": "Do not hide applied payments from Cobros; receipt existence alone never creates cobro."
+    },
+    {
+      "id": "B3-CARRY-INFERRED-PAYMENT-EFFECTIVE-DATE-R6",
+      "block": "B3",
+      "title": "Inferred payment must not inflate the discovery/reconciliation month.",
+      "classification": "CANONICAL_PAYMENT_DATE_SEMANTICS",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "invariant": "For inferred payment, effective/display payment date belongs to the required contractual period and is explicitly marked inferred; evidenceAsOf and reconciliation/application dates remain distinct."
+    },
+    {
+      "id": "B3-CARRY-INVOICE-APPLICATION-SEPARATE-DATES-R6",
+      "block": "B3",
+      "title": "Payment date, reconciliation date, insurer application date, invoice date are separate fields.",
+      "classification": "FINANCIAL_EVENT_MODEL",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS"
+    },
+    {
+      "id": "B3-CARRY-REPORTED-PAYMENT-HISTORICAL-AUDIT-R6",
+      "block": "B3",
+      "title": "Existing reported payments require deterministic classification before projection as confirmed cobros.",
+      "classification": "DATA_AUDIT_REQUIRED",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "invariant": "Do not auto-convert every pago_reportado and do not reimport."
+    },
+    {
+      "id": "B3-CARRY-SURCHARGE-ISSUANCE-RULE-CONFIG-R6",
+      "block": "B3",
+      "title": "Issuance expenses/surcharges need insurer + product/line + payment-frequency configuration with policy override.",
+      "classification": "CONFIGURABLE_FINANCIAL_RULE",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "invariant": "No insurer hardcodes; preview resulting calendar before save."
+    },
+    {
+      "id": "B3-CARRY-DASHBOARD-REALITY-RECONCILIATION-R6",
+      "block": "B3",
+      "title": "Dashboard must reconcile real portfolio, confirmed cobros, pending payments, reconciliation, currency/country and aging.",
+      "classification": "READ_MODEL_RECONCILIATION",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS"
+    },
+    {
+      "id": "B4-CARRY-RENEWAL-SINGLE-OWNER-R6",
+      "block": "B4",
+      "title": "Renewal flow has competing legacy and operational owners and must be consolidated into one canonical end-to-end owner.",
+      "classification": "OWNER_CONSOLIDATION_REQUIRED",
+      "status": "FROZEN_CARRY_FORWARD_B4",
+      "invariant": "Current policy -> renewal management -> risk/conditions -> quotes -> comparison -> client decision -> new vigency -> receipts/portfolio -> bidirectional history -> Ops/Leads/Cliente360 sync."
+    },
+    {
+      "id": "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6",
+      "block": "B4",
+      "title": "Portal/importer/email surfaces must converge on the canonical financial and management model.",
+      "classification": "TRANSVERSAL_TRACEABILITY",
+      "status": "FROZEN_CARRY_FORWARD_B4"
     }
   ],
   "phaseBBacklog": [
@@ -1523,72 +1653,93 @@
     "rule": "Only these human-visible items require Paula confirmation before B2 acceptance; technical findings already closed may not be reopened without reproducible causal regression."
   },
   "currentHumanReview": {
-    "date": "2026-09-25",
-    "origin": "PAULA_VISUAL_REVIEW_20260925_R5",
-    "decision": "R5_SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
+    "date": "2026-09-26",
+    "recordedAt": "2026-09-26T07:30:00-06:00",
+    "origin": "PAULA_VISUAL_REVIEW_20260926_R6",
+    "decision": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
     "exactSourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
-    "confirmedPass": [
-      "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN",
-      "VEHICLE_LINK_ACTION_EXECUTED",
-      "RECEIPT_PLAN_EDIT_VISIBLE",
-      "INSURER_READ_VISUAL",
-      "AUTHENTICATED_B2_RUNTIME_PASS"
+    "exactBuildId": "gi-i65-b2-2963f4140f2f-57f234755dc1",
+    "exactPreviewRunId": 36217789995,
+    "authenticatedRunId": 36218497058,
+    "preservedPass": [
+      "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN_LEAKCOUNT_0",
+      "COTIZADOR_COMPARATIVO_PERMISSION_RUNTIME",
+      "CLIENT_CRUD",
+      "POLICY_CRUD",
+      "VEHICLE_SAME_ID_EDIT",
+      "VEHICLE_TO_POLICY_PRESERVES_POLICYID_VEHICLEID",
+      "INDIVIDUAL_RECEIPT_EDIT",
+      "SYNTHETIC_INSURER_LOGO_CREDENTIAL_BACKEND",
+      "SYNTHETIC_RENEWAL_DURABLE",
+      "SYNTHETIC_CLEANUP",
+      "ZERO_CONFIRMED_COBRO_FROM_POLICY_CREATION_ONLY"
     ],
-    "blockingFindingIds": [],
-    "nonBlockingObserved": [
-      "B2-R45-INSURER-REAL-LOGO-SAVE-BLOCKED-BY-PREVIEW-BOUNDARY-R5",
-      "B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5"
+    "blockingFindingIds": [
+      "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
+      "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
+      "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
+      "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
+      "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
+      "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6",
+      "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
+    ],
+    "carryForwardFindingIds": [
+      "B3-CARRY-PAYMENT-CONFIRMED-NOT-CONCILIATED-R6",
+      "B3-CARRY-INFERRED-PAYMENT-EFFECTIVE-DATE-R6",
+      "B3-CARRY-INVOICE-APPLICATION-SEPARATE-DATES-R6",
+      "B3-CARRY-REPORTED-PAYMENT-HISTORICAL-AUDIT-R6",
+      "B3-CARRY-SURCHARGE-ISSUANCE-RULE-CONFIG-R6",
+      "B3-CARRY-DASHBOARD-REALITY-RECONCILIATION-R6",
+      "B4-CARRY-RENEWAL-SINGLE-OWNER-R6",
+      "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
     ],
     "noLive": true,
-    "b3": "NOT_STARTED",
-    "remediationHeadParent": "49f687519e733af736dfc8173d5b28c50f11e7fb",
-    "rootfixProductFiles": [
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
-      "orbit360-platform/core/policy-receipts-engine.js",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/index.html"
-    ],
-    "mechanismFiles": [
-      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
-    ],
-    "emailDeliveryNotClaimedResolved": true,
-    "r5EffectiveCobrosOwnerRootCause": "CONFIRMED_AND_FIXED_PENDING_PREVIEW",
-    "dashboardLabel": "REGISTROS_VENCIDOS_EN_CARTERA_NOT_COBROS",
-    "status": "R5_TECHNICAL_AND_AUTHENTICATED_PASS_PENDING_PAULA_REVIEW",
-    "authenticatedRunId": 36218497058,
-    "unresolvedNonBlocking": [
-      "B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5"
-    ]
+    "b3": "NOT_STARTED"
   },
   "lastReview": {
-    "origin": "PAULA_VISUAL_REVIEW_20260925_R4",
-    "recordedAt": "2026-09-25",
-    "status": "B2_R4_SOURCE_FIXED_PENDING_NEW_PREVIEW",
-    "advanceToB3Authorized": false,
-    "livePromotionAuthorized": false,
-    "sourceFixPrepared": true,
-    "changedProductFiles": [
-      "functions/product-ops-leads-domain.js",
-      "orbit360-platform/core/config.js",
-      "orbit360-platform/core/access-scope.js",
-      "orbit360-platform/data/store-firestore-product-operational-p0.js",
-      "orbit360-platform/modules/crm-v1198-operational-bridge.js",
-      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
-      "orbit360-platform/modules/aseguradoras.js",
-      "orbit360-platform/index.html"
+    "date": "2026-09-26",
+    "recordedAt": "2026-09-26T07:30:00-06:00",
+    "origin": "PAULA_VISUAL_REVIEW_20260926_R6",
+    "decision": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
+    "exactSourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
+    "exactBuildId": "gi-i65-b2-2963f4140f2f-57f234755dc1",
+    "exactPreviewRunId": 36217789995,
+    "authenticatedRunId": 36218497058,
+    "preservedPass": [
+      "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN_LEAKCOUNT_0",
+      "COTIZADOR_COMPARATIVO_PERMISSION_RUNTIME",
+      "CLIENT_CRUD",
+      "POLICY_CRUD",
+      "VEHICLE_SAME_ID_EDIT",
+      "VEHICLE_TO_POLICY_PRESERVES_POLICYID_VEHICLEID",
+      "INDIVIDUAL_RECEIPT_EDIT",
+      "SYNTHETIC_INSURER_LOGO_CREDENTIAL_BACKEND",
+      "SYNTHETIC_RENEWAL_DURABLE",
+      "SYNTHETIC_CLEANUP",
+      "ZERO_CONFIRMED_COBRO_FROM_POLICY_CREATION_ONLY"
     ],
-    "previewIsolation": "OPS_AND_ASSET_SYNTHETIC_ONLY",
-    "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED",
-    "b2StorageAndAssetCleanup": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
-    "closureRunId": 36207874692,
-    "r5AuthenticatedRunId": 36218497058,
-    "r5AuthenticatedStatus": "PASS_PENDING_PAULA_VISUAL",
-    "emailDelivery": "UNCHANGED_UNRESOLVED"
+    "blockingFindingIds": [
+      "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
+      "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
+      "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
+      "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
+      "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
+      "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6",
+      "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
+    ],
+    "carryForwardFindingIds": [
+      "B3-CARRY-PAYMENT-CONFIRMED-NOT-CONCILIATED-R6",
+      "B3-CARRY-INFERRED-PAYMENT-EFFECTIVE-DATE-R6",
+      "B3-CARRY-INVOICE-APPLICATION-SEPARATE-DATES-R6",
+      "B3-CARRY-REPORTED-PAYMENT-HISTORICAL-AUDIT-R6",
+      "B3-CARRY-SURCHARGE-ISSUANCE-RULE-CONFIG-R6",
+      "B3-CARRY-DASHBOARD-REALITY-RECONCILIATION-R6",
+      "B4-CARRY-RENEWAL-SINGLE-OWNER-R6",
+      "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
+    ],
+    "noLive": true,
+    "b3": "NOT_STARTED"
   }
 }

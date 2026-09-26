@@ -33,7 +33,7 @@
     "deltaAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
     "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
     "staticSourceUpdateRequired": true,
-    "reason": "Permanent normative architecture change: canonical accumulative composition and findings ledger are now machine-authoritative to prevent regression/lost improvements. V6 retains the frozen execution-plan authorities from V5.",
+    "reason": "Pending Project-source synchronization includes V6 canonical composition/findings authority plus the 2026-09-26 permanent payment/date semantics addendum required before B3.",
     "operationalStateChangesDoNotRequireReplacement": true,
     "notificationRequiredWhenFlagTrue": true,
     "compositionModel": "IMMUTABLE_RETAINED_V5_PLUS_V6_ADDENDUM",
@@ -46,7 +46,14 @@
       "userAction": "KEEP_7_EXISTING_SOURCES_AND_ADD_ONLY_V6_CANONICAL_COMPOSITION_FINDINGS_ADDENDUM"
     },
     "normativeAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v6/09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
-    "normativeAddendumBlobSha": "40b57682f89fc134bc95c5806b71a34bc4119882"
+    "normativeAddendumBlobSha": "40b57682f89fc134bc95c5806b71a34bc4119882",
+    "pendingNormativeChange": {
+      "requestedVersion": 7,
+      "reason": "Permanent payment/cobro/date semantics changed on 2026-09-26; V2 payment addendum supersedes only conflicting inferred-date interpretation while V6 source-sync obligation is still pending.",
+      "addendumPath": "artifacts/orbit360-recovery/release-control/GRAVICENTRA_REGLAS_CANONICAS_PAGOS_CONCILIACION_INFERENCIA_V2_20260926.md",
+      "addendumBlobSha": "c0c1ba8e58940d0796f94129ac7a6c7ce660e540",
+      "requiredBefore": "B3_OPEN"
+    }
   },
   "deprecatedMutableAuthorities": {
     "artifacts/orbit360-recovery/release-control/RECOVERY_STATE.json": "DEPRECATED_NON_AUTHORITATIVE_TOMBSTONE",
@@ -717,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_R6_ROOT_CAUSE_AND_CUMULATIVE_FIX",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1938,7 +1945,10 @@
       "client360AndCobrosUseSamePaymentCommand": true,
       "autoReconcileUniqueHighConfidenceEvidence": true,
       "backfillPriorContiguousInstallments": true,
-      "inferredPaymentDateMustNotBeInvented": true
+      "inferredPaymentDateMustNotBeInvented": false,
+      "confirmedAppliedPaymentIsCobroBeforeReconciliation": true,
+      "inferredPaymentEffectiveDateBelongsToContractualPeriod": true,
+      "paymentDateReconciliationDateInsurerApplicationDateSeparate": true
     },
     "paymentInferenceLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_20260919.json",
     "paymentInferenceDecision": "AUTO_COMMIT_UNIQUE_HIGH_CONFIDENCE_MATCH_AND_BACKFILL_PRIOR_CONTIGUOUS_INSTALLMENTS_WITH_PROVENANCE",
@@ -1946,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R5_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+    "mechanismSyncStatus": "B2_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2012,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "676b13427fc774a30c07c74a8578cb21f46b0954",
+    "b2ExecutionLockBlobSha": "c24ebf3113f56dcb77be4d2f54854d1aae196614",
     "b2": {
-      "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2090,12 +2100,12 @@
       "visualAuditBrandingRootCauseClosedPendingPreview": true,
       "visualReceiptRecapture": true,
       "assistantVisualAudit": "PASS",
-      "outstandingBlockersForHumanReview": 13,
+      "outstandingBlockersForHumanReview": 7,
       "paulaVisualAccepted": false,
       "technicalPassHistoricalPreserved": true,
       "authenticatedPassHistoricalPreserved": true,
       "syntheticCleanupHistoricalPreserved": true,
-      "paulaVisualDecision": "REJECTED_R3",
+      "paulaVisualDecision": "REJECTED_R6",
       "paulaVisualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
       "paulaVisualRejectionReceiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
       "rejectedPreviewRunId": 35964339112,
@@ -2121,15 +2131,13 @@
       "authenticatedRunArmed": true,
       "previewCredentialSecretIamRepair": "AUTHORIZED_PENDING_PROOF",
       "humanReviewOutstandingIds": [
-        "B2-R16-RECEIPT_PLAN_EDIT_DISCOVERABILITY",
-        "B2-H01",
-        "B2-H03",
-        "B2-H05",
-        "B2-H08",
-        "B2-H09",
-        "B2-H10",
-        "B2-H12",
-        "B2-H13"
+        "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
+        "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
+        "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
+        "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
+        "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
+        "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6",
+        "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
       ],
       "humanReviewOutstandingCount": 9,
       "humanReviewR3": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
@@ -2312,14 +2320,16 @@
       "previousGuardError": "I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR",
       "cause": "B2 authorized owners were ignored because composition admission depended on a duplicated hardcoded B2 status list that did not include the current visual-rejection remediation state.",
       "fix": "Central guard now consumes one exact-set/blob-bound canonical composition lock independent of duplicated status labels; findings are mechanically retained in one ledger."
-    }
+    },
+    "paymentInferenceAddendumV2Path": "artifacts/orbit360-recovery/release-control/GRAVICENTRA_REGLAS_CANONICAS_PAGOS_CONCILIACION_INFERENCIA_V2_20260926.md",
+    "paymentInferenceAddendumV2BlobSha": "c0c1ba8e58940d0796f94129ac7a6c7ce660e540"
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "984d3713814aec3419787bd440132e98d9fd7bcd",
+    "findingLedgerBlobSha": "e53860d000eae5ac78bc846d86a11420202303b9",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
@@ -2331,7 +2341,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_PAULA_VISUAL_REVIEW_R5_ON_EXACT_AUTHENTICATED_PREVIEW"
+    "nextAction": "B2_R6_ROOT_CAUSE_AND_CUMULATIVE_REMEDIATION"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
@@ -2366,6 +2376,39 @@
     ],
     "carryToB3": [
       "B3-CARRY-REPORTED-PAYMENT-PRESENTATION-R4"
+    ],
+    "b2": "OPEN",
+    "b3": "NOT_STARTED",
+    "livePromoted": false
+  },
+  "paulaVisualReview20260926R6": {
+    "decision": "REJECTED_REMEDIATION_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R6_20260926.json",
+    "receiptBlobSha": "b57f64d14e27312612523674856c4353ccfde500",
+    "reviewedSourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
+    "reviewedRunId": 36217789995,
+    "authenticatedRunId": 36218497058,
+    "blockingFindingIds": [
+      "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
+      "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
+      "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
+      "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
+      "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
+      "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6",
+      "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
+    ],
+    "preservedPass": [
+      "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN_LEAKCOUNT_0",
+      "COTIZADOR_COMPARATIVO_PERMISSION_RUNTIME",
+      "CLIENT_CRUD",
+      "POLICY_CRUD",
+      "VEHICLE_SAME_ID_EDIT",
+      "VEHICLE_TO_POLICY_PRESERVES_POLICYID_VEHICLEID",
+      "INDIVIDUAL_RECEIPT_EDIT",
+      "SYNTHETIC_INSURER_LOGO_CREDENTIAL_BACKEND",
+      "SYNTHETIC_RENEWAL_DURABLE",
+      "SYNTHETIC_CLEANUP",
+      "ZERO_CONFIRMED_COBRO_FROM_POLICY_CREATION_ONLY"
     ],
     "b2": "OPEN",
     "b3": "NOT_STARTED",
