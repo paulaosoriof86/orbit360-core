@@ -3649,7 +3649,8 @@ jobs:
           })().catch(e=>{console.error(e);process.exit(1);});
           NODE
           )
-          printf 'FIREBASE_STORAGE_BUCKET=%s\n' "$STORAGE_BUCKET" > "$FROOT/backend/.env"
+          printf 'ORBIT360_STORAGE_BUCKET=%s\n' "$STORAGE_BUCKET" > "$FROOT/backend/.env"
+          cat "$RUNNER_TEMP/b2-storage-bucket-readonly.json"
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
           node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
           printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","storageBucket":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview"],"productionFunctionDeployed":false,"operationalBusinessWritesAuthorized":false}\n' "$GITHUB_SHA" "$STORAGE_BUCKET" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"

@@ -368,7 +368,7 @@ async function uploadProductAsset(request, previewOnly) {
   const bucketCandidates=unique([
     app.options&&app.options.storageBucket,
     firebaseConfig.storageBucket,
-    process.env.FIREBASE_STORAGE_BUCKET,
+    process.env.ORBIT360_STORAGE_BUCKET,
     projectId?projectId+'.firebasestorage.app':'',
     projectId?projectId+'.appspot.com':''
   ]);
