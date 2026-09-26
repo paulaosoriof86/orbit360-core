@@ -3641,17 +3641,30 @@ jobs:
             if(![projectId+'.firebasestorage.app',projectId+'.appspot.com'].includes(sdk))throw new Error('B2_FIREBASE_SDKCONFIG_STORAGE_BUCKET_UNEXPECTED:'+sdk);
             const storage=new Storage({projectId});
             const list=async()=>{const [buckets]=await storage.getBuckets({project:projectId});return buckets.map(b=>String(b.name||'').trim()).filter(Boolean).sort();};
-            let names=await list(),created=false;
-            if(!names.includes(sdk)){
-              const productBuckets=names.filter(n=>!/^gcf-v2-(?:sources|uploads)-/i.test(n)&&!/\.cloudfunctions\.appspot\.com$/i.test(n));
-              if(productBuckets.length)throw new Error('B2_FIREBASE_STORAGE_EXISTING_PRODUCT_BUCKET_CONFLICT:'+JSON.stringify({sdk,productBuckets}));
-              await storage.createBucket(sdk,{location:'US-CENTRAL1',uniformBucketLevelAccess:true,labels:{owner:'gravicentra-insurance',purpose:'product-assets'}});
-              created=true;
-              names=await list();
-              if(!names.includes(sdk))throw new Error('B2_FIREBASE_STORAGE_DEFAULT_BUCKET_CREATE_READBACK_FAILED');
+            let names=await list(),created=false,selected='';
+            const internal=n=>/^gcf-v2-(?:sources|uploads)-/i.test(n)||/\.cloudfunctions\.appspot\.com$/i.test(n);
+            const productBuckets=()=>names.filter(n=>!internal(n));
+            if(names.includes(sdk))selected=sdk;
+            else {
+              let existing=productBuckets();
+              if(existing.length>1)throw new Error('B2_FIREBASE_STORAGE_EXISTING_PRODUCT_BUCKET_CONFLICT:'+JSON.stringify({sdk,existing}));
+              if(existing.length===1)selected=existing[0];
+              else {
+                const crypto=require('node:crypto');
+                const suffix=crypto.createHash('sha256').update(projectId).digest('hex').slice(0,10);
+                selected=('gravicentra-insurance-assets-'+suffix).toLowerCase();
+                try{
+                  await storage.createBucket(selected,{location:'US-CENTRAL1',uniformBucketLevelAccess:true,labels:{owner:'gravicentra-insurance',purpose:'product-assets',project:projectId.replace(/[^a-z0-9_-]/gi,'_').slice(0,63)}});
+                  created=true;
+                }catch(error){
+                  if(Number(error&&error.code)!==409)throw error;
+                }
+                names=await list();
+                if(!names.includes(selected))throw new Error('B2_FIREBASE_STORAGE_PRODUCT_BUCKET_CREATE_READBACK_FAILED:'+selected);
+              }
             }
-            fs.writeFileSync(process.env.RUNNER_TEMP+'/b2-storage-bucket-readonly.json',JSON.stringify({status:'PASS',sdkStorageBucket:sdk,existingBuckets:names,selectedBucket:sdk,createdBucket:created,writeExecuted:created,projectId},null,2)+'\n');
-            process.stdout.write(sdk);
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/b2-storage-bucket-readonly.json',JSON.stringify({status:'PASS',sdkStorageBucket:sdk,existingBuckets:names,selectedBucket:selected,createdBucket:created,writeExecuted:created,projectId,sameProject:true},null,2)+'\n');
+            process.stdout.write(selected);
           })().catch(e=>{console.error(e);process.exit(1);});
           NODE
           )
