@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -245,7 +245,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_R12_WRITE_ENABLED_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "cf719c02c0c74bb76022a4897e9db5eeb9b12efb",
     "exactPreviewBuildId": "gi-i65-b2-cf719c02c0c7-57f234755dc1",
@@ -2385,7 +2385,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "0f612462b1bf7b6fe2392ee15792c3e606340b0d",
+  "findingLedgerBlobSha": "4d2ae44a19b5c21d6144343c5b1b27c29e43a833",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2584,5 +2584,13 @@
     "findingId": "B2-R65-OPS-LEADS-AUTH-E2E-COVERAGE-GAP-R11",
     "requiredMilestone": "OPS_LEADS_SYNTHETIC_E2E_PASS",
     "preservedHumanEvidence": "REAL_PREVIEW_FAIL_CLOSED_NO_FALSE_SUCCESS"
+  },
+  "r12PreviewUatWrites": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B2-R66-PREVIEW-UAT-WRITE-CAPABILITY-R12",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
+    "receiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
+    "notificationsSuppressed": true,
+    "roleScopePreserved": true
   }
 }

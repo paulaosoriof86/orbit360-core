@@ -1,0 +1,25 @@
+{
+  "schema": "gravicentra-i6-5-b2-r12-preview-uat-write-mode-v1",
+  "recordedAt": "2026-09-26",
+  "authority": "PAULA_EXPLICIT_UAT_REQUIREMENT",
+  "statement": "El Preview debe permitir escrituras controladas para validar persistencia real desde la UI; un Preview read-only no es suficiente para aceptación funcional.",
+  "scope": {
+    "workflow": [
+      "gestiones",
+      "negocios"
+    ],
+    "create": "Permitido en Preview con autorización normal de rol, incluso si referencia cliente o póliza real.",
+    "update": "Solo permitido sobre gestiones/negocios creados en Preview (previewWrite=true).",
+    "notifications": "Notificaciones externas suprimidas en Preview; el evento queda auditado.",
+    "persistence": "Mismo backend canónico; readback obligatorio."
+  },
+  "safety": [
+    "Sin escrituras Firestore desde navegador",
+    "Sin localStorage como persistencia de negocio",
+    "Roles/scopes intactos",
+    "Sin deploy LIVE",
+    "Sin reimportación"
+  ],
+  "supersedes": "PREVIEW_SYNTHETIC_ONLY para UAT manual de Ops/Leads.",
+  "note": "Los registros de prueba creados en Preview quedan marcados previewWrite=true y deben limpiarse al cerrar la revisión."
+}

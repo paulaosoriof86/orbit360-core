@@ -1204,7 +1204,7 @@
       "rootCause": "Effective current owners still used optimistic Orbit.store insert: core/ciclo.js returned before server commit, and renewal bridge immediately redirected/toasted. Backend rejection in protected Preview rolled back the pending row after UI had implied success.",
       "remediation": "Use awaited crearGestionDurable -> server-owned workflow command -> canonical readback before any success/notification. Preview real-data rejection must be explicit.",
       "requiredProof": "Synthetic authenticated management create from Cliente360/Renovaciones -> server commit -> canonical readback -> visible exactly once in Ops -> reload -> cleanup; real Preview action must explicitly report no write.",
-      "status": "HUMAN_FAIL_CLOSED_PASS_AUTH_E2E_PENDING_R11",
+      "status": "R12_WRITE_ENABLED_PREVIEW_PENDING_EXACT_AUTH_AND_PAULA_UAT",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "blocking": true,
@@ -1219,7 +1219,9 @@
       "latestRuleLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R9_RENEWAL_WORKFLOW_BUSINESS_RULE_LOCK_20260926.json",
       "latestRuleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e",
       "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
-      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a"
+      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a",
+      "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
+      "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae"
     },
     {
       "id": "B2-R35-VEHICLE-HISTORY-PROJECTION-R4",
@@ -2088,7 +2090,7 @@
       "rootCause": "renewals-v1200-operational-bridge invokes optimistic Orbit.ciclo.crearGestion; core/ciclo crearGestion uses non-awaited S().insert.",
       "remediation": "Await server-owned create_management + canonical readback before normal success. Preserve approved Renew -> Cotizador/Comparativo -> accepted offer -> Ops issuance -> real renewed policy workflow.",
       "requiredProof": "Synthetic renewal_proposals + renewal_accepted management commit/readback; each appears once in Ops after reload; accepted panel exposes issuance/direct-registration branches; cleanup.",
-      "status": "HUMAN_FAIL_CLOSED_PASS_AUTH_E2E_PENDING_R11",
+      "status": "R12_WRITE_ENABLED_PREVIEW_PENDING_EXACT_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "sourceFix": {
         "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
@@ -2102,7 +2104,9 @@
       "businessRule": "Propuestas->Ops; Pedir renovar->renewal_accepted en Ops tras aprobación; Cotizar es acción separada y no disponible al Asesor; Ops decide solicitar emisión o registrar renovación en firme.",
       "prevalentRuleReceipt": "artifacts/orbit360-recovery/release-control/I6_5_RENEWAL_SEMANTICS_PREVALENT_20260926.json",
       "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
-      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a"
+      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a",
+      "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
+      "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae"
     },
     {
       "id": "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
@@ -2128,7 +2132,7 @@
       "rootCause": "Legacy renewal bridge encoded 'create/reuse management and open Cotizador' as one action, and Cliente360 Renovar delegated to solicitarPropuestas.",
       "remediation": "Separate proposal, direct-quote and accepted-renewal actions; make Ops the canonical decision owner; add direct firm-renewal engine and version-safe duplicate contract.",
       "requiredProof": "Exact immutable Preview functional proof + authenticated general proof + Paula visual: three renewal actions by role; Propuestas/Renovar do not auto-open Cotizador; Ops accepted panel exposes issuance/direct registration; no optimistic persistence claim in protected Preview.",
-      "status": "HUMAN_SEMANTICS_VISIBLE_AUTH_E2E_PENDING_R11",
+      "status": "R12_WRITE_ENABLED_PREVIEW_PENDING_EXACT_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "noReimport": true,
       "noLive": true,
@@ -2145,7 +2149,9 @@
         "tools/gravicentra-i6-5-b2-functional.mjs": "435eb9db882c14682f062bb7a2b0ac54a06ccbfd"
       },
       "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
-      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a"
+      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a",
+      "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
+      "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae"
     },
     {
       "id": "B2-R63-RENEWAL-ACTION-SEMANTICS-R9",
@@ -2154,14 +2160,16 @@
       "surface": "Renovaciones/Cliente360/Ops",
       "classification": "BUSINESS_RULE_PREVALENT",
       "finding": "Renewal actions must be semantically separated: Propuestas creates Ops proposal management; Pedir renovar creates accepted-renewal management after client approval; Cotizar is separate and advisor-forbidden; Ops handles issuance request or direct firm-renewal registration.",
-      "status": "HUMAN_SEMANTICS_VISIBLE_AUTH_E2E_PENDING_R11",
+      "status": "R12_WRITE_ENABLED_PREVIEW_PENDING_EXACT_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_RENEWAL_SEMANTICS_PREVALENT_20260926.json",
       "receiptBlobSha": "112819674f4f112cc85ca0f4a85c76905977f432",
       "noReimport": true,
       "noLive": true,
       "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
-      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a"
+      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a",
+      "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
+      "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae"
     },
     {
       "id": "B2-R64-RENEWALS-DUAL-PASS-VISUAL-AUTHORITY-R10",
@@ -2192,13 +2200,32 @@
       "rootCause": "The harness validated source contracts and advisor Ops visibility but had no server-owned synthetic management E2E discriminant.",
       "remediation": "Strengthen authenticated harness with b2-ges/b2-neg canonical writes, readback, one-card projection, accepted-renewal branches, reload idempotency and cleanup.",
       "requiredProof": "New exact immutable Preview authenticated run passes OPS_LEADS_SYNTHETIC_E2E_PASS and cleanup leaves zero synthetic data/workflow residue.",
-      "status": "HARNESS_FIXED_PENDING_EXACT_PREVIEW_AUTH_PROOF",
+      "status": "R12_WRITE_ENABLED_PREVIEW_PENDING_EXACT_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "harnessBlobSha": "ab1fdb808fb255be3f490a500c63705a23bba32e",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
       "receiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a",
       "noLive": true,
-      "noB3": true
+      "noB3": true,
+      "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
+      "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae"
+    },
+    {
+      "id": "B2-R66-PREVIEW-UAT-WRITE-CAPABILITY-R12",
+      "block": "B2",
+      "source": "PAULA_EXPLICIT_UAT_REQUIREMENT_20260926",
+      "surface": "Preview/Ops/Leads/Cliente360/Renovaciones",
+      "classification": "UAT_CAPABILITY_REQUIREMENT",
+      "finding": "La regla synthetic-only impedía validar desde la UI la persistencia real de los flujos de Ops/Leads.",
+      "rootCause": "El endurecimiento de seguridad B2 convirtió el Preview de workflow en read-only para registros no sintéticos.",
+      "remediation": "Permitir creación autenticada y role-scoped en Preview; solo registros creados en Preview pueden modificarse; suprimir notificaciones externas y auditar previewWrite.",
+      "requiredProof": "Propuestas, Pedir renovar y Gestión desde Cliente360 persisten y aparecen una sola vez en Ops; negocio de prueba se sincroniza Leads↔Ops; reload conserva; cero outbox externo.",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "blocking": true,
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
+      "receiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
+      "noLive": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [

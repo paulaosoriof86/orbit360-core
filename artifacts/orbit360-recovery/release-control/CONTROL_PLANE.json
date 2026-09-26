@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R11_OPS_LEADS_AUTH_E2E_HARNESS_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "mechanismSyncStatus": "B2_R12_PREVIEW_UAT_WRITES_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "3c5801173af05aa8baef83658c70a55675b73cbc",
+    "b2ExecutionLockBlobSha": "60c9f326822a06c6764201389d67cf28b70c513c",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2332,7 +2332,11 @@
       "r10ReceiptBlobSha": "df531173ab4cee8cab79cee0e432f8e6602cb6d6",
       "r11FindingId": "B2-R65-OPS-LEADS-AUTH-E2E-COVERAGE-GAP-R11",
       "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
-      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a"
+      "r11ReceiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a",
+      "r12FindingId": "B2-R66-PREVIEW-UAT-WRITE-CAPABILITY-R12",
+      "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
+      "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
+      "previewManualWrites": "ENABLED_CONTROLLED_WORKFLOW_WRITES"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2452,7 +2456,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "a0cfad3bffc836ec4d212dec67975c43f374f955",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "0f612462b1bf7b6fe2392ee15792c3e606340b0d",
+    "findingLedgerBlobSha": "4d2ae44a19b5c21d6144343c5b1b27c29e43a833",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
@@ -2464,7 +2468,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R11_NEW_IMMUTABLE_PREVIEW_THEN_STRENGTHENED_AUTH_OPS_LEADS_E2E"
+    "nextAction": "B2_R12_NEW_IMMUTABLE_PREVIEW_THEN_AUTH_AND_MANUAL_UAT_WRITES"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

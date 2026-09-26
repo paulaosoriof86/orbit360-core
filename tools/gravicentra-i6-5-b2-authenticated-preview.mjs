@@ -927,11 +927,11 @@ try{
       accepted:'b2-ges-accepted-'+suffix,
       business:'b2-neg-'+suffix
     };
-    const base={clienteId,polizaId:policyId,asesorId:advisorId,estado:'Pendiente',prioridad:'Media',origen:'B2 QA'};
+    const base={clienteId:clientId,polizaId:policyId,asesorId:advisorId,estado:'Pendiente',prioridad:'Media',origen:'B2 QA'};
     await Orbit.ciclo.crearGestionDurable(Object.assign({},base,{id:ids.generic,lista:'Gestiones Admin',tipo:'Gestión QA',titulo:'Gestión QA durable'}));
     await Orbit.ciclo.crearGestionDurable(Object.assign({},base,{id:ids.proposals,lista:'Renovaciones / Modif.',tipo:'Solicitar propuestas de renovación',titulo:'Propuestas B2 QA',workflowType:'renewal_proposals',renewalAction:'request_proposals',sourcePolicyId:policyId,proximaAccion:'Operaciones: solicitar propuestas a aseguradoras o cotizar'}));
     await Orbit.ciclo.crearGestionDurable(Object.assign({},base,{id:ids.accepted,lista:'Renovaciones / Modif.',tipo:'Renovación aceptada',titulo:'Renovación aceptada B2 QA',workflowType:'renewal_accepted',renewalAction:'client_approved',sourcePolicyId:policyId,acceptedConfirmed:true,clientApprovalAt:new Date().toISOString(),clientApprovalNote:'B2 QA'}));
-    await Orbit.store.insertDurable('negocios',{id:ids.business,nombre:'Lead B2 QA '+suffix,tipo:'Empresa',clienteId,asesorId:advisorId,pais:'GT',moneda:'GTQ',canal:'B2 QA',producto:'Auto',ramo:'VEHICULOS',primaEst:1000,prioridad:'Media',origen:'Leads',etapa:'nuevo',prob:10});
+    await Orbit.store.insertDurable('negocios',{id:ids.business,nombre:'Lead B2 QA '+suffix,tipo:'Empresa',clienteId:clientId,asesorId:advisorId,pais:'GT',moneda:'GTQ',canal:'B2 QA',producto:'Auto',ramo:'VEHICULOS',primaEst:1000,prioridad:'Media',origen:'Leads',etapa:'nuevo',prob:10});
     await Orbit.store.updateDurable('negocios',ids.business,{etapa:'cotizando',prob:45});
     const storeCounts={
       generic:(Orbit.store.all('gestiones')||[]).filter(x=>x.id===ids.generic).length,
