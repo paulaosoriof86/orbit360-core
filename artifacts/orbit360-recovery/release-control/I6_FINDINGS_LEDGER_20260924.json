@@ -1360,10 +1360,22 @@
       "rootCause": "Current grouping uses plate as primary key and falls back to vehicle.id when plate is missing. Explicit versionOfVehicleId lineage is not used to collapse versioned relations, and incomplete-identity historical rows remain top-level cards.",
       "remediation": "Group only by explicit physical lineage first (versionOfVehicleId/source relation), then exact plate. Keep ambiguous incomplete rows unmerged but move them to a clearly labeled historical/incomplete-identity section with physical IDs and policy context.",
       "requiredProof": "Oscar vehicle view shows resolved current identity once; versioned records under history; ambiguous incomplete rows clearly separated; zero merge/delete writes.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
-      "blocking": true,
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS_PENDING_PAULA_VISUAL",
+      "blocking": false,
       "noDataMerge": true,
-      "sourceFixAt": "2026-09-25"
+      "sourceFixAt": "2026-09-25",
+      "closureProof": {
+        "runId": 36218497058,
+        "authJobId": 108339197129,
+        "previewRunId": 36217789995,
+        "sourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
+        "buildId": "gi-i65-b2-2963f4140f2f-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
+        "exactReadback": true,
+        "livePromoted": false,
+        "vehicleHistorySourceFixBound": true,
+        "noMergeDeleteWrites": true
+      }
     },
     {
       "id": "B2-R42-POLICY-FROM-VEHICLE-PHYSICAL-VERSION-CONTEXT-R5",
@@ -1375,9 +1387,22 @@
       "rootCause": "Vehicle page link passes only clientId+policyId; policy renderer selects first vehicle by policy and does not disclose same-number sibling physical versions or source vehicle context.",
       "remediation": "Carry vehicleId into policy route, prefer exact linked vehicle, expose physical version context/vigency/ID, and explicitly disclose when this physical version has no receipt calendar while sibling same-number versions exist.",
       "requiredProof": "Open from exact vehicle preserves vehicleId context and same physical policy ID; receipt section corresponds to that exact version; sibling versions are distinguishable.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
-      "blocking": true,
-      "sourceFixAt": "2026-09-25"
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS_PENDING_PAULA_VISUAL",
+      "blocking": false,
+      "sourceFixAt": "2026-09-25",
+      "closureProof": {
+        "runId": 36218497058,
+        "authJobId": 108339197129,
+        "previewRunId": 36217789995,
+        "sourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
+        "buildId": "gi-i65-b2-2963f4140f2f-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
+        "exactReadback": true,
+        "livePromoted": false,
+        "vehiclePolicyContext": true,
+        "samePolicy": true,
+        "sameVehicle": true
+      }
     },
     {
       "id": "B2-R43-INDIVIDUAL-RECEIPT-EDIT-MISSING-R5",
@@ -1389,9 +1414,22 @@
       "rootCause": "Native receipt detail delegates all changes to policy-level plan editing and has no per-receipt durable write contract.",
       "remediation": "Add controlled per-receipt edit with reason, explicit allowed fields and durable readback; paid/conciliated receipts remain protected from destructive financial edits.",
       "requiredProof": "Authorized role can edit one eligible receipt and reload same receipt; sibling receipts unchanged; paid evidence protected; portfolio row stays synchronized.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
-      "blocking": true,
-      "sourceFixAt": "2026-09-25"
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS_PENDING_PAULA_VISUAL",
+      "blocking": false,
+      "sourceFixAt": "2026-09-25",
+      "closureProof": {
+        "runId": 36218497058,
+        "authJobId": 108339197129,
+        "previewRunId": 36217789995,
+        "sourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
+        "buildId": "gi-i65-b2-2963f4140f2f-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
+        "exactReadback": true,
+        "livePromoted": false,
+        "individualReceiptEditReadback": true,
+        "individualReceiptPortfolioSync": true,
+        "siblingProtected": true
+      }
     },
     {
       "id": "B2-R44-COBROS-PROJECTION-MISSES-REPORTED-PAYMENTS-R5",
@@ -1403,10 +1441,23 @@
       "rootCause": "modules/cobros.js contained the reported-payment projection, but later-loaded cobros-cartera-i65-closure-bridge.js replaced mod.render and omitted it. The effective owner dropped payment evidence even after the browser read model reached estadoOperativo=pago_reportado.",
       "remediation": "Project reported-payment evidence in the effective closure owner, keep it separate from canonical cobros, and preserve zero fabricated confirmed cobros.",
       "requiredProof": "Same client shows reported-payment evidence in Cobros; zero fabricated confirmed cobros; validation/apply actions remain explicit.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
-      "blocking": true,
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS_PENDING_PAULA_VISUAL",
+      "blocking": false,
       "sourceFixAt": "2026-09-25",
-      "effectiveOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js"
+      "effectiveOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+      "closureProof": {
+        "runId": 36218497058,
+        "authJobId": 108339197129,
+        "previewRunId": 36217789995,
+        "sourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
+        "buildId": "gi-i65-b2-2963f4140f2f-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
+        "exactReadback": true,
+        "livePromoted": false,
+        "reportedPaymentVisible": true,
+        "reportedPaymentDoesNotFabricateCobro": true,
+        "confirmedCobrosCreated": 0
+      }
     },
     {
       "id": "B2-R45-INSURER-REAL-LOGO-SAVE-BLOCKED-BY-PREVIEW-BOUNDARY-R5",
@@ -1475,8 +1526,8 @@
     "date": "2026-09-25",
     "origin": "PAULA_VISUAL_REVIEW_20260925_R5",
     "decision": "R5_SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36207016351-130c1g81.web.app",
-    "exactSourceSha": "2c09fb92facf917d95edeac1394c34edb146a056",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
+    "exactSourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
     "confirmedPass": [
       "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN",
       "VEHICLE_LINK_ACTION_EXECUTED",
@@ -1484,12 +1535,7 @@
       "INSURER_READ_VISUAL",
       "AUTHENTICATED_B2_RUNTIME_PASS"
     ],
-    "blockingFindingIds": [
-      "B2-R41-VEHICLE-HISTORY-PROJECTION-INCOMPLETE-R5",
-      "B2-R42-POLICY-FROM-VEHICLE-PHYSICAL-VERSION-CONTEXT-R5",
-      "B2-R43-INDIVIDUAL-RECEIPT-EDIT-MISSING-R5",
-      "B2-R44-COBROS-PROJECTION-MISSES-REPORTED-PAYMENTS-R5"
-    ],
+    "blockingFindingIds": [],
     "nonBlockingObserved": [
       "B2-R45-INSURER-REAL-LOGO-SAVE-BLOCKED-BY-PREVIEW-BOUNDARY-R5",
       "B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5"
@@ -1511,7 +1557,12 @@
     ],
     "emailDeliveryNotClaimedResolved": true,
     "r5EffectiveCobrosOwnerRootCause": "CONFIRMED_AND_FIXED_PENDING_PREVIEW",
-    "dashboardLabel": "REGISTROS_VENCIDOS_EN_CARTERA_NOT_COBROS"
+    "dashboardLabel": "REGISTROS_VENCIDOS_EN_CARTERA_NOT_COBROS",
+    "status": "R5_TECHNICAL_AND_AUTHENTICATED_PASS_PENDING_PAULA_REVIEW",
+    "authenticatedRunId": 36218497058,
+    "unresolvedNonBlocking": [
+      "B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5"
+    ]
   },
   "lastReview": {
     "origin": "PAULA_VISUAL_REVIEW_20260925_R4",
@@ -1535,6 +1586,9 @@
     "previewIsolation": "OPS_AND_ASSET_SYNTHETIC_ONLY",
     "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED",
     "b2StorageAndAssetCleanup": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
-    "closureRunId": 36207874692
+    "closureRunId": 36207874692,
+    "r5AuthenticatedRunId": 36218497058,
+    "r5AuthenticatedStatus": "PASS_PENDING_PAULA_VISUAL",
+    "emailDelivery": "UNCHANGED_UNRESOLVED"
   }
 }

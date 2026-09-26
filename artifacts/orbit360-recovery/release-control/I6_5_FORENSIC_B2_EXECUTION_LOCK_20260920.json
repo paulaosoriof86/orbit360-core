@@ -160,8 +160,11 @@
     "visibleGravicentraBrand": true,
     "renewalBidirectionalLink": true,
     "renewalDurableClosure": true,
-    "authenticatedPreviewPass": false,
-    "technicalFindingsClosedByExactRun": true
+    "authenticatedPreviewPass": true,
+    "technicalFindingsClosedByExactRun": true,
+    "vehiclePolicyContext": true,
+    "individualReceiptEdit": true,
+    "reportedPaymentProjection": true
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING",
@@ -390,12 +393,16 @@
     "storageAssetBucket": "gravicentra-insurance-assets-60e88ed5a1",
     "cleanupAssetProofRequired": true,
     "cleanupAssetProofStatus": "PASS",
-    "findingLedgerBlobSha": "8187aeebf71db0d2136d2c10cc85103faff7f148",
+    "findingLedgerBlobSha": "984d3713814aec3419787bd440132e98d9fd7bcd",
     "requiredR5Assertions": [
       "VEHICLE_POLICY_EXACT_CONTEXT",
       "INDIVIDUAL_RECEIPT_ATOMIC_EDIT",
       "REPORTED_PAYMENT_VISIBLE_WITH_ZERO_CONFIRMED_COBRO"
-    ]
+    ],
+    "jobId": 108339197129,
+    "r5VehiclePolicyContext": true,
+    "r5IndividualReceiptEdit": true,
+    "r5ReportedPaymentProjection": true
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -1786,9 +1793,9 @@
     "b3": "NOT_STARTED"
   },
   "r5": {
-    "status": "CANDIDATE_PENDING_PREVIEW",
+    "status": "AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
-    "findingLedgerBlobSha": "8187aeebf71db0d2136d2c10cc85103faff7f148",
+    "findingLedgerBlobSha": "984d3713814aec3419787bd440132e98d9fd7bcd",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -1809,6 +1816,7 @@
     "emailDeliveryStatus": "UNCHANGED_UNRESOLVED",
     "exactSetBound": true,
     "effectiveCobrosOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
-    "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL"
+    "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL",
+    "authenticatedRunId": 36218497058
   }
 }
