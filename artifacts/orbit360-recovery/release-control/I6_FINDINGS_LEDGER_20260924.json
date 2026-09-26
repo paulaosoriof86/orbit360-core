@@ -411,7 +411,9 @@
       "remediation": "Close before B4 promotion; no reimport.",
       "status": "OPEN_BLOCKING_FINAL_PROMOTION",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "latestVisual": "R8: portfolio counts render, but monthly/advisor target reality remains not accepted as canonical.",
+      "deferTo": "B3-008 / required before B4"
     },
     {
       "id": "B2-H01",
@@ -1199,13 +1201,21 @@
     {
       "id": "B2-R34-ASESOR-OPS-FALSE-SUCCESS-R4",
       "surface": "Cliente360/Ops",
-      "rootCause": "UI confirmaba éxito tras insert optimista mientras backend rechazaba create_management para Asesor.",
-      "remediation": "Await durable + readback; autoservicio solo gestión propia; Preview sintética aislada.",
-      "requiredProof": "Solicitud sintética Asesor persiste/readback/cleanup; cero falso éxito.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "rootCause": "Effective current owners still used optimistic Orbit.store insert: core/ciclo.js returned before server commit, and renewal bridge immediately redirected/toasted. Backend rejection in protected Preview rolled back the pending row after UI had implied success.",
+      "remediation": "Use awaited crearGestionDurable -> server-owned workflow command -> canonical readback before any success/notification. Preview real-data rejection must be explicit.",
+      "requiredProof": "Synthetic authenticated management create from Cliente360/Renovaciones -> server commit -> canonical readback -> visible exactly once in Ops -> cleanup; real Preview action never claims persistence.",
+      "status": "SOURCE_REFIXED_R8_PENDING_NEW_EXACT_PREVIEW_AUTH_PROOF",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
-      "blocking": true
+      "blocking": true,
+      "sourceFix": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R8_VISUAL_REVIEW_OPS_DURABILITY_20260926.json",
+        "receiptBlobSha": "185abfa73b4f2f6c723273e913b74a2ef77d2c2e",
+        "files": {
+          "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
+          "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "efe54d0974d1374e7c06a62bf15857e4b8fc6f9e"
+        }
+      }
     },
     {
       "id": "B2-R35-VEHICLE-HISTORY-PROJECTION-R4",
@@ -1807,7 +1817,8 @@
       "block": "B3",
       "title": "Dashboard must reconcile real portfolio, confirmed cobros, pending payments, reconciliation, currency/country and aging.",
       "classification": "READ_MODEL_RECONCILIATION",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS"
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "latestVisual": "R8: Inicio still not accepted as fully real/canonical; preserve for B3 closure before B4."
     },
     {
       "id": "B4-CARRY-RENEWAL-SINGLE-OWNER-R6",
@@ -2062,6 +2073,40 @@
         "cleanupPass": true
       },
       "remainingDisposition": "PAULA_VISUAL_ON_EXACT_PREVIEW"
+    },
+    {
+      "id": "B2-R62-RENEWAL-OPS-MANAGEMENT-DURABILITY-R8",
+      "block": "B2",
+      "source": "PAULA_VISUAL_REVIEW_R8",
+      "surface": "Cliente360/Renovaciones/Ops",
+      "classification": "PRODUCT_DEFECT_FALSE_SUCCESS_DURABILITY",
+      "finding": "Renewal/management action can navigate or imply success before canonical Ops management is committed; protected Preview then shows Ops with zero managements.",
+      "rootCause": "renewals-v1200-operational-bridge invokes optimistic Orbit.ciclo.crearGestion; core/ciclo crearGestion uses non-awaited S().insert.",
+      "remediation": "Await server-owned create_management + canonical readback before normal success. Preserve approved Renew -> Cotizador/Comparativo -> accepted offer -> Ops issuance -> real renewed policy workflow.",
+      "requiredProof": "Synthetic authenticated renewal management appears exactly once in Ops and survives reload; protected real Preview explicitly reports no write; no provisional renewed policy created by clicking Renew.",
+      "status": "SOURCE_FIXED_R8_PENDING_NEW_EXACT_PREVIEW_AUTH_PROOF",
+      "blocking": true,
+      "sourceFix": {
+        "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "efe54d0974d1374e7c06a62bf15857e4b8fc6f9e"
+      },
+      "noReimport": true,
+      "noLive": true,
+      "noB3": true
+    },
+    {
+      "id": "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
+      "block": "B3",
+      "source": "PAULA_VISUAL_REVIEW_R8",
+      "surface": "Cliente360/Recibos/Cobros",
+      "classification": "CARRY_FORWARD_CONDITIONAL_ON_PRESERVATION_PROOF",
+      "finding": "AUTO39012 current 10-receipt calendar is visible but financial breakdown is incomplete and previously reported payment evidence is not visible on the current client projection.",
+      "rationale": "Other clients visibly render pago reportado correctly, so the general reported-payment projection works. The remaining issue is specific calendar/payment lineage and belongs to B3 only if prior evidence remains physically preserved.",
+      "precondition": "Before B2 final disposition, run read-only proof that prior receipt/payment evidence for the reviewed policy still exists and was not deleted; no reimport or synthetic payment creation.",
+      "status": "FROZEN_CARRY_FORWARD_TO_B3_PENDING_READONLY_PRESERVATION_PROOF",
+      "blocking": false,
+      "noReimport": true,
+      "noLive": true
     }
   ],
   "phaseBBacklog": [

@@ -126,16 +126,29 @@ Orbit.ciclo = (function () {
   }
 
   /* ===================== gestiones (Ops admin/renov) ===================== */
-  function crearGestion(g) {
+  function gestionPayload(g) {
+    let activeAdvisor = '';
+    try { activeAdvisor = Orbit.session && Orbit.session.asesorId ? (Orbit.session.asesorId() || '') : ''; } catch (e) {}
     const base = {
       id: 'ges' + Date.now().toString().slice(-7), lista: 'Gestiones Admin', tipo: '', titulo: '',
-      clienteId: '', polizaId: '', asesorId: 'ase001', aseguradoraId: '', ramo: '',
+      clienteId: '', polizaId: '', asesorId: activeAdvisor, aseguradoraId: '', ramo: '',
       estado: 'Pendiente', prioridad: 'Media', vence: '', proximaAccion: 'Pendiente de definir',
       checklist: [], nota: '', notas: '', origen: 'manual',
       bitacora: [{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Gestión creada', origen: 'manual' }],
       comentarios: [], creado: today(), actualizado: today(), archivado: false
     };
-    return S().insert('gestiones', Object.assign(base, g));
+    return Object.assign(base, g || {});
+  }
+  function crearGestion(g) {
+    return S().insert('gestiones', gestionPayload(g));
+  }
+  async function crearGestionDurable(g) {
+    if (!S().insertDurable) throw new Error('OPS_MANAGEMENT_DURABLE_WRITE_REQUIRED');
+    const row = gestionPayload(g);
+    await S().insertDurable('gestiones', row);
+    const readback = S().get('gestiones', row.id);
+    if (!readback) throw new Error('OPS_MANAGEMENT_DURABLE_READBACK_MISSING');
+    return readback;
   }
 
   /* ===================== tableros ===================== */
@@ -522,24 +535,37 @@ Orbit.ciclo = (function () {
     drop.addEventListener('dragleave', () => drop.classList.remove('over'));
     drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); [...e.dataTransfer.files].forEach(f => adjuntos.push({ nombre: f.name, size: f.size })); paintFiles(); });
     file.addEventListener('change', () => { [...file.files].forEach(f => adjuntos.push({ nombre: f.name, size: f.size })); paintFiles(); });
-    back.querySelector('#sg-ok').addEventListener('click', () => {
+    back.querySelector('#sg-ok').addEventListener('click', async () => {
+      const save = back.querySelector('#sg-ok');
+      if (save.disabled) return;
       let titulo, lista;
       if (selTipo.value === 'nueva') { titulo = (back.querySelector('#sg-nueva').value || '').trim() || 'Gestión'; lista = back.querySelector('#sg-nueva-lista').value; Orbit.cat.get('tiposGestion').push({ t: titulo, lista }); Orbit.cat.save(); }
       else { const t = tipos[+selTipo.value]; titulo = t.t; lista = t.lista; }
       const polId = back.querySelector('#sg-pol').value;
       const pol = polId ? S().get('polizas', polId) : null;
-      crearGestion({
-        lista, tipo: titulo, titulo, clienteId, polizaId: polId,
-        asesorId: cli.asesorId, aseguradoraId: pol ? pol.aseguradoraId : '', ramo: pol ? pol.ramo : '',
-        prioridad: back.querySelector('#sg-prio').value, vence: inDays(7),
-        nota: back.querySelector('#sg-nota').value.trim(), origen: desdeCliente ? 'Solicitud del cliente' : 'Ficha cliente',
-        adjuntos: adjuntos.slice(),
-        checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'Documentación completa', done: !!adjuntos.length }, { t: 'Enviado a aseguradora', done: false }]
-      });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '🗂', fecha: today(), titulo: (desdeCliente ? 'Cliente solicitó: ' : 'Gestión solicitada: ') + titulo, detalle: 'Enviada a Orbit Ops (' + lista + ')' + (adjuntos.length ? ' · ' + adjuntos.length + ' adjunto(s)' : '') });
-      const ase = q.asesor(cli.asesorId);
-      notify({ tipo: 'gestion', titulo: (desdeCliente ? 'Solicitud de cliente · ' : 'Nueva gestión · ') + titulo, detalle: cli.nombre + ' → ' + lista, para: ase ? ase.nombre : '', tel: cli.telefono, email: cli.email });
-      back.remove(); refresh();
+      const originalText = save.textContent;
+      save.disabled = true; save.textContent = 'Guardando…';
+      try {
+        const gestion = await crearGestionDurable({
+          lista, tipo: titulo, titulo, clienteId, polizaId: polId,
+          asesorId: cli.asesorId, aseguradoraId: pol ? pol.aseguradoraId : '', ramo: pol ? pol.ramo : '',
+          prioridad: back.querySelector('#sg-prio').value, vence: inDays(7),
+          nota: back.querySelector('#sg-nota').value.trim(), origen: desdeCliente ? 'Solicitud del cliente' : 'Ficha cliente',
+          adjuntos: adjuntos.slice(),
+          checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'Documentación completa', done: !!adjuntos.length }, { t: 'Enviado a aseguradora', done: false }]
+        });
+        try { S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '🗂', fecha: today(), titulo: (desdeCliente ? 'Cliente solicitó: ' : 'Gestión solicitada: ') + titulo, detalle: 'Confirmada en Orbit Ops (' + lista + ')' + (adjuntos.length ? ' · ' + adjuntos.length + ' adjunto(s)' : ''), gestionId: gestion.id }); } catch (e) {}
+        const ase = q.asesor(cli.asesorId);
+        notify({ tipo: 'gestion', titulo: (desdeCliente ? 'Solicitud de cliente · ' : 'Nueva gestión · ') + titulo, detalle: cli.nombre + ' → ' + lista, para: ase ? ase.nombre : '', tel: cli.telefono, email: cli.email });
+        U.toast('Gestión creada y confirmada en Ops');
+        back.remove(); refresh();
+      } catch (error) {
+        const code = String(error && (error.code || error.message) || '');
+        U.toast(/PREVIEW_SYNTHETIC_ONLY|preview.*synthetic|synthetic.*only/i.test(code)
+          ? 'Preview protege los datos reales: no se creó ninguna gestión en Ops.'
+          : 'No fue posible crear la gestión. No se registró nada.');
+        save.disabled = false; save.textContent = originalText;
+      }
     });
   }
 
@@ -688,7 +714,7 @@ Orbit.ciclo = (function () {
     ETAPAS, E, FLUJO, opsListas, leadsListas, etapaInfo, flag,
     negocios, gestiones, opsBoard, leadsBoard, metricasLeads,
     cardNegocio, cardGestion, wireCards, notify, gestionarListas,
-    setEtapa, decidirCierre, perder, archivar, emitir, crearGestion,
+    setEtapa, decidirCierre, perder, archivar, emitir, crearGestion, crearGestionDurable,
     openNegocio, openGestion, solicitarGestion, nuevoNegocio, nuevaGestion
   };
 })();

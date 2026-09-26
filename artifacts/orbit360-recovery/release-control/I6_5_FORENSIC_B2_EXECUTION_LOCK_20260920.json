@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -245,7 +245,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PASS",
+    "status": "PENDING_NEW_EXACT_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "975fe97647bed9350d0af2608f4edb965893ff85",
     "exactPreviewBuildId": "gi-i65-b2-975fe97647be-57f234755dc1",
@@ -424,7 +424,7 @@
     "r5ReportedPaymentProjection": true,
     "lastFailureJobId": 108452982186,
     "lastFailureCode": "B2_AUTH_INSURER_LOGO_FILE_SELECTION_MISSING",
-    "lastFailureClassification": "PRODUCT_DEFECT_ASYNC_OWNER_RERENDER_DROPS_PENDING_LOGO_FILE",
+    "lastFailureClassification": "R8_PRODUCT_DEFECT_OPS_MANAGEMENT_OPTIMISTIC_FALSE_SUCCESS",
     "productRegressionDemonstrated": true,
     "requiredNewHarnessBlob": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
     "priorPassRunId": 36258221310,
@@ -1463,8 +1463,8 @@
     "broadRediscoveryRequired": false,
     "authorityBlobSha": "2250d63fc5dd2fb824e30b5493e7e6a611fc02d4",
     "findingsLedgerBlobSha": "6912bfbecfc963c3c57c64a058e192ee18173b68",
-    "compositionLockBlobSha": "b973ff3d5064d89d4e5f8290da26a7044c69f6f3",
-    "findingLedgerBlobSha": "e96c76430f88511146d82e3df969f69591e7a384"
+    "compositionLockBlobSha": "75593d80865dbdc0c7af5ca6b52a96ba6a2f7604",
+    "findingLedgerBlobSha": "1ce905a25ee48d99c494394771f42d9083eebb38"
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
   "lastPreviewFailure": {
@@ -2383,7 +2383,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "e96c76430f88511146d82e3df969f69591e7a384",
+  "findingLedgerBlobSha": "1ce905a25ee48d99c494394771f42d9083eebb38",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2491,5 +2491,40 @@
     "additionalPendingVisualFindingIds": [
       "B2-R61-INSURER-LOGO-PENDING-FILE-ASYNC-RERENDER-R7"
     ]
+  },
+  "paulaVisualReviewR8": {
+    "status": "REJECTED_CAUSAL_REMEDIATION_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R8_VISUAL_REVIEW_OPS_DURABILITY_20260926.json",
+    "receiptBlobSha": "185abfa73b4f2f6c723273e913b74a2ef77d2c2e",
+    "blockingFindingIds": [
+      "B2-R34-ASESOR-OPS-FALSE-SUCCESS-R4",
+      "B2-R62-RENEWAL-OPS-MANAGEMENT-DURABILITY-R8"
+    ],
+    "carryForwardIds": [
+      "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
+      "DASHBOARD-INICIO-001"
+    ],
+    "observedPass": [
+      "CLIENT360_PERFORMANCE_IMPROVED",
+      "CLIENT_KPI_CONFLICT_NOT_REPRODUCED",
+      "REVIEWED_CLIENT_VEHICLE_PROJECTION_CORRECT",
+      "REPORTED_PAYMENT_VISIBLE_ON_OTHER_CLIENTS",
+      "INSURER_FILE_PREVIEW_VISIBLE"
+    ],
+    "approvedRenewalNavigation": "COTIZADOR_COMPARATIVO_BEFORE_REAL_POLICY"
+  },
+  "r8": {
+    "status": "OPS_DURABILITY_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "sourceFix": {
+      "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "efe54d0974d1374e7c06a62bf15857e4b8fc6f9e"
+    },
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R8_VISUAL_REVIEW_OPS_DURABILITY_20260926.json",
+    "receiptBlobSha": "185abfa73b4f2f6c723273e913b74a2ef77d2c2e",
+    "findingLedgerBlobSha": "1ce905a25ee48d99c494394771f42d9083eebb38",
+    "compositionLockBlobSha": "75593d80865dbdc0c7af5ca6b52a96ba6a2f7604",
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true
   }
 }

@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B2",
-  "productFileCount": 57,
+  "productFileCount": 59,
   "productFiles": [
     "functions/bootstrap.js",
     "functions/package.json",
@@ -54,6 +54,7 @@
     "orbit360-platform/core/auth-product-runtime-p0.js",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+    "orbit360-platform/core/ciclo.js",
     "orbit360-platform/core/comisiones-eng.js",
     "orbit360-platform/core/config.js",
     "orbit360-platform/core/issuance-workflow-v1201-refinements.js",
@@ -91,6 +92,7 @@
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
     "orbit360-platform/product-runtime-config.js",
     "orbit360-platform/styles/base.css",
     "orbit360-platform/styles/infra.css",
@@ -153,7 +155,9 @@
     "functions/product-ops-leads-domain.js": "2e6792d180f51377398b79d801b83c54ead39000",
     "orbit360-platform/modules/cobros.js": "5b94eb504316bfa88bac70f75d69f6ac5705b429",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "cba6099ff7499c452c99f283702f27886154ae23",
-    "orbit360-platform/modules/inicio.js": "bbae195ae7725ee1bcd790f1234946b31660d68e"
+    "orbit360-platform/modules/inicio.js": "bbae195ae7725ee1bcd790f1234946b31660d68e",
+    "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "efe54d0974d1374e7c06a62bf15857e4b8fc6f9e"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -173,26 +177,29 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "AUTHENTICATED_EXACT_PREVIEW_RUN_36259661784",
-    "parentHead": "77b35716395ea5376e5179eeb1014c65da6aaf07",
-    "status": "R7N_INSURER_LOGO_ASYNC_EDIT_RERENDER_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "origin": "PAULA_VISUAL_REVIEW_R8_OPS_DURABILITY",
+    "parentHead": "5aafa7c65bde09bb30e8a76ca5f285fd325ed665",
+    "status": "R8_OPS_DURABILITY_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "changedProductFiles": [
-      "orbit360-platform/modules/aseguradoras.js"
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
     ],
     "productBlobs": {
-      "orbit360-platform/modules/aseguradoras.js": "2d7db2a218459bb5a6239845f0e277db12aa5490"
+      "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "efe54d0974d1374e7c06a62bf15857e4b8fc6f9e"
     },
-    "rootCause": "Async knowledge-summary completion rebuilt an active insurer edit form; the browser FileList was replaced and preserveState omitted pending logoFile.",
-    "fix": "Defer async owner refresh while editing and carry logoFile through preserveState reconstruction.",
-    "requiredProof": "new immutable Preview + exact authenticated synthetic insurer logo commit/reload/cleanup",
+    "rootCause": "Management creation was optimistic and caller-visible success preceded backend create_management commit/readback.",
+    "fix": "Await insertDurable/canonical workflow readback on Cliente360 and renewal management paths; explicit protected-Preview no-write truth; remove hardcoded advisor fallback.",
     "preservedPass": [
-      "R7 policy receipts 10/10",
-      "active-only receipt filter",
-      "reported-payment rows",
-      "Cliente KPI stability",
-      "payment hierarchy",
-      "performance under 4s",
-      "client/policy/vehicle/receipt CRUD"
+      "R7/R7N client performance",
+      "client KPI stability",
+      "vehicle normalized-plate projection",
+      "reported-payment rendering on applicable clients",
+      "insurer logo durable synthetic proof"
+    ],
+    "carryForward": [
+      "Dashboard reality to B3/B4 precondition",
+      "Oscar receipt/payment lineage to B3 after read-only preservation proof"
     ],
     "noDataReimport": true,
     "noLive": true,

@@ -1,0 +1,59 @@
+{
+  "schema": "gravicentra-i6-5-b2-r8-visual-review-ops-durability-v1",
+  "recordedAt": "2026-09-26T12:49:00-06:00",
+  "origin": "PAULA_VISUAL_REVIEW_R8",
+  "reviewedPreview": {
+    "sourceSha": "975fe97647bed9350d0af2608f4edb965893ff85",
+    "buildId": "gi-i65-b2-975fe97647be-57f234755dc1",
+    "runId": 36260674764,
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36260674764-22z4n1i9.web.app"
+  },
+  "observations": {
+    "client360Performance": "HUMAN_OBSERVED_IMPROVED_FAST_ENTRY",
+    "clientKpiConflict": "HUMAN_OBSERVED_NOT_REPRODUCED",
+    "vehicleProjection": "HUMAN_OBSERVED_CORRECT_FOR_REVIEWED_CLIENT_AND_SOURCE_FIX_IS_GENERIC_PER_CLIENT_NORMALIZED_PLATE",
+    "dashboardReality": "STILL_OPEN_CARRY_FORWARD",
+    "oscarReceipts": "CURRENT_10_VISIBLE_BUT_BREAKDOWN_INCOMPLETE; PRIOR_CALENDAR_INFORMATION_MUST_NOT_BE_DISCARDED",
+    "oscarReportedPayments": "NOT_VISIBLE_ON_CURRENT_PROJECTION; OTHER_CLIENTS_PROVE_REPORTED_PAYMENT_PROJECTION_WORKS",
+    "renewalsOps": "FALSE_SUCCESS_REPRODUCED; REAL_PREVIEW_ACTION CLAIMED_OR_IMPLIED_MANAGEMENT_BUT OPS_REMAINED_EMPTY",
+    "insurerPreview": "REAL_WRITE_BLOCK_EXPECTED; FILE_SELECTION_AND_PREVIEW_OBSERVED; DURABLE_PERSISTENCE_ALREADY_AUTHENTICATED_ON_SYNTHETIC_FIXTURE"
+  },
+  "classification": {
+    "b2Blocking": [
+      "B2-R34-ASESOR-OPS-FALSE-SUCCESS-R4",
+      "B2-R62-RENEWAL-OPS-MANAGEMENT-DURABILITY-R8"
+    ],
+    "b3Carry": [
+      "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
+      "B3-CARRY-DASHBOARD-REALITY-RECONCILIATION-R6"
+    ],
+    "expectedPreviewBoundary": [
+      "B2-R45-INSURER-REAL-LOGO-SAVE-BLOCKED-BY-PREVIEW-BOUNDARY-R5"
+    ],
+    "approvedRenewalNavigation": "RENEWAL_STARTS_WITH_REAL_COTIZADOR_COMPARATIVO_CONTEXT; NO_PROVISIONAL_POLICY_ON_CLICK; ACCEPTED_OFFER_CONTINUES_TO_OPS_ISSUANCE"
+  },
+  "rootCause": {
+    "managementWrite": "core/ciclo.js crearGestion uses optimistic S().insert and the operational facade starts the server write asynchronously while swallowing rejection from the caller.",
+    "renewalWrite": "renewals-v1200-operational-bridge.js calls optimistic crearGestion and immediately redirects/toasts; Preview real-data protection can reject the backend write after UI has already implied success.",
+    "hardcodedDefault": "core/ciclo.js still defaulted management asesorId to ase001 when caller omitted it."
+  },
+  "sourceFix": {
+    "orbit360-platform/core/ciclo.js": {
+      "before": "1809ff73e8cdbceb908aa65b3aaf177f5ebee908",
+      "after": "998669e654c615ce038aae10b72cba857c15e65d"
+    },
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": {
+      "before": "693356a926e51be6dc167188489b8976035e1537",
+      "after": "efe54d0974d1374e7c06a62bf15857e4b8fc6f9e"
+    },
+    "behavior": [
+      "Add awaited crearGestionDurable using insertDurable and canonical server readback.",
+      "Cliente360 Solicitar gestion shows success only after durable management commit; Preview real-data rejection is explicit and modal remains open.",
+      "Renewal management is awaited before normal Cotizador navigation; real Preview may open Cotizador read-only only with explicit no-Ops-write message.",
+      "Remove hardcoded ase001 fallback; use active session advisor only when caller provides no explicit advisor."
+    ]
+  },
+  "noReimport": true,
+  "noLive": true,
+  "noB3": true
+}

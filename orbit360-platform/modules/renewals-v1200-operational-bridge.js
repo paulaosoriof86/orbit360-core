@@ -57,13 +57,26 @@ Orbit.modules = Orbit.modules || {};
   function existingManagement(policyId) {
     return (S().all('gestiones')||[]).find(g=>g.polizaId===policyId&&norm(g.tipo)==='renovacion'&&!['completada','cerrada','cancelada','anulada'].includes(norm(g.estado)));
   }
-  function solicitarPropuestas(policyId) {
+  async function solicitarPropuestas(policyId) {
     const p=S().get('polizas',policyId);if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
     if(!active(p))return U.toast('La póliza está en histórico; usa recuperación o nueva gestión.');
     const c=S().get('clientes',p.clienteId)||{};
     let g=existingManagement(p.id);
-    if(!g&&Orbit.ciclo&&Orbit.ciclo.crearGestion){
-      g=Orbit.ciclo.crearGestion({lista:'Renovaciones / Modif.',tipo:'Renovación',titulo:'Renovación '+p.numero,clienteId:p.clienteId,polizaId:p.id,asesorId:p.asesorId,aseguradoraId:p.aseguradoraId,ramo:p.ramo,estado:'Pendiente',prioridad:(daysUntil(p.vigenciaFin)<=15?'Alta':'Media'),vence:p.vigenciaFin,proximaAccion:'Cotizar con fuentes vigentes',nota:'Pendiente de cotización real. No usar estimaciones ni tarifas no validadas.',origen:'Renovaciones',checklist:[{t:'Datos del riesgo actualizados',done:false},{t:'Cotizaciones reales recibidas',done:false},{t:'Comparativo presentado',done:false},{t:'Decisión del cliente',done:false},{t:'Nueva póliza emitida',done:false}]});
+    if(!g){
+      if(!Orbit.ciclo||typeof Orbit.ciclo.crearGestionDurable!=='function')return U.toast('No está disponible la persistencia segura de Ops. No se inició la renovación.');
+      try{
+        g=await Orbit.ciclo.crearGestionDurable({lista:'Renovaciones / Modif.',tipo:'Renovación',titulo:'Renovación '+p.numero,clienteId:p.clienteId,polizaId:p.id,asesorId:p.asesorId,aseguradoraId:p.aseguradoraId,ramo:p.ramo,estado:'Pendiente',prioridad:(daysUntil(p.vigenciaFin)<=15?'Alta':'Media'),vence:p.vigenciaFin,proximaAccion:'Cotizar con fuentes vigentes',nota:'Pendiente de cotización real. No usar estimaciones ni tarifas no validadas.',origen:'Renovaciones',checklist:[{t:'Datos del riesgo actualizados',done:false},{t:'Cotizaciones reales recibidas',done:false},{t:'Comparativo presentado',done:false},{t:'Decisión del cliente',done:false},{t:'Nueva póliza emitida',done:false}]});
+      }catch(error){
+        const code=String(error&&(error.code||error.message)||'');
+        if(/PREVIEW_SYNTHETIC_ONLY|preview.*synthetic|synthetic.*only/i.test(code)){
+          window.__orbitRenewalContext={policyId:p.id,clienteId:p.clienteId,gestionId:'',pais:p.pais||c.pais,moneda:p.moneda,ramo:p.ramo,producto:p.producto||p.subramo,renuevaDe:p.id,previewReadOnly:true};
+          U.toast('Preview protege los datos reales: no se creó gestión en Ops. Se abre Cotizador solo para revisión.');
+          location.hash='#/cotizador?renueva='+encodeURIComponent(p.id);
+          return;
+        }
+        U.toast('No fue posible crear la gestión de renovación. No se registró nada.');
+        return;
+      }
     }
     const context={policyId:p.id,clienteId:p.clienteId,gestionId:g&&g.id||'',pais:p.pais||c.pais,moneda:p.moneda,ramo:p.ramo,producto:p.producto||p.subramo,renuevaDe:p.id};
     window.__orbitRenewalContext=context;

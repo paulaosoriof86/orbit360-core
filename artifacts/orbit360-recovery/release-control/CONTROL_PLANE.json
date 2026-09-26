@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_AUTHENTICATED_PREVIEW_PASS_PENDING_VISUAL",
+    "mechanismSyncStatus": "B2_R8_OPS_DURABILITY_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "b55c317fa128ae5a5fa109e2c85086d63adbdee9",
+    "b2ExecutionLockBlobSha": "ba1d2eb0748fcb65f1e9ab5b6e2e4df31d1b9fef",
     "b2": {
-      "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2073,7 +2073,7 @@
       },
       "visualHierarchyAccepted": false,
       "visualCorrectionFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923.json",
-      "authenticatedPreviewPass": true,
+      "authenticatedPreviewPass": false,
       "academiaRegression": "ROLE_ACCESS_ROOT_CAUSE_CONFIRMED_SOURCE_FIX_PENDING_PREVIEW",
       "oldPreviewRunId": 35961983479,
       "oldPreviewSuperseded": true,
@@ -2307,7 +2307,17 @@
       "invalidatedOldPreviewAuthRunId": 36260454531,
       "r7nExactAuthenticatedPass": true,
       "r7nPassReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7N_EXACT_AUTHENTICATED_PASS_20260926.json",
-      "r7nPassReceiptBlobSha": "a416081c61e403f28a64f2c4f0e7b0644ad7a21f"
+      "r7nPassReceiptBlobSha": "a416081c61e403f28a64f2c4f0e7b0644ad7a21f",
+      "r8ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R8_VISUAL_REVIEW_OPS_DURABILITY_20260926.json",
+      "r8ReceiptBlobSha": "185abfa73b4f2f6c723273e913b74a2ef77d2c2e",
+      "r8BlockingFindingIds": [
+        "B2-R34-ASESOR-OPS-FALSE-SUCCESS-R4",
+        "B2-R62-RENEWAL-OPS-MANAGEMENT-DURABILITY-R8"
+      ],
+      "r8CarryForwardIds": [
+        "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
+        "DASHBOARD-INICIO-001"
+      ]
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2425,9 +2435,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "b973ff3d5064d89d4e5f8290da26a7044c69f6f3",
+    "compositionLockBlobSha": "75593d80865dbdc0c7af5ca6b52a96ba6a2f7604",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "e96c76430f88511146d82e3df969f69591e7a384",
+    "findingLedgerBlobSha": "1ce905a25ee48d99c494394771f42d9083eebb38",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
@@ -2439,7 +2449,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R7N_NEW_IMMUTABLE_PREVIEW_THEN_AUTHENTICATED_PROOF"
+    "nextAction": "B2_R8_NEW_IMMUTABLE_PREVIEW_THEN_AUTHENTICATED_PROOF"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
