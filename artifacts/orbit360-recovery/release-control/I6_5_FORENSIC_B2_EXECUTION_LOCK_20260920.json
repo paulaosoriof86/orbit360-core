@@ -2353,7 +2353,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "8198b81181ac7f04653160bd8395cfce1a929025",
+  "findingLedgerBlobSha": "66ac2ece9740e6b8dd00288c76e43e3d9aa20920",
   "r7": {
     "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2385,8 +2385,8 @@
     "noReimport": true,
     "remediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
     "remediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-    "compositionLockBlobSha": "d6524f6bb26379ea8bdef78c64f373913523211d",
-    "findingLedgerBlobSha": "8198b81181ac7f04653160bd8395cfce1a929025",
+    "compositionLockBlobSha": "05e019a46071fc860fda47cc484dad0d4a1fd05c",
+    "findingLedgerBlobSha": "66ac2ece9740e6b8dd00288c76e43e3d9aa20920",
     "productBlobs": {
       "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",

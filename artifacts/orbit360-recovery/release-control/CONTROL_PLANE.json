@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "da9e7da5cae051e2ec5ce844d7c6f2fa624e0e9a",
+    "b2ExecutionLockBlobSha": "8487aed7e52584f76306d5eb98c821f774b765f6",
     "b2": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2267,8 +2267,8 @@
       ],
       "r7RemediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R7_ROOT_CAUSE_REMEDIATION_20260926.json",
       "r7RemediationReceiptBlobSha": "25a2e5fbcdf6b66021637d0aac72ecfcbb704e1e",
-      "r7CompositionLockBlobSha": "d6524f6bb26379ea8bdef78c64f373913523211d",
-      "r7FindingLedgerBlobSha": "8198b81181ac7f04653160bd8395cfce1a929025",
+      "r7CompositionLockBlobSha": "05e019a46071fc860fda47cc484dad0d4a1fd05c",
+      "r7FindingLedgerBlobSha": "66ac2ece9740e6b8dd00288c76e43e3d9aa20920",
       "r7ProductBlobs": {
         "orbit360-platform/modules/cliente360.js": "c90bdd200072402bff208b72d9f962616893acad",
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "ee23b16c40086d883bb87f388ab4f2cc34a280f0",
@@ -2396,9 +2396,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "d6524f6bb26379ea8bdef78c64f373913523211d",
+    "compositionLockBlobSha": "05e019a46071fc860fda47cc484dad0d4a1fd05c",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "8198b81181ac7f04653160bd8395cfce1a929025",
+    "findingLedgerBlobSha": "66ac2ece9740e6b8dd00288c76e43e3d9aa20920",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
