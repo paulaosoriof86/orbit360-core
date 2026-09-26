@@ -744,7 +744,10 @@ try{
 
   await bounded(page.evaluate(async ({rid,date})=>Orbit.store.updateDurable('recibosEsperados',rid,{estadoOperativo:'pago_reportado',fechaPagoReportada:date,reportado:date}),{rid:receiptTarget.id,date:editedDue}),'B2_AUTH_REPORTED_PAYMENT_MARK_TIMEOUT',30000);
   evidence.writes.synthetic+=1;
+  await page.waitForFunction(({rid})=>{const r=Orbit.store&&Orbit.store.get&&Orbit.store.get('recibosEsperados',rid);return !!r&&String(r.estadoOperativo||'').toLowerCase()==='pago_reportado';},{rid:receiptTarget.id},{timeout:30000});
+  milestone('REPORTED_PAYMENT_BROWSER_READ_MODEL_READY',{receiptId:hash(receiptTarget.id)});
   await page.evaluate(()=>{if(window.Orbit?.router?.go)Orbit.router.go('cobros');else location.hash='#/cobros';});
+  await page.waitForFunction(()=>Orbit.route?.key==='cobros',null,{timeout:10000});
   await page.waitForSelector('[data-reported-payment-evidence="'+receiptTarget.id+'"]',{timeout:15000});
   const reportedText=clean(await page.locator('[data-reported-payment-evidence="'+receiptTarget.id+'"]').innerText(),800);need(/Pago reportado/i.test(reportedText),'B2_AUTH_REPORTED_PAYMENT_NOT_VISIBLE:'+reportedText);
   const cobrosAfterReported=await rowsBy(db,'cobros','polizaId',policy.id);need(cobrosAfterReported.length===0,'B2_AUTH_REPORTED_PAYMENT_FABRICATED_COBRO:'+cobrosAfterReported.length);
