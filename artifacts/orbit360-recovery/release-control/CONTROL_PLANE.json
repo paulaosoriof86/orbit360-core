@@ -33,7 +33,7 @@
     "deltaAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
     "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
     "staticSourceUpdateRequired": true,
-    "reason": "Pending Project-source synchronization includes V6 canonical composition/findings authority plus the 2026-09-26 permanent payment/date semantics addendum required before B3.",
+    "reason": "Permanent normative architecture change: canonical accumulative composition and findings ledger are machine-authoritative to prevent regression/lost improvements; pending Project-source synchronization also includes the 2026-09-26 permanent payment/date semantics addendum required before B3.",
     "operationalStateChangesDoNotRequireReplacement": true,
     "notificationRequiredWhenFlagTrue": true,
     "compositionModel": "IMMUTABLE_RETAINED_V5_PLUS_V6_ADDENDUM",
@@ -2325,7 +2325,17 @@
       "fix": "Central guard now consumes one exact-set/blob-bound canonical composition lock independent of duplicated status labels; findings are mechanically retained in one ledger."
     },
     "paymentInferenceAddendumV2Path": "artifacts/orbit360-recovery/release-control/GRAVICENTRA_REGLAS_CANONICAS_PAGOS_CONCILIACION_INFERENCIA_V2_20260926.md",
-    "paymentInferenceAddendumV2BlobSha": "c0c1ba8e58940d0796f94129ac7a6c7ce660e540"
+    "paymentInferenceAddendumV2BlobSha": "c0c1ba8e58940d0796f94129ac7a6c7ce660e540",
+    "r6GuardCompatibilityRepair": {
+      "status": "FIXED_PENDING_RERUN",
+      "failedRunId": 36247670441,
+      "failedJobId": 108419764357,
+      "error": "I6_PROJECT_SOURCE_UPDATE_REASON_MISSING",
+      "cause": "The 2026-09-26 reason text preserved the V6 obligation but no longer contained the guard's frozen literal 'canonical accumulative composition'.",
+      "correction": "Restore the frozen V6 discriminant while retaining the V7 payment/date pending-source obligation.",
+      "productSourceChanged": false,
+      "livePromoted": false
+    }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
