@@ -121,15 +121,25 @@ Orbit.policyReceipts = (function () {
     if (statusActive && !(+p.primaNeta > 0)) errors.push('prima_neta_requerida');
     if (statusActive && !(+p.cuotas > 0 || (Orbit.primas && Orbit.primas.cuotasDe(p.frecuencia) > 0))) errors.push('cuotas_requeridas');
 
-    const key = canonicalPolicyKey(Object.assign({}, p, { pais: country, moneda: currency }));
-    const duplicate = (S().all('polizas') || []).find(x => x.id !== currentId && canonicalPolicyKey(x) === key);
-    if (duplicate) errors.push('poliza_duplicada:' + duplicate.id);
+    const normalizedPolicy = Object.assign({}, p, { pais: country, moneda: currency });
+    const key = canonicalPolicyKey(normalizedPolicy);
+    const versionKey = policyVersionKey(normalizedPolicy);
+    const rows = (S().all('polizas') || []).filter(x => x && x.id !== currentId);
+    const duplicateVersion = rows.find(x => policyVersionKey(x) === versionKey);
+    if (duplicateVersion) errors.push('poliza_version_duplicada:' + duplicateVersion.id);
+    const sameCommercial = rows.find(x => canonicalPolicyKey(x) === key);
+    if (sameCommercial && !clean(p.renuevaDe)) errors.push('poliza_duplicada:' + sameCommercial.id);
+    if (clean(p.renuevaDe)) {
+      const source = S().get('polizas', clean(p.renuevaDe));
+      if (!source) errors.push('poliza_origen_renovacion_no_encontrada');
+      else if (clean(source.clienteId) !== clean(p.clienteId)) errors.push('poliza_origen_no_coincide_cliente');
+    }
 
     if (!statusActive) warnings.push('estado_historico_sin_cartera');
     if (!clean(p.formaPago)) warnings.push('forma_pago_requiere_validacion');
     if (!clean(p.conducto)) warnings.push('conducto_requiere_validacion');
 
-    return { ok: errors.length === 0, errors, warnings, client, insurer, country, currency, key, versionKey: policyVersionKey(Object.assign({}, p, { pais: country, moneda: currency })), active: statusActive };
+    return { ok: errors.length === 0, errors, warnings, client, insurer, country, currency, key, versionKey, active: statusActive };
   }
 
   function premiumBreakdown(raw, country) {

@@ -1,0 +1,123 @@
+{
+  "schema": "gravicentra-i6-5-b2-r9-renewal-workflow-business-rule-lock-v1",
+  "recordedAt": "2026-09-26",
+  "authority": "PAULA_EXPLICIT_BUSINESS_RULE",
+  "supersedes": [
+    "Any prior interpretation that Propuestas or Renovar must automatically navigate to Cotizador.",
+    "The prior bridge comment/behavior 'Renovar -> Cotizador/Comparativo'."
+  ],
+  "canonicalFlow": {
+    "proposals": {
+      "label": "Propuestas",
+      "actors": "Asesor and higher roles within active scope",
+      "action": "Create/reuse a durable renewal_proposals management in Ops.",
+      "opsPurpose": [
+        "Solicitar propuestas a aseguradoras",
+        "Cotizar desde Operaciones when role allows"
+      ],
+      "mustNot": "Must not automatically navigate the advisor to Cotizador."
+    },
+    "directQuote": {
+      "label": "Cotizar",
+      "actors": "Operativo/AdminTenant/Admin/SuperAdmin/Dirección or equivalent authorized non-advisor role",
+      "action": "Open Cotizador with renewal context as a separate explicit action.",
+      "advisorForbidden": true
+    },
+    "renewAccepted": {
+      "label": "Renovar",
+      "actors": "Asesor and higher roles within active scope after real client approval",
+      "action": "Create/reuse a durable renewal_accepted management in Ops; do not create a policy at button click.",
+      "acceptanceEvidenceRequired": true
+    },
+    "opsAcceptedDecision": {
+      "canonicalOwner": "Ops",
+      "choices": [
+        {
+          "action": "Solicitar emisión a la aseguradora",
+          "result": "Create linked issuance_request; no policy until real issuance data/document exist."
+        },
+        {
+          "action": "Registrar renovación en el sistema",
+          "precondition": "Firm renewal already received",
+          "result": "Create new physical policy version linked by renuevaDe, plus receipts/portfolio and risk snapshot."
+        }
+      ]
+    },
+    "directFirmRenewal": {
+      "editableFields": [
+        "aseguradora",
+        "numeroPoliza",
+        "vigenciaInicio",
+        "vigenciaFin",
+        "productoSubramo",
+        "frecuencia",
+        "cantidadPagos",
+        "formaPago",
+        "conducto",
+        "primaNeta",
+        "gastos",
+        "referenciaAseguradora",
+        "documentoRenovacion"
+      ],
+      "insurerMayChange": true,
+      "commercialPolicyNumberMayRemainSame": true,
+      "duplicateRule": "Same commercial policy number is allowed only as a distinct renewal physical version with renuevaDe and different policyVersionKey; exact same version remains forbidden.",
+      "sourcePolicyPreserved": true,
+      "createsConfirmedCobro": false,
+      "createsExpectedReceiptsAndPortfolio": true
+    },
+    "surfaces": {
+      "renewalList": [
+        "Propuestas",
+        "Renovar",
+        "Cotizar only if authorized"
+      ],
+      "cliente360": "Renovar creates renewal_accepted Ops management.",
+      "ops": "Canonical owner for proposals and accepted-renewal operational decisions.",
+      "leads": "No duplicate renewal owner is introduced; Ops remains canonical in this phase."
+    }
+  },
+  "roleBoundary": {
+    "advisor": [
+      "Solicitar propuestas via Ops",
+      "Registrar renovación aceptada via Ops"
+    ],
+    "advisorCannot": [
+      "Cotizar directamente",
+      "Crear póliza de renovación directamente"
+    ],
+    "operationalAndAbove": [
+      "Solicitar propuestas",
+      "Cotizar directamente",
+      "Procesar renovación aceptada in Ops",
+      "Solicitar emisión",
+      "Registrar firm renewal"
+    ]
+  },
+  "failClosed": [
+    "No optimistic success before server commit/readback",
+    "Preview real records remain write-protected",
+    "No provisional renewed policy",
+    "No reimport",
+    "No LIVE promotion"
+  ],
+  "sourceBlobs": {
+    "renew": "c945df58a8b7e29b18214b45ecfd039022f4f443",
+    "issuance": "fc19d625431fcde54faa0d6d79309e5dff5f1722",
+    "issuanceBridge": "a4bd2f91a2fca3ab4feb7e6baa83ae418534a978",
+    "engine": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
+    "opsBackend": "01eacecdd66baf143217e9b6cf5f588902649b1c",
+    "index": "ff7e84f91d8078dd8bc6e424920c9101afb44837",
+    "functional": "435eb9db882c14682f062bb7a2b0ac54a06ccbfd"
+  },
+  "priorPassPreserved": [
+    "Cliente360 performance",
+    "vehicle projection",
+    "reported-payment semantics",
+    "insurer logo synthetic durable proof"
+  ],
+  "carriesUnchanged": [
+    "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
+    "DASHBOARD-INICIO-001"
+  ]
+}

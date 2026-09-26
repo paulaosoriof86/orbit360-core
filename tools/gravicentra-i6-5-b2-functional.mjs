@@ -15,6 +15,8 @@ const files={
   issuance:read('orbit360-platform/core/issuance-workflow-v1201.js'),
   issuanceRefinements:read('orbit360-platform/core/issuance-workflow-v1201-refinements.js'),
   issuanceBridge:read('orbit360-platform/modules/issuance-endosos-v1201-bridge.js'),
+  renewals:read('orbit360-platform/modules/renewals-v1200-operational-bridge.js'),
+  ciclo:read('orbit360-platform/core/ciclo.js'),
   receiptsProjection:read('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js'),
   detail:read('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'),
   academia:read('orbit360-platform/modules/academia.js'),
@@ -86,6 +88,16 @@ need(files.issuance.includes('async function createRequest')&&files.issuance.inc
 need(files.issuance.includes('async function advanceRequest')&&files.issuance.includes("await S().updateDurable('gestiones', id, next)"),'B2_ISSUANCE_ADVANCE_NOT_DURABLE');
 need(files.issuanceRefinements.includes('I.advanceRequest = async function')&&files.issuanceRefinements.includes('return await originalAdvance')&&files.issuanceRefinements.includes('I.issueRequest = async function')&&files.issuanceRefinements.includes('return await originalIssue'),'B2_ISSUANCE_REFINEMENTS_NOT_ASYNC');
 need(files.issuanceBridge.includes('await I.createRequest')&&files.issuanceBridge.includes('await I.advanceRequest'),'B2_ISSUANCE_UI_CREATE_ADVANCE_NOT_AWAITED');
+const proposalOwner=(files.renewals.match(/async function solicitarPropuestas\(policyId\)[\s\S]*?\n  function cotizarDirecto/)||[])[0]||'';
+need(proposalOwner&&proposalOwner.includes("workflowType:'renewal_proposals'")&&proposalOwner.includes("await Orbit.ciclo.crearGestionDurable")&&proposalOwner.includes("location.hash='#/ops'")&&!proposalOwner.includes("location.hash='#/cotizador"),'B2_R9_RENEWAL_PROPOSALS_MUST_CREATE_OPS_NOT_QUOTER');
+need(files.renewals.includes('function cotizarDirecto(policyId)')&&files.renewals.includes("A.can('renovaciones','edit')")&&files.renewals.includes("A.esAsesor"),'B2_R9_DIRECT_QUOTE_ROLE_GATE_MISSING');
+need(files.renewals.includes('function registrarAceptacion(policyId)')&&files.renewals.includes("workflowType:'renewal_accepted'")&&files.renewals.includes("acceptedConfirmed:true"),'B2_R9_RENEWAL_ACCEPTED_MANAGEMENT_MISSING');
+need(files.issuanceBridge.includes("Orbit.modules.renovaciones.registrarAceptacion")&&files.issuanceBridge.includes('Solicitar emisión a aseguradora')&&files.issuanceBridge.includes('Registrar renovación en sistema'),'B2_R9_CLIENT_OPS_RENEWAL_BRANCHES_MISSING');
+need(files.issuance.includes('async function createDirectRenewal')&&files.issuance.includes("await P().createPolicy")&&files.issuance.includes("workflowType: 'renewal_accepted'")&&files.issuance.includes("directRenewalPolicyId: policy.id"),'B2_R9_DIRECT_RENEWAL_ENGINE_MISSING');
+need(files.engine.includes('duplicateVersion')&&files.engine.includes("if (sameCommercial && !clean(p.renuevaDe))")&&files.engine.includes('poliza_version_duplicada'),'B2_R9_RENEWAL_SAME_COMMERCIAL_NUMBER_VERSION_CONTRACT_MISSING');
+need(files.opsBackend.includes('RENEWAL_MANAGEMENT_FIELDS')&&files.opsBackend.includes("wt==='renewal_proposals'||wt==='renewal_accepted'")&&files.opsBackend.includes("'directRenewalPolicyId'"),'B2_R9_RENEWAL_WORKFLOW_BACKEND_FIELDS_MISSING');
+need(files.ciclo.includes('async function crearGestionDurable')&&files.ciclo.includes("await S().insertDurable('gestiones', row)")&&!files.ciclo.includes("asesorId: 'ase001'"),'B2_R9_OPS_MANAGEMENT_DURABILITY_OR_HARDCODE_REGRESSION');
+new Function(files.renewals);new Function(files.issuanceBridge);
 need(files.issuance.includes('async function issueRequest'),'B2_ISSUANCE_NOT_ASYNC');
 need(files.issuance.includes('await P().createPolicy'),'B2_ISSUANCE_CREATE_NOT_AWAITED');
 need(files.issuance.includes("await S().updateDurable('polizas', source.id")&&files.issuance.includes("await S().updateDurable('gestiones', request.id")&&files.issuance.includes("renovadaPor: policy.id")&&files.issuance.includes("policyCreatedId: policy.id"),'B2_RENEWAL_DURABLE_CLOSURE_MISSING');
@@ -137,7 +149,7 @@ for(const role of ['Dirección','Admin','Comercial','Finanzas','Marketing','Oper
   need(slice.includes("'academia'"),'B2_ACADEMIA_ALL_ROLE_DEFAULT_MISSING:'+role);
 }
 new Function(files.academiaCatalog);new Function(files.academiaOwner);new Function(files.academia);
-for(const marker of ['core/config.js?v=20260925-b2r4','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260924-b2r1','core/product-app-p0.js?v=20260923-b2a1','core/tenant-domain-config-client.js?v=20260924-b2r2','core/access-scope.js?v=20260925-b2r4','core/policy-receipts-engine.js?v=20260925-b2r5','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260924-b2r2','modules/inicio.js?v=20260925-b2r5c','modules/cliente360.js?v=20260926-b2r7','modules/cobros.js?v=20260925-b2r5','modules/aseguradoras.js?v=20260925-b2r4','modules/crm-v1198-operational-bridge.js?v=20260926-b2r7b','modules/policy-receipts-v1199-bridge.js?v=20260925-b2r4','modules/policy-receipts-v1199-detail-guard.js?v=20260926-b2r7','core/product-insurer-credential-provider-p0.js?v=20260924-b2r2','core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260926-b2r7','modules/cobros-cartera-i65-closure-bridge.js?v=20260925-b2r5c','modules/issuance-endosos-v1201-bridge.js?v=20260924-b2a6'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
+for(const marker of ['core/config.js?v=20260925-b2r4','data/academia-product-catalog-v1.js?v=20260923-b2a1','core/academia-product-catalog-p0.js?v=20260923-b2a1','product-runtime-config.js?v=20260923-b2a1','core/tenant-access-policy-contract-p0.js?v=20260923-b2a1','modules/academia.js?v=20260924-b2r1','core/product-app-p0.js?v=20260923-b2a1','core/tenant-domain-config-client.js?v=20260924-b2r2','core/access-scope.js?v=20260925-b2r4','core/ciclo.js?v=20260926-b2r9','core/policy-receipts-engine.js?v=20260926-b2r9','core/policy-receipts-v1199-refinements.js?v=20260923-b2a3','core/issuance-workflow-v1201.js?v=20260926-b2r9','modules/inicio.js?v=20260925-b2r5c','modules/cliente360.js?v=20260926-b2r7','modules/cobros.js?v=20260925-b2r5','modules/aseguradoras.js?v=20260925-b2r4','modules/crm-v1198-operational-bridge.js?v=20260926-b2r7b','modules/policy-receipts-v1199-bridge.js?v=20260925-b2r4','modules/policy-receipts-v1199-detail-guard.js?v=20260926-b2r7','core/product-insurer-credential-provider-p0.js?v=20260924-b2r2','core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260926-b2r7','modules/cobros-cartera-i65-closure-bridge.js?v=20260925-b2r5c','modules/renewals-v1200-operational-bridge.js?v=20260926-b2r9','modules/issuance-endosos-v1201-bridge.js?v=20260926-b2r9'])need(files.index.includes(marker),'B2_CACHE_KEY_MISSING:'+marker);
 
 global.window=global;
 const rows={
@@ -266,6 +278,24 @@ const issuedVehicles=rows.vehiculos.filter(x=>x.polizaId===issued.policy.id);
 need(issuedVehicles.length===1&&issuedVehicles[0].id!==rows.vehiculos.find(x=>x.polizaId==='pol-b2-a')?.id,'B2_RENEWAL_VEHICLE_SNAPSHOT_MISSING_OR_REUSED');
 need(issuedVehicles[0].marca==='Toyota'&&issuedVehicles[0].linea==='Corolla'&&issuedVehicles[0].placa==='B2TEST','B2_RENEWAL_VEHICLE_SNAPSHOT_FIELDS_INVALID');
 
+rows.gestiones.push({
+  id:'ren-b2-direct',tenantId:'alianzas-soluciones',workflowType:'renewal_accepted',renewalAction:'client_approved',
+  acceptedConfirmed:true,sourcePolicyId:issued.policy.id,polizaId:issued.policy.id,clienteId:'cli-b2',asesorId:'ase-b2',
+  aseguradoraId:'asg-b2',ramo:'Autos',estado:'Pendiente',lista:'Renovaciones / Modif.',tipo:'Renovación aceptada',titulo:'Renovación aceptada B2'
+});
+const directRenewal=await Orbit.issuance.createDirectRenewal('ren-b2-direct',{
+  numero:'B2-002',aseguradoraId:'asg-b2',vigenciaInicio:'2028-09-20',vigenciaFin:'2029-09-20',
+  frecuencia:'Semestral',cuotas:2,formaPago:'Transferencia',conducto:'Cobro directo del intermediario',
+  primaNeta:1200,gastosEmision:60,documentRef:'doc-b2-firm-renewal',sourceRef:'firm-b2'
+},{motivo:'B2 controlled direct firm renewal',operationId:'b2-direct-renew'});
+need(directRenewal.ok===true,'B2_R9_DIRECT_RENEWAL_FAILED:'+JSON.stringify(directRenewal.errors||[]));
+need(directRenewal.policy&&directRenewal.policy.numero==='B2-002'&&directRenewal.policy.renuevaDe===issued.policy.id,'B2_R9_DIRECT_RENEWAL_LINEAGE_INVALID');
+need(rows.polizas.filter(x=>x.numero==='B2-002').length===2,'B2_R9_SAME_COMMERCIAL_POLICY_NUMBER_VERSION_NOT_PRESERVED');
+need(rows.recibosEsperados.filter(x=>x.polizaId===directRenewal.policy.id&&String(x.estado).toLowerCase()!=='anulado').length===2,'B2_R9_DIRECT_RENEWAL_RECEIPTS_MISSING');
+need(rows.carteraPrimas.filter(x=>x.polizaId===directRenewal.policy.id&&x.carteraActiva!==false).length===2,'B2_R9_DIRECT_RENEWAL_PORTFOLIO_MISSING');
+need(rows.gestiones.find(x=>x.id==='ren-b2-direct')?.directRenewalPolicyId===directRenewal.policy.id&&rows.gestiones.find(x=>x.id==='ren-b2-direct')?.estado==='Resuelta','B2_R9_DIRECT_RENEWAL_OPS_CLOSURE_MISSING');
+need(rows.cobros.length===0,'B2_R9_DIRECT_RENEWAL_CREATED_CONFIRMED_COBRO');
+
 
 const r6Cliente=fs.readFileSync('orbit360-platform/modules/cliente360.js','utf8');
 const r6Detail=fs.readFileSync('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js','utf8');
@@ -292,5 +322,10 @@ console.log('I65_B2_RECEIPTS_PROJECTION=V920');
 console.log('I65_B2_RENEWAL_ASYNC_AWAIT=true');
 console.log('I65_B2_RENEWAL_RECEIPTS='+rows.recibosEsperados.filter(x=>x.polizaId===issued.policy.id&&String(x.estado).toLowerCase()!=='anulado').length);
 console.log('I65_B2_RENEWAL_PORTFOLIO='+rows.carteraPrimas.filter(x=>x.polizaId===issued.policy.id&&x.carteraActiva!==false).length);
+console.log('I65_B2_R9_PROPOSALS_TO_OPS=true');
+console.log('I65_B2_R9_RENEW_ACCEPTED_TO_OPS=true');
+console.log('I65_B2_R9_DIRECT_QUOTE_ROLE_GATED=true');
+console.log('I65_B2_R9_DIRECT_RENEWAL_SAME_NUMBER_VERSION=true');
+console.log('I65_B2_R9_DIRECT_RENEWAL_RECEIPTS='+rows.recibosEsperados.filter(x=>x.polizaId===directRenewal.policy.id&&String(x.estado).toLowerCase()!=='anulado').length);
 console.log('I65_B2_CONFIRMED_COBROS='+rows.cobros.length);
 console.log('I65_B2_DATA_WRITES=0');

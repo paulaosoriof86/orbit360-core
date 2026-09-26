@@ -2,7 +2,9 @@
    Orbit 360 · Bridge UX Emisión + Endosos v1.201
    ------------------------------------------------------------
    - Comparativo → Solicitud de emisión en Ops.
-   - Renovar → Cotizador/Comparativo, no póliza provisional.
+   - Propuestas → gestión en Ops; Cotizar es acción separada por rol.
+   - Renovar → gestión de renovación aceptada en Ops.
+   - Ops decide solicitar emisión o registrar renovación en firme.
    - Endoso → gestión aprobable, no edición directa.
    - Ops muestra controles de emisión/endoso en la ficha de gestión.
    ============================================================ */
@@ -226,12 +228,128 @@ Orbit.modules = Orbit.modules || {};
     };
   }
 
+  function renewalSource(g) { return S().get('polizas', g && (g.sourcePolicyId || g.polizaId)); }
+  function renewalInsurers(source) {
+    return (S().all('aseguradoras') || []).filter(a => a && a.vinculada !== false && (!source || !source.pais || !a.pais || a.pais === source.pais || [].concat(a.paises || []).includes(source.pais)));
+  }
+  function renewalContextFromManagement(g) {
+    const p=renewalSource(g)||{},c=S().get('clientes',p.clienteId)||{};
+    return {policyId:p.id||g.polizaId||'',clienteId:p.clienteId||g.clienteId||'',gestionId:g.id||'',pais:p.pais||c.pais||'',moneda:p.moneda||'',ramo:p.ramo||g.ramo||'',producto:p.producto||p.subramo||'',renuevaDe:p.id||g.polizaId||''};
+  }
+  function openRenewalQuoteFromOps(g) {
+    if (!I.canManage()) return toast('Tu rol activo no puede cotizar directamente.');
+    const ctx=renewalContextFromManagement(g); if(!ctx.policyId)return toast('No se encontró la póliza origen.');
+    window.__orbitRenewalContext=ctx; location.hash='#/cotizador?renueva='+encodeURIComponent(ctx.policyId);
+  }
+  function openProposalApproval(g) {
+    const source=renewalSource(g); if(!source)return toast('No se encontró la póliza origen.');
+    const body='<div class="cfg-note">Convierte esta gestión de propuestas en una renovación aceptada. Después, Operaciones podrá solicitar emisión o registrar la renovación en firme.</div><label style="display:flex;gap:8px;align-items:flex-start;margin-top:14px"><input id="ops-ren-accepted" type="checkbox"><span><b>El cliente aprobó la renovación.</b><small class="muted" style="display:block">Debe existir soporte de la decisión.</small></span></label><label class="ce-l" style="margin-top:12px">Nota / referencia de aprobación<textarea id="ops-ren-note" class="o-sel" style="min-height:72px"></textarea></label>';
+    const b=modal('ops-renewal-approval-v1201','Registrar aprobación del cliente',body,'<button class="btn primary" data-confirm>Confirmar renovación aceptada</button>',620);
+    const btn=b.querySelector('[data-confirm]');
+    btn.onclick=async()=>{
+      if(!b.querySelector('#ops-ren-accepted').checked)return toast('Confirma primero la aprobación del cliente.');
+      const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
+      try{
+        await S().updateDurable('gestiones',g.id,{
+          workflowType:'renewal_accepted',renewalAction:'client_approved',acceptedConfirmed:true,
+          clientApprovalAt:new Date().toISOString(),clientApprovalNote:b.querySelector('#ops-ren-note').value.trim(),
+          tipo:'Renovación aceptada',titulo:'Renovación aceptada · '+(source.numero||''),estado:'Pendiente',
+          proximaAccion:'Operaciones: solicitar emisión o registrar renovación en firme',
+          nota:b.querySelector('#ops-ren-note').value.trim()||g.nota||'Cliente aprobó la renovación.'
+        });
+        b.remove();toast('Aprobación registrada.');Orbit.ciclo.openGestion(g.id);
+      }catch(e){btn.disabled=false;btn.textContent=original;toast('No fue posible registrar la aprobación.');}
+    };
+  }
+  function openRenewalIssuance(g) {
+    if(!I.canManage())return toast('Tu rol activo no puede solicitar emisión.');
+    const source=renewalSource(g);if(!source)return toast('No se encontró la póliza origen.');
+    const insurers=renewalInsurers(source),client=S().get('clientes',source.clienteId)||{};
+    const selected=source.aseguradoraId||((insurers[0]||{}).id||''),payments=Math.max(1,+source.cuotas||1);
+    const body=`<div class="cfg-note" style="margin-bottom:12px">El cliente ya aprobó renovar. Esta acción crea una <b>solicitud de emisión en Ops</b>; no crea todavía la nueva póliza.</div><div class="cgrid">
+      <label class="ce-l">Aseguradora aceptada *<select id="reni-asg" class="o-sel">${insurers.map(a=>`<option value="${esc(a.id)}" ${a.id===selected?'selected':''}>${esc(a.nombre)}</option>`).join('')}</select></label>
+      <label class="ce-l">Producto / subramo *<input id="reni-prod" class="o-sel" value="${esc(source.producto||source.subramo||'')}"></label>
+      <label class="ce-l">Prima neta aceptada *<input id="reni-net" type="number" class="o-sel" value="${+source.primaNeta||0}"></label>
+      <label class="ce-l">Prima total aceptada *<input id="reni-total" type="number" class="o-sel" value="${+source.primaTotal||+source.prima||0}"></label>
+      <label class="ce-l">Cantidad de pagos<input id="reni-payments" type="number" min="1" class="o-sel" value="${payments}"></label>
+      <label class="ce-l">Forma de pago<input id="reni-form" class="o-sel" value="${esc(source.formaPago||'')}"></label>
+      <label class="ce-l">Referencia de propuesta / aceptación<input id="reni-source" class="o-sel" placeholder="Cotización, correo, WhatsApp o referencia"></label>
+      <label class="ce-l">Documento de propuesta<input id="reni-doc" class="o-sel" placeholder="documentRef opcional en esta etapa"></label>
+    </div>`;
+    const b=modal('ops-renewal-issuance-v1201','Solicitar emisión de renovación',body,'<button class="btn primary" data-create>Crear solicitud de emisión</button>',740);
+    const $=x=>b.querySelector(x),btn=b.querySelector('[data-create]');
+    btn.onclick=async()=>{
+      const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
+      const insurerId=$('#reni-asg').value,cuotas=Math.max(1,+$('#reni-payments').value||1);
+      const result=await I.createRequest({
+        clienteId:source.clienteId,asesorId:source.asesorId,aseguradoraId:insurerId,
+        sourcePolicyId:source.id,renewalManagementId:g.id,pais:source.pais,moneda:source.moneda,
+        ramo:source.ramo,producto:$('#reni-prod').value.trim(),acceptedConfirmed:true,
+        nota:g.clientApprovalNote||g.nota||'Renovación aprobada por el cliente.',origen:'Ops · Renovación aceptada',
+        acceptedOffer:{aseguradoraId:insurerId,pais:source.pais,moneda:source.moneda,ramo:source.ramo,
+          producto:$('#reni-prod').value.trim(),primaNeta:+$('#reni-net').value||0,primaTotal:+$('#reni-total').value||0,
+          cuotas,frecuencia:frequencyFromPayments(cuotas),formaPago:$('#reni-form').value.trim(),
+          sourceType:'renovacion_aceptada',sourceRef:$('#reni-source').value.trim(),documentRef:$('#reni-doc').value.trim()}
+      },{motivo:'Renovación aprobada: solicitar emisión a aseguradora'});
+      if(!result.ok){btn.disabled=false;btn.textContent=original;return toast('No se creó: '+(result.errors||[]).join(', '));}
+      try{await S().updateDurable('gestiones',g.id,{estado:'En proceso',renewalAction:'issuance_requested',issuanceRequestId:result.request.id,emisionGestionId:result.request.id,proximaAccion:'Esperar emisión de aseguradora'});}catch(e){}
+      b.remove();const base=document.getElementById('ciclo-modal');if(base)base.remove();toast(result.reused?'La solicitud de emisión ya estaba activa.':'Solicitud de emisión creada en Ops.');location.hash='#/ops';window.__orbitOpenGestion=result.request.id;
+    };
+  }
+  function openDirectRenewal(g) {
+    if(!I.canManage())return toast('Tu rol activo no puede registrar la renovación.');
+    const source=renewalSource(g);if(!source)return toast('No se encontró la póliza origen.');
+    const insurers=renewalInsurers(source),start=source.vigenciaFin||today(),payments=Math.max(1,+source.cuotas||1);
+    const body=`<div class="cfg-note" style="margin-bottom:12px">Usa esta opción cuando la aseguradora ya envió la <b>renovación en firme</b>. Al confirmar se crea una nueva póliza vinculada a la anterior, con sus recibos/cartera; la póliza origen se conserva.</div><div class="cgrid">
+      <label class="ce-l">Aseguradora *<select id="rend-asg" class="o-sel">${insurers.map(a=>`<option value="${esc(a.id)}" ${a.id===source.aseguradoraId?'selected':''}>${esc(a.nombre)}</option>`).join('')}</select></label>
+      <label class="ce-l">Número real de nueva póliza *<input id="rend-num" class="o-sel"></label>
+      <label class="ce-l">Vigencia inicio *<input id="rend-start" type="date" class="o-sel" value="${esc(start)}"></label>
+      <label class="ce-l">Vigencia fin *<input id="rend-end" type="date" class="o-sel" value="${esc(plusYear(start))}"></label>
+      <label class="ce-l">Producto / subramo<input id="rend-prod" class="o-sel" value="${esc(source.producto||source.subramo||'')}"></label>
+      <label class="ce-l">Frecuencia<select id="rend-freq" class="o-sel">${['Contado','Semestral','Cuatrimestral','Trimestral','Bimestral','Mensual'].map(x=>`<option ${x===source.frecuencia?'selected':''}>${x}</option>`).join('')}</select></label>
+      <label class="ce-l">Cantidad de pagos<input id="rend-payments" type="number" min="1" class="o-sel" value="${payments}"></label>
+      <label class="ce-l">Forma de pago<input id="rend-form" class="o-sel" value="${esc(source.formaPago||'')}"></label>
+      <label class="ce-l">Conducto<input id="rend-conduct" class="o-sel" value="${esc(source.conducto||'')}"></label>
+      <label class="ce-l">Prima neta *<input id="rend-net" type="number" class="o-sel" value="${+source.primaNeta||0}"></label>
+      <label class="ce-l">Gastos emisión<input id="rend-gem" type="number" class="o-sel" value="${+source.gastosEmision||0}"></label>
+      <label class="ce-l">Gastos financieros<input id="rend-gfin" type="number" class="o-sel" value="${+source.gastosFinan||0}"></label>
+      <label class="ce-l">Otros<input id="rend-other" type="number" class="o-sel" value="${+source.otros||0}"></label>
+      <label class="ce-l">Referencia aseguradora<input id="rend-source" class="o-sel"></label>
+      <label class="ce-l">Documento de renovación en firme *<input id="rend-doc" class="o-sel" placeholder="documentRef"></label>
+    </div>`;
+    const b=modal('ops-direct-renewal-v1201','Registrar renovación en el sistema',body,'<button class="btn primary" data-create>Crear nueva póliza de renovación</button>',780);
+    const $=x=>b.querySelector(x),btn=b.querySelector('[data-create]');
+    btn.onclick=async()=>{
+      const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
+      const result=await I.createDirectRenewal(g.id,{
+        aseguradoraId:$('#rend-asg').value,numero:$('#rend-num').value.trim(),
+        vigenciaInicio:$('#rend-start').value,vigenciaFin:$('#rend-end').value,producto:$('#rend-prod').value.trim(),
+        frecuencia:$('#rend-freq').value,cuotas:+$('#rend-payments').value||1,formaPago:$('#rend-form').value.trim(),
+        conducto:$('#rend-conduct').value.trim(),primaNeta:+$('#rend-net').value||0,gastosEmision:+$('#rend-gem').value||0,
+        gastosFinan:+$('#rend-gfin').value||0,otros:+$('#rend-other').value||0,sourceRef:$('#rend-source').value.trim(),documentRef:$('#rend-doc').value.trim()
+      },{motivo:'Renovación en firme recibida y aprobada'});
+      if(!result.ok){btn.disabled=false;btn.textContent=original;return toast('No se creó: '+(result.errors||[]).join(', '));}
+      b.remove();const base=document.getElementById('ciclo-modal');if(base)base.remove();toast(result.alreadyCreated?'La renovación ya estaba registrada.':'Nueva póliza de renovación creada con sus recibos.');Orbit.modules.cliente360.verPoliza(result.policy.id);
+    };
+  }
+
   function enhanceGestion(id) {
     const g = S().get('gestiones', id), back = document.getElementById('ciclo-modal');
     if (!g || !back || back.querySelector('[data-workflow-v1201]')) return;
     const main = back.querySelector('.ciclo-main'); if (!main) return;
     const panel = document.createElement('div'); panel.className = 'ciclo-sec'; panel.dataset.workflowV1201 = '1';
-    if (g.workflowType === 'issuance_request') {
+    if (g.workflowType === 'renewal_proposals') {
+      const source=renewalSource(g);
+      panel.innerHTML=`<div class="ciclo-sec-t">📋 Propuestas de renovación</div><div class="vp-tags"><span class="badge info">En gestión</span></div><div class="vp-grid" style="margin-top:10px"><div class="vp-row"><span class="vp-l">Póliza origen</span><span class="vp-v">${esc(source&&source.numero||g.polizaId||'—')}</span></div><div class="vp-row"><span class="vp-l">Próxima acción</span><span class="vp-v">Solicitar propuestas o cotizar desde Operaciones</span></div></div>${I.canManage()?'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px"><button class="btn ghost sm" data-ren-quote>Cotizar directamente</button><button class="btn primary sm" data-ren-approved>Cliente aprobó · renovar</button></div>':'<div class="muted" style="margin-top:10px">El asesor solicitó propuestas; la cotización la gestiona Operaciones.</div>'}`;
+      const quote=panel.querySelector('[data-ren-quote]');if(quote)quote.onclick=()=>openRenewalQuoteFromOps(g);
+      const approved=panel.querySelector('[data-ren-approved]');if(approved)approved.onclick=()=>openProposalApproval(g);
+    } else if (g.workflowType === 'renewal_accepted') {
+      const source=renewalSource(g),policy=(g.directRenewalPolicyId||g.nuevaPolizaId)&&S().get('polizas',g.directRenewalPolicyId||g.nuevaPolizaId);
+      panel.innerHTML=`<div class="ciclo-sec-t">✅ Renovación aceptada</div><div class="vp-tags"><span class="badge ok">Cliente aprobó</span>${g.issuanceRequestId?'<span class="badge info">Emisión solicitada</span>':''}</div><div class="vp-grid" style="margin-top:10px"><div class="vp-row"><span class="vp-l">Póliza origen</span><span class="vp-v">${esc(source&&source.numero||g.polizaId||'—')}</span></div><div class="vp-row"><span class="vp-l">Decisión operativa</span><span class="vp-v">${policy?'Renovación ya registrada':g.issuanceRequestId?'Esperando emisión':'Solicitar emisión o registrar renovación en firme'}</span></div></div>${I.canManage()&&!policy?'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px"><button class="btn ghost sm" data-ren-issuance>Solicitar emisión a aseguradora</button><button class="btn primary sm" data-ren-direct>Registrar renovación en sistema</button></div>':''}${policy?'<div style="margin-top:11px"><button class="btn primary sm" data-ren-policy>Ver nueva póliza</button></div>':''}`;
+      const issuance=panel.querySelector('[data-ren-issuance]');if(issuance)issuance.onclick=()=>openRenewalIssuance(g);
+      const direct=panel.querySelector('[data-ren-direct]');if(direct)direct.onclick=()=>openDirectRenewal(g);
+      const policyBtn=panel.querySelector('[data-ren-policy]');if(policyBtn)policyBtn.onclick=()=>{back.remove();Orbit.modules.cliente360.verPoliza(policy.id);};
+    } else if (g.workflowType === 'issuance_request') {
       const o = g.acceptedOffer || {}, policy = g.policyCreatedId && S().get('polizas', g.policyCreatedId);
       panel.innerHTML = `<div class="ciclo-sec-t">📝 Solicitud de emisión</div><div class="vp-tags"><span class="badge info">${esc(I.stageLabel(g.emissionStage))}</span>${g.requiereValidacion ? '<span class="badge warn">Requiere validación</span>' : '<span class="badge ok">Oferta referenciada</span>'}</div><div class="vp-grid" style="margin-top:10px"><div class="vp-row"><span class="vp-l">Prima aceptada</span><span class="vp-v">${esc(g.moneda)} ${Number(o.primaTotal || 0).toLocaleString('es-GT')}</span></div><div class="vp-row"><span class="vp-l">Fuente</span><span class="vp-v">${esc(o.sourceRef || o.sourceType || 'Pendiente')}</span></div><div class="vp-row"><span class="vp-l">Póliza origen</span><span class="vp-v">${esc((S().get('polizas', g.sourcePolicyId) || {}).numero || 'Nueva emisión')}</span></div><div class="vp-row"><span class="vp-l">Resultado</span><span class="vp-v">${policy ? esc(policy.numero) : 'Aún no crea póliza'}</span></div></div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px">${g.emissionStage === 'PROPUESTA_ACEPTADA' ? '<button class="btn ghost sm" data-stage="PENDIENTE_DOCUMENTOS">Pendiente documentos</button>' : ''}${g.requiereInspeccion && ['PROPUESTA_ACEPTADA','PENDIENTE_DOCUMENTOS'].includes(g.emissionStage) ? '<button class="btn ghost sm" data-stage="PENDIENTE_INSPECCION">Pasar a inspección</button>' : ''}${['PROPUESTA_ACEPTADA','PENDIENTE_DOCUMENTOS','PENDIENTE_INSPECCION'].includes(g.emissionStage) ? '<button class="btn ghost sm" data-stage="PENDIENTE_EMISION">Lista para emisión</button>' : ''}${!policy && !['CANCELADA','RECHAZADA'].includes(g.emissionStage) && I.canManage() ? '<button class="btn primary sm" data-issue>Registrar emisión real</button>' : ''}${policy ? '<button class="btn primary sm" data-policy>Ver póliza emitida</button>' : ''}</div>`;
       panel.querySelectorAll('[data-stage]').forEach(x => x.onclick = async () => {
@@ -265,7 +383,7 @@ Orbit.modules = Orbit.modules || {};
     const originalEndorse = mod.endoso && mod.endoso.bind(mod);
     mod.renovar = function (policyId) {
       const p = S().get('polizas', policyId); if (!p || !A.canView('polizas', p, 'renovaciones')) return toast('Póliza fuera de tu alcance.');
-      if (Orbit.modules.renovaciones && Orbit.modules.renovaciones.solicitarPropuestas) return Orbit.modules.renovaciones.solicitarPropuestas(policyId);
+      if (Orbit.modules.renovaciones && Orbit.modules.renovaciones.registrarAceptacion) return Orbit.modules.renovaciones.registrarAceptacion(policyId);
       return toast('El flujo de renovación no está disponible.');
     };
     mod.endoso = function (policyId) { return openEndorsementRequest(policyId); };

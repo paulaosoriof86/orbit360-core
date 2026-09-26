@@ -1204,7 +1204,7 @@
       "rootCause": "Effective current owners still used optimistic Orbit.store insert: core/ciclo.js returned before server commit, and renewal bridge immediately redirected/toasted. Backend rejection in protected Preview rolled back the pending row after UI had implied success.",
       "remediation": "Use awaited crearGestionDurable -> server-owned workflow command -> canonical readback before any success/notification. Preview real-data rejection must be explicit.",
       "requiredProof": "Synthetic authenticated management create from Cliente360/Renovaciones -> server commit -> canonical readback -> visible exactly once in Ops -> cleanup; real Preview action never claims persistence.",
-      "status": "SOURCE_REFIXED_R8_PENDING_NEW_EXACT_PREVIEW_AUTH_PROOF",
+      "status": "SOURCE_RECOMPOSED_R9_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_VISUAL",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "blocking": true,
@@ -1215,7 +1215,9 @@
           "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
           "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "efe54d0974d1374e7c06a62bf15857e4b8fc6f9e"
         }
-      }
+      },
+      "latestRuleLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R9_RENEWAL_WORKFLOW_BUSINESS_RULE_LOCK_20260926.json",
+      "latestRuleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e"
     },
     {
       "id": "B2-R35-VEHICLE-HISTORY-PROJECTION-R4",
@@ -2084,7 +2086,7 @@
       "rootCause": "renewals-v1200-operational-bridge invokes optimistic Orbit.ciclo.crearGestion; core/ciclo crearGestion uses non-awaited S().insert.",
       "remediation": "Await server-owned create_management + canonical readback before normal success. Preserve approved Renew -> Cotizador/Comparativo -> accepted offer -> Ops issuance -> real renewed policy workflow.",
       "requiredProof": "Synthetic authenticated renewal management appears exactly once in Ops and survives reload; protected real Preview explicitly reports no write; no provisional renewed policy created by clicking Renew.",
-      "status": "SOURCE_FIXED_R8_PENDING_NEW_EXACT_PREVIEW_AUTH_PROOF",
+      "status": "SOURCE_RECOMPOSED_R9_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_VISUAL",
       "blocking": true,
       "sourceFix": {
         "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
@@ -2092,7 +2094,9 @@
       },
       "noReimport": true,
       "noLive": true,
-      "noB3": true
+      "noB3": true,
+      "latestRuleLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R9_RENEWAL_WORKFLOW_BUSINESS_RULE_LOCK_20260926.json",
+      "latestRuleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e"
     },
     {
       "id": "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
@@ -2107,6 +2111,33 @@
       "blocking": false,
       "noReimport": true,
       "noLive": true
+    },
+    {
+      "id": "B2-R63-RENEWAL-WORKFLOW-SEMANTIC-CONTRACT-R9",
+      "block": "B2",
+      "source": "PAULA_EXPLICIT_BUSINESS_RULE_R9",
+      "surface": "Renovaciones/Cliente360/Ops/Cotizador",
+      "classification": "PRODUCT_SEMANTIC_CONTRACT_CORRECTION",
+      "finding": "Propuestas and Renovar were incorrectly coupled to Cotizador. Propuestas must create Ops work; Renovar means client-approved renewal and creates Ops work; Cotizar must be a separate role-gated action; Ops must support request issuance or direct firm-renewal registration.",
+      "rootCause": "Legacy renewal bridge encoded 'create/reuse management and open Cotizador' as one action, and Cliente360 Renovar delegated to solicitarPropuestas.",
+      "remediation": "Separate proposal, direct-quote and accepted-renewal actions; make Ops the canonical decision owner; add direct firm-renewal engine and version-safe duplicate contract.",
+      "requiredProof": "Exact immutable Preview functional proof + authenticated general proof + Paula visual: three renewal actions by role; Propuestas/Renovar do not auto-open Cotizador; Ops accepted panel exposes issuance/direct registration; no optimistic persistence claim in protected Preview.",
+      "status": "SOURCE_FIXED_R9_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_VISUAL",
+      "blocking": true,
+      "noReimport": true,
+      "noLive": true,
+      "noB3": true,
+      "ruleLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R9_RENEWAL_WORKFLOW_BUSINESS_RULE_LOCK_20260926.json",
+      "ruleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e",
+      "sourceFix": {
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c945df58a8b7e29b18214b45ecfd039022f4f443",
+        "orbit360-platform/core/issuance-workflow-v1201.js": "fc19d625431fcde54faa0d6d79309e5dff5f1722",
+        "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "a4bd2f91a2fca3ab4feb7e6baa83ae418534a978",
+        "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
+        "functions/product-ops-leads-domain.js": "01eacecdd66baf143217e9b6cf5f588902649b1c",
+        "orbit360-platform/index.html": "ff7e84f91d8078dd8bc6e424920c9101afb44837",
+        "tools/gravicentra-i6-5-b2-functional.mjs": "435eb9db882c14682f062bb7a2b0ac54a06ccbfd"
+      }
     }
   ],
   "phaseBBacklog": [

@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -245,7 +245,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PASS",
+    "status": "PENDING_NEW_EXACT_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "3b6001be5e847bafe242cf8dafadd0551b4e2e88",
     "exactPreviewBuildId": "gi-i65-b2-3b6001be5e84-57f234755dc1",
@@ -424,7 +424,7 @@
     "r5ReportedPaymentProjection": true,
     "lastFailureJobId": 108452982186,
     "lastFailureCode": "B2_AUTH_INSURER_LOGO_FILE_SELECTION_MISSING",
-    "lastFailureClassification": "R8_PRODUCT_DEFECT_OPS_MANAGEMENT_OPTIMISTIC_FALSE_SUCCESS",
+    "lastFailureClassification": "R9_RENEWAL_WORKFLOW_SEMANTIC_CONTRACT_CORRECTION",
     "productRegressionDemonstrated": true,
     "requiredNewHarnessBlob": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
     "priorPassRunId": 36258221310,
@@ -1463,8 +1463,8 @@
     "broadRediscoveryRequired": false,
     "authorityBlobSha": "2250d63fc5dd2fb824e30b5493e7e6a611fc02d4",
     "findingsLedgerBlobSha": "6912bfbecfc963c3c57c64a058e192ee18173b68",
-    "compositionLockBlobSha": "75593d80865dbdc0c7af5ca6b52a96ba6a2f7604",
-    "findingLedgerBlobSha": "1ce905a25ee48d99c494394771f42d9083eebb38"
+    "compositionLockBlobSha": "3fb858d290b1fd2da4eeba1a6a225c8012e0225b",
+    "findingLedgerBlobSha": "56614826509399eef92d0a937c6d46c47fc7d285"
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
   "lastPreviewFailure": {
@@ -2383,7 +2383,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "1ce905a25ee48d99c494394771f42d9083eebb38",
+  "findingLedgerBlobSha": "56614826509399eef92d0a937c6d46c47fc7d285",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2523,6 +2523,38 @@
     "receiptBlobSha": "185abfa73b4f2f6c723273e913b74a2ef77d2c2e",
     "findingLedgerBlobSha": "1ce905a25ee48d99c494394771f42d9083eebb38",
     "compositionLockBlobSha": "75593d80865dbdc0c7af5ca6b52a96ba6a2f7604",
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true
+  },
+  "paulaVisualReviewR9": {
+    "status": "BUSINESS_RULE_ACCEPTED_SOURCE_FIXED_PENDING_NEW_PREVIEW",
+    "ruleLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R9_RENEWAL_WORKFLOW_BUSINESS_RULE_LOCK_20260926.json",
+    "ruleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e",
+    "blockingFindingIds": [
+      "B2-R34-ASESOR-OPS-FALSE-SUCCESS-R4",
+      "B2-R62-RENEWAL-OPS-MANAGEMENT-DURABILITY-R8",
+      "B2-R63-RENEWAL-WORKFLOW-SEMANTIC-CONTRACT-R9"
+    ],
+    "carryForwardIds": [
+      "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
+      "DASHBOARD-INICIO-001"
+    ],
+    "previousPreviewSupersededForRenewalSurfaces": true
+  },
+  "r9": {
+    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "ruleLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R9_RENEWAL_WORKFLOW_BUSINESS_RULE_LOCK_20260926.json",
+    "ruleLockBlobSha": "26b935ca94d3be1fffcc134c18aa1adb944c028e",
+    "sourceBlobs": {
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c945df58a8b7e29b18214b45ecfd039022f4f443",
+      "orbit360-platform/core/issuance-workflow-v1201.js": "fc19d625431fcde54faa0d6d79309e5dff5f1722",
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "a4bd2f91a2fca3ab4feb7e6baa83ae418534a978",
+      "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
+      "functions/product-ops-leads-domain.js": "01eacecdd66baf143217e9b6cf5f588902649b1c",
+      "orbit360-platform/index.html": "ff7e84f91d8078dd8bc6e424920c9101afb44837"
+    },
+    "functionalProofBlobSha": "435eb9db882c14682f062bb7a2b0ac54a06ccbfd",
     "noLive": true,
     "noB3": true,
     "noReimport": true

@@ -279,8 +279,76 @@ Orbit.issuance = (function () {
     return { ok: true, policy: S().get('polizas', policy.id), request: finalRequest, receipts: created.receipts, operationId: opId };
   }
 
+  async function createDirectRenewal(managementId, input, options) {
+    input = input || {}; options = options || {};
+    if (!canManage()) return { ok: false, errors: ['permiso_renovacion_denegado'] };
+    const management = S().get('gestiones', managementId);
+    if (!management || management.workflowType !== 'renewal_accepted') return { ok: false, errors: ['gestion_renovacion_aceptada_no_encontrada'] };
+    if (!management.acceptedConfirmed) return { ok: false, errors: ['aceptacion_cliente_requerida'] };
+    if (management.directRenewalPolicyId || management.nuevaPolizaId) {
+      const prior = S().get('polizas', management.directRenewalPolicyId || management.nuevaPolizaId);
+      if (prior) return { ok: true, alreadyCreated: true, policy: prior, management };
+    }
+    const sourceId = clean(management.sourcePolicyId || management.polizaId);
+    const source = sourceId ? S().get('polizas', sourceId) : null;
+    if (!source) return { ok: false, errors: ['poliza_origen_no_encontrada'] };
+    if (!P() || !P().createPolicy) return { ok: false, errors: ['motor_polizas_no_disponible'] };
+    const insurerId = clean(input.aseguradoraId || source.aseguradoraId);
+    const opId = options.operationId || operationId('rendirect');
+    const raw = {
+      numero: clean(input.numero), clienteId: source.clienteId, asesorId: source.asesorId,
+      aseguradoraId: insurerId, pais: clean(input.pais || source.pais), moneda: clean(input.moneda || source.moneda),
+      ramo: clean(input.ramo || source.ramo), subramo: clean(input.subramo || source.subramo || source.producto),
+      producto: clean(input.producto || source.producto || source.subramo), estado: 'Vigente',
+      vigenciaInicio: clean(input.vigenciaInicio), vigenciaFin: clean(input.vigenciaFin),
+      frecuencia: clean(input.frecuencia || source.frecuencia || 'Contado'),
+      formaPago: clean(input.formaPago || source.formaPago), cuotas: Math.max(1, +(input.cuotas || source.cuotas) || 1),
+      conducto: clean(input.conducto || source.conducto),
+      primaNeta: +(input.primaNeta != null ? input.primaNeta : source.primaNeta) || 0,
+      gastosEmision: +(input.gastosEmision != null ? input.gastosEmision : source.gastosEmision) || 0,
+      gastosFinan: +(input.gastosFinan != null ? input.gastosFinan : source.gastosFinan) || 0,
+      otros: +(input.otros != null ? input.otros : source.otros) || 0,
+      ivaPct: input.ivaPct != null ? +input.ivaPct : source.ivaPct,
+      recargoFinPct: input.recargoFinPct != null ? +input.recargoFinPct : source.recargoFinPct,
+      sumaAsegurada: +(input.sumaAsegurada != null ? input.sumaAsegurada : source.sumaAsegurada) || 0,
+      comAseguradoraPct: +(input.comAseguradoraPct != null ? input.comAseguradoraPct : source.comAseguradoraPct) || 0,
+      comVendedorPct: +(input.comVendedorPct != null ? input.comVendedorPct : source.comVendedorPct) || 0,
+      fuente: 'renovacion_en_firme', sourceRef: clean(input.sourceRef), documentRef: clean(input.documentRef),
+      renuevaDe: source.id, gestionRenovacionId: management.id, renewalOperationId: opId,
+      vehiculo: renewalVehicleSnapshot(source)
+    };
+    if (!raw.numero) return { ok: false, errors: ['numero_poliza_real_requerido'] };
+    if (!raw.vigenciaInicio || !raw.vigenciaFin) return { ok: false, errors: ['vigencia_real_requerida'] };
+    if (source.vigenciaFin && raw.vigenciaInicio && String(raw.vigenciaInicio) < String(source.vigenciaFin)) return { ok: false, errors: ['traslape_requiere_regla_tenant'], sourceEnd: source.vigenciaFin, newStart: raw.vigenciaInicio };
+    if (!raw.documentRef) return { ok: false, errors: ['documento_renovacion_en_firme_requerido'] };
+    const created = await P().createPolicy(raw, { operationId: opId, motivo: options.motivo || 'Renovación en firme recibida y aprobada por el cliente' });
+    if (!created.ok) return created;
+    const policy = created.policy;
+    const hist = [].concat(source.historial || [], [{ icon: '🔄', fecha: today(), t: 'Renovación registrada', d: 'Nueva póliza ' + policy.numero + ' · vínculo ' + policy.id }]);
+    await S().updateDurable('polizas', source.id, {
+      renovadaPor: policy.id, renovacionEstado: 'Renovada', renovacionFechaEfectiva: policy.vigenciaInicio,
+      renovacionGestionId: management.id, historial: hist
+    });
+    await S().updateDurable('gestiones', management.id, {
+      estado: 'Resuelta', workflowType: 'renewal_accepted', renewalAction: 'direct_policy_registered',
+      directRenewalPolicyId: policy.id, nuevaPolizaId: policy.id, resultado: 'Renovación registrada · póliza ' + policy.numero,
+      proximaAccion: 'Cerrada', actualizado: today()
+    });
+    try {
+      S().insert('actividades', {
+        id: 'act_' + Date.now().toString(36), tenantId: management.tenantId, clienteId: source.clienteId,
+        asesorId: source.asesorId, tipo: 'renovacion', icon: '✅', fecha: today(),
+        titulo: 'Renovación registrada: ' + policy.numero,
+        detalle: 'Renueva ' + source.numero + ' · gestión ' + management.id,
+        gestionId: management.id, polizaId: policy.id, sourcePolicyId: source.id, operationId: opId
+      });
+    } catch (e) {}
+    if (A() && A().audit) A().audit('registrar_renovacion_en_firme', 'gestiones', management.id, management, S().get('gestiones', management.id), options.motivo || 'Renovación en firme recibida', { operationId: opId, newPolicyId: policy.id, sourcePolicyId: source.id });
+    return { ok: true, policy: S().get('polizas', policy.id), management: S().get('gestiones', management.id), receipts: created.receipts, operationId: opId };
+  }
+
   return {
     ACTIVE_STAGES, TRANSITIONS, canManage, stageLabel, requestKey, activeRequests, existingByKey,
-    validateRequest, createRequest, advanceRequest, issueRequest
+    validateRequest, createRequest, advanceRequest, issueRequest, createDirectRenewal
   };
 })();
