@@ -974,8 +974,15 @@ try{
   }));
   need(acceptedPanel.issuance===true&&acceptedPanel.direct===true,'B2_AUTH_RENEWAL_ACCEPTED_OPS_BRANCHES_MISSING:'+JSON.stringify(acceptedPanel));
   await page.reload({waitUntil:'domcontentloaded',timeout:30000});
-  await page.waitForFunction(ids=>window.Orbit&&Orbit.store&&ids.every(id=>!!Orbit.store.get('gestiones',id)),[opsE2E.ids.generic,opsE2E.ids.proposals,opsE2E.ids.accepted],{timeout:30000});
+  await bounded(activate(page,auth,actor),'B2_AUTH_OPS_LEADS_RELOAD_ACTIVATE_TIMEOUT',45000);
+  await setRole(page,'Operativo');
   await page.evaluate(()=>{location.hash='#/ops';});
+  await page.waitForFunction(()=>{
+    const s=window.Orbit?.store?._productStatus?.()||{};
+    const confirmed=[].concat(s.serverConfirmedCollections||[]);
+    return s.ready===true&&confirmed.includes('gestiones')&&confirmed.includes('negocios');
+  },null,{timeout:30000});
+  await page.waitForFunction(ids=>window.Orbit&&Orbit.store&&ids.every(id=>!!Orbit.store.get('gestiones',id))&&!!Orbit.store.get('negocios',ids[3]),[opsE2E.ids.generic,opsE2E.ids.proposals,opsE2E.ids.accepted,opsE2E.ids.business],{timeout:30000});
   await page.waitForSelector('[data-ges]',{timeout:15000});
   const afterReload=await page.evaluate(ids=>({
     generic:(Orbit.store.all('gestiones')||[]).filter(x=>x.id===ids.generic).length,

@@ -131,7 +131,10 @@
       "operationalDataMutationAuthorized": false,
       "liveHostingPromotionAuthorized": false,
       "idempotentEnsureOnly": true
-    }
+    },
+    "previewWorkflowCreateAuthorized": true,
+    "previewExistingWorkflowMutationAuthorized": false,
+    "previewExternalNotificationsAuthorized": false
   },
   "emailDebt": {
     "status": "DEFERRED_NON_BLOCKING_BY_OWNER",
@@ -253,7 +256,10 @@
     "exactPreviewArtifactId": 10914894140,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
-      "syntheticQaOnly": true,
+      "syntheticQaOnly": false,
+      "interactiveUatWorkflowCreatesAuthorized": true,
+      "previewCreatedWorkflowUpdatesOnly": true,
+      "externalNotificationsSuppressed": true,
       "cleanupMandatory": true,
       "businessDataMutationAuthorized": false,
       "reimportAuthorized": false,
@@ -390,7 +396,7 @@
     "cleanupWrites": 25,
     "visualEvidenceRecapture": true,
     "visualReceiptRecapture": true,
-    "lastFailureRunId": 36259661784,
+    "lastFailureRunId": 36270274202,
     "requiredNewSource": true,
     "lastArmCommitParent": "219bf4d02c37d785e2c6d2a811ee1b5ff42f84dd",
     "lastArmReason": "R22_PREVIEW_CREDENTIAL_ISOLATION_EXACT_AUTHENTICATED_PROOF",
@@ -424,7 +430,7 @@
     "r5ReportedPaymentProjection": true,
     "lastFailureJobId": 108452982186,
     "lastFailureCode": "B2_AUTH_INSURER_LOGO_FILE_SELECTION_MISSING",
-    "lastFailureClassification": "R9_RENEWAL_WORKFLOW_SEMANTIC_CONTRACT_CORRECTION",
+    "lastFailureClassification": "HARNESS_RELOAD_ACTIVATION_GAP",
     "productRegressionDemonstrated": true,
     "requiredNewHarnessBlob": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
     "priorPassRunId": 36258221310,
@@ -432,7 +438,8 @@
     "proofStrengtheningReason": "R59_VISIBLE_PLATE_UNIQUENESS_AND_ACTIVE_POLICY_COVERAGE",
     "invalidatedOldPreviewRunId": 36260454531,
     "requiredHarnessBlob": "ab1fdb808fb255be3f490a500c63705a23bba32e",
-    "priorPassInsufficientForOpsManagement": true
+    "priorPassInsufficientForOpsManagement": true,
+    "harnessBlobSha": "b6d7e99b8c2beeea878510a7869df3b8fcebb0d6"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -2385,7 +2392,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "4d2ae44a19b5c21d6144343c5b1b27c29e43a833",
+  "findingLedgerBlobSha": "1bd0e95a78fb35e67f62960e6a50a446d0c0c861",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2586,10 +2593,10 @@
     "preservedHumanEvidence": "REAL_PREVIEW_FAIL_CLOSED_NO_FALSE_SUCCESS"
   },
   "r12PreviewUatWrites": {
-    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "status": "TECHNICAL_PREVIEW_PASS_AUTH_RETRY_AUTHORIZED",
     "findingId": "B2-R66-PREVIEW-UAT-WRITE-CAPABILITY-R12",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
-    "receiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
+    "receiptBlobSha": "1190db15b4fb3e4a4d8a4e5617dce615481eab05",
     "notificationsSuppressed": true,
     "roleScopePreserved": true
   }

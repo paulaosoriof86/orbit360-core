@@ -3673,7 +3673,7 @@ jobs:
           cat "$RUNNER_TEMP/b2-storage-bucket-readonly.json"
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
           node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","storageBucket":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview"],"productionFunctionDeployed":false,"operationalBusinessWritesAuthorized":false}\n' "$GITHUB_SHA" "$STORAGE_BUCKET" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
+          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","storageBucket":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview","orbit360OpsLeadsCommandPreview"],"productionFunctionDeployed":false,"controlledWorkflowUatWritesAuthorized":true,"existingWorkflowMutationAuthorized":false,"externalNotificationsSuppressed":true}\n' "$GITHUB_SHA" "$STORAGE_BUCKET" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
           cp "$RUNNER_TEMP/b2-storage-bucket-readonly.json" "$RUNNER_TEMP/b2-package/evidence/b2-storage-bucket-readonly.json"
       - name: Deploy exact B2 package to isolated Preview
         if: steps.mode.outputs.mode == 'preview'
@@ -3810,7 +3810,8 @@ jobs:
             && q.status==='AUTHORIZED_PENDING_RUN'
             && cleanup.status==='PASS';
           if(run){
-            if(!x.syntheticQaWritesAuthorized||!x.syntheticQaOnly||!x.cleanupMandatory||x.businessDataMutationAuthorized!==false||x.reimportAuthorized!==false||x.emailSendAuthorized!==false||x.liveHostingPromotionAuthorized!==false||x.productSourceMutationAuthorized!==false)throw Error('B2_AUTH_PROOF_BOUNDARY_INVALID');
+            const controlledUat=x.syntheticQaWritesAuthorized===true&&x.interactiveUatWorkflowCreatesAuthorized===true&&x.previewCreatedWorkflowUpdatesOnly===true&&x.externalNotificationsSuppressed===true&&x.cleanupMandatory===true&&x.businessDataMutationAuthorized===false&&x.reimportAuthorized===false&&x.emailSendAuthorized===false&&x.liveHostingPromotionAuthorized===false&&x.productSourceMutationAuthorized===false;
+            if(!controlledUat)throw Error('B2_AUTH_PROOF_BOUNDARY_INVALID');
             if(!p.url||p.exactReadback!==true||p.functionalPass!==true||p.livePromoted!==false)throw Error('B2_AUTH_PREVIEW_NOT_CERTIFIED');
             if(q.exactPreviewSourceSha!==p.sourceSha||q.exactPreviewBuildId!==p.buildId||q.exactPreviewArtifactId!==p.artifactId||q.exactPreviewUrl!==p.url)throw Error('B2_AUTH_PREVIEW_BINDING_DRIFT');
           }

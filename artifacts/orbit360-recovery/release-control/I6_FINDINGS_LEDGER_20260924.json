@@ -2200,7 +2200,7 @@
       "rootCause": "The harness validated source contracts and advisor Ops visibility but had no server-owned synthetic management E2E discriminant.",
       "remediation": "Strengthen authenticated harness with b2-ges/b2-neg canonical writes, readback, one-card projection, accepted-renewal branches, reload idempotency and cleanup.",
       "requiredProof": "New exact immutable Preview authenticated run passes OPS_LEADS_SYNTHETIC_E2E_PASS and cleanup leaves zero synthetic data/workflow residue.",
-      "status": "R12_WRITE_ENABLED_PREVIEW_PENDING_EXACT_AUTH_AND_PAULA_UAT",
+      "status": "R12_AUTH_RETRY_AUTHORIZED_SAME_EXACT_PREVIEW",
       "blocking": true,
       "harnessBlobSha": "ab1fdb808fb255be3f490a500c63705a23bba32e",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
@@ -2208,7 +2208,9 @@
       "noLive": true,
       "noB3": true,
       "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
-      "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae"
+      "r12ReceiptBlobSha": "1190db15b4fb3e4a4d8a4e5617dce615481eab05",
+      "authFailureRunId": 36270274202,
+      "authFailureClassification": "HARNESS_RELOAD_ACTIVATION_GAP"
     },
     {
       "id": "B2-R66-PREVIEW-UAT-WRITE-CAPABILITY-R12",
@@ -2220,12 +2222,15 @@
       "rootCause": "El endurecimiento de seguridad B2 convirtió el Preview de workflow en read-only para registros no sintéticos.",
       "remediation": "Permitir creación autenticada y role-scoped en Preview; solo registros creados en Preview pueden modificarse; suprimir notificaciones externas y auditar previewWrite.",
       "requiredProof": "Propuestas, Pedir renovar y Gestión desde Cliente360 persisten y aparecen una sola vez en Ops; negocio de prueba se sincroniza Leads↔Ops; reload conserva; cero outbox externo.",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "status": "R12_AUTH_RETRY_AUTHORIZED_SAME_EXACT_PREVIEW",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "receiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "r12ReceiptBlobSha": "1190db15b4fb3e4a4d8a4e5617dce615481eab05",
+      "authFailureRunId": 36270274202,
+      "authFailureClassification": "HARNESS_RELOAD_ACTIVATION_GAP"
     }
   ],
   "phaseBBacklog": [

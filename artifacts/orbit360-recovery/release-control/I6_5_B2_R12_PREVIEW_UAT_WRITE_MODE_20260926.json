@@ -21,5 +21,20 @@
     "Sin reimportación"
   ],
   "supersedes": "PREVIEW_SYNTHETIC_ONLY para UAT manual de Ops/Leads.",
-  "note": "Los registros de prueba creados en Preview quedan marcados previewWrite=true y deben limpiarse al cerrar la revisión."
+  "note": "Los registros de prueba creados en Preview quedan marcados previewWrite=true y deben limpiarse al cerrar la revisión.",
+  "authRetry": {
+    "failureRunId": 36270274202,
+    "classification": "HARNESS_RELOAD_ACTIVATION_GAP",
+    "failure": "After page.reload the harness asserted deferred gestiones/negocios before re-running authenticated app activation and explicit role restoration.",
+    "productDefectDemonstrated": false,
+    "fix": "After reload, activate authenticated product app again, restore Operativo role, route to Ops, wait for server-confirmed deferred gestiones/negocios, then assert exact IDs and DOM.",
+    "sameExactPreviewRequired": true
+  },
+  "governanceBoundary": {
+    "interactiveUatWorkflowCreatesAuthorized": true,
+    "previewCreatedWorkflowUpdatesOnly": true,
+    "externalNotificationsSuppressed": true,
+    "existingWorkflowMutationAuthorized": false,
+    "browserFirestoreWritesAuthorized": false
+  }
 }
