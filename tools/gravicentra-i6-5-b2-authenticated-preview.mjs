@@ -14,7 +14,7 @@ const OUT=process.env.B2_AUTH_PROOF_FILE||path.join(process.env.RUNNER_TEMP||pro
 const VISUAL_DIR=process.env.B2_VISUAL_DIR||path.join(process.env.RUNNER_TEMP||process.cwd(),'b2-visual');
 const B2_LOCK_PATH=process.env.B2_LOCK||'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json';
 let FROZEN_ASSET_BUCKET='';
-try{const lock=JSON.parse(fs.readFileSync(B2_LOCK_PATH,'utf8'));FROZEN_ASSET_BUCKET=clean(lock?.authenticatedPreviewProof?.storageAssetBucket||'',180);}catch{}
+try{const lock=JSON.parse(fs.readFileSync(B2_LOCK_PATH,'utf8'));FROZEN_ASSET_BUCKET=String(lock?.authenticatedPreviewProof?.storageAssetBucket||'').trim().slice(0,180);}catch{}
 const RUN=String(process.env.GITHUB_RUN_ID||Date.now());
 const clean=(v,m=500)=>String(v==null?'':v).trim().slice(0,m);
 const norm=v=>clean(v,180).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
