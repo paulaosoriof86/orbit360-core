@@ -257,6 +257,17 @@ const issuedVehicles=rows.vehiculos.filter(x=>x.polizaId===issued.policy.id);
 need(issuedVehicles.length===1&&issuedVehicles[0].id!==rows.vehiculos.find(x=>x.polizaId==='pol-b2-a')?.id,'B2_RENEWAL_VEHICLE_SNAPSHOT_MISSING_OR_REUSED');
 need(issuedVehicles[0].marca==='Toyota'&&issuedVehicles[0].linea==='Corolla'&&issuedVehicles[0].placa==='B2TEST','B2_RENEWAL_VEHICLE_SNAPSHOT_FIELDS_INVALID');
 
+
+const r6Cliente=fs.readFileSync('orbit360-platform/modules/cliente360.js','utf8');
+const r6Detail=fs.readFileSync('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js','utf8');
+const r6Receipts=fs.readFileSync('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js','utf8');
+const r6Css=fs.readFileSync('orbit360-platform/styles/base.css','utf8');
+need(r6Cliente.includes('orderedClientPolicies')&&r6Cliente.includes('canonicalVehicle'),'B2_R6_CLIENT_CANONICAL_PROJECTION_MISSING');
+need(!r6Cliente.includes('ID físico')&&!r6Cliente.includes('Registros históricos con identidad incompleta'),'B2_R6_CLIENT_TECHNICAL_LANGUAGE_LEAK');
+need(r6Detail.includes('receiptCalendarProjection')&&!r6Detail.includes('por ID físico')&&!r6Detail.includes('Policy ID'),'B2_R6_DETAIL_CALENDAR_OR_LANGUAGE_CONTRACT_MISSING');
+need(r6Receipts.includes('calendarClassReceipt')&&r6Receipts.includes('data-rp-calendar-review'),'B2_R6_SINGLE_CALENDAR_PROJECTION_MISSING');
+need(r6Css.includes('scrollbar-width:auto')&&r6Css.includes('#sidebar::-webkit-scrollbar{width:8px}')&&r6Css.includes('.vp-sec-t{'),'B2_R6_UI_HIERARCHY_SCROLLBAR_CONTRACT_MISSING');
+console.log('I65_B2_R6_SOURCE_DISCRIMINANTS=PASS');
 console.log('I65_B2_FUNCTIONAL=PASS');
 console.log('I65_B2_CLIENT_DURABLE=true');
 console.log('I65_B2_ACTIVE_CLIENT_MODAL_OWNER=CRM_V1198_DURABLE_PROTECTED');

@@ -1491,7 +1491,7 @@
       "block": "B2",
       "title": "Active vehicle tied to current policy is projected as incomplete history while detail has canonical plate/policy/vigency.",
       "classification": "CANONICAL_PROJECTION_DIVERGENCE",
-      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
       "invariant": "Any vehicle linked to a current policy is current; historical/versioned rows subordinate to the same canonical identity; ambiguous rows remain pending review, never heuristically merged/deleted.",
       "rootCauseHypothesis": "Vehicle tab may group on raw record while detail uses normalized vehicleVisual/canonical projection.",
       "proofRequired": [
@@ -1499,52 +1499,102 @@
         "TWO_CURRENT_POLICIES_SHOW_THEIR_CURRENT_VEHICLES",
         "HISTORY_SUBORDINATE_NOT_TOP_LEVEL",
         "NO_HEURISTIC_MERGE_DELETE"
-      ]
+      ],
+      "sourceFix": {
+        "changedProductFiles": [
+          "orbit360-platform/modules/cliente360.js",
+          "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "orbit360-platform/styles/base.css",
+          "orbit360-platform/index.html"
+        ],
+        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+      }
     },
     {
       "id": "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
       "block": "B2",
       "title": "A physical policy version visibly has two concurrent active receipt calendars after payment-plan edit.",
       "classification": "FINANCIAL_PROJECTION_INTEGRITY_BLOCKER",
-      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
       "invariant": "One physical policy version has exactly one active contractual calendar; superseded rows do not count in current schedule/active portfolio; paid/evidenced receipts are preserved with traceability.",
       "proofRequired": [
         "GLOBAL_DOUBLE_ACTIVE_CALENDAR_DISCRIMINANT",
         "AUTO39012_SINGLE_ACTIVE_CALENDAR",
         "PAID_EVIDENCE_PRESERVED",
         "NO_BLIND_10_TO_12_REGENERATION"
-      ]
+      ],
+      "sourceFix": {
+        "changedProductFiles": [
+          "orbit360-platform/modules/cliente360.js",
+          "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "orbit360-platform/styles/base.css",
+          "orbit360-platform/index.html"
+        ],
+        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+      }
     },
     {
       "id": "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
       "block": "B2",
       "title": "Current policy can render below renewed/historical policies.",
       "classification": "BUSINESS_ORDERING_DEFECT",
-      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
-      "invariant": "Order groups: current, renewal-due, renewed/history, cancelled/void; newest vigency first; same-number versions show current first with history subordinate."
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
+      "invariant": "Order groups: current, renewal-due, renewed/history, cancelled/void; newest vigency first; same-number versions show current first with history subordinate.",
+      "sourceFix": {
+        "changedProductFiles": [
+          "orbit360-platform/modules/cliente360.js",
+          "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "orbit360-platform/styles/base.css",
+          "orbit360-platform/index.html"
+        ],
+        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+      }
     },
     {
       "id": "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
       "block": "B2",
       "title": "Operational UI exposes physical IDs/version/lineage language.",
       "classification": "TECHNICAL_LANGUAGE_LEAK",
-      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
-      "invariant": "Operational UI uses business language; physical IDs and lineage remain only in audit/technical detail when needed."
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
+      "invariant": "Operational UI uses business language; physical IDs and lineage remain only in audit/technical detail when needed.",
+      "sourceFix": {
+        "changedProductFiles": [
+          "orbit360-platform/modules/cliente360.js",
+          "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "orbit360-platform/styles/base.css",
+          "orbit360-platform/index.html"
+        ],
+        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+      }
     },
     {
       "id": "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
       "block": "B2",
       "title": "Section titles/labels remain visually weak while values dominate.",
       "classification": "VISUAL_HIERARCHY_DEFECT",
-      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
-      "invariant": "Section titles semibold/bold; relevant labels semibold; values regular/medium; total/KPI may stand out; apply cumulatively to Cliente360/Policy/Vehicle/Receipt."
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
+      "invariant": "Section titles semibold/bold; relevant labels semibold; values regular/medium; total/KPI may stand out; apply cumulatively to Cliente360/Policy/Vehicle/Receipt.",
+      "sourceFix": {
+        "changedProductFiles": [
+          "orbit360-platform/modules/cliente360.js",
+          "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "orbit360-platform/styles/base.css",
+          "orbit360-platform/index.html"
+        ],
+        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+      }
     },
     {
       "id": "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6",
       "block": "B2",
       "title": "Human logo persistence cannot be verified safely against a real insurer in Preview.",
       "classification": "HUMAN_PROOF_FIXTURE_GAP",
-      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "status": "TECHNICAL_FLOW_PASS_HUMAN_SAFE_FIXTURE_STILL_REQUIRED_AFTER_EXACT_PREVIEW",
       "invariant": "Provide visible synthetic insurer fixture for edit/upload/save/refresh/readback/cleanup without relaxing Preview boundary for real insurers."
     },
     {
@@ -1552,8 +1602,18 @@
       "block": "B2",
       "title": "Sidebar vertical scroll/navigation defect must remain tracked and be fixed now if it blocks module access.",
       "classification": "NAVIGATION_USABILITY_DEFECT",
-      "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
-      "invariant": "Sidebar scroll is visible and usable; if non-blocking in B2 it is mandatory carry-forward to B4."
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
+      "invariant": "Sidebar scroll is visible and usable; if non-blocking in B2 it is mandatory carry-forward to B4.",
+      "sourceFix": {
+        "changedProductFiles": [
+          "orbit360-platform/modules/cliente360.js",
+          "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "orbit360-platform/styles/base.css",
+          "orbit360-platform/index.html"
+        ],
+        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+      }
     },
     {
       "id": "B3-CARRY-PAYMENT-CONFIRMED-NOT-CONCILIATED-R6",
@@ -1695,7 +1755,9 @@
       "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
     ],
     "noLive": true,
-    "b3": "NOT_STARTED"
+    "b3": "NOT_STARTED",
+    "sourceRemediationStatus": "R6_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
   },
   "lastReview": {
     "date": "2026-09-26",

@@ -468,11 +468,29 @@ Orbit.modules.cliente360 = (function () {
       ${when ? `<span class="mono" style="font-size:12px;color:var(--ink-2)">${when}</span>` : ''}</div>`;
   }
 
+  function policyBusinessRank(p) {
+    const s=String(p&&p.estado||'').trim().toLowerCase();
+    if (/^(vigente|activa|activo)$/.test(s)) return 0;
+    if (s.includes('por renovar') || s==='renovacion pendiente') return 1;
+    if (s.includes('cancel') || s.includes('anul')) return 3;
+    return 2;
+  }
+  function policyBusinessDate(p) { return String(p&&p.vigenciaFin||p&&p.vigenciaInicio||''); }
+  function orderedClientPolicies(rows) {
+    return [].concat(rows||[]).slice().sort((a,b)=>{
+      const rank=policyBusinessRank(a)-policyBusinessRank(b);
+      if(rank) return rank;
+      const date=policyBusinessDate(b).localeCompare(policyBusinessDate(a));
+      if(date) return date;
+      return String(a&&a.numero||'').localeCompare(String(b&&b.numero||''));
+    });
+  }
+
   /* ---- Pólizas ---- */
   function tabPolizas(cid, r) {
     return `<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Póliza</th><th>Ramo / Producto</th><th>Aseguradora</th><th>Forma</th><th class="num">Prima</th><th>Vigencia</th><th>Estado</th><th></th></tr></thead>
-      <tbody>${r.pol.map(p => {
+      <tbody>${orderedClientPolicies(r.pol).map(p => {
         const asg = q.aseguradora(p.aseguradoraId);
         return `<tr class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')">
           <td><span class="mono" style="font-size:12.5px;font-weight:600">${p.numero}</span></td>
@@ -562,9 +580,20 @@ Orbit.modules.cliente360 = (function () {
     const t=v==null?'':String(v).trim();
     return (!t||/^(undefined|null|\[object Object\])$/i.test(t))?'—':t;
   }
-  function vehiclePolicySort(v) {
-    const p=S().get('polizas',v.polizaId)||{};
-    return String(p.vigenciaFin||p.vigenciaInicio||'')+'|'+String(v.id||'');
+  function vehiclePolicyCompare(a,b) {
+    const pa=S().get('polizas',a&&a.polizaId)||{},pb=S().get('polizas',b&&b.polizaId)||{};
+    const rank=policyBusinessRank(pa)-policyBusinessRank(pb);
+    if(rank) return rank;
+    const date=policyBusinessDate(pb).localeCompare(policyBusinessDate(pa));
+    if(date) return date;
+    return String(a&&a.id||'').localeCompare(String(b&&b.id||''));
+  }
+  function canonicalVehicle(v) {
+    if(!v||typeof v!=='object') return v;
+    try {
+      const n=Orbit.policyReceipts&&typeof Orbit.policyReceipts.normalizeVehicle==='function' ? Orbit.policyReceipts.normalizeVehicle(v) : null;
+      return n?Object.assign({},v,n,{id:v.id,polizaId:v.polizaId,clienteId:v.clienteId,versionOfVehicleId:v.versionOfVehicleId||n.versionOfVehicleId||''}):Object.assign({},v);
+    } catch(e) { return Object.assign({},v); }
   }
   function vehicleLineageRoot(v,byId) {
     let root=String(v&&v.id||''),parent=String(v&&v.versionOfVehicleId||''),seen=new Set();
@@ -572,28 +601,30 @@ Orbit.modules.cliente360 = (function () {
     return root;
   }
   function tabVehiculos(cid, r) {
-    const vs = q.vehiculosDe(cid);
+    const rawVs = q.vehiculosDe(cid);
+    const vs = rawVs.map(canonicalVehicle);
     if (!vs.length) return `<div class="card pad"><span class="muted">Este cliente no tiene vehículos asegurados.</span></div>`;
     const groups = new Map(), ambiguous=[];
     const byId=new Map(vs.filter(v=>v&&v.id).map(v=>[String(v.id),v]));
     const referenced=new Set(vs.map(v=>String(v&&v.versionOfVehicleId||'')).filter(Boolean));
     vs.forEach(v=>{
       const plate=vehicleShown(v.placa),root=vehicleLineageRoot(v,byId),hasLineage=!!String(v&&v.versionOfVehicleId||'')||referenced.has(String(v&&v.id||''));
-      if(!hasLineage&&plate==='—'){ambiguous.push(v);return;}
-      const key=hasLineage?('lineage:'+root):('plate:'+plate.toUpperCase());
+      const linkedPolicy=S().get('polizas',v.polizaId)||{},linkedCurrent=policyBusinessRank(linkedPolicy)<=1;
+      if(!hasLineage&&plate==='—'&&!linkedCurrent){ambiguous.push(v);return;}
+      const key=hasLineage?('lineage:'+root):(plate!=='—'?('plate:'+plate.toUpperCase()):('current:'+String(v.id||v.polizaId||'')));
       if(!groups.has(key))groups.set(key,[]);groups.get(key).push(v);
     });
     const cards=Array.from(groups.entries()).map(([groupKey,records])=>{
-      records.sort((a,b)=>vehiclePolicySort(b).localeCompare(vehiclePolicySort(a)));
+      records.sort(vehiclePolicyCompare);
       const v=records[0],p=S().get('polizas',v.polizaId),historyRecords=records.filter(h=>String(h.id)!==String(v.id));
-      const historyLabel=groupKey.indexOf('lineage:')===0?'registro(s) histórico(s) de esta identidad física':'registro(s) histórico(s) con esta placa';
-      const history=historyRecords.length?`<details style="margin-top:12px"><summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--ink-2)">${historyRecords.length} ${historyLabel}</summary><div style="display:grid;gap:7px;margin-top:9px">${historyRecords.map(h=>{const hp=S().get('polizas',h.polizaId)||{};return `<div style="padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:12px"><b>${U.esc(vehicleShown(h.marca))} ${U.esc(vehicleShown(h.linea))} · ${U.esc(vehicleShown(h.placa))}</b><div class="muted">${U.esc(vehicleShown(hp.numero))} · ${U.fmtDate(hp.vigenciaInicio)} → ${U.fmtDate(hp.vigenciaFin)} · ${U.esc(vehicleShown(hp.estado))}</div><div class="muted mono">ID físico ${U.esc(String(h.id||''))}</div><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${h.id}')">Ver registro</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${h.polizaId}')">Ver póliza</button></div></div>`;}).join('')}</div></details>`:'';
+      const historyLabel='vigencia(s) anterior(es) de este vehículo';
+      const history=historyRecords.length?`<details style="margin-top:12px"><summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--ink-2)">${historyRecords.length} ${historyLabel}</summary><div style="display:grid;gap:7px;margin-top:9px">${historyRecords.map(h=>{const hp=S().get('polizas',h.polizaId)||{};return `<div style="padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:12px"><b>${U.esc(vehicleShown(h.marca))} ${U.esc(vehicleShown(h.linea))} · ${U.esc(vehicleShown(h.placa))}</b><div class="muted">${U.esc(vehicleShown(hp.numero))} · ${U.fmtDate(hp.vigenciaInicio)} → ${U.fmtDate(hp.vigenciaFin)} · ${U.esc(vehicleShown(hp.estado))}</div><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${h.id}')">Ver registro</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${h.polizaId}')">Ver póliza</button></div></div>`;}).join('')}</div></details>`:'';
       return `<div class="card pad"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="width:46px;height:46px;border-radius:11px;background:var(--red-soft);display:grid;place-items:center;font-size:22px">🚗</span><div><b style="font-family:var(--f-display);font-size:16px">${U.esc(vehicleShown(v.marca))} ${U.esc(vehicleShown(v.linea))}</b><div class="muted mono" style="font-size:12px">${U.esc(vehicleShown(v.placa))} · ${U.esc(vehicleShown(v.anio))}</div></div><span class="badge ${p && p.estado === 'Vigente' ? 'ok' : p && p.estado === 'Por renovar' ? 'warn' : 'neutral'}" style="margin-left:auto">${p ? U.esc(vehicleShown(p.estado)) : '—'}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:12.5px">${vrow('Uso',v.uso)}${vrow('Color',v.color)}${vrow('Chasis (VIN)',v.chasis)}${vrow('Motor',v.motor)}${vrow('Suma asegurada',U.money(v.sumaAsegurada,p?p.moneda:'GTQ'))}${vrow('Póliza',p?p.numero:'—')}</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${v.id}')">Ver vehículo</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.editarVehiculo&&Orbit.modules.cliente360.editarVehiculo('${v.id}')">Editar vehículo</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${v.polizaId}')">Ver póliza</button><button class="btn ghost sm" onclick="Orbit.importa.open('polizas')">Importar documentos</button></div>${history}</div>`;
     });
-    const unresolved=ambiguous.length?`<div class="card pad" data-vehicle-identity-incomplete="1" style="grid-column:1/-1;border-left:3px solid var(--warn)"><b>Registros históricos con identidad incompleta</b><div class="muted" style="margin:5px 0 10px">Se conservan por ID físico, pero no se presentan como vehículos equivalentes hasta contar con placa o relación versionada explícita.</div><div style="display:grid;gap:7px">${ambiguous.sort((a,b)=>vehiclePolicySort(b).localeCompare(vehiclePolicySort(a))).map(h=>{const hp=S().get('polizas',h.polizaId)||{};return `<div style="padding:8px 10px;border:1px solid var(--line);border-radius:10px"><b>${U.esc(vehicleShown(h.marca))} ${U.esc(vehicleShown(h.linea))}</b><div class="muted">${U.esc(vehicleShown(hp.numero))} · ${U.fmtDate(hp.vigenciaInicio)} → ${U.fmtDate(hp.vigenciaFin)} · ${U.esc(vehicleShown(hp.estado))}</div><div class="muted mono">ID físico ${U.esc(String(h.id||''))}</div><div style="margin-top:6px;display:flex;gap:6px"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${h.id}')">Ver registro</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${h.polizaId}')">Ver póliza</button></div></div>`;}).join('')}</div></div>`:'';
+    const unresolved=ambiguous.length?`<div class="card pad" data-vehicle-identity-incomplete="1" style="grid-column:1/-1;border-left:3px solid var(--warn)"><b>Pendientes de relacionar o revisar</b><div class="muted" style="margin:5px 0 10px">Estos registros conservan su historial, pero necesitan una relación o identidad suficiente antes de mostrarse como un mismo vehículo.</div><div style="display:grid;gap:7px">${ambiguous.sort((a,b)=>vehiclePolicySort(b).localeCompare(vehiclePolicySort(a))).map(h=>{const hp=S().get('polizas',h.polizaId)||{};return `<div style="padding:8px 10px;border:1px solid var(--line);border-radius:10px"><b>${U.esc(vehicleShown(h.marca))} ${U.esc(vehicleShown(h.linea))}</b><div class="muted">${U.esc(vehicleShown(hp.numero))} · ${U.fmtDate(hp.vigenciaInicio)} → ${U.fmtDate(hp.vigenciaFin)} · ${U.esc(vehicleShown(hp.estado))}</div><div style="margin-top:6px;display:flex;gap:6px"><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verVehiculo('${h.id}')">Ver registro</button><button class="btn ghost sm" onclick="Orbit.modules.cliente360.verPoliza('${h.polizaId}')">Ver póliza</button></div></div>`;}).join('')}</div></div>`:'';
     return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">${cards.join('')}${unresolved}</div>`;
   }
-  function vrow(k,v){return `<div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">${k}</div><div style="font-weight:500;margin-top:1px">${U.esc(vehicleShown(v))}</div></div>`; }
+  function vrow(k,v){return `<div><div style="font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.035em">${k}</div><div style="font-weight:500;margin-top:2px">${U.esc(vehicleShown(v))}</div></div>`; }
 
   /* ---- Recibos y cobros (filtro por póliza + confirmar cobro) ---- */
   let recPolFiltro = {};  // por cliente: polizaId seleccionada

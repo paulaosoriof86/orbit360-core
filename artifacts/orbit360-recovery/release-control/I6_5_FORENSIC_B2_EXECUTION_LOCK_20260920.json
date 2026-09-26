@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1818,7 +1818,7 @@
     "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL",
     "authenticatedRunId": 36218497058
   },
-  "paulaVisualDecision": "REJECTED_R6",
+  "paulaVisualDecision": "REJECTED_R6_REMEDIATION_IN_PROGRESS",
   "paulaVisualAccepted": false,
   "b3Status": "NOT_STARTED",
   "humanReviewR6": {
@@ -1875,8 +1875,8 @@
     "noReimport": true
   },
   "r6": {
-    "status": "FINDINGS_FROZEN_PENDING_ROOT_CAUSE_AND_CUMULATIVE_SOURCE_REMEDIATION",
-    "findingLedgerBlobSha": "e53860d000eae5ac78bc846d86a11420202303b9",
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "findingLedgerBlobSha": "bcbe0b90073087e696549849bd553fa72ddd6bdb",
     "blockers": [
       "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
       "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
@@ -1902,7 +1902,29 @@
     "sourceBeforeRemediation": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
     "exactReviewedPreview": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13",
+    "changedProductFiles": [
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/styles/base.css",
+      "orbit360-platform/index.html"
+    ],
+    "mechanismFiles": [
+      "tools/gravicentra-i6-5-b2-functional.mjs"
+    ],
+    "rootCauses": {
+      "vehicleProjection": "CLIENTE360_USED_RAW_VEHICLE_IDENTITY_WHILE_DETAIL_USED_NORMALIZED_CANONICAL_VEHICLE",
+      "receiptCalendar": "PRIMARY_RECEIPT_AND_PORTFOLIO_RENDERERS_INCLUDED_REPLACED_OR_CONTRACT_MISMATCH_CALENDARS_AS_CURRENT",
+      "policyOrdering": "CLIENTE360_RENDERED_STORAGE_ORDER_WITHOUT_BUSINESS_STATE_AND_VIGENCY_ORDER",
+      "technicalLanguage": "PRIMARY_OPERATIONAL_UI_EXPOSED_PHYSICAL_ID_AND_LINEAGE_TERMS",
+      "visualHierarchy": "DETAIL_LABELS_WERE_MUTED_11PX_WHILE_VALUES_DOMINATED",
+      "sidebar": "VERTICAL_SCROLL_EXISTED_BUT_THUMB_WAS_LOW_VISIBILITY_4PX"
+    },
+    "receiptRule": "EXPLICIT_POLICY_CUOTAS_AUTHORITY_IF_PRESENT_ELSE_SINGLE_PHYSICAL_DENOMINATOR_ELSE_FAIL_CLOSED_REVIEW",
+    "humanFixtureStatus": "PENDING_SAFE_PREVIEW_ONLY_IMPLEMENTATION_AFTER_TECHNICAL_AUTHENTICATED_PASS",
+    "noReimport": true
   },
-  "findingLedgerBlobSha": "e53860d000eae5ac78bc846d86a11420202303b9"
+  "findingLedgerBlobSha": "bcbe0b90073087e696549849bd553fa72ddd6bdb"
 }

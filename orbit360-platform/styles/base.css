@@ -107,11 +107,12 @@ button{font-family:inherit}
 #sidebar{
   width:var(--sidebar-w);flex-shrink:0;position:fixed;top:var(--topbar-h);bottom:0;left:0;
   background:linear-gradient(180deg,var(--graph) 0%,var(--graph-900) 100%);
-  overflow-y:auto;z-index:55;border-right:1px solid rgba(255,255,255,.05);
+  overflow-y:auto;scrollbar-width:auto;scrollbar-color:rgba(197,22,46,.72) rgba(255,255,255,.08);z-index:55;border-right:1px solid rgba(255,255,255,.05);
   transition:transform .24s ease;
 }
-#sidebar::-webkit-scrollbar{width:4px}
-#sidebar::-webkit-scrollbar-thumb{background:rgba(197,22,46,.3);border-radius:4px}
+#sidebar::-webkit-scrollbar{width:8px}
+#sidebar::-webkit-scrollbar-track{background:rgba(255,255,255,.06)}
+#sidebar::-webkit-scrollbar-thumb{background:rgba(197,22,46,.72);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
 #main{margin-left:var(--sidebar-w);flex:1;min-width:0;background:var(--surface);min-height:calc(100vh - var(--topbar-h))}
 
 /* Sidebar CLARO (personalizable) — texto oscuro sobre fondo claro */
@@ -494,3 +495,9 @@ button.kpi-click:active{transform:translateY(0)}
 
 /* Gravicentra B2 R3 · policy/payment hierarchy aligned to mature detail family */
 .gi-premium-contract{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}.gi-premium-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}.gi-premium-row>span{font-size:12.5px;line-height:1.4;color:var(--ink-2);font-weight:500}.gi-premium-row>b{font-family:var(--f-display);font-size:14px;line-height:1.35;font-weight:700;color:var(--ink)}.gi-premium-row.is-total>span{font-weight:700;color:var(--ink)}.gi-premium-row.is-total>b{font-size:15px;font-weight:800}.gi-schedule-delta{margin-top:12px;white-space:normal;line-height:1.4}.gi-technical-origin summary{cursor:pointer;font-size:12px;font-weight:700;color:var(--ink-2)}@media(max-width:680px){.gi-premium-contract{grid-template-columns:1fr}.gi-premium-row>b{text-align:right}}
+
+
+/* B2 R6 — business visual hierarchy without technical noise */
+.vp-sec-t{font-family:var(--f-display);font-size:15px;font-weight:800;line-height:1.3;color:var(--ink);margin-bottom:9px}
+.orbit-detail-grid>div>div:first-child{font-weight:600}
+body.sb-light #sidebar,body.sb-gray #sidebar{scrollbar-color:rgba(197,22,46,.68) rgba(0,0,0,.06)}

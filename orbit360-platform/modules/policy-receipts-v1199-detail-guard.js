@@ -181,7 +181,7 @@ Orbit.modules = Orbit.modules || {};
   }
   function field(label, value, opts) {
     const o = opts || {};
-    return `<div style="min-width:0"><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.045em">${esc(label)}</div><div style="font-size:13.5px;font-weight:500;margin-top:3px;line-height:1.42;overflow-wrap:anywhere;${o.mono ? 'font-family:var(--f-mono);font-weight:500;' : ''}">${o.html ? value : esc(shown(value))}</div></div>`;
+    return `<div style="min-width:0"><div style="font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.035em">${esc(label)}</div><div style="font-size:13.5px;font-weight:500;margin-top:3px;line-height:1.42;overflow-wrap:anywhere;${o.mono ? 'font-family:var(--f-mono);font-weight:500;' : ''}">${o.html ? value : esc(shown(value))}</div></div>`;
   }
   function grid(items, cols) {
     return `<div class="orbit-detail-grid" style="display:grid;grid-template-columns:repeat(${cols || 3},minmax(0,1fr));gap:13px 18px">${items.join('')}</div>`;
@@ -211,10 +211,31 @@ Orbit.modules = Orbit.modules || {};
     const labels = pending.concat(gaps).slice(0,8).map(x => esc(String(x).replace(/_/g,' ').toLowerCase()));
     return `<span class="badge warn">Información pendiente de completar</span>${labels.length ? `<div class="muted" style="font-size:12px;margin-top:7px">${labels.join(' · ')}</div>` : ''}`;
   }
+  function receiptPlanDenominator(r) {
+    const raw=[r&&r.cuota,r&&r.serie,r&&r.numeroReciboFuente].map(x=>safe(x)).find(Boolean)||'';
+    const m=raw.match(/(?:^|\s)(\d+)\s*\/\s*(\d+)(?:\s|$)/);
+    return m?Number(m[2]):null;
+  }
+  function receiptBaseInactive(r) {
+    const s=String(r&&r.estado||'').trim().toLowerCase();
+    return !!(r&&(r.superseded===true||r.calendarActive===false||s==='anulado'||s==='superseded'||s==='reemplazado'));
+  }
+  function receiptCalendarProjection(policy, rows) {
+    const all=[].concat(rows||[]),base=all.filter(r=>!receiptBaseInactive(r)),history=all.filter(receiptBaseInactive);
+    const explicit=Number(policy&&policy.cuotas);
+    if(Number.isFinite(explicit)&&explicit>0){
+      const current=[],replaced=history.slice();
+      base.forEach(r=>{const d=receiptPlanDenominator(r);(d&&d!==explicit?replaced:current).push(r);});
+      return {current,replaced,review:[],authority:'POLICY_CUOTAS',expected:explicit};
+    }
+    const denoms=[...new Set(base.map(receiptPlanDenominator).filter(n=>Number.isFinite(n)&&n>0))];
+    if(denoms.length<=1)return {current:base,replaced:history,review:[],authority:denoms.length?'SINGLE_PHYSICAL_CALENDAR':'NO_DENOMINATOR',expected:denoms[0]||null};
+    return {current:base.filter(r=>receiptPlanDenominator(r)==null),replaced:history,review:base.filter(r=>receiptPlanDenominator(r)!=null),authority:'AMBIGUOUS_FAIL_CLOSED',expected:null};
+  }
   function receiptSchedule(policyId) {
-    const rows=(S().all('recibosEsperados') || []).filter(r=>r.polizaId===policyId);
+    const policy=S().get('polizas',policyId)||{},all=(S().all('recibosEsperados') || []).filter(r=>r.polizaId===policyId),projection=receiptCalendarProjection(policy,all),rows=projection.current;
     const sum=key=>{const vals=rows.map(r=>numberOrNull(r[key])).filter(v=>v!=null);return vals.length?vals.reduce((a,b)=>a+b,0):null;};
-    return {rows,net:sum('primaNeta'),expedition:sum('gastosExpedicion'),finance:sum('gastosFinanciamiento'),sourceAdjustment:sum('descuento'),iva:sum('impuestosIVA'),total:sum('primaTotal')};
+    return {rows,historicalRows:projection.replaced,reviewRows:projection.review,calendarAuthority:projection.authority,net:sum('primaNeta'),expedition:sum('gastosExpedicion'),finance:sum('gastosFinanciamiento'),sourceAdjustment:sum('descuento'),iva:sum('impuestosIVA'),total:sum('primaTotal')};
   }
   function premiumBreakdown(p) {
     const sch=receiptSchedule(p.id);
@@ -259,7 +280,7 @@ Orbit.modules = Orbit.modules || {};
     let old = document.getElementById('gi-vehicle-linker'); if (old) old.remove();
     const back = document.createElement('div'); back.id='gi-vehicle-linker'; back.className='drawer-back open'; back.style.cssText='display:grid;place-items:center;z-index:240';
     const permissionNote=canLink?'':'<div class="cfg-note" style="margin-top:10px">Tu rol activo es de consulta. Cambia a un rol autorizado para vincular el vehículo; no se creará ninguna gestión.</div>';
-    back.innerHTML='<div class="card" style="width:min(720px,96vw);max-height:90vh;overflow:auto;padding:0"><div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px"><div><small class="muted">Relación por identidad física</small><b style="display:block;font-family:var(--f-display);font-size:18px">Vincular vehículo a póliza '+esc(policy.numero||'')+'</b><small class="muted">'+esc(fmtDate(policy.vigenciaInicio))+' → '+esc(fmtDate(policy.vigenciaFin))+' · Policy ID '+esc(policy.id)+'</small></div><button class="imp-x" data-close>✕</button></div><div style="padding:18px 20px"><div class="cfg-note">Selecciona el registro exacto. Si pertenece a una póliza histórica, se creará una relación versionada nueva y el registro anterior permanecerá intacto.</div>'+permissionNote+'<div style="display:grid;gap:9px;margin-top:12px">'+candidates.map((item,i)=>{const v=item.v,p=item.policy,label=[shown(v.marca),shown(v.linea),shown(v.placa)].join(' · '),ctx=p?('Póliza '+shown(p.numero)+' · '+fmtDate(p.vigenciaInicio)+' → '+fmtDate(p.vigenciaFin)+' · ID '+p.id):'Sin póliza directa';return '<label class="card pad" style="display:flex;gap:10px;align-items:flex-start;cursor:pointer"><input type="radio" name="gi-vehicle-choice" value="'+esc(item.raw.id)+'" '+(i===0?'checked':'')+' '+(canLink?'':'disabled')+'><span><b>'+esc(label)+'</b><small class="muted" style="display:block;margin-top:3px">'+esc(ctx)+' · Vehículo ID '+esc(item.raw.id)+'</small></span></label>';}).join('')+'</div>'+(canLink?'<label class="ce-l" style="margin-top:12px">Motivo de la vinculación *<textarea class="o-sel" data-reason rows="2" placeholder="Ej. Confirmación del riesgo de la renovación vigente"></textarea></label>':'')+'<div class="hint error" data-error style="display:none"></div></div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px"><button class="btn ghost" data-close>Cancelar</button>'+(canLink?'<button class="btn primary" data-save>Vincular vehículo</button>':'')+'</div></div>';
+    back.innerHTML='<div class="card" style="width:min(720px,96vw);max-height:90vh;overflow:auto;padding:0"><div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px"><div><small class="muted">Vincular vehículo a esta vigencia</small><b style="display:block;font-family:var(--f-display);font-size:18px">Vincular vehículo a póliza '+esc(policy.numero||'')+'</b><small class="muted">'+esc(fmtDate(policy.vigenciaInicio))+' → '+esc(fmtDate(policy.vigenciaFin))+'</small></div><button class="imp-x" data-close>✕</button></div><div style="padding:18px 20px"><div class="cfg-note">Selecciona el vehículo exacto. Si pertenece a una vigencia anterior, se conservará el historial sin sobrescribirlo y el registro anterior permanecerá intacto.</div>'+permissionNote+'<div style="display:grid;gap:9px;margin-top:12px">'+candidates.map((item,i)=>{const v=item.v,p=item.policy,label=[shown(v.marca),shown(v.linea),shown(v.placa)].join(' · '),ctx=p?('Póliza '+shown(p.numero)+' · '+fmtDate(p.vigenciaInicio)+' → '+fmtDate(p.vigenciaFin)+' · ID '+p.id):'Sin póliza directa';return '<label class="card pad" style="display:flex;gap:10px;align-items:flex-start;cursor:pointer"><input type="radio" name="gi-vehicle-choice" value="'+esc(item.raw.id)+'" '+(i===0?'checked':'')+' '+(canLink?'':'disabled')+'><span><b>'+esc(label)+'</b><small class="muted" style="display:block;margin-top:3px">'+esc(ctx)+' · Vehículo ID '+esc(item.raw.id)+'</small></span></label>';}).join('')+'</div>'+(canLink?'<label class="ce-l" style="margin-top:12px">Motivo de la vinculación *<textarea class="o-sel" data-reason rows="2" placeholder="Ej. Confirmación del riesgo de la renovación vigente"></textarea></label>':'')+'<div class="hint error" data-error style="display:none"></div></div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px"><button class="btn ghost" data-close>Cancelar</button>'+(canLink?'<button class="btn primary" data-save>Vincular vehículo</button>':'')+'</div></div>';
     document.body.appendChild(back);
     back.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click',()=>back.remove()));
     back.addEventListener('click',e=>{if(e.target===back){e.preventDefault();e.stopPropagation();}});
@@ -283,7 +304,7 @@ Orbit.modules = Orbit.modules || {};
         const action=canLink?'<button class="btn primary sm" onclick="Orbit.policyVehicleReadModelV1199c.openVehicleLinker(\''+esc(policyId)+'\',\''+esc(clientId)+'\')">Vincular vehículo a esta póliza</button>':'<span class="badge neutral">Solo consulta · cambia a un rol autorizado para vincular</span>';
         return '<div class="gi-integrity-warning"><div><b>🚘 Vehículo pendiente de vincular a esta póliza</b><span>El cliente tiene '+candidates.length+' registro(s) físico(s) de vehículo. Se distinguen por ID e historial; no se fusionan ni se vinculan automáticamente.</span><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+links+'</div></div>'+action+'</div>';
       }
-      return '<div class="gi-integrity-warning"><div><b>🚘 Falta vincular el vehículo</b><span>Esta póliza vehicular no tiene un vehículo vinculado por ID físico.</span></div></div>';
+      return '<div class="gi-integrity-warning"><div><b>🚘 Falta vincular el vehículo</b><span>Esta póliza vehicular no tiene un vehículo vinculado a esta vigencia.</span></div></div>';
     }
     const V = vehicleVisual(v);
     return grid([
