@@ -57,7 +57,7 @@ Orbit.modules.inicio = (function () {
           <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
             <span class="badge neutral">${clientes.length} clientes</span>
             <span class="badge neutral">${polizas.length} pólizas</span>
-            <span class="badge danger">${venc.length} cobros vencidos</span>
+            <span class="badge danger">${venc.length} registros vencidos en cartera</span>
           </div>
         </div>
         ${dial(pctPrima, 'Prima vigente', U.moneyShort(prima, Orbit.q.monedaPais()))}
