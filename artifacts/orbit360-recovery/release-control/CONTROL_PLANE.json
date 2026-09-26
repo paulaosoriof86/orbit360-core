@@ -717,7 +717,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2012,9 +2012,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "d34f2397361b646e7012037cc6237c001077de7e",
+    "b2ExecutionLockBlobSha": "c31e9fc34f9e246f0bd0ca2e92f98dcdfe943ee8",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2033,14 +2033,14 @@
         "orbit360-platform/styles/base.css"
       ],
       "productMutationAuthorized": true,
-      "sourcePendingFromHead": "fe1c252e8a506d32bc7912826c1d010d4bd82057",
+      "sourcePendingFromHead": "2283c0a51b177e1172a579badee3b93d4463f31a",
       "sourceSha": "65fd357bf26f0a284e1a84e7511e67fb2f13d306",
       "buildId": "gi-i65-b2-65fd357bf26f-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36203700711-wt4ia07f.web.app",
       "runId": 36203700711,
       "artifactId": 10892732129,
-      "exactReadback": true,
-      "functionalPass": true,
+      "exactReadback": false,
+      "functionalPass": false,
       "authenticatedPreviewProof": "PENDING_NEW_PREVIEW",
       "authenticatedPreviewProofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "orphanSyntheticCleanup": "PASS",
@@ -2159,7 +2159,7 @@
       "r4CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "parentHead": "d64ea08c583e1bd99652a1b42f7fd01403274b61",
-        "compositionLockBlobSha": "898dbdd7c939b3a523beef2a06a270a2d0bec4d6",
+        "compositionLockBlobSha": "ee52485535b476d021cdf160bfb664ec83c2bcba",
         "findingLedgerBlobSha": "175f367740492ec3726cd1977a9ddd6a5795bb11",
         "changedProductFiles": [
           "functions/product-ops-leads-domain.js",
@@ -2171,7 +2171,8 @@
           "orbit360-platform/modules/cliente360.js",
           "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
           "orbit360-platform/modules/aseguradoras.js",
-          "orbit360-platform/index.html"
+          "orbit360-platform/index.html",
+          "functions/product-operational-domain.js"
         ],
         "workflowAuthSequencing": "PREVIEW_JOB_THEN_AUTH_BRANCH_TIP",
         "previewOpsIsolation": "orbit360OpsLeadsCommandPreview@us-east1 synthetic-only",
@@ -2180,7 +2181,7 @@
         "noDataReimport": true,
         "noLive": true,
         "noB3": true,
-        "latestCausalFix": "B2_INSURER_CONFIRM_INTENT_BEFORE_SECURE_SIDE_EFFECTS"
+        "latestCausalFix": "B2_ASSET_BUCKET_RESOLUTION_AND_EXPLICIT_STORAGE_FAILURE"
       },
       "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED"
     },
@@ -2288,7 +2289,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "898dbdd7c939b3a523beef2a06a270a2d0bec4d6",
+    "compositionLockBlobSha": "ee52485535b476d021cdf160bfb664ec83c2bcba",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "79a30b13ae0f15020a762253a283d8e394537e42",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -2302,7 +2303,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_BUILD_NEW_EXACT_PREVIEW_AFTER_INSURER_TRANSACTION_ROOTFIX"
+    "nextAction": "B2_BUILD_NEW_EXACT_PREVIEW_AFTER_ASSET_BUCKET_ROOTFIX"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

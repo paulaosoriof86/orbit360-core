@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -239,10 +239,12 @@
     "artifactDigest": "b0728d79a2b676efc7c824ee6f97c0272411fe044a32a1a93cf4989c372c84b5",
     "exactReadback": true,
     "functionalPass": true,
-    "livePromoted": false
+    "livePromoted": false,
+    "supersededByProductSourceChange": true,
+    "supersededReason": "Asset uploader now resolves the actual Firebase bucket and exposes Storage failure explicitly"
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_NEW_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "65fd357bf26f0a284e1a84e7511e67fb2f13d306",
     "exactPreviewBuildId": "gi-i65-b2-65fd357bf26f-57f234755dc1",
@@ -1696,7 +1698,10 @@
   },
   "r4": {
     "status": "CANDIDATE_PENDING_PREVIEW",
-    "compositionLockBlobSha": "898dbdd7c939b3a523beef2a06a270a2d0bec4d6",
-    "latestCausalFix": "B2_INSURER_CONFIRM_INTENT_BEFORE_SECURE_SIDE_EFFECTS"
+    "compositionLockBlobSha": "ee52485535b476d021cdf160bfb664ec83c2bcba",
+    "latestCausalFix": "B2_ASSET_BUCKET_RESOLUTION_AND_EXPLICIT_STORAGE_FAILURE",
+    "changedProductFiles": [
+      "functions/product-operational-domain.js"
+    ]
   }
 }

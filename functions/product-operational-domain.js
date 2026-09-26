@@ -363,8 +363,25 @@ async function uploadProductAsset(request, previewOnly) {
   let bytes;try{bytes=Buffer.from(encoded,'base64');}catch(e){throw new HttpsError('invalid-argument','Archivo de logo inválido.');}
   if(!bytes.length||bytes.length>2*1024*1024)throw new HttpsError('invalid-argument','El logo no puede superar 2 MB.');
   const contentHash=sha(bytes),assetRef=(previewOnly===true?'preview/':'')+'tenants/'+tenantId+'/assets/insurers/'+insurerId+'/logo-'+contentHash.slice(0,20)+'.'+ext;
-  const bucket=storage.bucket(),token=crypto.randomUUID(),file=bucket.file(assetRef);
-  await file.save(bytes,{resumable:false,contentType:mime,metadata:{cacheControl:'public,max-age=3600',metadata:{firebaseStorageDownloadTokens:token,tenantId,insurerId,assetKind:'insurer-logo',contentHash}}});
+  let firebaseConfig={};try{firebaseConfig=JSON.parse(process.env.FIREBASE_CONFIG||'{}')||{};}catch(e){}
+  const projectId=text(app.options&&app.options.projectId||process.env.GCLOUD_PROJECT||process.env.GOOGLE_CLOUD_PROJECT||'',120);
+  const bucketCandidates=unique([
+    app.options&&app.options.storageBucket,
+    firebaseConfig.storageBucket,
+    process.env.FIREBASE_STORAGE_BUCKET,
+    projectId?projectId+'.firebasestorage.app':'',
+    projectId?projectId+'.appspot.com':''
+  ]);
+  const token=crypto.randomUUID(),saveOptions={resumable:false,contentType:mime,metadata:{cacheControl:'public,max-age=3600',metadata:{firebaseStorageDownloadTokens:token,tenantId,insurerId,assetKind:'insurer-logo',contentHash}}};
+  let bucket=null,lastStorageError=null;
+  for(const bucketName of bucketCandidates){
+    try{
+      const candidate=storage.bucket(bucketName),candidateFile=candidate.file(assetRef);
+      await candidateFile.save(bytes,saveOptions);
+      bucket=candidate;break;
+    }catch(error){lastStorageError=error;}
+  }
+  if(!bucket)throw new HttpsError('failed-precondition','STORAGE_ASSET_WRITE_UNAVAILABLE',{bucketCandidates,errorCode:text(lastStorageError&&(lastStorageError.code||lastStorageError.message)||'',180)});
   const url='https://firebasestorage.googleapis.com/v0/b/'+encodeURIComponent(bucket.name)+'/o/'+encodeURIComponent(assetRef)+'?alt=media&token='+encodeURIComponent(token);
   await insurerRef.set({logo:url,logoAssetRef:assetRef,logoContentHash:contentHash,logoUpdatedAt:now(),logoUpdatedByUid:actor.uid},{merge:true});
   const confirmed=await insurerRef.get(),row=confirmed.data()||{};

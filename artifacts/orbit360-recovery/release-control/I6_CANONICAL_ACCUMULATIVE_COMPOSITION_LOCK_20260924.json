@@ -97,7 +97,7 @@
     "functions/bootstrap.js": "5b1a04617e6be3cf68d7d923862abcf0174fe8fb",
     "functions/package.json": "bfa00e1b1b0349251fe853d2fa3cea00a8ae9366",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
-    "functions/product-operational-domain.js": "32119797a6ffb652688e506531c9b62ffd37e90e",
+    "functions/product-operational-domain.js": "f1d85d8c0fd69a4697b1a59d8e93afb2bb8eee85",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "e4b602b4abb26fcd3d9413b1ab9bb67998be78dd",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -180,7 +180,8 @@
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "orbit360-platform/modules/aseguradoras.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "functions/product-operational-domain.js"
     ],
     "preservedPass": [
       "ACADEMIA_28_102",
@@ -199,9 +200,9 @@
       "orbit360OpsLeadsCommandPreview"
     ],
     "r4Hotfix": "POLICY_VEHICLE_ROLE_CONTEXT_OWNER_APPLIED",
-    "latestCausalFix": "B2_INSURER_CONFIRM_INTENT_BEFORE_SECURE_SIDE_EFFECTS",
+    "latestCausalFix": "B2_ASSET_BUCKET_RESOLUTION_AND_EXPLICIT_STORAGE_FAILURE",
     "latestCausalFixAt": "2026-09-25",
-    "latestCausalOwner": "orbit360-platform/modules/aseguradoras.js",
-    "latestCausalBlob": "af3af47ed2fb71c2bdf9e81775a7359eefb1c606"
+    "latestCausalOwner": "functions/product-operational-domain.js",
+    "latestCausalBlob": "f1d85d8c0fd69a4697b1a59d8e93afb2bb8eee85"
   }
 }
