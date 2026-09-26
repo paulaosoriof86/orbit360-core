@@ -1510,8 +1510,7 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R52_HUMAN_SAFE_SYNTHETIC_INSURER_LOGO_FIXTURE",
-    "PAULA_VISUAL_ACCEPTANCE_ON_EXACT_PREVIEW"
+    "PAULA_VISUAL_ACCEPTANCE_ON_EXACT_PREVIEW_AND_R52_FIXTURE"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -1866,7 +1865,7 @@
     "noReimport": true
   },
   "r6": {
-    "status": "EXACT_AUTHENTICATED_TECHNICAL_PASS_R52_FIXTURE_PENDING_PAULA_VISUAL",
+    "status": "EXACT_AUTHENTICATED_TECHNICAL_PASS_HUMAN_FIXTURE_READY_PENDING_PAULA_VISUAL",
     "findingLedgerBlobSha": "ae462fc185e189916290572c66a15fc7bf04ce85",
     "blockers": [
       "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
@@ -2335,10 +2334,22 @@
       "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
       "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
     ],
-    "remainingHumanFixtureFindingIds": [
-      "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6"
-    ],
-    "paulaVisualAccepted": false
+    "remainingHumanFixtureFindingIds": [],
+    "paulaVisualAccepted": false,
+    "humanFixture": {
+      "url": "https://ays-orbit-360-lab--b2-r52-36250652563-lstmcnh0.web.app",
+      "channelId": "b2-r52-36250652563",
+      "runId": 36250652563,
+      "expiresIn": "7d",
+      "exactCandidateSourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+      "exactCandidateBuildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+      "exactCandidatePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+      "isolation": "BROWSER_LOCAL_STORAGE_ONLY",
+      "firestoreWrites": false,
+      "storageWrites": false,
+      "businessDataWrites": false,
+      "livePromoted": false
+    }
   },
   "findingLedgerBlobSha": "270a89345dbdb32c1d84c240edae3c32b9f4b1af"
 }

@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R6_EXACT_AUTHENTICATED_TECHNICAL_PASS_R52_FIXTURE_PENDING",
+    "mechanismSyncStatus": "B2_R6_EXACT_AUTHENTICATED_PASS_HUMAN_FIXTURE_READY_PENDING_VISUAL",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "4c2e792d4f4cb892af6ec1ce30b0da2e5c523679",
+    "b2ExecutionLockBlobSha": "5b4aec73d3e5103c0da1e2c2fe71c622f4e09ca2",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2239,10 +2239,13 @@
       "exactR6ProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
       "exactR6ProofReceiptBlobSha": "2f062f65e10e06479f0547469968f5a519a815ff",
       "r6TechnicalExactPassCount": 6,
-      "r6HumanFixtureOutstandingCount": 1,
+      "r6HumanFixtureOutstandingCount": 0,
       "r6HumanFixtureOutstandingIds": [
         "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6"
-      ]
+      ],
+      "r6HumanFixtureReadyCount": 1,
+      "r6HumanFixtureUrl": "https://ays-orbit-360-lab--b2-r52-36250652563-lstmcnh0.web.app",
+      "r52FixtureReceiptBlobSha": "1582a1b87eb06089a606da4aa2be4fab284931d1"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2362,7 +2365,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "66f01b82a177242c62500937b9da0ec8be7bc00b",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "270a89345dbdb32c1d84c240edae3c32b9f4b1af",
+    "findingLedgerBlobSha": "3314186f98f3abaa8720464e2c690e1ce3556670",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
@@ -2374,7 +2377,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R52_SAFE_HUMAN_FIXTURE_THEN_PAULA_VISUAL"
+    "nextAction": "B2_PAULA_VISUAL_ON_EXACT_PREVIEW_AND_R52_FIXTURE"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
@@ -2446,7 +2449,7 @@
     "b2": "OPEN",
     "b3": "NOT_STARTED",
     "livePromoted": false,
-    "remediationStatus": "R6_EXACT_AUTHENTICATED_TECHNICAL_PASS_R52_FIXTURE_PENDING",
+    "remediationStatus": "R6_EXACT_AUTHENTICATED_PASS_HUMAN_FIXTURE_READY_PENDING_VISUAL",
     "compositionLockBlobSha": "66f01b82a177242c62500937b9da0ec8be7bc00b",
     "findingLedgerBlobSha": "ae462fc185e189916290572c66a15fc7bf04ce85",
     "assistantVisualAuditRunId": 36247964139,
@@ -2463,6 +2466,7 @@
     ],
     "humanFixturePendingIds": [
       "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6"
-    ]
+    ],
+    "humanFixtureUrl": "https://ays-orbit-360-lab--b2-r52-36250652563-lstmcnh0.web.app"
   }
 }

@@ -1655,7 +1655,7 @@
       "block": "B2",
       "title": "Human logo persistence cannot be verified safely against a real insurer in Preview.",
       "classification": "HUMAN_PROOF_FIXTURE_GAP",
-      "status": "TECHNICAL_AUTHENTICATED_PASS_HUMAN_SAFE_FIXTURE_PENDING",
+      "status": "HUMAN_SAFE_FIXTURE_READY_PENDING_PAULA_VISUAL",
       "invariant": "Provide visible synthetic insurer fixture for edit/upload/save/refresh/readback/cleanup without relaxing Preview boundary for real insurers.",
       "exactR6Proof": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R6_EXACT_AUTHENTICATED_RUNTIME_PROOF_20260926.json",
@@ -1666,6 +1666,20 @@
         "authArtifactId": 10908448359,
         "technicalLogoPersistence": true,
         "cleanupPass": true
+      },
+      "humanFixture": {
+        "url": "https://ays-orbit-360-lab--b2-r52-36250652563-lstmcnh0.web.app",
+        "channelId": "b2-r52-36250652563",
+        "runId": 36250652563,
+        "expiresIn": "7d",
+        "exactCandidateSourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+        "exactCandidateBuildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+        "exactCandidatePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+        "isolation": "BROWSER_LOCAL_STORAGE_ONLY",
+        "firestoreWrites": false,
+        "storageWrites": false,
+        "businessDataWrites": false,
+        "livePromoted": false
       }
     },
     {
@@ -1901,10 +1915,11 @@
       "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
     ],
     "r6TechnicalExactPassCount": 6,
-    "r6RemainingHumanFixtureIds": [
+    "r6RemainingHumanFixtureIds": [],
+    "r6OverallPaulaVisualAccepted": false,
+    "r6HumanFixtureReadyIds": [
       "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6"
-    ],
-    "r6OverallPaulaVisualAccepted": false
+    ]
   },
   "lastReview": {
     "date": "2026-09-26",

@@ -1,0 +1,34 @@
+{
+  "schema": "gravicentra-i6-5-b2-r52-human-fixture-ready-v1",
+  "recordedAt": "2026-09-26T15:07:16.093Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "findingId": "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6",
+  "status": "HUMAN_SAFE_FIXTURE_READY_PENDING_PAULA_VISUAL",
+  "fixture": {
+    "url": "https://ays-orbit-360-lab--b2-r52-36250652563-lstmcnh0.web.app",
+    "channelId": "b2-r52-36250652563",
+    "runId": 36250652563,
+    "expiresIn": "7d",
+    "exactCandidateSourceSha": "e0e9369071f5634e3fb53921bb169822bc6f99bd",
+    "exactCandidateBuildId": "gi-i65-b2-e0e9369071f5-57f234755dc1",
+    "exactCandidatePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36249482718-sybk0lm2.web.app",
+    "isolation": "BROWSER_LOCAL_STORAGE_ONLY",
+    "firestoreWrites": false,
+    "storageWrites": false,
+    "businessDataWrites": false,
+    "livePromoted": false
+  },
+  "technicalServerProof": {
+    "status": "PASS",
+    "runId": 36249482718,
+    "logoPersisted": true,
+    "cleanup": true
+  },
+  "boundaries": {
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true
+  }
+}
