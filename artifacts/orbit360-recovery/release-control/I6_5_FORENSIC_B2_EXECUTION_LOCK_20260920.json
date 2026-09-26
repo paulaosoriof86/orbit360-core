@@ -1875,8 +1875,8 @@
     "noReimport": true
   },
   "r6": {
-    "status": "R6A_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
-    "findingLedgerBlobSha": "1d6caea998e3521f0a51e685c2705809a183fd51",
+    "status": "R6B_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+    "findingLedgerBlobSha": "730ae54817e72b6b67c8e743eaa0c582e97600de",
     "blockers": [
       "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
       "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
@@ -1926,10 +1926,11 @@
     "humanFixtureStatus": "PENDING_SAFE_PREVIEW_ONLY_IMPLEMENTATION_AFTER_TECHNICAL_AUTHENTICATED_PASS",
     "noReimport": true,
     "lastPreviewFailure": {
-      "runId": 36247735266,
-      "jobId": 108419940856,
-      "code": "B2_R5_POLICY_VEHICLE_CONTEXT_MISSING",
-      "classification": "STALE_HARNESS_PLUS_RESIDUAL_TECHNICAL_UI_LANGUAGE",
+      "runId": 36247874721,
+      "jobId": 108420324309,
+      "code": "B2_CACHE_KEY_MISSING:modules/cliente360.js?v=20260925-b2r5",
+      "classification": "STALE_FUNCTIONAL_CACHE_KEY_DISCRIMINANT",
+      "productDefectDemonstrated": false,
       "livePromoted": false,
       "dataWrites": 0
     },
@@ -1938,7 +1939,15 @@
       "functionalBlob": "2299142218a40d59b25a518d102a7c6a49322da5",
       "businessLanguageNoPhysicalIds": true,
       "staleHarnessCorrected": true
+    },
+    "r6b": {
+      "functionalBlob": "9378af142c680788445832739ad95e30270853a8",
+      "cacheKeysRebound": [
+        "modules/cliente360.js?v=20260926-b2r6",
+        "modules/policy-receipts-v1199-detail-guard.js?v=20260926-b2r6",
+        "core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260926-b2r6"
+      ]
     }
   },
-  "findingLedgerBlobSha": "1d6caea998e3521f0a51e685c2705809a183fd51"
+  "findingLedgerBlobSha": "730ae54817e72b6b67c8e743eaa0c582e97600de"
 }

@@ -1765,12 +1765,14 @@
     ],
     "noLive": true,
     "b3": "NOT_STARTED",
-    "sourceRemediationStatus": "R6A_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "sourceRemediationStatus": "R6B_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
     "compositionLockBlobSha": "e08361dfaf9d462d2d4f4b834f22c94762066c7c",
-    "lastFailedPreviewRunId": 36247735266,
-    "lastFailedPreviewJobId": 108419940856,
-    "lastFailureCode": "B2_R5_POLICY_VEHICLE_CONTEXT_MISSING",
-    "lastFailureClassification": "STALE_HARNESS_PLUS_RESIDUAL_TECHNICAL_UI_LANGUAGE"
+    "lastFailedPreviewRunId": 36247874721,
+    "lastFailedPreviewJobId": 108420324309,
+    "lastFailureCode": "B2_CACHE_KEY_MISSING:modules/cliente360.js?v=20260925-b2r5",
+    "lastFailureClassification": "STALE_FUNCTIONAL_CACHE_KEY_DISCRIMINANT",
+    "productDefectDemonstrated": false,
+    "livePromoted": false
   },
   "lastReview": {
     "date": "2026-09-26",
