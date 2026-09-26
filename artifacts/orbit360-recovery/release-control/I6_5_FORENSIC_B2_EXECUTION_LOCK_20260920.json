@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -242,10 +242,11 @@
     "artifactDigest": "e0559df0da430787bad424851eb289a01c0b81600c678cbeae581566eafc30ac",
     "exactReadback": true,
     "functionalPass": true,
-    "livePromoted": false
+    "livePromoted": false,
+    "supersededBySourceChange": true
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "HISTORICAL_ATTEMPT_SUPERSEDED_BY_R6D_MECHANISM_CHANGE",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "4e9916652603e20dbb44c2effb97faaf4972892d",
     "exactPreviewBuildId": "gi-i65-b2-4e9916652603-57f234755dc1",
@@ -1875,8 +1876,8 @@
     "noReimport": true
   },
   "r6": {
-    "status": "R6C_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
-    "findingLedgerBlobSha": "8f8be504e1d491a9daf5944f3087f1ac29c2cbe3",
+    "status": "R6D_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
+    "findingLedgerBlobSha": "727ff72c8a3b8f86e8e8897ae86d8c4747d1f2a0",
     "blockers": [
       "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
       "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
@@ -1903,7 +1904,7 @@
     "exactReviewedPreview": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
     "noLive": true,
     "noB3": true,
-    "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
+    "compositionLockBlobSha": "27903530cbe5af2a3b26ef5c3e75861b4fc7aa57",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -2143,7 +2144,189 @@
         "r5IndividualReceiptEdit": true,
         "r5ReportedPaymentProjection": true
       }
+    },
+    "r6d": {
+      "authenticatedHarnessBlobSha": "79d6554897a2f37cfe879ea62e0fce37b2e9349d",
+      "failedRunId": 36248865201,
+      "failedJobId": 108423473972,
+      "failureCode": "B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT",
+      "classification": "HARNESS_ONLY_PERFORMANCE_DEFECT",
+      "productRegressionDemonstrated": false,
+      "syntheticWritesBeforeFailure": 0,
+      "optimizedAlgorithm": "ONE_PASS_RECEIPT_INDEX",
+      "previousTechnicalPreviewHistorical": {
+        "sourceSha": "4e9916652603e20dbb44c2effb97faaf4972892d",
+        "buildId": "gi-i65-b2-4e9916652603-57f234755dc1",
+        "channelId": "gi-i65-b2-36248865201",
+        "url": "https://ays-orbit-360-lab--gi-i65-b2-36248865201-rxvb8jx7.web.app",
+        "runId": 36248865201,
+        "artifactId": 10908073118,
+        "artifactDigest": "e0559df0da430787bad424851eb289a01c0b81600c678cbeae581566eafc30ac",
+        "exactReadback": true,
+        "functionalPass": true,
+        "livePromoted": false
+      },
+      "previousAuthAttemptHistorical": {
+        "status": "AUTHORIZED_PENDING_RUN",
+        "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+        "exactPreviewSourceSha": "4e9916652603e20dbb44c2effb97faaf4972892d",
+        "exactPreviewBuildId": "gi-i65-b2-4e9916652603-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36248865201-rxvb8jx7.web.app",
+        "exactPreviewArtifactId": 10908073118,
+        "boundaries": {
+          "syntheticQaWritesAuthorized": true,
+          "syntheticQaOnly": true,
+          "cleanupMandatory": true,
+          "businessDataMutationAuthorized": false,
+          "reimportAuthorized": false,
+          "emailSendAuthorized": false,
+          "liveHostingPromotionAuthorized": false,
+          "productSourceMutationAuthorized": false
+        },
+        "requiredAssertions": [
+          "OPERATIVO_ALL_TO_ASESOR_OWN_RUNTIME",
+          "CLIENT_CREATE_EDIT_DURABLE_READBACK",
+          "CLIENT_AND_POLICY_BACKDROP_PROTECTED",
+          "POLICY_EXPLICIT_SELLER_DURABLE_READBACK",
+          "VEHICLE_COMPLETE_CREATE_EDIT_SAME_ID",
+          "RENEWAL_REAL_POLICY_LINKED",
+          "RENEWAL_RECEIPTS_AND_PORTFOLIO_CREATED",
+          "ZERO_CONFIRMED_COBRO_WITHOUT_PAYMENT_EVIDENCE",
+          "SYNTHETIC_CLEANUP_CONFIRMED",
+          "PROTECTED_ACCESS_CONFIG_OPERATIVO_COTIZADOR_COMPARATIVO",
+          "NO_DUPLICATE_VER_VEHICULO_COMPLETO",
+          "TRUTHFUL_UNLINKED_POLICY_VEHICLE_RELATION",
+          "POLICY_RECEIPT_MATURE_HIERARCHY",
+          "RECEIPT_EDIT_PLAN_ROUTE"
+        ],
+        "lastTimedOutRunId": 35556007094,
+        "lastTimedOutAt": "2026-09-20T21:30:44-06:00",
+        "retryPolicy": "ONLY_AFTER_ORPHAN_SYNTHETIC_CLEANUP_PASS",
+        "failureClassification": "HARNESS_TIMEOUT_CAUSE_NOT_YET_LOCALIZED",
+        "productRegressionDeclared": false,
+        "retryAttempt": 2,
+        "instrumented": true,
+        "instrumentedProofBlobSha": "3bdc60899eb8125b5e25858381ccd328bbe7baed",
+        "retryAuthorizedAfterCleanup": {
+          "currentRun": 35558851618,
+          "currentTarget": 35557909667,
+          "history": [
+            {
+              "cleanupRunId": 35558678312,
+              "orphanRunId": 35556007094,
+              "status": "PASS"
+            }
+          ]
+        },
+        "maxExpectedRuntimeMinutes": 10,
+        "timeoutFailureMayNotBeDeclaredProductFailure": true,
+        "lastFailedRunId": 36205585644,
+        "lastFailure": "FIREBASE_STORAGE_ASSET_BUCKET_MISSING",
+        "lastCleanupRunId": 35953693091,
+        "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
+        "productSourceMutationAuthorized": false,
+        "runId": 36247964139,
+        "scope": {
+          "operativo": "all",
+          "asesor": "own",
+          "asesorLeakCount": 0,
+          "operativoCounts": {
+            "clientes": 439,
+            "polizas": 1415,
+            "recibosEsperados": 1867,
+            "carteraPrimas": 1308,
+            "asesores": 7,
+            "metas": 0
+          },
+          "asesorCounts": {
+            "clientes": 393,
+            "polizas": 1238,
+            "recibosEsperados": 1662,
+            "carteraPrimas": 1167,
+            "asesores": 1,
+            "metas": 0
+          }
+        },
+        "crud": {
+          "vehiclePolicyContext": true,
+          "individualReceiptEditReadback": true,
+          "individualReceiptPortfolioSync": true,
+          "reportedPaymentVisible": true,
+          "reportedPaymentDoesNotFabricateCobro": true,
+          "clientIdHash": "cea4f8666ccf77bba6c951b0d3a1c0cac028dcbbb9474d35fa23727203be4221",
+          "policyIdHash": "b53ff2f56c00505b40129cbf18e377a283f5002ef65c4d9c0d4211f9552a0a9e",
+          "vehicleIdHash": "da7baaa4396abc59d75b8114ad18f5264a61a2528566bbd3b9bd167293997a35",
+          "clientCreateReadback": true,
+          "clientEditReadback": true,
+          "policyCreateReadback": true,
+          "policyEditReadback": true,
+          "policyEditReload": true,
+          "advisorSellerReadback": true,
+          "vehicleCreateReadback": true,
+          "vehicleEditSameId": true,
+          "vehicleEditReload": true,
+          "receipts": 2,
+          "portfolio": 2,
+          "cobros": 0,
+          "dirtyBackdropProtected": true
+        },
+        "renewal": {
+          "requestIdHash": "d57d63ba5cedf251f5144d21802fecb29786133b080db3c255042fd8b66b1647",
+          "newPolicyIdHash": "8b9430f1c3a958770d67dea82d0abc865b86ca1891acd4485259a90de7d25cac",
+          "sourceLink": true,
+          "receipts": 2,
+          "portfolio": 2,
+          "cobros": 0,
+          "vehicleSnapshot": true,
+          "vehicleNewId": true,
+          "awaitedRuntime": true
+        },
+        "cleanup": {
+          "preRunAssetsDeleted": 0,
+          "deleted": 25,
+          "clientAbsent": true,
+          "insurerAbsent": true,
+          "assetPrefixResidual": 0,
+          "assetAbsent": true
+        },
+        "syntheticWrites": 18,
+        "cleanupWrites": 25,
+        "visualEvidenceRecapture": true,
+        "visualReceiptRecapture": true,
+        "lastFailureRunId": 36158157603,
+        "requiredNewSource": true,
+        "lastArmCommitParent": "219bf4d02c37d785e2c6d2a811ee1b5ff42f84dd",
+        "lastArmReason": "R22_PREVIEW_CREDENTIAL_ISOLATION_EXACT_AUTHENTICATED_PROOF",
+        "lastArmAt": "2026-09-25T10:35:00-06:00",
+        "dispatchRequest": {
+          "requestedAt": "2026-09-25T13:06:00-06:00",
+          "reason": "EXECUTE_R3_AUTHENTICATED_PROOF_ON_EXACT_PREVIEW_AFTER_PREVIEW_FREEZE",
+          "expectedHeadBeforeDispatch": "56ae83e028de9071400e952acfa8cf6882104955",
+          "productSourceMutation": false,
+          "livePromotion": false,
+          "b3Advance": false
+        },
+        "insurerSecureEdit": {
+          "logoPersisted": true,
+          "credentialPreviewIsolated": true,
+          "durableReadback": true,
+          "cleanup": true
+        },
+        "storageAssetBucket": "gravicentra-insurance-assets-60e88ed5a1",
+        "cleanupAssetProofRequired": true,
+        "cleanupAssetProofStatus": "PASS",
+        "findingLedgerBlobSha": "984d3713814aec3419787bd440132e98d9fd7bcd",
+        "requiredR5Assertions": [
+          "VEHICLE_POLICY_EXACT_CONTEXT",
+          "INDIVIDUAL_RECEIPT_ATOMIC_EDIT",
+          "REPORTED_PAYMENT_VISIBLE_WITH_ZERO_CONFIRMED_COBRO"
+        ],
+        "jobId": 108339197129,
+        "r5VehiclePolicyContext": true,
+        "r5IndividualReceiptEdit": true,
+        "r5ReportedPaymentProjection": true
+      }
     }
   },
-  "findingLedgerBlobSha": "8f8be504e1d491a9daf5944f3087f1ac29c2cbe3"
+  "findingLedgerBlobSha": "727ff72c8a3b8f86e8e8897ae86d8c4747d1f2a0"
 }

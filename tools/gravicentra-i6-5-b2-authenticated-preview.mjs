@@ -507,20 +507,33 @@ try{
     const shown=v=>String(v==null?'':v).trim();
     const rank=p=>{const s=shown(p&&p.estado).toLowerCase();if(/^(vigente|activa|activo)$/.test(s))return 0;if(s.includes('por renovar')||s==='renovacion pendiente')return 1;if(s.includes('cancel')||s.includes('anul'))return 3;return 2;};
     const date=p=>shown(p&&p.vigenciaFin||p&&p.vigenciaInicio);
-    const denom=r=>{const raw=[r&&r.cuota,r&&r.serie,r&&r.numeroReciboFuente].map(shown).find(Boolean)||'',m=raw.match(/(?:^|\s)(\d+)\s*\/\s*(\d+)(?:\s|$)/);return m?Number(m[2]):null;};
+    const denom=r=>{const raw=[r&&r.cuota,r&&r.serie,r&&r.numeroReciboFuente].map(shown).find(Boolean)||'',m=raw.match(/(?:^|\\s)(\\d+)\\s*\\/\\s*(\\d+)(?:\\s|$)/);return m?Number(m[2]):null;};
+    const inactive=r=>{const s=shown(r&&r.estado).toLowerCase();return !!(r&&(r.superseded===true||r.calendarActive===false||s==='anulado'||s==='superseded'||s==='reemplazado'));};
     const policies=(Orbit.store?.all?.('polizas')||[]).filter(Boolean),vehicles=(Orbit.store?.all?.('vehiculos')||[]).filter(Boolean),rawReceipts=(Orbit.store?.all?.('recibosEsperados')||[]).filter(Boolean);
+    const receiptsByPolicy=new Map();
+    for(const r of rawReceipts){const id=String(r.polizaId||'');if(!receiptsByPolicy.has(id))receiptsByPolicy.set(id,[]);receiptsByPolicy.get(id).push(r);}
+    const project=(p,rows)=>{
+      const base=rows.filter(r=>!inactive(r)),history=rows.filter(inactive),explicit=Number(p&&p.cuotas);
+      if(Number.isFinite(explicit)&&explicit>0){
+        const current=[],replaced=history.slice();for(const r of base){const d=denom(r);(d&&d!==explicit?replaced:current).push(r);}
+        return{current,replaced,review:[],explicit};
+      }
+      const ds=[...new Set(base.map(denom).filter(n=>Number.isFinite(n)&&n>0))];
+      if(ds.length<=1)return{current:base,replaced:history,review:[],explicit:null};
+      return{current:base.filter(r=>denom(r)==null),replaced:history,review:base.filter(r=>denom(r)!=null),explicit:null};
+    };
     const calendarIssues=[];
     for(const p of policies){
-      const current=(Orbit.q?.recibosEsperadosDe?Orbit.q.recibosEsperadosDe(p.clienteId):[]).filter(r=>String(r.polizaId||'')===String(p.id||''));
-      const ds=[...new Set(current.map(denom).filter(n=>Number.isFinite(n)&&n>0))],explicit=Number(p.cuotas);
-      if(ds.length>1)calendarIssues.push({policyId:String(p.id||''),reason:'MULTIPLE_PROJECTED_DENOMINATORS',denoms:ds});
-      if(Number.isFinite(explicit)&&explicit>0&&current.length>explicit)calendarIssues.push({policyId:String(p.id||''),reason:'PROJECTED_COUNT_EXCEEDS_POLICY_CUOTAS',count:current.length,explicit});
+      const pr=project(p,receiptsByPolicy.get(String(p.id||''))||[]),ds=[...new Set(pr.current.map(denom).filter(n=>Number.isFinite(n)&&n>0))];
+      if(ds.length>1)calendarIssues.push({policyId:String(p.id||''),reason:'MULTIPLE_EXPECTED_ACTIVE_DENOMINATORS',denoms:ds});
+      if(Number.isFinite(pr.explicit)&&pr.explicit>0&&pr.current.length>pr.explicit)calendarIssues.push({policyId:String(p.id||''),reason:'EXPECTED_ACTIVE_COUNT_EXCEEDS_POLICY_CUOTAS',count:pr.current.length,explicit:pr.explicit});
     }
     const auto=policies.find(p=>/39012/.test(shown(p.numero)||shown(p.polizaNumero)||shown(p.numeroPoliza)));
     let auto39012={found:false};
     if(auto){
-      const raw=rawReceipts.filter(r=>String(r.polizaId||'')===String(auto.id||'')),current=(Orbit.q?.recibosEsperadosDe?Orbit.q.recibosEsperadosDe(auto.clienteId):[]).filter(r=>String(r.polizaId||'')===String(auto.id||''));
-      auto39012={found:true,policyId:String(auto.id||''),rawCount:raw.length,currentCount:current.length,explicit:Number(auto.cuotas)||null,currentDenoms:[...new Set(current.map(denom).filter(Boolean))],rawDenoms:[...new Set(raw.map(denom).filter(Boolean))]};
+      const raw=receiptsByPolicy.get(String(auto.id||''))||[],expected=project(auto,raw),actual=(Orbit.q?.recibosEsperadosDe?Orbit.q.recibosEsperadosDe(auto.clienteId):[]).filter(r=>String(r.polizaId||'')===String(auto.id||''));
+      const expectedIds=expected.current.map(r=>String(r.id||'')).sort(),actualIds=actual.map(r=>String(r.id||'')).sort();
+      auto39012={found:true,policyId:String(auto.id||''),rawCount:raw.length,expectedCurrentCount:expected.current.length,currentCount:actual.length,explicit:Number(auto.cuotas)||null,currentDenoms:[...new Set(actual.map(denom).filter(Boolean))],rawDenoms:[...new Set(raw.map(denom).filter(Boolean))],projectionMatch:expectedIds.length===actualIds.length&&expectedIds.every((id,i)=>id===actualIds[i])};
     }
 
     const byClient=new Map();
@@ -529,33 +542,29 @@ try{
     for(const [cid,rows] of byClient.entries()){
       if(rows.length<2||new Set(rows.map(rank)).size<2)continue;
       const expected=rows.slice().sort((a,b)=>rank(a)-rank(b)||date(b).localeCompare(date(a))||shown(a.numero).localeCompare(shown(b.numero))).map(p=>String(p.id||''));
-      location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&t=polizas';await wait(700);
+      location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&t=polizas';await wait(550);
       const actual=Array.from(document.querySelectorAll('[data-client-policy-row="1"]')).map(x=>String(x.getAttribute('data-policy-id')||''));
       if(actual.length){policyOrder={applicable:true,clientId:cid,expected:expected.slice(0,actual.length),actual,pass:actual.every((id,i)=>id===expected[i])};break;}
     }
 
     let vehicleProjection={applicable:false};
-    const candidates=[];
     for(const [cid,rows] of byClient.entries()){
       const currentPolicies=rows.filter(p=>rank(p)<=1),vp=currentPolicies.map(p=>({p,v:vehicles.find(v=>String(v.polizaId||'')===String(p.id||''))})).filter(x=>x.v);
       const distinctPlates=new Set(vp.map(x=>shown(x.v.placa).toUpperCase()).filter(Boolean));
-      if(vp.length>=2&&distinctPlates.size>=2)candidates.push({cid,vp});
-    }
-    if(candidates.length){
-      const x=candidates[0];location.hash='#/cliente360?c='+encodeURIComponent(x.cid)+'&t=vehiculos';await wait(700);
+      if(vp.length<2||distinctPlates.size<2)continue;
+      location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&t=vehiculos';await wait(550);
       const cards=Array.from(document.querySelectorAll('[data-vehicle-current-card="1"]')).map(el=>({vehicleId:String(el.getAttribute('data-vehicle-current-id')||''),policyId:String(el.getAttribute('data-vehicle-policy-id')||''),historyCount:Number(el.getAttribute('data-vehicle-history-count')||0)}));
-      const expectedPolicyIds=x.vp.map(z=>String(z.p.id||''));
-      const unresolved=String(document.querySelector('[data-vehicle-identity-incomplete="1"]')?.innerText||'');
-      vehicleProjection={applicable:true,clientId:x.cid,expectedPolicyIds,cards,unresolved,pass:expectedPolicyIds.every(id=>cards.some(c=>c.policyId===id))};
+      const expectedPolicyIds=vp.map(z=>String(z.p.id||'')),unresolved=String(document.querySelector('[data-vehicle-identity-incomplete="1"]')?.innerText||'');
+      vehicleProjection={applicable:true,clientId:cid,expectedPolicyIds,cards,unresolved,pass:expectedPolicyIds.every(id=>cards.some(c=>c.policyId===id))};break;
     }
 
     const sidebar=document.querySelector('#sidebar'),max=sidebar?Math.max(0,sidebar.scrollHeight-sidebar.clientHeight):0;
     if(sidebar)sidebar.scrollTop=max;
     const sidebarScroll={present:!!sidebar,max,scrollTop:sidebar?sidebar.scrollTop:0,overflowY:sidebar?getComputedStyle(sidebar).overflowY:'',scrollbarWidth:sidebar?getComputedStyle(sidebar).scrollbarWidth:'',pass:!!sidebar&&(max===0||sidebar.scrollTop>0)};
-    return{calendarIssues,auto39012,policyOrder,vehicleProjection,sidebarScroll};
-  }),'B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT',45000);
+    return{calendarIssues,auto39012,policyOrder,vehicleProjection,sidebarScroll,counts:{policies:policies.length,receipts:rawReceipts.length}};
+  }),'B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT',30000);
   need(r6Runtime.calendarIssues.length===0,'B2_AUTH_R6_ACTIVE_CALENDAR_CONFLICT:'+JSON.stringify(r6Runtime.calendarIssues.slice(0,10)));
-  need(r6Runtime.auto39012.found===true&&r6Runtime.auto39012.currentDenoms.length<=1&&(r6Runtime.auto39012.explicit==null||r6Runtime.auto39012.currentCount<=r6Runtime.auto39012.explicit),'B2_AUTH_R6_AUTO39012_CALENDAR_INVALID:'+JSON.stringify(r6Runtime.auto39012));
+  need(r6Runtime.auto39012.found===true&&r6Runtime.auto39012.projectionMatch===true&&r6Runtime.auto39012.currentDenoms.length<=1&&(r6Runtime.auto39012.explicit==null||r6Runtime.auto39012.currentCount<=r6Runtime.auto39012.explicit),'B2_AUTH_R6_AUTO39012_CALENDAR_INVALID:'+JSON.stringify(r6Runtime.auto39012));
   need(r6Runtime.policyOrder.applicable===true&&r6Runtime.policyOrder.pass===true,'B2_AUTH_R6_POLICY_ORDER_INVALID:'+JSON.stringify(r6Runtime.policyOrder));
   if(r6Runtime.vehicleProjection.applicable)need(r6Runtime.vehicleProjection.pass===true,'B2_AUTH_R6_VEHICLE_CURRENT_PROJECTION_INVALID:'+JSON.stringify(r6Runtime.vehicleProjection));
   need(r6Runtime.sidebarScroll.pass===true,'B2_AUTH_R6_SIDEBAR_SCROLL_INVALID:'+JSON.stringify(r6Runtime.sidebarScroll));

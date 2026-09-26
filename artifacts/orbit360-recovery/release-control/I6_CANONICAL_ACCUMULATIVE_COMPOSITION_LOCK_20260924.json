@@ -175,7 +175,7 @@
   "lastRemediation": {
     "origin": "ASSISTANT_FORENSIC_VISUAL_AUDIT_AFTER_AUTH_PASS_20260926",
     "parentHead": "cc0e8434578838f617ae7d5b6f7682dab09455f3",
-    "status": "R6C_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "status": "R6D_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -204,10 +204,14 @@
     "noLive": true,
     "noB3": true,
     "exactSetRebound": true,
-    "followupFix": "R6A_BUSINESS_LANGUAGE_AND_STALE_HARNESS",
+    "followupFix": "R6D_BOUND_RUNTIME_DISCRIMINANTS",
     "followupRootCause": {
-      "harness": "R5_DISCRIMINANT_REQUIRED_POLICY_ID_LITERAL_THAT_R6_INTENTIONALLY_REMOVED",
-      "product": "POLICY_VERSION_CONTEXT_STILL_RENDERED_PHYSICAL_IDS_AFTER_FIRST_R6_PASS"
+      "classification": "HARNESS_ONLY_PERFORMANCE_DEFECT",
+      "failedRunId": 36248865201,
+      "failedJobId": 108423473972,
+      "error": "B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT",
+      "cause": "R6C runtime proof rescanned the full receipt collection once per policy, creating O(P×R) work before any synthetic write.",
+      "productRegressionDemonstrated": false
     },
     "latestCausalOwner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
     "latestCausalBlob": "320cd86487581a267a165f2df6d6c1b37c497560",
@@ -220,7 +224,7 @@
     ],
     "mechanismBlobs": {
       "functional": "59dbbcc39914c9364b664cd40dc1adee5e9cf804",
-      "authenticated": "ea96aa6b386cc8437fb5f58811fd1aaa4dafaa51"
+      "authenticated": "79d6554897a2f37cfe879ea62e0fce37b2e9349d"
     },
     "strengthenedProof": [
       "R47_CURRENT_VEHICLE_PROJECTION_RUNTIME",
@@ -229,6 +233,8 @@
       "R49_POLICY_BUSINESS_ORDER_RUNTIME",
       "R50_BUSINESS_LANGUAGE_RUNTIME",
       "R53_SIDEBAR_SCROLL_RUNTIME"
-    ]
+    ],
+    "productFileBlobsChanged": false,
+    "immutableBuildRequiredAfterMechanismChange": true
   }
 }

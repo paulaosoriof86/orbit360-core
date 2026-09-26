@@ -1778,8 +1778,8 @@
     ],
     "noLive": true,
     "b3": "NOT_STARTED",
-    "sourceRemediationStatus": "R6C_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
-    "compositionLockBlobSha": "2a41bf6c4d8d01efdb109cccbfbd39969c3e3eb9",
+    "sourceRemediationStatus": "R6D_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
+    "compositionLockBlobSha": "27903530cbe5af2a3b26ef5c3e75861b4fc7aa57",
     "lastFailedPreviewRunId": 36247874721,
     "lastFailedPreviewJobId": 108420324309,
     "lastFailureCode": "B2_CACHE_KEY_MISSING:modules/cliente360.js?v=20260925-b2r5",
@@ -1797,6 +1797,22 @@
       ],
       "preservedPass": true,
       "noLive": true
+    },
+    "lastAuthenticatedFailure": {
+      "runId": 36248865201,
+      "jobId": 108423473972,
+      "code": "B2_AUTH_R6_RUNTIME_DISCRIMINANTS_TIMEOUT",
+      "classification": "HARNESS_ONLY_PERFORMANCE_DEFECT",
+      "beforeSyntheticWrites": true,
+      "productRegressionDemonstrated": false,
+      "livePromoted": false,
+      "reimport": false
+    },
+    "harnessOptimization": {
+      "blobSha": "79d6554897a2f37cfe879ea62e0fce37b2e9349d",
+      "algorithm": "ONE_PASS_RECEIPTS_BY_POLICY_PLUS_LOCAL_EXPECTED_PROJECTION_AND_SINGLE_TARGETED_PRODUCT_READBACK_FOR_AUTO39012",
+      "complexity": "O(P+R) plus bounded DOM spot checks",
+      "timeoutMs": 30000
     }
   },
   "lastReview": {
