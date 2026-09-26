@@ -1387,7 +1387,7 @@
       "rootCause": "Vehicle page link passes only clientId+policyId; policy renderer selects first vehicle by policy and does not disclose same-number sibling physical versions or source vehicle context.",
       "remediation": "Carry vehicleId into policy route, prefer exact linked vehicle, expose physical version context/vigency/ID, and explicitly disclose when this physical version has no receipt calendar while sibling same-number versions exist.",
       "requiredProof": "Open from exact vehicle preserves vehicleId context and same physical policy ID; receipt section corresponds to that exact version; sibling versions are distinguishable.",
-      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_DISCRIMINANTS",
       "blocking": false,
       "sourceFixAt": "2026-09-25",
       "closureProof": {
@@ -1402,6 +1402,12 @@
         "vehiclePolicyContext": true,
         "samePolicy": true,
         "sameVehicle": true
+      },
+      "sourceFix": {
+        "compositionLockBlobSha": "e08361dfaf9d462d2d4f4b834f22c94762066c7c",
+        "latestOwner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "latestBlob": "320cd86487581a267a165f2df6d6c1b37c497560",
+        "businessLanguageNoPhysicalIds": true
       }
     },
     {
@@ -1568,7 +1574,10 @@
           "orbit360-platform/styles/base.css",
           "orbit360-platform/index.html"
         ],
-        "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+        "compositionLockBlobSha": "e08361dfaf9d462d2d4f4b834f22c94762066c7c",
+        "latestOwner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "latestBlob": "320cd86487581a267a165f2df6d6c1b37c497560",
+        "businessLanguageNoPhysicalIds": true
       }
     },
     {
@@ -1756,8 +1765,12 @@
     ],
     "noLive": true,
     "b3": "NOT_STARTED",
-    "sourceRemediationStatus": "R6_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
-    "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13"
+    "sourceRemediationStatus": "R6A_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "compositionLockBlobSha": "e08361dfaf9d462d2d4f4b834f22c94762066c7c",
+    "lastFailedPreviewRunId": 36247735266,
+    "lastFailedPreviewJobId": 108419940856,
+    "lastFailureCode": "B2_R5_POLICY_VEHICLE_CONTEXT_MISSING",
+    "lastFailureClassification": "STALE_HARNESS_PLUS_RESIDUAL_TECHNICAL_UI_LANGUAGE"
   },
   "lastReview": {
     "date": "2026-09-26",

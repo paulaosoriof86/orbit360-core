@@ -145,7 +145,7 @@
     "orbit360-platform/modules/equipo.js": "105b869445919802fb6e07d6120ace6a0772ec57",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "a9dc395a0764bca3ff8f04d1d211acc5f3d0b085",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "4fe27ba24508e193362c592c2fd4073d02b88cfc",
-    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "b22e45ba0f74680aaf3898b470b1e9e07eed549a",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "320cd86487581a267a165f2df6d6c1b37c497560",
     "orbit360-platform/product-runtime-config.js": "b03bd57e6c77b6204ce860b93ec4556b1cd3e4e7",
     "orbit360-platform/styles/base.css": "bade3293a779e62c57acac12468766548bcd1a87",
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
@@ -208,6 +208,15 @@
     "noDataReimport": true,
     "noLive": true,
     "noB3": true,
-    "exactSetRebound": true
+    "exactSetRebound": true,
+    "followupFix": "R6A_BUSINESS_LANGUAGE_AND_STALE_HARNESS",
+    "followupRootCause": {
+      "harness": "R5_DISCRIMINANT_REQUIRED_POLICY_ID_LITERAL_THAT_R6_INTENTIONALLY_REMOVED",
+      "product": "POLICY_VERSION_CONTEXT_STILL_RENDERED_PHYSICAL_IDS_AFTER_FIRST_R6_PASS"
+    },
+    "latestCausalOwner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "latestCausalBlob": "320cd86487581a267a165f2df6d6c1b37c497560",
+    "mechanismFile": "tools/gravicentra-i6-5-b2-functional.mjs",
+    "mechanismBlob": "2299142218a40d59b25a518d102a7c6a49322da5"
   }
 }

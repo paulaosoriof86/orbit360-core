@@ -1875,8 +1875,8 @@
     "noReimport": true
   },
   "r6": {
-    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
-    "findingLedgerBlobSha": "bcbe0b90073087e696549849bd553fa72ddd6bdb",
+    "status": "R6A_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "findingLedgerBlobSha": "1d6caea998e3521f0a51e685c2705809a183fd51",
     "blockers": [
       "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
       "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
@@ -1903,7 +1903,7 @@
     "exactReviewedPreview": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
     "noLive": true,
     "noB3": true,
-    "compositionLockBlobSha": "fe2f8ce3835057c224120380a1079689e22abc13",
+    "compositionLockBlobSha": "e08361dfaf9d462d2d4f4b834f22c94762066c7c",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -1924,7 +1924,21 @@
     },
     "receiptRule": "EXPLICIT_POLICY_CUOTAS_AUTHORITY_IF_PRESENT_ELSE_SINGLE_PHYSICAL_DENOMINATOR_ELSE_FAIL_CLOSED_REVIEW",
     "humanFixtureStatus": "PENDING_SAFE_PREVIEW_ONLY_IMPLEMENTATION_AFTER_TECHNICAL_AUTHENTICATED_PASS",
-    "noReimport": true
+    "noReimport": true,
+    "lastPreviewFailure": {
+      "runId": 36247735266,
+      "jobId": 108419940856,
+      "code": "B2_R5_POLICY_VEHICLE_CONTEXT_MISSING",
+      "classification": "STALE_HARNESS_PLUS_RESIDUAL_TECHNICAL_UI_LANGUAGE",
+      "livePromoted": false,
+      "dataWrites": 0
+    },
+    "r6a": {
+      "detailBlob": "320cd86487581a267a165f2df6d6c1b37c497560",
+      "functionalBlob": "2299142218a40d59b25a518d102a7c6a49322da5",
+      "businessLanguageNoPhysicalIds": true,
+      "staleHarnessCorrected": true
+    }
   },
-  "findingLedgerBlobSha": "bcbe0b90073087e696549849bd553fa72ddd6bdb"
+  "findingLedgerBlobSha": "1d6caea998e3521f0a51e685c2705809a183fd51"
 }
