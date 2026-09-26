@@ -1261,6 +1261,32 @@
       "status": "FROZEN_FOR_B3_NOT_B2_BLOCKER",
       "blocking": false,
       "requiredProof": "B3 conciliación/readback; cero cobros confirmados fabricados."
+    },
+    {
+      "id": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
+      "surface": "Aseguradoras",
+      "classification": "INFRASTRUCTURE_PREREQUISITE_MISSING",
+      "finding": "INSURER_LOGO_FILE_UPLOAD_CONTRACT_CANNOT_COMPLETE_BECAUSE_FIREBASE_PROJECT_HAS_NO_USABLE_ASSET_BUCKET",
+      "evidence": {
+        "sdkStorageBucket": "ays-orbit-360-lab.firebasestorage.app",
+        "physicalBucketInventory": [
+          "gcf-v2-sources-646761409743-us-central1",
+          "gcf-v2-sources-646761409743-us-east1",
+          "gcf-v2-uploads-646761409743.us-central1.cloudfunctions.appspot.com"
+        ],
+        "usableAssetBucketCount": 0,
+        "storageWriteResult": "404",
+        "exactRunId": 36205585644,
+        "previewOnly": true
+      },
+      "rootCause": "Firebase SDK config advertises the default Storage bucket name, but that bucket is not provisioned. The only physical buckets belong to Cloud Functions internals and must not be repurposed.",
+      "contract": "Paula visual rejection requires authorized Storage/Drive/secure URL architecture; Data URL/localStorage are forbidden. Current approved owner is Firebase Storage.",
+      "remediation": "Provision or authorize one asset bucket in the SAME Firebase/GCP project, then bind orbit360ProductAssetUploadPreview to that bucket and rerun B2. No new Firebase, no data reimport, no LIVE.",
+      "status": "BLOCKED_PENDING_OWNER_INFRASTRUCTURE_AUTHORIZATION",
+      "blocking": true,
+      "noDataReimport": true,
+      "noLive": true,
+      "noB3": true
     }
   ],
   "phaseBBacklog": [
