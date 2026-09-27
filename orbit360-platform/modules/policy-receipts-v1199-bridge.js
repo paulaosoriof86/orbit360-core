@@ -157,7 +157,7 @@ Orbit.modules = Orbit.modules || {};
         ${existing ? '<label class="ce-l">Motivo del cambio *<textarea class="o-sel" data-reason style="min-height:58px"></textarea></label>' : ''}
         <div class="hint error" data-error style="display:none"></div>
       </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--card)"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" data-save>${existing ? 'Guardar y sincronizar recibos' : 'Crear póliza y recibos'}</button></div>`;
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card)">${existing ? '<button class="btn ghost" data-delete style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>' : ''}<button class="btn ghost" data-close>Cancelar</button><button class="btn primary" data-save>${existing ? 'Guardar y sincronizar recibos' : 'Crear póliza y recibos'}</button></div>`;
     const b = modal('policy-v1199', inner, 800), $ = s => b.querySelector(s);
     const clientEl = $('[data-client]'), advisorEl = $('[data-advisor]'), insurerEl = $('[data-insurer]'), ramoEl = $('[data-ramo]'), productEl = $('[data-product]');
     const clientSearch = $('[data-client-search]');
@@ -222,6 +222,22 @@ Orbit.modules = Orbit.modules || {};
     $('[data-frequency]').addEventListener('change', syncInstallments);
     b.querySelectorAll('input,select').forEach(el => el.addEventListener('input', preview));
     $('[data-import]').addEventListener('click', () => { b.remove(); Orbit.importa.open('polizas', { scope: { clienteId: selectedClient.id } }); });
+    const deletePolicy = $('[data-delete]');
+    if (deletePolicy && existing) deletePolicy.addEventListener('click', async () => {
+      if (!Orbit.recordDelete) return toast('Eliminación canónica no disponible');
+      deletePolicy.disabled = true;
+      try {
+        const result = await Orbit.recordDelete.remove('polizas', existing.id, { label: existing.numero || existing.id });
+        if (result && result.ok) {
+          b.remove();
+          location.hash = '#/cliente360?c=' + encodeURIComponent(existing.clienteId) + '&t=polizas';
+          return;
+        }
+      } catch (error) {
+        toast('No fue posible confirmar la eliminación de la póliza');
+      }
+      deletePolicy.disabled = false;
+    });
     $('[data-save]').addEventListener('click', async () => {
       const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
       const err = $('[data-error]'), originalText = save.textContent;
@@ -273,8 +289,25 @@ Orbit.modules = Orbit.modules || {};
         <label class="ce-l">Motivo del cambio *<textarea class="o-sel" data-vreason style="min-height:58px" placeholder="Describe por qué se actualiza el vehículo"></textarea></label>
         <div class="hint error" data-verror style="display:none"></div>
       </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--card)"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" data-vsave>Guardar vehículo</button></div>`;
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card)"><button class="btn ghost" data-vdelete style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" data-vsave>Guardar vehículo</button></div>`;
     const b = modal('vehicle-v1199', inner, 720), q = s => b.querySelector(s);
+    const deleteVehicle = q('[data-vdelete]');
+    if (deleteVehicle) deleteVehicle.addEventListener('click', async () => {
+      if (!Orbit.recordDelete) return toast('Eliminación canónica no disponible');
+      deleteVehicle.disabled = true;
+      const vehicleLabel = [initial.marca, initial.linea, initial.placa].filter(Boolean).join(' · ') || current.id;
+      try {
+        const result = await Orbit.recordDelete.remove('vehiculos', current.id, { label: vehicleLabel });
+        if (result && result.ok) {
+          b.remove();
+          location.hash = '#/cliente360?c=' + encodeURIComponent(policy.clienteId) + '&t=vehiculos';
+          return;
+        }
+      } catch (error) {
+        toast('No fue posible confirmar la eliminación del vehículo');
+      }
+      deleteVehicle.disabled = false;
+    });
     q('[data-vsave]').addEventListener('click', async () => {
       const reason = q('[data-vreason]').value.trim(), err = q('[data-verror]'), save = q('[data-vsave]'), originalText = save.textContent;
       if (!reason) { err.style.display=''; err.textContent=ERROR_LABELS.motivo_requerido; q('[data-vreason]').focus(); return; }
