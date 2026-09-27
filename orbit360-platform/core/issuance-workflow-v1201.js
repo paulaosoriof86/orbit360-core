@@ -321,6 +321,7 @@ Orbit.issuance = (function () {
     if (!raw.vigenciaInicio || !raw.vigenciaFin) return { ok: false, errors: ['vigencia_real_requerida'] };
     if (source.vigenciaFin && raw.vigenciaInicio && String(raw.vigenciaInicio) < String(source.vigenciaFin)) return { ok: false, errors: ['traslape_requiere_regla_tenant'], sourceEnd: source.vigenciaFin, newStart: raw.vigenciaInicio };
     if (!raw.documentRef) return { ok: false, errors: ['documento_renovacion_en_firme_requerido'] };
+    if (/^(prueba|test|x|na|n\/a)$/i.test(raw.documentRef) || raw.documentRef.length < 6) return { ok: false, errors: ['soporte_renovacion_en_firme_invalido'] };
     const created = await P().createPolicy(raw, { operationId: opId, motivo: options.motivo || 'Renovación en firme recibida y aprobada por el cliente' });
     if (!created.ok) return created;
     const policy = created.policy;
