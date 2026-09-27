@@ -593,7 +593,7 @@ Orbit.ciclo = (function () {
     const uploadStatus = Orbit.secureResources && Orbit.secureResources.documentUploadStatus
       ? Orbit.secureResources.documentUploadStatus({ entidad: 'gestion', clienteId: opts.clienteId || '', polizaId: opts.polizaId || '' })
       : { available: false, status: 'pendiente_conexion', message: 'Carga directa pendiente de conexión con Drive' };
-    const canUpload = uploadStatus && uploadStatus.available === true;
+    let canUpload = uploadStatus && uploadStatus.available === true;
     const sourceLabel = opts.desdeCliente ? 'Solicitud del cliente (Portal)' : (opts.origen === 'Ops' ? 'Nueva gestión · Ops' : 'Gestión operativa');
     const headerColor = opts.desdeCliente ? '#15803d,#0c5a2a' : '#1f3a5f,#142840';
     let pendingFiles = [];
@@ -650,15 +650,15 @@ Orbit.ciclo = (function () {
         <div class="ciclo-sec" style="margin:0">
           <div class="ciclo-sec-t">Documentos de soporte · Drive</div>
           <label class="ce-l">Enlace(s) de Drive / origen<textarea id="mg-links" class="o-sel" style="min-height:68px;resize:vertical;padding:9px 11px" placeholder="Pega uno o varios enlaces https://, uno por línea"></textarea></label>
-          ${canUpload ? `
+          <div class="cfg-note" id="mg-drive-connect-note" style="margin-top:10px;${canUpload ? 'display:none' : ''}">
+            <b>Drive requiere una cuenta Google con permiso de escritura en Clientes.</b>
+            <div style="margin-top:6px">La autorización se usa solo durante esta sesión; no se guarda la credencial de Google.</div>
+            <button type="button" class="btn ghost sm" id="mg-drive-connect" style="margin-top:8px">🔗 Conectar Drive</button>
+          </div>
+          <div id="mg-drive-upload-area" style="${canUpload ? '' : 'display:none'}">
             <div class="sg-drop" id="mg-drop" style="margin-top:10px"><span>📎 Arrastra o haz clic para cargar a Drive</span><input type="file" id="mg-file" multiple hidden></div>
             <div id="mg-files" class="sg-files"></div>
-          ` : `
-            <div class="cfg-note" data-drive-upload-unavailable style="margin-top:10px">
-              La carga directa de archivos está <b>bloqueada hasta que el proveedor Drive confirme almacenamiento y readback</b>.
-              Puedes vincular un enlace de Drive/origen arriba. No se mostrará un falso “archivo cargado”.
-            </div>
-          `}
+          </div>
         </div>
       </div>
       <div class="ciclo-foot">
@@ -694,22 +694,33 @@ Orbit.ciclo = (function () {
       if (pol && insurerSelect && pol.aseguradoraId) insurerSelect.value = pol.aseguradoraId;
     });
 
-    if (canUpload) {
-      const drop = el('mg-drop'), input = el('mg-file'), chips = el('mg-files');
-      const paint = () => {
-        chips.innerHTML = pendingFiles.map((f, i) => '<span class="sg-fchip">📄 ' + U.esc(f.name) + ' <b data-rm="' + i + '">✕</b></span>').join('');
-        chips.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { pendingFiles.splice(+b.dataset.rm, 1); paint(); });
-      };
-      const addFiles = list => {
-        Array.from(list || []).forEach(f => { if (!pendingFiles.some(x => x.name === f.name && x.size === f.size)) pendingFiles.push(f); });
-        paint();
-      };
-      drop.addEventListener('click', () => input.click());
-      drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
-      drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-      drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); addFiles(e.dataTransfer.files); });
-      input.addEventListener('change', () => addFiles(input.files));
-    }
+    const drop = el('mg-drop'), input = el('mg-file'), chips = el('mg-files');
+    const driveArea = el('mg-drive-upload-area'), driveNote = el('mg-drive-connect-note'), driveConnect = el('mg-drive-connect');
+    const paintFiles = () => {
+      chips.innerHTML = pendingFiles.map((f, i) => '<span class="sg-fchip">📄 ' + U.esc(f.name) + ' <b data-rm="' + i + '">✕</b></span>').join('');
+      chips.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { pendingFiles.splice(+b.dataset.rm, 1); paintFiles(); });
+    };
+    const addFiles = list => {
+      Array.from(list || []).forEach(f => { if (!pendingFiles.some(x => x.name === f.name && x.size === f.size)) pendingFiles.push(f); });
+      paintFiles();
+    };
+    drop.addEventListener('click', () => { if (canUpload) input.click(); });
+    drop.addEventListener('dragover', e => { e.preventDefault(); if (canUpload) drop.classList.add('over'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+    drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); if (canUpload) addFiles(e.dataTransfer.files); });
+    input.addEventListener('change', () => { if (canUpload) addFiles(input.files); });
+    if (driveConnect) driveConnect.addEventListener('click', async () => {
+      const provider = Orbit.productDriveDocumentProviderP0;
+      if (!provider || typeof provider.connect !== 'function') return U.toast('La conexión Drive no está disponible.');
+      driveConnect.disabled = true;
+      const st = await provider.connect();
+      driveConnect.disabled = false;
+      if (!st || st.available !== true) return U.toast((st && st.message) || 'No fue posible conectar Drive.');
+      canUpload = true;
+      if (driveNote) driveNote.style.display = 'none';
+      if (driveArea) driveArea.style.display = '';
+      U.toast('✓ Drive conectado para esta sesión.');
+    });
 
     el('mg-save').addEventListener('click', async () => {
       const save = el('mg-save');
