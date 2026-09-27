@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_R84_DRIVE_TENANT_AUTH",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_DIAGNOSTIC",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2024,7 +2024,7 @@
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
     "b2ExecutionLockBlobSha": "7f9887a44eb633a0c00510e60275162111806eea",
     "b2": {
-      "status": "R84_PERSISTENT_TENANT_DRIVE_AUTH_SOURCE_IMPLEMENTATION_PENDING",
+      "status": "R84_PERSISTENT_TENANT_DRIVE_AUTH_DIAGNOSTIC",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2166,7 +2166,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "R84 prevailing Drive rule: persistent tenant backend integration; routine users must not select/authorize Google for document use. Previous R83 OAuth retest superseded. No LIVE, no B3, no reimport.",
+      "boundaryNote": "R84 prevailing Drive rule remains inside canonical B2. Diagnose/implement persistent tenant backend Drive authority using existing B2 owners; do not create a new gate/action enum. Previous per-user OAuth proof is causally superseded only for Drive auth/document operations. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2643,7 +2643,7 @@
     },
     "planVersion": 2,
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
-    "activePlanBlobSha": "0c21b358a61d4dc5d51711e83fd29afe7022575d",
+    "activePlanBlobSha": "4618c4821cef25ab6f9eacee497bffddc011cdbd",
     "mechanismRootCause20260924": {
       "status": "FROZEN",
       "classification": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
@@ -2672,7 +2672,7 @@
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "5a76bd4e9e45fc0503085bac69eb5379dd410862",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
-    "activePlanBlobSha": "0c21b358a61d4dc5d51711e83fd29afe7022575d",
+    "activePlanBlobSha": "4618c4821cef25ab6f9eacee497bffddc011cdbd",
     "activeBlock": "B2",
     "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2682,7 +2682,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R84_PERSISTENT_TENANT_DRIVE_AUTH_IMPLEMENTATION"
+    "nextAction": "B2_R84_PERSISTENT_TENANT_DRIVE_AUTH_DIAGNOSTIC"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
