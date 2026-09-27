@@ -464,7 +464,7 @@ Orbit.ciclo = (function () {
           <div class="ciclo-sec">
             <div class="ciclo-sec-t">Nota / contexto</div>
             <label class="ce-l"><textarea id="gs-nota" class="o-sel" style="min-height:64px;resize:vertical;padding:9px 11px" placeholder="Detalle de la gestión…">${U.esc(g.nota || g.notas || '')}</textarea></label>
-            ${(g.adjuntos && g.adjuntos.length) ? `<div class="sg-files" style="margin-top:8px">${g.adjuntos.map(a => `<span class="sg-fchip">📄 ${U.esc(a.nombre)}</span>`).join('')}</div>` : ''}
+            ${(g.adjuntos && g.adjuntos.length) ? `<div class="sg-files" style="margin-top:8px">${g.adjuntos.map((a, i) => gestionDocumentChip(a, i)).join('')}</div>` : '<div class="muted" style="font-size:12px;margin-top:8px">Sin documentos vinculados.</div>'}
           </div>
         </div>
         <aside class="ciclo-aside">
@@ -488,6 +488,7 @@ Orbit.ciclo = (function () {
         <div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cerrar</button><button class="btn primary" id="gs-save">Guardar cambios</button></div>
       </div>`;
     const back = modal(html, 820);
+    back.querySelectorAll('[data-gdoc]').forEach(btn => btn.addEventListener('click', () => openGestionDocument((g.adjuntos || [])[+btn.dataset.gdoc], g.id)));
     back.querySelectorAll('[data-chk]').forEach(c => c.addEventListener('change', async () => {
       const i = +c.dataset.chk, before = !!g.checklist[i].done, next = !!c.checked, item = g.checklist[i] || {};
       c.disabled = true; g.checklist[i].done = next; g.bitacora = g.bitacora || [];
@@ -549,75 +550,284 @@ Orbit.ciclo = (function () {
 
   /* ===================== Solicitar gestión ===================== */
   /* desdeCliente=true → la solicita el propio cliente (Portal); notifica al equipo y al asesor. */
-  function solicitarGestion(clienteId, polizaId, desdeCliente) {
-    const cli = S().get('clientes', clienteId); if (!cli) return;
-    const pols = S().where('polizas', p => p.clienteId === clienteId);
-    let tipos = tiposGestion().slice();
-    let adjuntos = [];
+  function gestionDocumentChip(a, i) {
+    const name = U.esc((a && a.nombre) || ('Documento ' + (i + 1)));
+    const safeIndex = Number(i) || 0;
+    if (a && (a.documentRef || a.driveUrl || a.externalUrl || a.url)) {
+      return '<button type="button" class="sg-fchip" data-gdoc="' + safeIndex + '" style="border:1px solid var(--line);cursor:pointer">📄 ' + name + '</button>';
+    }
+    return '<span class="sg-fchip">📄 ' + name + '</span>';
+  }
+
+  function openGestionDocument(a, gestionId) {
+    if (!a) return;
+    if (Orbit.documentViewer && typeof Orbit.documentViewer.open === 'function') {
+      Orbit.documentViewer.open(a, { context: { entidad: 'gestion', entidadId: gestionId || '', clienteId: a.clienteId || '', polizaId: a.polizaId || '' } });
+      return;
+    }
+    const url = String(a.driveUrl || a.externalUrl || a.url || '').trim();
+    if (/^https:\/\/[^\s]+$/i.test(url)) window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  function managementCreateModal(opts) {
+    opts = Object.assign({
+      clienteId: '', polizaId: '', tipo: '', lista: '', prioridad: 'Media',
+      asesorId: '', aseguradoraId: '', vence: inDays(7), proximaAccion: 'Pendiente de definir',
+      nota: '', origen: 'Ops', desdeCliente: false
+    }, opts || {});
+
+    const clientes = S().all('clientes').filter(c => c && c.id);
+    const asesores = S().all('asesores').filter(a => a && a.id);
+    const asgs = S().all('aseguradoras').filter(a => a && a.id);
+    const tipos = tiposGestion().slice();
+    const initialClient = opts.clienteId ? S().get('clientes', opts.clienteId) : null;
+    const typeDef = tipos.find(t => t.t === opts.tipo) || null;
+    const initialList = opts.lista || (typeDef && typeDef.lista) || (opts.polizaId ? 'Renovaciones / Modif.' : 'Gestiones Admin');
+    const initialAdvisor = opts.asesorId || (initialClient && initialClient.asesorId) || (Orbit.session && Orbit.session.asesorId ? Orbit.session.asesorId() : '');
+    const uploadStatus = Orbit.secureResources && Orbit.secureResources.documentUploadStatus
+      ? Orbit.secureResources.documentUploadStatus({ entidad: 'gestion', clienteId: opts.clienteId || '', polizaId: opts.polizaId || '' })
+      : { available: false, status: 'pendiente_conexion', message: 'Carga directa pendiente de conexión con Drive' };
+    const canUpload = uploadStatus && uploadStatus.available === true;
+    const sourceLabel = opts.desdeCliente ? 'Solicitud del cliente (Portal)' : (opts.origen === 'Ops' ? 'Nueva gestión · Ops' : 'Gestión operativa');
+    const headerColor = opts.desdeCliente ? '#15803d,#0c5a2a' : '#1f3a5f,#142840';
+    let pendingFiles = [];
+
+    const clientOptions = [['', '— Seleccionar cliente —']].concat(clientes.map(c => [c.id, c.nombre]));
+    const managementLists = opsListas().filter(l => l.kind === 'gestion');
+    const listOptions = managementLists.map(l => [l.nombre, l.emoji + ' ' + l.nombre]);
+    const typeOptions = Array.from(new Set(tipos.map(t => t.t).concat(opts.tipo ? [opts.tipo] : [])));
+
     const html = `
-      <div class="ciclo-h" style="background:linear-gradient(120deg,${desdeCliente ? '#15803d,#0c5a2a' : '#1f3a5f,#142840'})">
-        <div><div class="ciclo-eyebrow">${desdeCliente ? 'Solicitud del cliente (Portal)' : 'Solicitar gestión operativa'}</div><h2>🗂 ${U.esc(cli.nombre)}</h2>
-        <div class="ciclo-sub">La gestión aparecerá en <b>Orbit Ops</b> asociada a este cliente${desdeCliente ? ' y notificará al asesor' : ''}.</div></div>
+      <div class="ciclo-h" style="background:linear-gradient(120deg,${headerColor})">
+        <div>
+          <div class="ciclo-eyebrow">${sourceLabel}</div>
+          <h2>🗂 ${initialClient ? U.esc(initialClient.nombre) : 'Crear gestión'}</h2>
+          <div class="ciclo-sub">Un solo registro canónico en <b>Ops</b>. La ficha se crea únicamente al confirmar.</div>
+        </div>
         <div class="ciclo-h-act"><button class="imp-x" data-close>✕</button></div>
       </div>
-      <div class="ciclo-create-body" style="padding:20px 22px;display:grid;gap:13px">
-        <label class="ce-l">Tipo de gestión<select id="sg-tipo" class="o-sel">${tipos.map((t, i) => `<option value="${i}">${t.t}  →  ${t.lista}</option>`).join('')}<option value="nueva">➕ Crear otro tipo…</option></select></label>
-        <div id="sg-nueva-wrap" style="display:none"><div class="cgrid">${fInput('Nombre del nuevo tipo', 'sg-nueva', '')}${fSelect('Lista en Ops', 'sg-nueva-lista', ['Gestiones Admin', 'Renovaciones / Modif.'], 'Gestiones Admin')}</div></div>
-        <div class="cgrid">
-          <label class="ce-l">Póliza (opcional)<select id="sg-pol" class="o-sel"><option value="">— Sin póliza específica —</option>${pols.map(p => `<option value="${p.id}" ${p.id === polizaId ? 'selected' : ''}>${p.numero} · ${p.ramo}</option>`).join('')}</select></label>
-          ${fSelectCat('Prioridad', 'sg-prio', 'prioridades', 'Media')}
+      <div class="ciclo-create-body" style="padding:20px 22px;display:grid;gap:14px;max-height:72vh;overflow:auto">
+        <div class="ciclo-sec" style="margin:0">
+          <div class="ciclo-sec-t">Datos de la gestión</div>
+          <div class="cgrid">
+            ${fSelectOpt('Cliente', 'mg-cli', clientOptions, opts.clienteId || '')}
+            ${fSelectOpt('Lista (Ops)', 'mg-lista', listOptions, initialList)}
+            ${fSelectFree('Tipo de gestión', 'mg-tipo', typeOptions, opts.tipo || (typeOptions[0] || 'Actualizar datos de cliente'))}
+            ${fSelectFree('Estado', 'mg-estado', ['Pendiente', 'En proceso'], 'Pendiente')}
+            ${fSelectCat('Prioridad', 'mg-prio', 'prioridades', opts.prioridad || 'Media')}
+            ${fSelectOpt('Responsable', 'mg-ase', asesores.map(a => [a.id, a.nombre]), initialAdvisor)}
+            ${fSelectOpt('Aseguradora', 'mg-asg', [['', '—']].concat(asgs.map(a => [a.id, a.nombre])), opts.aseguradoraId || '')}
+            ${fInput('Vence', 'mg-vence', opts.vence || inDays(7), 'date')}
+            ${fInput('Próxima acción', 'mg-prox', opts.proximaAccion || 'Pendiente de definir')}
+          </div>
+          <label class="ce-l" style="margin-top:10px">Póliza vinculada<select id="mg-pol" class="o-sel"></select></label>
         </div>
-        <label class="ce-l">Nota / detalle<textarea id="sg-nota" class="o-sel" style="min-height:62px;resize:vertical;padding:9px 11px" placeholder="Detalle de lo que se necesita gestionar…"></textarea></label>
-        <div>
-          <div class="ce-l" style="margin-bottom:6px">Documentos de soporte</div>
-          <div class="sg-drop" id="sg-drop"><span>📎 Arrastra o haz clic para adjuntar</span><input type="file" id="sg-file" multiple hidden></div>
-          <div id="sg-files" class="sg-files"></div>
+
+        <div class="ciclo-sec" style="margin:0">
+          <div class="ciclo-sec-t">Checklist inicial</div>
+          <textarea id="mg-checklist" class="o-sel" style="min-height:82px;resize:vertical;padding:9px 11px" placeholder="Un control por línea">Solicitud recibida
+Documentación completa
+Enviado a aseguradora</textarea>
         </div>
-        <div class="cfg-note">Quedará en Ops en la lista correspondiente, asignada a <b>${U.esc((q.asesor(cli.asesorId) || {}).nombre || '—')}</b>. Se enviará <b>notificación por WhatsApp y correo</b> al asesor responsable.</div>
+
+        <div class="ciclo-sec" style="margin:0">
+          <div class="ciclo-sec-t">Nota / contexto</div>
+          <textarea id="mg-nota" class="o-sel" style="min-height:82px;resize:vertical;padding:9px 11px" placeholder="Detalle de lo que se necesita gestionar…">${U.esc(opts.nota || '')}</textarea>
+        </div>
+
+        <div class="ciclo-sec" style="margin:0">
+          <div class="ciclo-sec-t">Documentos de soporte · Drive</div>
+          <label class="ce-l">Enlace(s) de Drive / origen<textarea id="mg-links" class="o-sel" style="min-height:68px;resize:vertical;padding:9px 11px" placeholder="Pega uno o varios enlaces https://, uno por línea"></textarea></label>
+          ${canUpload ? `
+            <div class="sg-drop" id="mg-drop" style="margin-top:10px"><span>📎 Arrastra o haz clic para cargar a Drive</span><input type="file" id="mg-file" multiple hidden></div>
+            <div id="mg-files" class="sg-files"></div>
+          ` : `
+            <div class="cfg-note" data-drive-upload-unavailable style="margin-top:10px">
+              La carga directa de archivos está <b>bloqueada hasta que el proveedor Drive confirme almacenamiento y readback</b>.
+              Puedes vincular un enlace de Drive/origen arriba. No se mostrará un falso “archivo cargado”.
+            </div>
+          `}
+        </div>
       </div>
-      <div class="ciclo-foot"><div></div><div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="sg-ok">${desdeCliente ? 'Enviar solicitud' : 'Crear gestión en Ops'}</button></div></div>`;
-    const back = modal(html, 640);
-    const selTipo = back.querySelector('#sg-tipo');
-    selTipo.addEventListener('change', () => { back.querySelector('#sg-nueva-wrap').style.display = selTipo.value === 'nueva' ? '' : 'none'; });
-    // adjuntos (demo: guarda nombre/size, no sube binario)
-    const drop = back.querySelector('#sg-drop'), file = back.querySelector('#sg-file'), list = back.querySelector('#sg-files');
-    const paintFiles = () => { list.innerHTML = adjuntos.map((a, i) => `<span class="sg-fchip">📄 ${U.esc(a.nombre)} <b data-rm="${i}">✕</b></span>`).join(''); list.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => { adjuntos.splice(+b.dataset.rm, 1); paintFiles(); })); };
-    drop.addEventListener('click', () => file.click());
-    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
-    drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-    drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); [...e.dataTransfer.files].forEach(f => adjuntos.push({ nombre: f.name, size: f.size })); paintFiles(); });
-    file.addEventListener('change', () => { [...file.files].forEach(f => adjuntos.push({ nombre: f.name, size: f.size })); paintFiles(); });
-    back.querySelector('#sg-ok').addEventListener('click', async () => {
-      const save = back.querySelector('#sg-ok');
+      <div class="ciclo-foot">
+        <div class="muted" style="font-size:12px">Origen: ${U.esc(opts.origen || 'Ops')} · persistencia y readback obligatorios.</div>
+        <div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="mg-save">${opts.desdeCliente ? 'Enviar solicitud' : 'Crear gestión en Ops'}</button></div>
+      </div>`;
+
+    const back = modal(html, 760);
+    const el = id => back.querySelector('#' + id);
+    const policySelect = el('mg-pol');
+    const clientSelect = el('mg-cli');
+    const insurerSelect = el('mg-asg');
+    const advisorSelect = el('mg-ase');
+
+    function paintPolicies(preferred) {
+      const cid = clientSelect.value;
+      const pols = cid ? S().where('polizas', p => p.clienteId === cid) : [];
+      policySelect.innerHTML = '<option value="">— Sin póliza específica —</option>' + pols.map(p => '<option value="' + U.esc(p.id) + '">' + U.esc((p.numero || 'Sin número') + ' · ' + (p.ramo || 'Sin ramo')) + '</option>').join('');
+      const target = preferred && pols.some(p => p.id === preferred) ? preferred : '';
+      policySelect.value = target;
+      const selected = target ? S().get('polizas', target) : null;
+      if (selected && insurerSelect && selected.aseguradoraId) insurerSelect.value = selected.aseguradoraId;
+    }
+    paintPolicies(opts.polizaId || '');
+
+    clientSelect.addEventListener('change', () => {
+      const cli = S().get('clientes', clientSelect.value);
+      if (cli && advisorSelect && cli.asesorId) advisorSelect.value = cli.asesorId;
+      paintPolicies('');
+    });
+    policySelect.addEventListener('change', () => {
+      const pol = policySelect.value ? S().get('polizas', policySelect.value) : null;
+      if (pol && insurerSelect && pol.aseguradoraId) insurerSelect.value = pol.aseguradoraId;
+    });
+
+    if (canUpload) {
+      const drop = el('mg-drop'), input = el('mg-file'), chips = el('mg-files');
+      const paint = () => {
+        chips.innerHTML = pendingFiles.map((f, i) => '<span class="sg-fchip">📄 ' + U.esc(f.name) + ' <b data-rm="' + i + '">✕</b></span>').join('');
+        chips.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { pendingFiles.splice(+b.dataset.rm, 1); paint(); });
+      };
+      const addFiles = list => {
+        Array.from(list || []).forEach(f => { if (!pendingFiles.some(x => x.name === f.name && x.size === f.size)) pendingFiles.push(f); });
+        paint();
+      };
+      drop.addEventListener('click', () => input.click());
+      drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+      drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+      drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); addFiles(e.dataTransfer.files); });
+      input.addEventListener('change', () => addFiles(input.files));
+    }
+
+    el('mg-save').addEventListener('click', async () => {
+      const save = el('mg-save');
       if (save.disabled) return;
-      let titulo, lista;
-      if (selTipo.value === 'nueva') { titulo = (back.querySelector('#sg-nueva').value || '').trim() || 'Gestión'; lista = back.querySelector('#sg-nueva-lista').value; Orbit.cat.get('tiposGestion').push({ t: titulo, lista }); Orbit.cat.save(); }
-      else { const t = tipos[+selTipo.value]; titulo = t.t; lista = t.lista; }
-      const polId = back.querySelector('#sg-pol').value;
-      const pol = polId ? S().get('polizas', polId) : null;
-      const originalText = save.textContent;
-      save.disabled = true; save.textContent = 'Guardando…';
+      const clienteId = clientSelect.value;
+      const cli = clienteId ? S().get('clientes', clienteId) : null;
+      if (!cli) return U.toast('Selecciona el cliente de la gestión.');
+
+      const tipo = String(el('mg-tipo').value || '').trim();
+      const lista = String(el('mg-lista').value || '').trim();
+      if (!tipo || tipo === '__otro__' || !lista) return U.toast('Completa tipo y lista de la gestión.');
+
+      const polizaId = policySelect.value || '';
+      const pol = polizaId ? S().get('polizas', polizaId) : null;
+      const linkLines = String(el('mg-links').value || '').split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+      const invalidLink = linkLines.find(x => !/^https:\/\/[^\s]+$/i.test(x));
+      if (invalidLink) return U.toast('Los enlaces documentales deben iniciar con https://');
+
+      const managementId = 'ges' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      const linkedDocs = linkLines.map((url, i) => ({
+        nombre: 'Documento Drive ' + (i + 1),
+        driveUrl: url, externalUrl: url, origen: 'Drive/enlace',
+        clienteId, polizaId, entidad: 'gestion', entidadId: managementId
+      }));
+      const checklistLines = String(el('mg-checklist').value || '').split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+      const checklist = checklistLines.map((t, i) => ({ t, done: i === 0 }));
+
+      save.disabled = true;
+      const original = save.textContent;
+      save.textContent = 'Guardando…';
       try {
-        const gestion = await crearGestionDurable({
-          lista, tipo: titulo, titulo, clienteId, polizaId: polId,
-          asesorId: cli.asesorId, aseguradoraId: pol ? pol.aseguradoraId : '', ramo: pol ? pol.ramo : '',
-          prioridad: back.querySelector('#sg-prio').value, vence: inDays(7),
-          nota: back.querySelector('#sg-nota').value.trim(), origen: desdeCliente ? 'Solicitud del cliente' : 'Ficha cliente',
-          adjuntos: adjuntos.slice(),
-          checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'Documentación completa', done: !!adjuntos.length }, { t: 'Enviado a aseguradora', done: false }]
+        let gestion = await crearGestionDurable({
+          id: managementId,
+          lista, tipo, titulo: tipo, clienteId, polizaId,
+          asesorId: el('mg-ase').value || cli.asesorId || '',
+          aseguradoraId: el('mg-asg').value || (pol ? pol.aseguradoraId : ''),
+          ramo: pol ? pol.ramo : '',
+          prioridad: el('mg-prio').value || 'Media',
+          estado: el('mg-estado').value || 'Pendiente',
+          vence: el('mg-vence').value || inDays(7),
+          proximaAccion: String(el('mg-prox').value || '').trim() || 'Pendiente de definir',
+          nota: String(el('mg-nota').value || '').trim(),
+          origen: opts.desdeCliente ? 'Solicitud del cliente' : (opts.origen || 'Ops'),
+          adjuntos: linkedDocs.slice(),
+          checklist
         });
-        try { S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: 'sistema', icon: '🗂', fecha: today(), titulo: (desdeCliente ? 'Cliente solicitó: ' : 'Gestión solicitada: ') + titulo, detalle: 'Confirmada en Orbit Ops (' + lista + ')' + (adjuntos.length ? ' · ' + adjuntos.length + ' adjunto(s)' : ''), gestionId: gestion.id }); } catch (e) {}
-        const ase = q.asesor(cli.asesorId);
-        notify({ tipo: 'gestion', titulo: (desdeCliente ? 'Solicitud de cliente · ' : 'Nueva gestión · ') + titulo, detalle: cli.nombre + ' → ' + lista, para: ase ? ase.nombre : '', tel: cli.telefono, email: cli.email });
-        U.toast('Gestión creada y confirmada en Ops');
-        back.remove(); refresh();
+
+        const uploaded = [];
+        const failed = [];
+        if (pendingFiles.length) {
+          save.textContent = 'Guardando documentos…';
+          for (const file of pendingFiles) {
+            const out = await Orbit.secureResources.uploadDocument(file, {
+              entidad: 'gestion', entidadId: managementId, clienteId, polizaId,
+              categoria: 'soporte_gestion', nombre: file.name
+            });
+            if (out && out.ok) {
+              uploaded.push({
+                nombre: out.nombre || file.name,
+                documentRef: out.documentRef || out.fileId || '',
+                driveUrl: out.driveUrl || out.externalUrl || out.url || '',
+                externalUrl: out.externalUrl || out.driveUrl || out.url || '',
+                mimeType: out.mimeType || file.type || '',
+                size: file.size,
+                origen: out.origen || 'Drive',
+                clienteId, polizaId, entidad: 'gestion', entidadId: managementId
+              });
+            } else {
+              failed.push({ nombre: file.name, status: out && out.status || 'error' });
+            }
+          }
+          const docs = linkedDocs.concat(uploaded);
+          await S().updateDurable('gestiones', managementId, {
+            adjuntos: docs,
+            documentoCargaPendiente: failed.length > 0,
+            documentoCargaFallida: failed,
+            checklist: checklist.map((x, i) => i === 1 ? Object.assign({}, x, { done: docs.length > 0 && failed.length === 0 }) : x),
+            actualizado: today()
+          });
+          gestion = S().get('gestiones', managementId);
+          if (!gestion) throw new Error('OPS_MANAGEMENT_POST_DOCUMENT_READBACK_MISSING');
+        }
+
+        try {
+          S().insert('actividades', {
+            id: 'act' + Date.now(), clienteId, asesorId: gestion.asesorId,
+            tipo: 'sistema', icon: '🗂', fecha: today(), titulo: 'Gestión creada: ' + tipo,
+            detalle: 'Confirmada en Ops (' + lista + ')' + ((gestion.adjuntos || []).length ? ' · ' + (gestion.adjuntos || []).length + ' documento(s)' : ''),
+            gestionId: managementId
+          });
+        } catch (e) {}
+        const ase = q.asesor(gestion.asesorId);
+        notify({
+          tipo: 'gestion',
+          titulo: (opts.desdeCliente ? 'Solicitud de cliente · ' : 'Nueva gestión · ') + tipo,
+          detalle: cli.nombre + ' → ' + lista,
+          para: ase ? ase.nombre : '', tel: cli.telefono, email: cli.email
+        });
+        back.remove();
+        refresh();
+        if (failed.length) U.toast('Gestión creada. ' + failed.length + ' documento(s) no fueron confirmados por Drive; la gestión quedó marcada para completar.');
+        else U.toast('Gestión creada y confirmada en Ops.');
+        openGestion(managementId);
       } catch (error) {
         const code = String(error && (error.code || error.message) || '');
         U.toast(/PREVIEW_SYNTHETIC_ONLY|preview.*synthetic|synthetic.*only/i.test(code)
           ? 'Preview protege los datos reales: no se creó ninguna gestión en Ops.'
-          : 'No fue posible crear la gestión. No se registró nada.');
-        save.disabled = false; save.textContent = originalText;
+          : 'No fue posible crear la gestión. No se registró un falso éxito.');
+        save.disabled = false;
+        save.textContent = original;
       }
+    });
+    return back;
+  }
+
+  /* Desde Cliente 360, Póliza, Renovaciones o Portal: mismo editor canónico de Ops con contexto prellenado. */
+  function solicitarGestion(clienteId, polizaId, desdeCliente) {
+    const cli = S().get('clientes', clienteId);
+    if (!cli) return;
+    const pol = polizaId ? S().get('polizas', polizaId) : null;
+    return managementCreateModal({
+      clienteId,
+      polizaId: polizaId || '',
+      desdeCliente: !!desdeCliente,
+      tipo: polizaId ? 'Solicitar condiciones de renovación' : 'Actualizar datos de cliente',
+      lista: polizaId ? 'Renovaciones / Modif.' : 'Gestiones Admin',
+      prioridad: 'Media',
+      asesorId: cli.asesorId || '',
+      aseguradoraId: pol ? pol.aseguradoraId || '' : '',
+      origen: desdeCliente ? 'Portal' : 'Ficha cliente'
     });
   }
 
@@ -670,8 +880,7 @@ Orbit.ciclo = (function () {
     });
   }
   function nuevaGestion() {
-    const g = crearGestion({ titulo: 'Nueva gestión', tipo: 'Actualizar datos de cliente', vence: inDays(7) });
-    refresh(); openGestion(g.id);
+    return managementCreateModal({ origen: 'Ops', lista: 'Gestiones Admin', tipo: 'Actualizar datos de cliente', prioridad: 'Media' });
   }
 
   /* ===================== notificaciones (WhatsApp / correo) ===================== */
@@ -767,7 +976,7 @@ Orbit.ciclo = (function () {
     negocios, gestiones, opsBoard, leadsBoard, metricasLeads,
     cardNegocio, cardGestion, wireCards, notify, gestionarListas,
     setEtapa, decidirCierre, perder, archivar, emitir, crearGestion, crearGestionDurable,
-    openNegocio, openGestion, solicitarGestion, nuevoNegocio, nuevaGestion
+    openNegocio, openGestion, managementCreateModal, solicitarGestion, nuevoNegocio, nuevaGestion
   };
 })();
 
