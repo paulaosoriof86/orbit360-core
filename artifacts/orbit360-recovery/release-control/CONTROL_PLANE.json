@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R13_RENEWAL_OPS_UAT_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "mechanismSyncStatus": "B2_R13_SOURCE_FIXED_GOVERNANCE_REBOUND_PENDING_NEW_EXACT_PREVIEW",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "fb02d778e9831d475373eaeeb2dbc32aa940e088",
+    "b2ExecutionLockBlobSha": "46fbd3d5c3e64ed4400c3fc08d5e49df0ec96052",
     "b2": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2340,7 +2340,7 @@
       "r12AuthRetryRunFrom": 36270785111,
       "r12AuthRetryClassification": "POST_RELOAD_BROWSER_VISIBILITY_TIMEOUT",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2458,9 +2458,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "6f1cdc1e39631d808e3a9a5ca11a94a1649a5555",
+    "compositionLockBlobSha": "65bf336b5de8a47727961467a3b6a332c41a48dd",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "a0688db5e6edae2b3c218c2fc7d42060344f8a5d",
+    "findingLedgerBlobSha": "834bfe9b621f6669e46fe00a21f7ee16a98a9389",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",

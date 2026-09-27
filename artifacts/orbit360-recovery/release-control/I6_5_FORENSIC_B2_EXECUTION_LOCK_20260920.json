@@ -1472,8 +1472,8 @@
     "broadRediscoveryRequired": false,
     "authorityBlobSha": "2250d63fc5dd2fb824e30b5493e7e6a611fc02d4",
     "findingsLedgerBlobSha": "6912bfbecfc963c3c57c64a058e192ee18173b68",
-    "compositionLockBlobSha": "6f1cdc1e39631d808e3a9a5ca11a94a1649a5555",
-    "findingLedgerBlobSha": "a0688db5e6edae2b3c218c2fc7d42060344f8a5d"
+    "compositionLockBlobSha": "65bf336b5de8a47727961467a3b6a332c41a48dd",
+    "findingLedgerBlobSha": "834bfe9b621f6669e46fe00a21f7ee16a98a9389"
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
   "lastPreviewFailure": {
@@ -2392,7 +2392,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "a0688db5e6edae2b3c218c2fc7d42060344f8a5d",
+  "findingLedgerBlobSha": "834bfe9b621f6669e46fe00a21f7ee16a98a9389",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2601,9 +2601,9 @@
     "roleScopePreserved": true
   },
   "r13RenewalOpsUat": {
-    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+    "status": "SOURCE_FIXED_AND_REBOUND_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-    "receiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36",
+    "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
     "findingIds": [
       "B2-R67-OPS-MANAGEMENT-COUNTRY-RELOAD-R13",
       "B2-R68-RENEWAL-PROPOSALS-PREMATURE-CREATE-R13",

@@ -1223,7 +1223,7 @@
       "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
     },
     {
       "id": "B2-R35-VEHICLE-HISTORY-PROJECTION-R4",
@@ -2110,7 +2110,7 @@
       "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
     },
     {
       "id": "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
@@ -2157,7 +2157,7 @@
       "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
     },
     {
       "id": "B2-R63-RENEWAL-ACTION-SEMANTICS-R9",
@@ -2169,7 +2169,7 @@
       "status": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_RENEWAL_SEMANTICS_PREVALENT_20260926.json",
-      "receiptBlobSha": "112819674f4f112cc85ca0f4a85c76905977f432",
+      "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noReimport": true,
       "noLive": true,
       "r11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
@@ -2177,7 +2177,7 @@
       "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
     },
     {
       "id": "B2-R64-RENEWALS-DUAL-PASS-VISUAL-AUTHORITY-R10",
@@ -2212,7 +2212,7 @@
       "blocking": true,
       "harnessBlobSha": "ab1fdb808fb255be3f490a500c63705a23bba32e",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
-      "receiptBlobSha": "9add82862b92628dda6929649fd5f3aab4cf167a",
+      "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
       "noB3": true,
       "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
@@ -2220,7 +2220,7 @@
       "authFailureRunId": 36270785111,
       "authFailureClassification": "POST_RELOAD_BROWSER_VISIBILITY_TIMEOUT",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
     },
     {
       "id": "B2-R66-PREVIEW-UAT-WRITE-CAPABILITY-R12",
@@ -2235,14 +2235,14 @@
       "status": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
-      "receiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
+      "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
       "noReimport": true,
       "r12ReceiptBlobSha": "2d88808ed77e8044ac5f640124d01c996ed13171",
       "authFailureRunId": 36270785111,
       "authFailureClassification": "POST_RELOAD_BROWSER_VISIBILITY_TIMEOUT",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
     },
     {
       "id": "B2-R67-OPS-MANAGEMENT-COUNTRY-RELOAD-R13",
@@ -2255,7 +2255,7 @@
       "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "receiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36",
+      "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
       "noReimport": true
     },
@@ -2270,7 +2270,7 @@
       "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "receiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36",
+      "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
       "noReimport": true
     },
@@ -2280,12 +2280,12 @@
       "source": "PAULA_VISUAL_UAT_20260927",
       "surface": "Ops/Renovaciones/Pólizas/Recibos",
       "classification": "PRODUCT_DEFECT",
-      "finding": "Direct renewal could prefill Mensual + 1 receipt from inconsistent source cuotas. Fixed with sane frequency-derived default, editable count honored by receipt engine, editable premium components/IVA and live total preview.",
-      "requiredProof": "Monthly source defaults coherently; edited count creates exact receipt count; premium component edits recalc/persist.",
+      "finding": "Direct renewal could prefill Mensual + 1 receipt from inconsistent source cuotas. Fixed with a coherent frequency-derived default in the renewal UI; monthly custom receipt count remains editable under the approved engine contract, while fixed frequencies continue deriving their canonical count from frequency; premium components/IVA and live total preview are editable/visible.",
+      "requiredProof": "Source Mensual + inconsistent cuotas does not prefill one receipt; user can set a monthly custom count and exact receipts are generated; fixed frequencies keep canonical frequency counts; premium component edits recalc/persist.",
       "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "receiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36",
+      "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
       "noReimport": true
     },
@@ -2300,7 +2300,7 @@
       "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "receiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36",
+      "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
       "noReimport": true
     },
@@ -2315,7 +2315,7 @@
       "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "receiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36",
+      "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
       "noReimport": true
     }

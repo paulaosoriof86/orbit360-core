@@ -118,7 +118,7 @@
     "orbit360-platform/core/config.js": "774c6cbe32be08f23e45f37b8e12e56f9be08bf3",
     "orbit360-platform/core/issuance-workflow-v1201-refinements.js": "47a9d68bef8cb60a00a057375efdf443c2ff2de2",
     "orbit360-platform/core/issuance-workflow-v1201.js": "d1b075ee251bd5a798299ecd90391db5c5d86552",
-    "orbit360-platform/core/policy-receipts-engine.js": "6e845838cf3aeb30a4e142a2051aed4254d2c127",
+    "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
     "orbit360-platform/core/product-app-p0.js": "b6ccd725f214c666e04299574be4c1fdae3a6b83",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "fcf45f869897b205df48d17906555fc688250f83",
@@ -179,7 +179,7 @@
   "lastRemediation": {
     "origin": "PAULA_B2_RENEWAL_OPS_UAT_R13",
     "parentHead": "8c6e798598193dd6a4e55c4d49d0c75e3845ab9e",
-    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+    "status": "SOURCE_FIXED_AND_GOVERNANCE_REBOUND_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
     "changedProductFiles": [
       "functions/product-ops-leads-domain.js",
       "orbit360-platform/core/ciclo.js",
@@ -194,7 +194,7 @@
       "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "9db92325fb4eb430c564d924cb572823748c5458",
       "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "ab3185e5df3b470cd37e0e3acf688805ecdcf904",
       "orbit360-platform/core/issuance-workflow-v1201.js": "d1b075ee251bd5a798299ecd90391db5c5d86552",
-      "orbit360-platform/core/policy-receipts-engine.js": "6e845838cf3aeb30a4e142a2051aed4254d2c127"
+      "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2"
     },
     "noDataReimport": true,
     "noLive": true,
