@@ -65,7 +65,8 @@ need(!imports.includes('Los archivos quedan almacenados y visibles en el expedie
 
 has(driveClient,"provider.addScope('https://www.googleapis.com/auth/drive')",'R77_DRIVE_OAUTH_SCOPE_MISSING');
 has(driveClient,"tokenPersistence: 'memory_only'",'R77_DRIVE_TOKEN_PERSISTENCE_NOT_MEMORY_ONLY');
-has(driveClient,'authMod.linkWithPopup','R77_DRIVE_USER_CONSENT_FLOW_MISSING');
+need(driveClient.includes('authMod.signInWithPopup')||driveClient.includes('authMod.linkWithPopup'),'R77_DRIVE_USER_CONSENT_FLOW_MISSING');
+need(!driveClient.includes('authMod.linkWithPopup(user, provider)'),'R77_PRIMARY_FIREBASE_IDENTITY_MUST_NOT_BE_LINKED_TO_DRIVE_OAUTH');
 need(!driveClient.includes('service-account credentials'),'R77_STALE_SERVICE_ACCOUNT_PROVIDER_COPY');
 
 has(driveBackend,'function googleToken(input)','R77_DRIVE_DELEGATED_TOKEN_REQUIRED');
