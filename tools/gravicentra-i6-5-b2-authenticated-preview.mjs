@@ -973,6 +973,18 @@ try{
     text:String(document.querySelector('[data-workflow-v1201]')?.innerText||'').slice(0,1200)
   }));
   need(acceptedPanel.issuance===true&&acceptedPanel.direct===true,'B2_AUTH_RENEWAL_ACCEPTED_OPS_BRANCHES_MISSING:'+JSON.stringify(acceptedPanel));
+  const canonicalBeforeReload={};
+  for(const [k,id,collection] of [
+    ['generic',opsE2E.ids.generic,'gestiones'],
+    ['proposals',opsE2E.ids.proposals,'gestiones'],
+    ['accepted',opsE2E.ids.accepted,'gestiones'],
+    ['business',opsE2E.ids.business,'negocios']
+  ]){
+    const snap=await db.collection('tenants').doc(TENANT).collection('data').doc(collection).collection('items').doc(id).get();
+    canonicalBeforeReload[k]=snap.exists?{exists:true,id:snap.id,tenantId:String(snap.data()?.tenantId||''),previewWrite:snap.data()?.previewWrite===true,asesorId:String(snap.data()?.asesorId||'')}:{exists:false};
+  }
+  milestone('OPS_LEADS_CANONICAL_READBACK_BEFORE_RELOAD',canonicalBeforeReload);
+  need(Object.values(canonicalBeforeReload).every(x=>x.exists===true&&x.tenantId===TENANT),'B2_AUTH_OPS_LEADS_CANONICAL_MISSING_BEFORE_RELOAD:'+JSON.stringify(canonicalBeforeReload));
   await page.reload({waitUntil:'domcontentloaded',timeout:30000});
   await bounded(activate(page,auth,actor),'B2_AUTH_OPS_LEADS_RELOAD_ACTIVATE_TIMEOUT',45000);
   await setRole(page,'Operativo');
@@ -982,7 +994,34 @@ try{
     const confirmed=[].concat(s.serverConfirmedCollections||[]);
     return s.ready===true&&confirmed.includes('gestiones')&&confirmed.includes('negocios');
   },null,{timeout:30000});
-  await page.waitForFunction(ids=>window.Orbit&&Orbit.store&&ids.every(id=>!!Orbit.store.get('gestiones',id))&&!!Orbit.store.get('negocios',ids[3]),[opsE2E.ids.generic,opsE2E.ids.proposals,opsE2E.ids.accepted,opsE2E.ids.business],{timeout:30000});
+  const reloadIds=[opsE2E.ids.generic,opsE2E.ids.proposals,opsE2E.ids.accepted,opsE2E.ids.business];
+  const reloadVisible=await page.waitForFunction(ids=>window.Orbit&&Orbit.store&&ids.slice(0,3).every(id=>!!Orbit.store.get('gestiones',id))&&!!Orbit.store.get('negocios',ids[3]),reloadIds,{timeout:12000}).then(()=>true).catch(()=>false);
+  const canonicalAfterReload={};
+  for(const [k,id,collection] of [
+    ['generic',opsE2E.ids.generic,'gestiones'],
+    ['proposals',opsE2E.ids.proposals,'gestiones'],
+    ['accepted',opsE2E.ids.accepted,'gestiones'],
+    ['business',opsE2E.ids.business,'negocios']
+  ]){
+    const snap=await db.collection('tenants').doc(TENANT).collection('data').doc(collection).collection('items').doc(id).get();
+    canonicalAfterReload[k]=snap.exists?{exists:true,id:snap.id,tenantId:String(snap.data()?.tenantId||''),previewWrite:snap.data()?.previewWrite===true,asesorId:String(snap.data()?.asesorId||'')}:{exists:false};
+  }
+  const reloadDiag=await page.evaluate(ids=>{
+    const raw=(Orbit.store&&Orbit.store.raw&&Orbit.store.raw())||{};
+    const st=(Orbit.store&&Orbit.store._productStatus&&Orbit.store._productStatus())||{};
+    const gs=(Orbit.store&&Orbit.store.all&&Orbit.store.all('gestiones'))||[];
+    const ns=(Orbit.store&&Orbit.store.all&&Orbit.store.all('negocios'))||[];
+    return{
+      visible:ids.slice(0,3).map(id=>({id,present:!!Orbit.store.get('gestiones',id)})),
+      business:{id:ids[3],present:!!Orbit.store.get('negocios',ids[3])},
+      counts:{gestiones:gs.length,negocios:ns.length},
+      matching:{gestiones:gs.filter(x=>ids.slice(0,3).includes(x.id)).map(x=>({id:x.id,asesorId:x.asesorId,tenantId:x.tenantId,previewWrite:x.previewWrite})),negocios:ns.filter(x=>x.id===ids[3]).map(x=>({id:x.id,asesorId:x.asesorId,tenantId:x.tenantId,previewWrite:x.previewWrite}))},
+      status:{ready:st.ready,status:st.status,serverConfirmedCollections:st.serverConfirmedCollections,deniedCollections:st.deniedCollections,snapshotErrors:st.snapshotErrors,queryPlans:st.queryPlans},
+      rawBackend:raw.__backend||null
+    };
+  },reloadIds);
+  milestone('OPS_LEADS_RELOAD_VISIBILITY_DIAG',{reloadVisible,canonicalAfterReload,reloadDiag});
+  need(reloadVisible===true,'B2_AUTH_OPS_LEADS_RELOAD_VISIBILITY_DIAG:'+JSON.stringify({canonicalAfterReload,reloadDiag}));
   await page.waitForSelector('[data-ges]',{timeout:15000});
   const afterReload=await page.evaluate(ids=>({
     generic:(Orbit.store.all('gestiones')||[]).filter(x=>x.id===ids.generic).length,

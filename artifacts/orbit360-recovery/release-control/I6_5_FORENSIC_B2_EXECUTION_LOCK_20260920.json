@@ -396,7 +396,7 @@
     "cleanupWrites": 25,
     "visualEvidenceRecapture": true,
     "visualReceiptRecapture": true,
-    "lastFailureRunId": 36270274202,
+    "lastFailureRunId": 36270785111,
     "requiredNewSource": true,
     "lastArmCommitParent": "219bf4d02c37d785e2c6d2a811ee1b5ff42f84dd",
     "lastArmReason": "R22_PREVIEW_CREDENTIAL_ISOLATION_EXACT_AUTHENTICATED_PROOF",
@@ -430,7 +430,7 @@
     "r5ReportedPaymentProjection": true,
     "lastFailureJobId": 108452982186,
     "lastFailureCode": "B2_AUTH_INSURER_LOGO_FILE_SELECTION_MISSING",
-    "lastFailureClassification": "HARNESS_RELOAD_ACTIVATION_GAP",
+    "lastFailureClassification": "POST_RELOAD_BROWSER_VISIBILITY_TIMEOUT",
     "productRegressionDemonstrated": true,
     "requiredNewHarnessBlob": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
     "priorPassRunId": 36258221310,
@@ -439,7 +439,7 @@
     "invalidatedOldPreviewRunId": 36260454531,
     "requiredHarnessBlob": "ab1fdb808fb255be3f490a500c63705a23bba32e",
     "priorPassInsufficientForOpsManagement": true,
-    "harnessBlobSha": "b6d7e99b8c2beeea878510a7869df3b8fcebb0d6"
+    "harnessBlobSha": "e6bd9c1e2bd59b83105fe0644e5527704a7be417"
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -2392,7 +2392,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "1bd0e95a78fb35e67f62960e6a50a446d0c0c861",
+  "findingLedgerBlobSha": "514f602d0677a2b8bd8274425f6d24f6200290e2",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2593,10 +2593,10 @@
     "preservedHumanEvidence": "REAL_PREVIEW_FAIL_CLOSED_NO_FALSE_SUCCESS"
   },
   "r12PreviewUatWrites": {
-    "status": "TECHNICAL_PREVIEW_PASS_AUTH_RETRY_AUTHORIZED",
+    "status": "CAUSAL_DIAGNOSTIC_AUTHORIZED_SAME_EXACT_PREVIEW",
     "findingId": "B2-R66-PREVIEW-UAT-WRITE-CAPABILITY-R12",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
-    "receiptBlobSha": "1190db15b4fb3e4a4d8a4e5617dce615481eab05",
+    "receiptBlobSha": "2d88808ed77e8044ac5f640124d01c996ed13171",
     "notificationsSuppressed": true,
     "roleScopePreserved": true
   }

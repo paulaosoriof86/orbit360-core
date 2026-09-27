@@ -28,7 +28,10 @@
     "failure": "After page.reload the harness asserted deferred gestiones/negocios before re-running authenticated app activation and explicit role restoration.",
     "productDefectDemonstrated": false,
     "fix": "After reload, activate authenticated product app again, restore Operativo role, route to Ops, wait for server-confirmed deferred gestiones/negocios, then assert exact IDs and DOM.",
-    "sameExactPreviewRequired": true
+    "sameExactPreviewRequired": true,
+    "latestFailureRunId": 36270785111,
+    "latestFailureClassification": "POST_RELOAD_BROWSER_VISIBILITY_TIMEOUT_NEEDS_CAUSAL_DIAGNOSTIC",
+    "harnessDiagnostic": "Admin canonical readback before/after reload + browser store query plans/counts/ID visibility; same exact Preview; no product mutation."
   },
   "governanceBoundary": {
     "interactiveUatWorkflowCreatesAuthorized": true,
