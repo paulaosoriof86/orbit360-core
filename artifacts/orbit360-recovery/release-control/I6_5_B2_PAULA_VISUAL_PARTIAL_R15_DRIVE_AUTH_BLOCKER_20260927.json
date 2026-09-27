@@ -52,6 +52,22 @@
     "reimportExecuted": false,
     "productSourceChanged": false,
     "firebaseAuthConfigurationChanged": false,
-    "nextRequiredAction": "CONTROLLED_FIREBASE_GOOGLE_PROVIDER_READBACK_AND_ENABLEMENT_IF_AUTHORIZED_THEN_REPEAT_HUMAN_DRIVE_OAUTH_PROOF"
+    "nextRequiredAction": "CONTROLLED_FIREBASE_GOOGLE_PROVIDER_READBACK_AND_ENABLEMENT_AUTHORIZED"
+  },
+  "authorization": {
+    "decision": "AUTHORIZED",
+    "authorizedBy": "Paula",
+    "authorizedAt": "2026-09-27",
+    "scope": "ENABLE_EXISTING_GOOGLE_DOT_COM_FIREBASE_AUTH_PROVIDER_WITH_BEFORE_AFTER_READBACK_AND_PERMANENT_GUARD",
+    "firebaseProject": "ays-orbit-360-lab",
+    "boundaries": {
+      "createNewOAuthClient": false,
+      "changeExistingClientCredentials": false,
+      "dataWrites": false,
+      "liveHostingPromotion": false,
+      "b3Open": false,
+      "reimport": false
+    },
+    "status": "AUTHORIZED_PENDING_APPLY"
   }
 }
