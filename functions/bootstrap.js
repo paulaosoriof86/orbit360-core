@@ -13,5 +13,6 @@ module.exports = Object.assign(
   require('./product-insurer-credentials'),
   require('./recurring-insurance-import'),
   require('./index'),
-  require('./bank-accounts')
+  require('./bank-accounts'),
+  require('./document-drive-domain')
 );
