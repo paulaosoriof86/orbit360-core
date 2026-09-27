@@ -20,8 +20,9 @@
   },
   "counts": {
     "total": 135,
-    "b2HumanFindings": 69,
-    "currentBlocking": 9
+    "b2HumanFindings": 51,
+    "currentBlocking": 41,
+    "countingNote": "Conservative carry-forward: prior frozen counts (42 human / 32 blocking) plus 9 new R15 findings. No prior blocker is removed by this R15 update without explicit closure evidence."
   },
   "findings": [
     {
