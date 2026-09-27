@@ -2407,7 +2407,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "1f9d19f641ad449f3e3588c371af2d955a1649c0",
+  "findingLedgerBlobSha": "42a630ada59460231d4560e41f0229a75e60ed45",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2638,7 +2638,7 @@
   "r15": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
     "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
-    "findingLedgerBlobSha": "1f9d19f641ad449f3e3588c371af2d955a1649c0",
+    "findingLedgerBlobSha": "42a630ada59460231d4560e41f0229a75e60ed45",
     "blockingFindingIds": [
       "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
       "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
