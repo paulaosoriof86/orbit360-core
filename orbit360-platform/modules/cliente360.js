@@ -70,7 +70,7 @@ Orbit.modules.cliente360 = (function () {
     return '<span class="badge ' + tone + '">' + e + '</span>';
   }
 
-  const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'siniestros', 'comisiones', 'correos', 'historial'];
+  const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'siniestros', 'documentos', 'comisiones', 'correos', 'historial'];
   window.addEventListener('orbit:store:emit', event => {
     if (!listWaitingForReady) return;
     const collection = event && event.detail && event.detail.collection;
@@ -301,7 +301,7 @@ Orbit.modules.cliente360 = (function () {
     const ase = q.asesor(c.asesorId);
     const tabs = [
       ['resumen', 'Resumen', '📊'], ['polizas', 'Pólizas', '📑'], ['vehiculos', 'Vehículos', '🚗'], ['cobros', 'Cobros', '💳'],
-      ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']
+      ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['documentos', 'Documentos', '📎'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']
     ];
     const saludCol = r.salud >= 70 ? '#1f8a4c' : r.salud >= 45 ? '#c9821b' : '#C5162E';
     const waNum = (c.telefono || '').replace(/[^0-9]/g, '');
@@ -341,7 +341,8 @@ Orbit.modules.cliente360 = (function () {
               ${c.driveLink
                 ? `<a href="${U.esc(c.driveLink)}" target="_blank" rel="noopener" class="fh-drive">📁 Expediente vinculado <span style="opacity:.6">↗</span></a>`
                 : `<span class="fh-drive ghost" onclick="Orbit.modules.cliente360.edit('${cid}')">📁 Agregar enlace de expediente</span>`}
-              <span class="fh-drive ghost" onclick="Orbit.importa.openFor('${cid}')">⬇ Importar a este expediente</span>
+              <span class="fh-drive ghost" onclick="Orbit.modules.cliente360.reabrir('${cid}','documentos')">📎 Documentos del cliente</span>
+              <span class="fh-drive ghost" onclick="Orbit.importa.openFor('${cid}')">⬇ Importar / actualizar expediente</span>
             </div>
           </div>
           <!-- salud + acciones -->
@@ -440,6 +441,7 @@ Orbit.modules.cliente360 = (function () {
     }
     else if (tab === 'cobros') { body.innerHTML = tabCobros(cid, r); const pf = body.querySelector('#cob-pol-fil'); if (pf) pf.addEventListener('change', () => { window._cobFilPol = window._cobFilPol || {}; window._cobFilPol[cid] = pf.value; body.innerHTML = tabCobros(cid, r); const pf2 = body.querySelector('#cob-pol-fil'); if (pf2) pf2.addEventListener('change', () => { window._cobFilPol[cid] = pf2.value; body.innerHTML = tabCobros(cid, r); }); }); }
     else if (tab === 'renovaciones') body.innerHTML = tabRenov(cid, r);
+    else if (tab === 'documentos') { body.innerHTML = tabDocumentos(cid, r); wireDocumentos(cid); }
     else if (tab === 'comisiones') body.innerHTML = tabComis(cid, r);
     else if (tab === 'correos') { body.innerHTML = tabCorreos(cid, r); }
     else if (tab === 'siniestros') { body.innerHTML = tabSiniestros(cid, r); }
@@ -692,6 +694,62 @@ Orbit.modules.cliente360 = (function () {
     return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">${cards.join('')}${unresolved}</div>`;
   }
   function vrow(k,v){return `<div><div style="font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.035em">${k}</div><div style="font-weight:500;margin-top:2px">${U.esc(vehicleShown(v))}</div></div>`; }
+
+  /* ---- Documentos del cliente · Drive como repositorio documental ---- */
+  function tabDocumentos(cid, r) {
+    const cli = S().get('clientes', cid) || r.cli || {};
+    const docs = Array.isArray(cli.documentos) ? cli.documentos : [];
+    const uploadStatus = Orbit.secureResources && Orbit.secureResources.documentUploadStatus
+      ? Orbit.secureResources.documentUploadStatus({ entidad: 'cliente', entidadId: cid, clienteId: cid })
+      : { available: false, status: 'pendiente_conexion' };
+    const directUpload = uploadStatus && uploadStatus.available === true;
+    const cards = docs.map((d, i) => `<div class="card pad" style="display:flex;gap:12px;align-items:center">
+      <div style="font-size:24px">📄</div>
+      <div style="flex:1;min-width:0">
+        <b style="font-family:var(--f-display);font-size:13.5px">${U.esc(d.nombre || ('Documento ' + (i + 1)))}</b>
+        <div class="muted" style="font-size:11.5px;margin-top:3px">${U.esc(d.categoria || 'Expediente')} · ${U.esc(d.origen || 'Drive')} ${d.creado ? '· ' + U.esc(d.creado) : ''}</div>
+      </div>
+      <button class="btn ghost sm" data-client-doc="${i}">Abrir</button>
+    </div>`).join('');
+    return `<div class="card pad" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <div><b style="font-family:var(--f-display);font-size:16px">📎 Documentos del cliente</b>
+          <div class="muted" style="font-size:12px;margin-top:4px">Drive es el repositorio documental; Firestore conserva la relación, metadata y provenance del expediente.</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${cli.driveLink ? `<a class="btn ghost sm" href="${U.esc(cli.driveLink)}" target="_blank" rel="noopener">📁 Abrir expediente Drive</a>` : ''}
+          <button class="btn ghost sm" data-doc-intelligent>🧠 Importar y extraer datos</button>
+          <button class="btn primary sm" data-doc-upload>${directUpload ? '⬆ Cargar documento a Drive' : '📎 Vincular / cargar documento'}</button>
+        </div>
+      </div>
+      ${directUpload ? '' : '<div class="cfg-note" style="margin-top:12px">La plataforma no declarará un archivo como cargado hasta que Drive confirme almacenamiento y readback. Mientras la conexión directa no esté disponible, puedes mantener el expediente Drive vinculado o usar un enlace documental desde una gestión.</div>'}
+    </div>
+    <div style="display:grid;gap:10px">${cards || '<div class="card pad" style="text-align:center;color:var(--ink-2);padding:28px">Todavía no hay documentos con vínculo Drive confirmado en esta ficha.</div>'}</div>`;
+  }
+
+  function wireDocumentos(cid) {
+    const body = document.getElementById('c360-body');
+    if (!body) return;
+    const cli = S().get('clientes', cid) || {};
+    body.querySelectorAll('[data-client-doc]').forEach(btn => btn.addEventListener('click', () => {
+      const d = (Array.isArray(cli.documentos) ? cli.documentos : [])[+btn.dataset.clientDoc];
+      if (!d) return;
+      if (Orbit.documentViewer && typeof Orbit.documentViewer.open === 'function') Orbit.documentViewer.open(d, { context: { entidad: 'cliente', entidadId: cid, clienteId: cid } });
+      else {
+        const url = String(d.driveUrl || d.externalUrl || d.url || '').trim();
+        if (/^https:\/\/[^\s]+$/i.test(url)) window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    }));
+    const upload = body.querySelector('[data-doc-upload]');
+    if (upload) upload.addEventListener('click', () => Orbit.importa.open('documentos', {
+      multi: true, modo: 'documental', scope: { cid, nombre: cli.nombre || 'Cliente' },
+      onDone: () => Orbit.modules.cliente360.reabrir(cid, 'documentos')
+    }));
+    const intelligent = body.querySelector('[data-doc-intelligent]');
+    if (intelligent) intelligent.addEventListener('click', () => Orbit.importa.open('documentos', {
+      multi: true, modo: 'inteligente', scope: { cid, nombre: cli.nombre || 'Cliente' },
+      onDone: () => Orbit.modules.cliente360.reabrir(cid, 'documentos')
+    }));
+  }
 
   /* ---- Recibos y cobros (filtro por póliza + confirmar cobro) ---- */
   let recPolFiltro = {};  // por cliente: polizaId seleccionada
