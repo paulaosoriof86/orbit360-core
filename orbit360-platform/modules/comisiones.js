@@ -138,7 +138,7 @@ Orbit.modules.comisiones = (function () {
         <button class="imp-x" id="cd-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
       </div>
       <div style="overflow:auto;flex:1"><table class="tbl">
-        <thead><tr><th>Periodo</th><th>Cliente</th><th>Póliza</th><th class="num">Base neta</th><th class="num">%</th><th class="num">Comisión</th><th>Estado</th></tr></thead>
+        <thead><tr><th>Periodo</th><th>Cliente</th><th>Póliza</th><th class="num">Base neta</th><th class="num">%</th><th class="num">Comisión</th><th>Estado</th><th></th></tr></thead>
         <tbody>${regs.map(c => { const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId); return `<tr>
           <td class="mono" style="font-size:11.5px">${c.periodo || '—'}</td>
           <td style="font-size:12.5px">${cli ? U.esc(cli.nombre) : '—'}</td>
@@ -146,7 +146,8 @@ Orbit.modules.comisiones = (function () {
           <td class="num">${U.money(c.base, c.moneda)}</td>
           <td class="num">${c.pct}%</td>
           <td class="num"><b>${U.money(c.monto, c.moneda)}</b></td>
-          <td><span class="badge ${c.estado === 'Liquidada' ? 'ok' : 'warn'}" style="cursor:pointer" title="Clic: conciliar / cambiar estado" onclick="Orbit.modules.comisiones.toggleEstado('${c.id}','${campo}','${key}')">${c.estado}</span></td></tr>`; }).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody>
+          <td><span class="badge ${c.estado === 'Liquidada' ? 'ok' : 'warn'}" style="cursor:pointer" title="Clic: conciliar / cambiar estado" onclick="Orbit.modules.comisiones.toggleEstado('${c.id}','${campo}','${key}')">${c.estado}</span></td>
+          <td><button class="btn ghost sm" style="color:var(--danger,var(--red))" onclick="event.stopPropagation();Orbit.modules.comisiones.eliminar('${c.id}','${campo}','${key}')">Eliminar</button></td></tr>`; }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody>
       </table></div>
       <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn primary" id="cd-ok">Cerrar</button></div>
     </div>`;
@@ -169,7 +170,23 @@ Orbit.modules.comisiones = (function () {
   }
   function scoreBadge(r) { const s = scoreConciliacion(r); return '<span class="badge ' + s.tone + '" title="Propuesta de conciliación — requiere validación antes de aplicar">' + s.t + '</span>'; }
 
-  return { render, detalle, toggleEstado, renderConciliacion };
+  return { render, detalle, toggleEstado, eliminar, renderConciliacion };
+
+  async function eliminar(id, campo, key) {
+    const c = S().get('comisiones', id); if (!c) return;
+    if (!Orbit.recordDelete) return U.toast('Eliminación canónica no disponible.');
+    try {
+      const result = await Orbit.recordDelete.remove('comisiones', id, { label: (c.periodo || '') + ' · ' + U.money(c.monto, c.moneda) });
+      if (result && result.ok) {
+        const modal = document.getElementById('com-det'); if (modal) modal.remove();
+        const remaining = S().all('comisiones').some(x => (campo === 'asesorId' ? x.asesorId : campo === 'aseguradoraId' ? x.aseguradoraId : x.periodo) === key);
+        if (remaining) detalle(campo, key);
+        const h = document.getElementById('host'); if (h) render(h);
+      }
+    } catch (error) {
+      U.toast('No fue posible confirmar la eliminación de la comisión.');
+    }
+  }
 
   function toggleEstado(id, campo, key) {
     const c = S().get('comisiones', id); if (!c) return;
