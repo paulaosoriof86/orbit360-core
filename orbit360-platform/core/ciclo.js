@@ -571,9 +571,11 @@ Orbit.ciclo = (function () {
 
   function managementCreateModal(opts) {
     opts = Object.assign({
-      clienteId: '', polizaId: '', tipo: '', lista: '', prioridad: 'Media',
+      clienteId: '', polizaId: '', tipo: '', titulo: '', lista: '', prioridad: 'Media', estado: 'Pendiente',
       asesorId: '', aseguradoraId: '', vence: inDays(7), proximaAccion: 'Pendiente de definir',
-      nota: '', origen: 'Ops', desdeCliente: false
+      nota: '', origen: 'Ops', desdeCliente: false, checklist: null, extraFields: null,
+      dynamicFields: null, onCreated: null, openAfterCreate: true,
+      requireConfirmationText: '', confirmationHelp: ''
     }, opts || {});
 
     const clientes = S().all('clientes').filter(c => c && c.id);
@@ -582,8 +584,12 @@ Orbit.ciclo = (function () {
     const tipos = tiposGestion().slice();
     const initialClient = opts.clienteId ? S().get('clientes', opts.clienteId) : null;
     const typeDef = tipos.find(t => t.t === opts.tipo) || null;
-    const initialList = opts.lista || (typeDef && typeDef.lista) || (opts.polizaId ? 'Renovaciones / Modif.' : 'Gestiones Admin');
+    const initialList = opts.lista || (typeDef && typeDef.lista) || 'Gestiones Admin';
     const initialAdvisor = opts.asesorId || (initialClient && initialClient.asesorId) || (Orbit.session && Orbit.session.asesorId ? Orbit.session.asesorId() : '');
+    const defaultChecklist = Array.isArray(opts.checklist) && opts.checklist.length
+      ? opts.checklist.map(x => typeof x === 'string' ? { t: x, done: false } : { t: String(x.t || '').trim(), done: !!x.done }).filter(x => x.t)
+      : [{ t: 'Solicitud recibida', done: true }, { t: 'Documentación completa', done: false }, { t: 'Enviado a aseguradora', done: false }];
+    const checklistText = defaultChecklist.map(x => x.t).join('\n');
     const uploadStatus = Orbit.secureResources && Orbit.secureResources.documentUploadStatus
       ? Orbit.secureResources.documentUploadStatus({ entidad: 'gestion', clienteId: opts.clienteId || '', polizaId: opts.polizaId || '' })
       : { available: false, status: 'pendiente_conexion', message: 'Carga directa pendiente de conexión con Drive' };
@@ -613,7 +619,7 @@ Orbit.ciclo = (function () {
             ${fSelectOpt('Cliente', 'mg-cli', clientOptions, opts.clienteId || '')}
             ${fSelectOpt('Lista (Ops)', 'mg-lista', listOptions, initialList)}
             ${fSelectFree('Tipo de gestión', 'mg-tipo', typeOptions, opts.tipo || (typeOptions[0] || 'Actualizar datos de cliente'))}
-            ${fSelectFree('Estado', 'mg-estado', ['Pendiente', 'En proceso'], 'Pendiente')}
+            ${fSelectFree('Estado', 'mg-estado', ['Pendiente', 'En proceso'], opts.estado || 'Pendiente')}
             ${fSelectCat('Prioridad', 'mg-prio', 'prioridades', opts.prioridad || 'Media')}
             ${fSelectOpt('Responsable', 'mg-ase', asesores.map(a => [a.id, a.nombre]), initialAdvisor)}
             ${fSelectOpt('Aseguradora', 'mg-asg', [['', '—']].concat(asgs.map(a => [a.id, a.nombre])), opts.aseguradoraId || '')}
@@ -625,10 +631,16 @@ Orbit.ciclo = (function () {
 
         <div class="ciclo-sec" style="margin:0">
           <div class="ciclo-sec-t">Checklist inicial</div>
-          <textarea id="mg-checklist" class="o-sel" style="min-height:82px;resize:vertical;padding:9px 11px" placeholder="Un control por línea">Solicitud recibida
-Documentación completa
-Enviado a aseguradora</textarea>
+          <textarea id="mg-checklist" class="o-sel" style="min-height:82px;resize:vertical;padding:9px 11px" placeholder="Un control por línea">${U.esc(checklistText)}</textarea>
         </div>
+
+        ${opts.requireConfirmationText ? `<div class="ciclo-sec" style="margin:0">
+          <div class="ciclo-sec-t">Confirmación requerida</div>
+          <label style="display:flex;gap:9px;align-items:flex-start">
+            <input type="checkbox" id="mg-confirm" style="margin-top:3px">
+            <span><b>${U.esc(opts.requireConfirmationText)}</b>${opts.confirmationHelp ? '<small class="muted" style="display:block;margin-top:3px">' + U.esc(opts.confirmationHelp) + '</small>' : ''}</span>
+          </label>
+        </div>` : ''}
 
         <div class="ciclo-sec" style="margin:0">
           <div class="ciclo-sec-t">Nota / contexto</div>
@@ -709,6 +721,8 @@ Enviado a aseguradora</textarea>
       const tipo = String(el('mg-tipo').value || '').trim();
       const lista = String(el('mg-lista').value || '').trim();
       if (!tipo || tipo === '__otro__' || !lista) return U.toast('Completa tipo y lista de la gestión.');
+      const confirmation = el('mg-confirm');
+      if (opts.requireConfirmationText && (!confirmation || !confirmation.checked)) return U.toast('Confirma la condición requerida antes de crear la gestión.');
 
       const polizaId = policySelect.value || '';
       const pol = polizaId ? S().get('polizas', polizaId) : null;
@@ -723,15 +737,23 @@ Enviado a aseguradora</textarea>
         clienteId, polizaId, entidad: 'gestion', entidadId: managementId
       }));
       const checklistLines = String(el('mg-checklist').value || '').split(/\r?\n/).map(x => x.trim()).filter(Boolean);
-      const checklist = checklistLines.map((t, i) => ({ t, done: i === 0 }));
+      const checklist = checklistLines.map(t => {
+        const found = defaultChecklist.find(x => x.t === t);
+        return { t, done: found ? !!found.done : false };
+      });
 
       save.disabled = true;
       const original = save.textContent;
       save.textContent = 'Guardando…';
       try {
-        let gestion = await crearGestionDurable({
+        const extra = Object.assign(
+          {},
+          opts.extraFields && typeof opts.extraFields === 'object' ? opts.extraFields : {},
+          typeof opts.dynamicFields === 'function' ? (opts.dynamicFields({ clienteId, polizaId, tipo, lista }) || {}) : {}
+        );
+        let gestion = await crearGestionDurable(Object.assign({}, extra, {
           id: managementId,
-          lista, tipo, titulo: tipo, clienteId, polizaId,
+          lista, tipo, titulo: opts.titulo || tipo, clienteId, polizaId,
           asesorId: el('mg-ase').value || cli.asesorId || '',
           aseguradoraId: el('mg-asg').value || (pol ? pol.aseguradoraId : ''),
           ramo: pol ? pol.ramo : '',
@@ -743,7 +765,7 @@ Enviado a aseguradora</textarea>
           origen: opts.desdeCliente ? 'Solicitud del cliente' : (opts.origen || 'Ops'),
           adjuntos: linkedDocs.slice(),
           checklist
-        });
+        }));
 
         const uploaded = [];
         const failed = [];
@@ -774,7 +796,7 @@ Enviado a aseguradora</textarea>
             adjuntos: docs,
             documentoCargaPendiente: failed.length > 0,
             documentoCargaFallida: failed,
-            checklist: checklist.map((x, i) => i === 1 ? Object.assign({}, x, { done: docs.length > 0 && failed.length === 0 }) : x),
+            checklist: checklist.map(x => /documentaci[oó]n|documentos?/i.test(x.t) ? Object.assign({}, x, { done: docs.length > 0 && failed.length === 0 }) : x),
             actualizado: today()
           });
           gestion = S().get('gestiones', managementId);
@@ -800,7 +822,10 @@ Enviado a aseguradora</textarea>
         refresh();
         if (failed.length) U.toast('Gestión creada. ' + failed.length + ' documento(s) no fueron confirmados por Drive; la gestión quedó marcada para completar.');
         else U.toast('Gestión creada y confirmada en Ops.');
-        openGestion(managementId);
+        if (typeof opts.onCreated === 'function') {
+          try { opts.onCreated(gestion); } catch (callbackError) { U.toast('La gestión quedó guardada, pero no se pudo completar la navegación posterior.'); }
+        }
+        if (opts.openAfterCreate !== false) openGestion(managementId);
       } catch (error) {
         const code = String(error && (error.code || error.message) || '');
         U.toast(/PREVIEW_SYNTHETIC_ONLY|preview.*synthetic|synthetic.*only/i.test(code)
@@ -814,21 +839,22 @@ Enviado a aseguradora</textarea>
   }
 
   /* Desde Cliente 360, Póliza, Renovaciones o Portal: mismo editor canónico de Ops con contexto prellenado. */
-  function solicitarGestion(clienteId, polizaId, desdeCliente) {
+  function solicitarGestion(clienteId, polizaId, desdeCliente, context) {
     const cli = S().get('clientes', clienteId);
     if (!cli) return;
     const pol = polizaId ? S().get('polizas', polizaId) : null;
-    return managementCreateModal({
+    const ctx = context && typeof context === 'object' ? context : {};
+    return managementCreateModal(Object.assign({
       clienteId,
       polizaId: polizaId || '',
       desdeCliente: !!desdeCliente,
-      tipo: polizaId ? 'Solicitar condiciones de renovación' : 'Actualizar datos de cliente',
-      lista: polizaId ? 'Renovaciones / Modif.' : 'Gestiones Admin',
+      tipo: 'Gestión de póliza',
+      lista: 'Gestiones Admin',
       prioridad: 'Media',
       asesorId: cli.asesorId || '',
       aseguradoraId: pol ? pol.aseguradoraId || '' : '',
       origen: desdeCliente ? 'Portal' : 'Ficha cliente'
-    });
+    }, ctx));
   }
 
   /* ===================== nuevo negocio / nueva gestión ===================== */
