@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -195,8 +195,8 @@
     "singleReceiptProjection": true,
     "dirtyFormsProtected": true,
     "dashboardRealityReconciled": false,
-    "previewExact": false,
-    "functionalPass": false,
+    "previewExact": true,
+    "functionalPass": true,
     "paulaVisual": false,
     "approvedVisualHierarchy": false,
     "academiaCatalog": true,
@@ -300,7 +300,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PASS",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "4e4771b57abcb6ced64034f81d9b609523b3433f",
     "exactPreviewBuildId": "gi-i65-b2-4e4771b57abc-57f234755dc1",
@@ -380,7 +380,7 @@
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
-    "runId": 36289840679,
+    "runId": 36333852637,
     "scope": {
       "operativo": "all",
       "asesor": "own",
@@ -391,7 +391,7 @@
         "recibosEsperados": 1868,
         "carteraPrimas": 1309,
         "asesores": 7,
-        "metas": 0
+        "metas": 3
       },
       "asesorCounts": {
         "clientes": 393,
@@ -399,7 +399,7 @@
         "recibosEsperados": 1663,
         "carteraPrimas": 1168,
         "asesores": 1,
-        "metas": 0
+        "metas": 3
       }
     },
     "crud": {
@@ -408,9 +408,9 @@
       "individualReceiptPortfolioSync": true,
       "reportedPaymentVisible": true,
       "reportedPaymentDoesNotFabricateCobro": true,
-      "clientIdHash": "87e9f69ac50fc25322cb2c873113a020f51c157ff267c1ec931393c92bcb0fb5",
-      "policyIdHash": "e2e829d1bb5e80f55fa335f8abd52ec844ce8787b3864f0578cc92df659f297c",
-      "vehicleIdHash": "1fe9c285ad3208d60fd7d8f15084a0f221db64d291b6ff8dd616bb402fc43703",
+      "clientIdHash": "11f5ad251320dea780e4f9456ffce5706063d071efa53aad1735216d769a4a49",
+      "policyIdHash": "f86328711e1378187be2fd2ccf0d59279cc6328b3c45d1213da3174a231331e4",
+      "vehicleIdHash": "7fb8bd48a6d3dedf643ed548855fa18ad4146b867cf11b60ae939ea2fb155e26",
       "clientCreateReadback": true,
       "clientEditReadback": true,
       "policyCreateReadback": true,
@@ -426,8 +426,8 @@
       "dirtyBackdropProtected": true
     },
     "renewal": {
-      "requestIdHash": "f571c921da732eaa6c5635e783cafa81b9a49727e0cc1334d37c99b7e080325d",
-      "newPolicyIdHash": "d04d7b743798d497e30f164f92bf3215d9edf5ec5dad4c22b7733c7e597799cb",
+      "requestIdHash": "07904cd950640c2fd4f993bf975f6ba1115785fc7c951ef25d8d8aeb65df5174",
+      "newPolicyIdHash": "89fa6fdf733a0cfd52986529cdbb6bf759d467ddadac5adc56c1463ad52969a0",
       "sourceLink": true,
       "receipts": 2,
       "portfolio": 2,
