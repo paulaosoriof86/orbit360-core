@@ -2476,7 +2476,9 @@
         "noReimport": true
       },
       "previewArmParentCommit": "52537669f11ebc5c21675551e59ca3ec0dd9cc86",
-      "previewArmReason": "R15_R15A_CUMULATIVE_SOURCE_FIXED_EXACT_COMPOSITION_GUARD_READY"
+      "previewArmReason": "R15_R15A_CUMULATIVE_SOURCE_FIXED_EXACT_COMPOSITION_GUARD_READY",
+      "previewValidatorRepairCommit": "2078cf8278969756f878dff0768d88a59f7247cf",
+      "previewValidatorRepairClass": "HARNESS_ONLY_STALE_OAUTH_CONSENT_ASSERTION"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
