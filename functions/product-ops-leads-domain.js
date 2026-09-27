@@ -87,4 +87,4 @@ after.tenantId=authz.tenantId;after.schemaVersion=VERSION;after.updatedAt=now();
 
 exports.orbit360OpsLeadsCommand=onCall({region:REGION,cors:true,timeoutSeconds:60,memory:'256MiB'},request=>execute(request,false));
 exports.orbit360OpsLeadsCommandPreview=onCall({region:PREVIEW_REGION,cors:true,timeoutSeconds:60,memory:'256MiB'},request=>execute(request,true));
-exports.__opsLeadsProductDomain=Object.freeze({VERSION,DEFAULT_STAGES,OPERATIONS,storageMode:'productCanonicalDataV1'});
+exports.__opsLeadsProductDomain=Object.freeze({VERSION,DEFAULT_STAGES,OPERATIONS,storageMode:'productCanonicalDataV1',authorize,advisorAllowed,dataRef,text});
