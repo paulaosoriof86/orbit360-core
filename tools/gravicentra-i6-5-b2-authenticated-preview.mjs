@@ -924,7 +924,7 @@ try{
     const id='b2-ges-advisor-'+String(stamp||'').toLowerCase();
     const beforeRole=String(Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.activeRole||'');
     const sessionRole=String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'');
-    const row=await Orbit.ciclo.crearGestionDurable({id,lista:'Renovaciones / Modif.',tipo:'Solicitar propuestas de renovación',titulo:'Asesor self-service B2 QA',clienteId,polizaId:policyId,sourcePolicyId:policyId,asesorId:advisorId,estado:'Pendiente',prioridad:'Media',origen:'B2 QA',workflowType:'renewal_proposals',renewalAction:'request_proposals',proximaAccion:'Operaciones: solicitar propuestas'});
+    const row=await Orbit.ciclo.crearGestionDurable({id,lista:'Renovaciones / Modif.',tipo:'Solicitar propuestas de renovación',titulo:'Asesor self-service B2 QA',clienteId:clientId,polizaId:policyId,sourcePolicyId:policyId,asesorId:advisorId,estado:'Pendiente',prioridad:'Media',origen:'B2 QA',workflowType:'renewal_proposals',renewalAction:'request_proposals',proximaAccion:'Operaciones: solicitar propuestas'});
     return{id,beforeRole,sessionRole,persisted:!!row};
   },{clientId:client.id,policyId:policy.id,advisorId:actor.advisorId,stamp}),'B2_AUTH_ADVISOR_SELF_SERVICE_TIMEOUT',45000);
   need(advisorSelf.persisted===true&&advisorSelf.sessionRole==='Asesor','B2_AUTH_ADVISOR_SELF_SERVICE_WRITE_FAILED:'+JSON.stringify(advisorSelf));
