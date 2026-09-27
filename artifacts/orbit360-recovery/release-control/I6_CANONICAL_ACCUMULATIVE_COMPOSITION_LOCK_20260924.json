@@ -134,7 +134,7 @@
     "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
     "orbit360-platform/core/product-app-p0.js": "b6ccd725f214c666e04299574be4c1fdae3a6b83",
-    "orbit360-platform/core/product-drive-document-provider-p0.js": "43f5ecf7bb8614ce8ce7cfda3191d1552ba440b9",
+    "orbit360-platform/core/product-drive-document-provider-p0.js": "696f74f883d722852a877b1ed3c643818d093ef5",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "fcf45f869897b205df48d17906555fc688250f83",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
@@ -198,10 +198,10 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "PAULA_R15_R15A_PLUS_DRIVE_PREVIEW_ISOLATION",
-    "parentHead": "a01b355a1d5dca88ebf90bf2db7dd705f4d0a4f7",
+    "origin": "PAULA_R15_R15A_DRIVE_HUMAN_PROOF_PLUS_R83_DOWNLOAD",
+    "parentHead": "58dd90648ba560d0332aa90ef23c9442657dcacd",
     "candidateHead": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
-    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_HUMAN_DRIVE_OAUTH_PROOF",
+    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_HUMAN_DOWNLOAD_RETEST",
     "changedProductFiles": [
       "functions/bootstrap.js",
       "functions/document-drive-domain.js",
@@ -249,7 +249,9 @@
     "noDataReimport": true,
     "noLive": true,
     "noB3": true,
-    "latestCausalFix": "PREVIEW_DRIVE_CLIENT_FOLDER_ISOLATED_UNDER_GRAVICENTRA_PREVIEW_QA",
-    "previewDocumentIsolation": "_GRAVICENTRA_PREVIEW_QA_ONLY"
+    "latestCausalFix": "GOOGLE_DRIVE_DELEGATED_OAUTH_DOWNLOAD_PROVIDER_IMPLEMENTED",
+    "previewDocumentIsolation": "_GRAVICENTRA_PREVIEW_QA_ONLY",
+    "findingLedgerBlobSha": "1ecca9ab089f3209482774f751c4d93768a83984",
+    "humanDownloadRetestRequired": true
   }
 }
