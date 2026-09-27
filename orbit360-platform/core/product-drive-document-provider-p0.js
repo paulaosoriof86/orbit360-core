@@ -20,6 +20,7 @@
   const state = {
     probed: false,
     probing: null,
+    lastProbeAt: 0,
     status: { available: false, status: 'pendiente_conexion', message: 'Verificando conexión con Drive…' }
   };
 
@@ -53,9 +54,10 @@
     if (state.probed && !force) return Promise.resolve(state.status);
     const names = callableNames();
     const payload = { tenantId: tenantId(), activeRole: activeRole() };
+    state.lastProbeAt = Date.now();
     state.probing = call(names.status, payload, names.region)
       .then(out => {
-        state.probed = true;
+        state.probed = !(out && out.status === 'unauthenticated');
         state.status = Object.assign(
           { available: false, status: 'pendiente_conexion', message: 'Drive no disponible.' },
           out || {}
@@ -63,12 +65,13 @@
         return state.status;
       })
       .catch(error => {
-        state.probed = true;
+        const raw = String(error && (error.code || error.message) || '');
+        state.probed = !/unauthenticated|auth/i.test(raw);
         state.status = {
           available: false,
           status: 'pendiente_conexion',
           message: 'No fue posible verificar la conexión de Drive.',
-          code: String(error && (error.code || error.message) || '')
+          code: raw
         };
         return state.status;
       })
@@ -150,7 +153,11 @@
   const provider = {
     resolve,
     upload,
-    uploadStatus: () => Object.assign({}, state.status),
+    uploadStatus: () => {
+      const stale = Date.now() - state.lastProbeAt > 5000;
+      if (!state.probing && (!state.probed || (state.status.available !== true && stale))) setTimeout(() => probe(true), 0);
+      return Object.assign({}, state.status);
+    },
     probe,
     repository: 'Google Drive',
     maxBytes: 15 * 1024 * 1024,
