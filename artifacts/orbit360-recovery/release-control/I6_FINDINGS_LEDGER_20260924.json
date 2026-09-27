@@ -19,10 +19,10 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 135,
-    "b2HumanFindings": 51,
-    "currentBlocking": 41,
-    "countingNote": "Conservative carry-forward: prior frozen counts (42 human / 32 blocking) plus 9 new R15 findings. No prior blocker is removed by this R15 update without explicit closure evidence."
+    "total": 136,
+    "b2HumanFindings": 52,
+    "currentBlocking": 42,
+    "countingNote": "Conservative carry-forward: prior frozen counts plus R15 and explicit R15A cross-module delete rule. No blocker is removed without explicit closure evidence."
   },
   "findings": [
     {
@@ -2486,6 +2486,23 @@
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
       "noReimport": true
+    },
+    {
+      "id": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
+      "block": "B2",
+      "source": "PAULA_EXPLICIT_PRODUCT_RULE_20260927",
+      "surface": "Cross-module CRUD",
+      "classification": "PRODUCT_DEFECT_CROSS_MODULE_CRUD_PARITY",
+      "blocking": true,
+      "finding": "La acción Eliminar no está disponible de forma consistente en todos los módulos que administran registros persistentes.",
+      "rootCause": "Los módulos implementan CRUD y borrado de forma fragmentada; algunos tienen eliminación especializada, otros solo archivar y otros ninguna acción. No existe un owner canónico transversal de eliminación durable y segura.",
+      "remediation": "Crear owner canónico de borrado lógico durable con permisos/scope/motivo/readback y entrypoints visibles en cada módulo administrable, conservando borrado físico solo donde sea relacionalmente seguro.",
+      "requiredProof": "Eliminar visible/operable según permiso en todos los módulos administrables; persistencia tras reload; registros dependientes fail-closed o soft-delete sin huérfanos; actor/motivo/fecha conservados.",
+      "status": "OPEN_R15A_CAUSAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15A_CROSS_MODULE_DELETE_RULE_20260927.json",
+      "receiptBlobSha": "e8456913dfedd0058743f1a66f7c42557aa06a68",
+      "noLive": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [
@@ -2527,7 +2544,7 @@
     "date": "2026-09-27",
     "recordedAt": "2026-09-27T06:23:00-06:00",
     "origin": "PAULA_MOBILE_UAT_R15_20260927",
-    "decision": "PAULA_VISUAL_REJECTED_R15_REMEDIATION_REQUIRED",
+    "decision": "PAULA_VISUAL_REJECTED_R15_PLUS_DELETE_RULE_R15A_REMEDIATION_REQUIRED",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36288967976-k58tfgn7.web.app",
     "exactSourceSha": "dab677e937f9586195e3e79b94d5b91c397f0841",
     "exactBuildId": "gi-i65-b2-dab677e937f9-57f234755dc1",
@@ -2550,15 +2567,18 @@
       "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
       "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
       "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
-      "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15"
+      "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
+      "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A"
     ],
-    "count": 9,
+    "count": 10,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
     "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
     "b2OverallAccepted": false,
     "noB3": true,
     "noLive": true,
-    "noReimport": true
+    "noReimport": true,
+    "r15aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15A_CROSS_MODULE_DELETE_RULE_20260927.json",
+    "r15aReceiptBlobSha": "e8456913dfedd0058743f1a66f7c42557aa06a68"
   },
   "lastReview": {
     "date": "2026-09-26",
