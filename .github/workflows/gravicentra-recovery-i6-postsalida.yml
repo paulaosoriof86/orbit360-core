@@ -4605,22 +4605,43 @@ jobs:
             const url='https://identitytoolkit.googleapis.com/v2/projects/'+encodeURIComponent(process.env.PROJECT_ID)+'/defaultSupportedIdpConfigs/google.com';
             const get=async()=>{const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});const body=await r.json().catch(()=>({}));return {r,body};};
             let g=await get();
-            if(g.r.status===404)throw new Error('B2_GOOGLE_PROVIDER_CONFIG_NOT_FOUND_FAIL_CLOSED');
-            if(!g.r.ok)throw new Error('B2_GOOGLE_PROVIDER_READ_HTTP_'+g.r.status);
-            const before=safe(g.body);
-            let mutationExecuted=false;
+            let mutationExecuted=false,providerConfigCreated=false;
+            let before=g.r.status===404?{name:'',enabled:false,clientIdPresent:false,clientSecretPresent:false}:safe(g.body);
+            if(g.r.status===404){
+              const collection='https://identitytoolkit.googleapis.com/admin/v2/projects/'+encodeURIComponent(process.env.PROJECT_ID)+'/defaultSupportedIdpConfigs?idpId=google.com';
+              const createBody={name:'projects/'+process.env.PROJECT_ID+'/defaultSupportedIdpConfigs/google.com',enabled:true};
+              const p=await fetch(collection,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(createBody)});
+              const pb=await p.json().catch(()=>({}));
+              if(!p.ok){
+                const evidence={status:'FAIL_CLOSED',projectId:process.env.PROJECT_ID,providerId:'google.com',stage:'CREATE_PROVIDER_CONFIG',httpStatus:p.status,before,createNewOAuthClient:false,clientCredentialsChanged:false,realDataWrites:0,liveHostingPromotion:false,b3Opened:false,reimport:false};
+                fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
+                throw new Error('B2_GOOGLE_PROVIDER_CREATE_HTTP_'+p.status);
+              }
+              mutationExecuted=true;providerConfigCreated=true;
+              g=await get();
+            }
+            if(!g.r.ok){
+              const evidence={status:'FAIL_CLOSED',projectId:process.env.PROJECT_ID,providerId:'google.com',stage:'READ_PROVIDER_CONFIG',httpStatus:g.r.status,before,providerConfigCreated,realDataWrites:0,liveHostingPromotion:false,b3Opened:false,reimport:false};
+              fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
+              throw new Error('B2_GOOGLE_PROVIDER_READ_HTTP_'+g.r.status);
+            }
             if(g.body.enabled!==true){
+              before=safe(g.body);
               const patch={...g.body,enabled:true};
               const p=await fetch(url,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(patch)});
               const pb=await p.json().catch(()=>({}));
-              if(!p.ok)throw new Error('B2_GOOGLE_PROVIDER_PATCH_HTTP_'+p.status);
+              if(!p.ok){
+                const evidence={status:'FAIL_CLOSED',projectId:process.env.PROJECT_ID,providerId:'google.com',stage:'ENABLE_PROVIDER_CONFIG',httpStatus:p.status,before,providerConfigCreated,realDataWrites:0,liveHostingPromotion:false,b3Opened:false,reimport:false};
+                fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
+                throw new Error('B2_GOOGLE_PROVIDER_PATCH_HTTP_'+p.status);
+              }
               mutationExecuted=true;
             }
             g=await get();
             if(!g.r.ok)throw new Error('B2_GOOGLE_PROVIDER_POST_READ_HTTP_'+g.r.status);
             const after=safe(g.body);
             if(after.enabled!==true)throw new Error('B2_GOOGLE_PROVIDER_POST_READBACK_NOT_ENABLED');
-            const evidence={status:'PASS',projectId:process.env.PROJECT_ID,providerId:'google.com',before,after,mutationExecuted,realDataWrites:0,liveHostingPromotion:false,b3Opened:false,reimport:false};
+            const evidence={status:'PASS',projectId:process.env.PROJECT_ID,providerId:'google.com',before,after,mutationExecuted,providerConfigCreated,createNewOAuthClient:false,clientCredentialsChanged:false,realDataWrites:0,liveHostingPromotion:false,b3Opened:false,reimport:false};
             fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
             console.log(JSON.stringify(evidence));
           })().catch(e=>{console.error(e);process.exit(1)});
