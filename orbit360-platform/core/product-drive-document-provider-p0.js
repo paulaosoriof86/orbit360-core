@@ -2,8 +2,8 @@
    Gravicentra Insurance · Google Drive document provider P0
    B2 R15/R15A
    - Drive remains the documentary repository.
-   - Browser never receives service-account credentials.
-   - All uploads use authenticated Firebase callable functions.
+   - Google OAuth access token remains only in browser memory for the active session.
+   - All uploads use authenticated Firebase callable functions and delegated Drive OAuth.
    - Preview is isolated to synthetic B2 client folders.
    ============================================================ */
 (function () {
@@ -20,14 +20,76 @@
   const state = {
     probed: false,
     probing: null,
+    connecting: null,
     lastProbeAt: 0,
-    status: { available: false, status: 'pendiente_conexion', message: 'Verificando conexión con Drive…' }
+    accessToken: '',
+    tokenIssuedAt: 0,
+    driveUserEmail: '',
+    status: { available: false, status: 'oauth_required', message: 'Conecta una cuenta Google con acceso al Drive de A&S.' }
   };
 
   function call(name, data, region) {
     const r = runtime();
     if (!r || typeof r.callFunction !== 'function') return Promise.reject(new Error('PRODUCT_RUNTIME_CALLABLE_UNAVAILABLE'));
     return r.callFunction(name, data, region);
+  }
+
+  function tokenFresh() {
+    return !!state.accessToken && (Date.now() - state.tokenIssuedAt) < 45 * 60 * 1000;
+  }
+
+  function clearToken(status) {
+    state.accessToken = '';
+    state.tokenIssuedAt = 0;
+    state.driveUserEmail = '';
+    state.probed = false;
+    state.status = status || { available: false, status: 'oauth_required', message: 'Conecta una cuenta Google con acceso al Drive de A&S.' };
+  }
+
+  async function connect() {
+    if (state.connecting) return state.connecting;
+    const r = runtime();
+    if (!r || typeof r.initialize !== 'function') {
+      state.status = { available: false, status: 'runtime_unavailable', message: 'No está disponible la conexión segura con Google.' };
+      return state.status;
+    }
+    state.connecting = r.initialize().then(async ctx => {
+      const authMod = ctx && ctx.modules && ctx.modules.auth;
+      const auth = ctx && ctx.auth;
+      const user = auth && auth.currentUser;
+      if (!authMod || !user || typeof authMod.GoogleAuthProvider !== 'function') throw new Error('DRIVE_FIREBASE_AUTH_UNAVAILABLE');
+      const provider = new authMod.GoogleAuthProvider();
+      provider.addScope('https://www.googleapis.com/auth/drive');
+      provider.setCustomParameters({ prompt: 'consent', include_granted_scopes: 'true' });
+      const linked = Array.isArray(user.providerData) && user.providerData.some(p => p && p.providerId === 'google.com');
+      let result;
+      if (linked && typeof authMod.reauthenticateWithPopup === 'function') result = await authMod.reauthenticateWithPopup(user, provider);
+      else if (typeof authMod.linkWithPopup === 'function') result = await authMod.linkWithPopup(user, provider);
+      else throw new Error('DRIVE_GOOGLE_POPUP_UNAVAILABLE');
+      const credential = authMod.GoogleAuthProvider.credentialFromResult(result);
+      const accessToken = credential && credential.accessToken ? String(credential.accessToken) : '';
+      if (!accessToken) throw new Error('DRIVE_GOOGLE_ACCESS_TOKEN_MISSING');
+      state.accessToken = accessToken;
+      state.tokenIssuedAt = Date.now();
+      state.probed = false;
+      return probe(true);
+    }).catch(error => {
+      const raw = String(error && (error.code || error.message) || '');
+      const popupClosed = /popup-closed|cancelled-popup|popup_closed/i.test(raw);
+      const providerDisabled = /operation-not-allowed|provider-disabled/i.test(raw);
+      clearToken({
+        available: false,
+        status: popupClosed ? 'oauth_cancelled' : providerDisabled ? 'google_provider_disabled' : 'oauth_failed',
+        message: popupClosed
+          ? 'La conexión con Google fue cancelada.'
+          : providerDisabled
+            ? 'El proveedor Google de Firebase Auth no está habilitado para esta plataforma.'
+            : 'No fue posible conectar la cuenta Google con Drive.',
+        code: raw
+      });
+      return state.status;
+    }).finally(() => { state.connecting = null; });
+    return state.connecting;
   }
 
   function callableNames() {
@@ -50,29 +112,33 @@
   }
 
   function probe(force) {
+    if (!tokenFresh()) {
+      if (state.accessToken) clearToken({ available: false, status: 'oauth_expired', message: 'La autorización de Google Drive venció. Vuelve a conectar Drive.' });
+      else if (!state.status || !/^oauth_|google_provider/.test(String(state.status.status || ''))) {
+        state.status = { available: false, status: 'oauth_required', message: 'Conecta una cuenta Google con acceso al Drive de A&S.' };
+      }
+      return Promise.resolve(state.status);
+    }
     if (state.probing && !force) return state.probing;
     if (state.probed && !force) return Promise.resolve(state.status);
     const names = callableNames();
-    const payload = { tenantId: tenantId(), activeRole: activeRole() };
+    const payload = { tenantId: tenantId(), activeRole: activeRole(), googleAccessToken: state.accessToken };
     state.lastProbeAt = Date.now();
     state.probing = call(names.status, payload, names.region)
       .then(out => {
-        state.probed = !(out && out.status === 'unauthenticated');
+        state.probed = true;
         state.status = Object.assign(
-          { available: false, status: 'pendiente_conexion', message: 'Drive no disponible.' },
+          { available: false, status: 'sin_permiso_drive', message: 'Drive no disponible para esta cuenta Google.' },
           out || {}
         );
+        state.driveUserEmail = String(state.status.driveUserEmail || '');
+        if (state.status.status === 'oauth_expired') clearToken(state.status);
         return state.status;
       })
       .catch(error => {
         const raw = String(error && (error.code || error.message) || '');
-        state.probed = !/unauthenticated|auth/i.test(raw);
-        state.status = {
-          available: false,
-          status: 'pendiente_conexion',
-          message: 'No fue posible verificar la conexión de Drive.',
-          code: raw
-        };
+        if (/unauthenticated|oauth|token|401/i.test(raw)) clearToken({ available: false, status: 'oauth_expired', message: 'La autorización de Google Drive venció. Vuelve a conectar Drive.', code: raw });
+        else state.status = { available: false, status: 'sin_permiso_drive', message: 'No fue posible validar el acceso al Drive de A&S.', code: raw };
         return state.status;
       })
       .finally(() => { state.probing = null; });
@@ -95,6 +161,7 @@
   }
 
   async function upload(file, extra) {
+    if (!tokenFresh()) return { ok: false, status: 'oauth_required', message: 'Conecta Drive antes de cargar documentos.' };
     const status = await probe(true);
     if (!status || status.available !== true) {
       return {
@@ -117,7 +184,8 @@
       name: file.name || (extra && extra.nombre) || 'Documento',
       mimeType: file.type || 'application/octet-stream',
       size: file.size || 0,
-      base64
+      base64,
+      googleAccessToken: state.accessToken
     });
     try {
       const out = await call(names.upload, payload, names.region);
@@ -127,6 +195,7 @@
       return out;
     } catch (error) {
       const raw = String(error && (error.code || error.message) || '');
+      if (/oauth|token|401|unauthenticated/i.test(raw)) clearToken({ available: false, status: 'oauth_expired', message: 'La autorización de Google Drive venció. Vuelve a conectar Drive.', code: raw });
       return {
         ok: false,
         status: /permission-denied/i.test(raw) ? 'sin_permiso' : /not-found/i.test(raw) ? 'sin_referencia' : 'no_disponible',
@@ -153,13 +222,17 @@
   const provider = {
     resolve,
     upload,
+    connect,
+    disconnect: () => clearToken(),
     uploadStatus: () => {
-      const stale = Date.now() - state.lastProbeAt > 5000;
-      if (!state.probing && (!state.probed || (state.status.available !== true && stale))) setTimeout(() => probe(true), 0);
-      return Object.assign({}, state.status);
+      const stale = Date.now() - state.lastProbeAt > 30000;
+      if (tokenFresh() && !state.probing && (!state.probed || (state.status.available !== true && stale))) setTimeout(() => probe(true), 0);
+      return Object.assign({}, state.status, { connected: tokenFresh(), driveUserEmail: state.driveUserEmail });
     },
     probe,
     repository: 'Google Drive',
+    oauthDelegated: true,
+    tokenPersistence: 'memory_only',
     maxBytes: 15 * 1024 * 1024,
     previewIsolated: isPreview()
   };
@@ -167,7 +240,7 @@
   function register() {
     if (!Orbit.secureResources || typeof Orbit.secureResources.registerDocumentProvider !== 'function') return false;
     Orbit.secureResources.registerDocumentProvider(provider);
-    setTimeout(() => probe(false), 0);
+    if (tokenFresh()) setTimeout(() => probe(false), 0);
     return true;
   }
 
@@ -180,14 +253,18 @@
   }
 
   document.addEventListener('orbit:active-role-changed', () => probe(true));
-  window.addEventListener('focus', () => { if (!state.probed) probe(false); });
+  window.addEventListener('focus', () => { if (tokenFresh() && !state.probed) probe(false); });
 
   Orbit.productDriveDocumentProviderP0 = Object.freeze({
-    VERSION: 'b2-r15-20260927.1',
+    VERSION: 'b2-r15-20260927.2-oauth',
+    connect,
+    disconnect: () => clearToken(),
     probe,
     upload,
-    status: () => Object.assign({}, state.status),
+    status: () => Object.assign({}, state.status, { connected: tokenFresh(), driveUserEmail: state.driveUserEmail }),
     previewIsolated: isPreview(),
+    oauthDelegated: true,
+    tokenPersistence: 'memory_only',
     repository: 'Google Drive'
   });
 })();
