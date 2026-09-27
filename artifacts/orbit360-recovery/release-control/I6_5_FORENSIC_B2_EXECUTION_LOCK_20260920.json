@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -288,13 +288,13 @@
     "preservesB1": true
   },
   "preview": {
-    "sourceSha": "a5bccd0629e45367acb4f7abda95d0b49b20aa06",
-    "buildId": "gi-i65-b2-a5bccd0629e4-57f234755dc1",
-    "channelId": "gi-i65-b2-36326461369",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36326461369-maj7of9b.web.app",
-    "runId": 36326461369,
-    "artifactId": 10934038069,
-    "artifactDigest": "696e77a28bd760588f446e7d2760ac212d1f009950971b45ef4cbda94aff95f8",
+    "sourceSha": "4e4771b57abcb6ced64034f81d9b609523b3433f",
+    "buildId": "gi-i65-b2-4e4771b57abc-57f234755dc1",
+    "channelId": "gi-i65-b2-36333357439",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36333357439-btpcl8fl.web.app",
+    "runId": 36333357439,
+    "artifactId": 10937055696,
+    "artifactDigest": "2717c455df0789259fe81bbf81d31d7cf9179133a5431017498a41d2277661b7",
     "exactReadback": true,
     "functionalPass": true,
     "livePromoted": false
@@ -302,10 +302,10 @@
   "authenticatedPreviewProof": {
     "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "a5bccd0629e45367acb4f7abda95d0b49b20aa06",
-    "exactPreviewBuildId": "gi-i65-b2-a5bccd0629e4-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36326461369-maj7of9b.web.app",
-    "exactPreviewArtifactId": 10934038069,
+    "exactPreviewSourceSha": "4e4771b57abcb6ced64034f81d9b609523b3433f",
+    "exactPreviewBuildId": "gi-i65-b2-4e4771b57abc-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36333357439-btpcl8fl.web.app",
+    "exactPreviewArtifactId": 10937055696,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": false,
