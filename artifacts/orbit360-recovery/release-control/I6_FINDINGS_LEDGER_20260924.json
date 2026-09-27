@@ -22,7 +22,7 @@
     "total": 136,
     "b2HumanFindings": 52,
     "currentBlocking": 42,
-    "countingNote": "Conservative carry-forward: prior frozen counts plus R15 and explicit R15A cross-module delete rule. No blocker is removed without explicit closure evidence."
+    "countingNote": "Conservative carry-forward preserved. R73–R82 are source-fixed but remain blocking until exact Preview proof; R77/R81 additionally require human Google Drive OAuth upload/readback proof. No blocker removed."
   },
   "findings": [
     {
@@ -2353,11 +2353,17 @@
       "finding": "Mobile header shows Gravicentra Insurance instead of configured tenant brand/logo.",
       "rootCause": "base.css hides .tb-logo at max-width:880px while public-tenant-branding renders tenant logo into .tb-logo; product brand remains visible.",
       "requiredProof": "On mobile and desktop, tenant brand/logo is visible according to approved shell hierarchy without losing Gravicentra product identity where applicable.",
-      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "sourceFixDate": "2026-09-27",
+      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+      "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true
     },
     {
       "id": "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
@@ -2369,11 +2375,17 @@
       "finding": "Cliente 360 mobile list exposes filters but no free-text search.",
       "rootCause": "Cliente360 list search reuses .tb-search; global mobile CSS hides .tb-search at max-width:980px.",
       "requiredProof": "Cliente360 free-text search remains visible and usable on mobile and desktop, without changing topbar mobile-search behavior.",
-      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "sourceFixDate": "2026-09-27",
+      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+      "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true
     },
     {
       "id": "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
@@ -2385,11 +2397,17 @@
       "finding": "Cliente360 Renewals tab overflows horizontally and content/actions are clipped on mobile.",
       "rootCause": "tabRenov renders fixed-width flex children (120px + flexible bar + 150px + badge + button) without a mobile wrap/grid contract.",
       "requiredProof": "Renewal row and actions fit mobile viewport with no clipped business information or action.",
-      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "sourceFixDate": "2026-09-27",
+      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+      "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true
     },
     {
       "id": "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -2401,11 +2419,17 @@
       "finding": "Management requested from Cliente360/Renewals does not use the same complete Ops management editor.",
       "rootCause": "Orbit.ciclo.solicitarGestion uses a separate request modal while Ops +Gestión creates a generic record and then opens openGestion; creation semantics/UI are split.",
       "requiredProof": "Cliente360, Policy, Renewals, Portal and Ops all open one canonical management creation/editor surface with contextual prefill and create one canonical gestion record.",
-      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "sourceFixDate": "2026-09-27",
+      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+      "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true
     },
     {
       "id": "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
@@ -2417,11 +2441,21 @@
       "finding": "Management request UI offers file attachment.",
       "rootCause": "solicitarGestion explicitly stores only file name/size in adjuntos and does not persist binary/document repository reference.",
       "requiredProof": "Attached support is durably stored in the approved documentary repository, linked by metadata/provenance to the gestion, opens after reload, and does not expose a false upload success.",
-      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_AND_HUMAN_DRIVE_OAUTH_PROOF",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "sourceFixDate": "2026-09-27",
+      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+      "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true,
+      "documentRepository": "Google Drive",
+      "documentAuth": "DELEGATED_USER_OAUTH_MEMORY_ONLY",
+      "humanOAuthProofRequired": true,
+      "serviceAccountDriveOwnership": false
     },
     {
       "id": "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
@@ -2433,11 +2467,17 @@
       "finding": "User requires ability to remove an erroneously created management; current management detail exposes archive but no delete/remove action.",
       "rootCause": "openGestion actions include resolve/reopen/client/archive, with no authorized remove path.",
       "requiredProof": "Authorized user can remove an erroneous management from active Ops with confirmation, audit/tombstone semantics and canonical readback; no silent orphaned relations.",
-      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "sourceFixDate": "2026-09-27",
+      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+      "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true
     },
     {
       "id": "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
@@ -2449,11 +2489,17 @@
       "finding": "A renewable policy expiring within the already-used renewal window lacks an active Renew action on policy detail.",
       "rootCause": "Canonical 0–45 day renewal criterion exists in CRM/policies list, but policy full-detail owner does not expose equivalent renewal entrypoint.",
       "requiredProof": "Renewable policies at 0–45 days show the canonical renewal action on policy detail; outside-window/non-renewable behavior is explicit and consistent.",
-      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "sourceFixDate": "2026-09-27",
+      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+      "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true
     },
     {
       "id": "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
@@ -2465,11 +2511,18 @@
       "finding": "Policy detail offers three vehicle candidates that visually represent the same vehicle/history.",
       "rootCause": "policy-receipts-v1199-detail-guard vehicleCandidates deduplicates only by raw record id; historical/lineage-equivalent records with normalized same plate remain separate candidates.",
       "requiredProof": "Linker shows one canonical current vehicle per normalized identity/lineage with prior vigencies preserved as history; no reimport.",
-      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "sourceFixDate": "2026-09-27",
+      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+      "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true,
+      "prevailingProjectionRule": "ONE_CANONICAL_CURRENT_CANDIDATE_PER_NORMALIZED_IDENTITY_WITH_DISTINCT_PHYSICAL_HISTORY_PRESERVED_OUTSIDE_CANDIDATE_DUPLICATES"
     },
     {
       "id": "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
@@ -2481,11 +2534,21 @@
       "finding": "Cliente360 offers Importar a este expediente and documentary mode claims files are stored/visible.",
       "rootCause": "importa.js documentary path advances directly to completion and performs no durable raw-file storage write; intelligent mode extracts data but does not retain the raw document.",
       "requiredProof": "Client document upload stores the raw file in the approved documentary repository (Drive), records durable link/provenance in the client expediente, survives reload, and remains distinct from data extraction proposals.",
-      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_AND_HUMAN_DRIVE_OAUTH_PROOF",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "sourceFixDate": "2026-09-27",
+      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+      "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true,
+      "documentRepository": "Google Drive",
+      "documentAuth": "DELEGATED_USER_OAUTH_MEMORY_ONLY",
+      "humanOAuthProofRequired": true,
+      "serviceAccountDriveOwnership": false
     },
     {
       "id": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
@@ -2498,11 +2561,17 @@
       "rootCause": "Los módulos implementan CRUD y borrado de forma fragmentada; algunos tienen eliminación especializada, otros solo archivar y otros ninguna acción. No existe un owner canónico transversal de eliminación durable y segura.",
       "remediation": "Crear owner canónico de borrado lógico durable con permisos/scope/motivo/readback y entrypoints visibles en cada módulo administrable, conservando borrado físico solo donde sea relacionalmente seguro.",
       "requiredProof": "Eliminar visible/operable según permiso en todos los módulos administrables; persistencia tras reload; registros dependientes fail-closed o soft-delete sin huérfanos; actor/motivo/fecha conservados.",
-      "status": "OPEN_R15A_CAUSAL_REMEDIATION",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15A_CROSS_MODULE_DELETE_RULE_20260927.json",
       "receiptBlobSha": "e8456913dfedd0058743f1a66f7c42557aa06a68",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "sourceFixDate": "2026-09-27",
+      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+      "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true
     }
   ],
   "phaseBBacklog": [
@@ -2544,7 +2613,7 @@
     "date": "2026-09-27",
     "recordedAt": "2026-09-27T06:23:00-06:00",
     "origin": "PAULA_MOBILE_UAT_R15_20260927",
-    "decision": "PAULA_VISUAL_REJECTED_R15_PLUS_DELETE_RULE_R15A_REMEDIATION_REQUIRED",
+    "decision": "R15_R15A_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36288967976-k58tfgn7.web.app",
     "exactSourceSha": "dab677e937f9586195e3e79b94d5b91c397f0841",
     "exactBuildId": "gi-i65-b2-dab677e937f9-57f234755dc1",
@@ -2578,7 +2647,11 @@
     "noLive": true,
     "noReimport": true,
     "r15aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15A_CROSS_MODULE_DELETE_RULE_20260927.json",
-    "r15aReceiptBlobSha": "e8456913dfedd0058743f1a66f7c42557aa06a68"
+    "r15aReceiptBlobSha": "e8456913dfedd0058743f1a66f7c42557aa06a68",
+    "exactPreviewRequired": true,
+    "humanDriveOAuthProofRequired": true,
+    "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+    "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5"
   },
   "lastReview": {
     "date": "2026-09-26",
