@@ -396,4 +396,4 @@ async function uploadProductAsset(request, previewOnly) {
 exports.orbit360ProductAssetUpload = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>uploadProductAsset(request,false));
 exports.orbit360ProductAssetUploadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>uploadProductAsset(request,true));
 exports.orbit360ProductOperationalCommand = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, execute);
-exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE });
+exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE, authorize, withinScope, canonicalRef, text, cleanId });
