@@ -19,10 +19,10 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 136,
-    "b2HumanFindings": 52,
-    "currentBlocking": 42,
-    "countingNote": "Conservative carry-forward preserved. R73–R82 are source-fixed but remain blocking until exact Preview proof; R77/R81 additionally require human Google Drive OAuth upload/readback proof. No blocker removed."
+    "total": 137,
+    "b2HumanFindings": 53,
+    "currentBlocking": 43,
+    "countingNote": "Conservative carry-forward preserved. R73–R82 remain blocking until exact Preview proof/closure; R77/R81 require human Drive proof. R83 is source-fixed but blocking pending new exact Preview and human download retest. No blocker removed."
   },
   "findings": [
     {
@@ -2548,7 +2548,11 @@
       "documentRepository": "Google Drive",
       "documentAuth": "DELEGATED_USER_OAUTH_MEMORY_ONLY",
       "humanOAuthProofRequired": true,
-      "serviceAccountDriveOwnership": false
+      "serviceAccountDriveOwnership": false,
+      "humanDriveUploadVisible": true,
+      "humanOpenInDrivePass": true,
+      "previewIsolationDriveReadback": true,
+      "reloadPersistenceStillRequired": true
     },
     {
       "id": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
@@ -2572,6 +2576,27 @@
       "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
       "closureState": "NOT_CLOSED",
       "previewProofRequired": true
+    },
+    {
+      "id": "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260927",
+      "surface": "Cliente360/DocumentViewer/GoogleDrive",
+      "classification": "PRODUCT_DEFECT_DRIVE_DOWNLOAD_PROVIDER_CAPABILITY_MISSING",
+      "blocking": true,
+      "finding": "Documento subido y abierto correctamente en Google Drive, pero la acción Descargar del visor no produce descarga.",
+      "rootCause": "document-viewer habilita descarga solo cuando el proveedor expone downloadAvailable y secureResources puede invocar provider.download(); product-drive-document-provider-p0.js no implementaba download() ni exponía esa capacidad.",
+      "remediation": "Implementar descarga autenticada con token OAuth delegado en memoria, lectura alt=media de Drive y handoff mediante anchor download; exponer downloadAvailable solo con referencia Drive válida y token fresco.",
+      "requiredProof": "En nueva Preview exacta, mismo documento sintético: Conectar Drive, abrir visor, Descargar produce archivo local verificable; Abrir en Drive continúa funcionando; sin persistir token; aislamiento Preview preservado.",
+      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_HUMAN_RETEST",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15B_DRIVE_DOWNLOAD_FINDING_20260927.json",
+      "noLive": true,
+      "noReimport": true,
+      "sourceFixCommit": "10f03257590eb0ab73952e63ff0296a20bcfeabb",
+      "contractGuardCommit": "328018188f582c57494ac77ac373484664632d5d",
+      "closureState": "NOT_CLOSED",
+      "previewProofRequired": true,
+      "humanProofRequired": true
     }
   ],
   "phaseBBacklog": [
