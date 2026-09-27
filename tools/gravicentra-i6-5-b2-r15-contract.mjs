@@ -68,6 +68,10 @@ has(driveClient,"tokenPersistence: 'memory_only'",'R77_DRIVE_TOKEN_PERSISTENCE_N
 need(driveClient.includes('authMod.signInWithPopup')||driveClient.includes('authMod.linkWithPopup'),'R77_DRIVE_USER_CONSENT_FLOW_MISSING');
 need(!driveClient.includes('authMod.linkWithPopup(user, provider)'),'R77_PRIMARY_FIREBASE_IDENTITY_MUST_NOT_BE_LINKED_TO_DRIVE_OAUTH');
 need(!driveClient.includes('service-account credentials'),'R77_STALE_SERVICE_ACCOUNT_PROVIDER_COPY');
+has(driveClient,'async function download(ref)','R83_DRIVE_DOWNLOAD_PROVIDER_MISSING');
+has(driveClient,"alt=media&supportsAllDrives=true",'R83_DRIVE_DOWNLOAD_MEDIA_PATH_MISSING');
+has(driveClient,'downloadAvailable','R83_DRIVE_DOWNLOAD_CAPABILITY_MISSING');
+has(driveClient,'a.download =','R83_DRIVE_DOWNLOAD_BROWSER_HANDOFF_MISSING');
 
 has(driveBackend,'function googleToken(input)','R77_DRIVE_DELEGATED_TOKEN_REQUIRED');
 has(driveBackend,'driveIdentity(accessToken)','R77_DRIVE_IDENTITY_READBACK_MISSING');
@@ -79,7 +83,7 @@ need(!driveBackend.includes('serviceAccount:SERVICE_ACCOUNT'),'R77_SERVICE_ACCOU
 console.log(JSON.stringify({
   status:'PASS',
   contract:'I6.5-B2-R15-R15A',
-  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82'],
+  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83'],
   drive:{repository:'Google Drive',auth:'delegated-user-oauth',tokenPersistence:'memory_only',readbackRequired:true},
   delete:{ui:'Eliminar',default:'durable-soft-delete',relationalSafety:'fail-closed'},
   renewalWindowDays:45
