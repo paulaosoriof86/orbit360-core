@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "87b7b5b82971c2095aafa1f27ac2f7f6c6df1151",
+    "b2ExecutionLockBlobSha": "9928b1845fbccf5104924cf236f140f543c52557",
     "b2": {
       "status": "PAULA_VISUAL_REJECTED_R15_REMEDIATION_REQUIRED",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2358,7 +2358,7 @@
       "lastAuthenticatedFailureSupersededByPassRunId": 36289840679,
       "r15ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "r15ReceiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
-      "r15FindingLedgerBlobSha": "1f9d19f641ad449f3e3588c371af2d955a1649c0",
+      "r15FindingLedgerBlobSha": "42a630ada59460231d4560e41f0229a75e60ed45",
       "r15BlockingFindingIds": [
         "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
         "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
@@ -2491,7 +2491,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "cdb5989fbf7255629ba8c5399fbf92971525d059",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "1f9d19f641ad449f3e3588c371af2d955a1649c0",
+    "findingLedgerBlobSha": "42a630ada59460231d4560e41f0229a75e60ed45",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
