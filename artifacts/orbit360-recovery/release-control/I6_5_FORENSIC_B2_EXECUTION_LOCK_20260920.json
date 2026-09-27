@@ -1845,10 +1845,9 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "NEW_EXACT_PREVIEW_READBACK",
-    "AUTHENTICATED_RUNTIME_REPROOF",
     "PAULA_VISUAL_ACCEPTANCE",
-    "HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_PROOF"
+    "HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_PROOF",
+    "DRIVE_QA_FIXTURE_CLEANUP"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -2961,5 +2960,19 @@
     "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "exactPreviewProofPending": true
   },
-  "boundaryNote": "R15/R15A cumulative source includes definitive Preview Drive folder isolation: synthetic client folder, uploaded document and persisted synthetic client Drive link must remain under _GRAVICENTRA_PREVIEW_QA. Prior authenticated pass is preserved as historical evidence but superseded for R77/R81 by this causal source fix. No LIVE, no B3, no reimport."
+  "boundaryNote": "R15/R15A cumulative source includes definitive Preview Drive folder isolation: synthetic client folder, uploaded document and persisted synthetic client Drive link must remain under _GRAVICENTRA_PREVIEW_QA. Prior authenticated pass is preserved as historical evidence but superseded for R77/R81 by this causal source fix. No LIVE, no B3, no reimport.",
+  "driveHumanFixture": {
+    "status": "AUTHORIZED_PENDING_RUN",
+    "purpose": "R77_R81_HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_PROOF",
+    "exactPreviewSourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
+    "exactPreviewBuildId": "gi-i65-b2-367c839a92aa-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36334556509-xmcb0vbv.web.app",
+    "syntheticClientId": "b2-drive-human-36334556509",
+    "syntheticOnly": true,
+    "realClientMutationAuthorized": false,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "cleanupMandatory": true
+  }
 }

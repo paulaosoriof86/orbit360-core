@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "ce768a0aa3ff4032ecfe10a35c16512432abc3ee",
+    "b2ExecutionLockBlobSha": "399da3c962155f21886e02ddfa1341b5db0188a6",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2480,7 +2480,21 @@
       "previewValidatorRepairCommit": "2078cf8278969756f878dff0768d88a59f7247cf",
       "previewValidatorRepairClass": "HARNESS_ONLY_STALE_OAUTH_CONSENT_ASSERTION",
       "humanDriveOAuthProofPending": true,
-      "drivePreviewIsolationFix": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW"
+      "drivePreviewIsolationFix": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+      "driveHumanFixture": {
+        "status": "AUTHORIZED_PENDING_RUN",
+        "purpose": "R77_R81_HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_PROOF",
+        "exactPreviewSourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
+        "exactPreviewBuildId": "gi-i65-b2-367c839a92aa-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36334556509-xmcb0vbv.web.app",
+        "syntheticClientId": "b2-drive-human-36334556509",
+        "syntheticOnly": true,
+        "realClientMutationAuthorized": false,
+        "noLive": true,
+        "noB3": true,
+        "noReimport": true,
+        "cleanupMandatory": true
+      }
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
