@@ -1,0 +1,70 @@
+{
+  "schema": "gravicentra-i6-5-b2-r15b-drive-human-proof-and-download-defect-v1",
+  "date": "2026-09-27",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "exactPreview": {
+    "sourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
+    "buildId": "gi-i65-b2-367c839a92aa-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36334556509-xmcb0vbv.web.app",
+    "runId": 36334556509
+  },
+  "syntheticFixture": {
+    "clientId": "b2-drive-human-36334556509",
+    "clientName": "B2 QA · PRUEBA DRIVE HUMANA · NO USAR",
+    "expectedDrivePath": "_GRAVICENTRA_PREVIEW_QA/b2-drive-human-36334556509",
+    "realClientMutation": false
+  },
+  "humanEvidence": {
+    "reviewer": "Paula",
+    "viewport": "mobile",
+    "googleOauthConnected": true,
+    "uploadVisibleInCliente360": true,
+    "openInDrive": true,
+    "observedFileName": "GRAVICENTRA_B2_DRIVE_QA_2026-09-27.txt",
+    "inlinePreviewAvailable": false,
+    "downloadAttempted": true,
+    "downloadSucceeded": false,
+    "note": "Abrir en Drive funciona; Descargar no produjo descarga."
+  },
+  "independentDriveReadback": {
+    "fileExists": true,
+    "mimeType": "text/plain",
+    "sizeBytes": 173,
+    "canDownload": true,
+    "directParentMatchesSyntheticClientFolder": true,
+    "syntheticClientFolderExists": true,
+    "syntheticClientFolderParentIsPreviewQaRoot": true,
+    "previewQaRootName": "_GRAVICENTRA_PREVIEW_QA",
+    "pathIsolationVerified": true,
+    "rawDriveIdsStoredInPublicReceipt": false
+  },
+  "diagnosis": {
+    "classification": "PRODUCT_DEFECT_DRIVE_DOWNLOAD_PROVIDER_CAPABILITY_MISSING",
+    "findingId": "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
+    "owner": "orbit360-platform/core/product-drive-document-provider-p0.js",
+    "viewerContract": "orbit360-platform/core/document-viewer.js enables Descargar only when resolved.downloadAvailable is true and secureResources can call provider.download().",
+    "rootCause": "The active Google Drive provider exposes resolve/upload/connect but no download() implementation and did not expose downloadAvailable. Drive itself reports the uploaded file as downloadable.",
+    "notPermissionFailure": true,
+    "notMobileDeviceFailure": true
+  },
+  "remediation": {
+    "sourceFixCommit": "10f03257590eb0ab73952e63ff0296a20bcfeabb",
+    "contractGuardCommit": "328018188f582c57494ac77ac373484664632d5d",
+    "implementation": "Delegated in-memory OAuth token downloads bytes from Drive API alt=media, hands off through a browser download anchor, and exposes downloadAvailable only while the token is fresh.",
+    "sourceChanged": true,
+    "newExactPreviewRequired": true,
+    "humanDownloadRetestRequired": true
+  },
+  "closure": {
+    "r81ClientDocumentUploadOpen": "PARTIAL_PASS",
+    "r81ReloadPersistence": "PENDING_TECHNICAL_READBACK_OR_EXPLICIT_HUMAN_RELOAD_PROOF",
+    "r77ManagementAttachment": "NOT_PROVEN_BY_THIS_TEST",
+    "r83Download": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_HUMAN_RETEST",
+    "cleanup": "HOLD_UNTIL_NEW_PREVIEW_RETEST",
+    "b2Closed": false,
+    "b3Opened": false,
+    "livePromoted": false,
+    "reimport": false
+  }
+}
