@@ -105,7 +105,16 @@ need(files.issuance.includes('async function advanceRequest')&&files.issuance.in
 need(files.issuanceRefinements.includes('I.advanceRequest = async function')&&files.issuanceRefinements.includes('return await originalAdvance')&&files.issuanceRefinements.includes('I.issueRequest = async function')&&files.issuanceRefinements.includes('return await originalIssue'),'B2_ISSUANCE_REFINEMENTS_NOT_ASYNC');
 need(files.issuanceBridge.includes('await I.createRequest')&&files.issuanceBridge.includes('await I.advanceRequest'),'B2_ISSUANCE_UI_CREATE_ADVANCE_NOT_AWAITED');
 const proposalOwner=(files.renewals.match(/async function solicitarPropuestas\(policyId\)[\s\S]*?\n  function cotizarDirecto/)||[])[0]||'';
-need(proposalOwner&&proposalOwner.includes("workflowType:'renewal_proposals'")&&proposalOwner.includes("await Orbit.ciclo.crearGestionDurable")&&proposalOwner.includes("location.hash='#/ops'")&&!proposalOwner.includes("location.hash='#/cotizador"),'B2_R9_RENEWAL_PROPOSALS_MUST_CREATE_OPS_NOT_QUOTER');
+need(
+  proposalOwner&&
+  proposalOwner.includes("workflowType:'renewal_proposals'")&&
+  proposalOwner.includes("Orbit.ciclo.managementCreateModal")&&
+  proposalOwner.includes("openAfterCreate:false")&&
+  proposalOwner.includes("location.hash='#/ops'")&&
+  !proposalOwner.includes("crearGestionDurable")&&
+  !proposalOwner.includes("location.hash='#/cotizador"),
+  'B2_R9_RENEWAL_PROPOSALS_MUST_CREATE_OPS_NOT_QUOTER'
+);
 need(files.renewals.includes('function cotizarDirecto(policyId)')&&files.renewals.includes("A.can('renovaciones','edit')")&&files.renewals.includes("A.esAsesor"),'B2_R9_DIRECT_QUOTE_ROLE_GATE_MISSING');
 need(files.renewals.includes('function registrarAceptacion(policyId)')&&files.renewals.includes("workflowType:'renewal_accepted'")&&files.renewals.includes("acceptedConfirmed:true"),'B2_R9_RENEWAL_ACCEPTED_MANAGEMENT_MISSING');
 need(files.issuanceBridge.includes("Orbit.modules.renovaciones.registrarAceptacion")&&files.issuanceBridge.includes('Solicitar emisión a aseguradora')&&files.issuanceBridge.includes('Registrar renovación en sistema'),'B2_R9_CLIENT_OPS_RENEWAL_BRANCHES_MISSING');
