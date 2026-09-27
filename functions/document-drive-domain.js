@@ -162,6 +162,22 @@ async function upload(request,previewOnly){
   const readback=await getMeta(uploaded.id,accessToken);
   if(!readback||readback.id!==uploaded.id||readback.trashed===true)throw new HttpsError('internal','Drive no confirmó el archivo.');
 
+  const canonicalFolderUrl='https://drive.google.com/drive/folders/'+clientFolderId;
+  try{
+    await target.ref.set({
+      driveFolderId:clientFolderId,
+      driveLink:canonicalFolderUrl,
+      driveUrl:canonicalFolderUrl,
+      driveRepository:'Google Drive',
+      driveLinkedAt:new Date().toISOString()
+    },{merge:true});
+    const folderReadback=await target.ref.get();
+    const folderRow=folderReadback.exists?(folderReadback.data()||{}):{};
+    if(clean(folderRow.driveFolderId,160)!==clientFolderId)throw new Error('DRIVE_CLIENT_FOLDER_READBACK_MISMATCH');
+  }catch(error){
+    throw new HttpsError('internal','Drive guardó el archivo, pero no se confirmó el vínculo documental del cliente.');
+  }
+
   return {
     ok:true,
     status:'disponible',
@@ -174,7 +190,7 @@ async function upload(request,previewOnly){
     externalUrl:uploaded.webViewLink||readback.webViewLink||('https://drive.google.com/file/d/'+uploaded.id+'/view'),
     folderId:destination.id,
     clientFolderId,
-    clientFolderUrl:'https://drive.google.com/drive/folders/'+clientFolderId,
+    clientFolderUrl:canonicalFolderUrl,
     contentHash,
     repository:'Google Drive',
     actorUid:actor.uid,
