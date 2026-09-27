@@ -50,7 +50,7 @@ need(files.opsBackend.includes('enrichManagementContext')&&files.opsBackend.incl
 need(files.renewals.includes("renewal-proposals-v1200")&&files.renewals.includes("La gestión se creará <b>solo al confirmar</b>"),'B2_R68_PROPOSALS_PREMATURE_CREATE_FIX_MISSING');
 need(files.issuanceBridge.includes("renewalDefaultPayments")&&files.issuanceBridge.includes("Comparar / enviar propuestas")&&files.issuanceBridge.includes("Registrar retroalimentación"),'B2_R69_RENEWAL_OPS_UAT_CONTROLS_MISSING');
 need(files.issuance.includes("soporte_renovacion_en_firme_invalido"),'B2_R70_FIRM_RENEWAL_SUPPORT_VALIDATION_MISSING');
-need(files.engine.includes("if (explicit > 0) return Math.max(1, Math.min(24, explicit));"),'B2_R69_RECEIPT_COUNT_EDITABILITY_MISSING');
+need(files.issuanceBridge.includes("renewalDefaultPayments")&&files.engine.includes("if (monthly) return Math.max(1, Math.min(24, +requested || configured || 12));"),'B2_R69_RECEIPT_COUNT_EDITABILITY_MISSING');
 need(files.ciclo.includes("No se pudo guardar el cambio del checklist.")&&files.ciclo.includes("if (e.target === back) { e.preventDefault(); e.stopPropagation(); }"),'B2_R71_OPS_MODAL_CHECKLIST_GUARD_MISSING');
 need(files.operationalStore.includes('WORKFLOW_PREVIEW_COMMAND')&&files.operationalStore.includes("action==='insert')requireServerReadback"),'B2_R4_OPS_PREVIEW_ROUTING_READBACK_MISSING');
 need(files.client.includes('vehicleLineageRoot')&&files.client.includes('data-vehicle-identity-incomplete')&&files.client.includes('versionOfVehicleId'),'B2_R5_VEHICLE_HISTORY_PRESENTATION_MISSING');
