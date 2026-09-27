@@ -13,7 +13,7 @@
     "antiDesync": "artifacts/orbit360-recovery/release-control/I6_RELEASE_MECHANISM_ANTI_DESYNC_LOCK_20260918.json",
     "addendum": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_ADDENDUM_20260919.md",
     "b2ExecutionLock": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "b29f9cd99997ec17040f2816f17671705d2c9e68"
+    "b2ExecutionLockBlobSha": "8ba4281fa9a44a828db4f35383850831ed8f5346"
   },
   "candidateRule": "ONE_PHYSICAL_ACCUMULATIVE_INCREMENTAL_CANDIDATE_WITH_MACHINE_AUTHORITATIVE_COMPOSITION",
   "executionRule": "SEARCH_CURRENT_REPO_FOR_APPROVED_EXISTING_CAPABILITY_FIRST; IF THE FINAL APPROVED OWNER/IMPLEMENTATION IS LOCATED, CONNECT/REUSE IT; IF SEARCH COST EXCEEDS DIRECT CAUSAL REIMPLEMENTATION, FIX THE CURRENT CANONICAL OWNER DIRECTLY WITHOUT OPENING A PARALLEL OWNER. NEVER SUBSTITUTE AN OLDER MODULE PACKAGE.",
@@ -210,7 +210,7 @@
     "futureChangeRule": "Every product-source change and its composition manifest update must land atomically; otherwise no build/Preview.",
     "ownerRule": "Every modified capability declares the effective runtime owner; after change, prove no older owner shadows it.",
     "findingRule": "A finding can leave the active ledger only as CLOSED_PASS or explicitly authorized DEFERRED/NOT_APPLICABLE with evidence.",
-    "compositionLockBlobSha": "1b0cd65b767e254be7825bd03ef52a4dfa94bd8f",
+    "compositionLockBlobSha": "34be4524e40db6606f042124e86c23a17c335a1a",
     "findingLedgerBlobSha": "b843a3a5e61eec14a8291917d17225af5e69b54d"
   },
   "findingControl": {
@@ -288,7 +288,8 @@
     "currentB2OnlyHumanVisualRemaining": false,
     "r3CausalReadOnlyAuditRequired": true,
     "r3SingleCumulativeFixRequired": true,
-    "r15R15aCandidateReadyForExactPreview": true
+    "r15R15aCandidateReadyForExactPreview": true,
+    "r15DrivePreviewIsolationFixPendingExactPreview": true
   },
   "antiInterruptionExecution": {
     "status": "FROZEN_ACTIVE",

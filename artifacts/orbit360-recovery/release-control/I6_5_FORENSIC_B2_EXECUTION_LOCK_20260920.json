@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -300,7 +300,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PASS",
+    "status": "SUPERSEDED_BY_DRIVE_PREVIEW_ISOLATION_FIX",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "4e4771b57abcb6ced64034f81d9b609523b3433f",
     "exactPreviewBuildId": "gi-i65-b2-4e4771b57abc-57f234755dc1",
@@ -485,7 +485,7 @@
     "lastFailureClassification": "POST_RELOAD_BROWSER_VISIBILITY_TIMEOUT",
     "productRegressionDemonstrated": true,
     "requiredNewHarnessBlob": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
-    "priorPassRunId": 36289840679,
+    "priorPassRunId": 36333852637,
     "priorPassPreserved": true,
     "proofStrengtheningReason": "R59_VISIBLE_PLATE_UNIQUENESS_AND_ACTIVE_POLICY_COVERAGE",
     "invalidatedOldPreviewRunId": 36260454531,
@@ -508,7 +508,8 @@
       "repairCommit": "ab27af93192a3cb414a0eeb26126503dfb207b04"
     },
     "humanDriveOAuthProofRequired": true,
-    "driveOAuthExpected": "DELEGATED_USER_OAUTH_MEMORY_ONLY"
+    "driveOAuthExpected": "DELEGATED_USER_OAUTH_MEMORY_ONLY",
+    "invalidationReason": "Preview Drive path could create synthetic client folder outside _GRAVICENTRA_PREVIEW_QA before upload."
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -1844,18 +1845,10 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R15_R15A_SOURCE_CONTRACT_PASS",
-    "R15_NEW_IMMUTABLE_PREVIEW_EXACT_READBACK",
-    "R15_AUTHENTICATED_RUNTIME_PASS",
-    "R73_MOBILE_TENANT_BRAND_VISIBLE",
-    "R74_CLIENT360_MOBILE_SEARCH_VISIBLE",
-    "R75_CLIENT360_RENEWALS_ZERO_HORIZONTAL_OVERFLOW",
-    "R76_ONE_CANONICAL_OPS_MANAGEMENT_EDITOR",
-    "R77_R81_HUMAN_GOOGLE_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_READBACK",
-    "R78_R82_CROSS_MODULE_DELETE_ROLE_RELATION_READBACK",
-    "R79_POLICY_RENEWAL_0_45D_ENTRYPOINT",
-    "R80_ONE_CANONICAL_CURRENT_VEHICLE_CANDIDATE_HISTORY_PRESERVED",
-    "PAULA_FOCAL_VISUAL_REVIEW"
+    "NEW_EXACT_PREVIEW_READBACK",
+    "AUTHENTICATED_RUNTIME_REPROOF",
+    "PAULA_VISUAL_ACCEPTANCE",
+    "HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_PROOF"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -2948,7 +2941,7 @@
     "noLive": true,
     "noB3": true,
     "noReimport": true,
-    "next": "B2_R15_NEW_EXACT_IMMUTABLE_PREVIEW",
+    "next": "B2_R15_NEW_EXACT_IMMUTABLE_PREVIEW_AFTER_DRIVE_ISOLATION_FIX",
     "sourceFixed": true,
     "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "compositionLockBlobSha": "1b0cd65b767e254be7825bd03ef52a4dfa94bd8f",
@@ -2968,5 +2961,5 @@
     "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "exactPreviewProofPending": true
   },
-  "boundaryNote": "R15/R15A cumulative source is ready for a new immutable exact Preview. Drive upload is delegated OAuth, memory-only and preview-isolated; human OAuth/upload/open/reload proof remains required for R77/R81. No LIVE, no B3, no reimport."
+  "boundaryNote": "R15/R15A cumulative source includes definitive Preview Drive folder isolation: synthetic client folder, uploaded document and persisted synthetic client Drive link must remain under _GRAVICENTRA_PREVIEW_QA. Prior authenticated pass is preserved as historical evidence but superseded for R77/R81 by this causal source fix. No LIVE, no B3, no reimport."
 }

@@ -108,7 +108,7 @@
   ],
   "productFileBlobs": {
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
-    "functions/document-drive-domain.js": "1708a4b9dfe9b14d1766f054955f2a673cf176c5",
+    "functions/document-drive-domain.js": "7535f780b327f7fd56681ab4f0688721baea7f16",
     "functions/package.json": "818c95c932203134c1a516a3f665d589632f829a",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "3d55155d3fbc77263d0b3a7094d85e90476c3424",
@@ -198,8 +198,8 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "PAULA_MOBILE_UAT_R15_PLUS_TRANSVERSAL_DELETE_R15A",
-    "parentHead": "7632bb060679ed63a3fb7d125ceb394e3cef1718",
+    "origin": "PAULA_R15_R15A_PLUS_DRIVE_PREVIEW_ISOLATION",
+    "parentHead": "a01b355a1d5dca88ebf90bf2db7dd705f4d0a4f7",
     "candidateHead": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_HUMAN_DRIVE_OAUTH_PROOF",
     "changedProductFiles": [
@@ -248,6 +248,8 @@
     "humanOAuthProofRequired": true,
     "noDataReimport": true,
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "latestCausalFix": "PREVIEW_DRIVE_CLIENT_FOLDER_ISOLATED_UNDER_GRAVICENTRA_PREVIEW_QA",
+    "previewDocumentIsolation": "_GRAVICENTRA_PREVIEW_QA_ONLY"
   }
 }
