@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "c0d709e672ca7483c41925bc6ba0638750b94557",
+    "b2ExecutionLockBlobSha": "1d6eadd5ba3901261c4318828147ff1e4a8e8457",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2052,7 +2052,7 @@
       "artifactId": 10921173757,
       "exactReadback": true,
       "functionalPass": true,
-      "authenticatedPreviewProof": "FAIL_HARNESS_ONLY_PENDING_RERUN",
+      "authenticatedPreviewProof": "PASS",
       "authenticatedPreviewProofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "orphanSyntheticCleanup": "PASS",
       "timedOutAuthenticatedRunId": 35556007094,
@@ -2111,7 +2111,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "Exact B2 technical Preview remains unchanged. Authenticated proof is NOT PASS. nextAction VISUAL is the executor's required precondition for the authenticated gate; Paula visual review remains blocked until authenticated proof passes. No LIVE, no B3, no reimport.",
+      "boundaryNote": "B2 exact technical Preview and authenticated runtime proof PASS on the same product source/build/artifact. Harness-only clienteId defect was repaired without product-source mutation; run 36289840679 passed and cleanup removed 48 synthetics. Paula focal visual UAT remains required. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2121,7 +2121,7 @@
       "accessMatrixRootCause": "PROTECTED_ACCESS_CONFIG_ROLE_PERMISSIONS_EMPTY_AFTER_B1_MIGRATION",
       "accessConfigRecoveryAuthorized": true,
       "accessConfigRecoveryState": "RETRY_AUTHORIZED_AFTER_PHYSICAL_SCOPE_OMISSION_DEMONSTRATED",
-      "lastAuthenticatedRunId": 36288967976,
+      "lastAuthenticatedRunId": 36289840679,
       "lastAuthenticatedFailure": "HARNESS_ASEGURADORAS_ROUTE_RACE",
       "rootCauseR20": "ASEGURADORAS_ASYNC_KNOWLEDGE_REFRESH_DROPS_EDIT_STATE",
       "authenticatedPreviewArm": "RERUN_EXACT_FE140_PROMPT_SCOPED",
@@ -2346,7 +2346,14 @@
       "r14ReceiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f",
       "lastAuthenticatedFailureJobId": 108535567078,
       "lastAuthenticatedFailureProductRegressionDemonstrated": false,
-      "lastAuthenticatedFailureCleanupDeleted": 13
+      "lastAuthenticatedFailureCleanupDeleted": 13,
+      "lastAuthenticatedOutcome": "PASS",
+      "lastAuthenticatedPassRunId": 36289840679,
+      "lastAuthenticatedPassJobId": 108537727775,
+      "lastAuthenticatedPassHarnessBlobSha": "617763462f20f3f872107795b2111c4f70623689",
+      "lastAuthenticatedPassArtifactId": 10922086380,
+      "lastAuthenticatedPassArtifactDigest": "sha256:c2afc1e4d68c55d02fd8882f296744f6a8c31a6ad5b99cbc979c215c0e9d0e73",
+      "lastAuthenticatedFailureSupersededByPassRunId": 36289840679
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
