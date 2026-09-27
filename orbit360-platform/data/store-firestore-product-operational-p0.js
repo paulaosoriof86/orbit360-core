@@ -80,14 +80,22 @@
       deletedIds.forEach(function(id){if(!ids[id])delete deleted[c][id];});
     });
   }
+  function isSoftDeleted(row){
+    if(!row||typeof row!=='object')return false;
+    var state=text(row.estado||row.status).toLowerCase();
+    return row.deleted===true||row.eliminado===true||state==='eliminado'||state==='deleted';
+  }
+  function visibleRows(rows){
+    return (rows||[]).filter(function(row){return !isSoftDeleted(row);});
+  }
   function mergedAll(collection){
     var pendingIds=Object.keys(pending[collection]||{}), deletedIds=Object.keys(deleted[collection]||{});
-    if(!pendingIds.length&&!deletedIds.length)return base.all(collection)||[];
+    if(!pendingIds.length&&!deletedIds.length)return visibleRows(base.all(collection)||[]);
     var map={};
     (base.all(collection)||[]).forEach(function(row){var id=text(idOf(row));if(id)map[id]=clone(row);});
     pendingIds.forEach(function(id){map[id]=clone(pending[collection][id]);});
     deletedIds.forEach(function(id){delete map[id];});
-    return Object.keys(map).map(function(id){return map[id];});
+    return visibleRows(Object.keys(map).map(function(id){return map[id];}));
   }
   function get(collection,id){
     id=text(id);
