@@ -1,0 +1,57 @@
+{
+  "schema": "gravicentra-i6-5-b2-paula-visual-partial-r15-v1",
+  "recordedAt": "2026-09-27",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "exactPreview": {
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36334556509-xmcb0vbv.web.app",
+    "sourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
+    "buildId": "gi-i65-b2-367c839a92aa-57f234755dc1",
+    "previewRunId": 36334556509
+  },
+  "humanEvidence": {
+    "reviewer": "Paula",
+    "viewport": "mobile",
+    "acceptedPartialFindings": [
+      {
+        "id": "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
+        "observation": "Tenant/company logo is visibly rendered in the mobile header.",
+        "state": "HUMAN_MOBILE_VISUAL_PASS_PARTIAL_REVIEW"
+      },
+      {
+        "id": "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
+        "observation": "Cliente 360 free-text client search is visibly available on mobile.",
+        "state": "HUMAN_MOBILE_VISUAL_PASS_PARTIAL_REVIEW"
+      }
+    ],
+    "driveOAuthAttempt": {
+      "syntheticClientId": "b2-drive-human-36334556509",
+      "syntheticClientName": "B2 QA · PRUEBA DRIVE HUMANA · NO USAR",
+      "attemptedSurface": "Cliente360/Documentos/Conectar Drive",
+      "uiError": "El proveedor Google de Firebase Auth no está habilitado para esta plataforma.",
+      "uploadExecuted": false,
+      "driveWriteExecuted": false,
+      "realClientMutation": false
+    }
+  },
+  "forensicDiagnosis": {
+    "productOwner": "orbit360-platform/core/product-drive-document-provider-p0.js",
+    "errorMapping": "The UI message is emitted only when signInWithPopup rejects with operation-not-allowed or provider-disabled.",
+    "firebaseProject": "ays-orbit-360-lab",
+    "releaseMechanismGap": "B2 deploys Preview Drive callables and prepares the human OAuth fixture, but the workflow does not preflight/read back that the google.com Firebase Authentication provider is enabled before declaring the human fixture ready.",
+    "classification": "FIREBASE_AUTH_GOOGLE_PROVIDER_DISABLED_AND_RELEASE_PREFLIGHT_GAP",
+    "affectedFindingIds": [
+      "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+      "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15"
+    ]
+  },
+  "governance": {
+    "b2Closed": false,
+    "b3Opened": false,
+    "livePromoted": false,
+    "reimportExecuted": false,
+    "productSourceChanged": false,
+    "firebaseAuthConfigurationChanged": false,
+    "nextRequiredAction": "CONTROLLED_FIREBASE_GOOGLE_PROVIDER_READBACK_AND_ENABLEMENT_IF_AUTHORIZED_THEN_REPEAT_HUMAN_DRIVE_OAUTH_PROOF"
+  }
+}
