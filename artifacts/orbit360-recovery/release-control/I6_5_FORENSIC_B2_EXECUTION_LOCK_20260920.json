@@ -424,7 +424,7 @@
       "INDIVIDUAL_RECEIPT_ATOMIC_EDIT",
       "REPORTED_PAYMENT_VISIBLE_WITH_ZERO_CONFIRMED_COBRO"
     ],
-    "jobId": 108339197129,
+    "jobId": 108537727775,
     "r5VehiclePolicyContext": true,
     "r5IndividualReceiptEdit": true,
     "r5ReportedPaymentProjection": true,
@@ -439,7 +439,22 @@
     "invalidatedOldPreviewRunId": 36260454531,
     "requiredHarnessBlob": "ab1fdb808fb255be3f490a500c63705a23bba32e",
     "priorPassInsufficientForOpsManagement": true,
-    "harnessBlobSha": "e6bd9c1e2bd59b83105fe0644e5527704a7be417"
+    "harnessBlobSha": "617763462f20f3f872107795b2111c4f70623689",
+    "priorHarnessBlobSha": "e6bd9c1e2bd59b83105fe0644e5527704a7be417",
+    "runHeadSha": "def5281bdb2ea92eda73694c24dae30865c69681",
+    "artifactId": 10922086380,
+    "artifactDigest": "sha256:c2afc1e4d68c55d02fd8882f296744f6a8c31a6ad5b99cbc979c215c0e9d0e73",
+    "harnessRepair": {
+      "classification": "HARNESS_ONLY_VARIABLE_NAME_DEFECT",
+      "failedRunId": 36288967976,
+      "failedJobId": 108535567078,
+      "failedCode": "REFERENCE_ERROR_CLIENTEID_NOT_DEFINED",
+      "cleanupDeleted": 13,
+      "productRegressionDemonstrated": false,
+      "beforeBlobSha": "050fe6bbea26f9f2aceceb9c13e6a8295224d130",
+      "afterBlobSha": "617763462f20f3f872107795b2111c4f70623689",
+      "repairCommit": "ab27af93192a3cb414a0eeb26126503dfb207b04"
+    }
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
