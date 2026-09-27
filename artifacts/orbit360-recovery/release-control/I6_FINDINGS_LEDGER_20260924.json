@@ -19,10 +19,10 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 137,
-    "b2HumanFindings": 53,
-    "currentBlocking": 43,
-    "countingNote": "Conservative carry-forward preserved. R73–R82 remain blocking until their required proof/closure; R77/R81 retain human Drive proof requirements. R83 exact Preview + authenticated runtime PASS; human download retest remains blocking. No blocker removed without final proof."
+    "total": 138,
+    "b2HumanFindings": 54,
+    "currentBlocking": 44,
+    "countingNote": "R84 is the prevailing Drive authorization blocker: routine per-user OAuth/memory-only consent is not acceptable for production. R83 remains open as download symptom but its old OAuth-based human retest is superseded. No B3/LIVE/reimport."
   },
   "findings": [
     {
@@ -2588,7 +2588,7 @@
       "rootCause": "document-viewer habilita descarga solo cuando el proveedor expone downloadAvailable y secureResources puede invocar provider.download(); product-drive-document-provider-p0.js no implementaba download() ni exponía esa capacidad.",
       "remediation": "Implementar descarga autenticada con token OAuth delegado en memoria, lectura alt=media de Drive y handoff mediante anchor download; exponer downloadAvailable solo con referencia Drive válida y token fresco.",
       "requiredProof": "En nueva Preview exacta, mismo documento sintético: Conectar Drive, abrir visor, Descargar produce archivo local verificable; Abrir en Drive continúa funcionando; sin persistir token; aislamiento Preview preservado.",
-      "status": "EXACT_PREVIEW_AUTHENTICATED_PASS_PENDING_HUMAN_RETEST",
+      "status": "SUPERSEDED_FOR_RETEST_BY_R84_PERSISTENT_TENANT_AUTH_REMEDIATION",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15B_DRIVE_DOWNLOAD_FINDING_20260927.json",
       "noLive": true,
       "noReimport": true,
@@ -2606,7 +2606,27 @@
         "functionalPass": true,
         "authenticatedPreviewPass": true
       },
-      "humanDownloadRetestPending": true
+      "humanDownloadRetestPending": false,
+      "supersededRetestReason": "Do not certify download through per-user memory-only OAuth after explicit tenant-persistent product rule."
+    },
+    {
+      "id": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
+      "block": "B2",
+      "source": "PAULA_EXPLICIT_PRODUCT_RULE_20260927",
+      "surface": "Cliente360/Ops/Documentos/GoogleDrive/Auth",
+      "classification": "PRODUCT_ARCHITECTURE_DEFECT_PER_USER_EPHEMERAL_OAUTH",
+      "blocking": true,
+      "finding": "Routine document access requires repeated Google account selection/consent because Drive authority is held in a browser access token for only the active session.",
+      "rootCause": "product-drive-document-provider-p0.js forces Google prompt=consent and memory_only token persistence; document-drive-domain.js requires googleAccessToken from the browser for status/upload. The same model would repeat in LIVE.",
+      "remediation": "Replace routine per-user OAuth with persistent tenant-level backend Drive integration. Gravicentra role/scope becomes the authorization boundary; Drive credential remains backend-only.",
+      "requiredProof": "fresh browser session with no Google account selection; authorized role opens existing client document; authorized role downloads existing client document; authorized write role uploads a synthetic Preview document; Asesor own scope can access only own authorized client documents; cross-scope access denied by backend; reload/new session retains repository availability without OAuth; Preview synthetic folder remains isolated; audit receipt records actor/role/action; cleanup synthetic fixture",
+      "status": "FROZEN_ACTIVE_SOURCE_IMPLEMENTATION_PENDING",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
+      "receiptBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true,
+      "mayDisappearWithoutDisposition": false
     }
   ],
   "phaseBBacklog": [

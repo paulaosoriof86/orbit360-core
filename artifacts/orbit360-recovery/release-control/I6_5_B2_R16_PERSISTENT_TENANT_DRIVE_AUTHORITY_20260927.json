@@ -1,0 +1,69 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_V1",
+  "date": "2026-09-27",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "origin": "PAULA_EXPLICIT_PRODUCT_RULE_20260927",
+  "findingId": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
+  "currentDemonstratedArchitecture": {
+    "browserGoogleConsentPrompt": true,
+    "providerParameter": "prompt=consent",
+    "accessTokenPersistence": "memory_only",
+    "tokenFreshWindowMinutes": 45,
+    "userGoogleAccountRequiredForRoutineDocumentOperations": true,
+    "productionWouldRepeatConsent": true,
+    "previewOnlyBehavior": false
+  },
+  "prevailingProductRule": {
+    "repository": "Google Drive",
+    "connectionAuthority": "TENANT_LEVEL_PERSISTENT_BACKEND_INTEGRATION",
+    "routineUserGoogleOAuthForbidden": true,
+    "routineGoogleAccountSelectionForbidden": true,
+    "authorizedBy": "GRAVICENTRA_ROLE_SCOPE_AND_RESOURCE_SCOPE",
+    "oneTimeAdministrativeBootstrapAllowed": true,
+    "backendCredentialStorage": "SECRET_MANAGER_ONLY",
+    "browserCredentialPersistenceForbidden": true,
+    "publicDriveLinksForbidden": true,
+    "internalViewDownloadUploadMustNotRequireGoogleLogin": true,
+    "externalOpenInDrive": "OPTIONAL_ADMIN_OR_FALLBACK_ACTION_MAY_REQUIRE_GOOGLE_IDENTITY_BUT_MUST_NOT_BE_REQUIRED_FOR_NORMAL_GRAVICENTRA_DOCUMENT_USE",
+    "auditRequired": [
+      "actorUid",
+      "activeRole",
+      "tenantId",
+      "clientId",
+      "documentRef",
+      "action",
+      "timestamp"
+    ],
+    "previewIsolation": "_GRAVICENTRA_PREVIEW_QA_ONLY",
+    "livePromotion": false,
+    "b3Advance": false,
+    "reimport": false
+  },
+  "requiredImplementation": [
+    "backend obtains Drive authority without end-user OAuth on each session",
+    "status/read/view/download/upload endpoints authorize current Gravicentra actor and client scope before Drive access",
+    "document bytes/preview are served through authenticated backend or equivalent secure same-origin path",
+    "no Drive access token is sent to or stored in browser",
+    "one-time tenant bootstrap is idempotent and restricted to Direccion/SuperAdmin/AdminTenant",
+    "existing file references remain valid; no document reimport",
+    "R77 management attachments and R81 client documents reuse the same canonical provider"
+  ],
+  "closureProof": [
+    "fresh browser session with no Google account selection",
+    "authorized role opens existing client document",
+    "authorized role downloads existing client document",
+    "authorized write role uploads a synthetic Preview document",
+    "Asesor own scope can access only own authorized client documents",
+    "cross-scope access denied by backend",
+    "reload/new session retains repository availability without OAuth",
+    "Preview synthetic folder remains isolated",
+    "audit receipt records actor/role/action",
+    "cleanup synthetic fixture"
+  ],
+  "supersedes": {
+    "authModel": "DELEGATED_USER_OAUTH_MEMORY_ONLY",
+    "priorR83HumanRetest": "DO_NOT_REPEAT_UNDER_OBSOLETE_AUTH_MODEL"
+  },
+  "status": "FROZEN_ACTIVE_SOURCE_IMPLEMENTATION_PENDING"
+}
