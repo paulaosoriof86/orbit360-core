@@ -43,7 +43,10 @@
     "affectedFindingIds": [
       "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
       "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15"
-    ]
+    ],
+    "currentRootCause": "GOOGLE_PROVIDER_CONFIG_ABSENT_AND_NEW_PROVIDER_REQUIRES_OAUTH_CLIENT_ID_AND_SECRET",
+    "permanentWorkflowGuardInstalled": true,
+    "programmaticCreationWithoutCredentialsRejected": true
   },
   "governance": {
     "b2Closed": false,
@@ -52,7 +55,7 @@
     "reimportExecuted": false,
     "productSourceChanged": false,
     "firebaseAuthConfigurationChanged": false,
-    "nextRequiredAction": "CONTROLLED_FIREBASE_GOOGLE_PROVIDER_READBACK_AND_ENABLEMENT_AUTHORIZED"
+    "nextRequiredAction": "PAULA_ENABLE_GOOGLE_PROVIDER_IN_FIREBASE_CONSOLE_THEN_AUTOMATED_READBACK_GUARD"
   },
   "authorization": {
     "decision": "AUTHORIZED",
@@ -68,6 +71,24 @@
       "b3Open": false,
       "reimport": false
     },
-    "status": "AUTHORIZED_PENDING_APPLY"
-  }
+    "status": "BLOCKED_MANUAL_FIREBASE_GOOGLE_PROVIDER_SETUP"
+  },
+  "firebaseGoogleProviderProgrammaticAttempts": [
+    {
+      "runId": 36345924282,
+      "outcome": "FAIL_CLOSED",
+      "stage": "READ_EXISTING_PROVIDER_CONFIG",
+      "result": "HTTP_404_CONFIG_NOT_FOUND",
+      "firebaseMutationExecuted": false
+    },
+    {
+      "runId": 36346015220,
+      "outcome": "FAIL_CLOSED",
+      "stage": "CREATE_PROVIDER_CONFIG_WITHOUT_OAUTH_CLIENT_CREDENTIALS",
+      "result": "HTTP_400",
+      "evidenceArtifactId": 10940916044,
+      "evidenceArtifactDigest": "sha256:bb0e4df1f6e36c922f9f3ff5057e56176bae04c7f6bf3acfa43976bbe7d29c71",
+      "firebaseMutationExecuted": false
+    }
+  ]
 }
