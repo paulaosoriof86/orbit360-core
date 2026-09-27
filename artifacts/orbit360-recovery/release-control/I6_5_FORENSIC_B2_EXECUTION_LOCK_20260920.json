@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -288,21 +288,24 @@
     "preservesB1": true
   },
   "preview": {
-    "status": "PENDING_NEW_EXACT_PREVIEW",
-    "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
-    "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
-    "findingLedgerBlobSha": "6263b79b6aa4c3273ee7c2b0a153f4abc5e8e6b9",
-    "livePromoted": false,
-    "exactReadback": false,
-    "functionalPass": false
+    "sourceSha": "a5bccd0629e45367acb4f7abda95d0b49b20aa06",
+    "buildId": "gi-i65-b2-a5bccd0629e4-57f234755dc1",
+    "channelId": "gi-i65-b2-36326461369",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36326461369-maj7of9b.web.app",
+    "runId": 36326461369,
+    "artifactId": 10934038069,
+    "artifactDigest": "696e77a28bd760588f446e7d2760ac212d1f009950971b45ef4cbda94aff95f8",
+    "exactReadback": true,
+    "functionalPass": true,
+    "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "SUPERSEDED_BY_R15_SOURCE_PENDING_NEW_EXACT_PREVIEW",
+    "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "",
-    "exactPreviewBuildId": "",
-    "exactPreviewUrl": "",
-    "exactPreviewArtifactId": null,
+    "exactPreviewSourceSha": "a5bccd0629e45367acb4f7abda95d0b49b20aa06",
+    "exactPreviewBuildId": "gi-i65-b2-a5bccd0629e4-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36326461369-maj7of9b.web.app",
+    "exactPreviewArtifactId": 10934038069,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": false,
