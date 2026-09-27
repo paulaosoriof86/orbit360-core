@@ -3565,9 +3565,22 @@ jobs:
           node --check orbit360-platform/modules/aseguradoras.js
           node --check functions/product-insurer-credentials.js
           node --check functions/product-operational-domain.js
+          node --check functions/product-ops-leads-domain.js
+          node --check functions/document-drive-domain.js
+          node --check orbit360-platform/core/record-delete.js
+          node --check orbit360-platform/core/backend-resource-contracts.js
+          node --check orbit360-platform/core/product-drive-document-provider-p0.js
+          node --check orbit360-platform/core/ciclo.js
+          node --check orbit360-platform/core/importa.js
+          node --check orbit360-platform/modules/renewals-v1200-operational-bridge.js
+          node --check orbit360-platform/modules/cancelaciones.js
+          node --check orbit360-platform/modules/comisiones.js
+          node --check orbit360-platform/modules/siniestros.js
           node --check tools/gravicentra-i6-5-b2-human-rejection-readonly.mjs
           node --check tools/gravicentra-i6-5-b2-authenticated-preview.mjs
           node --check tools/gravicentra-i6-5-b2-functional.mjs
+          node --check tools/gravicentra-i6-5-b2-r15-contract.mjs
+          node tools/gravicentra-i6-5-b2-r15-contract.mjs
           node tools/gravicentra-i6-5-b2-functional.mjs
       - name: Install Firebase CLI
         if: steps.mode.outputs.mode == 'preview'
@@ -3622,7 +3635,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b2-human-rejection-readonly.mjs "$RUNNER_TEMP/b2-package/evidence/b2-human-rejection-readonly.json"
-      - name: Deploy isolated B2 credential and asset Preview callables
+      - name: Deploy isolated B2 credential, asset, Ops and document Preview callables
         if: steps.mode.outputs.mode == 'preview'
         run: |
           set -euo pipefail
@@ -3672,8 +3685,8 @@ jobs:
           printf 'ORBIT360_STORAGE_BUCKET=%s\n' "$STORAGE_BUCKET" > "$FROOT/backend/.env"
           cat "$RUNNER_TEMP/b2-storage-bucket-readonly.json"
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","storageBucket":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview","orbit360OpsLeadsCommandPreview"],"productionFunctionDeployed":false,"controlledWorkflowUatWritesAuthorized":true,"existingWorkflowMutationAuthorized":false,"externalNotificationsSuppressed":true}\n' "$GITHUB_SHA" "$STORAGE_BUCKET" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360DocumentDriveStatusPreview,functions:orbit360DocumentDriveUploadPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","storageBucket":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview"],"documentRepository":"Google Drive","documentAuth":"delegated_user_oauth","documentTokenPersistence":"memory_only","productionFunctionDeployed":false,"controlledWorkflowUatWritesAuthorized":true,"existingWorkflowMutationAuthorized":false,"externalNotificationsSuppressed":true}\n' "$GITHUB_SHA" "$STORAGE_BUCKET" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
           cp "$RUNNER_TEMP/b2-storage-bucket-readonly.json" "$RUNNER_TEMP/b2-package/evidence/b2-storage-bucket-readonly.json"
       - name: Deploy exact B2 package to isolated Preview
         if: steps.mode.outputs.mode == 'preview'
