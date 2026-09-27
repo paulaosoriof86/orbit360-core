@@ -200,8 +200,8 @@
   "lastRemediation": {
     "origin": "PAULA_R15_R15A_DRIVE_HUMAN_PROOF_PLUS_R83_DOWNLOAD",
     "parentHead": "58dd90648ba560d0332aa90ef23c9442657dcacd",
-    "candidateHead": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
-    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_HUMAN_DOWNLOAD_RETEST",
+    "candidateHead": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
+    "status": "EXACT_PREVIEW_AUTHENTICATED_PASS_PENDING_HUMAN_DOWNLOAD_RETEST",
     "changedProductFiles": [
       "functions/bootstrap.js",
       "functions/document-drive-domain.js",
@@ -251,7 +251,18 @@
     "noB3": true,
     "latestCausalFix": "GOOGLE_DRIVE_DELEGATED_OAUTH_DOWNLOAD_PROVIDER_IMPLEMENTED",
     "previewDocumentIsolation": "_GRAVICENTRA_PREVIEW_QA_ONLY",
-    "findingLedgerBlobSha": "1ecca9ab089f3209482774f751c4d93768a83984",
-    "humanDownloadRetestRequired": true
+    "findingLedgerBlobSha": "a2ec426af844e9e4ee93dd0bd1004c15a3ba8235",
+    "humanDownloadRetestRequired": true,
+    "exactPreview": {
+      "sourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
+      "buildId": "gi-i65-b2-31f2ddc2ac8a-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
+      "runId": 36349185236,
+      "artifactId": 10942010623,
+      "artifactDigest": "5955a952e9a8aebf1efaf73f6dc8981e220bbb4e269834fd9eb9047b087edb8a",
+      "exactReadback": true,
+      "functionalPass": true,
+      "authenticatedPreviewPass": true
+    }
   }
 }

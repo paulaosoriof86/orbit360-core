@@ -22,7 +22,7 @@
     "total": 137,
     "b2HumanFindings": 53,
     "currentBlocking": 43,
-    "countingNote": "Conservative carry-forward preserved. R73–R82 remain blocking until exact Preview proof/closure; R77/R81 require human Drive proof. R83 is source-fixed but blocking pending new exact Preview and human download retest. No blocker removed."
+    "countingNote": "Conservative carry-forward preserved. R73–R82 remain blocking until their required proof/closure; R77/R81 retain human Drive proof requirements. R83 exact Preview + authenticated runtime PASS; human download retest remains blocking. No blocker removed without final proof."
   },
   "findings": [
     {
@@ -2588,7 +2588,7 @@
       "rootCause": "document-viewer habilita descarga solo cuando el proveedor expone downloadAvailable y secureResources puede invocar provider.download(); product-drive-document-provider-p0.js no implementaba download() ni exponía esa capacidad.",
       "remediation": "Implementar descarga autenticada con token OAuth delegado en memoria, lectura alt=media de Drive y handoff mediante anchor download; exponer downloadAvailable solo con referencia Drive válida y token fresco.",
       "requiredProof": "En nueva Preview exacta, mismo documento sintético: Conectar Drive, abrir visor, Descargar produce archivo local verificable; Abrir en Drive continúa funcionando; sin persistir token; aislamiento Preview preservado.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_HUMAN_RETEST",
+      "status": "EXACT_PREVIEW_AUTHENTICATED_PASS_PENDING_HUMAN_RETEST",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15B_DRIVE_DOWNLOAD_FINDING_20260927.json",
       "noLive": true,
       "noReimport": true,
@@ -2596,7 +2596,17 @@
       "contractGuardCommit": "328018188f582c57494ac77ac373484664632d5d",
       "closureState": "NOT_CLOSED",
       "previewProofRequired": true,
-      "humanProofRequired": true
+      "humanProofRequired": true,
+      "exactPreviewProof": {
+        "sourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
+        "buildId": "gi-i65-b2-31f2ddc2ac8a-57f234755dc1",
+        "runId": 36349185236,
+        "artifactId": 10942010623,
+        "exactReadback": true,
+        "functionalPass": true,
+        "authenticatedPreviewPass": true
+      },
+      "humanDownloadRetestPending": true
     }
   ],
   "phaseBBacklog": [

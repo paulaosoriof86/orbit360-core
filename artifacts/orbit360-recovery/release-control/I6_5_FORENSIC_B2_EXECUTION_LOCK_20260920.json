@@ -260,9 +260,9 @@
     "sourceCandidateSha": "10f03257590eb0ab73952e63ff0296a20bcfeabb",
     "governanceHeadBeforeCandidateArm": "06378fefe7fb250d70db19c80ece0febd5b23286",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "d836a1a369a812551a0802636b8c080ebf96c5d2",
+    "compositionLockBlobSha": "3bf5a31608db6d64278fc64ced7da9737366b836",
     "productFileCount": 67,
-    "findingLedgerBlobSha": "1ecca9ab089f3209482774f751c4d93768a83984",
+    "findingLedgerBlobSha": "a2ec426af844e9e4ee93dd0bd1004c15a3ba8235",
     "blockingFindingIds": [
       "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
       "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
@@ -1847,10 +1847,8 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R83_NEW_EXACT_PREVIEW_READBACK",
-    "R83_AUTHENTICATED_RUNTIME_REPROOF",
     "PAULA_VISUAL_ACCEPTANCE",
-    "HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_DOWNLOAD_PROOF",
+    "HUMAN_DRIVE_OAUTH_EXISTING_FILE_RELOAD_DOWNLOAD_PROOF",
     "DRIVE_QA_FIXTURE_CLEANUP"
   ],
   "lastAuthenticatedFailure": {
@@ -2966,7 +2964,7 @@
   },
   "boundaryNote": "R15/R15A cumulative source plus R83 Drive download fix must be rebuilt as a new immutable exact Preview. Existing synthetic Drive fixture remains isolated under _GRAVICENTRA_PREVIEW_QA and is preserved only for R83 retest; no cleanup until retest. No LIVE, no B3, no reimport.",
   "driveHumanFixture": {
-    "status": "PRESERVED_PENDING_R83_RETEST_ON_NEW_PREVIEW",
+    "status": "PRESERVED_PENDING_R83_HUMAN_RETEST_ON_AUTHENTICATED_PREVIEW",
     "tenantId": "alianzas-soluciones",
     "clientId": "b2-drive-human-36334556509",
     "clientName": "B2 QA · PRUEBA DRIVE HUMANA · NO USAR",
@@ -2990,7 +2988,10 @@
     "cleanupPending": true,
     "uploadOpenHumanPass": true,
     "previewIsolationReadbackPass": true,
-    "downloadHumanPass": false
+    "downloadHumanPass": false,
+    "retestPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
+    "retestPreviewSourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
+    "retestPreviewBuildId": "gi-i65-b2-31f2ddc2ac8a-57f234755dc1"
   },
   "r15bDriveDownload": {
     "findingId": "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
@@ -2999,9 +3000,18 @@
     "contractGuardCommit": "328018188f582c57494ac77ac373484664632d5d",
     "productOwner": "orbit360-platform/core/product-drive-document-provider-p0.js",
     "sourceFixed": true,
-    "exactPreviewPending": true,
+    "exactPreviewPending": false,
     "humanRetestPending": true,
     "livePromoted": false,
-    "noReimport": true
+    "noReimport": true,
+    "receiptBlobSha": "f8714813b93f4c11dabf833df3864c425ae6b994",
+    "exactPreviewSourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
+    "exactPreviewBuildId": "gi-i65-b2-31f2ddc2ac8a-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
+    "exactPreviewRunId": 36349185236,
+    "exactPreviewArtifactId": 10942010623,
+    "exactReadback": true,
+    "functionalPass": true,
+    "authenticatedPreviewPass": true
   }
 }

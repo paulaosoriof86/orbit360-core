@@ -58,13 +58,26 @@
   },
   "closure": {
     "r81ClientDocumentUploadOpen": "PARTIAL_PASS",
-    "r81ReloadPersistence": "PENDING_TECHNICAL_READBACK_OR_EXPLICIT_HUMAN_RELOAD_PROOF",
+    "r81ReloadPersistence": "PENDING_HUMAN_NEW_PREVIEW_VISIBILITY_PROOF",
     "r77ManagementAttachment": "NOT_PROVEN_BY_THIS_TEST",
-    "r83Download": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_HUMAN_RETEST",
-    "cleanup": "HOLD_UNTIL_NEW_PREVIEW_RETEST",
+    "r83Download": "EXACT_PREVIEW_AUTHENTICATED_PASS_PENDING_HUMAN_RETEST",
+    "cleanup": "HOLD_UNTIL_R83_HUMAN_RETEST",
     "b2Closed": false,
     "b3Opened": false,
     "livePromoted": false,
     "reimport": false
+  },
+  "retestPreview": {
+    "status": "EXACT_PREVIEW_AUTHENTICATED_PASS_PENDING_HUMAN_DOWNLOAD_RETEST",
+    "sourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
+    "buildId": "gi-i65-b2-31f2ddc2ac8a-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
+    "runId": 36349185236,
+    "artifactId": 10942010623,
+    "artifactDigest": "5955a952e9a8aebf1efaf73f6dc8981e220bbb4e269834fd9eb9047b087edb8a",
+    "exactReadback": true,
+    "functionalPass": true,
+    "authenticatedPreviewPass": true,
+    "livePromoted": false
   }
 }

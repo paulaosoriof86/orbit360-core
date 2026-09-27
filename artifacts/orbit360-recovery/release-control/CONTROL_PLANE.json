@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "77a6a0d8efa07bc4698fcf019e19378b92b05185",
+    "b2ExecutionLockBlobSha": "c13a97af0a9d0b44ad3a4beafea1807ab17adced",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2482,7 +2482,7 @@
       "humanDriveOAuthProofPending": true,
       "drivePreviewIsolationFix": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
       "driveHumanFixture": {
-        "status": "PRESERVED_PENDING_R83_RETEST_ON_NEW_PREVIEW",
+        "status": "PRESERVED_PENDING_R83_HUMAN_RETEST_ON_AUTHENTICATED_PREVIEW",
         "tenantId": "alianzas-soluciones",
         "clientId": "b2-drive-human-36334556509",
         "clientName": "B2 QA · PRUEBA DRIVE HUMANA · NO USAR",
@@ -2506,7 +2506,10 @@
         "cleanupPending": true,
         "uploadOpenHumanPass": true,
         "previewIsolationReadbackPass": true,
-        "downloadHumanPass": false
+        "downloadHumanPass": false,
+        "retestPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
+        "retestPreviewSourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
+        "retestPreviewBuildId": "gi-i65-b2-31f2ddc2ac8a-57f234755dc1"
       },
       "googleAuthProvider": {
         "status": "READBACK_PASS",
@@ -2523,10 +2526,19 @@
         "compositionLockBlobSha": "d836a1a369a812551a0802636b8c080ebf96c5d2",
         "findingLedgerBlobSha": "1ecca9ab089f3209482774f751c4d93768a83984",
         "sourceFixed": true,
-        "exactPreviewPending": true,
+        "exactPreviewPending": false,
         "humanDownloadRetestPending": true,
         "previousDriveUploadOpenPass": true,
-        "previewIsolationReadbackPass": true
+        "previewIsolationReadbackPass": true,
+        "receiptBlobSha": "f8714813b93f4c11dabf833df3864c425ae6b994",
+        "exactPreviewSourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
+        "exactPreviewBuildId": "gi-i65-b2-31f2ddc2ac8a-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
+        "exactPreviewRunId": 36349185236,
+        "exactPreviewArtifactId": 10942010623,
+        "exactReadback": true,
+        "functionalPass": true,
+        "authenticatedPreviewPass": true
       }
     },
     "dashboardRealityGate": {
@@ -2620,7 +2632,7 @@
     },
     "planVersion": 2,
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
-    "activePlanBlobSha": "1600fef5e21db431569e7bbb941fda72ee944c28",
+    "activePlanBlobSha": "7d5b990be9997c849f647691213d16cf65e7496f",
     "mechanismRootCause20260924": {
       "status": "FROZEN",
       "classification": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
@@ -2645,11 +2657,11 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "d836a1a369a812551a0802636b8c080ebf96c5d2",
+    "compositionLockBlobSha": "3bf5a31608db6d64278fc64ced7da9737366b836",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "1ecca9ab089f3209482774f751c4d93768a83984",
+    "findingLedgerBlobSha": "a2ec426af844e9e4ee93dd0bd1004c15a3ba8235",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
-    "activePlanBlobSha": "1600fef5e21db431569e7bbb941fda72ee944c28",
+    "activePlanBlobSha": "7d5b990be9997c849f647691213d16cf65e7496f",
     "activeBlock": "B2",
     "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2659,7 +2671,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R83_NEW_EXACT_IMMUTABLE_PREVIEW"
+    "nextAction": "B2_R83_HUMAN_DOWNLOAD_RETEST_AND_REMAINING_VISUAL_REVIEW"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

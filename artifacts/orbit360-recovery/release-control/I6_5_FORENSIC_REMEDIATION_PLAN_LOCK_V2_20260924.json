@@ -210,8 +210,8 @@
     "futureChangeRule": "Every product-source change and its composition manifest update must land atomically; otherwise no build/Preview.",
     "ownerRule": "Every modified capability declares the effective runtime owner; after change, prove no older owner shadows it.",
     "findingRule": "A finding can leave the active ledger only as CLOSED_PASS or explicitly authorized DEFERRED/NOT_APPLICABLE with evidence.",
-    "compositionLockBlobSha": "d836a1a369a812551a0802636b8c080ebf96c5d2",
-    "findingLedgerBlobSha": "1ecca9ab089f3209482774f751c4d93768a83984"
+    "compositionLockBlobSha": "3bf5a31608db6d64278fc64ced7da9737366b836",
+    "findingLedgerBlobSha": "a2ec426af844e9e4ee93dd0bd1004c15a3ba8235"
   },
   "findingControl": {
     "ledgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -238,20 +238,22 @@
     "block": "B2",
     "readinessPercent": 80,
     "targetPercent": 90,
-    "step": "CANDIDATE_PENDING_PREVIEW",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36161420776-7cgx9h30.web.app",
-    "exactPreviewSourceSha": "ac78fd8fcdfb7013a96878ce5f78d091e8ef6299",
-    "authenticatedRunId": 36162989052,
+    "step": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
+    "exactPreviewSourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
+    "authenticatedRunId": 36349185236,
     "noBroadRediscovery": true,
     "noReimport": true,
     "noLive": true,
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
     "r3Origin": "PAULA_VISUAL_REVIEW_20260925_R3",
     "r3RecordedAt": "2026-09-25T11:43:00-06:00",
     "r3ReadOnlyAuditTarget": "OSCAR_HAROLDO_RODRIGUEZ_PADILLA / 91-0169567 / 5 vehicles",
     "r15bOrigin": "PAULA_DRIVE_HUMAN_PROOF_20260927",
     "r15bFindingId": "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
-    "r15bSourceFix": true
+    "r15bSourceFix": true,
+    "r15bTechnicalAndAuthenticatedPass": true,
+    "r15bHumanDownloadRetestRequired": true
   },
   "dataUpdateCompletion": {
     "preservedPass": [
@@ -287,13 +289,13 @@
     "historicalPassPreservedUnlessCausallyInvalidated": true,
     "independentFailureAggregationRequired": true,
     "noSerialPrerequisiteDiscovery": true,
-    "currentB2TechnicalAndAuthenticatedPass": false,
+    "currentB2TechnicalAndAuthenticatedPass": true,
     "currentB2OnlyHumanVisualRemaining": false,
     "r3CausalReadOnlyAuditRequired": true,
     "r3SingleCumulativeFixRequired": true,
     "r15R15aCandidateReadyForExactPreview": true,
     "r15DrivePreviewIsolationFixPendingExactPreview": true,
-    "r15bDriveDownloadFixPendingExactPreview": true,
+    "r15bDriveDownloadFixPendingExactPreview": false,
     "r15bHumanDownloadRetestRequired": true
   },
   "antiInterruptionExecution": {
