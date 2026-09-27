@@ -2493,7 +2493,9 @@
         "noLive": true,
         "noB3": true,
         "noReimport": true,
-        "cleanupMandatory": true
+        "cleanupMandatory": true,
+        "retryAfterHarnessFix": true,
+        "retryHarnessCommit": "4bfd2113dceed1d9fcb53d531733c60f2fc766bf"
       }
     },
     "dashboardRealityGate": {
