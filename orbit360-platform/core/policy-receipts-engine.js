@@ -86,10 +86,10 @@ Orbit.policyReceipts = (function () {
 
   function installmentsForFrequency(frequency, requested) {
     const f = clean(frequency || 'Contado');
+    const monthly = norm(f) === 'mensual';
     const configured = Orbit.primas && Orbit.primas.cuotasDe ? +Orbit.primas.cuotasDe(f) : 1;
-    const explicit = +requested;
-    if (explicit > 0) return Math.max(1, Math.min(24, explicit));
-    return Math.max(1, Math.min(24, configured || 1));
+    if (monthly) return Math.max(1, Math.min(24, +requested || configured || 12));
+    return Math.max(1, configured || 1);
   }
 
   function validatePolicy(input, currentId) {
