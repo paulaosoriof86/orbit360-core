@@ -104,8 +104,15 @@
       out.push('El siniestro está en estado final y debe conservarse como evidencia histórica.');
     }
 
-    if (collection === 'cancelaciones' && ['cancelada','aplicada','cerrada','finalizada'].includes(norm(row.estado))) {
-      out.push('La cancelación ya produjo un estado final y debe conservarse como evidencia histórica.');
+    if (collection === 'cancelaciones') {
+      const finalState = norm(row.recuperacion || row.estado);
+      if (['cancelada','aplicada','cerrada','finalizada','recuperada','no_recuperable'].includes(finalState)) {
+        out.push('La cancelación/recuperación ya produjo un estado final y debe conservarse como evidencia histórica.');
+      }
+      const linkedBusiness = text(row.recuperacionNegocioId) && S().get('negocios', row.recuperacionNegocioId);
+      const linkedManagement = text(row.recuperacionGestionId) && S().get('gestiones', row.recuperacionGestionId);
+      if (linkedBusiness && linkedBusiness.deleted !== true && linkedBusiness.eliminado !== true) out.push('La cancelación tiene un seguimiento de recuperación activo en Leads.');
+      if (linkedManagement && linkedManagement.deleted !== true && linkedManagement.eliminado !== true) out.push('La cancelación tiene una gestión de recuperación activa en Ops.');
     }
 
     if (collection === 'comisiones' && (row.conciliado === true || ['pagada','conciliada','liquidada'].includes(norm(row.estado)))) {
