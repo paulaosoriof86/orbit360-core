@@ -633,7 +633,7 @@ Orbit.modules.cliente360 = (function () {
           <div class="c360-renewal-actions">
             <button class="btn ${gestionable ? 'primary' : 'ghost'} sm" ${gestionable ? '' : 'disabled style="opacity:.4"'} onclick="Orbit.modules.renovaciones&&Orbit.modules.renovaciones.registrarAceptacion?Orbit.modules.renovaciones.registrarAceptacion('${p.id}'):Orbit.modules.cliente360.renovar('${p.id}')">Renovar</button>
             <button class="btn ghost sm" onclick="Orbit.modules.cliente360.comparativo('${p.id}')" title="Comparar propuesta de renovación vs actual">⚖ Comparar</button>
-            <button class="btn ghost sm" onclick="Orbit.ciclo.solicitarGestion('${cid}','${p.id}')" title="Solicitar condiciones de renovación a la aseguradora">🗂 Gestión</button>
+            <button class="btn ghost sm" onclick="Orbit.ciclo.solicitarGestion('${cid}','${p.id}',false,{tipo:'Solicitar condiciones de renovación',titulo:'Condiciones de renovación · '+String('${p.numero}'),lista:'Renovaciones / Modif.',prioridad:'${d <= 15 ? 'Alta' : 'Media'}',vence:'${p.vigenciaFin || ''}',proximaAccion:'Operaciones: solicitar condiciones de renovación',origen:'Renovaciones',checklist:[{t:'Solicitud recibida en Ops',done:true},{t:'Condiciones solicitadas a aseguradora',done:false},{t:'Respuesta / propuesta recibida',done:false}]})" title="Solicitar condiciones de renovación a la aseguradora">🗂 Gestión</button>
           </div>
         </div>`;
       }).join('') || '<span class="muted">Sin pólizas para renovar.</span>'}
