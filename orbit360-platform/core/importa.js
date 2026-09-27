@@ -784,7 +784,7 @@ Orbit.importa = (function () {
         <label class="btn ghost sm" style="margin-top:14px;cursor:pointer">Seleccionar archivo${state.multi ? 's' : ''}<input type="file" id="imp-file" ${state.multi ? 'multiple' : ''} style="display:none"></label>
         <div id="imp-files" class="imp-files"></div>
       </div>
-      <div class="imp-note">${state.modo === 'documental' ? '📁 Modo documental: los archivos se <b>almacenan y quedan visibles</b> en el expediente/ficha, sin extraer datos.' : '🧠 Modo inteligente: reconoce el formato, <b>extrae los datos y los mapea</b> a Orbit 360 (cruza y complementa sin duplicar).'}</div>`;
+      <div class="imp-note">${state.modo === 'documental' ? '📁 Modo documental: el archivo se guardará en <b>Drive únicamente después de confirmar</b> y de recibir readback del proveedor documental. Si Drive no está conectado, la operación se bloquea sin falso éxito.' : '🧠 Modo inteligente: reconoce el formato, <b>extrae los datos y los mapea</b> a Orbit 360 (cruza y complementa sin duplicar). Para documentos de expediente, el archivo original también debe quedar confirmado en Drive.'}</div>`;
   }
   function step2(m) {
     // Base de datos inicial: si aún no se resolvió a una entidad real, hacerlo aquí (nunca mostrar la tabla de ejemplo)
@@ -929,18 +929,87 @@ Orbit.importa = (function () {
     </div>`;
   }
   function step3(m) {
+    const documentary = state.modo === 'documental';
+    const clientDocument = state.kind === 'documentos' && state.scope && state.scope.cid;
+    const filesCount = (state.filesReal || []).length;
     return `<div style="text-align:center;padding:24px 8px">
-        <div style="font-size:52px">✅</div>
-        <div style="font-family:var(--f-display);font-weight:800;font-size:20px;margin-top:8px">Importación lista para revisión/aprobación</div>
-        <p class="muted" style="max-width:380px;margin:10px auto 0">${(state.parsed && IMPORT_MAP[state.kind] && state.modo !== 'documental') ? '<b>' + state.parsed.rows.length + ' registros</b> de tu archivo quedan listos para revisión/aprobación en <b>' + IMPORT_MAP[state.kind].label + '</b> — se proponen altas y actualizaciones, sin duplicar.' : 'Las propuestas quedan disponibles para revisión en los módulos relacionados.'}</p>
+        <div style="font-size:52px">${documentary ? '📁' : '✅'}</div>
+        <div style="font-family:var(--f-display);font-weight:800;font-size:20px;margin-top:8px">${documentary ? 'Documento listo para guardar en Drive' : 'Importación lista para revisión/aprobación'}</div>
+        <p class="muted" style="max-width:420px;margin:10px auto 0">${documentary
+          ? ('<b>' + filesCount + ' archivo(s)</b> seleccionado(s). Todavía no se consideran almacenados: al finalizar se exigirá confirmación del proveedor Drive.')
+          : ((state.parsed && IMPORT_MAP[state.kind]) ? '<b>' + state.parsed.rows.length + ' registros</b> de tu archivo quedan listos para revisión/aprobación en <b>' + IMPORT_MAP[state.kind].label + '</b> — se proponen altas y actualizaciones, sin duplicar.' : 'Las propuestas quedan disponibles para revisión en los módulos relacionados.')}</p>
+        ${clientDocument ? '<div class="cfg-note" style="max-width:520px;margin:14px auto 0;text-align:left">El documento original debe quedar vinculado al expediente del cliente con referencia Drive y readback durable. La extracción de datos no sustituye el archivo documental.</div>' : ''}
         ${m.conciliacion ? `<button class="btn ghost" style="margin-top:16px">Revisar propuestas de conciliación por póliza →</button>` : ''}
         <div style="margin-top:20px;display:flex;gap:8px;justify-content:center">
           <button class="btn ghost" id="imp-again">Importar otro</button>
-          <button class="btn primary" id="imp-finish">Finalizar</button>
+          <button class="btn primary" id="imp-finish">${documentary ? 'Guardar en Drive' : 'Finalizar'}</button>
         </div>
-        <div class="muted" style="font-size:12px;margin-top:14px">${state.modo === 'documental' ? 'Los archivos quedan almacenados y visibles en el expediente/ficha.' : 'El motor mapea automáticamente los datos a Orbit 360.'}</div>
+        <div class="muted" style="font-size:12px;margin-top:14px">${documentary ? 'No se mostrará éxito sin referencia documental confirmada.' : (clientDocument ? 'Los datos y el archivo documental se confirman por separado.' : 'El motor mapea automáticamente los datos a Gravicentra Insurance.')}</div>
       </div>`;
   }
+  async function persistDocumentaryFiles() {
+    const files = Array.from(state.filesReal || []);
+    if (!files.length) return { ok: false, status: 'sin_archivos', message: 'Selecciona al menos un archivo.' };
+    const secure = Orbit.secureResources;
+    const status = secure && secure.documentUploadStatus
+      ? secure.documentUploadStatus({ entidad: state.scope && state.scope.cid ? 'cliente' : state.kind, entidadId: state.scope && state.scope.cid || '' })
+      : { available: false, status: 'pendiente_conexion' };
+    if (!status || status.available !== true || !secure || typeof secure.uploadDocument !== 'function') {
+      return { ok: false, status: 'pendiente_conexion', message: 'Drive no tiene un proveedor de carga confirmado. No se guardó ningún archivo.' };
+    }
+
+    const cid = state.scope && state.scope.cid || '';
+    const out = [];
+    for (const file of files) {
+      const uploaded = await secure.uploadDocument(file, {
+        entidad: cid ? 'cliente' : state.kind,
+        entidadId: cid || '',
+        clienteId: cid,
+        categoria: state.kind === 'documentos' ? 'expediente_cliente' : state.kind,
+        nombre: file.name
+      });
+      if (!uploaded || uploaded.ok !== true || !(uploaded.documentRef || uploaded.driveUrl || uploaded.externalUrl || uploaded.url)) {
+        return { ok: false, status: uploaded && uploaded.status || 'sin_readback', message: 'Drive no confirmó "' + file.name + '". No se declarará la carga como completada.', uploaded: out };
+      }
+      out.push({
+        id: uploaded.documentRef || uploaded.fileId || ('doc_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
+        nombre: uploaded.nombre || file.name,
+        documentRef: uploaded.documentRef || uploaded.fileId || '',
+        driveUrl: uploaded.driveUrl || uploaded.externalUrl || uploaded.url || '',
+        externalUrl: uploaded.externalUrl || uploaded.driveUrl || uploaded.url || '',
+        mimeType: uploaded.mimeType || file.type || '',
+        size: file.size,
+        origen: uploaded.origen || 'Drive',
+        clienteId: cid,
+        categoria: state.kind === 'documentos' ? 'expediente_cliente' : state.kind,
+        creado: Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0,10),
+        provenance: { source: 'usuario', repository: 'Drive', confirmed: true }
+      });
+    }
+
+    if (cid) {
+      const cli = Orbit.store.get('clientes', cid);
+      if (!cli || !Orbit.store.updateDurable) return { ok: false, status: 'cliente_sin_persistencia', message: 'El archivo llegó a Drive pero no se pudo confirmar el vínculo con el expediente.', uploaded: out };
+      const previous = Array.isArray(cli.documentos) ? cli.documentos.slice() : [];
+      const key = d => String(d.documentRef || d.driveUrl || d.externalUrl || d.url || '').trim();
+      const merged = previous.slice();
+      out.forEach(doc => {
+        const k = key(doc);
+        const at = k ? merged.findIndex(x => key(x) === k) : -1;
+        if (at >= 0) merged[at] = Object.assign({}, merged[at], doc);
+        else merged.push(doc);
+      });
+      await Orbit.store.updateDurable('clientes', cid, { documentos: merged, actualizado: Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0,10) });
+      const readback = Orbit.store.get('clientes', cid);
+      const rb = readback && Array.isArray(readback.documentos) ? readback.documentos : [];
+      if (!out.every(doc => rb.some(x => key(x) && key(x) === key(doc)))) {
+        return { ok: false, status: 'link_readback_missing', message: 'Drive confirmó el archivo, pero el expediente no confirmó todos los vínculos.', uploaded: out };
+      }
+    }
+    state.documentUploadResults = out;
+    return { ok: true, uploaded: out };
+  }
+
   function wire() {
     const dr = document.getElementById('imp-drawer');
     const drop = dr.querySelector('#imp-drop');
@@ -1064,7 +1133,20 @@ Orbit.importa = (function () {
       drop.addEventListener('click', e => { if (e.target.closest('label')) return; if (fileInput) fileInput.click(); });
       drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
       drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-      drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); state.step = state.modo === 'documental' ? 3 : 2; paint(); });
+      drop.addEventListener('drop', e => {
+        e.preventDefault(); drop.classList.remove('over');
+        const files = Array.from(e.dataTransfer && e.dataTransfer.files || []);
+        state.files = files.map(f => f.name);
+        state.filesReal = files;
+        state.parsed = null;
+        if (!files.length) return;
+        if (state.modo === 'documental') { state.step = 3; paint(); return; }
+        const synthetic = document.createElement('input');
+        synthetic.type = 'file';
+        const fl = dr.querySelector('#imp-files');
+        if (fl) fl.innerHTML = state.files.map(n => `<span class="mail-chip">📎 ${U.esc(n)}</span>`).join('');
+        state.step = 2; paint();
+      });
     }
     if (state.step === 2) {
       const it = dr.querySelector('#imp-iterar');
@@ -1082,17 +1164,38 @@ Orbit.importa = (function () {
       bar.querySelector('#imp-back2').addEventListener('click', () => { state.step = 1; paint(); });
       bar.querySelector('#imp-next2').addEventListener('click', () => { state.step = 3; paint(); });
     }
-    const fin = dr.querySelector('#imp-finish'); if (fin) fin.addEventListener('click', () => {
+    const fin = dr.querySelector('#imp-finish'); if (fin) fin.addEventListener('click', async () => {
+      if (fin.disabled) return;
       let msg = '';
       const kind = state.kind;
       const cfgFin = IMPORT_MAP[kind];
       const isConc = !!(cfgFin && cfgFin.conciliacion === true);
+      const mustPersistRawDocument = state.modo === 'documental' || (kind === 'documentos' && state.scope && state.scope.cid);
+      if (mustPersistRawDocument) {
+        fin.disabled = true;
+        const oldText = fin.textContent;
+        fin.textContent = 'Confirmando Drive…';
+        const docs = await persistDocumentaryFiles();
+        if (!docs.ok) {
+          if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast(docs.message || 'No se pudo confirmar el documento en Drive.');
+          fin.disabled = false;
+          fin.textContent = oldText;
+          return;
+        }
+        msg = '✓ ' + docs.uploaded.length + ' documento(s) confirmado(s) en Drive';
+        if (state.modo === 'documental') {
+          if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast(msg);
+          close();
+          if (state.opts.onDone) state.opts.onDone();
+          return;
+        }
+      }
       if (state.parsed && state.modo !== 'documental' && isConc) {
         const r = applyConciliacion(kind);
-        msg = '✓ Conciliación: ' + r.creados + ' referencias creadas · ' + r.propuestas + ' propuestas para revisión (pendiente de validación · no impacta cobros hasta aprobación)';
+        msg += (msg ? ' · ' : '✓ ') + 'Conciliación: ' + r.creados + ' referencias creadas · ' + r.propuestas + ' propuestas para revisión';
       } else if (state.parsed && state.modo !== 'documental' && IMPORT_MAP[kind]) {
         const r = applyImport(kind);
-        msg = '✓ ' + r.created + ' creados · ' + r.updated + ' actualizados en ' + IMPORT_MAP[kind].label;
+        msg += (msg ? ' · ' : '✓ ') + r.created + ' creados · ' + r.updated + ' actualizados en ' + IMPORT_MAP[kind].label;
       }
       if (kind === 'planillas-comision' && state.detectedRates && state.tarifasConfiables && state.aplicarTarifas && Orbit.comeng) {
         const validas = state.detectedRates.filter(r => r.valido && r.aseguradoraId);
@@ -1101,7 +1204,7 @@ Orbit.importa = (function () {
       } else if (kind === 'planillas-comision') {
         msg = 'Comisiones importadas como referencia · tarifas NO modificadas (sin confirmar diff)';
       }
-      if (msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2800); }
+      if (msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3200); }
       close(); if (state.opts.onDone) state.opts.onDone();
     });
     const again = dr.querySelector('#imp-again'); if (again) again.addEventListener('click', () => { state.step = 1; paint(); });
