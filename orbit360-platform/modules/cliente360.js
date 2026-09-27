@@ -718,10 +718,11 @@ Orbit.modules.cliente360 = (function () {
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           ${cli.driveLink ? `<a class="btn ghost sm" href="${U.esc(cli.driveLink)}" target="_blank" rel="noopener">📁 Abrir expediente Drive</a>` : ''}
           <button class="btn ghost sm" data-doc-intelligent>🧠 Importar y extraer datos</button>
-          <button class="btn primary sm" data-doc-upload>${directUpload ? '⬆ Cargar documento a Drive' : '📎 Vincular / cargar documento'}</button>
+          ${directUpload ? '' : '<button class="btn ghost sm" data-doc-connect>🔗 Conectar Drive</button>'}
+          <button class="btn primary sm" data-doc-upload>${directUpload ? '⬆ Cargar documento a Drive' : '📎 Cargar documento'}</button>
         </div>
       </div>
-      ${directUpload ? '' : '<div class="cfg-note" style="margin-top:12px">La plataforma no declarará un archivo como cargado hasta que Drive confirme almacenamiento y readback. Mientras la conexión directa no esté disponible, puedes mantener el expediente Drive vinculado o usar un enlace documental desde una gestión.</div>'}
+      ${directUpload ? '' : '<div class="cfg-note" style="margin-top:12px">Conecta una cuenta Google con permiso de escritura en la carpeta Clientes de A&S. El token se usa únicamente durante esta sesión y la plataforma no declarará un archivo cargado hasta recibir readback de Drive.</div>'}
     </div>
     <div style="display:grid;gap:10px">${cards || '<div class="card pad" style="text-align:center;color:var(--ink-2);padding:28px">Todavía no hay documentos con vínculo Drive confirmado en esta ficha.</div>'}</div>`;
   }
@@ -739,16 +740,44 @@ Orbit.modules.cliente360 = (function () {
         if (/^https:\/\/[^\s]+$/i.test(url)) window.open(url, '_blank', 'noopener,noreferrer');
       }
     }));
+    async function ensureDriveConnected() {
+      const provider = Orbit.productDriveDocumentProviderP0;
+      if (!provider || typeof provider.connect !== 'function') {
+        c360toast('La conexión Drive no está disponible.');
+        return false;
+      }
+      let st = provider.status ? provider.status() : {};
+      if (st && st.available === true) return true;
+      st = await provider.connect();
+      if (!st || st.available !== true) {
+        c360toast((st && st.message) || 'No fue posible conectar Drive.');
+        return false;
+      }
+      Orbit.modules.cliente360.reabrir(cid, 'documentos');
+      return true;
+    }
+    const connect = body.querySelector('[data-doc-connect]');
+    if (connect) connect.addEventListener('click', async () => {
+      connect.disabled = true;
+      await ensureDriveConnected();
+      connect.disabled = false;
+    });
     const upload = body.querySelector('[data-doc-upload]');
-    if (upload) upload.addEventListener('click', () => Orbit.importa.open('documentos', {
-      multi: true, modo: 'documental', scope: { cid, nombre: cli.nombre || 'Cliente' },
-      onDone: () => Orbit.modules.cliente360.reabrir(cid, 'documentos')
-    }));
+    if (upload) upload.addEventListener('click', async () => {
+      if (!(await ensureDriveConnected())) return;
+      Orbit.importa.open('documentos', {
+        multi: true, modo: 'documental', scope: { cid, nombre: cli.nombre || 'Cliente' },
+        onDone: () => Orbit.modules.cliente360.reabrir(cid, 'documentos')
+      });
+    });
     const intelligent = body.querySelector('[data-doc-intelligent]');
-    if (intelligent) intelligent.addEventListener('click', () => Orbit.importa.open('documentos', {
-      multi: true, modo: 'inteligente', scope: { cid, nombre: cli.nombre || 'Cliente' },
-      onDone: () => Orbit.modules.cliente360.reabrir(cid, 'documentos')
-    }));
+    if (intelligent) intelligent.addEventListener('click', async () => {
+      if (!(await ensureDriveConnected())) return;
+      Orbit.importa.open('documentos', {
+        multi: true, modo: 'inteligente', scope: { cid, nombre: cli.nombre || 'Cliente' },
+        onDone: () => Orbit.modules.cliente360.reabrir(cid, 'documentos')
+      });
+    });
   }
 
   /* ---- Recibos y cobros (filtro por póliza + confirmar cobro) ---- */
