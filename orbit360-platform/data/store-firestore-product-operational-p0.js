@@ -39,8 +39,11 @@
   function error(code){var e=new Error(code);e.code=code;state.lastError=code;throw e;}
   function member(){
     var m=Orbit.auth&&Orbit.auth.productUser;
-    if(!m||m.productReadOnly!==true||!text(m.uid)||!text(m.tenantId)||!Array.isArray(m.roles)||!m.roles.length||m.roles.indexOf(m.activeRole)<0)error('PRODUCT_WRITE_MEMBERSHIP_REQUIRED');
-    return m;
+    if(!m||m.productReadOnly!==true||!text(m.uid)||!text(m.tenantId)||!Array.isArray(m.roles)||!m.roles.length)error('PRODUCT_WRITE_MEMBERSHIP_REQUIRED');
+    var role=text(m.activeRole);
+    try{if(Orbit.session&&typeof Orbit.session.rol==='function')role=text(Orbit.session.rol())||role;}catch(e){}
+    if(m.roles.indexOf(role)<0)error('PRODUCT_WRITE_MEMBERSHIP_REQUIRED');
+    return Object.assign({},m,{activeRole:role});
   }
   function moduleFor(collection){
     var moduleKey=SURFACE[collection];

@@ -133,7 +133,7 @@
     "orbit360-platform/core/tenant-domain-config-client.js": "89bff4ac9131ff5805ffe96ee8d6ccd4927a84dc",
     "orbit360-platform/core/user-onboarding.js": "bf645951a23491ce53d2034ba4281d965cbb326d",
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
-    "orbit360-platform/data/store-firestore-product-operational-p0.js": "e49fa536b6e39514ba528c5b42d12263df93facb",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "5e2f66f4e442ecfcf3153c64d98d4c579b7d1058",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "ff7e84f91d8078dd8bc6e424920c9101afb44837",
@@ -177,25 +177,17 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "PAULA_B2_RENEWAL_OPS_UAT_R13",
-    "parentHead": "8c6e798598193dd6a4e55c4d49d0c75e3845ab9e",
-    "status": "SOURCE_FIXED_AND_GOVERNANCE_REBOUND_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+    "origin": "PAULA_MANUAL_UAT_R14_ADVISOR_WRITE_ROLE_DESYNC",
+    "parentHead": "a3087a1a213baf064534fc2cc71894d3c3fd0d35",
+    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "changedProductFiles": [
-      "functions/product-ops-leads-domain.js",
-      "orbit360-platform/core/ciclo.js",
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
-      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
-      "orbit360-platform/core/issuance-workflow-v1201.js",
-      "orbit360-platform/core/policy-receipts-engine.js"
+      "orbit360-platform/data/store-firestore-product-operational-p0.js"
     ],
     "productBlobs": {
-      "functions/product-ops-leads-domain.js": "8e584ae5b13332ebe5836d9ed951a1bbe85564c4",
-      "orbit360-platform/core/ciclo.js": "ee9fab2530ca9bc5603dcfb5ee6c18bd0723092e",
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "9db92325fb4eb430c564d924cb572823748c5458",
-      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "ab3185e5df3b470cd37e0e3acf688805ecdcf904",
-      "orbit360-platform/core/issuance-workflow-v1201.js": "d1b075ee251bd5a798299ecd90391db5c5d86552",
-      "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2"
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "5e2f66f4e442ecfcf3153c64d98d4c579b7d1058"
     },
+    "rootCause": "Write facade used membership/default activeRole while UI/access used current session role.",
+    "fix": "Bind write activeRole to Orbit.session.rol() with assigned-role validation.",
     "noDataReimport": true,
     "noLive": true,
     "noB3": true

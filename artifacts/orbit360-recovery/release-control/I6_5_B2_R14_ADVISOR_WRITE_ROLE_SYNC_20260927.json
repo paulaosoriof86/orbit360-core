@@ -1,0 +1,23 @@
+{
+  "schema": "gravicentra-i6-5-b2-r14-advisor-write-role-sync-v1",
+  "recordedAt": "2026-09-27",
+  "authority": "PAULA_MANUAL_UAT_PLUS_SOURCE_CAUSAL_AUDIT",
+  "observedPreview": {
+    "sourceSha": "083d549c6b9b73234502e43fff708f563122b1e6",
+    "runId": 36287477420,
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36287477420-g6dy71t0.web.app"
+  },
+  "symptom": "Con rol visual Asesor, Propuestas, Pedir renovar y Cliente360 Solicitar gestión fallan sin escribir, mientras la persistencia sintética con rol Operativo sí pasa.",
+  "rootCause": "El facade de escritura tomaba Orbit.auth.productUser.activeRole (rol proyectado/default) mientras permisos y UI usaban Orbit.session.rol() (rol activo seleccionado). Esa desincronización impedía entrar al self-service create_management del Asesor.",
+  "fix": "Resolver activeRole de escritura desde Orbit.session.rol(), validar que esté asignado y enviar esa misma autoridad al backend.",
+  "proofRequired": [
+    "Asesor crea gestión propia de propuestas",
+    "readback servidor",
+    "visible una vez en Ops",
+    "persiste tras reload",
+    "Operativo/Dirección sin regresión"
+  ],
+  "noLive": true,
+  "noReimport": true,
+  "noB3": true
+}

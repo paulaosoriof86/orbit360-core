@@ -918,6 +918,20 @@ try{
   evidence.crud.reportedPaymentVisible=true;evidence.crud.reportedPaymentDoesNotFabricateCobro=true;
   milestone('REPORTED_PAYMENT_COBROS_PROJECTION_PASS',{confirmedCobros:0});
 
+  milestone('ADVISOR_SELF_SERVICE_MANAGEMENT_START');
+  await setRole(page,'Asesor');
+  const advisorSelf=await bounded(page.evaluate(async ({clientId,policyId,advisorId,stamp})=>{
+    const id='b2-ges-advisor-'+String(stamp||'').toLowerCase();
+    const beforeRole=String(Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.activeRole||'');
+    const sessionRole=String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'');
+    const row=await Orbit.ciclo.crearGestionDurable({id,lista:'Renovaciones / Modif.',tipo:'Solicitar propuestas de renovación',titulo:'Asesor self-service B2 QA',clienteId,polizaId:policyId,sourcePolicyId:policyId,asesorId:advisorId,estado:'Pendiente',prioridad:'Media',origen:'B2 QA',workflowType:'renewal_proposals',renewalAction:'request_proposals',proximaAccion:'Operaciones: solicitar propuestas'});
+    return{id,beforeRole,sessionRole,persisted:!!row};
+  },{clientId:client.id,policyId:policy.id,advisorId:actor.advisorId,stamp}),'B2_AUTH_ADVISOR_SELF_SERVICE_TIMEOUT',45000);
+  need(advisorSelf.persisted===true&&advisorSelf.sessionRole==='Asesor','B2_AUTH_ADVISOR_SELF_SERVICE_WRITE_FAILED:'+JSON.stringify(advisorSelf));
+  state.managementIds=[advisorSelf.id];
+  milestone('ADVISOR_SELF_SERVICE_MANAGEMENT_PASS',advisorSelf);
+  await setRole(page,'Operativo');
+
   milestone('OPS_LEADS_SYNTHETIC_E2E_START');
   const opsE2E=await bounded(page.evaluate(async ({clientId,policyId,advisorId,stamp})=>{
     const suffix=String(stamp||'').toLowerCase();
@@ -954,7 +968,7 @@ try{
   need(Object.values(opsE2E.storeCounts).every(n=>n===1),'B2_AUTH_OPS_LEADS_CANONICAL_DUPLICATE:'+JSON.stringify(opsE2E));
   need(opsE2E.genericOps===1&&opsE2E.proposalsOps===1&&opsE2E.acceptedOps===1,'B2_AUTH_MANAGEMENT_NOT_VISIBLE_ONCE_IN_OPS:'+JSON.stringify(opsE2E));
   need(opsE2E.businessOps===1&&opsE2E.businessLeads===1&&opsE2E.businessStage==='cotizando','B2_AUTH_LEADS_OPS_SYNC_FAILED:'+JSON.stringify(opsE2E));
-  state.managementId=opsE2E.ids.generic;state.managementIds=[opsE2E.ids.generic,opsE2E.ids.proposals,opsE2E.ids.accepted];state.businessId=opsE2E.ids.business;
+  state.managementId=opsE2E.ids.generic;state.managementIds=[advisorSelf.id,opsE2E.ids.generic,opsE2E.ids.proposals,opsE2E.ids.accepted];state.businessId=opsE2E.ids.business;
   evidence.writes.synthetic+=5;
   await page.evaluate(()=>{location.hash='#/ops';});
   await page.waitForSelector('[data-ges]',{timeout:15000});

@@ -46,6 +46,7 @@ need(files.crmBridge.includes('await A.correction')&&files.crmBridge.includes('S
 need(files.bridge.includes('await A.correction')&&files.bridge.includes('Solicitud creada y confirmada en Ops'),'B2_R4_POLICY_FALSE_SUCCESS_NOT_CLOSED');
 need(files.opsBackend.includes('SELF_SERVICE_ROLES')&&files.opsBackend.includes('orbit360OpsLeadsCommandPreview')&&files.opsBackend.includes('canonicalReadback:true'),'B2_R4_OPS_SELF_SERVICE_PREVIEW_READBACK_MISSING');
 need(files.opsBackend.includes("PREVIEW_TEST_RECORD_ONLY")&&files.opsBackend.includes("previewWrite:previewOnly===true")&&files.opsBackend.includes("targets.length&&previewOnly!==true"),'B2_R12_PREVIEW_UAT_WRITE_MODE_MISSING');
+need(files.operationalStore.includes("typeof Orbit.session.rol==='function'")&&files.operationalStore.includes("Object.assign({},m,{activeRole:role})"),'B2_R14_WRITE_ROLE_NOT_SYNCED_WITH_ACTIVE_SESSION');
 need(files.opsBackend.includes('enrichManagementContext')&&files.opsBackend.includes("row.pais=text(row.pais||(policy&&policy.pais)||(client&&client.pais)"),'B2_R67_MANAGEMENT_COUNTRY_RELOAD_FIX_MISSING');
 need(files.renewals.includes("renewal-proposals-v1200")&&files.renewals.includes("La gestión se creará <b>solo al confirmar</b>"),'B2_R68_PROPOSALS_PREMATURE_CREATE_FIX_MISSING');
 need(files.issuanceBridge.includes("renewalDefaultPayments")&&files.issuanceBridge.includes("Comparar / enviar propuestas")&&files.issuanceBridge.includes("Registrar retroalimentación"),'B2_R69_RENEWAL_OPS_UAT_CONTROLS_MISSING');

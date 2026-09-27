@@ -1204,7 +1204,7 @@
       "rootCause": "Effective current owners still used optimistic Orbit.store insert: core/ciclo.js returned before server commit, and renewal bridge immediately redirected/toasted. Backend rejection in protected Preview rolled back the pending row after UI had implied success.",
       "remediation": "Use awaited crearGestionDurable -> server-owned workflow command -> canonical readback before any success/notification. Preview real-data rejection must be explicit.",
       "requiredProof": "Synthetic authenticated management create from Cliente360/Renovaciones -> server commit -> canonical readback -> visible exactly once in Ops -> reload -> cleanup; real Preview action must explicitly report no write.",
-      "status": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "status": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "blocking": true,
@@ -1223,7 +1223,9 @@
       "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
+      "r14ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R14_ADVISOR_WRITE_ROLE_SYNC_20260927.json",
+      "r14ReceiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f"
     },
     {
       "id": "B2-R35-VEHICLE-HISTORY-PROJECTION-R4",
@@ -2092,7 +2094,7 @@
       "rootCause": "renewals-v1200-operational-bridge invokes optimistic Orbit.ciclo.crearGestion; core/ciclo crearGestion uses non-awaited S().insert.",
       "remediation": "Await server-owned create_management + canonical readback before normal success. Preserve approved Renew -> Cotizador/Comparativo -> accepted offer -> Ops issuance -> real renewed policy workflow.",
       "requiredProof": "Synthetic renewal_proposals + renewal_accepted management commit/readback; each appears once in Ops after reload; accepted panel exposes issuance/direct-registration branches; cleanup.",
-      "status": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "status": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "sourceFix": {
         "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
@@ -2110,7 +2112,9 @@
       "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
+      "r14ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R14_ADVISOR_WRITE_ROLE_SYNC_20260927.json",
+      "r14ReceiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f"
     },
     {
       "id": "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
@@ -2232,7 +2236,7 @@
       "rootCause": "El endurecimiento de seguridad B2 convirtió el Preview de workflow en read-only para registros no sintéticos.",
       "remediation": "Permitir creación autenticada y role-scoped en Preview; solo registros creados en Preview pueden modificarse; suprimir notificaciones externas y auditar previewWrite.",
       "requiredProof": "Propuestas, Pedir renovar y Gestión desde Cliente360 persisten y aparecen una sola vez en Ops; negocio de prueba se sincroniza Leads↔Ops; reload conserva; cero outbox externo.",
-      "status": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "status": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
@@ -2242,7 +2246,9 @@
       "authFailureRunId": 36270785111,
       "authFailureClassification": "POST_RELOAD_BROWSER_VISIBILITY_TIMEOUT",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
+      "r14ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R14_ADVISOR_WRITE_ROLE_SYNC_20260927.json",
+      "r14ReceiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f"
     },
     {
       "id": "B2-R67-OPS-MANAGEMENT-COUNTRY-RELOAD-R13",
@@ -2316,6 +2322,23 @@
       "blocking": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
       "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R72-ADVISOR-WRITE-ACTIVE-ROLE-DESYNC-R14",
+      "block": "B2",
+      "source": "PAULA_MANUAL_UAT_20260927",
+      "surface": "Cliente360/Renovaciones/Ops",
+      "classification": "PRODUCT_DEFECT_ROLE_AUTHORITY_DESYNC",
+      "blocking": true,
+      "finding": "El rol activo visible Asesor y el rol usado por la capa de escritura divergían; create_management self-service se bloqueaba antes del backend.",
+      "rootCause": "store-firestore-product-operational-p0 member() usaba Orbit.auth.productUser.activeRole en lugar de Orbit.session.rol().",
+      "remediation": "Vincular la escritura al rol de sesión canónico y probar create_management autenticado con Asesor.",
+      "requiredProof": "Asesor dentro de own-scope puede crear Propuestas/Pedir renovar/Gestión, aparece una vez en Ops y persiste tras reload.",
+      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R14_ADVISOR_WRITE_ROLE_SYNC_20260927.json",
+      "receiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f",
       "noLive": true,
       "noReimport": true
     }
