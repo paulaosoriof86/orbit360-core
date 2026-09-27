@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -257,12 +257,12 @@
   },
   "candidate": {
     "status": "CANDIDATE_PENDING_PREVIEW",
-    "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
-    "governanceHeadBeforeCandidateArm": "50ec563f8861afd542e09b9154293ee7338f96b5",
+    "sourceCandidateSha": "10f03257590eb0ab73952e63ff0296a20bcfeabb",
+    "governanceHeadBeforeCandidateArm": "06378fefe7fb250d70db19c80ece0febd5b23286",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+    "compositionLockBlobSha": "d836a1a369a812551a0802636b8c080ebf96c5d2",
     "productFileCount": 67,
-    "findingLedgerBlobSha": "6263b79b6aa4c3273ee7c2b0a153f4abc5e8e6b9",
+    "findingLedgerBlobSha": "1ecca9ab089f3209482774f751c4d93768a83984",
     "blockingFindingIds": [
       "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
       "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
@@ -273,7 +273,8 @@
       "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
       "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
       "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
-      "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A"
+      "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
+      "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B"
     ],
     "sourceContract": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
     "authenticatedHarness": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
@@ -285,7 +286,8 @@
     "noReimport": true,
     "noLivePromotion": true,
     "noB3": true,
-    "preservesB1": true
+    "preservesB1": true,
+    "humanDownloadRetestRequired": true
   },
   "preview": {
     "sourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
@@ -300,7 +302,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "PASS",
+    "status": "SUPERSEDED_BY_R83_DRIVE_DOWNLOAD_SOURCE_FIX",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
     "exactPreviewBuildId": "gi-i65-b2-367c839a92aa-57f234755dc1",
@@ -485,7 +487,7 @@
     "lastFailureClassification": "POST_RELOAD_BROWSER_VISIBILITY_TIMEOUT",
     "productRegressionDemonstrated": true,
     "requiredNewHarnessBlob": "7ad8ac9b195353b9e7285e365181fbc4abb390f7",
-    "priorPassRunId": 36333852637,
+    "priorPassRunId": 36334556509,
     "priorPassPreserved": true,
     "proofStrengtheningReason": "R59_VISIBLE_PLATE_UNIQUENESS_AND_ACTIVE_POLICY_COVERAGE",
     "invalidatedOldPreviewRunId": 36260454531,
@@ -509,7 +511,7 @@
     },
     "humanDriveOAuthProofRequired": true,
     "driveOAuthExpected": "DELEGATED_USER_OAUTH_MEMORY_ONLY",
-    "invalidationReason": "Preview Drive path could create synthetic client folder outside _GRAVICENTRA_PREVIEW_QA before upload."
+    "invalidationReason": "R83 Drive download provider source changed after human Preview proof; new immutable Preview and authenticated reproof required."
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -1845,8 +1847,10 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
+    "R83_NEW_EXACT_PREVIEW_READBACK",
+    "R83_AUTHENTICATED_RUNTIME_REPROOF",
     "PAULA_VISUAL_ACCEPTANCE",
-    "HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_PROOF",
+    "HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_DOWNLOAD_PROOF",
     "DRIVE_QA_FIXTURE_CLEANUP"
   ],
   "lastAuthenticatedFailure": {
@@ -2960,9 +2964,9 @@
     "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "exactPreviewProofPending": true
   },
-  "boundaryNote": "R15/R15A cumulative source includes definitive Preview Drive folder isolation: synthetic client folder, uploaded document and persisted synthetic client Drive link must remain under _GRAVICENTRA_PREVIEW_QA. Prior authenticated pass is preserved as historical evidence but superseded for R77/R81 by this causal source fix. No LIVE, no B3, no reimport.",
+  "boundaryNote": "R15/R15A cumulative source plus R83 Drive download fix must be rebuilt as a new immutable exact Preview. Existing synthetic Drive fixture remains isolated under _GRAVICENTRA_PREVIEW_QA and is preserved only for R83 retest; no cleanup until retest. No LIVE, no B3, no reimport.",
   "driveHumanFixture": {
-    "status": "READY_PENDING_PAULA_OAUTH",
+    "status": "PRESERVED_PENDING_R83_RETEST_ON_NEW_PREVIEW",
     "tenantId": "alianzas-soluciones",
     "clientId": "b2-drive-human-36334556509",
     "clientName": "B2 QA · PRUEBA DRIVE HUMANA · NO USAR",
@@ -2983,6 +2987,21 @@
     "createdAt": "2026-09-27T17:03:06.086Z",
     "fixtureRunId": 36335271355,
     "humanProofPending": true,
-    "cleanupPending": true
+    "cleanupPending": true,
+    "uploadOpenHumanPass": true,
+    "previewIsolationReadbackPass": true,
+    "downloadHumanPass": false
+  },
+  "r15bDriveDownload": {
+    "findingId": "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15B_DRIVE_DOWNLOAD_FINDING_20260927.json",
+    "sourceFixCommit": "10f03257590eb0ab73952e63ff0296a20bcfeabb",
+    "contractGuardCommit": "328018188f582c57494ac77ac373484664632d5d",
+    "productOwner": "orbit360-platform/core/product-drive-document-provider-p0.js",
+    "sourceFixed": true,
+    "exactPreviewPending": true,
+    "humanRetestPending": true,
+    "livePromoted": false,
+    "noReimport": true
   }
 }
