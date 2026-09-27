@@ -39,7 +39,7 @@ const payload={
   id,tenantId:TENANT,
   nombre:'B2 QA · PRUEBA DRIVE HUMANA · NO USAR',
   tipo:'Persona',pais:'GT',moneda:'GTQ',
-  asesorId,
+  asesorId:advisorId,
   identificacion:'B2DRIVE-'+run,
   estado:'Nuevo',estadoOperativo:'Nuevo',segmento:'Nuevo',canal:'B2 QA',
   telefono:'',correo:'',documentos:[],
