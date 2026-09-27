@@ -210,8 +210,8 @@
     "futureChangeRule": "Every product-source change and its composition manifest update must land atomically; otherwise no build/Preview.",
     "ownerRule": "Every modified capability declares the effective runtime owner; after change, prove no older owner shadows it.",
     "findingRule": "A finding can leave the active ledger only as CLOSED_PASS or explicitly authorized DEFERRED/NOT_APPLICABLE with evidence.",
-    "compositionLockBlobSha": "34be4524e40db6606f042124e86c23a17c335a1a",
-    "findingLedgerBlobSha": "b843a3a5e61eec14a8291917d17225af5e69b54d"
+    "compositionLockBlobSha": "d836a1a369a812551a0802636b8c080ebf96c5d2",
+    "findingLedgerBlobSha": "1ecca9ab089f3209482774f751c4d93768a83984"
   },
   "findingControl": {
     "ledgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -248,7 +248,10 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
     "r3Origin": "PAULA_VISUAL_REVIEW_20260925_R3",
     "r3RecordedAt": "2026-09-25T11:43:00-06:00",
-    "r3ReadOnlyAuditTarget": "OSCAR_HAROLDO_RODRIGUEZ_PADILLA / 91-0169567 / 5 vehicles"
+    "r3ReadOnlyAuditTarget": "OSCAR_HAROLDO_RODRIGUEZ_PADILLA / 91-0169567 / 5 vehicles",
+    "r15bOrigin": "PAULA_DRIVE_HUMAN_PROOF_20260927",
+    "r15bFindingId": "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
+    "r15bSourceFix": true
   },
   "dataUpdateCompletion": {
     "preservedPass": [
@@ -289,7 +292,9 @@
     "r3CausalReadOnlyAuditRequired": true,
     "r3SingleCumulativeFixRequired": true,
     "r15R15aCandidateReadyForExactPreview": true,
-    "r15DrivePreviewIsolationFixPendingExactPreview": true
+    "r15DrivePreviewIsolationFixPendingExactPreview": true,
+    "r15bDriveDownloadFixPendingExactPreview": true,
+    "r15bHumanDownloadRetestRequired": true
   },
   "antiInterruptionExecution": {
     "status": "FROZEN_ACTIVE",
