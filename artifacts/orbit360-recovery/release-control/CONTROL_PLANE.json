@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "1d6eadd5ba3901261c4318828147ff1e4a8e8457",
+    "b2ExecutionLockBlobSha": "87b7b5b82971c2095aafa1f27ac2f7f6c6df1151",
     "b2": {
-      "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R15_REMEDIATION_REQUIRED",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2100,18 +2100,18 @@
       "visualAuditBrandingRootCauseClosedPendingPreview": true,
       "visualReceiptRecapture": true,
       "assistantVisualAudit": "REMEDIATION_REQUIRED_BEFORE_PAULA_VISUAL",
-      "outstandingBlockersForHumanReview": 7,
+      "outstandingBlockersForHumanReview": 9,
       "paulaVisualAccepted": false,
       "technicalPassHistoricalPreserved": true,
       "authenticatedPassHistoricalPreserved": true,
       "syntheticCleanupHistoricalPreserved": true,
-      "paulaVisualDecision": "REJECTED_R6",
+      "paulaVisualDecision": "REJECTED_R15_REMEDIATION_REQUIRED",
       "paulaVisualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
       "paulaVisualRejectionReceiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "B2 exact technical Preview and authenticated runtime proof PASS on the same product source/build/artifact. Harness-only clienteId defect was repaired without product-source mutation; run 36289840679 passed and cleanup removed 48 synthetics. Paula focal visual UAT remains required. No LIVE, no B3, no reimport.",
+      "boundaryNote": "Paula mobile UAT R15 rejected the exact B2 Preview on nine reproducible product defects. Prior technical/authenticated PASS remains historical evidence only and does not equal visual acceptance. Remediate causally on the single cumulative candidate, build a new immutable Preview, authenticate, then Paula focal UAT. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2131,13 +2131,15 @@
       "authenticatedRunArmed": true,
       "previewCredentialSecretIamRepair": "AUTHORIZED_PENDING_PROOF",
       "humanReviewOutstandingIds": [
-        "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
-        "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
-        "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
-        "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
-        "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
-        "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6",
-        "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
+        "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
+        "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
+        "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
+        "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
+        "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+        "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
+        "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
+        "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
+        "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15"
       ],
       "humanReviewOutstandingCount": 9,
       "humanReviewR3": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
@@ -2353,7 +2355,23 @@
       "lastAuthenticatedPassHarnessBlobSha": "617763462f20f3f872107795b2111c4f70623689",
       "lastAuthenticatedPassArtifactId": 10922086380,
       "lastAuthenticatedPassArtifactDigest": "sha256:c2afc1e4d68c55d02fd8882f296744f6a8c31a6ad5b99cbc979c215c0e9d0e73",
-      "lastAuthenticatedFailureSupersededByPassRunId": 36289840679
+      "lastAuthenticatedFailureSupersededByPassRunId": 36289840679,
+      "r15ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+      "r15ReceiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+      "r15FindingLedgerBlobSha": "1f9d19f641ad449f3e3588c371af2d955a1649c0",
+      "r15BlockingFindingIds": [
+        "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
+        "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
+        "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
+        "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
+        "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+        "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
+        "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
+        "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
+        "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15"
+      ],
+      "r15AuthenticatedTechnicalPassPreserved": true,
+      "r15AuthenticatedPassRunId": 36289840679
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2473,7 +2491,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "cdb5989fbf7255629ba8c5399fbf92971525d059",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "4049c4244e8f076b6b0c237837798e3396b0828e",
+    "findingLedgerBlobSha": "1f9d19f641ad449f3e3588c371af2d955a1649c0",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
     "activeBlock": "B2",
@@ -2485,7 +2503,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R14_NEW_IMMUTABLE_PREVIEW_THEN_ADVISOR_WRITE_AUTH_AND_FOCUSED_PAULA_UAT"
+    "nextAction": "B2_R15_CAUSAL_REMEDIATION_SINGLE_CUMULATIVE_CANDIDATE"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
