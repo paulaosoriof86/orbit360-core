@@ -47,10 +47,10 @@ need(files.bridge.includes('await A.correction')&&files.bridge.includes('Solicit
 need(files.opsBackend.includes('SELF_SERVICE_ROLES')&&files.opsBackend.includes('orbit360OpsLeadsCommandPreview')&&files.opsBackend.includes('canonicalReadback:true'),'B2_R4_OPS_SELF_SERVICE_PREVIEW_READBACK_MISSING');
 need(files.opsBackend.includes("PREVIEW_TEST_RECORD_ONLY")&&files.opsBackend.includes("previewWrite:previewOnly===true")&&files.opsBackend.includes("targets.length&&previewOnly!==true"),'B2_R12_PREVIEW_UAT_WRITE_MODE_MISSING');
 need(files.opsBackend.includes('enrichManagementContext')&&files.opsBackend.includes("row.pais=text(row.pais||(policy&&policy.pais)||(client&&client.pais)"),'B2_R67_MANAGEMENT_COUNTRY_RELOAD_FIX_MISSING');
-need(files.renewalsBridge.includes("renewal-proposals-v1200")&&files.renewalsBridge.includes("La gestión se creará <b>solo al confirmar</b>"),'B2_R68_PROPOSALS_PREMATURE_CREATE_FIX_MISSING');
+need(files.renewals.includes("renewal-proposals-v1200")&&files.renewals.includes("La gestión se creará <b>solo al confirmar</b>"),'B2_R68_PROPOSALS_PREMATURE_CREATE_FIX_MISSING');
 need(files.issuanceBridge.includes("renewalDefaultPayments")&&files.issuanceBridge.includes("Comparar / enviar propuestas")&&files.issuanceBridge.includes("Registrar retroalimentación"),'B2_R69_RENEWAL_OPS_UAT_CONTROLS_MISSING');
-need(files.issuanceCore.includes("soporte_renovacion_en_firme_invalido"),'B2_R70_FIRM_RENEWAL_SUPPORT_VALIDATION_MISSING');
-need(files.policyReceiptsEngine.includes("if (explicit > 0) return Math.max(1, Math.min(24, explicit));"),'B2_R69_RECEIPT_COUNT_EDITABILITY_MISSING');
+need(files.issuance.includes("soporte_renovacion_en_firme_invalido"),'B2_R70_FIRM_RENEWAL_SUPPORT_VALIDATION_MISSING');
+need(files.engine.includes("if (explicit > 0) return Math.max(1, Math.min(24, explicit));"),'B2_R69_RECEIPT_COUNT_EDITABILITY_MISSING');
 need(files.ciclo.includes("No se pudo guardar el cambio del checklist.")&&files.ciclo.includes("if (e.target === back) { e.preventDefault(); e.stopPropagation(); }"),'B2_R71_OPS_MODAL_CHECKLIST_GUARD_MISSING');
 need(files.operationalStore.includes('WORKFLOW_PREVIEW_COMMAND')&&files.operationalStore.includes("action==='insert')requireServerReadback"),'B2_R4_OPS_PREVIEW_ROUTING_READBACK_MISSING');
 need(files.client.includes('vehicleLineageRoot')&&files.client.includes('data-vehicle-identity-incomplete')&&files.client.includes('versionOfVehicleId'),'B2_R5_VEHICLE_HISTORY_PRESENTATION_MISSING');
