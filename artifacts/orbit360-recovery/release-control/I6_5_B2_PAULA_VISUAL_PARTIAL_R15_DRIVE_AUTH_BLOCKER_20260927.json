@@ -55,7 +55,7 @@
     "reimportExecuted": false,
     "productSourceChanged": false,
     "firebaseAuthConfigurationChanged": false,
-    "nextRequiredAction": "PAULA_ENABLE_GOOGLE_PROVIDER_IN_FIREBASE_CONSOLE_THEN_AUTOMATED_READBACK_GUARD"
+    "nextRequiredAction": "AUTOMATED_GOOGLE_PROVIDER_READBACK_GUARD_THEN_REPEAT_HUMAN_DRIVE_OAUTH_PROOF"
   },
   "authorization": {
     "decision": "AUTHORIZED",
@@ -71,7 +71,14 @@
       "b3Open": false,
       "reimport": false
     },
-    "status": "BLOCKED_MANUAL_FIREBASE_GOOGLE_PROVIDER_SETUP"
+    "status": "MANUAL_ENABLEMENT_REPORTED_PENDING_READBACK",
+    "manualEnablementEvidence": {
+      "reportedBy": "Paula",
+      "reportedAt": "2026-09-27",
+      "uiObservedState": "Google = Habilitada",
+      "firebaseProject": "ays-orbit-360-lab",
+      "source": "Paula mobile Firebase Console screenshots"
+    }
   },
   "firebaseGoogleProviderProgrammaticAttempts": [
     {
