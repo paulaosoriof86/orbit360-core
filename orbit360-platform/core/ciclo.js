@@ -346,7 +346,8 @@ Orbit.ciclo = (function () {
       </div>
       <div class="ciclo-foot">
         <div class="muted" style="font-size:12px">${n.clienteIdCreado ? '🏆 Cliente creado · <a style="color:var(--red);cursor:pointer" onclick="document.getElementById(\'ciclo-modal\').remove();location.hash=\'#/cliente360?c=' + n.clienteIdCreado + '\'">ver expediente</a>' : 'Creado ' + U.fmtDate(n.creado)}</div>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn ghost" id="ng-delete" style="color:var(--danger,var(--red))">Eliminar</button>
           <button class="btn ghost" data-close>Cerrar</button>
           <button class="btn primary" id="ng-save">Guardar cambios</button>
         </div>
@@ -373,6 +374,19 @@ Orbit.ciclo = (function () {
     if (cadd) cadd.addEventListener('click', () => { const v = back.querySelector('#ng-chk-new').value.trim(); if (!v) return; n.checklist = n.checklist || []; n.checklist.push({ t: v, done: false }); S().update('negocios', id, { checklist: n.checklist }); openNegocio(id); });
     const comadd = back.querySelector('#ng-com-add');
     if (comadd) comadd.addEventListener('click', () => { const v = back.querySelector('#ng-com-new').value.trim(); if (!v) return; n.comentarios = n.comentarios || []; n.comentarios.push({ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), texto: v }); S().update('negocios', id, { comentarios: n.comentarios }); openNegocio(id); });
+    // delete
+    const ngDelete = back.querySelector('#ng-delete');
+    if (ngDelete) ngDelete.addEventListener('click', async () => {
+      if (!Orbit.recordDelete) return U.toast('Eliminación canónica no disponible.');
+      ngDelete.disabled = true;
+      try {
+        const result = await Orbit.recordDelete.remove('negocios', id, { label: n.nombre || n.id });
+        if (result && result.ok) { back.remove(); refresh(); return; }
+      } catch (error) {
+        U.toast('No fue posible confirmar la eliminación del negocio.');
+      }
+      ngDelete.disabled = false;
+    });
     // save
     back.querySelector('#ng-save').addEventListener('click', () => {
       const g = sid => (back.querySelector('#' + sid) || {}).value;
@@ -460,6 +474,7 @@ Orbit.ciclo = (function () {
               ${g.estado !== 'Resuelta' ? '<button class="btn primary" data-gact="resolver">✓ Marcar resuelta</button>' : '<button class="btn ghost" data-gact="reabrir">↺ Reabrir</button>'}
               ${cli ? `<button class="btn ghost" data-gact="cliente">🧑‍💼 Ver cliente</button>` : ''}
               <button class="btn ghost" data-gact="archivar">📦 Archivar</button>
+              <button class="btn ghost" data-gact="eliminar" style="color:var(--danger,var(--red))">Eliminar</button>
             </div>
           </div>
           <div class="ciclo-sec">
@@ -488,11 +503,23 @@ Orbit.ciclo = (function () {
     }));
     const cadd = back.querySelector('#gs-chk-add');
     if (cadd) cadd.addEventListener('click', () => { const v = back.querySelector('#gs-chk-new').value.trim(); if (!v) return; g.checklist = g.checklist || []; g.checklist.push({ t: v, done: false }); S().update('gestiones', id, { checklist: g.checklist }); openGestion(id); });
-    back.querySelectorAll('[data-gact]').forEach(b => b.addEventListener('click', () => {
+    back.querySelectorAll('[data-gact]').forEach(b => b.addEventListener('click', async () => {
       const a = b.dataset.gact;
       if (a === 'resolver') { log(g, 'Estado', g.estado, 'Resuelta', 'manual'); S().update('gestiones', id, { estado: 'Resuelta', bitacora: g.bitacora }); const cl = S().get('clientes', g.clienteId); notify({ tipo: 'gestion', titulo: 'Gestión resuelta · ' + (g.titulo || g.tipo), detalle: cl ? cl.nombre : '', para: (ase || {}).nombre, tel: cl ? cl.telefono : '', email: cl ? cl.email : '' }); if (cl && Orbit.notify) { Orbit.notify.pedir(cl.id, { tipo: 'Respuesta de gestión', icon: '✅', asunto: 'Actualización de tu gestión · ' + (g.tipo || ''), mensaje: 'Hola ' + cl.nombre + ', tu solicitud "' + (g.titulo || g.tipo) + '" ha sido resuelta. ' + (g.resultado ? g.resultado + ' ' : '') + 'Quedamos atentos a cualquier consulta.', onSent: () => openGestion(id) }); } else { openGestion(id); } }
       else if (a === 'reabrir') { S().update('gestiones', id, { estado: 'Pendiente' }); openGestion(id); }
       else if (a === 'archivar') { S().update('gestiones', id, { archivado: true }); back.remove(); }
+      else if (a === 'eliminar') {
+        if (!Orbit.recordDelete) { U.toast('Eliminación canónica no disponible.'); return; }
+        b.disabled = true;
+        try {
+          const result = await Orbit.recordDelete.remove('gestiones', id, { label: g.titulo || g.tipo || g.id });
+          if (result && result.ok) { back.remove(); refresh(); return; }
+        } catch (error) {
+          U.toast('No fue posible confirmar la eliminación de la gestión.');
+        }
+        b.disabled = false;
+        return;
+      }
       else if (a === 'cliente') { back.remove(); location.hash = '#/cliente360?c=' + g.clienteId; }
       refresh();
     }));
