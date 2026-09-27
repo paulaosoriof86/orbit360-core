@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "PAULA_VISUAL_REJECTED_R15_REMEDIATION_REQUIRED",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1864,7 +1864,7 @@
     "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL",
     "authenticatedRunId": 36218497058
   },
-  "paulaVisualDecision": "REJECTED_R7_REMEDIATION_REQUIRED",
+  "paulaVisualDecision": "REJECTED_R15_REMEDIATION_REQUIRED",
   "paulaVisualAccepted": false,
   "b3Status": "NOT_STARTED",
   "humanReviewR6": {
@@ -2407,7 +2407,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "4049c4244e8f076b6b0c237837798e3396b0828e",
+  "findingLedgerBlobSha": "1f9d19f641ad449f3e3588c371af2d955a1649c0",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2634,5 +2634,30 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R14_ADVISOR_WRITE_ROLE_SYNC_20260927.json",
     "receiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f",
     "requiredMilestone": "ADVISOR_SELF_SERVICE_MANAGEMENT_PASS"
+  },
+  "r15": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+    "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+    "findingLedgerBlobSha": "1f9d19f641ad449f3e3588c371af2d955a1649c0",
+    "blockingFindingIds": [
+      "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
+      "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
+      "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
+      "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
+      "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+      "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
+      "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
+      "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
+      "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15"
+    ],
+    "blockingCount": 9,
+    "authenticatedRuntimePassPreserved": true,
+    "authenticatedRuntimePassRunId": 36289840679,
+    "priorExactPreviewTechnicalPassPreserved": true,
+    "productSourceRemediationRequired": true,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "next": "B2_R15_CAUSAL_REMEDIATION_SINGLE_CUMULATIVE_CANDIDATE"
   }
 }
