@@ -118,6 +118,7 @@ Orbit.modules.cancelaciones = (function () {
         </div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn ghost" id="cx-delete" style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>
         ${p ? `<button class="btn ghost" onclick="Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
         <button class="btn primary" id="cx-save">Guardar</button>
       </div>
@@ -126,6 +127,23 @@ Orbit.modules.cancelaciones = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#cx-x').addEventListener('click', close);
+    const del = back.querySelector('#cx-delete');
+    if (del) del.addEventListener('click', async () => {
+      if (!Orbit.recordDelete) return U.toast('Eliminación canónica no disponible.');
+      del.disabled = true;
+      try {
+        const result = await Orbit.recordDelete.remove('cancelaciones', canId, { label: (p ? p.numero : '') || (cli ? cli.nombre : '') || canId });
+        if (result && result.ok) {
+          close();
+          const h = document.getElementById('host');
+          if (h) render(h);
+          return;
+        }
+      } catch (error) {
+        U.toast('No fue posible confirmar la eliminación de la cancelación.');
+      }
+      del.disabled = false;
+    });
     back.querySelector('#cx-save').addEventListener('click', async () => {
       const rec = back.querySelector('#cx-rec').value;
       const nota = back.querySelector('#cx-nota').value.trim();
