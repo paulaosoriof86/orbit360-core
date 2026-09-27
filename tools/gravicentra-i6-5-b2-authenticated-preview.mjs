@@ -944,11 +944,42 @@ try{
   const oldDue=String(receiptTarget.fechaLimite||receiptTarget.vence||receiptTarget.fechaVencimiento||'');need(/^\d{4}-\d{2}-\d{2}$/.test(oldDue),'B2_AUTH_RECEIPT_DUE_MISSING');
   const dueObj=new Date(oldDue+'T00:00:00Z');dueObj.setUTCDate(dueObj.getUTCDate()+1);const editedDue=dueObj.toISOString().slice(0,10);
   const siblingBefore=siblingReceipt?(await dataCol(db,'recibosEsperados').doc(siblingReceipt.id).get()).data()||{}:null;
+
+  // Keep the synthetic receipt proof on its stable canonical surface. Prior visual/runtime
+  // discriminants already prove the edit control exists for hydrated receipts; after the
+  // vehicle/policy reload sequence, explicitly wait for the newly-created policy+receipt
+  // to rehydrate before asserting its individual-edit control.
+  await setRole(page,'Operativo');
+  await page.evaluate(cid=>{location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&t=recibos';},client.id);
+  await page.waitForFunction(({rid,pid})=>{
+    const receipt=window.Orbit?.store?.get?.('recibosEsperados',rid);
+    const policy=window.Orbit?.store?.get?.('polizas',pid);
+    return !!receipt&&!!policy&&String(receipt.polizaId||'')===String(pid||'')&&
+      !!window.Orbit?.policyReceipts?.canManagePolicies?.();
+  },{rid:receiptTarget.id,pid:policy.id},{timeout:30000});
+  await page.waitForSelector('#rp-native-policy',{timeout:15000});
   await page.evaluate(({rid,cid})=>Orbit.receiptsPortfolioProjection.openReceiptDetail(rid,cid),{rid:receiptTarget.id,cid:client.id});
   await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:10000});
-  const editControl=await page.evaluate(()=>{const el=document.querySelector('[data-rp-edit-receipt="1"]');return{present:!!el,disabled:!!(el&&(el.disabled||el.getAttribute('aria-disabled')==='true'))};});
-  need(editControl.present===true,'B2_AUTH_INDIVIDUAL_RECEIPT_EDIT_CONTROL_MISSING');
-  need(editControl.disabled===false,'B2_AUTH_SYNTHETIC_RECEIPT_UNEXPECTEDLY_PROTECTED');
+  const editControl=await page.evaluate(({rid,pid})=>{
+    const el=document.querySelector('[data-rp-edit-receipt="1"]');
+    const receipt=Orbit.store?.get?.('recibosEsperados',rid)||null;
+    const policy=Orbit.store?.get?.('polizas',pid)||null;
+    return{
+      present:!!el,
+      disabled:!!(el&&(el.disabled||el.getAttribute('aria-disabled')==='true')),
+      role:String(Orbit.session?.rol?.()||''),
+      canManage:!!Orbit.policyReceipts?.canManagePolicies?.(),
+      receiptPresent:!!receipt,
+      policyPresent:!!policy,
+      receiptPolicyId:String(receipt?.polizaId||''),
+      expectedPolicyId:String(pid||''),
+      detailPresent:!!document.querySelector('[data-rp-receipt-detail="1"]'),
+      hash:String(location.hash||'')
+    };
+  },{rid:receiptTarget.id,pid:policy.id});
+  milestone('RECEIPT_INDIVIDUAL_EDIT_CONTROL',editControl);
+  need(editControl.present===true,'B2_AUTH_INDIVIDUAL_RECEIPT_EDIT_CONTROL_MISSING:'+JSON.stringify(editControl));
+  need(editControl.disabled===false,'B2_AUTH_SYNTHETIC_RECEIPT_UNEXPECTEDLY_PROTECTED:'+JSON.stringify(editControl));
   const receiptEditorOpened=await page.evaluate(({rid,cid})=>!!(Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.editReceipt&&Orbit.receiptsPortfolioProjection.editReceipt(rid,cid)),{rid:receiptTarget.id,cid:client.id});
   need(receiptEditorOpened===true,'B2_AUTH_INDIVIDUAL_RECEIPT_EDITOR_OWNER_REJECTED');
   await page.waitForSelector('#rp-edit-receipt',{timeout:10000});
