@@ -501,3 +501,82 @@ button.kpi-click:active{transform:translateY(0)}
 .vp-sec-t{font-family:var(--f-display);font-size:15px;font-weight:800;line-height:1.3;color:var(--ink);margin-bottom:9px}
 .orbit-detail-grid>div>div:first-child{font-weight:600}
 body.sb-light #sidebar,body.sb-gray #sidebar{scrollbar-color:rgba(197,22,46,.68) rgba(0,0,0,.06)}
+
+
+/* ---------- B2 R15 · tenant branding + Cliente360 mobile contract ----------
+   - Tenant identity remains visible on mobile.
+   - Cliente360 free-text search is not the topbar search and never inherits its hide/show gate.
+   - Renewal rows reflow instead of overflowing the viewport. */
+.c360-search{
+  display:flex;align-items:center;gap:8px;
+  border:1px solid var(--line);border-radius:999px;
+  padding:7px 14px;flex:1 1 260px;min-width:220px;max-width:520px;
+  cursor:text;position:relative;
+}
+.c360-search input{
+  background:none;border:none;outline:none;color:var(--ink);
+  font-family:inherit;font-size:13px;width:100%;min-width:0;
+}
+.c360-search input::placeholder{color:var(--ink-3)}
+.c360-renewals-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.c360-renewal-row{
+  display:grid;
+  grid-template-columns:120px minmax(90px,1fr) 145px auto minmax(270px,auto);
+  align-items:center;gap:12px;min-width:0;
+  padding:10px 0;border-bottom:1px solid var(--line);
+}
+.c360-renewal-row:last-child{border-bottom:0}
+.c360-renewal-id,.c360-renewal-progress,.c360-renewal-date,.c360-renewal-status,.c360-renewal-actions{min-width:0}
+.c360-renewal-date{text-align:right;font-size:12.5px}
+.c360-renewal-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+@media(max-width:980px){
+  .c360-search{display:flex!important;flex:1 1 100%;width:100%;max-width:none;min-width:0;margin:0}
+}
+@media(max-width:880px){
+  .tb-logo{
+    display:flex!important;
+    visibility:visible;
+    min-width:84px!important;
+    max-width:116px!important;
+    width:116px!important;
+    height:36px!important;
+  }
+  #client-logo{
+    width:100%!important;max-width:116px!important;height:34px!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+  }
+  #client-logo img{width:auto!important;max-width:100%!important;max-height:34px!important;object-fit:contain!important}
+}
+@media(max-width:680px){
+  .c360-renewal-row{
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:9px 10px;
+    padding:12px 0;
+  }
+  .c360-renewal-id{grid-column:1}
+  .c360-renewal-status{grid-column:2;grid-row:1;justify-self:end}
+  .c360-renewal-progress{grid-column:1 / -1;grid-row:2}
+  .c360-renewal-date{grid-column:1 / -1;grid-row:3;text-align:left}
+  .c360-renewal-actions{
+    grid-column:1 / -1;grid-row:4;
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;
+  }
+  .c360-renewal-actions .btn{width:100%;min-width:0;padding-left:7px;padding-right:7px}
+}
+@media(max-width:560px){
+  .brand{grid-column:2!important;grid-row:1!important;min-width:24px!important;width:24px!important;overflow:visible!important}
+  .brand .brand-text{display:none!important}
+  .brand-mark{width:22px!important;height:22px!important}
+  .tb-logo{
+    grid-column:3 / span 2!important;grid-row:1!important;
+    justify-self:stretch!important;align-self:center!important;
+    display:flex!important;
+    min-width:0!important;max-width:none!important;width:100%!important;height:36px!important;
+    overflow:hidden!important;
+  }
+  #client-logo{width:100%!important;max-width:none!important;height:34px!important;overflow:hidden!important}
+  #client-logo img{max-width:100%!important;max-height:34px!important}
+}
+@media(max-width:410px){
+  .c360-renewal-actions{grid-template-columns:1fr}
+}
