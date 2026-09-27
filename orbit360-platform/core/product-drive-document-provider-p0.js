@@ -55,23 +55,41 @@
     }
     state.connecting = r.initialize().then(async ctx => {
       const authMod = ctx && ctx.modules && ctx.modules.auth;
-      const auth = ctx && ctx.auth;
-      const user = auth && auth.currentUser;
-      if (!authMod || !user || typeof authMod.GoogleAuthProvider !== 'function') throw new Error('DRIVE_FIREBASE_AUTH_UNAVAILABLE');
+      const appMod = ctx && ctx.modules && ctx.modules.app;
+      const mainUser = ctx && ctx.auth && ctx.auth.currentUser;
+      if (!authMod || !appMod || !mainUser || typeof authMod.GoogleAuthProvider !== 'function') throw new Error('DRIVE_FIREBASE_AUTH_UNAVAILABLE');
+
       const provider = new authMod.GoogleAuthProvider();
       provider.addScope('https://www.googleapis.com/auth/drive');
       provider.setCustomParameters({ prompt: 'consent', include_granted_scopes: 'true' });
-      const linked = Array.isArray(user.providerData) && user.providerData.some(p => p && p.providerId === 'google.com');
-      let result;
-      if (linked && typeof authMod.reauthenticateWithPopup === 'function') result = await authMod.reauthenticateWithPopup(user, provider);
-      else if (typeof authMod.linkWithPopup === 'function') result = await authMod.linkWithPopup(user, provider);
-      else throw new Error('DRIVE_GOOGLE_POPUP_UNAVAILABLE');
+
+      const publicConfig = window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ || {};
+      const secondaryName = 'orbit360-drive-oauth-session';
+      let secondaryApp = (appMod.getApps ? appMod.getApps() : []).find(a => a && a.name === secondaryName);
+      if (!secondaryApp) {
+        secondaryApp = appMod.initializeApp({
+          apiKey: publicConfig.apiKey,
+          authDomain: publicConfig.authDomain,
+          projectId: publicConfig.projectId,
+          appId: publicConfig.appId
+        }, secondaryName);
+      }
+      const secondaryAuth = authMod.getAuth(secondaryApp);
+      if (typeof authMod.setPersistence === 'function' && authMod.inMemoryPersistence) {
+        await authMod.setPersistence(secondaryAuth, authMod.inMemoryPersistence);
+      }
+      if (secondaryAuth.currentUser && typeof authMod.signOut === 'function') {
+        try { await authMod.signOut(secondaryAuth); } catch (_) {}
+      }
+      if (typeof authMod.signInWithPopup !== 'function') throw new Error('DRIVE_GOOGLE_POPUP_UNAVAILABLE');
+      const result = await authMod.signInWithPopup(secondaryAuth, provider);
       const credential = authMod.GoogleAuthProvider.credentialFromResult(result);
       const accessToken = credential && credential.accessToken ? String(credential.accessToken) : '';
       if (!accessToken) throw new Error('DRIVE_GOOGLE_ACCESS_TOKEN_MISSING');
       state.accessToken = accessToken;
       state.tokenIssuedAt = Date.now();
       state.probed = false;
+      try { if (typeof authMod.signOut === 'function') await authMod.signOut(secondaryAuth); } catch (_) {}
       return probe(true);
     }).catch(error => {
       const raw = String(error && (error.code || error.message) || '');
@@ -256,7 +274,7 @@
   window.addEventListener('focus', () => { if (tokenFresh() && !state.probed) probe(false); });
 
   Orbit.productDriveDocumentProviderP0 = Object.freeze({
-    VERSION: 'b2-r15-20260927.2-oauth',
+    VERSION: 'b2-r15-20260927.3-secondary-oauth',
     connect,
     disconnect: () => clearToken(),
     probe,
