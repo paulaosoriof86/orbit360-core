@@ -120,6 +120,18 @@
       row && (row.nombre || row.numero || row.titulo || row.tipo || row.placa || row.cuota || row.id)
     ) || 'este registro';
   }
+  function relatedSoftDeletes(collection, row) {
+    const id = text(row && row.id);
+    if (!id) return [];
+    if (collection === 'polizas') {
+      return [
+        ...activeRows('cobros').filter(x => text(x.polizaId) === id && !paymentEvidence(x)).map(x => ({ collection: 'cobros', id: x.id })),
+        ...activeRows('vehiculos').filter(x => text(x.polizaId) === id).map(x => ({ collection: 'vehiculos', id: x.id }))
+      ];
+    }
+    return [];
+  }
+
 
   function button(collection, id, label, options) {
     const row = S() && S().get ? S().get(collection, id) : null;
@@ -186,20 +198,41 @@
       estadoEliminacion: 'Eliminado'
     };
 
-    await st.updateDurable(collection, id, patch);
+    const related = relatedSoftDeletes(collection, row);
+    if (related.length && typeof st.batchDurable === 'function') {
+      const mutations = [{ action: 'update', collection, id, payload: patch }].concat(
+        related.map(child => ({
+          action: 'update',
+          collection: child.collection,
+          id: child.id,
+          payload: Object.assign({}, patch, {
+            deletedParentCollection: collection,
+            deletedParentId: id
+          })
+        }))
+      );
+      await st.batchDurable(mutations, { requestId: 'delete_' + collection + '_' + id + '_' + Date.now().toString(36), timeoutMs: 20000 });
+    } else {
+      await st.updateDurable(collection, id, patch);
+    }
+
     const readback = st.get(collection, id);
     if (!readback || readback.deleted !== true || text(readback.deleteReason) !== text(reason)) {
       throw new Error('DELETE_DURABLE_READBACK_MISMATCH');
     }
+    for (const child of related) {
+      const childReadback = st.get(child.collection, child.id);
+      if (!childReadback || childReadback.deleted !== true) throw new Error('DELETE_CHILD_READBACK_MISMATCH');
+    }
 
     try {
       document.dispatchEvent(new CustomEvent('orbit:record-delete', {
-        detail: { collection, id, softDelete: true, reason: text(reason), deletedAt: now }
+        detail: { collection, id, softDelete: true, reason: text(reason), deletedAt: now, relatedSoftDeleted: related.length }
       }));
     } catch (_) {}
-    if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('✓ Registro eliminado y confirmado.');
+    if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('✓ Registro eliminado y confirmado' + (related.length ? ' · ' + related.length + ' registro(s) dependiente(s) ocultado(s)' : '') + '.');
     if (options && typeof options.onDeleted === 'function') options.onDeleted(readback);
-    return { ok: true, softDelete: true, row: readback };
+    return { ok: true, softDelete: true, row: readback, relatedSoftDeleted: related.length };
   }
 
   Orbit.recordDelete = Object.freeze({
