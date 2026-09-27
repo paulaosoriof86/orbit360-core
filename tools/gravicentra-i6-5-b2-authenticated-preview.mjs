@@ -115,32 +115,66 @@ async function captureVisualAudit(page){
   }
 
   await page.setViewportSize({width:390,height:844});
-  out.mobile.academia=await go('academia'); await shot('10-academia-mobile');
-  out.mobile.aseguradoras=await go('aseguradoras'); await shot('11-aseguradoras-mobile');
+  out.mobile.cliente360=await go('cliente360');
+  out.mobile.r15List=await page.evaluate(()=>{
+    const search=document.querySelector('#f-q'),logo=document.querySelector('#client-logo img')||document.querySelector('#client-logo');
+    const sr=search?.getBoundingClientRect?.(),lr=logo?.getBoundingClientRect?.();
+    const css=search?getComputedStyle(search):null,lc=logo?getComputedStyle(logo):null;
+    return{
+      searchVisible:!!search&&!!sr&&sr.width>80&&sr.height>20&&css?.display!=='none'&&css?.visibility!=='hidden',
+      searchPlaceholder:String(search?.getAttribute('placeholder')||''),
+      tenantLogoVisible:!!logo&&!!lr&&lr.width>20&&lr.height>15&&lc?.display!=='none'&&lc?.visibility!=='hidden',
+      viewportWidth:innerWidth,
+      pageScrollWidth:document.documentElement.scrollWidth
+    };
+  });
+  need(out.mobile.r15List.searchVisible===true,'B2_R15_CLIENT360_MOBILE_SEARCH_NOT_VISIBLE:'+JSON.stringify(out.mobile.r15List));
+  need(out.mobile.r15List.tenantLogoVisible===true,'B2_R15_TENANT_LOGO_MOBILE_NOT_VISIBLE:'+JSON.stringify(out.mobile.r15List));
+  need(out.mobile.r15List.pageScrollWidth<=out.mobile.r15List.viewportWidth+2,'B2_R15_CLIENT360_LIST_HORIZONTAL_OVERFLOW:'+JSON.stringify(out.mobile.r15List));
+  await shot('10-cliente360-list-mobile-r15');
+  out.mobile.academia=await go('academia'); await shot('11-academia-mobile');
+  out.mobile.aseguradoras=await go('aseguradoras'); await shot('12-aseguradoras-mobile');
   if(sample.insurerId){
     await page.evaluate(id=>Orbit.modules?.aseguradoras?.ficha?.(id),sample.insurerId);
     await page.waitForSelector('#asg-ficha',{timeout:10000});
-    await shot('12-aseguradora-detail-mobile');
+    await shot('13-aseguradora-detail-mobile');
     await page.evaluate(()=>document.getElementById('asg-ficha')?.remove());
   }
   if(sample.clientId){
     await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id);},sample.clientId);
-    await sleep(900); await shot('13-cliente360-detail-mobile');
+    await sleep(900); await shot('14-cliente360-detail-mobile');
+    await page.evaluate(id=>Orbit.modules?.cliente360?.reabrir?.(id,'renovaciones'),sample.clientId);
+    await sleep(500);
+    out.mobile.renewals=await page.evaluate(()=>{
+      const body=document.querySelector('#c360-body'),rows=[...document.querySelectorAll('.c360-renewal-row')];
+      const br=body?.getBoundingClientRect?.();
+      return{
+        rows:rows.length,
+        bodyClientWidth:body?.clientWidth||0,
+        bodyScrollWidth:body?.scrollWidth||0,
+        pageScrollWidth:document.documentElement.scrollWidth,
+        viewportWidth:innerWidth,
+        actionWidths:rows.map(r=>r.querySelector('.c360-renewal-actions')?.getBoundingClientRect?.().width||0)
+      };
+    });
+    need(out.mobile.renewals.pageScrollWidth<=out.mobile.renewals.viewportWidth+2,'B2_R15_RENEWALS_PAGE_HORIZONTAL_OVERFLOW:'+JSON.stringify(out.mobile.renewals));
+    need(!out.mobile.renewals.bodyClientWidth||out.mobile.renewals.bodyScrollWidth<=out.mobile.renewals.bodyClientWidth+2,'B2_R15_RENEWALS_BODY_HORIZONTAL_OVERFLOW:'+JSON.stringify(out.mobile.renewals));
+    await shot('15-cliente360-renewals-mobile-r15');
   }
   if(sample.policyId){
     await page.evaluate(id=>Orbit.modules?.cliente360?.verPoliza?.(id),sample.policyId);
     await page.waitForSelector('[data-policy-fullpage="1"]',{timeout:10000});
-    await shot('14-policy-detail-mobile');
+    await shot('16-policy-detail-mobile');
   }
   if(sample.vehicleId){
     await page.evaluate(id=>Orbit.modules?.cliente360?.verVehiculo?.(id),sample.vehicleId);
     await page.waitForSelector('[data-vehicle-fullpage="1"]',{timeout:10000});
-    await shot('15-vehicle-detail-mobile');
+    await shot('17-vehicle-detail-mobile');
   }
   if(sample.receiptId){
     await page.evaluate(({id,cid})=>Orbit.receiptsPortfolioProjection?.openReceiptDetail?.(id,cid),{id:sample.receiptId,cid:sample.clientId});
     await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:10000});
-    await shot('16-receipt-detail-mobile');
+    await shot('18-receipt-detail-mobile');
   }
   await page.setViewportSize({width:1500,height:1000});
 
@@ -365,6 +399,26 @@ try{
   await page.goto(TARGET+'/?b2auth='+Date.now()+'#/inicio',{waitUntil:'domcontentloaded',timeout:30000});
   await bounded(activate(page,auth,actor),'B2_AUTH_ACTIVATE_TIMEOUT',45000);
   milestone('PREVIEW_AUTHENTICATED');
+
+  const drivePreConsent=await page.evaluate(()=>{
+    const provider=Orbit.productDriveDocumentProviderP0;
+    const secure=Orbit.secureResources;
+    const p=provider&&provider.status?provider.status():null;
+    const s=secure&&secure.documentUploadStatus?secure.documentUploadStatus({entidad:'cliente',entidadId:'b2-auth-no-oauth',clienteId:'b2-auth-no-oauth'}):null;
+    const tokenKeys=[...Object.keys(localStorage),...Object.keys(sessionStorage)].filter(k=>/drive|oauth|google.*token|access.*token/i.test(k));
+    return{
+      providerPresent:!!provider,
+      providerStatus:p,
+      secureStatus:s,
+      tokenKeys,
+      oauthDelegated:!!provider?.oauthDelegated
+    };
+  });
+  need(drivePreConsent.providerPresent===true&&drivePreConsent.oauthDelegated===true,'B2_R15_DRIVE_OAUTH_PROVIDER_MISSING:'+JSON.stringify(drivePreConsent));
+  need(drivePreConsent.providerStatus?.available!==true&&['oauth_required','oauth_expired','oauth_failed','google_provider_disabled'].includes(String(drivePreConsent.providerStatus?.status||'')),'B2_R15_DRIVE_PRECONSENT_NOT_FAIL_CLOSED:'+JSON.stringify(drivePreConsent));
+  need(drivePreConsent.tokenKeys.length===0,'B2_R15_DRIVE_TOKEN_PERSISTED_IN_WEB_STORAGE:'+JSON.stringify(drivePreConsent));
+  evidence.driveOAuth={preConsentFailClosed:true,tokenPersistence:'memory_only',humanConsentRequired:true,status:drivePreConsent.providerStatus?.status||''};
+  milestone('DRIVE_OAUTH_PRECONSENT_FAIL_CLOSED_PASS',evidence.driveOAuth);
 
   await setRole(page,'Operativo');
   await page.evaluate(()=>{location.hash='#/inicio';});
