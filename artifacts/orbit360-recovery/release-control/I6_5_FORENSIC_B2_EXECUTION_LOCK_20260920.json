@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PAULA_VISUAL_REJECTED_R15_REMEDIATION_REQUIRED",
+  "status": "PAULA_VISUAL_REJECTED_R15_PLUS_DELETE_RULE_R15A_REMEDIATION_REQUIRED",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -2407,7 +2407,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "42a630ada59460231d4560e41f0229a75e60ed45",
+  "findingLedgerBlobSha": "d2b4282306ab27e387a2d96ed91ecef210f4af1a",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2638,7 +2638,7 @@
   "r15": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
     "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
-    "findingLedgerBlobSha": "42a630ada59460231d4560e41f0229a75e60ed45",
+    "findingLedgerBlobSha": "d2b4282306ab27e387a2d96ed91ecef210f4af1a",
     "blockingFindingIds": [
       "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
       "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
@@ -2648,9 +2648,10 @@
       "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
       "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
       "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
-      "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15"
+      "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
+      "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A"
     ],
-    "blockingCount": 9,
+    "blockingCount": 10,
     "authenticatedRuntimePassPreserved": true,
     "authenticatedRuntimePassRunId": 36289840679,
     "priorExactPreviewTechnicalPassPreserved": true,
@@ -2659,5 +2660,15 @@
     "noB3": true,
     "noReimport": true,
     "next": "B2_R15_CAUSAL_REMEDIATION_SINGLE_CUMULATIVE_CANDIDATE"
+  },
+  "r15a": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15A_CROSS_MODULE_DELETE_RULE_20260927.json",
+    "receiptBlobSha": "e8456913dfedd0058743f1a66f7c42557aa06a68",
+    "findingId": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
+    "rule": "VISIBLE_DELETE_FOR_EVERY_PERSISTENT_ADMINISTRABLE_MODULE_WITH_FAIL_CLOSED_RELATIONAL_SAFETY",
+    "productSourceRemediationRequired": true,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true
   }
 }
