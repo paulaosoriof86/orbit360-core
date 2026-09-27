@@ -4571,7 +4571,7 @@ jobs:
           const run=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
             && c.i65ForensicRemediationPlan?.currentBlock==='B2'
             && r.authorization?.decision==='AUTHORIZED'
-            && r.authorization?.status==='AUTHORIZED_PENDING_APPLY'
+            && ['AUTHORIZED_PENDING_APPLY','MANUAL_ENABLEMENT_REPORTED_PENDING_READBACK'].includes(r.authorization?.status)
             && r.authorization?.firebaseProject===process.env.PROJECT_ID;
           if(run){
             const b=r.authorization.boundaries||{};
@@ -4667,7 +4667,7 @@ jobs:
           const rp=process.env.RECEIPT,cp=process.env.CONTROL;
           const r=JSON.parse(fs.readFileSync(rp)),c=JSON.parse(fs.readFileSync(cp)),e=JSON.parse(fs.readFileSync(process.env.EVIDENCE));
           if(e.status!=='PASS'||e.after?.enabled!==true)throw new Error('B2_GOOGLE_PROVIDER_FREEZE_EVIDENCE_INVALID');
-          if(r.authorization?.status!=='AUTHORIZED_PENDING_APPLY')throw new Error('B2_GOOGLE_PROVIDER_AUTHORIZATION_CURSOR_CHANGED');
+          if(!['AUTHORIZED_PENDING_APPLY','MANUAL_ENABLEMENT_REPORTED_PENDING_READBACK'].includes(r.authorization?.status))throw new Error('B2_GOOGLE_PROVIDER_AUTHORIZATION_CURSOR_CHANGED');
           r.authorization.status='APPLIED_READBACK_PASS';
           r.firebaseGoogleProviderRemediation={status:'READBACK_PASS',runId:Number(process.env.GITHUB_RUN_ID),projectId:e.projectId,providerId:e.providerId,before:e.before,after:e.after,mutationExecuted:e.mutationExecuted,permanentFixturePreflightInstalled:true};
           r.governance.firebaseAuthConfigurationChanged=e.mutationExecuted===true;
