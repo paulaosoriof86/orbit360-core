@@ -87,6 +87,46 @@ Orbit.secureResources = (function () {
     return true;
   }
 
+  function documentUploadStatus(extra) {
+    if (!documentProvider || typeof documentProvider.upload !== 'function') {
+      return normalizeStatus({ message: 'Carga directa pendiente de conexión con Drive' }, 'pendiente_conexion');
+    }
+    try {
+      const out = typeof documentProvider.uploadStatus === 'function'
+        ? documentProvider.uploadStatus(context(extra))
+        : { available: true };
+      return normalizeStatus(Object.assign({ available: true }, out || {}), 'disponible');
+    } catch (e) {
+      return normalizeStatus({ message: 'No fue posible verificar la conexión de carga documental' }, 'no_disponible');
+    }
+  }
+
+  async function uploadDocument(file, extra) {
+    const fileName = file && file.name ? String(file.name) : '';
+    if (!file || !fileName) {
+      audit('document.upload', fileName, 'invalid_argument');
+      return { ok: false, status: 'invalid_argument', message: 'Selecciona un archivo válido.' };
+    }
+    if (!documentProvider || typeof documentProvider.upload !== 'function') {
+      audit('document.upload', fileName, 'pendiente_conexion');
+      return { ok: false, status: 'pendiente_conexion', message: 'La carga directa a Drive todavía no está conectada.' };
+    }
+    try {
+      const out = await documentProvider.upload(file, context(extra));
+      const ok = !!(out && out.ok !== false && (out.documentRef || out.driveUrl || out.externalUrl || out.url));
+      audit('document.upload', fileName, ok ? 'ok' : 'sin_readback', {
+        documentRef: out && out.documentRef ? String(out.documentRef) : '',
+        entity: extra && extra.entidad ? String(extra.entidad) : '',
+        entityId: extra && extra.entidadId ? String(extra.entidadId) : ''
+      });
+      if (!ok) return Object.assign({ ok: false, status: 'sin_readback', message: 'Drive no confirmó el documento.' }, out || {});
+      return Object.assign({ ok: true, status: 'disponible' }, out || {});
+    } catch (e) {
+      audit('document.upload', fileName, 'error', { code: e && e.code ? e.code : '' });
+      return { ok: false, status: 'no_disponible', message: 'No fue posible guardar el documento en Drive.' };
+    }
+  }
+
   function registerCredentialProvider(provider) {
     if (!provider || (typeof provider.copy !== 'function' && typeof provider.reveal !== 'function')) throw new Error('Proveedor de credenciales inválido');
     credentialProvider = provider;
@@ -191,8 +231,10 @@ Orbit.secureResources = (function () {
     registerDocumentProvider,
     registerCredentialProvider,
     documentStatus,
+    documentUploadStatus,
     credentialStatus,
     resolveDocument,
+    uploadDocument,
     downloadDocument,
     revealCredential,
     copyCredential,
