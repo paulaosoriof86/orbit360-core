@@ -137,7 +137,16 @@ Orbit.ciclo = (function () {
       bitacora: [{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Gestión creada', origen: 'manual' }],
       comentarios: [], creado: today(), actualizado: today(), archivado: false
     };
-    return Object.assign(base, g || {});
+    const out = Object.assign(base, g || {});
+    const pol = out.polizaId ? S().get('polizas', out.polizaId) : null;
+    const cliId = out.clienteId || (pol && pol.clienteId) || '';
+    const cli = cliId ? S().get('clientes', cliId) : null;
+    if (!out.clienteId && cliId) out.clienteId = cliId;
+    out.pais = out.pais || (pol && pol.pais) || (cli && cli.pais) || '';
+    out.moneda = out.moneda || (pol && pol.moneda) || (cli && cli.moneda) || '';
+    out.producto = out.producto || (pol && (pol.producto || pol.subramo)) || '';
+    out.ramo = out.ramo || (pol && pol.ramo) || '';
+    return out;
   }
   function crearGestion(g) {
     return S().insert('gestiones', gestionPayload(g));
@@ -239,7 +248,7 @@ Orbit.ciclo = (function () {
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 95;
     back.innerHTML = `<div class="ciclo-card" style="width:min(${width || 880}px,96vw)">${html}</div>`;
     document.body.appendChild(back);
-    back.addEventListener('click', e => { if (e.target === back) back.remove(); });
+    back.addEventListener('click', e => { if (e.target === back) { e.preventDefault(); e.stopPropagation(); } });
     back.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => back.remove()));
     return back;
   }
@@ -464,7 +473,19 @@ Orbit.ciclo = (function () {
         <div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cerrar</button><button class="btn primary" id="gs-save">Guardar cambios</button></div>
       </div>`;
     const back = modal(html, 820);
-    back.querySelectorAll('[data-chk]').forEach(c => c.addEventListener('change', () => { const i = +c.dataset.chk; g.checklist[i].done = c.checked; S().update('gestiones', id, { checklist: g.checklist }); refresh(); }));
+    back.querySelectorAll('[data-chk]').forEach(c => c.addEventListener('change', async () => {
+      const i = +c.dataset.chk, before = !!g.checklist[i].done, next = !!c.checked, item = g.checklist[i] || {};
+      c.disabled = true; g.checklist[i].done = next; g.bitacora = g.bitacora || [];
+      g.bitacora.push({ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Checklist', de: before ? 'Completado' : 'Pendiente', a: next ? 'Completado' : 'Pendiente', origen: 'manual', detalle: item.t || '' });
+      try {
+        await S().updateDurable('gestiones', id, { checklist: g.checklist, bitacora: g.bitacora, actualizado: today() });
+        const resp = S().get('asesores', g.asesorId), cl = S().get('clientes', g.clienteId);
+        notify({ tipo: 'gestion', titulo: (next ? '✅ Checklist completado · ' : '↺ Checklist reabierto · ') + (item.t || g.titulo || g.tipo), detalle: cl ? cl.nombre : '', para: resp ? resp.nombre : '', tel: resp ? resp.telefono : '', email: resp ? resp.email : '' });
+        refresh(); openGestion(id);
+      } catch (error) {
+        g.checklist[i].done = before; c.checked = before; c.disabled = false; U.toast('No se pudo guardar el cambio del checklist.');
+      }
+    }));
     const cadd = back.querySelector('#gs-chk-add');
     if (cadd) cadd.addEventListener('click', () => { const v = back.querySelector('#gs-chk-new').value.trim(); if (!v) return; g.checklist = g.checklist || []; g.checklist.push({ t: v, done: false }); S().update('gestiones', id, { checklist: g.checklist }); openGestion(id); });
     back.querySelectorAll('[data-gact]').forEach(b => b.addEventListener('click', () => {
@@ -475,17 +496,21 @@ Orbit.ciclo = (function () {
       else if (a === 'cliente') { back.remove(); location.hash = '#/cliente360?c=' + g.clienteId; }
       refresh();
     }));
-    back.querySelector('#gs-save').addEventListener('click', () => {
+    back.querySelector('#gs-save').addEventListener('click', async () => {
       const v = sid => (back.querySelector('#' + sid) || {}).value;
       const nuevoAse = v('gs-ase'), nuevaNota = v('gs-nota');
       const cambioAse = nuevoAse && nuevoAse !== g.asesorId;
       const cambioNota = (nuevaNota || '') !== (g.nota || g.notas || '');
       if (cambioNota) { g.bitacora = g.bitacora || []; g.bitacora.push({ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Nota', de: '', a: 'Nota actualizada', origen: 'manual' }); }
-      S().update('gestiones', id, {
-        lista: v('gs-lista'), tipo: v('gs-tipo'), titulo: v('gs-tipo'), estado: v('gs-estado'), prioridad: v('gs-prio'),
-        asesorId: nuevoAse, aseguradoraId: v('gs-asg'), vence: v('gs-vence'), proximaAccion: v('gs-prox'),
-        polizaId: (back.querySelector('#gs-pol') || {}).value || g.polizaId, nota: nuevaNota, bitacora: g.bitacora, actualizado: today()
-      });
+      try {
+        await S().updateDurable('gestiones', id, {
+          lista: v('gs-lista'), tipo: v('gs-tipo'), titulo: v('gs-tipo'), estado: v('gs-estado'), prioridad: v('gs-prio'),
+          asesorId: nuevoAse, aseguradoraId: v('gs-asg'), vence: v('gs-vence'), proximaAccion: v('gs-prox'),
+          polizaId: (back.querySelector('#gs-pol') || {}).value || g.polizaId, nota: nuevaNota, bitacora: g.bitacora, actualizado: today()
+        });
+      } catch (error) {
+        U.toast('No fue posible guardar los cambios de la gestión.'); return;
+      }
       // notificar al responsable (cambio de asignación o nueva nota) por WA + correo
       const resp = S().get('asesores', nuevoAse); const cl = S().get('clientes', g.clienteId);
       if (resp && (cambioAse || cambioNota)) {
