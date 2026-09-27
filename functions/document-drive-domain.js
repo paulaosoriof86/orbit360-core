@@ -60,7 +60,7 @@ async function driveFetch(url,options={}){
   return body;
 }
 async function getMeta(id){
-  return driveFetch('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(id)+'?fields=id,name,mimeType,parents,webViewLink,trashed&supportsAllDrives=true');
+  return driveFetch('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(id)+'?fields=id,name,mimeType,parents,webViewLink,trashed,capabilities(canAddChildren,canEdit,canShare)&supportsAllDrives=true');
 }
 async function listChildFolder(parentId,name){
   const q="'"+parentId.replace(/'/g,"\\'")+"' in parents and trashed=false and mimeType='application/vnd.google-apps.folder' and name='"+name.replace(/'/g,"\\'")+"'";
@@ -189,6 +189,8 @@ async function status(request,previewOnly){
   if(!rootId)return {ok:false,available:false,status:'pendiente_conexion',message:'Repositorio Drive no configurado.'};
   try{
     const meta=await getMeta(rootId);
+    const writable=!!(meta&&meta.capabilities&&meta.capabilities.canAddChildren===true);
+    if(!writable)return {ok:false,available:false,status:'pendiente_permiso_drive',message:'La cuenta de servicio puede ver el repositorio, pero no puede crear documentos dentro de la carpeta Clientes.',rootFolderId:meta.id,rootName:meta.name,previewIsolated:previewOnly===true,serviceAccount:SERVICE_ACCOUNT};
     return {ok:true,available:true,status:'disponible',rootFolderId:meta.id,rootName:meta.name,previewIsolated:previewOnly===true,serviceAccount:SERVICE_ACCOUNT};
   }catch(error){
     return {ok:false,available:false,status:'pendiente_conexion',message:'La cuenta de servicio no tiene acceso de escritura al repositorio Drive.',code:error&&error.code||'',serviceAccount:SERVICE_ACCOUNT};
