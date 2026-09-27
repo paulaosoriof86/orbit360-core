@@ -4471,7 +4471,30 @@ jobs:
           NODE
       - name: Install fixture dependency
         if: steps.mode.outputs.run == 'true'
-        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 google-auth-library@9.15.1 >/dev/null
+      - name: Preflight Google Auth provider before Drive human fixture
+        if: steps.mode.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const {GoogleAuth}=require('google-auth-library');
+          let sa=null;
+          for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
+            try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.private_key&&x?.client_email){sa=x;break;}}catch{}
+          }
+          if(!sa)throw new Error('B2_GOOGLE_PROVIDER_PREFLIGHT_NO_SERVICE_ACCOUNT');
+          (async()=>{
+            const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform']});
+            const token=await auth.getAccessToken();
+            const url='https://identitytoolkit.googleapis.com/v2/projects/'+encodeURIComponent(process.env.PROJECT_ID)+'/defaultSupportedIdpConfigs/google.com';
+            const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+            const body=await r.json().catch(()=>({}));
+            if(!r.ok)throw new Error('B2_GOOGLE_PROVIDER_PREFLIGHT_HTTP_'+r.status);
+            if(body.enabled!==true)throw new Error('B2_GOOGLE_PROVIDER_DISABLED_FAIL_CLOSED');
+            console.log(JSON.stringify({status:'PASS',provider:'google.com',enabled:true,projectId:process.env.PROJECT_ID}));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
       - name: Create exact Preview synthetic Drive client
         id: fixture
         if: steps.mode.outputs.run == 'true'
@@ -4517,4 +4540,123 @@ jobs:
           git config user.name gravicentra-recovery-bot
           git config user.email gravicentra-recovery-bot@users.noreply.github.com
           git commit -m "freeze(i6.5): Drive human OAuth fixture ready"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+
+
+  i65-b2-google-auth-provider-remediation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R15_DRIVE_AUTH_BLOCKER_20260927.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate authorized Google provider remediation
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL)),r=JSON.parse(fs.readFileSync(process.env.RECEIPT));
+          const run=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
+            && c.i65ForensicRemediationPlan?.currentBlock==='B2'
+            && r.authorization?.decision==='AUTHORIZED'
+            && r.authorization?.status==='AUTHORIZED_PENDING_APPLY'
+            && r.authorization?.firebaseProject===process.env.PROJECT_ID;
+          if(run){
+            const b=r.authorization.boundaries||{};
+            if(b.createNewOAuthClient!==false||b.changeExistingClientCredentials!==false||b.dataWrites!==false||b.liveHostingPromotion!==false||b.b3Open!==false||b.reimport!==false)throw new Error('B2_GOOGLE_PROVIDER_AUTHORIZATION_BOUNDARY_INVALID');
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B2_GOOGLE_PROVIDER_REMEDIATION_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Install Google auth dependency
+        if: steps.mode.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false google-auth-library@9.15.1 >/dev/null
+      - name: Read, enable existing google.com provider, and read back
+        id: apply
+        if: steps.mode.outputs.run == 'true'
+        env:
+          OUT: ${{ runner.temp }}/b2-google-provider-remediation.json
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const {GoogleAuth}=require('google-auth-library');
+          let sa=null;
+          for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
+            try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.private_key&&x?.client_email){sa=x;break;}}catch{}
+          }
+          if(!sa)throw new Error('B2_GOOGLE_PROVIDER_NO_SERVICE_ACCOUNT');
+          const safe=x=>({name:String(x?.name||''),enabled:x?.enabled===true,clientIdPresent:!!String(x?.clientId||'').trim(),clientSecretPresent:!!String(x?.clientSecret||'').trim()});
+          (async()=>{
+            const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform']});
+            const token=await auth.getAccessToken();
+            const url='https://identitytoolkit.googleapis.com/v2/projects/'+encodeURIComponent(process.env.PROJECT_ID)+'/defaultSupportedIdpConfigs/google.com';
+            const get=async()=>{const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});const body=await r.json().catch(()=>({}));return {r,body};};
+            let g=await get();
+            if(g.r.status===404)throw new Error('B2_GOOGLE_PROVIDER_CONFIG_NOT_FOUND_FAIL_CLOSED');
+            if(!g.r.ok)throw new Error('B2_GOOGLE_PROVIDER_READ_HTTP_'+g.r.status);
+            const before=safe(g.body);
+            let mutationExecuted=false;
+            if(g.body.enabled!==true){
+              const patch={...g.body,enabled:true};
+              const p=await fetch(url,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(patch)});
+              const pb=await p.json().catch(()=>({}));
+              if(!p.ok)throw new Error('B2_GOOGLE_PROVIDER_PATCH_HTTP_'+p.status);
+              mutationExecuted=true;
+            }
+            g=await get();
+            if(!g.r.ok)throw new Error('B2_GOOGLE_PROVIDER_POST_READ_HTTP_'+g.r.status);
+            const after=safe(g.body);
+            if(after.enabled!==true)throw new Error('B2_GOOGLE_PROVIDER_POST_READBACK_NOT_ENABLED');
+            const evidence={status:'PASS',projectId:process.env.PROJECT_ID,providerId:'google.com',before,after,mutationExecuted,realDataWrites:0,liveHostingPromotion:false,b3Opened:false,reimport:false};
+            fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
+            console.log(JSON.stringify(evidence));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Upload Google provider remediation evidence
+        if: always() && steps.mode.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-google-provider-${{ github.run_id }}
+          path: ${{ runner.temp }}/b2-google-provider-remediation.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+      - name: Freeze Google provider readback
+        if: steps.mode.outputs.run == 'true' && steps.apply.conclusion == 'success'
+        run: |
+          set -euo pipefail
+          git fetch origin recovery/fase-a-clean-20260831
+          git reset --hard origin/recovery/fase-a-clean-20260831
+          export EVIDENCE="$RUNNER_TEMP/b2-google-provider-remediation.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const rp=process.env.RECEIPT,cp=process.env.CONTROL;
+          const r=JSON.parse(fs.readFileSync(rp)),c=JSON.parse(fs.readFileSync(cp)),e=JSON.parse(fs.readFileSync(process.env.EVIDENCE));
+          if(e.status!=='PASS'||e.after?.enabled!==true)throw new Error('B2_GOOGLE_PROVIDER_FREEZE_EVIDENCE_INVALID');
+          if(r.authorization?.status!=='AUTHORIZED_PENDING_APPLY')throw new Error('B2_GOOGLE_PROVIDER_AUTHORIZATION_CURSOR_CHANGED');
+          r.authorization.status='APPLIED_READBACK_PASS';
+          r.firebaseGoogleProviderRemediation={status:'READBACK_PASS',runId:Number(process.env.GITHUB_RUN_ID),projectId:e.projectId,providerId:e.providerId,before:e.before,after:e.after,mutationExecuted:e.mutationExecuted,permanentFixturePreflightInstalled:true};
+          r.governance.firebaseAuthConfigurationChanged=e.mutationExecuted===true;
+          r.governance.nextRequiredAction='REPEAT_HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_PROOF';
+          fs.writeFileSync(rp,JSON.stringify(r,null,2)+'\n');
+          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),googleAuthProvider:{status:'READBACK_PASS',providerId:'google.com',enabled:true,runId:Number(process.env.GITHUB_RUN_ID),permanentFixturePreflightInstalled:true},humanDriveOAuthProofPending:true};
+          fs.writeFileSync(cp,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$RECEIPT" "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5): Google Auth provider enabled with readback"
           git push origin "HEAD:$GITHUB_REF_NAME"
