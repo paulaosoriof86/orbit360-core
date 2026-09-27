@@ -106,7 +106,8 @@ Orbit.modules.siniestros = (function () {
           </div>
         </div>
       </div>
-      <div style="padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+      <div style="padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn ghost" id="si-delete" style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>
         ${cli ? `<button class="btn ghost" onclick="location.hash='#/cliente360?c=${r.clienteId}'">🧑‍💼 Ver cliente</button>` : ''}
         <button class="btn primary" id="si-save">Guardar</button></div>
     </div>`;
@@ -115,6 +116,18 @@ Orbit.modules.siniestros = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#si-x').addEventListener('click', close);
+    const del = $('#si-delete');
+    if (del) del.addEventListener('click', async () => {
+      if (!Orbit.recordDelete) return U.toast('Eliminación canónica no disponible.');
+      del.disabled = true;
+      try {
+        const result = await Orbit.recordDelete.remove('reclamos', id, { label: r.numero || r.tipo || id });
+        if (result && result.ok) { close(); render(host); return; }
+      } catch (error) {
+        U.toast('No fue posible confirmar la eliminación del siniestro.');
+      }
+      del.disabled = false;
+    });
     $('#si-add').addEventListener('click', () => { const v = $('#si-nota').value.trim(); if (!v) return; const bit = (r.bitacora || []).concat([{ ts: ts(), user: 'Equipo', t: v, d: '' }]); S().update('reclamos', id, { bitacora: bit }); ficha(id); });
     $('#si-save').addEventListener('click', async () => {
       const nuevoEst = $('#si-estado').value;
