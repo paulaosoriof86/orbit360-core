@@ -7,7 +7,7 @@ const { __opsLeadsProductDomain } = require('./product-ops-leads-domain');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'gravicentra-drive-document-domain-v1';
+const VERSION = 'gravicentra-drive-document-domain-v1.1-preview-isolation';
 const ROOT_BY_TENANT = Object.freeze({
   'alianzas-soluciones': process.env.ORBIT360_DRIVE_CLIENTS_ROOT_FOLDER_ID || '13H7zMGwFC9f1UnHyfNqzzSfFex1jJRHE'
 });
@@ -143,20 +143,24 @@ async function upload(request,previewOnly){
   const rootMeta=await getMeta(rootId,accessToken);
   if(!rootMeta||!rootMeta.capabilities||rootMeta.capabilities.canAddChildren!==true)throw new HttpsError('permission-denied','La cuenta Google conectada no tiene permiso de escritura en la carpeta Clientes.');
 
-  let clientFolderId=clean(input.driveFolderId,160)||clean(row.driveFolderId,160)||driveIdFromUrl(row.driveLink||row.driveUrl||'');
-  let clientFolder=null;
-  if(clientFolderId){
-    clientFolder=await getMeta(clientFolderId,accessToken);
-    if(clientFolder.mimeType!=='application/vnd.google-apps.folder')throw new HttpsError('failed-precondition','La referencia Drive del cliente no es una carpeta.');
-  }else{
-    clientFolder=await ensureFolder(rootId,row.nombre||row.razonSocial||clientId,accessToken);
-    clientFolderId=clientFolder.id;
-  }
-
-  let destination=clientFolder;
+  let clientFolderId='',clientFolder=null,destination=null;
   if(previewOnly===true){
+    // Preview must be fully isolated: never create or reuse a synthetic client's folder
+    // directly under the operational Clientes root.
     const qaRoot=await ensureFolder(rootId,'_GRAVICENTRA_PREVIEW_QA',accessToken);
     destination=await ensureFolder(qaRoot.id,clientId,accessToken);
+    clientFolder=destination;
+    clientFolderId=destination.id;
+  }else{
+    clientFolderId=clean(input.driveFolderId,160)||clean(row.driveFolderId,160)||driveIdFromUrl(row.driveLink||row.driveUrl||'');
+    if(clientFolderId){
+      clientFolder=await getMeta(clientFolderId,accessToken);
+      if(clientFolder.mimeType!=='application/vnd.google-apps.folder')throw new HttpsError('failed-precondition','La referencia Drive del cliente no es una carpeta.');
+    }else{
+      clientFolder=await ensureFolder(rootId,row.nombre||row.razonSocial||clientId,accessToken);
+      clientFolderId=clientFolder.id;
+    }
+    destination=clientFolder;
   }
   const uploaded=await multipartUpload(destination.id,input.name||'Documento',mime,bytes,accessToken);
   const readback=await getMeta(uploaded.id,accessToken);
