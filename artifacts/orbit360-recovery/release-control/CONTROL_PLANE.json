@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "c1a25db527333805e3605b0e398da6ad143ec9a4",
+    "b2ExecutionLockBlobSha": "b29f9cd99997ec17040f2816f17671705d2c9e68",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2099,7 +2099,7 @@
         "orbit360-platform/sw.js"
       ],
       "productMutationAuthorized": true,
-      "sourcePendingFromHead": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "sourcePendingFromHead": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
       "sourceSha": "a5bccd0629e45367acb4f7abda95d0b49b20aa06",
       "buildId": "gi-i65-b2-a5bccd0629e4-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36326461369-maj7of9b.web.app",
@@ -2166,7 +2166,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "R15/R15A source remediation is frozen in the single cumulative composition. All ten R73–R82 findings remain blocking until a new immutable exact Preview passes source/readback/authenticated runtime proof; R77/R81 additionally require Paula's focal Google Drive OAuth upload/open/reload proof. Historical run 36289840679 remains evidence for the superseded source only. No LIVE, no B3, no reimport.",
+      "boundaryNote": "R15/R15A cumulative source is ready for a new immutable exact Preview. Drive upload is delegated OAuth, memory-only and preview-isolated; human OAuth/upload/open/reload proof remains required for R77/R81. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2567,7 +2567,7 @@
     },
     "planVersion": 2,
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
-    "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
+    "activePlanBlobSha": "8ec15be361501047084f50256f903e4ab150e530",
     "mechanismRootCause20260924": {
       "status": "FROZEN",
       "classification": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
@@ -2592,11 +2592,11 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+    "compositionLockBlobSha": "1b0cd65b767e254be7825bd03ef52a4dfa94bd8f",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "6263b79b6aa4c3273ee7c2b0a153f4abc5e8e6b9",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
-    "activePlanBlobSha": "f9c838a7db273687df142844a58029306aabf469",
+    "activePlanBlobSha": "8ec15be361501047084f50256f903e4ab150e530",
     "activeBlock": "B2",
     "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",

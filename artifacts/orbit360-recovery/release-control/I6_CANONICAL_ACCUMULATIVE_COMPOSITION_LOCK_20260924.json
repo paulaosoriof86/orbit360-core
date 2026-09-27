@@ -108,7 +108,7 @@
   ],
   "productFileBlobs": {
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
-    "functions/document-drive-domain.js": "5ba6c8896fb2e15e989bdd0c472fc15e9340d812",
+    "functions/document-drive-domain.js": "1708a4b9dfe9b14d1766f054955f2a673cf176c5",
     "functions/package.json": "818c95c932203134c1a516a3f665d589632f829a",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "3d55155d3fbc77263d0b3a7094d85e90476c3424",
@@ -134,7 +134,7 @@
     "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
     "orbit360-platform/core/product-app-p0.js": "b6ccd725f214c666e04299574be4c1fdae3a6b83",
-    "orbit360-platform/core/product-drive-document-provider-p0.js": "6939489afd78eada1482e88d95b453039dd5d1d9",
+    "orbit360-platform/core/product-drive-document-provider-p0.js": "43f5ecf7bb8614ce8ce7cfda3191d1552ba440b9",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "fcf45f869897b205df48d17906555fc688250f83",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
@@ -171,7 +171,7 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "d329ed1c822d42803bf2eb38c34873218d63faad",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "b03bd57e6c77b6204ce860b93ec4556b1cd3e4e7",
-    "orbit360-platform/styles/base.css": "9141d9252a68c22f1221930ed9bcedd2414760f0",
+    "orbit360-platform/styles/base.css": "72da4a95d7c8be5e15a9c803480ea6d8ee67f6d8",
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b"
   },
@@ -200,7 +200,7 @@
   "lastRemediation": {
     "origin": "PAULA_MOBILE_UAT_R15_PLUS_TRANSVERSAL_DELETE_R15A",
     "parentHead": "7632bb060679ed63a3fb7d125ceb394e3cef1718",
-    "candidateHead": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+    "candidateHead": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AND_HUMAN_DRIVE_OAUTH_PROOF",
     "changedProductFiles": [
       "functions/bootstrap.js",
@@ -243,7 +243,7 @@
       "normalized vehicle candidate identity with history preservation"
     ],
     "documentRepository": "Google Drive",
-    "documentAuth": "DELEGATED_USER_OAUTH_MEMORY_ONLY",
+    "documentAuth": "DELEGATED_USER_OAUTH_MEMORY_ONLY_SECONDARY_FIREBASE_AUTH",
     "serviceAccountDriveOwnership": false,
     "humanOAuthProofRequired": true,
     "noDataReimport": true,

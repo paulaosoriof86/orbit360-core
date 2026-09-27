@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -2950,8 +2950,8 @@
     "noReimport": true,
     "next": "B2_R15_NEW_EXACT_IMMUTABLE_PREVIEW",
     "sourceFixed": true,
-    "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
-    "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+    "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
+    "compositionLockBlobSha": "1b0cd65b767e254be7825bd03ef52a4dfa94bd8f",
     "technicalExactPreviewPending": true,
     "humanDriveOAuthProofPending": true
   },
@@ -2965,7 +2965,8 @@
     "noB3": true,
     "noReimport": true,
     "sourceFixed": true,
-    "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+    "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "exactPreviewProofPending": true
-  }
+  },
+  "boundaryNote": "R15/R15A cumulative source is ready for a new immutable exact Preview. Drive upload is delegated OAuth, memory-only and preview-isolated; human OAuth/upload/open/reload proof remains required for R77/R81. No LIVE, no B3, no reimport."
 }
