@@ -746,10 +746,11 @@ Orbit.ciclo = (function () {
       const original = save.textContent;
       save.textContent = 'Guardando…';
       try {
+        const noteValue = String(el('mg-nota').value || '').trim();
         const extra = Object.assign(
           {},
           opts.extraFields && typeof opts.extraFields === 'object' ? opts.extraFields : {},
-          typeof opts.dynamicFields === 'function' ? (opts.dynamicFields({ clienteId, polizaId, tipo, lista }) || {}) : {}
+          typeof opts.dynamicFields === 'function' ? (opts.dynamicFields({ clienteId, polizaId, tipo, lista, nota: noteValue }) || {}) : {}
         );
         let gestion = await crearGestionDurable(Object.assign({}, extra, {
           id: managementId,
@@ -761,7 +762,7 @@ Orbit.ciclo = (function () {
           estado: el('mg-estado').value || 'Pendiente',
           vence: el('mg-vence').value || inDays(7),
           proximaAccion: String(el('mg-prox').value || '').trim() || 'Pendiente de definir',
-          nota: String(el('mg-nota').value || '').trim(),
+          nota: noteValue,
           origen: opts.desdeCliente ? 'Solicitud del cliente' : (opts.origen || 'Ops'),
           adjuntos: linkedDocs.slice(),
           checklist
