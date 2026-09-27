@@ -979,11 +979,15 @@ Orbit.importa = (function () {
         externalUrl: uploaded.externalUrl || uploaded.driveUrl || uploaded.url || '',
         mimeType: uploaded.mimeType || file.type || '',
         size: file.size,
-        origen: uploaded.origen || 'Drive',
+        origen: uploaded.origen || uploaded.repository || 'Drive',
         clienteId: cid,
         categoria: state.kind === 'documentos' ? 'expediente_cliente' : state.kind,
+        clientFolderId: uploaded.clientFolderId || '',
+        clientFolderUrl: uploaded.clientFolderUrl || '',
+        driveUserEmail: uploaded.driveUserEmail || '',
+        contentHash: uploaded.contentHash || '',
         creado: Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0,10),
-        provenance: { source: 'usuario', repository: 'Drive', confirmed: true }
+        provenance: { source: 'usuario', repository: 'Drive', confirmed: true, driveUserEmail: uploaded.driveUserEmail || '' }
       });
     }
 
@@ -999,11 +1003,21 @@ Orbit.importa = (function () {
         if (at >= 0) merged[at] = Object.assign({}, merged[at], doc);
         else merged.push(doc);
       });
-      await Orbit.store.updateDurable('clientes', cid, { documentos: merged, actualizado: Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0,10) });
+      const folderDoc = out.find(d => d.clientFolderId || d.clientFolderUrl) || {};
+      const clientPatch = {
+        documentos: merged,
+        actualizado: Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0,10)
+      };
+      if (folderDoc.clientFolderId) clientPatch.driveFolderId = folderDoc.clientFolderId;
+      if (folderDoc.clientFolderUrl) clientPatch.driveLink = folderDoc.clientFolderUrl;
+      await Orbit.store.updateDurable('clientes', cid, clientPatch);
       const readback = Orbit.store.get('clientes', cid);
       const rb = readback && Array.isArray(readback.documentos) ? readback.documentos : [];
       if (!out.every(doc => rb.some(x => key(x) && key(x) === key(doc)))) {
         return { ok: false, status: 'link_readback_missing', message: 'Drive confirmó el archivo, pero el expediente no confirmó todos los vínculos.', uploaded: out };
+      }
+      if (folderDoc.clientFolderId && String(readback.driveFolderId || '') !== String(folderDoc.clientFolderId)) {
+        return { ok: false, status: 'folder_readback_missing', message: 'Drive confirmó el archivo, pero la ficha no confirmó la carpeta del cliente.', uploaded: out };
       }
     }
     state.documentUploadResults = out;
