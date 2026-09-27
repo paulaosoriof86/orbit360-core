@@ -164,6 +164,7 @@ Orbit.modules.cobros = (function () {
         ${c.facturaNombre ? `<div class="cfg-note">📄 Factura adjunta: <b>${U.esc(c.facturaNombre)}</b></div>` : ''}
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn ghost" id="cd-delete" style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>
         ${cli ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();location.hash='#/cliente360?c=${cli.id}'">👤 Ver cliente</button>` : ''}
         ${p ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
         ${c.reportado && aplicable ? `<button class="btn primary" id="cd-val">🔎 Validar pago reportado</button>` : (aplicable ? `<button class="btn primary" id="cd-apply">💳 Confirmar cobro</button>` : '')}
@@ -174,6 +175,18 @@ Orbit.modules.cobros = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#cd-x').addEventListener('click', close);
+    const del = back.querySelector('#cd-delete');
+    if (del) del.addEventListener('click', async () => {
+      if (!Orbit.recordDelete) return U.toast('Eliminación canónica no disponible.');
+      del.disabled = true;
+      try {
+        const result = await Orbit.recordDelete.remove('cobros', cobroId, { label: 'Recibo ' + (c.cuota || c.numero || c.serie || cobroId) });
+        if (result && result.ok) { back.remove(); render(document.getElementById('host')); return; }
+      } catch (error) {
+        U.toast('No fue posible confirmar la eliminación del recibo.');
+      }
+      del.disabled = false;
+    });
     const ap = back.querySelector('#cd-apply');
     if (ap) ap.addEventListener('click', () => { back.remove(); aplicarPago(cobroId); });
     const av = back.querySelector('#cd-val');
