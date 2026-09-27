@@ -452,7 +452,22 @@ Orbit.modules = Orbit.modules || {};
       return;
     }
     const renewals = Orbit.modules && Orbit.modules.renovaciones;
-    if (renewals && typeof renewals.registrarAceptacion === 'function') return renewals.registrarAceptacion(policyId);
+    if (renewals && typeof renewals.solicitarPropuestas === 'function') return renewals.solicitarPropuestas(policyId);
+    if (Orbit.ciclo && typeof Orbit.ciclo.managementCreateModal === 'function') {
+      return Orbit.ciclo.managementCreateModal({
+        clienteId: p.clienteId,
+        polizaId: p.id,
+        tipo: 'Solicitar condiciones de renovación',
+        titulo: 'Renovación · ' + (p.numero || p.id),
+        lista: 'Renovaciones / Modif.',
+        prioridad: daysUntil(p.vigenciaFin) <= 15 ? 'Alta' : 'Media',
+        asesorId: p.asesorId,
+        aseguradoraId: p.aseguradoraId,
+        vence: p.vigenciaFin,
+        proximaAccion: 'Operaciones: solicitar condiciones/propuestas de renovación',
+        origen: 'Póliza'
+      });
+    }
     location.hash = '#/renovaciones';
   }
 
