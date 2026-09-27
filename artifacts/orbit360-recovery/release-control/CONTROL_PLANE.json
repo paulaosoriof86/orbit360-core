@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2111,7 +2111,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "Exact B2 technical Preview remains unchanged. Authenticated proof is NOT PASS: run 36288967976 failed in versioned harness after ADVISOR_SELF_SERVICE_MANAGEMENT_START; harness-only variable binding fixed at branch HEAD. Rerun exact same Preview/artifact before Paula UAT. No LIVE, no B3, no reimport.",
+      "boundaryNote": "Exact B2 technical Preview remains unchanged. Authenticated proof is NOT PASS. nextAction VISUAL is the executor's required precondition for the authenticated gate; Paula visual review remains blocked until authenticated proof passes. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
