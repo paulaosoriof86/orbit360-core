@@ -1,0 +1,90 @@
+{
+  "schema": "gravicentra-i6-5-b2-r15-mobile-uat-findings-v1",
+  "recordedAt": "2026-09-27",
+  "authority": "PAULA_MOBILE_UAT_PLUS_SOURCE_FORENSIC_REVIEW",
+  "reviewedPreview": {
+    "sourceSha": "dab677e937f9586195e3e79b94d5b91c397f0841",
+    "buildId": "gi-i65-b2-dab677e937f9-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36288967976-k58tfgn7.web.app",
+    "artifactId": 10921173757,
+    "authenticatedPassRunId": 36289840679
+  },
+  "decision": "PAULA_VISUAL_REJECTED_R15_REMEDIATION_REQUIRED",
+  "findings": [
+    {
+      "id": "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
+      "classification": "PRODUCT_DEFECT_RESPONSIVE_BRANDING_OWNER",
+      "evidence": "Mobile header shows Gravicentra Insurance instead of configured tenant brand/logo.",
+      "rootCause": "base.css hides .tb-logo at max-width:880px while public-tenant-branding renders tenant logo into .tb-logo; product brand remains visible.",
+      "requiredProof": "On mobile and desktop, tenant brand/logo is visible according to approved shell hierarchy without losing Gravicentra product identity where applicable."
+    },
+    {
+      "id": "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
+      "classification": "PRODUCT_DEFECT_CSS_SELECTOR_COLLISION",
+      "evidence": "Cliente 360 mobile list exposes filters but no free-text search.",
+      "rootCause": "Cliente360 list search reuses .tb-search; global mobile CSS hides .tb-search at max-width:980px.",
+      "requiredProof": "Cliente360 free-text search remains visible and usable on mobile and desktop, without changing topbar mobile-search behavior."
+    },
+    {
+      "id": "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
+      "classification": "PRODUCT_DEFECT_RESPONSIVE_LAYOUT",
+      "evidence": "Cliente360 Renewals tab overflows horizontally and content/actions are clipped on mobile.",
+      "rootCause": "tabRenov renders fixed-width flex children (120px + flexible bar + 150px + badge + button) without a mobile wrap/grid contract.",
+      "requiredProof": "Renewal row and actions fit mobile viewport with no clipped business information or action."
+    },
+    {
+      "id": "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
+      "classification": "PRODUCT_DEFECT_CANONICAL_UI_OWNER_SPLIT",
+      "evidence": "Management requested from Cliente360/Renewals does not use the same complete Ops management editor.",
+      "rootCause": "Orbit.ciclo.solicitarGestion uses a separate request modal while Ops +Gestión creates a generic record and then opens openGestion; creation semantics/UI are split.",
+      "requiredProof": "Cliente360, Policy, Renewals, Portal and Ops all open one canonical management creation/editor surface with contextual prefill and create one canonical gestion record."
+    },
+    {
+      "id": "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+      "classification": "PRODUCT_DEFECT_FALSE_DOCUMENT_PERSISTENCE",
+      "evidence": "Management request UI offers file attachment.",
+      "rootCause": "solicitarGestion explicitly stores only file name/size in adjuntos and does not persist binary/document repository reference.",
+      "requiredProof": "Attached support is durably stored in the approved documentary repository, linked by metadata/provenance to the gestion, opens after reload, and does not expose a false upload success."
+    },
+    {
+      "id": "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
+      "classification": "PRODUCT_DEFECT_SELF_ADMINISTRATION_GAP",
+      "evidence": "User requires ability to remove an erroneously created management; current management detail exposes archive but no delete/remove action.",
+      "rootCause": "openGestion actions include resolve/reopen/client/archive, with no authorized remove path.",
+      "requiredProof": "Authorized user can remove an erroneous management from active Ops with confirmation, audit/tombstone semantics and canonical readback; no silent orphaned relations."
+    },
+    {
+      "id": "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
+      "classification": "PRODUCT_DEFECT_CROSS_SURFACE_ACTION_PARITY",
+      "evidence": "A renewable policy expiring within the already-used renewal window lacks an active Renew action on policy detail.",
+      "rootCause": "Canonical 0–45 day renewal criterion exists in CRM/policies list, but policy full-detail owner does not expose equivalent renewal entrypoint.",
+      "requiredProof": "Renewable policies at 0–45 days show the canonical renewal action on policy detail; outside-window/non-renewable behavior is explicit and consistent."
+    },
+    {
+      "id": "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
+      "classification": "PRODUCT_DEFECT_LINEAGE_PROJECTION_DEDUP",
+      "evidence": "Policy detail offers three vehicle candidates that visually represent the same vehicle/history.",
+      "rootCause": "policy-receipts-v1199-detail-guard vehicleCandidates deduplicates only by raw record id; historical/lineage-equivalent records with normalized same plate remain separate candidates.",
+      "requiredProof": "Linker shows one canonical current vehicle per normalized identity/lineage with prior vigencies preserved as history; no reimport."
+    },
+    {
+      "id": "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
+      "classification": "PRODUCT_DEFECT_DOCUMENT_REPOSITORY_CONTRACT",
+      "evidence": "Cliente360 offers Importar a este expediente and documentary mode claims files are stored/visible.",
+      "rootCause": "importa.js documentary path advances directly to completion and performs no durable raw-file storage write; intelligent mode extracts data but does not retain the raw document.",
+      "requiredProof": "Client document upload stores the raw file in the approved documentary repository (Drive), records durable link/provenance in the client expediente, survives reload, and remains distinct from data extraction proposals."
+    }
+  ],
+  "preservedPass": {
+    "authenticatedRuntimeRunId": 36289840679,
+    "technicalPassPreserved": true,
+    "functionalFlowsObservedWorking": true
+  },
+  "boundaries": {
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noMassDataApply": true
+  },
+  "next": "B2_R15_CAUSAL_REMEDIATION_SINGLE_CUMULATIVE_CANDIDATE"
+}
