@@ -33,7 +33,7 @@ Orbit.modules = Orbit.modules || {};
   function modal(id,title,body,actions) {
     let b=document.getElementById(id);if(b)b.remove();b=document.createElement('div');b.id=id;b.className='drawer-back open';b.style.cssText='display:grid;place-items:center;z-index:230';
     b.innerHTML=`<div class="card" style="width:min(760px,96vw);max-height:92vh;display:flex;flex-direction:column;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px"><div><small class="muted">Renovaciones</small><b style="display:block;font-family:var(--f-display);font-size:17px">${esc(title)}</b></div><button class="imp-x" data-close>✕</button></div><div style="padding:12px 18px 18px;overflow:auto;flex:1">${body}</div><div style="padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">${actions||''}<button class="btn ghost" data-close>Cerrar</button></div></div>`;
-    document.body.appendChild(b);const close=()=>b.remove();b.querySelectorAll('[data-close]').forEach(x=>x.onclick=close);b.addEventListener('click',e=>{if(e.target===b)close();});return b;
+    document.body.appendChild(b);const close=()=>b.remove();b.querySelectorAll('[data-close]').forEach(x=>x.onclick=close);b.addEventListener('click',e=>{if(e.target===b){e.preventDefault();e.stopPropagation();}});return b;
   }
   function row(p,checkable) {
     const c=S().get('clientes',p.clienteId)||{},d=daysUntil(p.vigenciaFin),asg=S().get('aseguradoras',p.aseguradoraId)||{};
@@ -82,29 +82,36 @@ Orbit.modules = Orbit.modules || {};
   async function solicitarPropuestas(policyId) {
     const p=S().get('polizas',policyId);if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
     if(!active(p))return U.toast('La póliza está en histórico; usa recuperación o nueva gestión.');
-    let g=existingManagement(p.id,'renewal_proposals');
-    if(!g){
+    const existing=existingManagement(p.id,'renewal_proposals');
+    if(existing){window.__orbitRenewalContext=renewalContext(p,existing);U.toast('La gestión de propuestas ya existe en Ops.');location.hash='#/ops';window.__orbitOpenGestion=existing.id;return;}
+    const defaultPriority=daysUntil(p.vigenciaFin)<=15?'Alta':'Media';
+    const body=`<div class="cfg-note">La gestión se creará <b>solo al confirmar</b>. Completa el contexto que Operaciones necesita para solicitar o cargar propuestas reales.</div><div class="cgrid" style="margin-top:12px"><label class="ce-l">Prioridad<select id="ren-prop-prio" class="o-sel"><option ${defaultPriority==='Alta'?'selected':''}>Alta</option><option ${defaultPriority==='Media'?'selected':''}>Media</option><option>Baja</option></select></label><label class="ce-l">Vence<input id="ren-prop-due" type="date" class="o-sel" value="${esc(p.vigenciaFin||'')}"></label></div><label class="ce-l" style="margin-top:12px">Detalle para Operaciones<textarea id="ren-prop-note" class="o-sel" style="min-height:82px">Solicitar propuestas reales de renovación. El asesor no cotiza directamente.</textarea></label>`;
+    const m=modal('renewal-proposals-v1200','Solicitar propuestas · '+esc(p.numero),body,'<button class="btn primary" data-create-proposals>Crear gestión en Ops</button>');
+    const save=m.querySelector('[data-create-proposals]');
+    save.onclick=async()=>{
       if(!Orbit.ciclo||typeof Orbit.ciclo.crearGestionDurable!=='function')return U.toast('No está disponible la persistencia segura de Ops.');
+      const original=save.textContent;save.disabled=true;save.textContent='Guardando…';
       try{
-        g=await Orbit.ciclo.crearGestionDurable({
+        const g=await Orbit.ciclo.crearGestionDurable({
           lista:'Renovaciones / Modif.',tipo:'Solicitar propuestas de renovación',titulo:'Propuestas de renovación · '+p.numero,
           clienteId:p.clienteId,polizaId:p.id,sourcePolicyId:p.id,asesorId:p.asesorId,aseguradoraId:p.aseguradoraId,ramo:p.ramo,
+          pais:p.pais,moneda:p.moneda,producto:p.producto||p.subramo,
           workflowType:'renewal_proposals',renewalAction:'request_proposals',estado:'Pendiente',
-          prioridad:(daysUntil(p.vigenciaFin)<=15?'Alta':'Media'),vence:p.vigenciaFin,
-          proximaAccion:'Operaciones: solicitar propuestas a aseguradoras o cotizar',
-          nota:'Solicitar propuestas reales de renovación. El asesor no cotiza directamente.',
+          prioridad:m.querySelector('#ren-prop-prio').value,vence:m.querySelector('#ren-prop-due').value||p.vigenciaFin,
+          proximaAccion:'Operaciones: solicitar/cargar propuestas y preparar comparativo',
+          nota:m.querySelector('#ren-prop-note').value.trim()||'Solicitar propuestas reales de renovación.',
           origen:'Renovaciones',checklist:[{t:'Solicitud recibida en Ops',done:true},{t:'Propuestas / cotizaciones reales obtenidas',done:false},{t:'Comparativo presentado',done:false},{t:'Decisión del cliente',done:false}]
         });
+        m.remove();window.__orbitRenewalContext=renewalContext(p,g);
+        try{S().insert('actividades',{id:'act_'+Date.now().toString(36),tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,tipo:'renovacion',icon:'📋',fecha:today(),titulo:'Propuestas de renovación solicitadas',detalle:'Gestión confirmada en Ops · póliza '+p.numero,gestionId:g.id,polizaId:p.id});}catch(e){}
+        if(A.audit)A.audit('solicitar_propuestas_renovacion','gestiones',g.id,null,g,'Solicitud de propuestas de renovación',{policyId:p.id});
+        U.toast('Gestión de propuestas creada y confirmada en Ops.');location.hash='#/ops';window.__orbitOpenGestion=g.id;
       }catch(error){
-        if(previewBlocked(error))return U.toast('Preview protege los datos reales: no se creó la gestión de propuestas en Ops.');
-        return U.toast('No fue posible crear la gestión de propuestas. No se registró nada.');
+        save.disabled=false;save.textContent=original;
+        if(previewBlocked(error))return U.toast('Preview protege este registro: no se creó la gestión de propuestas en Ops.');
+        U.toast('No fue posible crear la gestión de propuestas. No se registró nada.');
       }
-    }
-    window.__orbitRenewalContext=renewalContext(p,g);
-    try{S().insert('actividades',{id:'act_'+Date.now().toString(36),tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,tipo:'renovacion',icon:'📋',fecha:today(),titulo:'Propuestas de renovación solicitadas',detalle:'Gestión confirmada en Ops · póliza '+p.numero,gestionId:g.id,polizaId:p.id});}catch(e){}
-    if(A.audit)A.audit('solicitar_propuestas_renovacion','gestiones',g.id,null,g,'Solicitud de propuestas de renovación',{policyId:p.id});
-    U.toast('Gestión de propuestas creada y confirmada en Ops.');
-    location.hash='#/ops';window.__orbitOpenGestion=g.id;
+    };
   }
   function cotizarDirecto(policyId) {
     const p=S().get('polizas',policyId);if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
@@ -127,6 +134,7 @@ Orbit.modules = Orbit.modules || {};
         const g=await Orbit.ciclo.crearGestionDurable({
           lista:'Renovaciones / Modif.',tipo:'Renovación aceptada',titulo:'Renovación aceptada · '+p.numero,
           clienteId:p.clienteId,polizaId:p.id,sourcePolicyId:p.id,asesorId:p.asesorId,aseguradoraId:p.aseguradoraId,ramo:p.ramo,
+          pais:p.pais,moneda:p.moneda,producto:p.producto||p.subramo,
           workflowType:'renewal_accepted',renewalAction:'client_approved',acceptedConfirmed:true,clientApprovalAt:new Date().toISOString(),
           clientApprovalNote:b.querySelector('#ren-accepted-note').value.trim(),estado:'Pendiente',
           prioridad:'Alta',vence:p.vigenciaFin,proximaAccion:'Operaciones: solicitar emisión o registrar renovación en firme',
