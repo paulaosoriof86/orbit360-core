@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "399da3c962155f21886e02ddfa1341b5db0188a6",
+    "b2ExecutionLockBlobSha": "987633e1fb0217e9a6789dfce855b9497175094e",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2482,20 +2482,28 @@
       "humanDriveOAuthProofPending": true,
       "drivePreviewIsolationFix": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
       "driveHumanFixture": {
-        "status": "AUTHORIZED_PENDING_RUN",
-        "purpose": "R77_R81_HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_PROOF",
-        "exactPreviewSourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
-        "exactPreviewBuildId": "gi-i65-b2-367c839a92aa-57f234755dc1",
-        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36334556509-xmcb0vbv.web.app",
-        "syntheticClientId": "b2-drive-human-36334556509",
-        "syntheticOnly": true,
-        "realClientMutationAuthorized": false,
-        "noLive": true,
-        "noB3": true,
-        "noReimport": true,
-        "cleanupMandatory": true,
-        "retryAfterHarnessFix": true,
-        "retryHarnessCommit": "4bfd2113dceed1d9fcb53d531733c60f2fc766bf"
+        "status": "READY_PENDING_PAULA_OAUTH",
+        "tenantId": "alianzas-soluciones",
+        "clientId": "b2-drive-human-36334556509",
+        "clientName": "B2 QA · PRUEBA DRIVE HUMANA · NO USAR",
+        "searchText": "PRUEBA DRIVE HUMANA",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36334556509-xmcb0vbv.web.app",
+        "sourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
+        "buildId": "gi-i65-b2-367c839a92aa-57f234755dc1",
+        "previewRunId": 36334556509,
+        "firestoreReadback": true,
+        "driveExpectedRoot": "_GRAVICENTRA_PREVIEW_QA/b2-drive-human-36334556509",
+        "boundaries": {
+          "syntheticOnly": true,
+          "livePromotion": false,
+          "reimport": false,
+          "realClientMutation": false,
+          "cleanupMandatory": true
+        },
+        "createdAt": "2026-09-27T17:03:06.086Z",
+        "fixtureRunId": 36335271355,
+        "humanProofPending": true,
+        "cleanupPending": true
       }
     },
     "dashboardRealityGate": {

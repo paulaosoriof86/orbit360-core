@@ -2962,17 +2962,27 @@
   },
   "boundaryNote": "R15/R15A cumulative source includes definitive Preview Drive folder isolation: synthetic client folder, uploaded document and persisted synthetic client Drive link must remain under _GRAVICENTRA_PREVIEW_QA. Prior authenticated pass is preserved as historical evidence but superseded for R77/R81 by this causal source fix. No LIVE, no B3, no reimport.",
   "driveHumanFixture": {
-    "status": "AUTHORIZED_PENDING_RUN",
-    "purpose": "R77_R81_HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_PROOF",
-    "exactPreviewSourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
-    "exactPreviewBuildId": "gi-i65-b2-367c839a92aa-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36334556509-xmcb0vbv.web.app",
-    "syntheticClientId": "b2-drive-human-36334556509",
-    "syntheticOnly": true,
-    "realClientMutationAuthorized": false,
-    "noLive": true,
-    "noB3": true,
-    "noReimport": true,
-    "cleanupMandatory": true
+    "status": "READY_PENDING_PAULA_OAUTH",
+    "tenantId": "alianzas-soluciones",
+    "clientId": "b2-drive-human-36334556509",
+    "clientName": "B2 QA · PRUEBA DRIVE HUMANA · NO USAR",
+    "searchText": "PRUEBA DRIVE HUMANA",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36334556509-xmcb0vbv.web.app",
+    "sourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
+    "buildId": "gi-i65-b2-367c839a92aa-57f234755dc1",
+    "previewRunId": 36334556509,
+    "firestoreReadback": true,
+    "driveExpectedRoot": "_GRAVICENTRA_PREVIEW_QA/b2-drive-human-36334556509",
+    "boundaries": {
+      "syntheticOnly": true,
+      "livePromotion": false,
+      "reimport": false,
+      "realClientMutation": false,
+      "cleanupMandatory": true
+    },
+    "createdAt": "2026-09-27T17:03:06.086Z",
+    "fixtureRunId": 36335271355,
+    "humanProofPending": true,
+    "cleanupPending": true
   }
 }
