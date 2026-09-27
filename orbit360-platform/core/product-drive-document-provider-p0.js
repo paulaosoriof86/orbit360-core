@@ -225,20 +225,73 @@
     }
   }
 
+  function driveFileId(ref) {
+    const raw = typeof ref === 'object' && ref ? ref : { documentRef: ref };
+    const direct = String(raw.documentRef || raw.fileId || raw.archivoRef || '').trim();
+    if (/^[A-Za-z0-9_-]{20,}$/.test(direct)) return direct;
+    const url = String(raw.driveUrl || raw.externalUrl || raw.url || '').trim();
+    const m = url.match(/\/d\/([A-Za-z0-9_-]{20,})/) || url.match(/[?&]id=([A-Za-z0-9_-]{20,})/);
+    return m ? m[1] : '';
+  }
+
   function resolve(ref, extra) {
     const raw = typeof ref === 'object' && ref ? ref : { documentRef: ref };
     const url = String(raw.driveUrl || raw.externalUrl || raw.url || '').trim();
-    if (/^https:\/\/[^\s]+$/i.test(url)) return Promise.resolve({ ok: true, status: 'disponible', externalUrl: url, url });
-    const id = String(raw.documentRef || raw.fileId || '').trim();
-    if (/^[A-Za-z0-9_-]{20,}$/.test(id)) {
+    const id = driveFileId(raw);
+    const downloadAvailable = !!(id && tokenFresh());
+    if (/^https:\/\/[^\s]+$/i.test(url)) return Promise.resolve({ ok: true, status: 'disponible', externalUrl: url, url, downloadAvailable });
+    if (id) {
       const driveUrl = 'https://drive.google.com/file/d/' + encodeURIComponent(id) + '/view';
-      return Promise.resolve({ ok: true, status: 'disponible', externalUrl: driveUrl, url: driveUrl });
+      return Promise.resolve({ ok: true, status: 'disponible', externalUrl: driveUrl, url: driveUrl, downloadAvailable });
     }
-    return Promise.resolve({ ok: false, status: 'sin_referencia', message: 'Documento sin referencia Drive.' });
+    return Promise.resolve({ ok: false, status: 'sin_referencia', message: 'Documento sin referencia Drive.', downloadAvailable: false });
+  }
+
+  async function download(ref) {
+    if (!tokenFresh()) return { ok: false, status: 'oauth_required', message: 'Conecta Drive antes de descargar documentos.' };
+    const id = driveFileId(ref);
+    if (!id) return { ok: false, status: 'sin_referencia', message: 'Documento sin referencia Drive.' };
+    try {
+      const headers = { Authorization: 'Bearer ' + state.accessToken };
+      const metaUrl = 'https://www.googleapis.com/drive/v3/files/' + encodeURIComponent(id) + '?fields=id,name,mimeType,size,capabilities(canDownload)&supportsAllDrives=true';
+      const metaResp = await fetch(metaUrl, { headers });
+      if (!metaResp.ok) {
+        const code = metaResp.status;
+        return { ok: false, status: code === 403 ? 'sin_permiso' : code === 404 ? 'sin_referencia' : 'no_disponible', message: 'Drive no autorizó la descarga.' };
+      }
+      const meta = await metaResp.json();
+      if (meta && meta.capabilities && meta.capabilities.canDownload === false) {
+        return { ok: false, status: 'sin_permiso', message: 'Drive no permite descargar este documento.' };
+      }
+      if (/^application\/vnd\.google-apps\./i.test(String(meta && meta.mimeType || ''))) {
+        return { ok: false, status: 'solo_drive', message: 'Este archivo nativo de Google debe abrirse en Drive.' };
+      }
+      const mediaUrl = 'https://www.googleapis.com/drive/v3/files/' + encodeURIComponent(id) + '?alt=media&supportsAllDrives=true';
+      const mediaResp = await fetch(mediaUrl, { headers });
+      if (!mediaResp.ok) {
+        const code = mediaResp.status;
+        return { ok: false, status: code === 403 ? 'sin_permiso' : code === 404 ? 'sin_referencia' : 'no_disponible', message: 'No fue posible descargar el archivo desde Drive.' };
+      }
+      const blob = await mediaResp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = String(meta && meta.name || 'documento');
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { try { URL.revokeObjectURL(blobUrl); } catch (_) {} try { a.remove(); } catch (_) {} }, 1500);
+      return { ok: true, status: 'descargado', downloaded: true, fileName: a.download, mimeType: String(meta && meta.mimeType || blob.type || '') };
+    } catch (error) {
+      const raw = String(error && (error.code || error.message) || '');
+      if (/oauth|token|401|unauthenticated/i.test(raw)) clearToken({ available: false, status: 'oauth_expired', message: 'La autorización de Google Drive venció. Vuelve a conectar Drive.', code: raw });
+      return { ok: false, status: 'no_disponible', message: 'No fue posible descargar el documento desde Drive.', code: raw };
+    }
   }
 
   const provider = {
     resolve,
+    download,
     upload,
     connect,
     disconnect: () => clearToken(),
@@ -274,11 +327,12 @@
   window.addEventListener('focus', () => { if (tokenFresh() && !state.probed) probe(false); });
 
   Orbit.productDriveDocumentProviderP0 = Object.freeze({
-    VERSION: 'b2-r15-20260927.3-secondary-oauth',
+    VERSION: 'b2-r15b-20260927.4-drive-download',
     connect,
     disconnect: () => clearToken(),
     probe,
     upload,
+    download,
     status: () => Object.assign({}, state.status, { connected: tokenFresh(), driveUserEmail: state.driveUserEmail }),
     previewIsolated: isPreview(),
     oauthDelegated: true,
