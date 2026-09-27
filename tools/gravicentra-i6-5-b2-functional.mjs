@@ -48,7 +48,15 @@ need(files.opsBackend.includes('SELF_SERVICE_ROLES')&&files.opsBackend.includes(
 need(files.opsBackend.includes("PREVIEW_TEST_RECORD_ONLY")&&files.opsBackend.includes("previewWrite:previewOnly===true")&&files.opsBackend.includes("targets.length&&previewOnly!==true"),'B2_R12_PREVIEW_UAT_WRITE_MODE_MISSING');
 need(files.operationalStore.includes("typeof Orbit.session.rol==='function'")&&files.operationalStore.includes("Object.assign({},m,{activeRole:role})"),'B2_R14_WRITE_ROLE_NOT_SYNCED_WITH_ACTIVE_SESSION');
 need(files.opsBackend.includes('enrichManagementContext')&&files.opsBackend.includes("row.pais=text(row.pais||(policy&&policy.pais)||(client&&client.pais)"),'B2_R67_MANAGEMENT_COUNTRY_RELOAD_FIX_MISSING');
-need(files.renewals.includes("renewal-proposals-v1200")&&files.renewals.includes("La gestión se creará <b>solo al confirmar</b>"),'B2_R68_PROPOSALS_PREMATURE_CREATE_FIX_MISSING');
+need(
+  files.renewals.includes("async function solicitarPropuestas(policyId)")&&
+  files.renewals.includes("Orbit.ciclo.managementCreateModal")&&
+  files.renewals.includes("workflowType:'renewal_proposals'")&&
+  files.renewals.includes("openAfterCreate:false")&&
+  !files.renewals.includes("crearGestionDurable({")&&
+  files.ciclo.includes("La ficha se crea únicamente al confirmar."),
+  'B2_R68_PROPOSALS_PREMATURE_CREATE_FIX_MISSING'
+);
 need(files.issuanceBridge.includes("renewalDefaultPayments")&&files.issuanceBridge.includes("Comparar / enviar propuestas")&&files.issuanceBridge.includes("Registrar retroalimentación"),'B2_R69_RENEWAL_OPS_UAT_CONTROLS_MISSING');
 need(files.issuance.includes("soporte_renovacion_en_firme_invalido"),'B2_R70_FIRM_RENEWAL_SUPPORT_VALIDATION_MISSING');
 need(files.issuanceBridge.includes("renewalDefaultPayments")&&files.engine.includes("if (monthly) return Math.max(1, Math.min(24, +requested || configured || 12));"),'B2_R69_RECEIPT_COUNT_EDITABILITY_MISSING');
