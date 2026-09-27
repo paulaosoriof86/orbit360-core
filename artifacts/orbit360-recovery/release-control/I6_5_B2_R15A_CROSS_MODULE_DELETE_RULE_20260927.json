@@ -1,0 +1,48 @@
+{
+  "schema": "gravicentra-i6-5-b2-r15a-cross-module-delete-rule-v1",
+  "recordedAt": "2026-09-27",
+  "authority": "PAULA_EXPLICIT_PRODUCT_RULE",
+  "block": "B2",
+  "finding": {
+    "id": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
+    "classification": "PRODUCT_DEFECT_CROSS_MODULE_CRUD_PARITY",
+    "finding": "La acción Eliminar no está disponible de forma consistente en todos los módulos que administran registros persistentes.",
+    "rule": "Todo módulo con registros administrables debe ofrecer una acción visible Eliminar a los roles autorizados. La eliminación debe respetar permisos, alcance de datos, dependencias, confirmación reforzada, motivo y readback; no puede romper relaciones ni borrar evidencia histórica necesaria.",
+    "semantics": {
+      "default": "SOFT_DELETE_DURABLE_WITH_AUDIT_METADATA",
+      "physicalDelete": "ONLY_WHERE_RELATIONALLY_SAFE_AND_ALREADY_GOVERNED",
+      "relationalProtection": "FAIL_CLOSED",
+      "hiddenFromNormalLists": true,
+      "historyResolvable": true,
+      "noCascadeBlindDelete": true
+    },
+    "phaseASurfaces": [
+      "Cliente360/clientes",
+      "Pólizas",
+      "Vehículos",
+      "Recibos/Cobros",
+      "Ops/Gestiones",
+      "Leads/Negocios",
+      "Renovaciones/gestiones y propuestas administrables",
+      "Siniestros",
+      "Cancelaciones",
+      "Comisiones",
+      "Aseguradoras",
+      "Equipo/Usuarios"
+    ],
+    "requiredProof": [
+      "Cada superficie administrable muestra Eliminar cuando el rol activo tiene permiso.",
+      "Sin permiso, la acción no ejecuta escritura aunque se fuerce desde UI.",
+      "Registro sin dependencias puede eliminarse y desaparece de listas después de reload.",
+      "Registro con dependencias críticas se bloquea o usa borrado lógico sin huérfanos.",
+      "Se conserva motivo, actor, fecha y readback durable."
+    ]
+  },
+  "implementationDirection": "CANONICAL_DELETE_OWNER_PLUS_MODULE_ENTRYPOINTS",
+  "boundaries": {
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noBlindCascade": true
+  }
+}
