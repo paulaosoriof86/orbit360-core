@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -248,7 +248,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PENDING_R13_NEW_EXACT_PREVIEW",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "8e576008f0725bbdf3bb1428d5cd878aac56ee0d",
     "exactPreviewBuildId": "gi-i65-b2-8e576008f072-57f234755dc1",
@@ -1472,8 +1472,8 @@
     "broadRediscoveryRequired": false,
     "authorityBlobSha": "2250d63fc5dd2fb824e30b5493e7e6a611fc02d4",
     "findingsLedgerBlobSha": "6912bfbecfc963c3c57c64a058e192ee18173b68",
-    "compositionLockBlobSha": "0cc0aae13458370c59b1a8e241300707eecdb391",
-    "findingLedgerBlobSha": "4d2ae44a19b5c21d6144343c5b1b27c29e43a833"
+    "compositionLockBlobSha": "6f1cdc1e39631d808e3a9a5ca11a94a1649a5555",
+    "findingLedgerBlobSha": "a0688db5e6edae2b3c218c2fc7d42060344f8a5d"
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
   "lastPreviewFailure": {
@@ -2392,7 +2392,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "514f602d0677a2b8bd8274425f6d24f6200290e2",
+  "findingLedgerBlobSha": "a0688db5e6edae2b3c218c2fc7d42060344f8a5d",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -2599,5 +2599,18 @@
     "receiptBlobSha": "2d88808ed77e8044ac5f640124d01c996ed13171",
     "notificationsSuppressed": true,
     "roleScopePreserved": true
+  },
+  "r13RenewalOpsUat": {
+    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
+    "receiptBlobSha": "6bb99bfabb9a2770bd0bec1d90a3fa90cf429b36",
+    "findingIds": [
+      "B2-R67-OPS-MANAGEMENT-COUNTRY-RELOAD-R13",
+      "B2-R68-RENEWAL-PROPOSALS-PREMATURE-CREATE-R13",
+      "B2-R69-DIRECT-RENEWAL-RECEIPTS-PREMIUM-R13",
+      "B2-R70-FIRM-RENEWAL-SUPPORT-R13",
+      "B2-R71-OPS-CHECKLIST-FEEDBACK-MODAL-R13"
+    ],
+    "previewTestPolicyCleanupRequired": true
   }
 }

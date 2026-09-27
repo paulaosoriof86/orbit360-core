@@ -1,0 +1,22 @@
+{
+  "schema": "gravicentra-i6-5-b2-r13-renewal-ops-uat-fixes-v1",
+  "recordedAt": "2026-09-27",
+  "authority": "PAULA_VISUAL_UAT_PLUS_AUTH_DIAGNOSTIC",
+  "sourceParent": "8c6e798598193dd6a4e55c4d49d0c75e3845ab9e",
+  "findings": {
+    "B2-R67-OPS-MANAGEMENT-COUNTRY-RELOAD-R13": "Canonical gestiones persisted but disappeared after reload because product Ops query requires pais and created managements lacked pais. Fixed by enriching from linked policy/client and persisting pais/moneda/producto.",
+    "B2-R68-RENEWAL-PROPOSALS-PREMATURE-CREATE-R13": "Propuestas created Ops work before the user completed/confirmed its management form. Fixed with explicit pre-create modal and no persistence until confirmation.",
+    "B2-R69-DIRECT-RENEWAL-RECEIPTS-PREMIUM-R13": "Direct renewal could prefill Mensual + 1 receipt from inconsistent source cuotas. Fixed with sane frequency-derived default, editable count honored by receipt engine, editable premium components/IVA and live total preview.",
+    "B2-R70-FIRM-RENEWAL-SUPPORT-R13": "Firm-renewal document was an unconstrained text field that accepted placeholder text. Clarified as traceable insurer support and reject placeholder/too-short values.",
+    "B2-R71-OPS-CHECKLIST-FEEDBACK-MODAL-R13": "Ops modal closed on backdrop click, checklist changes lacked durable feedback, and renewal proposal management lacked compare/send/feedback path. Backdrop close disabled; checklist uses durable write + bitacora/notification; compare/send and feedback actions added."
+  },
+  "manualUat": {
+    "firmRenewalSupportMeaning": "Documento o soporte oficial de la aseguradora con condiciones definitivas de renovación: PDF/documento de renovación, enlace de Drive, referencia documental o equivalente trazable. No es una nota libre.",
+    "previewTestResidue": "La póliza número 'prueba' creada por Paula durante UAT debe tratarse como dato de prueba y limpiarse de forma exacta antes de cerrar B2/promover."
+  },
+  "boundaries": {
+    "noLive": true,
+    "noReimport": true,
+    "controlledPreviewWrites": true
+  }
+}
