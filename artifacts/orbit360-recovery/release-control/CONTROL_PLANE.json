@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_B2_AUTH_HARNESS_FIX_AND_RERUN_SAME_EXACT_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2024,7 +2024,7 @@
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
     "b2ExecutionLockBlobSha": "ac25c63d21642d93070b099b23c9abf80028ac99",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_AUTH_FAILURE_HARNESS_PENDING_RERUN",
+      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2111,7 +2111,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "B2 technical Preview remains exact and unchanged. Authenticated proof failed only in versioned harness after ADVISOR_SELF_SERVICE_MANAGEMENT_START; no product regression declared, no LIVE, no B3, no reimport. Correct harness only and rerun against the same exact Preview/artifact.",
+      "boundaryNote": "Exact B2 technical Preview remains unchanged. Authenticated proof is NOT PASS: run 36288967976 failed in versioned harness after ADVISOR_SELF_SERVICE_MANAGEMENT_START; harness-only variable binding fixed at branch HEAD. Rerun exact same Preview/artifact before Paula UAT. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2128,7 +2128,7 @@
       "rootCauseR21": "ASEGURADORAS_DEEPLINK_RERENDER_DROPS_EDIT_STATE",
       "insurerCredentialRootCause": "PREVIEW_CALLABLE_CROSS_READ_PRODUCTION_VAULT",
       "insurerCredentialIsolationFix": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
-      "authenticatedRunArmed": false,
+      "authenticatedRunArmed": true,
       "previewCredentialSecretIamRepair": "AUTHORIZED_PENDING_PROOF",
       "humanReviewOutstandingIds": [
         "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
