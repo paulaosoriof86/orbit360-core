@@ -55,7 +55,7 @@
     "reimportExecuted": false,
     "productSourceChanged": false,
     "firebaseAuthConfigurationChanged": false,
-    "nextRequiredAction": "AUTOMATED_GOOGLE_PROVIDER_READBACK_GUARD_THEN_REPEAT_HUMAN_DRIVE_OAUTH_PROOF"
+    "nextRequiredAction": "REPEAT_HUMAN_DRIVE_OAUTH_UPLOAD_OPEN_RELOAD_PROOF"
   },
   "authorization": {
     "decision": "AUTHORIZED",
@@ -71,7 +71,7 @@
       "b3Open": false,
       "reimport": false
     },
-    "status": "MANUAL_ENABLEMENT_REPORTED_PENDING_READBACK",
+    "status": "APPLIED_READBACK_PASS",
     "manualEnablementEvidence": {
       "reportedBy": "Paula",
       "reportedAt": "2026-09-27",
@@ -97,5 +97,25 @@
       "evidenceArtifactDigest": "sha256:bb0e4df1f6e36c922f9f3ff5057e56176bae04c7f6bf3acfa43976bbe7d29c71",
       "firebaseMutationExecuted": false
     }
-  ]
+  ],
+  "firebaseGoogleProviderRemediation": {
+    "status": "READBACK_PASS",
+    "runId": 36348217185,
+    "projectId": "ays-orbit-360-lab",
+    "providerId": "google.com",
+    "before": {
+      "name": "projects/646761409743/defaultSupportedIdpConfigs/google.com",
+      "enabled": true,
+      "clientIdPresent": true,
+      "clientSecretPresent": true
+    },
+    "after": {
+      "name": "projects/646761409743/defaultSupportedIdpConfigs/google.com",
+      "enabled": true,
+      "clientIdPresent": true,
+      "clientSecretPresent": true
+    },
+    "mutationExecuted": false,
+    "permanentFixturePreflightInstalled": true
+  }
 }
