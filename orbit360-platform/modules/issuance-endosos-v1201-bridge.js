@@ -32,6 +32,8 @@ Orbit.modules = Orbit.modules || {};
     return b;
   }
   function frequencyFromPayments(n) { return ({1:'Contado',2:'Semestral',3:'Cuatrimestral',4:'Trimestral',6:'Bimestral',12:'Mensual'})[+n] || (+n > 1 ? 'Mensual' : 'Contado'); }
+  function paymentsFromFrequency(f) { const n=Orbit.primas&&Orbit.primas.cuotasDe?+Orbit.primas.cuotasDe(f):0; return n>0?n:1; }
+  function renewalDefaultPayments(source) { const expected=paymentsFromFrequency(source&&source.frecuencia||'Contado'), raw=Math.max(0,+(source&&source.cuotas)||0); return raw>0&&raw===expected?raw:expected; }
   function insurerForQuote(q) {
     const name = String(q && (q.nombre || q.aseguradora) || '').toLowerCase();
     return (S().all('aseguradoras') || []).find(a => a && a.nombre && (a.nombre.toLowerCase() === name || name.includes(a.nombre.toLowerCase()) || a.nombre.toLowerCase().includes(name))) || null;
@@ -278,6 +280,11 @@ Orbit.modules = Orbit.modules || {};
     </div>`;
     const b=modal('ops-renewal-issuance-v1201','Solicitar emisión de renovación',body,'<button class="btn primary" data-create>Crear solicitud de emisión</button>',740);
     const $=x=>b.querySelector(x),btn=b.querySelector('[data-create]');
+    let paymentsTouched=false;
+    $('#rend-payments').addEventListener('input',()=>{paymentsTouched=true;paintTotal();});
+    const paintTotal=()=>{try{const net=+$('#rend-net').value||0,gem=+$('#rend-gem').value||0,gfin=+$('#rend-gfin').value||0,other=+$('#rend-other').value||0,iva=+$('#rend-iva').value||0,n=Math.max(1,+$('#rend-payments').value||1);const recargo=net>0?gfin/net*100:0,d=Orbit.primas.desglose(net,source.pais,{fraccionado:n>1,gastosEmision:gem,otros:other,recargoFinPct:recargo,ivaPct:iva});$('#rend-total').value=(source.moneda||'')+' '+Number(d.total||0).toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2});}catch(e){$('#rend-total').value='';}};
+    $('#rend-freq').addEventListener('change',()=>{if(!paymentsTouched)$('#rend-payments').value=paymentsFromFrequency($('#rend-freq').value);paintTotal();});
+    ['#rend-net','#rend-gem','#rend-gfin','#rend-other','#rend-iva'].forEach(sel=>$(sel).addEventListener('input',paintTotal));paintTotal();
     btn.onclick=async()=>{
       const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
       const insurerId=$('#reni-asg').value,cuotas=Math.max(1,+$('#reni-payments').value||1);
@@ -299,7 +306,7 @@ Orbit.modules = Orbit.modules || {};
   function openDirectRenewal(g) {
     if(!I.canManage())return toast('Tu rol activo no puede registrar la renovación.');
     const source=renewalSource(g);if(!source)return toast('No se encontró la póliza origen.');
-    const insurers=renewalInsurers(source),start=source.vigenciaFin||today(),payments=Math.max(1,+source.cuotas||1);
+    const insurers=renewalInsurers(source),start=source.vigenciaFin||today(),payments=renewalDefaultPayments(source);
     const body=`<div class="cfg-note" style="margin-bottom:12px">Usa esta opción cuando la aseguradora ya envió la <b>renovación en firme</b>. Al confirmar se crea una nueva póliza vinculada a la anterior, con sus recibos/cartera; la póliza origen se conserva.</div><div class="cgrid">
       <label class="ce-l">Aseguradora *<select id="rend-asg" class="o-sel">${insurers.map(a=>`<option value="${esc(a.id)}" ${a.id===source.aseguradoraId?'selected':''}>${esc(a.nombre)}</option>`).join('')}</select></label>
       <label class="ce-l">Número real de nueva póliza *<input id="rend-num" class="o-sel"></label>
@@ -310,12 +317,14 @@ Orbit.modules = Orbit.modules || {};
       <label class="ce-l">Cantidad de pagos<input id="rend-payments" type="number" min="1" class="o-sel" value="${payments}"></label>
       <label class="ce-l">Forma de pago<input id="rend-form" class="o-sel" value="${esc(source.formaPago||'')}"></label>
       <label class="ce-l">Conducto<input id="rend-conduct" class="o-sel" value="${esc(source.conducto||'')}"></label>
-      <label class="ce-l">Prima neta *<input id="rend-net" type="number" class="o-sel" value="${+source.primaNeta||0}"></label>
-      <label class="ce-l">Gastos emisión<input id="rend-gem" type="number" class="o-sel" value="${+source.gastosEmision||0}"></label>
-      <label class="ce-l">Gastos financieros<input id="rend-gfin" type="number" class="o-sel" value="${+source.gastosFinan||0}"></label>
-      <label class="ce-l">Otros<input id="rend-other" type="number" class="o-sel" value="${+source.otros||0}"></label>
-      <label class="ce-l">Referencia aseguradora<input id="rend-source" class="o-sel"></label>
-      <label class="ce-l">Documento de renovación en firme *<input id="rend-doc" class="o-sel" placeholder="documentRef"></label>
+      <label class="ce-l">Prima neta *<input id="rend-net" type="number" step="0.01" class="o-sel" value="${+source.primaNeta||0}"></label>
+      <label class="ce-l">Gastos emisión<input id="rend-gem" type="number" step="0.01" class="o-sel" value="${+source.gastosEmision||0}"></label>
+      <label class="ce-l">Gastos financieros<input id="rend-gfin" type="number" step="0.01" class="o-sel" value="${+source.gastosFinan||0}"></label>
+      <label class="ce-l">Otros / asistencias<input id="rend-other" type="number" step="0.01" class="o-sel" value="${+source.otros||0}"></label>
+      <label class="ce-l">IVA / impuestos %<input id="rend-iva" type="number" step="0.01" class="o-sel" value="${source.ivaPct!=null?+source.ivaPct:((Orbit.primas&&Orbit.primas.cfgPais&&Orbit.primas.cfgPais(source.pais).iva)||0)}"></label>
+      <label class="ce-l">Prima total calculada<input id="rend-total" class="o-sel" readonly></label>
+      <label class="ce-l">Referencia aseguradora<input id="rend-source" class="o-sel" placeholder="N.º propuesta, correo o referencia"></label>
+      <label class="ce-l">Soporte de renovación en firme *<input id="rend-doc" class="o-sel" placeholder="URL de Drive, referencia documental o identificador del PDF"></label>
     </div>`;
     const b=modal('ops-direct-renewal-v1201','Registrar renovación en el sistema',body,'<button class="btn primary" data-create>Crear nueva póliza de renovación</button>',780);
     const $=x=>b.querySelector(x),btn=b.querySelector('[data-create]');
@@ -326,7 +335,7 @@ Orbit.modules = Orbit.modules || {};
         vigenciaInicio:$('#rend-start').value,vigenciaFin:$('#rend-end').value,producto:$('#rend-prod').value.trim(),
         frecuencia:$('#rend-freq').value,cuotas:+$('#rend-payments').value||1,formaPago:$('#rend-form').value.trim(),
         conducto:$('#rend-conduct').value.trim(),primaNeta:+$('#rend-net').value||0,gastosEmision:+$('#rend-gem').value||0,
-        gastosFinan:+$('#rend-gfin').value||0,otros:+$('#rend-other').value||0,sourceRef:$('#rend-source').value.trim(),documentRef:$('#rend-doc').value.trim()
+        gastosFinan:+$('#rend-gfin').value||0,otros:+$('#rend-other').value||0,ivaPct:+$('#rend-iva').value||0,sourceRef:$('#rend-source').value.trim(),documentRef:$('#rend-doc').value.trim()
       },{motivo:'Renovación en firme recibida y aprobada'});
       if(!result.ok){btn.disabled=false;btn.textContent=original;return toast('No se creó: '+(result.errors||[]).join(', '));}
       b.remove();const base=document.getElementById('ciclo-modal');if(base)base.remove();toast(result.alreadyCreated?'La renovación ya estaba registrada.':'Nueva póliza de renovación creada con sus recibos.');Orbit.modules.cliente360.verPoliza(result.policy.id);
@@ -340,8 +349,14 @@ Orbit.modules = Orbit.modules || {};
     const panel = document.createElement('div'); panel.className = 'ciclo-sec'; panel.dataset.workflowV1201 = '1';
     if (g.workflowType === 'renewal_proposals') {
       const source=renewalSource(g);
-      panel.innerHTML=`<div class="ciclo-sec-t">📋 Propuestas de renovación</div><div class="vp-tags"><span class="badge info">En gestión</span></div><div class="vp-grid" style="margin-top:10px"><div class="vp-row"><span class="vp-l">Póliza origen</span><span class="vp-v">${esc(source&&source.numero||g.polizaId||'—')}</span></div><div class="vp-row"><span class="vp-l">Próxima acción</span><span class="vp-v">Solicitar propuestas o cotizar desde Operaciones</span></div></div>${I.canManage()?'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px"><button class="btn ghost sm" data-ren-quote>Cotizar directamente</button><button class="btn primary sm" data-ren-approved>Cliente aprobó · renovar</button></div>':'<div class="muted" style="margin-top:10px">El asesor solicitó propuestas; la cotización la gestiona Operaciones.</div>'}`;
+      panel.innerHTML=`<div class="ciclo-sec-t">📋 Propuestas de renovación</div><div class="vp-tags"><span class="badge info">En gestión</span></div><div class="vp-grid" style="margin-top:10px"><div class="vp-row"><span class="vp-l">Póliza origen</span><span class="vp-v">${esc(source&&source.numero||g.polizaId||'—')}</span></div><div class="vp-row"><span class="vp-l">Próxima acción</span><span class="vp-v">Solicitar/cargar propuestas, compararlas y retroalimentar al asesor/cliente</span></div></div>${I.canManage()?'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px"><button class="btn ghost sm" data-ren-quote>Cotizar directamente</button><button class="btn ghost sm" data-ren-compare>Comparar / enviar propuestas</button><button class="btn ghost sm" data-ren-feedback>Registrar retroalimentación</button><button class="btn primary sm" data-ren-approved>Cliente aprobó · renovar</button></div>':'<div class="muted" style="margin-top:10px">El asesor solicitó propuestas; la gestión operativa y la retroalimentación corresponden a Operaciones.</div>'}`;
       const quote=panel.querySelector('[data-ren-quote]');if(quote)quote.onclick=()=>openRenewalQuoteFromOps(g);
+      const compare=panel.querySelector('[data-ren-compare]');if(compare)compare.onclick=()=>{window.__orbitRenewalContext=renewalContextFromManagement(g);back.remove();location.hash='#/comparativo';};
+      const feedback=panel.querySelector('[data-ren-feedback]');if(feedback)feedback.onclick=()=>{
+        const body='<div class="cfg-note">Registra qué propuestas llegaron, qué se compartió y la respuesta del asesor o cliente. El detalle queda en la gestión.</div><label class="ce-l" style="margin-top:12px">Retroalimentación<textarea id="ren-feedback-note" class="o-sel" style="min-height:90px"></textarea></label>';
+        const m=modal('ops-renewal-feedback-v1201','Registrar retroalimentación',body,'<button class="btn primary" data-save-feedback>Guardar retroalimentación</button>',620);
+        m.querySelector('[data-save-feedback]').onclick=async()=>{const note=m.querySelector('#ren-feedback-note').value.trim();if(!note)return toast('Escribe la retroalimentación.');const checklist=[].concat(g.checklist||[]).map(x=>Object.assign({},x));const idx=checklist.findIndex(x=>/propuestas \/ cotizaciones reales obtenidas/i.test(String(x.t||'')));if(idx>=0)checklist[idx].done=true;const bits=[].concat(g.bitacora||[],[{ts:new Date().toISOString(),user:(Orbit.session&&Orbit.session.rol?Orbit.session.rol():'Equipo'),campo:'Retroalimentación',de:'',a:'Actualizada',origen:'manual',detalle:note}]);try{await S().updateDurable('gestiones',g.id,{nota:note,checklist,bitacora:bits,proximaAccion:'Preparar/enviar comparativo y registrar decisión del cliente'});m.remove();toast('Retroalimentación guardada en Ops.');Orbit.ciclo.openGestion(g.id);}catch(e){toast('No fue posible guardar la retroalimentación.');}};
+      };
       const approved=panel.querySelector('[data-ren-approved]');if(approved)approved.onclick=()=>openProposalApproval(g);
     } else if (g.workflowType === 'renewal_accepted') {
       const source=renewalSource(g),policy=(g.directRenewalPolicyId||g.nuevaPolizaId)&&S().get('polizas',g.directRenewalPolicyId||g.nuevaPolizaId);
