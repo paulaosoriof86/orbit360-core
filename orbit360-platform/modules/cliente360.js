@@ -919,7 +919,8 @@ Orbit.modules.cliente360 = (function () {
         ${field('Link de Drive (expediente)', 'ce-drive', c.driveLink || '')}
         <label class="ce-l">Notas<textarea id="ce-notas" class="o-sel" style="width:100%;min-height:62px;resize:vertical;padding:9px 11px">${U.esc(c.notas || '')}</textarea></label>
       </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn ghost" id="ce-delete" style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>
         <button class="btn ghost" id="ce-cancel">Cancelar</button>
         <button class="btn primary" id="ce-save">Guardar cambios</button>
       </div>
@@ -929,6 +930,24 @@ Orbit.modules.cliente360 = (function () {
     back.addEventListener('click', e => { if (e.target === back) { e.preventDefault(); e.stopPropagation(); c360toast('Usa Guardar cambios o Cancelar para cerrar este formulario.'); } });
     back.querySelector('#ce-x').addEventListener('click', closeM);
     back.querySelector('#ce-cancel').addEventListener('click', closeM);
+    const delClient = back.querySelector('#ce-delete');
+    if (delClient) delClient.addEventListener('click', async () => {
+      if (!Orbit.recordDelete) return c360toast('Eliminación canónica no disponible.');
+      delClient.disabled = true;
+      try {
+        const result = await Orbit.recordDelete.remove('clientes', cid, { label: c.nombre });
+        if (result && result.ok) {
+          closeM();
+          location.hash = '#/cliente360';
+          const h = document.getElementById('host');
+          if (h) render(h);
+          return;
+        }
+      } catch (error) {
+        c360toast('No fue posible confirmar la eliminación.');
+      }
+      delClient.disabled = false;
+    });
     // contacto alterno toggle
     const chk = back.querySelector('#ce-cont-chk');
     chk.addEventListener('change', () => { back.querySelector('#ce-cont-wrap').style.display = chk.checked ? '' : 'none'; });
