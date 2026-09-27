@@ -19,9 +19,9 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 105,
-    "b2HumanFindings": 42,
-    "currentBlocking": 32
+    "total": 135,
+    "b2HumanFindings": 69,
+    "currentBlocking": 9
   },
   "findings": [
     {
@@ -2341,6 +2341,150 @@
       "receiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f",
       "noLive": true,
       "noReimport": true
+    },
+    {
+      "id": "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260927",
+      "surface": "Shell/Branding/Mobile",
+      "classification": "PRODUCT_DEFECT_RESPONSIVE_BRANDING_OWNER",
+      "blocking": true,
+      "finding": "Mobile header shows Gravicentra Insurance instead of configured tenant brand/logo.",
+      "rootCause": "base.css hides .tb-logo at max-width:880px while public-tenant-branding renders tenant logo into .tb-logo; product brand remains visible.",
+      "requiredProof": "On mobile and desktop, tenant brand/logo is visible according to approved shell hierarchy without losing Gravicentra product identity where applicable.",
+      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+      "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260927",
+      "surface": "Cliente360/Listado/Mobile",
+      "classification": "PRODUCT_DEFECT_CSS_SELECTOR_COLLISION",
+      "blocking": true,
+      "finding": "Cliente 360 mobile list exposes filters but no free-text search.",
+      "rootCause": "Cliente360 list search reuses .tb-search; global mobile CSS hides .tb-search at max-width:980px.",
+      "requiredProof": "Cliente360 free-text search remains visible and usable on mobile and desktop, without changing topbar mobile-search behavior.",
+      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+      "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260927",
+      "surface": "Cliente360/Renovaciones/Mobile",
+      "classification": "PRODUCT_DEFECT_RESPONSIVE_LAYOUT",
+      "blocking": true,
+      "finding": "Cliente360 Renewals tab overflows horizontally and content/actions are clipped on mobile.",
+      "rootCause": "tabRenov renders fixed-width flex children (120px + flexible bar + 150px + badge + button) without a mobile wrap/grid contract.",
+      "requiredProof": "Renewal row and actions fit mobile viewport with no clipped business information or action.",
+      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+      "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260927",
+      "surface": "Cliente360/Póliza/Renovaciones/Ops/Portal",
+      "classification": "PRODUCT_DEFECT_CANONICAL_UI_OWNER_SPLIT",
+      "blocking": true,
+      "finding": "Management requested from Cliente360/Renewals does not use the same complete Ops management editor.",
+      "rootCause": "Orbit.ciclo.solicitarGestion uses a separate request modal while Ops +Gestión creates a generic record and then opens openGestion; creation semantics/UI are split.",
+      "requiredProof": "Cliente360, Policy, Renewals, Portal and Ops all open one canonical management creation/editor surface with contextual prefill and create one canonical gestion record.",
+      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+      "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260927",
+      "surface": "Ops/Gestiones/Documentos",
+      "classification": "PRODUCT_DEFECT_FALSE_DOCUMENT_PERSISTENCE",
+      "blocking": true,
+      "finding": "Management request UI offers file attachment.",
+      "rootCause": "solicitarGestion explicitly stores only file name/size in adjuntos and does not persist binary/document repository reference.",
+      "requiredProof": "Attached support is durably stored in the approved documentary repository, linked by metadata/provenance to the gestion, opens after reload, and does not expose a false upload success.",
+      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+      "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260927",
+      "surface": "Ops/Gestiones",
+      "classification": "PRODUCT_DEFECT_SELF_ADMINISTRATION_GAP",
+      "blocking": true,
+      "finding": "User requires ability to remove an erroneously created management; current management detail exposes archive but no delete/remove action.",
+      "rootCause": "openGestion actions include resolve/reopen/client/archive, with no authorized remove path.",
+      "requiredProof": "Authorized user can remove an erroneous management from active Ops with confirmation, audit/tombstone semantics and canonical readback; no silent orphaned relations.",
+      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+      "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260927",
+      "surface": "Póliza/Renovaciones",
+      "classification": "PRODUCT_DEFECT_CROSS_SURFACE_ACTION_PARITY",
+      "blocking": true,
+      "finding": "A renewable policy expiring within the already-used renewal window lacks an active Renew action on policy detail.",
+      "rootCause": "Canonical 0–45 day renewal criterion exists in CRM/policies list, but policy full-detail owner does not expose equivalent renewal entrypoint.",
+      "requiredProof": "Renewable policies at 0–45 days show the canonical renewal action on policy detail; outside-window/non-renewable behavior is explicit and consistent.",
+      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+      "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260927",
+      "surface": "Póliza/Vehículos",
+      "classification": "PRODUCT_DEFECT_LINEAGE_PROJECTION_DEDUP",
+      "blocking": true,
+      "finding": "Policy detail offers three vehicle candidates that visually represent the same vehicle/history.",
+      "rootCause": "policy-receipts-v1199-detail-guard vehicleCandidates deduplicates only by raw record id; historical/lineage-equivalent records with normalized same plate remain separate candidates.",
+      "requiredProof": "Linker shows one canonical current vehicle per normalized identity/lineage with prior vigencies preserved as history; no reimport.",
+      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+      "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260927",
+      "surface": "Cliente360/Importación/Drive",
+      "classification": "PRODUCT_DEFECT_DOCUMENT_REPOSITORY_CONTRACT",
+      "blocking": true,
+      "finding": "Cliente360 offers Importar a este expediente and documentary mode claims files are stored/visible.",
+      "rootCause": "importa.js documentary path advances directly to completion and performs no durable raw-file storage write; intelligent mode extracts data but does not retain the raw document.",
+      "requiredProof": "Client document upload stores the raw file in the approved documentary repository (Drive), records durable link/provenance in the client expediente, survives reload, and remains distinct from data extraction proposals.",
+      "status": "OPEN_R15_CAUSAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+      "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+      "noLive": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [
@@ -2379,6 +2523,43 @@
     "rule": "Only these human-visible items require Paula confirmation before B2 acceptance; technical findings already closed may not be reopened without reproducible causal regression."
   },
   "currentHumanReview": {
+    "date": "2026-09-27",
+    "recordedAt": "2026-09-27T06:23:00-06:00",
+    "origin": "PAULA_MOBILE_UAT_R15_20260927",
+    "decision": "PAULA_VISUAL_REJECTED_R15_REMEDIATION_REQUIRED",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36288967976-k58tfgn7.web.app",
+    "exactSourceSha": "dab677e937f9586195e3e79b94d5b91c397f0841",
+    "exactBuildId": "gi-i65-b2-dab677e937f9-57f234755dc1",
+    "exactPreviewRunId": 36288967976,
+    "authenticatedRunId": 36289840679,
+    "preservedPass": [
+      "B2_TECHNICAL_PREVIEW_PASS_HISTORICAL",
+      "B2_AUTHENTICATED_RUNTIME_PASS_36289840679",
+      "CLIENT_POLICY_VEHICLE_RECEIPT_CRUD_RUNTIME",
+      "OPS_LEADS_DURABLE_RELOAD_RUNTIME",
+      "RENEWAL_RUNTIME_RECEIPTS_PORTFOLIO_ZERO_COBRO",
+      "SYNTHETIC_CLEANUP"
+    ],
+    "blockingFindingIds": [
+      "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
+      "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
+      "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
+      "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
+      "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+      "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
+      "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
+      "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
+      "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15"
+    ],
+    "count": 9,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
+    "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+    "b2OverallAccepted": false,
+    "noB3": true,
+    "noLive": true,
+    "noReimport": true
+  },
+  "lastReview": {
     "date": "2026-09-26",
     "recordedAt": "2026-09-26T07:30:00-06:00",
     "origin": "PAULA_VISUAL_REVIEW_R7_20260926",
@@ -2594,50 +2775,5 @@
       "classification": "HARNESS_PROOF_ASSUMPTION_CORRECTED",
       "productRegressionDemonstrated": false
     }
-  },
-  "lastReview": {
-    "date": "2026-09-26",
-    "recordedAt": "2026-09-26T07:30:00-06:00",
-    "origin": "PAULA_VISUAL_REVIEW_20260926_R6",
-    "decision": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36217789995-utmqc2sg.web.app",
-    "exactSourceSha": "2963f4140f2f78b77c9ffffa1a7da23bd66e9d4e",
-    "exactBuildId": "gi-i65-b2-2963f4140f2f-57f234755dc1",
-    "exactPreviewRunId": 36217789995,
-    "authenticatedRunId": 36218497058,
-    "preservedPass": [
-      "ROLE_SCOPE_OPERATIVO_ALL_ASESOR_OWN_LEAKCOUNT_0",
-      "COTIZADOR_COMPARATIVO_PERMISSION_RUNTIME",
-      "CLIENT_CRUD",
-      "POLICY_CRUD",
-      "VEHICLE_SAME_ID_EDIT",
-      "VEHICLE_TO_POLICY_PRESERVES_POLICYID_VEHICLEID",
-      "INDIVIDUAL_RECEIPT_EDIT",
-      "SYNTHETIC_INSURER_LOGO_CREDENTIAL_BACKEND",
-      "SYNTHETIC_RENEWAL_DURABLE",
-      "SYNTHETIC_CLEANUP",
-      "ZERO_CONFIRMED_COBRO_FROM_POLICY_CREATION_ONLY"
-    ],
-    "blockingFindingIds": [
-      "B2-R47-VEHICLE-CURRENT-VS-HISTORY-PROJECTION-R6",
-      "B2-R48-SINGLE-ACTIVE-RECEIPT-CALENDAR-R6",
-      "B2-R49-POLICY-STATE-VIGENCY-ORDERING-R6",
-      "B2-R50-OPERATIONAL-LANGUAGE-LINEAGE-LEAK-R6",
-      "B2-R51-VISUAL-HIERARCHY-SECTION-LABELS-R6",
-      "B2-R52-INSURER-LOGO-HUMAN-SYNTHETIC-FIXTURE-R6",
-      "B2-R53-SIDEBAR-SCROLL-NAVIGATION-R6"
-    ],
-    "carryForwardFindingIds": [
-      "B3-CARRY-PAYMENT-CONFIRMED-NOT-CONCILIATED-R6",
-      "B3-CARRY-INFERRED-PAYMENT-EFFECTIVE-DATE-R6",
-      "B3-CARRY-INVOICE-APPLICATION-SEPARATE-DATES-R6",
-      "B3-CARRY-REPORTED-PAYMENT-HISTORICAL-AUDIT-R6",
-      "B3-CARRY-SURCHARGE-ISSUANCE-RULE-CONFIG-R6",
-      "B3-CARRY-DASHBOARD-REALITY-RECONCILIATION-R6",
-      "B4-CARRY-RENEWAL-SINGLE-OWNER-R6",
-      "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
-    ],
-    "noLive": true,
-    "b3": "NOT_STARTED"
   }
 }
