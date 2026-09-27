@@ -223,8 +223,8 @@ Orbit.modules.cliente360 = (function () {
 
       <div class="card" style="overflow:hidden">
         <div style="display:flex;gap:10px;flex-wrap:wrap;padding:13px 14px;border-bottom:1px solid var(--line);align-items:center">
-          <div class="tb-search" style="background:var(--surface);border-color:var(--line);color:var(--ink-3);min-width:220px">
-            <span>🔍</span><input id="f-q" placeholder="Buscar cliente, correo, identificación…" value="${U.esc(f.q)}">
+          <div class="c360-search" style="background:var(--surface);border-color:var(--line);color:var(--ink-3)">
+            <span>🔍</span><input id="f-q" placeholder="Buscar cliente, correo, identificación…" value="${U.esc(f.q)}" aria-label="Buscar en Cliente 360">
           </div>
           <select id="f-tipo" class="o-sel"><option value="">Tipo</option><option ${f.tipo === 'Persona' ? 'selected' : ''}>Persona</option><option ${f.tipo === 'Empresa' ? 'selected' : ''}>Empresa</option></select>
           <select id="f-pais" class="o-sel"><option value="">País</option><option value="GT" ${f.pais === 'GT' ? 'selected' : ''}>Guatemala</option><option value="CO" ${f.pais === 'CO' ? 'selected' : ''}>Colombia</option></select>
@@ -612,7 +612,7 @@ Orbit.modules.cliente360 = (function () {
   function tabRenov(cid, r) {
     const items = r.pol.filter(esRenovable).slice().sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
     return `<div class="card pad">
-      <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="c360-renewals-head">
         <b style="font-family:var(--f-display);font-size:15px">Línea de renovaciones</b>
         <button class="btn ghost sm" onclick="Orbit.ciclo.solicitarGestion('${cid}')">🗂 Solicitar gestión</button>
       </div>
@@ -623,14 +623,16 @@ Orbit.modules.cliente360 = (function () {
         const tone = estado === 'Vencida' ? 'danger' : estado === 'Por renovar' ? 'warn' : 'ok';
         const pct = Math.max(2, Math.min(100, 100 - (d / 365 * 100)));
         const gestionable = estado !== 'Vigente';
-        return `<div style="display:flex;align-items:center;gap:14px">
-          <div style="width:120px;flex-shrink:0"><div style="font-weight:700;font-size:13px">${p.ramo}</div><div class="muted mono" style="font-size:11px">${p.numero}</div></div>
-          <div style="flex:1"><div class="bar"><i style="width:${pct}%;background:${tone === 'danger' ? 'var(--danger)' : tone === 'warn' ? 'linear-gradient(90deg,#c9821b,#e0a23c)' : 'linear-gradient(90deg,#1f8a4c,#34b96a)'}"></i></div></div>
-          <div style="width:150px;text-align:right;font-size:12.5px">${U.fmtDate(p.vigenciaFin)}<div class="muted">${d < 0 ? 'venció hace ' + (-d) + ' d' : 'en ' + d + ' d'}</div></div>
-          ${U.estadoBadge(estado)}
-          <button class="btn ${gestionable ? 'primary' : 'ghost'} sm" ${gestionable ? '' : 'disabled style="opacity:.4"'} onclick="Orbit.modules.cliente360.renovar('${p.id}')">Renovar</button>
-          <button class="btn ghost sm" onclick="Orbit.modules.cliente360.comparativo('${p.id}')" title="Comparar propuesta de renovación vs actual">⚖ Comparar</button>
-          <button class="btn ghost sm" onclick="Orbit.ciclo.solicitarGestion('${cid}','${p.id}')" title="Solicitar condiciones de renovación a la aseguradora">🗂</button>
+        return `<div class="c360-renewal-row">
+          <div class="c360-renewal-id"><div style="font-weight:700;font-size:13px">${p.ramo}</div><div class="muted mono" style="font-size:11px">${p.numero}</div></div>
+          <div class="c360-renewal-progress"><div class="bar"><i style="width:${pct}%;background:${tone === 'danger' ? 'var(--danger)' : tone === 'warn' ? 'linear-gradient(90deg,#c9821b,#e0a23c)' : 'linear-gradient(90deg,#1f8a4c,#34b96a)'}"></i></div></div>
+          <div class="c360-renewal-date">${U.fmtDate(p.vigenciaFin)}<div class="muted">${d < 0 ? 'venció hace ' + (-d) + ' d' : 'en ' + d + ' d'}</div></div>
+          <div class="c360-renewal-status">${U.estadoBadge(estado)}</div>
+          <div class="c360-renewal-actions">
+            <button class="btn ${gestionable ? 'primary' : 'ghost'} sm" ${gestionable ? '' : 'disabled style="opacity:.4"'} onclick="Orbit.modules.renovaciones&&Orbit.modules.renovaciones.registrarAceptacion?Orbit.modules.renovaciones.registrarAceptacion('${p.id}'):Orbit.modules.cliente360.renovar('${p.id}')">Renovar</button>
+            <button class="btn ghost sm" onclick="Orbit.modules.cliente360.comparativo('${p.id}')" title="Comparar propuesta de renovación vs actual">⚖ Comparar</button>
+            <button class="btn ghost sm" onclick="Orbit.ciclo.solicitarGestion('${cid}','${p.id}')" title="Solicitar condiciones de renovación a la aseguradora">🗂 Gestión</button>
+          </div>
         </div>`;
       }).join('') || '<span class="muted">Sin pólizas para renovar.</span>'}
       </div>
