@@ -4681,3 +4681,98 @@ jobs:
           git config user.email gravicentra-recovery-bot@users.noreply.github.com
           git commit -m "freeze(i6.5): Google Auth provider enabled with readback"
           git push origin "HEAD:$GITHUB_REF_NAME"
+
+  i65-b2-r84-service-account-drive-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      DRIVE_CLIENTS_ROOT_FOLDER_ID: 13H7zMGwFC9f1UnHyfNqzzSfFex1jJRHE
+      OUT: ${{ runner.temp }}/b2-r84-service-account-drive-diagnostic.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate R84 diagnostic
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL));
+          const run=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_DIAGNOSTIC'
+            && c.i65ForensicRemediationPlan?.currentBlock==='B2'
+            && c.i65ForensicRemediationPlan?.b2?.r16PersistentTenantDriveAuthority?.findingId==='B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('R84_SERVICE_ACCOUNT_DRIVE_DIAGNOSTIC_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Install Google auth dependency
+        if: steps.mode.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false google-auth-library@9.15.1 >/dev/null
+      - name: Read Drive root using Firebase service account
+        if: steps.mode.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto');
+          const {GoogleAuth}=require('google-auth-library');
+          const redactEmail=e=>{
+            const s=String(e||'').trim(); if(!s.includes('@')) return '';
+            const [l,d]=s.split('@'); return (l.slice(0,6)||'service')+'…@'+d;
+          };
+          let sa=null;
+          for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
+            try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.private_key&&x?.client_email){sa=x;break;}}catch{}
+          }
+          if(!sa)throw new Error('R84_NO_MATCHING_FIREBASE_SERVICE_ACCOUNT');
+          (async()=>{
+            const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/drive']});
+            const token=await auth.getAccessToken();
+            const url='https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(process.env.DRIVE_CLIENTS_ROOT_FOLDER_ID)
+              +'?fields=id,name,mimeType,shared,driveId,capabilities(canAddChildren,canEdit,canShare)&supportsAllDrives=true';
+            const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+            let body={}; try{body=await r.json();}catch{}
+            const evidence={
+              schema:'gravicentra-b2-r84-service-account-drive-diagnostic-v1',
+              status:r.ok?'READBACK':'NO_ACCESS',
+              projectId:process.env.PROJECT_ID,
+              serviceAccount:redactEmail(sa.client_email),
+              serviceAccountEmailSha256:crypto.createHash('sha256').update(sa.client_email).digest('hex'),
+              rootFolderId:process.env.DRIVE_CLIENTS_ROOT_FOLDER_ID,
+              httpStatus:r.status,
+              rootVisible:r.ok===true,
+              rootName:r.ok?String(body.name||''):'',
+              mimeType:r.ok?String(body.mimeType||''):'',
+              canAddChildren:r.ok&&body.capabilities?.canAddChildren===true,
+              canEdit:r.ok&&body.capabilities?.canEdit===true,
+              canShare:r.ok&&body.capabilities?.canShare===true,
+              shared:r.ok&&body.shared===true,
+              sharedDrive:!!(r.ok&&body.driveId),
+              firestoreWrites:0,
+              driveWrites:0,
+              permissionsChanged:false,
+              liveHostingPromotion:false,
+              b3Opened:false,
+              reimport:false
+            };
+            fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
+            console.log(JSON.stringify(evidence));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Upload R84 diagnostic evidence
+        if: always() && steps.mode.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-r84-sa-drive-${{ github.run_id }}
+          path: ${{ runner.temp }}/b2-r84-service-account-drive-diagnostic.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
