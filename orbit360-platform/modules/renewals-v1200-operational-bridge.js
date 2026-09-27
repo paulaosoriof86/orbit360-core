@@ -80,38 +80,55 @@ Orbit.modules = Orbit.modules || {};
     return /PREVIEW_SYNTHETIC_ONLY|preview.*synthetic|synthetic.*only/i.test(code);
   }
   async function solicitarPropuestas(policyId) {
-    const p=S().get('polizas',policyId);if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
+    const p=S().get('polizas',policyId);
+    if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
     if(!active(p))return U.toast('La póliza está en histórico; usa recuperación o nueva gestión.');
     const existing=existingManagement(p.id,'renewal_proposals');
-    if(existing){window.__orbitRenewalContext=renewalContext(p,existing);U.toast('La gestión de propuestas ya existe en Ops.');location.hash='#/ops';window.__orbitOpenGestion=existing.id;return;}
-    const defaultPriority=daysUntil(p.vigenciaFin)<=15?'Alta':'Media';
-    const body=`<div class="cfg-note">La gestión se creará <b>solo al confirmar</b>. Completa el contexto que Operaciones necesita para solicitar o cargar propuestas reales.</div><div class="cgrid" style="margin-top:12px"><label class="ce-l">Prioridad<select id="ren-prop-prio" class="o-sel"><option ${defaultPriority==='Alta'?'selected':''}>Alta</option><option ${defaultPriority==='Media'?'selected':''}>Media</option><option>Baja</option></select></label><label class="ce-l">Vence<input id="ren-prop-due" type="date" class="o-sel" value="${esc(p.vigenciaFin||'')}"></label></div><label class="ce-l" style="margin-top:12px">Detalle para Operaciones<textarea id="ren-prop-note" class="o-sel" style="min-height:82px">Solicitar propuestas reales de renovación. El asesor no cotiza directamente.</textarea></label>`;
-    const m=modal('renewal-proposals-v1200','Solicitar propuestas · '+esc(p.numero),body,'<button class="btn primary" data-create-proposals>Crear gestión en Ops</button>');
-    const save=m.querySelector('[data-create-proposals]');
-    save.onclick=async()=>{
-      if(!Orbit.ciclo||typeof Orbit.ciclo.crearGestionDurable!=='function')return U.toast('No está disponible la persistencia segura de Ops.');
-      const original=save.textContent;save.disabled=true;save.textContent='Guardando…';
-      try{
-        const g=await Orbit.ciclo.crearGestionDurable({
-          lista:'Renovaciones / Modif.',tipo:'Solicitar propuestas de renovación',titulo:'Propuestas de renovación · '+p.numero,
-          clienteId:p.clienteId,polizaId:p.id,sourcePolicyId:p.id,asesorId:p.asesorId,aseguradoraId:p.aseguradoraId,ramo:p.ramo,
-          pais:p.pais,moneda:p.moneda,producto:p.producto||p.subramo,
-          workflowType:'renewal_proposals',renewalAction:'request_proposals',estado:'Pendiente',
-          prioridad:m.querySelector('#ren-prop-prio').value,vence:m.querySelector('#ren-prop-due').value||p.vigenciaFin,
-          proximaAccion:'Operaciones: solicitar/cargar propuestas y preparar comparativo',
-          nota:m.querySelector('#ren-prop-note').value.trim()||'Solicitar propuestas reales de renovación.',
-          origen:'Renovaciones',checklist:[{t:'Solicitud recibida en Ops',done:true},{t:'Propuestas / cotizaciones reales obtenidas',done:false},{t:'Comparativo presentado',done:false},{t:'Decisión del cliente',done:false}]
-        });
-        m.remove();window.__orbitRenewalContext=renewalContext(p,g);
-        try{S().insert('actividades',{id:'act_'+Date.now().toString(36),tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,tipo:'renovacion',icon:'📋',fecha:today(),titulo:'Propuestas de renovación solicitadas',detalle:'Gestión confirmada en Ops · póliza '+p.numero,gestionId:g.id,polizaId:p.id});}catch(e){}
+    if(existing){
+      window.__orbitRenewalContext=renewalContext(p,existing);
+      U.toast('La gestión de propuestas ya existe en Ops.');
+      location.hash='#/ops';
+      window.__orbitOpenGestion=existing.id;
+      return;
+    }
+    if(!Orbit.ciclo||typeof Orbit.ciclo.managementCreateModal!=='function')return U.toast('No está disponible el editor operativo canónico.');
+    const priority=daysUntil(p.vigenciaFin)<=15?'Alta':'Media';
+    return Orbit.ciclo.managementCreateModal({
+      clienteId:p.clienteId,
+      polizaId:p.id,
+      tipo:'Solicitar propuestas de renovación',
+      titulo:'Propuestas de renovación · '+p.numero,
+      lista:'Renovaciones / Modif.',
+      prioridad:priority,
+      asesorId:p.asesorId,
+      aseguradoraId:p.aseguradoraId,
+      vence:p.vigenciaFin,
+      proximaAccion:'Operaciones: solicitar/cargar propuestas y preparar comparativo',
+      nota:'Solicitar propuestas reales de renovación. El asesor no cotiza directamente.',
+      origen:'Renovaciones',
+      checklist:[
+        {t:'Solicitud recibida en Ops',done:true},
+        {t:'Propuestas / cotizaciones reales obtenidas',done:false},
+        {t:'Comparativo presentado',done:false},
+        {t:'Decisión del cliente',done:false}
+      ],
+      extraFields:{
+        sourcePolicyId:p.id,
+        pais:p.pais,
+        moneda:p.moneda,
+        producto:p.producto||p.subramo,
+        workflowType:'renewal_proposals',
+        renewalAction:'request_proposals'
+      },
+      openAfterCreate:false,
+      onCreated:g=>{
+        window.__orbitRenewalContext=renewalContext(p,g);
         if(A.audit)A.audit('solicitar_propuestas_renovacion','gestiones',g.id,null,g,'Solicitud de propuestas de renovación',{policyId:p.id});
-        U.toast('Gestión de propuestas creada y confirmada en Ops.');location.hash='#/ops';window.__orbitOpenGestion=g.id;
-      }catch(error){
-        save.disabled=false;save.textContent=original;
-        if(previewBlocked(error))return U.toast('Preview protege este registro: no se creó la gestión de propuestas en Ops.');
-        U.toast('No fue posible crear la gestión de propuestas. No se registró nada.');
+        U.toast('Gestión de propuestas creada y confirmada en Ops.');
+        location.hash='#/ops';
+        window.__orbitOpenGestion=g.id;
       }
-    };
+    });
   }
   function cotizarDirecto(policyId) {
     const p=S().get('polizas',policyId);if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
@@ -120,34 +137,59 @@ Orbit.modules = Orbit.modules || {};
     location.hash='#/cotizador?renueva='+encodeURIComponent(p.id);
   }
   function registrarAceptacion(policyId) {
-    const p=S().get('polizas',policyId);if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
+    const p=S().get('polizas',policyId);
+    if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
     if(!active(p))return U.toast('La póliza está en histórico; usa recuperación o nueva gestión.');
     const existing=existingManagement(p.id,'renewal_accepted');
-    if(existing){U.toast('La renovación aceptada ya está en Ops.');location.hash='#/ops';window.__orbitOpenGestion=existing.id;return;}
-    const body='<div class="cfg-note">Usa esta acción únicamente cuando el cliente ya aprobó renovar. No crea la nueva póliza todavía: crea una gestión en Ops para que Operaciones solicite emisión o registre la renovación en firme recibida.</div><label style="display:flex;gap:8px;align-items:flex-start;margin-top:14px"><input type="checkbox" id="ren-accepted"><span><b>Confirmo que el cliente aprobó la renovación.</b><small class="muted" style="display:block">La aprobación debe estar respaldada por correo, WhatsApp, documento o registro de gestión.</small></span></label><label class="ce-l" style="margin-top:12px">Nota / referencia de aprobación<textarea id="ren-accepted-note" class="o-sel" style="min-height:72px" placeholder="Referencia, fecha o detalle de la aceptación"></textarea></label>';
-    const b=modal('renewal-accepted-v1200','Renovación aprobada · '+esc(p.numero),body,'<button class="btn primary" data-accept-renewal>Crear gestión en Ops</button>');
-    const save=b.querySelector('[data-accept-renewal]');
-    save.onclick=async()=>{
-      if(!b.querySelector('#ren-accepted').checked)return U.toast('Confirma primero la aprobación del cliente.');
-      const original=save.textContent;save.disabled=true;save.textContent='Guardando…';
-      try{
-        const g=await Orbit.ciclo.crearGestionDurable({
-          lista:'Renovaciones / Modif.',tipo:'Renovación aceptada',titulo:'Renovación aceptada · '+p.numero,
-          clienteId:p.clienteId,polizaId:p.id,sourcePolicyId:p.id,asesorId:p.asesorId,aseguradoraId:p.aseguradoraId,ramo:p.ramo,
-          pais:p.pais,moneda:p.moneda,producto:p.producto||p.subramo,
-          workflowType:'renewal_accepted',renewalAction:'client_approved',acceptedConfirmed:true,clientApprovalAt:new Date().toISOString(),
-          clientApprovalNote:b.querySelector('#ren-accepted-note').value.trim(),estado:'Pendiente',
-          prioridad:'Alta',vence:p.vigenciaFin,proximaAccion:'Operaciones: solicitar emisión o registrar renovación en firme',
-          nota:b.querySelector('#ren-accepted-note').value.trim()||'Cliente aprobó la renovación.',
-          origen:'Renovaciones',checklist:[{t:'Aprobación del cliente registrada',done:true},{t:'Definir: solicitar emisión o registrar renovación en firme',done:false},{t:'Nueva póliza de renovación creada',done:false}]
-        });
-        b.remove();window.__orbitRenewalContext=renewalContext(p,g);U.toast('Renovación aceptada creada y confirmada en Ops.');location.hash='#/ops';window.__orbitOpenGestion=g.id;
-      }catch(error){
-        save.disabled=false;save.textContent=original;
-        if(previewBlocked(error))return U.toast('Preview protege los datos reales: no se creó la gestión de renovación aceptada en Ops.');
-        U.toast('No fue posible crear la gestión de renovación. No se registró nada.');
+    if(existing){
+      U.toast('La renovación aceptada ya está en Ops.');
+      location.hash='#/ops';
+      window.__orbitOpenGestion=existing.id;
+      return;
+    }
+    if(!Orbit.ciclo||typeof Orbit.ciclo.managementCreateModal!=='function')return U.toast('No está disponible el editor operativo canónico.');
+    return Orbit.ciclo.managementCreateModal({
+      clienteId:p.clienteId,
+      polizaId:p.id,
+      tipo:'Renovación aceptada',
+      titulo:'Renovación aceptada · '+p.numero,
+      lista:'Renovaciones / Modif.',
+      prioridad:'Alta',
+      asesorId:p.asesorId,
+      aseguradoraId:p.aseguradoraId,
+      vence:p.vigenciaFin,
+      proximaAccion:'Operaciones: solicitar emisión o registrar renovación en firme',
+      nota:'',
+      origen:'Renovaciones',
+      requireConfirmationText:'Confirmo que el cliente aprobó la renovación.',
+      confirmationHelp:'La aprobación debe estar respaldada por correo, WhatsApp, documento o registro de gestión.',
+      checklist:[
+        {t:'Aprobación del cliente registrada',done:true},
+        {t:'Definir: solicitar emisión o registrar renovación en firme',done:false},
+        {t:'Nueva póliza de renovación creada',done:false}
+      ],
+      extraFields:{
+        sourcePolicyId:p.id,
+        pais:p.pais,
+        moneda:p.moneda,
+        producto:p.producto||p.subramo,
+        workflowType:'renewal_accepted',
+        renewalAction:'client_approved',
+        acceptedConfirmed:true
+      },
+      dynamicFields:ctx=>({
+        clientApprovalAt:new Date().toISOString(),
+        clientApprovalNote:ctx.nota||''
+      }),
+      openAfterCreate:false,
+      onCreated:g=>{
+        window.__orbitRenewalContext=renewalContext(p,g);
+        if(A.audit)A.audit('renovacion_aceptada','gestiones',g.id,null,g,'Cliente confirmó renovación',{policyId:p.id});
+        U.toast('Renovación aceptada creada y confirmada en Ops.');
+        location.hash='#/ops';
+        window.__orbitOpenGestion=g.id;
       }
-    };
+    });
   }
   function campana() {
     const rows=policies(60);
