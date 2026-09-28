@@ -55,6 +55,10 @@ has(policy,"return 'PLATE:' + plate",'R80_PLATE_DEDUP_MISSING');
 for(const collection of ['clientes','polizas','vehiculos','cobros','gestiones','negocios','reclamos','cancelaciones','comisiones','asesores','aseguradoras']){
   has(del,collection+":",'R82_DELETE_MODULE_MAP_MISSING:'+collection);
 }
+has(opsBackend,"const DELETE_AUDIT_FIELDS = Object.freeze", 'R82_OPS_DELETE_AUDIT_FIELDS_MISSING');
+has(opsBackend,"copyAllowed(after,payload,DELETE_AUDIT_FIELDS)", 'R82_OPS_DELETE_AUDIT_PERSISTENCE_MISSING');
+has(opsBackend,'deleteAuditReadback', 'R82_OPS_DELETE_AUDIT_READBACK_MISSING');
+has(store,'PRODUCT_WORKFLOW_DELETE_DURABLE_READBACK_REQUIRED','R82_STORE_DELETE_DURABLE_GUARD_MISSING');
 has(del,'DELETE_RELATION_BLOCKED','R82_DELETE_RELATION_FAIL_CLOSED_MISSING');
 has(del,'deleteReason','R82_DELETE_REASON_AUDIT_MISSING');
 has(store,'function isSoftDeleted(row)','R82_SOFT_DELETE_PROJECTION_FILTER_MISSING');

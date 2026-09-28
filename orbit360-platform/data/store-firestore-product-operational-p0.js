@@ -193,6 +193,10 @@
       return p.callFunction(GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[{action:action,collection:collection,id:id,payload:action==='remove'?null:clone(payload)}]},'us-central1');
     }).then(function(result){
       if(!workflow||action==='insert')requireServerReadback(result,[{collection:collection,id:id,action:action}]);
+      if(workflow&&payload&&payload.deleted===true){
+        var dr=result&&result.deleteAuditReadback||null;
+        if(!dr||dr.deleted!==true||dr.eliminado!==true||dr.archivado!==true||text(dr.deleteReason)!==text(payload.deleteReason||payload.motivoEliminacion)||!text(dr.deletedAt))throw new Error('PRODUCT_WORKFLOW_DELETE_DURABLE_READBACK_REQUIRED');
+      }
       if(workflow&&collection==='gestiones'&&(action==='insert'||action==='update')&&payload&&Array.isArray(payload.adjuntos)){
         var docKey=function(x){if(!x||typeof x!=='object')return text(x);return text(x.documentRef||x.fileId||x.archivoRef||x.driveUrl||x.externalUrl||x.url);};
         var wanted=payload.adjuntos.map(docKey).filter(Boolean).sort();
