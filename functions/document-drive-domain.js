@@ -253,7 +253,7 @@ async function status(request,previewOnly){
   catch(error){return{ok:false,available:false,status:'sin_permiso',message:'El rol activo no tiene acceso al expediente documental.'};}
   const rootId=ROOT_BY_TENANT[tenantId];
   if(!rootId)return{ok:false,available:false,status:'pendiente_conexion',message:'Repositorio Drive no configurado.'};
-  const vault=await readVault(tenantId);
+  const vault=await readVault(tenantId,previewOnly);
   if(!vault)return{ok:false,available:false,configured:false,backendPersistent:true,bootstrapRequired:true,status:'tenant_setup_required',message:'Drive requiere una configuración administrativa única para este tenant.'};
   try{
     const accessToken=await accessTokenFromRefresh(vault.refreshToken),meta=await getMeta(rootId,accessToken);

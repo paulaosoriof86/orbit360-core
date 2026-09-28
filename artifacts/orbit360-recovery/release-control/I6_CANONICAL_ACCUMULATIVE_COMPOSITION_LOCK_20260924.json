@@ -110,7 +110,7 @@
   ],
   "productFileBlobs": {
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
-    "functions/document-drive-domain.js": "e00482ab4d54717d13a075835e35cd2f8ee8e4db",
+    "functions/document-drive-domain.js": "755098c6fbb00f83b162dae2e97ab8b877db942a",
     "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "682941c99f0a6cf401f87ff413a426245996bad9",
@@ -202,20 +202,12 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "PAULA_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY",
-    "parentHead": "58dd90648ba560d0332aa90ef23c9442657dcacd",
+    "origin": "R84_AUTHENTICATED_PREVIEW_FAILURE_ROOT_CAUSE_20260927",
+    "parentHead": "1d4644478bf0fa05db1db447b1cfad92bb758a6f",
     "candidateHead": "3343616b2afd079af1597da09aba22d600ce72c2",
-    "status": "R84_EMPTY_VAULT_FAIL_CLOSED_SOURCE_FIXED_PENDING_GUARD",
+    "status": "R84_PREVIEW_VAULT_CONTEXT_SOURCE_FIXED_PENDING_GUARD",
     "changedProductFiles": [
-      "functions/document-drive-domain.js",
-      "functions/package.json",
-      "functions/package-lock.json",
-      "functions/product-operational-domain.js",
-      "orbit360-platform/core/backend-resource-contracts.js",
-      "orbit360-platform/core/document-viewer.js",
-      "orbit360-platform/core/product-drive-document-provider-p0.js",
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/core/ciclo.js"
+      "functions/document-drive-domain.js"
     ],
     "rootCauses": [
       "mobile CSS hid tenant logo and Cliente360 search",
@@ -241,9 +233,9 @@
     "noDataReimport": true,
     "noLive": true,
     "noB3": true,
-    "latestCausalFix": "DRIVE_VAULT_WITH_ZERO_ENABLED_VERSIONS_RETURNS_TENANT_SETUP_REQUIRED_INSTEAD_OF_FUNCTIONS_UNAVAILABLE",
+    "latestCausalFix": "STATUS_PRESERVES_PREVIEWONLY_TO_READVAULT",
     "previewDocumentIsolation": "_GRAVICENTRA_PREVIEW_QA_ONLY",
-    "findingLedgerBlobSha": "eb54eaf6f663ef43e7d8d8d486f18e639ff93b07",
+    "findingLedgerBlobSha": "7b65a0ecb94879775823ab4ac5589387e9c15b05",
     "humanDownloadRetestRequired": true,
     "exactPreview": {
       "sourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
@@ -268,6 +260,13 @@
     "previousTechnicalPassPreserved": true,
     "previousAuthenticatedRetries": [
       36362935245
-    ]
+    ],
+    "runtimeRootCause": "Preview Drive status dropped previewOnly before readVault and therefore used the wrong Secret Manager vault namespace.",
+    "previousAuthenticatedFailureRunId": 36366076644,
+    "effectiveServiceAccount": "orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com",
+    "previewFunctionRegion": "us-east1",
+    "previewFunctionRevision": "orbit360documentdrivestatuspreview-00007-poy",
+    "cloudLoggingRead": "DENIED_403_NO_LOG_VIEW",
+    "productionSecretTouched": false
   }
 }
