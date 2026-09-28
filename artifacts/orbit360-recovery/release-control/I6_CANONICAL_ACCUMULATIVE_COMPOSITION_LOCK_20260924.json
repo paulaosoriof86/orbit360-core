@@ -204,7 +204,7 @@
   "lastRemediation": {
     "origin": "PAULA_UAT_R21_RENEWAL_DOCUMENTARY_AND_VISUAL_20260928",
     "parentHead": "7b0baba33d1c0f2532ec0232e2bd6f567fd9cd8c",
-    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "changedProductFiles": [
       "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
       "orbit360-platform/core/importa.js",
@@ -254,9 +254,11 @@
     ],
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
     "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
-    "findingLedgerBlobSha": "cfb39fc5efec86eb6a97c9be7ff265f792a67956",
+    "findingLedgerBlobSha": "55daa5563605378e859b074ebc59cc2c4bf93fe4",
     "noDataReimport": true,
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "candidateHead": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
+    "guardPassRunId": 36466197519
   }
 }

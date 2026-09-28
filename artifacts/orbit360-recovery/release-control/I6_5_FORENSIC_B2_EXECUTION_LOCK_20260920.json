@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "SOURCE_FIXED_PENDING_GUARD",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -275,13 +275,13 @@
     "noHardcodedIdentities": true
   },
   "candidate": {
-    "status": "SOURCE_FIXED_PENDING_GUARD",
-    "sourceCandidateSha": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
-    "governanceHeadBeforeCandidateArm": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
+    "status": "CANDIDATE_PENDING_PREVIEW",
+    "sourceCandidateSha": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
+    "governanceHeadBeforeCandidateArm": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "88cfac7930b7a09ac6c220e790401024dcc75a0e",
+    "compositionLockBlobSha": "0e1e6c1289912ea2ccea582e75ae59eba1cc312d",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "cfb39fc5efec86eb6a97c9be7ff265f792a67956",
+    "findingLedgerBlobSha": "55daa5563605378e859b074ebc59cc2c4bf93fe4",
     "blockingFindingIds": [
       "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
       "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
@@ -307,7 +307,7 @@
     "humanDownloadRetestRequired": false,
     "tenantBootstrapRequired": true,
     "routineUserGoogleOAuth": false,
-    "sourceFixCommitPendingArm": true,
+    "sourceFixCommitPendingArm": false,
     "sourceCandidateParentHead": "7b0baba33d1c0f2532ec0232e2bd6f567fd9cd8c",
     "changedProductFiles": [
       "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
@@ -3334,7 +3334,7 @@
     ]
   },
   "r21": {
-    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
     "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
     "paulaVisualClosed": [
@@ -3365,6 +3365,8 @@
     ],
     "noLive": true,
     "noB3": true,
-    "noReimport": true
+    "noReimport": true,
+    "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
+    "guardPassRunId": 36466197519
   }
 }

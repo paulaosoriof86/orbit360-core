@@ -3202,7 +3202,7 @@
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "SOURCE_FIXED_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3216,13 +3216,16 @@
       "rootCause": "Direct-renewal UI treated documentRef as manual text while the backend correctly requires document evidence.",
       "remediation": "Allow selecting an existing confirmed client document or uploading the firm policy/PDF through Orbit.secureResources; bind confirmed documentRef into the renewal management and new policy; refuse creation without confirmed support.",
       "productBlobSha": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
-      "requiredProof": "New exact Preview: synthetic B2 firm-support upload/readback, management attachment linkage, direct renewal idempotence and reload."
+      "requiredProof": "New exact Preview: synthetic B2 firm-support upload/readback, management attachment linkage, direct renewal idempotence and reload.",
+      "guardPassRunId": 36466197519,
+      "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
+      "previewArmed": true
     },
     {
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "SOURCE_FIXED_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3236,13 +3239,16 @@
       "rootCause": "The direct-renewal modal did not consult aseguradora.cotTasas/cotTasasValidadas for issuance expense and installment surcharge.",
       "remediation": "For a validated matching insurer/ramo tariff only, auto-populate issuance expense and financing surcharge by payment count and recalculate total; otherwise explicitly preserve values and invent nothing.",
       "productBlobSha": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
-      "requiredProof": "New exact Preview: validated tariff fixture calculates configured costs; missing/unvalidated tariff remains fail-closed without invented charge."
+      "requiredProof": "New exact Preview: validated tariff fixture calculates configured costs; missing/unvalidated tariff remains fail-closed without invented charge.",
+      "guardPassRunId": 36466197519,
+      "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
+      "previewArmed": true
     },
     {
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "SOURCE_FIXED_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3256,13 +3262,16 @@
       "rootCause": "Copy/pasted direct-renewal listeners remained inside openRenewalIssuance, while a separate generic modal helper bypassed canonical Ops visual semantics.",
       "remediation": "Remove invalid listeners; label action as Crear solicitud de emisión en Ops with explicit no-email semantics; use canonical ciclo visual family.",
       "productBlobSha": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
-      "requiredProof": "New exact Preview: modal opens without page/console errors, button creates one internal canonical issuance management, no false email behavior, canonical visual family."
+      "requiredProof": "New exact Preview: modal opens without page/console errors, button creates one internal canonical issuance management, no false email behavior, canonical visual family.",
+      "guardPassRunId": 36466197519,
+      "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
+      "previewArmed": true
     },
     {
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "SOURCE_FIXED_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3279,13 +3288,16 @@
         "orbit360-platform/core/importa.js": "416076ec9af339f6c1f08437ce44a68c2082cdbc",
         "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55"
       },
-      "requiredProof": "New exact Preview: real client shows explicit protected message without false failure; synthetic B2 upload appears and succeeds after tenant provider probe."
+      "requiredProof": "New exact Preview: real client shows explicit protected message without false failure; synthetic B2 upload appears and succeeds after tenant provider probe.",
+      "guardPassRunId": 36466197519,
+      "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
+      "previewArmed": true
     },
     {
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "SOURCE_FIXED_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3299,7 +3311,10 @@
       "rootCause": "Legacy preserved client.driveLink UI predates the canonical tenant Drive provider and was not relabeled after R84.",
       "remediation": "Preserve historical driveLink values but label them as linked historical folder references; when absent, state that Drive is linked by confirmed document upload rather than requiring manual entry; retain optional historical field in Edit.",
       "productBlobSha": "62c98fc97ce92e9b826f08ce8195594d88996813",
-      "requiredProof": "New exact Preview: clients with and without legacy driveLink show unambiguous copy; provider-managed documents do not require manual folder URL."
+      "requiredProof": "New exact Preview: clients with and without legacy driveLink show unambiguous copy; provider-managed documents do not require manual folder URL.",
+      "guardPassRunId": 36466197519,
+      "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
+      "previewArmed": true
     }
   ],
   "phaseBBacklog": [
