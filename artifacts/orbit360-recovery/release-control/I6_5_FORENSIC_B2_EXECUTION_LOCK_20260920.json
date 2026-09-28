@@ -1876,7 +1876,7 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R87_CLIENTAUTHCONFIG_READONLY_DISCOVERY",
+    "R87_TEMPORARY_READONLY_IAM_DISCOVERY_AND_ROLLBACK",
     "R87_ADDITIVE_EXACT_PREVIEW_ORIGIN_APPLY_AND_READBACK",
     "R85_ADMIN_AUTHORIZATION_CODE_BOOTSTRAP_AND_SECRET_READBACK",
     "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_AUTHORIZED_VIEW_DOWNLOAD",
@@ -3189,12 +3189,12 @@
     "bootstrapClientIdPresent": true
   },
   "r19": {
-    "status": "R87_READONLY_DISCOVERY_ARMED_R88_FROZEN",
+    "status": "R87_TEMPORARY_READONLY_IAM_DISCOVERY_ARMED_R88_FROZEN",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
-    "receiptBlobSha": "ba1ea10dded41d22b85021660b3bcb4c3cd0848f",
+    "receiptBlobSha": "408f19d7b5a6d98be7f875003dde8c7a80ca1a09",
     "r87": {
       "findingId": "B2-R87-DRIVE-OAUTH-PREVIEW-ORIGIN-MISMATCH-R19",
-      "status": "READONLY_DISCOVERY_ARMED",
+      "status": "TEMPORARY_READONLY_IAM_DISCOVERY_ARMED",
       "exactPreview": {
         "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
         "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
@@ -3209,7 +3209,14 @@
       },
       "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
       "targetClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com",
-      "mutationAuthorized": false
+      "mutationAuthorized": false,
+      "temporaryIamElevationAuthorized": true,
+      "temporaryRoles": [
+        "roles/oauthconfig.viewer",
+        "roles/serviceusage.serviceUsageConsumer"
+      ],
+      "temporaryRoleRollbackRequired": true,
+      "oauthClientMutationAuthorized": false
     },
     "r88": {
       "findingId": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",

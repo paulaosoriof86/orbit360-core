@@ -4754,13 +4754,15 @@ jobs:
 
   i65-b2-r87-oauth-origin-discovery:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 15
     env:
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
       R19_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json
+      IAM_STATE: ${{ runner.temp }}/b2-r87-iam-state.json
+      OUT: ${{ runner.temp }}/b2-r87-clientauthconfig-discovery.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -4770,7 +4772,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Gate R87 read-only OAuth client discovery
+      - name: Gate R87 temporary read-only IAM discovery
         id: mode
         run: |
           set -euo pipefail
@@ -4780,9 +4782,10 @@ jobs:
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK)),r=JSON.parse(fs.readFileSync(process.env.R19_RECEIPT));
           const run=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
             && c.i65ForensicRemediationPlan?.currentBlock==='B2'
-            && b.r19?.r87?.status==='READONLY_DISCOVERY_ARMED'
-            && r.r87Execution?.status==='READONLY_DISCOVERY_ARMED'
-            && r.r87Execution?.mutationAuthorized===false;
+            && b.r19?.r87?.status==='TEMPORARY_READONLY_IAM_DISCOVERY_ARMED'
+            && r.r87Execution?.status==='TEMPORARY_READONLY_IAM_DISCOVERY_ARMED'
+            && r.r87Execution?.temporaryIamElevationAuthorized===true
+            && r.r87Execution?.oauthClientMutationAuthorized===false;
           if(run){
             if(b.boundaries?.dataMutationAuthorized!==false||b.boundaries?.liveHostingPromotionAuthorized!==false||b.boundaries?.reimportAuthorized!==false)throw new Error('R87_BOUNDARY_INVALID');
           }
@@ -4795,120 +4798,133 @@ jobs:
       - name: Install Google auth dependency
         if: steps.mode.outputs.run == 'true'
         run: npm install --no-save --package-lock=false google-auth-library@10.9.1 >/dev/null
-      - name: Discover ClientAuthConfig authority and endpoints read-only
-        id: discover
+      - name: Temporarily grant read-only OAuth discovery roles
+        id: elevate
         if: steps.mode.outputs.run == 'true'
-        env:
-          OUT: ${{ runner.temp }}/b2-r87-clientauthconfig-discovery.json
         run: |
           set -euo pipefail
           node - <<'NODE'
           const fs=require('node:fs');
           const {GoogleAuth}=require('google-auth-library');
+          const roles=['roles/oauthconfig.viewer','roles/serviceusage.serviceUsageConsumer'];
+          let sa=null;
+          for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
+            try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.private_key&&x?.client_email){sa=x;break;}}catch{}
+          }
+          if(!sa)throw new Error('R87_NO_SERVICE_ACCOUNT');
+          (async()=>{
+            const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform']});
+            const token=await auth.getAccessToken(),headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
+            const policyUrl='https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID)+':getIamPolicy';
+            const setUrl='https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID)+':setIamPolicy';
+            const gr=await fetch(policyUrl,{method:'POST',headers,body:JSON.stringify({options:{requestedPolicyVersion:3}})});
+            const before=await gr.json().catch(()=>({}));if(!gr.ok||!before.etag)throw new Error('R87_IAM_GET_HTTP_'+gr.status);
+            const member='serviceAccount:'+sa.client_email,bindings=Array.isArray(before.bindings)?before.bindings.map(x=>({...x,members:[...(x.members||[])]})):[];
+            const added=[];
+            for(const role of roles){
+              let b=bindings.find(x=>x.role===role&&!x.condition);
+              if(b&&b.members.includes(member))continue;
+              if(!b){b={role,members:[]};bindings.push(b);}
+              b.members.push(member);added.push(role);
+            }
+            if(added.length){
+              const sr=await fetch(setUrl,{method:'POST',headers,body:JSON.stringify({policy:{version:before.version||1,etag:before.etag,bindings,auditConfigs:before.auditConfigs||[]}})});
+              const after=await sr.json().catch(()=>({}));if(!sr.ok||!after.etag)throw new Error('R87_IAM_SET_HTTP_'+sr.status);
+            }
+            fs.writeFileSync(process.env.IAM_STATE,JSON.stringify({serviceAccount:sa.client_email,member,addedRoles:added,rollbackRequired:added.length>0},null,2)+'\n');
+            console.log(JSON.stringify({status:'PASS',serviceAccount:sa.client_email,addedRoles:added,oauthClientMutation:false}));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+          sleep 8
+      - name: Discover existing OAuth client configuration read-only
+        id: discover
+        if: steps.mode.outputs.run == 'true' && steps.elevate.conclusion == 'success'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const {GoogleAuth}=require('google-auth-library');
+          const state=JSON.parse(fs.readFileSync(process.env.IAM_STATE));
           const target='646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com';
           const exactOrigin='https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app';
-          const permissionSet=[
-            'clientauthconfig.brands.get','clientauthconfig.brands.list',
-            'clientauthconfig.clients.get','clientauthconfig.clients.list','clientauthconfig.clients.update',
-            'serviceusage.services.get','serviceusage.services.use',
-            'resourcemanager.projects.get','resourcemanager.projects.getIamPolicy','resourcemanager.projects.setIamPolicy',
-            'iam.serviceAccounts.getAccessToken'
-          ];
-          const candidates=[];
+          let sa=null;
           for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
-            try{
-              const x=JSON.parse(process.env[k]||'');
-              if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.private_key&&x?.client_email&&!candidates.some(y=>y.client_email===x.client_email))candidates.push(x);
-            }catch{}
+            try{const x=JSON.parse(process.env[k]||'');if(x?.client_email===state.serviceAccount){sa=x;break;}}catch{}
           }
+          if(!sa)throw new Error('R87_ELEVATED_SERVICE_ACCOUNT_MISSING');
           const redact=(value)=>{
             if(Array.isArray(value))return value.map(redact);
-            if(value&&typeof value==='object'){
-              const out={};
-              for(const [k,v] of Object.entries(value)){
-                if(/secret|token|credential/i.test(k)){out[k]='[REDACTED]';continue;}
-                out[k]=redact(v);
-              }
-              return out;
-            }
+            if(value&&typeof value==='object'){const out={};for(const [k,v] of Object.entries(value)){out[k]=/secret|token|credential/i.test(k)?'[REDACTED]':redact(v);}return out;}
             return value;
           };
-          const json=async r=>r.json().catch(()=>({}));
-          const short=x=>JSON.stringify(redact(x)).slice(0,5000);
+          const body=async r=>r.json().catch(()=>({}));
           (async()=>{
+            const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform']});
+            const token=await auth.getAccessToken(),headers={Authorization:'Bearer '+token,'X-Goog-User-Project':process.env.PROJECT_ID};
+            const tp=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID)+':testIamPermissions',{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({permissions:['clientauthconfig.clients.get','clientauthconfig.clients.list','clientauthconfig.clients.update','serviceusage.services.use']})});
+            const tpb=await body(tp);
+            const pr=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID),{headers});
+            const project=await body(pr);if(!pr.ok||!project.projectNumber)throw new Error('R87_PROJECT_READ_'+pr.status);
+            const pn=String(project.projectNumber);
+            const dr=await fetch('https://clientauthconfig.googleapis.com/$discovery/rest?version=v1',{headers});const db=await body(dr);
+            const br=await fetch('https://clientauthconfig.googleapis.com/v1/brands/lookupkey/brand/'+encodeURIComponent(pn)+'?readMask=*&readOptions.staleness=0.02s&returnDeveloperBrand=true&returnDisabledBrands=true',{headers});const bb=await body(br);
+            const brandId=String(bb.brandId||pn);
+            const lr=await fetch('https://clientauthconfig.googleapis.com/v1/brands/'+encodeURIComponent(brandId)+'/clients?showDeleted=false',{headers});const lb=await body(lr);
+            const gr=await fetch('https://clientauthconfig.googleapis.com/v1/brands/'+encodeURIComponent(brandId)+'/clients/'+encodeURIComponent(target),{headers});const gb=await body(gr);
             const evidence={
-              schema:'GRAVICENTRA_B2_R87_CLIENTAUTHCONFIG_AUTHORITY_DISCOVERY_V2',
-              status:'READ_ONLY_COMPLETE',
-              projectId:process.env.PROJECT_ID,
-              targetClientId:target,
-              exactOrigin,
-              candidates:[],
-              mutationExecuted:false,
-              productionOriginMutation:false,
-              credentialRotation:false,
-              liveHostingPromotion:false,
-              dataWrites:0,
-              b3Opened:false
-            };
-            for(const sa of candidates){
-              const row={serviceAccount:sa.client_email,permissions:[],projectNumber:'',serviceUsage:null,discovery:null,brandRead:null,listClients:null,getTarget:null};
-              try{
-                const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform']});
-                const token=await auth.getAccessToken();
-                const headers={Authorization:'Bearer '+token,'X-Goog-User-Project':process.env.PROJECT_ID};
-                const pr=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID),{headers});
-                const project=await json(pr); row.projectRead={httpStatus:pr.status,ok:pr.ok};
-                if(pr.ok&&project.projectNumber)row.projectNumber=String(project.projectNumber);
-                const tp=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID)+':testIamPermissions',{
-                  method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({permissions:permissionSet})
-                });
-                const tpb=await json(tp);row.testIamPermissions={httpStatus:tp.status,ok:tp.ok};
-                row.permissions=Array.isArray(tpb.permissions)?tpb.permissions:[];
-                if(row.projectNumber){
-                  const su=await fetch('https://serviceusage.googleapis.com/v1/projects/'+encodeURIComponent(row.projectNumber)+'/services/clientauthconfig.googleapis.com',{headers});
-                  const sub=await json(su);row.serviceUsage={httpStatus:su.status,ok:su.ok,state:String(sub.state||''),name:String(sub.name||''),error:su.ok?'':short(sub)};
-                }
-                const dr=await fetch('https://clientauthconfig.googleapis.com/$discovery/rest?version=v1',{headers});
-                const db=await json(dr);row.discovery={httpStatus:dr.status,ok:dr.ok,error:dr.ok?'':short(db)};
-                if(row.projectNumber){
-                  const brandUrl='https://clientauthconfig.googleapis.com/v1/brands/lookupkey/brand/'+encodeURIComponent(row.projectNumber)+'?readMask=*&readOptions.staleness=0.02s&returnDeveloperBrand=true&returnDisabledBrands=true';
-                  const br=await fetch(brandUrl,{headers});const bb=await json(br);
-                  row.brandRead={httpStatus:br.status,ok:br.ok,body:br.ok?redact(bb):undefined,error:br.ok?'':short(bb)};
-                  const brandId=String(bb.brandId||row.projectNumber);
-                  const listUrl='https://clientauthconfig.googleapis.com/v1/brands/'+encodeURIComponent(brandId)+'/clients?showDeleted=false';
-                  const lr=await fetch(listUrl,{headers});const lb=await json(lr);
-                  const listSafe=redact(lb);
-                  row.listClients={httpStatus:lr.status,ok:lr.ok,body:lr.ok?listSafe:undefined,error:lr.ok?'':short(lb)};
-                  if(lr.ok){
-                    const clients=Array.isArray(lb.clients)?lb.clients:Array.isArray(lb.oauthClients)?lb.oauthClients:[];
-                    const hit=clients.find(x=>String(x.clientId||x.client_id||'')===target);
-                    if(hit)row.targetFromList=redact(hit);
-                  }
-                  const getUrl='https://clientauthconfig.googleapis.com/v1/brands/'+encodeURIComponent(brandId)+'/clients/'+encodeURIComponent(target);
-                  const gr=await fetch(getUrl,{headers});const gb=await json(gr);
-                  row.getTarget={httpStatus:gr.status,ok:gr.ok,body:gr.ok?redact(gb):undefined,error:gr.ok?'':short(gb)};
-                }
-              }catch(e){row.exception=String(e&&e.message||e);}
-              evidence.candidates.push(row);
-            }
-            evidence.authoritySummary={
-              candidateCount:evidence.candidates.length,
-              anyGet:evidence.candidates.some(x=>x.permissions.includes('clientauthconfig.clients.get')),
-              anyList:evidence.candidates.some(x=>x.permissions.includes('clientauthconfig.clients.list')),
-              anyUpdate:evidence.candidates.some(x=>x.permissions.includes('clientauthconfig.clients.update')),
-              anyListEndpoint:evidence.candidates.some(x=>x.listClients?.ok===true),
-              anyGetEndpoint:evidence.candidates.some(x=>x.getTarget?.ok===true)
+              schema:'GRAVICENTRA_B2_R87_OAUTH_CLIENT_READONLY_DISCOVERY_V3',
+              status:'PASS',
+              projectId:process.env.PROJECT_ID,projectNumber:pn,targetClientId:target,exactOrigin,
+              temporaryIam:{serviceAccount:state.serviceAccount,addedRoles:state.addedRoles},
+              permissions:Array.isArray(tpb.permissions)?tpb.permissions:[],
+              endpoints:{
+                discovery:{httpStatus:dr.status,ok:dr.ok,body:dr.ok?redact(db):undefined,error:dr.ok?'':redact(db)},
+                brand:{httpStatus:br.status,ok:br.ok,body:br.ok?redact(bb):undefined,error:br.ok?'':redact(bb)},
+                listClients:{httpStatus:lr.status,ok:lr.ok,body:lr.ok?redact(lb):undefined,error:lr.ok?'':redact(lb)},
+                getTarget:{httpStatus:gr.status,ok:gr.ok,body:gr.ok?redact(gb):undefined,error:gr.ok?'':redact(gb)}
+              },
+              mutationExecuted:false,oauthClientMutation:false,productionOriginMutation:false,credentialRotation:false,liveHostingPromotion:false,dataWrites:0,b3Opened:false
             };
             fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
-            console.log(JSON.stringify({status:evidence.status,authoritySummary:evidence.authoritySummary,candidates:evidence.candidates.map(x=>({serviceAccount:x.serviceAccount,permissions:x.permissions,serviceUsage:x.serviceUsage,discovery:x.discovery,brandRead:x.brandRead&&{httpStatus:x.brandRead.httpStatus,ok:x.brandRead.ok},listClients:x.listClients&&{httpStatus:x.listClients.httpStatus,ok:x.listClients.ok},getTarget:x.getTarget&&{httpStatus:x.getTarget.httpStatus,ok:x.getTarget.ok}}))}));
+            console.log(JSON.stringify({status:'PASS',permissions:evidence.permissions,endpoints:Object.fromEntries(Object.entries(evidence.endpoints).map(([k,v])=>[k,{httpStatus:v.httpStatus,ok:v.ok}])),oauthClientMutation:false}));
           })().catch(e=>{
-            const evidence={schema:'GRAVICENTRA_B2_R87_CLIENTAUTHCONFIG_AUTHORITY_DISCOVERY_V2',status:'FAIL_CLOSED',projectId:process.env.PROJECT_ID,targetClientId:target,exactOrigin,error:String(e&&e.message||e),mutationExecuted:false,productionOriginMutation:false,credentialRotation:false,liveHostingPromotion:false,dataWrites:0,b3Opened:false};
-            fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
-            console.error(evidence.error);
-            process.exit(1);
+            fs.writeFileSync(process.env.OUT,JSON.stringify({schema:'GRAVICENTRA_B2_R87_OAUTH_CLIENT_READONLY_DISCOVERY_V3',status:'FAIL_CLOSED',error:String(e&&e.message||e),targetClientId:target,exactOrigin,mutationExecuted:false,oauthClientMutation:false,productionOriginMutation:false,credentialRotation:false,liveHostingPromotion:false,dataWrites:0,b3Opened:false},null,2)+'\n');
+            console.error(e);process.exit(1);
           });
           NODE
-      - name: Upload R87 read-only discovery evidence
+      - name: Remove temporary R87 IAM roles
+        if: always() && steps.mode.outputs.run == 'true' && steps.elevate.conclusion == 'success'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const {GoogleAuth}=require('google-auth-library');
+          const state=JSON.parse(fs.readFileSync(process.env.IAM_STATE));
+          if(!state.rollbackRequired){console.log(JSON.stringify({status:'PASS',removedRoles:[],reason:'roles_preexisting'}));process.exit(0);}
+          let sa=null;
+          for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.client_email===state.serviceAccount){sa=x;break;}}catch{}}
+          if(!sa)throw new Error('R87_ROLLBACK_SERVICE_ACCOUNT_MISSING');
+          (async()=>{
+            const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform']});
+            const token=await auth.getAccessToken(),headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
+            const getUrl='https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID)+':getIamPolicy';
+            const setUrl='https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID)+':setIamPolicy';
+            const gr=await fetch(getUrl,{method:'POST',headers,body:JSON.stringify({options:{requestedPolicyVersion:3}})});
+            const current=await gr.json().catch(()=>({}));if(!gr.ok||!current.etag)throw new Error('R87_ROLLBACK_GET_'+gr.status);
+            const bindings=[];
+            for(const raw of current.bindings||[]){
+              const b={...raw,members:[...(raw.members||[])]};
+              if(state.addedRoles.includes(b.role)&&!b.condition)b.members=b.members.filter(m=>m!==state.member);
+              if(b.members.length)bindings.push(b);
+            }
+            const sr=await fetch(setUrl,{method:'POST',headers,body:JSON.stringify({policy:{version:current.version||1,etag:current.etag,bindings,auditConfigs:current.auditConfigs||[]}})});
+            const after=await sr.json().catch(()=>({}));if(!sr.ok||!after.etag)throw new Error('R87_ROLLBACK_SET_'+sr.status);
+            const remaining=(after.bindings||[]).filter(b=>state.addedRoles.includes(b.role)&&!b.condition&&(b.members||[]).includes(state.member)).map(b=>b.role);
+            if(remaining.length)throw new Error('R87_ROLLBACK_INCOMPLETE_'+remaining.join(','));
+            console.log(JSON.stringify({status:'PASS',removedRoles:state.addedRoles,remainingRoles:remaining}));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Upload R87 discovery evidence
         if: always() && steps.mode.outputs.run == 'true'
         uses: actions/upload-artifact@v4
         with:
@@ -4920,4 +4936,4 @@ jobs:
       - name: R87 discovery failure remains fail-closed
         if: ${{ failure() && steps.mode.outputs.run == 'true' }}
         continue-on-error: true
-        run: echo "R87_DISCOVERY_FAILED_NO_EXTERNAL_MUTATION_NO_LIVE_NO_B3"
+        run: echo "R87_DISCOVERY_FAILED_ROLLBACK_REQUIRED_NO_OAUTH_CLIENT_MUTATION_NO_LIVE_NO_B3"

@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B2",
-  "status": "R87_READONLY_CLIENTAUTHCONFIG_DISCOVERY_ARMED_R88_FROZEN",
+  "status": "R87_TEMPORARY_READONLY_IAM_DISCOVERY_ARMED_R88_FROZEN",
   "exactPreview": {
     "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
     "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
@@ -107,7 +107,7 @@
     "b3Open": false
   },
   "r87Execution": {
-    "status": "READONLY_DISCOVERY_ARMED",
+    "status": "TEMPORARY_READONLY_IAM_DISCOVERY_ARMED",
     "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
     "targetClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com",
     "mutationAuthorized": false,
@@ -115,6 +115,14 @@
     "productionOriginMutationAuthorized": false,
     "liveHostingPromotionAuthorized": false,
     "dataWritesAuthorized": false,
-    "b3OpenAuthorized": false
+    "b3OpenAuthorized": false,
+    "temporaryIamElevationAuthorized": true,
+    "temporaryRoles": [
+      "roles/oauthconfig.viewer",
+      "roles/serviceusage.serviceUsageConsumer"
+    ],
+    "temporaryRolePurpose": "Read-only discovery of the existing OAuth client configuration and exact update contract.",
+    "temporaryRoleRollbackRequired": true,
+    "oauthClientMutationAuthorized": false
   }
 }
