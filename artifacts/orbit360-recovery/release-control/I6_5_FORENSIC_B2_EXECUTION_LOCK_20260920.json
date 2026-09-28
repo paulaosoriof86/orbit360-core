@@ -277,7 +277,9 @@
       "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
       "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
       "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
-      "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17"
+      "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
+      "B2-R87-DRIVE-OAUTH-PREVIEW-ORIGIN-MISMATCH-R19",
+      "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19"
     ],
     "sourceContract": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
     "authenticatedHarness": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
@@ -1874,11 +1876,14 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
+    "R87_CLIENTAUTHCONFIG_READONLY_DISCOVERY",
+    "R87_ADDITIVE_EXACT_PREVIEW_ORIGIN_APPLY_AND_READBACK",
     "R85_ADMIN_AUTHORIZATION_CODE_BOOTSTRAP_AND_SECRET_READBACK",
     "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_AUTHORIZED_VIEW_DOWNLOAD",
     "R84_ACTIVE_ROLE_SCOPE_AND_CROSS_SCOPE_DENIAL",
     "R77_R81_CANONICAL_PROVIDER_PROOF",
     "DRIVE_QA_FIXTURE_CLEANUP",
+    "R88_AUTH_READY_DATA_ROUTE_READY_PERFORMANCE_REMEDIATION",
     "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
   ],
   "lastAuthenticatedFailure": {
@@ -3182,5 +3187,42 @@
     "previewOAuthClientSecretProvision": true,
     "previewOAuthClientSecretBinding": true,
     "bootstrapClientIdPresent": true
+  },
+  "r19": {
+    "status": "R87_READONLY_DISCOVERY_ARMED_R88_FROZEN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
+    "receiptBlobSha": "ba1ea10dded41d22b85021660b3bcb4c3cd0848f",
+    "r87": {
+      "findingId": "B2-R87-DRIVE-OAUTH-PREVIEW-ORIGIN-MISMATCH-R19",
+      "status": "READONLY_DISCOVERY_ARMED",
+      "exactPreview": {
+        "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
+        "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
+        "channelId": "gi-i65-b2-36418353246",
+        "url": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+        "runId": 36418353246,
+        "artifactId": 10968560537,
+        "artifactDigest": "d3e73ddedd878cdf251b8a0c3148d8a3cbe38b354d8af3304aa28cb2078b2374",
+        "exactReadback": true,
+        "functionalPass": true,
+        "livePromoted": false
+      },
+      "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+      "targetClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com",
+      "mutationAuthorized": false
+    },
+    "r88": {
+      "findingId": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
+      "status": "ROOT_CAUSE_CONFIRMED_REMEDIATION_SEQUENCED_AFTER_DRIVE_BOOTSTRAP",
+      "measuredElapsedSeconds": 7.433
+    },
+    "boundaries": {
+      "live": false,
+      "b3": false,
+      "reimport": false,
+      "dataMutation": false,
+      "credentialRotation": false,
+      "productionOriginMutation": false
+    }
   }
 }

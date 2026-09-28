@@ -4750,3 +4750,123 @@ jobs:
           git config user.email gravicentra-recovery-bot@users.noreply.github.com
           git commit -m "freeze(i6.5): Google Auth provider enabled with readback"
           git push origin "HEAD:$GITHUB_REF_NAME"
+
+
+  i65-b2-r87-oauth-origin-discovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+      R19_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate R87 read-only OAuth client discovery
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK)),r=JSON.parse(fs.readFileSync(process.env.R19_RECEIPT));
+          const run=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
+            && c.i65ForensicRemediationPlan?.currentBlock==='B2'
+            && b.r19?.r87?.status==='READONLY_DISCOVERY_ARMED'
+            && r.r87Execution?.status==='READONLY_DISCOVERY_ARMED'
+            && r.r87Execution?.mutationAuthorized===false;
+          if(run){
+            if(b.boundaries?.dataMutationAuthorized!==false||b.boundaries?.liveHostingPromotionAuthorized!==false||b.boundaries?.reimportAuthorized!==false)throw new Error('R87_BOUNDARY_INVALID');
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B2_R87_DISCOVERY_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Assert LIVE unchanged
+        if: steps.mode.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Install Google auth dependency
+        if: steps.mode.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false google-auth-library@10.9.1 >/dev/null
+      - name: Discover ClientAuthConfig contract read-only
+        id: discover
+        if: steps.mode.outputs.run == 'true'
+        env:
+          OUT: ${{ runner.temp }}/b2-r87-clientauthconfig-discovery.json
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const {GoogleAuth}=require('google-auth-library');
+          const target='646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com';
+          const exactOrigin='https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app';
+          let sa=null;
+          for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
+            try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.private_key&&x?.client_email){sa=x;break;}}catch{}
+          }
+          if(!sa)throw new Error('R87_NO_SERVICE_ACCOUNT');
+          function methodsOf(node,path=[],out=[]){
+            if(!node||typeof node!=='object')return out;
+            if(node.methods)for(const [name,m] of Object.entries(node.methods))out.push({resource:path.join('.'),name,id:m.id||'',path:m.path||'',httpMethod:m.httpMethod||'',parameters:m.parameters||{},requestRef:m.request?.$ref||'',responseRef:m.response?.$ref||''});
+            if(node.resources)for(const [name,r] of Object.entries(node.resources))methodsOf(r,path.concat(name),out);
+            return out;
+          }
+          (async()=>{
+            const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform']});
+            const token=await auth.getAccessToken();
+            const headers={Authorization:'Bearer '+token};
+            const pr=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID),{headers});
+            const project=await pr.json().catch(()=>({}));
+            if(!pr.ok||!project.projectNumber)throw new Error('R87_PROJECT_NUMBER_READ_FAILED_'+pr.status);
+            const dr=await fetch('https://clientauthconfig.googleapis.com/$discovery/rest?version=v1',{headers});
+            const discovery=await dr.json().catch(()=>({}));
+            if(!dr.ok||!discovery.resources)throw new Error('R87_DISCOVERY_HTTP_'+dr.status);
+            const methods=methodsOf(discovery).filter(m=>/client/i.test(m.resource+'.'+m.name+'.'+m.id)||/clients/i.test(m.path));
+            const schemas={};
+            for(const [name,s] of Object.entries(discovery.schemas||{})){
+              const props=Object.keys(s.properties||{});
+              if(/client/i.test(name)||props.some(p=>/origin|redirect|client/i.test(p)))schemas[name]={properties:props,required:s.required||[]};
+            }
+            const brandUrl='https://clientauthconfig.googleapis.com/v1/brands/lookupkey/brand/'+encodeURIComponent(String(project.projectNumber))+'?readMask=*&readOptions.staleness=0.02s&returnDeveloperBrand=true&returnDisabledBrands=true';
+            const br=await fetch(brandUrl,{headers});
+            const brand=await br.json().catch(()=>({}));
+            const evidence={
+              schema:'GRAVICENTRA_B2_R87_CLIENTAUTHCONFIG_DISCOVERY_V1',
+              status:'PASS',
+              projectId:process.env.PROJECT_ID,
+              projectNumber:String(project.projectNumber),
+              targetClientId:target,
+              exactOrigin,
+              discovery:{rootUrl:discovery.rootUrl||'',servicePath:discovery.servicePath||'',methods,schemas},
+              brandRead:{httpStatus:br.status,ok:br.ok,brandId:String(brand.brandId||''),projectNumbers:Array.isArray(brand.projectNumbers)?brand.projectNumbers.map(String):[],fields:Object.keys(brand||{}).sort()},
+              mutationExecuted:false,
+              productionOriginMutation:false,
+              credentialRotation:false,
+              liveHostingPromotion:false,
+              dataWrites:0,
+              b3Opened:false
+            };
+            fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
+            console.log(JSON.stringify({status:evidence.status,projectNumber:evidence.projectNumber,methodCount:methods.length,brandRead:evidence.brandRead,mutationExecuted:false}));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Upload R87 read-only discovery evidence
+        if: always() && steps.mode.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-r87-oauth-discovery-${{ github.run_id }}
+          path: ${{ runner.temp }}/b2-r87-clientauthconfig-discovery.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+      - name: R87 discovery failure remains fail-closed
+        if: ${{ failure() && steps.mode.outputs.run == 'true' }}
+        continue-on-error: true
+        run: echo "R87_DISCOVERY_FAILED_NO_EXTERNAL_MUTATION_NO_LIVE_NO_B3"
