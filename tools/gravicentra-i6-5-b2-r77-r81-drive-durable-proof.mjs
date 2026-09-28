@@ -97,16 +97,22 @@ try{
   const db=getFirestore(app),auth=getAuth(app);
   const dataCol=name=>db.collection('tenants').doc(TENANT).collection('data').doc(name).collection('items');
   let preRunDeleted=0;
+  const preExistingTargets=[];
   for(const colName of ['gestiones','clientes']){
     const stale=await dataCol(colName).where('qaFixtureType','==','B2_R77_R81_DRIVE_DURABLE').get();
     for(const d of stale.docs){
       const row=d.data()||{};
       const refs=[...(Array.isArray(row.documentos)?row.documentos:[]),...(Array.isArray(row.adjuntos)?row.adjuntos:[])].filter(x=>x&&(x.documentRef||x.fileId||x.driveUrl||x.externalUrl));
-      if(refs.length||row.driveFolderId)throw new Error('B2_R77_R81_STALE_DRIVE_FIXTURE_REQUIRES_ORDERED_CLEANUP:'+colName+':'+d.id);
+      const driveFolderId=clean(row.driveFolderId,180);
+      if(refs.length||driveFolderId){
+        preExistingTargets.push({collection:colName,id:d.id,driveFolderId,documentRefs:refs.map(x=>clean(x.documentRef||x.fileId,180)).filter(Boolean)});
+        continue;
+      }
       await d.ref.delete();preRunDeleted++;
     }
   }
   evidence.cleanup.preRunOrphanRowsDeleted=preRunDeleted;
+  evidence.cleanup.preExistingTargets=preExistingTargets;
   const actor=await pickActor(db,auth);
   evidence.actor={uidHash:hash(actor.uid),advisorIdHash:hash(actor.advisorId),roles:actor.roles};
   const suffix=RUN.replace(/[^0-9A-Za-z_-]/g,'').slice(-24);
@@ -216,7 +222,7 @@ try{
 
   const finalClient=await clientRef.get(),finalManagement=await managementRef.get();
   need(finalClient.exists&&finalManagement.exists,'B2_R77_R81_FINAL_PERSISTENCE_MISSING');
-  evidence.cleanup.targets={clientId,managementId,clientDocumentRef:r81.documentRef,managementDocumentRef:r77.documentRef,clientFolderId:r81.clientFolderId||r77.clientFolderId||''};
+  evidence.cleanup.targets={clientId,managementId,clientDocumentRef:r81.documentRef,managementDocumentRef:r77.documentRef,clientFolderId:r81.clientFolderId||r77.clientFolderId||'',preExisting:evidence.cleanup.preExistingTargets||[]};
   evidence.cleanup.pending=true;
   evidence.cleanup.noOperationalRowsTouched=true;
   evidence.pageErrors=evidence.pageErrors.filter(Boolean);
