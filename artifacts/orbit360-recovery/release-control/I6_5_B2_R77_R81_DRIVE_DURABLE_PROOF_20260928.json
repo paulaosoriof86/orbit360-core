@@ -1,0 +1,119 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R77_R81_DRIVE_DURABLE_PROOF_20260928_V1",
+  "recordedAt": "2026-09-28T21:52:44.822Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "status": "MACHINE_RUNTIME_PASS_CLEANUP_PENDING",
+  "findings": [
+    "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+    "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15"
+  ],
+  "exactPreview": {
+    "sourceSha": "673d1a18f53482f714914b1b899840efc7000cde",
+    "buildId": "gi-i65-b2-673d1a18f534-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36473871933-9etmyp95.web.app",
+    "previewRunId": 36473871933,
+    "artifactId": 10992099399
+  },
+  "runtime": {
+    "r77": {
+      "status": "PASS",
+      "rawFileStored": true,
+      "canonicalDocumentRef": true,
+      "durableManagementLink": true,
+      "firestoreReadback": true,
+      "providerCanonicalReadback": true,
+      "documentRefHash": "d2ea385ab0a472128dc46c20e3ac69b3e164b0c22ff0bc79c498430c8a60d8be",
+      "folderIdHash": "7c56a9303b32f68742b8166085e3e8b5bea79756b0b5c2751f05b039f95c44b7",
+      "contentHash": "822e07d0abb23c3dc23fa3981782fa56eef3678daa966aa66f2134c77a49b788"
+    },
+    "r81": {
+      "status": "PASS",
+      "rawFileStored": true,
+      "canonicalDocumentRef": true,
+      "durableClientLink": true,
+      "firestoreReadback": true,
+      "clientFolderBound": true,
+      "providerCanonicalReadback": true,
+      "documentRefHash": "80216d6b33e4428b0678ecd1b3820adfeb98b95f67a23a40c6c6980adc39ca48",
+      "folderIdHash": "7c56a9303b32f68742b8166085e3e8b5bea79756b0b5c2751f05b039f95c44b7",
+      "contentHash": "259cd9208a76cb2d378b63c1e513624a3b539d5b4ad47c03fa2dcd68340c3e76"
+    },
+    "reload": {
+      "ok": true,
+      "clientLinked": true,
+      "managementLinked": true,
+      "clientDriveRead": true,
+      "managementDriveRead": true,
+      "clientContentMatch": true,
+      "managementContentMatch": true,
+      "clientDownloadAvailable": true,
+      "managementDownloadAvailable": true
+    },
+    "writes": {
+      "syntheticFixture": 1,
+      "clientDocumentLink": 1,
+      "managementCreate": 1,
+      "managementDocumentLink": 1
+    },
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "cleanup": {
+    "pending": true,
+    "targets": {
+      "clientId": "b2-r7781-client-36488745414",
+      "managementId": "b2-r7781-gestion-36488745414",
+      "clientDocumentRef": "1FnASArFSBE1W4PwKbB-62ZId2d6yBWTD",
+      "managementDocumentRef": "1zI0bHo0KWSixNjhYhfgHBFYVbLHtmAL3",
+      "clientFolderId": "1ycXma0N6puUst1q6-pFpK4bSgrdyXHME",
+      "preExisting": [
+        {
+          "collection": "clientes",
+          "id": "b2-r7781-client-36471719837",
+          "driveFolderId": "1R2gisNElSEaLi0E1c1YwxCN6aQWgzzxc",
+          "documentRefs": []
+        },
+        {
+          "collection": "clientes",
+          "id": "b2-r7781-client-36472554384",
+          "driveFolderId": "1Po0kwX-r4iiIrLTJnaGIBayAFkFAIJtk",
+          "documentRefs": [
+            "13K01QMLHvB6AFzfplIk5U0vkLxW2OBTU"
+          ]
+        },
+        {
+          "collection": "clientes",
+          "id": "b2-r7781-client-36472934760",
+          "driveFolderId": "1EMHeZFk0Dhtb6l3quJf4p18YbSJ7ZBn2",
+          "documentRefs": [
+            "11Gmq3PKZ77V4AZ_g7gbmbzwH1BIN9vYg"
+          ]
+        },
+        {
+          "collection": "clientes",
+          "id": "b2-r7781-client-36473871933",
+          "driveFolderId": "1ZWiEivjCgwPWkBBwoktIfdASqGJu4CTx",
+          "documentRefs": [
+            "1gPnfyGf9sAL0sVU0FhMehjpypfXDt_b1"
+          ]
+        }
+      ]
+    }
+  },
+  "boundaries": {
+    "syntheticOnly": true,
+    "realClientMutation": false,
+    "productionHosting": false,
+    "b3": false,
+    "reimport": false,
+    "emailSend": false,
+    "cleanupMandatory": true
+  },
+  "artifact": {
+    "id": 11000650970,
+    "digest": "d948b7bc1eb81a2db1671cd4093189b81e235c7de1501e4fc4c6f465f13af588"
+  },
+  "nextRequiredProof": "R91_R92_R93_R94_R95_EXACT_PREVIEW_RUNTIME"
+}

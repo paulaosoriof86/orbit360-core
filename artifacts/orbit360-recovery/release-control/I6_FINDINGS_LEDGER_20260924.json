@@ -2481,7 +2481,7 @@
       "finding": "Management request UI offers file attachment.",
       "rootCause": "Canonical Ops/Leads backend omitted adjuntos, documentoCargaPendiente and documentoCargaFallida from management create/update allowlists; the browser workflow writer kept optimistic attachment state without a discriminating server document readback.",
       "requiredProof": "Attached support is durably stored in the approved documentary repository, linked by metadata/provenance to the gestion, opens after reload, and does not expose a false upload success.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+      "status": "MACHINE_RUNTIME_PASS_CLEANUP_PENDING",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
@@ -2490,7 +2490,7 @@
       "sourceCandidateSha": "8af4f889175b6c59770b6f4626607af629b1470e",
       "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
       "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
-      "closureState": "NOT_CLOSED",
+      "closureState": "MACHINE_PROOF_PASS_CLEANUP_PENDING",
       "previewProofRequired": true,
       "documentRepository": "Google Drive",
       "documentAuth": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER_AUTHORIZATION_CODE",
@@ -2514,6 +2514,18 @@
         "backendBlobSha": "4ccb34e39fbaafc58e2c810b47213aad1ea47ac6",
         "storeBlobSha": "01d658668295cc7301193d80fde7a31dd13f588e",
         "contractBlobSha": "e7f1e4e7b72f72afc6a38f223544d2cf097e6642"
+      },
+      "machineProof": {
+        "status": "PASS",
+        "runId": 36488745414,
+        "exactPreviewSourceSha": "673d1a18f53482f714914b1b899840efc7000cde",
+        "exactPreviewBuildId": "gi-i65-b2-673d1a18f534-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36473871933-9etmyp95.web.app",
+        "artifactId": 11000650970,
+        "artifactDigest": "d948b7bc1eb81a2db1671cd4093189b81e235c7de1501e4fc4c6f465f13af588",
+        "durableReloadReadback": true,
+        "rawDriveFile": true,
+        "cleanupPending": true
       }
     },
     {
@@ -2626,7 +2638,7 @@
       "finding": "Cliente360 offers Importar a este expediente and documentary mode claims files are stored/visible.",
       "rootCause": "importa.js documentary path advances directly to completion and performs no durable raw-file storage write; intelligent mode extracts data but does not retain the raw document.",
       "requiredProof": "Client document upload stores the raw file in the approved documentary repository (Drive), records durable link/provenance in the client expediente, survives reload, and remains distinct from data extraction proposals.",
-      "status": "SYNTHETIC_UPLOAD_PARTIAL_PASS_RELOAD_PROOF_PENDING_NEW_EXACT_PREVIEW",
+      "status": "MACHINE_RUNTIME_PASS_CLEANUP_PENDING",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
@@ -2635,7 +2647,7 @@
       "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
       "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
       "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
-      "closureState": "NOT_CLOSED",
+      "closureState": "MACHINE_PROOF_PASS_CLEANUP_PENDING",
       "previewProofRequired": true,
       "documentRepository": "Google Drive",
       "documentAuth": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER_AUTHORIZATION_CODE",
@@ -2661,6 +2673,18 @@
         "durableClientLink": true,
         "managementPhaseFailedLater": true,
         "notFinalPass": true
+      },
+      "machineProof": {
+        "status": "PASS",
+        "runId": 36488745414,
+        "exactPreviewSourceSha": "673d1a18f53482f714914b1b899840efc7000cde",
+        "exactPreviewBuildId": "gi-i65-b2-673d1a18f534-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36473871933-9etmyp95.web.app",
+        "artifactId": 11000650970,
+        "artifactDigest": "d948b7bc1eb81a2db1671cd4093189b81e235c7de1501e4fc4c6f465f13af588",
+        "durableReloadReadback": true,
+        "rawDriveFile": true,
+        "cleanupPending": true
       }
     },
     {
