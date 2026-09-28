@@ -68,6 +68,8 @@ has(packageTool,"'reclamos'",'R82_PACKAGE_RECLAMOS_HYDRATION_MISSING');
 has(del,'DELETE_RELATION_BLOCKED','R82_DELETE_RELATION_FAIL_CLOSED_MISSING');
 has(del,'deleteReason','R82_DELETE_REASON_AUDIT_MISSING');
 has(store,'function isSoftDeleted(row)','R82_SOFT_DELETE_PROJECTION_FILTER_MISSING');
+has(store,'return isSoftDeleted(durable)?null:durable;','R82_GET_SOFT_DELETE_PROJECTION_FILTER_MISSING');
+has(del,'DELETE_OPERATIONAL_PROJECTION_NOT_HIDDEN','R82_DELETE_OWNER_PROJECTION_CONFIRMATION_MISSING');
 has(store,'var listeners=[], pending={}, pendingExpected={}, deleted={}, prefOverlay={};','R89_PENDING_EXPECTATION_STATE_MISSING');
 has(store,'function baseMatchesExpectation(row,expectation)','R89_EXPECTATION_MATCHER_MISSING');
 has(store,'if(baseMatchesExpectation(ids[id],expectation))clearPending(c,id);','R89_RECONCILE_FIELD_MATCH_MISSING');

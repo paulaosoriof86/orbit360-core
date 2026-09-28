@@ -206,6 +206,7 @@
     };
 
     const related = relatedSoftDeletes(collection, row);
+    let readback = null;
     if (related.length && typeof st.batchDurable === 'function') {
       const mutations = [{ action: 'update', collection, id, payload: patch }].concat(
         related.map(child => ({
@@ -218,18 +219,21 @@
           })
         }))
       );
-      await st.batchDurable(mutations, { requestId: 'delete_' + collection + '_' + id + '_' + Date.now().toString(36), timeoutMs: 20000 });
+      const batchResult = await st.batchDurable(mutations, { requestId: 'delete_' + collection + '_' + id + '_' + Date.now().toString(36), timeoutMs: 20000 });
+      if (!batchResult || batchResult.canonicalReadback !== true || Number(batchResult.mutationCount || 0) !== mutations.length) {
+        throw new Error('DELETE_BATCH_DURABLE_READBACK_MISMATCH');
+      }
+      readback = Object.assign({}, row, patch);
     } else {
-      await st.updateDurable(collection, id, patch);
+      readback = await st.updateDurable(collection, id, patch);
     }
 
-    const readback = st.get(collection, id);
-    if (!readback || readback.deleted !== true || text(readback.deleteReason) !== text(reason)) {
+    if (!readback || readback.deleted !== true || text(readback.deleteReason) !== text(reason) || !text(readback.deletedAt)) {
       throw new Error('DELETE_DURABLE_READBACK_MISMATCH');
     }
+    if (st.get(collection, id) !== null) throw new Error('DELETE_OPERATIONAL_PROJECTION_NOT_HIDDEN');
     for (const child of related) {
-      const childReadback = st.get(child.collection, child.id);
-      if (!childReadback || childReadback.deleted !== true) throw new Error('DELETE_CHILD_READBACK_MISMATCH');
+      if (st.get(child.collection, child.id) !== null) throw new Error('DELETE_CHILD_OPERATIONAL_PROJECTION_NOT_HIDDEN');
     }
 
     try {

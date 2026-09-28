@@ -5,7 +5,7 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-product-operational-write-20260928.3-snapshot-expectation';
+  var VERSION='fase-a-i2-product-operational-write-20260928.4-soft-delete-get-projection';
   var GENERAL_COMMAND='orbit360ProductOperationalCommand';
   var WORKFLOW_COMMAND='orbit360OpsLeadsCommand';
   var WORKFLOW_PREVIEW_COMMAND='orbit360OpsLeadsCommandPreview';
@@ -136,8 +136,10 @@
   function get(collection,id){
     id=text(id);
     if((deleted[collection]||{})[id])return null;
-    if((pending[collection]||{})[id])return clone(pending[collection][id]);
-    return base.get(collection,id);
+    var optimistic=(pending[collection]||{})[id];
+    if(optimistic)return isSoftDeleted(optimistic)?null:clone(optimistic);
+    var durable=base.get(collection,id);
+    return isSoftDeleted(durable)?null:durable;
   }
   function where(collection,fieldOrPredicate,opOrValue,maybeValue){
     var rows=mergedAll(collection);
