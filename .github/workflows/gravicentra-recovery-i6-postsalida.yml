@@ -4795,7 +4795,7 @@ jobs:
       - name: Install Google auth dependency
         if: steps.mode.outputs.run == 'true'
         run: npm install --no-save --package-lock=false google-auth-library@10.9.1 >/dev/null
-      - name: Discover ClientAuthConfig contract read-only
+      - name: Discover ClientAuthConfig authority and endpoints read-only
         id: discover
         if: steps.mode.outputs.run == 'true'
         env:
@@ -4807,45 +4807,40 @@ jobs:
           const {GoogleAuth}=require('google-auth-library');
           const target='646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com';
           const exactOrigin='https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app';
-          let sa=null;
+          const permissionSet=[
+            'clientauthconfig.brands.get','clientauthconfig.brands.list',
+            'clientauthconfig.clients.get','clientauthconfig.clients.list','clientauthconfig.clients.update',
+            'serviceusage.services.get','resourcemanager.projects.get'
+          ];
+          const candidates=[];
           for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
-            try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.private_key&&x?.client_email){sa=x;break;}}catch{}
+            try{
+              const x=JSON.parse(process.env[k]||'');
+              if(x?.type==='service_account'&&x?.project_id===process.env.PROJECT_ID&&x?.private_key&&x?.client_email&&!candidates.some(y=>y.client_email===x.client_email))candidates.push(x);
+            }catch{}
           }
-          if(!sa)throw new Error('R87_NO_SERVICE_ACCOUNT');
-          function methodsOf(node,path=[],out=[]){
-            if(!node||typeof node!=='object')return out;
-            if(node.methods)for(const [name,m] of Object.entries(node.methods))out.push({resource:path.join('.'),name,id:m.id||'',path:m.path||'',httpMethod:m.httpMethod||'',parameters:m.parameters||{},requestRef:m.request?.$ref||'',responseRef:m.response?.$ref||''});
-            if(node.resources)for(const [name,r] of Object.entries(node.resources))methodsOf(r,path.concat(name),out);
-            return out;
-          }
-          (async()=>{
-            const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform']});
-            const token=await auth.getAccessToken();
-            const headers={Authorization:'Bearer '+token};
-            const pr=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID),{headers});
-            const project=await pr.json().catch(()=>({}));
-            if(!pr.ok||!project.projectNumber)throw new Error('R87_PROJECT_NUMBER_READ_FAILED_'+pr.status);
-            const dr=await fetch('https://clientauthconfig.googleapis.com/$discovery/rest?version=v1',{headers});
-            const discovery=await dr.json().catch(()=>({}));
-            if(!dr.ok||!discovery.resources)throw new Error('R87_DISCOVERY_HTTP_'+dr.status);
-            const methods=methodsOf(discovery).filter(m=>/client/i.test(m.resource+'.'+m.name+'.'+m.id)||/clients/i.test(m.path));
-            const schemas={};
-            for(const [name,s] of Object.entries(discovery.schemas||{})){
-              const props=Object.keys(s.properties||{});
-              if(/client/i.test(name)||props.some(p=>/origin|redirect|client/i.test(p)))schemas[name]={properties:props,required:s.required||[]};
+          const redact=(value)=>{
+            if(Array.isArray(value))return value.map(redact);
+            if(value&&typeof value==='object'){
+              const out={};
+              for(const [k,v] of Object.entries(value)){
+                if(/secret|token|credential/i.test(k)){out[k]='[REDACTED]';continue;}
+                out[k]=redact(v);
+              }
+              return out;
             }
-            const brandUrl='https://clientauthconfig.googleapis.com/v1/brands/lookupkey/brand/'+encodeURIComponent(String(project.projectNumber))+'?readMask=*&readOptions.staleness=0.02s&returnDeveloperBrand=true&returnDisabledBrands=true';
-            const br=await fetch(brandUrl,{headers});
-            const brand=await br.json().catch(()=>({}));
+            return value;
+          };
+          const json=async r=>r.json().catch(()=>({}));
+          const short=x=>JSON.stringify(redact(x)).slice(0,5000);
+          (async()=>{
             const evidence={
-              schema:'GRAVICENTRA_B2_R87_CLIENTAUTHCONFIG_DISCOVERY_V1',
-              status:'PASS',
+              schema:'GRAVICENTRA_B2_R87_CLIENTAUTHCONFIG_AUTHORITY_DISCOVERY_V2',
+              status:'READ_ONLY_COMPLETE',
               projectId:process.env.PROJECT_ID,
-              projectNumber:String(project.projectNumber),
               targetClientId:target,
               exactOrigin,
-              discovery:{rootUrl:discovery.rootUrl||'',servicePath:discovery.servicePath||'',methods,schemas},
-              brandRead:{httpStatus:br.status,ok:br.ok,brandId:String(brand.brandId||''),projectNumbers:Array.isArray(brand.projectNumbers)?brand.projectNumbers.map(String):[],fields:Object.keys(brand||{}).sort()},
+              candidates:[],
               mutationExecuted:false,
               productionOriginMutation:false,
               credentialRotation:false,
@@ -4853,9 +4848,63 @@ jobs:
               dataWrites:0,
               b3Opened:false
             };
+            for(const sa of candidates){
+              const row={serviceAccount:sa.client_email,permissions:[],projectNumber:'',serviceUsage:null,discovery:null,brandRead:null,listClients:null,getTarget:null};
+              try{
+                const auth=new GoogleAuth({credentials:sa,scopes:['https://www.googleapis.com/auth/cloud-platform']});
+                const token=await auth.getAccessToken();
+                const headers={Authorization:'Bearer '+token,'X-Goog-User-Project':process.env.PROJECT_ID};
+                const pr=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID),{headers});
+                const project=await json(pr); row.projectRead={httpStatus:pr.status,ok:pr.ok};
+                if(pr.ok&&project.projectNumber)row.projectNumber=String(project.projectNumber);
+                const tp=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+encodeURIComponent(process.env.PROJECT_ID)+':testIamPermissions',{
+                  method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({permissions:permissionSet})
+                });
+                const tpb=await json(tp);row.testIamPermissions={httpStatus:tp.status,ok:tp.ok};
+                row.permissions=Array.isArray(tpb.permissions)?tpb.permissions:[];
+                if(row.projectNumber){
+                  const su=await fetch('https://serviceusage.googleapis.com/v1/projects/'+encodeURIComponent(row.projectNumber)+'/services/clientauthconfig.googleapis.com',{headers});
+                  const sub=await json(su);row.serviceUsage={httpStatus:su.status,ok:su.ok,state:String(sub.state||''),name:String(sub.name||''),error:su.ok?'':short(sub)};
+                }
+                const dr=await fetch('https://clientauthconfig.googleapis.com/$discovery/rest?version=v1',{headers});
+                const db=await json(dr);row.discovery={httpStatus:dr.status,ok:dr.ok,error:dr.ok?'':short(db)};
+                if(row.projectNumber){
+                  const brandUrl='https://clientauthconfig.googleapis.com/v1/brands/lookupkey/brand/'+encodeURIComponent(row.projectNumber)+'?readMask=*&readOptions.staleness=0.02s&returnDeveloperBrand=true&returnDisabledBrands=true';
+                  const br=await fetch(brandUrl,{headers});const bb=await json(br);
+                  row.brandRead={httpStatus:br.status,ok:br.ok,body:br.ok?redact(bb):undefined,error:br.ok?'':short(bb)};
+                  const brandId=String(bb.brandId||row.projectNumber);
+                  const listUrl='https://clientauthconfig.googleapis.com/v1/brands/'+encodeURIComponent(brandId)+'/clients?showDeleted=false';
+                  const lr=await fetch(listUrl,{headers});const lb=await json(lr);
+                  const listSafe=redact(lb);
+                  row.listClients={httpStatus:lr.status,ok:lr.ok,body:lr.ok?listSafe:undefined,error:lr.ok?'':short(lb)};
+                  if(lr.ok){
+                    const clients=Array.isArray(lb.clients)?lb.clients:Array.isArray(lb.oauthClients)?lb.oauthClients:[];
+                    const hit=clients.find(x=>String(x.clientId||x.client_id||'')===target);
+                    if(hit)row.targetFromList=redact(hit);
+                  }
+                  const getUrl='https://clientauthconfig.googleapis.com/v1/brands/'+encodeURIComponent(brandId)+'/clients/'+encodeURIComponent(target);
+                  const gr=await fetch(getUrl,{headers});const gb=await json(gr);
+                  row.getTarget={httpStatus:gr.status,ok:gr.ok,body:gr.ok?redact(gb):undefined,error:gr.ok?'':short(gb)};
+                }
+              }catch(e){row.exception=String(e&&e.message||e);}
+              evidence.candidates.push(row);
+            }
+            evidence.authoritySummary={
+              candidateCount:evidence.candidates.length,
+              anyGet:evidence.candidates.some(x=>x.permissions.includes('clientauthconfig.clients.get')),
+              anyList:evidence.candidates.some(x=>x.permissions.includes('clientauthconfig.clients.list')),
+              anyUpdate:evidence.candidates.some(x=>x.permissions.includes('clientauthconfig.clients.update')),
+              anyListEndpoint:evidence.candidates.some(x=>x.listClients?.ok===true),
+              anyGetEndpoint:evidence.candidates.some(x=>x.getTarget?.ok===true)
+            };
             fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
-            console.log(JSON.stringify({status:evidence.status,projectNumber:evidence.projectNumber,methodCount:methods.length,brandRead:evidence.brandRead,mutationExecuted:false}));
-          })().catch(e=>{console.error(e);process.exit(1)});
+            console.log(JSON.stringify({status:evidence.status,authoritySummary:evidence.authoritySummary,candidates:evidence.candidates.map(x=>({serviceAccount:x.serviceAccount,permissions:x.permissions,serviceUsage:x.serviceUsage,discovery:x.discovery,brandRead:x.brandRead&&{httpStatus:x.brandRead.httpStatus,ok:x.brandRead.ok},listClients:x.listClients&&{httpStatus:x.listClients.httpStatus,ok:x.listClients.ok},getTarget:x.getTarget&&{httpStatus:x.getTarget.httpStatus,ok:x.getTarget.ok}}))}));
+          })().catch(e=>{
+            const evidence={schema:'GRAVICENTRA_B2_R87_CLIENTAUTHCONFIG_AUTHORITY_DISCOVERY_V2',status:'FAIL_CLOSED',projectId:process.env.PROJECT_ID,targetClientId:target,exactOrigin,error:String(e&&e.message||e),mutationExecuted:false,productionOriginMutation:false,credentialRotation:false,liveHostingPromotion:false,dataWrites:0,b3Opened:false};
+            fs.writeFileSync(process.env.OUT,JSON.stringify(evidence,null,2)+'\n');
+            console.error(evidence.error);
+            process.exit(1);
+          });
           NODE
       - name: Upload R87 read-only discovery evidence
         if: always() && steps.mode.outputs.run == 'true'
