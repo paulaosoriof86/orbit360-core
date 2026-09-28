@@ -2653,14 +2653,14 @@
       "rootCause": "product-drive-document-provider-p0.js forces Google prompt=consent and memory_only token persistence; document-drive-domain.js requires googleAccessToken from the browser for status/upload. The same model would repeat in LIVE.",
       "remediation": "Replace routine per-user OAuth with persistent tenant-level backend Drive integration. Gravicentra role/scope becomes the authorization boundary; Drive credential remains backend-only.",
       "requiredProof": "one-time tenant bootstrap succeeds and readback persists; fresh user browser has zero Google consent/account selection; authorized client document read/download/upload works by active role/scope; cross-scope access denied; no Drive token in browser storage; Preview synthetic isolation preserved; audit receipt present; cleanup synthetic fixture",
-      "status": "SOURCE_FIXED_BOOTSTRAP_SURFACE_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
+      "status": "GUARD_PASS_PREVIEW_ARMED_BOOTSTRAP_SURFACE",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
       "receiptBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
       "mayDisappearWithoutDisposition": false,
-      "sourceFixCommit": "3343616b2afd079af1597da09aba22d600ce72c2",
+      "sourceFixCommit": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
       "productOwners": [
         "functions/document-drive-domain.js",
         "functions/package.json",
@@ -2718,7 +2718,10 @@
       "uiRemediation": "When the backend probe returns bootstrapRequired for Dirección/Admin roles and the setup action is absent, rerender the same Documentos tab once so the existing tenant-level Configurar Drive control becomes visible.",
       "latestProductBlob": {
         "orbit360-platform/modules/cliente360.js": "40edf8a6f7818328255f32524255b58a51eecf0f"
-      }
+      },
+      "guardPassRunId": 36413998564,
+      "guardPass": true,
+      "previewArmed": true
     }
   ],
   "phaseBBacklog": [

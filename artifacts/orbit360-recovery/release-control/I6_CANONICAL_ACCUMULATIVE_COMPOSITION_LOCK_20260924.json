@@ -204,7 +204,7 @@
   "lastRemediation": {
     "origin": "PAULA_VISUAL_R16_20260928_R73_R74_PASS_R84_BOOTSTRAP_SURFACE_DEFECT",
     "parentHead": "5d52efe68c3663f8fa243d19abfa7d918ca9ad07",
-    "status": "SOURCE_FIXED_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js"
     ],
@@ -235,9 +235,11 @@
     },
     "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
     "evidenceReceiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63",
-    "findingLedgerBlobSha": "0d5b208f3e2e3529f0b5d44f430ba29f956090ac",
+    "findingLedgerBlobSha": "4986619fcbd876c9c130c50a7c761de5dbefd299",
     "noDataReimport": true,
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "candidateHead": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
+    "guardPassRunId": 36413998564
   }
 }

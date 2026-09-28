@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "SOURCE_FIXED_PENDING_GUARD",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -260,13 +260,13 @@
     "noHardcodedIdentities": true
   },
   "candidate": {
-    "status": "SOURCE_FIXED_PENDING_GUARD",
-    "sourceCandidateSha": "8b9da11fb8acb0a9a7d5d9dc2f5b0599f43d660c",
-    "governanceHeadBeforeCandidateArm": "8b9da11fb8acb0a9a7d5d9dc2f5b0599f43d660c",
+    "status": "CANDIDATE_PENDING_PREVIEW",
+    "sourceCandidateSha": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
+    "governanceHeadBeforeCandidateArm": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "2bee7ca187241a2a4a21692741c55c945c995389",
+    "compositionLockBlobSha": "aa343849cc44803862591f1ad4ef1f4b28143087",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "0d5b208f3e2e3529f0b5d44f430ba29f956090ac",
+    "findingLedgerBlobSha": "4986619fcbd876c9c130c50a7c761de5dbefd299",
     "blockingFindingIds": [
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -292,7 +292,7 @@
     "humanDownloadRetestRequired": false,
     "tenantBootstrapRequired": true,
     "routineUserGoogleOAuth": false,
-    "sourceFixCommitPendingArm": true,
+    "sourceFixCommitPendingArm": false,
     "sourceCandidateParentHead": "5d52efe68c3663f8fa243d19abfa7d918ca9ad07",
     "changedProductFiles": [
       "orbit360-platform/modules/cliente360.js"
@@ -3102,5 +3102,14 @@
     },
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
     "receiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63"
+  },
+  "r84BootstrapSurfaceArm": {
+    "status": "GUARD_PASS_PREVIEW_ARMED",
+    "sourceFixCommit": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
+    "guardPassRunId": 36413998564,
+    "productBlob": "40edf8a6f7818328255f32524255b58a51eecf0f",
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true
   }
 }
