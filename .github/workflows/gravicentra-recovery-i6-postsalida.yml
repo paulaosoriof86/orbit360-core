@@ -4810,7 +4810,9 @@ jobs:
           const permissionSet=[
             'clientauthconfig.brands.get','clientauthconfig.brands.list',
             'clientauthconfig.clients.get','clientauthconfig.clients.list','clientauthconfig.clients.update',
-            'serviceusage.services.get','resourcemanager.projects.get'
+            'serviceusage.services.get','serviceusage.services.use',
+            'resourcemanager.projects.get','resourcemanager.projects.getIamPolicy','resourcemanager.projects.setIamPolicy',
+            'iam.serviceAccounts.getAccessToken'
           ];
           const candidates=[];
           for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
