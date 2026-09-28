@@ -19,6 +19,7 @@ const driveClient=read('orbit360-platform/core/product-drive-document-provider-p
 const driveBackend=read('functions/document-drive-domain.js');
 const opsBackend=read('functions/product-ops-leads-domain.js');
 const i6Workflow=read('.github/workflows/gravicentra-recovery-i6-postsalida.yml');
+const packageTool=read('tools/gravicentra-i6-1-preview-package.mjs');
 const cobros=read('orbit360-platform/modules/cobros.js');
 const siniestros=read('orbit360-platform/modules/siniestros.js');
 const cancelaciones=read('orbit360-platform/modules/cancelaciones.js');
@@ -63,6 +64,7 @@ has(opsBackend,"const DELETE_AUDIT_FIELDS = Object.freeze", 'R82_OPS_DELETE_AUDI
 has(opsBackend,"copyAllowed(after,payload,DELETE_AUDIT_FIELDS)", 'R82_OPS_DELETE_AUDIT_PERSISTENCE_MISSING');
 has(opsBackend,'deleteAuditReadback', 'R82_OPS_DELETE_AUDIT_READBACK_MISSING');
 has(store,'PRODUCT_WORKFLOW_DELETE_DURABLE_READBACK_REQUIRED','R82_STORE_DELETE_DURABLE_GUARD_MISSING');
+has(packageTool,"'reclamos'",'R82_PACKAGE_RECLAMOS_HYDRATION_MISSING');
 has(del,'DELETE_RELATION_BLOCKED','R82_DELETE_RELATION_FAIL_CLOSED_MISSING');
 has(del,'deleteReason','R82_DELETE_REASON_AUDIT_MISSING');
 has(store,'function isSoftDeleted(row)','R82_SOFT_DELETE_PROJECTION_FILTER_MISSING');
