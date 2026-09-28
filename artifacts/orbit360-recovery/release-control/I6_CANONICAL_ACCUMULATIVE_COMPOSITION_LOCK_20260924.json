@@ -137,7 +137,7 @@
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
     "orbit360-platform/core/product-app-p0.js": "b6ccd725f214c666e04299574be4c1fdae3a6b83",
     "orbit360-platform/core/product-drive-document-provider-p0.js": "30f84e48d94a728c71471902134b0cd657f61a4a",
-    "orbit360-platform/core/product-hydration-required-optional-p0.js": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
+    "orbit360-platform/core/product-hydration-required-optional-p0.js": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
@@ -153,7 +153,7 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "68a2b2d0cccec3b3dea815634a98ba7fecb3f586",
+    "orbit360-platform/index.html": "75edf2bf0ee9e945c1e503ad10e4eb468822c83a",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "2d7db2a218459bb5a6239845f0e277db12aa5490",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
@@ -202,60 +202,39 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "R20_DRIVE_PERSISTENT_PASS_R88_STARTUP_R89_OPS_LEADS_20260928",
-    "parentHead": "b92e5da1fa52399a05c844db46e95bade2af47a5",
-    "status": "GUARD_PASS_PREVIEW_ARMED",
+    "origin": "R20A_R88_PREMEMBERSHIP_ENUMERATION_CORRECTION_20260928",
+    "parentHead": "4a223fe39ea9167a2365eb0ab2f80245af34cedd",
+    "status": "SOURCE_FIXED_PENDING_GUARD",
     "changedProductFiles": [
-      "orbit360-platform/data/store-firestore-product-operational-p0.js",
       "orbit360-platform/core/product-hydration-required-optional-p0.js",
       "orbit360-platform/index.html"
     ],
     "changedProductBlobs": {
-      "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e",
-      "orbit360-platform/core/product-hydration-required-optional-p0.js": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
-      "orbit360-platform/index.html": "68a2b2d0cccec3b3dea815634a98ba7fecb3f586"
+      "orbit360-platform/core/product-hydration-required-optional-p0.js": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
+      "orbit360-platform/index.html": "75edf2bf0ee9e945c1e503ad10e4eb468822c83a"
+    },
+    "preservedProductBlob": {
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e"
     },
     "changedTestFiles": {
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "8ca7fa6593583ebbca9cc522e2861713fc14fa29",
-      "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs": "7f843d8304135284acc49006bcec90b3cce4edf6",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "fbb4622ff1666f429fe80d2ef456e8492a05836d"
+      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "0bc7f8c21724460f4dd3f769be781ce873d6fc15",
+      "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs": "a51c7478581e3767b6d669e7a148eec20cc76203"
     },
-    "driveHistoricalExactPreview": {
-      "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
-      "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
-      "channelId": "gi-i65-b2-36418353246",
-      "url": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
-      "runId": 36418353246,
-      "artifactId": 10968560537,
-      "artifactDigest": "d3e73ddedd878cdf251b8a0c3148d8a3cbe38b354d8af3304aa28cb2078b2374",
-      "exactReadback": true,
+    "previousExactPreview": {
+      "runId": 36448274176,
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36448274176-9mxjjxfv.web.app",
+      "technicalReadback": true,
       "functionalPass": true,
-      "livePromoted": false
+      "authenticatedFailure": "product_required_hydration_contract_missing",
+      "syntheticWritesBeforeFailure": 0
     },
-    "driveDisposition": {
-      "r83": "CLOSED",
-      "r85": "CLOSED",
-      "r87": "CLOSED",
-      "r84": "PERSISTENT_PASS_FRESH_SESSION_SCOPE_UPLOAD_PENDING"
-    },
-    "r88": {
-      "findingId": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
-      "remediationBlobSha": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
-      "priorElapsedSeconds": 7.433
-    },
-    "r89": {
-      "findingId": "B2-R89-OPS-LEADS-PENDING-OVERLAY-PREMATURE-RECONCILIATION-R20",
-      "remediationBlobSha": "4cc627428397e65c16912e42c1fb4d2a0979358e",
-      "runtimeContractBlobSha": "7f843d8304135284acc49006bcec90b3cce4edf6"
-    },
+    "rootCause": "R88 route-primary selection was applied during productApp's pre-membership enumeration call.",
+    "fix": "Return full collection universe before membership; apply single route-primary required collection only after validated membership in store factory.",
     "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
-    "evidenceReceiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
-    "findingLedgerBlobSha": "60a50e2145fb0da4c215ef84cea61e209646618b",
-    "noDataReimport": true,
+    "evidenceReceiptBlobSha": "3304f2ce0ef5714df6be249a385288ed1015df83",
+    "findingLedgerBlobSha": "1b6118a5eab82f3a759846748767d4ca250e1659",
     "noLive": true,
     "noB3": true,
-    "productionSecretTouched": false,
-    "candidateHead": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745",
-    "guardPassRunId": 36448006084
+    "noReimport": true
   }
 }

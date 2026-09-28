@@ -80,6 +80,9 @@ function clone(v){ return JSON.parse(JSON.stringify(v)); }
   };
   context.Orbit=context.window.Orbit;
   vm.runInNewContext(source,context,{filename:'product-hydration-required-optional-p0.js'});
+  const pre=context.Orbit.productHydrationRequiredOptionalP0.contract();
+  assert(pre.preMembershipEnumeration===true,'R88_PREMEMBERSHIP_ENUMERATION_FLAG_MISSING');
+  assert(pre.required.length===8&&pre.all.length===12,'R88_PREMEMBERSHIP_COLLECTION_UNIVERSE_LOST');
   const membership={tenantId:'alianzas-soluciones'};
   let h=context.Orbit.productHydrationRequiredOptionalP0.contract(membership);
   assert(JSON.stringify(h.required)==='["clientes"]','R88_INICIO_PRIMARY_NOT_CLIENTES');

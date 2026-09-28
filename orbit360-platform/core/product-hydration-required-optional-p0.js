@@ -13,7 +13,7 @@
   'use strict';
 
   window.Orbit = window.Orbit || {};
-  var VERSION = 'p0-20260928-route-primary-authoritative-startup-6';
+  var VERSION = 'p0-20260928-route-primary-authoritative-startup-6a';
   var MARKER = 'PRODUCT_HYDRATION_AUTHORITATIVE_REQUIRED_OPTIONAL_P0';
   var originalCreate = window.Orbit.createFirestoreProductReadOnlyStoreP0;
 
@@ -24,6 +24,25 @@
     var cfg = window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ || {};
     var required = unique(cfg.requiredCollections);
     var optional = unique(cfg.optionalCollections).filter(function (name) { return required.indexOf(name) < 0; });
+    // ProductApp requests the collection universe before membership authority is loaded.
+    // Preserve that pre-membership contract as enumeration-only; route-primary readiness
+    // is selected later by the store factory once a validated membership is available.
+    if (!membership || !text(membership.tenantId)) {
+      if (!required.length) throw new Error('product_required_hydration_contract_missing');
+      return {
+        version:text(cfg.hydrationContractVersion)||'unversioned',
+        source:text(cfg.hydrationContractSource)||'public-runtime-config',
+        required:required,
+        optional:optional,
+        all:required.concat(optional),
+        teamDirectoryRequired:false,
+        routeOptimized:false,
+        startupCollection:'',
+        startupRoute:'',
+        fullHydrationDeferred:false,
+        preMembershipEnumeration:true
+      };
+    }
     var teamDirectoryRequired = false;
     try {
       var policy = window.Orbit.tenantAccessPolicyProductP0;

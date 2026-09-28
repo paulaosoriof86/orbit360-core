@@ -2973,19 +2973,27 @@
         "Do not promote to LIVE from this finding"
       ],
       "requiredProof": "New exact Preview must show materially improved restored-session shell readiness, no access weakening, and subsequent route data hydration/reactive rerender.",
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
-      "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
+      "receiptBlobSha": "3304f2ce0ef5714df6be249a385288ed1015df83",
       "closureState": "NOT_CLOSED",
       "recordedAt": "2026-09-28",
       "previewProofRequired": true,
-      "remediationBlobSha": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
+      "remediationBlobSha": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
       "guardPassRunId": 36448006084,
       "sourceFixCommit": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745",
-      "previewArmed": true
+      "previewArmed": true,
+      "lastPreviewFailure": {
+        "runId": 36448274176,
+        "jobId": 109017337531,
+        "code": "product_required_hydration_contract_missing",
+        "classification": "R88_REMEDIATION_PREMEMBERSHIP_ENUMERATION_GAP",
+        "syntheticWritesBeforeFailure": 0
+      },
+      "correction": "Preserve full enumeration contract before membership; choose route-primary startup only after validated membership in store factory."
     },
     {
       "id": "B2-R89-OPS-LEADS-PENDING-OVERLAY-PREMATURE-RECONCILIATION-R20",
@@ -2998,7 +3006,7 @@
       "finding": "OPS_LEADS_ACCEPTED_BUSINESS_DISAPPEARED_FROM_OPS_BECAUSE_PENDING_STAGE_UPDATE_WAS_RECONCILED_BY_ID_EXISTENCE_BEFORE_AUTHORITATIVE_FIELDS_MATCHED",
       "rootCause": "The operational facade reconciled every pending update away as soon as the authoritative base snapshot contained the same record ID, even when that base row still held pre-write values. A stale negocios snapshot therefore removed the optimistic cotizando overlay and exposed nuevo until the later server snapshot.",
       "remediation": "Track per-record expectations. Inserts reconcile on existence; updates reconcile only when authoritative base fields match the requested patch; workflow soft-delete reconciles only when archivado=true; failures and hard deletes clear both pending row and expectation.",
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "SOURCE_FIXED_PENDING_NEW_CANDIDATE_GUARD",
       "blocking": true,
       "closureState": "NOT_CLOSED",
       "observed": {
@@ -3013,7 +3021,7 @@
       "runtimeContractBlobSha": "7f843d8304135284acc49006bcec90b3cce4edf6",
       "requiredProof": "R20 dynamic contract plus exact authenticated Preview must keep cotizando visible through stale base snapshot and show accepted business exactly once in Ops and Leads.",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
-      "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
+      "receiptBlobSha": "3304f2ce0ef5714df6be249a385288ed1015df83",
       "noLive": true,
       "noB3": true,
       "noReimport": true,

@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "8b0ba8db35fe3a15cc1ac4bdaeb94d19836b5699",
+    "b2ExecutionLockBlobSha": "094e9f784383c97d68ae607e727ac0f7599c424b",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2168,7 +2168,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "Persistent Drive bootstrap/preview/download/direct-open are proven on the frozen exact Preview. Authenticated rerun also proves backend Secret Manager persistence with zero browser token keys, then exposed R89 Ops/Leads stale-overlay reconciliation. R88 and R89 are source-fixed in one cumulative candidate to minimize rebuilds. Guard before arming one new exact Preview. No LIVE, no B3, no reimport.",
+      "boundaryNote": "First R88 candidate reached exact technical Preview PASS but authenticated activation failed before writes because productApp pre-membership enumeration was incorrectly route-optimized. R20A preserves full enumeration pre-membership and applies route-primary readiness only after validated membership. R89 overlay fix is preserved. Guard before one new exact Preview. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2254,7 +2254,7 @@
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
       "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
       "insurerStableEditRuntimePass": true,
-      "findingLedgerBlobSha": "60a50e2145fb0da4c215ef84cea61e209646618b",
+      "findingLedgerBlobSha": "1b6118a5eab82f3a759846748767d4ca250e1659",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
@@ -2587,8 +2587,8 @@
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
         "receiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63"
       },
-      "compositionLockBlobSha": "ba630ebf25b87796d304f4898239f10b0e3b1e62",
-      "sourceFixPendingArm": false,
+      "compositionLockBlobSha": "7eff2e58ced208e4d04c6eac3a7e387d42848778",
+      "sourceFixPendingArm": true,
       "r84BootstrapSurfaceArm": {
         "status": "GUARD_PASS_PREVIEW_ARMED",
         "sourceFixCommit": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
@@ -2656,9 +2656,9 @@
         }
       },
       "r20": {
-        "status": "GUARD_PASS_PREVIEW_ARMED",
+        "status": "R88A_SOURCE_FIXED_PENDING_GUARD",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
-        "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
+        "receiptBlobSha": "3304f2ce0ef5714df6be249a385288ed1015df83",
         "drive": {
           "persistentBootstrap": true,
           "inAppPreview": true,
@@ -2667,11 +2667,12 @@
           "r84FreshSessionScopeUploadPending": true
         },
         "r88": {
-          "status": "GUARD_PASS_PREVIEW_ARMED",
-          "productBlob": "6268db97af9610d48b63201718c0e9ec1dd7e06b"
+          "status": "SOURCE_FIXED_PENDING_GUARD",
+          "productBlob": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
+          "lastFailureJobId": 109017337531
         },
         "r89": {
-          "status": "GUARD_PASS_PREVIEW_ARMED",
+          "status": "SOURCE_FIXED_PENDING_NEW_CANDIDATE_GUARD",
           "productBlob": "4cc627428397e65c16912e42c1fb4d2a0979358e",
           "failureJobId": 109006464190
         },

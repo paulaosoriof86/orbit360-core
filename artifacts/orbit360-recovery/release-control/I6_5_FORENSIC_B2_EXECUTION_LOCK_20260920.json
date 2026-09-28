@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "SOURCE_FIXED_PENDING_GUARD",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -264,13 +264,13 @@
     "noHardcodedIdentities": true
   },
   "candidate": {
-    "status": "CANDIDATE_PENDING_PREVIEW",
+    "status": "SOURCE_FIXED_PENDING_GUARD",
     "sourceCandidateSha": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745",
     "governanceHeadBeforeCandidateArm": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "ba630ebf25b87796d304f4898239f10b0e3b1e62",
+    "compositionLockBlobSha": "7eff2e58ced208e4d04c6eac3a7e387d42848778",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "60a50e2145fb0da4c215ef84cea61e209646618b",
+    "findingLedgerBlobSha": "1b6118a5eab82f3a759846748767d4ca250e1659",
     "blockingFindingIds": [
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -298,17 +298,17 @@
     "humanDownloadRetestRequired": false,
     "tenantBootstrapRequired": true,
     "routineUserGoogleOAuth": false,
-    "sourceFixCommitPendingArm": false,
-    "sourceCandidateParentHead": "b92e5da1fa52399a05c844db46e95bade2af47a5",
+    "sourceFixCommitPendingArm": true,
+    "sourceCandidateParentHead": "4a223fe39ea9167a2365eb0ab2f80245af34cedd",
     "changedProductFiles": [
-      "orbit360-platform/data/store-firestore-product-operational-p0.js",
       "orbit360-platform/core/product-hydration-required-optional-p0.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js"
     ],
     "changedProductBlobs": {
-      "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e",
-      "orbit360-platform/core/product-hydration-required-optional-p0.js": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
-      "orbit360-platform/index.html": "68a2b2d0cccec3b3dea815634a98ba7fecb3f586"
+      "orbit360-platform/core/product-hydration-required-optional-p0.js": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
+      "orbit360-platform/index.html": "75edf2bf0ee9e945c1e503ad10e4eb468822c83a",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e"
     },
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
     "visualReceiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63",
@@ -325,16 +325,14 @@
     },
     "changedTestFiles": [
       "tools/gravicentra-i6-5-b2-r15-contract.mjs",
-      "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs"
     ],
     "testBlobs": {
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "8ca7fa6593583ebbca9cc522e2861713fc14fa29",
-      "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs": "7f843d8304135284acc49006bcec90b3cce4edf6",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "fbb4622ff1666f429fe80d2ef456e8492a05836d"
+      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "0bc7f8c21724460f4dd3f769be781ce873d6fc15",
+      "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs": "a51c7478581e3767b6d669e7a148eec20cc76203"
     },
     "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
-    "evidenceReceiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23"
+    "evidenceReceiptBlobSha": "3304f2ce0ef5714df6be249a385288ed1015df83"
   },
   "preview": {
     "sourceSha": "253bbc6df76019d0557875dc2fae802923ead591",
@@ -1896,7 +1894,7 @@
   },
   "nextRequiredProof": [
     "CENTRAL_GUARD_PASS",
-    "R20_RUNTIME_CONTRACT_PASS",
+    "R20_RUNTIME_CONTRACT_PASS_INCLUDING_PREMEMBERSHIP_ENUMERATION",
     "NEW_EXACT_B2_PREVIEW_READBACK",
     "R89_OPS_LEADS_COTIZANDO_SYNC_PASS",
     "R88_STARTUP_TIMING_AND_ROUTE_HYDRATION_PASS",
@@ -3250,9 +3248,9 @@
     }
   },
   "r20": {
-    "status": "GUARD_PASS_PREVIEW_ARMED",
+    "status": "R88A_SOURCE_FIXED_PENDING_GUARD",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
-    "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
+    "receiptBlobSha": "3304f2ce0ef5714df6be249a385288ed1015df83",
     "drive": {
       "r83": "CLOSED",
       "r85": "CLOSED",
@@ -3261,12 +3259,14 @@
       "authenticatedJobId": 109006464190
     },
     "r88": {
-      "status": "GUARD_PASS_PREVIEW_ARMED",
-      "blob": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
-      "priorElapsedSeconds": 7.433
+      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "blob": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
+      "priorElapsedSeconds": 7.433,
+      "lastFailureJobId": 109017337531,
+      "lastFailure": "product_required_hydration_contract_missing"
     },
     "r89": {
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "SOURCE_FIXED_PENDING_NEW_CANDIDATE_GUARD",
       "blob": "4cc627428397e65c16912e42c1fb4d2a0979358e",
       "runtimeContractBlob": "7f843d8304135284acc49006bcec90b3cce4edf6",
       "failureJobId": 109006464190

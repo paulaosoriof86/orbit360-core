@@ -66,6 +66,7 @@ has(hydration,"required=[startup]",'R88_SINGLE_AUTHORITATIVE_STARTUP_COLLECTION_
 has(hydration,"fullHydrationDeferred:true",'R88_DEFERRED_FULL_HYDRATION_MISSING');
 has(hydration,"startupCollection:startup",'R88_STARTUP_COLLECTION_STATUS_MISSING');
 has(hydration,"primaryByRoute",'R88_ROUTE_PRIMARY_MAP_MISSING');
+has(hydration,"preMembershipEnumeration:true",'R88_PREMEMBERSHIP_ENUMERATION_GUARD_MISSING');
 has(cobros,"Orbit.recordDelete.remove('cobros'","R82_COBROS_DELETE_ENTRYPOINT_MISSING");
 has(siniestros,"Orbit.recordDelete.remove('reclamos'","R82_SINIESTROS_DELETE_ENTRYPOINT_MISSING");
 has(cancelaciones,"Orbit.recordDelete.remove('cancelaciones'","R82_CANCELACIONES_DELETE_ENTRYPOINT_MISSING");

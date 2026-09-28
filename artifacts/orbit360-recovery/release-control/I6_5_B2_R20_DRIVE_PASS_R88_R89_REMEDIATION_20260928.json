@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928_V1",
-  "status": "GUARD_PASS_PREVIEW_ARMED",
+  "status": "R88A_SOURCE_FIXED_PENDING_GUARD",
   "recordedAt": "2026-09-28",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -68,14 +68,18 @@
     "priorMeasuredElapsedSeconds": 7.433,
     "rootCause": "Product activation validated identity and membership but still blocked shell readiness on authoritative snapshots for all eight required business collections.",
     "remediation": "Preserve membership/tenant/role/scope validation before shell authority, but require only one route-primary authoritative collection for startup. All configured remaining collections stay attached immediately after primary confirmation as deferred authoritative hydration; router reactive dependencies rerender the active route as those snapshots arrive.",
-    "productBlob": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
+    "productBlob": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
     "invariants": {
       "membershipBeforeData": true,
       "authoritativeFirstRead": true,
       "fullHydrationPreserved": true,
       "noFallback": true,
       "serviceWorkerBlocking": false
-    }
+    },
+    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "correctionRootCause": "productApp calls hydration.contract() before membership is loaded to enumerate the collection universe. The first R88 implementation incorrectly required membership-aware readable() selection in that pre-membership phase and returned no startup collection.",
+    "correction": "Pre-membership contract is enumeration-only and preserves the full configured required+optional universe. Route-primary authoritative startup is selected only inside the store factory after validated membership is available.",
+    "runtimeContractBlob": "a51c7478581e3767b6d669e7a148eec20cc76203"
   },
   "changedProductFiles": [
     "orbit360-platform/data/store-firestore-product-operational-p0.js",
@@ -84,12 +88,12 @@
   ],
   "changedProductBlobs": {
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e",
-    "orbit360-platform/core/product-hydration-required-optional-p0.js": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
-    "orbit360-platform/index.html": "68a2b2d0cccec3b3dea815634a98ba7fecb3f586"
+    "orbit360-platform/core/product-hydration-required-optional-p0.js": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
+    "orbit360-platform/index.html": "75edf2bf0ee9e945c1e503ad10e4eb468822c83a"
   },
   "changedTestFiles": {
-    "tools/gravicentra-i6-5-b2-r15-contract.mjs": "8ca7fa6593583ebbca9cc522e2861713fc14fa29",
-    "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs": "7f843d8304135284acc49006bcec90b3cce4edf6",
+    "tools/gravicentra-i6-5-b2-r15-contract.mjs": "0bc7f8c21724460f4dd3f769be781ce873d6fc15",
+    "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs": "a51c7478581e3767b6d669e7a148eec20cc76203",
     ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "fbb4622ff1666f429fe80d2ef456e8492a05836d"
   },
   "boundaries": {
@@ -101,7 +105,7 @@
   },
   "nextRequiredProof": [
     "CENTRAL_GUARD_PASS",
-    "R20_RUNTIME_CONTRACT_PASS",
+    "R20_RUNTIME_CONTRACT_PASS_INCLUDING_PREMEMBERSHIP_ENUMERATION",
     "NEW_EXACT_B2_PREVIEW_READBACK",
     "R89_OPS_LEADS_COTIZANDO_SYNC_PASS",
     "R88_STARTUP_TIMING_AND_ROUTE_HYDRATION_PASS",
@@ -111,5 +115,16 @@
     "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
   ],
   "guardPassRunId": 36448006084,
-  "sourceFixCommit": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745"
+  "sourceFixCommit": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745",
+  "lastExactPreviewFailure": {
+    "runId": 36448274176,
+    "jobId": 109017337531,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36448274176-9mxjjxfv.web.app",
+    "code": "product_required_hydration_contract_missing",
+    "classification": "R88_REMEDIATION_IMPLEMENTATION_PREMEMBERSHIP_ENUMERATION_GAP",
+    "syntheticWritesBeforeFailure": 0,
+    "cleanupDeleted": 0,
+    "productRegressionBeforeR88Change": false,
+    "driveRegressionDemonstrated": false
+  }
 }
