@@ -159,7 +159,22 @@ try{
   await directModal.locator('#rend-source').fill('B2 QA firme '+suffix);
   await directModal.locator('#rend-doc-file').setInputFiles({name:'b2-r91-firm-'+suffix+'.txt',mimeType:'text/plain',buffer:Buffer.from('GRAVICENTRA B2 R91 firm renewal support '+suffix,'utf8')});
   await directModal.locator('[data-create]').click();
-  const directManagement=await waitFor(async()=>{const s=await dataCol('gestiones').doc(ids.direct).get(),d=s.data()||{};return d.directRenewalPolicyId?d:null;},'B2_R91_DIRECT_RENEWAL_MANAGEMENT_LINK',45000);
+  let directManagement;
+  try{
+    directManagement=await waitFor(async()=>{const snap=await dataCol('gestiones').doc(ids.direct).get(),d=snap.data()||{};return d.directRenewalPolicyId?d:null;},'B2_R91_DIRECT_RENEWAL_MANAGEMENT_LINK',30000);
+  }catch(error){
+    const mg=await dataCol('gestiones').doc(ids.direct).get(),mgd=mg.data()||{};
+    const pq=await dataCol('polizas').where('renuevaDe','==',ids.source).get();
+    const diag=await page.evaluate(({managementId,sourceId})=>{
+      const modal=document.getElementById('ops-direct-renewal-v1201'),source=Orbit.store.get('polizas',sourceId)||{},g=Orbit.store.get('gestiones',managementId)||{};
+      const val=id=>modal?.querySelector(id)?.value||'';
+      const raw={numero:val('#rend-num'),clienteId:source.clienteId,asesorId:source.asesorId,aseguradoraId:val('#rend-asg')||source.aseguradoraId,pais:source.pais,moneda:source.moneda,ramo:source.ramo,subramo:source.subramo||source.producto,producto:val('#rend-prod')||source.producto||source.subramo,estado:'Vigente',vigenciaInicio:val('#rend-start'),vigenciaFin:val('#rend-end'),frecuencia:val('#rend-freq')||source.frecuencia,formaPago:val('#rend-form')||source.formaPago,cuotas:+val('#rend-payments')||1,conducto:val('#rend-conduct')||source.conducto,primaNeta:+val('#rend-net')||0,gastosEmision:+val('#rend-gem')||0,gastosFinan:+val('#rend-gfin')||0,otros:+val('#rend-other')||0,ivaPct:+val('#rend-iva')||0,fuente:'renovacion_en_firme',sourceRef:val('#rend-source'),documentRef:val('#rend-doc'),renuevaDe:source.id,gestionRenovacionId:g.id};
+      let validation=null;try{validation=Orbit.policyReceipts?.validatePolicy?.(raw,'')||null;}catch(e){validation={exception:String(e?.message||e)};}
+      const st=Orbit.store?._productStatus?.()||{};
+      return{modalPresent:!!modal,buttonDisabled:!!modal?.querySelector('[data-create]')?.disabled,buttonText:modal?.querySelector('[data-create]')?.textContent||'',documentRef:val('#rend-doc'),validation,storeManagement:g,storeStatus:{confirmed:st.serverConfirmedCollections||[],missing:st.optionalMissing||[],failed:st.optionalFailed||[]},toasts:[...document.querySelectorAll('.ciclo-toast')].map(x=>x.textContent||'').slice(-5)};
+    },{managementId:ids.direct,sourceId:ids.source});
+    throw new Error('B2_R91_DIRECT_DIAG:'+JSON.stringify({management:{exists:mg.exists,directRenewalPolicyId:mgd.directRenewalPolicyId||'',estado:mgd.estado||'',adjuntos:[].concat(mgd.adjuntos||[]).map(x=>({documentRef:x?.documentRef||'',nombre:x?.nombre||''}))},policies:pq.docs.map(d=>({id:d.id,numero:d.data()?.numero||'',documentRef:d.data()?.documentRef||'',gestionRenovacionId:d.data()?.gestionRenovacionId||''})),ui:diag}));
+  }
   const newPolicyId=clean(directManagement.directRenewalPolicyId,180);
   const newPolicy=await waitFor(async()=>{const s=await dataCol('polizas').doc(newPolicyId).get();return s.exists?s.data():null;},'B2_R91_DIRECT_RENEWAL_POLICY',30000);
   const supportRef=clean(newPolicy.documentRef,180);
