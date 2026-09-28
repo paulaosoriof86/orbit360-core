@@ -2780,7 +2780,7 @@
       "rootCause": "Drive Preview functions attempted to obtain the Google provider OAuth client configuration at runtime. The function service account did not expose the client-secret-bearing Identity Platform config required by providerConfig, and the status path intentionally collapsed that failure to an empty bootstrapClientId.",
       "remediation": "Read the already configured Identity Platform google.com client ID/secret during CI, store the pair in Firebase Functions Secret Manager under a Preview-only secret, and bind only that secret to Preview Drive functions. Do not broaden runtime Firebase Auth IAM and do not touch the production secret.",
       "requiredProof": "Central guard PASS; workflow creates/updates ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW without touching production; Preview Drive functions deploy with explicit secret binding; authenticated status returns non-empty bootstrapClientId while tenant remains unconfigured; then one admin authorization-code bootstrap succeeds and persists.",
-      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R18_DRIVE_OAUTH_CLIENT_SECRET_BINDING_20260928.json",
       "receiptBlobSha": "014d9c0d935991c3ee489add56e5f93db42ef52e",
@@ -2796,7 +2796,10 @@
       "productionSecretTouched": false,
       "noLive": true,
       "noB3": true,
-      "noReimport": true
+      "noReimport": true,
+      "guardPassRunId": 36418111656,
+      "sourceFixCommit": "ac136eea7f317db1b10cf24c6ef21b9d42cfd7e2",
+      "previewArmed": true
     }
   ],
   "phaseBBacklog": [

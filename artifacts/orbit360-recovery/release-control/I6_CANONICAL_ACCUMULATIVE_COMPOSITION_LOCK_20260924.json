@@ -204,7 +204,7 @@
   "lastRemediation": {
     "origin": "AUTHENTICATED_PREVIEW_R18_OAUTH_CLIENT_SECRET_BINDING_20260928",
     "parentHead": "36f44c1cd510716b71cef741f6c76bcc6972e039",
-    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "changedProductFiles": [
       "functions/document-drive-domain.js"
     ],
@@ -244,9 +244,11 @@
     },
     "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R18_DRIVE_OAUTH_CLIENT_SECRET_BINDING_20260928.json",
     "evidenceReceiptBlobSha": "014d9c0d935991c3ee489add56e5f93db42ef52e",
-    "findingLedgerBlobSha": "4e2090e75cbbe9d090b2568957682d63f829c7c6",
+    "findingLedgerBlobSha": "f2c429d947aebb402a223c054a2e479e453f6e6c",
     "noDataReimport": true,
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "candidateHead": "ac136eea7f317db1b10cf24c6ef21b9d42cfd7e2",
+    "guardPassRunId": 36418111656
   }
 }
