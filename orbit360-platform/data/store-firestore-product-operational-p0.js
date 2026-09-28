@@ -193,6 +193,14 @@
       return p.callFunction(GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[{action:action,collection:collection,id:id,payload:action==='remove'?null:clone(payload)}]},'us-central1');
     }).then(function(result){
       if(!workflow||action==='insert')requireServerReadback(result,[{collection:collection,id:id,action:action}]);
+      if(workflow&&collection==='gestiones'&&(action==='insert'||action==='update')&&payload&&Array.isArray(payload.adjuntos)){
+        var docKey=function(x){if(!x||typeof x!=='object')return text(x);return text(x.documentRef||x.fileId||x.archivoRef||x.driveUrl||x.externalUrl||x.url);};
+        var wanted=payload.adjuntos.map(docKey).filter(Boolean).sort();
+        var got=result&&result.managementDocumentReadback&&Array.isArray(result.managementDocumentReadback.documentRefs)?result.managementDocumentReadback.documentRefs.map(text).filter(Boolean).sort():null;
+        if(!got||JSON.stringify(wanted)!==JSON.stringify(got))throw new Error('PRODUCT_WORKFLOW_DOCUMENT_DURABLE_READBACK_REQUIRED');
+        if(Object.prototype.hasOwnProperty.call(payload,'documentoCargaPendiente')&&!!payload.documentoCargaPendiente!==!!result.managementDocumentReadback.documentoCargaPendiente)throw new Error('PRODUCT_WORKFLOW_DOCUMENT_PENDING_READBACK_MISMATCH');
+        if(Array.isArray(payload.documentoCargaFallida)&&payload.documentoCargaFallida.length!==Number(result.managementDocumentReadback.documentoCargaFallidaCount||0))throw new Error('PRODUCT_WORKFLOW_DOCUMENT_FAILURE_READBACK_MISMATCH');
+      }
       state.pending=Math.max(0,state.pending-1);state.committed+=1;state.lastCommittedAt=new Date().toISOString();state.lastError='';
       if(collection==='negocios'&&result&&result.projection&&text(result.projection.clientId)&&pending[collection]&&pending[collection][id]&&pending[collection][id].clienteIdCreado===SERVER_EMISSION_GUARD){pending[collection][id].clienteIdCreado=text(result.projection.clientId);pending[collection][id].clienteId=pending[collection][id].clienteId||text(result.projection.clientId);}
       try{window.dispatchEvent(new CustomEvent('orbit:operational-write:committed',{detail:{collection:collection,id:id,action:action,version:VERSION,serverOwned:true,canonicalReadback:!workflow}}));}catch(e){}
