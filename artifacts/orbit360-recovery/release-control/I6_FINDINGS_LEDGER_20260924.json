@@ -3242,7 +3242,7 @@
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+      "status": "MACHINE_RUNTIME_PASS_PENDING_FINAL_PAULA_VISUAL",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3273,13 +3273,23 @@
         "workflowResolutionFieldParity": true,
         "backendBlobSha": "55ee18efd399bd1b54c00a29f7514de4efa6fb5e",
         "contractBlobSha": "cbd307266abec395f1d158402773ea6f04c57560"
+      },
+      "machineProof": {
+        "status": "PASS",
+        "runId": 36491115133,
+        "exactPreviewSourceSha": "3df446bcbd46add33036ff049956cd94bde103d6",
+        "exactPreviewBuildId": "gi-i65-b2-3df446bcbd46-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36491115133-y4oumlr3.web.app",
+        "artifactId": 11002375024,
+        "artifactDigest": "d9d0bc2358593bcc469f388f094994e4524ac668dc80984043e528e00424e401",
+        "cleanupPending": true
       }
     },
     {
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "MACHINE_RUNTIME_PASS_PENDING_FINAL_PAULA_VISUAL",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3296,13 +3306,23 @@
       "requiredProof": "New exact Preview: validated tariff fixture calculates configured costs; missing/unvalidated tariff remains fail-closed without invented charge.",
       "guardPassRunId": 36466197519,
       "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
-      "previewArmed": true
+      "previewArmed": true,
+      "machineProof": {
+        "status": "PASS",
+        "runId": 36491115133,
+        "exactPreviewSourceSha": "3df446bcbd46add33036ff049956cd94bde103d6",
+        "exactPreviewBuildId": "gi-i65-b2-3df446bcbd46-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36491115133-y4oumlr3.web.app",
+        "artifactId": 11002375024,
+        "artifactDigest": "d9d0bc2358593bcc469f388f094994e4524ac668dc80984043e528e00424e401",
+        "cleanupPending": true
+      }
     },
     {
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "MACHINE_RUNTIME_PASS_PENDING_FINAL_PAULA_VISUAL",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3319,13 +3339,23 @@
       "requiredProof": "New exact Preview: modal opens without page/console errors, button creates one internal canonical issuance management, no false email behavior, canonical visual family.",
       "guardPassRunId": 36466197519,
       "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
-      "previewArmed": true
+      "previewArmed": true,
+      "machineProof": {
+        "status": "PASS",
+        "runId": 36491115133,
+        "exactPreviewSourceSha": "3df446bcbd46add33036ff049956cd94bde103d6",
+        "exactPreviewBuildId": "gi-i65-b2-3df446bcbd46-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36491115133-y4oumlr3.web.app",
+        "artifactId": 11002375024,
+        "artifactDigest": "d9d0bc2358593bcc469f388f094994e4524ac668dc80984043e528e00424e401",
+        "cleanupPending": true
+      }
     },
     {
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "MACHINE_RUNTIME_PASS_PENDING_FINAL_PAULA_VISUAL",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3345,13 +3375,23 @@
       "requiredProof": "New exact Preview: real client shows explicit protected message without false failure; synthetic B2 upload appears and succeeds after tenant provider probe.",
       "guardPassRunId": 36466197519,
       "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
-      "previewArmed": true
+      "previewArmed": true,
+      "machineProof": {
+        "status": "PASS",
+        "runId": 36491115133,
+        "exactPreviewSourceSha": "3df446bcbd46add33036ff049956cd94bde103d6",
+        "exactPreviewBuildId": "gi-i65-b2-3df446bcbd46-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36491115133-y4oumlr3.web.app",
+        "artifactId": 11002375024,
+        "artifactDigest": "d9d0bc2358593bcc469f388f094994e4524ac668dc80984043e528e00424e401",
+        "cleanupPending": true
+      }
     },
     {
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "MACHINE_RUNTIME_PASS_PENDING_FINAL_PAULA_VISUAL",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3368,7 +3408,17 @@
       "requiredProof": "New exact Preview: clients with and without legacy driveLink show unambiguous copy; provider-managed documents do not require manual folder URL.",
       "guardPassRunId": 36466197519,
       "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
-      "previewArmed": true
+      "previewArmed": true,
+      "machineProof": {
+        "status": "PASS",
+        "runId": 36491115133,
+        "exactPreviewSourceSha": "3df446bcbd46add33036ff049956cd94bde103d6",
+        "exactPreviewBuildId": "gi-i65-b2-3df446bcbd46-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36491115133-y4oumlr3.web.app",
+        "artifactId": 11002375024,
+        "artifactDigest": "d9d0bc2358593bcc469f388f094994e4524ac668dc80984043e528e00424e401",
+        "cleanupPending": true
+      }
     }
   ],
   "phaseBBacklog": [

@@ -1888,7 +1888,6 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R91_R92_R93_R94_R95_EXACT_PREVIEW_RUNTIME",
     "R82_CROSS_MODULE_DELETE_FINAL_AUDIT",
     "DRIVE_QA_FIXTURE_CLEANUP",
     "PAULA_TARGETED_FINAL_VISUAL_ONLY_IF_MACHINE_PROOF_PASSES"
@@ -2189,7 +2188,7 @@
     "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL",
     "authenticatedRunId": 36218497058
   },
-  "paulaVisualDecision": "R77_R81_MACHINE_PASS_PRESERVED_R91_RESOLVE_ROOTFIX_PENDING_NEW_EXACT_PREVIEW",
+  "paulaVisualDecision": "R75_R76_R78_R79_R80_R88_R77_R81_MACHINE_PASS_R91_R95_MACHINE_PASS_R82_AUDIT_PENDING",
   "paulaVisualAccepted": false,
   "b3Status": "NOT_STARTED",
   "humanReviewR6": {
@@ -3498,6 +3497,121 @@
     "artifact": {
       "id": 11000650970,
       "digest": "d948b7bc1eb81a2db1671cd4093189b81e235c7de1501e4fc4c6f465f13af588"
+    }
+  },
+  "r91r95RuntimeProof": {
+    "status": "PASS_CLEANUP_PENDING_FINAL_PAULA_VISUAL",
+    "runId": 36491115133,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R91_R95_RUNTIME_PROOF_20260928.json",
+    "exactPreview": {
+      "sourceSha": "3df446bcbd46add33036ff049956cd94bde103d6",
+      "buildId": "gi-i65-b2-3df446bcbd46-57f234755dc1",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36491115133-y4oumlr3.web.app",
+      "previewRunId": 36491115133,
+      "artifactId": 11000159338
+    },
+    "r91": {
+      "status": "PASS",
+      "firmSupportUploaded": true,
+      "canonicalDocumentRef": true,
+      "managementAttachmentLinked": true,
+      "newPolicyDocumentLinked": true,
+      "directRenewalIdempotent": true,
+      "policyIdHash": "61e7d351166df413800b0932f9b12a7839f6c3f2ddbccd645a5eaf41de16371c",
+      "documentRefHash": "8d19058305d5ae6d5c5236e9937852f5a4125306f1665e0c09057ecbd217c7ba",
+      "reloadPass": true
+    },
+    "r92": {
+      "status": "PASS",
+      "validatedTariffApplied": true,
+      "validatedIssuanceExpense": 50,
+      "validatedFinancingExpense": 40,
+      "unvalidatedPreservedSourceCharges": true,
+      "unvalidatedInventedCharge": false
+    },
+    "r93": {
+      "status": "PASS",
+      "canonicalModal": true,
+      "internalOpsLabel": true,
+      "noEmailCopy": true,
+      "requestCreated": true,
+      "requestIdHash": "ed5a9dfc256e7b8fae8c1f8bb7102ed1952b630470a3b4d721c0fdd5c4372206",
+      "externalNotificationSuppressed": true,
+      "reloadPass": true
+    },
+    "r94": {
+      "status": "PASS",
+      "protectedOperationalId": true,
+      "syntheticUploadRuntimePass": true,
+      "providerProbeRuntimePass": true,
+      "protectedCopySourceContract": true
+    },
+    "r95": {
+      "status": "PASS",
+      "legacyFolderClearlyLabeled": true,
+      "canonicalUploadSemantics": true,
+      "historicalFieldOptional": true
+    },
+    "cleanup": {
+      "pending": true,
+      "targets": [
+        {
+          "kind": "client",
+          "id": "b2-r9195-client-36491115133"
+        },
+        {
+          "kind": "legacy",
+          "id": "b2-r95-legacy-36491115133"
+        },
+        {
+          "kind": "protected",
+          "id": "qa-r94-protected-36491115133"
+        },
+        {
+          "kind": "insurer",
+          "id": "b2-r9195-insurer-36491115133"
+        },
+        {
+          "kind": "insurerUnvalidated",
+          "id": "b2-r92-unvalidated-36491115133"
+        },
+        {
+          "kind": "source",
+          "id": "b2-r9195-policy-36491115133"
+        },
+        {
+          "kind": "sourceUnvalidated",
+          "id": "b2-r92-policy-36491115133"
+        },
+        {
+          "kind": "direct",
+          "id": "b2-r9195-renew-36491115133"
+        },
+        {
+          "kind": "issuance",
+          "id": "b2-r93-renew-36491115133"
+        },
+        {
+          "kind": "unvalidated",
+          "id": "b2-r92-renew-36491115133"
+        },
+        {
+          "kind": "policy",
+          "id": "pol_multc4hr"
+        },
+        {
+          "kind": "management",
+          "id": "ges_emi_multby0k"
+        },
+        {
+          "kind": "driveDocumentRef",
+          "id": "1l1XDC3tDEIJzRvwpTgo1O1Fda5tFGE32"
+        }
+      ]
+    },
+    "artifact": {
+      "id": 11002375024,
+      "digest": "d9d0bc2358593bcc469f388f094994e4524ac668dc80984043e528e00424e401"
     }
   }
 }

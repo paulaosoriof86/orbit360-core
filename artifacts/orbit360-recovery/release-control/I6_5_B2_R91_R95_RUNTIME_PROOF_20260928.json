@@ -1,0 +1,139 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R91_R95_RUNTIME_PROOF_20260928_V1",
+  "recordedAt": "2026-09-28T22:22:41.426Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "status": "MACHINE_RUNTIME_PASS_PENDING_FINAL_PAULA_VISUAL",
+  "findings": [
+    "B2-R91-RENEWAL-FIRM-SUPPORT-NO-CANONICAL-DRIVE-UPLOAD-R21",
+    "B2-R92-RENEWAL-TARIFF-COSTS-NOT-AUTO-DERIVED-R21",
+    "B2-R93-RENEWAL-ISSUANCE-MODAL-CRASH-SEMANTIC-VISUAL-R21",
+    "B2-R94-PREVIEW-DOCUMENT-UPLOAD-GUARD-MISLEADING-UX-R21",
+    "B2-R95-CLIENT-DRIVE-LEGACY-VS-CANONICAL-SEMANTICS-R21"
+  ],
+  "exactPreview": {
+    "sourceSha": "3df446bcbd46add33036ff049956cd94bde103d6",
+    "buildId": "gi-i65-b2-3df446bcbd46-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36491115133-y4oumlr3.web.app",
+    "previewRunId": 36491115133,
+    "artifactId": 11000159338
+  },
+  "runtime": {
+    "r91": {
+      "status": "PASS",
+      "firmSupportUploaded": true,
+      "canonicalDocumentRef": true,
+      "managementAttachmentLinked": true,
+      "newPolicyDocumentLinked": true,
+      "directRenewalIdempotent": true,
+      "policyIdHash": "61e7d351166df413800b0932f9b12a7839f6c3f2ddbccd645a5eaf41de16371c",
+      "documentRefHash": "8d19058305d5ae6d5c5236e9937852f5a4125306f1665e0c09057ecbd217c7ba",
+      "reloadPass": true
+    },
+    "r92": {
+      "status": "PASS",
+      "validatedTariffApplied": true,
+      "validatedIssuanceExpense": 50,
+      "validatedFinancingExpense": 40,
+      "unvalidatedPreservedSourceCharges": true,
+      "unvalidatedInventedCharge": false
+    },
+    "r93": {
+      "status": "PASS",
+      "canonicalModal": true,
+      "internalOpsLabel": true,
+      "noEmailCopy": true,
+      "requestCreated": true,
+      "requestIdHash": "ed5a9dfc256e7b8fae8c1f8bb7102ed1952b630470a3b4d721c0fdd5c4372206",
+      "externalNotificationSuppressed": true,
+      "reloadPass": true
+    },
+    "r94": {
+      "status": "PASS",
+      "protectedOperationalId": true,
+      "syntheticUploadRuntimePass": true,
+      "providerProbeRuntimePass": true,
+      "protectedCopySourceContract": true
+    },
+    "r95": {
+      "status": "PASS",
+      "legacyFolderClearlyLabeled": true,
+      "canonicalUploadSemantics": true,
+      "historicalFieldOptional": true
+    },
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  "cleanup": {
+    "pending": true,
+    "targets": [
+      {
+        "kind": "client",
+        "id": "b2-r9195-client-36491115133"
+      },
+      {
+        "kind": "legacy",
+        "id": "b2-r95-legacy-36491115133"
+      },
+      {
+        "kind": "protected",
+        "id": "qa-r94-protected-36491115133"
+      },
+      {
+        "kind": "insurer",
+        "id": "b2-r9195-insurer-36491115133"
+      },
+      {
+        "kind": "insurerUnvalidated",
+        "id": "b2-r92-unvalidated-36491115133"
+      },
+      {
+        "kind": "source",
+        "id": "b2-r9195-policy-36491115133"
+      },
+      {
+        "kind": "sourceUnvalidated",
+        "id": "b2-r92-policy-36491115133"
+      },
+      {
+        "kind": "direct",
+        "id": "b2-r9195-renew-36491115133"
+      },
+      {
+        "kind": "issuance",
+        "id": "b2-r93-renew-36491115133"
+      },
+      {
+        "kind": "unvalidated",
+        "id": "b2-r92-renew-36491115133"
+      },
+      {
+        "kind": "policy",
+        "id": "pol_multc4hr"
+      },
+      {
+        "kind": "management",
+        "id": "ges_emi_multby0k"
+      },
+      {
+        "kind": "driveDocumentRef",
+        "id": "1l1XDC3tDEIJzRvwpTgo1O1Fda5tFGE32"
+      }
+    ]
+  },
+  "boundaries": {
+    "syntheticWritesOnly": true,
+    "realBusinessMutation": false,
+    "productionHosting": false,
+    "b3": false,
+    "reimport": false,
+    "emailSend": false,
+    "cleanupMandatory": true
+  },
+  "artifact": {
+    "id": 11002375024,
+    "digest": "d9d0bc2358593bcc469f388f094994e4524ac668dc80984043e528e00424e401"
+  },
+  "nextRequiredProof": "R82_CROSS_MODULE_DELETE_FINAL_AUDIT"
+}

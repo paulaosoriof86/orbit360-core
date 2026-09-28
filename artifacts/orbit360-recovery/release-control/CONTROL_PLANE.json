@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_AUTHENTICATED_PREVIEW_PASS_PENDING_VISUAL",
+    "mechanismSyncStatus": "B2_R91_R95_MACHINE_RUNTIME_PASS_R82_PENDING",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "499362cde8257664a4ce3a5bf5357605f241f456",
+    "b2ExecutionLockBlobSha": "7ea9a3123003285aeef5c298c73e82c1d04c77a5",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2162,13 +2162,13 @@
       "technicalPassHistoricalPreserved": true,
       "authenticatedPassHistoricalPreserved": true,
       "syntheticCleanupHistoricalPreserved": true,
-      "paulaVisualDecision": "R77_R81_MACHINE_PASS_PRESERVED_R91_RESOLVE_ROOTFIX_PENDING_NEW_EXACT_PREVIEW",
+      "paulaVisualDecision": "R75_R76_R78_R79_R80_R88_R77_R81_MACHINE_PASS_R91_R95_MACHINE_PASS_R82_AUDIT_PENDING",
       "paulaVisualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
       "paulaVisualRejectionReceiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "R91 runtime proved policy+Drive persisted but renewal closure IDs were dropped by resolve_management. Backend field-parity fix armed for a new exact Preview. No LIVE, no B3, no reimport.",
+      "boundaryNote": "R91-R95 exact Preview runtime PASS. Synthetic QA rows/files remain pending ordered cleanup after R82. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2251,7 +2251,7 @@
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
       "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
       "insurerStableEditRuntimePass": true,
-      "findingLedgerBlobSha": "36aa04d2e91467fd33eed2531f82b994294c3e20",
+      "findingLedgerBlobSha": "e234f3695908d382ddfedab7f8be506af316347e",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
@@ -2780,7 +2780,12 @@
       "r77R81ReceiptBlobSha": "2da0142cdde81689629dfeae04c3ea86b215f74b",
       "r91ResolveRootfixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R91_RESOLVE_WORKFLOW_FIELD_PARITY_ROOTFIX_20260928.json",
       "r91ResolveRootfixReceiptBlobSha": "2d3c99c62f214bdfbd85b0222e84ee218239bbc6",
-      "r91ResolveRootfixSourceHead": "e70242ceadcedfaacc3ababb7a545a7645bf531f"
+      "r91ResolveRootfixSourceHead": "e70242ceadcedfaacc3ababb7a545a7645bf531f",
+      "r91R95MachineRuntimePass": true,
+      "r91R95ProofRunId": 36491115133,
+      "r91R95ProofArtifactId": 11002375024,
+      "r91R95CleanupPending": true,
+      "r91R95ReceiptBlobSha": "fe1bc57b20284ad7572d00159034a53c02761c9c"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2913,7 +2918,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "b30177f9498c472ef735b264a40e2bb707294571",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "36aa04d2e91467fd33eed2531f82b994294c3e20",
+    "findingLedgerBlobSha": "e234f3695908d382ddfedab7f8be506af316347e",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B2",
@@ -2925,7 +2930,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_BUILD_NEW_EXACT_PREVIEW_AFTER_R91_RESOLVE_ROOTFIX"
+    "nextAction": "B2_R82_CROSS_MODULE_DELETE_FINAL_AUDIT"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
