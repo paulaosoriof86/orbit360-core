@@ -2479,15 +2479,15 @@
       "classification": "PRODUCT_DEFECT_FALSE_DOCUMENT_PERSISTENCE",
       "blocking": true,
       "finding": "Management request UI offers file attachment.",
-      "rootCause": "solicitarGestion explicitly stores only file name/size in adjuntos and does not persist binary/document repository reference.",
+      "rootCause": "Canonical Ops/Leads backend omitted adjuntos, documentoCargaPendiente and documentoCargaFallida from management create/update allowlists; the browser workflow writer kept optimistic attachment state without a discriminating server document readback.",
       "requiredProof": "Attached support is durably stored in the approved documentary repository, linked by metadata/provenance to the gestion, opens after reload, and does not expose a false upload success.",
-      "status": "PREVIEW_REAL_CLIENT_WRITE_EXPECTED_DENIAL_SYNTHETIC_UPLOAD_PROOF_PENDING",
+      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
       "noReimport": true,
-      "sourceFixDate": "2026-09-27",
-      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "sourceFixDate": "2026-09-28",
+      "sourceCandidateSha": "8af4f889175b6c59770b6f4626607af629b1470e",
       "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
       "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
       "closureState": "NOT_CLOSED",
@@ -2505,7 +2505,16 @@
         "remainingProof": "Synthetic B2 upload + durable provider readback + management/client documentary linkage + cleanup."
       },
       "r21ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
-      "r21ReceiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4"
+      "r21ReceiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
+      "causalFix": {
+        "backendMutableFields": true,
+        "backendCreateFields": true,
+        "managementDocumentReadback": true,
+        "browserDurableDocumentGuard": true,
+        "backendBlobSha": "4ccb34e39fbaafc58e2c810b47213aad1ea47ac6",
+        "storeBlobSha": "01d658668295cc7301193d80fde7a31dd13f588e",
+        "contractBlobSha": "e7f1e4e7b72f72afc6a38f223544d2cf097e6642"
+      }
     },
     {
       "id": "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
@@ -2617,7 +2626,7 @@
       "finding": "Cliente360 offers Importar a este expediente and documentary mode claims files are stored/visible.",
       "rootCause": "importa.js documentary path advances directly to completion and performs no durable raw-file storage write; intelligent mode extracts data but does not retain the raw document.",
       "requiredProof": "Client document upload stores the raw file in the approved documentary repository (Drive), records durable link/provenance in the client expediente, survives reload, and remains distinct from data extraction proposals.",
-      "status": "PREVIEW_REAL_CLIENT_WRITE_EXPECTED_DENIAL_SYNTHETIC_UPLOAD_PROOF_PENDING",
+      "status": "SYNTHETIC_UPLOAD_PARTIAL_PASS_RELOAD_PROOF_PENDING_NEW_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
@@ -2645,7 +2654,14 @@
         "remainingProof": "Synthetic B2 upload + durable provider readback + management/client documentary linkage + cleanup."
       },
       "r21ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
-      "r21ReceiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4"
+      "r21ReceiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
+      "lastRuntimeObservation": {
+        "runId": 36472554384,
+        "clientUpload": true,
+        "durableClientLink": true,
+        "managementPhaseFailedLater": true,
+        "notFinalPass": true
+      }
     },
     {
       "id": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
@@ -3624,6 +3640,12 @@
       "failedStrengtheningRunId": 36258613932,
       "classification": "HARNESS_PROOF_ASSUMPTION_CORRECTED",
       "productRegressionDemonstrated": false
+    }
+  },
+  "currentMachineProof": {
+    "r77r81": {
+      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+      "sourceCandidateSha": "8af4f889175b6c59770b6f4626607af629b1470e"
     }
   }
 }

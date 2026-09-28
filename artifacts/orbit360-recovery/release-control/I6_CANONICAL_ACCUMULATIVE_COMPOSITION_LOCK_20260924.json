@@ -114,7 +114,7 @@
     "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "682941c99f0a6cf401f87ff413a426245996bad9",
-    "functions/product-ops-leads-domain.js": "b3d01b7502d1d82270e411672d8803575398b669",
+    "functions/product-ops-leads-domain.js": "4ccb34e39fbaafc58e2c810b47213aad1ea47ac6",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "e4b602b4abb26fcd3d9413b1ab9bb67998be78dd",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -150,7 +150,7 @@
     "orbit360-platform/core/tenant-domain-config-client.js": "89bff4ac9131ff5805ffe96ee8d6ccd4927a84dc",
     "orbit360-platform/core/user-onboarding.js": "bf645951a23491ce53d2034ba4281d965cbb326d",
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
-    "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "01d658668295cc7301193d80fde7a31dd13f588e",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "75edf2bf0ee9e945c1e503ad10e4eb468822c83a",
@@ -204,7 +204,7 @@
   "lastRemediation": {
     "origin": "PAULA_UAT_R21_RENEWAL_DOCUMENTARY_AND_VISUAL_20260928",
     "parentHead": "7b0baba33d1c0f2532ec0232e2bd6f567fd9cd8c",
-    "status": "GUARD_PASS_PREVIEW_ARMED",
+    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
     "changedProductFiles": [
       "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
       "orbit360-platform/core/importa.js",
@@ -220,7 +220,7 @@
     "changedContractFiles": [
       "tools/gravicentra-i6-5-b2-r15-contract.mjs"
     ],
-    "contractBlobSha": "9435c03377e6a9ad2dcff65b50c3b33140dd62b4",
+    "contractBlobSha": "e7f1e4e7b72f72afc6a38f223544d2cf097e6642",
     "visuallyClosedFindings": [
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -259,6 +259,16 @@
     "noLive": true,
     "noB3": true,
     "candidateHead": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
-    "guardPassRunId": 36466197519
+    "guardPassRunId": 36466197519,
+    "id": "B2-R77-DURABLE-DRIVE-ATTACHMENT-BACKEND-ROOTFIX-20260928",
+    "sourceHead": "8af4f889175b6c59770b6f4626607af629b1470e",
+    "causalFindingId": "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+    "rootCause": "Ops canonical backend filtered adjuntos/documentoCargaPendiente/documentoCargaFallida from create/update; browser workflow update path did not discriminate durable document readback, allowing optimistic UI state to diverge from Firestore.",
+    "fixFiles": {
+      "functions/product-ops-leads-domain.js": "4ccb34e39fbaafc58e2c810b47213aad1ea47ac6",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "01d658668295cc7301193d80fde7a31dd13f588e"
+    },
+    "contractFile": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+    "noReimport": true
   }
 }

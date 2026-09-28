@@ -1,0 +1,56 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R77_DURABLE_BACKEND_ROOTFIX_20260928_V1",
+  "recordedAt": "2026-09-28T19:40:13.401Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+  "findingId": "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+  "failedRuntimeRuns": [
+    {
+      "runId": 36471719837,
+      "classification": "QA_HARNESS_CLIENT_ID_TYPO_NO_PRODUCT_VERDICT"
+    },
+    {
+      "runId": 36472176624,
+      "classification": "QA_ORPHAN_DRIVE_FOLDER_GUARD_NO_PRODUCT_VERDICT"
+    },
+    {
+      "runId": 36472554384,
+      "classification": "QA_HARNESS_ADVISOR_ID_TYPO_R81_PARTIAL_ONLY"
+    },
+    {
+      "runId": 36472934760,
+      "classification": "PRODUCT_CAUSE_PROVEN_R77_MANAGEMENT_ATTACHMENT_NOT_DURABLE"
+    }
+  ],
+  "rootCause": "Canonical Ops/Leads backend omitted adjuntos, documentoCargaPendiente and documentoCargaFallida from management create/update allowlists; the browser workflow writer kept optimistic attachment state without a discriminating server document readback.",
+  "fix": {
+    "sourceHead": "8af4f889175b6c59770b6f4626607af629b1470e",
+    "files": {
+      "backendMutableFields": true,
+      "backendCreateFields": true,
+      "managementDocumentReadback": true,
+      "browserDurableDocumentGuard": true,
+      "backendBlobSha": "4ccb34e39fbaafc58e2c810b47213aad1ea47ac6",
+      "storeBlobSha": "01d658668295cc7301193d80fde7a31dd13f588e",
+      "contractBlobSha": "e7f1e4e7b72f72afc6a38f223544d2cf097e6642"
+    },
+    "managementFields": [
+      "adjuntos",
+      "documentoCargaPendiente",
+      "documentoCargaFallida"
+    ],
+    "falseOptimisticSuccessGuard": "PRODUCT_WORKFLOW_DOCUMENT_DURABLE_READBACK_REQUIRED"
+  },
+  "preserved": {
+    "r81PartialRuntimeEvidence": true,
+    "priorUnaffectedPasses": true
+  },
+  "boundaries": {
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "oldCertifiedArtifactNotPatched": true
+  }
+}
