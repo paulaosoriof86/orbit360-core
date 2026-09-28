@@ -24,6 +24,8 @@ const siniestros=read('orbit360-platform/modules/siniestros.js');
 const cancelaciones=read('orbit360-platform/modules/cancelaciones.js');
 const comisiones=read('orbit360-platform/modules/comisiones.js');
 const issuanceBridge=read('orbit360-platform/modules/issuance-endosos-v1201-bridge.js');
+const equipo=read('orbit360-platform/modules/equipo.js');
+const aseguradoras=read('orbit360-platform/modules/aseguradoras.js');
 
 has(idx,'core/record-delete.js?v=20260927-b2r15','R15_DELETE_OWNER_NOT_COMPOSED');
 has(idx,'core/product-drive-document-provider-p0.js?v=20260927-b2r15','R15_DRIVE_PROVIDER_NOT_COMPOSED');
@@ -78,6 +80,14 @@ has(siniestros,"Orbit.recordDelete.remove('reclamos'","R82_SINIESTROS_DELETE_ENT
 has(cancelaciones,"Orbit.recordDelete.remove('cancelaciones'","R82_CANCELACIONES_DELETE_ENTRYPOINT_MISSING");
 has(comisiones,"Orbit.recordDelete.remove('comisiones'","R82_COMISIONES_DELETE_ENTRYPOINT_MISSING");
 has(c360,"Orbit.recordDelete.remove('clientes'","R82_CLIENT_DELETE_ENTRYPOINT_MISSING");
+has(policy,"Orbit.recordDelete.remove('polizas'","R82_POLICY_DELETE_ENTRYPOINT_MISSING");
+has(policy,"Orbit.recordDelete.remove('vehiculos'","R82_VEHICLE_DELETE_ENTRYPOINT_MISSING");
+has(ciclo,"Orbit.recordDelete.remove('gestiones'","R82_MANAGEMENT_DELETE_ENTRYPOINT_MISSING");
+has(ciclo,"Orbit.recordDelete.remove('negocios'","R82_LEAD_DELETE_ENTRYPOINT_MISSING");
+has(equipo,'Eliminar usuario','R82_TEAM_DELETE_ENTRYPOINT_MISSING');
+has(equipo,'deleteReason','R82_TEAM_DELETE_AUDIT_MISSING');
+has(aseguradoras,'borrarOdesactivar','R82_INSURER_DELETE_ENTRYPOINT_MISSING');
+has(aseguradoras,'auditoría EXTERNA antes de eliminar','R82_INSURER_DELETE_AUDIT_MISSING');
 
 has(issuanceBridge,"Crear solicitud de emisión en Ops",'R93_RENEWAL_ISSUANCE_INTERNAL_OPS_LABEL_MISSING');
 has(issuanceBridge,"no envía correo ni crea todavía la nueva póliza",'R93_RENEWAL_ISSUANCE_SEMANTICS_COPY_MISSING');
