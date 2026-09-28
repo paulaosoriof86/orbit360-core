@@ -1512,7 +1512,7 @@ jobs:
           set -euo pipefail
           node - <<'NODE'
           const fs=require('node:fs'),crypto=require('node:crypto');let sa=null;
-          for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id==='ays-orbit-360-lab'&&x?.private_key){sa=x;break;}}catch{}}
+          for(const k of ['SA_ORBIT360_LAB','SA_DEFAULT','SA_ORBIT_360_LAB']){try{const x=JSON.parse(process.env[k]||'');if(x?.type==='service_account'&&x?.project_id==='ays-orbit-360-lab'&&x?.private_key){sa=x;break;}}catch{}}
           if(!sa)throw new Error('I65_APPLY_SERVICE_ACCOUNT_NOT_FOUND');
           fs.writeFileSync(process.env.I65_APPLY_PUBLIC_KEY,crypto.createPublicKey(sa.private_key).export({type:'spki',format:'pem'}).toString());
           NODE
