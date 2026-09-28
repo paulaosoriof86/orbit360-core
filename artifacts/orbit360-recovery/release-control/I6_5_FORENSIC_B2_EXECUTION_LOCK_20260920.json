@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -352,7 +352,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PASS",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "3df446bcbd46add33036ff049956cd94bde103d6",
     "exactPreviewBuildId": "gi-i65-b2-3df446bcbd46-57f234755dc1",
@@ -420,24 +420,24 @@
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
-    "runId": 36473871933,
+    "runId": 36491115133,
     "scope": {
       "operativo": "all",
       "asesor": "own",
       "asesorLeakCount": 0,
       "operativoCounts": {
-        "clientes": 443,
-        "polizas": 1416,
-        "recibosEsperados": 1868,
-        "carteraPrimas": 1309,
+        "clientes": 454,
+        "polizas": 1425,
+        "recibosEsperados": 1874,
+        "carteraPrimas": 1315,
         "asesores": 7,
         "metas": 3
       },
       "asesorCounts": {
-        "clientes": 396,
-        "polizas": 1239,
-        "recibosEsperados": 1663,
-        "carteraPrimas": 1168,
+        "clientes": 407,
+        "polizas": 1248,
+        "recibosEsperados": 1669,
+        "carteraPrimas": 1174,
         "asesores": 1,
         "metas": 3
       }
@@ -448,9 +448,9 @@
       "individualReceiptPortfolioSync": true,
       "reportedPaymentVisible": true,
       "reportedPaymentDoesNotFabricateCobro": true,
-      "clientIdHash": "28807de2b86bfe70e96bfcbbfb43fe1bbe4193cfdc4a4bdd4bf8036add4591da",
-      "policyIdHash": "c0b3cae8a55891e170bc3d58589b7b64729fe4a87c85541da2aff55f9476afa3",
-      "vehicleIdHash": "ae203c9e53c1e11f139678a7337a8b25cd9a106cb5401318de098b0e7b42b384",
+      "clientIdHash": "e8c2bc05a8237a94d0ca021c88793fe5b2226f872aa5bf7f72262f3d931ad7a0",
+      "policyIdHash": "86b17767c34d92ed24c900f51b9303bb46d44b08451f959ccee3dd8f6268618e",
+      "vehicleIdHash": "3dd7475c566b7d25136f05e1db5cbe0d073413118a735121f65fd50aa28bae0a",
       "clientCreateReadback": true,
       "clientEditReadback": true,
       "policyCreateReadback": true,
@@ -466,8 +466,8 @@
       "dirtyBackdropProtected": true
     },
     "renewal": {
-      "requestIdHash": "e14968900be913ff5c4143a08e2a634bdc649459de345fa41a4b1abc5fa6d635",
-      "newPolicyIdHash": "1147a87acf5e1eed1f37a77ef73986c6071c686ee8b823fb46374a33f6011b18",
+      "requestIdHash": "3200a1e49b1f2fd65b4602be79974e46dd15397ce4c4bc99fd05f9bc1eca3663",
+      "newPolicyIdHash": "e7e8bb9daa8bfa0afb4b753f4621b067a3053694ff2e1200ebe2abf1a5de5774",
       "sourceLink": true,
       "receipts": 2,
       "portfolio": 2,
