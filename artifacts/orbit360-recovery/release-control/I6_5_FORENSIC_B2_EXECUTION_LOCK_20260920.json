@@ -259,8 +259,8 @@
   },
   "candidate": {
     "status": "CANDIDATE_PENDING_PREVIEW",
-    "sourceCandidateSha": "146e04adf7e1573c92abd5dae2e266528d68110a",
-    "governanceHeadBeforeCandidateArm": "06378fefe7fb250d70db19c80ece0febd5b23286",
+    "sourceCandidateSha": "8b9da11fb8acb0a9a7d5d9dc2f5b0599f43d660c",
+    "governanceHeadBeforeCandidateArm": "8b9da11fb8acb0a9a7d5d9dc2f5b0599f43d660c",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "b30177f9498c472ef735b264a40e2bb707294571",
     "productFileCount": 69,
@@ -292,7 +292,7 @@
     "humanDownloadRetestRequired": false,
     "tenantBootstrapRequired": true,
     "routineUserGoogleOAuth": false,
-    "sourceFixCommitPendingArm": true
+    "sourceFixCommitPendingArm": false
   },
   "preview": {
     "sourceSha": "126317b3eb01e56f900ba4b89c8f58f95685dca7",
@@ -3028,7 +3028,7 @@
     "findingId": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
     "decisionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
     "decisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
-    "status": "PREVIEW_VAULT_CONTEXT_SOURCE_FIXED_PENDING_GUARD",
+    "status": "PREVIEW_VAULT_CONTEXT_GUARD_PASS_PREVIEW_ARMED",
     "perUserOAuthProductive": false,
     "tenantPersistentBackendAuthorityRequired": true,
     "routineUserGooglePromptAllowed": false,
@@ -3037,12 +3037,12 @@
     "noReimport": true,
     "noLive": true,
     "noB3": true,
-    "sourceFixCommit": "146e04adf7e1573c92abd5dae2e266528d68110a",
+    "sourceFixCommit": "8b9da11fb8acb0a9a7d5d9dc2f5b0599f43d660c",
     "productFileCount": 69,
     "credentialStore": "SecretManager",
     "tenantBootstrapRequired": true,
-    "guardPassRunId": 36363485578,
-    "previewArmed": false,
+    "guardPassRunId": 36366524357,
+    "previewArmed": true,
     "managementSessionOauthRemoved": true,
     "previewVaultIsolated": true,
     "previewVaultPattern": "orbit360-drive-oauth-preview-{tenant}",
@@ -3057,6 +3057,6 @@
     "previewFunctionRegion": "us-east1",
     "previewFunctionRevision": "orbit360documentdrivestatuspreview-00007-poy",
     "productionSecretTouched": false,
-    "sourceFixCommitPendingArm": true
+    "sourceFixCommitPendingArm": false
   }
 }
