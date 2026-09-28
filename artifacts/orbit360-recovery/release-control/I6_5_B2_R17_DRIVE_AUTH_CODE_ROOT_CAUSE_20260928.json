@@ -1,0 +1,60 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928_V1",
+  "status": "SOURCE_FIXED_PENDING_GUARD",
+  "recordedAt": "2026-09-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "parentHead": "0752c80dc5d5dcf9596313c0cb525e8fc155ba6b",
+  "trigger": "PAULA_MOBILE_UAT_20260928",
+  "observed": {
+    "accountsTried": 2,
+    "userMessage": "Google no entregó autorización persistente. La conexión no se guardó.",
+    "tenantBootstrapCompleted": false,
+    "browserGoogleAccountSelectionObserved": true
+  },
+  "rootCause": {
+    "classification": "ARCHITECTURE_DEFECT_FIREBASE_AUTH_POPUP_CANNOT_SUPPLY_GOOGLE_DRIVE_OFFLINE_REFRESH_CREDENTIAL",
+    "detail": "The bootstrap used Firebase Authentication signInWithPopup and attempted to read a Google OAuth refresh token from Firebase's _tokenResponse. That flow is an authentication/provider access-token flow and does not provide the server-side Google OAuth refresh credential required for durable Drive access.",
+    "priorAssumptionInvalidated": true
+  },
+  "remediation": {
+    "model": "GOOGLE_OAUTH_AUTHORIZATION_CODE_BACKEND_EXCHANGE",
+    "browserReceives": "short_lived_authorization_code_only",
+    "browserRefreshTokenAllowed": false,
+    "backendExchange": "https://oauth2.googleapis.com/token",
+    "backendCredentialSource": "Identity Platform google.com provider clientId/clientSecret",
+    "persistentSecret": "Secret Manager tenant vault",
+    "routineUsersGooglePrompt": false,
+    "changedProductFiles": [
+      "orbit360-platform/core/product-drive-document-provider-p0.js",
+      "functions/document-drive-domain.js"
+    ],
+    "changedContractFiles": [
+      "tools/gravicentra-i6-5-b2-r15-contract.mjs"
+    ],
+    "productBlobs": {
+      "orbit360-platform/core/product-drive-document-provider-p0.js": "30f84e48d94a728c71471902134b0cd657f61a4a",
+      "functions/document-drive-domain.js": "432b41db61d6d73318d52447285d554052bf9088"
+    },
+    "contractBlob": "bda9236f62614932b0628a6a4c6ae7d517df8330"
+  },
+  "boundaries": {
+    "livePromotion": false,
+    "productionSecretTouched": false,
+    "dataReimport": false,
+    "businessDataMutation": false,
+    "b3Open": false,
+    "sameFirebaseProject": true
+  },
+  "nextRequiredProof": [
+    "CENTRAL_GUARD_PASS",
+    "NEW_EXACT_B2_PREVIEW_READBACK",
+    "R85_ADMIN_AUTHORIZATION_CODE_BOOTSTRAP_AND_SECRET_READBACK",
+    "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_AUTHORIZED_VIEW_DOWNLOAD_UPLOAD",
+    "R84_ACTIVE_ROLE_SCOPE_AND_CROSS_SCOPE_DENIAL",
+    "R77_R81_CANONICAL_PROVIDER_PROOF",
+    "DRIVE_QA_FIXTURE_CLEANUP",
+    "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
+  ]
+}

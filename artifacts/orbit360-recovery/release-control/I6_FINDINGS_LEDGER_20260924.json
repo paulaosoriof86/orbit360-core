@@ -2653,7 +2653,7 @@
       "rootCause": "product-drive-document-provider-p0.js forces Google prompt=consent and memory_only token persistence; document-drive-domain.js requires googleAccessToken from the browser for status/upload. The same model would repeat in LIVE.",
       "remediation": "Replace routine per-user OAuth with persistent tenant-level backend Drive integration. Gravicentra role/scope becomes the authorization boundary; Drive credential remains backend-only.",
       "requiredProof": "one-time tenant bootstrap succeeds and readback persists; fresh user browser has zero Google consent/account selection; authorized client document read/download/upload works by active role/scope; cross-scope access denied; no Drive token in browser storage; Preview synthetic isolation preserved; audit receipt present; cleanup synthetic fixture",
-      "status": "GUARD_PASS_PREVIEW_ARMED_BOOTSTRAP_SURFACE",
+      "status": "R85_CAUSAL_SUCCESSOR_SOURCE_FIXED_PENDING_GUARD",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
       "receiptBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
       "noLive": true,
@@ -2672,7 +2672,7 @@
         "orbit360-platform/modules/cliente360.js",
         "orbit360-platform/core/ciclo.js"
       ],
-      "authModel": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER",
+      "authModel": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER_AUTHORIZATION_CODE",
       "routineUserGoogleOAuth": false,
       "bootstrapRequiredOnce": true,
       "closureState": "NOT_CLOSED",
@@ -2721,7 +2721,49 @@
       },
       "guardPassRunId": 36413998564,
       "guardPass": true,
-      "previewArmed": true
+      "previewArmed": true,
+      "latestBootstrapFailure": {
+        "date": "2026-09-28",
+        "userEvidence": "PAULA_MOBILE_UAT_TWO_GOOGLE_ACCOUNTS",
+        "code": "BOOTSTRAP_REFRESH_TOKEN_MISSING",
+        "message": "Google no entregó autorización persistente. La conexión no se guardó.",
+        "tenantBootstrapCompleted": false
+      },
+      "causalSuccessorId": "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
+      "browserDriveTokenAllowed": false,
+      "browserRefreshTokenAllowed": false
+    },
+    {
+      "id": "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
+      "block": "B2",
+      "source": "PAULA_MOBILE_UAT_20260928",
+      "surface": "Cliente360/Documentos/GoogleDrive/TenantBootstrap",
+      "classification": "PRODUCT_ARCHITECTURE_DEFECT_WRONG_OAUTH_FLOW_FOR_OFFLINE_DRIVE_AUTHORITY",
+      "blocking": true,
+      "finding": "The one-time tenant bootstrap completed Google account selection/consent but Firebase Auth signInWithPopup did not return a Google Drive refresh token, so the persistent tenant connection could not be stored.",
+      "rootCause": "The browser bootstrap used Firebase Authentication GoogleAuthProvider and inspected Firebase _tokenResponse for oauthRefreshToken. Durable Google Drive authority requires an OAuth authorization-code flow with backend code exchange; refresh tokens are not a browser authentication credential.",
+      "remediation": "Use Google Identity Services authorization-code popup. Browser receives only a short-lived authorization code. Authenticated backend validates tenant/admin role and Preview origin, exchanges the code using the existing Identity Platform Google provider client ID/secret, verifies Drive/root-folder access, and stores only the refresh token in the tenant Secret Manager vault.",
+      "requiredProof": "On one new exact Preview, Dirección performs one administrative authorization; backend returns configured=true and Secret Manager readback survives reload; fresh routine-user sessions receive zero Google account/consent prompts; authorized view/download/upload pass; cross-scope denial passes; no Google access or refresh token exists in browser storage.",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "closureState": "NOT_CLOSED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928.json",
+      "receiptBlobSha": "2cc9f9d70d4bca863b2c1ab60f996f1310c7721f",
+      "changedProductFiles": [
+        "orbit360-platform/core/product-drive-document-provider-p0.js",
+        "functions/document-drive-domain.js"
+      ],
+      "productBlobs": {
+        "orbit360-platform/core/product-drive-document-provider-p0.js": "30f84e48d94a728c71471902134b0cd657f61a4a",
+        "functions/document-drive-domain.js": "432b41db61d6d73318d52447285d554052bf9088"
+      },
+      "contractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "contractBlobSha": "bda9236f62614932b0628a6a4c6ae7d517df8330",
+      "browserRefreshTokenAllowed": false,
+      "routineUserGoogleOAuth": false,
+      "backendPersistent": true,
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [

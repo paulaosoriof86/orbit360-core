@@ -11,7 +11,7 @@ const { __opsLeadsProductDomain } = require('./product-ops-leads-domain');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'gravicentra-drive-document-domain-v2-r84-tenant-persistent';
+const VERSION = 'gravicentra-drive-document-domain-v3-r85-auth-code-backend-exchange';
 const PROJECT_ID = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'ays-orbit-360-lab';
 const SERVICE_ACCOUNT = process.env.ORBIT360_SECRETS_SERVICE_ACCOUNT || 'orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com';
 const ROOT_BY_TENANT = Object.freeze({
@@ -102,6 +102,33 @@ async function providerConfig(){
     throw new HttpsError('failed-precondition','La configuración administrativa de Google no está disponible para la integración Drive.');
   }
   return{clientId:clean(body.clientId,1000),clientSecret:clean(body.clientSecret,2000)};
+}
+function oauthRedirectUri(value,previewOnly){
+  const raw=clean(value,1200);
+  let u;try{u=new URL(raw);}catch(e){throw new HttpsError('invalid-argument','Origen OAuth inválido.');}
+  const host=String(u.hostname||'').toLowerCase();
+  const preview=/^ays-orbit-360-lab--[a-z0-9-]+\.web\.app$/.test(host);
+  const live=host==='ays-orbit-360-lab.web.app'||host==='ays-orbit-360-lab.firebaseapp.com';
+  if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash||(previewOnly===true?!preview:!live)){
+    throw new HttpsError('permission-denied','Origen OAuth fuera del entorno autorizado.');
+  }
+  return u.origin;
+}
+async function authorizationCodeTokens(code,redirectUri,previewOnly){
+  const authorizationCode=clean(code,8192);
+  if(!authorizationCode)throw new HttpsError('invalid-argument','Código de autorización de Google requerido.');
+  const cfg=await providerConfig(),safeRedirect=oauthRedirectUri(redirectUri,previewOnly);
+  const form=new URLSearchParams({client_id:cfg.clientId,client_secret:cfg.clientSecret,code:authorizationCode,redirect_uri:safeRedirect,grant_type:'authorization_code'});
+  const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:form});
+  const body=await r.json().catch(()=>({}));
+  if(!r.ok||!clean(body.access_token,4096)){
+    throw new HttpsError('failed-precondition','Google no pudo completar la conexión persistente con Drive.',{oauthError:clean(body.error||body.error_description||r.status,300)});
+  }
+  const refreshToken=clean(body.refresh_token,4096);
+  if(!refreshToken){
+    throw new HttpsError('failed-precondition','Google autorizó Drive pero no emitió credencial persistente. Debe repetirse la autorización con consentimiento completo.',{oauthError:'refresh_token_missing'});
+  }
+  return{accessToken:clean(body.access_token,4096),refreshToken,redirectUri:safeRedirect};
 }
 async function accessTokenFromRefresh(refreshToken){
   const cfg=await providerConfig();
@@ -232,9 +259,9 @@ async function bootstrap(request,previewOnly){
   const tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
   const actor=await __productOperationalDomain.authorizeRead(request,tenantId,'clientes');
   if(!BOOTSTRAP_ROLES.has(norm(actor.activeRole)))throw new HttpsError('permission-denied','Solo Dirección o administración del tenant puede configurar Drive.');
-  const refreshToken=clean(input.oauthRefreshToken,4096);
-  if(!refreshToken)throw new HttpsError('failed-precondition','DRIVE_REFRESH_TOKEN_REQUIRED');
-  const accessToken=await accessTokenFromRefresh(refreshToken);
+  if(clean(input.oauthRefreshToken,4096))throw new HttpsError('invalid-argument','La credencial persistente de Drive no puede ingresar desde el navegador.');
+  const tokens=await authorizationCodeTokens(input.authorizationCode,input.redirectUri,previewOnly);
+  const accessToken=tokens.accessToken,refreshToken=tokens.refreshToken;
   const rootId=ROOT_BY_TENANT[tenantId];
   const [user,root]=await Promise.all([driveIdentity(accessToken),getMeta(rootId,accessToken)]);
   if(!root||root.mimeType!=='application/vnd.google-apps.folder')throw new HttpsError('failed-precondition','La carpeta Clientes configurada no está disponible.');
@@ -249,12 +276,19 @@ async function status(request,previewOnly){
   const input=request.data||{};
   const tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
   if(!request.auth||!request.auth.uid)return{ok:false,available:false,status:'unauthenticated',message:'Se requiere sesión activa.'};
-  try{await __productOperationalDomain.authorizeRead(request,tenantId,'clientes');}
+  let actor;
+  try{actor=await __productOperationalDomain.authorizeRead(request,tenantId,'clientes');}
   catch(error){return{ok:false,available:false,status:'sin_permiso',message:'El rol activo no tiene acceso al expediente documental.'};}
   const rootId=ROOT_BY_TENANT[tenantId];
   if(!rootId)return{ok:false,available:false,status:'pendiente_conexion',message:'Repositorio Drive no configurado.'};
   const vault=await readVault(tenantId,previewOnly);
-  if(!vault)return{ok:false,available:false,configured:false,backendPersistent:true,bootstrapRequired:true,status:'tenant_setup_required',message:'Drive requiere una configuración administrativa única para este tenant.'};
+  if(!vault){
+    let bootstrapClientId='';
+    if(BOOTSTRAP_ROLES.has(norm(actor.activeRole))){
+      try{bootstrapClientId=(await providerConfig()).clientId;}catch(error){bootstrapClientId='';}
+    }
+    return{ok:false,available:false,configured:false,backendPersistent:true,bootstrapRequired:true,bootstrapClientId,status:'tenant_setup_required',message:'Drive requiere una configuración administrativa única para este tenant.'};
+  }
   try{
     const accessToken=await accessTokenFromRefresh(vault.refreshToken),meta=await getMeta(rootId,accessToken);
     const writable=!!(meta&&meta.capabilities&&meta.capabilities.canAddChildren===true);

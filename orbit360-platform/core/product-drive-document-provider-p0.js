@@ -84,6 +84,7 @@
       .then(out => {
         state.probed = true;
         state.status = Object.assign({ available: false, configured: false, backendPersistent: true, status: 'no_disponible' }, out || {});
+        if (state.status.bootstrapRequired === true && state.status.bootstrapClientId) setTimeout(() => loadGoogleIdentity().catch(() => {}), 0);
         return state.status;
       })
       .catch(error => {
@@ -95,35 +96,75 @@
   }
   function connect() { return probe(true); }
 
+  let gisPromise = null;
+  function loadGoogleIdentity() {
+    if (window.google && google.accounts && google.accounts.oauth2 && typeof google.accounts.oauth2.initCodeClient === 'function') return Promise.resolve(window.google);
+    if (gisPromise) return gisPromise;
+    gisPromise = new Promise((resolve, reject) => {
+      const existing = document.querySelector('script[data-orbit-google-identity]');
+      const ready = () => {
+        if (window.google && google.accounts && google.accounts.oauth2 && typeof google.accounts.oauth2.initCodeClient === 'function') resolve(window.google);
+        else reject(new Error('DRIVE_BOOTSTRAP_GIS_UNAVAILABLE'));
+      };
+      if (existing) {
+        existing.addEventListener('load', ready, { once: true });
+        existing.addEventListener('error', () => reject(new Error('DRIVE_BOOTSTRAP_GIS_LOAD_FAILED')), { once: true });
+        if (window.google && google.accounts && google.accounts.oauth2) ready();
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.dataset.orbitGoogleIdentity = '1';
+      script.onload = ready;
+      script.onerror = () => reject(new Error('DRIVE_BOOTSTRAP_GIS_LOAD_FAILED'));
+      document.head.appendChild(script);
+    }).catch(error => { gisPromise = null; throw error; });
+    return gisPromise;
+  }
+
   async function bootstrap() {
     if (state.bootstrapping) return state.bootstrapping;
-    const r = runtime();
-    if (!r || typeof r.initialize !== 'function') return { ok: false, status: 'runtime_unavailable', message: 'No está disponible la configuración segura de Drive.' };
-    state.bootstrapping = r.initialize().then(async ctx => {
-      const authMod = ctx && ctx.modules && ctx.modules.auth;
-      const appMod = ctx && ctx.modules && ctx.modules.app;
-      if (!authMod || !appMod || typeof authMod.GoogleAuthProvider !== 'function' || typeof authMod.signInWithPopup !== 'function') throw new Error('DRIVE_BOOTSTRAP_FIREBASE_AUTH_UNAVAILABLE');
-      const publicConfig = window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ || {};
-      const secondaryName = 'orbit360-drive-admin-bootstrap';
-      let secondaryApp = (appMod.getApps ? appMod.getApps() : []).find(a => a && a.name === secondaryName);
-      if (!secondaryApp) secondaryApp = appMod.initializeApp({ apiKey: publicConfig.apiKey, authDomain: publicConfig.authDomain, projectId: publicConfig.projectId, appId: publicConfig.appId }, secondaryName);
-      const secondaryAuth = authMod.getAuth(secondaryApp);
-      if (typeof authMod.setPersistence === 'function' && authMod.inMemoryPersistence) await authMod.setPersistence(secondaryAuth, authMod.inMemoryPersistence);
-      if (secondaryAuth.currentUser && typeof authMod.signOut === 'function') { try { await authMod.signOut(secondaryAuth); } catch (_) {} }
-      const provider = new authMod.GoogleAuthProvider();
-      provider.addScope('https://www.googleapis.com/auth/drive');
-      provider.setCustomParameters({ prompt: 'consent', access_type: 'offline', include_granted_scopes: 'true' });
-      const result = await authMod.signInWithPopup(secondaryAuth, provider);
-      const tr = result && result._tokenResponse ? result._tokenResponse : {};
-      const oauthRefreshToken = String(tr.oauthRefreshToken || tr.oauth_refresh_token || '').trim();
-      try { if (typeof authMod.signOut === 'function') await authMod.signOut(secondaryAuth); } catch (_) {}
-      if (!oauthRefreshToken) return { ok: false, status: 'bootstrap_refresh_token_missing', message: 'Google no entregó autorización persistente. La conexión no se guardó.' };
+    state.bootstrapping = (async () => {
+      const status = state.status && state.status.bootstrapRequired === true ? state.status : await probe(true);
+      const clientId = String(status && status.bootstrapClientId || '').trim();
+      if (!clientId) return { ok: false, status: 'bootstrap_client_unavailable', message: 'No está disponible la configuración segura de Google Drive.' };
+      const g = await loadGoogleIdentity();
       const names = callableNames();
-      const out = await call(names.bootstrap, { tenantId: tenantId(), activeRole: activeRole(), oauthRefreshToken }, names.region);
-      state.probed = false;
-      await probe(true);
-      return Object.assign({ ok: true }, out || {});
-    }).catch(error => ({ ok: false, status: 'bootstrap_failed', message: 'No fue posible configurar Drive de forma persistente.', code: String(error && (error.code || error.message) || '') }))
+      return new Promise(resolve => {
+        let settled = false;
+        const done = value => { if (!settled) { settled = true; resolve(value); } };
+        const client = g.accounts.oauth2.initCodeClient({
+          client_id: clientId,
+          scope: 'https://www.googleapis.com/auth/drive',
+          include_granted_scopes: true,
+          ux_mode: 'popup',
+          select_account: true,
+          callback: async response => {
+            if (!response || response.error || !response.code) {
+              done({ ok: false, status: 'bootstrap_google_denied', message: 'Google no completó la autorización de Drive.', code: String(response && (response.error || response.error_description) || '') });
+              return;
+            }
+            try {
+              const out = await call(names.bootstrap, {
+                tenantId: tenantId(),
+                activeRole: activeRole(),
+                authorizationCode: String(response.code),
+                redirectUri: location.origin
+              }, names.region);
+              state.probed = false;
+              await probe(true);
+              done(Object.assign({ ok: true }, out || {}));
+            } catch (error) {
+              done({ ok: false, status: 'bootstrap_failed', message: 'No fue posible configurar Drive de forma persistente.', code: String(error && (error.code || error.message) || '') });
+            }
+          },
+          error_callback: error => done({ ok: false, status: 'bootstrap_popup_failed', message: 'No fue posible abrir la autorización segura de Google Drive.', code: String(error && (error.type || error.message) || '') })
+        });
+        client.requestCode();
+      });
+    })().catch(error => ({ ok: false, status: 'bootstrap_failed', message: 'No fue posible configurar Drive de forma persistente.', code: String(error && (error.code || error.message) || '') }))
       .finally(() => { state.bootstrapping = null; });
     return state.bootstrapping;
   }
@@ -205,7 +246,7 @@
   document.addEventListener('orbit:active-role-changed', () => { state.probed = false; probe(true); });
 
   Orbit.productDriveDocumentProviderP0 = Object.freeze({
-    VERSION: 'b2-r84-20260927.1-tenant-persistent',
+    VERSION: 'b2-r85-20260928.1-auth-code-backend-exchange',
     connect, bootstrap, probe, upload, resolve, download,
     status: () => Object.assign({}, state.status),
     previewIsolated: isPreview(),

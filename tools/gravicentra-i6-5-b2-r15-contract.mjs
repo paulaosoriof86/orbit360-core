@@ -71,6 +71,10 @@ has(driveClient,"oauthDelegated: false",'R84_CLIENT_OAUTH_DELEGATION_NOT_DISABLE
 has(driveClient,"backendPersistent: true",'R84_CLIENT_BACKEND_PERSISTENCE_MISSING');
 has(driveClient,"tokenPersistence: 'backend_secret_manager'",'R84_CLIENT_SECRET_MANAGER_PERSISTENCE_MISSING');
 has(driveClient,'async function bootstrap()','R84_ONE_TIME_ADMIN_BOOTSTRAP_MISSING');
+has(driveClient,'google.accounts.oauth2.initCodeClient','R85_GOOGLE_AUTH_CODE_CLIENT_MISSING');
+has(driveClient,'authorizationCode: String(response.code)','R85_AUTHORIZATION_CODE_HANDOFF_MISSING');
+need(!driveClient.includes('signInWithPopup'),'R85_FIREBASE_AUTH_POPUP_BOOTSTRAP_REMAINS');
+need(!driveClient.includes('oauthRefreshToken'),'R85_BROWSER_REFRESH_TOKEN_REMAINS');
 has(driveClient,'async function download(ref, extra)','R83_DRIVE_DOWNLOAD_PROVIDER_MISSING');
 has(driveClient,'async function resolve(ref, extra)','R84_BACKEND_DOCUMENT_READ_MISSING');
 has(driveClient,"a.download = String(out.nombre || 'documento')",'R83_DRIVE_DOWNLOAD_BROWSER_HANDOFF_MISSING');
@@ -80,6 +84,10 @@ need(!driveBackend.includes('input.googleAccessToken'),'R84_BROWSER_ACCESS_TOKEN
 has(driveBackend,'SecretManagerServiceClient','R84_SECRET_MANAGER_VAULT_MISSING');
 has(driveBackend,"'orbit360-drive-oauth-preview-'",'R84_PREVIEW_DRIVE_VAULT_ISOLATION_MISSING');
 has(driveBackend,'async function accessTokenFromRefresh','R84_REFRESH_TOKEN_EXCHANGE_MISSING');
+has(driveBackend,'async function authorizationCodeTokens','R85_BACKEND_AUTH_CODE_EXCHANGE_MISSING');
+has(driveBackend,"grant_type:'authorization_code'",'R85_AUTHORIZATION_CODE_GRANT_MISSING');
+has(driveBackend,'bootstrapClientId','R85_BOOTSTRAP_CLIENT_ID_READBACK_MISSING');
+has(driveBackend,"La credencial persistente de Drive no puede ingresar desde el navegador.",'R85_BROWSER_REFRESH_TOKEN_REJECTION_MISSING');
 has(driveBackend,'async function bootstrap(request,previewOnly)','R84_TENANT_BOOTSTRAP_MISSING');
 has(driveBackend,'async function readDocument(request,previewOnly,downloadMode)','R84_SECURE_READ_DOWNLOAD_MISSING');
 has(driveBackend,'serviceAccount:SERVICE_ACCOUNT','R84_DRIVE_FUNCTION_SERVICE_ACCOUNT_BINDING_MISSING');
@@ -91,8 +99,8 @@ has(driveBackend,'ROOT_BY_TENANT','R81_DRIVE_ROOT_BINDING_MISSING');
 console.log(JSON.stringify({
   status:'PASS',
   contract:'I6.5-B2-R15-R15A-R16',
-  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83','R84'],
-  drive:{repository:'Google Drive',auth:'tenant-persistent-backend',tokenPersistence:'SecretManager',routineUserGoogleOAuth:false,readbackRequired:true},
+  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83','R84','R85'],
+  drive:{repository:'Google Drive',auth:'tenant-persistent-backend-auth-code',tokenPersistence:'SecretManager',routineUserGoogleOAuth:false,browserRefreshToken:false,readbackRequired:true},
   delete:{ui:'Eliminar',default:'durable-soft-delete',relationalSafety:'fail-closed'},
   renewalWindowDays:45
 },null,2));

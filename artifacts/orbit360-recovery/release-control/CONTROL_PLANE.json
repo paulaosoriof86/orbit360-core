@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "41938481f572ebfea1ee6a7caa31c8789389c033",
+    "b2ExecutionLockBlobSha": "83380dacf897dc597980f82f11787bea11a11afe",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2162,13 +2162,13 @@
       "technicalPassHistoricalPreserved": true,
       "authenticatedPassHistoricalPreserved": true,
       "syntheticCleanupHistoricalPreserved": true,
-      "paulaVisualDecision": "R73_R74_ACCEPTED_R84_BOOTSTRAP_SURFACE_SOURCE_FIXED_PENDING_GUARD",
+      "paulaVisualDecision": "R73_R74_ACCEPTED_R85_DRIVE_AUTH_CODE_SOURCE_FIXED_PENDING_GUARD",
       "paulaVisualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
       "paulaVisualRejectionReceiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "R73/R74 are visually accepted and frozen. R84 bootstrap-surface source fix passed central guard and is armed for one new exact B2 Preview. No LIVE, no B3, no reimport.",
+      "boundaryNote": "Paula's two-account bootstrap test proved the Firebase Auth popup cannot supply the durable Google Drive refresh credential. R85 replaces only the bootstrap transport with GIS authorization code + backend exchange; tenant Secret Manager authority and routine zero-Google-prompt model remain. Run central guard before one new exact B2 Preview. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2254,7 +2254,7 @@
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
       "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
       "insurerStableEditRuntimePass": true,
-      "findingLedgerBlobSha": "4986619fcbd876c9c130c50a7c761de5dbefd299",
+      "findingLedgerBlobSha": "a332b75105515b73c67e56a17cf478a974fbd469",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
@@ -2587,12 +2587,22 @@
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
         "receiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63"
       },
-      "compositionLockBlobSha": "aa343849cc44803862591f1ad4ef1f4b28143087",
-      "sourceFixPendingArm": false,
+      "compositionLockBlobSha": "9d289763108776211375709813e9836ee5460174",
+      "sourceFixPendingArm": true,
       "r84BootstrapSurfaceArm": {
         "status": "GUARD_PASS_PREVIEW_ARMED",
         "sourceFixCommit": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
         "guardPassRunId": 36413998564
+      },
+      "driveBootstrapR17": {
+        "status": "SOURCE_FIXED_PENDING_GUARD",
+        "findingId": "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928.json",
+        "receiptBlobSha": "2cc9f9d70d4bca863b2c1ab60f996f1310c7721f",
+        "parentHead": "0752c80dc5d5dcf9596313c0cb525e8fc155ba6b",
+        "documentAuth": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER_AUTHORIZATION_CODE",
+        "browserRefreshTokenAllowed": false,
+        "routineUserGoogleOAuth": false
       }
     },
     "dashboardRealityGate": {
