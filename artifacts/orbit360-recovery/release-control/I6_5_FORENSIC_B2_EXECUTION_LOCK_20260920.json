@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -335,13 +335,13 @@
     "evidenceReceiptBlobSha": "3304f2ce0ef5714df6be249a385288ed1015df83"
   },
   "preview": {
-    "sourceSha": "253bbc6df76019d0557875dc2fae802923ead591",
-    "buildId": "gi-i65-b2-253bbc6df760-57f234755dc1",
-    "channelId": "gi-i65-b2-36448274176",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36448274176-9mxjjxfv.web.app",
-    "runId": 36448274176,
-    "artifactId": 10982321143,
-    "artifactDigest": "75a5d5ca8dca7d1ad7499eba4e23754a19881c6965e88096557d5e546c6b8fa4",
+    "sourceSha": "2a343b1fb871e0468b26d16666fcc27b8ebdca25",
+    "buildId": "gi-i65-b2-2a343b1fb871-57f234755dc1",
+    "channelId": "gi-i65-b2-36449511487",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36449511487-rxodk8gn.web.app",
+    "runId": 36449511487,
+    "artifactId": 10982372740,
+    "artifactDigest": "049827059dbef1409af37fa0f2418d206f6b334b669e9c275e8ab2518246dfea",
     "exactReadback": true,
     "functionalPass": true,
     "livePromoted": false
@@ -349,10 +349,10 @@
   "authenticatedPreviewProof": {
     "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "253bbc6df76019d0557875dc2fae802923ead591",
-    "exactPreviewBuildId": "gi-i65-b2-253bbc6df760-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36448274176-9mxjjxfv.web.app",
-    "exactPreviewArtifactId": 10982321143,
+    "exactPreviewSourceSha": "2a343b1fb871e0468b26d16666fcc27b8ebdca25",
+    "exactPreviewBuildId": "gi-i65-b2-2a343b1fb871-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36449511487-rxodk8gn.web.app",
+    "exactPreviewArtifactId": 10982372740,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": false,
