@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "CANDIDATE_PENDING_PREVIEW",
+  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -317,13 +317,13 @@
     }
   },
   "preview": {
-    "sourceSha": "7a5a34354c1b19be7b71720574d86fd9c42d228e",
-    "buildId": "gi-i65-b2-7a5a34354c1b-57f234755dc1",
-    "channelId": "gi-i65-b2-36417141888",
-    "url": "https://ays-orbit-360-lab--gi-i65-b2-36417141888-omypglza.web.app",
-    "runId": 36417141888,
-    "artifactId": 10967803150,
-    "artifactDigest": "a7d91f16ac3e4f1f708ac148f41dacf4225dd72a52f226353f384b688f9409d0",
+    "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
+    "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
+    "channelId": "gi-i65-b2-36418353246",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+    "runId": 36418353246,
+    "artifactId": 10968560537,
+    "artifactDigest": "d3e73ddedd878cdf251b8a0c3148d8a3cbe38b354d8af3304aa28cb2078b2374",
     "exactReadback": true,
     "functionalPass": true,
     "livePromoted": false
@@ -331,10 +331,10 @@
   "authenticatedPreviewProof": {
     "status": "AUTHORIZED_PENDING_RUN",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-    "exactPreviewSourceSha": "7a5a34354c1b19be7b71720574d86fd9c42d228e",
-    "exactPreviewBuildId": "gi-i65-b2-7a5a34354c1b-57f234755dc1",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36417141888-omypglza.web.app",
-    "exactPreviewArtifactId": 10967803150,
+    "exactPreviewSourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
+    "exactPreviewBuildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+    "exactPreviewArtifactId": 10968560537,
     "boundaries": {
       "syntheticQaWritesAuthorized": true,
       "syntheticQaOnly": false,
