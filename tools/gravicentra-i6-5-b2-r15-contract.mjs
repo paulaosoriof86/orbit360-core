@@ -95,6 +95,8 @@ has(c360,'Referencia histórica de carpeta Drive (opcional)','R95_CLIENT_DRIVE_L
 
 has(opsBackend,"'adjuntos','documentoCargaPendiente','documentoCargaFallida'",'R77_OPS_BACKEND_DOCUMENT_FIELDS_NOT_MUTABLE');
 has(opsBackend,'managementDocumentReadback','R77_OPS_BACKEND_DOCUMENT_READBACK_MISSING');
+has(opsBackend,'function copyWorkflowManagementFields','R91_WORKFLOW_RESOLUTION_FIELD_PARITY_MISSING');
+has(opsBackend,"else if(operation==='resolve_management'){copyAllowed(after,payload,MANAGEMENT_MUTABLE_FIELDS.filter(k=>k!=='estado'));copyWorkflowManagementFields(after,payload,before);",'R91_RESOLVE_SPECIALIZED_FIELDS_NOT_PERSISTED');
 has(store,'PRODUCT_WORKFLOW_DOCUMENT_DURABLE_READBACK_REQUIRED','R77_STORE_DOCUMENT_DURABLE_GUARD_MISSING');
 has(resources,'async function uploadDocument(file, extra)','R77_DOCUMENT_UPLOAD_CONTRACT_MISSING');
 has(imports,'async function persistDocumentaryFiles()','R81_DOCUMENTARY_PERSISTENCE_MISSING');
