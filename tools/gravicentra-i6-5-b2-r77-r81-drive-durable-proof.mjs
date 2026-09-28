@@ -205,6 +205,13 @@ try{
   await page.reload({waitUntil:'domcontentloaded',timeout:30000});
   await activate(page,auth,actor);
   await setRole(page,'Operativo');
+  await page.evaluate(()=>{location.hash='#/ops';});
+  await page.waitForFunction(()=>{
+    const s=window.Orbit?.store?._productStatus?.()||{};
+    const confirmed=[].concat(s.serverConfirmedCollections||[]);
+    return s.ready===true&&confirmed.includes('gestiones')&&confirmed.includes('clientes');
+  },null,{timeout:30000});
+  await page.waitForFunction(({clientId,managementId})=>!!window.Orbit?.store?.get?.('clientes',clientId)&&!!window.Orbit?.store?.get?.('gestiones',managementId),{clientId,managementId},{timeout:15000});
   const reload=await page.evaluate(async ({clientId,managementId,clientRef,managementRef,clientText,managementText})=>{
     const c=Orbit.store.get('clientes',clientId),g=Orbit.store.get('gestiones',managementId),p=Orbit.productDriveDocumentProviderP0;
     const cdoc=(Array.isArray(c?.documentos)?c.documentos:[]).find(x=>String(x?.documentRef||'')===clientRef);
