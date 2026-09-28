@@ -4761,8 +4761,8 @@ jobs:
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
       R19_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json
-      IAM_STATE: ${{ runner.temp }}/b2-r87-iam-state.json
-      OUT: ${{ runner.temp }}/b2-r87-clientauthconfig-discovery.json
+      IAM_STATE: /tmp/b2-r87-iam-state.json
+      OUT: /tmp/b2-r87-clientauthconfig-discovery.json
     steps:
       - uses: actions/checkout@v4
         with:
