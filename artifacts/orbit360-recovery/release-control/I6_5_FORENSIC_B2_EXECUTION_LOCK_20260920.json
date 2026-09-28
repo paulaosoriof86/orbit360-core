@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -358,7 +358,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PASS",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "279b933a8c350e5815010315f72338b126f70585",
     "exactPreviewBuildId": "gi-i65-b2-279b933a8c35-57f234755dc1",
@@ -426,7 +426,7 @@
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
-    "runId": 36454148965,
+    "runId": 36468309630,
     "scope": {
       "operativo": "all",
       "asesor": "own",
@@ -454,9 +454,9 @@
       "individualReceiptPortfolioSync": true,
       "reportedPaymentVisible": true,
       "reportedPaymentDoesNotFabricateCobro": true,
-      "clientIdHash": "16861c32182e2cf950d33448127fe03c8632efd5be616a99c4c19e42569e5225",
-      "policyIdHash": "a02c8726a5011d624e6e6d5bfc11e2f078598b8afd28c0e8f07491ca5cc9afd5",
-      "vehicleIdHash": "d31531c95daee4a0dcad2789c190851cdc2e003cb6e985ef0e7a014d99447345",
+      "clientIdHash": "4c831d14e14585f4eb40cb52e3fdf43ae152cc49cb8f6eaab1ef2dbc350091df",
+      "policyIdHash": "878c79ea76574310f22d594971a512a7d1b3a0026e230a6004a606f6edb3697f",
+      "vehicleIdHash": "9f42fdc604ea87a9372ad6ce726ebfeb61326111218a9bd70446828d0da079a3",
       "clientCreateReadback": true,
       "clientEditReadback": true,
       "policyCreateReadback": true,
@@ -472,8 +472,8 @@
       "dirtyBackdropProtected": true
     },
     "renewal": {
-      "requestIdHash": "f8f178eb9ffefbdbede293c7fa20534ff4b68ee92a6dd2223d571801205539e9",
-      "newPolicyIdHash": "0d0f2216735981a04e0bc681d6bdd660c66ce4ea744d4591f7ad3cdc6647b8da",
+      "requestIdHash": "c4deaf01a9d0f5b2732e8f294b513d66bc01e270c90181d8a08971cf8009c2d9",
+      "newPolicyIdHash": "b4f04a67374c6a774b536b4d9687690332c94752b89b1c6324a583c656fdb89c",
       "sourceLink": true,
       "receipts": 2,
       "portfolio": 2,
