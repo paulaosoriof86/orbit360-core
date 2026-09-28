@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "83380dacf897dc597980f82f11787bea11a11afe",
+    "b2ExecutionLockBlobSha": "d412f6b2fe649562ec01bd8ad5b2bbac8decb176",
     "b2": {
-      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2101,7 +2101,7 @@
         "orbit360-platform/core/document-viewer.js"
       ],
       "productMutationAuthorized": true,
-      "sourcePendingFromHead": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
+      "sourcePendingFromHead": "2c84899d46089ce91a6343230d5effbbf8025c35",
       "sourceSha": "1255031fdd430c4cff0e8b143add8d0e6e818481",
       "buildId": "gi-i65-b2-1255031fdd43-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36414260906-1gr3fqh4.web.app",
@@ -2254,7 +2254,7 @@
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
       "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
       "insurerStableEditRuntimePass": true,
-      "findingLedgerBlobSha": "a332b75105515b73c67e56a17cf478a974fbd469",
+      "findingLedgerBlobSha": "5812261155407fedb5ea72dc85cd86151b593f14",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
@@ -2587,22 +2587,24 @@
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
         "receiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63"
       },
-      "compositionLockBlobSha": "9d289763108776211375709813e9836ee5460174",
-      "sourceFixPendingArm": true,
+      "compositionLockBlobSha": "81b592eb54b039ee502c60fa2acf8c068069ce93",
+      "sourceFixPendingArm": false,
       "r84BootstrapSurfaceArm": {
         "status": "GUARD_PASS_PREVIEW_ARMED",
         "sourceFixCommit": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
         "guardPassRunId": 36413998564
       },
       "driveBootstrapR17": {
-        "status": "SOURCE_FIXED_PENDING_GUARD",
+        "status": "GUARD_PASS_PREVIEW_ARMED",
         "findingId": "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928.json",
         "receiptBlobSha": "2cc9f9d70d4bca863b2c1ab60f996f1310c7721f",
         "parentHead": "0752c80dc5d5dcf9596313c0cb525e8fc155ba6b",
         "documentAuth": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER_AUTHORIZATION_CODE",
         "browserRefreshTokenAllowed": false,
-        "routineUserGoogleOAuth": false
+        "routineUserGoogleOAuth": false,
+        "sourceFixCommit": "2c84899d46089ce91a6343230d5effbbf8025c35",
+        "guardPassRunId": 36416977794
       }
     },
     "dashboardRealityGate": {

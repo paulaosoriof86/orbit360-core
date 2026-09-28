@@ -204,7 +204,7 @@
   "lastRemediation": {
     "origin": "PAULA_MOBILE_UAT_R17_DRIVE_PERSISTENT_AUTH_FAILURE_20260928",
     "parentHead": "0752c80dc5d5dcf9596313c0cb525e8fc155ba6b",
-    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "changedProductFiles": [
       "orbit360-platform/core/product-drive-document-provider-p0.js",
       "functions/document-drive-domain.js"
@@ -243,9 +243,11 @@
     "userEvidence": "TWO_GOOGLE_ACCOUNTS_BOTH_RETURNED_PERSISTENT_AUTHORIZATION_NOT_SAVED",
     "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928.json",
     "evidenceReceiptBlobSha": "2cc9f9d70d4bca863b2c1ab60f996f1310c7721f",
-    "findingLedgerBlobSha": "a332b75105515b73c67e56a17cf478a974fbd469",
+    "findingLedgerBlobSha": "5812261155407fedb5ea72dc85cd86151b593f14",
     "noDataReimport": true,
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "candidateHead": "2c84899d46089ce91a6343230d5effbbf8025c35",
+    "guardPassRunId": 36416977794
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "SOURCE_FIXED_PENDING_GUARD",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -260,13 +260,13 @@
     "noHardcodedIdentities": true
   },
   "candidate": {
-    "status": "SOURCE_FIXED_PENDING_GUARD",
-    "sourceCandidateSha": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
-    "governanceHeadBeforeCandidateArm": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
+    "status": "CANDIDATE_PENDING_PREVIEW",
+    "sourceCandidateSha": "2c84899d46089ce91a6343230d5effbbf8025c35",
+    "governanceHeadBeforeCandidateArm": "2c84899d46089ce91a6343230d5effbbf8025c35",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "9d289763108776211375709813e9836ee5460174",
+    "compositionLockBlobSha": "81b592eb54b039ee502c60fa2acf8c068069ce93",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "a332b75105515b73c67e56a17cf478a974fbd469",
+    "findingLedgerBlobSha": "5812261155407fedb5ea72dc85cd86151b593f14",
     "blockingFindingIds": [
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -293,7 +293,7 @@
     "humanDownloadRetestRequired": false,
     "tenantBootstrapRequired": true,
     "routineUserGoogleOAuth": false,
-    "sourceFixCommitPendingArm": true,
+    "sourceFixCommitPendingArm": false,
     "sourceCandidateParentHead": "0752c80dc5d5dcf9596313c0cb525e8fc155ba6b",
     "changedProductFiles": [
       "orbit360-platform/core/product-drive-document-provider-p0.js",
@@ -3121,7 +3121,7 @@
     "noReimport": true
   },
   "driveBootstrapR17": {
-    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "findingId": "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928.json",
     "receiptBlobSha": "2cc9f9d70d4bca863b2c1ab60f996f1310c7721f",
@@ -3134,6 +3134,8 @@
     "contractBlobSha": "bda9236f62614932b0628a6a4c6ae7d517df8330",
     "noLive": true,
     "noB3": true,
-    "noReimport": true
+    "noReimport": true,
+    "sourceFixCommit": "2c84899d46089ce91a6343230d5effbbf8025c35",
+    "guardPassRunId": 36416977794
   }
 }

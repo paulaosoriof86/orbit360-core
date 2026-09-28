@@ -2744,7 +2744,7 @@
       "rootCause": "The browser bootstrap used Firebase Authentication GoogleAuthProvider and inspected Firebase _tokenResponse for oauthRefreshToken. Durable Google Drive authority requires an OAuth authorization-code flow with backend code exchange; refresh tokens are not a browser authentication credential.",
       "remediation": "Use Google Identity Services authorization-code popup. Browser receives only a short-lived authorization code. Authenticated backend validates tenant/admin role and Preview origin, exchanges the code using the existing Identity Platform Google provider client ID/secret, verifies Drive/root-folder access, and stores only the refresh token in the tenant Secret Manager vault.",
       "requiredProof": "On one new exact Preview, Dirección performs one administrative authorization; backend returns configured=true and Secret Manager readback survives reload; fresh routine-user sessions receive zero Google account/consent prompts; authorized view/download/upload pass; cross-scope denial passes; no Google access or refresh token exists in browser storage.",
-      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928.json",
       "receiptBlobSha": "2cc9f9d70d4bca863b2c1ab60f996f1310c7721f",
@@ -2763,7 +2763,10 @@
       "backendPersistent": true,
       "noLive": true,
       "noB3": true,
-      "noReimport": true
+      "noReimport": true,
+      "guardPassRunId": 36416977794,
+      "sourceFixCommit": "2c84899d46089ce91a6343230d5effbbf8025c35",
+      "previewArmed": true
     }
   ],
   "phaseBBacklog": [
