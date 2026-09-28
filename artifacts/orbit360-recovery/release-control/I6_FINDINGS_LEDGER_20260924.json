@@ -2698,7 +2698,7 @@
       "rootCause": "R82 cumulative root cause now includes direct-read projection: after durable soft-delete and reload, all()/where()/find() hid deleted rows but get() returned the durable deleted row, allowing a direct detail/deep-link read to resurrect it.",
       "remediation": "Crear owner canónico de borrado lógico durable con permisos/scope/motivo/readback y entrypoints visibles en cada módulo administrable, conservando borrado físico solo donde sea relacionalmente seguro.",
       "requiredProof": "Eliminar visible/operable según permiso en todos los módulos administrables; persistencia tras reload; registros dependientes fail-closed o soft-delete sin huérfanos; actor/motivo/fecha conservados.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+      "status": "MACHINE_RUNTIME_PASS_PENDING_FINAL_PAULA_VISUAL",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15A_CROSS_MODULE_DELETE_RULE_20260927.json",
       "receiptBlobSha": "e8456913dfedd0058743f1a66f7c42557aa06a68",
       "noLive": true,
@@ -2707,7 +2707,7 @@
       "sourceCandidateSha": "1cc6b0d0a36e11bad96408e3846c0b542115e161",
       "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
       "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
-      "closureState": "NOT_CLOSED",
+      "closureState": "MACHINE_PROOF_PASS",
       "previewProofRequired": true,
       "r21VisualEvidence": {
         "clientDeleteVisibleInEdit": true,
@@ -2736,6 +2736,30 @@
         "softDeleteDirectGetHidden": true,
         "deleteOwnerCommittedRowReadback": true,
         "recordDeleteBlobSha": "3c8b4b06126abaa6b1ea0b6efe3c85c04bf71da9"
+      },
+      "machineProof": {
+        "status": "PASS",
+        "runId": 36499598188,
+        "exactPreviewSourceSha": "0231996b156e0563755966103b861875e0862a07",
+        "exactPreviewBuildId": "gi-i65-b2-0231996b156e-57f234755dc1",
+        "artifactId": 11005500772,
+        "artifactDigest": "96ea2cfe82998b982393745ea89266f1e582696d02d60b02ce0cf055e5caa625",
+        "collections": [
+          "clientes",
+          "polizas",
+          "vehiculos",
+          "cobros",
+          "gestiones",
+          "negocios",
+          "reclamos",
+          "cancelaciones",
+          "comisiones",
+          "asesores",
+          "aseguradoras"
+        ],
+        "relationBlocker": true,
+        "reloadProjection": true,
+        "syntheticCleanup": true
       }
     },
     {

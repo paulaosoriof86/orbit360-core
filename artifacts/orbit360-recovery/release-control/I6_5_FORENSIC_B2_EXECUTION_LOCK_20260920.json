@@ -1896,7 +1896,6 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R82_CROSS_MODULE_DELETE_FINAL_AUDIT",
     "DRIVE_QA_FIXTURE_CLEANUP",
     "PAULA_TARGETED_FINAL_VISUAL_ONLY_IF_MACHINE_PROOF_PASSES"
   ],
@@ -2196,7 +2195,7 @@
     "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL",
     "authenticatedRunId": 36218497058
   },
-  "paulaVisualDecision": "R77_R81_R91_R95_MACHINE_PASS_PRESERVED_R82_SOFT_DELETE_DIRECT_READ_ROOTFIX_PENDING_NEW_EXACT_PREVIEW",
+  "paulaVisualDecision": "R75_R76_R78_R79_R80_R88_R77_R81_R91_R95_R82_MACHINE_PASS_DRIVE_CLEANUP_PENDING",
   "paulaVisualAccepted": false,
   "b3Status": "NOT_STARTED",
   "humanReviewR6": {
@@ -3620,6 +3619,185 @@
     "artifact": {
       "id": 11002375024,
       "digest": "d9d0bc2358593bcc469f388f094994e4524ac668dc80984043e528e00424e401"
+    }
+  },
+  "r82CrossModuleDeleteProof": {
+    "status": "PASS_PENDING_FINAL_PAULA_VISUAL",
+    "runId": 36499598188,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R82_CROSS_MODULE_DELETE_RUNTIME_PROOF_20260928.json",
+    "exactPreview": {
+      "sourceSha": "0231996b156e0563755966103b861875e0862a07",
+      "buildId": "gi-i65-b2-0231996b156e-57f234755dc1",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36499598188-p6m38hix.web.app",
+      "previewRunId": 36499598188,
+      "artifactId": 11004860554
+    },
+    "collections": {
+      "clientes": {
+        "status": "PASS",
+        "module": "cliente360",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      },
+      "polizas": {
+        "status": "PASS",
+        "module": "polizas",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      },
+      "vehiculos": {
+        "status": "PASS",
+        "module": "polizas",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      },
+      "cobros": {
+        "status": "PASS",
+        "module": "cobros",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      },
+      "gestiones": {
+        "status": "PASS",
+        "module": "ops",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      },
+      "negocios": {
+        "status": "PASS",
+        "module": "leads",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      },
+      "reclamos": {
+        "status": "PASS",
+        "module": "siniestros",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      },
+      "cancelaciones": {
+        "status": "PASS",
+        "module": "cancelaciones",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      },
+      "comisiones": {
+        "status": "PASS",
+        "module": "comisiones",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      },
+      "asesores": {
+        "status": "PASS",
+        "module": "equipo",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      },
+      "aseguradoras": {
+        "status": "PASS",
+        "module": "aseguradoras",
+        "softDelete": true,
+        "deleted": true,
+        "eliminado": true,
+        "archivado": true,
+        "reasonPersisted": true,
+        "deletedAtPersisted": true,
+        "actorRolePersisted": true,
+        "actorUidPersisted": true
+      }
+    },
+    "blocker": {
+      "status": "PASS",
+      "code": "DELETE_RELATION_BLOCKED",
+      "blockerCount": 1,
+      "recordUnchanged": true
+    },
+    "reload": {
+      "status": "PASS",
+      "allDeletedHidden": true,
+      "checked": 11,
+      "collections": [
+        "clientes",
+        "polizas",
+        "vehiculos",
+        "cobros",
+        "gestiones",
+        "negocios",
+        "reclamos",
+        "cancelaciones",
+        "comisiones",
+        "asesores",
+        "aseguradoras"
+      ]
+    },
+    "cleanup": {
+      "pending": false,
+      "deletedRows": 13,
+      "businessRowsResidual": 0
+    },
+    "artifact": {
+      "id": 11005500772,
+      "digest": "96ea2cfe82998b982393745ea89266f1e582696d02d60b02ce0cf055e5caa625"
     }
   }
 }
