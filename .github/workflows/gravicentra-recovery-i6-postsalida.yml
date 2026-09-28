@@ -70,6 +70,8 @@ on:
       - 'tools/gravicentra-i6-5-b2-authenticated-preview.mjs'
       - 'tools/gravicentra-i6-5-b2-r52-human-fixture.mjs'
       - 'tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs'
+      - 'tools/gravicentra-i6-5-b2-r77-r81-drive-durable-proof.mjs'
+      - 'tools/gravicentra-i6-5-b2-r77-r81-freeze.mjs'
       - 'orbit360-platform/core/policy-receipts-engine.js'
       - 'orbit360-platform/core/issuance-workflow-v1201.js'
       - 'orbit360-platform/modules/issuance-endosos-v1201-bridge.js'
