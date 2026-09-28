@@ -204,7 +204,7 @@
   "lastRemediation": {
     "origin": "R20_DRIVE_PERSISTENT_PASS_R88_STARTUP_R89_OPS_LEADS_20260928",
     "parentHead": "b92e5da1fa52399a05c844db46e95bade2af47a5",
-    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "changedProductFiles": [
       "orbit360-platform/data/store-firestore-product-operational-p0.js",
       "orbit360-platform/core/product-hydration-required-optional-p0.js",
@@ -250,10 +250,12 @@
     },
     "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
     "evidenceReceiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
-    "findingLedgerBlobSha": "c0428a52812175bbe0e4679852a5ce69bdeb7949",
+    "findingLedgerBlobSha": "60a50e2145fb0da4c215ef84cea61e209646618b",
     "noDataReimport": true,
     "noLive": true,
     "noB3": true,
-    "productionSecretTouched": false
+    "productionSecretTouched": false,
+    "candidateHead": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745",
+    "guardPassRunId": 36448006084
   }
 }

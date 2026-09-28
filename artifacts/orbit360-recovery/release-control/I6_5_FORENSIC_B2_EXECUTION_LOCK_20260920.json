@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "SOURCE_FIXED_PENDING_GUARD",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -264,13 +264,13 @@
     "noHardcodedIdentities": true
   },
   "candidate": {
-    "status": "SOURCE_FIXED_PENDING_GUARD",
-    "sourceCandidateSha": "ac136eea7f317db1b10cf24c6ef21b9d42cfd7e2",
-    "governanceHeadBeforeCandidateArm": "ac136eea7f317db1b10cf24c6ef21b9d42cfd7e2",
+    "status": "CANDIDATE_PENDING_PREVIEW",
+    "sourceCandidateSha": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745",
+    "governanceHeadBeforeCandidateArm": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "fb82d694dd7647c511b7cbd0fdd8da2434106b53",
+    "compositionLockBlobSha": "ba630ebf25b87796d304f4898239f10b0e3b1e62",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "c0428a52812175bbe0e4679852a5ce69bdeb7949",
+    "findingLedgerBlobSha": "60a50e2145fb0da4c215ef84cea61e209646618b",
     "blockingFindingIds": [
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -298,7 +298,7 @@
     "humanDownloadRetestRequired": false,
     "tenantBootstrapRequired": true,
     "routineUserGoogleOAuth": false,
-    "sourceFixCommitPendingArm": true,
+    "sourceFixCommitPendingArm": false,
     "sourceCandidateParentHead": "b92e5da1fa52399a05c844db46e95bade2af47a5",
     "changedProductFiles": [
       "orbit360-platform/data/store-firestore-product-operational-p0.js",
@@ -3250,7 +3250,7 @@
     }
   },
   "r20": {
-    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
     "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
     "drive": {
@@ -3261,15 +3261,17 @@
       "authenticatedJobId": 109006464190
     },
     "r88": {
-      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "blob": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
       "priorElapsedSeconds": 7.433
     },
     "r89": {
-      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "blob": "4cc627428397e65c16912e42c1fb4d2a0979358e",
       "runtimeContractBlob": "7f843d8304135284acc49006bcec90b3cce4edf6",
       "failureJobId": 109006464190
-    }
+    },
+    "guardPassRunId": 36448006084,
+    "sourceFixCommit": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745"
   }
 }

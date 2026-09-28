@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928_V1",
-  "status": "SOURCE_FIXED_PENDING_GUARD",
+  "status": "GUARD_PASS_PREVIEW_ARMED",
   "recordedAt": "2026-09-28",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -109,5 +109,7 @@
     "R77_R81_CANONICAL_PROVIDER_PROOF",
     "DRIVE_QA_FIXTURE_CLEANUP",
     "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
-  ]
+  ],
+  "guardPassRunId": 36448006084,
+  "sourceFixCommit": "ac5ff6ae5dab82e4ef3bdfb34b8f11e233d8c745"
 }
