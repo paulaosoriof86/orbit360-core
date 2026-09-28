@@ -117,7 +117,7 @@ need(
 );
 need(files.renewals.includes('function cotizarDirecto(policyId)')&&files.renewals.includes("A.can('renovaciones','edit')")&&files.renewals.includes("A.esAsesor"),'B2_R9_DIRECT_QUOTE_ROLE_GATE_MISSING');
 need(files.renewals.includes('function registrarAceptacion(policyId)')&&files.renewals.includes("workflowType:'renewal_accepted'")&&files.renewals.includes("acceptedConfirmed:true"),'B2_R9_RENEWAL_ACCEPTED_MANAGEMENT_MISSING');
-need(files.issuanceBridge.includes("Orbit.modules.renovaciones.registrarAceptacion")&&files.issuanceBridge.includes('Solicitar emisión a aseguradora')&&files.issuanceBridge.includes('Registrar renovación en sistema'),'B2_R9_CLIENT_OPS_RENEWAL_BRANCHES_MISSING');
+need(files.issuanceBridge.includes("Orbit.modules.renovaciones.registrarAceptacion")&&files.issuanceBridge.includes('Crear solicitud de emisión en Ops')&&files.issuanceBridge.includes('Registrar renovación en sistema'),'B2_R9_CLIENT_OPS_RENEWAL_BRANCHES_MISSING');
 need(files.issuance.includes('async function createDirectRenewal')&&files.issuance.includes("await P().createPolicy")&&files.issuance.includes("workflowType: 'renewal_accepted'")&&files.issuance.includes("directRenewalPolicyId: policy.id"),'B2_R9_DIRECT_RENEWAL_ENGINE_MISSING');
 need(files.engine.includes('duplicateVersion')&&files.engine.includes("if (sameCommercial && !clean(p.renuevaDe))")&&files.engine.includes('poliza_version_duplicada'),'B2_R9_RENEWAL_SAME_COMMERCIAL_NUMBER_VERSION_CONTRACT_MISSING');
 need(files.opsBackend.includes('RENEWAL_MANAGEMENT_FIELDS')&&files.opsBackend.includes("wt==='renewal_proposals'||wt==='renewal_accepted'")&&files.opsBackend.includes("'directRenewalPolicyId'"),'B2_R9_RENEWAL_WORKFLOW_BACKEND_FIELDS_MISSING');

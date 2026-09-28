@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928_V1",
-  "status": "SOURCE_FIXED_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
+  "status": "PREVIEW_RETRY_AFTER_STALE_VALIDATOR_FIX",
   "recordedAt": "2026-09-28",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -116,5 +116,20 @@
     "R91_R92_R93_R94_R95_EXACT_PREVIEW_RUNTIME",
     "R82_CROSS_MODULE_DELETE_FINAL_AUDIT",
     "PAULA_TARGETED_FINAL_VISUAL_ONLY_IF_MACHINE_PROOF_PASSES"
-  ]
+  ],
+  "firstPreviewAttempt": {
+    "runId": 36466519267,
+    "jobId": 109077848734,
+    "result": "FAIL_BEFORE_BUILD_OR_DEPLOY",
+    "classification": "STALE_VALIDATOR_EXPECTED_OLD_ISSUANCE_LABEL",
+    "code": "B2_R9_CLIENT_OPS_RENEWAL_BRANCHES_MISSING",
+    "productSourceDefect": false,
+    "liveTouched": false,
+    "dataWrites": 0
+  },
+  "validatorFix": {
+    "path": "tools/gravicentra-i6-5-b2-functional.mjs",
+    "blobSha": "461c8c4dc42c34c92061a2a70034b8bd4f9e7526",
+    "change": "Validator now expects canonical label Crear solicitud de emisión en Ops instead of superseded Solicitar emisión a aseguradora."
+  }
 }

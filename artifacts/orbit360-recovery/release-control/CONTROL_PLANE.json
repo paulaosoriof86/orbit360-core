@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "e989df66a3b21220a37b5722e79f5aacbc14a2ac",
+    "b2ExecutionLockBlobSha": "f12510d61806ad258be1479734faeda0a4de9b3a",
     "b2": {
       "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2168,7 +2168,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "Paula visual closed R75/R76/R78/R79/R80 and human startup R88. Insurer logo persistence and renewal lineage/expected receipts are machine-proven; do not ask Paula to perform a real renewal yet. R77/R81 require synthetic B2 Drive upload/readback because Preview intentionally blocks operational-client binary writes. R91-R95 source fixes address firm-policy support upload, validated tariff costs, internal issuance semantics/runtime, Preview upload messaging, and legacy-vs-canonical Drive copy. Run guard before one new exact Preview. No LIVE, no B3, no reimport.",
+      "boundaryNote": "R21 first Preview attempt failed before build/deploy only because the functional validator still expected the superseded label Solicitar emisión a aseguradora. Product contract and syntax passed. Validator now expects Crear solicitud de emisión en Ops. Candidate remains armed; no LIVE, no data writes, no B3.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2715,7 +2715,7 @@
       "r21": {
         "status": "GUARD_PASS_PREVIEW_ARMED",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
-        "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
+        "receiptBlobSha": "3a560ab7de3fdb5c844cf91f1bb9deb43928ad7a",
         "paulaVisualClosed": [
           "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
           "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -2739,7 +2739,14 @@
         },
         "contractBlobSha": "9435c03377e6a9ad2dcff65b50c3b33140dd62b4",
         "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
-        "guardPassRunId": 36466197519
+        "guardPassRunId": 36466197519,
+        "lastPreviewFailure": {
+          "runId": 36466519267,
+          "jobId": 109077848734,
+          "classification": "STALE_VALIDATOR_ONLY",
+          "productSourceDefect": false
+        },
+        "validatorFixBlobSha": "461c8c4dc42c34c92061a2a70034b8bd4f9e7526"
       }
     },
     "dashboardRealityGate": {

@@ -335,13 +335,15 @@
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "f41f04d24c497369c90c5e982b393cd465843a9d"
     },
     "changedTestFiles": [
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs"
+      "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "tools/gravicentra-i6-5-b2-functional.mjs"
     ],
     "testBlobs": {
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "9435c03377e6a9ad2dcff65b50c3b33140dd62b4"
+      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "9435c03377e6a9ad2dcff65b50c3b33140dd62b4",
+      "tools/gravicentra-i6-5-b2-functional.mjs": "461c8c4dc42c34c92061a2a70034b8bd4f9e7526"
     },
     "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
-    "evidenceReceiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4"
+    "evidenceReceiptBlobSha": "3a560ab7de3fdb5c844cf91f1bb9deb43928ad7a"
   },
   "preview": {
     "sourceSha": "dcfe50d8e131d27ad5036ac551a19c8527a2db9b",
@@ -3336,7 +3338,7 @@
   "r21": {
     "status": "GUARD_PASS_PREVIEW_ARMED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
-    "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
+    "receiptBlobSha": "3a560ab7de3fdb5c844cf91f1bb9deb43928ad7a",
     "paulaVisualClosed": [
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -3367,6 +3369,14 @@
     "noB3": true,
     "noReimport": true,
     "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
-    "guardPassRunId": 36466197519
+    "guardPassRunId": 36466197519,
+    "lastPreviewFailure": {
+      "runId": 36466519267,
+      "jobId": 109077848734,
+      "classification": "STALE_VALIDATOR_ONLY",
+      "code": "B2_R9_CLIENT_OPS_RENEWAL_BRANCHES_MISSING",
+      "productSourceDefect": false
+    },
+    "validatorFixBlobSha": "461c8c4dc42c34c92061a2a70034b8bd4f9e7526"
   }
 }
