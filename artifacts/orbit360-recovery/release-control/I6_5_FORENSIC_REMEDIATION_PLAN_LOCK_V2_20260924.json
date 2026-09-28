@@ -210,8 +210,8 @@
     "futureChangeRule": "Every product-source change and its composition manifest update must land atomically; otherwise no build/Preview.",
     "ownerRule": "Every modified capability declares the effective runtime owner; after change, prove no older owner shadows it.",
     "findingRule": "A finding can leave the active ledger only as CLOSED_PASS or explicitly authorized DEFERRED/NOT_APPLICABLE with evidence.",
-    "compositionLockBlobSha": "c5819b94f0a5efe49ffd92b1518af71cb95313ea",
-    "findingLedgerBlobSha": "5a76bd4e9e45fc0503085bac69eb5379dd410862"
+    "compositionLockBlobSha": "89d582f001a19ff6cf1fe2e0bc7deec3189681b9",
+    "findingLedgerBlobSha": "b99427f71b56ebb2567eba461c71368976d5881e"
   },
   "findingControl": {
     "ledgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -238,7 +238,7 @@
     "block": "B2",
     "readinessPercent": 80,
     "targetPercent": 90,
-    "step": "R84_PERSISTENT_TENANT_DRIVE_AUTHORITY_DIAGNOSTIC",
+    "step": "R84_SOURCE_FIXED_PENDING_GUARD_AND_PREVIEW_ARM",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
     "exactPreviewSourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
     "authenticatedRunId": 36349185236,
@@ -255,7 +255,11 @@
     "r15bTechnicalAndAuthenticatedPass": true,
     "r15bHumanDownloadRetestRequired": true,
     "r84DecisionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
-    "r84DecisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676"
+    "r84DecisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
+    "r84SourceFixCommit": "3343616b2afd079af1597da09aba22d600ce72c2",
+    "r84ProductFileCount": 69,
+    "r84RoutineUserGoogleOAuth": false,
+    "r84TenantBootstrapRequired": true
   },
   "dataUpdateCompletion": {
     "preservedPass": [
@@ -299,7 +303,9 @@
     "r15DrivePreviewIsolationFixPendingExactPreview": true,
     "r15bDriveDownloadFixPendingExactPreview": false,
     "r15bHumanDownloadRetestRequired": false,
-    "r84PersistentTenantDriveAuthRequired": true
+    "r84PersistentTenantDriveAuthRequired": true,
+    "r84SourceFixed": true,
+    "r84PreviewPending": true
   },
   "antiInterruptionExecution": {
     "status": "FROZEN_ACTIVE",

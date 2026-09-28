@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "7f9887a44eb633a0c00510e60275162111806eea",
+    "b2ExecutionLockBlobSha": "ec520bfb806e8c92064c4e68dc4ac2b1ac38be64",
     "b2": {
-      "status": "R84_PERSISTENT_TENANT_DRIVE_AUTH_DIAGNOSTIC",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2096,10 +2096,12 @@
         "orbit360-platform/product-runtime-config.js",
         "orbit360-platform/styles/base.css",
         "orbit360-platform/styles/infra.css",
-        "orbit360-platform/sw.js"
+        "orbit360-platform/sw.js",
+        "functions/package-lock.json",
+        "orbit360-platform/core/document-viewer.js"
       ],
       "productMutationAuthorized": true,
-      "sourcePendingFromHead": "5cd14eb9e585f36e4cb5edfb32d1e003c3414772",
+      "sourcePendingFromHead": "3343616b2afd079af1597da09aba22d600ce72c2",
       "sourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
       "buildId": "gi-i65-b2-31f2ddc2ac8a-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
@@ -2166,7 +2168,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "R84 prevailing Drive rule remains inside canonical B2. Diagnose/implement persistent tenant backend Drive authority using existing B2 owners; do not create a new gate/action enum. Previous per-user OAuth proof is causally superseded only for Drive auth/document operations. No LIVE, no B3, no reimport.",
+      "boundaryNote": "R84 source fixed and exact composition bound. Keep canonical B2 diagnostic cursor until central guard passes; then arm one new immutable Preview. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2544,12 +2546,14 @@
         "findingId": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
         "decisionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
         "decisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
-        "status": "FROZEN_ACTIVE_SOURCE_IMPLEMENTATION_PENDING",
-        "productiveAuthModel": "TENANT_LEVEL_PERSISTENT_BACKEND_INTEGRATION",
+        "status": "SOURCE_FIXED_PENDING_GUARD_AND_PREVIEW",
+        "productiveAuthModel": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER",
         "routineUserGooglePromptAllowed": false,
         "browserTokenPersistenceAllowed": false,
         "roleScopeAuthorizationRequired": true,
-        "existingDocumentReferencesPreserved": true
+        "existingDocumentReferencesPreserved": true,
+        "sourceFixCommit": "3343616b2afd079af1597da09aba22d600ce72c2",
+        "tenantBootstrapRequired": true
       }
     },
     "dashboardRealityGate": {
@@ -2643,7 +2647,7 @@
     },
     "planVersion": 2,
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
-    "activePlanBlobSha": "4618c4821cef25ab6f9eacee497bffddc011cdbd",
+    "activePlanBlobSha": "ba14468385296a091e75268a4cdf3700c6f7f0dc",
     "mechanismRootCause20260924": {
       "status": "FROZEN",
       "classification": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
@@ -2668,21 +2672,21 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "c5819b94f0a5efe49ffd92b1518af71cb95313ea",
+    "compositionLockBlobSha": "89d582f001a19ff6cf1fe2e0bc7deec3189681b9",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "5a76bd4e9e45fc0503085bac69eb5379dd410862",
+    "findingLedgerBlobSha": "b99427f71b56ebb2567eba461c71368976d5881e",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
-    "activePlanBlobSha": "4618c4821cef25ab6f9eacee497bffddc011cdbd",
+    "activePlanBlobSha": "ba14468385296a091e75268a4cdf3700c6f7f0dc",
     "activeBlock": "B2",
     "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
-    "productFileCount": 67,
+    "productFileCount": 69,
     "rootCause": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
     "definitiveFix": "SINGLE_MACHINE_AUTHORITATIVE_EXACT_SET_AND_BLOB_BOUND_COMPOSITION",
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R84_PERSISTENT_TENANT_DRIVE_AUTH_DIAGNOSTIC"
+    "nextAction": "B2_R84_SOURCE_FIXED_PENDING_GUARD_AND_PREVIEW_ARM"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

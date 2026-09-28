@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "R84_PERSISTENT_TENANT_DRIVE_AUTH_SOURCE_IMPLEMENTATION_PENDING",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -102,7 +102,9 @@
       "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
       "tools/gravicentra-i6-5-b2-functional.mjs",
       "tools/gravicentra-i6-5-b2-human-rejection-readonly.mjs",
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs"
+      "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "functions/package-lock.json",
+      "orbit360-platform/core/document-viewer.js"
     ],
     "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
@@ -257,12 +259,12 @@
   },
   "candidate": {
     "status": "CANDIDATE_PENDING_PREVIEW",
-    "sourceCandidateSha": "10f03257590eb0ab73952e63ff0296a20bcfeabb",
+    "sourceCandidateSha": "3343616b2afd079af1597da09aba22d600ce72c2",
     "governanceHeadBeforeCandidateArm": "06378fefe7fb250d70db19c80ece0febd5b23286",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "c5819b94f0a5efe49ffd92b1518af71cb95313ea",
-    "productFileCount": 67,
-    "findingLedgerBlobSha": "5a76bd4e9e45fc0503085bac69eb5379dd410862",
+    "compositionLockBlobSha": "89d582f001a19ff6cf1fe2e0bc7deec3189681b9",
+    "productFileCount": 69,
+    "findingLedgerBlobSha": "b99427f71b56ebb2567eba461c71368976d5881e",
     "blockingFindingIds": [
       "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
       "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
@@ -280,14 +282,16 @@
     "authenticatedHarness": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "authenticatedHarnessBlobSha": "c09093eebf676d029e7e938601bc2c568b847508",
     "documentRepository": "Google Drive",
-    "documentAuth": "DELEGATED_USER_OAUTH_MEMORY_ONLY",
-    "humanDriveOAuthProofRequired": true,
+    "documentAuth": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER",
+    "humanDriveOAuthProofRequired": false,
     "noDataApply": true,
     "noReimport": true,
     "noLivePromotion": true,
     "noB3": true,
     "preservesB1": true,
-    "humanDownloadRetestRequired": true
+    "humanDownloadRetestRequired": false,
+    "tenantBootstrapRequired": true,
+    "routineUserGoogleOAuth": false
   },
   "preview": {
     "sourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
@@ -1847,9 +1851,11 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R84_SOURCE_IMPLEMENTATION_AND_CONTRACT_PASS",
+    "R84_CENTRAL_GUARD_PASS",
+    "R84_ONE_TIME_TENANT_BOOTSTRAP_AND_READBACK",
     "R84_NEW_EXACT_PREVIEW_READBACK",
     "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_AUTHORIZED_VIEW_DOWNLOAD",
+    "R84_ACTIVE_ROLE_SCOPE_AND_CROSS_SCOPE_DENIAL",
     "R77_R81_CANONICAL_PROVIDER_PROOF",
     "DRIVE_QA_FIXTURE_CLEANUP",
     "PAULA_VISUAL_ACCEPTANCE"
@@ -3021,7 +3027,7 @@
     "findingId": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
     "decisionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
     "decisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
-    "status": "FROZEN_ACTIVE_SOURCE_IMPLEMENTATION_PENDING",
+    "status": "SOURCE_FIXED_PENDING_GUARD_AND_PREVIEW",
     "perUserOAuthProductive": false,
     "tenantPersistentBackendAuthorityRequired": true,
     "routineUserGooglePromptAllowed": false,
@@ -3029,6 +3035,10 @@
     "existingReferencesPreserved": true,
     "noReimport": true,
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "sourceFixCommit": "3343616b2afd079af1597da09aba22d600ce72c2",
+    "productFileCount": 69,
+    "credentialStore": "SecretManager",
+    "tenantBootstrapRequired": true
   }
 }

@@ -2619,14 +2619,29 @@
       "finding": "Routine document access requires repeated Google account selection/consent because Drive authority is held in a browser access token for only the active session.",
       "rootCause": "product-drive-document-provider-p0.js forces Google prompt=consent and memory_only token persistence; document-drive-domain.js requires googleAccessToken from the browser for status/upload. The same model would repeat in LIVE.",
       "remediation": "Replace routine per-user OAuth with persistent tenant-level backend Drive integration. Gravicentra role/scope becomes the authorization boundary; Drive credential remains backend-only.",
-      "requiredProof": "fresh browser session with no Google account selection; authorized role opens existing client document; authorized role downloads existing client document; authorized write role uploads a synthetic Preview document; Asesor own scope can access only own authorized client documents; cross-scope access denied by backend; reload/new session retains repository availability without OAuth; Preview synthetic folder remains isolated; audit receipt records actor/role/action; cleanup synthetic fixture",
-      "status": "FROZEN_ACTIVE_SOURCE_IMPLEMENTATION_PENDING",
+      "requiredProof": "one-time tenant bootstrap succeeds and readback persists; fresh user browser has zero Google consent/account selection; authorized client document read/download/upload works by active role/scope; cross-scope access denied; no Drive token in browser storage; Preview synthetic isolation preserved; audit receipt present; cleanup synthetic fixture",
+      "status": "SOURCE_FIXED_PENDING_GUARD_AND_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
       "receiptBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "sourceFixCommit": "3343616b2afd079af1597da09aba22d600ce72c2",
+      "productOwners": [
+        "functions/document-drive-domain.js",
+        "functions/package.json",
+        "functions/package-lock.json",
+        "functions/product-operational-domain.js",
+        "orbit360-platform/core/backend-resource-contracts.js",
+        "orbit360-platform/core/document-viewer.js",
+        "orbit360-platform/core/product-drive-document-provider-p0.js",
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "authModel": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER",
+      "routineUserGoogleOAuth": false,
+      "bootstrapRequiredOnce": true,
+      "closureState": "NOT_CLOSED"
     }
   ],
   "phaseBBacklog": [

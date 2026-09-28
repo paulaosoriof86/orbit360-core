@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B2",
-  "productFileCount": 67,
+  "productFileCount": 69,
   "productFiles": [
     "functions/bootstrap.js",
     "functions/document-drive-domain.js",
@@ -104,14 +104,16 @@
     "orbit360-platform/product-runtime-config.js",
     "orbit360-platform/styles/base.css",
     "orbit360-platform/styles/infra.css",
-    "orbit360-platform/sw.js"
+    "orbit360-platform/sw.js",
+    "functions/package-lock.json",
+    "orbit360-platform/core/document-viewer.js"
   ],
   "productFileBlobs": {
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
-    "functions/document-drive-domain.js": "7535f780b327f7fd56681ab4f0688721baea7f16",
-    "functions/package.json": "818c95c932203134c1a516a3f665d589632f829a",
+    "functions/document-drive-domain.js": "726795109281cc2058da46c8bc29ff4d4187d936",
+    "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
-    "functions/product-operational-domain.js": "3d55155d3fbc77263d0b3a7094d85e90476c3424",
+    "functions/product-operational-domain.js": "682941c99f0a6cf401f87ff413a426245996bad9",
     "functions/product-ops-leads-domain.js": "b3d01b7502d1d82270e411672d8803575398b669",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "e4b602b4abb26fcd3d9413b1ab9bb67998be78dd",
@@ -124,7 +126,7 @@
     "orbit360-platform/core/auth-product-runtime-p0.js": "6decc66566ca6b6fe1761fb0d2db5a108e9d1033",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "81cb2db0a7b3a26387fba980d9cecaa5f8d3d4eb",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
-    "orbit360-platform/core/backend-resource-contracts.js": "b14ccbbd330e82640c8913a77c0ecbc934760d94",
+    "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "f1fb9ef8af0abd677d0e768f4fd3e788a3fb7f05",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "774c6cbe32be08f23e45f37b8e12e56f9be08bf3",
@@ -134,7 +136,7 @@
     "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
     "orbit360-platform/core/product-app-p0.js": "b6ccd725f214c666e04299574be4c1fdae3a6b83",
-    "orbit360-platform/core/product-drive-document-provider-p0.js": "696f74f883d722852a877b1ed3c643818d093ef5",
+    "orbit360-platform/core/product-drive-document-provider-p0.js": "b42ceb3959e16affb05c2e4872554a80e396cf3c",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "fcf45f869897b205df48d17906555fc688250f83",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
@@ -155,7 +157,7 @@
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "2d7db2a218459bb5a6239845f0e277db12aa5490",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
-    "orbit360-platform/modules/cliente360.js": "98ed18a5e4b2ccac4917d12909e705d7aa2b2455",
+    "orbit360-platform/modules/cliente360.js": "4238530434e650394d12301754aab4f9ba77cc22",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "cba6099ff7499c452c99f283702f27886154ae23",
     "orbit360-platform/modules/cobros.js": "db8ae9c55d32ea922bb8aa371700b80826e40998",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
@@ -173,7 +175,9 @@
     "orbit360-platform/product-runtime-config.js": "b03bd57e6c77b6204ce860b93ec4556b1cd3e4e7",
     "orbit360-platform/styles/base.css": "72da4a95d7c8be5e15a9c803480ea6d8ee67f6d8",
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
-    "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b"
+    "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
+    "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
+    "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -200,30 +204,17 @@
   "lastRemediation": {
     "origin": "PAULA_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY",
     "parentHead": "58dd90648ba560d0332aa90ef23c9442657dcacd",
-    "candidateHead": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
-    "status": "R84_FROZEN_SOURCE_IMPLEMENTATION_PENDING",
+    "candidateHead": "3343616b2afd079af1597da09aba22d600ce72c2",
+    "status": "SOURCE_FIXED_PENDING_GUARD_AND_PREVIEW_ARM",
     "changedProductFiles": [
-      "functions/bootstrap.js",
       "functions/document-drive-domain.js",
       "functions/package.json",
+      "functions/package-lock.json",
       "functions/product-operational-domain.js",
-      "functions/product-ops-leads-domain.js",
       "orbit360-platform/core/backend-resource-contracts.js",
-      "orbit360-platform/core/ciclo.js",
-      "orbit360-platform/core/importa.js",
+      "orbit360-platform/core/document-viewer.js",
       "orbit360-platform/core/product-drive-document-provider-p0.js",
-      "orbit360-platform/core/record-delete.js",
-      "orbit360-platform/data/store-firestore-product-operational-p0.js",
-      "orbit360-platform/index.html",
-      "orbit360-platform/modules/cancelaciones.js",
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/modules/comisiones.js",
-      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
-      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
-      "orbit360-platform/modules/siniestros.js",
-      "orbit360-platform/styles/base.css"
+      "orbit360-platform/modules/cliente360.js"
     ],
     "rootCauses": [
       "mobile CSS hid tenant logo and Cliente360 search",
@@ -243,15 +234,15 @@
       "normalized vehicle candidate identity with history preservation"
     ],
     "documentRepository": "Google Drive",
-    "documentAuth": "DELEGATED_USER_OAUTH_MEMORY_ONLY_SECONDARY_FIREBASE_AUTH",
+    "documentAuth": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER",
     "serviceAccountDriveOwnership": false,
-    "humanOAuthProofRequired": true,
+    "humanOAuthProofRequired": false,
     "noDataReimport": true,
     "noLive": true,
     "noB3": true,
-    "latestCausalFix": "PENDING_REPLACE_PER_USER_MEMORY_ONLY_OAUTH_WITH_TENANT_PERSISTENT_BACKEND_DRIVE_AUTHORITY",
+    "latestCausalFix": "PER_USER_EPHEMERAL_DRIVE_OAUTH_REPLACED_BY_TENANT_PERSISTENT_BACKEND_SECRET_MANAGER_AUTHORITY",
     "previewDocumentIsolation": "_GRAVICENTRA_PREVIEW_QA_ONLY",
-    "findingLedgerBlobSha": "5a76bd4e9e45fc0503085bac69eb5379dd410862",
+    "findingLedgerBlobSha": "b99427f71b56ebb2567eba461c71368976d5881e",
     "humanDownloadRetestRequired": true,
     "exactPreview": {
       "sourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
@@ -265,6 +256,9 @@
       "authenticatedPreviewPass": true
     },
     "governanceDecisionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
-    "governanceDecisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676"
+    "governanceDecisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
+    "routineUserGoogleOAuth": false,
+    "tenantBootstrapRequired": true,
+    "browserDriveTokenAllowed": false
   }
 }
