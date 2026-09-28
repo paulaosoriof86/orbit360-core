@@ -3580,7 +3580,9 @@ jobs:
           node --check tools/gravicentra-i6-5-b2-authenticated-preview.mjs
           node --check tools/gravicentra-i6-5-b2-functional.mjs
           node --check tools/gravicentra-i6-5-b2-r15-contract.mjs
+          node --check tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs
           node tools/gravicentra-i6-5-b2-r15-contract.mjs
+          node tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs
           node tools/gravicentra-i6-5-b2-functional.mjs
       - name: Install Firebase CLI
         if: steps.mode.outputs.mode == 'preview'

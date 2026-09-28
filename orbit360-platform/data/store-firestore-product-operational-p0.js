@@ -5,13 +5,13 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-product-operational-write-20260923.2-server-receipt';
+  var VERSION='fase-a-i2-product-operational-write-20260928.3-snapshot-expectation';
   var GENERAL_COMMAND='orbit360ProductOperationalCommand';
   var WORKFLOW_COMMAND='orbit360OpsLeadsCommand';
   var WORKFLOW_PREVIEW_COMMAND='orbit360OpsLeadsCommandPreview';
   var SERVER_EMISSION_GUARD='__ORBIT_SERVER_EMISSION_PENDING__';
   var base=null, facade=null, provider=null, installed=false;
-  var listeners=[], pending={}, deleted={}, prefOverlay={};
+  var listeners=[], pending={}, pendingExpected={}, deleted={}, prefOverlay={};
   var state={ready:false,failClosed:true,pending:0,committed:0,failed:0,lastError:'',lastCommittedAt:'',tenantId:'',version:VERSION};
 
   var SURFACE=Object.freeze({
@@ -69,14 +69,50 @@
     try{document.dispatchEvent(new CustomEvent('orbit:store',{detail:{collection:collection||'*',operationalWrite:true}}));}catch(e){}
   }
   function pendingBucket(collection){return pending[collection]||(pending[collection]={});}
+  function expectationBucket(collection){return pendingExpected[collection]||(pendingExpected[collection]={});}
   function deletedBucket(collection){return deleted[collection]||(deleted[collection]={});}
+  function expectedPatch(input){
+    var out={},src=clone(input)||{};
+    Object.keys(src).forEach(function(k){
+      if(k==='updatedAt'||k==='updatedByUid'||k==='updatedByEmail'||k==='createdAt'||k==='ownerUid'||k==='ownerEmail'||k==='tenantId'||k==='canonicalDocumentId'||k==='legacyDataId')return;
+      out[k]=clone(src[k]);
+    });
+    return out;
+  }
+  function sameValue(a,b){
+    if(a===b)return true;
+    try{return JSON.stringify(a)===JSON.stringify(b);}catch(e){return false;}
+  }
+  function baseMatchesExpectation(row,expectation){
+    if(!expectation)return false;
+    if(expectation.kind==='insert')return !!row;
+    if(expectation.kind==='update'){
+      if(!row)return false;
+      var patch=expectation.patch||{};
+      return Object.keys(patch).every(function(k){return sameValue(row[k],patch[k]);});
+    }
+    if(expectation.kind==='soft-remove')return !!row&&row.archivado===true;
+    return false;
+  }
+  function setPending(collection,id,row,expectation){
+    pendingBucket(collection)[id]=clone(row);
+    expectationBucket(collection)[id]=clone(expectation)||null;
+    delete deletedBucket(collection)[id];
+  }
+  function clearPending(collection,id){
+    delete (pending[collection]||{})[id];
+    delete (pendingExpected[collection]||{})[id];
+  }
   function reconcile(collection){
-    var cols=collection&&collection!=='*'?[collection]:Object.keys(pending);
+    var cols=collection&&collection!=='*'?[collection]:Array.from(new Set(Object.keys(pending).concat(Object.keys(deleted))));
     cols.forEach(function(c){
       var pendingIds=Object.keys(pending[c]||{}), deletedIds=Object.keys(deleted[c]||{});
       if(!pendingIds.length&&!deletedIds.length)return;
       var rows=base.all(c)||[], ids={};rows.forEach(function(r){var id=text(idOf(r));if(id)ids[id]=r;});
-      pendingIds.forEach(function(id){if(ids[id])delete pending[c][id];});
+      pendingIds.forEach(function(id){
+        var expectation=(pendingExpected[c]||{})[id];
+        if(baseMatchesExpectation(ids[id],expectation))clearPending(c,id);
+      });
       deletedIds.forEach(function(id){if(!ids[id])delete deleted[c][id];});
     });
   }
@@ -163,7 +199,7 @@
       return result||true;
     }).catch(function(e){
       state.pending=Math.max(0,state.pending-1);state.failed+=1;state.lastError=text(e&&e.message||e)||'PRODUCT_WRITE_FAILED';
-      delete (pending[collection]||{})[id];delete (deleted[collection]||{})[id];emit(collection);
+      clearPending(collection,id);delete (deleted[collection]||{})[id];emit(collection);
       try{window.dispatchEvent(new CustomEvent('orbit:operational-write:failed',{detail:{collection:collection,id:id,action:action,error:state.lastError,version:VERSION}}));}catch(_e){}
       throw e;
     });
@@ -192,11 +228,11 @@
         if(action==='insert'){if(prior)error('PRODUCT_BATCH_INSERT_ALREADY_EXISTS');row=payload||{};row.id=id;row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);authorize(collection,'insert',row);}
         else if(action==='update'){if(!prior)error('PRODUCT_BATCH_UPDATE_NOT_FOUND');row=Object.assign({},prior,payload||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});authorize(collection,'update',row);}
         else{if(!prior)error('PRODUCT_BATCH_REMOVE_NOT_FOUND');authorize(collection,'remove',prior);}
-        var pb=pendingBucket(collection),db=deletedBucket(collection);
-        backups.push({collection:collection,id:id,pendingHad:Object.prototype.hasOwnProperty.call(pb,id),pendingValue:clone(pb[id]),deletedHad:Object.prototype.hasOwnProperty.call(db,id),deletedValue:db[id]});
-        prepared.push({action:action,collection:collection,id:id,row:row,prior:prior});
+        var pb=pendingBucket(collection),eb=expectationBucket(collection),db=deletedBucket(collection);
+        backups.push({collection:collection,id:id,pendingHad:Object.prototype.hasOwnProperty.call(pb,id),pendingValue:clone(pb[id]),expectationHad:Object.prototype.hasOwnProperty.call(eb,id),expectationValue:clone(eb[id]),deletedHad:Object.prototype.hasOwnProperty.call(db,id),deletedValue:db[id]});
+        prepared.push({action:action,collection:collection,id:id,row:row,prior:prior,expected:action==='insert'?{kind:'insert'}:action==='update'?{kind:'update',patch:expectedPatch(payload||{})}:null});
       });
-      prepared.forEach(function(x){if(x.action==='remove'){deletedBucket(x.collection)[x.id]=true;delete pendingBucket(x.collection)[x.id];}else{pendingBucket(x.collection)[x.id]=clone(x.row);delete deletedBucket(x.collection)[x.id];}});
+      prepared.forEach(function(x){if(x.action==='remove'){deletedBucket(x.collection)[x.id]=true;clearPending(x.collection,x.id);}else{setPending(x.collection,x.id,x.row,x.expected);}});
       [...new Set(prepared.map(function(x){return x.collection;}))].forEach(emit);
     }catch(e){return Promise.reject(e);}
     state.pending+=prepared.length;state.tenantId=text(m.tenantId);state.lastError='';
@@ -214,7 +250,7 @@
       return {ok:true,serverOwned:true,canonicalReadback:true,mutationCount:prepared.length,result:result||{},readback:readback};
     }).catch(function(e){
       state.pending=Math.max(0,state.pending-prepared.length);state.failed+=1;state.lastError=text(e&&e.message||e)||'PRODUCT_BATCH_FAILED';
-      if(!serverCommitted){backups.forEach(function(b){var pb=pendingBucket(b.collection),db=deletedBucket(b.collection);if(b.pendingHad)pb[b.id]=clone(b.pendingValue);else delete pb[b.id];if(b.deletedHad)db[b.id]=b.deletedValue;else delete db[b.id];});[...new Set(prepared.map(function(x){return x.collection;}))].forEach(emit);}
+      if(!serverCommitted){backups.forEach(function(b){var pb=pendingBucket(b.collection),eb=expectationBucket(b.collection),db=deletedBucket(b.collection);if(b.pendingHad)pb[b.id]=clone(b.pendingValue);else delete pb[b.id];if(b.expectationHad)eb[b.id]=clone(b.expectationValue);else delete eb[b.id];if(b.deletedHad)db[b.id]=b.deletedValue;else delete db[b.id];});[...new Set(prepared.map(function(x){return x.collection;}))].forEach(emit);}
       prepared.forEach(function(x){try{window.dispatchEvent(new CustomEvent('orbit:operational-write:failed',{detail:{collection:x.collection,id:x.id,action:x.action,error:state.lastError,version:VERSION,batch:true,serverCommitted:serverCommitted}}));}catch(_e){}});
       throw e;
     });
@@ -224,7 +260,7 @@
     if(!row.id)row.id=collection+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
     row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);
     authorize(collection,'insert',row);
-    pendingBucket(collection)[row.id]=clone(row);delete deletedBucket(collection)[row.id];emit(collection);
+    setPending(collection,row.id,row,{kind:'insert'});emit(collection);
     callDurable('insert',collection,row.id,row,null).catch(function(){});
     return clone(row);
   }
@@ -235,7 +271,7 @@
     authorize(collection,'update',row);
     var optimistic=clone(row);
     if(collection==='negocios'&&text(prior.etapa)!=='emitido'&&text(row.etapa)==='emitido'&&!text(row.clienteIdCreado))optimistic.clienteIdCreado=text(row.clienteId)||SERVER_EMISSION_GUARD;
-    pendingBucket(collection)[id]=optimistic;delete deletedBucket(collection)[id];emit(collection);
+    setPending(collection,id,optimistic,{kind:'update',patch:expectedPatch(patch||{})});emit(collection);
     callDurable('update',collection,id,row,prior).catch(function(){});
     return clone(row);
   }
@@ -245,11 +281,11 @@
     authorize(collection,'remove',prior);
     if(collection==='negocios'||collection==='gestiones'){
       var row=Object.assign({},prior,{archivado:true,updatedAt:new Date().toISOString()});
-      pendingBucket(collection)[id]=clone(row);delete deletedBucket(collection)[id];emit(collection);
+      setPending(collection,id,row,{kind:'soft-remove'});emit(collection);
       callDurable('remove',collection,id,row,prior).catch(function(){});
       return true;
     }
-    deletedBucket(collection)[id]=true;delete pendingBucket(collection)[id];emit(collection);
+    deletedBucket(collection)[id]=true;clearPending(collection,id);emit(collection);
     callDurable('remove',collection,id,null,prior).catch(function(){});
     return true;
   }
@@ -257,25 +293,25 @@
     var row=clone(payload)||{},m=member();
     if(!row.id)row.id=collection+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
     row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);
-    authorize(collection,'insert',row);pendingBucket(collection)[row.id]=clone(row);delete deletedBucket(collection)[row.id];emit(collection);
+    authorize(collection,'insert',row);setPending(collection,row.id,row,{kind:'insert'});emit(collection);
     return callDurable('insert',collection,row.id,row,null).then(function(){return clone(row);});
   }
   function updateDurable(collection,id,patch){
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
     var m=member(),row=Object.assign({},prior,clone(patch)||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});
-    authorize(collection,'update',row);pendingBucket(collection)[id]=clone(row);delete deletedBucket(collection)[id];emit(collection);
+    authorize(collection,'update',row);setPending(collection,id,row,{kind:'update',patch:expectedPatch(patch||{})});emit(collection);
     return callDurable('update',collection,id,row,prior).then(function(){return clone(row);});
   }
   function removeDurable(collection,id){
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
-    authorize(collection,'remove',prior);deletedBucket(collection)[id]=true;delete pendingBucket(collection)[id];emit(collection);
+    authorize(collection,'remove',prior);deletedBucket(collection)[id]=true;clearPending(collection,id);emit(collection);
     return callDurable('remove',collection,id,null,prior).then(function(){return true;});
   }
   function status(){
     var bs=base&&typeof base._productStatus==='function'?base._productStatus():{};
-    return Object.assign({},state,{ready:installed===true&&bs.ready===true&&bs.status==='ready-read-only',readAuthority:'store-firestore-product-readonly-p0',writeAuthority:'product-operational-write-p0',writeTransport:'firebase-functions',generalCommand:GENERAL_COMMAND,workflowCommand:WORKFLOW_COMMAND,browserFirestoreWriteAuthorized:false,workflowSemanticOwner:true,urlTenantAllowed:false,labModeAllowed:false,seedFallback:false,localStorageBusinessPersistence:false,noFallback:true});
+    return Object.assign({},state,{ready:installed===true&&bs.ready===true&&bs.status==='ready-read-only',readAuthority:'store-firestore-product-readonly-p0',writeAuthority:'product-operational-write-p0',writeTransport:'firebase-functions',generalCommand:GENERAL_COMMAND,workflowCommand:WORKFLOW_COMMAND,browserFirestoreWriteAuthorized:false,workflowSemanticOwner:true,urlTenantAllowed:false,labModeAllowed:false,seedFallback:false,localStorageBusinessPersistence:false,pendingReconcile:'expected-field-match',noFallback:true});
   }
   function install(readStore){
     if(installed)return status();

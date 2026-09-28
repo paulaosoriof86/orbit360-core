@@ -19,10 +19,10 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 142,
+    "total": 143,
     "b2HumanFindings": 54,
-    "currentBlocking": 44,
-    "countingNote": "Array total reconciled after R87/R88 freeze. R87 is the current external OAuth-origin blocker for the exact R85 bootstrap proof; R88 startup remediation is sequenced after R87/R85 so the exact Preview is not invalidated. No LIVE/B3/reimport."
+    "currentBlocking": 75,
+    "countingNote": "R83/R85/R87 closed by exact persistent Drive evidence. R84 remains only for fresh-session zero-Google-prompt upload/scope proof. R88 startup and new R89 Ops/Leads stale-overlay defect are source-fixed pending guard/new exact Preview. No LIVE/B3/reimport."
   },
   "findings": [
     {
@@ -2601,18 +2601,18 @@
       "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Cliente360/DocumentViewer/GoogleDrive",
       "classification": "PRODUCT_DEFECT_DRIVE_DOWNLOAD_PROVIDER_CAPABILITY_MISSING",
-      "blocking": true,
+      "blocking": false,
       "finding": "Documento subido y abierto correctamente en Google Drive, pero la acción Descargar del visor no produce descarga.",
       "rootCause": "document-viewer habilita descarga solo cuando el proveedor expone downloadAvailable y secureResources puede invocar provider.download(); product-drive-document-provider-p0.js no implementaba download() ni exponía esa capacidad.",
       "remediation": "Implementar descarga autenticada con token OAuth delegado en memoria, lectura alt=media de Drive y handoff mediante anchor download; exponer downloadAvailable solo con referencia Drive válida y token fresco.",
       "requiredProof": "En nueva Preview exacta, mismo documento sintético: Conectar Drive, abrir visor, Descargar produce archivo local verificable; Abrir en Drive continúa funcionando; sin persistir token; aislamiento Preview preservado.",
-      "status": "SUPERSEDED_FOR_RETEST_BY_R84_PERSISTENT_TENANT_AUTH_REMEDIATION",
+      "status": "PAULA_VISUAL_PASS_PERSISTENT_DRIVE_PREVIEW_DOWNLOAD",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15B_DRIVE_DOWNLOAD_FINDING_20260927.json",
       "noLive": true,
       "noReimport": true,
       "sourceFixCommit": "10f03257590eb0ab73952e63ff0296a20bcfeabb",
       "contractGuardCommit": "328018188f582c57494ac77ac373484664632d5d",
-      "closureState": "NOT_CLOSED",
+      "closureState": "CLOSED",
       "previewProofRequired": true,
       "humanProofRequired": true,
       "exactPreviewProof": {
@@ -2640,6 +2640,25 @@
         "externalGoogleAccountChooserObserved": true,
         "blockedByR84TenantBootstrap": true,
         "classification": "R83_RETEST_REMAINS_SUPERSEDED_BY_R84"
+      },
+      "closedAt": "2026-09-28",
+      "closureProof": "Same exact Preview: tenant persistent connection toast, in-app preview available with fixture content, Paula confirmed Download succeeded, and direct Drive open succeeded.",
+      "closedBy": {
+        "source": "PAULA_VISUAL_20260928",
+        "exactPreview": {
+          "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
+          "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
+          "channelId": "gi-i65-b2-36418353246",
+          "url": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+          "runId": 36418353246,
+          "artifactId": 10968560537,
+          "artifactDigest": "d3e73ddedd878cdf251b8a0c3148d8a3cbe38b354d8af3304aa28cb2078b2374",
+          "exactReadback": true,
+          "functionalPass": true,
+          "livePromoted": false
+        },
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
+        "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23"
       }
     },
     {
@@ -2653,9 +2672,9 @@
       "rootCause": "product-drive-document-provider-p0.js forces Google prompt=consent and memory_only token persistence; document-drive-domain.js requires googleAccessToken from the browser for status/upload. The same model would repeat in LIVE.",
       "remediation": "Replace routine per-user OAuth with persistent tenant-level backend Drive integration. Gravicentra role/scope becomes the authorization boundary; Drive credential remains backend-only.",
       "requiredProof": "one-time tenant bootstrap succeeds and readback persists; fresh user browser has zero Google consent/account selection; authorized client document read/download/upload works by active role/scope; cross-scope access denied; no Drive token in browser storage; Preview synthetic isolation preserved; audit receipt present; cleanup synthetic fixture",
-      "status": "R85_CAUSAL_SUCCESSOR_SOURCE_FIXED_PENDING_GUARD",
+      "status": "TENANT_PERSISTENT_AUTHORITY_PASS_REMAINING_FRESH_SESSION_SCOPE_UPLOAD_PROOF",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
-      "receiptBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
+      "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
@@ -2731,7 +2750,18 @@
       },
       "causalSuccessorId": "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
       "browserDriveTokenAllowed": false,
-      "browserRefreshTokenAllowed": false
+      "browserRefreshTokenAllowed": false,
+      "tenantPersistentProof": {
+        "runId": 36418353246,
+        "runAttempt": 2,
+        "jobId": 109006464190,
+        "milestone": "DRIVE_TENANT_PERSISTENT_AUTHORITY_PASS",
+        "routineUserGoogleOAuth": false,
+        "tokenPersistence": "backend_secret_manager",
+        "browserTokenKeys": 0,
+        "status": "disponible",
+        "uploadAvailable": true
+      }
     },
     {
       "id": "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
@@ -2739,13 +2769,13 @@
       "source": "PAULA_MOBILE_UAT_20260928",
       "surface": "Cliente360/Documentos/GoogleDrive/TenantBootstrap",
       "classification": "PRODUCT_ARCHITECTURE_DEFECT_WRONG_OAUTH_FLOW_FOR_OFFLINE_DRIVE_AUTHORITY",
-      "blocking": true,
+      "blocking": false,
       "finding": "The one-time tenant bootstrap completed Google account selection/consent but Firebase Auth signInWithPopup did not return a Google Drive refresh token, so the persistent tenant connection could not be stored.",
       "rootCause": "The browser bootstrap used Firebase Authentication GoogleAuthProvider and inspected Firebase _tokenResponse for oauthRefreshToken. Durable Google Drive authority requires an OAuth authorization-code flow with backend code exchange; refresh tokens are not a browser authentication credential.",
       "remediation": "Use Google Identity Services authorization-code popup. Browser receives only a short-lived authorization code. Authenticated backend validates tenant/admin role and Preview origin, exchanges the code using the existing Identity Platform Google provider client ID/secret, verifies Drive/root-folder access, and stores only the refresh token in the tenant Secret Manager vault.",
       "requiredProof": "On one new exact Preview, Dirección performs one administrative authorization; backend returns configured=true and Secret Manager readback survives reload; fresh routine-user sessions receive zero Google account/consent prompts; authorized view/download/upload pass; cross-scope denial passes; no Google access or refresh token exists in browser storage.",
-      "status": "EXACT_PREVIEW_READY_PENDING_ONE_TIME_ADMIN_BOOTSTRAP",
-      "closureState": "NOT_CLOSED",
+      "status": "CLOSED_TENANT_PERSISTENT_BOOTSTRAP_PASS",
+      "closureState": "CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928.json",
       "receiptBlobSha": "2cc9f9d70d4bca863b2c1ab60f996f1310c7721f",
       "changedProductFiles": [
@@ -2778,7 +2808,25 @@
         "exactReadback": true,
         "functionalPass": true
       },
-      "bootstrapClientIdPresent": true
+      "bootstrapClientIdPresent": true,
+      "closedAt": "2026-09-28",
+      "closureProof": "Paula completed the one-time authorization-code bootstrap on the exact Preview and received persistent tenant connection confirmation; authenticated rerun read back status disponible with backend Secret Manager persistence and zero browser token keys.",
+      "closedBy": {
+        "exactPreview": {
+          "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
+          "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
+          "channelId": "gi-i65-b2-36418353246",
+          "url": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+          "runId": 36418353246,
+          "artifactId": 10968560537,
+          "artifactDigest": "d3e73ddedd878cdf251b8a0c3148d8a3cbe38b354d8af3304aa28cb2078b2374",
+          "exactReadback": true,
+          "functionalPass": true,
+          "livePromoted": false
+        },
+        "authenticatedJobId": 109006464190,
+        "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23"
+      }
     },
     {
       "id": "B2-R86-DRIVE-OAUTH-CLIENT-RUNTIME-CONFIG-UNAVAILABLE-R18",
@@ -2832,7 +2880,7 @@
     {
       "id": "B2-R87-DRIVE-OAUTH-PREVIEW-ORIGIN-MISMATCH-R19",
       "classification": "PREVIEW_OAUTH_CLIENT_AUTHORIZED_JAVASCRIPT_ORIGIN_MISMATCH",
-      "blocking": true,
+      "blocking": false,
       "surface": "Cliente360/Documentos/GoogleDrive/TenantBootstrap",
       "evidence": {
         "userScreenshot": "Google OAuth Error 400 origin_mismatch on 2026-09-28",
@@ -2851,14 +2899,14 @@
         "fresh routine-user session shows zero Google account/consent prompts",
         "no Google access/refresh token is persisted in browser storage"
       ],
-      "status": "EXTERNAL_CONSOLE_APPLY_REQUIRED_PROGRAMMATIC_PATH_EXHAUSTED",
+      "status": "CLOSED_EXACT_ORIGIN_APPLIED_AND_BOOTSTRAP_PASS",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
       "productionSecretTouched": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
       "receiptBlobSha": "55878f32e9aa711ea0119525b4464f58c7aec652",
-      "closureState": "NOT_CLOSED",
+      "closureState": "CLOSED",
       "recordedAt": "2026-09-28",
       "previewProofRequired": true,
       "discoveryProof": {
@@ -2887,7 +2935,14 @@
       },
       "externalActionRequired": "Add exact Preview origin in Google Auth Platform > Clients > existing web client > Authorized JavaScript origins.",
       "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
-      "targetClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com"
+      "targetClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com",
+      "closedAt": "2026-09-28",
+      "closureProof": "Paula added only the exact frozen Preview origin to the existing OAuth web client, saved it, and the subsequent same-Preview administrative bootstrap completed persistently.",
+      "closedBy": {
+        "source": "PAULA_GOOGLE_AUTH_PLATFORM_PLUS_SAME_PREVIEW_BOOTSTRAP",
+        "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+        "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23"
+      }
     },
     {
       "id": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
@@ -2909,7 +2964,7 @@
         ]
       },
       "rootCause": "The UI state labeled Restaurando sesión spans more than session restoration. It also waits membership, tenant/read authority and full authoritative hydration of eight required business collections before revealing the product shell. This conflates identity readiness with data readiness and makes startup latency visible as an authentication delay.",
-      "remediation": "Preserve fail-closed identity, membership, tenant and role/scope validation, but separate AUTH_READY from DATA_ROUTE_READY. Reveal the authenticated shell once identity/access authority is proven; hydrate non-critical business collections and route-specific data afterward with bounded loading states. Add milestone timing so regressions are measured rather than hidden behind one splash.",
+      "remediation": "Route-primary authoritative startup collection; all remaining configured collections deferred immediately after primary server confirmation, preserving membership/tenant/role/scope validation and authoritative-first-read.",
       "guardrails": [
         "Do not weaken membership/tenant/role/scope authorization",
         "Do not introduce local/demo fallback",
@@ -2917,22 +2972,48 @@
         "Do not add duplicate auth listeners",
         "Do not promote to LIVE from this finding"
       ],
-      "requiredProof": [
-        "cold no-session opens login without waiting for business hydration",
-        "valid existing session reaches authenticated shell after access authority without waiting for unrelated collections",
-        "direct protected route waits only for its required authoritative data",
-        "logout/login/account-expired paths remain deterministic",
-        "startup milestones and elapsed timings are captured on mobile and desktop"
-      ],
-      "status": "ROOT_CAUSE_CONFIRMED_REMEDIATION_SEQUENCED_AFTER_DRIVE_BOOTSTRAP",
+      "requiredProof": "New exact Preview must show materially improved restored-session shell readiness, no access weakening, and subsequent route data hydration/reactive rerender.",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
-      "receiptBlobSha": "55878f32e9aa711ea0119525b4464f58c7aec652",
+      "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
       "closureState": "NOT_CLOSED",
       "recordedAt": "2026-09-28",
-      "previewProofRequired": true
+      "previewProofRequired": true,
+      "remediationBlobSha": "6268db97af9610d48b63201718c0e9ec1dd7e06b"
+    },
+    {
+      "id": "B2-R89-OPS-LEADS-PENDING-OVERLAY-PREMATURE-RECONCILIATION-R20",
+      "block": "B2",
+      "source": "AUTHENTICATED_PREVIEW_RERUN_36418353246_ATTEMPT2",
+      "owner": [
+        "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "tools/gravicentra-i6-5-b2-authenticated-preview.mjs"
+      ],
+      "finding": "OPS_LEADS_ACCEPTED_BUSINESS_DISAPPEARED_FROM_OPS_BECAUSE_PENDING_STAGE_UPDATE_WAS_RECONCILED_BY_ID_EXISTENCE_BEFORE_AUTHORITATIVE_FIELDS_MATCHED",
+      "rootCause": "The operational facade reconciled every pending update away as soon as the authoritative base snapshot contained the same record ID, even when that base row still held pre-write values. A stale negocios snapshot therefore removed the optimistic cotizando overlay and exposed nuevo until the later server snapshot.",
+      "remediation": "Track per-record expectations. Inserts reconcile on existence; updates reconcile only when authoritative base fields match the requested patch; workflow soft-delete reconciles only when archivado=true; failures and hard deletes clear both pending row and expectation.",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "blocking": true,
+      "closureState": "NOT_CLOSED",
+      "observed": {
+        "businessLeads": 1,
+        "businessOps": 0,
+        "businessStage": "nuevo",
+        "expectedStage": "cotizando",
+        "storeCountsAllOne": true
+      },
+      "remediationBlobSha": "4cc627428397e65c16912e42c1fb4d2a0979358e",
+      "runtimeContractPath": "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs",
+      "runtimeContractBlobSha": "7f843d8304135284acc49006bcec90b3cce4edf6",
+      "requiredProof": "R20 dynamic contract plus exact authenticated Preview must keep cotizando visible through stale base snapshot and show accepted business exactly once in Ops and Leads.",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
+      "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [

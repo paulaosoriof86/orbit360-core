@@ -1,0 +1,113 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928_V1",
+  "status": "SOURCE_FIXED_PENDING_GUARD",
+  "recordedAt": "2026-09-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "parentHead": "b92e5da1fa52399a05c844db46e95bade2af47a5",
+  "driveClosureEvidence": {
+    "exactPreview": {
+      "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
+      "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
+      "channelId": "gi-i65-b2-36418353246",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+      "runId": 36418353246,
+      "artifactId": 10968560537,
+      "artifactDigest": "d3e73ddedd878cdf251b8a0c3148d8a3cbe38b354d8af3304aa28cb2078b2374",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false
+    },
+    "paulaVisual": {
+      "tenantPersistentToast": "Drive quedó conectado de forma persistente para el tenant.",
+      "inAppPreviewAvailable": true,
+      "inAppPreviewContentMatchesFixture": true,
+      "downloadConfirmedByPaula": true,
+      "directDriveOpen": true,
+      "oauthOriginManuallyApplied": true,
+      "oauthOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app"
+    },
+    "authenticatedRerun": {
+      "runId": 36418353246,
+      "runAttempt": 2,
+      "jobId": 109006464190,
+      "driveMilestone": "DRIVE_TENANT_PERSISTENT_AUTHORITY_PASS",
+      "tenantPersistent": true,
+      "routineUserGoogleOAuth": false,
+      "tokenPersistence": "backend_secret_manager",
+      "browserTokenKeys": 0,
+      "status": "disponible",
+      "uploadAvailable": true,
+      "laterFailure": "B2_AUTH_LEADS_OPS_SYNC_FAILED"
+    },
+    "disposition": {
+      "r83": "CLOSED_VISUAL_PASS",
+      "r85": "CLOSED_BOOTSTRAP_PERSISTENT_PASS",
+      "r87": "CLOSED_ORIGIN_APPLY_PLUS_BOOTSTRAP_PASS",
+      "r84": "PERSISTENT_AUTHORITY_PASS_REMAINING_NEW_CANDIDATE_FRESH_SESSION_SCOPE_UPLOAD_PROOF"
+    }
+  },
+  "r89": {
+    "id": "B2-R89-OPS-LEADS-PENDING-OVERLAY-PREMATURE-RECONCILIATION-R20",
+    "trigger": "Authenticated exact Preview rerun after Drive persistence",
+    "observed": {
+      "businessLeads": 1,
+      "businessOps": 0,
+      "businessStage": "nuevo",
+      "expectedStage": "cotizando",
+      "storeCountsAllOne": true
+    },
+    "rootCause": "The operational facade reconciled every pending update away as soon as the authoritative base snapshot contained the same record ID, even when that base row still held pre-write values. A stale negocios snapshot therefore removed the optimistic cotizando overlay and exposed nuevo until the later server snapshot.",
+    "remediation": "Track per-record expectations. Inserts reconcile on existence; updates reconcile only when authoritative base fields match the requested patch; workflow soft-delete reconciles only when archivado=true; failures and hard deletes clear both pending row and expectation.",
+    "productBlob": "4cc627428397e65c16912e42c1fb4d2a0979358e",
+    "runtimeContractBlob": "7f843d8304135284acc49006bcec90b3cce4edf6"
+  },
+  "r88": {
+    "id": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
+    "priorMeasuredElapsedSeconds": 7.433,
+    "rootCause": "Product activation validated identity and membership but still blocked shell readiness on authoritative snapshots for all eight required business collections.",
+    "remediation": "Preserve membership/tenant/role/scope validation before shell authority, but require only one route-primary authoritative collection for startup. All configured remaining collections stay attached immediately after primary confirmation as deferred authoritative hydration; router reactive dependencies rerender the active route as those snapshots arrive.",
+    "productBlob": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
+    "invariants": {
+      "membershipBeforeData": true,
+      "authoritativeFirstRead": true,
+      "fullHydrationPreserved": true,
+      "noFallback": true,
+      "serviceWorkerBlocking": false
+    }
+  },
+  "changedProductFiles": [
+    "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "orbit360-platform/core/product-hydration-required-optional-p0.js",
+    "orbit360-platform/index.html"
+  ],
+  "changedProductBlobs": {
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e",
+    "orbit360-platform/core/product-hydration-required-optional-p0.js": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
+    "orbit360-platform/index.html": "68a2b2d0cccec3b3dea815634a98ba7fecb3f586"
+  },
+  "changedTestFiles": {
+    "tools/gravicentra-i6-5-b2-r15-contract.mjs": "8ca7fa6593583ebbca9cc522e2861713fc14fa29",
+    "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs": "7f843d8304135284acc49006bcec90b3cce4edf6",
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "fbb4622ff1666f429fe80d2ef456e8492a05836d"
+  },
+  "boundaries": {
+    "livePromotion": false,
+    "b3Open": false,
+    "reimport": false,
+    "productionSecretTouched": false,
+    "oauthClientFurtherMutation": false
+  },
+  "nextRequiredProof": [
+    "CENTRAL_GUARD_PASS",
+    "R20_RUNTIME_CONTRACT_PASS",
+    "NEW_EXACT_B2_PREVIEW_READBACK",
+    "R89_OPS_LEADS_COTIZANDO_SYNC_PASS",
+    "R88_STARTUP_TIMING_AND_ROUTE_HYDRATION_PASS",
+    "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_VIEW_DOWNLOAD_UPLOAD_AND_SCOPE_DENIAL",
+    "R77_R81_CANONICAL_PROVIDER_PROOF",
+    "DRIVE_QA_FIXTURE_CLEANUP",
+    "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
+  ]
+}

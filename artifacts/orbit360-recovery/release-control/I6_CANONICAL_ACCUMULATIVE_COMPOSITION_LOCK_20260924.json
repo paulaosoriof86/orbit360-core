@@ -137,7 +137,7 @@
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
     "orbit360-platform/core/product-app-p0.js": "b6ccd725f214c666e04299574be4c1fdae3a6b83",
     "orbit360-platform/core/product-drive-document-provider-p0.js": "30f84e48d94a728c71471902134b0cd657f61a4a",
-    "orbit360-platform/core/product-hydration-required-optional-p0.js": "fcf45f869897b205df48d17906555fc688250f83",
+    "orbit360-platform/core/product-hydration-required-optional-p0.js": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
@@ -150,10 +150,10 @@
     "orbit360-platform/core/tenant-domain-config-client.js": "89bff4ac9131ff5805ffe96ee8d6ccd4927a84dc",
     "orbit360-platform/core/user-onboarding.js": "bf645951a23491ce53d2034ba4281d965cbb326d",
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
-    "orbit360-platform/data/store-firestore-product-operational-p0.js": "405d2da318285ab223d8f859cb17deef70c0c47e",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "1b3f744c5e1a07c534807a802064efb6562577a8",
+    "orbit360-platform/index.html": "68a2b2d0cccec3b3dea815634a98ba7fecb3f586",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "2d7db2a218459bb5a6239845f0e277db12aa5490",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
@@ -202,72 +202,58 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "AUTHENTICATED_PREVIEW_R18_OAUTH_CLIENT_SECRET_BINDING_20260928",
-    "parentHead": "36f44c1cd510716b71cef741f6c76bcc6972e039",
-    "status": "R86_EXACT_PREVIEW_PASS_R85_ADMIN_BOOTSTRAP_PENDING",
+    "origin": "R20_DRIVE_PERSISTENT_PASS_R88_STARTUP_R89_OPS_LEADS_20260928",
+    "parentHead": "b92e5da1fa52399a05c844db46e95bade2af47a5",
+    "status": "SOURCE_FIXED_PENDING_GUARD",
     "changedProductFiles": [
-      "functions/document-drive-domain.js"
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/core/product-hydration-required-optional-p0.js",
+      "orbit360-platform/index.html"
     ],
     "changedProductBlobs": {
-      "functions/document-drive-domain.js": "c0687b789790344c1463d48500b16070078ff9b2"
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e",
+      "orbit360-platform/core/product-hydration-required-optional-p0.js": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
+      "orbit360-platform/index.html": "68a2b2d0cccec3b3dea815634a98ba7fecb3f586"
     },
-    "changedWorkflowFiles": [
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
-    ],
-    "workflowBlobs": {
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "f41f04d24c497369c90c5e982b393cd465843a9d"
+    "changedTestFiles": {
+      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "8ca7fa6593583ebbca9cc522e2861713fc14fa29",
+      "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs": "7f843d8304135284acc49006bcec90b3cce4edf6",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "fbb4622ff1666f429fe80d2ef456e8492a05836d"
     },
-    "changedContractFiles": [
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs"
-    ],
-    "contractBlobSha": "24c320684cc1920e16270ee54068de6ce0e8554b",
-    "rootCause": "PREVIEW_RUNTIME_OAUTH_CLIENT_CONFIG_NOT_AVAILABLE",
-    "fix": "CI_MATERIALIZES_EXISTING_GOOGLE_PROVIDER_CLIENT_TO_FIREBASE_FUNCTIONS_SECRET_AND_PREVIEW_FUNCTIONS_BIND_IT",
-    "previewOAuthClientSecret": "ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW",
-    "productionOAuthClientSecret": "ORBIT360_DRIVE_OAUTH_CLIENT_PRODUCTION",
-    "runtimeIamBroadening": false,
-    "productionSecretTouched": false,
-    "priorPreview": {
-      "sourceSha": "7a5a34354c1b19be7b71720574d86fd9c42d228e",
-      "buildId": "gi-i65-b2-7a5a34354c1b-57f234755dc1",
-      "runId": 36417141888,
-      "artifactId": 10967803150,
-      "exactReadback": true,
-      "functionalPass": true
-    },
-    "priorAuthenticatedFailure": {
-      "jobId": 108911882524,
-      "status": "tenant_setup_required",
-      "bootstrapRequired": true,
-      "bootstrapClientId": "",
-      "previewSecretIam": "PASS"
-    },
-    "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R18_DRIVE_OAUTH_CLIENT_SECRET_BINDING_20260928.json",
-    "evidenceReceiptBlobSha": "014d9c0d935991c3ee489add56e5f93db42ef52e",
-    "findingLedgerBlobSha": "1213f5423033d09cf846d7765dd633bf0898c66b",
-    "noDataReimport": true,
-    "noLive": true,
-    "noB3": true,
-    "candidateHead": "ac136eea7f317db1b10cf24c6ef21b9d42cfd7e2",
-    "guardPassRunId": 36418111656,
-    "exactPreview": {
+    "driveHistoricalExactPreview": {
       "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
       "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
+      "channelId": "gi-i65-b2-36418353246",
       "url": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
       "runId": 36418353246,
       "artifactId": 10968560537,
       "artifactDigest": "d3e73ddedd878cdf251b8a0c3148d8a3cbe38b354d8af3304aa28cb2078b2374",
       "exactReadback": true,
-      "functionalPass": true
+      "functionalPass": true,
+      "livePromoted": false
     },
-    "r86Proof": {
-      "status": "PASS",
-      "previewOAuthClientSecretProvision": true,
-      "previewOAuthClientSecretBinding": true,
-      "bootstrapClientIdPresent": true,
-      "authenticatedJobId": 108915808441,
-      "productionSecretTouched": false,
-      "runtimeIamBroadening": false
-    }
+    "driveDisposition": {
+      "r83": "CLOSED",
+      "r85": "CLOSED",
+      "r87": "CLOSED",
+      "r84": "PERSISTENT_PASS_FRESH_SESSION_SCOPE_UPLOAD_PENDING"
+    },
+    "r88": {
+      "findingId": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
+      "remediationBlobSha": "6268db97af9610d48b63201718c0e9ec1dd7e06b",
+      "priorElapsedSeconds": 7.433
+    },
+    "r89": {
+      "findingId": "B2-R89-OPS-LEADS-PENDING-OVERLAY-PREMATURE-RECONCILIATION-R20",
+      "remediationBlobSha": "4cc627428397e65c16912e42c1fb4d2a0979358e",
+      "runtimeContractBlobSha": "7f843d8304135284acc49006bcec90b3cce4edf6"
+    },
+    "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
+    "evidenceReceiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
+    "findingLedgerBlobSha": "c0428a52812175bbe0e4679852a5ce69bdeb7949",
+    "noDataReimport": true,
+    "noLive": true,
+    "noB3": true,
+    "productionSecretTouched": false
   }
 }

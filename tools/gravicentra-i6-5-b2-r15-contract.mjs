@@ -12,6 +12,7 @@ const renew=read('orbit360-platform/modules/renewals-v1200-operational-bridge.js
 const policy=read('orbit360-platform/modules/policy-receipts-v1199-detail-guard.js');
 const del=read('orbit360-platform/core/record-delete.js');
 const store=read('orbit360-platform/data/store-firestore-product-operational-p0.js');
+const hydration=read('orbit360-platform/core/product-hydration-required-optional-p0.js');
 const imports=read('orbit360-platform/core/importa.js');
 const resources=read('orbit360-platform/core/backend-resource-contracts.js');
 const driveClient=read('orbit360-platform/core/product-drive-document-provider-p0.js');
@@ -55,6 +56,16 @@ for(const collection of ['clientes','polizas','vehiculos','cobros','gestiones','
 has(del,'DELETE_RELATION_BLOCKED','R82_DELETE_RELATION_FAIL_CLOSED_MISSING');
 has(del,'deleteReason','R82_DELETE_REASON_AUDIT_MISSING');
 has(store,'function isSoftDeleted(row)','R82_SOFT_DELETE_PROJECTION_FILTER_MISSING');
+has(store,'var listeners=[], pending={}, pendingExpected={}, deleted={}, prefOverlay={};','R89_PENDING_EXPECTATION_STATE_MISSING');
+has(store,'function baseMatchesExpectation(row,expectation)','R89_EXPECTATION_MATCHER_MISSING');
+has(store,'if(baseMatchesExpectation(ids[id],expectation))clearPending(c,id);','R89_RECONCILE_FIELD_MATCH_MISSING');
+need(!store.includes("pendingIds.forEach(function(id){if(ids[id])delete pending[c][id];});"),'R89_PREMATURE_ID_ONLY_RECONCILE_REMAINS');
+has(store,"{kind:'update',patch:expectedPatch(patch||{})}",'R89_UPDATE_EXPECTATION_MISSING');
+has(store,"pendingReconcile:'expected-field-match'",'R89_STATUS_INVARIANT_MISSING');
+has(hydration,"required=[startup]",'R88_SINGLE_AUTHORITATIVE_STARTUP_COLLECTION_MISSING');
+has(hydration,"fullHydrationDeferred:true",'R88_DEFERRED_FULL_HYDRATION_MISSING');
+has(hydration,"startupCollection:startup",'R88_STARTUP_COLLECTION_STATUS_MISSING');
+has(hydration,"primaryByRoute",'R88_ROUTE_PRIMARY_MAP_MISSING');
 has(cobros,"Orbit.recordDelete.remove('cobros'","R82_COBROS_DELETE_ENTRYPOINT_MISSING");
 has(siniestros,"Orbit.recordDelete.remove('reclamos'","R82_SINIESTROS_DELETE_ENTRYPOINT_MISSING");
 has(cancelaciones,"Orbit.recordDelete.remove('cancelaciones'","R82_CANCELACIONES_DELETE_ENTRYPOINT_MISSING");
@@ -106,8 +117,10 @@ has(driveBackend,'ROOT_BY_TENANT','R81_DRIVE_ROOT_BINDING_MISSING');
 console.log(JSON.stringify({
   status:'PASS',
   contract:'I6.5-B2-R15-R15A-R16',
-  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83','R84','R85','R86'],
+  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83','R84','R85','R86','R87','R88','R89'],
   drive:{repository:'Google Drive',auth:'tenant-persistent-backend-auth-code',tokenPersistence:'SecretManager',routineUserGoogleOAuth:false,browserRefreshToken:false,readbackRequired:true},
   delete:{ui:'Eliminar',default:'durable-soft-delete',relationalSafety:'fail-closed'},
-  renewalWindowDays:45
+  renewalWindowDays:45,
+  startup:{authority:'membership-before-data',readiness:'single-route-primary-authoritative',fullHydrationDeferred:true},
+  operationalOverlay:{reconcile:'expected-field-match'}
 },null,2));

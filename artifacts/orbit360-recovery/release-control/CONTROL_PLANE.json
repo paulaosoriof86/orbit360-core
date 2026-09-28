@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "27e120dee51b8228a84faa961d8934ada47bfae0",
+    "b2ExecutionLockBlobSha": "89253b71e44e361e6906dece7607afb3c7bc102a",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2168,7 +2168,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "R87 programmatic path is exhausted without unsafe/private API guessing. Temporary read-only IAM was fully rolled back. The only pending external mutation is one additive Authorized JavaScript origin on the existing OAuth web client for the exact frozen Preview. After that, complete Drive persistence proof on the same artifact, then remediate R88 startup. No LIVE, no B3, no reimport.",
+      "boundaryNote": "Persistent Drive bootstrap/preview/download/direct-open are proven on the frozen exact Preview. Authenticated rerun also proves backend Secret Manager persistence with zero browser token keys, then exposed R89 Ops/Leads stale-overlay reconciliation. R88 and R89 are source-fixed in one cumulative candidate to minimize rebuilds. Guard before arming one new exact Preview. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2254,7 +2254,7 @@
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
       "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
       "insurerStableEditRuntimePass": true,
-      "findingLedgerBlobSha": "79ee4ee2667d67fa4e3692ac89d9df14fa6e8545",
+      "findingLedgerBlobSha": "c0428a52812175bbe0e4679852a5ce69bdeb7949",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
@@ -2587,8 +2587,8 @@
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
         "receiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63"
       },
-      "compositionLockBlobSha": "27a9c76de861a28a965fe04cd825f6974a8d0698",
-      "sourceFixPendingArm": false,
+      "compositionLockBlobSha": "fb82d694dd7647c511b7cbd0fdd8da2434106b53",
+      "sourceFixPendingArm": true,
       "r84BootstrapSurfaceArm": {
         "status": "GUARD_PASS_PREVIEW_ARMED",
         "sourceFixCommit": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
@@ -2644,20 +2644,36 @@
         "bootstrapClientIdPresent": true
       },
       "r19": {
-        "status": "R87_EXTERNAL_CONSOLE_APPLY_REQUIRED_R88_FROZEN",
+        "status": "R87_CLOSED_R88_SOURCE_FIXED_PENDING_GUARD",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
         "receiptBlobSha": "55878f32e9aa711ea0119525b4464f58c7aec652",
         "r87": {
-          "status": "EXTERNAL_CONSOLE_APPLY_REQUIRED_PROGRAMMATIC_PATH_EXHAUSTED",
-          "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
-          "targetClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com",
-          "discoveryRunId": 36423957488,
-          "temporaryIamRollbackPass": true,
-          "oauthClientMutationExecuted": false
+          "status": "CLOSED_EXACT_ORIGIN_AND_BOOTSTRAP_PASS"
         },
         "r88": {
-          "status": "ROOT_CAUSE_CONFIRMED_REMEDIATION_SEQUENCED_AFTER_DRIVE_BOOTSTRAP",
+          "status": "SOURCE_FIXED_PENDING_GUARD",
           "measuredElapsedSeconds": 7.433
+        }
+      },
+      "r20": {
+        "status": "SOURCE_FIXED_PENDING_GUARD",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
+        "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
+        "drive": {
+          "persistentBootstrap": true,
+          "inAppPreview": true,
+          "download": true,
+          "directDriveOpen": true,
+          "r84FreshSessionScopeUploadPending": true
+        },
+        "r88": {
+          "status": "SOURCE_FIXED_PENDING_GUARD",
+          "productBlob": "6268db97af9610d48b63201718c0e9ec1dd7e06b"
+        },
+        "r89": {
+          "status": "SOURCE_FIXED_PENDING_GUARD",
+          "productBlob": "4cc627428397e65c16912e42c1fb4d2a0979358e",
+          "failureJobId": 109006464190
         }
       }
     },

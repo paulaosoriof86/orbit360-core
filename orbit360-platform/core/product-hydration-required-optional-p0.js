@@ -13,7 +13,7 @@
   'use strict';
 
   window.Orbit = window.Orbit || {};
-  var VERSION = 'p0-20260919-team-canonical-policy-required-5';
+  var VERSION = 'p0-20260928-route-primary-authoritative-startup-6';
   var MARKER = 'PRODUCT_HYDRATION_AUTHORITATIVE_REQUIRED_OPTIONAL_P0';
   var originalCreate = window.Orbit.createFirestoreProductReadOnlyStoreP0;
 
@@ -39,14 +39,52 @@
       required = required.filter(function (name) { return name !== 'asesores'; });
       if (optional.indexOf('asesores') < 0) optional.push('asesores');
     }
-    var equipoRoute=false;
-    try { equipoRoute=/^#\/equipo(?:[/?#]|$)/.test(String(window.location&&window.location.hash||'')); } catch (error) {}
-    if (equipoRoute && teamDirectoryRequired) {
-      optional = unique(required.concat(optional)).filter(function (name) { return name !== 'asesores'; });
-      required = ['asesores'];
+    var route='inicio';
+    try { route=String(window.location&&window.location.hash||'').replace(/^#\/?/,'').split(/[?/#]/)[0]||'inicio'; } catch (error) { route='inicio'; }
+    var primaryByRoute={
+      inicio:'clientes',
+      cliente360:'clientes',
+      clientes:'clientes',
+      polizas:'polizas',
+      cobros:'cobros',
+      conciliaciones:'cobros',
+      renovaciones:'polizas',
+      aseguradoras:'aseguradoras',
+      equipo:'asesores',
+      vehiculos:'vehiculos'
+    };
+    function readable(collection){
+      try{
+        var policy=window.Orbit.tenantAccessPolicyProductP0;
+        var plan=policy&&typeof policy.queryConstraints==='function'
+          ?policy.queryConstraints(collection,membership||{},{tenantId:text(membership&&membership.tenantId)})
+          :null;
+        return !!(plan&&plan.ok===true&&plan.scope!=='none'&&!(plan.constraints||[]).some(function(x){return x&&x.field==='__deny__';}));
+      }catch(error){return false;}
     }
-    if (!required.length) throw new Error('product_required_hydration_contract_missing');
-    return { version: text(cfg.hydrationContractVersion) || 'unversioned', source: text(cfg.hydrationContractSource) || 'public-runtime-config', required: required, optional: optional, all: required.concat(optional), teamDirectoryRequired: teamDirectoryRequired, routeOptimized: equipoRoute && teamDirectoryRequired };
+    var allConfigured=unique(required.concat(optional));
+    var preferred=primaryByRoute[route]||'clientes';
+    var startup='';
+    if(allConfigured.indexOf(preferred)>=0&&readable(preferred))startup=preferred;
+    if(!startup){
+      startup=required.find(function(name){return readable(name);})||allConfigured.find(function(name){return readable(name);})||'';
+    }
+    if(route==='equipo'&&teamDirectoryRequired&&allConfigured.indexOf('asesores')>=0&&readable('asesores'))startup='asesores';
+    if(!startup) throw new Error('product_required_hydration_contract_missing');
+    optional=allConfigured.filter(function(name){return name!==startup;});
+    required=[startup];
+    return {
+      version:text(cfg.hydrationContractVersion)||'unversioned',
+      source:text(cfg.hydrationContractSource)||'public-runtime-config',
+      required:required,
+      optional:optional,
+      all:required.concat(optional),
+      teamDirectoryRequired:teamDirectoryRequired,
+      routeOptimized:true,
+      startupCollection:startup,
+      startupRoute:route,
+      fullHydrationDeferred:true
+    };
   }
   function rowId(row) { return row && (row.id || row.uid || row.codigo || row.numero || row.key); }
 
@@ -90,6 +128,9 @@
         writeEnabled: false,
         writeAuthorized: false,
         requiredReadinessAuthority: MARKER,
+        startupCollection: hydration.startupCollection || '',
+        startupRoute: hydration.startupRoute || 'inicio',
+        fullHydrationDeferred: hydration.fullHydrationDeferred === true,
         authoritativeServerSnapshotRequired: true,
         authoritativeFirstReadRequired: true
       });
@@ -126,7 +167,7 @@
     base.get = function (collection, id) { if (collection !== 'asesores') return baseGet(collection, id); return advisorProjection().find(function (row) { return rowId(row) === id; }) || null; };
     base.where = function (collection, fieldOrPredicate, opOrValue, maybeValue) { if (collection !== 'asesores') return baseWhere.apply(null, arguments); var rows = advisorProjection(); if (typeof fieldOrPredicate === 'function') return rows.filter(fieldOrPredicate); if (fieldOrPredicate && typeof fieldOrPredicate === 'object') return rows.filter(function (row) { return Object.keys(fieldOrPredicate).every(function (key) { return row[key] === fieldOrPredicate[key]; }); }); var op = arguments.length >= 4 ? opOrValue : '=='; var value = arguments.length >= 4 ? maybeValue : opOrValue; return rows.filter(function (row) { return (op === '==' || op === '=') ? row[fieldOrPredicate] === value : op === '!=' ? row[fieldOrPredicate] !== value : false; }); };
     base.find = function (collection, predicate) { if (collection !== 'asesores') return baseFind(collection, predicate); return typeof predicate === 'function' ? (advisorProjection().find(predicate) || null) : null; };
-    base.__productHydrationRequiredOptionalP0 = Object.freeze({ version: VERSION, marker: MARKER, writes: 0, noFallback: true, authoritativeServerSnapshotRequired: true, authoritativeFirstReadRequired: true, advisorProjectionMemoized: true, teamDirectoryRequired: hydration.teamDirectoryRequired === true });
+    base.__productHydrationRequiredOptionalP0 = Object.freeze({ version: VERSION, marker: MARKER, writes: 0, noFallback: true, authoritativeServerSnapshotRequired: true, authoritativeFirstReadRequired: true, advisorProjectionMemoized: true, teamDirectoryRequired: hydration.teamDirectoryRequired === true, routeOptimized: hydration.routeOptimized === true, startupCollection: hydration.startupCollection || '', fullHydrationDeferred: hydration.fullHydrationDeferred === true });
     return base;
   }
 
