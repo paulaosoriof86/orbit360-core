@@ -2973,7 +2973,7 @@
         "Do not promote to LIVE from this finding"
       ],
       "requiredProof": "New exact Preview must show materially improved restored-session shell readiness, no access weakening, and subsequent route data hydration/reactive rerender.",
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "R20B_SOURCE_FIXED_PENDING_GUARD",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
@@ -2993,7 +2993,11 @@
         "classification": "R88_REMEDIATION_PREMEMBERSHIP_ENUMERATION_GAP",
         "syntheticWritesBeforeFailure": 0
       },
-      "correction": "Preserve full enumeration contract before membership; choose route-primary startup only after validated membership in store factory."
+      "correction": "Preserve full enumeration contract before membership; choose route-primary startup only after validated membership in store factory.",
+      "causalSuccessorId": "B2-R90-ROUTE-DEFERRED-WORKFLOW-DEPENDENCY-R20B",
+      "latestFailureRunId": 36449511487,
+      "latestFailureJobId": 109021556909,
+      "routePrimaryStartupPreserved": true
     },
     {
       "id": "B2-R89-OPS-LEADS-PENDING-OVERLAY-PREMATURE-RECONCILIATION-R20",
@@ -3006,9 +3010,9 @@
       "finding": "OPS_LEADS_ACCEPTED_BUSINESS_DISAPPEARED_FROM_OPS_BECAUSE_PENDING_STAGE_UPDATE_WAS_RECONCILED_BY_ID_EXISTENCE_BEFORE_AUTHORITATIVE_FIELDS_MATCHED",
       "rootCause": "The operational facade reconciled every pending update away as soon as the authoritative base snapshot contained the same record ID, even when that base row still held pre-write values. A stale negocios snapshot therefore removed the optimistic cotizando overlay and exposed nuevo until the later server snapshot.",
       "remediation": "Track per-record expectations. Inserts reconcile on existence; updates reconcile only when authoritative base fields match the requested patch; workflow soft-delete reconciles only when archivado=true; failures and hard deletes clear both pending row and expectation.",
-      "status": "GUARD_PASS_PREVIEW_ARMED",
-      "blocking": true,
-      "closureState": "NOT_CLOSED",
+      "status": "EXACT_AUTHENTICATED_PASS",
+      "blocking": false,
+      "closureState": "CLOSED",
       "observed": {
         "businessLeads": 1,
         "businessOps": 0,
@@ -3027,7 +3031,38 @@
       "noReimport": true,
       "guardPassRunId": 36449234646,
       "sourceFixCommit": "5af2856a4beafe83e538d4dc862d4e0acb4607b7",
-      "previewArmed": true
+      "previewArmed": true,
+      "closedAt": "2026-09-28",
+      "exactAuthenticatedProof": {
+        "runId": 36449511487,
+        "jobId": 109021556909,
+        "leadsOpsBusinessSync": true,
+        "reloadIdempotent": true
+      },
+      "sourceChangeCausallyInvalidatesPass": false
+    },
+    {
+      "id": "B2-R90-ROUTE-DEFERRED-WORKFLOW-DEPENDENCY-R20B",
+      "block": "B2",
+      "source": "AUTHENTICATED_PREVIEW_36449511487",
+      "surface": "R88/Issuance/Renewal/CrossModuleHydration",
+      "classification": "PRODUCT_RUNTIME_RACE_DEFERRED_COLLECTION_READ_BEFORE_AUTHORITATIVE_SNAPSHOT",
+      "blocking": true,
+      "finding": "After route-primary startup, issuance/renewal may synchronously read a deferred policy/client/insurer/management/vehicle before its authoritative snapshot is available, producing a null cross-module dependency.",
+      "rootCause": "R88 correctly made startup route-primary and deferred unrelated collections, but issuance/renewal APIs synchronously read clientes/polizas/aseguradoras/gestiones/vehiculos. A cross-module workflow invoked after an Aseguradoras reload can therefore read a still-deferred policy as null before its authoritative snapshot arrives.",
+      "remediation": "Async issuance entry points wait only for the authoritative collections they require when fullHydrationDeferred=true. The shell/startup collection remains route-primary; full hydration is not restored as a startup blocker.",
+      "requiredProof": "New exact Preview must preserve route-primary startup, pass startup timing, and complete renewal/issuance after an unrelated-route reload without null dependency or full-startup hydration regression.",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "closureState": "NOT_CLOSED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20B_ROUTE_DEFERRED_WORKFLOW_HYDRATION_20260928.json",
+      "receiptBlobSha": "a1fbe1bb983b09e3233e68f1c4aa6f5a8dc33afe",
+      "changedProductFiles": [
+        "orbit360-platform/core/issuance-workflow-v1201.js"
+      ],
+      "productBlobSha": "ab138f218e041b41ac737ff250c7e808edc8c030",
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [

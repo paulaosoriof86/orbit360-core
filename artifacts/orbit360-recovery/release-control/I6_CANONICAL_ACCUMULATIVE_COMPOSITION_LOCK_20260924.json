@@ -132,7 +132,7 @@
     "orbit360-platform/core/config.js": "774c6cbe32be08f23e45f37b8e12e56f9be08bf3",
     "orbit360-platform/core/importa.js": "e31bd0b04f3d2634e2f2bacd02660c4f1bc2df67",
     "orbit360-platform/core/issuance-workflow-v1201-refinements.js": "47a9d68bef8cb60a00a057375efdf443c2ff2de2",
-    "orbit360-platform/core/issuance-workflow-v1201.js": "d1b075ee251bd5a798299ecd90391db5c5d86552",
+    "orbit360-platform/core/issuance-workflow-v1201.js": "ab138f218e041b41ac737ff250c7e808edc8c030",
     "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
     "orbit360-platform/core/product-app-p0.js": "b6ccd725f214c666e04299574be4c1fdae3a6b83",
@@ -202,41 +202,39 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "R20A_R88_PREMEMBERSHIP_ENUMERATION_CORRECTION_20260928",
-    "parentHead": "4a223fe39ea9167a2365eb0ab2f80245af34cedd",
-    "status": "GUARD_PASS_PREVIEW_ARMED",
+    "origin": "R20B_ROUTE_DEFERRED_CROSS_WORKFLOW_HYDRATION_20260928",
+    "parentHead": "d323797e05a0f99628810282681d5a471ceeb069",
+    "status": "SOURCE_FIXED_PENDING_GUARD",
     "changedProductFiles": [
-      "orbit360-platform/core/product-hydration-required-optional-p0.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/core/issuance-workflow-v1201.js"
     ],
     "changedProductBlobs": {
-      "orbit360-platform/core/product-hydration-required-optional-p0.js": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
-      "orbit360-platform/index.html": "75edf2bf0ee9e945c1e503ad10e4eb468822c83a"
+      "orbit360-platform/core/issuance-workflow-v1201.js": "ab138f218e041b41ac737ff250c7e808edc8c030"
     },
-    "preservedProductBlob": {
-      "orbit360-platform/data/store-firestore-product-operational-p0.js": "4cc627428397e65c16912e42c1fb4d2a0979358e"
-    },
-    "changedTestFiles": {
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "0bc7f8c21724460f4dd3f769be781ce873d6fc15",
-      "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs": "a51c7478581e3767b6d669e7a148eec20cc76203"
-    },
-    "previousExactPreview": {
-      "runId": 36448274176,
-      "url": "https://ays-orbit-360-lab--gi-i65-b2-36448274176-9mxjjxfv.web.app",
-      "technicalReadback": true,
+    "closedFindings": [
+      "B2-R89-OPS-LEADS-PENDING-OVERLAY-PREMATURE-RECONCILIATION-R20"
+    ],
+    "openFindings": [
+      "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
+      "B2-R90-ROUTE-DEFERRED-WORKFLOW-DEPENDENCY-R20B"
+    ],
+    "rootCause": "R88_ROUTE_PRIMARY_HYDRATION_CROSS_WORKFLOW_DEPENDENCY_RACE",
+    "fix": "ON_DEMAND_AUTHORITATIVE_DEPENDENCY_GATE_WITHOUT_FULL_STARTUP_HYDRATION",
+    "failedPreview": {
+      "sourceSha": "2a343b1fb871e0468b26d16666fcc27b8ebdca25",
+      "buildId": "gi-i65-b2-2a343b1fb871-57f234755dc1",
+      "runId": 36449511487,
+      "artifactId": 10982372740,
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36449511487-rxodk8gn.web.app",
+      "exactReadback": true,
       "functionalPass": true,
-      "authenticatedFailure": "product_required_hydration_contract_missing",
-      "syntheticWritesBeforeFailure": 0
+      "livePromoted": false
     },
-    "rootCause": "R88 route-primary selection was applied during productApp's pre-membership enumeration call.",
-    "fix": "Return full collection universe before membership; apply single route-primary required collection only after validated membership in store factory.",
-    "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
-    "evidenceReceiptBlobSha": "3304f2ce0ef5714df6be249a385288ed1015df83",
-    "findingLedgerBlobSha": "1c2213e891ae23c62e6074383707e1107e771629",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20B_ROUTE_DEFERRED_WORKFLOW_HYDRATION_20260928.json",
+    "receiptBlobSha": "a1fbe1bb983b09e3233e68f1c4aa6f5a8dc33afe",
+    "findingLedgerBlobSha": "ad7faa3e56ef3641195902926df21e2a41039197",
+    "noDataReimport": true,
     "noLive": true,
-    "noB3": true,
-    "noReimport": true,
-    "candidateHead": "5af2856a4beafe83e538d4dc862d4e0acb4607b7",
-    "guardPassRunId": 36449234646
+    "noB3": true
   }
 }

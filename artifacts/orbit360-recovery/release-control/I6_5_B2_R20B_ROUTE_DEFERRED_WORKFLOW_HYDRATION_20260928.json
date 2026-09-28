@@ -1,0 +1,83 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R20B_ROUTE_DEFERRED_WORKFLOW_HYDRATION_20260928_V1",
+  "status": "SOURCE_FIXED_PENDING_GUARD",
+  "recordedAt": "2026-09-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "parentHead": "d323797e05a0f99628810282681d5a471ceeb069",
+  "trigger": {
+    "runId": 36449511487,
+    "authenticatedJobId": 109021556909,
+    "preview": {
+      "sourceSha": "2a343b1fb871e0468b26d16666fcc27b8ebdca25",
+      "buildId": "gi-i65-b2-2a343b1fb871-57f234755dc1",
+      "runId": 36449511487,
+      "artifactId": 10982372740,
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36449511487-rxodk8gn.web.app",
+      "exactReadback": true,
+      "functionalPass": true,
+      "livePromoted": false
+    },
+    "failure": "B2_AUTH_RENEWAL_RUNTIME_FAILED",
+    "exception": "Cannot read properties of null (reading 'clienteId')"
+  },
+  "preservedPassesFromSameRun": {
+    "driveTenantPersistentAuthority": true,
+    "routineUserGoogleOAuth": false,
+    "browserTokenKeys": 0,
+    "r89OpsLeadsSyntheticE2E": true,
+    "r89LeadsOpsBusinessSync": true,
+    "r89ReloadIdempotent": true,
+    "syntheticCleanupDeleted": 32
+  },
+  "rootCause": {
+    "classification": "R88_ROUTE_PRIMARY_HYDRATION_CROSS_WORKFLOW_DEPENDENCY_RACE",
+    "detail": "R88 correctly made startup route-primary and deferred unrelated collections, but issuance/renewal APIs synchronously read clientes/polizas/aseguradoras/gestiones/vehiculos. A cross-module workflow invoked after an Aseguradoras reload can therefore read a still-deferred policy as null before its authoritative snapshot arrives.",
+    "productRegression": true,
+    "harnessOnly": false
+  },
+  "remediation": {
+    "model": "ON_DEMAND_AUTHORITATIVE_DEPENDENCY_GATE",
+    "changedProductFiles": [
+      "orbit360-platform/core/issuance-workflow-v1201.js"
+    ],
+    "productBlob": "ab138f218e041b41ac737ff250c7e808edc8c030",
+    "behavior": "Async issuance entry points wait only for the authoritative collections they require when fullHydrationDeferred=true. The shell/startup collection remains route-primary; full hydration is not restored as a startup blocker.",
+    "guardedEntryPoints": [
+      "createRequest",
+      "advanceRequest",
+      "issueRequest",
+      "createDirectRenewal"
+    ],
+    "timeoutMs": 20000,
+    "failClosedErrors": [
+      "datos_autoritativos_no_disponibles",
+      "datos_autoritativos_en_carga_timeout"
+    ],
+    "preservesR88StartupOptimization": true
+  },
+  "r89Disposition": {
+    "findingId": "B2-R89-OPS-LEADS-PENDING-OVERLAY-PREMATURE-RECONCILIATION-R20",
+    "status": "EXACT_AUTHENTICATED_PASS",
+    "proofRunId": 36449511487,
+    "proofJobId": 109021556909,
+    "sourceChangeCausallyTouchesR89": false
+  },
+  "boundaries": {
+    "dataReimport": false,
+    "livePromotion": false,
+    "b3Open": false,
+    "productionSecretTouched": false
+  },
+  "nextRequiredProof": [
+    "CENTRAL_GUARD_PASS",
+    "NEW_EXACT_B2_PREVIEW_READBACK",
+    "R90_CROSS_WORKFLOW_AUTHORITATIVE_DEPENDENCY_PASS",
+    "R88_STARTUP_TIMING_AND_ROUTE_HYDRATION_PASS",
+    "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_VIEW_DOWNLOAD_UPLOAD_AND_SCOPE_DENIAL",
+    "R77_R81_CANONICAL_PROVIDER_PROOF",
+    "DRIVE_QA_FIXTURE_CLEANUP",
+    "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
+  ]
+}

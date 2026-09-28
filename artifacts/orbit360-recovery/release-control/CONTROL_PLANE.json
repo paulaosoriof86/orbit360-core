@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "ba2327f64a18495dc92498916585017c6e109e30",
+    "b2ExecutionLockBlobSha": "caf37537e5309bbb9d92d5f3bf2c3d26ca32f5d0",
     "b2": {
-      "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2101,7 +2101,7 @@
         "orbit360-platform/core/document-viewer.js"
       ],
       "productMutationAuthorized": true,
-      "sourcePendingFromHead": "5af2856a4beafe83e538d4dc862d4e0acb4607b7",
+      "sourcePendingFromHead": "d323797e05a0f99628810282681d5a471ceeb069",
       "sourceSha": "2a343b1fb871e0468b26d16666fcc27b8ebdca25",
       "buildId": "gi-i65-b2-2a343b1fb871-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36449511487-rxodk8gn.web.app",
@@ -2168,7 +2168,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "First R88 candidate reached exact technical Preview PASS but authenticated activation failed before writes because productApp pre-membership enumeration was incorrectly route-optimized. R20A preserves full enumeration pre-membership and applies route-primary readiness only after validated membership. R89 overlay fix is preserved. Guard before one new exact Preview. No LIVE, no B3, no reimport.",
+      "boundaryNote": "R89 is closed by exact authenticated proof on run 36449511487. R20B fixes the real R88 cross-module race by waiting only for workflow-required authoritative collections after shell readiness; it does not restore full startup hydration. Guard before one new exact B2 Preview. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2254,7 +2254,7 @@
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
       "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
       "insurerStableEditRuntimePass": true,
-      "findingLedgerBlobSha": "1c2213e891ae23c62e6074383707e1107e771629",
+      "findingLedgerBlobSha": "ad7faa3e56ef3641195902926df21e2a41039197",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
@@ -2587,8 +2587,8 @@
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
         "receiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63"
       },
-      "compositionLockBlobSha": "6063caff03c0c0b3530d88dfa9cf622cc60ad92f",
-      "sourceFixPendingArm": false,
+      "compositionLockBlobSha": "d013d5fb662ea3c6d95cd29fa0ceebd0236f5c01",
+      "sourceFixPendingArm": true,
       "r84BootstrapSurfaceArm": {
         "status": "GUARD_PASS_PREVIEW_ARMED",
         "sourceFixCommit": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
@@ -2678,6 +2678,15 @@
         },
         "guardPassRunId": 36449234646,
         "sourceFixCommit": "5af2856a4beafe83e538d4dc862d4e0acb4607b7"
+      },
+      "r20b": {
+        "status": "SOURCE_FIXED_PENDING_GUARD",
+        "findingId": "B2-R90-ROUTE-DEFERRED-WORKFLOW-DEPENDENCY-R20B",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20B_ROUTE_DEFERRED_WORKFLOW_HYDRATION_20260928.json",
+        "receiptBlobSha": "a1fbe1bb983b09e3233e68f1c4aa6f5a8dc33afe",
+        "sourceBlob": "ab138f218e041b41ac737ff250c7e808edc8c030",
+        "r89ExactAuthenticatedPass": true,
+        "r89ProofRunId": 36449511487
       }
     },
     "dashboardRealityGate": {

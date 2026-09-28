@@ -38,6 +38,46 @@ Orbit.issuance = (function () {
     return MANAGE_ROLES.has(activeRole()) || extras.includes('emisiones_gestionar');
   }
   function operationId(prefix) { return (prefix || 'emi') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7); }
+  async function ensureAuthoritativeCollections(names, timeoutMs) {
+    const store = S(), wanted = [...new Set([].concat(names || []).map(clean).filter(Boolean))];
+    if (!wanted.length || !store || typeof store._productStatus !== 'function') return { ok: true, bypass: true };
+    const initial = store._productStatus() || {};
+    if (initial.fullHydrationDeferred !== true) return { ok: true, bypass: true };
+    const inspect = () => {
+      const st = store._productStatus() || {}, confirmed = [].concat(st.serverConfirmedCollections || []);
+      const denied = [].concat(st.deniedCollections || []), errors = st.snapshotErrors || {};
+      const failed = wanted.filter(name => denied.includes(name) || !!errors[name]);
+      const missing = wanted.filter(name => !confirmed.includes(name) && !failed.includes(name));
+      return { ok: failed.length === 0 && missing.length === 0, failed, missing, status: st };
+    };
+    let current = inspect();
+    if (current.failed.length) return { ok: false, errors: ['datos_autoritativos_no_disponibles'], failed: current.failed, missing: current.missing };
+    if (current.ok) return { ok: true, waited: false };
+    const limit = Math.max(1000, Number(timeoutMs) || 20000);
+    return await new Promise(resolve => {
+      let settled = false, off = null, timer = null, poll = null;
+      const done = value => {
+        if (settled) return;
+        settled = true;
+        if (timer) clearTimeout(timer);
+        if (poll) clearInterval(poll);
+        try { if (typeof off === 'function') off(); } catch (e) {}
+        resolve(value);
+      };
+      const check = () => {
+        const next = inspect();
+        if (next.failed.length) return done({ ok: false, errors: ['datos_autoritativos_no_disponibles'], failed: next.failed, missing: next.missing });
+        if (next.ok) return done({ ok: true, waited: true });
+      };
+      try { if (typeof store.on === 'function') off = store.on('*', check); } catch (e) {}
+      poll = setInterval(check, 125);
+      timer = setTimeout(() => {
+        const last = inspect();
+        done({ ok: false, errors: ['datos_autoritativos_en_carga_timeout'], failed: last.failed, missing: last.missing });
+      }, limit);
+      check();
+    });
+  }
   function currencyFor(country) {
     if (A() && A().currencyFor) return A().currencyFor(country);
     const p = (Orbit.PAISES || []).find(x => x.id === country);
@@ -99,6 +139,8 @@ Orbit.issuance = (function () {
   async function createRequest(input, options) {
     input = input || {}; options = options || {};
     if (!canManage()) return { ok: false, errors: ['permiso_emision_denegado'] };
+    const hydration = await ensureAuthoritativeCollections(['clientes','aseguradoras','gestiones'].concat(clean(input.sourcePolicyId) ? ['polizas'] : []), 20000);
+    if (!hydration.ok) return hydration;
     const check = validateRequest(input);
     if (!check.ok) return Object.assign({ ok: false }, check);
     const key = requestKey(Object.assign({}, input, { aseguradoraId: check.insurerId, pais: check.country, moneda: check.currency }));
@@ -169,6 +211,8 @@ Orbit.issuance = (function () {
   async function advanceRequest(id, nextStage, patch, options) {
     patch = patch || {}; options = options || {};
     if (!canManage()) return { ok: false, errors: ['permiso_emision_denegado'] };
+    const hydration = await ensureAuthoritativeCollections(['gestiones'], 20000);
+    if (!hydration.ok) return hydration;
     const current = S().get('gestiones', id);
     if (!current || current.workflowType !== 'issuance_request') return { ok: false, errors: ['solicitud_emision_no_encontrada'] };
     const from = current.emissionStage || 'PROPUESTA_ACEPTADA';
@@ -198,6 +242,8 @@ Orbit.issuance = (function () {
   async function issueRequest(id, policyInput, options) {
     policyInput = policyInput || {}; options = options || {};
     if (!canManage()) return { ok: false, errors: ['permiso_emision_denegado'] };
+    const hydration = await ensureAuthoritativeCollections(['gestiones','polizas','vehiculos','clientes'], 20000);
+    if (!hydration.ok) return hydration;
     const request = S().get('gestiones', id);
     if (!request || request.workflowType !== 'issuance_request') return { ok: false, errors: ['solicitud_emision_no_encontrada'] };
     if (request.policyCreatedId) {
@@ -282,6 +328,8 @@ Orbit.issuance = (function () {
   async function createDirectRenewal(managementId, input, options) {
     input = input || {}; options = options || {};
     if (!canManage()) return { ok: false, errors: ['permiso_renovacion_denegado'] };
+    const hydration = await ensureAuthoritativeCollections(['gestiones','polizas','vehiculos','clientes'], 20000);
+    if (!hydration.ok) return hydration;
     const management = S().get('gestiones', managementId);
     if (!management || management.workflowType !== 'renewal_accepted') return { ok: false, errors: ['gestion_renovacion_aceptada_no_encontrada'] };
     if (!management.acceptedConfirmed) return { ok: false, errors: ['aceptacion_cliente_requerida'] };
