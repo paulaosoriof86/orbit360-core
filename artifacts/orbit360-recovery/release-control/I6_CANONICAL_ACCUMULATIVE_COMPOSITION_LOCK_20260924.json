@@ -142,7 +142,7 @@
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
-    "orbit360-platform/core/record-delete.js": "62db86a81254293f53c482708a2d706d782d3ed7",
+    "orbit360-platform/core/record-delete.js": "3c8b4b06126abaa6b1ea0b6efe3c85c04bf71da9",
     "orbit360-platform/core/router.js": "671b6da3d75a0d3df9e14e44157e1c58fa2cb338",
     "orbit360-platform/core/tenant-access-policy-contract-p0.js": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
     "orbit360-platform/core/tenant-access-policy-effective-p0.js": "56e515206ff18e3baabcfd66b217b4985f1288ad",
@@ -150,7 +150,7 @@
     "orbit360-platform/core/tenant-domain-config-client.js": "89bff4ac9131ff5805ffe96ee8d6ccd4927a84dc",
     "orbit360-platform/core/user-onboarding.js": "bf645951a23491ce53d2034ba4281d965cbb326d",
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
-    "orbit360-platform/data/store-firestore-product-operational-p0.js": "8ff58b3d309da5aae76cecd4ff2e83af8a09e533",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "dbc6ae798f580ee991fd3053e9822f3bd7c0825b",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "75edf2bf0ee9e945c1e503ad10e4eb468822c83a",
@@ -202,17 +202,17 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "id": "B2-R82-CERTIFIED-PACKAGE-HYDRATION-PARITY-20260928",
+    "id": "B2-R82-SOFT-DELETE-DIRECT-READ-PROJECTION-20260928",
     "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
-    "sourceHead": "2ff119887e64c3cf5ea6cf5a48f0840731826510",
+    "sourceHead": "1cc6b0d0a36e11bad96408e3846c0b542115e161",
     "causalFindingId": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
-    "rootCause": "Certified Preview package generator omitted reclamos from optionalCollections even though product-runtime-config and R82 access policy included the collection. Therefore the exact artifact never attached an authoritative reclamos snapshot.",
+    "rootCause": "Operational facade filtered soft-deleted rows from all()/where()/find(), but get() delegated durable rows directly to the base store after reload. Deep-link/detail reads could therefore resurrect a deleted record even though collection lists hid it.",
     "fixFiles": {
-      "tools/gravicentra-i6-1-preview-package.mjs": "d0c5649ef56d794238a80fca011770175624d83d",
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "d200e04bb16b8dfa3ee09ee9dfb07c7793239423"
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "dbc6ae798f580ee991fd3053e9822f3bd7c0825b",
+      "orbit360-platform/core/record-delete.js": "3c8b4b06126abaa6b1ea0b6efe3c85c04bf71da9"
     },
-    "generatedArtifactChange": true,
-    "productSourceFilesChanged": false,
+    "contractBlobSha": "ffe69173c7de0c1fcff7d68bd2562a3fcd40b2fb",
+    "preservesAuditRow": true,
     "preservesPriorMachinePasses": true,
     "noLive": true,
     "noB3": true,

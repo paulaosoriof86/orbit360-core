@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R82_SOFT_DELETE_DIRECT_READ_ROOTFIX_20260928_V1",
+  "recordedAt": "2026-09-28T23:44:25.264Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "findingId": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
+  "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+  "failedProof": {
+    "runId": 36498444961,
+    "jobId": 109185592175,
+    "code": "B2_R82_SOFT_DELETE_PROJECTION_RELOAD_FAILED"
+  },
+  "diagnostic": {
+    "allWhereFindFilteredSoftDeleted": true,
+    "directGetFilteredBeforeFix": false,
+    "allElevenDurableDeletesPassedBeforeReload": true,
+    "relationBlockerPassed": true,
+    "firestoreAuditRowsPreserved": true
+  },
+  "fix": {
+    "backendDeleteAuditFields": true,
+    "backendDeleteAuditReadback": true,
+    "browserWorkflowDeleteReadbackGuard": true,
+    "backendBlobSha": "fe5307b171a9d51e3f449f0dd2b5aba6fbcbb341",
+    "storeBlobSha": "dbc6ae798f580ee991fd3053e9822f3bd7c0825b",
+    "contractBlobSha": "ffe69173c7de0c1fcff7d68bd2562a3fcd40b2fb",
+    "claimsAccessPolicy": true,
+    "cancellationsAccessPolicy": true,
+    "commissionsAccessPolicy": true,
+    "claimsHydration": true,
+    "accessPolicyBlobSha": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
+    "runtimeConfigBlobSha": "cce5e1b74b246640297a734871a71364e4209061",
+    "certifiedPackageClaimsHydration": true,
+    "previewPackageBlobSha": "d0c5649ef56d794238a80fca011770175624d83d",
+    "softDeleteDirectGetHidden": true,
+    "deleteOwnerCommittedRowReadback": true,
+    "recordDeleteBlobSha": "3c8b4b06126abaa6b1ea0b6efe3c85c04bf71da9"
+  },
+  "boundaries": {
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "oldArtifactNotPatched": true,
+    "newDigestRequired": true
+  }
+}
