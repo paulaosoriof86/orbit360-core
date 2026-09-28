@@ -701,30 +701,24 @@ Orbit.modules.cliente360 = (function () {
     const docs = Array.isArray(cli.documentos) ? cli.documentos : [];
     const uploadStatus = Orbit.secureResources && Orbit.secureResources.documentUploadStatus
       ? Orbit.secureResources.documentUploadStatus({ entidad: 'cliente', entidadId: cid, clienteId: cid })
-      : { available: false, status: 'pendiente_conexion' };
-    const directUpload = uploadStatus && uploadStatus.available === true;
-    const cards = docs.map((d, i) => `<div class="card pad" style="display:flex;gap:12px;align-items:center">
-      <div style="font-size:24px">📄</div>
-      <div style="flex:1;min-width:0">
-        <b style="font-family:var(--f-display);font-size:13.5px">${U.esc(d.nombre || ('Documento ' + (i + 1)))}</b>
-        <div class="muted" style="font-size:11.5px;margin-top:3px">${U.esc(d.categoria || 'Expediente')} · ${U.esc(d.origen || 'Drive')} ${d.creado ? '· ' + U.esc(d.creado) : ''}</div>
-      </div>
-      <button class="btn ghost sm" data-client-doc="${i}">Abrir</button>
-    </div>`).join('');
-    return `<div class="card pad" style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-        <div><b style="font-family:var(--f-display);font-size:16px">📎 Documentos del cliente</b>
-          <div class="muted" style="font-size:12px;margin-top:4px">Drive es el repositorio documental; Firestore conserva la relación, metadata y provenance del expediente.</div></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          ${cli.driveLink ? `<a class="btn ghost sm" href="${U.esc(cli.driveLink)}" target="_blank" rel="noopener">📁 Abrir expediente Drive</a>` : ''}
-          <button class="btn ghost sm" data-doc-intelligent>🧠 Importar y extraer datos</button>
-          ${directUpload ? '' : '<button class="btn ghost sm" data-doc-connect>🔗 Conectar Drive</button>'}
-          <button class="btn primary sm" data-doc-upload>${directUpload ? '⬆ Cargar documento a Drive' : '📎 Cargar documento'}</button>
-        </div>
-      </div>
-      ${directUpload ? '' : '<div class="cfg-note" style="margin-top:12px">Conecta una cuenta Google con permiso de escritura en la carpeta Clientes de A&S. El token se usa únicamente durante esta sesión y la plataforma no declarará un archivo cargado hasta recibir readback de Drive.</div>'}
-    </div>
-    <div style="display:grid;gap:10px">${cards || '<div class="card pad" style="text-align:center;color:var(--ink-2);padding:28px">Todavía no hay documentos con vínculo Drive confirmado en esta ficha.</div>'}</div>`;
+      : { available: false, status: 'checking', backendPersistent: true };
+    const canManageDocs = !!(Orbit.access && Orbit.access.can && (Orbit.access.can('cliente360','manage_documents') || Orbit.access.can('cliente360','edit')));
+    const directUpload = canManageDocs && uploadStatus && uploadStatus.available === true && uploadStatus.uploadAvailable !== false;
+    const needsBootstrap = canManageDocs && uploadStatus && uploadStatus.bootstrapRequired === true;
+    const cards = docs.map((d, i) => '<div class="card pad" style="display:flex;gap:12px;align-items:center">'
+      + '<div style="font-size:24px">📄</div><div style="flex:1;min-width:0"><b style="font-family:var(--f-display);font-size:13.5px">' + U.esc(d.nombre || ('Documento ' + (i + 1))) + '</b>'
+      + '<div class="muted" style="font-size:11.5px;margin-top:3px">' + U.esc(d.categoria || 'Expediente') + ' · ' + U.esc(d.origen || 'Drive') + (d.creado ? ' · ' + U.esc(d.creado) : '') + '</div></div>'
+      + '<button class="btn ghost sm" data-client-doc="' + i + '">Abrir</button></div>').join('');
+    return '<div class="card pad" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">'
+      + '<div><b style="font-family:var(--f-display);font-size:16px">📎 Documentos del cliente</b><div class="muted" style="font-size:12px;margin-top:4px">Drive es el repositorio documental; Gravicentra controla el acceso según tu rol y alcance.</div></div>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+      + (cli.driveLink ? '<a class="btn ghost sm" href="' + U.esc(cli.driveLink) + '" target="_blank" rel="noopener">📁 Abrir en Drive</a>' : '')
+      + (canManageDocs ? '<button class="btn ghost sm" data-doc-intelligent>🧠 Importar y extraer datos</button>' : '')
+      + (needsBootstrap ? '<button class="btn ghost sm" data-doc-bootstrap>⚙ Configurar Drive</button>' : '')
+      + (canManageDocs ? '<button class="btn primary sm" data-doc-upload>' + (directUpload ? '⬆ Cargar documento' : '📎 Cargar documento') + '</button>' : '')
+      + '</div></div>'
+      + (needsBootstrap ? '<div class="cfg-note" style="margin-top:12px">Drive requiere una configuración administrativa única. Después, los usuarios autorizados trabajarán con el expediente sin conectar cuentas Google.</div>' : '')
+      + '</div><div style="display:grid;gap:10px">' + (cards || '<div class="card pad" style="text-align:center;color:var(--ink-2);padding:28px">Todavía no hay documentos con vínculo Drive confirmado en esta ficha.</div>') + '</div>';
   }
 
   function wireDocumentos(cid) {
@@ -740,43 +734,32 @@ Orbit.modules.cliente360 = (function () {
         if (/^https:\/\/[^\s]+$/i.test(url)) window.open(url, '_blank', 'noopener,noreferrer');
       }
     }));
-    async function ensureDriveConnected() {
+    async function ensureRepository() {
       const provider = Orbit.productDriveDocumentProviderP0;
-      if (!provider || typeof provider.connect !== 'function') {
-        c360toast('La conexión Drive no está disponible.');
-        return false;
-      }
-      let st = provider.status ? provider.status() : {};
-      if (st && st.available === true) return true;
-      st = await provider.connect();
-      if (!st || st.available !== true) {
-        c360toast((st && st.message) || 'No fue posible conectar Drive.');
-        return false;
-      }
-      Orbit.modules.cliente360.reabrir(cid, 'documentos');
+      if (!provider || typeof provider.probe !== 'function') { c360toast('El repositorio documental no está disponible.'); return false; }
+      const st = await provider.probe(true);
+      if (!st || st.available !== true) { c360toast((st && st.message) || 'El repositorio documental no está disponible.'); return false; }
       return true;
     }
-    const connect = body.querySelector('[data-doc-connect]');
-    if (connect) connect.addEventListener('click', async () => {
-      connect.disabled = true;
-      await ensureDriveConnected();
-      connect.disabled = false;
+    const bootstrap = body.querySelector('[data-doc-bootstrap]');
+    if (bootstrap) bootstrap.addEventListener('click', async () => {
+      const provider = Orbit.productDriveDocumentProviderP0;
+      if (!provider || typeof provider.bootstrap !== 'function') { c360toast('La configuración administrativa de Drive no está disponible.'); return; }
+      bootstrap.disabled = true;
+      const out = await provider.bootstrap();
+      bootstrap.disabled = false;
+      c360toast((out && out.ok === true) ? 'Drive quedó conectado de forma persistente para el tenant.' : ((out && out.message) || 'No fue posible configurar Drive.'));
+      Orbit.modules.cliente360.reabrir(cid, 'documentos');
     });
     const upload = body.querySelector('[data-doc-upload]');
     if (upload) upload.addEventListener('click', async () => {
-      if (!(await ensureDriveConnected())) return;
-      Orbit.importa.open('documentos', {
-        multi: true, modo: 'documental', scope: { cid, nombre: cli.nombre || 'Cliente' },
-        onDone: () => Orbit.modules.cliente360.reabrir(cid, 'documentos')
-      });
+      if (!(await ensureRepository())) return;
+      Orbit.importa.open('documentos', { multi: true, modo: 'documental', scope: { cid, nombre: cli.nombre || 'Cliente' }, onDone: () => Orbit.modules.cliente360.reabrir(cid, 'documentos') });
     });
     const intelligent = body.querySelector('[data-doc-intelligent]');
     if (intelligent) intelligent.addEventListener('click', async () => {
-      if (!(await ensureDriveConnected())) return;
-      Orbit.importa.open('documentos', {
-        multi: true, modo: 'inteligente', scope: { cid, nombre: cli.nombre || 'Cliente' },
-        onDone: () => Orbit.modules.cliente360.reabrir(cid, 'documentos')
-      });
+      if (!(await ensureRepository())) return;
+      Orbit.importa.open('documentos', { multi: true, modo: 'inteligente', scope: { cid, nombre: cli.nombre || 'Cliente' }, onDone: () => Orbit.modules.cliente360.reabrir(cid, 'documentos') });
     });
   }
 

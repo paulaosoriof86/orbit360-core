@@ -204,6 +204,31 @@ function withinScope(actor,collection,moduleKey,row){
   const scope=effectiveScope(actor.member,actor.accessConfig,actor.activeRole,moduleKey); if(scope==='none')return false; if(scope==='all')return true;
   const target=rowAdvisorId(collection,row); if(!target)return false; if(scope==='own')return target===text(actor.member.advisorId,180); if(scope==='team')return actor.teamAdvisorIds.has(target); return false;
 }
+async function authorizeRead(request, tenantId, collection) {
+  if (!request.auth || !request.auth.uid) throw new HttpsError('unauthenticated', 'Se requiere sesión activa.');
+  collection=text(collection,80);
+  const moduleKey=COLLECTION_MODULE[collection];
+  if(!moduleKey)throw new HttpsError('permission-denied','Colección fuera del contrato operativo.');
+  const [snap,accessSnap]=await Promise.all([memberRef(tenantId,request.auth.uid).get(),accessConfigRef(tenantId).get()]);
+  const member=snap.exists?snap.data():null;
+  if(!activeMember(member)||text(member.tenantId,160)!==tenantId)throw new HttpsError('permission-denied','Membresía activa requerida.');
+  let requestedRole;
+  try{requestedRole=resolveProductActiveRole(member,request.data&&request.data.activeRole).activeRole;}
+  catch(error){throw new HttpsError('permission-denied',error&&error.code==='PRODUCT_ASSIGNED_ROLES_MISSING'?'La membresía no tiene roles asignados.':'El rol activo no está asignado.');}
+  const accessConfig=accessSnap.exists?accessSnap.data()||{}:{};
+  if(!moduleVisibleForWrite(member,accessConfig,requestedRole,moduleKey))throw new HttpsError('permission-denied',`El rol activo no puede ver ${collection}.`);
+  const own=text(member.advisorId,180),teamAdvisorIds=new Set(own?[own]:[]),roleMap=member.roleVisibleAdvisorIds&&typeof member.roleVisibleAdvisorIds==='object'?member.roleVisibleAdvisorIds:{};
+  const roleMapKey=Object.keys(roleMap).find(k=>norm(k)===norm(requestedRole)); unique(roleMapKey?roleMap[roleMapKey]:[]).forEach(id=>teamAdvisorIds.add(id)); unique(member.teamAdvisorIds||member.asesoresEquipo||[]).forEach(id=>teamAdvisorIds.add(id));
+  if(!UNSCOPED_COLLECTIONS.has(collection)&&effectiveScope(member,accessConfig,requestedRole,moduleKey)==='team'){
+    const teamId=text(member.teamId||member.equipoId,160);
+    if(teamId||own){
+      const advisorSnap=await db.collection('tenants').doc(tenantId).collection('data').doc('asesores').collection('items').get();
+      advisorSnap.docs.forEach(doc=>{const row=doc.data()||{},id=text(row.id||doc.id,180);if(teamId&&text(row.teamId||row.equipoId,160)===teamId)teamAdvisorIds.add(id);if(own&&text(row.supervisorId,180)===own)teamAdvisorIds.add(id);});
+    }
+  }
+  return{uid:request.auth.uid,activeRole:requestedRole,member,accessConfig,teamAdvisorIds};
+}
+
 async function authorize(request, tenantId, mutations) {
   if (!request.auth || !request.auth.uid) throw new HttpsError('unauthenticated', 'Se requiere sesión activa.');
   const [snap,accessSnap]=await Promise.all([memberRef(tenantId,request.auth.uid).get(),accessConfigRef(tenantId).get()]);
@@ -396,4 +421,4 @@ async function uploadProductAsset(request, previewOnly) {
 exports.orbit360ProductAssetUpload = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>uploadProductAsset(request,false));
 exports.orbit360ProductAssetUploadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>uploadProductAsset(request,true));
 exports.orbit360ProductOperationalCommand = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, execute);
-exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE, authorize, withinScope, canonicalRef, text, cleanId });
+exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE, authorize, authorizeRead, withinScope, canonicalRef, text, cleanId });

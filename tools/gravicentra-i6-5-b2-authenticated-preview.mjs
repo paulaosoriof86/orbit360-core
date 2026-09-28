@@ -400,25 +400,19 @@ try{
   await bounded(activate(page,auth,actor),'B2_AUTH_ACTIVATE_TIMEOUT',45000);
   milestone('PREVIEW_AUTHENTICATED');
 
-  const drivePreConsent=await page.evaluate(()=>{
+  const driveAuthority=await page.evaluate(async()=>{
     const provider=Orbit.productDriveDocumentProviderP0;
-    const secure=Orbit.secureResources;
-    const p=provider&&provider.status?provider.status():null;
-    const s=secure&&secure.documentUploadStatus?secure.documentUploadStatus({entidad:'cliente',entidadId:'b2-auth-no-oauth',clienteId:'b2-auth-no-oauth'}):null;
-    const tokenKeys=[...Object.keys(localStorage),...Object.keys(sessionStorage)].filter(k=>/drive|oauth|google.*token|access.*token/i.test(k));
-    return{
-      providerPresent:!!provider,
-      providerStatus:p,
-      secureStatus:s,
-      tokenKeys,
-      oauthDelegated:!!provider?.oauthDelegated
-    };
+    const tokenKeys=[...Object.keys(localStorage),...Object.keys(sessionStorage)].filter(k=>/drive|oauth|google.*token|access.*token|refresh.*token/i.test(k));
+    const status=provider&&provider.probe?await provider.probe(true):(provider&&provider.status?provider.status():null);
+    return{providerPresent:!!provider,status,tokenKeys,oauthDelegated:provider?.oauthDelegated,backendPersistent:provider?.backendPersistent,tokenPersistence:provider?.tokenPersistence};
   });
-  need(drivePreConsent.providerPresent===true&&drivePreConsent.oauthDelegated===true,'B2_R15_DRIVE_OAUTH_PROVIDER_MISSING:'+JSON.stringify(drivePreConsent));
-  need(drivePreConsent.providerStatus?.available!==true&&['oauth_required','oauth_expired','oauth_failed','google_provider_disabled'].includes(String(drivePreConsent.providerStatus?.status||'')),'B2_R15_DRIVE_PRECONSENT_NOT_FAIL_CLOSED:'+JSON.stringify(drivePreConsent));
-  need(drivePreConsent.tokenKeys.length===0,'B2_R15_DRIVE_TOKEN_PERSISTED_IN_WEB_STORAGE:'+JSON.stringify(drivePreConsent));
-  evidence.driveOAuth={preConsentFailClosed:true,tokenPersistence:'memory_only',humanConsentRequired:true,status:drivePreConsent.providerStatus?.status||''};
-  milestone('DRIVE_OAUTH_PRECONSENT_FAIL_CLOSED_PASS',evidence.driveOAuth);
+  need(driveAuthority.providerPresent===true,'B2_R84_DRIVE_PROVIDER_MISSING:'+JSON.stringify(driveAuthority));
+  need(driveAuthority.oauthDelegated===false&&driveAuthority.backendPersistent===true&&driveAuthority.tokenPersistence==='backend_secret_manager','B2_R84_DRIVE_AUTHORITY_NOT_TENANT_PERSISTENT:'+JSON.stringify(driveAuthority));
+  need(driveAuthority.tokenKeys.length===0,'B2_R84_DRIVE_TOKEN_PERSISTED_IN_BROWSER:'+JSON.stringify(driveAuthority));
+  if(driveAuthority.status?.bootstrapRequired===true||driveAuthority.status?.status==='tenant_setup_required')throw new Error('B2_R84_TENANT_DRIVE_NOT_CONFIGURED:'+JSON.stringify(driveAuthority.status));
+  need(driveAuthority.status?.available===true&&driveAuthority.status?.configured===true,'B2_R84_TENANT_DRIVE_NOT_AVAILABLE:'+JSON.stringify(driveAuthority.status));
+  evidence.driveAuthority={tenantPersistent:true,routineUserGoogleOAuth:false,tokenPersistence:'backend_secret_manager',browserTokenKeys:0,status:driveAuthority.status?.status||'',uploadAvailable:driveAuthority.status?.uploadAvailable===true};
+  milestone('DRIVE_TENANT_PERSISTENT_AUTHORITY_PASS',evidence.driveAuthority);
 
   await setRole(page,'Operativo');
   await page.evaluate(()=>{location.hash='#/inicio';});

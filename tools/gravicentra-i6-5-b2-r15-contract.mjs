@@ -63,28 +63,33 @@ has(imports,'async function persistDocumentaryFiles()','R81_DOCUMENTARY_PERSISTE
 has(imports,"await Orbit.store.updateDurable('clientes', cid, clientPatch)",'R81_CLIENT_DOCUMENT_READBACK_LINK_MISSING');
 need(!imports.includes('Los archivos quedan almacenados y visibles en el expediente/ficha.'),'R81_FALSE_DOCUMENT_SUCCESS_COPY_REMAINS');
 
-has(driveClient,"provider.addScope('https://www.googleapis.com/auth/drive')",'R77_DRIVE_OAUTH_SCOPE_MISSING');
-has(driveClient,"tokenPersistence: 'memory_only'",'R77_DRIVE_TOKEN_PERSISTENCE_NOT_MEMORY_ONLY');
-need(driveClient.includes('authMod.signInWithPopup')||driveClient.includes('authMod.linkWithPopup'),'R77_DRIVE_USER_CONSENT_FLOW_MISSING');
-need(!driveClient.includes('authMod.linkWithPopup(user, provider)'),'R77_PRIMARY_FIREBASE_IDENTITY_MUST_NOT_BE_LINKED_TO_DRIVE_OAUTH');
-need(!driveClient.includes('service-account credentials'),'R77_STALE_SERVICE_ACCOUNT_PROVIDER_COPY');
-has(driveClient,'async function download(ref)','R83_DRIVE_DOWNLOAD_PROVIDER_MISSING');
-has(driveClient,"alt=media&supportsAllDrives=true",'R83_DRIVE_DOWNLOAD_MEDIA_PATH_MISSING');
-has(driveClient,'downloadAvailable','R83_DRIVE_DOWNLOAD_CAPABILITY_MISSING');
-has(driveClient,'a.download =','R83_DRIVE_DOWNLOAD_BROWSER_HANDOFF_MISSING');
+need(!driveClient.includes("provider.addScope('https://www.googleapis.com/auth/drive')")||driveClient.includes('async function bootstrap()'),'R84_ROUTINE_USER_DRIVE_OAUTH_REMAINS');
+need(!driveClient.includes('googleAccessToken'),'R84_BROWSER_DRIVE_TOKEN_REMAINS');
+has(driveClient,"oauthDelegated: false",'R84_CLIENT_OAUTH_DELEGATION_NOT_DISABLED');
+has(driveClient,"backendPersistent: true",'R84_CLIENT_BACKEND_PERSISTENCE_MISSING');
+has(driveClient,"tokenPersistence: 'backend_secret_manager'",'R84_CLIENT_SECRET_MANAGER_PERSISTENCE_MISSING');
+has(driveClient,'async function bootstrap()','R84_ONE_TIME_ADMIN_BOOTSTRAP_MISSING');
+has(driveClient,'async function download(ref, extra)','R83_DRIVE_DOWNLOAD_PROVIDER_MISSING');
+has(driveClient,'async function resolve(ref, extra)','R84_BACKEND_DOCUMENT_READ_MISSING');
+has(driveClient,"a.download = String(out.nombre || 'documento')",'R83_DRIVE_DOWNLOAD_BROWSER_HANDOFF_MISSING');
 
-has(driveBackend,'function googleToken(input)','R77_DRIVE_DELEGATED_TOKEN_REQUIRED');
-has(driveBackend,'driveIdentity(accessToken)','R77_DRIVE_IDENTITY_READBACK_MISSING');
-has(driveBackend,'capabilities.canAddChildren!==true','R77_DRIVE_WRITE_CAPABILITY_CHECK_MISSING');
+need(!driveBackend.includes('function googleToken(input)'),'R84_DELEGATED_TOKEN_BACKEND_REMAINS');
+need(!driveBackend.includes('input.googleAccessToken'),'R84_BROWSER_ACCESS_TOKEN_BACKEND_REMAINS');
+has(driveBackend,'SecretManagerServiceClient','R84_SECRET_MANAGER_VAULT_MISSING');
+has(driveBackend,'async function accessTokenFromRefresh','R84_REFRESH_TOKEN_EXCHANGE_MISSING');
+has(driveBackend,'async function bootstrap(request,previewOnly)','R84_TENANT_BOOTSTRAP_MISSING');
+has(driveBackend,'async function readDocument(request,previewOnly,downloadMode)','R84_SECURE_READ_DOWNLOAD_MISSING');
+has(driveBackend,'serviceAccount:SERVICE_ACCOUNT','R84_DRIVE_FUNCTION_SERVICE_ACCOUNT_BINDING_MISSING');
+has(driveBackend,'authorizeRead(request,tenantId','R84_READ_SCOPE_AUTHORIZATION_MISSING');
+has(driveBackend,'El documento no pertenece al expediente autorizado.','R84_DOCUMENT_RESOURCE_BINDING_MISSING');
+has(driveBackend,"'_GRAVICENTRA_PREVIEW_QA'",'R84_PREVIEW_ISOLATION_MISSING');
 has(driveBackend,'ROOT_BY_TENANT','R81_DRIVE_ROOT_BINDING_MISSING');
-need(!driveBackend.includes('new GoogleAuth('),'R77_SERVICE_ACCOUNT_DRIVE_AUTH_REMAINS');
-need(!driveBackend.includes('serviceAccount:SERVICE_ACCOUNT'),'R77_SERVICE_ACCOUNT_FUNCTION_BINDING_REMAINS');
 
 console.log(JSON.stringify({
   status:'PASS',
-  contract:'I6.5-B2-R15-R15A',
-  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83'],
-  drive:{repository:'Google Drive',auth:'delegated-user-oauth',tokenPersistence:'memory_only',readbackRequired:true},
+  contract:'I6.5-B2-R15-R15A-R16',
+  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83','R84'],
+  drive:{repository:'Google Drive',auth:'tenant-persistent-backend',tokenPersistence:'SecretManager',routineUserGoogleOAuth:false,readbackRequired:true},
   delete:{ui:'Eliminar',default:'durable-soft-delete',relationalSafety:'fail-closed'},
   renewalWindowDays:45
 },null,2));

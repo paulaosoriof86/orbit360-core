@@ -14,6 +14,11 @@ Orbit.documentViewer = (function () {
     return /^https:\/\/[^\s]+$/i.test(s) ? s : '';
   }
 
+  function safePreviewUrl(value) {
+    const s = String(value || '').trim();
+    return /^(?:https:\/\/[^\s]+|blob:[^\s]+)$/i.test(s) ? s : '';
+  }
+
   function icon(value) {
     const s = String(value || '').toLowerCase();
     if (/pdf/.test(s)) return '📄';
@@ -38,7 +43,7 @@ Orbit.documentViewer = (function () {
   }
 
   function previewMarkup(doc) {
-    const preview = safeUrl(doc.previewUrl || doc.embedUrl);
+    const preview = safePreviewUrl(doc.previewUrl || doc.embedUrl);
     const type = String(doc.tipo || doc.mimeType || doc.nombre || '').toLowerCase();
     if (!preview) return `<div class="dv-empty"><span>${icon(type)}</span><b>Vista previa no disponible</b><p>El documento conserva su referencia y podrá abrirse aquí cuando la conexión documental esté disponible.</p></div>`;
     if (/image|png|jpg|jpeg|gif|webp/.test(type)) return `<div class="dv-preview"><img src="${esc(preview)}" alt="${esc(doc.nombre || 'Documento')}"></div>`;

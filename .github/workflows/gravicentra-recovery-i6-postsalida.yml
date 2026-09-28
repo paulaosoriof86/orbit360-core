@@ -3685,8 +3685,8 @@ jobs:
           printf 'ORBIT360_STORAGE_BUCKET=%s\n' "$STORAGE_BUCKET" > "$FROOT/backend/.env"
           cat "$RUNNER_TEMP/b2-storage-bucket-readonly.json"
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360DocumentDriveStatusPreview,functions:orbit360DocumentDriveUploadPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","storageBucket":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview"],"documentRepository":"Google Drive","documentAuth":"delegated_user_oauth","documentTokenPersistence":"memory_only","productionFunctionDeployed":false,"controlledWorkflowUatWritesAuthorized":true,"existingWorkflowMutationAuthorized":false,"externalNotificationsSuppressed":true}\n' "$GITHUB_SHA" "$STORAGE_BUCKET" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360DocumentDriveStatusPreview,functions:orbit360DocumentDriveUploadPreview,functions:orbit360DocumentDriveReadPreview,functions:orbit360DocumentDriveDownloadPreview,functions:orbit360DocumentDriveBootstrapPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","storageBucket":"%s","functions":["orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview","orbit360DocumentDriveReadPreview","orbit360DocumentDriveDownloadPreview","orbit360DocumentDriveBootstrapPreview"],"documentRepository":"Google Drive","documentAuth":"tenant_persistent_backend","documentTokenPersistence":"secret_manager","routineUserGoogleOAuth":false,"productionFunctionDeployed":false,"controlledWorkflowUatWritesAuthorized":true,"existingWorkflowMutationAuthorized":false,"externalNotificationsSuppressed":true}\n' "$GITHUB_SHA" "$STORAGE_BUCKET" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
           cp "$RUNNER_TEMP/b2-storage-bucket-readonly.json" "$RUNNER_TEMP/b2-package/evidence/b2-storage-bucket-readonly.json"
       - name: Deploy exact B2 package to isolated Preview
         if: steps.mode.outputs.mode == 'preview'
@@ -4458,17 +4458,8 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
-          node - <<'NODE'
-          const fs=require('node:fs');
-          const c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK));
-          const q=c.i65ForensicRemediationPlan?.b2?.driveHumanFixture||{};
-          const run=b.status==='PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL'
-            && b.authenticatedPreviewProof?.status==='PASS'
-            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
-            && q.status==='AUTHORIZED_PENDING_RUN';
-          if(run&&(b.preview?.livePromoted!==false||b.boundaries?.humanDriveOAuthConsentAuthorizedOnExactPreview!==true))throw Error('B2_DRIVE_HUMAN_FIXTURE_BOUNDARY_INVALID');
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
-          NODE
+          echo "run=false" >> "$GITHUB_OUTPUT"
+          echo "R84 supersedes routine per-session Google OAuth. Existing synthetic Drive fixture is preserved for zero-Google proof."
       - name: Install fixture dependency
         if: steps.mode.outputs.run == 'true'
         run: npm install --no-save --package-lock=false firebase-admin@13.4.0 google-auth-library@9.15.1 >/dev/null

@@ -76,7 +76,12 @@ Orbit.secureResources = (function () {
       downloadAvailable: raw.downloadAvailable === true,
       revealAvailable: raw.revealAvailable === true,
       copyAvailable: raw.copyAvailable === true,
-      requiresReauth: raw.requiresReauth !== false,
+      uploadAvailable: raw.uploadAvailable === true,
+      readAvailable: raw.readAvailable === true,
+      configured: raw.configured === true,
+      bootstrapRequired: raw.bootstrapRequired === true,
+      backendPersistent: raw.backendPersistent === true,
+      requiresReauth: raw.backendPersistent === true ? false : raw.requiresReauth !== false,
       message: raw.message || ''
     };
   }
