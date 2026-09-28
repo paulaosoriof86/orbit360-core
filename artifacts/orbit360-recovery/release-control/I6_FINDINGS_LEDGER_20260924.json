@@ -2695,16 +2695,16 @@
       "classification": "PRODUCT_DEFECT_CROSS_MODULE_CRUD_PARITY",
       "blocking": true,
       "finding": "La acción Eliminar no está disponible de forma consistente en todos los módulos que administran registros persistentes.",
-      "rootCause": "Los módulos implementan CRUD y borrado de forma fragmentada; algunos tienen eliminación especializada, otros solo archivar y otros ninguna acción. No existe un owner canónico transversal de eliminación durable y segura.",
+      "rootCause": "Cross-module delete owner was present, but Ops/Leads archive semantic backend did not persist delete audit metadata (reason/actor/date) and the workflow writer did not require a discriminating server delete readback.",
       "remediation": "Crear owner canónico de borrado lógico durable con permisos/scope/motivo/readback y entrypoints visibles en cada módulo administrable, conservando borrado físico solo donde sea relacionalmente seguro.",
       "requiredProof": "Eliminar visible/operable según permiso en todos los módulos administrables; persistencia tras reload; registros dependientes fail-closed o soft-delete sin huérfanos; actor/motivo/fecha conservados.",
-      "status": "SOURCE_CONTRACT_PASS_PAULA_PARTIAL_VISUAL_FINAL_CROSS_MODULE_AUDIT_PENDING",
+      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15A_CROSS_MODULE_DELETE_RULE_20260927.json",
       "receiptBlobSha": "e8456913dfedd0058743f1a66f7c42557aa06a68",
       "noLive": true,
       "noReimport": true,
       "sourceFixDate": "2026-09-27",
-      "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
+      "sourceCandidateSha": "19c441702b52a0c988c520b6f5f10f7a43eb380d",
       "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
       "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
       "closureState": "NOT_CLOSED",
@@ -2717,7 +2717,15 @@
         "remaining": "Final role/readback audit across all administrable delete entrypoints."
       },
       "r21ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
-      "r21ReceiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4"
+      "r21ReceiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
+      "causalFix": {
+        "backendDeleteAuditFields": true,
+        "backendDeleteAuditReadback": true,
+        "browserWorkflowDeleteReadbackGuard": true,
+        "backendBlobSha": "fe5307b171a9d51e3f449f0dd2b5aba6fbcbb341",
+        "storeBlobSha": "8ff58b3d309da5aae76cecd4ff2e83af8a09e533",
+        "contractBlobSha": "16914ca022c342b02886cda8da4f0258976da423"
+      }
     },
     {
       "id": "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",

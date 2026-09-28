@@ -114,7 +114,7 @@
     "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "682941c99f0a6cf401f87ff413a426245996bad9",
-    "functions/product-ops-leads-domain.js": "55ee18efd399bd1b54c00a29f7514de4efa6fb5e",
+    "functions/product-ops-leads-domain.js": "fe5307b171a9d51e3f449f0dd2b5aba6fbcbb341",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "e4b602b4abb26fcd3d9413b1ab9bb67998be78dd",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -150,7 +150,7 @@
     "orbit360-platform/core/tenant-domain-config-client.js": "89bff4ac9131ff5805ffe96ee8d6ccd4927a84dc",
     "orbit360-platform/core/user-onboarding.js": "bf645951a23491ce53d2034ba4281d965cbb326d",
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
-    "orbit360-platform/data/store-firestore-product-operational-p0.js": "01d658668295cc7301193d80fde7a31dd13f588e",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "8ff58b3d309da5aae76cecd4ff2e83af8a09e533",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "75edf2bf0ee9e945c1e503ad10e4eb468822c83a",
@@ -202,72 +202,19 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "PAULA_UAT_R21_RENEWAL_DOCUMENTARY_AND_VISUAL_20260928",
-    "parentHead": "7b0baba33d1c0f2532ec0232e2bd6f567fd9cd8c",
+    "id": "B2-R82-OPS-LEADS-DELETE-AUDIT-DURABILITY-20260928",
     "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
-    "changedProductFiles": [
-      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
-      "orbit360-platform/core/importa.js",
-      "orbit360-platform/core/ciclo.js",
-      "orbit360-platform/modules/cliente360.js"
-    ],
-    "changedProductBlobs": {
-      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
-      "orbit360-platform/core/importa.js": "416076ec9af339f6c1f08437ce44a68c2082cdbc",
-      "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
-      "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813"
+    "sourceHead": "19c441702b52a0c988c520b6f5f10f7a43eb380d",
+    "causalFindingId": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
+    "rootCause": "Canonical cross-module delete owner requested durable audit fields, but Ops/Leads semantic backend archive operations persisted archivado while filtering deleteReason/actor/date metadata and returned no discriminating delete audit readback.",
+    "fixFiles": {
+      "functions/product-ops-leads-domain.js": "fe5307b171a9d51e3f449f0dd2b5aba6fbcbb341",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "8ff58b3d309da5aae76cecd4ff2e83af8a09e533"
     },
-    "changedContractFiles": [
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs"
-    ],
-    "contractBlobSha": "cbd307266abec395f1d158402773ea6f04c57560",
-    "visuallyClosedFindings": [
-      "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
-      "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
-      "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
-      "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
-      "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
-      "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19"
-    ],
-    "machineConfirmed": {
-      "insurerLogoPersistence": "PASS_RUN_36454148965",
-      "renewalBidirectionalLineage": "PASS_RUN_36454148965",
-      "renewalReceiptsPortfolio": "PASS_RECEIPTS_2_PORTFOLIO_2_RUN_36454148965",
-      "drivePersistentReadPreviewDownload": "PASS"
-    },
-    "openFindings": [
-      "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
-      "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
-      "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
-      "B2-R91-RENEWAL-FIRM-SUPPORT-NO-CANONICAL-DRIVE-UPLOAD-R21",
-      "B2-R92-RENEWAL-TARIFF-COSTS-NOT-AUTO-DERIVED-R21",
-      "B2-R93-RENEWAL-ISSUANCE-MODAL-CRASH-SEMANTIC-VISUAL-R21",
-      "B2-R94-PREVIEW-DOCUMENT-UPLOAD-GUARD-MISLEADING-UX-R21",
-      "B2-R95-CLIENT-DRIVE-LEGACY-VS-CANONICAL-SEMANTICS-R21"
-    ],
-    "rootCauses": [
-      "PREVIEW_SYNTHETIC_ONLY_DRIVE_BOUNDARY_NOT_PROJECTED_IN_UI",
-      "DIRECT_RENEWAL_SUPPORT_IS_MANUAL_DOCUMENTREF_WITHOUT_CANONICAL_UPLOAD",
-      "DIRECT_RENEWAL_TARIFF_CONFIG_NOT_CONSUMED",
-      "RENEWAL_ISSUANCE_MODAL_COPIED_INVALID_SELECTORS_AND_OVERPROMISED_EXTERNAL_SEND",
-      "LEGACY_CLIENT_DRIVELINK_UI_AMBIGUOUS_AFTER_TENANT_DRIVE_AUTHORITY"
-    ],
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
-    "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
-    "findingLedgerBlobSha": "55daa5563605378e859b074ebc59cc2c4bf93fe4",
-    "noDataReimport": true,
+    "contractBlobSha": "16914ca022c342b02886cda8da4f0258976da423",
+    "preservesPriorMachinePasses": true,
     "noLive": true,
     "noB3": true,
-    "candidateHead": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
-    "guardPassRunId": 36466197519,
-    "id": "B2-R91-RESOLVE-WORKFLOW-FIELD-PARITY-20260928",
-    "sourceHead": "e70242ceadcedfaacc3ababb7a545a7645bf531f",
-    "causalFindingId": "B2-R91-RENEWAL-FIRM-SUPPORT-NO-CANONICAL-DRIVE-UPLOAD-R21",
-    "rootCause": "Direct renewal created the policy and resolved the management, but workflowOperation classified the final management update as resolve_management; that branch persisted generic fields but dropped RENEWAL_MANAGEMENT_FIELDS, including directRenewalPolicyId/nuevaPolizaId. Optimistic browser state therefore diverged from Firestore.",
-    "fixFiles": {
-      "functions/product-ops-leads-domain.js": "55ee18efd399bd1b54c00a29f7514de4efa6fb5e"
-    },
-    "contractFile": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
     "noReimport": true
   }
 }
