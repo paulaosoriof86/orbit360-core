@@ -204,7 +204,7 @@
   "lastRemediation": {
     "origin": "R20A_R88_PREMEMBERSHIP_ENUMERATION_CORRECTION_20260928",
     "parentHead": "4a223fe39ea9167a2365eb0ab2f80245af34cedd",
-    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "changedProductFiles": [
       "orbit360-platform/core/product-hydration-required-optional-p0.js",
       "orbit360-platform/index.html"
@@ -232,9 +232,11 @@
     "fix": "Return full collection universe before membership; apply single route-primary required collection only after validated membership in store factory.",
     "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
     "evidenceReceiptBlobSha": "3304f2ce0ef5714df6be249a385288ed1015df83",
-    "findingLedgerBlobSha": "1b6118a5eab82f3a759846748767d4ca250e1659",
+    "findingLedgerBlobSha": "1c2213e891ae23c62e6074383707e1107e771629",
     "noLive": true,
     "noB3": true,
-    "noReimport": true
+    "noReimport": true,
+    "candidateHead": "5af2856a4beafe83e538d4dc862d4e0acb4607b7",
+    "guardPassRunId": 36449234646
   }
 }
