@@ -2973,7 +2973,7 @@
         "Do not promote to LIVE from this finding"
       ],
       "requiredProof": "New exact Preview must show materially improved restored-session shell readiness, no access weakening, and subsequent route data hydration/reactive rerender.",
-      "status": "R20B_SOURCE_FIXED_PENDING_GUARD",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
@@ -2983,8 +2983,8 @@
       "recordedAt": "2026-09-28",
       "previewProofRequired": true,
       "remediationBlobSha": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
-      "guardPassRunId": 36449234646,
-      "sourceFixCommit": "5af2856a4beafe83e538d4dc862d4e0acb4607b7",
+      "guardPassRunId": 36452408403,
+      "sourceFixCommit": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
       "previewArmed": true,
       "lastPreviewFailure": {
         "runId": 36448274176,
@@ -3052,7 +3052,7 @@
       "rootCause": "R88 correctly made startup route-primary and deferred unrelated collections, but issuance/renewal APIs synchronously read clientes/polizas/aseguradoras/gestiones/vehiculos. A cross-module workflow invoked after an Aseguradoras reload can therefore read a still-deferred policy as null before its authoritative snapshot arrives.",
       "remediation": "Async issuance entry points wait only for the authoritative collections they require when fullHydrationDeferred=true. The shell/startup collection remains route-primary; full hydration is not restored as a startup blocker.",
       "requiredProof": "New exact Preview must preserve route-primary startup, pass startup timing, and complete renewal/issuance after an unrelated-route reload without null dependency or full-startup hydration regression.",
-      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "status": "GUARD_PASS_PREVIEW_ARMED",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20B_ROUTE_DEFERRED_WORKFLOW_HYDRATION_20260928.json",
       "receiptBlobSha": "a1fbe1bb983b09e3233e68f1c4aa6f5a8dc33afe",
@@ -3062,7 +3062,10 @@
       "productBlobSha": "ab138f218e041b41ac737ff250c7e808edc8c030",
       "noLive": true,
       "noB3": true,
-      "noReimport": true
+      "noReimport": true,
+      "guardPassRunId": 36452408403,
+      "sourceFixCommit": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
+      "previewArmed": true
     }
   ],
   "phaseBBacklog": [

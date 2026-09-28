@@ -204,7 +204,7 @@
   "lastRemediation": {
     "origin": "R20B_ROUTE_DEFERRED_CROSS_WORKFLOW_HYDRATION_20260928",
     "parentHead": "d323797e05a0f99628810282681d5a471ceeb069",
-    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "changedProductFiles": [
       "orbit360-platform/core/issuance-workflow-v1201.js"
     ],
@@ -232,9 +232,11 @@
     },
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20B_ROUTE_DEFERRED_WORKFLOW_HYDRATION_20260928.json",
     "receiptBlobSha": "a1fbe1bb983b09e3233e68f1c4aa6f5a8dc33afe",
-    "findingLedgerBlobSha": "ad7faa3e56ef3641195902926df21e2a41039197",
+    "findingLedgerBlobSha": "478899325064db8695a717ea01e71d743421f707",
     "noDataReimport": true,
     "noLive": true,
-    "noB3": true
+    "noB3": true,
+    "candidateHead": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
+    "guardPassRunId": 36452408403
   }
 }

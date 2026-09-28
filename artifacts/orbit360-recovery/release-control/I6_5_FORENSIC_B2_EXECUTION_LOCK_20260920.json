@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "SOURCE_FIXED_PENDING_GUARD",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -264,13 +264,13 @@
     "noHardcodedIdentities": true
   },
   "candidate": {
-    "status": "SOURCE_FIXED_PENDING_GUARD",
-    "sourceCandidateSha": "5af2856a4beafe83e538d4dc862d4e0acb4607b7",
-    "governanceHeadBeforeCandidateArm": "5af2856a4beafe83e538d4dc862d4e0acb4607b7",
+    "status": "CANDIDATE_PENDING_PREVIEW",
+    "sourceCandidateSha": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
+    "governanceHeadBeforeCandidateArm": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "d013d5fb662ea3c6d95cd29fa0ceebd0236f5c01",
+    "compositionLockBlobSha": "2d822831cf6b5b61a5fe87781344adf1df5262e1",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "ad7faa3e56ef3641195902926df21e2a41039197",
+    "findingLedgerBlobSha": "478899325064db8695a717ea01e71d743421f707",
     "blockingFindingIds": [
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -298,7 +298,7 @@
     "humanDownloadRetestRequired": false,
     "tenantBootstrapRequired": true,
     "routineUserGoogleOAuth": false,
-    "sourceFixCommitPendingArm": true,
+    "sourceFixCommitPendingArm": false,
     "sourceCandidateParentHead": "d323797e05a0f99628810282681d5a471ceeb069",
     "changedProductFiles": [
       "orbit360-platform/core/issuance-workflow-v1201.js"
@@ -3270,7 +3270,7 @@
     "sourceFixCommit": "5af2856a4beafe83e538d4dc862d4e0acb4607b7"
   },
   "r20b": {
-    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "status": "GUARD_PASS_PREVIEW_ARMED",
     "findingId": "B2-R90-ROUTE-DEFERRED-WORKFLOW-DEPENDENCY-R20B",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20B_ROUTE_DEFERRED_WORKFLOW_HYDRATION_20260928.json",
     "receiptBlobSha": "a1fbe1bb983b09e3233e68f1c4aa6f5a8dc33afe",
@@ -3290,6 +3290,8 @@
     "routePrimaryStartupPreserved": true,
     "noLive": true,
     "noB3": true,
-    "noReimport": true
+    "noReimport": true,
+    "sourceFixCommit": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
+    "guardPassRunId": 36452408403
   }
 }
