@@ -202,16 +202,17 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "id": "B2-R82-READ-AUTHORITY-HYDRATION-20260928",
+    "id": "B2-R82-CERTIFIED-PACKAGE-HYDRATION-PARITY-20260928",
     "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
-    "sourceHead": "405d972e7cc4f2cc7d3819e5f3af2da253b0de24",
+    "sourceHead": "2ff119887e64c3cf5ea6cf5a48f0840731826510",
     "causalFindingId": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
-    "rootCause": "Final R82 audit exposed that Siniestros/Cancelaciones/Comisiones delete surfaces could not be authoritatively read in product runtime: reclamos was absent from hydration and reclamos/cancelaciones/comisiones were absent from collection access policy.",
+    "rootCause": "Certified Preview package generator omitted reclamos from optionalCollections even though product-runtime-config and R82 access policy included the collection. Therefore the exact artifact never attached an authoritative reclamos snapshot.",
     "fixFiles": {
-      "orbit360-platform/core/tenant-access-policy-contract-p0.js": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
-      "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061"
+      "tools/gravicentra-i6-1-preview-package.mjs": "d0c5649ef56d794238a80fca011770175624d83d",
+      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "d200e04bb16b8dfa3ee09ee9dfb07c7793239423"
     },
-    "contractBlobSha": "9aa5c34a7556043003d7a1e36746bf2bc4fd9785",
+    "generatedArtifactChange": true,
+    "productSourceFilesChanged": false,
     "preservesPriorMachinePasses": true,
     "noLive": true,
     "noB3": true,

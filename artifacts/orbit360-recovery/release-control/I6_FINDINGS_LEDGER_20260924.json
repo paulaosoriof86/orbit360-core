@@ -2695,7 +2695,7 @@
       "classification": "PRODUCT_DEFECT_CROSS_MODULE_CRUD_PARITY",
       "blocking": true,
       "finding": "La acción Eliminar no está disponible de forma consistente en todos los módulos que administran registros persistentes.",
-      "rootCause": "Cross-module delete had two causal gaps: Ops/Leads archive owner filtered delete audit metadata, and final read-authority audit showed reclamos missing from hydration plus reclamos/cancelaciones/comisiones missing from the canonical collection access policy.",
+      "rootCause": "R82 exposed three cumulative gaps: Ops/Leads archive filtered delete audit metadata; claims/cancellations/commissions lacked complete read authority/hydration; and the certified Preview package generator still omitted reclamos from optionalCollections, so the exact artifact could not hydrate Siniestros despite corrected source policy.",
       "remediation": "Crear owner canónico de borrado lógico durable con permisos/scope/motivo/readback y entrypoints visibles en cada módulo administrable, conservando borrado físico solo donde sea relacionalmente seguro.",
       "requiredProof": "Eliminar visible/operable según permiso en todos los módulos administrables; persistencia tras reload; registros dependientes fail-closed o soft-delete sin huérfanos; actor/motivo/fecha conservados.",
       "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
@@ -2704,7 +2704,7 @@
       "noLive": true,
       "noReimport": true,
       "sourceFixDate": "2026-09-27",
-      "sourceCandidateSha": "405d972e7cc4f2cc7d3819e5f3af2da253b0de24",
+      "sourceCandidateSha": "2ff119887e64c3cf5ea6cf5a48f0840731826510",
       "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
       "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
       "closureState": "NOT_CLOSED",
@@ -2724,13 +2724,15 @@
         "browserWorkflowDeleteReadbackGuard": true,
         "backendBlobSha": "fe5307b171a9d51e3f449f0dd2b5aba6fbcbb341",
         "storeBlobSha": "8ff58b3d309da5aae76cecd4ff2e83af8a09e533",
-        "contractBlobSha": "9aa5c34a7556043003d7a1e36746bf2bc4fd9785",
+        "contractBlobSha": "d200e04bb16b8dfa3ee09ee9dfb07c7793239423",
         "claimsAccessPolicy": true,
         "cancellationsAccessPolicy": true,
         "commissionsAccessPolicy": true,
         "claimsHydration": true,
         "accessPolicyBlobSha": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
-        "runtimeConfigBlobSha": "cce5e1b74b246640297a734871a71364e4209061"
+        "runtimeConfigBlobSha": "cce5e1b74b246640297a734871a71364e4209061",
+        "certifiedPackageClaimsHydration": true,
+        "previewPackageBlobSha": "d0c5649ef56d794238a80fca011770175624d83d"
       }
     },
     {
