@@ -2606,7 +2606,7 @@
       "rootCause": "document-viewer habilita descarga solo cuando el proveedor expone downloadAvailable y secureResources puede invocar provider.download(); product-drive-document-provider-p0.js no implementaba download() ni exponía esa capacidad.",
       "remediation": "Implementar descarga autenticada con token OAuth delegado en memoria, lectura alt=media de Drive y handoff mediante anchor download; exponer downloadAvailable solo con referencia Drive válida y token fresco.",
       "requiredProof": "En nueva Preview exacta, mismo documento sintético: Conectar Drive, abrir visor, Descargar produce archivo local verificable; Abrir en Drive continúa funcionando; sin persistir token; aislamiento Preview preservado.",
-      "status": "PAULA_VISUAL_PASS_PERSISTENT_DRIVE_PREVIEW_DOWNLOAD",
+      "status": "CLOSED_PASS",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15B_DRIVE_DOWNLOAD_FINDING_20260927.json",
       "noLive": true,
       "noReimport": true,
@@ -2659,7 +2659,8 @@
         },
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
         "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23"
-      }
+      },
+      "r20dReceiptBlobSha": "8158d8e5d6ad3a59d98cbabe863d1e1ce1bb88a5"
     },
     {
       "id": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
@@ -2672,7 +2673,7 @@
       "rootCause": "product-drive-document-provider-p0.js forces Google prompt=consent and memory_only token persistence; document-drive-domain.js requires googleAccessToken from the browser for status/upload. The same model would repeat in LIVE.",
       "remediation": "Replace routine per-user OAuth with persistent tenant-level backend Drive integration. Gravicentra role/scope becomes the authorization boundary; Drive credential remains backend-only.",
       "requiredProof": "one-time tenant bootstrap succeeds and readback persists; fresh user browser has zero Google consent/account selection; authorized client document read/download/upload works by active role/scope; cross-scope access denied; no Drive token in browser storage; Preview synthetic isolation preserved; audit receipt present; cleanup synthetic fixture",
-      "status": "TENANT_PERSISTENT_AUTHORITY_PASS_REMAINING_FRESH_SESSION_SCOPE_UPLOAD_PROOF",
+      "status": "PERSISTENT_FRESH_SESSION_SCOPE_PASS_UPLOAD_READBACK_PENDING",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
       "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23",
       "noLive": true,
@@ -2761,7 +2762,20 @@
         "browserTokenKeys": 0,
         "status": "disponible",
         "uploadAvailable": true
-      }
+      },
+      "latestProof": {
+        "runId": 36454148965,
+        "jobId": 109036417571,
+        "routineUserGoogleOAuth": false,
+        "browserTokenKeys": 0,
+        "operativoScope": "all",
+        "asesorScope": "own",
+        "asesorLeakCount": 0,
+        "userPreview": true,
+        "userDownload": true,
+        "userDirectOpen": true
+      },
+      "r20dReceiptBlobSha": "8158d8e5d6ad3a59d98cbabe863d1e1ce1bb88a5"
     },
     {
       "id": "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
@@ -2774,7 +2788,7 @@
       "rootCause": "The browser bootstrap used Firebase Authentication GoogleAuthProvider and inspected Firebase _tokenResponse for oauthRefreshToken. Durable Google Drive authority requires an OAuth authorization-code flow with backend code exchange; refresh tokens are not a browser authentication credential.",
       "remediation": "Use Google Identity Services authorization-code popup. Browser receives only a short-lived authorization code. Authenticated backend validates tenant/admin role and Preview origin, exchanges the code using the existing Identity Platform Google provider client ID/secret, verifies Drive/root-folder access, and stores only the refresh token in the tenant Secret Manager vault.",
       "requiredProof": "On one new exact Preview, Dirección performs one administrative authorization; backend returns configured=true and Secret Manager readback survives reload; fresh routine-user sessions receive zero Google account/consent prompts; authorized view/download/upload pass; cross-scope denial passes; no Google access or refresh token exists in browser storage.",
-      "status": "CLOSED_TENANT_PERSISTENT_BOOTSTRAP_PASS",
+      "status": "CLOSED_PASS",
       "closureState": "CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928.json",
       "receiptBlobSha": "2cc9f9d70d4bca863b2c1ab60f996f1310c7721f",
@@ -2826,7 +2840,8 @@
         },
         "authenticatedJobId": 109006464190,
         "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23"
-      }
+      },
+      "r20dReceiptBlobSha": "8158d8e5d6ad3a59d98cbabe863d1e1ce1bb88a5"
     },
     {
       "id": "B2-R86-DRIVE-OAUTH-CLIENT-RUNTIME-CONFIG-UNAVAILABLE-R18",
@@ -2899,7 +2914,7 @@
         "fresh routine-user session shows zero Google account/consent prompts",
         "no Google access/refresh token is persisted in browser storage"
       ],
-      "status": "CLOSED_EXACT_ORIGIN_APPLIED_AND_BOOTSTRAP_PASS",
+      "status": "CLOSED_PASS",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
@@ -2942,7 +2957,8 @@
         "source": "PAULA_GOOGLE_AUTH_PLATFORM_PLUS_SAME_PREVIEW_BOOTSTRAP",
         "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
         "receiptBlobSha": "5b926a15e42b23d7c6497cbb992681726b915d23"
-      }
+      },
+      "r20dReceiptBlobSha": "8158d8e5d6ad3a59d98cbabe863d1e1ce1bb88a5"
     },
     {
       "id": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
@@ -2973,7 +2989,7 @@
         "Do not promote to LIVE from this finding"
       ],
       "requiredProof": "New exact Preview must show materially improved restored-session shell readiness, no access weakening, and subsequent route data hydration/reactive rerender.",
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "SOURCE_RUNTIME_PASS_HUMAN_STARTUP_SPOTCHECK_PENDING",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
@@ -2997,7 +3013,10 @@
       "causalSuccessorId": "B2-R90-ROUTE-DEFERRED-WORKFLOW-DEPENDENCY-R20B",
       "latestFailureRunId": 36449511487,
       "latestFailureJobId": 109021556909,
-      "routePrimaryStartupPreserved": true
+      "routePrimaryStartupPreserved": true,
+      "latestAuthenticatedRunId": 36454148965,
+      "crossWorkflowDependencyPass": true,
+      "r20dReceiptBlobSha": "8158d8e5d6ad3a59d98cbabe863d1e1ce1bb88a5"
     },
     {
       "id": "B2-R89-OPS-LEADS-PENDING-OVERLAY-PREMATURE-RECONCILIATION-R20",
@@ -3047,13 +3066,13 @@
       "source": "AUTHENTICATED_PREVIEW_36449511487",
       "surface": "R88/Issuance/Renewal/CrossModuleHydration",
       "classification": "PRODUCT_RUNTIME_RACE_DEFERRED_COLLECTION_READ_BEFORE_AUTHORITATIVE_SNAPSHOT",
-      "blocking": true,
+      "blocking": false,
       "finding": "After route-primary startup, issuance/renewal may synchronously read a deferred policy/client/insurer/management/vehicle before its authoritative snapshot is available, producing a null cross-module dependency.",
       "rootCause": "R88 correctly made startup route-primary and deferred unrelated collections, but issuance/renewal APIs synchronously read clientes/polizas/aseguradoras/gestiones/vehiculos. A cross-module workflow invoked after an Aseguradoras reload can therefore read a still-deferred policy as null before its authoritative snapshot arrives.",
       "remediation": "Async issuance entry points wait only for the authoritative collections they require when fullHydrationDeferred=true. The shell/startup collection remains route-primary; full hydration is not restored as a startup blocker.",
       "requiredProof": "New exact Preview must preserve route-primary startup, pass startup timing, and complete renewal/issuance after an unrelated-route reload without null dependency or full-startup hydration regression.",
-      "status": "GUARD_PASS_PREVIEW_ARMED",
-      "closureState": "NOT_CLOSED",
+      "status": "CLOSED_PASS",
+      "closureState": "CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20B_ROUTE_DEFERRED_WORKFLOW_HYDRATION_20260928.json",
       "receiptBlobSha": "a1fbe1bb983b09e3233e68f1c4aa6f5a8dc33afe",
       "changedProductFiles": [
@@ -3065,7 +3084,9 @@
       "noReimport": true,
       "guardPassRunId": 36452408403,
       "sourceFixCommit": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
-      "previewArmed": true
+      "previewArmed": true,
+      "closedAt": "2026-09-28",
+      "r20dReceiptBlobSha": "8158d8e5d6ad3a59d98cbabe863d1e1ce1bb88a5"
     }
   ],
   "phaseBBacklog": [

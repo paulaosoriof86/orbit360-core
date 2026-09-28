@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "912a12d7d0373c49cca4a9bc06af4c4eb04c5181",
+    "b2ExecutionLockBlobSha": "691cdd615cbe0558b9ff288141083741eb9e0888",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2168,7 +2168,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "R20B product source remains the exact certified Preview. The first authenticated attempt failed in the harness before Orbit.issuance could exercise the product dependency gate. R20C repairs only that pre-read and authorizes authenticated retry on the same artifact. No product rebuild, LIVE, B3 or reimport.",
+      "boundaryNote": "Drive persistent authority, in-app preview, download, direct open, fresh-session zero-Google-prompt and active-role scope are PASS. Remaining machine proof is upload durable readback + R77/R81 provider proof + fixture cleanup; R88 requires one human startup spot-check on current exact Preview; R75-R82 remain human visual. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2254,7 +2254,7 @@
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
       "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
       "insurerStableEditRuntimePass": true,
-      "findingLedgerBlobSha": "478899325064db8695a717ea01e71d743421f707",
+      "findingLedgerBlobSha": "d9de49a12c98855209c160274c54f01353fc0121",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
@@ -2696,6 +2696,24 @@
         "receiptBlobSha": "ced2d39595ccb62597b2b1d16c3cd9d4eb2244bb",
         "harnessBlobSha": "b05cd363cb736f4c100264e140014881e29ff860",
         "exactPreviewRunId": 36452653473
+      },
+      "r20d": {
+        "status": "DRIVE_PERSISTENCE_PREVIEW_DOWNLOAD_DIRECT_OPEN_PASS_AUTH_FRESH_SCOPE_PASS_UPLOAD_PENDING",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20D_DRIVE_VISUAL_AND_AUTH_PASS_20260928.json",
+        "receiptBlobSha": "8158d8e5d6ad3a59d98cbabe863d1e1ce1bb88a5",
+        "closed": [
+          "R83",
+          "R85",
+          "R87",
+          "R90"
+        ],
+        "pending": [
+          "R84_PREVIEW_UPLOAD_AND_DURABLE_READBACK",
+          "R77_R81_CANONICAL_PROVIDER_PROOF",
+          "DRIVE_QA_FIXTURE_CLEANUP",
+          "R88_HUMAN_STARTUP_SPOTCHECK_ON_CURRENT_EXACT_PREVIEW",
+          "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
+        ]
       }
     },
     "dashboardRealityGate": {

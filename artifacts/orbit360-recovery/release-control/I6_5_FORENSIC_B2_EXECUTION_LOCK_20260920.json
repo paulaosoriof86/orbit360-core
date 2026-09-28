@@ -209,20 +209,23 @@
     "visibleGravicentraBrand": true,
     "renewalBidirectionalLink": true,
     "renewalDurableClosure": true,
-    "authenticatedPreviewPass": false,
+    "authenticatedPreviewPass": true,
     "technicalFindingsClosedByExactRun": false,
     "vehiclePolicyContext": true,
     "individualReceiptEdit": true,
     "reportedPaymentProjection": true,
     "r15R15aSourceFixed": true,
-    "r15R15aExactPreviewPass": false,
+    "r15R15aExactPreviewPass": true,
     "humanDriveOAuthUploadReadback": false,
     "mobileTenantBrandingVisual": true,
     "client360MobileSearchVisual": true,
     "driveTenantPersistentBootstrap": true,
     "driveInAppPreview": true,
     "driveDownload": true,
-    "driveDirectOpen": true
+    "driveDirectOpen": true,
+    "driveFreshSessionZeroGooglePrompt": true,
+    "driveActiveRoleScopePass": true,
+    "driveUploadReadback": false
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING",
@@ -270,7 +273,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "2d822831cf6b5b61a5fe87781344adf1df5262e1",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "478899325064db8695a717ea01e71d743421f707",
+    "findingLedgerBlobSha": "d9de49a12c98855209c160274c54f01353fc0121",
     "blockingFindingIds": [
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -1879,13 +1882,10 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "CENTRAL_GUARD_PASS",
-    "NEW_EXACT_B2_PREVIEW_READBACK",
-    "R90_CROSS_WORKFLOW_AUTHORITATIVE_DEPENDENCY_PASS",
-    "R88_STARTUP_TIMING_AND_ROUTE_HYDRATION_PASS",
-    "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_VIEW_DOWNLOAD_UPLOAD_AND_SCOPE_DENIAL",
+    "R84_PREVIEW_UPLOAD_AND_DURABLE_READBACK",
     "R77_R81_CANONICAL_PROVIDER_PROOF",
     "DRIVE_QA_FIXTURE_CLEANUP",
+    "R88_HUMAN_STARTUP_SPOTCHECK_ON_CURRENT_EXACT_PREVIEW",
     "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
   ],
   "lastAuthenticatedFailure": {
@@ -3292,5 +3292,33 @@
     "failedJobId": 109032593233,
     "productRegressionDemonstrated": false,
     "exactPreviewUnchanged": true
+  },
+  "r20d": {
+    "status": "DRIVE_PERSISTENCE_PREVIEW_DOWNLOAD_DIRECT_OPEN_PASS_AUTH_FRESH_SCOPE_PASS_UPLOAD_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20D_DRIVE_VISUAL_AND_AUTH_PASS_20260928.json",
+    "receiptBlobSha": "8158d8e5d6ad3a59d98cbabe863d1e1ce1bb88a5",
+    "exactPreview": {
+      "sourceSha": "dcfe50d8e131d27ad5036ac551a19c8527a2db9b",
+      "buildId": "gi-i65-b2-dcfe50d8e131-57f234755dc1",
+      "runId": 36452653473,
+      "artifactId": 10984480961,
+      "artifactDigest": "a08fb2777404c2d5b0a3c256703b18d971ad73f540f579aa5628f10845daa245",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36452653473-sx5v5wt6.web.app"
+    },
+    "authenticatedRunId": 36454148965,
+    "authenticatedJobId": 109036417571,
+    "closed": [
+      "R83",
+      "R85",
+      "R87",
+      "R90"
+    ],
+    "pending": [
+      "R84_UPLOAD_READBACK",
+      "R77_R81_PROVIDER_PROOF",
+      "DRIVE_FIXTURE_CLEANUP",
+      "R88_HUMAN_STARTUP_SPOTCHECK",
+      "R75_R82_VISUAL"
+    ]
   }
 }

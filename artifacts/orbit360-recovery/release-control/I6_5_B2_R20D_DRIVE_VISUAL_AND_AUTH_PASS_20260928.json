@@ -1,0 +1,61 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R20D_DRIVE_VISUAL_AND_AUTH_PASS_20260928_V1",
+  "status": "DRIVE_PERSISTENCE_PREVIEW_DOWNLOAD_DIRECT_OPEN_PASS_AUTH_FRESH_SCOPE_PASS_UPLOAD_PENDING",
+  "recordedAt": "2026-09-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "parentHead": "fa81629472caa4a03e084527f7b9d4f1d9fc6f27",
+  "userVisualEvidence": {
+    "source": "PAULA_DESKTOP_UAT_20260928",
+    "persistentTenantToast": true,
+    "inAppPreview": true,
+    "previewContentMatchesFixture": true,
+    "download": true,
+    "directDriveOpen": true
+  },
+  "authenticatedEvidence": {
+    "runId": 36454148965,
+    "jobId": 109036417571,
+    "exactPreview": {
+      "sourceSha": "dcfe50d8e131d27ad5036ac551a19c8527a2db9b",
+      "buildId": "gi-i65-b2-dcfe50d8e131-57f234755dc1",
+      "runId": 36452653473,
+      "artifactId": 10984480961,
+      "artifactDigest": "a08fb2777404c2d5b0a3c256703b18d971ad73f540f579aa5628f10845daa245",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36452653473-sx5v5wt6.web.app"
+    },
+    "status": "PASS",
+    "driveTenantPersistentAuthority": true,
+    "routineUserGoogleOAuth": false,
+    "browserTokenKeys": 0,
+    "uploadAvailable": true,
+    "operativoScope": "all",
+    "asesorScope": "own",
+    "asesorLeakCount": 0,
+    "renewalCrossWorkflowPass": true,
+    "syntheticCleanupPass": true
+  },
+  "disposition": {
+    "r83": "CLOSED",
+    "r85": "CLOSED",
+    "r87": "CLOSED",
+    "r90": "CLOSED_AUTHENTICATED_PASS",
+    "r84": "PERSISTENT_FRESH_SESSION_AND_SCOPE_PASS_UPLOAD_READBACK_PENDING",
+    "r88": "SOURCE_AND_CROSS_WORKFLOW_RUNTIME_PASS_HUMAN_STARTUP_SPOTCHECK_PENDING",
+    "r77_r81": "CANONICAL_PROVIDER_PROOF_STILL_PENDING"
+  },
+  "boundaries": {
+    "live": false,
+    "b3": false,
+    "reimport": false,
+    "productionSecretTouched": false
+  },
+  "nextRequiredProof": [
+    "R84_PREVIEW_UPLOAD_AND_DURABLE_READBACK",
+    "R77_R81_CANONICAL_PROVIDER_PROOF",
+    "DRIVE_QA_FIXTURE_CLEANUP",
+    "R88_HUMAN_STARTUP_SPOTCHECK_ON_CURRENT_EXACT_PREVIEW",
+    "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
+  ]
+}
