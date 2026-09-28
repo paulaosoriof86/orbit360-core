@@ -26,7 +26,14 @@ Orbit.modules = Orbit.modules || {};
   function modal(id, title, body, actions, width) {
     let b = document.getElementById(id); if (b) b.remove();
     b = document.createElement('div'); b.id = id; b.className = 'drawer-back open'; b.style.cssText = 'display:grid;place-items:center;z-index:245';
-    b.innerHTML = `<div class="card" style="width:min(${width || 720}px,96vw);max-height:92vh;display:flex;flex-direction:column;padding:0"><div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;gap:12px"><div><small style="color:rgba(255,255,255,.68)">Orbit Ops</small><b style="display:block;color:#fff;font-family:var(--f-display);font-size:17px">${esc(title)}</b></div><button class="imp-x" data-close style="color:#fff">✕</button></div><div style="padding:18px 20px;overflow:auto;flex:1">${body}</div><div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">${actions || ''}<button class="btn ghost" data-close>Cancelar</button></div></div>`;
+    b.innerHTML = `<div class="ciclo-card" style="width:min(${width || 720}px,96vw);max-height:92vh;display:flex;flex-direction:column">
+      <div class="ciclo-h" style="background:linear-gradient(120deg,#1f3a5f,#142840)">
+        <div><div class="ciclo-eyebrow">Gestión operativa · Renovaciones</div><h2 style="margin:0">${esc(title)}</h2></div>
+        <div class="ciclo-h-act"><button class="imp-x" data-close aria-label="Cerrar">✕</button></div>
+      </div>
+      <div style="padding:18px 20px;overflow:auto;flex:1">${body}</div>
+      <div class="ciclo-foot"><div style="margin-left:auto;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">${actions || ''}<button class="btn ghost" data-close>Cancelar</button></div></div>
+    </div>`;
     document.body.appendChild(b);
     const close = () => b.remove(); b.querySelectorAll('[data-close]').forEach(x => x.onclick = close); b.addEventListener('click', e => { if (e.target === b) { e.preventDefault(); e.stopPropagation(); } });
     return b;
@@ -34,6 +41,32 @@ Orbit.modules = Orbit.modules || {};
   function frequencyFromPayments(n) { return ({1:'Contado',2:'Semestral',3:'Cuatrimestral',4:'Trimestral',6:'Bimestral',12:'Mensual'})[+n] || (+n > 1 ? 'Mensual' : 'Contado'); }
   function paymentsFromFrequency(f) { const n=Orbit.primas&&Orbit.primas.cuotasDe?+Orbit.primas.cuotasDe(f):0; return n>0?n:1; }
   function renewalDefaultPayments(source) { const expected=paymentsFromFrequency(source&&source.frecuencia||'Contado'), raw=Math.max(0,+(source&&source.cuotas)||0); return raw>0&&raw===expected?raw:expected; }
+  function normKey(v) { return String(v == null ? '' : v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,''); }
+  function r2(v) { return Math.round(((+v || 0) + Number.EPSILON) * 100) / 100; }
+  function validatedRenewalTariff(insurerId, source, payments) {
+    const insurer = insurerId ? S().get('aseguradoras', insurerId) : null;
+    if (!insurer) return null;
+    const rates = insurer.cotTasas || {}, validated = insurer.cotTasasValidadas || {};
+    const wanted = [source && source.ramo, source && source.producto, source && source.subramo].map(normKey).filter(Boolean);
+    const sameFamily = (a,b) => a===b || (!!a && !!b && (a.includes(b) || b.includes(a))) || (/auto|vehicul/.test(a) && /auto|vehicul/.test(b));
+    const key = Object.keys(rates).find(k => wanted.some(w => sameFamily(normKey(k), w)));
+    if (!key || validated[key] !== true) return null;
+    const cfg = rates[key] || {}, geMap = cfg.gastosEmisionPct || {}, rfMap = cfg.recargoFraccPct || {};
+    const country = String(source && source.pais || '').toUpperCase();
+    const gePct = Number(geMap[country]);
+    const hasGe = Number.isFinite(gePct);
+    const hasRf = Object.prototype.hasOwnProperty.call(rfMap, String(payments)) && Number.isFinite(Number(rfMap[payments]));
+    return { insurer, key, cfg, hasGe, gePct: hasGe ? gePct : 0, hasRf, recargoPct: hasRf ? Number(rfMap[payments]) : null };
+  }
+  function documentaryRef(doc) { return String(doc && (doc.documentRef || doc.fileId || doc.archivoRef) || '').trim(); }
+  function clientDocumentOptions(client) {
+    return (client && Array.isArray(client.documentos) ? client.documentos : [])
+      .map(doc => ({ ref: documentaryRef(doc), name: String(doc && (doc.nombre || doc.name) || 'Documento') }))
+      .filter(doc => doc.ref);
+  }
+  function previewProtectedDriveClient(clientId) {
+    return /--/.test(String(location.hostname || '')) && !!clientId && !/^b2[-_]/i.test(String(clientId));
+  }
   function insurerForQuote(q) {
     const name = String(q && (q.nombre || q.aseguradora) || '').toLowerCase();
     return (S().all('aseguradoras') || []).find(a => a && a.nombre && (a.nombre.toLowerCase() === name || name.includes(a.nombre.toLowerCase()) || a.nombre.toLowerCase().includes(name))) || null;
@@ -268,7 +301,7 @@ Orbit.modules = Orbit.modules || {};
     const source=renewalSource(g);if(!source)return toast('No se encontró la póliza origen.');
     const insurers=renewalInsurers(source),client=S().get('clientes',source.clienteId)||{};
     const selected=source.aseguradoraId||((insurers[0]||{}).id||''),payments=Math.max(1,+source.cuotas||1);
-    const body=`<div class="cfg-note" style="margin-bottom:12px">El cliente ya aprobó renovar. Esta acción crea una <b>solicitud de emisión en Ops</b>; no crea todavía la nueva póliza.</div><div class="cgrid">
+    const body=`<div class="cfg-note" style="margin-bottom:12px">El cliente ya aprobó renovar. Esta acción crea una <b>solicitud interna de emisión en Ops</b>; no envía correo ni crea todavía la nueva póliza. Desde Ops se controla el seguimiento hasta recibir la emisión en firme.</div><div class="cgrid">
       <label class="ce-l">Aseguradora aceptada *<select id="reni-asg" class="o-sel">${insurers.map(a=>`<option value="${esc(a.id)}" ${a.id===selected?'selected':''}>${esc(a.nombre)}</option>`).join('')}</select></label>
       <label class="ce-l">Producto / subramo *<input id="reni-prod" class="o-sel" value="${esc(source.producto||source.subramo||'')}"></label>
       <label class="ce-l">Prima neta aceptada *<input id="reni-net" type="number" class="o-sel" value="${+source.primaNeta||0}"></label>
@@ -278,13 +311,8 @@ Orbit.modules = Orbit.modules || {};
       <label class="ce-l">Referencia de propuesta / aceptación<input id="reni-source" class="o-sel" placeholder="Cotización, correo, WhatsApp o referencia"></label>
       <label class="ce-l">Documento de propuesta<input id="reni-doc" class="o-sel" placeholder="documentRef opcional en esta etapa"></label>
     </div>`;
-    const b=modal('ops-renewal-issuance-v1201','Solicitar emisión de renovación',body,'<button class="btn primary" data-create>Crear solicitud de emisión</button>',740);
+    const b=modal('ops-renewal-issuance-v1201','Crear solicitud de emisión en Ops',body,'<button class="btn primary" data-create>Crear solicitud en Ops</button>',740);
     const $=x=>b.querySelector(x),btn=b.querySelector('[data-create]');
-    let paymentsTouched=false;
-    $('#rend-payments').addEventListener('input',()=>{paymentsTouched=true;paintTotal();});
-    const paintTotal=()=>{try{const net=+$('#rend-net').value||0,gem=+$('#rend-gem').value||0,gfin=+$('#rend-gfin').value||0,other=+$('#rend-other').value||0,iva=+$('#rend-iva').value||0,n=Math.max(1,+$('#rend-payments').value||1);const recargo=net>0?gfin/net*100:0,d=Orbit.primas.desglose(net,source.pais,{fraccionado:n>1,gastosEmision:gem,otros:other,recargoFinPct:recargo,ivaPct:iva});$('#rend-total').value=(source.moneda||'')+' '+Number(d.total||0).toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2});}catch(e){$('#rend-total').value='';}};
-    $('#rend-freq').addEventListener('change',()=>{if(!paymentsTouched)$('#rend-payments').value=paymentsFromFrequency($('#rend-freq').value);paintTotal();});
-    ['#rend-net','#rend-gem','#rend-gfin','#rend-other','#rend-iva'].forEach(sel=>$(sel).addEventListener('input',paintTotal));paintTotal();
     btn.onclick=async()=>{
       const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
       const insurerId=$('#reni-asg').value,cuotas=Math.max(1,+$('#reni-payments').value||1);
@@ -324,18 +352,76 @@ Orbit.modules = Orbit.modules || {};
       <label class="ce-l">IVA / impuestos %<input id="rend-iva" type="number" step="0.01" class="o-sel" value="${source.ivaPct!=null?+source.ivaPct:((Orbit.primas&&Orbit.primas.cfgPais&&Orbit.primas.cfgPais(source.pais).iva)||0)}"></label>
       <label class="ce-l">Prima total calculada<input id="rend-total" class="o-sel" readonly></label>
       <label class="ce-l">Referencia aseguradora<input id="rend-source" class="o-sel" placeholder="N.º propuesta, correo o referencia"></label>
-      <label class="ce-l">Soporte de renovación en firme *<input id="rend-doc" class="o-sel" placeholder="URL de Drive, referencia documental o identificador del PDF"></label>
+      <label class="ce-l">Soporte de renovación en firme *
+        <select id="rend-doc-existing" class="o-sel"><option value="">— Seleccionar documento existente —</option></select>
+      </label>
+      <label class="ce-l">O cargar póliza / PDF recibido
+        <input id="rend-doc-file" type="file" class="o-sel" accept="application/pdf,image/png,image/jpeg,text/plain">
+      </label>
+      <label class="ce-l">Referencia documental confirmada
+        <input id="rend-doc" class="o-sel" placeholder="Se completa con Drive o con una referencia existente">
+      </label>
+      <div id="rend-doc-note" class="cfg-note" style="grid-column:1/-1">El soporte debe ser la póliza/renovación en firme o el documento emitido por la aseguradora. Gravicentra exige una referencia Drive confirmada antes de crear la nueva vigencia.</div>
+      <div id="rend-tariff-note" class="cfg-note" style="grid-column:1/-1"></div>
     </div>`;
     const b=modal('ops-direct-renewal-v1201','Registrar renovación en el sistema',body,'<button class="btn primary" data-create>Crear nueva póliza de renovación</button>',780);
     const $=x=>b.querySelector(x),btn=b.querySelector('[data-create]');
+    const client=S().get('clientes',source.clienteId)||{};
+    const docs=clientDocumentOptions(client),docSelect=$('#rend-doc-existing'),docFile=$('#rend-doc-file'),docInput=$('#rend-doc'),docNote=$('#rend-doc-note'),tariffNote=$('#rend-tariff-note');
+    docs.forEach(doc=>{const opt=document.createElement('option');opt.value=doc.ref;opt.textContent=doc.name;docSelect.appendChild(opt);});
+    docSelect.addEventListener('change',()=>{if(docSelect.value)docInput.value=docSelect.value;});
+    if(previewProtectedDriveClient(source.clienteId)){
+      docFile.disabled=true;
+      docNote.innerHTML='<b>Preview protege clientes operativos reales.</b> La carga binaria se valida con fixture sintético B2; en producción este mismo control carga a Drive sin pedir cuentas Google al usuario.';
+    }
+    let paymentsTouched=false;
+    const paintTotal=()=>{
+      const net=+$('#rend-net').value||0,gem=+$('#rend-gem').value||0,gfin=+$('#rend-gfin').value||0,other=+$('#rend-other').value||0,iva=+$('#rend-iva').value||0,n=Math.max(1,+$('#rend-payments').value||1);
+      const recargo=net>0?gfin/net*100:0;
+      const d=Orbit.primas.desglose(net,source.pais,{fraccionado:n>1,gastosEmision:gem,otros:other,recargoFinPct:recargo,ivaPct:iva});
+      $('#rend-total').value=(source.moneda||'')+' '+Number(d.total||0).toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2});
+    };
+    const applyValidatedTariff=()=>{
+      const net=+$('#rend-net').value||0,n=Math.max(1,+$('#rend-payments').value||1),t=validatedRenewalTariff($('#rend-asg').value,source,n);
+      if(!t){
+        tariffNote.textContent='No hay una tarifa validada para esta aseguradora/ramo; se conservan los valores de la póliza origen y no se inventan cargos.';
+        paintTotal();return;
+      }
+      if(t.hasGe)$('#rend-gem').value=String(r2(net*t.gePct/100));
+      if(n===1)$('#rend-gfin').value='0';
+      else if(t.hasRf)$('#rend-gfin').value=String(r2(net*t.recargoPct/100));
+      tariffNote.textContent='Tarifa validada: '+t.key+' · emisión '+(t.hasGe?t.gePct+'%':'sin % configurado')+' · fraccionamiento '+(n===1?'0%':t.hasRf?t.recargoPct+'% para '+n+' pagos':'sin % configurado para '+n+' pagos')+'. Puedes ajustar el valor si el documento en firme difiere.';
+      paintTotal();
+    };
+    $('#rend-freq').addEventListener('change',()=>{if(!paymentsTouched)$('#rend-payments').value=paymentsFromFrequency($('#rend-freq').value);applyValidatedTariff();});
+    $('#rend-payments').addEventListener('input',()=>{paymentsTouched=true;applyValidatedTariff();});
+    $('#rend-asg').addEventListener('change',applyValidatedTariff);
+    $('#rend-net').addEventListener('input',applyValidatedTariff);
+    ['#rend-gem','#rend-gfin','#rend-other','#rend-iva'].forEach(sel=>$(sel).addEventListener('input',paintTotal));
+    applyValidatedTariff();
     btn.onclick=async()=>{
       const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
+      let confirmedDocumentRef=docInput.value.trim();
+      const supportFile=docFile.files&&docFile.files[0];
+      if(supportFile){
+        if(!Orbit.secureResources||typeof Orbit.secureResources.uploadDocument!=='function'){btn.disabled=false;btn.textContent=original;return toast('Drive no está disponible para cargar el soporte.');}
+        const uploaded=await Orbit.secureResources.uploadDocument(supportFile,{entidad:'gestion',entidadId:g.id,clienteId:source.clienteId,polizaId:source.id,categoria:'renovacion_en_firme',nombre:supportFile.name});
+        if(!uploaded||uploaded.ok!==true||!(uploaded.documentRef||uploaded.fileId)){btn.disabled=false;btn.textContent=original;return toast(uploaded&&uploaded.message||'Drive no confirmó el soporte de renovación.');}
+        confirmedDocumentRef=uploaded.documentRef||uploaded.fileId;
+        docInput.value=confirmedDocumentRef;
+        const adjuntos=[].concat(g.adjuntos||[]);
+        if(!adjuntos.some(x=>documentaryRef(x)===confirmedDocumentRef)){
+          adjuntos.push({id:confirmedDocumentRef,nombre:uploaded.nombre||supportFile.name,documentRef:confirmedDocumentRef,driveUrl:uploaded.driveUrl||uploaded.externalUrl||'',externalUrl:uploaded.externalUrl||uploaded.driveUrl||'',mimeType:uploaded.mimeType||supportFile.type||'',clienteId:source.clienteId,polizaId:source.id,categoria:'renovacion_en_firme',origen:'Google Drive'});
+          await S().updateDurable('gestiones',g.id,{adjuntos,documentoCargaPendiente:false,actualizado:today()});
+        }
+      }
+      if(!confirmedDocumentRef){btn.disabled=false;btn.textContent=original;return toast('Selecciona o carga el soporte de renovación en firme.');}
       const result=await I.createDirectRenewal(g.id,{
         aseguradoraId:$('#rend-asg').value,numero:$('#rend-num').value.trim(),
         vigenciaInicio:$('#rend-start').value,vigenciaFin:$('#rend-end').value,producto:$('#rend-prod').value.trim(),
         frecuencia:$('#rend-freq').value,cuotas:+$('#rend-payments').value||1,formaPago:$('#rend-form').value.trim(),
         conducto:$('#rend-conduct').value.trim(),primaNeta:+$('#rend-net').value||0,gastosEmision:+$('#rend-gem').value||0,
-        gastosFinan:+$('#rend-gfin').value||0,otros:+$('#rend-other').value||0,ivaPct:+$('#rend-iva').value||0,sourceRef:$('#rend-source').value.trim(),documentRef:$('#rend-doc').value.trim()
+        gastosFinan:+$('#rend-gfin').value||0,otros:+$('#rend-other').value||0,ivaPct:+$('#rend-iva').value||0,sourceRef:$('#rend-source').value.trim(),documentRef:confirmedDocumentRef
       },{motivo:'Renovación en firme recibida y aprobada'});
       if(!result.ok){btn.disabled=false;btn.textContent=original;return toast('No se creó: '+(result.errors||[]).join(', '));}
       b.remove();const base=document.getElementById('ciclo-modal');if(base)base.remove();toast(result.alreadyCreated?'La renovación ya estaba registrada.':'Nueva póliza de renovación creada con sus recibos.');Orbit.modules.cliente360.verPoliza(result.policy.id);
@@ -360,7 +446,7 @@ Orbit.modules = Orbit.modules || {};
       const approved=panel.querySelector('[data-ren-approved]');if(approved)approved.onclick=()=>openProposalApproval(g);
     } else if (g.workflowType === 'renewal_accepted') {
       const source=renewalSource(g),policy=(g.directRenewalPolicyId||g.nuevaPolizaId)&&S().get('polizas',g.directRenewalPolicyId||g.nuevaPolizaId);
-      panel.innerHTML=`<div class="ciclo-sec-t">✅ Renovación aceptada</div><div class="vp-tags"><span class="badge ok">Cliente aprobó</span>${g.issuanceRequestId?'<span class="badge info">Emisión solicitada</span>':''}</div><div class="vp-grid" style="margin-top:10px"><div class="vp-row"><span class="vp-l">Póliza origen</span><span class="vp-v">${esc(source&&source.numero||g.polizaId||'—')}</span></div><div class="vp-row"><span class="vp-l">Decisión operativa</span><span class="vp-v">${policy?'Renovación ya registrada':g.issuanceRequestId?'Esperando emisión':'Solicitar emisión o registrar renovación en firme'}</span></div></div>${I.canManage()&&!policy?'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px"><button class="btn ghost sm" data-ren-issuance>Solicitar emisión a aseguradora</button><button class="btn primary sm" data-ren-direct>Registrar renovación en sistema</button></div>':''}${policy?'<div style="margin-top:11px"><button class="btn primary sm" data-ren-policy>Ver nueva póliza</button></div>':''}`;
+      panel.innerHTML=`<div class="ciclo-sec-t">✅ Renovación aceptada</div><div class="vp-tags"><span class="badge ok">Cliente aprobó</span>${g.issuanceRequestId?'<span class="badge info">Emisión solicitada</span>':''}</div><div class="vp-grid" style="margin-top:10px"><div class="vp-row"><span class="vp-l">Póliza origen</span><span class="vp-v">${esc(source&&source.numero||g.polizaId||'—')}</span></div><div class="vp-row"><span class="vp-l">Decisión operativa</span><span class="vp-v">${policy?'Renovación ya registrada':g.issuanceRequestId?'Esperando emisión':'Solicitar emisión o registrar renovación en firme'}</span></div></div>${I.canManage()&&!policy?'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px"><button class="btn ghost sm" data-ren-issuance>Crear solicitud de emisión en Ops</button><button class="btn primary sm" data-ren-direct>Registrar renovación en sistema</button></div>':''}${policy?'<div style="margin-top:11px"><button class="btn primary sm" data-ren-policy>Ver nueva póliza</button></div>':''}`;
       const issuance=panel.querySelector('[data-ren-issuance]');if(issuance)issuance.onclick=()=>openRenewalIssuance(g);
       const direct=panel.querySelector('[data-ren-direct]');if(direct)direct.onclick=()=>openDirectRenewal(g);
       const policyBtn=panel.querySelector('[data-ren-policy]');if(policyBtn)policyBtn.onclick=()=>{back.remove();Orbit.modules.cliente360.verPoliza(policy.id);};

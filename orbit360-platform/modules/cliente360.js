@@ -339,8 +339,8 @@ Orbit.modules.cliente360 = (function () {
             </div>
             <div style="margin-top:11px;display:flex;gap:8px;flex-wrap:wrap">
               ${c.driveLink
-                ? `<a href="${U.esc(c.driveLink)}" target="_blank" rel="noopener" class="fh-drive">📁 Expediente vinculado <span style="opacity:.6">↗</span></a>`
-                : `<span class="fh-drive ghost" onclick="Orbit.modules.cliente360.edit('${cid}')">📁 Agregar enlace de expediente</span>`}
+                ? `<a href="${U.esc(c.driveLink)}" target="_blank" rel="noopener" class="fh-drive" title="Referencia de carpeta Drive preservada para este cliente">📁 Carpeta Drive vinculada <span style="opacity:.6">↗</span></a>`
+                : `<span class="fh-drive ghost" title="La carpeta documental se crea o vincula al guardar el primer documento confirmado en Drive">📁 Drive se vincula al cargar documento</span>`}
               <span class="fh-drive ghost" onclick="Orbit.modules.cliente360.reabrir('${cid}','documentos')">📎 Documentos del cliente</span>
               <span class="fh-drive ghost" onclick="Orbit.importa.openFor('${cid}')">⬇ Importar / actualizar expediente</span>
             </div>
@@ -1005,7 +1005,7 @@ Orbit.modules.cliente360 = (function () {
           <label class="ce-l">Asesor<select id="ce-ase" class="o-sel" style="width:100%">${asesores.map(a => `<option value="${a.id}" ${a.id === c.asesorId ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">Segmento<select id="ce-seg" class="o-sel" style="width:100%">${['Premium', 'Recurrente', 'Estándar', 'Nuevo'].map(s => `<option ${s === c.segmento ? 'selected' : ''}>${s}</option>`).join('')}</select></label>
         </div>
-        ${field('Link de Drive (expediente)', 'ce-drive', c.driveLink || '')}
+        ${field('Referencia histórica de carpeta Drive (opcional)', 'ce-drive', c.driveLink || '')}
         <label class="ce-l">Notas<textarea id="ce-notas" class="o-sel" style="width:100%;min-height:62px;resize:vertical;padding:9px 11px">${U.esc(c.notas || '')}</textarea></label>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">

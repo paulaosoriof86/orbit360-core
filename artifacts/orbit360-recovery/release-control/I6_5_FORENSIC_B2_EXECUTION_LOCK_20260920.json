@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "SOURCE_FIXED_PENDING_GUARD",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -209,13 +209,13 @@
     "visibleGravicentraBrand": true,
     "renewalBidirectionalLink": true,
     "renewalDurableClosure": true,
-    "authenticatedPreviewPass": true,
+    "authenticatedPreviewPass": false,
     "technicalFindingsClosedByExactRun": false,
     "vehiclePolicyContext": true,
     "individualReceiptEdit": true,
     "reportedPaymentProjection": true,
     "r15R15aSourceFixed": true,
-    "r15R15aExactPreviewPass": true,
+    "r15R15aExactPreviewPass": false,
     "humanDriveOAuthUploadReadback": false,
     "mobileTenantBrandingVisual": true,
     "client360MobileSearchVisual": true,
@@ -225,7 +225,15 @@
     "driveDirectOpen": true,
     "driveFreshSessionZeroGooglePrompt": true,
     "driveActiveRoleScopePass": true,
-    "driveUploadReadback": false
+    "driveUploadReadback": false,
+    "mobileRenewalsResponsiveVisual": true,
+    "canonicalManagementCreationVisual": true,
+    "managementDeleteVisual": true,
+    "policyRenewEntrypointVisual": true,
+    "vehicleCandidateDedupVisual": true,
+    "startupHumanSpotcheck": true,
+    "insurerLogoPhysicalPersistenceMachineProof": true,
+    "renewalLineageReceiptsMachineProof": true
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING",
@@ -267,25 +275,23 @@
     "noHardcodedIdentities": true
   },
   "candidate": {
-    "status": "CANDIDATE_PENDING_PREVIEW",
+    "status": "SOURCE_FIXED_PENDING_GUARD",
     "sourceCandidateSha": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
     "governanceHeadBeforeCandidateArm": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "2d822831cf6b5b61a5fe87781344adf1df5262e1",
+    "compositionLockBlobSha": "88cfac7930b7a09ac6c220e790401024dcc75a0e",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "d9de49a12c98855209c160274c54f01353fc0121",
+    "findingLedgerBlobSha": "cfb39fc5efec86eb6a97c9be7ff265f792a67956",
     "blockingFindingIds": [
-      "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
-      "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
       "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
-      "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
-      "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
-      "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
       "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
       "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
-      "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
       "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
-      "B2-R90-ROUTE-DEFERRED-WORKFLOW-DEPENDENCY-R20B"
+      "B2-R91-RENEWAL-FIRM-SUPPORT-NO-CANONICAL-DRIVE-UPLOAD-R21",
+      "B2-R92-RENEWAL-TARIFF-COSTS-NOT-AUTO-DERIVED-R21",
+      "B2-R93-RENEWAL-ISSUANCE-MODAL-CRASH-SEMANTIC-VISUAL-R21",
+      "B2-R94-PREVIEW-DOCUMENT-UPLOAD-GUARD-MISLEADING-UX-R21",
+      "B2-R95-CLIENT-DRIVE-LEGACY-VS-CANONICAL-SEMANTICS-R21"
     ],
     "sourceContract": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
     "authenticatedHarness": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
@@ -301,20 +307,26 @@
     "humanDownloadRetestRequired": false,
     "tenantBootstrapRequired": true,
     "routineUserGoogleOAuth": false,
-    "sourceFixCommitPendingArm": false,
-    "sourceCandidateParentHead": "d323797e05a0f99628810282681d5a471ceeb069",
+    "sourceFixCommitPendingArm": true,
+    "sourceCandidateParentHead": "7b0baba33d1c0f2532ec0232e2bd6f567fd9cd8c",
     "changedProductFiles": [
-      "orbit360-platform/core/issuance-workflow-v1201.js"
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "orbit360-platform/core/importa.js",
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/cliente360.js"
     ],
     "changedProductBlobs": {
-      "orbit360-platform/core/issuance-workflow-v1201.js": "ab138f218e041b41ac737ff250c7e808edc8c030"
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
+      "orbit360-platform/core/importa.js": "416076ec9af339f6c1f08437ce44a68c2082cdbc",
+      "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
+      "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813"
     },
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
     "visualReceiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63",
     "changedContractFiles": [
       "tools/gravicentra-i6-5-b2-r15-contract.mjs"
     ],
-    "contractBlobSha": "24c320684cc1920e16270ee54068de6ce0e8554b",
+    "contractBlobSha": "9435c03377e6a9ad2dcff65b50c3b33140dd62b4",
     "browserRefreshTokenAllowed": false,
     "changedWorkflowFiles": [
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
@@ -323,15 +335,13 @@
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "f41f04d24c497369c90c5e982b393cd465843a9d"
     },
     "changedTestFiles": [
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs",
-      "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs"
+      "tools/gravicentra-i6-5-b2-r15-contract.mjs"
     ],
     "testBlobs": {
-      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "0bc7f8c21724460f4dd3f769be781ce873d6fc15",
-      "tools/gravicentra-i6-5-b2-r20-runtime-contract.mjs": "a51c7478581e3767b6d669e7a148eec20cc76203"
+      "tools/gravicentra-i6-5-b2-r15-contract.mjs": "9435c03377e6a9ad2dcff65b50c3b33140dd62b4"
     },
-    "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20_DRIVE_PASS_R88_R89_REMEDIATION_20260928.json",
-    "evidenceReceiptBlobSha": "3304f2ce0ef5714df6be249a385288ed1015df83"
+    "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
+    "evidenceReceiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4"
   },
   "preview": {
     "sourceSha": "dcfe50d8e131d27ad5036ac551a19c8527a2db9b",
@@ -1882,11 +1892,13 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R84_PREVIEW_UPLOAD_AND_DURABLE_READBACK",
-    "R77_R81_CANONICAL_PROVIDER_PROOF",
+    "CENTRAL_GUARD_PASS",
+    "R21_NEW_EXACT_B2_PREVIEW_READBACK",
+    "R77_R81_SYNTHETIC_B2_DRIVE_UPLOAD_AND_DURABLE_READBACK",
+    "R91_R92_R93_R94_R95_EXACT_PREVIEW_RUNTIME",
+    "R82_CROSS_MODULE_DELETE_FINAL_AUDIT",
     "DRIVE_QA_FIXTURE_CLEANUP",
-    "R88_HUMAN_STARTUP_SPOTCHECK_ON_CURRENT_EXACT_PREVIEW",
-    "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
+    "PAULA_TARGETED_FINAL_VISUAL_ONLY_IF_MACHINE_PROOF_PASSES"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -3320,5 +3332,39 @@
       "R88_HUMAN_STARTUP_SPOTCHECK",
       "R75_R82_VISUAL"
     ]
+  },
+  "r21": {
+    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
+    "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
+    "paulaVisualClosed": [
+      "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
+      "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
+      "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
+      "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
+      "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
+      "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19"
+    ],
+    "machinePass": {
+      "insurerLogoPersistence": {
+        "runId": 36454148965,
+        "jobId": 109036417571
+      },
+      "renewalBidirectionalLineage": true,
+      "renewalReceipts": 2,
+      "renewalPortfolio": 2,
+      "zeroConfirmedCobroFabrication": true
+    },
+    "previewRealClientDriveWrite": "EXPECTED_DENIED_BY_SYNTHETIC_ONLY_GUARD",
+    "newFindings": [
+      "B2-R91-RENEWAL-FIRM-SUPPORT-NO-CANONICAL-DRIVE-UPLOAD-R21",
+      "B2-R92-RENEWAL-TARIFF-COSTS-NOT-AUTO-DERIVED-R21",
+      "B2-R93-RENEWAL-ISSUANCE-MODAL-CRASH-SEMANTIC-VISUAL-R21",
+      "B2-R94-PREVIEW-DOCUMENT-UPLOAD-GUARD-MISLEADING-UX-R21",
+      "B2-R95-CLIENT-DRIVE-LEGACY-VS-CANONICAL-SEMANTICS-R21"
+    ],
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true
   }
 }

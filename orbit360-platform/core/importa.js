@@ -950,15 +950,18 @@ Orbit.importa = (function () {
   async function persistDocumentaryFiles() {
     const files = Array.from(state.filesReal || []);
     if (!files.length) return { ok: false, status: 'sin_archivos', message: 'Selecciona al menos un archivo.' };
+    const cid = state.scope && state.scope.cid || '';
+    if (/--/.test(String(location.hostname || '')) && cid && !/^b2[-_]/i.test(String(cid))) {
+      return { ok: false, status: 'preview_protected_operational_client', message: 'Preview protege los expedientes operativos reales. La carga Drive se valida con un cliente sintético B2 y se habilita con el mismo flujo al promover el artifact.' };
+    }
     const secure = Orbit.secureResources;
     const status = secure && secure.documentUploadStatus
-      ? secure.documentUploadStatus({ entidad: state.scope && state.scope.cid ? 'cliente' : state.kind, entidadId: state.scope && state.scope.cid || '' })
+      ? secure.documentUploadStatus({ entidad: cid ? 'cliente' : state.kind, entidadId: cid })
       : { available: false, status: 'pendiente_conexion' };
     if (!status || status.available !== true || !secure || typeof secure.uploadDocument !== 'function') {
       return { ok: false, status: 'pendiente_conexion', message: 'Drive no tiene un proveedor de carga confirmado. No se guardó ningún archivo.' };
     }
 
-    const cid = state.scope && state.scope.cid || '';
     const out = [];
     for (const file of files) {
       const uploaded = await secure.uploadDocument(file, {

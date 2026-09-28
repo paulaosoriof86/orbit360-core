@@ -590,11 +590,12 @@ Orbit.ciclo = (function () {
       ? opts.checklist.map(x => typeof x === 'string' ? { t: x, done: false } : { t: String(x.t || '').trim(), done: !!x.done }).filter(x => x.t)
       : [{ t: 'Solicitud recibida', done: true }, { t: 'Documentación completa', done: false }, { t: 'Enviado a aseguradora', done: false }];
     const checklistText = defaultChecklist.map(x => x.t).join('\n');
+    const previewProtectedClient = /--/.test(String(location.hostname || '')) && !!opts.clienteId && !/^b2[-_]/i.test(String(opts.clienteId));
     const uploadStatus = Orbit.secureResources && Orbit.secureResources.documentUploadStatus
       ? Orbit.secureResources.documentUploadStatus({ entidad: 'gestion', clienteId: opts.clienteId || '', polizaId: opts.polizaId || '' })
       : { available: false, status: 'pendiente_conexion', message: 'Carga directa pendiente de conexión con Drive' };
-    let canUpload = uploadStatus && uploadStatus.available === true && uploadStatus.uploadAvailable !== false;
-    const needsDriveBootstrap = !!(uploadStatus && uploadStatus.bootstrapRequired === true);
+    let canUpload = !previewProtectedClient && uploadStatus && uploadStatus.available === true && uploadStatus.uploadAvailable !== false;
+    const needsDriveBootstrap = !previewProtectedClient && !!(uploadStatus && uploadStatus.bootstrapRequired === true);
     const sourceLabel = opts.desdeCliente ? 'Solicitud del cliente (Portal)' : (opts.origen === 'Ops' ? 'Nueva gestión · Ops' : 'Gestión operativa');
     const headerColor = opts.desdeCliente ? '#15803d,#0c5a2a' : '#1f3a5f,#142840';
     let pendingFiles = [];
@@ -652,8 +653,8 @@ Orbit.ciclo = (function () {
           <div class="ciclo-sec-t">Documentos de soporte · Drive</div>
           <label class="ce-l">Enlace(s) de Drive / origen<textarea id="mg-links" class="o-sel" style="min-height:68px;resize:vertical;padding:9px 11px" placeholder="Pega uno o varios enlaces https://, uno por línea"></textarea></label>
           <div class="cfg-note" id="mg-drive-connect-note" style="margin-top:10px;${canUpload ? 'display:none' : ''}">
-            <b>${needsDriveBootstrap ? 'Drive requiere una configuración administrativa única.' : 'El repositorio documental no está disponible para carga.'}</b>
-            <div style="margin-top:6px">Gravicentra controla el acceso por rol y alcance; los usuarios no deben conectar cuentas Google para trabajar los expedientes.</div>
+            <b>${previewProtectedClient ? 'Preview protege los expedientes operativos reales.' : needsDriveBootstrap ? 'Drive requiere una configuración administrativa única.' : 'Verificando disponibilidad del repositorio documental.'}</b>
+            <div style="margin-top:6px">${previewProtectedClient ? 'La carga binaria se valida con una gestión y cliente sintéticos B2; el artifact productivo usa el mismo proveedor Drive sin pedir cuentas Google al usuario.' : 'Gravicentra controla el acceso por rol y alcance; los usuarios no deben conectar cuentas Google para trabajar los expedientes.'}</div>
             ${needsDriveBootstrap ? '<button type="button" class="btn ghost sm" id="mg-drive-bootstrap" style="margin-top:8px">⚙ Configurar Drive</button>' : ''}
           </div>
           <div id="mg-drive-upload-area" style="${canUpload ? '' : 'display:none'}">
@@ -710,7 +711,14 @@ Orbit.ciclo = (function () {
     drop.addEventListener('dragleave', () => drop.classList.remove('over'));
     drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); if (canUpload) addFiles(e.dataTransfer.files); });
     input.addEventListener('change', () => { if (canUpload) addFiles(input.files); });
-    if (driveBootstrap) driveBootstrap.addEventListener('click', async () => {
+    if (!previewProtectedClient && !canUpload && Orbit.productDriveDocumentProviderP0 && typeof Orbit.productDriveDocumentProviderP0.probe === 'function') {
+      Orbit.productDriveDocumentProviderP0.probe(true).then(st => {
+        canUpload = !!(st && st.available === true && st.uploadAvailable !== false);
+        if (canUpload && driveNote) driveNote.style.display = 'none';
+        if (canUpload && driveArea) driveArea.style.display = '';
+      }).catch(() => {});
+    }
+        if (driveBootstrap) driveBootstrap.addEventListener('click', async () => {
       const provider = Orbit.productDriveDocumentProviderP0;
       if (!provider || typeof provider.bootstrap !== 'function') return U.toast('La configuración administrativa de Drive no está disponible.');
       driveBootstrap.disabled = true;

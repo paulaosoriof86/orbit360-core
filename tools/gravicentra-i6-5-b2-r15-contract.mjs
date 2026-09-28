@@ -22,6 +22,7 @@ const cobros=read('orbit360-platform/modules/cobros.js');
 const siniestros=read('orbit360-platform/modules/siniestros.js');
 const cancelaciones=read('orbit360-platform/modules/cancelaciones.js');
 const comisiones=read('orbit360-platform/modules/comisiones.js');
+const issuanceBridge=read('orbit360-platform/modules/issuance-endosos-v1201-bridge.js');
 
 has(idx,'core/record-delete.js?v=20260927-b2r15','R15_DELETE_OWNER_NOT_COMPOSED');
 has(idx,'core/product-drive-document-provider-p0.js?v=20260927-b2r15','R15_DRIVE_PROVIDER_NOT_COMPOSED');
@@ -73,6 +74,24 @@ has(cancelaciones,"Orbit.recordDelete.remove('cancelaciones'","R82_CANCELACIONES
 has(comisiones,"Orbit.recordDelete.remove('comisiones'","R82_COMISIONES_DELETE_ENTRYPOINT_MISSING");
 has(c360,"Orbit.recordDelete.remove('clientes'","R82_CLIENT_DELETE_ENTRYPOINT_MISSING");
 
+has(issuanceBridge,"Crear solicitud de emisión en Ops",'R93_RENEWAL_ISSUANCE_INTERNAL_OPS_LABEL_MISSING');
+has(issuanceBridge,"no envía correo ni crea todavía la nueva póliza",'R93_RENEWAL_ISSUANCE_SEMANTICS_COPY_MISSING');
+need(!issuanceBridge.includes("$('#rend-payments').addEventListener('input',()=>{paymentsTouched=true;paintTotal();});"),'R93_RENEWAL_ISSUANCE_WRONG_SELECTOR_CRASH_REMAINS');
+has(issuanceBridge,'class="ciclo-card"','R93_RENEWAL_MODAL_CANONICAL_VISUAL_FAMILY_MISSING');
+has(issuanceBridge,'id="rend-doc-file"','R91_RENEWAL_FIRM_SUPPORT_FILE_INPUT_MISSING');
+has(issuanceBridge,'id="rend-doc-existing"','R91_RENEWAL_FIRM_SUPPORT_EXISTING_DOC_SELECTOR_MISSING');
+has(issuanceBridge,"Orbit.secureResources.uploadDocument(supportFile,{entidad:'gestion'",'R91_RENEWAL_SUPPORT_DRIVE_UPLOAD_MISSING');
+has(issuanceBridge,"documentRef:confirmedDocumentRef",'R91_RENEWAL_SUPPORT_CANONICAL_REF_MISSING');
+has(issuanceBridge,'function validatedRenewalTariff','R92_RENEWAL_VALIDATED_TARIFF_RESOLVER_MISSING');
+has(issuanceBridge,'cotTasasValidadas','R92_RENEWAL_TARIFF_VALIDATION_GUARD_MISSING');
+has(issuanceBridge,'gastosEmisionPct','R92_RENEWAL_ISSUANCE_COST_AUTOFILL_MISSING');
+has(issuanceBridge,'recargoFraccPct','R92_RENEWAL_FINANCING_SURCHARGE_AUTOFILL_MISSING');
+has(imports,'preview_protected_operational_client','R94_CLIENT_DOCUMENT_PREVIEW_PROTECTION_MESSAGE_MISSING');
+has(ciclo,'Preview protege los expedientes operativos reales.','R94_MANAGEMENT_DOCUMENT_PREVIEW_PROTECTION_MESSAGE_MISSING');
+has(ciclo,"Orbit.productDriveDocumentProviderP0.probe(true).then",'R94_MANAGEMENT_DRIVE_ASYNC_STATUS_REFRESH_MISSING');
+has(c360,'Drive se vincula al cargar documento','R95_CLIENT_DRIVE_CANONICAL_LINK_COPY_MISSING');
+has(c360,'Referencia histórica de carpeta Drive (opcional)','R95_CLIENT_DRIVE_LEGACY_REFERENCE_COPY_MISSING');
+
 has(resources,'async function uploadDocument(file, extra)','R77_DOCUMENT_UPLOAD_CONTRACT_MISSING');
 has(imports,'async function persistDocumentaryFiles()','R81_DOCUMENTARY_PERSISTENCE_MISSING');
 has(imports,"await Orbit.store.updateDurable('clientes', cid, clientPatch)",'R81_CLIENT_DOCUMENT_READBACK_LINK_MISSING');
@@ -118,7 +137,7 @@ has(driveBackend,'ROOT_BY_TENANT','R81_DRIVE_ROOT_BINDING_MISSING');
 console.log(JSON.stringify({
   status:'PASS',
   contract:'I6.5-B2-R15-R15A-R16',
-  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83','R84','R85','R86','R87','R88','R89'],
+  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83','R84','R85','R86','R87','R88','R89','R91','R92','R93','R94','R95'],
   drive:{repository:'Google Drive',auth:'tenant-persistent-backend-auth-code',tokenPersistence:'SecretManager',routineUserGoogleOAuth:false,browserRefreshToken:false,readbackRequired:true},
   delete:{ui:'Eliminar',default:'durable-soft-delete',relationalSafety:'fail-closed'},
   renewalWindowDays:45,

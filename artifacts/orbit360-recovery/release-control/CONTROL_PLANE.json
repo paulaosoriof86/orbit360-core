@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "691cdd615cbe0558b9ff288141083741eb9e0888",
+    "b2ExecutionLockBlobSha": "ed8a15d1217c4f9fa89ea1ca60acafa7bea1d605",
     "b2": {
-      "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2162,13 +2162,13 @@
       "technicalPassHistoricalPreserved": true,
       "authenticatedPassHistoricalPreserved": true,
       "syntheticCleanupHistoricalPreserved": true,
-      "paulaVisualDecision": "R73_R74_ACCEPTED_R86_OAUTH_CLIENT_SECRET_BINDING_PENDING_GUARD",
+      "paulaVisualDecision": "R75_R76_R78_R79_R80_R88_PASS_R77_R81_MACHINE_PROOF_PENDING_R91_R95_SOURCE_FIXED_PENDING_GUARD",
       "paulaVisualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
       "paulaVisualRejectionReceiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "Drive persistent authority, in-app preview, download, direct open, fresh-session zero-Google-prompt and active-role scope are PASS. Remaining machine proof is upload durable readback + R77/R81 provider proof + fixture cleanup; R88 requires one human startup spot-check on current exact Preview; R75-R82 remain human visual. No LIVE, no B3, no reimport.",
+      "boundaryNote": "Paula visual closed R75/R76/R78/R79/R80 and human startup R88. Insurer logo persistence and renewal lineage/expected receipts are machine-proven; do not ask Paula to perform a real renewal yet. R77/R81 require synthetic B2 Drive upload/readback because Preview intentionally blocks operational-client binary writes. R91-R95 source fixes address firm-policy support upload, validated tariff costs, internal issuance semantics/runtime, Preview upload messaging, and legacy-vs-canonical Drive copy. Run guard before one new exact Preview. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2188,16 +2188,13 @@
       "authenticatedRunArmed": false,
       "previewCredentialSecretIamRepair": "AUTHORIZED_PENDING_PROOF",
       "humanReviewOutstandingIds": [
-        "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
-        "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
-        "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
-        "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
-        "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
-        "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
-        "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
-        "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A"
+        "B2-R91-RENEWAL-FIRM-SUPPORT-NO-CANONICAL-DRIVE-UPLOAD-R21",
+        "B2-R92-RENEWAL-TARIFF-COSTS-NOT-AUTO-DERIVED-R21",
+        "B2-R93-RENEWAL-ISSUANCE-MODAL-CRASH-SEMANTIC-VISUAL-R21",
+        "B2-R94-PREVIEW-DOCUMENT-UPLOAD-GUARD-MISLEADING-UX-R21",
+        "B2-R95-CLIENT-DRIVE-LEGACY-VS-CANONICAL-SEMANTICS-R21"
       ],
-      "humanReviewOutstandingCount": 8,
+      "humanReviewOutstandingCount": 5,
       "humanReviewR3": "SOURCE_FIXED_PENDING_NEW_PREVIEW",
       "r3CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
@@ -2254,7 +2251,7 @@
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
       "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
       "insurerStableEditRuntimePass": true,
-      "findingLedgerBlobSha": "d9de49a12c98855209c160274c54f01353fc0121",
+      "findingLedgerBlobSha": "cfb39fc5efec86eb6a97c9be7ff265f792a67956",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
@@ -2587,8 +2584,8 @@
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
         "receiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63"
       },
-      "compositionLockBlobSha": "2d822831cf6b5b61a5fe87781344adf1df5262e1",
-      "sourceFixPendingArm": false,
+      "compositionLockBlobSha": "88cfac7930b7a09ac6c220e790401024dcc75a0e",
+      "sourceFixPendingArm": true,
       "r84BootstrapSurfaceArm": {
         "status": "GUARD_PASS_PREVIEW_ARMED",
         "sourceFixCommit": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
@@ -2714,6 +2711,33 @@
           "R88_HUMAN_STARTUP_SPOTCHECK_ON_CURRENT_EXACT_PREVIEW",
           "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
         ]
+      },
+      "r21": {
+        "status": "SOURCE_FIXED_PENDING_GUARD",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
+        "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
+        "paulaVisualClosed": [
+          "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
+          "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
+          "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
+          "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
+          "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
+          "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19"
+        ],
+        "machineValidated": {
+          "insurerLogoPersistence": "PASS",
+          "renewalLineage": "PASS",
+          "renewalExpectedReceiptsPortfolio": "PASS_2_2",
+          "drivePersistentReadPreviewDownload": "PASS"
+        },
+        "previewUploadInterpretation": "REAL_CLIENT_DENIAL_IS_EXPECTED_PREVIEW_ISOLATION_NOT_PROVIDER_REGRESSION",
+        "sourceChanges": {
+          "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
+          "orbit360-platform/core/importa.js": "416076ec9af339f6c1f08437ce44a68c2082cdbc",
+          "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
+          "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813"
+        },
+        "contractBlobSha": "9435c03377e6a9ad2dcff65b50c3b33140dd62b4"
       }
     },
     "dashboardRealityGate": {

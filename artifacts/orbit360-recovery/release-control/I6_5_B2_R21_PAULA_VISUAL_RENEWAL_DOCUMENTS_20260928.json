@@ -1,0 +1,120 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928_V1",
+  "status": "SOURCE_FIXED_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
+  "recordedAt": "2026-09-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "parentHead": "7b0baba33d1c0f2532ec0232e2bd6f567fd9cd8c",
+  "exactPreviewReviewed": {
+    "sourceSha": "dcfe50d8e131d27ad5036ac551a19c8527a2db9b",
+    "buildId": "gi-i65-b2-dcfe50d8e131-57f234755dc1",
+    "runId": 36452653473,
+    "artifactId": 10984480961,
+    "artifactDigest": "a08fb2777404c2d5b0a3c256703b18d971ad73f540f579aa5628f10845daa245",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36452653473-sx5v5wt6.web.app"
+  },
+  "paulaVisual": {
+    "source": "PAULA_DESKTOP_MOBILE_UAT_20260928",
+    "passes": [
+      "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
+      "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
+      "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
+      "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
+      "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
+      "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19"
+    ],
+    "observed": {
+      "startupFast": true,
+      "mobileRenewalsNoClipping": true,
+      "renewalActionsOpenCorrectFlows": true,
+      "opsManagementCreatedFromRenewal": true,
+      "opsDeleteVisible": true,
+      "vehicleDuplicatesNotObserved": true,
+      "realClientPreviewUploadFailed": true,
+      "managementAttachmentNotVisible": true
+    }
+  },
+  "machineProofAlreadyAccepted": {
+    "insurerLogo": {
+      "status": "PASS",
+      "runId": 36454148965,
+      "jobId": 109036417571,
+      "proof": "Synthetic insurer file upload + Firebase Storage URL + physical Firestore readback + cleanup PASS."
+    },
+    "renewalLineage": {
+      "status": "PASS",
+      "runId": 36454148965,
+      "jobId": 109036417571,
+      "proof": "New renewal policy preserves source clienteId, sets renuevaDe, source sets renovadaPor, management stores directRenewalPolicyId and idempotent reuse."
+    },
+    "renewalReceipts": {
+      "status": "PASS",
+      "runId": 36454148965,
+      "jobId": 109036417571,
+      "proof": "RENEWAL_READBACK receipts=2 portfolio=2 and zero confirmed cobro fabrication."
+    },
+    "driveReadDownload": {
+      "status": "PASS",
+      "proof": "Paula confirmed persistent tenant connection, in-app preview, direct Drive open and download."
+    }
+  },
+  "analysis": {
+    "realClientPreviewUpload": "EXPECTED_FAIL_CLOSED_PREVIEW_ISOLATION",
+    "reason": "Preview Drive backend intentionally accepts only synthetic B2 client IDs. Operational client binary writes are not permitted in Preview.",
+    "managementAttachmentAbsence": "Because the real-client Preview upload was intentionally denied, no confirmed documentRef was available to bind into gestion.adjuntos. The Ops renderer is capable of displaying confirmed adjuntos.",
+    "legacyDriveLinks": "Existing cliente.driveLink values are historical references preserved from prior imports/work. The tenant Drive provider is the canonical documentary authority for new documents. A manual historical folder link is not a prerequisite for provider-managed documents.",
+    "directRenewalSupportMeaning": "The support is the firm renewal policy/document issued by the insurer or another confirmed documentary reference proving the issued renewal.",
+    "issuanceActionMeaning": "This is an internal Ops issuance request; it does not send an email. The prior label implied external sending and was misleading."
+  },
+  "sourceRemediation": {
+    "changedProductFiles": [
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "orbit360-platform/core/importa.js",
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/cliente360.js"
+    ],
+    "changedProductBlobs": {
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
+      "orbit360-platform/core/importa.js": "416076ec9af339f6c1f08437ce44a68c2082cdbc",
+      "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
+      "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813"
+    },
+    "contractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
+    "contractBlobSha": "9435c03377e6a9ad2dcff65b50c3b33140dd62b4",
+    "fixes": [
+      "Firm-renewal modal now supports selecting an existing confirmed client document or uploading the firm policy/PDF through the canonical Drive provider.",
+      "Renewal creation refuses to proceed without a confirmed documentary reference.",
+      "Validated insurer/ramo tariff settings can auto-fill issuance expense and financing surcharge; absent validated config remains explicit and no charge is invented.",
+      "Renewal total recalculation is correctly wired.",
+      "Internal issuance action is relabeled as Crear solicitud de emisión en Ops and explicitly states that it does not send email.",
+      "Wrong selector crash in renewal issuance modal is removed.",
+      "Renewal workflow modals use canonical Ops visual family instead of the inconsistent dark/white-circle surface.",
+      "Real operational clients in Preview show an explicit safety/isolation message rather than a false Drive failure.",
+      "Ops management upload surface refreshes asynchronously when tenant Drive status becomes available.",
+      "Cliente360 distinguishes preserved historical Drive folder references from provider-managed documentary linkage."
+    ]
+  },
+  "newFindings": [
+    "B2-R91-RENEWAL-FIRM-SUPPORT-NO-CANONICAL-DRIVE-UPLOAD-R21",
+    "B2-R92-RENEWAL-TARIFF-COSTS-NOT-AUTO-DERIVED-R21",
+    "B2-R93-RENEWAL-ISSUANCE-MODAL-CRASH-SEMANTIC-VISUAL-R21",
+    "B2-R94-PREVIEW-DOCUMENT-UPLOAD-GUARD-MISLEADING-UX-R21",
+    "B2-R95-CLIENT-DRIVE-LEGACY-VS-CANONICAL-SEMANTICS-R21"
+  ],
+  "boundaries": {
+    "livePromotion": false,
+    "productionSecretTouched": false,
+    "dataReimport": false,
+    "operationalDataMutation": false,
+    "b3Open": false
+  },
+  "nextRequiredProof": [
+    "CENTRAL_GUARD_PASS",
+    "NEW_EXACT_B2_PREVIEW_READBACK",
+    "R77_R81_SYNTHETIC_B2_DRIVE_UPLOAD_AND_DURABLE_READBACK",
+    "R91_R92_R93_R94_R95_EXACT_PREVIEW_RUNTIME",
+    "R82_CROSS_MODULE_DELETE_FINAL_AUDIT",
+    "PAULA_TARGETED_FINAL_VISUAL_ONLY_IF_MACHINE_PROOF_PASSES"
+  ]
+}
