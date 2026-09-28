@@ -1383,7 +1383,7 @@ try{
   milestone('INSURER_SECURE_EDIT_PASS',{logo:true,credential:true,cleanup:true});
 
   milestone('RENEWAL_RUNTIME_START');
-  const renewal=await bounded(page.evaluate(async ({policyId,stamp,renewNo})=>{
+  const renewal=await bounded(page.evaluate(async ({policyId,policySeed,clientSeed,stamp,renewNo})=>{
     window.__b2RenewalDurableTrace=[];
     const originalUpdateDurable=Orbit.store.updateDurable.bind(Orbit.store);
     Orbit.store.updateDurable=async function(collection,id,patch){
@@ -1398,7 +1398,12 @@ try{
       }
     };
     try{
-    const p=Orbit.store.get('polizas',policyId),c=Orbit.store.get('clientes',p.clienteId);
+    // R20C: do not synchronously pre-read a deferred policy before the product
+    // issuance API has a chance to enforce its authoritative dependency gate.
+    // Use the already server-confirmed synthetic fixture values only to form the request;
+    // createRequest/advanceRequest/issueRequest must prove their own route-deferred readiness.
+    const p=policySeed,c=clientSeed;
+    if(!p||!p.id||!c)return{ok:false,phase:'harness_seed',errors:['R20C_FIXTURE_SEED_MISSING'],durableTrace:window.__b2RenewalDurableTrace};
     const total=(+p.primaTotal||+p.primaNeta||1000)*1.05;
     const req=await Orbit.issuance.createRequest({
       tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,aseguradoraId:p.aseguradoraId,
@@ -1424,7 +1429,17 @@ try{
     }finally{
       Orbit.store.updateDurable=originalUpdateDurable;
     }
-  },{policyId:policy.id,stamp,renewNo}),'B2_AUTH_RENEWAL_EVALUATE_TIMEOUT',60000);
+  },{
+    policyId:policy.id,
+    policySeed:{
+      id:policy.id,tenantId:policy.tenantId,clienteId:policy.clienteId,asesorId:policy.asesorId,
+      aseguradoraId:policy.aseguradoraId,pais:policy.pais,moneda:policy.moneda,ramo:policy.ramo,
+      producto:policy.producto,subramo:policy.subramo,primaTotal:policy.primaTotal,primaNeta:policy.primaNeta,
+      formaPago:policy.formaPago,conducto:policy.conducto,vigenciaFin:policy.vigenciaFin
+    },
+    clientSeed:{id:client.id,pais:client.pais,moneda:client.moneda},
+    stamp,renewNo
+  }),'B2_AUTH_RENEWAL_EVALUATE_TIMEOUT',60000);
   milestone('RENEWAL_RUNTIME_RETURN',{ok:renewal&&renewal.ok,phase:renewal&&renewal.phase,errors:renewal&&renewal.errors||[],durableTrace:renewal&&renewal.durableTrace||[]});
   need(renewal.ok,'B2_AUTH_RENEWAL_RUNTIME_FAILED:'+JSON.stringify(renewal));
   state.requestId=renewal.requestId;state.renewedPolicyId=renewal.policyId;

@@ -1,0 +1,40 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R20C_AUTH_HARNESS_DEFERRED_PRE_READ_FIX_20260928_V1",
+  "status": "HARNESS_FIXED_EXACT_PREVIEW_RETRY_AUTHORIZED",
+  "recordedAt": "2026-09-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "parentHead": "d6a92e0e01cbfb65c4669fda36af3543e70bdfa4",
+  "exactPreview": {
+    "sourceSha": "dcfe50d8e131d27ad5036ac551a19c8527a2db9b",
+    "buildId": "gi-i65-b2-dcfe50d8e131-57f234755dc1",
+    "runId": 36452653473,
+    "artifactId": 10984480961,
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36452653473-sx5v5wt6.web.app"
+  },
+  "failedAuthenticated": {
+    "runId": 36452653473,
+    "jobId": 109032593233,
+    "failure": "B2_AUTH_RENEWAL_RUNTIME_FAILED",
+    "exception": "Cannot read properties of null (reading 'clienteId')",
+    "cleanupDeleted": 32
+  },
+  "classification": "HARNESS_PRE_READ_BYPASSED_PRODUCT_R20B_DEPENDENCY_GATE",
+  "productRegressionFromThisFailure": false,
+  "productR20BStillRequiresProof": true,
+  "remediation": {
+    "harnessPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+    "harnessBlob": "b05cd363cb736f4c100264e140014881e29ff860",
+    "change": "Renewal proof now builds request inputs from the already server-confirmed synthetic fixture object instead of directly reading a potentially deferred browser policy before calling Orbit.issuance.createRequest.",
+    "expectedProof": "The product createRequest/advanceRequest/issueRequest path must itself wait for authoritative route-deferred dependencies and complete the renewal."
+  },
+  "boundaries": {
+    "productSourceMutation": false,
+    "previewRebuild": false,
+    "live": false,
+    "b3": false,
+    "reimport": false
+  },
+  "next": "RERUN_AUTHENTICATED_PROOF_ON_SAME_EXACT_PREVIEW"
+}

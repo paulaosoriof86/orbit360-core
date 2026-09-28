@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "58b3d2e6de523e4e1125bc3a8c2839bf7ca3e932",
+    "b2ExecutionLockBlobSha": "fd6f7d5c4a18620f60aea202d31b3953da94b933",
     "b2": {
       "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2168,7 +2168,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "R89 is closed by exact authenticated proof on run 36449511487. R20B fixes the real R88 cross-module race by waiting only for workflow-required authoritative collections after shell readiness; it does not restore full startup hydration. Guard before one new exact B2 Preview. No LIVE, no B3, no reimport.",
+      "boundaryNote": "R20B product source remains the exact certified Preview. The first authenticated attempt failed in the harness before Orbit.issuance could exercise the product dependency gate. R20C repairs only that pre-read and authorizes authenticated retry on the same artifact. No product rebuild, LIVE, B3 or reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2689,6 +2689,13 @@
         "r89ProofRunId": 36449511487,
         "sourceFixCommit": "2c56bb20c97de9c073da898c65dfc10166ec1f0e",
         "guardPassRunId": 36452408403
+      },
+      "r20c": {
+        "status": "HARNESS_FIXED_EXACT_PREVIEW_RETRY_AUTHORIZED",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20C_AUTH_HARNESS_DEFERRED_PRE_READ_FIX_20260928.json",
+        "receiptBlobSha": "ced2d39595ccb62597b2b1d16c3cd9d4eb2244bb",
+        "harnessBlobSha": "b05cd363cb736f4c100264e140014881e29ff860",
+        "exactPreviewRunId": 36452653473
       }
     },
     "dashboardRealityGate": {
