@@ -19,10 +19,10 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 138,
+    "total": 142,
     "b2HumanFindings": 54,
     "currentBlocking": 44,
-    "countingNote": "R84 is the prevailing Drive authorization blocker: routine per-user OAuth/memory-only consent is not acceptable for production. R83 remains open as download symptom but its old OAuth-based human retest is superseded. No B3/LIVE/reimport."
+    "countingNote": "Array total reconciled after R87/R88 freeze. R87 is the current external OAuth-origin blocker for the exact R85 bootstrap proof; R88 startup remediation is sequenced after R87/R85 so the exact Preview is not invalidated. No LIVE/B3/reimport."
   },
   "findings": [
     {
@@ -2828,6 +2828,84 @@
         "productionSecretTouched": false,
         "runtimeIamBroadening": false
       }
+    },
+    {
+      "id": "B2-R87-DRIVE-OAUTH-PREVIEW-ORIGIN-MISMATCH-R19",
+      "classification": "PREVIEW_OAUTH_CLIENT_AUTHORIZED_JAVASCRIPT_ORIGIN_MISMATCH",
+      "blocking": true,
+      "surface": "Cliente360/Documentos/GoogleDrive/TenantBootstrap",
+      "evidence": {
+        "userScreenshot": "Google OAuth Error 400 origin_mismatch on 2026-09-28",
+        "bootstrapClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com",
+        "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+        "sourceFlow": "google.accounts.oauth2.initCodeClient popup with redirectUri location.origin",
+        "accountChooserSourceOption": "select_account=true"
+      },
+      "rootCause": "The one-time Google Identity Services authorization-code popup originates from the exact Firebase Hosting Preview origin. Google rejects the request before account selection because that exact scheme+host is not registered as an Authorized JavaScript origin for the OAuth web client.",
+      "remediation": "Add only the exact current B2 Preview origin to the existing OAuth web client's Authorized JavaScript origins, preserving client ID/secret, redirect URIs, production origins and production secrets. Then repeat the one-time administrative Drive bootstrap on the same exact Preview.",
+      "durableFollowup": "After R85/R84 proof closes, replace run-ID-dependent OAuth bootstrap origins with one stable dedicated administrative bootstrap surface/channel so future forensic runs do not require additive OAuth-origin churn.",
+      "requiredProof": [
+        "Google account chooser/consent opens without origin_mismatch on the exact Preview",
+        "backend bootstrap returns configured=true",
+        "Preview tenant Secret Manager vault readback survives reload",
+        "fresh routine-user session shows zero Google account/consent prompts",
+        "no Google access/refresh token is persisted in browser storage"
+      ],
+      "status": "ROOT_CAUSE_CONFIRMED_EXTERNAL_CONFIG_APPLY_PENDING",
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true,
+      "productionSecretTouched": false,
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
+      "receiptBlobSha": "da1c4f7b3297b1ca58b682a943f567e6d9769c75",
+      "closureState": "NOT_CLOSED",
+      "recordedAt": "2026-09-28",
+      "previewProofRequired": true
+    },
+    {
+      "id": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
+      "classification": "PRODUCT_STARTUP_PERFORMANCE_AND_STATE_SEMANTICS_DEFECT",
+      "blocking": true,
+      "surface": "Login/SessionRestore/ProductBootstrap",
+      "evidence": {
+        "userObservation": "Long Restaurando sesión followed by Validando acceso on mobile",
+        "automatedPreviewTiming": {
+          "previewNavStart": "2026-09-28T11:57:37.296Z",
+          "previewAuthenticated": "2026-09-28T11:57:44.729Z",
+          "elapsedSeconds": 7.433
+        },
+        "sourceFacts": [
+          "auth-product-runtime-p0.js keeps data-auth-restoring until Orbit.productAppP0.activate completes",
+          "product-app-p0.js waits backendProductReadOnlyBootstrapP0 before showApp",
+          "backend-product-readonly-bootstrap-p0.js waits authoritative required snapshots with snapshotTimeoutMs=20000",
+          "product runtime hydration requires clientes, polizas, cobros, aseguradoras, vehiculos, recibosEsperados, carteraPrimas and asesores before ready"
+        ]
+      },
+      "rootCause": "The UI state labeled Restaurando sesión spans more than session restoration. It also waits membership, tenant/read authority and full authoritative hydration of eight required business collections before revealing the product shell. This conflates identity readiness with data readiness and makes startup latency visible as an authentication delay.",
+      "remediation": "Preserve fail-closed identity, membership, tenant and role/scope validation, but separate AUTH_READY from DATA_ROUTE_READY. Reveal the authenticated shell once identity/access authority is proven; hydrate non-critical business collections and route-specific data afterward with bounded loading states. Add milestone timing so regressions are measured rather than hidden behind one splash.",
+      "guardrails": [
+        "Do not weaken membership/tenant/role/scope authorization",
+        "Do not introduce local/demo fallback",
+        "Do not show protected data before its authoritative route readiness",
+        "Do not add duplicate auth listeners",
+        "Do not promote to LIVE from this finding"
+      ],
+      "requiredProof": [
+        "cold no-session opens login without waiting for business hydration",
+        "valid existing session reaches authenticated shell after access authority without waiting for unrelated collections",
+        "direct protected route waits only for its required authoritative data",
+        "logout/login/account-expired paths remain deterministic",
+        "startup milestones and elapsed timings are captured on mobile and desktop"
+      ],
+      "status": "ROOT_CAUSE_CONFIRMED_SOURCE_REMEDIATION_DEFERRED_UNTIL_R87_R85_BOOTSTRAP_PROOF",
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true,
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
+      "receiptBlobSha": "da1c4f7b3297b1ca58b682a943f567e6d9769c75",
+      "closureState": "NOT_CLOSED",
+      "recordedAt": "2026-09-28",
+      "previewProofRequired": true
     }
   ],
   "phaseBBacklog": [
@@ -2907,7 +2985,20 @@
     "exactPreviewRequired": true,
     "humanDriveOAuthProofRequired": true,
     "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
-    "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5"
+    "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
+    "r19AuthOriginAndStartupForensic": {
+      "status": "FROZEN_PENDING_EXTERNAL_ORIGIN_APPLY_AND_PERFORMANCE_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
+      "receiptBlobSha": "da1c4f7b3297b1ca58b682a943f567e6d9769c75",
+      "findingIds": [
+        "B2-R87-DRIVE-OAUTH-PREVIEW-ORIGIN-MISMATCH-R19",
+        "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19"
+      ],
+      "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true
+    }
   },
   "lastReview": {
     "date": "2026-09-26",
