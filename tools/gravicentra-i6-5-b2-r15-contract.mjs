@@ -26,6 +26,8 @@ const comisiones=read('orbit360-platform/modules/comisiones.js');
 const issuanceBridge=read('orbit360-platform/modules/issuance-endosos-v1201-bridge.js');
 const equipo=read('orbit360-platform/modules/equipo.js');
 const aseguradoras=read('orbit360-platform/modules/aseguradoras.js');
+const accessContract=read('orbit360-platform/core/tenant-access-policy-contract-p0.js');
+const runtimeConfig=read('orbit360-platform/product-runtime-config.js');
 
 has(idx,'core/record-delete.js?v=20260927-b2r15','R15_DELETE_OWNER_NOT_COMPOSED');
 has(idx,'core/product-drive-document-provider-p0.js?v=20260927-b2r15','R15_DRIVE_PROVIDER_NOT_COMPOSED');
@@ -88,6 +90,10 @@ has(equipo,'Eliminar usuario','R82_TEAM_DELETE_ENTRYPOINT_MISSING');
 has(equipo,'deleteReason','R82_TEAM_DELETE_AUDIT_MISSING');
 has(aseguradoras,'borrarOdesactivar','R82_INSURER_DELETE_ENTRYPOINT_MISSING');
 has(aseguradoras,'auditoría EXTERNA antes de eliminar','R82_INSURER_DELETE_AUDIT_MISSING');
+has(accessContract,"reclamos: { module: 'siniestros'","R82_RECLAMOS_ACCESS_POLICY_MISSING");
+has(accessContract,"cancelaciones: { module: 'cancelaciones'","R82_CANCELACIONES_ACCESS_POLICY_MISSING");
+has(accessContract,"comisiones: { module: 'comisiones'","R82_COMISIONES_ACCESS_POLICY_MISSING");
+has(runtimeConfig,"'reclamos'","R82_RECLAMOS_HYDRATION_COLLECTION_MISSING");
 
 has(issuanceBridge,"Crear solicitud de emisión en Ops",'R93_RENEWAL_ISSUANCE_INTERNAL_OPS_LABEL_MISSING');
 has(issuanceBridge,"no envía correo ni crea todavía la nueva póliza",'R93_RENEWAL_ISSUANCE_SEMANTICS_COPY_MISSING');

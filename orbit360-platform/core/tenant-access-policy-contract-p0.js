@@ -11,7 +11,7 @@
 
   window.Orbit = window.Orbit || {};
 
-  var VERSION = 'p0-b1-r12-20260921';
+  var VERSION = 'p0-b2-r82-20260928-claims-cancellations-commissions';
   var PRIVILEGED_ROLES = Object.freeze(['Dirección', 'SuperAdmin', 'AdminTenant']);
   var OPERATIONS_ROLES = Object.freeze(['Dirección', 'SuperAdmin', 'AdminTenant', 'Operativo']);
   var FINANCE_ROLES = Object.freeze(['Dirección', 'SuperAdmin', 'AdminTenant', 'Finanzas']);
@@ -45,6 +45,9 @@
     recibosEsperados: { module: 'cobros', scoped: true, advisorRead: true, advisorWrite: false },
     cobros: { module: 'cobros', scoped: true, advisorRead: true, advisorWrite: false },
     carteraPrimas: { module: 'cobros', scoped: true, advisorRead: true, advisorWrite: false },
+    reclamos: { module: 'siniestros', scoped: true, advisorRead: true, advisorWrite: false },
+    cancelaciones: { module: 'cancelaciones', scoped: true, advisorRead: false, advisorWrite: false },
+    comisiones: { module: 'comisiones', scoped: true, advisorRead: false, advisorWrite: false, finance: true },
     documentos: { module: 'cliente360', scoped: true, advisorRead: true, advisorWrite: false },
     solicitudesPortal: { module: 'portal', scoped: true, advisorRead: true, advisorWrite: false },
     aseguradoras: { module: 'aseguradoras', scoped: false, advisorRead: true, advisorWrite: false },

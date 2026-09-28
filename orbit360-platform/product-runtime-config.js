@@ -16,6 +16,7 @@ window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze({
     'metas',
     'negocios',
     'gestiones',
+    'reclamos',
     'comisiones',
     'cancelaciones',
     'auditoria',
