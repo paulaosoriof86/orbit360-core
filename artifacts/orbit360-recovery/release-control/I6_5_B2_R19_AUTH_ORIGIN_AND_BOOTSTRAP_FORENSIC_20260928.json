@@ -1,0 +1,107 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_V1",
+  "date": "2026-09-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "status": "FROZEN_PENDING_EXTERNAL_ORIGIN_APPLY_AND_PERFORMANCE_REMEDIATION",
+  "exactPreview": {
+    "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
+    "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+    "runId": 36418353246,
+    "authenticatedJobId": 108915808441,
+    "exactReadback": true,
+    "functionalPass": true,
+    "livePromoted": false
+  },
+  "findings": [
+    {
+      "id": "B2-R87-DRIVE-OAUTH-PREVIEW-ORIGIN-MISMATCH-R19",
+      "classification": "PREVIEW_OAUTH_CLIENT_AUTHORIZED_JAVASCRIPT_ORIGIN_MISMATCH",
+      "blocking": true,
+      "surface": "Cliente360/Documentos/GoogleDrive/TenantBootstrap",
+      "evidence": {
+        "userScreenshot": "Google OAuth Error 400 origin_mismatch on 2026-09-28",
+        "bootstrapClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com",
+        "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+        "sourceFlow": "google.accounts.oauth2.initCodeClient popup with redirectUri location.origin",
+        "accountChooserSourceOption": "select_account=true"
+      },
+      "rootCause": "The one-time Google Identity Services authorization-code popup originates from the exact Firebase Hosting Preview origin. Google rejects the request before account selection because that exact scheme+host is not registered as an Authorized JavaScript origin for the OAuth web client.",
+      "remediation": "Add only the exact current B2 Preview origin to the existing OAuth web client's Authorized JavaScript origins, preserving client ID/secret, redirect URIs, production origins and production secrets. Then repeat the one-time administrative Drive bootstrap on the same exact Preview.",
+      "durableFollowup": "After R85/R84 proof closes, replace run-ID-dependent OAuth bootstrap origins with one stable dedicated administrative bootstrap surface/channel so future forensic runs do not require additive OAuth-origin churn.",
+      "requiredProof": [
+        "Google account chooser/consent opens without origin_mismatch on the exact Preview",
+        "backend bootstrap returns configured=true",
+        "Preview tenant Secret Manager vault readback survives reload",
+        "fresh routine-user session shows zero Google account/consent prompts",
+        "no Google access/refresh token is persisted in browser storage"
+      ],
+      "status": "ROOT_CAUSE_CONFIRMED_EXTERNAL_CONFIG_APPLY_PENDING",
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true,
+      "productionSecretTouched": false
+    },
+    {
+      "id": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
+      "classification": "PRODUCT_STARTUP_PERFORMANCE_AND_STATE_SEMANTICS_DEFECT",
+      "blocking": true,
+      "surface": "Login/SessionRestore/ProductBootstrap",
+      "evidence": {
+        "userObservation": "Long Restaurando sesión followed by Validando acceso on mobile",
+        "automatedPreviewTiming": {
+          "previewNavStart": "2026-09-28T11:57:37.296Z",
+          "previewAuthenticated": "2026-09-28T11:57:44.729Z",
+          "elapsedSeconds": 7.433
+        },
+        "sourceFacts": [
+          "auth-product-runtime-p0.js keeps data-auth-restoring until Orbit.productAppP0.activate completes",
+          "product-app-p0.js waits backendProductReadOnlyBootstrapP0 before showApp",
+          "backend-product-readonly-bootstrap-p0.js waits authoritative required snapshots with snapshotTimeoutMs=20000",
+          "product runtime hydration requires clientes, polizas, cobros, aseguradoras, vehiculos, recibosEsperados, carteraPrimas and asesores before ready"
+        ]
+      },
+      "rootCause": "The UI state labeled Restaurando sesión spans more than session restoration. It also waits membership, tenant/read authority and full authoritative hydration of eight required business collections before revealing the product shell. This conflates identity readiness with data readiness and makes startup latency visible as an authentication delay.",
+      "remediation": "Preserve fail-closed identity, membership, tenant and role/scope validation, but separate AUTH_READY from DATA_ROUTE_READY. Reveal the authenticated shell once identity/access authority is proven; hydrate non-critical business collections and route-specific data afterward with bounded loading states. Add milestone timing so regressions are measured rather than hidden behind one splash.",
+      "guardrails": [
+        "Do not weaken membership/tenant/role/scope authorization",
+        "Do not introduce local/demo fallback",
+        "Do not show protected data before its authoritative route readiness",
+        "Do not add duplicate auth listeners",
+        "Do not promote to LIVE from this finding"
+      ],
+      "requiredProof": [
+        "cold no-session opens login without waiting for business hydration",
+        "valid existing session reaches authenticated shell after access authority without waiting for unrelated collections",
+        "direct protected route waits only for its required authoritative data",
+        "logout/login/account-expired paths remain deterministic",
+        "startup milestones and elapsed timings are captured on mobile and desktop"
+      ],
+      "status": "ROOT_CAUSE_CONFIRMED_SOURCE_REMEDIATION_DEFERRED_UNTIL_R87_R85_BOOTSTRAP_PROOF",
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true
+    }
+  ],
+  "executionOrder": [
+    "Apply R87 additive Authorized JavaScript origin to the existing OAuth client without changing credentials.",
+    "Complete R85 one-time tenant Drive bootstrap and R84/R83 persistent read/download/upload proof on the same exact Preview.",
+    "Only after the exact Preview is no longer needed for R85 proof, implement R88 startup-state separation in a new cumulative Preview candidate."
+  ],
+  "externalAutomation": {
+    "attempted": true,
+    "provider": "TinyFish browser automation",
+    "outcome": "NOT_STARTED_INSUFFICIENT_WALLET_BALANCE",
+    "productConfigurationMutated": false
+  },
+  "boundaries": {
+    "liveHostingPromotion": false,
+    "productionOAuthSecretMutation": false,
+    "oauthClientCredentialRotation": false,
+    "realBusinessDataWrites": false,
+    "reimport": false,
+    "b3Open": false
+  }
+}
