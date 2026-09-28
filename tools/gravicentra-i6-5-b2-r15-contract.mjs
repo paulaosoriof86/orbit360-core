@@ -29,13 +29,15 @@ has(css,'.tb-logo{','R73_TENANT_LOGO_MOBILE_CONTRACT_MISSING');
 has(css,'.c360-renewal-row{','R75_RENEWAL_RESPONSIVE_CONTRACT_MISSING');
 has(c360,'class="c360-search"','R74_CLIENT_SEARCH_OWNER_NOT_FIXED');
 has(c360,"['documentos', 'Documentos', '📎']",'R81_CLIENT_DOCUMENTS_TAB_MISSING');
-has(c360,'data-doc-connect','R81_DRIVE_CONNECT_ENTRYPOINT_MISSING');
+has(c360,'data-doc-bootstrap','R84_CLIENT_DRIVE_BOOTSTRAP_ENTRYPOINT_MISSING');
 
 has(ciclo,'function managementCreateModal(opts)','R76_CANONICAL_MANAGEMENT_EDITOR_MISSING');
 has(ciclo,"return managementCreateModal({ origen: 'Ops'","R76_OPS_STILL_SPLIT");
-has(ciclo,'id="mg-drive-connect"','R77_MANAGEMENT_DRIVE_CONNECT_MISSING');
+has(ciclo,'id="mg-drive-bootstrap"','R84_MANAGEMENT_DRIVE_BOOTSTRAP_MISSING');
 has(ciclo,"Orbit.recordDelete.remove('gestiones'","R78_MANAGEMENT_DELETE_MISSING");
 need(!ciclo.includes("adjuntos: files.map(f => ({ nombre: f.name, size: f.size }))"),'R77_METADATA_ONLY_ATTACHMENT_PATH_REMAINS');
+need(!ciclo.includes('La autorización se usa solo durante esta sesión'),'R84_MANAGEMENT_SESSION_OAUTH_COPY_REMAINS');
+need(!ciclo.includes('✓ Drive conectado para esta sesión.'),'R84_MANAGEMENT_SESSION_OAUTH_SUCCESS_COPY_REMAINS');
 
 has(renew,'Orbit.ciclo.managementCreateModal','R76_RENEWALS_NOT_USING_CANONICAL_EDITOR');
 has(renew,"workflowType:'renewal_proposals'",'R76_RENEWAL_PROPOSAL_CONTEXT_MISSING');

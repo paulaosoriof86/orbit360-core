@@ -593,7 +593,8 @@ Orbit.ciclo = (function () {
     const uploadStatus = Orbit.secureResources && Orbit.secureResources.documentUploadStatus
       ? Orbit.secureResources.documentUploadStatus({ entidad: 'gestion', clienteId: opts.clienteId || '', polizaId: opts.polizaId || '' })
       : { available: false, status: 'pendiente_conexion', message: 'Carga directa pendiente de conexión con Drive' };
-    let canUpload = uploadStatus && uploadStatus.available === true;
+    let canUpload = uploadStatus && uploadStatus.available === true && uploadStatus.uploadAvailable !== false;
+    const needsDriveBootstrap = !!(uploadStatus && uploadStatus.bootstrapRequired === true);
     const sourceLabel = opts.desdeCliente ? 'Solicitud del cliente (Portal)' : (opts.origen === 'Ops' ? 'Nueva gestión · Ops' : 'Gestión operativa');
     const headerColor = opts.desdeCliente ? '#15803d,#0c5a2a' : '#1f3a5f,#142840';
     let pendingFiles = [];
@@ -651,9 +652,9 @@ Orbit.ciclo = (function () {
           <div class="ciclo-sec-t">Documentos de soporte · Drive</div>
           <label class="ce-l">Enlace(s) de Drive / origen<textarea id="mg-links" class="o-sel" style="min-height:68px;resize:vertical;padding:9px 11px" placeholder="Pega uno o varios enlaces https://, uno por línea"></textarea></label>
           <div class="cfg-note" id="mg-drive-connect-note" style="margin-top:10px;${canUpload ? 'display:none' : ''}">
-            <b>Drive requiere una cuenta Google con permiso de escritura en Clientes.</b>
-            <div style="margin-top:6px">La autorización se usa solo durante esta sesión; no se guarda la credencial de Google.</div>
-            <button type="button" class="btn ghost sm" id="mg-drive-connect" style="margin-top:8px">🔗 Conectar Drive</button>
+            <b>${needsDriveBootstrap ? 'Drive requiere una configuración administrativa única.' : 'El repositorio documental no está disponible para carga.'}</b>
+            <div style="margin-top:6px">Gravicentra controla el acceso por rol y alcance; los usuarios no deben conectar cuentas Google para trabajar los expedientes.</div>
+            ${needsDriveBootstrap ? '<button type="button" class="btn ghost sm" id="mg-drive-bootstrap" style="margin-top:8px">⚙ Configurar Drive</button>' : ''}
           </div>
           <div id="mg-drive-upload-area" style="${canUpload ? '' : 'display:none'}">
             <div class="sg-drop" id="mg-drop" style="margin-top:10px"><span>📎 Arrastra o haz clic para cargar a Drive</span><input type="file" id="mg-file" multiple hidden></div>
@@ -695,7 +696,7 @@ Orbit.ciclo = (function () {
     });
 
     const drop = el('mg-drop'), input = el('mg-file'), chips = el('mg-files');
-    const driveArea = el('mg-drive-upload-area'), driveNote = el('mg-drive-connect-note'), driveConnect = el('mg-drive-connect');
+    const driveArea = el('mg-drive-upload-area'), driveNote = el('mg-drive-connect-note'), driveBootstrap = el('mg-drive-bootstrap');
     const paintFiles = () => {
       chips.innerHTML = pendingFiles.map((f, i) => '<span class="sg-fchip">📄 ' + U.esc(f.name) + ' <b data-rm="' + i + '">✕</b></span>').join('');
       chips.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { pendingFiles.splice(+b.dataset.rm, 1); paintFiles(); });
@@ -709,17 +710,18 @@ Orbit.ciclo = (function () {
     drop.addEventListener('dragleave', () => drop.classList.remove('over'));
     drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); if (canUpload) addFiles(e.dataTransfer.files); });
     input.addEventListener('change', () => { if (canUpload) addFiles(input.files); });
-    if (driveConnect) driveConnect.addEventListener('click', async () => {
+    if (driveBootstrap) driveBootstrap.addEventListener('click', async () => {
       const provider = Orbit.productDriveDocumentProviderP0;
-      if (!provider || typeof provider.connect !== 'function') return U.toast('La conexión Drive no está disponible.');
-      driveConnect.disabled = true;
-      const st = await provider.connect();
-      driveConnect.disabled = false;
-      if (!st || st.available !== true) return U.toast((st && st.message) || 'No fue posible conectar Drive.');
-      canUpload = true;
-      if (driveNote) driveNote.style.display = 'none';
-      if (driveArea) driveArea.style.display = '';
-      U.toast('✓ Drive conectado para esta sesión.');
+      if (!provider || typeof provider.bootstrap !== 'function') return U.toast('La configuración administrativa de Drive no está disponible.');
+      driveBootstrap.disabled = true;
+      const out = await provider.bootstrap();
+      driveBootstrap.disabled = false;
+      if (!out || out.ok !== true) return U.toast((out && out.message) || 'No fue posible configurar Drive.');
+      const st = provider.probe ? await provider.probe(true) : null;
+      canUpload = !!(st && st.available === true && st.uploadAvailable !== false);
+      if (canUpload && driveNote) driveNote.style.display = 'none';
+      if (canUpload && driveArea) driveArea.style.display = '';
+      U.toast(canUpload ? '✓ Drive quedó conectado de forma persistente.' : 'Drive quedó configurado, pero la carga todavía no está disponible.');
     });
 
     el('mg-save').addEventListener('click', async () => {

@@ -127,7 +127,7 @@
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "81cb2db0a7b3a26387fba980d9cecaa5f8d3d4eb",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
-    "orbit360-platform/core/ciclo.js": "f1fb9ef8af0abd677d0e768f4fd3e788a3fb7f05",
+    "orbit360-platform/core/ciclo.js": "e55956bcea6c8438be207d08758ff0a58cd0b304",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "774c6cbe32be08f23e45f37b8e12e56f9be08bf3",
     "orbit360-platform/core/importa.js": "e31bd0b04f3d2634e2f2bacd02660c4f1bc2df67",
@@ -205,7 +205,7 @@
     "origin": "PAULA_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY",
     "parentHead": "58dd90648ba560d0332aa90ef23c9442657dcacd",
     "candidateHead": "3343616b2afd079af1597da09aba22d600ce72c2",
-    "status": "SOURCE_FIXED_PENDING_GUARD_AND_PREVIEW_ARM",
+    "status": "SOURCE_EXTENDED_FOR_MANAGEMENT_PERSISTENT_DRIVE_PENDING_GUARD",
     "changedProductFiles": [
       "functions/document-drive-domain.js",
       "functions/package.json",
@@ -214,7 +214,8 @@
       "orbit360-platform/core/backend-resource-contracts.js",
       "orbit360-platform/core/document-viewer.js",
       "orbit360-platform/core/product-drive-document-provider-p0.js",
-      "orbit360-platform/modules/cliente360.js"
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/core/ciclo.js"
     ],
     "rootCauses": [
       "mobile CSS hid tenant logo and Cliente360 search",
@@ -240,9 +241,9 @@
     "noDataReimport": true,
     "noLive": true,
     "noB3": true,
-    "latestCausalFix": "PER_USER_EPHEMERAL_DRIVE_OAUTH_REPLACED_BY_TENANT_PERSISTENT_BACKEND_SECRET_MANAGER_AUTHORITY",
+    "latestCausalFix": "TENANT_PERSISTENT_BACKEND_DRIVE_PLUS_MANAGEMENT_UI_REMOVES_SESSION_OAUTH_COPY_AND_CONNECT_ENTRYPOINT",
     "previewDocumentIsolation": "_GRAVICENTRA_PREVIEW_QA_ONLY",
-    "findingLedgerBlobSha": "b99427f71b56ebb2567eba461c71368976d5881e",
+    "findingLedgerBlobSha": "9819485af99c88e72ac60c392e9d67bca795a285",
     "humanDownloadRetestRequired": true,
     "exactPreview": {
       "sourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",

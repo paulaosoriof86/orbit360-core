@@ -210,8 +210,8 @@
     "futureChangeRule": "Every product-source change and its composition manifest update must land atomically; otherwise no build/Preview.",
     "ownerRule": "Every modified capability declares the effective runtime owner; after change, prove no older owner shadows it.",
     "findingRule": "A finding can leave the active ledger only as CLOSED_PASS or explicitly authorized DEFERRED/NOT_APPLICABLE with evidence.",
-    "compositionLockBlobSha": "89d582f001a19ff6cf1fe2e0bc7deec3189681b9",
-    "findingLedgerBlobSha": "b99427f71b56ebb2567eba461c71368976d5881e"
+    "compositionLockBlobSha": "d50c28580077fbcc78a25c15bd71a7d827492f51",
+    "findingLedgerBlobSha": "9819485af99c88e72ac60c392e9d67bca795a285"
   },
   "findingControl": {
     "ledgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -238,14 +238,14 @@
     "block": "B2",
     "readinessPercent": 80,
     "targetPercent": 90,
-    "step": "R84_EXACT_PREVIEW_ARMED",
+    "step": "R84_MANAGEMENT_OWNER_SOURCE_EXTENDED_PENDING_GUARD",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
     "exactPreviewSourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
     "authenticatedRunId": 36349185236,
     "noBroadRediscovery": true,
     "noReimport": true,
     "noLive": true,
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_DIAGNOSTIC",
     "r3Origin": "PAULA_VISUAL_REVIEW_20260925_R3",
     "r3RecordedAt": "2026-09-25T11:43:00-06:00",
     "r3ReadOnlyAuditTarget": "OSCAR_HAROLDO_RODRIGUEZ_PADILLA / 91-0169567 / 5 vehicles",
@@ -261,7 +261,7 @@
     "r84RoutineUserGoogleOAuth": false,
     "r84TenantBootstrapRequired": true,
     "r84GuardPassRunId": 36361993833,
-    "r84PreviewArmed": true,
+    "r84PreviewArmed": false,
     "noB3": true
   },
   "dataUpdateCompletion": {

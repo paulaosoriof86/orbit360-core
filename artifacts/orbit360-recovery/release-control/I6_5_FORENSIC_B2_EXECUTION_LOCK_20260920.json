@@ -262,9 +262,9 @@
     "sourceCandidateSha": "3343616b2afd079af1597da09aba22d600ce72c2",
     "governanceHeadBeforeCandidateArm": "06378fefe7fb250d70db19c80ece0febd5b23286",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "89d582f001a19ff6cf1fe2e0bc7deec3189681b9",
+    "compositionLockBlobSha": "d50c28580077fbcc78a25c15bd71a7d827492f51",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "b99427f71b56ebb2567eba461c71368976d5881e",
+    "findingLedgerBlobSha": "9819485af99c88e72ac60c392e9d67bca795a285",
     "blockingFindingIds": [
       "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
       "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
@@ -3026,7 +3026,7 @@
     "findingId": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
     "decisionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
     "decisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
-    "status": "SOURCE_FIXED_GUARD_PASS_PREVIEW_ARMED",
+    "status": "SOURCE_EXTENDED_PENDING_GUARD_AND_PREVIEW",
     "perUserOAuthProductive": false,
     "tenantPersistentBackendAuthorityRequired": true,
     "routineUserGooglePromptAllowed": false,
@@ -3040,6 +3040,7 @@
     "credentialStore": "SecretManager",
     "tenantBootstrapRequired": true,
     "guardPassRunId": 36361993833,
-    "previewArmed": true
+    "previewArmed": false,
+    "managementSessionOauthRemoved": true
   }
 }
