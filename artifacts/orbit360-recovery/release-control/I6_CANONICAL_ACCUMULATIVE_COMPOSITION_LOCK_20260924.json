@@ -110,7 +110,7 @@
   ],
   "productFileBlobs": {
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
-    "functions/document-drive-domain.js": "726795109281cc2058da46c8bc29ff4d4187d936",
+    "functions/document-drive-domain.js": "e89d771317cbe5c8dd9709c1d0163930834cda0c",
     "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "682941c99f0a6cf401f87ff413a426245996bad9",
@@ -205,7 +205,7 @@
     "origin": "PAULA_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY",
     "parentHead": "58dd90648ba560d0332aa90ef23c9442657dcacd",
     "candidateHead": "3343616b2afd079af1597da09aba22d600ce72c2",
-    "status": "SOURCE_EXTENDED_FOR_MANAGEMENT_PERSISTENT_DRIVE_PENDING_GUARD",
+    "status": "R84_PREVIEW_SECRET_ISOLATION_SOURCE_FIXED_PENDING_GUARD",
     "changedProductFiles": [
       "functions/document-drive-domain.js",
       "functions/package.json",
@@ -241,9 +241,9 @@
     "noDataReimport": true,
     "noLive": true,
     "noB3": true,
-    "latestCausalFix": "TENANT_PERSISTENT_BACKEND_DRIVE_PLUS_MANAGEMENT_UI_REMOVES_SESSION_OAUTH_COPY_AND_CONNECT_ENTRYPOINT",
+    "latestCausalFix": "PREVIEW_DRIVE_SECRET_PREPROVISIONED_AND_ISOLATED_FROM_PRODUCTION_WITH_RUNTIME_IAM",
     "previewDocumentIsolation": "_GRAVICENTRA_PREVIEW_QA_ONLY",
-    "findingLedgerBlobSha": "9819485af99c88e72ac60c392e9d67bca795a285",
+    "findingLedgerBlobSha": "b331ee5bca3b03a8f334c688c20e2d21e2cbd8a1",
     "humanDownloadRetestRequired": true,
     "exactPreview": {
       "sourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
@@ -260,6 +260,11 @@
     "governanceDecisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
     "routineUserGoogleOAuth": false,
     "tenantBootstrapRequired": true,
-    "browserDriveTokenAllowed": false
+    "browserDriveTokenAllowed": false,
+    "previewDriveSecretPattern": "orbit360-drive-oauth-preview-{tenant}",
+    "productionDriveSecretPattern": "orbit360-drive-oauth-{tenant}",
+    "previousExactPreviewSourceSha": "1300b80298b6075f508481a16289d5d31688f4fb",
+    "previousExactPreviewRunId": 36362404589,
+    "previousTechnicalPassPreserved": true
   }
 }

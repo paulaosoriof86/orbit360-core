@@ -78,6 +78,7 @@ has(driveClient,"a.download = String(out.nombre || 'documento')",'R83_DRIVE_DOWN
 need(!driveBackend.includes('function googleToken(input)'),'R84_DELEGATED_TOKEN_BACKEND_REMAINS');
 need(!driveBackend.includes('input.googleAccessToken'),'R84_BROWSER_ACCESS_TOKEN_BACKEND_REMAINS');
 has(driveBackend,'SecretManagerServiceClient','R84_SECRET_MANAGER_VAULT_MISSING');
+has(driveBackend,"'orbit360-drive-oauth-preview-'",'R84_PREVIEW_DRIVE_VAULT_ISOLATION_MISSING');
 has(driveBackend,'async function accessTokenFromRefresh','R84_REFRESH_TOKEN_EXCHANGE_MISSING');
 has(driveBackend,'async function bootstrap(request,previewOnly)','R84_TENANT_BOOTSTRAP_MISSING');
 has(driveBackend,'async function readDocument(request,previewOnly,downloadMode)','R84_SECURE_READ_DOWNLOAD_MISSING');

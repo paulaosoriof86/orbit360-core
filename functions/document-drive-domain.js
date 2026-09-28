@@ -47,20 +47,20 @@ function base64Bytes(encoded){
   if(!bytes.length||bytes.length>MAX_BYTES)throw new HttpsError('invalid-argument','El archivo supera el límite de 15 MB.');
   return bytes;
 }
-function vaultSecretId(tenantId){return 'orbit360-drive-oauth-'+tenantId;}
-function vaultParent(tenantId){return 'projects/'+PROJECT_ID+'/secrets/'+vaultSecretId(tenantId);}
-function vaultLatest(tenantId){return vaultParent(tenantId)+'/versions/latest';}
-async function ensureVaultSecret(tenantId){
-  try{await secrets.getSecret({name:vaultParent(tenantId)});}
+function vaultSecretId(tenantId,previewOnly){return (previewOnly===true?'orbit360-drive-oauth-preview-':'orbit360-drive-oauth-')+tenantId;}
+function vaultParent(tenantId,previewOnly){return 'projects/'+PROJECT_ID+'/secrets/'+vaultSecretId(tenantId,previewOnly);}
+function vaultLatest(tenantId,previewOnly){return vaultParent(tenantId,previewOnly)+'/versions/latest';}
+async function ensureVaultSecret(tenantId,previewOnly){
+  try{await secrets.getSecret({name:vaultParent(tenantId,previewOnly)});}
   catch(e){
     if(Number(e&&e.code)!==5)throw e;
-    try{await secrets.createSecret({parent:'projects/'+PROJECT_ID,secretId:vaultSecretId(tenantId),secret:{replication:{automatic:{}}}});}
+    try{await secrets.createSecret({parent:'projects/'+PROJECT_ID,secretId:vaultSecretId(tenantId,previewOnly),secret:{replication:{automatic:{}}}});}
     catch(createError){if(Number(createError&&createError.code)!==6)throw createError;}
   }
 }
-async function readVault(tenantId){
+async function readVault(tenantId,previewOnly){
   try{
-    const[v]=await secrets.accessSecretVersion({name:vaultLatest(tenantId)});
+    const[v]=await secrets.accessSecretVersion({name:vaultLatest(tenantId,previewOnly)});
     const raw=v&&v.payload&&v.payload.data?Buffer.from(v.payload.data).toString('utf8'):'';
     if(!raw)return null;
     const out=JSON.parse(raw);
@@ -71,7 +71,7 @@ async function readVault(tenantId){
     throw new HttpsError('unavailable','No fue posible consultar la conexión segura con Drive.');
   }
 }
-async function writeVault(tenantId,vault){
+async function writeVault(tenantId,vault,previewOnly){
   const out={
     schemaVersion:VERSION,
     tenantId,
@@ -84,8 +84,8 @@ async function writeVault(tenantId,vault){
   };
   if(!out.refreshToken)throw new HttpsError('failed-precondition','Google no entregó una autorización persistente.');
   try{
-    await ensureVaultSecret(tenantId);
-    await secrets.addSecretVersion({parent:vaultParent(tenantId),payload:{data:Buffer.from(JSON.stringify(out),'utf8')}});
+    await ensureVaultSecret(tenantId,previewOnly);
+    await secrets.addSecretVersion({parent:vaultParent(tenantId,previewOnly),payload:{data:Buffer.from(JSON.stringify(out),'utf8')}});
   }catch(e){throw new HttpsError('unavailable','No fue posible guardar la conexión segura con Drive.');}
 }
 async function providerConfig(){
@@ -107,8 +107,8 @@ async function accessTokenFromRefresh(refreshToken){
   if(!r.ok||!clean(body.access_token,4096))throw new HttpsError('failed-precondition','La conexión persistente con Google Drive debe volver a configurarse.');
   return clean(body.access_token,4096);
 }
-async function tenantDriveToken(tenantId){
-  const vault=await readVault(tenantId);
+async function tenantDriveToken(tenantId,previewOnly){
+  const vault=await readVault(tenantId,previewOnly);
   if(!vault)throw new HttpsError('failed-precondition','DRIVE_TENANT_SETUP_REQUIRED');
   return{accessToken:await accessTokenFromRefresh(vault.refreshToken),vault};
 }
@@ -235,8 +235,8 @@ async function bootstrap(request,previewOnly){
   const [user,root]=await Promise.all([driveIdentity(accessToken),getMeta(rootId,accessToken)]);
   if(!root||root.mimeType!=='application/vnd.google-apps.folder')throw new HttpsError('failed-precondition','La carpeta Clientes configurada no está disponible.');
   if(!root.capabilities||root.capabilities.canAddChildren!==true)throw new HttpsError('permission-denied','La cuenta administrativa de Drive no tiene permiso de escritura en Clientes.');
-  await writeVault(tenantId,{refreshToken,googleAccountEmail:user.email,googleAccountDisplayName:user.displayName,rootFolderId:root.id,connectedByUidHash:sha(actor.uid)});
-  const verify=await tenantDriveToken(tenantId),verifyRoot=await getMeta(root.id,verify.accessToken);
+  await writeVault(tenantId,{refreshToken,googleAccountEmail:user.email,googleAccountDisplayName:user.displayName,rootFolderId:root.id,connectedByUidHash:sha(actor.uid)},previewOnly);
+  const verify=await tenantDriveToken(tenantId,previewOnly),verifyRoot=await getMeta(root.id,verify.accessToken);
   if(!verifyRoot||verifyRoot.capabilities?.canAddChildren!==true)throw new HttpsError('internal','No fue posible confirmar la conexión persistente con Drive.');
   await audit(tenantId,actor,'drive.tenant_bootstrap',{clientId:'',documentRef:'',outcome:'connected'},previewOnly);
   return{ok:true,status:'disponible',available:true,configured:true,backendPersistent:true,googleAccountEmail:user.email,rootFolderId:root.id,rootName:root.name,uploadAvailable:true,previewIsolated:previewOnly===true};
@@ -264,7 +264,7 @@ async function upload(request,previewOnly){
   const input=request.data||{},tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
   const target=await authorizeTarget(request,tenantId,input,'write'),clientId=target.clientId;
   if(previewOnly===true&&!/^b2[-_]/i.test(clientId))throw new HttpsError('permission-denied','Preview solo admite clientes sintéticos B2.');
-  const auth=await tenantDriveToken(tenantId),accessToken=auth.accessToken,vault=auth.vault,{actor,row}=target;
+  const auth=await tenantDriveToken(tenantId,previewOnly),accessToken=auth.accessToken,vault=auth.vault,{actor,row}=target;
   const mime=clean(input.mimeType,160).toLowerCase();
   if(!ALLOWED_MIME.has(mime))throw new HttpsError('invalid-argument','Tipo de archivo no permitido.');
   const bytes=base64Bytes(input.base64),contentHash=crypto.createHash('sha256').update(bytes).digest('hex'),rootId=ROOT_BY_TENANT[tenantId];
@@ -291,7 +291,7 @@ async function upload(request,previewOnly){
   return{ok:true,status:'disponible',documentRef:uploaded.id,fileId:uploaded.id,nombre:uploaded.name||safeName(input.name),mimeType:uploaded.mimeType||mime,size:Number(uploaded.size||bytes.length),driveUrl:uploaded.webViewLink||readback.webViewLink||('https://drive.google.com/file/d/'+uploaded.id+'/view'),externalUrl:uploaded.webViewLink||readback.webViewLink||('https://drive.google.com/file/d/'+uploaded.id+'/view'),folderId:destination.id,clientFolderId,clientFolderUrl:canonicalFolderUrl,contentHash,repository:'Google Drive',actorUid:actor.uid,activeRole:actor.activeRole,driveUserEmail:clean(vault.googleAccountEmail,320),previewIsolated:previewOnly===true,canonicalReadback:true,backendPersistent:true,version:VERSION};
 }
 async function readDocument(request,previewOnly,downloadMode){
-  const authz=await authorizeDocument(request,previewOnly,'read'),auth=await tenantDriveToken(authz.tenantId),accessToken=auth.accessToken;
+  const authz=await authorizeDocument(request,previewOnly,'read'),auth=await tenantDriveToken(authz.tenantId,previewOnly),accessToken=auth.accessToken;
   const meta=await getMeta(authz.fileId,accessToken);
   if(!meta||meta.trashed===true)throw new HttpsError('not-found','Documento no disponible en Drive.');
   const parents=Array.isArray(meta.parents)?meta.parents:[],clientFolderId=clean(authz.target.row&&authz.target.row.driveFolderId,180);

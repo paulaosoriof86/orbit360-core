@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -262,9 +262,9 @@
     "sourceCandidateSha": "e2efddad60a6798fd307ca5b0bbde235f92001a7",
     "governanceHeadBeforeCandidateArm": "06378fefe7fb250d70db19c80ece0febd5b23286",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "d50c28580077fbcc78a25c15bd71a7d827492f51",
+    "compositionLockBlobSha": "27021cca9f720dc00732e9870a57c5482b59dc39",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "9819485af99c88e72ac60c392e9d67bca795a285",
+    "findingLedgerBlobSha": "b331ee5bca3b03a8f334c688c20e2d21e2cbd8a1",
     "blockingFindingIds": [
       "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
       "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
@@ -306,7 +306,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "SUPERSEDED_BY_R84_PREVIEW_SECRET_ISOLATION_SOURCE_FIX",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "1300b80298b6075f508481a16289d5d31688f4fb",
     "exactPreviewBuildId": "gi-i65-b2-1300b80298b6-57f234755dc1",
@@ -515,7 +515,8 @@
     },
     "humanDriveOAuthProofRequired": true,
     "driveOAuthExpected": "DELEGATED_USER_OAUTH_MEMORY_ONLY",
-    "invalidationReason": "R83 Drive download provider source changed after human Preview proof; new immutable Preview and authenticated reproof required."
+    "invalidationReason": "R84 Preview runtime could not read a Drive vault because only insurer secret IAM was provisioned; Preview Drive vault now has separate preprovisioned IAM.",
+    "priorTechnicalPreviewPassRunId": 36362404589
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
@@ -3026,7 +3027,7 @@
     "findingId": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
     "decisionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
     "decisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
-    "status": "SOURCE_FIXED_GUARD_PASS_PREVIEW_ARMED",
+    "status": "PREVIEW_SECRET_ISOLATION_SOURCE_FIXED_PENDING_GUARD",
     "perUserOAuthProductive": false,
     "tenantPersistentBackendAuthorityRequired": true,
     "routineUserGooglePromptAllowed": false,
@@ -3040,7 +3041,12 @@
     "credentialStore": "SecretManager",
     "tenantBootstrapRequired": true,
     "guardPassRunId": 36362318104,
-    "previewArmed": true,
-    "managementSessionOauthRemoved": true
+    "previewArmed": false,
+    "managementSessionOauthRemoved": true,
+    "previewVaultIsolated": true,
+    "previewVaultPattern": "orbit360-drive-oauth-preview-{tenant}",
+    "productionVaultPattern": "orbit360-drive-oauth-{tenant}",
+    "lastAuthenticatedFailureRunId": 36362404589,
+    "lastAuthenticatedFailureCode": "FUNCTIONS_UNAVAILABLE_PREVIEW_DRIVE_VAULT_IAM"
   }
 }
