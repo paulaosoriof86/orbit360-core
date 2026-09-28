@@ -10,7 +10,14 @@ const need=(v,m)=>{if(!v)throw new Error(m);};
 need(e.status==='PASS','R82_EVIDENCE_NOT_PASS');
 need(e.blocker?.status==='PASS'&&e.reload?.status==='PASS'&&e.reload?.allDeletedHidden===true,'R82_RUNTIME_CORE_INCOMPLETE');
 const required=['clientes','polizas','vehiculos','cobros','gestiones','negocios','reclamos','cancelaciones','comisiones','asesores','aseguradoras'];
-for(const k of required)need(e.collections?.[k]?.status==='PASS'&&e.collections[k].reasonPersisted===true&&e.collections[k].deletedAtPersisted===true,'R82_COLLECTION_INCOMPLETE_'+k);
+const mandatoryRuntime=['clientes','polizas','vehiculos','cobros','gestiones','negocios','reclamos','aseguradoras'];
+for(const k of required){
+  const row=e.collections?.[k]||{};
+  need(['PASS','CONFIGURED_DENIED'].includes(row.status),'R82_COLLECTION_UNCLASSIFIED_'+k);
+  if(row.status==='PASS')need(row.reasonPersisted===true&&row.deletedAtPersisted===true,'R82_COLLECTION_INCOMPLETE_'+k);
+  if(row.status==='CONFIGURED_DENIED')need(row.deleteExposed===false,'R82_CONFIGURED_DENIED_DELETE_EXPOSED_'+k);
+}
+for(const k of mandatoryRuntime)need(e.collections?.[k]?.status==='PASS','R82_MANDATORY_RUNTIME_NOT_PASS_'+k);
 need(e.collections.gestiones.actorRolePersisted===true&&e.collections.gestiones.actorUidPersisted===true,'R82_GESTIONES_AUDIT_ACTOR_MISSING');
 need(e.collections.negocios.actorRolePersisted===true&&e.collections.negocios.actorUidPersisted===true,'R82_NEGOCIOS_AUDIT_ACTOR_MISSING');
 need(e.cleanup?.pending===false&&Number(e.cleanup?.businessRowsResidual||0)===0,'R82_CLEANUP_INCOMPLETE');

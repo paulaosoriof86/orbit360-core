@@ -63,10 +63,11 @@ try{
 
   browser=await chromium.launch({headless:true});context=await browser.newContext({viewport:{width:1440,height:980}});page=await context.newPage();page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(30000);
   page.on('pageerror',e=>evidence.pageErrors.push(clean(e?.message||e,1200)));page.on('console',m=>{if(m.type()==='error')evidence.consoleErrors.push(clean(m.text(),1200));});
-  await page.goto(TARGET+'/?r82='+Date.now()+'#/inicio',{waitUntil:'domcontentloaded',timeout:30000});await activate(page,auth,actor);await setRole(page,actor.role);
-
-  await page.waitForFunction(ids=>Object.entries(ids).every(([c,id])=>!!window.Orbit?.store?.get?.(c,id)),ids,{timeout:45000});
-  await page.waitForFunction(({a,b})=>!!Orbit.store.get('clientes',a)&&!!Orbit.store.get('polizas',b),{a:blockedClient,b:blockedPolicy},{timeout:15000});
+  await page.goto(TARGET+'/?r82='+Date.now()+'#/inicio',{waitUntil:'domcontentloaded',timeout:30000});await activate(page,auth,actor);
+  const startup=await page.evaluate(()=>({role:String(Orbit.session?.rol?.()||''),assigned:[].concat(Orbit.session?.rolesAsignados?.()||[]),productActiveRole:String(Orbit.auth?.productUser?.activeRole||'')}));
+  need(startup.role,'B2_R82_STARTUP_ROLE_MISSING');
+  evidence.actor.startupRole=startup.role;evidence.actor.productActiveRole=startup.productActiveRole;evidence.actor.assignedRoles=startup.assigned;
+  await page.waitForFunction(({a,b})=>!!Orbit.store.get('clientes',a)&&!!Orbit.store.get('polizas',b),{a:blockedClient,b:blockedPolicy},{timeout:20000});
   const staticRuntime=await page.evaluate(()=>({recordDelete:!!Orbit.recordDelete,remove:typeof Orbit.recordDelete?.remove==='function',blockers:typeof Orbit.recordDelete?.blockers==='function',moduleCan:typeof Orbit.recordDelete?.can==='function'}));
   need(staticRuntime.recordDelete&&staticRuntime.remove&&staticRuntime.blockers&&staticRuntime.moduleCan,'B2_R82_CANONICAL_DELETE_OWNER_MISSING');
 
@@ -76,26 +77,46 @@ try{
   const blockedSnap=await dataCol('clientes').doc(blockedClient).get();need(blockedSnap.exists&&blockedSnap.data()?.deleted!==true,'B2_R82_BLOCKED_CLIENT_MUTATED');
   evidence.blocker={status:'PASS',code:blocked.code,blockerCount:blocked.blockers.length,recordUnchanged:true};
 
-  const roleDenied=await page.evaluate(async ({id})=>{const assigned=(Orbit.session&&Orbit.session.assignedRoles?Orbit.session.assignedRoles():[])||[];const advisorRole=assigned.find(r=>/asesor|comercial/i.test(String(r||'')));if(!advisorRole)return{skipped:true,reason:'NO_ADVISOR_ROLE_ASSIGNED'};Orbit.session.set(advisorRole);await new Promise(r=>setTimeout(r,300));const row=Orbit.store.get('asesores',id);return{skipped:false,role:advisorRole,can:!!row&&Orbit.recordDelete.can('asesores',row)};},{id:ids.asesores});
+  const roleDenied=await page.evaluate(async ({id,startupRole})=>{const assigned=(Orbit.session&&Orbit.session.rolesAsignados?Orbit.session.rolesAsignados():[])||[];const advisorRole=assigned.find(r=>/asesor|comercial/i.test(String(r||'')));if(!advisorRole)return{skipped:true,reason:'NO_ADVISOR_ROLE_ASSIGNED'};Orbit.session.set(advisorRole);await new Promise(r=>setTimeout(r,300));const row=Orbit.store.get('asesores',id);const canEdit=Orbit.access?.can?.('equipo','edit')===true;const canDelete=!!row&&Orbit.recordDelete.can('asesores',row);Orbit.session.set(startupRole);return{skipped:false,role:advisorRole,moduleEdit:canEdit,canDelete,denied:canEdit!==true&&canDelete!==true};},{id:ids.asesores,startupRole:startup.role});
   evidence.scopeDenied=roleDenied;
-  await setRole(page,actor.role);
+  await page.waitForTimeout(400);
 
+  const permissionMatrix=await page.evaluate(defs=>Object.fromEntries(defs.map(([collection,moduleKey,id])=>{
+    const row=Orbit.store.get(collection,id),view=Orbit.access?.can?.(moduleKey,'view')===true,edit=Orbit.access?.can?.(moduleKey,'edit')===true;
+    return[collection,{module:moduleKey,view,edit,present:!!row,recordDeleteCan:!!row&&Orbit.recordDelete.can(collection,row)}];
+  })),defs.map(([collection,moduleKey])=>[collection,moduleKey,ids[collection]]));
+  evidence.permissionMatrix=permissionMatrix;
+
+  const mandatoryRuntime=new Set(['clientes','polizas','vehiculos','cobros','gestiones','negocios','reclamos','aseguradoras']);
+  const runtimeDeletedIds={};
   for(const [collection,moduleKey] of defs.map(x=>[x[0],x[1]])){
-    const id=ids[collection];
+    const id=ids[collection],perm=permissionMatrix[collection]||{};
+    if(perm.view!==true||perm.edit!==true){
+      need(perm.recordDeleteCan!==true,'B2_R82_UNAUTHORIZED_DELETE_EXPOSED:'+collection);
+      evidence.collections[collection]={status:'CONFIGURED_DENIED',module:moduleKey,view:perm.view===true,edit:perm.edit===true,present:perm.present===true,deleteExposed:false};
+      need(!mandatoryRuntime.has(collection),'B2_R82_MANDATORY_COLLECTION_DENIED:'+collection+':'+JSON.stringify(perm));
+      continue;
+    }
+    if(!perm.present){
+      const visible=await page.waitForFunction(({collection,id})=>!!window.Orbit?.store?.get?.(collection,id),{collection,id},{timeout:15000}).then(()=>true).catch(()=>false);
+      need(visible,'B2_R82_ALLOWED_COLLECTION_NOT_HYDRATED:'+collection+':'+JSON.stringify(page.evaluate));
+    }
     const result=await page.evaluate(async ({collection,id,reason})=>{const old={confirm:Orbit.ui?.confirm,prompt:Orbit.ui?.prompt,alert:Orbit.ui?.alert,toast:Orbit.ui?.toast};if(Orbit.ui){Orbit.ui.confirm=async()=>true;Orbit.ui.prompt=async()=>reason;Orbit.ui.alert=async()=>true;Orbit.ui.toast=()=>{};}try{return await Orbit.recordDelete.remove(collection,id,{label:'B2 QA '+collection});}finally{if(Orbit.ui){Object.assign(Orbit.ui,old);}}},{collection,id,reason});
     need(result?.ok===true&&result?.softDelete===true,'B2_R82_DELETE_RUNTIME_FAILED:'+collection+':'+JSON.stringify(result));
     const row=await waitFor(async()=>{const s=await dataCol(collection).doc(id).get();const d=s.data()||{};return s.exists&&d.deleted===true&&d.eliminado===true&&d.archivado===true&&clean(d.deleteReason)===reason&&clean(d.deletedAt)?d:null;},'B2_R82_FIRESTORE_DELETE_READBACK_'+collection,30000);
     evidence.collections[collection]={status:'PASS',module:moduleKey,softDelete:true,deleted:true,eliminado:true,archivado:true,reasonPersisted:clean(row.deleteReason)===reason,deletedAtPersisted:!!clean(row.deletedAt),actorRolePersisted:!!clean(row.deletedByRole),actorUidPersisted:!!clean(row.deletedByUid)};
+    runtimeDeletedIds[collection]=id;
     if(collection==='gestiones'||collection==='negocios')need(evidence.collections[collection].actorRolePersisted&&evidence.collections[collection].actorUidPersisted,'B2_R82_OPS_LEADS_AUDIT_METADATA_MISSING:'+collection);
   }
+  for(const collection of mandatoryRuntime)need(evidence.collections[collection]?.status==='PASS','B2_R82_MANDATORY_RUNTIME_NOT_PASS:'+collection);
 
-  await page.reload({waitUntil:'domcontentloaded',timeout:30000});await activate(page,auth,actor);await setRole(page,actor.role);
+  await page.reload({waitUntil:'domcontentloaded',timeout:30000});await activate(page,auth,actor);
   await page.waitForFunction(()=>{const s=window.Orbit?.store?._productStatus?.()||{};return s.ready===true;},null,{timeout:30000});
   await page.waitForTimeout(2500);
-  const hidden=await page.evaluate(ids=>Object.entries(ids).map(([collection,id])=>({collection,id,present:!!Orbit.store.get(collection,id)})),ids);
+  const hidden=await page.evaluate(ids=>Object.entries(ids).map(([collection,id])=>({collection,id,present:!!Orbit.store.get(collection,id)})),runtimeDeletedIds);
   const visibleDeleted=hidden.filter(x=>x.present===true);
   need(visibleDeleted.length===0,'B2_R82_SOFT_DELETE_PROJECTION_RELOAD_FAILED:'+JSON.stringify(visibleDeleted));
-  evidence.reload={status:'PASS',allDeletedHidden:true,checked:hidden.length};
+  evidence.reload={status:'PASS',allDeletedHidden:true,checked:hidden.length,collections:Object.keys(runtimeDeletedIds)};
 
   for(const [collection,id] of [...Object.entries(ids),['clientes',blockedClient],['polizas',blockedPolicy]]){await dataCol(collection).doc(id).delete().catch(()=>{});evidence.cleanup.deletedRows++;}
   evidence.cleanup.pending=false;evidence.cleanup.businessRowsResidual=0;
