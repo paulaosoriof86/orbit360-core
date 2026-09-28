@@ -72,6 +72,8 @@ on:
       - 'tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs'
       - 'tools/gravicentra-i6-5-b2-r77-r81-drive-durable-proof.mjs'
       - 'tools/gravicentra-i6-5-b2-r77-r81-freeze.mjs'
+      - 'tools/gravicentra-i6-5-b2-r91-r95-runtime-proof.mjs'
+      - 'tools/gravicentra-i6-5-b2-r91-r95-freeze.mjs'
       - 'orbit360-platform/core/policy-receipts-engine.js'
       - 'orbit360-platform/core/issuance-workflow-v1201.js'
       - 'orbit360-platform/modules/issuance-endosos-v1201-bridge.js'
@@ -5061,4 +5063,125 @@ jobs:
       - name: R77 R81 failure remains fail-closed
         if: ${{ failure() && steps.mode.outputs.run == 'true' }}
         run: echo "B2_R77_R81_FAILED_NO_LIVE_NO_B3_NO_REIMPORT_CLEANUP_REQUIRED"
+
+  i65-b2-r91-r95-runtime-proof:
+    needs: i65-b2-r77-r81-drive-durable-proof
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+      FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+      R91_R95_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B2_R91_R95_RUNTIME_PROOF_20260928.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate R91 R95 exact Preview runtime proof
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK));
+          const p=b.preview||{},q=b.authenticatedPreviewProof||{},x=q.boundaries||{};
+          const cursor=Array.isArray(b.nextRequiredProof)?b.nextRequiredProof[0]:'';
+          const run=b.status==='PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL'
+            && q.status==='PASS'
+            && b.r77r81DriveDurableProof?.status==='PASS_CLEANUP_PENDING'
+            && cursor==='R91_R92_R93_R94_R95_EXACT_PREVIEW_RUNTIME'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
+            && c.i65ForensicRemediationPlan?.currentBlock==='B2';
+          if(run){
+            if(!p.url||p.exactReadback!==true||p.functionalPass!==true||p.livePromoted!==false)throw Error('R91_R95_PREVIEW_NOT_CERTIFIED');
+            if(x.syntheticQaWritesAuthorized!==true||x.cleanupMandatory!==true||x.businessDataMutationAuthorized!==false||x.reimportAuthorized!==false||x.emailSendAuthorized!==false||x.liveHostingPromotionAuthorized!==false)throw Error('R91_R95_BOUNDARY_INVALID');
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'target='+(p.url||'')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'build='+(p.buildId||'')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'source='+(p.sourceSha||'')+'\n');
+          console.log('B2_R91_R95_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Assert LIVE unchanged before R91 R95 proof
+        if: steps.mode.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Validate exact B2 Preview marker for R91 R95
+        if: steps.mode.outputs.run == 'true'
+        env:
+          TARGET_URL: ${{ steps.mode.outputs.target }}
+          EXPECTED_BUILD_ID: ${{ steps.mode.outputs.build }}
+          EXPECTED_SOURCE_SHA: ${{ steps.mode.outputs.source }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,urllib.request,time
+          url=os.environ['TARGET_URL'].rstrip('/')+'/__recovery__/build.json?r9195='+str(time.time())
+          with urllib.request.urlopen(url,timeout=30) as z:d=json.loads(z.read())
+          if d.get('buildId')!=os.environ['EXPECTED_BUILD_ID'] or d.get('sourceSha')!=os.environ['EXPECTED_SOURCE_SHA']:
+              raise SystemExit('B2_R91_R95_PREVIEW_MARKER_DRIFT:'+str(d))
+          print('B2_R91_R95_PREVIEW_MARKER=PASS')
+          PY
+      - name: Validate R91 R95 proof source
+        if: steps.mode.outputs.run == 'true'
+        run: |
+          node --check tools/gravicentra-i6-5-b2-r91-r95-runtime-proof.mjs
+          node --check tools/gravicentra-i6-5-b2-r91-r95-freeze.mjs
+      - name: Install R91 R95 proof dependencies
+        if: steps.mode.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Execute R91 R95 exact Preview runtime proof
+        id: proof
+        if: steps.mode.outputs.run == 'true'
+        env:
+          TARGET_URL: ${{ steps.mode.outputs.target }}
+          B2_R91_R95_PROOF_FILE: ${{ runner.temp }}/b2-r91-r95-runtime-proof.json
+        run: node tools/gravicentra-i6-5-b2-r91-r95-runtime-proof.mjs
+      - name: Upload R91 R95 proof evidence
+        id: evidence
+        if: ${{ always() && steps.mode.outputs.run == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-r91-r95-runtime-proof-${{ github.run_id }}
+          path: ${{ runner.temp }}/b2-r91-r95-runtime-proof.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Freeze R91 R95 machine proof
+        if: ${{ steps.mode.outputs.run == 'true' && steps.proof.conclusion == 'success' && steps.evidence.conclusion == 'success' }}
+        env:
+          B2_R91_R95_PROOF_FILE: ${{ runner.temp }}/b2-r91-r95-runtime-proof.json
+          PROOF_ARTIFACT_ID: ${{ steps.evidence.outputs.artifact-id }}
+          PROOF_ARTIFACT_DIGEST: ${{ steps.evidence.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b2-r91-r95-freeze.mjs
+          git add "$R91_R95_RECEIPT" "$FINDINGS" "$B2_LOCK"
+          LOCK_BLOB=$(git hash-object "$B2_LOCK"); export LOCK_BLOB
+          LEDGER_BLOB=$(git hash-object "$FINDINGS"); export LEDGER_BLOB
+          RECEIPT_BLOB=$(git hash-object "$R91_R95_RECEIPT"); export RECEIPT_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p,'utf8'));
+          c.i65ForensicRemediationPlan.b2ExecutionLockBlobSha=process.env.LOCK_BLOB;
+          c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),findingLedgerBlobSha:process.env.LEDGER_BLOB};
+          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),findingLedgerBlobSha:process.env.LEDGER_BLOB,r91R95ReceiptBlobSha:process.env.RECEIPT_BLOB};
+          fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5 B2): R91 R95 runtime proof pass"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: R91 R95 failure remains fail-closed
+        if: ${{ failure() && steps.mode.outputs.run == 'true' }}
+        run: echo "B2_R91_R95_FAILED_NO_LIVE_NO_B3_NO_REIMPORT_CLEANUP_REQUIRED"
 
