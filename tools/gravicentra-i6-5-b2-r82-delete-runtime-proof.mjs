@@ -44,15 +44,15 @@ try{
   const defs=[
     ['clientes','cliente360',{nombre:'B2 QA R82 Cliente',tipo:'Persona',pais:'GT',moneda:'GTQ'}],
     ['polizas','polizas',{numero:'B2-R82-POL-'+suffix,estado:'borrador',pais:'GT',moneda:'GTQ'}],
-    ['vehiculos','polizas',{placa:'B2R82'+suffix.slice(-4),marca:'QA',linea:'R82',estado:'borrador'}],
-    ['cobros','cobros',{numero:'B2-R82-COB-'+suffix,estado:'Pendiente',estadoOperativo:'Pendiente',monto:1}],
-    ['gestiones','ops',{lista:'Gestiones Admin',tipo:'Gestión QA R82',titulo:'B2 QA R82 Gestión',estado:'Pendiente',prioridad:'Media',previewWrite:true}],
-    ['negocios','leads',{nombre:'B2 QA R82 Lead',tipo:'QA',etapa:'nuevo',estado:'Nuevo',previewWrite:true}],
-    ['reclamos','siniestros',{numero:'B2-R82-SIN-'+suffix,tipo:'QA',estado:'Abierto'}],
-    ['cancelaciones','cancelaciones',{tipo:'QA',estado:'Pendiente',recuperacion:'Pendiente'}],
-    ['comisiones','comisiones',{periodo:'B2 R82',estado:'Pendiente',monto:1,moneda:'GTQ'}],
+    ['vehiculos','polizas',{placa:'B2R82'+suffix.slice(-4),marca:'QA',linea:'R82',estado:'borrador',pais:'GT'}],
+    ['cobros','cobros',{numero:'B2-R82-COB-'+suffix,estado:'Pendiente',estadoOperativo:'Pendiente',monto:1,pais:'GT'}],
+    ['gestiones','ops',{lista:'Gestiones Admin',tipo:'Gestión QA R82',titulo:'B2 QA R82 Gestión',estado:'Pendiente',prioridad:'Media',previewWrite:true,pais:'GT'}],
+    ['negocios','leads',{nombre:'B2 QA R82 Lead',tipo:'QA',etapa:'nuevo',estado:'Nuevo',previewWrite:true,pais:'GT'}],
+    ['reclamos','siniestros',{numero:'B2-R82-SIN-'+suffix,tipo:'QA',estado:'Abierto',pais:'GT'}],
+    ['cancelaciones','cancelaciones',{tipo:'QA',estado:'Pendiente',recuperacion:'Pendiente',pais:'GT'}],
+    ['comisiones','comisiones',{periodo:'B2 R82',estado:'Pendiente',monto:1,moneda:'GTQ',pais:'GT'}],
     ['asesores','equipo',{nombre:'B2 QA R82 Asesor',email:'',activo:true,estado:'activo'}],
-    ['aseguradoras','aseguradoras',{nombre:'B2 QA R82 Aseguradora',activo:true,estado:'activo'}]
+    ['aseguradoras','aseguradoras',{nombre:'B2 QA R82 Aseguradora',activo:true,estado:'activo',pais:'GT'}]
   ];
   const ids={};
   for(const [collection,,extra] of defs){const id='b2-r82-'+collection+'-'+suffix;ids[collection]=id;await dataCol(collection).doc(id).set({id,tenantId:TENANT,asesorId:collection==='asesores'?id:actor.advisorId,advisorId:collection==='asesores'?id:actor.advisorId,qaFixture:true,qaFixtureType:'B2_R82_DELETE_RUNTIME',createdAt:now,updatedAt:now,...extra},{merge:false});}
@@ -99,7 +99,14 @@ try{
     }
     if(!perm.present){
       const visible=await page.waitForFunction(({collection,id})=>!!window.Orbit?.store?.get?.(collection,id),{collection,id},{timeout:15000}).then(()=>true).catch(()=>false);
-      need(visible,'B2_R82_ALLOWED_COLLECTION_NOT_HYDRATED:'+collection+':'+JSON.stringify(page.evaluate));
+      if(!visible){
+        const diag=await page.evaluate(({collection,id})=>{
+          const st=Orbit.store?._productStatus?.()||{};
+          const plan=Orbit.tenantAccessPolicyProductP0?.queryConstraints?.(collection,Orbit.auth?.productUser||{},{tenantId:Orbit.auth?.productUser?.tenantId||''})||{};
+          return{collection,id,present:!!Orbit.store?.get?.(collection,id),serverConfirmed:[].concat(st.serverConfirmedCollections||[]),denied:[].concat(st.deniedCollections||[]),snapshotError:st.snapshotErrors?.[collection]||'',plan};
+        },{collection,id});
+        throw new Error('B2_R82_ALLOWED_COLLECTION_NOT_HYDRATED:'+collection+':'+JSON.stringify(diag));
+      }
     }
     const result=await page.evaluate(async ({collection,id,reason})=>{const old={confirm:Orbit.ui?.confirm,prompt:Orbit.ui?.prompt,alert:Orbit.ui?.alert,toast:Orbit.ui?.toast};if(Orbit.ui){Orbit.ui.confirm=async()=>true;Orbit.ui.prompt=async()=>reason;Orbit.ui.alert=async()=>true;Orbit.ui.toast=()=>{};}try{return await Orbit.recordDelete.remove(collection,id,{label:'B2 QA '+collection});}finally{if(Orbit.ui){Object.assign(Orbit.ui,old);}}},{collection,id,reason});
     need(result?.ok===true&&result?.softDelete===true,'B2_R82_DELETE_RUNTIME_FAILED:'+collection+':'+JSON.stringify(result));
