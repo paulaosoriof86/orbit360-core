@@ -264,9 +264,9 @@
     "sourceCandidateSha": "ac136eea7f317db1b10cf24c6ef21b9d42cfd7e2",
     "governanceHeadBeforeCandidateArm": "ac136eea7f317db1b10cf24c6ef21b9d42cfd7e2",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "e926d55223e2f23fd68d018682d29cdec54a56d1",
+    "compositionLockBlobSha": "27a9c76de861a28a965fe04cd825f6974a8d0698",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "f2c429d947aebb402a223c054a2e479e453f6e6c",
+    "findingLedgerBlobSha": "1213f5423033d09cf846d7765dd633bf0898c66b",
     "blockingFindingIds": [
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -277,8 +277,7 @@
       "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
       "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
       "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
-      "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
-      "B2-R86-DRIVE-OAUTH-CLIENT-RUNTIME-CONFIG-UNAVAILABLE-R18"
+      "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17"
     ],
     "sourceContract": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
     "authenticatedHarness": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
@@ -1875,9 +1874,6 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "CENTRAL_GUARD_PASS",
-    "R86_PREVIEW_OAUTH_CLIENT_SECRET_PROVISION_AND_BINDING_PASS",
-    "R85_NEW_EXACT_PREVIEW_READBACK",
     "R85_ADMIN_AUTHORIZATION_CODE_BOOTSTRAP_AND_SECRET_READBACK",
     "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_AUTHORIZED_VIEW_DOWNLOAD",
     "R84_ACTIVE_ROLE_SCOPE_AND_CROSS_SCOPE_DENIAL",
@@ -3127,7 +3123,7 @@
     "noReimport": true
   },
   "driveBootstrapR17": {
-    "status": "GUARD_PASS_PREVIEW_ARMED",
+    "status": "EXACT_PREVIEW_READY_PENDING_ONE_TIME_ADMIN_BOOTSTRAP",
     "findingId": "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928.json",
     "receiptBlobSha": "2cc9f9d70d4bca863b2c1ab60f996f1310c7721f",
@@ -3142,10 +3138,21 @@
     "noB3": true,
     "noReimport": true,
     "sourceFixCommit": "2c84899d46089ce91a6343230d5effbbf8025c35",
-    "guardPassRunId": 36416977794
+    "guardPassRunId": 36416977794,
+    "exactPreview": {
+      "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
+      "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+      "runId": 36418353246,
+      "artifactId": 10968560537,
+      "artifactDigest": "d3e73ddedd878cdf251b8a0c3148d8a3cbe38b354d8af3304aa28cb2078b2374",
+      "exactReadback": true,
+      "functionalPass": true
+    },
+    "bootstrapClientIdPresent": true
   },
   "driveOAuthClientR18": {
-    "status": "GUARD_PASS_PREVIEW_ARMED",
+    "status": "EXACT_PREVIEW_PASS",
     "findingId": "B2-R86-DRIVE-OAUTH-CLIENT-RUNTIME-CONFIG-UNAVAILABLE-R18",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R18_DRIVE_OAUTH_CLIENT_SECRET_BINDING_20260928.json",
     "receiptBlobSha": "014d9c0d935991c3ee489add56e5f93db42ef52e",
@@ -3159,6 +3166,21 @@
     "noB3": true,
     "noReimport": true,
     "sourceFixCommit": "ac136eea7f317db1b10cf24c6ef21b9d42cfd7e2",
-    "guardPassRunId": 36418111656
+    "guardPassRunId": 36418111656,
+    "closureState": "CLOSED",
+    "exactPreview": {
+      "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
+      "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+      "runId": 36418353246,
+      "artifactId": 10968560537,
+      "artifactDigest": "d3e73ddedd878cdf251b8a0c3148d8a3cbe38b354d8af3304aa28cb2078b2374",
+      "exactReadback": true,
+      "functionalPass": true
+    },
+    "authenticatedJobId": 108915808441,
+    "previewOAuthClientSecretProvision": true,
+    "previewOAuthClientSecretBinding": true,
+    "bootstrapClientIdPresent": true
   }
 }
