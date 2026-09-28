@@ -176,7 +176,7 @@ try{
   const management=await page.evaluate(async ({managementId,clientId,advisorId})=>{
     return Orbit.ciclo.crearGestionDurable({
       id:managementId,lista:'Gestiones Admin',tipo:'Gestión QA documental',titulo:'B2 QA R77 adjunto Drive',
-      clienteId:clientId,polizaId:'',asesorId,prioridad:'Media',estado:'Pendiente',vence:new Date().toISOString().slice(0,10),
+      clienteId:clientId,polizaId:'',asesorId:advisorId,prioridad:'Media',estado:'Pendiente',vence:new Date().toISOString().slice(0,10),
       proximaAccion:'Validar soporte documental QA',nota:'Fixture sintético B2 R77/R81',origen:'B2 QA',
       adjuntos:[],checklist:[{t:'Documentación adjunta',done:false}],qaFixture:true,qaFixtureType:'B2_R77_R81_DRIVE_DURABLE'
     });
