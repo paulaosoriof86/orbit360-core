@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "b3a5fdab2770bc4f7e2b73a76d7182a7632152de",
+    "b2ExecutionLockBlobSha": "27e120dee51b8228a84faa961d8934ada47bfae0",
     "b2": {
       "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2168,7 +2168,7 @@
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "R87 discovery may temporarily add only read-only OAuth Config Viewer and Service Usage Consumer to the existing CI service account, must remove only those added bindings in the same job, and may not mutate the OAuth client. R88 remains frozen until Drive persistence closes. No LIVE, no B3, no reimport.",
+      "boundaryNote": "R87 programmatic path is exhausted without unsafe/private API guessing. Temporary read-only IAM was fully rolled back. The only pending external mutation is one additive Authorized JavaScript origin on the existing OAuth web client for the exact frozen Preview. After that, complete Drive persistence proof on the same artifact, then remediate R88 startup. No LIVE, no B3, no reimport.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2254,7 +2254,7 @@
       "lastInfrastructureBlocker": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
       "storageAssetInfrastructure": "AUTHORIZED_SAME_FIREBASE_PROJECT_ONLY",
       "insurerStableEditRuntimePass": true,
-      "findingLedgerBlobSha": "1213f5423033d09cf846d7765dd633bf0898c66b",
+      "findingLedgerBlobSha": "79ee4ee2667d67fa4e3692ac89d9df14fa6e8545",
       "r5CumulativeSourceRemediation": {
         "status": "CANDIDATE_PENDING_PREVIEW",
         "compositionLockBlobSha": "31b7e182c39f3baf70ee9c15f21014ff90ce77cb",
@@ -2644,13 +2644,16 @@
         "bootstrapClientIdPresent": true
       },
       "r19": {
-        "status": "R87_TEMPORARY_READONLY_IAM_DISCOVERY_ARMED_R88_FROZEN",
+        "status": "R87_EXTERNAL_CONSOLE_APPLY_REQUIRED_R88_FROZEN",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
-        "receiptBlobSha": "408f19d7b5a6d98be7f875003dde8c7a80ca1a09",
+        "receiptBlobSha": "55878f32e9aa711ea0119525b4464f58c7aec652",
         "r87": {
-          "status": "TEMPORARY_READONLY_IAM_DISCOVERY_ARMED",
-          "temporaryIamElevationAuthorized": true,
-          "oauthClientMutationAuthorized": false
+          "status": "EXTERNAL_CONSOLE_APPLY_REQUIRED_PROGRAMMATIC_PATH_EXHAUSTED",
+          "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+          "targetClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com",
+          "discoveryRunId": 36423957488,
+          "temporaryIamRollbackPass": true,
+          "oauthClientMutationExecuted": false
         },
         "r88": {
           "status": "ROOT_CAUSE_CONFIRMED_REMEDIATION_SEQUENCED_AFTER_DRIVE_BOOTSTRAP",

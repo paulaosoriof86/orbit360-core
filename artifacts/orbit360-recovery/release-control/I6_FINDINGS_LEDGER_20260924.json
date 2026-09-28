@@ -2851,16 +2851,43 @@
         "fresh routine-user session shows zero Google account/consent prompts",
         "no Google access/refresh token is persisted in browser storage"
       ],
-      "status": "ROOT_CAUSE_CONFIRMED_EXTERNAL_CONFIG_APPLY_PENDING",
+      "status": "EXTERNAL_CONSOLE_APPLY_REQUIRED_PROGRAMMATIC_PATH_EXHAUSTED",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
       "productionSecretTouched": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
-      "receiptBlobSha": "da1c4f7b3297b1ca58b682a943f567e6d9769c75",
+      "receiptBlobSha": "55878f32e9aa711ea0119525b4464f58c7aec652",
       "closureState": "NOT_CLOSED",
       "recordedAt": "2026-09-28",
-      "previewProofRequired": true
+      "previewProofRequired": true,
+      "discoveryProof": {
+        "runId": 36423957488,
+        "jobId": 108933217905,
+        "temporaryRolesAdded": [
+          "roles/oauthconfig.viewer",
+          "roles/serviceusage.serviceUsageConsumer"
+        ],
+        "readPermissionsObtained": [
+          "clientauthconfig.clients.get",
+          "clientauthconfig.clients.list",
+          "serviceusage.services.use"
+        ],
+        "updatePermissionObtained": false,
+        "endpointStatuses": {
+          "discovery": 403,
+          "brand": 400,
+          "listClients": 404,
+          "getTarget": 404
+        },
+        "rollbackPass": true,
+        "temporaryRolesRemaining": [],
+        "oauthClientMutationExecuted": false,
+        "liveBindingPass": true
+      },
+      "externalActionRequired": "Add exact Preview origin in Google Auth Platform > Clients > existing web client > Authorized JavaScript origins.",
+      "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+      "targetClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com"
     },
     {
       "id": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
@@ -2897,12 +2924,12 @@
         "logout/login/account-expired paths remain deterministic",
         "startup milestones and elapsed timings are captured on mobile and desktop"
       ],
-      "status": "ROOT_CAUSE_CONFIRMED_SOURCE_REMEDIATION_DEFERRED_UNTIL_R87_R85_BOOTSTRAP_PROOF",
+      "status": "ROOT_CAUSE_CONFIRMED_REMEDIATION_SEQUENCED_AFTER_DRIVE_BOOTSTRAP",
       "noLive": true,
       "noB3": true,
       "noReimport": true,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
-      "receiptBlobSha": "da1c4f7b3297b1ca58b682a943f567e6d9769c75",
+      "receiptBlobSha": "55878f32e9aa711ea0119525b4464f58c7aec652",
       "closureState": "NOT_CLOSED",
       "recordedAt": "2026-09-28",
       "previewProofRequired": true

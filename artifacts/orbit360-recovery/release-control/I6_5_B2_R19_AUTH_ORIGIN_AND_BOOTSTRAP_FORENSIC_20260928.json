@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B2",
-  "status": "R87_TEMPORARY_READONLY_IAM_DISCOVERY_ARMED_R88_FROZEN",
+  "status": "R87_PROGRAMMATIC_PATH_EXHAUSTED_CONSOLE_APPLY_REQUIRED_R88_FROZEN",
   "exactPreview": {
     "sourceSha": "c595ac1c2ca76a4dcb3959f7cb9ba42dc9734342",
     "buildId": "gi-i65-b2-c595ac1c2ca7-57f234755dc1",
@@ -86,10 +86,11 @@
     }
   ],
   "executionOrder": [
-    "Discover the existing OAuth web client's ClientAuthConfig read/update contract read-only through the existing GitHub/Firebase authority.",
-    "Apply only the exact current B2 Preview origin if and only if the existing client and current origin set are read back unambiguously and additive update semantics are proven.",
-    "Complete R85 one-time tenant Drive bootstrap and R84/R83 persistent read/download/upload proof on the same exact Preview.",
-    "Only after the exact Preview is no longer needed for R85 proof, implement R88 startup-state separation in a new cumulative Preview candidate."
+    "Apply the single additive Authorized JavaScript origin in Google Auth Platform > Clients to the existing web client; do not change client ID, secret, redirect URIs, production origins or other settings.",
+    "Repeat the one-time administrative Drive bootstrap on the same exact Preview.",
+    "Complete R84/R83 persistent read/download/upload, fresh-session zero-Google-prompt and scope-denial proof.",
+    "Implement R88 AUTH_READY versus DATA_ROUTE_READY startup remediation in the next cumulative candidate.",
+    "Finish the remaining R75-R82 visual acceptance and only then open B3."
   ],
   "externalAutomation": {
     "attempted": true,
@@ -107,22 +108,60 @@
     "b3Open": false
   },
   "r87Execution": {
-    "status": "TEMPORARY_READONLY_IAM_DISCOVERY_ARMED",
+    "status": "PROGRAMMATIC_PATH_EXHAUSTED_CONSOLE_APPLY_REQUIRED",
     "exactOrigin": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
     "targetClientId": "646761409743-3e8osg24ojvp5nt20m7dln952os1s5d8.apps.googleusercontent.com",
+    "discoveryRunId": 36423957488,
+    "discoveryJobId": 108933217905,
+    "liveBindingPass": true,
+    "temporaryIam": {
+      "serviceAccount": "firebase-adminsdk-fbsvc@ays-orbit-360-lab.iam.gserviceaccount.com",
+      "addedRoles": [
+        "roles/oauthconfig.viewer",
+        "roles/serviceusage.serviceUsageConsumer"
+      ],
+      "addedPass": true,
+      "discoveredPermissions": [
+        "clientauthconfig.clients.get",
+        "clientauthconfig.clients.list",
+        "serviceusage.services.use"
+      ],
+      "updatePermissionPresent": false,
+      "rollbackPass": true,
+      "removedRoles": [
+        "roles/oauthconfig.viewer",
+        "roles/serviceusage.serviceUsageConsumer"
+      ],
+      "remainingTemporaryRoles": []
+    },
+    "endpointEvidence": {
+      "discovery": {
+        "httpStatus": 403,
+        "ok": false
+      },
+      "brand": {
+        "httpStatus": 400,
+        "ok": false
+      },
+      "listClients": {
+        "httpStatus": 404,
+        "ok": false
+      },
+      "getTarget": {
+        "httpStatus": 404,
+        "ok": false
+      }
+    },
+    "conclusion": "The available CI identity can be elevated reversibly for read-only OAuth config visibility, but no documented/supported programmatic surface exposed the existing web client's Authorized JavaScript origins for additive update. Google documentation directs this setting through Google Auth Platform > Clients. Further blind use of private/guessed endpoints or granting OAuth Config Editor is not authorized.",
+    "requiredExternalAction": "In Google Auth Platform > Clients, edit the existing web client and add only the exact current B2 Preview origin under Authorized JavaScript origins.",
     "mutationAuthorized": false,
-    "credentialRotationAuthorized": false,
-    "productionOriginMutationAuthorized": false,
-    "liveHostingPromotionAuthorized": false,
-    "dataWritesAuthorized": false,
-    "b3OpenAuthorized": false,
-    "temporaryIamElevationAuthorized": true,
-    "temporaryRoles": [
-      "roles/oauthconfig.viewer",
-      "roles/serviceusage.serviceUsageConsumer"
-    ],
-    "temporaryRolePurpose": "Read-only discovery of the existing OAuth client configuration and exact update contract.",
-    "temporaryRoleRollbackRequired": true,
-    "oauthClientMutationAuthorized": false
+    "oauthClientMutationExecuted": false,
+    "credentialRotationExecuted": false,
+    "productionOriginMutationExecuted": false,
+    "productionSecretTouched": false,
+    "liveHostingPromotionExecuted": false,
+    "dataWritesExecuted": 0,
+    "b3Opened": false,
+    "workflowEvidenceUploadHarnessIssue": "Artifact upload path used runner.temp while evidence file was written to /tmp. Discovery and IAM rollback themselves passed; workflow path corrected for future evidence."
   }
 }

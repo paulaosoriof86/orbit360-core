@@ -4929,7 +4929,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gravicentra-i6-5-b2-r87-oauth-discovery-${{ github.run_id }}
-          path: ${{ runner.temp }}/b2-r87-clientauthconfig-discovery.json
+          path: /tmp/b2-r87-clientauthconfig-discovery.json
           if-no-files-found: error
           compression-level: 0
           retention-days: 30
