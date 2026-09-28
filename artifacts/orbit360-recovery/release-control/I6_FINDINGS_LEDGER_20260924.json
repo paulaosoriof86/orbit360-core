@@ -3242,7 +3242,7 @@
       "block": "B2",
       "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "blocking": true,
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
       "receiptBlobSha": "c65658d17c6c3da5aa688c497b16235f1685c6f4",
@@ -3253,13 +3253,27 @@
       "surface": "Ops/Renovación aceptada/Registrar renovación",
       "classification": "PRODUCT_DEFECT_DOCUMENTARY_CONTRACT",
       "finding": "Firm-renewal registration requires documentary proof but exposed only a free-text documentRef field, with no canonical Drive file upload or selection of existing confirmed client documents.",
-      "rootCause": "Direct-renewal UI treated documentRef as manual text while the backend correctly requires document evidence.",
+      "rootCause": "Two-layer defect: the original UI lacked canonical support upload, and the exact Preview runtime then proved that resolve_management dropped renewal-specific closure fields after policy creation. The policy and Drive attachment persisted, but Firestore management did not persist directRenewalPolicyId/nuevaPolizaId.",
       "remediation": "Allow selecting an existing confirmed client document or uploading the firm policy/PDF through Orbit.secureResources; bind confirmed documentRef into the renewal management and new policy; refuse creation without confirmed support.",
       "productBlobSha": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
       "requiredProof": "New exact Preview: synthetic B2 firm-support upload/readback, management attachment linkage, direct renewal idempotence and reload.",
       "guardPassRunId": 36466197519,
       "sourceFixCommit": "30cbdf90dbcf090e7485fa996bc2ed1c5bd576b7",
-      "previewArmed": true
+      "previewArmed": true,
+      "sourceCandidateSha": "e70242ceadcedfaacc3ababb7a545a7645bf531f",
+      "runtimeDiagnostic": {
+        "runId": 36490640789,
+        "policyCreated": true,
+        "driveAttachmentPersisted": true,
+        "managementResolved": true,
+        "firestoreDirectRenewalPolicyIdMissing": true,
+        "browserOptimisticDirectRenewalPolicyIdPresent": true
+      },
+      "causalFix": {
+        "workflowResolutionFieldParity": true,
+        "backendBlobSha": "55ee18efd399bd1b54c00a29f7514de4efa6fb5e",
+        "contractBlobSha": "cbd307266abec395f1d158402773ea6f04c57560"
+      }
     },
     {
       "block": "B2",

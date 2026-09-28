@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R91_RESOLVE_WORKFLOW_FIELD_PARITY_ROOTFIX_20260928_V1",
+  "recordedAt": "2026-09-28T22:13:25.549Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+  "findingId": "B2-R91-RENEWAL-FIRM-SUPPORT-NO-CANONICAL-DRIVE-UPLOAD-R21",
+  "failedRuntimeRunId": 36490640789,
+  "diagnostic": {
+    "runId": 36490640789,
+    "policyCreated": true,
+    "driveAttachmentPersisted": true,
+    "managementResolved": true,
+    "firestoreDirectRenewalPolicyIdMissing": true,
+    "browserOptimisticDirectRenewalPolicyIdPresent": true
+  },
+  "rootCause": "Two-layer defect: the original UI lacked canonical support upload, and the exact Preview runtime then proved that resolve_management dropped renewal-specific closure fields after policy creation. The policy and Drive attachment persisted, but Firestore management did not persist directRenewalPolicyId/nuevaPolizaId.",
+  "fix": {
+    "sourceHead": "e70242ceadcedfaacc3ababb7a545a7645bf531f",
+    "backendBlobSha": "55ee18efd399bd1b54c00a29f7514de4efa6fb5e",
+    "contractBlobSha": "cbd307266abec395f1d158402773ea6f04c57560",
+    "workflowResolutionFieldParity": true
+  },
+  "preserved": {
+    "r77r81MachinePass": true,
+    "r93RuntimePassObservation": true,
+    "priorUnaffectedPasses": true
+  },
+  "boundaries": {
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "oldArtifactNotPatched": true
+  }
+}
