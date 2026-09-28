@@ -96,6 +96,17 @@ try{
   app=initializeApp({credential:cert(sa()),projectId:PROJECT},'b2-r77-r81-'+RUN);
   const db=getFirestore(app),auth=getAuth(app);
   const dataCol=name=>db.collection('tenants').doc(TENANT).collection('data').doc(name).collection('items');
+  let preRunDeleted=0;
+  for(const colName of ['gestiones','clientes']){
+    const stale=await dataCol(colName).where('qaFixtureType','==','B2_R77_R81_DRIVE_DURABLE').get();
+    for(const d of stale.docs){
+      const row=d.data()||{};
+      const refs=[...(Array.isArray(row.documentos)?row.documentos:[]),...(Array.isArray(row.adjuntos)?row.adjuntos:[])].filter(x=>x&&(x.documentRef||x.fileId||x.driveUrl||x.externalUrl));
+      if(refs.length||row.driveFolderId)throw new Error('B2_R77_R81_STALE_DRIVE_FIXTURE_REQUIRES_ORDERED_CLEANUP:'+colName+':'+d.id);
+      await d.ref.delete();preRunDeleted++;
+    }
+  }
+  evidence.cleanup.preRunOrphanRowsDeleted=preRunDeleted;
   const actor=await pickActor(db,auth);
   evidence.actor={uidHash:hash(actor.uid),advisorIdHash:hash(actor.advisorId),roles:actor.roles};
   const suffix=RUN.replace(/[^0-9A-Za-z_-]/g,'').slice(-24);
@@ -144,7 +155,7 @@ try{
     const cli=Orbit.store.get('clientes',clientId);
     if(!cli)return{ok:false,phase:'client_missing'};
     const previous=Array.isArray(cli.documentos)?cli.documentos.slice():[];
-    const doc={id:out.documentRef,nombre:out.nombre||f.name,documentRef:out.documentRef,driveUrl:out.driveUrl||out.externalUrl||'',externalUrl:out.externalUrl||out.driveUrl||'',mimeType:out.mimeType||f.type,size:f.size,origen:out.repository||'Drive',clienteId,categoria:'expediente_cliente',clientFolderId:out.clientFolderId||'',clientFolderUrl:out.clientFolderUrl||'',contentHash:out.contentHash||'',provenance:{source:'usuario',repository:'Drive',confirmed:true}};
+    const doc={id:out.documentRef,nombre:out.nombre||f.name,documentRef:out.documentRef,driveUrl:out.driveUrl||out.externalUrl||'',externalUrl:out.externalUrl||out.driveUrl||'',mimeType:out.mimeType||f.type,size:f.size,origen:out.repository||'Drive',clienteId:clientId,categoria:'expediente_cliente',clientFolderId:out.clientFolderId||'',clientFolderUrl:out.clientFolderUrl||'',contentHash:out.contentHash||'',provenance:{source:'usuario',repository:'Drive',confirmed:true}};
     const merged=previous.filter(x=>String(x?.documentRef||'')!==String(out.documentRef));merged.push(doc);
     const patch={documentos:merged,actualizado:new Date().toISOString().slice(0,10)};
     if(out.clientFolderId)patch.driveFolderId=out.clientFolderId;
@@ -159,7 +170,7 @@ try{
   const management=await page.evaluate(async ({managementId,clientId,advisorId})=>{
     return Orbit.ciclo.crearGestionDurable({
       id:managementId,lista:'Gestiones Admin',tipo:'Gestión QA documental',titulo:'B2 QA R77 adjunto Drive',
-      clienteId,polizaId:'',asesorId,prioridad:'Media',estado:'Pendiente',vence:new Date().toISOString().slice(0,10),
+      clienteId:clientId,polizaId:'',asesorId,prioridad:'Media',estado:'Pendiente',vence:new Date().toISOString().slice(0,10),
       proximaAccion:'Validar soporte documental QA',nota:'Fixture sintético B2 R77/R81',origen:'B2 QA',
       adjuntos:[],checklist:[{t:'Documentación adjunta',done:false}],qaFixture:true,qaFixtureType:'B2_R77_R81_DRIVE_DURABLE'
     });
@@ -169,9 +180,9 @@ try{
 
   const r77=await page.evaluate(async ({managementId,clientId,text,suffix})=>{
     const f=new File([text], 'b2-r77-'+suffix+'.txt', {type:'text/plain'});
-    const out=await Orbit.secureResources.uploadDocument(f,{entidad:'gestion',entidadId:managementId,clienteId,categoria:'soporte_gestion',nombre:f.name});
+    const out=await Orbit.secureResources.uploadDocument(f,{entidad:'gestion',entidadId:managementId,clienteId:clientId,categoria:'soporte_gestion',nombre:f.name});
     if(!out||out.ok!==true||!out.documentRef)return{ok:false,phase:'upload',out};
-    const doc={nombre:out.nombre||f.name,documentRef:out.documentRef,driveUrl:out.driveUrl||out.externalUrl||'',externalUrl:out.externalUrl||out.driveUrl||'',mimeType:out.mimeType||f.type,size:f.size,origen:out.repository||'Drive',clienteId,entidad:'gestion',entidadId:managementId,contentHash:out.contentHash||''};
+    const doc={nombre:out.nombre||f.name,documentRef:out.documentRef,driveUrl:out.driveUrl||out.externalUrl||'',externalUrl:out.externalUrl||out.driveUrl||'',mimeType:out.mimeType||f.type,size:f.size,origen:out.repository||'Drive',clienteId:clientId,entidad:'gestion',entidadId:managementId,contentHash:out.contentHash||''};
     await Orbit.store.updateDurable('gestiones',managementId,{adjuntos:[doc],documentoCargaPendiente:false,documentoCargaFallida:[],actualizado:new Date().toISOString().slice(0,10)});
     const g=Orbit.store.get('gestiones',managementId);
     return{ok:true,documentRef:out.documentRef,clientFolderId:out.clientFolderId||'',contentHash:out.contentHash||'',canonicalReadback:out.canonicalReadback===true,backendPersistent:out.backendPersistent===true,localLinked:Array.isArray(g?.adjuntos)&&g.adjuntos.some(x=>x?.documentRef===out.documentRef)};
