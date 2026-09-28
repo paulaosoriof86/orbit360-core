@@ -1851,9 +1851,8 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R84_CENTRAL_GUARD_PASS",
-    "R84_ONE_TIME_TENANT_BOOTSTRAP_AND_READBACK",
     "R84_NEW_EXACT_PREVIEW_READBACK",
+    "R84_ONE_TIME_TENANT_BOOTSTRAP_AND_READBACK",
     "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_AUTHORIZED_VIEW_DOWNLOAD",
     "R84_ACTIVE_ROLE_SCOPE_AND_CROSS_SCOPE_DENIAL",
     "R77_R81_CANONICAL_PROVIDER_PROOF",
@@ -3027,7 +3026,7 @@
     "findingId": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
     "decisionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
     "decisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
-    "status": "SOURCE_FIXED_PENDING_GUARD_AND_PREVIEW",
+    "status": "SOURCE_FIXED_GUARD_PASS_PREVIEW_ARMED",
     "perUserOAuthProductive": false,
     "tenantPersistentBackendAuthorityRequired": true,
     "routineUserGooglePromptAllowed": false,
@@ -3039,6 +3038,8 @@
     "sourceFixCommit": "3343616b2afd079af1597da09aba22d600ce72c2",
     "productFileCount": 69,
     "credentialStore": "SecretManager",
-    "tenantBootstrapRequired": true
+    "tenantBootstrapRequired": true,
+    "guardPassRunId": 36361993833,
+    "previewArmed": true
   }
 }
