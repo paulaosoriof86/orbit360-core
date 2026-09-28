@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "0aa45c421d2434a34c5f342f76eb53794a8a6095",
+    "b2ExecutionLockBlobSha": "41938481f572ebfea1ee6a7caa31c8789389c033",
     "b2": {
-      "status": "CANDIDATE_PENDING_PREVIEW",
+      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2102,11 +2102,11 @@
       ],
       "productMutationAuthorized": true,
       "sourcePendingFromHead": "1bdf084a660328ba977a5b253a16fa1ce26b0f12",
-      "sourceSha": "0813e689dcd753ae0d9e968223475014b3370b8b",
-      "buildId": "gi-i65-b2-0813e689dcd7-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36366681569-osy5c3a6.web.app",
-      "runId": 36366681569,
-      "artifactId": 10946594995,
+      "sourceSha": "1255031fdd430c4cff0e8b143add8d0e6e818481",
+      "buildId": "gi-i65-b2-1255031fdd43-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36414260906-1gr3fqh4.web.app",
+      "runId": 36414260906,
+      "artifactId": 10966677594,
       "exactReadback": true,
       "functionalPass": true,
       "authenticatedPreviewProof": "SUPERSEDED_BY_R83_DRIVE_DOWNLOAD_SOURCE_FIX",
