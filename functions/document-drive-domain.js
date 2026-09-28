@@ -59,7 +59,10 @@ async function ensureVaultSecret(tenantId,previewOnly){
   }
 }
 async function readVault(tenantId,previewOnly){
+  const parent=vaultParent(tenantId,previewOnly);
   try{
+    const[versions]=await secrets.listSecretVersions({parent,filter:'state=ENABLED',pageSize:1});
+    if(!Array.isArray(versions)||versions.length===0)return null;
     const[v]=await secrets.accessSecretVersion({name:vaultLatest(tenantId,previewOnly)});
     const raw=v&&v.payload&&v.payload.data?Buffer.from(v.payload.data).toString('utf8'):'';
     if(!raw)return null;
@@ -67,8 +70,9 @@ async function readVault(tenantId,previewOnly){
     if(!out||out.tenantId!==tenantId||!clean(out.refreshToken,4096))return null;
     return out;
   }catch(e){
-    if(Number(e&&e.code)===5)return null;
-    throw new HttpsError('unavailable','No fue posible consultar la conexión segura con Drive.');
+    const code=Number(e&&e.code);
+    if(code===5)return null;
+    throw new HttpsError('unavailable','No fue posible consultar la conexión segura con Drive.',{vaultState:'read_failed',code:String(code||'')});
   }
 }
 async function writeVault(tenantId,vault,previewOnly){

@@ -2620,7 +2620,7 @@
       "rootCause": "product-drive-document-provider-p0.js forces Google prompt=consent and memory_only token persistence; document-drive-domain.js requires googleAccessToken from the browser for status/upload. The same model would repeat in LIVE.",
       "remediation": "Replace routine per-user OAuth with persistent tenant-level backend Drive integration. Gravicentra role/scope becomes the authorization boundary; Drive credential remains backend-only.",
       "requiredProof": "one-time tenant bootstrap succeeds and readback persists; fresh user browser has zero Google consent/account selection; authorized client document read/download/upload works by active role/scope; cross-scope access denied; no Drive token in browser storage; Preview synthetic isolation preserved; audit receipt present; cleanup synthetic fixture",
-      "status": "SOURCE_FIXED_PREVIEW_SECRET_ISOLATION_PENDING_GUARD_AND_NEW_PREVIEW",
+      "status": "EMPTY_VAULT_SOURCE_FIXED_PENDING_GUARD_AND_NEW_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
       "receiptBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
       "noLive": true,
@@ -2645,17 +2645,17 @@
       "closureState": "NOT_CLOSED",
       "managementSurfacePersistentModel": true,
       "latestFailure": {
-        "runId": 36362404589,
-        "jobId": 108742569247,
-        "code": "B2_R84_TENANT_DRIVE_NOT_AVAILABLE_FUNCTIONS_UNAVAILABLE",
-        "classification": "PREVIEW_SECRET_IAM_AND_VAULT_PREPROVISION_GAP",
-        "productRegressionDemonstrated": true
+        "runId": 36362935245,
+        "jobId": 108744648482,
+        "code": "FUNCTIONS_UNAVAILABLE_AFTER_IAM_PROPAGATION_RETRY",
+        "classification": "EMPTY_PREPROVISIONED_SECRET_READ_PATH"
       },
       "previewSecretIsolation": true,
       "previewSecretPattern": "orbit360-drive-oauth-preview-{tenant}",
       "productionSecretPattern": "orbit360-drive-oauth-{tenant}",
       "previousTechnicalPreviewPassPreserved": true,
-      "authenticatedPreviewPass": false
+      "authenticatedPreviewPass": false,
+      "emptyVaultSemantics": "NO_ENABLED_VERSION => tenant_setup_required"
     }
   ],
   "phaseBBacklog": [
