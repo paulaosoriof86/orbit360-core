@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "SOURCE_FIXED_PENDING_GUARD",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -216,7 +216,9 @@
     "reportedPaymentProjection": true,
     "r15R15aSourceFixed": true,
     "r15R15aExactPreviewPass": false,
-    "humanDriveOAuthUploadReadback": false
+    "humanDriveOAuthUploadReadback": false,
+    "mobileTenantBrandingVisual": true,
+    "client360MobileSearchVisual": true
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING",
@@ -258,16 +260,14 @@
     "noHardcodedIdentities": true
   },
   "candidate": {
-    "status": "CANDIDATE_PENDING_PREVIEW",
+    "status": "SOURCE_FIXED_PENDING_GUARD",
     "sourceCandidateSha": "8b9da11fb8acb0a9a7d5d9dc2f5b0599f43d660c",
     "governanceHeadBeforeCandidateArm": "8b9da11fb8acb0a9a7d5d9dc2f5b0599f43d660c",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "b30177f9498c472ef735b264a40e2bb707294571",
+    "compositionLockBlobSha": "2bee7ca187241a2a4a21692741c55c945c995389",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "7b65a0ecb94879775823ab4ac5589387e9c15b05",
+    "findingLedgerBlobSha": "0d5b208f3e2e3529f0b5d44f430ba29f956090ac",
     "blockingFindingIds": [
-      "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
-      "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
       "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
@@ -292,7 +292,16 @@
     "humanDownloadRetestRequired": false,
     "tenantBootstrapRequired": true,
     "routineUserGoogleOAuth": false,
-    "sourceFixCommitPendingArm": false
+    "sourceFixCommitPendingArm": true,
+    "sourceCandidateParentHead": "5d52efe68c3663f8fa243d19abfa7d918ca9ad07",
+    "changedProductFiles": [
+      "orbit360-platform/modules/cliente360.js"
+    ],
+    "changedProductBlobs": {
+      "orbit360-platform/modules/cliente360.js": "40edf8a6f7818328255f32524255b58a51eecf0f"
+    },
+    "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
+    "visualReceiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63"
   },
   "preview": {
     "sourceSha": "0813e689dcd753ae0d9e968223475014b3370b8b",
@@ -1853,13 +1862,14 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
+    "CENTRAL_GUARD_PASS",
     "R84_NEW_EXACT_PREVIEW_READBACK",
     "R84_ONE_TIME_TENANT_BOOTSTRAP_AND_READBACK",
     "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_AUTHORIZED_VIEW_DOWNLOAD",
     "R84_ACTIVE_ROLE_SCOPE_AND_CROSS_SCOPE_DENIAL",
     "R77_R81_CANONICAL_PROVIDER_PROOF",
     "DRIVE_QA_FIXTURE_CLEANUP",
-    "PAULA_VISUAL_ACCEPTANCE"
+    "PAULA_VISUAL_ACCEPTANCE_REMAINING_R75_R82"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -3058,5 +3068,39 @@
     "previewFunctionRevision": "orbit360documentdrivestatuspreview-00007-poy",
     "productionSecretTouched": false,
     "sourceFixCommitPendingArm": false
+  },
+  "paulaVisualPartial20260928": {
+    "status": "PARTIAL_PASS_DRIVE_REMEDIATION_REQUIRED",
+    "exactPreview": {
+      "sourceSha": "0813e689dcd753ae0d9e968223475014b3370b8b",
+      "buildId": "gi-i65-b2-0813e689dcd7-57f234755dc1",
+      "runId": 36366681569,
+      "artifactId": 10946594995,
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36366681569-osy5c3a6.web.app"
+    },
+    "closedIds": [
+      "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
+      "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15"
+    ],
+    "remainingHumanVisualIds": [
+      "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
+      "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
+      "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
+      "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
+      "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
+      "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
+      "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
+      "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A"
+    ],
+    "drive": {
+      "externalDriveAccountChooserObserved": true,
+      "inAppPreviewAvailable": false,
+      "inAppDownloadAvailable": false,
+      "configureDriveActionVisible": false,
+      "backendState": "tenant_setup_required",
+      "sourceRootCauseFixed": true
+    },
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
+    "receiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63"
   }
 }

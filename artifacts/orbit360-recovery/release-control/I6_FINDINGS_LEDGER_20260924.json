@@ -2349,11 +2349,11 @@
       "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Shell/Branding/Mobile",
       "classification": "PRODUCT_DEFECT_RESPONSIVE_BRANDING_OWNER",
-      "blocking": true,
+      "blocking": false,
       "finding": "Mobile header shows Gravicentra Insurance instead of configured tenant brand/logo.",
       "rootCause": "base.css hides .tb-logo at max-width:880px while public-tenant-branding renders tenant logo into .tb-logo; product brand remains visible.",
       "requiredProof": "On mobile and desktop, tenant brand/logo is visible according to approved shell hierarchy without losing Gravicentra product identity where applicable.",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+      "status": "PAULA_VISUAL_PASS_EXACT_PREVIEW_20260928",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
@@ -2362,8 +2362,17 @@
       "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
       "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
       "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
-      "closureState": "NOT_CLOSED",
-      "previewProofRequired": true
+      "closureState": "CLOSED",
+      "previewProofRequired": false,
+      "closedAt": "2026-09-28",
+      "exactPreviewVisualProof": {
+        "sourceSha": "0813e689dcd753ae0d9e968223475014b3370b8b",
+        "buildId": "gi-i65-b2-0813e689dcd7-57f234755dc1",
+        "runId": 36366681569,
+        "artifactId": 10946594995,
+        "url": "https://ays-orbit-360-lab--gi-i65-b2-36366681569-osy5c3a6.web.app",
+        "source": "PAULA_MOBILE_UAT_20260928"
+      }
     },
     {
       "id": "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
@@ -2371,11 +2380,11 @@
       "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Cliente360/Listado/Mobile",
       "classification": "PRODUCT_DEFECT_CSS_SELECTOR_COLLISION",
-      "blocking": true,
+      "blocking": false,
       "finding": "Cliente 360 mobile list exposes filters but no free-text search.",
       "rootCause": "Cliente360 list search reuses .tb-search; global mobile CSS hides .tb-search at max-width:980px.",
       "requiredProof": "Cliente360 free-text search remains visible and usable on mobile and desktop, without changing topbar mobile-search behavior.",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+      "status": "PAULA_VISUAL_PASS_EXACT_PREVIEW_20260928",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
       "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
       "noLive": true,
@@ -2384,8 +2393,17 @@
       "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
       "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
       "r15ContractPath": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
-      "closureState": "NOT_CLOSED",
-      "previewProofRequired": true
+      "closureState": "CLOSED",
+      "previewProofRequired": false,
+      "closedAt": "2026-09-28",
+      "exactPreviewVisualProof": {
+        "sourceSha": "0813e689dcd753ae0d9e968223475014b3370b8b",
+        "buildId": "gi-i65-b2-0813e689dcd7-57f234755dc1",
+        "runId": 36366681569,
+        "artifactId": 10946594995,
+        "url": "https://ays-orbit-360-lab--gi-i65-b2-36366681569-osy5c3a6.web.app",
+        "source": "PAULA_MOBILE_UAT_20260928"
+      }
     },
     {
       "id": "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
@@ -2607,7 +2625,22 @@
         "authenticatedPreviewPass": true
       },
       "humanDownloadRetestPending": false,
-      "supersededRetestReason": "Do not certify download through per-user memory-only OAuth after explicit tenant-persistent product rule."
+      "supersededRetestReason": "Do not certify download through per-user memory-only OAuth after explicit tenant-persistent product rule.",
+      "currentVisual20260928": {
+        "exactPreview": {
+          "sourceSha": "0813e689dcd753ae0d9e968223475014b3370b8b",
+          "buildId": "gi-i65-b2-0813e689dcd7-57f234755dc1",
+          "runId": 36366681569,
+          "artifactId": 10946594995,
+          "url": "https://ays-orbit-360-lab--gi-i65-b2-36366681569-osy5c3a6.web.app"
+        },
+        "inAppPreview": "UNAVAILABLE",
+        "inAppDownload": "UNAVAILABLE",
+        "directDriveOpen": "EXTERNAL_GOOGLE_SURFACE_REACHED",
+        "externalGoogleAccountChooserObserved": true,
+        "blockedByR84TenantBootstrap": true,
+        "classification": "R83_RETEST_REMAINS_SUPERSEDED_BY_R84"
+      }
     },
     {
       "id": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
@@ -2620,7 +2653,7 @@
       "rootCause": "product-drive-document-provider-p0.js forces Google prompt=consent and memory_only token persistence; document-drive-domain.js requires googleAccessToken from the browser for status/upload. The same model would repeat in LIVE.",
       "remediation": "Replace routine per-user OAuth with persistent tenant-level backend Drive integration. Gravicentra role/scope becomes the authorization boundary; Drive credential remains backend-only.",
       "requiredProof": "one-time tenant bootstrap succeeds and readback persists; fresh user browser has zero Google consent/account selection; authorized client document read/download/upload works by active role/scope; cross-scope access denied; no Drive token in browser storage; Preview synthetic isolation preserved; audit receipt present; cleanup synthetic fixture",
-      "status": "PREVIEW_VAULT_CONTEXT_SOURCE_FIXED_PENDING_GUARD_AND_NEW_PREVIEW",
+      "status": "SOURCE_FIXED_BOOTSTRAP_SURFACE_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
       "receiptBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
       "noLive": true,
@@ -2665,7 +2698,27 @@
       "runtimeRootCause": "orbit360DocumentDriveStatusPreview calls status(request,true), but status() invoked readVault(tenantId) without previewOnly. That dropped Preview vault context and could query the production vault while the Preview preflight intentionally authorized only orbit360-drive-oauth-preview-{tenant}.",
       "runtimeRemediation": "Preserve previewOnly in status() by calling readVault(tenantId,previewOnly); keep production vault untouched.",
       "sourcePatchParentHead": "1d4644478bf0fa05db1db447b1cfad92bb758a6f",
-      "sourceFixCommitPendingArm": true
+      "sourceFixCommitPendingArm": true,
+      "visualEvidence20260928": {
+        "exactPreview": {
+          "sourceSha": "0813e689dcd753ae0d9e968223475014b3370b8b",
+          "buildId": "gi-i65-b2-0813e689dcd7-57f234755dc1",
+          "runId": 36366681569,
+          "artifactId": 10946594995,
+          "url": "https://ays-orbit-360-lab--gi-i65-b2-36366681569-osy5c3a6.web.app"
+        },
+        "automaticNewGoogleLinkPromptObserved": false,
+        "externalDriveAccountChooserObserved": true,
+        "inAppPreviewAvailable": false,
+        "inAppDownloadAvailable": false,
+        "configureDriveActionVisible": false,
+        "interpretation": "External Drive account selection is not the tenant bootstrap and does not satisfy R84. Authenticated Preview already proved tenant_setup_required; the UI failed to surface that asynchronous backend state."
+      },
+      "uiRootCause": "Cliente360 reads documentUploadStatus synchronously while the R84 provider probes asynchronously; bootstrapRequired arrives later but the Documentos tab is not rerendered, so Dirección never sees the one-time Configurar Drive action.",
+      "uiRemediation": "When the backend probe returns bootstrapRequired for Dirección/Admin roles and the setup action is absent, rerender the same Documentos tab once so the existing tenant-level Configurar Drive control becomes visible.",
+      "latestProductBlob": {
+        "orbit360-platform/modules/cliente360.js": "40edf8a6f7818328255f32524255b58a51eecf0f"
+      }
     }
   ],
   "phaseBBacklog": [

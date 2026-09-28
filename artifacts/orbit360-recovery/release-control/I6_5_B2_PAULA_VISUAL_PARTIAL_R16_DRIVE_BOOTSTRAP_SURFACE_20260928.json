@@ -1,0 +1,56 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_PAULA_VISUAL_PARTIAL_R16_20260928_V1",
+  "status": "SOURCE_FIXED_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
+  "recordedAt": "2026-09-28",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "parentHead": "5d52efe68c3663f8fa243d19abfa7d918ca9ad07",
+  "exactPreviewReviewed": {
+    "sourceSha": "0813e689dcd753ae0d9e968223475014b3370b8b",
+    "buildId": "gi-i65-b2-0813e689dcd7-57f234755dc1",
+    "runId": 36366681569,
+    "artifactId": 10946594995,
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36366681569-osy5c3a6.web.app"
+  },
+  "acceptedVisualFindings": [
+    "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
+    "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15"
+  ],
+  "driveEvidence": {
+    "automaticNewGoogleLinkPromptObserved": false,
+    "externalDriveAccountChooserObserved": true,
+    "inAppPreviewAvailable": false,
+    "inAppDownloadAvailable": false,
+    "configureDriveActionVisible": false,
+    "backendPriorProof": "tenant_setup_required",
+    "interpretation": "The external Google account chooser came from explicitly opening Google Drive. It is not the one-time tenant bootstrap. In-app preview/download remain unaccepted until the tenant backend vault is configured."
+  },
+  "rootCause": "The Documentos surface consumed provider status synchronously while R84 status resolves asynchronously. A first render in checking state never rerendered when bootstrapRequired arrived, hiding the existing one-time Configurar Drive control.",
+  "remediation": {
+    "changedProductFiles": [
+      "orbit360-platform/modules/cliente360.js"
+    ],
+    "productBlob": "40edf8a6f7818328255f32524255b58a51eecf0f",
+    "behavior": "Administrative roles rerender the same Documentos tab once when a forced provider probe confirms bootstrapRequired, exposing the existing tenant-level setup action.",
+    "routineUserGoogleOAuth": false,
+    "browserDriveTokenPersistence": false
+  },
+  "boundaries": {
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3Open": false,
+    "productionSecretTouched": false
+  },
+  "nextRequiredProof": [
+    "CENTRAL_GUARD_PASS",
+    "NEW_EXACT_B2_PREVIEW_READBACK",
+    "R84_ONE_TIME_TENANT_BOOTSTRAP_AND_READBACK",
+    "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_IN_APP_VIEW_DOWNLOAD_UPLOAD",
+    "R84_ACTIVE_ROLE_SCOPE_AND_CROSS_SCOPE_DENIAL",
+    "R77_R81_CANONICAL_PROVIDER_PROOF",
+    "DRIVE_QA_FIXTURE_CLEANUP",
+    "REMAINING_PAULA_VISUAL_R75_R82"
+  ]
+}

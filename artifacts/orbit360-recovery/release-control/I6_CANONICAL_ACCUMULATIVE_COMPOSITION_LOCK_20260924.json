@@ -157,7 +157,7 @@
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "2d7db2a218459bb5a6239845f0e277db12aa5490",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
-    "orbit360-platform/modules/cliente360.js": "4238530434e650394d12301754aab4f9ba77cc22",
+    "orbit360-platform/modules/cliente360.js": "40edf8a6f7818328255f32524255b58a51eecf0f",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "cba6099ff7499c452c99f283702f27886154ae23",
     "orbit360-platform/modules/cobros.js": "db8ae9c55d32ea922bb8aa371700b80826e40998",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
@@ -202,71 +202,42 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "origin": "R84_AUTHENTICATED_PREVIEW_FAILURE_ROOT_CAUSE_20260927",
-    "parentHead": "1d4644478bf0fa05db1db447b1cfad92bb758a6f",
-    "candidateHead": "3343616b2afd079af1597da09aba22d600ce72c2",
-    "status": "R84_PREVIEW_VAULT_CONTEXT_SOURCE_FIXED_PENDING_GUARD",
+    "origin": "PAULA_VISUAL_R16_20260928_R73_R74_PASS_R84_BOOTSTRAP_SURFACE_DEFECT",
+    "parentHead": "5d52efe68c3663f8fa243d19abfa7d918ca9ad07",
+    "status": "SOURCE_FIXED_PENDING_GUARD_AND_NEW_EXACT_PREVIEW",
     "changedProductFiles": [
-      "functions/document-drive-domain.js"
+      "orbit360-platform/modules/cliente360.js"
     ],
-    "rootCauses": [
-      "mobile CSS hid tenant logo and Cliente360 search",
-      "Cliente360 renewal layout had fixed-width overflow",
-      "management creation had split owners across Ops/client/renewal surfaces",
-      "document attachment paths could claim success without durable Drive file readback",
-      "delete semantics were fragmented by module",
-      "policy detail lacked canonical renewal-window action",
-      "policy vehicle linker deduplicated by raw id instead of normalized identity/lineage"
+    "changedProductBlobs": {
+      "orbit360-platform/modules/cliente360.js": "40edf8a6f7818328255f32524255b58a51eecf0f"
+    },
+    "closedVisualFindings": [
+      "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
+      "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15"
     ],
-    "fixes": [
-      "mobile branding/search/renewal responsive contracts",
-      "single canonical Ops management creation editor",
-      "delegated Google OAuth Drive provider with memory-only token and readback",
-      "canonical fail-closed cross-module delete owner",
-      "0-45 day policy renewal entrypoint into proposal workflow",
-      "normalized vehicle candidate identity with history preservation"
+    "openDriveFindings": [
+      "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
+      "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16"
     ],
+    "rootCause": "ASYNC_DRIVE_STATUS_DID_NOT_RERENDER_DOCUMENTOS_TO_SURFACE_TENANT_BOOTSTRAP",
+    "fix": "RERENDER_DOCUMENTOS_ON_BOOTSTRAP_REQUIRED_FOR_ADMINISTRATIVE_ROLE",
     "documentRepository": "Google Drive",
     "documentAuth": "TENANT_PERSISTENT_BACKEND_SECRET_MANAGER",
-    "serviceAccountDriveOwnership": false,
-    "humanOAuthProofRequired": false,
-    "noDataReimport": true,
-    "noLive": true,
-    "noB3": true,
-    "latestCausalFix": "STATUS_PRESERVES_PREVIEWONLY_TO_READVAULT",
-    "previewDocumentIsolation": "_GRAVICENTRA_PREVIEW_QA_ONLY",
-    "findingLedgerBlobSha": "7b65a0ecb94879775823ab4ac5589387e9c15b05",
-    "humanDownloadRetestRequired": true,
-    "exactPreview": {
-      "sourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
-      "buildId": "gi-i65-b2-31f2ddc2ac8a-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
-      "runId": 36349185236,
-      "artifactId": 10942010623,
-      "artifactDigest": "5955a952e9a8aebf1efaf73f6dc8981e220bbb4e269834fd9eb9047b087edb8a",
-      "exactReadback": true,
-      "functionalPass": true,
-      "authenticatedPreviewPass": true
-    },
-    "governanceDecisionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R16_PERSISTENT_TENANT_DRIVE_AUTHORITY_20260927.json",
-    "governanceDecisionBlobSha": "10574608bf8cc42456206b7bedd26e0f7ae8a676",
     "routineUserGoogleOAuth": false,
     "tenantBootstrapRequired": true,
     "browserDriveTokenAllowed": false,
-    "previewDriveSecretPattern": "orbit360-drive-oauth-preview-{tenant}",
-    "productionDriveSecretPattern": "orbit360-drive-oauth-{tenant}",
-    "previousExactPreviewSourceSha": "1300b80298b6075f508481a16289d5d31688f4fb",
-    "previousExactPreviewRunId": 36362404589,
-    "previousTechnicalPassPreserved": true,
-    "previousAuthenticatedRetries": [
-      36362935245
-    ],
-    "runtimeRootCause": "Preview Drive status dropped previewOnly before readVault and therefore used the wrong Secret Manager vault namespace.",
-    "previousAuthenticatedFailureRunId": 36366076644,
-    "effectiveServiceAccount": "orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com",
-    "previewFunctionRegion": "us-east1",
-    "previewFunctionRevision": "orbit360documentdrivestatuspreview-00007-poy",
-    "cloudLoggingRead": "DENIED_403_NO_LOG_VIEW",
-    "productionSecretTouched": false
+    "exactPreviewReviewed": {
+      "sourceSha": "0813e689dcd753ae0d9e968223475014b3370b8b",
+      "buildId": "gi-i65-b2-0813e689dcd7-57f234755dc1",
+      "runId": 36366681569,
+      "artifactId": 10946594995,
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36366681569-osy5c3a6.web.app"
+    },
+    "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
+    "evidenceReceiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63",
+    "findingLedgerBlobSha": "0d5b208f3e2e3529f0b5d44f430ba29f956090ac",
+    "noDataReimport": true,
+    "noLive": true,
+    "noB3": true
   }
 }

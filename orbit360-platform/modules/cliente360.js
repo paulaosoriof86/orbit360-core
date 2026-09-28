@@ -741,6 +741,23 @@ Orbit.modules.cliente360 = (function () {
       if (!st || st.available !== true) { c360toast((st && st.message) || 'El repositorio documental no está disponible.'); return false; }
       return true;
     }
+    // R84: document provider status resolves asynchronously. If the first render
+    // happened while status was still "checking", refresh this tab once when
+    // the backend confirms that the tenant needs its one-time Drive bootstrap.
+    const driveProvider = Orbit.productDriveDocumentProviderP0;
+    const activeDriveRole = (() => {
+      try { return String(Orbit.session && Orbit.session.rol ? Orbit.session.rol() : '').trim(); }
+      catch (_) { return ''; }
+    })();
+    const mayBootstrapDrive = /^(Dirección|Direccion|SuperAdmin|AdminTenant|Admin)$/i.test(activeDriveRole);
+    if (driveProvider && typeof driveProvider.probe === 'function' && mayBootstrapDrive && !body.querySelector('[data-doc-bootstrap]')) {
+      driveProvider.probe(true).then(st => {
+        if (!st || st.bootstrapRequired !== true) return;
+        if (document.getElementById('c360-body') !== body || tab !== 'documentos') return;
+        Orbit.modules.cliente360.reabrir(cid, 'documentos');
+      }).catch(() => {});
+    }
+
     const bootstrap = body.querySelector('[data-doc-bootstrap]');
     if (bootstrap) bootstrap.addEventListener('click', async () => {
       const provider = Orbit.productDriveDocumentProviderP0;
