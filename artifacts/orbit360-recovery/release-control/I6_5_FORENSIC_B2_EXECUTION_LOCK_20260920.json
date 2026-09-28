@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -347,7 +347,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PASS",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "2a343b1fb871e0468b26d16666fcc27b8ebdca25",
     "exactPreviewBuildId": "gi-i65-b2-2a343b1fb871-57f234755dc1",
@@ -427,7 +427,7 @@
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
-    "runId": 36349185236,
+    "runId": 36418353246,
     "scope": {
       "operativo": "all",
       "asesor": "own",
@@ -455,9 +455,9 @@
       "individualReceiptPortfolioSync": true,
       "reportedPaymentVisible": true,
       "reportedPaymentDoesNotFabricateCobro": true,
-      "clientIdHash": "04cb7e26967b34d04fbc7ed1f8e75e67d27cd05fccf52b453eb1ba381bd4ed02",
-      "policyIdHash": "30eafc34a2a12c48f59c85b582ae04fc34684b42683a2e16d9abc4db86c1bbdc",
-      "vehicleIdHash": "78fbab0078e530731e87fe49eb9bedd1697ff7a42a00ff12f62d07432168653f",
+      "clientIdHash": "d231dfebcb54da65fbb7703c58866e3c969d379eee647af2ce891e3832721529",
+      "policyIdHash": "16aa5adea43944490cdff3313dff440e61786d24ed1b1908fe4d4f1b8cf2eefa",
+      "vehicleIdHash": "f4bc14eec57bef72bc9eaaf94d19d1f7bdff98b40bbffad9c675ac3234b947b4",
       "clientCreateReadback": true,
       "clientEditReadback": true,
       "policyCreateReadback": true,
@@ -473,8 +473,8 @@
       "dirtyBackdropProtected": true
     },
     "renewal": {
-      "requestIdHash": "0c9d586c719e4a3736c404c925b20398bfd267b0d039d65acd2470b77ed03053",
-      "newPolicyIdHash": "65b8c7d5f27e092988493c69748ce1dc9ccb242ffe39e83b36883ad6389a32bc",
+      "requestIdHash": "6d50895862b425b71df161918e9938aa0615fa27f128001a53346507d52b0614",
+      "newPolicyIdHash": "bb925e316ed0637ec0c83b8ea58eb866e1663ac976ed9d23085297b3f5619542",
       "sourceLink": true,
       "receipts": 2,
       "portfolio": 2,
@@ -485,14 +485,14 @@
     },
     "cleanup": {
       "preRunAssetsDeleted": 0,
-      "deleted": 48,
+      "deleted": 58,
       "clientAbsent": true,
       "insurerAbsent": true,
       "assetPrefixResidual": 0,
       "assetAbsent": true
     },
     "syntheticWrites": 23,
-    "cleanupWrites": 48,
+    "cleanupWrites": 58,
     "visualEvidenceRecapture": true,
     "visualReceiptRecapture": true,
     "lastFailureRunId": 36270785111,
