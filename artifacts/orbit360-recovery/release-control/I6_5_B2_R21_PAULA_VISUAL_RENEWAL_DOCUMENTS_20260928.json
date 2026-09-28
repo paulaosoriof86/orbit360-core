@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928_V1",
-  "status": "PREVIEW_RETRY_AFTER_STALE_VALIDATOR_FIX",
+  "status": "MACHINE_PROOF_DISPATCHED_AFTER_PAULA_DRIVE_PASS",
   "recordedAt": "2026-09-28",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -131,5 +131,36 @@
     "path": "tools/gravicentra-i6-5-b2-functional.mjs",
     "blobSha": "461c8c4dc42c34c92061a2a70034b8bd4f9e7526",
     "change": "Validator now expects canonical label Crear solicitud de emisión en Ops instead of superseded Solicitar emisión a aseguradora."
+  },
+  "latestPaulaEvidence": {
+    "recordedAt": "2026-09-28",
+    "source": "PAULA_DESKTOP_UAT",
+    "persistentTenantConnected": true,
+    "inAppPreviewVisible": true,
+    "downloadConfirmed": true,
+    "directDriveOpenConfirmed": true,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
+    "note": "Drive human proof accepted; machine proof continues on current exact R21 Preview for synthetic upload/readback and remaining runtime findings."
+  },
+  "machineProofDispatch": {
+    "requested": true,
+    "exactPreview": {
+      "sourceSha": "279b933a8c350e5815010315f72338b126f70585",
+      "buildId": "gi-i65-b2-279b933a8c35-57f234755dc1",
+      "runId": 36466885781,
+      "artifactId": 10990040716,
+      "artifactDigest": "32c3e6ef24c3e39017f4a5e9f43931d3d2385aa7f0821218ee2101b3d6ee33af",
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36466885781-lqihfgee.web.app"
+    },
+    "required": [
+      "R77_R81_SYNTHETIC_B2_DRIVE_UPLOAD_AND_DURABLE_READBACK",
+      "R91_R92_R93_R94_R95_EXACT_PREVIEW_RUNTIME",
+      "R82_CROSS_MODULE_DELETE_FINAL_AUDIT",
+      "DRIVE_QA_FIXTURE_CLEANUP"
+    ],
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "productSourceMutation": false
   }
 }

@@ -1894,8 +1894,6 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "CENTRAL_GUARD_PASS",
-    "R21_NEW_EXACT_B2_PREVIEW_READBACK",
     "R77_R81_SYNTHETIC_B2_DRIVE_UPLOAD_AND_DURABLE_READBACK",
     "R91_R92_R93_R94_R95_EXACT_PREVIEW_RUNTIME",
     "R82_CROSS_MODULE_DELETE_FINAL_AUDIT",
@@ -3336,7 +3334,7 @@
     ]
   },
   "r21": {
-    "status": "GUARD_PASS_PREVIEW_ARMED",
+    "status": "MACHINE_PROOF_DISPATCHED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
     "receiptBlobSha": "3a560ab7de3fdb5c844cf91f1bb9deb43928ad7a",
     "paulaVisualClosed": [
@@ -3377,6 +3375,31 @@
       "code": "B2_R9_CLIENT_OPS_RENEWAL_BRANCHES_MISSING",
       "productSourceDefect": false
     },
-    "validatorFixBlobSha": "461c8c4dc42c34c92061a2a70034b8bd4f9e7526"
+    "validatorFixBlobSha": "461c8c4dc42c34c92061a2a70034b8bd4f9e7526",
+    "latestPaulaDriveEvidence": {
+      "persistentTenantConnected": true,
+      "inAppPreviewVisible": true,
+      "downloadConfirmed": true,
+      "directDriveOpenConfirmed": true,
+      "recordedAt": "2026-09-28"
+    },
+    "machineProofDispatch": {
+      "requested": true,
+      "exactPreview": {
+        "sourceSha": "279b933a8c350e5815010315f72338b126f70585",
+        "buildId": "gi-i65-b2-279b933a8c35-57f234755dc1",
+        "channelId": "gi-i65-b2-36466885781",
+        "url": "https://ays-orbit-360-lab--gi-i65-b2-36466885781-lqihfgee.web.app",
+        "runId": 36466885781,
+        "artifactId": 10990040716,
+        "artifactDigest": "32c3e6ef24c3e39017f4a5e9f43931d3d2385aa7f0821218ee2101b3d6ee33af",
+        "exactReadback": true,
+        "functionalPass": true,
+        "livePromoted": false
+      },
+      "productSourceMutation": false,
+      "livePromotion": false,
+      "b3Advance": false
+    }
   }
 }

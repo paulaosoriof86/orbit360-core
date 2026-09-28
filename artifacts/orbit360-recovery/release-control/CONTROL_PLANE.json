@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "8b64aa786094c758a4f7886c943a466a54efbb55",
+    "b2ExecutionLockBlobSha": "e29436ce3ee288e96b32f8032e40108e2ff39cdb",
     "b2": {
       "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2713,7 +2713,7 @@
         ]
       },
       "r21": {
-        "status": "GUARD_PASS_PREVIEW_ARMED",
+        "status": "MACHINE_PROOF_DISPATCHED",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R21_PAULA_VISUAL_RENEWAL_DOCUMENTS_20260928.json",
         "receiptBlobSha": "3a560ab7de3fdb5c844cf91f1bb9deb43928ad7a",
         "paulaVisualClosed": [
@@ -2746,7 +2746,29 @@
           "classification": "STALE_VALIDATOR_ONLY",
           "productSourceDefect": false
         },
-        "validatorFixBlobSha": "461c8c4dc42c34c92061a2a70034b8bd4f9e7526"
+        "validatorFixBlobSha": "461c8c4dc42c34c92061a2a70034b8bd4f9e7526",
+        "exactPreview": {
+          "sourceSha": "279b933a8c350e5815010315f72338b126f70585",
+          "buildId": "gi-i65-b2-279b933a8c35-57f234755dc1",
+          "channelId": "gi-i65-b2-36466885781",
+          "url": "https://ays-orbit-360-lab--gi-i65-b2-36466885781-lqihfgee.web.app",
+          "runId": 36466885781,
+          "artifactId": 10990040716,
+          "artifactDigest": "32c3e6ef24c3e39017f4a5e9f43931d3d2385aa7f0821218ee2101b3d6ee33af",
+          "exactReadback": true,
+          "functionalPass": true,
+          "livePromoted": false
+        },
+        "latestPaulaDriveEvidence": {
+          "persistentTenantConnected": true,
+          "inAppPreviewVisible": true,
+          "downloadConfirmed": true,
+          "directDriveOpenConfirmed": true,
+          "recordedAt": "2026-09-28"
+        },
+        "productSourceMutation": false,
+        "livePromotion": false,
+        "b3Advance": false
       }
     },
     "dashboardRealityGate": {
