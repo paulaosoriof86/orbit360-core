@@ -17,6 +17,7 @@ const imports=read('orbit360-platform/core/importa.js');
 const resources=read('orbit360-platform/core/backend-resource-contracts.js');
 const driveClient=read('orbit360-platform/core/product-drive-document-provider-p0.js');
 const driveBackend=read('functions/document-drive-domain.js');
+const opsBackend=read('functions/product-ops-leads-domain.js');
 const i6Workflow=read('.github/workflows/gravicentra-recovery-i6-postsalida.yml');
 const cobros=read('orbit360-platform/modules/cobros.js');
 const siniestros=read('orbit360-platform/modules/siniestros.js');
@@ -92,6 +93,9 @@ has(ciclo,"Orbit.productDriveDocumentProviderP0.probe(true).then",'R94_MANAGEMEN
 has(c360,'Drive se vincula al cargar documento','R95_CLIENT_DRIVE_CANONICAL_LINK_COPY_MISSING');
 has(c360,'Referencia histórica de carpeta Drive (opcional)','R95_CLIENT_DRIVE_LEGACY_REFERENCE_COPY_MISSING');
 
+has(opsBackend,"'adjuntos','documentoCargaPendiente','documentoCargaFallida'",'R77_OPS_BACKEND_DOCUMENT_FIELDS_NOT_MUTABLE');
+has(opsBackend,'managementDocumentReadback','R77_OPS_BACKEND_DOCUMENT_READBACK_MISSING');
+has(store,'PRODUCT_WORKFLOW_DOCUMENT_DURABLE_READBACK_REQUIRED','R77_STORE_DOCUMENT_DURABLE_GUARD_MISSING');
 has(resources,'async function uploadDocument(file, extra)','R77_DOCUMENT_UPLOAD_CONTRACT_MISSING');
 has(imports,'async function persistDocumentaryFiles()','R81_DOCUMENTARY_PERSISTENCE_MISSING');
 has(imports,"await Orbit.store.updateDurable('clientes', cid, clientPatch)",'R81_CLIENT_DOCUMENT_READBACK_LINK_MISSING');
