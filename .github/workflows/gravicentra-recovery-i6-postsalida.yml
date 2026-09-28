@@ -3642,6 +3642,26 @@ jobs:
           FROOT="$RUNNER_TEMP/b2-functions";mkdir -p "$FROOT"
           cp -a "$RUNNER_TEMP/b2-package/bundle/backend" "$FROOT/backend"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          PREVIEW_OAUTH_CLIENT_FILE="$RUNNER_TEMP/b2-drive-oauth-client-preview.json"; export PREVIEW_OAUTH_CLIENT_FILE
+          (cd "$FROOT/backend" && node - <<'NODE'
+          const fs=require('node:fs');
+          const {GoogleAuth}=require('google-auth-library');
+          const project=String(process.env.PROJECT_ID||'').trim();
+          (async()=>{
+            const auth=new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']});
+            const token=await auth.getAccessToken();
+            const url='https://identitytoolkit.googleapis.com/v2/projects/'+encodeURIComponent(project)+'/defaultSupportedIdpConfigs/google.com';
+            const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+            const body=await r.json().catch(()=>({}));
+            if(!r.ok||body.enabled!==true||!body.clientId||!body.clientSecret)throw new Error('B2_R86_GOOGLE_OAUTH_CLIENT_SECRET_READ_FAILED');
+            fs.writeFileSync(process.env.PREVIEW_OAUTH_CLIENT_FILE,JSON.stringify({clientId:String(body.clientId),clientSecret:String(body.clientSecret)}));
+            fs.chmodSync(process.env.PREVIEW_OAUTH_CLIENT_FILE,0o600);
+            console.log(JSON.stringify({status:'PASS',secret:'ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW',clientIdPresent:true,clientSecretPresent:true,productionSecretTouched:false}));
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1);});
+          NODE
+          )
+          node "$FIREBASE_CLI_BIN" functions:secrets:set ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW --data-file "$PREVIEW_OAUTH_CLIENT_FILE" --project "$PROJECT_ID" --non-interactive >/dev/null
+          rm -f "$PREVIEW_OAUTH_CLIENT_FILE"
           STORAGE_BUCKET=$(cd "$FROOT/backend" && node - <<'NODE'
           const fs=require('fs');
           const {Storage}=require('@google-cloud/storage');

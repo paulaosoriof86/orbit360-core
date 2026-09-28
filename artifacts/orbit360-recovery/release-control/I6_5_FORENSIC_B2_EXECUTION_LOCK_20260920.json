@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "SOURCE_FIXED_PENDING_GUARD",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -260,13 +260,13 @@
     "noHardcodedIdentities": true
   },
   "candidate": {
-    "status": "CANDIDATE_PENDING_PREVIEW",
+    "status": "SOURCE_FIXED_PENDING_GUARD",
     "sourceCandidateSha": "2c84899d46089ce91a6343230d5effbbf8025c35",
     "governanceHeadBeforeCandidateArm": "2c84899d46089ce91a6343230d5effbbf8025c35",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "81b592eb54b039ee502c60fa2acf8c068069ce93",
+    "compositionLockBlobSha": "eaf1139f586b4f7ab3650d8575663a97483af232",
     "productFileCount": 69,
-    "findingLedgerBlobSha": "5812261155407fedb5ea72dc85cd86151b593f14",
+    "findingLedgerBlobSha": "4e2090e75cbbe9d090b2568957682d63f829c7c6",
     "blockingFindingIds": [
       "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
       "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -277,7 +277,8 @@
       "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
       "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
       "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
-      "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17"
+      "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
+      "B2-R86-DRIVE-OAUTH-CLIENT-RUNTIME-CONFIG-UNAVAILABLE-R18"
     ],
     "sourceContract": "tools/gravicentra-i6-5-b2-r15-contract.mjs",
     "authenticatedHarness": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
@@ -293,23 +294,27 @@
     "humanDownloadRetestRequired": false,
     "tenantBootstrapRequired": true,
     "routineUserGoogleOAuth": false,
-    "sourceFixCommitPendingArm": false,
-    "sourceCandidateParentHead": "0752c80dc5d5dcf9596313c0cb525e8fc155ba6b",
+    "sourceFixCommitPendingArm": true,
+    "sourceCandidateParentHead": "36f44c1cd510716b71cef741f6c76bcc6972e039",
     "changedProductFiles": [
-      "orbit360-platform/core/product-drive-document-provider-p0.js",
       "functions/document-drive-domain.js"
     ],
     "changedProductBlobs": {
-      "orbit360-platform/core/product-drive-document-provider-p0.js": "30f84e48d94a728c71471902134b0cd657f61a4a",
-      "functions/document-drive-domain.js": "432b41db61d6d73318d52447285d554052bf9088"
+      "functions/document-drive-domain.js": "c0687b789790344c1463d48500b16070078ff9b2"
     },
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_PARTIAL_R16_DRIVE_BOOTSTRAP_SURFACE_20260928.json",
     "visualReceiptBlobSha": "b7731120b6b6d14ba9fde4b27e9faf32fd68ce63",
     "changedContractFiles": [
       "tools/gravicentra-i6-5-b2-r15-contract.mjs"
     ],
-    "contractBlobSha": "bda9236f62614932b0628a6a4c6ae7d517df8330",
-    "browserRefreshTokenAllowed": false
+    "contractBlobSha": "24c320684cc1920e16270ee54068de6ce0e8554b",
+    "browserRefreshTokenAllowed": false,
+    "changedWorkflowFiles": [
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+    ],
+    "workflowBlobs": {
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "f41f04d24c497369c90c5e982b393cd465843a9d"
+    }
   },
   "preview": {
     "sourceSha": "7a5a34354c1b19be7b71720574d86fd9c42d228e",
@@ -1871,6 +1876,7 @@
   },
   "nextRequiredProof": [
     "CENTRAL_GUARD_PASS",
+    "R86_PREVIEW_OAUTH_CLIENT_SECRET_PROVISION_AND_BINDING_PASS",
     "R85_NEW_EXACT_PREVIEW_READBACK",
     "R85_ADMIN_AUTHORIZATION_CODE_BOOTSTRAP_AND_SECRET_READBACK",
     "R84_FRESH_SESSION_ZERO_GOOGLE_PROMPT_AUTHORIZED_VIEW_DOWNLOAD",
@@ -3137,5 +3143,20 @@
     "noReimport": true,
     "sourceFixCommit": "2c84899d46089ce91a6343230d5effbbf8025c35",
     "guardPassRunId": 36416977794
+  },
+  "driveOAuthClientR18": {
+    "status": "SOURCE_FIXED_PENDING_GUARD",
+    "findingId": "B2-R86-DRIVE-OAUTH-CLIENT-RUNTIME-CONFIG-UNAVAILABLE-R18",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R18_DRIVE_OAUTH_CLIENT_SECRET_BINDING_20260928.json",
+    "receiptBlobSha": "014d9c0d935991c3ee489add56e5f93db42ef52e",
+    "previewSecret": "ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW",
+    "productionSecretTouched": false,
+    "runtimeIamBroadening": false,
+    "productBlob": "c0687b789790344c1463d48500b16070078ff9b2",
+    "workflowBlob": "f41f04d24c497369c90c5e982b393cd465843a9d",
+    "contractBlobSha": "24c320684cc1920e16270ee54068de6ce0e8554b",
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true
   }
 }

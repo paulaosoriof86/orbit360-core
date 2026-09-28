@@ -2744,7 +2744,7 @@
       "rootCause": "The browser bootstrap used Firebase Authentication GoogleAuthProvider and inspected Firebase _tokenResponse for oauthRefreshToken. Durable Google Drive authority requires an OAuth authorization-code flow with backend code exchange; refresh tokens are not a browser authentication credential.",
       "remediation": "Use Google Identity Services authorization-code popup. Browser receives only a short-lived authorization code. Authenticated backend validates tenant/admin role and Preview origin, exchanges the code using the existing Identity Platform Google provider client ID/secret, verifies Drive/root-folder access, and stores only the refresh token in the tenant Secret Manager vault.",
       "requiredProof": "On one new exact Preview, Dirección performs one administrative authorization; backend returns configured=true and Secret Manager readback survives reload; fresh routine-user sessions receive zero Google account/consent prompts; authorized view/download/upload pass; cross-scope denial passes; no Google access or refresh token exists in browser storage.",
-      "status": "GUARD_PASS_PREVIEW_ARMED",
+      "status": "R86_CAUSAL_SUCCESSOR_SOURCE_FIXED_PENDING_GUARD",
       "closureState": "NOT_CLOSED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R17_DRIVE_AUTH_CODE_ROOT_CAUSE_20260928.json",
       "receiptBlobSha": "2cc9f9d70d4bca863b2c1ab60f996f1310c7721f",
@@ -2766,7 +2766,37 @@
       "noReimport": true,
       "guardPassRunId": 36416977794,
       "sourceFixCommit": "2c84899d46089ce91a6343230d5effbbf8025c35",
-      "previewArmed": true
+      "previewArmed": true,
+      "causalSuccessorId": "B2-R86-DRIVE-OAUTH-CLIENT-RUNTIME-CONFIG-UNAVAILABLE-R18"
+    },
+    {
+      "id": "B2-R86-DRIVE-OAUTH-CLIENT-RUNTIME-CONFIG-UNAVAILABLE-R18",
+      "block": "B2",
+      "source": "AUTHENTICATED_PREVIEW_36417141888",
+      "surface": "GoogleDrive/TenantBootstrap/OAuthClientConfig",
+      "classification": "PREVIEW_RUNTIME_CONFIG_DEFECT_SECRET_NOT_BOUND",
+      "blocking": true,
+      "finding": "Exact authenticated Preview returned tenant_setup_required with bootstrapClientId empty, so the authorization-code bootstrap could not start.",
+      "rootCause": "Drive Preview functions attempted to obtain the Google provider OAuth client configuration at runtime. The function service account did not expose the client-secret-bearing Identity Platform config required by providerConfig, and the status path intentionally collapsed that failure to an empty bootstrapClientId.",
+      "remediation": "Read the already configured Identity Platform google.com client ID/secret during CI, store the pair in Firebase Functions Secret Manager under a Preview-only secret, and bind only that secret to Preview Drive functions. Do not broaden runtime Firebase Auth IAM and do not touch the production secret.",
+      "requiredProof": "Central guard PASS; workflow creates/updates ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW without touching production; Preview Drive functions deploy with explicit secret binding; authenticated status returns non-empty bootstrapClientId while tenant remains unconfigured; then one admin authorization-code bootstrap succeeds and persists.",
+      "status": "SOURCE_FIXED_PENDING_GUARD",
+      "closureState": "NOT_CLOSED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R18_DRIVE_OAUTH_CLIENT_SECRET_BINDING_20260928.json",
+      "receiptBlobSha": "014d9c0d935991c3ee489add56e5f93db42ef52e",
+      "productBlobs": {
+        "functions/document-drive-domain.js": "c0687b789790344c1463d48500b16070078ff9b2"
+      },
+      "workflowBlobs": {
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "f41f04d24c497369c90c5e982b393cd465843a9d"
+      },
+      "contractBlobSha": "24c320684cc1920e16270ee54068de6ce0e8554b",
+      "runtimeIamBroadening": false,
+      "previewSecret": "ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW",
+      "productionSecretTouched": false,
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [

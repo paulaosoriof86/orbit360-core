@@ -5,15 +5,16 @@ const { getApps, initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
-const { GoogleAuth } = require('google-auth-library');
 const { __productOperationalDomain } = require('./product-operational-domain');
 const { __opsLeadsProductDomain } = require('./product-ops-leads-domain');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'gravicentra-drive-document-domain-v3-r85-auth-code-backend-exchange';
+const VERSION = 'gravicentra-drive-document-domain-v4-r86-secret-bound-oauth-client';
 const PROJECT_ID = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'ays-orbit-360-lab';
 const SERVICE_ACCOUNT = process.env.ORBIT360_SECRETS_SERVICE_ACCOUNT || 'orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com';
+const DRIVE_OAUTH_CLIENT_PREVIEW_SECRET = 'ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW';
+const DRIVE_OAUTH_CLIENT_PRODUCTION_SECRET = 'ORBIT360_DRIVE_OAUTH_CLIENT_PRODUCTION';
 const ROOT_BY_TENANT = Object.freeze({
   'alianzas-soluciones': process.env.ORBIT360_DRIVE_CLIENTS_ROOT_FOLDER_ID || '13H7zMGwFC9f1UnHyfNqzzSfFex1jJRHE'
 });
@@ -92,14 +93,13 @@ async function writeVault(tenantId,vault,previewOnly){
     await secrets.addSecretVersion({parent:vaultParent(tenantId,previewOnly),payload:{data:Buffer.from(JSON.stringify(out),'utf8')}});
   }catch(e){throw new HttpsError('unavailable','No fue posible guardar la conexión segura con Drive.');}
 }
-async function providerConfig(){
-  const auth=new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']});
-  const token=await auth.getAccessToken();
-  const url='https://identitytoolkit.googleapis.com/v2/projects/'+encodeURIComponent(PROJECT_ID)+'/defaultSupportedIdpConfigs/google.com';
-  const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
-  const body=await r.json().catch(()=>({}));
-  if(!r.ok||body.enabled!==true||!clean(body.clientId,1000)||!clean(body.clientSecret,2000)){
-    throw new HttpsError('failed-precondition','La configuración administrativa de Google no está disponible para la integración Drive.');
+async function providerConfig(previewOnly){
+  const secretName=previewOnly===true?DRIVE_OAUTH_CLIENT_PREVIEW_SECRET:DRIVE_OAUTH_CLIENT_PRODUCTION_SECRET;
+  const raw=clean(process.env[secretName],12000);
+  if(!raw)throw new HttpsError('failed-precondition','La configuración administrativa segura de Google no está disponible para la integración Drive.',{secretName});
+  let body={};try{body=JSON.parse(raw);}catch(e){throw new HttpsError('failed-precondition','La configuración administrativa segura de Google es inválida.',{secretName});}
+  if(!clean(body.clientId,1000)||!clean(body.clientSecret,2000)){
+    throw new HttpsError('failed-precondition','La configuración administrativa segura de Google está incompleta.',{secretName});
   }
   return{clientId:clean(body.clientId,1000),clientSecret:clean(body.clientSecret,2000)};
 }
@@ -117,7 +117,7 @@ function oauthRedirectUri(value,previewOnly){
 async function authorizationCodeTokens(code,redirectUri,previewOnly){
   const authorizationCode=clean(code,8192);
   if(!authorizationCode)throw new HttpsError('invalid-argument','Código de autorización de Google requerido.');
-  const cfg=await providerConfig(),safeRedirect=oauthRedirectUri(redirectUri,previewOnly);
+  const cfg=await providerConfig(previewOnly),safeRedirect=oauthRedirectUri(redirectUri,previewOnly);
   const form=new URLSearchParams({client_id:cfg.clientId,client_secret:cfg.clientSecret,code:authorizationCode,redirect_uri:safeRedirect,grant_type:'authorization_code'});
   const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:form});
   const body=await r.json().catch(()=>({}));
@@ -130,8 +130,8 @@ async function authorizationCodeTokens(code,redirectUri,previewOnly){
   }
   return{accessToken:clean(body.access_token,4096),refreshToken,redirectUri:safeRedirect};
 }
-async function accessTokenFromRefresh(refreshToken){
-  const cfg=await providerConfig();
+async function accessTokenFromRefresh(refreshToken,previewOnly){
+  const cfg=await providerConfig(previewOnly);
   const form=new URLSearchParams({client_id:cfg.clientId,client_secret:cfg.clientSecret,refresh_token:clean(refreshToken,4096),grant_type:'refresh_token'});
   const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:form});
   const body=await r.json().catch(()=>({}));
@@ -141,7 +141,7 @@ async function accessTokenFromRefresh(refreshToken){
 async function tenantDriveToken(tenantId,previewOnly){
   const vault=await readVault(tenantId,previewOnly);
   if(!vault)throw new HttpsError('failed-precondition','DRIVE_TENANT_SETUP_REQUIRED');
-  return{accessToken:await accessTokenFromRefresh(vault.refreshToken),vault};
+  return{accessToken:await accessTokenFromRefresh(vault.refreshToken,previewOnly),vault};
 }
 async function driveFetch(url,options={},accessToken){
   if(!accessToken)throw new HttpsError('failed-precondition','DRIVE_BACKEND_AUTH_REQUIRED');
@@ -285,12 +285,12 @@ async function status(request,previewOnly){
   if(!vault){
     let bootstrapClientId='';
     if(BOOTSTRAP_ROLES.has(norm(actor.activeRole))){
-      try{bootstrapClientId=(await providerConfig()).clientId;}catch(error){bootstrapClientId='';}
+      try{bootstrapClientId=(await providerConfig(previewOnly)).clientId;}catch(error){bootstrapClientId='';}
     }
     return{ok:false,available:false,configured:false,backendPersistent:true,bootstrapRequired:true,bootstrapClientId,status:'tenant_setup_required',message:'Drive requiere una configuración administrativa única para este tenant.'};
   }
   try{
-    const accessToken=await accessTokenFromRefresh(vault.refreshToken),meta=await getMeta(rootId,accessToken);
+    const accessToken=await accessTokenFromRefresh(vault.refreshToken,previewOnly),meta=await getMeta(rootId,accessToken);
     const writable=!!(meta&&meta.capabilities&&meta.capabilities.canAddChildren===true);
     return{ok:true,available:true,readAvailable:true,uploadAvailable:writable,configured:true,backendPersistent:true,status:writable?'disponible':'solo_lectura',rootFolderId:meta.id,rootName:meta.name,googleAccountEmail:clean(vault.googleAccountEmail,320),previewIsolated:previewOnly===true};
   }catch(error){
@@ -341,8 +341,8 @@ async function readDocument(request,previewOnly,downloadMode){
   return{ok:true,status:'disponible',documentRef:authz.fileId,fileId:authz.fileId,nombre:safeName(meta.name||'Documento'),mimeType:mime,size:bytes.length,base64:bytes.toString('base64'),previewAvailable:downloadMode?false:previewAvailable,downloadAvailable:true,externalUrl:meta.webViewLink||('https://drive.google.com/file/d/'+authz.fileId+'/view'),driveUrl:meta.webViewLink||('https://drive.google.com/file/d/'+authz.fileId+'/view'),backendPersistent:true,previewIsolated:previewOnly===true};
 }
 
-const PROD={region:REGION,cors:true,serviceAccount:SERVICE_ACCOUNT};
-const PREVIEW={region:PREVIEW_REGION,cors:true,serviceAccount:SERVICE_ACCOUNT};
+const PROD={region:REGION,cors:true,serviceAccount:SERVICE_ACCOUNT,secrets:[DRIVE_OAUTH_CLIENT_PRODUCTION_SECRET]};
+const PREVIEW={region:PREVIEW_REGION,cors:true,serviceAccount:SERVICE_ACCOUNT,secrets:[DRIVE_OAUTH_CLIENT_PREVIEW_SECRET]};
 exports.orbit360DocumentDriveStatus = onCall(Object.assign({},PROD,{timeoutSeconds:30,memory:'256MiB'}),r=>status(r,false));
 exports.orbit360DocumentDriveUpload = onCall(Object.assign({},PROD,{timeoutSeconds:90,memory:'512MiB'}),r=>upload(r,false));
 exports.orbit360DocumentDriveRead = onCall(Object.assign({},PROD,{timeoutSeconds:60,memory:'512MiB'}),r=>readDocument(r,false,false));

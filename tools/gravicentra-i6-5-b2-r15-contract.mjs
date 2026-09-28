@@ -16,6 +16,7 @@ const imports=read('orbit360-platform/core/importa.js');
 const resources=read('orbit360-platform/core/backend-resource-contracts.js');
 const driveClient=read('orbit360-platform/core/product-drive-document-provider-p0.js');
 const driveBackend=read('functions/document-drive-domain.js');
+const i6Workflow=read('.github/workflows/gravicentra-recovery-i6-postsalida.yml');
 const cobros=read('orbit360-platform/modules/cobros.js');
 const siniestros=read('orbit360-platform/modules/siniestros.js');
 const cancelaciones=read('orbit360-platform/modules/cancelaciones.js');
@@ -85,6 +86,12 @@ has(driveBackend,'SecretManagerServiceClient','R84_SECRET_MANAGER_VAULT_MISSING'
 has(driveBackend,"'orbit360-drive-oauth-preview-'",'R84_PREVIEW_DRIVE_VAULT_ISOLATION_MISSING');
 has(driveBackend,'async function accessTokenFromRefresh','R84_REFRESH_TOKEN_EXCHANGE_MISSING');
 has(driveBackend,'async function authorizationCodeTokens','R85_BACKEND_AUTH_CODE_EXCHANGE_MISSING');
+has(driveBackend,"DRIVE_OAUTH_CLIENT_PREVIEW_SECRET = 'ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW'",'R86_PREVIEW_OAUTH_CLIENT_SECRET_NAME_MISSING');
+has(driveBackend,'secrets:[DRIVE_OAUTH_CLIENT_PREVIEW_SECRET]','R86_PREVIEW_FUNCTION_SECRET_BINDING_MISSING');
+need(!driveBackend.includes('new GoogleAuth('),'R86_RUNTIME_IDENTITY_TOOLKIT_SECRET_FETCH_REMAINS');
+has(i6Workflow,'functions:secrets:set ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW','R86_PREVIEW_OAUTH_CLIENT_SECRET_PROVISION_MISSING');
+has(i6Workflow,'B2_R86_GOOGLE_OAUTH_CLIENT_SECRET_READ_FAILED','R86_PREVIEW_OAUTH_CLIENT_PREFLIGHT_MISSING');
+need(!i6Workflow.includes('functions:secrets:set ORBIT360_DRIVE_OAUTH_CLIENT_PRODUCTION'),'R86_PRODUCTION_OAUTH_CLIENT_SECRET_TOUCHED_IN_PREVIEW');
 has(driveBackend,"grant_type:'authorization_code'",'R85_AUTHORIZATION_CODE_GRANT_MISSING');
 has(driveBackend,'bootstrapClientId','R85_BOOTSTRAP_CLIENT_ID_READBACK_MISSING');
 has(driveBackend,"La credencial persistente de Drive no puede ingresar desde el navegador.",'R85_BROWSER_REFRESH_TOKEN_REJECTION_MISSING');
@@ -99,7 +106,7 @@ has(driveBackend,'ROOT_BY_TENANT','R81_DRIVE_ROOT_BINDING_MISSING');
 console.log(JSON.stringify({
   status:'PASS',
   contract:'I6.5-B2-R15-R15A-R16',
-  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83','R84','R85'],
+  findings:['R73','R74','R75','R76','R77','R78','R79','R80','R81','R82','R83','R84','R85','R86'],
   drive:{repository:'Google Drive',auth:'tenant-persistent-backend-auth-code',tokenPersistence:'SecretManager',routineUserGoogleOAuth:false,browserRefreshToken:false,readbackRequired:true},
   delete:{ui:'Eliminar',default:'durable-soft-delete',relationalSafety:'fail-closed'},
   renewalWindowDays:45
