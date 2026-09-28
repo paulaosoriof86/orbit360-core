@@ -121,7 +121,7 @@ try{
   await page.evaluate(()=>{location.hash='#/ops';});
   await page.waitForFunction(()=>{
     const s=window.Orbit?.store?._productStatus?.()||{},c=[].concat(s.serverConfirmedCollections||[]);
-    return s.ready===true&&['gestiones','polizas','clientes','aseguradoras'].every(x=>c.includes(x));
+    return s.ready===true&&['gestiones','polizas','vehiculos','clientes','aseguradoras'].every(x=>c.includes(x));
   },null,{timeout:30000});
   await page.waitForFunction(x=>!!Orbit.store.get('gestiones',x.direct)&&!!Orbit.store.get('gestiones',x.issuance)&&!!Orbit.store.get('gestiones',x.unvalidated)&&!!Orbit.store.get('polizas',x.source)&&!!Orbit.store.get('aseguradoras',x.insurer),ids,{timeout:15000});
 
@@ -146,6 +146,10 @@ try{
   // R92 validated tariff + R91 firm support upload and direct renewal.
   await page.evaluate(id=>Orbit.ciclo.openGestion(id),ids.direct);
   await page.locator('#ciclo-modal [data-ren-direct]').waitFor({state:'visible',timeout:10000});
+  await page.waitForFunction(()=>{
+    const s=window.Orbit?.store?._productStatus?.()||{},c=[].concat(s.serverConfirmedCollections||[]);
+    return ['gestiones','polizas','vehiculos','clientes'].every(x=>c.includes(x));
+  },null,{timeout:30000});
   await page.locator('#ciclo-modal [data-ren-direct]').click();
   const directModal=page.locator('#ops-direct-renewal-v1201');await directModal.waitFor({state:'visible',timeout:10000});
   const tariff=await directModal.evaluate(el=>({gem:el.querySelector('#rend-gem')?.value,gfin:el.querySelector('#rend-gfin')?.value,note:el.querySelector('#rend-tariff-note')?.textContent||'',canonical:!!el.querySelector('.ciclo-card'),docRequired:(el.querySelector('#rend-doc-note')?.textContent||'').includes('referencia Drive confirmada')}));
