@@ -112,3 +112,47 @@ test('CO annual program requires max shipment value and annual movement budget',
   assert.ok(r.missing.includes('maxValuePerShipment'));
   assert.ok(r.missing.includes('annualMovementBudget'));
 });
+
+
+test('GT health accepts numbered dependent DOB fields from the public UX', () => {
+  const r = bridge.mapPublicToBackend({
+    country:'gt', product:'salud',
+    data:{
+      modalidad:'Familiar',
+      titularDob:'1988-05-12',
+      conyuge:'No',
+      hijos:'2',
+      dependentDob1:'2017-03-04',
+      dependentDob2:'2020-09-16',
+      maternidad:'No',
+      contactName:'Paula',
+      contactWhatsapp:'+50255555555',
+      contactEmail:'paula@example.com',
+      requestManagementConsent:true
+    }
+  });
+  assert.deepEqual(r.mapped.dependentDobs,['2017-03-04','2020-09-16']);
+  assert.equal(r.missing.includes('dependentDobs'),false);
+});
+
+test('CO transport accepts one explicit primary mode and converts it to the backend array', () => {
+  const r = bridge.mapPublicToBackend({
+    country:'co', product:'transporte',
+    data:{
+      rolCadena:'Transportador',
+      coverageModeNeed:'SPECIFIC_SHIPMENT',
+      carga:'Mercancía general',
+      trayecto:'Colombia',
+      transportModePrimary:'ROAD',
+      origin:'Bogotá',
+      destination:'Medellín',
+      valueToProtect:'180000000',
+      contactName:'Paula',
+      contactWhatsapp:'+573001112233',
+      contactEmail:'paula@example.com',
+      requestManagementConsent:true
+    }
+  });
+  assert.deepEqual(r.mapped.transportModes,['ROAD']);
+  assert.equal(r.missing.includes('transportModes'),false);
+});
