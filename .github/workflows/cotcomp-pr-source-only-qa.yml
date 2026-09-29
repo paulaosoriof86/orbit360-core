@@ -27,7 +27,10 @@ jobs:
           node --check cotcomp-transport-contract.test.js
           node --check cotcomp-gateway-harness.js
           node --check cotcomp-gateway-harness.test.js
+          node --check cotcomp-completion-contract.js
+          node --check cotcomp-completion-contract.test.js
       - name: Tests
         working-directory: functions
         run: |
-          node --test             cotcomp-validator.test.js             cotcomp-proposal-contracts.test.js             cotcomp-public-bridge.test.js             cotcomp-transport-contract.test.js             cotcomp-gateway-harness.test.js
+          node --test             cotcomp-validator.test.js             cotcomp-proposal-contracts.test.js             cotcomp-public-bridge.test.js             cotcomp-transport-contract.test.js             cotcomp-gateway-harness.test.js \
+            cotcomp-completion-contract.test.js
