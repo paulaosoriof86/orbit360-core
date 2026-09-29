@@ -50,3 +50,65 @@ test('unsupported route remains consultative', () => {
   assert.equal(r.readyForBackendValidation, false);
   assert.ok(r.notes[0].includes('consultative'));
 });
+
+
+test('GT health treats geography preference as optional and does not invent it from broad territory', () => {
+  const r = bridge.mapPublicToBackend({
+    country:'gt', product:'salud',
+    data:{
+      modalidad:'Individual',
+      titularDob:'1988-04-10',
+      hijos:'0',
+      maternidad:'No',
+      territorio:'Guatemala',
+      contactName:'Paula',
+      contactWhatsapp:'+50255555555',
+      contactEmail:'paula@example.com',
+      requestManagementConsent:true
+    }
+  });
+  assert.equal(r.journeyId, 'GT_GASTOS_MEDICOS_HYBRID');
+  assert.equal(r.missing.includes('geographyPreference'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(r.mapped,'geographyPreference'), false);
+  assert.ok(r.notes.some(x => x.includes('optional backend geographyPreference')));
+});
+
+test('CO specific shipment maps its conditional contract fields explicitly', () => {
+  const r = bridge.mapPublicToBackend({
+    country:'co', product:'transporte',
+    data:{
+      rolCadena:'Transportador',
+      coverageModeNeed:'SPECIFIC_SHIPMENT',
+      carga:'Mercancía general',
+      trayecto:'Colombia',
+      transportModes:['ROAD'],
+      origin:'Bogotá',
+      destination:'Medellín',
+      valueToProtect:'180000000',
+      contactName:'Paula',
+      contactWhatsapp:'+573001112233',
+      contactEmail:'paula@example.com',
+      requestManagementConsent:true
+    }
+  });
+  assert.equal(r.mapped.origin,'Bogotá');
+  assert.equal(r.mapped.destination,'Medellín');
+  assert.equal(r.mapped.valueToProtect,180000000);
+  assert.equal(r.missing.length,0);
+  assert.equal(r.readyForBackendValidation,true);
+});
+
+test('CO annual program requires max shipment value and annual movement budget', () => {
+  const r = bridge.mapPublicToBackend({
+    country:'co', product:'transporte',
+    data:{
+      rolCadena:'Transportador',
+      coverageModeNeed:'ANNUAL_PROGRAM',
+      carga:'Mercancía general',
+      trayecto:'Colombia',
+      transportModes:['ROAD']
+    }
+  });
+  assert.ok(r.missing.includes('maxValuePerShipment'));
+  assert.ok(r.missing.includes('annualMovementBudget'));
+});
