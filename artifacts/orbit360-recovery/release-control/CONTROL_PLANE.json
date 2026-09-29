@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -3157,18 +3157,26 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "IN_PROGRESS",
+      "status": "B3_001_CANDIDATE_PENDING_PREVIEW",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
-      "livePromoted": false
+      "livePromoted": false,
+      "activeFindingId": "B3-001",
+      "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
+      "executionLockBlobSha": "55593df28f2f01deff30b9cf5b8208d631784b57",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
+      "sourceFixReceiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
+      "productMutationAuthorized": true,
+      "dataMutationAuthorized": false,
+      "reimportAuthorized": false
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "fd9314fb647e2c57f74461313f5fc86880eb1545",
+    "compositionLockBlobSha": "7de09ccf0f529a7fb610d90299601bb66f974425",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "e135ef18ab00a9b0bc758467c4fd770bea2a51b5",
+    "findingLedgerBlobSha": "4cc4b6d284d067651c5371b32c8f133c8c3f939a",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -3180,7 +3188,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_EXECUTE_FIRST_INCOMPLETE_GATE"
+    "nextAction": "B3_001_EXACT_PREVIEW"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

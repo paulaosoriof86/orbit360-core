@@ -678,9 +678,21 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Restore approved Cobros y cartera shell; bridge is projection adapter, not renderer replacement.",
-      "status": "NOT_STARTED",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "owner": [
+        "orbit360-platform/modules/cobros.js",
+        "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+        "orbit360-platform/core/queries.js"
+      ],
+      "rootCause": "cobros-cartera-i65-closure-bridge.js replaced Orbit.modules.cobros.render with a second full renderer.",
+      "remediation": "Restore modules/cobros.js as sole renderer; bridge becomes projection adapter only and may trigger refresh without writing shell DOM.",
+      "requiredProof": "exact B3 Preview readback + static owner contract + targeted visual shell confirmation",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
+      "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-002",
@@ -4197,5 +4209,14 @@
       "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
       "sourceCandidateSha": "8af4f889175b6c59770b6f4626607af629b1470e"
     }
+  },
+  "currentB3": {
+    "status": "B3_001_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "activeFindingId": "B3-001",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
+    "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
+    "compositionLockBlobSha": "7de09ccf0f529a7fb610d90299601bb66f974425",
+    "noLive": true,
+    "noReimport": true
   }
 }

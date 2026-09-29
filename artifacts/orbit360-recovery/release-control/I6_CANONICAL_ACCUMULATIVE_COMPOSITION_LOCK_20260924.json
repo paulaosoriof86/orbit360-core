@@ -159,7 +159,7 @@
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813",
-    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "cba6099ff7499c452c99f283702f27886154ae23",
+    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "29baab7a9a6caa75aa21196b7b91deb2919025a2",
     "orbit360-platform/modules/cobros.js": "db8ae9c55d32ea922bb8aa371700b80826e40998",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
@@ -204,28 +204,19 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "id": "B2-R102-LOGO-ASSET-RESOLVER-ROOTFIX-20260929",
-    "status": "SOURCE_FIXED_PENDING_SINGLE_EXACT_PREVIEW",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_LOGO_ASSET_RESOLVER_ROOTFIX_20260929.json",
-    "receiptBlobSha": "23d76da22ee123780a2a89fbe0fe6e19902bb64c",
+    "id": "B3-001-COBROS-SHELL-ROOTFIX-20260929",
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "parentHead": "0ff9dbc6da4874f43443b5b7573e8eff9f7f657d",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
+    "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
     "changedProductFiles": [
-      "functions/product-operational-domain.js",
-      "orbit360-platform/modules/aseguradoras.js"
+      "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js"
     ],
     "mechanismFiles": [
-      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
-      "tools/gravicentra-i6-5-b2-functional.mjs",
+      "tools/gravicentra-i6-5-b3-001-contract.mjs",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
     ],
-    "preservedHumanPasses": [
-      "TEST1_PERMISSIONS",
-      "TEST2_MULTIROLE",
-      "TEST3_USER",
-      "TEST4_OPS_DOCUMENT"
-    ],
-    "humanRetestOnly": "TEST5_R102",
     "noLive": true,
-    "noB3": true,
     "noReimport": true
   }
 }

@@ -1,0 +1,75 @@
+{
+  "schema": "GRAVICENTRA_I6_5_FORENSIC_B3_EXECUTION_LOCK_V1",
+  "recordedAt": "2026-09-29",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B3",
+  "status": "B3_001_CANDIDATE_PENDING_PREVIEW",
+  "entryCondition": {
+    "b2Status": "B2_PASS",
+    "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
+    "b2CleanupReceiptBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8",
+    "b2FinalHead": "0ff9dbc6da4874f43443b5b7573e8eff9f7f657d"
+  },
+  "activeFinding": {
+    "id": "B3-001",
+    "title": "Restore approved Cobros y cartera shell; bridge remains projection adapter.",
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "rootFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
+    "rootFixReceiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
+    "productBlob": {
+      "path": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+      "sha": "29baab7a9a6caa75aa21196b7b91deb2919025a2"
+    },
+    "contractBlob": {
+      "path": "tools/gravicentra-i6-5-b3-001-contract.mjs",
+      "sha": "d8a277ae7a01d5882e230de497cdede94d36e2ab"
+    }
+  },
+  "canonicalComposition": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "blobSha": "7de09ccf0f529a7fb610d90299601bb66f974425",
+    "productFileCount": 70
+  },
+  "findingLedger": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "blobSha": "4cc4b6d284d067651c5371b32c8f133c8c3f939a"
+  },
+  "nextRequiredProof": [
+    "B3_001_EXACT_PREVIEW_READBACK",
+    "B3_001_STATIC_OWNER_CONTRACT_PASS",
+    "B3_001_TARGETED_VISUAL_APPROVED_SHELL"
+  ],
+  "preservedB3CarryForward": [
+    "B3-002",
+    "B3-003",
+    "B3-004",
+    "B3-005",
+    "B3-006",
+    "B3-007",
+    "B3-008",
+    "B3-CARRY-PAYMENT-CONFIRMED-NOT-CONCILIATED-R6",
+    "B3-CARRY-INFERRED-PAYMENT-EFFECTIVE-DATE-R6",
+    "B3-CARRY-INVOICE-APPLICATION-SEPARATE-DATES-R6",
+    "B3-CARRY-REPORTED-PAYMENT-HISTORICAL-AUDIT-R6",
+    "B3-CARRY-SURCHARGE-ISSUANCE-RULE-CONFIG-R6",
+    "B3-CARRY-DASHBOARD-REALITY-RECONCILIATION-R6",
+    "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
+    "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
+    "B3-CARRY-VEHICLE-CANONICAL-IDENTITY-20260929",
+    "B3-CARRY-OPS-CATALOG-ADMIN-20260929",
+    "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
+    "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
+    "B3-CARRY-OPS-HYDRATION-EMPTY-FLASH-20260929"
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "confirmedCobroWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "liveHostingPromotionAuthorized": false,
+    "b4AdvanceAuthorized": false,
+    "syntheticWriteAuthorized": false,
+    "oneExactPreviewForB3001": true
+  }
+}

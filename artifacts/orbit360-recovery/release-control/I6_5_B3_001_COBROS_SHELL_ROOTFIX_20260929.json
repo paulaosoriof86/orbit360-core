@@ -1,0 +1,49 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_001_COBROS_SHELL_ROOTFIX_V1",
+  "recordedAt": "2026-09-29",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B3",
+  "findingId": "B3-001",
+  "parentHead": "0ff9dbc6da4874f43443b5b7573e8eff9f7f657d",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "rootCause": {
+    "classification": "RENDERER_AUTHORITY_REPLACEMENT",
+    "evidence": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js captured Orbit.modules.cobros.render and assigned mod.render=render, replacing the approved shell with a second full renderer.",
+    "approvedShellOwner": "orbit360-platform/modules/cobros.js",
+    "projectionOwners": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+    ]
+  },
+  "remediation": {
+    "file": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+    "oldBlobSha": "cba6099ff7499c452c99f283702f27886154ae23",
+    "newBlobSha": "29baab7a9a6caa75aa21196b7b91deb2919025a2",
+    "rule": "Bridge exposes canonical portfolio/cobro/reported-payment projections and refreshes the approved shell, but never assigns mod.render and never writes host.innerHTML.",
+    "rendererOwner": "orbit360-platform/modules/cobros.js",
+    "rendererReplacement": false
+  },
+  "preservedSemantics": {
+    "pendingAndOverdueAuthority": "carteraPrimas",
+    "confirmedPaymentAuthority": "cobros",
+    "reportedPaymentEvidence": "recibosEsperados.estadoOperativo=pago_reportado",
+    "agingAuthority": "carteraPrimas",
+    "noSyntheticCrossDomainWrite": true
+  },
+  "contract": {
+    "file": "tools/gravicentra-i6-5-b3-001-contract.mjs",
+    "blobSha": "d8a277ae7a01d5882e230de497cdede94d36e2ab"
+  },
+  "nextProof": [
+    "EXACT_B3_PREVIEW_READBACK",
+    "B3_001_STATIC_CONTRACT_PASS",
+    "TARGETED_APPROVED_COBROS_SHELL_VISUAL"
+  ],
+  "boundaries": {
+    "noBusinessWrite": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB4": true
+  }
+}
