@@ -90,8 +90,10 @@ function gtHealth(src) {
   const count = num(src.hijos);
   if (Number.isInteger(count) && count >= 0) out.mapped.childrenCount = count;
   if (out.mapped.childrenCount > 0) {
-    Array.isArray(src.dependentDobs) && src.dependentDobs.length === count
-      ? out.mapped.dependentDobs = src.dependentDobs.slice()
+    const numbered = Array.from({length: out.mapped.childrenCount}, (_,i) => src['dependentDob'+(i+1)]).filter(nonEmpty);
+    const dobs = Array.isArray(src.dependentDobs) ? src.dependentDobs.slice() : numbered;
+    dobs.length === out.mapped.childrenCount
+      ? out.mapped.dependentDobs = dobs
       : out.missing.push('dependentDobs');
   }
 
@@ -117,7 +119,9 @@ function coTransport(src) {
   if (src.trayecto === 'Colombia') out.mapped.transitScope = 'NATIONAL';
   else if (nonEmpty(src.transitScope)) out.mapped.transitScope = src.transitScope;
   else out.missing.push('transitScope');
-  Array.isArray(src.transportModes) && src.transportModes.length ? out.mapped.transportModes = src.transportModes.slice() : out.missing.push('transportModes');
+  if (Array.isArray(src.transportModes) && src.transportModes.length) out.mapped.transportModes = src.transportModes.slice();
+  else if (nonEmpty(src.transportModePrimary)) out.mapped.transportModes = [src.transportModePrimary];
+  else out.missing.push('transportModes');
 
   if (out.mapped.coverageModeNeed === 'SPECIFIC_SHIPMENT') {
     nonEmpty(src.origin) ? out.mapped.origin = src.origin.trim() : out.missing.push('origin');
