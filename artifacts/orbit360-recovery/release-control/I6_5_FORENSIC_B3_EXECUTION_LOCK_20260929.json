@@ -82,5 +82,23 @@
     "productRegressionDemonstrated": false,
     "buildAttempted": false,
     "previewDeployed": false
+  },
+  "transitionGuardRootFix": {
+    "status": "MECHANISM_FIXED_PENDING_RERUN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_TRANSITION_GUARD_ROOTFIX_20260929.json",
+    "receiptBlobSha": "329889dbb68cd56ae077b27b10d3e31340345c0f",
+    "guardBlobSha": "f40d4817df9d7db5d500601b0f2f46f515ff2717",
+    "failedRuns": [
+      36645668903,
+      36645668909,
+      36645915464,
+      36645915470
+    ],
+    "productSourceChanged": false
+  },
+  "lastFailure": {
+    "code": "I6_B2_FINDINGS_STILL_OPEN",
+    "classification": "STALE_PRE_SEAL_LEDGER_REINTERPRETATION",
+    "productRegressionDemonstrated": false
   }
 }

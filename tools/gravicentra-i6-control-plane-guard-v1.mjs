@@ -443,8 +443,19 @@ const allowedI65ForensicB2Product=new Set((b2Active||b2PausedRetained)&&Array.is
 const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!canonicalCompositionProduct.has(p)&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p)&&!allowedI65ForensicB2Product.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));
 if(forensicActiveBlock==='B3'||forensicActiveBlock==='B4'){
- const openB2=(FIND.findings||[]).filter(x=>x.block==='B2'&&x.blocking===true&&!['CLOSED_PASS','DEFERRED_NON_BLOCKING_WITH_EXPLICIT_AUTHORITY','NOT_APPLICABLE_WITH_EVIDENCE'].includes(x.status));
- need(openB2.length===0,'I6_B2_FINDINGS_STILL_OPEN:'+openB2.map(x=>x.id).join(','));
+ const b2SealOk=
+   String(B2.status||'')==='B2_PASS' &&
+   B2.acceptance?.b2OverallAccepted===true &&
+   B2.acceptance?.humanTargetedUatPass===true &&
+   B2.acceptance?.finalSyntheticCleanupPass===true &&
+   B2.finalSyntheticCleanup?.status==='PASS' &&
+   Array.isArray(B2.nextRequiredProof) && B2.nextRequiredProof.length===0 &&
+   B2.boundaries?.advanceToB3Authorized===true &&
+   B2.boundaries?.liveHostingPromotionAuthorized===false &&
+   B2.boundaries?.reimportAuthorized===false;
+ need(b2SealOk,'I6_B2_SEAL_REQUIRED_FOR_B3');
+ const postSealB2=(FIND.findings||[]).filter(x=>x.block==='B2'&&x.blocking===true&&x.postB2Seal===true&&!['CLOSED_PASS','DEFERRED_NON_BLOCKING_WITH_EXPLICIT_AUTHORITY','NOT_APPLICABLE_WITH_EVIDENCE'].includes(x.status));
+ need(postSealB2.length===0,'I6_POST_SEAL_B2_FINDINGS_OPEN:'+postSealB2.map(x=>x.id).join(','));
 }
 if(i63DefectPending||i63DefectLive){
  need(i63CodeDefect.classification==='CODE_DEFECT','I6_3_DEFECT_CLASS_INVALID');

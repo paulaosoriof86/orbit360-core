@@ -4,35 +4,26 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "failedRunId": 36645668909,
-  "failedJobId": 109667923632,
   "status": "MECHANISM_FIXED_PENDING_RERUN",
-  "error": "I6_5_NEXT_ACTION_INVALID",
-  "rootCause": [
-    "Control Plane transition to B3 preserved stale readiness values 80 -> 90 instead of 90 -> 96.",
-    "Canonical composition currentBlock remained B2 after B2 PASS.",
-    "Control Plane Guard had explicit forensic branches only for B1 and B2 and therefore rejected valid B3 actions."
+  "failedRuns": [
+    36645668903,
+    36645668909,
+    36645915464,
+    36645915470
   ],
-  "remediation": {
-    "guardFile": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
-    "guardBlobSha": "7b1d14c415702478fb2ad55feb86f75dd3f2e47b",
-    "b3Readiness": {
-      "current": 90,
-      "target": 96
-    },
-    "b3LockRequired": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-    "allowedB3Actions": [
-      "I6_5_FORENSIC_REMEDIATION_B3",
-      "I6_5_FORENSIC_REMEDIATION_B3_PREVIEW",
-      "I6_5_FORENSIC_REMEDIATION_B3_VISUAL"
-    ],
-    "compositionCurrentBlock": "B3"
+  "rootCause": "Central guard reinterpreted stale historical B2 finding statuses after B2 had already been physically sealed B2_PASS by targeted human UAT plus final synthetic cleanup.",
+  "correction": {
+    "file": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+    "blobSha": "f40d4817df9d7db5d500601b0f2f46f515ff2717",
+    "rule": "For B3/B4 entry, require the physical B2 seal (B2_PASS + b2OverallAccepted + humanTargetedUatPass + finalSyntheticCleanupPass + cleanup receipt state + no required proofs + B3 advance authorized). Historical pre-seal B2 ledger rows remain immutable evidence and are not reinterpreted as active blockers. Any future B2 blocker must be explicitly marked postB2Seal=true to block B3."
   },
-  "productRegressionDemonstrated": false,
-  "productSourceFixChanged": false,
-  "buildAttempted": false,
-  "previewDeployed": false,
-  "liveTouched": false,
-  "dataMutation": false,
-  "reimport": false
+  "productSourceChanged": false,
+  "productArtifactChanged": false,
+  "b3001SourceFixPreserved": true,
+  "boundaries": {
+    "noDataMutation": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB4": true
+  }
 }
