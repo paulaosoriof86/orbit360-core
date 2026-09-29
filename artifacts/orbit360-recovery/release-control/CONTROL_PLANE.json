@@ -3163,7 +3163,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-001",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "4cd577c1713b430c291b9ebbdec7e3547a7ac2b6",
+      "executionLockBlobSha": "cff4700287df17a5127fd447732469ad16da2864",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
       "sourceFixReceiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
       "productMutationAuthorized": true,
@@ -3172,10 +3172,15 @@
       "mechanismRootFix": {
         "status": "MECHANISM_FIXED_PENDING_RERUN",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_TRANSITION_GUARD_ROOTFIX_20260929.json",
-        "receiptBlobSha": "3d18e793a21dc73be7643bb07766e5d726cf2394",
-        "guardBlobSha": "7b1d14c415702478fb2ad55feb86f75dd3f2e47b",
-        "failedRunId": 36645668909,
-        "failedJobId": 109667923632,
+        "receiptBlobSha": "329889dbb68cd56ae077b27b10d3e31340345c0f",
+        "guardBlobSha": "f40d4817df9d7db5d500601b0f2f46f515ff2717",
+        "failedRuns": [
+          36645668903,
+          36645668909,
+          36645915464,
+          36645915470,
+          36647624321
+        ],
         "productRegressionDemonstrated": false
       }
     }
