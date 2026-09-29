@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const h = require('./cotcomp-gateway-harness');
 
-const auth = {channel:'PUBLIC_WEB',sessionId:'s1',appCheckVerified:true,signedSessionVerified:true};
+const auth = {channel:'PUBLIC_WEB',appCheckVerified:true,caseAccessVerified:true};
 
 function validGtAuto() {
   return {
