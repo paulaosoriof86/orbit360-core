@@ -1789,7 +1789,7 @@
       "block": "B3",
       "title": "An authorized applied/confirmed payment is a confirmed cobro even before reconciliation.",
       "classification": "CANONICAL_PAYMENT_SEMANTICS",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "invariant": "Do not hide applied payments from Cobros; receipt existence alone never creates cobro."
     },
     {
@@ -1797,7 +1797,7 @@
       "block": "B3",
       "title": "Inferred payment must not inflate the discovery/reconciliation month.",
       "classification": "CANONICAL_PAYMENT_DATE_SEMANTICS",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "invariant": "For inferred payment, effective/display payment date belongs to the required contractual period and is explicitly marked inferred; evidenceAsOf and reconciliation/application dates remain distinct."
     },
     {
@@ -1805,14 +1805,14 @@
       "block": "B3",
       "title": "Payment date, reconciliation date, insurer application date, invoice date are separate fields.",
       "classification": "FINANCIAL_EVENT_MODEL",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS"
+      "status": "OPEN_B3_CARRY_FORWARD"
     },
     {
       "id": "B3-CARRY-REPORTED-PAYMENT-HISTORICAL-AUDIT-R6",
       "block": "B3",
       "title": "Existing reported payments require deterministic classification before projection as confirmed cobros.",
       "classification": "DATA_AUDIT_REQUIRED",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "invariant": "Do not auto-convert every pago_reportado and do not reimport."
     },
     {
@@ -1820,7 +1820,7 @@
       "block": "B3",
       "title": "Issuance expenses/surcharges need insurer + product/line + payment-frequency configuration with policy override.",
       "classification": "CONFIGURABLE_FINANCIAL_RULE",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "invariant": "No insurer hardcodes; preview resulting calendar before save."
     },
     {
@@ -1828,7 +1828,7 @@
       "block": "B3",
       "title": "Dashboard must reconcile real portfolio, confirmed cobros, pending payments, reconciliation, currency/country and aging.",
       "classification": "READ_MODEL_RECONCILIATION",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "latestVisual": "R8: Inicio still not accepted as fully real/canonical; preserve for B3 closure before B4."
     },
     {
@@ -2126,7 +2126,7 @@
       "finding": "AUTO39012 current 10-receipt calendar is visible but financial breakdown is incomplete and previously reported payment evidence is not visible on the current client projection.",
       "rationale": "Other clients visibly render pago reportado correctly, so the general reported-payment projection works. The remaining issue is specific calendar/payment lineage and belongs to B3 only if prior evidence remains physically preserved.",
       "precondition": "Before B2 final disposition, run read-only proof that prior receipt/payment evidence for the reviewed policy still exists and was not deleted; no reimport or synthetic payment creation.",
-      "status": "FROZEN_CARRY_FORWARD_TO_B3_PENDING_READONLY_PRESERVATION_PROOF",
+      "status": "OPEN_B3_PENDING_READONLY_PRESERVATION_PROOF",
       "blocking": false,
       "noReimport": true,
       "noLive": true
@@ -3692,7 +3692,7 @@
       "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Aseguradoras/Logo",
       "classification": "HUMAN_PERSISTENCE_PROOF_GAP",
-      "blocking": true,
+      "blocking": false,
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
         "functions/product-operational-domain.js"
@@ -3701,7 +3701,7 @@
       "rootCause": "Firestore reference, Storage object, token metadata and image bytes persist correctly, but both persisted and metadata-token Firebase download URLs return HTTP 412.",
       "remediation": "Render from canonical logoAssetRef through authenticated server asset resolver. Machine proof now requires real image rendering after reload.",
       "requiredProof": "new exact Preview machine render PASS -> Paula retests only insurer logo refresh",
-      "status": "HUMAN_PASS_CLOSED_B2",
+      "status": "CLOSED_PASS",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3725,7 +3725,9 @@
       "humanRetestFixtureId": "b2-asg-36624806450",
       "humanRetestPreviewSourceSha": "99edf875d2e36bcdf8057aaae5d72f37b4969191",
       "humanRetestBuildId": "gi-i65-b2-99edf875d2e3-57f234755dc1",
-      "humanRetestRunId": 36640733189
+      "humanRetestRunId": 36640733189,
+      "cleanupReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
+      "cleanupStatus": "PASS"
     },
     {
       "id": "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
@@ -3742,7 +3744,7 @@
       "rootCause": "receiptCalendarProjection keeps no-denominator rows in current calendar even when policy.cuotas is known.",
       "remediation": "B3 global read-model/lineage audit and deterministic correction; no reimport.",
       "requiredProof": "schedule count/total/provenance invariants",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3762,7 +3764,7 @@
       "rootCause": "Current identity grouping is insufficient for alias variants.",
       "remediation": "Use plate aliases + VIN/chassis + motor + renewal lineage + client; fail-closed uncertain merges.",
       "requiredProof": "deterministic identity without unsafe merge",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3783,7 +3785,7 @@
       "rootCause": "UI administration gap.",
       "remediation": "Expose server-owned tenant catalog administration; no hardcoded lists.",
       "requiredProof": "CRUD/readback/reload",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3803,7 +3805,7 @@
       "rootCause": "Cotizador/Comparativo and official tariff-source integration pending.",
       "remediation": "Integrate in B3 without replacing accepted B2 renewal workflow.",
       "requiredProof": "official-source lineage + canonical engine runtime",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3824,7 +3826,7 @@
       "rootCause": "Official source integration pending.",
       "remediation": "Resume fail-closed with Cotizador/Comparativo in B3.",
       "requiredProof": "source lineage + runtime/import proof",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3845,7 +3847,7 @@
       "rootCause": "PENDING_B3_PERFORMANCE_HYDRATION_DIAGNOSTIC",
       "remediation": "In B3 audit hydration timing/empty-state semantics; show loading state rather than transient empty result if reproducible. No reimport.",
       "requiredProof": "Refresh Ops with existing records; distinguish loading vs true empty; records appear without retry/data mutation.",
-      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "status": "OPEN_B3_CARRY_FORWARD",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
       "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
       "noLive": true,
@@ -3891,7 +3893,7 @@
     "date": "2026-09-29",
     "recordedAt": "2026-09-29T11:13:00-06:00",
     "origin": "PAULA_FINAL_TARGETED_UAT_20260929",
-    "decision": "B2_TARGETED_HUMAN_UAT_PASS_CLEANUP_PENDING",
+    "decision": "B2_PASS",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36499598188-p6m38hix.web.app",
     "exactSourceSha": "0231996b156e0563755966103b861875e0862a07",
     "exactBuildId": "gi-i65-b2-0231996b156e-57f234755dc1",
@@ -3918,7 +3920,7 @@
     "count": 7,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
     "receiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
-    "b2OverallAccepted": false,
+    "b2OverallAccepted": true,
     "noB3": true,
     "noLive": true,
     "noReimport": true,
@@ -3967,8 +3969,11 @@
     "r102HumanRetestReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_TARGETED_HUMAN_RETEST_PASS_20260929.json",
     "r102HumanRetestReceiptBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
     "remainingB2HumanBlockers": 0,
-    "cleanupPending": true,
-    "noB3UntilCleanup": true
+    "cleanupPending": false,
+    "noB3UntilCleanup": true,
+    "cleanupStatus": "PASS",
+    "cleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
+    "openedB3": true
   },
   "lastReview": {
     "date": "2026-09-26",

@@ -1,0 +1,235 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929_V1",
+  "recordedAt": "2026-09-29T23:21:02.947Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "status": "PASS",
+  "preview": {
+    "sourceSha": "99edf875d2e36bcdf8057aaae5d72f37b4969191",
+    "buildId": "gi-i65-b2-99edf875d2e3-57f234755dc1",
+    "channelId": "gi-i65-b2-36640733189",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36640733189-i4w5i8mn.web.app",
+    "runId": 36640733189,
+    "artifactId": 11065984124,
+    "artifactDigest": "889a861016b645c776f753c4530d66854f07a514d243d24a57be4b6930e32a91",
+    "exactReadback": true,
+    "functionalPass": true,
+    "livePromoted": false
+  },
+  "firestore": {
+    "targets": [
+      {
+        "collection": "gestiones",
+        "id": "gesmun8jyotn1urz",
+        "reason": "LINKED_TO_B2_DRIVE_CLIENT"
+      },
+      {
+        "collection": "actividades",
+        "id": "act1790720184374",
+        "reason": "LINKED_TO_B2_DRIVE_CLIENT"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-drive-human-36334556509",
+        "reason": "B2_R15_DRIVE_HUMAN"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-drive-human-36622988522",
+        "reason": "B2_R15_DRIVE_HUMAN"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-drive-human-36640733189",
+        "reason": "B2_R15_DRIVE_HUMAN"
+      },
+      {
+        "collection": "asesores",
+        "id": "b2-user-36624806450",
+        "reason": "B2_FINAL_HUMAN_USER"
+      },
+      {
+        "collection": "asesores",
+        "id": "b2-user-36640733189",
+        "reason": "B2_FINAL_HUMAN_USER"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-asg-36624806450",
+        "reason": "B2_FINAL_HUMAN_INSURER"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-asg-36640733189",
+        "reason": "B2_FINAL_HUMAN_INSURER"
+      }
+    ],
+    "deleted": [
+      {
+        "collection": "gestiones",
+        "id": "gesmun8jyotn1urz",
+        "reason": "LINKED_TO_B2_DRIVE_CLIENT",
+        "status": "DELETED"
+      },
+      {
+        "collection": "actividades",
+        "id": "act1790720184374",
+        "reason": "LINKED_TO_B2_DRIVE_CLIENT",
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-drive-human-36334556509",
+        "reason": "B2_R15_DRIVE_HUMAN",
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-drive-human-36622988522",
+        "reason": "B2_R15_DRIVE_HUMAN",
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-drive-human-36640733189",
+        "reason": "B2_R15_DRIVE_HUMAN",
+        "status": "DELETED"
+      },
+      {
+        "collection": "asesores",
+        "id": "b2-user-36624806450",
+        "reason": "B2_FINAL_HUMAN_USER",
+        "status": "DELETED"
+      },
+      {
+        "collection": "asesores",
+        "id": "b2-user-36640733189",
+        "reason": "B2_FINAL_HUMAN_USER",
+        "status": "DELETED"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-asg-36624806450",
+        "reason": "B2_FINAL_HUMAN_INSURER",
+        "status": "DELETED"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-asg-36640733189",
+        "reason": "B2_FINAL_HUMAN_INSURER",
+        "status": "DELETED"
+      }
+    ],
+    "residual": []
+  },
+  "drive": {
+    "targets": {
+      "refs": [
+        "1sdJesUODMEZBvRn9Bjh0t7F_JF1m4tP3",
+        "1htE1HDMSMGpp-JhMyrOY-5uGdXrka9pu"
+      ],
+      "folders": [
+        "1h0wc_bW105rdv2skIXfYk0ge8GlUR7L_"
+      ]
+    },
+    "results": [
+      {
+        "kind": "file",
+        "status": "TRASHED",
+        "id": "1sdJesUODMEZBvRn9Bjh0t7F_JF1m4tP3",
+        "name": "GRAVICENTRA_B2_DRIVE_QA_2026-09-27.txt"
+      },
+      {
+        "kind": "file",
+        "status": "TRASHED",
+        "id": "1htE1HDMSMGpp-JhMyrOY-5uGdXrka9pu",
+        "name": "AYS_Integrada_WhatsApp_4093_6180.png"
+      },
+      {
+        "kind": "folder",
+        "status": "TRASHED",
+        "id": "1h0wc_bW105rdv2skIXfYk0ge8GlUR7L_",
+        "name": "b2-drive-human-36334556509"
+      }
+    ]
+  },
+  "storage": {
+    "targets": [
+      {
+        "insurerId": "b2-asg-36624806450",
+        "prefix": "preview/tenants/alianzas-soluciones/assets/insurers/b2-asg-36624806450/",
+        "buckets": [
+          "gravicentra-insurance-assets-60e88ed5a1",
+          "ays-orbit-360-lab.firebasestorage.app",
+          "ays-orbit-360-lab.appspot.com"
+        ]
+      },
+      {
+        "insurerId": "b2-asg-36640733189",
+        "prefix": "preview/tenants/alianzas-soluciones/assets/insurers/b2-asg-36640733189/",
+        "buckets": [
+          "gravicentra-insurance-assets-60e88ed5a1",
+          "ays-orbit-360-lab.firebasestorage.app",
+          "ays-orbit-360-lab.appspot.com"
+        ]
+      }
+    ],
+    "deleted": [
+      {
+        "bucket": "gravicentra-insurance-assets-60e88ed5a1",
+        "name": "preview/tenants/alianzas-soluciones/assets/insurers/b2-asg-36624806450/logo-a5a81500b787c616d7e9.jpg"
+      },
+      {
+        "bucket": "ays-orbit-360-lab.firebasestorage.app",
+        "prefix": "preview/tenants/alianzas-soluciones/assets/insurers/b2-asg-36624806450/",
+        "status": "BUCKET_UNAVAILABLE",
+        "code": "404"
+      },
+      {
+        "bucket": "ays-orbit-360-lab.appspot.com",
+        "prefix": "preview/tenants/alianzas-soluciones/assets/insurers/b2-asg-36624806450/",
+        "status": "BUCKET_UNAVAILABLE",
+        "code": "404"
+      },
+      {
+        "bucket": "gravicentra-insurance-assets-60e88ed5a1",
+        "name": "preview/tenants/alianzas-soluciones/assets/insurers/b2-asg-36640733189/logo-79b686bd47bec26f3203.png"
+      },
+      {
+        "bucket": "ays-orbit-360-lab.firebasestorage.app",
+        "prefix": "preview/tenants/alianzas-soluciones/assets/insurers/b2-asg-36640733189/",
+        "status": "BUCKET_UNAVAILABLE",
+        "code": "404"
+      },
+      {
+        "bucket": "ays-orbit-360-lab.appspot.com",
+        "prefix": "preview/tenants/alianzas-soluciones/assets/insurers/b2-asg-36640733189/",
+        "status": "BUCKET_UNAVAILABLE",
+        "code": "404"
+      }
+    ],
+    "residual": []
+  },
+  "previewConfig": {
+    "deleted": [
+      "previewUatConfig/access",
+      "previewUatConfigEvents/uat_13a685ba698d9dc9d1a51d2bda8c",
+      "previewUatConfigEvents/uat_c2ac1bf4af6e0d24a0a695fe6da5",
+      "previewUatConfigEvents/uat_da325f5803dc6f62e83fb3e6c227",
+      "previewUatConfigEvents/uat_dfab9bdd3a997e6b9c6b7f6dfa28"
+    ],
+    "residual": []
+  },
+  "boundaries": {
+    "qaOnly": true,
+    "productionHosting": false,
+    "b3AdvanceOnlyAfterPass": true,
+    "reimport": false,
+    "realBusinessMutation": false
+  },
+  "artifact": {
+    "id": 11067598625,
+    "digest": "5abf08d354eaebf99857da439a567e69d30c733db14528cda9418ed19d57eff0"
+  }
+}

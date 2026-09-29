@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "B2_HUMAN_PASS_CLEANUP_PENDING",
+  "status": "B2_PASS",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -111,7 +111,7 @@
     "reimportAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "liveHostingPromotionAuthorized": false,
-    "advanceToB3Authorized": false,
+    "advanceToB3Authorized": true,
     "noHardcodedIdentities": true,
     "extensionReason20260924": "Causal owners demonstrated by Paula visual rejection: secure credential Preview/provider path, canonical receipts projection owner, visual tokens, and one read-only relationship diagnostic. Scope remains B2 only; no data apply, no B3, no LIVE.",
     "accessConfigRecovery": {
@@ -181,7 +181,7 @@
     "humanDriveOAuthConsentAuthorizedOnExactPreview": true,
     "productionDocumentFunctionDeployAuthorized": false,
     "previewDocumentFunctionDeployAuthorized": true,
-    "finalSyntheticCleanupAuthorized": true
+    "finalSyntheticCleanupAuthorized": false
   },
   "emailDebt": {
     "status": "DEFERRED_NON_BLOCKING_BY_OWNER",
@@ -239,7 +239,9 @@
     "r97DirectionDocumentAuthorization": true,
     "finalHumanUserInsurerFixturesReady": true,
     "humanTargetedUatPass": true,
-    "r102HumanRetestPass": true
+    "r102HumanRetestPass": true,
+    "finalSyntheticCleanupPass": true,
+    "b2OverallAccepted": true
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING",
@@ -1995,9 +1997,7 @@
     "b3Status": "NOT_STARTED",
     "livePromoted": false
   },
-  "nextRequiredProof": [
-    "FINAL_SYNTHETIC_CLEANUP"
-  ],
+  "nextRequiredProof": [],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
     "classification": "PREVIEW_SECRET_MANAGER_RUNTIME_ACCESS_DEFECT",
@@ -2294,7 +2294,7 @@
     "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL",
     "authenticatedRunId": 36218497058
   },
-  "paulaVisualDecision": "B2_TARGETED_HUMAN_UAT_4_PASS_1_FAIL_R102",
+  "paulaVisualDecision": "B2_ACCEPTED_TARGETED_HUMAN_UAT_AND_CLEANUP_PASS",
   "paulaVisualAccepted": false,
   "b3Status": "NOT_STARTED",
   "humanReviewR6": {
@@ -3109,7 +3109,7 @@
     "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "exactPreviewProofPending": true
   },
-  "boundaryNote": "All five targeted B2 human tests PASS. Final synthetic cleanup is the only remaining B2 proof. No LIVE/B3/reimport before cleanup PASS.",
+  "boundaryNote": "B2 PASS. Five targeted human tests and final synthetic cleanup passed. B3 may open; LIVE remains unchanged and promotion is not authorized.",
   "driveHumanFixture": {
     "status": "READY_FOR_TARGETED_HUMAN_UAT",
     "tenantId": "alianzas-soluciones",
@@ -4158,5 +4158,17 @@
     "refreshPersistence": true,
     "detailRender": true,
     "directoryRender": true
+  },
+  "finalSyntheticCleanup": {
+    "status": "PASS",
+    "runId": 36644642520,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
+    "artifact": {
+      "id": 11067598625,
+      "digest": "5abf08d354eaebf99857da439a567e69d30c733db14528cda9418ed19d57eff0"
+    },
+    "firestoreDeleted": 9,
+    "driveResults": 3,
+    "storageDeleted": 6
   }
 }

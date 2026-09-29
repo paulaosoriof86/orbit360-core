@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1928,7 +1928,7 @@
     "addendumPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_ADDENDUM_20260919.md",
     "forensicAuditPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_AUDIT_20260919.json",
     "candidateMode": "ONE_ACCUMULATIVE_INCREMENTAL_CANDIDATE",
-    "currentBlock": "B2",
+    "currentBlock": "B3",
     "currentReadinessPercent": 80,
     "nextTargetPercent": 90,
     "previewAfterEveryBlockRequired": true,
@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_AUTHENTICATED_PREVIEW_PASS_PENDING_VISUAL",
+    "mechanismSyncStatus": "B2_PASS_B3_OPEN",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "cc01067ec9ff0fd6c4994c360a1f86260a1eaf2d",
+    "b2ExecutionLockBlobSha": "c4dacbe7ac8958c603baa184a14858300b58fbf5",
     "b2": {
-      "status": "B2_HUMAN_PASS_CLEANUP_PENDING",
+      "status": "B2_PASS",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2168,7 +2168,7 @@
       "paulaVisualRejectionReceiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
-      "b3Status": "NOT_STARTED",
+      "b3Status": "OPEN",
       "boundaryNote": "All ordered B2 machine proofs and Drive QA cleanup PASS. Exact Preview remains isolated; LIVE unchanged; final Paula targeted visual review is the only remaining B2 gate.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
@@ -3026,7 +3026,10 @@
       "r102HumanRetestPass": true,
       "r102HumanRetestReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_TARGETED_HUMAN_RETEST_PASS_20260929.json",
       "r102HumanRetestReceiptBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
-      "finalSyntheticCleanupAuthorized": true
+      "finalSyntheticCleanupAuthorized": true,
+      "finalSyntheticCleanup": "PASS",
+      "finalSyntheticCleanupRunId": 36644642520,
+      "finalSyntheticCleanupReceiptBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -3152,6 +3155,12 @@
       "emptyVaultReturnsTenantSetupRequired": true,
       "sourceFixCommit": "8b9da11fb8acb0a9a7d5d9dc2f5b0599f43d660c",
       "guardPassRunId": 36366524357
+    },
+    "b3": {
+      "status": "IN_PROGRESS",
+      "entryCondition": "B2_PASS",
+      "targetPercent": 96,
+      "livePromoted": false
     }
   },
   "canonicalAccumulationControl": {
@@ -3159,10 +3168,10 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "fd9314fb647e2c57f74461313f5fc86880eb1545",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "44620dd06306746d3e17cfe85d12c4f5fe829e74",
+    "findingLedgerBlobSha": "e135ef18ab00a9b0bc758467c4fd770bea2a51b5",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
-    "activeBlock": "B2",
+    "activeBlock": "B3",
     "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
     "productFileCount": 70,
@@ -3171,7 +3180,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_FINAL_SYNTHETIC_CLEANUP"
+    "nextAction": "B3_EXECUTE_FIRST_INCOMPLETE_GATE"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
