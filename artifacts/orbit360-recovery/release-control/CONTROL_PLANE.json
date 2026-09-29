@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_R82_MACHINE_RUNTIME_PASS_DRIVE_CLEANUP_PENDING",
+    "mechanismSyncStatus": "B2_MACHINE_PROOFS_AND_DRIVE_CLEANUP_PASS_PAULA_FINAL_VISUAL_READY",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "17c6fdda2a5ed48a7cd4f068fce4c7af34634318",
+    "b2ExecutionLockBlobSha": "866a2985227515dc8d2f631d8b9f1f3fd562dfbb",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2162,13 +2162,13 @@
       "technicalPassHistoricalPreserved": true,
       "authenticatedPassHistoricalPreserved": true,
       "syntheticCleanupHistoricalPreserved": true,
-      "paulaVisualDecision": "R75_R76_R78_R79_R80_R88_R77_R81_R91_R95_R82_MACHINE_PASS_DRIVE_CLEANUP_PENDING",
+      "paulaVisualDecision": "R75_R76_R78_R79_R80_R88_R77_R81_R91_R95_R82_MACHINE_PASS_DRIVE_CLEANUP_PASS_PAULA_FINAL_VISUAL_READY",
       "paulaVisualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
       "paulaVisualRejectionReceiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
       "rejectedPreviewRunId": 35964339112,
       "rejectedPreviewSourceSha": "aff32646f1f7fd14d98c52711714df0849e3c7c4",
       "b3Status": "NOT_STARTED",
-      "boundaryNote": "R82 cross-module delete runtime PASS with permission owner, required reason, relation fail-closed, durable audit metadata, reload projection and synthetic cleanup. Drive QA fixture cleanup remains before Paula final visual. No LIVE, no B3, no reimport.",
+      "boundaryNote": "All ordered B2 machine proofs and Drive QA cleanup PASS. Exact Preview remains isolated; LIVE unchanged; final Paula targeted visual review is the only remaining B2 gate.",
       "causalOwnerExtension": "AUTHORIZED_20260924",
       "causalOwnerExtensionBlobSha": "94056db915040603bc12a66f98efbe1c83e8cb08",
       "lastFailedRunId": 36005170683,
@@ -2801,7 +2801,10 @@
       "r82MachineRuntimePass": true,
       "r82ProofRunId": 36499598188,
       "r82ProofArtifactId": 11005500772,
-      "r82ReceiptBlobSha": "e9a22db9d63aa87a9f60fca13d59a90724b560d4"
+      "r82ReceiptBlobSha": "e9a22db9d63aa87a9f60fca13d59a90724b560d4",
+      "driveQaFixtureCleanup": "PASS",
+      "driveQaFixtureCleanupRunId": 36506176575,
+      "driveQaFixtureCleanupReceiptBlobSha": "b0e0ed5aa81902f13ff612732158d41e31726ec3"
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2946,7 +2949,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_DRIVE_QA_FIXTURE_CLEANUP"
+    "nextAction": "B2_PAULA_TARGETED_FINAL_VISUAL"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

@@ -1,0 +1,728 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_DRIVE_QA_FIXTURE_CLEANUP_20260928_V1",
+  "recordedAt": "2026-09-29T01:07:14.792Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "status": "PASS",
+  "preview": {
+    "sourceSha": "0231996b156e0563755966103b861875e0862a07",
+    "buildId": "gi-i65-b2-0231996b156e-57f234755dc1",
+    "channelId": "gi-i65-b2-36499598188",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36499598188-p6m38hix.web.app",
+    "runId": 36499598188,
+    "artifactId": 11004860554,
+    "artifactDigest": "a2b09d57e7528278788f94143dc3f07febaa9fb47c9c1cec426fc329024326a6",
+    "exactReadback": true,
+    "functionalPass": true,
+    "livePromoted": false
+  },
+  "drive": {
+    "targets": {
+      "refs": [
+        "1FnASArFSBE1W4PwKbB-62ZId2d6yBWTD",
+        "1zI0bHo0KWSixNjhYhfgHBFYVbLHtmAL3",
+        "13K01QMLHvB6AFzfplIk5U0vkLxW2OBTU",
+        "11Gmq3PKZ77V4AZ_g7gbmbzwH1BIN9vYg",
+        "1gPnfyGf9sAL0sVU0FhMehjpypfXDt_b1",
+        "1l1XDC3tDEIJzRvwpTgo1O1Fda5tFGE32",
+        "1_XjJ7DIxRJVLczLDNWXN4ZiXdC_O4xUP",
+        "1ZOtlDFnJXTvjIrl2zQLWRhH0pqiCxmYL",
+        "1TOYW2a39-E0W3xNQHSag-zrpBU0DfWce"
+      ],
+      "folders": [
+        "1ycXma0N6puUst1q6-pFpK4bSgrdyXHME",
+        "1R2gisNElSEaLi0E1c1YwxCN6aQWgzzxc",
+        "1Po0kwX-r4iiIrLTJnaGIBayAFkFAIJtk",
+        "1EMHeZFk0Dhtb6l3quJf4p18YbSJ7ZBn2",
+        "1ZWiEivjCgwPWkBBwoktIfdASqGJu4CTx",
+        "1OhAkDjNqMiUFBLe1_4Nj-jbDISVSotVY",
+        "10FSQNkLUaQuPu1JRyGvQdjx1f_9pm0aq",
+        "1yIBfWqCfrztDObWbuAE5GQdeK-1jGr4I"
+      ]
+    },
+    "results": [
+      {
+        "kind": "file",
+        "status": "ALREADY_TRASHED",
+        "id": "1FnASArFSBE1W4PwKbB-62ZId2d6yBWTD",
+        "name": "b2-r81-36488745414.txt"
+      },
+      {
+        "kind": "file",
+        "status": "ALREADY_TRASHED",
+        "id": "1zI0bHo0KWSixNjhYhfgHBFYVbLHtmAL3",
+        "name": "b2-r77-36488745414.txt"
+      },
+      {
+        "kind": "file",
+        "status": "ALREADY_TRASHED",
+        "id": "13K01QMLHvB6AFzfplIk5U0vkLxW2OBTU",
+        "name": "b2-r81-36472554384.txt"
+      },
+      {
+        "kind": "file",
+        "status": "ALREADY_TRASHED",
+        "id": "11Gmq3PKZ77V4AZ_g7gbmbzwH1BIN9vYg",
+        "name": "b2-r81-36472934760.txt"
+      },
+      {
+        "kind": "file",
+        "status": "ALREADY_TRASHED",
+        "id": "1gPnfyGf9sAL0sVU0FhMehjpypfXDt_b1",
+        "name": "b2-r81-36473871933.txt"
+      },
+      {
+        "kind": "file",
+        "status": "ALREADY_TRASHED",
+        "id": "1l1XDC3tDEIJzRvwpTgo1O1Fda5tFGE32",
+        "name": "b2-r91-firm-36491115133.txt"
+      },
+      {
+        "kind": "file",
+        "status": "TRASHED",
+        "id": "1_XjJ7DIxRJVLczLDNWXN4ZiXdC_O4xUP",
+        "name": "b2-r91-firm-36489784713.txt"
+      },
+      {
+        "kind": "file",
+        "status": "TRASHED",
+        "id": "1ZOtlDFnJXTvjIrl2zQLWRhH0pqiCxmYL",
+        "name": "b2-r91-firm-36490245512.txt"
+      },
+      {
+        "kind": "file",
+        "status": "TRASHED",
+        "id": "1TOYW2a39-E0W3xNQHSag-zrpBU0DfWce",
+        "name": "b2-r91-firm-36490640789.txt"
+      },
+      {
+        "kind": "folder",
+        "status": "ALREADY_TRASHED",
+        "id": "1ycXma0N6puUst1q6-pFpK4bSgrdyXHME",
+        "name": "b2-r7781-client-36488745414"
+      },
+      {
+        "kind": "folder",
+        "status": "ALREADY_TRASHED",
+        "id": "1R2gisNElSEaLi0E1c1YwxCN6aQWgzzxc",
+        "name": "b2-r7781-client-36471719837"
+      },
+      {
+        "kind": "folder",
+        "status": "ALREADY_TRASHED",
+        "id": "1Po0kwX-r4iiIrLTJnaGIBayAFkFAIJtk",
+        "name": "b2-r7781-client-36472554384"
+      },
+      {
+        "kind": "folder",
+        "status": "ALREADY_TRASHED",
+        "id": "1EMHeZFk0Dhtb6l3quJf4p18YbSJ7ZBn2",
+        "name": "b2-r7781-client-36472934760"
+      },
+      {
+        "kind": "folder",
+        "status": "ALREADY_TRASHED",
+        "id": "1ZWiEivjCgwPWkBBwoktIfdASqGJu4CTx",
+        "name": "b2-r7781-client-36473871933"
+      },
+      {
+        "kind": "folder",
+        "status": "TRASHED",
+        "id": "1OhAkDjNqMiUFBLe1_4Nj-jbDISVSotVY",
+        "name": "b2-r9195-client-36489784713"
+      },
+      {
+        "kind": "folder",
+        "status": "TRASHED",
+        "id": "10FSQNkLUaQuPu1JRyGvQdjx1f_9pm0aq",
+        "name": "b2-r9195-client-36490245512"
+      },
+      {
+        "kind": "folder",
+        "status": "TRASHED",
+        "id": "1yIBfWqCfrztDObWbuAE5GQdeK-1jGr4I",
+        "name": "b2-r9195-client-36490640789"
+      }
+    ]
+  },
+  "firestore": {
+    "targets": [
+      {
+        "collection": "clientes",
+        "id": "b2-r7781-client-36488745414",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r7781-gestion-36488745414",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r7781-client-36471719837",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r7781-client-36472554384",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r7781-client-36472934760",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r7781-client-36473871933",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r9195-client-36491115133",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r95-legacy-36491115133",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "qa-r94-protected-36491115133",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r9195-insurer-36491115133",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r92-unvalidated-36491115133",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r9195-policy-36491115133",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r92-policy-36491115133",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r9195-renew-36491115133",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r93-renew-36491115133",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r92-renew-36491115133",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "polizas",
+        "id": "pol_multc4hr",
+        "allowExplicitNonPrefix": true
+      },
+      {
+        "collection": "gestiones",
+        "id": "ges_emi_multby0k",
+        "allowExplicitNonPrefix": true
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r9195-client-36489784713",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r9195-client-36490245512",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r9195-client-36490640789",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r95-legacy-36489784713",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r95-legacy-36490245512",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r95-legacy-36490640789",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "qa-r94-protected-36489784713",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "qa-r94-protected-36490245512",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "clientes",
+        "id": "qa-r94-protected-36490640789",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r9195-renew-36489784713",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r9195-renew-36490245512",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r9195-renew-36490640789",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r92-renew-36489784713",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r92-renew-36490245512",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r92-renew-36490640789",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r93-renew-36489784713",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "ges_emi_mulsmrzt",
+        "allowExplicitNonPrefix": true
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r93-renew-36490245512",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "ges_emi_mulssh3h",
+        "allowExplicitNonPrefix": true
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r93-renew-36490640789",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "gestiones",
+        "id": "ges_emi_mulsxitg",
+        "allowExplicitNonPrefix": true
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r9195-policy-36489784713",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r9195-policy-36490245512",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r9195-policy-36490640789",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r92-policy-36489784713",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r92-policy-36490245512",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r92-policy-36490640789",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r9195-insurer-36489784713",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r9195-insurer-36490245512",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r9195-insurer-36490640789",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r92-unvalidated-36489784713",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r92-unvalidated-36490245512",
+        "allowExplicitNonPrefix": false
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r92-unvalidated-36490640789",
+        "allowExplicitNonPrefix": false
+      }
+    ],
+    "deleted": [
+      {
+        "collection": "clientes",
+        "id": "b2-r7781-client-36488745414",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r7781-gestion-36488745414",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r7781-client-36471719837",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r7781-client-36472554384",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r7781-client-36472934760",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r7781-client-36473871933",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r9195-client-36491115133",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r95-legacy-36491115133",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "clientes",
+        "id": "qa-r94-protected-36491115133",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r9195-insurer-36491115133",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r92-unvalidated-36491115133",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r9195-policy-36491115133",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r92-policy-36491115133",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r9195-renew-36491115133",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r93-renew-36491115133",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r92-renew-36491115133",
+        "allowExplicitNonPrefix": false,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "polizas",
+        "id": "pol_multc4hr",
+        "allowExplicitNonPrefix": true,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "gestiones",
+        "id": "ges_emi_multby0k",
+        "allowExplicitNonPrefix": true,
+        "status": "ABSENT"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r9195-client-36489784713",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r9195-client-36490245512",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r9195-client-36490640789",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r95-legacy-36489784713",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r95-legacy-36490245512",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "b2-r95-legacy-36490640789",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "qa-r94-protected-36489784713",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "qa-r94-protected-36490245512",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "clientes",
+        "id": "qa-r94-protected-36490640789",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r9195-renew-36489784713",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r9195-renew-36490245512",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r9195-renew-36490640789",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r92-renew-36489784713",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r92-renew-36490245512",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r92-renew-36490640789",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r93-renew-36489784713",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "ges_emi_mulsmrzt",
+        "allowExplicitNonPrefix": true,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r93-renew-36490245512",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "ges_emi_mulssh3h",
+        "allowExplicitNonPrefix": true,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "b2-r93-renew-36490640789",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "gestiones",
+        "id": "ges_emi_mulsxitg",
+        "allowExplicitNonPrefix": true,
+        "status": "DELETED"
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r9195-policy-36489784713",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r9195-policy-36490245512",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r9195-policy-36490640789",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r92-policy-36489784713",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r92-policy-36490245512",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "polizas",
+        "id": "b2-r92-policy-36490640789",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r9195-insurer-36489784713",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r9195-insurer-36490245512",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r9195-insurer-36490640789",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r92-unvalidated-36489784713",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r92-unvalidated-36490245512",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b2-r92-unvalidated-36490640789",
+        "allowExplicitNonPrefix": false,
+        "status": "DELETED"
+      }
+    ],
+    "residual": []
+  },
+  "boundaries": {
+    "qaOnly": true,
+    "productionHosting": false,
+    "b3": false,
+    "reimport": false,
+    "realBusinessMutation": false
+  },
+  "artifact": {
+    "id": 11007108177,
+    "digest": "995e4f3fbe26f47cee5757819e7525d436f62ce679d097d90287937fdc38129d"
+  }
+}

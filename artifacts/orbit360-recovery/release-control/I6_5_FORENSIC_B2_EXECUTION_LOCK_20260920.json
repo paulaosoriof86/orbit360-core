@@ -1896,7 +1896,6 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "DRIVE_QA_FIXTURE_CLEANUP",
     "PAULA_TARGETED_FINAL_VISUAL_ONLY_IF_MACHINE_PROOF_PASSES"
   ],
   "lastAuthenticatedFailure": {
@@ -2195,7 +2194,7 @@
     "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL",
     "authenticatedRunId": 36218497058
   },
-  "paulaVisualDecision": "R75_R76_R78_R79_R80_R88_R77_R81_R91_R95_R82_MACHINE_PASS_DRIVE_CLEANUP_PENDING",
+  "paulaVisualDecision": "R75_R76_R78_R79_R80_R88_R77_R81_R91_R95_R82_MACHINE_PASS_DRIVE_CLEANUP_PASS_PAULA_FINAL_VISUAL_READY",
   "paulaVisualAccepted": false,
   "b3Status": "NOT_STARTED",
   "humanReviewR6": {
@@ -3460,7 +3459,7 @@
       "managementDownloadAvailable": true
     },
     "cleanup": {
-      "pending": true,
+      "pending": false,
       "targets": {
         "clientId": "b2-r7781-client-36488745414",
         "managementId": "b2-r7781-gestion-36488745414",
@@ -3499,7 +3498,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "PASS"
     },
     "artifact": {
       "id": 11000650970,
@@ -3560,7 +3560,7 @@
       "historicalFieldOptional": true
     },
     "cleanup": {
-      "pending": true,
+      "pending": false,
       "targets": [
         {
           "kind": "client",
@@ -3614,7 +3614,8 @@
           "kind": "driveDocumentRef",
           "id": "1l1XDC3tDEIJzRvwpTgo1O1Fda5tFGE32"
         }
-      ]
+      ],
+      "status": "PASS"
     },
     "artifact": {
       "id": 11002375024,
@@ -3799,5 +3800,17 @@
       "id": 11005500772,
       "digest": "96ea2cfe82998b982393745ea89266f1e582696d02d60b02ce0cf055e5caa625"
     }
+  },
+  "driveQaFixtureCleanup": {
+    "status": "PASS",
+    "runId": 36506176575,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_DRIVE_QA_FIXTURE_CLEANUP_20260928.json",
+    "artifact": {
+      "id": 11007108177,
+      "digest": "995e4f3fbe26f47cee5757819e7525d436f62ce679d097d90287937fdc38129d"
+    },
+    "driveResultCount": 17,
+    "firestoreDeletedCount": 51,
+    "residualCount": 0
   }
 }
