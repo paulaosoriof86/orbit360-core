@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "SOURCE_FIXED_PENDING_HUMAN_FIXTURES_AND_EXACT_PREVIEW",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1814,12 +1814,12 @@
     "findingsLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "mechanismRootCause": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
     "definitiveFix": "EXACT_PRODUCT_DIFF_AND_BLOB_BOUND_SINGLE_COMPOSITION_AUTHORITY",
-    "productSourceReadyForPreview": false,
+    "productSourceReadyForPreview": true,
     "broadRediscoveryRequired": false,
     "authorityBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
-    "findingsLedgerBlobSha": "6128ad2d7bede9bbca3400018ebb46e9cbf88026",
+    "findingsLedgerBlobSha": "e8f84018adcb03db9b20d024dd06d2dc3ef620ad",
     "compositionLockBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
-    "findingLedgerBlobSha": "6128ad2d7bede9bbca3400018ebb46e9cbf88026",
+    "findingLedgerBlobSha": "e8f84018adcb03db9b20d024dd06d2dc3ef620ad",
     "productFileCount": 70
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -1896,17 +1896,16 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "PREPARE_R98_EXACT_PREVIEW_SYNTHETIC_DRIVE_CLIENT",
-    "PREPARE_R101_SYNTHETIC_TEAM_FIXTURE_NO_AUTH_EMAIL",
-    "PREPARE_R102_SYNTHETIC_INSURER_FIXTURE_EXACT_PREVIEW",
+    "SINGLE_EXACT_B2_PREVIEW_TECHNICAL_PASS",
     "R96_ACCESS_CONFIG_PREVIEW_ISOLATED_SERVER_READBACK",
     "R97_DIRECTION_DOCUMENT_AUTHORIZATION",
+    "R98_EXACT_PREVIEW_SYNTHETIC_DRIVE_CLIENT_FIXTURE",
+    "R99_OPS_MOBILE_RESPONSIVE",
     "R100_TEAM_DELETE_MOBILE_COMPOSITION",
-    "R98_R99_OPS_SYNTHETIC_UPLOAD_AND_MOBILE_RESPONSIVE",
-    "R101_USER_EDIT_HUMAN_FIXTURE",
-    "R102_INSURER_LOGO_HUMAN_FIXTURE",
-    "NEW_EXACT_CUMULATIVE_B2_PREVIEW_MACHINE_FOCAL_PASS",
-    "PAULA_FIVE_TARGETED_HUMAN_TESTS"
+    "R101_SYNTHETIC_TEAM_FIXTURE",
+    "R102_SYNTHETIC_INSURER_FIXTURE",
+    "PAULA_FIVE_TARGETED_HUMAN_TESTS",
+    "FINAL_SYNTHETIC_CLEANUP"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -2747,7 +2746,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "6128ad2d7bede9bbca3400018ebb46e9cbf88026",
+  "findingLedgerBlobSha": "e8f84018adcb03db9b20d024dd06d2dc3ef620ad",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -3019,7 +3018,7 @@
     "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "exactPreviewProofPending": true
   },
-  "boundaryNote": "R22 source remediation is prepared for R96/R97/R99/R100; R98 reuses the canonical synthetic upload surface. Exact-candidate human fixtures for R98/R101/R102 are still required before the single cumulative build. No LIVE/B3/reimport.",
+  "boundaryNote": "R22 single cumulative candidate armed. Build/Preview once from exact product composition; authenticated proof must create only marked synthetic human fixtures and R15 drive client. No LIVE/B3/reimport.",
   "driveHumanFixture": {
     "status": "PRESERVED_PENDING_R83_HUMAN_RETEST_ON_AUTHENTICATED_PREVIEW",
     "tenantId": "alianzas-soluciones",
@@ -3869,7 +3868,7 @@
     }
   },
   "r22FinalHumanRemediation": {
-    "status": "SOURCE_FIXED_PENDING_HUMAN_FIXTURES_AND_EXACT_PREVIEW",
+    "status": "CANDIDATE_ARMED_PENDING_SINGLE_EXACT_PREVIEW",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
     "receiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
     "compositionLockBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
@@ -3898,10 +3897,19 @@
       "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22"
     ],
     "productFileCount": 70,
-    "noBuildYet": true,
-    "noPreviewYet": true,
+    "noBuildYet": false,
+    "noPreviewYet": false,
     "noLive": true,
     "noB3": true,
-    "noReimport": true
+    "noReimport": true,
+    "candidateArmReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_CANDIDATE_ARM_20260929.json",
+    "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
+    "mechanismBlobs": {
+      "authenticatedHarness": "4bcfa5864107f04be5fcfd4888db370d998a8ad1",
+      "driveHumanFixture": "72780e8867105ceb7b1cbcff9afaacc945371cfe",
+      "functionalValidator": "bedd58e37d98ff2582e25d12ba377c7f3b763940",
+      "workflow": "baae4b3a98e60e7d318a87ba6cd7584f34d0e0e2"
+    },
+    "singleCandidateAuthorized": true
   }
 }

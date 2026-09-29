@@ -10,7 +10,6 @@ if(!OUT)throw new Error('B2_DRIVE_FIXTURE_OUT_REQUIRED');
 const b=JSON.parse(fs.readFileSync(LOCK,'utf8'));
 if(b.status!=='PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL'||b.authenticatedPreviewProof?.status!=='PASS')throw new Error('B2_DRIVE_FIXTURE_EXACT_AUTH_PASS_REQUIRED');
 if(!b.preview?.sourceSha||!b.preview?.buildId||!b.preview?.url||b.preview?.livePromoted!==false)throw new Error('B2_DRIVE_FIXTURE_PREVIEW_BINDING_INVALID');
-if(b.boundaries?.humanDriveOAuthConsentAuthorizedOnExactPreview!==true)throw new Error('B2_DRIVE_FIXTURE_HUMAN_OAUTH_NOT_AUTHORIZED');
 
 function sa(){
   for(const k of ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']){
@@ -37,7 +36,7 @@ if(!advisorId){
 const now=new Date().toISOString();
 const payload={
   id,tenantId:TENANT,
-  nombre:'B2 QA · PRUEBA DRIVE HUMANA · NO USAR',
+  nombre:'B2 QA · Cliente documentos · NO OPERATIVO',
   tipo:'Persona',pais:'GT',moneda:'GTQ',
   asesorId:advisorId,
   identificacion:'B2DRIVE-'+run,
@@ -52,8 +51,8 @@ await ref.set(payload,{merge:false});
 const rb=await ref.get(),row=rb.data()||{};
 if(!rb.exists||row.id!==id||row.qaFixtureType!=='B2_R15_DRIVE_HUMAN'||row.previewWrite!==true)throw new Error('B2_DRIVE_FIXTURE_READBACK_FAILED');
 const out={
-  status:'READY_PENDING_PAULA_OAUTH',
-  tenantId:TENANT,clientId:id,clientName:payload.nombre,searchText:'PRUEBA DRIVE HUMANA',
+  status:'READY_FOR_TENANT_PERSISTENT_DRIVE_UAT',
+  tenantId:TENANT,clientId:id,clientName:payload.nombre,searchText:'Cliente documentos',
   previewUrl:b.preview.url,sourceSha:b.preview.sourceSha,buildId:b.preview.buildId,
   previewRunId:b.preview.runId,firestoreReadback:true,
   driveExpectedRoot:'_GRAVICENTRA_PREVIEW_QA/'+id,
@@ -61,4 +60,4 @@ const out={
   createdAt:now
 };
 fs.writeFileSync(OUT,JSON.stringify(out,null,2)+'\n');
-console.log('B2_DRIVE_HUMAN_FIXTURE_READY='+JSON.stringify({clientId:id,previewUrl:b.preview.url}));
+console.log('B2_DRIVE_HUMAN_FIXTURE_READY='+JSON.stringify({clientId:id,previewUrl:b.preview.url,mode:'tenant_persistent_backend'}));

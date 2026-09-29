@@ -29,6 +29,8 @@ const files={
   productApp:read('orbit360-platform/core/product-app-p0.js'),
   credentialProvider:read('orbit360-platform/core/product-insurer-credential-provider-p0.js'),
   domainConfig:read('orbit360-platform/core/tenant-domain-config-client.js'),
+  domainConfigBackend:read('functions/tenant-domain-config.js'),
+  accessRoleOwner:read('orbit360-platform/core/access-role-session-owner-v20260728.js'),
   credentialBackend:read('functions/product-insurer-credentials.js'),
   operationalBackend:read('functions/product-operational-domain.js'),
   opsBackend:read('functions/product-ops-leads-domain.js'),
@@ -151,7 +153,24 @@ need(files.operationalBackend.includes('exports.orbit360ProductAssetUploadPrevie
 need(files.credentialBackend.includes("'operativo']")&&files.credentialBackend.includes("previewSecretPattern:'orbit360-insurer-credentials-preview-{tenantId}'")&&files.credentialBackend.includes("importEnabled:true")&&!files.credentialBackend.includes("Importación deshabilitada en Preview"),'B2_INSURER_CREDENTIAL_PREVIEW_CONTRACT_INVALID');
 need(files.credentialProvider.includes('importCredentials')&&files.credentialProvider.includes('previewCleanup:cleanupPreview')&&files.credentialProvider.includes("operation:'delete_preview'"),'B2_INSURER_CREDENTIAL_PRODUCT_PROVIDER_CONTRACT_MISSING');
 need(files.insurers.includes('provider.importCredentials'),'B2_INSURER_DIRECT_CREDENTIAL_IMPORT_MISSING');
-need(files.domainConfig.includes("tenant-domain-config-client-v3")&&files.domainConfig.includes("dispatchEvent(new CustomEvent('orbit:domain-config'")&&files.accessScope.includes("Orbit.domainConfig.peek('access')")&&files.router.includes("hydrateAccessAuthority"),'B2_ACCESS_MATRIX_PROTECTED_HYDRATION_MISSING');
+need(
+  files.domainConfig.includes("tenant-domain-config-client-v4-b2-r96")&&
+  files.domainConfig.includes("PREVIEW_FUNCTION_NAME='orbit360TenantDomainConfigPreview'")&&
+  files.domainConfig.includes("previewIsolated:isPreview()")&&
+  files.domainConfigBackend.includes("exports.orbit360TenantDomainConfigPreview")&&
+  files.domainConfigBackend.includes("previewUatConfig")&&
+  files.domainConfigBackend.includes("canonical_readonly_baseline")&&
+  files.domainConfig.includes("dispatchEvent(new CustomEvent('orbit:domain-config'")&&
+  files.accessScope.includes("Orbit.domainConfig.peek('access')")&&
+  files.router.includes("hydrateAccessAuthority"),
+  'B2_R96_ACCESS_MATRIX_PREVIEW_ISOLATED_SERVER_OWNER_MISSING'
+);
+need(
+  files.accessRoleOwner.includes("orbit:active-role-changed")&&
+  files.accessRoleOwner.includes("before !== role")&&
+  files.accessRoleOwner.includes("safeSessionWrite(role, advisorId, projection)"),
+  'B2_R97_ACTIVE_ROLE_CHANGE_EVENT_OWNER_MISSING'
+);
 need(files.academia.includes("['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin'].includes(rol)"),'B2_ACADEMIA_PRIVILEGED_ROLE_ALIAS_MISSING');
 need(files.runtimeConfig.includes("'cursos'")&&files.runtimeConfig.includes("'academyProgress'"),'B2_ACADEMIA_RUNTIME_HYDRATION_MISSING');
 need(files.accessPolicy.includes("cursos: { module: 'academia'")&&files.accessPolicy.includes("academyProgress: { module: 'academia'")&&files.accessPolicy.includes("field: 'uid'"),'B2_ACADEMIA_READ_POLICY_MISSING');

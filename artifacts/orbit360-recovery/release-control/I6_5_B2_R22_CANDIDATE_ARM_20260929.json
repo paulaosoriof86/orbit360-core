@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R22_CANDIDATE_ARM_V1",
+  "recordedAt": "2026-09-29T13:47:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "82336d26e2d4bf100099b41a826ca3e003b13815",
+  "block": "B2",
+  "status": "CANDIDATE_ARMED_PENDING_SINGLE_EXACT_PREVIEW",
+  "productSourceCommit": "82336d26e2d4bf100099b41a826ca3e003b13815",
+  "productFileCount": 70,
+  "mechanismBlobs": {
+    "authenticatedHarness": "4bcfa5864107f04be5fcfd4888db370d998a8ad1",
+    "driveHumanFixture": "72780e8867105ceb7b1cbcff9afaacc945371cfe",
+    "functionalValidator": "bedd58e37d98ff2582e25d12ba377c7f3b763940",
+    "workflow": "baae4b3a98e60e7d318a87ba6cd7584f34d0e0e2"
+  },
+  "focalMachineProofs": {
+    "r96": "Preview isolated tenant-domain-config save/get server roundtrip",
+    "r97": "Operativo -> Dirección -> Operativo Drive authorization refresh",
+    "r99": "mobile modal responsive source contract plus targeted human test",
+    "r100": "Equipo footer responsive source contract plus targeted human test"
+  },
+  "humanFixtures": {
+    "user": "authenticated harness creates b2-user-* with blank email/no Auth and preserves only after complete PASS",
+    "insurer": "authenticated harness preserves b2-asg-* plus Preview logo asset only after complete PASS; secure credential remains cleaned",
+    "driveClient": "R15 existing writer creates b2-drive-human-* after authenticated PASS using tenant-persistent Drive authority"
+  },
+  "cleanup": {
+    "runFailure": "authenticated harness deletes user/insurer if proof fails",
+    "finalHumanAcceptance": "all remaining B2 synthetic fixtures must be removed and read back absent before B2 PASS",
+    "userDelete": "TEST 3 exercises canonical delete and therefore removes the user fixture itself"
+  },
+  "nextState": "CANDIDATE_PENDING_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B2_PREVIEW",
+  "boundaries": {
+    "oneNewCandidate": true,
+    "noSecondBuildUnlessSourceChanges": true,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "realBusinessMutation": false,
+    "emailSend": false
+  }
+}
