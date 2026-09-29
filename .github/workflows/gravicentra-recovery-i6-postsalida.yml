@@ -70,6 +70,7 @@ on:
       - 'tools/gravicentra-i6-5-b2-authenticated-preview.mjs'
       - 'tools/gravicentra-i6-5-b2-r52-human-fixture.mjs'
       - 'tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs'
+      - 'tools/gravicentra-i6-5-b2-drive-qa-cleanup.mjs'
       - 'tools/gravicentra-i6-5-b2-r77-r81-drive-durable-proof.mjs'
       - 'tools/gravicentra-i6-5-b2-r77-r81-freeze.mjs'
       - 'tools/gravicentra-i6-5-b2-r82-delete-runtime-proof.mjs'
@@ -5307,4 +5308,111 @@ jobs:
       - name: R82 failure remains fail-closed
         if: ${{ failure() && steps.mode.outputs.run == 'true' }}
         run: echo "B2_R82_FAILED_NO_LIVE_NO_B3_NO_REIMPORT_CLEANUP_REQUIRED"
+
+  i65-b2-drive-qa-fixture-cleanup:
+    needs: i65-b2-r82-delete-runtime-proof
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+      DRIVE_CLEANUP_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B2_DRIVE_QA_FIXTURE_CLEANUP_20260928.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate Drive QA fixture cleanup
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK));
+          const cursor=Array.isArray(b.nextRequiredProof)?b.nextRequiredProof[0]:'';
+          const run=b.status==='PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL'
+            && cursor==='DRIVE_QA_FIXTURE_CLEANUP'
+            && b.r77r81DriveDurableProof?.status==='PASS_CLEANUP_PENDING'
+            && b.r91r95RuntimeProof?.status==='PASS_CLEANUP_PENDING_FINAL_PAULA_VISUAL'
+            && b.r82CrossModuleDeleteProof?.status==='PASS'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
+            && c.i65ForensicRemediationPlan?.currentBlock==='B2';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B2_DRIVE_QA_CLEANUP_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Assert LIVE unchanged before Drive QA cleanup
+        if: steps.mode.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Validate Drive QA cleanup source
+        if: steps.mode.outputs.run == 'true'
+        run: node --check tools/gravicentra-i6-5-b2-drive-qa-cleanup.mjs
+      - name: Install Drive QA cleanup dependencies
+        if: steps.mode.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 @google-cloud/secret-manager@6.1.0 >/dev/null
+      - name: Execute Drive QA fixture cleanup
+        id: cleanup
+        if: steps.mode.outputs.run == 'true'
+        env:
+          B2_DRIVE_CLEANUP_OUT: ${{ runner.temp }}/b2-drive-qa-cleanup.json
+        run: node tools/gravicentra-i6-5-b2-drive-qa-cleanup.mjs
+      - name: Upload Drive QA cleanup evidence
+        id: evidence
+        if: ${{ always() && steps.mode.outputs.run == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-drive-qa-cleanup-${{ github.run_id }}
+          path: ${{ runner.temp }}/b2-drive-qa-cleanup.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Freeze Drive QA cleanup pass and open final visual
+        if: ${{ steps.mode.outputs.run == 'true' && steps.cleanup.conclusion == 'success' && steps.evidence.conclusion == 'success' }}
+        env:
+          B2_DRIVE_CLEANUP_OUT: ${{ runner.temp }}/b2-drive-qa-cleanup.json
+          CLEANUP_ARTIFACT_ID: ${{ steps.evidence.outputs.artifact-id }}
+          CLEANUP_ARTIFACT_DIGEST: ${{ steps.evidence.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const cpPath=process.env.CONTROL,lockPath=process.env.B2_LOCK,evPath=process.env.B2_DRIVE_CLEANUP_OUT,receiptPath=process.env.DRIVE_CLEANUP_RECEIPT;
+          const c=JSON.parse(fs.readFileSync(cpPath,'utf8')),b=JSON.parse(fs.readFileSync(lockPath,'utf8')),e=JSON.parse(fs.readFileSync(evPath,'utf8'));
+          if(e.status!=='PASS'||e.firestore?.residual?.length)throw Error('B2_DRIVE_QA_CLEANUP_EVIDENCE_INVALID');
+          if(!Array.isArray(b.nextRequiredProof)||b.nextRequiredProof[0]!=='DRIVE_QA_FIXTURE_CLEANUP')throw Error('B2_DRIVE_QA_CLEANUP_CURSOR_CHANGED');
+          const receipt={schema:'GRAVICENTRA_I6_5_B2_DRIVE_QA_FIXTURE_CLEANUP_20260928_V1',recordedAt:new Date().toISOString(),repository:'paulaosoriof86/orbit360-core',branch:process.env.GITHUB_REF_NAME,block:'B2',status:'PASS',preview:b.preview,drive:e.drive,firestore:{targets:e.firestore.targets,deleted:e.firestore.deleted,residual:e.firestore.residual},boundaries:e.boundaries,artifact:{id:Number(process.env.CLEANUP_ARTIFACT_ID||0),digest:String(process.env.CLEANUP_ARTIFACT_DIGEST||'')}};
+          fs.writeFileSync(receiptPath,JSON.stringify(receipt,null,2)+'\n');
+          b.driveQaFixtureCleanup={status:'PASS',runId:Number(process.env.GITHUB_RUN_ID),receiptPath,artifact:receipt.artifact,driveResultCount:e.drive?.results?.length||0,firestoreDeletedCount:e.firestore?.deleted?.length||0,residualCount:e.firestore?.residual?.length||0};
+          b.r77r81DriveDurableProof.cleanup={...(b.r77r81DriveDurableProof.cleanup||{}),pending:false,status:'PASS'};
+          b.r91r95RuntimeProof.cleanup={...(b.r91r95RuntimeProof.cleanup||{}),pending:false,status:'PASS'};
+          b.nextRequiredProof=b.nextRequiredProof.slice(1);
+          b.paulaVisualDecision='R75_R76_R78_R79_R80_R88_R77_R81_R91_R95_R82_MACHINE_PASS_DRIVE_CLEANUP_PASS_PAULA_FINAL_VISUAL_READY';
+          fs.writeFileSync(lockPath,JSON.stringify(b,null,2)+'\n');
+          c.i65ForensicRemediationPlan.mechanismSyncStatus='B2_MACHINE_PROOFS_AND_DRIVE_CLEANUP_PASS_PAULA_FINAL_VISUAL_READY';
+          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),status:b.status,driveQaFixtureCleanup:'PASS',driveQaFixtureCleanupRunId:Number(process.env.GITHUB_RUN_ID),paulaVisualDecision:b.paulaVisualDecision,boundaryNote:'All ordered B2 machine proofs and Drive QA cleanup PASS. Exact Preview remains isolated; LIVE unchanged; final Paula targeted visual review is the only remaining B2 gate.'};
+          c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),nextAction:'B2_PAULA_TARGETED_FINAL_VISUAL'};
+          fs.writeFileSync(cpPath,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$DRIVE_CLEANUP_RECEIPT" "$B2_LOCK"
+          LOCK_BLOB=$(git hash-object "$B2_LOCK"); export LOCK_BLOB
+          RECEIPT_BLOB=$(git hash-object "$DRIVE_CLEANUP_RECEIPT"); export RECEIPT_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p,'utf8'));
+          c.i65ForensicRemediationPlan.b2ExecutionLockBlobSha=process.env.LOCK_BLOB;
+          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),driveQaFixtureCleanupReceiptBlobSha:process.env.RECEIPT_BLOB};
+          fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5 B2): Drive QA cleanup pass final visual ready"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Drive QA cleanup failure remains fail-closed
+        if: ${{ failure() && steps.mode.outputs.run == 'true' }}
+        run: echo "B2_DRIVE_QA_CLEANUP_FAILED_NO_LIVE_NO_B3_FINAL_VISUAL_BLOCKED"
 
