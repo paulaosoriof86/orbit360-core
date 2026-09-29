@@ -1,0 +1,70 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R22_R101_HARNESS_PRIVILEGED_FIXTURE_WRITE_FIX_V1",
+  "recordedAt": "2026-09-29T14:12:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "failedRunId": 36623828226,
+  "failedJobId": 109595835762,
+  "exactPreview": {
+    "sourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
+    "buildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36622988522-gy3bsyhy.web.app",
+    "artifactId": 11059202434,
+    "artifactDigest": "cf2cd355de95eaf79f7cd5f66b66ebf7c1ad4307d1e9b5ea729bfdbda4ac4b21"
+  },
+  "machineProofPreserved": {
+    "r96": {
+      "status": "PASS",
+      "functionName": "orbit360TenantDomainConfigPreview",
+      "functionRegion": "us-east1",
+      "previewIsolated": true,
+      "saveOk": true,
+      "getOk": true,
+      "configEqual": true,
+      "readbackMetadataKeys": [
+        "previewIsolated",
+        "schemaOwner",
+        "tenantId",
+        "updatedAt",
+        "updatedByUid"
+      ]
+    },
+    "r97": {
+      "status": "PASS",
+      "activeRole": "Dirección",
+      "driveAvailable": true,
+      "configured": true,
+      "uploadAvailable": true,
+      "previewIsolated": true
+    },
+    "downstreamReached": [
+      "OPS_LEADS_SYNTHETIC_E2E_PASS",
+      "INSURER_SECURE_EDIT_PASS",
+      "RENEWAL_READBACK_PASS"
+    ]
+  },
+  "failure": {
+    "code": "PRODUCT_WRITE_ACCESS_DENIED",
+    "stage": "PREPARE_R101_SYNTHETIC_TEAM_FIXTURE",
+    "activeRoleAtFailure": "Operativo",
+    "classification": "HARNESS_USED_NON_PRIVILEGED_ROLE_FOR_TEAM_ADMIN_FIXTURE"
+  },
+  "productBehavior": "CORRECT_FAIL_CLOSED_DENIAL",
+  "productRegressionDemonstrated": false,
+  "productSourceMutation": false,
+  "buildInvalidated": false,
+  "sameArtifactRetryAuthorized": true,
+  "harnessBeforeBlob": "8f04fee01a3ffaaf67d61bff364ef652db66ec8f",
+  "harnessAfterBlob": "a25e13edb57844ff63d9b3d4524e216eaa595978",
+  "remediation": "Switch to an already assigned privileged actor role, assert Equipo view/edit authority, create the blank-email synthetic user through canonical durable store, read it back, then restore Operativo. On any failure the fixture remains cleanup-eligible.",
+  "boundaries": {
+    "noRebuild": true,
+    "noNewPreview": true,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noEmail": true,
+    "syntheticOnly": true
+  }
+}

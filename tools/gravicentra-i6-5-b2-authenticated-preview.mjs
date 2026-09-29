@@ -1530,6 +1530,17 @@ try{
   milestone('RENEWAL_READBACK',{receipts:renewalReceipts.length,portfolio:renewalPortfolio.length});
   const userId='b2-user-'+stamp.toLowerCase();
   state.userId=userId;
+  const userFixtureRole=privilegedRole;
+  need(!!userFixtureRole,'B2_FINAL_HUMAN_USER_PRIVILEGED_ROLE_REQUIRED');
+  await setRole(page,userFixtureRole);
+  await sleep(350);
+  const userFixtureAccess=await page.evaluate(()=>({
+    role:String(Orbit.session&&Orbit.session.rol?Orbit.session.rol():''),
+    equipoVisible:!!Orbit.access?.puedeVerModulo?.('equipo'),
+    equipoEdit:!!Orbit.access?.can?.('equipo','edit')
+  }));
+  milestone('FINAL_HUMAN_USER_WRITE_AUTH',userFixtureAccess);
+  need(userFixtureAccess.equipoVisible===true&&userFixtureAccess.equipoEdit===true,'B2_FINAL_HUMAN_USER_PRIVILEGED_WRITE_DENIED:'+JSON.stringify(userFixtureAccess));
   await bounded(page.evaluate(async ({userId,stamp})=>{
     const payload={
       id:userId,nombre:'B2 QA Usuario '+stamp,email:'',telefono:'',color:'#64748b',
@@ -1552,8 +1563,11 @@ try{
     return row&&row.qaFixture===true&&row.qaFixtureType==='B2_FINAL_HUMAN_USER'&&row.email===''?row:null;
   },'B2_FINAL_HUMAN_USER_READBACK',30000);
   need(!!userReadback,'B2_FINAL_HUMAN_USER_NOT_DURABLE');
+  await setRole(page,'Operativo');
+  await sleep(300);
   state.preserveHumanFixtures=true;
   evidence.humanFixtures={
+    fixtureWriteRole:userFixtureRole,
     status:'READY_FOR_TARGETED_HUMAN_UAT',
     user:{id:userId,name:userReadback.nombre,search:'B2 QA Usuario'},
     insurer:{id:insurerId,name:'B2 QA Aseguradora '+stamp,search:'B2 QA Aseguradora'},

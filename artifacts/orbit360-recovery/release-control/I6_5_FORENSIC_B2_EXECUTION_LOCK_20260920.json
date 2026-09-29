@@ -1817,9 +1817,9 @@
     "productSourceReadyForPreview": true,
     "broadRediscoveryRequired": false,
     "authorityBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
-    "findingsLedgerBlobSha": "2be8069a8a76ff72eefd935b3dd3fcf9e881cf94",
+    "findingsLedgerBlobSha": "1137839407a128b7a6c13be68cc3f6f15cf4a565",
     "compositionLockBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
-    "findingLedgerBlobSha": "2be8069a8a76ff72eefd935b3dd3fcf9e881cf94",
+    "findingLedgerBlobSha": "1137839407a128b7a6c13be68cc3f6f15cf4a565",
     "productFileCount": 70
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -1896,13 +1896,9 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R96_ACCESS_CONFIG_PREVIEW_SEMANTIC_SERVER_READBACK_RETRY",
-    "R97_DIRECTION_DOCUMENT_AUTHORIZATION",
+    "R101_SYNTHETIC_TEAM_FIXTURE_PRIVILEGED_WRITE_READBACK",
+    "R102_SYNTHETIC_INSURER_FIXTURE_PRESERVE",
     "R98_EXACT_PREVIEW_SYNTHETIC_DRIVE_CLIENT_FIXTURE",
-    "R99_OPS_MOBILE_RESPONSIVE",
-    "R100_TEAM_DELETE_MOBILE_COMPOSITION",
-    "R101_SYNTHETIC_TEAM_FIXTURE",
-    "R102_SYNTHETIC_INSURER_FIXTURE",
     "PAULA_FIVE_TARGETED_HUMAN_TESTS",
     "FINAL_SYNTHETIC_CLEANUP"
   ],
@@ -2745,7 +2741,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "2be8069a8a76ff72eefd935b3dd3fcf9e881cf94",
+  "findingLedgerBlobSha": "1137839407a128b7a6c13be68cc3f6f15cf4a565",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -3909,7 +3905,11 @@
       "functionalValidator": "bedd58e37d98ff2582e25d12ba377c7f3b763940",
       "workflow": "baae4b3a98e60e7d318a87ba6cd7584f34d0e0e2"
     },
-    "singleCandidateAuthorized": true
+    "singleCandidateAuthorized": true,
+    "r96MachinePass": true,
+    "r97MachinePass": true,
+    "r96PassRunId": 36623828226,
+    "r97PassRunId": 36623828226
   },
   "r22R96HarnessRepair": {
     "status": "HARNESS_ONLY_FIXED_RETRY_SAME_EXACT_PREVIEW_AUTHORIZED",
@@ -3922,5 +3922,18 @@
     "productSourceMutation": false,
     "exactPreviewUnchanged": true,
     "sameArtifactRetryAuthorized": true
+  },
+  "r22R101HarnessRepair": {
+    "status": "HARNESS_ONLY_FIXED_PRIVILEGED_TEAM_FIXTURE_RETRY_SAME_EXACT_PREVIEW_AUTHORIZED",
+    "failedRunId": 36623828226,
+    "failedJobId": 109595835762,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_R101_HARNESS_PRIVILEGED_FIXTURE_WRITE_FIX_20260929.json",
+    "receiptBlobSha": "bfd4074a5dee18f8b593eca64bfafcc34fd9343f",
+    "harnessBeforeBlob": "8f04fee01a3ffaaf67d61bff364ef652db66ec8f",
+    "harnessAfterBlob": "a25e13edb57844ff63d9b3d4524e216eaa595978",
+    "productSourceMutation": false,
+    "exactPreviewUnchanged": true,
+    "sameArtifactRetryAuthorized": true,
+    "productBehavior": "CORRECT_FAIL_CLOSED_DENIAL"
   }
 }

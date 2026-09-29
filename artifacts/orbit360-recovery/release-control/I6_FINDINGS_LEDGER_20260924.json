@@ -3480,7 +3480,7 @@
       "rootCause": "Preview browser used production tenant-domain-config callable; no Preview-isolated server write/readback path existed.",
       "remediation": "Dedicated orbit360TenantDomainConfigPreview@us-east1 with previewUatConfig namespace; canonical access read-only baseline; browser chooses Preview callable by hostname.",
       "requiredProof": "reversible save -> server readback -> reload",
-      "status": "SERVER_ROUNDTRIP_OBSERVED_HARNESS_SEMANTIC_RETRY_ARMED",
+      "status": "MACHINE_PASS_PENDING_HUMAN_TEST_1",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3504,7 +3504,17 @@
       "harnessRepairReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_R96_HARNESS_SEMANTIC_READBACK_FIX_20260929.json",
       "harnessRepairReceiptBlobSha": "41e8026b5570685d66f4a44f839bb781c27f7dce",
       "harnessAfterBlob": "8f04fee01a3ffaaf67d61bff364ef652db66ec8f",
-      "sameArtifactRetryAuthorized": true
+      "sameArtifactRetryAuthorized": true,
+      "lastMachinePass": {
+        "runId": 36623828226,
+        "jobId": 109595835762,
+        "saveOk": true,
+        "getOk": true,
+        "semanticConfigEqual": true,
+        "previewIsolated": true,
+        "functionName": "orbit360TenantDomainConfigPreview",
+        "functionRegion": "us-east1"
+      }
     },
     {
       "id": "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
@@ -3522,7 +3532,7 @@
       "rootCause": "Canonical role owner emitted orbit:session on product role switch while Drive authorization provider listened for orbit:active-role-changed; stale previous-role document status could persist.",
       "remediation": "Canonical session owner now emits orbit:active-role-changed after a successful actual role change; backend role/scope contract unchanged.",
       "requiredProof": "Dirección synthetic status/read/upload authorization",
-      "status": "SOURCE_FIXED_CANDIDATE_ARMED_PENDING_EXACT_PREVIEW",
+      "status": "MACHINE_PASS_PENDING_HUMAN_SPOTCHECK",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3530,7 +3540,16 @@
       "sourceFixReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
       "sourceFixReceiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
       "candidateArmReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_CANDIDATE_ARM_20260929.json",
-      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687"
+      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
+      "lastMachinePass": {
+        "runId": 36623828226,
+        "jobId": 109595835762,
+        "activeRole": "Dirección",
+        "driveAvailable": true,
+        "configured": true,
+        "uploadAvailable": true,
+        "previewIsolated": true
+      }
     },
     {
       "id": "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
@@ -3625,13 +3644,24 @@
       "rootCause": "Safe reversible human fixture not prepared.",
       "remediation": "Prepare reversible synthetic Equipo record bound to exact candidate; no Auth/email delivery.",
       "requiredProof": "edit -> save confirmed -> reload -> cleanup",
-      "status": "FIXTURE_MECHANISM_ARMED_PENDING_EXACT_PREVIEW",
+      "status": "HARNESS_FIXTURE_AUTH_REPAIR_ARMED_SAME_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
       "noReimport": true,
       "candidateArmReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_CANDIDATE_ARM_20260929.json",
-      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687"
+      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
+      "lastFailure": {
+        "runId": 36623828226,
+        "jobId": 109595835762,
+        "code": "PRODUCT_WRITE_ACCESS_DENIED",
+        "activeRole": "Operativo",
+        "productRegressionDemonstrated": false
+      },
+      "harnessRepairReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_R101_HARNESS_PRIVILEGED_FIXTURE_WRITE_FIX_20260929.json",
+      "harnessRepairReceiptBlobSha": "bfd4074a5dee18f8b593eca64bfafcc34fd9343f",
+      "harnessAfterBlob": "a25e13edb57844ff63d9b3d4524e216eaa595978",
+      "sameArtifactRetryAuthorized": true
     },
     {
       "id": "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22",
@@ -3836,7 +3866,7 @@
       "TEST4_OPS_DOCUMENT",
       "TEST5_INSURER"
     ],
-    "remediationStage": "R22_R96_HARNESS_RETRY_SAME_EXACT_PREVIEW",
+    "remediationStage": "R22_R101_HARNESS_PRIVILEGED_FIXTURE_RETRY_SAME_EXACT_PREVIEW",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
     "sourceFixReceiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
     "compositionLockPendingBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
@@ -3844,7 +3874,9 @@
     "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
     "exactPreviewUnchanged": true,
     "productSourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
-    "harnessRepairReceiptBlobSha": "41e8026b5570685d66f4a44f839bb781c27f7dce"
+    "harnessRepairReceiptBlobSha": "bfd4074a5dee18f8b593eca64bfafcc34fd9343f",
+    "r96MachinePass": true,
+    "r97MachinePass": true
   },
   "lastReview": {
     "date": "2026-09-26",
