@@ -91,6 +91,21 @@ try{
   const r91=lock.r91r95RuntimeProof.cleanup?.targets||[];
   const map={client:'clientes',legacy:'clientes',protected:'clientes',insurer:'aseguradoras',insurerUnvalidated:'aseguradoras',source:'polizas',sourceUnvalidated:'polizas',direct:'gestiones',issuance:'gestiones',unvalidated:'gestiones',policy:'polizas',management:'gestiones'};
   for(const x of r91){if(map[x.kind])addRow(map[x.kind],x.id,x.kind==='policy'||x.kind==='management');}
+  const r91Ids=Object.fromEntries(r91.map(x=>[x.kind,clean(x.id,220)]));
+  function explicitGeneratedQaLineage(collection,row,id){
+    if(collection==='polizas'&&id===r91Ids.policy){
+      return /^B2-REN-/i.test(clean(row.numero,180))
+        && clean(row.renuevaDe,220)===r91Ids.source
+        && clean(row.gestionRenovacionId,220)===r91Ids.direct;
+    }
+    if(collection==='gestiones'&&id===r91Ids.management){
+      return clean(row.workflowType,100)==='issuance_request'
+        && clean(row.sourcePolicyId,220)===r91Ids.source
+        && clean(row.renewalManagementId,220)===r91Ids.issuance
+        && row.previewWrite===true;
+    }
+    return false;
+  }
 
   const rowMap=new Map();
   for(const x of explicitRows){const k=x.collection+'|'+x.id;const prior=rowMap.get(k)||{collection:x.collection,id:x.id,allowExplicitNonPrefix:false};prior.allowExplicitNonPrefix=prior.allowExplicitNonPrefix||x.allowExplicitNonPrefix===true;rowMap.set(k,prior);}
@@ -110,7 +125,8 @@ try{
     if(!s.exists)continue;
     const row=s.data()||{};
     const qaMarker=row.qaFixture===true||/B2_|QA_/i.test(clean(row.qaFixtureType,180))||allowedQaId(rowRef.id);
-    if(rowRef.allowExplicitNonPrefix===true)need(qaMarker,'B2_DRIVE_CLEANUP_EXPLICIT_ROW_NOT_QA:'+rowRef.collection+':'+rowRef.id);
+    const lineageMarker=rowRef.allowExplicitNonPrefix===true&&explicitGeneratedQaLineage(rowRef.collection,row,rowRef.id);
+    if(rowRef.allowExplicitNonPrefix===true)need(qaMarker||lineageMarker,'B2_DRIVE_CLEANUP_EXPLICIT_ROW_NOT_QA:'+rowRef.collection+':'+rowRef.id);
     else need(qaMarker,'B2_DRIVE_CLEANUP_NON_QA_ROW:'+rowRef.collection+':'+rowRef.id);
     refsFrom(row).forEach(addRef);
     addFolder(row.driveFolderId);
@@ -125,7 +141,8 @@ try{
     if(!s.exists){evidence.firestore.deleted.push({...rowRef,status:'ABSENT'});continue;}
     const row=s.data()||{};
     const qaMarker=row.qaFixture===true||/B2_|QA_/i.test(clean(row.qaFixtureType,180))||allowedQaId(rowRef.id);
-    if(rowRef.allowExplicitNonPrefix===true)need(qaMarker,'B2_DRIVE_CLEANUP_EXPLICIT_DELETE_NOT_QA:'+rowRef.collection+':'+rowRef.id);
+    const lineageMarker=rowRef.allowExplicitNonPrefix===true&&explicitGeneratedQaLineage(rowRef.collection,row,rowRef.id);
+    if(rowRef.allowExplicitNonPrefix===true)need(qaMarker||lineageMarker,'B2_DRIVE_CLEANUP_EXPLICIT_DELETE_NOT_QA:'+rowRef.collection+':'+rowRef.id);
     else need(qaMarker,'B2_DRIVE_CLEANUP_NON_QA_DELETE_BLOCK:'+rowRef.collection+':'+rowRef.id);
     await ref.delete();
     const after=await ref.get();
