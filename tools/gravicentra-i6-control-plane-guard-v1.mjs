@@ -29,6 +29,7 @@ const I65_FORENSIC_ADDENDUM='artifacts/orbit360-recovery/release-control/I6_5_FO
 const I65_PAYMENT_INFERENCE='artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_20260919.json';
 const I65_FORENSIC_B1='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json';
 const I65_FORENSIC_B2='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json';
+const I65_FORENSIC_B3='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json';
 const I6_CANONICAL_COMPOSITION='artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json';
 const I6_FINDINGS_LEDGER='artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json';
 const I65_FORENSIC_PLAN_V2='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json';
@@ -47,8 +48,8 @@ const stable=v=>{if(v===null||typeof v!=='object')return v;if(Array.isArray(v))r
 const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
-for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,V6_MANIFEST,V6_ADDENDUM,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2,I6_CANONICAL_COMPOSITION,I6_FINDINGS_LEDGER,I65_FORENSIC_PLAN_V2,I65_B2_REJECTION,I65_B2_ROOT_CAUSE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
-const C=readJson(CONTROL),S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M=readJson(V6_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2);
+for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,V6_MANIFEST,V6_ADDENDUM,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2,I65_FORENSIC_B3,I6_CANONICAL_COMPOSITION,I6_FINDINGS_LEDGER,I65_FORENSIC_PLAN_V2,I65_B2_REJECTION,I65_B2_ROOT_CAUSE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
+const C=readJson(CONTROL),S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M=readJson(V6_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);
 need(C.schemaVersion==='gravicentra-control-plane-v2','I6_CONTROL_SCHEMA_INVALID');
@@ -319,6 +320,11 @@ if(activeI65){
       need(FR.b2ExecutionLockPath===I65_FORENSIC_B2&&git('hash-object',I65_FORENSIC_B2)===FR.b2ExecutionLockBlobSha,'I6_5_B2_LOCK_DRIFT');
       need(B2.block==='B2'&&B2.conversationDependent===false&&B2.boundaries?.dataMutationAuthorized===false&&B2.boundaries?.reimportAuthorized===false&&B2.boundaries?.liveHostingPromotionAuthorized===false,'I6_5_B2_BOUNDARY_INVALID');
       need(['I6_5_FORENSIC_REMEDIATION_B2_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B2_PREVIEW','I6_5_FORENSIC_REMEDIATION_B2_VISUAL'].includes(C.nextAction),'I6_5_FORENSIC_B2_ACTION_INVALID');
+    }else if(FR.status==='FROZEN_ACTIVE'&&forensicBlock==='B3'){
+      need(FR.currentReadinessPercent===90&&FR.nextTargetPercent===96&&FR.previewAfterEveryBlockRequired===true&&FR.sameArtifactPreviewToLiveRequired===true,'I6_5_FORENSIC_B3_STATE_INVALID');
+      need(FR.b3?.executionLockPath===I65_FORENSIC_B3&&git('hash-object',I65_FORENSIC_B3)===FR.b3?.executionLockBlobSha,'I6_5_B3_LOCK_DRIFT');
+      need(B3.block==='B3'&&B3.entryCondition?.b2Status==='B2_PASS'&&B3.boundaries?.dataMutationAuthorized===false&&B3.boundaries?.reimportAuthorized===false&&B3.boundaries?.liveHostingPromotionAuthorized===false,'I6_5_B3_BOUNDARY_INVALID');
+      need(['I6_5_FORENSIC_REMEDIATION_B3','I6_5_FORENSIC_REMEDIATION_B3_PREVIEW','I6_5_FORENSIC_REMEDIATION_B3_VISUAL'].includes(C.nextAction),'I6_5_FORENSIC_B3_ACTION_INVALID');
     }else{
       need(C.nextAction===expectedI65Action,'I6_5_NEXT_ACTION_INVALID');
     }

@@ -35,7 +35,7 @@
   },
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
-  "currentBlock": "B2",
+  "currentBlock": "B3",
   "productFileCount": 70,
   "productFiles": [
     "functions/bootstrap.js",
@@ -218,5 +218,13 @@
     ],
     "noLive": true,
     "noReimport": true
+  },
+  "lastMechanismRootFix": {
+    "id": "B3-TRANSITION-GUARD-ROOTFIX-20260929",
+    "status": "MECHANISM_FIXED_PENDING_RERUN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_TRANSITION_GUARD_ROOTFIX_20260929.json",
+    "receiptBlobSha": "3d18e793a21dc73be7643bb07766e5d726cf2394",
+    "productSourceFixChanged": false,
+    "productFileCount": 70
   }
 }

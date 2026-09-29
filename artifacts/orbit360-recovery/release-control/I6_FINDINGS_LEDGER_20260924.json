@@ -4215,8 +4215,16 @@
     "activeFindingId": "B3-001",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
-    "compositionLockBlobSha": "7de09ccf0f529a7fb610d90299601bb66f974425",
+    "compositionLockBlobSha": "6824a4b873f14a3c96669eb0cf495feeea1a9f64",
     "noLive": true,
-    "noReimport": true
+    "noReimport": true,
+    "mechanismRootFix": {
+      "status": "MECHANISM_FIXED_PENDING_RERUN",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_TRANSITION_GUARD_ROOTFIX_20260929.json",
+      "receiptBlobSha": "3d18e793a21dc73be7643bb07766e5d726cf2394",
+      "failedRunId": 36645668909,
+      "failedJobId": 109667923632,
+      "productRegressionDemonstrated": false
+    }
   }
 }

@@ -28,12 +28,12 @@
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "7de09ccf0f529a7fb610d90299601bb66f974425",
+    "blobSha": "6824a4b873f14a3c96669eb0cf495feeea1a9f64",
     "productFileCount": 70
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "4cc4b6d284d067651c5371b32c8f133c8c3f939a"
+    "blobSha": "6acd820e238c229a68e97ee7a422bf46267a12b1"
   },
   "nextRequiredProof": [
     "B3_001_EXACT_PREVIEW_READBACK",
@@ -71,5 +71,16 @@
     "b4AdvanceAuthorized": false,
     "syntheticWriteAuthorized": false,
     "oneExactPreviewForB3001": true
+  },
+  "mechanismRootFix": {
+    "status": "MECHANISM_FIXED_PENDING_RERUN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_TRANSITION_GUARD_ROOTFIX_20260929.json",
+    "receiptBlobSha": "3d18e793a21dc73be7643bb07766e5d726cf2394",
+    "guardBlobSha": "7b1d14c415702478fb2ad55feb86f75dd3f2e47b",
+    "failedRunId": 36645668909,
+    "failedJobId": 109667923632,
+    "productRegressionDemonstrated": false,
+    "buildAttempted": false,
+    "previewDeployed": false
   }
 }
