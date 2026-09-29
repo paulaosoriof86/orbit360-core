@@ -1,0 +1,33 @@
+name: cotcomp-pr-source-only-qa
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  cotcomp-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax
+        working-directory: functions
+        run: |
+          node --check cotcomp-contracts.js
+          node --check cotcomp-validator.js
+          node --check cotcomp-proposal-contracts.js
+          node --check cotcomp-public-bridge.js
+          node --check cotcomp-public-bridge.test.js
+          node --check cotcomp-transport-contract.js
+          node --check cotcomp-transport-contract.test.js
+          node --check cotcomp-gateway-harness.js
+          node --check cotcomp-gateway-harness.test.js
+      - name: Tests
+        working-directory: functions
+        run: |
+          node --test             cotcomp-validator.test.js             cotcomp-proposal-contracts.test.js             cotcomp-public-bridge.test.js             cotcomp-transport-contract.test.js             cotcomp-gateway-harness.test.js
