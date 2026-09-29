@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION = 'ays-cotcomp-public-bridge-s47-v0.1';
+const VERSION = 'ays-cotcomp-public-bridge-s410-v0.2';
 const AUTO_READY = false;
 const RUNTIME_SIDE_EFFECTS_ALLOWED = false;
 
@@ -98,7 +98,7 @@ function gtHealth(src) {
   const maternity = {'Sí / revisar aplicabilidad':'YES','No':'NO'}[src.maternidad];
   if (maternity) out.mapped.maternityPreference = maternity;
   if (nonEmpty(src.geographyPreference)) out.mapped.geographyPreference = src.geographyPreference;
-  else { out.missing.push('geographyPreference'); if (src.territorio) out.notes.push('territorio is not silently converted to backend geographyPreference'); }
+  else if (src.territorio) out.notes.push('territorio is not silently converted to optional backend geographyPreference');
   contact(src, out);
   return finish(out);
 }
@@ -118,6 +118,21 @@ function coTransport(src) {
   else if (nonEmpty(src.transitScope)) out.mapped.transitScope = src.transitScope;
   else out.missing.push('transitScope');
   Array.isArray(src.transportModes) && src.transportModes.length ? out.mapped.transportModes = src.transportModes.slice() : out.missing.push('transportModes');
+
+  if (out.mapped.coverageModeNeed === 'SPECIFIC_SHIPMENT') {
+    nonEmpty(src.origin) ? out.mapped.origin = src.origin.trim() : out.missing.push('origin');
+    nonEmpty(src.destination) ? out.mapped.destination = src.destination.trim() : out.missing.push('destination');
+    const value = num(src.valueToProtect);
+    value !== undefined ? out.mapped.valueToProtect = value : out.missing.push('valueToProtect');
+  }
+
+  if (out.mapped.coverageModeNeed === 'ANNUAL_PROGRAM') {
+    const maxValue = num(src.maxValuePerShipment);
+    const annual = num(src.annualMovementBudget);
+    maxValue !== undefined ? out.mapped.maxValuePerShipment = maxValue : out.missing.push('maxValuePerShipment');
+    annual !== undefined ? out.mapped.annualMovementBudget = annual : out.missing.push('annualMovementBudget');
+  }
+
   contact(src, out);
   return finish(out);
 }
