@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "9cea344608b9bf9cc84f6d4dbcb5c843b6c85391",
+    "b2ExecutionLockBlobSha": "a463614a76af267351660e48f128dbb634e5027c",
     "b2": {
-      "status": "PREVIEW_HUMAN_REJECTED_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_HUMAN_FIXTURES_AND_EXACT_PREVIEW",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2032,6 +2032,7 @@
       "allowedProductFiles": [
         "functions/bootstrap.js",
         "functions/document-drive-domain.js",
+        "functions/package-lock.json",
         "functions/package.json",
         "functions/product-insurer-credentials.js",
         "functions/product-operational-domain.js",
@@ -2042,6 +2043,7 @@
         "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png",
         "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png",
         "orbit360-platform/core/academia-product-catalog-p0.js",
+        "orbit360-platform/core/access-role-session-owner-v20260728.js",
         "orbit360-platform/core/access-scope.js",
         "orbit360-platform/core/auth-password-change-v20260805.js",
         "orbit360-platform/core/auth-product-runtime-p0.js",
@@ -2051,6 +2053,7 @@
         "orbit360-platform/core/ciclo.js",
         "orbit360-platform/core/comisiones-eng.js",
         "orbit360-platform/core/config.js",
+        "orbit360-platform/core/document-viewer.js",
         "orbit360-platform/core/importa.js",
         "orbit360-platform/core/issuance-workflow-v1201-refinements.js",
         "orbit360-platform/core/issuance-workflow-v1201.js",
@@ -2096,9 +2099,7 @@
         "orbit360-platform/product-runtime-config.js",
         "orbit360-platform/styles/base.css",
         "orbit360-platform/styles/infra.css",
-        "orbit360-platform/sw.js",
-        "functions/package-lock.json",
-        "orbit360-platform/core/document-viewer.js"
+        "orbit360-platform/sw.js"
       ],
       "productMutationAuthorized": true,
       "sourcePendingFromHead": true,
@@ -2824,6 +2825,31 @@
         "noLive": true,
         "noB3": true,
         "noReimport": true
+      },
+      "r22FinalHumanRemediation": {
+        "status": "SOURCE_FIXED_PENDING_HUMAN_FIXTURES_AND_EXACT_PREVIEW",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
+        "receiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
+        "compositionLockBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
+        "findingLedgerBlobSha": "6128ad2d7bede9bbca3400018ebb46e9cbf88026",
+        "b2ExecutionLockBlobSha": "a463614a76af267351660e48f128dbb634e5027c",
+        "productFileCount": 70,
+        "sourceFixedFindingIds": [
+          "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22",
+          "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
+          "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
+          "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22"
+        ],
+        "fixturePendingFindingIds": [
+          "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+          "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
+          "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22"
+        ],
+        "noBuildYet": true,
+        "noPreviewYet": true,
+        "noLive": true,
+        "noB3": true,
+        "noReimport": true
       }
     },
     "dashboardRealityGate": {
@@ -2955,21 +2981,21 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "b30177f9498c472ef735b264a40e2bb707294571",
+    "compositionLockBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "5026cc6db04f0ccf2061e0d651c06fb042f363c0",
+    "findingLedgerBlobSha": "6128ad2d7bede9bbca3400018ebb46e9cbf88026",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B2",
     "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
-    "productFileCount": 69,
+    "productFileCount": 70,
     "rootCause": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
     "definitiveFix": "SINGLE_MACHINE_AUTHORITATIVE_EXACT_SET_AND_BLOB_BOUND_COMPOSITION",
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_FINAL_HUMAN_REMEDIATION_SOURCE_FIX"
+    "nextAction": "B2_PREPARE_FINAL_HUMAN_FIXTURES"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

@@ -1,0 +1,78 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_V1",
+  "recordedAt": "2026-09-29T13:47:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "77b72a58e60dc8ebc5d97dfcbb9f6e30c994f610",
+  "block": "B2",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_AND_HUMAN_FIXTURES",
+  "causalFixes": {
+    "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22": {
+      "rootCause": "Preview browser used production tenant-domain-config callable; human UAT could not safely obtain server-confirmed Preview-isolated access config.",
+      "fixFiles": {
+        "functions/tenant-domain-config.js": "3aaf2fe9ef818d0afaa079d3d678ba8fcccd359c",
+        "orbit360-platform/core/tenant-domain-config-client.js": "5f6f876efe6b330ebf22b6d67f011dd294fa2c07",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "f3459a4e55ffa5fbcd828899bfbaf04b84901943"
+      },
+      "solution": "Dedicated orbit360TenantDomainConfigPreview@us-east1 writes only tenants/{tenant}/previewUatConfig and reads canonical config only as baseline. Production config path remains unchanged.",
+      "proofPending": "save -> callable server readback -> reload -> same Preview config"
+    },
+    "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22": {
+      "rootCause": "Canonical role owner changed product role through orbit:session, while Drive provider invalidated authorization status on orbit:active-role-changed. Role switch could leave documentary status from the previous role.",
+      "fixFiles": {
+        "orbit360-platform/core/access-role-session-owner-v20260728.js": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5"
+      },
+      "solution": "Canonical session owner emits orbit:active-role-changed only after a successful real role change, preserving existing backend role/scope authorization.",
+      "proofPending": "Operativo -> Dirección role change -> Drive status/read authorization refresh; no stale prior-role denial"
+    },
+    "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22": {
+      "rootCause": "Ciclo modal width was viewport-bounded but mobile body/footer children could retain minimum widths and the footer remained horizontally composed.",
+      "fixFiles": {
+        "orbit360-platform/styles/base.css": "72a064d7b97308dd6c54c163ca8858915031d6f4"
+      },
+      "solution": "Mobile modal gets width/min-width constraints and stacked footer composition without changing Ops fields or semantics.",
+      "proofPending": "mobile create-management surface has no horizontal clipping/overflow"
+    },
+    "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22": {
+      "rootCause": "Equipo delete depended on margin-right:auto in a single flex row; onboarding bridge injects a fourth action, displacing the destructive action on narrow viewports.",
+      "fixFiles": {
+        "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
+        "orbit360-platform/styles/base.css": "72a064d7b97308dd6c54c163ca8858915031d6f4"
+      },
+      "solution": "Canonical footer receives #eu-actions and mobile grid composition; delete/sync/cancel/save remain present.",
+      "proofPending": "all four actions visible and reachable at mobile viewport"
+    },
+    "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22": {
+      "solution": "No new product uploader owner added. Existing canonical Crear gestión already enables binary upload for /^b2[-_]/ synthetic client IDs and opens the persisted management after save.",
+      "proofPending": "exact-Preview synthetic Drive client fixture -> Crear gestión -> upload -> save -> reload -> visible/open/download -> cleanup"
+    }
+  },
+  "stillPendingFixturePreparation": [
+    "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+    "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
+    "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22"
+  ],
+  "composition": {
+    "addProductOwner": "orbit360-platform/core/access-role-session-owner-v20260728.js",
+    "newProductFileCount": 70,
+    "exactBlobBindingRequired": true
+  },
+  "validation": {
+    "javascriptBlobReadbackSyntaxPass": [
+      "functions/tenant-domain-config.js",
+      "orbit360-platform/core/tenant-domain-config-client.js",
+      "orbit360-platform/modules/equipo.js",
+      "orbit360-platform/core/access-role-session-owner-v20260728.js"
+    ],
+    "cssDiscriminantsReadback": true,
+    "workflowPreviewCallableDiscriminantsReadback": true
+  },
+  "boundaries": {
+    "noBuildYet": true,
+    "noPreviewYet": true,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noRealBusinessWrite": true
+  }
+}

@@ -6,7 +6,9 @@ const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
+const PREVIEW_REGION = process.env.ORBIT360_PREVIEW_FUNCTIONS_REGION || 'us-east1';
 const VERSION = 'orbit360-tenant-domain-config-v1';
+const PREVIEW_VERSION = 'orbit360-tenant-domain-config-preview-b2-r96-v1';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 const DOMAINS = new Set(['workflow', 'reconciliation', 'access']);
@@ -38,6 +40,12 @@ function configRef(tenantId, domain) {
 }
 function eventRef(tenantId, eventId) {
   return db.collection('tenants').doc(tenantId).collection('configEvents').doc(eventId);
+}
+function previewConfigRef(tenantId, domain) {
+  return db.collection('tenants').doc(tenantId).collection('previewUatConfig').doc(domain);
+}
+function previewEventRef(tenantId, eventId) {
+  return db.collection('tenants').doc(tenantId).collection('previewUatConfigEvents').doc(eventId);
 }
 function roles(member) {
   return unique([...(member.roles || []), member.activeRole, member.rolActivo, member.rol]).map(norm);
@@ -167,5 +175,62 @@ async function execute(request) {
   });
 }
 
+
+async function executePreview(request) {
+  const data = request.data || {};
+  const action = norm(data.action || 'get');
+  const domain = norm(data.domain);
+  if (!DOMAINS.has(domain)) throw new HttpsError('invalid-argument', 'Dominio no soportado.');
+  if (!['get', 'save'].includes(action)) throw new HttpsError('invalid-argument', 'Acción no soportada.');
+  const authz = await authorize(request, domain, action === 'save');
+  const ref = previewConfigRef(authz.tenantId, domain);
+  if (action === 'get') {
+    const previewSnap = await ref.get();
+    if (previewSnap.exists) {
+      return { ok: true, domain, exists: true, config: previewSnap.data(), previewIsolated: true, source: 'preview_uat' };
+    }
+    const canonicalSnap = await configRef(authz.tenantId, domain).get();
+    return {
+      ok: true,
+      domain,
+      exists: canonicalSnap.exists,
+      config: canonicalSnap.exists ? canonicalSnap.data() : null,
+      previewIsolated: true,
+      source: canonicalSnap.exists ? 'canonical_readonly_baseline' : 'empty_baseline'
+    };
+  }
+  const reason = text(data.reason || data.motivo, 1000);
+  if (!reason) throw new HttpsError('invalid-argument', 'El motivo es obligatorio.');
+  const next = validate(domain, data.config || {});
+  const eventId = `uat_${sha(`${authz.tenantId}|${domain}|${digest(next)}|${reason}`).slice(0, 28)}`;
+  return db.runTransaction(async tx => {
+    const beforeSnap = await tx.get(ref);
+    const before = beforeSnap.exists ? beforeSnap.data() : null;
+    const stored = Object.assign({}, next, {
+      tenantId: authz.tenantId,
+      previewIsolated: true,
+      schemaOwner: PREVIEW_VERSION,
+      updatedAt: FieldValue.serverTimestamp(),
+      updatedByUid: authz.actor.uid
+    });
+    tx.set(ref, stored, { merge: false });
+    tx.set(previewEventRef(authz.tenantId, eventId), {
+      schemaVersion: PREVIEW_VERSION,
+      tenantId: authz.tenantId,
+      domain,
+      actor: authz.actor,
+      reason,
+      beforeDigest: before ? digest(before) : '',
+      afterDigest: digest(next),
+      previewIsolated: true,
+      productionConfigWrite: false,
+      createdAt: FieldValue.serverTimestamp()
+    }, { merge: false });
+    return { ok: true, domain, eventId, config: next, previewIsolated: true, source: 'preview_uat' };
+  });
+}
+
 exports.orbit360TenantDomainConfig = onCall({ region: REGION, cors: true }, execute);
-exports.__tenantDomainConfig = Object.freeze({ VERSION, DOMAINS });
+exports.orbit360TenantDomainConfigPreview = onCall({ region: PREVIEW_REGION, cors: true }, executePreview);
+exports.__tenantDomainConfig = Object.freeze({ VERSION, PREVIEW_VERSION, DOMAINS });
+

@@ -452,7 +452,7 @@ Orbit.modules.equipo = (function () {
         <div class="cfg-note">🔐 Guardar crea o actualiza el registro del equipo. <b>No envía correos ni habilita acceso todavía.</b> La invitación se enviará cuando Auth e integración de correo estén aprobadas y conectadas.</div>
         <div class="cfg-note">🎯 Las metas no se definen aquí. Usa la pestaña <b>Metas</b> para separarlas por mes, país, moneda, producción nueva, renovación y recaudo.</div>
       </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+      <div id="eu-actions" class="eu-actions" style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
         ${id ? '<button class="btn ghost" id="eu-delete" style="margin-right:auto;color:var(--red)">Eliminar usuario</button>' : ''}
         <button class="btn ghost" id="eu-cancel">Cancelar</button><button class="btn primary" id="eu-ok">Guardar</button></div>
     </div>`;

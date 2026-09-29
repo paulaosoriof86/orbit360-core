@@ -189,7 +189,12 @@
     }
     var projection = productProjection();
     var advisorId = projection ? projection.advisorId : text(ignoredAdvisorId);
-    return safeSessionWrite(role, advisorId, projection);
+    var before = currentRole();
+    var saved = safeSessionWrite(role, advisorId, projection);
+    if (saved && before !== role) {
+      try { document.dispatchEvent(new CustomEvent('orbit:active-role-changed', { detail: { before: before, role: role } })); } catch (error) {}
+    }
+    return saved;
   }
   function syncFromAuth() {
     var projection = productProjection();

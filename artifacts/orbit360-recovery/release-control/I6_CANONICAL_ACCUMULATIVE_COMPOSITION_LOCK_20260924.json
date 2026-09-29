@@ -36,10 +36,11 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B2",
-  "productFileCount": 69,
+  "productFileCount": 70,
   "productFiles": [
     "functions/bootstrap.js",
     "functions/document-drive-domain.js",
+    "functions/package-lock.json",
     "functions/package.json",
     "functions/product-insurer-credentials.js",
     "functions/product-operational-domain.js",
@@ -50,6 +51,7 @@
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png",
     "orbit360-platform/core/academia-product-catalog-p0.js",
+    "orbit360-platform/core/access-role-session-owner-v20260728.js",
     "orbit360-platform/core/access-scope.js",
     "orbit360-platform/core/auth-password-change-v20260805.js",
     "orbit360-platform/core/auth-product-runtime-p0.js",
@@ -59,6 +61,7 @@
     "orbit360-platform/core/ciclo.js",
     "orbit360-platform/core/comisiones-eng.js",
     "orbit360-platform/core/config.js",
+    "orbit360-platform/core/document-viewer.js",
     "orbit360-platform/core/importa.js",
     "orbit360-platform/core/issuance-workflow-v1201-refinements.js",
     "orbit360-platform/core/issuance-workflow-v1201.js",
@@ -104,9 +107,7 @@
     "orbit360-platform/product-runtime-config.js",
     "orbit360-platform/styles/base.css",
     "orbit360-platform/styles/infra.css",
-    "orbit360-platform/sw.js",
-    "functions/package-lock.json",
-    "orbit360-platform/core/document-viewer.js"
+    "orbit360-platform/sw.js"
   ],
   "productFileBlobs": {
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
@@ -116,7 +117,7 @@
     "functions/product-operational-domain.js": "682941c99f0a6cf401f87ff413a426245996bad9",
     "functions/product-ops-leads-domain.js": "fe5307b171a9d51e3f449f0dd2b5aba6fbcbb341",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
-    "functions/tenant-domain-config.js": "e4b602b4abb26fcd3d9413b1ab9bb67998be78dd",
+    "functions/tenant-domain-config.js": "3aaf2fe9ef818d0afaa079d3d678ba8fcccd359c",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png": "9e16fae65f366556f55398309eb7bb3f398bf072",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png": "726da844034b98f3132788920a1b8111f4d1764a",
@@ -147,7 +148,7 @@
     "orbit360-platform/core/tenant-access-policy-contract-p0.js": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
     "orbit360-platform/core/tenant-access-policy-effective-p0.js": "56e515206ff18e3baabcfd66b217b4985f1288ad",
     "orbit360-platform/core/tenant-access-policy-product-p0.js": "045322231523ec624c6f19efea1a66c204b962bc",
-    "orbit360-platform/core/tenant-domain-config-client.js": "89bff4ac9131ff5805ffe96ee8d6ccd4927a84dc",
+    "orbit360-platform/core/tenant-domain-config-client.js": "5f6f876efe6b330ebf22b6d67f011dd294fa2c07",
     "orbit360-platform/core/user-onboarding.js": "bf645951a23491ce53d2034ba4281d965cbb326d",
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "dbc6ae798f580ee991fd3053e9822f3bd7c0825b",
@@ -165,7 +166,7 @@
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
-    "orbit360-platform/modules/equipo.js": "105b869445919802fb6e07d6120ace6a0772ec57",
+    "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
     "orbit360-platform/modules/inicio.js": "bbae195ae7725ee1bcd790f1234946b31660d68e",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "f820ef06305367678ce3078190251b7bdfd69261",
@@ -173,11 +174,12 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "d329ed1c822d42803bf2eb38c34873218d63faad",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
-    "orbit360-platform/styles/base.css": "72da4a95d7c8be5e15a9c803480ea6d8ee67f6d8",
+    "orbit360-platform/styles/base.css": "72a064d7b97308dd6c54c163ca8858915031d6f4",
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
-    "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c"
+    "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
+    "orbit360-platform/core/access-role-session-owner-v20260728.js": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -202,18 +204,35 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "id": "B2-R82-SOFT-DELETE-DIRECT-READ-PROJECTION-20260928",
-    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
-    "sourceHead": "1cc6b0d0a36e11bad96408e3846c0b542115e161",
-    "causalFindingId": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
-    "rootCause": "Operational facade filtered soft-deleted rows from all()/where()/find(), but get() delegated durable rows directly to the base store after reload. Deep-link/detail reads could therefore resurrect a deleted record even though collection lists hid it.",
-    "fixFiles": {
-      "orbit360-platform/data/store-firestore-product-operational-p0.js": "dbc6ae798f580ee991fd3053e9822f3bd7c0825b",
-      "orbit360-platform/core/record-delete.js": "3c8b4b06126abaa6b1ea0b6efe3c85c04bf71da9"
-    },
-    "contractBlobSha": "ffe69173c7de0c1fcff7d68bd2562a3fcd40b2fb",
-    "preservesAuditRow": true,
-    "preservesPriorMachinePasses": true,
+    "id": "B2-R22-FINAL-HUMAN-REMEDIATION-SOURCE-FIX-20260929",
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_AND_HUMAN_FIXTURES",
+    "parentHead": "77b72a58e60dc8ebc5d97dfcbb9f6e30c994f610",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
+    "receiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
+    "changedProductFiles": [
+      "functions/tenant-domain-config.js",
+      "orbit360-platform/core/tenant-domain-config-client.js",
+      "orbit360-platform/core/access-role-session-owner-v20260728.js",
+      "orbit360-platform/modules/equipo.js",
+      "orbit360-platform/styles/base.css"
+    ],
+    "mechanismFiles": [
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+    ],
+    "blockerIds": [
+      "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22",
+      "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
+      "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+      "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
+      "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22"
+    ],
+    "fixturePendingIds": [
+      "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+      "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
+      "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22"
+    ],
+    "noBuildYet": true,
+    "noPreviewYet": true,
     "noLive": true,
     "noB3": true,
     "noReimport": true

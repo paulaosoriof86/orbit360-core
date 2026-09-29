@@ -592,3 +592,16 @@ body.sb-light #sidebar,body.sb-gray #sidebar{scrollbar-color:rgba(197,22,46,.68)
 @media(max-width:410px){
   .c360-renewal-actions{grid-template-columns:1fr}
 }
+
+@media(max-width:640px){
+  #eu-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important}
+  #eu-actions #eu-delete,#eu-actions #eu-access-now{grid-column:1 / -1;margin-right:0!important;width:100%}
+  #eu-actions #eu-cancel,#eu-actions #eu-ok{width:100%;min-width:0}
+  #ciclo-modal{padding:8px;box-sizing:border-box}
+  #ciclo-modal>.ciclo-card{width:100%!important;max-width:100%!important;min-width:0;max-height:calc(100dvh - 16px)}
+  #ciclo-modal .ciclo-create-body{padding:14px!important;max-height:none!important;min-width:0}
+  #ciclo-modal .ciclo-sec,#ciclo-modal .cgrid,#ciclo-modal .cgrid>*{min-width:0}
+  #ciclo-modal .ciclo-foot{flex-direction:column;align-items:stretch;padding:12px 14px}
+  #ciclo-modal .ciclo-foot>div:last-child{display:grid!important;grid-template-columns:1fr 1fr;width:100%}
+  #ciclo-modal .ciclo-foot .btn{min-width:0;white-space:normal}
+}
