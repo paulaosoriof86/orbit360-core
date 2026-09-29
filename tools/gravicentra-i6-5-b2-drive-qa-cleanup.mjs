@@ -92,16 +92,48 @@ try{
   const map={client:'clientes',legacy:'clientes',protected:'clientes',insurer:'aseguradoras',insurerUnvalidated:'aseguradoras',source:'polizas',sourceUnvalidated:'polizas',direct:'gestiones',issuance:'gestiones',unvalidated:'gestiones',policy:'polizas',management:'gestiones'};
   for(const x of r91){if(map[x.kind])addRow(map[x.kind],x.id,x.kind==='policy'||x.kind==='management');}
   const r91Ids=Object.fromEntries(r91.map(x=>[x.kind,clean(x.id,220)]));
-  function explicitGeneratedQaLineage(collection,row,id){
-    if(collection==='polizas'&&id===r91Ids.policy){
-      return /^B2-REN-/i.test(clean(row.numero,180))
-        && clean(row.renuevaDe,220)===r91Ids.source
-        && clean(row.gestionRenovacionId,220)===r91Ids.direct;
+  const generatedLineage=new Map();
+  function registerGenerated(collection,id,expected){
+    id=clean(id,220);if(!id)return;
+    addRow(collection,id,true);
+    generatedLineage.set(collection+'|'+id,expected);
+  }
+  if(r91Ids.policy)registerGenerated('polizas',r91Ids.policy,{kind:'renewal_policy',source:r91Ids.source,parent:r91Ids.direct});
+  if(r91Ids.management)registerGenerated('gestiones',r91Ids.management,{kind:'issuance_request',source:r91Ids.source,parent:r91Ids.issuance});
+
+  // Sweep every historical row carrying an exact B2 QA marker. This is still fail-closed:
+  // only the two frozen qaFixtureType values are eligible, never a business row by pattern alone.
+  const historicalMarked=[];
+  for(const collection of ['clientes','gestiones','polizas','aseguradoras']){
+    for(const marker of ['B2_R77_R81_DRIVE_DURABLE','B2_R91_R95_RUNTIME']){
+      const q=await dataCol(collection).where('qaFixtureType','==',marker).get();
+      for(const d of q.docs){
+        const row=d.data()||{};
+        historicalMarked.push({collection,id:d.id,marker,row});
+        addRow(collection,d.id,false);
+        if(collection==='gestiones'&&marker==='B2_R91_R95_RUNTIME'){
+          const directPolicy=clean(row.directRenewalPolicyId,220);
+          if(directPolicy)registerGenerated('polizas',directPolicy,{kind:'renewal_policy',source:clean(row.sourcePolicyId||row.polizaId,220),parent:d.id});
+          const issuanceRequest=clean(row.issuanceRequestId,220);
+          if(issuanceRequest)registerGenerated('gestiones',issuanceRequest,{kind:'issuance_request',source:clean(row.sourcePolicyId||row.polizaId,220),parent:d.id});
+        }
+      }
     }
-    if(collection==='gestiones'&&id===r91Ids.management){
+  }
+  evidence.firestore.historicalMarkedCount=historicalMarked.length;
+
+  function explicitGeneratedQaLineage(collection,row,id){
+    const expected=generatedLineage.get(collection+'|'+id);
+    if(!expected)return false;
+    if(expected.kind==='renewal_policy'){
+      return /^B2-REN-/i.test(clean(row.numero,180))
+        && clean(row.renuevaDe,220)===clean(expected.source,220)
+        && clean(row.gestionRenovacionId,220)===clean(expected.parent,220);
+    }
+    if(expected.kind==='issuance_request'){
       return clean(row.workflowType,100)==='issuance_request'
-        && clean(row.sourcePolicyId,220)===r91Ids.source
-        && clean(row.renewalManagementId,220)===r91Ids.issuance
+        && clean(row.sourcePolicyId,220)===clean(expected.source,220)
+        && clean(row.renewalManagementId,220)===clean(expected.parent,220)
         && row.previewWrite===true;
     }
     return false;
@@ -110,7 +142,7 @@ try{
   const rowMap=new Map();
   for(const x of explicitRows){const k=x.collection+'|'+x.id;const prior=rowMap.get(k)||{collection:x.collection,id:x.id,allowExplicitNonPrefix:false};prior.allowExplicitNonPrefix=prior.allowExplicitNonPrefix||x.allowExplicitNonPrefix===true;rowMap.set(k,prior);}
   const rows=[...rowMap.values()];
-  evidence.firestore.targets=rows;
+  evidence.firestore.targets=rows.map(x=>({collection:x.collection,id:x.id,allowExplicitNonPrefix:x.allowExplicitNonPrefix===true}));
 
   const driveRefs=[];
   const driveFolders=[];
