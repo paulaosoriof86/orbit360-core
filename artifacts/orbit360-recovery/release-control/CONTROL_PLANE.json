@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "39abbc7605e0747e3918f5d16ed5dd3d25744cc9",
+    "b2ExecutionLockBlobSha": "413cb406af196e57b099fea694b166b8c3b37303",
     "b2": {
-      "status": "PREVIEW_HUMAN_4_PASS_R102_FAIL_DIAGNOSTIC_PENDING",
+      "status": "R102_DIAGNOSTIC_COMPLETE_PENDING_CAUSAL_FIX",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2982,12 +2982,22 @@
         "opsHydration": "NONBLOCKING_CARRY_B3_TRANSIENT_EMPTY_THEN_HYDRATED"
       },
       "r102ReadonlyDiagnostic": {
-        "status": "ARMED_PENDING_RUN",
-        "toolPath": "tools/gravicentra-i6-5-b2-r102-logo-readonly.mjs",
-        "toolBlobSha": "02df818096ae4dc2cb50be77f062bb91ce162ce1",
-        "workflowBlobSha": "359b5f37cce14bdc6a52151a38b8e15345073d96",
-        "readOnly": true,
-        "productSourceMutation": false
+        "status": "COMPLETE_PENDING_CAUSAL_FIX",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_LOGO_READONLY_DIAGNOSTIC_20260929.json",
+        "runId": 36639752990,
+        "findings": [
+          "PERSISTED_URL_HTTP_UNREADABLE",
+          "CANONICAL_METADATA_TOKEN_URL_HTTP_UNREADABLE"
+        ],
+        "insurerId": "b2-asg-36624806450",
+        "objectExists": true,
+        "persistedUrlHttpStatus": 412,
+        "persistedUrlHttpOk": false,
+        "canonicalUrlHttpStatus": 412,
+        "canonicalUrlHttpOk": false,
+        "persistedTokenMatchesMetadata": true,
+        "imageBytesValid": true,
+        "readOnly": true
       }
     },
     "dashboardRealityGate": {
@@ -3133,7 +3143,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R102_READONLY_STORAGE_URL_DIAGNOSTIC"
+    "nextAction": "B2_R102_CAUSAL_FIX"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

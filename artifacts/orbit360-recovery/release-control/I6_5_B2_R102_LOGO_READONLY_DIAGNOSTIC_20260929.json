@@ -1,0 +1,114 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R102_LOGO_READONLY_DIAGNOSTIC_V1",
+  "status": "PASS_READONLY_DIAGNOSTIC",
+  "tenantId": "alianzas-soluciones",
+  "insurerId": "b2-asg-36624806450",
+  "exactPreview": {
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36622988522-gy3bsyhy.web.app",
+    "sourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
+    "buildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
+    "runId": 36622988522
+  },
+  "readOnly": true,
+  "findings": [
+    "PERSISTED_URL_HTTP_UNREADABLE",
+    "CANONICAL_METADATA_TOKEN_URL_HTTP_UNREADABLE"
+  ],
+  "errors": [],
+  "firestore": {
+    "exists": true,
+    "name": "B2 QA Aseguradora 36624806450",
+    "qaFixture": true,
+    "qaFixtureType": "B2_FINAL_HUMAN_INSURER",
+    "logoPresent": true,
+    "assetRefPresent": true,
+    "logoUrl": {
+      "present": true,
+      "host": "firebasestorage.googleapis.com",
+      "pathHash": "9617e2d5ffc1ff23b978dcb6f52568956640e782aca05651e0f083b466007d1b",
+      "queryKeys": [
+        "alt",
+        "token"
+      ],
+      "urlHash": "38040d3bea64ea94e2eaa3d592a8b81a04494ac5202ae2c536599374aa0db7e1"
+    },
+    "assetRef": "preview/tenants/alianzas-soluciones/assets/insurers/b2-asg-36624806450/logo-a5a81500b787c616d7e9.jpg",
+    "logoContentHash": "79b686bd47bec26f320307905617ebec8fb34ded8159cb922a9b294203a81e3f",
+    "logoUpdatedByUidPresent": true
+  },
+  "storage": {
+    "bucket": "gravicentra-insurance-assets-60e88ed5a1",
+    "objectExists": true,
+    "persistedTokenPresent": true,
+    "size": 40342,
+    "contentType": "image/jpeg",
+    "metadataTokenCount": 1,
+    "persistedTokenMatchesMetadata": true,
+    "generation": "1790720478717080",
+    "objectSha256": "7208cf00dfba8e3aac6756567f54dad37c9c82d9b701e943bfc33be2320de682",
+    "magic": {
+      "png": false,
+      "jpg": true,
+      "webp": false,
+      "valid": true
+    }
+  },
+  "canonicalUrl": {
+    "present": true,
+    "host": "firebasestorage.googleapis.com",
+    "pathHash": "9617e2d5ffc1ff23b978dcb6f52568956640e782aca05651e0f083b466007d1b",
+    "queryKeys": [
+      "alt",
+      "token"
+    ],
+    "urlHash": "38040d3bea64ea94e2eaa3d592a8b81a04494ac5202ae2c536599374aa0db7e1"
+  },
+  "persistedUrlProbe": {
+    "attempted": true,
+    "status": 412,
+    "ok": false,
+    "contentType": "application/json; charset=UTF-8",
+    "length": 452,
+    "sha256": "5bb4cd3797c91481f79f774b6ba11989b8f11ef9b7f4e17c4e11bd6f36cc7144",
+    "magic": {
+      "png": false,
+      "jpg": false,
+      "webp": false,
+      "valid": false
+    },
+    "finalUrl": {
+      "present": true,
+      "host": "firebasestorage.googleapis.com",
+      "pathHash": "9617e2d5ffc1ff23b978dcb6f52568956640e782aca05651e0f083b466007d1b",
+      "queryKeys": [
+        "alt",
+        "token"
+      ],
+      "urlHash": "38040d3bea64ea94e2eaa3d592a8b81a04494ac5202ae2c536599374aa0db7e1"
+    }
+  },
+  "canonicalUrlProbe": {
+    "attempted": true,
+    "status": 412,
+    "ok": false,
+    "contentType": "application/json; charset=UTF-8",
+    "length": 452,
+    "sha256": "5bb4cd3797c91481f79f774b6ba11989b8f11ef9b7f4e17c4e11bd6f36cc7144",
+    "magic": {
+      "png": false,
+      "jpg": false,
+      "webp": false,
+      "valid": false
+    },
+    "finalUrl": {
+      "present": true,
+      "host": "firebasestorage.googleapis.com",
+      "pathHash": "9617e2d5ffc1ff23b978dcb6f52568956640e782aca05651e0f083b466007d1b",
+      "queryKeys": [
+        "alt",
+        "token"
+      ],
+      "urlHash": "38040d3bea64ea94e2eaa3d592a8b81a04494ac5202ae2c536599374aa0db7e1"
+    }
+  }
+}
