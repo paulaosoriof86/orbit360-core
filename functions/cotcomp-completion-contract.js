@@ -27,7 +27,7 @@ const FIELDS = Object.freeze({
   ]),
   CO_TRANSPORTE_CONSULTATIVE_HYBRID: Object.freeze([
     { id:'coverageModeNeed', label:'¿Es un despacho específico o un programa anual?', control:'select', phase:PHASES.JOURNEY, required:true, options:['SPECIFIC_SHIPMENT','ANNUAL_PROGRAM','NEED_GUIDANCE'] },
-    { id:'transportModes', label:'Medios de transporte', control:'multi-select', phase:PHASES.JOURNEY, required:true, options:['ROAD','AIR','MARITIME','FLUVIAL','RAIL','MULTIMODAL','OTHER','NEED_GUIDANCE'] },
+    { id:'transportModePrimary', backendField:'transportModes', label:'Medio principal de transporte', control:'select', phase:PHASES.JOURNEY, required:true, options:['ROAD','AIR','MARITIME','MULTIMODAL','OTHER','NEED_GUIDANCE'], normalization:'WRAP_AS_SINGLE_ITEM_ARRAY' },
     { id:'origin', label:'Origen', control:'text', phase:PHASES.JOURNEY, requiredWhen:{field:'coverageModeNeed',equals:'SPECIFIC_SHIPMENT'} },
     { id:'destination', label:'Destino', control:'text', phase:PHASES.JOURNEY, requiredWhen:{field:'coverageModeNeed',equals:'SPECIFIC_SHIPMENT'} },
     { id:'valueToProtect', label:'Valor a proteger', control:'money', phase:PHASES.JOURNEY, requiredWhen:{field:'coverageModeNeed',equals:'SPECIFIC_SHIPMENT'} },
