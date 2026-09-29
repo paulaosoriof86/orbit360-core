@@ -3564,10 +3564,10 @@
         "orbit360-platform/core/product-drive-document-provider-p0.js"
       ],
       "finding": "Synthetic-only Preview upload is machine-proven but no clear human management fixture is surfaced.",
-      "rootCause": "Product already has Preview synthetic upload semantics, but no exact-candidate synthetic fixture was prepared for human UAT.",
-      "remediation": "Reuse canonical Crear gestión uploader with a /^b2[-_]/ synthetic client on the exact candidate; no new product uploader owner.",
+      "rootCause": "Exact Preview product surface is valid; fixture job NOOP was caused by stale workflow state gating after r22 had advanced to CANDIDATE_ARMED_PENDING_SINGLE_EXACT_PREVIEW.",
+      "remediation": "R98 gate now accepts the canonical armed state and treats a prior fixture as valid only when sourceSha/buildId/previewUrl match the current exact Preview.",
       "requiredProof": "upload -> visible -> reload -> open/download -> cleanup",
-      "status": "FIXTURE_MECHANISM_ARMED_PENDING_EXACT_PREVIEW",
+      "status": "MECHANISM_GATE_ROOTFIX_PENDING_EXACT_FIXTURE_RUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3575,7 +3575,12 @@
       "sourceFixReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
       "sourceFixReceiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
       "candidateArmReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_CANDIDATE_ARM_20260929.json",
-      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687"
+      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
+      "gateRootFixReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R98_FIXTURE_GATE_ROOTFIX_20260929.json",
+      "gateRootFixReceiptBlobSha": "4088199243ae40a7b1d6ad3a8b96dee62ba76b1a",
+      "mechanismOnly": true,
+      "productSourceChanged": false,
+      "exactPreviewPreserved": true
     },
     {
       "id": "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
@@ -3876,7 +3881,11 @@
     "productSourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
     "harnessRepairReceiptBlobSha": "bfd4074a5dee18f8b593eca64bfafcc34fd9343f",
     "r96MachinePass": true,
-    "r97MachinePass": true
+    "r97MachinePass": true,
+    "r98FixtureGateRootFix": "ARMED_PENDING_RUN",
+    "r98FixtureGateReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R98_FIXTURE_GATE_ROOTFIX_20260929.json",
+    "r98FixtureGateReceiptBlobSha": "4088199243ae40a7b1d6ad3a8b96dee62ba76b1a",
+    "exactPreviewPreserved": true
   },
   "lastReview": {
     "date": "2026-09-26",

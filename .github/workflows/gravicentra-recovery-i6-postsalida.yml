@@ -4562,17 +4562,20 @@ jobs:
           const fs=require('node:fs'),c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK));
           const q=b.authenticatedPreviewProof||{},p=b.preview||{},r=b.r22FinalHumanRemediation||{};
           const existing=b.finalHumanFixtures&&b.finalHumanFixtures.drive;
+          const existingExact=!!(existing&&existing.firestoreReadback===true&&existing.sourceSha===p.sourceSha&&existing.buildId===p.buildId&&existing.previewUrl===p.url);
+          const remediationReady=['SOURCE_FIXED_PENDING_HUMAN_FIXTURES_AND_EXACT_PREVIEW','CANDIDATE_ARMED_PENDING_SINGLE_EXACT_PREVIEW'].includes(r.status);
           const run=b.status==='PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL'
             && q.status==='PASS'
             && c.i65ForensicRemediationPlan?.currentBlock==='B2'
             && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
-            && r.status==='SOURCE_FIXED_PENDING_HUMAN_FIXTURES_AND_EXACT_PREVIEW'
-            && !existing;
+            && remediationReady
+            && !existingExact;
           if(run){
             if(!p.url||p.exactReadback!==true||p.functionalPass!==true||p.livePromoted!==false)throw Error('R98_PREVIEW_BINDING_INVALID');
             if(q.humanFixtures?.status!=='READY_FOR_TARGETED_HUMAN_UAT')throw Error('R98_USER_INSURER_FIXTURES_NOT_READY');
           }
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B2_R98_DRIVE_FIXTURE_GATE='+JSON.stringify({mode:run?'RUN':'NOOP',remediationStatus:r.status,existingExact,existingSourceSha:existing?.sourceSha||'',targetSourceSha:p.sourceSha||'',targetBuildId:p.buildId||''}));
           console.log('B2_R98_DRIVE_FIXTURE_MODE='+(run?'RUN':'NOOP'));
           NODE
       - name: Install fixture dependency

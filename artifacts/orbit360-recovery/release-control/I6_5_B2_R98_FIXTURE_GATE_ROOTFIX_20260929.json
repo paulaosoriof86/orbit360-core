@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R98_FIXTURE_GATE_ROOTFIX_V1",
+  "recordedAt": "2026-09-29T15:41:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "651e4d28ba5626996d9dff370785d504e2954260",
+  "block": "B2",
+  "findingId": "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+  "status": "MECHANISM_ROOTFIX_ARMED_PENDING_RUN",
+  "exactCertifiedPreview": {
+    "sourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
+    "buildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36622988522-gy3bsyhy.web.app",
+    "runId": 36622988522,
+    "artifactId": 11059202434,
+    "artifactDigest": "cf2cd355de95eaf79f7cd5f66b66ebf7c1ad4307d1e9b5ea729bfdbda4ac4b21"
+  },
+  "rootCause": {
+    "type": "STALE_GATE_STATE_CONDITION",
+    "evidenceRunId": 36624806450,
+    "evidenceJobId": 109601167890,
+    "observed": "B2_R98_DRIVE_FIXTURE_MODE=NOOP",
+    "reason": "R98 gate accepted only r22 status SOURCE_FIXED_PENDING_HUMAN_FIXTURES_AND_EXACT_PREVIEW while canonical lock had already advanced to CANDIDATE_ARMED_PENDING_SINGLE_EXACT_PREVIEW."
+  },
+  "remediation": {
+    "workflowBlob": "414ea3fad97b34a4e62087c888365be90f30b1b1",
+    "rule": "A prior Drive fixture blocks creation only when firestoreReadback=true and sourceSha/buildId/previewUrl equal the current exact certified Preview.",
+    "acceptedR22Statuses": [
+      "SOURCE_FIXED_PENDING_HUMAN_FIXTURES_AND_EXACT_PREVIEW",
+      "CANDIDATE_ARMED_PENDING_SINGLE_EXACT_PREVIEW"
+    ],
+    "productSourceChanged": false,
+    "buildChanged": false,
+    "artifactChanged": false
+  },
+  "expectedFixture": {
+    "clientIdPrefix": "b2-drive-human-",
+    "exactSourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
+    "exactBuildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36622988522-gy3bsyhy.web.app",
+    "syntheticOnly": true,
+    "cleanupMandatory": true
+  },
+  "boundaries": {
+    "noProductSourceMutation": true,
+    "noBuild": true,
+    "noNewPreview": true,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noRealBusinessMutation": true
+  }
+}

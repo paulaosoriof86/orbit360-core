@@ -1995,8 +1995,6 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R101_SYNTHETIC_TEAM_FIXTURE_PRIVILEGED_WRITE_READBACK",
-    "R102_SYNTHETIC_INSURER_FIXTURE_PRESERVE",
     "R98_EXACT_PREVIEW_SYNTHETIC_DRIVE_CLIENT_FIXTURE",
     "PAULA_FIVE_TARGETED_HUMAN_TESTS",
     "FINAL_SYNTHETIC_CLEANUP"
@@ -3112,7 +3110,7 @@
     "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "exactPreviewProofPending": true
   },
-  "boundaryNote": "R22 single cumulative candidate armed. Build/Preview once from exact product composition; authenticated proof must create only marked synthetic human fixtures and R15 drive client. No LIVE/B3/reimport.",
+  "boundaryNote": "R98 mechanism-only gate rootfix armed. Existing stale Drive fixture cannot satisfy exact-candidate proof. Product source/build/artifact/Preview remain unchanged; no LIVE/B3/reimport.",
   "driveHumanFixture": {
     "status": "PRESERVED_PENDING_R83_HUMAN_RETEST_ON_AUTHENTICATED_PREVIEW",
     "tenantId": "alianzas-soluciones",
@@ -4034,5 +4032,19 @@
     "exactPreviewUnchanged": true,
     "sameArtifactRetryAuthorized": true,
     "productBehavior": "CORRECT_FAIL_CLOSED_DENIAL"
+  },
+  "r98FixtureGateRootFix": {
+    "status": "MECHANISM_ROOTFIX_ARMED_PENDING_RUN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R98_FIXTURE_GATE_ROOTFIX_20260929.json",
+    "receiptBlobSha": "4088199243ae40a7b1d6ad3a8b96dee62ba76b1a",
+    "workflowBlobSha": "414ea3fad97b34a4e62087c888365be90f30b1b1",
+    "cause": "STALE_GATE_STATE_CONDITION",
+    "exactPreviewPreserved": true,
+    "exactPreviewSourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
+    "exactPreviewBuildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36622988522-gy3bsyhy.web.app",
+    "productSourceChanged": false,
+    "buildChanged": false,
+    "artifactChanged": false
   }
 }

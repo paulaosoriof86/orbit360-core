@@ -2022,7 +2022,7 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "04ed305e631ec322d761a9269fadd506c9441e3e",
+    "b2ExecutionLockBlobSha": "f1682c07cd4ac9d9bf07d11a510c2c3a9645e578",
     "b2": {
       "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
@@ -2915,6 +2915,18 @@
         "emailSend": false,
         "syntheticOnly": true,
         "cleanupMandatory": true
+      },
+      "r98FixtureGateRootFix": {
+        "status": "MECHANISM_ROOTFIX_ARMED_PENDING_RUN",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R98_FIXTURE_GATE_ROOTFIX_20260929.json",
+        "receiptBlobSha": "4088199243ae40a7b1d6ad3a8b96dee62ba76b1a",
+        "workflowBlobSha": "414ea3fad97b34a4e62087c888365be90f30b1b1",
+        "exactPreviewSourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
+        "exactPreviewBuildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
+        "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36622988522-gy3bsyhy.web.app",
+        "productSourceChanged": false,
+        "buildChanged": false,
+        "artifactChanged": false
       }
     },
     "dashboardRealityGate": {
@@ -3048,7 +3060,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "1137839407a128b7a6c13be68cc3f6f15cf4a565",
+    "findingLedgerBlobSha": "6a621aaf67834c5bde6fe0a11c81fd12309254e5",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B2",
@@ -3060,7 +3072,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_AUTHENTICATED_RETRY_R101_SAME_EXACT_PREVIEW"
+    "nextAction": "B2_R98_EXACT_PREVIEW_FIXTURE_RUN"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
