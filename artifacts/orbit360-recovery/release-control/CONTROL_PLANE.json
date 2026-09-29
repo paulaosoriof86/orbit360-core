@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "f4596f165e234e75e2077cd84b546cf00a76b6cc",
+    "b2ExecutionLockBlobSha": "39abbc7605e0747e3918f5d16ed5dd3d25744cc9",
     "b2": {
-      "status": "PREVIEW_AUTHENTICATED_PASS_HUMAN_FIXTURES_READY_PENDING_PAULA_VISUAL",
+      "status": "PREVIEW_HUMAN_4_PASS_R102_FAIL_DIAGNOSTIC_PENDING",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2163,7 +2163,7 @@
       "technicalPassHistoricalPreserved": true,
       "authenticatedPassHistoricalPreserved": true,
       "syntheticCleanupHistoricalPreserved": true,
-      "paulaVisualDecision": "B2_FINAL_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+      "paulaVisualDecision": "B2_TARGETED_HUMAN_UAT_4_PASS_1_FAIL_R102",
       "paulaVisualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
       "paulaVisualRejectionReceiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
       "rejectedPreviewRunId": 35964339112,
@@ -2964,7 +2964,31 @@
           "cleanupPending": true
         }
       },
-      "humanDriveProofPending": true
+      "humanDriveProofPending": true,
+      "targetedHumanUat20260929": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
+        "receiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
+        "tests": {
+          "permissions": "PASS",
+          "multirole": "PASS",
+          "userMobile": "PASS",
+          "opsDocumentMobile": "PASS",
+          "insurerLogo": "FAIL_BROKEN_IMAGE_AFTER_REFRESH"
+        },
+        "remainingBlocking": [
+          "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22"
+        ],
+        "dashboardInicio": "CARRY_FORWARD_DASHBOARD_INICIO_001",
+        "opsHydration": "NONBLOCKING_CARRY_B3_TRANSIENT_EMPTY_THEN_HYDRATED"
+      },
+      "r102ReadonlyDiagnostic": {
+        "status": "ARMED_PENDING_RUN",
+        "toolPath": "tools/gravicentra-i6-5-b2-r102-logo-readonly.mjs",
+        "toolBlobSha": "02df818096ae4dc2cb50be77f062bb91ce162ce1",
+        "workflowBlobSha": "359b5f37cce14bdc6a52151a38b8e15345073d96",
+        "readOnly": true,
+        "productSourceMutation": false
+      }
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -3097,7 +3121,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "6a621aaf67834c5bde6fe0a11c81fd12309254e5",
+    "findingLedgerBlobSha": "2409e0f3c54788135a1ac687de9418af6bf8fa25",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B2",
@@ -3109,7 +3133,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R98_EXACT_PREVIEW_FIXTURE_RUN"
+    "nextAction": "B2_R102_READONLY_STORAGE_URL_DIAGNOSTIC"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

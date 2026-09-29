@@ -4634,6 +4634,112 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
 
+  i65-b2-r102-logo-readonly:
+    needs: i65-b2-r15-drive-human-fixture
+    if: always() && needs.i65-b2-r15-drive-human-fixture.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+      R102_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B2_R102_LOGO_READONLY_DIAGNOSTIC_20260929.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate R102 read-only logo diagnostic
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL)),b=JSON.parse(fs.readFileSync(process.env.B2_LOCK));
+          const run=b.status==='PREVIEW_HUMAN_4_PASS_R102_FAIL_DIAGNOSTIC_PENDING'
+            && c.i65ForensicRemediationPlan?.currentBlock==='B2'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
+            && b.r102ReadonlyDiagnostic?.status==='ARMED_PENDING_RUN'
+            && b.preview?.livePromoted===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B2_R102_READONLY_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Install R102 diagnostic dependency
+        if: steps.mode.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Assert LIVE unchanged before R102 diagnostic
+        if: steps.mode.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Execute R102 Storage URL read-only diagnostic
+        id: diag
+        if: steps.mode.outputs.run == 'true'
+        env:
+          B2_R102_DIAG_OUT: ${{ runner.temp }}/b2-r102-logo-readonly.json
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-5-b2-r102-logo-readonly.mjs
+          node tools/gravicentra-i6-5-b2-r102-logo-readonly.mjs
+      - name: Upload R102 read-only diagnostic evidence
+        if: always() && steps.mode.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-r102-logo-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/b2-r102-logo-readonly.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+      - name: Freeze R102 diagnostic result
+        if: steps.mode.outputs.run == 'true' && steps.diag.conclusion == 'success'
+        run: |
+          set -euo pipefail
+          cp "$RUNNER_TEMP/b2-r102-logo-readonly.json" "$R102_RECEIPT"
+          node - <<'NODE'
+          const fs=require('node:fs'),cpPath=process.env.CONTROL,lockPath=process.env.B2_LOCK,rp=process.env.R102_RECEIPT;
+          const c=JSON.parse(fs.readFileSync(cpPath)),b=JSON.parse(fs.readFileSync(lockPath)),e=JSON.parse(fs.readFileSync(rp));
+          if(e.status!=='PASS_READONLY_DIAGNOSTIC'||e.readOnly!==true||!Array.isArray(e.findings)||!e.findings.length)throw Error('B2_R102_DIAGNOSTIC_EVIDENCE_INVALID');
+          const q={
+            status:'COMPLETE_PENDING_CAUSAL_FIX',
+            receiptPath:rp,
+            runId:Number(process.env.GITHUB_RUN_ID),
+            findings:e.findings,
+            insurerId:e.insurerId,
+            objectExists:e.storage?.objectExists===true,
+            persistedUrlHttpStatus:Number(e.persistedUrlProbe?.status||0),
+            persistedUrlHttpOk:e.persistedUrlProbe?.ok===true,
+            canonicalUrlHttpStatus:Number(e.canonicalUrlProbe?.status||0),
+            canonicalUrlHttpOk:e.canonicalUrlProbe?.ok===true,
+            persistedTokenMatchesMetadata:e.storage?.persistedTokenMatchesMetadata===true,
+            imageBytesValid:e.storage?.magic?.valid===true,
+            readOnly:true
+          };
+          b.r102ReadonlyDiagnostic=q;
+          b.status='R102_DIAGNOSTIC_COMPLETE_PENDING_CAUSAL_FIX';
+          b.nextRequiredProof=['R102_CAUSAL_FIX_IF_REQUIRED','R102_TARGETED_HUMAN_RETEST','FINAL_SYNTHETIC_CLEANUP'];
+          fs.writeFileSync(lockPath,JSON.stringify(b,null,2)+'\n');
+          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),status:b.status,r102ReadonlyDiagnostic:q};
+          c.canonicalAccumulationControl.nextAction='B2_R102_CAUSAL_FIX';
+          fs.writeFileSync(cpPath,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$R102_RECEIPT" "$B2_LOCK"
+          BLOB=$(git hash-object "$B2_LOCK"); export BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p));
+          c.i65ForensicRemediationPlan.b2ExecutionLockBlobSha=process.env.BLOB;
+          fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5 B2): R102 logo read-only diagnostic"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+
+
   i65-b2-google-auth-provider-remediation:
     runs-on: ubuntu-24.04
     timeout-minutes: 12

@@ -19,7 +19,7 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 161,
+    "total": 162,
     "b2HumanFindings": 61,
     "currentBlocking": 82,
     "countingNote": "Final human review 2026-09-29 reopens B2 with R96-R102; prior unaffected PASS preserved. Five B3 carries frozen; existing dashboard/email debt preserved. No LIVE/B3/reimport."
@@ -3480,7 +3480,7 @@
       "rootCause": "Preview browser used production tenant-domain-config callable; no Preview-isolated server write/readback path existed.",
       "remediation": "Dedicated orbit360TenantDomainConfigPreview@us-east1 with previewUatConfig namespace; canonical access read-only baseline; browser chooses Preview callable by hostname.",
       "requiredProof": "reversible save -> server readback -> reload",
-      "status": "MACHINE_PASS_PENDING_HUMAN_TEST_1",
+      "status": "HUMAN_PASS_CLOSED_B2",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3514,7 +3514,10 @@
         "previewIsolated": true,
         "functionName": "orbit360TenantDomainConfigPreview",
         "functionRegion": "us-east1"
-      }
+      },
+      "humanUatReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
+      "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
+      "humanEvidence": "Paula targeted UAT PASS on exact B2 Preview 2026-09-29."
     },
     {
       "id": "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
@@ -3532,7 +3535,7 @@
       "rootCause": "Canonical role owner emitted orbit:session on product role switch while Drive authorization provider listened for orbit:active-role-changed; stale previous-role document status could persist.",
       "remediation": "Canonical session owner now emits orbit:active-role-changed after a successful actual role change; backend role/scope contract unchanged.",
       "requiredProof": "Dirección synthetic status/read/upload authorization",
-      "status": "MACHINE_PASS_PENDING_HUMAN_SPOTCHECK",
+      "status": "HUMAN_PASS_CLOSED_B2",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3549,7 +3552,10 @@
         "configured": true,
         "uploadAvailable": true,
         "previewIsolated": true
-      }
+      },
+      "humanUatReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
+      "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
+      "humanEvidence": "Paula targeted UAT PASS on exact B2 Preview 2026-09-29."
     },
     {
       "id": "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
@@ -3567,7 +3573,7 @@
       "rootCause": "Exact Preview product surface is valid; fixture job NOOP was caused by stale workflow state gating after r22 had advanced to CANDIDATE_ARMED_PENDING_SINGLE_EXACT_PREVIEW.",
       "remediation": "R98 gate now accepts the canonical armed state and treats a prior fixture as valid only when sourceSha/buildId/previewUrl match the current exact Preview.",
       "requiredProof": "upload -> visible -> reload -> open/download -> cleanup",
-      "status": "MECHANISM_GATE_ROOTFIX_PENDING_EXACT_FIXTURE_RUN",
+      "status": "HUMAN_PASS_CLOSED_B2",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3580,7 +3586,10 @@
       "gateRootFixReceiptBlobSha": "4088199243ae40a7b1d6ad3a8b96dee62ba76b1a",
       "mechanismOnly": true,
       "productSourceChanged": false,
-      "exactPreviewPreserved": true
+      "exactPreviewPreserved": true,
+      "humanUatReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
+      "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
+      "humanEvidence": "Paula targeted UAT PASS on exact B2 Preview 2026-09-29."
     },
     {
       "id": "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
@@ -3598,7 +3607,7 @@
       "rootCause": "Mobile ciclo modal descendants/footer could exceed available width despite viewport-bounded outer card.",
       "remediation": "Mobile modal min-width constraints and stacked footer composition in canonical base CSS.",
       "requiredProof": "no mobile horizontal clipping",
-      "status": "SOURCE_FIXED_CANDIDATE_ARMED_PENDING_EXACT_PREVIEW",
+      "status": "HUMAN_PASS_CLOSED_B2",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3606,7 +3615,10 @@
       "sourceFixReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
       "sourceFixReceiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
       "candidateArmReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_CANDIDATE_ARM_20260929.json",
-      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687"
+      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
+      "humanUatReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
+      "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
+      "humanEvidence": "Paula targeted UAT PASS on exact B2 Preview 2026-09-29."
     },
     {
       "id": "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22",
@@ -3624,7 +3636,7 @@
       "rootCause": "Delete used margin-right:auto in single-row footer while onboarding bridge injected the fourth action.",
       "remediation": "Canonical #eu-actions footer plus two-column mobile grid with destructive/access actions full-row.",
       "requiredProof": "delete/sync/cancel/save all visible",
-      "status": "SOURCE_FIXED_CANDIDATE_ARMED_PENDING_EXACT_PREVIEW",
+      "status": "HUMAN_PASS_CLOSED_B2",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3632,7 +3644,10 @@
       "sourceFixReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
       "sourceFixReceiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
       "candidateArmReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_CANDIDATE_ARM_20260929.json",
-      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687"
+      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
+      "humanUatReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
+      "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
+      "humanEvidence": "Paula targeted UAT PASS on exact B2 Preview 2026-09-29."
     },
     {
       "id": "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
@@ -3649,7 +3664,7 @@
       "rootCause": "Safe reversible human fixture not prepared.",
       "remediation": "Prepare reversible synthetic Equipo record bound to exact candidate; no Auth/email delivery.",
       "requiredProof": "edit -> save confirmed -> reload -> cleanup",
-      "status": "HARNESS_FIXTURE_AUTH_REPAIR_ARMED_SAME_EXACT_PREVIEW",
+      "status": "HUMAN_PASS_CLOSED_B2",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3666,7 +3681,10 @@
       "harnessRepairReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_R101_HARNESS_PRIVILEGED_FIXTURE_WRITE_FIX_20260929.json",
       "harnessRepairReceiptBlobSha": "bfd4074a5dee18f8b593eca64bfafcc34fd9343f",
       "harnessAfterBlob": "a25e13edb57844ff63d9b3d4524e216eaa595978",
-      "sameArtifactRetryAuthorized": true
+      "sameArtifactRetryAuthorized": true,
+      "humanUatReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
+      "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
+      "humanEvidence": "Paula targeted UAT PASS on exact B2 Preview 2026-09-29."
     },
     {
       "id": "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22",
@@ -3680,16 +3698,19 @@
         "functions/product-operational-domain.js"
       ],
       "finding": "Insurer logo machine persistence passed but final human save/reload proof is absent.",
-      "rootCause": "Safe synthetic insurer fixture not prepared on final Preview.",
-      "remediation": "Prepare reversible synthetic insurer inside exact Preview runtime; do not substitute localStorage-only R52 fixture.",
+      "rootCause": "PENDING_READONLY_STORAGE_URL_DIAGNOSTIC",
+      "remediation": "Do not promote B2. Diagnose exact Firestore logo URL, Storage object existence, download token, response content and image bytes before changing product source.",
       "requiredProof": "logo save/readback -> reload -> cleanup",
-      "status": "FIXTURE_MECHANISM_ARMED_PENDING_EXACT_PREVIEW",
+      "status": "HUMAN_FAIL_R102_DIAGNOSTIC_PENDING",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
       "noReimport": true,
       "candidateArmReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_CANDIDATE_ARM_20260929.json",
-      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687"
+      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
+      "humanUatReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
+      "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
+      "humanEvidence": "Synthetic insurer logo save appeared successful but after refresh the Logo field rendered a broken image."
     },
     {
       "id": "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
@@ -3793,6 +3814,27 @@
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
       "noReimport": true
+    },
+    {
+      "id": "B3-CARRY-OPS-HYDRATION-EMPTY-FLASH-20260929",
+      "block": "B3",
+      "source": "PAULA_FINAL_TARGETED_UAT_20260929",
+      "surface": "Ops/refresh hydration",
+      "classification": "NONBLOCKING_HYDRATION_UX_CARRY_FORWARD",
+      "blocking": false,
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/core/product-hydration-required-optional-p0.js"
+      ],
+      "finding": "After refreshing Ops, management rows were temporarily absent for a few seconds and then appeared. Document and management persisted; no data loss observed.",
+      "rootCause": "PENDING_B3_PERFORMANCE_HYDRATION_DIAGNOSTIC",
+      "remediation": "In B3 audit hydration timing/empty-state semantics; show loading state rather than transient empty result if reproducible. No reimport.",
+      "requiredProof": "Refresh Ops with existing records; distinguish loading vs true empty; records appear without retry/data mutation.",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
+      "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
+      "noLive": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [
@@ -3833,8 +3875,8 @@
   "currentHumanReview": {
     "date": "2026-09-29",
     "recordedAt": "2026-09-29T11:13:00-06:00",
-    "origin": "PAULA_FINAL_HUMAN_UAT_20260929",
-    "decision": "B2_FINAL_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+    "origin": "PAULA_FINAL_TARGETED_UAT_20260929",
+    "decision": "B2_TARGETED_HUMAN_UAT_4_PASS_1_FAIL_R102",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36499598188-p6m38hix.web.app",
     "exactSourceSha": "0231996b156e0563755966103b861875e0862a07",
     "exactBuildId": "gi-i65-b2-0231996b156e-57f234755dc1",
@@ -3855,11 +3897,12 @@
       "B3-CARRY-OPS-CATALOG-ADMIN-20260929",
       "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
       "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
-      "B1-EMAIL-DELIVERY-001"
+      "B1-EMAIL-DELIVERY-001",
+      "B3-CARRY-OPS-HYDRATION-EMPTY-FLASH-20260929"
     ],
     "count": 7,
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
-    "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
+    "receiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
     "b2OverallAccepted": false,
     "noB3": true,
     "noLive": true,
@@ -3885,7 +3928,23 @@
     "r98FixtureGateRootFix": "ARMED_PENDING_RUN",
     "r98FixtureGateReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R98_FIXTURE_GATE_ROOTFIX_20260929.json",
     "r98FixtureGateReceiptBlobSha": "4088199243ae40a7b1d6ad3a8b96dee62ba76b1a",
-    "exactPreviewPreserved": true
+    "exactPreviewPreserved": true,
+    "targetedTests": {
+      "pass": 4,
+      "fail": 1
+    },
+    "closedFindingIds": [
+      "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22",
+      "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
+      "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+      "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
+      "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22",
+      "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22"
+    ],
+    "remainingBlockingFindingIds": [
+      "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22"
+    ],
+    "nextAction": "R102_READONLY_STORAGE_URL_DIAGNOSTIC"
   },
   "lastReview": {
     "date": "2026-09-26",
