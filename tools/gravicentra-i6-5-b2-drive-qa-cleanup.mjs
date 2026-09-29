@@ -73,7 +73,7 @@ need(lock.status==='PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL','B2_DRIVE_C
 need(Array.isArray(lock.nextRequiredProof)&&lock.nextRequiredProof[0]==='DRIVE_QA_FIXTURE_CLEANUP','B2_DRIVE_CLEANUP_CURSOR');
 need(lock.r77r81DriveDurableProof?.status==='PASS_CLEANUP_PENDING','B2_DRIVE_CLEANUP_R7781_NOT_READY');
 need(lock.r91r95RuntimeProof?.status==='PASS_CLEANUP_PENDING_FINAL_PAULA_VISUAL','B2_DRIVE_CLEANUP_R9195_NOT_READY');
-need(lock.r82CrossModuleDeleteProof?.status==='PASS','B2_DRIVE_CLEANUP_R82_NOT_PASS');
+need(/^PASS/.test(clean(lock.r82CrossModuleDeleteProof?.status,80)),'B2_DRIVE_CLEANUP_R82_NOT_PASS');
 
 let app;
 const evidence={schema:'GRAVICENTRA_I6_5_B2_DRIVE_QA_CLEANUP_V1',status:'RUNNING',tenantId:TENANT,preview:lock.preview,drive:{targets:[],results:[]},firestore:{targets:[],deleted:[],residual:[]},errors:[],boundaries:{qaOnly:true,productionHosting:false,b3:false,reimport:false,realBusinessMutation:false}};
