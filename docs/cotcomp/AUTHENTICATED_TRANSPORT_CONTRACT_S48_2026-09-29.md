@@ -7,8 +7,9 @@
 
 The public CotComp does not require the visitor to log in before exploring the journey. Transport security is therefore split by channel:
 
-- PUBLIC_WEB: signed public session + App Check verification at the gateway.
-- PORTAL / INTERNAL: Firebase Auth identity + session authorization.
+- PUBLIC_WEB exploration/submission: App Check at the gateway; no visible login is required.
+- PUBLIC_WEB proposal reads/selection: App Check plus verified case access bound to the QuoteCase.
+- PORTAL / INTERNAL: Firebase Auth identity plus session authorization.
 
 The public browser must not call Orbit360 data stores directly.
 
@@ -48,6 +49,8 @@ For CO Transport, coverage mode and transport modes must be explicit before subm
 No value is invented simply to satisfy the backend.
 
 ## Security boundary
+
+App Check protects the callable from requests that do not originate from the registered web app. Case-level access is a separate authorization concern and is required before a public visitor can read or select proposals for an existing QuoteCase.
 
 S4.8 defines the envelope and authorization preconditions only. It does not:
 - expose a Cloud Function;
