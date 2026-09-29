@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -233,7 +233,10 @@
     "vehicleCandidateDedupVisual": true,
     "startupHumanSpotcheck": true,
     "insurerLogoPhysicalPersistenceMachineProof": true,
-    "renewalLineageReceiptsMachineProof": true
+    "renewalLineageReceiptsMachineProof": true,
+    "r96AccessPreviewServerReadback": true,
+    "r97DirectionDocumentAuthorization": true,
+    "finalHumanUserInsurerFixturesReady": true
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING",
@@ -360,7 +363,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PASS",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
     "exactPreviewBuildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
@@ -428,26 +431,26 @@
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
-    "runId": 36499598188,
+    "runId": 36624806450,
     "scope": {
       "operativo": "all",
       "asesor": "own",
       "asesorLeakCount": 0,
       "operativoCounts": {
-        "clientes": 457,
-        "polizas": 0,
-        "recibosEsperados": 0,
-        "carteraPrimas": 0,
-        "asesores": 0,
-        "metas": 0
+        "clientes": 440,
+        "polizas": 1419,
+        "recibosEsperados": 1876,
+        "carteraPrimas": 1317,
+        "asesores": 7,
+        "metas": 3
       },
       "asesorCounts": {
-        "clientes": 410,
-        "polizas": 0,
-        "recibosEsperados": 0,
-        "carteraPrimas": 0,
-        "asesores": 0,
-        "metas": 0
+        "clientes": 393,
+        "polizas": 1242,
+        "recibosEsperados": 1671,
+        "carteraPrimas": 1176,
+        "asesores": 1,
+        "metas": 3
       }
     },
     "crud": {
@@ -456,9 +459,9 @@
       "individualReceiptPortfolioSync": true,
       "reportedPaymentVisible": true,
       "reportedPaymentDoesNotFabricateCobro": true,
-      "clientIdHash": "24883984635cec7d9fd413901b7a8115b010947fea21c8df408c6b93d464d108",
-      "policyIdHash": "6bb238e4bb3cb7b01382a404cbcab5499694b8667c5add4521836a61ba984f05",
-      "vehicleIdHash": "bab7b0104a640e7e719bc59be8f4b5017f22cfc02122816562dac7f701344a2a",
+      "clientIdHash": "57abd9c568f6aae9e4db68c06dd4169cc0c27ed73095075bc65d7818ec984260",
+      "policyIdHash": "efaa75bdd708177efa9930cd8d1722bd15a6c1e66eef961cf305c37d4e5cb526",
+      "vehicleIdHash": "2809b2927553a7e0375a235aedfe8bf410c9882ca5115a5cfd1ac134d3c9b964",
       "clientCreateReadback": true,
       "clientEditReadback": true,
       "policyCreateReadback": true,
@@ -474,8 +477,8 @@
       "dirtyBackdropProtected": true
     },
     "renewal": {
-      "requestIdHash": "9b1226933b174b1e3f3b209a73cffb5de76a69fa87b73f915906f01cce18f877",
-      "newPolicyIdHash": "775cdce400f7d68be12762a31881e9e86741ca4095e4572e01b83e491080ca84",
+      "requestIdHash": "dc290530df2cb9752ad6008259aff0ab79cf8fdcecd45b9d6f12564db1f032ee",
+      "newPolicyIdHash": "2d792bf3ca707f4c1f95fa8c67834a727c1f2462e5c6d72d066bfa59b8133712",
       "sourceLink": true,
       "receipts": 2,
       "portfolio": 2,
@@ -486,14 +489,17 @@
     },
     "cleanup": {
       "preRunAssetsDeleted": 0,
-      "deleted": 48,
+      "deleted": 46,
       "clientAbsent": true,
-      "insurerAbsent": true,
-      "assetPrefixResidual": 0,
-      "assetAbsent": true
+      "insurerAbsent": false,
+      "insurerFixturePreserved": true,
+      "userFixturePreserved": true,
+      "assetPrefixResidual": 1,
+      "assetAbsent": false,
+      "assetFixturePreserved": true
     },
     "syntheticWrites": 23,
-    "cleanupWrites": 48,
+    "cleanupWrites": 46,
     "visualEvidenceRecapture": true,
     "visualReceiptRecapture": true,
     "lastFailureRunId": 36270785111,
@@ -560,7 +566,100 @@
     "invalidationReason": "Empty preprovisioned Preview Drive secret produced functions/unavailable instead of explicit tenant_setup_required.",
     "priorTechnicalPreviewPassRunId": 36362404589,
     "r20cReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R20C_AUTH_HARNESS_DEFERRED_PRE_READ_FIX_20260928.json",
-    "r20cReceiptBlobSha": "ced2d39595ccb62597b2b1d16c3cd9d4eb2244bb"
+    "r20cReceiptBlobSha": "ced2d39595ccb62597b2b1d16c3cd9d4eb2244bb",
+    "accessConfigRoundtrip": {
+      "functionName": "orbit360TenantDomainConfigPreview",
+      "functionRegion": "us-east1",
+      "previewIsolated": true,
+      "saveOk": true,
+      "saveSource": "preview_uat",
+      "savePreviewIsolated": true,
+      "getOk": true,
+      "getSource": "preview_uat",
+      "getPreviewIsolated": true,
+      "configEqual": true,
+      "readbackMetadataKeys": [
+        "previewIsolated",
+        "schemaOwner",
+        "tenantId",
+        "updatedAt",
+        "updatedByUid"
+      ],
+      "rolePermissionKeys": [
+        "Dirección",
+        "Admin",
+        "Finanzas",
+        "Marketing",
+        "Operativo",
+        "Asesor",
+        "Asistente",
+        "Comercial"
+      ],
+      "roleScopeKeys": [
+        "Dirección",
+        "SuperAdmin",
+        "AdminTenant",
+        "Admin",
+        "Finanzas",
+        "Operativo",
+        "Marketing",
+        "Asesor",
+        "Asistente",
+        "Comercial"
+      ]
+    },
+    "directionDocumentAuth": {
+      "direction": {
+        "role": "Dirección",
+        "status": {
+          "available": true,
+          "configured": true,
+          "backendPersistent": true,
+          "status": "disponible",
+          "ok": true,
+          "readAvailable": true,
+          "uploadAvailable": true,
+          "rootFolderId": "13H7zMGwFC9f1UnHyfNqzzSfFex1jJRHE",
+          "rootName": "Clientes",
+          "googleAccountEmail": "paula.osorio.f86@gmail.com",
+          "previewIsolated": true
+        }
+      },
+      "operativoRestored": {
+        "role": "Operativo",
+        "status": {
+          "available": true,
+          "configured": true,
+          "backendPersistent": true,
+          "status": "disponible",
+          "ok": true,
+          "readAvailable": true,
+          "uploadAvailable": true,
+          "rootFolderId": "13H7zMGwFC9f1UnHyfNqzzSfFex1jJRHE",
+          "rootName": "Clientes",
+          "googleAccountEmail": "paula.osorio.f86@gmail.com",
+          "previewIsolated": true
+        }
+      }
+    },
+    "humanFixtures": {
+      "fixtureWriteRole": "AdminTenant",
+      "status": "READY_FOR_TARGETED_HUMAN_UAT",
+      "user": {
+        "id": "b2-user-36624806450",
+        "name": "B2 QA Usuario 36624806450",
+        "search": "B2 QA Usuario"
+      },
+      "insurer": {
+        "id": "b2-asg-36624806450",
+        "name": "B2 QA Aseguradora 36624806450",
+        "search": "B2 QA Aseguradora"
+      },
+      "noAuthUser": true,
+      "emailSend": false,
+      "syntheticOnly": true,
+      "cleanupMandatory": true
+    }
   },
   "orphanSyntheticCleanup": {
     "status": "PASS",
