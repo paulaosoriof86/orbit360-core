@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "11d52b25d331df534a53425f0d86d83e97b0f117",
+    "b2ExecutionLockBlobSha": "cc01067ec9ff0fd6c4994c360a1f86260a1eaf2d",
     "b2": {
-      "status": "PREVIEW_R102_MACHINE_PASS_PENDING_TARGETED_HUMAN_RETEST",
+      "status": "B2_HUMAN_PASS_CLEANUP_PENDING",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2159,7 +2159,7 @@
       "visualReceiptRecapture": true,
       "assistantVisualAudit": "REMEDIATION_REQUIRED_BEFORE_PAULA_VISUAL",
       "outstandingBlockersForHumanReview": 10,
-      "paulaVisualAccepted": false,
+      "paulaVisualAccepted": true,
       "technicalPassHistoricalPreserved": true,
       "authenticatedPassHistoricalPreserved": true,
       "syntheticCleanupHistoricalPreserved": true,
@@ -3021,7 +3021,12 @@
         "noReimport": true
       },
       "r102MachinePass": true,
-      "r102HumanRetestPending": true
+      "r102HumanRetestPending": true,
+      "targetedHumanUatPass": true,
+      "r102HumanRetestPass": true,
+      "r102HumanRetestReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_TARGETED_HUMAN_RETEST_PASS_20260929.json",
+      "r102HumanRetestReceiptBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+      "finalSyntheticCleanupAuthorized": true
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -3154,7 +3159,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "fd9314fb647e2c57f74461313f5fc86880eb1545",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "9a23170fa46512706f8ae5f0936ced96a1d58a14",
+    "findingLedgerBlobSha": "44620dd06306746d3e17cfe85d12c4f5fe829e74",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B2",
@@ -3166,7 +3171,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_R102_SINGLE_EXACT_PREVIEW"
+    "nextAction": "B2_FINAL_SYNTHETIC_CLEANUP"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

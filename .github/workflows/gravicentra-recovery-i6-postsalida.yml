@@ -71,6 +71,7 @@ on:
       - 'tools/gravicentra-i6-5-b2-r52-human-fixture.mjs'
       - 'tools/gravicentra-i6-5-b2-synthetic-cleanup.mjs'
       - 'tools/gravicentra-i6-5-b2-drive-qa-cleanup.mjs'
+      - 'tools/gravicentra-i6-5-b2-final-human-cleanup.mjs'
       - 'tools/gravicentra-i6-5-b2-r77-r81-drive-durable-proof.mjs'
       - 'tools/gravicentra-i6-5-b2-r77-r81-freeze.mjs'
       - 'tools/gravicentra-i6-5-b2-r82-delete-runtime-proof.mjs'
@@ -5538,3 +5539,146 @@ jobs:
         if: ${{ failure() && steps.mode.outputs.run == 'true' }}
         run: echo "B2_DRIVE_QA_CLEANUP_FAILED_NO_LIVE_NO_B3_FINAL_VISUAL_BLOCKED"
 
+
+
+  i65-b2-final-human-cleanup:
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+      FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+      FINAL_CLEANUP_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate B2 final human cleanup
+        id: mode
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const b=JSON.parse(fs.readFileSync(process.env.B2_LOCK,'utf8'));
+          const run=b.status==='B2_HUMAN_PASS_CLEANUP_PENDING'
+            && b.r102HumanRetestPass===true
+            && Array.isArray(b.nextRequiredProof)
+            && b.nextRequiredProof.length===1
+            && b.nextRequiredProof[0]==='FINAL_SYNTHETIC_CLEANUP'
+            && c.i65ForensicRemediationPlan?.currentBlock==='B2'
+            && c.i65ForensicRemediationPlan?.b2?.finalSyntheticCleanupAuthorized===true;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B2_FINAL_HUMAN_CLEANUP_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Assert LIVE unchanged before final cleanup
+        if: steps.mode.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Validate final cleanup source
+        if: steps.mode.outputs.run == 'true'
+        run: node --check tools/gravicentra-i6-5-b2-final-human-cleanup.mjs
+      - name: Install final cleanup dependencies
+        if: steps.mode.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 @google-cloud/secret-manager@6.1.0 >/dev/null
+      - name: Execute final B2 human fixture cleanup
+        id: cleanup
+        if: steps.mode.outputs.run == 'true'
+        env:
+          B2_FINAL_HUMAN_CLEANUP_OUT: ${{ runner.temp }}/b2-final-human-cleanup.json
+        run: node tools/gravicentra-i6-5-b2-final-human-cleanup.mjs
+      - name: Upload final B2 cleanup evidence
+        id: evidence
+        if: ${{ always() && steps.mode.outputs.run == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b2-final-human-cleanup-${{ github.run_id }}
+          path: ${{ runner.temp }}/b2-final-human-cleanup.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Freeze B2 PASS and open B3
+        if: ${{ steps.mode.outputs.run == 'true' && steps.cleanup.conclusion == 'success' && steps.evidence.conclusion == 'success' }}
+        env:
+          B2_FINAL_HUMAN_CLEANUP_OUT: ${{ runner.temp }}/b2-final-human-cleanup.json
+          CLEANUP_ARTIFACT_ID: ${{ steps.evidence.outputs.artifact-id }}
+          CLEANUP_ARTIFACT_DIGEST: ${{ steps.evidence.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const cpPath=process.env.CONTROL,lockPath=process.env.B2_LOCK,findingsPath=process.env.FINDINGS,evPath=process.env.B2_FINAL_HUMAN_CLEANUP_OUT,receiptPath=process.env.FINAL_CLEANUP_RECEIPT;
+          const c=JSON.parse(fs.readFileSync(cpPath,'utf8'));
+          const b=JSON.parse(fs.readFileSync(lockPath,'utf8'));
+          const f=JSON.parse(fs.readFileSync(findingsPath,'utf8'));
+          const e=JSON.parse(fs.readFileSync(evPath,'utf8'));
+          if(e.status!=='PASS'||e.firestore?.residual?.length||e.storage?.residual?.length||e.previewConfig?.residual?.length)throw Error('B2_FINAL_CLEANUP_EVIDENCE_INVALID');
+          if(b.status!=='B2_HUMAN_PASS_CLEANUP_PENDING'||b.r102HumanRetestPass!==true)throw Error('B2_FINAL_CLEANUP_LOCK_CHANGED');
+          const receipt={
+            schema:'GRAVICENTRA_I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929_V1',
+            recordedAt:new Date().toISOString(),
+            repository:'paulaosoriof86/orbit360-core',
+            branch:process.env.GITHUB_REF_NAME,
+            block:'B2',
+            status:'PASS',
+            preview:b.preview,
+            firestore:e.firestore,
+            drive:e.drive,
+            storage:e.storage,
+            previewConfig:e.previewConfig,
+            boundaries:e.boundaries,
+            artifact:{id:Number(process.env.CLEANUP_ARTIFACT_ID||0),digest:String(process.env.CLEANUP_ARTIFACT_DIGEST||'')}
+          };
+          fs.writeFileSync(receiptPath,JSON.stringify(receipt,null,2)+'\n');
+          const r102=(f.findings||[]).find(x=>x.id==='B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22');
+          if(r102)Object.assign(r102,{status:'CLOSED_PASS',blocking:false,cleanupReceipt:receiptPath,cleanupStatus:'PASS'});
+          for(const x of (f.findings||[])){
+            if(x.block==='B3'&&x.status==='FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS')x.status='OPEN_B3_CARRY_FORWARD';
+            if(x.block==='B3'&&x.status==='FROZEN_CARRY_FORWARD_TO_B3_PENDING_READONLY_PRESERVATION_PROOF')x.status='OPEN_B3_PENDING_READONLY_PRESERVATION_PROOF';
+          }
+          f.currentHumanReview={...(f.currentHumanReview||{}),decision:'B2_PASS',b2OverallAccepted:true,cleanupPending:false,cleanupStatus:'PASS',cleanupReceiptPath:receiptPath,openedB3:true};
+          fs.writeFileSync(findingsPath,JSON.stringify(f,null,2)+'\n');
+
+          b.status='B2_PASS';
+          b.nextRequiredProof=[];
+          b.finalSyntheticCleanup={status:'PASS',runId:Number(process.env.GITHUB_RUN_ID),receiptPath,artifact:receipt.artifact,firestoreDeleted:e.firestore?.deleted?.length||0,driveResults:e.drive?.results?.length||0,storageDeleted:e.storage?.deleted?.length||0};
+          b.acceptance={...(b.acceptance||{}),paulaVisual:true,humanTargetedUatPass:true,r102HumanRetestPass:true,finalSyntheticCleanupPass:true,b2OverallAccepted:true};
+          b.boundaries={...(b.boundaries||{}),advanceToB3Authorized:true,finalSyntheticCleanupAuthorized:false,liveHostingPromotionAuthorized:false,reimportAuthorized:false};
+          b.paulaVisualDecision='B2_ACCEPTED_TARGETED_HUMAN_UAT_AND_CLEANUP_PASS';
+          b.boundaryNote='B2 PASS. Five targeted human tests and final synthetic cleanup passed. B3 may open; LIVE remains unchanged and promotion is not authorized.';
+          fs.writeFileSync(lockPath,JSON.stringify(b,null,2)+'\n');
+
+          c.i65ForensicRemediationPlan.currentBlock='B3';
+          c.i65ForensicRemediationPlan.mechanismSyncStatus='B2_PASS_B3_OPEN';
+          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),status:'B2_PASS',paulaVisualAccepted:true,targetedHumanUatPass:true,finalSyntheticCleanup:'PASS',finalSyntheticCleanupRunId:Number(process.env.GITHUB_RUN_ID),b3Status:'OPEN',livePromoted:false};
+          c.i65ForensicRemediationPlan.b3={...(c.i65ForensicRemediationPlan.b3||{}),status:'IN_PROGRESS',entryCondition:'B2_PASS',targetPercent:96,livePromoted:false};
+          c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),activeBlock:'B3',findingLedgerBlobSha:'PENDING_GIT_HASH',nextAction:'B3_EXECUTE_FIRST_INCOMPLETE_GATE'};
+          c.nextAction='I6_5_FORENSIC_REMEDIATION_B3';
+          fs.writeFileSync(cpPath,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$FINAL_CLEANUP_RECEIPT" "$FINDINGS" "$B2_LOCK"
+          LOCK_BLOB=$(git hash-object "$B2_LOCK"); export LOCK_BLOB
+          FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
+          RECEIPT_BLOB=$(git hash-object "$FINAL_CLEANUP_RECEIPT"); export RECEIPT_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p,'utf8'));
+          c.i65ForensicRemediationPlan.b2ExecutionLockBlobSha=process.env.LOCK_BLOB;
+          c.canonicalAccumulationControl.findingLedgerBlobSha=process.env.FINDINGS_BLOB;
+          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),finalSyntheticCleanupReceiptBlobSha:process.env.RECEIPT_BLOB};
+          fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5): B2 pass final cleanup B3 open"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Final cleanup failure remains fail-closed
+        if: ${{ failure() && steps.mode.outputs.run == 'true' }}
+        run: echo "B2_FINAL_CLEANUP_FAILED_NO_B3_NO_LIVE_NO_REIMPORT"

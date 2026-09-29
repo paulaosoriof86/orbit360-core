@@ -1,0 +1,67 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R102_TARGETED_HUMAN_RETEST_PASS_V1",
+  "recordedAt": "2026-09-29",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "decision": "PASS",
+  "findingId": "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22",
+  "exactPreview": {
+    "sourceSha": "99edf875d2e36bcdf8057aaae5d72f37b4969191",
+    "buildId": "gi-i65-b2-99edf875d2e3-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36640733189-i4w5i8mn.web.app",
+    "runId": 36640733189,
+    "artifactId": 11065984124,
+    "artifactDigest": "889a861016b645c776f753c4530d66854f07a514d243d24a57be4b6930e32a91"
+  },
+  "humanEvidence": {
+    "source": "PAULA_TARGETED_R102_RETEST_20260929",
+    "testedFixtureId": "b2-asg-36624806450",
+    "note": "The retest used the same synthetic insurer that demonstrated the R102 failure/diagnostic, but on the new exact R102 Preview. Logo saved, remained visible after full refresh, and rendered in both insurer detail and directory card.",
+    "screenshots": [
+      "detail_after_refresh_logo_visible",
+      "directory_after_refresh_logo_visible"
+    ],
+    "refreshPersistence": true,
+    "brokenImageAfterRefresh": false,
+    "directoryRender": true,
+    "detailRender": true
+  },
+  "causalValidity": {
+    "diagnosticFixtureMatch": true,
+    "diagnosticFixtureId": "b2-asg-36624806450",
+    "exactNewPreview": true,
+    "resolverAppliesByCanonicalLogoAssetRef": true,
+    "noNeedToRepeatTests1to4": true
+  },
+  "preservedHumanPasses": [
+    "TEST1_PERMISSIONS",
+    "TEST2_MULTIROLE",
+    "TEST3_USER",
+    "TEST4_OPS_DOCUMENT"
+  ],
+  "finalTargetedHumanUat": {
+    "TEST1_PERMISSIONS": "PASS",
+    "TEST2_MULTIROLE": "PASS",
+    "TEST3_USER_MOBILE": "PASS",
+    "TEST4_OPS_DOCUMENT_MOBILE": "PASS",
+    "TEST5_INSURER_LOGO_R102": "PASS"
+  },
+  "carryForwardToB3": [
+    "DASHBOARD-INICIO-001",
+    "B3-CARRY-OPS-HYDRATION-EMPTY-FLASH-20260929",
+    "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
+    "B3-CARRY-VEHICLE-CANONICAL-IDENTITY-20260929",
+    "B3-CARRY-OPS-CATALOG-ADMIN-20260929",
+    "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
+    "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
+    "B1-EMAIL-DELIVERY-001"
+  ],
+  "nextAction": "FINAL_B2_SYNTHETIC_CLEANUP",
+  "boundaries": {
+    "noLive": true,
+    "noB3UntilCleanupPass": true,
+    "noReimport": true,
+    "noRealBusinessMutation": true
+  }
+}

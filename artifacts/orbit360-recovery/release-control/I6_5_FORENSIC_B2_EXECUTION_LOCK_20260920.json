@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_R102_MACHINE_PASS_PENDING_TARGETED_HUMAN_RETEST",
+  "status": "B2_HUMAN_PASS_CLEANUP_PENDING",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -180,7 +180,8 @@
     "previewExternalNotificationsAuthorized": false,
     "humanDriveOAuthConsentAuthorizedOnExactPreview": true,
     "productionDocumentFunctionDeployAuthorized": false,
-    "previewDocumentFunctionDeployAuthorized": true
+    "previewDocumentFunctionDeployAuthorized": true,
+    "finalSyntheticCleanupAuthorized": true
   },
   "emailDebt": {
     "status": "DEFERRED_NON_BLOCKING_BY_OWNER",
@@ -199,8 +200,8 @@
     "dashboardRealityReconciled": false,
     "previewExact": true,
     "functionalPass": true,
-    "paulaVisual": false,
-    "approvedVisualHierarchy": false,
+    "paulaVisual": true,
+    "approvedVisualHierarchy": true,
     "academiaCatalog": true,
     "academiaRoleRoutes": true,
     "academiaBrand": true,
@@ -209,8 +210,8 @@
     "visibleGravicentraBrand": true,
     "renewalBidirectionalLink": true,
     "renewalDurableClosure": true,
-    "authenticatedPreviewPass": false,
-    "technicalFindingsClosedByExactRun": false,
+    "authenticatedPreviewPass": true,
+    "technicalFindingsClosedByExactRun": true,
     "vehiclePolicyContext": true,
     "individualReceiptEdit": true,
     "reportedPaymentProjection": true,
@@ -236,7 +237,9 @@
     "renewalLineageReceiptsMachineProof": true,
     "r96AccessPreviewServerReadback": true,
     "r97DirectionDocumentAuthorization": true,
-    "finalHumanUserInsurerFixturesReady": true
+    "finalHumanUserInsurerFixturesReady": true,
+    "humanTargetedUatPass": true,
+    "r102HumanRetestPass": true
   },
   "carryForward": {
     "activeRoleScopeVisualSpotCheck": "AUTHENTICATED_RUNTIME_PASS_VISUAL_CONFIRMATION_PENDING",
@@ -1993,7 +1996,7 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "PAULA_R102_TARGETED_HUMAN_RETEST"
+    "FINAL_SYNTHETIC_CLEANUP"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -2834,7 +2837,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "9a23170fa46512706f8ae5f0936ced96a1d58a14",
+  "findingLedgerBlobSha": "44620dd06306746d3e17cfe85d12c4f5fe829e74",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -3106,7 +3109,7 @@
     "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "exactPreviewProofPending": true
   },
-  "boundaryNote": "R102 source fix only. Tests 1-4 remain human PASS. New source requires new digest/Preview; after machine render proof Paula retests only insurer logo. No LIVE/B3/reimport.",
+  "boundaryNote": "All five targeted B2 human tests PASS. Final synthetic cleanup is the only remaining B2 proof. No LIVE/B3/reimport before cleanup PASS.",
   "driveHumanFixture": {
     "status": "READY_FOR_TARGETED_HUMAN_UAT",
     "tenantId": "alianzas-soluciones",
@@ -4142,5 +4145,18 @@
     "noLive": true,
     "noB3": true,
     "noReimport": true
+  },
+  "r102HumanRetestPass": true,
+  "r102HumanRetest": {
+    "status": "PASS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_TARGETED_HUMAN_RETEST_PASS_20260929.json",
+    "receiptBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+    "testedFixtureId": "b2-asg-36624806450",
+    "exactPreviewSourceSha": "99edf875d2e36bcdf8057aaae5d72f37b4969191",
+    "exactPreviewBuildId": "gi-i65-b2-99edf875d2e3-57f234755dc1",
+    "exactPreviewRunId": 36640733189,
+    "refreshPersistence": true,
+    "detailRender": true,
+    "directoryRender": true
   }
 }

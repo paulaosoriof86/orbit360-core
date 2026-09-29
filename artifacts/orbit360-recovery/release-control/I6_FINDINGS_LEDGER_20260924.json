@@ -3701,7 +3701,7 @@
       "rootCause": "Firestore reference, Storage object, token metadata and image bytes persist correctly, but both persisted and metadata-token Firebase download URLs return HTTP 412.",
       "remediation": "Render from canonical logoAssetRef through authenticated server asset resolver. Machine proof now requires real image rendering after reload.",
       "requiredProof": "new exact Preview machine render PASS -> Paula retests only insurer logo refresh",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_AND_R102_HUMAN_RETEST",
+      "status": "HUMAN_PASS_CLOSED_B2",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3710,7 +3710,7 @@
       "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
       "humanUatReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
       "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
-      "humanEvidence": "Synthetic insurer logo save appeared successful but after refresh the Logo field rendered a broken image.",
+      "humanEvidence": "Paula targeted R102 retest PASS on exact new Preview 2026-09-29. Logo remained rendered after refresh in insurer detail and directory.",
       "diagnosticReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_LOGO_READONLY_DIAGNOSTIC_20260929.json",
       "rootFixReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_LOGO_ASSET_RESOLVER_ROOTFIX_20260929.json",
       "rootFixReceiptBlobSha": "23d76da22ee123780a2a89fbe0fe6e19902bb64c",
@@ -3719,7 +3719,13 @@
         "TEST2_MULTIROLE",
         "TEST3_USER",
         "TEST4_OPS_DOCUMENT"
-      ]
+      ],
+      "humanRetestReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_TARGETED_HUMAN_RETEST_PASS_20260929.json",
+      "humanRetestReceiptBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+      "humanRetestFixtureId": "b2-asg-36624806450",
+      "humanRetestPreviewSourceSha": "99edf875d2e36bcdf8057aaae5d72f37b4969191",
+      "humanRetestBuildId": "gi-i65-b2-99edf875d2e3-57f234755dc1",
+      "humanRetestRunId": 36640733189
     },
     {
       "id": "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
@@ -3885,7 +3891,7 @@
     "date": "2026-09-29",
     "recordedAt": "2026-09-29T11:13:00-06:00",
     "origin": "PAULA_FINAL_TARGETED_UAT_20260929",
-    "decision": "B2_4_HUMAN_PASS_R102_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "decision": "B2_TARGETED_HUMAN_UAT_PASS_CLEANUP_PENDING",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36499598188-p6m38hix.web.app",
     "exactSourceSha": "0231996b156e0563755966103b861875e0862a07",
     "exactBuildId": "gi-i65-b2-0231996b156e-57f234755dc1",
@@ -3955,7 +3961,14 @@
       "TEST2_MULTIROLE",
       "TEST3_USER",
       "TEST4_OPS_DOCUMENT"
-    ]
+    ],
+    "allFiveTargetedTestsPass": true,
+    "r102HumanRetestPass": true,
+    "r102HumanRetestReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_TARGETED_HUMAN_RETEST_PASS_20260929.json",
+    "r102HumanRetestReceiptBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+    "remainingB2HumanBlockers": 0,
+    "cleanupPending": true,
+    "noB3UntilCleanup": true
   },
   "lastReview": {
     "date": "2026-09-26",
