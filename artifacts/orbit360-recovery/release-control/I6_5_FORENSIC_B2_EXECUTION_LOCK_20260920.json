@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_HUMAN_REJECTED_REMEDIATION_REQUIRED",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1896,7 +1896,14 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "PAULA_TARGETED_FINAL_VISUAL_ONLY_IF_MACHINE_PROOF_PASSES"
+    "R96_ACCESS_CONFIG_PREVIEW_ISOLATED_SERVER_READBACK",
+    "R97_DIRECTION_DOCUMENT_AUTHORIZATION",
+    "R100_TEAM_DELETE_MOBILE_COMPOSITION",
+    "R98_R99_OPS_SYNTHETIC_UPLOAD_AND_MOBILE_RESPONSIVE",
+    "R101_USER_EDIT_HUMAN_FIXTURE",
+    "R102_INSURER_LOGO_HUMAN_FIXTURE",
+    "NEW_EXACT_CUMULATIVE_B2_PREVIEW_MACHINE_FOCAL_PASS",
+    "PAULA_FIVE_TARGETED_HUMAN_TESTS"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -2194,7 +2201,7 @@
     "latestCausalFix": "B2_R5_EFFECTIVE_COBROS_OWNER_REPORTED_PAYMENT_PLUS_CARTERA_LABEL",
     "authenticatedRunId": 36218497058
   },
-  "paulaVisualDecision": "R75_R76_R78_R79_R80_R88_R77_R81_R91_R95_R82_MACHINE_PASS_DRIVE_CLEANUP_PASS_PAULA_FINAL_VISUAL_READY",
+  "paulaVisualDecision": "B2_FINAL_VISUAL_REJECTED_REMEDIATION_REQUIRED",
   "paulaVisualAccepted": false,
   "b3Status": "NOT_STARTED",
   "humanReviewR6": {
@@ -2737,7 +2744,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "6263b79b6aa4c3273ee7c2b0a153f4abc5e8e6b9",
+  "findingLedgerBlobSha": "5026cc6db04f0ccf2061e0d651c06fb042f363c0",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -3009,7 +3016,7 @@
     "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "exactPreviewProofPending": true
   },
-  "boundaryNote": "R84 supersedes per-user delegated memory-only OAuth as the productive Drive authorization model. Do not repeat R83 human retest under obsolete auth. Implement tenant-persistent backend authority inside B2; no LIVE, no B3, no reimport.",
+  "boundaryNote": "2026-09-29 final human review rejected B2. Remediate R96-R102 on one cumulative candidate; preserve unaffected PASS; no LIVE/B3/reimport/real-business UAT.",
   "driveHumanFixture": {
     "status": "PRESERVED_PENDING_R83_HUMAN_RETEST_ON_AUTHENTICATED_PREVIEW",
     "tenantId": "alianzas-soluciones",
@@ -3812,5 +3819,50 @@
     "driveResultCount": 17,
     "firestoreDeletedCount": 51,
     "residualCount": 0
+  },
+  "finalHumanReview20260929": {
+    "recordedAt": "2026-09-29T11:13:00-06:00",
+    "decision": "B2_FINAL_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+    "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+    "reviewedPreview": {
+      "sourceSha": "0231996b156e0563755966103b861875e0862a07",
+      "buildId": "gi-i65-b2-0231996b156e-57f234755dc1",
+      "runId": 36499598188,
+      "artifactId": 11004860554,
+      "url": "https://ays-orbit-360-lab--gi-i65-b2-36499598188-p6m38hix.web.app"
+    },
+    "blockerIds": [
+      "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22",
+      "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
+      "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+      "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
+      "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22",
+      "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
+      "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22"
+    ],
+    "carryForwardIds": [
+      "DASHBOARD-INICIO-001",
+      "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
+      "B3-CARRY-VEHICLE-CANONICAL-IDENTITY-20260929",
+      "B3-CARRY-OPS-CATALOG-ADMIN-20260929",
+      "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
+      "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
+      "B1-EMAIL-DELIVERY-001"
+    ],
+    "requiredHumanRetest": [
+      "TEST1_PERMISSIONS",
+      "TEST2_MULTIROLE",
+      "TEST3_USER",
+      "TEST4_OPS_DOCUMENT",
+      "TEST5_INSURER"
+    ],
+    "boundaries": {
+      "noLive": true,
+      "noB3": true,
+      "noReimport": true,
+      "syntheticFixturesOnly": true,
+      "cleanupMandatory": true
+    }
   }
 }

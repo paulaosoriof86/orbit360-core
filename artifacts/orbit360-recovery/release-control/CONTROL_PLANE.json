@@ -1956,7 +1956,7 @@
     "addendumBlobSha": "05099a90cfb4862eec97e0359d55932828cb930b",
     "forensicAuditBlobSha": "fcfdf29c9eb851d76cebf67bcbe36d8ed308eb0f",
     "paymentInferenceBlobSha": "cfb026ded52c36083528de658a70191c8380d725",
-    "mechanismSyncStatus": "B2_MACHINE_PROOFS_AND_DRIVE_CLEANUP_PASS_PAULA_FINAL_VISUAL_READY",
+    "mechanismSyncStatus": "B2_FINAL_VISUAL_REJECTED_REMEDIATION_REQUIRED",
     "guardFailureBeforeFix": {
       "runId": 35450692628,
       "code": "I6_5_NEXT_ACTION_INVALID",
@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "866a2985227515dc8d2f631d8b9f1f3fd562dfbb",
+    "b2ExecutionLockBlobSha": "9cea344608b9bf9cc84f6d4dbcb5c843b6c85391",
     "b2": {
-      "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+      "status": "PREVIEW_HUMAN_REJECTED_REMEDIATION_REQUIRED",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2162,7 +2162,7 @@
       "technicalPassHistoricalPreserved": true,
       "authenticatedPassHistoricalPreserved": true,
       "syntheticCleanupHistoricalPreserved": true,
-      "paulaVisualDecision": "R75_R76_R78_R79_R80_R88_R77_R81_R91_R95_R82_MACHINE_PASS_DRIVE_CLEANUP_PASS_PAULA_FINAL_VISUAL_READY",
+      "paulaVisualDecision": "B2_FINAL_VISUAL_REJECTED_REMEDIATION_REQUIRED",
       "paulaVisualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
       "paulaVisualRejectionReceiptBlobSha": "8127ccc94dd7e8d12cd82e74e1246a7ac0a0d447",
       "rejectedPreviewRunId": 35964339112,
@@ -2804,7 +2804,27 @@
       "r82ReceiptBlobSha": "e9a22db9d63aa87a9f60fca13d59a90724b560d4",
       "driveQaFixtureCleanup": "PASS",
       "driveQaFixtureCleanupRunId": 36506176575,
-      "driveQaFixtureCleanupReceiptBlobSha": "b0e0ed5aa81902f13ff612732158d41e31726ec3"
+      "driveQaFixtureCleanupReceiptBlobSha": "b0e0ed5aa81902f13ff612732158d41e31726ec3",
+      "finalHumanReview20260929": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+        "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+        "reviewedSourceSha": "0231996b156e0563755966103b861875e0862a07",
+        "reviewedBuildId": "gi-i65-b2-0231996b156e-57f234755dc1",
+        "reviewedRunId": 36499598188,
+        "blockerIds": [
+          "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22",
+          "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
+          "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+          "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
+          "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22",
+          "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
+          "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22"
+        ],
+        "requiredHumanRetestCount": 5,
+        "noLive": true,
+        "noB3": true,
+        "noReimport": true
+      }
     },
     "dashboardRealityGate": {
       "id": "DASHBOARD_INICIO_REALITY_RECONCILIATION_REQUIRED",
@@ -2937,7 +2957,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "b30177f9498c472ef735b264a40e2bb707294571",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "acf7bde21f75ca1c82d672e10d07ebbafafa842e",
+    "findingLedgerBlobSha": "5026cc6db04f0ccf2061e0d651c06fb042f363c0",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B2",
@@ -2949,7 +2969,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B2_PAULA_TARGETED_FINAL_VISUAL"
+    "nextAction": "B2_FINAL_HUMAN_REMEDIATION_SOURCE_FIX"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

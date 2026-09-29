@@ -19,10 +19,10 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 143,
-    "b2HumanFindings": 54,
-    "currentBlocking": 75,
-    "countingNote": "R83/R85/R87 closed by exact persistent Drive evidence. R84 remains only for fresh-session zero-Google-prompt upload/scope proof. R88 startup and new R89 Ops/Leads stale-overlay defect are source-fixed pending guard/new exact Preview. No LIVE/B3/reimport."
+    "total": 161,
+    "b2HumanFindings": 61,
+    "currentBlocking": 82,
+    "countingNote": "Final human review 2026-09-29 reopens B2 with R96-R102; prior unaffected PASS preserved. Five B3 carries frozen; existing dashboard/email debt preserved. No LIVE/B3/reimport."
   },
   "findings": [
     {
@@ -3462,6 +3462,262 @@
         "artifactDigest": "d9d0bc2358593bcc469f388f094994e4524ac668dc80984043e528e00424e401",
         "cleanupPending": true
       }
+    },
+    {
+      "id": "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22",
+      "block": "B2",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Configuración/Equipo/Matriz",
+      "classification": "PRODUCT_DEFECT_PREVIEW_UAT_SERVER_BOUNDARY",
+      "blocking": true,
+      "owner": [
+        "orbit360-platform/modules/equipo.js",
+        "orbit360-platform/core/tenant-domain-config-client.js",
+        "functions/tenant-domain-config.js",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      ],
+      "finding": "Access matrix save could not be server-confirmed on reviewed Preview.",
+      "rootCause": "Preview lacks isolated tenant-domain-config UAT path while browser client targets production callable.",
+      "remediation": "Isolated Preview config store/callable with canonical readback and reload; production config untouched.",
+      "requiredProof": "reversible save -> server readback -> reload",
+      "status": "OPEN_BLOCKING_B2_FINAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
+      "block": "B2",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Documentos/Drive",
+      "classification": "PRODUCT_DEFECT_ACTIVE_ROLE_DOCUMENT_AUTHORIZATION",
+      "blocking": true,
+      "owner": [
+        "functions/document-drive-domain.js",
+        "functions/product-operational-domain.js",
+        "orbit360-platform/core/product-drive-document-provider-p0.js"
+      ],
+      "finding": "Dirección was denied documentary access.",
+      "rootCause": "PENDING_CAUSAL_CONFIRMATION_IN_BACKEND_ROLE_MODULE_SCOPE_PATH",
+      "remediation": "Reconcile backend authorization with privileged Dirección contract; no UI bypass.",
+      "requiredProof": "Dirección synthetic status/read/upload authorization",
+      "status": "OPEN_BLOCKING_B2_FINAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+      "block": "B2",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Ops/Gestión/Documentos",
+      "classification": "PREVIEW_UAT_SURFACE_GAP",
+      "blocking": true,
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "functions/document-drive-domain.js",
+        "orbit360-platform/core/product-drive-document-provider-p0.js"
+      ],
+      "finding": "Synthetic-only Preview upload is machine-proven but no clear human management fixture is surfaced.",
+      "rootCause": "Preview safety hides real-client uploader and final human fixture/navigation was not prepared.",
+      "remediation": "Provision clearly named synthetic client/management with uploader; mandatory cleanup.",
+      "requiredProof": "upload -> visible -> reload -> open/download -> cleanup",
+      "status": "OPEN_BLOCKING_B2_FINAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
+      "block": "B2",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Ops/Crear gestión/Mobile",
+      "classification": "PRODUCT_DEFECT_RESPONSIVE_OVERFLOW",
+      "blocking": true,
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/styles/base.css",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "finding": "Ops create/detail clips to right on mobile.",
+      "rootCause": "Modal/footer sizing and action layout exceed viewport.",
+      "remediation": "Responsive width/overflow/footer wrap fix only.",
+      "requiredProof": "no mobile horizontal clipping",
+      "status": "OPEN_BLOCKING_B2_FINAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22",
+      "block": "B2",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Equipo/Editar usuario/Mobile",
+      "classification": "PRODUCT_DEFECT_RESPONSIVE_ACTION_COMPOSITION",
+      "blocking": true,
+      "owner": [
+        "orbit360-platform/modules/equipo.js",
+        "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
+        "orbit360-platform/styles/base.css"
+      ],
+      "finding": "Eliminar usuario is displaced/hidden by Sync/Cancel/Save.",
+      "rootCause": "Fourth action injected into single footer where delete relies on margin-right:auto.",
+      "remediation": "Responsive grouped/wrapped footer preserving all operations.",
+      "requiredProof": "delete/sync/cancel/save all visible",
+      "status": "OPEN_BLOCKING_B2_FINAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
+      "block": "B2",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Equipo/Editar usuario",
+      "classification": "HUMAN_PERSISTENCE_PROOF_GAP",
+      "blocking": true,
+      "owner": [
+        "orbit360-platform/modules/equipo.js",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js"
+      ],
+      "finding": "Current Preview lacks human edit-user server-readback/reload proof.",
+      "rootCause": "Safe reversible human fixture not prepared.",
+      "remediation": "Provision synthetic team fixture; do not mutate real users.",
+      "requiredProof": "edit -> save confirmed -> reload -> cleanup",
+      "status": "OPEN_BLOCKING_B2_FINAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22",
+      "block": "B2",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Aseguradoras/Logo",
+      "classification": "HUMAN_PERSISTENCE_PROOF_GAP",
+      "blocking": true,
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "functions/product-operational-domain.js"
+      ],
+      "finding": "Insurer logo machine persistence passed but final human save/reload proof is absent.",
+      "rootCause": "Safe synthetic insurer fixture not prepared on final Preview.",
+      "remediation": "Provision one synthetic insurer using Preview asset path.",
+      "requiredProof": "logo save/readback -> reload -> cleanup",
+      "status": "OPEN_BLOCKING_B2_FINAL_REMEDIATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
+      "block": "B3",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Pólizas/Recibos",
+      "classification": "FROZEN_B3_DATA_READ_MODEL_LINEAGE",
+      "blocking": false,
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/core/policy-receipts-engine.js"
+      ],
+      "finding": "Current calendar may coexist x/n plus no-denominator overlapping rows; count/total can contradict contractual cuotas/premium.",
+      "rootCause": "receiptCalendarProjection keeps no-denominator rows in current calendar even when policy.cuotas is known.",
+      "remediation": "B3 global read-model/lineage audit and deterministic correction; no reimport.",
+      "requiredProof": "schedule count/total/provenance invariants",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B3-CARRY-VEHICLE-CANONICAL-IDENTITY-20260929",
+      "block": "B3",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Cliente360/Vehículos",
+      "classification": "FROZEN_B3_CANONICAL_IDENTITY",
+      "blocking": false,
+      "owner": [
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "finding": "Exact plateKey/version lineage does not safely resolve aliases such as prefixed plate variants.",
+      "rootCause": "Current identity grouping is insufficient for alias variants.",
+      "remediation": "Use plate aliases + VIN/chassis + motor + renewal lineage + client; fail-closed uncertain merges.",
+      "requiredProof": "deterministic identity without unsafe merge",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B3-CARRY-OPS-CATALOG-ADMIN-20260929",
+      "block": "B3",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Configuración/Ops",
+      "classification": "FROZEN_B3_TENANT_ADMIN_UI",
+      "blocking": false,
+      "owner": [
+        "functions/tenant-domain-config.js",
+        "orbit360-platform/modules/configuracion.js"
+      ],
+      "finding": "Backend supports stages/priorities/managementTypes/SLA but Configuración does not expose complete tenant administration.",
+      "rootCause": "UI administration gap.",
+      "remediation": "Expose server-owned tenant catalog administration; no hardcoded lists.",
+      "requiredProof": "CRUD/readback/reload",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
+      "block": "B3",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Renovaciones/Comparativo",
+      "classification": "FROZEN_B3_ENGINE_INTEGRATION",
+      "blocking": false,
+      "owner": [
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+      ],
+      "finding": "Current renewal comparison is not the final comparative engine.",
+      "rootCause": "Cotizador/Comparativo and official tariff-source integration pending.",
+      "remediation": "Integrate in B3 without replacing accepted B2 renewal workflow.",
+      "requiredProof": "official-source lineage + canonical engine runtime",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
+      "block": "B3",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
+      "surface": "Aseguradoras/Tarifas/Conocimiento/Planes",
+      "classification": "FROZEN_B3_FAIL_CLOSED_CONTENT",
+      "blocking": false,
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/modules/aseguradoras-knowledge-p09.js"
+      ],
+      "finding": "Tariff/knowledge/plan content is deferred; no importer is final without proof.",
+      "rootCause": "Official source integration pending.",
+      "remediation": "Resume fail-closed with Cotizador/Comparativo in B3.",
+      "requiredProof": "source lineage + runtime/import proof",
+      "status": "FROZEN_CARRY_FORWARD_DO_NOT_EXECUTE_UNTIL_B2_PASS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+      "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
+      "noLive": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [
@@ -3500,61 +3756,46 @@
     "rule": "Only these human-visible items require Paula confirmation before B2 acceptance; technical findings already closed may not be reopened without reproducible causal regression."
   },
   "currentHumanReview": {
-    "date": "2026-09-27",
-    "recordedAt": "2026-09-27T06:23:00-06:00",
-    "origin": "PAULA_MOBILE_UAT_R15_20260927",
-    "decision": "R15_R15A_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36288967976-k58tfgn7.web.app",
-    "exactSourceSha": "dab677e937f9586195e3e79b94d5b91c397f0841",
-    "exactBuildId": "gi-i65-b2-dab677e937f9-57f234755dc1",
-    "exactPreviewRunId": 36288967976,
-    "authenticatedRunId": 36289840679,
-    "preservedPass": [
-      "B2_TECHNICAL_PREVIEW_PASS_HISTORICAL",
-      "B2_AUTHENTICATED_RUNTIME_PASS_36289840679",
-      "CLIENT_POLICY_VEHICLE_RECEIPT_CRUD_RUNTIME",
-      "OPS_LEADS_DURABLE_RELOAD_RUNTIME",
-      "RENEWAL_RUNTIME_RECEIPTS_PORTFOLIO_ZERO_COBRO",
-      "SYNTHETIC_CLEANUP"
-    ],
+    "date": "2026-09-29",
+    "recordedAt": "2026-09-29T11:13:00-06:00",
+    "origin": "PAULA_FINAL_HUMAN_UAT_20260929",
+    "decision": "B2_FINAL_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36499598188-p6m38hix.web.app",
+    "exactSourceSha": "0231996b156e0563755966103b861875e0862a07",
+    "exactBuildId": "gi-i65-b2-0231996b156e-57f234755dc1",
+    "exactPreviewRunId": 36499598188,
     "blockingFindingIds": [
-      "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
-      "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
-      "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
-      "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
-      "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
-      "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
-      "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
-      "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
-      "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
-      "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A"
+      "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22",
+      "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
+      "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+      "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
+      "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22",
+      "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
+      "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22"
     ],
-    "count": 10,
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15_MOBILE_UAT_FINDINGS_20260927.json",
-    "receiptBlobSha": "b20e3cdfe32915f4ba0e72acbbae29414d4051bc",
+    "carryForwardFindingIds": [
+      "DASHBOARD-INICIO-001",
+      "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
+      "B3-CARRY-VEHICLE-CANONICAL-IDENTITY-20260929",
+      "B3-CARRY-OPS-CATALOG-ADMIN-20260929",
+      "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
+      "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
+      "B1-EMAIL-DELIVERY-001"
+    ],
+    "count": 7,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
+    "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
     "b2OverallAccepted": false,
     "noB3": true,
     "noLive": true,
     "noReimport": true,
-    "r15aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R15A_CROSS_MODULE_DELETE_RULE_20260927.json",
-    "r15aReceiptBlobSha": "e8456913dfedd0058743f1a66f7c42557aa06a68",
-    "exactPreviewRequired": true,
-    "humanDriveOAuthProofRequired": true,
-    "sourceCandidateSha": "2735681ad06ac8d2b3a05d56492071d61744d94a",
-    "compositionLockBlobSha": "3219c641a301df172fb370256256de6792b7d6e5",
-    "r19AuthOriginAndStartupForensic": {
-      "status": "FROZEN_PENDING_EXTERNAL_ORIGIN_APPLY_AND_PERFORMANCE_REMEDIATION",
-      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R19_AUTH_ORIGIN_AND_BOOTSTRAP_FORENSIC_20260928.json",
-      "receiptBlobSha": "da1c4f7b3297b1ca58b682a943f567e6d9769c75",
-      "findingIds": [
-        "B2-R87-DRIVE-OAUTH-PREVIEW-ORIGIN-MISMATCH-R19",
-        "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19"
-      ],
-      "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36418353246-m4izjg2r.web.app",
-      "noLive": true,
-      "noB3": true,
-      "noReimport": true
-    }
+    "requiredHumanRetest": [
+      "TEST1_PERMISSIONS",
+      "TEST2_MULTIROLE",
+      "TEST3_USER",
+      "TEST4_OPS_DOCUMENT",
+      "TEST5_INSURER"
+    ]
   },
   "lastReview": {
     "date": "2026-09-26",

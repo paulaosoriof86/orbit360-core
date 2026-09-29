@@ -1,0 +1,95 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929_V1",
+  "recordedAt": "2026-09-29T11:13:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B2",
+  "parentHead": "44579197c32a590ce509a561a3a7f88b6951a0cb",
+  "decision": "B2_FINAL_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+  "reviewedPreview": {
+    "sourceSha": "0231996b156e0563755966103b861875e0862a07",
+    "buildId": "gi-i65-b2-0231996b156e-57f234755dc1",
+    "runId": 36499598188,
+    "artifactId": 11004860554,
+    "artifactDigest": "a2b09d57e7528278788f94143dc3f07febaa9fb47c9c1cec426fc329024326a6",
+    "url": "https://ays-orbit-360-lab--gi-i65-b2-36499598188-p6m38hix.web.app",
+    "exactReadback": true,
+    "functionalPass": true,
+    "livePromoted": false
+  },
+  "preservedPass": [
+    "LOGIN_STARTUP",
+    "SHELL_BRANDING",
+    "MOBILE_NAV",
+    "COTIZADOR_COMPARATIVO_ROLE_VISIBILITY",
+    "USER_DIRECTORY",
+    "POLICY_VISUAL_HIERARCHY",
+    "POLICY_OPS_DELETE",
+    "RENEWAL_TO_OPS",
+    "R77_R81_DRIVE_DURABLE",
+    "R91_R95_MACHINE_RUNTIME",
+    "R82_MACHINE_RUNTIME",
+    "DRIVE_QA_CLEANUP",
+    "INSURER_BANK_DIRECTORY"
+  ],
+  "blockers": [
+    {
+      "id": "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22",
+      "finding": "Access matrix save not server-confirmed in Preview.",
+      "requiredProof": "isolated Preview write -> server readback -> reload"
+    },
+    {
+      "id": "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
+      "finding": "Dirección denied documentary access.",
+      "requiredProof": "backend active-role/scope authorization"
+    },
+    {
+      "id": "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
+      "finding": "Human synthetic Ops upload surface missing.",
+      "requiredProof": "upload -> reload -> open/download -> cleanup"
+    },
+    {
+      "id": "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
+      "finding": "Ops create/detail overflows mobile.",
+      "requiredProof": "no horizontal overflow"
+    },
+    {
+      "id": "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22",
+      "finding": "Delete user hidden/displaced by mobile footer actions.",
+      "requiredProof": "delete/sync/cancel/save all visible"
+    },
+    {
+      "id": "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
+      "finding": "Human user edit persistence unproven.",
+      "requiredProof": "synthetic edit -> readback -> reload -> cleanup"
+    },
+    {
+      "id": "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22",
+      "finding": "Human insurer logo persistence unproven.",
+      "requiredProof": "synthetic logo -> readback -> reload -> cleanup"
+    }
+  ],
+  "carryForward": [
+    "DASHBOARD-INICIO-001",
+    "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
+    "B3-CARRY-VEHICLE-CANONICAL-IDENTITY-20260929",
+    "B3-CARRY-OPS-CATALOG-ADMIN-20260929",
+    "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
+    "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
+    "B1-EMAIL-DELIVERY-001"
+  ],
+  "humanRetest": [
+    "TEST1_PERMISSIONS",
+    "TEST2_MULTIROLE",
+    "TEST3_USER",
+    "TEST4_OPS_DOCUMENT",
+    "TEST5_INSURER"
+  ],
+  "boundaries": {
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "syntheticFixturesOnly": true,
+    "cleanupMandatory": true
+  }
+}
