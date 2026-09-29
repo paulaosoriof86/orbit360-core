@@ -24,12 +24,12 @@ test('GT health geography preference is not forced by completion contract', () =
 
 test('CO transport specific shipment gets origin destination and value', () => {
   const ids = c.fieldsFor('CO_TRANSPORTE_CONSULTATIVE_HYBRID',{coverageModeNeed:'SPECIFIC_SHIPMENT'},c.PHASES.JOURNEY).map(x=>x.id);
-  assert.deepEqual(ids,['coverageModeNeed','transportModes','origin','destination','valueToProtect']);
+  assert.deepEqual(ids,['coverageModeNeed','transportModePrimary','origin','destination','valueToProtect']);
 });
 
 test('CO transport annual program gets max and annual values', () => {
   const ids = c.fieldsFor('CO_TRANSPORTE_CONSULTATIVE_HYBRID',{coverageModeNeed:'ANNUAL_PROGRAM'},c.PHASES.JOURNEY).map(x=>x.id);
-  assert.deepEqual(ids,['coverageModeNeed','transportModes','maxValuePerShipment','annualMovementBudget']);
+  assert.deepEqual(ids,['coverageModeNeed','transportModePrimary','maxValuePerShipment','annualMovementBudget']);
 });
 
 test('CO RC professional business name is conditional', () => {
@@ -37,4 +37,11 @@ test('CO RC professional business name is conditional', () => {
   assert.equal(natural.includes('businessName'),false);
   const legal = c.fieldsFor('CO_RC_PROFESIONAL_CONSULTATIVE_HYBRID',{applicantType:'LEGAL_ENTITY'},c.PHASES.JOURNEY).map(x=>x.id);
   assert.equal(legal.includes('businessName'),true);
+});
+
+
+test('CO transport primary mode is explicitly normalized to backend transportModes', () => {
+  const field = c.fieldsFor('CO_TRANSPORTE_CONSULTATIVE_HYBRID',{coverageModeNeed:'SPECIFIC_SHIPMENT'},c.PHASES.JOURNEY).find(x=>x.id==='transportModePrimary');
+  assert.equal(field.backendField,'transportModes');
+  assert.equal(field.normalization,'WRAP_AS_SINGLE_ITEM_ARRAY');
 });
