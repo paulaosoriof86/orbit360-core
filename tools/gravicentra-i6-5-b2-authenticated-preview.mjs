@@ -429,7 +429,18 @@ try{
     const payload={rolePermissions:current.rolePermissions||{},roleScopes:current.roleScopes||{}};
     const saved=await dc.save('access',payload,'B2 R96 prueba aislada de persistencia en Preview');
     const readback=await dc.get('access');
-    const a=JSON.stringify(saved&&saved.config||{}),b=JSON.stringify(readback&&readback.config||{});
+    const savedConfig=saved&&saved.config||{},readConfig=readback&&readback.config||{};
+    const stable=value=>{
+      if(Array.isArray(value))return value.map(stable);
+      if(value&&typeof value==='object')return Object.fromEntries(Object.keys(value).sort().map(k=>[k,stable(value[k])]));
+      return value;
+    };
+    const semantic=config=>stable({
+      schemaVersion:String(config&&config.schemaVersion||''),
+      rolePermissions:config&&config.rolePermissions||{},
+      roleScopes:config&&config.roleScopes||{}
+    });
+    const a=JSON.stringify(semantic(savedConfig)),b=JSON.stringify(semantic(readConfig));
     return{
       functionName:String(st.functionName||''),
       functionRegion:String(st.functionRegion||''),
@@ -441,8 +452,9 @@ try{
       getSource:String(readback&&readback.source||''),
       getPreviewIsolated:readback&&readback.previewIsolated===true,
       configEqual:a===b,
-      rolePermissionKeys:Object.keys((readback&&readback.config&&readback.config.rolePermissions)||{}),
-      roleScopeKeys:Object.keys((readback&&readback.config&&readback.config.roleScopes)||{})
+      readbackMetadataKeys:Object.keys(readConfig).filter(k=>!['schemaVersion','rolePermissions','roleScopes'].includes(k)).sort(),
+      rolePermissionKeys:Object.keys(readConfig.rolePermissions||{}),
+      roleScopeKeys:Object.keys(readConfig.roleScopes||{})
     };
   }),'B2_R96_ACCESS_CONFIG_PREVIEW_ROUNDTRIP_TIMEOUT',25000);
   milestone('R96_ACCESS_CONFIG_PREVIEW_ROUNDTRIP',accessRoundtrip);

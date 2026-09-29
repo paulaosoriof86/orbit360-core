@@ -3480,7 +3480,7 @@
       "rootCause": "Preview browser used production tenant-domain-config callable; no Preview-isolated server write/readback path existed.",
       "remediation": "Dedicated orbit360TenantDomainConfigPreview@us-east1 with previewUatConfig namespace; canonical access read-only baseline; browser chooses Preview callable by hostname.",
       "requiredProof": "reversible save -> server readback -> reload",
-      "status": "SOURCE_FIXED_CANDIDATE_ARMED_PENDING_EXACT_PREVIEW",
+      "status": "SERVER_ROUNDTRIP_OBSERVED_HARNESS_SEMANTIC_RETRY_ARMED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
@@ -3488,7 +3488,23 @@
       "sourceFixReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
       "sourceFixReceiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
       "candidateArmReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_CANDIDATE_ARM_20260929.json",
-      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687"
+      "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
+      "lastMachineEvidence": {
+        "runId": 36622988522,
+        "jobId": 109594133103,
+        "functionName": "orbit360TenantDomainConfigPreview",
+        "functionRegion": "us-east1",
+        "previewIsolated": true,
+        "saveOk": true,
+        "getOk": true,
+        "saveSource": "preview_uat",
+        "getSource": "preview_uat",
+        "productRegressionDemonstrated": false
+      },
+      "harnessRepairReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_R96_HARNESS_SEMANTIC_READBACK_FIX_20260929.json",
+      "harnessRepairReceiptBlobSha": "41e8026b5570685d66f4a44f839bb781c27f7dce",
+      "harnessAfterBlob": "8f04fee01a3ffaaf67d61bff364ef652db66ec8f",
+      "sameArtifactRetryAuthorized": true
     },
     {
       "id": "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
@@ -3820,12 +3836,15 @@
       "TEST4_OPS_DOCUMENT",
       "TEST5_INSURER"
     ],
-    "remediationStage": "R22_CANDIDATE_ARMED_PENDING_SINGLE_EXACT_PREVIEW",
+    "remediationStage": "R22_R96_HARNESS_RETRY_SAME_EXACT_PREVIEW",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
     "sourceFixReceiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
     "compositionLockPendingBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
     "candidateArmReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_CANDIDATE_ARM_20260929.json",
-    "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687"
+    "candidateArmReceiptBlobSha": "9a071c5fda9175fada3a56a379cefed8a7144687",
+    "exactPreviewUnchanged": true,
+    "productSourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
+    "harnessRepairReceiptBlobSha": "41e8026b5570685d66f4a44f839bb781c27f7dce"
   },
   "lastReview": {
     "date": "2026-09-26",

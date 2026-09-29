@@ -1817,9 +1817,9 @@
     "productSourceReadyForPreview": true,
     "broadRediscoveryRequired": false,
     "authorityBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
-    "findingsLedgerBlobSha": "e8f84018adcb03db9b20d024dd06d2dc3ef620ad",
+    "findingsLedgerBlobSha": "2be8069a8a76ff72eefd935b3dd3fcf9e881cf94",
     "compositionLockBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
-    "findingLedgerBlobSha": "e8f84018adcb03db9b20d024dd06d2dc3ef620ad",
+    "findingLedgerBlobSha": "2be8069a8a76ff72eefd935b3dd3fcf9e881cf94",
     "productFileCount": 70
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -1896,8 +1896,7 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "SINGLE_EXACT_B2_PREVIEW_TECHNICAL_PASS",
-    "R96_ACCESS_CONFIG_PREVIEW_ISOLATED_SERVER_READBACK",
+    "R96_ACCESS_CONFIG_PREVIEW_SEMANTIC_SERVER_READBACK_RETRY",
     "R97_DIRECTION_DOCUMENT_AUTHORIZATION",
     "R98_EXACT_PREVIEW_SYNTHETIC_DRIVE_CLIENT_FIXTURE",
     "R99_OPS_MOBILE_RESPONSIVE",
@@ -2746,7 +2745,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "e8f84018adcb03db9b20d024dd06d2dc3ef620ad",
+  "findingLedgerBlobSha": "2be8069a8a76ff72eefd935b3dd3fcf9e881cf94",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -3911,5 +3910,17 @@
       "workflow": "baae4b3a98e60e7d318a87ba6cd7584f34d0e0e2"
     },
     "singleCandidateAuthorized": true
+  },
+  "r22R96HarnessRepair": {
+    "status": "HARNESS_ONLY_FIXED_RETRY_SAME_EXACT_PREVIEW_AUTHORIZED",
+    "failedRunId": 36622988522,
+    "failedJobId": 109594133103,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_R96_HARNESS_SEMANTIC_READBACK_FIX_20260929.json",
+    "receiptBlobSha": "41e8026b5570685d66f4a44f839bb781c27f7dce",
+    "harnessBeforeBlob": "4bcfa5864107f04be5fcfd4888db370d998a8ad1",
+    "harnessAfterBlob": "8f04fee01a3ffaaf67d61bff364ef652db66ec8f",
+    "productSourceMutation": false,
+    "exactPreviewUnchanged": true,
+    "sameArtifactRetryAuthorized": true
   }
 }
