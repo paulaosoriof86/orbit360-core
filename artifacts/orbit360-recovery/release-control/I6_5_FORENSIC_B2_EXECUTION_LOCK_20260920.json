@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "R102_DIAGNOSTIC_COMPLETE_PENDING_CAUSAL_FIX",
+  "status": "CANDIDATE_PENDING_PREVIEW",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1915,10 +1915,10 @@
     "definitiveFix": "EXACT_PRODUCT_DIFF_AND_BLOB_BOUND_SINGLE_COMPOSITION_AUTHORITY",
     "productSourceReadyForPreview": true,
     "broadRediscoveryRequired": false,
-    "authorityBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
-    "findingsLedgerBlobSha": "1137839407a128b7a6c13be68cc3f6f15cf4a565",
-    "compositionLockBlobSha": "ef437a86329844519c4b8981226a3baa9d48d8c6",
-    "findingLedgerBlobSha": "1137839407a128b7a6c13be68cc3f6f15cf4a565",
+    "authorityBlobSha": "fd9314fb647e2c57f74461313f5fc86880eb1545",
+    "findingsLedgerBlobSha": "9a23170fa46512706f8ae5f0936ced96a1d58a14",
+    "compositionLockBlobSha": "fd9314fb647e2c57f74461313f5fc86880eb1545",
+    "findingLedgerBlobSha": "9a23170fa46512706f8ae5f0936ced96a1d58a14",
     "productFileCount": 70
   },
   "planV2Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -1995,8 +1995,8 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R102_CAUSAL_FIX_IF_REQUIRED",
-    "R102_TARGETED_HUMAN_RETEST",
+    "R102_NEW_EXACT_PREVIEW_MACHINE_RENDER_PASS",
+    "PAULA_R102_TARGETED_HUMAN_RETEST",
     "FINAL_SYNTHETIC_CLEANUP"
   ],
   "lastAuthenticatedFailure": {
@@ -2838,7 +2838,7 @@
       "livePromoted": false
     }
   },
-  "findingLedgerBlobSha": "2409e0f3c54788135a1ac687de9418af6bf8fa25",
+  "findingLedgerBlobSha": "9a23170fa46512706f8ae5f0936ced96a1d58a14",
   "r7": {
     "status": "R7N_EXACT_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
     "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_R7_20260926.json",
@@ -3110,7 +3110,7 @@
     "sourceCandidateSha": "96085cce605bbcd768ef0fa844773cbb4cb0786c",
     "exactPreviewProofPending": true
   },
-  "boundaryNote": "Targeted UAT 4/5 PASS. R102 broken insurer logo after refresh is the only B2 blocker. R102 diagnostic is read-only; preserve all other PASS and exact Preview.",
+  "boundaryNote": "R102 source fix only. Tests 1-4 remain human PASS. New source requires new digest/Preview; after machine render proof Paula retests only insurer logo. No LIVE/B3/reimport.",
   "driveHumanFixture": {
     "status": "READY_FOR_TARGETED_HUMAN_UAT",
     "tenantId": "alianzas-soluciones",
@@ -4116,5 +4116,35 @@
     "persistedTokenMatchesMetadata": true,
     "imageBytesValid": true,
     "readOnly": true
+  },
+  "r102RootFix": {
+    "status": "SOURCE_FIXED_PENDING_SINGLE_EXACT_PREVIEW",
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_LOGO_READONLY_DIAGNOSTIC_20260929.json",
+    "rootFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_LOGO_ASSET_RESOLVER_ROOTFIX_20260929.json",
+    "rootFixReceiptBlobSha": "23d76da22ee123780a2a89fbe0fe6e19902bb64c",
+    "compositionLockBlobSha": "fd9314fb647e2c57f74461313f5fc86880eb1545",
+    "findingLedgerBlobSha": "9a23170fa46512706f8ae5f0936ced96a1d58a14",
+    "changedProductFiles": {
+      "functions/product-operational-domain.js": "48bf9f7d291f071500c6efa1b71a75767568b978",
+      "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563"
+    },
+    "mechanismBlobs": {
+      "authenticatedHarness": "889cd4b9581ca552b0104b0e5aa8e760636d0f2a",
+      "functionalValidator": "f9b88bf597c34274b06dc3f4f601bad129612580",
+      "workflow": "2c728c7efa6636addc10a044a4bf40a50e957c43"
+    },
+    "preservedHumanPasses": [
+      "TEST1_PERMISSIONS",
+      "TEST2_MULTIROLE",
+      "TEST3_USER",
+      "TEST4_OPS_DOCUMENT"
+    ],
+    "requiredHumanRetest": [
+      "TEST5_INSURER_LOGO_R102_ONLY"
+    ],
+    "newDigestRequired": true,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true
   }
 }

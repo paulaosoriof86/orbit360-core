@@ -3718,8 +3718,8 @@ jobs:
           printf 'ORBIT360_STORAGE_BUCKET=%s\n' "$STORAGE_BUCKET" > "$FROOT/backend/.env"
           cat "$RUNNER_TEMP/b2-storage-bucket-readonly.json"
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantDomainConfigPreview,functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360DocumentDriveStatusPreview,functions:orbit360DocumentDriveUploadPreview,functions:orbit360DocumentDriveReadPreview,functions:orbit360DocumentDriveDownloadPreview,functions:orbit360DocumentDriveBootstrapPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","storageBucket":"%s","functions":["orbit360TenantDomainConfigPreview","orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview","orbit360DocumentDriveReadPreview","orbit360DocumentDriveDownloadPreview","orbit360DocumentDriveBootstrapPreview"],"documentRepository":"Google Drive","documentAuth":"tenant_persistent_backend","documentTokenPersistence":"secret_manager","routineUserGoogleOAuth":false,"productionFunctionDeployed":false,"controlledWorkflowUatWritesAuthorized":true,"existingWorkflowMutationAuthorized":false,"externalNotificationsSuppressed":true}\n' "$GITHUB_SHA" "$STORAGE_BUCKET" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantDomainConfigPreview,functions:orbit360ProductInsurerCredentialCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360ProductAssetReadPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360DocumentDriveStatusPreview,functions:orbit360DocumentDriveUploadPreview,functions:orbit360DocumentDriveReadPreview,functions:orbit360DocumentDriveDownloadPreview,functions:orbit360DocumentDriveBootstrapPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          printf '{"status":"DEPLOYED_PREVIEW_ONLY","sourceSha":"%s","storageBucket":"%s","functions":["orbit360TenantDomainConfigPreview","orbit360ProductInsurerCredentialCommandPreview","orbit360ProductAssetUploadPreview","orbit360ProductAssetReadPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview","orbit360DocumentDriveReadPreview","orbit360DocumentDriveDownloadPreview","orbit360DocumentDriveBootstrapPreview"],"documentRepository":"Google Drive","documentAuth":"tenant_persistent_backend","documentTokenPersistence":"secret_manager","routineUserGoogleOAuth":false,"productionFunctionDeployed":false,"controlledWorkflowUatWritesAuthorized":true,"existingWorkflowMutationAuthorized":false,"externalNotificationsSuppressed":true}\n' "$GITHUB_SHA" "$STORAGE_BUCKET" > "$RUNNER_TEMP/b2-package/evidence/b2-preview-isolated-backend.json"
           cp "$RUNNER_TEMP/b2-storage-bucket-readonly.json" "$RUNNER_TEMP/b2-package/evidence/b2-storage-bucket-readonly.json"
       - name: Deploy exact B2 package to isolated Preview
         if: steps.mode.outputs.mode == 'preview'
@@ -4614,10 +4614,13 @@ jobs:
           const q={...e,status:'READY_FOR_TARGETED_HUMAN_UAT',fixtureRunId:Number(process.env.GITHUB_RUN_ID),humanProofPending:true,cleanupPending:true};
           b.driveHumanFixture=q;
           b.finalHumanFixtures={...(b.authenticatedPreviewProof?.humanFixtures||{}),drive:q,status:'READY_FOR_FIVE_TARGETED_HUMAN_TESTS',cleanupMandatory:true};
-          b.status='PREVIEW_AUTHENTICATED_PASS_HUMAN_FIXTURES_READY_PENDING_PAULA_VISUAL';
-          b.nextRequiredProof=['PAULA_FIVE_TARGETED_HUMAN_TESTS'];
+          const priorHuman=b.targetedHumanUat20260929||{};
+          const priorTests=priorHuman.tests||{};
+          const fourPass=priorTests.permissions==='PASS'&&priorTests.multirole==='PASS'&&priorTests.userMobile==='PASS'&&priorTests.opsDocumentMobile==='PASS';
+          b.status=fourPass?'PREVIEW_R102_MACHINE_PASS_PENDING_TARGETED_HUMAN_RETEST':'PREVIEW_AUTHENTICATED_PASS_HUMAN_FIXTURES_READY_PENDING_PAULA_VISUAL';
+          b.nextRequiredProof=fourPass?['PAULA_R102_TARGETED_HUMAN_RETEST']:['PAULA_FIVE_TARGETED_HUMAN_TESTS'];
           fs.writeFileSync(lockPath,JSON.stringify(b,null,2)+'\n');
-          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),status:b.status,driveHumanFixture:q,finalHumanFixtures:b.finalHumanFixtures,humanDriveProofPending:true};
+          c.i65ForensicRemediationPlan.b2={...(c.i65ForensicRemediationPlan.b2||{}),status:b.status,driveHumanFixture:q,finalHumanFixtures:b.finalHumanFixtures,humanDriveProofPending:true,r102MachinePass:fourPass===true,r102HumanRetestPending:fourPass===true};
           fs.writeFileSync(cpPath,JSON.stringify(c,null,2)+'\n');
           NODE
           git add "$B2_LOCK"

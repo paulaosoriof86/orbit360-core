@@ -1438,7 +1438,17 @@ try{
   await page.waitForFunction(()=>Orbit.route?.key==='aseguradoras'&&!!document.querySelector('#asg-q'),null,{timeout:10000});
   await page.evaluate(id=>Orbit.modules.aseguradoras.ficha(id),insurerId);
   await page.waitForSelector('#asg-ficha .asg-logo img',{timeout:10000});
-  need((await page.locator('#asg-ficha .asg-logo img').getAttribute('src'))===persistedLogoUrl,'B2_AUTH_INSURER_LOGO_REFRESH_MISMATCH');
+  const logoRender=await bounded(page.waitForFunction(()=>{
+    const img=document.querySelector('#asg-ficha .asg-logo img');
+    return !!img&&img.complete&&img.naturalWidth>0&&img.naturalHeight>0&&/^data:image\/(png|jpeg|webp);base64,/i.test(String(img.src||''))
+      ? {srcKind:'resolved-data-url',naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight}
+      : false;
+  },null,{timeout:30000}).then(h=>h.jsonValue()),'B2_R102_INSURER_LOGO_RENDER_TIMEOUT',32000);
+  need(logoRender&&logoRender.naturalWidth>0,'B2_R102_INSURER_LOGO_RENDER_AFTER_REFRESH_FAILED:'+JSON.stringify(logoRender));
+  evidence.insurerLogo.renderAfterReload=true;
+  evidence.insurerLogo.resolverDataUrl=true;
+  evidence.insurerLogo.naturalWidth=logoRender.naturalWidth;
+  evidence.insurerLogo.naturalHeight=logoRender.naturalHeight;
   const revealProof=await bounded(page.evaluate(async ({ref,insurerId,expectedHash})=>{
     const out=await Orbit.secureResources.revealCredential(ref,{insurerId});
     const bytes=new TextEncoder().encode(String(out&&out.value||'')),digest=await crypto.subtle.digest('SHA-256',bytes),hashValue=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -1632,6 +1642,7 @@ console.log('I65_B2_CLIENT_CREATE_EDIT=PASS');
 console.log('I65_B2_POLICY_SELLER=PASS');
 console.log('I65_B2_VEHICLE_CREATE_EDIT=PASS');
 console.log('I65_B2_INSURER_LOGO_CREDENTIAL=PASS');
+console.log('I65_B2_R102_INSURER_LOGO_RENDER_AFTER_REFRESH=PASS');
 console.log('I65_B2_FINAL_HUMAN_USER_INSURER_FIXTURES=READY');
 console.log('I65_B2_RENEWAL_REAL_POLICY=PASS');
 console.log('I65_B2_CONFIRMED_COBRO_CREATED=0');

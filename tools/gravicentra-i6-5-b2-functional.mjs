@@ -148,8 +148,24 @@ need(files.detail.includes("out.formaPago = first(p.formaPago, p.metodoPago)")&&
 need(files.detail.includes('Base imponible para IVA')&&!files.detail.includes("['Base gravable', pb.taxable]"),'B2_TAXABLE_BASE_UI_SEMANTIC_NOT_FIXED');
 need(files.receiptsProjection.includes("clientWrapper=function(host){var out=cr(host);patchClient(host);return out;}")&&!files.receiptsProjection.includes("setTimeout(function(){patchHeader(cid)"),'B2_RECEIPT_DOUBLE_RENDER_RACE_REMAINS');
 need(files.receiptsProjection.includes('Datos actualizados al')&&files.receiptsProjection.includes('Detalles de origen y auditoría')&&files.receiptsProjection.includes('Documento de origen')&&!files.receiptsProjection.includes('<h3 style="margin-top:0;font-size:17px;font-weight:800">📎 Origen del dato'),'B2_RECEIPT_DETAIL_TECHNICAL_UI_REMAINS');
-need(files.insurers.includes('id="af-logo-file"')&&files.insurers.includes('orbit360ProductAssetUploadPreview')&&files.insurers.includes("'logoAssetRef'"),'B2_INSURER_LOGO_NOT_ADMINISTRABLE');
-need(files.operationalBackend.includes('exports.orbit360ProductAssetUploadPreview')&&files.operationalBackend.includes("previewOnly===true")&&files.operationalBackend.includes("getStorage"),'B2_INSURER_LOGO_SERVER_OWNER_MISSING');
+need(
+  files.insurers.includes('id="af-logo-file"')&&
+  files.insurers.includes('orbit360ProductAssetUploadPreview')&&
+  files.insurers.includes('orbit360ProductAssetReadPreview')&&
+  files.insurers.includes('__r102LogoAssetResolver')&&
+  files.insurers.includes('data-asg-logo-ref')&&
+  files.insurers.includes("'logoAssetRef'"),
+  'B2_R102_INSURER_LOGO_ASSET_RESOLVER_UI_MISSING'
+);
+need(
+  files.operationalBackend.includes('exports.orbit360ProductAssetUploadPreview')&&
+  files.operationalBackend.includes('exports.orbit360ProductAssetReadPreview')&&
+  files.operationalBackend.includes('async function readProductAsset')&&
+  files.operationalBackend.includes("authorizeRead(request,tenantId,'aseguradoras')")&&
+  files.operationalBackend.includes("base64:found.bytes.toString('base64')")&&
+  files.operationalBackend.includes("previewOnly===true"),
+  'B2_R102_INSURER_LOGO_SERVER_RESOLVER_MISSING'
+);
 need(files.credentialBackend.includes("'operativo']")&&files.credentialBackend.includes("previewSecretPattern:'orbit360-insurer-credentials-preview-{tenantId}'")&&files.credentialBackend.includes("importEnabled:true")&&!files.credentialBackend.includes("Importación deshabilitada en Preview"),'B2_INSURER_CREDENTIAL_PREVIEW_CONTRACT_INVALID');
 need(files.credentialProvider.includes('importCredentials')&&files.credentialProvider.includes('previewCleanup:cleanupPreview')&&files.credentialProvider.includes("operation:'delete_preview'"),'B2_INSURER_CREDENTIAL_PRODUCT_PROVIDER_CONTRACT_MISSING');
 need(files.insurers.includes('provider.importCredentials'),'B2_INSURER_DIRECT_CREDENTIAL_IMPORT_MISSING');

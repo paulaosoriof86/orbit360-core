@@ -18,6 +18,7 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.aseguradoras = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   let host, q = '', fPais = 'TODOS', fRamo = '', fEstado = 'TODAS', orderMode = 'country', knowledgeSummaryLoading = false;
+  const logoAssetCache = new Map();
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function norm(value) { return clean(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); }
   function tenantId() {
@@ -27,6 +28,62 @@ Orbit.modules.aseguradoras = (function () {
       return clean(backend.tenantId || backend.tenant || tenant.tenantId || tenant.id || tenant.slug);
     } catch (e) { return ''; }
   }
+  function isB2PreviewHost() {
+    return /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location && location.hostname || ''));
+  }
+  async function resolveLogoAsset(id, assetRef) {
+    id = clean(id); assetRef = clean(assetRef);
+    if (!id || !assetRef) throw new Error('INSURER_LOGO_ASSET_REFERENCE_REQUIRED');
+    const key = id + '|' + assetRef;
+    if (logoAssetCache.has(key)) return logoAssetCache.get(key);
+    const provider = Orbit.productRuntimeBrowserProvidersP0;
+    if (!provider || typeof provider.callFunction !== 'function') throw new Error('INSURER_LOGO_ASSET_PROVIDER_UNAVAILABLE');
+    const preview = isB2PreviewHost();
+    const out = await provider.callFunction(
+      preview ? 'orbit360ProductAssetReadPreview' : 'orbit360ProductAssetRead',
+      { tenantId: tenantId(), activeRole: activeRole(), insurerId: id, assetRef },
+      preview ? 'us-east1' : 'us-central1'
+    );
+    if (!out || out.ok !== true || !out.base64 || !/^image\/(png|jpeg|webp)$/i.test(String(out.mimeType || ''))) throw new Error('INSURER_LOGO_ASSET_READ_NOT_CONFIRMED');
+    const src = 'data:' + out.mimeType + ';base64,' + out.base64;
+    logoAssetCache.set(key, src);
+    return src;
+  }
+  function logoImg(a, alt, style) {
+    const src = clean(a && a.logo), assetRef = clean(a && a.logoAssetRef), id = clean(a && a.id);
+    const attrs = assetRef && id ? ' data-asg-logo-id="' + U.esc(id) + '" data-asg-logo-ref="' + U.esc(assetRef) + '"' : '';
+    const hidden = assetRef && id ? ';visibility:hidden' : '';
+    return '<img' + attrs + (src ? ' src="' + U.esc(src) + '"' : '') + ' alt="' + U.esc(alt || 'Logo') + '" style="' + (style || '') + hidden + '">';
+  }
+  function hydrateLogoAssets(root) {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll('img[data-asg-logo-ref]').forEach(img => {
+      if (img.dataset.asgLogoWired === '1') return;
+      img.dataset.asgLogoWired = '1';
+      const reveal = () => { img.style.visibility = 'visible'; };
+      const recover = async () => {
+        if (img.dataset.asgLogoResolving === '1') return;
+        img.dataset.asgLogoResolving = '1';
+        try {
+          img.src = await resolveLogoAsset(img.dataset.asgLogoId, img.dataset.asgLogoRef);
+          if (img.complete && img.naturalWidth > 0) reveal();
+        } catch (error) {
+          img.removeAttribute('src');
+          img.alt = 'Logo no disponible';
+          reveal();
+          try { console.warn('[Orbit Aseguradoras] LOGO_ASSET_RESOLVE_FAILED', error && (error.code || error.message) || error); } catch (e) {}
+        }
+      };
+      img.addEventListener('load', reveal);
+      img.addEventListener('error', recover, { once: true });
+      if (!img.getAttribute('src')) recover();
+      else if (img.complete) {
+        if (img.naturalWidth > 0) reveal();
+        else recover();
+      }
+    });
+  }
+
   function tenantInsurerConfig() {
     const id = tenantId();
     return [].concat(window.OrbitTenantInsurerConfigsP10 || []).find(item => clean(item && item.tenantId) === id) || {};
@@ -295,6 +352,7 @@ Orbit.modules.aseguradoras = (function () {
       </div>
       <div class="asg-grid">${all.map(a => card(a)).join('') || '<div class="muted" style="padding:16px">Sin resultados para este filtro.</div>'}</div>
     </div>`;
+    hydrateLogoAssets(host);
     if (host.querySelector('#asg-new')) host.querySelector('#asg-new').addEventListener('click', nueva);
     if (host.querySelector('#asg-imp')) host.querySelector('#asg-imp').addEventListener('click', () => { if (!canEdit()) { U.toast('Solo Dirección, Superadmin, Admin u Operativo puede importar.'); return; } Orbit.importa.open('directorio-aseguradoras', { onDone: reload }); });
     host.querySelector('#asg-q').addEventListener('input', e => { q = e.target.value; render(host); });
@@ -336,7 +394,7 @@ Orbit.modules.aseguradoras = (function () {
     const estAcc = portales.length ? (portales.some(p => p.estadoAcceso === 'Acceso disponible') ? 'Acceso disponible' : portales.some(p => p.estadoAcceso === 'Requiere actualización') ? 'Requiere actualización' : 'Pendiente de conexión segura') : 'Sin acceso registrado';
     const estDoc = (a.docs || []).length ? ((a.docs || []).length + ' documentos') : 'Sin documentos';
     const productos = (a.ramos || []).slice(0, 3);
-    const logo = a.logo ? `<span class="asg-dot" style="padding:0;overflow:hidden"><img src="${U.esc(a.logo)}" style="width:100%;height:100%;object-fit:contain"></span>` : `<span class="asg-dot" style="background:${U.esc(a.color || '#5a6472')}">${U.esc(U.text(a.nombre, 'A')[0])}</span>`;
+    const logo = (a.logo || a.logoAssetRef) ? `<span class="asg-dot" style="padding:0;overflow:hidden">${logoImg(a, 'Logo de ' + U.text(a.nombre, 'aseguradora'), 'width:100%;height:100%;object-fit:contain')}</span>` : `<span class="asg-dot" style="background:${U.esc(a.color || '#5a6472')}">${U.esc(U.text(a.nombre, 'A')[0])}</span>`;
     return `<div class="asg-card ${on ? '' : 'off'}" data-asg="${a.id}">
       <div class="asg-card-h">
         ${logo}
@@ -390,6 +448,7 @@ Orbit.modules.aseguradoras = (function () {
     const st = fichaState[id]; const data = st.editing ? st.draft : S().get('aseguradoras', id);
     if (!data || !body) return;
     body.innerHTML = tabBody(data, t, st.editing);
+    hydrateLogoAssets(body);
     wireBody(back, data, t);
   }
 
@@ -417,7 +476,7 @@ Orbit.modules.aseguradoras = (function () {
       <div class="card" style="overflow:hidden;padding:0;display:flex;flex-direction:column">
         <div style="padding:20px 24px;background:linear-gradient(120deg,${a.color},#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
           <div style="display:flex;gap:13px;align-items:center">
-            <span class="asg-logo">${a.logo ? `<img src="${a.logo}">` : '<span>🏢<br><small>logo</small></span>'}</span>
+            <span class="asg-logo">${(a.logo || a.logoAssetRef) ? logoImg(a, 'Logo de ' + U.text(a.nombre, 'aseguradora'), 'max-width:100%;max-height:100%;object-fit:contain') : '<span>🏢<br><small>logo</small></span>'}</span>
             <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Aseguradora · ${a.pais}</div>
               <div style="font-family:var(--f-display);font-weight:800;font-size:20px;color:#fff">${U.esc(a.nombre)}</div>
               <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'}${st.editing ? ' · <b>Editando</b>' : ''}</div></div>
@@ -437,6 +496,7 @@ Orbit.modules.aseguradoras = (function () {
       </div>
     </div>`;
     const back = document.getElementById('asg-ficha');
+    hydrateLogoAssets(back);
     Orbit.vault.wire(back);
     back.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
     if (back.querySelector('#af-editar')) back.querySelector('#af-editar').addEventListener('click', () => ficha(id, true));
@@ -617,7 +677,7 @@ Orbit.modules.aseguradoras = (function () {
         <label class="ce-l">NIT / identificación fiscal<input id="af-nit" class="o-sel" value="${U.esc(a.nit || '')}" ${ro}></label>
         <label class="ce-l">Código de intermediario<input id="af-cod" class="o-sel" value="${U.esc(a.codigoIntermediario || '')}" ${ro}></label>
         <label class="ce-l">Sitio web / app<input id="af-web" class="o-sel" value="${U.esc(a.web || '')}" ${ro}></label>
-        <div class="ce-l"><span>🖼 Logo</span>${editing ? '<input id="af-logo-file" class="o-sel" type="file" accept="image/png,image/jpeg,image/webp"><div id="af-logo-preview" style="margin-top:8px;min-height:72px;border:1px dashed var(--line);border-radius:12px;display:grid;place-items:center;padding:8px">'+(a.logo?'<img src="'+U.esc(a.logo)+'" alt="Vista previa del logo" style="max-width:180px;max-height:70px;object-fit:contain">':'<span class="muted">Selecciona una imagen para ver la vista previa.</span>')+'</div><details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--ink-2)">Usar URL como alternativa</summary><input id="af-logo" class="o-sel" type="url" placeholder="https://…" value="'+U.esc(a.logo || '')+'" style="margin-top:6px"></details>' : (a.logo?'<img src="'+U.esc(a.logo)+'" alt="Logo" style="max-width:180px;max-height:70px;object-fit:contain">':'<span class="muted">Sin logo cargado.</span>')}</div>
+        <div class="ce-l"><span>🖼 Logo</span>${editing ? '<input id="af-logo-file" class="o-sel" type="file" accept="image/png,image/jpeg,image/webp"><div id="af-logo-preview" style="margin-top:8px;min-height:72px;border:1px dashed var(--line);border-radius:12px;display:grid;place-items:center;padding:8px">'+((a.logo||a.logoAssetRef)?logoImg(a,'Vista previa del logo','max-width:180px;max-height:70px;object-fit:contain'):'<span class="muted">Selecciona una imagen para ver la vista previa.</span>')+'</div><details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--ink-2)">Usar URL como alternativa</summary><input id="af-logo" class="o-sel" type="url" placeholder="https://…" value="'+U.esc(a.logo || '')+'" style="margin-top:6px"></details>' : ((a.logo||a.logoAssetRef)?logoImg(a,'Logo','max-width:180px;max-height:70px;object-fit:contain'):'<span class="muted">Sin logo cargado.</span>')}</div>
         <label class="ce-l">Responsable interno<input id="af-resp" class="o-sel" value="${U.esc(a.responsable || '')}" ${ro}></label>
       </div>
       <div class="cgrid" style="margin-top:10px">
@@ -861,7 +921,7 @@ Orbit.modules.aseguradoras = (function () {
       if (fileInput) fileInput.addEventListener('change', () => {
         const file = fileInput.files && fileInput.files[0]; st.logoFile = file || null;
         const preview = body.querySelector('#af-logo-preview'); if (!preview) return;
-        if (!file) { preview.innerHTML = draft.logo ? '<img src="'+U.esc(draft.logo)+'" alt="Vista previa del logo" style="max-width:180px;max-height:70px;object-fit:contain">' : '<span class="muted">Selecciona una imagen para ver la vista previa.</span>'; return; }
+        if (!file) { preview.innerHTML = (draft.logo || draft.logoAssetRef) ? logoImg(draft, 'Vista previa del logo', 'max-width:180px;max-height:70px;object-fit:contain') : '<span class="muted">Selecciona una imagen para ver la vista previa.</span>'; hydrateLogoAssets(preview); return; }
         const url = URL.createObjectURL(file); preview.innerHTML = '<img src="'+url+'" alt="Vista previa del logo" style="max-width:180px;max-height:70px;object-fit:contain">'; const img=preview.querySelector('img'); if(img)img.addEventListener('load',()=>URL.revokeObjectURL(url),{once:true});
       });
     }
@@ -1001,6 +1061,7 @@ Orbit.modules.aseguradoras = (function () {
     __ownerKnowledgeV20260717: true,
     __tenantOrderV20260717: true,
     __consumerGatesSeparatedV20260717: true,
+    __r102LogoAssetResolver: { resolveLogoAsset, hydrateLogoAssets },
     _fuentes: { SOURCE_TYPES, SOURCE_STATES, DIMENSION_KEYS, normalizarFuente, evaluarFuente, resumenFuentes, resumenGrupos, knowledgeSources, sourceDimensions, sourceCombinationKey, groupLabel, legacyType }
   };
 })();

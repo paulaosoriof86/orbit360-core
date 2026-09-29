@@ -1,0 +1,69 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_R102_LOGO_ASSET_RESOLVER_ROOTFIX_V1",
+  "recordedAt": "2026-09-29T16:42:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "2f6347b9d47e12080efbb03b863bc7da74397e32",
+  "block": "B2",
+  "findingId": "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22",
+  "status": "SOURCE_FIXED_PENDING_SINGLE_EXACT_PREVIEW",
+  "diagnosis": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_LOGO_READONLY_DIAGNOSTIC_20260929.json",
+    "objectExists": true,
+    "imageBytesValid": true,
+    "persistedTokenMatchesMetadata": true,
+    "persistedUrlHttpStatus": 412,
+    "canonicalMetadataTokenUrlHttpStatus": 412,
+    "rootCause": "FIREBASE_DOWNLOAD_ENDPOINT_REJECTS_PERSISTED_LOGO_URL_FOR_FROZEN_ASSET_BUCKET",
+    "note": "Persistence itself is intact; render fails because the stored Firebase download-token URL is not retrievable even though the object/token/bytes are valid."
+  },
+  "fix": {
+    "backend": {
+      "file": "functions/product-operational-domain.js",
+      "blobSha": "48bf9f7d291f071500c6efa1b71a75767568b978",
+      "contract": "Authenticated asset reader resolves exact insurer.logoAssetRef from Storage and returns authorized image bytes; Preview remains restricted to b2-asg-* fixtures."
+    },
+    "ui": {
+      "file": "orbit360-platform/modules/aseguradoras.js",
+      "blobSha": "059722a945a53b963fb3a5daca69c8c4d14c1563",
+      "contract": "Aseguradoras uses logoAssetRef as durable authority and recovers rendering through the authenticated resolver; directory, ficha and resumen hydrate the asset after refresh."
+    },
+    "machineProof": {
+      "file": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+      "blobSha": "889cd4b9581ca552b0104b0e5aa8e760636d0f2a",
+      "contract": "After reload the logo must have naturalWidth/naturalHeight > 0 and resolve to image data, not merely preserve the URL string."
+    },
+    "validator": {
+      "file": "tools/gravicentra-i6-5-b2-functional.mjs",
+      "blobSha": "f9b88bf597c34274b06dc3f4f601bad129612580"
+    },
+    "workflow": {
+      "file": ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+      "blobSha": "2c728c7efa6636addc10a044a4bf40a50e957c43",
+      "previewCallable": "orbit360ProductAssetReadPreview",
+      "preservePriorHumanPasses": true,
+      "onlyHumanRetestAfterMachinePass": "R102"
+    }
+  },
+  "preservedHumanPasses": [
+    "TEST1_PERMISSIONS",
+    "TEST2_MULTIROLE",
+    "TEST3_USER",
+    "TEST4_OPS_DOCUMENT"
+  ],
+  "humanRetestRequired": [
+    "TEST5_INSURER_LOGO_R102_ONLY"
+  ],
+  "carryForward": [
+    "DASHBOARD-INICIO-001",
+    "B3-CARRY-OPS-HYDRATION-EMPTY-FLASH-20260929"
+  ],
+  "boundaries": {
+    "sourceChanged": true,
+    "newDigestRequired": true,
+    "noLive": true,
+    "noB3": true,
+    "noReimport": true,
+    "noRealBusinessMutation": true
+  }
+}

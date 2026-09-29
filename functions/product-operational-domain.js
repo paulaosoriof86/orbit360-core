@@ -9,7 +9,7 @@ const { resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'gravicentra-product-operational-domain-v4-b1-server-readback';
+const VERSION = 'gravicentra-product-operational-domain-v5-r102-asset-resolver';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -418,7 +418,60 @@ async function uploadProductAsset(request, previewOnly) {
   return{ok:true,insurerId,assetRef,url,contentHash,mimeType:mime,size:bytes.length,serverOwned:true,canonicalReadback:true,previewIsolated:previewOnly===true};
 }
 
+
+async function readProductAsset(request, previewOnly) {
+  const input=request.data||{},tenantId=cleanId(input.tenantId,'tenantId'),insurerId=cleanId(input.insurerId,'insurerId');
+  if(previewOnly===true && !/^b2-asg-[a-z0-9-]+$/i.test(insurerId)) throw new HttpsError('permission-denied','La lectura aislada de Preview solo admite fixtures sintéticos B2.');
+  const actor=await authorizeRead(request,tenantId,'aseguradoras');
+  const insurerRef=canonicalRef(tenantId,'aseguradoras',insurerId),snap=await insurerRef.get();
+  if(!snap.exists)throw new HttpsError('not-found','Aseguradora no encontrada.');
+  const row=Object.assign({},snap.data()||{},{id:insurerId,tenantId});
+  if(!withinScope(actor,'aseguradoras','aseguradoras',row))throw new HttpsError('permission-denied','El alcance activo no autoriza esta aseguradora.');
+  const assetRef=text(row.logoAssetRef,1000),requested=text(input.assetRef,1000);
+  if(!assetRef)throw new HttpsError('not-found','La aseguradora no tiene un logo administrado.');
+  if(requested&&requested!==assetRef)throw new HttpsError('failed-precondition','La referencia solicitada no coincide con el logo vigente.');
+  if(previewOnly===true&&!assetRef.startsWith('preview/tenants/'+tenantId+'/assets/insurers/'+insurerId+'/'))throw new HttpsError('permission-denied','El asset no pertenece al fixture Preview autorizado.');
+  let firebaseConfig={};try{firebaseConfig=JSON.parse(process.env.FIREBASE_CONFIG||'{}')||{};}catch(e){}
+  const projectId=text(app.options&&app.options.projectId||process.env.GCLOUD_PROJECT||process.env.GOOGLE_CLOUD_PROJECT||'',120);
+  const urlBucket=(()=>{const m=text(row.logo,5000).match(/\/v0\/b\/([^/]+)\/o\//i);try{return m?decodeURIComponent(m[1]):'';}catch(e){return m?m[1]:'';}})();
+  const bucketCandidates=unique([
+    urlBucket,
+    app.options&&app.options.storageBucket,
+    firebaseConfig.storageBucket,
+    process.env.ORBIT360_STORAGE_BUCKET,
+    projectId?projectId+'.firebasestorage.app':'',
+    projectId?projectId+'.appspot.com':''
+  ]);
+  let found=null,lastError=null;
+  for(const bucketName of bucketCandidates){
+    try{
+      const bucket=storage.bucket(bucketName),file=bucket.file(assetRef),exists=(await file.exists())[0];
+      if(!exists)continue;
+      const [metadata]=await file.getMetadata(),size=Number(metadata&&metadata.size||0),mime=text(metadata&&metadata.contentType,80).toLowerCase();
+      if(!['image/png','image/jpeg','image/webp'].includes(mime))throw new HttpsError('failed-precondition','El logo almacenado no tiene un formato permitido.');
+      if(!size||size>2*1024*1024)throw new HttpsError('failed-precondition','El logo almacenado excede el tamaño permitido.');
+      const [bytes]=await file.download();
+      if(!bytes||!bytes.length||bytes.length>2*1024*1024)throw new HttpsError('failed-precondition','No fue posible leer el logo almacenado.');
+      found={bucketName,mime,bytes};break;
+    }catch(error){lastError=error;}
+  }
+  if(!found)throw new HttpsError('not-found','No fue posible resolver el logo almacenado.',{errorCode:text(lastError&&(lastError.code||lastError.message)||'',180)});
+  return{
+    ok:true,
+    insurerId,
+    assetRef,
+    mimeType:found.mime,
+    base64:found.bytes.toString('base64'),
+    contentHash:crypto.createHash('sha256').update(found.bytes).digest('hex'),
+    serverOwned:true,
+    canonicalReadback:true,
+    previewIsolated:previewOnly===true
+  };
+}
+
 exports.orbit360ProductAssetUpload = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>uploadProductAsset(request,false));
 exports.orbit360ProductAssetUploadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>uploadProductAsset(request,true));
+exports.orbit360ProductAssetRead = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>readProductAsset(request,false));
+exports.orbit360ProductAssetReadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>readProductAsset(request,true));
 exports.orbit360ProductOperationalCommand = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, execute);
-exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE, authorize, authorizeRead, withinScope, canonicalRef, text, cleanId });
+exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE, authorize, authorizeRead, withinScope, canonicalRef, text, cleanId, readProductAsset });

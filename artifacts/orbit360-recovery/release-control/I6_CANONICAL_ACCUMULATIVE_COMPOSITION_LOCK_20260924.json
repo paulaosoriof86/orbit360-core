@@ -114,7 +114,7 @@
     "functions/document-drive-domain.js": "c0687b789790344c1463d48500b16070078ff9b2",
     "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
-    "functions/product-operational-domain.js": "682941c99f0a6cf401f87ff413a426245996bad9",
+    "functions/product-operational-domain.js": "48bf9f7d291f071500c6efa1b71a75767568b978",
     "functions/product-ops-leads-domain.js": "fe5307b171a9d51e3f449f0dd2b5aba6fbcbb341",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "3aaf2fe9ef818d0afaa079d3d678ba8fcccd359c",
@@ -156,7 +156,7 @@
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "75edf2bf0ee9e945c1e503ad10e4eb468822c83a",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
-    "orbit360-platform/modules/aseguradoras.js": "2d7db2a218459bb5a6239845f0e277db12aa5490",
+    "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "cba6099ff7499c452c99f283702f27886154ae23",
@@ -204,35 +204,26 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "id": "B2-R22-FINAL-HUMAN-REMEDIATION-SOURCE-FIX-20260929",
-    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_AND_HUMAN_FIXTURES",
-    "parentHead": "77b72a58e60dc8ebc5d97dfcbb9f6e30c994f610",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R22_FINAL_HUMAN_REMEDIATION_SOURCE_FIX_20260929.json",
-    "receiptBlobSha": "bcea4140760dc0ab060285a8c003ea265550a475",
+    "id": "B2-R102-LOGO-ASSET-RESOLVER-ROOTFIX-20260929",
+    "status": "SOURCE_FIXED_PENDING_SINGLE_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_LOGO_ASSET_RESOLVER_ROOTFIX_20260929.json",
+    "receiptBlobSha": "23d76da22ee123780a2a89fbe0fe6e19902bb64c",
     "changedProductFiles": [
-      "functions/tenant-domain-config.js",
-      "orbit360-platform/core/tenant-domain-config-client.js",
-      "orbit360-platform/core/access-role-session-owner-v20260728.js",
-      "orbit360-platform/modules/equipo.js",
-      "orbit360-platform/styles/base.css"
+      "functions/product-operational-domain.js",
+      "orbit360-platform/modules/aseguradoras.js"
     ],
     "mechanismFiles": [
+      "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
+      "tools/gravicentra-i6-5-b2-functional.mjs",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
     ],
-    "blockerIds": [
-      "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22",
-      "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
-      "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
-      "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
-      "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22"
+    "preservedHumanPasses": [
+      "TEST1_PERMISSIONS",
+      "TEST2_MULTIROLE",
+      "TEST3_USER",
+      "TEST4_OPS_DOCUMENT"
     ],
-    "fixturePendingIds": [
-      "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
-      "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
-      "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22"
-    ],
-    "noBuildYet": true,
-    "noPreviewYet": true,
+    "humanRetestOnly": "TEST5_R102",
     "noLive": true,
     "noB3": true,
     "noReimport": true
