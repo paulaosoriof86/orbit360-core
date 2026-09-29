@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_AUTHENTICATED_PASS_HUMAN_FIXTURES_READY_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1995,9 +1995,7 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R98_EXACT_PREVIEW_SYNTHETIC_DRIVE_CLIENT_FIXTURE",
-    "PAULA_FIVE_TARGETED_HUMAN_TESTS",
-    "FINAL_SYNTHETIC_CLEANUP"
+    "PAULA_FIVE_TARGETED_HUMAN_TESTS"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -3112,17 +3110,17 @@
   },
   "boundaryNote": "R98 mechanism-only gate rootfix armed. Existing stale Drive fixture cannot satisfy exact-candidate proof. Product source/build/artifact/Preview remain unchanged; no LIVE/B3/reimport.",
   "driveHumanFixture": {
-    "status": "PRESERVED_PENDING_R83_HUMAN_RETEST_ON_AUTHENTICATED_PREVIEW",
+    "status": "READY_FOR_TARGETED_HUMAN_UAT",
     "tenantId": "alianzas-soluciones",
-    "clientId": "b2-drive-human-36334556509",
-    "clientName": "B2 QA · PRUEBA DRIVE HUMANA · NO USAR",
-    "searchText": "PRUEBA DRIVE HUMANA",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36334556509-xmcb0vbv.web.app",
-    "sourceSha": "367c839a92aa24b0121a248339fd2f18dbf69525",
-    "buildId": "gi-i65-b2-367c839a92aa-57f234755dc1",
-    "previewRunId": 36334556509,
+    "clientId": "b2-drive-human-36622988522",
+    "clientName": "B2 QA · Cliente documentos · NO OPERATIVO",
+    "searchText": "Cliente documentos",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36622988522-gy3bsyhy.web.app",
+    "sourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
+    "buildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
+    "previewRunId": 36622988522,
     "firestoreReadback": true,
-    "driveExpectedRoot": "_GRAVICENTRA_PREVIEW_QA/b2-drive-human-36334556509",
+    "driveExpectedRoot": "_GRAVICENTRA_PREVIEW_QA/b2-drive-human-36622988522",
     "boundaries": {
       "syntheticOnly": true,
       "livePromotion": false,
@@ -3130,16 +3128,10 @@
       "realClientMutation": false,
       "cleanupMandatory": true
     },
-    "createdAt": "2026-09-27T17:03:06.086Z",
-    "fixtureRunId": 36335271355,
+    "createdAt": "2026-09-29T21:47:48.297Z",
+    "fixtureRunId": 36635487618,
     "humanProofPending": true,
-    "cleanupPending": true,
-    "uploadOpenHumanPass": true,
-    "previewIsolationReadbackPass": true,
-    "downloadHumanPass": false,
-    "retestPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36349185236-c9q8h64m.web.app",
-    "retestPreviewSourceSha": "31f2ddc2ac8a819af73a1656eb61078934f8fe1d",
-    "retestPreviewBuildId": "gi-i65-b2-31f2ddc2ac8a-57f234755dc1"
+    "cleanupPending": true
   },
   "r15bDriveDownload": {
     "findingId": "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
@@ -4046,5 +4038,47 @@
     "productSourceChanged": false,
     "buildChanged": false,
     "artifactChanged": false
+  },
+  "finalHumanFixtures": {
+    "fixtureWriteRole": "AdminTenant",
+    "status": "READY_FOR_FIVE_TARGETED_HUMAN_TESTS",
+    "user": {
+      "id": "b2-user-36624806450",
+      "name": "B2 QA Usuario 36624806450",
+      "search": "B2 QA Usuario"
+    },
+    "insurer": {
+      "id": "b2-asg-36624806450",
+      "name": "B2 QA Aseguradora 36624806450",
+      "search": "B2 QA Aseguradora"
+    },
+    "noAuthUser": true,
+    "emailSend": false,
+    "syntheticOnly": true,
+    "cleanupMandatory": true,
+    "drive": {
+      "status": "READY_FOR_TARGETED_HUMAN_UAT",
+      "tenantId": "alianzas-soluciones",
+      "clientId": "b2-drive-human-36622988522",
+      "clientName": "B2 QA · Cliente documentos · NO OPERATIVO",
+      "searchText": "Cliente documentos",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36622988522-gy3bsyhy.web.app",
+      "sourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
+      "buildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
+      "previewRunId": 36622988522,
+      "firestoreReadback": true,
+      "driveExpectedRoot": "_GRAVICENTRA_PREVIEW_QA/b2-drive-human-36622988522",
+      "boundaries": {
+        "syntheticOnly": true,
+        "livePromotion": false,
+        "reimport": false,
+        "realClientMutation": false,
+        "cleanupMandatory": true
+      },
+      "createdAt": "2026-09-29T21:47:48.297Z",
+      "fixtureRunId": 36635487618,
+      "humanProofPending": true,
+      "cleanupPending": true
+    }
   }
 }
