@@ -5,16 +5,16 @@ const t = require('./cotcomp-transport-contract');
 
 const publicAuth = {
   channel:'PUBLIC_WEB',
-  sessionId:'sess_123',
-  appCheckVerified:true,
-  signedSessionVerified:true
+  appCheckVerified:true
 };
 
-test('public web requires App Check and signed session', () => {
-  const r = t.validateAuthContext({channel:'PUBLIC_WEB',sessionId:'x'});
-  assert.equal(r.ok,false);
-  assert.ok(r.errors.includes('APP_CHECK_REQUIRED'));
-  assert.ok(r.errors.includes('SIGNED_SESSION_REQUIRED'));
+test('public web draft/handoff requires App Check but no visible login or pre-issued session', () => {
+  const missing = t.validateAuthContext({channel:'PUBLIC_WEB'},t.OPERATIONS.VALIDATE_DRAFT);
+  assert.equal(missing.ok,false);
+  assert.ok(missing.errors.includes('APP_CHECK_REQUIRED'));
+
+  const ok = t.validateAuthContext({channel:'PUBLIC_WEB',appCheckVerified:true},t.OPERATIONS.SUBMIT_HANDOFF);
+  assert.equal(ok.ok,true);
 });
 
 test('portal/internal requires Firebase Auth identity', () => {
@@ -112,4 +112,24 @@ test('proposal selection requires explicit user choice and is not issuance', () 
 test('runtime and writes stay disabled', () => {
   assert.equal(t.RUNTIME_ENABLED,false);
   assert.equal(t.WRITE_ENABLED,false);
+});
+
+
+test('public proposal reads and selection require verified case access', () => {
+  const read = t.buildTransportPlan({
+    operation:'FETCH_COMPARABLE_PROPOSALS',
+    requestId:'r-case-1',
+    auth:{channel:'PUBLIC_WEB',appCheckVerified:true},
+    quoteCaseId:'qc_1'
+  });
+  assert.equal(read.transportAllowed,false);
+  assert.ok(read.errors.includes('CASE_ACCESS_REQUIRED'));
+
+  const verified = t.buildTransportPlan({
+    operation:'FETCH_COMPARABLE_PROPOSALS',
+    requestId:'r-case-2',
+    auth:{channel:'PUBLIC_WEB',appCheckVerified:true,caseAccessVerified:true},
+    quoteCaseId:'qc_1'
+  });
+  assert.equal(verified.transportAllowed,true);
 });
