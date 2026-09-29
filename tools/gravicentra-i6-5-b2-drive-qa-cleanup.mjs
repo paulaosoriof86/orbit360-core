@@ -73,7 +73,7 @@ need(lock.status==='PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL','B2_DRIVE_C
 need(Array.isArray(lock.nextRequiredProof)&&lock.nextRequiredProof[0]==='DRIVE_QA_FIXTURE_CLEANUP','B2_DRIVE_CLEANUP_CURSOR');
 need(lock.r77r81DriveDurableProof?.status==='PASS_CLEANUP_PENDING','B2_DRIVE_CLEANUP_R7781_NOT_READY');
 need(lock.r91r95RuntimeProof?.status==='PASS_CLEANUP_PENDING_FINAL_PAULA_VISUAL','B2_DRIVE_CLEANUP_R9195_NOT_READY');
-need(lock.r82DeleteRuntimeProof?.status==='PASS','B2_DRIVE_CLEANUP_R82_NOT_PASS');
+need(lock.r82CrossModuleDeleteProof?.status==='PASS','B2_DRIVE_CLEANUP_R82_NOT_PASS');
 
 let app;
 const evidence={schema:'GRAVICENTRA_I6_5_B2_DRIVE_QA_CLEANUP_V1',status:'RUNNING',tenantId:TENANT,preview:lock.preview,drive:{targets:[],results:[]},firestore:{targets:[],deleted:[],residual:[]},errors:[],boundaries:{qaOnly:true,productionHosting:false,b3:false,reimport:false,realBusinessMutation:false}};
@@ -84,15 +84,17 @@ try{
   const dataCol=name=>db.collection('tenants').doc(TENANT).collection('data').doc(name).collection('items');
 
   const explicitRows=[];
-  const addRow=(collection,id)=>{id=clean(id,220);if(id&&allowedQaId(id))explicitRows.push({collection,id});};
+  const addRow=(collection,id,allowExplicitNonPrefix=false)=>{id=clean(id,220);if(!id)return;if(allowedQaId(id)||allowExplicitNonPrefix===true)explicitRows.push({collection,id,allowExplicitNonPrefix:allowExplicitNonPrefix===true});};
   const r77=lock.r77r81DriveDurableProof.cleanup?.targets||{};
   addRow('clientes',r77.clientId);addRow('gestiones',r77.managementId);
   for(const x of r77.preExisting||[])addRow(clean(x.collection,100),x.id);
   const r91=lock.r91r95RuntimeProof.cleanup?.targets||[];
   const map={client:'clientes',legacy:'clientes',protected:'clientes',insurer:'aseguradoras',insurerUnvalidated:'aseguradoras',source:'polizas',sourceUnvalidated:'polizas',direct:'gestiones',issuance:'gestiones',unvalidated:'gestiones',policy:'polizas',management:'gestiones'};
-  for(const x of r91){if(map[x.kind])addRow(map[x.kind],x.id);}
+  for(const x of r91){if(map[x.kind])addRow(map[x.kind],x.id,x.kind==='policy'||x.kind==='management');}
 
-  const rows=uniq(explicitRows.map(x=>x.collection+'|'+x.id)).map(k=>{const [collection,id]=k.split('|');return{collection,id};});
+  const rowMap=new Map();
+  for(const x of explicitRows){const k=x.collection+'|'+x.id;const prior=rowMap.get(k)||{collection:x.collection,id:x.id,allowExplicitNonPrefix:false};prior.allowExplicitNonPrefix=prior.allowExplicitNonPrefix||x.allowExplicitNonPrefix===true;rowMap.set(k,prior);}
+  const rows=[...rowMap.values()];
   evidence.firestore.targets=rows;
 
   const driveRefs=[];
@@ -107,7 +109,9 @@ try{
     const s=await dataCol(rowRef.collection).doc(rowRef.id).get();
     if(!s.exists)continue;
     const row=s.data()||{};
-    need(row.qaFixture===true||/B2_|QA_/i.test(clean(row.qaFixtureType,180))||allowedQaId(rowRef.id),'B2_DRIVE_CLEANUP_NON_QA_ROW:'+rowRef.collection+':'+rowRef.id);
+    const qaMarker=row.qaFixture===true||/B2_|QA_/i.test(clean(row.qaFixtureType,180))||allowedQaId(rowRef.id);
+    if(rowRef.allowExplicitNonPrefix===true)need(qaMarker,'B2_DRIVE_CLEANUP_EXPLICIT_ROW_NOT_QA:'+rowRef.collection+':'+rowRef.id);
+    else need(qaMarker,'B2_DRIVE_CLEANUP_NON_QA_ROW:'+rowRef.collection+':'+rowRef.id);
     refsFrom(row).forEach(addRef);
     addFolder(row.driveFolderId);
   }
@@ -120,7 +124,9 @@ try{
     const ref=dataCol(rowRef.collection).doc(rowRef.id),s=await ref.get();
     if(!s.exists){evidence.firestore.deleted.push({...rowRef,status:'ABSENT'});continue;}
     const row=s.data()||{};
-    need(row.qaFixture===true||/B2_|QA_/i.test(clean(row.qaFixtureType,180))||allowedQaId(rowRef.id),'B2_DRIVE_CLEANUP_NON_QA_DELETE_BLOCK:'+rowRef.collection+':'+rowRef.id);
+    const qaMarker=row.qaFixture===true||/B2_|QA_/i.test(clean(row.qaFixtureType,180))||allowedQaId(rowRef.id);
+    if(rowRef.allowExplicitNonPrefix===true)need(qaMarker,'B2_DRIVE_CLEANUP_EXPLICIT_DELETE_NOT_QA:'+rowRef.collection+':'+rowRef.id);
+    else need(qaMarker,'B2_DRIVE_CLEANUP_NON_QA_DELETE_BLOCK:'+rowRef.collection+':'+rowRef.id);
     await ref.delete();
     const after=await ref.get();
     need(!after.exists,'B2_DRIVE_CLEANUP_FIRESTORE_DELETE_FAILED:'+rowRef.collection+':'+rowRef.id);
