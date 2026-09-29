@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_001_CANDIDATE_PENDING_PREVIEW",
+  "status": "B3_001_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -36,8 +36,6 @@
     "blobSha": "6acd820e238c229a68e97ee7a422bf46267a12b1"
   },
   "nextRequiredProof": [
-    "B3_001_EXACT_PREVIEW_READBACK",
-    "B3_001_STATIC_OWNER_CONTRACT_PASS",
     "B3_001_TARGETED_VISUAL_APPROVED_SHELL"
   ],
   "preservedB3CarryForward": [
@@ -100,5 +98,17 @@
     "code": "I6_B2_FINDINGS_STILL_OPEN",
     "classification": "STALE_PRE_SEAL_LEDGER_REINTERPRETATION",
     "productRegressionDemonstrated": false
+  },
+  "preview": {
+    "sourceSha": "085aaa3c88807e043001c755f7e4c4080b8cfe43",
+    "buildId": "gi-i65-b3-085aaa3c8880-57f234755dc1",
+    "channelId": "gi-i65-b3-36647950059",
+    "url": "https://ays-orbit-360-lab--gi-i65-b3-36647950059-sdvtx3v3.web.app",
+    "runId": 36647950059,
+    "artifactId": 11069906298,
+    "artifactDigest": "8e94f30977d1395dcebad05fa50df85925d79fa09021e3a7aa0b660cc9474224",
+    "exactReadback": true,
+    "contractPass": true,
+    "livePromoted": false
   }
 }

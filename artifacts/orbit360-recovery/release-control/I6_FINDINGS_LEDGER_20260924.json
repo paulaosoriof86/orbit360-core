@@ -678,7 +678,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Restore approved Cobros y cartera shell; bridge is projection adapter, not renderer replacement.",
-      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "owner": [
@@ -692,7 +692,13 @@
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
       "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "previewSourceSha": "085aaa3c88807e043001c755f7e4c4080b8cfe43",
+      "previewBuildId": "gi-i65-b3-085aaa3c8880-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b3-36647950059-sdvtx3v3.web.app",
+      "previewRunId": 36647950059,
+      "artifactId": 11069906298,
+      "artifactDigest": "8e94f30977d1395dcebad05fa50df85925d79fa09021e3a7aa0b660cc9474224"
     },
     {
       "id": "B3-002",
@@ -4211,7 +4217,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_001_SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "status": "B3_001_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "activeFindingId": "B3-001",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
