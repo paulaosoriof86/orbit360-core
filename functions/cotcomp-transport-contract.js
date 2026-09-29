@@ -2,7 +2,7 @@
 
 const { mapPublicToBackend } = require('./cotcomp-public-bridge');
 
-const VERSION = 'ays-cotcomp-transport-s48-v0.1';
+const VERSION = 'ays-cotcomp-transport-s410-v0.2';
 const RUNTIME_ENABLED = false;
 const WRITE_ENABLED = false;
 
@@ -22,14 +22,15 @@ const CHANNELS = Object.freeze({
 function nonEmpty(v) { return typeof v === 'string' && v.trim().length > 0; }
 function uniq(xs) { return [...new Set(xs)]; }
 
-function validateAuthContext(auth = {}) {
+function validateAuthContext(auth = {}, operation = null) {
   const errors = [];
   if (!Object.values(CHANNELS).includes(auth.channel)) errors.push('AUTH_CHANNEL_INVALID');
 
   if (auth.channel === CHANNELS.PUBLIC_WEB) {
-    if (!nonEmpty(auth.sessionId)) errors.push('PUBLIC_SESSION_REQUIRED');
     if (auth.appCheckVerified !== true) errors.push('APP_CHECK_REQUIRED');
-    if (auth.signedSessionVerified !== true) errors.push('SIGNED_SESSION_REQUIRED');
+    if ([OPERATIONS.FETCH_COMPARABLE_PROPOSALS, OPERATIONS.SELECT_PROPOSAL].includes(operation) && auth.caseAccessVerified !== true) {
+      errors.push('CASE_ACCESS_REQUIRED');
+    }
   }
 
   if ([CHANNELS.PORTAL, CHANNELS.INTERNAL].includes(auth.channel)) {
@@ -62,7 +63,7 @@ function validateBaseEnvelope(req = {}) {
   const errors = [];
   if (!Object.values(OPERATIONS).includes(req.operation)) errors.push('OPERATION_INVALID');
   if (!nonEmpty(req.requestId)) errors.push('REQUEST_ID_REQUIRED');
-  const auth = validateAuthContext(req.auth);
+  const auth = validateAuthContext(req.auth, req.operation);
   errors.push(...auth.errors);
   return errors;
 }
