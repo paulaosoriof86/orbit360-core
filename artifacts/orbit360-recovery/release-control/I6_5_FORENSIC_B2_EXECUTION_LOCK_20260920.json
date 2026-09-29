@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -363,7 +363,7 @@
     "livePromoted": false
   },
   "authenticatedPreviewProof": {
-    "status": "AUTHORIZED_PENDING_RUN",
+    "status": "PASS",
     "proofPath": "tools/gravicentra-i6-5-b2-authenticated-preview.mjs",
     "exactPreviewSourceSha": "99edf875d2e36bcdf8057aaae5d72f37b4969191",
     "exactPreviewBuildId": "gi-i65-b2-99edf875d2e3-57f234755dc1",
@@ -431,17 +431,17 @@
     "lastCleanupRunId": 35953693091,
     "retryReason": "DIAGNOSE_CLIENT_DURABLE_SAVE_AFTER_VERIFIED_CLEANUP",
     "productSourceMutationAuthorized": false,
-    "runId": 36624806450,
+    "runId": 36640733189,
     "scope": {
       "operativo": "all",
       "asesor": "own",
       "asesorLeakCount": 0,
       "operativoCounts": {
-        "clientes": 440,
+        "clientes": 441,
         "polizas": 1419,
         "recibosEsperados": 1876,
         "carteraPrimas": 1317,
-        "asesores": 7,
+        "asesores": 8,
         "metas": 3
       },
       "asesorCounts": {
@@ -459,9 +459,9 @@
       "individualReceiptPortfolioSync": true,
       "reportedPaymentVisible": true,
       "reportedPaymentDoesNotFabricateCobro": true,
-      "clientIdHash": "57abd9c568f6aae9e4db68c06dd4169cc0c27ed73095075bc65d7818ec984260",
-      "policyIdHash": "efaa75bdd708177efa9930cd8d1722bd15a6c1e66eef961cf305c37d4e5cb526",
-      "vehicleIdHash": "2809b2927553a7e0375a235aedfe8bf410c9882ca5115a5cfd1ac134d3c9b964",
+      "clientIdHash": "80ad946892622e0ddbaa7222160e1e1806ad34796dadbd633c68b287fc8d66ae",
+      "policyIdHash": "940bc6f0172167422bc0978451cbf96699ac72c8e17bf4f1de7ddde1a5e8f83b",
+      "vehicleIdHash": "0fd644d1685cc13285b3c3474291185da8cbb03bf7b70fcc690d61d29116c5f0",
       "clientCreateReadback": true,
       "clientEditReadback": true,
       "policyCreateReadback": true,
@@ -477,8 +477,8 @@
       "dirtyBackdropProtected": true
     },
     "renewal": {
-      "requestIdHash": "dc290530df2cb9752ad6008259aff0ab79cf8fdcecd45b9d6f12564db1f032ee",
-      "newPolicyIdHash": "2d792bf3ca707f4c1f95fa8c67834a727c1f2462e5c6d72d066bfa59b8133712",
+      "requestIdHash": "3672f7d9d9f20aedd4b9be55c277ef21a40ec2ecfe087549962756778cb47cbe",
+      "newPolicyIdHash": "95411ffea8325bc9942defedea7a6dade81ed95ea9e22603dab7bff62c381b66",
       "sourceLink": true,
       "receipts": 2,
       "portfolio": 2,
@@ -488,7 +488,7 @@
       "awaitedRuntime": true
     },
     "cleanup": {
-      "preRunAssetsDeleted": 0,
+      "preRunAssetsDeleted": 2,
       "deleted": 46,
       "clientAbsent": true,
       "insurerAbsent": false,
@@ -597,12 +597,10 @@
       ],
       "roleScopeKeys": [
         "Dirección",
-        "SuperAdmin",
-        "AdminTenant",
         "Admin",
         "Finanzas",
-        "Operativo",
         "Marketing",
+        "Operativo",
         "Asesor",
         "Asistente",
         "Comercial"
@@ -646,13 +644,13 @@
       "fixtureWriteRole": "AdminTenant",
       "status": "READY_FOR_TARGETED_HUMAN_UAT",
       "user": {
-        "id": "b2-user-36624806450",
-        "name": "B2 QA Usuario 36624806450",
+        "id": "b2-user-36640733189",
+        "name": "B2 QA Usuario 36640733189",
         "search": "B2 QA Usuario"
       },
       "insurer": {
-        "id": "b2-asg-36624806450",
-        "name": "B2 QA Aseguradora 36624806450",
+        "id": "b2-asg-36640733189",
+        "name": "B2 QA Aseguradora 36640733189",
         "search": "B2 QA Aseguradora"
       },
       "noAuthUser": true,

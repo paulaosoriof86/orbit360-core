@@ -2022,9 +2022,9 @@
       "blocksCurrentForensicProgression": false
     },
     "b2ExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json",
-    "b2ExecutionLockBlobSha": "657d2dec74de67cfe59748aa057885937d08e2d4",
+    "b2ExecutionLockBlobSha": "4a5c362f384481bac15844a6fc05e3028aefc18d",
     "b2": {
-      "status": "PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL",
+      "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
       "parentB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "activeRoleScopeSpotCheckCarryForward": true,
       "dashboardRealityCarryForward": true,
@@ -2147,7 +2147,7 @@
       "renewalDurableClosureRootCauseClosedPendingPreview": true,
       "renewalDomainSplitDurabilityClosedPendingPreview": true,
       "issuanceCreateAdvanceDurableRootCauseClosedPendingPreview": true,
-      "authenticatedPreviewRunId": 36624806450,
+      "authenticatedPreviewRunId": 36640733189,
       "activeRoleScopeRuntimePass": true,
       "clientCreateEditRuntimePass": true,
       "policyVehicleRuntimePass": true,
@@ -2896,13 +2896,13 @@
         "fixtureWriteRole": "AdminTenant",
         "status": "READY_FOR_TARGETED_HUMAN_UAT",
         "user": {
-          "id": "b2-user-36624806450",
-          "name": "B2 QA Usuario 36624806450",
+          "id": "b2-user-36640733189",
+          "name": "B2 QA Usuario 36640733189",
           "search": "B2 QA Usuario"
         },
         "insurer": {
-          "id": "b2-asg-36624806450",
-          "name": "B2 QA Aseguradora 36624806450",
+          "id": "b2-asg-36640733189",
+          "name": "B2 QA Aseguradora 36640733189",
           "search": "B2 QA Aseguradora"
         },
         "noAuthUser": true,
