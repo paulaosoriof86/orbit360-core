@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B2_EXECUTION_LOCK_V1",
   "block": "B2",
-  "status": "PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL",
+  "status": "PREVIEW_R102_MACHINE_PASS_PENDING_TARGETED_HUMAN_RETEST",
   "recordedAt": "2026-09-24",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -1993,9 +1993,7 @@
     "livePromoted": false
   },
   "nextRequiredProof": [
-    "R102_NEW_EXACT_PREVIEW_MACHINE_RENDER_PASS",
-    "PAULA_R102_TARGETED_HUMAN_RETEST",
-    "FINAL_SYNTHETIC_CLEANUP"
+    "PAULA_R102_TARGETED_HUMAN_RETEST"
   ],
   "lastAuthenticatedFailure": {
     "runId": 36161855364,
@@ -3112,15 +3110,15 @@
   "driveHumanFixture": {
     "status": "READY_FOR_TARGETED_HUMAN_UAT",
     "tenantId": "alianzas-soluciones",
-    "clientId": "b2-drive-human-36622988522",
+    "clientId": "b2-drive-human-36640733189",
     "clientName": "B2 QA · Cliente documentos · NO OPERATIVO",
     "searchText": "Cliente documentos",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36622988522-gy3bsyhy.web.app",
-    "sourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
-    "buildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
-    "previewRunId": 36622988522,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36640733189-i4w5i8mn.web.app",
+    "sourceSha": "99edf875d2e36bcdf8057aaae5d72f37b4969191",
+    "buildId": "gi-i65-b2-99edf875d2e3-57f234755dc1",
+    "previewRunId": 36640733189,
     "firestoreReadback": true,
-    "driveExpectedRoot": "_GRAVICENTRA_PREVIEW_QA/b2-drive-human-36622988522",
+    "driveExpectedRoot": "_GRAVICENTRA_PREVIEW_QA/b2-drive-human-36640733189",
     "boundaries": {
       "syntheticOnly": true,
       "livePromotion": false,
@@ -3128,8 +3126,8 @@
       "realClientMutation": false,
       "cleanupMandatory": true
     },
-    "createdAt": "2026-09-29T21:47:48.297Z",
-    "fixtureRunId": 36635487618,
+    "createdAt": "2026-09-29T22:46:33.614Z",
+    "fixtureRunId": 36640733189,
     "humanProofPending": true,
     "cleanupPending": true
   },
@@ -4043,13 +4041,13 @@
     "fixtureWriteRole": "AdminTenant",
     "status": "READY_FOR_FIVE_TARGETED_HUMAN_TESTS",
     "user": {
-      "id": "b2-user-36624806450",
-      "name": "B2 QA Usuario 36624806450",
+      "id": "b2-user-36640733189",
+      "name": "B2 QA Usuario 36640733189",
       "search": "B2 QA Usuario"
     },
     "insurer": {
-      "id": "b2-asg-36624806450",
-      "name": "B2 QA Aseguradora 36624806450",
+      "id": "b2-asg-36640733189",
+      "name": "B2 QA Aseguradora 36640733189",
       "search": "B2 QA Aseguradora"
     },
     "noAuthUser": true,
@@ -4059,15 +4057,15 @@
     "drive": {
       "status": "READY_FOR_TARGETED_HUMAN_UAT",
       "tenantId": "alianzas-soluciones",
-      "clientId": "b2-drive-human-36622988522",
+      "clientId": "b2-drive-human-36640733189",
       "clientName": "B2 QA · Cliente documentos · NO OPERATIVO",
       "searchText": "Cliente documentos",
-      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36622988522-gy3bsyhy.web.app",
-      "sourceSha": "239dea3e27f78e2c5c695f0a808bcb25958c2ce1",
-      "buildId": "gi-i65-b2-239dea3e27f7-57f234755dc1",
-      "previewRunId": 36622988522,
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36640733189-i4w5i8mn.web.app",
+      "sourceSha": "99edf875d2e36bcdf8057aaae5d72f37b4969191",
+      "buildId": "gi-i65-b2-99edf875d2e3-57f234755dc1",
+      "previewRunId": 36640733189,
       "firestoreReadback": true,
-      "driveExpectedRoot": "_GRAVICENTRA_PREVIEW_QA/b2-drive-human-36622988522",
+      "driveExpectedRoot": "_GRAVICENTRA_PREVIEW_QA/b2-drive-human-36640733189",
       "boundaries": {
         "syntheticOnly": true,
         "livePromotion": false,
@@ -4075,8 +4073,8 @@
         "realClientMutation": false,
         "cleanupMandatory": true
       },
-      "createdAt": "2026-09-29T21:47:48.297Z",
-      "fixtureRunId": 36635487618,
+      "createdAt": "2026-09-29T22:46:33.614Z",
+      "fixtureRunId": 36640733189,
       "humanProofPending": true,
       "cleanupPending": true
     }
