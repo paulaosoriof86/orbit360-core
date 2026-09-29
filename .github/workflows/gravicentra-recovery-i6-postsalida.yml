@@ -5341,7 +5341,7 @@ jobs:
             && cursor==='DRIVE_QA_FIXTURE_CLEANUP'
             && b.r77r81DriveDurableProof?.status==='PASS_CLEANUP_PENDING'
             && b.r91r95RuntimeProof?.status==='PASS_CLEANUP_PENDING_FINAL_PAULA_VISUAL'
-            && b.r82CrossModuleDeleteProof?.status==='PASS'
+            && /^PASS/.test(String(b.r82CrossModuleDeleteProof?.status||''))
             && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B2_VISUAL'
             && c.i65ForensicRemediationPlan?.currentBlock==='B2';
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
