@@ -1,6 +1,5 @@
 'use strict';
 
-const { buildSourceOnlyCallables } = require('./cotcomp-callable-source');
 const stagingDeps = require('./cotcomp-staging-deps-candidate');
 
 const VERSION = 'ays-cotcomp-runtime-entry-candidate-s413-v0.1';
@@ -49,7 +48,7 @@ function buildCandidateExports(input = {}) {
 
   return {
     ok: true,
-    exports: buildSourceOnlyCallables({
+    exports: require('./cotcomp-callable-source').buildSourceOnlyCallables({
       verifyCaseAccess: stagingDeps.verifyCaseAccess,
       loadProposals: stagingDeps.loadProposals
     }),
