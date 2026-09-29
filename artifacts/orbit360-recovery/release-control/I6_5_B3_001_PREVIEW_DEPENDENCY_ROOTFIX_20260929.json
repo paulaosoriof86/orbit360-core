@@ -1,0 +1,30 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_001_PREVIEW_DEPENDENCY_ROOTFIX_V1",
+  "recordedAt": "2026-09-29",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B3",
+  "findingId": "B3-001",
+  "status": "MECHANISM_FIXED_PENDING_RERUN",
+  "failedRunId": 36647737468,
+  "failedJobId": 109674511320,
+  "failedStep": "Snapshot canonical branding for B3-001",
+  "rootCause": "The B3-001 Preview job reused tools/gravicentra-i6-5-b1-branding-snapshot.mjs, which imports firebase-admin, but the B3 job installed only firebase-tools.",
+  "correction": {
+    "workflow": ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+    "workflowBlobSha": "0ed5b163444053988da72feb13f0a2060fd0b09e",
+    "dependency": "firebase-admin@13.4.0",
+    "productSourceChanged": false
+  },
+  "proofBeforeFailure": {
+    "b3001Gate": "PASS",
+    "liveUnchanged": "PASS",
+    "b3001SourceContract": "PASS"
+  },
+  "boundaries": {
+    "noDataMutation": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB4": true
+  }
+}

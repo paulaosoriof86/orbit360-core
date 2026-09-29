@@ -5755,6 +5755,7 @@ jobs:
           pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
           PY
           CROOT="$RUNNER_TEMP/b3-firebase-cli";npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
           node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CROOT"
           CLI="$CROOT/node_modules/firebase-tools/lib/bin/firebase.js";echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
           SEL='';while read -r F;do if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1;then SEL="$F";break;fi;done<"$ROOT/files"
