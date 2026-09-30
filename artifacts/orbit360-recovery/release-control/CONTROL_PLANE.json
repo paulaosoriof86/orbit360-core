@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_SURFACE_CONTRACT",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -3184,16 +3184,16 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "B3_004_SURFACES_FIXED_PENDING_CONTRACT",
+      "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "aeb0501dbb56647c7fdbc18b3360740f4515a37e",
+      "executionLockBlobSha": "b8f193cd6fabb496c4a38ffe0e69d92761243874",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
-      "productMutationAuthorized": true,
+      "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "mechanismRootFix": {
@@ -3221,7 +3221,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "4f7ecda1ab842aef4168602f2fbabca68ed935a7",
+      "findingLedgerBlobSha": "2cf5825d9a23292b27e3c0b5b3966f3c7e9e315c",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "diagnosticRunId": 36658190622,
@@ -3458,7 +3458,7 @@
       "visualPreflightReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REJECTION_20260930.json",
       "visualPreflightReceiptBlobSha": "b332b18224cad8688532dc8f5d96f804d8a8d7f1",
       "visualSemanticRemediation": {
-        "status": "SOURCE_FIXED_PENDING_CONTRACT",
+        "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
         "changedProductFiles": [
           "orbit360-platform/modules/cobros.js",
           "orbit360-platform/modules/cliente360.js"
@@ -3471,7 +3471,11 @@
         },
         "dataMutation": false,
         "reimport": false,
-        "livePromotion": false
+        "livePromotion": false,
+        "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_VISUAL_SEMANTIC_REMEDIATION_CONTRACT_PASS_20260930.json",
+        "contractReceiptBlobSha": "95bf858308f2183fa08d834d85ccd794d2871d03",
+        "contractRunId": 36726907190,
+        "contractJobId": 109926025043
       }
     }
   },
@@ -3480,7 +3484,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "d2785bca12bf76ccaa186f7baf145aef7e1277cb",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "4f7ecda1ab842aef4168602f2fbabca68ed935a7",
+    "findingLedgerBlobSha": "2cf5825d9a23292b27e3c0b5b3966f3c7e9e315c",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -3492,7 +3496,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_004_SURFACE_CONTRACT_AFTER_VISUAL_REMEDIATION"
+    "nextAction": "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

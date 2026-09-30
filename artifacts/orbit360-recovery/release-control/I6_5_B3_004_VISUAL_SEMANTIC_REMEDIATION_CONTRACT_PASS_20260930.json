@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_VISUAL_SEMANTIC_REMEDIATION_CONTRACT_PASS_V1",
+  "status": "PASS",
+  "recordedAt": "2026-09-30",
+  "sourceCommit": "23e25511991eba33f74129540615c448bcfb1945",
+  "workflow": {
+    "name": "Gravicentra I6 Post-Salida",
+    "runId": 36726907190,
+    "jobId": 109926025043,
+    "conclusion": "success",
+    "evidence": [
+      "B3_004_SURFACE_CONVERGENCE_CONTRACT=PASS",
+      "B3_004_PAYMENT_PROVENANCE_CONTRACT=PASS",
+      "B3_004_SURFACE_CONVERGENCE=PASS"
+    ]
+  },
+  "exactBlobs": {
+    "orbit360-platform/modules/cobros.js": "5c5aeaba9a53e5716f962cd3e77c892b81905d34",
+    "orbit360-platform/modules/cliente360.js": "466852427fe6152edb57ae30c510a15878d522e0",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "a2264accb652fe382724099e9fc04a357c62eb70"
+  },
+  "assertions": {
+    "invoiceNotPresentedAsActualPaidDate": true,
+    "paymentInferredAndApplicationDatesDistinct": true,
+    "clientReportedUniqueValidMatchAutocommitCopy": true,
+    "cliente360DelegatesCanonicalCobrosFlow": true,
+    "wrongFinanzasStatementDestinationRemoved": true,
+    "businessDataWrites": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS"
+}

@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_SURFACES_FIXED_PENDING_CONTRACT",
+  "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "SURFACES_FIXED_PENDING_CONTRACT",
+    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
     "boundaries": {
@@ -78,7 +78,7 @@
     "subFindings": [
       {
         "id": "B3-004-R2-VISUAL-PAYMENT-SEMANTICS",
-        "status": "SOURCE_FIXED_PENDING_CONTRACT",
+        "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
         "blocking": true,
         "rootCause": "EXACT_PREVIEW_RENDERS_LEGACY_INVOICE_DATE_LABEL_AND_HUMAN_VALIDATION_COPY",
         "remediation": "Align visible Cobros/Cliente360 temporal semantics and client-reported payment copy with Payment Lock V2; preserve canonical command owner.",
@@ -87,9 +87,13 @@
           "orbit360-platform/modules/cliente360.js"
         ],
         "qaGuardFile": "tools/gravicentra-i6-5-b3-004-contract.mjs",
-        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REJECTION_20260930.json"
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REJECTION_20260930.json",
+        "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_VISUAL_SEMANTIC_REMEDIATION_CONTRACT_PASS_20260930.json",
+        "contractReceiptBlobSha": "95bf858308f2183fa08d834d85ccd794d2871d03"
       }
-    ]
+    ],
+    "visualSemanticContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_VISUAL_SEMANTIC_REMEDIATION_CONTRACT_PASS_20260930.json",
+    "visualSemanticContractReceiptBlobSha": "95bf858308f2183fa08d834d85ccd794d2871d03"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -101,7 +105,6 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_004_SURFACE_CONTRACT_PASS_AFTER_VISUAL_REMEDIATION",
     "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS",
     "B3_004_TARGETED_VISUAL_PASS"
   ],
@@ -131,7 +134,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
@@ -248,7 +251,7 @@
     "idContract": "ALPHANUMERIC_LEADING_ID_COMPATIBLE_WITH_CANONICAL_COMMAND"
   },
   "visualPreflight": {
-    "status": "FAIL_REMEDIATED_PENDING_CONTRACT",
+    "status": "REMEDIATION_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REJECTION_20260930.json",
     "receiptBlobSha": "b332b18224cad8688532dc8f5d96f804d8a8d7f1",
     "rejectedPreview": {
@@ -264,6 +267,8 @@
       "syntheticProofPass": true,
       "cleanupPass": true,
       "liveUnchanged": true
-    }
+    },
+    "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_VISUAL_SEMANTIC_REMEDIATION_CONTRACT_PASS_20260930.json",
+    "contractReceiptBlobSha": "95bf858308f2183fa08d834d85ccd794d2871d03"
   }
 }
