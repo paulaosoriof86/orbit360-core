@@ -138,11 +138,11 @@
     "orbit360-platform/core/access-scope.js": "f50156162f59e105d3564c1c3f6036daf03ebd56",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "6decc66566ca6b6fe1761fb0d2db5a108e9d1033",
-    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "601e07ecc6a420a30c1de743c6a256f0f38b3d78",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "71c88c358d4eeb7ea185513f7e6f23959300c094",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
-    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "8f668d6db0cf8e513c4ff17f12a46c73fa150da1",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "b1313a77db2950e4f70f9e44d052d0c2fa39e980",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "774c6cbe32be08f23e45f37b8e12e56f9be08bf3",
     "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
@@ -170,13 +170,13 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "dbc6ae798f580ee991fd3053e9822f3bd7c0825b",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "4efd278dfa790f99901a178d1d07c51f9e025dc1",
+    "orbit360-platform/index.html": "405337c13fa3292f63832f3dff5bc92c3291ffae",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
-    "orbit360-platform/modules/cliente360.js": "9ef53b323d3532b53400067425579960ffba77f6",
+    "orbit360-platform/modules/cliente360.js": "68072f7b59781145538c2b3e6312b5190f4806b5",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
-    "orbit360-platform/modules/cobros.js": "9d2a3c423e130ff4bdcc88832e7640dbe61fa0ac",
+    "orbit360-platform/modules/cobros.js": "0aa93dc3f8cb354dccfad926cc24245f161ac1ea",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
@@ -193,7 +193,8 @@
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "72a064d7b97308dd6c54c163ca8858915031d6f4",
     "orbit360-platform/styles/infra.css": "422a85b851d85efe9c53aca8a4364880730ab9a9",
-    "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b"
+    "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
+    "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -359,18 +360,19 @@
     "b3002MustRegress": true
   },
   "b3004PaymentOwner": {
-    "status": "ACTION_SURFACES_SOURCE_FIXED_PENDING_CONTRACT",
+    "status": "R5_CRM_ORIGIN_SOURCE_FIXED_PENDING_CONTRACT",
     "findingId": "B3-004",
     "canonicalServerOwner": "functions/cobros-reconciliation-domain.js",
     "canonicalBrowserOwner": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
     "exactBlobBindings": {
       "functions/cobros-reconciliation-domain.js": "1f2d89428b99368dc058218d62d33ddd4ec804a2",
-      "orbit360-platform/core/cobros-reconciliation-domain-client.js": "8f668d6db0cf8e513c4ff17f12a46c73fa150da1",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
-      "orbit360-platform/index.html": "0d94cd428b03443d52d3400bce6354c8ed1dfb5a",
-      "orbit360-platform/modules/cliente360.js": "c684fef4d21f8867d9919623c5cab316752a2dfd",
-      "orbit360-platform/modules/cobros.js": "3ef70a2e3cbbd62ab245788096cbc41e02aa733f",
-      "orbit360-platform/modules/portal.js": "fc23c03e4c59c256be81553e472dee6d2d4ef895"
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js": "b1313a77db2950e4f70f9e44d052d0c2fa39e980",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "71c88c358d4eeb7ea185513f7e6f23959300c094",
+      "orbit360-platform/index.html": "405337c13fa3292f63832f3dff5bc92c3291ffae",
+      "orbit360-platform/modules/cliente360.js": "68072f7b59781145538c2b3e6312b5190f4806b5",
+      "orbit360-platform/modules/cobros.js": "0aa93dc3f8cb354dccfad926cc24245f161ac1ea",
+      "orbit360-platform/modules/portal.js": "fc23c03e4c59c256be81553e472dee6d2d4ef895",
+      "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955"
     },
     "temporalContract": "paidDate != inferredEffectiveDate != applicationDate != reconciledAt",
     "provenanceContract": "later application evidence enriches same payment without rewriting payment origin",
@@ -382,12 +384,13 @@
   "lastAuthorizedMutation": {
     "date": "2026-09-30",
     "gate": "I6.5-B3-004",
-    "reason": "PAULA_TARGETED_VISUAL_REJECTION_APPLY_VS_RECONCILE_R4",
+    "reason": "PAULA_CLARIFIED_SIGA_MIGRATION_IS_DIRECT_PAYMENT_EVIDENCE_NOT_CLIENT_PORTAL_REPORT",
     "changedProductFiles": [
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+      "orbit360-platform/modules/portal-v1142-copyfix.js",
       "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/index.html"
     ],
     "noDataMutation": true,
@@ -477,5 +480,27 @@
       "contractRunId": 36737880811,
       "contractJobId": 109964252116
     }
+  },
+  "b3004CrmMigrationOriginR5": {
+    "status": "SURFACES_FIXED_PENDING_CONTRACT",
+    "findingId": "B3-004",
+    "subFindingId": "B3-004-R5-CRM-MIGRATION-PROVENANCE-AND-COPYFIX",
+    "rootCause": "MIGRATED_CRM_DIRECT_PAYMENT_COLLAPSED_INTO_CLIENT_REPORT_PLUS_GLOBAL_COPYFIX_REWRITES_CANONICAL_PAYMENT_LABELS",
+    "exactBlobBindings": {
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js": "b1313a77db2950e4f70f9e44d052d0c2fa39e980",
+      "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
+      "orbit360-platform/modules/cobros.js": "0aa93dc3f8cb354dccfad926cc24245f161ac1ea",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "71c88c358d4eeb7ea185513f7e6f23959300c094",
+      "orbit360-platform/modules/cliente360.js": "68072f7b59781145538c2b3e6312b5190f4806b5",
+      "orbit360-platform/index.html": "405337c13fa3292f63832f3dff5bc92c3291ffae",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "883257d8a29f6bab43651280757521d8910a6532"
+    },
+    "paymentLockV3Path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V3_20260930.json",
+    "paymentLockV3BlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_SOURCE_FIX_20260930.json",
+    "sourceFixReceiptBlobSha": "4c77da96d75abbcfb9dcf572d3a826dc21a8ab81",
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

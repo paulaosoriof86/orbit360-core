@@ -5,8 +5,17 @@
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
-  const VERSION='orbit360-cobros-reconciliation-client-v3-payment-owner';
+  const VERSION='orbit360-cobros-reconciliation-client-v4-payment-origin';
   const text=value=>String(value==null?'':value).trim();
+  const low=value=>text(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  function classifyPaymentOrigin(row){
+    row=row||{};
+    const explicit=[row.evidenceType,row.sourceType,row.paymentSourceType,row.originType,row.origenTipo].map(low).join('|');
+    const authority=[row.fuenteAutoridad,row.origenAutoridad,row.fuenteConciliacion,row.authority,row.sourceAuthority].map(low).join('|');
+    if(/client[_ -]?reported|client[_ -]?portal|portal[_ -]?client|cliente[_ -]?portal/.test(explicit+'|'+authority))return 'CLIENT_PORTAL';
+    if(/cobros[_ -]?realizados|direct[_ -]?payment[_ -]?reported[_ -]?crm/.test(explicit)||/(^|[| _-])(siga|crm)([| _-]|$)/.test(authority))return 'CRM_DIRECT';
+    return 'UNKNOWN';
+  }
   const backend=()=>window.OrbitBackend||{};
   const provider=()=>window.Orbit&&Orbit.productRuntimeBrowserProvidersP0;
   const tenantId=()=>text(backend().tenantId||backend().tenant);
@@ -26,5 +35,5 @@
   function confirmProposal(proposalId,options){options=options||{};return command('confirm_application',{payload:Object.assign({proposalId},options.payload||{}),reason:options.reason||options.motivo||'Conciliación confirmada por usuario autorizado'});}
   function holdProposal(proposalId,motivo,accionRequerida){return command('hold_proposal',{payload:{proposalId,accionRequerida},reason:motivo});}
   function status(){return Object.freeze({version:VERSION,functionName:functionName(),tenantId:tenantId(),activeRole:activeRole(),region:region(),enabled:enabled(),available:available(),transport:'firebase-functions-modular'});}
-  Orbit.reconciliationDomain=Object.freeze({VERSION,enabled,available,command,previewPolicy,applyPayment,reportClientPayment,enrichApplication,confirmProposal,holdProposal,status});
+  Orbit.reconciliationDomain=Object.freeze({VERSION,enabled,available,classifyPaymentOrigin,command,previewPolicy,applyPayment,reportClientPayment,enrichApplication,confirmProposal,holdProposal,status});
 })();

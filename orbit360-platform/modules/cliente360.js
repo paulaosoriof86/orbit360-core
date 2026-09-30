@@ -555,8 +555,14 @@ Orbit.modules.cliente360 = (function () {
     });
     const cob = cobAll.filter(c => !polFil || c.polizaId === polFil).sort((a, b) => (b.vence||'').localeCompare(a.vence||''));
     const receiptSource = q.recibosEsperadosDe ? q.recibosEsperadosDe(cid) : S().where('recibosEsperados', x => x && x.clienteId === cid);
-    const reportedAll = (receiptSource || []).filter(x => x && String(x.estadoOperativo || '').toLowerCase() === 'pago_reportado' && activePolicyIds.has(String(x.polizaId || '')));
+    const evidenceAll = (receiptSource || []).filter(x => x && String(x.estadoOperativo || '').toLowerCase() === 'pago_reportado' && activePolicyIds.has(String(x.polizaId || '')));
+    const paymentOriginKind = x => { try { if (Orbit.reconciliationDomain && typeof Orbit.reconciliationDomain.classifyPaymentOrigin === 'function') return Orbit.reconciliationDomain.classifyPaymentOrigin(x); } catch (e) {} return 'UNKNOWN'; };
+    const crmDirectAll = evidenceAll.filter(x => paymentOriginKind(x) === 'CRM_DIRECT');
+    const reportedAll = evidenceAll.filter(x => paymentOriginKind(x) === 'CLIENT_PORTAL');
+    const unknownEvidenceAll = evidenceAll.filter(x => paymentOriginKind(x) === 'UNKNOWN');
+    const crmDirect = crmDirectAll.filter(x => !polFil || x.polizaId === polFil).sort((a,b) => String(b.fechaPagoReportada||b.fechaPago||'').localeCompare(String(a.fechaPagoReportada||a.fechaPago||'')));
     const reported = reportedAll.filter(x => !polFil || x.polizaId === polFil).sort((a,b) => String(b.fechaPagoReportada||b.fechaPago||'').localeCompare(String(a.fechaPagoReportada||a.fechaPago||'')));
+    const unknownEvidence = unknownEvidenceAll.filter(x => !polFil || x.polizaId === polFil);
     const polOptions = '<option value="">Todas las pólizas vigentes</option>' + activePolicies.map(p => {
       const ase = S().all('aseguradoras').find(a => a && a.id === p.aseguradoraId);
       const lbl = (p.numero||'—') + ' · ' + (ase ? ase.nombre : '—') + (p.ramo ? ' · '+p.ramo : '');
@@ -576,6 +582,13 @@ Orbit.modules.cliente360 = (function () {
         <td style="text-align:right;white-space:nowrap">${c.conciliado ? '<span class="badge ok">Conciliado</span>' : `<button class="btn primary sm" data-c360-conciliar="${c.id}">Conciliar</button>`}</td>
       </tr>`;
     }).join('');
+    const crmDirectRows = crmDirect.map(x => {
+      const p = S().get('polizas', x.polizaId);
+      const amount = U.finiteNumber(x.primaTotal != null ? x.primaTotal : (x.montoTotal != null ? x.montoTotal : x.monto));
+      const paymentDate = x.paidDate || x.fechaPago || x.fechaPagoReportada || '';
+      const method = x.paymentMethod || x.metodoPago || x.metodo || x.formaPago || '';
+      return `<tr data-siga-direct-payment="1"><td><span class="mono" style="font-size:12px">${p ? p.numero : (x.polizaNumero || '—')}</span></td><td>${U.esc(x.serie || x.cuota || x.numeroReciboFuente || '—')}</td><td class="num">${amount == null ? '<span class="muted">—</span>' : U.money(amount, x.moneda || (p && p.moneda) || r.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(x.fechaLimite || x.vence || x.fechaVencimiento)}</td><td style="font-size:12.5px">${paymentDate ? U.fmtDate(paymentDate) : '<span class="muted">—</span>'}</td><td style="font-size:12.5px">${method ? U.esc(method) : '<span class="muted">—</span>'}</td><td><span class="badge ok">Pago registrado en SIGA</span></td><td><span class="badge warn">Pendiente de conciliación</span></td><td><span class="badge info">Conciliación automática</span></td></tr>`;
+    }).join('');
     const reportedRows = reported.map(x => {
       const p = S().get('polizas', x.polizaId);
       const amount = U.finiteNumber(x.primaTotal != null ? x.primaTotal : (x.montoTotal != null ? x.montoTotal : x.monto));
@@ -593,10 +606,13 @@ Orbit.modules.cliente360 = (function () {
         <td><span class="muted">Aplicar desde Recibos y pagos</span></td>
       </tr>`;
     }).join('');
-    const visibleRows = confirmedRows + reportedRows;
-    const note = reported.length
-      ? `Hay <b>${reported.length}</b> pago(s) reportado(s) pendientes de materialización canónica. Se muestran como evidencia histórica hasta ejecutar la aplicación idempotente.`
-      : 'No hay pagos reportados pendientes de validación para el filtro actual.';
+    const unknownRows = unknownEvidence.map(x => { const p=S().get('polizas',x.polizaId); return `<tr data-payment-origin-review="1"><td><span class="mono" style="font-size:12px">${p?p.numero:'—'}</span></td><td>${U.esc(x.serie||x.cuota||'—')}</td><td colspan="5"><span class="badge warn">Origen de pago por confirmar</span></td><td><span class="badge warn">Revisión</span></td><td></td></tr>`; }).join('');
+    const visibleRows = confirmedRows + crmDirectRows + reportedRows + unknownRows;
+    const noteParts = [];
+    if (crmDirect.length) noteParts.push(`<b>${crmDirect.length}</b> pago(s) registrados en SIGA listos para materialización y conciliación canónica automática; no requieren aplicación manual.`);
+    if (reported.length) noteParts.push(`<b>${reported.length}</b> pago(s) realmente reportados desde portal pendientes de aplicación automática.`);
+    if (unknownEvidence.length) noteParts.push(`<b>${unknownEvidence.length}</b> evidencia(s) con origen por confirmar.`);
+    const note = noteParts.join(' ') || 'No hay pagos pendientes de conciliación para el filtro actual.';
     return `<div class="card" data-rp-native-cobros-note="1" style="padding:12px 14px;margin-bottom:12px"><b>Cobros y evidencia de pago</b><div class="muted" style="font-size:12.5px;margin-top:3px">${note} Los cobros confirmados se muestran en la misma tabla y su conciliación se mantiene separada.</div></div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="cob-pol-fil" class="o-sel" style="max-width:360px;font-size:12.5px">${polOptions}</select></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
       ${miniStat('Cobrado confirmado', U.money(r.cobrado, r.moneda), 'ok')}
@@ -605,7 +621,7 @@ Orbit.modules.cliente360 = (function () {
     </div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Método</th><th>Estado</th><th>Conciliación</th><th>Acción</th></tr></thead>
-      <tbody>${visibleRows || '<tr><td colspan="9" class="muted" style="text-align:center;padding:28px">Sin cobros confirmados ni pagos reportados para el filtro actual.</td></tr>'}</tbody>
+      <tbody>${visibleRows || '<tr><td colspan="9" class="muted" style="text-align:center;padding:28px">Sin cobros ni evidencia de pago para el filtro actual.</td></tr>'}</tbody>
     </table></div>
     <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Pago reportado ≠ cobro confirmado. Cobro confirmado ≠ necesariamente conciliado. La conciliación no cambia la fecha real del pago.</div></div>`;
   }

@@ -12,6 +12,7 @@ window.Orbit = window.Orbit || {};
   var academiaStoreEnsured = false;
   var academiaStoreEnsuring = false;
   var applyTimer = 0;
+  // Payment-state terminology is canonical and must never be globally rewritten here.
   var phrasePairs = [
     ['✓ Pago reportado · el equipo lo validará', '✓ Recibimos tu reporte · pendiente de revisión/conciliación'],
     ['El equipo lo valida y te confirma.', 'Queda pendiente de revisión/conciliación y te confirmaremos cuando quede conciliado.'],
@@ -19,23 +20,11 @@ window.Orbit = window.Orbit || {};
     [TODO + '.', 'Sin diferencias detectadas.'],
     [TODO, 'Sin diferencias detectadas'],
     ['Todo ' + A, 'Cartera al día'],
-    [AP.charAt(0).toUpperCase() + AP.slice(1) + ' pago', 'Confirmar cobro'],
-    ['Pago ' + A, 'Cobro confirmado'],
-    ['Aplicado a póliza', 'Confirmado y conciliado con póliza'],
-    ['Pagos no ' + A + 's', 'Pagos pendientes de validación'],
-    ['pago sin ' + AP, 'pendiente de conciliación'],
-    ['pagos aún no ' + A + 's', 'pagos pendientes de validación'],
-    ['pagos no ' + A + 's a póliza', 'pagos pendientes de relación con recibo/póliza'],
-    ['Pagado en banco, sin ' + AP, 'Pago en banco pendiente de validación'],
-    ['pago no ' + A, 'propuesta pendiente de conciliación'],
-    ['Importación lista para ' + AP, 'Importación lista para revisión/aprobación'],
-    [AP.charAt(0).toUpperCase() + AP.slice(1) + ' pagos por póliza', 'Revisar propuestas de conciliación'],
     ['Se crearán al confirmar', 'Se propondrán para revisión'],
     ['Alcance (crea/actualiza)', 'Alcance permitido / efecto propuesto'],
     ['Simulación preescritura', 'Revisión previa'],
     ['Simulación pre-escritura', 'Revisión previa'],
     [AP.charAt(0).toUpperCase() + AP.slice(1) + ' mapeo', 'Confirmar mapeo'],
-    ['Doble conciliación: pago ' + A + ' a póliza creada', 'Doble conciliación: cobro confirmado/conciliado con póliza'],
     ['listas p/ backend', 'listas para revisión técnica']
   ];
   function replaceTextValue(t) {

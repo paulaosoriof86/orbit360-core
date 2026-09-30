@@ -89,3 +89,18 @@ need(!cobros.includes('Confirmar cobro'),'B3_004_GLOBAL_CONFIRMAR_COBRO_REMAINS'
 need(indexR4.includes('modules/cobros.js?v=20260930-b3004r4'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r4'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT=PASS');
+
+const domainClient=read('orbit360-platform/core/cobros-reconciliation-domain-client.js');
+const portalCopyFix=read('orbit360-platform/modules/portal-v1142-copyfix.js');
+need(domainClient.includes('classifyPaymentOrigin'),'B3_004_PAYMENT_ORIGIN_CLASSIFIER_MISSING');
+need(domainClient.includes("return 'CRM_DIRECT'"),'B3_004_CRM_DIRECT_CLASSIFICATION_MISSING');
+need(domainClient.includes("return 'CLIENT_PORTAL'"),'B3_004_CLIENT_PORTAL_CLASSIFICATION_MISSING');
+need(cobros.includes('Pago registrado en SIGA'),'B3_004_SIGA_DIRECT_PAYMENT_LABEL_MISSING');
+need(cobros.includes('Conciliación automática'),'B3_004_SIGA_AUTOMATIC_RECONCILIATION_LABEL_MISSING');
+need(cobros.includes('__crmDirectEvidence'),'B3_004_SIGA_DIRECT_EVIDENCE_BRANCH_MISSING');
+need(cobros.includes('__clientReportedEvidence'),'B3_004_CLIENT_REPORT_SEPARATION_MISSING');
+need(cliente.includes('Pago registrado en SIGA'),'B3_004_CLIENTE360_SIGA_DIRECT_LABEL_MISSING');
+need(nativeReceiptOwner.includes('Pago histórico registrado en SIGA'),'B3_004_RECEIPT_DETAIL_SIGA_SEMANTICS_MISSING');
+need(!portalCopyFix.includes("'Confirmar cobro'"),'B3_004_LEGACY_COPYFIX_STILL_REWRITES_APPLY_TO_CONFIRM');
+need(!portalCopyFix.includes("'Cobro confirmado'"),'B3_004_LEGACY_COPYFIX_STILL_REWRITES_PAID_STATE');
+console.log('B3_004_CRM_MIGRATION_ORIGIN_CONTRACT=PASS');

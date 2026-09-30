@@ -119,6 +119,13 @@
     var state=low(r.estadoConciliacion||r.estadoConciliado||r.estado||'');
     return r.conciliado===true||r.conciliadoPago===true||state==='conciliado'||state==='cobro conciliado'||state==='cobro_conciliado';
   }
+  function paymentOriginKind(r){
+    try{if(Orbit.reconciliationDomain&&typeof Orbit.reconciliationDomain.classifyPaymentOrigin==='function')return Orbit.reconciliationDomain.classifyPaymentOrigin(r);}catch(e){}
+    var source=low([r&&r.evidenceType,r&&r.sourceType,r&&r.fuenteAutoridad,r&&r.origenAutoridad,r&&r.fuenteConciliacion,r&&r.authority].filter(Boolean).join('|'));
+    if(/client[_ -]?reported|client[_ -]?portal|cliente[_ -]?portal/.test(source))return'CLIENT_PORTAL';
+    if(/cobros[_ -]?realizados|direct[_ -]?payment[_ -]?reported[_ -]?crm|(^|[| _-])(siga|crm)([| _-]|$)/.test(source))return'CRM_DIRECT';
+    return'UNKNOWN';
+  }
   function hasInsurerAuthority(r){
     if(!r)return false;
     var source=low(r.fuenteAutoridad||r.origenAutoridad||r.fuenteConciliacion||'');
@@ -132,7 +139,12 @@
   function reconciliationLabel(r,portfolio){
     if(isPaymentReconciled(r))return{t:'Cobro conciliado',c:'ok'};
     if(isPortfolioReconciled(portfolio))return{t:'Cartera conciliada con aseguradora',c:'ok'};
-    if(r&&low(r.estadoOperativo)==='pago_reportado')return{t:'Pago reportado · pendiente de aplicar',c:'info'};
+    if(r&&low(r.estadoOperativo)==='pago_reportado'){
+      var origin=paymentOriginKind(r);
+      if(origin==='CRM_DIRECT')return{t:'Pago registrado en SIGA · pendiente de conciliación',c:'ok'};
+      if(origin==='CLIENT_PORTAL')return{t:'Pago reportado por cliente · pendiente de aplicar',c:'info'};
+      return{t:'Origen de pago por confirmar',c:'warn'};
+    }
     if(r&&low(r.estadoOperativo)==='requiere_validacion_estado')return{t:'Requiere validación',c:'warn'};
     return{t:'Pendiente de conciliación',c:'warn'};
   }
@@ -143,7 +155,12 @@
     if(s==='futuro_pendiente')return{t:'Futuro',c:'warn'};
     if(s==='pendiente_vencido')return{t:'Vencido',c:'danger'};
     if(s==='pendiente_vence_corte')return{t:'Por vencer',c:'warn'};
-    if(s==='pago_reportado')return{t:'Pago reportado · pendiente de aplicar',c:'info'};
+    if(s==='pago_reportado'){
+      var origin=paymentOriginKind(r);
+      if(origin==='CRM_DIRECT')return{t:'Pago registrado en SIGA · pendiente de conciliación',c:'ok'};
+      if(origin==='CLIENT_PORTAL')return{t:'Pago reportado por cliente · pendiente de aplicar',c:'info'};
+      return{t:'Origen de pago por confirmar',c:'warn'};
+    }
     if(s==='no_pendiente_segun_aseguradora')return{t:'Sin saldo pendiente según aseguradora',c:'ok'};
     if(s==='requiere_validacion_estado')return{t:'Requiere validación',c:'warn'};
     return{t:s||'Pendiente',c:'warn'};
@@ -156,7 +173,13 @@
     var c=linkedCobro(r&&r.id),op=low(r&&r.estadoOperativo),paid=!!(c&&(low(c.estado)==='pagado'||c.paymentState==='PAID_DIRECT'||c.paymentState==='PAID_REPORTED'||c.paymentState==='PAID_INFERRED'));
     if(paid)return{kind:'applied',label:'Pago aplicado'};
     if(op==='requiere_validacion_estado'||op==='no_pendiente_segun_aseguradora')return{kind:'review',label:'Revisar'};
-    return{kind:op==='pago_reportado'?'reported':'apply',label:'Aplicar pago'};
+    if(op==='pago_reportado'){
+      var origin=paymentOriginKind(r);
+      if(origin==='CRM_DIRECT')return{kind:'crm_direct',label:'Pago registrado'};
+      if(origin==='CLIENT_PORTAL')return{kind:'reported',label:'Aplicar pago'};
+      return{kind:'review',label:'Revisar origen'};
+    }
+    return{kind:'apply',label:'Aplicar pago'};
   }
   function invokeReceiptPayment(receiptId,reported){
     var mod=Orbit.modules&&Orbit.modules.cobros;
@@ -172,6 +195,7 @@
   function actionHtml(r){
     var a=receiptAction(r),id=esc(r&&r.id);
     if(a.kind==='applied')return'<span class="badge ok">Pago aplicado</span>';
+    if(a.kind==='crm_direct')return'<span class="badge info">Listo para conciliación automática</span>';
     if(a.kind==='review')return'<span class="badge warn">Revisar</span>';
     return'<button class="btn primary sm" data-rp-apply-payment="'+id+'" data-rp-reported="'+(a.kind==='reported'?'1':'0')+'">Aplicar pago</button>';
   }
@@ -232,7 +256,12 @@
     if(isPaymentReconciled(r))return'Este pago ya fue conciliado contra fuentes autoritativas y se considera cobro conciliado.';
     if(isPortfolioReconciled(portfolio))return'El saldo pendiente fue conciliado contra la fuente de autoridad de la aseguradora. Esto confirma cartera; no equivale a un pago.';
     var s=clean(r&&r.estadoOperativo);
-    if(s==='pago_reportado')return'Existe evidencia de pago reportado. Si la coincidencia es única y válida, se aplica automáticamente; los casos ambiguos quedan para revisión.';
+    if(s==='pago_reportado'){
+      var origin=paymentOriginKind(r);
+      if(origin==='CRM_DIRECT')return'Pago histórico registrado en SIGA. Es evidencia directa de pago y no requiere aplicación manual; queda pendiente de conciliación canónica.';
+      if(origin==='CLIENT_PORTAL')return'Existe evidencia de pago reportado por el cliente. Si la coincidencia es única y válida, se aplica automáticamente; los casos ambiguos quedan para revisión.';
+      return'Existe evidencia de pago, pero su origen debe resolverse antes de materializar o conciliar.';
+    }
     if(s==='no_pendiente_segun_aseguradora')return'La aseguradora no reporta saldo pendiente; la ausencia de saldo no crea por sí sola un cobro conciliado.';
     if(s==='requiere_validacion_estado')return'El estado requiere validación antes de cualquier conciliación.';
     return'Este registro pertenece al calendario de recibos; los cobros conciliados se administran por separado.';

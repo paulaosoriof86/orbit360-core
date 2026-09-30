@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_SOURCE_FIX_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "findingId": "B3-004",
+  "subFindingId": "B3-004-R5-CRM-MIGRATION-PROVENANCE-AND-COPYFIX",
+  "status": "SURFACES_FIXED_PENDING_CONTRACT",
+  "humanEvidence": [
+    "Current portal payment intake is not operational; no client has directly uploaded a payment.",
+    "Rows shown as Reportado por cliente are migrated SIGA CRM payment history and must not require row-by-row application.",
+    "High-confidence reconciliation must also be batch/idempotent rather than row-by-row."
+  ],
+  "rootCause": [
+    "I6.5 receipt import intentionally wrote receipts/portfolio but not cobros; direct CRM payment evidence therefore remained represented on receipt rows.",
+    "UI equated estadoOperativo=pago_reportado with CLIENT_PORTAL origin instead of reading provenance.",
+    "portal-v1142-copyfix.js globally rewrote canonical payment labels after render, including Aplicar pago -> Confirmar cobro and Pago aplicado -> Cobro confirmado."
+  ],
+  "sourceAuthority": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
+      "blobSha": "90982e8fcbb88baa370350e0082c4db3b4474aa7",
+      "rule": "CobranzaCendoso (24) actual payment date is primary direct payment evidence."
+    },
+    {
+      "path": "orbit360-platform/docs/COBROS-CONCILIACION-FUENTES-INTAKE-20260801.json",
+      "blobSha": "1fe57ccfe49f2eea559852dccd6e63bbddaeb2f4",
+      "rule": "cobros_realizados authority DIRECT_PAYMENT_REPORTED_CRM."
+    }
+  ],
+  "changedProductBlobs": {
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "b1313a77db2950e4f70f9e44d052d0c2fa39e980",
+    "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
+    "orbit360-platform/modules/cobros.js": "0aa93dc3f8cb354dccfad926cc24245f161ac1ea",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "71c88c358d4eeb7ea185513f7e6f23959300c094",
+    "orbit360-platform/modules/cliente360.js": "68072f7b59781145538c2b3e6312b5190f4806b5",
+    "orbit360-platform/index.html": "405337c13fa3292f63832f3dff5bc92c3291ffae",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "883257d8a29f6bab43651280757521d8910a6532"
+  },
+  "paymentLockV3Path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V3_20260930.json",
+  "paymentLockV3BlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244",
+  "boundaries": {
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextRequiredProof": [
+    "B3_004_CRM_MIGRATION_ORIGIN_CONTRACT_PASS",
+    "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_TARGETED_VISUAL_PASS"
+  ],
+  "nextMechanism": "After B3-004 visual closure, B3-005 must prove batch/idempotent auto-materialization and reconciliation engine before any controlled operational materialization."
+}
