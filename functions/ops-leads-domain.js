@@ -173,9 +173,28 @@ function advisorAllowed(member, targetAdvisorId) {
   }
   return true;
 }
+function sanitizeCotcompRef(input) {
+  if (input == null) return null;
+  if (typeof input !== 'object' || Array.isArray(input)) throw new HttpsError('invalid-argument', 'Referencia CotComp inválida.');
+  const caseId = text(input.caseId, 180);
+  const journeyId = text(input.journeyId, 180);
+  const correlationId = text(input.correlationId, 180);
+  if (!caseId && !journeyId && !correlationId) return null;
+  if (!caseId || !journeyId || !correlationId) throw new HttpsError('invalid-argument', 'La referencia CotComp requiere caseId, journeyId y correlationId.');
+  return {
+    schemaVersion: 'orbit360-cotcomp-workflow-ref-v1',
+    role: text(input.role, 80),
+    caseId,
+    journeyId,
+    correlationId,
+    quoteCasePath: text(input.quoteCasePath, 500),
+    selectedProposalId: text(input.selectedProposalId, 180),
+    intakeStatus: text(input.intakeStatus || 'lead_recibido', 100)
+  };
+}
 function sanitizeBusiness(input, actor) {
   const stage = norm(input.stage || input.etapa || 'nuevo').replace(/ /g, '_');
-  return {
+  const row = {
     id: cleanId(input.id || `neg_${Date.now().toString(36)}`, 'businessId'),
     nombre: text(input.nombre || input.name, 220),
     tipo: text(input.tipo || input.type, 80),
@@ -193,9 +212,12 @@ function sanitizeBusiness(input, actor) {
     origen: text(input.origen || input.origin || 'Plataforma', 100),
     archivado: false
   };
+  const ref = sanitizeCotcompRef(input.cotcompRef);
+  if (ref) row.cotcompRef = ref;
+  return row;
 }
 function sanitizeManagement(input, actor) {
-  return {
+  const row = {
     id: cleanId(input.id || `ges_${Date.now().toString(36)}`, 'managementId'),
     lista: text(input.lista || input.opsList || 'Gestiones Admin', 120),
     tipo: text(input.tipo || input.type || 'Gestión', 180),
@@ -213,6 +235,9 @@ function sanitizeManagement(input, actor) {
     solicitanteId: text(input.solicitanteId || input.requesterId, 180),
     archivado: false
   };
+  const ref = sanitizeCotcompRef(input.cotcompRef);
+  if (ref) row.cotcompRef = ref;
+  return row;
 }
 function eventPayload({ tenantId, operation, entityType, entityId, actor, reason, before, after, requestId }) {
   return {
@@ -286,11 +311,19 @@ async function executeCommand(request) {
     } else if (operation === 'update_business') {
       const allowed = ['nombre', 'tipo', 'asesorId', 'clienteId', 'pais', 'moneda', 'canal', 'producto', 'ramo', 'aseguradoraId', 'primaEst', 'prioridad', 'proximoToque', 'descripcion'];
       allowed.forEach(key => { if (payload[key] !== undefined) after[key] = payload[key]; });
+      if (payload.cotcompRef !== undefined) {
+        const ref = sanitizeCotcompRef(payload.cotcompRef);
+        if (ref) after.cotcompRef = ref;
+      }
     } else if (operation === 'archive_business') {
       after.archivado = true;
     } else if (operation === 'update_management') {
       const allowed = ['lista', 'tipo', 'titulo', 'clienteId', 'polizaId', 'negocioId', 'asesorId', 'aseguradoraId', 'estado', 'prioridad', 'vence', 'proximaAccion', 'nota', 'resultado'];
       allowed.forEach(key => { if (payload[key] !== undefined) after[key] = payload[key]; });
+      if (payload.cotcompRef !== undefined) {
+        const ref = sanitizeCotcompRef(payload.cotcompRef);
+        if (ref) after.cotcompRef = ref;
+      }
     } else if (operation === 'assign_management') {
       after.asesorId = cleanId(payload.asesorId || payload.advisorId, 'advisorId');
       if (!advisorAllowed(authz.member, after.asesorId)) throw new HttpsError('permission-denied', 'El asesor está fuera de su alcance activo.');
