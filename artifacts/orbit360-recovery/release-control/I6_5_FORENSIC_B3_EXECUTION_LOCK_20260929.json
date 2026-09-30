@@ -154,7 +154,9 @@
       },
       "rootCause": "MEASURED_FACTS_REQUIRE_REVIEW_BEFORE_PRODUCT_FIX",
       "productFixAuthorizedByDiagnostic": false
-    }
+    },
+    "residualColdAnalysisReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_RESIDUAL_COLD_HYDRATION_ANALYSIS_20260929.json",
+    "residualColdDecision": "NO_ADDITIONAL_COBROS_SOURCE_CHANGE_BEFORE_TARGETED_HUMAN_PROOF"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
