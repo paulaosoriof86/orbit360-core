@@ -195,7 +195,7 @@
   "syntheticQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
     "purpose": "CREATE_RETRY_ENRICH_READBACK_CLEANUP_PROOF",
-    "idPrefix": "__b3004qa_",
+    "idPrefix": "b3004qa_",
     "allowedCollections": [
       "clientes",
       "polizas",
@@ -209,6 +209,7 @@
     "cleanupMustPassBeforeMachinePass": true,
     "operationalBusinessWritesAuthorized": false,
     "reimportAuthorized": false,
-    "livePromotionAuthorized": false
+    "livePromotionAuthorized": false,
+    "idContract": "ALPHANUMERIC_LEADING_ID_COMPATIBLE_WITH_CANONICAL_COMMAND"
   }
 }
