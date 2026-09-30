@@ -75,10 +75,10 @@ test('lead and ops projections carry the same case/journey/correlation',()=>{
   assert.equal(ops.requiredFields.businessId,r.identifiers.leadBusinessId);
 });
 
-test('current workflow schema blocker is explicit',()=>{
+test('undeployed workflow schema blocker is explicit',()=>{
   const r=p.buildInitialHandoffPlan(sample());
-  assert.equal(r.phases[1].blockedByCurrentWorkflowSchema,true);
-  assert.ok(r.blockers.includes('CURRENT_OPS_LEADS_SCHEMA_DOES_NOT_PRESERVE_COTCOMP_CORRELATION_FIELDS'));
+  assert.equal(r.phases[1].blockedByUndeployedWorkflowSchema,true);
+  assert.ok(r.blockers.includes('WORKFLOW_COTCOMP_SCHEMA_MERGED_SOURCE_NOT_DEPLOYED'));
 });
 
 test('notification is outbox-only and cannot invalidate the case',()=>{
