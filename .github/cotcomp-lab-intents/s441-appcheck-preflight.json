@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s441-appcheck-preflight-intent-v1.0",
   "authorization": "READ_ONLY_APPCHECK_PREFLIGHT",
-  "authorizedSourceParent": "75b405a7c468521ceeeb982bfe141acc567d38ef",
+  "authorizedSourceParent": "e22e84d9870a2e70e6f7c28f3f8efcd1f41e8a86",
   "projectId": "ays-orbit-360-lab",
   "environment": "LAB",
   "region": "us-central1",
@@ -10,5 +10,6 @@
   "appDataWrites": false,
   "deploy": false,
   "production": false,
-  "purpose": "DISCOVER_LAB_WEB_APP_AND_DEBUG_TOKEN_SECRET_READINESS_WITHOUT_SECURITY_WEAKENING"
+  "purpose": "DISCOVER_LAB_WEB_APP_AND_DEBUG_TOKEN_SECRET_READINESS_WITHOUT_SECURITY_WEAKENING",
+  "retriggerReason": "PREFLIGHT_WORKFLOW_HEREDOC_SYNTAX_FIXED_NO_FIREBASE_OR_APP_DATA_WRITE"
 }
