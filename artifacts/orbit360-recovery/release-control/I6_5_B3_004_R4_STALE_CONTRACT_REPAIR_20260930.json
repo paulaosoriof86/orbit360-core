@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R4_STALE_CONTRACT_REPAIR_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "findingId": "B3-004",
+  "subFindingId": "B3-004-R4-APPLY-VS-RECONCILE-SURFACE-BOUNDARY",
+  "status": "MECHANISM_FIXED_PENDING_RERUN",
+  "failedRunId": 36737203151,
+  "failedJobId": 109961924188,
+  "failureCode": "B3_004_CLIENTE360_CANONICAL_FLOW_COPY_MISSING",
+  "classification": "STALE_VALIDATOR_AFTER_APPROVED_SEMANTIC_CHANGE",
+  "productRegressionDemonstrated": false,
+  "productSourceChanged": false,
+  "cause": "The R3 contract still required the superseded Cliente360 copy 'abre el mismo flujo canónico de pago de Cobros y cartera' and the prior V920 receipt footer after R4 intentionally renamed the action to Aplicar pago and moved reconciliation to Cliente360 > Cobros.",
+  "repair": {
+    "qaGuardFile": "tools/gravicentra-i6-5-b3-004-contract.mjs",
+    "qaGuardBlobSha": "118854e2c3bace7477e4ae52060faf1a382abb3f",
+    "changes": [
+      "Require Aplicar pago canonical-flow copy instead of the superseded Confirmar cobro phrasing.",
+      "Keep auto-commit proof on the canonical Cobros copy.",
+      "Require the new Recibos y pagos application-only / Cobros reconciliation boundary copy.",
+      "Compile the neutralized policy-receipts-v1199 bridge with new Function before declaring the contract PASS."
+    ]
+  },
+  "failClosedProof": {
+    "nodeCheckCobrosPass": true,
+    "nodeCheckCliente360Pass": true,
+    "nodeCheckPortalPass": true,
+    "nodeCheckNativeReceiptOwnerPass": true,
+    "previewBuilt": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextRequiredProof": [
+    "B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT_PASS"
+  ]
+}

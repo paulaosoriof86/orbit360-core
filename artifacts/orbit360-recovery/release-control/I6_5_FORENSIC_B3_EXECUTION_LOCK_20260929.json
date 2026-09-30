@@ -140,7 +140,10 @@
         ],
         "qaGuardFile": "tools/gravicentra-i6-5-b3-004-contract.mjs",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_APPLY_VS_RECONCILE_R4_20260930.json",
-        "receiptBlobSha": "9c0db9b809cb106a286c297b6f95d03c119dce3a"
+        "receiptBlobSha": "9c0db9b809cb106a286c297b6f95d03c119dce3a",
+        "validatorRepairReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R4_STALE_CONTRACT_REPAIR_20260930.json",
+        "validatorRepairReceiptBlobSha": "5fff161b559c218d71782ad5470fbe79084b04d5",
+        "qaGuardBlobSha": "118854e2c3bace7477e4ae52060faf1a382abb3f"
       }
     ],
     "visualSemanticContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_VISUAL_SEMANTIC_REMEDIATION_CONTRACT_PASS_20260930.json",
@@ -173,17 +176,26 @@
       "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "c4382238964ba18ac9e0669f4e01dd0897681d62",
       "orbit360-platform/modules/cobros.js": "9d2a3c423e130ff4bdcc88832e7640dbe61fa0ac",
       "orbit360-platform/index.html": "4efd278dfa790f99901a178d1d07c51f9e025dc1",
-      "tools/gravicentra-i6-5-b3-004-contract.mjs": "1217c4d6a9341d9576eb99f7b511ab8375d3a1a5"
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "118854e2c3bace7477e4ae52060faf1a382abb3f"
+    },
+    "validatorRepairR4": {
+      "status": "MECHANISM_FIXED_PENDING_RERUN",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R4_STALE_CONTRACT_REPAIR_20260930.json",
+      "receiptBlobSha": "5fff161b559c218d71782ad5470fbe79084b04d5",
+      "failedRunId": 36737203151,
+      "failedJobId": 109961924188,
+      "failureCode": "B3_004_CLIENTE360_CANONICAL_FLOW_COPY_MISSING",
+      "productRegressionDemonstrated": false
     }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "42b27af8d910e884844f3cd6d27663a1122020fa",
+    "blobSha": "ce957f784e98f05237a089fa6e3508f42fdd03a9",
     "productFileCount": 77
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "4555051732c0ab4ade1d64e48ca73d6720815ed2"
+    "blobSha": "306b8ca2fa494266ca315008b86afd3cd6df1a99"
   },
   "nextRequiredProof": [
     "B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT_PASS"

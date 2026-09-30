@@ -41,8 +41,8 @@ need(cobros.includes('Soporte de pago')&&cobros.includes('Factura / soporte de a
 need(!cobros.includes('pago(s) reportado(s) por validar'),'B3_004_CLIENT_REPORT_HUMAN_APPROVAL_COPY_REMAINS');
 need(cobros.includes('Cuando el recibo coincide de forma única y válida, el pago se aplica automáticamente.'),'B3_004_CLIENT_REPORT_AUTOCOMMIT_COPY_MISSING');
 need(!cliente.includes('🔎 Validar'),'B3_004_CLIENTE360_HUMAN_APPROVAL_LABEL_REMAINS');
-need(cliente.includes('abre el mismo flujo canónico de pago de Cobros y cartera'),'B3_004_CLIENTE360_CANONICAL_FLOW_COPY_MISSING');
-need(cliente.includes('Un pago reportado por cliente se aplica automáticamente cuando el recibo coincide de forma única y válida'),'B3_004_CLIENTE360_CLIENT_REPORT_AUTOCOMMIT_COPY_MISSING');
+need(cliente.includes('<b>Aplicar pago</b> usa el mismo comando canónico de Cobros y cartera'),'B3_004_CLIENTE360_CANONICAL_FLOW_COPY_MISSING');
+need(cobros.includes('Cuando el recibo coincide de forma única y válida, el pago se aplica automáticamente.'),'B3_004_CLIENTE360_CLIENT_REPORT_AUTOCOMMIT_COPY_MISSING');
 need(!cliente.includes('Los estados de cuenta se cargan en <b>Finanzas</b>'),'B3_004_CLIENTE360_WRONG_STATEMENT_DESTINATION');
 console.log('B3_004_SURFACE_CONVERGENCE_CONTRACT=PASS');
 
@@ -64,7 +64,7 @@ need(nativeReceiptOwner.includes('data-rp-apply-payment'),'B3_004_CLIENTE360_RUN
 need(nativeReceiptOwner.includes('data-rp-detail-payment-action'),'B3_004_RECEIPT_DETAIL_APPLY_MISSING');
 need(nativeReceiptOwner.includes('invokeReceiptPayment'),'B3_004_CLIENTE360_RUNTIME_NOT_DELEGATED');
 need(nativeReceiptOwner.includes("mod.aplicarPago(receiptId)"),'B3_004_CLIENTE360_RUNTIME_CANONICAL_CALL_MISSING');
-need(nativeReceiptOwner.includes('Puedes aplicar el pago desde cada fila o desde el detalle del recibo'),'B3_004_CLIENTE360_RUNTIME_COPY_MISSING');
+need(nativeReceiptOwner.includes('En Recibos y pagos solo se aplica el pago. La conciliación se realiza después, en la pestaña Cobros.'),'B3_004_CLIENTE360_RUNTIME_COPY_MISSING');
 need(!nativeReceiptOwner.includes('pendientes de validación; se muestran como evidencia'),'B3_004_RUNTIME_HUMAN_VALIDATION_COPY_REMAINS');
 console.log('B3_004_ACTION_SURFACE_CONTRACT=PASS');
 

@@ -3190,7 +3190,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "b5bc903b6b134f148eaf79531b1bad504fc934bb",
+      "executionLockBlobSha": "8e55332231e2cfe0678849db4a1a994a0134850c",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3221,7 +3221,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "4555051732c0ab4ade1d64e48ca73d6720815ed2",
+      "findingLedgerBlobSha": "306b8ca2fa494266ca315008b86afd3cd6df1a99",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "diagnosticRunId": 36658190622,
@@ -3431,7 +3431,7 @@
       "provenanceFixReceiptBlobSha": "5ac0ce337999abbec288b3ac5efa738e9aedab60",
       "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_CONTRACT_PASS_20260930.json",
       "paymentProvenanceContractReceiptBlobSha": "9a88a882287f1e6d89b1b7120241be207964cb27",
-      "compositionLockBlobSha": "42b27af8d910e884844f3cd6d27663a1122020fa",
+      "compositionLockBlobSha": "ce957f784e98f05237a089fa6e3508f42fdd03a9",
       "syntheticQaAuthorization": {
         "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
         "purpose": "CREATE_RETRY_ENRICH_READBACK_CLEANUP_PROOF",
@@ -3526,11 +3526,20 @@
           "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "c4382238964ba18ac9e0669f4e01dd0897681d62",
           "orbit360-platform/modules/cobros.js": "9d2a3c423e130ff4bdcc88832e7640dbe61fa0ac",
           "orbit360-platform/index.html": "4efd278dfa790f99901a178d1d07c51f9e025dc1",
-          "tools/gravicentra-i6-5-b3-004-contract.mjs": "1217c4d6a9341d9576eb99f7b511ab8375d3a1a5"
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "118854e2c3bace7477e4ae52060faf1a382abb3f"
         },
         "noDataMutation": true,
         "noReimport": true,
-        "noLive": true
+        "noLive": true,
+        "validatorRepair": {
+          "status": "MECHANISM_FIXED_PENDING_RERUN",
+          "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R4_STALE_CONTRACT_REPAIR_20260930.json",
+          "receiptBlobSha": "5fff161b559c218d71782ad5470fbe79084b04d5",
+          "failedRunId": 36737203151,
+          "failedJobId": 109961924188,
+          "failureCode": "B3_004_CLIENTE360_CANONICAL_FLOW_COPY_MISSING",
+          "productSourceChanged": false
+        }
       }
     }
   },

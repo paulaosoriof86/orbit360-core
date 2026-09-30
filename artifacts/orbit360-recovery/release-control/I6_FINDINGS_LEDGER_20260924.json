@@ -1041,7 +1041,10 @@
           ],
           "qaGuardFile": "tools/gravicentra-i6-5-b3-004-contract.mjs",
           "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_APPLY_VS_RECONCILE_R4_20260930.json",
-          "receiptBlobSha": "9c0db9b809cb106a286c297b6f95d03c119dce3a"
+          "receiptBlobSha": "9c0db9b809cb106a286c297b6f95d03c119dce3a",
+          "validatorRepairReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R4_STALE_CONTRACT_REPAIR_20260930.json",
+          "validatorRepairReceiptBlobSha": "5fff161b559c218d71782ad5470fbe79084b04d5",
+          "qaGuardBlobSha": "118854e2c3bace7477e4ae52060faf1a382abb3f"
         }
       ],
       "paymentProvenanceContractStatus": "PASS",
@@ -1113,7 +1116,16 @@
         "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "c4382238964ba18ac9e0669f4e01dd0897681d62",
         "orbit360-platform/modules/cobros.js": "9d2a3c423e130ff4bdcc88832e7640dbe61fa0ac",
         "orbit360-platform/index.html": "4efd278dfa790f99901a178d1d07c51f9e025dc1",
-        "tools/gravicentra-i6-5-b3-004-contract.mjs": "1217c4d6a9341d9576eb99f7b511ab8375d3a1a5"
+        "tools/gravicentra-i6-5-b3-004-contract.mjs": "118854e2c3bace7477e4ae52060faf1a382abb3f"
+      },
+      "validatorRepairR4": {
+        "status": "MECHANISM_FIXED_PENDING_RERUN",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R4_STALE_CONTRACT_REPAIR_20260930.json",
+        "receiptBlobSha": "5fff161b559c218d71782ad5470fbe79084b04d5",
+        "failedRunId": 36737203151,
+        "failedJobId": 109961924188,
+        "failureCode": "B3_004_CLIENTE360_CANONICAL_FLOW_COPY_MISSING",
+        "productRegressionDemonstrated": false
       }
     },
     {
