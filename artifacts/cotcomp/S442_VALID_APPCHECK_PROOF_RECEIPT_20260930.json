@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "ays-cotcomp-s442-valid-appcheck-proof-v1.0",
+  "capturedAt": "2026-09-30",
+  "projectId": "ays-orbit-360-lab",
+  "region": "us-central1",
+  "webApp": {
+    "displayName": "Orbit360 LAB Web",
+    "appId": "1:646761409743:web:2ec4595ee9160f9d945bba"
+  },
+  "deployedSourceSha": "17d599e884d5b834b73b9499d8cef177575d56f9",
+  "proofRun": {
+    "runId": 36774479211,
+    "conclusion": "success",
+    "artifactId": "11124713611",
+    "artifactDigest": "sha256:ceb3ac6efb7c02b44251c2dfde765b1c90c925e002c14c4bb53a982861a6c172"
+  },
+  "exactHeadQa": {
+    "runId": 36774479299,
+    "tests": 283,
+    "passed": 283,
+    "failed": 0
+  },
+  "appCheck": {
+    "enforced": true,
+    "debugTokenRegistered": true,
+    "custodyMode": "GOOGLE_SECRET_MANAGER_REUSE",
+    "secretResource": "projects/646761409743/secrets/cotcomp-s442-appcheck-debug-token",
+    "secretVersionResource": "projects/646761409743/secrets/cotcomp-s442-appcheck-debug-token/versions/1",
+    "debugTokenResource": "projects/646761409743/apps/1:646761409743:web:2ec4595ee9160f9d945bba/debugTokens/NDdmNzRjMDktYzUzZS00NDg4LWI4MDEtYjY3OWRkOWUyMTI1",
+    "tokenValuePersistedInArtifact": false,
+    "tokenValueCommitted": false,
+    "tokenPrinted": false
+  },
+  "replayProtectionIam": {
+    "runId": 36774411951,
+    "artifactId": "11125950250",
+    "artifactDigest": "sha256:968d9b0b3c5c8a81165afdf8d6c4f800225b18dee18a6a741b845cec2c80aae7",
+    "runtimeServiceAccount": "orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com",
+    "role": "roles/firebaseappcheck.tokenVerifier",
+    "permission": "firebaseappcheck.appCheckTokens.verify",
+    "leastPrivilege": true,
+    "productionTouched": false
+  },
+  "calls": [
+    {
+      "name": "cotcompValidateDraft",
+      "ok": true
+    },
+    {
+      "name": "cotcompSubmitHandoff",
+      "ok": true
+    },
+    {
+      "name": "cotcompFetchComparableProposals",
+      "ok": true
+    },
+    {
+      "name": "cotcompSelectProposal",
+      "ok": true
+    }
+  ],
+  "dataTruth": {
+    "syntheticOnly": true,
+    "persistenceEnabled": false,
+    "appDataWritesExecuted": 0,
+    "realDataUsed": false,
+    "productionTouched": false
+  },
+  "releaseTruth": {
+    "validAppCheckSyntheticInvocationPass": true,
+    "persistenceReleased": false,
+    "writesReleased": false,
+    "realDataReleased": false,
+    "productionReleased": false
+  }
+}
