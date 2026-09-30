@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "findingId": "B3-004",
+  "subFindingId": "B3-004-R5-CRM-MIGRATION-PROVENANCE-AND-COPYFIX",
+  "status": "PASS",
+  "proof": {
+    "workflowRunId": 36747689293,
+    "workflowJobId": 109997954180,
+    "sourceHead": "7c3ba3b8bb161865626d348fdd83e37c3cef439c",
+    "markers": [
+      "B3_004_SURFACE_CONVERGENCE_CONTRACT=PASS",
+      "B3_004_PAYMENT_PROVENANCE_CONTRACT=PASS",
+      "B3_004_ACTION_SURFACE_CONTRACT=PASS",
+      "B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT=PASS",
+      "B3_004_CRM_MIGRATION_ORIGIN_CONTRACT=PASS",
+      "B3_004_SURFACE_CONVERGENCE=PASS"
+    ]
+  },
+  "conclusion": "R5 contract proves migrated SIGA/CRM direct-payment evidence is distinct from future client-portal reports and the legacy global copyfix no longer rewrites canonical payment-state labels.",
+  "boundaries": {
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextRequiredProof": [
+    "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_TARGETED_VISUAL_PASS"
+  ]
+}

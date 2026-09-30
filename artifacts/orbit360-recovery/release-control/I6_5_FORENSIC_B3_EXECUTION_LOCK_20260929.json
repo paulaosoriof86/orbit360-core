@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_SURFACES_FIXED_PENDING_CONTRACT",
+  "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "SURFACES_FIXED_PENDING_CONTRACT",
+    "status": "CANDIDATE_PENDING_EXACT_PREVIEW",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V3_20260930.json",
     "boundaries": {
@@ -149,7 +149,7 @@
       },
       {
         "id": "B3-004-R5-CRM-MIGRATION-PROVENANCE-AND-COPYFIX",
-        "status": "SURFACES_FIXED_PENDING_CONTRACT",
+        "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
         "blocking": true,
         "rootCause": "MIGRATED_CRM_DIRECT_PAYMENT_COLLAPSED_INTO_CLIENT_REPORT_PLUS_GLOBAL_COPYFIX_REWRITES_CANONICAL_PAYMENT_LABELS",
         "remediation": "Origin-aware SIGA/CRM direct-payment projection + future CLIENT_PORTAL separation + disable global copy rewrite.",
@@ -165,7 +165,9 @@
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_SOURCE_FIX_20260930.json",
         "receiptBlobSha": "4c77da96d75abbcfb9dcf572d3a826dc21a8ab81",
         "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V3_20260930.json",
-        "paymentLockBlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244"
+        "paymentLockBlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244",
+        "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_20260930.json",
+        "contractReceiptBlobSha": "1dc8409f9e5617c7e65a252969281f4995aa1760"
       }
     ],
     "visualSemanticContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_VISUAL_SEMANTIC_REMEDIATION_CONTRACT_PASS_20260930.json",
@@ -261,19 +263,22 @@
       "qaGuardBlobSha": "df57d853145ea6ff7e8fdc6495e7bba9cc083e44",
       "productRegressionDemonstrated": false,
       "productSourceChanged": false
-    }
+    },
+    "r5ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_20260930.json",
+    "r5ContractReceiptBlobSha": "1dc8409f9e5617c7e65a252969281f4995aa1760"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "4a8fb5d0f62c93a4b12355b47e0121371a6652d8",
+    "blobSha": "57d7ad29e96f85c68290a8f3fc96c463db5e3e5e",
     "productFileCount": 78
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "46a9e309af9daa34b090198e1b5169e05e77de06"
+    "blobSha": "aa91c2f801af1953a8a6c95e49e5a7a819d7e1c4"
   },
   "nextRequiredProof": [
-    "B3_004_CRM_MIGRATION_ORIGIN_CONTRACT_PASS"
+    "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",

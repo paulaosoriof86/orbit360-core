@@ -483,7 +483,7 @@
     }
   },
   "b3004CrmMigrationOriginR5": {
-    "status": "SURFACES_FIXED_PENDING_CONTRACT",
+    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
     "findingId": "B3-004",
     "subFindingId": "B3-004-R5-CRM-MIGRATION-PROVENANCE-AND-COPYFIX",
     "rootCause": "MIGRATED_CRM_DIRECT_PAYMENT_COLLAPSED_INTO_CLIENT_REPORT_PLUS_GLOBAL_COPYFIX_REWRITES_CANONICAL_PAYMENT_LABELS",
@@ -510,6 +510,10 @@
       "cause": "R5 causally modified portal-v1142-copyfix.js, which was not previously in the certified changed-product set.",
       "fix": "Add the newly changed product owner to the exact product set and bind its exact blob.",
       "productSourceChanged": false
-    }
+    },
+    "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_20260930.json",
+    "contractReceiptBlobSha": "1dc8409f9e5617c7e65a252969281f4995aa1760",
+    "contractRunId": 36747689293,
+    "contractJobId": 109997954180
   }
 }

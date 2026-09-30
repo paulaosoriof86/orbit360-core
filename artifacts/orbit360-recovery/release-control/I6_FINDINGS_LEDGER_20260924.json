@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "SURFACES_FIXED_PENDING_CONTRACT",
+      "status": "CANDIDATE_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -965,7 +965,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_CRM_MIGRATION_ORIGIN_CONTRACT_PASS",
+      "nextAction": "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1051,7 +1051,7 @@
         },
         {
           "id": "B3-004-R5-CRM-MIGRATION-PROVENANCE-AND-COPYFIX",
-          "status": "SURFACES_FIXED_PENDING_CONTRACT",
+          "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
           "blocking": true,
           "rootCause": "MIGRATED_CRM_DIRECT_PAYMENT_COLLAPSED_INTO_CLIENT_REPORT_PLUS_GLOBAL_COPYFIX_REWRITES_CANONICAL_PAYMENT_LABELS",
           "remediation": "Classify payment origin explicitly; present SIGA migration as direct payment evidence ready for automatic reconciliation; remove global legacy payment terminology rewrite.",
@@ -1067,7 +1067,9 @@
           "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_SOURCE_FIX_20260930.json",
           "receiptBlobSha": "4c77da96d75abbcfb9dcf572d3a826dc21a8ab81",
           "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V3_20260930.json",
-          "paymentLockBlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244"
+          "paymentLockBlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244",
+          "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_20260930.json",
+          "contractReceiptBlobSha": "1dc8409f9e5617c7e65a252969281f4995aa1760"
         }
       ],
       "paymentProvenanceContractStatus": "PASS",
@@ -1184,7 +1186,10 @@
         "orbit360-platform/modules/cliente360.js": "68072f7b59781145538c2b3e6312b5190f4806b5",
         "orbit360-platform/index.html": "405337c13fa3292f63832f3dff5bc92c3291ffae",
         "tools/gravicentra-i6-5-b3-004-contract.mjs": "883257d8a29f6bab43651280757521d8910a6532"
-      }
+      },
+      "r5ContractStatus": "PASS",
+      "r5ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_20260930.json",
+      "r5ContractReceiptBlobSha": "1dc8409f9e5617c7e65a252969281f4995aa1760"
     },
     {
       "id": "B3-005",
