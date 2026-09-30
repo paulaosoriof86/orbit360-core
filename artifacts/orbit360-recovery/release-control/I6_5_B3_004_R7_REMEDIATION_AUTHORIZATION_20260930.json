@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R7_REMEDIATION_AUTHORIZATION_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "0e02d976385ba01c1aaab648d8ccda434ccd3b64",
+  "findingId": "B3-004",
+  "status": "AUTHORIZED_CAUSAL_SOURCE_REMEDIATION_ONLY",
+  "authorityLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_COBROS_VISIBILITY_FILTER_LOCK_20260930.json",
+  "authorizedProductFiles": [
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/core/crmkit.js",
+    "orbit360-platform/index.html"
+  ],
+  "qaFiles": [
+    "tools/gravicentra-i6-5-b3-004-contract.mjs",
+    "tools/gravicentra-i6-5-b3-004-preview-proof.mjs"
+  ],
+  "causalScope": [
+    "Remove active-policy gating from payment-history visibility in Cliente 360 > Cobros while retaining it for open portfolio semantics.",
+    "Add deduplicated paid-receipt/evidence fallback projection to Cobros when canonical cobro is absent from the visible read model.",
+    "Repair or provide a robust local Estado filter interaction without changing unrelated module filters.",
+    "Add regression contracts proving paid receipt visibility independent of policy lifecycle and dedupe against canonical cobro."
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "operationalDataWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b3005Authorized": false
+  }
+}

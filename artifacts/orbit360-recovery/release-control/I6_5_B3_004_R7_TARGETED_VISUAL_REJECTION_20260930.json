@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R7_TARGETED_VISUAL_REJECTION_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "0e02d976385ba01c1aaab648d8ccda434ccd3b64",
+  "findingId": "B3-004",
+  "status": "REJECTED_REMEDIATION_REQUIRED",
+  "observedRole": "Dirección",
+  "confirmedPasses": [
+    "Cobros y cartera shows 457 Pago registrado en SIGA evidence records.",
+    "SIGA rows visibly expose individual Conciliar.",
+    "Pending/overdue rows visibly expose Aplicar pago for Dirección.",
+    "Cliente 360 > Recibos y pagos visibly exposes SIGA payment rows with Conciliar."
+  ],
+  "blockers": [
+    {
+      "id": "B3-004-R7-A",
+      "finding": "Estado filter is visible but user cannot open/select its options in the authenticated visual session."
+    },
+    {
+      "id": "B3-004-R7-B",
+      "finding": "Cliente 360 > Cobros suppresses payment history when the linked policy is not in active/renewable policy set; observed case shows Pólizas vigentes 0/1, Recibos y pagos has paid evidence, Cobros is empty."
+    },
+    {
+      "id": "B3-004-R7-C",
+      "finding": "Global/client Cobros lacks a universal receipt-payment fallback: only pago_reportado evidence is projected when no cobro row is visible, so a receipt with an already applied/confirmed payment can disappear from Cobros."
+    }
+  ],
+  "decision": "NO_VISUAL_PASS_NO_B3005",
+  "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_COBROS_VISIBILITY_FILTER_LOCK_20260930.json",
+  "doNotReimport": true,
+  "noLive": true
+}

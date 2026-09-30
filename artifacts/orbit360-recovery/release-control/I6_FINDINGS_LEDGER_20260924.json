@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "PREVIEW_MACHINE_PASS_TARGETED_VISUAL_HUMAN_EVIDENCE_REQUIRED",
+      "status": "R7_REMEDIATION_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R6_1_TARGETED_VISUAL_HUMAN_SESSION_MINIMAL_EVIDENCE",
+      "nextAction": "B3_004_R7_CAUSAL_SOURCE_FIX",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1292,6 +1292,23 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_TINYFISH_FIREBASE_AUTH_REPLAY_LIMITATION_20260930.json",
         "blobSha": "14b765d95c9397dca4b43107c717458d0c98d452",
         "productFailure": false
+      },
+      "r7VisibilityFilterLock": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_COBROS_VISIBILITY_FILTER_LOCK_20260930.json",
+        "blobSha": "9c64bf9a580d89165fc4ced4427268d628a748f4"
+      },
+      "r7VisualRejection": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_TARGETED_VISUAL_REJECTION_20260930.json",
+        "blobSha": "9df3987a3b22f0f13f5931838347a3864af3313b",
+        "blockers": [
+          "B3-004-R7-A",
+          "B3-004-R7-B",
+          "B3-004-R7-C"
+        ]
+      },
+      "r7RemediationAuthorization": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_REMEDIATION_AUTHORIZATION_20260930.json",
+        "blobSha": "aa125b6e882f4e1e1776590b05f212c1fd428818"
       }
     },
     {

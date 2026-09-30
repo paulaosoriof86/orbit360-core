@@ -1,0 +1,45 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R7_COBROS_VISIBILITY_FILTER_LOCK_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "0e02d976385ba01c1aaab648d8ccda434ccd3b64",
+  "status": "FROZEN_ACTIVE",
+  "binds": {
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+    "paymentLockBlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
+    "machinePassPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_MACHINE_PASS_20260930.json",
+    "machinePassBlobSha": "6d11ecba53d570b514c75590d6e144a97c1fc770"
+  },
+  "invariants": [
+    "Any receipt with confirmed/applied payment or canonical payment evidence must be visible in Cobros y cartera and in Cliente 360 > Cobros.",
+    "Policy lifecycle status may limit future/open portfolio, but must never suppress historical payment visibility.",
+    "A paid receipt may not appear only in Recibos y pagos while being absent from Cobros.",
+    "If a canonical cobro document already exists for a receipt, Cobros must render that cobro and must not duplicate it with receipt evidence.",
+    "If a paid/evidenced receipt lacks a currently visible cobro projection, Cobros must render a read-only payment-evidence projection until the canonical cobro is visible/materialized.",
+    "CRM/SIGA direct-payment evidence remains paid evidence pending reconciliation; it exposes individual Conciliar and may also participate in deterministic batch reconciliation.",
+    "Advisor-reported payment remains distinct from CLIENT_PORTAL and does not become a paid receipt before operative validation.",
+    "Estado filtering in Cobros must be operable in the supported browser surface. The current state choices must remain reachable: Pagado, Pendiente, Vencido, Pago registrado en SIGA, Por conciliar, Reportado por asesor, Reportado por cliente, Conciliado, Requiere validación, Bloqueado, Anulado.",
+    "Search/filter changes must not require a full rehydration or remove paid receipts from the read model."
+  ],
+  "projectionContract": {
+    "canonicalCobroPriority": true,
+    "dedupeKey": "receiptId/reciboId",
+    "receiptPaymentFallback": true,
+    "activePolicyGateForbiddenForPaymentHistory": true,
+    "activePolicyGateAllowedForOpenPortfolioOnly": true,
+    "client360PolicyFilterLabel": "Todas las pólizas",
+    "historicalPoliciesVisibleWhenTheyHavePayment": true
+  },
+  "filterContract": {
+    "stateFilterMustOpenAndSelect": true,
+    "stateFilterMustPersistSelectionAcrossLocalRerender": true,
+    "nativeSelectToolingUncertainty": "Do not assume the TinyFish embedded-browser symptom is product-only. Source must nevertheless expose a robust operable state control and contract coverage."
+  },
+  "boundaries": {
+    "reimport": false,
+    "operationalDataWrites": false,
+    "livePromotion": false,
+    "b3005Opened": false
+  }
+}
