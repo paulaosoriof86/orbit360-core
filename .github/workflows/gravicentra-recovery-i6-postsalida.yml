@@ -6658,6 +6658,9 @@ jobs:
           git config user.email gravicentra-recovery-bot@users.noreply.github.com
           git commit -m "freeze(i6.5 B3-004): R8 contract pass pending exact preview"
           git push origin "HEAD:$GITHUB_REF_NAME"
+          gh workflow run gravicentra-recovery-i6-postsalida.yml --ref "$GITHUB_REF_NAME"
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Preserve B3-004 fail-closed boundary
         if: ${{ failure() && steps.gate.outputs.run == 'true' }}
         run: echo "B3_004_FOUNDATION_FAILED_NO_DATA_WRITE_NO_REIMPORT_NO_LIVE"

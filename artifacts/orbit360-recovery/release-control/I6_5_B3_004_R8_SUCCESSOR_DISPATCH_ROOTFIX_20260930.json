@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R8_SUCCESSOR_DISPATCH_ROOTFIX_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "5275e8babc9cafe5478d0e4f4571880d626cc1d5",
+  "status": "FIXED_AND_PENDING_CURRENT_PREVIEW_RUN",
+  "rootCause": "A push made by the workflow GITHUB_TOKEN does not recursively trigger the push workflow, so the contract PASS freeze advanced governance to exact Preview but created no successor run.",
+  "evidence": {
+    "head": "5275e8babc9cafe5478d0e4f4571880d626cc1d5",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_PREVIEW",
+    "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
+    "checkRunsForHead": 0
+  },
+  "fix": "After the contract PASS governance push, explicitly dispatch gravicentra-recovery-i6-postsalida.yml on the branch using GitHub workflow_dispatch and github.token.",
+  "workflowBlobSha": "503ebfc0efb124f676712eb7b145204800e0b2ed",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

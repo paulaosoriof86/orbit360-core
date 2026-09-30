@@ -1430,6 +1430,12 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_SOURCE_CONTRACT_PASS_20260930.json",
         "blobSha": "a83b598813301a7696e5ef1f78960d6129647bbe",
         "runId": 36785023592
+      },
+      "r8SuccessorDispatchRootfix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_SUCCESSOR_DISPATCH_ROOTFIX_20260930.json",
+        "blobSha": "9bba43730e52c69abe21550b1d083677db8b94fc",
+        "workflowBlobSha": "503ebfc0efb124f676712eb7b145204800e0b2ed",
+        "status": "FIXED"
       }
     },
     {
@@ -5056,6 +5062,7 @@
     "b3003Status": "CLOSED_PASS",
     "r8SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_CAUSAL_SOURCE_FIX_20260930.json",
     "b3005Opened": false,
-    "r8ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_SOURCE_CONTRACT_PASS_20260930.json"
+    "r8ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_SOURCE_CONTRACT_PASS_20260930.json",
+    "successorDispatchRootfixStatus": "FIXED"
   }
 }
