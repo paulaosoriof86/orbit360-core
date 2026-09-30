@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "ays-cotcomp-s442-replay-verifier-iam-intent-v1.0",
+  "authorization": "GRANT_LAB_RUNTIME_APPCHECK_TOKEN_VERIFIER_FOR_S442_REPLAY_PROOF",
+  "authorizedSourceParent": "5fea23e980978d2a3f83cacde03e0628a9567a62",
+  "projectId": "ays-orbit-360-lab",
+  "functionName": "cotcompSubmitHandoff",
+  "runtimeServiceAccount": "orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com",
+  "role": "roles/firebaseappcheck.tokenVerifier",
+  "requiredPermission": "firebaseappcheck.appCheckTokens.verify",
+  "broaderRoleAllowed": false,
+  "appCheckWeakening": false,
+  "appDataWrites": false,
+  "deploy": false,
+  "production": false,
+  "basis": "Required by Firebase replay protection for Gen2 Cloud Functions runtime token consumption; minimum verifier role only."
+}
