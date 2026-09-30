@@ -128,7 +128,7 @@ function buildInitialHandoffPlan(input = {}) {
       {
         phase:'OPERATIONS_PROJECTION',
         atomicGroup:'B',
-        blockedByCurrentWorkflowSchema:true,
+        blockedByUndeployedWorkflowSchema:true,
         operations:[
           {
             type:'UPSERT_DETERMINISTIC',
@@ -206,7 +206,7 @@ function buildInitialHandoffPlan(input = {}) {
       directPublicWorkflowWriteForbidden:true
     },
     blockers:[
-      'CURRENT_OPS_LEADS_SCHEMA_DOES_NOT_PRESERVE_COTCOMP_CORRELATION_FIELDS',
+      'WORKFLOW_COTCOMP_SCHEMA_MERGED_SOURCE_NOT_DEPLOYED',
       'RETENTION_POLICY_NOT_YET_FROZEN',
       'CASE_ACCESS_PERSISTENCE_NOT_AUTHORIZED',
       'WRITES_DISABLED_BY_CODE'
