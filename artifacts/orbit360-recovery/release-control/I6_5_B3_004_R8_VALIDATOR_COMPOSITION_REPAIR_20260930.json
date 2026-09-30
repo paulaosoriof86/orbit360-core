@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R8_VALIDATOR_COMPOSITION_REPAIR_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "8fd4d3bfb1300da514213d6d3740b28e241744b5",
+  "status": "FIXED_PENDING_RERUN",
+  "failedRunId": 36784487121,
+  "failure1": {
+    "jobId": 110122485735,
+    "code": "B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED",
+    "cause": "stale R6 cache-key assertion"
+  },
+  "failure2": {
+    "jobId": 110122485837,
+    "code": "I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR",
+    "cause": "composition.currentBlock B3-004 did not equal Control Plane currentBlock B3, disabling canonical composition authority"
+  },
+  "repair": {
+    "contractBlobSha": "b49b03a167c7e3469cbf3a6a2de60406f39cc4f5",
+    "compositionBlobSha": "00b1c795b7ba786e471f0b266af0bd3b57ba9a29",
+    "executionLockBlobSha": "a9966bff7ce722700cf26a2a7cf9557939ea5d00",
+    "findingLedgerBlobSha": "78f61354c603127c9465da1c3f229be39ef820d9",
+    "controlPlaneBlobSha": "852759a54e0cfa210212e5481f6d0ea38bf7d1b4"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  }
+}

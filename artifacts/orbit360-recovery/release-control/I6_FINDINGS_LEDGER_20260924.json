@@ -1418,6 +1418,13 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_AUTOMATED_CHECKPOINT_MECHANISM_20260930.json",
         "blobSha": "1c23a2128e112f19233fe383e2d3be714e057bf9",
         "workflowBlobSha": "890a0c1dea66c27e849983412bb3db88e31a4b5b"
+      },
+      "r8ValidatorCompositionRepair": {
+        "status": "FIXED_PENDING_RERUN",
+        "runId": 36784487121,
+        "contractBlobSha": "b49b03a167c7e3469cbf3a6a2de60406f39cc4f5",
+        "compositionBlobSha": "00b1c795b7ba786e471f0b266af0bd3b57ba9a29",
+        "productRegressionDemonstrated": false
       }
     },
     {
@@ -5026,7 +5033,7 @@
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
-    "compositionLockBlobSha": "018efd26042772ff9bfde680b56f08bf2af25260",
+    "compositionLockBlobSha": "00b1c795b7ba786e471f0b266af0bd3b57ba9a29",
     "noLive": true,
     "noReimport": true,
     "mechanismRootFix": {

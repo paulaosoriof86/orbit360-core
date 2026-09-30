@@ -35,7 +35,7 @@
   },
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
-  "currentBlock": "B3-004",
+  "currentBlock": "B3",
   "productFileCount": 78,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
@@ -246,12 +246,29 @@
     "noLive": true
   },
   "lastMechanismRootFix": {
-    "id": "B3-TRANSITION-GUARD-ROOTFIX-20260929",
-    "status": "MECHANISM_FIXED_PENDING_RERUN",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_TRANSITION_GUARD_ROOTFIX_20260929.json",
-    "receiptBlobSha": "3d18e793a21dc73be7643bb07766e5d726cf2394",
-    "productSourceFixChanged": false,
-    "productFileCount": 70
+    "status": "FIXED_PENDING_RERUN",
+    "recordedAt": "2026-09-30",
+    "failureRunId": 36784487121,
+    "failedJobs": [
+      {
+        "jobId": 110122485735,
+        "code": "B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED",
+        "classification": "STALE_QA_ASSET_ASSERTION"
+      },
+      {
+        "jobId": 110122485837,
+        "code": "I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR",
+        "classification": "COMPOSITION_BLOCK_LABEL_MISMATCH"
+      }
+    ],
+    "cause": "The R8 composition lock was labeled B3-004 while the central guard activates canonical composition only when composition.currentBlock equals Control Plane currentBlock B3. Separately, the B3-004 contract retained one R6 native-receipt cache-key assertion after the R8 cache bump.",
+    "fix": "Restore composition currentBlock to B3 with activeFindingId B3-004, and update only the stale QA assertion to the R8 asset key.",
+    "productRegressionDemonstrated": false,
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
   },
   "b3002PerformanceFix": {
     "status": "CAUSAL_SOURCE_FIX_BOUND",
@@ -725,5 +742,6 @@
     "noDataMutation": true,
     "noReimport": true,
     "noLive": true
-  }
+  },
+  "activeFindingId": "B3-004"
 }
