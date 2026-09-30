@@ -3390,6 +3390,16 @@
         "dataMutation": false,
         "reimport": false,
         "livePromotion": false
+      },
+      "mechanismRaceFix": {
+        "status": "FIXED",
+        "recordedAt": "2026-09-30",
+        "workflow": ".github/workflows/gravicentra-b3-003-country-diagnostic.yml",
+        "rootCause": "STEP_LOCAL_NODE_NOOP_DID_NOT_EXIT_SHELL; STALE_GOVERNANCE_WRITE_EXECUTED_AFTER synced=false/frozen=false",
+        "fix": "EXIT_STEP_IMMEDIATELY_ON_SYNC_OR_FREEZE_NOOP",
+        "productSourceChanged": false,
+        "dataMutation": false,
+        "rebuildRequired": false
       }
     }
   },
@@ -3410,7 +3420,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_003_INDEPENDENT_FIRESTORE_LINEAGE_DIAGNOSTIC"
+    "nextAction": "B3_003_TARGETED_VISUAL_PASS"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

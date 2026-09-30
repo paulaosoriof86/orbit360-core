@@ -69,6 +69,9 @@ jobs:
           f.currentB3={...(f.currentB3||{}),status:'B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE',activeFindingId:'B3-003'};
           fs.writeFileSync(process.env.FINDINGS,JSON.stringify(f,null,2)+'\n');
           NODE
+          if grep -qx 'synced=false' "$GITHUB_OUTPUT"; then
+            exit 0
+          fi
           LOCK_BLOB=$(git hash-object "$B3_LOCK"); export LOCK_BLOB
           FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
           node - <<'NODE'
@@ -175,6 +178,9 @@ jobs:
           c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),nextAction:'B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS'};
           fs.writeFileSync(process.env.CONTROL,JSON.stringify(c,null,2)+'\n');
           NODE
+          if grep -qx 'frozen=false' "$GITHUB_OUTPUT"; then
+            exit 0
+          fi
           git add "$B3_LOCK" "$FINDINGS" "$COMPOSITION" \
             orbit360-platform/core/queries.js orbit360-platform/modules/cobros.js orbit360-platform/index.html \
             tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs \
