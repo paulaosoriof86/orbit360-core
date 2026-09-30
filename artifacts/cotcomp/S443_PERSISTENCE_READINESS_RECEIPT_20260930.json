@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "ays-cotcomp-s443-persistence-readiness-receipt-v1.0",
+  "capturedAt": "2026-09-30",
+  "baseline": {
+    "s442ValidAppCheckProof": true,
+    "s442ProofRunId": 36774479211,
+    "persistenceEnabled": false,
+    "appDataWritesExecuted": 0,
+    "realDataUsed": false,
+    "productionTouched": false
+  },
+  "sourceAlignment": {
+    "retentionPolicyVersion": "ays-cotcomp-governance-policy-s426-v1.0",
+    "retentionPolicyStatus": "OWNER_INTERNAL_POLICY_ACTIVE",
+    "legalComplianceVerified": false,
+    "workflowOwnerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170"
+  },
+  "qa": {
+    "sourceHead": "f98793c98b2ec649470bfe9c1bf87b3bc94dc295",
+    "runId": 36781505150,
+    "tests": 292,
+    "passed": 292,
+    "failed": 0
+  },
+  "currentLocks": {
+    "persistenceExecution": false,
+    "writes": false,
+    "driverCalls": false,
+    "effectiveWriteAllowed": false,
+    "realDataAllowed": false,
+    "productionAllowed": false
+  },
+  "blockers": [
+    "STORAGE_DRIVER_REQUIRED",
+    "AUDIT_ADAPTER_REQUIRED",
+    "WORKFLOW_OWNER_RUNTIME_PROOF_REQUIRED",
+    "SAGA_RESUME_COMPENSATION_REQUIRED",
+    "SYNTHETIC_CONTROLLED_WRITE_ROLLBACK_PROOF_REQUIRED",
+    "NOTIFICATION_SIDE_EFFECTS_MUST_BE_DISABLED",
+    "OWNER_WRITE_AUTHORIZATION_REQUIRED",
+    "DEPLOY_AUTHORIZATION_REQUIRED"
+  ],
+  "writeStages": [
+    "W0_SOURCE_ONLY_CURRENT",
+    "W1_SYNTHETIC_CORE_COMMIT",
+    "W2_SYNTHETIC_WORKFLOW_PROJECTION",
+    "W3_SYNTHETIC_PROPOSAL_VERSIONING",
+    "W4_SYNTHETIC_SELECTION",
+    "W5_REAL_DATA_PILOT"
+  ]
+}
