@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "CANDIDATE_PENDING_EXACT_PREVIEW",
+      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -964,7 +964,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_EXACT_PREVIEW_MACHINE_PASS",
+      "nextAction": "B3_004_TARGETED_VISUAL_PASS",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -994,7 +994,27 @@
         }
       ],
       "paymentProvenanceContractStatus": "PASS",
-      "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_CONTRACT_PASS_20260930.json"
+      "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_CONTRACT_PASS_20260930.json",
+      "previewSourceSha": "61e81ba87e7a10d076951d1118bc1527d71a7fdd",
+      "previewBuildId": "gi-i65-b3-61e81ba87e7a-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36722855770-2mjpfi0g.web.app",
+      "previewRunId": 36722855770,
+      "artifactId": 11101346698,
+      "artifactDigest": "2b592bb18fe87cd07e02f7c63debe4be8c6f0c7baddc269150e0d1f0e90684cc",
+      "machineProof": {
+        "sourceSha": "61e81ba87e7a10d076951d1118bc1527d71a7fdd",
+        "buildId": "gi-i65-b3-61e81ba87e7a-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36722855770-2mjpfi0g.web.app",
+        "channelId": "gi-b3004-36722855770",
+        "runId": 36722855770,
+        "artifactId": 11101346698,
+        "artifactDigest": "2b592bb18fe87cd07e02f7c63debe4be8c6f0c7baddc269150e0d1f0e90684cc",
+        "previewBackendPass": true,
+        "exactHostingReadbackPass": true,
+        "syntheticProofPass": true,
+        "cleanupPass": true,
+        "liveUnchanged": true
+      }
     },
     {
       "id": "B3-005",
@@ -4596,7 +4616,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
+    "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
