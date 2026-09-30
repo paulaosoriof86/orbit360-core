@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B3",
-  "productFileCount": 77,
+  "productFileCount": 78,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "functions/bootstrap.js",
@@ -108,6 +108,7 @@
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "orbit360-platform/modules/portal-v1142-copyfix.js",
     "orbit360-platform/modules/portal.js",
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
     "orbit360-platform/modules/siniestros.js",
@@ -501,6 +502,14 @@
     "sourceFixReceiptBlobSha": "4c77da96d75abbcfb9dcf572d3a826dc21a8ab81",
     "dataMutation": false,
     "reimport": false,
-    "livePromotion": false
+    "livePromotion": false,
+    "compositionSetRepair": {
+      "failureRunId": 36746983718,
+      "failureJobId": 109995540499,
+      "failureCode": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT",
+      "cause": "R5 causally modified portal-v1142-copyfix.js, which was not previously in the certified changed-product set.",
+      "fix": "Add the newly changed product owner to the exact product set and bind its exact blob.",
+      "productSourceChanged": false
+    }
   }
 }

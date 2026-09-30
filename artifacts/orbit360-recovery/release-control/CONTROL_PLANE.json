@@ -3190,7 +3190,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "f3dfa4b54da94c7b43e4607e40e1b711f18e67bd",
+      "executionLockBlobSha": "a3ba7509f21125be7c548d37c3a45616f83b2f0a",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3431,7 +3431,7 @@
       "provenanceFixReceiptBlobSha": "5ac0ce337999abbec288b3ac5efa738e9aedab60",
       "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_CONTRACT_PASS_20260930.json",
       "paymentProvenanceContractReceiptBlobSha": "9a88a882287f1e6d89b1b7120241be207964cb27",
-      "compositionLockBlobSha": "c62b5cebf049525776a8ef205ff3f2887c7442fb",
+      "compositionLockBlobSha": "4a8fb5d0f62c93a4b12355b47e0121371a6652d8",
       "syntheticQaAuthorization": {
         "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
         "purpose": "CREATE_RETRY_ENRICH_READBACK_CLEANUP_PROOF",
@@ -3571,13 +3571,20 @@
           "orbit360-platform/index.html": "405337c13fa3292f63832f3dff5bc92c3291ffae",
           "tools/gravicentra-i6-5-b3-004-contract.mjs": "883257d8a29f6bab43651280757521d8910a6532"
         },
-        "executionLockBlobSha": "f3dfa4b54da94c7b43e4607e40e1b711f18e67bd",
+        "executionLockBlobSha": "a3ba7509f21125be7c548d37c3a45616f83b2f0a",
         "findingLedgerBlobSha": "46a9e309af9daa34b090198e1b5169e05e77de06",
-        "compositionLockBlobSha": "c62b5cebf049525776a8ef205ff3f2887c7442fb",
+        "compositionLockBlobSha": "4a8fb5d0f62c93a4b12355b47e0121371a6652d8",
         "operationalDataWrites": false,
         "reimport": false,
         "livePromotion": false,
-        "nextAfterVisual": "B3-005_READONLY_BATCH_AUTO_MATERIALIZATION_AND_RECONCILIATION_DIAGNOSTIC"
+        "nextAfterVisual": "B3-005_READONLY_BATCH_AUTO_MATERIALIZATION_AND_RECONCILIATION_DIAGNOSTIC",
+        "compositionSetRepair": {
+          "status": "FIXED_PENDING_GUARD_RERUN",
+          "failureRunId": 36746983718,
+          "failureJobId": 109995540499,
+          "failureCode": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT",
+          "productFileCount": 78
+        }
       }
     }
   },
