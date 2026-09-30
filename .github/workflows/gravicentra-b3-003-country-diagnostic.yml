@@ -111,6 +111,7 @@ jobs:
           NODE
           )
           if [ "$MODE" = "APPLY" ]; then
+            sed -i 's/\\${U\\./\\\\${U./g; s/\\${c\\.id}/\\\\${c.id}/g' tools/gravicentra-i6-5-b3-003-country-rootfix.mjs
             node tools/gravicentra-i6-5-b3-003-country-rootfix.mjs
             echo "applied=true" >> "$GITHUB_OUTPUT"
           else
@@ -177,6 +178,7 @@ jobs:
           git add "$B3_LOCK" "$FINDINGS" "$COMPOSITION" \
             orbit360-platform/core/queries.js orbit360-platform/modules/cobros.js orbit360-platform/index.html \
             tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs \
+            tools/gravicentra-i6-5-b3-003-country-rootfix.mjs \
             artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json
           LOCK_BLOB=$(git hash-object "$B3_LOCK"); export LOCK_BLOB
           FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
