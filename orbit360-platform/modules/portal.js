@@ -158,19 +158,34 @@ Orbit.modules.portal = (function () {
   }
 
   function reportarPago(cobroId) {
-    const c = S().get('cobros', cobroId); if (!c) return;
-    const cli = S().get('clientes', clienteId);
-    const html = `<div class="cfg-note">Reporta tu pago de la cuota <b>${c.cuota}</b> por <b>${U.money(c.monto, c.moneda)}</b>. El equipo lo valida y te confirma.</div>
-      <label class="ce-l" style="margin-top:10px">Fecha del pago<input id="rp-fecha" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
-      <label class="ce-l" style="margin-top:10px">Soporte de pago (comprobante)<input id="rp-file" type="file" class="o-sel" accept="image/*,application/pdf"></label>
-      <label class="ce-l" style="margin-top:10px">Nota<input id="rp-nota" class="o-sel" placeholder="Banco, referencia…"></label>`;
-    const back = drawer('📤 Reportar pago', html, () => {
-      const f = back.querySelector('#rp-file').files[0];
-      S().update('cobros', cobroId, { reportado: Orbit.ui.today(), soporteNombre: f ? f.name : '', notaReporte: back.querySelector('#rp-nota').value });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: (S().get('polizas', c.polizaId) || {}).asesorId || cli.asesorId, tipo: 'sistema', icon: '📤', fecha: Orbit.ui.today(), titulo: 'Pago reportado por el cliente', detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (f ? ' · soporte: ' + f.name : '') + ' · pendiente de validar' });
-      if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo: 'Validar pago reportado', titulo: 'Validar pago · ' + cli.nombre, clienteId, polizaId: c.polizaId, asesorId: cli.asesorId, prioridad: 'Alta', vence: Orbit.ui.today(), nota: 'El cliente reportó el pago de la cuota ' + c.cuota, origen: 'Portal del cliente' });
-      back.remove(); toast('✓ Recibimos tu reporte · pendiente de revisión/conciliación'); render(host);
-    }, 'Enviar reporte');
+    const c=S().get('cobros',cobroId); if(!c)return;
+    const receiptId=Orbit.modules&&Orbit.modules.cobros&&Orbit.modules.cobros.resolveReceiptId?Orbit.modules.cobros.resolveReceiptId(cobroId):(c.reciboId||'');
+    if(!receiptId){toast('No fue posible relacionar este pago con un recibo único.');return;}
+    const html='<div class="cfg-note">Reporta el pago de la cuota <b>'+U.esc(c.cuota||'')+'</b> por <b>'+U.money(c.monto,c.moneda)+'</b>. El reporte es evidencia suficiente del pago; la aplicación de la aseguradora puede completarse después.</div>'
+      +'<label class="ce-l" style="margin-top:10px">Fecha real del pago <span class="muted">(opcional)</span><input id="rp-fecha" class="o-sel" type="date"></label>'
+      +'<label class="ce-l" style="margin-top:10px">Soporte de pago <span class="muted">(opcional)</span><input id="rp-file" type="file" class="o-sel" accept="image/*,application/pdf"></label>'
+      +'<label class="ce-l" style="margin-top:10px">Nota <span class="muted">(opcional)</span><textarea id="rp-nota" class="o-sel" style="min-height:60px"></textarea></label>';
+    const back=drawer('📤 Reportar pago',html,async()=>{
+      const btn=back.querySelector('.btn.primary');if(btn)btn.disabled=true;
+      try{
+        const file=back.querySelector('#rp-file').files[0]||null;let supportRef='';
+        if(file){
+          const provider=Orbit.productDriveDocumentProviderP0;if(!provider||typeof provider.upload!=='function')throw new Error('PAYMENT_DOCUMENT_PROVIDER_UNAVAILABLE');
+          const out=await provider.upload(file,{documentType:'payment_support',clienteId:c.clienteId||clienteId,polizaId:c.polizaId||'',receiptId,sourceModule:'portal'});
+          if(!out||out.ok!==true||!(out.documentRef||out.driveUrl||out.externalUrl))throw new Error('PAYMENT_DOCUMENT_UPLOAD_FAILED');
+          supportRef=out.documentRef||out.driveUrl||out.externalUrl;
+        }
+        const domain=Orbit.reconciliationDomain;if(!domain||typeof domain.reportClientPayment!=='function')throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
+        await domain.reportClientPayment(receiptId,{payload:{
+          paidDate:back.querySelector('#rp-fecha').value||'',
+          paymentSupportDocumentRef:supportRef,
+          evidenceAsOfDate:Orbit.ui.today(),
+          paymentMethod:'',
+          note:back.querySelector('#rp-nota').value.trim()
+        }});
+        back.remove();toast('✓ Pago registrado · aplicación de aseguradora pendiente si aún no existe');render(host);
+      }catch(error){if(btn)btn.disabled=false;toast('No fue posible registrar el pago.');}
+    },'Registrar pago');
   }
 
   function soporteAsesor(cli) {

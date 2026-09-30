@@ -201,7 +201,7 @@ Orbit.modules.cobros = (function () {
           <thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th><th></th></tr></thead>
           <tbody>${r.map(c => {
             const p = indexPolicy(idx, c.polizaId);
-            if (c.__reportedEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-reported-payment-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado · por validar</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right"><button class="btn ghost sm" onclick="event.stopPropagation();Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')">Abrir recibo</button></td></tr>`; }
+            if (c.__reportedEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-reported-payment-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado · pendiente de aplicación automática</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right"><button class="btn ghost sm" onclick="event.stopPropagation();Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')">Abrir recibo</button></td></tr>`; }
 
             const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
             return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" onclick="Orbit.modules.cobros.detalle('${c.id}')">
@@ -213,7 +213,7 @@ Orbit.modules.cobros = (function () {
               <td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">—</span>'}</td>
               <td>${badgeValidacion(c)}</td>
               <td>${c.estado === 'Pagado' ? (c.conciliado ? '<span style="color:var(--ok)" title="Confirmado y conciliado con póliza">✓</span>' : '<span style="color:var(--warn)" title="Por conciliar">◷</span>') : '<span class="muted">—</span>'}</td>
-              <td style="text-align:right;white-space:nowrap">${c.reportado && !c.validadoReporte && (c.estado === 'Pendiente' || c.estado === 'Vencido') ? `<button class="btn primary sm" title="Validar pago reportado por el cliente" onclick="event.stopPropagation();Orbit.modules.cobros.validarReporte('${c.id}')">Validar</button>` : (aplicable ? `<button class="btn primary sm" title="Confirmar cobro" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${c.id}')">💳 Confirmar</button>` : '')}</td>
+              <td style="text-align:right;white-space:nowrap">${c.reportado && !c.validadoReporte && (c.estado === 'Pendiente' || c.estado === 'Vencido') ? `<button class="btn primary sm" title="Aplicar pago reportado por el cliente" onclick="event.stopPropagation();Orbit.modules.cobros.validarReporte('${c.id}')">Aplicar</button>` : (aplicable ? `<button class="btn primary sm" title="Confirmar cobro" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${c.id}')">💳 Confirmar</button>` : '')}</td>
             </tr>`;
           }).join('') || `<tr><td colspan="9" class="muted" style="text-align:center;padding:30px">Sin cobros.</td></tr>`}</tbody>
         </table></div>
@@ -242,6 +242,46 @@ Orbit.modules.cobros = (function () {
     st.page = next;
     const host = document.getElementById('host');
     if (host) render(host);
+  }
+
+  function resolveReceipt(cobroOrId) {
+    const c = typeof cobroOrId === 'object' && cobroOrId ? cobroOrId : S().get('cobros', cobroOrId);
+    if (!c) return null;
+    const directId = c.reciboId || c.receiptId || '';
+    if (directId) {
+      const direct = S().get('recibosEsperados', directId);
+      if (direct) return direct;
+    }
+    const sameText = (a,b) => String(a == null ? '' : a).trim().toLowerCase() === String(b == null ? '' : b).trim().toLowerCase();
+    const amount = x => { const n=Number(x); return Number.isFinite(n)?Math.round(n*100)/100:null; };
+    const targetAmount = amount(c.monto);
+    const due = String(c.vence || c.fechaLimite || c.fechaVencimiento || '');
+    const candidates = (S().all('recibosEsperados') || []).filter(r => {
+      if (!r || String(r.polizaId || '') !== String(c.polizaId || '')) return false;
+      const ri = r.cuota || r.serie || r.numeroReciboFuente || '';
+      if (c.cuota && ri && !sameText(ri,c.cuota)) return false;
+      const ra = amount(r.monto != null ? r.monto : (r.montoTotal != null ? r.montoTotal : r.primaTotal));
+      if (targetAmount != null && ra != null && Math.abs(targetAmount-ra)>0.01) return false;
+      const rd = String(r.vence || r.fechaLimite || r.fechaVencimiento || '');
+      if (due && rd && due !== rd) return false;
+      return true;
+    });
+    return candidates.length === 1 ? candidates[0] : null;
+  }
+  function resolveReceiptId(cobroOrId) { const r=resolveReceipt(cobroOrId); return r && r.id || ''; }
+  async function uploadPaymentDocument(file, kind, cobro, receiptId) {
+    if (!file) return '';
+    const provider = Orbit.productDriveDocumentProviderP0;
+    if (!provider || typeof provider.upload !== 'function') throw new Error('PAYMENT_DOCUMENT_PROVIDER_UNAVAILABLE');
+    const out = await provider.upload(file, {
+      documentType: kind,
+      clienteId: cobro.clienteId || '',
+      polizaId: cobro.polizaId || '',
+      receiptId: receiptId || '',
+      sourceModule: 'cobros'
+    });
+    if (!out || out.ok !== true || !(out.documentRef || out.driveUrl || out.externalUrl)) throw new Error('PAYMENT_DOCUMENT_UPLOAD_FAILED');
+    return out.documentRef || out.driveUrl || out.externalUrl;
   }
 
   /* ---- Detalle del recibo (drawer) — abre el detalle del cobro, no la póliza ---- */
@@ -315,138 +355,126 @@ Orbit.modules.cobros = (function () {
     if (cc) cc.addEventListener('click', () => { back.remove(); conciliarFactura(cobroId); });
   }
 
-  /* ---- Cargar factura y conciliar un recibo ya pagado (post-pago) ---- */
+  /* ---- Registrar aplicación del pago por la aseguradora: factura/fecha/número son enriquecimientos opcionales ---- */
   function conciliarFactura(cobroId) {
     const c = S().get('cobros', cobroId); if (!c) return;
+    const receipt = resolveReceipt(c);
+    if (!receipt) return U.toast('No fue posible identificar un único recibo esperado para este cobro.');
     let pm = document.getElementById('cob-conc'); if (pm) pm.remove();
     pm = document.createElement('div'); pm.id = 'cob-conc'; pm.className = 'drawer-back open';
     pm.style.cssText = 'display:grid;place-items:center;z-index:210';
-    const hoy = new Date().toISOString().slice(0, 10);
-    pm.innerHTML = '<div class="card" style="width:min(460px,95vw);padding:0">'
+    pm.innerHTML = '<div class="card" style="width:min(480px,95vw);padding:0">'
       + '<div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center">'
-      + '<b style="font-family:var(--f-display);font-size:16px;color:#fff">📄 Conciliar con factura</b>'
+      + '<b style="font-family:var(--f-display);font-size:16px;color:#fff">📄 Registrar aplicación del pago</b>'
       + '<button class="imp-x" id="cc-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
       + '<div style="padding:18px 20px;display:grid;gap:12px">'
-      + '<div class="cfg-note">El recibo está <b>Pagado</b> pero pendiente de conciliación. Carga la factura de la aseguradora y registra la fecha real de pago.</div>'
-      + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">Factura de la aseguradora *</span>'
-      + '<div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="cc-btn">⬆ Seleccionar factura</button>'
-      + '<span id="cc-name" class="muted" style="font-size:12px">Sin factura</span></div></div>'
-      + '<label class="ce-l">Fecha real de pago (de la factura)<input id="cc-fecha" class="o-sel" type="date" value="' + (c.fechaPago || hoy) + '"></label>'
-      + '</div>'
-      + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">'
-      + '<button class="btn ghost" id="cc-cancel">Cancelar</button>'
-      + '<button class="btn primary" id="cc-ok" disabled style="opacity:.5">✅ Conciliar</button></div></div>';
+      + '<div class="cfg-note">La <b>fecha de aplicación</b> es distinta de la fecha real en que pagó el cliente. La factura, su número y la fecha de aplicación son datos opcionales; se pueden completar ahora o después.</div>'
+      + '<label class="ce-l">Fecha de aplicación por la aseguradora<input id="cc-aplicacion" class="o-sel" type="date" value="' + U.esc(c.applicationDate || '') + '"></label>'
+      + '<label class="ce-l">Número de factura<input id="cc-numero" class="o-sel" value="' + U.esc(c.invoiceNumber || c.numeroFactura || '') + '" placeholder="Opcional"></label>'
+      + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">Factura / soporte de aplicación <span class="muted">(opcional)</span></span>'
+      + '<div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="cc-btn">⬆ Adjuntar factura</button><span id="cc-name" class="muted" style="font-size:12px">Sin archivo nuevo</span></div></div>'
+      + '</div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">'
+      + '<button class="btn ghost" id="cc-cancel">Cancelar</button><button class="btn primary" id="cc-ok">Guardar aplicación</button></div></div>';
     document.body.appendChild(pm);
-    let factName = '';
+    let invoiceFile = null;
     const close = () => pm.remove();
     pm.addEventListener('click', e => { if (e.target === pm) close(); });
-    pm.querySelector('#cc-x').addEventListener('click', close);
-    pm.querySelector('#cc-cancel').addEventListener('click', close);
-    const okBtn = pm.querySelector('#cc-ok');
-    pm.querySelector('#cc-btn').addEventListener('click', () => {
-      const fi = document.createElement('input'); fi.type = 'file'; fi.accept = '.pdf,image/*';
-      fi.onchange = () => { if (!fi.files[0]) return; factName = fi.files[0].name; pm.querySelector('#cc-name').textContent = '📄 ' + factName; okBtn.disabled = false; okBtn.style.opacity = '1'; };
+    pm.querySelector('#cc-x').onclick = close; pm.querySelector('#cc-cancel').onclick = close;
+    pm.querySelector('#cc-btn').onclick = () => {
+      const fi=document.createElement('input'); fi.type='file'; fi.accept='.pdf,image/*';
+      fi.onchange=()=>{ invoiceFile=fi.files&&fi.files[0]||null; pm.querySelector('#cc-name').textContent=invoiceFile?invoiceFile.name:'Sin archivo nuevo'; };
       fi.click();
-    });
-    okBtn.addEventListener('click', () => {
-      if (!factName) return;
-      const fechaReal = pm.querySelector('#cc-fecha').value || c.fechaPago;
-      S().update('cobros', cobroId, { conciliado: true, facturaNombre: factName, fechaReal });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'cobro', icon: '📄', fecha: fechaReal, titulo: 'Recibo conciliado', detalle: 'Factura ' + factName + ' · pago real ' + U.fmtDate(fechaReal) });
-      close();
-      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✅ Recibo conciliado'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
-      const host2 = document.getElementById('host'); if (host2) render(host2);
-    });
+    };
+    pm.querySelector('#cc-ok').onclick = async () => {
+      const btn=pm.querySelector('#cc-ok'); btn.disabled=true;
+      try {
+        const invoiceDocumentRef = await uploadPaymentDocument(invoiceFile,'insurer_invoice',c,receipt.id);
+        const domain=Orbit.reconciliationDomain;
+        if(!domain||typeof domain.enrichApplication!=='function') throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
+        await domain.enrichApplication(receipt.id,{payload:{
+          applicationDate:pm.querySelector('#cc-aplicacion').value||'',
+          invoiceNumber:pm.querySelector('#cc-numero').value.trim(),
+          invoiceDocumentRef
+        }});
+        close(); U.toast('✓ Aplicación del pago actualizada');
+        setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
+      } catch(error) {
+        btn.disabled=false; U.toast('No fue posible guardar la aplicación del pago.');
+      }
+    };
   }
 
-  /* ---- Validar un pago REPORTADO por el cliente (paso previo a aplicar) ---- */
-  function validarReporte(cobroId) {
+  /* ---- Compatibilidad: un pago reportado por el cliente se aplica automáticamente si el recibo es único ---- */
+  async function validarReporte(cobroId) {
     const c = S().get('cobros', cobroId); if (!c) return;
-    const cli = S().get('clientes', c.clienteId) || {};
-    let pm = document.getElementById('cob-val'); if (pm) pm.remove();
-    pm = document.createElement('div'); pm.id = 'cob-val'; pm.className = 'drawer-back open';
-    pm.style.cssText = 'display:grid;place-items:center;z-index:210';
-    pm.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
-      <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:16px">🔎 Validar pago reportado</b><button class="imp-x" id="cv-x">✕</button></div>
-      <div style="padding:18px 20px;display:grid;gap:12px">
-        <div class="cfg-note">El cliente <b>${U.esc(cli.nombre || '')}</b> reportó este pago (cuota ${U.esc(U.text(c.cuota, '—'))}, ${U.money(c.monto, c.moneda)}) el ${U.fmtDate(c.reportado)}. ${c.soporteNombre ? 'Soporte: <b>' + U.esc(c.soporteNombre) + '</b>.' : 'Sin soporte adjunto.'} Revisa contra el estado de cuenta antes de aplicar.</div>
-        ${c.notaReporte ? `<div style="font-size:12.5px"><b>Nota del cliente:</b> ${U.esc(c.notaReporte)}</div>` : ''}
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn ghost sm" id="cv-rev">◷ Marcar en revisión</button>
-          <button class="btn ghost sm" id="cv-rej" style="color:var(--danger)">✕ Rechazar reporte</button>
-        </div>
-      </div>
-      <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
-        <button class="btn ghost" id="cv-close">Cerrar</button>
-        <button class="btn primary" id="cv-ok">✓ Validar reporte</button></div></div>`;
-    document.body.appendChild(pm);
-    const close = () => pm.remove();
-    pm.addEventListener('click', e => { if (e.target === pm) close(); });
-    pm.querySelector('#cv-x').onclick = close; pm.querySelector('#cv-close').onclick = close;
-    pm.querySelector('#cv-rev').onclick = () => { S().update('cobros', cobroId, { enRevision: true }); close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('◷ Pago en revisión'); };
-    pm.querySelector('#cv-rej').onclick = () => { S().update('cobros', cobroId, { reportado: null, enRevision: false, notaReporte: '' }); close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('✕ Reporte rechazado — recibo vuelve a pendiente'); };
-    pm.querySelector('#cv-ok').onclick = () => { S().update('cobros', cobroId, { validadoReporte: true, enRevision: false }); close(); const h = document.getElementById('host'); if (h) render(h); Orbit.ui.toast('✓ Reporte validado — ahora podés aplicar el pago'); };
+    const receipt = resolveReceipt(c);
+    if (!receipt) return U.toast('El reporte no tiene un recibo único; requiere revisión de relación, no validación manual del pago.');
+    const domain=Orbit.reconciliationDomain;
+    if(!domain||typeof domain.reportClientPayment!=='function') return U.toast('Aplicación canónica de pagos no disponible.');
+    try {
+      await domain.reportClientPayment(receipt.id,{payload:{
+        paidDate:c.fechaPagoReportada||c.fechaPago||'',
+        evidenceAsOfDate:c.reportado||'',
+        paymentMethod:c.metodoPago||c.metodo||'',
+        paymentSupportDocumentRef:c.paymentSupportDocumentRef||''
+      }});
+      U.toast('✓ Pago reportado aplicado');
+      setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
+    } catch(error) {
+      U.toast('No fue posible aplicar el pago reportado.');
+    }
   }
 
-  /* ---- Confirmar cobro (modal reutilizable: desde la ficha del recibo y desde la tabla) ---- */
+  /* ---- Registrar pago por el owner canónico: pago y aplicación son hechos distintos ---- */
   function aplicarPago(cobroId) {
-      const c = S().get('cobros', cobroId); if (!c) return;
-      const cur = c.moneda;
-      let pm = document.getElementById('cob-pay'); if (pm) pm.remove();
-      pm = document.createElement('div'); pm.id = 'cob-pay'; pm.className = 'drawer-back open';
-      pm.style.cssText = 'display:grid;place-items:center;z-index:210';
-      const hoy = new Date().toISOString().slice(0, 10);
-      pm.innerHTML = '<div class="card" style="width:min(480px,95vw);padding:0;max-height:92vh;overflow:auto">'
-        + '<div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center">'
-        + '<div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.6);text-transform:uppercase">Cobros · confirmar cobro</div>'
-        + '<b style="font-family:var(--f-display);font-size:16px;color:#fff">💳 Confirmar cobro — ' + U.money(c.monto, cur) + '</b></div>'
-        + '<button class="imp-x" id="pm-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
-        + '<div style="padding:18px 20px;display:grid;gap:12px">'
-        + '<label class="ce-l">Fecha de envío a gestión *<input id="pm-fecha" class="o-sel" type="date" value="' + hoy + '"></label>'
-        + '<label class="ce-l">Método de pago<select id="pm-metodo" class="o-sel"><option>Transferencia bancaria</option><option>Tarjeta de crédito</option><option>Tarjeta de débito</option><option>Cheque</option><option>Efectivo</option><option>Visa cuotas</option></select></label>'
-        + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">📄 Factura de la aseguradora (opcional)</span>'
-        + '<div style="display:flex;gap:8px;align-items:center">'
-        + '<button class="btn ghost sm" id="pm-fact-btn">⬆ Seleccionar factura</button>'
-        + '<span id="pm-fact-name" class="muted" style="font-size:12px">Sin factura</span></div>'
-        + '<div class="muted" style="font-size:11.5px;margin-top:5px">Al cargar la factura, el recibo pasa a <b>Conciliado</b> y se registra la fecha real de pago.</div></div>'
-        + '<label class="ce-l">Fecha real de pago (de la factura)<input id="pm-fecha-real" class="o-sel" type="date"></label>'
-        + '</div>'
-        + '<div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">'
-        + '<button class="btn ghost" id="pm-cancel">Cancelar</button>'
-        + '<button class="btn primary" id="pm-ok">✅ Confirmar cobro</button></div></div>';
-      document.body.appendChild(pm);
-      let factName = '', factData = '';
-      const pmClose = () => pm.remove();
-      pm.addEventListener('click', e => { if (e.target === pm) pmClose(); });
-      pm.querySelector('#pm-x').addEventListener('click', pmClose);
-      pm.querySelector('#pm-cancel').addEventListener('click', pmClose);
-      pm.querySelector('#pm-fact-btn').addEventListener('click', () => {
-        const fi = document.createElement('input'); fi.type = 'file'; fi.accept = '.pdf,image/*';
-        fi.onchange = () => {
-          if (!fi.files[0]) return;
-          factName = fi.files[0].name;
-          pm.querySelector('#pm-fact-name').textContent = '📄 ' + factName;
-          const r = new FileReader(); r.onload = e2 => { factData = e2.target.result; }; r.readAsDataURL(fi.files[0]);
-        };
-        fi.click();
-      });
-      pm.querySelector('#pm-ok').addEventListener('click', () => {
-        const fecha = pm.querySelector('#pm-fecha').value;
-        const metodo = pm.querySelector('#pm-metodo').value;
-        const fechaReal = pm.querySelector('#pm-fecha-real').value;
-        const conciliado = !!factName;
-        const patch = { estado: 'Pagado', fechaPago: fecha, metodo, conciliado };
-        if (factName) { patch.facturaNombre = factName; patch.fechaReal = fechaReal || fecha; }
-        S().update('cobros', cobroId, patch);
-        if (Orbit.q && Orbit.q.postRecaudo) Orbit.q.postRecaudo(Object.assign({}, c, patch), fecha, metodo);
-        S().insert('actividades', { id: 'act'+Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'cobro', icon: '💳', fecha, titulo: 'Pago confirmado', detalle: U.money(c.monto, cur) + ' · ' + metodo + (conciliado ? ' · Conciliado' : '') });
-        // Fire automations
-        const cliObj = S().get('clientes', c.clienteId);
-        if (Orbit.modules.automatizaciones && cliObj) Orbit.modules.automatizaciones.disparar('pago_aplicado', { nombre: (cliObj.nombre||'').split(' ')[0], monto: U.money(c.monto, cur) });
-        pmClose();
-        const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✅ Pago confirmado' + (conciliado ? ' y conciliado' : ' — pendiente conciliación'); document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
-        const host2 = document.getElementById('host'); if (host2) render(host2);
-      });
+    const c = S().get('cobros', cobroId); if (!c) return;
+    const receipt=resolveReceipt(c);
+    if(!receipt) return U.toast('No fue posible identificar un único recibo esperado para registrar el pago.');
+    const p=S().get('polizas',c.polizaId)||{};
+    const cli=S().get('clientes',c.clienteId)||{};
+    let pm=document.getElementById('cob-pay'); if(pm)pm.remove();
+    pm=document.createElement('div');pm.id='cob-pay';pm.className='drawer-back open';pm.style.cssText='display:grid;place-items:center;z-index:210';
+    pm.innerHTML='<div class="card" style="width:min(520px,95vw);padding:0;max-height:92vh;overflow:auto">'
+      +'<div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.6);text-transform:uppercase">Cobros · registrar pago</div><b style="font-family:var(--f-display);font-size:16px;color:#fff">💳 '+U.money(c.monto,c.moneda)+'</b></div><button class="imp-x" id="pm-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
+      +'<div style="padding:18px 20px;display:grid;gap:12px">'
+      +'<div class="cfg-note"><b>Pago</b> y <b>aplicación de la aseguradora</b> son fechas distintas. Ningún soporte es obligatorio. Si no conoces un dato, puede completarse después sin duplicar el cobro.</div>'
+      +'<label class="ce-l">Fecha real del pago <span class="muted">(opcional)</span><input id="pm-paid" class="o-sel" type="date" value="'+U.esc(c.paidDate||c.fechaPago||'')+'"></label>'
+      +'<label class="ce-l">Método de pago <span class="muted">(opcional)</span><select id="pm-metodo" class="o-sel"><option value="">Sin especificar</option><option>Transferencia bancaria</option><option>Tarjeta de crédito</option><option>Tarjeta de débito</option><option>Cheque</option><option>Efectivo</option><option>Visa cuotas</option><option>Link de pago</option></select></label>'
+      +'<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);display:block;margin-bottom:7px">Soporte del pago del cliente <span class="muted">(opcional)</span></span><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="pm-support-btn">⬆ Adjuntar soporte</button><span id="pm-support-name" class="muted" style="font-size:12px">Sin archivo</span></div></div>'
+      +'<hr style="border:0;border-top:1px solid var(--line)">'
+      +'<label class="ce-l">Fecha de aplicación por la aseguradora <span class="muted">(opcional)</span><input id="pm-app" class="o-sel" type="date" value="'+U.esc(c.applicationDate||'')+'"></label>'
+      +'<label class="ce-l">Número de factura <span class="muted">(opcional)</span><input id="pm-invoice-number" class="o-sel" value="'+U.esc(c.invoiceNumber||c.numeroFactura||'')+'"></label>'
+      +'<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);display:block;margin-bottom:7px">Factura / soporte de aplicación <span class="muted">(opcional)</span></span><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="pm-invoice-btn">⬆ Adjuntar factura</button><span id="pm-invoice-name" class="muted" style="font-size:12px">Sin archivo</span></div></div>'
+      +'<label class="ce-l" style="display:flex;align-items:center;gap:8px;flex-direction:row;cursor:pointer"><input id="pm-avisar" type="checkbox" checked style="width:auto"> Avisar al cliente después de registrar</label>'
+      +'</div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="pm-cancel">Cancelar</button><button class="btn primary" id="pm-ok">Registrar pago</button></div></div>';
+    document.body.appendChild(pm);
+    let supportFile=null,invoiceFile=null;
+    const close=()=>pm.remove();
+    pm.addEventListener('click',e=>{if(e.target===pm)close();});pm.querySelector('#pm-x').onclick=close;pm.querySelector('#pm-cancel').onclick=close;
+    const choose=(id,label,setter)=>{pm.querySelector(id).onclick=()=>{const fi=document.createElement('input');fi.type='file';fi.accept='.pdf,image/*';fi.onchange=()=>{const file=fi.files&&fi.files[0]||null;setter(file);pm.querySelector(label).textContent=file?file.name:'Sin archivo';};fi.click();};};
+    choose('#pm-support-btn','#pm-support-name',f=>supportFile=f);choose('#pm-invoice-btn','#pm-invoice-name',f=>invoiceFile=f);
+    pm.querySelector('#pm-ok').onclick=async()=>{
+      const btn=pm.querySelector('#pm-ok');btn.disabled=true;
+      try{
+        const domain=Orbit.reconciliationDomain;if(!domain||typeof domain.applyPayment!=='function')throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
+        const supportRef=await uploadPaymentDocument(supportFile,'payment_support',c,receipt.id);
+        const invoiceRef=await uploadPaymentDocument(invoiceFile,'insurer_invoice',c,receipt.id);
+        await domain.applyPayment(receipt.id,{payload:{
+          sourceType:'manual',
+          paidDate:pm.querySelector('#pm-paid').value||'',
+          paymentMethod:pm.querySelector('#pm-metodo').value||'',
+          paymentSupportDocumentRef:supportRef,
+          applicationDate:pm.querySelector('#pm-app').value||'',
+          invoiceNumber:pm.querySelector('#pm-invoice-number').value.trim(),
+          invoiceDocumentRef:invoiceRef,
+          amount:c.monto
+        }});
+        const avisar=pm.querySelector('#pm-avisar')&&pm.querySelector('#pm-avisar').checked;
+        close();U.toast('✓ Pago registrado');
+        if(avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
+        setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
+      }catch(error){btn.disabled=false;U.toast('No fue posible registrar el pago.');}
+    };
   }
 
   /* ---- Preparación de cobro por LOTE (selecciona recibos pendientes/vencidos) ---- */
@@ -500,5 +528,5 @@ Orbit.modules.cobros = (function () {
     paint();
   }
 
-  return { render, detalle, aplicarPago, validarReporte, conciliarFactura, lote, pagina };
+  return { render, detalle, aplicarPago, validarReporte, conciliarFactura, resolveReceiptId, lote, pagina };
 })();

@@ -19,3 +19,19 @@ need(client.includes('function enrichApplication'),'B3_004_CLIENT_ENRICH_MISSING
 need(client.includes("orbit360CobrosReconciliationCommandPreview"),'B3_004_PREVIEW_ROUTING_MISSING');
 need(!/makeRequestId\([^)]*\)[^{]*\{[^}]*Date\.now/.test(client),'B3_004_NONDETERMINISTIC_REQUEST_ID');
 console.log(JSON.stringify({schema:'GRAVICENTRA_I6_5_B3_004_SOURCE_CONTRACT_V1',status:'PASS',serverOwner:'functions/cobros-reconciliation-domain.js',browserOwner:'orbit360-platform/core/cobros-reconciliation-domain-client.js',idempotent:true,separatePaymentAndApplicationDates:true,previewOnlyAlias:true,noBusinessWrite:true,noReimport:true,noLive:true}));
+
+const cobros=read('orbit360-platform/modules/cobros.js');
+const cliente=read('orbit360-platform/modules/cliente360.js');
+const portal=read('orbit360-platform/modules/portal.js');
+const receiptView=read('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js');
+need(cobros.includes('domain.applyPayment'),'B3_004_COBROS_NOT_CANONICAL');
+need(cobros.includes('domain.reportClientPayment'),'B3_004_REPORTED_PAYMENT_NOT_CANONICAL');
+need(cobros.includes('domain.enrichApplication'),'B3_004_APPLICATION_NOT_CANONICAL');
+need(cobros.includes('Fecha real del pago')&&cobros.includes('Fecha de aplicación por la aseguradora'),'B3_004_DATE_SEMANTICS_UI_MISSING');
+need(cobros.includes('Número de factura'),'B3_004_INVOICE_NUMBER_UI_MISSING');
+need(cliente.includes('reutiliza exactamente el owner canónico de Cobros'),'B3_004_CLIENTE360_NOT_DELEGATED');
+need(!cliente.includes('Cargar la factura fija la <b>fecha real</b> del pago'),'B3_004_CLIENTE360_LEGACY_INVOICE_SEMANTIC');
+need(portal.includes('domain.reportClientPayment'),'B3_004_PORTAL_NOT_CANONICAL');
+need(!portal.includes("S().update('cobros', cobroId, { reportado:"),'B3_004_PORTAL_DIRECT_PAYMENT_WRITE');
+need(receiptView.includes("'Fecha real de pago'")&&receiptView.includes("'Fecha de aplicación'")&&receiptView.includes("'Número de factura'"),'B3_004_RECEIPT_DETAIL_FIELDS_MISSING');
+console.log('B3_004_SURFACE_CONVERGENCE_CONTRACT=PASS');

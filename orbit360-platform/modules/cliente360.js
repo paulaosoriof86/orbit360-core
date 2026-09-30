@@ -583,13 +583,13 @@ Orbit.modules.cliente360 = (function () {
         <td style="font-size:12.5px">${U.fmtDate(x.fechaLimite || x.vence || x.fechaVencimiento)}</td>
         <td style="font-size:12.5px">${paymentDate ? U.fmtDate(paymentDate) : '<span class="muted">—</span>'}</td>
         <td style="font-size:12.5px">${method ? U.esc(method) : '<span class="muted">—</span>'}</td>
-        <td><span class="badge info">Pago reportado · por validar</span></td>
+        <td><span class="badge info">Pago reportado · pendiente de aplicación automática</span></td>
         <td><span class="badge warn">Pendiente</span></td>
       </tr>`;
     }).join('');
     const visibleRows = confirmedRows + reportedRows;
     const note = reported.length
-      ? `Hay <b>${reported.length}</b> pago(s) reportado(s) pendientes de validación. Se muestran como evidencia y no incrementan cobros confirmados.`
+      ? `Hay <b>${reported.length}</b> pago(s) reportado(s) pendientes de materialización canónica. Se muestran como evidencia histórica hasta ejecutar la aplicación idempotente.`
       : 'No hay pagos reportados pendientes de validación para el filtro actual.';
     return `<div class="card" data-rp-native-cobros-note="1" style="padding:12px 14px;margin-bottom:12px"><b>Cobros y evidencia de pago</b><div class="muted" style="font-size:12.5px;margin-top:3px">${note} Los cobros confirmados se muestran en la misma tabla y su conciliación se mantiene separada.</div></div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="cob-pol-fil" class="o-sel" style="max-width:360px;font-size:12.5px">${polOptions}</select></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
@@ -833,60 +833,12 @@ Orbit.modules.cliente360 = (function () {
     if (f) f.addEventListener('change', () => { recPolFiltro[cid] = f.value; tab = 'recibos'; detalle(cid); });
   }
 
-  /* ---- Confirmar cobro: fecha de confirmación (default hoy, editable) + factura (fecha real) ---- */
+  /* ---- Registrar pago: Cliente 360 reutiliza exactamente el owner canónico de Cobros ---- */
   function aplicarPago(cobroId, cid) {
-    const c = S().get('cobros', cobroId); if (!c) return;
-    const p = S().get('polizas', c.polizaId);
-    let back = document.getElementById('c360-pago'); if (back) back.remove();
-    back = document.createElement('div'); back.id = 'c360-pago'; back.className = 'drawer-back open';
-    back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
-    back.innerHTML = `<div class="card" style="width:min(460px,94vw);padding:0">
-      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:16px">💳 Confirmar cobro</b><button class="imp-x" id="ap-x">✕</button></div>
-      <div style="padding:18px 20px;display:grid;gap:13px">
-        <div class="vp-grid">
-          ${vrow('Recibo', 'REC-' + c.id.slice(-5).toUpperCase())}${vrow('Cuota', c.cuota)}
-          ${vrow('Póliza', p ? p.numero : '—')}${vrow('Monto', U.money(c.monto, c.moneda))}
-        </div>
-        <label class="ce-l">Fecha de confirmación <span class="muted">(día en que el equipo confirma el cobro)</span><input id="ap-fecha" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
-        <label class="ce-l">Forma de pago<select id="ap-metodo" class="o-sel">${(Orbit.primas ? Orbit.primas.FORMAS_PAGO : ['Transferencia', 'Tarjeta de crédito', 'Efectivo']).map(m => `<option ${m === (p && p.formaPago) ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
-        <div class="ap-fact">
-          <label class="ce-l" style="margin:0">📄 Factura de la aseguradora <span class="muted">(opcional)</span><input id="ap-file" type="file" class="o-sel" accept="image/*,application/pdf"></label>
-          <label class="ce-l" id="ap-real-wrap" style="display:none;margin-top:9px">Fecha real en que pagó la aseguradora<input id="ap-real" class="o-sel" type="date" value="${Orbit.ui.today()}"></label>
-          <div class="muted" style="font-size:11px;margin-top:7px">Cargar la factura fija la <b>fecha real</b> del pago y <b>concilia</b> el recibo (medio adicional de conciliación). Sin factura, el recibo queda <b>Pagado · por conciliar</b>.</div>
-          <label class="ce-l" style="margin-top:11px;display:flex;align-items:center;gap:8px;flex-direction:row;cursor:pointer"><input id="ap-avisar" type="checkbox" checked style="width:auto"> 📲 Avisar al cliente (WhatsApp / correo)</label>
-        </div>
-      </div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn ghost" id="ap-cancel">Cancelar</button><button class="btn primary" id="ap-ok">Registrar cobro confirmado</button></div>
-    </div>`;
-    document.body.appendChild(back);
-    const close = () => back.remove();
-    const $ = s => back.querySelector(s);
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    $('#ap-x').addEventListener('click', close); $('#ap-cancel').addEventListener('click', close);
-    let factura = null;
-    $('#ap-file').addEventListener('change', e => { factura = e.target.files[0] ? e.target.files[0].name : null; $('#ap-real-wrap').style.display = factura ? '' : 'none'; });
-    $('#ap-ok').addEventListener('click', () => {
-      const conciliado = !!factura;
-      const patchP = {
-        estado: 'Pagado', fechaPago: $('#ap-fecha').value, metodo: $('#ap-metodo').value,
-        conciliado, facturaNombre: factura || '', fechaReal: conciliado ? $('#ap-real').value : ''
-      };
-      S().update('cobros', cobroId, patchP);
-      if (Orbit.q && Orbit.q.postRecaudo) Orbit.q.postRecaudo(Object.assign({}, c, patchP), $('#ap-fecha').value, $('#ap-metodo').value);
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: (p && p.asesorId) || '', tipo: 'sistema', icon: '💳', fecha: $('#ap-fecha').value, titulo: 'Pago confirmado · ' + (p ? p.numero : ''), detalle: 'Cuota ' + c.cuota + ' · ' + U.money(c.monto, c.moneda) + (conciliado ? ' · conciliado con factura (' + factura + ')' : ' · por conciliar') });
-      const avisar = $('#ap-avisar') && $('#ap-avisar').checked;
-      close();
-      if (avisar) {
-        Orbit.notify.pedir(cid, {
-          tipo: 'Aviso de pago confirmado', icon: '💳',
-          asunto: 'Confirmación de pago · póliza ' + (p ? p.numero : ''),
-          mensaje: 'Hola ' + (r.cli.nombre || '') + ', confirmamos tu pago de ' + U.money(c.monto, c.moneda) + ' (cuota ' + c.cuota + ') de la póliza ' + (p ? p.numero : '') + '. ¡Gracias por tu confianza!',
-          onSent: () => detalle(cid)
-        });
-      } else { detalle(cid); }
-    });
+    if (Orbit.modules && Orbit.modules.cobros && typeof Orbit.modules.cobros.aplicarPago === 'function') {
+      return Orbit.modules.cobros.aplicarPago(cobroId);
+    }
+    U.toast('Aplicación canónica de pagos no disponible.');
   }
 
   /* ---- Comisiones ---- */

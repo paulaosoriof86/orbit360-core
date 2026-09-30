@@ -6601,3 +6601,34 @@ jobs:
       - name: Preserve B3-004 fail-closed boundary
         if: ${{ failure() && steps.gate.outputs.run == 'true' }}
         run: echo "B3_004_FOUNDATION_FAILED_NO_DATA_WRITE_NO_REIMPORT_NO_LIVE"
+
+      - name: Gate B3-004 surface convergence
+        id: surface
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const b=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json','utf8'));
+          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_004_SURFACE_CONTRACT'
+            && c.i65ForensicRemediationPlan?.b3?.status==='B3_004_SURFACES_FIXED_PENDING_CONTRACT'
+            && b.status==='B3_004_SURFACES_FIXED_PENDING_CONTRACT'
+            && b.activeFinding?.id==='B3-004';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          NODE
+      - uses: actions/setup-node@v4
+        if: steps.surface.outputs.run == 'true'
+        with:
+          node-version: '22'
+      - name: Prove B3-004 surface convergence contract
+        if: steps.surface.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/modules/cobros.js
+          node --check orbit360-platform/modules/cliente360.js
+          node --check orbit360-platform/modules/portal.js
+          node --check orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js
+          node tools/gravicentra-i6-5-b3-004-contract.mjs
+          echo "B3_004_SURFACE_CONVERGENCE=PASS"
+      - name: Preserve B3-004 surface fail-closed boundary
+        if: ${{ failure() && steps.surface.outputs.run == 'true' }}
+        run: echo "B3_004_SURFACE_FAILED_NO_DATA_WRITE_NO_REIMPORT_NO_LIVE"

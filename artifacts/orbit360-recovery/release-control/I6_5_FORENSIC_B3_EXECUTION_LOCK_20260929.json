@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_SURFACE_CONVERGENCE_AUTHORIZED",
+  "status": "B3_004_SURFACES_FIXED_PENDING_CONTRACT",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "SURFACE_CONVERGENCE_AUTHORIZED",
+    "status": "SURFACES_FIXED_PENDING_CONTRACT",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
     "boundaries": {
@@ -40,7 +40,16 @@
       "client": "8f668d6db0cf8e513c4ff17f12a46c73fa150da1",
       "contract": "f7873144557effff71b7e33f2eccdb772832692b"
     },
-    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json"
+    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
+    "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
+    "surfaceBlobs": {
+      "orbit360-platform/modules/cobros.js": "12172970c503bc535569878702ffea6e65f9508a",
+      "orbit360-platform/modules/cliente360.js": "c684fef4d21f8867d9919623c5cab316752a2dfd",
+      "orbit360-platform/modules/portal.js": "fc23c03e4c59c256be81553e472dee6d2d4ef895",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "148c68af1a4362102c3f14586e475682fffbcafe",
+      "orbit360-platform/index.html": "0d94cd428b03443d52d3400bce6354c8ed1dfb5a",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "e39e6cb1a6d33bc1abe9b35732cf2fab4b493d82"
+    }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -83,7 +92,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,

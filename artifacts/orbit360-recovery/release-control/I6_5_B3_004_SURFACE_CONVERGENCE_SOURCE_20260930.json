@@ -1,0 +1,71 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_V1",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "date": "2026-09-30",
+  "gate": "I6.5-B3-004",
+  "parentSourceContract": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
+  "rootCause": "SPLIT_DIRECT_PAYMENT_WRITES_AND_CONFLATED_PAYMENT_APPLICATION_SEMANTICS",
+  "changes": {
+    "orbit360-platform/modules/cobros.js": {
+      "before": "6a3c521b8973b15504ef569e819651219ebb6363",
+      "after": "12172970c503bc535569878702ffea6e65f9508a",
+      "semantics": [
+        "canonical applyPayment/reportClientPayment/enrichApplication",
+        "receipt identity resolution",
+        "optional Drive support/invoice uploads",
+        "paidDate separate from applicationDate",
+        "invoiceNumber exposed"
+      ]
+    },
+    "orbit360-platform/modules/cliente360.js": {
+      "before": "62c98fc97ce92e9b826f08ce8195594d88996813",
+      "after": "c684fef4d21f8867d9919623c5cab316752a2dfd",
+      "semantics": [
+        "delegates payment action to Cobros canonical owner",
+        "removes legacy invoice-as-real-payment-date semantics"
+      ]
+    },
+    "orbit360-platform/modules/portal.js": {
+      "before": "18931725de98e1ac630f85b269969f6aa6f0f50c",
+      "after": "fc23c03e4c59c256be81553e472dee6d2d4ef895",
+      "semantics": [
+        "client report calls reportClientPayment",
+        "optional payment support",
+        "no second human validation step",
+        "no direct cobros mutation"
+      ]
+    },
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": {
+      "before": "81cb2db0a7b3a26387fba980d9cecaa5f8d3d4eb",
+      "after": "148c68af1a4362102c3f14586e475682fffbcafe",
+      "semantics": [
+        "receipt detail surfaces actual paid date",
+        "inferred effective date",
+        "application date",
+        "invoice number",
+        "two evidence refs"
+      ]
+    },
+    "orbit360-platform/index.html": {
+      "before": "6309531946f8363dbcf444f61a3fca61d84070c2",
+      "after": "0d94cd428b03443d52d3400bce6354c8ed1dfb5a",
+      "semantics": [
+        "cache bust exact B3-004 surface files"
+      ]
+    },
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": {
+      "before": "f7873144557effff71b7e33f2eccdb772832692b",
+      "after": "e39e6cb1a6d33bc1abe9b35732cf2fab4b493d82",
+      "semantics": [
+        "surface convergence assertions"
+      ]
+    }
+  },
+  "boundaries": {
+    "businessDataWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "productionCallableDeploy": false
+  },
+  "next": "B3_004_SURFACE_CONVERGENCE_CONTRACT_PASS"
+}
