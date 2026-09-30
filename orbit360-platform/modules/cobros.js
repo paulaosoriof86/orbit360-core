@@ -97,6 +97,38 @@ Orbit.modules.cobros = (function () {
     const tone = e === 'Conciliado' ? 'ok' : /Pagado/.test(e) ? 'ok' : e === 'Validada (por aplicar)' ? 'ok' : e === 'Reportado por cliente' ? 'info' : e === 'En revisión' ? 'info' : e === 'Requiere validación' ? 'warn' : e === 'Bloqueado' ? 'danger' : e === 'Vencido' ? 'danger' : 'warn';
     return '<span class="badge ' + tone + '">' + U.esc(U.text(e, 'Sin estado')) + '</span>';
   }
+  function safeMoney(value, currency, short) {
+    const cur = String(currency || '').trim().toUpperCase() || 'SIN_MONEDA';
+    if (cur === 'SIN_MONEDA') return 'Sin moneda · ' + Math.round(Number(value) || 0).toLocaleString('es-GT');
+    if (cur === 'GTQ' || cur === 'COP' || cur === 'USD') return (short ? U.moneyShort(value, cur) : U.money(value, cur)) + ' ' + cur;
+    const n = U.finiteNumber(value);
+    return cur + ' ' + (n == null ? '—' : Math.round(n).toLocaleString('es-GT'));
+  }
+  function currencyMetric(summary, field) {
+    const currencies = (summary && summary.currencies || []).slice();
+    if (!currencies.length) return '—';
+    return '<span data-currency-safe-metric="' + U.esc(field) + '" style="display:grid;gap:2px">' +
+      currencies.map(cur => '<span style="white-space:nowrap">' + U.esc(safeMoney(summary.byCurrency[cur] && summary.byCurrency[cur][field], cur, true)) + '</span>').join('') +
+      '</span>';
+  }
+  function agingCurrencyBlocks(summary, colors) {
+    const currencies = (summary && summary.currencies || []).slice();
+    if (!currencies.length) return '<div class="muted" style="font-size:12.5px;margin-top:12px">Sin cartera vencida en el filtro actual.</div>';
+    return currencies.map(cur => {
+      const buckets = summary.byCurrency[cur] || { '1-30': 0, '31-60': 0, '61-90': 0, '90+': 0 };
+      const total = Object.values(buckets).reduce((s, v) => s + (U.finiteNumber(v) || 0), 0);
+      const denom = total || 1;
+      return '<div data-aging-currency="' + U.esc(cur) + '" style="padding-top:12px' + (currencies.length > 1 ? ';border-top:1px solid var(--line-2)' : '') + '">' +
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><b style="font-size:12.5px">' + U.esc(cur) + '</b><span class="muted" style="font-size:12px">total ' + U.esc(safeMoney(total, cur, false)) + '</span></div>' +
+        '<div style="height:13px;border-radius:99px;overflow:hidden;display:flex;margin:10px 0 10px">' +
+          Object.entries(buckets).map(([k, v]) => '<div title="' + U.esc(k) + ' días" style="width:' + ((U.finiteNumber(v) || 0) / denom * 100) + '%;background:' + colors[k] + '"></div>').join('') +
+        '</div>' +
+        '<div style="display:flex;gap:18px;flex-wrap:wrap">' +
+          Object.entries(buckets).map(([k, v]) => '<span style="display:flex;align-items:center;gap:7px;font-size:12.5px"><span class="dot-s" style="background:' + colors[k] + '"></span>' + U.esc(k) + ' d · <b>' + U.esc(safeMoney(v, cur, false)) + '</b></span>').join('') +
+        '</div></div>';
+    }).join('');
+  }
+
   function render(host) {
     const hyd = hydrationState();
     if (!hyd.ready) {
@@ -112,10 +144,9 @@ Orbit.modules.cobros = (function () {
     }
 
     const idx = buildIndex();
-    const cart = q.carteraGlobal();
-    const aging = q.agingVencido();
-    const agingTot = Object.values(aging).reduce((s, v) => s + v, 0) || 1;
-    const porConciliar = S().where('cobros', c => c.estado === 'Pagado' && !c.conciliado).length;
+    const cart = q.carteraGlobalPorMoneda();
+    const aging = q.agingVencidoPorMoneda();
+    const porConciliar = (cart.currencies || []).reduce((sum, cur) => sum + Number(cart.byCurrency[cur] && cart.byCurrency[cur].porConciliar || 0), 0);
     const authoritative = rows(idx), reported = reportedRows(idx), allRows = authoritative.concat(reported);
     const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE));
     if (st.page > totalPages) st.page = totalPages;
@@ -128,24 +159,19 @@ Orbit.modules.cobros = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('cobros', `<button class="btn ghost" onclick="Orbit.modules.cobros.lote()" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📤 Preparar lote</button>`)}
       ${K.kpis([
-        { label: 'Cartera al día', val: U.moneyShort(cart.alDia, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'cobros confirmados', footTone: 'up' },
-        { label: 'Pendiente', val: U.moneyShort(cart.pend, Orbit.q.monedaPais()), color: 'var(--warn)', foot: 'por vencer' },
-        { label: 'Vencido', val: U.moneyShort(cart.venc, Orbit.q.monedaPais()), color: 'var(--danger)', foot: 'en gestión', footTone: 'down' },
+        { label: 'Cartera al día', val: currencyMetric(cart, 'alDia'), color: 'var(--ok)', foot: 'cobros confirmados · sin conversión entre monedas', footTone: 'up' },
+        { label: 'Pendiente', val: currencyMetric(cart, 'pend'), color: 'var(--warn)', foot: 'por vencer · por moneda' },
+        { label: 'Vencido', val: currencyMetric(cart, 'venc'), color: 'var(--danger)', foot: 'en gestión · por moneda', footTone: 'down' },
         { label: 'Por conciliar', onclick: "location.hash='#/cobros'", val: porConciliar, color: 'var(--info)', foot: 'cobros confirmados sin conciliación' }
       ])}
       ${reported.length ? `<div class="card" data-reported-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${reported.length} pago(s) reportado(s) por validar</b><div class="muted" style="font-size:12px;margin-top:3px">Se muestran como evidencia operativa y no se contabilizan como cobros confirmados hasta validación/aplicación.</div></div>` : ''}
 
       <div class="card pad" style="margin-bottom:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
           <b style="font-family:var(--f-display);font-size:15px">Antigüedad de cartera vencida (aging)</b>
-          <span class="muted" style="font-size:12px">total ${U.money(agingTot, Orbit.q.monedaPais())}</span>
+          <span class="muted" style="font-size:12px">País: ${U.esc(aging.country === 'TODOS' ? 'Todos los países' : aging.country)} · importes separados por moneda</span>
         </div>
-        <div style="height:13px;border-radius:99px;overflow:hidden;display:flex;margin:14px 0 12px">
-          ${Object.entries(aging).map(([k, v]) => `<div title="${k} días" style="width:${v / agingTot * 100}%;background:${agingCols[k]}"></div>`).join('')}
-        </div>
-        <div style="display:flex;gap:18px;flex-wrap:wrap">
-          ${Object.entries(aging).map(([k, v]) => `<span style="display:flex;align-items:center;gap:7px;font-size:12.5px"><span class="dot-s" style="background:${agingCols[k]}"></span>${k} d · <b>${U.money(v, Orbit.q.monedaPais())}</b></span>`).join('')}
-        </div>
+        ${agingCurrencyBlocks(aging, agingCols)}
       </div>
 
       <div class="card" style="overflow:hidden">
