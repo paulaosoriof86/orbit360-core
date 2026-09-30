@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_V1",
+  "status": "B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE",
+  "exactCandidate": {
+    "sourceSha": "41aacc71b343574338ed25efbc6902fb25b13677",
+    "buildId": "gi-i65-b3-41aacc71b343-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b3-36656317848-phqsawss.web.app",
+    "runId": 36656317848,
+    "artifactId": 11071994782
+  },
+  "humanEvidence": {
+    "recordedAt": "2026-09-29T19:57:00-06:00",
+    "findings": [
+      "Colombia selected but table continues showing Persona · GT, GT policies and GTQ amounts.",
+      "Guatemala and Colombia show the same mixed client universe.",
+      "With Colombia selected the top KPI remains GTQ while aging is labeled País: CO and COP.",
+      "Country selection visibly renders one screen and then another."
+    ],
+    "screenshots": [
+      "image(20260930-015429).png",
+      "image(20260930-015454).png",
+      "image(20260930-015509).png",
+      "image(20260930-015545).png",
+      "image(20260930-015658).png",
+      "image(20260930-015714).png"
+    ]
+  },
+  "sourceFacts": {
+    "rendererOwner": "orbit360-platform/modules/cobros.js",
+    "rendererCountryLeak": "rows() and reportedPaymentEvidence() do not apply active Orbit.pais.",
+    "parallelProjectionOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+    "splitAuthority": "Adapter has countryOk() but replacesRenderer=false, so its filtered rows are not the rendered table authority.",
+    "countryTransitionOwner": "orbit360-platform/index.html",
+    "countryTransition": "sets Orbit.pais, dispatches orbit:pais, then synthetic hashchange; runtime discriminator still required for double-render source."
+  },
+  "boundaries": {
+    "productMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "liveHostingPromotionAuthorized": false,
+    "b4Authorized": false
+  },
+  "nextAction": "B3_003_COUNTRY_TRANSITION_RUNTIME_DIAGNOSTIC"
+}
