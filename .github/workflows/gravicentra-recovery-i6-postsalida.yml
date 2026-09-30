@@ -6660,3 +6660,224 @@ jobs:
       - name: Preserve B3-004 provenance fail-closed boundary
         if: ${{ failure() && steps.provenance.outputs.run == 'true' }}
         run: echo "B3_004_PROVENANCE_FAILED_NO_DATA_WRITE_NO_REIMPORT_NO_LIVE"
+
+
+  i65-b3-004-exact-preview:
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B3_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json
+      FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate B3-004 exact Preview
+        id: gate
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const b=JSON.parse(fs.readFileSync(process.env.B3_LOCK,'utf8'));
+          const qa=b.syntheticQaAuthorization||{};
+          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_004_PREVIEW'
+            && c.i65ForensicRemediationPlan?.b3?.status==='B3_004_CANDIDATE_PENDING_EXACT_PREVIEW'
+            && b.status==='B3_004_CANDIDATE_PENDING_EXACT_PREVIEW'
+            && b.activeFinding?.id==='B3-004'
+            && b.boundaries?.dataMutationAuthorized===false
+            && b.boundaries?.reimportAuthorized===false
+            && b.boundaries?.liveHostingPromotionAuthorized===false
+            && qa.status==='AUTHORIZED_FOR_B3_004_PREVIEW_ONLY'
+            && qa.cleanupRequired===true
+            && qa.operationalBusinessWritesAuthorized===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('B3_004_PREVIEW_MODE='+(ok?'RUN':'NOOP'));
+          NODE
+      - name: Assert LIVE unchanged before B3-004
+        if: steps.gate.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+      - name: Validate B3-004 source contracts
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node --check functions/cobros-reconciliation-domain.js
+          node --check orbit360-platform/core/cobros-reconciliation-domain-client.js
+          node --check orbit360-platform/modules/cobros.js
+          node --check orbit360-platform/modules/cliente360.js
+          node --check orbit360-platform/modules/portal.js
+          node --check tools/gravicentra-i6-5-b3-004-preview-proof.mjs
+          node tools/gravicentra-i6-5-b3-004-contract.mjs
+      - name: Install Firebase CLI and B3-004 dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b3-004-auth"; mkdir -p "$ROOT"; export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json'; p.write_text(json.dumps(d)); p.chmod(0o600); rows.append(str(p))
+          if not rows: raise SystemExit('B3_004_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          CROOT="$RUNNER_TEMP/b3-004-firebase-cli"
+          npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CROOT"
+          CLI="$CROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          SEL=''
+          while read -r F; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then SEL="$F"; break; fi
+          done < "$ROOT/files"
+          test -n "$SEL"
+          cp "$SEL" "$RUNNER_TEMP/b3-004-sa.json"
+          chmod 600 "$RUNNER_TEMP/b3-004-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b3-004-sa.json" >> "$GITHUB_ENV"
+          npm --prefix functions ci --ignore-scripts >/dev/null
+      - name: Resolve public web config
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps-b3-004.json"
+          export APPS="$RUNNER_TEMP/apps-b3-004.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['APPS'])); a=d.get('result') if isinstance(d,dict) else None
+          web=[x for x in (a or []) if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1: raise SystemExit('B3_004_WEB_APP_CARDINALITY:'+str(len(web)))
+          print(web[0].get('appId',''))
+          PY
+          )
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config-b3-004.json"
+          echo "PUBLIC_CONFIG_FILE=$RUNNER_TEMP/public-config-b3-004.json" >> "$GITHUB_ENV"
+      - name: Deploy B3-004 Preview-only payment backend
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommandPreview --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-function-deploy.json"
+          cat "$RUNNER_TEMP/b3-004-function-deploy.json"
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-functions.json"
+          grep -q "orbit360CobrosReconciliationCommandPreview" "$RUNNER_TEMP/b3-004-functions.json"
+          echo "B3_004_PREVIEW_BACKEND=PASS"
+      - name: Snapshot branding and materialize immutable B3-004 package
+        if: steps.gate.outputs.run == 'true'
+        id: build
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/b3-004-branding-snapshot.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/b3-004-branding-snapshot.json"
+          export SOURCE_SHA="$GITHUB_SHA" RELEASE_GATE="I6.5-B3-004" BUILD_PREFIX="gi-i65-b3" ENVIRONMENT_REF="firebase-hosting-preview-i6-5-forensic-b3-004"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b3-004-package" "$PUBLIC_CONFIG_FILE" > "$RUNNER_TEMP/b3-004-package-output.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b3-004-package-output.json'));
+          for(const[k,v]of Object.entries({build_id:d.buildId,hosted_payload_digest:d.hostedPayloadDigest,backend_source_digest:d.backendSourceDigest,bundle_digest:d.bundleDigest}))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
+          NODE
+      - name: Deploy exact B3-004 package to isolated Hosting Preview
+        if: steps.gate.outputs.run == 'true'
+        id: preview
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/b3-004-package/bundle"
+          CHANNEL_ID="gi-b3004-$GITHUB_RUN_ID"
+          deploy_channel() {
+            set +e
+            node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b3-004-preview.json" 2>&1
+            RC=$?
+            set -e
+            cat "$RUNNER_TEMP/b3-004-preview.json"
+            return "$RC"
+          }
+          if ! deploy_channel; then
+            if grep -Fq "channel quota reached" "$RUNNER_TEMP/b3-004-preview.json"; then
+              node "$GITHUB_WORKSPACE/tools/gravicentra-preview-channel-gc.mjs" "$FIREBASE_CLI_BIN" "$PROJECT_ID" "$CHANNEL_ID" "$GITHUB_WORKSPACE" "gi-"
+              deploy_channel
+            else
+              exit 1
+            fi
+          fi
+          export DEPLOY="$RUNNER_TEMP/b3-004-preview.json"
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['DEPLOY']).read(); prod='https://'+os.environ['HOSTING_SITE']+'.web.app'
+          urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
+          if not urls: raise SystemExit('B3_004_PREVIEW_URL_NOT_FOUND')
+          print(urls[-1])
+          PY
+          )
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+      - name: Exact B3-004 Hosting Preview readback
+        if: steps.gate.outputs.run == 'true'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+        run: |
+          set -euo pipefail
+          export MANIFEST="$RUNNER_TEMP/b3-004-package/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import hashlib,json,os,time,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
+          base=os.environ['TARGET_URL'].rstrip('/')
+          for attempt in range(1,9):
+              bad=[]
+              for want,rel in rows:
+                  try:
+                      with urllib.request.urlopen(urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?b3004='+str(attempt)+'-'+str(int(time.time())),headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store'}),timeout=30) as z: got=hashlib.sha256(z.read()).hexdigest()
+                  except Exception as e: got=type(e).__name__
+                  if got!=want: bad.append(rel)
+              with urllib.request.urlopen(base+'/__recovery__/build.json?b3004='+str(time.time()),timeout=30) as z: marker=json.loads(z.read())
+              if not bad and marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID']: break
+              if attempt==8: raise SystemExit('B3_004_READBACK:'+str(bad[:5])+':'+str(marker))
+              time.sleep(3)
+          print('B3_004_HOSTING_READBACK=PASS')
+          PY
+      - name: B3-004 synthetic create retry enrich readback cleanup proof
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B3_004_PROOF_OUT: ${{ runner.temp }}/b3-004-preview-proof.json
+          FUNCTION_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360CobrosReconciliationCommandPreview
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b3-004-preview-proof.mjs
+          node -e "const x=require(process.env.B3_004_PROOF_OUT);if(x.status!=='PASS'||x.cleanup?.pass!==true)process.exit(1);console.log('B3_004_SYNTHETIC_PROOF=PASS')"
+      - name: Upload immutable B3-004 package and proof
+        if: steps.gate.outputs.run == 'true'
+        id: artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b3-004-preview-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b3-004-package
+            ${{ runner.temp }}/b3-004-preview-proof.json
+            ${{ runner.temp }}/b3-004-function-deploy.json
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+      - name: Emit B3-004 machine proof summary
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          echo "B3_004_MACHINE_PASS=PASS"
+          echo "B3_004_SOURCE_SHA=$GITHUB_SHA"
+          echo "B3_004_BUILD_ID=${{ steps.build.outputs.build_id }}"
+          echo "B3_004_PREVIEW_URL=${{ steps.preview.outputs.preview_url }}"
+          echo "B3_004_CHANNEL_ID=${{ steps.preview.outputs.channel_id }}"
+          echo "B3_004_ARTIFACT_ID=${{ steps.artifact.outputs.artifact-id }}"
+          echo "B3_004_ARTIFACT_DIGEST=${{ steps.artifact.outputs.artifact-digest }}"
+      - name: B3-004 failure remains fail-closed
+        if: ${{ failure() && steps.gate.outputs.run == 'true' }}
+        run: echo "B3_004_FAILED_NO_OPERATIONAL_DATA_WRITE_NO_REIMPORT_NO_LIVE_NO_B4"
