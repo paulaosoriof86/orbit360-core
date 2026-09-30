@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_MACHINE_PASS_AFTER_VISUAL_REMEDIATION_V1",
+  "status": "PASS_PENDING_TARGETED_VISUAL",
+  "recordedAt": "2026-09-30",
+  "exactCandidate": {
+    "sourceSha": "1fa38ba1e1b2736f7a6cb61a4e4bc869de9d9ace",
+    "buildId": "gi-i65-b3-1fa38ba1e1b2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36727490527-y3yfh7tk.web.app",
+    "channelId": "gi-b3004-36727490527",
+    "runId": 36727490527,
+    "artifactId": 11102708133,
+    "artifactDigest": "f0d3d99f99af61ce3f93caf820841bc5893f3ea3dc87ec618e1450f28e8f06c3",
+    "previewBackendPass": true,
+    "exactHostingReadbackPass": true,
+    "syntheticProofPass": true,
+    "cleanupPass": true,
+    "clientReportAutoApplied": true,
+    "secondHumanApprovalRequired": false,
+    "idempotentRetry": true,
+    "singleCobro": true,
+    "applicationEnrichesSameCobro": true,
+    "paymentProvenancePreserved": true,
+    "paidDateSeparatedFromApplicationDate": true,
+    "invoiceNumberPersisted": true,
+    "receiptUpdated": true,
+    "portfolioUpdated": true,
+    "liveUnchanged": true,
+    "liveBindingSource": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+    "liveBindingBuild": "gi-i65-4bf67a373875-57f234755dc1"
+  },
+  "evidence": {
+    "workflowName": "Gravicentra I6 Post-Salida",
+    "workflowConclusion": "success",
+    "exactReadback": "B3_004_HOSTING_READBACK=PASS",
+    "syntheticProof": "B3_004_SYNTHETIC_PROOF=PASS",
+    "machineProof": "B3_004_MACHINE_PASS=PASS",
+    "cleanup": true
+  },
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4": false
+  },
+  "nextRequiredProof": "B3_004_TARGETED_VISUAL_PASS"
+}
