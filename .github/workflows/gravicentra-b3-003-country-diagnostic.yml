@@ -9,6 +9,10 @@ on:
       - 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json'
+      - 'orbit360-platform/core/queries.js'
+      - 'orbit360-platform/modules/cobros.js'
+      - 'orbit360-platform/index.html'
+      - 'artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json'
       - '.github/workflows/gravicentra-b3-003-country-diagnostic.yml'
   workflow_dispatch:
 
@@ -23,6 +27,7 @@ jobs:
       CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       B3_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json
       FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+      COMPOSITION: artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -83,8 +88,78 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
           echo "synced=true" >> "$GITHUB_OUTPUT"
 
-      - name: Gate exact diagnostic state
+
+      - name: Freeze causal source fix as exact Preview candidate
+        id: sourcefix
         if: steps.sync.outputs.synced != 'true'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),cp=require('node:child_process');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const b=JSON.parse(fs.readFileSync(process.env.B3_LOCK,'utf8'));
+          const m=JSON.parse(fs.readFileSync(process.env.COMPOSITION,'utf8'));
+          const f=JSON.parse(fs.readFileSync(process.env.FINDINGS,'utf8'));
+          const allowed=['orbit360-platform/core/queries.js','orbit360-platform/modules/cobros.js','orbit360-platform/index.html'];
+          const ready=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_003_FIX'
+            && c.i65ForensicRemediationPlan?.b3?.status==='B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED'
+            && b.status==='B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED'
+            && b.activeFinding?.id==='B3-003'
+            && b.boundaries?.productMutationAuthorized===true
+            && b.boundaries?.dataMutationAuthorized===false
+            && b.boundaries?.reimportAuthorized===false
+            && b.boundaries?.liveHostingPromotionAuthorized===false
+            && m.lastRemediation?.id==='B3-003-COUNTRY-LINEAGE-TRANSITION-ROOTFIX-20260929'
+            && m.lastRemediation?.status==='SOURCE_FIXED_PENDING_EXACT_PREVIEW';
+          if(!ready){
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,'frozen=false\n');
+            process.exit(0);
+          }
+          for(const p of allowed){
+            const actual=cp.execFileSync('git',['hash-object',p],{encoding:'utf8'}).trim();
+            if(m.productFileBlobs?.[p]!==actual)throw new Error('B3_003_COMPOSITION_BLOB_DRIFT:'+p);
+            if(m.b3003CountryLineageFix?.exactBlobBindings?.[p]!==actual)throw new Error('B3_003_CAUSAL_BINDING_DRIFT:'+p);
+          }
+          b.status='B3_003_CANDIDATE_PENDING_PREVIEW';
+          b.activeFinding={...(b.activeFinding||{}),status:'CANDIDATE_PENDING_PREVIEW',sourceFixHead:process.env.GITHUB_SHA};
+          b.boundaries.productMutationAuthorized=false;
+          b.nextRequiredProof=['B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS','B3_003_TARGETED_VISUAL_PASS'];
+          fs.writeFileSync(process.env.B3_LOCK,JSON.stringify(b,null,2)+'\n');
+          const x=(f.findings||[]).find(y=>y.id==='B3-003'); if(!x)throw new Error('B3_003_FINDING_MISSING');
+          Object.assign(x,{status:'CANDIDATE_PENDING_PREVIEW',sourceFixHead:process.env.GITHUB_SHA,nextAction:'B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS'});
+          f.currentB3={...(f.currentB3||{}),status:'B3_003_CANDIDATE_PENDING_PREVIEW',activeFindingId:'B3-003'};
+          fs.writeFileSync(process.env.FINDINGS,JSON.stringify(f,null,2)+'\n');
+          c.i65ForensicRemediationPlan.b3={...(c.i65ForensicRemediationPlan.b3||{}),
+            status:'B3_003_CANDIDATE_PENDING_PREVIEW',
+            sourceSha:process.env.GITHUB_SHA,
+            productMutationAuthorized:false,
+            candidateEligibleForPromotion:false,
+            paulaVisualAccepted:false
+          };
+          c.nextAction='I6_5_FORENSIC_REMEDIATION_B3_003_PREVIEW';
+          c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),nextAction:'B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS'};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$B3_LOCK" "$FINDINGS"
+          LOCK_BLOB=$(git hash-object "$B3_LOCK"); export LOCK_BLOB
+          FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
+          COMPOSITION_BLOB=$(git hash-object "$COMPOSITION"); export COMPOSITION_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p,'utf8'));
+          c.i65ForensicRemediationPlan.b3.executionLockBlobSha=process.env.LOCK_BLOB;
+          c.canonicalAccumulationControl.findingLedgerBlobSha=process.env.FINDINGS_BLOB;
+          c.canonicalAccumulationControl.compositionLockBlobSha=process.env.COMPOSITION_BLOB;
+          fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5 B3): bind B3-003 causal source fix candidate"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+          echo "frozen=true" >> "$GITHUB_OUTPUT"
+
+      - name: Gate exact diagnostic state
+        if: steps.sync.outputs.synced != 'true' && steps.sourcefix.outputs.frozen != 'true'
         id: gate
         run: |
           set -euo pipefail
