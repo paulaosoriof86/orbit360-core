@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-lab-deploy-intent-s440-v1.0",
   "authorization": "APPLY_RUNTIME_EXPORT_AND_DEPLOY_LAB_SYNTHETIC_READBACK",
-  "authorizedSourceParent": "008e5e95d8e9ee343c03fddc5f0d6c69ec380276",
+  "authorizedSourceParent": "e8f61589e144fd5379316dfcfdc2d5899f0df49d",
   "projectId": "ays-orbit-360-lab",
   "environment": "LAB",
   "region": "us-central1",
@@ -12,5 +12,6 @@
   "production": false,
   "syntheticReadbackOnly": true,
   "authorizedAt": "2026-09-30",
-  "ownerAuthorizationText": "Autorizo aplicar el runtime export CotComp S4.38 y desplegarlo exclusivamente en ays-orbit-360-lab para prueba sintética/readback, sin persistencia, sin writes, sin datos reales y sin producción."
+  "ownerAuthorizationText": "Autorizo aplicar el runtime export CotComp S4.38 y desplegarlo exclusivamente en ays-orbit-360-lab para prueba sintética/readback, sin persistencia, sin writes, sin datos reales y sin producción.",
+  "retriggerReason": "PREDEPLOY_GUARD_CAUGHT_OLD_OPS_LEADS_OWNER_BLOB; DEPLOY_BRANCH_REALIGNED_TO_CANONICAL_S4.20"
 }
