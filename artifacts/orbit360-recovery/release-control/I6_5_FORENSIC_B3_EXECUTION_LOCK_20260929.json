@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_PREVIEW_MACHINE_PASS_TARGETED_VISUAL_AUTH_BLOCKED",
+  "status": "B3_004_PREVIEW_MACHINE_PASS_TARGETED_VISUAL_HUMAN_EVIDENCE_REQUIRED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -290,7 +290,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R6_1_AUTHENTICATE_TINYFISH_PROFILE_THEN_TARGETED_VISUAL",
+    "nextAction": "B3_004_R6_1_TARGETED_VISUAL_HUMAN_SESSION_MINIMAL_EVIDENCE",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -329,6 +329,11 @@
       "blobSha": "c62a956ab7d78850a833e2a6651c2cf6b60144ba",
       "tinyFishRunId": "c6d912d4-9d97-48ff-934a-f886f5f0e8c2",
       "productFailure": false
+    },
+    "r61TinyFishAuthReplayLimitation": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_TINYFISH_FIREBASE_AUTH_REPLAY_LIMITATION_20260930.json",
+      "blobSha": "14b765d95c9397dca4b43107c717458d0c98d452",
+      "productFailure": false
     }
   },
   "canonicalComposition": {
@@ -338,7 +343,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "fab4eb9d9db560022dad0bef0a5801b0c5c0cf4c"
+    "blobSha": "b13c2c7fb3a197dcb94048a2b9a540f5403c9c7e"
   },
   "nextRequiredProof": [
     "B3_004_R6_TARGETED_VISUAL_PASS"

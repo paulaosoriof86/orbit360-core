@@ -1,0 +1,37 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R6_1_TINYFISH_FIREBASE_AUTH_REPLAY_LIMITATION_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "636fb8b97986e8f7fe97bd7176eddfa8b2136d3c",
+  "findingId": "B3-004",
+  "status": "VISUAL_AUTOMATION_TOOLING_LIMITATION_CONFIRMED",
+  "exactPreview": {
+    "sourceSha": "5daa1b1e50931dfa7af346c97c06754f503f88d1",
+    "buildId": "gi-i65-b3-5daa1b1e5093-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36763283882-x867tfv3.web.app",
+    "artifactDigest": "60db8f505d6809b97e6ad527bf2797c1a7e796c7a9d8cbe8be2b5b9864acdf06"
+  },
+  "evidence": {
+    "userAuthenticatedSetupBrowserObserved": true,
+    "activeRoleObserved": "Dirección",
+    "appShellObserved": "Gravicentra Insurance authenticated dashboard",
+    "dedicatedTinyFishProfileId": "prof_73964ba53f8f4106",
+    "dedicatedProfileCapture": "1 captured domain, 0 cookies, 1 storage origin",
+    "replayRunId": "f0e39df2-400f-4fd1-b0e6-aab53d900ed2",
+    "replayResult": "PRE_AUTH_LOGIN_SCREEN",
+    "vaultRepairRunId": "a5a23f8c-8f18-4e98-b35e-9bf9693ab584",
+    "vaultRepairResult": "NO_VAULT_ITEMS_AND_NO_REPLAYABLE_ACTIVE_SESSION"
+  },
+  "diagnosis": "The user successfully authenticated inside TinyFish profile capture, but the saved Browser Context Profile does not replay the Firebase authenticated state into automation. Repeating profile login/save is not expected to add evidence and must not be requested again.",
+  "productFailure": false,
+  "securityDecision": "Do not create a bypass, temporary backdoor, hidden auth route, or expose user credentials to automate visual QA.",
+  "fallback": "Targeted visual acceptance must use the already authenticated human Preview session with minimal screenshots/read-only observation; machine proof remains valid and unchanged.",
+  "boundaries": {
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3005Opened": false
+  },
+  "nextAction": "B3_004_R6_1_TARGETED_VISUAL_HUMAN_SESSION_MINIMAL_EVIDENCE"
+}
