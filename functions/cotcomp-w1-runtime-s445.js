@@ -46,7 +46,11 @@ function requireProofRequest(request){
   if(!/^s445-[A-Za-z0-9._:-]{6,100}$/.test(proofRunId)){
     throw new HttpsError('invalid-argument','S445_PROOF_RUN_ID_INVALID');
   }
-  return proofRunId;
+  const mode=clean(request.data.mode||'RUN',40);
+  if(!['RUN','VERIFY_ABSENCE'].includes(mode)){
+    throw new HttpsError('invalid-argument','S445_MODE_INVALID');
+  }
+  return {proofRunId,mode};
 }
 function idsFor(proofRunId){
   const seed=TENANT_ID+'|'+proofRunId;
@@ -239,12 +243,32 @@ const cotcompSyntheticCoreWriteProof=onCall({
   memory:'256MiB',
   maxInstances:1
 },async request=>{
-  const proofRunId=requireProofRequest(request);
+  const gate=requireProofRequest(request);
+  const proofRunId=gate.proofRunId;
   const ids=idsFor(proofRunId);
   const paths=pathsFor(ids);
   const refs=refsFor(paths);
   const proofStartedAt=new Date().toISOString();
   const payloads=payloadsFor(ids,proofStartedAt,'BASE');
+
+  if(gate.mode==='VERIFY_ABSENCE'){
+    const verify=await readExact(refs);
+    const finalAbsence=Object.values(verify).every(x=>x.exists===false);
+    if(!finalAbsence) throw new HttpsError('failed-precondition','S445_VERIFY_ABSENCE_FAILED');
+    return {
+      ok:true,
+      version:VERSION,
+      mode:'VERIFY_ABSENCE',
+      proofRunId,
+      projectId:PROJECT_ID,
+      region:REGION,
+      tenantId:TENANT_ID,
+      syntheticOnly:true,
+      finalAbsence:true,
+      writesExecuted:0,
+      productionTouched:false
+    };
+  }
 
   let created=false;
   let initialReadback=null;
@@ -296,6 +320,7 @@ const cotcompSyntheticCoreWriteProof=onCall({
     return {
       ok:true,
       version:VERSION,
+      mode:'RUN',
       proofRunId,
       projectId:PROJECT_ID,
       region:REGION,
