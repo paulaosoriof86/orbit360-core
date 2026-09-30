@@ -453,6 +453,13 @@
       "blobSha": "9bba43730e52c69abe21550b1d083677db8b94fc",
       "workflowBlobSha": "503ebfc0efb124f676712eb7b145204800e0b2ed",
       "status": "FIXED"
+    },
+    "r8OperationalProofAuthTransportRootfix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_OPERATIONAL_PROOF_AUTH_TRANSPORT_ROOTFIX_20260930.json",
+      "blobSha": "5c450cd2cb9a0429e3261443b19a014a878ceb72",
+      "harnessBlobSha": "5250adf733cf686b661e426481a5cec871a628b0",
+      "failedRunId": 36785475672,
+      "status": "FIXED_PENDING_RERUN"
     }
   },
   "canonicalComposition": {
@@ -462,7 +469,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "b906050374cd617984bada5d54c7a1d0917b515f"
+    "blobSha": "fd8e0fe38d3d2b219338561bc06dabe40c1943b5"
   },
   "nextRequiredProof": [
     "B3_004_R8_EXACT_PREVIEW_MACHINE_PASS",

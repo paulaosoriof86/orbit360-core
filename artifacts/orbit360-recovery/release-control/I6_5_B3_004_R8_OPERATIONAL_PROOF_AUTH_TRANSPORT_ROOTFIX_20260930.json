@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R8_OPERATIONAL_PROOF_AUTH_TRANSPORT_ROOTFIX_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "51c7aa445997766e3e1cfe2f4becfa52f68702dc",
+  "status": "HARNESS_FIXED_PENDING_EXACT_PREVIEW_RERUN",
+  "failedRunId": 36785475672,
+  "failedJobId": 110125730226,
+  "preservedPass": [
+    "B3-004 source contracts",
+    "LIVE unchanged precheck",
+    "Preview backend deployment",
+    "immutable package materialization",
+    "Hosting Preview deploy",
+    "exact Hosting readback",
+    "canonical payment synthetic proof + cleanup"
+  ],
+  "failure": {
+    "step": "B3-004 R8 operational scope and soft-delete synthetic proof",
+    "code": "functions/unauthenticated",
+    "classification": "HARNESS_AUTH_TRANSPORT_DEFECT",
+    "productRegressionDemonstrated": false
+  },
+  "rootCause": "The Node Firebase Functions client invocation did not attach authenticated request context immediately after custom-token sign-in. The callable therefore rejected before the product scope/delete logic was exercised.",
+  "fix": "Keep Firebase custom-token authentication but explicitly obtain the Firebase ID token and send it as Authorization: Bearer to the isolated us-east1 Preview callable. Also verify/clean only the known failed-run synthetic IDs before the rerun.",
+  "harnessBlobSha": "5250adf733cf686b661e426481a5cec871a628b0",
+  "boundaries": {
+    "productSourceChanged": false,
+    "operationalBusinessWrites": false,
+    "syntheticQaOnly": true,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  }
+}
