@@ -141,12 +141,17 @@ jobs:
           sha256sum "$ARCHIVE" | awk '{print $1}' > "$EVID/source-archive-sha256.txt"
 
           FUNCTIONS_OK=false
-          if gcloud functions list --gen2 --project "$COTCOMP_PROJECT_ID" --format=json > "$EVID/functions-inventory.json" 2>"$ROOT/functions-list.err"; then
+          TOKEN="$(gcloud auth print-access-token)"
+          FUNCTIONS_URL="https://cloudfunctions.googleapis.com/v2/projects/$COTCOMP_PROJECT_ID/locations/-/functions?pageSize=1000"
+          FUNCTIONS_HTTP="$(curl -sS -L -w '%{http_code}' -H "Authorization: Bearer $TOKEN" -o "$ROOT/functions-list-response.json" "$FUNCTIONS_URL" || true)"
+          if [ "$FUNCTIONS_HTTP" = "200" ]; then
+            jq '.functions // []' "$ROOT/functions-list-response.json" > "$EVID/functions-inventory.json"
             FUNCTIONS_OK=true
           else
             printf '[]' > "$EVID/functions-inventory.json"
           fi
           printf '%s' "$FUNCTIONS_OK" > "$EVID/functions-inventory-read.txt"
+          rm -f "$ROOT/functions-list-response.json"
 
           EVENTARC_OK=false
           if gcloud eventarc triggers list --location "$COTCOMP_REGION" --project "$COTCOMP_PROJECT_ID" --format=json > "$EVID/eventarc-triggers.json" 2>"$ROOT/eventarc-list.err"; then
