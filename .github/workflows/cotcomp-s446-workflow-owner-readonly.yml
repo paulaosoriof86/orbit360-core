@@ -226,6 +226,7 @@ jobs:
             region:'us-central1',
             functionObservedActive:e.state==='ACTIVE',
             deployedOwnerBlob:e.deployedOwnerBlob,
+            containsCotcompRef:e.containsCotcompRef===true,
             sourceArchiveReadOnly:e.sourceArchiveReadOnly===true,
             writeExecuted:false,
             productionTouched:false
