@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R9P1_SOURCE_CONTRACT",
+      "nextAction": "B3_004_R9P1_SOURCE_CONTRACT_RERUN",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1494,6 +1494,12 @@
         "blobSha": "3b90fa3b8d7624bac16179ef4a2202caf0bc1b50",
         "sourceSha": "ad8d79438c87b234501405e5d15743f6538957f0",
         "compositionLockBlobSha": "67e9f26b51350daf99e8dfdb18bf128a8c8e9b6d"
+      },
+      "r9p1StaleClientValidatorRepair": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9P1_STALE_CLIENT_ASSET_VALIDATOR_REPAIR_20260930.json",
+        "blobSha": "e6f700eb7e3de15e3e40c17e135cb3250d06a11c",
+        "contractBlobSha": "578fa63457a613d74d63b6a35a1f2fc43634ae85",
+        "status": "FIXED_PENDING_RERUN"
       }
     },
     {
@@ -5123,7 +5129,7 @@
     "r8ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_SOURCE_CONTRACT_PASS_20260930.json",
     "successorDispatchRootfixStatus": "FIXED",
     "lastFailedPreviewRunId": 36785475672,
-    "lastFailureClassification": "QA_STALE_ASSET_ASSERTION",
+    "lastFailureClassification": "STALE_QA_SUCCESSOR_ASSERTION",
     "productRegressionDemonstrated": false,
     "r8MachineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_MACHINE_PASS_20260930.json",
     "r9VisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_TARGETED_VISUAL_REJECTION_20260930.json",

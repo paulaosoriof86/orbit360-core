@@ -1,0 +1,26 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R9P1_STALE_CLIENT_ASSET_VALIDATOR_REPAIR_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "a77e51ede61a44185922cf009bbf4c461de54a5c",
+  "status": "FIXED_PENDING_RERUN",
+  "failedRunId": 36791776256,
+  "failedJobId": 110146086000,
+  "failure": {
+    "code": "B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED",
+    "classification": "STALE_QA_SUCCESSOR_ASSERTION",
+    "productRegressionDemonstrated": false
+  },
+  "fix": {
+    "contractBlobSha": "578fa63457a613d74d63b6a35a1f2fc43634ae85",
+    "staleR7ClientAssetAssertionsUpdatedToR9P1": 2
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  }
+}

@@ -91,7 +91,7 @@ need(cobros.includes('data-cobros-action="apply"'),'B3_004_GLOBAL_APPLY_ACTION_M
 need(cobros.includes('data-cobros-action="reconcile"'),'B3_004_GLOBAL_RECONCILE_ACTION_MARKER_MISSING');
 need(!cobros.includes('Confirmar cobro'),'B3_004_GLOBAL_CONFIRMAR_COBRO_REMAINS');
 need(indexR4.includes('modules/cobros.js?v=20260930-b3004r8'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
-need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r7'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r9p1'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20260930-b3004r6'),'B3_004_PAYMENT_CLIENT_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r9p1'),'B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT=PASS');
@@ -148,7 +148,7 @@ need(cliente.includes('data-paid-receipt-evidence'),'B3_004_R7_CLIENT_PAID_RECEI
 need(cliente.includes('Todas las pólizas</option>'),'B3_004_R7_CLIENT_ALL_POLICIES_FILTER_MISSING');
 need(!cliente.includes('activePolicyIds'),'B3_004_R7_CLIENT_ACTIVE_POLICY_PAYMENT_GATE_REMAINS');
 need(indexR4.includes('modules/cobros.js?v=20260930-b3004r8'),'B3_004_R8_COBROS_ASSET_VERSION_NOT_BUMPED');
-need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r7'),'B3_004_R7_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r9p1'),'B3_004_R7_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_R7_COBROS_VISIBILITY_FILTER_CONTRACT=PASS');
 
 const operationalStoreR8=read('orbit360-platform/data/store-firestore-product-operational-p0.js');
