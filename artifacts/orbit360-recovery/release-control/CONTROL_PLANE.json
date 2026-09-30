@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_003_DIAGNOSTIC",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_003_FIX",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -3157,16 +3157,16 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "B3_003_READ_ONLY_DIAGNOSTIC_ACTIVE",
+      "status": "B3_003_CAUSE_CONFIRMED_FIX_AUTHORIZED",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
       "livePromoted": false,
       "activeFindingId": "B3-003",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "427bbaf767a7235db339d0578fb355f0c4a39e89",
+      "executionLockBlobSha": "006f66fedffecb06683d37a9636535aa3cd53f49",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
       "sourceFixReceiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
-      "productMutationAuthorized": false,
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "mechanismRootFix": {
@@ -3196,11 +3196,11 @@
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
       "findingLedgerBlobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
-      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_20260929.json",
-      "diagnosticRunId": 36651311858,
-      "diagnosticArtifactId": 11070607951,
-      "diagnosticArtifactDigest": "sha256:a94f1225aff71d7fd53ab7cebb553e684ccb52bcd90f111bebf49af5ac222245",
-      "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_KPI_AGING_CURRENCY_DIAGNOSTIC_20260929.json",
+      "diagnosticRunId": 36654461494,
+      "diagnosticArtifactId": 11071897701,
+      "diagnosticArtifactDigest": "sha256:5921eb661a892abb11d7371fbce3e31bc4fa93e9bb356b5807f4aad6c4f6c5dc",
+      "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
       "causalFixSource": {
         "rendererBlobSha": "6b399b2b27423d170b7a758a9e65a873bba70605",
         "adapterBlobSha": "08367dc718e702a5634711e4efc90722c1cac923",
@@ -3312,7 +3312,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "7c98d93553fa773364edfcf321abf081b2fef7eb",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "3b9bb03ed0f7d9c612e6de078d49f52abde23bd4",
+    "findingLedgerBlobSha": "1d7d076725ce25eb219320aa36f6acfa57765122",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -3324,7 +3324,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_003_READONLY_KPI_AGING_CURRENCY_DIAGNOSTIC"
+    "nextAction": "B3_003_CAUSAL_SOURCE_FIX"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
