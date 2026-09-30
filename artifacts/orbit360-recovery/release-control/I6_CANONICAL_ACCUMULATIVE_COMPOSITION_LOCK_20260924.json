@@ -483,7 +483,7 @@
     }
   },
   "b3004CrmMigrationOriginR5": {
-    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "findingId": "B3-004",
     "subFindingId": "B3-004-R5-CRM-MIGRATION-PROVENANCE-AND-COPYFIX",
     "rootCause": "MIGRATED_CRM_DIRECT_PAYMENT_COLLAPSED_INTO_CLIENT_REPORT_PLUS_GLOBAL_COPYFIX_REWRITES_CANONICAL_PAYMENT_LABELS",
@@ -514,6 +514,25 @@
     "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_20260930.json",
     "contractReceiptBlobSha": "1dc8409f9e5617c7e65a252969281f4995aa1760",
     "contractRunId": 36747689293,
-    "contractJobId": 109997954180
+    "contractJobId": 109997954180,
+    "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_MACHINE_PASS_20260930.json",
+    "machineProofReceiptBlobSha": "7ed2e68bbd5780a03cb3a0395bc4695b5fd669b0",
+    "preview": {
+      "sourceSha": "63e7cb32fe1d08ef5c85d613dc6a4b97e3928edb",
+      "buildId": "gi-i65-b3-63e7cb32fe1d-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36747946055-a07ytls3.web.app",
+      "channelId": "gi-b3004-36747946055",
+      "runId": 36747946055,
+      "jobId": 109998836942,
+      "artifactId": 11112569457,
+      "artifactDigest": "69a3ffc7b5cc6d662a5dc615430953206996af1ff606bd2de2a2e6642c8858a3",
+      "exactHostingReadbackPass": true,
+      "syntheticProofPass": true,
+      "cleanupPass": true,
+      "machinePass": true,
+      "liveUnchanged": true,
+      "liveBindingSource": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+      "liveBindingBuild": "gi-i65-4bf67a373875-57f234755dc1"
+    }
   }
 }

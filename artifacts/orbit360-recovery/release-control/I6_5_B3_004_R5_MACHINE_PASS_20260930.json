@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R5_MACHINE_PASS_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "findingId": "B3-004",
+  "subFindingId": "B3-004-R5-CRM-MIGRATION-PROVENANCE-AND-COPYFIX",
+  "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "machineProof": {
+    "sourceSha": "63e7cb32fe1d08ef5c85d613dc6a4b97e3928edb",
+    "buildId": "gi-i65-b3-63e7cb32fe1d-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36747946055-a07ytls3.web.app",
+    "channelId": "gi-b3004-36747946055",
+    "runId": 36747946055,
+    "jobId": 109998836942,
+    "artifactId": 11112569457,
+    "artifactDigest": "69a3ffc7b5cc6d662a5dc615430953206996af1ff606bd2de2a2e6642c8858a3",
+    "exactHostingReadbackPass": true,
+    "syntheticProofPass": true,
+    "cleanupPass": true,
+    "machinePass": true,
+    "liveUnchanged": true,
+    "liveBindingSource": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+    "liveBindingBuild": "gi-i65-4bf67a373875-57f234755dc1"
+  },
+  "boundaries": {
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextRequiredProof": [
+    "B3_004_TARGETED_VISUAL_PASS"
+  ]
+}
