@@ -15,25 +15,31 @@ function policy(r){return S().get('polizas',r&&r.polizaId)||{};}
 function client(r){var p=policy(r||{});return S().get('clientes',(r&&r.clienteId)||p.clienteId)||{};}
 function countryOk(r){var c=client(r),p=Orbit.pais;return !p||p==='TODOS'||c.pais===p||(r&&r.pais===p);}
 function accessOk(col,r){try{return !Orbit.access||!Orbit.access.canView||Orbit.access.canView(col,r,'cobros');}catch(e){return true;}}
-function searchText(r){
-  var c=client(r),p=policy(r),vehicles=S().all('vehiculos')||[],v=vehicles.find(function(x){return x.polizaId===p.id;})||{};
+function searchIndex(){
+  var vehicles=S().all('vehiculos')||[],byPolicy={};
+  vehicles.forEach(function(v){var id=clean(v&&v.polizaId);if(id&&!byPolicy[id])byPolicy[id]=v;});
+  return {vehicleByPolicy:byPolicy};
+}
+function searchText(r,idx){
+  var c=client(r),p=policy(r),v=(idx&&idx.vehicleByPolicy&&idx.vehicleByPolicy[clean(p&&p.id)])||{};
   return [c.nombre,p.numero,v.placa,r&&r.serie,r&&r.cuota].map(clean).join(' ').toLowerCase();
 }
-function matches(r,q){q=clean(q).toLowerCase();return !q||searchText(r).indexOf(q)>=0;}
+function matches(r,q,idx){q=clean(q).toLowerCase();return !q||searchText(r,idx).indexOf(q)>=0;}
 function portfolioRows(q){
-  var due=rp().dueDate||function(x){return x.fechaLimite||x.vence||x.fechaVencimiento;};
-  return (S().all('carteraPrimas')||[]).filter(function(r){return r&&r.carteraActiva!==false&&countryOk(r)&&accessOk('carteraPrimas',r)&&matches(r,q);})
+  var due=rp().dueDate||function(x){return x.fechaLimite||x.vence||x.fechaVencimiento;},idx=searchIndex();
+  return (S().all('carteraPrimas')||[]).filter(function(r){return r&&r.carteraActiva!==false&&countryOk(r)&&accessOk('carteraPrimas',r)&&matches(r,q,idx);})
     .sort(function(a,b){return clean(due(a)).localeCompare(clean(due(b)));});
 }
 function cobroRows(q){
-  return (S().all('cobros')||[]).filter(function(r){return r&&countryOk(r)&&accessOk('cobros',r)&&matches(r,q);})
+  var idx=searchIndex();
+  return (S().all('cobros')||[]).filter(function(r){return r&&countryOk(r)&&accessOk('cobros',r)&&matches(r,q,idx);})
     .sort(function(a,b){return clean(a.fechaPago||a.vence).localeCompare(clean(b.fechaPago||b.vence));});
 }
 function reportedPaymentRows(q){
-  var linked={};
+  var linked={},idx=searchIndex();
   (S().all('cobros')||[]).forEach(function(c){var id=clean(c&&c.reciboId);if(id)linked[id]=true;});
   return (S().all('recibosEsperados')||[]).filter(function(r){
-    return r&&clean(r.estadoOperativo).toLowerCase()==='pago_reportado'&&!linked[clean(r.id)]&&countryOk(r)&&accessOk('recibosEsperados',r)&&matches(r,q);
+    return r&&clean(r.estadoOperativo).toLowerCase()==='pago_reportado'&&!linked[clean(r.id)]&&countryOk(r)&&accessOk('recibosEsperados',r)&&matches(r,q,idx);
   }).sort(function(a,b){return clean(a.fechaPagoReportada||a.fechaLimite||a.vence).localeCompare(clean(b.fechaPagoReportada||b.fechaLimite||b.vence));});
 }
 function snapshot(q){
@@ -46,15 +52,11 @@ function snapshot(q){
     rendererOwner:'modules/cobros.js'
   };
 }
-function refreshApprovedShell(){
-  if(location.hash.indexOf('#/cobros')!==0)return;
-  var host=document.getElementById('host');
-  if(host&&typeof mod.render==='function')mod.render(host);
-}
 mod.__i65GlobalPortfolioAdapter=Object.freeze({
-  version:'b3-001-20260929.1',
+  version:'b3-002-20260929.1',
   rendererOwner:'modules/cobros.js',
   replacesRenderer:false,
+  refreshOwner:'core/router.js',
   confirmed:confirmed,
   portfolioRows:portfolioRows,
   cobroRows:cobroRows,
@@ -62,9 +64,4 @@ mod.__i65GlobalPortfolioAdapter=Object.freeze({
   snapshot:snapshot
 });
 Orbit.cobrosCarteraProjectionAdapter=mod.__i65GlobalPortfolioAdapter;
-window.addEventListener('orbit:store:emit',function(e){
-  var c=e&&e.detail&&e.detail.collection||'';
-  if(['carteraPrimas','recibosEsperados','cobros','clientes','polizas','vehiculos','*'].indexOf(c)>=0)setTimeout(refreshApprovedShell,0);
-});
-document.addEventListener('orbit:session',function(){setTimeout(refreshApprovedShell,0);});
 })();
