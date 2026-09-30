@@ -1,0 +1,104 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_V1",
+  "recordedAt": "2026-09-30T00:42:08Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "B3-002",
+  "status": "CAUSE_CONFIRMED",
+  "targetPreview": {
+    "sourceSha": "085aaa3c88807e043001c755f7e4c4080b8cfe43",
+    "buildId": "gi-i65-b3-085aaa3c8880-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b3-36647950059-sdvtx3v3.web.app",
+    "artifactId": 11069906298,
+    "artifactDigest": "8e94f30977d1395dcebad05fa50df85925d79fa09021e3a7aa0b660cc9474224"
+  },
+  "diagnostic": {
+    "runId": 36651311858,
+    "jobId": 109685848435,
+    "harnessHeadSha": "235efd3e5e0bbe2a208a561e19868af7c3bde1f8",
+    "artifactId": 11070607951,
+    "artifactDigest": "sha256:a94f1225aff71d7fd53ab7cebb553e684ccb52bcd90f111bebf49af5ac222245",
+    "readOnly": true,
+    "businessWrites": 0,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "measurements": {
+    "inSessionCold": {
+      "shellMs": 47.5,
+      "kpisMs": 47.5,
+      "agingMs": 47.5,
+      "tableMs": 47.5,
+      "usableMs": 47.5,
+      "completeMs": 51391.8,
+      "renderCount": 12,
+      "totalRenderMs": 45413,
+      "maxRenderMs": 6595,
+      "longTaskCount": 30,
+      "longTaskTotalMs": 48965,
+      "finalRows": 489,
+      "reportedRows": 484,
+      "storeEventCount": 15
+    },
+    "directCold": {
+      "shellMs": 683.8,
+      "kpisMs": 683.8,
+      "agingMs": 683.8,
+      "tableMs": 683.8,
+      "usableMs": 683.8,
+      "completeMs": 52514.9,
+      "renderCount": 15,
+      "totalRenderMs": 46053,
+      "maxRenderMs": 6606,
+      "longTaskCount": 29,
+      "longTaskTotalMs": 49560,
+      "finalRows": 489,
+      "reportedRows": 484,
+      "storeEventCount": 16
+    },
+    "warm": {
+      "shellMs": 6677.7,
+      "kpisMs": 6677.7,
+      "agingMs": 6677.7,
+      "tableMs": 6677.7,
+      "usableMs": 6677.7,
+      "completeMs": 7270.5,
+      "renderCount": 1,
+      "totalRenderMs": 6673,
+      "maxRenderMs": 6673,
+      "longTaskCount": 3,
+      "longTaskTotalMs": 6937,
+      "finalRows": 489,
+      "reportedRows": 484,
+      "storeEventCount": 0
+    }
+  },
+  "causalEvidence": {
+    "warmSingleRenderWithoutNewStoreEventsMs": 6673,
+    "hydrationRenderStorm": true,
+    "duplicatedReactiveRenderOwners": true,
+    "fullDomRows489": true,
+    "reportedRows484": true,
+    "perRowVehicleFullScanInCobros": true,
+    "bridgeUncoalescedStoreEmitRefresh": true,
+    "routerAlreadyHasDebouncedReactiveRefresh": true,
+    "falseZeroRiskDuringPartialHydration": true,
+    "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN"
+  },
+  "authorizedFixBoundary": {
+    "preserveB3001Shell": true,
+    "noSecondRenderer": true,
+    "noFinancialSemanticChange": true,
+    "noDataWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "fixOnly": [
+      "coalesce Cobros reactive refresh through one owner",
+      "replace per-row vehicle scans with render-scoped indexes",
+      "paginate/limit initial DOM while preserving access to all rows",
+      "debounce live search",
+      "show explicit loading while dependent collections hydrate instead of false zero"
+    ]
+  },
+  "nextAction": "B3_002_CAUSAL_SOURCE_FIX_THEN_EXACT_PREVIEW_TIMING_PROOF"
+}
