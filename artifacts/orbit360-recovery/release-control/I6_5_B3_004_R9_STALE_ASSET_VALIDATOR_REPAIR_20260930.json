@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R9_STALE_ASSET_VALIDATOR_REPAIR_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "c287c8eff872503dc47f627ed2e8d0e41ee5904b",
+  "status": "QA_VALIDATOR_REPAIRED_PENDING_RERUN",
+  "findingId": "B3-004",
+  "failedRunId": 36790347807,
+  "failedJobId": 110141522768,
+  "failureCode": "B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED",
+  "classification": "QA_STALE_ASSET_ASSERTION",
+  "rootCause": "Two older B3-004 contract assertions still required the R8 native-receipt cache key after the authorized R9 source bumped that same asset to b3004r9.",
+  "fix": "Update only the two stale contract expectations from b3004r8 to b3004r9; preserve all R9 product blobs unchanged.",
+  "contractBlobSha": "27ac24d42ed81db2dfed6bb45b153ce173302ee6",
+  "productRegressionDemonstrated": false,
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

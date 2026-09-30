@@ -3190,7 +3190,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "b09df1e78110e4fa13253378216c0fd69623fc48",
+      "executionLockBlobSha": "5ac10b937fe464c964fdd06f0798a69742323c8b",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3221,7 +3221,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "e9198e66c0a57e1102860cb94b8a8c17aa3ae870",
+      "findingLedgerBlobSha": "24b93f1711fd11d81104c9802a54ed5eed11c0e9",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "diagnosticRunId": 36658190622,
@@ -3917,6 +3917,15 @@
         "blobSha": "c749bba3adc3f177f43643763c60d568dc10eee0",
         "sourceSha": "4319ad47c7a2288bde356865d56412418a2bc0f9",
         "compositionLockBlobSha": "f1d347fa661f4f3402fa97e54fd09911e4810ef8"
+      },
+      "r9ValidatorRepair": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_STALE_ASSET_VALIDATOR_REPAIR_20260930.json",
+        "blobSha": "2dee5457eb5a05805e704289e7d94bbb4c57df66",
+        "contractBlobSha": "27ac24d42ed81db2dfed6bb45b153ce173302ee6",
+        "failedRunId": 36790347807,
+        "failedJobId": 110141522768,
+        "status": "FIXED_PENDING_RERUN",
+        "productRegressionDemonstrated": false
       }
     }
   },
@@ -3925,7 +3934,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "f1d347fa661f4f3402fa97e54fd09911e4810ef8",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "e9198e66c0a57e1102860cb94b8a8c17aa3ae870",
+    "findingLedgerBlobSha": "24b93f1711fd11d81104c9802a54ed5eed11c0e9",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -3937,7 +3946,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_004_R9_SOURCE_CONTRACT"
+    "nextAction": "B3_004_R9_SOURCE_CONTRACT_RERUN"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

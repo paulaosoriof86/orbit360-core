@@ -302,7 +302,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R9_SOURCE_CONTRACT",
+    "nextAction": "B3_004_R9_SOURCE_CONTRACT_RERUN",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -476,6 +476,15 @@
       "blobSha": "c749bba3adc3f177f43643763c60d568dc10eee0",
       "sourceSha": "4319ad47c7a2288bde356865d56412418a2bc0f9",
       "compositionLockBlobSha": "f1d347fa661f4f3402fa97e54fd09911e4810ef8"
+    },
+    "r9ValidatorRepair": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_STALE_ASSET_VALIDATOR_REPAIR_20260930.json",
+      "blobSha": "2dee5457eb5a05805e704289e7d94bbb4c57df66",
+      "contractBlobSha": "27ac24d42ed81db2dfed6bb45b153ce173302ee6",
+      "failedRunId": 36790347807,
+      "failedJobId": 110141522768,
+      "status": "FIXED_PENDING_RERUN",
+      "productRegressionDemonstrated": false
     }
   },
   "canonicalComposition": {
@@ -485,7 +494,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "e9198e66c0a57e1102860cb94b8a8c17aa3ae870"
+    "blobSha": "24b93f1711fd11d81104c9802a54ed5eed11c0e9"
   },
   "nextRequiredProof": [
     "B3_004_R9_SOURCE_CONTRACT_PASS",

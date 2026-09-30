@@ -93,7 +93,7 @@ need(!cobros.includes('Confirmar cobro'),'B3_004_GLOBAL_CONFIRMAR_COBRO_REMAINS'
 need(indexR4.includes('modules/cobros.js?v=20260930-b3004r8'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r7'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20260930-b3004r6'),'B3_004_PAYMENT_CLIENT_ASSET_VERSION_NOT_BUMPED');
-need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r8'),'B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r9'),'B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT=PASS');
 
 const domainClient=read('orbit360-platform/core/cobros-reconciliation-domain-client.js');
@@ -170,7 +170,7 @@ need(closureR8.includes('activePolicyRow')&&closureR8.includes('carteraActiva!==
 need(receiptDetailGuardR8.includes("authority:'POLICY_INACTIVE'"),'B3_004_R8_POLICY_DETAIL_CANCELLED_HISTORY_GATE_MISSING');
 need(nativeReceiptOwner.includes('Completar datos del pago')&&nativeReceiptOwner.includes('Conciliar / completar datos'),'B3_004_R8_CONTROLLED_PAYMENT_ENRICHMENT_ACTION_MISSING');
 need(nativeReceiptOwner.includes('data-rp-back-local')&&nativeReceiptOwner.includes("mod.reabrir(clientId,'recibos')")&&nativeReceiptOwner.includes('OrbitRuntimeDiagnostics.receiptsBack'),'B3_004_R8_LOCAL_RECEIPT_BACK_PATH_MISSING');
-need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r8'),'B3_004_R8_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r9'),'B3_004_R8_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/policy-receipts-v1199-detail-guard.js?v=20260930-b3004r8'),'B3_004_R8_RECEIPT_DETAIL_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/cobros-cartera-i65-closure-bridge.js?v=20260930-b3004r8'),'B3_004_R8_CLOSURE_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('data/store-firestore-product-operational-p0.js?v=20260930-b3004r8'),'B3_004_R8_OPERATIONAL_STORE_ASSET_VERSION_NOT_BUMPED');

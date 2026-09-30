@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R9_SOURCE_CONTRACT",
+      "nextAction": "B3_004_R9_SOURCE_CONTRACT_RERUN",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1463,6 +1463,15 @@
         "blobSha": "c749bba3adc3f177f43643763c60d568dc10eee0",
         "sourceSha": "4319ad47c7a2288bde356865d56412418a2bc0f9",
         "compositionLockBlobSha": "f1d347fa661f4f3402fa97e54fd09911e4810ef8"
+      },
+      "r9ValidatorRepair": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_STALE_ASSET_VALIDATOR_REPAIR_20260930.json",
+        "blobSha": "2dee5457eb5a05805e704289e7d94bbb4c57df66",
+        "contractBlobSha": "27ac24d42ed81db2dfed6bb45b153ce173302ee6",
+        "failedRunId": 36790347807,
+        "failedJobId": 110141522768,
+        "status": "FIXED_PENDING_RERUN",
+        "productRegressionDemonstrated": false
       }
     },
     {
@@ -5092,10 +5101,11 @@
     "r8ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_SOURCE_CONTRACT_PASS_20260930.json",
     "successorDispatchRootfixStatus": "FIXED",
     "lastFailedPreviewRunId": 36785475672,
-    "lastFailureClassification": "HARNESS_AUTH_TRANSPORT_DEFECT",
+    "lastFailureClassification": "QA_STALE_ASSET_ASSERTION",
     "productRegressionDemonstrated": false,
     "r8MachineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_MACHINE_PASS_20260930.json",
     "r9VisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_TARGETED_VISUAL_REJECTION_20260930.json",
-    "r9SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_CAUSAL_SOURCE_FIX_20260930.json"
+    "r9SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_CAUSAL_SOURCE_FIX_20260930.json",
+    "r9ValidatorRepairStatus": "FIXED_PENDING_RERUN"
   }
 }
