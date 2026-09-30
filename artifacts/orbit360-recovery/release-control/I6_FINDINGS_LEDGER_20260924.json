@@ -19,7 +19,7 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 162,
+    "total": 165,
     "b2HumanFindings": 61,
     "currentBlocking": 82,
     "countingNote": "Final human review 2026-09-29 reopens B2 with R96-R102; prior unaffected PASS preserved. Five B3 carries frozen; existing dashboard/email debt preserved. No LIVE/B3/reimport."
@@ -678,8 +678,8 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Restore approved Cobros y cartera shell; bridge is projection adapter, not renderer replacement.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
-      "blocking": true,
+      "status": "CLOSED_PASS",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
       "owner": [
         "orbit360-platform/modules/cobros.js",
@@ -698,16 +698,25 @@
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b3-36647950059-sdvtx3v3.web.app",
       "previewRunId": 36647950059,
       "artifactId": 11069906298,
-      "artifactDigest": "8e94f30977d1395dcebad05fa50df85925d79fa09021e3a7aa0b660cc9474224"
+      "artifactDigest": "8e94f30977d1395dcebad05fa50df85925d79fa09021e3a7aa0b660cc9474224",
+      "humanEvidence": "Paula targeted visual review PASS on exact B3 Preview 2026-09-29; approved Cobros shell visible across KPIs, aging, table, confirmed receipt modal and reported-payment detail.",
+      "humanReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
+      "humanReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c"
     },
     {
       "id": "B3-002",
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Search/performance: indexing, debounce and pagination/virtualization; no page freeze.",
-      "status": "NOT_STARTED",
+      "status": "IN_PROGRESS",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "rootCause": "PENDING_B3_002_MEASURED_PERFORMANCE_HYDRATION_DIAGNOSTIC",
+      "remediation": "Measure module-load phases and blocking dependencies; reduce blocking hydration, add explicit loading state, index/debounce/paginate/virtualize as evidence requires.",
+      "requiredProof": "Cold/warm Cobros entry timing with phase markers; no ~10s blank/unusable wait; no page freeze; data complete after load.",
+      "humanEvidence": "Paula reports approximately 10 seconds to enter Cobros on exact B3 Preview 2026-09-29.",
+      "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
+      "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c"
     },
     {
       "id": "B3-003",
@@ -716,7 +725,13 @@
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
       "status": "NOT_STARTED",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "rootCause": "PENDING_B3_003_KPI_AGING_CURRENCY_AUTHORITY_DIAGNOSTIC",
+      "remediation": "Reconcile KPI/aging/read-model authority by country and currency; prohibit cross-currency aggregation without explicit conversion; define reported-payment effect on pending/overdue/conciliation metrics.",
+      "requiredProof": "KPI and aging invariant audit by country/currency; no contradiction such as Vencido=0 with positive overdue aging unless semantics explicitly exclude those rows and UI explains it.",
+      "humanEvidence": "Exact B3 Preview shows Vencido=0 and Pendiente=0 while aging totals Q5,760; table includes Q and $ amounts and 484 reported-payment rows.",
+      "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
+      "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c"
     },
     {
       "id": "B3-004",
@@ -3766,7 +3781,10 @@
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_VISUAL_REJECTION_20260929.json",
       "receiptBlobSha": "0113a5adde7245ccaa647fdcacd2cb67f91a726b",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "humanEvidence": "Exact B3 Preview: policy 1-AP-14234 appears multiple times as 1/1 with different amounts; AUTO-524367 shows cuota '-' in table while detail states Recibo 1/10.",
+      "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
+      "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c"
     },
     {
       "id": "B3-CARRY-VEHICLE-CANONICAL-IDENTITY-20260929",
@@ -3870,6 +3888,57 @@
       "humanUatReceiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
       "noLive": true,
       "noReimport": true
+    },
+    {
+      "id": "B3-CARRY-PAYMENT-STATUS-LABEL-CONSISTENCY-20260929",
+      "block": "B3",
+      "status": "OPEN_B3_CARRY_FORWARD",
+      "blocking": false,
+      "source": "PAULA_TARGETED_B3_001_VISUAL_20260929",
+      "surface": "Cobros/Recibo detalle/KPIs",
+      "classification": "SEMANTIC_STATE_DRIFT",
+      "finding": "Table labels reported evidence as 'Pago reportado · por validar' while receipt detail labels it 'Pago reportado · por conciliar'; KPI Por conciliar shows 0.",
+      "rootCause": "PENDING_CANONICAL_PAYMENT_STATE_MODEL_RECONCILIATION",
+      "remediation": "Use one canonical state model and copy for reported, validated/confirmed, applied and reconciled payment evidence; KPI semantics must match row/detail semantics.",
+      "requiredProof": "Same record state renders consistently in list/detail/KPI and maps to one server-owned state transition contract.",
+      "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
+      "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B3-CARRY-RECEIPT-EDIT-GATE-AFFORDANCE-20260929",
+      "block": "B3",
+      "status": "OPEN_B3_CARRY_FORWARD",
+      "blocking": false,
+      "source": "PAULA_TARGETED_B3_001_VISUAL_20260929",
+      "surface": "Cobros/Recibo esperado detalle",
+      "classification": "UI_CONTRACT_AMBIGUITY",
+      "finding": "Detail states 'Edición bloqueada · existe evidencia de pago' while 'Editar plan de recibos' remains available.",
+      "rootCause": "PENDING_WRITE_GATE_VS_UI_ACTION_RECONCILIATION",
+      "remediation": "Align UI action availability with write contract; if plan editing is prohibited, disable/remove with reason; if partially allowed, constrain fields and explain permitted scope.",
+      "requiredProof": "Action availability exactly matches backend write gate when payment evidence exists.",
+      "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
+      "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929",
+      "block": "B3",
+      "status": "OPEN_B3_CARRY_FORWARD",
+      "blocking": false,
+      "source": "PAULA_TARGETED_B3_001_VISUAL_20260929",
+      "surface": "Cobros/header",
+      "classification": "NON_BLOCKING_VISUAL_POLISH",
+      "finding": "Right-side Cobros header microcopy is cramped and low-legibility on desktop.",
+      "rootCause": "PENDING_VISUAL_SPACING_REVIEW",
+      "remediation": "Improve spacing/legibility while preserving the approved Cobros shell and renderer ownership.",
+      "requiredProof": "Desktop/mobile visual spotcheck with no text collision or hierarchy regression.",
+      "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
+      "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
+      "noLive": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [
@@ -3910,8 +3979,8 @@
   "currentHumanReview": {
     "date": "2026-09-29",
     "recordedAt": "2026-09-29T11:13:00-06:00",
-    "origin": "PAULA_FINAL_TARGETED_UAT_20260929",
-    "decision": "B2_PASS",
+    "origin": "PAULA_TARGETED_B3_001_VISUAL_20260929",
+    "decision": "B3_001_TARGETED_VISUAL_PASS",
     "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b2-36499598188-p6m38hix.web.app",
     "exactSourceSha": "0231996b156e0563755966103b861875e0862a07",
     "exactBuildId": "gi-i65-b2-0231996b156e-57f234755dc1",
@@ -3936,8 +4005,8 @@
       "B3-CARRY-OPS-HYDRATION-EMPTY-FLASH-20260929"
     ],
     "count": 7,
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_TARGETED_HUMAN_UAT_20260929.json",
-    "receiptBlobSha": "d1bc0a8277b4bf2640dff6f2e7b4196a7dceb3e6",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
+    "receiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
     "b2OverallAccepted": true,
     "noB3": true,
     "noLive": true,
@@ -3991,7 +4060,14 @@
     "noB3UntilCleanup": true,
     "cleanupStatus": "PASS",
     "cleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
-    "openedB3": true
+    "openedB3": true,
+    "b3001Pass": true,
+    "nextFindingId": "B3-002",
+    "notes": [
+      "Cobros approved shell restored and visually accepted.",
+      "Approx. 10s module entry time opens B3-002 performance/hydration.",
+      "KPI/aging/currency and payment-state semantic inconsistencies remain open in B3."
+    ]
   },
   "lastReview": {
     "date": "2026-09-26",

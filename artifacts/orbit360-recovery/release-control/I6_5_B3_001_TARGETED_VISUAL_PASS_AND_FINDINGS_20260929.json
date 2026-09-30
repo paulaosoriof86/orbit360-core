@@ -1,0 +1,88 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929_V1",
+  "recordedAt": "2026-09-29T18:25:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "93dbf8a12ce044319c6a082b6be10456ae422048",
+  "block": "B3",
+  "findingId": "B3-001",
+  "decision": "PASS",
+  "exactPreview": {
+    "sourceSha": "085aaa3c88807e043001c755f7e4c4080b8cfe43",
+    "buildId": "gi-i65-b3-085aaa3c8880-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b3-36647950059-sdvtx3v3.web.app",
+    "runId": 36647950059,
+    "artifactId": 11069906298,
+    "artifactDigest": "8e94f30977d1395dcebad05fa50df85925d79fa09021e3a7aa0b660cc9474224"
+  },
+  "humanEvidence": {
+    "source": "PAULA_TARGETED_B3_001_VISUAL_20260929",
+    "screenshots": 6,
+    "approvedShellVisible": true,
+    "surfaces": [
+      "Cobros header/KPIs/aging",
+      "search and filters",
+      "confirmed cobros rows",
+      "reported-payment rows",
+      "confirmed receipt modal",
+      "reported-payment receipt detail"
+    ],
+    "shellOwnerVisualMatch": true
+  },
+  "b3001Conclusion": {
+    "rendererOwnership": "PASS",
+    "approvedCobrosShellRestored": true,
+    "bridgeRendererReplacementAbsentByMachineContract": true,
+    "b3001Closed": true
+  },
+  "newOrExpandedFindings": [
+    {
+      "id": "B3-002",
+      "evidence": "Human observation: entering Cobros takes approximately 10 seconds before the module is usable.",
+      "classification": "BLOCKING_PERFORMANCE_HYDRATION",
+      "action": "Measure module-load phases, remove unnecessary blocking hydration, add loading state, index/debounce/paginate/virtualize where needed; successful path must not require long waits."
+    },
+    {
+      "id": "B3-003",
+      "evidence": "KPI Vencido=0 and Pendiente=0 while aging shows total Q5,760; table also contains mixed Q and $ amounts and reported-payment rows.",
+      "classification": "BLOCKING_KPI_AGING_CURRENCY_SEMANTICS",
+      "action": "Reconcile KPI/aging authority by country/currency; no cross-currency totals; define whether reported evidence affects pending/overdue/conciliation metrics without double counting."
+    },
+    {
+      "id": "B3-CARRY-PAYMENT-STATUS-LABEL-CONSISTENCY-20260929",
+      "evidence": "Table says 'Pago reportado · por validar' while receipt detail says 'Pago reportado · por conciliar'; KPI 'Por conciliar' shows 0.",
+      "classification": "SEMANTIC_STATE_DRIFT",
+      "action": "One canonical state model and labels for reported, confirmed, applied and reconciled payment evidence."
+    },
+    {
+      "id": "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
+      "evidence": "Policy 1-AP-14234 shows multiple rows both 1/1 with different amounts; Nora AUTO-524367 shows cuota '-' in table while detail shows Recibo 1/10.",
+      "classification": "READ_MODEL_LINEAGE_INCONSISTENCY",
+      "action": "Audit expected-receipt identity/count/amount/provenance globally; no reimport."
+    },
+    {
+      "id": "B3-CARRY-RECEIPT-EDIT-GATE-AFFORDANCE-20260929",
+      "evidence": "Reported-payment detail shows 'Edición bloqueada · existe evidencia de pago' while button 'Editar plan de recibos' remains available.",
+      "classification": "UI_CONTRACT_AMBIGUITY",
+      "action": "Align action availability with write contract; if plan edit is prohibited, disable/remove with reason; if partially allowed, state exactly what can change."
+    },
+    {
+      "id": "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929",
+      "evidence": "Header microcopy on the right is visually cramped/low-legibility.",
+      "classification": "NON_BLOCKING_VISUAL_POLISH",
+      "action": "Preserve approved shell hierarchy while improving spacing/legibility; do not reopen renderer ownership."
+    }
+  ],
+  "preservedPass": [
+    "B2_PASS",
+    "B3-001_MACHINE_CONTRACT_PASS",
+    "B3-001_APPROVED_SHELL_VISUAL_PASS"
+  ],
+  "nextAction": "B3-002_PERFORMANCE_AND_HYDRATION",
+  "boundaries": {
+    "noLive": true,
+    "noB4": true,
+    "noReimport": true,
+    "noBusinessWrite": true
+  }
+}
