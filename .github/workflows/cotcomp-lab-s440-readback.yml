@@ -163,6 +163,7 @@ jobs:
               git show "$DEPLOYED_SOURCE_SHA:functions/cotcomp-gateway-harness.js"
             } | sha256sum | awk '{print $1}'
           )"
+          export SOURCE_TREE BACKEND_DIGEST
           node <<'NODE'
           const fs=require('fs');
           const fnReadback=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/cotcomp-readback/function-readback.json','utf8'));
@@ -216,9 +217,6 @@ jobs:
             cleanupPolicyWarningObserved:true
           },null,2));
           NODE
-        env:
-          SOURCE_TREE: ${{ env.SOURCE_TREE }}
-          BACKEND_DIGEST: ${{ env.BACKEND_DIGEST }}
 
       - name: Validate S4.39 contract against receipt
         shell: bash
