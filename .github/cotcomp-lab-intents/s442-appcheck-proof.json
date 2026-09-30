@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s442-appcheck-proof-intent-v1.0",
   "authorization": "REGISTER_LAB_APPCHECK_DEBUG_TOKEN_AND_RUN_SYNTHETIC_PROOF",
-  "authorizedSourceParent": "c34a16a27db5b49d3328715c3f69479ab250ba00",
+  "authorizedSourceParent": "74569d6b409ef6eebd7cfdbfdf4069c2f9a95da6",
   "projectId": "ays-orbit-360-lab",
   "environment": "LAB",
   "region": "us-central1",
@@ -15,5 +15,6 @@
   "production": false,
   "secretCustody": "SECRET_MANAGER_IF_PERMITTED_ELSE_EPHEMERAL_AND_REVOKE",
   "authorizedAt": "2026-09-30",
-  "ownerAuthorizationText": "Autorizo S4.42 para crear y registrar un App Check debug token exclusivamente para Orbit360 LAB Web en ays-orbit-360-lab, custodiarlo de forma cifrada para CI/Secret Manager si los permisos existentes lo permiten y ejecutar la prueba sintética de las cuatro callables, sin persistencia, sin app-data writes, sin datos reales, sin debilitar App Check y sin producción."
+  "ownerAuthorizationText": "Autorizo S4.42 para crear y registrar un App Check debug token exclusivamente para Orbit360 LAB Web en ays-orbit-360-lab, custodiarlo de forma cifrada para CI/Secret Manager si los permisos existentes lo permiten y ejecutar la prueba sintética de las cuatro callables, sin persistencia, sin app-data writes, sin datos reales, sin debilitar App Check y sin producción.",
+  "retriggerReason": "PRIMARY_LAB_SERVICE_ACCOUNT_RETURNED_403_FOR_APPCHECK_DEBUG_TOKEN_CREATE; RETRY_ALL_EXISTING_LAB_CREDENTIALS_WITHOUT_IAM_CHANGE"
 }
