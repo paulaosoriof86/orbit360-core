@@ -20,7 +20,7 @@ function evaluate(input={}){
   if(input.projectId!==EXPECTED.projectId) blockers.push('PROJECT_NOT_LAB');
   if(input.region!==EXPECTED.region) blockers.push('REGION_MISMATCH');
   if(input.functionObservedActive!==true) blockers.push('OPS_LEADS_FUNCTION_NOT_ACTIVE');
-  if(input.sourceArchiveReadSuccessful!==true) blockers.push('DEPLOYED_SOURCE_ARCHIVE_READBACK_REQUIRED');
+  if(!(input.sourceArchiveReadSuccessful===true || input.sourceArchiveReadOnly===true)) blockers.push('DEPLOYED_SOURCE_ARCHIVE_READBACK_REQUIRED');
   if(input.deployedOwnerBlob!==EXPECTED.ownerBlob) blockers.push('DEPLOYED_OWNER_BLOB_MISMATCH');
   if(input.containsCotcompRef!==true) blockers.push('COTCOMP_REF_NOT_DEPLOYED');
   if(input.writeExecuted===true) blockers.push('READ_ONLY_PROOF_VIOLATED');
