@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R6_EXACT_PREVIEW_MACHINE_FAIL_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "b82b91c4b174e1670e882ac4d0ba5d1d348a0c8b",
+  "runId": 36762229434,
+  "jobId": 110047419361,
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36762229434-l04qqqvj.web.app",
+  "buildId": "gi-i65-b3-b82b91c4b174-57f234755dc1",
+  "hostingReadback": "PASS",
+  "backendPreviewDeploy": "PASS",
+  "syntheticProof": "FAIL",
+  "failure": "FirebaseError: INTERNAL",
+  "rootCause": {
+    "file": "functions/cobros-reconciliation-domain.js",
+    "operation": "report_advisor_payment",
+    "defect": "receiptPatch references finalPaymentMethod, which is undefined in reportAdvisorPayment.",
+    "runtimeEffect": "ReferenceError is surfaced by callable as INTERNAL before advisor-report transaction can commit."
+  },
+  "decision": "REJECT_PREVIEW_REBUILD_REQUIRED",
+  "noReuseOfFailedPreview": true,
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3005Opened": false
+  }
+}

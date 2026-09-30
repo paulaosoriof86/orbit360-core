@@ -1,0 +1,26 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R6_1_INTERNAL_HOTFIX_AUTHORIZATION_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "b82b91c4b174e1670e882ac4d0ba5d1d348a0c8b",
+  "findingId": "B3-004",
+  "status": "AUTHORIZED_CAUSAL_SOURCE_HOTFIX_ONLY",
+  "failureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_EXACT_PREVIEW_MACHINE_FAIL_20260930.json",
+  "authorizedProductFiles": [
+    "functions/cobros-reconciliation-domain.js"
+  ],
+  "qaFiles": [
+    "tools/gravicentra-i6-5-b3-004-contract.mjs"
+  ],
+  "exactFix": "Within reportAdvisorPayment only, use paymentMethod when writing receiptPatch.metodoPago; finalPaymentMethod belongs to applyPayment and must not be referenced by advisor intake.",
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "onlyAuthorizedProductFiles": true,
+    "operationalDataWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b3005Authorized": false
+  },
+  "next": "Apply hotfix, revoke product mutation, return to SOURCE_FIXED_PENDING_CONTRACT, rerun contracts, then build a new exact Preview."
+}

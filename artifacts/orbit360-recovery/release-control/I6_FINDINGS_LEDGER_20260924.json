@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "CANDIDATE_PENDING_EXACT_PREVIEW",
+      "status": "R6_1_INTERNAL_HOTFIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R6_EXACT_PREVIEW",
+      "nextAction": "B3_004_R6_1_CAUSAL_HOTFIX",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1237,6 +1237,18 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_EXACT_PREVIEW_BACKEND_MECHANISM_FIX_20260930.json",
         "blobSha": "c6dde8828aef698fbd6b3cfe3b81084b3bb59947",
         "workflowBlobSha": "ceb9493319993f699659ff09b97a9ab2e8862cf6"
+      },
+      "r6MachineFail": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_EXACT_PREVIEW_MACHINE_FAIL_20260930.json",
+        "blobSha": "302edda601eb0b7b684f01f761a6f22de1c0f313",
+        "runId": 36762229434,
+        "jobId": 110047419361,
+        "buildId": "gi-i65-b3-b82b91c4b174-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36762229434-l04qqqvj.web.app"
+      },
+      "r61HotfixAuthorization": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_INTERNAL_HOTFIX_AUTHORIZATION_20260930.json",
+        "blobSha": "9801f627bf4591e1e6cad25891586738d36bd848"
       }
     },
     {
