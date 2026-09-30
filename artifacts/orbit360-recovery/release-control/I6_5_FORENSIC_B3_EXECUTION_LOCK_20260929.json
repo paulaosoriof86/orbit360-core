@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_R6_REMEDIATION_AUTHORIZED",
+  "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -21,7 +21,7 @@
       "businessWritesAuthorized": false,
       "reimportAuthorized": false,
       "liveHostingPromotionAuthorized": false,
-      "productMutationAuthorized": true,
+      "productMutationAuthorized": false,
       "b3005Authorized": false
     },
     "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -285,16 +285,32 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs"
     ],
     "r6RemediationAuthorizationPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_REMEDIATION_AUTHORIZATION_20260930.json",
-    "r6RemediationAuthorizationBlobSha": "37e9e70dce6f950658f4eec04c73eb79e406b69e"
+    "r6RemediationAuthorizationBlobSha": "37e9e70dce6f950658f4eec04c73eb79e406b69e",
+    "r6SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_CAUSAL_SOURCE_FIX_20260930.json",
+    "r6SourceFixReceiptBlobSha": "9af16d8cf1a4ab6d471de99d987baac8ae64e7d8",
+    "r6SourceBlobs": {
+      "functions/cobros-reconciliation-domain.js": "2d614da3e4dbf943f19e627ae0f0b17e38d2a76a",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js": "2e7acbc0f3e8c70adc3199cb3ac4a5f5d0f6c16a",
+      "orbit360-platform/modules/cobros.js": "f1b2a15eb77198fa68903db3d0e0817de20c4bdf",
+      "orbit360-platform/modules/cliente360.js": "ae5f64ce2bcf6736de3d4d7317bded23799083d5",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "00d8210c75dc2e1ebe567c5c4047c4b418830247",
+      "orbit360-platform/index.html": "a24d371881d169d82e638801587f038a0febeb2b"
+    },
+    "r6QaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "a30deecc6629d3f086f30390f60879672d0c06ea",
+      "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
+    },
+    "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
+    "nextAction": "B3_004_R6_SOURCE_CONTRACT"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "e6426fec4fe3376fe6a88ac4a4df73de065717c9",
+    "blobSha": "6b90f7e5b95eb4edc069d55b4935311184e4748a",
     "productFileCount": 78
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "481bb508ef5e23926848b05ba5ebcbfe6afeead8"
+    "blobSha": "282f52b5a01b0160422fdefc79b4cf3c50f55618"
   },
   "nextRequiredProof": [
     "B3_004_R6_SOURCE_CONTRACT_PASS",
@@ -327,7 +343,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
@@ -428,7 +444,7 @@
   "compositionLockBlobSha": "d2785bca12bf76ccaa186f7baf145aef7e1277cb",
   "syntheticQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
-    "purpose": "CREATE_RETRY_ENRICH_READBACK_CLEANUP_PROOF",
+    "purpose": "ADVISOR_REPORT_CROSS_ADVISOR_OPERATIVE_APPLY_RECONCILE_READBACK_CLEANUP_PROOF",
     "idPrefix": "b3004qa_",
     "allowedCollections": [
       "clientes",
@@ -437,7 +453,8 @@
       "carteraPrimas",
       "cobros",
       "reconciliationRequests",
-      "reconciliationEvents"
+      "reconciliationEvents",
+      "gestiones"
     ],
     "cleanupRequired": true,
     "cleanupMustPassBeforeMachinePass": true,

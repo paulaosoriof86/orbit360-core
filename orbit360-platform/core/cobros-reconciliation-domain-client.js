@@ -5,13 +5,14 @@
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
-  const VERSION='orbit360-cobros-reconciliation-client-v4-payment-origin';
+  const VERSION='orbit360-cobros-reconciliation-client-v5-payment-origin-workflows';
   const text=value=>String(value==null?'':value).trim();
   const low=value=>text(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   function classifyPaymentOrigin(row){
     row=row||{};
-    const explicit=[row.evidenceType,row.sourceType,row.paymentSourceType,row.originType,row.origenTipo].map(low).join('|');
+    const explicit=[row.evidenceType,row.sourceType,row.paymentSourceType,row.originType,row.origenTipo,row.paymentOrigin,row.paymentOriginKind].map(low).join('|');
     const authority=[row.fuenteAutoridad,row.origenAutoridad,row.fuenteConciliacion,row.authority,row.sourceAuthority].map(low).join('|');
+    if(/advisor[_ -]?reported|asesor[_ -]?reportado|advisor[_ -]?payment/.test(explicit+'|'+authority))return 'ADVISOR_REPORTED';
     if(/client[_ -]?reported|client[_ -]?portal|portal[_ -]?client|cliente[_ -]?portal/.test(explicit+'|'+authority))return 'CLIENT_PORTAL';
     if(/cobros[_ -]?realizados|direct[_ -]?payment[_ -]?reported[_ -]?crm/.test(explicit)||/(^|[| _-])(siga|crm)([| _-]|$)/.test(authority))return 'CRM_DIRECT';
     return 'UNKNOWN';
@@ -31,9 +32,11 @@
   function previewPolicy(polizaId){return command('preview_policy',{payload:{polizaId},reason:'Vista previa inferencial sin aplicar pagos'});}
   function applyPayment(receiptId,options){options=options||{};const payload=Object.assign({receiptId},options.payload||{});return command('apply_payment',{payload,reason:options.reason||options.motivo||'Aplicación canónica de pago'});}
   function reportClientPayment(receiptId,options){options=options||{};return applyPayment(receiptId,{payload:Object.assign({},options.payload||{},{sourceType:'client_reported'}),reason:options.reason||'Pago reportado por cliente'});}
+  function reportAdvisorPayment(receiptId,options){options=options||{};const payload=Object.assign({receiptId},options.payload||{});return command('report_advisor_payment',{payload,reason:options.reason||options.motivo||'Pago reportado por asesor'});}
+  function reconcilePayment(receiptId,options){options=options||{};const payload=Object.assign({receiptId,forceReconciliation:true},options.payload||{});return command('reconcile_payment',{payload,reason:options.reason||options.motivo||'Conciliación individual de pago'});}
   function enrichApplication(receiptId,options){options=options||{};return applyPayment(receiptId,{payload:Object.assign({},options.payload||{},{sourceType:options.sourceType||'insurer_invoice'}),reason:options.reason||'Aplicación de aseguradora'});}
   function confirmProposal(proposalId,options){options=options||{};return command('confirm_application',{payload:Object.assign({proposalId},options.payload||{}),reason:options.reason||options.motivo||'Conciliación confirmada por usuario autorizado'});}
   function holdProposal(proposalId,motivo,accionRequerida){return command('hold_proposal',{payload:{proposalId,accionRequerida},reason:motivo});}
   function status(){return Object.freeze({version:VERSION,functionName:functionName(),tenantId:tenantId(),activeRole:activeRole(),region:region(),enabled:enabled(),available:available(),transport:'firebase-functions-modular'});}
-  Orbit.reconciliationDomain=Object.freeze({VERSION,enabled,available,classifyPaymentOrigin,command,previewPolicy,applyPayment,reportClientPayment,enrichApplication,confirmProposal,holdProposal,status});
+  Orbit.reconciliationDomain=Object.freeze({VERSION,enabled,available,classifyPaymentOrigin,command,previewPolicy,applyPayment,reportClientPayment,reportAdvisorPayment,reconcilePayment,enrichApplication,confirmProposal,holdProposal,status});
 })();

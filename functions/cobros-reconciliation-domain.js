@@ -8,13 +8,14 @@ const { validateActiveLedgerContract } = require('./cobros-ledger-contract');
 const { normalizeRole, resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
-const VERSION = 'orbit360-cobros-reconciliation-domain-v3-payment-owner';
+const VERSION = 'orbit360-cobros-reconciliation-domain-v4-payment-origin-workflows';
 const CONTRACT_VERSION = '10.10.2';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 const ADMIN_ROLES = new Set(['superadmin', 'admintenant', 'direccion', 'admin', 'operativo', 'finanzas']);
+const ADVISOR_REPORT_ROLES = new Set(['asesor', 'asesora', 'asesor_sr', 'asesora_sr', 'asesor_jr', 'asesora_jr', 'comercial']);
 const PERMISSIONS = new Set(['cobros_manage', 'conciliaciones_manage', 'payments_reconcile']);
-const OPERATIONS = new Set(['preview_policy', 'apply_payment', 'register_evidence', 'confirm_application', 'hold_proposal', 'reopen_proposal']);
+const OPERATIONS = new Set(['preview_policy', 'report_advisor_payment', 'apply_payment', 'reconcile_payment', 'register_evidence', 'confirm_application', 'hold_proposal', 'reopen_proposal']);
 
 const text = (value, max = 1000) => String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
 const norm = value => text(value, 180).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -81,7 +82,8 @@ async function authorize(request, operation) {
   } catch (error) {
     throw new HttpsError('permission-denied', error && error.code === 'PRODUCT_ASSIGNED_ROLES_MISSING' ? 'La membresía no tiene roles asignados.' : 'El rol activo no está asignado.');
   }
-  if (operation !== 'preview_policy' && !canManage(roleState.activeRole, member)) throw new HttpsError('permission-denied', 'No puede administrar conciliaciones.');
+  const advisorSelfService = operation === 'report_advisor_payment' && ADVISOR_REPORT_ROLES.has(roleState.activeRole);
+  if (operation !== 'preview_policy' && !advisorSelfService && !canManage(roleState.activeRole, member)) throw new HttpsError('permission-denied', 'No puede administrar conciliaciones.');
   return {
     tenantId,
     member,
@@ -157,7 +159,7 @@ function dueDate(row) {
 }
 function paymentSource(value) {
   const out = norm(value).replace(/ /g, '_');
-  const allowed = new Set(['client_reported','manual','payment_support','insurer_invoice','insurer_statement','commission_statement','inference']);
+  const allowed = new Set(['client_reported','advisor_reported','crm_migrated_direct','manual','payment_support','insurer_invoice','insurer_statement','commission_statement','inference']);
   if (!allowed.has(out)) throw new HttpsError('invalid-argument', 'Fuente de pago inválida.');
   return out;
 }
@@ -168,6 +170,14 @@ function paidStateFor(source, inferred) {
 }
 function deterministicCobroId(tenantId, receiptId) {
   return `cob_${sha(`${tenantId}|receipt|${receiptId}`).slice(0, 28)}`;
+}
+function deterministicAdvisorPaymentManagementId(tenantId, receiptId) {
+  return `ges_pay_${sha(`${tenantId}|advisor-payment|${receiptId}`).slice(0, 24)}`;
+}
+function advisorReportPending(receipt) {
+  const op = norm(receipt && receipt.estadoOperativo).replace(/ /g, '_');
+  const origin = norm(receipt && (receipt.paymentOrigin || receipt.paymentOriginKind || receipt.paymentSourceType)).replace(/ /g, '_');
+  return op === 'pago_reportado_asesor' || origin === 'advisor_reported_payment' || origin === 'advisor_reported';
 }
 function activePortfolio(row) {
   if (!row) return false;
@@ -216,7 +226,134 @@ async function previewPolicy(authz, payload) {
 }
 
 
-async function applyPayment(authz, data, payload) {
+
+async function reportAdvisorPayment(authz, data, payload) {
+  if (!ADVISOR_REPORT_ROLES.has(authz.actor.activeRole)) {
+    throw new HttpsError('permission-denied', 'El rol activo no puede reportar pagos como Asesor.');
+  }
+  const receiptId = id(payload.receiptId || payload.reciboId, 'reciboId');
+  const paidDate = isoDate(payload.paidDate || payload.fechaPago, 'Fecha real de pago', false);
+  const evidenceAsOfDate = isoDate(payload.evidenceAsOfDate || payload.fechaCorteEvidencia, 'Fecha de evidencia', false);
+  const paymentMethod = text(payload.paymentMethod || payload.metodoPago || payload.metodo, 180);
+  const paymentSupportDocumentRef = text(payload.paymentSupportDocumentRef || payload.soportePagoRef, 500);
+  const explicitAmount = money(payload.amount || payload.monto, 'Monto');
+  const note = text(payload.note || payload.nota || payload.observacion, 1200);
+  const receiptRef = tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId);
+  const reqPayload = { receiptId, paidDate, evidenceAsOfDate, paymentMethod, paymentSupportDocumentRef, amount: explicitAmount, note };
+  const reqId = operationRequestId(authz.tenantId, 'report_advisor_payment', reqPayload, data.requestId);
+  const reqRef = requestRef(authz.tenantId, reqId);
+  const eventId = `payevt_${sha(`${authz.tenantId}|advisor-report|${receiptId}|${reqId}`).slice(0, 28)}`;
+  const managementId = deterministicAdvisorPaymentManagementId(authz.tenantId, receiptId);
+  const managementRef = tenantData(authz.tenantId, 'gestiones').doc(managementId);
+
+  const result = await db.runTransaction(async tx => {
+    const previous = await tx.get(reqRef);
+    if (previous.exists && (previous.data() || {}).status === 'committed') {
+      return Object.assign({ reused: true }, (previous.data() || {}).result || {});
+    }
+    const receiptSnap = await tx.get(receiptRef);
+    if (!receiptSnap.exists) throw new HttpsError('not-found', 'El recibo esperado no existe.');
+    const receipt = Object.assign({ id: receiptSnap.id }, receiptSnap.data() || {});
+    const policyId = id(receipt.polizaId, 'polizaId');
+    const policyRef = tenantData(authz.tenantId, 'polizas').doc(policyId);
+    const policySnap = await tx.get(policyRef);
+    if (!policySnap.exists) throw new HttpsError('failed-precondition', 'La póliza vinculada no existe.');
+    const policy = Object.assign({ id: policySnap.id }, policySnap.data() || {});
+    const clientId = id(receipt.clienteId || policy.clienteId, 'clienteId');
+    const receiptAdvisorId = text(receipt.asesorId || policy.asesorId, 180);
+    if (!authz.actor.advisorId || !receiptAdvisorId || receiptAdvisorId !== authz.actor.advisorId) {
+      throw new HttpsError('permission-denied', 'El recibo no pertenece a la cartera propia del rol Asesor.');
+    }
+    const cobroQuery = tenantData(authz.tenantId, 'cobros').where('reciboId', '==', receiptId);
+    const cobroSnap = await tx.get(cobroQuery);
+    const alreadyPaid = cobroSnap.docs.some(doc => {
+      const row = doc.data() || {};
+      return norm(row.estado) === 'pagado' || ['PAID_DIRECT','PAID_REPORTED','PAID_INFERRED'].includes(text(row.paymentState, 80).toUpperCase());
+    });
+    if (alreadyPaid) throw new HttpsError('failed-precondition', 'El pago ya está aplicado; no corresponde crear otro reporte.');
+
+    const amount = explicitAmount != null ? explicitAmount : receiptAmount(receipt);
+    if (amount == null || amount <= 0) throw new HttpsError('failed-precondition', 'El recibo no tiene monto válido.');
+    const technicalNow = now();
+    const receiptPatch = {
+      estadoOperativo: 'pago_reportado_asesor',
+      paymentOrigin: 'ADVISOR_REPORTED_PAYMENT',
+      paymentIntakeState: 'PENDIENTE_VALIDACION_OPERATIVA',
+      paymentState: 'REPORTED_PENDING_OPERATIVE_VALIDATION',
+      linkedOpsManagementId: managementId,
+      reportedByAdvisorId: authz.actor.advisorId,
+      reportedByUid: authz.actor.uid,
+      evidenceAsOfDate: evidenceAsOfDate || text(receipt.evidenceAsOfDate, 32),
+      updatedAt: technicalNow,
+      updatedByUid: authz.actor.uid
+    };
+    if (paidDate) receiptPatch.fechaPagoReportada = paidDate;
+    if (finalPaymentMethod) receiptPatch.metodoPago = finalPaymentMethod;
+    if (paymentSupportDocumentRef) receiptPatch.paymentSupportDocumentRef = paymentSupportDocumentRef;
+
+    const management = {
+      id: managementId,
+      tenantId: authz.tenantId,
+      lista: 'Gestiones Admin',
+      tipo: 'Validar pago reportado',
+      titulo: 'Validar pago reportado',
+      clienteId: clientId,
+      polizaId: policyId,
+      asesorId: authz.actor.advisorId,
+      estado: 'Pendiente',
+      prioridad: 'Alta',
+      origen: 'Cobros · reporte de asesor',
+      workflowType: 'advisor_payment_validation',
+      receiptId,
+      paymentOrigin: 'ADVISOR_REPORTED_PAYMENT',
+      paymentReportStatus: 'PENDIENTE_VALIDACION_OPERATIVA',
+      paidDate: paidDate || '',
+      paymentMethod: paymentMethod || '',
+      paymentSupportDocumentRef: paymentSupportDocumentRef || '',
+      amount,
+      nota: note || 'El asesor reportó un pago. Operativo debe validar la correspondencia antes de aplicarlo.',
+      archivado: false,
+      updatedAt: technicalNow,
+      updatedByUid: authz.actor.uid
+    };
+    tx.set(receiptRef, receiptPatch, { merge: true });
+    tx.set(managementRef, management, { merge: true });
+    const committed = {
+      ok: true,
+      operation: 'report_advisor_payment',
+      receiptId,
+      policyId,
+      clientId,
+      managementId,
+      paymentOrigin: 'ADVISOR_REPORTED_PAYMENT',
+      paymentState: 'REPORTED_PENDING_OPERATIVE_VALIDATION',
+      validationState: 'PENDIENTE_VALIDACION_OPERATIVA',
+      serverOwned: true,
+      idempotent: true
+    };
+    tx.set(eventRef(authz.tenantId, eventId), {
+      schemaVersion: VERSION,
+      contractVersion: CONTRACT_VERSION,
+      tenantId: authz.tenantId,
+      eventId,
+      operation: 'report_advisor_payment',
+      requestId: reqId,
+      actor: authz.actor,
+      receiptId,
+      managementId,
+      payloadDigest: digest(reqPayload),
+      resultDigest: digest(committed),
+      createdAt: technicalNow
+    }, { merge: false });
+    tx.set(reqRef, { status: 'committed', operation: 'report_advisor_payment', eventId, payloadDigest: digest(reqPayload), result: committed, committedAt: technicalNow }, { merge: true });
+    return committed;
+  });
+  const [receiptReadback, managementReadback] = await Promise.all([receiptRef.get(), managementRef.get()]);
+  if (!receiptReadback.exists || !managementReadback.exists) throw new HttpsError('data-loss', 'No fue posible confirmar el reporte del pago.');
+  return result;
+}
+
+async function applyPayment(authz, data, payload, operationName = 'apply_payment') {
   const receiptId = id(payload.receiptId || payload.reciboId, 'reciboId');
   const source = paymentSource(payload.sourceType || payload.fuentePago || 'manual');
   const inferred = payload.inferred === true || source === 'inference';
@@ -233,13 +370,15 @@ async function applyPayment(authz, data, payload) {
   if (inferred && paidDate && payload.actualPaidDateEvidence !== true) {
     throw new HttpsError('failed-precondition', 'Una inferencia no puede inventar fecha real de pago.');
   }
-  const applicationProved = Boolean(applicationDate || invoiceNumber || invoiceDocumentRef || ['insurer_invoice','insurer_statement','commission_statement'].includes(source));
+  const applicationEvidenceTypeInput = text(payload.applicationEvidenceType || payload.tipoEvidenciaAplicacion, 120).toUpperCase();
+  const applicationProved = Boolean(payload.forceReconciliation === true || applicationDate || invoiceNumber || invoiceDocumentRef || ['insurer_invoice','insurer_statement','commission_statement'].includes(source));
   const receiptRef = tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId);
   const reqPayload = {
     receiptId, source, inferred, paidDate, inferredEffectiveDate, evidenceAsOfDate, applicationDate,
-    invoiceNumber, paymentMethod, paymentSupportDocumentRef, invoiceDocumentRef, amount: explicitAmount
+    invoiceNumber, paymentMethod, paymentSupportDocumentRef, invoiceDocumentRef, amount: explicitAmount,
+    forceReconciliation: payload.forceReconciliation === true, applicationEvidenceType: applicationEvidenceTypeInput
   };
-  const reqId = operationRequestId(authz.tenantId, 'apply_payment', reqPayload, '');
+  const reqId = operationRequestId(authz.tenantId, operationName, reqPayload, data.requestId);
   const reqRef = requestRef(authz.tenantId, reqId);
   const eventId = `payevt_${sha(`${authz.tenantId}|${receiptId}|${reqId}`).slice(0, 28)}`;
 
@@ -274,10 +413,14 @@ async function applyPayment(authz, data, payload) {
     const cobroId = cobroDoc ? cobroDoc.id : deterministicCobroId(authz.tenantId, receiptId);
     const cobroRef = tenantData(authz.tenantId, 'cobros').doc(cobroId);
     const beforeCobro = cobroDoc ? (cobroDoc.data() || {}) : {};
+    const advisorReported = advisorReportPending(receipt);
     const existingPaidDate = text(beforeCobro.paidDate || beforeCobro.fechaPago, 32);
     const existingApplicationDate = text(beforeCobro.applicationDate || beforeCobro.fechaAplicacion, 32);
-    const finalPaidDate = paidDate || existingPaidDate;
+    const reportPaidDate = advisorReported ? text(receipt.fechaPagoReportada || receipt.paidDate || receipt.fechaPago, 32) : '';
+    const finalPaidDate = paidDate || reportPaidDate || existingPaidDate;
     const finalApplicationDate = applicationDate || existingApplicationDate;
+    const finalPaymentMethod = paymentMethod || (advisorReported ? text(receipt.metodoPago || receipt.paymentMethod, 180) : '') || text(beforeCobro.paymentMethod || beforeCobro.metodo, 180);
+    const finalPaymentSupportDocumentRef = paymentSupportDocumentRef || (advisorReported ? text(receipt.paymentSupportDocumentRef || receipt.soportePagoRef, 500) : '') || text(beforeCobro.paymentSupportDocumentRef, 500);
     const applicationEvidenceSource = ['insurer_invoice','insurer_statement','commission_statement'].includes(source);
     const isApplicationEnrichment = Boolean(cobroDoc && applicationEvidenceSource);
     const existingPaymentState = text(beforeCobro.paymentState, 80);
@@ -285,8 +428,9 @@ async function applyPayment(authz, data, payload) {
     const existingPaymentEvidenceType = text(beforeCobro.paymentEvidenceType, 120);
     const paymentState = isApplicationEnrichment && existingPaymentState ? existingPaymentState : paidStateFor(source, inferred);
     const directOrInferred = isApplicationEnrichment && existingDirectOrInferred ? existingDirectOrInferred : (inferred ? 'INFERRED' : 'DIRECT');
-    const paymentEvidenceType = isApplicationEnrichment && existingPaymentEvidenceType ? existingPaymentEvidenceType : source.toUpperCase();
-    const applicationEvidenceType = applicationProved ? source.toUpperCase() : text(beforeCobro.applicationEvidenceType, 120);
+    const paymentEvidenceType = isApplicationEnrichment && existingPaymentEvidenceType ? existingPaymentEvidenceType : (advisorReported ? 'ADVISOR_REPORTED' : source.toUpperCase());
+    const paymentOrigin = advisorReported ? 'ADVISOR_REPORTED_PAYMENT' : (source === 'crm_migrated_direct' ? 'CRM_MIGRATED_DIRECT_PAYMENT' : (source === 'client_reported' ? 'CLIENT_PORTAL' : text(beforeCobro.paymentOrigin, 120) || 'OPERATIVE_DIRECT_PAYMENT'));
+    const applicationEvidenceType = applicationProved ? (applicationEvidenceTypeInput || (source === 'crm_migrated_direct' ? 'MANUAL_RECONCILIATION' : source.toUpperCase())) : text(beforeCobro.applicationEvidenceType, 120);
     const applicationState = (applicationProved || finalApplicationDate || beforeCobro.conciliado === true) ? 'APPLIED_DIRECT' : 'PENDING_APPLICATION';
     const technicalNow = now();
 
@@ -295,6 +439,7 @@ async function applyPayment(authz, data, payload) {
       applicationState,
       directOrInferred,
       paymentEvidenceType,
+      paymentOrigin,
       applicationEvidenceType,
       evidenceAsOfDate: evidenceAsOfDate || text(beforeCobro.evidenceAsOfDate, 32),
       inferredEffectiveDate: inferredEffectiveDate || text(beforeCobro.inferredEffectiveDate, 32),
@@ -303,8 +448,8 @@ async function applyPayment(authz, data, payload) {
       updatedByUid: authz.actor.uid
     };
     if (finalPaidDate) shared.paidDate = finalPaidDate;
-    if (paymentMethod) shared.paymentMethod = paymentMethod;
-    if (paymentSupportDocumentRef) shared.paymentSupportDocumentRef = paymentSupportDocumentRef;
+    if (finalPaymentMethod) shared.paymentMethod = finalPaymentMethod;
+    if (finalPaymentSupportDocumentRef) shared.paymentSupportDocumentRef = finalPaymentSupportDocumentRef;
     if (finalApplicationDate) shared.applicationDate = finalApplicationDate;
     if (invoiceNumber) shared.invoiceNumber = invoiceNumber;
     if (invoiceDocumentRef) shared.invoiceDocumentRef = invoiceDocumentRef;
@@ -326,16 +471,20 @@ async function applyPayment(authz, data, payload) {
       ...shared
     });
     if (finalPaidDate) cobro.fechaPago = finalPaidDate;
-    if (paymentMethod) cobro.metodo = paymentMethod;
+    if (finalPaymentMethod) cobro.metodo = finalPaymentMethod;
     if (invoiceNumber) cobro.numeroFactura = invoiceNumber;
 
-    const receiptPaymentState = isApplicationEnrichment && text(receipt.estadoOperativo, 120)
-      ? text(receipt.estadoOperativo, 120)
-      : (source === 'client_reported' ? 'pago_reportado_aplicado' : (inferred ? 'pago_inferido' : 'pagado'));
+    const receiptPaymentState = advisorReported
+      ? 'pago_reportado_asesor_aplicado'
+      : (isApplicationEnrichment && text(receipt.estadoOperativo, 120)
+        ? text(receipt.estadoOperativo, 120)
+        : (source === 'client_reported' ? 'pago_reportado_aplicado' : (inferred ? 'pago_inferido' : 'pagado')));
     const receiptPatch = {
       estado: 'Pagado',
       estadoOperativo: receiptPaymentState,
       cobroId,
+      paymentOrigin,
+      paymentIntakeState: advisorReported ? 'VALIDATED_APPLIED' : text(receipt.paymentIntakeState, 120),
       conciliadoPago: true,
       conciliado: applicationState === 'APPLIED_DIRECT',
       ...shared
@@ -349,6 +498,18 @@ async function applyPayment(authz, data, payload) {
 
     tx.set(cobroRef, cobro, { merge: true });
     tx.set(receiptRef, receiptPatch, { merge: true });
+    const linkedManagementId = advisorReported ? text(receipt.linkedOpsManagementId, 180) : '';
+    if (linkedManagementId) {
+      const linkedRef = tenantData(authz.tenantId, 'gestiones').doc(id(linkedManagementId, 'managementId'));
+      tx.set(linkedRef, {
+        estado: 'Resuelta',
+        paymentReportStatus: 'VALIDATED_APPLIED',
+        resultado: 'Pago validado y aplicado por Operativo/Dirección.',
+        resolvedAt: technicalNow,
+        updatedAt: technicalNow,
+        updatedByUid: authz.actor.uid
+      }, { merge: true });
+    }
     if (activePortfolioRows.length === 1) {
       const pRef = activePortfolioRows[0].ref;
       const portfolioPatch = {
@@ -370,7 +531,7 @@ async function applyPayment(authz, data, payload) {
 
     const committed = {
       ok: true,
-      operation: 'apply_payment',
+      operation: operationName,
       receiptId,
       cobroId,
       policyId,
@@ -380,6 +541,8 @@ async function applyPayment(authz, data, payload) {
       paidDate: finalPaidDate || '',
       inferredEffectiveDate: inferredEffectiveDate || '',
       applicationDate: finalApplicationDate || '',
+      paymentOrigin,
+      linkedManagementId: advisorReported ? text(receipt.linkedOpsManagementId, 180) : '',
       invoiceNumber: invoiceNumber || text(beforeCobro.invoiceNumber || beforeCobro.numeroFactura, 180),
       portfolioUpdated: activePortfolioRows.length === 1,
       serverOwned: true,
@@ -390,7 +553,7 @@ async function applyPayment(authz, data, payload) {
       contractVersion: CONTRACT_VERSION,
       tenantId: authz.tenantId,
       eventId,
-      operation: 'apply_payment',
+      operation: operationName,
       requestId: reqId,
       actor: authz.actor,
       receiptId,
@@ -399,7 +562,7 @@ async function applyPayment(authz, data, payload) {
       resultDigest: digest(committed),
       createdAt: technicalNow
     }, { merge: false });
-    tx.set(reqRef, { status: 'committed', operation: 'apply_payment', eventId, payloadDigest: digest(reqPayload), result: committed, committedAt: technicalNow }, { merge: true });
+    tx.set(reqRef, { status: 'committed', operation: operationName, eventId, payloadDigest: digest(reqPayload), result: committed, committedAt: technicalNow }, { merge: true });
     return committed;
   });
 
@@ -425,7 +588,16 @@ async function execute(request) {
   const payload = data.payload && typeof data.payload === 'object' ? data.payload : {};
 
   if (operation === 'preview_policy') return previewPolicy(authz, payload);
-  if (operation === 'apply_payment') return applyPayment(authz, data, payload);
+  if (operation === 'report_advisor_payment') return reportAdvisorPayment(authz, data, payload);
+  if (operation === 'apply_payment') return applyPayment(authz, data, payload, 'apply_payment');
+  if (operation === 'reconcile_payment') {
+    const origin = text(payload.paymentOriginSource || payload.sourceType || 'insurer_invoice', 120);
+    return applyPayment(authz, data, Object.assign({}, payload, {
+      sourceType: origin,
+      forceReconciliation: true,
+      applicationEvidenceType: payload.applicationEvidenceType || 'MANUAL_RECONCILIATION'
+    }), 'reconcile_payment');
+  }
   unsupportedMutation(operation);
 
   const motive = reason(data, true);

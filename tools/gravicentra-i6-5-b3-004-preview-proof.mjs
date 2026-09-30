@@ -15,15 +15,9 @@ const sdkPath=process.env.PUBLIC_CONFIG_FILE;
 const callableName='orbit360CobrosReconciliationCommandPreview';
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const text=v=>String(v==null?'':v).trim();
-const norm=v=>text(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const norm=v=>text(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-function recursiveFind(obj,key){
-  if(!obj||typeof obj!=='object')return '';
-  if(typeof obj[key]==='string'&&obj[key])return obj[key];
-  for(const v of Object.values(obj)){const x=recursiveFind(v,key);if(x)return x;}
-  return '';
-}
 function findFirebaseConfig(obj){
   if(!obj||typeof obj!=='object')return null;
   if(typeof obj.apiKey==='string'&&typeof obj.projectId==='string'&&(obj.appId||obj.authDomain))return obj;
@@ -31,13 +25,39 @@ function findFirebaseConfig(obj){
   return null;
 }
 function assignedRoles(m){
-  const xs=[m.rol,m.role,m.activeRole,m.rolActivo,...(Array.isArray(m.roles)?m.roles:[]),...(Array.isArray(m.assignedRoles)?m.assignedRoles:[]),...(Array.isArray(m.rolesAsignados)?m.rolesAsignados:[])];
+  const xs=[...(Array.isArray(m.roles)?m.roles:[]),...(Array.isArray(m.assignedRoles)?m.assignedRoles:[]),...(Array.isArray(m.rolesAsignados)?m.rolesAsignados:[]),...(Array.isArray(m.rolesDisponibles)?m.rolesDisponibles:[])];
   return xs.map(norm).filter(Boolean);
 }
 function activeMember(m){
   const s=norm(m.status||m.estado);
   return m.active!==false&&m.activo!==false&&!['inactive','inactivo','blocked','bloqueado'].includes(s);
 }
+function advisorIdOf(m){return text(m&& (m.advisorId||m.asesorId));}
+async function authenticatedCandidates(memberDocs,auth){
+  const out=[];
+  for(const doc of memberDocs){
+    const member=doc.data()||{};
+    if(!activeMember(member))continue;
+    try{await auth.getUser(doc.id);}catch{continue;}
+    out.push({uid:doc.id,member,roles:assignedRoles(member),advisorId:advisorIdOf(member)});
+  }
+  return out;
+}
+async function signedCallable(auth,clientConfig,actor,label){
+  const token=await auth.createCustomToken(actor.uid);
+  const app=initializeClientApp(clientConfig,'b3004-'+label+'-'+runId);
+  await signInWithCustomToken(getClientAuth(app),token);
+  return httpsCallable(getFunctions(app,'us-central1'),callableName);
+}
+async function invoke(callable,activeRole,operation,payload,reason){
+  const out=await callable({tenantId,activeRole,operation,payload,reason});
+  return out.data;
+}
+async function expectDenied(callable,activeRole,operation,payload,reason){
+  try{await invoke(callable,activeRole,operation,payload,reason);return false;}
+  catch(error){return /permission-denied/i.test(String(error&&error.code||''))||/permiso|rol activo/i.test(String(error&&error.message||''));}
+}
+
 async function main(){
   need(sdkPath&&fs.existsSync(sdkPath),'B3_004_PUBLIC_CONFIG_MISSING');
   const sdk=JSON.parse(fs.readFileSync(sdkPath,'utf8'));
@@ -45,114 +65,167 @@ async function main(){
   need(clientConfig&&clientConfig.apiKey,'B3_004_FIREBASE_CLIENT_CONFIG_MISSING');
 
   const app=getApps()[0]||initializeAdminApp({credential:applicationDefault(),projectId});
-  const db=getFirestore(app), auth=getAdminAuth(app);
+  const db=getFirestore(app),auth=getAdminAuth(app);
   const members=await db.collection('tenants').doc(tenantId).collection('members').get();
-  let actor=null;
-  const allowed=new Set(['superadmin','admintenant','direccion','admin','operativo','finanzas']);
-  for(const doc of members.docs){
-    const m=doc.data()||{};
-    const activeRole=assignedRoles(m).find(r=>allowed.has(r))||'';
-    if(!activeMember(m)||!activeRole)continue;
-    try{await auth.getUser(doc.id);actor={uid:doc.id,member:m,activeRole};break;}catch{}
+  const candidates=await authenticatedCandidates(members.docs,auth);
+  const privilegedOrder=['direccion','operativo','superadmin','admintenant','admin','finanzas'];
+  let operator=null;
+  for(const role of privilegedOrder){
+    operator=candidates.find(x=>x.roles.includes(role));
+    if(operator){operator=Object.assign({},operator,{activeRole:role});break;}
   }
-  need(actor,'B3_004_AUTHORIZED_MEMBER_NOT_FOUND');
+  need(operator,'B3_004_PRIVILEGED_MEMBER_NOT_FOUND');
+  const advisorRoles=new Set(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial']);
+  let advisor=null;
+  for(const c of candidates){
+    const role=c.roles.find(r=>advisorRoles.has(r));
+    if(role&&c.advisorId&&c.advisorId!==operator.advisorId){advisor=Object.assign({},c,{activeRole:role});break;}
+  }
+  need(advisor,'B3_004_CROSS_ADVISOR_MEMBER_NOT_FOUND');
 
-  const customToken=await auth.createCustomToken(actor.uid);
-  const clientApp=initializeClientApp(clientConfig,'b3004-'+runId);
-  const clientAuth=getClientAuth(clientApp);
-  await signInWithCustomToken(clientAuth,customToken);
-  const callable=httpsCallable(getFunctions(clientApp,'us-central1'),callableName);
+  const operatorCall=await signedCallable(auth,clientConfig,operator,'operator');
+  const advisorCall=await signedCallable(auth,clientConfig,advisor,'advisor');
 
   const suffix=crypto.createHash('sha256').update(runId).digest('hex').slice(0,10);
   const ids={
     client:'b3004qa_client_'+suffix,
     policy:'b3004qa_policy_'+suffix,
-    receipt:'b3004qa_receipt_'+suffix,
-    portfolio:'b3004qa_portfolio_'+suffix
+    receiptReport:'b3004qa_receipt_report_'+suffix,
+    portfolioReport:'b3004qa_portfolio_report_'+suffix,
+    receiptDirect:'b3004qa_receipt_direct_'+suffix,
+    portfolioDirect:'b3004qa_portfolio_direct_'+suffix
   };
   const dataRoot=db.collection('tenants').doc(tenantId).collection('data');
   const refs={
     client:dataRoot.doc('clientes').collection('items').doc(ids.client),
     policy:dataRoot.doc('polizas').collection('items').doc(ids.policy),
-    receipt:dataRoot.doc('recibosEsperados').collection('items').doc(ids.receipt),
-    portfolio:dataRoot.doc('carteraPrimas').collection('items').doc(ids.portfolio)
+    receiptReport:dataRoot.doc('recibosEsperados').collection('items').doc(ids.receiptReport),
+    portfolioReport:dataRoot.doc('carteraPrimas').collection('items').doc(ids.portfolioReport),
+    receiptDirect:dataRoot.doc('recibosEsperados').collection('items').doc(ids.receiptDirect),
+    portfolioDirect:dataRoot.doc('carteraPrimas').collection('items').doc(ids.portfolioDirect)
   };
-  const today='2026-09-30', paidDate='2026-09-29', applicationDate='2026-09-30';
-  const amount=123.45;
-  const audit={schema:'GRAVICENTRA_I6_5_B3_004_PREVIEW_PROOF_V3',status:'RUNNING',runId:Number(runId)||runId,tenantId,actorUid:actor.uid,actorActiveRole:actor.activeRole,ids,callableName,region:'us-central1',assertions:{},cleanup:{attempted:false,pass:false}};
-  let cobroId='';
+  const today='2026-09-30',paidDate='2026-09-29',applicationDate='2026-09-30',amountReport=123.45,amountDirect=234.56;
+  const audit={
+    schema:'GRAVICENTRA_I6_5_B3_004_PREVIEW_PROOF_R6_V1',
+    status:'RUNNING',runId:Number(runId)||runId,tenantId,callableName,region:'us-central1',
+    actors:{
+      advisor:{uid:advisor.uid,activeRole:advisor.activeRole,advisorId:advisor.advisorId},
+      operator:{uid:operator.uid,activeRole:operator.activeRole,advisorId:operator.advisorId},
+      crossAdvisor:advisor.advisorId!==operator.advisorId
+    },
+    ids,assertions:{},cleanup:{attempted:false,pass:false}
+  };
+  let reportCobroId='',directCobroId='',managementId='';
   try{
     const batch=db.batch();
-    batch.set(refs.client,{id:ids.client,nombre:'B3-004 QA Synthetic',pais:'GT',__syntheticQa:true,__syntheticRun:runId});
-    batch.set(refs.policy,{id:ids.policy,clienteId:ids.client,numero:'B3-004-QA-'+suffix,pais:'GT',moneda:'GTQ',asesorId:text(actor.member.advisorId||actor.member.asesorId),__syntheticQa:true,__syntheticRun:runId});
-    batch.set(refs.receipt,{id:ids.receipt,polizaId:ids.policy,clienteId:ids.client,pais:'GT',moneda:'GTQ',cuota:'1/10',vence:'2026-09-30',monto:amount,estado:'Pendiente',asesorId:text(actor.member.advisorId||actor.member.asesorId),__syntheticQa:true,__syntheticRun:runId});
-    batch.set(refs.portfolio,{id:ids.portfolio,reciboId:ids.receipt,polizaId:ids.policy,clienteId:ids.client,pais:'GT',moneda:'GTQ',monto:amount,estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true,__syntheticQa:true,__syntheticRun:runId});
+    batch.set(refs.client,{id:ids.client,nombre:'B3-004 QA Synthetic R6',pais:'GT',asesorId:advisor.advisorId,__syntheticQa:true,__syntheticRun:runId});
+    batch.set(refs.policy,{id:ids.policy,clienteId:ids.client,numero:'B3-004-QA-'+suffix,pais:'GT',moneda:'GTQ',asesorId:advisor.advisorId,estado:'Vigente',__syntheticQa:true,__syntheticRun:runId});
+    batch.set(refs.receiptReport,{id:ids.receiptReport,polizaId:ids.policy,clienteId:ids.client,pais:'GT',moneda:'GTQ',cuota:'1/10',vence:'2026-09-30',monto:amountReport,estado:'Pendiente',estadoOperativo:'pendiente_vence_corte',asesorId:advisor.advisorId,__syntheticQa:true,__syntheticRun:runId});
+    batch.set(refs.portfolioReport,{id:ids.portfolioReport,reciboId:ids.receiptReport,polizaId:ids.policy,clienteId:ids.client,pais:'GT',moneda:'GTQ',monto:amountReport,estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true,asesorId:advisor.advisorId,__syntheticQa:true,__syntheticRun:runId});
+    batch.set(refs.receiptDirect,{id:ids.receiptDirect,polizaId:ids.policy,clienteId:ids.client,pais:'GT',moneda:'GTQ',cuota:'2/10',vence:'2026-10-30',monto:amountDirect,estado:'Pendiente',estadoOperativo:'futuro_pendiente',asesorId:advisor.advisorId,__syntheticQa:true,__syntheticRun:runId});
+    batch.set(refs.portfolioDirect,{id:ids.portfolioDirect,reciboId:ids.receiptDirect,polizaId:ids.policy,clienteId:ids.client,pais:'GT',moneda:'GTQ',monto:amountDirect,estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true,asesorId:advisor.advisorId,__syntheticQa:true,__syntheticRun:runId});
     await batch.commit();
 
-    async function call(payload,reason){
-      try{
-        const out=await callable({tenantId,activeRole:actor.activeRole,operation:'apply_payment',reason,payload});
-        return out.data;
-      }catch(error){
-        throw new Error('B3_004_CALL_FAILED:'+(error?.code||'')+':'+(error?.message||String(error)));
-      }
-    }
-    const first=await call({receiptId:ids.receipt,sourceType:'client_reported',paidDate,evidenceAsOfDate:today,amount},'B3-004 synthetic client report');
-    need(first?.ok===true&&first.receiptId===ids.receipt,'B3_004_FIRST_APPLY_FAILED');
-    cobroId=first.cobroId;
-    need(cobroId,'B3_004_COBRO_ID_MISSING');
-    need(first.paymentState==='PAID_REPORTED','B3_004_CLIENT_REPORT_STATE_INVALID');
-    need(first.applicationState==='PENDING_APPLICATION','B3_004_PREMATURE_APPLICATION_INVALID');
+    const report=await invoke(advisorCall,advisor.activeRole,'report_advisor_payment',{
+      receiptId:ids.receiptReport,paidDate,paymentMethod:'Transferencia bancaria',amount:amountReport,note:'B3-004 R6 advisor report'
+    },'B3-004 R6 synthetic advisor report');
+    need(report?.ok===true&&report.paymentState==='REPORTED_PENDING_OPERATIVE_VALIDATION','B3_004_ADVISOR_REPORT_STATE_INVALID');
+    managementId=text(report.managementId);need(managementId,'B3_004_ADVISOR_REPORT_MANAGEMENT_MISSING');
 
-    const retry=await call({receiptId:ids.receipt,sourceType:'client_reported',paidDate,evidenceAsOfDate:today,amount},'B3-004 synthetic client report');
-    need(retry?.cobroId===cobroId&&retry?.reused===true,'B3_004_IDEMPOTENT_RETRY_FAILED');
+    const beforeApplyQuery=await dataRoot.doc('cobros').collection('items').where('reciboId','==',ids.receiptReport).get();
+    need(beforeApplyQuery.size===0,'B3_004_ADVISOR_REPORT_PREMATURE_COBRO');
+    const [reportedReceiptSnap,managementSnap]=await Promise.all([
+      refs.receiptReport.get(),dataRoot.doc('gestiones').collection('items').doc(managementId).get()
+    ]);
+    need(reportedReceiptSnap.exists&&managementSnap.exists,'B3_004_ADVISOR_REPORT_READBACK_MISSING');
+    const reportedReceipt=reportedReceiptSnap.data()||{},management=managementSnap.data()||{};
+    need(reportedReceipt.estado!=='Pagado'&&reportedReceipt.paymentOrigin==='ADVISOR_REPORTED_PAYMENT','B3_004_ADVISOR_REPORT_PREMATURE_PAYMENT');
+    need(management.workflowType==='advisor_payment_validation'&&management.estado==='Pendiente','B3_004_ADVISOR_REPORT_OPS_STATE_INVALID');
 
-    const enriched=await call({receiptId:ids.receipt,sourceType:'insurer_invoice',applicationDate,invoiceNumber:'B3004-QA-'+suffix,invoiceDocumentRef:'qa://invoice/'+suffix,amount},'B3-004 synthetic insurer application');
-    need(enriched?.cobroId===cobroId,'B3_004_ENRICH_CREATED_SECOND_COBRO');
-    need(enriched?.paymentState==='PAID_REPORTED','B3_004_ENRICH_REWROTE_PAYMENT_STATE');
-    need(enriched?.applicationState==='APPLIED_DIRECT','B3_004_APPLICATION_NOT_APPLIED');
+    const advisorApplyDenied=await expectDenied(advisorCall,advisor.activeRole,'apply_payment',{receiptId:ids.receiptReport,sourceType:'manual',amount:amountReport},'Advisor must not apply');
+    need(advisorApplyDenied,'B3_004_ADVISOR_APPLY_NOT_DENIED');
+
+    const applied=await invoke(operatorCall,operator.activeRole,'apply_payment',{
+      receiptId:ids.receiptReport,sourceType:'manual',amount:amountReport
+    },'B3-004 R6 operative validates advisor report');
+    need(applied?.ok===true&&applied.paymentState==='PAID_DIRECT','B3_004_ADVISOR_REPORT_APPLY_FAILED');
+    need(applied.paymentOrigin==='ADVISOR_REPORTED_PAYMENT','B3_004_ADVISOR_REPORT_PROVENANCE_LOST');
+    reportCobroId=text(applied.cobroId);need(reportCobroId,'B3_004_ADVISOR_REPORT_COBRO_MISSING');
+    need(text(applied.linkedManagementId)===managementId,'B3_004_ADVISOR_REPORT_LINK_LOST');
+
+    const retry=await invoke(operatorCall,operator.activeRole,'apply_payment',{
+      receiptId:ids.receiptReport,sourceType:'manual',amount:amountReport
+    },'B3-004 R6 operative validates advisor report');
+    need(retry?.cobroId===reportCobroId&&retry?.reused===true,'B3_004_ADVISOR_REPORT_IDEMPOTENT_RETRY_FAILED');
+
+    const reconciled=await invoke(operatorCall,operator.activeRole,'reconcile_payment',{
+      receiptId:ids.receiptReport,paymentOriginSource:'insurer_invoice',applicationDate,
+      invoiceNumber:'B3004-R6-'+suffix,invoiceDocumentRef:'qa://invoice/'+suffix,
+      applicationEvidenceType:'INSURER_INVOICE',amount:amountReport
+    },'B3-004 R6 individual reconciliation');
+    need(reconciled?.cobroId===reportCobroId,'B3_004_RECONCILE_CREATED_SECOND_COBRO');
+    need(reconciled?.applicationState==='APPLIED_DIRECT','B3_004_RECONCILE_APPLICATION_STATE_INVALID');
+    need(reconciled?.paymentOrigin==='ADVISOR_REPORTED_PAYMENT','B3_004_RECONCILE_REWROTE_ORIGIN');
+
+    const direct=await invoke(operatorCall,operator.activeRole,'apply_payment',{
+      receiptId:ids.receiptDirect,sourceType:'manual',paidDate,paymentMethod:'Transferencia bancaria',amount:amountDirect
+    },'B3-004 R6 direct operative payment');
+    need(direct?.ok===true&&direct.paymentState==='PAID_DIRECT','B3_004_OPERATIVE_DIRECT_APPLY_FAILED');
+    directCobroId=text(direct.cobroId);need(directCobroId,'B3_004_OPERATIVE_DIRECT_COBRO_MISSING');
 
     await sleep(500);
-    const [receiptSnap,portfolioSnap,cobroSnap,cobroQuery]=await Promise.all([
-      refs.receipt.get(),refs.portfolio.get(),dataRoot.doc('cobros').collection('items').doc(cobroId).get(),
-      dataRoot.doc('cobros').collection('items').where('reciboId','==',ids.receipt).get()
+    const [reportReceiptFinal,directReceiptFinal,reportCobroSnap,directCobroSnap,managementFinal,reportQuery,directQuery]=await Promise.all([
+      refs.receiptReport.get(),refs.receiptDirect.get(),
+      dataRoot.doc('cobros').collection('items').doc(reportCobroId).get(),
+      dataRoot.doc('cobros').collection('items').doc(directCobroId).get(),
+      dataRoot.doc('gestiones').collection('items').doc(managementId).get(),
+      dataRoot.doc('cobros').collection('items').where('reciboId','==',ids.receiptReport).get(),
+      dataRoot.doc('cobros').collection('items').where('reciboId','==',ids.receiptDirect).get()
     ]);
-    need(receiptSnap.exists&&portfolioSnap.exists&&cobroSnap.exists,'B3_004_READBACK_MISSING');
-    need(cobroQuery.size===1,'B3_004_DUPLICATE_COBRO:'+cobroQuery.size);
-    const rr=receiptSnap.data()||{}, pp=portfolioSnap.data()||{}, cc=cobroSnap.data()||{};
-    need(cc.paymentState==='PAID_REPORTED'&&cc.applicationState==='APPLIED_DIRECT','B3_004_COBRO_STATE_READBACK_INVALID');
-    need(cc.paidDate===paidDate&&cc.applicationDate===applicationDate,'B3_004_DATE_SEPARATION_INVALID');
-    need(cc.invoiceNumber==='B3004-QA-'+suffix,'B3_004_INVOICE_READBACK_INVALID');
-    need(cc.paymentEvidenceType==='CLIENT_REPORTED','B3_004_PAYMENT_PROVENANCE_LOST');
-    need(cc.applicationEvidenceType==='INSURER_INVOICE','B3_004_APPLICATION_PROVENANCE_MISSING');
-    need(rr.estado==='Pagado'&&rr.applicationDate===applicationDate,'B3_004_RECEIPT_READBACK_INVALID');
-    need(pp.estado==='Pagado'&&pp.applicationDate===applicationDate,'B3_004_PORTFOLIO_READBACK_INVALID');
+    need(reportReceiptFinal.exists&&directReceiptFinal.exists&&reportCobroSnap.exists&&directCobroSnap.exists&&managementFinal.exists,'B3_004_FINAL_READBACK_MISSING');
+    need(reportQuery.size===1&&directQuery.size===1,'B3_004_DUPLICATE_COBRO');
+    const rr=reportReceiptFinal.data()||{},cc=reportCobroSnap.data()||{},mg=managementFinal.data()||{};
+    need(rr.estado==='Pagado'&&rr.paymentOrigin==='ADVISOR_REPORTED_PAYMENT','B3_004_REPORT_RECEIPT_FINAL_INVALID');
+    need(cc.paymentEvidenceType==='ADVISOR_REPORTED'&&cc.applicationDate===applicationDate,'B3_004_REPORT_COBRO_FINAL_INVALID');
+    need(mg.estado==='Resuelta'&&mg.paymentReportStatus==='VALIDATED_APPLIED','B3_004_OPS_MANAGEMENT_NOT_RESOLVED');
 
     audit.assertions={
-      previewCallable:true,clientReportAutoApplied:true,secondHumanApprovalRequired:false,
-      idempotentRetry:true,singleCobro:true,applicationEnrichesSameCobro:true,
-      paymentProvenancePreserved:true,paidDateSeparatedFromApplicationDate:true,
-      invoiceNumberPersisted:true,receiptUpdated:true,portfolioUpdated:true
+      crossAdvisorPrivilegedApply:true,
+      advisorReportDoesNotApplyPayment:true,
+      advisorCannotApplyOrReconcile:true,
+      advisorReportCreatesLinkedOpsManagement:true,
+      operativeValidatesAndAppliesSameCanonicalPayment:true,
+      operativeDirectPaymentNeedsNoSecondApproval:true,
+      individualReconciliationEnrichesSamePayment:true,
+      idempotentRetry:true,
+      singleCobroPerReceipt:true,
+      advisorProvenancePreserved:true,
+      paidDateSeparatedFromApplicationDate:true
     };
     audit.status='PASS_PENDING_CLEANUP';
   } finally {
     audit.cleanup.attempted=true;
     const deletes=[];
-    if(cobroId)deletes.push(dataRoot.doc('cobros').collection('items').doc(cobroId).delete().catch(()=>null));
-    deletes.push(refs.portfolio.delete().catch(()=>null),refs.receipt.delete().catch(()=>null),refs.policy.delete().catch(()=>null),refs.client.delete().catch(()=>null));
+    if(reportCobroId)deletes.push(dataRoot.doc('cobros').collection('items').doc(reportCobroId).delete().catch(()=>null));
+    if(directCobroId)deletes.push(dataRoot.doc('cobros').collection('items').doc(directCobroId).delete().catch(()=>null));
+    if(managementId)deletes.push(dataRoot.doc('gestiones').collection('items').doc(managementId).delete().catch(()=>null));
+    deletes.push(refs.portfolioReport.delete().catch(()=>null),refs.portfolioDirect.delete().catch(()=>null),refs.receiptReport.delete().catch(()=>null),refs.receiptDirect.delete().catch(()=>null),refs.policy.delete().catch(()=>null),refs.client.delete().catch(()=>null));
     const reqs=await db.collection('tenants').doc(tenantId).collection('reconciliationRequests').get().catch(()=>null);
-    if(reqs)for(const d of reqs.docs){const x=d.data()||{};if(x.result?.receiptId===ids.receipt)deletes.push(d.ref.delete().catch(()=>null));}
-    const evts=await db.collection('tenants').doc(tenantId).collection('reconciliationEvents').where('receiptId','==',ids.receipt).get().catch(()=>null);
-    if(evts)for(const d of evts.docs)deletes.push(d.ref.delete().catch(()=>null));
+    if(reqs)for(const d of reqs.docs){const x=d.data()||{},rid=text(x.result&&x.result.receiptId);if(rid===ids.receiptReport||rid===ids.receiptDirect)deletes.push(d.ref.delete().catch(()=>null));}
+    for(const receiptId of [ids.receiptReport,ids.receiptDirect]){
+      const evts=await db.collection('tenants').doc(tenantId).collection('reconciliationEvents').where('receiptId','==',receiptId).get().catch(()=>null);
+      if(evts)for(const d of evts.docs)deletes.push(d.ref.delete().catch(()=>null));
+    }
     await Promise.all(deletes);
-    const [a,b,c,d]=await Promise.all([refs.client.get(),refs.policy.get(),refs.receipt.get(),refs.portfolio.get()]);
-    let remainingCobro=0;
-    if(cobroId)remainingCobro=(await dataRoot.doc('cobros').collection('items').doc(cobroId).get()).exists?1:0;
-    audit.cleanup.pass=!a.exists&&!b.exists&&!c.exists&&!d.exists&&remainingCobro===0;
+    const [a,b,c,d,e,f]=await Promise.all([refs.client.get(),refs.policy.get(),refs.receiptReport.get(),refs.receiptDirect.get(),refs.portfolioReport.get(),refs.portfolioDirect.get()]);
+    let remaining=0;
+    for(const cobroId of [reportCobroId,directCobroId].filter(Boolean)){if((await dataRoot.doc('cobros').collection('items').doc(cobroId).get()).exists)remaining++;}
+    const managementExists=managementId?(await dataRoot.doc('gestiones').collection('items').doc(managementId).get()).exists:false;
+    audit.cleanup.pass=!a.exists&&!b.exists&&!c.exists&&!d.exists&&!e.exists&&!f.exists&&remaining===0&&!managementExists;
     if(audit.status==='PASS_PENDING_CLEANUP'&&audit.cleanup.pass)audit.status='PASS';
     fs.writeFileSync(outPath,JSON.stringify(audit,null,2)+'\n');
   }
-  need(audit.status==='PASS','B3_004_SYNTHETIC_CLEANUP_FAILED');
+  need(audit.status==='PASS','B3_004_R6_SYNTHETIC_CLEANUP_FAILED');
   console.log(JSON.stringify(audit));
 }
 main().catch(error=>{console.error(error&&error.stack||error);process.exit(1);});

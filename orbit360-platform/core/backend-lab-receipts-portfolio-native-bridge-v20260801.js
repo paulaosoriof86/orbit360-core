@@ -121,7 +121,8 @@
   }
   function paymentOriginKind(r){
     try{if(Orbit.reconciliationDomain&&typeof Orbit.reconciliationDomain.classifyPaymentOrigin==='function')return Orbit.reconciliationDomain.classifyPaymentOrigin(r);}catch(e){}
-    var source=low([r&&r.evidenceType,r&&r.sourceType,r&&r.fuenteAutoridad,r&&r.origenAutoridad,r&&r.fuenteConciliacion,r&&r.authority].filter(Boolean).join('|'));
+    var source=low([r&&r.evidenceType,r&&r.sourceType,r&&r.paymentOrigin,r&&r.paymentOriginKind,r&&r.fuenteAutoridad,r&&r.origenAutoridad,r&&r.fuenteConciliacion,r&&r.authority].filter(Boolean).join('|'));
+    if(/advisor[_ -]?reported|asesor[_ -]?reportado|advisor[_ -]?payment/.test(source))return'ADVISOR_REPORTED';
     if(/client[_ -]?reported|client[_ -]?portal|cliente[_ -]?portal/.test(source))return'CLIENT_PORTAL';
     if(/cobros[_ -]?realizados|direct[_ -]?payment[_ -]?reported[_ -]?crm|(^|[| _-])(siga|crm)([| _-]|$)/.test(source))return'CRM_DIRECT';
     return'UNKNOWN';
@@ -142,6 +143,7 @@
     if(r&&low(r.estadoOperativo)==='pago_reportado'){
       var origin=paymentOriginKind(r);
       if(origin==='CRM_DIRECT')return{t:'Pago registrado en SIGA · pendiente de conciliación',c:'ok'};
+      if(origin==='ADVISOR_REPORTED')return{t:'Pago reportado por asesor · pendiente de validación operativa',c:'info'};
       if(origin==='CLIENT_PORTAL')return{t:'Pago reportado por cliente · pendiente de aplicar',c:'info'};
       return{t:'Origen de pago por confirmar',c:'warn'};
     }
@@ -155,7 +157,7 @@
     if(s==='futuro_pendiente')return{t:'Futuro',c:'warn'};
     if(s==='pendiente_vencido')return{t:'Vencido',c:'danger'};
     if(s==='pendiente_vence_corte')return{t:'Por vencer',c:'warn'};
-    if(s==='pago_reportado'){
+    if(s==='pago_reportado'||s==='pago_reportado_asesor'){
       var origin=paymentOriginKind(r);
       if(origin==='CRM_DIRECT')return{t:'Pago registrado en SIGA · pendiente de conciliación',c:'ok'};
       if(origin==='CLIENT_PORTAL')return{t:'Pago reportado por cliente · pendiente de aplicar',c:'info'};
@@ -169,20 +171,23 @@
     var id=clean(receiptId);if(!id)return null;
     return (Orbit.store.all('cobros')||[]).find(function(c){return clean(c&&(c.reciboId||c.receiptId))===id;})||null;
   }
+  function advisorRole(){try{var role=String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');return['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial'].indexOf(role)>=0;}catch(e){return false;}}
   function receiptAction(r){
     var c=linkedCobro(r&&r.id),op=low(r&&r.estadoOperativo),paid=!!(c&&(low(c.estado)==='pagado'||c.paymentState==='PAID_DIRECT'||c.paymentState==='PAID_REPORTED'||c.paymentState==='PAID_INFERRED'));
     if(paid)return{kind:'applied',label:'Pago aplicado'};
     if(op==='requiere_validacion_estado'||op==='no_pendiente_segun_aseguradora')return{kind:'review',label:'Revisar'};
-    if(op==='pago_reportado'){
+    if(op==='pago_reportado'||op==='pago_reportado_asesor'){
       var origin=paymentOriginKind(r);
-      if(origin==='CRM_DIRECT')return{kind:'crm_direct',label:'Pago registrado'};
+      if(origin==='CRM_DIRECT')return{kind:'crm_direct',label:'Conciliar'};
+      if(origin==='ADVISOR_REPORTED')return advisorRole()?{kind:'advisor_sent',label:'Enviado a Ops'}:{kind:'advisor_validate',label:'Validar y aplicar'};
       if(origin==='CLIENT_PORTAL')return{kind:'reported',label:'Aplicar pago'};
       return{kind:'review',label:'Revisar origen'};
     }
-    return{kind:'apply',label:'Aplicar pago'};
+    return advisorRole()?{kind:'advisor_report',label:'Reportar pago'}:{kind:'apply',label:'Aplicar pago'};
   }
-  function invokeReceiptPayment(receiptId,reported){
+  function invokeReceiptPayment(receiptId,reported,advisorReport){
     var mod=Orbit.modules&&Orbit.modules.cobros;
+    if(advisorReport&&mod&&typeof mod.reportarPago==='function')return mod.reportarPago(receiptId);
     if(reported&&mod&&typeof mod.validarReporte==='function')return mod.validarReporte(receiptId);
     if(mod&&typeof mod.aplicarPago==='function')return mod.aplicarPago(receiptId);
     try{Orbit.ui&&Orbit.ui.toast&&Orbit.ui.toast('Aplicación canónica de pagos no disponible.');}catch(e){}
@@ -195,9 +200,10 @@
   function actionHtml(r){
     var a=receiptAction(r),id=esc(r&&r.id);
     if(a.kind==='applied')return'<span class="badge ok">Pago aplicado</span>';
-    if(a.kind==='crm_direct')return'<span class="badge info">Listo para conciliación automática</span>';
+    if(a.kind==='crm_direct')return'<button class="btn primary sm" data-rp-reconcile-payment="'+id+'">Conciliar</button>';
+    if(a.kind==='advisor_sent')return'<span class="badge info">Enviado a Ops</span>';
     if(a.kind==='review')return'<span class="badge warn">Revisar</span>';
-    return'<button class="btn primary sm" data-rp-apply-payment="'+id+'" data-rp-reported="'+(a.kind==='reported'?'1':'0')+'">Aplicar pago</button>';
+    return'<button class="btn primary sm" data-rp-apply-payment="'+id+'" data-rp-reported="'+(a.kind==='reported'?'1':'0')+'" data-rp-advisor-report="'+(a.kind==='advisor_report'?'1':'0')+'">'+a.label+'</button>';
   }
 
   function portfolioSummary(cid){
@@ -317,16 +323,17 @@
       +(portfolio?'<div style="margin-top:10px">En cartera: <span style="font-weight:600">'+esc(moneyDetail(portfolio.primaTotal||portfolio.montoTotal||portfolio.monto||r.primaTotal||r.montoTotal||r.monto,cur))+'</span></div>':'')
       +'</section><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">📅 Información del registro</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px">'+(operationalAsOf||'<div class="muted">Sin fecha adicional reportada.</div>')+'</div><details class="gi-technical-origin" style="margin-top:14px"><summary>Detalles de origen y auditoría</summary><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px">'+trace+'</div></details></section></div></div></div>';
     var statusEl=target.querySelector('[data-rp-hero-status="1"]'),paymentAction=receiptAction(r);
-    if(statusEl&&(paymentAction.kind==='apply'||paymentAction.kind==='reported')){
+    if(statusEl&&['apply','reported','advisor_report','advisor_validate','crm_direct'].indexOf(paymentAction.kind)>=0){
       var paymentButton=document.createElement('button');paymentButton.className='btn primary sm';paymentButton.setAttribute('data-rp-detail-payment-action','1');paymentButton.style.marginLeft='8px';paymentButton.textContent=paymentAction.label;
-      paymentButton.addEventListener('click',function(){invokeReceiptPayment(r.id,paymentAction.kind==='reported');});
+      if(paymentAction.kind==='crm_direct')paymentButton.addEventListener('click',function(){invokeReceiptReconciliation(r.id);});
+      else paymentButton.addEventListener('click',function(){invokeReceiptPayment(r.id,paymentAction.kind==='reported',paymentAction.kind==='advisor_report');});
       statusEl.parentElement&&statusEl.parentElement.appendChild(paymentButton);
     }
     if(canEditPlan){var statusEl=target.querySelector('[data-rp-hero-status="1"]');if(statusEl){var parent=statusEl.parentElement,locked=receiptLockedForEdit(r),edit=document.createElement('button');edit.className='btn primary sm';edit.setAttribute('data-rp-edit-receipt','1');edit.textContent=locked?'🔒 Edición bloqueada · existe evidencia de pago':'✏ Editar este recibo';edit.style.marginLeft='8px';edit.disabled=locked;if(!locked)edit.addEventListener('click',function(){editReceipt(r.id,cid||r.clienteId);});parent&&parent.appendChild(edit);var btn=document.createElement('button');btn.className='btn ghost sm';btn.textContent='Editar plan de recibos';btn.style.marginLeft='8px';btn.addEventListener('click',function(){Orbit.modules.cliente360.editarPoliza(p.id);});parent&&parent.appendChild(btn);}}
     return true;
   }
   function openReceiptDetail(receiptId,cid){return renderReceiptDetail(receiptId,cid);}
-  function wireReceiptRows(body,cid){if(!body)return;body.querySelectorAll('[data-rp-receipt-id]').forEach(function(row){if(row.dataset.rpWired==='1')return;row.dataset.rpWired='1';row.addEventListener('click',function(){openReceiptDetail(row.getAttribute('data-rp-receipt-id'),cid);});});body.querySelectorAll('[data-rp-apply-payment]').forEach(function(btn){if(btn.dataset.rpActionWired==='1')return;btn.dataset.rpActionWired='1';btn.addEventListener('click',function(e){e.stopPropagation();invokeReceiptPayment(btn.getAttribute('data-rp-apply-payment'),btn.getAttribute('data-rp-reported')==='1');});});}
+  function wireReceiptRows(body,cid){if(!body)return;body.querySelectorAll('[data-rp-receipt-id]').forEach(function(row){if(row.dataset.rpWired==='1')return;row.dataset.rpWired='1';row.addEventListener('click',function(){openReceiptDetail(row.getAttribute('data-rp-receipt-id'),cid);});});body.querySelectorAll('[data-rp-apply-payment]').forEach(function(btn){if(btn.dataset.rpActionWired==='1')return;btn.dataset.rpActionWired='1';btn.addEventListener('click',function(e){e.stopPropagation();invokeReceiptPayment(btn.getAttribute('data-rp-apply-payment'),btn.getAttribute('data-rp-reported')==='1',btn.getAttribute('data-rp-advisor-report')==='1');});});body.querySelectorAll('[data-rp-reconcile-payment]').forEach(function(btn){if(btn.dataset.rpActionWired==='1')return;btn.dataset.rpActionWired='1';btn.addEventListener('click',function(e){e.stopPropagation();invokeReceiptReconciliation(btn.getAttribute('data-rp-reconcile-payment'));});});}
 
   function renderReceipts(cid){
     var body=document.getElementById('c360-body');if(!body||!Orbit.q||!Orbit.q.recibosEsperadosDe)return;

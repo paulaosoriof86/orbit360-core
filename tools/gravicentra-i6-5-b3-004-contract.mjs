@@ -4,6 +4,8 @@ const read=p=>fs.readFileSync(p,'utf8');
 const server=read('functions/cobros-reconciliation-domain.js');
 const client=read('orbit360-platform/core/cobros-reconciliation-domain-client.js');
 need(server.includes("'apply_payment'"),'B3_004_APPLY_OPERATION_MISSING');
+need(server.includes("'report_advisor_payment'"),'B3_004_ADVISOR_REPORT_OPERATION_MISSING');
+need(server.includes("'reconcile_payment'"),'B3_004_RECONCILE_OPERATION_MISSING');
 need(server.includes('async function applyPayment'),'B3_004_SERVER_OWNER_MISSING');
 need(server.includes('deterministicCobroId'),'B3_004_IDEMPOTENT_COBRO_ID_MISSING');
 need(server.includes("paymentState"),'B3_004_PAYMENT_STATE_MISSING');
@@ -15,6 +17,8 @@ need(server.includes("paymentSupportDocumentRef"),'B3_004_SUPPORT_REF_MISSING');
 need(server.includes("orbit360CobrosReconciliationCommandPreview"),'B3_004_PREVIEW_ALIAS_MISSING');
 need(client.includes('function applyPayment'),'B3_004_CLIENT_APPLY_MISSING');
 need(client.includes('function reportClientPayment'),'B3_004_CLIENT_REPORT_MISSING');
+need(client.includes('function reportAdvisorPayment'),'B3_004_ADVISOR_REPORT_CLIENT_MISSING');
+need(client.includes('function reconcilePayment'),'B3_004_RECONCILE_CLIENT_MISSING');
 need(client.includes('function enrichApplication'),'B3_004_CLIENT_ENRICH_MISSING');
 need(client.includes("orbit360CobrosReconciliationCommandPreview"),'B3_004_PREVIEW_ROUTING_MISSING');
 need(!/makeRequestId\([^)]*\)[^{]*\{[^}]*Date\.now/.test(client),'B3_004_NONDETERMINISTIC_REQUEST_ID');
@@ -26,7 +30,7 @@ const portal=read('orbit360-platform/modules/portal.js');
 const receiptView=read('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js');
 need(cobros.includes('domain.applyPayment'),'B3_004_COBROS_NOT_CANONICAL');
 need(cobros.includes('domain.reportClientPayment'),'B3_004_REPORTED_PAYMENT_NOT_CANONICAL');
-need(cobros.includes('domain.enrichApplication'),'B3_004_APPLICATION_NOT_CANONICAL');
+need(cobros.includes('domain.reconcilePayment'),'B3_004_RECONCILIATION_NOT_CANONICAL');
 need(cobros.includes('Fecha real del pago')&&cobros.includes('Fecha de aplicación por la aseguradora'),'B3_004_DATE_SEMANTICS_UI_MISSING');
 need(cobros.includes('Número de factura'),'B3_004_INVOICE_NUMBER_UI_MISSING');
 need(cliente.includes('reutiliza exactamente el owner canónico de Cobros'),'B3_004_CLIENTE360_NOT_DELEGATED');
@@ -86,8 +90,10 @@ need(nativeReceiptR4.includes("if(paid)return{kind:'applied',label:'Pago aplicad
 need(cobros.includes('data-cobros-action="apply"'),'B3_004_GLOBAL_APPLY_ACTION_MARKER_MISSING');
 need(cobros.includes('data-cobros-action="reconcile"'),'B3_004_GLOBAL_RECONCILE_ACTION_MARKER_MISSING');
 need(!cobros.includes('Confirmar cobro'),'B3_004_GLOBAL_CONFIRMAR_COBRO_REMAINS');
-need(indexR4.includes('modules/cobros.js?v=20260930-b3004r5'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
-need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r5'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cobros.js?v=20260930-b3004r6'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r6'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20260930-b3004r6'),'B3_004_PAYMENT_CLIENT_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r6'),'B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT=PASS');
 
 const domainClient=read('orbit360-platform/core/cobros-reconciliation-domain-client.js');
@@ -96,7 +102,7 @@ need(domainClient.includes('classifyPaymentOrigin'),'B3_004_PAYMENT_ORIGIN_CLASS
 need(domainClient.includes("return 'CRM_DIRECT'"),'B3_004_CRM_DIRECT_CLASSIFICATION_MISSING');
 need(domainClient.includes("return 'CLIENT_PORTAL'"),'B3_004_CLIENT_PORTAL_CLASSIFICATION_MISSING');
 need(cobros.includes('Pago registrado en SIGA'),'B3_004_SIGA_DIRECT_PAYMENT_LABEL_MISSING');
-need(cobros.includes('Conciliación automática'),'B3_004_SIGA_AUTOMATIC_RECONCILIATION_LABEL_MISSING');
+need(cobros.toLowerCase().includes('conciliación automática'),'B3_004_SIGA_AUTOMATIC_RECONCILIATION_LABEL_MISSING');
 need(cobros.includes('__crmDirectEvidence'),'B3_004_SIGA_DIRECT_EVIDENCE_BRANCH_MISSING');
 need(cobros.includes('__clientReportedEvidence'),'B3_004_CLIENT_REPORT_SEPARATION_MISSING');
 need(cliente.includes('Pago registrado en SIGA'),'B3_004_CLIENTE360_SIGA_DIRECT_LABEL_MISSING');
@@ -104,3 +110,19 @@ need(nativeReceiptOwner.includes('Pago histórico registrado en SIGA'),'B3_004_R
 need(!portalCopyFix.includes("'Confirmar cobro'"),'B3_004_LEGACY_COPYFIX_STILL_REWRITES_APPLY_TO_CONFIRM');
 need(!portalCopyFix.includes("'Cobro confirmado'"),'B3_004_LEGACY_COPYFIX_STILL_REWRITES_PAID_STATE');
 console.log('B3_004_CRM_MIGRATION_ORIGIN_CONTRACT=PASS');
+
+
+need(server.includes("ADVISOR_REPORT_ROLES"),'B3_004_ADVISOR_ROLE_BOUNDARY_MISSING');
+need(server.includes("workflowType: 'advisor_payment_validation'"),'B3_004_ADVISOR_REPORT_OPS_LINK_MISSING');
+need(server.includes("paymentOrigin: 'ADVISOR_REPORTED_PAYMENT'"),'B3_004_ADVISOR_PAYMENT_ORIGIN_MISSING');
+need(server.includes("deterministicAdvisorPaymentManagementId"),'B3_004_ADVISOR_REPORT_IDEMPOTENT_MANAGEMENT_MISSING');
+need(client.includes("return 'ADVISOR_REPORTED'"),'B3_004_ADVISOR_ORIGIN_CLASSIFIER_MISSING');
+need(cobros.includes('function reportarPago'),'B3_004_ADVISOR_REPORT_UI_MISSING');
+need(cobros.includes('data-cobros-action="report"'),'B3_004_ADVISOR_REPORT_ACTION_MISSING');
+need(cobros.includes('Conciliar este pago'),'B3_004_SIGA_INDIVIDUAL_RECONCILE_MISSING');
+need(cobros.includes('function baseModel(reuse)')&&cobros.includes('render(host, true)'),'B3_004_FILTER_PERFORMANCE_CACHE_MISSING');
+need(cliente.includes('data-advisor-reported-payment'),'B3_004_CLIENTE360_ADVISOR_REPORT_VISIBILITY_MISSING');
+need(cliente.includes('data-c360-conciliar-receipt'),'B3_004_CLIENTE360_SIGA_RECONCILE_MISSING');
+need(nativeReceiptOwner.includes('data-rp-advisor-report'),'B3_004_RECEIPT_ADVISOR_REPORT_ACTION_MISSING');
+need(nativeReceiptOwner.includes('data-rp-reconcile-payment'),'B3_004_RECEIPT_SIGA_RECONCILE_ACTION_MISSING');
+console.log('B3_004_R6_ORIGIN_SCOPE_PERFORMANCE_CONTRACT=PASS');

@@ -8,12 +8,16 @@ Orbit.modules.cobros = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
   let st = { fq: '', fest: '', fase: '', sort: 'vence', page: 1 };
   let searchTimer = null;
+  let baseCache = null;
   const PAGE_SIZE = 60;
+  function activeRoleNorm(){try{return String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');}catch(e){return'';}}
+  function advisorRole(){return ['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial'].includes(activeRoleNorm());}
+  function directPaymentRole(){return !advisorRole();}
   const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'vehiculos', 'recibosEsperados', 'carteraPrimas'];
 
   const FDEFS = () => [
     { id: 'fq', type: 'search', ph: 'Buscar cliente, póliza o placa…' },
-    { id: 'fest', type: 'select', ph: 'Estado', options: ['Pagado', 'Pendiente', 'Vencido', 'Pago registrado en SIGA', 'Por conciliar', 'Reportado por cliente', 'Conciliado', 'Requiere validación', 'Bloqueado', 'Anulado'].map(v => ({ v, t: v })) },
+    { id: 'fest', type: 'select', ph: 'Estado', options: ['Pagado', 'Pendiente', 'Vencido', 'Pago registrado en SIGA', 'Por conciliar', 'Reportado por asesor', 'Reportado por cliente', 'Conciliado', 'Requiere validación', 'Bloqueado', 'Anulado'].map(v => ({ v, t: v })) },
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
   ];
 
@@ -37,6 +41,13 @@ Orbit.modules.cobros = (function () {
       if (pid && !vehicleByPolicy.has(pid)) vehicleByPolicy.set(pid, v);
     });
     return { clients, policies, vehicleByPolicy };
+  }
+  function baseModel(reuse){
+    const country=activeCountry();
+    if(reuse&&baseCache&&baseCache.country===country)return baseCache;
+    const idx=buildIndex();
+    baseCache={country,idx,cart:q.carteraGlobalPorMoneda(),aging:q.agingVencidoPorMoneda()};
+    return baseCache;
   }
   function indexClient(idx, id) { return idx.clients.get(String(id || '')) || null; }
   function indexPolicy(idx, id) { return idx.policies.get(String(id || '')) || null; }
@@ -70,7 +81,8 @@ Orbit.modules.cobros = (function () {
 
   function paymentOriginKind(row) {
     try { if (Orbit.reconciliationDomain && typeof Orbit.reconciliationDomain.classifyPaymentOrigin === 'function') return Orbit.reconciliationDomain.classifyPaymentOrigin(row); } catch (e) {}
-    const s = String([row && row.evidenceType,row && row.sourceType,row && row.fuenteAutoridad,row && row.origenAutoridad,row && row.fuenteConciliacion,row && row.authority].filter(Boolean).join('|')).toLowerCase();
+    const s = String([row && row.evidenceType,row && row.sourceType,row && row.paymentOrigin,row && row.paymentOriginKind,row && row.fuenteAutoridad,row && row.origenAutoridad,row && row.fuenteConciliacion,row && row.authority].filter(Boolean).join('|')).toLowerCase();
+    if (/advisor[_ -]?reported|asesor[_ -]?reportado|advisor[_ -]?payment/.test(s)) return 'ADVISOR_REPORTED';
     if (/client[_ -]?reported|client[_ -]?portal|cliente[_ -]?portal/.test(s)) return 'CLIENT_PORTAL';
     if (/cobros[_ -]?realizados|direct[_ -]?payment[_ -]?reported[_ -]?crm|(^|[| _-])(siga|crm)([| _-]|$)/.test(s)) return 'CRM_DIRECT';
     return 'UNKNOWN';
@@ -79,13 +91,14 @@ Orbit.modules.cobros = (function () {
   function reportedPaymentEvidence(idx) {
     const linked = new Set((S().all('cobros') || []).map(c => String(c && c.reciboId || '')).filter(Boolean));
     return (S().all('recibosEsperados') || [])
-      .filter(r => r && String(r.estadoOperativo || '').toLowerCase() === 'pago_reportado' && !linked.has(String(r.id || '')))
+      .filter(r => r && ['pago_reportado','pago_reportado_asesor'].includes(String(r.estadoOperativo || '').toLowerCase()) && !linked.has(String(r.id || '')))
       .filter(r => countryMatches(r, idx))
       .map(r => {
         const originKind = paymentOriginKind(r);
         return {
           id: 'reported:' + r.id, receiptId: r.id, __reportedEvidence: true,
           __crmDirectEvidence: originKind === 'CRM_DIRECT',
+          __advisorReportedEvidence: originKind === 'ADVISOR_REPORTED',
           __clientReportedEvidence: originKind === 'CLIENT_PORTAL',
           __unclassifiedPaymentEvidence: originKind === 'UNKNOWN',
           paymentOriginKind: originKind,
@@ -95,8 +108,8 @@ Orbit.modules.cobros = (function () {
           moneda: r.moneda, vence: r.fechaLimite || r.vence || r.fechaVencimiento,
           fechaPago: r.paidDate || r.fechaPago || r.fechaPagoReportada || '',
           estado: originKind === 'CRM_DIRECT' ? 'Pagado' : 'Pendiente',
-          paymentState: originKind === 'CRM_DIRECT' ? 'PAID_DIRECT' : (originKind === 'CLIENT_PORTAL' ? 'PAID_REPORTED' : 'CONFLICT_REVIEW_REQUIRED'),
-          estadoOperativo: 'pago_reportado', reportado: r.fechaPagoReportada || r.reportado || true
+          paymentState: originKind === 'CRM_DIRECT' ? 'PAID_DIRECT' : (originKind === 'ADVISOR_REPORTED' ? 'REPORTED_PENDING_OPERATIVE_VALIDATION' : (originKind === 'CLIENT_PORTAL' ? 'PAID_REPORTED' : 'CONFLICT_REVIEW_REQUIRED')),
+          estadoOperativo: String(r.estadoOperativo || 'pago_reportado'), reportado: r.fechaPagoReportada || r.reportado || true
         };
       });
   }
@@ -105,6 +118,7 @@ Orbit.modules.cobros = (function () {
       if (!matchTxt(c, idx)) return false;
       if (!st.fest) return true;
       if (st.fest === 'Pago registrado en SIGA' || st.fest === 'Pagado' || st.fest === 'Por conciliar') return c.__crmDirectEvidence;
+      if (st.fest === 'Reportado por asesor') return c.__advisorReportedEvidence;
       if (st.fest === 'Reportado por cliente') return c.__clientReportedEvidence;
       if (st.fest === 'Requiere validación') return c.__unclassifiedPaymentEvidence;
       return false;
@@ -141,7 +155,7 @@ Orbit.modules.cobros = (function () {
       };
     }).filter(Boolean).filter(c => {
       if (!countryMatches(c, idx) || !matchTxt(c, idx)) return false;
-      if (st.fest === 'Reportado por cliente' || st.fest === 'Pago registrado en SIGA' || st.fest === 'Por conciliar' || st.fest === 'Conciliado' || st.fest === 'Bloqueado' || st.fest === 'Anulado' || st.fest === 'Pagado') return false;
+      if (st.fest === 'Reportado por asesor' || st.fest === 'Reportado por cliente' || st.fest === 'Pago registrado en SIGA' || st.fest === 'Por conciliar' || st.fest === 'Conciliado' || st.fest === 'Bloqueado' || st.fest === 'Anulado' || st.fest === 'Pagado') return false;
       if (st.fest === 'Requiere validación') return c.requiereValidacion === true;
       return !st.fest || c.estado === st.fest;
     }).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
@@ -152,6 +166,7 @@ Orbit.modules.cobros = (function () {
       if (!countryMatches(c, idx)) return false;
       if (c.estado === 'Anulado' && st.fest !== 'Anulado') return false;
       const estV = estadoValidacion(c);
+      if (st.fest === 'Reportado por asesor') return paymentOriginKind(c) === 'ADVISOR_REPORTED' && estV === 'Reportado por asesor' && matchTxt(c, idx);
       if (st.fest === 'Reportado por cliente') return paymentOriginKind(c) === 'CLIENT_PORTAL' && estV === 'Reportado por cliente' && matchTxt(c, idx);
       if (st.fest === 'Pago registrado en SIGA') return paymentOriginKind(c) === 'CRM_DIRECT' && matchTxt(c, idx);
       if (st.fest === 'Por conciliar') return c.estado === 'Pagado' && !c.conciliado && matchTxt(c, idx);
@@ -172,6 +187,7 @@ Orbit.modules.cobros = (function () {
     if (c.reportado && (c.estado === 'Pendiente' || c.estado === 'Vencido')) {
       const origin = paymentOriginKind(c);
       if (origin === 'CRM_DIRECT') return 'Pago registrado en SIGA · pendiente de conciliación';
+      if (origin === 'ADVISOR_REPORTED') return 'Reportado por asesor';
       if (origin === 'CLIENT_PORTAL') return c.enRevision ? 'En revisión' : 'Reportado por cliente';
       return 'Origen de pago por confirmar';
     }
@@ -179,7 +195,7 @@ Orbit.modules.cobros = (function () {
   }
   function badgeValidacion(c) {
     const e = estadoValidacion(c);
-    const tone = e === 'Conciliado' ? 'ok' : /Pagado|Pago registrado/.test(e) ? 'ok' : e === 'Validada (por aplicar)' ? 'ok' : e === 'Reportado por cliente' ? 'info' : e === 'En revisión' ? 'info' : e === 'Requiere validación' ? 'warn' : e === 'Bloqueado' ? 'danger' : e === 'Vencido' ? 'danger' : 'warn';
+    const tone = e === 'Conciliado' ? 'ok' : /Pagado|Pago registrado/.test(e) ? 'ok' : e === 'Validada (por aplicar)' ? 'ok' : (e === 'Reportado por cliente' || e === 'Reportado por asesor') ? 'info' : e === 'En revisión' ? 'info' : e === 'Requiere validación' ? 'warn' : e === 'Bloqueado' ? 'danger' : e === 'Vencido' ? 'danger' : 'warn';
     return '<span class="badge ' + tone + '">' + U.esc(U.text(e, 'Sin estado')) + '</span>';
   }
   function safeMoney(value, currency, short) {
@@ -216,7 +232,7 @@ Orbit.modules.cobros = (function () {
     }).join('');
   }
 
-  function render(host) {
+  function render(host, reuseBase) {
     const hyd = hydrationState();
     if (!hyd.ready) {
       const blocked = hyd.failed.length > 0;
@@ -230,12 +246,13 @@ Orbit.modules.cobros = (function () {
       return;
     }
 
-    const idx = buildIndex();
-    const cart = q.carteraGlobalPorMoneda();
-    const aging = q.agingVencidoPorMoneda();
+    const model = baseModel(reuseBase === true);
+    const idx = model.idx;
+    const cart = model.cart;
+    const aging = model.aging;
     const porConciliar = (cart.currencies || []).reduce((sum, cur) => sum + Number(cart.byCurrency[cur] && cart.byCurrency[cur].porConciliar || 0), 0);
     const authoritative = rows(idx), portfolioOnly = portfolioPaymentRows(idx), reported = reportedRows(idx);
-    const crmDirect = reported.filter(x => x.__crmDirectEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
+    const crmDirect = reported.filter(x => x.__crmDirectEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
     const allRows = authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
     const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE));
     if (st.page > totalPages) st.page = totalPages;
@@ -243,6 +260,7 @@ Orbit.modules.cobros = (function () {
     const from = (st.page - 1) * PAGE_SIZE, r = allRows.slice(from, from + PAGE_SIZE);
     st.__count = allRows.length + ' registros' +
       (crmDirect.length ? ' · ' + crmDirect.length + ' pagos SIGA por conciliar' : '') +
+      (advisorReported.length ? ' · ' + advisorReported.length + ' reportes de asesor' : '') +
       (clientReported.length ? ' · ' + clientReported.length + ' reportes de cliente' : '') +
       (allRows.length ? ' · ' + (from + 1) + '–' + Math.min(from + PAGE_SIZE, allRows.length) + ' de ' + allRows.length : '');
     const agingCols = { '1-30': '#c9821b', '31-60': '#d9602e', '61-90': '#b5253b', '90+': '#7e1220' };
@@ -255,7 +273,8 @@ Orbit.modules.cobros = (function () {
         { label: 'Vencido', val: currencyMetric(cart, 'venc'), color: 'var(--danger)', foot: 'en gestión · por moneda', footTone: 'down' },
         { label: 'Por conciliar', onclick: "location.hash='#/cobros'", val: porConciliar, color: 'var(--info)', foot: 'cobros confirmados sin conciliación' }
       ])}
-      ${crmDirect.length ? `<div class="card" data-siga-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--ok)"><b>${crmDirect.length} pago(s) registrados en SIGA</b><div class="muted" style="font-size:12px;margin-top:3px">Son evidencia directa de pagos ya efectuados. No requieren aplicación manual; quedan listos para materialización y conciliación canónica automática por lote.</div></div>` : ''}
+      ${crmDirect.length ? `<div class="card" data-siga-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--ok)"><b>${crmDirect.length} pago(s) registrados en SIGA</b><div class="muted" style="font-size:12px;margin-top:3px">Son evidencia directa de pagos ya efectuados. No requieren aplicación manual; conservan conciliación automática por lote y también acción individual <b>Conciliar</b>.</div></div>` : ''}
+      ${advisorReported.length ? `<div class="card" data-advisor-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${advisorReported.length} pago(s) reportado(s) por asesor</b><div class="muted" style="font-size:12px;margin-top:3px">El reporte no aplica el pago. Operativo valida la correspondencia desde Ops y luego aplica el mismo pago sin duplicarlo.</div></div>` : ''}
       ${clientReported.length ? `<div class="card" data-reported-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${clientReported.length} pago(s) reportado(s) realmente desde portal</b><div class="muted" style="font-size:12px;margin-top:3px">Cuando el recibo coincide de forma única y válida, el pago se aplica automáticamente. Solo los casos ambiguos o contradictorios quedan para revisión.</div></div>` : ''}
 
       <div class="card pad" style="margin-bottom:16px">
@@ -272,8 +291,9 @@ Orbit.modules.cobros = (function () {
           <thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th><th></th></tr></thead>
           <tbody>${r.map(c => {
             const p = indexPolicy(idx, c.polizaId);
-            if (c.__portfolioReceipt) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-portfolio-receipt="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td><span class="muted">—</span></td><td>${badgeValidacion(c)}</td><td><span class="muted">—</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${c.requiereValidacion ? '<span class="badge warn">Revisar</span>' : `<button class="btn primary sm" title="Aplicar pago a este recibo" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${U.esc(c.receiptId)}')" data-cobros-action="apply">Aplicar pago</button>`}</td></tr>`; }
-            if (c.__crmDirectEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-siga-direct-payment="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">No informada</span>'}</td><td><span class="badge ok">Pago registrado en SIGA</span></td><td><span class="badge warn">Pendiente de conciliación</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2"><span class="badge info">Conciliación automática</span></td></tr>`; }
+            if (c.__portfolioReceipt) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-portfolio-receipt="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td><span class="muted">—</span></td><td>${badgeValidacion(c)}</td><td><span class="muted">—</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${c.requiereValidacion ? '<span class="badge warn">Revisar</span>' : (advisorRole() ? `<button class="btn primary sm" title="Reportar pago para validación operativa" onclick="event.stopPropagation();Orbit.modules.cobros.reportarPago('${U.esc(c.receiptId)}')" data-cobros-action="report">Reportar pago</button>` : `<button class="btn primary sm" title="Aplicar pago a este recibo" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${U.esc(c.receiptId)}')" data-cobros-action="apply">Aplicar pago</button>`)}</td></tr>`; }
+            if (c.__crmDirectEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-siga-direct-payment="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">No informada</span>'}</td><td><span class="badge ok">Pago registrado en SIGA</span></td><td><span class="badge warn">Pendiente de conciliación</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2"><button class="btn primary sm" title="Conciliar este pago" onclick="event.stopPropagation();Orbit.modules.cobros.conciliarFactura('${U.esc(c.receiptId)}')" data-cobros-action="reconcile">Conciliar</button></td></tr>`; }
+            if (c.__advisorReportedEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-advisor-reported-payment="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado por asesor · pendiente de validación operativa</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${advisorRole() ? '<span class="badge info">Enviado a Ops</span>' : `<button class="btn primary sm" title="Validar y aplicar el pago reportado" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${U.esc(c.receiptId)}')" data-cobros-action="apply-advisor-report">Validar y aplicar</button>`}</td></tr>`; }
             if (c.__clientReportedEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-reported-payment-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado por cliente · pendiente de aplicar</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2"><button class="btn primary sm" title="Aplicar el pago reportado" onclick="event.stopPropagation();Orbit.modules.cobros.validarReporte('${U.esc(c.receiptId)}')" data-cobros-action="apply">Aplicar pago</button></td></tr>`; }
             if (c.__unclassifiedPaymentEvidence) { return `<tr data-unclassified-payment-evidence="${U.esc(c.receiptId)}"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? U.esc(U.text(p.numero)) : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto,c.moneda)}</td><td>${U.fmtDate(c.vence)}</td><td>${c.fechaPago ? U.fmtDate(c.fechaPago) : '—'}</td><td><span class="badge warn">Origen de pago por confirmar</span></td><td><span class="badge warn">Revisión</span></td><td></td></tr>`; }
 
@@ -287,7 +307,7 @@ Orbit.modules.cobros = (function () {
               <td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">—</span>'}</td>
               <td>${badgeValidacion(c)}</td>
               <td>${c.estado === 'Pagado' ? (c.conciliado ? '<span style="color:var(--ok)" title="Confirmado y conciliado con póliza">✓</span>' : '<span style="color:var(--warn)" title="Por conciliar">◷</span>') : '<span class="muted">—</span>'}</td>
-              <td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${c.reportado && !c.validadoReporte && (c.estado === 'Pendiente' || c.estado === 'Vencido') ? `<button class="btn primary sm" title="Aplicar pago reportado por el cliente" onclick="event.stopPropagation();Orbit.modules.cobros.validarReporte('${c.id}')" data-cobros-action="apply">Aplicar pago</button>` : (aplicable ? `<button class="btn primary sm" title="Aplicar pago" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${c.id}')" data-cobros-action="apply">Aplicar pago</button>` : ((c.estado === 'Pagado' && !c.conciliado) ? `<button class="btn primary sm" title="Conciliar pago" onclick="event.stopPropagation();Orbit.modules.cobros.conciliarFactura('${c.id}')" data-cobros-action="reconcile">Conciliar</button>` : ''))}</td>
+              <td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${c.reportado && paymentOriginKind(c) === 'ADVISOR_REPORTED' && (c.estado === 'Pendiente' || c.estado === 'Vencido') ? (advisorRole() ? '<span class="badge info">Enviado a Ops</span>' : `<button class="btn primary sm" title="Validar y aplicar pago reportado por asesor" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${c.id}')" data-cobros-action="apply-advisor-report">Validar y aplicar</button>`) : (c.reportado && !c.validadoReporte && paymentOriginKind(c) === 'CLIENT_PORTAL' && (c.estado === 'Pendiente' || c.estado === 'Vencido') ? `<button class="btn primary sm" title="Aplicar pago reportado por el cliente" onclick="event.stopPropagation();Orbit.modules.cobros.validarReporte('${c.id}')" data-cobros-action="apply">Aplicar pago</button>` : (aplicable ? (advisorRole() ? `<button class="btn primary sm" title="Reportar pago para validación operativa" onclick="event.stopPropagation();Orbit.modules.cobros.reportarPago('${c.id}')" data-cobros-action="report">Reportar pago</button>` : `<button class="btn primary sm" title="Aplicar pago" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${c.id}')" data-cobros-action="apply">Aplicar pago</button>`) : ((c.estado === 'Pagado' && !c.conciliado) ? `<button class="btn primary sm" title="Conciliar pago" onclick="event.stopPropagation();Orbit.modules.cobros.conciliarFactura('${c.id}')" data-cobros-action="reconcile">Conciliar</button>` : '')))}</td>
             </tr>`;
           }).join('') || `<tr><td colspan="9" class="muted" style="text-align:center;padding:30px">Sin cobros.</td></tr>`}</tbody>
         </table></div>
@@ -300,12 +320,12 @@ Orbit.modules.cobros = (function () {
         if (searchTimer) clearTimeout(searchTimer);
         searchTimer = setTimeout(() => {
           searchTimer = null;
-          render(host);
+          render(host, true);
           const i = document.getElementById('fq');
           if (i) { i.focus(); const v = i.value; i.setSelectionRange(v.length, v.length); }
         }, 180);
       } else {
-        render(host);
+        render(host, true);
       }
     });
   }
@@ -315,7 +335,7 @@ Orbit.modules.cobros = (function () {
     if (next === st.page) return;
     st.page = next;
     const host = document.getElementById('host');
-    if (host) render(host);
+    if (host) render(host, true);
   }
 
   function resolveReceipt(cobroOrId) {
@@ -428,8 +448,8 @@ Orbit.modules.cobros = (function () {
         <button class="btn ghost" id="cd-delete" style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>
         ${cli ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();location.hash='#/cliente360?c=${cli.id}'">👤 Ver cliente</button>` : ''}
         ${p ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
-        ${c.reportado && aplicable ? `<button class="btn primary" id="cd-val">Aplicar pago reportado</button>` : (aplicable ? `<button class="btn primary" id="cd-apply" data-cobros-action="apply">Aplicar pago</button>` : '')}
-        ${(c.estado === 'Pagado' && !c.conciliado) ? `<button class="btn primary" id="cd-conc">📄 Cargar factura y conciliar</button>` : ''}
+        ${c.reportado && paymentOriginKind(c) === 'ADVISOR_REPORTED' && aplicable ? (advisorRole() ? '<span class="badge info">Enviado a Ops</span>' : `<button class="btn primary" id="cd-apply" data-cobros-action="apply-advisor-report">Validar y aplicar</button>`) : (c.reportado && paymentOriginKind(c) === 'CLIENT_PORTAL' && aplicable ? `<button class="btn primary" id="cd-val">Aplicar pago reportado</button>` : (aplicable ? (advisorRole() ? `<button class="btn primary" id="cd-report" data-cobros-action="report">Reportar pago</button>` : `<button class="btn primary" id="cd-apply" data-cobros-action="apply">Aplicar pago</button>`) : ''))}
+        ${(c.estado === 'Pagado' && !c.conciliado) ? `<button class="btn primary" id="cd-conc">Conciliar / completar datos</button>` : ''}
       </div>
     </div>`;
     document.body.appendChild(back);
@@ -448,6 +468,8 @@ Orbit.modules.cobros = (function () {
       }
       del.disabled = false;
     });
+    const rp = back.querySelector('#cd-report');
+    if (rp) rp.addEventListener('click', () => { back.remove(); reportarPago(cobroId); });
     const ap = back.querySelector('#cd-apply');
     if (ap) ap.addEventListener('click', () => { back.remove(); aplicarPago(cobroId); });
     const av = back.querySelector('#cd-val');
@@ -457,10 +479,10 @@ Orbit.modules.cobros = (function () {
   }
 
   /* ---- Registrar aplicación del pago por la aseguradora: factura/fecha/número son enriquecimientos opcionales ---- */
-  function conciliarFactura(cobroId) {
-    const c = S().get('cobros', cobroId); if (!c) return;
-    const receipt = resolveReceipt(c);
-    if (!receipt) return U.toast('No fue posible identificar un único recibo esperado para este cobro.');
+  function conciliarFactura(cobroOrReceiptId) {
+    if (!directPaymentRole()) return U.toast('El rol Asesor no puede conciliar pagos.');
+    const ctx = paymentContext(cobroOrReceiptId); if (!ctx || !ctx.receipt) return U.toast('No fue posible identificar un único recibo esperado para este cobro.');
+    const c = ctx.cobro, receipt = ctx.receipt;
     let pm = document.getElementById('cob-conc'); if (pm) pm.remove();
     pm = document.createElement('div'); pm.id = 'cob-conc'; pm.className = 'drawer-back open';
     pm.style.cssText = 'display:grid;place-items:center;z-index:210';
@@ -469,7 +491,10 @@ Orbit.modules.cobros = (function () {
       + '<b style="font-family:var(--f-display);font-size:16px;color:#fff">📄 Registrar aplicación del pago</b>'
       + '<button class="imp-x" id="cc-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
       + '<div style="padding:18px 20px;display:grid;gap:12px">'
-      + '<div class="cfg-note">La <b>fecha de aplicación</b> es distinta de la fecha real en que pagó el cliente. La factura, su número y la fecha de aplicación son datos opcionales; se pueden completar ahora o después.</div>'
+      + '<div class="cfg-note">Puedes completar datos faltantes del <b>pago</b> y de su <b>aplicación por la aseguradora</b>. Se enriquecen sobre el mismo pago; no se crea un duplicado. Los soportes son opcionales.</div>'
+      + '<label class="ce-l">Fecha real del pago <span class="muted">(opcional)</span><input id="cc-paid" class="o-sel" type="date" value="' + U.esc(c.paidDate || c.fechaPago || c.fechaPagoReportada || '') + '"></label>'
+      + '<label class="ce-l">Método de pago <span class="muted">(opcional)</span><input id="cc-method" class="o-sel" value="' + U.esc(c.paymentMethod || c.metodo || '') + '" placeholder="Opcional"></label>'
+      + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">Soporte del pago <span class="muted">(opcional)</span></span><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="cc-pay-btn">⬆ Adjuntar soporte</button><span id="cc-pay-name" class="muted" style="font-size:12px">Sin archivo nuevo</span></div></div>'
       + '<label class="ce-l">Fecha de aplicación por la aseguradora<input id="cc-aplicacion" class="o-sel" type="date" value="' + U.esc(c.applicationDate || '') + '"></label>'
       + '<label class="ce-l">Número de factura<input id="cc-numero" class="o-sel" value="' + U.esc(c.invoiceNumber || c.numeroFactura || '') + '" placeholder="Opcional"></label>'
       + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">Factura / soporte de aplicación <span class="muted">(opcional)</span></span>'
@@ -477,10 +502,15 @@ Orbit.modules.cobros = (function () {
       + '</div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">'
       + '<button class="btn ghost" id="cc-cancel">Cancelar</button><button class="btn primary" id="cc-ok">Guardar aplicación</button></div></div>';
     document.body.appendChild(pm);
-    let invoiceFile = null;
+    let invoiceFile = null, paymentFile = null;
     const close = () => pm.remove();
     pm.addEventListener('click', e => { if (e.target === pm) close(); });
     pm.querySelector('#cc-x').onclick = close; pm.querySelector('#cc-cancel').onclick = close;
+    pm.querySelector('#cc-pay-btn').onclick = () => {
+      const fi=document.createElement('input'); fi.type='file'; fi.accept='.pdf,image/*';
+      fi.onchange=()=>{ paymentFile=fi.files&&fi.files[0]||null; pm.querySelector('#cc-pay-name').textContent=paymentFile?paymentFile.name:'Sin archivo nuevo'; };
+      fi.click();
+    };
     pm.querySelector('#cc-btn').onclick = () => {
       const fi=document.createElement('input'); fi.type='file'; fi.accept='.pdf,image/*';
       fi.onchange=()=>{ invoiceFile=fi.files&&fi.files[0]||null; pm.querySelector('#cc-name').textContent=invoiceFile?invoiceFile.name:'Sin archivo nuevo'; };
@@ -489,19 +519,64 @@ Orbit.modules.cobros = (function () {
     pm.querySelector('#cc-ok').onclick = async () => {
       const btn=pm.querySelector('#cc-ok'); btn.disabled=true;
       try {
+        const paymentSupportDocumentRef = await uploadPaymentDocument(paymentFile,'payment_support',c,receipt.id);
         const invoiceDocumentRef = await uploadPaymentDocument(invoiceFile,'insurer_invoice',c,receipt.id);
         const domain=Orbit.reconciliationDomain;
-        if(!domain||typeof domain.enrichApplication!=='function') throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
-        await domain.enrichApplication(receipt.id,{payload:{
+        if(!domain||typeof domain.reconcilePayment!=='function') throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
+        const origin=paymentOriginKind(receipt) === 'CRM_DIRECT' ? 'crm_migrated_direct' : 'insurer_invoice';
+        await domain.reconcilePayment(receipt.id,{payload:{
+          paymentOriginSource:origin,
+          paidDate:pm.querySelector('#cc-paid').value||'',
+          paymentMethod:pm.querySelector('#cc-method').value.trim(),
+          paymentSupportDocumentRef,
           applicationDate:pm.querySelector('#cc-aplicacion').value||'',
           invoiceNumber:pm.querySelector('#cc-numero').value.trim(),
-          invoiceDocumentRef
+          invoiceDocumentRef,
+          applicationEvidenceType:'MANUAL_RECONCILIATION'
         }});
-        close(); U.toast('✓ Aplicación del pago actualizada');
-        setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
+        close(); U.toast('✓ Pago conciliado y datos actualizados');
+        baseCache=null;setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
       } catch(error) {
         btn.disabled=false; U.toast('No fue posible guardar la aplicación del pago.');
       }
+    };
+  }
+
+
+  function reportarPago(cobroOrReceiptId) {
+    if (!advisorRole()) return U.toast('El rol activo no corresponde a Asesor para reportar este pago.');
+    const ctx = paymentContext(cobroOrReceiptId);
+    if (!ctx || !ctx.receipt) return U.toast('No fue posible identificar un único recibo esperado para reportar el pago.');
+    const c=ctx.cobro, receipt=ctx.receipt;
+    let pm=document.getElementById('cob-report-advisor'); if(pm)pm.remove();
+    pm=document.createElement('div');pm.id='cob-report-advisor';pm.className='drawer-back open';pm.style.cssText='display:grid;place-items:center;z-index:210';
+    pm.innerHTML='<div class="card" style="width:min(500px,95vw);padding:0;max-height:92vh;overflow:auto">'
+      +'<div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.6);text-transform:uppercase">Cobros · asesor</div><b style="font-family:var(--f-display);font-size:16px;color:#fff">Reportar pago</b></div><button class="imp-x" id="ra-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
+      +'<div style="padding:18px 20px;display:grid;gap:12px"><div class="cfg-note">Este reporte <b>no aplica el pago</b>. Se enviará a Ops para que Operativo valide la correspondencia y aplique el mismo pago. El soporte es opcional.</div>'
+      +'<label class="ce-l">Fecha real del pago <span class="muted">(opcional)</span><input id="ra-paid" class="o-sel" type="date" value="'+U.esc(c.paidDate||c.fechaPago||c.fechaPagoReportada||'')+'"></label>'
+      +'<label class="ce-l">Método de pago <span class="muted">(opcional)</span><select id="ra-method" class="o-sel"><option value="">Sin especificar</option><option>Transferencia bancaria</option><option>Tarjeta de crédito</option><option>Tarjeta de débito</option><option>Cheque</option><option>Efectivo</option><option>Visa cuotas</option><option>Link de pago</option></select></label>'
+      +'<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);display:block;margin-bottom:7px">Soporte del pago <span class="muted">(opcional)</span></span><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="ra-support-btn">⬆ Adjuntar soporte</button><span id="ra-support-name" class="muted" style="font-size:12px">Sin archivo</span></div></div>'
+      +'<label class="ce-l">Observación <span class="muted">(opcional)</span><textarea id="ra-note" class="o-sel" style="min-height:64px" placeholder="Ej. Cliente envió comprobante por WhatsApp"></textarea></label>'
+      +'</div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="ra-cancel">Cancelar</button><button class="btn primary" id="ra-ok">Enviar a Ops</button></div></div>';
+    document.body.appendChild(pm);
+    let supportFile=null; const close=()=>pm.remove();
+    pm.addEventListener('click',e=>{if(e.target===pm)close();});pm.querySelector('#ra-x').onclick=close;pm.querySelector('#ra-cancel').onclick=close;
+    pm.querySelector('#ra-support-btn').onclick=()=>{const fi=document.createElement('input');fi.type='file';fi.accept='.pdf,image/*';fi.onchange=()=>{supportFile=fi.files&&fi.files[0]||null;pm.querySelector('#ra-support-name').textContent=supportFile?supportFile.name:'Sin archivo';};fi.click();};
+    pm.querySelector('#ra-ok').onclick=async()=>{
+      const btn=pm.querySelector('#ra-ok');btn.disabled=true;
+      try{
+        const domain=Orbit.reconciliationDomain;if(!domain||typeof domain.reportAdvisorPayment!=='function')throw new Error('ADVISOR_PAYMENT_REPORT_DOMAIN_UNAVAILABLE');
+        const supportRef=await uploadPaymentDocument(supportFile,'payment_support',c,receipt.id);
+        await domain.reportAdvisorPayment(receipt.id,{payload:{
+          paidDate:pm.querySelector('#ra-paid').value||'',
+          paymentMethod:pm.querySelector('#ra-method').value||'',
+          paymentSupportDocumentRef:supportRef,
+          amount:c.monto,
+          note:pm.querySelector('#ra-note').value.trim()
+        }});
+        close();U.toast('✓ Pago reportado y enviado a Ops para validación');
+        baseCache=null;setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
+      }catch(error){btn.disabled=false;U.toast('No fue posible enviar el reporte de pago a Ops.');}
     };
   }
 
@@ -519,7 +594,7 @@ Orbit.modules.cobros = (function () {
         paymentMethod:c.metodoPago||c.metodo||receipt.paymentMethod||receipt.metodoPago||'',
         paymentSupportDocumentRef:c.paymentSupportDocumentRef||receipt.paymentSupportDocumentRef||''
       }});
-      U.toast('✓ Pago reportado aplicado');
+      U.toast('✓ Pago reportado aplicado');baseCache=null;
       setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
     } catch(error) {
       U.toast('No fue posible aplicar el pago reportado.');
@@ -528,6 +603,7 @@ Orbit.modules.cobros = (function () {
 
   /* ---- Registrar pago por el owner canónico: pago y aplicación son hechos distintos ---- */
   function aplicarPago(cobroId) {
+    if (!directPaymentRole()) return U.toast('El rol Asesor reporta el pago a Ops; no puede aplicarlo directamente.');
     const ctx = paymentContext(cobroId);
     if(!ctx) return U.toast('No fue posible identificar un único recibo esperado para registrar el pago.');
     const c=ctx.cobro, receipt=ctx.receipt;
@@ -572,7 +648,7 @@ Orbit.modules.cobros = (function () {
           amount:c.monto
         }});
         const avisar=pm.querySelector('#pm-avisar')&&pm.querySelector('#pm-avisar').checked;
-        close();U.toast('✓ Pago registrado');
+        close();U.toast('✓ Pago registrado');baseCache=null;
         if(avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
         setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
       }catch(error){btn.disabled=false;U.toast('No fue posible registrar el pago.');}
@@ -630,5 +706,5 @@ Orbit.modules.cobros = (function () {
     paint();
   }
 
-  return { render, detalle, aplicarPago, validarReporte, conciliarFactura, resolveReceiptId, lote, pagina };
+  return { render, detalle, reportarPago, aplicarPago, validarReporte, conciliarFactura, resolveReceiptId, lote, pagina };
 })();
