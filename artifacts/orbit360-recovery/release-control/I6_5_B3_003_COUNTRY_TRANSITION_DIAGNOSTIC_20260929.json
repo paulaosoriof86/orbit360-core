@@ -83,8 +83,9 @@
     ]
   },
   "authorizedProductFiles": [
+    "orbit360-platform/core/queries.js",
     "orbit360-platform/modules/cobros.js",
-    "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+    "orbit360-platform/index.html"
   ],
   "requiredFix": [
     "Canonical Cobros renderer must enforce active country for authoritative and reported rows.",
@@ -97,5 +98,66 @@
     "livePromotion": false,
     "b4": false
   },
-  "nextAction": "B3_003_COUNTRY_SCOPE_CAUSAL_FIX"
+  "nextAction": "B3_003_COUNTRY_LINEAGE_AND_TRANSITION_CAUSAL_FIX",
+  "latestIndependentCountryLineage": {
+    "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
+    "runId": 36666588079,
+    "artifactId": 11076094667,
+    "artifactDigest": "4f673f5d80639d9594213199067f313136abf613988c8e13fa268d50266bdb5f",
+    "headSha": "b58755df4d639b20d41d4f4d7630fae16bd38adf",
+    "focal9758": {
+      "clienteId": "cli_siga_bc6a82b63dd2271263",
+      "clienteNombre": "PIEDAD CECILIA PEDREROS PEREA",
+      "clientePais": "GT",
+      "polizaId": "pol_7813c2bfb555853ade607ff25015",
+      "polizaNumero": "9758",
+      "polizaPais": "CO",
+      "polizaMoneda": "COP",
+      "recibos": [
+        {
+          "id": "rec_0237160ef3988c889d17325f",
+          "pais": "",
+          "moneda": "COP",
+          "estadoOperativo": "pago_reportado",
+          "provenance": ""
+        }
+      ],
+      "cartera": [],
+      "cobros": [],
+      "financialExplicitCountries": [
+        "CO"
+      ],
+      "financialCountryConflict": false,
+      "canonicalCountryCandidate": "CO",
+      "currentCobrosRowCountry": "GT",
+      "currentQueriesPolicyLinkedCountry": "GT",
+      "precedenceDefectDemonstrated": true,
+      "clientPolicyMismatch": true
+    },
+    "collectionCounts": {
+      "clientes": 442,
+      "polizas": 1419,
+      "recibosEsperados": 1876,
+      "carteraPrimas": 1317,
+      "cobros": 5
+    },
+    "totalPolicyLineages": 1419,
+    "precedenceDefectCount": 42,
+    "policyLineageCountryConflicts": 0,
+    "classification": "READ_MODEL_COUNTRY_RESOLUTION_DEFECT",
+    "dataDefectStatus": "NOT_REQUIRED_TO_EXPLAIN_FAILURE_NOT_MUTATED",
+    "canonicalContract": "POLICY_LINKED_FINANCIAL_SCOPE_USES_EXPLICIT_POLICY_COUNTRY_FIRST_THEN_UNANIMOUS_EXPLICIT_LINKED_ROW_COUNTRY_THEN_CLIENT_FALLBACK_CONFLICT_FAIL_CLOSED",
+    "transitionFinding": "COUNTRY_CHANGE_SYNCHRONOUS_RENDER_346_416MS_REQUIRES_EXPLICIT_LOADING_FRAME_NO_OLD_COUNTRY_PAINT",
+    "authorizedProductFiles": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/index.html"
+    ],
+    "boundaries": {
+      "dataWrites": 0,
+      "reimport": false,
+      "livePromotion": false,
+      "b4": false
+    }
+  }
 }

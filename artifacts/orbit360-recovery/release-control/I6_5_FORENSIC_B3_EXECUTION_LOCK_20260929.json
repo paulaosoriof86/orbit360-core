@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE",
+  "status": "B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-003",
     "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "VISUAL_REJECTED_DIAGNOSTIC_ACTIVE",
+    "status": "ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
     "blocking": true,
     "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
     "requiredProof": [
@@ -59,7 +59,15 @@
       "COUNTRY_CHANGE_DOUBLE_RENDER"
     ],
     "countryLineageDiagnosis": "PENDING_INDEPENDENT_FIRESTORE_TRUTH",
-    "currentRemediationAuthorizedProductFiles": []
+    "currentRemediationAuthorizedProductFiles": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/index.html"
+    ],
+    "rootCauseClassification": "READ_MODEL_COUNTRY_RESOLUTION_DEFECT",
+    "precedenceDefectCount": 42,
+    "focalPolicyNumber": "9758",
+    "transitionRemediation": "EXPLICIT_LOADING_FRAME_BEFORE_COUNTRY_RENDER"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -71,8 +79,7 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_INDEPENDENT_FIRESTORE_LINEAGE_DIAGNOSTIC",
-    "B3_003_CAUSE_ROOT_CONFIRMED",
+    "B3_003_CAUSAL_SOURCE_FIX",
     "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
     "B3_003_TARGETED_VISUAL_PASS"
   ],
@@ -102,7 +109,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
