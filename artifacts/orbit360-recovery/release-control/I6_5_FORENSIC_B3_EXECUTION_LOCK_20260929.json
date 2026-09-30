@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+  "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-003",
     "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
+    "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
     "blocking": true,
     "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
     "requiredProof": [
@@ -33,11 +33,13 @@
       "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
     ],
     "causalFix": {
-      "queriesBlobSha": "7ba5f363a5143236179777a1a30d763142e8e7a8",
-      "cobrosBlobSha": "4c893396d12ac5ff20d9a1ccc1b5b31abdf5fb65",
-      "crossCurrencyConversionIntroduced": false,
-      "agingCountryFiltered": true,
-      "inicioChanged": false
+      "cobrosBlobSha": "668b6133ae4e52c8f26e8c884a2fc0396a1a3ac0",
+      "policyReceiptsBridgeBlobSha": "d1bd8c883db39b946b3833bd1684a0a8fe4843b3",
+      "proofBlobSha": "144bed375204947c283e3205d7a3bcda23613495",
+      "canonicalKpiOwner": "orbit360-platform/modules/cobros.js",
+      "asyncKpiOverrideRemoved": true,
+      "renderedRowsCountryScoped": true,
+      "realSelectorProofStrengthened": true
     },
     "previewProof": {
       "exactReadback": true,
@@ -64,9 +66,9 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_COUNTRY_SCOPE_CAUSAL_FIX",
-    "B3_003_STRENGTHENED_REAL_SELECTOR_PROOF",
     "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_003_REAL_SELECTOR_COUNTRY_PROOF",
+    "B3_002_REGRESSION_ON_NEW_B3_003",
     "B3_003_TARGETED_VISUAL_RETEST"
   ],
   "preservedB3CarryForward": [
@@ -95,7 +97,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
@@ -169,7 +171,7 @@
     },
     "shellOwnerVisualMatch": true
   },
-  "boundaryNote": "B3-003 root cause confirmed. Product mutation authorized only for modules/cobros.js and modules/policy-receipts-v1199-bridge.js. No data writes, reimport, LIVE or B4.",
+  "boundaryNote": "B3-003 two-owner causal source fix committed. Only immutable build, isolated Preview, exact readback and read-only proofs are authorized.",
   "priorFinding": {
     "id": "B3-002",
     "status": "CLOSED_PASS",
