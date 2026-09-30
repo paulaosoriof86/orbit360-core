@@ -15,7 +15,7 @@ Orbit.router = (function () {
     cliente360: ['clientes', 'asesores', 'polizas', 'cobros', 'vehiculos'],
     aseguradoras: ['aseguradoras', 'asesores'],
     polizas: ['polizas', 'clientes', 'aseguradoras', 'vehiculos'],
-    cobros: ['cobros', 'clientes', 'polizas'],
+    cobros: ['cobros', 'clientes', 'polizas', 'vehiculos', 'recibosEsperados', 'carteraPrimas', 'asesores'],
     conciliaciones: ['cobros', 'polizas', 'clientes', 'finmovs'],
     renovaciones: ['polizas', 'clientes', 'gestiones'],
     comisiones: ['comisiones', 'polizas', 'clientes'],
