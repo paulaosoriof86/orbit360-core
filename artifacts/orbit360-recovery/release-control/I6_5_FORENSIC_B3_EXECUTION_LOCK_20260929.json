@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
+  "status": "B3_003_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-003",
     "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "CANDIDATE_PENDING_PREVIEW",
+    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "blocking": true,
     "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
     "requiredProof": [
@@ -102,7 +102,6 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
     "B3_003_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
@@ -172,13 +171,13 @@
     "productRegressionDemonstrated": false
   },
   "preview": {
-    "sourceSha": "3c290e24443ea07940fed6c25ad33ddf186ca0b5",
-    "buildId": "gi-i65-b3-3c290e24443e-57f234755dc1",
-    "channelId": "gi-i65-b3-36659101980",
-    "url": "https://ays-orbit-360-lab--gi-i65-b3-36659101980-5tklbjdk.web.app",
-    "runId": 36659101980,
-    "artifactId": 11073776021,
-    "artifactDigest": "de3c51b1f0a321d8d5e890f0023954ababcc04e562fa5a0b1f01f973f55ff18e",
+    "sourceSha": "4d57267cd2bc267e166ecbe54d1418adf41ff4bb",
+    "buildId": "gi-i65-b3-4d57267cd2bc-57f234755dc1",
+    "channelId": "gi-i65-b3-36711186151",
+    "url": "https://ays-orbit-360-lab--gi-i65-b3-36711186151-934bxjxe.web.app",
+    "runId": 36711186151,
+    "artifactId": 11093444225,
+    "artifactDigest": "5e307dcb2c256e42a31c568fd97f5f89c19fbf872c434965b64bde86732c30c3",
     "exactReadback": true,
     "contractPass": true,
     "previewProofPass": true,
