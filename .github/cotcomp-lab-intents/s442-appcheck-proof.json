@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s442-appcheck-proof-intent-v1.0",
   "authorization": "REGISTER_LAB_APPCHECK_DEBUG_TOKEN_AND_RUN_SYNTHETIC_PROOF",
-  "authorizedSourceParent": "d58d0218dc8d5257816783cad14b54be4daeac33",
+  "authorizedSourceParent": "4c7e8bd01b607f53e7e56af61135ffca8d460c9b",
   "projectId": "ays-orbit-360-lab",
   "environment": "LAB",
   "region": "us-central1",
@@ -16,8 +16,11 @@
   "secretCustody": "SECRET_MANAGER_IF_PERMITTED_ELSE_EPHEMERAL_AND_REVOKE",
   "authorizedAt": "2026-09-30",
   "ownerAuthorizationText": "Autorizo S4.42 para crear y registrar un App Check debug token exclusivamente para Orbit360 LAB Web en ays-orbit-360-lab, custodiarlo de forma cifrada para CI/Secret Manager si los permisos existentes lo permiten y ejecutar la prueba sintética de las cuatro callables, sin persistencia, sin app-data writes, sin datos reales, sin debilitar App Check y sin producción.",
-  "retriggerReason": "REUSE_REGISTERED_SECRET_MANAGER_DEBUG_TOKEN_AND_USE_FIREBASE_NATIVE_DEBUG_MODE_FOR_LIMITED_USE_REPLAY_PROTECTION",
+  "retriggerReason": "GEN2_RUNTIME_SERVICE_ACCOUNT_GRANTED_LEAST_PRIVILEGE_ROLES_FIREBASEAPPCHECK_TOKENVERIFIER_AFTER_READ_ONLY_DIAGNOSTIC; RETRY_VALID_APPCHECK_REPLAY_PROTECTED_PROOF",
   "requiredServiceEnablement": "firebaseappcheck.googleapis.com",
   "debugTokenCustody": "GOOGLE_SECRET_MANAGER_REUSE",
-  "debugTokenSecretResource": "projects/646761409743/secrets/cotcomp-s442-appcheck-debug-token"
+  "debugTokenSecretResource": "projects/646761409743/secrets/cotcomp-s442-appcheck-debug-token",
+  "replayVerifierIamRunId": 36774411951,
+  "runtimeServiceAccount": "orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com",
+  "replayVerifierRole": "roles/firebaseappcheck.tokenVerifier"
 }
