@@ -51,8 +51,9 @@ async function main(){
   const allowed=new Set(['superadmin','admintenant','direccion','admin','operativo','finanzas']);
   for(const doc of members.docs){
     const m=doc.data()||{};
-    if(!activeMember(m)||!assignedRoles(m).some(r=>allowed.has(r)))continue;
-    try{await auth.getUser(doc.id);actor={uid:doc.id,member:m};break;}catch{}
+    const activeRole=assignedRoles(m).find(r=>allowed.has(r))||'';
+    if(!activeMember(m)||!activeRole)continue;
+    try{await auth.getUser(doc.id);actor={uid:doc.id,member:m,activeRole};break;}catch{}
   }
   need(actor,'B3_004_AUTHORIZED_MEMBER_NOT_FOUND');
 
@@ -78,7 +79,7 @@ async function main(){
   };
   const today='2026-09-30', paidDate='2026-09-29', applicationDate='2026-09-30';
   const amount=123.45;
-  const audit={schema:'GRAVICENTRA_I6_5_B3_004_PREVIEW_PROOF_V2',status:'RUNNING',runId:Number(runId)||runId,tenantId,actorUid:actor.uid,ids,callableName,region:'us-central1',assertions:{},cleanup:{attempted:false,pass:false}};
+  const audit={schema:'GRAVICENTRA_I6_5_B3_004_PREVIEW_PROOF_V3',status:'RUNNING',runId:Number(runId)||runId,tenantId,actorUid:actor.uid,actorActiveRole:actor.activeRole,ids,callableName,region:'us-central1',assertions:{},cleanup:{attempted:false,pass:false}};
   let cobroId='';
   try{
     const batch=db.batch();
@@ -90,7 +91,7 @@ async function main(){
 
     async function call(payload,reason){
       try{
-        const out=await callable({tenantId,activeRole:'direccion',operation:'apply_payment',reason,payload});
+        const out=await callable({tenantId,activeRole:actor.activeRole,operation:'apply_payment',reason,payload});
         return out.data;
       }catch(error){
         throw new Error('B3_004_CALL_FAILED:'+(error?.code||'')+':'+(error?.message||String(error)));
