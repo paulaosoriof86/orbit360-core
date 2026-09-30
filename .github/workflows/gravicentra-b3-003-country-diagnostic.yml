@@ -1,0 +1,84 @@
+name: Gravicentra B3-003 Country Diagnostic
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - 'tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs'
+      - 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
+      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json'
+      - '.github/workflows/gravicentra-b3-003-country-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  b3-003-country-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      B3_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate exact diagnostic state
+        id: gate
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const b=JSON.parse(fs.readFileSync(process.env.B3_LOCK,'utf8'));
+          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_003_COUNTRY_DIAGNOSTIC'
+            && c.i65ForensicRemediationPlan?.b3?.status==='B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE'
+            && b.status==='B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE'
+            && b.activeFinding?.id==='B3-003'
+            && b.boundaries?.productMutationAuthorized===false
+            && b.boundaries?.dataMutationAuthorized===false
+            && b.boundaries?.reimportAuthorized===false
+            && b.boundaries?.liveHostingPromotionAuthorized===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          if(ok){
+            const p=b.preview||{};
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,'url='+String(p.url||'')+'\n');
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,'source='+String(p.sourceSha||'')+'\n');
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,'build='+String(p.buildId||'')+'\n');
+          }
+          console.log('B3_003_COUNTRY_DIAG_MODE='+(ok?'RUN':'NOOP'));
+          NODE
+      - name: Install diagnostic dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Run real selector transition diagnostic
+        if: steps.gate.outputs.run == 'true'
+        env:
+          TARGET_URL: ${{ steps.gate.outputs.url }}
+          EXPECTED_SOURCE_SHA: ${{ steps.gate.outputs.source }}
+          EXPECTED_BUILD_ID: ${{ steps.gate.outputs.build }}
+          B3_003_COUNTRY_DIAG_OUT: ${{ runner.temp }}/b3-003-country-transition-diagnostic.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs
+      - name: Upload diagnostic evidence
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b3-003-country-diagnostic-${{ github.run_id }}
+          path: ${{ runner.temp }}/b3-003-country-transition-diagnostic.json
+          if-no-files-found: error
+          retention-days: 30
