@@ -17,7 +17,7 @@ test('runtime verification fails closed on owner mismatch',()=>{
     region:'us-central1',
     functionObservedActive:true,
     deployedOwnerBlob:'bad',
-    sourceArchiveReadOnly:true,
+    sourceArchiveReadSuccessful:true,
     writeExecuted:false,
     productionTouched:false
   });
@@ -85,7 +85,11 @@ test('W2 candidate carries cotcompRef into both commands',()=>{
     production:false
   });
   assert.equal(x.commands[0].payload.cotcompRef.caseId,'qcase_synth_2');
-  assert.equal(x.commands[1].payload.cotcompRef.selectionId,'sel_synth_2');
+  assert.equal(x.commands[0].payload.cotcompRef.role,'LEAD_PROJECTION');
+  assert.equal(x.commands[1].payload.cotcompRef.role,'OPS_QUOTATION_PROJECTION');
+  assert.equal(x.commands[1].payload.cotcompRef.selectedProposalId,'prop_synth_2');
+  assert.equal(x.commands[1].payload.cotcompRef.selectionId,undefined);
+  assert.equal(x.commands[1].payload.cotcompRef.proposalId,undefined);
 });
 
 test('W2 payload intentionally omits advisor/client ids but still requires runtime zero-side-effect proof',()=>{
