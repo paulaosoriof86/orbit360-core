@@ -940,10 +940,10 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "IN_PROGRESS",
+      "status": "ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "rootCause": "CURRENT_PAYMENT_SURFACES_HAVE_SPLIT_CLIENT_REPORT_VALIDATION_AND_LEGACY_DIRECT_WRITES; CANONICAL_SERVER_OWNED_COMMAND_NOT_YET_PROVEN",
+      "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
       "remediation": "Converge Cliente360/Cobros/client-report payment into one server-owned idempotent command using Payment Lock V2 semantics.",
       "requiredProof": [
         "Client-reported payment materializes one payment without mandatory attachment or second human validation when match is unique and valid.",
@@ -952,7 +952,19 @@
         "Retry/double-submit returns same committed payment.",
         "Receipt, portfolio, audit and reload/readback are consistent."
       ],
-      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json"
+      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
+      "authorizedProductFiles": [
+        "functions/cobros-reconciliation-domain.js",
+        "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+        "orbit360-platform/modules/cobros.js",
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/modules/portal.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "orbit360-platform/index.html"
+      ],
+      "nextAction": "B3_004_SOURCE_FIX"
     },
     {
       "id": "B3-005",
@@ -4554,7 +4566,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_004_IN_PROGRESS",
+    "status": "B3_004_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",

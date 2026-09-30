@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_DIAGNOSTIC",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_FIX",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -3184,16 +3184,16 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "B3_004_IN_PROGRESS",
+      "status": "B3_004_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "56de1e4a1952e06980eb6a0911a8f2e1467d5b8b",
+      "executionLockBlobSha": "18c885615429a883f738fd8e38f4365f2c8ed510",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
       "sourceFixReceiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
-      "productMutationAuthorized": false,
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "mechanismRootFix": {
@@ -3223,7 +3223,7 @@
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
       "findingLedgerBlobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
-      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "diagnosticRunId": 36658190622,
       "diagnosticArtifactId": 11073202655,
       "diagnosticArtifactDigest": "sha256:5921eb661a892abb11d7371fbce3e31bc4fa93e9bb356b5807f4aad6c4f6c5dc",
@@ -3418,7 +3418,8 @@
         "prior": "AUTO_COMMIT_HIGH_CONFIDENCE_INFERRED_MATCH_VS_PROPOSE_FOR_HUMAN_CONFIRMATION",
         "resolution": "AUTO_COMMIT_HIGH_CONFIDENCE_INFERRED_MATCH",
         "authority": "USER_RECONFIRMED_2026-09-30"
-      }
+      },
+      "diagnosticReceiptBlobSha": "37c6d6e95f3d2941d608405a0cd8a9666495e527"
     }
   },
   "canonicalAccumulationControl": {
@@ -3426,7 +3427,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "26ecaf7547c83aed01e4bfc91684118cb9f90b23",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "cce6df5d3d27540feb8bb9d589c2fe07ffcad256",
+    "findingLedgerBlobSha": "94e2f8c6d411cf7ad3c96e7553e2d55a8ee970ad",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -3438,7 +3439,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC"
+    "nextAction": "B3_004_SOURCE_FIX"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

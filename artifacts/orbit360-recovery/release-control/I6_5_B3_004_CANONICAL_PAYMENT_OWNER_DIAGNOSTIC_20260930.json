@@ -1,0 +1,86 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_V1",
+  "status": "ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+  "date": "2026-09-30",
+  "gate": "I6.5-B3-004",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authority": {
+    "paymentRulesPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
+    "paymentRulesBlobSha": "df8c5a936e9df23920ee2657a01199d3ec75c8ee"
+  },
+  "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
+  "evidence": [
+    {
+      "path": "functions/cobros-reconciliation-domain.js",
+      "blobSha": "40f4eb5ce7d0aea34ad97f6f0abde6fa1321358a",
+      "finding": "Canonical callable is server-owned/idempotent but OPERATIONS excludes apply_payment and confirm_application is explicitly rejected."
+    },
+    {
+      "path": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+      "blobSha": "c8340b7421fb7cc23aa60b9d575dd2e01d991b51",
+      "finding": "Browser client exposes preview/confirm proposal/HOLD, not canonical applyPayment."
+    },
+    {
+      "path": "orbit360-platform/modules/cobros.js",
+      "blobSha": "6a3c521b8973b15504ef569e819651219ebb6363",
+      "finding": "Cobros still treats client report as por validar and contains direct store payment mutation paths."
+    },
+    {
+      "path": "orbit360-platform/modules/cliente360.js",
+      "blobSha": "62c98fc97ce92e9b826f08ce8195594d88996813",
+      "finding": "Cliente360 keeps reported-payment validation state and legacy invoice semantics."
+    },
+    {
+      "path": "orbit360-platform/modules/portal.js",
+      "blobSha": "18931725de98e1ac630f85b269969f6aa6f0f50c",
+      "finding": "Portal reports payment by direct store update and creates validation work instead of using canonical payment owner."
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "blobSha": "d1bd8c883db39b946b3833bd1684a0a8fe4843b3",
+      "finding": "Receipt payment UI does not yet expose V2-separated paidDate/support vs applicationDate/invoice fields."
+    },
+    {
+      "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "blobSha": "81cb2db0a7b3a26387fba980d9cecaa5f8d3d4eb",
+      "finding": "Receipt detail projection does not yet surface all V2 reconciliation fields."
+    }
+  ],
+  "preservedApprovedArchitecture": {
+    "canonicalServerOwner": "functions/cobros-reconciliation-domain.js",
+    "noNewPaymentEngine": true,
+    "noReimport": true,
+    "noBusinessDataWriteDuringSourceFix": true,
+    "noLivePromotion": true
+  },
+  "authorizedProductFiles": [
+    "functions/cobros-reconciliation-domain.js",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/modules/portal.js",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+    "orbit360-platform/index.html"
+  ],
+  "requiredFix": [
+    "Add one server-owned idempotent apply_payment operation keyed to a canonical expected receipt.",
+    "Atomically materialize/update one cobro, close the matching expected receipt and portfolio obligation, and append reconciliation audit/request evidence.",
+    "Client-reported payment with unique valid receipt is payment evidence and does not require a second human approval; insurer application may remain pending.",
+    "Keep paidDate/support separate from applicationDate/invoiceNumber/invoice evidence.",
+    "Cliente360, Cobros and Portal must call the same payment command; remove/disable direct business-write alternatives.",
+    "Later invoice/application evidence enriches the same payment rather than creating another cobro."
+  ],
+  "nextRequiredProof": [
+    "B3_004_SOURCE_CONTRACT_PASS",
+    "B3_004_PREVIEW_ONLY_BACKEND_PASS",
+    "B3_004_SYNTHETIC_CREATE_RETRY_ENRICH_READBACK_CLEANUP_PASS",
+    "B3_004_TARGETED_VISUAL_PASS"
+  ],
+  "boundaries": {
+    "businessDataWritesAuthorizedNow": false,
+    "reimport": false,
+    "livePromotion": false
+  }
+}

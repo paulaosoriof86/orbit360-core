@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_IN_PROGRESS",
+  "status": "B3_004_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,14 +14,26 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "IN_PROGRESS",
+    "status": "ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
     "boundaries": {
       "businessWritesAuthorized": false,
       "reimportAuthorized": false,
       "liveHostingPromotionAuthorized": false
-    }
+    },
+    "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
+    "authorizedProductFiles": [
+      "functions/cobros-reconciliation-domain.js",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/portal.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/index.html"
+    ]
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -33,8 +45,9 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC",
-    "B3_004_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_SOURCE_CONTRACT_PASS",
+    "B3_004_PREVIEW_ONLY_BACKEND_PASS",
+    "B3_004_SYNTHETIC_CREATE_RETRY_ENRICH_READBACK_CLEANUP_PASS",
     "B3_004_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
@@ -63,7 +76,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
