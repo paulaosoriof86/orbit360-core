@@ -6,6 +6,7 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - 'tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs'
+      - 'tools/gravicentra-i6-5-b3-003-country-rootfix.mjs'
       - 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json'
@@ -89,6 +90,34 @@ jobs:
           echo "synced=true" >> "$GITHUB_OUTPUT"
 
 
+      - name: Materialize authorized B3-003 causal fix in working tree
+        id: rootfix
+        if: steps.sync.outputs.synced != 'true'
+        run: |
+          set -euo pipefail
+          MODE=$(node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const b=JSON.parse(fs.readFileSync(process.env.B3_LOCK,'utf8'));
+          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_003_FIX'
+            && c.i65ForensicRemediationPlan?.b3?.status==='B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED'
+            && b.status==='B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED'
+            && b.activeFinding?.id==='B3-003'
+            && b.boundaries?.productMutationAuthorized===true
+            && b.boundaries?.dataMutationAuthorized===false
+            && b.boundaries?.reimportAuthorized===false
+            && b.boundaries?.liveHostingPromotionAuthorized===false;
+          process.stdout.write(ok?'APPLY':'NOOP');
+          NODE
+          )
+          if [ "$MODE" = "APPLY" ]; then
+            node tools/gravicentra-i6-5-b3-003-country-rootfix.mjs
+            echo "applied=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "applied=false" >> "$GITHUB_OUTPUT"
+          fi
+
+
       - name: Freeze causal source fix as exact Preview candidate
         id: sourcefix
         if: steps.sync.outputs.synced != 'true'
@@ -101,11 +130,16 @@ jobs:
           const m=JSON.parse(fs.readFileSync(process.env.COMPOSITION,'utf8'));
           const f=JSON.parse(fs.readFileSync(process.env.FINDINGS,'utf8'));
           const allowed=['orbit360-platform/core/queries.js','orbit360-platform/modules/cobros.js','orbit360-platform/index.html'];
-          const ready=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_003_FIX'
+          const authorized=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_003_FIX'
             && c.i65ForensicRemediationPlan?.b3?.status==='B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED'
             && b.status==='B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED'
+            && b.boundaries?.productMutationAuthorized===true;
+          const materialized=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_003_PREVIEW'
+            && c.i65ForensicRemediationPlan?.b3?.status==='B3_003_CANDIDATE_PENDING_PREVIEW'
+            && b.status==='B3_003_CANDIDATE_PENDING_PREVIEW'
+            && b.boundaries?.productMutationAuthorized===false;
+          const ready=(authorized||materialized)
             && b.activeFinding?.id==='B3-003'
-            && b.boundaries?.productMutationAuthorized===true
             && b.boundaries?.dataMutationAuthorized===false
             && b.boundaries?.reimportAuthorized===false
             && b.boundaries?.liveHostingPromotionAuthorized===false
@@ -140,7 +174,10 @@ jobs:
           c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),nextAction:'B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS'};
           fs.writeFileSync(process.env.CONTROL,JSON.stringify(c,null,2)+'\n');
           NODE
-          git add "$B3_LOCK" "$FINDINGS"
+          git add "$B3_LOCK" "$FINDINGS" "$COMPOSITION" \
+            orbit360-platform/core/queries.js orbit360-platform/modules/cobros.js orbit360-platform/index.html \
+            tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs \
+            artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json
           LOCK_BLOB=$(git hash-object "$B3_LOCK"); export LOCK_BLOB
           FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
           COMPOSITION_BLOB=$(git hash-object "$COMPOSITION"); export COMPOSITION_BLOB
