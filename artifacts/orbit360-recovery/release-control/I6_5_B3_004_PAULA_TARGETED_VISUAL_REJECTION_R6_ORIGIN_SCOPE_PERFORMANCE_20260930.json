@@ -1,0 +1,96 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_TARGETED_VISUAL_REJECTION_R6_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "findingId": "B3-004",
+  "reviewedPreview": {
+    "sourceSha": "63e7cb32fe1d08ef5c85d613dc6a4b97e3928edb",
+    "buildId": "gi-i65-b3-63e7cb32fe1d-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36747946055-a07ytls3.web.app",
+    "channelId": "gi-b3004-36747946055",
+    "runId": 36747946055,
+    "jobId": 109998836942,
+    "artifactId": 11112569457,
+    "artifactDigest": "69a3ffc7b5cc6d662a5dc615430953206996af1ff606bd2de2a2e6642c8858a3",
+    "exactHostingReadbackPass": true,
+    "syntheticProofPass": true,
+    "cleanupPass": true,
+    "machinePass": true,
+    "liveUnchanged": true,
+    "liveBindingSource": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+    "liveBindingBuild": "gi-i65-4bf67a373875-57f234755dc1"
+  },
+  "decision": "REJECTED_REMEDIATION_REQUIRED",
+  "preservedConfirmedImprovements": [
+    "Pending and overdue obligations are visible in Cobros y cartera.",
+    "Aplicar pago exists for pending/overdue obligations.",
+    "Historical SIGA records no longer display as Reportado por cliente.",
+    "457 records display Pago registrado en SIGA and Pendiente de conciliación.",
+    "SIGA detail states direct evidence and no manual apply requirement.",
+    "Filters Pago registrado en SIGA and Por conciliar exist.",
+    "Five existing reconciled records remain separated.",
+    "Legacy Aplicar pago -> Confirmar cobro rewrite is removed."
+  ],
+  "blockingFindings": [
+    {
+      "id": "B3-004-R6-A",
+      "finding": "Missing Asesor -> Operativo reported-payment flow with linked Ops management."
+    },
+    {
+      "id": "B3-004-R6-B",
+      "finding": "Operativo who directly receives and validates payment must be able to Apply Payment directly."
+    },
+    {
+      "id": "B3-004-R6-C",
+      "finding": "Applied/unreconciled payment lacks visible individual Conciliar fallback."
+    },
+    {
+      "id": "B3-004-R6-D",
+      "finding": "Automatic reconciliation may not replace individual Conciliar fallback."
+    },
+    {
+      "id": "B3-004-R6-E",
+      "finding": "Dirección encountered false scope denial while attempting Aplicar pago."
+    },
+    {
+      "id": "B3-004-R6-F",
+      "finding": "Cobros y cartera entry has material latency."
+    },
+    {
+      "id": "B3-004-R6-G",
+      "finding": "State/filter changes have perceptible latency."
+    },
+    {
+      "id": "B3-004-R6-H",
+      "finding": "Receipt detail lacks controlled surfaces to complete/correct payment and insurer-application facts without mixing domains."
+    },
+    {
+      "id": "B3-004-R6-I",
+      "finding": "27 records remain Origen de pago por confirmar and require read-only provenance resolution first."
+    },
+    {
+      "id": "B3-004-R6-J",
+      "finding": "Individual intelligent invoice mapping is not yet proven."
+    },
+    {
+      "id": "B3-004-R6-K",
+      "finding": "Real batch reconciliation engine is not yet proven; remains outside operational B3-005 until B3-004 closes."
+    }
+  ],
+  "paymentLockV4": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+    "blobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986"
+  },
+  "boundaries": {
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3005Opened": false
+  },
+  "nextWithinSameGate": [
+    "Read-only root-cause diagnostic for scope denial, payment origin provenance, action surfaces and performance.",
+    "Remediate B3-004 only after diagnosis; any product source change requires new exact build/digest/Preview.",
+    "Do not open B3-005 until B3-004 targeted visual pass."
+  ]
+}

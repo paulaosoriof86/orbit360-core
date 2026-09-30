@@ -946,14 +946,21 @@
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
       "remediation": "Converge canonical payment owner and distinguish migrated SIGA/CRM direct-payment evidence from future client-portal reports. No one-by-one application for deterministic migrated payments; high-confidence reconciliation is batch/idempotent.",
       "requiredProof": [
-        "Migrated SIGA/CRM direct-payment evidence is never labeled Reportado por cliente.",
-        "Migrated direct payments show no row-by-row Aplicar pago requirement.",
-        "Future true client-portal reports remain a distinct origin and retain automatic unique-match application semantics.",
-        "Global legacy copyfix cannot rewrite Aplicar pago/Pago aplicado into Confirmar cobro/Cobro confirmado.",
-        "Cobros already materialized and not reconciled expose Conciliar; deterministic batch reconciliation remains engine-owned.",
-        "No duplicate payment is created by later evidence."
+        "SIGA is never presented as client/advisor reported.",
+        "457 deterministic SIGA records require no individual Apply Payment.",
+        "The 27 unknown-origin records are resolved by provenance or remain explicitly CONFLICT_REVIEW_REQUIRED only when genuinely ambiguous.",
+        "Asesor can Reportar pago but cannot Aplicar/Conciliar.",
+        "Advisor report creates linked Ops management and Operativo can validate/apply the same canonical evidence.",
+        "Operativo can directly Apply Payment for payment evidence received and validated directly.",
+        "Pending/overdue obligation exposes Aplicar pago.",
+        "Applied/unreconciled payment exposes Conciliar in Cobros surfaces, including SIGA fallback.",
+        "Payment support and insurer invoice/application evidence can enrich the same payment without duplication.",
+        "Receipt editing cannot corrupt payment/application facts and controlled edit surfaces exist.",
+        "Authorized Dirección/Operativo does not receive false scope denial.",
+        "Cobros entry and filter changes show no material redundant hydration/double render.",
+        "No relevant 404, console or page errors; responsive behavior applicable."
       ],
-      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V3_20260930.json",
+      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "authorizedProductFiles": [
         "functions/cobros-reconciliation-domain.js",
@@ -965,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_TARGETED_VISUAL_PASS",
+      "nextAction": "B3_004_REMEDIATION_REQUIRED_WITHIN_SAME_GATE",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1066,8 +1073,8 @@
           "qaGuardFile": "tools/gravicentra-i6-5-b3-004-contract.mjs",
           "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_SOURCE_FIX_20260930.json",
           "receiptBlobSha": "4c77da96d75abbcfb9dcf572d3a826dc21a8ab81",
-          "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V3_20260930.json",
-          "paymentLockBlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244",
+          "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+          "paymentLockBlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
           "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_20260930.json",
           "contractReceiptBlobSha": "1dc8409f9e5617c7e65a252969281f4995aa1760",
           "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_MACHINE_PASS_20260930.json",
@@ -1166,7 +1173,7 @@
       "applyVsReconcileBoundaryContractStatus": "PASS",
       "applyVsReconcileBoundaryContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT_PASS_20260930.json",
       "applyVsReconcileBoundaryContractReceiptBlobSha": "c488d2340883260eae10258ac82b9e0737cfb43b",
-      "paymentLockBlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244",
+      "paymentLockBlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
       "r5SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_SOURCE_FIX_20260930.json",
       "r5SourceFixReceiptBlobSha": "4c77da96d75abbcfb9dcf572d3a826dc21a8ab81",
       "r5SourceBlobs": {
@@ -1182,7 +1189,10 @@
       "r5ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_20260930.json",
       "r5ContractReceiptBlobSha": "1dc8409f9e5617c7e65a252969281f4995aa1760",
       "r5MachineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_MACHINE_PASS_20260930.json",
-      "r5MachineProofReceiptBlobSha": "7ed2e68bbd5780a03cb3a0395bc4695b5fd669b0"
+      "r5MachineProofReceiptBlobSha": "7ed2e68bbd5780a03cb3a0395bc4695b5fd669b0",
+      "latestTargetedVisualDecision": "REJECTED_REMEDIATION_REQUIRED",
+      "visualRejectionR6ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_R6_ORIGIN_SCOPE_PERFORMANCE_20260930.json",
+      "visualRejectionR6ReceiptBlobSha": "3619ff84312d8dba3170663733ac77813b98a5c2"
     },
     {
       "id": "B3-005",
@@ -1193,14 +1203,16 @@
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "businessRulesFrozen": true,
-      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
+      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
       "requiredProof": [
         "High-confidence invoice/statement/commission inference auto-commits without human approval.",
         "Prior contiguous installments are inferred with inferredEffectiveDate=their scheduled due date while paidDate remains unknown unless directly evidenced.",
         "Explicit source installment denominator/total reconciles expected receipt count.",
         "La Ceiba, Aseguradora General and G&T Seguros fraccionado schedules obey tenant-config max 10.",
         "Later direct evidence enriches prior inferred payment instead of duplicating it."
-      ]
+      ],
+      "paymentLockBlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
+      "entryBlockedBy": "B3-004"
     },
     {
       "id": "B3-006",

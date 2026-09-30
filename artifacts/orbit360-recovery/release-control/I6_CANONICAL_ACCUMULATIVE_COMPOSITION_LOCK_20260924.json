@@ -496,8 +496,8 @@
       "orbit360-platform/index.html": "405337c13fa3292f63832f3dff5bc92c3291ffae",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "883257d8a29f6bab43651280757521d8910a6532"
     },
-    "paymentLockV3Path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V3_20260930.json",
-    "paymentLockV3BlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244",
+    "paymentLockV3Path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+    "paymentLockV3BlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_SOURCE_FIX_20260930.json",
     "sourceFixReceiptBlobSha": "4c77da96d75abbcfb9dcf572d3a826dc21a8ab81",
     "dataMutation": false,
@@ -534,5 +534,16 @@
       "liveBindingSource": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
       "liveBindingBuild": "gi-i65-4bf67a373875-57f234755dc1"
     }
+  },
+  "b3004PaymentOriginContractV4": {
+    "status": "FROZEN_GOVERNANCE_ONLY",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+    "blobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_R6_ORIGIN_SCOPE_PERFORMANCE_20260930.json",
+    "visualRejectionReceiptBlobSha": "3619ff84312d8dba3170663733ac77813b98a5c2",
+    "productSourceChanged": false,
+    "exactProductSetChanged": false,
+    "operationalDataWrites": false,
+    "livePromotion": false
   }
 }
