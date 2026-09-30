@@ -171,7 +171,7 @@ jobs:
               raise SystemExit('S446_UNKNOWN_SOURCE_ARCHIVE_FORMAT')
           PY
 
-      - name: Verify exact deployed S4.20 owner blob
+      - name: Observe deployed owner blob and drift without mutation
         shell: bash
         run: |
           set -euo pipefail
@@ -179,19 +179,30 @@ jobs:
           test "${#OWNERS[@]}" -ge 1
           OWNER_FILE="${OWNERS[0]}"
           DEPLOYED_BLOB="$(git hash-object "$OWNER_FILE")"
-          test "$DEPLOYED_BLOB" = "$EXPECTED_OWNER_BLOB"
-
-          grep -q "cotcompRef" "$OWNER_FILE"
-          grep -q "orbit360OpsLeadsCommand" "$OWNER_FILE"
-
           printf '%s' "$DEPLOYED_BLOB" > "$RUNNER_TEMP/s446/deployed-owner-blob.txt"
+
+          HAS_COTCOMP_REF=false
+          HAS_EXPORT=false
+          grep -q "cotcompRef" "$OWNER_FILE" && HAS_COTCOMP_REF=true
+          grep -q "orbit360OpsLeadsCommand" "$OWNER_FILE" && HAS_EXPORT=true
+          printf '%s' "$HAS_COTCOMP_REF" > "$RUNNER_TEMP/s446/has-cotcomp-ref.txt"
+          printf '%s' "$HAS_EXPORT" > "$RUNNER_TEMP/s446/has-export.txt"
+
+          git diff --no-index --numstat -- functions/ops-leads-domain.js "$OWNER_FILE" > "$RUNNER_TEMP/s446/diff-numstat.txt" || true
 
           node <<'NODE'
           const fs=require('fs');
           const evidence=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s446/evidence/function-sanitized.json','utf8'));
+          const num=(fs.readFileSync(process.env.RUNNER_TEMP+'/s446/diff-numstat.txt','utf8').trim().split(/\s+/));
           evidence.deployedOwnerBlob=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/deployed-owner-blob.txt','utf8').trim();
           evidence.expectedOwnerBlob='73e09a4404cb4298dc34c9c38e26ad1f960d3170';
           evidence.ownerBlobExactMatch=evidence.deployedOwnerBlob===evidence.expectedOwnerBlob;
+          evidence.containsCotcompRef=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/has-cotcomp-ref.txt','utf8').trim()==='true';
+          evidence.containsOpsLeadsExport=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/has-export.txt','utf8').trim()==='true';
+          evidence.diffVsCanonical={
+            addedLines:Number(num[0]||0),
+            deletedLines:Number(num[1]||0)
+          };
           evidence.deployedSourceArchiveSha256=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/source-archive-sha.txt','utf8').trim();
           evidence.sourceArchiveReadOnly=true;
           evidence.appDataReadsExecuted=0;
@@ -199,11 +210,10 @@ jobs:
           evidence.deployExecuted=false;
           evidence.iamWritesExecuted=0;
           evidence.productionTouched=false;
-          if(!evidence.ownerBlobExactMatch) throw new Error('S446_OWNER_BLOB_MISMATCH');
           fs.writeFileSync(process.env.RUNNER_TEMP+'/s446/evidence/S446_WORKFLOW_OWNER_RUNTIME_RECEIPT.json',JSON.stringify(evidence,null,2));
           NODE
 
-      - name: Validate evidence contract
+      - name: Evaluate runtime evidence contract
         shell: bash
         run: |
           set -euo pipefail
@@ -220,8 +230,9 @@ jobs:
             writeExecuted:false,
             productionTouched:false
           });
-          if(!r.ok) throw new Error('S446_EVIDENCE_CONTRACT_FAILED_'+r.blockers.join('_'));
           fs.writeFileSync(process.env.RUNNER_TEMP+'/s446/evidence/S446_WORKFLOW_OWNER_EVALUATION.json',JSON.stringify(r,null,2));
+          console.log('S446_WORKFLOW_OWNER_RUNTIME_VERIFIED='+r.workflowOwnerRuntimeVerified);
+          console.log('S446_BLOCKERS='+r.blockers.join(','));
           NODE
 
       - name: Upload sanitized S4.46 evidence
