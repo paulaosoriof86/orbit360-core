@@ -857,16 +857,24 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-      "status": "READ_ONLY_DIAGNOSTIC_ACTIVE",
+      "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "rootCause": "PENDING_B3_003_KPI_AGING_CURRENCY_AUTHORITY_DIAGNOSTIC",
+      "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
       "remediation": "Reconcile KPI/aging/read-model authority by country and currency; prohibit cross-currency aggregation without explicit conversion; define reported-payment effect on pending/overdue/conciliation metrics.",
       "requiredProof": "KPI and aging invariant audit by country/currency; no contradiction such as Vencido=0 with positive overdue aging unless semantics explicitly exclude those rows and UI explains it.",
       "humanEvidence": "Exact B3 Preview shows Vencido=0 and Pendiente=0 while aging totals Q5,760; table includes Q and $ amounts and 484 reported-payment rows.",
       "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "nextAction": "B3_003_KPI_AGING_CURRENCY_AUTHORITY_DIAGNOSTIC"
+      "nextAction": "B3_003_CAUSAL_SOURCE_FIX",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_KPI_AGING_CURRENCY_DIAGNOSTIC_20260929.json",
+      "diagnosticRunId": 36654461494,
+      "diagnosticArtifactId": 11071897701,
+      "diagnosticArtifactDigest": "sha256:5921eb661a892abb11d7371fbce3e31bc4fa93e9bb356b5807f4aad6c4f6c5dc",
+      "allowedProductFiles": [
+        "orbit360-platform/core/queries.js",
+        "orbit360-platform/modules/cobros.js"
+      ]
     },
     {
       "id": "B3-004",
@@ -923,7 +931,16 @@
         "image(20260930-011108).png"
       ],
       "rootCause": "PENDING_B3_008_DASHBOARD_KPI_AUTHORITY_DIAGNOSTIC",
-      "nextAction": "PRESERVE_UNTIL_B3_008_AFTER_B3_003_TO_B3_007"
+      "nextAction": "PRESERVE_UNTIL_B3_008_AFTER_B3_003_TO_B3_007",
+      "diagnosticClue": {
+        "fromGate": "B3-003",
+        "authoritativeCounts": {
+          "confirmedCobros": 5,
+          "pendingPortfolioRows": 788,
+          "overduePortfolioRows": 529
+        },
+        "explanation": "Inicio amount cards consume carteraPrimas while current KPI modals labeled Cobros pendientes/vencidos appear to query cobros event states; this explains nonzero cards vs 0 modal rows. Preserve for B3-008."
+      }
     },
     {
       "id": "B4-001",
