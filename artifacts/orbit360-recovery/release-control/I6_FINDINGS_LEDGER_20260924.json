@@ -857,16 +857,21 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "VISUAL_REJECTED_DIAGNOSTIC_ACTIVE",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
+      "rootCause": "PARTIAL_CONFIRMED: renderer country filter omission + split read-model authority; country-change double-render runtime source pending trace",
       "remediation": "Reconcile KPI/aging/read-model authority by country and currency; prohibit cross-currency aggregation without explicit conversion; define reported-payment effect on pending/overdue/conciliation metrics.",
       "requiredProof": "KPI and aging invariant audit by country/currency; no contradiction such as Vencido=0 with positive overdue aging unless semantics explicitly exclude those rows and UI explains it.",
-      "humanEvidence": "Exact B3 Preview shows Vencido=0 and Pendiente=0 while aging totals Q5,760; table includes Q and $ amounts and 484 reported-payment rows.",
+      "humanEvidence": [
+        "Colombia selected but rendered table still includes Persona · GT and GTQ rows.",
+        "Guatemala and Colombia retain the same mixed client universe.",
+        "Colombia shows GTQ top KPI while aging is labeled CO/COP.",
+        "Country transition visibly paints one screen and then another."
+      ],
       "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "nextAction": "B3_003_EXACT_PREVIEW_KPI_AGING_PROOF",
+      "nextAction": "B3_003_COUNTRY_TRANSITION_RUNTIME_DIAGNOSTIC",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_KPI_AGING_CURRENCY_DIAGNOSTIC_20260929.json",
       "diagnosticRunId": 36654461494,
       "diagnosticArtifactId": 11071897701,
@@ -905,7 +910,8 @@
         "agingCountryFilterEffective": true,
         "safeKpiMarkers": true,
         "noBrowserErrors": true
-      }
+      },
+      "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_20260929.json"
     },
     {
       "id": "B3-004",
@@ -4488,7 +4494,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_003_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE",
     "activeFindingId": "B3-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
@@ -4505,6 +4511,7 @@
     },
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_20260929.json",
     "priorFindingId": "B3-002",
-    "priorFindingStatus": "CLOSED_PASS"
+    "priorFindingStatus": "CLOSED_PASS",
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_20260929.json"
   }
 }
