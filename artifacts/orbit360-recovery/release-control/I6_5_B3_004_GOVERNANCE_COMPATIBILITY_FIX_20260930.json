@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_GOVERNANCE_COMPATIBILITY_FIX_V1",
+  "status": "FIXED_PENDING_SELFTEST",
+  "date": "2026-09-30",
+  "rootCause": "B3-004 legal actions absent from central B3 allowlist; retired B3-003 diagnostic invoked governance preflight before determining NOOP.",
+  "changes": {
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs": {
+      "before": "71cacddfea002a615a06e560d13864602ba6b1fe",
+      "after": "ca4dd03d14fd9e5068fe6a7392198b933c766581"
+    },
+    ".github/workflows/gravicentra-b3-003-country-diagnostic.yml": {
+      "before": "541aa962415066278400fa539045a65666f11a24",
+      "after": "32010294259766d72dfb7fac9e76d5e73af7dc23"
+    }
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "businessDataWrites": 0,
+    "reimport": false,
+    "live": false
+  }
+}

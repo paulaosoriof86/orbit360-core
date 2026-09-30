@@ -208,6 +208,22 @@ jobs:
         id: gate
         run: |
           set -euo pipefail
+          ACTIVE=$(node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const b=JSON.parse(fs.readFileSync(process.env.B3_LOCK,'utf8'));
+          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_003_COUNTRY_DIAGNOSTIC'
+            && c.i65ForensicRemediationPlan?.b3?.status==='B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE'
+            && b.status==='B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE'
+            && b.activeFinding?.id==='B3-003';
+          process.stdout.write(ok?'true':'false');
+          NODE
+          )
+          if [ "$ACTIVE" != "true" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "B3_003_COUNTRY_DIAG_MODE=NOOP"
+            exit 0
+          fi
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           node - <<'NODE'
           const fs=require('node:fs');
