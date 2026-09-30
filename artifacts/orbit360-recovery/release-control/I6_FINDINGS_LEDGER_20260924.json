@@ -857,7 +857,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-      "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
+      "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
@@ -866,7 +866,7 @@
       "humanEvidence": "Exact B3 Preview shows Vencido=0 and Pendiente=0 while aging totals Q5,760; table includes Q and $ amounts and 484 reported-payment rows.",
       "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "nextAction": "B3_003_CAUSAL_SOURCE_FIX",
+      "nextAction": "B3_003_EXACT_PREVIEW_KPI_AGING_PROOF",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_KPI_AGING_CURRENCY_DIAGNOSTIC_20260929.json",
       "diagnosticRunId": 36654461494,
       "diagnosticArtifactId": 11071897701,
@@ -874,7 +874,24 @@
       "allowedProductFiles": [
         "orbit360-platform/core/queries.js",
         "orbit360-platform/modules/cobros.js"
-      ]
+      ],
+      "causalFix": {
+        "owners": [
+          "orbit360-platform/core/queries.js",
+          "orbit360-platform/modules/cobros.js"
+        ],
+        "blobs": {
+          "orbit360-platform/core/queries.js": "7ba5f363a5143236179777a1a30d763142e8e7a8",
+          "orbit360-platform/modules/cobros.js": "4c893396d12ac5ff20d9a1ccc1b5b31abdf5fb65"
+        },
+        "semantics": [
+          "currency-separated portfolio KPIs",
+          "aging filtered by active country",
+          "no implicit FX conversion",
+          "reported payment evidence remains excluded from confirmed cobro KPI"
+        ],
+        "inicioChanged": false
+      }
     },
     {
       "id": "B3-004",
@@ -4457,7 +4474,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_003_READ_ONLY_DIAGNOSTIC_ACTIVE",
+    "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
     "activeFindingId": "B3-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
