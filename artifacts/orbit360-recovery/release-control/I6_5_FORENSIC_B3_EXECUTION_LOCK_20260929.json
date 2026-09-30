@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_READ_ONLY_DIAGNOSTIC_ACTIVE",
+  "status": "B3_003_CAUSE_CONFIRMED_FIX_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,15 +14,23 @@
   "activeFinding": {
     "id": "B3-003",
     "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "READ_ONLY_DIAGNOSTIC_ACTIVE",
+    "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
     "blocking": true,
-    "rootCause": "PENDING_B3_003_KPI_AGING_CURRENCY_AUTHORITY_DIAGNOSTIC",
+    "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
     "requiredProof": [
       "Identify exact source/owner for Cobros KPIs and aging.",
       "Prove country and currency filtering semantics from authoritative collections.",
       "Prove no cross-currency arithmetic is presented as one amount.",
       "Prove payment-state classification does not mix reported evidence with confirmed cobro.",
       "No business writes, no reimport, no LIVE."
+    ],
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_KPI_AGING_CURRENCY_DIAGNOSTIC_20260929.json",
+    "diagnosticRunId": 36654461494,
+    "diagnosticArtifactId": 11071897701,
+    "diagnosticArtifactDigest": "sha256:5921eb661a892abb11d7371fbce3e31bc4fa93e9bb356b5807f4aad6c4f6c5dc",
+    "allowedProductFiles": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/cobros.js"
     ]
   },
   "canonicalComposition": {
@@ -35,7 +43,9 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_READONLY_KPI_AGING_CURRENCY_DIAGNOSTIC"
+    "B3_003_CAUSAL_SOURCE_FIX",
+    "B3_003_EXACT_PREVIEW_KPI_AGING_PROOF",
+    "B3_003_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -63,7 +73,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
@@ -134,7 +144,7 @@
     },
     "shellOwnerVisualMatch": true
   },
-  "boundaryNote": "B3-002 human PASS frozen. B3-003 read-only diagnostic only; Inicio KPI inconsistency preserved separately under B3-008.",
+  "boundaryNote": "B3-003 cause confirmed from read-only Firestore + source. Product mutation authorized only for queries.js and cobros.js; no Inicio changes in this gate.",
   "priorFinding": {
     "id": "B3-002",
     "status": "CLOSED_PASS",
