@@ -57,3 +57,11 @@ test('W1 proof excludes workflow notifications proposal selection real data and 
   }
   assert.match(source,/productionTouched:false/);
 });
+
+
+test('W1 proof exposes independent read-only final-absence verification mode',()=>{
+  const source=fs.readFileSync(require.resolve('./cotcomp-w1-runtime-s445'),'utf8');
+  assert.match(source,/VERIFY_ABSENCE/);
+  assert.match(source,/S445_VERIFY_ABSENCE_FAILED/);
+  assert.match(source,/writesExecuted:0/);
+});
