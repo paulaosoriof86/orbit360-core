@@ -40,5 +40,31 @@
     "liveHostingPromotionAuthorized": false,
     "b4Authorized": false
   },
-  "nextAction": "B3_003_COUNTRY_TRANSITION_RUNTIME_DIAGNOSTIC"
+  "nextAction": "B3_003_INDEPENDENT_FIRESTORE_LINEAGE_DIAGNOSTIC",
+  "latestHumanRejection": {
+    "recordedAt": "2026-09-29T21:36:00-06:00",
+    "exactPreview": {
+      "sourceSha": "3c290e24443ea07940fed6c25ad33ddf186ca0b5",
+      "buildId": "gi-i65-b3-3c290e24443e-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b3-36659101980-5tklbjdk.web.app",
+      "runId": 36659101980,
+      "artifactId": 11073776021
+    },
+    "testedScopes": [
+      "TODOS",
+      "GT",
+      "CO"
+    ],
+    "focalPolicyNumber": "9758",
+    "focalClientDisplay": "PIEDAD CECILIA PEDREROS PEREA",
+    "observedInGt": true,
+    "absentFromExpectedCoView": true,
+    "coFinalReportedPaymentCountApprox": 7,
+    "countryTransitionIntermediateRender": true,
+    "reasonCodes": [
+      "COUNTRY_CANONICAL_LINEAGE_ASYMMETRY",
+      "DOM_SELF_ASSERTION_FALSE_PASS_RISK",
+      "COUNTRY_TRANSITION_INTERMEDIATE_RENDER"
+    ]
+  }
 }
