@@ -1,0 +1,402 @@
+name: CotComp S4.47 align Leads Ops owner in LAB
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s447-owner-align-lab-20260930
+    paths:
+      - '.github/cotcomp-lab-intents/s447-owner-align-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  COTCOMP_FUNCTION: orbit360OpsLeadsCommand
+  EXPECTED_OLD_OWNER_BLOB: d0a1e116186bba860d34ec540e8abba81830b553
+  EXPECTED_NEW_OWNER_BLOB: 73e09a4404cb4298dc34c9c38e26ad1f960d3170
+
+jobs:
+  align-owner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout authorized isolated source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify immutable S4.47 authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s447-owner-align-authorized.json
+          jq -e '
+            .authorization == "S447_ALIGN_CANONICAL_S420_LEADS_OPS_OWNER_IN_LAB" and
+            .projectId == "ays-orbit-360-lab" and
+            .function == "orbit360OpsLeadsCommand" and
+            .expectedOldOwnerBlob == "d0a1e116186bba860d34ec540e8abba81830b553" and
+            .expectedNewOwnerBlob == "73e09a4404cb4298dc34c9c38e26ad1f960d3170" and
+            .appDataWrites == false and
+            .executeW2 == false and
+            .providerDelivery == false and
+            .realData == false and
+            .production == false and
+            .preQaRequired == true and
+            .postQaRequired == true and
+            .physicalSourceReadbackRequired == true
+          ' "$INTENT" >/dev/null
+
+          PARENT="$(git rev-parse HEAD^)"
+          EXPECTED_PARENT="$(jq -r '.authorizedSourceParent // empty' "$INTENT")"
+          test "$EXPECTED_PARENT" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$INTENT"
+
+      - name: Verify canonical owner source before QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object functions/ops-leads-domain.js)" = "$EXPECTED_NEW_OWNER_BLOB"
+          grep -q "cotcompRef" functions/ops-leads-domain.js
+          grep -q "sanitizeCotcompRef" functions/ops-leads-domain.js
+          node --check functions/ops-leads-domain.js
+
+      - name: Pre-deploy full source QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+
+      - name: Prepare exact LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s447/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s447/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI and gcloud
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@15.32.0
+          firebase --version
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: 'latest'
+
+      - name: Authenticate gcloud to exact LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" >/dev/null
+          gcloud config set project "$COTCOMP_PROJECT_ID" >/dev/null
+          test "$(gcloud config get-value project 2>/dev/null)" = "$COTCOMP_PROJECT_ID"
+
+      - name: Pre-deploy physical readback requires exact old owner
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud functions describe "$COTCOMP_FUNCTION"             --gen2             --region "$COTCOMP_REGION"             --project "$COTCOMP_PROJECT_ID"             --format=json > "$RUNNER_TEMP/s447/pre-function.json"
+
+          node <<'NODE'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s447/pre-function.json','utf8'));
+          if(String(d.state||'')!=='ACTIVE') throw new Error('S447_PRE_FUNCTION_NOT_ACTIVE');
+          const s=d.buildConfig&&d.buildConfig.source&&d.buildConfig.source.storageSource;
+          if(!s||!s.bucket||!s.object) throw new Error('S447_PRE_SOURCE_LOCATOR_MISSING');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s447/pre-source-locator.json',JSON.stringify(s));
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s447/evidence/pre-function-sanitized.json',JSON.stringify({
+            name:'orbit360OpsLeadsCommand',
+            state:d.state||null,
+            runtime:d.buildConfig&&d.buildConfig.runtime||null,
+            entryPoint:d.buildConfig&&d.buildConfig.entryPoint||null,
+            updateTime:d.updateTime||null,
+            service:d.serviceConfig&&d.serviceConfig.service||null,
+            revision:d.serviceConfig&&d.serviceConfig.revision||null,
+            sourceGeneration:s.generation||null
+          },null,2));
+          NODE
+
+          BUCKET="$(node -e "const x=require(process.env.RUNNER_TEMP+'/s447/pre-source-locator.json');console.log(x.bucket)")"
+          OBJECT="$(node -e "const x=require(process.env.RUNNER_TEMP+'/s447/pre-source-locator.json');console.log(x.object)")"
+          GENERATION="$(node -e "const x=require(process.env.RUNNER_TEMP+'/s447/pre-source-locator.json');console.log(x.generation||'')")"
+          URI="gs://$BUCKET/$OBJECT"
+          if [ -n "$GENERATION" ]; then URI="$URI#$GENERATION"; fi
+          gcloud storage cp "$URI" "$RUNNER_TEMP/s447/pre-source-archive.bin" >/dev/null
+
+          mkdir -p "$RUNNER_TEMP/s447/pre-source"
+          python3 <<'PY'
+          import os, zipfile, tarfile
+          src=os.environ['RUNNER_TEMP']+'/s447/pre-source-archive.bin'
+          dst=os.environ['RUNNER_TEMP']+'/s447/pre-source'
+          if zipfile.is_zipfile(src):
+              with zipfile.ZipFile(src) as z: z.extractall(dst)
+          elif tarfile.is_tarfile(src):
+              with tarfile.open(src) as t: t.extractall(dst)
+          else:
+              raise SystemExit('S447_UNKNOWN_PRE_SOURCE_ARCHIVE_FORMAT')
+          PY
+
+          mapfile -t OWNERS < <(find "$RUNNER_TEMP/s447/pre-source" -type f -name 'ops-leads-domain.js' | sort)
+          test "${#OWNERS[@]}" -ge 1
+          PRE_BLOB="$(git hash-object "${OWNERS[0]}")"
+          test "$PRE_BLOB" = "$EXPECTED_OLD_OWNER_BLOB"
+          printf '%s' "$PRE_BLOB" > "$RUNNER_TEMP/s447/pre-owner-blob.txt"
+
+          node <<'NODE'
+          const fs=require('fs');
+          const e=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s447/evidence/pre-function-sanitized.json','utf8'));
+          e.deployedOwnerBlob=fs.readFileSync(process.env.RUNNER_TEMP+'/s447/pre-owner-blob.txt','utf8').trim();
+          e.expectedOldOwnerBlob='d0a1e116186bba860d34ec540e8abba81830b553';
+          e.oldOwnerExactMatch=e.deployedOwnerBlob===e.expectedOldOwnerBlob;
+          e.containsCotcompRef=false;
+          e.appDataReadsExecuted=0;
+          e.appDataWritesExecuted=0;
+          e.productionTouched=false;
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s447/evidence/S447_PREDEPLOY_RUNTIME_RECEIPT.json',JSON.stringify(e,null,2));
+          NODE
+
+      - name: Freeze authorized source identity
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          SOURCE_TREE="$(git rev-parse HEAD^{tree})"
+          OWNER_BLOB="$(git hash-object functions/ops-leads-domain.js)"
+          test "$OWNER_BLOB" = "$EXPECTED_NEW_OWNER_BLOB"
+          mkdir -p "$RUNNER_TEMP/s447/evidence"
+          git archive --format=tar.gz -o "$RUNNER_TEMP/s447/evidence/s447-source.tar.gz" HEAD functions firebase.json
+          ARTIFACT_DIGEST="$(sha256sum "$RUNNER_TEMP/s447/evidence/s447-source.tar.gz" | awk '{print $1}')"
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          echo "source_tree=$SOURCE_TREE" >> "$GITHUB_OUTPUT"
+          echo "owner_blob=$OWNER_BLOB" >> "$GITHUB_OUTPUT"
+          echo "artifact_digest=$ARTIFACT_DIGEST" >> "$GITHUB_OUTPUT"
+
+      - name: Upload immutable source artifact
+        id: source_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s447-source-${{ github.run_id }}
+          path: ${{ runner.temp }}/s447/evidence/s447-source.tar.gz
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Deploy only canonical Leads Ops owner function to LAB
+        id: deploy
+        shell: bash
+        run: |
+          set +e
+          firebase deploy             --project "$COTCOMP_PROJECT_ID"             --only "functions:$COTCOMP_FUNCTION"             --non-interactive             > "$RUNNER_TEMP/s447/firebase-deploy.log" 2>&1
+          RC=$?
+          set -e
+          echo "deploy_rc=$RC" >> "$GITHUB_OUTPUT"
+
+      - name: Post-deploy physical source readback exact-match
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud functions describe "$COTCOMP_FUNCTION"             --gen2             --region "$COTCOMP_REGION"             --project "$COTCOMP_PROJECT_ID"             --format=json > "$RUNNER_TEMP/s447/post-function.json"
+
+          node <<'NODE'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s447/post-function.json','utf8'));
+          if(String(d.state||'')!=='ACTIVE') throw new Error('S447_POST_FUNCTION_NOT_ACTIVE');
+          const s=d.buildConfig&&d.buildConfig.source&&d.buildConfig.source.storageSource;
+          if(!s||!s.bucket||!s.object) throw new Error('S447_POST_SOURCE_LOCATOR_MISSING');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s447/post-source-locator.json',JSON.stringify(s));
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s447/evidence/post-function-sanitized.json',JSON.stringify({
+            name:'orbit360OpsLeadsCommand',
+            state:d.state||null,
+            runtime:d.buildConfig&&d.buildConfig.runtime||null,
+            entryPoint:d.buildConfig&&d.buildConfig.entryPoint||null,
+            updateTime:d.updateTime||null,
+            service:d.serviceConfig&&d.serviceConfig.service||null,
+            revision:d.serviceConfig&&d.serviceConfig.revision||null,
+            sourceGeneration:s.generation||null
+          },null,2));
+          NODE
+
+          BUCKET="$(node -e "const x=require(process.env.RUNNER_TEMP+'/s447/post-source-locator.json');console.log(x.bucket)")"
+          OBJECT="$(node -e "const x=require(process.env.RUNNER_TEMP+'/s447/post-source-locator.json');console.log(x.object)")"
+          GENERATION="$(node -e "const x=require(process.env.RUNNER_TEMP+'/s447/post-source-locator.json');console.log(x.generation||'')")"
+          URI="gs://$BUCKET/$OBJECT"
+          if [ -n "$GENERATION" ]; then URI="$URI#$GENERATION"; fi
+          gcloud storage cp "$URI" "$RUNNER_TEMP/s447/post-source-archive.bin" >/dev/null
+
+          mkdir -p "$RUNNER_TEMP/s447/post-source"
+          python3 <<'PY'
+          import os, zipfile, tarfile
+          src=os.environ['RUNNER_TEMP']+'/s447/post-source-archive.bin'
+          dst=os.environ['RUNNER_TEMP']+'/s447/post-source'
+          if zipfile.is_zipfile(src):
+              with zipfile.ZipFile(src) as z: z.extractall(dst)
+          elif tarfile.is_tarfile(src):
+              with tarfile.open(src) as t: t.extractall(dst)
+          else:
+              raise SystemExit('S447_UNKNOWN_POST_SOURCE_ARCHIVE_FORMAT')
+          PY
+
+          mapfile -t OWNERS < <(find "$RUNNER_TEMP/s447/post-source" -type f -name 'ops-leads-domain.js' | sort)
+          test "${#OWNERS[@]}" -ge 1
+          OWNER_FILE="${OWNERS[0]}"
+          POST_BLOB="$(git hash-object "$OWNER_FILE")"
+          test "$POST_BLOB" = "$EXPECTED_NEW_OWNER_BLOB"
+          grep -q "cotcompRef" "$OWNER_FILE"
+          grep -q "sanitizeCotcompRef" "$OWNER_FILE"
+          printf '%s' "$POST_BLOB" > "$RUNNER_TEMP/s447/post-owner-blob.txt"
+          POST_ARCHIVE_SHA="$(sha256sum "$RUNNER_TEMP/s447/post-source-archive.bin" | awk '{print $1}')"
+          printf '%s' "$POST_ARCHIVE_SHA" > "$RUNNER_TEMP/s447/post-source-archive-sha.txt"
+
+          node <<'NODE'
+          const fs=require('fs');
+          const pre=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s447/evidence/S447_PREDEPLOY_RUNTIME_RECEIPT.json','utf8'));
+          const post=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s447/evidence/post-function-sanitized.json','utf8'));
+          const postBlob=fs.readFileSync(process.env.RUNNER_TEMP+'/s447/post-owner-blob.txt','utf8').trim();
+          const receipt={
+            schemaVersion:'ays-cotcomp-s447-owner-alignment-runtime-readback-v1.0',
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            function:'orbit360OpsLeadsCommand',
+            preDeploy:{
+              ownerBlob:pre.deployedOwnerBlob,
+              updateTime:pre.updateTime||null,
+              revision:pre.revision||null
+            },
+            postDeploy:{
+              ownerBlob:postBlob,
+              expectedOwnerBlob:'73e09a4404cb4298dc34c9c38e26ad1f960d3170',
+              exactOwnerBlobMatch:postBlob==='73e09a4404cb4298dc34c9c38e26ad1f960d3170',
+              containsCotcompRef:true,
+              containsSanitizeCotcompRef:true,
+              state:post.state,
+              runtime:post.runtime,
+              entryPoint:post.entryPoint,
+              updateTime:post.updateTime,
+              revision:post.revision,
+              sourceGeneration:post.sourceGeneration,
+              sourceArchiveSha256:fs.readFileSync(process.env.RUNNER_TEMP+'/s447/post-source-archive-sha.txt','utf8').trim()
+            },
+            appDataReadsExecuted:0,
+            appDataWritesExecuted:0,
+            w2Executed:false,
+            providerDeliveryExecuted:false,
+            realDataUsed:false,
+            productionTouched:false
+          };
+          if(!receipt.postDeploy.exactOwnerBlobMatch) throw new Error('S447_POST_OWNER_BLOB_MISMATCH');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s447/evidence/S447_POSTDEPLOY_RUNTIME_RECEIPT.json',JSON.stringify(receipt,null,2));
+          NODE
+
+      - name: Post-deploy full source QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run check
+          npm run test:cotcomp
+
+      - name: Build final sanitized S4.47 receipt
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.source_sha }}
+          SOURCE_TREE: ${{ steps.source.outputs.source_tree }}
+          OWNER_BLOB: ${{ steps.source.outputs.owner_blob }}
+          SOURCE_ARTIFACT_ID: ${{ steps.source_artifact.outputs.artifact-id }}
+          SOURCE_ARTIFACT_DIGEST: ${{ steps.source.outputs.artifact_digest }}
+          DEPLOY_RC: ${{ steps.deploy.outputs.deploy_rc }}
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const pre=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s447/evidence/S447_PREDEPLOY_RUNTIME_RECEIPT.json','utf8'));
+          const post=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s447/evidence/S447_POSTDEPLOY_RUNTIME_RECEIPT.json','utf8'));
+          const receipt={
+            schemaVersion:'ays-cotcomp-s447-owner-alignment-v1.0',
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            function:'orbit360OpsLeadsCommand',
+            sourceSha:process.env.SOURCE_SHA,
+            sourceTree:process.env.SOURCE_TREE,
+            sourceOwnerBlob:process.env.OWNER_BLOB,
+            sourceArtifactId:process.env.SOURCE_ARTIFACT_ID,
+            sourceArtifactDigest:process.env.SOURCE_ARTIFACT_DIGEST,
+            firebaseDeployCliExitCode:Number(process.env.DEPLOY_RC||0),
+            preDeploy:pre,
+            postDeploy:post.postDeploy,
+            alignment:{
+              replacedOldBlob:'d0a1e116186bba860d34ec540e8abba81830b553',
+              withCanonicalBlob:'73e09a4404cb4298dc34c9c38e26ad1f960d3170',
+              physicalSourceReadbackExact:true
+            },
+            boundaries:{
+              appDataReadsExecuted:0,
+              appDataWritesExecuted:0,
+              w2Executed:false,
+              providerDeliveryExecuted:false,
+              realDataUsed:false,
+              productionTouched:false
+            }
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s447/evidence/S447_OWNER_ALIGNMENT_RECEIPT.json',JSON.stringify(receipt,null,2));
+          NODE
+
+      - name: Final S4.47 evidence guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '
+            .preDeploy.deployedOwnerBlob == "d0a1e116186bba860d34ec540e8abba81830b553" and
+            .postDeploy.ownerBlob == "73e09a4404cb4298dc34c9c38e26ad1f960d3170" and
+            .postDeploy.exactOwnerBlobMatch == true and
+            .postDeploy.state == "ACTIVE" and
+            .boundaries.appDataReadsExecuted == 0 and
+            .boundaries.appDataWritesExecuted == 0 and
+            .boundaries.w2Executed == false and
+            .boundaries.providerDeliveryExecuted == false and
+            .boundaries.realDataUsed == false and
+            .boundaries.productionTouched == false
+          ' "$RUNNER_TEMP/s447/evidence/S447_OWNER_ALIGNMENT_RECEIPT.json" >/dev/null
+
+      - name: Upload sanitized S4.47 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s447-owner-alignment-${{ github.run_id }}
+          path: ${{ runner.temp }}/s447/evidence/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove transient credential and source copies
+        if: always()
+        shell: bash
+        run: |
+          rm -rf "$RUNNER_TEMP/s447/pre-source" "$RUNNER_TEMP/s447/post-source"
+          rm -f "$RUNNER_TEMP/s447/pre-source-archive.bin" "$RUNNER_TEMP/s447/post-source-archive.bin"
+          rm -f "$RUNNER_TEMP/s447/firebase-service-account.json"
