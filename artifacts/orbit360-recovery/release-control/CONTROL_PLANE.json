@@ -724,7 +724,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_003_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_003_COUNTRY_DIAGNOSTIC",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -3157,7 +3157,7 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "B3_003_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
       "livePromoted": false,
@@ -3325,7 +3325,8 @@
         "orbit360-platform/modules/cobros.js",
         "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
       ],
-      "sourceFixCommit": "632998cdfb532dc7516db207e63ea49c440f5e5f"
+      "sourceFixCommit": "632998cdfb532dc7516db207e63ea49c440f5e5f",
+      "readModelCountryAuthorityStatus": "PENDING_INDEPENDENT_FIRESTORE_LINEAGE_DIAGNOSTIC"
     }
   },
   "canonicalAccumulationControl": {
