@@ -171,34 +171,34 @@ d=rep(d,
 """      renderedTable:{rows:tableRows.length,countryTokens,firstRows:tableRows.slice(0,20),rowIdentities},""",
 "B3_003_FIX_DIAG_RENDERED_DRIFT")
 d=rep(d,
-"""   const co=evidence.transitions.CO,gt=evidence.transitions.GT;
-   evidence.demonstrated={""",
-"""   const co=evidence.transitions.CO,gt=evidence.transitions.GT,all=evidence.transitions.TODOS;
-   const indexes={clientes:indexRows(independentData.clientes),polizas:indexRows(independentData.polizas)};
-   const canonicalByPolicy=Object.fromEntries((independentData.polizas||[]).map(p=>[entityId(p),summarizeLineage(p,independentData,indexes).canonicalCountryCandidate]));
-   const foreignLeaks=(tr,country)=>(tr?.renderedTable?.rowIdentities||[]).filter(x=>x.polizaId&&canonicalByPolicy[x.polizaId]&&canonicalByPolicy[x.polizaId]!==country).length;
-   const mutationLeaks=(tr,country)=>Math.max(0,...(tr?.mutations||[]).map(x=>(x?.snapshot?.rowIdentities||[]).filter(y=>y.polizaId&&canonicalByPolicy[y.polizaId]&&canonicalByPolicy[y.polizaId]!==country).length));
-   evidence.independentUiAdjudication={
+"""  const co=evidence.transitions.CO,gt=evidence.transitions.GT;
+  evidence.demonstrated={""",
+"""  const co=evidence.transitions.CO,gt=evidence.transitions.GT,all=evidence.transitions.TODOS;
+  const indexes={clientes:indexRows(independentData.clientes),polizas:indexRows(independentData.polizas)};
+  const canonicalByPolicy=Object.fromEntries((independentData.polizas||[]).map(p=>[entityId(p),summarizeLineage(p,independentData,indexes).canonicalCountryCandidate]));
+  const foreignLeaks=(tr,country)=>(tr?.renderedTable?.rowIdentities||[]).filter(x=>x.polizaId&&canonicalByPolicy[x.polizaId]&&canonicalByPolicy[x.polizaId]!==country).length;
+  const mutationLeaks=(tr,country)=>Math.max(0,...(tr?.mutations||[]).map(x=>(x?.snapshot?.rowIdentities||[]).filter(y=>y.polizaId&&canonicalByPolicy[y.polizaId]&&canonicalByPolicy[y.polizaId]!==country).length));
+  evidence.independentUiAdjudication={
      GT:{foreignCountryLeakCount:foreignLeaks(gt,'GT'),transitionLeakCount:mutationLeaks(gt,'GT')},
      CO:{foreignCountryLeakCount:foreignLeaks(co,'CO'),transitionLeakCount:mutationLeaks(co,'CO')},
      loadingSeen:{GT:(gt.mutations||[]).some(x=>x?.snapshot?.loading),CO:(co.mutations||[]).some(x=>x?.snapshot?.loading),TODOS:(all.mutations||[]).some(x=>x?.snapshot?.loading)},
      focal9758:{polizaId:evidence.independentTruth.focal9758?.polizaId||'',canonicalCountry:evidence.independentTruth.focal9758?.canonicalCountryCandidate||''}
    };
-   need(evidence.independentTruth.policyLineageCountryConflicts===0,'B3_003_INDEPENDENT_COUNTRY_CONFLICT');
-   need(evidence.independentUiAdjudication.GT.foreignCountryLeakCount===0,'B3_003_GT_INDEPENDENT_FIRESTORE_LEAK');
-   need(evidence.independentUiAdjudication.CO.foreignCountryLeakCount===0,'B3_003_CO_INDEPENDENT_FIRESTORE_LEAK');
-   need(evidence.independentUiAdjudication.GT.transitionLeakCount===0&&evidence.independentUiAdjudication.CO.transitionLeakCount===0,'B3_003_PRIOR_COUNTRY_PAINT_DURING_TRANSITION');
-   need(evidence.independentUiAdjudication.loadingSeen.GT&&evidence.independentUiAdjudication.loadingSeen.CO&&evidence.independentUiAdjudication.loadingSeen.TODOS,'B3_003_LOADING_FRAME_NOT_OBSERVED');
-   need(evidence.independentUiAdjudication.focal9758.canonicalCountry==='CO','B3_003_9758_CANONICAL_NOT_CO');
-   need((co.renderedTable.rowIdentities||[]).some(x=>x.polizaId===evidence.independentUiAdjudication.focal9758.polizaId),'B3_003_9758_MISSING_FROM_CO');
-   need(!(gt.renderedTable.rowIdentities||[]).some(x=>x.polizaId===evidence.independentUiAdjudication.focal9758.polizaId),'B3_003_9758_LEAKS_INTO_GT');
-   evidence.demonstrated={""",
+  need(evidence.independentTruth.policyLineageCountryConflicts===0,'B3_003_INDEPENDENT_COUNTRY_CONFLICT');
+  need(evidence.independentUiAdjudication.GT.foreignCountryLeakCount===0,'B3_003_GT_INDEPENDENT_FIRESTORE_LEAK');
+  need(evidence.independentUiAdjudication.CO.foreignCountryLeakCount===0,'B3_003_CO_INDEPENDENT_FIRESTORE_LEAK');
+  need(evidence.independentUiAdjudication.GT.transitionLeakCount===0&&evidence.independentUiAdjudication.CO.transitionLeakCount===0,'B3_003_PRIOR_COUNTRY_PAINT_DURING_TRANSITION');
+  need(evidence.independentUiAdjudication.loadingSeen.GT&&evidence.independentUiAdjudication.loadingSeen.CO&&evidence.independentUiAdjudication.loadingSeen.TODOS,'B3_003_LOADING_FRAME_NOT_OBSERVED');
+  need(evidence.independentUiAdjudication.focal9758.canonicalCountry==='CO','B3_003_9758_CANONICAL_NOT_CO');
+  need((co.renderedTable.rowIdentities||[]).some(x=>x.polizaId===evidence.independentUiAdjudication.focal9758.polizaId),'B3_003_9758_MISSING_FROM_CO');
+  need(!(gt.renderedTable.rowIdentities||[]).some(x=>x.polizaId===evidence.independentUiAdjudication.focal9758.polizaId),'B3_003_9758_LEAKS_INTO_GT');
+  evidence.demonstrated={""",
 "B3_003_FIX_DIAG_ADJUDICATION_INSERT_DRIFT")
 d=rep(d,
-"""   evidence.status='DIAGNOSTIC_COMPLETE';""",
-"""   evidence.status='PASS';
-   evidence.assertions={independentFirestoreTruth:true,foreignCountryLeakCountGt:0,foreignCountryLeakCountCo:0,focal9758Explicit:true,countryLoadingFrameObserved:true,noPriorCountryPaintDuringTransition:true,noBrowserErrors:evidence.errors.length===0};
-   need(evidence.errors.length===0,'B3_003_BROWSER_ERRORS:'+JSON.stringify(evidence.errors));""",
+"""  evidence.status='DIAGNOSTIC_COMPLETE';""",
+"""  evidence.status='PASS';
+  evidence.assertions={independentFirestoreTruth:true,foreignCountryLeakCountGt:0,foreignCountryLeakCountCo:0,focal9758Explicit:true,countryLoadingFrameObserved:true,noPriorCountryPaintDuringTransition:true,noBrowserErrors:evidence.errors.length===0};
+  need(evidence.errors.length===0,'B3_003_BROWSER_ERRORS:'+JSON.stringify(evidence.errors));""",
 "B3_003_FIX_DIAG_STATUS_DRIFT")
 write(P["diagnostic"],d)
 
