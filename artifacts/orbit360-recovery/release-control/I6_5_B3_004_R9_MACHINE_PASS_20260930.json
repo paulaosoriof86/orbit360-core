@@ -1,0 +1,21 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R9_MACHINE_PASS_V1",
+  "recordedAt": "2026-09-30",
+  "status": "PASS_PENDING_TARGETED_VISUAL",
+  "sourceSha": "019f4a48292b6a62ee46a871373655504f460751",
+  "buildId": "gi-i65-b3-019f4a48292b-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36790957579-mud6irus.web.app",
+  "channelId": "gi-b3004-36790957579",
+  "runId": 36790957579,
+  "artifactId": 11131108512,
+  "artifactDigest": "21244b9263657be51ff6f56ecbdf98e13e37cf6027fb7c462e6297b77eb779f1",
+  "exactHostingReadback": true,
+  "paymentProofPass": true,
+  "operationalScopeDeleteProofPass": true,
+  "cleanupPass": true,
+  "cancelledPolicyReadModelContractPass": true,
+  "r9HumanRejectionCausalContractPass": true,
+  "liveUnchanged": true,
+  "reimport": false,
+  "b3005": false
+}
