@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_ACTION_SURFACE_CONTRACT",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_SURFACE_CONTRACT",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -3184,13 +3184,13 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "B3_004_ACTION_SURFACES_SOURCE_FIXED_PENDING_CONTRACT",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "9bd69c27bda5e1416468a9e9951b612cec6102ab",
+      "executionLockBlobSha": "d3920f20d1026dfb7c653e48d301f556358cb4c7",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3210,7 +3210,7 @@
         ],
         "productRegressionDemonstrated": false
       },
-      "sourceSha": "1fa38ba1e1b2736f7a6cb61a4e4bc869de9d9ace",
+      "sourceSha": "dde6773ceaf3dc6e6705331f43cde9e9fcf1dc0c",
       "buildId": "gi-i65-b3-1fa38ba1e1b2-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36727490527-y3yfh7tk.web.app",
       "runId": 36727490527,
@@ -3424,7 +3424,7 @@
       "sourceContractReceiptBlobSha": "e44130834a811c0d516f28f278adcd65779807f6",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
       "surfaceFixReceiptBlobSha": "2f0e47928da03d04ec2da77aa19526082211a68f",
-      "activeSubFindingId": "B3-004-R1-PAYMENT-PROVENANCE-ENRICHMENT",
+      "activeSubFindingId": "B3-004-R3-RECEIPT-ACTION-AND-PORTFOLIO-COMPOSITION",
       "surfaceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_CONTRACT_PASS_20260930.json",
       "surfaceContractReceiptBlobSha": "18c529add798f3cb2e8af14567017325d138911a",
       "provenanceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_FIX_20260930.json",
@@ -3480,7 +3480,35 @@
         "machineProofReceiptBlobSha": "4a51b6638e4a17c508e8c6ef8d138b7ac5a84749"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_MACHINE_PASS_AFTER_VISUAL_REMEDIATION_20260930.json",
-      "machineProofReceiptBlobSha": "4a51b6638e4a17c508e8c6ef8d138b7ac5a84749"
+      "machineProofReceiptBlobSha": "4a51b6638e4a17c508e8c6ef8d138b7ac5a84749",
+      "actionSurfaceRemediation": {
+        "status": "SOURCE_FIXED_PENDING_CONTRACT",
+        "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_ACTION_SURFACES_20260930.json",
+        "visualRejectionReceiptBlobSha": "7ea64853d5134ceed91eb16771b0c5d9fec8be5a",
+        "executionLockBlobSha": "d3920f20d1026dfb7c653e48d301f556358cb4c7",
+        "compositionLockBlobSha": "e7ebaa36860cd7e5b2218d8314b864b54d257aab",
+        "findingLedgerBlobSha": "5806ce6c7a36e984d1c2e96a99bafdd259a998cb",
+        "sourceBlobs": {
+          "orbit360-platform/modules/cobros.js": "3ef70a2e3cbbd62ab245788096cbc41e02aa733f",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
+        },
+        "priorPreviewRejected": true,
+        "priorMachineProofInvalidatedBySourceChange": true,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false
+      },
+      "governanceRepair": {
+        "failedGuardRunId": 36730801627,
+        "failedGuardJobId": 109939568171,
+        "failureCode": "I6_5_B3_LOCK_DRIFT",
+        "cause": "CONTROL_PLANE still pointed to the pre-remediation B3 execution-lock blob after the atomic B3-004 R3 source/governance commit.",
+        "fix": "Bind CONTROL_PLANE to the current B3 execution-lock blob and reuse the already-supported B3_004_SURFACE_CONTRACT cursor.",
+        "productSourceChanged": false,
+        "dataMutation": false,
+        "livePromotion": false
+      }
     }
   },
   "canonicalAccumulationControl": {
