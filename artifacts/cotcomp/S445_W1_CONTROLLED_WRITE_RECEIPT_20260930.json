@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "ays-cotcomp-s445-w1-observed-state-v1.0",
+  "capturedAt": "2026-09-30",
+  "runId": 36783783932,
+  "source": {
+    "branch": "ays/cotcomp-w1-s445-lab-20260930",
+    "sha": "fa55f4ce6185656bf00600e8dd41b44b3d13a370",
+    "tree": "fc8d136e559eea787d139a9fb0f4c4e4bd58f556",
+    "sourceArtifactId": "11129200783",
+    "sourceArtifactUploadDigest": "sha256:557156f6dce2c58f5dd5584a021fcdf70e868b19671ac1bb89ac69a11b0b4c68",
+    "sourceTarDigest": "sha256:3bc6d17d137f99c58542846ec754ff6d237601ca6cd4c355bad7debd97e3f745",
+    "backendSourceDigest": "sha256:9eb7b1a4f9389bb00c0d0446fd4987404bb53b7a1a4eceb17b44358275194fcb"
+  },
+  "proofArtifact": {
+    "id": "11128643714",
+    "uploadDigest": "sha256:177aff0b3d906e7b39a44506929ad5ccf88b8dc24825d1d8390c9d267f308130"
+  },
+  "qa": {
+    "tests": 307,
+    "passed": 307,
+    "failed": 0
+  },
+  "deployment": {
+    "deployCliExitCode": 1,
+    "functionObservedActive": true,
+    "region": "us-central1",
+    "platform": "gcfv2",
+    "runtime": "nodejs22",
+    "isolatedProofFunctionRemoved": true
+  },
+  "proof": {
+    "proofRunId": "s445-36783783932",
+    "firstReadbackExact": true,
+    "samePayloadRetryPass": true,
+    "samePayloadRetryWrites": 0,
+    "duplicateCreatedOnRetry": false,
+    "conflictingPayloadDenied": true,
+    "conflictWrites": 0,
+    "caseAccessRawTokenPersisted": false,
+    "cleanupDeleted": 4,
+    "finalAbsence": true,
+    "independentFinalAbsence": true,
+    "independentFinalAbsenceWrites": 0
+  },
+  "writeAccounting": {
+    "createWrites": 4,
+    "retryWrites": 0,
+    "conflictWrites": 0,
+    "deleteWrites": 4,
+    "totalAppDataMutations": 8,
+    "netPersistentDocuments": 0
+  },
+  "boundaries": {
+    "workflowProjection": false,
+    "providerNotifications": false,
+    "proposalPersistence": false,
+    "selectionPersistence": false,
+    "realDataUsed": false,
+    "productionTouched": false
+  },
+  "releaseTruth": {
+    "w1SyntheticCoreProofPass": true,
+    "syntheticPersistencePhysicallyProven": true,
+    "generalPersistenceReleased": false,
+    "workflowProjectionReleased": false,
+    "proposalPersistenceReleased": false,
+    "selectionPersistenceReleased": false,
+    "realDataReleased": false,
+    "productionReleased": false
+  }
+}
