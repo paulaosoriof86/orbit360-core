@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+  "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-003",
     "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
+    "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
     "blocking": true,
     "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
     "requiredProof": [
@@ -31,7 +31,14 @@
     "allowedProductFiles": [
       "orbit360-platform/core/queries.js",
       "orbit360-platform/modules/cobros.js"
-    ]
+    ],
+    "causalFix": {
+      "queriesBlobSha": "7ba5f363a5143236179777a1a30d763142e8e7a8",
+      "cobrosBlobSha": "4c893396d12ac5ff20d9a1ccc1b5b31abdf5fb65",
+      "crossCurrencyConversionIntroduced": false,
+      "agingCountryFiltered": true,
+      "inicioChanged": false
+    }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -43,7 +50,6 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_CAUSAL_SOURCE_FIX",
     "B3_003_EXACT_PREVIEW_KPI_AGING_PROOF",
     "B3_003_TARGETED_VISUAL_PASS"
   ],
@@ -73,7 +79,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
@@ -144,7 +150,7 @@
     },
     "shellOwnerVisualMatch": true
   },
-  "boundaryNote": "B3-003 cause confirmed from read-only Firestore + source. Product mutation authorized only for queries.js and cobros.js; no Inicio changes in this gate.",
+  "boundaryNote": "B3-003 causal source fix frozen. Only immutable build, isolated Preview, exact readback and read-only proof are authorized.",
   "priorFinding": {
     "id": "B3-002",
     "status": "CLOSED_PASS",
