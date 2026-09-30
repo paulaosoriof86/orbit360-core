@@ -1,0 +1,25 @@
+name: cotcomp-workflow-s419-source-qa
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-workflow-schema-s419-20260929
+
+permissions:
+  contents: read
+
+jobs:
+  source-only-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check owner source
+        working-directory: functions
+        run: node --check ops-leads-domain.js
+      - name: Run isolated CotComp owner patch tests
+        working-directory: functions
+        run: node --test cotcomp-workflow-owner-patch.test.js
