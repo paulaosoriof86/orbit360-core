@@ -312,7 +312,7 @@ Orbit.modules.cobros = (function () {
         ${agingCurrencyBlocks(aging, agingCols)}
       </div>
 
-      <div class="card" style="overflow:hidden">
+      <div class="card" style="overflow:visible">
         ${K.filterBar(FDEFS(), st)}
         ${stateFilterMenu()}
         <div style="overflow-x:auto"><table class="tbl">

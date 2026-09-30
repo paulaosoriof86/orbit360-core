@@ -5,7 +5,7 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-product-operational-write-20260928.4-soft-delete-get-projection';
+  var VERSION='fase-a-i2-product-operational-write-20260930.5-r8-receipt-scope-owner';
   var GENERAL_COMMAND='orbit360ProductOperationalCommand';
   var WORKFLOW_COMMAND='orbit360OpsLeadsCommand';
   var WORKFLOW_PREVIEW_COMMAND='orbit360OpsLeadsCommandPreview';
@@ -19,8 +19,8 @@
     aseguradoras:'aseguradoras',
     polizas:'polizas',
     vehiculos:'polizas',
-    recibosEsperados:'polizas',
-    carteraPrimas:'polizas',
+    recibosEsperados:'cobros',
+    carteraPrimas:'cobros',
     cobros:'cobros',
     negocios:'leads',
     gestiones:'ops',

@@ -9,7 +9,7 @@ const { resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'gravicentra-product-operational-domain-v5-r102-asset-resolver';
+const VERSION = 'gravicentra-product-operational-domain-v6-r8-receipt-scope-owner';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -19,8 +19,8 @@ const COLLECTION_MODULE = Object.freeze({
   aseguradoras: 'aseguradoras',
   polizas: 'polizas',
   vehiculos: 'polizas',
-  recibosEsperados: 'polizas',
-  carteraPrimas: 'polizas',
+  recibosEsperados: 'cobros',
+  carteraPrimas: 'cobros',
   cobros: 'cobros',
   reclamos: 'siniestros',
   cancelaciones: 'cancelaciones',

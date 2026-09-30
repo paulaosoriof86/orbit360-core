@@ -245,7 +245,7 @@ Orbit.modules = Orbit.modules || {};
     return {current:base.filter(r=>receiptPlanDenominator(r)==null),replaced:history,review:base.filter(r=>receiptPlanDenominator(r)!=null),authority:'AMBIGUOUS_FAIL_CLOSED',expected:null};
   }
   function receiptSchedule(policyId) {
-    const policy=S().get('polizas',policyId)||{},all=(S().all('recibosEsperados') || []).filter(r=>r.polizaId===policyId),projection=receiptCalendarProjection(policy,all),rows=projection.current;
+    const policy=S().get('polizas',policyId)||{},all=(S().all('recibosEsperados') || []).filter(r=>r.polizaId===policyId),projection=activePolicy(policy)?receiptCalendarProjection(policy,all):{current:[],replaced:all,review:[],authority:'POLICY_INACTIVE',expected:0},rows=projection.current;
     const sum=key=>{const vals=rows.map(r=>numberOrNull(r[key])).filter(v=>v!=null);return vals.length?vals.reduce((a,b)=>a+b,0):null;};
     return {rows,historicalRows:projection.replaced,reviewRows:projection.review,calendarAuthority:projection.authority,net:sum('primaNeta'),expedition:sum('gastosExpedicion'),finance:sum('gastosFinanciamiento'),sourceAdjustment:sum('descuento'),iva:sum('impuestosIVA'),total:sum('primaTotal')};
   }

@@ -12,6 +12,7 @@ function confirmed(){
   }catch(e){return false;}
 }
 function policy(r){return S().get('polizas',r&&r.polizaId)||{};}
+function activePolicyRow(r){var p=policy(r),s=clean(p&&p.estado).toLowerCase();return !!(p&&p.id&&(s==='vigente'||s==='por renovar'));}
 function client(r){var p=policy(r||{});return S().get('clientes',(r&&r.clienteId)||p.clienteId)||{};}
 function countryOk(r){var c=client(r),p=Orbit.pais;return !p||p==='TODOS'||c.pais===p||(r&&r.pais===p);}
 function accessOk(col,r){try{return !Orbit.access||!Orbit.access.canView||Orbit.access.canView(col,r,'cobros');}catch(e){return true;}}
@@ -27,7 +28,7 @@ function searchText(r,idx){
 function matches(r,q,idx){q=clean(q).toLowerCase();return !q||searchText(r,idx).indexOf(q)>=0;}
 function portfolioRows(q){
   var due=rp().dueDate||function(x){return x.fechaLimite||x.vence||x.fechaVencimiento;},idx=searchIndex();
-  return (S().all('carteraPrimas')||[]).filter(function(r){return r&&r.carteraActiva!==false&&countryOk(r)&&accessOk('carteraPrimas',r)&&matches(r,q,idx);})
+  return (S().all('carteraPrimas')||[]).filter(function(r){return r&&r.carteraActiva!==false&&activePolicyRow(r)&&countryOk(r)&&accessOk('carteraPrimas',r)&&matches(r,q,idx);})
     .sort(function(a,b){return clean(due(a)).localeCompare(clean(due(b)));});
 }
 function cobroRows(q){

@@ -14,6 +14,8 @@
     clientes: 'cliente360',
     polizas: 'polizas',
     vehiculos: 'polizas',
+    recibosEsperados: 'cobros',
+    carteraPrimas: 'cobros',
     cobros: 'cobros',
     gestiones: 'ops',
     negocios: 'leads',
@@ -53,7 +55,8 @@
       c.conciliado === true ||
       c.reportado === true ||
       c.validadoReporte === true ||
-      text(c.fechaPago || c.fechaPagoReal || c.paymentDate || c.referenciaPago || c.factura || c.documentRef)
+      /^PAID_/i.test(text(c.paymentState)) ||
+      text(c.cobroId || c.fechaPago || c.paidDate || c.fechaPagoReal || c.paymentDate || c.referenciaPago || c.factura || c.documentRef || c.paymentSupportDocumentRef || c.invoiceDocumentRef)
     ));
   }
 
@@ -96,6 +99,11 @@
       out.push('El recibo tiene evidencia de pago, reporte o conciliación y no puede ocultarse como si nunca hubiera existido.');
     }
 
+    if (collection === 'recibosEsperados') {
+      const linkedPaid = activeRows('cobros').filter(x => text(x.reciboId || x.receiptId) === id && paymentEvidence(x)).length;
+      if (paymentEvidence(row) || linkedPaid) out.push('El recibo tiene evidencia de pago, reporte o conciliación y debe conservarse como histórico.');
+    }
+
     if (collection === 'negocios' && (text(row.clienteIdCreado) || ['emitido','ganado'].includes(norm(row.etapa)))) {
       out.push('El negocio ya produjo un cliente/emisión. Debe conservarse como trazabilidad del ciclo comercial.');
     }
@@ -134,6 +142,12 @@
       return [
         ...activeRows('cobros').filter(x => text(x.polizaId) === id && !paymentEvidence(x)).map(x => ({ collection: 'cobros', id: x.id })),
         ...activeRows('vehiculos').filter(x => text(x.polizaId) === id).map(x => ({ collection: 'vehiculos', id: x.id }))
+      ];
+    }
+    if (collection === 'recibosEsperados') {
+      return [
+        ...activeRows('carteraPrimas').filter(x => text(x.reciboId || x.receiptId) === id).map(x => ({ collection: 'carteraPrimas', id: x.id })),
+        ...activeRows('cobros').filter(x => text(x.reciboId || x.receiptId) === id && !paymentEvidence(x)).map(x => ({ collection: 'cobros', id: x.id }))
       ];
     }
     return [];
