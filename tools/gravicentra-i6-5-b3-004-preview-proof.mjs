@@ -65,10 +65,10 @@ async function main(){
 
   const suffix=crypto.createHash('sha256').update(runId).digest('hex').slice(0,10);
   const ids={
-    client:'__b3004qa_client_'+suffix,
-    policy:'__b3004qa_policy_'+suffix,
-    receipt:'__b3004qa_receipt_'+suffix,
-    portfolio:'__b3004qa_portfolio_'+suffix
+    client:'b3004qa_client_'+suffix,
+    policy:'b3004qa_policy_'+suffix,
+    receipt:'b3004qa_receipt_'+suffix,
+    portfolio:'b3004qa_portfolio_'+suffix
   };
   const dataRoot=db.collection('tenants').doc(tenantId).collection('data');
   const refs={
