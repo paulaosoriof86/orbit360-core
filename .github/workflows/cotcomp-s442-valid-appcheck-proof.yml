@@ -190,23 +190,69 @@ jobs:
 
             for(const candidate of candidates){
               const candidateOauth=await accessToken(candidate.sa);
-              const response=await jsonFetch(createUrl,{
-                method:'POST',
-                headers:{
-                  authorization:'Bearer '+candidateOauth,
-                  'content-type':'application/json'
-                },
-                body:JSON.stringify({
-                  displayName:'CotComp S4.42 CI synthetic proof 2026-09-30',
-                  token:debugSecret
-                })
-              });
+
+              async function createDebugToken(){
+                return jsonFetch(createUrl,{
+                  method:'POST',
+                  headers:{
+                    authorization:'Bearer '+candidateOauth,
+                    'content-type':'application/json'
+                  },
+                  body:JSON.stringify({
+                    displayName:'CotComp S4.42 CI synthetic proof 2026-09-30',
+                    token:debugSecret
+                  })
+                });
+              }
+
+              let response=await createDebugToken();
+              let errorReason=response.json&&response.json.error&&response.json.error.details&&
+                response.json.error.details[0]&&response.json.error.details[0].reason||null;
+
+              if(!response.ok && errorReason==='SERVICE_DISABLED'){
+                const enableUrl='https://serviceusage.googleapis.com/v1/projects/'+
+                  process.env.COTCOMP_PROJECT_NUMBER+
+                  '/services/firebaseappcheck.googleapis.com:enable';
+                const enabled=await jsonFetch(enableUrl,{
+                  method:'POST',
+                  headers:{
+                    authorization:'Bearer '+candidateOauth,
+                    'content-type':'application/json'
+                  },
+                  body:'{}'
+                });
+                attempts.push({
+                  credential:candidate.label,
+                  action:'ENABLE_FIREBASE_APPCHECK_API',
+                  status:enabled.status,
+                  errorStatus:enabled.json&&enabled.json.error&&enabled.json.error.status||null
+                });
+
+                if(enabled.ok){
+                  const operationName=enabled.json&&enabled.json.name;
+                  if(operationName){
+                    for(let i=0;i<30;i++){
+                      const op=await jsonFetch('https://serviceusage.googleapis.com/v1/'+operationName,{
+                        headers:{authorization:'Bearer '+candidateOauth}
+                      });
+                      if(op.ok && op.json&&op.json.done===true) break;
+                      await new Promise(resolve=>setTimeout(resolve,2000));
+                    }
+                  }else{
+                    await new Promise(resolve=>setTimeout(resolve,5000));
+                  }
+                  response=await createDebugToken();
+                  errorReason=response.json&&response.json.error&&response.json.error.details&&
+                    response.json.error.details[0]&&response.json.error.details[0].reason||null;
+                }
+              }
+
               attempts.push({
                 credential:candidate.label,
+                action:'CREATE_APPCHECK_DEBUG_TOKEN',
                 status:response.status,
                 errorStatus:response.json&&response.json.error&&response.json.error.status||null,
-                errorReason:response.json&&response.json.error&&response.json.error.details&&
-                  response.json.error.details[0]&&response.json.error.details[0].reason||null
+                errorReason
               });
               if(response.ok){
                 selected=candidate;
