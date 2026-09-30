@@ -50,5 +50,13 @@
     "iamMutationExecuted": false,
     "firebaseConfigMutationExecuted": false,
     "productionTouched": false
+  },
+  "blockers": [
+    "DEPLOYED_OWNER_BLOB_MISMATCH",
+    "COTCOMP_REF_NOT_DEPLOYED"
+  ],
+  "runtimeVerification": {
+    "workflowOwnerRuntimeVerified": false,
+    "sourceArchiveReadSuccessful": true
   }
 }
