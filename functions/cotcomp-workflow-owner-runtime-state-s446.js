@@ -29,7 +29,7 @@ const OBSERVED=Object.freeze({
     runtime:'nodejs22',
     updateTime:'2026-08-05T12:21:30.389035236Z'
   }),
-  blockers:Object.freeze(['DEPLOYED_OWNER_BLOB_MISMATCH']),
+  blockers:Object.freeze(['DEPLOYED_OWNER_BLOB_MISMATCH','COTCOMP_REF_NOT_DEPLOYED']),
   appDataReadsExecuted:0,
   appDataWritesExecuted:0,
   deployExecuted:false,
