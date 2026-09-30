@@ -99,6 +99,7 @@ on:
       - 'tools/gravicentra-i6-5-b3-003-kpi-aging-readonly.mjs'
       - 'tools/gravicentra-i6-5-b3-003-preview-proof.mjs'
       - 'tools/gravicentra-i6-5-b3-003-contract.mjs'
+      - 'tools/gravicentra-i6-5-b3-004-preview-proof.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json'
       - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
 
@@ -6764,12 +6765,22 @@ jobs:
           )
           node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config-b3-004.json"
           echo "PUBLIC_CONFIG_FILE=$RUNNER_TEMP/public-config-b3-004.json" >> "$GITHUB_ENV"
-      - name: Deploy B3-004 Preview-only payment backend
+      - name: Deploy or reuse exact B3-004 Preview-only payment backend
         if: steps.gate.outputs.run == 'true'
         run: |
           set -euo pipefail
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommandPreview --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-function-deploy.json"
-          cat "$RUNNER_TEMP/b3-004-function-deploy.json"
+          EXPECTED=$(node -e "const x=require('./artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json');process.stdout.write(x.productFileBlobs['functions/cobros-reconciliation-domain.js']||'')")
+          ACTUAL=$(git hash-object functions/cobros-reconciliation-domain.js)
+          test -n "$EXPECTED"
+          test "$ACTUAL" = "$EXPECTED"
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-functions-before.json" || true
+          if grep -q "orbit360CobrosReconciliationCommandPreview" "$RUNNER_TEMP/b3-004-functions-before.json"; then
+            echo '{"status":"reused","reason":"exact_product_blob_unchanged"}' > "$RUNNER_TEMP/b3-004-function-deploy.json"
+            echo "B3_004_PREVIEW_BACKEND_REUSE=PASS"
+          else
+            node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommandPreview --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-function-deploy.json"
+            cat "$RUNNER_TEMP/b3-004-function-deploy.json"
+          fi
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-functions.json"
           grep -q "orbit360CobrosReconciliationCommandPreview" "$RUNNER_TEMP/b3-004-functions.json"
           echo "B3_004_PREVIEW_BACKEND=PASS"
