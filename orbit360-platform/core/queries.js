@@ -175,6 +175,71 @@ Orbit.q = (function () {
     const venc = car.filter(portfolioIsOverdue).reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
     return { alDia, pend, venc, moneda: monedaPais(), source: 'cobros+carteraPrimas' };
   }
+  function currencyCodeFor(row, clients, policies) {
+    row = row || {};
+    const policy = row.polizaId != null ? (policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId)) : null;
+    const clientId = row.clienteId != null ? row.clienteId : (policy && policy.clienteId);
+    const client = clientId != null ? (clients instanceof Map ? clients.get(clientId) : S().get('clientes', clientId)) : null;
+    return String(row.moneda || (policy && policy.moneda) || (client && client.moneda) || '').trim().toUpperCase() || 'SIN_MONEDA';
+  }
+  function emptyPortfolioCurrency() { return { alDia: 0, pend: 0, venc: 0, porConciliar: 0 }; }
+  function carteraGlobalPorMoneda() {
+    const clients = clientIndex();
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
+    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));
+    const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));
+    const byCurrency = {};
+    const ensure = cur => byCurrency[cur] || (byCurrency[cur] = emptyPortfolioCurrency());
+    cob.filter(confirmedCobro).forEach(c => {
+      const cur = currencyCodeFor(c, clients, policies);
+      ensure(cur).alDia += amount(c.monto);
+      if (!c.conciliado) ensure(cur).porConciliar += 1;
+    });
+    car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).forEach(r => {
+      const cur = currencyCodeFor(r, clients, policies);
+      ensure(cur).pend += amount(r.monto != null ? r.monto : r.saldo);
+    });
+    car.filter(portfolioIsOverdue).forEach(r => {
+      const cur = currencyCodeFor(r, clients, policies);
+      ensure(cur).venc += amount(r.monto != null ? r.monto : r.saldo);
+    });
+    return {
+      byCurrency,
+      currencies: Object.keys(byCurrency).sort(),
+      country: paisActivo() || 'TODOS',
+      source: 'cobros+carteraPrimas',
+      crossCurrencyConversion: false,
+      fxAuthorityUsed: false
+    };
+  }
+  function agingVencidoPorMoneda() {
+    const clients = clientIndex();
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
+    const byCurrency = {};
+    const ensure = cur => byCurrency[cur] || (byCurrency[cur] = { '1-30': 0, '31-60': 0, '61-90': 0, '90+': 0 });
+    (S().all('carteraPrimas') || [])
+      .filter(r => policyLinkedRowPais(r, clients, policies))
+      .filter(portfolioIsOverdue)
+      .forEach(r => {
+        const due = portfolioDue(r);
+        const d = -U.daysFromNow(due);
+        const cur = currencyCodeFor(r, clients, policies);
+        const v = amount(r.monto != null ? r.monto : r.saldo);
+        const buckets = ensure(cur);
+        if (d <= 30) buckets['1-30'] += v;
+        else if (d <= 60) buckets['31-60'] += v;
+        else if (d <= 90) buckets['61-90'] += v;
+        else buckets['90+'] += v;
+      });
+    return {
+      byCurrency,
+      currencies: Object.keys(byCurrency).sort(),
+      country: paisActivo() || 'TODOS',
+      source: 'carteraPrimas',
+      crossCurrencyConversion: false,
+      fxAuthorityUsed: false
+    };
+  }
   function primaVigenteGlobal() {
     const clients = clientIndex();
     return S().where('polizas', p => (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients))
@@ -241,7 +306,7 @@ Orbit.q = (function () {
 
   return {
     asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
-    clienteResumen, clientesResumenIndex, carteraGlobal, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
-    agingVencido, comisionesPor, clienteNombre, norm, monedaPais, vehiculosDe, vehiculoDePoliza, postRecaudo
+    clienteResumen, clientesResumenIndex, carteraGlobal, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
+    agingVencido, agingVencidoPorMoneda, comisionesPor, clienteNombre, norm, monedaPais, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();
