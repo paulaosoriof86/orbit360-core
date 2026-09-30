@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_002_CANDIDATE_PENDING_PREVIEW",
+  "status": "B3_002_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-002",
     "title": "Cobros search/performance/hydration must be fast and non-blocking.",
-    "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
+    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "blocking": true,
     "humanEvidence": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
     "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN",
@@ -48,6 +48,112 @@
       "shellPreserved": true,
       "secondRendererCreated": false,
       "financialSemanticsChanged": false
+    },
+    "candidatePerformance": {
+      "inSessionCold": {
+        "shellMs": 25.10000000000582,
+        "kpisMs": 8064.899999999994,
+        "agingMs": 8064.899999999994,
+        "tableMs": 8064.899999999994,
+        "usableMs": 8064.899999999994,
+        "completeMs": 8143.5,
+        "renderCount": 6,
+        "totalRenderMs": 393,
+        "maxRenderMs": 391,
+        "longTaskCount": 18,
+        "longTaskTotalMs": 4836,
+        "finalRows": 60,
+        "reportedRows": 55,
+        "storeEventCount": 15,
+        "storeEventsByCollection": {
+          "clientes": 1,
+          "polizas": 1,
+          "cobros": 1,
+          "aseguradoras": 1,
+          "vehiculos": 1,
+          "recibosEsperados": 1,
+          "carteraPrimas": 1,
+          "asesores": 1,
+          "metas": 1,
+          "gestiones": 1,
+          "auditoria": 1,
+          "negocios": 1,
+          "reclamos": 1,
+          "comisiones": 1,
+          "cancelaciones": 1
+        }
+      },
+      "directCold": {
+        "shellMs": 877.2000000000116,
+        "kpisMs": 8636.300000000017,
+        "agingMs": 8636.300000000017,
+        "tableMs": 8636.300000000017,
+        "usableMs": 8636.300000000017,
+        "completeMs": 8739,
+        "renderCount": 6,
+        "totalRenderMs": 368,
+        "maxRenderMs": 366,
+        "longTaskCount": 17,
+        "longTaskTotalMs": 3702,
+        "finalRows": 60,
+        "reportedRows": 55,
+        "storeEventCount": 16,
+        "storeEventsByCollection": {
+          "cobros": 2,
+          "clientes": 1,
+          "polizas": 1,
+          "aseguradoras": 1,
+          "vehiculos": 1,
+          "recibosEsperados": 1,
+          "carteraPrimas": 1,
+          "asesores": 1,
+          "metas": 1,
+          "negocios": 1,
+          "gestiones": 1,
+          "reclamos": 1,
+          "comisiones": 1,
+          "cancelaciones": 1,
+          "auditoria": 1
+        }
+      },
+      "warm": {
+        "shellMs": 380.6000000000058,
+        "kpisMs": 380.6000000000058,
+        "agingMs": 380.6000000000058,
+        "tableMs": 380.6000000000058,
+        "usableMs": 380.6000000000058,
+        "completeMs": 906,
+        "renderCount": 1,
+        "totalRenderMs": 372,
+        "maxRenderMs": 372,
+        "longTaskCount": 2,
+        "longTaskTotalMs": 650,
+        "finalRows": 60,
+        "reportedRows": 55,
+        "storeEventCount": 0,
+        "storeEventsByCollection": {}
+      },
+      "search": {
+        "available": true,
+        "keyEvents": 4,
+        "renderCount": 0,
+        "totalRenderMs": 0,
+        "maxRenderMs": 0
+      }
+    },
+    "candidateRootCauseResult": {
+      "status": "MEASURED_DIAGNOSTIC_COMPLETE",
+      "facts": {
+        "renderBurstDuringHydration": true,
+        "fullDomHundredsOfRows": false,
+        "searchRendersPerKeystroke": false,
+        "perRowVehicleFullScan": false,
+        "duplicateReactiveOwners": false,
+        "routePrimaryCobros": true,
+        "coldVsWarmRatio": 21.19
+      },
+      "rootCause": "MEASURED_FACTS_REQUIRE_REVIEW_BEFORE_PRODUCT_FIX",
+      "productFixAuthorizedByDiagnostic": false
     }
   },
   "canonicalComposition": {
@@ -60,7 +166,6 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_002_EXACT_PREVIEW_TIMING_PASS",
     "B3_002_TARGETED_VISUAL_PERFORMANCE_PASS"
   ],
   "preservedB3CarryForward": [
@@ -130,15 +235,16 @@
     "productRegressionDemonstrated": false
   },
   "preview": {
-    "sourceSha": "085aaa3c88807e043001c755f7e4c4080b8cfe43",
-    "buildId": "gi-i65-b3-085aaa3c8880-57f234755dc1",
-    "channelId": "gi-i65-b3-36647950059",
-    "url": "https://ays-orbit-360-lab--gi-i65-b3-36647950059-sdvtx3v3.web.app",
-    "runId": 36647950059,
-    "artifactId": 11069906298,
-    "artifactDigest": "8e94f30977d1395dcebad05fa50df85925d79fa09021e3a7aa0b660cc9474224",
+    "sourceSha": "af4e716464fc964894cb4e16d2c3f5a66b618022",
+    "buildId": "gi-i65-b3-af4e716464fc-57f234755dc1",
+    "channelId": "gi-i65-b3-36652377361",
+    "url": "https://ays-orbit-360-lab--gi-i65-b3-36652377361-i66sagm4.web.app",
+    "runId": 36652377361,
+    "artifactId": 11070539732,
+    "artifactDigest": "fe342bbff3313a54b92feccf6a73f55cef6568de46ee27081b31ec0a3bc04ac5",
     "exactReadback": true,
     "contractPass": true,
+    "timingPass": true,
     "livePromoted": false
   },
   "b3001TargetedVisual": {
