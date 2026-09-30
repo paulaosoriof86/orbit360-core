@@ -32,14 +32,16 @@ function deriveIds({caseId,correlationId}={}){
   });
 }
 
-function buildCotcompRef(input={}){
-  return Object.freeze({
+function buildCotcompRef(input={},role){
+  const ref=workflow.cotcompRef({
     caseId:clean(input.caseId,180),
-    journeyId:clean(input.journeyId,160),
-    proposalId:clean(input.proposalId,180),
-    selectionId:clean(input.selectionId,180),
-    correlationId:clean(input.correlationId,180)
-  });
+    journeyId:clean(input.journeyId,180),
+    correlationId:clean(input.correlationId,180),
+    quoteCasePath:clean(input.quoteCasePath,500),
+    selectedProposalId:clean(input.selectedProposalId||input.proposalId,180),
+    intakeStatus:clean(input.intakeStatus||'lead_recibido',100)
+  },role);
+  return ref.ok ? Object.freeze(ref.value) : null;
 }
 
 function buildSyntheticProjection(input={}){
@@ -55,7 +57,9 @@ function buildSyntheticProjection(input={}){
   if(input.production===true) reasons.push('PRODUCTION_FORBIDDEN');
 
   const ids=deriveIds(input);
-  const cotcompRef=buildCotcompRef(input);
+  const businessCotcompRef=buildCotcompRef(input,'LEAD_PROJECTION');
+  const managementCotcompRef=buildCotcompRef(input,'OPS_QUOTATION_PROJECTION');
+  if(!businessCotcompRef||!managementCotcompRef) reasons.push('COTCOMP_REF_INVALID');
 
   const businessPayload={
     id:ids.businessId,
@@ -68,7 +72,7 @@ function buildSyntheticProjection(input={}){
     ramo:clean(input.line||'SYNTHETIC',120),
     prioridad:'Media',
     descripcion:'Synthetic W2 workflow-projection proof only',
-    cotcompRef
+    cotcompRef:businessCotcompRef
   };
 
   const managementPayload={
@@ -81,7 +85,7 @@ function buildSyntheticProjection(input={}){
     prioridad:'Media',
     origen:'CotComp',
     nota:'Synthetic W2 workflow-projection proof only',
-    cotcompRef
+    cotcompRef:managementCotcompRef
   };
 
   return Object.freeze({
@@ -90,7 +94,7 @@ function buildSyntheticProjection(input={}){
     reasons,
     target:TARGET,
     ids,
-    cotcompRef,
+    cotcompRefs:Object.freeze({business:businessCotcompRef,management:managementCotcompRef}),
     commands:Object.freeze([
       Object.freeze({
         operation:'create_business',
