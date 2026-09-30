@@ -857,7 +857,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-      "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
+      "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
@@ -871,7 +871,7 @@
       ],
       "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "nextAction": "B3_003_COUNTRY_SCOPE_CAUSAL_FIX",
+      "nextAction": "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json",
       "diagnosticRunId": 36658190622,
       "diagnosticArtifactId": 11073202655,
@@ -882,20 +882,21 @@
       ],
       "causalFix": {
         "owners": [
-          "orbit360-platform/core/queries.js",
-          "orbit360-platform/modules/cobros.js"
+          "orbit360-platform/modules/cobros.js",
+          "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
         ],
         "blobs": {
-          "orbit360-platform/core/queries.js": "7ba5f363a5143236179777a1a30d763142e8e7a8",
-          "orbit360-platform/modules/cobros.js": "4c893396d12ac5ff20d9a1ccc1b5b31abdf5fb65"
+          "orbit360-platform/modules/cobros.js": "668b6133ae4e52c8f26e8c884a2fc0396a1a3ac0",
+          "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "d1bd8c883db39b946b3833bd1684a0a8fe4843b3"
         },
+        "proofBlobSha": "144bed375204947c283e3205d7a3bcda23613495",
         "semantics": [
-          "currency-separated portfolio KPIs",
-          "aging filtered by active country",
-          "no implicit FX conversion",
-          "reported payment evidence remains excluded from confirmed cobro KPI"
-        ],
-        "inicioChanged": false
+          "rendered cobro rows enforce active country",
+          "reported-payment rows enforce active country",
+          "Cobros KPI owner is modules/cobros.js only",
+          "no async policy-receipts KPI overwrite",
+          "real selector proof waits for async settle"
+        ]
       },
       "previewSourceSha": "41aacc71b343574338ed25efbc6902fb25b13677",
       "previewBuildId": "gi-i65-b3-41aacc71b343-57f234755dc1",
@@ -4494,7 +4495,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_003_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+    "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
     "activeFindingId": "B3-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
