@@ -1,0 +1,318 @@
+name: CotComp S4.49 runtime workflow-config readback
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s449-runtime-config-readback-20260930
+    paths:
+      - '.github/cotcomp-lab-intents/s449-runtime-config-readonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  COTCOMP_TENANT_ID: alianzas-soluciones
+  EXPECTED_OWNER_BLOB: 73e09a4404cb4298dc34c9c38e26ad1f960d3170
+
+jobs:
+  s449-runtime-config-readback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.49 narrow read-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s449-runtime-config-readonly.json
+          jq -e '
+            .authorization == "S449_RUNTIME_WORKFLOW_CONFIG_READ_ONLY" and
+            .projectId == "ays-orbit-360-lab" and
+            .tenantId == "alianzas-soluciones" and
+            .configReadAttempts == 1 and
+            .appDataWrites == false and
+            .w2Executed == false and
+            .providerDelivery == false and
+            .deploy == false and
+            .iamWrites == false and
+            .firebaseConfigWrites == false and
+            .businessOrClientData == false and
+            .production == false
+          ' "$INTENT" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$INTENT")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$INTENT"
+
+      - name: Run accumulated CotComp QA plus S4.48 and S4.49 gates
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-provider-isolation-s448.js
+          node --check cotcomp-provider-isolation-s448.test.js
+          node --check cotcomp-w2-readiness-harness-s448.js
+          node --check cotcomp-w2-readiness-harness-s448.test.js
+          node --test cotcomp-provider-isolation-s448.test.js cotcomp-w2-readiness-harness-s448.test.js
+          node --check cotcomp-runtime-config-readback-s449.js
+          node --check cotcomp-runtime-config-readback-s449.test.js
+          node --test cotcomp-runtime-config-readback-s449.test.js
+
+      - name: Prepare exact LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s449/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s449/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: 'latest'
+
+      - name: Authenticate exact LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" >/dev/null
+          gcloud config set project "$COTCOMP_PROJECT_ID" >/dev/null
+          test "$(gcloud config get-value project 2>/dev/null)" = "$COTCOMP_PROJECT_ID"
+
+      - name: Re-read physical owner source
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/s449"
+          EVID="$ROOT/evidence"
+          DESC="$ROOT/orbit360OpsLeadsCommand.json"
+
+          gcloud functions describe orbit360OpsLeadsCommand \
+            --gen2 --region "$COTCOMP_REGION" --project "$COTCOMP_PROJECT_ID" --format=json > "$DESC"
+
+          BUCKET="$(jq -r '.buildConfig.source.storageSource.bucket // empty' "$DESC")"
+          OBJECT="$(jq -r '.buildConfig.source.storageSource.object // empty' "$DESC")"
+          GENERATION="$(jq -r '.buildConfig.source.storageSource.generation // empty' "$DESC")"
+          test -n "$BUCKET"
+          test -n "$OBJECT"
+
+          ARCHIVE="$ROOT/source-archive.bin"
+          URI="gs://$BUCKET/$OBJECT"
+          if [ -n "$GENERATION" ]; then URI="$URI#$GENERATION"; fi
+          if ! gcloud storage cp "$URI" "$ARCHIVE" >/dev/null 2>&1; then
+            gsutil cp "$URI" "$ARCHIVE" >/dev/null
+          fi
+
+          mkdir -p "$ROOT/source"
+          if unzip -q "$ARCHIVE" -d "$ROOT/source" 2>/dev/null; then
+            :
+          elif tar -xzf "$ARCHIVE" -C "$ROOT/source" 2>/dev/null; then
+            :
+          else
+            echo "S449_DEPLOYED_SOURCE_ARCHIVE_UNREADABLE" >&2
+            exit 1
+          fi
+
+          OWNER_FILE="$(find "$ROOT/source" -type f -name 'ops-leads-domain.js' -print -quit)"
+          test -n "$OWNER_FILE"
+          cp "$OWNER_FILE" "$ROOT/deployed-ops-leads-domain.js"
+          git hash-object "$OWNER_FILE" > "$EVID/deployed-owner-blob.txt"
+          sha256sum "$ARCHIVE" | awk '{print $1}' > "$EVID/source-archive-sha256.txt"
+
+          jq '{
+            name:.name,
+            state:.state,
+            environment:.environment,
+            updateTime:.updateTime,
+            runtime:(.buildConfig.runtime // null),
+            entryPoint:(.buildConfig.entryPoint // null),
+            revision:(.serviceConfig.revision // null)
+          }' "$DESC" > "$EVID/function-runtime-sanitized.json"
+
+          rm -rf "$ROOT/source" "$ARCHIVE" "$DESC"
+
+      - name: Read exactly one masked workflow-config document
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/s449"
+          EVID="$ROOT/evidence"
+          TOKEN="$(gcloud auth print-access-token)"
+          URL="https://firestore.googleapis.com/v1/projects/$COTCOMP_PROJECT_ID/databases/(default)/documents/tenants/$COTCOMP_TENANT_ID/config/workflow?mask.fieldPaths=storageMode&mask.fieldPaths=version"
+          HTTP="$(curl -sS -L -w '%{http_code}' -H "Authorization: Bearer $TOKEN" -o "$ROOT/config-response.json" "$URL" || true)"
+          printf '%s' "$HTTP" > "$EVID/config-http-status.txt"
+
+          if [ "$HTTP" = "200" ]; then
+            jq '{
+              name:(.name // null),
+              fields:{
+                storageMode:(.fields.storageMode // null),
+                version:(.fields.version // null)
+              },
+              createTime:(.createTime // null),
+              updateTime:(.updateTime // null)
+            }' "$ROOT/config-response.json" > "$EVID/workflow-config-sanitized.json"
+          elif [ "$HTTP" = "404" ]; then
+            printf '{"documentExists":false}' > "$EVID/workflow-config-sanitized.json"
+          else
+            jq '{error:{code:(.error.code // null),status:(.error.status // null)}}' "$ROOT/config-response.json" > "$EVID/workflow-config-sanitized.json" 2>/dev/null || printf '{}' > "$EVID/workflow-config-sanitized.json"
+          fi
+          rm -f "$ROOT/config-response.json"
+
+      - name: Build S4.49 receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const path=require('path');
+          const gate=require('./functions/cotcomp-runtime-config-readback-s449');
+          const root=path.join(process.env.RUNNER_TEMP,'s449');
+          const evid=path.join(root,'evidence');
+          const runtime=JSON.parse(fs.readFileSync(path.join(evid,'function-runtime-sanitized.json'),'utf8'));
+          const ownerSource=fs.readFileSync(path.join(root,'deployed-ops-leads-domain.js'),'utf8');
+          const deployedOwnerBlob=fs.readFileSync(path.join(evid,'deployed-owner-blob.txt'),'utf8').trim();
+          const httpStatus=Number(fs.readFileSync(path.join(evid,'config-http-status.txt'),'utf8').trim());
+          const configResponse=JSON.parse(fs.readFileSync(path.join(evid,'workflow-config-sanitized.json'),'utf8'));
+          const result=gate.evaluate({
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            tenantId:'alianzas-soluciones',
+            functionState:runtime.state,
+            deployedOwnerBlob,
+            ownerSource,
+            configHttpStatus:httpStatus,
+            configResponse,
+            configReadAttempts:1,
+            appDataWritesExecuted:0,
+            w2Executed:false,
+            providerDeliveryExecuted:false,
+            realDataTouched:false,
+            productionTouched:false,
+            deployExecuted:false,
+            iamWritesExecuted:0,
+            firebaseConfigWritesExecuted:0
+          });
+          const receipt={
+            schemaVersion:'ays-cotcomp-s449-runtime-config-readback-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            tenantId:'alianzas-soluciones',
+            primaryFunction:'orbit360OpsLeadsCommand',
+            runtime,
+            expectedOwnerBlob:gate.EXPECTED_OWNER_BLOB,
+            deployedOwnerBlob,
+            physicalOwnerExactMatch:deployedOwnerBlob===gate.EXPECTED_OWNER_BLOB,
+            sourceArchiveSha256:fs.readFileSync(path.join(evid,'source-archive-sha256.txt'),'utf8').trim(),
+            configRead:{
+              exactPath:'tenants/alianzas-soluciones/config/workflow',
+              fieldMask:['storageMode','version'],
+              attempts:1,
+              httpStatus,
+              documentExists:result.readback.documentExists,
+              rawStorageMode:result.readback.rawStorageMode || null,
+              configVersion:result.readback.configVersion || null,
+              effectiveStorageMode:result.effectiveStorageMode,
+              basis:result.readback.basis
+            },
+            runtimeStorageModeVerified:result.runtimeStorageModeVerified,
+            blockers:result.blockers,
+            priorClosedGate:{
+              s448ProviderDeliveryIsolationVerified:true,
+              checkpoint:'AYS_CHECKPOINT_CANONICO_COTCOMP_F8_G4_S448_2026-09-30.md'
+            },
+            w2:{
+              effectiveCallAllowed:false,
+              effectiveWriteAllowed:false,
+              executed:false,
+              remainingBlockers:result.remainingW2Blockers
+            },
+            boundaries:{
+              configDocumentReadAttempts:1,
+              applicationDataWritesExecuted:0,
+              businessOrClientDataTouched:false,
+              providerDeliveryExecuted:false,
+              realDataTouched:false,
+              productionTouched:false,
+              deployExecuted:false,
+              iamWritesExecuted:0,
+              firebaseConfigWritesExecuted:0
+            }
+          };
+          fs.writeFileSync(path.join(evid,'S449_RUNTIME_WORKFLOW_CONFIG_READBACK_RECEIPT.json'),JSON.stringify(receipt,null,2));
+          fs.rmSync(path.join(root,'deployed-ops-leads-domain.js'),{force:true});
+          console.log('S449_RUNTIME_STORAGE_MODE_VERIFIED='+String(receipt.runtimeStorageModeVerified));
+          console.log('S449_EFFECTIVE_STORAGE_MODE='+String(receipt.configRead.effectiveStorageMode));
+          console.log('S449_BLOCKERS='+receipt.blockers.join(','));
+          console.log('S449_W2_REMAINING_BLOCKERS='+receipt.w2.remainingBlockers.join(','));
+          NODE
+
+      - name: Upload sanitized S4.49 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s449-runtime-config-readback-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s449/evidence/function-runtime-sanitized.json
+            ${{ runner.temp }}/s449/evidence/deployed-owner-blob.txt
+            ${{ runner.temp }}/s449/evidence/source-archive-sha256.txt
+            ${{ runner.temp }}/s449/evidence/config-http-status.txt
+            ${{ runner.temp }}/s449/evidence/workflow-config-sanitized.json
+            ${{ runner.temp }}/s449/evidence/S449_RUNTIME_WORKFLOW_CONFIG_READBACK_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce S4.49 runtime-config gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          RECEIPT="$RUNNER_TEMP/s449/evidence/S449_RUNTIME_WORKFLOW_CONFIG_READBACK_RECEIPT.json"
+          jq -e '
+            .physicalOwnerExactMatch == true and
+            .runtimeStorageModeVerified == true and
+            (.configRead.effectiveStorageMode == "legacyCompatible" or .configRead.effectiveStorageMode == "canonicalV2") and
+            .boundaries.configDocumentReadAttempts == 1 and
+            .boundaries.applicationDataWritesExecuted == 0 and
+            .boundaries.businessOrClientDataTouched == false and
+            .boundaries.providerDeliveryExecuted == false and
+            .boundaries.productionTouched == false and
+            .boundaries.deployExecuted == false and
+            .w2.executed == false and
+            .w2.effectiveCallAllowed == false and
+            .w2.effectiveWriteAllowed == false and
+            .w2.remainingBlockers == ["OWNER_W2_AUTHORIZATION_REQUIRED"]
+          ' "$RECEIPT" >/dev/null
+
+      - name: Remove transient credentials
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/s449/firebase-service-account.json"
