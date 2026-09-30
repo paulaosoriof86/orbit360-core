@@ -1,0 +1,281 @@
+name: CotComp S4.40 LAB synthetic runtime proof
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-lab-runtime-s440-20260930
+    paths:
+      - '.github/cotcomp-lab-intents/s440-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: cotcomp-s440-lab-runtime-proof
+  cancel-in-progress: false
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_ENVIRONMENT: LAB
+  COTCOMP_REGION: us-central1
+  COTCOMP_OWNER_BLOB: 73e09a4404cb4298dc34c9c38e26ad1f960d3170
+  COTCOMP_FUNCTIONS: cotcompValidateDraft,cotcompSubmitHandoff,cotcompFetchComparableProposals,cotcompSelectProposal
+
+jobs:
+  deploy-readback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout authorized execution commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify authorization intent and immutable target
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s440-authorized.json
+          test -f "$INTENT"
+          jq -e '
+            .authorization == "APPLY_RUNTIME_EXPORT_AND_DEPLOY_LAB_SYNTHETIC_READBACK" and
+            .projectId == "ays-orbit-360-lab" and
+            .environment == "LAB" and
+            .persistence == false and
+            .writes == false and
+            .realData == false and
+            .production == false
+          ' "$INTENT" >/dev/null
+          test "$(git hash-object functions/ops-leads-domain.js)" = "$COTCOMP_OWNER_BLOB"
+          git diff --exit-code HEAD^ HEAD -- . ':!/.github/cotcomp-lab-intents/s440-authorized.json' || true
+
+      - name: Install function dependencies and execute source QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+
+      - name: Verify exact runtime export and no persistence imports
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const bootstrap=fs.readFileSync('functions/bootstrap.js','utf8');
+          const entry=fs.readFileSync('functions/cotcomp-runtime-entry-s438.js','utf8');
+          if(!bootstrap.includes("require('./cotcomp-runtime-entry-s438')")) throw new Error('RUNTIME_ENTRY_NOT_EXPORTED');
+          for(const name of ['cotcompValidateDraft','cotcompSubmitHandoff','cotcompFetchComparableProposals','cotcompSelectProposal']){
+            if(!entry.includes(name)) throw new Error('CALLABLE_MISSING:'+name);
+          }
+          for(const forbidden of ['firebase-admin','firestore','cotcomp-persistence','ops-leads-domain']){
+            if(entry.includes(forbidden)) throw new Error('FORBIDDEN_RUNTIME_DEP:'+forbidden);
+          }
+          if(!entry.includes('syntheticProof === true')) throw new Error('SYNTHETIC_GATE_REQUIRED');
+          NODE
+
+      - name: Create immutable source artifact and digests
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/cotcomp-evidence"
+          git archive --format=tar.gz -o "$RUNNER_TEMP/cotcomp-evidence/cotcomp-s440-source.tar.gz" HEAD functions firebase.json
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          SOURCE_TREE="$(git rev-parse HEAD^{tree})"
+          ARTIFACT_DIGEST="$(sha256sum "$RUNNER_TEMP/cotcomp-evidence/cotcomp-s440-source.tar.gz" | awk '{print $1}')"
+          BACKEND_DIGEST="$(
+            cat               functions/bootstrap.js               functions/cotcomp-runtime-entry-s438.js               functions/cotcomp-callable-source.js               functions/cotcomp-callable-handlers.js               functions/cotcomp-callable-policy.js               functions/cotcomp-gateway-harness.js |
+            sha256sum | awk '{print $1}'
+          )"
+          printf '%s' "$SOURCE_SHA" > "$RUNNER_TEMP/cotcomp-evidence/source-sha.txt"
+          printf '%s' "$SOURCE_TREE" > "$RUNNER_TEMP/cotcomp-evidence/source-tree.txt"
+          printf '%s' "$ARTIFACT_DIGEST" > "$RUNNER_TEMP/cotcomp-evidence/artifact-sha256.txt"
+          printf '%s' "$BACKEND_DIGEST" > "$RUNNER_TEMP/cotcomp-evidence/backend-source-sha256.txt"
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          echo "source_tree=$SOURCE_TREE" >> "$GITHUB_OUTPUT"
+          echo "artifact_digest=$ARTIFACT_DIGEST" >> "$GITHUB_OUTPUT"
+          echo "backend_digest=$BACKEND_DIGEST" >> "$GITHUB_OUTPUT"
+
+      - name: Upload immutable source artifact
+        id: source_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s440-source-${{ github.run_id }}
+          path: ${{ runner.temp }}/cotcomp-evidence/cotcomp-s440-source.tar.gz
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Prepare Firebase LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/firebase-cotcomp-s440.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI and record version
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@latest
+          firebase --version | tee "$RUNNER_TEMP/cotcomp-evidence/firebase-cli-version.txt"
+
+      - name: Deploy exactly four CotComp callables to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy             --project "$COTCOMP_PROJECT_ID"             --only "functions:cotcompValidateDraft,functions:cotcompSubmitHandoff,functions:cotcompFetchComparableProposals,functions:cotcompSelectProposal"             --non-interactive 2>&1 | tee "$RUNNER_TEMP/cotcomp-evidence/firebase-deploy.log"
+
+      - name: Read back deployed LAB function inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase functions:list --project "$COTCOMP_PROJECT_ID" --json > "$RUNNER_TEMP/cotcomp-evidence/functions-list.json"
+          node <<'NODE'
+          const fs=require('fs');
+          const p=process.env.RUNNER_TEMP+'/cotcomp-evidence/functions-list.json';
+          const json=JSON.parse(fs.readFileSync(p,'utf8'));
+          const expected=['cotcompValidateDraft','cotcompSubmitHandoff','cotcompFetchComparableProposals','cotcompSelectProposal'];
+          const found=new Set();
+          const cotcomp=new Set();
+          function walk(v,key=''){
+            if(Array.isArray(v)) return v.forEach(x=>walk(x,key));
+            if(v && typeof v==='object'){
+              for(const [k,x] of Object.entries(v)) walk(x,k);
+              return;
+            }
+            if(typeof v==='string'){
+              let s=v;
+              if(['id','name','entryPoint','function','functionName'].includes(key)){
+                s=s.split('/').pop();
+                if(/^cotcomp[A-Z]/.test(s)) cotcomp.add(s);
+                if(expected.includes(s)) found.add(s);
+              }
+            }
+          }
+          walk(json);
+          for(const n of expected) if(!found.has(n)) throw new Error('DEPLOYED_FUNCTION_NOT_FOUND:'+n);
+          const extras=[...cotcomp].filter(x=>!expected.includes(x));
+          if(extras.length) throw new Error('UNEXPECTED_COTCOMP_FUNCTIONS:'+extras.join(','));
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/cotcomp-evidence/cotcomp-function-readback.json',
+            JSON.stringify({expected,found:[...found],extraCotcomp:extras,exact:true},null,2));
+          NODE
+
+      - name: Validate source security manifest tied to deployed commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const source=fs.readFileSync('functions/cotcomp-callable-source.js','utf8');
+          const checks=[
+            ["cotcompValidateDraft","enforceAppCheck: true, consumeAppCheckToken: false"],
+            ["cotcompSubmitHandoff","enforceAppCheck: true, consumeAppCheckToken: true"],
+            ["cotcompFetchComparableProposals","enforceAppCheck: true, consumeAppCheckToken: false"],
+            ["cotcompSelectProposal","enforceAppCheck: true, consumeAppCheckToken: true"]
+          ];
+          for(const [name,fragment] of checks){
+            const idx=source.indexOf(name);
+            if(idx<0 || !source.slice(idx,idx+260).includes(fragment)) throw new Error('SECURITY_CONFIG_MISMATCH:'+name);
+          }
+          const manifest={
+            projectId:'ays-orbit-360-lab',
+            environment:'LAB',
+            region:'us-central1',
+            functionNames:checks.map(x=>x[0]),
+            appCheck:Object.fromEntries(checks.map(x=>[x[0],true])),
+            replayProtection:{
+              cotcompValidateDraft:false,
+              cotcompSubmitHandoff:true,
+              cotcompFetchComparableProposals:false,
+              cotcompSelectProposal:true
+            },
+            persistenceEnabled:false,
+            writesExpected:0,
+            syntheticOnly:true,
+            productionTouched:false,
+            dataTouched:false
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/cotcomp-evidence/readback-manifest.json',JSON.stringify(manifest,null,2));
+          NODE
+
+      - name: Build and validate S4.39 proof receipt
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.source_sha }}
+          SOURCE_TREE: ${{ steps.source.outputs.source_tree }}
+          ARTIFACT_DIGEST: ${{ steps.source.outputs.artifact_digest }}
+          BACKEND_DIGEST: ${{ steps.source.outputs.backend_digest }}
+          SOURCE_ARTIFACT_ID: ${{ steps.source_artifact.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const manifest=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/cotcomp-evidence/readback-manifest.json','utf8'));
+          const receipt={
+            sourceSha:process.env.SOURCE_SHA,
+            sourceTree:process.env.SOURCE_TREE,
+            runId:process.env.GITHUB_RUN_ID,
+            artifactId:process.env.SOURCE_ARTIFACT_ID,
+            artifactDigest:process.env.ARTIFACT_DIGEST,
+            backendSourceDigest:process.env.BACKEND_DIGEST,
+            workflowOwnerBlob:process.env.COTCOMP_OWNER_BLOB,
+            receiptPath:'github-actions/run/'+process.env.GITHUB_RUN_ID+'/cotcomp-s440-evidence',
+            readback:{...manifest,writesExecuted:0}
+          };
+          const contract=require('./functions/cotcomp-lab-proof-receipt-s439');
+          const state=contract.validateReceipt(receipt);
+          if(!state.ok) throw new Error('S439_RECEIPT_INVALID:'+state.reasons.join(','));
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/cotcomp-evidence/s439-proof-receipt.json',JSON.stringify({
+            ...receipt,
+            contractValidation:{ok:true,reasons:[]},
+            runtimeReadbackObserved:true,
+            appDataWritesExecuted:0,
+            realDataUsed:false,
+            productionTouched:false
+          },null,2));
+          NODE
+
+      - name: Upload LAB proof evidence
+        id: evidence_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s440-lab-proof-${{ github.run_id }}
+          path: ${{ runner.temp }}/cotcomp-evidence/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Final zero-write guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$RUNNER_TEMP/cotcomp-evidence/s439-proof-receipt.json"
+          jq -e '
+            .contractValidation.ok == true and
+            .readback.persistenceEnabled == false and
+            .readback.writesExecuted == 0 and
+            .readback.syntheticOnly == true and
+            .appDataWritesExecuted == 0 and
+            .realDataUsed == false and
+            .productionTouched == false
+          ' "$RUNNER_TEMP/cotcomp-evidence/s439-proof-receipt.json" >/dev/null
