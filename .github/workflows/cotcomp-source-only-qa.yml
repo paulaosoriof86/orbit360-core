@@ -11,32 +11,24 @@ permissions:
 jobs:
   source-only-qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Node 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Syntax check
+
+      - name: Install dependencies
         working-directory: functions
-        run: |
-          node --check cotcomp-contracts.js
-          node --check cotcomp-validator.js
-          node --check cotcomp-proposal-contracts.js
-          node --check cotcomp-public-bridge.js
-          node --check cotcomp-public-bridge.test.js
-          node --check cotcomp-transport-contract.js
-          node --check cotcomp-transport-contract.test.js
-          node --check cotcomp-gateway-harness.js
-          node --check cotcomp-gateway-harness.test.js
-      - name: Contract tests
+        run: npm ci
+
+      - name: Full CotComp syntax check
         working-directory: functions
-        run: |
-          node --test \
-            cotcomp-validator.test.js \
-            cotcomp-proposal-contracts.test.js \
-            cotcomp-public-bridge.test.js \
-            cotcomp-transport-contract.test.js \
-            cotcomp-gateway-harness.test.js
+        run: npm run check
+
+      - name: Full CotComp contract suite
+        working-directory: functions
+        run: npm run test:cotcomp
