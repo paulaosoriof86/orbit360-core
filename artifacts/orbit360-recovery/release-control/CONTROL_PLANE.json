@@ -3362,6 +3362,16 @@
         "reimport": false,
         "livePromotion": false,
         "b3002MustRegress": true
+      },
+      "previewDispatchRequest": {
+        "status": "REQUESTED",
+        "requestedAt": "2026-09-30",
+        "requestedFor": "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
+        "triggerClass": "EXISTING_I6_CONTROL_PLANE_PUSH_TRIGGER",
+        "productMutation": false,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false
       }
     }
   },
