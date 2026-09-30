@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "ays-cotcomp-s444-write-infrastructure-source-receipt-v1.0",
+  "capturedAt": "2026-09-30",
+  "baseline": {
+    "s443ReadinessPass": true,
+    "s442FunctionalLabBaselinePreserved": true,
+    "persistenceEnabled": false,
+    "appDataWritesExecuted": 0,
+    "realDataUsed": false,
+    "productionTouched": false
+  },
+  "sourceHeadBeforeReceipt": "07cd0b0041fc2ca984df2122fef08cee7eb6f99b",
+  "qa": {
+    "runId": 36782392150,
+    "tests": 300,
+    "passed": 300,
+    "failed": 0
+  },
+  "candidates": {
+    "labFirestoreDriver": {
+      "present": true,
+      "executionEnabled": false,
+      "writeCallsAllowed": false,
+      "deleteCallsAllowed": false,
+      "crossTenantDeny": true,
+      "exactPathCleanupJournal": true
+    },
+    "auditAdapter": {
+      "present": true,
+      "executionEnabled": false,
+      "writeCallsAllowed": false,
+      "digestOnly": true,
+      "rawPiiExcluded": true
+    },
+    "sagaCompensation": {
+      "present": true,
+      "executionEnabled": false,
+      "compensationCallsAllowed": false,
+      "partialSuccessCannotReportComplete": true,
+      "exactDigestBeforeCleanup": true
+    },
+    "rollbackHarness": {
+      "sourceOnly": true,
+      "sideEffectsAllowed": false,
+      "firstReadbackPass": true,
+      "samePayloadRetryPass": true,
+      "duplicateCreatedOnRetry": false,
+      "conflictingPayloadDenied": true,
+      "cleanupPass": true,
+      "finalAbsence": true
+    }
+  },
+  "w1": {
+    "sourceReadyForOwnerGate": true,
+    "effectiveWriteAllowed": false,
+    "scope": [
+      "idempotency",
+      "quoteCase",
+      "caseAccess_hash_only",
+      "cotcomp_event",
+      "exact_readback",
+      "same_payload_retry_no_duplicate",
+      "conflicting_payload_deny",
+      "controlled_cleanup",
+      "final_absence"
+    ],
+    "excluded": [
+      "workflow_projection",
+      "notification_provider_delivery",
+      "proposal_persistence",
+      "selection_persistence",
+      "real_data",
+      "production"
+    ],
+    "remainingGateBlockers": [
+      "OWNER_W1_SYNTHETIC_WRITE_AUTHORIZATION_REQUIRED",
+      "W1_LAB_DEPLOY_AUTHORIZATION_REQUIRED"
+    ]
+  }
+}
