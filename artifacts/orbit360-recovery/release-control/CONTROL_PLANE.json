@@ -3190,7 +3190,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "65a89fe4630422030dcb12b394b0fc80aa88817e",
+      "executionLockBlobSha": "b88d7872e383a9998535f017716ffa0aa9966cc4",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3435,7 +3435,7 @@
       "syntheticQaAuthorization": {
         "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
         "purpose": "CREATE_RETRY_ENRICH_READBACK_CLEANUP_PROOF",
-        "idPrefix": "__b3004qa_",
+        "idPrefix": "b3004qa_",
         "allowedCollections": [
           "clientes",
           "polizas",
@@ -3449,7 +3449,8 @@
         "cleanupMustPassBeforeMachinePass": true,
         "operationalBusinessWritesAuthorized": false,
         "reimportAuthorized": false,
-        "livePromotionAuthorized": false
+        "livePromotionAuthorized": false,
+        "idContract": "ALPHANUMERIC_LEADING_ID_COMPATIBLE_WITH_CANONICAL_COMMAND"
       }
     }
   },
