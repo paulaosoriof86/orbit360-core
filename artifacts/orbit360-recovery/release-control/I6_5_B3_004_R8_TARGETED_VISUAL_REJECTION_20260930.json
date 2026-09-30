@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R8_TARGETED_VISUAL_REJECTION_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "8fea5143363fd8ae75a748d3e3bcb285d2657bc3",
+  "findingId": "B3-004",
+  "status": "REJECTED_REMEDIATION_REQUIRED",
+  "observedRole": "Dirección",
+  "preservedPasses": [
+    "Estado filter opens/selects and table changes for tested states.",
+    "SIGA payments are visible in Cobros y cartera and expose Conciliar.",
+    "Pending/overdue rows expose Aplicar pago.",
+    "Cliente 360 > Cobros preserves historical paid evidence after R7.",
+    "Cliente 360 > Recibos y pagos shows calendar and paid SIGA evidence.",
+    "Unpaid receipt detail exposes Editar este recibo."
+  ],
+  "blockers": [
+    {
+      "id": "B3-004-R8-A",
+      "finding": "Estado popover is clipped when result table is short/empty."
+    },
+    {
+      "id": "B3-004-R8-B",
+      "finding": "Authorized receipt operations can hit false record-scope denial because receipt/portfolio operational-write surfaces are mapped to polizas while canonical access policy maps them to cobros."
+    },
+    {
+      "id": "B3-004-R8-C",
+      "finding": "Canonical delete owner does not register recibosEsperados and native receipt detail exposes no Eliminar action."
+    },
+    {
+      "id": "B3-004-R8-D",
+      "finding": "Cancelled/inactive policy receipts are not defensively classified as historical by every runtime projection even though the policy-receipts engine already closes future/open portfolio."
+    },
+    {
+      "id": "B3-004-R8-E",
+      "finding": "Paid receipt generic edit is correctly locked, but receipt detail does not expose the already-existing controlled payment/application enrichment surface."
+    },
+    {
+      "id": "B3-004-R8-F",
+      "finding": "Receipt-detail back uses full hash routing instead of the already-available local Cliente360 reabrir path."
+    }
+  ],
+  "decision": "NO_VISUAL_PASS_NO_B3005_NO_LIVE",
+  "operationalDataWrites": false,
+  "reimport": false
+}

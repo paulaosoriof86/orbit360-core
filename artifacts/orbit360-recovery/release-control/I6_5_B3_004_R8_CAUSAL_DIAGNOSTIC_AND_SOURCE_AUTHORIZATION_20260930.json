@@ -1,0 +1,103 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R8_CAUSAL_DIAGNOSTIC_AND_SOURCE_AUTHORIZATION_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "8fea5143363fd8ae75a748d3e3bcb285d2657bc3",
+  "status": "SOURCE_DELTA_AUTHORIZED",
+  "matrix": [
+    {
+      "id": "R8-A",
+      "cause": "Absolute Estado popover is rendered inside Cobros card with overflow:hidden, so card height clips the menu.",
+      "owner": "orbit360-platform/modules/cobros.js",
+      "files": [
+        "orbit360-platform/modules/cobros.js"
+      ],
+      "proof": [
+        "all 12 options reachable with 0 rows",
+        "max-height scroll",
+        "selection persists local rerender"
+      ]
+    },
+    {
+      "id": "R8-B",
+      "cause": "Canonical access contract classifies recibosEsperados/carteraPrimas under cobros, but both browser operational-write SURFACE and server product-operational COLLECTION_MODULE classify them under polizas. Scope is therefore evaluated against the wrong module.",
+      "owner": "product operational write authorization",
+      "files": [
+        "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "functions/product-operational-domain.js"
+      ],
+      "proof": [
+        "receipt write module=cobros client/server",
+        "Dirección operation not falsely denied",
+        "Asesor remains role/scope bounded"
+      ]
+    },
+    {
+      "id": "R8-C",
+      "cause": "B2-R15A delete owner omits recibosEsperados from MODULE and native receipt detail never calls the owner.",
+      "owner": "orbit360-platform/core/record-delete.js",
+      "files": [
+        "orbit360-platform/core/record-delete.js",
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+      ],
+      "proof": [
+        "eligible unpaid receipt shows Eliminar",
+        "paid/reported/reconciled receipt blocked",
+        "linked open portfolio/non-paid projections closed/hidden",
+        "durable soft-delete readback"
+      ]
+    },
+    {
+      "id": "R8-D",
+      "cause": "Engine already returns no expected receipts for inactive policy and closes portfolio, but runtime calendarClassReceipt/portfolio projections do not all independently gate current operation by policy lifecycle.",
+      "owner": "receipt/portfolio read model",
+      "files": [
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "proof": [
+        "cancelled fixture has no current receipts/open portfolio/apply action",
+        "paid history remains visible as history/payment evidence",
+        "reload stable"
+      ]
+    },
+    {
+      "id": "R8-E",
+      "cause": "Generic paid-receipt editing is intentionally locked; controlled enrichment already exists in Cobros conciliarFactura/reconciliation domain but receipt detail collapses an applied payment to a passive badge.",
+      "owner": "receipt-detail action surface",
+      "files": [
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+      ],
+      "proof": [
+        "paid receipt stays generic-edit locked",
+        "same canonical payment opens Conciliar/completar datos",
+        "payment date remains distinct from application date",
+        "no duplicate cobro"
+      ]
+    },
+    {
+      "id": "R8-F",
+      "cause": "Receipt detail back link always changes hash and re-enters Cliente360 routing although Cliente360.reabrir(cid,'recibos') can render from hydrated state.",
+      "owner": "receipt-detail navigation",
+      "files": [
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+      ],
+      "proof": [
+        "local back path used when hydrated",
+        "hash fallback preserved",
+        "no redundant hydration",
+        "measured navigation diagnostic"
+      ]
+    }
+  ],
+  "boundaries": {
+    "noOperationalDataWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true,
+    "noGlobalPermissionExpansion": true,
+    "noKpiSemanticChange": true
+  }
+}

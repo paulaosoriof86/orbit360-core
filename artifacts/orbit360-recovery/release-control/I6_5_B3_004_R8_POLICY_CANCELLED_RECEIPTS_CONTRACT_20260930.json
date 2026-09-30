@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R8_POLICY_CANCELLED_RECEIPTS_CONTRACT_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "8fea5143363fd8ae75a748d3e3bcb285d2657bc3",
+  "status": "FROZEN_ACTIVE",
+  "invariant": "POLICY_CANCELLED_OR_INACTIVE => NO_CURRENT_OPERATIONAL_RECEIPTS",
+  "activePolicyStates": [
+    "Vigente",
+    "Por renovar"
+  ],
+  "inactivePolicyBehavior": {
+    "currentReceipts": false,
+    "activePortfolio": false,
+    "collectable": false,
+    "applyPaymentAction": false,
+    "operationalKpiContribution": false,
+    "historicalPaidEvidencePreserved": true,
+    "reconciliationsPreserved": true,
+    "supportsPreserved": true,
+    "invoicesPreserved": true,
+    "paymentDatesPreserved": true,
+    "applicationFactsPreserved": true,
+    "auditPreserved": true
+  },
+  "surfaces": [
+    "Cliente 360 > Recibos y pagos",
+    "Cliente 360 > Cobros",
+    "Cobros y cartera global",
+    "carteraPrimas",
+    "policy full-page receipt schedule"
+  ],
+  "deletion": "NO_PHYSICAL_DELETE_OF_PAYMENT_HISTORY",
+  "reimport": false
+}
