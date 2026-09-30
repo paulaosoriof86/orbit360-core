@@ -1,0 +1,248 @@
+name: CotComp S4.46 workflow owner runtime read-only proof
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-public-bridge-s47-20260929
+    paths:
+      - '.github/cotcomp-lab-intents/s446-owner-runtime-readonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  EXPECTED_OWNER_BLOB: 73e09a4404cb4298dc34c9c38e26ad1f960d3170
+
+jobs:
+  owner-runtime-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify read-only authorization intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s446-owner-runtime-readonly.json
+          jq -e '
+            .authorization == "S446_OWNER_RUNTIME_READONLY_PROOF" and
+            .projectId == "ays-orbit-360-lab" and
+            .appDataReads == false and
+            .appDataWrites == false and
+            .deploy == false and
+            .iamMutation == false and
+            .firebaseConfigMutation == false and
+            .production == false
+          ' "$INTENT" >/dev/null
+
+      - name: Run source QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+
+      - name: Prepare LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s446"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s446/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: 'latest'
+
+      - name: Authenticate gcloud
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" >/dev/null
+          gcloud config set project "$COTCOMP_PROJECT_ID" >/dev/null
+          gcloud config set functions/region "$COTCOMP_REGION" >/dev/null
+
+      - name: Describe deployed Leads Ops functions read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s446/describes"
+          FOUND=0
+          for FN in orbit360OpsLeadsCommand orbit360OpsLeadsCommandLabV20260804; do
+            if gcloud functions describe "$FN"               --gen2               --region "$COTCOMP_REGION"               --project "$COTCOMP_PROJECT_ID"               --format=json > "$RUNNER_TEMP/s446/describes/$FN.json" 2>"$RUNNER_TEMP/s446/describes/$FN.err"; then
+              FOUND=$((FOUND+1))
+            fi
+          done
+          printf '%s' "$FOUND" > "$RUNNER_TEMP/s446/function-count.txt"
+
+      - name: Read deployment source archive and hash owner
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const path=require('path');
+          const dir=process.env.RUNNER_TEMP+'/s446/describes';
+          const names=['orbit360OpsLeadsCommand','orbit360OpsLeadsCommandLabV20260804'];
+          const records=[];
+          for(const name of names){
+            const p=path.join(dir,name+'.json');
+            if(!fs.existsSync(p)) continue;
+            const x=JSON.parse(fs.readFileSync(p,'utf8'));
+            const src=x&&x.buildConfig&&x.buildConfig.source&&x.buildConfig.source.storageSource||null;
+            records.push({
+              name,
+              state:x.state||null,
+              environment:x.environment||null,
+              updateTime:x.updateTime||null,
+              buildId:x.buildConfig&&x.buildConfig.build||null,
+              runtime:x.buildConfig&&x.buildConfig.runtime||null,
+              entryPoint:x.buildConfig&&x.buildConfig.entryPoint||null,
+              service:x.serviceConfig&&x.serviceConfig.service||null,
+              storageSource:src?{
+                bucket:src.bucket||null,
+                object:src.object||null,
+                generation:src.generation||null
+              }:null
+            });
+          }
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s446/runtime-functions-sanitized.json',JSON.stringify(records,null,2));
+          NODE
+
+          SOURCE_OK=false
+          DEPLOYED_BLOB=""
+          BLOCKER=""
+          PRIMARY="$RUNNER_TEMP/s446/describes/orbit360OpsLeadsCommand.json"
+          if [ ! -f "$PRIMARY" ]; then
+            BLOCKER="OPS_LEADS_PRIMARY_FUNCTION_NOT_FOUND"
+          else
+            BUCKET="$(jq -r '.buildConfig.source.storageSource.bucket // empty' "$PRIMARY")"
+            OBJECT="$(jq -r '.buildConfig.source.storageSource.object // empty' "$PRIMARY")"
+            GENERATION="$(jq -r '.buildConfig.source.storageSource.generation // empty' "$PRIMARY")"
+            if [ -z "$BUCKET" ] || [ -z "$OBJECT" ]; then
+              BLOCKER="DEPLOYED_SOURCE_STORAGE_REFERENCE_UNAVAILABLE"
+            else
+              TOKEN="$(gcloud auth print-access-token)"
+              ENCODED_OBJECT="$(python3 -c 'import urllib.parse,sys;print(urllib.parse.quote(sys.argv[1],safe=""))' "$OBJECT")"
+              URL="https://storage.googleapis.com/download/storage/v1/b/$BUCKET/o/$ENCODED_OBJECT?alt=media"
+              if [ -n "$GENERATION" ]; then URL="$URL&generation=$GENERATION"; fi
+              HTTP="$(curl -sS -L -w '%{http_code}' -H "Authorization: Bearer $TOKEN" -o "$RUNNER_TEMP/s446/source-archive.bin" "$URL" || true)"
+              if [ "$HTTP" != "200" ]; then
+                BLOCKER="DEPLOYED_SOURCE_ARCHIVE_READ_DENIED_OR_UNAVAILABLE_HTTP_$HTTP"
+              else
+                mkdir -p "$RUNNER_TEMP/s446/source"
+                if unzip -q "$RUNNER_TEMP/s446/source-archive.bin" -d "$RUNNER_TEMP/s446/source" 2>/dev/null; then
+                  :
+                elif tar -xzf "$RUNNER_TEMP/s446/source-archive.bin" -C "$RUNNER_TEMP/s446/source" 2>/dev/null; then
+                  :
+                else
+                  BLOCKER="DEPLOYED_SOURCE_ARCHIVE_FORMAT_UNREADABLE"
+                fi
+
+                if [ -z "$BLOCKER" ]; then
+                  OWNER_FILE="$(find "$RUNNER_TEMP/s446/source" -type f -name 'ops-leads-domain.js' -print -quit)"
+                  if [ -z "$OWNER_FILE" ]; then
+                    BLOCKER="OPS_LEADS_DOMAIN_NOT_FOUND_IN_DEPLOYED_ARCHIVE"
+                  else
+                    DEPLOYED_BLOB="$(git hash-object "$OWNER_FILE")"
+                    if [ "$DEPLOYED_BLOB" = "$EXPECTED_OWNER_BLOB" ]; then
+                      SOURCE_OK=true
+                    else
+                      BLOCKER="DEPLOYED_OWNER_BLOB_MISMATCH"
+                    fi
+                  fi
+                fi
+              fi
+            fi
+          fi
+
+          rm -rf "$RUNNER_TEMP/s446/source" "$RUNNER_TEMP/s446/source-archive.bin"
+          printf '%s' "$SOURCE_OK" > "$RUNNER_TEMP/s446/source-ok.txt"
+          printf '%s' "$DEPLOYED_BLOB" > "$RUNNER_TEMP/s446/deployed-blob.txt"
+          printf '%s' "$BLOCKER" > "$RUNNER_TEMP/s446/blocker.txt"
+
+      - name: Build sanitized S4.46 receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const ev=require('./functions/cotcomp-workflow-owner-runtime-evidence-s446');
+          const records=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s446/runtime-functions-sanitized.json','utf8'));
+          const sourceOk=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/source-ok.txt','utf8').trim()==='true';
+          const blob=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/deployed-blob.txt','utf8').trim();
+          const blocker=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/blocker.txt','utf8').trim();
+          const primary=records.find(x=>x.name==='orbit360OpsLeadsCommand')||null;
+          const result=ev.evaluate({
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            functionObservedActive:!!primary && primary.state==='ACTIVE',
+            deployedOwnerBlob:blob,
+            sourceArchiveReadOnly:sourceOk,
+            writeExecuted:false,
+            productionTouched:false
+          });
+          const receipt={
+            schemaVersion:'ays-cotcomp-s446-owner-runtime-readonly-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            expectedOwnerBlob:'73e09a4404cb4298dc34c9c38e26ad1f960d3170',
+            deployedOwnerBlob:blob||null,
+            runtimeFunctions:records,
+            sourceArchiveReadOnly:sourceOk,
+            workflowOwnerRuntimeVerified:result.workflowOwnerRuntimeVerified,
+            blockers:[...new Set([...(result.blockers||[]),...(blocker?[blocker]:[])])],
+            appDataReadsExecuted:0,
+            appDataWritesExecuted:0,
+            deployExecuted:false,
+            iamMutationExecuted:false,
+            firebaseConfigMutationExecuted:false,
+            productionTouched:false
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s446/S446_OWNER_RUNTIME_RECEIPT.json',JSON.stringify(receipt,null,2));
+          console.log('S446_WORKFLOW_OWNER_RUNTIME_VERIFIED='+receipt.workflowOwnerRuntimeVerified);
+          console.log('S446_BLOCKERS='+receipt.blockers.join(','));
+          NODE
+
+      - name: Upload sanitized S4.46 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s446-owner-runtime-readonly-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s446/runtime-functions-sanitized.json
+            ${{ runner.temp }}/s446/S446_OWNER_RUNTIME_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove transient credentials
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/s446/firebase-service-account.json"
