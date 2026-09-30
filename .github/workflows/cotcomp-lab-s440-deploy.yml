@@ -187,7 +187,7 @@ jobs:
           set -euo pipefail
           node <<'NODE'
           const fs=require('fs');
-          const source=fs.readFileSync('functions/cotcomp-callable-source.js','utf8');
+          const source=fs.readFileSync('functions/cotcomp-runtime-entry-s438.js','utf8');
           const checks=[
             ["cotcompValidateDraft","enforceAppCheck: true, consumeAppCheckToken: false"],
             ["cotcompSubmitHandoff","enforceAppCheck: true, consumeAppCheckToken: true"],
@@ -196,7 +196,7 @@ jobs:
           ];
           for(const [name,fragment] of checks){
             const idx=source.indexOf(name);
-            if(idx<0 || !source.slice(idx,idx+260).includes(fragment)) throw new Error('SECURITY_CONFIG_MISMATCH:'+name);
+            if(idx<0 || !source.slice(idx,idx+520).includes(fragment)) throw new Error('SECURITY_CONFIG_MISMATCH:'+name);
           }
           const manifest={
             projectId:'ays-orbit-360-lab',
