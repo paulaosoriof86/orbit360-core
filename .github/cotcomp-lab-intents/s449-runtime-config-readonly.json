@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "ays-cotcomp-s449-runtime-config-readonly-intent-v1.0",
+  "authorization": "S449_RUNTIME_WORKFLOW_CONFIG_READ_ONLY",
+  "date": "2026-09-30",
+  "projectId": "ays-orbit-360-lab",
+  "region": "us-central1",
+  "tenantId": "alianzas-soluciones",
+  "authorizedSourceParent": "1bd1655dd9cafe2df4ee87c603fea089a3a13792",
+  "expectedOwnerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+  "exactConfigPath": "tenants/alianzas-soluciones/config/workflow",
+  "fieldMask": [
+    "storageMode",
+    "version"
+  ],
+  "configReadAttempts": 1,
+  "appDataWrites": false,
+  "businessOrClientData": false,
+  "w2Executed": false,
+  "providerDelivery": false,
+  "deploy": false,
+  "iamWrites": false,
+  "firebaseConfigWrites": false,
+  "production": false,
+  "scope": [
+    "physical deployed owner source readback",
+    "one exact masked workflow-config document read",
+    "effective storage-mode derivation",
+    "sanitized evidence receipt"
+  ],
+  "explicitExclusions": [
+    "W2 callable invocation",
+    "workflow projection writes",
+    "notification provider delivery",
+    "client or business record reads",
+    "production",
+    "IAM or Firebase configuration mutation"
+  ]
+}
