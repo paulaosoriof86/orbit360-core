@@ -9,5 +9,6 @@ module.exports = Object.assign(
   require('./cobros-reconciliation-domain'),
   require('./recurring-insurance-import'),
   require('./index'),
-  require('./bank-accounts')
+  require('./bank-accounts'),
+  require('./cotcomp-runtime-entry-s438')
 );
