@@ -9,7 +9,7 @@ const TARGET_OWNER = Object.freeze({
   repository: 'paulaosoriof86/orbit360-core',
   branch: 'recovery/fase-a-clean-20260831',
   path: 'functions/ops-leads-domain.js',
-  reviewedBlobSha: 'd0a1e116186bba860d34ec540e8abba81830b553'
+  reviewedBlobSha: '73e09a4404cb4298dc34c9c38e26ad1f960d3170'
 });
 
 const REQUIRED_SCHEMA_DELTA = Object.freeze({
