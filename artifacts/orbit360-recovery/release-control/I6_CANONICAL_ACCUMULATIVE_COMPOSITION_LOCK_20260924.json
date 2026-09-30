@@ -120,7 +120,7 @@
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
-    "functions/cobros-reconciliation-domain.js": "2d614da3e4dbf943f19e627ae0f0b17e38d2a76a",
+    "functions/cobros-reconciliation-domain.js": "b2b839e702475a3f540fcb006cb24be125c14a09",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
     "functions/document-drive-domain.js": "c0687b789790344c1463d48500b16070078ff9b2",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
@@ -221,21 +221,15 @@
   ],
   "lastRemediation": {
     "findingId": "B3-004",
-    "subFindingId": "B3-004-R6-ORIGIN-SCOPE-PERFORMANCE",
+    "subFindingId": "B3-004-R6.1-INTERNAL",
     "status": "SOURCE_FIXED_PENDING_CONTRACT",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_CAUSAL_SOURCE_FIX_20260930.json",
-    "receiptBlobSha": "9af16d8cf1a4ab6d471de99d987baac8ae64e7d8",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_INTERNAL_HOTFIX_SOURCE_FIX_20260930.json",
+    "receiptBlobSha": "63b65ec9afe13230401431a09e793a479d5b743b",
     "changedProductFiles": [
-      "functions/cobros-reconciliation-domain.js",
-      "orbit360-platform/core/cobros-reconciliation-domain-client.js",
-      "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/index.html"
+      "functions/cobros-reconciliation-domain.js"
     ],
     "qaFiles": [
-      "tools/gravicentra-i6-5-b3-004-contract.mjs",
-      "tools/gravicentra-i6-5-b3-004-preview-proof.mjs"
+      "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
     "paymentLockBlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986"
@@ -607,5 +601,16 @@
     "priorWorkflowBlobSha": "aa873b9eb8d9026ac4b689be5003ebda23f45074",
     "newWorkflowBlobSha": "ceb9493319993f699659ff09b97a9ab2e8862cf6",
     "productSourceChanged": false
+  },
+  "b3004R61InternalHotfix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_INTERNAL_HOTFIX_SOURCE_FIX_20260930.json",
+    "receiptBlobSha": "63b65ec9afe13230401431a09e793a479d5b743b",
+    "productBlobSha": "b2b839e702475a3f540fcb006cb24be125c14a09",
+    "contractBlobSha": "516809059e8e90e71b0963b7281da34c83713ca6",
+    "exactProductSetChanged": false,
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

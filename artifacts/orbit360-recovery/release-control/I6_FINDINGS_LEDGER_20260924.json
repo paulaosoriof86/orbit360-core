@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "R6_1_INTERNAL_HOTFIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R6_1_CAUSAL_HOTFIX",
+      "nextAction": "B3_004_R6_1_SOURCE_CONTRACT",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1249,6 +1249,12 @@
       "r61HotfixAuthorization": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_INTERNAL_HOTFIX_AUTHORIZATION_20260930.json",
         "blobSha": "9801f627bf4591e1e6cad25891586738d36bd848"
+      },
+      "r61HotfixSourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_INTERNAL_HOTFIX_SOURCE_FIX_20260930.json",
+        "blobSha": "63b65ec9afe13230401431a09e793a479d5b743b",
+        "serverBlobSha": "b2b839e702475a3f540fcb006cb24be125c14a09",
+        "contractBlobSha": "516809059e8e90e71b0963b7281da34c83713ca6"
       }
     },
     {

@@ -288,7 +288,7 @@ async function reportAdvisorPayment(authz, data, payload) {
       updatedByUid: authz.actor.uid
     };
     if (paidDate) receiptPatch.fechaPagoReportada = paidDate;
-    if (finalPaymentMethod) receiptPatch.metodoPago = finalPaymentMethod;
+    if (paymentMethod) receiptPatch.metodoPago = paymentMethod;
     if (paymentSupportDocumentRef) receiptPatch.paymentSupportDocumentRef = paymentSupportDocumentRef;
 
     const management = {

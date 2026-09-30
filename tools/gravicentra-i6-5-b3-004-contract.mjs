@@ -126,3 +126,12 @@ need(cliente.includes('data-c360-conciliar-receipt'),'B3_004_CLIENTE360_SIGA_REC
 need(nativeReceiptOwner.includes('data-rp-advisor-report'),'B3_004_RECEIPT_ADVISOR_REPORT_ACTION_MISSING');
 need(nativeReceiptOwner.includes('data-rp-reconcile-payment'),'B3_004_RECEIPT_SIGA_RECONCILE_ACTION_MISSING');
 console.log('B3_004_R6_ORIGIN_SCOPE_PERFORMANCE_CONTRACT=PASS');
+
+
+const reportAdvisorStart=server.indexOf('async function reportAdvisorPayment');
+const applyPaymentStart=server.indexOf('async function applyPayment');
+need(reportAdvisorStart>=0&&applyPaymentStart>reportAdvisorStart,'B3_004_ADVISOR_REPORT_FUNCTION_BOUNDARY_MISSING');
+const reportAdvisorBody=server.slice(reportAdvisorStart,applyPaymentStart);
+need(!reportAdvisorBody.includes('finalPaymentMethod'),'B3_004_ADVISOR_REPORT_UNDEFINED_FINAL_PAYMENT_METHOD');
+need(reportAdvisorBody.includes('if (paymentMethod) receiptPatch.metodoPago = paymentMethod;'),'B3_004_ADVISOR_REPORT_PAYMENT_METHOD_PATCH_MISSING');
+console.log('B3_004_R6_1_ADVISOR_REPORT_RUNTIME_GUARD=PASS');
