@@ -845,7 +845,9 @@
           "totalRenderMs": 0,
           "maxRenderMs": 0
         }
-      }
+      },
+      "residualColdAnalysisReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_RESIDUAL_COLD_HYDRATION_ANALYSIS_20260929.json",
+      "residualColdDecision": "NO_ADDITIONAL_COBROS_SOURCE_CHANGE_BEFORE_TARGETED_HUMAN_PROOF"
     },
     {
       "id": "B3-003",
