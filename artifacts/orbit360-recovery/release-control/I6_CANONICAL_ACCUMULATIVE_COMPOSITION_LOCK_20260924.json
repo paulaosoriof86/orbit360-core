@@ -655,11 +655,18 @@
       "orbit360-platform/index.html": "24ee157327bc16d25c71fe27485e23ea85229ad2"
     },
     "qaBlobs": {
-      "tools/gravicentra-i6-5-b3-004-contract.mjs": "f3e3421e1079ba8da706d92b26e1036596dc07c3"
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "9f24853dd4563ce7e4efbbe606b49d8591cab919"
     },
     "exactProductSetChanged": false,
     "operationalDataWrites": false,
     "reimport": false,
-    "livePromotion": false
+    "livePromotion": false,
+    "validatorRepair": {
+      "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_STALE_ASSET_VALIDATOR_REPAIR_20260930.json",
+      "receiptBlobSha": "1f312eb54af919a5c6122feea8290518ed0cd4ad",
+      "contractBlobSha": "9f24853dd4563ce7e4efbbe606b49d8591cab919",
+      "productSourceChanged": false
+    }
   }
 }

@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R7_STALE_ASSET_VALIDATOR_REPAIR_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "6051651bf92dc2076cbdd18c91535b25996814b4",
+  "findingId": "B3-004",
+  "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
+  "failedRunId": 36771040129,
+  "failedJobId": 110077196406,
+  "failureCode": "B3_004_COBROS_ASSET_VERSION_NOT_BUMPED",
+  "cause": "The inherited R6 contract still required Cobros/Cliente360 asset suffix b3004r6 after R7 intentionally bumped only those two assets to b3004r7.",
+  "fix": "Update only the stale inherited asset assertions for Cobros and Cliente360 to b3004r7. Product source is unchanged.",
+  "contractBlobSha": "9f24853dd4563ce7e4efbbe606b49d8591cab919",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "b3005Opened": false
+}
