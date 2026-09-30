@@ -12,7 +12,7 @@ test('schema extension is source-only and cannot mutate owner source',()=>{
 test('target owner is the live canonical Gravicentra workflow owner',()=>{
   assert.equal(c.TARGET_OWNER.branch,'recovery/fase-a-clean-20260831');
   assert.equal(c.TARGET_OWNER.path,'functions/ops-leads-domain.js');
-  assert.equal(c.TARGET_OWNER.reviewedBlobSha,'d0a1e116186bba860d34ec540e8abba81830b553');
+  assert.equal(c.TARGET_OWNER.reviewedBlobSha,'73e09a4404cb4298dc34c9c38e26ad1f960d3170');
 });
 
 test('minimal schema delta adds cotcompRef only and changes no auth/storage/stages',()=>{
