@@ -57,7 +57,12 @@ jobs:
             .production == false
           ' "$INTENT" >/dev/null
           test "$(git hash-object functions/ops-leads-domain.js)" = "$COTCOMP_OWNER_BLOB"
-          git diff --exit-code HEAD^ HEAD -- . ':!/.github/cotcomp-lab-intents/s440-authorized.json' || true
+          PARENT="$(git rev-parse HEAD^)"
+          EXPECTED_PARENT="$(jq -r '.authorizedSourceParent // empty' "$INTENT")"
+          test "$EXPECTED_PARENT" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$INTENT"
 
       - name: Install function dependencies and execute source QA
         working-directory: functions
