@@ -857,7 +857,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-      "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
+      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
@@ -898,18 +898,21 @@
           "real selector proof waits for async settle"
         ]
       },
-      "previewSourceSha": "41aacc71b343574338ed25efbc6902fb25b13677",
-      "previewBuildId": "gi-i65-b3-41aacc71b343-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b3-36656317848-phqsawss.web.app",
-      "previewRunId": 36656317848,
-      "artifactId": 11071994782,
-      "artifactDigest": "16348717e4a0679b7586b4333cf0730bcaf467038cc202a2b4c2bae8861e2120",
+      "previewSourceSha": "3c290e24443ea07940fed6c25ad33ddf186ca0b5",
+      "previewBuildId": "gi-i65-b3-3c290e24443e-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b3-36659101980-5tklbjdk.web.app",
+      "previewRunId": 36659101980,
+      "artifactId": 11073776021,
+      "artifactDigest": "de3c51b1f0a321d8d5e890f0023954ababcc04e562fa5a0b1f01f973f55ff18e",
       "previewProof": {
         "exactReadback": true,
         "currenciesSeparated": true,
         "noFxAuthorityInvented": true,
         "agingCountryFilterEffective": true,
         "safeKpiMarkers": true,
+        "realCountrySelector": true,
+        "renderedRowsCountryScoped": true,
+        "kpiMarkersStableAfterAsyncSettle": true,
         "noBrowserErrors": true
       },
       "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_20260929.json"
@@ -4495,7 +4498,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
+    "status": "B3_003_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "activeFindingId": "B3-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",

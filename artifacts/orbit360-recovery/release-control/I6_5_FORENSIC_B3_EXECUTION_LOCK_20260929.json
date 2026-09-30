@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
+  "status": "B3_003_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-003",
     "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
+    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "blocking": true,
     "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
     "requiredProof": [
@@ -47,6 +47,9 @@
       "noFxAuthorityInvented": true,
       "agingCountryFilterEffective": true,
       "safeKpiMarkers": true,
+      "realCountrySelector": true,
+      "renderedRowsCountryScoped": true,
+      "kpiMarkersStableAfterAsyncSettle": true,
       "noBrowserErrors": true
     },
     "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_20260929.json",
@@ -66,10 +69,7 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
-    "B3_003_REAL_SELECTOR_COUNTRY_PROOF",
-    "B3_002_REGRESSION_ON_NEW_B3_003",
-    "B3_003_TARGETED_VISUAL_RETEST"
+    "B3_003_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -138,20 +138,18 @@
     "productRegressionDemonstrated": false
   },
   "preview": {
-    "sourceSha": "41aacc71b343574338ed25efbc6902fb25b13677",
-    "buildId": "gi-i65-b3-41aacc71b343-57f234755dc1",
-    "channelId": "gi-i65-b3-36656317848",
-    "url": "https://ays-orbit-360-lab--gi-i65-b3-36656317848-phqsawss.web.app",
-    "runId": 36656317848,
-    "artifactId": 11071994782,
-    "artifactDigest": "16348717e4a0679b7586b4333cf0730bcaf467038cc202a2b4c2bae8861e2120",
+    "sourceSha": "3c290e24443ea07940fed6c25ad33ddf186ca0b5",
+    "buildId": "gi-i65-b3-3c290e24443e-57f234755dc1",
+    "channelId": "gi-i65-b3-36659101980",
+    "url": "https://ays-orbit-360-lab--gi-i65-b3-36659101980-5tklbjdk.web.app",
+    "runId": 36659101980,
+    "artifactId": 11073776021,
+    "artifactDigest": "de3c51b1f0a321d8d5e890f0023954ababcc04e562fa5a0b1f01f973f55ff18e",
     "exactReadback": true,
     "contractPass": true,
     "previewProofPass": true,
     "b3002RegressionPass": true,
-    "livePromoted": false,
-    "paulaVisualAccepted": false,
-    "eligibleForPromotion": false
+    "livePromoted": false
   },
   "b3001TargetedVisual": {
     "status": "PASS",
