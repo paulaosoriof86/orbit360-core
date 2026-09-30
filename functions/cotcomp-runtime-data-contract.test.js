@@ -107,8 +107,15 @@ test('save-first sequence preserves case before projections and notifications', 
   assert.ok(c.SAVE_FIRST_SEQUENCE.indexOf('PREPARE_NOTIFICATIONS') > c.SAVE_FIRST_SEQUENCE.indexOf('PROJECT_OPS'));
 });
 
-test('PII policy forbids URL and analytics and leaves retention to governance/legal', () => {
+test('PII policy forbids URL/analytics and binds to Owner S4.26 internal retention policy', () => {
   assert.equal(c.PII_POLICY.urlQueryStringAllowed,false);
   assert.equal(c.PII_POLICY.analyticsAllowed,false);
-  assert.equal(c.PII_POLICY.retention,'GOVERNANCE_LEGAL_DECISION_REQUIRED');
+  assert.equal(c.PII_POLICY.retentionPolicyVersion,'ays-cotcomp-governance-policy-s426-v1.0');
+  assert.equal(c.PII_POLICY.retentionPolicyStatus,'OWNER_INTERNAL_POLICY_ACTIVE');
+  assert.equal(c.PII_POLICY.legalComplianceVerified,false);
+  assert.equal(c.PII_POLICY.retention.inactiveDraftDays,30);
+  assert.equal(c.PII_POLICY.retention.submittedNotConvertedMonths,12);
+  assert.equal(c.PII_POLICY.retention.caseAccessDays,7);
+  assert.equal(c.PII_POLICY.retention.rawTokenPersistenceAllowed,false);
+  assert.equal(c.PII_POLICY.retention.convertedCaseGovernance,'GRAVICENTRA_CLIENT_POLICY_GOVERNANCE');
 });
