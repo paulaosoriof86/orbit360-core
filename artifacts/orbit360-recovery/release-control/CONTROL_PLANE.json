@@ -3542,6 +3542,19 @@
         },
         "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT_PASS_20260930.json",
         "contractReceiptBlobSha": "c488d2340883260eae10258ac82b9e0737cfb43b"
+      },
+      "r4PreviewChannelGcRootfix": {
+        "status": "MECHANISM_FIXED_PENDING_RERUN",
+        "failedRunId": 36738404568,
+        "failedJobId": 109967202204,
+        "failureCode": "PREVIEW_GC_NO_SAFE_CHANNEL_DELETED",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R4_PREVIEW_CHANNEL_GC_ROOTFIX_20260930.json",
+        "receiptBlobSha": "ae5e50021e54e2cd6d406cc41a78816c39f09581",
+        "gcBlobSha": "8bb4a2fca747f3e4e3dbc08d33f459054372066e",
+        "productRegressionDemonstrated": false,
+        "productSourceChanged": false,
+        "dataMutation": false,
+        "livePromotion": false
       }
     }
   },
