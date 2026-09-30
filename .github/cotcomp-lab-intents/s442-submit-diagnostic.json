@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "ays-cotcomp-s442-submit-diagnostic-v1.0",
+  "authorization": "READ_ONLY_S442_SUBMIT_DIAGNOSTIC",
+  "authorizedSourceParent": "a2f494297b33ec1de068d563b27eb3678d669f7b",
+  "projectId": "ays-orbit-360-lab",
+  "configWrites": false,
+  "appDataWrites": false,
+  "deploy": false,
+  "production": false,
+  "sourceProofRunId": 36773619630,
+  "purpose": "DIAGNOSE_REPLAY_PROTECTED_SUBMIT_HANDOFF_401_WITHOUT_WEAKENING_APPCHECK"
+}
