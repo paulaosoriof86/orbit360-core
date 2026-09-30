@@ -1,0 +1,154 @@
+name: CotComp S4.42 replay-protection IAM diagnostic
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-public-bridge-s47-20260929
+    paths:
+      - '.github/cotcomp-lab-intents/s442-replay-iam-diagnostic.json'
+
+permissions:
+  contents: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  COTCOMP_FUNCTION: cotcompSubmitHandoff
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify read-only IAM diagnostic intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '
+            .authorization == "READ_ONLY_S442_REPLAY_IAM_DIAGNOSTIC" and
+            .projectId == "ays-orbit-360-lab" and
+            .iamWrites == false and
+            .appDataWrites == false and
+            .deploy == false and
+            .production == false
+          ' .github/cotcomp-lab-intents/s442-replay-iam-diagnostic.json >/dev/null
+
+      - name: Inspect runtime service account and project IAM read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s442iam"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          printf '%s' "$SA" > "$RUNNER_TEMP/s442iam/cred.json"
+          chmod 600 "$RUNNER_TEMP/s442iam/cred.json"
+
+          node <<'NODE'
+          const fs=require('fs');
+          const crypto=require('crypto');
+          const sa=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s442iam/cred.json','utf8'));
+          if(sa.project_id!=='ays-orbit-360-lab') throw new Error('CREDENTIAL_PROJECT_MISMATCH');
+
+          const b64url=v=>Buffer.from(v).toString('base64url');
+          async function oauth(){
+            const now=Math.floor(Date.now()/1000);
+            const h=b64url(JSON.stringify({alg:'RS256',typ:'JWT'}));
+            const p=b64url(JSON.stringify({
+              iss:sa.client_email,
+              scope:'https://www.googleapis.com/auth/cloud-platform',
+              aud:'https://oauth2.googleapis.com/token',
+              iat:now,exp:now+3600
+            }));
+            const unsigned=h+'.'+p;
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const body=new URLSearchParams({
+              grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',
+              assertion:unsigned+'.'+sig
+            });
+            const r=await fetch('https://oauth2.googleapis.com/token',{
+              method:'POST',
+              headers:{'content-type':'application/x-www-form-urlencoded'},
+              body
+            });
+            if(!r.ok) throw new Error('OAUTH_'+r.status);
+            return (await r.json()).access_token;
+          }
+
+          (async()=>{
+            const token=await oauth();
+            const headers={authorization:'Bearer '+token,'content-type':'application/json'};
+
+            const fnUrl='https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-central1/functions/cotcompSubmitHandoff';
+            const fr=await fetch(fnUrl,{headers});
+            const ft=await fr.text();
+            let fj={}; try{fj=ft?JSON.parse(ft):{}}catch{}
+            if(!fr.ok) throw new Error('FUNCTION_DESCRIBE_'+fr.status);
+
+            const runtimeServiceAccount=
+              fj&&fj.serviceConfig&&fj.serviceConfig.serviceAccountEmail||null;
+            if(!runtimeServiceAccount) throw new Error('RUNTIME_SERVICE_ACCOUNT_NOT_FOUND');
+
+            const ir=await fetch(
+              'https://cloudresourcemanager.googleapis.com/v1/projects/ays-orbit-360-lab:getIamPolicy',
+              {method:'POST',headers,body:'{}'}
+            );
+            const it=await ir.text();
+            let ij={}; try{ij=it?JSON.parse(it):{}}catch{}
+
+            const member='serviceAccount:'+runtimeServiceAccount;
+            const roles=[];
+            if(ir.ok && Array.isArray(ij.bindings)){
+              for(const b of ij.bindings){
+                if(Array.isArray(b.members) && b.members.includes(member)) roles.push(b.role);
+              }
+            }
+
+            const verifierGrantRoles=[
+              'roles/firebaseappcheck.tokenVerifier',
+              'roles/firebaseappcheck.admin',
+              'roles/firebase.admin',
+              'roles/firebase.developAdmin',
+              'roles/owner'
+            ];
+            const hasKnownVerifierGrant=roles.some(r=>verifierGrantRoles.includes(r));
+
+            const out={
+              schemaVersion:'ays-cotcomp-s442-replay-iam-diagnostic-v1.0',
+              projectId:'ays-orbit-360-lab',
+              functionName:'cotcompSubmitHandoff',
+              generation:'GEN_2',
+              runtimeServiceAccount,
+              functionState:fj.state||null,
+              runtime:fj&&fj.buildConfig&&fj.buildConfig.runtime||null,
+              projectIamPolicyReadable:ir.ok,
+              directProjectRoles:roles.sort(),
+              knownVerifierGrantPresent:hasKnownVerifierGrant,
+              requiredVerifierRole:'roles/firebaseappcheck.tokenVerifier',
+              requiredPermission:'firebaseappcheck.appCheckTokens.verify',
+              iamWritesExecuted:0,
+              appDataWritesExecuted:0,
+              deployExecuted:false,
+              productionTouched:false
+            };
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s442iam/S442_REPLAY_IAM_DIAGNOSTIC.json',JSON.stringify(out,null,2));
+            console.log('RUNTIME_SERVICE_ACCOUNT='+runtimeServiceAccount);
+            console.log('KNOWN_VERIFIER_GRANT_PRESENT='+hasKnownVerifierGrant);
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)});
+          NODE
+          rm -f "$RUNNER_TEMP/s442iam/cred.json"
+
+      - name: Upload sanitized IAM diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s442-replay-iam-diagnostic-${{ github.run_id }}
+          path: ${{ runner.temp }}/s442iam/S442_REPLAY_IAM_DIAGNOSTIC.json
+          if-no-files-found: error
+          retention-days: 14
