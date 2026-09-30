@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_PAYMENT_PROVENANCE_CONTRACT_PASS_V1",
+  "status": "PASS",
+  "date": "2026-09-30",
+  "gate": "I6.5-B3-004",
+  "sourceSha": "9d0bc7c500f78713517a03452cfaaca65f8447cf",
+  "runId": 36717624167,
+  "jobId": 109894373594,
+  "assertions": {
+    "paymentStatePreservedOnApplicationEnrichment": true,
+    "directOrInferredPreserved": true,
+    "paymentEvidenceTypePreserved": true,
+    "applicationEvidenceSeparated": true,
+    "receiptPaymentProvenancePreserved": true,
+    "businessWrites": 0,
+    "reimport": false,
+    "live": false
+  },
+  "next": "B3_004_EXACT_PREVIEW"
+}
