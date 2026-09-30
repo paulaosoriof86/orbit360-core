@@ -3303,13 +3303,19 @@
       "b3002Status": "PASS",
       "b3002TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_TARGETED_VISUAL_PERFORMANCE_PASS_20260929.json",
       "b3002HumanAcceptance": "PASS",
-      "dashboardFindingPreservedUnder": "B3-008"
+      "dashboardFindingPreservedUnder": "B3-008",
+      "concurrentSourceReconciliationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_CONCURRENT_SOURCE_RECONCILIATION_20260929.json",
+      "concurrentSourceReconciliationReceiptBlobSha": "41e15eecfcb1899785d8a915b30072dada3cf091",
+      "priorB3003MachineProofSourceSha": "88d8e53c035180e344651d46815d3368cbbeb9f1",
+      "priorB3003ArtifactId": 11071804971,
+      "priorB3003ArtifactEligibleForPromotion": false,
+      "exactCumulativeRebuildRequired": true
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "23ed519efdf6d59e34bb27fbce6f1e3a3d74b8d8",
+    "compositionLockBlobSha": "7e81c50f36a87f2f8041774f4e4b65a861a5924d",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0ceaaacc0dc5d5d992180d2430055a102885d8b7",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -3323,7 +3329,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_003_EXACT_PREVIEW_KPI_AGING_PROOF"
+    "nextAction": "B3_003_REBUILD_EXACT_CUMULATIVE_PREVIEW"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",

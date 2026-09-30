@@ -1,0 +1,45 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_003_CONCURRENT_SOURCE_RECONCILIATION_V1",
+  "recordedAt": "2026-09-30T01:34:00Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "RECONCILED_REBUILD_REQUIRED",
+  "priorB3003MachineProof": {
+    "sourceSha": "88d8e53c035180e344651d46815d3368cbbeb9f1",
+    "buildId": "gi-i65-b3-88d8e53c0351-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b3-36655223227-113re1zi.web.app",
+    "runId": 36655223227,
+    "artifactId": 11071804971,
+    "artifactDigest": "4b2b174c1e58c743210b02d20ee59f164fea8ceff7e13a5a5d5c1dd588695c6f",
+    "exactReadback": true,
+    "previewProofPass": true,
+    "b3002RegressionPass": true
+  },
+  "concurrentChange": {
+    "sourceCommit": "832a39305150faa72f25020e1b86a269e58aa3e2",
+    "evidenceCommit": "d34b3b6d15c549caa75f6e5d9b9535fefc4e9800",
+    "productPath": "functions/ops-leads-domain.js",
+    "productBlobSha": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/COTCOMP_S420_WORKFLOW_SCHEMA_PATCH_QA_20260929.md",
+    "evidenceBlobSha": "470be752a3671946d4ef39238f4c66ce04ecb0c0",
+    "evidenceStatus": "MERGED TO CANONICAL RECOVERY SOURCE / POST-MERGE STATIC QA 15/15 PASS / NO DEPLOY / NO WRITES"
+  },
+  "adjudication": {
+    "overlapsB3003Owners": false,
+    "b3003Owners": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/cobros.js"
+    ],
+    "b3003FunctionalProofRetainedAsEvidence": true,
+    "priorArtifactEligibleForPromotion": false,
+    "newExactCumulativeArtifactRequired": true,
+    "compositionLockUpdated": true
+  },
+  "boundaries": {
+    "businessWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "b4": false
+  },
+  "nextAction": "B3_003_REBUILD_EXACT_CUMULATIVE_PREVIEW"
+}
