@@ -112,19 +112,9 @@ jobs:
           if [ "$APP_COUNT" = "1" ]; then
             SELECTED_APP_ID="$(node -e "const a=require(process.env.RUNNER_TEMP+'/s441/apps-sanitized.json');console.log(a[0].appId)")"
             if firebase apps:sdkconfig WEB "$SELECTED_APP_ID" --project "$COTCOMP_PROJECT_ID" --json > "$RUNNER_TEMP/s441/sdkconfig.raw.json" 2>"$RUNNER_TEMP/s441/sdkconfig.err"; then
-              node <<'NODE'
-              const fs=require('fs');
-              const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s441/sdkconfig.raw.json','utf8'));
-              let found=false;
-              function walk(v){
-                if(!v || typeof v!=='object') return;
-                if(typeof v.projectId==='string' && typeof v.appId==='string') found=true;
-                for(const x of Object.values(v)) if(typeof x==='object') walk(x);
-              }
-              walk(raw);
-              if(!found) process.exit(2);
-              NODE
-              SDK_OK=true
+              if node -e "const fs=require('fs');const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s441/sdkconfig.raw.json','utf8'));let found=false;const walk=v=>{if(!v||typeof v!=='object')return;if(typeof v.projectId==='string'&&typeof v.appId==='string')found=true;for(const x of Object.values(v))if(typeof x==='object')walk(x)};walk(raw);if(!found)process.exit(2);"; then
+                SDK_OK=true
+              fi
             fi
           fi
           rm -f "$RUNNER_TEMP/s441/sdkconfig.raw.json"
