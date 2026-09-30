@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "ays-cotcomp-lab-readback-intent-s440-v1.0",
+  "authorization": "READBACK_ALREADY_DEPLOYED_S440_LAB",
+  "authorizedSourceParent": "6be17ea45e50c81a791f62bc31ae9b877405022f",
+  "projectId": "ays-orbit-360-lab",
+  "environment": "LAB",
+  "region": "us-central1",
+  "deployedSourceSha": "17d599e884d5b834b73b9499d8cef177575d56f9",
+  "deployRunId": 36763893708,
+  "writes": false,
+  "realData": false,
+  "production": false,
+  "purpose": "POST_DEPLOY_READBACK_AND_S439_RECEIPT_AFTER_FIREBASE_CLI_CLEANUP_POLICY_EXIT"
+}
