@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "ays-cotcomp-s448-readonly-intent-v1.0",
+  "authorization": "S448_READONLY_PROVIDER_ISOLATION_AND_W2_HARNESS",
+  "date": "2026-09-30",
+  "projectId": "ays-orbit-360-lab",
+  "region": "us-central1",
+  "authorizedSourceParent": "676c3cf1ddd07b886ee68bbde2dbc0d01f2ed6fc",
+  "expectedOwnerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+  "primaryFunction": "orbit360OpsLeadsCommand",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "deploy": false,
+  "iamWrites": false,
+  "firebaseConfigWrites": false,
+  "w2Executed": false,
+  "providerDelivery": false,
+  "realData": false,
+  "production": false,
+  "scope": [
+    "physical deployed owner source readback",
+    "read-only Cloud Functions inventory",
+    "read-only Eventarc inventory in us-central1",
+    "source-only provider-isolation verification",
+    "source-only W2 journal/readback/retry/cleanup harness"
+  ],
+  "explicitExclusions": [
+    "invoke orbit360OpsLeadsCommand",
+    "W2 workflow projection writes",
+    "provider delivery",
+    "real data",
+    "production"
+  ]
+}
