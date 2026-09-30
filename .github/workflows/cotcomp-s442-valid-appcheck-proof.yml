@@ -364,7 +364,7 @@ jobs:
           CLIENT="$RUNNER_TEMP/s442/client"
           cat > "$CLIENT/client.js" <<'NODE'
           import { initializeApp } from 'firebase/app';
-          import { initializeAppCheck, CustomProvider, getToken } from 'firebase/app-check';
+          import { initializeAppCheck, CustomProvider } from 'firebase/app-check';
           import { getFunctions, httpsCallable } from 'firebase/functions';
 
           const cfg=window.__S442_FIREBASE_CONFIG__;
@@ -379,13 +379,13 @@ jobs:
           }
 
           const provider=new CustomProvider({
-            getToken: async()=>{
+            getToken: async(isLimitedUse=false)=>{
               const url='https://firebaseappcheck.googleapis.com/v1/projects/'+projectNumber+
                 '/apps/'+encodeURIComponent(appId)+':exchangeDebugToken?key='+encodeURIComponent(cfg.apiKey);
               const r=await fetch(url,{
                 method:'POST',
                 headers:{'content-type':'application/json'},
-                body:JSON.stringify({debugToken,limitedUse:true})
+                body:JSON.stringify({debugToken,limitedUse:!!isLimitedUse})
               });
               if(!r.ok) throw new Error('APPCHECK_EXCHANGE_FAILED_'+r.status);
               const j=await r.json();
@@ -408,8 +408,12 @@ jobs:
             const calls=[];
             for(const name of names){
               try{
-                await getToken(appCheck,true);
-                const fn=httpsCallable(functions,name,{timeout:30000});
+                const limitedUseAppCheckTokens=
+                  name==='cotcompSubmitHandoff' || name==='cotcompSelectProposal';
+                const fn=httpsCallable(functions,name,{
+                  timeout:30000,
+                  limitedUseAppCheckTokens
+                });
                 const res=await fn({syntheticProof:true});
                 const data=res&&res.data;
                 const ok=!(data&&data.ok===false);
