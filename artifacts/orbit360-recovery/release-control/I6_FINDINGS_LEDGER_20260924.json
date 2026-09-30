@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "R6_REMEDIATION_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_REMEDIATION_REQUIRED_WITHIN_SAME_GATE",
+      "nextAction": "B3_004_R6_CAUSAL_SOURCE_FIX",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1192,7 +1192,9 @@
       "r5MachineProofReceiptBlobSha": "7ed2e68bbd5780a03cb3a0395bc4695b5fd669b0",
       "latestTargetedVisualDecision": "REJECTED_REMEDIATION_REQUIRED",
       "visualRejectionR6ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_R6_ORIGIN_SCOPE_PERFORMANCE_20260930.json",
-      "visualRejectionR6ReceiptBlobSha": "3619ff84312d8dba3170663733ac77813b98a5c2"
+      "visualRejectionR6ReceiptBlobSha": "3619ff84312d8dba3170663733ac77813b98a5c2",
+      "r6RemediationAuthorizationPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_REMEDIATION_AUTHORIZATION_20260930.json",
+      "r6RemediationAuthorizationBlobSha": "37e9e70dce6f950658f4eec04c73eb79e406b69e"
     },
     {
       "id": "B3-005",

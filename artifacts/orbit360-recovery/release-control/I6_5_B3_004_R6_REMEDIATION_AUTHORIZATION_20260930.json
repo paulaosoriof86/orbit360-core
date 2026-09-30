@@ -1,0 +1,51 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R6_REMEDIATION_AUTHORIZATION_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "44e11c594b9ba65133d9342fd610a6132c516113",
+  "findingId": "B3-004",
+  "status": "AUTHORIZED_CAUSAL_SOURCE_REMEDIATION_ONLY",
+  "authority": {
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+    "paymentLockBlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_R6_ORIGIN_SCOPE_PERFORMANCE_20260930.json",
+    "visualRejectionReceiptBlobSha": "3619ff84312d8dba3170663733ac77813b98a5c2"
+  },
+  "authorizedProductFiles": [
+    "functions/cobros-reconciliation-domain.js",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/modules/portal.js",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+    "orbit360-platform/index.html"
+  ],
+  "qaFiles": [
+    "tools/gravicentra-i6-5-b3-004-contract.mjs",
+    "tools/gravicentra-i6-5-b3-004-preview-proof.mjs"
+  ],
+  "causalScope": [
+    "Implement distinct advisor reported-payment intake without classifying it as CLIENT_PORTAL or PAID_DIRECT.",
+    "Create linked Ops management for advisor report; operative validation/apply enriches the same canonical payment and resolves the linked management.",
+    "Preserve direct Apply Payment for authorized Operativo/Dirección without a second operative approval.",
+    "Expose individual Conciliar fallback for applied/unreconciled and CRM/SIGA direct-payment evidence.",
+    "Preserve payment/application temporal domains and controlled edit boundaries.",
+    "Remove false cross-advisor scope denial for privileged operational roles and prove it in synthetic Preview QA.",
+    "Eliminate redundant Cobros recomputation on filter/state changes after hydration.",
+    "Perform read-only provenance diagnosis for unresolved payment origin before any reconciliation/materialization decision."
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "onlyAuthorizedProductFiles": true,
+    "operationalDataWritesAuthorized": false,
+    "confirmedCobroWritesAuthorized": false,
+    "syntheticWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b3005Authorized": false,
+    "b4Authorized": false
+  },
+  "next": "Commit causal source remediation, then move B3-004 to SOURCE_FIXED_PENDING_CONTRACT and immediately revoke product-mutation authorization."
+}

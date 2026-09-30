@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_004_R6_REMEDIATION_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -20,7 +20,9 @@
     "boundaries": {
       "businessWritesAuthorized": false,
       "reimportAuthorized": false,
-      "liveHostingPromotionAuthorized": false
+      "liveHostingPromotionAuthorized": false,
+      "productMutationAuthorized": true,
+      "b3005Authorized": false
     },
     "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
@@ -277,7 +279,13 @@
         "B3-004-R6-K"
       ],
       "next": "READ_ONLY_ROOT_CAUSE_DIAGNOSTIC_WITHIN_B3_004"
-    }
+    },
+    "qaFiles": [
+      "tools/gravicentra-i6-5-b3-004-contract.mjs",
+      "tools/gravicentra-i6-5-b3-004-preview-proof.mjs"
+    ],
+    "r6RemediationAuthorizationPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_REMEDIATION_AUTHORIZATION_20260930.json",
+    "r6RemediationAuthorizationBlobSha": "37e9e70dce6f950658f4eec04c73eb79e406b69e"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -286,11 +294,12 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "3ca2f0ec8db3244021883cc103be41e348ffb5b7"
+    "blobSha": "481bb508ef5e23926848b05ba5ebcbfe6afeead8"
   },
   "nextRequiredProof": [
-    "B3_004_REMEDIATION_EXACT_PREVIEW_MACHINE_PASS",
-    "B3_004_TARGETED_VISUAL_PASS"
+    "B3_004_R6_SOURCE_CONTRACT_PASS",
+    "B3_004_R6_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_R6_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -318,7 +327,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
