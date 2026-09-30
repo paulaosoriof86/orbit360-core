@@ -612,5 +612,24 @@
     "operationalDataWrites": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "b3004R61ContractPass": {
+    "status": "PASS_PENDING_EXACT_PREVIEW",
+    "source": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_SOURCE_CONTRACT_PASS_20260930.json",
+      "blobSha": "4646d753a9310e5639181fc8d80ee3cf60d49b2e"
+    },
+    "surface": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_SURFACE_CONTRACT_PASS_20260930.json",
+      "blobSha": "46c1d24586aa2ce4f714db925bc46855f321dc51"
+    },
+    "provenance": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_PROVENANCE_CONTRACT_PASS_20260930.json",
+      "blobSha": "34f2f5e0aedf6a5a68e4f3c476040349ecf38794"
+    },
+    "runId": 36762943153,
+    "jobId": 110050423644,
+    "sourceSha": "04cc4405332165e8ab7c12812a15fc71c265c3e1",
+    "contractBlobSha": "516809059e8e90e71b0963b7281da34c83713ca6"
   }
 }
