@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R8_AUTOMATED_CHECKPOINT_MECHANISM_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "43b64b77c39b86153a5a34abb50d29da4074ec96",
+  "status": "ACTIVE",
+  "workflowBlobSha": "890a0c1dea66c27e849983412bb3db88e31a4b5b",
+  "behavior": [
+    "contract PASS atomically freezes governance to exact Preview",
+    "machine PASS atomically freezes governance to targeted visual",
+    "remote HEAD drift aborts push",
+    "no gate skipped"
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "syntheticQaOnly": true,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  }
+}
