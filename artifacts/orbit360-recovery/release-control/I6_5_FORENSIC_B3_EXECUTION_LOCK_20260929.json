@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_002_IN_PROGRESS",
+  "status": "B3_002_CAUSE_CONFIRMED_FIX_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,11 +14,30 @@
   "activeFinding": {
     "id": "B3-002",
     "title": "Cobros search/performance/hydration must be fast and non-blocking.",
-    "status": "IN_PROGRESS",
+    "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
     "blocking": true,
     "humanEvidence": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
-    "rootCause": "PENDING_MEASURED_PERFORMANCE_HYDRATION_DIAGNOSTIC",
-    "requiredProof": "Cold/warm Cobros entry timing with phase markers; no ~10s unusable wait; no page freeze; complete data after load."
+    "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN",
+    "requiredProof": "Cold/warm Cobros entry timing with phase markers; no ~10s unusable wait; no page freeze; complete data after load.",
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_20260929.json",
+    "diagnosticRunId": 36651311858,
+    "diagnosticArtifactId": 11070607951,
+    "diagnosticArtifactDigest": "sha256:a94f1225aff71d7fd53ab7cebb553e684ccb52bcd90f111bebf49af5ac222245",
+    "measured": {
+      "warmSingleRenderMs": 6673,
+      "inSessionCold": {
+        "renderCount": 12,
+        "totalRenderMs": 45413,
+        "completeMs": 51391.8
+      },
+      "directCold": {
+        "renderCount": 15,
+        "totalRenderMs": 46053,
+        "completeMs": 52514.9
+      },
+      "finalRows": 489,
+      "reportedRows": 484
+    }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -30,9 +49,9 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC",
-    "B3_002_CAUSAL_SOURCE_FIX_IF_DEMONSTRATED",
-    "B3_002_EXACT_PREVIEW_TIMING_PASS"
+    "B3_002_CAUSAL_SOURCE_FIX",
+    "B3_002_EXACT_PREVIEW_TIMING_PASS",
+    "B3_002_TARGETED_VISUAL_PERFORMANCE_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -67,7 +86,9 @@
     "liveHostingPromotionAuthorized": false,
     "b4AdvanceAuthorized": false,
     "syntheticWriteAuthorized": false,
-    "oneExactPreviewForB3001": true
+    "oneExactPreviewForB3001": true,
+    "b4Authorized": false,
+    "syntheticWritesAuthorized": false
   },
   "mechanismRootFix": {
     "status": "MECHANISM_FIXED_PENDING_RERUN",
@@ -128,5 +149,5 @@
     },
     "shellOwnerVisualMatch": true
   },
-  "boundaryNote": "B3-001 PASS by exact machine contract + Paula targeted visual. B3-002 is now the first incomplete gate due ~10s Cobros entry. KPI/aging/currency and semantic inconsistencies remain frozen for subsequent B3 gates. No LIVE/B4/reimport/business writes."
+  "boundaryNote": "B3-002 measured cause confirmed. Product-only causal performance fix authorized; no business/data writes, no reimport, no LIVE, no B4."
 }
