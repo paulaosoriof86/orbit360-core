@@ -708,13 +708,13 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Search/performance: indexing, debounce and pagination/virtualization; no page freeze.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
-      "blocking": true,
+      "status": "CLOSED_PASS",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN",
       "remediation": "Measure module-load phases and blocking dependencies; reduce blocking hydration, add explicit loading state, index/debounce/paginate/virtualize as evidence requires.",
       "requiredProof": "Cold/warm Cobros entry timing with phase markers; no ~10s blank/unusable wait; no page freeze; data complete after load.",
-      "humanEvidence": "Paula reports approximately 10 seconds to enter Cobros on exact B3 Preview 2026-09-29.",
+      "humanEvidence": "User confirmed Cobros y cartera opens quickly from menu on exact B3-002 Preview.",
       "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
       "diagnosticRunId": 36651311858,
@@ -730,7 +730,7 @@
         "finalRows": 489,
         "reportedRows": 484
       },
-      "nextAction": "B3_002_EXACT_PREVIEW_TIMING_PROOF",
+      "nextAction": "B3-003",
       "causalFix": {
         "rendererOwner": "orbit360-platform/modules/cobros.js",
         "adapterOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
@@ -847,14 +847,17 @@
         }
       },
       "residualColdAnalysisReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_RESIDUAL_COLD_HYDRATION_ANALYSIS_20260929.json",
-      "residualColdDecision": "NO_ADDITIONAL_COBROS_SOURCE_CHANGE_BEFORE_TARGETED_HUMAN_PROOF"
+      "residualColdDecision": "NO_ADDITIONAL_COBROS_SOURCE_CHANGE_BEFORE_TARGETED_HUMAN_PROOF",
+      "targetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_TARGETED_VISUAL_PERFORMANCE_PASS_20260929.json",
+      "humanAcceptance": "PASS",
+      "closedAt": "2026-09-30T01:14:00Z"
     },
     {
       "id": "B3-003",
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-      "status": "NOT_STARTED",
+      "status": "READ_ONLY_DIAGNOSTIC_ACTIVE",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "PENDING_B3_003_KPI_AGING_CURRENCY_AUTHORITY_DIAGNOSTIC",
@@ -862,7 +865,8 @@
       "requiredProof": "KPI and aging invariant audit by country/currency; no contradiction such as Vencido=0 with positive overdue aging unless semantics explicitly exclude those rows and UI explains it.",
       "humanEvidence": "Exact B3 Preview shows Vencido=0 and Pendiente=0 while aging totals Q5,760; table includes Q and $ amounts and 484 reported-payment rows.",
       "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
-      "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c"
+      "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
+      "nextAction": "B3_003_KPI_AGING_CURRENCY_AUTHORITY_DIAGNOSTIC"
     },
     {
       "id": "B3-004",
@@ -905,9 +909,21 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Dashboard Inicio reality reconciliation closed before B4.",
-      "status": "NOT_STARTED",
+      "status": "OPEN_HUMAN_EVIDENCE_RECORDED",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "humanEvidence": [
+        "Inicio card 'Pendiente de cobro' shows Q10K while its modal 'Cobros pendientes' shows 0 records.",
+        "Inicio card 'Cartera vencida' shows Q6K while its modal 'Cobros vencidos' shows 0 records.",
+        "User reports Inicio KPI figures appear incorrect/hardcoded."
+      ],
+      "sourceScreenshots": [
+        "image(20260930-010959).png",
+        "image(20260930-011052).png",
+        "image(20260930-011108).png"
+      ],
+      "rootCause": "PENDING_B3_008_DASHBOARD_KPI_AUTHORITY_DIAGNOSTIC",
+      "nextAction": "PRESERVE_UNTIL_B3_008_AFTER_B3_003_TO_B3_007"
     },
     {
       "id": "B4-001",
@@ -4424,8 +4440,8 @@
     }
   },
   "currentB3": {
-    "status": "B3_002_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
-    "activeFindingId": "B3-002",
+    "status": "B3_003_READ_ONLY_DIAGNOSTIC_ACTIVE",
+    "activeFindingId": "B3-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
     "compositionLockBlobSha": "6824a4b873f14a3c96669eb0cf495feeea1a9f64",
@@ -4439,6 +4455,8 @@
       "failedJobId": 109667923632,
       "productRegressionDemonstrated": false
     },
-    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_20260929.json"
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_20260929.json",
+    "priorFindingId": "B3-002",
+    "priorFindingStatus": "CLOSED_PASS"
   }
 }
