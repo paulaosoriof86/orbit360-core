@@ -98,8 +98,8 @@ cb=rep(cb,
     return String((p && p.pais) || (c && c.pais) || (cli && cli.pais) || '').trim().toUpperCase();
   }""","B3_003_FIX_COBROS_ROWCOUNTRY_DRIFT")
 cb=rep(cb,
-"""<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-reported-payment-evidence="${U.esc(c.receiptId)}"""",
-"""<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-reported-payment-evidence="${U.esc(c.receiptId)}"""",
+'''<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-reported-payment-evidence="${U.esc(c.receiptId)}"''',
+'''<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-reported-payment-evidence="${U.esc(c.receiptId)}"''',
 "B3_003_FIX_REPORTED_ROW_IDENTITY_DRIFT")
 cb=rep(cb,
 """<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" onclick="Orbit.modules.cobros.detalle('${c.id}')">""",
