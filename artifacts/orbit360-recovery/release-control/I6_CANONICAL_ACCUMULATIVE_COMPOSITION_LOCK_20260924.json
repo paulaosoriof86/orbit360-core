@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B3",
-  "productFileCount": 70,
+  "productFileCount": 71,
   "productFiles": [
     "functions/bootstrap.js",
     "functions/document-drive-domain.js",
@@ -74,6 +74,7 @@
     "orbit360-platform/core/product-runtime-browser-providers-p0.js",
     "orbit360-platform/core/public-tenant-branding.js",
     "orbit360-platform/core/pwa.js",
+    "orbit360-platform/core/queries.js",
     "orbit360-platform/core/record-delete.js",
     "orbit360-platform/core/router.js",
     "orbit360-platform/core/tenant-access-policy-contract-p0.js",
@@ -160,7 +161,7 @@
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
-    "orbit360-platform/modules/cobros.js": "6b399b2b27423d170b7a758a9e65a873bba70605",
+    "orbit360-platform/modules/cobros.js": "0df189146f1e06b7cc72d84214b76592930d9f92",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
@@ -179,7 +180,8 @@
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
     "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
-    "orbit360-platform/core/access-role-session-owner-v20260728.js": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5"
+    "orbit360-platform/core/access-role-session-owner-v20260728.js": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5",
+    "orbit360-platform/core/queries.js": "7ba5f363a5143236179777a1a30d763142e8e7a8"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -204,17 +206,12 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "id": "B3-001-COBROS-SHELL-ROOTFIX-20260929",
+    "id": "B3-003-KPI-AGING-CURRENCY-ROOTFIX-20260929",
     "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
-    "parentHead": "0ff9dbc6da4874f43443b5b7573e8eff9f7f657d",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
-    "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_KPI_AGING_CURRENCY_DIAGNOSTIC_20260929.json",
     "changedProductFiles": [
-      "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js"
-    ],
-    "mechanismFiles": [
-      "tools/gravicentra-i6-5-b3-001-contract.mjs",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/cobros.js"
     ],
     "noLive": true,
     "noReimport": true
@@ -243,6 +240,25 @@
     },
     "shellOwnerPreserved": "orbit360-platform/modules/cobros.js",
     "secondRendererCreated": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "b3003CurrencyAgingFix": {
+    "status": "CAUSAL_SOURCE_FIX_BOUND",
+    "findingId": "B3-003",
+    "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
+    "changedProductFiles": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/cobros.js"
+    ],
+    "exactBlobBindings": {
+      "orbit360-platform/core/queries.js": "7ba5f363a5143236179777a1a30d763142e8e7a8",
+      "orbit360-platform/modules/cobros.js": "0df189146f1e06b7cc72d84214b76592930d9f92"
+    },
+    "crossCurrencyConversionIntroduced": false,
+    "countryFilterAppliedToAging": true,
+    "inicioChanged": false,
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
