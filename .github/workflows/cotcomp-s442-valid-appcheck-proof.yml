@@ -105,7 +105,7 @@ jobs:
           NODE
           rm -f "$RUNNER_TEMP/s442/sdkconfig.raw.json"
 
-      - name: Register LAB App Check debug token and attempt encrypted Secret Manager custody
+      - name: Load registered LAB App Check debug token from Secret Manager
         id: token
         shell: bash
         run: |
@@ -115,8 +115,11 @@ jobs:
           const crypto=require('crypto');
 
           const dir=process.env.RUNNER_TEMP+'/s442';
+          const secretResource='projects/646761409743/secrets/cotcomp-s442-appcheck-debug-token';
+          const debugTokenResource='projects/646761409743/apps/1:646761409743:web:2ec4595ee9160f9d945bba/debugTokens/NDdmNzRjMDktYzUzZS00NDg4LWI4MDEtYjY3OWRkOWUyMTI1';
 
           const b64url=v=>Buffer.from(v).toString('base64url');
+
           async function accessToken(sa){
             const now=Math.floor(Date.now()/1000);
             const header=b64url(JSON.stringify({alg:'RS256',typ:'JWT'}));
@@ -129,11 +132,11 @@ jobs:
             }));
             const unsigned=header+'.'+payload;
             const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
-            const assertion=unsigned+'.'+sig;
             const body=new URLSearchParams({
-              grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',
-              assertion
+              grant_type:'urn:ietf:params:oauth-type:jwt-bearer',
+              assertion:unsigned+'.'+sig
             });
+            body.set('grant_type','urn:ietf:params:oauth:grant-type:jwt-bearer');
             const r=await fetch('https://oauth2.googleapis.com/token',{
               method:'POST',
               headers:{'content-type':'application/x-www-form-urlencoded'},
@@ -143,204 +146,86 @@ jobs:
             return (await r.json()).access_token;
           }
 
-          async function jsonFetch(url,options={}){
-            const r=await fetch(url,options);
-            const text=await r.text();
-            let json={};
-            try{ json=text?JSON.parse(text):{}; }catch{}
-            return {ok:r.ok,status:r.status,json};
-          }
-
-          function parseCandidate(label,value){
-            if(!value) return null;
-            try{
-              const sa=JSON.parse(value);
-              if(sa.project_id!=='ays-orbit-360-lab') return null;
-              return {label,sa};
-            }catch{return null;}
+          function candidates(){
+            const out=[];
+            const seen=new Set();
+            for(const [label,value] of [
+              ['ORBIT360_LAB',process.env.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB],
+              ['ORBIT_360_LAB',process.env.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB],
+              ['FALLBACK',process.env.FIREBASE_SERVICE_ACCOUNT_FALLBACK]
+            ]){
+              if(!value) continue;
+              try{
+                const sa=JSON.parse(value);
+                if(sa.project_id!=='ays-orbit-360-lab') continue;
+                const key=sa.client_email||label;
+                if(seen.has(key)) continue;
+                seen.add(key);
+                out.push({label,sa});
+              }catch{}
+            }
+            return out;
           }
 
           (async()=>{
-            const candidates=[];
-            const seen=new Set();
-            for(const item of [
-              parseCandidate('ORBIT360_LAB',process.env.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB),
-              parseCandidate('ORBIT_360_LAB',process.env.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB),
-              parseCandidate('FALLBACK',process.env.FIREBASE_SERVICE_ACCOUNT_FALLBACK)
-            ]){
-              if(!item) continue;
-              const key=item.sa.client_email||item.label;
-              if(seen.has(key)) continue;
-              seen.add(key);
-              candidates.push(item);
-            }
-            if(!candidates.length) throw new Error('NO_LAB_SERVICE_ACCOUNT_CANDIDATE');
-
-            const debugSecret=crypto.randomUUID();
-            if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(debugSecret)){
-              throw new Error('DEBUG_TOKEN_NOT_UUID4');
-            }
-
-            const appParent='projects/'+process.env.COTCOMP_PROJECT_NUMBER+'/apps/'+process.env.COTCOMP_WEB_APP_ID;
-            const createUrl='https://firebaseappcheck.googleapis.com/v1/'+appParent+'/debugTokens';
-            const attempts=[];
+            const tries=[];
             let selected=null;
-            let created=null;
-            let oauth=null;
+            let debugSecret=null;
+            let versionName=null;
 
-            for(const candidate of candidates){
-              const candidateOauth=await accessToken(candidate.sa);
-
-              async function createDebugToken(){
-                return jsonFetch(createUrl,{
-                  method:'POST',
-                  headers:{
-                    authorization:'Bearer '+candidateOauth,
-                    'content-type':'application/json'
-                  },
-                  body:JSON.stringify({
-                    displayName:'CotComp S4.42 CI synthetic proof 2026-09-30',
-                    token:debugSecret
-                  })
-                });
-              }
-
-              let response=await createDebugToken();
-              let errorReason=response.json&&response.json.error&&response.json.error.details&&
-                response.json.error.details[0]&&response.json.error.details[0].reason||null;
-
-              if(!response.ok && errorReason==='SERVICE_DISABLED'){
-                const enableUrl='https://serviceusage.googleapis.com/v1/projects/'+
-                  process.env.COTCOMP_PROJECT_NUMBER+
-                  '/services/firebaseappcheck.googleapis.com:enable';
-                const enabled=await jsonFetch(enableUrl,{
-                  method:'POST',
-                  headers:{
-                    authorization:'Bearer '+candidateOauth,
-                    'content-type':'application/json'
-                  },
-                  body:'{}'
-                });
-                attempts.push({
-                  credential:candidate.label,
-                  action:'ENABLE_FIREBASE_APPCHECK_API',
-                  status:enabled.status,
-                  errorStatus:enabled.json&&enabled.json.error&&enabled.json.error.status||null
-                });
-
-                if(enabled.ok){
-                  const operationName=enabled.json&&enabled.json.name;
-                  if(operationName){
-                    for(let i=0;i<30;i++){
-                      const op=await jsonFetch('https://serviceusage.googleapis.com/v1/'+operationName,{
-                        headers:{authorization:'Bearer '+candidateOauth}
-                      });
-                      if(op.ok && op.json&&op.json.done===true) break;
-                      await new Promise(resolve=>setTimeout(resolve,2000));
-                    }
-                  }else{
-                    await new Promise(resolve=>setTimeout(resolve,5000));
-                  }
-                  response=await createDebugToken();
-                  errorReason=response.json&&response.json.error&&response.json.error.details&&
-                    response.json.error.details[0]&&response.json.error.details[0].reason||null;
-                }
-              }
-
-              attempts.push({
+            for(const candidate of candidates()){
+              const oauth=await accessToken(candidate.sa);
+              const url='https://secretmanager.googleapis.com/v1/'+
+                secretResource+'/versions/latest:access';
+              const r=await fetch(url,{headers:{authorization:'Bearer '+oauth}});
+              const text=await r.text();
+              let json={};
+              try{json=text?JSON.parse(text):{};}catch{}
+              tries.push({
                 credential:candidate.label,
-                action:'CREATE_APPCHECK_DEBUG_TOKEN',
-                status:response.status,
-                errorStatus:response.json&&response.json.error&&response.json.error.status||null,
-                errorReason
+                status:r.status,
+                errorStatus:json&&json.error&&json.error.status||null
               });
-              if(response.ok){
-                selected=candidate;
-                created=response;
-                oauth=candidateOauth;
-                break;
+              if(!r.ok) continue;
+              const data=json&&json.payload&&json.payload.data;
+              if(!data) continue;
+              const candidateSecret=Buffer.from(data,'base64').toString('utf8').trim();
+              if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateSecret)){
+                continue;
               }
+              selected=candidate;
+              debugSecret=candidateSecret;
+              versionName=json.name||secretResource+'/versions/latest';
+              break;
             }
 
-            fs.writeFileSync(dir+'/appcheck-create-attempts.json',JSON.stringify(attempts,null,2));
+            fs.writeFileSync(dir+'/secret-access-attempts.json',JSON.stringify(tries,null,2));
 
-            if(!selected || !created){
-              const err=new Error('APPCHECK_DEBUG_TOKEN_CREATE_FAILED_ALL_EXISTING_LAB_CREDENTIALS');
-              err.attempts=attempts;
-              throw err;
+            if(!selected || !debugSecret){
+              throw new Error('S442_REGISTERED_DEBUG_TOKEN_SECRET_NOT_ACCESSIBLE');
             }
 
-            const resourceName=created.json.name;
-            if(!resourceName) throw new Error('APPCHECK_DEBUG_TOKEN_RESOURCE_MISSING');
+            const credPath=dir+'/firebase-selected-appcheck.json';
+            fs.writeFileSync(credPath,JSON.stringify(selected.sa),{mode:0o600});
+            fs.appendFileSync(process.env.GITHUB_ENV,'GOOGLE_APPLICATION_CREDENTIALS='+credPath+'\n');
 
             fs.writeFileSync(dir+'/debug-token.secret',debugSecret,{mode:0o600});
-            fs.writeFileSync(dir+'/debug-token-resource.txt',resourceName);
-            const selectedPath=dir+'/firebase-selected-appcheck.json';
-            fs.writeFileSync(selectedPath,JSON.stringify(selected.sa),{mode:0o600});
-            fs.appendFileSync(process.env.GITHUB_ENV,'GOOGLE_APPLICATION_CREDENTIALS='+selectedPath+'\n');
-
-            const secretId=process.env.COTCOMP_SECRET_ID;
-            const base='https://secretmanager.googleapis.com/v1/projects/'+process.env.COTCOMP_PROJECT_NUMBER+'/secrets';
-            let custody={
-              mode:'EPHEMERAL_ONLY',
+            fs.writeFileSync(dir+'/debug-token-resource.txt',debugTokenResource);
+            fs.writeFileSync(dir+'/custody.json',JSON.stringify({
+              mode:'GOOGLE_SECRET_MANAGER_REUSE',
               credentialUsed:selected.label,
-              secretManagerStored:false,
-              secretResource:null,
-              secretVersionResource:null,
-              debugTokenResource:resourceName,
+              secretManagerStored:true,
+              secretResource,
+              secretVersionResource:versionName,
+              debugTokenResource,
               tokenPrinted:false,
-              tokenCommitted:false
-            };
+              tokenCommitted:false,
+              existingTokenReused:true
+            },null,2));
 
-            try{
-              let existing=await jsonFetch(base+'/'+secretId,{
-                headers:{authorization:'Bearer '+oauth}
-              });
-              if(existing.status===404){
-                const made=await jsonFetch(base+'?secretId='+encodeURIComponent(secretId),{
-                  method:'POST',
-                  headers:{
-                    authorization:'Bearer '+oauth,
-                    'content-type':'application/json'
-                  },
-                  body:JSON.stringify({replication:{automatic:{}}})
-                });
-                if(!made.ok) throw new Error('SECRET_CREATE_'+made.status);
-              }else if(!existing.ok){
-                throw new Error('SECRET_GET_'+existing.status);
-              }
-
-              const version=await jsonFetch(base+'/'+secretId+':addVersion',{
-                method:'POST',
-                headers:{
-                  authorization:'Bearer '+oauth,
-                  'content-type':'application/json'
-                },
-                body:JSON.stringify({
-                  payload:{data:Buffer.from(debugSecret).toString('base64')}
-                })
-              });
-              if(!version.ok) throw new Error('SECRET_VERSION_'+version.status);
-
-              custody={
-                ...custody,
-                mode:'GOOGLE_SECRET_MANAGER',
-                secretManagerStored:true,
-                secretResource:'projects/'+process.env.COTCOMP_PROJECT_NUMBER+'/secrets/'+secretId,
-                secretVersionResource:version.json.name||null
-              };
-            }catch(e){
-              custody.secretManagerErrorCode=String(e&&e.message||e).replace(/[^A-Z0-9_]/gi,'_').slice(0,120);
-            }
-
-            fs.writeFileSync(dir+'/custody.json',JSON.stringify(custody,null,2));
-            console.log('APPCHECK_DEBUG_TOKEN_REGISTERED=true');
-            console.log('APPCHECK_CREDENTIAL_USED='+selected.label);
-            console.log('SECRET_MANAGER_CUSTODY='+custody.mode);
+            console.log('APPCHECK_DEBUG_TOKEN_REUSED=true');
+            console.log('SECRET_MANAGER_CUSTODY=GOOGLE_SECRET_MANAGER_REUSE');
           })().catch(e=>{
-            if(e&&e.attempts){
-              console.error('APPCHECK_CREATE_ATTEMPTS='+JSON.stringify(e.attempts));
-            }
             console.error(String(e&&e.message||e));
             process.exit(1);
           });
@@ -369,33 +254,16 @@ jobs:
 
           const cfg=window.__S442_FIREBASE_CONFIG__;
           const debugToken=window.__S442_DEBUG_TOKEN__;
-          const projectNumber='646761409743';
-          const appId='1:646761409743:web:2ec4595ee9160f9d945bba';
-
-          function expMillis(jwt){
-            const payload=JSON.parse(atob(jwt.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-            if(!payload.exp) throw new Error('APPCHECK_TOKEN_EXP_MISSING');
-            return payload.exp*1000;
-          }
+          self.FIREBASE_APPCHECK_DEBUG_TOKEN=debugToken;
 
           const provider=new CustomProvider({
-            getToken: async(isLimitedUse=false)=>{
-              const url='https://firebaseappcheck.googleapis.com/v1/projects/'+projectNumber+
-                '/apps/'+encodeURIComponent(appId)+':exchangeDebugToken?key='+encodeURIComponent(cfg.apiKey);
-              const r=await fetch(url,{
-                method:'POST',
-                headers:{'content-type':'application/json'},
-                body:JSON.stringify({debugToken,limitedUse:!!isLimitedUse})
-              });
-              if(!r.ok) throw new Error('APPCHECK_EXCHANGE_FAILED_'+r.status);
-              const j=await r.json();
-              if(!j.token) throw new Error('APPCHECK_TOKEN_MISSING');
-              return {token:j.token,expireTimeMillis:expMillis(j.token)};
+            getToken: async()=>{
+              throw new Error('CUSTOM_PROVIDER_SHOULD_NOT_RUN_IN_DEBUG_MODE');
             }
           });
 
           const app=initializeApp(cfg);
-          const appCheck=initializeAppCheck(app,{provider,isTokenAutoRefreshEnabled:false});
+          initializeAppCheck(app,{provider,isTokenAutoRefreshEnabled:false});
           const functions=getFunctions(app,'us-central1');
           const names=[
             'cotcompValidateDraft',
