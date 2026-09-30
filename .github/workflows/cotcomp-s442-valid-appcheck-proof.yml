@@ -115,10 +115,9 @@ jobs:
           const crypto=require('crypto');
 
           const dir=process.env.RUNNER_TEMP+'/s442';
-          const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS,'utf8'));
 
           const b64url=v=>Buffer.from(v).toString('base64url');
-          async function accessToken(){
+          async function accessToken(sa){
             const now=Math.floor(Date.now()/1000);
             const header=b64url(JSON.stringify({alg:'RS256',typ:'JWT'}));
             const payload=b64url(JSON.stringify({
@@ -152,8 +151,31 @@ jobs:
             return {ok:r.ok,status:r.status,json};
           }
 
+          function parseCandidate(label,value){
+            if(!value) return null;
+            try{
+              const sa=JSON.parse(value);
+              if(sa.project_id!=='ays-orbit-360-lab') return null;
+              return {label,sa};
+            }catch{return null;}
+          }
+
           (async()=>{
-            const oauth=await accessToken();
+            const candidates=[];
+            const seen=new Set();
+            for(const item of [
+              parseCandidate('ORBIT360_LAB',process.env.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB),
+              parseCandidate('ORBIT_360_LAB',process.env.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB),
+              parseCandidate('FALLBACK',process.env.FIREBASE_SERVICE_ACCOUNT_FALLBACK)
+            ]){
+              if(!item) continue;
+              const key=item.sa.client_email||item.label;
+              if(seen.has(key)) continue;
+              seen.add(key);
+              candidates.push(item);
+            }
+            if(!candidates.length) throw new Error('NO_LAB_SERVICE_ACCOUNT_CANDIDATE');
+
             const debugSecret=crypto.randomUUID();
             if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(debugSecret)){
               throw new Error('DEBUG_TOKEN_NOT_UUID4');
@@ -161,28 +183,61 @@ jobs:
 
             const appParent='projects/'+process.env.COTCOMP_PROJECT_NUMBER+'/apps/'+process.env.COTCOMP_WEB_APP_ID;
             const createUrl='https://firebaseappcheck.googleapis.com/v1/'+appParent+'/debugTokens';
-            const created=await jsonFetch(createUrl,{
-              method:'POST',
-              headers:{
-                authorization:'Bearer '+oauth,
-                'content-type':'application/json'
-              },
-              body:JSON.stringify({
-                displayName:'CotComp S4.42 CI synthetic proof 2026-09-30',
-                token:debugSecret
-              })
-            });
-            if(!created.ok) throw new Error('APPCHECK_DEBUG_TOKEN_CREATE_FAILED_'+created.status);
+            const attempts=[];
+            let selected=null;
+            let created=null;
+            let oauth=null;
+
+            for(const candidate of candidates){
+              const candidateOauth=await accessToken(candidate.sa);
+              const response=await jsonFetch(createUrl,{
+                method:'POST',
+                headers:{
+                  authorization:'Bearer '+candidateOauth,
+                  'content-type':'application/json'
+                },
+                body:JSON.stringify({
+                  displayName:'CotComp S4.42 CI synthetic proof 2026-09-30',
+                  token:debugSecret
+                })
+              });
+              attempts.push({
+                credential:candidate.label,
+                status:response.status,
+                errorStatus:response.json&&response.json.error&&response.json.error.status||null,
+                errorReason:response.json&&response.json.error&&response.json.error.details&&
+                  response.json.error.details[0]&&response.json.error.details[0].reason||null
+              });
+              if(response.ok){
+                selected=candidate;
+                created=response;
+                oauth=candidateOauth;
+                break;
+              }
+            }
+
+            fs.writeFileSync(dir+'/appcheck-create-attempts.json',JSON.stringify(attempts,null,2));
+
+            if(!selected || !created){
+              const err=new Error('APPCHECK_DEBUG_TOKEN_CREATE_FAILED_ALL_EXISTING_LAB_CREDENTIALS');
+              err.attempts=attempts;
+              throw err;
+            }
+
             const resourceName=created.json.name;
             if(!resourceName) throw new Error('APPCHECK_DEBUG_TOKEN_RESOURCE_MISSING');
 
             fs.writeFileSync(dir+'/debug-token.secret',debugSecret,{mode:0o600});
             fs.writeFileSync(dir+'/debug-token-resource.txt',resourceName);
+            const selectedPath=dir+'/firebase-selected-appcheck.json';
+            fs.writeFileSync(selectedPath,JSON.stringify(selected.sa),{mode:0o600});
+            fs.appendFileSync(process.env.GITHUB_ENV,'GOOGLE_APPLICATION_CREDENTIALS='+selectedPath+'\n');
 
             const secretId=process.env.COTCOMP_SECRET_ID;
             const base='https://secretmanager.googleapis.com/v1/projects/'+process.env.COTCOMP_PROJECT_NUMBER+'/secrets';
             let custody={
               mode:'EPHEMERAL_ONLY',
+              credentialUsed:selected.label,
               secretManagerStored:false,
               secretResource:null,
               secretVersionResource:null,
@@ -234,8 +289,15 @@ jobs:
 
             fs.writeFileSync(dir+'/custody.json',JSON.stringify(custody,null,2));
             console.log('APPCHECK_DEBUG_TOKEN_REGISTERED=true');
+            console.log('APPCHECK_CREDENTIAL_USED='+selected.label);
             console.log('SECRET_MANAGER_CUSTODY='+custody.mode);
-          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)});
+          })().catch(e=>{
+            if(e&&e.attempts){
+              console.error('APPCHECK_CREATE_ATTEMPTS='+JSON.stringify(e.attempts));
+            }
+            console.error(String(e&&e.message||e));
+            process.exit(1);
+          });
           NODE
 
       - name: Install browser proof dependencies
