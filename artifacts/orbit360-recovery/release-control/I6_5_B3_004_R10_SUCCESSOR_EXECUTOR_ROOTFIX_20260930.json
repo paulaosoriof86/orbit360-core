@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R10_SUCCESSOR_EXECUTOR_ROOTFIX_V1",
+  "recordedAt": "2026-09-30",
+  "status": "ROOT_CAUSE_PROVED_FIX_AUTHORIZED_PENDING_WORKFLOW_PATCH",
+  "findingId": "B3-004",
+  "rootCause": {
+    "code": "GITHUB_TOKEN_PUSH_DOES_NOT_TRIGGER_SUCCESSOR_WORKFLOW",
+    "evidenceRunId": 36791933821,
+    "foundationJobId": 110146673238,
+    "exactPreviewJobId": 110146673273,
+    "sourceRunHead": "78cdde607ec87b0c7a9ea29adf64aa23cc3336a9",
+    "producedHead": "fd5a6068d31e503a69f352676aba4cfebcf79fa3",
+    "producedHeadWorkflowRunCount": 0,
+    "priorWorkflowMarker": "B3_004_SUCCESSOR_RUN_REQUIRES_AUTHORIZED_EXTERNAL_PUSH=1",
+    "causalConclusion": "The contract job pushed the frozen successor state with GITHUB_TOKEN; that push did not start a new workflow, while the exact-preview job in the same run had already gated against the pre-freeze state."
+  },
+  "requiredFix": {
+    "exactPreviewNeedsFoundation": true,
+    "exactPreviewChecksOutRemoteBranchHead": true,
+    "candidateSourceShaResolvedFromCheckedOutHead": true,
+    "buildReadbackReceiptUseCandidateSourceSha": true,
+    "externalSuccessorPushDependencyRemoved": true
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3005Opened": false
+  }
+}
