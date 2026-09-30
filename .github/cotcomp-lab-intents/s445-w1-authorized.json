@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "ays-cotcomp-s445-w1-authorization-v1.0",
+  "authorization": "S445_W1_LAB_SYNTHETIC_CORE_CONTROLLED_WRITE",
+  "authorizedSourceParent": "3dabb7f00a84ab9f5f727309b941b446de835114",
+  "authorizedAt": "2026-09-30",
+  "projectId": "ays-orbit-360-lab",
+  "environment": "LAB",
+  "region": "us-central1",
+  "tenantId": "alianzas-soluciones",
+  "syntheticOnly": true,
+  "scope": [
+    "idempotency",
+    "quoteCase",
+    "caseAccess_hash_only",
+    "cotcomp_event",
+    "exact_readback",
+    "same_payload_retry_no_duplicate",
+    "conflicting_payload_deny",
+    "mandatory_cleanup",
+    "final_absence"
+  ],
+  "workflowProjection": false,
+  "providerNotifications": false,
+  "proposalPersistence": false,
+  "selectionPersistence": false,
+  "realData": false,
+  "production": false,
+  "cleanupRequired": true,
+  "finalAbsenceRequired": true,
+  "ownerAuthorizationText": "Autorizo S4.45 / W1 para desplegar exclusivamente en ays-orbit-360-lab la superficie aislada de prueba de persistencia CotComp y ejecutar un controlled-write sintético limitado a idempotency, quoteCase, caseAccess hash-only y CotComp event, con readback exacto, retry sin duplicado, rechazo de payload conflictivo, cleanup obligatorio y verificación de ausencia final; sin workflow Lead/Ops, sin notificaciones a proveedores, sin propuestas, sin selección, sin datos reales y sin producción."
+}
