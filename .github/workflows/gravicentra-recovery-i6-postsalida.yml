@@ -3621,7 +3621,7 @@ jobs:
           if not rows:raise SystemExit('B2_NO_SERVICE_ACCOUNT')
           pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
           PY
-          npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 firebase@11.10.0 >/dev/null
           CROOT="$RUNNER_TEMP/b2-firebase-cli";npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
           node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CROOT"
           CLI="$CROOT/node_modules/firebase-tools/lib/bin/firebase.js";echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
