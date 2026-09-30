@@ -70,11 +70,11 @@ try{
   evidence.target.actualSourceSha=marker?.sourceSha||'';evidence.target.actualBuildId=marker?.buildId||'';
   await signIn(page,auth,a);
   await waitHydration(page);
-  for(const country of ['TODOS','GT','CO']){
+  for(const country of ['GT','CO','TODOS']){
+    await page.selectOption('#pais-sel',country);
+    await sleep(700);
     const r=await page.evaluate(country=>{
-      Orbit.pais=country;
       const host=document.getElementById('host');
-      Orbit.modules.cobros.render(host);
       const cart=Orbit.q.carteraGlobalPorMoneda();
       const aging=Orbit.q.agingVencidoPorMoneda();
       const metricNodes=[...host.querySelectorAll('[data-currency-safe-metric]')].map(n=>({
@@ -86,14 +86,20 @@ try{
         currency:n.getAttribute('data-aging-currency'),
         text:(n.textContent||'').trim().slice(0,500)
       }));
+      const dataRows=[...host.querySelectorAll('table.tbl tbody tr[data-row-country]')];
+      const rowCountries=dataRows.map(n=>String(n.getAttribute('data-row-country')||'').trim().toUpperCase()).filter(Boolean);
       return {
         country,
+        selectedCountry:String(document.getElementById('pais-sel')?.value||''),
+        orbitCountry:String(Orbit.pais||''),
         cart,
         aging,
         metrics:metricNodes,
         agingNodes,
+        dataRowCount:dataRows.length,
+        rowCountries:[...new Set(rowCountries)],
+        reportedRowCount:host.querySelectorAll('[data-reported-payment-evidence]').length,
         hydrationLoading:!!host.querySelector('[data-cobros-hydration-loading="1"]'),
-        pageErrors:[],
         oldScalarUsed:false
       };
     },country);
@@ -106,6 +112,11 @@ try{
   need((all?.metrics||[]).length===3,'B3_003_SAFE_KPI_MARKERS_MISSING');
   need((all?.agingNodes||[]).some(x=>x.currency==='GTQ')&&(all?.agingNodes||[]).some(x=>x.currency==='COP'),'B3_003_MULTI_CURRENCY_AGING_NOT_RENDERED_SEPARATELY');
   need(gt?.cart?.country==='GT'&&co?.cart?.country==='CO','B3_003_COUNTRY_CONTEXT_NOT_APPLIED');
+  need(gt?.selectedCountry==='GT'&&gt?.orbitCountry==='GT'&&co?.selectedCountry==='CO'&&co?.orbitCountry==='CO','B3_003_REAL_SELECTOR_CONTEXT_NOT_APPLIED');
+  need((gt?.metrics||[]).length===3&&(co?.metrics||[]).length===3,'B3_003_SAFE_KPI_MARKERS_NOT_STABLE_AFTER_SELECTOR');
+  need((gt?.rowCountries||[]).every(x=>x==='GT'),'B3_003_GT_TABLE_COUNTRY_LEAK:'+JSON.stringify(gt?.rowCountries));
+  need((co?.rowCountries||[]).every(x=>x==='CO'),'B3_003_CO_TABLE_COUNTRY_LEAK:'+JSON.stringify(co?.rowCountries));
+  need((co?.dataRowCount||0)>0,'B3_003_CO_TABLE_UNEXPECTEDLY_EMPTY');
   need(JSON.stringify(gt?.aging?.byCurrency)!==JSON.stringify(co?.aging?.byCurrency),'B3_003_AGING_COUNTRY_FILTER_NOT_EFFECTIVE');
   need(!(gt?.hydrationLoading||co?.hydrationLoading||all?.hydrationLoading),'B3_003_HYDRATION_INCOMPLETE');
   need(evidence.errors.length===0,'B3_003_BROWSER_ERRORS:'+JSON.stringify(evidence.errors));
@@ -116,11 +127,14 @@ try{
     noFxAuthorityInvented:true,
     agingCountryFilterEffective:true,
     safeKpiMarkers:true,
+    realCountrySelector:true,
+    renderedRowsCountryScoped:true,
+    kpiMarkersStableAfterAsyncSettle:true,
     noBrowserErrors:true
   };
   fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(evidence,null,2)+'\n');
   console.log('B3_003_PREVIEW_PROOF=PASS');
-  console.log('B3_003_COUNTRY_SUMMARY='+JSON.stringify(Object.fromEntries(Object.entries(evidence.countries).map(([k,v])=>[k,{currencies:v.cart.currencies,agingCurrencies:v.aging.currencies,metrics:v.metrics.map(x=>x.text)}]))));
+  console.log('B3_003_COUNTRY_SUMMARY='+JSON.stringify(Object.fromEntries(Object.entries(evidence.countries).map(([k,v])=>[k,{currencies:v.cart.currencies,agingCurrencies:v.aging.currencies,metrics:v.metrics.map(x=>x.text),rowCountries:v.rowCountries,dataRowCount:v.dataRowCount}]))));
 }catch(error){
   evidence.status='FAIL';evidence.failure=clean(error?.stack||error?.message||error,4000);
   try{fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(evidence,null,2)+'\n');}catch{}

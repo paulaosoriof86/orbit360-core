@@ -164,7 +164,7 @@
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
-    "orbit360-platform/modules/cobros.js": "4c893396d12ac5ff20d9a1ccc1b5b31abdf5fb65",
+    "orbit360-platform/modules/cobros.js": "668b6133ae4e52c8f26e8c884a2fc0396a1a3ac0",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
@@ -173,7 +173,7 @@
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
     "orbit360-platform/modules/inicio.js": "bbae195ae7725ee1bcd790f1234946b31660d68e",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
-    "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "f820ef06305367678ce3078190251b7bdfd69261",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "d1bd8c883db39b946b3833bd1684a0a8fe4843b3",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "256b0ad5ed0937ad60f1e45eac1c8d748976627a",
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "d329ed1c822d42803bf2eb38c34873218d63faad",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
@@ -299,5 +299,26 @@
       "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170"
     },
     "guardClassificationNote": "Current guard treats every changed path outside approved Gravicentra governance prefixes as canonical composition diff; the CotComp QA workflow and test therefore must be bound alongside the owner source."
+  },
+  "b3003CountryScopeFix": {
+    "status": "CAUSAL_SOURCE_FIX_BOUND_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-003",
+    "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json",
+    "changedProductFiles": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+    ],
+    "exactBlobBindings": {
+      "orbit360-platform/modules/cobros.js": "668b6133ae4e52c8f26e8c884a2fc0396a1a3ac0",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "d1bd8c883db39b946b3833bd1684a0a8fe4843b3"
+    },
+    "canonicalKpiOwner": "orbit360-platform/modules/cobros.js",
+    "asyncCobrosKpiOverrideRemoved": true,
+    "renderedRowsCountryScoped": true,
+    "realSelectorProofStrengthened": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
