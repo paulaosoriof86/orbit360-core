@@ -161,7 +161,7 @@
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
-    "orbit360-platform/modules/cobros.js": "0df189146f1e06b7cc72d84214b76592930d9f92",
+    "orbit360-platform/modules/cobros.js": "4c893396d12ac5ff20d9a1ccc1b5b31abdf5fb65",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
@@ -245,7 +245,7 @@
     "livePromotion": false
   },
   "b3003CurrencyAgingFix": {
-    "status": "CAUSAL_SOURCE_FIX_BOUND",
+    "status": "CAUSAL_SOURCE_FIX_BOUND_PENDING_EXACT_PREVIEW",
     "findingId": "B3-003",
     "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
     "changedProductFiles": [
@@ -254,7 +254,7 @@
     ],
     "exactBlobBindings": {
       "orbit360-platform/core/queries.js": "7ba5f363a5143236179777a1a30d763142e8e7a8",
-      "orbit360-platform/modules/cobros.js": "0df189146f1e06b7cc72d84214b76592930d9f92"
+      "orbit360-platform/modules/cobros.js": "4c893396d12ac5ff20d9a1ccc1b5b31abdf5fb65"
     },
     "crossCurrencyConversionIntroduced": false,
     "countryFilterAppliedToAging": true,
