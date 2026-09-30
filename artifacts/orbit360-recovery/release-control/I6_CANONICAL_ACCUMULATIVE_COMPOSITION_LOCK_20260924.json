@@ -36,9 +36,11 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B3",
-  "productFileCount": 72,
+  "productFileCount": 74,
   "productFiles": [
+    ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "functions/bootstrap.js",
+    "functions/cotcomp-workflow-owner-patch.test.js",
     "functions/document-drive-domain.js",
     "functions/ops-leads-domain.js",
     "functions/package-lock.json",
@@ -183,7 +185,9 @@
     "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
     "orbit360-platform/core/access-role-session-owner-v20260728.js": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5",
     "orbit360-platform/core/queries.js": "7ba5f363a5143236179777a1a30d763142e8e7a8",
-    "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170"
+    "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+    ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
+    "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -266,7 +270,7 @@
     "livePromotion": false
   },
   "concurrentSourceReconciliation": {
-    "status": "AUTHORIZED_SOURCE_BOUND_REQUIRES_NEW_EXACT_CUMULATIVE_PREVIEW",
+    "status": "AUTHORIZED_EXACT_SET_BOUND_REQUIRES_NEW_EXACT_CUMULATIVE_PREVIEW",
     "detectedByGuard": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT",
     "priorB3003ProofSourceSha": "88d8e53c035180e344651d46815d3368cbbeb9f1",
     "concurrentCommits": [
@@ -285,6 +289,15 @@
     "cumulativeArtifactInvalidated": true,
     "reason": "Product source changed after B3-003 artifact build; immutable release rules require a new exact artifact/digest.",
     "noLive": true,
-    "noReimport": true
+    "noReimport": true,
+    "guardFailureRunId": 36656194889,
+    "guardFailureJobId": 109700966157,
+    "guardFailureCode": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT",
+    "exactConcurrentDiffBindings": {
+      ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
+      "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
+      "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170"
+    },
+    "guardClassificationNote": "Current guard treats every changed path outside approved Gravicentra governance prefixes as canonical composition diff; the CotComp QA workflow and test therefore must be bound alongside the owner source."
   }
 }

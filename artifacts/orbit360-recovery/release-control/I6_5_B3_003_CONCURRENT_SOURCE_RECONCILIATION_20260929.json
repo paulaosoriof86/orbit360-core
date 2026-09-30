@@ -3,7 +3,7 @@
   "recordedAt": "2026-09-30T01:34:00Z",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "RECONCILED_REBUILD_REQUIRED",
+  "status": "EXACT_SET_RECONCILED_REBUILD_REQUIRED",
   "priorB3003MachineProof": {
     "sourceSha": "88d8e53c035180e344651d46815d3368cbbeb9f1",
     "buildId": "gi-i65-b3-88d8e53c0351-57f234755dc1",
@@ -41,5 +41,18 @@
     "livePromotion": false,
     "b4": false
   },
-  "nextAction": "B3_003_REBUILD_EXACT_CUMULATIVE_PREVIEW"
+  "nextAction": "B3_003_REBUILD_EXACT_CUMULATIVE_PREVIEW",
+  "guardReconciliation": {
+    "failedRunId": 36656194889,
+    "failedJobId": 109700966157,
+    "failureCode": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT",
+    "exactConcurrentDiffBindings": {
+      ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
+      "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
+      "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170"
+    },
+    "manifestCountAfterReconciliation": 74,
+    "guardRelaxed": false,
+    "explanation": "The authorized CotComp merge added owner source + QA test + QA workflow. Guard exact-set semantics require all three changed paths to be present in the canonical composition manifest."
+  }
 }
