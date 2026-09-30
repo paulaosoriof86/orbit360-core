@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
     "boundaries": {
@@ -34,7 +34,9 @@
       "orbit360-platform/core/record-delete.js",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
-      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/conciliaciones.js",
+      "orbit360-platform/modules/crm-v1198-operational-bridge.js"
     ],
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
     "foundationBlobs": {
@@ -171,7 +173,7 @@
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
     },
-    "machineProofInvalidatedBySourceChange": false,
+    "machineProofInvalidatedBySourceChange": true,
     "priorMachineProof": {
       "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
       "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
@@ -300,7 +302,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R8_EXACT_PREVIEW",
+    "nextAction": "B3_004_R9_SOURCE_CONTRACT",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -464,19 +466,31 @@
     "r8MachinePass": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_MACHINE_PASS_20260930.json",
       "blobSha": "2a0c82f22321c64b01fdd41e033200b4aa40a22f"
+    },
+    "r9VisualRejection": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_TARGETED_VISUAL_REJECTION_20260930.json",
+      "blobSha": "82a0965b246ace5cacd7d2c9a12c6839e70f6ab2"
+    },
+    "r9SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_CAUSAL_SOURCE_FIX_20260930.json",
+      "blobSha": "c749bba3adc3f177f43643763c60d568dc10eee0",
+      "sourceSha": "4319ad47c7a2288bde356865d56412418a2bc0f9",
+      "compositionLockBlobSha": "f1d347fa661f4f3402fa97e54fd09911e4810ef8"
     }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "00b1c795b7ba786e471f0b266af0bd3b57ba9a29",
-    "productFileCount": 78
+    "blobSha": "f1d347fa661f4f3402fa97e54fd09911e4810ef8",
+    "productFileCount": 79
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "cd2bda45e1609bae9f2d679cd0df05818432a595"
+    "blobSha": "e9198e66c0a57e1102860cb94b8a8c17aa3ae870"
   },
   "nextRequiredProof": [
-    "B3_004_R8_TARGETED_VISUAL_PASS"
+    "B3_004_R9_SOURCE_CONTRACT_PASS",
+    "B3_004_R9_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_R9_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",

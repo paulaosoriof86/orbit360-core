@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R9_CAUSAL_SOURCE_FIX_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "findingId": "B3-004",
+  "sourceSha": "4319ad47c7a2288bde356865d56412418a2bc0f9",
+  "parentHead": "2744f1d4d373bbcf9cb92eef6e4db03252e88f76",
+  "compositionLockBlobSha": "f1d347fa661f4f3402fa97e54fd09911e4810ef8",
+  "rejectionReceiptBlobSha": "82a0965b246ace5cacd7d2c9a12c6839e70f6ab2",
+  "productBlobs": {
+    "orbit360-platform/modules/conciliaciones.js": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25",
+    "orbit360-platform/modules/crm-v1198-operational-bridge.js": "716a345304d03f975ae1459a03a9e8c8df5801d4",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "1aaf128d1fdf25efbd93ff8df53b7e55d0dbe124",
+    "orbit360-platform/index.html": "116d5aec63774e1b33af5737b79472cdaeec8b3b"
+  },
+  "qaContractBlobSha": "176486211094f3539c188e201b530c4382b8307b",
+  "fixes": {
+    "actionOwner": "conciliaciones proposal browser no longer overrides/disables canonical Cobros payment actions",
+    "scopeGuard": "Cobros payment guards resolve both cobros and recibosEsperados IDs before access evaluation",
+    "fastBack": "receipt detail renders inside existing c360-body and repaints receipts body directly",
+    "modal": "canonical Cobros modals expose paid date, method, payment support, application date, invoice number and invoice/application support"
+  },
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "syntheticQaOnly": true,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  }
+}
