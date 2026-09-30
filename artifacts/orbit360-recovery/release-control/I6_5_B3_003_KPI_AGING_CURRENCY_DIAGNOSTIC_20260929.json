@@ -1,0 +1,87 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_003_KPI_AGING_CURRENCY_DIAGNOSTIC_V1",
+  "recordedAt": "2026-09-30T01:20:13Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "B3-003",
+  "status": "CAUSE_CONFIRMED",
+  "diagnostic": {
+    "runId": 36654461494,
+    "jobId": 109695973765,
+    "headSha": "7820cd9990f2f1693568c4e35f5c367872730d52",
+    "artifactId": 11071897701,
+    "artifactDigest": "sha256:5921eb661a892abb11d7371fbce3e31bc4fa93e9bb356b5807f4aad6c4f6c5dc",
+    "boundaries": {
+      "readOnly": true,
+      "businessWrites": 0,
+      "reimport": false,
+      "livePromotion": false,
+      "productMutation": false
+    }
+  },
+  "authoritativeData": {
+    "clientes": 442,
+    "polizas": 1419,
+    "cobrosConfirmed": {
+      "count": 5,
+      "GTQ": 2743.61
+    },
+    "carteraPending": {
+      "count": 788,
+      "GTQ": 11110.02
+    },
+    "carteraOverdue": {
+      "count": 529,
+      "GTQ": {
+        "count": 513,
+        "amount": 5759.67
+      },
+      "COP": {
+        "count": 16,
+        "amount": 0
+      },
+      "countryRows": {
+        "GT": 515,
+        "CO": 14
+      }
+    }
+  },
+  "demonstratedRootCauses": [
+    {
+      "id": "B3_003_RC1",
+      "code": "ALL_COUNTRIES_SUMS_MULTIPLE_CURRENCIES_IN_ONE_DISPLAY_AMOUNT",
+      "evidence": "Current all-country overdue set contains GTQ and COP rows while scalar aggregation is displayed as GTQ."
+    },
+    {
+      "id": "B3_003_RC2",
+      "code": "FIXED_COP_DIVISOR_IS_NOT_CANONICAL_FX_AUTHORITY",
+      "evidence": "queries.js uses TC_COP_GTQ=1000 and divides COP only when all countries are selected; no approved FX authority governs that conversion."
+    },
+    {
+      "id": "B3_003_RC3",
+      "code": "AGING_IGNORES_ACTIVE_COUNTRY_FILTER",
+      "evidence": "agingVencido() iterates all carteraPrimas overdue rows without policyLinkedRowPais/rowPais filtering; live data includes overdue rows from GT and CO."
+    }
+  ],
+  "currentNumericalNuance": {
+    "note": "The current COP overdue rows total 0, so the present Q5,759.67 overdue amount is not numerically inflated by COP today. The aggregation contract is nevertheless unsafe and the country leak is active."
+  },
+  "fixBoundary": {
+    "allowedProductFiles": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/cobros.js"
+    ],
+    "rules": [
+      "Cobros KPIs must aggregate by currency, never by implicit cross-currency conversion.",
+      "Aging must use the same active-country authority as cartera KPIs.",
+      "All-countries view may show multiple currency amounts; it may not collapse them to one GTQ amount without an approved FX source.",
+      "Selected-country view may still expose more than one currency if the underlying authoritative rows contain them; keep amounts separated by currency.",
+      "Reported payment evidence remains excluded from confirmed cobro KPIs.",
+      "No change to Inicio in B3-003; dashboard reconciliation remains frozen for B3-008."
+    ],
+    "dataWrites": false,
+    "reimport": false,
+    "live": false
+  },
+  "nextAction": "B3_003_CAUSAL_SOURCE_FIX"
+}
