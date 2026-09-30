@@ -1,0 +1,192 @@
+name: CotComp S4.41 App Check preflight
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-public-bridge-s47-20260929
+    paths:
+      - '.github/cotcomp-lab-intents/s441-appcheck-preflight.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  COTCOMP_DEPLOYED_SOURCE_SHA: 17d599e884d5b834b73b9499d8cef177575d56f9
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_APPCHECK_DEBUG_TOKEN: ${{ secrets.FIREBASE_APPCHECK_DEBUG_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify read-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s441-appcheck-preflight.json
+          jq -e '
+            .authorization == "READ_ONLY_APPCHECK_PREFLIGHT" and
+            .projectId == "ays-orbit-360-lab" and
+            .firebaseConfigWrites == false and
+            .appDataWrites == false and
+            .deploy == false and
+            .production == false
+          ' "$INTENT" >/dev/null
+
+      - name: Prepare Firebase LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/firebase-s441-preflight.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@15.32.0
+          firebase --version
+
+      - name: Discover LAB Web Apps read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s441"
+          firebase apps:list WEB --project "$COTCOMP_PROJECT_ID" --json > "$RUNNER_TEMP/s441/apps.json"
+          node <<'NODE'
+          const fs=require('fs');
+          const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s441/apps.json','utf8'));
+          const apps=[];
+          function walk(v){
+            if(Array.isArray(v)){ for(const x of v) walk(x); return; }
+            if(!v || typeof v!=='object') return;
+            const id=v.appId||v.app_id||v.appID||null;
+            const platform=String(v.platform||v.platformId||v.platform_id||'').toUpperCase();
+            if(id && (!platform || platform==='WEB')){
+              apps.push({
+                appId:id,
+                displayName:v.displayName||v.display_name||null,
+                platform:platform||'WEB'
+              });
+            }
+            for(const x of Object.values(v)) walk(x);
+          }
+          walk(raw);
+          const uniq=[...new Map(apps.map(x=>[x.appId,x])).values()];
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s441/apps-sanitized.json',JSON.stringify(uniq,null,2));
+          console.log('LAB_WEB_APP_COUNT='+uniq.length);
+          NODE
+
+      - name: Resolve one LAB Web SDK config without persisting raw config
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_COUNT="$(node -e "const a=require(process.env.RUNNER_TEMP+'/s441/apps-sanitized.json');console.log(a.length)")"
+          SDK_OK=false
+          SELECTED_APP_ID=""
+          if [ "$APP_COUNT" = "1" ]; then
+            SELECTED_APP_ID="$(node -e "const a=require(process.env.RUNNER_TEMP+'/s441/apps-sanitized.json');console.log(a[0].appId)")"
+            if firebase apps:sdkconfig WEB "$SELECTED_APP_ID" --project "$COTCOMP_PROJECT_ID" --json > "$RUNNER_TEMP/s441/sdkconfig.raw.json" 2>"$RUNNER_TEMP/s441/sdkconfig.err"; then
+              node <<'NODE'
+              const fs=require('fs');
+              const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s441/sdkconfig.raw.json','utf8'));
+              let found=false;
+              function walk(v){
+                if(!v || typeof v!=='object') return;
+                if(typeof v.projectId==='string' && typeof v.appId==='string') found=true;
+                for(const x of Object.values(v)) if(typeof x==='object') walk(x);
+              }
+              walk(raw);
+              if(!found) process.exit(2);
+              NODE
+              SDK_OK=true
+            fi
+          fi
+          rm -f "$RUNNER_TEMP/s441/sdkconfig.raw.json"
+          printf '%s' "$SDK_OK" > "$RUNNER_TEMP/s441/sdk-ok.txt"
+          printf '%s' "$SELECTED_APP_ID" > "$RUNNER_TEMP/s441/selected-app-id.txt"
+
+      - name: Record secret presence without disclosure
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "$FIREBASE_APPCHECK_DEBUG_TOKEN" ]; then
+            printf 'true' > "$RUNNER_TEMP/s441/debug-token-present.txt"
+          else
+            printf 'false' > "$RUNNER_TEMP/s441/debug-token-present.txt"
+          fi
+
+      - name: Build sanitized S4.41 preflight receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const plan=require('./functions/cotcomp-appcheck-proof-plan-s441');
+          const apps=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s441/apps-sanitized.json','utf8'));
+          const sdkOk=fs.readFileSync(process.env.RUNNER_TEMP+'/s441/sdk-ok.txt','utf8').trim()==='true';
+          const tokenPresent=fs.readFileSync(process.env.RUNNER_TEMP+'/s441/debug-token-present.txt','utf8').trim()==='true';
+          const selected=fs.readFileSync(process.env.RUNNER_TEMP+'/s441/selected-app-id.txt','utf8').trim()||null;
+          const state=plan.evaluatePreflight({
+            projectId:'ays-orbit-360-lab',
+            webAppCount:apps.length,
+            sdkConfigResolvable:sdkOk,
+            debugTokenSecretPresent:tokenPresent,
+            deployedSourceSha:'17d599e884d5b834b73b9499d8cef177575d56f9',
+            persistenceEnabled:false,
+            productionTargeted:false
+          });
+          const receipt={
+            schemaVersion:'ays-cotcomp-s441-appcheck-preflight-v1.0',
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            deployedSourceSha:'17d599e884d5b834b73b9499d8cef177575d56f9',
+            webApps:apps,
+            selectedWebAppId:selected,
+            sdkConfigResolvable:sdkOk,
+            debugTokenSecretPresent:tokenPresent,
+            firebaseConfigWritesExecuted:0,
+            appDataWritesExecuted:0,
+            deployExecuted:false,
+            productionTouched:false,
+            evaluation:state
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s441/S441_APPCHECK_PREFLIGHT_RECEIPT.json',JSON.stringify(receipt,null,2));
+          console.log('S441_READY='+state.ready);
+          console.log('S441_BLOCKERS='+state.blockers.join(','));
+          NODE
+
+      - name: Upload sanitized preflight evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s441-appcheck-preflight-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s441/apps-sanitized.json
+            ${{ runner.temp }}/s441/S441_APPCHECK_PREFLIGHT_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
