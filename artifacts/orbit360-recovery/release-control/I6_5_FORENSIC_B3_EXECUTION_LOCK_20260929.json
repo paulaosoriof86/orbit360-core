@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-003",
     "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "VISUAL_REJECTED_DIAGNOSTIC_ACTIVE",
     "blocking": true,
     "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
     "requiredProof": [
@@ -46,7 +46,13 @@
       "agingCountryFilterEffective": true,
       "safeKpiMarkers": true,
       "noBrowserErrors": true
-    }
+    },
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_20260929.json",
+    "humanEvidenceCodes": [
+      "COUNTRY_SCOPE_TABLE_LEAK",
+      "COUNTRY_SCOPE_KPI_CURRENCY_STALE_OR_SPLIT_WRITER",
+      "COUNTRY_CHANGE_DOUBLE_RENDER"
+    ]
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -58,7 +64,10 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_TARGETED_VISUAL_PASS"
+    "B3_003_COUNTRY_TRANSITION_RUNTIME_DIAGNOSTIC",
+    "B3_003_COUNTRY_SCOPE_CAUSAL_FIX",
+    "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_003_TARGETED_VISUAL_RETEST"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -138,7 +147,9 @@
     "contractPass": true,
     "previewProofPass": true,
     "b3002RegressionPass": true,
-    "livePromoted": false
+    "livePromoted": false,
+    "paulaVisualAccepted": false,
+    "eligibleForPromotion": false
   },
   "b3001TargetedVisual": {
     "status": "PASS",
@@ -158,7 +169,7 @@
     },
     "shellOwnerVisualMatch": true
   },
-  "boundaryNote": "B3-003 causal source fix frozen. Only immutable build, isolated Preview, exact readback and read-only proof are authorized.",
+  "boundaryNote": "Paula rejected B3-003 exact Preview. Diagnose country-scope leak, KPI/aging split state and country-change double render before source mutation.",
   "priorFinding": {
     "id": "B3-002",
     "status": "CLOSED_PASS",
