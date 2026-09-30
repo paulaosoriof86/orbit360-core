@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "SOURCE_FIXED_PENDING_ACTION_SURFACE_CONTRACT",
+      "status": "SURFACES_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -964,7 +964,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_ACTION_SURFACE_CONTRACT_PASS",
+      "nextAction": "B3_004_SURFACE_CONTRACT_PASS",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1010,7 +1010,7 @@
         },
         {
           "id": "B3-004-R3-RECEIPT-ACTION-AND-PORTFOLIO-COMPOSITION",
-          "status": "SOURCE_FIXED_PENDING_CONTRACT",
+          "status": "SURFACES_FIXED_PENDING_CONTRACT",
           "blocking": true,
           "rootCause": "EFFECTIVE_RUNTIME_OWNERS_OMIT_CANONICAL_PAYMENT_ACTION_AND_GLOBAL_COBROS_LIST_EXCLUDES_PORTFOLIO_ONLY_RECEIPTS",
           "remediation": "Make portfolio-only receipts first-class rows in Cobros y cartera; expose Aplicar pago in Cliente 360 row/detail and reuse the same canonical Cobros command.",

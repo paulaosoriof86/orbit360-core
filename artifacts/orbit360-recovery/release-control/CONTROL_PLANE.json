@@ -3184,13 +3184,13 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "B3_004_ACTION_SURFACES_SOURCE_FIXED_PENDING_CONTRACT",
+      "status": "B3_004_SURFACES_FIXED_PENDING_CONTRACT",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "d3920f20d1026dfb7c653e48d301f556358cb4c7",
+      "executionLockBlobSha": "3041955a789b56e179177aafbab0649a8480c349",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3221,7 +3221,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "5806ce6c7a36e984d1c2e96a99bafdd259a998cb",
+      "findingLedgerBlobSha": "eacca87d912342200718d4308edf0c2ffaa7b284",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "diagnosticRunId": 36658190622,
@@ -3482,12 +3482,12 @@
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_MACHINE_PASS_AFTER_VISUAL_REMEDIATION_20260930.json",
       "machineProofReceiptBlobSha": "4a51b6638e4a17c508e8c6ef8d138b7ac5a84749",
       "actionSurfaceRemediation": {
-        "status": "SOURCE_FIXED_PENDING_CONTRACT",
+        "status": "SURFACES_FIXED_PENDING_CONTRACT",
         "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_ACTION_SURFACES_20260930.json",
         "visualRejectionReceiptBlobSha": "7ea64853d5134ceed91eb16771b0c5d9fec8be5a",
-        "executionLockBlobSha": "d3920f20d1026dfb7c653e48d301f556358cb4c7",
+        "executionLockBlobSha": "3041955a789b56e179177aafbab0649a8480c349",
         "compositionLockBlobSha": "e7ebaa36860cd7e5b2218d8314b864b54d257aab",
-        "findingLedgerBlobSha": "5806ce6c7a36e984d1c2e96a99bafdd259a998cb",
+        "findingLedgerBlobSha": "eacca87d912342200718d4308edf0c2ffaa7b284",
         "sourceBlobs": {
           "orbit360-platform/modules/cobros.js": "3ef70a2e3cbbd62ab245788096cbc41e02aa733f",
           "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
@@ -3507,7 +3507,10 @@
         "fix": "Bind CONTROL_PLANE to the current B3 execution-lock blob and reuse the already-supported B3_004_SURFACE_CONTRACT cursor.",
         "productSourceChanged": false,
         "dataMutation": false,
-        "livePromotion": false
+        "livePromotion": false,
+        "normalizedExecutorState": "B3_004_SURFACES_FIXED_PENDING_CONTRACT",
+        "executorCursor": "I6_5_FORENSIC_REMEDIATION_B3_004_SURFACE_CONTRACT",
+        "reason": "Reuse existing canonical executor vocabulary so the surface contract runs instead of NOOP; no workflow or product source change."
       }
     }
   },
