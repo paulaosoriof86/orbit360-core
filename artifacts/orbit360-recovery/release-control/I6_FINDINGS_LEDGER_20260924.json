@@ -857,8 +857,8 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
-      "blocking": true,
+      "status": "CLOSED_PASS",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
       "remediation": "Reconcile KPI/aging/read-model authority by country and currency; prohibit cross-currency aggregation without explicit conversion; define reported-payment effect on pending/overdue/conciliation metrics.",
@@ -871,7 +871,7 @@
       ],
       "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "nextAction": "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
+      "nextAction": "B3-004",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json",
       "diagnosticRunId": 36658190622,
       "diagnosticArtifactId": 11073202655,
@@ -931,16 +931,28 @@
         "orbit360-platform/modules/cobros.js",
         "orbit360-platform/index.html"
       ],
-      "sourceFixHead": "04654ed123a6834c4ae2e6d5f3bd6187ddf6a321"
+      "sourceFixHead": "04654ed123a6834c4ae2e6d5f3bd6187ddf6a321",
+      "humanAcceptance": "PASS_2026-09-30",
+      "targetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_TARGETED_VISUAL_PASS_20260930.json"
     },
     {
       "id": "B3-004",
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "NOT_STARTED",
+      "status": "IN_PROGRESS",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "rootCause": "CURRENT_PAYMENT_SURFACES_HAVE_SPLIT_CLIENT_REPORT_VALIDATION_AND_LEGACY_DIRECT_WRITES; CANONICAL_SERVER_OWNED_COMMAND_NOT_YET_PROVEN",
+      "remediation": "Converge Cliente360/Cobros/client-report payment into one server-owned idempotent command using Payment Lock V2 semantics.",
+      "requiredProof": [
+        "Client-reported payment materializes one payment without mandatory attachment or second human validation when match is unique and valid.",
+        "Cliente360 and Cobros call the same command.",
+        "paidDate/support and applicationDate/invoiceNumber/invoice remain separate optional fields.",
+        "Retry/double-submit returns same committed payment.",
+        "Receipt, portfolio, audit and reload/readback are consistent."
+      ],
+      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json"
     },
     {
       "id": "B3-005",
@@ -949,7 +961,16 @@
       "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
       "status": "NOT_STARTED",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "businessRulesFrozen": true,
+      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
+      "requiredProof": [
+        "High-confidence invoice/statement/commission inference auto-commits without human approval.",
+        "Prior contiguous installments are inferred with inferredEffectiveDate=their scheduled due date while paidDate remains unknown unless directly evidenced.",
+        "Explicit source installment denominator/total reconciles expected receipt count.",
+        "La Ceiba, Aseguradora General and G&T Seguros fraccionado schedules obey tenant-config max 10.",
+        "Later direct evidence enriches prior inferred payment instead of duplicating it."
+      ]
     },
     {
       "id": "B3-006",
@@ -1026,12 +1047,13 @@
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
-        "2026-09-30: Paula reports Cancelaciones is not appearing in the current platform/navigation."
+        "2026-09-30 clarification: Cancelaciones module is visible; the problem is that operational cancellation information is not populated/displayed."
       ],
       "requiredProof": [
-        "Cancelaciones route is visible to Dirección/Admin according to effective protected access configuration.",
-        "Authorized route loads current data without alternate persistence owner or direct-write regression.",
-        "Role/scope and country filtering are verified in B4 exact Preview and final E2E."
+        "Cancelaciones route remains visible to authorized roles.",
+        "Real cancellation records/status derived from canonical policy/cancellation events are populated and visible where source evidence exists.",
+        "No empty module caused by alternate collection/owner or missing projection.",
+        "Role/country scope, persistence/readback and regression are verified."
       ]
     },
     {
@@ -1055,11 +1077,11 @@
         "comisiones"
       ],
       "humanEvidence": [
-        "2026-09-30: Paula reports Comisiones is not appearing in the current platform/navigation although canonical NAV and Dirección/Admin role definitions include it."
+        "2026-09-30 clarification: Comisiones module and Cliente360 commission tab are visible; missing item is automatic commission calculation/materialization from existing advisor configuration and operational evidence."
       ],
       "requiredVisibilityProof": {
-        "comisiones": "Visible for Dirección/Admin; Operativo hidden; Asesor/Comercial own-commission visibility only per frozen policy. Data reconciliation remains I6.7.",
-        "cancelaciones": "Visible for authorized roles and covered by B4-003 targeted regression."
+        "comisiones": "Module/tab visible. Prove real calculation/materialization uses configured advisor model and authorized visibility; I6.7 reconciles actual company/advisor commissions.",
+        "cancelaciones": "Module visible. Prove real cancellation data/projection, not only route existence."
       }
     },
     {
@@ -4532,8 +4554,8 @@
     }
   },
   "currentB3": {
-    "status": "B3_003_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
-    "activeFindingId": "B3-003",
+    "status": "B3_004_IN_PROGRESS",
+    "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
     "compositionLockBlobSha": "6824a4b873f14a3c96669eb0cf495feeea1a9f64",
@@ -4550,6 +4572,7 @@
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_20260929.json",
     "priorFindingId": "B3-002",
     "priorFindingStatus": "CLOSED_PASS",
-    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_20260929.json"
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_20260929.json",
+    "b3003Status": "CLOSED_PASS"
   }
 }

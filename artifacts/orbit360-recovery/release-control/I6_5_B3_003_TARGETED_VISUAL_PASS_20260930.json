@@ -1,0 +1,45 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_003_TARGETED_VISUAL_PASS_V1",
+  "status": "PASS",
+  "date": "2026-09-30",
+  "gate": "I6.5-B3-003",
+  "authority": "PAULA_TARGETED_VISUAL_ACCEPTANCE",
+  "preview": {
+    "sourceSha": "4d57267cd2bc267e166ecbe54d1418adf41ff4bb",
+    "buildId": "gi-i65-b3-4d57267cd2bc-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b3-36711186151-934bxjxe.web.app",
+    "runId": 36711186151,
+    "artifactId": 11093444225,
+    "artifactDigest": "5e307dcb2c256e42a31c568fd97f5f89c19fbf872c434965b64bde86732c30c3"
+  },
+  "humanEvidence": {
+    "accepted": true,
+    "screenshots": [
+      "1000571418.jpg",
+      "1000571417.jpg",
+      "1000571419.jpg",
+      "1000571420.jpg"
+    ],
+    "observed": {
+      "guatemalaKpisCurrency": "GTQ",
+      "colombiaKpisCurrency": "COP",
+      "colombiaReportedPayments": 23,
+      "focalPolicy": "9758"
+    },
+    "clarification": "Cliente cell subtitle displays client domicile country (e.g. Persona · GT) while B3-003 operational country filtering is bound to policy/financial-row country. This visual label must not be used as the country-filter proof."
+  },
+  "machineEvidence": {
+    "exactReadback": true,
+    "currenciesSeparated": true,
+    "agingCountryFilterEffective": true,
+    "renderedRowsCountryScoped": true,
+    "noBrowserErrors": true,
+    "b3002RegressionPass": true
+  },
+  "boundaries": {
+    "livePromoted": false,
+    "businessWrites": 0,
+    "reimport": false
+  },
+  "next": "B3-004"
+}

@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_004_IN_PROGRESS",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -12,85 +12,16 @@
     "b2FinalHead": "0ff9dbc6da4874f43443b5b7573e8eff9f7f657d"
   },
   "activeFinding": {
-    "id": "B3-003",
-    "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "id": "B3-004",
+    "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
+    "status": "IN_PROGRESS",
     "blocking": true,
-    "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
-    "requiredProof": [
-      "Identify exact source/owner for Cobros KPIs and aging.",
-      "Prove country and currency filtering semantics from authoritative collections.",
-      "Prove no cross-currency arithmetic is presented as one amount.",
-      "Prove payment-state classification does not mix reported evidence with confirmed cobro.",
-      "No business writes, no reimport, no LIVE."
-    ],
-    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json",
-    "diagnosticRunId": 36658190622,
-    "diagnosticArtifactId": 11073202655,
-    "diagnosticArtifactDigest": "sha256:5921eb661a892abb11d7371fbce3e31bc4fa93e9bb356b5807f4aad6c4f6c5dc",
-    "allowedProductFiles": [
-      "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
-    ],
-    "causalFix": {
-      "cobrosBlobSha": "668b6133ae4e52c8f26e8c884a2fc0396a1a3ac0",
-      "policyReceiptsBridgeBlobSha": "d1bd8c883db39b946b3833bd1684a0a8fe4843b3",
-      "proofBlobSha": "144bed375204947c283e3205d7a3bcda23613495",
-      "canonicalKpiOwner": "orbit360-platform/modules/cobros.js",
-      "asyncKpiOverrideRemoved": true,
-      "renderedRowsCountryScoped": true,
-      "realSelectorProofStrengthened": true
-    },
-    "previewProof": {
-      "exactReadback": true,
-      "currenciesSeparated": true,
-      "noFxAuthorityInvented": true,
-      "agingCountryFilterEffective": true,
-      "safeKpiMarkers": true,
-      "realCountrySelector": true,
-      "renderedRowsCountryScoped": true,
-      "kpiMarkersStableAfterAsyncSettle": true,
-      "noBrowserErrors": true
-    },
-    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_20260929.json",
-    "humanEvidenceCodes": [
-      "COUNTRY_SCOPE_TABLE_LEAK",
-      "COUNTRY_SCOPE_KPI_CURRENCY_STALE_OR_SPLIT_WRITER",
-      "COUNTRY_CHANGE_DOUBLE_RENDER"
-    ],
-    "countryLineageDiagnosis": "PENDING_INDEPENDENT_FIRESTORE_TRUTH",
-    "currentRemediationAuthorizedProductFiles": [],
-    "rootCauseClassification": "READ_MODEL_COUNTRY_RESOLUTION_DEFECT",
-    "precedenceDefectCount": 42,
-    "focalPolicyNumber": "9758",
-    "transitionRemediation": "EXPLICIT_LOADING_FRAME_BEFORE_COUNTRY_RENDER",
-    "countryLineageFix": {
-      "status": "CAUSAL_SOURCE_FIX_BOUND_PENDING_EXACT_PREVIEW",
-      "findingId": "B3-003",
-      "rootCause": "CLIENT_COUNTRY_PRECEDENCE_OVERRIDES_EXPLICIT_POLICY_COUNTRY_PLUS_COUNTRY_SWITCH_OLD_CONTENT_PAINT_WINDOW",
-      "changedProductFiles": [
-        "orbit360-platform/core/queries.js",
-        "orbit360-platform/modules/cobros.js",
-        "orbit360-platform/index.html"
-      ],
-      "exactBlobBindings": {
-        "orbit360-platform/core/queries.js": "47d8aa225ee0d57668684ba34737192bef76fc39",
-        "orbit360-platform/modules/cobros.js": "6a3c521b8973b15504ef569e819651219ebb6363",
-        "orbit360-platform/index.html": "6309531946f8363dbcf444f61a3fca61d84070c2"
-      },
-      "canonicalCountryContract": "policy.pais > explicit linked financial row pais > cliente.pais fallback; conflicting explicit policy/row country => REQUIERE_VALIDACION",
-      "rowIdentityQaAttributes": [
-        "data-row-client-id",
-        "data-row-policy-id"
-      ],
-      "transitionContract": "explicit loading frame via requestAnimationFrame; no timeout; no prior-country data painted",
-      "independentPreviewProof": "tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs",
-      "dataMutation": false,
-      "reimport": false,
-      "livePromotion": false,
-      "b3002MustRegress": true
-    },
-    "sourceFixHead": "04654ed123a6834c4ae2e6d5f3bd6187ddf6a321"
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
+    "boundaries": {
+      "businessWritesAuthorized": false,
+      "reimportAuthorized": false,
+      "liveHostingPromotionAuthorized": false
+    }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -102,7 +33,9 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_TARGETED_VISUAL_PASS"
+    "B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC",
+    "B3_004_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -208,5 +141,17 @@
     "status": "CLOSED_PASS",
     "targetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_TARGETED_VISUAL_PERFORMANCE_PASS_20260929.json",
     "humanAcceptance": "PASS"
+  },
+  "b3003Closure": {
+    "status": "CLOSED_PASS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_TARGETED_VISUAL_PASS_20260930.json",
+    "preview": {
+      "sourceSha": "4d57267cd2bc267e166ecbe54d1418adf41ff4bb",
+      "buildId": "gi-i65-b3-4d57267cd2bc-57f234755dc1",
+      "url": "https://ays-orbit-360-lab--gi-i65-b3-36711186151-934bxjxe.web.app",
+      "runId": 36711186151,
+      "artifactId": 11093444225,
+      "artifactDigest": "5e307dcb2c256e42a31c568fd97f5f89c19fbf872c434965b64bde86732c30c3"
+    }
   }
 }
