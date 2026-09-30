@@ -1024,7 +1024,15 @@
       "finding": "Targeted regression closure for Renovaciones and Cancelaciones.",
       "status": "NOT_STARTED",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "humanEvidence": [
+        "2026-09-30: Paula reports Cancelaciones is not appearing in the current platform/navigation."
+      ],
+      "requiredProof": [
+        "Cancelaciones route is visible to Dirección/Admin according to effective protected access configuration.",
+        "Authorized route loads current data without alternate persistence owner or direct-write regression.",
+        "Role/scope and country filtering are verified in B4 exact Preview and final E2E."
+      ]
     },
     {
       "id": "B4-004",
@@ -1042,7 +1050,17 @@
       "finding": "Authenticated module × role × viewport E2E matrix; zero relevant page/console/request errors.",
       "status": "NOT_STARTED",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "additionalRequiredModules": [
+        "comisiones"
+      ],
+      "humanEvidence": [
+        "2026-09-30: Paula reports Comisiones is not appearing in the current platform/navigation although canonical NAV and Dirección/Admin role definitions include it."
+      ],
+      "requiredVisibilityProof": {
+        "comisiones": "Visible for Dirección/Admin; Operativo hidden; Asesor/Comercial own-commission visibility only per frozen policy. Data reconciliation remains I6.7.",
+        "cancelaciones": "Visible for authorized roles and covered by B4-003 targeted regression."
+      }
     },
     {
       "id": "B4-006",

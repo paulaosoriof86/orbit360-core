@@ -647,7 +647,25 @@
     "reimportForVisibilityFailureForbidden": true,
     "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
     "executionCursor": "POST_WRITE_READBACK_INTEGRITY_PASS",
-    "miniClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json"
+    "miniClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
+    "futureI66ExecutionDecision": {
+      "status": "FROZEN_FOR_FUTURE_GATE_NOT_OPENED",
+      "recordedAt": "2026-09-30",
+      "gate": "I6.6",
+      "sourceProcessingPriority": [
+        "UPDATED_INSURER_ACCOUNT_STATEMENTS_CURRENT_AS_OF_FIRST",
+        "COMMISSION_PLANILLAS_WITH_LINEAGE",
+        "HISTORICAL_COBROS_RECEIPTS_AND_OTHER_PAYMENT_EVIDENCE"
+      ],
+      "evidencePrecedenceUnchanged": "EXPLICIT_PAYMENT_OR_REVERSAL_EVIDENCE_OVER_INFERENCE",
+      "inferenceAfterCurrentStatementBaseline": true,
+      "duplicateHandling": "DETERMINISTIC_IDEMPOTENT_DEDUP_WITH_PROVENANCE; AMBIGUOUS_OR_CONTRADICTORY_CASES_REQUIRE_REVIEW",
+      "receiptScheduleDuplicatesRemainI65B3LineageConcern": true,
+      "paymentCobroDuplicatesRemainI66ReconciliationConcern": true,
+      "dataMutationAuthorizedNow": false,
+      "sourceIntakeAuthorizedNow": false,
+      "gateOpenedNow": false
+    }
   },
   "governanceSyncChecklist": {
     "frozenPlanMaterialized": true,
@@ -3380,7 +3398,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "26ecaf7547c83aed01e4bfc91684118cb9f90b23",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "b2d6a98ebfbc018739f8070d0c75687c3295bafa",
+    "findingLedgerBlobSha": "e22353f158d43571501f0543e1d8b732b7e87f30",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -3392,7 +3410,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_003_INDEPENDENT_FIRESTORE_LINEAGE_DIAGNOSTIC"
+    "nextAction": "B3_003_TARGETED_VISUAL_PASS"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
