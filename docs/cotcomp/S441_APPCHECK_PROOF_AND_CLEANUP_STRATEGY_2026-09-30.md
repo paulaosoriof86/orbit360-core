@@ -101,3 +101,55 @@ S4.41 closes when:
 - LAB Web App/App Check preflight is observed read-only;
 - blockers are recorded;
 - no security weakening, Firebase config write or app-data write occurs.
+
+
+## 8. Observed read-only preflight
+
+Workflow:
+`36768717761`
+
+Conclusion:
+`SUCCESS`
+
+Evidence artifact:
+`11122917298`
+
+Digest:
+`sha256:764270f2c918e3ecb09ac4ca7981626b03e48210a2467734b984ca5efd09db5e`
+
+Observed:
+- exactly one LAB Web App: `Orbit360 LAB Web`;
+- Firebase App ID: `1:646761409743:web:2ec4595ee9160f9d945bba`;
+- SDK config resolvable read-only: `true`;
+- GitHub Actions secret `FIREBASE_APPCHECK_DEBUG_TOKEN` present: `false`;
+- Firebase config writes executed: `0`;
+- app-data writes executed: `0`;
+- deploy executed: `false`;
+- production touched: `false`.
+
+Therefore:
+
+`readyForValidAppCheckSyntheticInvocation=false`
+
+Sole blocker:
+
+`APPCHECK_DEBUG_TOKEN_SECRET_REQUIRED`
+
+This blocker must be resolved by registering a LAB App Check debug token and storing it in encrypted CI secret storage. S4.41 does not authorize that security-configuration write.
+
+## 9. Observable QA
+
+Exact preflight-head QA:
+
+- run: `36768717270`
+- tests: `275`
+- pass: `275`
+- fail: `0`
+
+## 10. S4.41 closure
+
+S4.41 is closed as:
+
+`SOURCE CONTRACTS PASS / LAB WEB APP FOUND / SDK CONFIG RESOLVABLE / DEBUG TOKEN SECRET ABSENT / VALID-APPCHECK LIVE INVOCATION BLOCKED / NO SECURITY WEAKENING / NO FIREBASE CONFIG WRITE / NO APP-DATA WRITE / NO DEPLOY / NO PRODUCTION`
+
+Next gated action requires explicit Owner authorization to create/register a LAB-only App Check debug token and store it as an encrypted GitHub Actions secret. No persistence or production gate is implied.
