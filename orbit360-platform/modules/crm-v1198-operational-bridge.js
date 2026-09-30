@@ -404,6 +404,37 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
     Orbit.cobrosConciliacionReadOnly.firestoreWrites === 0;
 }
 
+function paymentActionRecord(id) {
+  const raw=String(id==null?'':id).trim();
+  if(!raw)return null;
+  const normalized=raw.replace(/^(?:receipt-payment:|portfolio:)/,'');
+  const cobro=baseStore().get('cobros',raw)||baseStore().get('cobros',normalized);
+  if(cobro)return {collection:'cobros',record:cobro,id:raw};
+  const receipt=baseStore().get('recibosEsperados',normalized);
+  if(receipt)return {collection:'recibosEsperados',record:receipt,id:normalized};
+  return null;
+}
+function guardPaymentAction(actionName, permission) {
+  const mod=Orbit.modules.cobros;
+  if(!mod||typeof mod[actionName]!=='function')return;
+  let state=guardRegistry.get(mod);
+  if(!state){state=Object.create(null);guardRegistry.set(mod,state);}
+  if(state[actionName])return;
+  const original=mod[actionName].bind(mod);
+  const descriptor=Object.getOwnPropertyDescriptor(mod,actionName);
+  const mutable=Object.isExtensible(mod)&&(!descriptor||descriptor.writable!==false);
+  if(!mutable){state[actionName]={original,mode:'immutable_unwrapped'};guardDiagnostics.push({moduleName:'cobros',actionName,mode:'immutable_unwrapped'});return;}
+  mod[actionName]=function(id){
+    const target=paymentActionRecord(id);
+    if(id&&!target)return toast('Registro de pago no disponible');
+    if(target&&!A.canView(target.collection,target.record,'cobros'))return toast('Registro fuera de tu alcance');
+    if(permission&&!A.can('cobros',permission))return toast('No tienes permiso para realizar esta acción');
+    return original.apply(mod,arguments);
+  };
+  state[actionName]={original,mode:'wrapped_payment_relation_aware'};
+  guardDiagnostics.push({moduleName:'cobros',actionName,mode:'wrapped_payment_relation_aware'});
+}
+
 function guardAction(moduleName, actionName, collection, moduleKey, permission) {
   const mod = Orbit.modules[moduleName];
   if (!mod || typeof mod[actionName] !== 'function') return;
@@ -442,9 +473,9 @@ function guardAction(moduleName, actionName, collection, moduleKey, permission) 
   ['polizas','cobros','conciliaciones','calidad','renovaciones','cancelaciones','comisiones','historial','portal'].forEach(name => wrapRender(name, name, h => enhanceGeneric(h, name)));
   installClientActions();
   guardAction('cobros', 'detalle', 'cobros', 'cobros', 'view');
-  guardAction('cobros', 'aplicarPago', 'cobros', 'cobros', 'edit');
-  guardAction('cobros', 'validarReporte', 'cobros', 'cobros', 'edit');
-  guardAction('cobros', 'conciliarFactura', 'cobros', 'cobros', 'edit');
+  guardPaymentAction('aplicarPago', 'edit');
+  guardPaymentAction('validarReporte', 'edit');
+  guardPaymentAction('conciliarFactura', 'edit');
   guardAction('cobros', 'lote', null, 'cobros', 'edit');
   guardAction('conciliaciones', 'accion', null, 'conciliaciones', 'edit');
   guardAction('calidad', 'editarInline', 'clientes', 'cliente360', 'complete');

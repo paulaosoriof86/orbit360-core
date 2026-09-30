@@ -11,8 +11,8 @@
   window.Orbit = window.Orbit || {};
   Orbit.modules = Orbit.modules || {};
 
-  const VERSION = '20260801.1';
-  const PHASE = 'READ_ONLY_DRYRUN';
+  const VERSION = '20260930-b3004r9-operational-payment-owner-restored';
+  const PHASE = 'READ_ONLY_PROPOSALS_WITH_OPERATIONAL_PAYMENT_OWNER';
   const CANONICAL_COLLECTION = 'conciliaciones';
   const DOMAIN_COLLECTION = 'conciliacionesPrimas';
   let filterState = '';
@@ -171,37 +171,18 @@
     if (U().toast) U().toast('Esta acción estará disponible después de validar la conciliación y autorizar la aplicación.');
     return false;
   }
-  function disableLegacyActions(root) {
-    const host = root || document;
-    if (!host || !host.querySelectorAll) return;
-    const selectors = [
-      '#cd-apply','#cd-val','#cd-conc','#pm-ok','#cc-ok','#cv-ok','#cv-rej','#cv-rev',
-      '[onclick*="aplicarPago"]','[onclick*="validarReporte"]','[onclick*="conciliarFactura"]','[onclick*=".lote("]'
-    ];
-    host.querySelectorAll(selectors.join(',')).forEach(button => {
-      button.disabled = true; button.setAttribute('aria-disabled','true'); button.removeAttribute('onclick');
-      button.onclick = event => { if (event) event.preventDefault(); blocked(); };
-      button.title = 'Disponible después de la validación y autorización correspondiente';
-      button.style.opacity = '.55'; button.style.cursor = 'not-allowed';
-    });
+  function disableLegacyActions() {
+    // R9: this module owns only the read-only proposal browser. It must never disable
+    // canonical Cobros actions now served by the authenticated reconciliation domain.
+    return false;
   }
   function freezeCobrosModule() {
     const module = Orbit.modules && Orbit.modules.cobros;
     if (!module || module.__cobrosConciliacionReadOnlyOwner === VERSION) return false;
-    ['aplicarPago','validarReporte','conciliarFactura','lote'].forEach(name => {
-      if (typeof module[name] === 'function') module[name] = blocked;
-    });
-    ['render','detalle'].forEach(name => {
-      const original = module[name];
-      if (typeof original !== 'function') return;
-      module[name] = function () {
-        const result = original.apply(this, arguments);
-        disableLegacyActions(document); setTimeout(() => disableLegacyActions(document), 0);
-        return result;
-      };
-    });
     module.__cobrosConciliacionReadOnlyOwner = VERSION;
     module.__cobrosConciliacionPhase = PHASE;
+    module.__cobrosCanonicalPaymentOwner = 'modules/cobros.js';
+    module.__cobrosPaymentActionsPreserved = true;
     return true;
   }
 

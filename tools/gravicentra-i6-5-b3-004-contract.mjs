@@ -176,3 +176,20 @@ need(indexR4.includes('modules/cobros-cartera-i65-closure-bridge.js?v=20260930-b
 need(indexR4.includes('data/store-firestore-product-operational-p0.js?v=20260930-b3004r8'),'B3_004_R8_OPERATIONAL_STORE_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/record-delete.js?v=20260930-b3004r8'),'B3_004_R8_DELETE_OWNER_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_R8_CAUSAL_CONTRACT=PASS');
+
+const conciliacionesR9=read('orbit360-platform/modules/conciliaciones.js');
+const crmBridgeR9=read('orbit360-platform/modules/crm-v1198-operational-bridge.js');
+need(conciliacionesR9.includes("READ_ONLY_PROPOSALS_WITH_OPERATIONAL_PAYMENT_OWNER"),'B3_004_R9_CONCILIACIONES_PHASE_NOT_MIGRATED');
+need(conciliacionesR9.includes("__cobrosPaymentActionsPreserved = true"),'B3_004_R9_CANONICAL_COBROS_OWNER_NOT_PRESERVED');
+need(!conciliacionesR9.includes("module[name] = blocked"),'B3_004_R9_STALE_COBROS_ACTION_OVERRIDE_REMAINS');
+need(!conciliacionesR9.includes("button.disabled = true; button.setAttribute('aria-disabled','true')"),'B3_004_R9_STALE_PAYMENT_BUTTON_DISABLE_REMAINS');
+need(crmBridgeR9.includes('function paymentActionRecord')&&crmBridgeR9.includes("baseStore().get('recibosEsperados',normalized)"),'B3_004_R9_RECEIPT_ID_GUARD_RESOLUTION_MISSING');
+need(crmBridgeR9.includes("guardPaymentAction('aplicarPago', 'edit')")&&crmBridgeR9.includes("guardPaymentAction('conciliarFactura', 'edit')"),'B3_004_R9_PAYMENT_GUARD_NOT_RELATION_AWARE');
+need(nativeReceiptOwner.includes("target=document.getElementById('c360-body')||document.getElementById('host')"),'B3_004_R9_RECEIPT_DETAIL_DESTROYS_CLIENTE360_SHELL');
+need(nativeReceiptOwner.includes("mode:'local_receipts_body'")&&nativeReceiptOwner.includes('renderReceipts(clientId)')&&nativeReceiptOwner.includes('fullCliente360Rebuild:false'),'B3_004_R9_FAST_BACK_PATH_MISSING');
+need(nativeReceiptOwner.includes("return mod.conciliarFactura(receiptId)"),'B3_004_R9_RECONCILE_DOES_NOT_USE_CANONICAL_RECEIPT_ID');
+need(cobros.includes('Fecha real del pago')&&cobros.includes('Método de pago')&&cobros.includes('Soporte del pago')&&cobros.includes('Fecha de aplicación por la aseguradora')&&cobros.includes('Número de factura')&&cobros.includes('Factura / soporte de aplicación'),'B3_004_R9_PAYMENT_MODAL_REQUIRED_FIELDS_MISSING');
+need(indexR4.includes('modules/conciliaciones.js?v=20260930-b3004r9'),'B3_004_R9_CONCILIACIONES_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/crm-v1198-operational-bridge.js?v=20260930-b3004r9'),'B3_004_R9_CRM_GUARD_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r9'),'B3_004_R9_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
+console.log('B3_004_R9_HUMAN_REJECTION_CAUSAL_CONTRACT=PASS');

@@ -1,0 +1,45 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R9_TARGETED_VISUAL_REJECTION_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "reviewedPreview": {
+    "sourceSha": "ca329d7082ae724ff9cd133d9655760e17e4e86e",
+    "runId": 36786037309,
+    "buildId": "gi-i65-b3-ca329d7082ae-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36786037309-sv3t6dst.web.app"
+  },
+  "status": "REJECTED_REMEDIATION_REQUIRED",
+  "observedRole": "Dirección",
+  "preservedPasses": [
+    "Estado filter menu complete and no clipping",
+    "SIGA/pending rows visible",
+    "receipt generic edit modal visible",
+    "payment/application fields already exist in canonical Cobros modal source",
+    "R8 machine exact readback previously passed"
+  ],
+  "blockers": [
+    {
+      "id": "B3-004-R9-A",
+      "finding": "Aplicar pago / Conciliar / Completar datos del pago are disabled at runtime by stale conciliaciones.js READ_ONLY_DRYRUN global override."
+    },
+    {
+      "id": "B3-004-R9-B",
+      "finding": "CRM operational bridge guards Cobros actions against collection cobros only, causing receipt IDs from Cliente360 to be rejected as Registro fuera de tu alcance."
+    },
+    {
+      "id": "B3-004-R9-C",
+      "finding": "Receipt detail replaces entire #host instead of hydrated #c360-body, so Volver a Recibos y pagos rebuilds Cliente360 and remains slow."
+    }
+  ],
+  "requiredHumanRetest": [
+    "Aplicar pago modal opens",
+    "Conciliar/completar modal opens",
+    "Modal exposes paid date, method, payment support, application date, invoice number and invoice/application support",
+    "Direction no false scope denial",
+    "Back to receipts is immediate without full Cliente360 rebuild"
+  ],
+  "decision": "NO_VISUAL_PASS_NO_B3005_NO_LIVE",
+  "operationalDataWrites": false,
+  "reimport": false
+}
