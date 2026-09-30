@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_002_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_003_READ_ONLY_DIAGNOSTIC_ACTIVE",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -12,151 +12,18 @@
     "b2FinalHead": "0ff9dbc6da4874f43443b5b7573e8eff9f7f657d"
   },
   "activeFinding": {
-    "id": "B3-002",
-    "title": "Cobros search/performance/hydration must be fast and non-blocking.",
-    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "id": "B3-003",
+    "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
+    "status": "READ_ONLY_DIAGNOSTIC_ACTIVE",
     "blocking": true,
-    "humanEvidence": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
-    "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN",
-    "requiredProof": "Cold/warm Cobros entry timing with phase markers; no ~10s unusable wait; no page freeze; complete data after load.",
-    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_20260929.json",
-    "diagnosticRunId": 36651311858,
-    "diagnosticArtifactId": 11070607951,
-    "diagnosticArtifactDigest": "sha256:a94f1225aff71d7fd53ab7cebb553e684ccb52bcd90f111bebf49af5ac222245",
-    "measured": {
-      "warmSingleRenderMs": 6673,
-      "inSessionCold": {
-        "renderCount": 12,
-        "totalRenderMs": 45413,
-        "completeMs": 51391.8
-      },
-      "directCold": {
-        "renderCount": 15,
-        "totalRenderMs": 46053,
-        "completeMs": 52514.9
-      },
-      "finalRows": 489,
-      "reportedRows": 484
-    },
-    "causalFix": {
-      "rendererOwner": "orbit360-platform/modules/cobros.js",
-      "rendererBlobSha": "6b399b2b27423d170b7a758a9e65a873bba70605",
-      "adapterOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
-      "adapterBlobSha": "08367dc718e702a5634711e4efc90722c1cac923",
-      "reactiveOwner": "orbit360-platform/core/router.js",
-      "reactiveOwnerBlobSha": "ffea048a80c32c825c9f388a72d0764c8e5119ca",
-      "shellPreserved": true,
-      "secondRendererCreated": false,
-      "financialSemanticsChanged": false
-    },
-    "candidatePerformance": {
-      "inSessionCold": {
-        "shellMs": 25.10000000000582,
-        "kpisMs": 8064.899999999994,
-        "agingMs": 8064.899999999994,
-        "tableMs": 8064.899999999994,
-        "usableMs": 8064.899999999994,
-        "completeMs": 8143.5,
-        "renderCount": 6,
-        "totalRenderMs": 393,
-        "maxRenderMs": 391,
-        "longTaskCount": 18,
-        "longTaskTotalMs": 4836,
-        "finalRows": 60,
-        "reportedRows": 55,
-        "storeEventCount": 15,
-        "storeEventsByCollection": {
-          "clientes": 1,
-          "polizas": 1,
-          "cobros": 1,
-          "aseguradoras": 1,
-          "vehiculos": 1,
-          "recibosEsperados": 1,
-          "carteraPrimas": 1,
-          "asesores": 1,
-          "metas": 1,
-          "gestiones": 1,
-          "auditoria": 1,
-          "negocios": 1,
-          "reclamos": 1,
-          "comisiones": 1,
-          "cancelaciones": 1
-        }
-      },
-      "directCold": {
-        "shellMs": 877.2000000000116,
-        "kpisMs": 8636.300000000017,
-        "agingMs": 8636.300000000017,
-        "tableMs": 8636.300000000017,
-        "usableMs": 8636.300000000017,
-        "completeMs": 8739,
-        "renderCount": 6,
-        "totalRenderMs": 368,
-        "maxRenderMs": 366,
-        "longTaskCount": 17,
-        "longTaskTotalMs": 3702,
-        "finalRows": 60,
-        "reportedRows": 55,
-        "storeEventCount": 16,
-        "storeEventsByCollection": {
-          "cobros": 2,
-          "clientes": 1,
-          "polizas": 1,
-          "aseguradoras": 1,
-          "vehiculos": 1,
-          "recibosEsperados": 1,
-          "carteraPrimas": 1,
-          "asesores": 1,
-          "metas": 1,
-          "negocios": 1,
-          "gestiones": 1,
-          "reclamos": 1,
-          "comisiones": 1,
-          "cancelaciones": 1,
-          "auditoria": 1
-        }
-      },
-      "warm": {
-        "shellMs": 380.6000000000058,
-        "kpisMs": 380.6000000000058,
-        "agingMs": 380.6000000000058,
-        "tableMs": 380.6000000000058,
-        "usableMs": 380.6000000000058,
-        "completeMs": 906,
-        "renderCount": 1,
-        "totalRenderMs": 372,
-        "maxRenderMs": 372,
-        "longTaskCount": 2,
-        "longTaskTotalMs": 650,
-        "finalRows": 60,
-        "reportedRows": 55,
-        "storeEventCount": 0,
-        "storeEventsByCollection": {}
-      },
-      "search": {
-        "available": true,
-        "keyEvents": 4,
-        "renderCount": 0,
-        "totalRenderMs": 0,
-        "maxRenderMs": 0
-      }
-    },
-    "candidateRootCauseResult": {
-      "status": "MEASURED_DIAGNOSTIC_COMPLETE",
-      "facts": {
-        "renderBurstDuringHydration": true,
-        "fullDomHundredsOfRows": false,
-        "searchRendersPerKeystroke": false,
-        "perRowVehicleFullScan": false,
-        "duplicateReactiveOwners": false,
-        "routePrimaryCobros": true,
-        "coldVsWarmRatio": 21.19
-      },
-      "rootCause": "MEASURED_FACTS_REQUIRE_REVIEW_BEFORE_PRODUCT_FIX",
-      "productFixAuthorizedByDiagnostic": false
-    },
-    "residualColdAnalysisReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_RESIDUAL_COLD_HYDRATION_ANALYSIS_20260929.json",
-    "residualColdDecision": "NO_ADDITIONAL_COBROS_SOURCE_CHANGE_BEFORE_TARGETED_HUMAN_PROOF"
+    "rootCause": "PENDING_B3_003_KPI_AGING_CURRENCY_AUTHORITY_DIAGNOSTIC",
+    "requiredProof": [
+      "Identify exact source/owner for Cobros KPIs and aging.",
+      "Prove country and currency filtering semantics from authoritative collections.",
+      "Prove no cross-currency arithmetic is presented as one amount.",
+      "Prove payment-state classification does not mix reported evidence with confirmed cobro.",
+      "No business writes, no reimport, no LIVE."
+    ]
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -168,7 +35,7 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_002_TARGETED_VISUAL_PERFORMANCE_PASS"
+    "B3_003_READONLY_KPI_AGING_CURRENCY_DIAGNOSTIC"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -196,7 +63,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
@@ -267,5 +134,11 @@
     },
     "shellOwnerVisualMatch": true
   },
-  "boundaryNote": "Causal source fix committed. Build exact immutable successor and prove timing/DOM on isolated Preview; still no data writes, reimport, LIVE, or B4."
+  "boundaryNote": "B3-002 human PASS frozen. B3-003 read-only diagnostic only; Inicio KPI inconsistency preserved separately under B3-008.",
+  "priorFinding": {
+    "id": "B3-002",
+    "status": "CLOSED_PASS",
+    "targetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_TARGETED_VISUAL_PERFORMANCE_PASS_20260929.json",
+    "humanAcceptance": "PASS"
+  }
 }
