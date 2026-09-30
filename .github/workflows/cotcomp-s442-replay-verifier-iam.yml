@@ -1,0 +1,182 @@
+name: CotComp S4.42 least-privilege replay verifier IAM
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-public-bridge-s47-20260929
+    paths:
+      - '.github/cotcomp-lab-intents/s442-replay-verifier-iam.json'
+
+permissions:
+  contents: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_PROJECT_NUMBER: '646761409743'
+  COTCOMP_REGION: us-central1
+  COTCOMP_FUNCTION: cotcompSubmitHandoff
+  COTCOMP_RUNTIME_SA: orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com
+  COTCOMP_VERIFIER_ROLE: roles/firebaseappcheck.tokenVerifier
+
+jobs:
+  least-privilege-grant:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify S4.42 least-privilege IAM intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '
+            .authorization == "GRANT_LAB_RUNTIME_APPCHECK_TOKEN_VERIFIER_FOR_S442_REPLAY_PROOF" and
+            .projectId == "ays-orbit-360-lab" and
+            .runtimeServiceAccount == "orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com" and
+            .role == "roles/firebaseappcheck.tokenVerifier" and
+            .broaderRoleAllowed == false and
+            .appDataWrites == false and
+            .deploy == false and
+            .production == false
+          ' .github/cotcomp-lab-intents/s442-replay-verifier-iam.json >/dev/null
+
+      - name: Apply exact App Check Token Verifier role and read back
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s442iamgrant"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          printf '%s' "$SA" > "$RUNNER_TEMP/s442iamgrant/cred.json"
+          chmod 600 "$RUNNER_TEMP/s442iamgrant/cred.json"
+
+          node <<'NODE'
+          const fs=require('fs');
+          const crypto=require('crypto');
+          const sa=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s442iamgrant/cred.json','utf8'));
+          if(sa.project_id!=='ays-orbit-360-lab') throw new Error('CREDENTIAL_PROJECT_MISMATCH');
+
+          const b64url=v=>Buffer.from(v).toString('base64url');
+          async function oauth(){
+            const now=Math.floor(Date.now()/1000);
+            const h=b64url(JSON.stringify({alg:'RS256',typ:'JWT'}));
+            const p=b64url(JSON.stringify({
+              iss:sa.client_email,
+              scope:'https://www.googleapis.com/auth/cloud-platform',
+              aud:'https://oauth2.googleapis.com/token',
+              iat:now,exp:now+3600
+            }));
+            const unsigned=h+'.'+p;
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const body=new URLSearchParams({
+              grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',
+              assertion:unsigned+'.'+sig
+            });
+            const r=await fetch('https://oauth2.googleapis.com/token',{
+              method:'POST',
+              headers:{'content-type':'application/x-www-form-urlencoded'},
+              body
+            });
+            if(!r.ok) throw new Error('OAUTH_'+r.status);
+            return (await r.json()).access_token;
+          }
+
+          async function jsonFetch(url,options={}){
+            const r=await fetch(url,options);
+            const text=await r.text();
+            let json={}; try{json=text?JSON.parse(text):{}}catch{}
+            return {ok:r.ok,status:r.status,json};
+          }
+
+          (async()=>{
+            const token=await oauth();
+            const headers={authorization:'Bearer '+token,'content-type':'application/json'};
+
+            const functionUrl='https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-central1/functions/cotcompSubmitHandoff';
+            const fr=await jsonFetch(functionUrl,{headers});
+            if(!fr.ok) throw new Error('FUNCTION_DESCRIBE_'+fr.status);
+            const runtimeSa=fr.json&&fr.json.serviceConfig&&fr.json.serviceConfig.serviceAccountEmail;
+            if(runtimeSa!==process.env.COTCOMP_RUNTIME_SA){
+              throw new Error('RUNTIME_SERVICE_ACCOUNT_MISMATCH');
+            }
+
+            const policyUrl='https://cloudresourcemanager.googleapis.com/v1/projects/ays-orbit-360-lab:getIamPolicy';
+            const before=await jsonFetch(policyUrl,{method:'POST',headers,body:'{}'});
+            if(!before.ok) throw new Error('GET_IAM_POLICY_'+before.status);
+
+            const member='serviceAccount:'+process.env.COTCOMP_RUNTIME_SA;
+            const role=process.env.COTCOMP_VERIFIER_ROLE;
+            const policy=before.json;
+            if(!Array.isArray(policy.bindings)) policy.bindings=[];
+
+            let binding=policy.bindings.find(b=>b.role===role && !b.condition);
+            const alreadyGranted=!!(binding && Array.isArray(binding.members) && binding.members.includes(member));
+
+            if(!alreadyGranted){
+              if(!binding){
+                binding={role,members:[]};
+                policy.bindings.push(binding);
+              }
+              if(!Array.isArray(binding.members)) binding.members=[];
+              binding.members=[...new Set([...binding.members,member])].sort();
+
+              const setUrl='https://cloudresourcemanager.googleapis.com/v1/projects/ays-orbit-360-lab:setIamPolicy';
+              const set=await jsonFetch(setUrl,{
+                method:'POST',
+                headers,
+                body:JSON.stringify({policy,updateMask:'bindings,etag,version'})
+              });
+              if(!set.ok){
+                const status=set.json&&set.json.error&&set.json.error.status||null;
+                throw new Error('SET_IAM_POLICY_'+set.status+'_'+String(status||'UNKNOWN'));
+              }
+            }
+
+            const after=await jsonFetch(policyUrl,{method:'POST',headers,body:'{}'});
+            if(!after.ok) throw new Error('READBACK_IAM_POLICY_'+after.status);
+
+            const finalBinding=(after.json.bindings||[]).find(b=>b.role===role && !b.condition);
+            const readback=!!(finalBinding && Array.isArray(finalBinding.members) && finalBinding.members.includes(member));
+            if(!readback) throw new Error('TOKEN_VERIFIER_ROLE_READBACK_FAILED');
+
+            const directRoles=(after.json.bindings||[])
+              .filter(b=>!b.condition && Array.isArray(b.members) && b.members.includes(member))
+              .map(b=>b.role).sort();
+
+            const receipt={
+              schemaVersion:'ays-cotcomp-s442-replay-verifier-iam-receipt-v1.0',
+              projectId:'ays-orbit-360-lab',
+              functionName:'cotcompSubmitHandoff',
+              runtimeServiceAccount:process.env.COTCOMP_RUNTIME_SA,
+              requiredRole:role,
+              requiredPermission:'firebaseappcheck.appCheckTokens.verify',
+              alreadyGrantedBefore:alreadyGranted,
+              changed:!alreadyGranted,
+              readbackPass:readback,
+              directProjectRolesAfter:directRoles,
+              broaderRoleAdded:false,
+              appCheckWeakening:false,
+              appDataWritesExecuted:0,
+              deployExecuted:false,
+              productionTouched:false
+            };
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s442iamgrant/S442_REPLAY_VERIFIER_IAM_RECEIPT.json',JSON.stringify(receipt,null,2));
+            console.log('S442_REPLAY_VERIFIER_ROLE_READBACK=true');
+            console.log('S442_IAM_CHANGED='+String(!alreadyGranted));
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)});
+          NODE
+          rm -f "$RUNNER_TEMP/s442iamgrant/cred.json"
+
+      - name: Upload sanitized IAM receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s442-replay-verifier-iam-${{ github.run_id }}
+          path: ${{ runner.temp }}/s442iamgrant/S442_REPLAY_VERIFIER_IAM_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
