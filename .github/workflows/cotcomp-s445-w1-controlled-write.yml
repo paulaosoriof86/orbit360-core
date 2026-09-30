@@ -1,0 +1,517 @@
+name: CotComp S4.45 W1 LAB controlled-write proof
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-w1-s445-lab-20260930
+    paths:
+      - '.github/cotcomp-lab-intents/s445-w1-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  COTCOMP_WEB_APP_ID: '1:646761409743:web:2ec4595ee9160f9d945bba'
+  COTCOMP_SECRET_ID: cotcomp-s442-appcheck-debug-token
+  COTCOMP_PROOF_FUNCTION: cotcompSyntheticCoreWriteProof
+
+jobs:
+  w1-controlled-write:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout authorized isolated source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.45 / W1 authorization intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s445-w1-authorized.json
+          jq -e '
+            .authorization == "S445_W1_LAB_SYNTHETIC_CORE_CONTROLLED_WRITE" and
+            .projectId == "ays-orbit-360-lab" and
+            .tenantId == "alianzas-soluciones" and
+            .syntheticOnly == true and
+            .workflowProjection == false and
+            .providerNotifications == false and
+            .proposalPersistence == false and
+            .selectionPersistence == false and
+            .realData == false and
+            .production == false and
+            .cleanupRequired == true and
+            .finalAbsenceRequired == true
+          ' "$INTENT" >/dev/null
+
+      - name: Run full CotComp source QA before deploy
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+
+      - name: Prepare Firebase LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s445"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s445/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI and verify proof surface not already deployed
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@15.32.0
+          firebase --version
+          firebase functions:list --project "$COTCOMP_PROJECT_ID" --json > "$RUNNER_TEMP/s445/predeploy-functions.json"
+          node <<'NODE'
+          const fs=require('fs');
+          const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s445/predeploy-functions.json','utf8'));
+          const target='cotcompSyntheticCoreWriteProof';
+          let found=false;
+          function walk(v,key=''){
+            if(Array.isArray(v)){for(const x of v)walk(x,key);return;}
+            if(v&&typeof v==='object'){for(const [k,x] of Object.entries(v))walk(x,k);return;}
+            if(typeof v==='string'&&['id','name','entryPoint','function','functionName'].includes(key)){
+              if(v.split('/').pop()===target) found=true;
+            }
+          }
+          walk(raw);
+          if(found) throw new Error('S445_PROOF_FUNCTION_ALREADY_DEPLOYED');
+          NODE
+
+      - name: Freeze source identity and artifact
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          SOURCE_TREE="$(git rev-parse HEAD^{tree})"
+          mkdir -p "$RUNNER_TEMP/s445/evidence"
+          git archive --format=tar.gz -o "$RUNNER_TEMP/s445/evidence/s445-source.tar.gz" HEAD functions firebase.json
+          ARTIFACT_DIGEST="$(sha256sum "$RUNNER_TEMP/s445/evidence/s445-source.tar.gz" | awk '{print $1}')"
+          BACKEND_DIGEST="$(
+            cat               functions/bootstrap.js               functions/cotcomp-w1-runtime-s445.js               functions/cotcomp-runtime-data-contract.js               functions/cotcomp-lab-firestore-driver-s444.js               functions/cotcomp-audit-adapter-s444.js               functions/cotcomp-saga-compensation-s444.js |
+            sha256sum | awk '{print $1}'
+          )"
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          echo "source_tree=$SOURCE_TREE" >> "$GITHUB_OUTPUT"
+          echo "artifact_digest=$ARTIFACT_DIGEST" >> "$GITHUB_OUTPUT"
+          echo "backend_digest=$BACKEND_DIGEST" >> "$GITHUB_OUTPUT"
+
+      - name: Upload immutable source artifact
+        id: source_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s445-source-${{ github.run_id }}
+          path: ${{ runner.temp }}/s445/evidence/s445-source.tar.gz
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Deploy only isolated W1 proof function
+        id: deploy
+        shell: bash
+        run: |
+          set +e
+          firebase deploy             --project "$COTCOMP_PROJECT_ID"             --only "functions:$COTCOMP_PROOF_FUNCTION"             --non-interactive             > "$RUNNER_TEMP/s445/firebase-deploy.log" 2>&1
+          RC=$?
+          set -e
+          echo "deploy_rc=$RC" >> "$GITHUB_OUTPUT"
+
+          firebase functions:list --project "$COTCOMP_PROJECT_ID" --json > "$RUNNER_TEMP/s445/postdeploy-functions.json"
+          node <<'NODE'
+          const fs=require('fs');
+          const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s445/postdeploy-functions.json','utf8'));
+          const target='cotcompSyntheticCoreWriteProof';
+          let record=null;
+          function walk(v){
+            if(Array.isArray(v)){for(const x of v)walk(x);return;}
+            if(!v||typeof v!=='object') return;
+            const candidates=[v.id,v.name,v.entryPoint,v.function,v.functionName].filter(Boolean);
+            for(const cand of candidates){
+              if(String(cand).split('/').pop()===target){
+                let region=v.region||v.regionId||v.location||v.locationId||null;
+                const full=String(v.name||'');
+                const m=full.match(/\/locations\/([^/]+)\/functions\//);
+                if(!region&&m)region=m[1];
+                record={
+                  name:target,
+                  region,
+                  state:v.state||v.status||null,
+                  platform:v.platform||v.generation||null,
+                  runtime:v.runtime||v.runtimeId||null
+                };
+              }
+            }
+            for(const x of Object.values(v)) walk(x);
+          }
+          walk(raw);
+          if(!record) throw new Error('S445_DEPLOYED_FUNCTION_NOT_FOUND');
+          if(record.region&&record.region!=='us-central1') throw new Error('S445_REGION_MISMATCH');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s445/evidence/deployed-function.json',JSON.stringify(record,null,2));
+          NODE
+
+      - name: Resolve LAB Web SDK config read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase apps:sdkconfig WEB "$COTCOMP_WEB_APP_ID" --project "$COTCOMP_PROJECT_ID" --json > "$RUNNER_TEMP/s445/sdkconfig.raw.json"
+          node <<'NODE'
+          const fs=require('fs');
+          const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s445/sdkconfig.raw.json','utf8'));
+          let cfg=null;
+          function walk(v){
+            if(cfg||!v||typeof v!=='object') return;
+            if(typeof v.apiKey==='string'&&typeof v.projectId==='string'&&typeof v.appId==='string'){cfg=v;return;}
+            for(const x of Object.values(v)) if(typeof x==='object') walk(x);
+          }
+          walk(raw);
+          if(!cfg) throw new Error('S445_WEB_SDK_CONFIG_NOT_FOUND');
+          if(cfg.projectId!=='ays-orbit-360-lab') throw new Error('S445_SDK_PROJECT_MISMATCH');
+          if(cfg.appId!=='1:646761409743:web:2ec4595ee9160f9d945bba') throw new Error('S445_SDK_APP_MISMATCH');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s445/sdkconfig.json',JSON.stringify(cfg),{mode:0o600});
+          NODE
+          rm -f "$RUNNER_TEMP/s445/sdkconfig.raw.json"
+
+      - name: Load registered LAB App Check debug token from Secret Manager
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const crypto=require('crypto');
+          const dir=process.env.RUNNER_TEMP+'/s445';
+          const secretResource='projects/646761409743/secrets/cotcomp-s442-appcheck-debug-token';
+          const b64url=v=>Buffer.from(v).toString('base64url');
+
+          async function accessToken(sa){
+            const now=Math.floor(Date.now()/1000);
+            const a=b64url(JSON.stringify({alg:'RS256',typ:'JWT'}));
+            const b=b64url(JSON.stringify({
+              iss:sa.client_email,
+              scope:'https://www.googleapis.com/auth/cloud-platform',
+              aud:'https://oauth2.googleapis.com/token',
+              iat:now,exp:now+3600
+            }));
+            const unsigned=a+'.'+b;
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth-grant-type:jwt-bearer',assertion:unsigned+'.'+sig});
+            body.set('grant_type','urn:ietf:params:oauth:grant-type:jwt-bearer');
+            const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body});
+            if(!r.ok) throw new Error('S445_OAUTH_FAILED_'+r.status);
+            return (await r.json()).access_token;
+          }
+
+          function candidates(){
+            const out=[]; const seen=new Set();
+            for(const [label,value] of [
+              ['ORBIT360_LAB',process.env.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB],
+              ['ORBIT_360_LAB',process.env.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB],
+              ['FALLBACK',process.env.FIREBASE_SERVICE_ACCOUNT_FALLBACK]
+            ]){
+              if(!value) continue;
+              try{
+                const sa=JSON.parse(value);
+                if(sa.project_id!=='ays-orbit-360-lab') continue;
+                if(seen.has(sa.client_email)) continue;
+                seen.add(sa.client_email);
+                out.push({label,sa});
+              }catch{}
+            }
+            return out;
+          }
+
+          (async()=>{
+            for(const candidate of candidates()){
+              const oauth=await accessToken(candidate.sa);
+              const url='https://secretmanager.googleapis.com/v1/'+secretResource+'/versions/latest:access';
+              const r=await fetch(url,{headers:{authorization:'Bearer '+oauth}});
+              if(!r.ok) continue;
+              const json=await r.json();
+              const raw=json&&json.payload&&json.payload.data;
+              if(!raw) continue;
+              const token=Buffer.from(raw,'base64').toString('utf8').trim();
+              if(!token) continue;
+              fs.writeFileSync(dir+'/debug-token.secret',token,{mode:0o600});
+              fs.writeFileSync(dir+'/evidence/token-custody.json',JSON.stringify({
+                secretResource,
+                secretVersionResource:json.name||secretResource+'/versions/latest',
+                credentialUsed:candidate.label,
+                tokenPrinted:false,
+                tokenCommitted:false,
+                tokenPersistedInEvidence:false
+              },null,2));
+              return;
+            }
+            throw new Error('S445_DEBUG_TOKEN_SECRET_NOT_ACCESSIBLE');
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)});
+          NODE
+
+      - name: Install browser proof dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          CLIENT="$RUNNER_TEMP/s445/client"
+          mkdir -p "$CLIENT"
+          cd "$CLIENT"
+          npm init -y >/dev/null 2>&1
+          npm install --silent firebase@latest esbuild@latest playwright@latest
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Build W1 Firebase Web proof client
+        shell: bash
+        run: |
+          set -euo pipefail
+          CLIENT="$RUNNER_TEMP/s445/client"
+          cat > "$CLIENT/client.js" <<'NODE'
+          import { initializeApp } from 'firebase/app';
+          import { initializeAppCheck, CustomProvider } from 'firebase/app-check';
+          import { getFunctions, httpsCallable } from 'firebase/functions';
+
+          self.FIREBASE_APPCHECK_DEBUG_TOKEN=window.__S445_DEBUG_TOKEN__;
+          const provider=new CustomProvider({getToken:async()=>{throw new Error('S445_CUSTOM_PROVIDER_SHOULD_NOT_RUN')}});
+          const app=initializeApp(window.__S445_FIREBASE_CONFIG__);
+          initializeAppCheck(app,{provider,isTokenAutoRefreshEnabled:false});
+          const functions=getFunctions(app,'us-central1');
+
+          async function invoke(mode){
+            const fn=httpsCallable(functions,'cotcompSyntheticCoreWriteProof',{
+              timeout:120000,
+              limitedUseAppCheckTokens:true
+            });
+            const res=await fn({
+              syntheticProof:true,
+              mode,
+              proofRunId:window.__S445_PROOF_RUN_ID__
+            });
+            return res.data;
+          }
+
+          (async()=>{
+            try{
+              const run=await invoke('RUN');
+              const verify=await invoke('VERIFY_ABSENCE');
+              window.__S445_RESULT__={ok:true,run,verify};
+            }catch(e){
+              window.__S445_RESULT__={
+                ok:false,
+                errorCode:e&&e.code?String(e.code).slice(0,160):'UNKNOWN',
+                errorMessage:e&&e.message?String(e.message).slice(0,300):'UNKNOWN'
+              };
+            }finally{
+              window.__S445_DONE__=true;
+            }
+          })();
+          NODE
+          cd "$CLIENT"
+          npx esbuild client.js --bundle --platform=browser --format=iife --outfile=bundle.js >/dev/null
+          printf '<!doctype html><html><body><script src="/bundle.js"></script></body></html>' > index.html
+
+      - name: Execute W1 controlled-write proof and independent final-absence readback
+        id: proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          CLIENT="$RUNNER_TEMP/s445/client"
+          PROOF_RUN_ID="s445-$GITHUB_RUN_ID"
+          printf '%s' "$PROOF_RUN_ID" > "$RUNNER_TEMP/s445/proof-run-id.txt"
+
+          cat > "$CLIENT/run-proof.mjs" <<'NODE'
+          import fs from 'node:fs';
+          import http from 'node:http';
+          import path from 'node:path';
+          import { chromium } from 'playwright';
+
+          const root=process.env.RUNNER_TEMP+'/s445/client';
+          const cfg=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s445/sdkconfig.json','utf8'));
+          const debugToken=fs.readFileSync(process.env.RUNNER_TEMP+'/s445/debug-token.secret','utf8').trim();
+          const proofRunId=fs.readFileSync(process.env.RUNNER_TEMP+'/s445/proof-run-id.txt','utf8').trim();
+
+          const server=http.createServer((req,res)=>{
+            const name=req.url==='/'?'index.html':String(req.url||'').replace(/^\//,'');
+            const file=path.join(root,name);
+            if(!file.startsWith(root)||!fs.existsSync(file)){res.writeHead(404);res.end('not found');return;}
+            res.writeHead(200,{'content-type':name.endsWith('.js')?'application/javascript':'text/html'});
+            fs.createReadStream(file).pipe(res);
+          });
+          await new Promise(resolve=>server.listen(4173,'127.0.0.1',resolve));
+
+          let browser;
+          try{
+            browser=await chromium.launch({headless:true});
+            const page=await browser.newPage();
+            await page.addInitScript(({cfg,debugToken,proofRunId})=>{
+              window.__S445_FIREBASE_CONFIG__=cfg;
+              window.__S445_DEBUG_TOKEN__=debugToken;
+              window.__S445_PROOF_RUN_ID__=proofRunId;
+            },{cfg,debugToken,proofRunId});
+            await page.goto('http://127.0.0.1:4173/',{waitUntil:'load'});
+            await page.waitForFunction(()=>window.__S445_DONE__===true,null,{timeout:180000});
+            const result=await page.evaluate(()=>window.__S445_RESULT__);
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s445/evidence/browser-result.json',JSON.stringify(result,null,2));
+            if(!result||result.ok!==true) throw new Error('S445_BROWSER_PROOF_FAILED');
+            const r=result.run;
+            const v=result.verify;
+            if(!r||r.ok!==true||r.mode!=='RUN') throw new Error('S445_RUN_RESPONSE_INVALID');
+            if(r.firstReadbackExact!==true) throw new Error('S445_FIRST_READBACK_NOT_EXACT');
+            if(r.samePayloadRetryPass!==true||r.samePayloadRetryWrites!==0||r.duplicateCreatedOnRetry!==false) throw new Error('S445_RETRY_ASSERTION_FAILED');
+            if(r.conflictingPayloadDenied!==true||r.conflictWrites!==0) throw new Error('S445_CONFLICT_ASSERTION_FAILED');
+            if(r.caseAccessRawTokenPersisted!==false) throw new Error('S445_RAW_TOKEN_PERSISTED');
+            if(r.cleanupDeleted!==4||r.finalAbsence!==true) throw new Error('S445_CLEANUP_ASSERTION_FAILED');
+            if(!r.writeAccounting||r.writeAccounting.createWrites!==4||r.writeAccounting.deleteWrites!==4||r.writeAccounting.totalAppDataMutations!==8||r.writeAccounting.netPersistentDocuments!==0) throw new Error('S445_WRITE_ACCOUNTING_INVALID');
+            if(!v||v.ok!==true||v.mode!=='VERIFY_ABSENCE'||v.finalAbsence!==true||v.writesExecuted!==0) throw new Error('S445_INDEPENDENT_FINAL_ABSENCE_FAILED');
+          }finally{
+            if(browser) await browser.close();
+            await new Promise(resolve=>server.close(resolve));
+          }
+          NODE
+
+          cd "$CLIENT"
+          node run-proof.mjs
+
+      - name: Build sanitized W1 evidence receipt
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.source_sha }}
+          SOURCE_TREE: ${{ steps.source.outputs.source_tree }}
+          SOURCE_ARTIFACT_ID: ${{ steps.source_artifact.outputs.artifact-id }}
+          SOURCE_ARTIFACT_DIGEST: ${{ steps.source.outputs.artifact_digest }}
+          BACKEND_DIGEST: ${{ steps.source.outputs.backend_digest }}
+          DEPLOY_RC: ${{ steps.deploy.outputs.deploy_rc }}
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const browser=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s445/evidence/browser-result.json','utf8'));
+          const deployed=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s445/evidence/deployed-function.json','utf8'));
+          const custody=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s445/evidence/token-custody.json','utf8'));
+          const receipt={
+            schemaVersion:'ays-cotcomp-s445-w1-controlled-write-proof-v1.0',
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            tenantId:'alianzas-soluciones',
+            sourceSha:process.env.SOURCE_SHA,
+            sourceTree:process.env.SOURCE_TREE,
+            sourceArtifactId:process.env.SOURCE_ARTIFACT_ID,
+            sourceArtifactDigest:process.env.SOURCE_ARTIFACT_DIGEST,
+            backendSourceDigest:process.env.BACKEND_DIGEST,
+            deployCliExitCode:Number(process.env.DEPLOY_RC||0),
+            deployedFunction:deployed,
+            proofRunId:fs.readFileSync(process.env.RUNNER_TEMP+'/s445/proof-run-id.txt','utf8').trim(),
+            appCheck:{
+              enforced:true,
+              limitedUseToken:true,
+              secretResource:custody.secretResource,
+              tokenValuePersistedInEvidence:false
+            },
+            run:browser.run,
+            independentFinalAbsence:browser.verify,
+            scope:['idempotency','quoteCase','caseAccess_hash_only','cotcomp_event'],
+            excluded:['workflow_projection','provider_notifications','proposal_persistence','selection_persistence','real_data','production'],
+            productionTouched:false
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s445/evidence/S445_W1_PROOF_RECEIPT.json',JSON.stringify(receipt,null,2));
+          NODE
+
+      - name: Delete isolated W1 proof function after evidence
+        id: teardown
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          firebase functions:delete "$COTCOMP_PROOF_FUNCTION"             --region "$COTCOMP_REGION"             --project "$COTCOMP_PROJECT_ID"             --force             --non-interactive             > "$RUNNER_TEMP/s445/function-delete.log" 2>&1
+          DELETE_RC=$?
+          set -e
+          echo "delete_rc=$DELETE_RC" >> "$GITHUB_OUTPUT"
+
+          firebase functions:list --project "$COTCOMP_PROJECT_ID" --json > "$RUNNER_TEMP/s445/postdelete-functions.json"
+          node <<'NODE'
+          const fs=require('fs');
+          const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s445/postdelete-functions.json','utf8'));
+          const target='cotcompSyntheticCoreWriteProof';
+          let found=false;
+          function walk(v,key=''){
+            if(Array.isArray(v)){for(const x of v)walk(x,key);return;}
+            if(v&&typeof v==='object'){for(const [k,x] of Object.entries(v))walk(x,k);return;}
+            if(typeof v==='string'&&['id','name','entryPoint','function','functionName'].includes(key)){
+              if(v.split('/').pop()===target) found=true;
+            }
+          }
+          walk(raw);
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s445/evidence/function-teardown.json',JSON.stringify({
+            function:'cotcompSyntheticCoreWriteProof',
+            absentAfterTeardown:!found
+          },null,2));
+          if(found) throw new Error('S445_PROOF_FUNCTION_STILL_DEPLOYED');
+          NODE
+
+      - name: Final evidence guard
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$RUNNER_TEMP/s445/evidence/S445_W1_PROOF_RECEIPT.json"
+          test -f "$RUNNER_TEMP/s445/evidence/function-teardown.json"
+          jq -e '
+            .run.ok == true and
+            .run.firstReadbackExact == true and
+            .run.samePayloadRetryPass == true and
+            .run.samePayloadRetryWrites == 0 and
+            .run.duplicateCreatedOnRetry == false and
+            .run.conflictingPayloadDenied == true and
+            .run.conflictWrites == 0 and
+            .run.caseAccessRawTokenPersisted == false and
+            .run.cleanupDeleted == 4 and
+            .run.finalAbsence == true and
+            .run.writeAccounting.createWrites == 4 and
+            .run.writeAccounting.deleteWrites == 4 and
+            .run.writeAccounting.totalAppDataMutations == 8 and
+            .run.writeAccounting.netPersistentDocuments == 0 and
+            .independentFinalAbsence.finalAbsence == true and
+            .independentFinalAbsence.writesExecuted == 0 and
+            .productionTouched == false
+          ' "$RUNNER_TEMP/s445/evidence/S445_W1_PROOF_RECEIPT.json" >/dev/null
+          jq -e '.absentAfterTeardown == true' "$RUNNER_TEMP/s445/evidence/function-teardown.json" >/dev/null
+
+      - name: Upload sanitized S4.45 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s445-w1-proof-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s445/evidence/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove transient local secrets
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/s445/debug-token.secret"
+          rm -f "$RUNNER_TEMP/s445/sdkconfig.json"
+          rm -f "$RUNNER_TEMP/s445/firebase-service-account.json"
