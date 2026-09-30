@@ -1,0 +1,101 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_V1",
+  "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
+  "exactRejectedCandidate": {
+    "sourceSha": "41aacc71b343574338ed25efbc6902fb25b13677",
+    "buildId": "gi-i65-b3-41aacc71b343-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b3-36656317848-phqsawss.web.app",
+    "artifactId": 11071994782
+  },
+  "diagnostic": {
+    "runId": 36658190622,
+    "jobId": 109706934401,
+    "artifactId": 11073202655,
+    "artifactDigest": "sha256:3387abe63dcd0cb82935f864aabe4ccf539653c0b1353cc4ba05d2e62d02f6d7",
+    "controlPlaneGuardRunId": 36658190591,
+    "controlPlaneGuard": "PASS",
+    "errors": []
+  },
+  "discriminants": {
+    "colombia": {
+      "moduleRenderCount": 1,
+      "distinctDomStates": 2,
+      "renderedTableCountryTokens": {
+        "GT": 5,
+        "CO": 0
+      },
+      "adapter": {
+        "cobros": 0,
+        "reported": 7,
+        "portfolio": 3,
+        "reportedCountries": [
+          "CO"
+        ],
+        "portfolioCountries": [
+          "CO"
+        ]
+      },
+      "directQueryCurrencies": [
+        "COP"
+      ],
+      "firstCanonicalKpis": [
+        "$0 COP",
+        "$0 COP",
+        "$0 COP"
+      ],
+      "laterSafeKpiMarkers": "removed by post-render writer"
+    },
+    "guatemala": {
+      "moduleRenderCount": 1,
+      "distinctDomStates": 2,
+      "adapter": {
+        "cobros": 5,
+        "reported": 471,
+        "portfolio": 1303,
+        "cobroCountries": [
+          "GT"
+        ],
+        "reportedCountries": [
+          "GT"
+        ],
+        "portfolioCountries": [
+          "GT"
+        ]
+      }
+    }
+  },
+  "rootCause": {
+    "classification": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
+    "rowOwner": {
+      "path": "orbit360-platform/modules/cobros.js",
+      "defect": "rows() and reportedPaymentEvidence() do not enforce active Orbit.pais, so the rendered table ignores the country selector."
+    },
+    "kpiSecondWriter": {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "defect": "The bridge wraps cobros.render() and asynchronously calls enhanceCollections(host), which rewrites .kpi-row .kpi values after the canonical renderer. enhanceCollections uses access authorization scope rather than active country selector scope, removing data-currency-safe-metric and repainting stale/mixed KPI values."
+    },
+    "notRootCauses": [
+      "Firestore source data",
+      "data import",
+      "B3-003 currency queries",
+      "B3-002 performance fix",
+      "multiple cobros.render() calls during one country transition"
+    ]
+  },
+  "authorizedProductFiles": [
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+  ],
+  "requiredFix": [
+    "Canonical Cobros renderer must enforce active country for authoritative and reported rows.",
+    "Policy/receipts bridge must stop asynchronously overwriting Cobros KPIs; Cobros KPI ownership stays in modules/cobros.js.",
+    "Strengthen B3-003 proof to use the real country selector, assert rendered row countries, assert KPI marker persistence after async settle, and assert DOM/query agreement."
+  ],
+  "boundaries": {
+    "dataWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "b4": false
+  },
+  "nextAction": "B3_003_COUNTRY_SCOPE_CAUSAL_FIX"
+}
