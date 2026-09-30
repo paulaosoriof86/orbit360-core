@@ -1,0 +1,45 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R8_CAUSAL_SOURCE_FIX_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "findingId": "B3-004",
+  "sourceFixCommit": "f8ddb8605aaf2c58161e3a90628718cd959e6775",
+  "qaMechanismCommit": "e396632a342775c58009ed337b687388d362b5c2",
+  "productBlobs": {
+    "functions/product-operational-domain.js": "9800c5140ce415484ccacf086a3657dc66749d0f",
+    "orbit360-platform/index.html": "31980de0896f19fef38c065d8b3e9a8a22f9883f",
+    "orbit360-platform/modules/cobros.js": "2533d88e27c43031a3fbd1add96f2cbcdcaaf0f5",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
+    "orbit360-platform/core/record-delete.js": "749722f8482db5a72b72ac9b64dbcac08af86b82",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "9c784d14d8b92c485c22579d58658c6bb11d9c27",
+    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "16c32a84da9fbfdb765ba6f6803d43d05195dad4",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "cafbaa33a3f23d30ec773df3b569ecf12e891e6e"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "5fb455847d76f43e7daff23c26a1ed3ac9c91eed",
+    "tools/gravicentra-i6-5-b3-004-r8-readmodel-proof.mjs": "6f276bdd321fe1e2c62cebcecd1f119e72f4099b",
+    "tools/gravicentra-i6-5-b3-004-r8-operational-proof.mjs": "5558964b15d020f42b67f9bb236b267f00c7ead9",
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "eb22c5ba3f45bca5dcf2e9074fe086620a6b20e2"
+  },
+  "fixes": {
+    "r8A": "Cobros Estado popover escapes local card clipping without global select changes.",
+    "r8B": "recibosEsperados/carteraPrimas resolve under cobros in browser and server operational writer; isolated Preview callable added for synthetic proof only.",
+    "r8C": "canonical record-delete owner restored for expected receipts with payment-history blocker and linked operational soft delete.",
+    "r8D": "inactive/cancelled policy receipts are historical and open portfolio is excluded across native/global/policy-detail read models.",
+    "r8E": "paid receipt generic edit remains locked while controlled same-payment reconciliation/enrichment is exposed.",
+    "r8F": "receipt detail uses hydrated Cliente360 local back path with routing fallback and timing diagnostic."
+  },
+  "invalidates": {
+    "r7Preview": true,
+    "r7MachineProofForCurrentSource": true
+  },
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "syntheticQaOnly": true,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  }
+}

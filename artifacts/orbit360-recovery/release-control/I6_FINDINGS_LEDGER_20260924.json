@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R7_TARGETED_VISUAL",
+      "nextAction": "B3_004_R8_SOURCE_CONTRACT",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1079,6 +1079,36 @@
           "contractReceiptBlobSha": "1dc8409f9e5617c7e65a252969281f4995aa1760",
           "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_MACHINE_PASS_20260930.json",
           "machineProofReceiptBlobSha": "7ed2e68bbd5780a03cb3a0395bc4695b5fd669b0"
+        },
+        {
+          "id": "B3-004-R8-A",
+          "status": "SOURCE_FIXED_PENDING_CONTRACT",
+          "blocking": true
+        },
+        {
+          "id": "B3-004-R8-B",
+          "status": "SOURCE_FIXED_PENDING_CONTRACT",
+          "blocking": true
+        },
+        {
+          "id": "B3-004-R8-C",
+          "status": "SOURCE_FIXED_PENDING_CONTRACT",
+          "blocking": true
+        },
+        {
+          "id": "B3-004-R8-D",
+          "status": "SOURCE_FIXED_PENDING_CONTRACT",
+          "blocking": true
+        },
+        {
+          "id": "B3-004-R8-E",
+          "status": "SOURCE_FIXED_PENDING_CONTRACT",
+          "blocking": true
+        },
+        {
+          "id": "B3-004-R8-F",
+          "status": "SOURCE_FIXED_PENDING_CONTRACT",
+          "blocking": true
         }
       ],
       "paymentProvenanceContractStatus": "PASS",
@@ -1345,7 +1375,45 @@
         "runId": 36771425966,
         "artifactId": "11124481690",
         "artifactDigest": "e2b994cda6b40fd8a246f344ec886c61055db42b602bf834908ca1ed2a8b2b53"
-      }
+      },
+      "r8VisualRejection": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_TARGETED_VISUAL_REJECTION_20260930.json",
+        "blobSha": "1e7de0f7f99cd0d8207a61956110913e937212e4"
+      },
+      "r8CausalDiagnostic": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_CAUSAL_DIAGNOSTIC_AND_SOURCE_AUTHORIZATION_20260930.json",
+        "blobSha": "6ce8b83a4c752cdf6c9fd65246da31f5c7899d98"
+      },
+      "r8CancellationContract": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_POLICY_CANCELLED_RECEIPTS_CONTRACT_20260930.json",
+        "blobSha": "1eb935678d0c1413371725fc51a8ace7609b2908"
+      },
+      "r8SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_CAUSAL_SOURCE_FIX_20260930.json",
+        "blobSha": "1fbd852fc44b26c2262248402d18bd6b08e82933",
+        "sourceHead": "e396632a342775c58009ed337b687388d362b5c2",
+        "productBlobs": {
+          "functions/product-operational-domain.js": "9800c5140ce415484ccacf086a3657dc66749d0f",
+          "orbit360-platform/index.html": "31980de0896f19fef38c065d8b3e9a8a22f9883f",
+          "orbit360-platform/modules/cobros.js": "2533d88e27c43031a3fbd1add96f2cbcdcaaf0f5",
+          "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
+          "orbit360-platform/core/record-delete.js": "749722f8482db5a72b72ac9b64dbcac08af86b82",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "9c784d14d8b92c485c22579d58658c6bb11d9c27",
+          "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "16c32a84da9fbfdb765ba6f6803d43d05195dad4",
+          "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "cafbaa33a3f23d30ec773df3b569ecf12e891e6e"
+        },
+        "qaBlobs": {
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "5fb455847d76f43e7daff23c26a1ed3ac9c91eed",
+          "tools/gravicentra-i6-5-b3-004-r8-readmodel-proof.mjs": "6f276bdd321fe1e2c62cebcecd1f119e72f4099b",
+          "tools/gravicentra-i6-5-b3-004-r8-operational-proof.mjs": "5558964b15d020f42b67f9bb236b267f00c7ead9",
+          ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "eb22c5ba3f45bca5dcf2e9074fe086620a6b20e2"
+        }
+      },
+      "r8PreviewMechanism": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_PREVIEW_PROOF_MECHANISM_AUTHORIZATION_20260930.json",
+        "blobSha": "43df8ef8eed9f90dbfbe5a3ddbcce89b49fc3137"
+      },
+      "currentCandidateEligibleForPromotion": false
     },
     {
       "id": "B3-005",
@@ -4949,11 +5017,11 @@
     }
   },
   "currentB3": {
-    "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
-    "compositionLockBlobSha": "6824a4b873f14a3c96669eb0cf495feeea1a9f64",
+    "compositionLockBlobSha": "018efd26042772ff9bfde680b56f08bf2af25260",
     "noLive": true,
     "noReimport": true,
     "mechanismRootFix": {
@@ -4967,7 +5035,9 @@
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_20260929.json",
     "priorFindingId": "B3-002",
     "priorFindingStatus": "CLOSED_PASS",
-    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_20260929.json",
-    "b3003Status": "CLOSED_PASS"
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_TARGETED_VISUAL_REJECTION_20260930.json",
+    "b3003Status": "CLOSED_PASS",
+    "r8SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_CAUSAL_SOURCE_FIX_20260930.json",
+    "b3005Opened": false
   }
 }
