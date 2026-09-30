@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "CANDIDATE_PENDING_EXACT_PREVIEW",
+      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R6_1_EXACT_PREVIEW",
+      "nextAction": "B3_004_R6_1_TARGETED_VISUAL",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1271,6 +1271,16 @@
         },
         "runId": 36762943153,
         "jobId": 110050423644
+      },
+      "r61MachinePass": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_MACHINE_PASS_20260930.json",
+        "blobSha": "6d11ecba53d570b514c75590d6e144a97c1fc770",
+        "sourceSha": "5daa1b1e50931dfa7af346c97c06754f503f88d1",
+        "buildId": "gi-i65-b3-5daa1b1e5093-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36763283882-x867tfv3.web.app",
+        "runId": 36763283882,
+        "artifactId": "11120555043",
+        "artifactDigest": "60db8f505d6809b97e6ad527bf2797c1a7e796c7a9d8cbe8be2b5b9864acdf06"
       }
     },
     {

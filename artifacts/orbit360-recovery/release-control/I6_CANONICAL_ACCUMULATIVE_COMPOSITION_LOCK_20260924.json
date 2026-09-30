@@ -631,5 +631,16 @@
     "jobId": 110050423644,
     "sourceSha": "04cc4405332165e8ab7c12812a15fc71c265c3e1",
     "contractBlobSha": "516809059e8e90e71b0963b7281da34c83713ca6"
+  },
+  "b3004R61MachinePass": {
+    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_MACHINE_PASS_20260930.json",
+    "receiptBlobSha": "6d11ecba53d570b514c75590d6e144a97c1fc770",
+    "sourceSha": "5daa1b1e50931dfa7af346c97c06754f503f88d1",
+    "buildId": "gi-i65-b3-5daa1b1e5093-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36763283882-x867tfv3.web.app",
+    "runId": 36763283882,
+    "artifactId": "11120555043",
+    "artifactDigest": "60db8f505d6809b97e6ad527bf2797c1a7e796c7a9d8cbe8be2b5b9864acdf06"
   }
 }

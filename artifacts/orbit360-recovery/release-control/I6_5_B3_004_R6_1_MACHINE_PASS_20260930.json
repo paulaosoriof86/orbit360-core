@@ -1,0 +1,54 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R6_1_MACHINE_PASS_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "5daa1b1e50931dfa7af346c97c06754f503f88d1",
+  "workflowRunId": 36763283882,
+  "workflowRunConclusion": "failure",
+  "workflowFailureIsolation": {
+    "b3004ExactPreviewJobId": 110051333052,
+    "b3004ExactPreviewJobConclusion": "success",
+    "b3004FoundationJobId": 110051333148,
+    "b3004FoundationConclusion": "success",
+    "unrelatedFailedJobId": 110051332154,
+    "unrelatedFailedJobName": "i65-b1-hosting-byte-diagnostic",
+    "decision": "B3-004 machine proof is accepted from its exact successful jobs; unrelated B1 diagnostic failure does not override B3-004 evidence."
+  },
+  "buildId": "gi-i65-b3-5daa1b1e5093-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36763283882-x867tfv3.web.app",
+  "channelId": "gi-b3004-36763283882",
+  "artifactId": "11120555043",
+  "artifactDigest": "60db8f505d6809b97e6ad527bf2797c1a7e796c7a9d8cbe8be2b5b9864acdf06",
+  "proof": {
+    "contracts": "PASS",
+    "previewBackendExactDeploy": "PASS",
+    "hostingExactReadback": "PASS",
+    "syntheticProof": "PASS",
+    "cleanup": "PASS",
+    "crossAdvisorPrivilegedApply": true,
+    "advisorReportDoesNotApplyPayment": true,
+    "advisorCannotApplyOrReconcile": true,
+    "advisorReportCreatesLinkedOpsManagement": true,
+    "operativeValidatesAndAppliesSameCanonicalPayment": true,
+    "operativeDirectPaymentNeedsNoSecondApproval": true,
+    "individualReconciliationEnrichesSamePayment": true,
+    "idempotentRetry": true,
+    "singleCobroPerReceipt": true,
+    "advisorProvenancePreserved": true,
+    "paidDateSeparatedFromApplicationDate": true
+  },
+  "failedPriorPreview": {
+    "sourceSha": "b82b91c4b174e1670e882ac4d0ba5d1d348a0c8b",
+    "runId": 36762229434,
+    "buildId": "gi-i65-b3-b82b91c4b174-57f234755dc1",
+    "reuseForbidden": true
+  },
+  "boundaries": {
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3005Opened": false
+  },
+  "decision": "MACHINE_PASS_PENDING_TARGETED_VISUAL"
+}
