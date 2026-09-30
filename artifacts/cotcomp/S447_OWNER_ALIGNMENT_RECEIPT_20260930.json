@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "ays-cotcomp-s447-owner-alignment-observed-state-v1.0",
+  "capturedAt": "2026-09-30",
+  "workflowRunId": 36788222356,
+  "workflowConclusion": "success",
+  "projectId": "ays-orbit-360-lab",
+  "region": "us-central1",
+  "function": "orbit360OpsLeadsCommand",
+  "source": {
+    "sha": "5ecb1f429e30a4f832a2f370988ad9480b910705",
+    "tree": "dde681d7aa17c34c66bab7f022625ac77fcc6ab9",
+    "canonicalOwnerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+    "sourceArtifactId": "11129959326",
+    "sourceArtifactUploadDigest": "sha256:992419bd883487010046dc6da7d2381174d7acd8278b4c162d99674bb7cd9e84",
+    "sourceTarDigest": "sha256:2fbf38dfb8dfccb60d0be3732b4606343b032946ab38433bdf0c7430a98139ce"
+  },
+  "preDeploy": {
+    "ownerBlob": "d0a1e116186bba860d34ec540e8abba81830b553",
+    "revision": "orbit360opsleadscommand-00001-fub",
+    "updateTime": "2026-09-13T02:56:31.995474351Z",
+    "exactOldBlob": true,
+    "cotcompRefSupport": false
+  },
+  "postDeploy": {
+    "ownerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+    "exactCanonicalBlob": true,
+    "cotcompRefSupport": true,
+    "sanitizeCotcompRefSupport": true,
+    "state": "ACTIVE",
+    "runtime": "nodejs22",
+    "revision": "orbit360opsleadscommand-00002-nop",
+    "updateTime": "2026-09-30T22:56:39.004069740Z",
+    "sourceGeneration": "1790808936685610",
+    "sourceArchiveDigest": "sha256:dcf73a2b8b7002fadd7bfecfdc958729c56fca6b502c3e37e007cb649cec144e"
+  },
+  "qa": {
+    "preDeploy": {
+      "tests": 318,
+      "passed": 318,
+      "failed": 0
+    },
+    "postDeploy": {
+      "tests": 318,
+      "passed": 318,
+      "failed": 0
+    }
+  },
+  "deploy": {
+    "firebaseCliExitCode": 1,
+    "physicalSourceReadbackExact": true
+  },
+  "evidenceArtifact": {
+    "id": "11130254166",
+    "uploadDigest": "sha256:7bef89577862efe69831174bccd7fb5a5112d1dc38eec4d3383b72ba228ed40b"
+  },
+  "boundaries": {
+    "appDataReadsExecuted": 0,
+    "appDataWritesExecuted": 0,
+    "w2Executed": false,
+    "providerDeliveryExecuted": false,
+    "realDataUsed": false,
+    "productionTouched": false
+  },
+  "releaseTruth": {
+    "workflowOwnerRuntimeVerified": true,
+    "canonicalCotcompRefRuntimeAvailable": true,
+    "w2Released": false,
+    "providerDeliveryReleased": false,
+    "realDataReleased": false,
+    "productionReleased": false
+  }
+}
