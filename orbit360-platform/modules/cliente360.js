@@ -21,6 +21,19 @@ Orbit.modules.cliente360 = (function () {
   let filtros = { q: '', pais: '', tipo: '', asesor: '', seg: '' };
   let tab = 'resumen';
   let shownCid = null; // cliente actualmente abierto (para resetear pestaña al cambiar)
+  const receiptReturnSummaryCache = new Map();
+  function prepareReceiptReturn(cid) {
+    const id=String(cid||'').trim(); if(!id||receiptReturnSummaryCache.has(id)) return false;
+    const run=()=>{try{const r=q.clienteResumen(id);if(r&&r.cli)receiptReturnSummaryCache.set(id,r);}catch(_){}};
+    if(typeof requestIdleCallback==='function') requestIdleCallback(run,{timeout:250}); else setTimeout(run,0);
+    return true;
+  }
+  function summaryForDetail(cid) {
+    const id=String(cid||'').trim();
+    if(tab==='recibos'&&receiptReturnSummaryCache.has(id)){const r=receiptReturnSummaryCache.get(id);receiptReturnSummaryCache.delete(id);return r;}
+    return q.clienteResumen(cid);
+  }
+  try{document.addEventListener('orbit:store',e=>{const c=e&&e.detail&&e.detail.collection||'';if(['clientes','polizas','recibosEsperados','carteraPrimas','cobros','comisiones','*'].includes(c))receiptReturnSummaryCache.clear();});document.addEventListener('orbit:session',()=>receiptReturnSummaryCache.clear());}catch(_){};
   const LIST_PAGE_SIZE = 40;
   let listPage = 1;
   let listRenderSeq = 0;
@@ -295,7 +308,7 @@ Orbit.modules.cliente360 = (function () {
      DETALLE — el cerebro 360
      ========================================================= */
   function detalle(cid) {
-    const r = q.clienteResumen(cid);
+    const r = summaryForDetail(cid);
     const rawClient = r.cli;
     const c = Orbit.clientProjection && typeof Orbit.clientProjection.project === 'function'
       ? Orbit.clientProjection.project(rawClient, { policyClientIds: new Set((r.pol || []).map(p => String(p && p.clienteId || '')).filter(Boolean)) })
@@ -1862,5 +1875,5 @@ Orbit.modules.cliente360 = (function () {
     tab = 'siniestros'; detalle(cid);
   }
 
-  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); }, nuevoCliente, nuevoReclamo, addBitacora, renovabilidad };
+  return { render, edit, renovar, comparativo, verPoliza, editarPoliza, endoso, verVehiculo, correoPoliza, nuevaPoliza, prepareReceiptReturn, reabrir: (cid, t) => { tab = t || 'resumen'; detalle(cid); }, nuevoCliente, nuevoReclamo, addBitacora, renovabilidad };
 })();

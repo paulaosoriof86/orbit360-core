@@ -140,7 +140,7 @@
     "orbit360-platform/core/access-scope.js": "f50156162f59e105d3564c1c3f6036daf03ebd56",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "6decc66566ca6b6fe1761fb0d2db5a108e9d1033",
-    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "1aaf128d1fdf25efbd93ff8df53b7e55d0dbe124",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "29ed6e44c1501bcb6fec666146f5dd89df09d5a1",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
@@ -172,11 +172,11 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "116d5aec63774e1b33af5737b79472cdaeec8b3b",
+    "orbit360-platform/index.html": "a53ab958192cb494efca24a7182aaa6f2b4c5add",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
-    "orbit360-platform/modules/cliente360.js": "4104e0d63af041938a5102eb75ab43786e3d870a",
+    "orbit360-platform/modules/cliente360.js": "92d76a6c0c839091a57ab442c833c058eefbf9ba",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "16c32a84da9fbfdb765ba6f6803d43d05195dad4",
     "orbit360-platform/modules/cobros.js": "2533d88e27c43031a3fbd1add96f2cbcdcaaf0f5",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
@@ -222,32 +222,20 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "status": "B3_004_R9_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "status": "B3_004_R9P1_GLOBAL_BACK_SOURCE_FIXED_PENDING_CONTRACT",
     "findingId": "B3-004",
     "recordedAt": "2026-09-30",
-    "causes": [
-      "conciliaciones.js stale READ_ONLY_DRYRUN globally replaced canonical Cobros actions with blocked()",
-      "crm-v1198 guard treated receipt IDs passed to Cobros actions as cobros document IDs only",
-      "native receipt detail preferred #host over #c360-body and destroyed hydrated Cliente360 shell"
-    ],
+    "rootCause": "Global Cobros receipt detail has no c360-body, so R9 local-body optimization cannot apply and fallback still rebuilt Cliente360 on demand.",
+    "fix": "Idle-prefetch Cliente360 summary while receipt detail is open, consume one-shot summary on back, prevent hash routing, update URL with history.replaceState.",
     "productBlobs": {
-      "orbit360-platform/modules/conciliaciones.js": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25",
-      "orbit360-platform/modules/crm-v1198-operational-bridge.js": "716a345304d03f975ae1459a03a9e8c8df5801d4",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "1aaf128d1fdf25efbd93ff8df53b7e55d0dbe124",
-      "orbit360-platform/index.html": "116d5aec63774e1b33af5737b79472cdaeec8b3b"
+      "orbit360-platform/modules/cliente360.js": "92d76a6c0c839091a57ab442c833c058eefbf9ba",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "29ed6e44c1501bcb6fec666146f5dd89df09d5a1",
+      "orbit360-platform/index.html": "a53ab958192cb494efca24a7182aaa6f2b4c5add"
     },
-    "qaContractBlobSha": "27ac24d42ed81db2dfed6bb45b153ce173302ee6",
+    "qaContractBlobSha": "30021b1117f2b719d43c270916ec5d275cb227fa",
     "noDataMutation": true,
     "noReimport": true,
-    "noLive": true,
-    "workflowBlobSha": "1d6954245eed7e0c7267a6a9b6a065454517803c",
-    "contractRunId": 36790602214,
-    "contractJobId": 110142340406,
-    "contractPassedBeforePostPassDispatch403": true,
-    "productSourceChanged": false,
-    "dataMutation": false,
-    "reimport": false,
-    "live": false
+    "noLive": true
   },
   "lastMechanismRootFix": {
     "status": "FIXED_PENDING_RERUN",
