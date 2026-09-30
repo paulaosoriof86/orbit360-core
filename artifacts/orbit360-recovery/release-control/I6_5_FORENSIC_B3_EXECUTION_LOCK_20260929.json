@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_004_SURFACES_FIXED_PENDING_CONTRACT",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "SURFACES_FIXED_PENDING_CONTRACT",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
     "boundaries": {
@@ -43,15 +43,15 @@
     "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
     "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
     "surfaceBlobs": {
-      "orbit360-platform/modules/cobros.js": "12172970c503bc535569878702ffea6e65f9508a",
-      "orbit360-platform/modules/cliente360.js": "c684fef4d21f8867d9919623c5cab316752a2dfd",
+      "orbit360-platform/modules/cobros.js": "5c5aeaba9a53e5716f962cd3e77c892b81905d34",
+      "orbit360-platform/modules/cliente360.js": "466852427fe6152edb57ae30c510a15878d522e0",
       "orbit360-platform/modules/portal.js": "fc23c03e4c59c256be81553e472dee6d2d4ef895",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "148c68af1a4362102c3f14586e475682fffbcafe",
       "orbit360-platform/index.html": "0d94cd428b03443d52d3400bce6354c8ed1dfb5a",
-      "tools/gravicentra-i6-5-b3-004-contract.mjs": "e39e6cb1a6d33bc1abe9b35732cf2fab4b493d82"
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "a2264accb652fe382724099e9fc04a357c62eb70"
     },
     "surfaceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_CONTRACT_PASS_20260930.json",
-    "activeSubFindingId": "B3-004-R1-PAYMENT-PROVENANCE-ENRICHMENT",
+    "activeSubFindingId": "B3-004-R2-VISUAL-PAYMENT-SEMANTICS",
     "provenanceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_FIX_20260930.json",
     "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_CONTRACT_PASS_20260930.json",
     "machineProof": {
@@ -67,7 +67,29 @@
       "syntheticProofPass": true,
       "cleanupPass": true,
       "liveUnchanged": true
-    }
+    },
+    "visualPreflightReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REJECTION_20260930.json",
+    "visualPreflightReceiptBlobSha": "b332b18224cad8688532dc8f5d96f804d8a8d7f1",
+    "visualRemediationBlobs": {
+      "orbit360-platform/modules/cobros.js": "5c5aeaba9a53e5716f962cd3e77c892b81905d34",
+      "orbit360-platform/modules/cliente360.js": "466852427fe6152edb57ae30c510a15878d522e0",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "a2264accb652fe382724099e9fc04a357c62eb70"
+    },
+    "subFindings": [
+      {
+        "id": "B3-004-R2-VISUAL-PAYMENT-SEMANTICS",
+        "status": "SOURCE_FIXED_PENDING_CONTRACT",
+        "blocking": true,
+        "rootCause": "EXACT_PREVIEW_RENDERS_LEGACY_INVOICE_DATE_LABEL_AND_HUMAN_VALIDATION_COPY",
+        "remediation": "Align visible Cobros/Cliente360 temporal semantics and client-reported payment copy with Payment Lock V2; preserve canonical command owner.",
+        "authorizedProductFiles": [
+          "orbit360-platform/modules/cobros.js",
+          "orbit360-platform/modules/cliente360.js"
+        ],
+        "qaGuardFile": "tools/gravicentra-i6-5-b3-004-contract.mjs",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REJECTION_20260930.json"
+      }
+    ]
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -79,6 +101,8 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
+    "B3_004_SURFACE_CONTRACT_PASS_AFTER_VISUAL_REMEDIATION",
+    "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS",
     "B3_004_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
@@ -107,7 +131,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
@@ -202,7 +226,7 @@
     "functions/cobros-reconciliation-domain.js",
     "tools/gravicentra-i6-5-b3-004-contract.mjs"
   ],
-  "compositionLockBlobSha": "ed9e00957e9320ee4caa4e3d96b9f0b974f42dd3",
+  "compositionLockBlobSha": "d2785bca12bf76ccaa186f7baf145aef7e1277cb",
   "syntheticQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
     "purpose": "CREATE_RETRY_ENRICH_READBACK_CLEANUP_PROOF",
@@ -222,5 +246,24 @@
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
     "idContract": "ALPHANUMERIC_LEADING_ID_COMPATIBLE_WITH_CANONICAL_COMMAND"
+  },
+  "visualPreflight": {
+    "status": "FAIL_REMEDIATED_PENDING_CONTRACT",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REJECTION_20260930.json",
+    "receiptBlobSha": "b332b18224cad8688532dc8f5d96f804d8a8d7f1",
+    "rejectedPreview": {
+      "sourceSha": "61e81ba87e7a10d076951d1118bc1527d71a7fdd",
+      "buildId": "gi-i65-b3-61e81ba87e7a-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36722855770-2mjpfi0g.web.app",
+      "channelId": "gi-b3004-36722855770",
+      "runId": 36722855770,
+      "artifactId": 11101346698,
+      "artifactDigest": "2b592bb18fe87cd07e02f7c63debe4be8c6f0c7baddc269150e0d1f0e90684cc",
+      "previewBackendPass": true,
+      "exactHostingReadbackPass": true,
+      "syntheticProofPass": true,
+      "cleanupPass": true,
+      "liveUnchanged": true
+    }
   }
 }

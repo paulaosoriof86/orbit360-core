@@ -185,7 +185,7 @@ Orbit.modules.cobros = (function () {
         { label: 'Vencido', val: currencyMetric(cart, 'venc'), color: 'var(--danger)', foot: 'en gestión · por moneda', footTone: 'down' },
         { label: 'Por conciliar', onclick: "location.hash='#/cobros'", val: porConciliar, color: 'var(--info)', foot: 'cobros confirmados sin conciliación' }
       ])}
-      ${reported.length ? `<div class="card" data-reported-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${reported.length} pago(s) reportado(s) por validar</b><div class="muted" style="font-size:12px;margin-top:3px">Se muestran como evidencia operativa y no se contabilizan como cobros confirmados hasta validación/aplicación.</div></div>` : ''}
+      ${reported.length ? `<div class="card" data-reported-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${reported.length} pago(s) reportado(s) por cliente</b><div class="muted" style="font-size:12px;margin-top:3px">Cuando el recibo coincide de forma única y válida, el pago se aplica automáticamente. Solo los casos ambiguos o contradictorios quedan para revisión.</div></div>` : ''}
 
       <div class="card pad" style="margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
@@ -308,7 +308,7 @@ Orbit.modules.cobros = (function () {
           ${vr('Aseguradora', asg ? U.esc(asg.nombre) : '—')}${vr('Asesor', ase ? U.esc(ase.nombre) : '—')}
           ${vr('Forma de pago', (p && p.formaPago) || c.metodo || '—')}${vr('Conducto', (p && p.conducto) || '—')}
           ${vr('Vence', U.fmtDate(c.vence))}${vr('Fecha límite', U.fmtDate(c.fechaLimite || c.vence))}
-          ${vr('Fecha de pago', c.fechaPago ? U.fmtDate(c.fechaPago) : '—')}${vr('Fecha real (factura)', c.fechaReal ? U.fmtDate(c.fechaReal) : '—')}
+          ${vr('Fecha real de pago', (c.paidDate || c.fechaPago || c.fechaPagoReportada) ? U.fmtDate(c.paidDate || c.fechaPago || c.fechaPagoReportada) : '—')}${vr('Fecha operativa inferida', c.inferredEffectiveDate ? U.fmtDate(c.inferredEffectiveDate) : '—')}${vr('Fecha de aplicación', c.applicationDate ? U.fmtDate(c.applicationDate) : '—')}${vr('Número de factura', U.esc(c.invoiceNumber || c.numeroFactura || '—'))}${vr('Soporte de pago', c.paymentSupportDocumentRef ? 'Adjunto' : 'No adjunto')}${vr('Factura / soporte de aplicación', c.invoiceDocumentRef ? 'Adjunta' : 'No adjunta')}
         </div>
         <div class="vp-desglose">
           <div class="vp-sec-t">🧾 Desglose del ${TT('recibo').toLowerCase()}</div>

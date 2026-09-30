@@ -819,11 +819,11 @@ Orbit.modules.cliente360 = (function () {
             <td class="num">${U.money(c.monto, c.moneda)}</td>
             <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
             <td>${cobBadge(c)}</td>
-            <td style="text-align:right" onclick="event.stopPropagation()">${c.reportado && !c.validadoReporte && aplicable ? `<button class="btn primary sm" data-validar="${c.id}">🔎 Validar</button>` : (aplicable ? `<button class="btn primary sm" data-apply="${c.id}">Confirmar cobro</button>` : (c.estado === 'Pagado' ? `<span class="badge ${c.conciliado ? 'ok' : 'warn'}">${c.conciliado ? 'Conciliado' : 'Por conciliar'}</span>` : '<span class="muted">—</span>'))}</td>
+            <td style="text-align:right" onclick="event.stopPropagation()">${c.reportado && !c.validadoReporte && aplicable ? `<button class="btn primary sm" data-validar="${c.id}">Aplicar reporte</button>` : (aplicable ? `<button class="btn primary sm" data-apply="${c.id}">Confirmar cobro</button>` : (c.estado === 'Pagado' ? `<span class="badge ${c.conciliado ? 'ok' : 'warn'}">${c.conciliado ? 'Conciliado' : 'Por conciliar'}</span>` : '<span class="muted">—</span>'))}</td>
           </tr>`;
         }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">Sin recibos para esta póliza.</td></tr>'}</tbody>
       </table></div>
-      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Filtra por póliza para no mezclar recibos. <b>Confirmar cobro</b> concilia el recibo con su póliza; clic en la fila abre el detalle. Los estados de cuenta se cargan en <b>Finanzas</b>.</div>
+      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Filtra por póliza para no mezclar recibos. <b>Confirmar cobro</b> abre el mismo flujo canónico de pago de Cobros y cartera; clic en la fila abre el detalle. Un pago reportado por cliente se aplica automáticamente cuando el recibo coincide de forma única y válida; solo los casos ambiguos quedan para revisión. Los estados de cuenta forman parte de la conciliación de Cobros.</div>
     </div>`;
   }
   function wireRecibos(cid) {

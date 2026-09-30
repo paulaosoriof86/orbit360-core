@@ -1,0 +1,48 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REJECTION_V1",
+  "status": "TARGETED_VISUAL_PREFLIGHT_FAIL_SOURCE_REMEDIATED_PENDING_CONTRACT",
+  "recordedAt": "2026-09-30",
+  "exactRejectedPreview": {
+    "sourceSha": "61e81ba87e7a10d076951d1118bc1527d71a7fdd",
+    "buildId": "gi-i65-b3-61e81ba87e7a-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36722855770-2mjpfi0g.web.app",
+    "runId": 36722855770,
+    "artifactId": 11101346698,
+    "artifactDigest": "2b592bb18fe87cd07e02f7c63debe4be8c6f0c7baddc269150e0d1f0e90684cc"
+  },
+  "evidenceClass": "EXACT_SERVED_SOURCE_PLUS_RUNTIME_OWNER_TRACE",
+  "findings": [
+    {
+      "code": "INVOICE_DATE_MISLABELED_AS_REAL_PAYMENT_DATE",
+      "evidence": "Cobros detail renders 'Fecha real (factura)' from the exact Preview source; policy-receipts wrappers preserve original cobros.detalle and only rewire actions.",
+      "violates": "Payment Lock V2: invoice/application date must not be presented as actual paidDate."
+    },
+    {
+      "code": "CLIENT_REPORTED_PAYMENT_COPY_IMPLIES_HUMAN_VALIDATION",
+      "evidence": "Cobros shows 'pago(s) reportado(s) por validar' and says they are not confirmed until validation/application; Cliente 360 shows a visible 'Validar' action.",
+      "violates": "Payment Lock V2: unique valid client-reported payment is sufficient and does not require mandatory human approval."
+    },
+    {
+      "code": "CLIENTE360_WRONG_STATEMENT_DESTINATION",
+      "evidence": "Cliente 360 states account statements are loaded in Finanzas.",
+      "violates": "Frozen contract: customer premium portfolio/payment reconciliation belongs to Cobros/Recibos/Cliente 360, not Finanzas."
+    }
+  ],
+  "remediation": {
+    "changedProductFiles": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/cliente360.js"
+    ],
+    "qaGuardFile": "tools/gravicentra-i6-5-b3-004-contract.mjs",
+    "rules": [
+      "Show paidDate, inferredEffectiveDate and applicationDate as distinct concepts.",
+      "Keep payment support and insurer invoice/application support distinct.",
+      "State auto-application for unique valid client-reported payment; human review only for ambiguous/contradictory cases.",
+      "Cliente 360 delegates to the same canonical Cobros payment flow.",
+      "Remove incorrect Finanzas destination text for account-statement reconciliation."
+    ],
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  }
+}

@@ -34,6 +34,16 @@ need(!cliente.includes('Cargar la factura fija la <b>fecha real</b> del pago'),'
 need(portal.includes('domain.reportClientPayment'),'B3_004_PORTAL_NOT_CANONICAL');
 need(!portal.includes("S().update('cobros', cobroId, { reportado:"),'B3_004_PORTAL_DIRECT_PAYMENT_WRITE');
 need(receiptView.includes("'Fecha real de pago'")&&receiptView.includes("'Fecha de aplicación'")&&receiptView.includes("'Número de factura'"),'B3_004_RECEIPT_DETAIL_FIELDS_MISSING');
+
+need(!cobros.includes('Fecha real (factura)'),'B3_004_FORBIDDEN_INVOICE_AS_REAL_PAYMENT_DATE');
+need(cobros.includes('Fecha real de pago')&&cobros.includes('Fecha operativa inferida')&&cobros.includes('Fecha de aplicación'),'B3_004_COBROS_DETAIL_TEMPORAL_SEMANTICS_MISSING');
+need(cobros.includes('Soporte de pago')&&cobros.includes('Factura / soporte de aplicación'),'B3_004_COBROS_DETAIL_EVIDENCE_FIELDS_MISSING');
+need(!cobros.includes('pago(s) reportado(s) por validar'),'B3_004_CLIENT_REPORT_HUMAN_APPROVAL_COPY_REMAINS');
+need(cobros.includes('Cuando el recibo coincide de forma única y válida, el pago se aplica automáticamente.'),'B3_004_CLIENT_REPORT_AUTOCOMMIT_COPY_MISSING');
+need(!cliente.includes('🔎 Validar'),'B3_004_CLIENTE360_HUMAN_APPROVAL_LABEL_REMAINS');
+need(cliente.includes('abre el mismo flujo canónico de pago de Cobros y cartera'),'B3_004_CLIENTE360_CANONICAL_FLOW_COPY_MISSING');
+need(cliente.includes('Un pago reportado por cliente se aplica automáticamente cuando el recibo coincide de forma única y válida'),'B3_004_CLIENTE360_CLIENT_REPORT_AUTOCOMMIT_COPY_MISSING');
+need(!cliente.includes('Los estados de cuenta se cargan en <b>Finanzas</b>'),'B3_004_CLIENTE360_WRONG_STATEMENT_DESTINATION');
 console.log('B3_004_SURFACE_CONVERGENCE_CONTRACT=PASS');
 
 need(server.includes('isApplicationEnrichment'),'B3_004_APPLICATION_ENRICHMENT_GUARD_MISSING');

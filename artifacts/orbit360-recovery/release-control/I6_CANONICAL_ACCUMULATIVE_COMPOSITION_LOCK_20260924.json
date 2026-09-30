@@ -174,9 +174,9 @@
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
-    "orbit360-platform/modules/cliente360.js": "c684fef4d21f8867d9919623c5cab316752a2dfd",
+    "orbit360-platform/modules/cliente360.js": "466852427fe6152edb57ae30c510a15878d522e0",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
-    "orbit360-platform/modules/cobros.js": "12172970c503bc535569878702ffea6e65f9508a",
+    "orbit360-platform/modules/cobros.js": "5c5aeaba9a53e5716f962cd3e77c892b81905d34",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
@@ -378,5 +378,17 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "lastAuthorizedMutation": {
+    "date": "2026-09-30",
+    "gate": "I6.5-B3-004",
+    "reason": "TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REMEDIATION",
+    "changedProductFiles": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/cliente360.js"
+    ],
+    "noDataMutation": true,
+    "noReimport": true,
+    "noLive": true
   }
 }
