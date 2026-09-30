@@ -579,5 +579,33 @@
       "contractBlobSha": "20b01e71952dd68be71b53f5960be670a5548b0a",
       "productSourceChanged": false
     }
+  },
+  "b3004R6ContractPass": {
+    "status": "PASS_PENDING_EXACT_PREVIEW",
+    "sourceContract": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_SOURCE_CONTRACT_PASS_20260930.json",
+      "blobSha": "026663d0926ca913375ffdce2f15e540b6189443"
+    },
+    "surfaceContract": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_SURFACE_CONVERGENCE_CONTRACT_PASS_20260930.json",
+      "blobSha": "3cd5d9e2e649eb464f0b41012ef1e25c38b4dd1e"
+    },
+    "provenanceContract": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_PAYMENT_PROVENANCE_CONTRACT_PASS_20260930.json",
+      "blobSha": "1cc7c813026353cbf23e0703ceb1d7c9fae90f77"
+    },
+    "proofRunId": 36761661384,
+    "proofJobId": 110045742955,
+    "sourceSha": "624b70c7fdb8607e18257fd380a5f1701e7a2a1c",
+    "contractBlobSha": "20b01e71952dd68be71b53f5960be670a5548b0a"
+  },
+  "b3004R6ExactPreviewMechanismFix": {
+    "status": "FIXED_BEFORE_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_EXACT_PREVIEW_BACKEND_MECHANISM_FIX_20260930.json",
+    "receiptBlobSha": "c6dde8828aef698fbd6b3cfe3b81084b3bb59947",
+    "workflowPath": ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+    "priorWorkflowBlobSha": "aa873b9eb8d9026ac4b689be5003ebda23f45074",
+    "newWorkflowBlobSha": "ceb9493319993f699659ff09b97a9ab2e8862cf6",
+    "productSourceChanged": false
   }
 }

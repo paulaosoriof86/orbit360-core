@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
+  "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -42,7 +42,7 @@
       "client": "8f668d6db0cf8e513c4ff17f12a46c73fa150da1",
       "contract": "f7873144557effff71b7e33f2eccdb772832692b"
     },
-    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
+    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_SOURCE_CONTRACT_PASS_20260930.json",
     "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
     "surfaceBlobs": {
       "orbit360-platform/modules/cobros.js": "5c5aeaba9a53e5716f962cd3e77c892b81905d34",
@@ -52,10 +52,10 @@
       "orbit360-platform/index.html": "0d94cd428b03443d52d3400bce6354c8ed1dfb5a",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "a2264accb652fe382724099e9fc04a357c62eb70"
     },
-    "surfaceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_CONTRACT_PASS_20260930.json",
+    "surfaceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_SURFACE_CONVERGENCE_CONTRACT_PASS_20260930.json",
     "activeSubFindingId": "B3-004-R5-CRM-MIGRATION-PROVENANCE-AND-COPYFIX",
     "provenanceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_FIX_20260930.json",
-    "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_CONTRACT_PASS_20260930.json",
+    "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_PAYMENT_PROVENANCE_CONTRACT_PASS_20260930.json",
     "machineProof": {
       "sourceSha": "63e7cb32fe1d08ef5c85d613dc6a4b97e3928edb",
       "buildId": "gi-i65-b3-63e7cb32fe1d-57f234755dc1",
@@ -301,7 +301,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R6_SOURCE_CONTRACT",
+    "nextAction": "B3_004_R6_EXACT_PREVIEW",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -309,19 +309,26 @@
       "contractBlobSha": "20b01e71952dd68be71b53f5960be670a5548b0a",
       "failedRunId": 36761475222,
       "failedJobId": 110044845524
+    },
+    "sourceContractReceiptBlobSha": "026663d0926ca913375ffdce2f15e540b6189443",
+    "surfaceContractReceiptBlobSha": "3cd5d9e2e649eb464f0b41012ef1e25c38b4dd1e",
+    "paymentProvenanceContractReceiptBlobSha": "1cc7c813026353cbf23e0703ceb1d7c9fae90f77",
+    "r6ExactPreviewMechanismFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_EXACT_PREVIEW_BACKEND_MECHANISM_FIX_20260930.json",
+      "blobSha": "c6dde8828aef698fbd6b3cfe3b81084b3bb59947",
+      "workflowBlobSha": "ceb9493319993f699659ff09b97a9ab2e8862cf6"
     }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "d44ab2e5e207e35f48dfcb66f53528970a78735a",
+    "blobSha": "840ad94ecbb481df21e66b8b30f555e376ba9aa2",
     "productFileCount": 78
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "005e612323287961a40f1d0dafd53b61d4ebaefd"
+    "blobSha": "46006fc0e32e0780cb743cfe3a421a2454326185"
   },
   "nextRequiredProof": [
-    "B3_004_R6_SOURCE_CONTRACT_PASS",
     "B3_004_R6_EXACT_PREVIEW_MACHINE_PASS",
     "B3_004_R6_TARGETED_VISUAL_PASS"
   ],

@@ -1,0 +1,19 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R6_EXACT_PREVIEW_BACKEND_MECHANISM_FIX_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "624b70c7fdb8607e18257fd380a5f1701e7a2a1c",
+  "status": "FIXED_BEFORE_EXACT_PREVIEW",
+  "findingId": "B3-004-R6-M1",
+  "rootCause": "The exact-preview workflow previously reused the Preview-only callable when a function with the expected name already existed. That is insufficient after backend source changes and could validate new Hosting against stale backend code.",
+  "fix": "Always deploy the exact candidate Preview-only callable before B3-004 machine proof whenever the exact-preview gate is active.",
+  "workflowPath": ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+  "priorWorkflowBlobSha": "aa873b9eb8d9026ac4b689be5003ebda23f45074",
+  "newWorkflowBlobSha": "ceb9493319993f699659ff09b97a9ab2e8862cf6",
+  "productSourceChanged": false,
+  "businessDataWrites": false,
+  "reimport": false,
+  "livePromotion": false,
+  "b3005Opened": false
+}

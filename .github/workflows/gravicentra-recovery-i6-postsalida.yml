@@ -6774,13 +6774,10 @@ jobs:
           test -n "$EXPECTED"
           test "$ACTUAL" = "$EXPECTED"
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-functions-before.json" || true
-          if grep -q "orbit360CobrosReconciliationCommandPreview" "$RUNNER_TEMP/b3-004-functions-before.json"; then
-            echo '{"status":"reused","reason":"exact_product_blob_unchanged"}' > "$RUNNER_TEMP/b3-004-function-deploy.json"
-            echo "B3_004_PREVIEW_BACKEND_REUSE=PASS"
-          else
-            node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommandPreview --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-function-deploy.json"
-            cat "$RUNNER_TEMP/b3-004-function-deploy.json"
-          fi
+          # R6 fail-closed: source candidates may change the Preview-only callable.
+          # Always deploy the exact candidate preview alias; never infer backend parity from function-name existence.
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommandPreview --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-function-deploy.json"
+          cat "$RUNNER_TEMP/b3-004-function-deploy.json"
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-functions.json"
           grep -q "orbit360CobrosReconciliationCommandPreview" "$RUNNER_TEMP/b3-004-functions.json"
           echo "B3_004_PREVIEW_BACKEND=PASS"
