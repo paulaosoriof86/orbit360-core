@@ -1,0 +1,43 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_ACTION_SURFACE_CONTRACT_PASS_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "findingId": "B3-004",
+  "subFindingId": "B3-004-R3-RECEIPT-ACTION-AND-PORTFOLIO-COMPOSITION",
+  "status": "PASS",
+  "proof": {
+    "workflowRunId": 36731518593,
+    "workflowJobId": 109942073959,
+    "sourceHead": "8a97ed89c29d251d7a00403bcb2c1ab16a58a566",
+    "markers": [
+      "GRAVICENTRA_I6_5_B3_004_SOURCE_CONTRACT_V1 status PASS",
+      "B3_004_SURFACE_CONVERGENCE_CONTRACT=PASS",
+      "B3_004_PAYMENT_PROVENANCE_CONTRACT=PASS",
+      "B3_004_ACTION_SURFACE_CONTRACT=PASS",
+      "B3_004_SURFACE_CONVERGENCE=PASS"
+    ],
+    "syntaxChecked": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/portal.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+    ]
+  },
+  "sourceBlobs": {
+    "orbit360-platform/modules/cobros.js": "3ef70a2e3cbbd62ab245788096cbc41e02aa733f",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
+  },
+  "conclusion": "Effective Cobros/Cliente360 receipt surfaces are contractually bound to expose payment/reconciliation actions and portfolio-only current receipts without creating a second write owner.",
+  "boundaries": {
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "businessWrites": false
+  },
+  "nextRequiredProof": [
+    "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_TARGETED_VISUAL_PASS"
+  ]
+}

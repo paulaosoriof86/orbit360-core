@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "SURFACES_FIXED_PENDING_CONTRACT",
+      "status": "CANDIDATE_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -964,7 +964,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_SURFACE_CONTRACT_PASS",
+      "nextAction": "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1010,7 +1010,7 @@
         },
         {
           "id": "B3-004-R3-RECEIPT-ACTION-AND-PORTFOLIO-COMPOSITION",
-          "status": "SURFACES_FIXED_PENDING_CONTRACT",
+          "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
           "blocking": true,
           "rootCause": "EFFECTIVE_RUNTIME_OWNERS_OMIT_CANONICAL_PAYMENT_ACTION_AND_GLOBAL_COBROS_LIST_EXCLUDES_PORTFOLIO_ONLY_RECEIPTS",
           "remediation": "Make portfolio-only receipts first-class rows in Cobros y cartera; expose Aplicar pago in Cliente 360 row/detail and reuse the same canonical Cobros command.",
@@ -1020,7 +1020,9 @@
           ],
           "qaGuardFile": "tools/gravicentra-i6-5-b3-004-contract.mjs",
           "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_ACTION_SURFACES_20260930.json",
-          "receiptBlobSha": "7ea64853d5134ceed91eb16771b0c5d9fec8be5a"
+          "receiptBlobSha": "7ea64853d5134ceed91eb16771b0c5d9fec8be5a",
+          "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_ACTION_SURFACE_CONTRACT_PASS_20260930.json",
+          "contractReceiptBlobSha": "f5c5e4ea0d162452286188bebcc1a744b7ae0b17"
         }
       ],
       "paymentProvenanceContractStatus": "PASS",
@@ -1078,7 +1080,10 @@
         "runId": 36727490527,
         "artifactId": 11102708133,
         "artifactDigest": "f0d3d99f99af61ce3f93caf820841bc5893f3ea3dc87ec618e1450f28e8f06c3"
-      }
+      },
+      "actionSurfaceContractStatus": "PASS",
+      "actionSurfaceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_ACTION_SURFACE_CONTRACT_PASS_20260930.json",
+      "actionSurfaceContractReceiptBlobSha": "f5c5e4ea0d162452286188bebcc1a744b7ae0b17"
     },
     {
       "id": "B3-005",
