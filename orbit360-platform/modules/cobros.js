@@ -107,8 +107,10 @@ Orbit.modules.cobros = (function () {
   function currencyMetric(summary, field) {
     const currencies = (summary && summary.currencies || []).slice();
     if (!currencies.length) return '—';
+    const nonZero = currencies.filter(cur => Number(summary.byCurrency[cur] && summary.byCurrency[cur][field] || 0) !== 0);
+    const visible = nonZero.length ? nonZero : currencies;
     return '<span data-currency-safe-metric="' + U.esc(field) + '" style="display:grid;gap:2px">' +
-      currencies.map(cur => '<span style="white-space:nowrap">' + U.esc(safeMoney(summary.byCurrency[cur] && summary.byCurrency[cur][field], cur, true)) + '</span>').join('') +
+      visible.map(cur => '<span style="white-space:nowrap">' + U.esc(safeMoney(summary.byCurrency[cur] && summary.byCurrency[cur][field], cur, true)) + '</span>').join('') +
       '</span>';
   }
   function agingCurrencyBlocks(summary, colors) {
