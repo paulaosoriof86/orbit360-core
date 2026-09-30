@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
+  "status": "B3_003_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-003",
     "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
+    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "blocking": true,
     "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
     "requiredProof": [
@@ -38,6 +38,14 @@
       "crossCurrencyConversionIntroduced": false,
       "agingCountryFiltered": true,
       "inicioChanged": false
+    },
+    "previewProof": {
+      "exactReadback": true,
+      "currenciesSeparated": true,
+      "noFxAuthorityInvented": true,
+      "agingCountryFilterEffective": true,
+      "safeKpiMarkers": true,
+      "noBrowserErrors": true
     }
   },
   "canonicalComposition": {
@@ -50,7 +58,6 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_EXACT_PREVIEW_KPI_AGING_PROOF",
     "B3_003_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
@@ -120,16 +127,17 @@
     "productRegressionDemonstrated": false
   },
   "preview": {
-    "sourceSha": "af4e716464fc964894cb4e16d2c3f5a66b618022",
-    "buildId": "gi-i65-b3-af4e716464fc-57f234755dc1",
-    "channelId": "gi-i65-b3-36652377361",
-    "url": "https://ays-orbit-360-lab--gi-i65-b3-36652377361-i66sagm4.web.app",
-    "runId": 36652377361,
-    "artifactId": 11070539732,
-    "artifactDigest": "fe342bbff3313a54b92feccf6a73f55cef6568de46ee27081b31ec0a3bc04ac5",
+    "sourceSha": "41aacc71b343574338ed25efbc6902fb25b13677",
+    "buildId": "gi-i65-b3-41aacc71b343-57f234755dc1",
+    "channelId": "gi-i65-b3-36656317848",
+    "url": "https://ays-orbit-360-lab--gi-i65-b3-36656317848-phqsawss.web.app",
+    "runId": 36656317848,
+    "artifactId": 11071994782,
+    "artifactDigest": "16348717e4a0679b7586b4333cf0730bcaf467038cc202a2b4c2bae8861e2120",
     "exactReadback": true,
     "contractPass": true,
-    "timingPass": true,
+    "previewProofPass": true,
+    "b3002RegressionPass": true,
     "livePromoted": false
   },
   "b3001TargetedVisual": {

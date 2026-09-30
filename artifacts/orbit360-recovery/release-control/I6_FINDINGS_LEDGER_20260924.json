@@ -857,7 +857,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-      "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
+      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
@@ -891,6 +891,20 @@
           "reported payment evidence remains excluded from confirmed cobro KPI"
         ],
         "inicioChanged": false
+      },
+      "previewSourceSha": "41aacc71b343574338ed25efbc6902fb25b13677",
+      "previewBuildId": "gi-i65-b3-41aacc71b343-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b3-36656317848-phqsawss.web.app",
+      "previewRunId": 36656317848,
+      "artifactId": 11071994782,
+      "artifactDigest": "16348717e4a0679b7586b4333cf0730bcaf467038cc202a2b4c2bae8861e2120",
+      "previewProof": {
+        "exactReadback": true,
+        "currenciesSeparated": true,
+        "noFxAuthorityInvented": true,
+        "agingCountryFilterEffective": true,
+        "safeKpiMarkers": true,
+        "noBrowserErrors": true
       }
     },
     {
@@ -4474,7 +4488,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
+    "status": "B3_003_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "activeFindingId": "B3-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
