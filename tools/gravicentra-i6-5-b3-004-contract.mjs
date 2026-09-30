@@ -86,8 +86,8 @@ need(nativeReceiptR4.includes("if(paid)return{kind:'applied',label:'Pago aplicad
 need(cobros.includes('data-cobros-action="apply"'),'B3_004_GLOBAL_APPLY_ACTION_MARKER_MISSING');
 need(cobros.includes('data-cobros-action="reconcile"'),'B3_004_GLOBAL_RECONCILE_ACTION_MARKER_MISSING');
 need(!cobros.includes('Confirmar cobro'),'B3_004_GLOBAL_CONFIRMAR_COBRO_REMAINS');
-need(indexR4.includes('modules/cobros.js?v=20260930-b3004r4'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
-need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r4'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cobros.js?v=20260930-b3004r5'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r5'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT=PASS');
 
 const domainClient=read('orbit360-platform/core/cobros-reconciliation-domain-client.js');

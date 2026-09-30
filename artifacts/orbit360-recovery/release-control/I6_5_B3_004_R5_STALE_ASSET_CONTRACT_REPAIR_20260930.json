@@ -1,0 +1,15 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R5_STALE_ASSET_CONTRACT_REPAIR_V1",
+  "recordedAt": "2026-09-30",
+  "findingId": "B3-004",
+  "subFindingId": "B3-004-R5-CRM-MIGRATION-PROVENANCE-AND-COPYFIX",
+  "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
+  "failedRunId": 36747212312,
+  "failedJobId": 109996319909,
+  "failureCode": "B3_004_COBROS_ASSET_VERSION_NOT_BUMPED",
+  "cause": "R4 contract still asserted b3004r4 asset query after R5 correctly bumped cobros/cliente360 assets to b3004r5.",
+  "productRegressionDemonstrated": false,
+  "productSourceChanged": false,
+  "oldContractBlobSha": "883257d8a29f6bab43651280757521d8910a6532",
+  "newContractBlobSha": "df57d853145ea6ff7e8fdc6495e7bba9cc083e44"
+}

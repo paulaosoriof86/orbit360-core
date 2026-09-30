@@ -250,6 +250,17 @@
       "failureCode": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT",
       "compositionBlobSha": "4a8fb5d0f62c93a4b12355b47e0121371a6652d8",
       "productFileCount": 78
+    },
+    "r5ValidatorRepair": {
+      "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
+      "failedRunId": 36747212312,
+      "failedJobId": 109996319909,
+      "failureCode": "B3_004_COBROS_ASSET_VERSION_NOT_BUMPED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_STALE_ASSET_CONTRACT_REPAIR_20260930.json",
+      "receiptBlobSha": "ace6c40a01e8077b5a3939b45166d3675ebba02c",
+      "qaGuardBlobSha": "df57d853145ea6ff7e8fdc6495e7bba9cc083e44",
+      "productRegressionDemonstrated": false,
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
