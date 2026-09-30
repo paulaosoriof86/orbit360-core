@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "ays-cotcomp-s446-owner-runtime-readonly-intent-v1.0",
+  "authorization": "S446_OWNER_RUNTIME_READONLY_PROOF",
+  "authorizedSourceParent": "a59a8a84337621c1b11b6246a2225987fd9b2893",
+  "projectId": "ays-orbit-360-lab",
+  "environment": "LAB",
+  "region": "us-central1",
+  "expectedOwnerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "deploy": false,
+  "iamMutation": false,
+  "firebaseConfigMutation": false,
+  "production": false,
+  "purpose": "PHYSICALLY_VERIFY_DEPLOYED_OPS_LEADS_OWNER_SOURCE_ARCHIVE_AND_FREEZE_W2_WITH_WRITES_OFF"
+}
