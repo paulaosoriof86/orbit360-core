@@ -3190,7 +3190,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "a56f20ee9cc537434fd27363f9d71bf7aad2b5ed",
+      "executionLockBlobSha": "65a89fe4630422030dcb12b394b0fc80aa88817e",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3431,7 +3431,26 @@
       "provenanceFixReceiptBlobSha": "5ac0ce337999abbec288b3ac5efa738e9aedab60",
       "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_CONTRACT_PASS_20260930.json",
       "paymentProvenanceContractReceiptBlobSha": "9a88a882287f1e6d89b1b7120241be207964cb27",
-      "compositionLockBlobSha": "ed9e00957e9320ee4caa4e3d96b9f0b974f42dd3"
+      "compositionLockBlobSha": "ed9e00957e9320ee4caa4e3d96b9f0b974f42dd3",
+      "syntheticQaAuthorization": {
+        "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
+        "purpose": "CREATE_RETRY_ENRICH_READBACK_CLEANUP_PROOF",
+        "idPrefix": "__b3004qa_",
+        "allowedCollections": [
+          "clientes",
+          "polizas",
+          "recibosEsperados",
+          "carteraPrimas",
+          "cobros",
+          "reconciliationRequests",
+          "reconciliationEvents"
+        ],
+        "cleanupRequired": true,
+        "cleanupMustPassBeforeMachinePass": true,
+        "operationalBusinessWritesAuthorized": false,
+        "reimportAuthorized": false,
+        "livePromotionAuthorized": false
+      }
     }
   },
   "canonicalAccumulationControl": {
