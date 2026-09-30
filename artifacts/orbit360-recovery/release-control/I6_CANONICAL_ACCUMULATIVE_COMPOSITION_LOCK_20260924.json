@@ -138,7 +138,7 @@
     "orbit360-platform/core/access-scope.js": "f50156162f59e105d3564c1c3f6036daf03ebd56",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "6decc66566ca6b6fe1761fb0d2db5a108e9d1033",
-    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "148c68af1a4362102c3f14586e475682fffbcafe",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
@@ -176,7 +176,7 @@
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "466852427fe6152edb57ae30c510a15878d522e0",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
-    "orbit360-platform/modules/cobros.js": "5c5aeaba9a53e5716f962cd3e77c892b81905d34",
+    "orbit360-platform/modules/cobros.js": "3ef70a2e3cbbd62ab245788096cbc41e02aa733f",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
@@ -359,17 +359,17 @@
     "b3002MustRegress": true
   },
   "b3004PaymentOwner": {
-    "status": "SOURCE_CONTRACTS_PASS_PENDING_EXACT_PREVIEW",
+    "status": "ACTION_SURFACES_SOURCE_FIXED_PENDING_CONTRACT",
     "findingId": "B3-004",
     "canonicalServerOwner": "functions/cobros-reconciliation-domain.js",
     "canonicalBrowserOwner": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
     "exactBlobBindings": {
       "functions/cobros-reconciliation-domain.js": "1f2d89428b99368dc058218d62d33ddd4ec804a2",
       "orbit360-platform/core/cobros-reconciliation-domain-client.js": "8f668d6db0cf8e513c4ff17f12a46c73fa150da1",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "148c68af1a4362102c3f14586e475682fffbcafe",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
       "orbit360-platform/index.html": "0d94cd428b03443d52d3400bce6354c8ed1dfb5a",
       "orbit360-platform/modules/cliente360.js": "c684fef4d21f8867d9919623c5cab316752a2dfd",
-      "orbit360-platform/modules/cobros.js": "12172970c503bc535569878702ffea6e65f9508a",
+      "orbit360-platform/modules/cobros.js": "3ef70a2e3cbbd62ab245788096cbc41e02aa733f",
       "orbit360-platform/modules/portal.js": "fc23c03e4c59c256be81553e472dee6d2d4ef895"
     },
     "temporalContract": "paidDate != inferredEffectiveDate != applicationDate != reconciledAt",
@@ -382,13 +382,33 @@
   "lastAuthorizedMutation": {
     "date": "2026-09-30",
     "gate": "I6.5-B3-004",
-    "reason": "TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REMEDIATION",
+    "reason": "PAULA_TARGETED_VISUAL_REJECTION_ACTION_SURFACE_AND_PORTFOLIO_COMPOSITION",
     "changedProductFiles": [
       "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/modules/cliente360.js"
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
     ],
     "noDataMutation": true,
     "noReimport": true,
     "noLive": true
+  },
+  "b3004ActionSurfaceFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "findingId": "B3-004",
+    "subFindingId": "B3-004-R3-RECEIPT-ACTION-AND-PORTFOLIO-COMPOSITION",
+    "rootCause": "EFFECTIVE_RUNTIME_OWNERS_OMIT_ACTIONS_AND_GLOBAL_COBROS_ROWS_EXCLUDE_PORTFOLIO_ONLY_RECEIPTS",
+    "changedProductFiles": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+    ],
+    "exactBlobBindings": {
+      "orbit360-platform/modules/cobros.js": "3ef70a2e3cbbd62ab245788096cbc41e02aa733f",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa"
+    },
+    "qaContractBlob": "d545959999420d0b0b9cac7e3999968b3b11bb65",
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_ACTION_SURFACES_20260930.json",
+    "visualRejectionReceiptBlobSha": "7ea64853d5134ceed91eb16771b0c5d9fec8be5a",
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

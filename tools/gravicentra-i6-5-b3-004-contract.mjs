@@ -53,3 +53,17 @@ need(server.includes('existingPaymentEvidenceType ? existingPaymentEvidenceType'
 need(server.includes('applicationEvidenceType'),'B3_004_APPLICATION_EVIDENCE_TYPE_MISSING');
 need(server.includes('receiptPaymentState'),'B3_004_RECEIPT_PAYMENT_PROVENANCE_NOT_PRESERVED');
 console.log('B3_004_PAYMENT_PROVENANCE_CONTRACT=PASS');
+
+const nativeReceiptOwner=read('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js');
+need(cobros.includes('function portfolioPaymentRows'),'B3_004_COBROS_PORTFOLIO_ONLY_ROWS_MISSING');
+need(cobros.includes('__portfolioReceipt'),'B3_004_COBROS_PORTFOLIO_RENDER_PATH_MISSING');
+need(cobros.includes("Orbit.cobrosCarteraProjectionAdapter"),'B3_004_COBROS_PORTFOLIO_ADAPTER_NOT_CONSUMED');
+need(cobros.includes('function paymentContext'),'B3_004_RECEIPT_ID_PAYMENT_CONTEXT_MISSING');
+need(cobros.includes('Aplicar pago'),'B3_004_COBROS_ROW_APPLY_ACTION_MISSING');
+need(nativeReceiptOwner.includes('data-rp-apply-payment'),'B3_004_CLIENTE360_RUNTIME_ROW_APPLY_MISSING');
+need(nativeReceiptOwner.includes('data-rp-detail-payment-action'),'B3_004_RECEIPT_DETAIL_APPLY_MISSING');
+need(nativeReceiptOwner.includes('invokeReceiptPayment'),'B3_004_CLIENTE360_RUNTIME_NOT_DELEGATED');
+need(nativeReceiptOwner.includes("mod.aplicarPago(receiptId)"),'B3_004_CLIENTE360_RUNTIME_CANONICAL_CALL_MISSING');
+need(nativeReceiptOwner.includes('Puedes aplicar el pago desde cada fila o desde el detalle del recibo'),'B3_004_CLIENTE360_RUNTIME_COPY_MISSING');
+need(!nativeReceiptOwner.includes('pendientes de validación; se muestran como evidencia'),'B3_004_RUNTIME_HUMAN_VALIDATION_COPY_REMAINS');
+console.log('B3_004_ACTION_SURFACE_CONTRACT=PASS');

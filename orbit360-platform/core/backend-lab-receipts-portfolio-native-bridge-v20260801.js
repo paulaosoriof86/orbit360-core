@@ -132,7 +132,7 @@
   function reconciliationLabel(r,portfolio){
     if(isPaymentReconciled(r))return{t:'Cobro conciliado',c:'ok'};
     if(isPortfolioReconciled(portfolio))return{t:'Cartera conciliada con aseguradora',c:'ok'};
-    if(r&&low(r.estadoOperativo)==='pago_reportado')return{t:'Pago reportado · por conciliar',c:'info'};
+    if(r&&low(r.estadoOperativo)==='pago_reportado')return{t:'Pago reportado · pendiente de aplicar',c:'info'};
     if(r&&low(r.estadoOperativo)==='requiere_validacion_estado')return{t:'Requiere validación',c:'warn'};
     return{t:'Pendiente de conciliación',c:'warn'};
   }
@@ -143,10 +143,38 @@
     if(s==='futuro_pendiente')return{t:'Futuro',c:'warn'};
     if(s==='pendiente_vencido')return{t:'Vencido',c:'danger'};
     if(s==='pendiente_vence_corte')return{t:'Por vencer',c:'warn'};
-    if(s==='pago_reportado')return{t:'Pago reportado · por conciliar',c:'info'};
+    if(s==='pago_reportado')return{t:'Pago reportado · pendiente de aplicar',c:'info'};
     if(s==='no_pendiente_segun_aseguradora')return{t:'Sin saldo pendiente según aseguradora',c:'ok'};
     if(s==='requiere_validacion_estado')return{t:'Requiere validación',c:'warn'};
     return{t:s||'Pendiente',c:'warn'};
+  }
+  function linkedCobro(receiptId){
+    var id=clean(receiptId);if(!id)return null;
+    return (Orbit.store.all('cobros')||[]).find(function(c){return clean(c&&(c.reciboId||c.receiptId))===id;})||null;
+  }
+  function receiptAction(r){
+    var c=linkedCobro(r&&r.id),op=low(r&&r.estadoOperativo),paid=!!(c&&(low(c.estado)==='pagado'||c.paymentState==='PAID_DIRECT'||c.paymentState==='PAID_REPORTED'||c.paymentState==='PAID_INFERRED'));
+    if(paid)return c.conciliado===true?{kind:'done',label:'Conciliado'}:{kind:'reconcile',label:'Conciliar'};
+    if(op==='requiere_validacion_estado'||op==='no_pendiente_segun_aseguradora')return{kind:'review',label:'Revisar'};
+    return{kind:op==='pago_reportado'?'reported':'apply',label:'Aplicar pago'};
+  }
+  function invokeReceiptPayment(receiptId,reported){
+    var mod=Orbit.modules&&Orbit.modules.cobros;
+    if(reported&&mod&&typeof mod.validarReporte==='function')return mod.validarReporte(receiptId);
+    if(mod&&typeof mod.aplicarPago==='function')return mod.aplicarPago(receiptId);
+    try{Orbit.ui&&Orbit.ui.toast&&Orbit.ui.toast('Aplicación canónica de pagos no disponible.');}catch(e){}
+  }
+  function invokeReceiptReconciliation(receiptId){
+    var mod=Orbit.modules&&Orbit.modules.cobros,c=linkedCobro(receiptId);
+    if(c&&mod&&typeof mod.conciliarFactura==='function')return mod.conciliarFactura(c.id);
+    try{Orbit.ui&&Orbit.ui.toast&&Orbit.ui.toast('Conciliación canónica no disponible.');}catch(e){}
+  }
+  function actionHtml(r){
+    var a=receiptAction(r),id=esc(r&&r.id);
+    if(a.kind==='done')return'<span class="badge ok">Conciliado</span>';
+    if(a.kind==='review')return'<span class="badge warn">Revisar</span>';
+    if(a.kind==='reconcile')return'<button class="btn primary sm" data-rp-reconcile-payment="'+id+'">Conciliar</button>';
+    return'<button class="btn primary sm" data-rp-apply-payment="'+id+'" data-rp-reported="'+(a.kind==='reported'?'1':'0')+'">Aplicar pago</button>';
   }
 
   function portfolioSummary(cid){
@@ -205,7 +233,7 @@
     if(isPaymentReconciled(r))return'Este pago ya fue conciliado contra fuentes autoritativas y se considera cobro conciliado.';
     if(isPortfolioReconciled(portfolio))return'El saldo pendiente fue conciliado contra la fuente de autoridad de la aseguradora. Esto confirma cartera; no equivale a un pago.';
     var s=clean(r&&r.estadoOperativo);
-    if(s==='pago_reportado')return'Existe evidencia de pago reportado, pero aún no es un cobro conciliado.';
+    if(s==='pago_reportado')return'Existe evidencia de pago reportado. Si la coincidencia es única y válida, se aplica automáticamente; los casos ambiguos quedan para revisión.';
     if(s==='no_pendiente_segun_aseguradora')return'La aseguradora no reporta saldo pendiente; la ausencia de saldo no crea por sí sola un cobro conciliado.';
     if(s==='requiere_validacion_estado')return'El estado requiere validación antes de cualquier conciliación.';
     return'Este registro pertenece al calendario de recibos; los cobros conciliados se administran por separado.';
@@ -260,11 +288,17 @@
       +'</div></section><div style="display:grid;gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🔎 Estado y conciliación</h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'+badges+'</div><div class="muted" style="line-height:1.5">'+esc(receiptStateNote(r,portfolio))+'</div>'
       +(portfolio?'<div style="margin-top:10px">En cartera: <span style="font-weight:600">'+esc(moneyDetail(portfolio.primaTotal||portfolio.montoTotal||portfolio.monto||r.primaTotal||r.montoTotal||r.monto,cur))+'</span></div>':'')
       +'</section><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">📅 Información del registro</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px">'+(operationalAsOf||'<div class="muted">Sin fecha adicional reportada.</div>')+'</div><details class="gi-technical-origin" style="margin-top:14px"><summary>Detalles de origen y auditoría</summary><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px">'+trace+'</div></details></section></div></div></div>';
+    var statusEl=target.querySelector('[data-rp-hero-status="1"]'),paymentAction=receiptAction(r);
+    if(statusEl&&paymentAction.kind!=='done'&&paymentAction.kind!=='review'){
+      var paymentButton=document.createElement('button');paymentButton.className='btn primary sm';paymentButton.setAttribute('data-rp-detail-payment-action','1');paymentButton.style.marginLeft='8px';paymentButton.textContent=paymentAction.label;
+      paymentButton.addEventListener('click',function(){if(paymentAction.kind==='reconcile')invokeReceiptReconciliation(r.id);else invokeReceiptPayment(r.id,paymentAction.kind==='reported');});
+      statusEl.parentElement&&statusEl.parentElement.appendChild(paymentButton);
+    }
     if(canEditPlan){var statusEl=target.querySelector('[data-rp-hero-status="1"]');if(statusEl){var parent=statusEl.parentElement,locked=receiptLockedForEdit(r),edit=document.createElement('button');edit.className='btn primary sm';edit.setAttribute('data-rp-edit-receipt','1');edit.textContent=locked?'🔒 Edición bloqueada · existe evidencia de pago':'✏ Editar este recibo';edit.style.marginLeft='8px';edit.disabled=locked;if(!locked)edit.addEventListener('click',function(){editReceipt(r.id,cid||r.clienteId);});parent&&parent.appendChild(edit);var btn=document.createElement('button');btn.className='btn ghost sm';btn.textContent='Editar plan de recibos';btn.style.marginLeft='8px';btn.addEventListener('click',function(){Orbit.modules.cliente360.editarPoliza(p.id);});parent&&parent.appendChild(btn);}}
     return true;
   }
   function openReceiptDetail(receiptId,cid){return renderReceiptDetail(receiptId,cid);}
-  function wireReceiptRows(body,cid){if(!body)return;body.querySelectorAll('[data-rp-receipt-id]').forEach(function(row){if(row.dataset.rpWired==='1')return;row.dataset.rpWired='1';row.addEventListener('click',function(){openReceiptDetail(row.getAttribute('data-rp-receipt-id'),cid);});});}
+  function wireReceiptRows(body,cid){if(!body)return;body.querySelectorAll('[data-rp-receipt-id]').forEach(function(row){if(row.dataset.rpWired==='1')return;row.dataset.rpWired='1';row.addEventListener('click',function(){openReceiptDetail(row.getAttribute('data-rp-receipt-id'),cid);});});body.querySelectorAll('[data-rp-apply-payment]').forEach(function(btn){if(btn.dataset.rpActionWired==='1')return;btn.dataset.rpActionWired='1';btn.addEventListener('click',function(e){e.stopPropagation();invokeReceiptPayment(btn.getAttribute('data-rp-apply-payment'),btn.getAttribute('data-rp-reported')==='1');});});body.querySelectorAll('[data-rp-reconcile-payment]').forEach(function(btn){if(btn.dataset.rpActionWired==='1')return;btn.dataset.rpActionWired='1';btn.addEventListener('click',function(e){e.stopPropagation();invokeReceiptReconciliation(btn.getAttribute('data-rp-reconcile-payment'));});});}
 
   function renderReceipts(cid){
     var body=document.getElementById('c360-body');if(!body||!Orbit.q||!Orbit.q.recibosEsperadosDe)return;
@@ -286,9 +320,9 @@
       var c=byReceipt[r.id]||null,p=Orbit.store.get('polizas',r.polizaId)||{},v=Orbit.store.where('vehiculos',function(x){return x&&x.polizaId===r.polizaId;})[0];
       var st=stateLabel(r),rs=reconciliationLabel(r,c),kind='Calendario vigente';
       var veh=v?[v.marca,v.linea,v.placa].filter(Boolean).join(' '):'';
-      return'<tr class="clickable" data-rp-receipt-id="'+esc(r.id)+'"><td><b>'+esc(r.polizaNumero||p.numero||'—')+'</b><div class="muted" style="font-size:11px">'+esc(veh||p.ramo||'')+'</div></td><td><span class="badge neutral">'+kind+'</span></td><td>'+esc(r.serie||r.numeroReciboFuente||'—')+'</td><td>'+fmtDate(dueDate(r))+'</td><td class="num">'+moneyDetail(amount(r),r.moneda||cur)+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td><td><span class="badge '+rs.c+'">'+esc(rs.t)+'</span></td></tr>';
+      return'<tr class="clickable" data-rp-receipt-id="'+esc(r.id)+'"><td><b>'+esc(r.polizaNumero||p.numero||'—')+'</b><div class="muted" style="font-size:11px">'+esc(veh||p.ramo||'')+'</div></td><td><span class="badge neutral">'+kind+'</span></td><td>'+esc(r.serie||r.numeroReciboFuente||'—')+'</td><td>'+fmtDate(dueDate(r))+'</td><td class="num">'+moneyDetail(amount(r),r.moneda||cur)+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td><td><span class="badge '+rs.c+'">'+esc(rs.t)+'</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">'+actionHtml(r)+'</td></tr>';
     }).join('');
-    body.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="rp-native-policy" class="o-sel" style="max-width:360px">'+opts+'</select><span class="muted" style="margin-left:auto;font-size:12px">'+shown.length+' de '+receipts.length+' requerimientos vigentes</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px"><div class="mini-stat"><div class="muted">Por vencer</div><b>'+money(ps.futureAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">Exigible</div><b>'+money(ps.dueAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">Histórica exigible</div><b>'+money(ps.historicalAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">En cartera</div><b>'+ps.active.length+'</b></div></div>'+(receiptReview.length?'<div class="card pad" data-rp-calendar-review="1" style="border-left:3px solid var(--warn);margin-bottom:12px"><b>Calendario requiere revisión</b><div class="muted" style="margin-top:4px">Hay '+receiptReview.length+' requerimiento(s) de calendarios incompatibles sin autoridad contractual suficiente. No se cuentan como cartera vigente hasta resolverlos.</div></div>':'')+(receiptHistory.length?'<div class="muted" data-rp-calendar-history-count style="font-size:12px;margin:0 0 10px">Historial de calendarios: '+receiptHistory.length+' requerimiento(s) anteriores conservados.</div>':'')+'<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Póliza / riesgo</th><th>Tipo</th><th>Serie / recibo</th><th>Vence</th><th class="num">Monto</th><th>Estado</th><th>Conciliación</th></tr></thead><tbody>'+(rows||'<tr><td colspan="7" class="muted" style="text-align:center;padding:24px">No hay recibos esperados registrados para este cliente.</td></tr>')+'</tbody></table></div><div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Cartera conciliada confirma saldo pendiente; no equivale a un pago. Cobros se administran por separado.</div></div>';
+    body.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="rp-native-policy" class="o-sel" style="max-width:360px">'+opts+'</select><span class="muted" style="margin-left:auto;font-size:12px">'+shown.length+' de '+receipts.length+' requerimientos vigentes</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px"><div class="mini-stat"><div class="muted">Por vencer</div><b>'+money(ps.futureAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">Exigible</div><b>'+money(ps.dueAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">Histórica exigible</div><b>'+money(ps.historicalAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">En cartera</div><b>'+ps.active.length+'</b></div></div>'+(receiptReview.length?'<div class="card pad" data-rp-calendar-review="1" style="border-left:3px solid var(--warn);margin-bottom:12px"><b>Calendario requiere revisión</b><div class="muted" style="margin-top:4px">Hay '+receiptReview.length+' requerimiento(s) de calendarios incompatibles sin autoridad contractual suficiente. No se cuentan como cartera vigente hasta resolverlos.</div></div>':'')+(receiptHistory.length?'<div class="muted" data-rp-calendar-history-count style="font-size:12px;margin:0 0 10px">Historial de calendarios: '+receiptHistory.length+' requerimiento(s) anteriores conservados.</div>':'')+'<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Póliza / riesgo</th><th>Tipo</th><th>Serie / recibo</th><th>Vence</th><th class="num">Monto</th><th>Estado</th><th>Conciliación</th><th style="position:sticky;right:0;background:var(--surface,#fff);z-index:2">Acción</th></tr></thead><tbody>'+(rows||'<tr><td colspan="8" class="muted" style="text-align:center;padding:24px">No hay recibos esperados registrados para este cliente.</td></tr>')+'</tbody></table></div><div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Cartera conciliada confirma saldo pendiente; no equivale a un pago. Puedes aplicar el pago desde cada fila o desde el detalle del recibo; ambos usan el mismo flujo canónico de Cobros y cartera.</div></div>';
     var sel=body.querySelector('#rp-native-policy');if(sel)sel.addEventListener('change',function(){recFilter[cid]=sel.value;renderReceipts(cid);});
     wireReceiptRows(body,cid);
   }
@@ -301,7 +335,7 @@
     if(body.querySelector('[data-rp-native-cobros-note]'))return;
     var note=document.createElement('div');note.setAttribute('data-rp-native-cobros-note','1');note.className='card';note.style.cssText='padding:12px 14px;margin-bottom:12px';
     var appliedText=applied.length?reconciled.length+' de '+applied.length+' cobros confirmados están conciliados.':'No hay cobros confirmados para este cliente.';
-    var reportedText=reported.length?' Hay '+reported.length+' pago(s) reportado(s) pendientes de validación; se muestran como evidencia y no incrementan cobros confirmados.':'';
+    var reportedText=reported.length?' Hay '+reported.length+' pago(s) reportado(s). Los reportes con coincidencia única y válida usan aplicación automática; solo los ambiguos o contradictorios quedan para revisión.':'';
     note.innerHTML='<b>Cobros y evidencia de pago</b><div class="muted" style="font-size:12.5px;margin-top:3px">'+appliedText+reportedText+' Cartera conciliada representa saldo pendiente confirmado, no pago.</div>';
     body.insertBefore(note,body.firstChild);
   }

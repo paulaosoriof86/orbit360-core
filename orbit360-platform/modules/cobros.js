@@ -88,6 +88,42 @@ Orbit.modules.cobros = (function () {
     return reportedPaymentEvidence(idx).filter(c => matchTxt(c, idx));
   }
 
+  function portfolioPaymentRows(idx) {
+    const linked = new Set((S().all('cobros') || []).map(c => String(c && (c.reciboId || c.receiptId) || '')).filter(Boolean));
+    const adapter = Orbit.cobrosCarteraProjectionAdapter;
+    const source = adapter && typeof adapter.portfolioRows === 'function'
+      ? adapter.portfolioRows(st.fq)
+      : (S().all('carteraPrimas') || []).filter(r => r && r.carteraActiva !== false && countryMatches(r, idx));
+    return source.map(r => {
+      const receiptId = String(r && (r.reciboId || r.receiptId) || '');
+      if (!receiptId || linked.has(receiptId)) return null;
+      const receipt = S().get('recibosEsperados', receiptId) || r;
+      const op = String(receipt.estadoOperativo || r.estadoOperativo || '').trim().toLowerCase();
+      if (op === 'pago_reportado') return null;
+      const p = indexPolicy(idx, receipt.polizaId || r.polizaId);
+      let estado = op === 'pendiente_vencido' ? 'Vencido' : 'Pendiente';
+      let requiereValidacion = false;
+      if (op === 'requiere_validacion_estado' || op === 'no_pendiente_segun_aseguradora') { estado = 'Requiere validación'; requiereValidacion = true; }
+      return {
+        id: 'portfolio:' + receiptId, receiptId, __portfolioReceipt: true,
+        clienteId: receipt.clienteId || r.clienteId || (p && p.clienteId) || '',
+        polizaId: receipt.polizaId || r.polizaId || '',
+        asesorId: receipt.asesorId || r.asesorId || (p && p.asesorId) || '',
+        pais: rowCountry(receipt, idx) || rowCountry(r, idx) || receipt.pais || r.pais,
+        cuota: receipt.cuota || receipt.secuencia || receipt.serie || r.cuota || r.secuencia,
+        monto: receipt.primaTotal != null ? receipt.primaTotal : (receipt.montoTotal != null ? receipt.montoTotal : (r.primaTotal != null ? r.primaTotal : (r.montoTotal != null ? r.montoTotal : r.monto))),
+        moneda: receipt.moneda || r.moneda,
+        vence: receipt.fechaLimite || receipt.vence || receipt.fechaVencimiento || r.fechaLimite || r.vence || r.fechaVencimiento,
+        estado, requiereValidacion, estadoOperativo: op || 'pendiente'
+      };
+    }).filter(Boolean).filter(c => {
+      if (!countryMatches(c, idx) || !matchTxt(c, idx)) return false;
+      if (st.fest === 'Reportado por cliente' || st.fest === 'Conciliado' || st.fest === 'Bloqueado' || st.fest === 'Anulado' || st.fest === 'Pagado') return false;
+      if (st.fest === 'Requiere validación') return c.requiereValidacion === true;
+      return !st.fest || c.estado === st.fest;
+    }).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
+  }
+
   function rows(idx) {
     return (S().all('cobros') || []).filter(c => {
       if (!countryMatches(c, idx)) return false;
@@ -168,7 +204,8 @@ Orbit.modules.cobros = (function () {
     const cart = q.carteraGlobalPorMoneda();
     const aging = q.agingVencidoPorMoneda();
     const porConciliar = (cart.currencies || []).reduce((sum, cur) => sum + Number(cart.byCurrency[cur] && cart.byCurrency[cur].porConciliar || 0), 0);
-    const authoritative = rows(idx), reported = reportedRows(idx), allRows = authoritative.concat(reported);
+    const authoritative = rows(idx), portfolioOnly = portfolioPaymentRows(idx), reported = reportedRows(idx);
+    const allRows = authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
     const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE));
     if (st.page > totalPages) st.page = totalPages;
     if (st.page < 1) st.page = 1;
@@ -201,7 +238,8 @@ Orbit.modules.cobros = (function () {
           <thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th><th></th></tr></thead>
           <tbody>${r.map(c => {
             const p = indexPolicy(idx, c.polizaId);
-            if (c.__reportedEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-reported-payment-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado · pendiente de aplicación automática</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right"><button class="btn ghost sm" onclick="event.stopPropagation();Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')">Abrir recibo</button></td></tr>`; }
+            if (c.__portfolioReceipt) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-portfolio-receipt="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td><span class="muted">—</span></td><td>${badgeValidacion(c)}</td><td><span class="muted">—</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${c.requiereValidacion ? '<span class="badge warn">Revisar</span>' : `<button class="btn primary sm" title="Aplicar pago a este recibo" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${U.esc(c.receiptId)}')">Aplicar pago</button>`}</td></tr>`; }
+            if (c.__reportedEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-reported-payment-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado · pendiente de aplicar</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2"><button class="btn primary sm" title="Aplicar el pago reportado" onclick="event.stopPropagation();Orbit.modules.cobros.validarReporte('${U.esc(c.receiptId)}')">Aplicar pago</button></td></tr>`; }
 
             const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
             return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" onclick="Orbit.modules.cobros.detalle('${c.id}')">
@@ -213,7 +251,7 @@ Orbit.modules.cobros = (function () {
               <td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">—</span>'}</td>
               <td>${badgeValidacion(c)}</td>
               <td>${c.estado === 'Pagado' ? (c.conciliado ? '<span style="color:var(--ok)" title="Confirmado y conciliado con póliza">✓</span>' : '<span style="color:var(--warn)" title="Por conciliar">◷</span>') : '<span class="muted">—</span>'}</td>
-              <td style="text-align:right;white-space:nowrap">${c.reportado && !c.validadoReporte && (c.estado === 'Pendiente' || c.estado === 'Vencido') ? `<button class="btn primary sm" title="Aplicar pago reportado por el cliente" onclick="event.stopPropagation();Orbit.modules.cobros.validarReporte('${c.id}')">Aplicar</button>` : (aplicable ? `<button class="btn primary sm" title="Confirmar cobro" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${c.id}')">💳 Confirmar</button>` : '')}</td>
+              <td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${c.reportado && !c.validadoReporte && (c.estado === 'Pendiente' || c.estado === 'Vencido') ? `<button class="btn primary sm" title="Aplicar pago reportado por el cliente" onclick="event.stopPropagation();Orbit.modules.cobros.validarReporte('${c.id}')">Aplicar pago</button>` : (aplicable ? `<button class="btn primary sm" title="Aplicar pago" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${c.id}')">Aplicar pago</button>` : ((c.estado === 'Pagado' && !c.conciliado) ? `<button class="btn primary sm" title="Conciliar pago" onclick="event.stopPropagation();Orbit.modules.cobros.conciliarFactura('${c.id}')">Conciliar</button>` : ''))}</td>
             </tr>`;
           }).join('') || `<tr><td colspan="9" class="muted" style="text-align:center;padding:30px">Sin cobros.</td></tr>`}</tbody>
         </table></div>
@@ -269,6 +307,33 @@ Orbit.modules.cobros = (function () {
     return candidates.length === 1 ? candidates[0] : null;
   }
   function resolveReceiptId(cobroOrId) { const r=resolveReceipt(cobroOrId); return r && r.id || ''; }
+  function paymentContext(cobroOrReceiptId) {
+    const rawId = typeof cobroOrReceiptId === 'string' ? cobroOrReceiptId : '';
+    let receipt = rawId ? S().get('recibosEsperados', rawId) : null;
+    let cobro = typeof cobroOrReceiptId === 'object' && cobroOrReceiptId ? cobroOrReceiptId : (rawId ? S().get('cobros', rawId) : null);
+    if (!cobro && receipt) cobro = (S().all('cobros') || []).find(x => String(x && (x.reciboId || x.receiptId) || '') === String(receipt.id)) || null;
+    if (!receipt) receipt = resolveReceipt(cobro || cobroOrReceiptId);
+    if (!receipt) return null;
+    const portfolio = (S().all('carteraPrimas') || []).find(x => String(x && (x.reciboId || x.receiptId) || '') === String(receipt.id)) || {};
+    const p = S().get('polizas', receipt.polizaId || portfolio.polizaId || (cobro && cobro.polizaId)) || {};
+    if (!cobro) cobro = {
+      id: 'receipt:' + receipt.id,
+      reciboId: receipt.id,
+      receiptId: receipt.id,
+      clienteId: receipt.clienteId || portfolio.clienteId || p.clienteId || '',
+      polizaId: receipt.polizaId || portfolio.polizaId || '',
+      asesorId: receipt.asesorId || portfolio.asesorId || p.asesorId || '',
+      cuota: receipt.cuota || receipt.secuencia || receipt.serie || portfolio.cuota || '',
+      monto: receipt.primaTotal != null ? receipt.primaTotal : (receipt.montoTotal != null ? receipt.montoTotal : (portfolio.primaTotal != null ? portfolio.primaTotal : (portfolio.montoTotal != null ? portfolio.montoTotal : portfolio.monto))),
+      moneda: receipt.moneda || portfolio.moneda || p.moneda || '',
+      vence: receipt.fechaLimite || receipt.vence || receipt.fechaVencimiento || portfolio.fechaLimite || portfolio.vence || portfolio.fechaVencimiento || '',
+      estado: 'Pendiente',
+      fechaPago: receipt.paidDate || receipt.fechaPago || receipt.fechaPagoReportada || '',
+      paidDate: receipt.paidDate || receipt.fechaPago || receipt.fechaPagoReportada || '',
+      metodo: receipt.paymentMethod || receipt.metodoPago || ''
+    };
+    return { cobro, receipt, portfolio };
+  }
   async function uploadPaymentDocument(file, kind, cobro, receiptId) {
     if (!file) return '';
     const provider = Orbit.productDriveDocumentProviderP0;
@@ -327,7 +392,7 @@ Orbit.modules.cobros = (function () {
         <button class="btn ghost" id="cd-delete" style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>
         ${cli ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();location.hash='#/cliente360?c=${cli.id}'">👤 Ver cliente</button>` : ''}
         ${p ? `<button class="btn ghost" onclick="document.getElementById('cob-det').remove();Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
-        ${c.reportado && aplicable ? `<button class="btn primary" id="cd-val">🔎 Validar pago reportado</button>` : (aplicable ? `<button class="btn primary" id="cd-apply">💳 Confirmar cobro</button>` : '')}
+        ${c.reportado && aplicable ? `<button class="btn primary" id="cd-val">Aplicar pago reportado</button>` : (aplicable ? `<button class="btn primary" id="cd-apply">Aplicar pago</button>` : '')}
         ${(c.estado === 'Pagado' && !c.conciliado) ? `<button class="btn primary" id="cd-conc">📄 Cargar factura y conciliar</button>` : ''}
       </div>
     </div>`;
@@ -406,17 +471,17 @@ Orbit.modules.cobros = (function () {
 
   /* ---- Compatibilidad: un pago reportado por el cliente se aplica automáticamente si el recibo es único ---- */
   async function validarReporte(cobroId) {
-    const c = S().get('cobros', cobroId); if (!c) return;
-    const receipt = resolveReceipt(c);
+    const ctx = paymentContext(cobroId); if (!ctx) return U.toast('El reporte no tiene un recibo único; requiere revisión de relación, no validación manual del pago.');
+    const c = ctx.cobro, receipt = ctx.receipt;
     if (!receipt) return U.toast('El reporte no tiene un recibo único; requiere revisión de relación, no validación manual del pago.');
     const domain=Orbit.reconciliationDomain;
     if(!domain||typeof domain.reportClientPayment!=='function') return U.toast('Aplicación canónica de pagos no disponible.');
     try {
       await domain.reportClientPayment(receipt.id,{payload:{
-        paidDate:c.fechaPagoReportada||c.fechaPago||'',
-        evidenceAsOfDate:c.reportado||'',
-        paymentMethod:c.metodoPago||c.metodo||'',
-        paymentSupportDocumentRef:c.paymentSupportDocumentRef||''
+        paidDate:c.fechaPagoReportada||c.fechaPago||receipt.fechaPagoReportada||receipt.paidDate||'',
+        evidenceAsOfDate:c.reportado||receipt.evidenceAsOfDate||receipt.fechaCorteFuente||'',
+        paymentMethod:c.metodoPago||c.metodo||receipt.paymentMethod||receipt.metodoPago||'',
+        paymentSupportDocumentRef:c.paymentSupportDocumentRef||receipt.paymentSupportDocumentRef||''
       }});
       U.toast('✓ Pago reportado aplicado');
       setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
@@ -427,8 +492,9 @@ Orbit.modules.cobros = (function () {
 
   /* ---- Registrar pago por el owner canónico: pago y aplicación son hechos distintos ---- */
   function aplicarPago(cobroId) {
-    const c = S().get('cobros', cobroId); if (!c) return;
-    const receipt=resolveReceipt(c);
+    const ctx = paymentContext(cobroId);
+    if(!ctx) return U.toast('No fue posible identificar un único recibo esperado para registrar el pago.');
+    const c=ctx.cobro, receipt=ctx.receipt;
     if(!receipt) return U.toast('No fue posible identificar un único recibo esperado para registrar el pago.');
     const p=S().get('polizas',c.polizaId)||{};
     const cli=S().get('clientes',c.clienteId)||{};
