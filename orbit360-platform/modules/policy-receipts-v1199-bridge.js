@@ -408,9 +408,13 @@ Orbit.modules = Orbit.modules || {};
   }
   const cob=Orbit.modules.cobros;
   if(cob){
-    cob.__policyReceiptsV1199={aplicarPago:cob.aplicarPago,conciliarFactura:cob.conciliarFactura,detalle:cob.detalle,render:cob.render,kpiOwner:'cobros.js',kpiOwnerDelegated:true}; cob.aplicarPago=openPayment; cob.conciliarFactura=openReconciliationProposal;
-    const originalDetail=cob.detalle.bind(cob); cob.detalle=function(id){const out=originalDetail(id);setTimeout(()=>{const back=document.getElementById('cob-det');if(!back)return;const ap=back.querySelector('#cd-apply');if(ap){const n=ap.cloneNode(true);ap.replaceWith(n);n.onclick=()=>{back.remove();openPayment(id);};}const cc=back.querySelector('#cd-conc');if(cc){const n=cc.cloneNode(true);cc.replaceWith(n);n.textContent='Crear propuesta de conciliación';n.onclick=()=>{back.remove();openReconciliationProposal(id);};}},0);return out;};
-    // Cobros KPIs and country-scoped rows are owned only by modules/cobros.js. This bridge retains payment/reconciliation workflows but must not asynchronously overwrite the canonical Cobros renderer.
+    cob.__policyReceiptsV1199={
+      aplicarPago:cob.aplicarPago,conciliarFactura:cob.conciliarFactura,detalle:cob.detalle,render:cob.render,
+      kpiOwner:'cobros.js',kpiOwnerDelegated:true,canonicalPaymentOwner:'modules/cobros.js',
+      legacyPaymentOverrideDisabled:true,legacyReconciliationOverrideDisabled:true
+    };
+    // B3-004: payment application and reconciliation remain owned by modules/cobros.js.
+    // Legacy openPayment/openReconciliationProposal helpers stay inert for lineage only.
   }
   const pol=Orbit.modules.polizas;
   if(pol){

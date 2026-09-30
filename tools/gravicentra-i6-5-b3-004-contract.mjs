@@ -67,3 +67,25 @@ need(nativeReceiptOwner.includes("mod.aplicarPago(receiptId)"),'B3_004_CLIENTE36
 need(nativeReceiptOwner.includes('Puedes aplicar el pago desde cada fila o desde el detalle del recibo'),'B3_004_CLIENTE360_RUNTIME_COPY_MISSING');
 need(!nativeReceiptOwner.includes('pendientes de validación; se muestran como evidencia'),'B3_004_RUNTIME_HUMAN_VALIDATION_COPY_REMAINS');
 console.log('B3_004_ACTION_SURFACE_CONTRACT=PASS');
+
+const cliente360R4=read('orbit360-platform/modules/cliente360.js');
+const policyReceiptsR4=read('orbit360-platform/modules/policy-receipts-v1199-bridge.js');
+new Function(policyReceiptsR4);
+const nativeReceiptR4=read('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js');
+const indexR4=read('orbit360-platform/index.html');
+need(!cliente360R4.includes('Confirmar cobro'),'B3_004_CONFIRMAR_COBRO_REMAINS_IN_CLIENTE360');
+need(!policyReceiptsR4.includes('cob.aplicarPago=openPayment'),'B3_004_LEGACY_APPLY_OVERRIDE_REMAINS');
+need(!policyReceiptsR4.includes('cob.conciliarFactura=openReconciliationProposal'),'B3_004_LEGACY_RECONCILIATION_OVERRIDE_REMAINS');
+need(policyReceiptsR4.includes('legacyPaymentOverrideDisabled:true'),'B3_004_LEGACY_OVERRIDE_DISABLE_MARKER_MISSING');
+need(cliente360R4.includes('data-c360-conciliar'),'B3_004_CLIENTE360_COBROS_CONCILIAR_ACTION_MISSING');
+need(cliente360R4.includes('Aplicar desde Recibos y pagos'),'B3_004_CLIENTE360_COBROS_BOUNDARY_COPY_MISSING');
+need(cliente360R4.includes('La conciliación del pago se realiza después, en la pestaña Cobros.'),'B3_004_RECEIPT_TO_COBROS_BOUNDARY_MISSING');
+need(nativeReceiptR4.includes('En Recibos y pagos solo se aplica el pago. La conciliación se realiza después, en la pestaña Cobros.'),'B3_004_NATIVE_RECEIPT_BOUNDARY_MISSING');
+need(!nativeReceiptR4.includes('data-rp-reconcile-payment'),'B3_004_RECEIPT_RECONCILIATION_ACTION_REMAINS');
+need(nativeReceiptR4.includes("if(paid)return{kind:'applied',label:'Pago aplicado'}"),'B3_004_RECEIPT_PAID_STATE_NOT_APPLICATION_ONLY');
+need(cobros.includes('data-cobros-action="apply"'),'B3_004_GLOBAL_APPLY_ACTION_MARKER_MISSING');
+need(cobros.includes('data-cobros-action="reconcile"'),'B3_004_GLOBAL_RECONCILE_ACTION_MARKER_MISSING');
+need(!cobros.includes('Confirmar cobro'),'B3_004_GLOBAL_CONFIRMAR_COBRO_REMAINS');
+need(indexR4.includes('modules/cobros.js?v=20260930-b3004r4'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r4'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
+console.log('B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT=PASS');

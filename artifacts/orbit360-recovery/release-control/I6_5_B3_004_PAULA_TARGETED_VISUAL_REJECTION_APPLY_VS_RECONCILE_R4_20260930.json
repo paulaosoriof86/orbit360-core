@@ -1,0 +1,72 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_APPLY_VS_RECONCILE_R4_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "findingId": "B3-004",
+  "subFindingId": "B3-004-R4-APPLY-VS-RECONCILE-SURFACE-BOUNDARY",
+  "status": "FAIL_BLOCKING_SOURCE_REMEDIATED_PENDING_CONTRACT",
+  "rejectedPreview": {
+    "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
+    "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36731992802-73gn7z1h.web.app",
+    "runId": 36731992802,
+    "artifactId": 11105322952,
+    "artifactDigest": "feb706ea24e5166b43321b2a6120d54e186fa195e1731b4ed6f2ccdd07bb7f79"
+  },
+  "humanEvidence": {
+    "source": "Paula desktop targeted visual acceptance",
+    "observations": [
+      "Global Cobros y cartera now lists pending and overdue portfolio rows, but visible row actions still say Confirmar cobro instead of Aplicar pago.",
+      "Reported-payment rows also render Confirmar cobro instead of the application wording.",
+      "Cliente 360 > Recibos y pagos shows Confirmar cobro across actionable receipt rows; a transient alternate button is visible during rerender, proving competing owners.",
+      "Cliente 360 > Recibos y pagos should be application-only; payment reconciliation belongs in Cliente 360 > Cobros.",
+      "Cliente 360 > Cobros has reconciliation state but no Conciliar action for applied-unreconciled payments.",
+      "Global Cobros y cartera is intentionally combined, so row action must resolve by state: Aplicar pago before payment, Conciliar after payment when unreconciled.",
+      "The global count showed 0 cobros while simultaneously listing hundreds of portfolio receipts, which is misleading for a combined list."
+    ]
+  },
+  "rootCause": {
+    "legacyRuntimeOverride": "policy-receipts-v1199-bridge.js reassigns cob.aplicarPago=openPayment and cob.conciliarFactura=openReconciliationProposal after cobros.js loads, bypassing the canonical B3-004 owner.",
+    "cliente360CompetingRenderers": "cliente360.js fallback still contains Confirmar cobro semantics while the V920 owner paints Aplicar pago; rerenders can expose/finalize the legacy wording.",
+    "surfaceBoundary": "V920 Recibos y pagos exposes reconciliation action for already-paid receipts, while Cliente360 Cobros lacks the corresponding Conciliar action.",
+    "combinedCount": "cobros.js count header counts only materialized cobros although the table unions portfolio-only receipts and reported evidence."
+  },
+  "remediation": {
+    "changedProductFiles": [
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/index.html"
+    ],
+    "qaGuard": "tools/gravicentra-i6-5-b3-004-contract.mjs",
+    "behavior": [
+      "Recibos y pagos is application-only: Aplicar pago for unpaid/reportable receipts; paid receipts show Pago aplicado and no Conciliar button.",
+      "Cliente 360 > Cobros lists materialized paid cobros and exposes Conciliar only for applied-unreconciled payments.",
+      "Global Cobros y cartera uses Aplicar pago before payment and Conciliar after payment when unreconciled.",
+      "The legacy v1.199 payment/reconciliation override is disabled; modules/cobros.js remains the runtime command owner.",
+      "The combined list header reports visible records rather than misleading 0 cobros when portfolio-only receipts are present.",
+      "Asset query versions are bumped so the corrected owners cannot be masked by stale asset reuse."
+    ],
+    "sourceBlobs": {
+      "orbit360-platform/modules/cliente360.js": "9ef53b323d3532b53400067425579960ffba77f6",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "601e07ecc6a420a30c1de743c6a256f0f38b3d78",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "c4382238964ba18ac9e0669f4e01dd0897681d62",
+      "orbit360-platform/modules/cobros.js": "9d2a3c423e130ff4bdcc88832e7640dbe61fa0ac",
+      "orbit360-platform/index.html": "4efd278dfa790f99901a178d1d07c51f9e025dc1",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "1217c4d6a9341d9576eb99f7b511ab8375d3a1a5"
+    }
+  },
+  "boundaries": {
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "businessWrites": false
+  },
+  "nextRequiredProof": [
+    "B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT_PASS",
+    "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_TARGETED_VISUAL_PASS"
+  ]
+}

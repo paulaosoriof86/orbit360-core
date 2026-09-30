@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_004_SURFACES_FIXED_PENDING_CONTRACT",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "SURFACES_FIXED_PENDING_CONTRACT",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
     "boundaries": {
@@ -51,7 +51,7 @@
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "a2264accb652fe382724099e9fc04a357c62eb70"
     },
     "surfaceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_CONTRACT_PASS_20260930.json",
-    "activeSubFindingId": "B3-004-R3-RECEIPT-ACTION-AND-PORTFOLIO-COMPOSITION",
+    "activeSubFindingId": "B3-004-R4-APPLY-VS-RECONCILE-SURFACE-BOUNDARY",
     "provenanceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_FIX_20260930.json",
     "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_CONTRACT_PASS_20260930.json",
     "machineProof": {
@@ -124,6 +124,23 @@
         "contractReceiptBlobSha": "f5c5e4ea0d162452286188bebcc1a744b7ae0b17",
         "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_ACTION_SURFACE_MACHINE_PASS_20260930.json",
         "machineProofReceiptBlobSha": "e88b7dbe9ac02f8edce71021a9d6cf55f03f97e7"
+      },
+      {
+        "id": "B3-004-R4-APPLY-VS-RECONCILE-SURFACE-BOUNDARY",
+        "status": "SURFACES_FIXED_PENDING_CONTRACT",
+        "blocking": true,
+        "rootCause": "LEGACY_PAYMENT_OVERRIDE_PLUS_COMPETING_CLIENTE360_RECEIPT_RENDERERS_AND_MISSING_COBROS_RECONCILIATION_ACTION",
+        "remediation": "Recibos applies; Cobros reconciles; global combined list resolves by state.",
+        "authorizedProductFiles": [
+          "orbit360-platform/modules/cliente360.js",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "orbit360-platform/modules/cobros.js",
+          "orbit360-platform/index.html"
+        ],
+        "qaGuardFile": "tools/gravicentra-i6-5-b3-004-contract.mjs",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_APPLY_VS_RECONCILE_R4_20260930.json",
+        "receiptBlobSha": "9c0db9b809cb106a286c297b6f95d03c119dce3a"
       }
     ],
     "visualSemanticContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_VISUAL_SEMANTIC_REMEDIATION_CONTRACT_PASS_20260930.json",
@@ -137,29 +154,39 @@
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
     },
-    "machineProofInvalidatedBySourceChange": false,
+    "machineProofInvalidatedBySourceChange": true,
     "priorMachineProof": {
-      "sourceSha": "1fa38ba1e1b2736f7a6cb61a4e4bc869de9d9ace",
-      "buildId": "gi-i65-b3-1fa38ba1e1b2-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36727490527-y3yfh7tk.web.app",
-      "runId": 36727490527,
-      "artifactId": 11102708133,
-      "artifactDigest": "f0d3d99f99af61ce3f93caf820841bc5893f3ea3dc87ec618e1450f28e8f06c3"
+      "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
+      "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36731992802-73gn7z1h.web.app",
+      "runId": 36731992802,
+      "artifactId": 11105322952,
+      "artifactDigest": "feb706ea24e5166b43321b2a6120d54e186fa195e1731b4ed6f2ccdd07bb7f79"
     },
     "actionSurfaceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_ACTION_SURFACE_CONTRACT_PASS_20260930.json",
-    "actionSurfaceContractReceiptBlobSha": "f5c5e4ea0d162452286188bebcc1a744b7ae0b17"
+    "actionSurfaceContractReceiptBlobSha": "f5c5e4ea0d162452286188bebcc1a744b7ae0b17",
+    "visualRejectionR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_APPLY_VS_RECONCILE_R4_20260930.json",
+    "visualRejectionR4ReceiptBlobSha": "9c0db9b809cb106a286c297b6f95d03c119dce3a",
+    "actionBoundaryR4Blobs": {
+      "orbit360-platform/modules/cliente360.js": "9ef53b323d3532b53400067425579960ffba77f6",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "601e07ecc6a420a30c1de743c6a256f0f38b3d78",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "c4382238964ba18ac9e0669f4e01dd0897681d62",
+      "orbit360-platform/modules/cobros.js": "9d2a3c423e130ff4bdcc88832e7640dbe61fa0ac",
+      "orbit360-platform/index.html": "4efd278dfa790f99901a178d1d07c51f9e025dc1",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "1217c4d6a9341d9576eb99f7b511ab8375d3a1a5"
+    }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "0c74b87386f37d7f63c87d17ae06ab06f6ef967a",
+    "blobSha": "42b27af8d910e884844f3cd6d27663a1122020fa",
     "productFileCount": 77
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "82f56b31f503eaf34fd0db6bb9b3b8aaf76d94b1"
+    "blobSha": "4555051732c0ab4ade1d64e48ca73d6720815ed2"
   },
   "nextRequiredProof": [
-    "B3_004_TARGETED_VISUAL_PASS"
+    "B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",

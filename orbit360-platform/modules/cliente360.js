@@ -439,7 +439,7 @@ Orbit.modules.cliente360 = (function () {
         else { body.innerHTML = tabRecibos(cid, r); wireRecibos(cid); }
       }
     }
-    else if (tab === 'cobros') { body.innerHTML = tabCobros(cid, r); const pf = body.querySelector('#cob-pol-fil'); if (pf) pf.addEventListener('change', () => { window._cobFilPol = window._cobFilPol || {}; window._cobFilPol[cid] = pf.value; body.innerHTML = tabCobros(cid, r); const pf2 = body.querySelector('#cob-pol-fil'); if (pf2) pf2.addEventListener('change', () => { window._cobFilPol[cid] = pf2.value; body.innerHTML = tabCobros(cid, r); }); }); }
+    else if (tab === 'cobros') { body.innerHTML = tabCobros(cid, r); wireCobros(cid, r); }
     else if (tab === 'renovaciones') body.innerHTML = tabRenov(cid, r);
     else if (tab === 'documentos') { body.innerHTML = tabDocumentos(cid, r); wireDocumentos(cid); }
     else if (tab === 'comisiones') body.innerHTML = tabComis(cid, r);
@@ -548,7 +548,11 @@ Orbit.modules.cliente360 = (function () {
     const polFil = (window._cobFilPol && window._cobFilPol[cid]) || '';
     const activePolicies = r.pol.filter(esRenovable);
     const activePolicyIds = new Set(activePolicies.map(p => String(p.id)));
-    const cobAll = r.cob.filter(c => !c.polizaId || activePolicyIds.has(String(c.polizaId)));
+    const cobAll = r.cob.filter(c => {
+      if (c.polizaId && !activePolicyIds.has(String(c.polizaId))) return false;
+      const ps = String(c.paymentState || '').toUpperCase();
+      return c.estado === 'Pagado' || ps === 'PAID_DIRECT' || ps === 'PAID_REPORTED' || ps === 'PAID_INFERRED';
+    });
     const cob = cobAll.filter(c => !polFil || c.polizaId === polFil).sort((a, b) => (b.vence||'').localeCompare(a.vence||''));
     const receiptSource = q.recibosEsperadosDe ? q.recibosEsperadosDe(cid) : S().where('recibosEsperados', x => x && x.clienteId === cid);
     const reportedAll = (receiptSource || []).filter(x => x && String(x.estadoOperativo || '').toLowerCase() === 'pago_reportado' && activePolicyIds.has(String(x.polizaId || '')));
@@ -568,7 +572,8 @@ Orbit.modules.cliente360 = (function () {
         <td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">—</span>'}</td>
         <td style="font-size:12.5px">${c.metodo || '<span class="muted">—</span>'}</td>
         <td>${cobBadge(c)}</td>
-        <td>${c.estado === 'Pagado' ? (c.conciliado ? '<span title="Confirmado y conciliado con la póliza" style="color:var(--ok)">✓</span>' : '<span title="Cobro confirmado pendiente de conciliación" style="color:var(--warn)">◷</span>') : '<span class="muted">—</span>'}</td>
+        <td>${c.conciliado ? '<span class="badge ok">Conciliado</span>' : '<span class="badge warn">Pendiente</span>'}</td>
+        <td style="text-align:right;white-space:nowrap">${c.conciliado ? '<span class="badge ok">Conciliado</span>' : `<button class="btn primary sm" data-c360-conciliar="${c.id}">Conciliar</button>`}</td>
       </tr>`;
     }).join('');
     const reportedRows = reported.map(x => {
@@ -585,6 +590,7 @@ Orbit.modules.cliente360 = (function () {
         <td style="font-size:12.5px">${method ? U.esc(method) : '<span class="muted">—</span>'}</td>
         <td><span class="badge info">Pago reportado · pendiente de aplicación automática</span></td>
         <td><span class="badge warn">Pendiente</span></td>
+        <td><span class="muted">Aplicar desde Recibos y pagos</span></td>
       </tr>`;
     }).join('');
     const visibleRows = confirmedRows + reportedRows;
@@ -598,10 +604,31 @@ Orbit.modules.cliente360 = (function () {
       ${miniStat('Cartera exigible', U.money(r.vencido, r.moneda), r.vencido > 0 ? 'danger' : 'ok')}
     </div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Método</th><th>Estado</th><th>Conciliación</th></tr></thead>
-      <tbody>${visibleRows || '<tr><td colspan="8" class="muted" style="text-align:center;padding:28px">Sin cobros confirmados ni pagos reportados para el filtro actual.</td></tr>'}</tbody>
+      <thead><tr><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Método</th><th>Estado</th><th>Conciliación</th><th>Acción</th></tr></thead>
+      <tbody>${visibleRows || '<tr><td colspan="9" class="muted" style="text-align:center;padding:28px">Sin cobros confirmados ni pagos reportados para el filtro actual.</td></tr>'}</tbody>
     </table></div>
     <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Pago reportado ≠ cobro confirmado. Cobro confirmado ≠ necesariamente conciliado. La conciliación no cambia la fecha real del pago.</div></div>`;
+  }
+
+  function wireCobros(cid, r) {
+    const body = document.getElementById('c360-body');
+    if (!body) return;
+    body.querySelectorAll('[data-c360-conciliar]').forEach(b => {
+      if (b.dataset.c360Wired === '1') return;
+      b.dataset.c360Wired = '1';
+      b.addEventListener('click', e => {
+        e.stopPropagation();
+        if (Orbit.modules && Orbit.modules.cobros && typeof Orbit.modules.cobros.conciliarFactura === 'function') Orbit.modules.cobros.conciliarFactura(b.dataset.c360Conciliar);
+        else U.toast('Conciliación canónica no disponible.');
+      });
+    });
+    const pf = body.querySelector('#cob-pol-fil');
+    if (pf) pf.addEventListener('change', () => {
+      window._cobFilPol = window._cobFilPol || {};
+      window._cobFilPol[cid] = pf.value;
+      body.innerHTML = tabCobros(cid, r);
+      wireCobros(cid, r);
+    });
   }
 
   function miniStat(label, val, tone) {
@@ -819,11 +846,11 @@ Orbit.modules.cliente360 = (function () {
             <td class="num">${U.money(c.monto, c.moneda)}</td>
             <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
             <td>${cobBadge(c)}</td>
-            <td style="text-align:right" onclick="event.stopPropagation()">${c.reportado && !c.validadoReporte && aplicable ? `<button class="btn primary sm" data-validar="${c.id}">Aplicar reporte</button>` : (aplicable ? `<button class="btn primary sm" data-apply="${c.id}">Confirmar cobro</button>` : (c.estado === 'Pagado' ? `<span class="badge ${c.conciliado ? 'ok' : 'warn'}">${c.conciliado ? 'Conciliado' : 'Por conciliar'}</span>` : '<span class="muted">—</span>'))}</td>
+            <td style="text-align:right" onclick="event.stopPropagation()">${c.reportado && !c.validadoReporte && aplicable ? `<button class="btn primary sm" data-validar="${c.id}">Aplicar pago</button>` : (aplicable ? `<button class="btn primary sm" data-apply="${c.id}">Aplicar pago</button>` : (c.estado === 'Pagado' ? '<span class="badge ok">Pago aplicado</span>' : '<span class="muted">—</span>'))}</td>
           </tr>`;
         }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">Sin recibos para esta póliza.</td></tr>'}</tbody>
       </table></div>
-      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Filtra por póliza para no mezclar recibos. <b>Confirmar cobro</b> abre el mismo flujo canónico de pago de Cobros y cartera; clic en la fila abre el detalle. Un pago reportado por cliente se aplica automáticamente cuando el recibo coincide de forma única y válida; solo los casos ambiguos quedan para revisión. Los estados de cuenta forman parte de la conciliación de Cobros.</div>
+      <div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">Filtra por póliza para no mezclar recibos. <b>Aplicar pago</b> usa el mismo comando canónico de Cobros y cartera; clic en la fila abre el detalle. La conciliación del pago se realiza después, en la pestaña Cobros.</div>
     </div>`;
   }
   function wireRecibos(cid) {
