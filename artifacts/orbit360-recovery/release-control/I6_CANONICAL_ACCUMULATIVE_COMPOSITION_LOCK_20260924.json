@@ -144,7 +144,7 @@
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
     "orbit360-platform/core/record-delete.js": "3c8b4b06126abaa6b1ea0b6efe3c85c04bf71da9",
-    "orbit360-platform/core/router.js": "671b6da3d75a0d3df9e14e44157e1c58fa2cb338",
+    "orbit360-platform/core/router.js": "ffea048a80c32c825c9f388a72d0764c8e5119ca",
     "orbit360-platform/core/tenant-access-policy-contract-p0.js": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
     "orbit360-platform/core/tenant-access-policy-effective-p0.js": "56e515206ff18e3baabcfd66b217b4985f1288ad",
     "orbit360-platform/core/tenant-access-policy-product-p0.js": "045322231523ec624c6f19efea1a66c204b962bc",
@@ -159,8 +159,8 @@
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813",
-    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "29baab7a9a6caa75aa21196b7b91deb2919025a2",
-    "orbit360-platform/modules/cobros.js": "db8ae9c55d32ea922bb8aa371700b80826e40998",
+    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
+    "orbit360-platform/modules/cobros.js": "6b399b2b27423d170b7a758a9e65a873bba70605",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
@@ -226,5 +226,25 @@
     "receiptBlobSha": "3d18e793a21dc73be7643bb07766e5d726cf2394",
     "productSourceFixChanged": false,
     "productFileCount": 70
+  },
+  "b3002PerformanceFix": {
+    "status": "CAUSAL_SOURCE_FIX_BOUND",
+    "findingId": "B3-002",
+    "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN",
+    "changedProductFiles": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+      "orbit360-platform/core/router.js"
+    ],
+    "exactBlobBindings": {
+      "orbit360-platform/modules/cobros.js": "6b399b2b27423d170b7a758a9e65a873bba70605",
+      "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
+      "orbit360-platform/core/router.js": "ffea048a80c32c825c9f388a72d0764c8e5119ca"
+    },
+    "shellOwnerPreserved": "orbit360-platform/modules/cobros.js",
+    "secondRendererCreated": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
