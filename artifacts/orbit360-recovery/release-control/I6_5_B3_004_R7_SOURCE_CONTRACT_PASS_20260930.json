@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R7_SOURCE_CONTRACT_PASS_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "ab838bf50d6fcf054d40d3cabb710d5d6e4d8792",
+  "workflowRunId": 36771208607,
+  "workflowJobId": 110077972353,
+  "status": "PASS",
+  "contractPath": "tools/gravicentra-i6-5-b3-004-contract.mjs",
+  "contractBlobSha": "9f24853dd4563ce7e4efbbe606b49d8591cab919",
+  "proofOutput": [
+    "GRAVICENTRA_I6_5_B3_004_SOURCE_CONTRACT_V1 status PASS",
+    "B3_004_SURFACE_CONVERGENCE_CONTRACT=PASS",
+    "B3_004_PAYMENT_PROVENANCE_CONTRACT=PASS",
+    "B3_004_ACTION_SURFACE_CONTRACT=PASS",
+    "B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT=PASS",
+    "B3_004_CRM_MIGRATION_ORIGIN_CONTRACT=PASS",
+    "B3_004_R6_ORIGIN_SCOPE_PERFORMANCE_CONTRACT=PASS",
+    "B3_004_R6_1_ADVISOR_REPORT_RUNTIME_GUARD=PASS",
+    "B3_004_R7_COBROS_VISIBILITY_FILTER_CONTRACT=PASS"
+  ],
+  "boundaries": {
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3005Opened": false
+  }
+}

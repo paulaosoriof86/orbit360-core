@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "SOURCE_FIXED_PENDING_CONTRACT",
+      "status": "CANDIDATE_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R7_SOURCE_CONTRACT",
+      "nextAction": "B3_004_R7_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1326,6 +1326,14 @@
         "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_STALE_ASSET_VALIDATOR_REPAIR_20260930.json",
         "receiptBlobSha": "1f312eb54af919a5c6122feea8290518ed0cd4ad",
+        "contractBlobSha": "9f24853dd4563ce7e4efbbe606b49d8591cab919"
+      },
+      "r7ContractPass": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_SOURCE_CONTRACT_PASS_20260930.json",
+        "blobSha": "fa3ab238b90e745287d47e8cf8ce8ebd9205debc",
+        "runId": 36771208607,
+        "jobId": 110077972353,
+        "sourceSha": "ab838bf50d6fcf054d40d3cabb710d5d6e4d8792",
         "contractBlobSha": "9f24853dd4563ce7e4efbbe606b49d8591cab919"
       }
     },

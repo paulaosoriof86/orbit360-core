@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
+  "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -38,7 +38,7 @@
       "client": "8f668d6db0cf8e513c4ff17f12a46c73fa150da1",
       "contract": "f7873144557effff71b7e33f2eccdb772832692b"
     },
-    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_SOURCE_CONTRACT_PASS_20260930.json",
+    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_SOURCE_CONTRACT_PASS_20260930.json",
     "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
     "surfaceBlobs": {
       "orbit360-platform/modules/cobros.js": "5c5aeaba9a53e5716f962cd3e77c892b81905d34",
@@ -294,7 +294,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R7_SOURCE_CONTRACT",
+    "nextAction": "B3_004_R7_EXACT_PREVIEW",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -303,7 +303,7 @@
       "failedRunId": 36761475222,
       "failedJobId": 110044845524
     },
-    "sourceContractReceiptBlobSha": "4646d753a9310e5639181fc8d80ee3cf60d49b2e",
+    "sourceContractReceiptBlobSha": "fa3ab238b90e745287d47e8cf8ce8ebd9205debc",
     "surfaceContractReceiptBlobSha": "46c1d24586aa2ce4f714db925bc46855f321dc51",
     "paymentProvenanceContractReceiptBlobSha": "34f2f5e0aedf6a5a68e4f3c476040349ecf38794",
     "r6ExactPreviewMechanismFix": {
@@ -380,15 +380,14 @@
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "fcde4e2553d063ec87d6d185905a68515ac60d9a",
+    "blobSha": "205129ab3efa2e8c08c1a9a94fd61d4dc0b3ba8d",
     "productFileCount": 78
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "0ebf7ac7449d2e85b3c8cea840bb0706b82427a2"
+    "blobSha": "f7e8df14a03c02be93cb31dc407b5c61641725e0"
   },
   "nextRequiredProof": [
-    "B3_004_R7_SOURCE_CONTRACT_PASS",
     "B3_004_R7_EXACT_PREVIEW_MACHINE_PASS",
     "B3_004_R7_TARGETED_VISUAL_PASS"
   ],
