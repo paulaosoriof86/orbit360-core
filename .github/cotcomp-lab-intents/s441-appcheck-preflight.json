@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "ays-cotcomp-s441-appcheck-preflight-intent-v1.0",
+  "authorization": "READ_ONLY_APPCHECK_PREFLIGHT",
+  "authorizedSourceParent": "75b405a7c468521ceeeb982bfe141acc567d38ef",
+  "projectId": "ays-orbit-360-lab",
+  "environment": "LAB",
+  "region": "us-central1",
+  "deployedSourceSha": "17d599e884d5b834b73b9499d8cef177575d56f9",
+  "firebaseConfigWrites": false,
+  "appDataWrites": false,
+  "deploy": false,
+  "production": false,
+  "purpose": "DISCOVER_LAB_WEB_APP_AND_DEBUG_TOKEN_SECRET_READINESS_WITHOUT_SECURITY_WEAKENING"
+}
