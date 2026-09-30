@@ -708,15 +708,29 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Search/performance: indexing, debounce and pagination/virtualization; no page freeze.",
-      "status": "IN_PROGRESS",
+      "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "rootCause": "PENDING_B3_002_MEASURED_PERFORMANCE_HYDRATION_DIAGNOSTIC",
+      "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN",
       "remediation": "Measure module-load phases and blocking dependencies; reduce blocking hydration, add explicit loading state, index/debounce/paginate/virtualize as evidence requires.",
       "requiredProof": "Cold/warm Cobros entry timing with phase markers; no ~10s blank/unusable wait; no page freeze; data complete after load.",
       "humanEvidence": "Paula reports approximately 10 seconds to enter Cobros on exact B3 Preview 2026-09-29.",
       "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
-      "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c"
+      "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
+      "diagnosticRunId": 36651311858,
+      "diagnosticArtifactId": 11070607951,
+      "diagnosticArtifactDigest": "sha256:a94f1225aff71d7fd53ab7cebb553e684ccb52bcd90f111bebf49af5ac222245",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_20260929.json",
+      "measured": {
+        "warmSingleRenderMs": 6673,
+        "inSessionColdRenderCount": 12,
+        "inSessionColdTotalRenderMs": 45413,
+        "directColdRenderCount": 15,
+        "directColdTotalRenderMs": 46053,
+        "finalRows": 489,
+        "reportedRows": 484
+      },
+      "nextAction": "B3_002_CAUSAL_SOURCE_FIX"
     },
     {
       "id": "B3-003",
@@ -4293,8 +4307,8 @@
     }
   },
   "currentB3": {
-    "status": "B3_001_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
-    "activeFindingId": "B3-001",
+    "status": "B3_002_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+    "activeFindingId": "B3-002",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
     "compositionLockBlobSha": "6824a4b873f14a3c96669eb0cf495feeea1a9f64",
@@ -4307,6 +4321,7 @@
       "failedRunId": 36645668909,
       "failedJobId": 109667923632,
       "productRegressionDemonstrated": false
-    }
+    },
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_READONLY_PERFORMANCE_HYDRATION_DIAGNOSTIC_20260929.json"
   }
 }
