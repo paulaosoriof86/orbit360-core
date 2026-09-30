@@ -158,13 +158,13 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "dbc6ae798f580ee991fd3053e9822f3bd7c0825b",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "75edf2bf0ee9e945c1e503ad10e4eb468822c83a",
+    "orbit360-platform/index.html": "6309531946f8363dbcf444f61a3fca61d84070c2",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "62c98fc97ce92e9b826f08ce8195594d88996813",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
-    "orbit360-platform/modules/cobros.js": "668b6133ae4e52c8f26e8c884a2fc0396a1a3ac0",
+    "orbit360-platform/modules/cobros.js": "6a3c521b8973b15504ef569e819651219ebb6363",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
@@ -184,7 +184,7 @@
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
     "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
     "orbit360-platform/core/access-role-session-owner-v20260728.js": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5",
-    "orbit360-platform/core/queries.js": "7ba5f363a5143236179777a1a30d763142e8e7a8",
+    "orbit360-platform/core/queries.js": "47d8aa225ee0d57668684ba34737192bef76fc39",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d"
@@ -212,15 +212,17 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "id": "B3-003-KPI-AGING-CURRENCY-ROOTFIX-20260929",
+    "id": "B3-003-COUNTRY-LINEAGE-TRANSITION-ROOTFIX-20260929",
     "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_KPI_AGING_CURRENCY_DIAGNOSTIC_20260929.json",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json",
     "changedProductFiles": [
       "orbit360-platform/core/queries.js",
-      "orbit360-platform/modules/cobros.js"
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/index.html"
     ],
     "noLive": true,
-    "noReimport": true
+    "noReimport": true,
+    "dataWrites": 0
   },
   "lastMechanismRootFix": {
     "id": "B3-TRANSITION-GUARD-ROOTFIX-20260929",
@@ -320,5 +322,31 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "b3003CountryLineageFix": {
+    "status": "CAUSAL_SOURCE_FIX_BOUND_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-003",
+    "rootCause": "CLIENT_COUNTRY_PRECEDENCE_OVERRIDES_EXPLICIT_POLICY_COUNTRY_PLUS_COUNTRY_SWITCH_OLD_CONTENT_PAINT_WINDOW",
+    "changedProductFiles": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/index.html"
+    ],
+    "exactBlobBindings": {
+      "orbit360-platform/core/queries.js": "47d8aa225ee0d57668684ba34737192bef76fc39",
+      "orbit360-platform/modules/cobros.js": "6a3c521b8973b15504ef569e819651219ebb6363",
+      "orbit360-platform/index.html": "6309531946f8363dbcf444f61a3fca61d84070c2"
+    },
+    "canonicalCountryContract": "policy.pais > explicit linked financial row pais > cliente.pais fallback; conflicting explicit policy/row country => REQUIERE_VALIDACION",
+    "rowIdentityQaAttributes": [
+      "data-row-client-id",
+      "data-row-policy-id"
+    ],
+    "transitionContract": "explicit loading frame via requestAnimationFrame; no timeout; no prior-country data painted",
+    "independentPreviewProof": "tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs",
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3002MustRegress": true
   }
 }

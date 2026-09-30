@@ -153,22 +153,43 @@ Orbit.q = (function () {
   function monedaPais() { const p = paisActivo(); return p === 'CO' ? 'COP' : 'GTQ'; }
   const norm = (m, cur) => { const n = finite(m); if (n == null) return 0; if (paisActivo()) return n; return cur === 'COP' ? n / TC_COP_GTQ : n; };
   function clientIndex() { return new Map((S().all('clientes') || []).filter(c => c && c.id).map(c => [c.id, c])); }
-  function rowPais(row, clients) { const cli = clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p) || row.pais === p; }
+  function countryCode(v) { return String(v || '').trim().toUpperCase(); }
+  function policyLinkedCountry(row, clients, policies) {
+    row = row || {};
+    const policy = row.polizaId != null ? (policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId)) : null;
+    const clientId = row.clienteId != null ? row.clienteId : (policy && policy.clienteId);
+    const cli = clientId != null ? (clients instanceof Map ? clients.get(clientId) : S().get('clientes', clientId)) : null;
+    const policyCountry = countryCode(policy && policy.pais);
+    const rowCountry = countryCode(row.pais);
+    const clientCountry = countryCode(cli && cli.pais);
+    if (policyCountry && rowCountry && policyCountry !== rowCountry) return 'REQUIERE_VALIDACION';
+    return policyCountry || rowCountry || clientCountry || '';
+  }
+  function rowPais(row, clients, policies) {
+    const p = paisActivo();
+    if (!p) return true;
+    if (row && row.polizaId != null) return policyLinkedCountry(row, clients, policies) === p;
+    const cli = row && row.clienteId != null ? (clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId)) : null;
+    return (countryCode(row && row.pais) || countryCode(cli && cli.pais)) === p;
+  }
   function policyLinkedRowPais(row, clients, policies) {
     if (!row || row.polizaId == null) return false;
     const policy = policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId);
-    if (!policy || policy.clienteId == null) return false;
-    const cli = clients instanceof Map ? clients.get(policy.clienteId) : S().get('clientes', policy.clienteId);
+    if (!policy) return false;
     const p = paisActivo();
-    return !p || !!(cli && cli.pais === p);
+    return !p || policyLinkedCountry(row, clients, policies) === p;
   }
-  function polPais(p2, clients) { const cli = clients instanceof Map ? clients.get(p2.clienteId) : S().get('clientes', p2.clienteId); const p = paisActivo(); return !p || (cli && cli.pais === p); }
+  function polPais(p2, clients) {
+    const cli = p2 && p2.clienteId != null ? (clients instanceof Map ? clients.get(p2.clienteId) : S().get('clientes', p2.clienteId)) : null;
+    const p = paisActivo();
+    return !p || (countryCode(p2 && p2.pais) || countryCode(cli && cli.pais)) === p;
+  }
 
   /** Cartera Primas es la autoridad de pendiente/vencido; Cobros solo aporta recaudo confirmado. */
   function carteraGlobal() {
     const clients = clientIndex();
     const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
-    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));
+    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients, policies));
     const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));
     const alDia = cob.filter(confirmedCobro).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
     const pend = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
@@ -186,7 +207,7 @@ Orbit.q = (function () {
   function carteraGlobalPorMoneda() {
     const clients = clientIndex();
     const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
-    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients));
+    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients, policies));
     const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));
     const byCurrency = {};
     const ensure = cur => byCurrency[cur] || (byCurrency[cur] = emptyPortfolioCurrency());
@@ -307,6 +328,6 @@ Orbit.q = (function () {
   return {
     asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, clientesResumenIndex, carteraGlobal, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
-    agingVencido, agingVencidoPorMoneda, comisionesPor, clienteNombre, norm, monedaPais, vehiculosDe, vehiculoDePoliza, postRecaudo
+    agingVencido, agingVencidoPorMoneda, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();

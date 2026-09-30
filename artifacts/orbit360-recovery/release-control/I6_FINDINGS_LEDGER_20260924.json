@@ -857,7 +857,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-      "status": "ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+      "status": "CANDIDATE_PENDING_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
@@ -871,7 +871,7 @@
       ],
       "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "nextAction": "B3_003_COUNTRY_LINEAGE_AND_TRANSITION_CAUSAL_FIX",
+      "nextAction": "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json",
       "diagnosticRunId": 36658190622,
       "diagnosticArtifactId": 11073202655,
@@ -881,22 +881,30 @@
         "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
       ],
       "causalFix": {
-        "owners": [
+        "status": "CAUSAL_SOURCE_FIX_BOUND_PENDING_EXACT_PREVIEW",
+        "findingId": "B3-003",
+        "rootCause": "CLIENT_COUNTRY_PRECEDENCE_OVERRIDES_EXPLICIT_POLICY_COUNTRY_PLUS_COUNTRY_SWITCH_OLD_CONTENT_PAINT_WINDOW",
+        "changedProductFiles": [
+          "orbit360-platform/core/queries.js",
           "orbit360-platform/modules/cobros.js",
-          "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+          "orbit360-platform/index.html"
         ],
-        "blobs": {
-          "orbit360-platform/modules/cobros.js": "668b6133ae4e52c8f26e8c884a2fc0396a1a3ac0",
-          "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "d1bd8c883db39b946b3833bd1684a0a8fe4843b3"
+        "exactBlobBindings": {
+          "orbit360-platform/core/queries.js": "47d8aa225ee0d57668684ba34737192bef76fc39",
+          "orbit360-platform/modules/cobros.js": "6a3c521b8973b15504ef569e819651219ebb6363",
+          "orbit360-platform/index.html": "6309531946f8363dbcf444f61a3fca61d84070c2"
         },
-        "proofBlobSha": "144bed375204947c283e3205d7a3bcda23613495",
-        "semantics": [
-          "rendered cobro rows enforce active country",
-          "reported-payment rows enforce active country",
-          "Cobros KPI owner is modules/cobros.js only",
-          "no async policy-receipts KPI overwrite",
-          "real selector proof waits for async settle"
-        ]
+        "canonicalCountryContract": "policy.pais > explicit linked financial row pais > cliente.pais fallback; conflicting explicit policy/row country => REQUIERE_VALIDACION",
+        "rowIdentityQaAttributes": [
+          "data-row-client-id",
+          "data-row-policy-id"
+        ],
+        "transitionContract": "explicit loading frame via requestAnimationFrame; no timeout; no prior-country data painted",
+        "independentPreviewProof": "tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs",
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false,
+        "b3002MustRegress": true
       },
       "previewSourceSha": "3c290e24443ea07940fed6c25ad33ddf186ca0b5",
       "previewBuildId": "gi-i65-b3-3c290e24443e-57f234755dc1",
@@ -922,7 +930,8 @@
         "orbit360-platform/core/queries.js",
         "orbit360-platform/modules/cobros.js",
         "orbit360-platform/index.html"
-      ]
+      ],
+      "sourceFixHead": "04654ed123a6834c4ae2e6d5f3bd6187ddf6a321"
     },
     {
       "id": "B3-004",
@@ -4505,7 +4514,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+    "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
     "activeFindingId": "B3-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",

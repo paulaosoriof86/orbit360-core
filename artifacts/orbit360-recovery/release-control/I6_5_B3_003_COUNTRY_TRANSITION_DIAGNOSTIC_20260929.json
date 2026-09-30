@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_V1",
-  "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
   "exactRejectedCandidate": {
     "sourceSha": "41aacc71b343574338ed25efbc6902fb25b13677",
     "buildId": "gi-i65-b3-41aacc71b343-57f234755dc1",
@@ -98,7 +98,7 @@
     "livePromotion": false,
     "b4": false
   },
-  "nextAction": "B3_003_COUNTRY_LINEAGE_AND_TRANSITION_CAUSAL_FIX",
+  "nextAction": "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
   "latestIndependentCountryLineage": {
     "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
     "runId": 36666588079,
@@ -158,6 +158,13 @@
       "reimport": false,
       "livePromotion": false,
       "b4": false
-    }
+    },
+    "fixApplied": true,
+    "fixProductBlobBindings": {
+      "orbit360-platform/core/queries.js": "47d8aa225ee0d57668684ba34737192bef76fc39",
+      "orbit360-platform/modules/cobros.js": "6a3c521b8973b15504ef569e819651219ebb6363",
+      "orbit360-platform/index.html": "6309531946f8363dbcf444f61a3fca61d84070c2"
+    },
+    "previewProofStrengthened": true
   }
 }

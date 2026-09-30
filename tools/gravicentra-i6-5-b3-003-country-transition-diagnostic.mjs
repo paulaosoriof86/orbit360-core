@@ -131,8 +131,11 @@ async function installTrace(page){
       const host=document.getElementById('host');
       const k=[...host?.querySelectorAll?.('[data-currency-safe-metric]')||[]].map(n=>(n.textContent||'').trim());
       const aging=[...host?.querySelectorAll?.('[data-aging-currency]')||[]].map(n=>n.getAttribute('data-aging-currency'));
-      const rows=[...host?.querySelectorAll?.('table.tbl tbody tr')||[]].slice(0,15).map(n=>(n.textContent||'').replace(/\s+/g,' ').trim().slice(0,350));
-      return {at:performance.now(),country:window.Orbit?.pais||'',selected:document.getElementById('pais-sel')?.value||'',kpis:k,aging,rowCount:host?.querySelectorAll?.('table.tbl tbody tr')?.length||0,rows};
+      const rowNodes=[...host?.querySelectorAll?.('table.tbl tbody tr')||[]];
+      const rows=rowNodes.slice(0,15).map(n=>(n.textContent||'').replace(/\s+/g,' ').trim().slice(0,350));
+      const rowIdentities=rowNodes.map(n=>({clienteId:String(n.getAttribute('data-row-client-id')||''),polizaId:String(n.getAttribute('data-row-policy-id')||''),rowCountry:String(n.getAttribute('data-row-country')||'').trim().toUpperCase()}));
+      const loading=host?.getAttribute?.('aria-busy')==='true'||/Actualizando pa[ií]s/i.test(host?.textContent||'');
+      return {at:performance.now(),country:window.Orbit?.pais||'',selected:document.getElementById('pais-sel')?.value||'',kpis:k,aging,rowCount:rowNodes.length,rows,rowIdentities,loading};
     };
     const pushEvent=(type)=>t.events.push({seq:++t.seq,type,at:performance.now(),country:window.Orbit?.pais||'',selected:document.getElementById('pais-sel')?.value||''});
     document.addEventListener('orbit:pais',()=>pushEvent('orbit:pais'));
@@ -169,7 +172,9 @@ async function transition(page,country){
   await sleep(1200);
   return page.evaluate(country=>{
     const t=window.__b3003country,host=document.getElementById('host');
-    const tableRows=[...host.querySelectorAll('table.tbl tbody tr')].map(n=>(n.textContent||'').replace(/\s+/g,' ').trim());
+    const tableNodes=[...host.querySelectorAll('table.tbl tbody tr')];
+    const tableRows=tableNodes.map(n=>(n.textContent||'').replace(/\s+/g,' ').trim());
+    const rowIdentities=tableNodes.map(n=>({clienteId:String(n.getAttribute('data-row-client-id')||''),polizaId:String(n.getAttribute('data-row-policy-id')||''),rowCountry:String(n.getAttribute('data-row-country')||'').trim().toUpperCase()}));
     const countryTokens={GT:tableRows.filter(x=>/·\s*GT\b/.test(x)).length,CO:tableRows.filter(x=>/·\s*CO\b/.test(x)).length};
     const adapter=window.Orbit?.cobrosCarteraProjectionAdapter;
     const snap=adapter?.snapshot?.('')||{};
@@ -180,7 +185,7 @@ async function transition(page,country){
     return {
       requested:country,final:t.snapshot(),events:t.events.slice(),renders:t.renders.slice(),mutations:t.mutations.slice(),
       direct:{cart:Orbit.q.carteraGlobalPorMoneda(),aging:Orbit.q.agingVencidoPorMoneda()},
-      renderedTable:{rows:tableRows.length,countryTokens,firstRows:tableRows.slice(0,20)},
+      renderedTable:{rows:tableRows.length,countryTokens,firstRows:tableRows.slice(0,20),rowIdentities},
       adapter:{cobros:(snap.cobros||[]).length,reported:(snap.reported||[]).length,portfolio:(snap.portfolio||[]).length,cobroCountries:rowCountries(snap.cobros),reportedCountries:rowCountries(snap.reported),portfolioCountries:rowCountries(snap.portfolio)}
     };
   },country);
@@ -210,7 +215,25 @@ try{
   evidence.transitions.CO=await transition(page,'CO');
   evidence.transitions.GT=await transition(page,'GT');
   evidence.transitions.TODOS=await transition(page,'TODOS');
-  const co=evidence.transitions.CO,gt=evidence.transitions.GT;
+  const co=evidence.transitions.CO,gt=evidence.transitions.GT,all=evidence.transitions.TODOS;
+  const indexes={clientes:indexRows(independentData.clientes),polizas:indexRows(independentData.polizas)};
+  const canonicalByPolicy=Object.fromEntries((independentData.polizas||[]).map(p=>[entityId(p),summarizeLineage(p,independentData,indexes).canonicalCountryCandidate]));
+  const foreignLeaks=(tr,country)=>(tr?.renderedTable?.rowIdentities||[]).filter(x=>x.polizaId&&canonicalByPolicy[x.polizaId]&&canonicalByPolicy[x.polizaId]!==country).length;
+  const mutationLeaks=(tr,country)=>Math.max(0,...(tr?.mutations||[]).map(x=>(x?.snapshot?.rowIdentities||[]).filter(y=>y.polizaId&&canonicalByPolicy[y.polizaId]&&canonicalByPolicy[y.polizaId]!==country).length));
+  evidence.independentUiAdjudication={
+     GT:{foreignCountryLeakCount:foreignLeaks(gt,'GT'),transitionLeakCount:mutationLeaks(gt,'GT')},
+     CO:{foreignCountryLeakCount:foreignLeaks(co,'CO'),transitionLeakCount:mutationLeaks(co,'CO')},
+     loadingSeen:{GT:(gt.mutations||[]).some(x=>x?.snapshot?.loading),CO:(co.mutations||[]).some(x=>x?.snapshot?.loading),TODOS:(all.mutations||[]).some(x=>x?.snapshot?.loading)},
+     focal9758:{polizaId:evidence.independentTruth.focal9758?.polizaId||'',canonicalCountry:evidence.independentTruth.focal9758?.canonicalCountryCandidate||''}
+   };
+  need(evidence.independentTruth.policyLineageCountryConflicts===0,'B3_003_INDEPENDENT_COUNTRY_CONFLICT');
+  need(evidence.independentUiAdjudication.GT.foreignCountryLeakCount===0,'B3_003_GT_INDEPENDENT_FIRESTORE_LEAK');
+  need(evidence.independentUiAdjudication.CO.foreignCountryLeakCount===0,'B3_003_CO_INDEPENDENT_FIRESTORE_LEAK');
+  need(evidence.independentUiAdjudication.GT.transitionLeakCount===0&&evidence.independentUiAdjudication.CO.transitionLeakCount===0,'B3_003_PRIOR_COUNTRY_PAINT_DURING_TRANSITION');
+  need(evidence.independentUiAdjudication.loadingSeen.GT&&evidence.independentUiAdjudication.loadingSeen.CO&&evidence.independentUiAdjudication.loadingSeen.TODOS,'B3_003_LOADING_FRAME_NOT_OBSERVED');
+  need(evidence.independentUiAdjudication.focal9758.canonicalCountry==='CO','B3_003_9758_CANONICAL_NOT_CO');
+  need((co.renderedTable.rowIdentities||[]).some(x=>x.polizaId===evidence.independentUiAdjudication.focal9758.polizaId),'B3_003_9758_MISSING_FROM_CO');
+  need(!(gt.renderedTable.rowIdentities||[]).some(x=>x.polizaId===evidence.independentUiAdjudication.focal9758.polizaId),'B3_003_9758_LEAKS_INTO_GT');
   evidence.demonstrated={
     renderedCountryLeak:co.renderedTable.countryTokens.GT>0||gt.renderedTable.countryTokens.CO>0,
     adapterVsRendererSplit:(co.adapter.cobroCountries.length===0||co.adapter.cobroCountries.every(x=>x==='CO'))&&co.renderedTable.countryTokens.GT>0,
@@ -221,7 +244,9 @@ try{
     domSelfAssertionNotUsedAsCountryTruth:true,
     readModelCountryResolutionDefect:evidence.independentTruth.readModelCountryResolutionDefect
   };
-  evidence.status='DIAGNOSTIC_COMPLETE';
+  evidence.status='PASS';
+  evidence.assertions={independentFirestoreTruth:true,foreignCountryLeakCountGt:0,foreignCountryLeakCountCo:0,focal9758Explicit:true,countryLoadingFrameObserved:true,noPriorCountryPaintDuringTransition:true,noBrowserErrors:evidence.errors.length===0};
+  need(evidence.errors.length===0,'B3_003_BROWSER_ERRORS:'+JSON.stringify(evidence.errors));
   fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(evidence,null,2)+'\n');
   console.log('B3_003_COUNTRY_DIAGNOSTIC=COMPLETE');
   console.log('B3_003_COUNTRY_DISCRIMINANTS='+JSON.stringify({CO:{renders:co.renders.length,mutations:co.mutations.length,table:co.renderedTable.countryTokens,adapter:co.adapter,directCurrencies:co.direct.cart.currencies,kpis:co.final.kpis},GT:{renders:gt.renders.length,mutations:gt.mutations.length,table:gt.renderedTable.countryTokens,adapter:gt.adapter,directCurrencies:gt.direct.cart.currencies,kpis:gt.final.kpis}}));

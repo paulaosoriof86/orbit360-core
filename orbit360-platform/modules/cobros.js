@@ -45,9 +45,13 @@ Orbit.modules.cobros = (function () {
     return p && p !== 'TODOS' ? p : '';
   }
   function rowCountry(c, idx) {
+    if (q && typeof q.policyLinkedCountry === 'function') {
+      const canonical = q.policyLinkedCountry(c, idx && idx.clients, idx && idx.policies);
+      if (canonical) return canonical;
+    }
     const p = indexPolicy(idx, c && c.polizaId);
     const cli = indexClient(idx, c && c.clienteId) || (p ? indexClient(idx, p.clienteId) : null);
-    return String((cli && cli.pais) || (c && c.pais) || (p && p.pais) || '').trim().toUpperCase();
+    return String((p && p.pais) || (c && c.pais) || (cli && cli.pais) || '').trim().toUpperCase();
   }
   function countryMatches(c, idx) {
     const selected = activeCountry();
@@ -197,10 +201,10 @@ Orbit.modules.cobros = (function () {
           <thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th><th></th></tr></thead>
           <tbody>${r.map(c => {
             const p = indexPolicy(idx, c.polizaId);
-            if (c.__reportedEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-reported-payment-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado · por validar</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right"><button class="btn ghost sm" onclick="event.stopPropagation();Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')">Abrir recibo</button></td></tr>`; }
+            if (c.__reportedEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-reported-payment-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado · por validar</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right"><button class="btn ghost sm" onclick="event.stopPropagation();Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')">Abrir recibo</button></td></tr>`; }
 
             const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
-            return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" onclick="Orbit.modules.cobros.detalle('${c.id}')">
+            return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" onclick="Orbit.modules.cobros.detalle('${c.id}')">
               <td>${K.clienteCell(c.clienteId)}</td>
               <td>${p ? `<a class="mono" style="font-size:12px;color:var(--red);cursor:pointer" title="Ver póliza" onclick="event.stopPropagation();Orbit.modules.cliente360.verPoliza('${p.id}')">${U.esc(U.text(p.numero))}</a>` : '<span class="mono" style="font-size:12px">—</span>'}</td>
               <td>${U.esc(U.text(c.cuota))}</td>
@@ -447,7 +451,8 @@ Orbit.modules.cobros = (function () {
 
   /* ---- Preparación de cobro por LOTE (selecciona recibos pendientes/vencidos) ---- */
   function lote() {
-    const arr = S().all('cobros').filter(c => { if (c.estado !== 'Pendiente' && c.estado !== 'Vencido') return false; const cli = S().get('clientes', c.clienteId); return !Orbit.pais || Orbit.pais === 'TODOS' || (cli && cli.pais === Orbit.pais); }).sort((a, b) => (a.vence || '').localeCompare(b.vence || ''));
+    const idx = buildIndex();
+    const arr = S().all('cobros').filter(c => (c.estado === 'Pendiente' || c.estado === 'Vencido') && countryMatches(c, idx)).sort((a, b) => (a.vence || '').localeCompare(b.vence || ''));
     const incl = new Set(arr.map(c => c.id));
     let back = document.getElementById('cob-lote'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'cob-lote'; back.className = 'drawer-back open';

@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+  "status": "B3_003_CANDIDATE_PENDING_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-003",
     "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+    "status": "CANDIDATE_PENDING_PREVIEW",
     "blocking": true,
     "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
     "requiredProof": [
@@ -59,15 +59,38 @@
       "COUNTRY_CHANGE_DOUBLE_RENDER"
     ],
     "countryLineageDiagnosis": "PENDING_INDEPENDENT_FIRESTORE_TRUTH",
-    "currentRemediationAuthorizedProductFiles": [
-      "orbit360-platform/core/queries.js",
-      "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/index.html"
-    ],
+    "currentRemediationAuthorizedProductFiles": [],
     "rootCauseClassification": "READ_MODEL_COUNTRY_RESOLUTION_DEFECT",
     "precedenceDefectCount": 42,
     "focalPolicyNumber": "9758",
-    "transitionRemediation": "EXPLICIT_LOADING_FRAME_BEFORE_COUNTRY_RENDER"
+    "transitionRemediation": "EXPLICIT_LOADING_FRAME_BEFORE_COUNTRY_RENDER",
+    "countryLineageFix": {
+      "status": "CAUSAL_SOURCE_FIX_BOUND_PENDING_EXACT_PREVIEW",
+      "findingId": "B3-003",
+      "rootCause": "CLIENT_COUNTRY_PRECEDENCE_OVERRIDES_EXPLICIT_POLICY_COUNTRY_PLUS_COUNTRY_SWITCH_OLD_CONTENT_PAINT_WINDOW",
+      "changedProductFiles": [
+        "orbit360-platform/core/queries.js",
+        "orbit360-platform/modules/cobros.js",
+        "orbit360-platform/index.html"
+      ],
+      "exactBlobBindings": {
+        "orbit360-platform/core/queries.js": "47d8aa225ee0d57668684ba34737192bef76fc39",
+        "orbit360-platform/modules/cobros.js": "6a3c521b8973b15504ef569e819651219ebb6363",
+        "orbit360-platform/index.html": "6309531946f8363dbcf444f61a3fca61d84070c2"
+      },
+      "canonicalCountryContract": "policy.pais > explicit linked financial row pais > cliente.pais fallback; conflicting explicit policy/row country => REQUIERE_VALIDACION",
+      "rowIdentityQaAttributes": [
+        "data-row-client-id",
+        "data-row-policy-id"
+      ],
+      "transitionContract": "explicit loading frame via requestAnimationFrame; no timeout; no prior-country data painted",
+      "independentPreviewProof": "tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs",
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false,
+      "b3002MustRegress": true
+    },
+    "sourceFixHead": "04654ed123a6834c4ae2e6d5f3bd6187ddf6a321"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -79,7 +102,6 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_CAUSAL_SOURCE_FIX",
     "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
     "B3_003_TARGETED_VISUAL_PASS"
   ],
@@ -109,7 +131,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,

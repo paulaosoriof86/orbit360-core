@@ -66,13 +66,28 @@
       var paises = Orbit.PAISES || [{id:'TODOS',label:'Todos los países'}];
       sel.innerHTML = paises.map(function(p){return '<option value="'+p.id+'">'+p.label+'</option>';}).join('');
       sel.value = Orbit.pais || 'TODOS';
+      var countryRenderSeq = 0;
       sel.addEventListener('change', function(){
-        Orbit.pais = sel.value;
-        document.dispatchEvent(new CustomEvent('orbit:pais'));
-        if (Orbit.productAppP0 && Orbit.productAppP0.isStarted && Orbit.productAppP0.isStarted()) {
-          if (!location.hash) location.hash = '#/inicio';
-          try { window.dispatchEvent(new HashChangeEvent('hashchange')); } catch(e) { window.dispatchEvent(new Event('hashchange')); }
+        var next = sel.value || 'TODOS';
+        if ((Orbit.pais || 'TODOS') === next) return;
+        Orbit.pais = next;
+        var host = document.getElementById('host');
+        var seq = ++countryRenderSeq;
+        if (host) {
+          host.setAttribute('aria-busy','true');
+          host.innerHTML = '<div class="page"><div class="modstate"><div class="ms-ico">🌎</div><h2>Actualizando país…</h2><p>Preparando la vista seleccionada.</p></div></div>';
         }
+        window.requestAnimationFrame(function(){
+          if (seq !== countryRenderSeq) return;
+          document.dispatchEvent(new CustomEvent('orbit:pais'));
+          if (Orbit.productAppP0 && Orbit.productAppP0.isStarted && Orbit.productAppP0.isStarted()) {
+            if (!location.hash) location.hash = '#/inicio';
+            else {
+              try { window.dispatchEvent(new HashChangeEvent('hashchange')); } catch(e) { window.dispatchEvent(new Event('hashchange')); }
+            }
+          }
+          if (host) host.removeAttribute('aria-busy');
+        });
       });
     })();
     document.getElementById('sw-theme').addEventListener('click',function(e){e.stopPropagation();Orbit.theme.picker(this);});
