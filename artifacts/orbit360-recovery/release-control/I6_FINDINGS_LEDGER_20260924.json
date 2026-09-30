@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R8_EXACT_PREVIEW",
+      "nextAction": "B3_004_R9_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1472,6 +1472,12 @@
         "failedJobId": 110141522768,
         "status": "FIXED_PENDING_RERUN",
         "productRegressionDemonstrated": false
+      },
+      "r9ContractPass": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_SOURCE_CONTRACT_PASS_NORMALIZED_20260930.json",
+        "blobSha": "ae1386baedd9117d1fb7c524f5d92e4fb82f87de",
+        "runId": 36790602214,
+        "jobId": 110142340406
       }
     },
     {
@@ -5080,7 +5086,7 @@
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
-    "compositionLockBlobSha": "f1d347fa661f4f3402fa97e54fd09911e4810ef8",
+    "compositionLockBlobSha": "b82ef50b2e7c8e29ea41e6db57dd934ce17e12d7",
     "noLive": true,
     "noReimport": true,
     "mechanismRootFix": {
@@ -5106,6 +5112,7 @@
     "r8MachineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_MACHINE_PASS_20260930.json",
     "r9VisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_TARGETED_VISUAL_REJECTION_20260930.json",
     "r9SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_CAUSAL_SOURCE_FIX_20260930.json",
-    "r9ValidatorRepairStatus": "FIXED_PENDING_RERUN"
+    "r9ValidatorRepairStatus": "FIXED_PENDING_RERUN",
+    "r9ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_SOURCE_CONTRACT_PASS_NORMALIZED_20260930.json"
   }
 }

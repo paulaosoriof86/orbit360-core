@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R9_SOURCE_CONTRACT_PASS_NORMALIZED_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "PASS_PENDING_EXACT_PREVIEW",
+  "sourceSha": "4319ad47c7a2288bde356865d56412418a2bc0f9",
+  "contractRunId": 36790602214,
+  "contractJobId": 110142340406,
+  "contractBlobSha": "27ac24d42ed81db2dfed6bb45b153ce173302ee6",
+  "workflowPriorConclusion": "failure_after_contract_pass",
+  "postPassFailure": {
+    "code": "HTTP_403_WORKFLOW_DISPATCH_RESOURCE_NOT_ACCESSIBLE_BY_INTEGRATION",
+    "cause": "Workflow GITHUB_TOKEN has Actions:read only; self-dispatch occurred after all R9 source and readmodel contracts passed."
+  },
+  "assertions": {
+    "baseSourceContract": true,
+    "surfaceContract": true,
+    "paymentProvenance": true,
+    "actionSurface": true,
+    "applyVsReconcile": true,
+    "crmMigrationOrigin": true,
+    "r6OriginScopePerformance": true,
+    "r61AdvisorRuntime": true,
+    "r7Visibility": true,
+    "r8Causal": true,
+    "r9HumanRejectionCausal": true,
+    "r8CancelledPolicyReadModel": true
+  },
+  "workflowRepair": {
+    "blobSha": "1d6954245eed7e0c7267a6a9b6a065454517803c",
+    "selfDispatchRemoved": true,
+    "r9CheckpointNaming": true,
+    "newOwnerSyntaxChecks": true
+  },
+  "compositionBlobSha": "b82ef50b2e7c8e29ea41e6db57dd934ce17e12d7",
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "syntheticWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  }
+}

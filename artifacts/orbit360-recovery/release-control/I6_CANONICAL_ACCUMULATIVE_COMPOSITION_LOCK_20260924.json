@@ -222,7 +222,7 @@
     "SAME_ACCEPTED_ARTIFACT_PREVIEW_TO_LIVE"
   ],
   "lastRemediation": {
-    "status": "B3_004_R9_SOURCE_FIXED_PENDING_CONTRACT",
+    "status": "B3_004_R9_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
     "findingId": "B3-004",
     "recordedAt": "2026-09-30",
     "causes": [
@@ -236,10 +236,18 @@
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "1aaf128d1fdf25efbd93ff8df53b7e55d0dbe124",
       "orbit360-platform/index.html": "116d5aec63774e1b33af5737b79472cdaeec8b3b"
     },
-    "qaContractBlobSha": "176486211094f3539c188e201b530c4382b8307b",
+    "qaContractBlobSha": "27ac24d42ed81db2dfed6bb45b153ce173302ee6",
     "noDataMutation": true,
     "noReimport": true,
-    "noLive": true
+    "noLive": true,
+    "workflowBlobSha": "1d6954245eed7e0c7267a6a9b6a065454517803c",
+    "contractRunId": 36790602214,
+    "contractJobId": 110142340406,
+    "contractPassedBeforePostPassDispatch403": true,
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "live": false
   },
   "lastMechanismRootFix": {
     "status": "FIXED_PENDING_RERUN",

@@ -302,7 +302,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R8_EXACT_PREVIEW",
+    "nextAction": "B3_004_R9_EXACT_PREVIEW",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -485,20 +485,26 @@
       "failedJobId": 110141522768,
       "status": "FIXED_PENDING_RERUN",
       "productRegressionDemonstrated": false
+    },
+    "r9ContractPass": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9_SOURCE_CONTRACT_PASS_NORMALIZED_20260930.json",
+      "blobSha": "ae1386baedd9117d1fb7c524f5d92e4fb82f87de",
+      "runId": 36790602214,
+      "jobId": 110142340406
     }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "f1d347fa661f4f3402fa97e54fd09911e4810ef8",
+    "blobSha": "b82ef50b2e7c8e29ea41e6db57dd934ce17e12d7",
     "productFileCount": 79
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "63bf53f9af03d044cbe63cca9d7065093ab9ef81"
+    "blobSha": "3cbd1f6192c050e5a468ccd0a966283261f92f1a"
   },
   "nextRequiredProof": [
-    "B3_004_R8_EXACT_PREVIEW_MACHINE_PASS",
-    "B3_004_R8_TARGETED_VISUAL_PASS"
+    "B3_004_R9_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_R9_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
