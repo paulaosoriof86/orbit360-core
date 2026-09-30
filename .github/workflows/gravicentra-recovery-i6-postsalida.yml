@@ -96,6 +96,7 @@ on:
       - 'orbit360-platform/modules/cobros.js'
       - 'tools/gravicentra-i6-5-b3-001-contract.mjs'
       - 'tools/gravicentra-i6-5-b3-002-performance-readonly.mjs'
+      - 'tools/gravicentra-i6-5-b3-003-kpi-aging-readonly.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json'
       - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
 
@@ -6250,3 +6251,67 @@ jobs:
       - name: B3-002 failure remains fail-closed
         if: ${{ failure() && steps.mode.outputs.run == 'true' }}
         run: echo "B3_002_FAILED_NO_LIVE_NO_DATA_WRITE_NO_REIMPORT_NO_B4"
+
+
+  i65-b3-003-kpi-aging-readonly:
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B3_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate B3-003 read-only KPI diagnostic
+        id: gate
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const b=JSON.parse(fs.readFileSync(process.env.B3_LOCK,'utf8'));
+          const run=c.i65ForensicRemediationPlan?.currentBlock==='B3'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_003_DIAGNOSTIC'
+            && c.i65ForensicRemediationPlan?.b3?.status==='B3_003_READ_ONLY_DIAGNOSTIC_ACTIVE'
+            && b.status==='B3_003_READ_ONLY_DIAGNOSTIC_ACTIVE'
+            && b.activeFinding?.id==='B3-003'
+            && b.boundaries?.productMutationAuthorized===false
+            && b.boundaries?.dataMutationAuthorized===false
+            && b.boundaries?.reimportAuthorized===false
+            && b.boundaries?.liveHostingPromotionAuthorized===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B3_003_DIAGNOSTIC_MODE='+(run?'RUN':'NOOP'));
+          NODE
+      - name: Validate B3-003 diagnostic harness
+        if: steps.gate.outputs.run == 'true'
+        run: node --check tools/gravicentra-i6-5-b3-003-kpi-aging-readonly.mjs
+      - name: Install read-only Firestore dependency
+        if: steps.gate.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+      - name: Measure B3-003 authoritative financial data
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B3_003_OUT: ${{ runner.temp }}/b3-003-kpi-aging-readonly.json
+        run: node tools/gravicentra-i6-5-b3-003-kpi-aging-readonly.mjs
+      - name: Upload B3-003 diagnostic evidence
+        if: always() && steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b3-003-diagnostic-${{ github.run_id }}
+          path: ${{ runner.temp }}/b3-003-kpi-aging-readonly.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+      - name: Preserve B3-003 fail-closed boundary
+        if: always() && steps.gate.outputs.run == 'true'
+        run: echo "B3_003_DIAGNOSTIC_ONLY_NO_PRODUCT_MUTATION_NO_BUSINESS_WRITES_NO_REIMPORT_NO_LIVE"
