@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_VISUAL_AUTH",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -3184,13 +3184,13 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "B3_004_PREVIEW_MACHINE_PASS_TARGETED_VISUAL_AUTH_BLOCKED",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "1050973d5f38342ecb902664afebe9166ec68fc6",
+      "executionLockBlobSha": "768c080cba7e1154e96025c40a5249ad67424e86",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3221,7 +3221,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "14236be8dd5d3d78f6b93f1ab1264e8b6347bdf3",
+      "findingLedgerBlobSha": "fab4eb9d9db560022dad0bef0a5801b0c5c0cf4c",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "diagnosticRunId": 36658190622,
@@ -3761,6 +3761,13 @@
         "status": "PASS_PENDING_TARGETED_VISUAL",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_MACHINE_PASS_20260930.json",
         "receiptBlobSha": "6d11ecba53d570b514c75590d6e144a97c1fc770"
+      },
+      "r61VisualAutomationBlock": {
+        "status": "AUTH_PROFILE_SETUP_REQUIRED",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_TARGETED_VISUAL_AUTOMATION_BLOCKED_AUTH_20260930.json",
+        "receiptBlobSha": "c62a956ab7d78850a833e2a6651c2cf6b60144ba",
+        "tinyFishRunId": "c6d912d4-9d97-48ff-934a-f886f5f0e8c2",
+        "productFailure": false
       }
     }
   },

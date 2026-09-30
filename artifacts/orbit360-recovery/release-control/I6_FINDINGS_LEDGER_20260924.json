@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "PREVIEW_MACHINE_PASS_TARGETED_VISUAL_AUTH_BLOCKED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R6_1_TARGETED_VISUAL",
+      "nextAction": "B3_004_R6_1_AUTHENTICATE_TINYFISH_PROFILE_THEN_TARGETED_VISUAL",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1281,6 +1281,12 @@
         "runId": 36763283882,
         "artifactId": "11120555043",
         "artifactDigest": "60db8f505d6809b97e6ad527bf2797c1a7e796c7a9d8cbe8be2b5b9864acdf06"
+      },
+      "r61VisualAutomationBlock": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_TARGETED_VISUAL_AUTOMATION_BLOCKED_AUTH_20260930.json",
+        "blobSha": "c62a956ab7d78850a833e2a6651c2cf6b60144ba",
+        "tinyFishRunId": "c6d912d4-9d97-48ff-934a-f886f5f0e8c2",
+        "productFailure": false
       }
     },
     {
