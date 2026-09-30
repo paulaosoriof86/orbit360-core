@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "ays-cotcomp-s446-final-readonly-runtime-receipt-v1.0",
+  "capturedAt": "2026-09-30",
+  "projectId": "ays-orbit-360-lab",
+  "region": "us-central1",
+  "runId": 36785840790,
+  "artifactId": "11129294030",
+  "artifactDigest": "sha256:282bf1bb5ed3d1b2c8ffafe547c8638418a132852819647ad2beadc2e596e051",
+  "canonicalSource": {
+    "branch": "recovery/fase-a-clean-20260831",
+    "head": "43b64b77c39b86153a5a34abb50d29da4074ec96",
+    "path": "functions/ops-leads-domain.js",
+    "expectedOwnerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+    "cotcompRefSupport": true
+  },
+  "deployedRuntime": {
+    "function": "orbit360OpsLeadsCommand",
+    "state": "ACTIVE",
+    "environment": "GEN_2",
+    "runtime": "nodejs22",
+    "updateTime": "2026-09-13T02:56:31.995474351Z",
+    "buildId": "projects/646761409743/locations/us-central1/builds/f7023f11-606f-4be9-8aa5-a0dc839b858c",
+    "deployedOwnerBlob": "d0a1e116186bba860d34ec540e8abba81830b553",
+    "sourceArchiveReadSuccessful": true,
+    "exactOwnerBlobMatch": false,
+    "cotcompRefSupport": false
+  },
+  "blocker": "DEPLOYED_OWNER_BLOB_MISMATCH",
+  "impact": {
+    "w2RuntimeCompatibleNow": false,
+    "reason": "DEPLOYED_OWNER_MISSING_S420_COTCOMPREF_SCHEMA",
+    "w2WritesRemainClosed": true
+  },
+  "w2Candidate": {
+    "executionEnabled": false,
+    "callsAllowed": false,
+    "writesAllowed": false,
+    "payloadBoundRequestIdentity": true,
+    "canonicalCotcompRefSchema": true,
+    "notificationOutboxExpectedOnSuccessfulOwnerCreate": true,
+    "providerDeliveryIsolationRequired": true,
+    "outboxJournalAndCleanupRequired": true,
+    "runtimeConfigReadbackRequired": true,
+    "cleanupHarnessRequired": true
+  },
+  "proofBoundaries": {
+    "appDataReadsExecuted": 0,
+    "appDataWritesExecuted": 0,
+    "deployExecuted": false,
+    "iamMutationExecuted": false,
+    "firebaseConfigMutationExecuted": false,
+    "productionTouched": false
+  }
+}
