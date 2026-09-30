@@ -19,6 +19,7 @@ test('deployed owner is explicitly frozen as lacking S4.20 cotcompRef support',(
   const x=s.currentState();
   assert.equal(x.observed.deployedOwnerCotcompRefSupport,false);
   assert.ok(x.observed.blockers.includes('DEPLOYED_OWNER_BLOB_MISMATCH'));
+  assert.ok(x.observed.blockers.includes('COTCOMP_REF_NOT_DEPLOYED'));
   assert.equal(x.w2.runtimeCompatibleNow,false);
   assert.equal(x.w2.primaryRuntimeBlocker,'DEPLOYED_OWNER_MISSING_S420_COTCOMPREF_SCHEMA');
 });
