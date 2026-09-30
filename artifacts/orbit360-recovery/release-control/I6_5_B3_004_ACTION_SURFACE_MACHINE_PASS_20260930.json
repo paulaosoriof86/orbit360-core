@@ -1,0 +1,58 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_ACTION_SURFACE_MACHINE_PASS_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "findingId": "B3-004",
+  "subFindingId": "B3-004-R3-RECEIPT-ACTION-AND-PORTFOLIO-COMPOSITION",
+  "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "machineProof": {
+    "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
+    "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36731992802-73gn7z1h.web.app",
+    "channelId": "gi-b3004-36731992802",
+    "runId": 36731992802,
+    "jobId": 109943763569,
+    "artifactId": 11105322952,
+    "artifactDigest": "feb706ea24e5166b43321b2a6120d54e186fa195e1731b4ed6f2ccdd07bb7f79",
+    "artifactSizeBytes": 4397372,
+    "previewBackendPass": true,
+    "exactHostingReadbackPass": true,
+    "syntheticProofPass": true,
+    "cleanupPass": true,
+    "clientReportAutoApplied": true,
+    "secondHumanApprovalRequired": false,
+    "idempotentRetry": true,
+    "singleCobro": true,
+    "applicationEnrichesSameCobro": true,
+    "paymentProvenancePreserved": true,
+    "paidDateSeparatedFromApplicationDate": true,
+    "invoiceNumberPersisted": true,
+    "receiptUpdated": true,
+    "portfolioUpdated": true,
+    "liveUnchanged": true,
+    "liveBindingSource": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+    "liveBindingBuild": "gi-i65-4bf67a373875-57f234755dc1"
+  },
+  "sourceBlobs": {
+    "orbit360-platform/modules/cobros.js": "3ef70a2e3cbbd62ab245788096cbc41e02aa733f",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
+  },
+  "proofMarkers": [
+    "B3_004_PREVIEW_BACKEND_REUSE=PASS",
+    "B3_004_PREVIEW_BACKEND=PASS",
+    "B3_004_HOSTING_READBACK=PASS",
+    "B3_004_SYNTHETIC_PROOF=PASS",
+    "B3_004_MACHINE_PASS=PASS",
+    "LIVE_BINDING=PASS"
+  ],
+  "boundaries": {
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextRequiredProof": [
+    "B3_004_TARGETED_VISUAL_PASS"
+  ]
+}

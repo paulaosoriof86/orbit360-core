@@ -392,7 +392,7 @@
     "noLive": true
   },
   "b3004ActionSurfaceFix": {
-    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "findingId": "B3-004",
     "subFindingId": "B3-004-R3-RECEIPT-ACTION-AND-PORTFOLIO-COMPOSITION",
     "rootCause": "EFFECTIVE_RUNTIME_OWNERS_OMIT_ACTIONS_AND_GLOBAL_COBROS_ROWS_EXCLUDE_PORTFOLIO_ONLY_RECEIPTS",
@@ -413,6 +413,36 @@
     "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_ACTION_SURFACE_CONTRACT_PASS_20260930.json",
     "contractReceiptBlobSha": "f5c5e4ea0d162452286188bebcc1a744b7ae0b17",
     "contractRunId": 36731518593,
-    "contractJobId": 109942073959
+    "contractJobId": 109942073959,
+    "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_ACTION_SURFACE_MACHINE_PASS_20260930.json",
+    "machineProofReceiptBlobSha": "e88b7dbe9ac02f8edce71021a9d6cf55f03f97e7",
+    "preview": {
+      "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
+      "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36731992802-73gn7z1h.web.app",
+      "channelId": "gi-b3004-36731992802",
+      "runId": 36731992802,
+      "jobId": 109943763569,
+      "artifactId": 11105322952,
+      "artifactDigest": "feb706ea24e5166b43321b2a6120d54e186fa195e1731b4ed6f2ccdd07bb7f79",
+      "artifactSizeBytes": 4397372,
+      "previewBackendPass": true,
+      "exactHostingReadbackPass": true,
+      "syntheticProofPass": true,
+      "cleanupPass": true,
+      "clientReportAutoApplied": true,
+      "secondHumanApprovalRequired": false,
+      "idempotentRetry": true,
+      "singleCobro": true,
+      "applicationEnrichesSameCobro": true,
+      "paymentProvenancePreserved": true,
+      "paidDateSeparatedFromApplicationDate": true,
+      "invoiceNumberPersisted": true,
+      "receiptUpdated": true,
+      "portfolioUpdated": true,
+      "liveUnchanged": true,
+      "liveBindingSource": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+      "liveBindingBuild": "gi-i65-4bf67a373875-57f234755dc1"
+    }
   }
 }
