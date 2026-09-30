@@ -1,0 +1,50 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_002_TARGETED_VISUAL_PERFORMANCE_PASS_V1",
+  "recordedAt": "2026-09-30T01:14:00Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "B3-002",
+  "status": "PASS",
+  "acceptance": {
+    "actor": "Paula Osorio",
+    "statement": "B3-002 PASS",
+    "targetPreview": {
+      "sourceSha": "af4e716464fc964894cb4e16d2c3f5a66b618022",
+      "buildId": "gi-i65-b3-af4e716464fc-57f234755dc1",
+      "url": "https://ays-orbit-360-lab--gi-i65-b3-36652377361-i66sagm4.web.app",
+      "runId": 36652377361,
+      "artifactId": 11070539732,
+      "artifactDigest": "fe342bbff3313a54b92feccf6a73f55cef6568de46ee27081b31ec0a3bc04ac5"
+    },
+    "observations": [
+      "Cobros y cartera opens quickly from the menu.",
+      "Search/detail interaction was exercised on the exact B3-002 Preview.",
+      "No performance rejection was reported for B3-002."
+    ]
+  },
+  "machineProof": {
+    "exactReadback": true,
+    "b3001RegressionContractPass": true,
+    "timingProofPass": true,
+    "warmUsableMs": 380.6,
+    "warmRenderMs": 372,
+    "initialDomRows": 60
+  },
+  "preservedBoundaries": {
+    "businessWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "b4": false
+  },
+  "separateNewFinding": {
+    "scope": "Dashboard Inicio reality reconciliation",
+    "notPartOfB3002Acceptance": true,
+    "evidence": [
+      "Inicio card shows Pendiente de cobro Q10K while Cobros pendientes modal shows 0 records.",
+      "Inicio card shows Cartera vencida Q6K while Cobros vencidos modal shows 0 records.",
+      "User reports Inicio KPI figures appear incorrect/hardcoded."
+    ],
+    "route": "B3-008 / dashboard reality reconciliation; preserve now, do not let it reopen B3-002."
+  },
+  "nextAction": "B3_003_KPI_AGING_CURRENCY_AUTHORITY_DIAGNOSTIC"
+}
