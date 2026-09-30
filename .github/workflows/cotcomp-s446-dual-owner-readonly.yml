@@ -1,0 +1,195 @@
+name: CotComp S4.46 dual workflow owner runtime readback
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-public-bridge-s47-20260929
+    paths:
+      - '.github/cotcomp-lab-intents/s446-dual-owner-readonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  EXPECTED_OWNER_BLOB: 73e09a4404cb4298dc34c9c38e26ad1f960d3170
+
+jobs:
+  dual-owner-readback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify read-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s446-dual-owner-readonly.json
+          jq -e '
+            .authorization == "S446_DUAL_READ_ONLY_WORKFLOW_OWNER_RUNTIME_VERIFICATION" and
+            .projectId == "ays-orbit-360-lab" and
+            .appDataReads == false and
+            .appDataWrites == false and
+            .deploy == false and
+            .iamWrites == false and
+            .production == false
+          ' "$INTENT" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$INTENT")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$INTENT"
+
+      - name: Prepare LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s446dual/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s446dual/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: 'latest'
+
+      - name: Authenticate exact LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" >/dev/null
+          gcloud config set project "$COTCOMP_PROJECT_ID" >/dev/null
+          test "$(gcloud config get-value project 2>/dev/null)" = "$COTCOMP_PROJECT_ID"
+
+      - name: Read both Leads Ops runtime sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          import json, os, subprocess, pathlib, zipfile, tarfile, shutil, hashlib
+
+          root=pathlib.Path(os.environ["RUNNER_TEMP"])/"s446dual"
+          evidence=root/"evidence"
+          project=os.environ["COTCOMP_PROJECT_ID"]
+          region=os.environ["COTCOMP_REGION"]
+          expected=os.environ["EXPECTED_OWNER_BLOB"]
+          functions=["orbit360OpsLeadsCommand","orbit360OpsLeadsCommandLabV20260804"]
+          rows=[]
+
+          for fn in functions:
+              desc=root/f"{fn}.json"
+              p=subprocess.run([
+                  "gcloud","functions","describe",fn,"--gen2",
+                  "--region",region,"--project",project,"--format=json"
+              ],capture_output=True,text=True)
+              if p.returncode!=0:
+                  rows.append({"name":fn,"present":False,"state":None,"ownerBlob":None,"exactMatch":False})
+                  continue
+              desc.write_text(p.stdout)
+              d=json.loads(p.stdout)
+              s=((d.get("buildConfig") or {}).get("source") or {}).get("storageSource") or {}
+              bucket=s.get("bucket"); obj=s.get("object"); gen=s.get("generation")
+              if not bucket or not obj:
+                  raise SystemExit(f"S446DUAL_STORAGE_SOURCE_MISSING_{fn}")
+
+              archive=root/f"{fn}.archive"
+              uri=f"gs://{bucket}/{obj}" + (f"#{gen}" if gen else "")
+              cp=subprocess.run(["gcloud","storage","cp",uri,str(archive)],capture_output=True,text=True)
+              if cp.returncode!=0:
+                  cp=subprocess.run(["gsutil","cp",uri,str(archive)],capture_output=True,text=True)
+              if cp.returncode!=0:
+                  raise SystemExit(f"S446DUAL_SOURCE_READ_FAILED_{fn}")
+
+              extract=root/f"{fn}.src"
+              extract.mkdir(parents=True,exist_ok=True)
+              if zipfile.is_zipfile(archive):
+                  with zipfile.ZipFile(archive) as z: z.extractall(extract)
+              elif tarfile.is_tarfile(archive):
+                  with tarfile.open(archive) as t: t.extractall(extract)
+              else:
+                  raise SystemExit(f"S446DUAL_ARCHIVE_FORMAT_{fn}")
+
+              owners=sorted(extract.rglob("ops-leads-domain.js"))
+              if not owners:
+                  raise SystemExit(f"S446DUAL_OWNER_FILE_MISSING_{fn}")
+              owner=owners[0]
+              blob=subprocess.check_output(["git","hash-object",str(owner)],text=True).strip()
+              source=owner.read_text(errors="replace")
+              archive_sha=hashlib.sha256(archive.read_bytes()).hexdigest()
+
+              rows.append({
+                  "name":fn,
+                  "present":True,
+                  "state":d.get("state"),
+                  "runtime":(d.get("buildConfig") or {}).get("runtime"),
+                  "entryPoint":(d.get("buildConfig") or {}).get("entryPoint"),
+                  "updateTime":d.get("updateTime"),
+                  "revision":(d.get("serviceConfig") or {}).get("revision"),
+                  "sourceGeneration":gen,
+                  "sourceArchiveSha256":archive_sha,
+                  "ownerBlob":blob,
+                  "expectedOwnerBlob":expected,
+                  "exactMatch":blob==expected,
+                  "containsCotcompRef":"cotcompRef" in source,
+                  "containsOpsLeadsExport":"orbit360OpsLeadsCommand" in source
+              })
+              shutil.rmtree(extract,ignore_errors=True)
+              archive.unlink(missing_ok=True)
+              desc.unlink(missing_ok=True)
+
+          summary={
+              "schemaVersion":"ays-cotcomp-s446-dual-runtime-readback-v1.0",
+              "projectId":project,
+              "region":region,
+              "expectedOwnerBlob":expected,
+              "functions":rows,
+              "allPresentActive":all(r.get("present") and r.get("state")=="ACTIVE" for r in rows),
+              "allExactOwnerMatch":all(r.get("exactMatch") for r in rows if r.get("present")),
+              "anyExactOwnerMatch":any(r.get("exactMatch") for r in rows),
+              "anyCotcompRef":any(r.get("containsCotcompRef") for r in rows),
+              "workflowOwnerRuntimeVerified":all(r.get("present") and r.get("state")=="ACTIVE" and r.get("exactMatch") for r in rows),
+              "appDataReadsExecuted":0,
+              "appDataWritesExecuted":0,
+              "deployExecuted":False,
+              "iamWritesExecuted":0,
+              "productionTouched":False
+          }
+          (evidence/"S446_DUAL_WORKFLOW_OWNER_RUNTIME_RECEIPT.json").write_text(json.dumps(summary,indent=2))
+          print("S446_DUAL_RUNTIME_VERIFIED="+str(summary["workflowOwnerRuntimeVerified"]).lower())
+          for r in rows:
+              print("S446_FN="+r["name"]+" STATE="+str(r.get("state"))+" BLOB="+str(r.get("ownerBlob"))+" MATCH="+str(r.get("exactMatch")).lower()+" COTCOMPREF="+str(r.get("containsCotcompRef")).lower())
+          PY
+
+      - name: Upload sanitized dual runtime evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s446-dual-owner-readback-${{ github.run_id }}
+          path: ${{ runner.temp }}/s446dual/evidence/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/s446dual/firebase-service-account.json"
