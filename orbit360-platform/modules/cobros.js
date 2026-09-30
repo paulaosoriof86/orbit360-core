@@ -6,7 +6,10 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.cobros = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
-  let st = { fq: '', fest: '', fase: '', sort: 'vence' };
+  let st = { fq: '', fest: '', fase: '', sort: 'vence', page: 1 };
+  let searchTimer = null;
+  const PAGE_SIZE = 60;
+  const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'vehiculos', 'recibosEsperados', 'carteraPrimas'];
 
   const FDEFS = () => [
     { id: 'fq', type: 'search', ph: 'Buscar cliente, póliza o placa…' },
@@ -14,40 +17,72 @@ Orbit.modules.cobros = (function () {
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
   ];
 
+  function hydrationState() {
+    let s = {};
+    try { s = S()._productStatus ? (S()._productStatus() || {}) : {}; } catch (e) {}
+    const confirmed = [].concat(s.serverConfirmedCollections || []);
+    const denied = [].concat(s.deniedCollections || []);
+    const errors = s.snapshotErrors && typeof s.snapshotErrors === 'object' ? s.snapshotErrors : {};
+    const failed = HYDRATION_DEPS.filter(name => denied.includes(name) || !!errors[name]);
+    const missing = HYDRATION_DEPS.filter(name => !confirmed.includes(name) && !failed.includes(name));
+    return { ready: missing.length === 0 && failed.length === 0, missing, failed, confirmed };
+  }
+
+  function buildIndex() {
+    const clients = new Map((S().all('clientes') || []).filter(x => x && x.id != null).map(x => [String(x.id), x]));
+    const policies = new Map((S().all('polizas') || []).filter(x => x && x.id != null).map(x => [String(x.id), x]));
+    const vehicleByPolicy = new Map();
+    (S().all('vehiculos') || []).forEach(v => {
+      const pid = String(v && v.polizaId || '');
+      if (pid && !vehicleByPolicy.has(pid)) vehicleByPolicy.set(pid, v);
+    });
+    return { clients, policies, vehicleByPolicy };
+  }
+  function indexClient(idx, id) { return idx.clients.get(String(id || '')) || null; }
+  function indexPolicy(idx, id) { return idx.policies.get(String(id || '')) || null; }
+  function rowSearchText(c, idx) {
+    const cli = indexClient(idx, c && c.clienteId), p = indexPolicy(idx, c && c.polizaId);
+    const veh = p ? idx.vehicleByPolicy.get(String(p.id)) : null;
+    return ((cli ? cli.nombre : '') + ' ' + (p ? p.numero : '') + ' ' + (veh ? veh.placa || '' : '')).toLowerCase();
+  }
+  function matchTxt(c, idx) {
+    if (st.fase && c.asesorId !== st.fase) return false;
+    if (!st.fq) return true;
+    return rowSearchText(c, idx).includes(st.fq.toLowerCase());
+  }
+
   function reportedPaymentEvidence() {
-    const linked=new Set((S().all('cobros')||[]).map(c=>String(c&&c.reciboId||'')).filter(Boolean));
-    return (S().all('recibosEsperados')||[]).filter(r=>r&&String(r.estadoOperativo||'').toLowerCase()==='pago_reportado'&&!linked.has(String(r.id||''))).map(r=>({id:'reported:'+r.id,receiptId:r.id,__reportedEvidence:true,clienteId:r.clienteId,polizaId:r.polizaId,asesorId:r.asesorId,cuota:r.cuota||r.secuencia,monto:r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:r.monto),moneda:r.moneda,vence:r.fechaLimite||r.vence||r.fechaVencimiento,fechaPago:r.fechaPagoReportada||'',estado:'Pendiente',estadoOperativo:'pago_reportado',reportado:r.fechaPagoReportada||r.reportado||true}));
+    const linked = new Set((S().all('cobros') || []).map(c => String(c && c.reciboId || '')).filter(Boolean));
+    return (S().all('recibosEsperados') || [])
+      .filter(r => r && String(r.estadoOperativo || '').toLowerCase() === 'pago_reportado' && !linked.has(String(r.id || '')))
+      .map(r => ({
+        id: 'reported:' + r.id, receiptId: r.id, __reportedEvidence: true,
+        clienteId: r.clienteId, polizaId: r.polizaId, asesorId: r.asesorId,
+        cuota: r.cuota || r.secuencia,
+        monto: r.primaTotal != null ? r.primaTotal : (r.montoTotal != null ? r.montoTotal : r.monto),
+        moneda: r.moneda, vence: r.fechaLimite || r.vence || r.fechaVencimiento,
+        fechaPago: r.fechaPagoReportada || '', estado: 'Pendiente',
+        estadoOperativo: 'pago_reportado', reportado: r.fechaPagoReportada || r.reportado || true
+      }));
   }
-  function reportedRows() {
-    if(st.fest&&st.fest!=='Reportado por cliente')return[];
-    return reportedPaymentEvidence().filter(matchTxt);
+  function reportedRows(idx) {
+    if (st.fest && st.fest !== 'Reportado por cliente') return [];
+    return reportedPaymentEvidence().filter(c => matchTxt(c, idx));
   }
 
-  function rows() {
-    return S().all('cobros').filter(c => {
+  function rows(idx) {
+    return (S().all('cobros') || []).filter(c => {
       if (c.estado === 'Anulado' && st.fest !== 'Anulado') return false;
-      // Estados de validación derivados (P0-05): reportado por cliente / conciliado / requiere validación
       const estV = estadoValidacion(c);
-      if (st.fest === 'Reportado por cliente') return estV === 'Reportado por cliente' && matchTxt(c);
-      if (st.fest === 'Conciliado') return c.conciliado && matchTxt(c);
-      if (st.fest === 'Requiere validación') return (c.requiereValidacion || estV === 'Requiere validación') && matchTxt(c);
-      if (st.fest === 'Bloqueado') return c.estado === 'Bloqueado' && matchTxt(c);
-      const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
-      let placa = '';
-      if (p) { const veh = S().all('vehiculos').find(v => v.polizaId === p.id) || (p.vehiculoId ? S().get('vehiculos', p.vehiculoId) : null); if (veh) placa = veh.placa || ''; }
-      const txt = ((cli ? cli.nombre : '') + ' ' + (p ? p.numero : '') + ' ' + placa).toLowerCase();
-      return (!st.fq || txt.includes(st.fq.toLowerCase())) &&
-        (!st.fest || c.estado === st.fest) &&
-        (!st.fase || c.asesorId === st.fase);
-    }).sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
+      if (st.fest === 'Reportado por cliente') return estV === 'Reportado por cliente' && matchTxt(c, idx);
+      if (st.fest === 'Conciliado') return c.conciliado && matchTxt(c, idx);
+      if (st.fest === 'Requiere validación') return (c.requiereValidacion || estV === 'Requiere validación') && matchTxt(c, idx);
+      if (st.fest === 'Bloqueado') return c.estado === 'Bloqueado' && matchTxt(c, idx);
+      return matchTxt(c, idx) &&
+        (!st.fest || c.estado === st.fest);
+    }).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
   }
 
-  function matchTxt(c) {
-    const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
-    let placa = ''; try { const v = S().all('vehiculos').find(x => x.polizaId === (p && p.id)); placa = v ? v.placa : ''; } catch (e) {}
-    const txt = ((cli ? cli.nombre : '') + ' ' + (p ? p.numero : '') + ' ' + placa).toLowerCase();
-    return (!st.fq || txt.includes(st.fq.toLowerCase())) && (!st.fase || c.asesorId === st.fase);
-  }
   // Estado de validación visible (no confundir reportado con aplicado)
   function estadoValidacion(c) {
     if (c.estado === 'Pagado') return c.conciliado ? 'Conciliado' : 'Pagado (por conciliar)';
@@ -63,12 +98,31 @@ Orbit.modules.cobros = (function () {
     return '<span class="badge ' + tone + '">' + U.esc(U.text(e, 'Sin estado')) + '</span>';
   }
   function render(host) {
+    const hyd = hydrationState();
+    if (!hyd.ready) {
+      const blocked = hyd.failed.length > 0;
+      host.innerHTML = `<div class="page">
+        ${K.bannerFor('cobros', `<button class="btn ghost" onclick="Orbit.modules.cobros.lote()" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📤 Preparar lote</button>`)}
+        <div class="card pad" data-cobros-hydration-loading="1" style="display:grid;gap:8px">
+          <b style="font-family:var(--f-display);font-size:15px">${blocked ? 'No fue posible completar la carga de Cobros y cartera' : 'Cargando Cobros y cartera…'}</b>
+          <div class="muted" style="font-size:12.5px">${blocked ? 'La lectura quedó bloqueada para: ' + hyd.failed.map(U.esc).join(', ') + '. No se muestran ceros parciales.' : 'Preparando clientes, pólizas, recibos y cartera. La pantalla se habilitará cuando la lectura esté completa.'}</div>
+        </div>
+      </div>`;
+      return;
+    }
+
+    const idx = buildIndex();
     const cart = q.carteraGlobal();
     const aging = q.agingVencido();
     const agingTot = Object.values(aging).reduce((s, v) => s + v, 0) || 1;
     const porConciliar = S().where('cobros', c => c.estado === 'Pagado' && !c.conciliado).length;
-    const authoritative = rows(), reported = reportedRows(), r = authoritative.concat(reported);
-    st.__count = authoritative.length + ' cobros' + (reported.length ? ' + ' + reported.length + ' pagos reportados' : '');
+    const authoritative = rows(idx), reported = reportedRows(idx), allRows = authoritative.concat(reported);
+    const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE));
+    if (st.page > totalPages) st.page = totalPages;
+    if (st.page < 1) st.page = 1;
+    const from = (st.page - 1) * PAGE_SIZE, r = allRows.slice(from, from + PAGE_SIZE);
+    st.__count = authoritative.length + ' cobros' + (reported.length ? ' + ' + reported.length + ' pagos reportados' : '') +
+      (allRows.length ? ' · ' + (from + 1) + '–' + Math.min(from + PAGE_SIZE, allRows.length) + ' de ' + allRows.length : '');
     const agingCols = { '1-30': '#c9821b', '31-60': '#d9602e', '61-90': '#b5253b', '90+': '#7e1220' };
 
     host.innerHTML = `<div class="page">
@@ -99,8 +153,8 @@ Orbit.modules.cobros = (function () {
         <div style="overflow-x:auto"><table class="tbl">
           <thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th><th></th></tr></thead>
           <tbody>${r.map(c => {
-            const p = S().get('polizas', c.polizaId);
-            if(c.__reportedEvidence){return `<tr class="clickable" data-reported-payment-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p?'<span class="mono" style="font-size:12px">'+U.esc(U.text(p.numero))+'</span>':'—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto,c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago?U.fmtDate(c.fechaPago):'<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado · por validar</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right"><button class="btn ghost sm" onclick="event.stopPropagation();Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')">Abrir recibo</button></td></tr>`;}
+            const p = indexPolicy(idx, c.polizaId);
+            if (c.__reportedEvidence) { return `<tr class="clickable" data-reported-payment-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado · por validar</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right"><button class="btn ghost sm" onclick="event.stopPropagation();Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')">Abrir recibo</button></td></tr>`; }
 
             const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
             return `<tr class="clickable" onclick="Orbit.modules.cobros.detalle('${c.id}')">
@@ -116,12 +170,31 @@ Orbit.modules.cobros = (function () {
             </tr>`;
           }).join('') || `<tr><td colspan="9" class="muted" style="text-align:center;padding:30px">Sin cobros.</td></tr>`}</tbody>
         </table></div>
+        ${totalPages > 1 ? `<div data-cobros-pagination="1" style="padding:12px 14px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:flex-end;gap:8px"><span class="muted" style="font-size:12.5px;margin-right:auto">Página ${st.page} de ${totalPages}</span><button class="btn ghost sm" ${st.page <= 1 ? 'disabled' : ''} onclick="Orbit.modules.cobros.pagina(-1)">‹ Anterior</button><button class="btn ghost sm" ${st.page >= totalPages ? 'disabled' : ''} onclick="Orbit.modules.cobros.pagina(1)">Siguiente ›</button></div>` : ''}
       </div></div>`;
 
     K.wireFilters(FDEFS(), st, (id, live) => {
-      if (live) { const a = document.activeElement, v = a.value; render(host); const i = document.getElementById('fq'); if (i) { i.focus(); i.value = v; i.setSelectionRange(v.length, v.length); } }
-      else render(host);
+      st.page = 1;
+      if (live) {
+        if (searchTimer) clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+          searchTimer = null;
+          render(host);
+          const i = document.getElementById('fq');
+          if (i) { i.focus(); const v = i.value; i.setSelectionRange(v.length, v.length); }
+        }, 180);
+      } else {
+        render(host);
+      }
     });
+  }
+
+  function pagina(delta) {
+    const next = Math.max(1, Number(st.page || 1) + Number(delta || 0));
+    if (next === st.page) return;
+    st.page = next;
+    const host = document.getElementById('host');
+    if (host) render(host);
   }
 
   /* ---- Detalle del recibo (drawer) — abre el detalle del cobro, no la póliza ---- */
@@ -379,5 +452,5 @@ Orbit.modules.cobros = (function () {
     paint();
   }
 
-  return { render, detalle, aplicarPago, validarReporte, conciliarFactura, lote };
+  return { render, detalle, aplicarPago, validarReporte, conciliarFactura, lote, pagina };
 })();
