@@ -274,6 +274,7 @@ try{
     if(EXPECTED_BUILD)need(marker?.buildId===EXPECTED_BUILD,'B3_002_PREVIEW_BUILD_DRIFT:'+JSON.stringify(marker));
     evidence.identity={sourceSha:marker?.sourceSha||'',buildId:marker?.buildId||''};
     await installInstrumentation(page,label);
+    if(startRoute==='cobros')await page.evaluate(()=>window.__b3002.startNav());
     const activation=await signInAndActivate(page,auth,actor);
     need(activation?.started===true,'B3_002_APP_NOT_STARTED');
     return {context,page,pageErrors,consoleErrors};
@@ -293,7 +294,6 @@ try{
   // Scenario 2: direct cold deep-link makes Cobros the route-primary authoritative startup.
   {
     const s=await newMeasuredPage('cobros','direct-cold');
-    await s.page.evaluate(()=>window.__b3002.startNav());
     const complete=await waitForComplete(s.page);
     evidence.scenarios.directCold=await s.page.evaluate(()=>window.__b3002.finish());
     evidence.scenarios.directCold.completeWait=complete;
