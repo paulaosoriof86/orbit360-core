@@ -1,0 +1,315 @@
+name: CotComp S4.48 provider isolation and W2 readiness read-only
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s448-provider-isolation-readiness-20260930
+    paths:
+      - '.github/cotcomp-lab-intents/s448-provider-isolation-readonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  EXPECTED_OWNER_BLOB: 73e09a4404cb4298dc34c9c38e26ad1f960d3170
+
+jobs:
+  s448-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.48 read-only intent and single-file trigger commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s448-provider-isolation-readonly.json
+          jq -e '
+            .authorization == "S448_READONLY_PROVIDER_ISOLATION_AND_W2_HARNESS" and
+            .projectId == "ays-orbit-360-lab" and
+            .appDataReads == false and
+            .appDataWrites == false and
+            .deploy == false and
+            .w2Executed == false and
+            .providerDelivery == false and
+            .realData == false and
+            .production == false
+          ' "$INTENT" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$INTENT")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$INTENT"
+
+      - name: Full existing CotComp QA plus S4.48 source-only tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-provider-isolation-s448.js
+          node --check cotcomp-provider-isolation-s448.test.js
+          node --check cotcomp-w2-readiness-harness-s448.js
+          node --check cotcomp-w2-readiness-harness-s448.test.js
+          node --test cotcomp-provider-isolation-s448.test.js cotcomp-w2-readiness-harness-s448.test.js
+
+      - name: Prepare exact LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s448/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s448/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Set up and authenticate gcloud read-only
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: 'latest'
+
+      - name: Authenticate exact LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" >/dev/null
+          gcloud config set project "$COTCOMP_PROJECT_ID" >/dev/null
+          test "$(gcloud config get-value project 2>/dev/null)" = "$COTCOMP_PROJECT_ID"
+
+      - name: Read physical owner source and runtime inventories
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/s448"
+          EVID="$ROOT/evidence"
+          DESC="$ROOT/orbit360OpsLeadsCommand.json"
+
+          gcloud functions describe orbit360OpsLeadsCommand \
+            --gen2 --region "$COTCOMP_REGION" --project "$COTCOMP_PROJECT_ID" --format=json > "$DESC"
+
+          BUCKET="$(jq -r '.buildConfig.source.storageSource.bucket // empty' "$DESC")"
+          OBJECT="$(jq -r '.buildConfig.source.storageSource.object // empty' "$DESC")"
+          GENERATION="$(jq -r '.buildConfig.source.storageSource.generation // empty' "$DESC")"
+          test -n "$BUCKET"
+          test -n "$OBJECT"
+
+          ARCHIVE="$ROOT/source-archive.bin"
+          URI="gs://$BUCKET/$OBJECT"
+          if [ -n "$GENERATION" ]; then URI="$URI#$GENERATION"; fi
+          if ! gcloud storage cp "$URI" "$ARCHIVE" >/dev/null 2>&1; then
+            gsutil cp "$URI" "$ARCHIVE" >/dev/null
+          fi
+
+          mkdir -p "$ROOT/source"
+          if unzip -q "$ARCHIVE" -d "$ROOT/source" 2>/dev/null; then
+            :
+          elif tar -xzf "$ARCHIVE" -C "$ROOT/source" 2>/dev/null; then
+            :
+          else
+            echo "S448_DEPLOYED_SOURCE_ARCHIVE_UNREADABLE" >&2
+            exit 1
+          fi
+
+          OWNER_FILE="$(find "$ROOT/source" -type f -name 'ops-leads-domain.js' -print -quit)"
+          test -n "$OWNER_FILE"
+          cp "$OWNER_FILE" "$EVID/deployed-ops-leads-domain.js"
+          git hash-object "$OWNER_FILE" > "$EVID/deployed-owner-blob.txt"
+          sha256sum "$ARCHIVE" | awk '{print $1}' > "$EVID/source-archive-sha256.txt"
+
+          FUNCTIONS_OK=false
+          if gcloud functions list --gen2 --project "$COTCOMP_PROJECT_ID" --format=json > "$EVID/functions-inventory.json" 2>"$ROOT/functions-list.err"; then
+            FUNCTIONS_OK=true
+          else
+            printf '[]' > "$EVID/functions-inventory.json"
+          fi
+          printf '%s' "$FUNCTIONS_OK" > "$EVID/functions-inventory-read.txt"
+
+          EVENTARC_OK=false
+          if gcloud eventarc triggers list --location "$COTCOMP_REGION" --project "$COTCOMP_PROJECT_ID" --format=json > "$EVID/eventarc-triggers.json" 2>"$ROOT/eventarc-list.err"; then
+            EVENTARC_OK=true
+          else
+            printf '[]' > "$EVID/eventarc-triggers.json"
+          fi
+          printf '%s' "$EVENTARC_OK" > "$EVID/eventarc-inventory-read.txt"
+
+          jq '{
+            name:.name,
+            state:.state,
+            environment:.environment,
+            updateTime:.updateTime,
+            runtime:(.buildConfig.runtime // null),
+            entryPoint:(.buildConfig.entryPoint // null),
+            revision:(.serviceConfig.revision // null)
+          }' "$DESC" > "$EVID/function-runtime-sanitized.json"
+
+          rm -rf "$ROOT/source" "$ARCHIVE" "$DESC"
+
+      - name: Build sanitized S4.48 evidence receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const path=require('path');
+          const crypto=require('crypto');
+          const iso=require('./functions/cotcomp-provider-isolation-s448');
+          const h=require('./functions/cotcomp-w2-readiness-harness-s448');
+          const root=path.join(process.env.RUNNER_TEMP,'s448','evidence');
+          const runtime=JSON.parse(fs.readFileSync(path.join(root,'function-runtime-sanitized.json'),'utf8'));
+          const functionsInventory=JSON.parse(fs.readFileSync(path.join(root,'functions-inventory.json'),'utf8'));
+          const eventarcTriggers=JSON.parse(fs.readFileSync(path.join(root,'eventarc-triggers.json'),'utf8'));
+          const ownerSource=fs.readFileSync(path.join(root,'deployed-ops-leads-domain.js'),'utf8');
+          const deployedOwnerBlob=fs.readFileSync(path.join(root,'deployed-owner-blob.txt'),'utf8').trim();
+          const functionsInventoryRead=fs.readFileSync(path.join(root,'functions-inventory-read.txt'),'utf8').trim()==='true';
+          const eventarcInventoryRead=fs.readFileSync(path.join(root,'eventarc-inventory-read.txt'),'utf8').trim()==='true';
+          const proof=iso.evaluate({
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            functionState:runtime.state,
+            deployedOwnerBlob,
+            ownerSource,
+            functionsInventoryRead,
+            eventarcInventoryRead,
+            functions:functionsInventory,
+            eventarcTriggers,
+            appDataReadsExecuted:0,
+            appDataWritesExecuted:0,
+            w2Executed:false,
+            providerDeliveryExecuted:false,
+            realDataTouched:false,
+            productionTouched:false
+          });
+          const projection=h.buildFixture();
+          const journals={
+            legacyCompatible:h.buildJournal({storageMode:'legacyCompatible',projection}),
+            canonicalV2:h.buildJournal({storageMode:'canonicalV2',projection})
+          };
+          const simulations={
+            legacyCompatible:h.simulateLifecycle({projection,journal:journals.legacyCompatible}),
+            canonicalV2:h.simulateLifecycle({projection,journal:journals.canonicalV2})
+          };
+          const readiness=h.readiness({
+            projection,
+            storageMode:'legacyCompatible',
+            workflowOwnerRuntimeVerified:deployedOwnerBlob===iso.EXPECTED_OWNER_BLOB && runtime.state==='ACTIVE',
+            providerDeliveryIsolationVerified:proof.providerDeliveryIsolationVerified,
+            runtimeStorageModeVerified:false,
+            ownerW2Authorization:false
+          });
+          const receipt={
+            schemaVersion:'ays-cotcomp-s448-readonly-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            primaryFunction:'orbit360OpsLeadsCommand',
+            runtime,
+            expectedOwnerBlob:iso.EXPECTED_OWNER_BLOB,
+            deployedOwnerBlob,
+            physicalOwnerExactMatch:deployedOwnerBlob===iso.EXPECTED_OWNER_BLOB,
+            sourceArchiveSha256:fs.readFileSync(path.join(root,'source-archive-sha256.txt'),'utf8').trim(),
+            providerIsolation:{
+              verified:proof.providerDeliveryIsolationVerified,
+              blockers:proof.blockers,
+              owner:proof.owner,
+              infrastructure:{
+                functionsInventoryRead:proof.infrastructure.functionsInventoryRead,
+                eventarcInventoryRead:proof.infrastructure.eventarcInventoryRead,
+                functionCount:proof.infrastructure.functionCount,
+                eventarcTriggerCount:proof.infrastructure.eventarcTriggerCount,
+                outboxFunctionConsumerCount:proof.infrastructure.outboxFunctionConsumers.length,
+                outboxEventarcConsumerCount:proof.infrastructure.outboxEventarcConsumers.length,
+                automaticOutboxConsumerDetected:proof.infrastructure.automaticOutboxConsumerDetected
+              }
+            },
+            w2Harness:{
+              executionEnabled:h.EXECUTION_ENABLED,
+              appDataReadsAllowed:h.APP_DATA_READS_ALLOWED,
+              appDataWritesAllowed:h.APP_DATA_WRITES_ALLOWED,
+              projectionOk:projection.ok,
+              expectedCreatedDocuments:8,
+              journals,
+              simulations,
+              runtimeStorageModeVerified:false,
+              ownerW2Authorization:false,
+              readiness
+            },
+            boundaries:{
+              appDataReadsExecuted:0,
+              appDataWritesExecuted:0,
+              w2Executed:false,
+              providerDeliveryExecuted:false,
+              realDataTouched:false,
+              productionTouched:false,
+              deployExecuted:false,
+              iamWritesExecuted:0,
+              firebaseConfigWritesExecuted:0
+            }
+          };
+          fs.writeFileSync(path.join(root,'S448_PROVIDER_ISOLATION_W2_READINESS_RECEIPT.json'),JSON.stringify(receipt,null,2));
+          fs.rmSync(path.join(root,'deployed-ops-leads-domain.js'),{force:true});
+          console.log('S448_PROVIDER_ISOLATION_VERIFIED='+String(receipt.providerIsolation.verified));
+          console.log('S448_PROVIDER_BLOCKERS='+receipt.providerIsolation.blockers.join(','));
+          console.log('S448_W2_EXECUTION_ENABLED='+String(receipt.w2Harness.executionEnabled));
+          console.log('S448_W2_REMAINING_BLOCKERS='+receipt.w2Harness.readiness.blockers.join(','));
+          NODE
+
+      - name: Upload sanitized S4.48 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s448-provider-isolation-readonly-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s448/evidence/function-runtime-sanitized.json
+            ${{ runner.temp }}/s448/evidence/functions-inventory.json
+            ${{ runner.temp }}/s448/evidence/eventarc-triggers.json
+            ${{ runner.temp }}/s448/evidence/deployed-owner-blob.txt
+            ${{ runner.temp }}/s448/evidence/source-archive-sha256.txt
+            ${{ runner.temp }}/s448/evidence/S448_PROVIDER_ISOLATION_W2_READINESS_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce S4.48 provider-isolation gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          RECEIPT="$RUNNER_TEMP/s448/evidence/S448_PROVIDER_ISOLATION_W2_READINESS_RECEIPT.json"
+          jq -e '
+            .physicalOwnerExactMatch == true and
+            .providerIsolation.verified == true and
+            .boundaries.appDataReadsExecuted == 0 and
+            .boundaries.appDataWritesExecuted == 0 and
+            .boundaries.w2Executed == false and
+            .boundaries.providerDeliveryExecuted == false and
+            .boundaries.realDataTouched == false and
+            .boundaries.productionTouched == false and
+            .w2Harness.executionEnabled == false
+          ' "$RECEIPT" >/dev/null
+
+      - name: Remove transient credentials
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/s448/firebase-service-account.json"
