@@ -16,55 +16,65 @@ const TARGET=Object.freeze({
   ownerBlob:workflow.TARGET_OWNER.reviewedBlobSha
 });
 
+const EXPECTED_OWNER_SIDE_EFFECTS=Object.freeze({
+  businessDocuments:4,
+  managementDocuments:4,
+  totalCreatedDocuments:8,
+  components:Object.freeze([
+    'workflow_entity',
+    'workflow_event',
+    'workflow_request',
+    'notification_outbox'
+  ]),
+  portalNotificationExpected:false,
+  providerDeliveryAllowed:false,
+  cleanupRequired:true,
+  finalAbsenceRequired:true
+});
+
 function sha(v){
   return crypto.createHash('sha256').update(String(v??''),'utf8').digest('hex');
 }
-function clean(v,max=220){return String(v==null?'':v).trim().slice(0,max);}
+function clean(v,max=220){return String(v==null?'':v).replace(/\u0000/g,'').trim().slice(0,max);}
+function stable(v){
+  if(v==null) return v;
+  if(Array.isArray(v)) return v.map(stable);
+  if(typeof v==='object') return Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])]));
+  return v;
+}
+function requestIdentity(operation,entityId,payload){
+  const seed=JSON.stringify(stable({
+    tenantId:TARGET.tenantId,
+    operation,
+    entityId,
+    payload
+  }));
+  return 'wf_'+sha(seed).slice(0,28);
+}
 
-function deriveIds({caseId,correlationId}={}){
-  const seed=[TARGET.tenantId,clean(caseId,180),clean(correlationId,180),'W2'].join('|');
+function deriveEntityIds({caseId,correlationId}={}){
+  const caseValue=clean(caseId,180);
+  const correlationValue=clean(correlationId,180);
+  if(!caseValue||!correlationValue) return {ok:false,code:'CASE_AND_CORRELATION_REQUIRED'};
+  const seed=[TARGET.tenantId,caseValue,correlationValue,'W2'].join('|');
   const h=sha(seed);
   return Object.freeze({
+    ok:true,
     businessId:'cotbiz_'+h.slice(0,24),
-    managementId:'cotmgmt_'+h.slice(24,48),
-    businessRequestId:'cotreq_b_'+h.slice(0,24),
-    managementRequestId:'cotreq_m_'+h.slice(24,48)
+    managementId:'cotmgmt_'+h.slice(24,48)
   });
 }
 
-function quoteCasePath(caseId){
-  return 'tenants/'+TARGET.tenantId+'/cotcomp/quoteCases/items/'+clean(caseId,180);
-}
-
-function buildCotcompRef(input={},role='workflow_projection'){
-  return Object.freeze({
-    role:clean(role,80),
+function buildCotcompRef(input={},role){
+  const ref=workflow.cotcompRef({
     caseId:clean(input.caseId,180),
     journeyId:clean(input.journeyId,180),
     correlationId:clean(input.correlationId,180),
-    quoteCasePath:clean(input.quoteCasePath||quoteCasePath(input.caseId),500),
+    quoteCasePath:clean(input.quoteCasePath,500),
     selectedProposalId:clean(input.selectedProposalId||input.proposalId,180),
     intakeStatus:clean(input.intakeStatus||'lead_recibido',100)
-  });
-}
-
-function expectedCanonicalWrites(ids){
-  return Object.freeze({
-    business:Object.freeze([
-      'workflow_business_entity',
-      'workflow_event',
-      'workflow_request',
-      'notification_outbox'
-    ]),
-    management:Object.freeze([
-      'workflow_management_entity',
-      'workflow_event',
-      'workflow_request',
-      'notification_outbox'
-    ]),
-    portalNotificationExpected:false,
-    totalExpectedDocuments:8
-  });
+  },role);
+  return ref.ok ? Object.freeze(ref.value) : null;
 }
 
 function buildSyntheticProjection(input={}){
@@ -76,74 +86,98 @@ function buildSyntheticProjection(input={}){
   if(!clean(input.caseId,180)) reasons.push('CASE_ID_REQUIRED');
   if(!clean(input.journeyId,180)) reasons.push('JOURNEY_ID_REQUIRED');
   if(!clean(input.correlationId,180)) reasons.push('CORRELATION_ID_REQUIRED');
-  if(!clean(input.syntheticAdvisorId,180)) reasons.push('SYNTHETIC_ADVISOR_ID_REQUIRED_BY_CANONICAL_DOMAIN');
   if(input.realData===true) reasons.push('REAL_DATA_FORBIDDEN');
   if(input.production===true) reasons.push('PRODUCTION_FORBIDDEN');
 
-  const ids=deriveIds(input);
-  const advisorId=clean(input.syntheticAdvisorId,180);
-  const businessRef=buildCotcompRef(input,'business');
-  const managementRef=buildCotcompRef(input,'management');
+  const ids=deriveEntityIds(input);
+  if(!ids.ok) reasons.push(ids.code);
+
+  const businessCotcompRef=buildCotcompRef(input,'LEAD_PROJECTION');
+  const managementCotcompRef=buildCotcompRef(input,'OPS_QUOTATION_PROJECTION');
+  if(!businessCotcompRef||!managementCotcompRef) reasons.push('COTCOMP_REF_INVALID');
 
   const businessPayload={
     id:ids.businessId,
     nombre:'CotComp W2 Synthetic Business',
-    tipo:'CotComp',
-    asesorId:advisorId,
-    pais:clean(input.country||'GT',8),
-    moneda:clean(input.currency||'GTQ',8),
-    canal:'CotComp',
-    producto:clean(input.product||'SYNTHETIC',120),
-    ramo:clean(input.line||'SYNTHETIC',120),
+    tipo:'Cotización',
+    etapa:'cotizando',
+    pais:clean(input.country||'GT',8).toUpperCase(),
+    moneda:clean(input.currency||'GTQ',8).toUpperCase(),
+    canal:'Web pública A&S',
+    producto:clean(input.product||'SYNTHETIC',180),
+    ramo:clean(input.line||'SYNTHETIC',140),
     prioridad:'Media',
-    descripcion:'Synthetic W2 workflow-projection proof only',
-    cotcompRef:businessRef
+    origen:'CotComp',
+    cotcompRef:businessCotcompRef
   };
 
   const managementPayload={
     id:ids.managementId,
-    lista:'CotComp',
-    tipo:'CotComp',
+    lista:'Cotizaciones',
+    tipo:'Cotización',
     titulo:'CotComp W2 Synthetic Management',
     negocioId:ids.businessId,
-    asesorId:advisorId,
     estado:'Pendiente',
     prioridad:'Media',
     origen:'CotComp',
     nota:'Synthetic W2 workflow-projection proof only',
-    cotcompRef:managementRef
+    cotcompRef:managementCotcompRef
   };
+
+  const businessRequestId=requestIdentity('create_business',ids.businessId,businessPayload);
+  const managementRequestId=requestIdentity('create_management',ids.managementId,managementPayload);
 
   return Object.freeze({
     version:VERSION,
     ok:reasons.length===0,
     reasons,
     target:TARGET,
-    ids,
-    cotcompRefs:Object.freeze({business:businessRef,management:managementRef}),
+    ids:Object.freeze({
+      businessId:ids.businessId,
+      managementId:ids.managementId,
+      businessRequestId,
+      managementRequestId
+    }),
+    cotcompRefs:Object.freeze({
+      business:businessCotcompRef,
+      management:managementCotcompRef
+    }),
     commands:Object.freeze([
       Object.freeze({
         operation:'create_business',
         entityId:ids.businessId,
-        requestId:ids.businessRequestId,
+        requestId:businessRequestId,
+        requestIdentityPolicy:'PAYLOAD_BOUND_MIRRORS_OWNER_REQUEST_IDENTITY',
         reason:'CotComp W2 synthetic projection proof',
         payload:Object.freeze(businessPayload)
       }),
       Object.freeze({
         operation:'create_management',
         entityId:ids.managementId,
-        requestId:ids.managementRequestId,
+        requestId:managementRequestId,
+        requestIdentityPolicy:'PAYLOAD_BOUND_MIRRORS_OWNER_REQUEST_IDENTITY',
         reason:'CotComp W2 synthetic projection proof',
         payload:Object.freeze(managementPayload)
       })
     ]),
-    expectedCanonicalWrites:expectedCanonicalWrites(ids),
     notificationIsolation:Object.freeze({
-      advisorTargetExpected:true,
-      clientTargetExpected:false,
-      notificationOutboxWriteExpected:true,
-      providerDeliveryMustBeDisabledBeforeW2:true,
-      providerDeliveryGate:'PROVIDER_DELIVERY_DISABLED_VERIFIED_REQUIRED'
+      successfulOwnerCreateRequiresAdvisorId:true,
+      advisorTargetThereforeExpected:true,
+      notificationOutboxExpected:true,
+      portalNotificationExpected:false,
+      providerDeliveryAllowed:false,
+      providerDeliveryIsolationRequired:true,
+      outboxMustBeJournaledAndCleaned:true,
+      directOwnerExecutionAllowed:false
+    }),
+    cleanupRequirement:Object.freeze({
+      exactEntityIds:[ids.businessId,ids.managementId],
+      requestIds:[businessRequestId,managementRequestId],
+      workflowEventsMustBeJournaled:true,
+      notificationOutboxMustBeJournaled:true,
+      expectedCreatedDocuments:EXPECTED_OWNER_SIDE_EFFECTS.totalCreatedDocuments,
+      cleanupRequired:true,
+      finalAbsenceRequired:true
     }),
     executionEnabled:EXECUTION_ENABLED,
     callsAllowed:CALLS_ALLOWED,
@@ -155,7 +189,9 @@ function buildSyntheticProjection(input={}){
 function evaluateW2Gate(input={}){
   const blockers=[];
   if(input.workflowOwnerRuntimeVerified!==true) blockers.push('WORKFLOW_OWNER_RUNTIME_PROOF_REQUIRED');
-  if(input.providerDeliveryDisabledVerified!==true) blockers.push('PROVIDER_DELIVERY_DISABLED_VERIFIED_REQUIRED');
+  if(input.runtimeConfigReadbackVerified!==true) blockers.push('W2_RUNTIME_CONFIG_READBACK_REQUIRED');
+  if(input.providerDeliveryIsolationVerified!==true) blockers.push('PROVIDER_DELIVERY_ISOLATION_REQUIRED');
+  if(input.outboxCleanupHarnessReady!==true) blockers.push('W2_OUTBOX_CLEANUP_HARNESS_REQUIRED');
   if(input.syntheticCleanupHarnessReady!==true) blockers.push('W2_CLEANUP_HARNESS_REQUIRED');
   if(input.ownerW2Authorization!==true) blockers.push('OWNER_W2_AUTHORIZATION_REQUIRED');
   if(input.deployAuthorization!==true) blockers.push('W2_DEPLOY_AUTHORIZATION_REQUIRED');
@@ -171,7 +207,17 @@ function evaluateW2Gate(input={}){
 }
 
 module.exports=Object.freeze({
-  VERSION,EXECUTION_ENABLED,CALLS_ALLOWED,WRITE_ALLOWED,TARGET,
-  deriveIds,quoteCasePath,buildCotcompRef,expectedCanonicalWrites,
-  buildSyntheticProjection,evaluateW2Gate
+  VERSION,
+  EXECUTION_ENABLED,
+  CALLS_ALLOWED,
+  WRITE_ALLOWED,
+  TARGET,
+  EXPECTED_OWNER_SIDE_EFFECTS,
+  sha,
+  stable,
+  requestIdentity,
+  deriveEntityIds,
+  buildCotcompRef,
+  buildSyntheticProjection,
+  evaluateW2Gate
 });
