@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "PROVENANCE_FIX_AUTHORIZED",
+      "status": "PROVENANCE_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -964,7 +964,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_PROVENANCE_FIX",
+      "nextAction": "B3_004_PROVENANCE_CONTRACT",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -981,14 +981,15 @@
       "subFindings": [
         {
           "id": "B3-004-R1-PAYMENT-PROVENANCE-ENRICHMENT",
-          "status": "FIX_AUTHORIZED",
+          "status": "SOURCE_FIXED_PENDING_CONTRACT",
           "blocking": true,
           "rootCause": "APPLICATION_ENRICHMENT_RECOMPUTES_PAYMENT_PROVENANCE_FROM_INVOICE_SOURCE",
           "remediation": "Preserve existing payment provenance on enrichment; application evidence gets its own applicationEvidenceType.",
           "authorizedProductFiles": [
             "functions/cobros-reconciliation-domain.js",
             "tools/gravicentra-i6-5-b3-004-contract.mjs"
-          ]
+          ],
+          "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_FIX_20260930.json"
         }
       ]
     },
@@ -4592,7 +4593,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_004_PROVENANCE_FIX_AUTHORIZED",
+    "status": "B3_004_PROVENANCE_FIXED_PENDING_CONTRACT",
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",

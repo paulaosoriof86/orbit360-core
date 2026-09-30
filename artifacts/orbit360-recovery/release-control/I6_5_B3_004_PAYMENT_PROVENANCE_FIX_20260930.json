@@ -1,0 +1,28 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_PAYMENT_PROVENANCE_FIX_V1",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "date": "2026-09-30",
+  "findingId": "B3-004-R1-PAYMENT-PROVENANCE-ENRICHMENT",
+  "changes": {
+    "functions/cobros-reconciliation-domain.js": {
+      "before": "37460a693a55c6a292936d2f38ffb21fd19f74dd",
+      "after": "1f2d89428b99368dc058218d62d33ddd4ec804a2"
+    },
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": {
+      "before": "e39e6cb1a6d33bc1abe9b35732cf2fab4b493d82",
+      "after": "9d99205ddbda58ef1c2a263b0b666b0eb71cc52b"
+    }
+  },
+  "semantics": [
+    "Later application evidence enriches existing payment instead of changing PAID_INFERRED/PAID_REPORTED to PAID_DIRECT.",
+    "directOrInferred is preserved.",
+    "paymentEvidenceType is preserved.",
+    "applicationEvidenceType is recorded separately.",
+    "receipt estadoOperativo payment provenance is preserved."
+  ],
+  "boundaries": {
+    "businessDataWrites": 0,
+    "reimport": false,
+    "livePromotion": false
+  }
+}

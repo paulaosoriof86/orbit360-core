@@ -278,15 +278,24 @@ async function applyPayment(authz, data, payload) {
     const existingApplicationDate = text(beforeCobro.applicationDate || beforeCobro.fechaAplicacion, 32);
     const finalPaidDate = paidDate || existingPaidDate;
     const finalApplicationDate = applicationDate || existingApplicationDate;
-    const paymentState = paidStateFor(source, inferred);
+    const applicationEvidenceSource = ['insurer_invoice','insurer_statement','commission_statement'].includes(source);
+    const isApplicationEnrichment = Boolean(cobroDoc && applicationEvidenceSource);
+    const existingPaymentState = text(beforeCobro.paymentState, 80);
+    const existingDirectOrInferred = text(beforeCobro.directOrInferred, 80);
+    const existingPaymentEvidenceType = text(beforeCobro.paymentEvidenceType, 120);
+    const paymentState = isApplicationEnrichment && existingPaymentState ? existingPaymentState : paidStateFor(source, inferred);
+    const directOrInferred = isApplicationEnrichment && existingDirectOrInferred ? existingDirectOrInferred : (inferred ? 'INFERRED' : 'DIRECT');
+    const paymentEvidenceType = isApplicationEnrichment && existingPaymentEvidenceType ? existingPaymentEvidenceType : source.toUpperCase();
+    const applicationEvidenceType = applicationProved ? source.toUpperCase() : text(beforeCobro.applicationEvidenceType, 120);
     const applicationState = (applicationProved || finalApplicationDate || beforeCobro.conciliado === true) ? 'APPLIED_DIRECT' : 'PENDING_APPLICATION';
     const technicalNow = now();
 
     const shared = {
       paymentState,
       applicationState,
-      directOrInferred: inferred ? 'INFERRED' : 'DIRECT',
-      paymentEvidenceType: source.toUpperCase(),
+      directOrInferred,
+      paymentEvidenceType,
+      applicationEvidenceType,
       evidenceAsOfDate: evidenceAsOfDate || text(beforeCobro.evidenceAsOfDate, 32),
       inferredEffectiveDate: inferredEffectiveDate || text(beforeCobro.inferredEffectiveDate, 32),
       reconciledAt: technicalNow,
@@ -320,9 +329,12 @@ async function applyPayment(authz, data, payload) {
     if (paymentMethod) cobro.metodo = paymentMethod;
     if (invoiceNumber) cobro.numeroFactura = invoiceNumber;
 
+    const receiptPaymentState = isApplicationEnrichment && text(receipt.estadoOperativo, 120)
+      ? text(receipt.estadoOperativo, 120)
+      : (source === 'client_reported' ? 'pago_reportado_aplicado' : (inferred ? 'pago_inferido' : 'pagado'));
     const receiptPatch = {
       estado: 'Pagado',
-      estadoOperativo: source === 'client_reported' ? 'pago_reportado_aplicado' : (inferred ? 'pago_inferido' : 'pagado'),
+      estadoOperativo: receiptPaymentState,
       cobroId,
       conciliadoPago: true,
       conciliado: applicationState === 'APPLIED_DIRECT',

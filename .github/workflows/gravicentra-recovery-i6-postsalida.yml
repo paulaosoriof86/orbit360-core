@@ -6632,3 +6632,31 @@ jobs:
       - name: Preserve B3-004 surface fail-closed boundary
         if: ${{ failure() && steps.surface.outputs.run == 'true' }}
         run: echo "B3_004_SURFACE_FAILED_NO_DATA_WRITE_NO_REIMPORT_NO_LIVE"
+
+      - name: Gate B3-004 payment provenance
+        id: provenance
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const b=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json','utf8'));
+          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_004_PROVENANCE_CONTRACT'
+            && c.i65ForensicRemediationPlan?.b3?.status==='B3_004_PROVENANCE_FIXED_PENDING_CONTRACT'
+            && b.status==='B3_004_PROVENANCE_FIXED_PENDING_CONTRACT'
+            && b.activeFinding?.id==='B3-004';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          NODE
+      - uses: actions/setup-node@v4
+        if: steps.provenance.outputs.run == 'true'
+        with:
+          node-version: '22'
+      - name: Prove B3-004 payment provenance preservation
+        if: steps.provenance.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node --check functions/cobros-reconciliation-domain.js
+          node tools/gravicentra-i6-5-b3-004-contract.mjs
+          echo "B3_004_PAYMENT_PROVENANCE=PASS"
+      - name: Preserve B3-004 provenance fail-closed boundary
+        if: ${{ failure() && steps.provenance.outputs.run == 'true' }}
+        run: echo "B3_004_PROVENANCE_FAILED_NO_DATA_WRITE_NO_REIMPORT_NO_LIVE"

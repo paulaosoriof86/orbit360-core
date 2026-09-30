@@ -35,3 +35,11 @@ need(portal.includes('domain.reportClientPayment'),'B3_004_PORTAL_NOT_CANONICAL'
 need(!portal.includes("S().update('cobros', cobroId, { reportado:"),'B3_004_PORTAL_DIRECT_PAYMENT_WRITE');
 need(receiptView.includes("'Fecha real de pago'")&&receiptView.includes("'Fecha de aplicación'")&&receiptView.includes("'Número de factura'"),'B3_004_RECEIPT_DETAIL_FIELDS_MISSING');
 console.log('B3_004_SURFACE_CONVERGENCE_CONTRACT=PASS');
+
+need(server.includes('isApplicationEnrichment'),'B3_004_APPLICATION_ENRICHMENT_GUARD_MISSING');
+need(server.includes('existingPaymentState ? existingPaymentState'),'B3_004_PAYMENT_STATE_NOT_PRESERVED');
+need(server.includes('existingDirectOrInferred ? existingDirectOrInferred'),'B3_004_INFERENCE_PROVENANCE_NOT_PRESERVED');
+need(server.includes('existingPaymentEvidenceType ? existingPaymentEvidenceType'),'B3_004_PAYMENT_EVIDENCE_NOT_PRESERVED');
+need(server.includes('applicationEvidenceType'),'B3_004_APPLICATION_EVIDENCE_TYPE_MISSING');
+need(server.includes('receiptPaymentState'),'B3_004_RECEIPT_PAYMENT_PROVENANCE_NOT_PRESERVED');
+console.log('B3_004_PAYMENT_PROVENANCE_CONTRACT=PASS');
