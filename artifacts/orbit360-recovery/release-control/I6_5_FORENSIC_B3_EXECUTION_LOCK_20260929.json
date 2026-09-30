@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_SURFACES_FIXED_PENDING_CONTRACT",
+  "status": "B3_004_PROVENANCE_FIX_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "SURFACES_FIXED_PENDING_CONTRACT",
+    "status": "PROVENANCE_FIX_AUTHORIZED",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json",
     "boundaries": {
@@ -49,7 +49,9 @@
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "148c68af1a4362102c3f14586e475682fffbcafe",
       "orbit360-platform/index.html": "0d94cd428b03443d52d3400bce6354c8ed1dfb5a",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "e39e6cb1a6d33bc1abe9b35732cf2fab4b493d82"
-    }
+    },
+    "surfaceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_CONTRACT_PASS_20260930.json",
+    "activeSubFindingId": "B3-004-R1-PAYMENT-PROVENANCE-ENRICHMENT"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -61,7 +63,7 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_004_SURFACE_CONVERGENCE_CONTRACT_PASS",
+    "B3_004_PAYMENT_PROVENANCE_CONTRACT_PASS",
     "B3_004_PREVIEW_ONLY_BACKEND_PASS",
     "B3_004_SYNTHETIC_CREATE_RETRY_ENRICH_READBACK_CLEANUP_PASS",
     "B3_004_TARGETED_VISUAL_PASS"
@@ -92,7 +94,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
@@ -182,5 +184,9 @@
       "artifactId": 11093444225,
       "artifactDigest": "5e307dcb2c256e42a31c568fd97f5f89c19fbf872c434965b64bde86732c30c3"
     }
-  }
+  },
+  "authorizedProductFiles": [
+    "functions/cobros-reconciliation-domain.js",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs"
+  ]
 }

@@ -1,0 +1,26 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_SURFACE_CONVERGENCE_CONTRACT_PASS_V1",
+  "status": "PASS",
+  "date": "2026-09-30",
+  "runId": 36716977043,
+  "jobId": 109892187095,
+  "sourceSha": "f52cedafcb47c6f65f5a0df731b2cfc2778fe49a",
+  "assertions": {
+    "cobrosCanonical": true,
+    "cliente360Delegates": true,
+    "portalCanonical": true,
+    "directPortalPaymentWriteAbsent": true,
+    "paidDateSeparateFromApplicationDate": true,
+    "invoiceNumberVisible": true,
+    "receiptDetailFieldsVisible": true,
+    "businessWrites": 0,
+    "reimport": false,
+    "live": false
+  },
+  "discoveredPrePreviewRegression": {
+    "id": "B3-004-R1-PAYMENT-PROVENANCE-ENRICHMENT",
+    "rootCause": "APPLICATION_ENRICHMENT_RECOMPUTES_PAYMENT_PROVENANCE_FROM_INVOICE_SOURCE",
+    "impact": "A later invoice/application update could change a prior PAID_INFERRED or PAID_REPORTED payment to PAID_DIRECT and overwrite paymentEvidenceType/directOrInferred.",
+    "requiredFix": "Preserve existing payment provenance on enrichment; application evidence gets its own applicationEvidenceType."
+  }
+}
