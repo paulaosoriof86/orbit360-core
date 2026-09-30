@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "ays-cotcomp-s441-appcheck-preflight-v1.0",
+  "capturedAt": "2026-09-30",
+  "runId": 36768717761,
+  "runConclusion": "success",
+  "artifactId": "11122917298",
+  "artifactDigest": "sha256:764270f2c918e3ecb09ac4ca7981626b03e48210a2467734b984ca5efd09db5e",
+  "projectId": "ays-orbit-360-lab",
+  "region": "us-central1",
+  "deployedSourceSha": "17d599e884d5b834b73b9499d8cef177575d56f9",
+  "webApps": [
+    {
+      "appId": "1:646761409743:web:2ec4595ee9160f9d945bba",
+      "displayName": "Orbit360 LAB Web",
+      "platform": "WEB"
+    }
+  ],
+  "selectedWebAppId": "1:646761409743:web:2ec4595ee9160f9d945bba",
+  "sdkConfigResolvable": true,
+  "debugTokenSecretPresent": false,
+  "readyForValidAppCheckSyntheticInvocation": false,
+  "blockers": [
+    "APPCHECK_DEBUG_TOKEN_SECRET_REQUIRED"
+  ],
+  "firebaseConfigWritesExecuted": 0,
+  "appDataWritesExecuted": 0,
+  "deployExecuted": false,
+  "productionTouched": false,
+  "sourceQa": {
+    "runId": 36768717270,
+    "tests": 275,
+    "passed": 275,
+    "failed": 0
+  }
+}
