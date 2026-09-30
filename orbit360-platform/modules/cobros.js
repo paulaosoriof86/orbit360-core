@@ -10,6 +10,7 @@ Orbit.modules.cobros = (function () {
   let searchTimer = null;
   let baseCache = null;
   const PAGE_SIZE = 60;
+  const STATE_FILTER_OPTIONS = ['Pagado','Pendiente','Vencido','Pago registrado en SIGA','Por conciliar','Reportado por asesor','Reportado por cliente','Conciliado','Requiere validación','Bloqueado','Anulado'];
   function activeRoleNorm(){try{return String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');}catch(e){return'';}}
   function advisorRole(){return ['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial'].includes(activeRoleNorm());}
   function directPaymentRole(){return !advisorRole();}
@@ -17,9 +18,12 @@ Orbit.modules.cobros = (function () {
 
   const FDEFS = () => [
     { id: 'fq', type: 'search', ph: 'Buscar cliente, póliza o placa…' },
-    { id: 'fest', type: 'select', ph: 'Estado', options: ['Pagado', 'Pendiente', 'Vencido', 'Pago registrado en SIGA', 'Por conciliar', 'Reportado por asesor', 'Reportado por cliente', 'Conciliado', 'Requiere validación', 'Bloqueado', 'Anulado'].map(v => ({ v, t: v })) },
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
   ];
+  function stateFilterMenu(){
+    const current=st.fest||'Todos';
+    return `<div data-cobros-state-filter="1" style="padding:0 14px 12px;border-bottom:1px solid var(--line)"><details id="cobros-state-menu" style="position:relative;display:inline-block"><summary class="o-sel" style="list-style:none;cursor:pointer;min-width:220px;display:flex;align-items:center;justify-content:space-between;gap:12px"><span>Estado: <b>${U.esc(current)}</b></span><span aria-hidden="true">▾</span></summary><div style="position:absolute;z-index:25;top:calc(100% + 6px);left:0;min-width:260px;max-height:320px;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--sh-2);padding:6px"><button class="btn ghost sm" data-cobros-state-value="" style="width:100%;justify-content:flex-start;text-align:left">Todos</button>${STATE_FILTER_OPTIONS.map(v=>`<button class="btn ${st.fest===v?'primary':'ghost'} sm" data-cobros-state-value="${U.esc(v)}" style="width:100%;justify-content:flex-start;text-align:left;margin-top:3px">${U.esc(v)}</button>`).join('')}</div></details></div>`;
+  }
 
   function hydrationState() {
     let s = {};
@@ -88,36 +92,58 @@ Orbit.modules.cobros = (function () {
     return 'UNKNOWN';
   }
 
-  function reportedPaymentEvidence(idx) {
-    const linked = new Set((S().all('cobros') || []).map(c => String(c && c.reciboId || '')).filter(Boolean));
+  function receiptHasAppliedPayment(r){
+    const state=String(r&&r.estado||'').trim().toLowerCase();
+    const paymentState=String(r&&r.paymentState||'').trim().toUpperCase();
+    const op=String(r&&r.estadoOperativo||'').trim().toLowerCase();
+    return state==='pagado'||paymentState.startsWith('PAID_')||['pagado','pago_inferido','pago_reportado_aplicado','pago_reportado_asesor_aplicado'].includes(op)||!!(r&&(r.cobroId||r.paidDate||r.fechaPago));
+  }
+  function receiptPaymentEvidence(idx) {
+    const linked = new Set((S().all('cobros') || []).map(c => String(c && (c.reciboId || c.receiptId) || '')).filter(Boolean));
     return (S().all('recibosEsperados') || [])
-      .filter(r => r && ['pago_reportado','pago_reportado_asesor'].includes(String(r.estadoOperativo || '').toLowerCase()) && !linked.has(String(r.id || '')))
+      .filter(r => {
+        if(!r||linked.has(String(r.id||''))) return false;
+        const op=String(r.estadoOperativo||'').toLowerCase();
+        const origin=paymentOriginKind(r);
+        return receiptHasAppliedPayment(r)||origin==='CRM_DIRECT'||['pago_reportado','pago_reportado_asesor'].includes(op);
+      })
       .filter(r => countryMatches(r, idx))
       .map(r => {
         const originKind = paymentOriginKind(r);
+        const applied = receiptHasAppliedPayment(r);
+        const reconciled = r.conciliado === true || String(r.applicationState || '').toUpperCase() === 'APPLIED_DIRECT';
+        const crmDirect = originKind === 'CRM_DIRECT';
+        const advisorPending = !applied && originKind === 'ADVISOR_REPORTED';
+        const clientPending = !applied && originKind === 'CLIENT_PORTAL';
         return {
-          id: 'reported:' + r.id, receiptId: r.id, __reportedEvidence: true,
-          __crmDirectEvidence: originKind === 'CRM_DIRECT',
-          __advisorReportedEvidence: originKind === 'ADVISOR_REPORTED',
-          __clientReportedEvidence: originKind === 'CLIENT_PORTAL',
-          __unclassifiedPaymentEvidence: originKind === 'UNKNOWN',
+          id: 'receipt-payment:' + r.id, receiptId: r.id, __receiptPaymentEvidence: true,
+          __crmDirectEvidence: crmDirect,
+          __paidReceiptEvidence: applied && !crmDirect,
+          __advisorReportedEvidence: advisorPending,
+          __clientReportedEvidence: clientPending,
+          __unclassifiedPaymentEvidence: !applied && !crmDirect && !advisorPending && !clientPending,
           paymentOriginKind: originKind,
           clienteId: r.clienteId, polizaId: r.polizaId, asesorId: r.asesorId, pais: rowCountry(r, idx) || r.pais,
-          cuota: r.cuota || r.secuencia,
+          cuota: r.cuota || r.secuencia || r.serie,
           monto: r.primaTotal != null ? r.primaTotal : (r.montoTotal != null ? r.montoTotal : r.monto),
           moneda: r.moneda, vence: r.fechaLimite || r.vence || r.fechaVencimiento,
           fechaPago: r.paidDate || r.fechaPago || r.fechaPagoReportada || '',
-          estado: originKind === 'CRM_DIRECT' ? 'Pagado' : 'Pendiente',
-          paymentState: originKind === 'CRM_DIRECT' ? 'PAID_DIRECT' : (originKind === 'ADVISOR_REPORTED' ? 'REPORTED_PENDING_OPERATIVE_VALIDATION' : (originKind === 'CLIENT_PORTAL' ? 'PAID_REPORTED' : 'CONFLICT_REVIEW_REQUIRED')),
-          estadoOperativo: String(r.estadoOperativo || 'pago_reportado'), reportado: r.fechaPagoReportada || r.reportado || true
+          estado: (applied || crmDirect) ? 'Pagado' : 'Pendiente',
+          paymentState: r.paymentState || ((applied || crmDirect) ? 'PAID_DIRECT' : (advisorPending ? 'REPORTED_PENDING_OPERATIVE_VALIDATION' : (clientPending ? 'PAID_REPORTED' : 'CONFLICT_REVIEW_REQUIRED'))),
+          applicationState: r.applicationState || (reconciled ? 'APPLIED_DIRECT' : 'PENDING_APPLICATION'),
+          conciliado: reconciled,
+          estadoOperativo: String(r.estadoOperativo || ''), reportado: r.fechaPagoReportada || r.reportado || true
         };
       });
   }
   function reportedRows(idx) {
-    return reportedPaymentEvidence(idx).filter(c => {
+    return receiptPaymentEvidence(idx).filter(c => {
       if (!matchTxt(c, idx)) return false;
       if (!st.fest) return true;
-      if (st.fest === 'Pago registrado en SIGA' || st.fest === 'Pagado' || st.fest === 'Por conciliar') return c.__crmDirectEvidence;
+      if (st.fest === 'Pago registrado en SIGA') return c.__crmDirectEvidence;
+      if (st.fest === 'Pagado') return c.estado === 'Pagado';
+      if (st.fest === 'Por conciliar') return c.estado === 'Pagado' && !c.conciliado;
+      if (st.fest === 'Conciliado') return c.estado === 'Pagado' && c.conciliado;
       if (st.fest === 'Reportado por asesor') return c.__advisorReportedEvidence;
       if (st.fest === 'Reportado por cliente') return c.__clientReportedEvidence;
       if (st.fest === 'Requiere validación') return c.__unclassifiedPaymentEvidence;
@@ -252,7 +278,7 @@ Orbit.modules.cobros = (function () {
     const aging = model.aging;
     const porConciliar = (cart.currencies || []).reduce((sum, cur) => sum + Number(cart.byCurrency[cur] && cart.byCurrency[cur].porConciliar || 0), 0);
     const authoritative = rows(idx), portfolioOnly = portfolioPaymentRows(idx), reported = reportedRows(idx);
-    const crmDirect = reported.filter(x => x.__crmDirectEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
+    const crmDirect = reported.filter(x => x.__crmDirectEvidence), paidReceiptFallback = reported.filter(x => x.__paidReceiptEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
     const allRows = authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
     const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE));
     if (st.page > totalPages) st.page = totalPages;
@@ -260,6 +286,7 @@ Orbit.modules.cobros = (function () {
     const from = (st.page - 1) * PAGE_SIZE, r = allRows.slice(from, from + PAGE_SIZE);
     st.__count = allRows.length + ' registros' +
       (crmDirect.length ? ' · ' + crmDirect.length + ' pagos SIGA por conciliar' : '') +
+      (paidReceiptFallback.length ? ' · ' + paidReceiptFallback.length + ' pagos aplicados proyectados' : '') +
       (advisorReported.length ? ' · ' + advisorReported.length + ' reportes de asesor' : '') +
       (clientReported.length ? ' · ' + clientReported.length + ' reportes de cliente' : '') +
       (allRows.length ? ' · ' + (from + 1) + '–' + Math.min(from + PAGE_SIZE, allRows.length) + ' de ' + allRows.length : '');
@@ -287,12 +314,14 @@ Orbit.modules.cobros = (function () {
 
       <div class="card" style="overflow:hidden">
         ${K.filterBar(FDEFS(), st)}
+        ${stateFilterMenu()}
         <div style="overflow-x:auto"><table class="tbl">
           <thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th><th></th></tr></thead>
           <tbody>${r.map(c => {
             const p = indexPolicy(idx, c.polizaId);
             if (c.__portfolioReceipt) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-portfolio-receipt="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td><span class="muted">—</span></td><td>${badgeValidacion(c)}</td><td><span class="muted">—</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${c.requiereValidacion ? '<span class="badge warn">Revisar</span>' : (advisorRole() ? `<button class="btn primary sm" title="Reportar pago para validación operativa" onclick="event.stopPropagation();Orbit.modules.cobros.reportarPago('${U.esc(c.receiptId)}')" data-cobros-action="report">Reportar pago</button>` : `<button class="btn primary sm" title="Aplicar pago a este recibo" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${U.esc(c.receiptId)}')" data-cobros-action="apply">Aplicar pago</button>`)}</td></tr>`; }
-            if (c.__crmDirectEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-siga-direct-payment="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">No informada</span>'}</td><td><span class="badge ok">Pago registrado en SIGA</span></td><td><span class="badge warn">Pendiente de conciliación</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2"><button class="btn primary sm" title="Conciliar este pago" onclick="event.stopPropagation();Orbit.modules.cobros.conciliarFactura('${U.esc(c.receiptId)}')" data-cobros-action="reconcile">Conciliar</button></td></tr>`; }
+            if (c.__crmDirectEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-siga-direct-payment="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">No informada</span>'}</td><td><span class="badge ok">Pago registrado en SIGA</span></td><td>${c.conciliado ? '<span class="badge ok">Conciliado</span>' : '<span class="badge warn">Pendiente de conciliación</span>'}</td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${c.conciliado ? '<span class="badge ok">Conciliado</span>' : `<button class="btn primary sm" title="Conciliar este pago" onclick="event.stopPropagation();Orbit.modules.cobros.conciliarFactura('${U.esc(c.receiptId)}')" data-cobros-action="reconcile">Conciliar</button>`}</td></tr>`; }
+            if (c.__paidReceiptEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-paid-receipt-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">No informada</span>'}</td><td><span class="badge ok">Pago aplicado</span></td><td>${c.conciliado ? '<span class="badge ok">Conciliado</span>' : '<span class="badge warn">Pendiente de conciliación</span>'}</td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${c.conciliado ? '<span class="badge ok">Conciliado</span>' : `<button class="btn primary sm" title="Conciliar este pago" onclick="event.stopPropagation();Orbit.modules.cobros.conciliarFactura('${U.esc(c.receiptId)}')" data-cobros-action="reconcile">Conciliar</button>`}</td></tr>`; }
             if (c.__advisorReportedEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-advisor-reported-payment="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado por asesor · pendiente de validación operativa</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">${advisorRole() ? '<span class="badge info">Enviado a Ops</span>' : `<button class="btn primary sm" title="Validar y aplicar el pago reportado" onclick="event.stopPropagation();Orbit.modules.cobros.aplicarPago('${U.esc(c.receiptId)}')" data-cobros-action="apply-advisor-report">Validar y aplicar</button>`}</td></tr>`; }
             if (c.__clientReportedEvidence) { return `<tr class="clickable" data-row-country="${U.esc(rowCountry(c, idx))}" data-row-client-id="${U.esc(c.clienteId)}" data-row-policy-id="${U.esc(c.polizaId)}" data-reported-payment-evidence="${U.esc(c.receiptId)}" onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${U.esc(c.receiptId)}','${U.esc(c.clienteId)}')"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? '<span class="mono" style="font-size:12px">' + U.esc(U.text(p.numero)) + '</span>' : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto, c.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td style="font-size:12.5px">${c.fechaPago ? U.fmtDate(c.fechaPago) : '<span class="muted">Reportado</span>'}</td><td><span class="badge info">Pago reportado por cliente · pendiente de aplicar</span></td><td><span class="badge warn">Pendiente</span></td><td style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2"><button class="btn primary sm" title="Aplicar el pago reportado" onclick="event.stopPropagation();Orbit.modules.cobros.validarReporte('${U.esc(c.receiptId)}')" data-cobros-action="apply">Aplicar pago</button></td></tr>`; }
             if (c.__unclassifiedPaymentEvidence) { return `<tr data-unclassified-payment-evidence="${U.esc(c.receiptId)}"><td>${K.clienteCell(c.clienteId)}</td><td>${p ? U.esc(U.text(p.numero)) : '—'}</td><td>${U.esc(U.text(c.cuota))}</td><td class="num">${U.money(c.monto,c.moneda)}</td><td>${U.fmtDate(c.vence)}</td><td>${c.fechaPago ? U.fmtDate(c.fechaPago) : '—'}</td><td><span class="badge warn">Origen de pago por confirmar</span></td><td><span class="badge warn">Revisión</span></td><td></td></tr>`; }
@@ -328,6 +357,7 @@ Orbit.modules.cobros = (function () {
         render(host, true);
       }
     });
+    host.querySelectorAll('[data-cobros-state-value]').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();st.fest=btn.getAttribute('data-cobros-state-value')||'';st.page=1;render(host,true);}));
   }
 
   function pagina(delta) {

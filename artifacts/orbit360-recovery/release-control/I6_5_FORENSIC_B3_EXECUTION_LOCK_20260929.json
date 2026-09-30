@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_R7_REMEDIATION_AUTHORIZED",
+  "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -294,7 +294,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R7_CAUSAL_SOURCE_FIX",
+    "nextAction": "B3_004_R7_SOURCE_CONTRACT",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -355,16 +355,29 @@
     "r7RemediationAuthorization": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_REMEDIATION_AUTHORIZATION_20260930.json",
       "blobSha": "aa125b6e882f4e1e1776590b05f212c1fd428818"
-    }
+    },
+    "r7SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_CAUSAL_SOURCE_FIX_20260930.json",
+      "blobSha": "9c6091675a551936c529aff9458c932a8a7d2540",
+      "productBlobs": {
+        "orbit360-platform/modules/cobros.js": "6ccc19ed5f51f33e4f02461d55edbe01881ab223",
+        "orbit360-platform/modules/cliente360.js": "4104e0d63af041938a5102eb75ab43786e3d870a",
+        "orbit360-platform/index.html": "24ee157327bc16d25c71fe27485e23ea85229ad2"
+      },
+      "qaBlobs": {
+        "tools/gravicentra-i6-5-b3-004-contract.mjs": "f3e3421e1079ba8da706d92b26e1036596dc07c3"
+      }
+    },
+    "r7RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "243196f01d371986fd3aab1ac8e98dec2303aec7",
+    "blobSha": "6dcf6e8ec5e5251da2b0fcdb37b899d38f51aa59",
     "productFileCount": 78
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "875d434a1cac4b70ef0d723a637445b4ac5a2322"
+    "blobSha": "f4231b6eb424e964fef175fe320ce08102633857"
   },
   "nextRequiredProof": [
     "B3_004_R7_SOURCE_CONTRACT_PASS",
@@ -397,7 +410,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,

@@ -171,13 +171,13 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "dbc6ae798f580ee991fd3053e9822f3bd7c0825b",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "a24d371881d169d82e638801587f038a0febeb2b",
+    "orbit360-platform/index.html": "24ee157327bc16d25c71fe27485e23ea85229ad2",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
-    "orbit360-platform/modules/cliente360.js": "ae5f64ce2bcf6736de3d4d7317bded23799083d5",
+    "orbit360-platform/modules/cliente360.js": "4104e0d63af041938a5102eb75ab43786e3d870a",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
-    "orbit360-platform/modules/cobros.js": "f1b2a15eb77198fa68903db3d0e0817de20c4bdf",
+    "orbit360-platform/modules/cobros.js": "6ccc19ed5f51f33e4f02461d55edbe01881ab223",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "3416e943f37e6306346930b8d839bf8fd8a152e8",
@@ -221,18 +221,20 @@
   ],
   "lastRemediation": {
     "findingId": "B3-004",
-    "subFindingId": "B3-004-R6.1-INTERNAL",
+    "subFindingId": "B3-004-R7-COBROS-VISIBILITY-FILTER",
     "status": "SOURCE_FIXED_PENDING_CONTRACT",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_INTERNAL_HOTFIX_SOURCE_FIX_20260930.json",
-    "receiptBlobSha": "63b65ec9afe13230401431a09e793a479d5b743b",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_CAUSAL_SOURCE_FIX_20260930.json",
+    "receiptBlobSha": "9c6091675a551936c529aff9458c932a8a7d2540",
     "changedProductFiles": [
-      "functions/cobros-reconciliation-domain.js"
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/index.html"
     ],
     "qaFiles": [
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
-    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
-    "paymentLockBlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986"
+    "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_COBROS_VISIBILITY_FILTER_LOCK_20260930.json",
+    "lockBlobSha": "9c64bf9a580d89165fc4ced4427268d628a748f4"
   },
   "lastMechanismRootFix": {
     "id": "B3-TRANSITION-GUARD-ROOTFIX-20260929",
@@ -642,5 +644,22 @@
     "runId": 36763283882,
     "artifactId": "11120555043",
     "artifactDigest": "60db8f505d6809b97e6ad527bf2797c1a7e796c7a9d8cbe8be2b5b9864acdf06"
+  },
+  "b3004R7CausalSourceFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_CAUSAL_SOURCE_FIX_20260930.json",
+    "receiptBlobSha": "9c6091675a551936c529aff9458c932a8a7d2540",
+    "productBlobs": {
+      "orbit360-platform/modules/cobros.js": "6ccc19ed5f51f33e4f02461d55edbe01881ab223",
+      "orbit360-platform/modules/cliente360.js": "4104e0d63af041938a5102eb75ab43786e3d870a",
+      "orbit360-platform/index.html": "24ee157327bc16d25c71fe27485e23ea85229ad2"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "f3e3421e1079ba8da706d92b26e1036596dc07c3"
+    },
+    "exactProductSetChanged": false,
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

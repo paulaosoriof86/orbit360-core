@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "R7_REMEDIATION_AUTHORIZED",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R7_CAUSAL_SOURCE_FIX",
+      "nextAction": "B3_004_R7_SOURCE_CONTRACT",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1309,6 +1309,18 @@
       "r7RemediationAuthorization": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_REMEDIATION_AUTHORIZATION_20260930.json",
         "blobSha": "aa125b6e882f4e1e1776590b05f212c1fd428818"
+      },
+      "r7SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_CAUSAL_SOURCE_FIX_20260930.json",
+        "blobSha": "9c6091675a551936c529aff9458c932a8a7d2540",
+        "productBlobs": {
+          "orbit360-platform/modules/cobros.js": "6ccc19ed5f51f33e4f02461d55edbe01881ab223",
+          "orbit360-platform/modules/cliente360.js": "4104e0d63af041938a5102eb75ab43786e3d870a",
+          "orbit360-platform/index.html": "24ee157327bc16d25c71fe27485e23ea85229ad2"
+        },
+        "qaBlobs": {
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "f3e3421e1079ba8da706d92b26e1036596dc07c3"
+        }
       }
     },
     {

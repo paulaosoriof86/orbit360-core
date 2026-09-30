@@ -135,3 +135,18 @@ const reportAdvisorBody=server.slice(reportAdvisorStart,applyPaymentStart);
 need(!reportAdvisorBody.includes('finalPaymentMethod'),'B3_004_ADVISOR_REPORT_UNDEFINED_FINAL_PAYMENT_METHOD');
 need(reportAdvisorBody.includes('if (paymentMethod) receiptPatch.metodoPago = paymentMethod;'),'B3_004_ADVISOR_REPORT_PAYMENT_METHOD_PATCH_MISSING');
 console.log('B3_004_R6_1_ADVISOR_REPORT_RUNTIME_GUARD=PASS');
+
+
+need(cobros.includes('function receiptHasAppliedPayment'),'B3_004_R7_GLOBAL_PAID_RECEIPT_DETECTOR_MISSING');
+need(cobros.includes('function receiptPaymentEvidence'),'B3_004_R7_GLOBAL_PAYMENT_EVIDENCE_PROJECTION_MISSING');
+need(cobros.includes('__paidReceiptEvidence'),'B3_004_R7_GLOBAL_PAID_RECEIPT_FALLBACK_MISSING');
+need(cobros.includes('data-cobros-state-filter="1"'),'B3_004_R7_STATE_FILTER_FALLBACK_MISSING');
+need(cobros.includes('data-cobros-state-value'),'B3_004_R7_STATE_FILTER_ACTIONS_MISSING');
+need(!cobros.includes("{ id: 'fest', type: 'select'"),'B3_004_R7_BROKEN_NATIVE_STATE_FILTER_REMAINS');
+need(cliente.includes('linkedReceiptIds'),'B3_004_R7_CLIENT_PAYMENT_DEDUPE_MISSING');
+need(cliente.includes('data-paid-receipt-evidence'),'B3_004_R7_CLIENT_PAID_RECEIPT_FALLBACK_MISSING');
+need(cliente.includes('Todas las pólizas</option>'),'B3_004_R7_CLIENT_ALL_POLICIES_FILTER_MISSING');
+need(!cliente.includes('activePolicyIds'),'B3_004_R7_CLIENT_ACTIVE_POLICY_PAYMENT_GATE_REMAINS');
+need(indexR4.includes('modules/cobros.js?v=20260930-b3004r7'),'B3_004_R7_COBROS_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r7'),'B3_004_R7_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
+console.log('B3_004_R7_COBROS_VISIBILITY_FILTER_CONTRACT=PASS');

@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R7_CAUSAL_SOURCE_FIX_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "c7cc5e02244873bb4fa9e76316b2c27d339bd768",
+  "findingId": "B3-004",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "authority": {
+    "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_COBROS_VISIBILITY_FILTER_LOCK_20260930.json",
+    "lockBlobSha": "9c64bf9a580d89165fc4ced4427268d628a748f4",
+    "authorizationPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_REMEDIATION_AUTHORIZATION_20260930.json",
+    "authorizationBlobSha": "aa125b6e882f4e1e1776590b05f212c1fd428818"
+  },
+  "rootCauses": [
+    "Cliente 360 > Cobros filtered payment history by activePolicyIds derived from renewable/current policies, suppressing paid evidence for historical/non-current policies.",
+    "Global Cobros projected only unlinked pago_reportado/pago_reportado_asesor receipt evidence, not every paid/applied receipt when its canonical cobro was not currently visible in the read model.",
+    "Estado relied exclusively on a native select interaction that was not operable in the authenticated visual session; R7 introduces a Cobros-local deterministic state menu while leaving unrelated module filters untouched."
+  ],
+  "fixes": [
+    "Remove active-policy payment-history gate in Cliente 360; policy lifecycle affects open portfolio, not historical payment visibility.",
+    "Project unlinked paid receipts into Cobros with receiptId dedupe against canonical cobros; canonical cobro remains authoritative whenever visible.",
+    "Keep SIGA/CRM direct evidence and individual Conciliar semantics.",
+    "Replace Cobros Estado native select dependency with an explicit local state menu containing the same frozen state set.",
+    "Bump only Cobros/Cliente360 asset versions to R7."
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/cobros.js": "6ccc19ed5f51f33e4f02461d55edbe01881ab223",
+    "orbit360-platform/modules/cliente360.js": "4104e0d63af041938a5102eb75ab43786e3d870a",
+    "orbit360-platform/index.html": "24ee157327bc16d25c71fe27485e23ea85229ad2"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "f3e3421e1079ba8da706d92b26e1036596dc07c3"
+  },
+  "boundaries": {
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3005Opened": false
+  }
+}

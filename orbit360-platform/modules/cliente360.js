@@ -548,26 +548,38 @@ Orbit.modules.cliente360 = (function () {
   /* ---- Cobros y cartera ---- */
   function tabCobros(cid, r) {
     const polFil = (window._cobFilPol && window._cobFilPol[cid]) || '';
-    const activePolicies = r.pol.filter(esRenovable);
-    const activePolicyIds = new Set(activePolicies.map(p => String(p.id)));
+    const allPolicies = r.pol.slice();
     const cobAll = r.cob.filter(c => {
-      if (c.polizaId && !activePolicyIds.has(String(c.polizaId))) return false;
       const ps = String(c.paymentState || '').toUpperCase();
       return c.estado === 'Pagado' || ps === 'PAID_DIRECT' || ps === 'PAID_REPORTED' || ps === 'PAID_INFERRED';
     });
     const cob = cobAll.filter(c => !polFil || c.polizaId === polFil).sort((a, b) => (b.vence||'').localeCompare(a.vence||''));
     const receiptSource = q.recibosEsperadosDe ? q.recibosEsperadosDe(cid) : S().where('recibosEsperados', x => x && x.clienteId === cid);
-    const evidenceAll = (receiptSource || []).filter(x => x && ['pago_reportado','pago_reportado_asesor'].includes(String(x.estadoOperativo || '').toLowerCase()) && activePolicyIds.has(String(x.polizaId || '')));
     const paymentOriginKind = x => { try { if (Orbit.reconciliationDomain && typeof Orbit.reconciliationDomain.classifyPaymentOrigin === 'function') return Orbit.reconciliationDomain.classifyPaymentOrigin(x); } catch (e) {} return 'UNKNOWN'; };
+    const receiptHasAppliedPayment = x => {
+      const state=String(x&&x.estado||'').trim().toLowerCase();
+      const ps=String(x&&x.paymentState||'').trim().toUpperCase();
+      const op=String(x&&x.estadoOperativo||'').trim().toLowerCase();
+      return state==='pagado'||ps.startsWith('PAID_')||['pagado','pago_inferido','pago_reportado_aplicado','pago_reportado_asesor_aplicado'].includes(op)||!!(x&&(x.cobroId||x.paidDate||x.fechaPago));
+    };
+    const linkedReceiptIds = new Set((r.cob||[]).map(c=>String(c&&(c.reciboId||c.receiptId)||'')).filter(Boolean));
+    const evidenceAll = (receiptSource || []).filter(x => {
+      if(!x||linkedReceiptIds.has(String(x.id||''))) return false;
+      const op=String(x.estadoOperativo||'').toLowerCase();
+      const origin=paymentOriginKind(x);
+      return receiptHasAppliedPayment(x)||origin==='CRM_DIRECT'||['pago_reportado','pago_reportado_asesor'].includes(op);
+    });
     const crmDirectAll = evidenceAll.filter(x => paymentOriginKind(x) === 'CRM_DIRECT');
-    const advisorReportedAll = evidenceAll.filter(x => paymentOriginKind(x) === 'ADVISOR_REPORTED');
-    const reportedAll = evidenceAll.filter(x => paymentOriginKind(x) === 'CLIENT_PORTAL');
-    const unknownEvidenceAll = evidenceAll.filter(x => paymentOriginKind(x) === 'UNKNOWN');
+    const paidReceiptAll = evidenceAll.filter(x => paymentOriginKind(x) !== 'CRM_DIRECT' && receiptHasAppliedPayment(x));
+    const advisorReportedAll = evidenceAll.filter(x => !receiptHasAppliedPayment(x) && paymentOriginKind(x) === 'ADVISOR_REPORTED');
+    const reportedAll = evidenceAll.filter(x => !receiptHasAppliedPayment(x) && paymentOriginKind(x) === 'CLIENT_PORTAL');
+    const unknownEvidenceAll = evidenceAll.filter(x => !receiptHasAppliedPayment(x) && paymentOriginKind(x) === 'UNKNOWN');
     const crmDirect = crmDirectAll.filter(x => !polFil || x.polizaId === polFil).sort((a,b) => String(b.fechaPagoReportada||b.fechaPago||'').localeCompare(String(a.fechaPagoReportada||a.fechaPago||'')));
+    const paidReceipt = paidReceiptAll.filter(x => !polFil || x.polizaId === polFil).sort((a,b) => String(b.paidDate||b.fechaPago||b.fechaPagoReportada||'').localeCompare(String(a.paidDate||a.fechaPago||a.fechaPagoReportada||'')));
     const advisorReported = advisorReportedAll.filter(x => !polFil || x.polizaId === polFil).sort((a,b) => String(b.fechaPagoReportada||b.fechaPago||'').localeCompare(String(a.fechaPagoReportada||a.fechaPago||'')));
     const reported = reportedAll.filter(x => !polFil || x.polizaId === polFil).sort((a,b) => String(b.fechaPagoReportada||b.fechaPago||'').localeCompare(String(a.fechaPagoReportada||a.fechaPago||'')));
     const unknownEvidence = unknownEvidenceAll.filter(x => !polFil || x.polizaId === polFil);
-    const polOptions = '<option value="">Todas las pólizas vigentes</option>' + activePolicies.map(p => {
+    const polOptions = '<option value="">Todas las pólizas</option>' + allPolicies.map(p => {
       const ase = S().all('aseguradoras').find(a => a && a.id === p.aseguradoraId);
       const lbl = (p.numero||'—') + ' · ' + (ase ? ase.nombre : '—') + (p.ramo ? ' · '+p.ramo : '');
       return '<option value="' + U.esc(p.id) + '" ' + (polFil === p.id ? 'selected' : '') + '>' + U.esc(lbl) + '</option>';
@@ -592,6 +604,24 @@ Orbit.modules.cliente360 = (function () {
       const paymentDate = x.paidDate || x.fechaPago || x.fechaPagoReportada || '';
       const method = x.paymentMethod || x.metodoPago || x.metodo || x.formaPago || '';
       return `<tr data-siga-direct-payment="1"><td><span class="mono" style="font-size:12px">${p ? p.numero : (x.polizaNumero || '—')}</span></td><td>${U.esc(x.serie || x.cuota || x.numeroReciboFuente || '—')}</td><td class="num">${amount == null ? '<span class="muted">—</span>' : U.money(amount, x.moneda || (p && p.moneda) || r.moneda)}</td><td style="font-size:12.5px">${U.fmtDate(x.fechaLimite || x.vence || x.fechaVencimiento)}</td><td style="font-size:12.5px">${paymentDate ? U.fmtDate(paymentDate) : '<span class="muted">—</span>'}</td><td style="font-size:12.5px">${method ? U.esc(method) : '<span class="muted">—</span>'}</td><td><span class="badge ok">Pago registrado en SIGA</span></td><td><span class="badge warn">Pendiente de conciliación</span></td><td><button class="btn primary sm" data-c360-conciliar-receipt="${U.esc(x.id)}">Conciliar</button></td></tr>`;
+    }).join('');
+    const paidReceiptRows = paidReceipt.map(x => {
+      const p = S().get('polizas', x.polizaId);
+      const amount = U.finiteNumber(x.primaTotal != null ? x.primaTotal : (x.montoTotal != null ? x.montoTotal : x.monto));
+      const paymentDate = x.paidDate || x.fechaPago || x.fechaPagoReportada || '';
+      const method = x.paymentMethod || x.metodoPago || x.metodo || x.formaPago || '';
+      const reconciled = x.conciliado === true || String(x.applicationState || '').toUpperCase() === 'APPLIED_DIRECT';
+      return `<tr data-paid-receipt-evidence="1">
+        <td><span class="mono" style="font-size:12px">${p ? p.numero : (x.polizaNumero || '—')}</span></td>
+        <td>${U.esc(x.serie || x.cuota || x.numeroReciboFuente || '—')}</td>
+        <td class="num">${amount == null ? '<span class="muted">—</span>' : U.money(amount, x.moneda || (p && p.moneda) || r.moneda)}</td>
+        <td style="font-size:12.5px">${U.fmtDate(x.fechaLimite || x.vence || x.fechaVencimiento)}</td>
+        <td style="font-size:12.5px">${paymentDate ? U.fmtDate(paymentDate) : '<span class="muted">—</span>'}</td>
+        <td style="font-size:12.5px">${method ? U.esc(method) : '<span class="muted">—</span>'}</td>
+        <td><span class="badge ok">Pago aplicado</span></td>
+        <td>${reconciled ? '<span class="badge ok">Conciliado</span>' : '<span class="badge warn">Pendiente de conciliación</span>'}</td>
+        <td>${reconciled ? '<span class="badge ok">Conciliado</span>' : `<button class="btn primary sm" data-c360-conciliar-receipt="${U.esc(x.id)}">Conciliar</button>`}</td>
+      </tr>`;
     }).join('');
     const advisorReportedRows = advisorReported.map(x => {
       const p = S().get('polizas', x.polizaId);
@@ -628,9 +658,10 @@ Orbit.modules.cliente360 = (function () {
       </tr>`;
     }).join('');
     const unknownRows = unknownEvidence.map(x => { const p=S().get('polizas',x.polizaId); return `<tr data-payment-origin-review="1"><td><span class="mono" style="font-size:12px">${p?p.numero:'—'}</span></td><td>${U.esc(x.serie||x.cuota||'—')}</td><td colspan="5"><span class="badge warn">Origen de pago por confirmar</span></td><td><span class="badge warn">Revisión</span></td><td></td></tr>`; }).join('');
-    const visibleRows = confirmedRows + crmDirectRows + advisorReportedRows + reportedRows + unknownRows;
+    const visibleRows = confirmedRows + crmDirectRows + paidReceiptRows + advisorReportedRows + reportedRows + unknownRows;
     const noteParts = [];
     if (crmDirect.length) noteParts.push(`<b>${crmDirect.length}</b> pago(s) registrados en SIGA: conservan conciliación automática por lote y también conciliación individual.`);
+    if (paidReceipt.length) noteParts.push(`<b>${paidReceipt.length}</b> pago(s) aplicado(s) proyectados desde recibos mientras no exista un cobro visible; no se duplican cuando aparece el cobro canónico.`);
     if (advisorReported.length) noteParts.push(`<b>${advisorReported.length}</b> pago(s) reportado(s) por asesor pendientes de validación operativa en Ops.`);
     if (reported.length) noteParts.push(`<b>${reported.length}</b> pago(s) realmente reportados desde portal pendientes de aplicación automática.`);
     if (unknownEvidence.length) noteParts.push(`<b>${unknownEvidence.length}</b> evidencia(s) con origen por confirmar.`);
