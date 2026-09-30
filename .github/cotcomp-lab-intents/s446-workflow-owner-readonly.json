@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s446-workflow-owner-readonly-v1.0",
   "authorization": "S446_READ_ONLY_WORKFLOW_OWNER_RUNTIME_VERIFICATION",
-  "authorizedSourceParent": "2528f320e0f9473233a00e441f9fdd90b79b98e0",
+  "authorizedSourceParent": "12e88a6413c08fac7e77515a35cb9bfa968f1ae5",
   "projectId": "ays-orbit-360-lab",
   "environment": "LAB",
   "region": "us-central1",
@@ -12,5 +12,5 @@
   "iamWrites": false,
   "production": false,
   "purpose": "VERIFY_EXACT_DEPLOYED_S420_OPS_LEADS_OWNER_SOURCE_FROM_GEN2_SOURCE_ARCHIVE_READONLY",
-  "retriggerReason": "EVALUATE_EXPLICIT_COTCOMP_REF_RUNTIME_BLOCKER_AND_CANONICAL_W2_SEMANTICS"
+  "retriggerReason": "NORMALIZE_SOURCE_ARCHIVE_READBACK_EVIDENCE_FIELD_AND_CAPTURE_FINAL_BLOCKERS"
 }
