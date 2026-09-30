@@ -59,7 +59,16 @@ const PII_POLICY = Object.freeze({
   analyticsAllowed: false,
   sanitizedLogsRequired: true,
   marketingConsentSeparate: true,
-  retention: 'GOVERNANCE_LEGAL_DECISION_REQUIRED'
+  retentionPolicyVersion: 'ays-cotcomp-governance-policy-s426-v1.0',
+  retentionPolicyStatus: 'OWNER_INTERNAL_POLICY_ACTIVE',
+  legalComplianceVerified: false,
+  retention: Object.freeze({
+    inactiveDraftDays: 30,
+    submittedNotConvertedMonths: 12,
+    caseAccessDays: 7,
+    rawTokenPersistenceAllowed: false,
+    convertedCaseGovernance: 'GRAVICENTRA_CLIENT_POLICY_GOVERNANCE'
+  })
 });
 
 function clean(value, max = 240) {
