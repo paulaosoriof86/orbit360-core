@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "ays-cotcomp-s447-owner-alignment-authorization-v1.0",
+  "authorization": "S447_ALIGN_CANONICAL_S420_LEADS_OPS_OWNER_IN_LAB",
+  "authorizedSourceParent": "f0ef3ded48c9d98b1a48d0a74e4a42396e54f220",
+  "authorizedAt": "2026-09-30",
+  "projectId": "ays-orbit-360-lab",
+  "environment": "LAB",
+  "region": "us-central1",
+  "function": "orbit360OpsLeadsCommand",
+  "expectedOldOwnerBlob": "d0a1e116186bba860d34ec540e8abba81830b553",
+  "expectedNewOwnerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+  "preQaRequired": true,
+  "postQaRequired": true,
+  "physicalSourceReadbackRequired": true,
+  "appDataWrites": false,
+  "executeW2": false,
+  "providerDelivery": false,
+  "realData": false,
+  "production": false,
+  "ownerAuthorizationText": "Autorizo S4.47 para desplegar exclusivamente en ays-orbit-360-lab el owner canónico S4.20 de Leads/Ops (functions/ops-leads-domain.js, blob 73e09a4404cb4298dc34c9c38e26ad1f960d3170), reemplazando el runtime desactualizado d0a1e116186bba860d34ec540e8abba81830b553, con QA previo y posterior y readback físico exacto del source desplegado; sin app-data writes, sin ejecutar W2, sin provider delivery, sin datos reales y sin producción."
+}
