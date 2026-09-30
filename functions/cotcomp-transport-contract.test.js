@@ -86,7 +86,7 @@ test('handoff contract can become transport-valid but never persistence-enabled 
 
 test('proposal fetch contract is read-only and carries comparison truth locks', () => {
   const r = t.buildTransportPlan({
-    operation:'FETCH_COMPARABLE_PROPOSALS', requestId:'r4', auth:publicAuth, quoteCaseId:'qc_1'
+    operation:'FETCH_COMPARABLE_PROPOSALS', requestId:'r4', auth:{...publicAuth,caseAccessVerified:true}, quoteCaseId:'qc_1'
   });
   assert.equal(r.transportAllowed,true);
   assert.equal(r.responseMode,'READ_ONLY_VALIDATED_CURRENT_PROPOSALS');
@@ -96,13 +96,13 @@ test('proposal fetch contract is read-only and carries comparison truth locks', 
 
 test('proposal selection requires explicit user choice and is not issuance', () => {
   const blocked = t.buildTransportPlan({
-    operation:'SELECT_PROPOSAL', requestId:'r5', auth:publicAuth, quoteCaseId:'qc_1', proposalId:'p1'
+    operation:'SELECT_PROPOSAL', requestId:'r5', auth:{...publicAuth,caseAccessVerified:true}, quoteCaseId:'qc_1', proposalId:'p1'
   });
   assert.equal(blocked.transportAllowed,false);
   assert.ok(blocked.errors.includes('EXPLICIT_USER_CHOICE_REQUIRED'));
 
   const ok = t.buildTransportPlan({
-    operation:'SELECT_PROPOSAL', requestId:'r6', auth:publicAuth, quoteCaseId:'qc_1', proposalId:'p1', explicitUserChoice:true
+    operation:'SELECT_PROPOSAL', requestId:'r6', auth:{...publicAuth,caseAccessVerified:true}, quoteCaseId:'qc_1', proposalId:'p1', explicitUserChoice:true
   });
   assert.equal(ok.transportAllowed,true);
   assert.equal(ok.requirements.issuanceMeaning,'NOT_ISSUED_NOT_BOUND_NOT_COVERED');
