@@ -1,9 +1,9 @@
-name: cotcomp-workflow-s419-source-qa
+name: cotcomp-workflow-s420-source-qa
 
 on:
   push:
     branches:
-      - ays/cotcomp-workflow-schema-s419-20260929
+      - ays/cotcomp-workflow-schema-s420-20260929
 
 permissions:
   contents: read
