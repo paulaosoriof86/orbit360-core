@@ -56,6 +56,12 @@ jobs:
             .cleanupRequired == true and
             .finalAbsenceRequired == true
           ' "$INTENT" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          EXPECTED_PARENT="$(jq -r '.authorizedSourceParent // empty' "$INTENT")"
+          test "$EXPECTED_PARENT" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$INTENT"
 
       - name: Run full CotComp source QA before deploy
         working-directory: functions
