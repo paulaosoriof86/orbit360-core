@@ -191,5 +191,24 @@
     "functions/cobros-reconciliation-domain.js",
     "tools/gravicentra-i6-5-b3-004-contract.mjs"
   ],
-  "compositionLockBlobSha": "ed9e00957e9320ee4caa4e3d96b9f0b974f42dd3"
+  "compositionLockBlobSha": "ed9e00957e9320ee4caa4e3d96b9f0b974f42dd3",
+  "syntheticQaAuthorization": {
+    "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
+    "purpose": "CREATE_RETRY_ENRICH_READBACK_CLEANUP_PROOF",
+    "idPrefix": "__b3004qa_",
+    "allowedCollections": [
+      "clientes",
+      "polizas",
+      "recibosEsperados",
+      "carteraPrimas",
+      "cobros",
+      "reconciliationRequests",
+      "reconciliationEvents"
+    ],
+    "cleanupRequired": true,
+    "cleanupMustPassBeforeMachinePass": true,
+    "operationalBusinessWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false
+  }
 }
