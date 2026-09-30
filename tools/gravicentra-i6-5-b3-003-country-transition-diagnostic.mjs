@@ -1,3 +1,4 @@
+// B3-003 diagnostic rerun after atomic governance sync 087d02de6d6b8c053bafb62cdf4ff74778f788c5
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
