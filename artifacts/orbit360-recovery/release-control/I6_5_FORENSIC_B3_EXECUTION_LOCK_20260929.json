@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_002_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+  "status": "B3_002_CANDIDATE_PENDING_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-002",
     "title": "Cobros search/performance/hydration must be fast and non-blocking.",
-    "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
+    "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
     "blocking": true,
     "humanEvidence": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
     "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN",
@@ -37,6 +37,17 @@
       },
       "finalRows": 489,
       "reportedRows": 484
+    },
+    "causalFix": {
+      "rendererOwner": "orbit360-platform/modules/cobros.js",
+      "rendererBlobSha": "6b399b2b27423d170b7a758a9e65a873bba70605",
+      "adapterOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+      "adapterBlobSha": "08367dc718e702a5634711e4efc90722c1cac923",
+      "reactiveOwner": "orbit360-platform/core/router.js",
+      "reactiveOwnerBlobSha": "ffea048a80c32c825c9f388a72d0764c8e5119ca",
+      "shellPreserved": true,
+      "secondRendererCreated": false,
+      "financialSemanticsChanged": false
     }
   },
   "canonicalComposition": {
@@ -49,7 +60,6 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_002_CAUSAL_SOURCE_FIX",
     "B3_002_EXACT_PREVIEW_TIMING_PASS",
     "B3_002_TARGETED_VISUAL_PERFORMANCE_PASS"
   ],
@@ -149,5 +159,5 @@
     },
     "shellOwnerVisualMatch": true
   },
-  "boundaryNote": "B3-002 measured cause confirmed. Product-only causal performance fix authorized; no business/data writes, no reimport, no LIVE, no B4."
+  "boundaryNote": "Causal source fix committed. Build exact immutable successor and prove timing/DOM on isolated Preview; still no data writes, reimport, LIVE, or B4."
 }
