@@ -708,7 +708,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Search/performance: indexing, debounce and pagination/virtualization; no page freeze.",
-      "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
+      "status": "CAUSAL_SOURCE_FIX_COMMITTED_PENDING_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN",
@@ -730,7 +730,24 @@
         "finalRows": 489,
         "reportedRows": 484
       },
-      "nextAction": "B3_002_CAUSAL_SOURCE_FIX"
+      "nextAction": "B3_002_EXACT_PREVIEW_TIMING_PROOF",
+      "causalFix": {
+        "rendererOwner": "orbit360-platform/modules/cobros.js",
+        "adapterOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+        "reactiveOwner": "orbit360-platform/core/router.js",
+        "blobs": {
+          "orbit360-platform/modules/cobros.js": "6b399b2b27423d170b7a758a9e65a873bba70605",
+          "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "08367dc718e702a5634711e4efc90722c1cac923",
+          "orbit360-platform/core/router.js": "ffea048a80c32c825c9f388a72d0764c8e5119ca"
+        },
+        "changes": [
+          "explicit partial-hydration loading",
+          "render-scoped relation indexes",
+          "60-row pagination",
+          "180ms search debounce",
+          "single router-owned reactive refresh"
+        ]
+      }
     },
     {
       "id": "B3-003",
@@ -4307,7 +4324,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_002_CAUSE_CONFIRMED_FIX_AUTHORIZED",
+    "status": "B3_002_CANDIDATE_PENDING_PREVIEW",
     "activeFindingId": "B3-002",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
