@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "ays-cotcomp-lab-proof-receipt-s439-v0.1",
+  "capturedAt": "2026-09-30",
+  "deployedSourceSha": "17d599e884d5b834b73b9499d8cef177575d56f9",
+  "sourceTree": "e645aaed3d012174f1e6b1a9b083b86e03f8b60d",
+  "deployRun": {
+    "runId": 36763893708,
+    "workflowConclusion": "failure",
+    "materialOutcome": "FOUR_FUNCTION_CREATES_SUCCEEDED",
+    "terminalNonZeroReason": "ARTIFACT_REGISTRY_CLEANUP_POLICY_NOT_CONFIGURED"
+  },
+  "readbackRun": {
+    "runId": 36764338132,
+    "workflowConclusion": "success",
+    "artifactId": "11120545801",
+    "artifactDigest": "sha256:8f0673b0afa05c014c43b99c63d99a7055d87b1b0a65ef0e863d6677736e9e67"
+  },
+  "sourceArtifact": {
+    "artifactId": "11119533069",
+    "artifactDigest": "sha256:9d50a9b8fca53a9971811f5cae663109e602ec028129c6dede8f5adcc539e838"
+  },
+  "backendSourceDigest": "ea6941bfba5e53347a12713a978b7e35c3077a7854590bc1c520c4b50e628802",
+  "workflowOwnerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+  "runtimeInventory": {
+    "projectId": "ays-orbit-360-lab",
+    "environment": "LAB",
+    "region": "us-central1",
+    "exact": true,
+    "records": {
+      "cotcompValidateDraft": {
+        "state": "ACTIVE",
+        "platform": "gcfv2",
+        "runtime": "nodejs22"
+      },
+      "cotcompSubmitHandoff": {
+        "state": "ACTIVE",
+        "platform": "gcfv2",
+        "runtime": "nodejs22"
+      },
+      "cotcompFetchComparableProposals": {
+        "state": "ACTIVE",
+        "platform": "gcfv2",
+        "runtime": "nodejs22"
+      },
+      "cotcompSelectProposal": {
+        "state": "ACTIVE",
+        "platform": "gcfv2",
+        "runtime": "nodejs22"
+      }
+    }
+  },
+  "securitySourceBinding": {
+    "appCheckAllFour": true,
+    "replayProtection": {
+      "cotcompValidateDraft": false,
+      "cotcompSubmitHandoff": true,
+      "cotcompFetchComparableProposals": false,
+      "cotcompSelectProposal": true
+    },
+    "syntheticOnlySourceGate": true,
+    "forbiddenPersistenceDependenciesAbsent": true
+  },
+  "dataTruth": {
+    "persistenceEnabled": false,
+    "appDataWritesExecuted": 0,
+    "realDataUsed": false,
+    "productionTouched": false
+  },
+  "functionalInvocation": {
+    "successfulCallableInvocationObserved": false,
+    "note": "Inventory/readback and source-security binding were verified; no valid-App-Check live callable invocation is claimed."
+  },
+  "openOperationalItem": {
+    "artifactRegistryCleanupPolicyConfigured": false,
+    "warning": "Container images may accumulate and create a small monthly charge."
+  },
+  "technicalBranchQa": {
+    "runId": 36764842189,
+    "conclusion": "success",
+    "tests": 267,
+    "passed": 267,
+    "failed": 0
+  }
+}
