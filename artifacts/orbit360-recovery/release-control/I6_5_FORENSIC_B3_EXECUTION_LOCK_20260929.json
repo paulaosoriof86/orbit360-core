@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE",
+  "status": "B3_003_CAUSE_CONFIRMED_FIX_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,9 +14,9 @@
   "activeFinding": {
     "id": "B3-003",
     "title": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
-    "status": "VISUAL_REJECTED_DIAGNOSTIC_ACTIVE",
+    "status": "CAUSE_CONFIRMED_FIX_AUTHORIZED",
     "blocking": true,
-    "rootCause": "ALL_COUNTRIES_CROSS_CURRENCY_SCALAR_PLUS_FIXED_COP_DIVISOR_PLUS_AGING_COUNTRY_FILTER_LEAK",
+    "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
     "requiredProof": [
       "Identify exact source/owner for Cobros KPIs and aging.",
       "Prove country and currency filtering semantics from authoritative collections.",
@@ -24,13 +24,13 @@
       "Prove payment-state classification does not mix reported evidence with confirmed cobro.",
       "No business writes, no reimport, no LIVE."
     ],
-    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_KPI_AGING_CURRENCY_DIAGNOSTIC_20260929.json",
-    "diagnosticRunId": 36654461494,
-    "diagnosticArtifactId": 11071897701,
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json",
+    "diagnosticRunId": 36658190622,
+    "diagnosticArtifactId": 11073202655,
     "diagnosticArtifactDigest": "sha256:5921eb661a892abb11d7371fbce3e31bc4fa93e9bb356b5807f4aad6c4f6c5dc",
     "allowedProductFiles": [
-      "orbit360-platform/core/queries.js",
-      "orbit360-platform/modules/cobros.js"
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
     ],
     "causalFix": {
       "queriesBlobSha": "7ba5f363a5143236179777a1a30d763142e8e7a8",
@@ -64,8 +64,8 @@
     "blobSha": "655dd95bb62e5abef64206c9d4502f4fc93a48de"
   },
   "nextRequiredProof": [
-    "B3_003_COUNTRY_TRANSITION_RUNTIME_DIAGNOSTIC",
     "B3_003_COUNTRY_SCOPE_CAUSAL_FIX",
+    "B3_003_STRENGTHENED_REAL_SELECTOR_PROOF",
     "B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS",
     "B3_003_TARGETED_VISUAL_RETEST"
   ],
@@ -95,7 +95,7 @@
     "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929"
   ],
   "boundaries": {
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "confirmedCobroWritesAuthorized": false,
     "reimportAuthorized": false,
@@ -169,7 +169,7 @@
     },
     "shellOwnerVisualMatch": true
   },
-  "boundaryNote": "Paula rejected B3-003 exact Preview. Diagnose country-scope leak, KPI/aging split state and country-change double render before source mutation.",
+  "boundaryNote": "B3-003 root cause confirmed. Product mutation authorized only for modules/cobros.js and modules/policy-receipts-v1199-bridge.js. No data writes, reimport, LIVE or B4.",
   "priorFinding": {
     "id": "B3-002",
     "status": "CLOSED_PASS",
