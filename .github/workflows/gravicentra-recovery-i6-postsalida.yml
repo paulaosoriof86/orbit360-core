@@ -6567,3 +6567,37 @@ jobs:
       - name: B3-003 failure remains fail-closed
         if: ${{ failure() && steps.mode.outputs.run == 'true' }}
         run: echo "B3_003_FAILED_NO_LIVE_NO_DATA_WRITE_NO_REIMPORT_NO_B4"
+
+  i65-b3-004-payment-owner-foundation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gate B3-004 payment owner foundation
+        id: gate
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const b=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json','utf8'));
+          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_004_CONTRACT'
+            && c.i65ForensicRemediationPlan?.b3?.status==='B3_004_SOURCE_FIXED_PENDING_CONTRACT'
+            && b.status==='B3_004_SOURCE_FIXED_PENDING_CONTRACT'
+            && b.activeFinding?.id==='B3-004';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          NODE
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.run == 'true'
+        with:
+          node-version: '22'
+      - name: Prove B3-004 canonical payment source contract
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node --check functions/cobros-reconciliation-domain.js
+          node --check orbit360-platform/core/cobros-reconciliation-domain-client.js
+          node tools/gravicentra-i6-5-b3-004-contract.mjs
+          echo "B3_004_SOURCE_CONTRACT=PASS"
+      - name: Preserve B3-004 fail-closed boundary
+        if: ${{ failure() && steps.gate.outputs.run == 'true' }}
+        run: echo "B3_004_FOUNDATION_FAILED_NO_DATA_WRITE_NO_REIMPORT_NO_LIVE"

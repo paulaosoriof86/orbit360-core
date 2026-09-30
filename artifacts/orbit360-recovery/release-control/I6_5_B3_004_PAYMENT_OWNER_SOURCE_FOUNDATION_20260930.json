@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_V1",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "date": "2026-09-30",
+  "gate": "I6.5-B3-004",
+  "parentDiagnostic": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
+  "changes": {
+    "functions/cobros-reconciliation-domain.js": {
+      "before": "40f4eb5ce7d0aea34ad97f6f0abde6fa1321358a",
+      "after": "37460a693a55c6a292936d2f38ffb21fd19f74dd",
+      "semantics": [
+        "apply_payment server owner",
+        "receipt-keyed idempotency",
+        "atomic cobro+receipt+portfolio",
+        "separate payment/application dates",
+        "preview-only callable alias"
+      ]
+    },
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": {
+      "before": "c8340b7421fb7cc23aa60b9d575dd2e01d991b51",
+      "after": "8f668d6db0cf8e513c4ff17f12a46c73fa150da1",
+      "semantics": [
+        "deterministic request ids",
+        "applyPayment",
+        "reportClientPayment",
+        "enrichApplication",
+        "preview alias routing"
+      ]
+    },
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": {
+      "after": "f7873144557effff71b7e33f2eccdb772832692b"
+    }
+  },
+  "boundaries": {
+    "businessDataWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "productionCallableDeploy": false
+  },
+  "next": "B3_004_SOURCE_CONTRACT_PASS_THEN_SURFACE_CONVERGENCE"
+}
