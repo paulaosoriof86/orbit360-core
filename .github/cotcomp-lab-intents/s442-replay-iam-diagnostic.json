@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "ays-cotcomp-s442-replay-iam-diagnostic-intent-v1.0",
+  "authorization": "READ_ONLY_S442_REPLAY_IAM_DIAGNOSTIC",
+  "authorizedSourceParent": "55354b639cc5c4c88d581413d06a1f4c0ca7c781",
+  "projectId": "ays-orbit-360-lab",
+  "iamWrites": false,
+  "appDataWrites": false,
+  "deploy": false,
+  "production": false,
+  "purpose": "VERIFY_GEN2_RUNTIME_SERVICE_ACCOUNT_AND_APP_CHECK_TOKEN_VERIFIER_ROLE_BEFORE_ANY_IAM_CHANGE"
+}
