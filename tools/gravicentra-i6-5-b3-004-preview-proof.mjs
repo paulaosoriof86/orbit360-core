@@ -1,15 +1,18 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import { initializeApp, applicationDefault, getApps } from 'firebase-admin/app';
+import { initializeApp as initializeAdminApp, applicationDefault, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
+import { getAuth as getAdminAuth } from 'firebase-admin/auth';
+import { initializeApp as initializeClientApp } from 'firebase/app';
+import { getAuth as getClientAuth, signInWithCustomToken } from 'firebase/auth';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const projectId=process.env.PROJECT_ID||'ays-orbit-360-lab';
 const tenantId=process.env.TENANT_HINT||'alianzas-soluciones';
 const runId=String(process.env.GITHUB_RUN_ID||Date.now());
 const outPath=process.env.B3_004_PROOF_OUT||'/tmp/b3-004-preview-proof.json';
 const sdkPath=process.env.PUBLIC_CONFIG_FILE;
-const functionUrl=process.env.FUNCTION_URL||('https://us-central1-'+projectId+'.cloudfunctions.net/orbit360CobrosReconciliationCommandPreview');
+const callableName='orbit360CobrosReconciliationCommandPreview';
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const text=v=>String(v==null?'':v).trim();
 const norm=v=>text(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
@@ -20,6 +23,12 @@ function recursiveFind(obj,key){
   if(typeof obj[key]==='string'&&obj[key])return obj[key];
   for(const v of Object.values(obj)){const x=recursiveFind(v,key);if(x)return x;}
   return '';
+}
+function findFirebaseConfig(obj){
+  if(!obj||typeof obj!=='object')return null;
+  if(typeof obj.apiKey==='string'&&typeof obj.projectId==='string'&&(obj.appId||obj.authDomain))return obj;
+  for(const v of Object.values(obj)){const x=findFirebaseConfig(v);if(x)return x;}
+  return null;
 }
 function assignedRoles(m){
   const xs=[m.rol,m.role,m.activeRole,m.rolActivo,...(Array.isArray(m.roles)?m.roles:[]),...(Array.isArray(m.assignedRoles)?m.assignedRoles:[]),...(Array.isArray(m.rolesAsignados)?m.rolesAsignados:[])];
@@ -32,11 +41,11 @@ function activeMember(m){
 async function main(){
   need(sdkPath&&fs.existsSync(sdkPath),'B3_004_PUBLIC_CONFIG_MISSING');
   const sdk=JSON.parse(fs.readFileSync(sdkPath,'utf8'));
-  const apiKey=recursiveFind(sdk,'apiKey');
-  need(apiKey,'B3_004_API_KEY_MISSING');
+  const clientConfig=findFirebaseConfig(sdk);
+  need(clientConfig&&clientConfig.apiKey,'B3_004_FIREBASE_CLIENT_CONFIG_MISSING');
 
-  const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId});
-  const db=getFirestore(app), auth=getAuth(app);
+  const app=getApps()[0]||initializeAdminApp({credential:applicationDefault(),projectId});
+  const db=getFirestore(app), auth=getAdminAuth(app);
   const members=await db.collection('tenants').doc(tenantId).collection('members').get();
   let actor=null;
   const allowed=new Set(['superadmin','admintenant','direccion','admin','operativo','finanzas']);
@@ -48,12 +57,10 @@ async function main(){
   need(actor,'B3_004_AUTHORIZED_MEMBER_NOT_FOUND');
 
   const customToken=await auth.createCustomToken(actor.uid);
-  const sign=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key='+encodeURIComponent(apiKey),{
-    method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token:customToken,returnSecureToken:true})
-  });
-  const signBody=await sign.json();
-  need(sign.ok&&signBody.idToken,'B3_004_CUSTOM_TOKEN_EXCHANGE_FAILED:'+JSON.stringify(signBody).slice(0,500));
-  const idToken=signBody.idToken;
+  const clientApp=initializeClientApp(clientConfig,'b3004-'+runId);
+  const clientAuth=getClientAuth(clientApp);
+  await signInWithCustomToken(clientAuth,customToken);
+  const callable=httpsCallable(getFunctions(clientApp,'us-central1'),callableName);
 
   const suffix=crypto.createHash('sha256').update(runId).digest('hex').slice(0,10);
   const ids={
@@ -71,7 +78,7 @@ async function main(){
   };
   const today='2026-09-30', paidDate='2026-09-29', applicationDate='2026-09-30';
   const amount=123.45;
-  const audit={schema:'GRAVICENTRA_I6_5_B3_004_PREVIEW_PROOF_V1',status:'RUNNING',runId:Number(runId)||runId,tenantId,actorUid:actor.uid,ids,functionUrl,assertions:{},cleanup:{attempted:false,pass:false}};
+  const audit={schema:'GRAVICENTRA_I6_5_B3_004_PREVIEW_PROOF_V2',status:'RUNNING',runId:Number(runId)||runId,tenantId,actorUid:actor.uid,ids,callableName,region:'us-central1',assertions:{},cleanup:{attempted:false,pass:false}};
   let cobroId='';
   try{
     const batch=db.batch();
@@ -82,10 +89,12 @@ async function main(){
     await batch.commit();
 
     async function call(payload,reason){
-      const res=await fetch(functionUrl,{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+idToken},body:JSON.stringify({data:{tenantId,activeRole:'direccion',operation:'apply_payment',reason,payload}})});
-      const body=await res.json();
-      if(!res.ok||body.error)throw new Error('B3_004_CALL_FAILED:'+JSON.stringify(body).slice(0,1000));
-      return body.result;
+      try{
+        const out=await callable({tenantId,activeRole:'direccion',operation:'apply_payment',reason,payload});
+        return out.data;
+      }catch(error){
+        throw new Error('B3_004_CALL_FAILED:'+(error?.code||'')+':'+(error?.message||String(error)));
+      }
     }
     const first=await call({receiptId:ids.receipt,sourceType:'client_reported',paidDate,evidenceAsOfDate:today,amount},'B3-004 synthetic client report');
     need(first?.ok===true&&first.receiptId===ids.receipt,'B3_004_FIRST_APPLY_FAILED');
