@@ -1,0 +1,21 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_SOURCE_CONTRACT_PASS_V1",
+  "status": "PASS",
+  "date": "2026-09-30",
+  "runId": 36716025698,
+  "jobId": 109889038328,
+  "sourceSha": "5edf3b26f9088d48a93ead38f7fd6827e9601a23",
+  "assertions": {
+    "syntaxPass": true,
+    "canonicalServerOwner": "functions/cobros-reconciliation-domain.js",
+    "canonicalBrowserOwner": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+    "applyPaymentOperation": true,
+    "idempotent": true,
+    "separatePaymentAndApplicationDates": true,
+    "previewOnlyAlias": true,
+    "businessWrites": 0,
+    "reimport": false,
+    "live": false
+  },
+  "next": "B3_004_SURFACE_CONVERGENCE"
+}
