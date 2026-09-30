@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "ays-cotcomp-s446-dual-owner-readonly-v1.0",
+  "authorization": "S446_DUAL_READ_ONLY_WORKFLOW_OWNER_RUNTIME_VERIFICATION",
+  "authorizedSourceParent": "0d60c42d6280414251344495d8c607d4b1fbf445",
+  "projectId": "ays-orbit-360-lab",
+  "environment": "LAB",
+  "region": "us-central1",
+  "expectedOwnerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+  "functions": [
+    "orbit360OpsLeadsCommand",
+    "orbit360OpsLeadsCommandLabV20260804"
+  ],
+  "appDataReads": false,
+  "appDataWrites": false,
+  "deploy": false,
+  "iamWrites": false,
+  "production": false
+}
