@@ -99,7 +99,11 @@ on:
       - 'tools/gravicentra-i6-5-b3-003-kpi-aging-readonly.mjs'
       - 'tools/gravicentra-i6-5-b3-003-preview-proof.mjs'
       - 'tools/gravicentra-i6-5-b3-003-contract.mjs'
+      - 'tools/gravicentra-i6-5-b3-004-contract.mjs'
       - 'tools/gravicentra-i6-5-b3-004-preview-proof.mjs'
+      - 'tools/gravicentra-i6-5-b3-004-r8-readmodel-proof.mjs'
+      - 'tools/gravicentra-i6-5-b3-004-r8-operational-proof.mjs'
+      - 'orbit360-platform/core/record-delete.js'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json'
       - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
 
@@ -6717,7 +6721,10 @@ jobs:
           node --check orbit360-platform/modules/cliente360.js
           node --check orbit360-platform/modules/portal.js
           node --check tools/gravicentra-i6-5-b3-004-preview-proof.mjs
+          node --check tools/gravicentra-i6-5-b3-004-r8-readmodel-proof.mjs
+          node --check tools/gravicentra-i6-5-b3-004-r8-operational-proof.mjs
           node tools/gravicentra-i6-5-b3-004-contract.mjs
+          node tools/gravicentra-i6-5-b3-004-r8-readmodel-proof.mjs
       - name: Install Firebase CLI and B3-004 dependencies
         if: steps.gate.outputs.run == 'true'
         run: |
@@ -6771,15 +6778,20 @@ jobs:
           set -euo pipefail
           EXPECTED=$(node -e "const x=require('./artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json');process.stdout.write(x.productFileBlobs['functions/cobros-reconciliation-domain.js']||'')")
           ACTUAL=$(git hash-object functions/cobros-reconciliation-domain.js)
+          EXPECTED_OP=$(node -e "const x=require('./artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json');process.stdout.write(x.productFileBlobs['functions/product-operational-domain.js']||'')")
+          ACTUAL_OP=$(git hash-object functions/product-operational-domain.js)
           test -n "$EXPECTED"
+          test -n "$EXPECTED_OP"
           test "$ACTUAL" = "$EXPECTED"
+          test "$ACTUAL_OP" = "$EXPECTED_OP"
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-functions-before.json" || true
           # R6 fail-closed: source candidates may change the Preview-only callable.
           # Always deploy the exact candidate preview alias; never infer backend parity from function-name existence.
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommandPreview --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-function-deploy.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommandPreview,functions:orbit360ProductOperationalCommandPreview --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-function-deploy.json"
           cat "$RUNNER_TEMP/b3-004-function-deploy.json"
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b3-004-functions.json"
           grep -q "orbit360CobrosReconciliationCommandPreview" "$RUNNER_TEMP/b3-004-functions.json"
+          grep -q "orbit360ProductOperationalCommandPreview" "$RUNNER_TEMP/b3-004-functions.json"
           echo "B3_004_PREVIEW_BACKEND=PASS"
       - name: Snapshot branding and materialize immutable B3-004 package
         if: steps.gate.outputs.run == 'true'
@@ -6862,6 +6874,14 @@ jobs:
           set -euo pipefail
           node tools/gravicentra-i6-5-b3-004-preview-proof.mjs
           node -e "const x=require(process.env.B3_004_PROOF_OUT);if(x.status!=='PASS'||x.cleanup?.pass!==true)process.exit(1);console.log('B3_004_SYNTHETIC_PROOF=PASS')"
+      - name: B3-004 R8 operational scope and soft-delete synthetic proof
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B3_004_R8_OPERATIONAL_PROOF_OUT: ${{ runner.temp }}/b3-004-r8-operational-proof.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b3-004-r8-operational-proof.mjs
+          node -e "const x=require(process.env.B3_004_R8_OPERATIONAL_PROOF_OUT);if(x.status!=='PASS'||x.cleanup?.pass!==true)process.exit(1);console.log('B3_004_R8_OPERATIONAL_PROOF=PASS')"
       - name: Upload immutable B3-004 package and proof
         if: steps.gate.outputs.run == 'true'
         id: artifact
@@ -6871,6 +6891,7 @@ jobs:
           path: |
             ${{ runner.temp }}/b3-004-package
             ${{ runner.temp }}/b3-004-preview-proof.json
+            ${{ runner.temp }}/b3-004-r8-operational-proof.json
             ${{ runner.temp }}/b3-004-function-deploy.json
           include-hidden-files: true
           compression-level: 0

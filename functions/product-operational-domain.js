@@ -473,5 +473,16 @@ exports.orbit360ProductAssetUpload = onCall({ region: REGION, cors: true, timeou
 exports.orbit360ProductAssetUploadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>uploadProductAsset(request,true));
 exports.orbit360ProductAssetRead = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>readProductAsset(request,false));
 exports.orbit360ProductAssetReadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>readProductAsset(request,true));
+async function executePreview(request) {
+  const input=request.data||{},raw=[].concat(input.mutations||[]);
+  if(!raw.length||raw.some(m=>!/^b3004qa_[A-Za-z0-9._:-]+$/.test(text(m&&(m.id||(m.payload&&m.payload.id)),256)))) {
+    throw new HttpsError('permission-denied','B3-004 Preview operativo solo admite fixtures sintéticos b3004qa_.');
+  }
+  if(raw.some(m=>norm(m&&m.action)!=='remove'&&(!m.payload||m.payload.__syntheticQa!==true))) {
+    throw new HttpsError('permission-denied','B3-004 Preview operativo requiere marca sintética explícita.');
+  }
+  return execute(request);
+}
 exports.orbit360ProductOperationalCommand = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, execute);
+exports.orbit360ProductOperationalCommandPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, executePreview);
 exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE, authorize, authorizeRead, withinScope, canonicalRef, text, cleanId, readProductAsset });

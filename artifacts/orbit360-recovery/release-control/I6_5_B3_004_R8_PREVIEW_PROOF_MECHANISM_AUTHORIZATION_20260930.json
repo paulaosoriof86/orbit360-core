@@ -1,0 +1,30 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R8_PREVIEW_PROOF_MECHANISM_AUTHORIZATION_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "f8ddb8605aaf2c58161e3a90628718cd959e6775",
+  "status": "PREVIEW_MECHANISM_PREPARED_PENDING_CONTRACT",
+  "purpose": "Prove R8 scope/delete/cancellation against candidate source without real operational writes or LIVE backend mutation.",
+  "exactBlobs": {
+    "functions/product-operational-domain.js": "9800c5140ce415484ccacf086a3657dc66749d0f",
+    "orbit360-platform/index.html": "31980de0896f19fef38c065d8b3e9a8a22f9883f",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "5fb455847d76f43e7daff23c26a1ed3ac9c91eed",
+    "tools/gravicentra-i6-5-b3-004-r8-readmodel-proof.mjs": "6f276bdd321fe1e2c62cebcecd1f119e72f4099b",
+    "tools/gravicentra-i6-5-b3-004-r8-operational-proof.mjs": "5558964b15d020f42b67f9bb236b267f00c7ead9",
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "f9fbfa0bb659b2ea1e13d0ef439a05a438fcb272"
+  },
+  "previewFunction": "orbit360ProductOperationalCommandPreview",
+  "syntheticIdPrefix": "b3004qa_",
+  "previewFunctionGuard": "all mutation IDs must start b3004qa_ and non-remove payloads must carry __syntheticQa=true",
+  "changedProductSemantics": false,
+  "productSourceChange": "functions/product-operational-domain.js adds isolated Preview alias only; canonical live export remains unchanged.",
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "syntheticQaOnly": true,
+    "cleanupRequired": true,
+    "reimport": false,
+    "liveHostingPromotion": false,
+    "b3005": false
+  }
+}
