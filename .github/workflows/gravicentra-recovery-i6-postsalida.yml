@@ -6735,7 +6735,7 @@ jobs:
           PY
           CROOT="$RUNNER_TEMP/b3-004-firebase-cli"
           npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
-          npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 firebase@11.10.0 >/dev/null
           node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CROOT"
           CLI="$CROOT/node_modules/firebase-tools/lib/bin/firebase.js"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
