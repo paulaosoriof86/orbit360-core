@@ -1,0 +1,52 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R7_MACHINE_PASS_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "f1b16761e2995d41e469522ebe4bb57827c67c5a",
+  "workflowRunId": 36771425966,
+  "workflowJobId": 110078795083,
+  "buildId": "gi-i65-b3-f1b16761e299-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36771425966-vz0gy8jj.web.app",
+  "channelId": "gi-b3004-36771425966",
+  "artifactId": "11124481690",
+  "artifactDigest": "e2b994cda6b40fd8a246f344ec886c61055db42b602bf834908ca1ed2a8b2b53",
+  "proof": {
+    "r7SourceContract": "PASS",
+    "previewBackendExactDeploy": "PASS",
+    "hostingExactReadback": "PASS",
+    "syntheticProof": "PASS",
+    "cleanup": "PASS",
+    "crossAdvisorPrivilegedApply": true,
+    "advisorReportDoesNotApplyPayment": true,
+    "advisorCannotApplyOrReconcile": true,
+    "advisorReportCreatesLinkedOpsManagement": true,
+    "operativeValidatesAndAppliesSameCanonicalPayment": true,
+    "operativeDirectPaymentNeedsNoSecondApproval": true,
+    "individualReconciliationEnrichesSamePayment": true,
+    "idempotentRetry": true,
+    "singleCobroPerReceipt": true,
+    "advisorProvenancePreserved": true,
+    "paidDateSeparatedFromApplicationDate": true
+  },
+  "r7StaticProof": {
+    "globalPaidReceiptFallback": true,
+    "clientPaidReceiptFallback": true,
+    "canonicalCobroDedupe": true,
+    "activePolicyPaymentHistoryGateRemoved": true,
+    "cobrosStateMenu": true,
+    "r7AssetVersion": true
+  },
+  "supersedesVisualCandidate": {
+    "priorBuildId": "gi-i65-b3-5daa1b1e5093-57f234755dc1",
+    "priorPreviewUrl": "https://ays-orbit-360-lab--gi-b3004-36763283882-x867tfv3.web.app",
+    "reason": "R7 paid-receipt visibility and Estado-filter remediation changed source."
+  },
+  "decision": "MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "boundaries": {
+    "operationalDataWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3005Opened": false
+  }
+}

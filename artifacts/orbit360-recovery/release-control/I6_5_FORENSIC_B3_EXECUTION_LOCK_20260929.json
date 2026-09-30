@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
+  "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -53,18 +53,18 @@
     "provenanceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_PROVENANCE_FIX_20260930.json",
     "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_PROVENANCE_CONTRACT_PASS_20260930.json",
     "machineProof": {
-      "sourceSha": "5daa1b1e50931dfa7af346c97c06754f503f88d1",
-      "buildId": "gi-i65-b3-5daa1b1e5093-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36763283882-x867tfv3.web.app",
-      "runId": 36763283882,
-      "artifactId": "11120555043",
-      "artifactDigest": "60db8f505d6809b97e6ad527bf2797c1a7e796c7a9d8cbe8be2b5b9864acdf06",
+      "sourceSha": "f1b16761e2995d41e469522ebe4bb57827c67c5a",
+      "buildId": "gi-i65-b3-f1b16761e299-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36771425966-vz0gy8jj.web.app",
+      "runId": 36771425966,
+      "artifactId": "11124481690",
+      "artifactDigest": "e2b994cda6b40fd8a246f344ec886c61055db42b602bf834908ca1ed2a8b2b53",
       "exactReadback": true,
       "backendExactDeploy": true,
       "syntheticProofPass": true,
       "cleanupPass": true,
-      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_MACHINE_PASS_20260930.json",
-      "receiptBlobSha": "6d11ecba53d570b514c75590d6e144a97c1fc770"
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_MACHINE_PASS_20260930.json",
+      "receiptBlobSha": "86664bcdab185ec3d2d789a8167976f6ac248650"
     },
     "visualPreflightReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_TARGETED_VISUAL_PREFLIGHT_SEMANTIC_REJECTION_20260930.json",
     "visualPreflightReceiptBlobSha": "b332b18224cad8688532dc8f5d96f804d8a8d7f1",
@@ -294,7 +294,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R7_EXACT_PREVIEW",
+    "nextAction": "B3_004_R7_TARGETED_VISUAL",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -380,15 +380,14 @@
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "205129ab3efa2e8c08c1a9a94fd61d4dc0b3ba8d",
+    "blobSha": "f93033c704386a7ee0edbf777ee1582ab778ad2f",
     "productFileCount": 78
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "f7e8df14a03c02be93cb31dc407b5c61641725e0"
+    "blobSha": "3eb0a7d21dc87e52385b3965f605cc936193df57"
   },
   "nextRequiredProof": [
-    "B3_004_R7_EXACT_PREVIEW_MACHINE_PASS",
     "B3_004_R7_TARGETED_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
@@ -458,12 +457,12 @@
     "productRegressionDemonstrated": false
   },
   "preview": {
-    "sourceSha": "5daa1b1e50931dfa7af346c97c06754f503f88d1",
-    "buildId": "gi-i65-b3-5daa1b1e5093-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36763283882-x867tfv3.web.app",
-    "runId": 36763283882,
-    "artifactId": "11120555043",
-    "artifactDigest": "60db8f505d6809b97e6ad527bf2797c1a7e796c7a9d8cbe8be2b5b9864acdf06",
+    "sourceSha": "f1b16761e2995d41e469522ebe4bb57827c67c5a",
+    "buildId": "gi-i65-b3-f1b16761e299-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36771425966-vz0gy8jj.web.app",
+    "runId": 36771425966,
+    "artifactId": "11124481690",
+    "artifactDigest": "e2b994cda6b40fd8a246f344ec886c61055db42b602bf834908ca1ed2a8b2b53",
     "exactReadback": true,
     "backendExactDeploy": true,
     "syntheticProofPass": true,
