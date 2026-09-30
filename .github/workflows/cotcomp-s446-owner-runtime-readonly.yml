@@ -136,7 +136,8 @@ jobs:
           fs.writeFileSync(process.env.RUNNER_TEMP+'/s446/runtime-functions-sanitized.json',JSON.stringify(records,null,2));
           NODE
 
-          SOURCE_OK=false
+          SOURCE_READ=false
+          OWNER_MATCH=false
           DEPLOYED_BLOB=""
           BLOCKER=""
           PRIMARY="$RUNNER_TEMP/s446/describes/orbit360OpsLeadsCommand.json"
@@ -171,9 +172,10 @@ jobs:
                   if [ -z "$OWNER_FILE" ]; then
                     BLOCKER="OPS_LEADS_DOMAIN_NOT_FOUND_IN_DEPLOYED_ARCHIVE"
                   else
+                    SOURCE_READ=true
                     DEPLOYED_BLOB="$(git hash-object "$OWNER_FILE")"
                     if [ "$DEPLOYED_BLOB" = "$EXPECTED_OWNER_BLOB" ]; then
-                      SOURCE_OK=true
+                      OWNER_MATCH=true
                     else
                       BLOCKER="DEPLOYED_OWNER_BLOB_MISMATCH"
                     fi
@@ -184,7 +186,8 @@ jobs:
           fi
 
           rm -rf "$RUNNER_TEMP/s446/source" "$RUNNER_TEMP/s446/source-archive.bin"
-          printf '%s' "$SOURCE_OK" > "$RUNNER_TEMP/s446/source-ok.txt"
+          printf '%s' "$SOURCE_READ" > "$RUNNER_TEMP/s446/source-read.txt"
+          printf '%s' "$OWNER_MATCH" > "$RUNNER_TEMP/s446/owner-match.txt"
           printf '%s' "$DEPLOYED_BLOB" > "$RUNNER_TEMP/s446/deployed-blob.txt"
           printf '%s' "$BLOCKER" > "$RUNNER_TEMP/s446/blocker.txt"
 
@@ -196,7 +199,8 @@ jobs:
           const fs=require('fs');
           const ev=require('./functions/cotcomp-workflow-owner-runtime-evidence-s446');
           const records=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s446/runtime-functions-sanitized.json','utf8'));
-          const sourceOk=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/source-ok.txt','utf8').trim()==='true';
+          const sourceRead=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/source-read.txt','utf8').trim()==='true';
+          const ownerMatch=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/owner-match.txt','utf8').trim()==='true';
           const blob=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/deployed-blob.txt','utf8').trim();
           const blocker=fs.readFileSync(process.env.RUNNER_TEMP+'/s446/blocker.txt','utf8').trim();
           const primary=records.find(x=>x.name==='orbit360OpsLeadsCommand')||null;
@@ -205,7 +209,7 @@ jobs:
             region:'us-central1',
             functionObservedActive:!!primary && primary.state==='ACTIVE',
             deployedOwnerBlob:blob,
-            sourceArchiveReadOnly:sourceOk,
+            sourceArchiveReadSuccessful:sourceRead,
             writeExecuted:false,
             productionTouched:false
           });
@@ -216,7 +220,8 @@ jobs:
             expectedOwnerBlob:'73e09a4404cb4298dc34c9c38e26ad1f960d3170',
             deployedOwnerBlob:blob||null,
             runtimeFunctions:records,
-            sourceArchiveReadOnly:sourceOk,
+            sourceArchiveReadSuccessful:sourceRead,
+            exactOwnerBlobMatch:ownerMatch,
             workflowOwnerRuntimeVerified:result.workflowOwnerRuntimeVerified,
             blockers:[...new Set([...(result.blockers||[]),...(blocker?[blocker]:[])])],
             appDataReadsExecuted:0,
