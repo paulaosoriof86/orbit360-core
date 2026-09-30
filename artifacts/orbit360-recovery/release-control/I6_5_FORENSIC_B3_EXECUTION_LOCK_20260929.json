@@ -297,20 +297,28 @@
       "orbit360-platform/index.html": "a24d371881d169d82e638801587f038a0febeb2b"
     },
     "r6QaBlobs": {
-      "tools/gravicentra-i6-5-b3-004-contract.mjs": "a30deecc6629d3f086f30390f60879672d0c06ea",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "20b01e71952dd68be71b53f5960be670a5548b0a",
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R6_SOURCE_CONTRACT"
+    "nextAction": "B3_004_R6_SOURCE_CONTRACT",
+    "r6ValidatorRepair": {
+      "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
+      "receiptBlobSha": "8535cbe3e14058dfc67ef91176079c7b0deb083d",
+      "contractBlobSha": "20b01e71952dd68be71b53f5960be670a5548b0a",
+      "failedRunId": 36761475222,
+      "failedJobId": 110044845524
+    }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "6b90f7e5b95eb4edc069d55b4935311184e4748a",
+    "blobSha": "d44ab2e5e207e35f48dfcb66f53528970a78735a",
     "productFileCount": 78
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "282f52b5a01b0160422fdefc79b4cf3c50f55618"
+    "blobSha": "005e612323287961a40f1d0dafd53b61d4ebaefd"
   },
   "nextRequiredProof": [
     "B3_004_R6_SOURCE_CONTRACT_PASS",

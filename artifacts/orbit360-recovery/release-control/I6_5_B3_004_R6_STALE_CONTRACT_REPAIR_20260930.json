@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_V1",
+  "recordedAt": "2026-09-30",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "50402129a86a4a569523cc5946f988e091ea2ce8",
+  "findingId": "B3-004",
+  "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
+  "failedRunId": 36761475222,
+  "failedJobId": 110044845524,
+  "failureCode": "B3_004_RECEIPT_RECONCILIATION_ACTION_REMAINS",
+  "cause": "The prior R4 validator intentionally forbade individual reconciliation in Recibos y pagos; Payment Lock V4 now explicitly requires individual Conciliar fallback for applied/unreconciled and CRM/SIGA direct-payment evidence.",
+  "fix": "Replace the stale negative assertion with a positive requirement for data-rp-reconcile-payment. Product source is unchanged.",
+  "contractBlobSha": "20b01e71952dd68be71b53f5960be670a5548b0a",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "b3005Opened": false
+}

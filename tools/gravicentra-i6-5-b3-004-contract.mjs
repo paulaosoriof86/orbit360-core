@@ -85,7 +85,7 @@ need(cliente360R4.includes('data-c360-conciliar'),'B3_004_CLIENTE360_COBROS_CONC
 need(cliente360R4.includes('Aplicar desde Recibos y pagos'),'B3_004_CLIENTE360_COBROS_BOUNDARY_COPY_MISSING');
 need(cliente360R4.includes('La conciliación del pago se realiza después, en la pestaña Cobros.'),'B3_004_RECEIPT_TO_COBROS_BOUNDARY_MISSING');
 need(nativeReceiptR4.includes('En Recibos y pagos solo se aplica el pago. La conciliación se realiza después, en la pestaña Cobros.'),'B3_004_NATIVE_RECEIPT_BOUNDARY_MISSING');
-need(!nativeReceiptR4.includes('data-rp-reconcile-payment'),'B3_004_RECEIPT_RECONCILIATION_ACTION_REMAINS');
+need(nativeReceiptR4.includes('data-rp-reconcile-payment'),'B3_004_RECEIPT_RECONCILIATION_ACTION_MISSING');
 need(nativeReceiptR4.includes("if(paid)return{kind:'applied',label:'Pago aplicado'}"),'B3_004_RECEIPT_PAID_STATE_NOT_APPLICATION_ONLY');
 need(cobros.includes('data-cobros-action="apply"'),'B3_004_GLOBAL_APPLY_ACTION_MARKER_MISSING');
 need(cobros.includes('data-cobros-action="reconcile"'),'B3_004_GLOBAL_RECONCILE_ACTION_MARKER_MISSING');

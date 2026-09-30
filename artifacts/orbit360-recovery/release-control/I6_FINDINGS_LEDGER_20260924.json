@@ -1206,8 +1206,14 @@
         "orbit360-platform/index.html": "a24d371881d169d82e638801587f038a0febeb2b"
       },
       "r6QaBlobs": {
-        "tools/gravicentra-i6-5-b3-004-contract.mjs": "a30deecc6629d3f086f30390f60879672d0c06ea",
+        "tools/gravicentra-i6-5-b3-004-contract.mjs": "20b01e71952dd68be71b53f5960be670a5548b0a",
         "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
+      },
+      "r6ValidatorRepair": {
+        "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
+        "receiptBlobSha": "8535cbe3e14058dfc67ef91176079c7b0deb083d",
+        "contractBlobSha": "20b01e71952dd68be71b53f5960be670a5548b0a"
       }
     },
     {
