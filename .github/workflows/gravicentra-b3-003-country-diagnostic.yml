@@ -127,6 +127,7 @@ jobs:
           set -euo pipefail
           node tools/gravicentra-i6-5-b3-003-country-transition-diagnostic.mjs
       - name: Upload diagnostic evidence
+        id: artifact
         if: steps.gate.outputs.run == 'true'
         uses: actions/upload-artifact@v4
         with:
@@ -134,3 +135,116 @@ jobs:
           path: ${{ runner.temp }}/b3-003-country-transition-diagnostic.json
           if-no-files-found: error
           retention-days: 30
+
+      - name: Freeze independent country-lineage root cause
+        if: steps.gate.outputs.run == 'true'
+        env:
+          DIAG: ${{ runner.temp }}/b3-003-country-transition-diagnostic.json
+          DIAG_ARTIFACT_ID: ${{ steps.artifact.outputs.artifact-id }}
+          DIAG_ARTIFACT_DIGEST: ${{ steps.artifact.outputs.artifact-digest }}
+          RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B3_003_COUNTRY_TRANSITION_DIAGNOSTIC_20260929.json
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const b=JSON.parse(fs.readFileSync(process.env.B3_LOCK,'utf8'));
+          const f=JSON.parse(fs.readFileSync(process.env.FINDINGS,'utf8'));
+          const d=JSON.parse(fs.readFileSync(process.env.DIAG,'utf8'));
+          const r=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8'));
+          const t=d.independentTruth||{},p=t.focal9758||{};
+          const need=(ok,code)=>{if(!ok)throw new Error(code);};
+          need(d.status==='DIAGNOSTIC_COMPLETE','B3_003_DIAG_INCOMPLETE');
+          need(Array.isArray(d.errors)&&d.errors.length===0,'B3_003_DIAG_ERRORS');
+          need(t.readModelCountryResolutionDefect===true,'B3_003_READ_MODEL_DEFECT_NOT_PROVEN');
+          need(Number(t.precedenceDefectCount)>=1,'B3_003_PRECEDENCE_DEFECT_NOT_PROVEN');
+          need(Number(t.policyLineageCountryConflicts)===0,'B3_003_COUNTRY_CONFLICT_REQUIRES_HOLD');
+          need(String(p.polizaNumero)==='9758'&&p.polizaPais==='CO'&&p.clientePais==='GT'&&p.currentCobrosRowCountry==='GT'&&p.currentQueriesPolicyLinkedCountry==='GT'&&p.precedenceDefectDemonstrated===true,'B3_003_9758_DISCRIMINANT_NOT_PROVEN');
+          need(c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_003_COUNTRY_DIAGNOSTIC','B3_003_CONTROL_ACTION_DRIFT');
+          need(b.status==='B3_003_VISUAL_REJECTED_DIAGNOSTIC_ACTIVE'&&b.activeFinding?.id==='B3-003','B3_003_LOCK_STATE_DRIFT');
+          need(b.boundaries?.dataMutationAuthorized===false&&b.boundaries?.reimportAuthorized===false&&b.boundaries?.liveHostingPromotionAuthorized===false,'B3_003_BOUNDARY_DRIFT');
+          const allowed=['orbit360-platform/core/queries.js','orbit360-platform/modules/cobros.js','orbit360-platform/index.html'];
+          r.latestIndependentCountryLineage={
+            status:'CAUSE_CONFIRMED_FIX_AUTHORIZED',
+            runId:Number(process.env.GITHUB_RUN_ID),
+            artifactId:Number(process.env.DIAG_ARTIFACT_ID||0),
+            artifactDigest:process.env.DIAG_ARTIFACT_DIGEST||'',
+            headSha:process.env.GITHUB_SHA,
+            focal9758:p,
+            collectionCounts:t.collectionCounts||{},
+            totalPolicyLineages:Number(t.totalPolicyLineages||0),
+            precedenceDefectCount:Number(t.precedenceDefectCount||0),
+            policyLineageCountryConflicts:Number(t.policyLineageCountryConflicts||0),
+            classification:'READ_MODEL_COUNTRY_RESOLUTION_DEFECT',
+            dataDefectStatus:'NOT_REQUIRED_TO_EXPLAIN_FAILURE_NOT_MUTATED',
+            canonicalContract:'POLICY_LINKED_FINANCIAL_SCOPE_USES_EXPLICIT_POLICY_COUNTRY_FIRST_THEN_UNANIMOUS_EXPLICIT_LINKED_ROW_COUNTRY_THEN_CLIENT_FALLBACK_CONFLICT_FAIL_CLOSED',
+            transitionFinding:'COUNTRY_CHANGE_SYNCHRONOUS_RENDER_346_416MS_REQUIRES_EXPLICIT_LOADING_FRAME_NO_OLD_COUNTRY_PAINT',
+            authorizedProductFiles:allowed,
+            boundaries:{dataWrites:0,reimport:false,livePromotion:false,b4:false}
+          };
+          r.status='CAUSE_CONFIRMED_FIX_AUTHORIZED';
+          r.authorizedProductFiles=allowed;
+          r.nextAction='B3_003_COUNTRY_LINEAGE_AND_TRANSITION_CAUSAL_FIX';
+          fs.writeFileSync(process.env.RECEIPT,JSON.stringify(r,null,2)+'\n');
+
+          b.status='B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED';
+          b.activeFinding={...(b.activeFinding||{}),
+            status:'ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED',
+            blocking:true,
+            rootCauseClassification:'READ_MODEL_COUNTRY_RESOLUTION_DEFECT',
+            precedenceDefectCount:Number(t.precedenceDefectCount||0),
+            focalPolicyNumber:'9758',
+            currentRemediationAuthorizedProductFiles:allowed,
+            transitionRemediation:'EXPLICIT_LOADING_FRAME_BEFORE_COUNTRY_RENDER'
+          };
+          b.boundaries={...(b.boundaries||{}),productMutationAuthorized:true,dataMutationAuthorized:false,reimportAuthorized:false,liveHostingPromotionAuthorized:false,b4AdvanceAuthorized:false};
+          b.nextRequiredProof=['B3_003_CAUSAL_SOURCE_FIX','B3_003_NEW_EXACT_PREVIEW_MACHINE_PASS','B3_003_TARGETED_VISUAL_PASS'];
+          fs.writeFileSync(process.env.B3_LOCK,JSON.stringify(b,null,2)+'\n');
+
+          const x=(f.findings||[]).find(y=>y.id==='B3-003'); need(x,'B3_003_FINDING_MISSING');
+          Object.assign(x,{
+            status:'ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED',
+            blocking:true,
+            rootCauseClassification:'READ_MODEL_COUNTRY_RESOLUTION_DEFECT',
+            precedenceDefectCount:Number(t.precedenceDefectCount||0),
+            authorizedProductFiles:allowed,
+            nextAction:'B3_003_COUNTRY_LINEAGE_AND_TRANSITION_CAUSAL_FIX'
+          });
+          f.currentB3={...(f.currentB3||{}),status:'B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED',activeFindingId:'B3-003'};
+          fs.writeFileSync(process.env.FINDINGS,JSON.stringify(f,null,2)+'\n');
+
+          c.i65ForensicRemediationPlan.b3={...(c.i65ForensicRemediationPlan.b3||{}),
+            status:'B3_003_ROOT_CAUSE_CONFIRMED_FIX_AUTHORIZED',
+            activeFindingId:'B3-003',
+            paulaVisualAccepted:false,
+            candidateEligibleForPromotion:false,
+            productMutationAuthorized:true,
+            dataMutationAuthorized:false,
+            reimportAuthorized:false,
+            readModelCountryAuthorityStatus:'READ_MODEL_COUNTRY_RESOLUTION_DEFECT_CONFIRMED',
+            dataDefectStatus:'NOT_REQUIRED_TO_EXPLAIN_FAILURE_NOT_MUTATED',
+            authorizedProductFiles:allowed,
+            countryLineageDiagnosticRunId:Number(process.env.GITHUB_RUN_ID),
+            countryLineageDiagnosticArtifactId:Number(process.env.DIAG_ARTIFACT_ID||0),
+            countryLineageDiagnosticArtifactDigest:process.env.DIAG_ARTIFACT_DIGEST||''
+          };
+          c.nextAction='I6_5_FORENSIC_REMEDIATION_B3_003_FIX';
+          c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),nextAction:'B3_003_COUNTRY_LINEAGE_AND_TRANSITION_CAUSAL_FIX'};
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$B3_LOCK" "$FINDINGS" "$RECEIPT"
+          LOCK_BLOB=$(git hash-object "$B3_LOCK"); export LOCK_BLOB
+          FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
+          RECEIPT_BLOB=$(git hash-object "$RECEIPT"); export RECEIPT_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p,'utf8'));
+          c.i65ForensicRemediationPlan.b3.executionLockBlobSha=process.env.LOCK_BLOB;
+          c.i65ForensicRemediationPlan.b3.countryLineageDiagnosticReceiptBlobSha=process.env.RECEIPT_BLOB;
+          c.canonicalAccumulationControl.findingLedgerBlobSha=process.env.FINDINGS_BLOB;
+          fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
+          NODE
+          git add "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5 B3): confirm B3-003 country lineage root cause"
+          git push origin "HEAD:$GITHUB_REF_NAME"
