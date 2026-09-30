@@ -4,7 +4,7 @@
   "date": "2026-09-30",
   "projectId": "ays-orbit-360-lab",
   "region": "us-central1",
-  "authorizedSourceParent": "676c3cf1ddd07b886ee68bbde2dbc0d01f2ed6fc",
+  "authorizedSourceParent": "e629350bb48abcdfc3c638f4550a993ad37ec77d",
   "expectedOwnerBlob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
   "primaryFunction": "orbit360OpsLeadsCommand",
   "appDataReads": false,
@@ -29,5 +29,7 @@
     "provider delivery",
     "real data",
     "production"
-  ]
+  ],
+  "retryOfWorkflowRun": 36790353217,
+  "rootCauseCorrection": "Replace unsupported gcloud functions list --gen2 with read-only Cloud Functions v2 REST inventory."
 }
