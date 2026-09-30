@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "SURFACES_FIXED_PENDING_CONTRACT",
+      "status": "CANDIDATE_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -964,7 +964,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT_PASS",
+      "nextAction": "B3_004_NEW_EXACT_PREVIEW_MACHINE_PASS",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1028,7 +1028,7 @@
         },
         {
           "id": "B3-004-R4-APPLY-VS-RECONCILE-SURFACE-BOUNDARY",
-          "status": "SURFACES_FIXED_PENDING_CONTRACT",
+          "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
           "blocking": true,
           "rootCause": "LEGACY_PAYMENT_OVERRIDE_PLUS_COMPETING_CLIENTE360_RECEIPT_RENDERERS_AND_MISSING_COBROS_RECONCILIATION_ACTION",
           "remediation": "Recibos applies; Cobros reconciles; global combined list resolves by state; disable legacy command override.",
@@ -1044,7 +1044,9 @@
           "receiptBlobSha": "9c0db9b809cb106a286c297b6f95d03c119dce3a",
           "validatorRepairReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R4_STALE_CONTRACT_REPAIR_20260930.json",
           "validatorRepairReceiptBlobSha": "5fff161b559c218d71782ad5470fbe79084b04d5",
-          "qaGuardBlobSha": "118854e2c3bace7477e4ae52060faf1a382abb3f"
+          "qaGuardBlobSha": "118854e2c3bace7477e4ae52060faf1a382abb3f",
+          "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT_PASS_20260930.json",
+          "contractReceiptBlobSha": "c488d2340883260eae10258ac82b9e0737cfb43b"
         }
       ],
       "paymentProvenanceContractStatus": "PASS",
@@ -1126,7 +1128,10 @@
         "failedJobId": 109961924188,
         "failureCode": "B3_004_CLIENTE360_CANONICAL_FLOW_COPY_MISSING",
         "productRegressionDemonstrated": false
-      }
+      },
+      "applyVsReconcileBoundaryContractStatus": "PASS",
+      "applyVsReconcileBoundaryContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT_PASS_20260930.json",
+      "applyVsReconcileBoundaryContractReceiptBlobSha": "c488d2340883260eae10258ac82b9e0737cfb43b"
     },
     {
       "id": "B3-005",

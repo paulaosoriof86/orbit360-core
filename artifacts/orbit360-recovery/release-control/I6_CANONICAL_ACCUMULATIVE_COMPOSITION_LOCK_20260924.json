@@ -449,7 +449,7 @@
     },
     "activeSubFindingId": "B3-004-R4-APPLY-VS-RECONCILE-SURFACE-BOUNDARY",
     "r4": {
-      "status": "SOURCE_FIXED_PENDING_CONTRACT",
+      "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
       "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_APPLY_VS_RECONCILE_R4_20260930.json",
       "visualRejectionReceiptBlobSha": "9c0db9b809cb106a286c297b6f95d03c119dce3a",
       "exactBlobBindings": {
@@ -471,7 +471,11 @@
         "failedJobId": 109961924188,
         "failureCode": "B3_004_CLIENTE360_CANONICAL_FLOW_COPY_MISSING",
         "productSourceChanged": false
-      }
+      },
+      "contractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT_PASS_20260930.json",
+      "contractReceiptBlobSha": "c488d2340883260eae10258ac82b9e0737cfb43b",
+      "contractRunId": 36737880811,
+      "contractJobId": 109964252116
     }
   }
 }
