@@ -2151,7 +2151,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-      "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "businessRulesFrozen": true,
@@ -2166,7 +2166,7 @@
       "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
       "entryBlockedBy": null,
       "entryUnblockedBy": "B3-004 CLOSED_PASS",
-      "nextAction": "B3_005_EXACT_PREVIEW",
+      "nextAction": "B3_005_SOURCE_CONTRACT",
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
@@ -2189,7 +2189,7 @@
       "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
       "sourceBlobs": {
         "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
-        "functions/cobros-reconciliation-domain.js": "b13a641ece0177cebd31f8dc748dd4b88483f0d2",
+        "functions/cobros-reconciliation-domain.js": "751eeabe3d1e80a02557b819de2d64551c607877",
         "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
         "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
         "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
@@ -2200,7 +2200,15 @@
       "machineProofInvalidatedBySourceChange": true,
       "currentCandidateEligibleForPromotion": false,
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
-      "sourceContractReceiptBlobSha": "b3c4ee074967ecc9d3fe13e18504fb5204a1f205"
+      "sourceContractReceiptBlobSha": "b3c4ee074967ecc9d3fe13e18504fb5204a1f205",
+      "r1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
+      "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc",
+      "qaBlobs": {
+        "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
+        "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "9fd14eba50e15202de19558d091e2e69767cc921",
+        "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs": "4cd727c02f4b91fa3bec56917edfd479a64d01ff",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "2e29a17285a8ca4835e3140c6c55f84ea60c33f1"
+      }
     },
     {
       "id": "B3-006",
@@ -5795,13 +5803,13 @@
     }
   },
   "currentB3": {
-    "status": "B3_005_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "status": "B3_005_SOURCE_FIXED_PENDING_CONTRACT",
     "activeFindingId": "B3-005",
     "priorFindingId": "B3-004",
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "27c30fca69f98b85fe9d2fb09e2cc07706183d68",
+    "compositionLockBlobSha": "f01e2fdcd2c2b4fae4c57c7cc6715fe578be0d8b",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
@@ -5810,6 +5818,8 @@
     "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
     "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
-    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json"
+    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
+    "r1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
+    "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc"
   }
 }

@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "findingId": "B3-005",
+  "parentSha": "4b7f44bdfff15bd642b16f26093776175afd83c5",
+  "causalCorrection": {
+    "issue": "Later direct payment evidence over an inferred-and-applied payment could promote APPLIED_INFERRED to APPLIED_DIRECT merely because the existing cobro was conciliado.",
+    "fix": "Preserve the existing applicationState when the new evidence does not directly prove insurer application; payment evidence may become direct while inference provenance and application semantics remain intact."
+  },
+  "exactPreviewHarness": {
+    "machineProof": "tools/gravicentra-i6-5-b3-005-preview-proof.mjs",
+    "cleanup": "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs",
+    "workflowJob": "i65-b3-005-exact-preview",
+    "syntheticOnly": true,
+    "previewConfigOnly": true,
+    "cleanupRequired": true,
+    "humanFixtureRetainedOnlyAfterMachinePass": true
+  },
+  "productBlobs": {
+    "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
+    "functions/cobros-reconciliation-domain.js": "751eeabe3d1e80a02557b819de2d64551c607877",
+    "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
+    "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "9fd14eba50e15202de19558d091e2e69767cc921",
+    "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs": "4cd727c02f4b91fa3bec56917edfd479a64d01ff",
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "2e29a17285a8ca4835e3140c6c55f84ea60c33f1"
+  },
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "productionConfigWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3006": false,
+    "b4": false
+  },
+  "nextRequiredProof": "B3_005_SOURCE_CONTRACT_RERUN"
+}

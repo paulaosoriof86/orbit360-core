@@ -462,7 +462,10 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const paymentEvidenceType = isApplicationEnrichment && existingPaymentEvidenceType ? existingPaymentEvidenceType : (advisorReported ? 'ADVISOR_REPORTED' : source.toUpperCase());
     const paymentOrigin = advisorReported ? 'ADVISOR_REPORTED_PAYMENT' : (source === 'crm_migrated_direct' ? 'CRM_MIGRATED_DIRECT_PAYMENT' : (source === 'client_reported' ? 'CLIENT_PORTAL' : text(beforeCobro.paymentOrigin, 120) || 'OPERATIVE_DIRECT_PAYMENT'));
     const applicationEvidenceType = applicationProved ? (applicationEvidenceTypeInput || (source === 'crm_migrated_direct' ? 'MANUAL_RECONCILIATION' : source.toUpperCase())) : text(beforeCobro.applicationEvidenceType, 120);
-    const applicationState = (applicationProved || finalApplicationDate || beforeCobro.conciliado === true) ? (inferred ? 'APPLIED_INFERRED' : 'APPLIED_DIRECT') : 'PENDING_APPLICATION';
+    const existingApplicationState = text(beforeCobro.applicationState, 80);
+    const applicationState = (applicationProved || finalApplicationDate)
+      ? (inferred ? 'APPLIED_INFERRED' : 'APPLIED_DIRECT')
+      : (existingApplicationState || (beforeCobro.conciliado === true ? 'APPLIED_DIRECT' : 'PENDING_APPLICATION'));
     const technicalNow = now();
 
     const shared = {

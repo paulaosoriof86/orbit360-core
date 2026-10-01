@@ -403,8 +403,8 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-005-SOURCE",
-    "reason": "SERVER_OWNED_HIGH_CONFIDENCE_INFERENCE_SOURCE_FIX_AND_PAYMENT_LOCK_V5",
+    "gate": "I6.5-B3-005-R1",
+    "reason": "PRESERVE_INFERRED_APPLICATION_STATE_ON_LATER_DIRECT_PAYMENT_EVIDENCE_AND_ADD_EXACT_PREVIEW_HARNESS",
     "changedProductFiles": [
       "functions/payment-inference-engine.js",
       "functions/cobros-reconciliation-domain.js",
@@ -413,11 +413,13 @@
     ],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-005-contract.mjs",
+      "tools/gravicentra-i6-5-b3-005-preview-proof.mjs",
+      "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
     ],
     "productSourceChanged": true,
     "noOperationalBusinessMutation": true,
-    "noConfigWrite": true,
+    "noProductionConfigWrite": true,
     "noReimport": true,
     "noLive": true
   },
@@ -1599,5 +1601,23 @@
     "blobSha": "b3c4ee074967ecc9d3fe13e18504fb5204a1f205",
     "sourceSha": "9e8b0afb77e4726b6412170c04dee299ed9e9d73",
     "runId": 36934711886
+  },
+  "b3005R1PreviewAuthorization": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
+    "blobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc",
+    "productBlobs": {
+      "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
+      "functions/cobros-reconciliation-domain.js": "751eeabe3d1e80a02557b819de2d64551c607877",
+      "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
+      "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "9fd14eba50e15202de19558d091e2e69767cc921",
+      "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs": "4cd727c02f4b91fa3bec56917edfd479a64d01ff",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "2e29a17285a8ca4835e3140c6c55f84ea60c33f1"
+    },
+    "syntheticQaAuthorization": "B3_005_PREVIEW_ONLY"
   }
 }
