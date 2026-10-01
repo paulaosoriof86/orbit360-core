@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "ays-cotcomp-s459-w5-governance-sourceonly-intent-v1.0",
+  "authorization": "S459_W5_SOURCE_ONLY_GOVERNANCE_RECONCILIATION",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "bd5cdb121536b1cf89d95328d2634ca1a8592430",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W5",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "production": false,
+  "scope": [
+    "reconcile owner no-counsel exception with W5 real-data gate",
+    "confirm no-counsel exception cannot authorize real-data writes",
+    "confirm legal packets remain absent",
+    "freeze remaining external/Owner blockers"
+  ]
+}
