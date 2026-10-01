@@ -2248,6 +2248,14 @@
           "orbit360-platform/product-runtime-config.js",
           "orbit360-platform/styles/base.css"
         ]
+      },
+      "r3p1FullTreeCompositionRepair": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3P1_FULL_TREE_COMPOSITION_REPAIR_20261001.json",
+        "blobSha": "1d336d3d9339da82be8147332a1e9d963441353c",
+        "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+        "compositionLockBlobSha": "fc6d7c1faeecc8888f1ccb7fd21a5bbd369134d1",
+        "exactProductDiffCount": 80,
+        "productSourceChanged": false
       }
     },
     {
@@ -5849,7 +5857,7 @@
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "4d207849564950a19f57f706978c5fa672d0f9fa",
+    "compositionLockBlobSha": "fc6d7c1faeecc8888f1ccb7fd21a5bbd369134d1",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
@@ -5869,6 +5877,8 @@
     "r2PaymentPlanRulesV6Path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R2_PAYMENT_PLAN_RULES_V6_20261001.json",
     "r2PaymentPlanRulesV6BlobSha": "265d7f28fb2b409569f803bd8e2e49d6b486d1a2",
     "r3CompositionExactSetRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json",
-    "r3CompositionExactSetRepairBlobSha": "83ff0f9b7ee0bed8be80467a39919404dc11272f"
+    "r3CompositionExactSetRepairBlobSha": "83ff0f9b7ee0bed8be80467a39919404dc11272f",
+    "r3p1FullTreeCompositionRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3P1_FULL_TREE_COMPOSITION_REPAIR_20261001.json",
+    "r3p1FullTreeCompositionRepairBlobSha": "1d336d3d9339da82be8147332a1e9d963441353c"
   }
 }

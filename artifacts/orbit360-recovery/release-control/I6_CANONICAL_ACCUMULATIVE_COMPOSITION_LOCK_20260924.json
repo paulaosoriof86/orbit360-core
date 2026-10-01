@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B3",
-  "productFileCount": 75,
+  "productFileCount": 80,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "functions/bootstrap.js",
@@ -112,7 +112,12 @@
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
     "orbit360-platform/modules/portal-v1142-copyfix.js",
     "orbit360-platform/modules/portal.js",
-    "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+    "orbit360-platform/modules/siniestros.js",
+    "orbit360-platform/product-runtime-config.js",
+    "orbit360-platform/styles/base.css",
+    "orbit360-platform/styles/infra.css",
+    "orbit360-platform/sw.js"
   ],
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
@@ -189,7 +194,12 @@
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "cafbaa33a3f23d30ec773df3b569ecf12e891e6e",
     "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
     "orbit360-platform/modules/portal.js": "fc23c03e4c59c256be81553e472dee6d2d4ef895",
-    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "d329ed1c822d42803bf2eb38c34873218d63faad"
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "d329ed1c822d42803bf2eb38c34873218d63faad",
+    "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
+    "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
+    "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
+    "orbit360-platform/styles/infra.css": "53fbdb6ac1fcfae91e64e26d8b600acb910d4588",
+    "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -395,12 +405,12 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-005-R3-QA",
-    "reason": "RECONCILE_CANONICAL_COMPOSITION_TO_EXACT_75_FILE_PRODUCT_DIFF_AFTER_V6_CONTRACT_PASS",
+    "gate": "I6.5-B3-005-R3P1-QA",
+    "reason": "REBUILD_CANONICAL_COMPOSITION_FROM_FULL_RECURSIVE_GIT_TREES_NOT_TRUNCATED_COMPARE_FILE_LIST",
     "changedProductFiles": [],
     "changedQaFiles": [
       "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-      "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json"
+      "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3P1_FULL_TREE_COMPOSITION_REPAIR_20261001.json"
     ],
     "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
@@ -1658,6 +1668,23 @@
       "orbit360-platform/modules/siniestros.js",
       "orbit360-platform/product-runtime-config.js",
       "orbit360-platform/styles/base.css"
+    ],
+    "productSourceChanged": false
+  },
+  "b3005R3P1FullTreeCompositionRepair": {
+    "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3P1_FULL_TREE_COMPOSITION_REPAIR_20261001.json",
+    "receiptBlobSha": "1d336d3d9339da82be8147332a1e9d963441353c",
+    "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+    "baselineTree": "226737288912f7ff296ab1b20a117d949cb66fa3",
+    "currentTree": "d0b61c2a0d8c71b555d4178f3cefaf2f64e78908",
+    "exactProductDiffCount": 80,
+    "restoredToDeclaration": [
+      "orbit360-platform/modules/siniestros.js",
+      "orbit360-platform/product-runtime-config.js",
+      "orbit360-platform/styles/base.css",
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/sw.js"
     ],
     "productSourceChanged": false
   }

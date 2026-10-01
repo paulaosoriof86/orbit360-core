@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_R3P1_FULL_TREE_COMPOSITION_REPAIR_V1",
+  "recordedAt": "2026-10-01",
+  "gate": "I6.5-B3-005",
+  "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+  "parentSha": "1a037f098a321db394f0b9400686a2e3d8732dd3",
+  "observedGuardFailure": {
+    "runId": 36937344575,
+    "jobId": 110620594933,
+    "code": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT"
+  },
+  "rootCause": "Prior repair derived the product diff from GitHub compare files, whose file list was truncated for this large comparison. The canonical guard uses the full git diff, so the prior 75-file declaration was incomplete.",
+  "definitiveMethod": "Compare recursive Git trees for certified baseline and current source, then apply the exact same allowed-prefix exclusion as the guard.",
+  "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+  "baselineTree": "226737288912f7ff296ab1b20a117d949cb66fa3",
+  "currentTree": "d0b61c2a0d8c71b555d4178f3cefaf2f64e78908",
+  "exactProductDiffCount": 80,
+  "restoredToDeclaration": [
+    "orbit360-platform/modules/siniestros.js",
+    "orbit360-platform/product-runtime-config.js",
+    "orbit360-platform/styles/base.css",
+    "orbit360-platform/styles/infra.css",
+    "orbit360-platform/sw.js"
+  ],
+  "sourceContractPassPreserved": true,
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "productionConfigWrites": false,
+  "reimport": false,
+  "live": false,
+  "nextRequiredProof": "B3_005_PREVIEW_MACHINE_PASS"
+}
