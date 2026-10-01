@@ -155,9 +155,20 @@
     return{t:'Pendiente de conciliación',c:'warn'};
   }
   function activePolicy(p){return !!(p&&(p.estado==='Vigente'||p.estado==='Por renovar'));}
+  function paymentProvenanceKind(r,payment){
+    var evidence=payment&&clean(payment.id)?payment:r;
+    var ps=String(evidence&&evidence.paymentState||'').trim().toUpperCase();
+    var doi=String(evidence&&evidence.directOrInferred||'').trim().toUpperCase();
+    if(ps==='PAID_INFERRED'||doi==='INFERRED'||(evidence&&evidence.inferredPaid===true))return'INFERRED';
+    if(ps==='PAID_DIRECT'||doi==='DIRECT')return'DIRECT';
+    return'';
+  }
   function stateLabel(r,payment){
     var evidence=payment&&clean(payment.id)?payment:r;
+    var provenance=paymentProvenanceKind(r,payment);
     var app=String((payment&&payment.applicationState)||(r&&r.applicationState)||'').trim().toUpperCase();
+    if(provenance==='INFERRED')return{t:'Pago inferido',c:'info'};
+    if(provenance==='DIRECT')return{t:'Pago confirmado',c:'ok'};
     if(app==='PENDING_APPLICATION')return{t:'Pago aplicado · pendiente de conciliación',c:'warn'};
     if(isPaymentReconciled(evidence))return{t:'Cobro conciliado',c:'ok'};
     var s=clean(r&&r.estadoOperativo);
@@ -295,8 +306,10 @@
     });
   }
   function policyLabel(p){var a=Orbit.store.get('aseguradoras',p.aseguradoraId)||{};return clean(p.numero||'—')+(a.nombre?' · '+clean(a.nombre):'');}
-  function receiptStateNote(r,portfolio){
-    if(isPaymentReconciled(r))return'Este pago ya fue conciliado contra fuentes autoritativas y se considera cobro conciliado.';
+  function receiptStateNote(r,portfolio,payment){
+    var provenance=paymentProvenanceKind(r,payment),evidence=payment&&clean(payment.id)?payment:r;
+    if(provenance==='INFERRED')return'Pago inferido a partir de evidencia autoritativa. La fecha real de pago no se inventa; la conciliación se muestra como una dimensión separada.';
+    if(isPaymentReconciled(evidence))return'Este pago confirmado ya fue conciliado contra fuentes autoritativas.';
     if(isPortfolioReconciled(portfolio))return'El saldo pendiente fue conciliado contra la fuente de autoridad de la aseguradora. Esto confirma cartera; no equivale a un pago.';
     var s=clean(r&&r.estadoOperativo);
     if(s==='pago_reportado'){
@@ -344,12 +357,16 @@
     var paidDate=payment.paidDate||payment.fechaPago||r.paidDate||r.fechaPago||r.fechaPagoReportada||'',applicationDate=payment.applicationDate||r.applicationDate||'',invoiceNumber=payment.invoiceNumber||payment.numeroFactura||r.invoiceNumber||r.numeroFactura||'',paymentSupportRef=payment.paymentSupportDocumentRef||r.paymentSupportDocumentRef||'',invoiceDocumentRef=payment.invoiceDocumentRef||r.invoiceDocumentRef||'';
     var back='#/cliente360?c='+encodeURIComponent(cid||r.clienteId||p.clienteId||'')+'&t=recibos';
     var cell=function(k,val){var shown=val==null||clean(val)===''||/^(undefined|null)$/i.test(clean(val))?'Pendiente de completar':val;return'<div><div style="font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.035em">'+esc(k)+'</div><div style="font-size:13.5px;font-weight:500;line-height:1.42;margin-top:3px">'+esc(shown)+'</div></div>';};
-    var badges=[st].filter(Boolean).map(function(x){return'<span class="badge '+x.c+'">'+esc(x.t)+'</span>';}).join('');
-    var asOf=(portfolio&&portfolio.fechaCorteFuente)||r.fechaCorteFuente||'';
-    var sourceRef=businessSourceRef((portfolio&&portfolio.sourceRef)||r.sourceRef||'');
+    var provenance=paymentProvenanceKind(r,payment);
+    var badgeRows=[st];if(payment&&clean(payment.id)&&rec&&clean(rec.t)!==clean(st.t))badgeRows.push(rec);
+    var badges=badgeRows.filter(Boolean).map(function(x){return'<span class="badge '+x.c+'">'+esc(x.t)+'</span>';}).join('');
+    var asOf=payment.evidenceAsOfDate||(payment.inferenceProvenance&&payment.inferenceProvenance.evidenceAsOfDate)||(portfolio&&portfolio.fechaCorteFuente)||r.fechaCorteFuente||'';
+    var sourceRef=businessSourceRef(payment.sourceRef||payment.evidenceId||(payment.inferenceProvenance&&payment.inferenceProvenance.sourceRef)||(payment.inferenceProvenance&&payment.inferenceProvenance.evidenceId)||(portfolio&&portfolio.sourceRef)||r.sourceRef||'');
     var match=businessMatch((portfolio&&portfolio.matchQuality)||r.matchQuality||'');
     var operationalAsOf=asOf?cell('Datos actualizados al',fmtDate(asOf)):'';
-    var trace=[sourceRef?cell('Documento de origen',sourceRef):'',match?cell('Validación de coincidencia',match):''].filter(Boolean).join('');
+    var inf=payment.inferenceProvenance||{},anchor=payment.anchorInstallment||inf.anchorInstallment||'',rule=payment.inferenceRuleId||inf.inferenceRuleId||'',confidence=payment.confidence||inf.confidence||'';
+    var ruleLabel=rule==='INVOICE_CONTIGUOUS_PRIOR'?'Factura/recibo de aseguradora · cuotas anteriores':rule==='INSURER_PENDING_FROM_CONTIGUOUS_PRIOR'?'Estado de cuenta de aseguradora · cuotas anteriores':rule==='COMMISSION_CONTIGUOUS_PRIOR'?'Planilla de comisiones · cuotas anteriores':rule;
+    var trace=[provenance?cell('Tipo de pago',provenance==='INFERRED'?'Inferido':'Directo/confirmado'):'',sourceRef?cell('Documento / evidencia de origen',sourceRef):'',anchor?cell('Cuota ancla',String(anchor)):'',ruleLabel?cell('Regla de inferencia',ruleLabel):'',asOf?cell('Evidencia al',fmtDate(asOf)):'',confidence?cell('Confianza',String(confidence).toUpperCase()==='HIGH'?'Alta':confidence):'',match?cell('Validación de coincidencia',match):''].filter(Boolean).join('');
     if(!trace)trace='<div class="muted">Sin detalles técnicos adicionales.</div>';
     var vehicle=[v.marca,v.linea,v.placa].filter(function(x){return x&&!/^(undefined|null)$/i.test(clean(x));}).join(' ');var canEditPlan=!!(p&&p.id&&Orbit.policyReceipts&&typeof Orbit.policyReceipts.canManagePolicies==='function'&&Orbit.policyReceipts.canManagePolicies());
     target.innerHTML='<div class="page orbit-receipt-fullpage" data-rp-receipt-detail="1" data-rp-receipt-detail-id="'+esc(r.id)+'" data-rp-owner="v920">'
@@ -357,7 +374,7 @@
       +'<div class="card" style="overflow:hidden;margin-bottom:16px;border-left:4px solid var(--red)"><div data-rp-receipt-hero="1" style="padding:20px 22px;background:linear-gradient(135deg,#fff7f8 0%,#f7f4f0 68%,#f4f7fb 100%);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap"><div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.12em">🧾 Recibo esperado · '+esc(r.serie||'—')+'</div><h2 style="color:var(--ink);margin:4px 0;font-family:var(--f-display);font-size:24px;font-weight:800">Póliza '+esc(r.polizaNumero||p.numero||'—')+'</h2><div style="color:var(--ink-2)">'+esc(vehicle||p.ramo||'')+'</div></div><span data-rp-hero-status="1" class="badge '+st.c+'" style="align-self:flex-start;flex:0 0 auto;margin-top:2px">'+esc(st.t)+'</span></div></div>'
       +'<div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🧾 Desglose del recibo</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">'
       +cell('Prima neta',moneyDetail(r.primaNeta,cur))+cell('Gastos de expedición',moneyDetail(r.gastosExpedicion,cur))+cell('Gastos financieros',moneyDetail(r.gastosFinanciamiento,cur))+cell('Descuento / ajuste',moneyDetail(r.descuento,cur))+cell('IVA / impuestos',moneyDetail(r.impuestosIVA,cur))+cell('Prima total',moneyDetail(r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:r.monto),cur))+cell('Fecha límite',fmtDate(dueDate(r)))+cell('Fecha real de pago',paidDate?fmtDate(paidDate):'No informada')+cell('Fecha operativa inferida',r.inferredEffectiveDate?fmtDate(r.inferredEffectiveDate):'No aplica')+cell('Fecha de aplicación',applicationDate?fmtDate(applicationDate):'Pendiente / no informada')+cell('Número de factura',invoiceNumber||'No informado')+receiptDocumentHtml('Soporte de pago',paymentSupportRef,'payment_support')+receiptDocumentHtml('Factura / soporte de aplicación',invoiceDocumentRef,'insurer_invoice')
-      +'</div></section><div style="display:grid;gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🔎 Estado del recibo</h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'+badges+'</div><div class="muted" style="line-height:1.5">'+esc(receiptStateNote(r,portfolio))+'</div>'
+      +'</div></section><div style="display:grid;gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🔎 Estado del recibo</h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'+badges+'</div>'+(provenance==='INFERRED'?'<div data-rp-payment-provenance="inferred" class="cfg-note" style="margin-bottom:10px"><b>Pago inferido</b> · fecha real de pago no informada'+(sourceRef?' · evidencia: '+esc(sourceRef):'')+'</div>':'')+'<div class="muted" style="line-height:1.5">'+esc(receiptStateNote(r,portfolio,payment))+'</div>'
       +(portfolio?'<div style="margin-top:10px">En cartera: <span style="font-weight:600">'+esc(moneyDetail(portfolio.primaTotal||portfolio.montoTotal||portfolio.monto||r.primaTotal||r.montoTotal||r.monto,cur))+'</span></div>':'')
       +'</section><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">📅 Información del registro</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px">'+(operationalAsOf||'<div class="muted">Sin fecha adicional reportada.</div>')+'</div><details class="gi-technical-origin" style="margin-top:14px"><summary>Detalles de origen y auditoría</summary><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px">'+trace+'</div></details></section></div></div></div>';
     wireReceiptDocuments(target,r,p,c);
