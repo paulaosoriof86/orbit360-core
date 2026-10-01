@@ -2,7 +2,7 @@
 
 const REQUIRED_PROPOSAL_FIELDS = Object.freeze([
   'proposalId',
-  'quoteCaseId',
+  'caseId',
   'insurerId',
   'sourceId',
   'country',
@@ -48,11 +48,26 @@ function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function validateProposalShape(proposal) {
-  const errors = [];
-  if (!isPlainObject(proposal)) {
-    return { ok: false, errors: [{ fieldId: 'proposal', code: 'INVALID_OBJECT' }] };
+function normalizeProposalCaseLink(proposal) {
+  if (!isPlainObject(proposal)) return { ok:false, proposal, errors:[{ fieldId:'proposal', code:'INVALID_OBJECT' }] };
+  const caseId = isNonEmptyString(proposal.caseId) ? proposal.caseId.trim() : '';
+  const quoteCaseId = isNonEmptyString(proposal.quoteCaseId) ? proposal.quoteCaseId.trim() : '';
+  if (caseId && quoteCaseId && caseId !== quoteCaseId) {
+    return { ok:false, proposal, errors:[{ fieldId:'caseId', code:'CASE_LINK_CONFLICT' }] };
   }
+  const resolved = caseId || quoteCaseId;
+  return {
+    ok:true,
+    proposal: resolved ? { ...proposal, caseId: resolved } : { ...proposal },
+    errors:[]
+  };
+}
+
+function validateProposalShape(proposal) {
+  const normalized = normalizeProposalCaseLink(proposal);
+  if (!normalized.ok) return { ok:false, errors:normalized.errors };
+  proposal = normalized.proposal;
+  const errors = [];
 
   for (const fieldId of REQUIRED_PROPOSAL_FIELDS) {
     if (!hasOwn(proposal, fieldId)) errors.push({ fieldId, code: 'REQUIRED' });
@@ -112,6 +127,7 @@ function validateComparisonSemantic(state, context = {}) {
 
 module.exports = Object.freeze({
   REQUIRED_PROPOSAL_FIELDS,
+  normalizeProposalCaseLink,
   COMPARISON_SEMANTICS,
   COMPARISON_POLICY,
   validateProposalShape,
