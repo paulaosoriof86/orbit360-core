@@ -190,7 +190,7 @@ need(nativeReceiptOwner.includes("mode:'local_receipts_body'")&&nativeReceiptOwn
 need(nativeReceiptOwner.includes("return mod.conciliarFactura(receiptId)"),'B3_004_R9_RECONCILE_DOES_NOT_USE_CANONICAL_RECEIPT_ID');
 need(cobros.includes('Fecha real del pago')&&cobros.includes('Método de pago')&&cobros.includes('Soporte del pago')&&cobros.includes('Fecha de aplicación por la aseguradora')&&cobros.includes('Número de factura')&&cobros.includes('Factura / soporte de aplicación'),'B3_004_R9_PAYMENT_MODAL_REQUIRED_FIELDS_MISSING');
 need(indexR4.includes('modules/conciliaciones.js?v=20260930-b3004r9'),'B3_004_R9_CONCILIACIONES_ASSET_VERSION_NOT_BUMPED');
-need(indexR4.includes('modules/crm-v1198-operational-bridge.js?v=20260930-b3004r9'),'B3_004_R9_CRM_GUARD_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/crm-v1198-operational-bridge.js?v=20261001-b3004r12p9'),'B3_004_R9_CRM_GUARD_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r9p1'),'B3_004_R9_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_R9_HUMAN_REJECTION_CAUSAL_CONTRACT=PASS');
 

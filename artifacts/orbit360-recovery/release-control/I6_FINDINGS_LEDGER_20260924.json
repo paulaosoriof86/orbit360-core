@@ -1712,6 +1712,13 @@
         "rootCause": "CRM_V1198_PAYMENT_ACTION_WRAPPER_REAPPLIED_NORMAL_SCOPE_TO_EXACT_SYNTHETIC_QA_RECEIPT_AND_BLOCKED_BEFORE_CANONICAL_COBROS_HANDLER",
         "permissionGuardPreserved": true,
         "productSourceChanged": true
+      },
+      "r12p9p1ContractFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P9P1_STALE_ASSET_CONTRACT_FIX_20261001.json",
+        "blobSha": "5b195698f64d98d15664236baa544ffaf5dda295",
+        "compositionLockBlobSha": "46dc3c0c099d79580cbaced08c37e3b68660aa6f",
+        "classification": "QA_CONTRACT_STALE_ASSET_EXPECTATION",
+        "productSourceChanged": false
       }
     },
     {
