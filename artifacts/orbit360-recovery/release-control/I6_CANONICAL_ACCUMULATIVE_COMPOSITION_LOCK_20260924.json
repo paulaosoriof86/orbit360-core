@@ -1592,5 +1592,12 @@
       "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "9de5bb95ec18e7177cb7b419342eadc2a795d88c"
     }
+  },
+  "b3005SourceContract": {
+    "status": "PASS_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
+    "blobSha": "b3c4ee074967ecc9d3fe13e18504fb5204a1f205",
+    "sourceSha": "9e8b0afb77e4726b6412170c04dee299ed9e9d73",
+    "runId": 36934711886
   }
 }

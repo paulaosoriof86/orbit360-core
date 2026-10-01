@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_005_SOURCE_FIXED_PENDING_CONTRACT",
+  "status": "B3_005_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-005",
     "title": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
     "requiredProof": [
@@ -31,7 +31,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_005_SOURCE_CONTRACT",
+    "nextAction": "B3_005_EXACT_PREVIEW",
     "rootCause": "CANONICAL_SINGLE_RECEIPT_WRITE_PRIMITIVE_EXISTS_BUT_HIGH_CONFIDENCE_MULTI_EVIDENCE_INFERENCE_ORCHESTRATOR_AND_CURRENT_TENANT_CONFIG_CONTRACT_ARE_NOT_COMPOSED",
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
     "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75",
@@ -59,7 +59,9 @@
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "9de5bb95ec18e7177cb7b419342eadc2a795d88c"
     },
     "candidateEligibleForPromotion": false,
-    "machineProofInvalidatedBySourceChange": true
+    "machineProofInvalidatedBySourceChange": true,
+    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
+    "sourceContractReceiptBlobSha": "b3c4ee074967ecc9d3fe13e18504fb5204a1f205"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -68,10 +70,11 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "e69b0f57e49ee883f48df7a6cbce30c4d68a43c9"
+    "blobSha": "49a6a414712e545dc8b0625a3096c7df8737b142"
   },
   "nextRequiredProof": [
-    "B3_005_SOURCE_CONTRACT_PASS"
+    "B3_005_PREVIEW_MACHINE_PASS",
+    "B3_005_TARGETED_HUMAN_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -270,7 +273,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "1158cd81acc752d0fd6a6edff44e7e64ec6479f2"
+    "blobSha": "27c30fca69f98b85fe9d2fb09e2cc07706183d68"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
