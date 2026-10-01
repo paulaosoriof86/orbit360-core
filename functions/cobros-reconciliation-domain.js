@@ -650,7 +650,9 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
     partialPayment: payload.partialPayment === true,
     reversal: payload.reversal === true,
     allowPriorContiguousInference: payload.allowPriorContiguousInference === true,
-    actualPaidDateEvidence: payload.actualPaidDateEvidence === true
+    actualPaidDateEvidence: payload.actualPaidDateEvidence === true,
+    explicitInstallmentException: payload.explicitInstallmentException === true || payload.installmentExceptionApproved === true,
+    installmentExceptionReference: text(payload.installmentExceptionReference || payload.exceptionReference || payload.planExceptionReference, 500)
   };
   const reqId = operationRequestId(authz.tenantId, 'reconcile_evidence', evidencePayload, data.requestId);
   const reqRef = requestRef(authz.tenantId, reqId);
@@ -681,7 +683,8 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
         scheduleCorrectionRequired: plan.scheduleCorrectionRequired === true,
         expectedReceiptCount: plan.expectedReceiptCount || null,
         actualReceiptCount: plan.actualReceiptCount || null,
-        maxInstallments: plan.maxInstallments || null
+        maxInstallments: plan.maxInstallments || null,
+        exceptionalMaxInstallments: plan.exceptionalMaxInstallments || null
       };
     }
     if (!Array.isArray(plan.targets) || plan.targets.length === 0) {
@@ -756,6 +759,7 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
         confidence: plan.confidence,
         evidenceAsOfDate: plan.evidenceAsOfDate || text(beforeCobro.evidenceAsOfDate, 32),
         inferredEffectiveDate: isInferred ? target.inferredEffectiveDate : text(beforeCobro.inferredEffectiveDate, 32),
+        installmentPlanException: plan.installmentException || beforeCobro.installmentPlanException || null,
         reconciledAt: technicalNow,
         reconciledBy: authz.actor.uid,
         updatedAt: technicalNow,
@@ -838,6 +842,7 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
       anchorInstallment: plan.anchorInstallment,
       inferenceRuleId: plan.inferenceRuleId,
       confidence: plan.confidence,
+      installmentException: plan.installmentException || null,
       results,
       writes: results.length,
       serverOwned: true,

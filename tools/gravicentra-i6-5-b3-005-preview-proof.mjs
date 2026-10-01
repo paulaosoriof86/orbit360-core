@@ -70,7 +70,9 @@ function config(){
       {insurer:'ASEGURADORA LA CEIBA',aliases:['LA CEIBA'],maxInstallments:10,scope:'fraccionado'},
       {insurer:'ASEGURADORA GENERAL',aliases:['GENERAL'],maxInstallments:10,scope:'fraccionado'},
       {insurer:'G&T SEGUROS',aliases:['G&T','GT SEGUROS'],maxInstallments:10,scope:'fraccionado'},
-      {insurer:'ASEGURADORA GUATEMALTECA',aliases:['ASEGUATE','ASEGURADORA GUATEMALTECA'],maxInstallments:10,scope:'fraccionado'}
+      {insurer:'ASEGURADORA GUATEMALTECA',aliases:['ASEGUATE','ASEGURADORA GUATEMALTECA'],maxInstallments:10,scope:'fraccionado'},
+      {insurer:'ASEGURADORA DE LOS TRABAJADORES',aliases:['BANTRAB','ASEGURADORA DE LOS TRABAJADORES'],maxInstallments:10,exceptionalMaxInstallments:12,exceptionRequiresExplicitEvidence:true,scope:'fraccionado'},
+      {insurer:'FICOHSA',aliases:['FICOHSA','SEGUROS FICOHSA','FICOHSA SEGUROS'],maxInstallments:10,scope:'fraccionado'}
     ]
   };
 }
@@ -121,11 +123,14 @@ async function main(){
     cap:'b3005qa_policy_cap_'+suffix,
     statement:'b3005qa_policy_statement_'+suffix,
     commission:'b3005qa_policy_commission_'+suffix,
+    bantrab:'b3005qa_policy_bantrab_'+suffix,
+    ficohsa:'b3005qa_policy_ficohsa_'+suffix,
     human:'b3005human_policy_r1'
   };
   const humanClient='b3005human_client_r1';
   const machineRequests=[
-    'b3005qa_invoice_'+suffix,'b3005qa_direct_'+suffix,'b3005qa_cap_'+suffix,'b3005qa_statement_'+suffix,'b3005qa_commission_'+suffix
+    'b3005qa_invoice_'+suffix,'b3005qa_direct_'+suffix,'b3005qa_cap_'+suffix,'b3005qa_statement_'+suffix,'b3005qa_commission_'+suffix,
+    'b3005qa_bantrab_block_'+suffix,'b3005qa_bantrab_allow_'+suffix,'b3005qa_ficohsa_'+suffix
   ];
   const humanRequest='b3005human_invoice_r1';
   const audit={schema:'GRAVICENTRA_I6_5_B3_005_PREVIEW_MACHINE_PROOF_V1',status:'RUNNING',runId:Number(runId)||runId,tenantId,operator:{uid:operator.uid,activeRole:operator.activeRole},assertions:{},humanFixture:null,cleanup:{machine:false,configRestored:false,humanRetained:false}};
@@ -134,7 +139,11 @@ async function main(){
     const saved=await saveConfig(configCall,operator.activeRole,config(),'B3-005 isolated Preview high-confidence inference config');
     need(saved?.ok===true&&saved?.previewIsolated===true,'B3_005_PREVIEW_CONFIG_SAVE_FAILED');
     configEventId=text(saved.eventId);
-    need(Array.isArray(saved.config?.insurerPaymentPlans)&&saved.config.insurerPaymentPlans.length===4,'B3_005_PREVIEW_CONFIG_PAYMENT_PLANS_MISSING');
+    need(Array.isArray(saved.config?.insurerPaymentPlans)&&saved.config.insurerPaymentPlans.length===6,'B3_005_PREVIEW_CONFIG_PAYMENT_PLANS_MISSING');
+    const savedBantrab=saved.config.insurerPaymentPlans.find(x=>/TRABAJADORES|BANTRAB/i.test(String(x.insurer||'')+' '+String((x.aliases||[]).join(' '))));
+    const savedFicohsa=saved.config.insurerPaymentPlans.find(x=>/FICOHSA/i.test(String(x.insurer||'')+' '+String((x.aliases||[]).join(' '))));
+    need(savedBantrab&&Number(savedBantrab.maxInstallments)===10&&Number(savedBantrab.exceptionalMaxInstallments)===12&&savedBantrab.exceptionRequiresExplicitEvidence===true,'B3_005_PREVIEW_CONFIG_BANTRAB_RULE_MISSING');
+    need(savedFicohsa&&Number(savedFicohsa.maxInstallments)===10,'B3_005_PREVIEW_CONFIG_FICOHSA_RULE_MISSING');
     need(saved.config.humanConfirmationRequiredForHighConfidence===false&&saved.config.autoCommitHighConfidence===true,'B3_005_PREVIEW_CONFIG_AUTOCOMMIT_INVALID');
 
     await dataRoot.doc('clientes').collection('items').doc(clientId).set({id:clientId,nombre:'B3-005 QA Synthetic',pais:'GT',asesorId:operator.advisorId,__syntheticQa:true,__syntheticRun:runId});
@@ -142,6 +151,8 @@ async function main(){
     await createPolicyFixture(db,dataRoot,{clientId,policyId:policies.cap,total:12,advisorId:operator.advisorId});
     await createPolicyFixture(db,dataRoot,{clientId,policyId:policies.statement,total:10,advisorId:operator.advisorId});
     await createPolicyFixture(db,dataRoot,{clientId,policyId:policies.commission,total:10,advisorId:operator.advisorId});
+    await createPolicyFixture(db,dataRoot,{clientId,policyId:policies.bantrab,total:12,insurer:'Aseguradora de Los Trabajadores',advisorId:operator.advisorId});
+    await createPolicyFixture(db,dataRoot,{clientId,policyId:policies.ficohsa,total:11,insurer:'Ficohsa',advisorId:operator.advisorId});
 
     const invoice=await invoke(cobrosCall,operator.activeRole,'reconcile_evidence',{
       policyId:policies.invoice,evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'invoice:'+suffix,
@@ -197,6 +208,30 @@ async function main(){
     },'B3-005 commission statement installment 4',machineRequests[4]);
     need(commission?.status==='AUTO_COMMITTED_HIGH_CONFIDENCE'&&commission?.results?.length===4,'B3_005_COMMISSION_INFERENCE_FAILED');
 
+    const bantrabBlocked=await invoke(cobrosCall,operator.activeRole,'reconcile_evidence',{
+      policyId:policies.bantrab,evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'bantrab-block:'+suffix,
+      receiptId:receiptId(policies.bantrab,12),totalInstallments:12,currency:'GTQ'
+    },'B3-005 Bantrab 12 requires explicit documented exception',machineRequests[5]);
+    need(bantrabBlocked?.status==='REVIEW_REQUIRED'&&bantrabBlocked?.reason==='INSTALLMENT_TOTAL_REQUIRES_EXPLICIT_EXCEPTION'&&Number(bantrabBlocked?.maxInstallments)===10&&Number(bantrabBlocked?.exceptionalMaxInstallments)===12,'B3_005_BANTRAB_12_NOT_FAIL_CLOSED_WITHOUT_EXCEPTION');
+    const bantrabBefore=await dataRoot.doc('cobros').collection('items').where('polizaId','==',policies.bantrab).get();
+    need(bantrabBefore.empty,'B3_005_BANTRAB_12_BLOCKED_CASE_WROTE_COBROS');
+
+    const bantrabAllowed=await invoke(cobrosCall,operator.activeRole,'reconcile_evidence',{
+      policyId:policies.bantrab,evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'bantrab-allow:'+suffix,
+      receiptId:receiptId(policies.bantrab,12),totalInstallments:12,currency:'GTQ',
+      explicitInstallmentException:true,installmentExceptionReference:'b3005qa-authoritative-bantrab-12:'+suffix
+    },'B3-005 Bantrab explicit documented exception allows 12',machineRequests[6]);
+    need(bantrabAllowed?.status==='AUTO_COMMITTED_HIGH_CONFIDENCE'&&bantrabAllowed?.results?.length===12,'B3_005_BANTRAB_12_EXPLICIT_EXCEPTION_NOT_APPLIED');
+    need(bantrabAllowed?.installmentException?.explicit===true&&Number(bantrabAllowed?.installmentException?.exceptionalMaxInstallments)===12,'B3_005_BANTRAB_EXCEPTION_PROVENANCE_MISSING');
+
+    const ficohsa=await invoke(cobrosCall,operator.activeRole,'reconcile_evidence',{
+      policyId:policies.ficohsa,evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'ficohsa-cap:'+suffix,
+      receiptId:receiptId(policies.ficohsa,11),totalInstallments:11,currency:'GTQ'
+    },'B3-005 Ficohsa max 10 fail closed',machineRequests[7]);
+    need(ficohsa?.status==='REVIEW_REQUIRED'&&ficohsa?.reason==='INSTALLMENT_TOTAL_EXCEEDS_TENANT_CONFIG'&&Number(ficohsa?.maxInstallments)===10,'B3_005_FICOHSA_11_NOT_BLOCKED');
+    const ficohsaCobros=await dataRoot.doc('cobros').collection('items').where('polizaId','==',policies.ficohsa).get();
+    need(ficohsaCobros.empty,'B3_005_FICOHSA_11_WROTE_COBROS');
+
     // Recreate one deterministic synthetic case for Paula visual validation.
     await cleanupRequests(db,[humanRequest]);
     await cleanupPolicy(dataRoot,policies.human,10).catch(()=>null);
@@ -229,6 +264,11 @@ async function main(){
       inferenceProvenancePreserved:true,
       aseguateMax10Enforced:true,
       twelveInstallmentsFailClosedWithoutWrites:true,
+      bantrabStandardMax10:true,
+      bantrab12RequiresExplicitException:true,
+      bantrab12ExplicitExceptionAccepted:true,
+      bantrabExceptionProvenancePreserved:true,
+      ficohsaMax10Enforced:true,
       insurerStatementInference:true,
       commissionStatementInference:true,
       previewTenantConfigIsolated:true,
@@ -238,7 +278,7 @@ async function main(){
   }catch(error){
     audit.status='FAIL';audit.failure=text(error?.stack||error?.message||error);throw error;
   }finally{
-    for(const [key,total] of [['invoice',10],['cap',12],['statement',10],['commission',10]])await cleanupPolicy(dataRoot,policies[key],total).catch(()=>null);
+    for(const [key,total] of [['invoice',10],['cap',12],['statement',10],['commission',10],['bantrab',12],['ficohsa',11]])await cleanupPolicy(dataRoot,policies[key],total).catch(()=>null);
     await dataRoot.doc('clientes').collection('items').doc(clientId).delete().catch(()=>null);
     await cleanupRequests(db,machineRequests).catch(()=>null);
     if(configEventId)await tenant.collection('previewUatConfigEvents').doc(configEventId).delete().catch(()=>null);

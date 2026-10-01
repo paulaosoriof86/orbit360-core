@@ -20,7 +20,9 @@ const plans=[
  {insurer:'ASEGURADORA LA CEIBA',aliases:['LA CEIBA'],maxInstallments:10,scope:'fraccionado'},
  {insurer:'ASEGURADORA GENERAL',aliases:['GENERAL'],maxInstallments:10,scope:'fraccionado'},
  {insurer:'G&T SEGUROS',aliases:['G&T','GT SEGUROS'],maxInstallments:10,scope:'fraccionado'},
- {insurer:'ASEGURADORA GUATEMALTECA',aliases:['ASEGUATE','ASEGURADORA GUATEMALTECA'],maxInstallments:10,scope:'fraccionado'}
+ {insurer:'ASEGURADORA GUATEMALTECA',aliases:['ASEGUATE','ASEGURADORA GUATEMALTECA'],maxInstallments:10,scope:'fraccionado'},
+ {insurer:'ASEGURADORA DE LOS TRABAJADORES',aliases:['BANTRAB','ASEGURADORA DE LOS TRABAJADORES'],maxInstallments:10,exceptionalMaxInstallments:12,exceptionRequiresExplicitEvidence:true,scope:'fraccionado'},
+ {insurer:'FICOHSA',aliases:['FICOHSA','SEGUROS FICOHSA','FICOHSA SEGUROS'],maxInstallments:10,scope:'fraccionado'}
 ];
 const cfg={autoCommitHighConfidence:true,humanConfirmationRequired:false,humanConfirmationRequiredForHighConfidence:false,requireSameCurrency:true,insurerPaymentPlans:plans};
 const policy={id:'b3005qa_policy_01',aseguradoraNombre:'Aseguradora Guatemalteca',moneda:'GTQ',pais:'GT'};
@@ -42,6 +44,23 @@ need(commission.status==='AUTO_COMMIT'&&commission.targets.filter(x=>x.mode==='I
 const bad12=engine.planEvidence({policy,receipts:mkReceipts(12),evidence:{evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'qa_invoice_12',receiptId:'b3005qa_receipt_12',totalInstallments:12,currency:'GTQ'},reconciliationConfig:cfg});
 need(bad12.status==='REVIEW_REQUIRED'&&bad12.reason==='INSTALLMENT_TOTAL_EXCEEDS_TENANT_CONFIG'&&bad12.maxInstallments===10,'B3_005_ASEGUATE_MAX10_NOT_ENFORCED');
 
+const bantrabPolicy={...policy,aseguradoraNombre:'Aseguradora de Los Trabajadores'};
+const bantrab12Blocked=engine.planEvidence({policy:bantrabPolicy,receipts:mkReceipts(12),evidence:{evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'qa_bantrab_12_block',receiptId:'b3005qa_receipt_12',totalInstallments:12,currency:'GTQ'},reconciliationConfig:cfg});
+need(bantrab12Blocked.status==='REVIEW_REQUIRED'&&bantrab12Blocked.reason==='INSTALLMENT_TOTAL_REQUIRES_EXPLICIT_EXCEPTION'&&bantrab12Blocked.maxInstallments===10&&bantrab12Blocked.exceptionalMaxInstallments===12,'B3_005_BANTRAB_12_MUST_REQUIRE_EXCEPTION');
+
+const bantrab12Allowed=engine.planEvidence({policy:bantrabPolicy,receipts:mkReceipts(12),evidence:{evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'qa_bantrab_12_allowed',receiptId:'b3005qa_receipt_12',totalInstallments:12,currency:'GTQ',explicitInstallmentException:true,installmentExceptionReference:'qa-authoritative-plan-12'},reconciliationConfig:cfg});
+need(bantrab12Allowed.status==='AUTO_COMMIT'&&bantrab12Allowed.targets.length===12,'B3_005_BANTRAB_12_EXPLICIT_EXCEPTION_NOT_ACCEPTED');
+need(bantrab12Allowed.installmentException?.explicit===true&&bantrab12Allowed.installmentException?.exceptionalMaxInstallments===12,'B3_005_BANTRAB_EXCEPTION_PROVENANCE_MISSING');
+
+const bantrab13=engine.planEvidence({policy:bantrabPolicy,receipts:mkReceipts(13),evidence:{evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'qa_bantrab_13',receiptId:'b3005qa_receipt_13',totalInstallments:13,currency:'GTQ',explicitInstallmentException:true,installmentExceptionReference:'qa-over-limit'},reconciliationConfig:cfg});
+need(bantrab13.status==='REVIEW_REQUIRED'&&bantrab13.reason==='INSTALLMENT_TOTAL_EXCEEDS_TENANT_CONFIG','B3_005_BANTRAB_13_NOT_BLOCKED');
+
+const ficohsaPolicy={...policy,aseguradoraNombre:'Ficohsa'};
+const ficohsa10=engine.planEvidence({policy:ficohsaPolicy,receipts:mkReceipts(10),evidence:{evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'qa_ficohsa_10',receiptId:'b3005qa_receipt_10',totalInstallments:10,currency:'GTQ'},reconciliationConfig:cfg});
+need(ficohsa10.status==='AUTO_COMMIT','B3_005_FICOHSA_10_NOT_ALLOWED');
+const ficohsa11=engine.planEvidence({policy:ficohsaPolicy,receipts:mkReceipts(11),evidence:{evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'qa_ficohsa_11',receiptId:'b3005qa_receipt_11',totalInstallments:11,currency:'GTQ'},reconciliationConfig:cfg});
+need(ficohsa11.status==='REVIEW_REQUIRED'&&ficohsa11.reason==='INSTALLMENT_TOTAL_EXCEEDS_TENANT_CONFIG'&&ficohsa11.maxInstallments===10,'B3_005_FICOHSA_MAX10_NOT_ENFORCED');
+
 const mismatch=engine.planEvidence({policy,receipts:rows.slice(0,9),evidence:{evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'qa_mismatch',receiptId:'b3005qa_receipt_05',totalInstallments:10,currency:'GTQ'},reconciliationConfig:cfg});
 need(mismatch.status==='REVIEW_REQUIRED'&&mismatch.reason==='EXPECTED_RECEIPT_COUNT_MISMATCH'&&mismatch.scheduleCorrectionRequired===true,'B3_005_DENOMINATOR_MISMATCH_NOT_FAIL_CLOSED');
 
@@ -51,15 +70,17 @@ need(ambiguous.status==='REVIEW_REQUIRED'&&ambiguous.autoCommit===false,'B3_005_
 const server=read('functions/cobros-reconciliation-domain.js');
 const tenant=read('functions/tenant-domain-config.js');
 const client=read('orbit360-platform/core/cobros-reconciliation-domain-client.js');
-const lock=JSON.parse(read('artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json'));
+const lock=JSON.parse(read('artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json'));
 need(server.includes("reconcile_evidence")&&server.includes("planEvidence")&&server.includes("AUTO_COMMITTED_HIGH_CONFIDENCE"),'B3_005_SERVER_OWNER_MISSING');
 need(server.includes("inferenceProvenance")&&server.includes("APPLIED_INFERRED")&&server.includes("deterministicCobroId"),'B3_005_INFERENCE_PROVENANCE_IDEMPOTENCY_MISSING');
 need(server.includes("readReconciliationConfig")&&server.includes("previewUatConfig"),'B3_005_TENANT_CONFIG_READ_MISSING');
-need(tenant.includes("autoCommitHighConfidence")&&tenant.includes("humanConfirmationRequiredForHighConfidence: false")&&tenant.includes("insurerPaymentPlans"),'B3_005_CONFIG_CONTRACT_MISSING');
+need(tenant.includes("autoCommitHighConfidence")&&tenant.includes("humanConfirmationRequiredForHighConfidence: false")&&tenant.includes("insurerPaymentPlans")&&tenant.includes("exceptionalMaxInstallments")&&tenant.includes("exceptionRequiresExplicitEvidence"),'B3_005_CONFIG_CONTRACT_MISSING');
 need(client.includes("function reconcileEvidence")&&client.includes("command('reconcile_evidence'"),'B3_005_CLIENT_COMMAND_MISSING');
-const names=(lock.insurerPaymentPlanConfig.currentApprovedValidationCeilings||[]).map(x=>String(x.insurer||'').toUpperCase());
-for(const name of ['ASEGURADORA LA CEIBA','ASEGURADORA GENERAL','G&T SEGUROS','ASEGURADORA GUATEMALTECA'])need(names.includes(name),'B3_005_LOCK_MAX10_MISSING_'+name);
-need((lock.insurerPaymentPlanConfig.currentApprovedValidationCeilings||[]).filter(x=>names.includes(String(x.insurer||'').toUpperCase())).every(x=>Number(x.maxInstallments)===10),'B3_005_LOCK_MAX10_VALUE');
+const ceilings=lock.insurerPaymentPlanConfig.currentApprovedValidationCeilings||[];
+const byName=new Map(ceilings.map(x=>[String(x.insurer||'').toUpperCase(),x]));
+for(const name of ['ASEGURADORA LA CEIBA','ASEGURADORA GENERAL','G&T SEGUROS','ASEGURADORA GUATEMALTECA','ASEGURADORA DE LOS TRABAJADORES','FICOHSA'])need(byName.has(name),'B3_005_LOCK_RULE_MISSING_'+name);
+for(const name of ['ASEGURADORA LA CEIBA','ASEGURADORA GENERAL','G&T SEGUROS','ASEGURADORA GUATEMALTECA','ASEGURADORA DE LOS TRABAJADORES','FICOHSA'])need(Number(byName.get(name).maxInstallments)===10,'B3_005_LOCK_STANDARD_MAX10_'+name);
+need(Number(byName.get('ASEGURADORA DE LOS TRABAJADORES').exceptionalMaxInstallments)===12&&byName.get('ASEGURADORA DE LOS TRABAJADORES').exceptionRequiresExplicitEvidence===true,'B3_005_LOCK_BANTRAB_EXCEPTION12');
 need(!/Carlos Castro|Samuel Daza|Fernando Arias|Paula Osorio/.test(server),'B3_005_HARDCODED_IDENTITY_FORBIDDEN');
 
 console.log('B3_005_SOURCE_CONTRACT=PASS');
@@ -67,4 +88,6 @@ console.log('B3_005_INVOICE_SEQUENCE=PASS');
 console.log('B3_005_INSURER_STATEMENT_SEQUENCE=PASS');
 console.log('B3_005_COMMISSION_SEQUENCE=PASS');
 console.log('B3_005_ASEGUATE_MAX10=PASS');
+console.log('B3_005_BANTRAB_STANDARD10_EXCEPTION12=PASS');
+console.log('B3_005_FICOHSA_MAX10=PASS');
 console.log('B3_005_AMBIGUOUS_FAIL_CLOSED=PASS');

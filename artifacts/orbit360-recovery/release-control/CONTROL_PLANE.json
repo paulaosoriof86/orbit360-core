@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_005_EXACT_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_005_CONTRACT",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -3184,13 +3184,13 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "B3_005_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+      "status": "B3_005_SOURCE_FIXED_PENDING_CONTRACT",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
       "livePromoted": false,
       "activeFindingId": "B3-005",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "fe4d31195ced91326bcf1885c4453c6f76cf0fa5",
+      "executionLockBlobSha": "45a8e735a7b4e85a283548cb8f255b41f111bc4e",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
       "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
       "productMutationAuthorized": false,
@@ -3216,12 +3216,12 @@
       "runId": 36930630584,
       "artifactId": 11196130731,
       "artifactDigest": "16c4a465051a70d895468b4d88e69c4a842a4b08b7ded82f0c50f67061b83bdd",
-      "exactReadback": true,
-      "contractPass": true,
+      "exactReadback": false,
+      "contractPass": false,
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "1b1bd61bf375b065f7a178f6d732181a67c91889",
+      "findingLedgerBlobSha": "ead1bc031fa9a6ed1a8ecc53b4aa53d00f0cb27e",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
       "diagnosticRunId": 36658190622,
@@ -3418,8 +3418,8 @@
       },
       "b3003Status": "CLOSED_PASS",
       "b3003TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_TARGETED_VISUAL_PASS_20260930.json",
-      "paymentInferenceLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
-      "paymentInferenceLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
+      "paymentInferenceLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+      "paymentInferenceLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
       "pendingBusinessDecisionResolved": {
         "prior": "AUTO_COMMIT_HIGH_CONFIDENCE_INFERRED_MATCH_VS_PROPOSE_FOR_HUMAN_CONFIRMATION",
         "resolution": "AUTO_COMMIT_HIGH_CONFIDENCE_INFERRED_MATCH",
@@ -3437,7 +3437,7 @@
       "provenanceFixReceiptBlobSha": "5ac0ce337999abbec288b3ac5efa738e9aedab60",
       "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_PROVENANCE_CONTRACT_PASS_20260930.json",
       "paymentProvenanceContractReceiptBlobSha": "34f2f5e0aedf6a5a68e4f3c476040349ecf38794",
-      "compositionLockBlobSha": "1eb22269831d2ace6ea3eff434739b9e57d7632e",
+      "compositionLockBlobSha": "a7195c794e004a0d1a7d98b97339886b515b818e",
       "syntheticQaAuthorization": {
         "status": "AUTHORIZED_FOR_B3_005_PREVIEW_ONLY",
         "scope": "B3-005 exact Preview inference engine proof and one retained synthetic human fixture",
@@ -4488,7 +4488,7 @@
         "noLive": true,
         "noB3005": true
       },
-      "nextAction": "B3_005_EXACT_PREVIEW",
+      "nextAction": "B3_005_SOURCE_CONTRACT",
       "r12p11p6HarnessFix": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P6_BROWSER_HARNESS_SCOPE_HTTP_ADJUDICATION_FIX_20261001.json",
         "blobSha": "c9ae53a58dcccde11aa5b0a97bb888b606369446",
@@ -4625,22 +4625,22 @@
         "aseguradoraGuatemaltecaMaxInstallments": 10
       },
       "sourceBlobs": {
-        "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
-        "functions/cobros-reconciliation-domain.js": "751eeabe3d1e80a02557b819de2d64551c607877",
-        "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
+        "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
+        "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+        "functions/tenant-domain-config.js": "3aba4964dc56e5eb284c6288de5c7a74e9a9b765",
         "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
-        "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
-        "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
-        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "9de5bb95ec18e7177cb7b419342eadc2a795d88c"
+        "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+        "tools/gravicentra-i6-5-b3-005-contract.mjs": "d94c1baf4e1ca0b146aae8bff3673cff1aa4a159",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897"
       },
       "configMutationAuthorized": false,
       "r1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
       "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc",
       "qaBlobs": {
-        "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
-        "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "9fd14eba50e15202de19558d091e2e69767cc921",
+        "tools/gravicentra-i6-5-b3-005-contract.mjs": "d94c1baf4e1ca0b146aae8bff3673cff1aa4a159",
+        "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "1da0aeb89ea590fb3c1bd712e0ec8067ff4318f5",
         "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs": "4cd727c02f4b91fa3bec56917edfd479a64d01ff",
-        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "2e29a17285a8ca4835e3140c6c55f84ea60c33f1",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897",
         "tools/gravicentra-i6-control-plane-guard-v1.mjs": "e2df6ea293b280f6e37dfb5eb615d9fc01f9fc9e"
       },
       "p1GovernanceGuardRepair": {
@@ -4656,15 +4656,26 @@
         "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
         "compositionLockBlobSha": "1eb22269831d2ace6ea3eff434739b9e57d7632e",
         "productSourceChanged": false
+      },
+      "paymentLockV6": {
+        "status": "FROZEN_ACTIVE",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+        "blobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+        "supersedes": "V5"
+      },
+      "r2PaymentPlanRulesV6": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R2_PAYMENT_PLAN_RULES_V6_20261001.json",
+        "blobSha": "265d7f28fb2b409569f803bd8e2e49d6b486d1a2",
+        "status": "SOURCE_FIXED_PENDING_CONTRACT"
       }
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "1eb22269831d2ace6ea3eff434739b9e57d7632e",
+    "compositionLockBlobSha": "a7195c794e004a0d1a7d98b97339886b515b818e",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "1b1bd61bf375b065f7a178f6d732181a67c91889",
+    "findingLedgerBlobSha": "ead1bc031fa9a6ed1a8ecc53b4aa53d00f0cb27e",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -4676,7 +4687,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_005_EXACT_PREVIEW"
+    "nextAction": "B3_005_SOURCE_CONTRACT"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
@@ -4856,30 +4867,32 @@
     "currentClientPortalPaymentCountExpected": 0
   },
   "currentB3": {
-    "status": "B3_005_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "status": "B3_005_SOURCE_FIXED_PENDING_CONTRACT",
     "activeFindingId": "B3-005",
     "priorFindingId": "B3-004",
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "1eb22269831d2ace6ea3eff434739b9e57d7632e",
-    "findingLedgerBlobSha": "1b1bd61bf375b065f7a178f6d732181a67c91889",
-    "executionLockBlobSha": "fe4d31195ced91326bcf1885c4453c6f76cf0fa5",
+    "compositionLockBlobSha": "a7195c794e004a0d1a7d98b97339886b515b818e",
+    "findingLedgerBlobSha": "ead1bc031fa9a6ed1a8ecc53b4aa53d00f0cb27e",
+    "executionLockBlobSha": "45a8e735a7b4e85a283548cb8f255b41f111bc4e",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
     "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
     "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
-    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
-    "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
-    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
-    "sourceContractReceiptBlobSha": "ebcae4c26c418b042b384a7f697a15b0340ccff7",
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+    "paymentLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+    "sourceContractReceiptPath": null,
+    "sourceContractReceiptBlobSha": null,
     "r1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
     "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc",
     "p1GovernanceGuardRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P1_STALE_GOVERNANCE_GUARD_REPAIR_20261001.json",
     "p1GovernanceGuardRepairBlobSha": "03e89fa3e90a52706797bc3aaf2629f51efd58bf",
     "p2CompositionExactSetRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P2_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json",
-    "p2CompositionExactSetRepairBlobSha": "fb6e3c6b82d5f98f5c4c00bedff3eca4d7ffe490"
+    "p2CompositionExactSetRepairBlobSha": "fb6e3c6b82d5f98f5c4c00bedff3eca4d7ffe490",
+    "r2PaymentPlanRulesV6Path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R2_PAYMENT_PLAN_RULES_V6_20261001.json",
+    "r2PaymentPlanRulesV6BlobSha": "265d7f28fb2b409569f803bd8e2e49d6b486d1a2"
   }
 }

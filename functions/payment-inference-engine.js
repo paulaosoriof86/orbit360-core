@@ -133,10 +133,37 @@ function planEvidence(input) {
 
   const total = explicitTotal(evidence, anchorReceipt);
   const planRule = ruleForPolicy(config, policy);
+  let installmentException = null;
   if (planRule && norm(planRule.scope || 'fraccionado') === 'fraccionado') {
     const max = Math.floor(number(planRule.maxInstallments) || 0);
+    const exceptionalMax = Math.floor(number(planRule.exceptionalMaxInstallments || planRule.maxInstallmentsException) || 0);
     if (max > 0 && total && total > max) {
-      return review('INSTALLMENT_TOTAL_EXCEEDS_TENANT_CONFIG', { totalInstallments: total, maxInstallments: max, insurerRule: text(planRule.insurer || planRule.name || planRule.canonicalKey) });
+      const exceptionWithinCeiling = exceptionalMax > max && total <= exceptionalMax;
+      const explicitException = evidence.explicitInstallmentException === true || evidence.installmentExceptionApproved === true;
+      const exceptionReference = text(evidence.installmentExceptionReference || evidence.exceptionReference || evidence.planExceptionReference, 500);
+      if (exceptionWithinCeiling) {
+        if (!explicitException || !exceptionReference) {
+          return review('INSTALLMENT_TOTAL_REQUIRES_EXPLICIT_EXCEPTION', {
+            totalInstallments: total,
+            maxInstallments: max,
+            exceptionalMaxInstallments: exceptionalMax,
+            insurerRule: text(planRule.insurer || planRule.name || planRule.canonicalKey)
+          });
+        }
+        installmentException = {
+          explicit: true,
+          reference: exceptionReference,
+          standardMaxInstallments: max,
+          exceptionalMaxInstallments: exceptionalMax
+        };
+      } else {
+        return review('INSTALLMENT_TOTAL_EXCEEDS_TENANT_CONFIG', {
+          totalInstallments: total,
+          maxInstallments: max,
+          exceptionalMaxInstallments: exceptionalMax || null,
+          insurerRule: text(planRule.insurer || planRule.name || planRule.canonicalKey)
+        });
+      }
     }
   }
   if (total && rows.length !== total) {
@@ -225,8 +252,11 @@ function planEvidence(input) {
     insurerRule: planRule ? {
       insurer: text(planRule.insurer || planRule.name || planRule.canonicalKey),
       maxInstallments: Math.floor(number(planRule.maxInstallments) || 0),
+      exceptionalMaxInstallments: Math.floor(number(planRule.exceptionalMaxInstallments || planRule.maxInstallmentsException) || 0) || null,
+      exceptionRequiresExplicitEvidence: planRule.exceptionRequiresExplicitEvidence === true || planRule.exceptionRequiresExplicitApproval === true,
       scope: text(planRule.scope || 'fraccionado')
     } : null,
+    installmentException,
     targets
   };
 }

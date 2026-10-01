@@ -2151,22 +2151,23 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-      "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "businessRulesFrozen": true,
-      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
+      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
       "requiredProof": [
         "High-confidence invoice/statement/commission inference auto-commits without human approval.",
         "Prior contiguous installments are inferred with inferredEffectiveDate=their scheduled due date while paidDate remains unknown unless directly evidenced.",
         "Explicit source installment denominator/total reconciles expected receipt count.",
-        "La Ceiba, Aseguradora General and G&T Seguros fraccionado schedules obey tenant-config max 10.",
+        "La Ceiba, Aseguradora General, G&T Seguros, Aseguradora Guatemalteca, Bantrab and Ficohsa fraccionado schedules use standard max 10.",
+        "Bantrab may use 12 only when the exception is explicitly documented; without that evidence it fails closed with zero writes; more than 12 remains blocked.",
         "Later direct evidence enriches prior inferred payment instead of duplicating it."
       ],
-      "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
+      "paymentLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
       "entryBlockedBy": null,
       "entryUnblockedBy": "B3-004 CLOSED_PASS",
-      "nextAction": "B3_005_EXACT_PREVIEW",
+      "nextAction": "B3_005_SOURCE_CONTRACT",
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
@@ -2188,26 +2189,26 @@
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
       "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
       "sourceBlobs": {
-        "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
-        "functions/cobros-reconciliation-domain.js": "751eeabe3d1e80a02557b819de2d64551c607877",
-        "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
+        "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
+        "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+        "functions/tenant-domain-config.js": "3aba4964dc56e5eb284c6288de5c7a74e9a9b765",
         "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
-        "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
-        "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
-        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "9de5bb95ec18e7177cb7b419342eadc2a795d88c"
+        "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+        "tools/gravicentra-i6-5-b3-005-contract.mjs": "d94c1baf4e1ca0b146aae8bff3673cff1aa4a159",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897"
       },
       "configMutationAuthorized": false,
       "machineProofInvalidatedBySourceChange": true,
       "currentCandidateEligibleForPromotion": false,
-      "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
-      "sourceContractReceiptBlobSha": "ebcae4c26c418b042b384a7f697a15b0340ccff7",
+      "sourceContractReceiptPath": null,
+      "sourceContractReceiptBlobSha": null,
       "r1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
       "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc",
       "qaBlobs": {
-        "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
-        "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "9fd14eba50e15202de19558d091e2e69767cc921",
+        "tools/gravicentra-i6-5-b3-005-contract.mjs": "d94c1baf4e1ca0b146aae8bff3673cff1aa4a159",
+        "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "1da0aeb89ea590fb3c1bd712e0ec8067ff4318f5",
         "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs": "4cd727c02f4b91fa3bec56917edfd479a64d01ff",
-        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "2e29a17285a8ca4835e3140c6c55f84ea60c33f1",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897",
         "tools/gravicentra-i6-control-plane-guard-v1.mjs": "e2df6ea293b280f6e37dfb5eb615d9fc01f9fc9e"
       },
       "p1GovernanceGuardRepair": {
@@ -2230,6 +2231,11 @@
           "orbit360-platform/styles/infra.css",
           "orbit360-platform/sw.js"
         ]
+      },
+      "r2PaymentPlanRulesV6": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R2_PAYMENT_PLAN_RULES_V6_20261001.json",
+        "blobSha": "265d7f28fb2b409569f803bd8e2e49d6b486d1a2",
+        "status": "SOURCE_FIXED_PENDING_CONTRACT"
       }
     },
     {
@@ -5825,27 +5831,30 @@
     }
   },
   "currentB3": {
-    "status": "B3_005_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "status": "B3_005_SOURCE_FIXED_PENDING_CONTRACT",
     "activeFindingId": "B3-005",
     "priorFindingId": "B3-004",
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "1eb22269831d2ace6ea3eff434739b9e57d7632e",
+    "compositionLockBlobSha": "a7195c794e004a0d1a7d98b97339886b515b818e",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
     "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
     "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
-    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
-    "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
-    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+    "paymentLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+    "sourceContractReceiptPath": null,
     "r1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
     "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc",
     "p1GovernanceGuardRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P1_STALE_GOVERNANCE_GUARD_REPAIR_20261001.json",
     "p1GovernanceGuardRepairBlobSha": "03e89fa3e90a52706797bc3aaf2629f51efd58bf",
     "p2CompositionExactSetRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P2_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json",
-    "p2CompositionExactSetRepairBlobSha": "fb6e3c6b82d5f98f5c4c00bedff3eca4d7ffe490"
+    "p2CompositionExactSetRepairBlobSha": "fb6e3c6b82d5f98f5c4c00bedff3eca4d7ffe490",
+    "sourceContractReceiptBlobSha": null,
+    "r2PaymentPlanRulesV6Path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R2_PAYMENT_PLAN_RULES_V6_20261001.json",
+    "r2PaymentPlanRulesV6BlobSha": "265d7f28fb2b409569f803bd8e2e49d6b486d1a2"
   }
 }

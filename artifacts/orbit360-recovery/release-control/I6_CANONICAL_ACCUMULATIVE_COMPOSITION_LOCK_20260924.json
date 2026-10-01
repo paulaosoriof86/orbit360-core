@@ -120,18 +120,18 @@
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
-    "functions/cobros-reconciliation-domain.js": "751eeabe3d1e80a02557b819de2d64551c607877",
+    "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
     "functions/document-drive-domain.js": "253b7074c86bb6ce800cc933d10242e9b6096f0a",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
     "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
-    "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
+    "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "9800c5140ce415484ccacf086a3657dc66749d0f",
     "functions/product-ops-leads-domain.js": "fe5307b171a9d51e3f449f0dd2b5aba6fbcbb341",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
-    "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
+    "functions/tenant-domain-config.js": "3aba4964dc56e5eb284c6288de5c7a74e9a9b765",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png": "9e16fae65f366556f55398309eb7bb3f398bf072",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png": "726da844034b98f3132788920a1b8111f4d1764a",
@@ -401,13 +401,21 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-005-P2-QA",
-    "reason": "RECONCILE_CANONICAL_COMPOSITION_TO_EXACT_PHYSICAL_PRODUCT_DIFF",
-    "changedProductFiles": [],
-    "changedQaFiles": [
-      "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json"
+    "gate": "I6.5-B3-005-R2",
+    "reason": "ADD_BANTRAB_STANDARD_10_EXPLICIT_EXCEPTION_12_AND_FICOHSA_MAX_10_BEFORE_EXACT_PREVIEW",
+    "changedProductFiles": [
+      "functions/payment-inference-engine.js",
+      "functions/cobros-reconciliation-domain.js",
+      "functions/tenant-domain-config.js"
     ],
-    "productSourceChanged": false,
+    "changedQaFiles": [
+      "tools/gravicentra-i6-5-b3-005-contract.mjs",
+      "tools/gravicentra-i6-5-b3-005-preview-proof.mjs",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+      "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R2_PAYMENT_PLAN_RULES_V6_20261001.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json"
+    ],
+    "productSourceChanged": true,
     "noOperationalBusinessMutation": true,
     "noProductionConfigWrite": true,
     "noReimport": true,
@@ -1573,16 +1581,17 @@
     "status": "SOURCE_FIXED_PENDING_CONTRACT",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
     "blobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
-    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
-    "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+    "paymentLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
     "changedBlobs": {
-      "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
-      "functions/cobros-reconciliation-domain.js": "b13a641ece0177cebd31f8dc748dd4b88483f0d2",
-      "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
+      "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
+      "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+      "functions/tenant-domain-config.js": "3aba4964dc56e5eb284c6288de5c7a74e9a9b765",
       "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
       "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
-      "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "9de5bb95ec18e7177cb7b419342eadc2a795d88c"
+      "tools/gravicentra-i6-5-b3-005-contract.mjs": "d94c1baf4e1ca0b146aae8bff3673cff1aa4a159",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897",
+      "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5"
     }
   },
   "b3005SourceContract": {
@@ -1632,5 +1641,25 @@
       "orbit360-platform/sw.js"
     ],
     "productSourceChanged": false
+  },
+  "b3005R2PaymentPlanRulesV6": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R2_PAYMENT_PLAN_RULES_V6_20261001.json",
+    "receiptBlobSha": "265d7f28fb2b409569f803bd8e2e49d6b486d1a2",
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+    "paymentLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+    "productBlobs": {
+      "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
+      "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+      "functions/tenant-domain-config.js": "3aba4964dc56e5eb284c6288de5c7a74e9a9b765",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-005-contract.mjs": "d94c1baf4e1ca0b146aae8bff3673cff1aa4a159",
+      "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "1da0aeb89ea590fb3c1bd712e0ec8067ff4318f5",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897"
+    },
+    "priorSourceContractInvalidated": true,
+    "priorExactPreviewInvalidated": true
   }
 }

@@ -1,0 +1,74 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_R2_PAYMENT_PLAN_RULES_V6_V1",
+  "recordedAt": "2026-10-01",
+  "gate": "I6.5-B3-005",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "parentSha": "91c49976ea9367112e81c307d85b3ed682113124",
+  "reason": "USER_CLARIFICATION_BEFORE_EXACT_PREVIEW",
+  "supersedesPaymentLock": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
+    "blobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1"
+  },
+  "paymentLock": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+    "blobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+    "version": "V6"
+  },
+  "businessRules": {
+    "standardMax10": [
+      "ASEGURADORA LA CEIBA",
+      "ASEGURADORA GENERAL",
+      "G&T SEGUROS",
+      "ASEGURADORA GUATEMALTECA",
+      "ASEGURADORA DE LOS TRABAJADORES",
+      "FICOHSA"
+    ],
+    "bantrab": {
+      "canonicalName": "ASEGURADORA DE LOS TRABAJADORES",
+      "alias": "BANTRAB",
+      "standardMaxInstallments": 10,
+      "exceptionalMaxInstallments": 12,
+      "exceptionalCondition": "Only when the 12-installment exception is explicitly documented by authoritative evidence; otherwise fail closed with zero writes."
+    },
+    "ficohsa": {
+      "maxInstallments": 10,
+      "scope": "fraccionado"
+    }
+  },
+  "implementation": {
+    "standardCeilingTenantOwned": true,
+    "exceptionalCeilingTenantOwned": true,
+    "exceptionNotHardcodedToUserIdentity": true,
+    "exceptionRequiresExplicitEvidence": true,
+    "exceptionReferenceRequired": true,
+    "overExceptionalCeilingFailClosed": true,
+    "ambiguousEvidenceFailClosed": true
+  },
+  "changedProductBlobs": {
+    "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
+    "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+    "functions/tenant-domain-config.js": "3aba4964dc56e5eb284c6288de5c7a74e9a9b765"
+  },
+  "unchangedProductBlobs": {
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68"
+  },
+  "changedQaBlobs": {
+    "tools/gravicentra-i6-5-b3-005-contract.mjs": "d94c1baf4e1ca0b146aae8bff3673cff1aa4a159",
+    "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "1da0aeb89ea590fb3c1bd712e0ec8067ff4318f5",
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897"
+  },
+  "priorContractPassInvalidated": true,
+  "priorExactPreviewCandidateInvalidated": true,
+  "operationalBusinessWrites": false,
+  "productionConfigWrites": false,
+  "previewConfigWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3006": false,
+  "b4": false,
+  "nextRequiredProof": [
+    "B3_005_SOURCE_CONTRACT_PASS",
+    "B3_005_PREVIEW_MACHINE_PASS",
+    "B3_005_TARGETED_HUMAN_VISUAL_PASS"
+  ]
+}

@@ -116,6 +116,8 @@ function normalizeInsurerPaymentPlans(input) {
     row = row || {};
     const insurer = text(row.insurer || row.name || row.canonicalName || row.canonicalKey || row.insurerId, 180);
     const maxInstallments = Math.floor(Number(row.maxInstallments || row.maxCuotas || 0));
+    const exceptionalMaxRaw = Math.floor(Number(row.exceptionalMaxInstallments || row.maxInstallmentsException || row.maxCuotasExcepcion || 0));
+    const exceptionalMaxInstallments = exceptionalMaxRaw > maxInstallments && exceptionalMaxRaw <= 24 ? exceptionalMaxRaw : null;
     if (!insurer || !(maxInstallments > 0 && maxInstallments <= 24)) return null;
     return {
       insurer,
@@ -123,7 +125,9 @@ function normalizeInsurerPaymentPlans(input) {
       canonicalKey: text(row.canonicalKey, 180),
       aliases: unique(row.aliases || []).slice(0, 40),
       scope: norm(row.scope || 'fraccionado') || 'fraccionado',
-      maxInstallments
+      maxInstallments,
+      exceptionalMaxInstallments,
+      exceptionRequiresExplicitEvidence: exceptionalMaxInstallments ? row.exceptionRequiresExplicitEvidence !== false : false
     };
   }).filter(Boolean);
 }
