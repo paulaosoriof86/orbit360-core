@@ -403,8 +403,8 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P15",
-    "reason": "DIRECT_TIMING_HARNESS_REMOVE_ARTIFICIAL_650MS_SLEEP",
+    "gate": "I6.5-B3-004-R12P16",
+    "reason": "SEPARATE_SESSION_BOOTSTRAP_FROM_AUTHENTICATED_COLD_DEEPLINK_TIMING",
     "changedProductFiles": [],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
@@ -1426,6 +1426,17 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "b0678d169ed28c7ca77637e3af3153d28621bcdc",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "fd6de92e519b20ac1bfcc1495ac0a907329e2866"
+    },
+    "thresholdMs": 3000,
+    "thresholdRelaxed": false
+  },
+  "b3004R12P16AuthenticatedColdNavTimingFix": {
+    "status": "QA_MECHANISM_FIXED_PENDING_EXACT_PREVIEW_RERUN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P16_AUTHENTICATED_COLD_NAV_TIMING_FIX_20261001.json",
+    "receiptBlobSha": "8e5538731d25476307493d131127065d33607af8",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "9e6fd12040fb05359266de78ad52c7bb27050010",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "c3dad7f0dcc3de12cde63cec5899790e1e4c1b09"
     },
     "thresholdMs": 3000,
     "thresholdRelaxed": false

@@ -84,16 +84,35 @@ try{
     }catch{}
   },{scope:legalScope});
   proof.assertions.legalGatePreconditionSimulated=true;
+
+  // Session/bootstrap is measured separately. Navigation threshold starts only
+  // after a normal authenticated product session exists.
+  const sessionBootstrapStartedAt=Date.now();
+  await page.goto(target+'/#/inicio',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0&&!!window.Orbit?.modules?.cobros);
+  const bootstrap=await page.evaluate(async token=>{
+    const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
+    if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);
+    const activated=await Promise.resolve(Orbit.productAppP0.status?.().started?Orbit.productAppP0.status():Orbit.productAppP0.activate());
+    return{activated,uid:String(c.auth.currentUser?.uid||'')};
+  },token);
+  need(bootstrap?.activated?.started===true&&bootstrap?.uid,'B3_004_R12_PRODUCT_SESSION_NOT_STARTED');
+  await page.waitForFunction(scope=>window.Orbit?.legal?.yaAcepto?.(scope)===true&&document.querySelectorAll('[data-legal-gate]').length===0,legalScope,{timeout:3000});
+  proof.timing.sessionBootstrapMs=Date.now()-sessionBootstrapStartedAt;
+  proof.assertions.authenticatedSessionEstablished=true;
+
   const directReceiptUrl=target+'/#/cliente360?c='+encodeURIComponent(ids.client)+'&t=recibos&r='+encodeURIComponent(ids.receipt);
   const directReceiptStartedAt=Date.now();
   await page.goto(directReceiptUrl,{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0&&!!window.Orbit?.modules?.cobros);
-  const activated=await page.evaluate(async token=>{
-    const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
-    if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);
-    return Promise.resolve(Orbit.productAppP0.status?.().started?Orbit.productAppP0.status():Orbit.productAppP0.activate());
-  },token);
-  need(activated?.started===true,'B3_004_R12_PRODUCT_APP_NOT_STARTED');
+  const restored=await page.evaluate(async()=>{
+    const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize(),started=Date.now();
+    while(!c.auth.currentUser&&Date.now()-started<3000)await new Promise(r=>setTimeout(r,25));
+    if(!c.auth.currentUser)return{restored:false,activated:null};
+    const activated=await Promise.resolve(Orbit.productAppP0.status?.().started?Orbit.productAppP0.status():Orbit.productAppP0.activate());
+    return{restored:true,activated};
+  });
+  need(restored?.restored===true&&restored?.activated?.started===true,'B3_004_R12_AUTH_SESSION_NOT_RESTORED_ON_COLD_DEEPLINK');
   await page.waitForFunction(scope=>window.Orbit?.legal?.yaAcepto?.(scope)===true&&document.querySelectorAll('[data-legal-gate]').length===0,legalScope,{timeout:3000});
   const legalState=await page.evaluate(scope=>({accepted:window.Orbit?.legal?.yaAcepto?.(scope)===true,overlayCount:document.querySelectorAll('[data-legal-gate]').length}),legalScope);
   need(legalState.accepted===true,'B3_004_R12_QA_PRIOR_LEGAL_ACCEPTANCE_NOT_RECOGNIZED');

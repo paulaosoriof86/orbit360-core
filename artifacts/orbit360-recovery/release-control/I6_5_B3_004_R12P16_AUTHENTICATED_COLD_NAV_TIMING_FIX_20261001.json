@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P16_AUTHENTICATED_COLD_NAV_TIMING_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "findingId": "B3-004",
+  "status": "QA_MECHANISM_FIXED_PENDING_EXACT_PREVIEW_RERUN",
+  "parentHead": "63552ce7d7791e0b5a49f2e969d8e46e09fcd53d",
+  "failedRunId": 36911714011,
+  "failedJobId": 110535979462,
+  "failedMetric": {
+    "directReceiptUsableMs": 3396,
+    "thresholdMs": 3000
+  },
+  "classification": "HARNESS_BOUNDARY_DEFECT_AUTHENTICATION_AND_NAVIGATION_WERE_COMBINED",
+  "rootCause": "DIRECT_RECEIPT_TIMER_STARTED_BEFORE_CUSTOM_TOKEN_SIGN_IN_AND_PRODUCT_SESSION_ESTABLISHMENT_WHILE_FROZEN_CRITERION_IS_COLD_NAVIGATION_FROM_AUTHENTICATED_SESSION",
+  "remediation": {
+    "sessionBootstrapMeasuredSeparately": true,
+    "directNavigationStartsAfterAuthenticatedSession": true,
+    "fullDocumentColdDeepLinkPreserved": true,
+    "authPersistenceRestoreIncludedInNavigation": true,
+    "signInExcludedFromNavigationTimer": true,
+    "thresholdRelaxed": false,
+    "thresholdMs": 3000,
+    "productSourceChanged": false,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "9e6fd12040fb05359266de78ad52c7bb27050010",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "c3dad7f0dcc3de12cde63cec5899790e1e4c1b09"
+  }
+}

@@ -810,7 +810,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "4f83c5f1c7c0ac697c099dff01796e684110bbed"
+    "blobSha": "e74eb581dd23f68f0935ceb97a34e60f5d87bcb6"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -943,7 +943,7 @@
     "orbit360-platform/core/product-app-p0.js",
     "orbit360-platform/index.html"
   ],
-  "compositionLockBlobSha": "60a0458551783029601e6faa8e7588b4b7f53f33",
+  "compositionLockBlobSha": "3c4254c0fa4741329252fd065780b685ff918344",
   "syntheticQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
     "purpose": "B3-004 payment + R8 cross-advisor scope + durable soft-delete readback + cleanup proof",
@@ -1013,7 +1013,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "60a0458551783029601e6faa8e7588b4b7f53f33"
+    "blobSha": "3c4254c0fa4741329252fd065780b685ff918344"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -1445,6 +1445,17 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "b0678d169ed28c7ca77637e3af3153d28621bcdc",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "fd6de92e519b20ac1bfcc1495ac0a907329e2866"
+    },
+    "thresholdMs": 3000,
+    "thresholdRelaxed": false
+  },
+  "r12p16AuthenticatedColdNavTimingFix": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P16_AUTHENTICATED_COLD_NAV_TIMING_FIX_20261001.json",
+    "blobSha": "8e5538731d25476307493d131127065d33607af8",
+    "status": "QA_MECHANISM_FIXED_PENDING_EXACT_PREVIEW_RERUN",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "9e6fd12040fb05359266de78ad52c7bb27050010",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "c3dad7f0dcc3de12cde63cec5899790e1e4c1b09"
     },
     "thresholdMs": 3000,
     "thresholdRelaxed": false
