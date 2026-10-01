@@ -12,9 +12,11 @@ const TENANT_ID='alianzas-soluciones';
 const REGION='us-central1';
 const JOURNEY_ID='GT_AUTO_MOTO_HYBRID';
 const COUNTRY='GT';
-const TOKEN_SHA256='e932a26f52cf5777e911bbf200353c438f49f4a346ee8d197ebd1247ec6cebe7';
+const TOKEN_SHA256='b804016071aa93044224403f5f0471991a1368a6a3a58018df1a6bd351ad6c50';
 const EXPIRES_AT='2026-10-09T05:59:59.000Z';
 const STATE_PATH='tenants/alianzas-soluciones/cotcomp/pilotIntake/items/s467';
+const CONSENT_TEXT='Autorizo gestionar esta solicitud y contactarme';
+const ALLOWED_INPUT_KEYS=Object.freeze(['brand','lineModel','name','whatsapp','email','requestManagementConsent']);
 
 function clean(v,max=220){return String(v==null?'':v).replace(/\u0000/g,'').trim().slice(0,max);}
 function sha256(v){return crypto.createHash('sha256').update(String(v??''),'utf8').digest('hex');}
@@ -27,13 +29,18 @@ function verifyBearerToken(token,expectedHash=TOKEN_SHA256){
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean(v,220));}
 function validWhatsapp(v){return /^[+0-9() .-]{7,30}$/.test(clean(v,80));}
 function normalizeInput(body={}){
+  const raw=body&&typeof body==='object'&&!Array.isArray(body)?body:{};
+  const unknown=Object.keys(raw).filter(k=>!ALLOWED_INPUT_KEYS.includes(k));
+  if(unknown.length){
+    const e=new Error('S467_INPUT_FIELDS_NOT_ALLOWED');e.code='S467_INPUT_FIELDS_NOT_ALLOWED';throw e;
+  }
   return Object.freeze({
-    brand:clean(body.brand,180),
-    lineModel:clean(body.lineModel,180),
-    name:clean(body.name,180),
-    whatsapp:clean(body.whatsapp,80),
-    email:clean(body.email,220).toLowerCase(),
-    requestManagementConsent:body.requestManagementConsent===true
+    brand:clean(raw.brand,180),
+    lineModel:clean(raw.lineModel,180),
+    name:clean(raw.name,180),
+    whatsapp:clean(raw.whatsapp,80),
+    email:clean(raw.email,220).toLowerCase(),
+    requestManagementConsent:raw.requestManagementConsent===true
   });
 }
 function validateInput(v){
@@ -65,6 +72,7 @@ function buildRealQuoteCase(v,nowIso,caseId,correlationId){
     contact:{name:v.name,whatsapp:v.whatsapp,email:v.email},
     consents:{
       requestManagement:true,
+      requestManagementText:CONSENT_TEXT,
       requestManagementCapturedAt:nowIso,
       requestManagementSource:'W5_LAB_ONE_TIME_INTAKE',
       marketing:false
@@ -136,7 +144,7 @@ button:disabled{background:#aaa;cursor:not-allowed}.status{margin-top:16px;min-h
 <div class="full"><label for="name">Nombre</label><input id="name" maxlength="180" autocomplete="name" required></div>
 <div><label for="whatsapp">WhatsApp</label><input id="whatsapp" maxlength="30" inputmode="tel" autocomplete="tel" required></div>
 <div><label for="email">Correo electrónico</label><input id="email" maxlength="220" type="email" autocomplete="email" required></div>
-<div class="full"><label class="check"><input id="consent" type="checkbox" required><span>Autorizo a Alianzas y Soluciones a gestionar esta solicitud y contactarme para este piloto de cotización.</span></label></div>
+<div class="full"><label class="check"><input id="consent" type="checkbox" required><span>Autorizo gestionar esta solicitud y contactarme</span></label></div>
 </div>
 <button id="submit" type="submit" disabled>Enviar solicitud de prueba</button>
 </form>
@@ -197,7 +205,12 @@ async function handlePost(req,res){
   if(!verifyBearerToken(token))return res.status(403).json({ok:false,message:'Enlace de piloto no autorizado.'});
   const size=Number(req.get('content-length')||0);
   if(size>6000)return res.status(413).json({ok:false,message:'Solicitud demasiado grande.'});
-  const v=normalizeInput(req.body&&typeof req.body==='object'?req.body:{});
+  let v;
+  try{v=normalizeInput(req.body&&typeof req.body==='object'?req.body:{});}
+  catch(e){
+    if(e&&e.code==='S467_INPUT_FIELDS_NOT_ALLOWED')return res.status(400).json({ok:false,message:'El formulario contiene campos no autorizados.'});
+    throw e;
+  }
   const validated=validateInput(v);
   if(!validated.ok)return res.status(400).json({ok:false,message:'Revisa los datos requeridos.',errors:validated.errors});
 
@@ -268,6 +281,6 @@ const cotcompPilotIntakeS467=onRequest(
 );
 
 module.exports=Object.freeze({
-  VERSION,PROJECT_ID,TENANT_ID,REGION,JOURNEY_ID,COUNTRY,TOKEN_SHA256,EXPIRES_AT,STATE_PATH,
+  VERSION,PROJECT_ID,TENANT_ID,REGION,JOURNEY_ID,COUNTRY,TOKEN_SHA256,EXPIRES_AT,STATE_PATH,CONSENT_TEXT,ALLOWED_INPUT_KEYS,
   sha256,verifyBearerToken,normalizeInput,validateInput,buildRealQuoteCase,html,handler,cotcompPilotIntakeS467
 });
