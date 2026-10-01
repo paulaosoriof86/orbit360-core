@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <title>A&S · Cotización Auto/Moto</title>
+  <style>
+    :root{font-family:Segoe UI,Arial,sans-serif;color:#171717;background:#f4f4f4}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(180deg,#f7f7f7,#ececec)}
+    main{width:min(720px,100%);background:#fff;border:1px solid #ddd;border-radius:18px;box-shadow:0 18px 45px rgba(0,0,0,.08);overflow:hidden}
+    header{padding:26px 30px 20px;border-bottom:4px solid #b10f1b}
+    .eyebrow{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a0c15}
+    h1{font-size:30px;line-height:1.15;margin:7px 0 8px}
+    header p{margin:0;color:#555;line-height:1.5}
+    section{padding:28px 30px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    label{display:block;font-size:14px;font-weight:650;margin-bottom:7px}
+    input[type=text],input[type=tel],input[type=email]{width:100%;border:1px solid #c9c9c9;border-radius:10px;padding:12px 13px;font:inherit;background:#fff}
+    input:focus{outline:3px solid rgba(177,15,27,.14);border-color:#b10f1b}
+    .full{grid-column:1/-1}
+    .consent{display:flex;gap:10px;align-items:flex-start;padding:13px 14px;border:1px solid #ddd;border-radius:10px;background:#fafafa}
+    .consent input{margin-top:3px}
+    .consent label{margin:0;font-weight:500;line-height:1.4}
+    .marketing{margin-top:12px}
+    button{margin-top:20px;width:100%;border:0;border-radius:10px;padding:13px 16px;font:inherit;font-weight:700;background:#b10f1b;color:#fff;cursor:pointer}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    #status{margin:15px 0 0;min-height:24px;font-size:14px;color:#555}
+    #status[data-kind=success]{color:#176b35;font-weight:650}
+    #status[data-kind=error]{color:#9d111b;font-weight:650}
+    #status[data-kind=ready]{color:#333}
+    .privacy{font-size:12px;color:#666;line-height:1.45;margin-top:16px}
+    @media(max-width:640px){body{padding:12px}header,section{padding-left:20px;padding-right:20px}.grid{grid-template-columns:1fr}.full{grid-column:auto}h1{font-size:25px}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Alianzas &amp; Soluciones</div>
+    <h1>Cotización Auto/Moto</h1>
+    <p>Completa una sola solicitud con los datos mínimos indicados.</p>
+  </header>
+  <section id="form-region">
+    <form id="w5-intake-form" novalidate>
+      <div class="grid">
+        <div>
+          <label for="brand">Marca</label>
+          <input id="brand" name="brand" type="text" maxlength="100" required autocomplete="off">
+        </div>
+        <div>
+          <label for="lineModel">Línea / modelo</label>
+          <input id="lineModel" name="lineModel" type="text" maxlength="140" required autocomplete="off">
+        </div>
+        <div class="full">
+          <label for="contactName">Nombre</label>
+          <input id="contactName" name="contactName" type="text" maxlength="160" required autocomplete="name">
+        </div>
+        <div>
+          <label for="contactWhatsapp">WhatsApp</label>
+          <input id="contactWhatsapp" name="contactWhatsapp" type="tel" maxlength="40" required autocomplete="tel">
+        </div>
+        <div>
+          <label for="contactEmail">Correo electrónico</label>
+          <input id="contactEmail" name="contactEmail" type="email" maxlength="220" required autocomplete="email">
+        </div>
+        <div class="full">
+          <div class="consent">
+            <input id="requestManagementConsent" name="requestManagementConsent" type="checkbox" required>
+            <label for="requestManagementConsent">Autorizo gestionar esta solicitud y contactarme</label>
+          </div>
+          <div class="consent marketing">
+            <input id="marketingConsent" name="marketingConsent" type="checkbox">
+            <label for="marketingConsent">Acepto recibir información comercial de A&amp;S. Esta autorización es opcional.</label>
+          </div>
+        </div>
+      </div>
+      <button id="submit" type="submit" disabled>Enviar cotización</button>
+      <p id="status" role="status" aria-live="polite"></p>
+      <p class="privacy">No incluyas información médica ni documentos. Este formulario solo solicita los datos mínimos visibles arriba.</p>
+    </form>
+  </section>
+</main>
+<script src="/w5-intake-s467-config.js"></script>
+<script type="module" src="/w5-intake-s467.bundle.js"></script>
+</body>
+</html>
