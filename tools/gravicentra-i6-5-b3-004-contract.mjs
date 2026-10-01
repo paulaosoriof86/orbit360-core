@@ -93,7 +93,7 @@ need(!cobros.includes('Confirmar cobro'),'B3_004_GLOBAL_CONFIRMAR_COBRO_REMAINS'
 need(indexR4.includes('modules/cobros.js?v=20261001-b3004r12p11'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r11'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20261001-b3004r12p7'),'B3_004_PAYMENT_CLIENT_ASSET_VERSION_NOT_BUMPED');
-need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20261001-b3004r12p11p1'),'B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20261001-b3004r12p11p2'),'B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT=PASS');
 
 const domainClient=read('orbit360-platform/core/cobros-reconciliation-domain-client.js');
@@ -170,7 +170,7 @@ need(closureR8.includes('activePolicyRow')&&closureR8.includes('carteraActiva!==
 need(receiptDetailGuardR8.includes("authority:'POLICY_INACTIVE'"),'B3_004_R8_POLICY_DETAIL_CANCELLED_HISTORY_GATE_MISSING');
 need(nativeReceiptOwner.includes('Completar datos del pago')&&nativeReceiptOwner.includes('Conciliar / completar datos'),'B3_004_R8_CONTROLLED_PAYMENT_ENRICHMENT_ACTION_MISSING');
 need(nativeReceiptOwner.includes('data-rp-back-local')&&nativeReceiptOwner.includes("mod.reabrir(clientId,'recibos')")&&nativeReceiptOwner.includes('OrbitRuntimeDiagnostics.receiptsBack'),'B3_004_R8_LOCAL_RECEIPT_BACK_PATH_MISSING');
-need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20261001-b3004r12p11p1'),'B3_004_R8_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20261001-b3004r12p11p2'),'B3_004_R8_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/policy-receipts-v1199-detail-guard.js?v=20260930-b3004r8'),'B3_004_R8_RECEIPT_DETAIL_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/cobros-cartera-i65-closure-bridge.js?v=20260930-b3004r12p1'),'B3_004_R8_CLOSURE_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('data/store-firestore-product-operational-p0.js?v=20260930-b3004r8'),'B3_004_R8_OPERATIONAL_STORE_ASSET_VERSION_NOT_BUMPED');
@@ -191,7 +191,7 @@ need(nativeReceiptOwner.includes("return mod.conciliarFactura(receiptId)"),'B3_0
 need(cobros.includes('Fecha real del pago')&&cobros.includes('Método de pago')&&cobros.includes('Soporte del pago')&&cobros.includes('Fecha de aplicación por la aseguradora')&&cobros.includes('Número de factura')&&cobros.includes('Factura / soporte de aplicación'),'B3_004_R9_PAYMENT_MODAL_REQUIRED_FIELDS_MISSING');
 need(indexR4.includes('modules/conciliaciones.js?v=20260930-b3004r9'),'B3_004_R9_CONCILIACIONES_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/crm-v1198-operational-bridge.js?v=20261001-b3004r12p9'),'B3_004_R9_CRM_GUARD_ASSET_VERSION_NOT_BUMPED');
-need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20261001-b3004r12p11p1'),'B3_004_R9_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20261001-b3004r12p11p2'),'B3_004_R9_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_R9_HUMAN_REJECTION_CAUSAL_CONTRACT=PASS');
 
 const paymentEvidenceImporter=read('orbit360-platform/core/importa.js');
@@ -281,8 +281,10 @@ need(humanFixtureR11.includes("&t=recibos&r='+encodeURIComponent(ids.receipt)"),
 need(uiProofR12.includes('viewport:{width:412,height:915}')&&uiProofR12.includes('B3_004_R12P11_RECONCILE_MODAL_NOT_MOBILE_RESPONSIVE')&&uiProofR12.includes('B3_004_R12P11_RECEIPT_ACTION_OVERFLOW'),'B3_004_R12P11_MOBILE_BROWSER_ACCEPTANCE_MISSING');
 need(uiProofR12.includes('applySavingFeedback')&&uiProofR12.includes('reconcileSavingFeedback'),'B3_004_R12P11_SAVE_FEEDBACK_BROWSER_PROOF_MISSING');
 need(uiProofR12.includes('B3_004_R12P11_DOCUMENT_UI_CONTROLS_MISSING')&&uiProofR12.includes('browserDocumentViewWorks')&&uiProofR12.includes('browserDocumentDownloadWorks'),'B3_004_R12P11_DOCUMENT_DISCOVERABILITY_BROWSER_PROOF_MISSING');
-need(indexR4.includes('styles/base.css?v=20261001-b3004r12p11')&&indexR4.includes('modules/cobros.js?v=20261001-b3004r12p11')&&indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20261001-b3004r12p11p1'),'B3_004_R12P11_ASSET_BINDING_MISSING');
+need(indexR4.includes('styles/base.css?v=20261001-b3004r12p11')&&indexR4.includes('modules/cobros.js?v=20261001-b3004r12p11')&&indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20261001-b3004r12p11p2'),'B3_004_R12P11_ASSET_BINDING_MISSING');
 need(nativeReceiptOwner.includes('function ensureDirectReceiptRoute()')&&nativeReceiptOwner.includes('patchClient(h);ensureDirectReceiptRoute()')&&nativeReceiptOwner.includes('data-rp-receipt-detail-id'),'B3_004_R12P11P1_DIRECT_RECEIPT_POST_HYDRATION_OWNER_MISSING');
+need(nativeReceiptOwner.includes('function watchDirectReceiptRoute()')&&nativeReceiptOwner.includes('setInterval(tick,250)')&&nativeReceiptOwner.includes('attempts>=60')&&nativeReceiptOwner.includes('OrbitRuntimeDiagnostics.directReceiptHydration'),'B3_004_R12P11P2_DIRECT_RECEIPT_HYDRATION_RETRY_MISSING');
+console.log('B3_004_R12P11P2_DIRECT_RECEIPT_HYDRATION_RETRY_CONTRACT=PASS');
 console.log('B3_004_R12P11P1_DIRECT_RECEIPT_HYDRATION_CONTRACT=PASS');
 console.log('B3_004_R12P11_MOBILE_DOCUMENT_UX_PERFORMANCE_CONTRACT=PASS');
 need(crmBridgeR9.includes('function exactB3004QaScopeBypass(target)')&&crmBridgeR9.includes("target.collection!=='recibosEsperados'")&&crmBridgeR9.includes("record.__syntheticHumanQa===true")&&crmBridgeR9.includes("String(record.__syntheticGate||'')==='B3-004-R12'"),'B3_004_R12P9_EXACT_QA_SCOPE_BYPASS_GUARD_MISSING');
@@ -313,5 +315,5 @@ need(nativeReceiptOwner.includes("target.id==='host'")&&nativeReceiptOwner.inclu
 need(nativeReceiptOwner.includes("mode:'prefetched_cliente360_receipts'")&&nativeReceiptOwner.includes('summaryPrefetched:true')&&nativeReceiptOwner.includes('routerReload:false'),'B3_004_R9P1_GLOBAL_FAST_BACK_DIAGNOSTIC_MISSING');
 need(nativeReceiptOwner.includes("history.replaceState(history.state||null,'',back)"),'B3_004_R9P1_BACK_STILL_TRIGGERS_HASH_ROUTER');
 need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r11'),'B3_004_R9P1_CLIENTE360_ASSET_NOT_BUMPED');
-need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20261001-b3004r12p11p1'),'B3_004_R9P1_NATIVE_ASSET_NOT_BUMPED');
+need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20261001-b3004r12p11p2'),'B3_004_R9P1_NATIVE_ASSET_NOT_BUMPED');
 console.log('B3_004_R9P1_GLOBAL_BACK_CONTRACT=PASS');

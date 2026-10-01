@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11P2_DIRECT_RECEIPT_HYDRATION_RETRY_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "3d27291ee7e8b7b114e7f7b698edf316a29ca60d",
+  "failedRunId": 36864756229,
+  "failedJobId": 110377608229,
+  "classification": "PRODUCT_ROUTING_HYDRATION_RACE",
+  "rootCause": "DIRECT_RECEIPT_ROUTE_RETRY_DEPENDED_ON_STORE_EVENTS_AFTER_BRIDGE_READY_AND_COULD_MISS_THE_FINAL_ITEM_HYDRATION_EDGE",
+  "evidence": {
+    "directReceiptStillTimedOut": true,
+    "selector": "[data-rp-receipt-detail=\"1\"]",
+    "fixtureCleanupPass": true
+  },
+  "remediation": {
+    "boundedRetryEveryMs": 250,
+    "maxAttempts": 60,
+    "exactClientReceiptRelationshipGuard": true,
+    "runtimeDiagnostic": true
+  },
+  "productBlobs": {
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "de7a3d951c46d2b5b0c27b905aece08322c483e7",
+    "orbit360-platform/index.html": "959e5ef310a6b56bff56901c87a0538bb0cc8521"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "5338287653afcf89c3df6c4a727bcac04ed46828"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R12P11P1_EXACT_PREVIEW",
+      "nextAction": "B3_004_R12P11P2_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1848,6 +1848,18 @@
         },
         "qaBlobs": {
           "tools/gravicentra-i6-5-b3-004-contract.mjs": "2f53244e206fd6a834ceb87816496061535c0b31"
+        }
+      },
+      "r12p11p2SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P2_DIRECT_RECEIPT_HYDRATION_RETRY_FIX_20261001.json",
+        "blobSha": "f11851c026af0f7d96d8936c47edbe919722417a",
+        "compositionLockBlobSha": "f07fb91cb7999ce47026908e4443d70a3cafda80",
+        "productBlobs": {
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "de7a3d951c46d2b5b0c27b905aece08322c483e7",
+          "orbit360-platform/index.html": "959e5ef310a6b56bff56901c87a0538bb0cc8521"
+        },
+        "qaBlobs": {
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "5338287653afcf89c3df6c4a727bcac04ed46828"
         }
       }
     },
