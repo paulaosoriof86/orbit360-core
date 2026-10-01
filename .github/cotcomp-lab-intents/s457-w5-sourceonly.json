@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "ays-cotcomp-s457-w5-sourceonly-intent-v1.0",
+  "authorization": "S457_W5_SOURCE_ONLY_READINESS",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "0046efcbb6097a0c693c59d2061c370945569f6c",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W5",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "production": false,
+  "physicalW5": false,
+  "scope": [
+    "formal legal validation truth",
+    "exact pilot-scope readiness",
+    "single-execution guard readiness",
+    "real-data minimization and health-sensitive-data boundary",
+    "sanitized observability readiness",
+    "rollback/containment readiness",
+    "success/abort criteria readiness",
+    "success persistence disposition readiness",
+    "provider/production lock readiness"
+  ]
+}
