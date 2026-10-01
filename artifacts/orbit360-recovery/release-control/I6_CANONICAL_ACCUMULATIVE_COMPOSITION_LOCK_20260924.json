@@ -1687,5 +1687,16 @@
       "orbit360-platform/sw.js"
     ],
     "productSourceChanged": false
+  },
+  "b3005MachinePass": {
+    "status": "MACHINE_PASS_PENDING_TARGETED_HUMAN_VISUAL",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_MACHINE_PASS_20261001.json",
+    "blobSha": "0ba1ec5e047d18f1add881a8c05f0d43a9477ece",
+    "sourceSha": "ca27ffe558313a2603f9021174947d81644135a7",
+    "buildId": "gi-i65-b3-ca27ffe55831-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3005-36937661520-6e5g0gwl.web.app",
+    "runId": 36937661520,
+    "artifactId": 11199021002,
+    "artifactDigest": "f127210fcbc5923e0684252716eb0e246679e0d4fdfccb49ab583db2f6a74c6b"
   }
 }

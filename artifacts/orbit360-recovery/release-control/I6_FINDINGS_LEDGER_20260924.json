@@ -2151,7 +2151,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-      "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "businessRulesFrozen": true,
@@ -2167,7 +2167,7 @@
       "paymentLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
       "entryBlockedBy": null,
       "entryUnblockedBy": "B3-004 CLOSED_PASS",
-      "nextAction": "B3_005_EXACT_PREVIEW",
+      "nextAction": "B3_005_TARGETED_HUMAN_VISUAL",
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
@@ -2198,7 +2198,7 @@
         ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897"
       },
       "configMutationAuthorized": false,
-      "machineProofInvalidatedBySourceChange": true,
+      "machineProofInvalidatedBySourceChange": false,
       "currentCandidateEligibleForPromotion": false,
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
       "sourceContractReceiptBlobSha": "050a2fb2d174d2f9e6212ec7c5a53ecd3a9f24e2",
@@ -2256,7 +2256,9 @@
         "compositionLockBlobSha": "fc6d7c1faeecc8888f1ccb7fd21a5bbd369134d1",
         "exactProductDiffCount": 80,
         "productSourceChanged": false
-      }
+      },
+      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_MACHINE_PASS_20261001.json",
+      "machineProofReceiptBlobSha": "0ba1ec5e047d18f1add881a8c05f0d43a9477ece"
     },
     {
       "id": "B3-006",
@@ -5851,13 +5853,13 @@
     }
   },
   "currentB3": {
-    "status": "B3_005_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "status": "B3_005_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "activeFindingId": "B3-005",
     "priorFindingId": "B3-004",
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "fc6d7c1faeecc8888f1ccb7fd21a5bbd369134d1",
+    "compositionLockBlobSha": "ac185d81443371f3f4b0b388b57c32a59d451bbb",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
@@ -5879,6 +5881,7 @@
     "r3CompositionExactSetRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json",
     "r3CompositionExactSetRepairBlobSha": "83ff0f9b7ee0bed8be80467a39919404dc11272f",
     "r3p1FullTreeCompositionRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3P1_FULL_TREE_COMPOSITION_REPAIR_20261001.json",
-    "r3p1FullTreeCompositionRepairBlobSha": "1d336d3d9339da82be8147332a1e9d963441353c"
+    "r3p1FullTreeCompositionRepairBlobSha": "1d336d3d9339da82be8147332a1e9d963441353c",
+    "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_MACHINE_PASS_20261001.json"
   }
 }
