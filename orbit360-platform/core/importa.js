@@ -125,6 +125,96 @@ Orbit.importa = (function () {
       return { headers: fields.slice(), rows: rows.filter(r => r.some(v => v && v.trim())), ai: true };
     } catch (e) { return null; }
   }
+  function evidenceDate(value) {
+    const raw=String(value||'').trim(); if(!raw)return'';
+    let m=raw.match(/\b(20\d{2})[-\/.](\d{1,2})[-\/.](\d{1,2})\b/); if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
+    m=raw.match(/\b(\d{1,2})[-\/.](\d{1,2})[-\/.](20\d{2})\b/); if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
+    return'';
+  }
+  function evidenceLabel(text, labels, maxLen) {
+    const src=String(text||'').replace(/\r/g,' '), list=Array.isArray(labels)?labels:[labels];
+    for(const label of list){
+      const re=new RegExp('(?:^|\\n|\\s)'+label+'\\s*[:#=-]?\\s*([^\\n]{1,'+(maxLen||80)+'})','i'),m=src.match(re);
+      if(m&&m[1])return m[1].trim().replace(/\s{2,}.*$/,'').trim();
+    }
+    return'';
+  }
+  function evidenceCurrency(text) {
+    const n=norm(text); if(/\bgtq\b|quetzal/.test(n))return'GTQ'; if(/\busd\b|dolar/.test(n))return'USD'; if(/\bcop\b|peso colombiano/.test(n))return'COP'; if(/\beur\b|euro/.test(n))return'EUR'; return'';
+  }
+  function evidenceAmount(text) {
+    const labeled=evidenceLabel(text,['monto','importe','total pagado','valor pagado','total'],48);
+    if(!labeled)return 0; return parseNum(labeled);
+  }
+  function heuristicPaymentEvidence(text,kind) {
+    const src=String(text||''), out={}, confidence={};
+    function put(key,value,score){if(value!==''&&value!=null&&value!==0){out[key]=value;confidence[key]=score;}}
+    put('amount',evidenceAmount(src),0.88); put('currency',evidenceCurrency(src),0.86);
+    put('policyNumber',evidenceLabel(src,['(?:no\\.?\\s*)?p[oó]liza','policy'],64),0.9);
+    put('receiptNumber',evidenceLabel(src,['recibo','cuota','receipt'],64),0.84);
+    put('clientName',evidenceLabel(src,['cliente','asegurado','contratante','pagador'],90),0.78);
+    if(kind==='payment_support'){
+      put('paidDate',evidenceDate(evidenceLabel(src,['fecha(?:\\s+real)?(?:\\s+del)?\\s+pago','fecha de transacci[oó]n','fecha transacci[oó]n'],48)),0.95);
+      put('paymentMethod',evidenceLabel(src,['m[eé]todo(?:\\s+de)?\\s+pago','forma(?:\\s+de)?\\s+pago','medio(?:\\s+de)?\\s+pago'],64),0.88);
+      put('bankOrMedium',evidenceLabel(src,['banco','entidad','medio'],70),0.78);
+      put('transactionReference',evidenceLabel(src,['referencia','transacci[oó]n','autorizaci[oó]n','operaci[oó]n'],80),0.9);
+      put('payer',evidenceLabel(src,['pagador','ordenante','titular'],90),0.8);
+    } else {
+      put('invoiceNumber',evidenceLabel(src,['(?:n[uú]mero|no\\.?)\\s*(?:de\\s*)?factura','factura'],72),0.94);
+      put('applicationDate',evidenceDate(evidenceLabel(src,['fecha(?:\\s+de)?\\s+aplicaci[oó]n','aplicado(?:\\s+el)?','fecha(?:\\s+de)?\\s+procesamiento'],48)),0.96);
+      put('insurerName',evidenceLabel(src,['aseguradora','compa[nñ][ií]a','asegurador'],90),0.84);
+    }
+    return{proposal:out,fieldConfidence:confidence};
+  }
+  async function extractEvidenceText(file) {
+    if(!file)throw new Error('EVIDENCE_FILE_REQUIRED');
+    const ext=(String(file.name||'').split('.').pop()||'').toLowerCase();
+    if(['txt','csv','tsv'].includes(ext))return{method:'text',text:await file.text()};
+    if(ext==='pdf'){
+      await loadLib('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdfjsLib');
+      pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise; let txt='';
+      for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i),tc=await pg.getTextContent();txt+=tc.items.map(it=>it.str).join(' ')+'\n';}
+      if(txt.replace(/\s/g,'').length>=30)return{method:'pdf_text',text:txt};
+      const Tess=await loadLib('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js','Tesseract'); let ocr='';
+      for(let i=1;i<=Math.min(pdf.numPages,5);i++){const pg=await pdf.getPage(i),vp=pg.getViewport({scale:2}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;const out=await Tess.recognize(cv,'spa+eng');ocr+=out.data.text+'\n';}
+      return{method:'pdf_ocr',text:ocr};
+    }
+    if(/^(png|jpe?g|webp|gif|bmp|tiff?)$/.test(ext)){
+      const Tess=await loadLib('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js','Tesseract'),out=await Tess.recognize(file,'spa+eng');
+      return{method:'image_ocr',text:out.data.text||''};
+    }
+    throw new Error('EVIDENCE_FORMAT_NOT_SUPPORTED');
+  }
+  async function readPaymentEvidence(file,kind,context) {
+    const evidenceKind=kind==='insurer_invoice'?'insurer_invoice':'payment_support', extracted=await extractEvidenceText(file);
+    let parsed=heuristicPaymentEvidence(extracted.text,evidenceKind),proposal=Object.assign({},parsed.proposal),fieldConfidence=Object.assign({},parsed.fieldConfidence),method=extracted.method;
+    if(Orbit.ia&&typeof Orbit.ia.disponible==='function'&&Orbit.ia.disponible()){
+      const keys=evidenceKind==='payment_support'
+        ?['paidDate','amount','currency','paymentMethod','bankOrMedium','transactionReference','payer','policyNumber','receiptNumber','clientName']
+        :['invoiceNumber','applicationDate','insurerName','amount','currency','policyNumber','receiptNumber','clientName'];
+      const rule=evidenceKind==='insurer_invoice'
+        ?'IMPORTANTE: applicationDate solo puede salir de una etiqueta explícita de fecha de aplicación/procesamiento. Una fecha de emisión/factura genérica NO es applicationDate.'
+        :'IMPORTANTE: paidDate solo puede salir de una fecha explícita de pago/transacción.';
+      try{
+        const prompt='Lee este documento de seguros como evidencia. Devuelve SOLO un objeto JSON con estas claves: '+keys.join(', ')+'. Usa cadena vacía si no existe. '+rule+' No inventes valores ni relaciones. Documento:\n"""'+String(extracted.text).slice(0,7000)+'"""';
+        const raw=await Orbit.ia.complete(prompt),m=String(raw).match(/\{[\s\S]*\}/);
+        if(m){const ai=JSON.parse(m[0]);keys.forEach(k=>{if(!proposal[k]&&ai&&String(ai[k]||'').trim()){proposal[k]=k.toLowerCase().includes('date')?evidenceDate(ai[k]):String(ai[k]).trim();fieldConfidence[k]=0.72;}});method+='+ai_assist';}
+      }catch(_){}
+    }
+    const ctx=context||{},contradictions=[];
+    const compare=[['paidDate','paidDate'],['paymentMethod','paymentMethod'],['applicationDate','applicationDate'],['invoiceNumber','invoiceNumber'],['currency','currency'],['amount','amount'],['policyNumber','policyNumber'],['receiptNumber','receiptNumber']];
+    compare.forEach(([pk,ck])=>{const pv=proposal[pk],cv=ctx[ck];if(pv!=null&&pv!==''&&cv!=null&&cv!==''&&norm(String(pv))!==norm(String(cv)))contradictions.push({field:pk,canonicalValue:cv,proposedValue:pv});});
+    const scores=Object.values(fieldConfidence).filter(x=>Number.isFinite(Number(x))).map(Number),overall=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:0;
+    return{
+      ok:true,kind:evidenceKind,proposal,fieldConfidence,
+      confidence:Math.round(overall*100)/100,
+      contradictions,
+      requiresValidation:contradictions.length>0,
+      provenance:{source:'document',fileName:String(file.name||''),mimeType:String(file.type||''),extractionMethod:method,readAt:new Date().toISOString(),silentOverwrite:false}
+    };
+  }
+
   /* Procesa texto de documento: intenta IA, si no, heurística. (async) */
   async function procesarTexto(text) {
     showLoading('🧠 Extracción inteligente con IA…');
@@ -1227,6 +1317,6 @@ Orbit.importa = (function () {
     const again = dr.querySelector('#imp-again'); if (again) again.addEventListener('click', () => { state.step = 1; paint(); });
   }
 
-  return { open, openFor, close, KINDS };
+  return { open, openFor, readPaymentEvidence, close, KINDS };
 })();
 
