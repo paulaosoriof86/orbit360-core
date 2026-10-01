@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R10_TARGETED_HUMAN_VISUAL",
+      "nextAction": "B3_004_R11_SOURCE_CONTRACT",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1149,7 +1149,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
         "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
       },
-      "machineProofInvalidatedBySourceChange": false,
+      "machineProofInvalidatedBySourceChange": true,
       "priorMachineProof": {
         "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
         "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
@@ -1547,6 +1547,23 @@
         "runId": 36798303470,
         "artifactId": 11134577567,
         "artifactDigest": "707ec2976c52b54c9c7e64220ee7db469aa0efdf39d9c56a7b99557a05a3f91d"
+      },
+      "r11HumanRejection": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R11_HUMAN_REJECTED_ROUTING_PERFORMANCE_20260930.json",
+        "blobSha": "afa39d3862e2d5677f2178b8d0823cd52a618721"
+      },
+      "r11SourceFix": {
+        "status": "SOURCE_FIXED_PENDING_CONTRACT",
+        "compositionLockBlobSha": "78470713e5204fea8a0505c760de0df8d232333f",
+        "previewHostRoutingFixed": true,
+        "previewServerSyntheticGuard": true,
+        "humanSyntheticFixtureEnabled": true,
+        "realCaseReadonlyDiagnostic": true,
+        "stagedDemandHydration": true,
+        "operationalBusinessWrites": false,
+        "reimport": false,
+        "live": false,
+        "b3005": false
       }
     },
     {
@@ -5151,11 +5168,11 @@
     }
   },
   "currentB3": {
-    "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
-    "compositionLockBlobSha": "9fe58eb5d6164858a7e79a986b53586b32d5fb11",
+    "compositionLockBlobSha": "78470713e5204fea8a0505c760de0df8d232333f",
     "noLive": true,
     "noReimport": true,
     "mechanismRootFix": {
@@ -5191,6 +5208,8 @@
     "r10ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_SOURCE_CONTRACT_PASS_20260930.json",
     "r10FinalSourceBindingPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_FINAL_SOURCE_BINDING_20260930.json",
     "r10FinalSourceBindingBlobSha": "94f7d10827ab39b9d02e7e38f79b7fde70788def",
-    "r10MachineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_MACHINE_PASS_20260930.json"
+    "r10MachineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_MACHINE_PASS_20260930.json",
+    "r11HumanRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R11_HUMAN_REJECTED_ROUTING_PERFORMANCE_20260930.json",
+    "r11HumanRejectionBlobSha": "afa39d3862e2d5677f2178b8d0823cd52a618721"
   }
 }

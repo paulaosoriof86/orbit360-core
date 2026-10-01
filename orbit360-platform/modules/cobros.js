@@ -14,7 +14,7 @@ Orbit.modules.cobros = (function () {
   function activeRoleNorm(){try{return String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');}catch(e){return'';}}
   function advisorRole(){return ['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial'].includes(activeRoleNorm());}
   function directPaymentRole(){return !advisorRole();}
-  const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'vehiculos', 'recibosEsperados', 'carteraPrimas'];
+  const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas'];
 
   const FDEFS = () => [
     { id: 'fq', type: 'search', ph: 'Buscar cliente, póliza o placa…' },
@@ -26,6 +26,7 @@ Orbit.modules.cobros = (function () {
   }
 
   function hydrationState() {
+    try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(HYDRATION_DEPS); } catch(e) {}
     let s = {};
     try { s = S()._productStatus ? (S()._productStatus() || {}) : {}; } catch (e) {}
     const confirmed = [].concat(s.serverConfirmedCollections || []);
@@ -272,6 +273,7 @@ Orbit.modules.cobros = (function () {
       return;
     }
 
+    if (st.fq) { try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(['vehiculos']); } catch(e) {} }
     const model = baseModel(reuseBase === true);
     const idx = model.idx;
     const cart = model.cart;

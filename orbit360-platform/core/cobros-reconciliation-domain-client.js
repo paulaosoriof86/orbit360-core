@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
-  const VERSION='orbit360-cobros-reconciliation-client-v7-r10-document-lifecycle';
+  const VERSION='orbit360-cobros-reconciliation-client-v8-r11-preview-host-routing';
   const text=value=>String(value==null?'':value).trim();
   const low=value=>text(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   function classifyPaymentOrigin(row){
@@ -21,7 +21,7 @@
   const provider=()=>window.Orbit&&Orbit.productRuntimeBrowserProvidersP0;
   const tenantId=()=>text(backend().tenantId||backend().tenant);
   const region=()=>text(backend().functionsRegion||'us-central1');
-  const isPreviewHost=()=>/--gi-i65-b3-|--gi-i65-b2-|--gi-i65-b1-/.test(String(location&&location.hostname||''));
+  const isPreviewHost=()=>/--/.test(String(location&&location.hostname||''));
   const functionName=()=>isPreviewHost()?'orbit360CobrosReconciliationCommandPreview':(text(backend().functionNames&&backend().functionNames.reconciliation)||'orbit360CobrosReconciliationCommand');
   const activeRole=()=>{try{return text(Orbit.session&&Orbit.session.rol&&Orbit.session.rol());}catch(e){return'';}};
   const enabled=()=>!!((backend().featureFlags||{}).cobrosReconciliationDomainActive===true);

@@ -213,6 +213,21 @@ need(!previewProof.includes("qa://invoice/"),'B3_004_R10_SYNTHETIC_REFERENCE_STI
 need(previewProof.includes('persistentDocumentRefs:true')&&previewProof.includes('documentDownloadPath:true'),'B3_004_R10_DOCUMENT_ASSERTIONS_MISSING');
 need(indexR4.includes('core/product-drive-document-provider-p0.js?v=20260930-b3004r10p2'),'B3_004_R10_DRIVE_PROVIDER_ASSET_NOT_BUMPED');
 console.log('B3_004_R10_DOCUMENT_FLOW_CONTRACT=PASS');
+const reconciliationClientR11=read('orbit360-platform/core/cobros-reconciliation-domain-client.js');
+const reconciliationServerR11=read('functions/cobros-reconciliation-domain.js');
+const hydrationStoreR11=read('orbit360-platform/data/store-firestore-product-readonly-p0.js');
+const hydrationContractR11=read('orbit360-platform/core/product-hydration-required-optional-p0.js');
+const humanFixtureR11=read('tools/gravicentra-i6-5-b3-004-human-fixture.mjs');
+need(reconciliationClientR11.includes("const isPreviewHost=()=>/--/.test"),'B3_004_R11_PREVIEW_HOST_ROUTING_MISSING');
+need(reconciliationServerR11.includes('b3004human_')&&reconciliationServerR11.includes('executePreview'),'B3_004_R11_PREVIEW_SERVER_GUARD_MISSING');
+need(documentDomain.includes('b3004human_'),'B3_004_R11_DOCUMENT_HUMAN_FIXTURE_SCOPE_MISSING');
+need(hydrationStoreR11.includes('_ensureCollections: ensureCollections')&&hydrationStoreR11.includes('scheduleDeferredNext'),'B3_004_R11_DEMAND_HYDRATION_MISSING');
+need(hydrationContractR11.includes("cobros:['cobros','clientes','polizas','recibosEsperados','carteraPrimas']"),'B3_004_R11_COBROS_ROUTE_DEPS_MISSING');
+need(cobros.includes("const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas']"),'B3_004_R11_COBROS_HARD_DEPS_INVALID');
+need(humanFixtureR11.includes('b3004human_client_r11')&&humanFixtureR11.includes('cleanupRequired:true'),'B3_004_R11_HUMAN_FIXTURE_CONTRACT_MISSING');
+need(indexR4.includes('data/store-firestore-product-readonly-p0.js?v=20260930-b3004r11'),'B3_004_R11_STORE_ASSET_NOT_BUMPED');
+need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20260930-b3004r11'),'B3_004_R11_RECONCILIATION_ASSET_NOT_BUMPED');
+console.log('B3_004_R11_ROUTING_HUMAN_FIXTURE_PERFORMANCE_CONTRACT=PASS');
 
 const cliente360R9P1=read('orbit360-platform/modules/cliente360.js');
 need(cliente360R9P1.includes('receiptReturnSummaryCache')&&cliente360R9P1.includes('prepareReceiptReturn')&&cliente360R9P1.includes('summaryForDetail'),'B3_004_R9P1_RECEIPT_RETURN_PREFETCH_MISSING');

@@ -6606,6 +6606,8 @@ jobs:
           node --check functions/document-drive-domain.js
           node --check orbit360-platform/core/product-drive-document-provider-p0.js
           node --check orbit360-platform/core/cobros-reconciliation-domain-client.js
+          node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
+          node --check orbit360-platform/core/product-hydration-required-optional-p0.js
           node --check orbit360-platform/modules/cobros.js
           node --check orbit360-platform/modules/conciliaciones.js
           node --check orbit360-platform/modules/crm-v1198-operational-bridge.js
@@ -6614,23 +6616,25 @@ jobs:
           node --check tools/gravicentra-i6-5-b3-004-r8-readmodel-proof.mjs
           node --check tools/gravicentra-i6-5-b3-004-r8-operational-proof.mjs
           node --check tools/gravicentra-i6-5-b3-004-preview-proof.mjs
+          node --check tools/gravicentra-i6-5-b3-004-human-fixture.mjs
+          node --check tools/gravicentra-i6-5-b3-004-r11-realcase-readonly.mjs
           node tools/gravicentra-i6-5-b3-004-contract.mjs
           node tools/gravicentra-i6-5-b3-004-r8-readmodel-proof.mjs
           echo "B3_004_SOURCE_CONTRACT=PASS"
-      - name: Freeze B3-004 R10 contract PASS pending exact Preview
+      - name: Freeze B3-004 R11 contract PASS pending exact Preview
         if: steps.gate.outputs.run == 'true'
         run: |
           set -euo pipefail
           CONTROL="artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json"
           LOCK="artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json"
           FINDINGS="artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json"
-          RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_SOURCE_CONTRACT_PASS_20260930.json"
+          RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B3_004_R11_SOURCE_CONTRACT_PASS_20260930.json"
           REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
           test "$REMOTE" = "$GITHUB_SHA"
           export CONTROL LOCK FINDINGS RECEIPT
           node - <<'NODE'
           const fs=require('node:fs');
-          const r={schema:'GRAVICENTRA_I6_5_B3_004_R10_SOURCE_CONTRACT_PASS_V1',recordedAt:'2026-09-30',status:'PASS_PENDING_EXACT_PREVIEW',sourceSha:process.env.GITHUB_SHA,runId:Number(process.env.GITHUB_RUN_ID),findingId:'B3-004',assertions:{r8CausalContract:true,cancelledPolicySyntheticReadModel:true,scopeModuleAlignment:true,deleteOwnerRestored:true,controlledPaidEnrichment:true,localBackPath:true,assetBindings:true,r9HumanRejectionCausalContract:true,r10RealDocumentContract:true,r10DocumentLifecycleContract:true,r10ObservableErrorContract:true,canonicalPaymentOwnerRestored:true,relationAwarePaymentGuard:true,localReceiptBodyBack:true,paymentEditFieldsExposed:true},operationalBusinessWrites:false,syntheticWrites:false,reimport:false,live:false,b3005:false};
+          const r={schema:'GRAVICENTRA_I6_5_B3_004_R11_SOURCE_CONTRACT_PASS_V1',recordedAt:'2026-09-30',status:'PASS_PENDING_EXACT_PREVIEW',sourceSha:process.env.GITHUB_SHA,runId:Number(process.env.GITHUB_RUN_ID),findingId:'B3-004',assertions:{r8CausalContract:true,cancelledPolicySyntheticReadModel:true,scopeModuleAlignment:true,deleteOwnerRestored:true,controlledPaidEnrichment:true,localBackPath:true,assetBindings:true,r9HumanRejectionCausalContract:true,r11RealDocumentContract:true,r11DocumentLifecycleContract:true,r11ObservableErrorContract:true,r11PreviewHostRouting:true,r11HumanSyntheticFixture:true,r11DemandHydration:true,r11RealCaseReadonlyDiagnostic:true,canonicalPaymentOwnerRestored:true,relationAwarePaymentGuard:true,localReceiptBodyBack:true,paymentEditFieldsExposed:true},operationalBusinessWrites:false,syntheticWrites:false,reimport:false,live:false,b3005:false};
           fs.writeFileSync(process.env.RECEIPT,JSON.stringify(r,null,2)+'\n');
           NODE
           RECEIPT_BLOB=$(git hash-object "$RECEIPT"); export RECEIPT_BLOB
@@ -6638,12 +6642,12 @@ jobs:
           const fs=require('node:fs'),rp=process.env.RECEIPT,rb=process.env.RECEIPT_BLOB;
           const f=JSON.parse(fs.readFileSync(process.env.FINDINGS,'utf8')),b=JSON.parse(fs.readFileSync(process.env.LOCK,'utf8'));
           const x=(f.findings||[]).find(y=>y.id==='B3-004');if(!x)throw Error('B3_004_FINDING_MISSING');
-          Object.assign(x,{status:'CONTRACT_PASS_PENDING_EXACT_PREVIEW',nextAction:'B3_004_R10_EXACT_PREVIEW',r10ContractPass:{path:rp,blobSha:rb,runId:Number(process.env.GITHUB_RUN_ID)},currentCandidateEligibleForPromotion:false});
-          f.currentB3={...(f.currentB3||{}),status:'B3_004_CANDIDATE_PENDING_EXACT_PREVIEW',activeFindingId:'B3-004',r10ContractReceiptPath:rp,noLive:true,noReimport:true,b3005Opened:false};
+          Object.assign(x,{status:'CONTRACT_PASS_PENDING_EXACT_PREVIEW',nextAction:'B3_004_R11_EXACT_PREVIEW',r11ContractPass:{path:rp,blobSha:rb,runId:Number(process.env.GITHUB_RUN_ID)},currentCandidateEligibleForPromotion:false});
+          f.currentB3={...(f.currentB3||{}),status:'B3_004_CANDIDATE_PENDING_EXACT_PREVIEW',activeFindingId:'B3-004',r11ContractReceiptPath:rp,noLive:true,noReimport:true,b3005Opened:false};
           fs.writeFileSync(process.env.FINDINGS,JSON.stringify(f,null,2)+'\n');
           b.status='B3_004_CANDIDATE_PENDING_EXACT_PREVIEW';
-          b.activeFinding={...(b.activeFinding||{}),status:'CONTRACT_PASS_PENDING_EXACT_PREVIEW',r10ContractPass:{path:rp,blobSha:rb,runId:Number(process.env.GITHUB_RUN_ID)},machineProofInvalidatedBySourceChange:true,candidateEligibleForPromotion:false,nextAction:'B3_004_R10_EXACT_PREVIEW'};
-          b.nextRequiredProof=['B3_004_R10_EXACT_PREVIEW_MACHINE_PASS','B3_004_R10_TARGETED_HUMAN_VISUAL_PASS'];
+          b.activeFinding={...(b.activeFinding||{}),status:'CONTRACT_PASS_PENDING_EXACT_PREVIEW',r11ContractPass:{path:rp,blobSha:rb,runId:Number(process.env.GITHUB_RUN_ID)},machineProofInvalidatedBySourceChange:true,candidateEligibleForPromotion:false,nextAction:'B3_004_R11_EXACT_PREVIEW'};
+          b.nextRequiredProof=['B3_004_R11_EXACT_PREVIEW_MACHINE_PASS','B3_004_R11_TARGETED_HUMAN_VISUAL_PASS'];
           fs.writeFileSync(process.env.LOCK,JSON.stringify(b,null,2)+'\n');
           NODE
           FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
@@ -6657,13 +6661,13 @@ jobs:
           const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p,'utf8')),b=c.i65ForensicRemediationPlan.b3;
           Object.assign(b,{status:'B3_004_CANDIDATE_PENDING_EXACT_PREVIEW',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,sourceContractReceiptPath:process.env.RECEIPT,sourceContractReceiptBlobSha:process.env.RECEIPT_BLOB,contractPass:true,exactReadback:false,paulaVisualAccepted:false,candidateEligibleForPromotion:false,machineProofInvalidatedBySourceChange:true});
           c.nextAction='I6_5_FORENSIC_REMEDIATION_B3_004_PREVIEW';
-          c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),findingLedgerBlobSha:process.env.FINDINGS_BLOB,nextAction:'B3_004_R10_EXACT_PREVIEW'};
+          c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),findingLedgerBlobSha:process.env.FINDINGS_BLOB,nextAction:'B3_004_R11_EXACT_PREVIEW'};
           fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
           NODE
           git add "$RECEIPT" "$FINDINGS" "$LOCK" "$CONTROL"
           git config user.name gravicentra-recovery-bot
           git config user.email gravicentra-recovery-bot@users.noreply.github.com
-          git commit -m "freeze(i6.5 B3-004): R10 contract pass pending exact preview"
+          git commit -m "freeze(i6.5 B3-004): R11 contract pass pending exact preview"
           git push origin "HEAD:$GITHUB_REF_NAME"
           echo "B3_004_SUCCESSOR_EXECUTES_IN_SAME_RUN=1"
       - name: Preserve B3-004 fail-closed boundary
@@ -6839,6 +6843,16 @@ jobs:
           chmod 600 "$RUNNER_TEMP/b3-004-sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b3-004-sa.json" >> "$GITHUB_ENV"
           npm --prefix functions ci --ignore-scripts >/dev/null
+      - name: Diagnose Paula rejected receipt read-only
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B3_004_REALCASE_OUT: ${{ runner.temp }}/b3-004-r11-realcase.json
+          B3_004_REAL_CLIENT_ID: cli_siga_62cd81d1471c2628e3
+          B3_004_REAL_POLICY_NUMBER: A125-00003954
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b3-004-r11-realcase-readonly.mjs
+          cat "$B3_004_REALCASE_OUT"
       - name: Resolve public web config
         if: steps.gate.outputs.run == 'true'
         run: |
@@ -6965,7 +6979,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b3-004-preview-proof.mjs
-          node -e "const x=require(process.env.B3_004_PROOF_OUT);if(x.status!=='PASS'||x.cleanup?.pass!==true||x.documents?.readPass!==true||x.documents?.downloadPass!==true||x.documents?.finalizePass!==true||x.cleanup?.documentsQuarantined!==true)process.exit(1);console.log('B3_004_R10_REAL_DOCUMENT_PROOF=PASS')"
+          node -e "const x=require(process.env.B3_004_PROOF_OUT);if(x.status!=='PASS'||x.cleanup?.pass!==true||x.documents?.readPass!==true||x.documents?.downloadPass!==true||x.documents?.finalizePass!==true||x.cleanup?.documentsQuarantined!==true)process.exit(1);console.log('B3_004_R11_REAL_DOCUMENT_PROOF=PASS')"
       - name: B3-004 R8 operational scope and soft-delete synthetic proof
         if: steps.gate.outputs.run == 'true'
         env:
@@ -6974,6 +6988,15 @@ jobs:
           set -euo pipefail
           node tools/gravicentra-i6-5-b3-004-r8-operational-proof.mjs
           node -e "const x=require(process.env.B3_004_R8_OPERATIONAL_PROOF_OUT);if(x.status!=='PASS'||x.cleanup?.pass!==true)process.exit(1);console.log('B3_004_R8_OPERATIONAL_PROOF=PASS')"
+      - name: Create B3-004 R11 human synthetic fixture
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B3_004_HUMAN_FIXTURE_OUT: ${{ runner.temp }}/b3-004-human-fixture.json
+          B3_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b3-004-human-fixture.mjs
+          cat "$B3_004_HUMAN_FIXTURE_OUT"
       - name: Upload immutable B3-004 package and proof
         if: steps.gate.outputs.run == 'true'
         id: artifact
@@ -6984,12 +7007,14 @@ jobs:
             ${{ runner.temp }}/b3-004-package
             ${{ runner.temp }}/b3-004-preview-proof.json
             ${{ runner.temp }}/b3-004-r8-operational-proof.json
+            ${{ runner.temp }}/b3-004-r11-realcase.json
+            ${{ runner.temp }}/b3-004-human-fixture.json
             ${{ runner.temp }}/b3-004-function-deploy.json
           include-hidden-files: true
           compression-level: 0
           if-no-files-found: error
           retention-days: 30
-      - name: Freeze B3-004 R10 machine PASS pending targeted visual
+      - name: Freeze B3-004 R11 machine PASS pending targeted visual
         if: steps.gate.outputs.run == 'true'
         env:
           B3_BUILD_ID: ${{ steps.build.outputs.build_id }}
@@ -6999,19 +7024,21 @@ jobs:
           B3_ARTIFACT_DIGEST: ${{ steps.artifact.outputs.artifact-digest }}
           PAYMENT_PROOF: ${{ runner.temp }}/b3-004-preview-proof.json
           OPERATIONAL_PROOF: ${{ runner.temp }}/b3-004-r8-operational-proof.json
+          REALCASE_PROOF: ${{ runner.temp }}/b3-004-r11-realcase.json
+          HUMAN_FIXTURE: ${{ runner.temp }}/b3-004-human-fixture.json
         run: |
           set -euo pipefail
           CONTROL="artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json"
           LOCK="artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json"
           FINDINGS="artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json"
-          RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_MACHINE_PASS_20260930.json"
+          RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B3_004_R11_MACHINE_PASS_20260930.json"
           REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
           test "$REMOTE" = "$CANDIDATE_SOURCE_SHA"
           export CONTROL LOCK FINDINGS RECEIPT
           node - <<'NODE'
-          const fs=require('node:fs'),pay=JSON.parse(fs.readFileSync(process.env.PAYMENT_PROOF,'utf8')),op=JSON.parse(fs.readFileSync(process.env.OPERATIONAL_PROOF,'utf8'));
-          if(pay.status!=='PASS'||pay.cleanup?.pass!==true||op.status!=='PASS'||op.cleanup?.pass!==true)throw Error('B3_004_R8_PROOF_NOT_PASS');
-          const r={schema:'GRAVICENTRA_I6_5_B3_004_R10_MACHINE_PASS_V1',recordedAt:'2026-09-30',status:'MACHINE_PASS_PENDING_TARGETED_HUMAN_VISUAL',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B3_BUILD_ID,previewUrl:process.env.B3_PREVIEW_URL,channelId:process.env.B3_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B3_ARTIFACT_ID),artifactDigest:process.env.B3_ARTIFACT_DIGEST||'',exactHostingReadback:true,paymentProofPass:true,operationalScopeDeleteProofPass:true,cleanupPass:true,cancelledPolicyReadModelContractPass:true,r9HumanRejectionCausalContractPass:true,realPreviewDocumentsPass:true,documentReadDownloadPass:true,documentFinalizePass:true,documentQuarantineCleanupPass:true,liveUnchanged:true,reimport:false,b3005:false};
+          const fs=require('node:fs'),pay=JSON.parse(fs.readFileSync(process.env.PAYMENT_PROOF,'utf8')),op=JSON.parse(fs.readFileSync(process.env.OPERATIONAL_PROOF,'utf8')),realcase=JSON.parse(fs.readFileSync(process.env.REALCASE_PROOF,'utf8')),fixture=JSON.parse(fs.readFileSync(process.env.HUMAN_FIXTURE,'utf8'));
+          if(pay.status!=='PASS'||pay.cleanup?.pass!==true||op.status!=='PASS'||op.cleanup?.pass!==true||realcase.status!=='PASS'||fixture.status!=='READY')throw Error('B3_004_R11_PROOF_NOT_PASS');
+          const r={schema:'GRAVICENTRA_I6_5_B3_004_R11_MACHINE_PASS_V1',recordedAt:'2026-09-30',status:'MACHINE_PASS_PENDING_TARGETED_HUMAN_VISUAL',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B3_BUILD_ID,previewUrl:process.env.B3_PREVIEW_URL,channelId:process.env.B3_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B3_ARTIFACT_ID),artifactDigest:process.env.B3_ARTIFACT_DIGEST||'',exactHostingReadback:true,paymentProofPass:true,operationalScopeDeleteProofPass:true,cleanupPass:true,cancelledPolicyReadModelContractPass:true,r9HumanRejectionCausalContractPass:true,realPreviewDocumentsPass:true,documentReadDownloadPass:true,documentFinalizePass:true,documentQuarantineCleanupPass:true,realCaseReadonlyPass:true,humanFixtureReady:true,humanFixtureClientId:fixture.ids.client,humanFixtureReceiptId:fixture.ids.receipt,humanFixtureUrl:fixture.clientUrl,humanFixtureCleanupRequired:true,liveUnchanged:true,reimport:false,b3005:false};
           fs.writeFileSync(process.env.RECEIPT,JSON.stringify(r,null,2)+'\n');
           NODE
           RECEIPT_BLOB=$(git hash-object "$RECEIPT"); export RECEIPT_BLOB
@@ -7019,13 +7046,13 @@ jobs:
           const fs=require('node:fs'),rp=process.env.RECEIPT,rb=process.env.RECEIPT_BLOB;
           const f=JSON.parse(fs.readFileSync(process.env.FINDINGS,'utf8')),b=JSON.parse(fs.readFileSync(process.env.LOCK,'utf8'));
           const x=(f.findings||[]).find(y=>y.id==='B3-004');if(!x)throw Error('B3_004_FINDING_MISSING');
-          Object.assign(x,{status:'PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL',nextAction:'B3_004_R10_TARGETED_HUMAN_VISUAL',r10MachinePass:{path:rp,blobSha:rb,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B3_BUILD_ID,previewUrl:process.env.B3_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B3_ARTIFACT_ID),artifactDigest:process.env.B3_ARTIFACT_DIGEST||''},machineProofInvalidatedBySourceChange:false,currentCandidateEligibleForPromotion:false});
-          f.currentB3={...(f.currentB3||{}),status:'B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL',activeFindingId:'B3-004',r10MachineProofReceiptPath:rp,noLive:true,noReimport:true,b3005Opened:false};
+          Object.assign(x,{status:'PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL',nextAction:'B3_004_R11_TARGETED_HUMAN_VISUAL',r11MachinePass:{path:rp,blobSha:rb,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B3_BUILD_ID,previewUrl:process.env.B3_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B3_ARTIFACT_ID),artifactDigest:process.env.B3_ARTIFACT_DIGEST||''},machineProofInvalidatedBySourceChange:false,currentCandidateEligibleForPromotion:false});
+          f.currentB3={...(f.currentB3||{}),status:'B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL',activeFindingId:'B3-004',r11MachineProofReceiptPath:rp,noLive:true,noReimport:true,b3005Opened:false};
           fs.writeFileSync(process.env.FINDINGS,JSON.stringify(f,null,2)+'\n');
           b.status='B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL';
-          b.activeFinding={...(b.activeFinding||{}),status:'PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL',machineProofInvalidatedBySourceChange:false,candidateEligibleForPromotion:false,r10MachinePass:{path:rp,blobSha:rb}};
+          b.activeFinding={...(b.activeFinding||{}),status:'PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL',machineProofInvalidatedBySourceChange:false,candidateEligibleForPromotion:false,r11MachinePass:{path:rp,blobSha:rb}};
           b.machineProof={sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B3_BUILD_ID,previewUrl:process.env.B3_PREVIEW_URL,channelId:process.env.B3_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B3_ARTIFACT_ID),artifactDigest:process.env.B3_ARTIFACT_DIGEST||'',exactReadback:true,backendExactDeploy:true,syntheticProofPass:true,r8OperationalProofPass:true,cleanupPass:true,receiptPath:rp,receiptBlobSha:rb};
-          b.nextRequiredProof=['B3_004_R10_TARGETED_HUMAN_VISUAL_PASS'];
+          b.nextRequiredProof=['B3_004_R11_TARGETED_HUMAN_VISUAL_PASS'];
           fs.writeFileSync(process.env.LOCK,JSON.stringify(b,null,2)+'\n');
           NODE
           FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
@@ -7037,15 +7064,15 @@ jobs:
           LOCK_BLOB=$(git hash-object "$LOCK"); export LOCK_BLOB
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.CONTROL,c=JSON.parse(fs.readFileSync(p,'utf8')),b=c.i65ForensicRemediationPlan.b3;
-          Object.assign(b,{status:'B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B3_BUILD_ID,previewUrl:process.env.B3_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B3_ARTIFACT_ID),artifactDigest:process.env.B3_ARTIFACT_DIGEST||'',exactReadback:true,contractPass:true,previewProofPass:true,r8OperationalProofPass:true,paulaVisualAccepted:false,candidateEligibleForPromotion:false,machineProofInvalidatedBySourceChange:false,machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB,livePromoted:false});
+          Object.assign(b,{status:'B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B3_BUILD_ID,previewUrl:process.env.B3_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B3_ARTIFACT_ID),artifactDigest:process.env.B3_ARTIFACT_DIGEST||'',exactReadback:true,contractPass:true,previewProofPass:true,r8OperationalProofPass:true,realCaseReadonlyPass:true,humanFixtureReady:true,humanFixtureUrl:JSON.parse(fs.readFileSync(process.env.HUMAN_FIXTURE,'utf8')).clientUrl,paulaVisualAccepted:false,candidateEligibleForPromotion:false,machineProofInvalidatedBySourceChange:false,machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB,livePromoted:false});
           c.nextAction='I6_5_FORENSIC_REMEDIATION_B3_004_VISUAL';
-          c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),findingLedgerBlobSha:process.env.FINDINGS_BLOB,nextAction:'B3_004_R10_TARGETED_HUMAN_VISUAL_PASS'};
+          c.canonicalAccumulationControl={...(c.canonicalAccumulationControl||{}),findingLedgerBlobSha:process.env.FINDINGS_BLOB,nextAction:'B3_004_R11_TARGETED_HUMAN_VISUAL_PASS'};
           fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n');
           NODE
           git add "$RECEIPT" "$FINDINGS" "$LOCK" "$CONTROL"
           git config user.name gravicentra-recovery-bot
           git config user.email gravicentra-recovery-bot@users.noreply.github.com
-          git commit -m "freeze(i6.5 B3-004): R10 machine pass pending targeted human visual"
+          git commit -m "freeze(i6.5 B3-004): R11 machine pass pending targeted human visual"
           git push origin "HEAD:$GITHUB_REF_NAME"
       - name: Emit B3-004 machine proof summary
         if: steps.gate.outputs.run == 'true'
@@ -7057,6 +7084,13 @@ jobs:
           echo "B3_004_CHANNEL_ID=${{ steps.preview.outputs.channel_id }}"
           echo "B3_004_ARTIFACT_ID=${{ steps.artifact.outputs.artifact-id }}"
           echo "B3_004_ARTIFACT_DIGEST=${{ steps.artifact.outputs.artifact-digest }}"
+      - name: Cleanup R11 human fixture on machine failure
+        if: ${{ failure() && steps.gate.outputs.run == 'true' }}
+        env:
+          B3_004_HUMAN_FIXTURE_MODE: cleanup
+          B3_004_HUMAN_FIXTURE_OUT: ${{ runner.temp }}/b3-004-human-fixture-cleanup.json
+        run: |
+          if [ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" ] && [ -f "$GOOGLE_APPLICATION_CREDENTIALS" ]; then node tools/gravicentra-i6-5-b3-004-human-fixture.mjs || true; fi
       - name: B3-004 failure remains fail-closed
         if: ${{ failure() && steps.gate.outputs.run == 'true' }}
         run: echo "B3_004_FAILED_NO_OPERATIONAL_DATA_WRITE_NO_REIMPORT_NO_LIVE_NO_B4"

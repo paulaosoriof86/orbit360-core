@@ -36,7 +36,7 @@ function clean(v,max=500){return String(v==null?'':v).replace(/\u0000/g,'').trim
 function norm(v){return clean(v,160).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');}
 function safeName(v){return clean(v,180).replace(/[\\/:*?"<>|\u0000-\u001f]+/g,' ').replace(/\s+/g,' ').trim()||'Documento';}
 function sha(v){return crypto.createHash('sha256').update(String(v??''),'utf8').digest('hex');}
-function previewSyntheticClient(clientId){return /^(?:b2[-_]|b3004qa_)/i.test(clean(clientId,180));}
+function previewSyntheticClient(clientId){return /^(?:b2[-_]|b3004qa_|b3004human_)/i.test(clean(clientId,180));}
 function driveIdFromUrl(v){
   const s=clean(v,1000);
   const m=s.match(/\/(?:file\/d|folders)\/([A-Za-z0-9_-]{20,})/)||s.match(/[?&]id=([A-Za-z0-9_-]{20,})/);

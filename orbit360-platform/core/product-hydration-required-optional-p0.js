@@ -13,7 +13,7 @@
   'use strict';
 
   window.Orbit = window.Orbit || {};
-  var VERSION = 'p0-20260928-route-primary-authoritative-startup-6a';
+  var VERSION = 'p0-20260930-b3004r11-route-dependency-hydration';
   var MARKER = 'PRODUCT_HYDRATION_AUTHORITATIVE_REQUIRED_OPTIONAL_P0';
   var originalCreate = window.Orbit.createFirestoreProductReadOnlyStoreP0;
 
@@ -72,6 +72,11 @@
       equipo:'asesores',
       vehiculos:'vehiculos'
     };
+    var depsByRoute={
+      cobros:['cobros','clientes','polizas','recibosEsperados','carteraPrimas'],
+      cliente360:['clientes','polizas','recibosEsperados','carteraPrimas','cobros'],
+      conciliaciones:['cobros','clientes','polizas','recibosEsperados','carteraPrimas']
+    };
     function readable(collection){
       try{
         var policy=window.Orbit.tenantAccessPolicyProductP0;
@@ -83,15 +88,16 @@
     }
     var allConfigured=unique(required.concat(optional));
     var preferred=primaryByRoute[route]||'clientes';
-    var startup='';
-    if(allConfigured.indexOf(preferred)>=0&&readable(preferred))startup=preferred;
-    if(!startup){
-      startup=required.find(function(name){return readable(name);})||allConfigured.find(function(name){return readable(name);})||'';
+    var routeDeps=unique(depsByRoute[route]||[preferred]).filter(function(name){return allConfigured.indexOf(name)>=0&&readable(name);});
+    if(route==='equipo'&&teamDirectoryRequired&&allConfigured.indexOf('asesores')>=0&&readable('asesores'))routeDeps=['asesores'];
+    if(!routeDeps.length){
+      var fallback=required.find(function(name){return readable(name);})||allConfigured.find(function(name){return readable(name);})||'';
+      if(fallback)routeDeps=[fallback];
     }
-    if(route==='equipo'&&teamDirectoryRequired&&allConfigured.indexOf('asesores')>=0&&readable('asesores'))startup='asesores';
-    if(!startup) throw new Error('product_required_hydration_contract_missing');
-    optional=allConfigured.filter(function(name){return name!==startup;});
-    required=[startup];
+    if(!routeDeps.length) throw new Error('product_required_hydration_contract_missing');
+    var startup=routeDeps[0];
+    required=routeDeps;
+    optional=allConfigured.filter(function(name){return required.indexOf(name)<0;});
     return {
       version:text(cfg.hydrationContractVersion)||'unversioned',
       source:text(cfg.hydrationContractSource)||'public-runtime-config',

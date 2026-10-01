@@ -22,10 +22,18 @@ Orbit.modules.cliente360 = (function () {
   let tab = 'resumen';
   let shownCid = null; // cliente actualmente abierto (para resetear pestaña al cambiar)
   const receiptReturnSummaryCache = new Map();
+  const RECEIPT_RETURN_DEPS = ['clientes','polizas','cobros','recibosEsperados','carteraPrimas','comisiones','asesores'];
+  function receiptReturnReady() {
+    try { const store=S(),ps=store&&store._productStatus?store._productStatus():{},confirmed=[].concat(ps.serverConfirmedCollections||[]); return RECEIPT_RETURN_DEPS.every(name=>confirmed.includes(name)); }
+    catch(_) { return true; }
+  }
   function prepareReceiptReturn(cid) {
     const id=String(cid||'').trim(); if(!id||receiptReturnSummaryCache.has(id)) return false;
-    const run=()=>{try{const r=q.clienteResumen(id);if(r&&r.cli)receiptReturnSummaryCache.set(id,r);}catch(_){}};
-    if(typeof requestIdleCallback==='function') requestIdleCallback(run,{timeout:250}); else setTimeout(run,0);
+    const store=S();
+    try { if(store&&typeof store._ensureCollections==='function') store._ensureCollections(RECEIPT_RETURN_DEPS); } catch(_) {}
+    const run=()=>{try{if(!receiptReturnReady())return false;const r=q.clienteResumen(id);if(r&&r.cli)receiptReturnSummaryCache.set(id,r);return true;}catch(_){return false;}};
+    if(run()) return true;
+    if(store&&typeof store.on==='function'){let off=null;off=store.on('*',()=>{if(run()&&off){off();off=null;}});}
     return true;
   }
   function summaryForDetail(cid) {

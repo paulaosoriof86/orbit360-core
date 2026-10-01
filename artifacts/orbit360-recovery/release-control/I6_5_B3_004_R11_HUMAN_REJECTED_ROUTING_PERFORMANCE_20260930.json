@@ -1,0 +1,37 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R11_HUMAN_REJECTION_V1",
+  "recordedAt": "2026-09-30",
+  "status": "HUMAN_REJECTED_REMEDIATION_REQUIRED",
+  "findingId": "B3-004",
+  "rejectedPreview": {
+    "sourceSha": "50afa77f8404229151add9ba09713b2c2449b3f1",
+    "buildId": "gi-i65-b3-50afa77f8404-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36798303470-vo0ctza8.web.app",
+    "runId": 36798303470,
+    "artifactId": 11134577567,
+    "artifactDigest": "707ec2976c52b54c9c7e64220ee7db469aa0efdf39d9c56a7b99557a05a3f91d"
+  },
+  "humanEvidence": {
+    "cobrosEntrySlow": true,
+    "returnToReceiptsSlow": true,
+    "applyPaymentToast": "No fue posible registrar el pago. No se guardaron cambios.",
+    "reconcileToast": "No fue posible guardar la aplicación del pago.",
+    "policyNumber": "A125-00003954",
+    "clientId": "cli_siga_62cd81d1471c2628e3"
+  },
+  "rootCauseCodes": [
+    "PREVIEW_HOST_ROUTING_REGEX_EXCLUDED_GI_B3004_CHANNELS",
+    "MACHINE_SYNTHETIC_PROOF_NOT_REPLAYABLE_BY_HUMAN_ON_REAL_ROWS",
+    "DEFERRED_HYDRATION_ATTACHED_ALL_OPTIONAL_COLLECTIONS_IN_ONE_EVENT_LOOP_TURN",
+    "COBROS_HARD_READINESS_INCLUDED_VEHICLES_NOT_REQUIRED_FOR_FIRST_USE"
+  ],
+  "remediationContract": {
+    "previewPayments": "preview callable only",
+    "previewBusinessWrites": "synthetic fixtures only",
+    "humanFixturePrefix": "b3004human_",
+    "realCaseDiagnostic": "read-only",
+    "hydration": "route-demand critical deps + staged idle background",
+    "live": false,
+    "reimport": false
+  }
+}

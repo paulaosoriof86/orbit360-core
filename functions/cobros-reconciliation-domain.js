@@ -8,7 +8,7 @@ const { validateActiveLedgerContract } = require('./cobros-ledger-contract');
 const { normalizeRole, resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
-const VERSION = 'orbit360-cobros-reconciliation-domain-v4-payment-origin-workflows';
+const VERSION = 'orbit360-cobros-reconciliation-domain-v5-r11-preview-synthetic-guard';
 const CONTRACT_VERSION = '10.10.2';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
@@ -580,6 +580,16 @@ function unsupportedMutation(operation) {
   }
 }
 
+function previewSyntheticId(value) {
+  return /^(?:b3004qa_|b3004human_)/i.test(text(value, 180));
+}
+async function executePreview(request) {
+  const data = request.data || {}, payload = data.payload || {};
+  const targetId = text(payload.receiptId || payload.reciboId || payload.polizaId || payload.policyId || payload.proposalId, 180);
+  if (!previewSyntheticId(targetId)) throw new HttpsError('permission-denied', 'Preview de Cobros solo admite fixtures sintéticas autorizadas.');
+  return execute(request);
+}
+
 async function execute(request) {
   const data = request.data || {};
   const operation = norm(data.operation).replace(/ /g, '_');
@@ -660,6 +670,6 @@ async function execute(request) {
 }
 
 exports.orbit360CobrosReconciliationCommand = onCall({ region: REGION, cors: true }, execute);
-exports.orbit360CobrosReconciliationCommandPreview = onCall({ region: REGION, cors: true }, execute);
+exports.orbit360CobrosReconciliationCommandPreview = onCall({ region: REGION, cors: true }, executePreview);
 exports.orbit360CobrosReconciliationCommandLabV20260804 = onCall({ region: REGION, cors: true }, execute);
 exports.__cobrosReconciliationDomain = Object.freeze({ VERSION, CONTRACT_VERSION, OPERATIONS });
