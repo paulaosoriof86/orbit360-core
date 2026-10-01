@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_005_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_005_SEMANTIC_PROVENANCE_SOURCE_FIX",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -3184,7 +3184,7 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "B3_005_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "B3_005_TARGETED_HUMAN_REJECTED_SOURCE_REMEDIATION_AUTHORIZED",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
       "livePromoted": false,
@@ -3193,7 +3193,7 @@
       "executionLockBlobSha": "e5d62eaf4c13b802ee072b2410eebcda74b998db",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
       "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
-      "productMutationAuthorized": false,
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "mechanismRootFix": {
@@ -3347,10 +3347,11 @@
       "b3002RegressionPass": true,
       "paulaVisualAccepted": false,
       "candidateEligibleForPromotion": false,
-      "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_003_PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_20260929.json",
+      "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_REJECTION_SEMANTIC_PROVENANCE_20261001.json",
       "allowedProductFiles": [
         "orbit360-platform/modules/cobros.js",
-        "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "tools/gravicentra-i6-5-b3-005-contract.mjs"
       ],
       "sourceFixCommit": "632998cdfb532dc7516db207e63ea49c440f5e5f",
       "readModelCountryAuthorityStatus": "READ_MODEL_COUNTRY_RESOLUTION_DEFECT_CONFIRMED",
@@ -3841,7 +3842,7 @@
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R7_MACHINE_PASS_20260930.json",
         "receiptBlobSha": "86664bcdab185ec3d2d789a8167976f6ac248650"
       },
-      "machineProofInvalidatedBySourceChange": false,
+      "machineProofInvalidatedBySourceChange": true,
       "r8SourceFix": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R8_CAUSAL_SOURCE_FIX_20260930.json",
         "blobSha": "1fbd852fc44b26c2262248402d18bd6b08e82933",
@@ -4689,7 +4690,9 @@
         "clientUrl": "https://ays-orbit-360-lab--gi-b3005-36937661520-6e5g0gwl.web.app/#/cliente360?c=b3005human_client_r1&t=recibos&r=b3005human_policy_r1_receipt_02",
         "directUrl": "https://ays-orbit-360-lab--gi-b3005-36937661520-6e5g0gwl.web.app/#/cliente360?c=b3005human_client_r1&t=recibos&r=b3005human_policy_r1_receipt_05",
         "cobrosUrl": "https://ays-orbit-360-lab--gi-b3005-36937661520-6e5g0gwl.web.app/#/cobros?qaPolicy=b3005human_policy_r1"
-      }
+      },
+      "visualRejectionReceiptBlobSha": "cfffbce486fd132842c0a3569f1e3a0c8ceec136",
+      "visualRootCause": "UI_STATE_LABELS_EVALUATE_RECONCILIATION_BEFORE_PAYMENT_PROVENANCE_SO_PAID_INFERRED_COLLAPSES_INTO_CONCILIADO"
     }
   },
   "canonicalAccumulationControl": {
@@ -4709,7 +4712,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_005_TARGETED_HUMAN_VISUAL"
+    "nextAction": "B3_005_SEMANTIC_PROVENANCE_SOURCE_FIX"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
@@ -4889,7 +4892,7 @@
     "currentClientPortalPaymentCountExpected": 0
   },
   "currentB3": {
-    "status": "B3_005_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "B3_005_TARGETED_HUMAN_REJECTED_SOURCE_REMEDIATION_AUTHORIZED",
     "activeFindingId": "B3-005",
     "priorFindingId": "B3-004",
     "priorFindingStatus": "CLOSED_PASS",
@@ -4930,6 +4933,7 @@
       "clientUrl": "https://ays-orbit-360-lab--gi-b3005-36937661520-6e5g0gwl.web.app/#/cliente360?c=b3005human_client_r1&t=recibos&r=b3005human_policy_r1_receipt_02",
       "directUrl": "https://ays-orbit-360-lab--gi-b3005-36937661520-6e5g0gwl.web.app/#/cliente360?c=b3005human_client_r1&t=recibos&r=b3005human_policy_r1_receipt_05",
       "cobrosUrl": "https://ays-orbit-360-lab--gi-b3005-36937661520-6e5g0gwl.web.app/#/cobros?qaPolicy=b3005human_policy_r1"
-    }
+    },
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_REJECTION_SEMANTIC_PROVENANCE_20261001.json"
   }
 }
