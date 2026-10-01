@@ -72,6 +72,34 @@ function compileProposal(input = {}) {
   };
 }
 
+function compileVersionedProposal(input = {}) {
+  const plan=planner.buildVersionedProposalPlan(input);
+  if (!plan.ok) return plan;
+  return {
+    ok:true,
+    version:VERSION,
+    dryRunOnly:DRY_RUN_ONLY,
+    executionEnabled:EXECUTION_ENABLED,
+    writesEnabled:WRITES_ENABLED,
+    physicalW3Allowed:false,
+    requestId:plan.requestId,
+    requestDigest:plan.requestDigest,
+    proposalId:plan.proposal.proposalId,
+    proposalSeriesId:plan.proposal.proposalSeriesId,
+    versionNumber:plan.proposal.versionNumber,
+    atomic:plan.atomic===true,
+    commands:plan.operations.map(op=>({
+      type:op.type,
+      entity:op.entity,
+      path:op.path,
+      expectedBeforeDigest:op.expectedBeforeDigest||null,
+      payloadDigest:digest(op.payload||null)
+    })),
+    invariants:plan.invariants,
+    comparisonEligibility:plan.comparisonEligibility
+  };
+}
+
 function compileSelection(input = {}) {
   const plan=planner.buildSelectionPlan(input);
   if (!plan.ok) return plan;
@@ -104,6 +132,7 @@ module.exports=Object.freeze({
   flattenPlan,
   compileInitialHandoff,
   compileProposal,
+  compileVersionedProposal,
   compileSelection,
   executeCompiled
 });
