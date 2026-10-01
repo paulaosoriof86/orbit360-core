@@ -112,7 +112,8 @@ test('synthetic W3 lifecycle freezes exact journal and final-absence sequence',(
 test('readiness closes technical source blockers but leaves Owner W3 authorization',()=>{
   const r=s.readiness();
   assert.equal(r.sourceContractReady,true);
-  assert.equal(r.physicalW3Ready,true);
+  assert.equal(r.technicalW3Ready,true);
+  assert.equal(r.physicalW3Ready,false);
   assert.equal(r.physicalW3Allowed,false);
   assert.deepEqual(r.blockers,['OWNER_W3_AUTHORIZATION_REQUIRED']);
 });
