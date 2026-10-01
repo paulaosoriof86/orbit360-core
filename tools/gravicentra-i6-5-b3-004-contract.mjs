@@ -285,7 +285,7 @@ need(indexR4.includes('styles/base.css?v=20261001-b3004r12p11')&&indexR4.include
 need(nativeReceiptOwner.includes('function ensureDirectReceiptRoute()')&&nativeReceiptOwner.includes('patchClient(h);ensureDirectReceiptRoute()')&&nativeReceiptOwner.includes('data-rp-receipt-detail-id'),'B3_004_R12P11P1_DIRECT_RECEIPT_POST_HYDRATION_OWNER_MISSING');
 need(nativeReceiptOwner.includes('function watchDirectReceiptRoute()')&&nativeReceiptOwner.includes('setInterval(tick,250)')&&nativeReceiptOwner.includes('attempts>=60')&&nativeReceiptOwner.includes('OrbitRuntimeDiagnostics.directReceiptHydration'),'B3_004_R12P11P2_DIRECT_RECEIPT_HYDRATION_RETRY_MISSING');
 console.log('B3_004_R12P11P2_DIRECT_RECEIPT_HYDRATION_RETRY_CONTRACT=PASS');
-need(cliente360.includes('function waitForRoutedClient(cid)')&&cliente360.includes("data-c360-route-loading=\"1\"")&&cliente360.includes("S()._ensureCollections(['clientes','polizas','recibosEsperados','carteraPrimas','cobros'])"),'B3_004_R12P11P3_CLIENT_ROUTE_HYDRATION_OWNER_MISSING');
+need(cliente.includes('function waitForRoutedClient(cid)')&&cliente.includes("data-c360-route-loading=\"1\"")&&cliente.includes("S()._ensureCollections(['clientes','polizas','recibosEsperados','carteraPrimas','cobros'])"),'B3_004_R12P11P3_CLIENT_ROUTE_HYDRATION_OWNER_MISSING');
 need(indexR4.includes('modules/cliente360.js?v=20261001-b3004r12p11p3'),'B3_004_R12P11P3_CLIENTE360_ASSET_NOT_BUMPED');
 console.log('B3_004_R12P11P3_CLIENT_ROUTE_HYDRATION_OWNER_CONTRACT=PASS');
 console.log('B3_004_R12P11P1_DIRECT_RECEIPT_HYDRATION_CONTRACT=PASS');

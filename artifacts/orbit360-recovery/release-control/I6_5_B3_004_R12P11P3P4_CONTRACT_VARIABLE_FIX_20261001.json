@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11P3P4_CONTRACT_VARIABLE_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "2744eade248d99770fb2eae2e0e479000a2206e0",
+  "classification": "QA_CONTRACT_VARIABLE_NAME_MISMATCH",
+  "cause": "R12P11P3 assertion referenced undefined variable cliente360 while cliente360.js is already bound to variable cliente.",
+  "remediation": "Replace only the invalid variable reference in the QA contract; product source unchanged.",
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "399e0c109b96b6f59f9cca3e061acb33d0520e64"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}
