@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
     "boundaries": {
@@ -304,7 +304,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R12P11P5_EXACT_PREVIEW",
+    "nextAction": "B3_004_R12P11P6_EXACT_PREVIEW",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -781,6 +781,16 @@
       "blobSha": "7421430bcde2558009582407518b9db2a39e58ca",
       "rootCause": "HUMAN_QA_FIXTURE_USED_ARTIFICIAL_ADVISOR_ID_AND_THEREFORE_DID_NOT_ENTER_THE_SAME_NORMAL_PRODUCT_SCOPE_AS_THE_PRIVILEGED_BROWSER_ACTOR",
       "productSourceChanged": false
+    },
+    "r12p11p6HarnessFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P6_BROWSER_HARNESS_SCOPE_HTTP_ADJUDICATION_FIX_20261001.json",
+      "blobSha": "c9ae53a58dcccde11aa5b0a97bb888b606369446",
+      "rootCause": "R12_MOBILE_BROWSER_HARNESS_REFERENCED_NODE_LOCAL_DIRECT_UI_START_INSIDE_PAGE_EVALUATE_BROWSER_CONTEXT_AND_CAPTURED_CONSOLE_ERRORS_WITHOUT_FAIL_CLOSED_ADJUDICATION",
+      "qaBlobs": {
+        "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "9dc4ccf5ec7f35765bd1f2336f48b07f3b0c3105",
+        "tools/gravicentra-i6-5-b3-004-contract.mjs": "b9526fe2be4c5a44fc5d8ceacab4a658906df946"
+      },
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -790,10 +800,10 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "442d5ac16c0e6adb55cdb896c69d7a00fa9a34ba"
+    "blobSha": "d502180de9459ad65f2d8bdae8f05941337780c6"
   },
   "nextRequiredProof": [
-    "B3_004_R12P11P5_SOURCE_CONTRACT_PASS",
+    "B3_004_R12P11P6_SOURCE_CONTRACT_PASS",
     "B3_004_R12P11_EXACT_PREVIEW_MOBILE_BROWSER_PASS",
     "B3_004_R12_TARGETED_HUMAN_VISUAL_PASS"
   ],
@@ -989,7 +999,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "7799356657e21acf3117c178e9f5339516cc671e"
+    "blobSha": "6efd06697b1f619e8456d20a719b61fc6e47a6cb"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -1299,6 +1309,23 @@
     "compositionLockBlobSha": "7799356657e21acf3117c178e9f5339516cc671e",
     "findingsLedgerBlobSha": "442d5ac16c0e6adb55cdb896c69d7a00fa9a34ba",
     "rootCause": "HUMAN_QA_FIXTURE_USED_ARTIFICIAL_ADVISOR_ID_AND_THEREFORE_DID_NOT_ENTER_THE_SAME_NORMAL_PRODUCT_SCOPE_AS_THE_PRIVILEGED_BROWSER_ACTOR",
+    "productSourceChanged": false,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p11p6HarnessFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P6_BROWSER_HARNESS_SCOPE_HTTP_ADJUDICATION_FIX_20261001.json",
+    "blobSha": "c9ae53a58dcccde11aa5b0a97bb888b606369446",
+    "compositionLockBlobSha": "6efd06697b1f619e8456d20a719b61fc6e47a6cb",
+    "findingsLedgerBlobSha": "d502180de9459ad65f2d8bdae8f05941337780c6",
+    "rootCause": "R12_MOBILE_BROWSER_HARNESS_REFERENCED_NODE_LOCAL_DIRECT_UI_START_INSIDE_PAGE_EVALUATE_BROWSER_CONTEXT_AND_CAPTURED_CONSOLE_ERRORS_WITHOUT_FAIL_CLOSED_ADJUDICATION",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "9dc4ccf5ec7f35765bd1f2336f48b07f3b0c3105",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "b9526fe2be4c5a44fc5d8ceacab4a658906df946"
+    },
     "productSourceChanged": false,
     "noOperationalBusinessWrites": true,
     "noReimport": true,

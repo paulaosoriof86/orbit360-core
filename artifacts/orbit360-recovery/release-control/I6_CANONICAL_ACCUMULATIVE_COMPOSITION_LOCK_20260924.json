@@ -403,11 +403,11 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P11P5",
-    "reason": "NORMAL_SCOPE_HUMAN_FIXTURE",
+    "gate": "I6.5-B3-004-R12P11P6",
+    "reason": "BROWSER_HARNESS_SCOPE_AND_HTTP_ADJUDICATION",
     "changedProductFiles": [],
     "changedQaFiles": [
-      "tools/gravicentra-i6-5-b3-004-human-fixture.mjs",
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
     "productSourceChanged": false,
@@ -1333,6 +1333,18 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-human-fixture.mjs": "6114662ecbd2707208828146047d93ef3e919737",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "8c1839850867c9661383314fdba2a2cc32da09de"
+    },
+    "productSourceChanged": false
+  },
+  "b3004R12P11P6BrowserHarnessScopeHttpAdjudicationFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "rootCause": "R12_MOBILE_BROWSER_HARNESS_REFERENCED_NODE_LOCAL_DIRECT_UI_START_INSIDE_PAGE_EVALUATE_BROWSER_CONTEXT_AND_CAPTURED_CONSOLE_ERRORS_WITHOUT_FAIL_CLOSED_ADJUDICATION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P6_BROWSER_HARNESS_SCOPE_HTTP_ADJUDICATION_FIX_20261001.json",
+    "receiptBlobSha": "c9ae53a58dcccde11aa5b0a97bb888b606369446",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "9dc4ccf5ec7f35765bd1f2336f48b07f3b0c3105",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "b9526fe2be4c5a44fc5d8ceacab4a658906df946"
     },
     "productSourceChanged": false
   }

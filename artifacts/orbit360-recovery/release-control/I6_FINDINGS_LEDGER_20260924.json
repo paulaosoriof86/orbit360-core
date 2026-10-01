@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+      "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R12P11P5_EXACT_PREVIEW",
+      "nextAction": "B3_004_R12P11P6_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1904,6 +1904,17 @@
         "compositionLockBlobSha": "7799356657e21acf3117c178e9f5339516cc671e",
         "classification": "QA_FIXTURE_SCOPE_DEFECT",
         "rootCause": "HUMAN_QA_FIXTURE_USED_ARTIFICIAL_ADVISOR_ID_AND_THEREFORE_DID_NOT_ENTER_THE_SAME_NORMAL_PRODUCT_SCOPE_AS_THE_PRIVILEGED_BROWSER_ACTOR",
+        "productSourceChanged": false
+      },
+      "r12p11p6HarnessFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P6_BROWSER_HARNESS_SCOPE_HTTP_ADJUDICATION_FIX_20261001.json",
+        "blobSha": "c9ae53a58dcccde11aa5b0a97bb888b606369446",
+        "classification": "QA_HARNESS_REFERENCE_SCOPE_AND_ERROR_ADJUDICATION_DEFECT",
+        "rootCause": "R12_MOBILE_BROWSER_HARNESS_REFERENCED_NODE_LOCAL_DIRECT_UI_START_INSIDE_PAGE_EVALUATE_BROWSER_CONTEXT_AND_CAPTURED_CONSOLE_ERRORS_WITHOUT_FAIL_CLOSED_ADJUDICATION",
+        "qaBlobs": {
+          "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "9dc4ccf5ec7f35765bd1f2336f48b07f3b0c3105",
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "b9526fe2be4c5a44fc5d8ceacab4a658906df946"
+        },
         "productSourceChanged": false
       }
     },
@@ -5560,6 +5571,11 @@
     "r12ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_SOURCE_CONTRACT_PASS_20260930.json",
     "r12BrowserUiFailPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_BROWSER_UI_PROOF_FAIL_20260930.json",
     "r12BrowserUiFailBlobSha": "08f567fdbc7d14b8d04c8a1c24e29f888d576f79",
-    "r12MachineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_MACHINE_PASS_20260930.json"
+    "r12MachineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_MACHINE_PASS_20260930.json",
+    "r12p11p6HarnessFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P6_BROWSER_HARNESS_SCOPE_HTTP_ADJUDICATION_FIX_20261001.json",
+      "blobSha": "c9ae53a58dcccde11aa5b0a97bb888b606369446"
+    },
+    "candidateEligibleForPromotion": false
   }
 }

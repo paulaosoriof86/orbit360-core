@@ -41,7 +41,7 @@ async function waitCobro(predicate,timeout=12000){
 need(target,'B3_004_R12_PREVIEW_URL_MISSING');
 const who=await actor();
 const token=await auth.createCustomToken(who.uid,{b3004R12UiQa:true});
-const proof={schema:'GRAVICENTRA_B3_004_R12_BROWSER_UI_PROOF_V1',status:'RUNNING',tenantId,previewUrl:target,actor:{uidHash:hash(who.uid),activeRole:who.activeRole},ids,assertions:{},timing:{},errors:[]};
+const proof={schema:'GRAVICENTRA_B3_004_R12_BROWSER_UI_PROOF_V2',status:'RUNNING',tenantId,previewUrl:target,actor:{uidHash:hash(who.uid),activeRole:who.activeRole},ids,assertions:{},timing:{},errors:[],pageErrors:[],consoleErrors:[],httpErrors:[],requestFailures:[]};
 let browser;
 try{
   browser=await chromium.launch({headless:true});
@@ -52,18 +52,21 @@ try{
     const m=String(url||'').match(/(orbit360(?:DocumentDrive(?:Upload|Finalize|Quarantine|Read|Download)Preview|CobrosReconciliationCommandPreview))/i);
     return m?m[1]:'';
   };
-  page.on('pageerror',e=>proof.errors.push('page:'+clean(e?.message||e)));
-  page.on('console',m=>{if(m.type()==='error')proof.errors.push('console:'+clean(m.text()));});
+  page.on('pageerror',e=>{const row={message:clean(e?.message||e)};proof.pageErrors.push(row);proof.errors.push('page:'+row.message);});
+  page.on('console',m=>{if(m.type()==='error'){const loc=typeof m.location==='function'?(m.location()||{}):{};const row={text:clean(m.text()),url:clean(loc.url),lineNumber:Number(loc.lineNumber||0),columnNumber:Number(loc.columnNumber||0)};proof.consoleErrors.push(row);proof.errors.push('console:'+row.text);}});
   page.on('request',req=>{
     const fn=qaFunctionName(req.url());if(!fn||req.method()!=='POST')return;
     proof.transportEvents.push({kind:'request',fn,at:Date.now()});
   });
   page.on('requestfailed',req=>{
+    const row={url:clean(req.url()),method:clean(req.method()),failure:clean(req.failure()?.errorText||'')};proof.requestFailures.push(row);
     const fn=qaFunctionName(req.url());if(!fn)return;
-    proof.transportEvents.push({kind:'requestfailed',fn,at:Date.now(),failure:clean(req.failure()?.errorText||'')});
+    proof.transportEvents.push({kind:'requestfailed',fn,at:Date.now(),failure:row.failure});
   });
   page.on('response',async resp=>{
-    const fn=qaFunctionName(resp.url());if(!fn||resp.request().method()!=='POST')return;
+    const responseUrl=clean(resp.url()),responseMethod=clean(resp.request().method());
+    if(resp.status()>=400)proof.httpErrors.push({url:responseUrl,method:responseMethod,status:resp.status()});
+    const fn=qaFunctionName(responseUrl);if(!fn||responseMethod!=='POST')return;
     let body={};try{body=JSON.parse(await resp.text()||'{}');}catch{}
     const result=body&&body.result||{},error=body&&body.error||{};
     proof.transportEvents.push({
@@ -332,14 +335,14 @@ try{
   await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:15000});
   await page.waitForSelector('[data-rp-document="payment_support"] [data-rp-document-view]',{timeout:15000});
   await page.waitForSelector('[data-rp-document="insurer_invoice"] [data-rp-document-view]',{timeout:15000});
-  const documentUi=await page.evaluate(()=>({
+  const documentUi=await page.evaluate(start=>({
     paymentView:!!document.querySelector('[data-rp-document="payment_support"] [data-rp-document-view]'),
     paymentDownload:!!document.querySelector('[data-rp-document="payment_support"] [data-rp-document-download]'),
     invoiceView:!!document.querySelector('[data-rp-document="insurer_invoice"] [data-rp-document-view]'),
     invoiceDownload:!!document.querySelector('[data-rp-document="insurer_invoice"] [data-rp-document-download]'),
     receiptParam:String(window.Orbit?.route?.params?.r||''),
-    elapsedMs:Date.now()-directUiStart
-  }));
+    elapsedMs:Date.now()-start
+  }),directUiStart);
   need(documentUi.paymentView&&documentUi.paymentDownload&&documentUi.invoiceView&&documentUi.invoiceDownload&&documentUi.receiptParam===ids.receipt,'B3_004_R12P11_DOCUMENT_UI_CONTROLS_MISSING:'+JSON.stringify(documentUi));
   proof.documentUi=documentUi;
   proof.assertions.browserDocumentControlsVisible=true;
@@ -368,6 +371,23 @@ try{
   need(cleanupDocs.provider&&cleanupDocs.payment&&cleanupDocs.invoice,'B3_004_R12_UI_DOCUMENT_CLEANUP_QUARANTINE_FAILED:'+JSON.stringify(cleanupDocs));
   proof.assertions.browserDocumentCleanupQuarantined=true;
   proof.assertions.noRealBusinessWrite=true;
+  const criticalNetwork=x=>{
+    try{
+      const u=new URL(clean(x.url));
+      const h=u.hostname.toLowerCase();
+      return u.origin===new URL(target).origin||h.endsWith('.googleapis.com')||h.endsWith('.cloudfunctions.net')||h.endsWith('.firebaseio.com')||h.endsWith('.firebasedatabase.app');
+    }catch{return true;}
+  };
+  const criticalHttpErrors=proof.httpErrors.filter(criticalNetwork);
+  const criticalRequestFailures=proof.requestFailures.filter(criticalNetwork);
+  const relevantConsoleErrors=proof.consoleErrors.filter(x=>!/^failed to load resource/i.test(clean(x.text)));
+  proof.errorAdjudication={criticalHttpErrors,criticalRequestFailures,pageErrors:proof.pageErrors,relevantConsoleErrors,rawConsoleErrors:proof.consoleErrors};
+  console.log('B3_004_R12_ERROR_ADJUDICATION='+JSON.stringify(proof.errorAdjudication));
+  need(proof.pageErrors.length===0,'B3_004_R12P11P6_PAGE_ERRORS:'+JSON.stringify(proof.pageErrors));
+  need(criticalHttpErrors.length===0,'B3_004_R12P11P6_CRITICAL_HTTP_ERRORS:'+JSON.stringify(criticalHttpErrors));
+  need(criticalRequestFailures.length===0,'B3_004_R12P11P6_CRITICAL_REQUEST_FAILURES:'+JSON.stringify(criticalRequestFailures));
+  need(relevantConsoleErrors.length===0,'B3_004_R12P11P6_RELEVANT_CONSOLE_ERRORS:'+JSON.stringify(relevantConsoleErrors));
+  proof.assertions.noFunctionalPageConsoleHttpErrors=true;
   proof.status='PASS';
   await context.close();
 }catch(error){

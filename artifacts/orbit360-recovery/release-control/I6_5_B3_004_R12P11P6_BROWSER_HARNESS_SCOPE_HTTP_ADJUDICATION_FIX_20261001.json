@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11P6_BROWSER_HARNESS_SCOPE_HTTP_ADJUDICATION_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "990cfee02e585a20e9096f593e6af69cfb930aff",
+  "failedRunId": 36885448948,
+  "failedRunAttempt": 2,
+  "failedJobId": 110460569687,
+  "classification": "QA_HARNESS_REFERENCE_SCOPE_AND_ERROR_ADJUDICATION_DEFECT",
+  "rootCause": "R12_MOBILE_BROWSER_HARNESS_REFERENCED_NODE_LOCAL_DIRECT_UI_START_INSIDE_PAGE_EVALUATE_BROWSER_CONTEXT_AND_CAPTURED_CONSOLE_ERRORS_WITHOUT_FAIL_CLOSED_ADJUDICATION",
+  "observedBeforeFailure": {
+    "client360ToCobrosUsableMs": 78,
+    "paymentCallableHttp200": true,
+    "documentUploadHttp200": true,
+    "reconcileSamePaymentObserved": true,
+    "documentReadbackPersistent": true,
+    "browserFailure": "ReferenceError: directUiStart is not defined"
+  },
+  "remediation": {
+    "directUiStartPassedExplicitlyIntoBrowserContext": true,
+    "pageErrorsCaptured": true,
+    "consoleErrorsCapturedWithLocation": true,
+    "httpErrorsCapturedWithUrlStatusMethod": true,
+    "requestFailuresCaptured": true,
+    "criticalFirebaseAndSameOriginErrorsFailClosed": true,
+    "genericResourceConsoleDuplicatesAdjudicatedByHttpLayer": true,
+    "productSourceChanged": false,
+    "productPermissionBypassAdded": false
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "9dc4ccf5ec7f35765bd1f2336f48b07f3b0c3105",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "b9526fe2be4c5a44fc5d8ceacab4a658906df946"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}
