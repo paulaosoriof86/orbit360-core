@@ -1,0 +1,159 @@
+name: CotComp S4.52 W3 proposal contract remediation source-only
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s452-w3-contract-remediation-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s452-w3-remediation-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s452-w3-remediation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.52 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s452-w3-remediation-sourceonly.json
+          jq -e '
+            .authorization == "S452_W3_SOURCE_ONLY_CONTRACT_REMEDIATION" and
+            .projectId == "ays-orbit-360-lab" and
+            .stage == "W3" and
+            .appDataReads == false and
+            .appDataWrites == false and
+            .providerOrRaterCalls == false and
+            .realData == false and
+            .production == false and
+            .physicalW3 == false
+          ' "$INTENT" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$INTENT")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$INTENT"
+
+      - name: Run accumulated CotComp QA and S4.52 tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-proposal-versioning-contract-s452.js
+          node --check cotcomp-proposal-versioning-contract-s452.test.js
+          node --check cotcomp-w3-remediation-verifier-s452.js
+          node --check cotcomp-w3-remediation-verifier-s452.test.js
+          node --test cotcomp-proposal-versioning-contract-s452.test.js cotcomp-w3-remediation-verifier-s452.test.js
+
+      - name: Build S4.52 source-only receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s452/evidence"
+          node <<'NODE'
+          const fs=require('fs');
+          const verifier=require('./functions/cotcomp-w3-remediation-verifier-s452');
+          const versioning=require('./functions/cotcomp-proposal-versioning-contract-s452');
+          const result=verifier.evaluate();
+          const life=versioning.buildSyntheticW3Lifecycle();
+          const receipt={
+            schemaVersion:'ays-cotcomp-s452-w3-remediation-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',
+            stage:'W3',
+            sourceRemediationPass:result.sourceRemediationPass,
+            technicalW3Ready:result.technicalW3Ready,
+            physicalW3Ready:result.physicalW3Ready,
+            physicalW3Allowed:result.physicalW3Allowed,
+            remainingBlockers:result.remainingBlockers,
+            findings:result.findings,
+            lifecycle:life.ok?{
+              proposalSeriesId:life.v1.proposal.proposalSeriesId,
+              v1ProposalId:life.v1.proposal.proposalId,
+              v2ProposalId:life.v2.proposal.proposalId,
+              v1RequestId:life.v1.requestId,
+              v2RequestId:life.v2.requestId,
+              v1AfterValidationState:life.v1After.validationState,
+              v1AfterIsCurrentVersion:life.v1After.isCurrentVersion,
+              v2IsCurrentVersion:life.v2.proposal.isCurrentVersion,
+              currentValidityV2:life.validity.v2,
+              expectedCreatedDocuments:life.journal.expectedCreatedDocuments,
+              expectedV2AtomicWrites:life.journal.expectedVersion2AtomicWrites,
+              cleanupDeleteCount:life.journal.cleanupDeletePaths.length,
+              finalAbsenceRequired:life.journal.finalAbsenceRequired,
+              proofSequence:life.proofSequence
+            }:null,
+            boundaries:{
+              appDataReadsExecuted:0,
+              appDataWritesExecuted:0,
+              providerOrRaterCallsExecuted:0,
+              realDataTouched:false,
+              productionTouched:false,
+              physicalW3Executed:false
+            }
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s452/evidence/S452_W3_CONTRACT_REMEDIATION_RECEIPT.json',JSON.stringify(receipt,null,2));
+          console.log('S452_SOURCE_REMEDIATION_PASS='+receipt.sourceRemediationPass);
+          console.log('S452_TECHNICAL_W3_READY='+receipt.technicalW3Ready);
+          console.log('S452_PHYSICAL_W3_READY='+receipt.physicalW3Ready);
+          console.log('S452_REMAINING_BLOCKERS='+receipt.remainingBlockers.join(','));
+          NODE
+
+      - name: Enforce S4.52 closure truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          R="$RUNNER_TEMP/s452/evidence/S452_W3_CONTRACT_REMEDIATION_RECEIPT.json"
+          jq -e '
+            .sourceRemediationPass == true and
+            .technicalW3Ready == true and
+            .physicalW3Ready == false and
+            .physicalW3Allowed == false and
+            .remainingBlockers == ["OWNER_W3_AUTHORIZATION_REQUIRED"] and
+            .findings.canonicalCaseField == "caseId" and
+            .findings.publicAlias == "quoteCaseId" and
+            .findings.aliasConflictDenied == true and
+            .findings.sequentialSupersession == true and
+            .findings.currentValidityFromPersistedInterval == true and
+            .findings.idempotencyContract == true and
+            .findings.rollbackJournalCreatedDocuments == 4 and
+            .findings.rollbackCleanupPaths == 4 and
+            .lifecycle.v1AfterValidationState == "SUPERSEDED" and
+            .lifecycle.v1AfterIsCurrentVersion == false and
+            .lifecycle.v2IsCurrentVersion == true and
+            .lifecycle.currentValidityV2.current == true and
+            .lifecycle.expectedCreatedDocuments == 4 and
+            .lifecycle.expectedV2AtomicWrites == 3 and
+            .lifecycle.cleanupDeleteCount == 4 and
+            .lifecycle.finalAbsenceRequired == true and
+            .boundaries.appDataReadsExecuted == 0 and
+            .boundaries.appDataWritesExecuted == 0 and
+            .boundaries.providerOrRaterCallsExecuted == 0 and
+            .boundaries.realDataTouched == false and
+            .boundaries.productionTouched == false and
+            .boundaries.physicalW3Executed == false
+          ' "$R" >/dev/null
+
+      - name: Upload S4.52 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s452-w3-remediation-${{ github.run_id }}
+          path: ${{ runner.temp }}/s452/evidence/S452_W3_CONTRACT_REMEDIATION_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
