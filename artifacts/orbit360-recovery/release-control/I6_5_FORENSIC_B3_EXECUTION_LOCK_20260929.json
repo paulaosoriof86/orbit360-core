@@ -613,6 +613,12 @@
       "blobSha": "8fa609452e34e3a4b32ecc89edab5f3cbc1725a5",
       "purpose": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
       "productSourceChanged": false
+    },
+    "r12p6SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P6_EXACT_QA_ACTION_CONTEXT_FIX_20261001.json",
+      "blobSha": "4183e495a2ea63a7747fdd8ba709c8c3cc397a31",
+      "rootCause": "R12P2_RENDER_BYPASSED_SCOPE_FOR_EXACT_QA_ROW_BUT_PAYMENT_CONTEXT_REENTERED_SCOPED_STORE_ON_CLICK_SO_HANDLER_COULD_NOT_RESOLVE_SYNTHETIC_RECEIPT",
+      "productSourceChanged": true
     }
   },
   "canonicalComposition": {
@@ -622,7 +628,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "24654006544b3731be289c4bedb8e06aea9d9688"
+    "blobSha": "4342fd4ed1bd37855e143d47d2f3e5f39c6b786a"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -823,7 +829,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "d15907053be6463b2985ca701775dbe041395ae6"
+    "blobSha": "40688eed171808b54232b1c135e3cb6bde7ec6af"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -882,6 +888,19 @@
     "findingsLedgerBlobSha": "24654006544b3731be289c4bedb8e06aea9d9688",
     "purpose": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
     "productSourceChanged": false,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p6SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P6_EXACT_QA_ACTION_CONTEXT_FIX_20261001.json",
+    "blobSha": "4183e495a2ea63a7747fdd8ba709c8c3cc397a31",
+    "compositionLockBlobSha": "40688eed171808b54232b1c135e3cb6bde7ec6af",
+    "findingsLedgerBlobSha": "4342fd4ed1bd37855e143d47d2f3e5f39c6b786a",
+    "rootCause": "R12P2_RENDER_BYPASSED_SCOPE_FOR_EXACT_QA_ROW_BUT_PAYMENT_CONTEXT_REENTERED_SCOPED_STORE_ON_CLICK_SO_HANDLER_COULD_NOT_RESOLVE_SYNTHETIC_RECEIPT",
+    "productSourceChanged": true,
     "noOperationalBusinessWrites": true,
     "noReimport": true,
     "noLive": true,

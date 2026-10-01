@@ -1672,6 +1672,14 @@
         "classification": "QA_DIAGNOSTIC_ONLY",
         "purpose": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
         "productSourceChanged": false
+      },
+      "r12p6SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P6_EXACT_QA_ACTION_CONTEXT_FIX_20261001.json",
+        "blobSha": "4183e495a2ea63a7747fdd8ba709c8c3cc397a31",
+        "compositionLockBlobSha": "40688eed171808b54232b1c135e3cb6bde7ec6af",
+        "classification": "PRODUCT_UI_QA_ISOLATION_COMPOSITION_DEFECT",
+        "rootCause": "R12P2_RENDER_BYPASSED_SCOPE_FOR_EXACT_QA_ROW_BUT_PAYMENT_CONTEXT_REENTERED_SCOPED_STORE_ON_CLICK_SO_HANDLER_COULD_NOT_RESOLVE_SYNTHETIC_RECEIPT",
+        "productSourceChanged": true
       }
     },
     {

@@ -90,7 +90,7 @@ need(nativeReceiptR4.includes("if(paid){if(advisorRole())return{kind:'applied',l
 need(cobros.includes('data-cobros-action="apply"'),'B3_004_GLOBAL_APPLY_ACTION_MARKER_MISSING');
 need(cobros.includes('data-cobros-action="reconcile"'),'B3_004_GLOBAL_RECONCILE_ACTION_MARKER_MISSING');
 need(!cobros.includes('Confirmar cobro'),'B3_004_GLOBAL_CONFIRMAR_COBRO_REMAINS');
-need(indexR4.includes('modules/cobros.js?v=20260930-b3004r12p2'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cobros.js?v=20261001-b3004r12p6'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r11'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20260930-b3004r11'),'B3_004_PAYMENT_CLIENT_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r9p1'),'B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
@@ -147,7 +147,7 @@ need(cliente.includes('linkedReceiptIds'),'B3_004_R7_CLIENT_PAYMENT_DEDUPE_MISSI
 need(cliente.includes('data-paid-receipt-evidence'),'B3_004_R7_CLIENT_PAID_RECEIPT_FALLBACK_MISSING');
 need(cliente.includes('Todas las pólizas</option>'),'B3_004_R7_CLIENT_ALL_POLICIES_FILTER_MISSING');
 need(!cliente.includes('activePolicyIds'),'B3_004_R7_CLIENT_ACTIVE_POLICY_PAYMENT_GATE_REMAINS');
-need(indexR4.includes('modules/cobros.js?v=20260930-b3004r12p2'),'B3_004_R8_COBROS_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cobros.js?v=20261001-b3004r12p6'),'B3_004_R8_COBROS_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r11'),'B3_004_R7_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_R7_COBROS_VISIBILITY_FILTER_CONTRACT=PASS');
 
@@ -240,11 +240,15 @@ need(uiProofR12.includes("localStorage.setItem('orbit360_legal_aceptaciones'")&&
 need(uiProofR12.includes('B3_004_R12_APPLY_TRANSPORT=')&&uiProofR12.includes('B3_004_R12_APPLY_CALLABLE_HTTP_ERROR')&&uiProofR12.includes('B3_004_R12_APPLY_CALLABLE_ERROR')&&uiProofR12.includes('B3_004_R12_APPLY_CALLABLE_NO_OK_RESULT')&&uiProofR12.includes('B3_004_R12_APPLY_CALLABLE_NOT_OBSERVED'),'B3_004_R12P5_UI_CALLABLE_TRANSPORT_DIAGNOSTIC_MISSING');
 need(uiProofR12.includes('domainStatus')&&uiProofR12.includes('sessionRole')&&uiProofR12.includes('productUser'),'B3_004_R12P5_UI_ROLE_CONTEXT_DIAGNOSTIC_MISSING');
 console.log('B3_004_R12P5_UI_CALLABLE_DIAGNOSTIC_CONTRACT=PASS');
+need(cobros.includes('function qaActionStore(receiptId)')&&cobros.includes('qaReceiptId()!==exact')&&cobros.includes("receipt.__syntheticHumanQa!==true")&&cobros.includes("String(receipt.__syntheticGate||'')!=='B3-004-R12'"),'B3_004_R12P6_EXACT_QA_ACTION_STORE_GUARD_MISSING');
+need(cobros.includes("const store = rawId ? qaActionStore(rawId) : S()")&&cobros.includes("store.get('recibosEsperados', rawId)")&&cobros.includes("store.all('carteraPrimas')"),'B3_004_R12P6_PAYMENT_CONTEXT_STILL_SCOPED_FOR_EXACT_QA');
+need(indexR4.includes('modules/cobros.js?v=20261001-b3004r12p6'),'B3_004_R12P6_COBROS_ASSET_NOT_BUMPED');
+console.log('B3_004_R12P6_EXACT_QA_ACTION_CONTEXT_CONTRACT=PASS');
 console.log('B3_004_R12P4_EFFECTIVE_LEGAL_PRECONDITION_CONTRACT=PASS');
 need(uiProofR12.includes('__b3004r12NormalNavStart')&&uiProofR12.includes('qaCobrosUsableMs'),'B3_004_R12P3_NORMAL_AND_QA_PERFORMANCE_SPLIT_MISSING');
 console.log('B3_004_R12P3_BROWSER_HARNESS_PRECONDITION_CONTRACT=PASS');
 need(indexR4.includes('core/router.js?v=20260930-b3004r12'),'B3_004_R12_ROUTER_ASSET_NOT_BUMPED');
-need(indexR4.includes('modules/cobros.js?v=20260930-b3004r12p2'),'B3_004_R12_COBROS_ASSET_NOT_BUMPED');
+need(indexR4.includes('modules/cobros.js?v=20261001-b3004r12p6'),'B3_004_R12_COBROS_ASSET_NOT_BUMPED');
 console.log('B3_004_R12_HUMAN_PATH_AND_PERFORMANCE_CONTRACT=PASS');
 const closureBridgeR12p1=read('orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js');
 need(cobros.includes("const source = qaReceipt")&&cobros.includes("String(r.reciboId || r.receiptId || '') === qaReceipt"),'B3_004_R12P1_QA_PORTFOLIO_BYPASS_MISSING');
@@ -254,7 +258,7 @@ console.log('B3_004_R12P1_BROWSER_PATH_CAUSAL_FIX_CONTRACT=PASS');
 need(cobros.includes('function qaReceiptSurfaceRow')&&cobros.includes("receipt.__syntheticHumanQa!==true")&&cobros.includes("String(receipt.__syntheticGate||'')!=='B3-004-R12'"),'B3_004_R12P2_EXACT_SYNTHETIC_SURFACE_GUARD_MISSING');
 need(cobros.includes("const qaSurfaceRow = qaReceipt ? qaReceiptSurfaceRow(qaReceipt) : null")&&cobros.includes("qaReceipt ? [] : rows(idx)")&&cobros.includes("qaReceipt ? [] : portfolioPaymentRows(idx)"),'B3_004_R12P2_QA_SURFACE_STILL_USES_SCOPED_PROJECTION');
 need(cobros.includes('data-preview-readonly-row')&&cobros.includes('previewReadonlyRow(c)'),'B3_004_R12P2_REAL_PREVIEW_ROW_ACTION_GUARD_MISSING');
-need(indexR4.includes('modules/cobros.js?v=20260930-b3004r12p2'),'B3_004_R12P2_COBROS_ASSET_NOT_BUMPED');
+need(indexR4.includes('modules/cobros.js?v=20261001-b3004r12p6'),'B3_004_R12P2_COBROS_ASSET_NOT_BUMPED');
 console.log('B3_004_R12P2_SCOPED_STORE_QA_SURFACE_CONTRACT=PASS');
 
 const cliente360R9P1=read('orbit360-platform/modules/cliente360.js');

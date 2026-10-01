@@ -1,0 +1,45 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P6_EXACT_QA_ACTION_CONTEXT_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "1e0a6c1e0406bef9c84897f4bef64990b2867e4d",
+  "failedRunId": 36844048515,
+  "failedJobId": 110310006736,
+  "classification": "PRODUCT_UI_QA_ISOLATION_COMPOSITION_DEFECT",
+  "rootCause": "R12P2_RENDER_BYPASSED_SCOPE_FOR_EXACT_QA_ROW_BUT_PAYMENT_CONTEXT_REENTERED_SCOPED_STORE_ON_CLICK_SO_HANDLER_COULD_NOT_RESOLVE_SYNTHETIC_RECEIPT",
+  "evidence": {
+    "exactQaRowRendered": true,
+    "applyButtonVisible": true,
+    "clickExecuted": true,
+    "paymentModalOpened": false,
+    "failedSelector": "#cob-pay",
+    "normalCliente360ToCobrosUsableMs": 191,
+    "backendPreviewDirectProofPass": true,
+    "fixtureCleanupPass": true
+  },
+  "remediation": {
+    "exactPreviewSyntheticOnly": true,
+    "qaPrefix": "b3004human_",
+    "exactFixtureGate": "B3-004-R12",
+    "paymentContextUsesExactUnscopedStoreOnlyForQaReceipt": true,
+    "normalPaymentContextRemainsScoped": true,
+    "realPreviewRowsRemainReadOnly": true,
+    "backendPreviewGuardUnchanged": true
+  },
+  "changedProductFiles": [
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/index.html"
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/cobros.js": "a8f733297209c5324981444ec99c5f8353580075",
+    "orbit360-platform/index.html": "7c1919cd4a0e5b2e24b42df0e44ec189bc87dca3"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "00e290d2b3485c3926aac1f37ec82973c6e1fe09"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

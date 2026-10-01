@@ -55,6 +55,15 @@ Orbit.modules.cobros = (function () {
     return Object.assign({},common,{id:'portfolio:'+exact,__portfolioReceipt:true,estado:String(receipt.estado||'Pendiente'),estadoOperativo:String(receipt.estadoOperativo||'pendiente'),requiereValidacion:false});
   }
   function previewReadonlyRow(c){return isPreviewHost()&&!previewSyntheticReceiptId(receiptIdOf(c));}
+  function qaActionStore(receiptId){
+    const exact=String(receiptId||'').trim();
+    if(!isPreviewHost()||qaReceiptId()!==exact||!/^b3004human_/i.test(exact))return S();
+    const raw=qaUnscopedStore();
+    if(!raw||typeof raw.get!=='function')return S();
+    const receipt=raw.get('recibosEsperados',exact);
+    if(!receipt||String(receipt.id||'')!==exact||receipt.__syntheticHumanQa!==true||String(receipt.__syntheticGate||'')!=='B3-004-R12')return S();
+    return raw;
+  }
   function previewReadonlyBadge(c){return '<span class="badge neutral" data-preview-readonly-row="'+U.esc(receiptIdOf(c))+'">Solo lectura</span>';}
   const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas'];
 
@@ -449,13 +458,14 @@ Orbit.modules.cobros = (function () {
   function resolveReceiptId(cobroOrId) { const r=resolveReceipt(cobroOrId); return r && r.id || ''; }
   function paymentContext(cobroOrReceiptId) {
     const rawId = typeof cobroOrReceiptId === 'string' ? cobroOrReceiptId : '';
-    let receipt = rawId ? S().get('recibosEsperados', rawId) : null;
-    let cobro = typeof cobroOrReceiptId === 'object' && cobroOrReceiptId ? cobroOrReceiptId : (rawId ? S().get('cobros', rawId) : null);
-    if (!cobro && receipt) cobro = (S().all('cobros') || []).find(x => String(x && (x.reciboId || x.receiptId) || '') === String(receipt.id)) || null;
-    if (!receipt) receipt = resolveReceipt(cobro || cobroOrReceiptId);
+    const store = rawId ? qaActionStore(rawId) : S();
+    let receipt = rawId ? store.get('recibosEsperados', rawId) : null;
+    let cobro = typeof cobroOrReceiptId === 'object' && cobroOrReceiptId ? cobroOrReceiptId : (rawId ? store.get('cobros', rawId) : null);
+    if (!cobro && receipt) cobro = (store.all('cobros') || []).find(x => String(x && (x.reciboId || x.receiptId) || '') === String(receipt.id)) || null;
+    if (!receipt) receipt = store===S()?resolveReceipt(cobro || cobroOrReceiptId):null;
     if (!receipt) return null;
-    const portfolio = (S().all('carteraPrimas') || []).find(x => String(x && (x.reciboId || x.receiptId) || '') === String(receipt.id)) || {};
-    const p = S().get('polizas', receipt.polizaId || portfolio.polizaId || (cobro && cobro.polizaId)) || {};
+    const portfolio = (store.all('carteraPrimas') || []).find(x => String(x && (x.reciboId || x.receiptId) || '') === String(receipt.id)) || {};
+    const p = store.get('polizas', receipt.polizaId || portfolio.polizaId || (cobro && cobro.polizaId)) || {};
     if (!cobro) cobro = {
       id: 'receipt:' + receipt.id,
       reciboId: receipt.id,

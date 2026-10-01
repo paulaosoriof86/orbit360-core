@@ -172,13 +172,13 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "30753007242c482d9a3e6c2c6c438e07bdec0778",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "cb7144b863b0aca88dbb5872672935b4cedc0bf0",
+    "orbit360-platform/index.html": "7c1919cd4a0e5b2e24b42df0e44ec189bc87dca3",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "b6d242922133ee37e8ee4f850947fabdb693ac93",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495",
-    "orbit360-platform/modules/cobros.js": "496155fa725a38e9e59378549fe17f76bc827723",
+    "orbit360-platform/modules/cobros.js": "a8f733297209c5324981444ec99c5f8353580075",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "716a345304d03f975ae1459a03a9e8c8df5801d4",
@@ -403,14 +403,16 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P5",
-    "reason": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
-    "changedProductFiles": [],
+    "gate": "I6.5-B3-004-R12P6",
+    "reason": "EXACT_QA_ACTION_CONTEXT_REENTERED_SCOPED_STORE",
+    "changedProductFiles": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/index.html"
+    ],
     "changedQaFiles": [
-      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
-    "productSourceChanged": false,
+    "productSourceChanged": true,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -922,6 +924,29 @@
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "af53cce002a762f00353d98d1d7254e1908031e8"
     },
     "productSourceChanged": false,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  },
+  "b3004R12P6ExactQaActionContextFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36844048515,
+    "failedJobId": 110310006736,
+    "rootCause": "R12P2_RENDER_BYPASSED_SCOPE_FOR_EXACT_QA_ROW_BUT_PAYMENT_CONTEXT_REENTERED_SCOPED_STORE_ON_CLICK_SO_HANDLER_COULD_NOT_RESOLVE_SYNTHETIC_RECEIPT",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P6_EXACT_QA_ACTION_CONTEXT_FIX_20261001.json",
+    "receiptBlobSha": "4183e495a2ea63a7747fdd8ba709c8c3cc397a31",
+    "productBlobs": {
+      "orbit360-platform/modules/cobros.js": "a8f733297209c5324981444ec99c5f8353580075",
+      "orbit360-platform/index.html": "7c1919cd4a0e5b2e24b42df0e44ec189bc87dca3"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "00e290d2b3485c3926aac1f37ec82973c6e1fe09"
+    },
+    "exactPreviewSyntheticOnly": true,
+    "realPreviewRowsReadOnly": true,
+    "backendGuardUnchanged": true,
     "operationalBusinessWrites": false,
     "reimport": false,
     "live": false,
