@@ -149,6 +149,8 @@ function buildQuoteCase(input = {}) {
       notificationStatusByChannel: input.notificationStatusByChannel && typeof input.notificationStatusByChannel === 'object'
         ? input.notificationStatusByChannel : {},
       selectedProposalId: clean(input.selectedProposalId,180),
+      selectedComparisonSetId: clean(input.selectedComparisonSetId,180),
+      selectionId: clean(input.selectionId,180),
       createdAt: input.createdAt || null,
       updatedAt: input.updatedAt || null
     }
