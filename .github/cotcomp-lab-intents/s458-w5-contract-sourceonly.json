@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "ays-cotcomp-s458-w5-contract-sourceonly-intent-v1.0",
+  "authorization": "S458_W5_SOURCE_ONLY_PILOT_CONTRACT",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "87e2686ccfcdd3963188399d95e6ddfc422a5c4a",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W5",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "production": false,
+  "physicalW5": false,
+  "scope": [
+    "single-case/single-subject pilot descriptor",
+    "single-execution guard",
+    "data minimization",
+    "health-sensitive-data boundary",
+    "sanitized observability",
+    "rollback containment",
+    "success/abort criteria",
+    "explicit success persistence disposition",
+    "provider/rater/production/issuance/binding/payment hard locks"
+  ]
+}
