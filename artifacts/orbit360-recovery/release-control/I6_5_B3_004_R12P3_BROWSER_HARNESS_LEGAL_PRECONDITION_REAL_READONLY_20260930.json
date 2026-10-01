@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P3_BROWSER_HARNESS_PRECONDITION_V1",
+  "recordedAt": "2026-09-30",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "21196857121ccbbdaa6e37a6f1f8da40b784a996",
+  "failedRunId": 36815156364,
+  "failedJobId": 110218644660,
+  "classification": "QA_HARNESS_PRECONDITION",
+  "rootCause": "FRESH_PLAYWRIGHT_SESSION_TRIGGERED_VALID_USER_LEGAL_GATE_AND_OVERLAY_INTERCEPTED_POINTER_BEFORE_COBROS_CLICK",
+  "discriminatingEvidence": {
+    "applyButtonRendered": true,
+    "applyButtonVisible": true,
+    "applyButtonEnabled": true,
+    "applyButtonStable": true,
+    "interceptedBy": "drawer-back open / data-legal-gate=user:<real-member>",
+    "qaCobrosUsableMs": 349,
+    "fixtureCleanupPass": true,
+    "productActionRendererFailure": false
+  },
+  "remediation": {
+    "simulateReturningBrowserWithPriorLocalLegalAcceptance": true,
+    "acceptLegalOnBehalfOfActor": false,
+    "serverLegalWrite": false,
+    "userProfileWrite": false,
+    "productLegalGateChanged": false,
+    "normalPreviewCobrosRealRowsAudited": true,
+    "realPreviewWriteActionsMustBeZero": true,
+    "normalCliente360ToCobrosThresholdMs": 3000,
+    "qaCobrosThresholdMs": 3000
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "01a2d1fd850623c67b448598b2580cfce4469178",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "680f988196ce391860b9de373a53f4dbdcd542d4"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

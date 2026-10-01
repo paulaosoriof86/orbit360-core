@@ -403,12 +403,14 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-09-30",
-    "gate": "I6.5-B3-004-R12P2",
-    "reason": "R12P1_EXACT_QA_BYPASS_STILL_RAN_INSIDE_ROUTER_SCOPED_STORE",
-    "changedProductFiles": [
-      "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/index.html"
+    "gate": "I6.5-B3-004-R12P3",
+    "reason": "BROWSER_UI_PROOF_BLOCKED_BY_VALID_LEGAL_GATE_IN_FRESH_AUTOMATION_CONTEXT",
+    "changedProductFiles": [],
+    "changedQaFiles": [
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
+    "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -862,6 +864,26 @@
     "exactPreviewSyntheticOnly": true,
     "realPreviewRowsReadOnly": true,
     "backendGuardUnchanged": true,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  },
+  "b3004R12P3BrowserHarnessPreconditionFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36815156364,
+    "failedJobId": 110218644660,
+    "rootCause": "FRESH_PLAYWRIGHT_SESSION_TRIGGERED_VALID_USER_LEGAL_GATE_AND_OVERLAY_INTERCEPTED_POINTER_BEFORE_COBROS_CLICK",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P3_BROWSER_HARNESS_LEGAL_PRECONDITION_REAL_READONLY_20260930.json",
+    "receiptBlobSha": "da95acef41ecf08bfb88bf9022efcbeca9d3c215",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "01a2d1fd850623c67b448598b2580cfce4469178",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "680f988196ce391860b9de373a53f4dbdcd542d4"
+    },
+    "legalAcceptanceWrite": false,
+    "normalRealPreviewReadonlyBrowserProofRequired": true,
+    "productSourceChanged": false,
     "operationalBusinessWrites": false,
     "reimport": false,
     "live": false,

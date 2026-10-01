@@ -49,6 +49,8 @@ try{
   const page=await context.newPage();page.setDefaultTimeout(15000);
   page.on('pageerror',e=>proof.errors.push('page:'+clean(e?.message||e)));
   page.on('console',m=>{if(m.type()==='error')proof.errors.push('console:'+clean(m.text()));});
+  await page.addInitScript(()=>{try{localStorage.setItem('orbit360_confidencialidad','qa-existing-legal-acceptance');}catch{}});
+  proof.assertions.legalGatePreconditionSimulated=true;
   await page.goto(target+'/#/cliente360?c='+encodeURIComponent(ids.client)+'&t=recibos',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0&&!!window.Orbit?.modules?.cobros);
   const activated=await page.evaluate(async token=>{
@@ -59,12 +61,33 @@ try{
   need(activated?.started===true,'B3_004_R12_PRODUCT_APP_NOT_STARTED');
   await page.waitForFunction(id=>!!window.Orbit?.store?.get?.('recibosEsperados',id),ids.receipt);
 
+  const normalStart=await page.evaluate(()=>{const t=performance.now();window.__b3004r12NormalNavStart=t;location.hash='#/cobros';return t;});
+  await page.waitForSelector('table.tbl tbody tr[data-row-policy-id]');
+  const normalMs=await page.evaluate(()=>performance.now()-window.__b3004r12NormalNavStart);
+  proof.timing.client360ToCobrosUsableMs=Math.round(normalMs);
+  need(normalMs<=3000,'B3_004_R12_COBROS_NAVIGATION_OVER_3000MS:'+Math.round(normalMs));
+  const normalSurface=await page.evaluate(()=>({
+    rowCount:document.querySelectorAll('table.tbl tbody tr[data-row-policy-id]').length,
+    readonlyCount:document.querySelectorAll('[data-preview-readonly-row]').length,
+    writeActions:[...document.querySelectorAll('button[data-cobros-action]')].map(button=>{
+      const row=button.closest('tr');
+      const receiptId=String(row?.getAttribute('data-portfolio-receipt')||row?.getAttribute('data-siga-direct-payment')||row?.getAttribute('data-paid-receipt-evidence')||row?.getAttribute('data-advisor-reported-payment')||row?.getAttribute('data-reported-payment-evidence')||'');
+      return{action:button.getAttribute('data-cobros-action')||'',receiptId};
+    }).filter(x=>!/^b3004(?:qa|human)_/i.test(x.receiptId))
+  }));
+  need(normalSurface.rowCount>0,'B3_004_R12_REAL_PREVIEW_ROWS_NOT_RENDERED');
+  need(normalSurface.readonlyCount>0,'B3_004_R12_REAL_PREVIEW_READONLY_MARKER_MISSING');
+  need(normalSurface.writeActions.length===0,'B3_004_R12_REAL_PREVIEW_WRITE_ACTIONS_PRESENT:'+JSON.stringify(normalSurface.writeActions.slice(0,5)));
+  proof.normalSurface=normalSurface;
+  proof.assertions.realPreviewRowsReadOnly=true;
+  await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id)+'&t=recibos';},ids.client);
+  await page.waitForFunction(id=>String(window.Orbit?.route?.params?.c||'')===String(id),ids.client);
   const navStart=await page.evaluate(route=>{const t=performance.now();window.__b3004r12NavStart=t;location.hash=route;return t;},'#/cobros?qaReceipt='+encodeURIComponent(ids.receipt));
   await page.waitForSelector('[data-b3004-human-qa-mode="1"]');
   await page.waitForSelector('button[data-cobros-action="apply"]');
   const navMs=await page.evaluate(()=>performance.now()-window.__b3004r12NavStart);
-  proof.timing.client360ToCobrosUsableMs=Math.round(navMs);
-  need(navMs<=3000,'B3_004_R12_COBROS_NAVIGATION_OVER_3000MS:'+Math.round(navMs));
+  proof.timing.qaCobrosUsableMs=Math.round(navMs);
+  need(navMs<=3000,'B3_004_R12_QA_COBROS_NAVIGATION_OVER_3000MS:'+Math.round(navMs));
   const rows=await page.locator('table.tbl tbody tr').count();
   need(rows===1,'B3_004_R12_QA_ROUTE_NOT_ISOLATED:'+rows);
   proof.assertions.qaRouteIsolated=true;

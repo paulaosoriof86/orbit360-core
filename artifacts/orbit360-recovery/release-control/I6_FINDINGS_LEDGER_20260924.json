@@ -1643,6 +1643,17 @@
         "rootCause": "R12P1_EXACT_QA_BYPASS_RAN_INSIDE_ROUTER_SCOPED_STORE_SO_SYNTHETIC_RECEIPT_WAS_FILTERED_BEFORE_EXACT_SURFACE_SELECTION",
         "exactSyntheticSurfaceBypassesScopedProjectionOnlyForQa": true,
         "realPreviewRowsReadOnly": true
+      },
+      "r12p3HarnessFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P3_BROWSER_HARNESS_LEGAL_PRECONDITION_REAL_READONLY_20260930.json",
+        "blobSha": "da95acef41ecf08bfb88bf9022efcbeca9d3c215",
+        "compositionLockBlobSha": "afe74cc38eaa9ea4d22bdb1a4e366b6375006f6d",
+        "classification": "QA_HARNESS_PRECONDITION",
+        "rootCause": "FRESH_PLAYWRIGHT_SESSION_TRIGGERED_VALID_USER_LEGAL_GATE_AND_OVERLAY_INTERCEPTED_POINTER_BEFORE_COBROS_CLICK",
+        "applyButtonRenderedBeforeFailure": true,
+        "qaCobrosUsableMs": 349,
+        "realPreviewReadonlyBrowserProofRequired": true,
+        "productSourceChanged": false
       }
     },
     {

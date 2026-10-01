@@ -595,6 +595,12 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P2_SCOPED_STORE_QA_SURFACE_CAUSAL_FIX_20260930.json",
       "blobSha": "6a54830967bcbbbd4ab8f8dd0f8d6018c0ceaec2",
       "rootCause": "R12P1_EXACT_QA_BYPASS_RAN_INSIDE_ROUTER_SCOPED_STORE_SO_SYNTHETIC_RECEIPT_WAS_FILTERED_BEFORE_EXACT_SURFACE_SELECTION"
+    },
+    "r12p3HarnessFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P3_BROWSER_HARNESS_LEGAL_PRECONDITION_REAL_READONLY_20260930.json",
+      "blobSha": "da95acef41ecf08bfb88bf9022efcbeca9d3c215",
+      "rootCause": "FRESH_PLAYWRIGHT_SESSION_TRIGGERED_VALID_USER_LEGAL_GATE_AND_OVERLAY_INTERCEPTED_POINTER_BEFORE_COBROS_CLICK",
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -604,7 +610,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "feb3d276877f43766646e4b56aec4d41db46fdc3"
+    "blobSha": "6d28744d106f2e125ba1cf38ffec8d9b1ab155a2"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -805,7 +811,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "2c433422d5e33fe73ac784c8ff630d507a8007e1"
+    "blobSha": "afe74cc38eaa9ea4d22bdb1a4e366b6375006f6d"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -823,6 +829,19 @@
     "findingsLedgerBlobSha": "feb3d276877f43766646e4b56aec4d41db46fdc3",
     "rootCause": "R12P1_EXACT_QA_BYPASS_RAN_INSIDE_ROUTER_SCOPED_STORE_SO_SYNTHETIC_RECEIPT_WAS_FILTERED_BEFORE_EXACT_SURFACE_SELECTION",
     "productSourceChanged": true,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p3HarnessFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P3_BROWSER_HARNESS_LEGAL_PRECONDITION_REAL_READONLY_20260930.json",
+    "blobSha": "da95acef41ecf08bfb88bf9022efcbeca9d3c215",
+    "compositionLockBlobSha": "afe74cc38eaa9ea4d22bdb1a4e366b6375006f6d",
+    "findingsLedgerBlobSha": "6d28744d106f2e125ba1cf38ffec8d9b1ab155a2",
+    "rootCause": "FRESH_PLAYWRIGHT_SESSION_TRIGGERED_VALID_USER_LEGAL_GATE_AND_OVERLAY_INTERCEPTED_POINTER_BEFORE_COBROS_CLICK",
+    "productSourceChanged": false,
     "noOperationalBusinessWrites": true,
     "noReimport": true,
     "noLive": true,
