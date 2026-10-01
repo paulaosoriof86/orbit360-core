@@ -140,7 +140,7 @@
     "orbit360-platform/core/access-scope.js": "f50156162f59e105d3564c1c3f6036daf03ebd56",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "cb991621489263eaf60040ef3ddf221a69b25c6e",
-    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "bae523edcea95df9e0711699f259c4b82ad77285",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "010f245e8ab10ec2a1db96f164506d8683cef655",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
@@ -172,7 +172,7 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "30753007242c482d9a3e6c2c6c438e07bdec0778",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "af7479a8606911ab95f8cdef5ec4dd9dee2e7c39",
+    "orbit360-platform/index.html": "d15e704eb766c721fd775a4bcd5608b795632851",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
@@ -403,14 +403,18 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R14P2-QA",
-    "reason": "NORMAL_PREVIEW_READONLY_PROOF_ACCEPTS_AUTHORIZED_EMPTY_SCOPE_WITH_EXPLICIT_SAFE_EMPTY_STATE",
-    "changedProductFiles": [],
+    "gate": "I6.5-B3-004-R15",
+    "reason": "TARGETED_HUMAN_REJECTION_PDF_PRESENTATION_CONSISTENCY_CAUSAL_FIX",
+    "changedProductFiles": [
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/index.html"
+    ],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
-      "tools/gravicentra-i6-5-b3-004-contract.mjs"
+      "tools/gravicentra-i6-5-b3-004-contract.mjs",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
     ],
-    "productSourceChanged": false,
+    "productSourceChanged": true,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -1489,5 +1493,42 @@
     },
     "productSourceChanged": false,
     "performanceResidual": "HUMAN_APPROX_5000MS_STILL_BLOCKING_TARGETED_VISUAL"
+  },
+  "b3004R15TargetedHumanRejection": {
+    "status": "TARGETED_HUMAN_REJECTED_REMEDIATION_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_PAULA_VISUAL_REJECTION_PDF_CONSISTENCY_20261001.json",
+    "receiptBlobSha": "f5fcbd2fd05986ff506b23809c625658565b0857",
+    "reviewedSourceSha": "3f531b38127bfc7f497f19e4db3bc59128ebe729",
+    "contextPreservationHumanPass": true,
+    "pdfConsistencyHumanFail": true,
+    "performanceObservation": {
+      "cobrosOpenApproxSeconds": 4,
+      "applyPaymentApproxSeconds": "3-4",
+      "reconcileApproxSeconds": "4-5",
+      "postApplyReceiptContextPreserved": true,
+      "postReconcileReceiptContextPreserved": true,
+      "pdfInvoiceSurfaceNewTabOptionVisible": true,
+      "pdfInvoiceNewTabOpenedSuccessfully": true,
+      "pdfPaymentSupportSameFileNewTabOptionVisible": false,
+      "visiblePaymentSupportMessage": "El archivo se guardó, pero no tiene una estructura PDF válida para vista previa. Puedes descargarlo para revisarlo."
+    }
+  },
+  "b3004R15PdfConsistencyFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "productBlobs": {
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "010f245e8ab10ec2a1db96f164506d8683cef655",
+      "orbit360-platform/index.html": "d15e704eb766c721fd775a4bcd5608b795632851"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "31fc855824377b80044dad5fd314cedc8bb18d41",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "b0f47418d1ed52ee614fe3fb7084b035655555ef",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "59d0bf7ac63b7ae3a582f8afbc5a6eccb1219911"
+    },
+    "canonicalPdfBehavior": "NEW_TAB_OPTION_FOR_ALL_APPLICATION_PDF",
+    "productSourceChanged": true,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
   }
 }

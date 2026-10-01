@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R12_TARGETED_HUMAN_VISUAL",
+      "nextAction": "B3_004_R15_SOURCE_CONTRACT",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1149,7 +1149,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
         "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
       },
-      "machineProofInvalidatedBySourceChange": false,
+      "machineProofInvalidatedBySourceChange": true,
       "priorMachineProof": {
         "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
         "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
@@ -2066,6 +2066,27 @@
           "tools/gravicentra-i6-5-b3-004-contract.mjs": "6653fe33e2664fc0a712f2fda09e822522564954"
         },
         "productSourceChanged": false
+      },
+      "r15TargetedHumanRejection": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_PAULA_VISUAL_REJECTION_PDF_CONSISTENCY_20261001.json",
+        "blobSha": "f5fcbd2fd05986ff506b23809c625658565b0857",
+        "status": "TARGETED_HUMAN_REJECTED_REMEDIATION_REQUIRED",
+        "contextPreservationHumanPass": true,
+        "pdfConsistencyHumanFail": true
+      },
+      "r15PdfConsistencyFix": {
+        "status": "SOURCE_FIXED_PENDING_CONTRACT",
+        "productBlobs": {
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "010f245e8ab10ec2a1db96f164506d8683cef655",
+          "orbit360-platform/index.html": "d15e704eb766c721fd775a4bcd5608b795632851"
+        },
+        "qaBlobs": {
+          "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "31fc855824377b80044dad5fd314cedc8bb18d41",
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "b0f47418d1ed52ee614fe3fb7084b035655555ef",
+          ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "59d0bf7ac63b7ae3a582f8afbc5a6eccb1219911"
+        },
+        "compositionLockBlobSha": "2f5e00906455fd6b4299691c2e41372c258eee9d",
+        "performanceObservation": "Cobros ~4s; apply ~3-4s; reconcile ~4-5s; B3-002 remains closed absent causal regression."
       }
     },
     {
@@ -5681,7 +5702,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
@@ -5770,6 +5791,9 @@
     "r14TargetedHumanRejectionBlobSha": "e0740161d78bfe28fed615106c0022fa698dbc55",
     "r14p1CompositionLockBlobSha": "9c4091bee93c1efa8de8d69287eceb8df286cc6f",
     "r14p2HarnessFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R14P2_NORMAL_PREVIEW_EMPTY_STATE_HARNESS_FIX_20261001.json",
-    "r14p2HarnessFixBlobSha": "556cdc6da9a55258cbb7ca6d5d911f9d768c97d3"
+    "r14p2HarnessFixBlobSha": "556cdc6da9a55258cbb7ca6d5d911f9d768c97d3",
+    "r15TargetedHumanRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_PAULA_VISUAL_REJECTION_PDF_CONSISTENCY_20261001.json",
+    "r15TargetedHumanRejectionBlobSha": "f5fcbd2fd05986ff506b23809c625658565b0857",
+    "r15CompositionLockBlobSha": "2f5e00906455fd6b4299691c2e41372c258eee9d"
   }
 }

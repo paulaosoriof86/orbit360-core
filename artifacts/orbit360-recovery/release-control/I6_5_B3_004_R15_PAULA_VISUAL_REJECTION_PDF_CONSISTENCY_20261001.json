@@ -1,0 +1,55 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R15_PAULA_VISUAL_REJECTION_PDF_CONSISTENCY_V1",
+  "recordedAt": "2026-10-01",
+  "findingId": "B3-004",
+  "status": "TARGETED_HUMAN_REJECTED_REMEDIATION_REQUIRED",
+  "reviewedCandidate": {
+    "sourceSha": "3f531b38127bfc7f497f19e4db3bc59128ebe729",
+    "buildId": "gi-i65-b3-3f531b38127b-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36927379945-5yhi66fs.web.app",
+    "runId": 36927379945,
+    "artifactId": 11194393543,
+    "artifactDigest": "37b8d77bf6ed2f80f3e7c928b3cfe23981afdc610b7c7e032d41ca56dac698d0"
+  },
+  "humanEvidence": {
+    "cobrosOpenApproxSeconds": 4,
+    "applyPaymentApproxSeconds": "3-4",
+    "reconcileApproxSeconds": "4-5",
+    "postApplyReceiptContextPreserved": true,
+    "postReconcileReceiptContextPreserved": true,
+    "pdfInvoiceSurfaceNewTabOptionVisible": true,
+    "pdfInvoiceNewTabOpenedSuccessfully": true,
+    "pdfPaymentSupportSameFileNewTabOptionVisible": false,
+    "visiblePaymentSupportMessage": "El archivo se guardó, pero no tiene una estructura PDF válida para vista previa. Puedes descargarlo para revisarlo."
+  },
+  "adjudication": {
+    "receiptContext": "HUMAN_PASS_PRESERVE",
+    "persistenceAndDownload": "PRESERVE_PRIOR_PASS",
+    "pdfConsistency": "FAIL_CAUSAL_SOURCE_FIX_REQUIRED",
+    "b3002Performance": "DO_NOT_REOPEN_WITHOUT_REPRODUCIBLE_CAUSAL_REGRESSION",
+    "b3004ActionLatency": "OBSERVED_NOT_SILENTLY_ACCEPTED_PENDING_FINAL_TARGETED_VISUAL"
+  },
+  "rootCause": {
+    "class": "PDF_PRESENTATION_POLICY_INCONSISTENCY",
+    "detail": "The receipt viewer gated the PDF new-tab action behind a strict decoded-prefix signature test. The invoice copy reached the compatible new-tab path, while payment support could be rejected before rendering the same action even though persistence/download remained valid."
+  },
+  "remediation": {
+    "behavior": "All Drive documents reported as application/pdf use one canonical compatibility surface with an explicit 'Abrir PDF en una pestaña' action; no strict client-side PDF signature gate; images retain inline preview.",
+    "changedProductFiles": [
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/index.html"
+    ],
+    "changedQaFiles": [
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+    ]
+  },
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false,
+    "b4": false
+  }
+}

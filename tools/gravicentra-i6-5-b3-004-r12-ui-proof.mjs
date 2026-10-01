@@ -278,10 +278,10 @@ try{
   proof.mobileApplyModal=applyResponsive;
   await page.fill('#pm-paid','2026-09-30');
   await page.selectOption('#pm-metodo',{label:'Transferencia bancaria'});
-  const supportA={name:'B3-004-R12-soporte-A.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2t8QAAAAASUVORK5CYII=','base64')};
+  const supportA={name:'B3-004-R15-soporte-aplicar.pdf',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2t8QAAAAASUVORK5CYII=','base64')};
   const [supportChooser]=await Promise.all([page.waitForEvent('filechooser'),page.click('#pm-support-btn')]);
   await supportChooser.setFiles(supportA);
-  await page.waitForFunction(()=>document.querySelector('#pm-support-name')?.textContent?.includes('B3-004-R12-soporte-A.png'));
+  await page.waitForFunction(()=>document.querySelector('#pm-support-name')?.textContent?.includes('B3-004-R15-soporte-aplicar.pdf'));
   proof.assertions.browserPaymentSupportSelected=true;
   const avisar=page.locator('#pm-avisar');if(await avisar.isChecked())await avisar.uncheck();
   proof.uiCallContext=await page.evaluate(()=>({
@@ -335,6 +335,14 @@ try{
   need(postApplyContext.receiptParam===ids.receipt&&postApplyContext.detail===true&&postApplyContext.cobrosPage===false,'B3_004_R14_POST_APPLY_CONTEXT_LOST:'+JSON.stringify(postApplyContext));
   proof.postApplyContext=postApplyContext;proof.assertions.postApplyContextStable=true;
   await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:12000});
+  const applyPdfReadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveReadPreview/i.test(resp.url()),{timeout:15000});
+  await page.click('[data-rp-document="payment_support"] [data-rp-document-view]');
+  const applyPdfRead=await applyPdfReadPromise;
+  need(applyPdfRead.status()<400,'B3_004_R15_APPLY_PDF_VIEW_HTTP_FAILED:'+applyPdfRead.status());
+  await page.waitForSelector('#rp-document-viewer [data-rp-pdf-mode="new-tab"] [data-rp-pdf-open]',{timeout:15000});
+  need(await page.locator('#rp-document-viewer [data-rp-pdf-open]').isVisible(),'B3_004_R15_APPLY_PDF_OPEN_OPTION_MISSING');
+  proof.assertions.browserApplyPdfOpenOption=true;
+  await page.click('#rp-document-viewer [data-rp-doc-close]');
   const preReconcileReceipt=await page.evaluate(()=>{
     const detail=document.querySelector('[data-rp-receipt-detail="1"]');
     return{text:String(detail?.textContent||''),hash:String(location.hash||'')};
@@ -359,15 +367,15 @@ try{
   const reconcileTransportStart=proof.transportEvents.length;
   await page.fill('#cc-aplicacion','2026-09-30');
   await page.fill('#cc-numero','QA-R12-UI-001');
-  const supportB={name:'B3-004-R12-soporte-B.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64')};
-  const invoiceFile={name:'B3-004-R14-factura.pdf',mimeType:'application/pdf',buffer:minimalPdfBuffer()};
+  const supportB={name:'B3-004-R15-soporte-conciliar.pdf',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64')};
+  const invoiceFile={name:'B3-004-R15-factura.pdf',mimeType:'application/pdf',buffer:minimalPdfBuffer()};
   const [supportBChooser]=await Promise.all([page.waitForEvent('filechooser'),page.click('#cc-pay-btn')]);
   await supportBChooser.setFiles(supportB);
-  await page.waitForFunction(()=>document.querySelector('#cc-pay-name')?.textContent?.includes('B3-004-R12-soporte-B.png'));
+  await page.waitForFunction(()=>document.querySelector('#cc-pay-name')?.textContent?.includes('B3-004-R15-soporte-conciliar.pdf'));
   proof.assertions.browserReplacementSupportSelected=true;
   const [invoiceChooser]=await Promise.all([page.waitForEvent('filechooser'),page.click('#cc-btn')]);
   await invoiceChooser.setFiles(invoiceFile);
-  await page.waitForFunction(()=>document.querySelector('#cc-name')?.textContent?.includes('B3-004-R14-factura.pdf'));
+  await page.waitForFunction(()=>document.querySelector('#cc-name')?.textContent?.includes('B3-004-R15-factura.pdf'));
   proof.assertions.browserInvoiceSelected=true;
   const reconcileStartedAt=Date.now();
   await page.click('#cc-ok');
@@ -447,21 +455,23 @@ try{
   proof.documentUi=documentUi;
   proof.assertions.browserDocumentControlsVisible=true;
 
-  const imageReadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveReadPreview/i.test(resp.url()),{timeout:15000});
+  const supportPdfReadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveReadPreview/i.test(resp.url()),{timeout:15000});
   await page.click('[data-rp-document="payment_support"] [data-rp-document-view]');
-  const imageRead=await imageReadPromise;
-  need(imageRead.status()<400,'B3_004_R14_IMAGE_VIEW_HTTP_FAILED:'+imageRead.status());
-  await page.waitForSelector('#rp-document-viewer [data-rp-doc-body] img',{timeout:15000});
-  proof.assertions.browserImageInlinePreview=true;
+  const supportPdfRead=await supportPdfReadPromise;
+  need(supportPdfRead.status()<400,'B3_004_R15_SUPPORT_PDF_VIEW_HTTP_FAILED:'+supportPdfRead.status());
+  await page.waitForSelector('#rp-document-viewer [data-rp-pdf-mode="new-tab"] [data-rp-pdf-open]',{timeout:15000});
+  need(await page.locator('#rp-document-viewer [data-rp-pdf-open]').isVisible(),'B3_004_R15_SUPPORT_PDF_OPEN_OPTION_MISSING');
+  proof.assertions.browserSupportPdfOpenOption=true;
   await page.click('#rp-document-viewer [data-rp-doc-close]');
 
-  const pdfReadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveReadPreview/i.test(resp.url()),{timeout:15000});
+  const invoicePdfReadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveReadPreview/i.test(resp.url()),{timeout:15000});
   await page.click('[data-rp-document="insurer_invoice"] [data-rp-document-view]');
-  const pdfRead=await pdfReadPromise;
-  need(pdfRead.status()<400,'B3_004_R14_PDF_VIEW_HTTP_FAILED:'+pdfRead.status());
-  await page.waitForSelector('#rp-document-viewer [data-rp-pdf-preview="1"] object[type="application/pdf"]',{timeout:15000});
-  need(await page.locator('#rp-document-viewer [data-rp-pdf-open]').isVisible(),'B3_004_R14_PDF_FALLBACK_NOT_VISIBLE');
-  proof.assertions.browserPdfInlinePreview=true;
+  const invoicePdfRead=await invoicePdfReadPromise;
+  need(invoicePdfRead.status()<400,'B3_004_R15_INVOICE_PDF_VIEW_HTTP_FAILED:'+invoicePdfRead.status());
+  await page.waitForSelector('#rp-document-viewer [data-rp-pdf-mode="new-tab"] [data-rp-pdf-open]',{timeout:15000});
+  need(await page.locator('#rp-document-viewer [data-rp-pdf-open]').isVisible(),'B3_004_R15_INVOICE_PDF_OPEN_OPTION_MISSING');
+  proof.assertions.browserInvoicePdfOpenOption=true;
+  proof.assertions.browserPdfOpenOptionConsistent=true;
   await page.click('#rp-document-viewer [data-rp-doc-close]');
   proof.assertions.browserDocumentViewWorks=true;
 
