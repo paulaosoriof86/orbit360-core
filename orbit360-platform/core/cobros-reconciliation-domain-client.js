@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
-  const VERSION='orbit360-cobros-reconciliation-client-v5-payment-origin-workflows';
+  const VERSION='orbit360-cobros-reconciliation-client-v6-r10-observable-requests';
   const text=value=>String(value==null?'':value).trim();
   const low=value=>text(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   function classifyPaymentOrigin(row){
@@ -28,12 +28,12 @@
   const available=()=>{const p=provider();return!!(enabled()&&tenantId()&&activeRole()&&p&&typeof p.callFunction==='function');};
   function stable(value){if(value==null)return value;if(Array.isArray(value))return value.map(stable);if(typeof value==='object')return Object.fromEntries(Object.keys(value).sort().map(k=>[k,stable(value[k])]));return value;}
   function makeRequestId(operation,payload){const marker=[VERSION,tenantId(),operation,JSON.stringify(stable(payload||{}))].join('|');let hash=2166136261;for(let i=0;i<marker.length;i+=1){hash^=marker.charCodeAt(i);hash=Math.imul(hash,16777619);}return'recui_'+(hash>>>0).toString(16);}
-  async function command(operation,options){options=options||{};if(!available())throw new Error('COBROS_RECONCILIATION_BACKEND_NOT_ACTIVE');const payload=options.payload||{};return provider().callFunction(functionName(),{tenantId:tenantId(),activeRole:activeRole(),operation,payload,reason:text(options.reason||options.motivo||'Acción de conciliación desde Gravicentra Insurance'),requestId:text(options.requestId||makeRequestId(operation,payload))},region());}
+  async function command(operation,options){options=options||{};if(!available())throw new Error('COBROS_RECONCILIATION_BACKEND_NOT_ACTIVE');const payload=options.payload||{},requestId=text(options.requestId||makeRequestId(operation,payload)),fn=functionName();try{const out=await provider().callFunction(fn,{tenantId:tenantId(),activeRole:activeRole(),operation,payload,reason:text(options.reason||options.motivo||'Acción de conciliación desde Gravicentra Insurance'),requestId},region());return Object.assign({requestId},out||{});}catch(error){try{error.gravicentraPayment={operation,requestId,functionName:fn,region:region()};}catch(_){ }throw error;}}
   function previewPolicy(polizaId){return command('preview_policy',{payload:{polizaId},reason:'Vista previa inferencial sin aplicar pagos'});}
-  function applyPayment(receiptId,options){options=options||{};const payload=Object.assign({receiptId},options.payload||{});return command('apply_payment',{payload,reason:options.reason||options.motivo||'Aplicación canónica de pago'});}
+  function applyPayment(receiptId,options){options=options||{};const payload=Object.assign({receiptId},options.payload||{});return command('apply_payment',{payload,reason:options.reason||options.motivo||'Aplicación canónica de pago',requestId:options.requestId});}
   function reportClientPayment(receiptId,options){options=options||{};return applyPayment(receiptId,{payload:Object.assign({},options.payload||{},{sourceType:'client_reported'}),reason:options.reason||'Pago reportado por cliente'});}
   function reportAdvisorPayment(receiptId,options){options=options||{};const payload=Object.assign({receiptId},options.payload||{});return command('report_advisor_payment',{payload,reason:options.reason||options.motivo||'Pago reportado por asesor'});}
-  function reconcilePayment(receiptId,options){options=options||{};const payload=Object.assign({receiptId,forceReconciliation:true},options.payload||{});return command('reconcile_payment',{payload,reason:options.reason||options.motivo||'Conciliación individual de pago'});}
+  function reconcilePayment(receiptId,options){options=options||{};const payload=Object.assign({receiptId,forceReconciliation:true},options.payload||{});return command('reconcile_payment',{payload,reason:options.reason||options.motivo||'Conciliación individual de pago',requestId:options.requestId});}
   function enrichApplication(receiptId,options){options=options||{};return applyPayment(receiptId,{payload:Object.assign({},options.payload||{},{sourceType:options.sourceType||'insurer_invoice'}),reason:options.reason||'Aplicación de aseguradora'});}
   function confirmProposal(proposalId,options){options=options||{};return command('confirm_application',{payload:Object.assign({proposalId},options.payload||{}),reason:options.reason||options.motivo||'Conciliación confirmada por usuario autorizado'});}
   function holdProposal(proposalId,motivo,accionRequerida){return command('hold_proposal',{payload:{proposalId,accionRequerida},reason:motivo});}
