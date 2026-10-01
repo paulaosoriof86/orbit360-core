@@ -278,6 +278,9 @@ need(nativeReceiptOwner.includes('function directReceiptId()')&&nativeReceiptOwn
 need(nativeReceiptOwner.includes('data-rp-document-view')&&nativeReceiptOwner.includes('data-rp-document-download')&&nativeReceiptOwner.includes('provider.resolve')&&nativeReceiptOwner.includes('provider.download'),'B3_004_R12P11_RECEIPT_DOCUMENT_UI_MISSING');
 need(baseCssR12P11.includes('B3-004 R12P11 · mobile receipt/payment acceptance')&&baseCssR12P11.includes('#cob-pay,#cob-conc')&&baseCssR12P11.includes('[data-cobros-modal-footer]'),'B3_004_R12P11_MOBILE_CSS_MISSING');
 need(humanFixtureR11.includes("&t=recibos&r='+encodeURIComponent(ids.receipt)"),'B3_004_R12P11_HUMAN_FIXTURE_NOT_DIRECT_RECEIPT');
+need(humanFixtureR11.includes("import { getAuth } from 'firebase-admin/auth'")&&humanFixtureR11.includes('async function qaActor()')&&humanFixtureR11.includes('asesorId:who.advisorId')&&humanFixtureR11.includes('normalProductScope:true'),'B3_004_R12P11P5_NORMAL_SCOPE_HUMAN_FIXTURE_MISSING');
+need(!humanFixtureR11.includes("asesorId:'qa_human_b3004'"),'B3_004_R12P11P5_ARTIFICIAL_ADVISOR_SCOPE_STILL_PRESENT');
+console.log('B3_004_R12P11P5_NORMAL_SCOPE_HUMAN_FIXTURE_CONTRACT=PASS');
 need(uiProofR12.includes('viewport:{width:412,height:915}')&&uiProofR12.includes('B3_004_R12P11_RECONCILE_MODAL_NOT_MOBILE_RESPONSIVE')&&uiProofR12.includes('B3_004_R12P11_RECEIPT_ACTION_OVERFLOW'),'B3_004_R12P11_MOBILE_BROWSER_ACCEPTANCE_MISSING');
 need(uiProofR12.includes('applySavingFeedback')&&uiProofR12.includes('reconcileSavingFeedback'),'B3_004_R12P11_SAVE_FEEDBACK_BROWSER_PROOF_MISSING');
 need(uiProofR12.includes('B3_004_R12P11_DOCUMENT_UI_CONTROLS_MISSING')&&uiProofR12.includes('browserDocumentViewWorks')&&uiProofR12.includes('browserDocumentDownloadWorks'),'B3_004_R12P11_DOCUMENT_DISCOVERABILITY_BROWSER_PROOF_MISSING');

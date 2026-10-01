@@ -1,0 +1,27 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11P5_NORMAL_SCOPE_HUMAN_FIXTURE_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "7cf62d0c718bf7879180e62909a0752289fed65e",
+  "failedRunId": 36885448948,
+  "failedJobId": 110448606836,
+  "classification": "QA_FIXTURE_SCOPE_DEFECT",
+  "rootCause": "HUMAN_QA_FIXTURE_USED_ARTIFICIAL_ADVISOR_ID_AND_THEREFORE_DID_NOT_ENTER_THE_SAME_NORMAL_PRODUCT_SCOPE_AS_THE_PRIVILEGED_BROWSER_ACTOR",
+  "remediation": {
+    "sameActorSelectionContractAsBrowserHarness": true,
+    "fixtureAdvisorIdFromActivePrivilegedMembership": true,
+    "artificialAdvisorIdRemoved": true,
+    "normalProductScope": true,
+    "productSourceChanged": false,
+    "productPermissionBypassAdded": false
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-human-fixture.mjs": "6114662ecbd2707208828146047d93ef3e919737",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "8c1839850867c9661383314fdba2a2cc32da09de"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

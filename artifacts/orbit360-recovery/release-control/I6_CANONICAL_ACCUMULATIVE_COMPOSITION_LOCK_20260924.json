@@ -403,10 +403,11 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P11P3P4",
-    "reason": "QA_CONTRACT_VARIABLE_NAME_MISMATCH_ONLY",
+    "gate": "I6.5-B3-004-R12P11P5",
+    "reason": "NORMAL_SCOPE_HUMAN_FIXTURE",
     "changedProductFiles": [],
     "changedQaFiles": [
+      "tools/gravicentra-i6-5-b3-004-human-fixture.mjs",
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
     "productSourceChanged": false,
@@ -1320,6 +1321,18 @@
     "receiptBlobSha": "1dab00cf57b791c87334e04a16abe6079f975d86",
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "399e0c109b96b6f59f9cca3e061acb33d0520e64"
+    },
+    "productSourceChanged": false
+  },
+  "b3004R12P11P5NormalScopeHumanFixtureFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "rootCause": "HUMAN_QA_FIXTURE_USED_ARTIFICIAL_ADVISOR_ID_AND_THEREFORE_DID_NOT_ENTER_THE_SAME_NORMAL_PRODUCT_SCOPE_AS_THE_PRIVILEGED_BROWSER_ACTOR",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P5_NORMAL_SCOPE_HUMAN_FIXTURE_FIX_20261001.json",
+    "receiptBlobSha": "7421430bcde2558009582407518b9db2a39e58ca",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-human-fixture.mjs": "6114662ecbd2707208828146047d93ef3e919737",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "8c1839850867c9661383314fdba2a2cc32da09de"
     },
     "productSourceChanged": false
   }
