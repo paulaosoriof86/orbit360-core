@@ -250,6 +250,12 @@ need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20261001-b3
 console.log('B3_004_R12P7_PRODUCT_CONTEXT_CALLABLE_ENABLEMENT_CONTRACT=PASS');
 need(uiProofR12.includes('B3_004_R12_ACTION_CONTEXT=')&&uiProofR12.includes('B3_004_R12_APPLY_MODAL_NOT_OPEN')&&uiProofR12.includes('ownScopedFor')&&uiProofR12.includes('resolveReceiptId'),'B3_004_R12P8_ACTION_CONTEXT_DIAGNOSTIC_MISSING');
 console.log('B3_004_R12P8_ACTION_CONTEXT_DIAGNOSTIC_CONTRACT=PASS');
+need(uiProofR12.includes('B3-004-R12-soporte-A.png')&&uiProofR12.includes("page.waitForEvent('filechooser')")&&uiProofR12.includes('B3_004_R12_PAYMENT_SUPPORT_REF_MISSING_AFTER_UI_UPLOAD'),'B3_004_R12P10_UI_PAYMENT_SUPPORT_UPLOAD_MISSING');
+need(uiProofR12.includes('B3-004-R12-soporte-B.png')&&uiProofR12.includes('B3_004_R12_REPLACEMENT_SUPPORT_REF_DID_NOT_CHANGE')&&uiProofR12.includes('browserSupportReplacedSameCobro'),'B3_004_R12P10_UI_SUPPORT_REPLACEMENT_MISSING');
+need(uiProofR12.includes('B3-004-R12-factura.png')&&uiProofR12.includes('B3_004_R12_INVOICE_REF_MISSING_AFTER_UI_UPLOAD'),'B3_004_R12P10_UI_INVOICE_UPLOAD_MISSING');
+need(uiProofR12.includes('page.reload')&&uiProofR12.includes('B3_004_R12_PAYMENT_SUPPORT_NOT_DURABLE_AFTER_RELOAD')&&uiProofR12.includes('B3_004_R12_DRIVE_READBACK_AFTER_RELOAD_FAILED'),'B3_004_R12P10_UI_DURABILITY_AFTER_RELOAD_MISSING');
+need(uiProofR12.includes('browserDocumentCleanupQuarantined')&&uiProofR12.includes('B3_004_R12_UI_DOCUMENT_CLEANUP_QUARANTINE_FAILED'),'B3_004_R12P10_UI_DOCUMENT_CLEANUP_MISSING');
+console.log('B3_004_R12P10_FULL_FIDELITY_DOCUMENT_UI_PROOF_CONTRACT=PASS');
 need(crmBridgeR9.includes('function exactB3004QaScopeBypass(target)')&&crmBridgeR9.includes("target.collection!=='recibosEsperados'")&&crmBridgeR9.includes("record.__syntheticHumanQa===true")&&crmBridgeR9.includes("String(record.__syntheticGate||'')==='B3-004-R12'"),'B3_004_R12P9_EXACT_QA_SCOPE_BYPASS_GUARD_MISSING');
 need(crmBridgeR9.includes("if(target&&!exactB3004QaScopeBypass(target)&&!A.canView(target.collection,target.record,'cobros'))"),'B3_004_R12P9_PAYMENT_SCOPE_WRAPPER_STILL_BLOCKS_EXACT_QA');
 need(crmBridgeR9.includes("if(permission&&!A.can('cobros',permission))"),'B3_004_R12P9_PERMISSION_GUARD_RELAXED');

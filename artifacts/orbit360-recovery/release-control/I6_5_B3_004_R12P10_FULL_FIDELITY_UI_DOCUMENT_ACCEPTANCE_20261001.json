@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P10_FULL_FIDELITY_UI_DOCUMENT_ACCEPTANCE_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_ACCEPTANCE_STRENGTHENED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "c0c2af3d847afe634a51994522863a09c6f1a870",
+  "supersededForHumanAcceptanceOnly": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_MACHINE_PASS_20260930.json",
+    "priorSourceSha": "6299c8fc891028305400c8b2fdf40eb31f9c142f",
+    "reason": "Prior Browser UI proof did not upload files from UI, replace support, reload, or verify Drive readback after reload.",
+    "historicalEvidencePreserved": true,
+    "productRegressionDemonstrated": false
+  },
+  "userAcceptanceStrengthening": {
+    "previewRealOperationalWritesStillForbidden": true,
+    "realRowsRemainVisibleReadOnly": true,
+    "syntheticWriteFixtureRequiredForPreviewSafety": true,
+    "browserPaymentSupportUpload": true,
+    "browserPaymentSupportReplacement": true,
+    "browserInvoiceUpload": true,
+    "sameCobroRequired": true,
+    "reloadDurabilityRequired": true,
+    "driveReadbackAfterReloadRequired": true,
+    "uiDocumentCleanupQuarantineRequired": true,
+    "eventualLiveControlledRealClientWriteStillRequiredBeforeProductionAccepted": true
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "c69b4474497071ab627f297841965f2b527c1d46",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "edb77f72a0c7df912e04cfbd42bea7764ecdbb2d"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

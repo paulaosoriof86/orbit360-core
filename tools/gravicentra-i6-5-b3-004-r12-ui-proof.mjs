@@ -147,6 +147,11 @@ try{
   await page.waitForSelector('#cob-pay');
   await page.fill('#pm-paid','2026-09-30');
   await page.selectOption('#pm-metodo',{label:'Transferencia bancaria'});
+  const supportA={name:'B3-004-R12-soporte-A.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2t8QAAAAASUVORK5CYII=','base64')};
+  const [supportChooser]=await Promise.all([page.waitForEvent('filechooser'),page.click('#pm-support-btn')]);
+  await supportChooser.setFiles(supportA);
+  await page.waitForFunction(()=>document.querySelector('#pm-support-name')?.textContent?.includes('B3-004-R12-soporte-A.png'));
+  proof.assertions.browserPaymentSupportSelected=true;
   const avisar=page.locator('#pm-avisar');if(await avisar.isChecked())await avisar.uncheck();
   proof.uiCallContext=await page.evaluate(()=>({
     sessionRole:String(window.Orbit?.session?.rol?.()||''),
@@ -208,19 +213,61 @@ try{
   }
   const paid=await waitCobro(xs=>xs.length===1&&xs[0].estado==='Pagado');
   need(paid.length===1,'B3_004_R12_PAYMENT_NOT_SINGLE');
+  need(clean(paid[0].paymentSupportDocumentRef),'B3_004_R12_PAYMENT_SUPPORT_REF_MISSING_AFTER_UI_UPLOAD');
   proof.assertions.browserApplyPayment=true;
-  proof.payment={cobroId:paid[0].id,paymentState:paid[0].paymentState||'',applicationState:paid[0].applicationState||''};
+  proof.assertions.browserPaymentSupportPersisted=true;
+  proof.payment={cobroId:paid[0].id,paymentState:paid[0].paymentState||'',applicationState:paid[0].applicationState||'',paymentSupportDocumentRef:clean(paid[0].paymentSupportDocumentRef)};
 
   await page.waitForSelector('button[data-cobros-action="reconcile"]',{timeout:12000});
   await page.locator('button[data-cobros-action="reconcile"]').click();
   await page.waitForSelector('#cob-conc');
   await page.fill('#cc-aplicacion','2026-09-30');
   await page.fill('#cc-numero','QA-R12-UI-001');
+  const supportB={name:'B3-004-R12-soporte-B.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64')};
+  const invoiceFile={name:'B3-004-R12-factura.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/58BAQEDAQH/2x0AAAAASUVORK5CYII=','base64')};
+  const [supportBChooser]=await Promise.all([page.waitForEvent('filechooser'),page.click('#cc-pay-btn')]);
+  await supportBChooser.setFiles(supportB);
+  await page.waitForFunction(()=>document.querySelector('#cc-pay-name')?.textContent?.includes('B3-004-R12-soporte-B.png'));
+  proof.assertions.browserReplacementSupportSelected=true;
+  const [invoiceChooser]=await Promise.all([page.waitForEvent('filechooser'),page.click('#cc-btn')]);
+  await invoiceChooser.setFiles(invoiceFile);
+  await page.waitForFunction(()=>document.querySelector('#cc-name')?.textContent?.includes('B3-004-R12-factura.png'));
+  proof.assertions.browserInvoiceSelected=true;
   await page.click('#cc-ok');
-  const applied=await waitCobro(xs=>xs.length===1&&xs[0].applicationState==='APPLIED_DIRECT'&&xs[0].invoiceNumber==='QA-R12-UI-001');
+  const applied=await waitCobro(xs=>xs.length===1&&xs[0].applicationState==='APPLIED_DIRECT'&&xs[0].invoiceNumber==='QA-R12-UI-001'&&clean(xs[0].paymentSupportDocumentRef)&&clean(xs[0].invoiceDocumentRef),20000);
   need(applied[0].id===paid[0].id,'B3_004_R12_RECONCILE_CREATED_DIFFERENT_COBRO');
+  need(clean(applied[0].paymentSupportDocumentRef)!==clean(paid[0].paymentSupportDocumentRef),'B3_004_R12_REPLACEMENT_SUPPORT_REF_DID_NOT_CHANGE');
+  need(clean(applied[0].invoiceDocumentRef),'B3_004_R12_INVOICE_REF_MISSING_AFTER_UI_UPLOAD');
   proof.assertions.browserReconcileSamePayment=true;
+  proof.assertions.browserSupportReplacedSameCobro=true;
+  proof.assertions.browserInvoicePersisted=true;
   proof.assertions.singleCobroReadback=true;
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForSelector('[data-b3004-human-qa-mode="1"]');
+  const reloaded=await waitCobro(xs=>xs.length===1&&xs[0].applicationState==='APPLIED_DIRECT',12000);
+  need(reloaded.length===1&&reloaded[0].id===paid[0].id,'B3_004_R12_RELOAD_SINGLE_COBRO_MISMATCH');
+  need(clean(reloaded[0].paymentSupportDocumentRef)===clean(applied[0].paymentSupportDocumentRef),'B3_004_R12_PAYMENT_SUPPORT_NOT_DURABLE_AFTER_RELOAD');
+  need(clean(reloaded[0].invoiceDocumentRef)===clean(applied[0].invoiceDocumentRef),'B3_004_R12_INVOICE_NOT_DURABLE_AFTER_RELOAD');
+  proof.assertions.browserReloadDurability=true;
+  const docReadback=await page.evaluate(async ({paymentRef,invoiceRef,ids})=>{
+    const dp=window.Orbit?.productDriveDocumentProviderP0;
+    if(!dp||typeof dp.resolve!=='function')return{payment:false,invoice:false,provider:false};
+    const ctx={clienteId:ids.client,polizaId:ids.policy,receiptId:ids.receipt,sourceModule:'cobros'};
+    const [p,i]=await Promise.all([dp.resolve(paymentRef,ctx),dp.resolve(invoiceRef,ctx)]);
+    return{provider:true,payment:!!(p&&p.ok===true&&p.backendPersistent===true),invoice:!!(i&&i.ok===true&&i.backendPersistent===true)};
+  },{paymentRef:clean(reloaded[0].paymentSupportDocumentRef),invoiceRef:clean(reloaded[0].invoiceDocumentRef),ids});
+  need(docReadback.provider&&docReadback.payment&&docReadback.invoice,'B3_004_R12_DRIVE_READBACK_AFTER_RELOAD_FAILED:'+JSON.stringify(docReadback));
+  proof.assertions.browserDriveReadbackAfterReload=true;
+  proof.documents={paymentSupportDocumentRef:clean(reloaded[0].paymentSupportDocumentRef),invoiceDocumentRef:clean(reloaded[0].invoiceDocumentRef)};
+  const cleanupDocs=await page.evaluate(async ({paymentRef,invoiceRef,ids})=>{
+    const dp=window.Orbit?.productDriveDocumentProviderP0;
+    if(!dp||typeof dp.quarantine!=='function')return{payment:false,invoice:false,provider:false};
+    const ctx={clienteId:ids.client,polizaId:ids.policy,receiptId:ids.receipt,sourceModule:'cobros'};
+    const [p,i]=await Promise.all([dp.quarantine(paymentRef,ctx),dp.quarantine(invoiceRef,ctx)]);
+    return{provider:true,payment:!!(p&&p.ok===true),invoice:!!(i&&i.ok===true)};
+  },{paymentRef:clean(reloaded[0].paymentSupportDocumentRef),invoiceRef:clean(reloaded[0].invoiceDocumentRef),ids});
+  need(cleanupDocs.provider&&cleanupDocs.payment&&cleanupDocs.invoice,'B3_004_R12_UI_DOCUMENT_CLEANUP_QUARANTINE_FAILED:'+JSON.stringify(cleanupDocs));
+  proof.assertions.browserDocumentCleanupQuarantined=true;
   proof.assertions.noRealBusinessWrite=true;
   proof.status='PASS';
   await context.close();
