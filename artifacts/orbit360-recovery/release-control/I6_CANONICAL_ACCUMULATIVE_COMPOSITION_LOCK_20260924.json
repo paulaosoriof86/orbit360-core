@@ -403,15 +403,11 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P10P6",
-    "reason": "EXACT_FINALIZED_QA_DOCUMENT_CLEANUP_AFTER_DURABILITY_PROOF",
-    "changedProductFiles": [
-      "functions/document-drive-domain.js"
-    ],
-    "changedQaFiles": [
-      "tools/gravicentra-i6-5-b3-004-contract.mjs"
-    ],
-    "productSourceChanged": true,
+    "gate": "I6.5-B3-004-R12-HUMAN-REJECTION",
+    "reason": "TARGETED_HUMAN_REJECTED_MACHINE_PASS_ON_MOBILE_RESPONSIVE_DOCUMENT_DISCOVERABILITY_SAVE_FEEDBACK_AND_PERFORMANCE",
+    "changedProductFiles": [],
+    "changedQaFiles": [],
+    "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -1151,5 +1147,57 @@
     "reimport": false,
     "live": false,
     "b3005": false
+  },
+  "b3004R12TargetedHumanRejectionMobileDocumentUxPerformance": {
+    "status": "HUMAN_REJECTED_REMEDIATION_AUTHORIZED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_TARGETED_HUMAN_REJECTED_MOBILE_DOCUMENT_UX_PERFORMANCE_20261001.json",
+    "receiptBlobSha": "9d71eb4933713d58a9720e2abed2dea1bd152916",
+    "blockers": [
+      {
+        "id": "B3-004-R12-H1",
+        "type": "ROUTING",
+        "evidence": "Human direct receipt link did not open the exact receipt; user had to locate the synthetic client/receipt manually."
+      },
+      {
+        "id": "B3-004-R12-H2",
+        "type": "PERFORMANCE",
+        "evidence": "Human mobile observation: entering Cobros took approximately 7–10 seconds, despite desktop warm-browser machine metric of 138 ms."
+      },
+      {
+        "id": "B3-004-R12-H3",
+        "type": "SAVE_FEEDBACK",
+        "evidence": "Applying payment took approximately 10 seconds and the UI did not visibly indicate that save/upload/persistence was in progress."
+      },
+      {
+        "id": "B3-004-R12-H4",
+        "type": "RESPONSIVE",
+        "evidence": "Reconciliation modal was not mobile responsive; save control was not reachable/visible in the human viewport."
+      },
+      {
+        "id": "B3-004-R12-H5",
+        "type": "DOCUMENT_UI",
+        "evidence": "Receipt detail showed payment support as 'Adjunto' but exposed no visible open/view/download action for the durable document."
+      },
+      {
+        "id": "B3-004-R12-H6",
+        "type": "MOBILE_LAYOUT",
+        "evidence": "Receipt action area overflowed/clipped on mobile, including the long payment-evidence edit-lock action."
+      }
+    ],
+    "authorizedProductFiles": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/styles/base.css",
+      "orbit360-platform/index.html"
+    ],
+    "authorizedQaFiles": [
+      "tools/gravicentra-i6-5-b3-004-human-fixture.mjs",
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs"
+    ],
+    "priorMachineSourceSha": "4f19a7775b555b385cefb3a74bc63e805d0deb10",
+    "priorMachineRunId": 36857909461,
+    "priorPreviewRejected": true,
+    "productSourceChanged": false
   }
 }

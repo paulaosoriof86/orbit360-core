@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_004_HUMAN_REJECTED_REMEDIATION_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,14 +14,14 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "HUMAN_REJECTED_REMEDIATION_AUTHORIZED",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
     "boundaries": {
       "businessWritesAuthorized": false,
       "reimportAuthorized": false,
       "liveHostingPromotionAuthorized": false,
-      "productMutationAuthorized": false,
+      "productMutationAuthorized": true,
       "b3005Authorized": false
     },
     "rootCause": "R8_MULTICAUSAL_UI_SCOPE_DELETE_POLICY_LIFECYCLE_AND_NAVIGATION_DRIFT",
@@ -37,7 +37,8 @@
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "orbit360-platform/modules/conciliaciones.js",
       "orbit360-platform/modules/crm-v1198-operational-bridge.js",
-      "orbit360-platform/modules/cliente360.js"
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/styles/base.css"
     ],
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
     "foundationBlobs": {
@@ -303,7 +304,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R12_EXACT_PREVIEW",
+    "nextAction": "B3_004_R12P11_MOBILE_DOCUMENT_UX_PERFORMANCE_SOURCE_FIX",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -695,6 +696,19 @@
       "blobSha": "7fec0b0abc3c67a098e3add4c8d2cfc965116129",
       "rootCause": "POST_RELOAD_QA_CLEANUP_CALLED_QUARANTINE_AFTER_DOCUMENTS_WERE_FINALIZED_BUT_QUARANTINE_ONLY_ACCEPTED_STAGING_PARENTS",
       "productSourceChanged": true
+    },
+    "machineProofInvalidatedByHumanEvidence": true,
+    "r12TargetedHumanRejection": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_TARGETED_HUMAN_REJECTED_MOBILE_DOCUMENT_UX_PERFORMANCE_20261001.json",
+      "blobSha": "9d71eb4933713d58a9720e2abed2dea1bd152916",
+      "blockers": [
+        "B3-004-R12-H1",
+        "B3-004-R12-H2",
+        "B3-004-R12-H3",
+        "B3-004-R12-H4",
+        "B3-004-R12-H5",
+        "B3-004-R12-H6"
+      ]
     }
   },
   "canonicalComposition": {
@@ -704,9 +718,11 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "0781b1df495e077deea9c841fb9f98dd88370c25"
+    "blobSha": "8fe9231fd94c9b84556bffef271012768bd7c597"
   },
   "nextRequiredProof": [
+    "B3_004_R12P11_SOURCE_CONTRACT_PASS",
+    "B3_004_R12P11_EXACT_PREVIEW_MOBILE_BROWSER_PASS",
     "B3_004_R12_TARGETED_HUMAN_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
@@ -894,11 +910,14 @@
     "r8OperationalProofPass": true,
     "cleanupPass": true,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_MACHINE_PASS_20260930.json",
-    "receiptBlobSha": "87cc873f81a8519c6f5541dbd0e765320043a0d3"
+    "receiptBlobSha": "87cc873f81a8519c6f5541dbd0e765320043a0d3",
+    "humanRejected": true,
+    "candidateEligibleForPromotion": false,
+    "rejectedByReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_TARGETED_HUMAN_REJECTED_MOBILE_DOCUMENT_UX_PERFORMANCE_20261001.json"
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "25375045f8cb2c8fd7e56ceea8641b9ab325ac35"
+    "blobSha": "e7ea15d603cae4e62bdd1a01d4268c891be379ef"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",

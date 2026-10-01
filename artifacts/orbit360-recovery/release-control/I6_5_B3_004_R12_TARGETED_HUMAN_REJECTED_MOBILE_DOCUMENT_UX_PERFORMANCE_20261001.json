@@ -1,0 +1,89 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12_TARGETED_HUMAN_REJECTION_MOBILE_DOCUMENT_UX_PERFORMANCE_V1",
+  "recordedAt": "2026-10-01",
+  "status": "HUMAN_REJECTED_REMEDIATION_REQUIRED",
+  "findingId": "B3-004",
+  "rejectedCandidate": {
+    "sourceSha": "4f19a7775b555b385cefb3a74bc63e805d0deb10",
+    "runId": 36857909461,
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36857909461-zg0i93ji.web.app",
+    "machinePassReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_MACHINE_PASS_20260930.json"
+  },
+  "humanEvidence": {
+    "actorRole": "direccion",
+    "deviceClass": "mobile",
+    "screenshotsProvidedInConversation": true,
+    "paymentAppliedToSyntheticReceipt": true,
+    "receiptAfterReloadShowedPaidDate": true,
+    "receiptAfterReloadShowedPaymentSupportAttached": true,
+    "reconciliationNotCompletedByHuman": false
+  },
+  "blockers": [
+    {
+      "id": "B3-004-R12-H1",
+      "type": "ROUTING",
+      "evidence": "Human direct receipt link did not open the exact receipt; user had to locate the synthetic client/receipt manually."
+    },
+    {
+      "id": "B3-004-R12-H2",
+      "type": "PERFORMANCE",
+      "evidence": "Human mobile observation: entering Cobros took approximately 7–10 seconds, despite desktop warm-browser machine metric of 138 ms."
+    },
+    {
+      "id": "B3-004-R12-H3",
+      "type": "SAVE_FEEDBACK",
+      "evidence": "Applying payment took approximately 10 seconds and the UI did not visibly indicate that save/upload/persistence was in progress."
+    },
+    {
+      "id": "B3-004-R12-H4",
+      "type": "RESPONSIVE",
+      "evidence": "Reconciliation modal was not mobile responsive; save control was not reachable/visible in the human viewport."
+    },
+    {
+      "id": "B3-004-R12-H5",
+      "type": "DOCUMENT_UI",
+      "evidence": "Receipt detail showed payment support as 'Adjunto' but exposed no visible open/view/download action for the durable document."
+    },
+    {
+      "id": "B3-004-R12-H6",
+      "type": "MOBILE_LAYOUT",
+      "evidence": "Receipt action area overflowed/clipped on mobile, including the long payment-evidence edit-lock action."
+    }
+  ],
+  "causalObservations": {
+    "machineDesktopWarmPathWasNotRepresentativeOfHumanMobilePath": true,
+    "durableDocumentBackendProofDidNotProveDocumentDiscoverabilityInReceiptUi": true,
+    "syntheticWriteIsolationRemainsRequiredForPreview": true,
+    "realPreviewRowsRemainReadOnly": true
+  },
+  "remediationAuthorization": {
+    "status": "AUTHORIZED_WITHIN_B3_004_ONLY",
+    "productFiles": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/styles/base.css",
+      "orbit360-platform/index.html"
+    ],
+    "qaFiles": [
+      "tools/gravicentra-i6-5-b3-004-human-fixture.mjs",
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs"
+    ],
+    "governanceFiles": [
+      "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+      "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json"
+    ],
+    "mobileBrowserProofRequired": true,
+    "directReceiptDeepLinkRequired": true,
+    "visibleDocumentOpenDownloadRequired": true,
+    "saveProgressFeedbackRequired": true,
+    "client360ToCobrosThresholdMs": 3000,
+    "productMutationAuthorized": true,
+    "realOperationalPreviewWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b3005Authorized": false
+  }
+}

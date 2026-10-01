@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "HUMAN_REJECTED_REMEDIATION_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R12_TARGETED_HUMAN_VISUAL",
+      "nextAction": "B3_004_R12P11_MOBILE_DOCUMENT_UX_PERFORMANCE_SOURCE_FIX",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1788,6 +1788,39 @@
         "classification": "PRODUCT_PREVIEW_QA_CLEANUP_COMPOSITION_DEFECT",
         "rootCause": "POST_RELOAD_QA_CLEANUP_CALLED_QUARANTINE_AFTER_DOCUMENTS_WERE_FINALIZED_BUT_QUARANTINE_ONLY_ACCEPTED_STAGING_PARENTS",
         "productSourceChanged": true
+      },
+      "machineProofInvalidatedByHumanEvidence": true,
+      "r12TargetedHumanRejection": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_TARGETED_HUMAN_REJECTED_MOBILE_DOCUMENT_UX_PERFORMANCE_20261001.json",
+        "blobSha": "9d71eb4933713d58a9720e2abed2dea1bd152916",
+        "blockers": [
+          "B3-004-R12-H1",
+          "B3-004-R12-H2",
+          "B3-004-R12-H3",
+          "B3-004-R12-H4",
+          "B3-004-R12-H5",
+          "B3-004-R12-H6"
+        ],
+        "rejectedSourceSha": "4f19a7775b555b385cefb3a74bc63e805d0deb10",
+        "rejectedRunId": 36857909461
+      },
+      "r12p11Authorization": {
+        "status": "AUTHORIZED",
+        "productFiles": [
+          "orbit360-platform/modules/cobros.js",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "orbit360-platform/styles/base.css",
+          "orbit360-platform/index.html"
+        ],
+        "qaFiles": [
+          "tools/gravicentra-i6-5-b3-004-human-fixture.mjs",
+          "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
+          "tools/gravicentra-i6-5-b3-004-contract.mjs"
+        ],
+        "realOperationalPreviewWritesAuthorized": false,
+        "noLive": true,
+        "noReimport": true,
+        "noB3005": true
       }
     },
     {
@@ -5392,7 +5425,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "B3_004_HUMAN_REJECTED_REMEDIATION_AUTHORIZED",
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
