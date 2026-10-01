@@ -1,0 +1,407 @@
+name: CotComp S4.67 W5 first real intake readiness
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s467-w5-first-real-intake-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s467-w5-first-real-intake-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_PROJECT_NUMBER: '646761409743'
+  COTCOMP_TENANT_ID: alianzas-soluciones
+  COTCOMP_REGION: us-central1
+  COTCOMP_WEB_APP_ID: '1:646761409743:web:2ec4595ee9160f9d945bba'
+  COTCOMP_INTAKE_URL: 'https://ays-orbit-360-lab.web.app/w5-intake-s467.html'
+
+jobs:
+  s467-w5-first-real-intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: \${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.67 authorization intent and exact source parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s467-w5-first-real-intake-authorized.json
+          jq -e '
+            .authorization=="S467_W5_FIRST_REAL_INTAKE_READINESS" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .country=="GT" and
+            .journeyId=="GT_AUTO_MOTO_HYBRID" and
+            .maxQuoteCases==1 and
+            .maxDataSubjects==1 and
+            .singleUse==true and
+            .generalPersistenceRelease==false and
+            .appCheckRequired==true and
+            .healthSensitiveData==false and
+            .providerOrRaterCalls==false and
+            .production==false and
+            .issuance==false and
+            .binding==false and
+            .payment==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "\${#CHANGED[@]}" = "1"
+          test "\${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.67 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-w5-first-real-intake-s467.js
+          node --check cotcomp-w5-first-real-intake-s467.test.js
+          node --test cotcomp-w5-first-real-intake-s467.test.js
+
+      - name: Prepare exact LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s467/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s467/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+          echo "GCLOUD_PROJECT=$COTCOMP_PROJECT_ID" >> "$GITHUB_ENV"
+
+      - name: Resolve Firebase Web config and App Check Enterprise provider
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@15.32.0
+          firebase apps:sdkconfig WEB "$COTCOMP_WEB_APP_ID" --project "$COTCOMP_PROJECT_ID" --json > "$RUNNER_TEMP/s467/sdkconfig.raw.json"
+          node <<'NODE'
+          const fs=require('fs');
+          const crypto=require('crypto');
+          const dir=process.env.RUNNER_TEMP+'/s467';
+          const sa=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS,'utf8'));
+          const projectId=process.env.COTCOMP_PROJECT_ID;
+          const projectNumber=process.env.COTCOMP_PROJECT_NUMBER;
+          const appId=process.env.COTCOMP_WEB_APP_ID;
+          const raw=JSON.parse(fs.readFileSync(dir+'/sdkconfig.raw.json','utf8'));
+          let cfg=null;
+          function walk(v){
+            if(cfg || !v || typeof v!=='object') return;
+            if(typeof v.apiKey==='string' && typeof v.projectId==='string' && typeof v.appId==='string'){cfg=v;return;}
+            for(const x of Object.values(v)) if(typeof x==='object') walk(x);
+          }
+          walk(raw);
+          if(!cfg || cfg.projectId!==projectId || cfg.appId!==appId) throw new Error('S467_WEB_SDK_CONFIG_INVALID');
+
+          const b64url=v=>Buffer.from(v).toString('base64url');
+          async function oauth(){
+            const now=Math.floor(Date.now()/1000);
+            const a=b64url(JSON.stringify({alg:'RS256',typ:'JWT'}));
+            const b=b64url(JSON.stringify({
+              iss:sa.client_email,
+              scope:'https://www.googleapis.com/auth/cloud-platform',
+              aud:'https://oauth2.googleapis.com/token',
+              iat:now,exp:now+3600
+            }));
+            const unsigned=a+'.'+b;
+            const sig=crypto.sign('RSA-SHA256',Buffer.from(unsigned),sa.private_key).toString('base64url');
+            const body=new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:unsigned+'.'+sig});
+            const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body});
+            if(!r.ok) throw new Error('S467_OAUTH_FAILED_'+r.status);
+            return (await r.json()).access_token;
+          }
+
+          (async()=>{
+            const token=await oauth();
+            const appPath='projects/'+projectNumber+'/apps/'+encodeURIComponent(appId)+'/recaptchaEnterpriseConfig';
+            const r=await fetch('https://firebaseappcheck.googleapis.com/v1/'+appPath,{headers:{authorization:'Bearer '+token}});
+            const text=await r.text(); let appCheck={}; try{appCheck=JSON.parse(text||'{}');}catch{}
+            if(!r.ok || !appCheck.siteKey) throw new Error('S467_RECAPTCHA_ENTERPRISE_APPCHECK_NOT_CONFIGURED_'+r.status);
+
+            const keyUrl='https://recaptchaenterprise.googleapis.com/v1/projects/'+projectId+'/keys/'+encodeURIComponent(appCheck.siteKey);
+            const kr=await fetch(keyUrl,{headers:{authorization:'Bearer '+token}});
+            const kt=await kr.text(); let key={}; try{key=JSON.parse(kt||'{}');}catch{}
+            if(!kr.ok) throw new Error('S467_RECAPTCHA_KEY_READ_FAILED_'+kr.status);
+            const domains=key&&key.webSettings&&Array.isArray(key.webSettings.allowedDomains)?key.webSettings.allowedDomains:[];
+            if(!domains.includes('ays-orbit-360-lab.web.app')) throw new Error('S467_CANONICAL_HOST_NOT_ALLOWED_BY_RECAPTCHA');
+
+            fs.writeFileSync(dir+'/sdkconfig.json',JSON.stringify(cfg));
+            fs.writeFileSync(dir+'/appcheck-public.json',JSON.stringify({
+              provider:'RECAPTCHA_ENTERPRISE',
+              siteKey:appCheck.siteKey,
+              tokenTtl:appCheck.tokenTtl||null,
+              canonicalDomainAllowed:true
+            },null,2));
+            fs.writeFileSync(dir+'/oauth.token',token,{mode:0o600});
+
+            const secretUrl='https://secretmanager.googleapis.com/v1/projects/646761409743/secrets/cotcomp-s442-appcheck-debug-token/versions/latest:access';
+            const sr=await fetch(secretUrl,{headers:{authorization:'Bearer '+token}});
+            const sj=await sr.json().catch(()=>({}));
+            if(!sr.ok || !sj.payload || !sj.payload.data) throw new Error('S467_DEBUG_TOKEN_SECRET_NOT_ACCESSIBLE_'+sr.status);
+            const debugSecret=Buffer.from(sj.payload.data,'base64').toString('utf8').trim();
+            if(!/^[0-9a-f-]{36}$/i.test(debugSecret)) throw new Error('S467_DEBUG_TOKEN_SECRET_INVALID');
+            fs.writeFileSync(dir+'/debug-token.secret',debugSecret,{mode:0o600});
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1);});
+          NODE
+          rm -f "$RUNNER_TEMP/s467/sdkconfig.raw.json" "$RUNNER_TEMP/s467/oauth.token"
+
+      - name: Build one-off intake browser assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          CLIENT="$RUNNER_TEMP/s467/client"
+          mkdir -p "$CLIENT"
+          cd "$CLIENT"
+          npm init -y >/dev/null 2>&1
+          npm install --silent firebase@latest esbuild@latest
+          npx esbuild "$GITHUB_WORKSPACE/orbit360-platform/_w5-src/w5-intake-s467-client.js" \
+            --bundle --platform=browser --format=iife --minify \
+            --outfile="$GITHUB_WORKSPACE/orbit360-platform/w5-intake-s467.bundle.js" >/dev/null
+          node <<'NODE'
+          const fs=require('fs');
+          const root=process.env.GITHUB_WORKSPACE+'/orbit360-platform';
+          const cfg=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s467/sdkconfig.json','utf8'));
+          const appCheck=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s467/appcheck-public.json','utf8'));
+          const value={
+            firebaseConfig:cfg,
+            appCheckProvider:'RECAPTCHA_ENTERPRISE',
+            appCheckSiteKey:appCheck.siteKey
+          };
+          fs.writeFileSync(root+'/w5-intake-s467-config.js','window.__AYS_W5_INTAKE_CONFIG__ = Object.freeze('+JSON.stringify(value)+');\\n');
+          NODE
+          test -s "$GITHUB_WORKSPACE/orbit360-platform/w5-intake-s467.bundle.js"
+          test -s "$GITHUB_WORKSPACE/orbit360-platform/w5-intake-s467-config.js"
+
+      - name: Fail-closed Hosting preflight against current LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://ays-orbit-360-lab.web.app'
+          for F in \
+            index.html \
+            core/backend-lab-loader.js \
+            core/backend-lab-init.js \
+            data/store-firestore-lab.local.js \
+            sw.js
+          do
+            mkdir -p "$RUNNER_TEMP/s467/preflight/$(dirname "$F")"
+            curl -fsSL "$BASE/$F?s467=$GITHUB_RUN_ID" -o "$RUNNER_TEMP/s467/preflight/$F"
+            cmp -s "$RUNNER_TEMP/s467/preflight/$F" "$GITHUB_WORKSPACE/orbit360-platform/$F" || {
+              echo "S467_HOSTING_BASELINE_MISMATCH:$F" >&2
+              exit 1
+            }
+          done
+
+      - name: Confirm one-shot QuoteCase path is absent before deploy
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const data=require('./cotcomp-runtime-data-contract');
+          const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:'ays-orbit-360-lab'});
+          const db=getFirestore(app);
+          const ids=data.deriveCaseIds({tenantId:'alianzas-soluciones',idempotencyKey:'s467-w5-first-real-intake'});
+          const path=data.pathFor('alianzas-soluciones',data.ENTITY.QUOTE_CASE,ids.caseId);
+          db.doc(path).get().then(s=>{
+            if(s.exists) throw new Error('S467_ONE_SHOT_CASE_ALREADY_EXISTS');
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s467/evidence/predeploy-case-state.json',JSON.stringify({
+              expectedQuoteCasePresent:false,
+              inspectedDeterministicOneShotPath:true,
+              rawPathEmitted:false,
+              piiEmitted:false
+            },null,2));
+          }).catch(e=>{console.error(String(e&&e.message||e));process.exit(1);});
+          NODE
+
+      - name: Deploy only S4.67 callable and LAB Hosting
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy \
+            --only "functions:cotcompW5FirstRealIntake,hosting" \
+            --project "$COTCOMP_PROJECT_ID" \
+            --non-interactive
+
+      - name: Verify deployed form and fail-closed App Check
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL "$COTCOMP_INTAKE_URL?s467=$GITHUB_RUN_ID" -o "$RUNNER_TEMP/s467/deployed.html"
+          grep -q 'id="brand"' "$RUNNER_TEMP/s467/deployed.html"
+          grep -q 'id="lineModel"' "$RUNNER_TEMP/s467/deployed.html"
+          grep -q 'Autorizo gestionar esta solicitud y contactarme' "$RUNNER_TEMP/s467/deployed.html"
+          grep -q 'id="marketingConsent"' "$RUNNER_TEMP/s467/deployed.html"
+          curl -fsSL "https://ays-orbit-360-lab.web.app/w5-intake-s467-config.js?s467=$GITHUB_RUN_ID" -o "$RUNNER_TEMP/s467/deployed-config.js"
+          curl -fsSL "https://ays-orbit-360-lab.web.app/w5-intake-s467.bundle.js?s467=$GITHUB_RUN_ID" -o "$RUNNER_TEMP/s467/deployed-bundle.js"
+          test -s "$RUNNER_TEMP/s467/deployed-config.js"
+          test -s "$RUNNER_TEMP/s467/deployed-bundle.js"
+
+          ENDPOINT="https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompW5FirstRealIntake"
+          CODE="$(curl -sS -o "$RUNNER_TEMP/s467/no-appcheck.json" -w '%{http_code}' \
+            -X POST "$ENDPOINT" -H 'content-type: application/json' --data '{"data":{}}')"
+          test "$CODE" != "200"
+
+      - name: Prove valid limited-use App Check reaches validation without persistence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const dir=process.env.RUNNER_TEMP+'/s467';
+          const debugToken=fs.readFileSync(dir+'/debug-token.secret','utf8').trim();
+          const app='projects/'+process.env.COTCOMP_PROJECT_NUMBER+'/apps/'+encodeURIComponent(process.env.COTCOMP_WEB_APP_ID);
+          (async()=>{
+            const er=await fetch('https://firebaseappcheck.googleapis.com/v1/'+app+':exchangeDebugToken',{
+              method:'POST',
+              headers:{'content-type':'application/json'},
+              body:JSON.stringify({debugToken,limitedUse:true})
+            });
+            const ej=await er.json().catch(()=>({}));
+            if(!er.ok || !ej.token) throw new Error('S467_DEBUG_APPCHECK_EXCHANGE_FAILED_'+er.status);
+            const endpoint='https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompW5FirstRealIntake';
+            const cr=await fetch(endpoint,{
+              method:'POST',
+              headers:{'content-type':'application/json','X-Firebase-AppCheck':ej.token},
+              body:JSON.stringify({data:{}})
+            });
+            const body=await cr.text();
+            if(cr.status!==400 || !body.includes('BRAND_REQUIRED')) {
+              throw new Error('S467_VALID_APPCHECK_DID_NOT_REACH_PREWRITE_VALIDATION_'+cr.status);
+            }
+            fs.writeFileSync(dir+'/evidence/appcheck-proof.json',JSON.stringify({
+              noAppCheckBlocked:true,
+              limitedUseAppCheckAccepted:true,
+              invalidPayloadRejectedBeforePersistence:true,
+              expectedValidationCode:'BRAND_REQUIRED',
+              requestContainedPii:false,
+              appDataWritesExpected:0
+            },null,2));
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1);});
+          NODE
+
+      - name: Verify post-deploy zero real QuoteCases from QA and unchanged critical Hosting files
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const data=require('./cotcomp-runtime-data-contract');
+          const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:'ays-orbit-360-lab'});
+          const db=getFirestore(app);
+          const ids=data.deriveCaseIds({tenantId:'alianzas-soluciones',idempotencyKey:'s467-w5-first-real-intake'});
+          const path=data.pathFor('alianzas-soluciones',data.ENTITY.QUOTE_CASE,ids.caseId);
+          db.doc(path).get().then(s=>{
+            if(s.exists) throw new Error('S467_QA_CREATED_REAL_CASE');
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s467/evidence/postdeploy-case-state.json',JSON.stringify({
+              quoteCaseCreatedByQa:false,
+              intakeReadyForOneRealSubmission:true,
+              rawPathEmitted:false,
+              piiEmitted:false
+            },null,2));
+          }).catch(e=>{console.error(String(e&&e.message||e));process.exit(1);});
+          NODE
+          cd "$GITHUB_WORKSPACE"
+          BASE='https://ays-orbit-360-lab.web.app'
+          for F in index.html core/backend-lab-loader.js core/backend-lab-init.js data/store-firestore-lab.local.js sw.js
+          do
+            mkdir -p "$RUNNER_TEMP/s467/postdeploy/$(dirname "$F")"
+            curl -fsSL "$BASE/$F?s467post=$GITHUB_RUN_ID" -o "$RUNNER_TEMP/s467/postdeploy/$F"
+            cmp -s "$RUNNER_TEMP/s467/postdeploy/$F" "$GITHUB_WORKSPACE/orbit360-platform/$F"
+          done
+
+      - name: Write sanitized S4.67 readiness receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const out={
+            schemaVersion:'ays-cotcomp-s467-w5-first-real-intake-readiness-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',
+            tenantId:'alianzas-soluciones',
+            country:'GT',
+            journeyId:'GT_AUTO_MOTO_HYBRID',
+            intakeUrl:process.env.COTCOMP_INTAKE_URL,
+            sourceSha:process.env.GITHUB_SHA,
+            qa:{accumulatedCotCompPass:true,s467Safeguards:'5/5 PASS'},
+            deployment:{
+              callable:'cotcompW5FirstRealIntake',
+              hostingRoute:'/w5-intake-s467.html',
+              appCheckEnterpriseConfigured:true,
+              appCheckRequired:true,
+              oneShot:true,
+              generalPersistenceRelease:false
+            },
+            preUserSubmit:{
+              quoteCasesCreatedByS467Qa:0,
+              realDataWrite:false,
+              productionTouched:false,
+              providerOrRaterCalls:0,
+              issuance:false,
+              binding:false,
+              payment:false,
+              healthSensitiveData:false
+            },
+            privacy:{
+              piiInGitHub:false,
+              piiInLogs:false,
+              piiInArtifact:false,
+              rawCaseAccessTokenStored:false
+            },
+            status:'READY_FOR_SINGLE_REAL_SUBMISSION'
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s467/evidence/S467_W5_FIRST_REAL_INTAKE_READINESS_RECEIPT.json',JSON.stringify(out,null,2));
+          NODE
+
+      - name: Upload sanitized S4.67 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s467-w5-first-real-intake-\${{ github.run_id }}
+          path: |
+            \${{ runner.temp }}/s467/evidence/predeploy-case-state.json
+            \${{ runner.temp }}/s467/evidence/appcheck-proof.json
+            \${{ runner.temp }}/s467/evidence/postdeploy-case-state.json
+            \${{ runner.temp }}/s467/evidence/S467_W5_FIRST_REAL_INTAKE_READINESS_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credentials and App Check debug secret
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/s467/firebase-service-account.json"
+          rm -f "$RUNNER_TEMP/s467/debug-token.secret"
