@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "ays-cotcomp-s465-w5-binding-preflight-sourceonly-intent-v1.0",
+  "authorization": "S465_W5_SOURCE_ONLY_BINDING_PREFLIGHT",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "171da8c357d1ed7723bbc9b68f2b92998dda01e8",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W5",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "production": false,
+  "scope": [
+    "prepare SHA-256 case selector commitment mechanism",
+    "prepare SHA-256 actor selector commitment mechanism",
+    "prepare SHA-256 consent-evidence commitment mechanism",
+    "prove raw selectors are neither persisted nor returned",
+    "simulate complete commitments without touching real data",
+    "keep final Owner W5 authorization separate"
+  ]
+}
