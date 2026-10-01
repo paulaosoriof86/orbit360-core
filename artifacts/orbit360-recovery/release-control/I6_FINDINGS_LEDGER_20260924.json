@@ -2157,7 +2157,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-      "status": "TARGETED_HUMAN_REJECTED_SOURCE_REMEDIATION_AUTHORIZED",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "businessRulesFrozen": true,
@@ -2173,8 +2173,8 @@
       "paymentLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
       "entryBlockedBy": null,
       "entryUnblockedBy": "B3-004 CLOSED_PASS",
-      "nextAction": "B3_005_SEMANTIC_PROVENANCE_SOURCE_FIX",
-      "productMutationAuthorized": true,
+      "nextAction": "B3_005_SEMANTIC_PROVENANCE_SOURCE_CONTRACT",
+      "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
@@ -2200,8 +2200,10 @@
         "functions/tenant-domain-config.js": "3aba4964dc56e5eb284c6288de5c7a74e9a9b765",
         "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
         "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
-        "tools/gravicentra-i6-5-b3-005-contract.mjs": "d94c1baf4e1ca0b146aae8bff3673cff1aa4a159",
-        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897"
+        "tools/gravicentra-i6-5-b3-005-contract.mjs": "89d1f612f933c5453db4db7f109c8e1027a9aca2",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897",
+        "orbit360-platform/modules/cobros.js": "df8d483309fbd27861a5d55e93c69af780f7f0a6",
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "f98777a40f791612dd88c606a7172ba669a66312"
       },
       "configMutationAuthorized": false,
       "machineProofInvalidatedBySourceChange": true,
@@ -2211,7 +2213,7 @@
       "r1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
       "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc",
       "qaBlobs": {
-        "tools/gravicentra-i6-5-b3-005-contract.mjs": "d94c1baf4e1ca0b146aae8bff3673cff1aa4a159",
+        "tools/gravicentra-i6-5-b3-005-contract.mjs": "89d1f612f933c5453db4db7f109c8e1027a9aca2",
         "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "1da0aeb89ea590fb3c1bd712e0ec8067ff4318f5",
         "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs": "4cd727c02f4b91fa3bec56917edfd479a64d01ff",
         ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897",
@@ -2272,7 +2274,10 @@
         "orbit360-platform/modules/cobros.js",
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "tools/gravicentra-i6-5-b3-005-contract.mjs"
-      ]
+      ],
+      "semanticProvenanceSourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R4_SEMANTIC_PROVENANCE_SOURCE_FIX_20261001.json",
+      "semanticProvenanceSourceFixReceiptBlobSha": "4c214810a3897bab60fb757add6cbbf69fc3bca9",
+      "compositionLockBlobSha": "dd3d1856167919dcc418a122c6ecbe997aa65636"
     },
     {
       "id": "B3-006",
@@ -5876,18 +5881,18 @@
     }
   },
   "currentB3": {
-    "status": "B3_005_TARGETED_HUMAN_REJECTED_SOURCE_REMEDIATION_AUTHORIZED",
+    "status": "B3_005_SOURCE_FIXED_PENDING_CONTRACT",
     "activeFindingId": "B3-005",
     "priorFindingId": "B3-004",
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "ac185d81443371f3f4b0b388b57c32a59d451bbb",
+    "compositionLockBlobSha": "dd3d1856167919dcc418a122c6ecbe997aa65636",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
     "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75",
-    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R4_SEMANTIC_PROVENANCE_SOURCE_FIX_20261001.json",
     "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
     "paymentLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
