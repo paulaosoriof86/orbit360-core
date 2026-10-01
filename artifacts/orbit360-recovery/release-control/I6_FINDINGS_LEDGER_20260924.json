@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R12P11_EXACT_PREVIEW_MOBILE_BROWSER",
+      "nextAction": "B3_004_R12P11P3P3_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1883,6 +1883,12 @@
         "blobSha": "32403d6cc852f6b8d8796cd7452c51e3269373b6",
         "compositionLockBlobSha": "3fa9b56b89a7ecbbfdd33ccb50fb63c72bacaec4",
         "classification": "QA_CONTRACT_STALE_ASSET_BINDING",
+        "productSourceChanged": false
+      },
+      "r12p11p3p3ContractFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P3P3_STALE_R9P1_CLIENTE360_ASSET_CONTRACT_FIX_20261001.json",
+        "blobSha": "bbc390e58004e19a86d12e756b7be359e2ed4e8d",
+        "compositionLockBlobSha": "c2082052eda43bec131555e86ef2940b92c2928e",
         "productSourceChanged": false
       }
     },

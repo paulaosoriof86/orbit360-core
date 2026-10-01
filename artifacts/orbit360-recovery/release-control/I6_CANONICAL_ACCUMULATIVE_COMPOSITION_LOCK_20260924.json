@@ -403,8 +403,8 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P11P3P2",
-    "reason": "SECOND_STALE_CLIENTE360_ASSET_CONTRACT_ONLY",
+    "gate": "I6.5-B3-004-R12P11P3P3",
+    "reason": "FINAL_STALE_R9P1_CLIENTE360_ASSET_VALIDATOR",
     "changedProductFiles": [],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
@@ -1300,6 +1300,16 @@
     "receiptBlobSha": "32403d6cc852f6b8d8796cd7452c51e3269373b6",
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "ea6d5cc86c6730b9852e96b13176ff512ee2ccf2"
+    },
+    "productSourceChanged": false
+  },
+  "b3004R12P11P3P3StaleR9P1Cliente360AssetContractFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P3P3_STALE_R9P1_CLIENTE360_ASSET_CONTRACT_FIX_20261001.json",
+    "receiptBlobSha": "bbc390e58004e19a86d12e756b7be359e2ed4e8d",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "46f2cf18284ff2420d1dc35a3e8f190bb92d20bd"
     },
     "productSourceChanged": false
   }

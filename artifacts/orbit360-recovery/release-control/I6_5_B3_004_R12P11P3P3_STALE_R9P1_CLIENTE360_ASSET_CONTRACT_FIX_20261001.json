@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11P3P3_STALE_R9P1_CLIENTE360_ASSET_CONTRACT_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "feefa7996dc05cfd282b2385d697f7670d1d958d",
+  "classification": "QA_VALIDATOR_STALE_ASSET_BINDING",
+  "cause": "Final historical R9P1 assertion still expected cliente360.js?v=20260930-b3004r11 after R12P11P3 bumped canonical asset.",
+  "remediation": "Update final stale cliente360 asset assertion only; no product source change.",
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "46f2cf18284ff2420d1dc35a3e8f190bb92d20bd"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}
