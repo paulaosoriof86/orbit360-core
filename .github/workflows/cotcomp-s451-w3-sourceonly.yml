@@ -1,0 +1,129 @@
+name: CotComp S4.51 W3 proposal-versioning source-only readiness
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s451-w3-proposal-readiness-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s451-w3-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s451-w3-sourceonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.51 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s451-w3-sourceonly.json
+          jq -e '
+            .authorization == "S451_W3_SOURCE_ONLY_READINESS" and
+            .projectId == "ays-orbit-360-lab" and
+            .stage == "W3" and
+            .appDataReads == false and
+            .appDataWrites == false and
+            .providerOrRaterCalls == false and
+            .realData == false and
+            .production == false and
+            .physicalW3 == false
+          ' "$INTENT" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$INTENT")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$INTENT"
+
+      - name: Run accumulated CotComp QA and S4.51 audit tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-w3-proposal-readiness-s451.js
+          node --check cotcomp-w3-proposal-readiness-s451.test.js
+          node --test cotcomp-w3-proposal-readiness-s451.test.js
+
+      - name: Build S4.51 source-only receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s451/evidence"
+          node <<'NODE'
+          const fs=require('fs');
+          const s=require('./functions/cotcomp-w3-proposal-readiness-s451');
+          const r=s.readiness();
+          const receipt={
+            schemaVersion:'ays-cotcomp-s451-w3-sourceonly-readiness-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',
+            stage:'W3',
+            sourceOnlyReady:r.sourceOnlyReady,
+            physicalW3Ready:r.physicalW3Ready,
+            physicalW3Allowed:r.physicalW3Allowed,
+            findings:r.audit.findings,
+            blockers:r.blockers,
+            candidate:r.candidate,
+            boundaries:{
+              appDataReadsExecuted:0,
+              appDataWritesExecuted:0,
+              providerOrRaterCallsExecuted:0,
+              realDataTouched:false,
+              productionTouched:false
+            }
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s451/evidence/S451_W3_SOURCEONLY_READINESS_RECEIPT.json',JSON.stringify(receipt,null,2));
+          console.log('S451_SOURCE_ONLY_READY='+receipt.sourceOnlyReady);
+          console.log('S451_PHYSICAL_W3_READY='+receipt.physicalW3Ready);
+          console.log('S451_BLOCKERS='+receipt.blockers.join(','));
+          NODE
+
+      - name: Enforce source-only truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          R="$RUNNER_TEMP/s451/evidence/S451_W3_SOURCEONLY_READINESS_RECEIPT.json"
+          jq -e '
+            .sourceOnlyReady == true and
+            .physicalW3Ready == false and
+            .physicalW3Allowed == false and
+            .findings.runtimeBuildUsesCaseId == true and
+            .findings.runtimeBuildUsesQuoteCaseId == false and
+            .findings.comparisonRequiresQuoteCaseId == true and
+            .findings.directRuntimeProposalComparisonShapePasses == false and
+            (.blockers | index("PROPOSAL_CASE_LINK_FIELD_MISMATCH")) != null and
+            (.blockers | index("PROPOSAL_VERSION_IDENTITY_SEMANTICS_REQUIRED")) != null and
+            (.blockers | index("PROPOSAL_CURRENT_VALIDITY_PERSISTENCE_CONTRACT_REQUIRED")) != null and
+            (.blockers | index("PROPOSAL_IDEMPOTENT_WRITE_CONTRACT_REQUIRED")) != null and
+            (.blockers | index("PROPOSAL_SUPERSESSION_ATOMICITY_CONTRACT_REQUIRED")) != null and
+            (.blockers | index("W3_PHYSICAL_ROLLBACK_JOURNAL_REQUIRED")) != null and
+            (.blockers | index("OWNER_W3_AUTHORIZATION_REQUIRED")) != null and
+            .boundaries.appDataReadsExecuted == 0 and
+            .boundaries.appDataWritesExecuted == 0 and
+            .boundaries.providerOrRaterCallsExecuted == 0 and
+            .boundaries.realDataTouched == false and
+            .boundaries.productionTouched == false
+          ' "$R" >/dev/null
+
+      - name: Upload S4.51 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s451-w3-sourceonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/s451/evidence/S451_W3_SOURCEONLY_READINESS_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
