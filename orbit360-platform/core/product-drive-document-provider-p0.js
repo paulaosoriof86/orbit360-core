@@ -32,8 +32,8 @@
   }
   function callableNames() {
     return isPreview()
-      ? { status: 'orbit360DocumentDriveStatusPreview', upload: 'orbit360DocumentDriveUploadPreview', read: 'orbit360DocumentDriveReadPreview', download: 'orbit360DocumentDriveDownloadPreview', bootstrap: 'orbit360DocumentDriveBootstrapPreview', region: 'us-east1' }
-      : { status: 'orbit360DocumentDriveStatus', upload: 'orbit360DocumentDriveUpload', read: 'orbit360DocumentDriveRead', download: 'orbit360DocumentDriveDownload', bootstrap: 'orbit360DocumentDriveBootstrap', region: 'us-central1' };
+      ? { status: 'orbit360DocumentDriveStatusPreview', upload: 'orbit360DocumentDriveUploadPreview', read: 'orbit360DocumentDriveReadPreview', download: 'orbit360DocumentDriveDownloadPreview', finalize: 'orbit360DocumentDriveFinalizePreview', quarantine: 'orbit360DocumentDriveQuarantinePreview', bootstrap: 'orbit360DocumentDriveBootstrapPreview', region: 'us-east1' }
+      : { status: 'orbit360DocumentDriveStatus', upload: 'orbit360DocumentDriveUpload', read: 'orbit360DocumentDriveRead', download: 'orbit360DocumentDriveDownload', finalize: 'orbit360DocumentDriveFinalize', quarantine: 'orbit360DocumentDriveQuarantine', bootstrap: 'orbit360DocumentDriveBootstrap', region: 'us-central1' };
   }
   function requestBase(extra) {
     return {
@@ -174,7 +174,7 @@
     let base64;
     try { base64 = await toBase64(file); }
     catch (error) { return { ok: false, status: /TOO_LARGE/.test(String(error && error.message)) ? 'archivo_demasiado_grande' : 'lectura_fallida', message: /TOO_LARGE/.test(String(error && error.message)) ? 'El archivo supera el límite de 15 MB.' : 'No fue posible leer el archivo.' }; }
-    const payload = Object.assign(requestBase(extra), { name: file.name || (extra && extra.nombre) || 'Documento', mimeType: file.type || 'application/octet-stream', size: file.size || 0, base64 });
+    const payload = Object.assign(requestBase(extra), { name: file.name || (extra && extra.nombre) || 'Documento', mimeType: file.type || 'application/octet-stream', size: file.size || 0, base64, provisional: !!(extra && extra.provisional) });
     try {
       const out = await call(names.upload, payload, names.region);
       if (!out || out.ok !== true || !(out.documentRef || out.driveUrl || out.externalUrl)) return Object.assign({ ok: false, status: 'sin_readback', message: 'Drive no confirmó el documento.' }, out || {});
@@ -217,8 +217,29 @@
     }
   }
 
+  async function finalize(ref, extra) {
+    const id = driveFileId(ref);
+    if (!id) return { ok: false, status: 'sin_referencia' };
+    const names = callableNames();
+    try {
+      return await call(names.finalize, Object.assign(requestBase(extra), { documentRef: id, clientFolderId: String(extra && extra.clientFolderId || ''), stagingFolderId: String(extra && extra.stagingFolderId || '') }), names.region);
+    } catch (error) {
+      return { ok: false, status: 'finalize_failed', code: String(error && (error.code || error.message) || '') };
+    }
+  }
+  async function quarantine(ref, extra) {
+    const id = driveFileId(ref);
+    if (!id) return { ok: true, status: 'nothing_to_quarantine' };
+    const names = callableNames();
+    try {
+      return await call(names.quarantine, Object.assign(requestBase(extra), { documentRef: id, clientFolderId: String(extra && extra.clientFolderId || ''), stagingFolderId: String(extra && extra.stagingFolderId || '') }), names.region);
+    } catch (error) {
+      return { ok: false, status: 'quarantine_failed', code: String(error && (error.code || error.message) || '') };
+    }
+  }
+
   const provider = {
-    resolve, download, upload, connect, bootstrap,
+    resolve, download, upload, finalize, quarantine, connect, bootstrap,
     uploadStatus: () => {
       const stale = Date.now() - state.lastProbeAt > 30000;
       if (!state.probing && (!state.probed || stale)) setTimeout(() => probe(true), 0);
@@ -246,8 +267,8 @@
   document.addEventListener('orbit:active-role-changed', () => { state.probed = false; probe(true); });
 
   Orbit.productDriveDocumentProviderP0 = Object.freeze({
-    VERSION: 'b2-r85-20260928.1-auth-code-backend-exchange',
-    connect, bootstrap, probe, upload, resolve, download,
+    VERSION: 'b3-004-r10-20260930.1-payment-document-staging',
+    connect, bootstrap, probe, upload, finalize, quarantine, resolve, download,
     status: () => Object.assign({}, state.status),
     previewIsolated: isPreview(),
     oauthDelegated: false,
