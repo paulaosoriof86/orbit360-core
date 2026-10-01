@@ -681,7 +681,7 @@ Orbit.modules.cobros = (function () {
         close();U.toast('✓ Pago registrado');baseCache=null;
         if(avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
         setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
-      }catch(error){btn.disabled=false;U.toast('No fue posible registrar el pago.');}
+      }catch(error){console.error('[Gravicentra][Cobros] Registrar pago falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},cobroId:c.id||'',receiptId:receipt.id||''});btn.disabled=false;U.toast('No fue posible registrar el pago. No se guardaron cambios.');}
     };
   }
 
