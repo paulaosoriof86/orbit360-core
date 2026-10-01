@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P13_PENDING_APPLICATION_VISIBLE_STATE_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "findingId": "B3-004",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "parentHead": "0a5bd0a8ab77a33ff384a5842dd2b1a2128a1809",
+  "failedRunId": 36906017933,
+  "failedJobId": 110517106542,
+  "rootCause": "AFTER_PAYMENT_BEFORE_RECONCILIATION_CANONICAL_APPLICATION_STATE_WAS_PENDING_APPLICATION_BUT_RECEIPT_HERO_RENDERED_GENERIC_PAGADO_INSTEAD_OF_EXPLICIT_PENDING_RECONCILIATION",
+  "observedProof": {
+    "client360ToCobrosUsableMs": 156,
+    "originalFalseConciliatedLabelRemoved": true,
+    "applicationState": "PENDING_APPLICATION",
+    "applicationDate": "PENDING",
+    "invoiceNumber": "NOT_INFORMED",
+    "action": "Conciliar / completar datos"
+  },
+  "remediation": {
+    "pendingApplicationLabel": "Pago aplicado · pendiente de conciliación",
+    "reconciledLabelOnlyAfterApplicationEvidence": true,
+    "listAndDetailUseLinkedPaymentContext": true
+  },
+  "productBlobs": {
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "9c0c95e13127ec32c596616cee46d8f33cd6b709",
+    "orbit360-platform/index.html": "bb88a5ac518594bae3914c7f02b54a138f514b7b"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "ba35a4275e2934b7a37b929efbd5439f9d5c40de"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

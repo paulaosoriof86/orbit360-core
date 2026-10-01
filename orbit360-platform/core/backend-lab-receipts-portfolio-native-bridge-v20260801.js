@@ -155,8 +155,11 @@
     return{t:'Pendiente de conciliación',c:'warn'};
   }
   function activePolicy(p){return !!(p&&(p.estado==='Vigente'||p.estado==='Por renovar'));}
-  function stateLabel(r){
-    if(isPaymentReconciled(r))return{t:'Cobro conciliado',c:'ok'};
+  function stateLabel(r,payment){
+    var evidence=payment&&clean(payment.id)?payment:r;
+    var app=String((payment&&payment.applicationState)||(r&&r.applicationState)||'').trim().toUpperCase();
+    if(app==='PENDING_APPLICATION')return{t:'Pago aplicado · pendiente de conciliación',c:'warn'};
+    if(isPaymentReconciled(evidence))return{t:'Cobro conciliado',c:'ok'};
     var s=clean(r&&r.estadoOperativo);
     if(s==='futuro_pendiente')return{t:'Futuro',c:'warn'};
     if(s==='pendiente_vencido')return{t:'Vencido',c:'danger'};
@@ -331,7 +334,7 @@
 
   function renderReceiptDetail(receiptId,cid){
     var r=Orbit.store.get('recibosEsperados',receiptId);if(!r)return false;
-    var p=Orbit.store.get('polizas',r.polizaId)||{},c=Orbit.store.get('clientes',cid||r.clienteId)||{},v=Orbit.store.where('vehiculos',function(x){return x&&x.polizaId===r.polizaId;})[0]||{},portfolio=Orbit.store.where('carteraPrimas',function(x){return x&&x.reciboId===r.id;})[0]||null,payment=linkedCobro(r.id)||{},cur=r.moneda||p.moneda||c.moneda||'GTQ',st=stateLabel(r),rec=reconciliationLabel(r,portfolio),target=document.getElementById('c360-body')||document.getElementById('host');if(!target)return false;
+    var p=Orbit.store.get('polizas',r.polizaId)||{},c=Orbit.store.get('clientes',cid||r.clienteId)||{},v=Orbit.store.where('vehiculos',function(x){return x&&x.polizaId===r.polizaId;})[0]||{},portfolio=Orbit.store.where('carteraPrimas',function(x){return x&&x.reciboId===r.id;})[0]||null,payment=linkedCobro(r.id)||{},cur=r.moneda||p.moneda||c.moneda||'GTQ',st=stateLabel(r,payment),rec=reconciliationLabel(payment&&clean(payment.id)?payment:r,portfolio),target=document.getElementById('c360-body')||document.getElementById('host');if(!target)return false;
     var paidDate=payment.paidDate||payment.fechaPago||r.paidDate||r.fechaPago||r.fechaPagoReportada||'',applicationDate=payment.applicationDate||r.applicationDate||'',invoiceNumber=payment.invoiceNumber||payment.numeroFactura||r.invoiceNumber||r.numeroFactura||'',paymentSupportRef=payment.paymentSupportDocumentRef||r.paymentSupportDocumentRef||'',invoiceDocumentRef=payment.invoiceDocumentRef||r.invoiceDocumentRef||'';
     var back='#/cliente360?c='+encodeURIComponent(cid||r.clienteId||p.clienteId||'')+'&t=recibos';
     var cell=function(k,val){var shown=val==null||clean(val)===''||/^(undefined|null)$/i.test(clean(val))?'Pendiente de completar':val;return'<div><div style="font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.035em">'+esc(k)+'</div><div style="font-size:13.5px;font-weight:500;line-height:1.42;margin-top:3px">'+esc(shown)+'</div></div>';};
@@ -389,7 +392,7 @@
     var opts='<option value="todas">Todas las pólizas</option>'+policies.map(function(p){return'<option value="'+esc(p.id)+'" '+(selected===p.id?'selected':'')+'>'+esc(policyLabel(p))+'</option>';}).join('');
     var rows=shown.map(function(r){
       var c=byReceipt[r.id]||null,p=Orbit.store.get('polizas',r.polizaId)||{},v=Orbit.store.where('vehiculos',function(x){return x&&x.polizaId===r.polizaId;})[0];
-      var st=stateLabel(r),kind='Calendario vigente';
+      var st=stateLabel(r,c),kind='Calendario vigente';
       var veh=v?[v.marca,v.linea,v.placa].filter(Boolean).join(' '):'';
       return'<tr class="clickable" data-rp-receipt-id="'+esc(r.id)+'"><td><b>'+esc(r.polizaNumero||p.numero||'—')+'</b><div class="muted" style="font-size:11px">'+esc(veh||p.ramo||'')+'</div></td><td><span class="badge neutral">'+kind+'</span></td><td>'+esc(r.serie||r.numeroReciboFuente||'—')+'</td><td>'+fmtDate(dueDate(r))+'</td><td class="num">'+moneyDetail(amount(r),r.moneda||cur)+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td><td class="rp-action-cell" style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">'+actionHtml(r)+'</td></tr>';
     }).join('');
