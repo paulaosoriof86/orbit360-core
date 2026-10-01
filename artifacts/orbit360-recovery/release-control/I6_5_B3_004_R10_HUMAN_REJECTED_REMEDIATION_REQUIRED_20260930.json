@@ -1,0 +1,83 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R10_HUMAN_REJECTION_V1",
+  "recordedAt": "2026-09-30",
+  "status": "B3_004_R10_HUMAN_REJECTED_REMEDIATION_REQUIRED",
+  "findingId": "B3-004",
+  "priorMachineEvidence": {
+    "runId": 36793710445,
+    "sourceSha": "a388ed3a5bb64bcecc7ce8d617ffa6d567870d55",
+    "buildId": "gi-i65-b3-a388ed3a5bb6-57f234755dc1",
+    "artifactId": 11132738039,
+    "artifactDigest": "7ce3bff365989ae6b25b9773230058e5d37daf226472754785bc2c24ad83d473",
+    "preservedAs": "EXECUTOR_AND_OLD_SYNTHETIC_COVERAGE_EVIDENCE_ONLY",
+    "invalidatedForR10Acceptance": true
+  },
+  "humanEvidence": {
+    "applyPaymentResult": "No fue posible registrar el pago.",
+    "reconcilePaymentResult": "No fue posible guardar la aplicación del pago.",
+    "paidDate": "2026-09-28",
+    "paymentMethod": "Visa cuotas",
+    "applicationDate": "2026-09-28",
+    "invoiceNumber": "3927131830",
+    "invoiceFileName": "8466114_FACT_FACT_3927131830.pdf"
+  },
+  "rootCause": {
+    "confirmed": [
+      {
+        "code": "PREVIEW_DOCUMENT_GUARD_REJECTED_NON_B2_CLIENT_BEFORE_UPLOAD",
+        "owner": "functions/document-drive-domain.js",
+        "causalPath": "cobros UI -> uploadPaymentDocument -> Preview Drive upload guard -> permission-denied -> generic UI catch",
+        "explains": [
+          "apply_payment human failure with attached document",
+          "reconcile_payment human failure with attached document"
+        ]
+      },
+      {
+        "code": "MACHINE_PROOF_DOCUMENT_COVERAGE_GAP",
+        "owner": "tools/gravicentra-i6-5-b3-004-preview-proof.mjs",
+        "priorBehavior": "invoiceDocumentRef used qa://invoice/... instead of a real provider document",
+        "consequence": "old machine PASS did not test upload, provider permissions, read, download or orphan recovery"
+      },
+      {
+        "code": "PAYMENT_ERROR_OBSERVABILITY_GAP",
+        "owner": "orbit360-platform/modules/cobros.js",
+        "consequence": "generic toast hid phase and backend/request identity"
+      },
+      {
+        "code": "DOCUMENT_BEFORE_BUSINESS_WRITE_ORPHAN_RISK",
+        "owners": [
+          "orbit360-platform/modules/cobros.js",
+          "functions/document-drive-domain.js"
+        ],
+        "remediationContract": "stage -> canonical business write/readback -> finalize; failure -> explicit quarantine/recovery"
+      }
+    ],
+    "exactInvoiceAudit": {
+      "connectedDriveExactFileNameMatch": false,
+      "connectedDriveInvoiceNumberMatch": false,
+      "sourceGuardDemonstratesFailureBeforeUploadForHumanNonSyntheticPreviewClient": true,
+      "destructiveCleanupPerformed": false,
+      "conclusion": "No evidence of this exact invoice having been uploaded by the rejected Preview path; do not delete any real file."
+    }
+  },
+  "remediation": {
+    "documentDomainBlob": "2d3168ec7bc1c654883b71ce9fbe1d5ff0ec2796",
+    "documentProviderBlob": "0e72b04f37f60875c5805d569f6b130cda505bce",
+    "reconciliationClientBlob": "4e83158b3f595b26796763f4d9446d279c73d37f",
+    "cobrosBlob": "96930fc4b8c80e375202a1bbd8bdc5c68aa9c581",
+    "indexBlob": "255d01776ef38f9766339ce2e4cf72d75c0f7309",
+    "previewProofBlob": "dc3ffb458a1aa8769367eaf13a070c950099f82a",
+    "contractBlob": "af8774e2112af79ca6a798d09872447d7f971e27",
+    "workflowBlob": "872519711224bc9a80b82186c0338e8c3a638786",
+    "compositionLockBlob": "7c967f37cf27a6bcc26ff7a7539274ac10d6807e"
+  },
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "realOperationalDocumentWritesFromPreview": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false,
+    "previousR9PreviewNotAcceptableForHumanRetest": true
+  },
+  "nextAction": "B3_004_R10_SOURCE_CONTRACT"
+}
