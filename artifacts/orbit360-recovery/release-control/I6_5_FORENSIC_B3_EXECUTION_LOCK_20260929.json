@@ -672,6 +672,12 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P2_STALE_TRANSPORT_CONTRACT_FIX_20261001.json",
       "blobSha": "4b422ec01876e5a8c60a561f3a174106121c30de",
       "productSourceChanged": false
+    },
+    "r12p10p3SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P3_EXACT_DOCUMENT_QA_SCOPE_FIX_20261001.json",
+      "blobSha": "108880cb485466b8ef2b6a381280cb53838e3d19",
+      "rootCause": "DOCUMENT_DRIVE_PREVIEW_UPLOAD_AUTHORIZED_TARGET_APPLIED_NORMAL_CLIENT_SCOPE_BEFORE_EXACT_B3004HUMAN_QA_CLASSIFICATION",
+      "productSourceChanged": true
     }
   },
   "canonicalComposition": {
@@ -681,7 +687,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "e431f58f8be6f86680a42bdc3f8ddedec8d09959"
+    "blobSha": "2c6914f5f764ebe242c6ceb5e88a03da32dd0dfb"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -876,7 +882,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "aa86e940a17840f05c91639057d7076679b13393"
+    "blobSha": "5ada9cb24039d3f85122677b593259bf1478e1a9"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -1061,6 +1067,19 @@
     "compositionLockBlobSha": "aa86e940a17840f05c91639057d7076679b13393",
     "findingsLedgerBlobSha": "e431f58f8be6f86680a42bdc3f8ddedec8d09959",
     "productSourceChanged": false,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p10p3SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P3_EXACT_DOCUMENT_QA_SCOPE_FIX_20261001.json",
+    "blobSha": "108880cb485466b8ef2b6a381280cb53838e3d19",
+    "compositionLockBlobSha": "5ada9cb24039d3f85122677b593259bf1478e1a9",
+    "findingsLedgerBlobSha": "2c6914f5f764ebe242c6ceb5e88a03da32dd0dfb",
+    "rootCause": "DOCUMENT_DRIVE_PREVIEW_UPLOAD_AUTHORIZED_TARGET_APPLIED_NORMAL_CLIENT_SCOPE_BEFORE_EXACT_B3004HUMAN_QA_CLASSIFICATION",
+    "productSourceChanged": true,
     "noOperationalBusinessWrites": true,
     "noReimport": true,
     "noLive": true,

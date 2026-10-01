@@ -1,0 +1,43 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P10P3_EXACT_DOCUMENT_QA_SCOPE_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "e81971a530961635c66e7ad856edafcc30b6cfd9",
+  "failedRunId": 36854509458,
+  "failedJobId": 110343894583,
+  "classification": "PRODUCT_PREVIEW_QA_DOCUMENT_SCOPE_COMPOSITION_DEFECT",
+  "rootCause": "DOCUMENT_DRIVE_PREVIEW_UPLOAD_AUTHORIZED_TARGET_APPLIED_NORMAL_CLIENT_SCOPE_BEFORE_EXACT_B3004HUMAN_QA_CLASSIFICATION",
+  "evidence": {
+    "uiFileSelected": true,
+    "uploadCallableObserved": true,
+    "uploadHttpStatus": 403,
+    "uploadErrorStatus": "PERMISSION_DENIED",
+    "uploadErrorMessage": "El alcance activo no autoriza este cliente.",
+    "paymentCallableObserved": false,
+    "normalClientScopeGuardPreserved": true,
+    "browserPerformanceMs": 147
+  },
+  "remediation": {
+    "exactPreviewHumanFixtureOnly": true,
+    "requiredPrefix": "b3004human_",
+    "requiredRecordFlag": "__syntheticHumanQa=true",
+    "requiredGate": "B3-004-R12",
+    "previewOnlyRequired": true,
+    "normalRealClientScopeStillRequired": true,
+    "readWriteDocumentPathsReceivePreviewContext": true
+  },
+  "changedProductFiles": [
+    "functions/document-drive-domain.js"
+  ],
+  "productBlobs": {
+    "functions/document-drive-domain.js": "f7bc47c4b0e46064ed49b947c5881b57273b66fc"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "803067ea7df85dc7445f5eb6a259b8912f9a8751"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}
