@@ -35,7 +35,7 @@
   },
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
-  "currentBlock": "B3-005",
+  "currentBlock": "B3",
   "productFileCount": 80,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
@@ -1704,5 +1704,19 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "b3005R4P1CompositionBlockBindingRepair": {
+    "status": "QA_GOVERNANCE_MECHANISM_REPAIRED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R4P1_COMPOSITION_BLOCK_BINDING_REPAIR_20261001.json",
+    "blobSha": "6c10b68b1b6bedb368d6b31d9f3621b9225510c1",
+    "before": {
+      "currentBlock": "B3-005",
+      "activeFindingId": "B3-005"
+    },
+    "after": {
+      "currentBlock": "B3",
+      "activeFindingId": "B3-005"
+    },
+    "productSourceChanged": false
   }
 }
