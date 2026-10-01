@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_005_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_005_TARGETED_HUMAN_REJECTED_SOURCE_REMEDIATION_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-005",
     "title": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "TARGETED_HUMAN_REJECTED_SOURCE_REMEDIATION_AUTHORIZED",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
     "requiredProof": [
@@ -30,22 +30,16 @@
       "configWritesAuthorized": false,
       "reimportAuthorized": false,
       "liveHostingPromotionAuthorized": false,
-      "productMutationAuthorized": false
+      "productMutationAuthorized": true
     },
-    "nextAction": "B3_005_TARGETED_HUMAN_VISUAL",
+    "nextAction": "B3_005_SEMANTIC_PROVENANCE_SOURCE_FIX",
     "rootCause": "CANONICAL_SINGLE_RECEIPT_WRITE_PRIMITIVE_EXISTS_BUT_HIGH_CONFIDENCE_MULTI_EVIDENCE_INFERENCE_ORCHESTRATOR_AND_CURRENT_TENANT_CONFIG_CONTRACT_ARE_NOT_COMPOSED",
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
     "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75",
     "authorizedProductFiles": [
-      "functions/cobros-reconciliation-domain.js",
-      "functions/tenant-domain-config.js",
-      "functions/cobros-ledger-contract.js",
-      "orbit360-platform/core/cobros-reconciliation-domain-client.js",
-      "orbit360-platform/core/tenant-domain-config-client.js",
-      "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
-      "orbit360-platform/index.html",
-      "tools/*B3-005*",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "tools/gravicentra-i6-5-b3-005-contract.mjs"
     ],
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
     "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
@@ -57,7 +51,7 @@
       "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68"
     },
     "candidateEligibleForPromotion": false,
-    "machineProofInvalidatedBySourceChange": false,
+    "machineProofInvalidatedBySourceChange": true,
     "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
     "sourceContractReceiptBlobSha": "050a2fb2d174d2f9e6212ec7c5a53ecd3a9f24e2",
     "r1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
@@ -86,7 +80,9 @@
       "productSourceChanged": false
     },
     "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_MACHINE_PASS_20261001.json",
-    "machineProofReceiptBlobSha": "0ba1ec5e047d18f1add881a8c05f0d43a9477ece"
+    "machineProofReceiptBlobSha": "0ba1ec5e047d18f1add881a8c05f0d43a9477ece",
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_REJECTION_SEMANTIC_PROVENANCE_20261001.json",
+    "visualRejectionReceiptBlobSha": "cfffbce486fd132842c0a3569f1e3a0c8ceec136"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -98,6 +94,8 @@
     "blobSha": "9a371aca5289de016374710fb9de26d286b2b97c"
   },
   "nextRequiredProof": [
+    "B3_005_SEMANTIC_PROVENANCE_SOURCE_CONTRACT_PASS",
+    "B3_005_NEW_EXACT_PREVIEW_MACHINE_PASS",
     "B3_005_TARGETED_HUMAN_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
