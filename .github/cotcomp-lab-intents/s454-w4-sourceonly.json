@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "ays-cotcomp-s454-w4-sourceonly-intent-v1.0",
+  "authorization": "S454_W4_SOURCE_ONLY_READINESS",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "b975583cd84b9f5d426a3e3788a040ec71cd0957",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W4",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "production": false,
+  "physicalW4": false,
+  "scope": [
+    "selection explicit-choice truth audit",
+    "proposal/comparison/case linkage audit",
+    "current eligible proposal audit",
+    "selection idempotency audit",
+    "atomic quoteCase patch audit",
+    "multi-document dry-run audit",
+    "rollback/final-absence readiness audit"
+  ]
+}
