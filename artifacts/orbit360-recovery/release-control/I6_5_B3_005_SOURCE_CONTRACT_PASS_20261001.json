@@ -2,8 +2,8 @@
   "schema": "GRAVICENTRA_I6_5_B3_005_SOURCE_CONTRACT_PASS_V1",
   "recordedAt": "2026-10-01",
   "status": "PASS_PENDING_EXACT_PREVIEW",
-  "sourceSha": "a8292cb87a301b28379c8639d81f9b80ca1dabb8",
-  "runId": 36935421406,
+  "sourceSha": "f0fa2057eff8d9fede19c5e787a825095f7fd28f",
+  "runId": 36936963048,
   "findingId": "B3-005",
   "assertions": {
     "serverOwnedInference": true,
@@ -13,7 +13,10 @@
     "paidDateNotInvented": true,
     "explicitDenominatorValidated": true,
     "aseguradoraGuatemaltecaMax10": true,
-    "allFourMax10": true,
+    "bantrabStandardMax10": true,
+    "bantrabExplicitException12": true,
+    "ficohsaMax10": true,
+    "allSixRulesCovered": true,
     "inferenceProvenancePreserved": true,
     "deterministicCobroIdentity": true,
     "tenantConfigOwned": true

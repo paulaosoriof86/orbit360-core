@@ -1597,9 +1597,9 @@
   "b3005SourceContract": {
     "status": "PASS_PENDING_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
-    "blobSha": "ebcae4c26c418b042b384a7f697a15b0340ccff7",
-    "sourceSha": "a8292cb87a301b28379c8639d81f9b80ca1dabb8",
-    "runId": 36935421406
+    "blobSha": "050a2fb2d174d2f9e6212ec7c5a53ecd3a9f24e2",
+    "sourceSha": "f0fa2057eff8d9fede19c5e787a825095f7fd28f",
+    "runId": 36936963048
   },
   "b3005R1PreviewAuthorization": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT",
