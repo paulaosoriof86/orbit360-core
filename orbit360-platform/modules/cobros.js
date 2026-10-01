@@ -554,7 +554,7 @@ Orbit.modules.cobros = (function () {
         const domain=Orbit.reconciliationDomain;
         if(!domain||typeof domain.reconcilePayment!=='function') throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
         const origin=paymentOriginKind(receipt) === 'CRM_DIRECT' ? 'crm_migrated_direct' : 'insurer_invoice';
-        await domain.reconcilePayment(receipt.id,{payload:{
+        const saved=await domain.reconcilePayment(receipt.id,{payload:{
           paymentOriginSource:origin,
           paidDate:pm.querySelector('#cc-paid').value||'',
           paymentMethod:pm.querySelector('#cc-method').value.trim(),
@@ -564,7 +564,7 @@ Orbit.modules.cobros = (function () {
           invoiceDocumentRef,
           applicationEvidenceType:'MANUAL_RECONCILIATION'
         }});
-        close(); U.toast('✓ Pago conciliado y datos actualizados');
+        close(); U.toast(saved&&saved.documentLifecycleOk===false?'✓ Pago conciliado. Un documento quedó en recuperación controlada.':'✓ Pago conciliado y datos actualizados');
         baseCache=null;setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
       } catch(error) {
         btn.disabled=false; U.toast('No fue posible guardar la aplicación del pago.');
@@ -597,14 +597,14 @@ Orbit.modules.cobros = (function () {
       try{
         const domain=Orbit.reconciliationDomain;if(!domain||typeof domain.reportAdvisorPayment!=='function')throw new Error('ADVISOR_PAYMENT_REPORT_DOMAIN_UNAVAILABLE');
         const supportRef=await uploadPaymentDocument(supportFile,'payment_support',c,receipt.id);
-        await domain.reportAdvisorPayment(receipt.id,{payload:{
+        const reported=await domain.reportAdvisorPayment(receipt.id,{payload:{
           paidDate:pm.querySelector('#ra-paid').value||'',
           paymentMethod:pm.querySelector('#ra-method').value||'',
           paymentSupportDocumentRef:supportRef,
           amount:c.monto,
           note:pm.querySelector('#ra-note').value.trim()
         }});
-        close();U.toast('✓ Pago reportado y enviado a Ops para validación');
+        close();U.toast(reported&&reported.documentLifecycleOk===false?'✓ Pago reportado. El soporte quedó en recuperación controlada.':'✓ Pago reportado y enviado a Ops para validación');
         baseCache=null;setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
       }catch(error){btn.disabled=false;U.toast('No fue posible enviar el reporte de pago a Ops.');}
     };
@@ -667,7 +667,7 @@ Orbit.modules.cobros = (function () {
         const domain=Orbit.reconciliationDomain;if(!domain||typeof domain.applyPayment!=='function')throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
         const supportRef=await uploadPaymentDocument(supportFile,'payment_support',c,receipt.id);
         const invoiceRef=await uploadPaymentDocument(invoiceFile,'insurer_invoice',c,receipt.id);
-        await domain.applyPayment(receipt.id,{payload:{
+        const applied=await domain.applyPayment(receipt.id,{payload:{
           sourceType:'manual',
           paidDate:pm.querySelector('#pm-paid').value||'',
           paymentMethod:pm.querySelector('#pm-metodo').value||'',
@@ -678,8 +678,9 @@ Orbit.modules.cobros = (function () {
           amount:c.monto
         }});
         const avisar=pm.querySelector('#pm-avisar')&&pm.querySelector('#pm-avisar').checked;
-        close();U.toast('✓ Pago registrado');baseCache=null;
-        if(avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
+        const docsOk=!(applied&&applied.documentLifecycleOk===false);
+        close();U.toast(docsOk?'✓ Pago registrado':'✓ Pago registrado. Un documento quedó en recuperación controlada.');baseCache=null;
+        if(docsOk&&avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
         setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
       }catch(error){console.error('[Gravicentra][Cobros] Registrar pago falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},cobroId:c.id||'',receiptId:receipt.id||''});btn.disabled=false;U.toast('No fue posible registrar el pago. No se guardaron cambios.');}
     };
