@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "ays-cotcomp-s451-w3-sourceonly-intent-v1.0",
+  "authorization": "S451_W3_SOURCE_ONLY_READINESS",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "39d8c52d788ac9a9d2a8104cefd9da3014408333",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W3",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "providerOrRaterCalls": false,
+  "realData": false,
+  "production": false,
+  "physicalW3": false,
+  "scope": [
+    "proposal contract forensic alignment",
+    "proposal case-link field mismatch proof",
+    "version identity semantics readiness",
+    "current-validity persistence readiness",
+    "idempotency and atomic supersession readiness",
+    "rollback journal readiness"
+  ]
+}
