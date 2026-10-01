@@ -141,10 +141,6 @@ jobs:
           jq '.functions // []' "$EVID/functions-response.json" > "$EVID/functions-inventory.json"
           gcloud eventarc triggers list --location "$COTCOMP_REGION" --project "$COTCOMP_PROJECT_ID" --format=json > "$EVID/eventarc-triggers.json"
 
-          node <<'NODE'
-          const fs=require('fs'),iso=require('./functions/cotcomp-provider-isolation-s448');
-          const owner=fs.readFileSync(process.env.RUNNER_TEMP+'/s450/source/'+fs.readdirSync(process.env.RUNNER_TEMP+'/s450/source').find(()=>true),'utf8');
-          NODE
           OWNER_PATH="$OWNER_FILE" node <<'NODE'
           const fs=require('fs');
           const iso=require('./functions/cotcomp-provider-isolation-s448');
