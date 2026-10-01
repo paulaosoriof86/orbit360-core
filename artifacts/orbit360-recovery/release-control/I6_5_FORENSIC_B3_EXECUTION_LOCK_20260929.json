@@ -810,7 +810,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "7120bce28934b451c8c1f553d596d2fb48df6ae2"
+    "blobSha": "8a5a006ac2882ea935eb24a8b80505a67b9724fa"
   },
   "nextRequiredProof": [
     "B3_004_R12P12_SOURCE_CONTRACT_PASS",
@@ -1406,5 +1406,11 @@
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "6aadc776968bfb14e71333e4595bc97b8302963a",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "3fdf00c870b3467f580ecdf2c9779870ca84a8d0"
     }
+  },
+  "r12p12ContractAlignment": {
+    "status": "QA_FIXED_PENDING_CONTRACT_RERUN",
+    "contractPath": "tools/gravicentra-i6-5-b3-004-contract.mjs",
+    "contractBlobSha": "a9ef8ef1a86f3b7880858a5753e3761804ec3194",
+    "productSourceChanged": false
   }
 }

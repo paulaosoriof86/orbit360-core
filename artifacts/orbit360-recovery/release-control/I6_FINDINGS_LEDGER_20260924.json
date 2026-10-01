@@ -1969,6 +1969,12 @@
           "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "6aadc776968bfb14e71333e4595bc97b8302963a",
           "tools/gravicentra-i6-5-b3-004-contract.mjs": "3fdf00c870b3467f580ecdf2c9779870ca84a8d0"
         }
+      },
+      "r12p12ContractAlignment": {
+        "status": "QA_FIXED_PENDING_CONTRACT_RERUN",
+        "reason": "R11_STALE_FIVE_COLLECTION_BLOCKING_ASSERTION_SUPERSEDED_BY_R12P12_ROUTE_PRIMARY_PLUS_PREWARM",
+        "contractBlobSha": "a9ef8ef1a86f3b7880858a5753e3761804ec3194",
+        "productSourceChanged": false
       }
     },
     {

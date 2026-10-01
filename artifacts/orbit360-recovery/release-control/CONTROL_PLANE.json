@@ -3190,7 +3190,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "e1caa7ce9aedfb6ec215e15bc774b3d1054b304f",
+      "executionLockBlobSha": "332dc61be6f36935ffa8efec66f36f63707260f3",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3221,7 +3221,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "7120bce28934b451c8c1f553d596d2fb48df6ae2",
+      "findingLedgerBlobSha": "8a5a006ac2882ea935eb24a8b80505a67b9724fa",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "diagnosticRunId": 36658190622,
@@ -4548,7 +4548,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "ea1ee1edbc8e831322ddb133ff96911174856f55",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "7120bce28934b451c8c1f553d596d2fb48df6ae2",
+    "findingLedgerBlobSha": "8a5a006ac2882ea935eb24a8b80505a67b9724fa",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -5062,6 +5062,9 @@
     "r12p12CausalFix": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P12_HUMAN_REJECTION_CAUSAL_SOURCE_FIX_20261001.json",
       "receiptBlobSha": "438a89afa9a1bfc358a9443399d6a95e48290d69"
+    },
+    "r12p12ContractAlignment": {
+      "contractBlobSha": "a9ef8ef1a86f3b7880858a5753e3761804ec3194"
     }
   }
 }

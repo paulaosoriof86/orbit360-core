@@ -222,7 +222,7 @@ need(reconciliationClientR11.includes("const isPreviewHost=()=>/--/.test"),'B3_0
 need(reconciliationServerR11.includes('b3004human_')&&reconciliationServerR11.includes('executePreview'),'B3_004_R11_PREVIEW_SERVER_GUARD_MISSING');
 need(documentDomain.includes('b3004human_'),'B3_004_R11_DOCUMENT_HUMAN_FIXTURE_SCOPE_MISSING');
 need(hydrationStoreR11.includes('_ensureCollections: ensureCollections')&&hydrationStoreR11.includes('scheduleDeferredNext'),'B3_004_R11_DEMAND_HYDRATION_MISSING');
-need(hydrationContractR11.includes("cobros:['cobros','clientes','polizas','recibosEsperados','carteraPrimas']"),'B3_004_R11_COBROS_ROUTE_DEPS_MISSING');
+need(hydrationContractR11.includes("cobros:'cobros'")&&hydrationContractR11.includes("required=[startup]"),'B3_004_R11_ROUTE_PRIMARY_HYDRATION_CONTRACT_MISSING');
 need(cobros.includes("const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas']"),'B3_004_R11_COBROS_HARD_DEPS_INVALID');
 need(humanFixtureR11.includes('b3004human_client_r12')&&humanFixtureR11.includes('cleanupRequired:true'),'B3_004_R12_HUMAN_FIXTURE_CONTRACT_MISSING');
 need(indexR4.includes('data/store-firestore-product-readonly-p0.js?v=20260930-b3004r12'),'B3_004_R11_STORE_ASSET_NOT_BUMPED');
