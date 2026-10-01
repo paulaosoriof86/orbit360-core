@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "ays-cotcomp-s460-w5-external-gates-sourceonly-intent-v1.0",
+  "authorization": "S460_W5_SOURCE_ONLY_EXTERNAL_GATE_PACKAGE",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "60e86d235aa9b1a5c65154e9e3e54c6783e71d14",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W5",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "production": false,
+  "scope": [
+    "owner decision packet template",
+    "dual-country formal legal evidence requirements",
+    "success persistence disposition decision",
+    "exact pilot scope commitments",
+    "hard locks retained",
+    "execution remains disabled"
+  ]
+}
