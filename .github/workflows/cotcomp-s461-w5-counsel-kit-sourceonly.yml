@@ -1,0 +1,141 @@
+name: CotComp S4.61 W5 formal counsel intake kit source-only
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s461-w5-counsel-intake-kit-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s461-w5-counsel-kit-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s461-w5-counsel-kit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.61 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s461-w5-counsel-kit-sourceonly.json
+          jq -e '
+            .authorization=="S461_W5_SOURCE_ONLY_COUNSEL_INTAKE_KIT" and
+            .projectId=="ays-orbit-360-lab" and
+            .stage=="W5" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .realData==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA and S4.61 tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-w5-counsel-intake-kit-s461.js
+          node --check cotcomp-w5-counsel-intake-kit-s461.test.js
+          node --test cotcomp-w5-counsel-intake-kit-s461.test.js
+
+      - name: Validate static GT/CO templates against generated structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const kit=require('./functions/cotcomp-w5-counsel-intake-kit-s461');
+          for(const country of ['GT','CO']){
+            const file=JSON.parse(fs.readFileSync('./docs/cotcomp/legal/'+country+'_COUNSEL_INTAKE_TEMPLATE_S461.json','utf8'));
+            const generated=kit.countryCounselTemplate(country);
+            if(JSON.stringify(file)!==JSON.stringify(generated)){
+              throw new Error('S461_STATIC_TEMPLATE_MISMATCH_'+country);
+            }
+            const state=kit.validateCountryBundle(file);
+            if(state.ok!==false)throw new Error('S461_EMPTY_TEMPLATE_MUST_FAIL_CLOSED_'+country);
+          }
+          NODE
+
+      - name: Build and enforce S4.61 receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s461/evidence"
+          node <<'NODE'
+          const fs=require('fs');
+          const kit=require('./functions/cotcomp-w5-counsel-intake-kit-s461');
+          const r=kit.sourceReadiness();
+          const gt=kit.validateCountryBundle(kit.countryCounselTemplate('GT'));
+          const co=kit.validateCountryBundle(kit.countryCounselTemplate('CO'));
+          const out={
+            schemaVersion:'ays-cotcomp-s461-w5-counsel-intake-kit-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',
+            stage:'W5',
+            counselIntakeKitReady:r.counselIntakeKitReady,
+            executionAllowed:r.executionAllowed,
+            realDataAllowed:r.realDataAllowed,
+            productionAllowed:r.productionAllowed,
+            governancePolicyVersion:r.governancePolicyVersion,
+            countries:r.countries,
+            policyItems:r.policyItems,
+            allowedDecisions:r.decisions,
+            emptyTemplateStatus:{GT:gt,CO:co},
+            currentIntakeStatus:r.currentIntakeStatus,
+            remainingBlockers:r.remainingBlockers,
+            boundaries:{
+              appDataReadsExecuted:0,
+              appDataWritesExecuted:0,
+              realDataTouched:false,
+              productionTouched:false
+            }
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s461/evidence/S461_W5_COUNSEL_INTAKE_KIT_RECEIPT.json',JSON.stringify(out,null,2));
+          NODE
+          R="$RUNNER_TEMP/s461/evidence/S461_W5_COUNSEL_INTAKE_KIT_RECEIPT.json"
+          jq -e '
+            .counselIntakeKitReady==true and
+            .executionAllowed==false and
+            .realDataAllowed==false and
+            .productionAllowed==false and
+            .countries==["GT","CO"] and
+            (.policyItems|length)==8 and
+            .emptyTemplateStatus.GT.ok==false and
+            .emptyTemplateStatus.CO.ok==false and
+            .currentIntakeStatus.GT=="ABSENT" and
+            .currentIntakeStatus.CO=="ABSENT" and
+            .remainingBlockers==[
+              "FORMAL_LEGAL_VALIDATION_REQUIRED",
+              "W5_EXACT_PILOT_SCOPE_REQUIRED",
+              "W5_SUCCESS_PERSISTENCE_DISPOSITION_REQUIRED",
+              "OWNER_W5_REAL_DATA_AUTHORIZATION_REQUIRED"
+            ] and
+            .boundaries.appDataReadsExecuted==0 and
+            .boundaries.appDataWritesExecuted==0 and
+            .boundaries.realDataTouched==false and
+            .boundaries.productionTouched==false
+          ' "$R" >/dev/null
+
+      - name: Upload S4.61 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s461-w5-counsel-kit-${{ github.run_id }}
+          path: ${{ runner.temp }}/s461/evidence/S461_W5_COUNSEL_INTAKE_KIT_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
