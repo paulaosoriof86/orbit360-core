@@ -1,0 +1,67 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_TARGETED_HUMAN_REJECTION_SEMANTIC_PROVENANCE_V1",
+  "recordedAt": "2026-10-01",
+  "status": "TARGETED_HUMAN_REJECTED_SOURCE_REMEDIATION_AUTHORIZED",
+  "findingId": "B3-005",
+  "sourceCandidate": {
+    "sourceSha": "ca27ffe558313a2603f9021174947d81644135a7",
+    "buildId": "gi-i65-b3-ca27ffe55831-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3005-36937661520-6e5g0gwl.web.app",
+    "runId": 36937661520,
+    "artifactId": 11199021002,
+    "artifactDigest": "f127210fcbc5923e0684252716eb0e246679e0d4fdfccb49ab583db2f6a74c6b"
+  },
+  "humanEvidence": {
+    "receiptDetailApproxSeconds": 6,
+    "cobrosListApproxSeconds": 4,
+    "inferredInstallments": "1-4",
+    "directAnchorInstallment": 5,
+    "defect": [
+      "Cobros visually renders inferred installments 1-4 as Conciliado in Estado/Conciliación/acción, collapsing inferred provenance into reconciliation.",
+      "Receipt detail hero can render an inferred payment as Cobro conciliado although paidDate remains unknown and inferredEffectiveDate is present."
+    ]
+  },
+  "classification": "CODE_DEFECT_UI_READ_MODEL_SEMANTICS_WITHIN_B3_005",
+  "rootCause": "UI_STATE_LABELS_EVALUATE_RECONCILIATION_BEFORE_PAYMENT_PROVENANCE_SO_PAID_INFERRED_COLLAPSES_INTO_CONCILIADO",
+  "causalLayer": [
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+  ],
+  "remediationContract": [
+    "PAID_INFERRED/directOrInferred=INFERRED must remain visibly identified as Pago inferido.",
+    "Reconciliation must render as a separate dimension and must not replace payment provenance.",
+    "Actual paidDate remains No informada when no direct evidence exists.",
+    "inferredEffectiveDate remains visible.",
+    "Evidence/source and inference provenance remain available in receipt detail.",
+    "Direct anchor payment remains distinguishable from inferred prior installments."
+  ],
+  "authorizedFiles": [
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+    "tools/gravicentra-i6-5-b3-005-contract.mjs"
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3006": false,
+    "b4": false
+  },
+  "performanceDisposition": {
+    "observation": "Human timing approximately 6s receipt detail and 4s Cobros list.",
+    "decision": "PRESERVE_AND_COMPARE_AFTER_SEMANTIC_FIX;_DO_NOT_REOPEN_B3_002_WITHOUT_CAUSAL_REGRESSION",
+    "rationale": "The demonstrated defect is label/read-model precedence; no new fetch, hydration or KPI calculation is required by the remediation."
+  },
+  "kpiDisposition": {
+    "finding": "B3-008",
+    "status": "PRESERVE_OPEN",
+    "evidence": "Human captures show portfolio/KPI totals that do not reconcile with visible paid/inferred installments.",
+    "remediationInsideB3005": false
+  },
+  "paymentLock": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+    "blobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+    "newVersionRequired": false
+  }
+}
