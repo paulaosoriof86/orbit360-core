@@ -1,0 +1,85 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "gate": "I6.5-B3-005",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "parentSha": "1be19d7ffce125e54a46503d76c0f9bea4a67a05",
+  "rootCause": "CANONICAL_SINGLE_RECEIPT_WRITE_PRIMITIVE_EXISTS_BUT_HIGH_CONFIDENCE_MULTI_EVIDENCE_INFERENCE_ORCHESTRATOR_AND_CURRENT_TENANT_CONFIG_CONTRACT_ARE_NOT_COMPOSED",
+  "paymentLock": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
+    "blobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
+    "version": "V5",
+    "change": "Adds Aseguradora Guatemalteca/AseGuate max 10 fraccionado while preserving V4 rules."
+  },
+  "sourceChanges": {
+    "serverOwnedInferenceEngine": {
+      "planner": "functions/payment-inference-engine.js",
+      "commandOwner": "functions/cobros-reconciliation-domain.js",
+      "command": "reconcile_evidence",
+      "uniqueHighConfidenceAutoCommit": true,
+      "ambiguousFailClosed": true
+    },
+    "temporalSemantics": {
+      "inferredPaidDateInvented": false,
+      "inferredEffectiveDate": "scheduled receipt due date",
+      "appliedInferenceState": "APPLIED_INFERRED"
+    },
+    "idempotency": {
+      "deterministicCobroByReceipt": true,
+      "deterministicRequest": true,
+      "laterDirectEvidencePreservesInferenceProvenance": true
+    },
+    "tenantConfig": {
+      "owner": "functions/tenant-domain-config.js",
+      "autoCommitHighConfidence": true,
+      "humanConfirmationRequiredForHighConfidence": false,
+      "insurerPaymentPlansConfigurable": true
+    },
+    "paymentPlanRules": [
+      {
+        "insurer": "ASEGURADORA LA CEIBA",
+        "maxInstallments": 10,
+        "scope": "fraccionado"
+      },
+      {
+        "insurer": "ASEGURADORA GENERAL",
+        "maxInstallments": 10,
+        "scope": "fraccionado"
+      },
+      {
+        "insurer": "G&T SEGUROS",
+        "maxInstallments": 10,
+        "scope": "fraccionado"
+      },
+      {
+        "insurer": "ASEGURADORA GUATEMALTECA",
+        "aliases": [
+          "ASEGUATE"
+        ],
+        "maxInstallments": 10,
+        "scope": "fraccionado"
+      }
+    ],
+    "scheduleMismatchBoundary": "Explicit N/M mismatch is detected and routed fail-closed as CONTROLLED_IDEMPOTENT_RECEIPT_PLAN_CORRECTION_REQUIRED; this source fix does not silently rewrite an incompatible receipt calendar."
+  },
+  "changedBlobs": {
+    "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
+    "functions/cobros-reconciliation-domain.js": "b13a641ece0177cebd31f8dc748dd4b88483f0d2",
+    "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
+    "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
+    "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "9de5bb95ec18e7177cb7b419342eadc2a795d88c"
+  },
+  "contractTool": "tools/gravicentra-i6-5-b3-005-contract.mjs",
+  "workflowJob": "i65-b3-005-source-contract",
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "configWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3006": false,
+    "b4": false
+  },
+  "nextRequiredProof": "B3_005_SOURCE_CONTRACT_PASS"
+}

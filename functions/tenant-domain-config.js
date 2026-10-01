@@ -110,11 +110,33 @@ function validateWorkflow(input) {
     managementTypes: Array.isArray(input.managementTypes) ? input.managementTypes.slice(0, 200).map(row => ({ id: norm(row.id || row.label || row.nombre), label: text(row.label || row.nombre, 160), opsList: text(row.opsList || row.lista, 120), slaHours: Math.max(0, Number(row.slaHours || row.slaHoras || 0)) })).filter(row => row.id && row.label) : []
   };
 }
+function normalizeInsurerPaymentPlans(input) {
+  const rows = Array.isArray(input) ? input : [];
+  return rows.slice(0, 100).map(row => {
+    row = row || {};
+    const insurer = text(row.insurer || row.name || row.canonicalName || row.canonicalKey || row.insurerId, 180);
+    const maxInstallments = Math.floor(Number(row.maxInstallments || row.maxCuotas || 0));
+    if (!insurer || !(maxInstallments > 0 && maxInstallments <= 24)) return null;
+    return {
+      insurer,
+      insurerId: text(row.insurerId, 180),
+      canonicalKey: text(row.canonicalKey, 180),
+      aliases: unique(row.aliases || []).slice(0, 40),
+      scope: norm(row.scope || 'fraccionado') || 'fraccionado',
+      maxInstallments
+    };
+  }).filter(Boolean);
+}
 function validateReconciliation(input) {
   input = input || {};
   return {
     schemaVersion: VERSION,
     inferenceEnabled: input.inferenceEnabled !== false,
+    autoCommitHighConfidence: input.autoCommitHighConfidence !== false,
+    highConfidenceMode: 'UNIQUE_MATCH_FAIL_CLOSED',
+    humanConfirmationRequiredForHighConfidence: false,
+    humanConfirmationRequired: false,
+    ambiguousEvidenceRequiresHumanReview: true,
     commissionRecognitionEnabled: input.commissionRecognitionEnabled !== false,
     commissionSequenceEnabled: input.commissionSequenceEnabled !== false,
     completePortfolioSequenceEnabled: input.completePortfolioSequenceEnabled !== false,
@@ -128,7 +150,7 @@ function validateReconciliation(input) {
     holdOnReversal: input.holdOnReversal !== false,
     holdOnDuplicate: input.holdOnDuplicate !== false,
     autoApplyThreshold: null,
-    humanConfirmationRequired: true,
+    insurerPaymentPlans: normalizeInsurerPaymentPlans(input.insurerPaymentPlans || input.aseguradoraPlanesPago || []),
     evidencePriority: unique(input.evidencePriority || ['INSURER_PAYMENT', 'COMMISSION_RECOGNITION', 'PORTFOLIO_SNAPSHOT', 'PLATFORM_PAYMENT_REPORT', 'BANK_SUPPORT'])
   };
 }
@@ -232,5 +254,5 @@ async function executePreview(request) {
 
 exports.orbit360TenantDomainConfig = onCall({ region: REGION, cors: true }, execute);
 exports.orbit360TenantDomainConfigPreview = onCall({ region: PREVIEW_REGION, cors: true }, executePreview);
-exports.__tenantDomainConfig = Object.freeze({ VERSION, PREVIEW_VERSION, DOMAINS });
+exports.__tenantDomainConfig = Object.freeze({ VERSION, PREVIEW_VERSION, DOMAINS, validateReconciliation, normalizeInsurerPaymentPlans });
 

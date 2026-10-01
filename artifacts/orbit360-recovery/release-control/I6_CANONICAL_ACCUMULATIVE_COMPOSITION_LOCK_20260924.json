@@ -403,12 +403,21 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-005-DIAGNOSTIC",
-    "reason": "CAUSAL_DIAGNOSTIC_GOVERNANCE_ONLY",
-    "changedProductFiles": [],
-    "changedQaFiles": [],
-    "productSourceChanged": false,
+    "gate": "I6.5-B3-005-SOURCE",
+    "reason": "SERVER_OWNED_HIGH_CONFIDENCE_INFERENCE_SOURCE_FIX_AND_PAYMENT_LOCK_V5",
+    "changedProductFiles": [
+      "functions/payment-inference-engine.js",
+      "functions/cobros-reconciliation-domain.js",
+      "functions/tenant-domain-config.js",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js"
+    ],
+    "changedQaFiles": [
+      "tools/gravicentra-i6-5-b3-005-contract.mjs",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+    ],
+    "productSourceChanged": true,
     "noOperationalBusinessMutation": true,
+    "noConfigWrite": true,
     "noReimport": true,
     "noLive": true
   },
@@ -1567,5 +1576,21 @@
       "tools/*B3-005*",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
     ]
+  },
+  "b3005SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
+    "blobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
+    "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
+    "changedBlobs": {
+      "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
+      "functions/cobros-reconciliation-domain.js": "b13a641ece0177cebd31f8dc748dd4b88483f0d2",
+      "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
+      "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
+      "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "9de5bb95ec18e7177cb7b419342eadc2a795d88c"
+    }
   }
 }

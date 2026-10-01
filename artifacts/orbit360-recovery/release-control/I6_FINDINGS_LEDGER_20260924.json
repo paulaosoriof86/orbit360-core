@@ -2151,11 +2151,11 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-      "status": "DIAGNOSTIC_PASS_SOURCE_FIX_REQUIRED",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "businessRulesFrozen": true,
-      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+      "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
       "requiredProof": [
         "High-confidence invoice/statement/commission inference auto-commits without human approval.",
         "Prior contiguous installments are inferred with inferredEffectiveDate=their scheduled due date while paidDate remains unknown unless directly evidenced.",
@@ -2163,11 +2163,11 @@
         "La Ceiba, Aseguradora General and G&T Seguros fraccionado schedules obey tenant-config max 10.",
         "Later direct evidence enriches prior inferred payment instead of duplicating it."
       ],
-      "paymentLockBlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
+      "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
       "entryBlockedBy": null,
       "entryUnblockedBy": "B3-004 CLOSED_PASS",
-      "nextAction": "B3_005_SOURCE_FIX",
-      "productMutationAuthorized": true,
+      "nextAction": "B3_005_SOURCE_CONTRACT",
+      "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
@@ -2184,7 +2184,21 @@
         "orbit360-platform/index.html",
         "tools/*B3-005*",
         ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
-      ]
+      ],
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
+      "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
+      "sourceBlobs": {
+        "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
+        "functions/cobros-reconciliation-domain.js": "b13a641ece0177cebd31f8dc748dd4b88483f0d2",
+        "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
+        "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
+        "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
+        "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "9de5bb95ec18e7177cb7b419342eadc2a795d88c"
+      },
+      "configMutationAuthorized": false,
+      "machineProofInvalidatedBySourceChange": true,
+      "currentCandidateEligibleForPromotion": false
     },
     {
       "id": "B3-006",
@@ -5779,16 +5793,20 @@
     }
   },
   "currentB3": {
-    "status": "B3_005_DIAGNOSTIC_PASS_SOURCE_FIX_REQUIRED",
+    "status": "B3_005_SOURCE_FIXED_PENDING_CONTRACT",
     "activeFindingId": "B3-005",
     "priorFindingId": "B3-004",
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "f18092c2bbc09c3b2274d1c19ea12f78e6b6554d",
+    "compositionLockBlobSha": "1158cd81acc752d0fd6a6edff44e7e64ec6479f2",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
-    "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75"
+    "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
+    "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
+    "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1"
   }
 }

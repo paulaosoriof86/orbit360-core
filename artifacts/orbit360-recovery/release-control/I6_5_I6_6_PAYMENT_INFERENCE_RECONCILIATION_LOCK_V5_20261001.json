@@ -1,0 +1,455 @@
+{
+  "schema": "GRAVICENTRA_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5",
+  "status": "FROZEN_ACTIVE",
+  "date": "2026-10-01",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "scope": "I6.5 B3-004/B3-005 + I6.6 Cobros/Conciliación + I6.7 commission timing linkage",
+  "authority": "USER_APPROVED_BUSINESS_RULE",
+  "supersedes": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+    "blobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
+    "scope": "Adds user-approved tenant payment-plan rule: Aseguradora Guatemalteca / AseGuate fraccionado also has a maximum of 10 installments. Preserves all V4 payment-origin, inference, idempotency, scope, temporal and reconciliation rules."
+  },
+  "decision": "DISTINCT_PAYMENT_ORIGIN_WORKFLOWS_WITH_ADVISOR_VALIDATION_OPERATIVE_DIRECT_APPLY_AND_IDEMPOTENT_INDIVIDUAL_PLUS_BATCH_RECONCILIATION",
+  "invariants": [
+    "Migrated SIGA/CRM payment records are not client-reported portal payments.",
+    "Current tenant portal payment intake is not operational; no current migrated payment may be labeled as client-reported solely because estadoOperativo is pago_reportado.",
+    "A SIGA/CRM cobros_realizados record with sufficient unique receipt identity is direct evidence of an already-effected payment and must not require one-by-one Apply Payment action.",
+    "Direct migrated CRM payments materialize idempotently as PAID_DIRECT while preserving source date/method/provenance; they remain pending reconciliation/application evidence when those states are not yet proven.",
+    "High-confidence reconciliation against bank statements, insurer statements, commission statements, invoices or equivalent evidence auto-commits/enriches the same payment; it does not require row-by-row human clicks.",
+    "Expected receipt is an obligation, never proof of payment by itself.",
+    "Client-reported payment is valid payment evidence and is sufficient to materialize the payment state without requiring an attachment.",
+    "Payment support and insurer invoice are optional evidence enrichments and must remain distinct.",
+    "High-confidence unique-match inference is applied automatically; it does not wait for human approval.",
+    "Ambiguous, contradictory, partial, renumbered or non-contiguous cases remain fail-closed and require review.",
+    "No retry, later evidence, invoice or statement may create a second cobro for the same policy/installment reality.",
+    "Actual payment date, inferred period date, evidence as-of date, application date and reconciliation timestamp are distinct fields and may not overwrite each other.",
+    "Advisor-reported payment is an intake/evidence report, not a paid-direct event until Operativo validates and applies it.",
+    "Advisor-reported payment must never be classified as CLIENT_PORTAL.",
+    "Advisor may report within authorized scope but may not apply or reconcile unless a future explicit approved permission changes the contract.",
+    "Operativo receiving and validating payment evidence directly may Apply Payment immediately; no second operative approval is required.",
+    "Applying an advisor report must enrich/materialize the same canonical payment evidence idempotently and must not create a second payment.",
+    "Every applied but unreconciled payment must retain an individual Conciliar fallback in Cobros surfaces even when automatic/batch reconciliation is available.",
+    "Conciliation/application evidence enriches the same canonical payment and may add missing payment support later without duplication.",
+    "Receipt/calendar editing may not freely rewrite paidDate, applicationDate or inferredEffectiveDate; payment and application facts use controlled audited flows.",
+    "Authorized Dirección/Operativo scope must not be denied by a browser or server scope mismatch; authorization is policy-driven and identities are never hardcoded.",
+    "After initial hydration, Cobros filtering/state changes must not trigger redundant hydration/full reload or duplicate render work."
+  ],
+  "evidenceRules": [
+    {
+      "id": "OPERATIVE_DIRECT_PAYMENT",
+      "evidence": "Operativo directly receives and validates payment information/support through WhatsApp, email, call or other approved channel.",
+      "directEffect": "Apply Payment directly and materialize PAID_DIRECT with optional paidDate, paymentMethod, support, amount, channel and observation.",
+      "inferredEffect": "No second operative validation is required.",
+      "reconciliationEffect": "Remain pending insurer application/reconciliation when that evidence is not yet known; later evidence enriches the same payment.",
+      "uiRule": "Operativo with valid scope may use Aplicar pago directly.",
+      "command": "apply_payment"
+    },
+    {
+      "id": "ADVISOR_REPORTED_PAYMENT",
+      "evidence": "Asesor reports payment from Gestión 360 / Cliente 360 within authorized scope; optional paid date, method and support may be provided.",
+      "directEffect": "Create/retain payment evidence with advisorId, client, policy, receipt, amount, reported date/method/support, timestamp and channel ADVISOR_REPORTED; create linked Ops management item in PENDIENTE_VALIDACION_OPERATIVA.",
+      "inferredEffect": "Does not create PAID_DIRECT, does not retire the portfolio obligation, and does not reconcile before Operativo validation.",
+      "reconciliationEffect": "Operativo validates correspondence and Apply Payment materializes/enriches the same canonical payment idempotently; no duplicate payment.",
+      "uiRule": "Asesor sees Reportar pago, not Aplicar pago or Conciliar. Ops receives the report for Operativo review.",
+      "command": "report_advisor_payment"
+    },
+    {
+      "id": "MIGRATED_CRM_DIRECT_PAYMENT",
+      "evidence": "SIGA CRM / cobros_realizados or equivalent frozen migration source containing an actual recorded payment linked uniquely to policy/receipt.",
+      "directEffect": "Materialize the unique matched payment as PAID_DIRECT without manual Apply Payment. Preserve paidDate/paymentMethod when present and source provenance.",
+      "inferredEffect": "No additional installments are inferred solely from the CRM payment row; prior-installment inference requires another approved rule/evidence.",
+      "reconciliationEffect": "Payment remains pending reconciliation until bank/insurer/commission/application evidence resolves it; high-confidence matches auto-reconcile/enrich the same payment idempotently.",
+      "uiRule": "Show Pago registrado en SIGA / pendiente de conciliación, never Reportado por cliente and never a one-by-one Aplicar pago button.",
+      "canonicalOrigin": "CRM_MIGRATED_DIRECT_PAYMENT",
+      "individualFallback": "Conciliar is available in Cobros for applied/unreconciled records; normal deterministic processing remains batch/idempotent when high-confidence evidence exists."
+    },
+    {
+      "id": "INVOICE_INSTALLMENT_N",
+      "evidence": "Factura/recibo de aseguradora que identifica el pago/cuota N de una póliza",
+      "directEffect": "Cuota N queda confirmada y conciliada con esa evidencia.",
+      "inferredEffect": "Cuotas anteriores contiguas 1..N-1 se consideran pagadas/conciliadas por inferencia si continúan abiertas y no existe evidencia contradictoria.",
+      "example": "Factura del pago 5 -> pago 5 directo; pagos 1,2,3,4 se cierran por inferencia si estaban pendientes."
+    },
+    {
+      "id": "INSURER_STATEMENT_PENDING_FROM_N",
+      "evidence": "Estado de cuenta de aseguradora indica que la póliza presenta pagos pendientes a partir de la cuota N",
+      "directEffect": "La evidencia prueba que N y posteriores señalados continúan pendientes según el estado.",
+      "inferredEffect": "Cuotas anteriores 1..N-1 se consideran pagadas/conciliadas por inferencia si no hay contradicción.",
+      "example": "Pendientes desde pago 3 -> pagos 1 y 2 se consideran pagados; 3 en adelante permanecen pendientes salvo otra evidencia."
+    },
+    {
+      "id": "COMMISSION_STATEMENT_INSTALLMENT_N",
+      "evidence": "Planilla/estado de comisiones paga comisión correspondiente a la cuota N de una póliza/cliente",
+      "directEffect": "La cuota N se considera recaudada/pagada y puede materializar/reconciliar su cobro.",
+      "inferredEffect": "Cuotas anteriores contiguas 1..N-1 se consideran ya pagadas/conciliadas si seguían abiertas y no hay contradicción.",
+      "example": "Comisión pagada por cuota 4 -> cuota 4 directa; cuotas 1,2,3 por inferencia."
+    },
+    {
+      "id": "BANK_STATEMENT_MATCH",
+      "evidence": "Estado de cuenta bancario contiene pago identificable a cliente/póliza/recibo",
+      "directEffect": "Se materializa/reconcilia el cobro correspondiente al match.",
+      "inferredEffect": "Solo se backfillean cuotas anteriores cuando la propia evidencia y la secuencia contractual permiten concluir continuidad de pagos con alta confianza."
+    },
+    {
+      "id": "EXPLICIT_MANUAL_CONFIRMATION",
+      "evidence": "Usuario autorizado confirma expresamente pago de una cuota desde Cliente 360 o Cobros y cartera",
+      "directEffect": "Se materializa/reconcilia el cobro de la cuota seleccionada con fecha/método/evidencia disponible.",
+      "inferredEffect": "No se infieren cuotas anteriores únicamente por una confirmación manual aislada, salvo que el usuario seleccione explícitamente la opción de conciliar la secuencia anterior o adjunte evidencia que active otra regla."
+    }
+  ],
+  "autoCommitPolicy": {
+    "enabled": true,
+    "mode": "AUTO_COMMIT_WHEN_UNIQUE_HIGH_CONFIDENCE_MATCH",
+    "requiredConditions": [
+      "Existe una única póliza/cliente/recibo compatible con la evidencia.",
+      "La moneda y el contexto contractual son compatibles.",
+      "La numeración/periodicidad de cuotas permite inferir una secuencia contigua.",
+      "No existe evidencia contradictoria de impago, reversión, anulación, pago parcial, refinanciación, cambio de plan o endoso que rompa la secuencia.",
+      "La misma evidencia no fue aplicada previamente.",
+      "El cobro/conciliación se ejecuta idempotentemente en un comando server-owned."
+    ],
+    "failClosedCases": [
+      "Más de un match plausible.",
+      "Monto/moneda/identidad contractual inconsistente.",
+      "Secuencia de cuotas no contigua o renumerada.",
+      "Pago parcial o distribución entre varias obligaciones.",
+      "Evidencia contradictoria.",
+      "Documento sin información suficiente.",
+      "Cobro previamente conciliado con otra evidencia incompatible."
+    ],
+    "failClosedAction": "Crear propuesta de conciliación para revisión humana; no autoescribir cobro.",
+    "humanApprovalRequiredForHighConfidenceInference": false,
+    "explicitResolution": "AUTO_COMMIT_HIGH_CONFIDENCE_INFERRED_MATCH",
+    "clientReportedPayment": {
+      "evidenceType": "CLIENT_REPORTED_PAYMENT",
+      "sufficientWithoutAttachment": true,
+      "effect": "Materialize payment for the matched receipt and remove that obligation from pending/overdue portfolio, while application/insurer reconciliation may remain pending.",
+      "attachmentOptional": true,
+      "manualPaymentDateOptional": true,
+      "originRequirement": "Must have explicit CLIENT_PORTAL / client_reported provenance. estadoOperativo=pago_reportado alone is insufficient.",
+      "currentTenantOperationalStatus": "PORTAL_PAYMENT_INTAKE_NOT_OPERATIONAL_AS_OF_2026-09-30"
+    },
+    "crmMigratedDirectPayment": {
+      "evidenceType": "CRM_MIGRATED_DIRECT_PAYMENT",
+      "sufficientWhenUniqueReceiptMatch": true,
+      "effect": "AUTO_MATERIALIZE_PAID_DIRECT",
+      "manualApplyRequired": false,
+      "batchIdempotent": true,
+      "preservePaidDate": true,
+      "preservePaymentMethod": true,
+      "reconciliationMayRemainPending": true
+    }
+  },
+  "temporalSemantics": {
+    "actualPaidDate": {
+      "field": "paidDate",
+      "meaning": "Fecha real en que el cliente efectuó el pago.",
+      "source": "Payment support, explicit client/user-provided date, or other direct evidence.",
+      "required": false,
+      "inventedWhenUnknown": false
+    },
+    "inferredPeriodDate": {
+      "field": "inferredEffectiveDate",
+      "meaning": "Fecha/período operativo usado para atribuir una cuota cerrada por inferencia cuando paidDate real es desconocida.",
+      "rule": "Use the expected receipt due date / scheduled installment date for that inferred installment.",
+      "purpose": "Do not inflate the month in which the inference process ran; historical inferred installments remain attributed to the month in which that installment was contractually due.",
+      "mustNotBePresentedAsActualPaidDate": true
+    },
+    "evidenceAsOfDate": {
+      "field": "evidenceAsOfDate",
+      "meaning": "Fecha/as-of del estado de cuenta, planilla u otra evidencia que permitió la inferencia."
+    },
+    "applicationDate": {
+      "field": "applicationDate",
+      "meaning": "Fecha en que el pago fue aplicado por la aseguradora.",
+      "sourcePriority": [
+        "Insurer invoice date when the invoice proves application",
+        "Explicit insurer statement/application evidence",
+        "Manual authorized value when known"
+      ],
+      "required": false,
+      "commissionTimingAuthority": true
+    },
+    "reconciledAt": {
+      "field": "reconciledAt",
+      "meaning": "Timestamp técnico en que Gravicentra ejecutó la conciliación/inferencia.",
+      "forbiddenForBusinessPeriodAttribution": true
+    }
+  },
+  "evidenceFields": {
+    "paymentSupport": {
+      "documentRef": "paymentSupportDocumentRef",
+      "paymentDateField": "paidDate",
+      "optional": true,
+      "intelligentPrefill": "When an uploaded support yields a unique readable payment date, prefill paidDate; keep user-editable before commit."
+    },
+    "insurerInvoice": {
+      "documentRef": "invoiceDocumentRef",
+      "invoiceNumberField": "invoiceNumber",
+      "applicationDateField": "applicationDate",
+      "optional": true,
+      "intelligentPrefill": "When an uploaded invoice yields a unique invoice number/date, prefill invoiceNumber and applicationDate; keep user-editable before commit.",
+      "semanticRule": "Invoice date is applicationDate, not actualPaidDate, unless the same document explicitly and unambiguously proves both."
+    },
+    "manualEntryFallback": {
+      "allowed": true,
+      "fields": [
+        "paidDate",
+        "applicationDate",
+        "invoiceNumber",
+        "paymentMethod",
+        "reference"
+      ],
+      "attachmentsRequired": false
+    }
+  },
+  "installmentSequence": {
+    "rules": [
+      "Commission statement paying installment N: N is direct paid/application evidence and open contiguous 1..N-1 are auto-closed by inference unless contradicted.",
+      "Insurer statement showing pending from installment N: 1..N-1 are auto-closed by inference; N and later remain pending unless later evidence proves otherwise.",
+      "Insurer invoice for installment N: N is direct application evidence and open contiguous 1..N-1 may auto-close by inference unless contradicted."
+    ],
+    "explicitTotalInstallmentsAuthority": "When an authoritative insurer statement/account statement exposes N/M or otherwise states the policy total installment count M, M is authoritative for reconciliation of the expected-receipt schedule.",
+    "scheduleMismatchAction": "If platform expected-receipt count differs from an explicit authoritative total, do not silently retain the wrong calendar; reconcile the schedule through controlled idempotent receipt-plan correction with provenance. Contradictory sources remain review-required."
+  },
+  "insurerPaymentPlanConfig": {
+    "storageRule": "Tenant/insurer configuration, not product hardcode.",
+    "currentApprovedValidationCeilings": [
+      {
+        "insurer": "ASEGURADORA LA CEIBA",
+        "maxInstallments": 10,
+        "scope": "fraccionado"
+      },
+      {
+        "insurer": "ASEGURADORA GENERAL",
+        "maxInstallments": 10,
+        "scope": "fraccionado"
+      },
+      {
+        "insurer": "G&T SEGUROS",
+        "maxInstallments": 10,
+        "scope": "fraccionado"
+      },
+      {
+        "insurer": "ASEGURADORA GUATEMALTECA",
+        "aliases": [
+          "ASEGUATE",
+          "ASEGURADORA GUATEMALTECA"
+        ],
+        "maxInstallments": 10,
+        "scope": "fraccionado"
+      }
+    ],
+    "validationRule": "A 12-installment fraccionado schedule for these insurers is invalid under current approved tenant configuration and must be corrected or blocked; any future exception requires explicit authoritative policy evidence plus an approved insurer-config change.",
+    "userClarification20261001": "Aseguradora Guatemalteca (AseGuate) también se fracciona en un máximo de 10 pagos."
+  },
+  "stateModel": {
+    "paymentState": [
+      "PENDING",
+      "PAID_REPORTED",
+      "PAID_DIRECT",
+      "PAID_INFERRED",
+      "REVERSED",
+      "CONFLICT_REVIEW_REQUIRED"
+    ],
+    "applicationState": [
+      "NOT_APPLICABLE",
+      "PENDING_APPLICATION",
+      "APPLIED_DIRECT",
+      "APPLIED_INFERRED",
+      "CONFLICT_REVIEW_REQUIRED"
+    ],
+    "reconciliationRule": "Payment may be valid before insurer application is known. Payment support and invoice/application reconciliation are independent enrichments.",
+    "evidenceOrigin": [
+      "CRM_MIGRATED_DIRECT_PAYMENT",
+      "CLIENT_PORTAL",
+      "INSURER",
+      "BANK",
+      "COMMISSION_STATEMENT",
+      "MANUAL_AUTHORIZED",
+      "OTHER_SUPPORTED"
+    ]
+  },
+  "commissionLinkage": {
+    "rule": "Commission eligibility/timing is driven by application evidence/applicationDate or commission-statement evidence, not by paidDate alone.",
+    "advisorConfiguration": "Use the advisor commission model/percentage configured in Equipo/Usuarios. Operational calculation must not silently substitute demo/default percentages when required configuration is missing.",
+    "missingConfiguration": "Fail closed as REQUIERE_CONFIGURACION; do not fabricate commission values.",
+    "materialization": "I6.7 must materialize/reconcile company commission and advisor commission against policy/receipt/payment/application evidence and the configured advisor model."
+  },
+  "surfaces": {
+    "receiptDetailRequiredFields": [
+      "paidDate",
+      "paymentMethod",
+      "paymentSupportDocumentRef",
+      "invoiceNumber",
+      "applicationDate",
+      "invoiceDocumentRef",
+      "directOrInferred",
+      "anchorInstallment",
+      "inferenceRuleId",
+      "evidenceAsOfDate"
+    ],
+    "paths": [
+      "Cliente 360 > Recibos y pagos",
+      "Cobros y cartera > listado/detalle",
+      "Conciliaciones",
+      "Importador de factura",
+      "Importador de estado de cuenta",
+      "Importador de planilla/estado de comisiones",
+      "Importador de soporte de pago"
+    ],
+    "originPresentation": {
+      "migratedCrm": "Pago registrado en SIGA · pendiente de conciliación",
+      "futureClientPortal": "Pago reportado por cliente",
+      "unknown": "Origen de pago por confirmar"
+    }
+  },
+  "antiDuplication": [
+    "One canonical payment/reconciliation command is used by every surface.",
+    "Direct evidence on installment N and inferred closure of prior installments must be committed atomically when possible.",
+    "Later evidence for an already inferred installment enriches provenance instead of creating a second cobro.",
+    "Retries and double-submits must return the prior committed result through idempotency."
+  ],
+  "provenanceRequired": [
+    "evidenceType",
+    "evidenceId/sourceRef",
+    "directOrInferred",
+    "anchorInstallment",
+    "inferenceRuleId",
+    "matchedPolicyId",
+    "matchedReceiptId",
+    "reconciledAt",
+    "reconciledBy/systemActor",
+    "confidence",
+    "paidDate",
+    "inferredEffectiveDate",
+    "evidenceAsOfDate",
+    "applicationDate",
+    "invoiceNumber",
+    "paymentSupportDocumentRef",
+    "invoiceDocumentRef"
+  ],
+  "conversationDependent": false,
+  "currentTenantClarification": {
+    "tenantId": "alianzas-soluciones",
+    "portalPaymentIntakeOperational": false,
+    "currentClientPortalPaymentCountExpected": 0,
+    "migratedPaymentSourceSemantics": "Existing migrated payment evidence from SIGA CRM must be treated as historical direct payment evidence, not as client portal reports.",
+    "sourceAuthorityEvidence": [
+      "I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918: CobranzaCendoso (24) actual payment date is primary direct payment evidence.",
+      "COBROS-CONCILIACION-FUENTES-INTAKE-20260801: cobros_realizados authority DIRECT_PAYMENT_REPORTED_CRM."
+    ],
+    "oneByOneManualApplicationForbiddenForDeterministicMigratedBatch": true,
+    "oneByOneManualReconciliationForbiddenWhenHighConfidenceBatchMatchExists": true,
+    "advisorReportedPaymentIsClientPortal": false,
+    "operativeDirectPaymentSecondApprovalRequired": false,
+    "individualReconciliationFallbackRequired": true,
+    "unresolvedOriginCountObserved": 27,
+    "unresolvedOriginDisposition": "READ_ONLY_PROVENANCE_DIAGNOSTIC_BEFORE_ANY_MANUAL_REVIEW_OR_RECONCILIATION",
+    "approvedFraccionadoMaxInstallments": {
+      "ASEGURADORA LA CEIBA": 10,
+      "ASEGURADORA GENERAL": 10,
+      "G&T SEGUROS": 10,
+      "ASEGURADORA GUATEMALTECA": 10
+    }
+  },
+  "originContract": {
+    "canonicalOrigins": {
+      "CRM_MIGRATED_DIRECT_PAYMENT": {
+        "paymentState": "PAID_DIRECT",
+        "operativeValidationRequired": false,
+        "manualApplyRequired": false,
+        "currentTenant": true,
+        "uiPrimary": "Pago registrado en SIGA",
+        "uiSecondary": "Pendiente de conciliación"
+      },
+      "ADVISOR_REPORTED_PAYMENT": {
+        "intakeState": "PAGO_REPORTADO_POR_ASESOR",
+        "validationState": "PENDIENTE_VALIDACION_OPERATIVA",
+        "paymentStateBeforeValidation": "NOT_PAID_DIRECT",
+        "operativeValidationRequired": true,
+        "advisorCanApply": false,
+        "advisorCanReconcile": false,
+        "linkedOpsRequired": true,
+        "command": "report_advisor_payment"
+      },
+      "OPERATIVE_DIRECT_PAYMENT": {
+        "paymentState": "PAID_DIRECT",
+        "operativeValidationRequired": false,
+        "secondOperativeApprovalRequired": false,
+        "command": "apply_payment"
+      },
+      "CLIENT_PORTAL": {
+        "currentTenantOperational": false,
+        "currentRealCountExpected": 0,
+        "mustRemainDistinctFromAdvisorReported": true
+      }
+    },
+    "unknownOriginRule": "Diagnose provenance read-only first; classify deterministic SIGA/CRM matches as CRM_MIGRATED_DIRECT_PAYMENT. Only unresolved or contradictory records remain CONFLICT_REVIEW_REQUIRED."
+  },
+  "commandContract": {
+    "advisorReport": "report_advisor_payment",
+    "applyPayment": "apply_payment",
+    "reconcilePayment": "reconcile_payment",
+    "oneCanonicalPaymentOwner": true,
+    "duplicateWriteOwnerForbidden": true
+  },
+  "individualReconciliation": {
+    "required": true,
+    "surfaces": [
+      "Cobros y cartera global",
+      "Cliente 360 > Cobros",
+      "detalle del cobro"
+    ],
+    "notPrimaryOn": [
+      "Recibos y pagos"
+    ],
+    "actionLabel": "Conciliar",
+    "allowedEnrichment": [
+      "applicationDate",
+      "invoiceNumber",
+      "invoiceDocumentRef",
+      "paymentSupportDocumentRef",
+      "evidenceAsOfDate",
+      "evidenceType/evidenceOrigin"
+    ],
+    "enrichSamePayment": true,
+    "duplicatePaymentForbidden": true
+  },
+  "receiptEditBoundary": {
+    "receiptCalendar": [
+      "serie/recibo",
+      "fecha límite",
+      "desglose económico",
+      "total",
+      "campos contractuales realmente editables"
+    ],
+    "paymentFacts": [
+      "paidDate",
+      "paymentMethod",
+      "paymentSupportDocumentRef",
+      "evidence"
+    ],
+    "applicationFacts": [
+      "applicationDate",
+      "invoiceNumber",
+      "invoiceDocumentRef"
+    ],
+    "inferredEffectiveDate": "DERIVED_NOT_ORDINARY_FREE_TEXT",
+    "auditReasonRequiredForControlledCorrections": true
+  },
+  "scopeContract": {
+    "directionAndOperativeWithValidScopeCanApply": true,
+    "advisorCanReportOnly": true,
+    "hardcodedIdentitiesForbidden": true,
+    "uiHidingIsNotSecurity": true,
+    "browserAndServerAuthorizationMustAgree": true
+  },
+  "performanceContract": {
+    "initialHydrationMayLoadRequiredReadModel": true,
+    "filterChangeAfterHydration": "ESSENTIALLY_IMMEDIATE_NO_REDUNDANT_HYDRATION",
+    "duplicateRenderRegressionForbidden": true
+  }
+}

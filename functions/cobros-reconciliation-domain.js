@@ -6,16 +6,17 @@ const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { validateActiveLedgerContract } = require('./cobros-ledger-contract');
 const { normalizeRole, resolveProductActiveRole } = require('./product-active-role-contract');
+const { planEvidence } = require('./payment-inference-engine');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
-const VERSION = 'orbit360-cobros-reconciliation-domain-v5-r11-preview-synthetic-guard';
+const VERSION = 'orbit360-cobros-reconciliation-domain-v6-b3005-inference-owner';
 const CONTRACT_VERSION = '10.10.2';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 const ADMIN_ROLES = new Set(['superadmin', 'admintenant', 'direccion', 'admin', 'operativo', 'finanzas']);
 const ADVISOR_REPORT_ROLES = new Set(['asesor', 'asesora', 'asesor_sr', 'asesora_sr', 'asesor_jr', 'asesora_jr', 'comercial']);
 const PERMISSIONS = new Set(['cobros_manage', 'conciliaciones_manage', 'payments_reconcile']);
-const OPERATIONS = new Set(['preview_policy', 'report_advisor_payment', 'apply_payment', 'reconcile_payment', 'register_evidence', 'confirm_application', 'hold_proposal', 'reopen_proposal']);
+const OPERATIONS = new Set(['preview_policy', 'report_advisor_payment', 'apply_payment', 'reconcile_payment', 'reconcile_evidence', 'register_evidence', 'confirm_application', 'hold_proposal', 'reopen_proposal']);
 
 const text = (value, max = 1000) => String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
 const norm = value => text(value, 180).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -49,6 +50,20 @@ function eventRef(tenantId, eventId) {
 }
 function controlRef(tenantId) {
   return tenantData(tenantId, 'cobrosLedgerControl').doc('active');
+}
+function reconciliationConfigRef(tenantId) {
+  return db.collection('tenants').doc(tenantId).collection('config').doc('reconciliation');
+}
+function previewReconciliationConfigRef(tenantId) {
+  return db.collection('tenants').doc(tenantId).collection('previewUatConfig').doc('reconciliation');
+}
+async function readReconciliationConfig(tenantId, previewOnly) {
+  if (previewOnly === true) {
+    const preview = await previewReconciliationConfigRef(tenantId).get();
+    if (preview.exists) return Object.assign({ configSource: 'preview_uat' }, preview.data() || {});
+  }
+  const canonical = await reconciliationConfigRef(tenantId).get();
+  return canonical.exists ? Object.assign({ configSource: 'canonical' }, canonical.data() || {}) : { configSource: 'missing' };
 }
 function runRef(tenantId, runId) {
   return tenantData(tenantId, 'cobrosLedgerRuns').doc(runId);
@@ -221,7 +236,8 @@ async function previewPolicy(authz, payload) {
       proposalStates: stateCounts(proposals)
     },
     writes: 0,
-    inferenceDisabled: true
+    inferenceDisabled: false,
+    inferenceMode: 'SERVER_OWNED_HIGH_CONFIDENCE_ONLY'
   };
 }
 
@@ -366,6 +382,11 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
   const paymentSupportDocumentRef = text(payload.paymentSupportDocumentRef || payload.soportePagoRef, 500);
   const invoiceDocumentRef = text(payload.invoiceDocumentRef || payload.facturaRef, 500);
   const explicitAmount = money(payload.amount || payload.monto, 'Monto');
+  const evidenceId = text(payload.evidenceId || payload.sourceRef || payload.documentRef, 500);
+  const evidenceType = text(payload.evidenceType || payload.tipoEvidencia, 120);
+  const anchorInstallment = Number(payload.anchorInstallment || payload.cuotaAncla || 0) || null;
+  const inferenceRuleId = text(payload.inferenceRuleId || payload.reglaInferencia, 160);
+  const confidence = text(payload.confidence || payload.confianza, 40).toUpperCase();
   if (inferred && !inferredEffectiveDate) throw new HttpsError('invalid-argument', 'La inferencia requiere fecha operativa de la cuota.');
   if (inferred && paidDate && payload.actualPaidDateEvidence !== true) {
     throw new HttpsError('failed-precondition', 'Una inferencia no puede inventar fecha real de pago.');
@@ -376,6 +397,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
   const reqPayload = {
     receiptId, source, inferred, paidDate, inferredEffectiveDate, evidenceAsOfDate, applicationDate,
     invoiceNumber, paymentMethod, paymentSupportDocumentRef, invoiceDocumentRef, amount: explicitAmount,
+    evidenceId, evidenceType, anchorInstallment, inferenceRuleId, confidence,
     forceReconciliation: payload.forceReconciliation === true, applicationEvidenceType: applicationEvidenceTypeInput
   };
   const reqId = operationRequestId(authz.tenantId, operationName, reqPayload, data.requestId);
@@ -426,12 +448,21 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const existingPaymentState = text(beforeCobro.paymentState, 80);
     const existingDirectOrInferred = text(beforeCobro.directOrInferred, 80);
     const existingPaymentEvidenceType = text(beforeCobro.paymentEvidenceType, 120);
+    const priorInferenceProvenance = beforeCobro.inferenceProvenance || (existingPaymentState === 'PAID_INFERRED' || existingDirectOrInferred === 'INFERRED' ? {
+      evidenceType: text(beforeCobro.evidenceType || beforeCobro.paymentEvidenceType, 120),
+      evidenceId: text(beforeCobro.evidenceId || beforeCobro.sourceRef, 500),
+      anchorInstallment: Number(beforeCobro.anchorInstallment || 0) || null,
+      inferenceRuleId: text(beforeCobro.inferenceRuleId, 160),
+      inferredEffectiveDate: text(beforeCobro.inferredEffectiveDate, 32),
+      evidenceAsOfDate: text(beforeCobro.evidenceAsOfDate, 32),
+      confidence: text(beforeCobro.confidence, 40) || 'HIGH'
+    } : null);
     const paymentState = isApplicationEnrichment && existingPaymentState ? existingPaymentState : paidStateFor(source, inferred);
     const directOrInferred = isApplicationEnrichment && existingDirectOrInferred ? existingDirectOrInferred : (inferred ? 'INFERRED' : 'DIRECT');
     const paymentEvidenceType = isApplicationEnrichment && existingPaymentEvidenceType ? existingPaymentEvidenceType : (advisorReported ? 'ADVISOR_REPORTED' : source.toUpperCase());
     const paymentOrigin = advisorReported ? 'ADVISOR_REPORTED_PAYMENT' : (source === 'crm_migrated_direct' ? 'CRM_MIGRATED_DIRECT_PAYMENT' : (source === 'client_reported' ? 'CLIENT_PORTAL' : text(beforeCobro.paymentOrigin, 120) || 'OPERATIVE_DIRECT_PAYMENT'));
     const applicationEvidenceType = applicationProved ? (applicationEvidenceTypeInput || (source === 'crm_migrated_direct' ? 'MANUAL_RECONCILIATION' : source.toUpperCase())) : text(beforeCobro.applicationEvidenceType, 120);
-    const applicationState = (applicationProved || finalApplicationDate || beforeCobro.conciliado === true) ? 'APPLIED_DIRECT' : 'PENDING_APPLICATION';
+    const applicationState = (applicationProved || finalApplicationDate || beforeCobro.conciliado === true) ? (inferred ? 'APPLIED_INFERRED' : 'APPLIED_DIRECT') : 'PENDING_APPLICATION';
     const technicalNow = now();
 
     const shared = {
@@ -443,10 +474,18 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       applicationEvidenceType,
       evidenceAsOfDate: evidenceAsOfDate || text(beforeCobro.evidenceAsOfDate, 32),
       inferredEffectiveDate: inferredEffectiveDate || text(beforeCobro.inferredEffectiveDate, 32),
+      matchedPolicyId: policyId,
+      matchedReceiptId: receiptId,
       reconciledAt: technicalNow,
       updatedAt: technicalNow,
       updatedByUid: authz.actor.uid
     };
+    if (evidenceId) { shared.evidenceId = evidenceId; shared.sourceRef = text(payload.sourceRef || payload.documentRef || evidenceId, 500); }
+    if (evidenceType) shared.evidenceType = evidenceType;
+    if (anchorInstallment) shared.anchorInstallment = anchorInstallment;
+    if (inferenceRuleId) shared.inferenceRuleId = inferenceRuleId;
+    if (confidence) shared.confidence = confidence;
+    if (priorInferenceProvenance) shared.inferenceProvenance = priorInferenceProvenance;
     if (finalPaidDate) shared.paidDate = finalPaidDate;
     if (finalPaymentMethod) shared.paymentMethod = finalPaymentMethod;
     if (finalPaymentSupportDocumentRef) shared.paymentSupportDocumentRef = finalPaymentSupportDocumentRef;
@@ -467,7 +506,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       vence: dueDate(receipt),
       monto: amount,
       estado: 'Pagado',
-      conciliado: applicationState === 'APPLIED_DIRECT',
+      conciliado: /^APPLIED_/.test(applicationState),
       ...shared
     });
     if (finalPaidDate) cobro.fechaPago = finalPaidDate;
@@ -486,7 +525,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       paymentOrigin,
       paymentIntakeState: advisorReported ? 'VALIDATED_APPLIED' : text(receipt.paymentIntakeState, 120),
       conciliadoPago: true,
-      conciliado: applicationState === 'APPLIED_DIRECT',
+      conciliado: /^APPLIED_/.test(applicationState),
       ...shared
     };
     if (finalPaidDate) {
@@ -571,6 +610,258 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
   return result;
 }
 
+function evidenceOrigin(type) {
+  if (type === 'COMMISSION_STATEMENT_INSTALLMENT_N') return 'COMMISSION_STATEMENT';
+  if (type === 'BANK_STATEMENT_MATCH') return 'BANK';
+  return 'INSURER';
+}
+function evidenceSourceType(type) {
+  if (type === 'COMMISSION_STATEMENT_INSTALLMENT_N') return 'commission_statement';
+  if (type === 'BANK_STATEMENT_MATCH') return 'payment_support';
+  if (type === 'INSURER_STATEMENT_PENDING_FROM_N') return 'insurer_statement';
+  return 'insurer_invoice';
+}
+async function reconcileEvidence(authz, data, payload, previewOnly) {
+  const policyId = id(payload.policyId || payload.polizaId, 'polizaId');
+  const reconciliationConfig = await readReconciliationConfig(authz.tenantId, previewOnly === true);
+  const evidencePayload = {
+    policyId,
+    evidenceType: text(payload.evidenceType || payload.type || payload.sourceType, 120),
+    evidenceId: text(payload.evidenceId || payload.sourceRef || payload.documentRef, 500),
+    sourceRef: text(payload.sourceRef || payload.documentRef || payload.evidenceId, 500),
+    receiptId: text(payload.receiptId || payload.reciboId, 180),
+    anchorInstallment: Number(payload.anchorInstallment || payload.installmentNumber || payload.numeroCuota || 0) || null,
+    installment: text(payload.installment || payload.cuota, 120),
+    totalInstallments: Number(payload.totalInstallments || payload.installmentTotal || payload.totalCuotas || 0) || null,
+    evidenceAsOfDate: isoDate(payload.evidenceAsOfDate || payload.fechaCorteEvidencia, 'Fecha de evidencia', false),
+    paidDate: isoDate(payload.paidDate || payload.fechaPago, 'Fecha real de pago', false),
+    applicationDate: isoDate(payload.applicationDate || payload.fechaAplicacion, 'Fecha de aplicación', false),
+    invoiceNumber: text(payload.invoiceNumber || payload.numeroFactura, 180),
+    paymentMethod: text(payload.paymentMethod || payload.metodoPago || payload.metodo, 180),
+    paymentSupportDocumentRef: text(payload.paymentSupportDocumentRef || payload.soportePagoRef, 500),
+    invoiceDocumentRef: text(payload.invoiceDocumentRef || payload.facturaRef, 500),
+    currency: text(payload.currency || payload.moneda, 12).toUpperCase(),
+    amount: money(payload.amount || payload.monto, 'Monto'),
+    uniqueMatch: payload.uniqueMatch !== false,
+    conflictingEvidence: payload.conflictingEvidence === true,
+    partialPayment: payload.partialPayment === true,
+    reversal: payload.reversal === true,
+    allowPriorContiguousInference: payload.allowPriorContiguousInference === true,
+    actualPaidDateEvidence: payload.actualPaidDateEvidence === true
+  };
+  const reqId = operationRequestId(authz.tenantId, 'reconcile_evidence', evidencePayload, data.requestId);
+  const reqRef = requestRef(authz.tenantId, reqId);
+  const evtId = 'payinf_' + sha(authz.tenantId + '|' + policyId + '|' + reqId).slice(0, 28);
+  const policyRef = tenantData(authz.tenantId, 'polizas').doc(policyId);
+  const receiptQuery = tenantData(authz.tenantId, 'recibosEsperados').where('polizaId', '==', policyId);
+
+  return db.runTransaction(async tx => {
+    const previous = await tx.get(reqRef);
+    if (previous.exists && (previous.data() || {}).status === 'committed') return Object.assign({ reused: true }, (previous.data() || {}).result || {});
+    const [policySnap, receiptSnap] = await Promise.all([tx.get(policyRef), tx.get(receiptQuery)]);
+    if (!policySnap.exists) throw new HttpsError('not-found', 'La póliza no existe.');
+    const policy = Object.assign({ id: policySnap.id }, policySnap.data() || {});
+    const receipts = receiptSnap.docs.map(doc => Object.assign({ id: doc.id }, doc.data() || {}));
+    const plan = planEvidence({ policy, receipts, evidence: evidencePayload, reconciliationConfig });
+    if (!plan || plan.ok !== true) throw new HttpsError('failed-precondition', 'No fue posible evaluar la evidencia.');
+    if (plan.autoCommit !== true || plan.status === 'REVIEW_REQUIRED') {
+      return {
+        ok: true,
+        operation: 'reconcile_evidence',
+        status: 'REVIEW_REQUIRED',
+        reviewRequired: true,
+        reason: text(plan.reason, 180),
+        policyId,
+        writes: 0,
+        serverOwned: true,
+        failClosed: true,
+        scheduleCorrectionRequired: plan.scheduleCorrectionRequired === true,
+        expectedReceiptCount: plan.expectedReceiptCount || null,
+        actualReceiptCount: plan.actualReceiptCount || null,
+        maxInstallments: plan.maxInstallments || null
+      };
+    }
+    if (!Array.isArray(plan.targets) || plan.targets.length === 0) {
+      const noop = { ok: true, operation: 'reconcile_evidence', status: 'NOOP_ALREADY_SATISFIED', policyId, writes: 0, serverOwned: true, idempotent: true, confidence: plan.confidence || 'HIGH' };
+      tx.set(reqRef, { status: 'committed', operation: 'reconcile_evidence', payloadDigest: digest(evidencePayload), result: noop, committedAt: now() }, { merge: true });
+      return noop;
+    }
+
+    const states = [];
+    for (const target of plan.targets) {
+      const receiptId = id(target.receiptId, 'reciboId');
+      const receipt = receipts.find(row => row.id === receiptId);
+      if (!receipt) throw new HttpsError('failed-precondition', 'El recibo planificado ya no existe.');
+      const cobroQuery = tenantData(authz.tenantId, 'cobros').where('reciboId', '==', receiptId);
+      const portfolioQuery = tenantData(authz.tenantId, 'carteraPrimas').where('reciboId', '==', receiptId);
+      const [cobroSnap, portfolioSnap] = await Promise.all([tx.get(cobroQuery), tx.get(portfolioQuery)]);
+      if (cobroSnap.size > 1) throw new HttpsError('failed-precondition', 'Más de un cobro corresponde al mismo recibo.');
+      const activePortfolioRows = portfolioSnap.docs.filter(doc => activePortfolio(doc.data() || {}));
+      if (activePortfolioRows.length > 1) throw new HttpsError('failed-precondition', 'Más de una obligación activa corresponde al mismo recibo.');
+      states.push({ target, receipt, cobroDoc: cobroSnap.empty ? null : cobroSnap.docs[0], activePortfolioRows });
+    }
+
+    const technicalNow = now(), results = [];
+    const origin = evidenceOrigin(plan.evidenceType), source = evidenceSourceType(plan.evidenceType);
+    for (const state of states) {
+      const target = state.target, receipt = state.receipt, receiptId = receipt.id;
+      const cobroDoc = state.cobroDoc, beforeCobro = cobroDoc ? (cobroDoc.data() || {}) : {};
+      const cobroId = cobroDoc ? cobroDoc.id : deterministicCobroId(authz.tenantId, receiptId);
+      const cobroRef = tenantData(authz.tenantId, 'cobros').doc(cobroId);
+      const isInferred = target.mode === 'INFERRED';
+      const priorInference = beforeCobro.inferenceProvenance || (text(beforeCobro.paymentState, 80) === 'PAID_INFERRED' || text(beforeCobro.directOrInferred, 80) === 'INFERRED' ? {
+        evidenceType: text(beforeCobro.evidenceType || beforeCobro.paymentEvidenceType, 120),
+        evidenceId: text(beforeCobro.evidenceId || beforeCobro.sourceRef, 500),
+        anchorInstallment: Number(beforeCobro.anchorInstallment || 0) || null,
+        inferenceRuleId: text(beforeCobro.inferenceRuleId, 160),
+        inferredEffectiveDate: text(beforeCobro.inferredEffectiveDate, 32),
+        evidenceAsOfDate: text(beforeCobro.evidenceAsOfDate, 32),
+        confidence: text(beforeCobro.confidence, 40) || 'HIGH'
+      } : null);
+      const existingDirect = ['PAID_DIRECT','PAID_REPORTED'].includes(text(beforeCobro.paymentState, 80));
+      const paymentState = isInferred && existingDirect ? text(beforeCobro.paymentState, 80) : target.paymentState;
+      const applicationState = isInferred && text(beforeCobro.applicationState, 80) === 'APPLIED_DIRECT' ? 'APPLIED_DIRECT' : target.applicationState;
+      const directOrInferred = isInferred && !existingDirect ? 'INFERRED' : 'DIRECT';
+      const amount = (!isInferred && evidencePayload.amount != null) ? evidencePayload.amount : receiptAmount(receipt);
+      if (amount == null || amount <= 0) throw new HttpsError('failed-precondition', 'El recibo no tiene monto válido.');
+      const paidDate = !isInferred && evidencePayload.paidDate && (plan.evidenceType === 'BANK_STATEMENT_MATCH' || evidencePayload.actualPaidDateEvidence === true) ? evidencePayload.paidDate : text(beforeCobro.paidDate || beforeCobro.fechaPago, 32);
+      const applicationDate = !isInferred ? (evidencePayload.applicationDate || text(beforeCobro.applicationDate, 32)) : text(beforeCobro.applicationDate, 32);
+      const inferenceProvenance = isInferred ? {
+        evidenceType: plan.evidenceType,
+        evidenceId: plan.evidenceId,
+        sourceRef: plan.sourceRef,
+        anchorInstallment: plan.anchorInstallment,
+        inferenceRuleId: plan.inferenceRuleId,
+        inferredEffectiveDate: target.inferredEffectiveDate,
+        evidenceAsOfDate: plan.evidenceAsOfDate || '',
+        confidence: plan.confidence
+      } : priorInference;
+      const shared = {
+        paymentState,
+        applicationState,
+        directOrInferred,
+        paymentEvidenceType: plan.evidenceType,
+        paymentOrigin: origin,
+        applicationEvidenceType: applicationState === 'PENDING_APPLICATION' ? text(beforeCobro.applicationEvidenceType, 120) : plan.evidenceType,
+        evidenceType: plan.evidenceType,
+        evidenceId: plan.evidenceId,
+        sourceRef: plan.sourceRef,
+        anchorInstallment: plan.anchorInstallment,
+        inferenceRuleId: plan.inferenceRuleId,
+        matchedPolicyId: policyId,
+        matchedReceiptId: receiptId,
+        confidence: plan.confidence,
+        evidenceAsOfDate: plan.evidenceAsOfDate || text(beforeCobro.evidenceAsOfDate, 32),
+        inferredEffectiveDate: isInferred ? target.inferredEffectiveDate : text(beforeCobro.inferredEffectiveDate, 32),
+        reconciledAt: technicalNow,
+        reconciledBy: authz.actor.uid,
+        updatedAt: technicalNow,
+        updatedByUid: authz.actor.uid
+      };
+      if (inferenceProvenance) shared.inferenceProvenance = inferenceProvenance;
+      if (paidDate) shared.paidDate = paidDate;
+      if (applicationDate) shared.applicationDate = applicationDate;
+      if (!isInferred && evidencePayload.invoiceNumber) shared.invoiceNumber = evidencePayload.invoiceNumber;
+      if (!isInferred && evidencePayload.paymentSupportDocumentRef) shared.paymentSupportDocumentRef = evidencePayload.paymentSupportDocumentRef;
+      if (!isInferred && evidencePayload.invoiceDocumentRef) shared.invoiceDocumentRef = evidencePayload.invoiceDocumentRef;
+      if (!isInferred && evidencePayload.paymentMethod) shared.paymentMethod = evidencePayload.paymentMethod;
+
+      const cobro = Object.assign({}, beforeCobro, {
+        id: cobroId,
+        tenantId: authz.tenantId,
+        clienteId: text(receipt.clienteId || policy.clienteId, 180),
+        polizaId: policyId,
+        reciboId: receiptId,
+        asesorId: text(receipt.asesorId || policy.asesorId, 180),
+        pais: text(receipt.pais || policy.pais, 12).toUpperCase(),
+        moneda: text(receipt.moneda || policy.moneda, 12).toUpperCase(),
+        cuota: text(receipt.cuota || receipt.secuencia || receipt.numeroReciboFuente, 120),
+        vence: dueDate(receipt),
+        monto: amount,
+        estado: 'Pagado',
+        conciliado: /^APPLIED_/.test(applicationState),
+        ...shared
+      });
+      if (paidDate) cobro.fechaPago = paidDate;
+      if (!isInferred && evidencePayload.invoiceNumber) cobro.numeroFactura = evidencePayload.invoiceNumber;
+      tx.set(cobroRef, cobro, { merge: true });
+
+      const receiptPatch = Object.assign({
+        estado: 'Pagado',
+        estadoOperativo: isInferred ? 'pago_inferido' : 'pagado',
+        cobroId,
+        paymentOrigin: origin,
+        conciliadoPago: true,
+        conciliado: /^APPLIED_/.test(applicationState)
+      }, shared);
+      if (paidDate) receiptPatch.fechaPago = paidDate;
+      if (!isInferred && evidencePayload.invoiceNumber) receiptPatch.numeroFactura = evidencePayload.invoiceNumber;
+      tx.set(tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId), receiptPatch, { merge: true });
+
+      if (state.activePortfolioRows.length === 1) {
+        const portfolioPatch = {
+          estado: 'Pagado',
+          estadoCartera: 'Pagado',
+          carteraActiva: false,
+          conciliadoPago: true,
+          cobroId,
+          reciboId: receiptId,
+          paymentState,
+          applicationState,
+          directOrInferred,
+          evidenceType: plan.evidenceType,
+          evidenceId: plan.evidenceId,
+          inferenceRuleId: plan.inferenceRuleId,
+          anchorInstallment: plan.anchorInstallment,
+          evidenceAsOfDate: plan.evidenceAsOfDate || '',
+          updatedAt: technicalNow,
+          updatedByUid: authz.actor.uid
+        };
+        if (isInferred) portfolioPatch.inferredEffectiveDate = target.inferredEffectiveDate;
+        if (paidDate) portfolioPatch.fechaPago = paidDate;
+        if (applicationDate) portfolioPatch.applicationDate = applicationDate;
+        tx.set(state.activePortfolioRows[0].ref, portfolioPatch, { merge: true });
+      }
+      results.push({ receiptId, cobroId, installment: target.installment, directOrInferred, paymentState, applicationState });
+    }
+
+    const committed = {
+      ok: true,
+      operation: 'reconcile_evidence',
+      status: 'AUTO_COMMITTED_HIGH_CONFIDENCE',
+      policyId,
+      evidenceType: plan.evidenceType,
+      evidenceId: plan.evidenceId,
+      anchorInstallment: plan.anchorInstallment,
+      inferenceRuleId: plan.inferenceRuleId,
+      confidence: plan.confidence,
+      results,
+      writes: results.length,
+      serverOwned: true,
+      idempotent: true,
+      humanApprovalRequired: false
+    };
+    tx.set(eventRef(authz.tenantId, evtId), {
+      schemaVersion: VERSION,
+      contractVersion: CONTRACT_VERSION,
+      tenantId: authz.tenantId,
+      eventId: evtId,
+      operation: 'reconcile_evidence',
+      requestId: reqId,
+      actor: authz.actor,
+      policyId,
+      evidenceType: plan.evidenceType,
+      evidenceId: plan.evidenceId,
+      confidence: plan.confidence,
+      payloadDigest: digest(evidencePayload),
+      resultDigest: digest(committed),
+      createdAt: technicalNow
+    }, { merge: false });
+    tx.set(reqRef, { status: 'committed', operation: 'reconcile_evidence', eventId: evtId, payloadDigest: digest(evidencePayload), result: committed, committedAt: technicalNow }, { merge: true });
+    return committed;
+  });
+}
+
 function unsupportedMutation(operation) {
   if (operation === 'confirm_application') {
     throw new HttpsError('failed-precondition', 'COBROS_10102_PROPOSAL_IS_NOT_PAYMENT: una propuesta/HOLD no puede convertirse en Cobro ni modificar recibos.');
@@ -581,16 +872,16 @@ function unsupportedMutation(operation) {
 }
 
 function previewSyntheticId(value) {
-  return /^(?:b3004qa_|b3004human_)/i.test(text(value, 180));
+  return /^(?:b3004qa_|b3004human_|b3005qa_|b3005human_)/i.test(text(value, 180));
 }
 async function executePreview(request) {
   const data = request.data || {}, payload = data.payload || {};
   const targetId = text(payload.receiptId || payload.reciboId || payload.polizaId || payload.policyId || payload.proposalId, 180);
   if (!previewSyntheticId(targetId)) throw new HttpsError('permission-denied', 'Preview de Cobros solo admite fixtures sintéticas autorizadas.');
-  return execute(request);
+  return execute(request, true);
 }
 
-async function execute(request) {
+async function execute(request, previewOnly = false) {
   const data = request.data || {};
   const operation = norm(data.operation).replace(/ /g, '_');
   if (!OPERATIONS.has(operation)) throw new HttpsError('invalid-argument', 'Operación no soportada.');
@@ -608,6 +899,7 @@ async function execute(request) {
       applicationEvidenceType: payload.applicationEvidenceType || 'MANUAL_RECONCILIATION'
     }), 'reconcile_payment');
   }
+  if (operation === 'reconcile_evidence') return reconcileEvidence(authz, data, payload, previewOnly === true);
   unsupportedMutation(operation);
 
   const motive = reason(data, true);

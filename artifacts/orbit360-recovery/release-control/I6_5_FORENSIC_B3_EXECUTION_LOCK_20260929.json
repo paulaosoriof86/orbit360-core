@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_005_DIAGNOSTIC_PASS_SOURCE_FIX_REQUIRED",
+  "status": "B3_005_SOURCE_FIXED_PENDING_CONTRACT",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,9 +14,9 @@
   "activeFinding": {
     "id": "B3-005",
     "title": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-    "status": "DIAGNOSTIC_PASS_SOURCE_FIX_REQUIRED",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
     "blocking": true,
-    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json",
     "requiredProof": [
       "High-confidence invoice/statement/commission inference auto-commits without human approval.",
       "Prior contiguous installments are inferred with inferredEffectiveDate=their scheduled due date while paidDate remains unknown unless directly evidenced.",
@@ -26,11 +26,12 @@
     ],
     "boundaries": {
       "businessWritesAuthorized": false,
+      "configWritesAuthorized": false,
       "reimportAuthorized": false,
       "liveHostingPromotionAuthorized": false,
-      "productMutationAuthorized": true
+      "productMutationAuthorized": false
     },
-    "nextAction": "B3_005_SOURCE_FIX",
+    "nextAction": "B3_005_SOURCE_CONTRACT",
     "rootCause": "CANONICAL_SINGLE_RECEIPT_WRITE_PRIMITIVE_EXISTS_BUT_HIGH_CONFIDENCE_MULTI_EVIDENCE_INFERENCE_ORCHESTRATOR_AND_CURRENT_TENANT_CONFIG_CONTRACT_ARE_NOT_COMPOSED",
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
     "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75",
@@ -44,7 +45,21 @@
       "orbit360-platform/index.html",
       "tools/*B3-005*",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
-    ]
+    ],
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_FIX_20261001.json",
+    "sourceFixReceiptBlobSha": "46c819ebefe9e3534ccdf6e7286c68f584816c94",
+    "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
+    "sourceBlobs": {
+      "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
+      "functions/cobros-reconciliation-domain.js": "b13a641ece0177cebd31f8dc748dd4b88483f0d2",
+      "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
+      "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V5_20261001.json": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
+      "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "9de5bb95ec18e7177cb7b419342eadc2a795d88c"
+    },
+    "candidateEligibleForPromotion": false,
+    "machineProofInvalidatedBySourceChange": true
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -53,12 +68,10 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "1d993e05f1b047e9dfd989c06ac7a85ffaa0e655"
+    "blobSha": "e69b0f57e49ee883f48df7a6cbce30c4d68a43c9"
   },
   "nextRequiredProof": [
-    "B3_005_SOURCE_CONTRACT_PASS",
-    "B3_005_PREVIEW_MACHINE_PASS",
-    "B3_005_TARGETED_HUMAN_VISUAL_PASS"
+    "B3_005_SOURCE_CONTRACT_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -257,7 +270,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "f18092c2bbc09c3b2274d1c19ea12f78e6b6554d"
+    "blobSha": "1158cd81acc752d0fd6a6edff44e7e64ec6479f2"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",

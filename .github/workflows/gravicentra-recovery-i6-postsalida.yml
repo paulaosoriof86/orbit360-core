@@ -7119,3 +7119,96 @@ jobs:
       - name: B3-004 failure remains fail-closed
         if: ${{ failure() && steps.gate.outputs.run == 'true' }}
         run: echo "B3_004_FAILED_NO_OPERATIONAL_DATA_WRITE_NO_REIMPORT_NO_LIVE_NO_B4"
+
+  i65-b3-005-source-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate B3-005 source contract
+        id: gate
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const b=c.i65ForensicRemediationPlan&&c.i65ForensicRemediationPlan.b3||{};
+          const run=b.status==='B3_005_SOURCE_FIXED_PENDING_CONTRACT'&&c.nextAction==='I6_5_FORENSIC_REMEDIATION_B3_005_CONTRACT';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B3_005_SOURCE_CONTRACT_MODE='+(run?'run':'noop'));
+          NODE
+      - name: Run B3-005 source contract
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node --check functions/payment-inference-engine.js
+          node --check functions/cobros-reconciliation-domain.js
+          node --check functions/tenant-domain-config.js
+          node --check orbit360-platform/core/cobros-reconciliation-domain-client.js
+          node --check tools/gravicentra-i6-5-b3-005-contract.mjs
+          node tools/gravicentra-i6-5-b3-005-contract.mjs
+      - name: Freeze B3-005 source contract PASS
+        if: steps.gate.outputs.run == 'true'
+        env:
+          CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+          LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json
+          FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+          COMPOSITION: artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json
+          RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json
+        run: |
+          set -euo pipefail
+          REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
+          test "$REMOTE" = "$GITHUB_SHA"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const r={schema:'GRAVICENTRA_I6_5_B3_005_SOURCE_CONTRACT_PASS_V1',recordedAt:'2026-10-01',status:'PASS_PENDING_EXACT_PREVIEW',sourceSha:process.env.GITHUB_SHA,runId:Number(process.env.GITHUB_RUN_ID),findingId:'B3-005',assertions:{serverOwnedInference:true,highConfidenceAutoCommit:true,ambiguousFailClosed:true,inferredEffectiveDateDueDate:true,paidDateNotInvented:true,explicitDenominatorValidated:true,aseguradoraGuatemaltecaMax10:true,allFourMax10:true,inferenceProvenancePreserved:true,deterministicCobroIdentity:true,tenantConfigOwned:true},operationalBusinessWrites:false,reimport:false,live:false,b3006:false,b4:false};
+          fs.writeFileSync(process.env.RECEIPT,JSON.stringify(r,null,2)+'\n');
+          NODE
+          RECEIPT_BLOB=$(git hash-object "$RECEIPT"); export RECEIPT_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.COMPOSITION,o=JSON.parse(fs.readFileSync(p,'utf8'));
+          o.b3005SourceContract={status:'PASS_PENDING_EXACT_PREVIEW',path:process.env.RECEIPT,blobSha:process.env.RECEIPT_BLOB,sourceSha:process.env.GITHUB_SHA,runId:Number(process.env.GITHUB_RUN_ID)};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          COMPOSITION_BLOB=$(git hash-object "$COMPOSITION"); export COMPOSITION_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.FINDINGS,o=JSON.parse(fs.readFileSync(p,'utf8')),f=(o.findings||[]).find(x=>x.id==='B3-005');if(!f)throw Error('B3_005_MISSING');
+          Object.assign(f,{status:'CONTRACT_PASS_PENDING_EXACT_PREVIEW',sourceContractReceiptPath:process.env.RECEIPT,sourceContractReceiptBlobSha:process.env.RECEIPT_BLOB,nextAction:'B3_005_EXACT_PREVIEW',machineProofInvalidatedBySourceChange:true,currentCandidateEligibleForPromotion:false});
+          o.currentB3={...(o.currentB3||{}),status:'B3_005_CONTRACT_PASS_PENDING_EXACT_PREVIEW',activeFindingId:'B3-005',sourceContractReceiptPath:process.env.RECEIPT,compositionLockBlobSha:process.env.COMPOSITION_BLOB,noLive:true,noReimport:true};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.LOCK,o=JSON.parse(fs.readFileSync(p,'utf8'));
+          o.status='B3_005_CONTRACT_PASS_PENDING_EXACT_PREVIEW';
+          o.activeFinding={...(o.activeFinding||{}),status:'CONTRACT_PASS_PENDING_EXACT_PREVIEW',sourceContractReceiptPath:process.env.RECEIPT,sourceContractReceiptBlobSha:process.env.RECEIPT_BLOB,nextAction:'B3_005_EXACT_PREVIEW'};
+          o.nextRequiredProof=['B3_005_PREVIEW_MACHINE_PASS','B3_005_TARGETED_HUMAN_VISUAL_PASS'];
+          o.compositionLock={...(o.compositionLock||{}),blobSha:process.env.COMPOSITION_BLOB};
+          o.findingLedger={...(o.findingLedger||{}),blobSha:process.env.FINDINGS_BLOB};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          LOCK_BLOB=$(git hash-object "$LOCK"); export LOCK_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,o=JSON.parse(fs.readFileSync(p,'utf8')),b=o.i65ForensicRemediationPlan.b3;
+          Object.assign(b,{status:'B3_005_CONTRACT_PASS_PENDING_EXACT_PREVIEW',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,sourceContractReceiptPath:process.env.RECEIPT,sourceContractReceiptBlobSha:process.env.RECEIPT_BLOB,contractPass:true,machineProofInvalidatedBySourceChange:true,candidateEligibleForPromotion:false,nextAction:'B3_005_EXACT_PREVIEW'});
+          o.currentB3={...(o.currentB3||{}),status:'B3_005_CONTRACT_PASS_PENDING_EXACT_PREVIEW',activeFindingId:'B3-005',sourceContractReceiptPath:process.env.RECEIPT,sourceContractReceiptBlobSha:process.env.RECEIPT_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,executionLockBlobSha:process.env.LOCK_BLOB,noLive:true,noReimport:true};
+          o.nextAction='I6_5_FORENSIC_REMEDIATION_B3_005_EXACT_PREVIEW';
+          o.canonicalAccumulationControl={...(o.canonicalAccumulationControl||{}),compositionLockBlobSha:process.env.COMPOSITION_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,nextAction:'B3_005_EXACT_PREVIEW'};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          git add "$RECEIPT" "$COMPOSITION" "$FINDINGS" "$LOCK" "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "freeze(i6.5 B3-005): source contract pass pending exact preview"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: B3-005 source contract failure remains fail-closed
+        if: ${{ failure() && steps.gate.outputs.run == 'true' }}
+        run: echo "B3_005_SOURCE_CONTRACT_FAILED_NO_OPERATIONAL_WRITE_NO_REIMPORT_NO_LIVE_NO_B3006"
