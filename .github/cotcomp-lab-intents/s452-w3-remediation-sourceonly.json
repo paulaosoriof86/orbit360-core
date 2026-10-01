@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "ays-cotcomp-s452-w3-remediation-sourceonly-intent-v1.0",
+  "authorization": "S452_W3_SOURCE_ONLY_CONTRACT_REMEDIATION",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "410fbb3cf2c604fabbda666b69b6a38eabb9c47f",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W3",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "providerOrRaterCalls": false,
+  "realData": false,
+  "production": false,
+  "physicalW3": false,
+  "scope": [
+    "canonical proposal case-link remediation",
+    "proposal version-specific identity contract",
+    "persisted validity interval contract",
+    "proposal write idempotency contract",
+    "atomic sequential supersession contract",
+    "synthetic rollback and final-absence source model",
+    "dry-run persistence planner and adapter binding"
+  ],
+  "explicitExclusions": [
+    "physical proposal writes",
+    "insurer/provider/rater calls",
+    "real client or business data",
+    "production",
+    "selection persistence",
+    "issuance or binding"
+  ]
+}
