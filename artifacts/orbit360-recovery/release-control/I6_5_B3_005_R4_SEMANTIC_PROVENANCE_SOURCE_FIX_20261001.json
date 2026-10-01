@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_R4_SEMANTIC_PROVENANCE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "findingId": "B3-005",
+  "classification": "CODE_DEFECT_UI_READ_MODEL_SEMANTICS",
+  "rootCause": "UI_STATE_LABELS_EVALUATE_RECONCILIATION_BEFORE_PAYMENT_PROVENANCE_SO_PAID_INFERRED_COLLAPSES_INTO_CONCILIADO",
+  "changedProductFiles": {
+    "orbit360-platform/modules/cobros.js": "df8d483309fbd27861a5d55e93c69af780f7f0a6",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "f98777a40f791612dd88c606a7172ba669a66312"
+  },
+  "qaFiles": {
+    "tools/gravicentra-i6-5-b3-005-contract.mjs": "89d1f612f933c5453db4db7f109c8e1027a9aca2"
+  },
+  "remediation": [
+    "Cobros gives PAID_INFERRED/directOrInferred=INFERRED precedence over reconciled labeling.",
+    "Cobros renders Pago inferido separately from reconciliation state.",
+    "Receipt detail renders payment provenance and reconciliation as separate badges.",
+    "Receipt detail exposes inferred evidence/source, anchor installment, inference rule, evidence as-of and confidence in provenance details.",
+    "Receipt detail keeps actual paidDate and inferredEffectiveDate as distinct temporal fields.",
+    "QA contract parses both UI owners and asserts the semantic provenance markers."
+  ],
+  "unchanged": [
+    "functions/payment-inference-engine.js",
+    "functions/cobros-reconciliation-domain.js",
+    "functions/tenant-domain-config.js",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js"
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3006": false,
+    "b4": false
+  },
+  "preserved": {
+    "b3004": "CLOSED_PASS",
+    "b3008": "OPEN_KPI_REALITY",
+    "paymentLockV6": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+    "priorMachinePass": "INVALIDATED_ONLY_BY_R4_SOURCE_CHANGE"
+  },
+  "nextAction": "B3_005_SEMANTIC_PROVENANCE_SOURCE_CONTRACT"
+}
