@@ -118,3 +118,23 @@ test('planner explicitly forbids direct public workflow writes',()=>{
   const r=p.buildInitialHandoffPlan(sample());
   assert.equal(r.invariant.directPublicWorkflowWriteForbidden,true);
 });
+
+test('W3 versioned proposal plan is atomic source-only with persisted validity contract',()=>{
+  const r=p.buildVersionedProposalPlan({
+    tenantId:'alianzas-soluciones',caseId:'qcase_w3',country:'GT',product:'AUTO',currency:'GTQ',
+    insurerId:'ins1',insurerDisplayName:'Insurer',sourceId:'src1',planName:'Plan A',premium:2500,
+    coverages:{},limits:{},sublimits:{},deductibles:{},assistance:{},conditions:[],exclusions:[],
+    validity:{validFrom:'2026-10-01T00:00:00Z',validUntil:'2026-10-31T23:59:59Z'},
+    provenance:{synthetic:true},validationState:'VALIDATED',validatedBy:'qa',validatedAt:'2026-10-01T00:00:00Z',
+    versionNumber:1,requestKey:'w3-v1'
+  });
+  assert.equal(r.ok,true);
+  assert.equal(r.atomic,true);
+  assert.equal(r.physicalW3Allowed,false);
+  assert.equal(r.operations.length,2);
+  assert.equal(r.proposal.versionNumber,1);
+  assert.equal(r.proposal.isCurrentVersion,true);
+  assert.equal(r.comparisonEligibility.currentValidityDerivedFromPersistedInterval,true);
+  assert.equal(r.comparisonEligibility.rankingPolicy,'NONE_BY_DEFAULT');
+});
+
