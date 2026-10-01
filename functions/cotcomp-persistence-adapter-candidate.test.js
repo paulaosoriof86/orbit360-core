@@ -101,3 +101,26 @@ test('W3 versioned proposal compiles to sanitized atomic dry-run commands only',
   assert.ok(r.commands.every(x=>typeof x.payloadDigest==='string'&&x.payloadDigest.length===64));
 });
 
+test('W4 atomic selection compiles complete sanitized multi-document dry-run only',()=>{
+  const s=require('./cotcomp-selection-contract-s455');
+  const fx=s.syntheticFixture();
+  const r=a.compileAtomicSelection({
+    tenantId:fx.tenantId,caseId:fx.caseId,
+    comparisonSetId:fx.comparisonSet.comparisonSetId,
+    proposalId:fx.proposal.proposalId,
+    selectionRequestKey:'s455-selection-1',explicitUserChoice:true,
+    comparisonSet:fx.comparisonSet,proposal:fx.proposal,quoteCase:fx.quoteCase,
+    asOf:'2026-10-15T12:00:00Z'
+  });
+  assert.equal(r.ok,true);
+  assert.equal(r.dryRunOnly,true);
+  assert.equal(r.executionEnabled,false);
+  assert.equal(r.writesEnabled,false);
+  assert.equal(r.physicalW4Allowed,false);
+  assert.equal(r.atomic,true);
+  assert.equal(r.prerequisiteReadSet.length,3);
+  assert.equal(r.commands.length,3);
+  assert.ok(r.commands.every(x=>typeof x.payloadDigest==='string'&&x.payloadDigest.length===64));
+  assert.equal(r.truth.issuanceState,'NOT_ISSUED');
+});
+
