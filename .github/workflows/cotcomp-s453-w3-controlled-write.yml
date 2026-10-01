@@ -1,0 +1,187 @@
+name: CotComp S4.53 W3 LAB controlled-write proof
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s453-w3-controlled-write-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s453-w3-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_TENANT_ID: alianzas-soluciones
+
+jobs:
+  s453-w3-controlled-write:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.53 authorization intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          INTENT=.github/cotcomp-lab-intents/s453-w3-authorized.json
+          jq -e '
+            .authorization == "S453_W3_LAB_SYNTHETIC_CONTROLLED_WRITE" and
+            .projectId == "ays-orbit-360-lab" and
+            .tenantId == "alianzas-soluciones" and
+            .stage == "W3" and
+            .syntheticOnly == true and
+            .v1CreateReadbackRetryConflict == true and
+            .v2AtomicSupersessionReadbackRetryConflict == true and
+            .currentValidityVerification == true and
+            .cleanupRequired == true and
+            .finalAbsenceRequired == true and
+            .providerOrRaterCalls == false and
+            .realData == false and
+            .production == false
+          ' "$INTENT" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$INTENT")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$INTENT"
+
+      - name: Run accumulated QA plus S4.53 tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-proposal-versioning-contract-s452.js
+          node --check cotcomp-w3-controlled-proof-s453.js
+          node --check cotcomp-w3-controlled-proof-s453.test.js
+          node --test cotcomp-proposal-versioning-contract-s452.test.js cotcomp-w3-remediation-verifier-s452.test.js cotcomp-w3-controlled-proof-s453.test.js
+
+      - name: Prepare exact LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s453/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s453/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+          echo "GCLOUD_PROJECT=$COTCOMP_PROJECT_ID" >> "$GITHUB_ENV"
+
+      - name: Execute authorized W3 synthetic controlled-write proof
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          export S453_PROOF_RUN_ID="s453-$GITHUB_RUN_ID"
+          node cotcomp-w3-controlled-proof-s453.js > "$RUNNER_TEMP/s453/evidence/S453_W3_PROOF_RECEIPT.json"
+          jq -e '
+            .projectId == "ays-orbit-360-lab" and
+            .tenantId == "alianzas-soluciones" and
+            .syntheticOnly == true and
+            .v1.firstWrite.writes == 2 and .v1.firstWrite.reused == false and
+            .v1.readback == true and
+            .v1.retry.writes == 0 and .v1.retry.reused == true and
+            .v1.conflictDenied == true and
+            .v2.firstWrite.writes == 3 and .v2.firstWrite.reused == false and
+            .v2.readback == true and
+            .v2.retry.writes == 0 and .v2.retry.reused == true and
+            .v2.conflictDenied == true and
+            .supersession.v1ValidationState == "SUPERSEDED" and
+            .supersession.v1IsCurrentVersion == false and
+            .supersession.v2IsCurrentVersion == true and
+            .validity.v2Current == true and
+            .validity.v1ComparisonEligible == false and
+            .validity.v2ComparisonEligible == true and
+            .cleanup.deletes == 4 and
+            .cleanup.finalAbsence == true and
+            .writeAccounting.v1Writes == 2 and
+            .writeAccounting.v1RetryWrites == 0 and
+            .writeAccounting.v1ConflictWrites == 0 and
+            .writeAccounting.v2Writes == 3 and
+            .writeAccounting.v2RetryWrites == 0 and
+            .writeAccounting.v2ConflictWrites == 0 and
+            .writeAccounting.cleanupDeletes == 4 and
+            .writeAccounting.totalAppDataMutations == 9 and
+            .writeAccounting.netPersistentDocuments == 0 and
+            .boundaries.providerOrRaterCallsExecuted == 0 and
+            .boundaries.realDataTouched == false and
+            .boundaries.productionTouched == false and
+            .boundaries.selectionPersistence == false
+          ' "$RUNNER_TEMP/s453/evidence/S453_W3_PROOF_RECEIPT.json" >/dev/null
+
+      - name: Independent final-absence verification
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const receipt=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s453/evidence/S453_W3_PROOF_RECEIPT.json','utf8'));
+          const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:'ays-orbit-360-lab'});
+          const db=getFirestore(app);
+          const i=receipt.identifiers;
+          const paths=[
+            'tenants/alianzas-soluciones/cotcomp/proposals/items/'+i.v1ProposalId,
+            'tenants/alianzas-soluciones/cotcomp/idempotency/items/'+i.v1RequestId,
+            'tenants/alianzas-soluciones/cotcomp/proposals/items/'+i.v2ProposalId,
+            'tenants/alianzas-soluciones/cotcomp/idempotency/items/'+i.v2RequestId
+          ];
+          (async()=>{
+            const snaps=await Promise.all(paths.map(p=>db.doc(p).get()));
+            const allAbsent=snaps.every(s=>!s.exists);
+            const out={
+              schemaVersion:'ays-cotcomp-s453-independent-final-absence-v1',
+              projectId:'ays-orbit-360-lab',
+              checkedDocuments:4,
+              allAbsent,
+              writesExecuted:0,
+              providerOrRaterCallsExecuted:0,
+              realDataTouched:false,
+              productionTouched:false
+            };
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s453/evidence/S453_INDEPENDENT_FINAL_ABSENCE.json',JSON.stringify(out,null,2));
+            if(!allAbsent)process.exit(1);
+          })().catch(e=>{console.error(String(e&&e.stack||e));process.exit(1);});
+          NODE
+
+      - name: Upload sanitized S4.53 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s453-w3-proof-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s453/evidence/S453_W3_PROOF_RECEIPT.json
+            ${{ runner.temp }}/s453/evidence/S453_INDEPENDENT_FINAL_ABSENCE.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credentials
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/s453/firebase-service-account.json"
