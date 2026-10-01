@@ -625,6 +625,11 @@
       "blobSha": "796d1fe8003ab09cc27c771d411a785cfdf1127c",
       "rootCause": "PRODUCT_ENTRYPOINT_USES_AUTHENTICATED_PRODUCT_TENANT_CONTEXT_BUT_COBROS_CLIENT_ENABLED_ONLY_WHEN_LAB_FEATURE_FLAG_EXISTS_SO_COMMAND_THROWS_BEFORE_NETWORK",
       "productSourceChanged": true
+    },
+    "r12p7p1ContractFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P7P1_CONTRACT_LITERAL_FIX_20261001.json",
+      "blobSha": "b9c50d801871e681199861803fd202cb06536c3d",
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -634,7 +639,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "407485cc4d4ad317441ff433b336aafc79943ddf"
+    "blobSha": "b64587ebb3407d7e0120e28ff547f974893de9c0"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -835,7 +840,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "2d0910b710af72134757d9fc67b1ce51b2eede17"
+    "blobSha": "aea2d563cc19fd2864181a0e633e156fa25c11e3"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -920,6 +925,18 @@
     "findingsLedgerBlobSha": "407485cc4d4ad317441ff433b336aafc79943ddf",
     "rootCause": "PRODUCT_ENTRYPOINT_USES_AUTHENTICATED_PRODUCT_TENANT_CONTEXT_BUT_COBROS_CLIENT_ENABLED_ONLY_WHEN_LAB_FEATURE_FLAG_EXISTS_SO_COMMAND_THROWS_BEFORE_NETWORK",
     "productSourceChanged": true,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p7p1ContractFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P7P1_CONTRACT_LITERAL_FIX_20261001.json",
+    "blobSha": "b9c50d801871e681199861803fd202cb06536c3d",
+    "compositionLockBlobSha": "aea2d563cc19fd2864181a0e633e156fa25c11e3",
+    "findingsLedgerBlobSha": "b64587ebb3407d7e0120e28ff547f974893de9c0",
+    "productSourceChanged": false,
     "noOperationalBusinessWrites": true,
     "noReimport": true,
     "noLive": true,

@@ -403,16 +403,13 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P7",
-    "reason": "PRODUCT_COBROS_CALLABLE_CLIENT_DEPENDED_ON_LAB_FLAG_IN_PRODUCT_RUNTIME",
-    "changedProductFiles": [
-      "orbit360-platform/core/cobros-reconciliation-domain-client.js",
-      "orbit360-platform/index.html"
-    ],
+    "gate": "I6.5-B3-004-R12P7P1",
+    "reason": "QA_CONTRACT_LITERAL_MISMATCH_ONLY",
+    "changedProductFiles": [],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -973,5 +970,15 @@
     "reimport": false,
     "live": false,
     "b3005": false
+  },
+  "b3004R12P7P1ContractLiteralFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P7P1_CONTRACT_LITERAL_FIX_20261001.json",
+    "receiptBlobSha": "b9c50d801871e681199861803fd202cb06536c3d",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "ac793f508a0247f16bc8f3418bc42f979f5203be"
+    },
+    "productSourceChanged": false
   }
 }

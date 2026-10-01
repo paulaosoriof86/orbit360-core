@@ -1688,6 +1688,13 @@
         "classification": "PRODUCT_RUNTIME_COMPOSITION_DEFECT",
         "rootCause": "PRODUCT_ENTRYPOINT_USES_AUTHENTICATED_PRODUCT_TENANT_CONTEXT_BUT_COBROS_CLIENT_ENABLED_ONLY_WHEN_LAB_FEATURE_FLAG_EXISTS_SO_COMMAND_THROWS_BEFORE_NETWORK",
         "productSourceChanged": true
+      },
+      "r12p7p1ContractFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P7P1_CONTRACT_LITERAL_FIX_20261001.json",
+        "blobSha": "b9c50d801871e681199861803fd202cb06536c3d",
+        "compositionLockBlobSha": "aea2d563cc19fd2864181a0e633e156fa25c11e3",
+        "classification": "QA_CONTRACT_LITERAL_MISMATCH",
+        "productSourceChanged": false
       }
     },
     {

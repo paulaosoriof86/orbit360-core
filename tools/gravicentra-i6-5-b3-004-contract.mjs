@@ -244,7 +244,7 @@ need(cobros.includes('function qaActionStore(receiptId)')&&cobros.includes('qaRe
 need(cobros.includes("const store = rawId ? qaActionStore(rawId) : S()")&&cobros.includes("store.get('recibosEsperados', rawId)")&&cobros.includes("store.all('carteraPrimas')"),'B3_004_R12P6_PAYMENT_CONTEXT_STILL_SCOPED_FOR_EXACT_QA');
 need(indexR4.includes('modules/cobros.js?v=20261001-b3004r12p6'),'B3_004_R12P6_COBROS_ASSET_NOT_BUMPED');
 console.log('B3_004_R12P6_EXACT_QA_ACTION_CONTEXT_CONTRACT=PASS');
-need(reconciliationClientR11.includes('function productContextReady')&&reconciliationClientR11.includes("mode==='product'||mode==='product-readonly'")&&reconciliationClientR11.includes("text(b.tenantSource).toLowerCase()==='membership'"),'B3_004_R12P7_PRODUCT_CONTEXT_ENABLEMENT_MISSING');
+need(reconciliationClientR11.includes('const productContextReady=()=>')&&reconciliationClientR11.includes("mode==='product'||mode==='product-readonly'")&&reconciliationClientR11.includes("text(b.tenantSource).toLowerCase()==='membership'"),'B3_004_R12P7_PRODUCT_CONTEXT_ENABLEMENT_MISSING');
 need(reconciliationClientR11.includes("const enabled=()=>productContextReady()||!!((backend().featureFlags||{}).cobrosReconciliationDomainActive===true)"),'B3_004_R12P7_CLIENT_STILL_LAB_FLAG_ONLY');
 need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20261001-b3004r12p7'),'B3_004_R12P7_PAYMENT_CLIENT_ASSET_NOT_BUMPED');
 console.log('B3_004_R12P7_PRODUCT_CONTEXT_CALLABLE_ENABLEMENT_CONTRACT=PASS');

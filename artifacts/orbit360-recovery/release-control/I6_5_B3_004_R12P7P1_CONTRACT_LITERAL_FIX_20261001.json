@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P7P1_CONTRACT_LITERAL_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "2014fc15ac452cb9f47468ce0e9d9c7b443d6850",
+  "failedRunId": 36845665400,
+  "failedJobId": 110315135466,
+  "classification": "QA_CONTRACT_LITERAL_MISMATCH",
+  "cause": "Contract expected function declaration while source intentionally uses const arrow function for productContextReady.",
+  "remediation": "Validate exact implemented declaration without changing product source.",
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "ac793f508a0247f16bc8f3418bc42f979f5203be"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}
