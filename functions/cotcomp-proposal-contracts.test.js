@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const {
   COMPARISON_SEMANTICS,
   COMPARISON_POLICY,
+  normalizeProposalCaseLink,
   validateProposalShape,
   evaluateComparisonEligibility,
   validateComparisonSemantic
@@ -92,3 +93,27 @@ test('comparison policy has no ranking or historical pricing inference by defaul
   assert.equal(COMPARISON_POLICY.noSilentWeighting, true);
   assert.equal(COMPARISON_POLICY.historicalPricingInferenceAllowed, false);
 });
+
+test('canonical persisted caseId passes proposal shape directly', () => {
+  const proposal = validProposal({ caseId:'quote-1' });
+  delete proposal.quoteCaseId;
+  const normalized = normalizeProposalCaseLink(proposal);
+  assert.equal(normalized.ok, true);
+  assert.equal(normalized.proposal.caseId, 'quote-1');
+  assert.equal(validateProposalShape(proposal).ok, true);
+});
+
+test('legacy/public quoteCaseId alias normalizes explicitly to canonical caseId', () => {
+  const proposal = validProposal();
+  const normalized = normalizeProposalCaseLink(proposal);
+  assert.equal(normalized.ok, true);
+  assert.equal(normalized.proposal.caseId, proposal.quoteCaseId);
+});
+
+test('conflicting caseId and quoteCaseId fails closed', () => {
+  const proposal = validProposal({ caseId:'case-A', quoteCaseId:'case-B' });
+  const result = validateProposalShape(proposal);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some(error => error.code === 'CASE_LINK_CONFLICT'));
+});
+
