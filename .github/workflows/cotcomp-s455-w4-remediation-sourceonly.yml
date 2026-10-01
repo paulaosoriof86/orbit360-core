@@ -1,0 +1,124 @@
+name: CotComp S4.55 W4 selection contract remediation source-only
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s455-w4-selection-contract-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s455-w4-remediation-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s455-w4-remediation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.55 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s455-w4-remediation-sourceonly.json
+          jq -e '
+            .authorization=="S455_W4_SOURCE_ONLY_CONTRACT_REMEDIATION" and
+            .projectId=="ays-orbit-360-lab" and
+            .stage=="W4" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .realData==false and
+            .production==false and
+            .physicalW4==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated CotComp QA and S4.55 tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-selection-contract-s455.js
+          node --check cotcomp-selection-contract-s455.test.js
+          node --check cotcomp-w4-remediation-verifier-s455.js
+          node --check cotcomp-w4-remediation-verifier-s455.test.js
+          node --test cotcomp-selection-contract-s455.test.js cotcomp-w4-remediation-verifier-s455.test.js
+
+      - name: Build and enforce S4.55 receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s455/evidence"
+          node <<'NODE'
+          const fs=require('fs');
+          const v=require('./functions/cotcomp-w4-remediation-verifier-s455');
+          const r=v.evaluate();
+          const out={
+            schemaVersion:'ays-cotcomp-s455-w4-remediation-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',stage:'W4',
+            sourceRemediationPass:r.sourceRemediationPass,
+            technicalW4Ready:r.technicalW4Ready,
+            physicalW4Ready:r.physicalW4Ready,
+            physicalW4Allowed:r.physicalW4Allowed,
+            remainingBlockers:r.remainingBlockers,
+            findings:r.findings,
+            boundaries:{
+              appDataReadsExecuted:0,
+              appDataWritesExecuted:0,
+              realDataTouched:false,
+              productionTouched:false,
+              physicalW4Executed:false
+            }
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s455/evidence/S455_W4_SELECTION_CONTRACT_REMEDIATION_RECEIPT.json',JSON.stringify(out,null,2));
+          console.log('S455_SOURCE_REMEDIATION_PASS='+out.sourceRemediationPass);
+          console.log('S455_TECHNICAL_W4_READY='+out.technicalW4Ready);
+          console.log('S455_REMAINING_BLOCKERS='+out.remainingBlockers.join(','));
+          NODE
+          R="$RUNNER_TEMP/s455/evidence/S455_W4_SELECTION_CONTRACT_REMEDIATION_RECEIPT.json"
+          jq -e '
+            .sourceRemediationPass==true and
+            .technicalW4Ready==true and
+            .physicalW4Ready==false and
+            .physicalW4Allowed==false and
+            .remainingBlockers==["OWNER_W4_AUTHORIZATION_REQUIRED"] and
+            .findings.explicitUserChoiceRequired==true and
+            .findings.comparisonSetMembershipVerified==true and
+            .findings.sameCaseLinkageVerified==true and
+            .findings.currentEligibleProposalRequired==true and
+            .findings.requestBoundSelectionIdentity==true and
+            .findings.idempotencyContract==true and
+            .findings.atomicQuoteCasePatch==true and
+            .findings.immutableNonBindingTruth==true and
+            .findings.prerequisiteReadSetCount==3 and
+            .findings.atomicOperationCount==3 and
+            .findings.setupWrites==3 and
+            .findings.selectionAtomicWrites==3 and
+            .findings.cleanupDeletes==5 and
+            .findings.totalMutations==11 and
+            .boundaries.appDataReadsExecuted==0 and
+            .boundaries.appDataWritesExecuted==0 and
+            .boundaries.physicalW4Executed==false
+          ' "$R" >/dev/null
+
+      - name: Upload S4.55 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s455-w4-remediation-${{ github.run_id }}
+          path: ${{ runner.temp }}/s455/evidence/S455_W4_SELECTION_CONTRACT_REMEDIATION_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
