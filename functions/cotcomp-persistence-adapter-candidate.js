@@ -117,6 +117,37 @@ function compileSelection(input = {}) {
   };
 }
 
+function compileAtomicSelection(input = {}) {
+  const plan=planner.buildAtomicSelectionPlan(input);
+  if (!plan.ok) return plan;
+  return {
+    ok:true,
+    version:VERSION,
+    dryRunOnly:DRY_RUN_ONLY,
+    executionEnabled:EXECUTION_ENABLED,
+    writesEnabled:WRITES_ENABLED,
+    physicalW4Allowed:false,
+    atomic:plan.atomic===true,
+    selectionRequestId:plan.selectionRequestId,
+    requestDigest:plan.requestDigest,
+    selectionId:plan.selection.selectionId,
+    proposalId:plan.selection.proposalId,
+    comparisonSetId:plan.selection.comparisonSetId,
+    prerequisiteReadSet:plan.prerequisiteReadSet.map(x=>({
+      entity:x.entity,path:x.path,expectedDigest:x.expectedDigest
+    })),
+    commands:plan.operations.map(op=>({
+      type:op.type,
+      entity:op.entity,
+      path:op.path,
+      expectedBeforeDigest:op.expectedBeforeDigest||null,
+      payloadDigest:digest(op.payload||op.patch||null)
+    })),
+    invariants:plan.invariants,
+    truth:plan.truth
+  };
+}
+
 function executeCompiled() {
   const error=new Error('COTCOMP_PERSISTENCE_EXECUTION_DISABLED');
   error.code='COTCOMP_PERSISTENCE_EXECUTION_DISABLED';
@@ -134,5 +165,6 @@ module.exports=Object.freeze({
   compileProposal,
   compileVersionedProposal,
   compileSelection,
+  compileAtomicSelection,
   executeCompiled
 });
