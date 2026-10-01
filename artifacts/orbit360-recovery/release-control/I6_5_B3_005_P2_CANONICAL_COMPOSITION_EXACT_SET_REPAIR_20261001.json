@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_P2_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+  "failedRunId": 36935700214,
+  "failedJobId": 110615431193,
+  "failureCode": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT",
+  "classification": "STALE_CANONICAL_COMPOSITION_METADATA_NOT_PRODUCT_REGRESSION",
+  "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+  "inspectedSourceSha": "e9857efc2fa627115905dbf0fbe307156de215ff",
+  "rootCause": "The cumulative composition manifest was not reconciled after B3-005 added payment-inference-engine.js and after infra.css/sw.js became byte-identical to the certified baseline. The guard correctly requires the declared product set to equal the physical product diff exactly.",
+  "exactDiffReconciliation": {
+    "allowedPrefixes": [
+      ".github/workflows/gravicentra-",
+      ".github/i6-ephemeral/",
+      "tools/gravicentra-",
+      "artifacts/orbit360-recovery/release-control/",
+      "artifacts/orbit360-recovery/project-sources-v2/"
+    ],
+    "actualProductFileCount": 78,
+    "priorDeclaredProductFileCount": 79,
+    "addedToDeclaration": [
+      "functions/payment-inference-engine.js"
+    ],
+    "removedFromDeclarationBecauseNoLongerDifferentFromBaseline": [
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/sw.js"
+    ],
+    "allCurrentBlobsRebound": true
+  },
+  "productSourceChanged": false,
+  "productLogicChanged": false,
+  "operationalBusinessWrites": false,
+  "productionConfigWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3006": false,
+  "nextRequiredProof": "B3_005_EXACT_PREVIEW"
+}

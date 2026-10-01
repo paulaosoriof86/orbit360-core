@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_V1",
   "status": "FROZEN_ACTIVE",
-  "date": "2026-09-24",
+  "date": "2026-10-01",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "purpose": "Make the single accumulative incremental candidate a physical machine-enforced authority rather than a rule distributed across block locks and guard status enums.",
@@ -23,7 +23,7 @@
       "sourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
       "status": "ACCEPTED_FOR_B2_EMAIL_DEFERRED"
     },
-    "currentBlock": "B2",
+    "currentBlock": "B3",
     "mode": "ONE_ACCUMULATIVE_INCREMENTAL_CANDIDATE",
     "diffContract": "EXACT_PRODUCT_DIFF_SET_AND_EXACT_BLOB_BINDING_FROM_CERTIFIED_BASELINE",
     "updateRule": "Any product-source change must update this composition lock in the same atomic commit; otherwise the central guard fails closed before build/Preview.",
@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B3",
-  "productFileCount": 79,
+  "productFileCount": 78,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "functions/bootstrap.js",
@@ -46,6 +46,7 @@
     "functions/ops-leads-domain.js",
     "functions/package-lock.json",
     "functions/package.json",
+    "functions/payment-inference-engine.js",
     "functions/product-insurer-credentials.js",
     "functions/product-operational-domain.js",
     "functions/product-ops-leads-domain.js",
@@ -114,24 +115,23 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
     "orbit360-platform/modules/siniestros.js",
     "orbit360-platform/product-runtime-config.js",
-    "orbit360-platform/styles/base.css",
-    "orbit360-platform/styles/infra.css",
-    "orbit360-platform/sw.js"
+    "orbit360-platform/styles/base.css"
   ],
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
-    "functions/cobros-reconciliation-domain.js": "089bb7aa76c823da64e75dfe632c175f025b8a2c",
+    "functions/cobros-reconciliation-domain.js": "751eeabe3d1e80a02557b819de2d64551c607877",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
     "functions/document-drive-domain.js": "253b7074c86bb6ce800cc933d10242e9b6096f0a",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
     "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
+    "functions/payment-inference-engine.js": "c50355efde1bfce6d8f14f19e3d3028341b639ee",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "9800c5140ce415484ccacf086a3657dc66749d0f",
     "functions/product-ops-leads-domain.js": "fe5307b171a9d51e3f449f0dd2b5aba6fbcbb341",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
-    "functions/tenant-domain-config.js": "3aaf2fe9ef818d0afaa079d3d678ba8fcccd359c",
+    "functions/tenant-domain-config.js": "b4978815f41fa7598e9abfe9c21876ba62092b1d",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png": "9e16fae65f366556f55398309eb7bb3f398bf072",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png": "726da844034b98f3132788920a1b8111f4d1764a",
@@ -144,7 +144,7 @@
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
-    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "ebe950e586683b99abb6d05e01abbc8ed6f1a63c",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "774c6cbe32be08f23e45f37b8e12e56f9be08bf3",
     "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
@@ -180,6 +180,7 @@
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495",
     "orbit360-platform/modules/cobros.js": "b03650daa42675a27a2e39b7b00e980bb66cd81b",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
+    "orbit360-platform/modules/conciliaciones.js": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "dcb057e1a22b21ed5a02661033678dc1ccbd9c0d",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
@@ -189,15 +190,12 @@
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "c4382238964ba18ac9e0669f4e01dd0897681d62",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "cafbaa33a3f23d30ec773df3b569ecf12e891e6e",
+    "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
     "orbit360-platform/modules/portal.js": "fc23c03e4c59c256be81553e472dee6d2d4ef895",
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "d329ed1c822d42803bf2eb38c34873218d63faad",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
-    "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
-    "orbit360-platform/styles/infra.css": "53fbdb6ac1fcfae91e64e26d8b600acb910d4588",
-    "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
-    "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
-    "orbit360-platform/modules/conciliaciones.js": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25"
+    "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -403,11 +401,11 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-005-P1-QA",
-    "reason": "REPAIR_STALE_B3_ACTION_ALLOWLIST",
+    "gate": "I6.5-B3-005-P2-QA",
+    "reason": "RECONCILE_CANONICAL_COMPOSITION_TO_EXACT_PHYSICAL_PRODUCT_DIFF",
     "changedProductFiles": [],
     "changedQaFiles": [
-      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+      "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json"
     ],
     "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
@@ -1617,6 +1615,22 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P1_STALE_GOVERNANCE_GUARD_REPAIR_20261001.json",
     "blobSha": "03e89fa3e90a52706797bc3aaf2629f51efd58bf",
     "guardBlobSha": "e2df6ea293b280f6e37dfb5eb615d9fc01f9fc9e",
+    "productSourceChanged": false
+  },
+  "b3005P2CompositionExactSetRepair": {
+    "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P2_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json",
+    "blobSha": "fb6e3c6b82d5f98f5c4c00bedff3eca4d7ffe490",
+    "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+    "inspectedSourceSha": "e9857efc2fa627115905dbf0fbe307156de215ff",
+    "productFileCount": 78,
+    "addedToDeclaration": [
+      "functions/payment-inference-engine.js"
+    ],
+    "removedFromDeclarationBecauseNoLongerDifferentFromBaseline": [
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/sw.js"
+    ],
     "productSourceChanged": false
   }
 }

@@ -2216,6 +2216,20 @@
         "guardBlobSha": "e2df6ea293b280f6e37dfb5eb615d9fc01f9fc9e",
         "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
         "productSourceChanged": false
+      },
+      "p2CompositionExactSetRepair": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P2_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json",
+        "blobSha": "fb6e3c6b82d5f98f5c4c00bedff3eca4d7ffe490",
+        "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+        "compositionLockBlobSha": "1eb22269831d2ace6ea3eff434739b9e57d7632e",
+        "productSourceChanged": false,
+        "addedToDeclaration": [
+          "functions/payment-inference-engine.js"
+        ],
+        "removedFromDeclaration": [
+          "orbit360-platform/styles/infra.css",
+          "orbit360-platform/sw.js"
+        ]
       }
     },
     {
@@ -5817,7 +5831,7 @@
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "c4756f4f24057162a2c154ad7179d60ddd76c245",
+    "compositionLockBlobSha": "1eb22269831d2ace6ea3eff434739b9e57d7632e",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
@@ -5830,6 +5844,8 @@
     "r1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
     "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc",
     "p1GovernanceGuardRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P1_STALE_GOVERNANCE_GUARD_REPAIR_20261001.json",
-    "p1GovernanceGuardRepairBlobSha": "03e89fa3e90a52706797bc3aaf2629f51efd58bf"
+    "p1GovernanceGuardRepairBlobSha": "03e89fa3e90a52706797bc3aaf2629f51efd58bf",
+    "p2CompositionExactSetRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P2_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json",
+    "p2CompositionExactSetRepairBlobSha": "fb6e3c6b82d5f98f5c4c00bedff3eca4d7ffe490"
   }
 }
