@@ -648,6 +648,11 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P9P1_STALE_ASSET_CONTRACT_FIX_20261001.json",
       "blobSha": "5b195698f64d98d15664236baa544ffaf5dda295",
       "productSourceChanged": false
+    },
+    "r12p9p2ContractFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P9P2_CONTRACT_VARIABLE_FIX_20261001.json",
+      "blobSha": "6f202b1b252748e5b41e9bcbc9f39940a66b8605",
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -657,7 +662,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "3ea151d167faa60ef2de1052b3dbb3444ddc03f4"
+    "blobSha": "81be8371d58f15dd438db6dd5ce0709b0712ac46"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -858,7 +863,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "46dc3c0c099d79580cbaced08c37e3b68660aa6f"
+    "blobSha": "e9aec1731690d6955bea14219d26961be2cc3f11"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -993,6 +998,18 @@
     "blobSha": "5b195698f64d98d15664236baa544ffaf5dda295",
     "compositionLockBlobSha": "46dc3c0c099d79580cbaced08c37e3b68660aa6f",
     "findingsLedgerBlobSha": "3ea151d167faa60ef2de1052b3dbb3444ddc03f4",
+    "productSourceChanged": false,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p9p2ContractFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P9P2_CONTRACT_VARIABLE_FIX_20261001.json",
+    "blobSha": "6f202b1b252748e5b41e9bcbc9f39940a66b8605",
+    "compositionLockBlobSha": "e9aec1731690d6955bea14219d26961be2cc3f11",
+    "findingsLedgerBlobSha": "81be8371d58f15dd438db6dd5ce0709b0712ac46",
     "productSourceChanged": false,
     "noOperationalBusinessWrites": true,
     "noReimport": true,

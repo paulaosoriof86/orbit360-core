@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P9P2_CONTRACT_VARIABLE_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "90f759b562dc07bb1ce479685536283080a7a6d7",
+  "failedRunId": 36849330761,
+  "failedJobId": 110327215848,
+  "classification": "QA_CONTRACT_REFERENCE_ERROR",
+  "cause": "R12P9 assertions referenced crmBridge but the contract source already names the loaded CRM bridge crmBridgeR9.",
+  "remediation": "Replace only the QA variable reference; product source unchanged.",
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "07e14423c673bb868de62856e7bbff4be08e07fa"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}
