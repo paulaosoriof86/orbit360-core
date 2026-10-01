@@ -605,3 +605,56 @@ body.sb-light #sidebar,body.sb-gray #sidebar{scrollbar-color:rgba(197,22,46,.68)
   #ciclo-modal .ciclo-foot>div:last-child{display:grid!important;grid-template-columns:1fr 1fr;width:100%}
   #ciclo-modal .ciclo-foot .btn{min-width:0;white-space:normal}
 }
+
+
+/* ---------- B3-004 R12P11 · mobile receipt/payment acceptance ----------
+   Receipt actions must wrap inside the viewport; payment/reconciliation
+   modals keep their save footer reachable on small screens. */
+.orbit-receipt-fullpage [data-rp-receipt-hero="1"]{min-width:0}
+.orbit-receipt-fullpage [data-rp-receipt-hero="1"]>.btn{max-width:100%;white-space:normal;text-align:center}
+#cob-pay>.card,#cob-conc>.card{max-width:100%}
+[data-cobros-modal-footer]{box-sizing:border-box}
+@media(max-width:560px){
+  .orbit-receipt-fullpage{padding-left:10px!important;padding-right:10px!important}
+  .orbit-receipt-fullpage [data-rp-receipt-hero="1"]{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    align-items:stretch!important;
+    padding:16px!important;
+  }
+  .orbit-receipt-fullpage [data-rp-receipt-hero="1"]>.badge,
+  .orbit-receipt-fullpage [data-rp-receipt-hero="1"]>.btn{
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-top:7px!important;
+    justify-content:center;
+    white-space:normal!important;
+    line-height:1.25;
+    overflow-wrap:anywhere;
+  }
+  .orbit-receipt-fullpage .orbit-detail-layout{grid-template-columns:minmax(0,1fr)!important}
+  .orbit-receipt-fullpage .orbit-detail-grid{grid-template-columns:minmax(0,1fr)!important}
+  .orbit-receipt-fullpage [data-rp-document] .btn{flex:1 1 110px;min-width:0}
+  #cob-pay,#cob-conc{
+    padding:8px!important;
+    align-items:start!important;
+    overflow:auto!important;
+  }
+  #cob-pay>.card,#cob-conc>.card{
+    width:100%!important;
+    max-width:100%!important;
+    max-height:calc(100dvh - 16px)!important;
+    min-width:0!important;
+  }
+  [data-cobros-modal-footer]{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    width:100%;
+    padding:12px 14px!important;
+  }
+  [data-cobros-modal-footer]>span{grid-column:1 / -1;margin:0!important;min-height:16px}
+  [data-cobros-modal-footer]>.btn{width:100%;min-width:0;white-space:normal}
+  #rp-document-viewer{padding:6px!important}
+  #rp-document-viewer>.card{height:calc(100dvh - 12px)!important;border-radius:12px}
+}

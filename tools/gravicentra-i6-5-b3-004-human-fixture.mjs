@@ -36,10 +36,11 @@ async function create(){
   batch.set(refs.receipt,{...common,id:ids.receipt,polizaId:ids.policy,clienteId:ids.client,moneda:'GTQ',cuota:'1/1',serie:'QA-R12-1',vence:'2026-09-30',monto:111.11,primaTotal:111.11,estado:'Pendiente',estadoOperativo:'pendiente_vence_corte'});
   batch.set(refs.portfolio,{...common,id:ids.portfolio,reciboId:ids.receipt,polizaId:ids.policy,clienteId:ids.client,moneda:'GTQ',monto:111.11,estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true});
   await batch.commit();
-  const out={schema:'GRAVICENTRA_B3_004_R12_HUMAN_FIXTURE_V1',status:'READY',tenantId,ids,amount:111.11,synthetic:true,cleanupRequired:true,operationalBusinessData:false,previewUrl,
-    clientUrl:previewUrl?previewUrl+'/#/cliente360?c='+encodeURIComponent(ids.client)+'&t=recibos':'',
+  const out={schema:'GRAVICENTRA_B3_004_R12_HUMAN_FIXTURE_V2',status:'READY',tenantId,ids,amount:111.11,synthetic:true,cleanupRequired:true,operationalBusinessData:false,previewUrl,
+    clientUrl:previewUrl?previewUrl+'/#/cliente360?c='+encodeURIComponent(ids.client)+'&t=recibos&r='+encodeURIComponent(ids.receipt):'',
+    receiptsUrl:previewUrl?previewUrl+'/#/cliente360?c='+encodeURIComponent(ids.client)+'&t=recibos':'',
     cobrosUrl:previewUrl?previewUrl+'/#/cobros?qaReceipt='+encodeURIComponent(ids.receipt):''};
   fs.writeFileSync(outPath,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out));
 }
-if(mode==='cleanup'){await cleanup();const out={schema:'GRAVICENTRA_B3_004_R12_HUMAN_FIXTURE_V1',status:'CLEANED',tenantId,ids};fs.writeFileSync(outPath,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out));}
+if(mode==='cleanup'){await cleanup();const out={schema:'GRAVICENTRA_B3_004_R12_HUMAN_FIXTURE_V2',status:'CLEANED',tenantId,ids};fs.writeFileSync(outPath,JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out));}
 else await create();

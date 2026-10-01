@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "HUMAN_REJECTED_REMEDIATION_AUTHORIZED",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R12P11_MOBILE_DOCUMENT_UX_PERFORMANCE_SOURCE_FIX",
+      "nextAction": "B3_004_R12P11_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1149,7 +1149,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
         "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
       },
-      "machineProofInvalidatedBySourceChange": false,
+      "machineProofInvalidatedBySourceChange": true,
       "priorMachineProof": {
         "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
         "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
@@ -1821,6 +1821,22 @@
         "noLive": true,
         "noReimport": true,
         "noB3005": true
+      },
+      "r12p11SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11_MOBILE_DOCUMENT_UX_PERFORMANCE_SOURCE_FIX_20261001.json",
+        "blobSha": "67ce4d811530e17e9bf19148b3408522d10a756b",
+        "compositionLockBlobSha": "6c906bd194d95422f14900437574399e1265a8e0",
+        "productBlobs": {
+          "orbit360-platform/modules/cobros.js": "94db703a9232066d2284d5eebc6aac5b08b8009a",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "9759acf6e7976aa90e7e29fd15db0f4ae051dca6",
+          "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
+          "orbit360-platform/index.html": "76804e56317e6ea4874674e5104d74166d597a62"
+        },
+        "qaBlobs": {
+          "tools/gravicentra-i6-5-b3-004-human-fixture.mjs": "bcd2620995484451734f96f930c2e1e1130ccb80",
+          "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "8f0650da3046032a4dc8cd48f31ba09d8784ce03",
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "6714db391b7479e1a3492dfa844188d06c8aa575"
+        }
       }
     },
     {
@@ -5425,7 +5441,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_004_HUMAN_REJECTED_REMEDIATION_AUTHORIZED",
+    "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",

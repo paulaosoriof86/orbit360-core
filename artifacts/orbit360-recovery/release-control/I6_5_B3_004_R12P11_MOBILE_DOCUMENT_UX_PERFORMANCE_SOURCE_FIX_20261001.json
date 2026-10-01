@@ -1,0 +1,51 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11_MOBILE_DOCUMENT_UX_PERFORMANCE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "c53a2d9f53c3b72c54e5c2439fa1d2204519a1fb",
+  "causalInputs": [
+    "Human mobile reconciliation modal could not reach save.",
+    "Human payment save had no in-progress feedback.",
+    "Receipt detail exposed only 'Adjunto' without view/download.",
+    "Human exact receipt link did not land on exact receipt.",
+    "Human mobile Cobros entry observed approximately 7–10 seconds while prior desktop warm proof reported 138 ms."
+  ],
+  "remediation": {
+    "reconciliationModalViewportSafe": true,
+    "applyModalViewportSafe": true,
+    "stickyReachableSaveFooters": true,
+    "visibleSaveProgress": true,
+    "parallelPaymentAndInvoiceUploadWhenBothPresent": true,
+    "exactReceiptDeepLink": true,
+    "durableDocumentViewAndDownloadInReceiptDetail": true,
+    "linkedCobroPreferredForPaymentApplicationDocumentDisplay": true,
+    "mobileReceiptActionWrap": true,
+    "mobileBrowserProofViewport": {
+      "width": 412,
+      "height": 915
+    },
+    "mobileCliente360ToCobrosThresholdMs": 3000,
+    "directReceiptReloadProofRequired": true,
+    "uiDocumentViewDownloadProofRequired": true
+  },
+  "boundaries": {
+    "realPreviewRowsReadOnly": true,
+    "syntheticPreviewWritesOnly": true,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  },
+  "productBlobs": {
+    "orbit360-platform/modules/cobros.js": "94db703a9232066d2284d5eebc6aac5b08b8009a",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "9759acf6e7976aa90e7e29fd15db0f4ae051dca6",
+    "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
+    "orbit360-platform/index.html": "76804e56317e6ea4874674e5104d74166d597a62"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-human-fixture.mjs": "bcd2620995484451734f96f930c2e1e1130ccb80",
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "8f0650da3046032a4dc8cd48f31ba09d8784ce03",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "6714db391b7479e1a3492dfa844188d06c8aa575"
+  }
+}

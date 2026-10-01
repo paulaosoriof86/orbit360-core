@@ -45,7 +45,7 @@ const proof={schema:'GRAVICENTRA_B3_004_R12_BROWSER_UI_PROOF_V1',status:'RUNNING
 let browser;
 try{
   browser=await chromium.launch({headless:true});
-  const context=await browser.newContext({viewport:{width:1500,height:1000}});
+  const context=await browser.newContext({viewport:{width:412,height:915},isMobile:true,hasTouch:true});
   const page=await context.newPage();page.setDefaultTimeout(15000);
   proof.transportEvents=[];
   const qaFunctionName=url=>{
@@ -81,7 +81,8 @@ try{
     }catch{}
   },{scope:legalScope});
   proof.assertions.legalGatePreconditionSimulated=true;
-  await page.goto(target+'/#/cliente360?c='+encodeURIComponent(ids.client)+'&t=recibos',{waitUntil:'domcontentloaded'});
+  const directReceiptUrl=target+'/#/cliente360?c='+encodeURIComponent(ids.client)+'&t=recibos&r='+encodeURIComponent(ids.receipt);
+  await page.goto(directReceiptUrl,{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0&&!!window.Orbit?.modules?.cobros);
   const activated=await page.evaluate(async token=>{
     const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
@@ -95,6 +96,25 @@ try{
   need(legalState.overlayCount===0,'B3_004_R12_QA_LEGAL_OVERLAY_STILL_OPEN:'+legalState.overlayCount);
   proof.assertions.noLegalOverlay=true;
   await page.waitForFunction(id=>!!window.Orbit?.store?.get?.('recibosEsperados',id),ids.receipt);
+  await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:15000});
+  const directReceiptSurface=await page.evaluate(id=>{
+    const detail=document.querySelector('[data-rp-receipt-detail="1"]'),hero=detail?.querySelector('[data-rp-receipt-hero="1"]');
+    const actionRects=[...(hero?.querySelectorAll('.btn')||[])].map(x=>{const r=x.getBoundingClientRect();return{text:String(x.textContent||'').trim(),left:r.left,right:r.right,width:r.width};});
+    return{
+      receiptParam:String(window.Orbit?.route?.params?.r||''),
+      hash:String(location.hash||''),
+      viewportWidth:window.innerWidth,
+      detailScrollWidth:detail?.scrollWidth||0,
+      detailClientWidth:detail?.clientWidth||0,
+      actionRects
+    };
+  },ids.receipt);
+  need(directReceiptSurface.receiptParam===ids.receipt,'B3_004_R12P11_DIRECT_RECEIPT_PARAM_MISSING:'+JSON.stringify(directReceiptSurface));
+  need(directReceiptSurface.detailScrollWidth<=directReceiptSurface.detailClientWidth+2,'B3_004_R12P11_RECEIPT_HORIZONTAL_OVERFLOW:'+JSON.stringify(directReceiptSurface));
+  need(directReceiptSurface.actionRects.every(x=>x.left>=-1&&x.right<=directReceiptSurface.viewportWidth+1),'B3_004_R12P11_RECEIPT_ACTION_OVERFLOW:'+JSON.stringify(directReceiptSurface));
+  proof.directReceiptSurface=directReceiptSurface;
+  proof.assertions.directReceiptDeepLink=true;
+  proof.assertions.mobileReceiptResponsive=true;
 
   const normalStart=await page.evaluate(()=>{const t=performance.now();window.__b3004r12NormalNavStart=t;location.hash='#/cobros';return t;});
   await page.waitForSelector('table.tbl tbody tr[data-row-policy-id]');
@@ -169,6 +189,13 @@ try{
   proof.applyModalState=modalState;
   if(!modalState.open)throw new Error('B3_004_R12_APPLY_MODAL_NOT_OPEN:'+JSON.stringify({actionContext,modalState}));
   await page.waitForSelector('#cob-pay');
+  const applyResponsive=await page.evaluate(()=>{
+    const modal=document.getElementById('cob-pay'),card=modal?.querySelector('.card'),footer=modal?.querySelector('[data-cobros-modal-footer="apply"]');
+    const mr=modal?.getBoundingClientRect(),cr=card?.getBoundingClientRect();
+    return{viewportWidth:innerWidth,viewportHeight:innerHeight,modalWidth:mr?.width||0,cardWidth:cr?.width||0,cardMaxHeight:getComputedStyle(card).maxHeight,footerExists:!!footer};
+  });
+  need(applyResponsive.footerExists&&applyResponsive.cardWidth<=applyResponsive.viewportWidth+1,'B3_004_R12P11_APPLY_MODAL_NOT_MOBILE_RESPONSIVE:'+JSON.stringify(applyResponsive));
+  proof.mobileApplyModal=applyResponsive;
   await page.fill('#pm-paid','2026-09-30');
   await page.selectOption('#pm-metodo',{label:'Transferencia bancaria'});
   const supportA={name:'B3-004-R12-soporte-A.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2t8QAAAAASUVORK5CYII=','base64')};
@@ -189,7 +216,11 @@ try{
     }
   }));
   const applyStartedAt=Date.now();
+  await page.locator('#pm-ok').scrollIntoViewIfNeeded();
+  need(await page.locator('#pm-ok').isVisible(),'B3_004_R12P11_APPLY_SAVE_NOT_REACHABLE_MOBILE');
   await page.click('#pm-ok');
+  await page.waitForFunction(()=>String(document.querySelector('#pm-ok')?.textContent||'').includes('Guardando')||!document.getElementById('cob-pay'),null,{timeout:2500});
+  proof.assertions.applySavingFeedback=true;
   try{
     await page.waitForFunction(()=>!document.getElementById('cob-pay')||document.querySelector('#pm-ok')?.disabled===false,null,{timeout:25000});
   }catch{}
@@ -220,6 +251,16 @@ try{
   await page.waitForSelector('button[data-cobros-action="reconcile"]',{timeout:12000});
   await page.locator('button[data-cobros-action="reconcile"]').click();
   await page.waitForSelector('#cob-conc');
+  const reconcileResponsive=await page.evaluate(()=>{
+    const modal=document.getElementById('cob-conc'),card=modal?.querySelector('.card'),footer=modal?.querySelector('[data-cobros-modal-footer="reconcile"]');
+    const cr=card?.getBoundingClientRect();
+    return{viewportWidth:innerWidth,viewportHeight:innerHeight,cardWidth:cr?.width||0,cardHeight:cr?.height||0,cardScrollHeight:card?.scrollHeight||0,footerExists:!!footer};
+  });
+  need(reconcileResponsive.footerExists&&reconcileResponsive.cardWidth<=reconcileResponsive.viewportWidth+1&&reconcileResponsive.cardHeight<=reconcileResponsive.viewportHeight+1,'B3_004_R12P11_RECONCILE_MODAL_NOT_MOBILE_RESPONSIVE:'+JSON.stringify(reconcileResponsive));
+  await page.locator('#cc-ok').scrollIntoViewIfNeeded();
+  need(await page.locator('#cc-ok').isVisible(),'B3_004_R12P11_RECONCILE_SAVE_NOT_REACHABLE_MOBILE');
+  proof.mobileReconcileModal=reconcileResponsive;
+  proof.assertions.mobileReconcileResponsive=true;
   const reconcileTransportStart=proof.transportEvents.length;
   await page.fill('#cc-aplicacion','2026-09-30');
   await page.fill('#cc-numero','QA-R12-UI-001');
@@ -233,7 +274,10 @@ try{
   await invoiceChooser.setFiles(invoiceFile);
   await page.waitForFunction(()=>document.querySelector('#cc-name')?.textContent?.includes('B3-004-R12-factura.png'));
   proof.assertions.browserInvoiceSelected=true;
+  const reconcileStartedAt=Date.now();
   await page.click('#cc-ok');
+  await page.waitForFunction(()=>String(document.querySelector('#cc-ok')?.textContent||'').includes('Guardando')||!document.getElementById('cob-conc'),null,{timeout:2500});
+  proof.assertions.reconcileSavingFeedback=true;
   const applied=await waitCobro(xs=>xs.length===1&&xs[0].applicationState==='APPLIED_DIRECT'&&xs[0].invoiceNumber==='QA-R12-UI-001'&&clean(xs[0].paymentSupportDocumentRef)&&clean(xs[0].invoiceDocumentRef),20000);
   need(applied[0].id===paid[0].id,'B3_004_R12_RECONCILE_CREATED_DIFFERENT_COBRO');
   need(clean(applied[0].paymentSupportDocumentRef)!==clean(paid[0].paymentSupportDocumentRef),'B3_004_R12_REPLACEMENT_SUPPORT_REF_DID_NOT_CHANGE');
@@ -243,7 +287,7 @@ try{
   const reconcileTransport=proof.transportEvents.slice(reconcileTransportStart);
   const reconcileUploads=reconcileTransport.filter(x=>x.kind==='response'&&/DocumentDriveUploadPreview/i.test(x.fn));
   const reconcileFinalizes=reconcileTransport.filter(x=>x.kind==='response'&&/DocumentDriveFinalizePreview/i.test(x.fn));
-  proof.reconcileTransport={events:reconcileTransport,uploadSuccess:reconcileUploads.filter(x=>x.httpStatus<400&&x.ok===true&&!x.errorStatus).length,finalizeSuccess:reconcileFinalizes.filter(x=>x.httpStatus<400&&x.ok===true&&!x.errorStatus).length};
+  proof.reconcileTransport={events:reconcileTransport,uploadSuccess:reconcileUploads.filter(x=>x.httpStatus<400&&x.ok===true&&!x.errorStatus).length,finalizeSuccess:reconcileFinalizes.filter(x=>x.httpStatus<400&&x.ok===true&&!x.errorStatus).length,durationMs:Date.now()-reconcileStartedAt};
   console.log('B3_004_R12_RECONCILE_DOCUMENT_LIFECYCLE='+JSON.stringify(proof.reconcileTransport));
   need(proof.reconcileTransport.uploadSuccess===2,'B3_004_R12_RECONCILE_EXPECTED_TWO_SUCCESSFUL_UPLOADS:'+JSON.stringify(proof.reconcileTransport));
   need(proof.reconcileTransport.finalizeSuccess===2,'B3_004_R12_RECONCILE_EXPECTED_TWO_SUCCESSFUL_FINALIZES:'+JSON.stringify(proof.reconcileTransport));
@@ -282,6 +326,38 @@ try{
   need(docReadback.provider&&docReadback.payment&&docReadback.invoice,'B3_004_R12_DRIVE_READBACK_AFTER_RELOAD_FAILED:'+JSON.stringify(proof.documentReadbackDiagnostic));
   proof.assertions.browserDriveReadbackAfterReload=true;
   proof.documents={paymentSupportDocumentRef:clean(reloaded[0].paymentSupportDocumentRef),invoiceDocumentRef:clean(reloaded[0].invoiceDocumentRef)};
+
+  const directUiStart=Date.now();
+  await page.goto(directReceiptUrl,{waitUntil:'domcontentloaded'});
+  await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:15000});
+  await page.waitForSelector('[data-rp-document="payment_support"] [data-rp-document-view]',{timeout:15000});
+  await page.waitForSelector('[data-rp-document="insurer_invoice"] [data-rp-document-view]',{timeout:15000});
+  const documentUi=await page.evaluate(()=>({
+    paymentView:!!document.querySelector('[data-rp-document="payment_support"] [data-rp-document-view]'),
+    paymentDownload:!!document.querySelector('[data-rp-document="payment_support"] [data-rp-document-download]'),
+    invoiceView:!!document.querySelector('[data-rp-document="insurer_invoice"] [data-rp-document-view]'),
+    invoiceDownload:!!document.querySelector('[data-rp-document="insurer_invoice"] [data-rp-document-download]'),
+    receiptParam:String(window.Orbit?.route?.params?.r||''),
+    elapsedMs:Date.now()-directUiStart
+  }));
+  need(documentUi.paymentView&&documentUi.paymentDownload&&documentUi.invoiceView&&documentUi.invoiceDownload&&documentUi.receiptParam===ids.receipt,'B3_004_R12P11_DOCUMENT_UI_CONTROLS_MISSING:'+JSON.stringify(documentUi));
+  proof.documentUi=documentUi;
+  proof.assertions.browserDocumentControlsVisible=true;
+
+  const viewReadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveReadPreview/i.test(resp.url()),{timeout:15000});
+  await page.click('[data-rp-document="payment_support"] [data-rp-document-view]');
+  const viewRead=await viewReadPromise;
+  need(viewRead.status()<400,'B3_004_R12P11_DOCUMENT_UI_VIEW_HTTP_FAILED:'+viewRead.status());
+  await page.waitForSelector('#rp-document-viewer [data-rp-doc-body] img, #rp-document-viewer [data-rp-doc-body] iframe',{timeout:15000});
+  proof.assertions.browserDocumentViewWorks=true;
+  await page.click('#rp-document-viewer [data-rp-doc-close]');
+
+  const downloadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveDownloadPreview/i.test(resp.url()),{timeout:15000});
+  await page.click('[data-rp-document="payment_support"] [data-rp-document-download]');
+  const downloadResponse=await downloadPromise;
+  need(downloadResponse.status()<400,'B3_004_R12P11_DOCUMENT_UI_DOWNLOAD_HTTP_FAILED:'+downloadResponse.status());
+  proof.assertions.browserDocumentDownloadWorks=true;
+
   const cleanupDocs=await page.evaluate(async ({paymentRef,invoiceRef,ids})=>{
     const dp=window.Orbit?.productDriveDocumentProviderP0;
     if(!dp||typeof dp.quarantine!=='function')return{payment:false,invoice:false,provider:false};

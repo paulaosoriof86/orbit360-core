@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_HUMAN_REJECTED_REMEDIATION_AUTHORIZED",
+  "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,14 +14,14 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "HUMAN_REJECTED_REMEDIATION_AUTHORIZED",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
     "boundaries": {
       "businessWritesAuthorized": false,
       "reimportAuthorized": false,
       "liveHostingPromotionAuthorized": false,
-      "productMutationAuthorized": true,
+      "productMutationAuthorized": false,
       "b3005Authorized": false
     },
     "rootCause": "R8_MULTICAUSAL_UI_SCOPE_DELETE_POLICY_LIFECYCLE_AND_NAVIGATION_DRIFT",
@@ -175,7 +175,7 @@
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
     },
-    "machineProofInvalidatedBySourceChange": false,
+    "machineProofInvalidatedBySourceChange": true,
     "priorMachineProof": {
       "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
       "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
@@ -304,7 +304,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R12P11_MOBILE_DOCUMENT_UX_PERFORMANCE_SOURCE_FIX",
+    "nextAction": "B3_004_R12P11_EXACT_PREVIEW",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -709,6 +709,21 @@
         "B3-004-R12-H5",
         "B3-004-R12-H6"
       ]
+    },
+    "r12p11SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11_MOBILE_DOCUMENT_UX_PERFORMANCE_SOURCE_FIX_20261001.json",
+      "blobSha": "67ce4d811530e17e9bf19148b3408522d10a756b",
+      "productBlobs": {
+        "orbit360-platform/modules/cobros.js": "94db703a9232066d2284d5eebc6aac5b08b8009a",
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "9759acf6e7976aa90e7e29fd15db0f4ae051dca6",
+        "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
+        "orbit360-platform/index.html": "76804e56317e6ea4874674e5104d74166d597a62"
+      },
+      "qaBlobs": {
+        "tools/gravicentra-i6-5-b3-004-human-fixture.mjs": "bcd2620995484451734f96f930c2e1e1130ccb80",
+        "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "8f0650da3046032a4dc8cd48f31ba09d8784ce03",
+        "tools/gravicentra-i6-5-b3-004-contract.mjs": "6714db391b7479e1a3492dfa844188d06c8aa575"
+      }
     }
   },
   "canonicalComposition": {
@@ -718,7 +733,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "8fe9231fd94c9b84556bffef271012768bd7c597"
+    "blobSha": "dd16c5eeb396991d4121e9a07bb3daa4d01a47d2"
   },
   "nextRequiredProof": [
     "B3_004_R12P11_SOURCE_CONTRACT_PASS",
@@ -917,7 +932,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "e7ea15d603cae4e62bdd1a01d4268c891be379ef"
+    "blobSha": "6c906bd194d95422f14900437574399e1265a8e0"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",

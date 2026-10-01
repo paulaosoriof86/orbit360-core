@@ -580,8 +580,8 @@ Orbit.modules.cobros = (function () {
     if(!previewGuard(receipt)) return false;
     let pm = document.getElementById('cob-conc'); if (pm) pm.remove();
     pm = document.createElement('div'); pm.id = 'cob-conc'; pm.className = 'drawer-back open';
-    pm.style.cssText = 'display:grid;place-items:center;z-index:210';
-    pm.innerHTML = '<div class="card" style="width:min(480px,95vw);padding:0">'
+    pm.style.cssText = 'display:grid;place-items:center;z-index:210;padding:12px;box-sizing:border-box;overflow:auto';
+    pm.innerHTML = '<div class="card" style="width:min(480px,100%);max-height:calc(100dvh - 24px);overflow:auto;padding:0;display:flex;flex-direction:column">'
       + '<div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center">'
       + '<b style="font-family:var(--f-display);font-size:16px;color:#fff">📄 Registrar aplicación del pago</b>'
       + '<button class="imp-x" id="cc-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
@@ -594,8 +594,8 @@ Orbit.modules.cobros = (function () {
       + '<label class="ce-l">Número de factura<input id="cc-numero" class="o-sel" value="' + U.esc(c.invoiceNumber || c.numeroFactura || '') + '" placeholder="Opcional"></label>'
       + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">Factura / soporte de aplicación <span class="muted">(opcional)</span></span>'
       + '<div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="cc-btn">⬆ Adjuntar factura</button><span id="cc-name" class="muted" style="font-size:12px">Sin archivo nuevo</span></div></div>'
-      + '</div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">'
-      + '<button class="btn ghost" id="cc-cancel">Cancelar</button><button class="btn primary" id="cc-ok">Guardar aplicación</button></div></div>';
+      + '</div><div data-cobros-modal-footer="reconcile" style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card);z-index:2">'
+      + '<span id="cc-save-state" class="muted" aria-live="polite" style="font-size:12px;margin-right:auto"></span><button class="btn ghost" id="cc-cancel">Cancelar</button><button class="btn primary" id="cc-ok">Guardar aplicación</button></div></div>';
     document.body.appendChild(pm);
     let invoiceFile = null, paymentFile = null;
     const close = () => pm.remove();
@@ -612,10 +612,15 @@ Orbit.modules.cobros = (function () {
       fi.click();
     };
     pm.querySelector('#cc-ok').onclick = async () => {
-      const btn=pm.querySelector('#cc-ok'); btn.disabled=true;
+      const btn=pm.querySelector('#cc-ok'),state=pm.querySelector('#cc-save-state');
+      btn.disabled=true;btn.textContent='Guardando…';pm.setAttribute('aria-busy','true');
+      if(state)state.textContent='Guardando documentos y confirmando persistencia…';
       try {
-        const paymentSupportDocumentRef = await uploadPaymentDocument(paymentFile,'payment_support',c,receipt.id);
-        const invoiceDocumentRef = await uploadPaymentDocument(invoiceFile,'insurer_invoice',c,receipt.id);
+        const [paymentSupportDocumentRef,invoiceDocumentRef] = await Promise.all([
+          uploadPaymentDocument(paymentFile,'payment_support',c,receipt.id),
+          uploadPaymentDocument(invoiceFile,'insurer_invoice',c,receipt.id)
+        ]);
+        if(state)state.textContent='Confirmando aplicación y documentos…';
         const domain=Orbit.reconciliationDomain;
         if(!domain||typeof domain.reconcilePayment!=='function') throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
         const origin=paymentOriginKind(receipt) === 'CRM_DIRECT' ? 'crm_migrated_direct' : 'insurer_invoice';
@@ -632,7 +637,9 @@ Orbit.modules.cobros = (function () {
         close(); U.toast(saved&&saved.documentLifecycleOk===false?'✓ Pago conciliado. Un documento quedó en recuperación controlada.':'✓ Pago conciliado y datos actualizados');
         baseCache=null;setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
       } catch(error) {
-        console.error('[Gravicentra][Cobros] Aplicación falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},receiptId:receipt.id||''});btn.disabled=false; U.toast(isPreviewHost()?'La prueba Preview no fue aceptada por el servidor. No se guardaron cambios.':'No fue posible guardar la aplicación del pago.');
+        console.error('[Gravicentra][Cobros] Aplicación falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},receiptId:receipt.id||''});
+        btn.disabled=false;btn.textContent='Guardar aplicación';pm.removeAttribute('aria-busy');if(state)state.textContent='No se guardaron cambios.';
+        U.toast(isPreviewHost()?'La prueba Preview no fue aceptada por el servidor. No se guardaron cambios.':'No fue posible guardar la aplicación del pago.');
       }
     };
   }
@@ -709,8 +716,8 @@ Orbit.modules.cobros = (function () {
     const p=S().get('polizas',c.polizaId)||{};
     const cli=S().get('clientes',c.clienteId)||{};
     let pm=document.getElementById('cob-pay'); if(pm)pm.remove();
-    pm=document.createElement('div');pm.id='cob-pay';pm.className='drawer-back open';pm.style.cssText='display:grid;place-items:center;z-index:210';
-    pm.innerHTML='<div class="card" style="width:min(520px,95vw);padding:0;max-height:92vh;overflow:auto">'
+    pm=document.createElement('div');pm.id='cob-pay';pm.className='drawer-back open';pm.style.cssText='display:grid;place-items:center;z-index:210;padding:12px;box-sizing:border-box;overflow:auto';
+    pm.innerHTML='<div class="card" style="width:min(520px,100%);padding:0;max-height:calc(100dvh - 24px);overflow:auto;display:flex;flex-direction:column">'
       +'<div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.6);text-transform:uppercase">Cobros · registrar pago</div><b style="font-family:var(--f-display);font-size:16px;color:#fff">💳 '+U.money(c.monto,c.moneda)+'</b></div><button class="imp-x" id="pm-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
       +'<div style="padding:18px 20px;display:grid;gap:12px">'
       +'<div class="cfg-note"><b>Pago</b> y <b>aplicación de la aseguradora</b> son fechas distintas. Ningún soporte es obligatorio. Si no conoces un dato, puede completarse después sin duplicar el cobro.</div>'
@@ -722,7 +729,7 @@ Orbit.modules.cobros = (function () {
       +'<label class="ce-l">Número de factura <span class="muted">(opcional)</span><input id="pm-invoice-number" class="o-sel" value="'+U.esc(c.invoiceNumber||c.numeroFactura||'')+'"></label>'
       +'<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);display:block;margin-bottom:7px">Factura / soporte de aplicación <span class="muted">(opcional)</span></span><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="pm-invoice-btn">⬆ Adjuntar factura</button><span id="pm-invoice-name" class="muted" style="font-size:12px">Sin archivo</span></div></div>'
       +'<label class="ce-l" style="display:flex;align-items:center;gap:8px;flex-direction:row;cursor:pointer"><input id="pm-avisar" type="checkbox" checked style="width:auto"> Avisar al cliente después de registrar</label>'
-      +'</div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="pm-cancel">Cancelar</button><button class="btn primary" id="pm-ok">Registrar pago</button></div></div>';
+      +'</div><div data-cobros-modal-footer="apply" style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card);z-index:2"><span id="pm-save-state" class="muted" aria-live="polite" style="font-size:12px;margin-right:auto"></span><button class="btn ghost" id="pm-cancel">Cancelar</button><button class="btn primary" id="pm-ok">Registrar pago</button></div></div>';
     document.body.appendChild(pm);
     let supportFile=null,invoiceFile=null;
     const close=()=>pm.remove();
@@ -730,11 +737,15 @@ Orbit.modules.cobros = (function () {
     const choose=(id,label,setter)=>{pm.querySelector(id).onclick=()=>{const fi=document.createElement('input');fi.type='file';fi.accept='.pdf,image/*';fi.onchange=()=>{const file=fi.files&&fi.files[0]||null;setter(file);pm.querySelector(label).textContent=file?file.name:'Sin archivo';};fi.click();};};
     choose('#pm-support-btn','#pm-support-name',f=>supportFile=f);choose('#pm-invoice-btn','#pm-invoice-name',f=>invoiceFile=f);
     pm.querySelector('#pm-ok').onclick=async()=>{
-      const btn=pm.querySelector('#pm-ok');btn.disabled=true;
+      const btn=pm.querySelector('#pm-ok'),state=pm.querySelector('#pm-save-state');
+      btn.disabled=true;btn.textContent='Guardando…';pm.setAttribute('aria-busy','true');if(state)state.textContent='Guardando documentos…';
       try{
         const domain=Orbit.reconciliationDomain;if(!domain||typeof domain.applyPayment!=='function')throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
-        const supportRef=await uploadPaymentDocument(supportFile,'payment_support',c,receipt.id);
-        const invoiceRef=await uploadPaymentDocument(invoiceFile,'insurer_invoice',c,receipt.id);
+        const [supportRef,invoiceRef]=await Promise.all([
+          uploadPaymentDocument(supportFile,'payment_support',c,receipt.id),
+          uploadPaymentDocument(invoiceFile,'insurer_invoice',c,receipt.id)
+        ]);
+        if(state)state.textContent='Registrando pago y confirmando persistencia…';
         const applied=await domain.applyPayment(receipt.id,{payload:{
           sourceType:'manual',
           paidDate:pm.querySelector('#pm-paid').value||'',
@@ -750,7 +761,7 @@ Orbit.modules.cobros = (function () {
         close();U.toast(docsOk?'✓ Pago registrado':'✓ Pago registrado. Un documento quedó en recuperación controlada.');baseCache=null;
         if(docsOk&&avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
         setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
-      }catch(error){console.error('[Gravicentra][Cobros] Registrar pago falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},cobroId:c.id||'',receiptId:receipt.id||''});btn.disabled=false;U.toast(isPreviewHost()?'La prueba Preview no fue aceptada por el servidor. No se guardaron cambios.':'No fue posible registrar el pago. No se guardaron cambios.');}
+      }catch(error){console.error('[Gravicentra][Cobros] Registrar pago falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},cobroId:c.id||'',receiptId:receipt.id||''});btn.disabled=false;btn.textContent='Registrar pago';pm.removeAttribute('aria-busy');if(state)state.textContent='No se guardaron cambios.';U.toast(isPreviewHost()?'La prueba Preview no fue aceptada por el servidor. No se guardaron cambios.':'No fue posible registrar el pago. No se guardaron cambios.');}
     };
   }
 
