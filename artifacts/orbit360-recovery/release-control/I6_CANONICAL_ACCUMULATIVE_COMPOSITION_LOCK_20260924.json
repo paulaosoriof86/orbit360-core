@@ -403,21 +403,13 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-005-R1",
-    "reason": "PRESERVE_INFERRED_APPLICATION_STATE_ON_LATER_DIRECT_PAYMENT_EVIDENCE_AND_ADD_EXACT_PREVIEW_HARNESS",
-    "changedProductFiles": [
-      "functions/payment-inference-engine.js",
-      "functions/cobros-reconciliation-domain.js",
-      "functions/tenant-domain-config.js",
-      "orbit360-platform/core/cobros-reconciliation-domain-client.js"
-    ],
+    "gate": "I6.5-B3-005-P1-QA",
+    "reason": "REPAIR_STALE_B3_ACTION_ALLOWLIST",
+    "changedProductFiles": [],
     "changedQaFiles": [
-      "tools/gravicentra-i6-5-b3-005-contract.mjs",
-      "tools/gravicentra-i6-5-b3-005-preview-proof.mjs",
-      "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
     ],
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noProductionConfigWrite": true,
     "noReimport": true,
@@ -1619,5 +1611,12 @@
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "2e29a17285a8ca4835e3140c6c55f84ea60c33f1"
     },
     "syntheticQaAuthorization": "B3_005_PREVIEW_ONLY"
+  },
+  "b3005P1GovernanceGuardRepair": {
+    "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P1_STALE_GOVERNANCE_GUARD_REPAIR_20261001.json",
+    "blobSha": "03e89fa3e90a52706797bc3aaf2629f51efd58bf",
+    "guardBlobSha": "e2df6ea293b280f6e37dfb5eb615d9fc01f9fc9e",
+    "productSourceChanged": false
   }
 }

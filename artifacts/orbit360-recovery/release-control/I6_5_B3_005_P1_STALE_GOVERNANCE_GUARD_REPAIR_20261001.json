@@ -1,0 +1,19 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_P1_STALE_GOVERNANCE_GUARD_REPAIR_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+  "failedRunId": 36935421406,
+  "failedJobId": 110614578426,
+  "failureCode": "I6_5_FORENSIC_B3_ACTION_INVALID",
+  "classification": "STALE_GOVERNANCE_VALIDATOR_NOT_PRODUCT_REGRESSION",
+  "rootCause": "The I6 control-plane guard allowed B3 actions only through B3-004 and rejected the already-authorized B3-005 exact-preview action before any product/backend proof step ran.",
+  "remediation": "Extend the existing B3 action allowlist through the frozen B3-005 diagnostic/source/contract/exact-preview/visual actions; preserve all B3 boundary checks.",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "guardBlobSha": "e2df6ea293b280f6e37dfb5eb615d9fc01f9fc9e",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "productionConfigWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3006": false
+}

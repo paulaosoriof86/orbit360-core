@@ -2207,7 +2207,15 @@
         "tools/gravicentra-i6-5-b3-005-contract.mjs": "772bbd9667f09385ba0fc3bfadfe0e852a358859",
         "tools/gravicentra-i6-5-b3-005-preview-proof.mjs": "9fd14eba50e15202de19558d091e2e69767cc921",
         "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs": "4cd727c02f4b91fa3bec56917edfd479a64d01ff",
-        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "2e29a17285a8ca4835e3140c6c55f84ea60c33f1"
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "2e29a17285a8ca4835e3140c6c55f84ea60c33f1",
+        "tools/gravicentra-i6-control-plane-guard-v1.mjs": "e2df6ea293b280f6e37dfb5eb615d9fc01f9fc9e"
+      },
+      "p1GovernanceGuardRepair": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P1_STALE_GOVERNANCE_GUARD_REPAIR_20261001.json",
+        "blobSha": "03e89fa3e90a52706797bc3aaf2629f51efd58bf",
+        "guardBlobSha": "e2df6ea293b280f6e37dfb5eb615d9fc01f9fc9e",
+        "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+        "productSourceChanged": false
       }
     },
     {
@@ -5809,7 +5817,7 @@
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "22edbc8c1e5148408fdf1df91fd1000890ef2df7",
+    "compositionLockBlobSha": "c4756f4f24057162a2c154ad7179d60ddd76c245",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
@@ -5820,6 +5828,8 @@
     "paymentLockBlobSha": "fd7b3322146db70814b1183f2dd901bf4dea8ce1",
     "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
     "r1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R1_DIRECT_EVIDENCE_APPLICATION_STATE_AND_PREVIEW_AUTH_20261001.json",
-    "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc"
+    "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc",
+    "p1GovernanceGuardRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_P1_STALE_GOVERNANCE_GUARD_REPAIR_20261001.json",
+    "p1GovernanceGuardRepairBlobSha": "03e89fa3e90a52706797bc3aaf2629f51efd58bf"
   }
 }
