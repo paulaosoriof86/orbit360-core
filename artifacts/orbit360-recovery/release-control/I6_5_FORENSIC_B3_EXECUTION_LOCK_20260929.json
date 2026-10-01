@@ -590,6 +590,11 @@
       "compositionLockBlobSha": "59e6bad1221a0896ec3c4d2d9a06791f0fc19f81",
       "exactQaReceiptPortfolioBypass": true,
       "lazyVehicleIndexOnSearchOnly": true
+    },
+    "r12p2SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P2_SCOPED_STORE_QA_SURFACE_CAUSAL_FIX_20260930.json",
+      "blobSha": "6a54830967bcbbbd4ab8f8dd0f8d6018c0ceaec2",
+      "rootCause": "R12P1_EXACT_QA_BYPASS_RAN_INSIDE_ROUTER_SCOPED_STORE_SO_SYNTHETIC_RECEIPT_WAS_FILTERED_BEFORE_EXACT_SURFACE_SELECTION"
     }
   },
   "canonicalComposition": {
@@ -599,7 +604,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "7a53600fc03590bdfee5cb282f4074b42c304819"
+    "blobSha": "feb3d276877f43766646e4b56aec4d41db46fdc3"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -800,7 +805,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "59e6bad1221a0896ec3c4d2d9a06791f0fc19f81"
+    "blobSha": "2c433422d5e33fe73ac784c8ff630d507a8007e1"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -809,5 +814,18 @@
     "operationalBusinessWritesAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false
+  },
+  "r12p2SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P2_SCOPED_STORE_QA_SURFACE_CAUSAL_FIX_20260930.json",
+    "blobSha": "6a54830967bcbbbd4ab8f8dd0f8d6018c0ceaec2",
+    "compositionLockBlobSha": "2c433422d5e33fe73ac784c8ff630d507a8007e1",
+    "findingsLedgerBlobSha": "feb3d276877f43766646e4b56aec4d41db46fdc3",
+    "rootCause": "R12P1_EXACT_QA_BYPASS_RAN_INSIDE_ROUTER_SCOPED_STORE_SO_SYNTHETIC_RECEIPT_WAS_FILTERED_BEFORE_EXACT_SURFACE_SELECTION",
+    "productSourceChanged": true,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
   }
 }

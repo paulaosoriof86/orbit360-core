@@ -1,0 +1,48 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P2_SCOPED_STORE_QA_SURFACE_CAUSAL_FIX_V1",
+  "recordedAt": "2026-09-30",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "bddc975d86a0d552f29ddf3163fa5b79b0f266b4",
+  "failedRunId": 36807074094,
+  "failedJobId": 110193951657,
+  "failure": "PLAYWRIGHT_SELECTOR_TIMEOUT_BUTTON_DATA_COBROS_ACTION_APPLY",
+  "classification": "PRODUCT_UI_QA_ISOLATION_COMPOSITION_DEFECT",
+  "rootCause": "R12P1_EXACT_QA_BYPASS_RAN_INSIDE_ROUTER_SCOPED_STORE_SO_SYNTHETIC_RECEIPT_WAS_FILTERED_BEFORE_EXACT_SURFACE_SELECTION",
+  "evidence": [
+    "Raw receipt existence check passed before navigation.",
+    "QA route marker rendered, proving qaReceipt was parsed.",
+    "Router renders Cobros inside Orbit.access.withScope('cobros').",
+    "R12P1 exact route still sourced carteraPrimas through S().all(), therefore through scoped projection before exact receipt selection.",
+    "The synthetic fixture uses a synthetic advisorId and is not required to belong to the selected privileged actor's configured record scope."
+  ],
+  "remediation": {
+    "exactPreviewSyntheticOnly": true,
+    "qaPrefix": "b3004human_",
+    "exactFixtureGate": "B3-004-R12",
+    "surfaceReadsExactReceiptFromUnscopedStoreById": true,
+    "normalScopedProjectionSkippedOnlyForExactQaSurface": true,
+    "realPreviewRowsVisibleReadOnly": true,
+    "backendPreviewSyntheticGuardUnchanged": true,
+    "liveBehaviorUnchanged": true
+  },
+  "changedProductFiles": [
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/index.html"
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/cobros.js": "496155fa725a38e9e59378549fe17f76bc827723",
+    "orbit360-platform/index.html": "cb7144b863b0aca88dbb5872672935b4cedc0bf0"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "c93092704874ec431e65bd69a5e58da37b09edbc"
+  },
+  "requiredNextProof": [
+    "B3_004_R12_SOURCE_CONTRACT_PASS",
+    "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS"
+  ],
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

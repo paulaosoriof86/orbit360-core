@@ -4255,5 +4255,23 @@
     "individualReconciliationFallbackRequired": true,
     "clientPortalPaymentIntakeOperational": false,
     "currentClientPortalPaymentCountExpected": 0
+  },
+  "currentB3": {
+    "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
+    "compositionLockBlobSha": "2c433422d5e33fe73ac784c8ff630d507a8007e1",
+    "r12p2SourceFix": {
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P2_SCOPED_STORE_QA_SURFACE_CAUSAL_FIX_20260930.json",
+      "receiptBlobSha": "6a54830967bcbbbd4ab8f8dd0f8d6018c0ceaec2",
+      "compositionLockBlobSha": "2c433422d5e33fe73ac784c8ff630d507a8007e1",
+      "findingsLedgerBlobSha": "feb3d276877f43766646e4b56aec4d41db46fdc3",
+      "executionLockBlobSha": "62f6d47b4867d2d91f69efa296a1fa93b4a54393",
+      "rootCause": "R12P1_EXACT_QA_BYPASS_RAN_INSIDE_ROUTER_SCOPED_STORE_SO_SYNTHETIC_RECEIPT_WAS_FILTERED_BEFORE_EXACT_SURFACE_SELECTION",
+      "productSourceChanged": true,
+      "noOperationalBusinessWrites": true,
+      "noReimport": true,
+      "noLive": true,
+      "noB3005": true
+    }
   }
 }

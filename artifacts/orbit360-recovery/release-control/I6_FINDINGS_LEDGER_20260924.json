@@ -1634,6 +1634,15 @@
         "reimport": false,
         "live": false,
         "b3005": false
+      },
+      "r12p2SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P2_SCOPED_STORE_QA_SURFACE_CAUSAL_FIX_20260930.json",
+        "blobSha": "6a54830967bcbbbd4ab8f8dd0f8d6018c0ceaec2",
+        "compositionLockBlobSha": "2c433422d5e33fe73ac784c8ff630d507a8007e1",
+        "classification": "PRODUCT_UI_QA_ISOLATION_COMPOSITION_DEFECT",
+        "rootCause": "R12P1_EXACT_QA_BYPASS_RAN_INSIDE_ROUTER_SCOPED_STORE_SO_SYNTHETIC_RECEIPT_WAS_FILTERED_BEFORE_EXACT_SURFACE_SELECTION",
+        "exactSyntheticSurfaceBypassesScopedProjectionOnlyForQa": true,
+        "realPreviewRowsReadOnly": true
       }
     },
     {
