@@ -84,7 +84,11 @@
     "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_MACHINE_PASS_20261001.json",
     "machineProofReceiptBlobSha": "0ba1ec5e047d18f1add881a8c05f0d43a9477ece",
     "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_REJECTION_SEMANTIC_PROVENANCE_20261001.json",
-    "visualRejectionReceiptBlobSha": "cfffbce486fd132842c0a3569f1e3a0c8ceec136"
+    "visualRejectionReceiptBlobSha": "cfffbce486fd132842c0a3569f1e3a0c8ceec136",
+    "r4p1CompositionBlockBindingRepair": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R4P1_COMPOSITION_BLOCK_BINDING_REPAIR_20261001.json",
+      "blobSha": "6c10b68b1b6bedb368d6b31d9f3621b9225510c1"
+    }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -93,10 +97,10 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "813a97da7f922e1cf9615370dbd798e18ae63bed"
+    "blobSha": "6d5c9081c4057a745df4e6344ac29189c0be7830"
   },
   "nextRequiredProof": [
-    "B3_005_PREVIEW_MACHINE_PASS",
+    "B3_005_NEW_EXACT_PREVIEW_MACHINE_PASS",
     "B3_005_TARGETED_HUMAN_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
@@ -283,7 +287,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "c310388a85374f1aeea4d2ca42a564f96c5a3a64"
+    "blobSha": "3d843f77ce56f66b02e0f2878a46d4ab2c843be8"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
