@@ -54,11 +54,6 @@ function fixture(runId){
   if(!v1.ok)throw new Error('S453_V1_PLAN_'+v1.code);
   const v2=versioning.buildAtomicVersionPlan({...common,premium:2600,versionNumber:2,requestKey:runId+'-v2',supersedesProposalId:v1.proposal.proposalId,previousProposal:v1.proposal});
   if(!v2.ok)throw new Error('S453_V2_PLAN_'+v2.code);
-  for(const p of [v1,v2]){
-    for(const op of p.operations){
-      if(op.entity==='proposal_version_request')op.payload.proofRunId=runId,op.payload.synthetic=true;
-    }
-  }
   const paths={
     v1:versioning.pathForProposal(TENANT_ID,v1.proposal.proposalId),
     idem1:versioning.pathForIdempotency(TENANT_ID,v1.requestId),
@@ -155,7 +150,6 @@ async function run(){
     const beforeV2=(await db.doc(fx.paths.v1).get()).data();
     const v2Plan=versioning.buildAtomicVersionPlan({...fx.common,premium:2600,versionNumber:2,requestKey:fx.runId+'-v2',supersedesProposalId:fx.v1.proposal.proposalId,previousProposal:beforeV2});
     if(!v2Plan.ok)throw new Error('S453_V2_RUNTIME_PLAN_'+v2Plan.code);
-    for(const op of v2Plan.operations)if(op.entity==='proposal_version_request')op.payload.proofRunId=fx.runId,op.payload.synthetic=true;
 
     const firstV2=await commitV2(db,fx,v2Plan);
     if(firstV2.reused||firstV2.writes!==3)throw new Error('S453_V2_FIRST_WRITE_INVALID');
