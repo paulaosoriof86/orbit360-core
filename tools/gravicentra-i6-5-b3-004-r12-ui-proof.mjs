@@ -278,7 +278,7 @@ try{
   proof.mobileApplyModal=applyResponsive;
   await page.fill('#pm-paid','2026-09-30');
   await page.selectOption('#pm-metodo',{label:'Transferencia bancaria'});
-  const supportA={name:'B3-004-R15-soporte-aplicar.pdf',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2t8QAAAAASUVORK5CYII=','base64')};
+  const supportA={name:'B3-004-R15-soporte-aplicar.pdf',mimeType:'application/pdf',buffer:minimalPdfBuffer()};
   const [supportChooser]=await Promise.all([page.waitForEvent('filechooser'),page.click('#pm-support-btn')]);
   await supportChooser.setFiles(supportA);
   await page.waitForFunction(()=>document.querySelector('#pm-support-name')?.textContent?.includes('B3-004-R15-soporte-aplicar.pdf'));
@@ -367,7 +367,7 @@ try{
   const reconcileTransportStart=proof.transportEvents.length;
   await page.fill('#cc-aplicacion','2026-09-30');
   await page.fill('#cc-numero','QA-R12-UI-001');
-  const supportB={name:'B3-004-R15-soporte-conciliar.pdf',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64')};
+  const supportB={name:'B3-004-R15-soporte-conciliar.pdf',mimeType:'application/pdf',buffer:minimalPdfBuffer()};
   const invoiceFile={name:'B3-004-R15-factura.pdf',mimeType:'application/pdf',buffer:minimalPdfBuffer()};
   const [supportBChooser]=await Promise.all([page.waitForEvent('filechooser'),page.click('#cc-pay-btn')]);
   await supportBChooser.setFiles(supportB);

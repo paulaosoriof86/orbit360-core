@@ -403,18 +403,14 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R15",
-    "reason": "TARGETED_HUMAN_REJECTION_PDF_PRESENTATION_CONSISTENCY_CAUSAL_FIX",
-    "changedProductFiles": [
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/index.html"
-    ],
+    "gate": "I6.5-B3-004-R15P1-QA",
+    "reason": "FIX_QA_FIXTURE_MIME_CONTENT_MISMATCH_AND_STRENGTHEN_CONTRACT",
+    "changedProductFiles": [],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
-      "tools/gravicentra-i6-5-b3-004-contract.mjs",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -1520,8 +1516,8 @@
       "orbit360-platform/index.html": "d15e704eb766c721fd775a4bcd5608b795632851"
     },
     "qaBlobs": {
-      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "31fc855824377b80044dad5fd314cedc8bb18d41",
-      "tools/gravicentra-i6-5-b3-004-contract.mjs": "b0f47418d1ed52ee614fe3fb7084b035655555ef",
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "0bf98a90b60001f7ceb7e7b8ecfa737a6901f138",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "87223eb7d19b775f559dcf9a022bb4b724e85392",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "59d0bf7ac63b7ae3a582f8afbc5a6eccb1219911"
     },
     "canonicalPdfBehavior": "NEW_TAB_OPTION_FOR_ALL_APPLICATION_PDF",
@@ -1530,5 +1526,14 @@
     "noReimport": true,
     "noLive": true,
     "noB3005": true
+  },
+  "b3004R15P1QaFixtureMimeRepair": {
+    "status": "QA_HARNESS_REPAIRED_PENDING_RERUN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15P1_QA_FIXTURE_MIME_REPAIR_20261001.json",
+    "receiptBlobSha": "26b9d65dfb93b9565df9e9d4432e7ef3001ba00e",
+    "uiProofBlobSha": "0bf98a90b60001f7ceb7e7b8ecfa737a6901f138",
+    "contractBlobSha": "87223eb7d19b775f559dcf9a022bb4b724e85392",
+    "productSourceChanged": false,
+    "productRegressionDemonstrated": false
   }
 }

@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R15P1_QA_FIXTURE_MIME_REPAIR_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_HARNESS_REPAIRED_PENDING_RERUN",
+  "failedRunId": 36929787247,
+  "failedJobId": 110596009177,
+  "failurePoint": "APPLY_PAYMENT_PDF_OPEN_OPTION_PROOF",
+  "failureCode": "B3_004_R15_APPLY_PDF_OPEN_OPTION_TIMEOUT",
+  "classification": "QA_FIXTURE_MIME_CONTENT_MISMATCH",
+  "rootCause": "The R15 browser harness renamed the apply/reconcile support fixtures to .pdf before replacing their original PNG declarations, leaving mimeType image/png and PNG bytes. The browser correctly rendered the fixture as an image, so the new PDF-only selector never appeared.",
+  "productRegressionDemonstrated": false,
+  "productSourceChanged": false,
+  "productFixPreserved": {
+    "bridgeBlobSha": "010f245e8ab10ec2a1db96f164506d8683cef655",
+    "indexBlobSha": "d15e704eb766c721fd775a4bcd5608b795632851"
+  },
+  "qaFix": {
+    "uiProofBlobSha": "0bf98a90b60001f7ceb7e7b8ecfa737a6901f138",
+    "contractBlobSha": "87223eb7d19b775f559dcf9a022bb4b724e85392",
+    "supportApplyFixture": "application/pdf + minimalPdfBuffer",
+    "supportReconcileFixture": "application/pdf + minimalPdfBuffer",
+    "contractPreventsFilenameOnlyPdfFalsePositive": true
+  },
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false,
+    "b4": false
+  }
+}

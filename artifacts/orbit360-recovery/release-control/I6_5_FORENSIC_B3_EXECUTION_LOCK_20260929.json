@@ -304,7 +304,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R12_EXACT_PREVIEW",
+    "nextAction": "B3_004_R15_EXACT_PREVIEW",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -844,11 +844,18 @@
         "orbit360-platform/index.html": "d15e704eb766c721fd775a4bcd5608b795632851"
       },
       "qaBlobs": {
-        "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "31fc855824377b80044dad5fd314cedc8bb18d41",
-        "tools/gravicentra-i6-5-b3-004-contract.mjs": "b0f47418d1ed52ee614fe3fb7084b035655555ef",
+        "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "0bf98a90b60001f7ceb7e7b8ecfa737a6901f138",
+        "tools/gravicentra-i6-5-b3-004-contract.mjs": "87223eb7d19b775f559dcf9a022bb4b724e85392",
         ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "59d0bf7ac63b7ae3a582f8afbc5a6eccb1219911"
       },
       "performanceObservation": "Cobros ~4s; apply ~3-4s; reconcile ~4-5s"
+    },
+    "r15p1QaFixtureMimeRepair": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15P1_QA_FIXTURE_MIME_REPAIR_20261001.json",
+      "blobSha": "26b9d65dfb93b9565df9e9d4432e7ef3001ba00e",
+      "uiProofBlobSha": "0bf98a90b60001f7ceb7e7b8ecfa737a6901f138",
+      "contractBlobSha": "87223eb7d19b775f559dcf9a022bb4b724e85392",
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -858,11 +865,11 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "1886dbda3b433b91f68234c6161891b783f4dbf5"
+    "blobSha": "74d3134639b6f075e1f995f20bdace9cab612981"
   },
   "nextRequiredProof": [
-    "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
-    "B3_004_R12_TARGETED_HUMAN_VISUAL_PASS"
+    "B3_004_R15_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_R15_TARGETED_HUMAN_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -1061,7 +1068,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "2f5e00906455fd6b4299691c2e41372c258eee9d"
+    "blobSha": "9d1a5eccb23050285884cb2aeeaf79220298d1f8"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
