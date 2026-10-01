@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "ays-cotcomp-s461-w5-counsel-kit-sourceonly-intent-v1.0",
+  "authorization": "S461_W5_SOURCE_ONLY_COUNSEL_INTAKE_KIT",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "cbc8bde2b194a1323c3df2d8475bf0953e752006",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W5",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "production": false,
+  "scope": [
+    "GT formal counsel intake template",
+    "CO formal counsel intake template",
+    "country questionnaire bound to current governance policy",
+    "provenance and owner acceptance requirements",
+    "fail-closed empty-template validation",
+    "execution remains disabled"
+  ]
+}
