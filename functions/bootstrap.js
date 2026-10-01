@@ -10,5 +10,6 @@ module.exports = Object.assign(
   require('./recurring-insurance-import'),
   require('./index'),
   require('./bank-accounts'),
-  require('./cotcomp-runtime-entry-s438')
+  require('./cotcomp-runtime-entry-s438'),
+  require('./cotcomp-pilot-intake-s467')
 );
