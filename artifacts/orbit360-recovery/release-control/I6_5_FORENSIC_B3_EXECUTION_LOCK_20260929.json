@@ -814,10 +814,16 @@
       },
       "qaBlobs": {
         "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "29c35647bea9633be821bc0594ad05cf065de5b3",
-        "tools/gravicentra-i6-5-b3-004-contract.mjs": "20209675ab47cfa7c5a733581aba7c4a8f00672d",
+        "tools/gravicentra-i6-5-b3-004-contract.mjs": "424f8f9ccd8a0d0d14e8ab3d1799c091f1da0062",
         ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "a20577fb14cc7298213a967f44f690ecb2567ad9"
       },
       "performanceResidual": "HUMAN_APPROX_5000MS_PENDING_EXACT_REMEASUREMENT"
+    },
+    "r14p1ValidatorRepair": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R14P1_STALE_BROWSER_CONTRACT_REPAIR_20261001.json",
+      "blobSha": "288e5fe6721ae36fbf6e6db854da07f7b911a6c1",
+      "contractBlobSha": "424f8f9ccd8a0d0d14e8ab3d1799c091f1da0062",
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -827,7 +833,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "d4630710aa6057963533eaf57dd7d2c5f40845b2"
+    "blobSha": "f038027b3771fb72fd89cdda5f9e77e0cc9c75a0"
   },
   "nextRequiredProof": [
     "B3_004_R14_SOURCE_CONTRACT_PASS",
@@ -1031,7 +1037,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "ba21b1d88482d22d596000130d4c2be8cf20fbbd"
+    "blobSha": "9c4091bee93c1efa8de8d69287eceb8df286cc6f"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",

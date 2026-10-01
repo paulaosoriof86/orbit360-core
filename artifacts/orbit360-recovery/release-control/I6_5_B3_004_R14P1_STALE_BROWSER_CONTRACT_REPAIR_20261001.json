@@ -1,0 +1,19 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R14P1_QA_CONTRACT_REPAIR_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_VALIDATOR_REPAIRED_PENDING_RERUN",
+  "failedRunId": 36925967185,
+  "failedJobId": 110583243199,
+  "failureCode": "B3_004_R12_BROWSER_UI_PROOF_MISSING",
+  "classification": "STALE_QA_ASSERTION_AFTER_CONTEXT_PRESERVATION_TEST_REPLACED_GLOBAL_RECONCILE_PATH",
+  "productRegressionDemonstrated": false,
+  "productSourceChanged": false,
+  "oldContractBlobSha": "20209675ab47cfa7c5a733581aba7c4a8f00672d",
+  "newContractBlobSha": "424f8f9ccd8a0d0d14e8ab3d1799c091f1da0062",
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  }
+}

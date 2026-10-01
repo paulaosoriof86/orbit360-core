@@ -403,19 +403,13 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R14P1",
-    "reason": "HUMAN_REJECTION_CONTEXT_PDF_PERFORMANCE_CAUSAL_FIX",
-    "changedProductFiles": [
-      "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/index.html"
-    ],
+    "gate": "I6.5-B3-004-R14P1-QA",
+    "reason": "REPLACE_STALE_GLOBAL_RECONCILE_BROWSER_ASSERTION_WITH_SAME_RECEIPT_CONTEXT_ASSERTION",
+    "changedProductFiles": [],
     "changedQaFiles": [
-      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
-      "tools/gravicentra-i6-5-b3-004-contract.mjs",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -1468,7 +1462,7 @@
     },
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "29c35647bea9633be821bc0594ad05cf065de5b3",
-      "tools/gravicentra-i6-5-b3-004-contract.mjs": "20209675ab47cfa7c5a733581aba7c4a8f00672d",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "424f8f9ccd8a0d0d14e8ab3d1799c091f1da0062",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "a20577fb14cc7298213a967f44f690ecb2567ad9"
     },
     "performanceResidual": "HUMAN_APPROX_5000MS_PENDING_EXACT_REMEASUREMENT",
@@ -1476,5 +1470,12 @@
     "noReimport": true,
     "noLive": true,
     "noB3005": true
+  },
+  "b3004R14P1ValidatorRepair": {
+    "status": "QA_VALIDATOR_REPAIRED_PENDING_RERUN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R14P1_STALE_BROWSER_CONTRACT_REPAIR_20261001.json",
+    "receiptBlobSha": "288e5fe6721ae36fbf6e6db854da07f7b911a6c1",
+    "contractBlobSha": "424f8f9ccd8a0d0d14e8ab3d1799c091f1da0062",
+    "productSourceChanged": false
   }
 }
