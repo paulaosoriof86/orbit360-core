@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12_BROWSER_UI_PROOF_FAIL_V1",
+  "recordedAt": "2026-09-30",
+  "status": "MACHINE_BROWSER_UI_REJECTED_REMEDIATION_REQUIRED",
+  "findingId": "B3-004",
+  "runId": 36805222252,
+  "jobId": 110188070507,
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36805222252-i99d09f2.web.app",
+  "automatedPath": "Cliente360 synthetic fixture -> #/cobros?qaReceipt=b3004human_receipt_r12 -> Aplicar pago -> Conciliar",
+  "failure": {
+    "step": "wait for button[data-cobros-action=\"apply\"]",
+    "code": "PLAYWRIGHT_SELECTOR_TIMEOUT_15000MS",
+    "client360ToCobrosUsableMs": null,
+    "browserUiProofPass": false
+  },
+  "causalDiagnosis": {
+    "qaModeMarkerRendered": true,
+    "fixtureCreated": true,
+    "qaReceipt": "b3004human_receipt_r12",
+    "rootCause": "QA_ISOLATED_ROUTE_USED_NORMAL_ACCESS_PROJECTION_BEFORE_EXACT_SYNTHETIC_RECEIPT_FILTER",
+    "contributingPerformanceIssue": "CLOSURE_BRIDGE_STILL_BUILT_VEHICLE_INDEX_WITH_EMPTY_SEARCH",
+    "productBackendProofsBeforeUi": true,
+    "productHostingReadbackBeforeUi": true
+  },
+  "remediation": {
+    "exactQaReceiptPortfolioBypass": true,
+    "onlyForPreviewSyntheticQaRoute": true,
+    "lazyVehicleIndexWhenNoSearch": true,
+    "browserUiProofMustRerun": true,
+    "thresholdMs": 3000,
+    "humanRetest": false,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false
+  }
+}

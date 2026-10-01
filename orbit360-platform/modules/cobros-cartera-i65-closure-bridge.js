@@ -16,8 +16,11 @@ function activePolicyRow(r){var p=policy(r),s=clean(p&&p.estado).toLowerCase();r
 function client(r){var p=policy(r||{});return S().get('clientes',(r&&r.clienteId)||p.clienteId)||{};}
 function countryOk(r){var c=client(r),p=Orbit.pais;return !p||p==='TODOS'||c.pais===p||(r&&r.pais===p);}
 function accessOk(col,r){try{return !Orbit.access||!Orbit.access.canView||Orbit.access.canView(col,r,'cobros');}catch(e){return true;}}
-function searchIndex(){
-  var vehicles=S().all('vehiculos')||[],byPolicy={};
+function searchIndex(q){
+  q=clean(q);
+  var byPolicy={};
+  if(!q)return {vehicleByPolicy:byPolicy};
+  var vehicles=S().all('vehiculos')||[];
   vehicles.forEach(function(v){var id=clean(v&&v.polizaId);if(id&&!byPolicy[id])byPolicy[id]=v;});
   return {vehicleByPolicy:byPolicy};
 }
@@ -27,17 +30,17 @@ function searchText(r,idx){
 }
 function matches(r,q,idx){q=clean(q).toLowerCase();return !q||searchText(r,idx).indexOf(q)>=0;}
 function portfolioRows(q){
-  var due=rp().dueDate||function(x){return x.fechaLimite||x.vence||x.fechaVencimiento;},idx=searchIndex();
+  var due=rp().dueDate||function(x){return x.fechaLimite||x.vence||x.fechaVencimiento;},idx=searchIndex(q);
   return (S().all('carteraPrimas')||[]).filter(function(r){return r&&r.carteraActiva!==false&&activePolicyRow(r)&&countryOk(r)&&accessOk('carteraPrimas',r)&&matches(r,q,idx);})
     .sort(function(a,b){return clean(due(a)).localeCompare(clean(due(b)));});
 }
 function cobroRows(q){
-  var idx=searchIndex();
+  var idx=searchIndex(q);
   return (S().all('cobros')||[]).filter(function(r){return r&&countryOk(r)&&accessOk('cobros',r)&&matches(r,q,idx);})
     .sort(function(a,b){return clean(a.fechaPago||a.vence).localeCompare(clean(b.fechaPago||b.vence));});
 }
 function reportedPaymentRows(q){
-  var linked={},idx=searchIndex();
+  var linked={},idx=searchIndex(q);
   (S().all('cobros')||[]).forEach(function(c){var id=clean(c&&c.reciboId);if(id)linked[id]=true;});
   return (S().all('recibosEsperados')||[]).filter(function(r){
     return r&&clean(r.estadoOperativo).toLowerCase()==='pago_reportado'&&!linked[clean(r.id)]&&countryOk(r)&&accessOk('recibosEsperados',r)&&matches(r,q,idx);

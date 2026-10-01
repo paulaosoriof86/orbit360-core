@@ -168,9 +168,12 @@ Orbit.modules.cobros = (function () {
   function portfolioPaymentRows(idx) {
     const linked = new Set((S().all('cobros') || []).map(c => String(c && (c.reciboId || c.receiptId) || '')).filter(Boolean));
     const adapter = Orbit.cobrosCarteraProjectionAdapter;
-    const source = adapter && typeof adapter.portfolioRows === 'function'
-      ? adapter.portfolioRows(st.fq)
-      : (S().all('carteraPrimas') || []).filter(r => r && r.carteraActiva !== false && countryMatches(r, idx));
+    const qaReceipt = qaReceiptId();
+    const source = qaReceipt
+      ? (S().all('carteraPrimas') || []).filter(r => r && r.carteraActiva !== false && String(r.reciboId || r.receiptId || '') === qaReceipt)
+      : (adapter && typeof adapter.portfolioRows === 'function'
+        ? adapter.portfolioRows(st.fq)
+        : (S().all('carteraPrimas') || []).filter(r => r && r.carteraActiva !== false && countryMatches(r, idx)));
     return source.map(r => {
       const receiptId = String(r && (r.reciboId || r.receiptId) || '');
       if (!receiptId || linked.has(receiptId)) return null;
