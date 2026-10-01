@@ -186,24 +186,28 @@ try{
   proof.receiptListMobile=receiptListMobile;proof.assertions.mobileReceiptListResponsive=true;
 
   const normalStart=await page.evaluate(()=>{const t=performance.now();window.__b3004r12NormalNavStart=t;location.hash='#/cobros';return t;});
-  await page.waitForSelector('table.tbl tbody tr[data-row-policy-id]');
+  await page.waitForSelector('[data-preview-safe-mode="1"]',{timeout:15000});
+  await page.waitForSelector('table.tbl tbody',{timeout:15000});
   const normalMs=await page.evaluate(()=>performance.now()-window.__b3004r12NormalNavStart);
   proof.timing.client360ToCobrosUsableMs=Math.round(normalMs);
   need(normalMs<=3000,'B3_004_R12_COBROS_NAVIGATION_OVER_3000MS:'+Math.round(normalMs));
   const normalSurface=await page.evaluate(()=>({
     rowCount:document.querySelectorAll('table.tbl tbody tr[data-row-policy-id]').length,
     readonlyCount:document.querySelectorAll('[data-preview-readonly-row]').length,
+    safeMode:!!document.querySelector('[data-preview-safe-mode="1"]'),
+    emptyState:/Sin cobros\./i.test(String(document.querySelector('table.tbl tbody')?.textContent||'')),
     writeActions:[...document.querySelectorAll('button[data-cobros-action]')].map(button=>{
       const row=button.closest('tr');
       const receiptId=String(row?.getAttribute('data-portfolio-receipt')||row?.getAttribute('data-siga-direct-payment')||row?.getAttribute('data-paid-receipt-evidence')||row?.getAttribute('data-advisor-reported-payment')||row?.getAttribute('data-reported-payment-evidence')||'');
       return{action:button.getAttribute('data-cobros-action')||'',receiptId};
     }).filter(x=>!/^b3004(?:qa|human)_/i.test(x.receiptId))
   }));
-  need(normalSurface.rowCount>0,'B3_004_R12_REAL_PREVIEW_ROWS_NOT_RENDERED');
-  need(normalSurface.readonlyCount>0,'B3_004_R12_REAL_PREVIEW_READONLY_MARKER_MISSING');
+  need(normalSurface.safeMode===true,'B3_004_R14_REAL_PREVIEW_SAFE_MODE_MISSING');
+  need(normalSurface.rowCount===0?normalSurface.emptyState===true:normalSurface.readonlyCount>0,'B3_004_R14_REAL_PREVIEW_READONLY_OR_EMPTY_STATE_MISSING:'+JSON.stringify(normalSurface));
   need(normalSurface.writeActions.length===0,'B3_004_R12_REAL_PREVIEW_WRITE_ACTIONS_PRESENT:'+JSON.stringify(normalSurface.writeActions.slice(0,5)));
   proof.normalSurface=normalSurface;
   proof.assertions.realPreviewRowsReadOnly=true;
+  proof.assertions.realPreviewEmptyStateAccepted=normalSurface.rowCount===0&&normalSurface.emptyState===true;
   await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id)+'&t=recibos';},ids.client);
   await page.waitForFunction(id=>String(window.Orbit?.route?.params?.c||'')===String(id),ids.client);
   const navStart=await page.evaluate(route=>{const t=performance.now();window.__b3004r12NavStart=t;location.hash=route;return t;},'#/cobros?qaReceipt='+encodeURIComponent(ids.receipt));

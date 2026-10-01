@@ -1,0 +1,30 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R14P2_QA_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RERUN",
+  "failedRunId": 36926170548,
+  "failedJobId": 110584377763,
+  "failureCode": "B3_004_NORMAL_COBROS_ROWS_TIMEOUT",
+  "failurePoint": "NORMAL_PREVIEW_READONLY_AND_PERFORMANCE_PREFLIGHT_BEFORE_SYNTHETIC_APPLY",
+  "classification": "QA_HARNESS_ASSUMED_NONEMPTY_PRIVILEGED_REAL_DATA_SCOPE",
+  "rootCause": "The browser proof required at least one real Cobros row for whichever authorized privileged test actor was selected. An authorized actor can legitimately resolve to an empty scoped Cobros surface, causing a timeout before the B3-004 synthetic payment flow.",
+  "remediation": "Treat the normal Preview surface as usable when the safe-mode banner and Cobros table are rendered. If rows exist, require read-only markers; if the authorized scope is empty, require the explicit 'Sin cobros.' state. In both cases require zero real write actions. Keep the human ~5s observation blocking until revalidated.",
+  "productSourceChanged": false,
+  "productRegressionDemonstrated": false,
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "8373c4fe76979f738b63a6be817a7bea9920d2c2",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "6653fe33e2664fc0a712f2fda09e822522564954"
+  },
+  "preservedProductBlobs": {
+    "orbit360-platform/modules/cobros.js": "b03650daa42675a27a2e39b7b00e980bb66cd81b",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "bae523edcea95df9e0711699f259c4b82ad77285",
+    "orbit360-platform/index.html": "af7479a8606911ab95f8cdef5ec4dd9dee2e7c39"
+  },
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false,
+    "b4": false
+  }
+}

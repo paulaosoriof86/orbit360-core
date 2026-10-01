@@ -403,10 +403,11 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R14P1-QA",
-    "reason": "REPLACE_STALE_GLOBAL_RECONCILE_BROWSER_ASSERTION_WITH_SAME_RECEIPT_CONTEXT_ASSERTION",
+    "gate": "I6.5-B3-004-R14P2-QA",
+    "reason": "NORMAL_PREVIEW_READONLY_PROOF_ACCEPTS_AUTHORIZED_EMPTY_SCOPE_WITH_EXPLICIT_SAFE_EMPTY_STATE",
     "changedProductFiles": [],
     "changedQaFiles": [
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
     "productSourceChanged": false,
@@ -1461,8 +1462,8 @@
       "orbit360-platform/index.html": "af7479a8606911ab95f8cdef5ec4dd9dee2e7c39"
     },
     "qaBlobs": {
-      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "29c35647bea9633be821bc0594ad05cf065de5b3",
-      "tools/gravicentra-i6-5-b3-004-contract.mjs": "424f8f9ccd8a0d0d14e8ab3d1799c091f1da0062",
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "8373c4fe76979f738b63a6be817a7bea9920d2c2",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "6653fe33e2664fc0a712f2fda09e822522564954",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "a20577fb14cc7298213a967f44f690ecb2567ad9"
     },
     "performanceResidual": "HUMAN_APPROX_5000MS_PENDING_EXACT_REMEASUREMENT",
@@ -1477,5 +1478,16 @@
     "receiptBlobSha": "288e5fe6721ae36fbf6e6db854da07f7b911a6c1",
     "contractBlobSha": "424f8f9ccd8a0d0d14e8ab3d1799c091f1da0062",
     "productSourceChanged": false
+  },
+  "b3004R14P2HarnessFix": {
+    "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RERUN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R14P2_NORMAL_PREVIEW_EMPTY_STATE_HARNESS_FIX_20261001.json",
+    "receiptBlobSha": "556cdc6da9a55258cbb7ca6d5d911f9d768c97d3",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "8373c4fe76979f738b63a6be817a7bea9920d2c2",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "6653fe33e2664fc0a712f2fda09e822522564954"
+    },
+    "productSourceChanged": false,
+    "performanceResidual": "HUMAN_APPROX_5000MS_STILL_BLOCKING_TARGETED_VISUAL"
   }
 }
