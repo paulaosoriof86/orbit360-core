@@ -140,7 +140,7 @@
     "orbit360-platform/core/access-scope.js": "f50156162f59e105d3564c1c3f6036daf03ebd56",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "cb991621489263eaf60040ef3ddf221a69b25c6e",
-    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "34ad04825c66dd6e5404e5c3f72666c88a720b5d",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "bae523edcea95df9e0711699f259c4b82ad77285",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
@@ -172,13 +172,13 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "30753007242c482d9a3e6c2c6c438e07bdec0778",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "02972292806443ebdf0b62e2539441f964e9ad90",
+    "orbit360-platform/index.html": "af7479a8606911ab95f8cdef5ec4dd9dee2e7c39",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "cb127dd1eee1fa247d0210b0acd91f17d3e2e441",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495",
-    "orbit360-platform/modules/cobros.js": "94db703a9232066d2284d5eebc6aac5b08b8009a",
+    "orbit360-platform/modules/cobros.js": "b03650daa42675a27a2e39b7b00e980bb66cd81b",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "dcb057e1a22b21ed5a02661033678dc1ccbd9c0d",
@@ -403,14 +403,19 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P16",
-    "reason": "SEPARATE_SESSION_BOOTSTRAP_FROM_AUTHENTICATED_COLD_DEEPLINK_TIMING",
-    "changedProductFiles": [],
+    "gate": "I6.5-B3-004-R14P1",
+    "reason": "HUMAN_REJECTION_CONTEXT_PDF_PERFORMANCE_CAUSAL_FIX",
+    "changedProductFiles": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/index.html"
+    ],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
-      "tools/gravicentra-i6-5-b3-004-contract.mjs"
+      "tools/gravicentra-i6-5-b3-004-contract.mjs",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
     ],
-    "productSourceChanged": false,
+    "productSourceChanged": true,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -1440,5 +1445,36 @@
     },
     "thresholdMs": 3000,
     "thresholdRelaxed": false
+  },
+  "b3004R14TargetedHumanRejection": {
+    "status": "TARGETED_HUMAN_REJECTED_REMEDIATION_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R14_TARGETED_HUMAN_REJECTION_CONTEXT_PDF_PERFORMANCE_20261001.json",
+    "receiptBlobSha": "e0740161d78bfe28fed615106c0022fa698dbc55",
+    "blockedBy": [
+      "POST_APPLY_RECEIPT_CONTEXT_LOSS",
+      "POST_RECONCILE_RECEIPT_CONTEXT_LOSS",
+      "HUMAN_COBROS_NAVIGATION_APPROX_5000MS",
+      "PDF_INLINE_PREVIEW_FAILURE"
+    ]
+  },
+  "b3004R14P1ContextPdfFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R14_TARGETED_HUMAN_REJECTION_CONTEXT_PDF_PERFORMANCE_20261001.json",
+    "receiptBlobSha": "e0740161d78bfe28fed615106c0022fa698dbc55",
+    "productBlobs": {
+      "orbit360-platform/modules/cobros.js": "b03650daa42675a27a2e39b7b00e980bb66cd81b",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "bae523edcea95df9e0711699f259c4b82ad77285",
+      "orbit360-platform/index.html": "af7479a8606911ab95f8cdef5ec4dd9dee2e7c39"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "29c35647bea9633be821bc0594ad05cf065de5b3",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "20209675ab47cfa7c5a733581aba7c4a8f00672d",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "a20577fb14cc7298213a967f44f690ecb2567ad9"
+    },
+    "performanceResidual": "HUMAN_APPROX_5000MS_PENDING_EXACT_REMEASUREMENT",
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
   }
 }

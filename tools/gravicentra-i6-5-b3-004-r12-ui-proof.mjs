@@ -15,6 +15,23 @@ const clean=v=>String(v==null?'':v).trim();
 const norm=v=>clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 const hash=v=>crypto.createHash('sha256').update(String(v||'')).digest('hex').slice(0,16);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function minimalPdfBuffer(){
+  const stream='BT\n/F1 18 Tf\n72 720 Td\n(Gravicentra QA PDF) Tj\nET\n';
+  const objects=[
+    '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',
+    '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n',
+    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n',
+    '4 0 obj\n<< /Length '+Buffer.byteLength(stream,'binary')+' >>\nstream\n'+stream+'endstream\nendobj\n',
+    '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n'
+  ];
+  let pdf='%PDF-1.4\n',offsets=[0];
+  for(const obj of objects){offsets.push(Buffer.byteLength(pdf,'binary'));pdf+=obj;}
+  const xref=Buffer.byteLength(pdf,'binary');
+  pdf+='xref\n0 '+(objects.length+1)+'\n0000000000 65535 f \n';
+  for(let i=1;i<=objects.length;i++)pdf+=String(offsets[i]).padStart(10,'0')+' 00000 n \n';
+  pdf+='trailer\n<< /Size '+(objects.length+1)+' /Root 1 0 R >>\nstartxref\n'+xref+'\n%%EOF\n';
+  return Buffer.from(pdf,'binary');
+}
 const privileged=new Set(['direccion','superadmin','super_admin','admintenant','admin_tenant','admin','operativo','finanzas']);
 const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId});
 const db=getFirestore(app),auth=getAuth(app),tenant=db.collection('tenants').doc(tenantId),root=tenant.collection('data');
@@ -231,8 +248,13 @@ try{
   },ids.receipt);
   proof.actionContext=actionContext;
   console.log('B3_004_R12_ACTION_CONTEXT='+JSON.stringify(actionContext));
+  await page.goto(directReceiptUrl,{waitUntil:'domcontentloaded'});
+  await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:15000});
+  await page.waitForSelector('[data-rp-detail-payment-action]',{timeout:15000});
+  const applyOrigin=await page.evaluate(()=>({hash:String(location.hash||''),receiptParam:String(window.Orbit?.route?.params?.r||''),detail:!!document.querySelector('[data-rp-receipt-detail="1"]')}));
+  need(applyOrigin.receiptParam===ids.receipt&&applyOrigin.detail===true,'B3_004_R14_APPLY_NOT_STARTED_FROM_RECEIPT_DETAIL:'+JSON.stringify(applyOrigin));
   const applyOpenStartedAt=Date.now();
-  await page.locator('button[data-cobros-action="apply"]').click();
+  await page.locator('[data-rp-detail-payment-action]').click();
   await page.waitForTimeout(350);
   const modalState=await page.evaluate(()=>({
     open:!!document.getElementById('cob-pay'),
@@ -304,7 +326,10 @@ try{
   proof.timing.applyPostWriteReadbackMs=Math.max(0,Date.now()-(paymentEvent?.at||applyStartedAt));
   proof.payment={cobroId:paid[0].id,paymentState:paid[0].paymentState||'',applicationState:paid[0].applicationState||'',paymentSupportDocumentRef:clean(paid[0].paymentSupportDocumentRef)};
 
-  await page.evaluate(({client,receipt})=>{location.hash='#/cliente360?c='+encodeURIComponent(client)+'&t=recibos&r='+encodeURIComponent(receipt);},{client:ids.client,receipt:ids.receipt});
+  await page.waitForTimeout(700);
+  const postApplyContext=await page.evaluate(()=>({hash:String(location.hash||''),receiptParam:String(window.Orbit?.route?.params?.r||''),detail:!!document.querySelector('[data-rp-receipt-detail="1"]'),cobrosPage:!!document.querySelector('[data-cobros-root]')}));
+  need(postApplyContext.receiptParam===ids.receipt&&postApplyContext.detail===true&&postApplyContext.cobrosPage===false,'B3_004_R14_POST_APPLY_CONTEXT_LOST:'+JSON.stringify(postApplyContext));
+  proof.postApplyContext=postApplyContext;proof.assertions.postApplyContextStable=true;
   await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:12000});
   const preReconcileReceipt=await page.evaluate(()=>{
     const detail=document.querySelector('[data-rp-receipt-detail="1"]');
@@ -312,11 +337,9 @@ try{
   });
   need(/Pendiente de conciliaci[oó]n/i.test(preReconcileReceipt.text)&&!/Cobro conciliado/i.test(preReconcileReceipt.text),'B3_004_R12P12_PREMATURE_RECONCILED_UI_STATE:'+JSON.stringify(preReconcileReceipt));
   proof.preReconcileReceipt=preReconcileReceipt;proof.assertions.paymentNotPrematurelyReconciled=true;
-  await page.evaluate(receipt=>{location.hash='#/cobros?qaReceipt='+encodeURIComponent(receipt);},ids.receipt);
-  await page.waitForSelector('[data-b3004-human-qa-mode="1"]',{timeout:12000});
-  await page.waitForSelector('button[data-cobros-action="reconcile"]',{timeout:12000});
+  await page.waitForFunction(()=>/Conciliar/i.test(String(document.querySelector('[data-rp-detail-payment-action]')?.textContent||'')),null,{timeout:12000});
   const reconcileOpenStartedAt=Date.now();
-  await page.locator('button[data-cobros-action="reconcile"]').click();
+  await page.locator('[data-rp-detail-payment-action]').click();
   await page.waitForSelector('#cob-conc');
   proof.timing.reconcileOpenMs=Date.now()-reconcileOpenStartedAt;
   const reconcileResponsive=await page.evaluate(()=>{
@@ -333,14 +356,14 @@ try{
   await page.fill('#cc-aplicacion','2026-09-30');
   await page.fill('#cc-numero','QA-R12-UI-001');
   const supportB={name:'B3-004-R12-soporte-B.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64')};
-  const invoiceFile={name:'B3-004-R12-factura.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/58BAQEDAQH/2x0AAAAASUVORK5CYII=','base64')};
+  const invoiceFile={name:'B3-004-R14-factura.pdf',mimeType:'application/pdf',buffer:minimalPdfBuffer()};
   const [supportBChooser]=await Promise.all([page.waitForEvent('filechooser'),page.click('#cc-pay-btn')]);
   await supportBChooser.setFiles(supportB);
   await page.waitForFunction(()=>document.querySelector('#cc-pay-name')?.textContent?.includes('B3-004-R12-soporte-B.png'));
   proof.assertions.browserReplacementSupportSelected=true;
   const [invoiceChooser]=await Promise.all([page.waitForEvent('filechooser'),page.click('#cc-btn')]);
   await invoiceChooser.setFiles(invoiceFile);
-  await page.waitForFunction(()=>document.querySelector('#cc-name')?.textContent?.includes('B3-004-R12-factura.png'));
+  await page.waitForFunction(()=>document.querySelector('#cc-name')?.textContent?.includes('B3-004-R14-factura.pdf'));
   proof.assertions.browserInvoiceSelected=true;
   const reconcileStartedAt=Date.now();
   await page.click('#cc-ok');
@@ -364,8 +387,12 @@ try{
   proof.assertions.browserSupportReplacedSameCobro=true;
   proof.assertions.browserInvoicePersisted=true;
   proof.assertions.singleCobroReadback=true;
+  await page.waitForTimeout(700);
+  const postReconcileContext=await page.evaluate(()=>({hash:String(location.hash||''),receiptParam:String(window.Orbit?.route?.params?.r||''),detail:!!document.querySelector('[data-rp-receipt-detail="1"]'),text:String(document.querySelector('[data-rp-receipt-detail="1"]')?.textContent||''),cobrosPage:!!document.querySelector('[data-cobros-root]')}));
+  need(postReconcileContext.receiptParam===ids.receipt&&postReconcileContext.detail===true&&postReconcileContext.cobrosPage===false&&/Cobro conciliado/i.test(postReconcileContext.text),'B3_004_R14_POST_RECONCILE_CONTEXT_LOST:'+JSON.stringify(postReconcileContext));
+  proof.postReconcileContext=postReconcileContext;proof.assertions.postReconcileContextStable=true;
   await page.reload({waitUntil:'domcontentloaded'});
-  await page.waitForSelector('[data-b3004-human-qa-mode="1"]');
+  await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:15000});
   const reloaded=await waitCobro(xs=>xs.length===1&&xs[0].applicationState==='APPLIED_DIRECT',12000);
   need(reloaded.length===1&&reloaded[0].id===paid[0].id,'B3_004_R12_RELOAD_SINGLE_COBRO_MISMATCH');
   need(clean(reloaded[0].paymentSupportDocumentRef)===clean(applied[0].paymentSupportDocumentRef),'B3_004_R12_PAYMENT_SUPPORT_NOT_DURABLE_AFTER_RELOAD');
@@ -416,13 +443,23 @@ try{
   proof.documentUi=documentUi;
   proof.assertions.browserDocumentControlsVisible=true;
 
-  const viewReadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveReadPreview/i.test(resp.url()),{timeout:15000});
+  const imageReadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveReadPreview/i.test(resp.url()),{timeout:15000});
   await page.click('[data-rp-document="payment_support"] [data-rp-document-view]');
-  const viewRead=await viewReadPromise;
-  need(viewRead.status()<400,'B3_004_R12P11_DOCUMENT_UI_VIEW_HTTP_FAILED:'+viewRead.status());
-  await page.waitForSelector('#rp-document-viewer [data-rp-doc-body] img, #rp-document-viewer [data-rp-doc-body] iframe',{timeout:15000});
-  proof.assertions.browserDocumentViewWorks=true;
+  const imageRead=await imageReadPromise;
+  need(imageRead.status()<400,'B3_004_R14_IMAGE_VIEW_HTTP_FAILED:'+imageRead.status());
+  await page.waitForSelector('#rp-document-viewer [data-rp-doc-body] img',{timeout:15000});
+  proof.assertions.browserImageInlinePreview=true;
   await page.click('#rp-document-viewer [data-rp-doc-close]');
+
+  const pdfReadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveReadPreview/i.test(resp.url()),{timeout:15000});
+  await page.click('[data-rp-document="insurer_invoice"] [data-rp-document-view]');
+  const pdfRead=await pdfReadPromise;
+  need(pdfRead.status()<400,'B3_004_R14_PDF_VIEW_HTTP_FAILED:'+pdfRead.status());
+  await page.waitForSelector('#rp-document-viewer [data-rp-pdf-preview="1"] object[type="application/pdf"]',{timeout:15000});
+  need(await page.locator('#rp-document-viewer [data-rp-pdf-open]').isVisible(),'B3_004_R14_PDF_FALLBACK_NOT_VISIBLE');
+  proof.assertions.browserPdfInlinePreview=true;
+  await page.click('#rp-document-viewer [data-rp-doc-close]');
+  proof.assertions.browserDocumentViewWorks=true;
 
   const downloadPromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360DocumentDriveDownloadPreview/i.test(resp.url()),{timeout:15000});
   await page.click('[data-rp-document="payment_support"] [data-rp-document-download]');

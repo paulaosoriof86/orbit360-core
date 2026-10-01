@@ -1,0 +1,61 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R14_TARGETED_HUMAN_REJECTION_V1",
+  "recordedAt": "2026-10-01",
+  "findingId": "B3-004",
+  "status": "TARGETED_HUMAN_REJECTED_REMEDIATION_REQUIRED",
+  "rejectedCandidate": {
+    "sourceSha": "ed367c940122634fecbb0c04193e598c0d043f9b",
+    "buildId": "gi-i65-b3-ed367c940122-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36912945250-w7z40mns.web.app",
+    "runId": 36912945250,
+    "artifactId": 11188940341,
+    "artifactDigest": "4eee83c1d5a0f054a5c40bb117b59e82f860f96eb79a9c9205b0fa84e81ed87d"
+  },
+  "humanEvidence": {
+    "cobrosOpenApproxMs": 5000,
+    "postApply": "Receipt remained visible briefly, then Cobros/list renderer replaced the active receipt context.",
+    "postReconcile": "Receipt remained visible briefly, then Cobros/list renderer replaced the active receipt context.",
+    "documentsPersisted": true,
+    "imagesInlinePreview": true,
+    "pdfInlinePreview": false,
+    "downloads": true,
+    "pdfVisibleError": "Browser embedded PDF surface reported an error loading the PDF."
+  },
+  "causalFindings": [
+    {
+      "id": "B3-004-R14-A",
+      "classification": "PRODUCT_RUNTIME_SECOND_RENDER_OWNER",
+      "rootCause": "modules/cobros.js scheduled a global Cobros render 350ms after successful payment/reconciliation even when the active route remained the Cliente360 receipt deep-link.",
+      "remediation": "Remove the delayed global second-writer and leave post-write refresh to the router/store reactive owner plus the direct receipt projection."
+    },
+    {
+      "id": "B3-004-R14-B",
+      "classification": "PRODUCT_DOCUMENT_PREVIEW_PRESENTATION_DEFECT_PLUS_QA_GAP",
+      "rootCause": "Receipt document view sent every non-image, including PDFs, through a generic blob iframe; automated proof uploaded PNG fixtures and only asserted that an iframe/image element existed, so it did not exercise PDF rendering.",
+      "remediation": "Add an explicit validated PDF preview path with bounded secure data source and visible top-level fallback, and make the browser proof upload/open an actual PDF."
+    },
+    {
+      "id": "B3-004-R14-C",
+      "classification": "HUMAN_PERFORMANCE_RESIDUAL_PENDING_DISCRIMINANT",
+      "observation": "Cobros/Cartera opens in approximately 5 seconds in the human session.",
+      "disposition": "Keep blocking under B3-004 and remeasure exact authenticated navigation after the causal context/PDF fix; do not reopen B3-002 or mutate performance source without a discriminant."
+    }
+  ],
+  "preservedPass": [
+    "PAYMENT_AND_RECONCILIATION_WRITES_PERSIST",
+    "DOCUMENT_PERSISTENCE",
+    "IMAGE_INLINE_PREVIEW",
+    "DOCUMENT_DOWNLOAD",
+    "SINGLE_PAYMENT_FLOW",
+    "PAYMENT_STATE_VISIBLE",
+    "B3_008_KPI_FINDING_PRESERVED",
+    "B4_001_B4_002_PRESERVED"
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false,
+    "b4": false
+  }
+}

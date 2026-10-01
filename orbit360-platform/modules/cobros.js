@@ -10,6 +10,7 @@ Orbit.modules.cobros = (function () {
   let searchTimer = null;
   let baseCache = null;
   const PAGE_SIZE = 60;
+  const PAYMENT_CONTEXT_REFRESH_OWNER = 'ROUTER_STORE_REACTIVE_AND_RECEIPT_PROJECTION';
   const STATE_FILTER_OPTIONS = ['Pagado','Pendiente','Vencido','Pago registrado en SIGA','Por conciliar','Reportado por asesor','Reportado por cliente','Conciliado','Requiere validación','Bloqueado','Anulado'];
   function activeRoleNorm(){try{return String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');}catch(e){return'';}}
   function advisorRole(){return ['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial'].includes(activeRoleNorm());}
@@ -635,7 +636,7 @@ Orbit.modules.cobros = (function () {
           applicationEvidenceType:'MANUAL_RECONCILIATION'
         }});
         close(); U.toast(saved&&saved.documentLifecycleOk===false?'✓ Pago conciliado. Un documento quedó en recuperación controlada.':'✓ Pago conciliado y datos actualizados');
-        baseCache=null;setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
+        baseCache=null;/* B3-004 R14: router/store reactive owner preserves the active payment context. */
       } catch(error) {
         console.error('[Gravicentra][Cobros] Aplicación falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},receiptId:receipt.id||''});
         btn.disabled=false;btn.textContent='Guardar aplicación';pm.removeAttribute('aria-busy');if(state)state.textContent='No se guardaron cambios.';
@@ -678,7 +679,7 @@ Orbit.modules.cobros = (function () {
           note:pm.querySelector('#ra-note').value.trim()
         }});
         close();U.toast(reported&&reported.documentLifecycleOk===false?'✓ Pago reportado. El soporte quedó en recuperación controlada.':'✓ Pago reportado y enviado a Ops para validación');
-        baseCache=null;setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
+        baseCache=null;/* B3-004 R14: router/store reactive owner preserves the active payment context. */
       }catch(error){btn.disabled=false;U.toast('No fue posible enviar el reporte de pago a Ops.');}
     };
   }
@@ -699,7 +700,7 @@ Orbit.modules.cobros = (function () {
         paymentSupportDocumentRef:c.paymentSupportDocumentRef||receipt.paymentSupportDocumentRef||''
       }});
       U.toast('✓ Pago reportado aplicado');baseCache=null;
-      setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
+      /* B3-004 R14: router/store reactive owner preserves the active payment context. */
     } catch(error) {
       U.toast('No fue posible aplicar el pago reportado.');
     }
@@ -760,7 +761,7 @@ Orbit.modules.cobros = (function () {
         const docsOk=!(applied&&applied.documentLifecycleOk===false);
         close();U.toast(docsOk?'✓ Pago registrado':'✓ Pago registrado. Un documento quedó en recuperación controlada.');baseCache=null;
         if(docsOk&&avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
-        setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
+        /* B3-004 R14: router/store reactive owner preserves the active payment context. */
       }catch(error){console.error('[Gravicentra][Cobros] Registrar pago falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},cobroId:c.id||'',receiptId:receipt.id||''});btn.disabled=false;btn.textContent='Registrar pago';pm.removeAttribute('aria-busy');if(state)state.textContent='No se guardaron cambios.';U.toast(isPreviewHost()?'La prueba Preview no fue aceptada por el servidor. No se guardaron cambios.':'No fue posible registrar el pago. No se guardaron cambios.');}
     };
   }

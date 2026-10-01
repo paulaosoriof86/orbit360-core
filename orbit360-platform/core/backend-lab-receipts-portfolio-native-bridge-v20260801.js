@@ -194,7 +194,17 @@
     var out=await provider.resolve(ref,ctx),body=back.querySelector('[data-rp-doc-body]');
     if(!out||out.ok!==true||!out.previewUrl){body.innerHTML='<div class="muted">No fue posible abrir este documento. Puedes intentar descargarlo.</div>';return false;}
     blobUrl=out.previewUrl;var mime=clean(out.mimeType).toLowerCase();
-    body.innerHTML=mime.indexOf('image/')===0?'<img src="'+esc(blobUrl)+'" alt="'+esc(label)+'" style="max-width:100%;max-height:100%;object-fit:contain">':'<iframe src="'+esc(blobUrl)+'" title="'+esc(label)+'" style="border:0;width:100%;height:100%;min-height:60dvh"></iframe>';
+    if(mime.indexOf('image/')===0){body.innerHTML='<img src="'+esc(blobUrl)+'" alt="'+esc(label)+'" style="max-width:100%;max-height:100%;object-fit:contain">';return true;}
+    if(mime==='application/pdf'){
+      var b64=String(out.base64||'').replace(/\s+/g,''),signature='';
+      try{signature=b64?atob(b64.slice(0,16)):'';}catch(e){signature='';}
+      if(signature.indexOf('%PDF-')!==0){body.innerHTML='<div class="muted">El archivo se guardó, pero no tiene una estructura PDF válida para vista previa. Puedes descargarlo para revisarlo.</div>';return false;}
+      var inlineSrc=b64.length&&b64.length<=7000000?'data:application/pdf;base64,'+b64:blobUrl;
+      body.innerHTML='<div data-rp-pdf-preview="1" style="width:100%;height:100%;min-height:60dvh;display:flex;flex-direction:column;gap:8px"><object data="'+esc(inlineSrc)+'" type="application/pdf" style="border:0;width:100%;flex:1;min-height:54dvh"><div class="muted">El visor integrado no pudo mostrar el PDF.</div></object><div style="display:flex;justify-content:flex-end"><button class="btn ghost sm" type="button" data-rp-pdf-open>Abrir PDF en una pestaña</button></div></div>';
+      var openPdf=body.querySelector('[data-rp-pdf-open]');if(openPdf)openPdf.onclick=function(){try{window.open(blobUrl,'_blank','noopener,noreferrer');}catch(e){}};
+      return true;
+    }
+    body.innerHTML='<iframe src="'+esc(blobUrl)+'" title="'+esc(label)+'" style="border:0;width:100%;height:100%;min-height:60dvh"></iframe>';
     return true;
   }
   function wireReceiptDocuments(target,r,p,c){
