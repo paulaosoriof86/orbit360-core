@@ -220,6 +220,7 @@ try{
   await page.waitForSelector('button[data-cobros-action="reconcile"]',{timeout:12000});
   await page.locator('button[data-cobros-action="reconcile"]').click();
   await page.waitForSelector('#cob-conc');
+  const reconcileTransportStart=proof.transportEvents.length;
   await page.fill('#cc-aplicacion','2026-09-30');
   await page.fill('#cc-numero','QA-R12-UI-001');
   const supportB={name:'B3-004-R12-soporte-B.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64')};
@@ -237,6 +238,15 @@ try{
   need(applied[0].id===paid[0].id,'B3_004_R12_RECONCILE_CREATED_DIFFERENT_COBRO');
   need(clean(applied[0].paymentSupportDocumentRef)!==clean(paid[0].paymentSupportDocumentRef),'B3_004_R12_REPLACEMENT_SUPPORT_REF_DID_NOT_CHANGE');
   need(clean(applied[0].invoiceDocumentRef),'B3_004_R12_INVOICE_REF_MISSING_AFTER_UI_UPLOAD');
+  await page.waitForSelector('#cob-conc',{state:'detached',timeout:20000});
+  await page.waitForTimeout(250);
+  const reconcileTransport=proof.transportEvents.slice(reconcileTransportStart);
+  const reconcileUploads=reconcileTransport.filter(x=>x.kind==='response'&&/DocumentDriveUploadPreview/i.test(x.fn));
+  const reconcileFinalizes=reconcileTransport.filter(x=>x.kind==='response'&&/DocumentDriveFinalizePreview/i.test(x.fn));
+  proof.reconcileTransport={events:reconcileTransport,uploadSuccess:reconcileUploads.filter(x=>x.httpStatus<400&&x.ok===true&&!x.errorStatus).length,finalizeSuccess:reconcileFinalizes.filter(x=>x.httpStatus<400&&x.ok===true&&!x.errorStatus).length};
+  console.log('B3_004_R12_RECONCILE_DOCUMENT_LIFECYCLE='+JSON.stringify(proof.reconcileTransport));
+  need(proof.reconcileTransport.uploadSuccess===2,'B3_004_R12_RECONCILE_EXPECTED_TWO_SUCCESSFUL_UPLOADS:'+JSON.stringify(proof.reconcileTransport));
+  need(proof.reconcileTransport.finalizeSuccess===2,'B3_004_R12_RECONCILE_EXPECTED_TWO_SUCCESSFUL_FINALIZES:'+JSON.stringify(proof.reconcileTransport));
   proof.assertions.browserReconcileSamePayment=true;
   proof.assertions.browserSupportReplacedSameCobro=true;
   proof.assertions.browserInvoicePersisted=true;

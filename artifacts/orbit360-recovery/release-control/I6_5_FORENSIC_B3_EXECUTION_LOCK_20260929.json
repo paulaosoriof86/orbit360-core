@@ -683,6 +683,12 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P4_DOCUMENT_READBACK_DIAGNOSTIC_20261001.json",
       "blobSha": "7496453a5f15e3c0a82cb560a5b3cd2701d517f6",
       "productSourceChanged": false
+    },
+    "r12p10p5HarnessFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P5_FINALIZE_BEFORE_RELOAD_HARNESS_FIX_20261001.json",
+      "blobSha": "4c8a11549fc6418f269137fb58a98acc6284b85d",
+      "rootCause": "HARNESS_RELOADED_AFTER_FIRESTORE_RECONCILIATION_READBACK_BEFORE_SEQUENTIAL_DOCUMENT_FINALIZATION_COMPLETED_ABORTING_SECOND_INVOICE_FINALIZE",
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -692,7 +698,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "41cbf891cedaae996ff01af4d6207ad8f47b5fd5"
+    "blobSha": "67e75a5cd1fc71300845f250129ceb9d1360a066"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -887,7 +893,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "36ff32e6ba387da770efe8f2addbcbb30b64b4ae"
+    "blobSha": "aff7c8ee4c0bc8780eff730a1a4b2379cbf3f3c2"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -1096,6 +1102,19 @@
     "blobSha": "7496453a5f15e3c0a82cb560a5b3cd2701d517f6",
     "compositionLockBlobSha": "36ff32e6ba387da770efe8f2addbcbb30b64b4ae",
     "findingsLedgerBlobSha": "41cbf891cedaae996ff01af4d6207ad8f47b5fd5",
+    "productSourceChanged": false,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p10p5HarnessFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P5_FINALIZE_BEFORE_RELOAD_HARNESS_FIX_20261001.json",
+    "blobSha": "4c8a11549fc6418f269137fb58a98acc6284b85d",
+    "compositionLockBlobSha": "aff7c8ee4c0bc8780eff730a1a4b2379cbf3f3c2",
+    "findingsLedgerBlobSha": "67e75a5cd1fc71300845f250129ceb9d1360a066",
+    "rootCause": "HARNESS_RELOADED_AFTER_FIRESTORE_RECONCILIATION_READBACK_BEFORE_SEQUENTIAL_DOCUMENT_FINALIZATION_COMPLETED_ABORTING_SECOND_INVOICE_FINALIZE",
     "productSourceChanged": false,
     "noOperationalBusinessWrites": true,
     "noReimport": true,

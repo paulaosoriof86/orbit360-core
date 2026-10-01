@@ -403,8 +403,8 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P10P4",
-    "reason": "POST_RELOAD_DOCUMENT_READBACK_DIAGNOSTIC_ONLY",
+    "gate": "I6.5-B3-004-R12P10P5",
+    "reason": "HARNESS_RELOAD_RACED_SEQUENTIAL_DOCUMENT_FINALIZE",
     "changedProductFiles": [],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
@@ -1113,6 +1113,20 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "3a46ae58260a2009e78b4a719be20eca3fdc3cef",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "b411a6e611b08ecaab6de1c779b38bf1b57123a8"
+    },
+    "productSourceChanged": false
+  },
+  "b3004R12P10P5FinalizeBeforeReloadHarnessFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36856172795,
+    "failedJobId": 110349248070,
+    "rootCause": "HARNESS_RELOADED_AFTER_FIRESTORE_RECONCILIATION_READBACK_BEFORE_SEQUENTIAL_DOCUMENT_FINALIZATION_COMPLETED_ABORTING_SECOND_INVOICE_FINALIZE",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P5_FINALIZE_BEFORE_RELOAD_HARNESS_FIX_20261001.json",
+    "receiptBlobSha": "4c8a11549fc6418f269137fb58a98acc6284b85d",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "5970ff456240df4e15e3bc664a081eb6e6559c10",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "fd9a88d8e605dfd7f85ec9075bc16434818c6e21"
     },
     "productSourceChanged": false
   }

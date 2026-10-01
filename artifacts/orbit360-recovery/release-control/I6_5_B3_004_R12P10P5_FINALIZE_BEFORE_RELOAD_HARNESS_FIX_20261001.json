@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P10P5_FINALIZE_BEFORE_RELOAD_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "fced77262aa16cdb42b0f9371ad02e22d773769a",
+  "failedRunId": 36856172795,
+  "failedJobId": 110349248070,
+  "classification": "QA_HARNESS_RACE",
+  "rootCause": "HARNESS_RELOADED_AFTER_FIRESTORE_RECONCILIATION_READBACK_BEFORE_SEQUENTIAL_DOCUMENT_FINALIZATION_COMPLETED_ABORTING_SECOND_INVOICE_FINALIZE",
+  "evidence": {
+    "paymentReadAfterReload": true,
+    "invoiceReadAfterReload": false,
+    "invoiceReadHttpStatus": 403,
+    "invoiceReadError": "El documento no pertenece al expediente autorizado.",
+    "productClientFinalizesStagedDocumentsSequentially": true,
+    "priorHarnessReloadedOnFirestoreCobroStateWithoutWaitingUiCommandCompletion": true
+  },
+  "remediation": {
+    "waitForReconcileModalDetachedBeforeReload": true,
+    "requireTwoSuccessfulUiUploads": true,
+    "requireTwoSuccessfulUiFinalizes": true,
+    "retainPostReloadDriveReadback": true,
+    "productSourceChanged": false
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "5970ff456240df4e15e3bc664a081eb6e6559c10",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "fd9a88d8e605dfd7f85ec9075bc16434818c6e21"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

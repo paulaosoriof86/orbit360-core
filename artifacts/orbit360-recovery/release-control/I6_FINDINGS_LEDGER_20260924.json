@@ -1772,6 +1772,14 @@
         "compositionLockBlobSha": "36ff32e6ba387da770efe8f2addbcbb30b64b4ae",
         "classification": "QA_DIAGNOSTIC_ONLY",
         "productSourceChanged": false
+      },
+      "r12p10p5HarnessFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P5_FINALIZE_BEFORE_RELOAD_HARNESS_FIX_20261001.json",
+        "blobSha": "4c8a11549fc6418f269137fb58a98acc6284b85d",
+        "compositionLockBlobSha": "aff7c8ee4c0bc8780eff730a1a4b2379cbf3f3c2",
+        "classification": "QA_HARNESS_RACE",
+        "rootCause": "HARNESS_RELOADED_AFTER_FIRESTORE_RECONCILIATION_READBACK_BEFORE_SEQUENTIAL_DOCUMENT_FINALIZATION_COMPLETED_ABORTING_SECOND_INVOICE_FINALIZE",
+        "productSourceChanged": false
       }
     },
     {

@@ -265,6 +265,8 @@ need(documentDomain.includes("authorizeTarget(request,tenantId,input,'write',pre
 console.log('B3_004_R12P10P3_EXACT_DOCUMENT_QA_SCOPE_CONTRACT=PASS');
 need(uiProofR12.includes('B3_004_R12_DOCUMENT_READBACK=')&&uiProofR12.includes('paymentResult')&&uiProofR12.includes('invoiceResult')&&uiProofR12.includes('readTransportStart'),'B3_004_R12P10P4_DOCUMENT_READBACK_DIAGNOSTIC_MISSING');
 console.log('B3_004_R12P10P4_DOCUMENT_READBACK_DIAGNOSTIC_CONTRACT=PASS');
+need(uiProofR12.includes("waitForSelector('#cob-conc',{state:'detached'")&&uiProofR12.includes('B3_004_R12_RECONCILE_DOCUMENT_LIFECYCLE=')&&uiProofR12.includes('B3_004_R12_RECONCILE_EXPECTED_TWO_SUCCESSFUL_UPLOADS')&&uiProofR12.includes('B3_004_R12_RECONCILE_EXPECTED_TWO_SUCCESSFUL_FINALIZES'),'B3_004_R12P10P5_RELOAD_RACE_GUARD_MISSING');
+console.log('B3_004_R12P10P5_DOCUMENT_FINALIZE_BEFORE_RELOAD_CONTRACT=PASS');
 need(crmBridgeR9.includes('function exactB3004QaScopeBypass(target)')&&crmBridgeR9.includes("target.collection!=='recibosEsperados'")&&crmBridgeR9.includes("record.__syntheticHumanQa===true")&&crmBridgeR9.includes("String(record.__syntheticGate||'')==='B3-004-R12'"),'B3_004_R12P9_EXACT_QA_SCOPE_BYPASS_GUARD_MISSING');
 need(crmBridgeR9.includes("if(target&&!exactB3004QaScopeBypass(target)&&!A.canView(target.collection,target.record,'cobros'))"),'B3_004_R12P9_PAYMENT_SCOPE_WRAPPER_STILL_BLOCKS_EXACT_QA');
 need(crmBridgeR9.includes("if(permission&&!A.can('cobros',permission))"),'B3_004_R12P9_PERMISSION_GUARD_RELAXED');
