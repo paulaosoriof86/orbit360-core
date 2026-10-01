@@ -228,14 +228,18 @@ function buildSelection({ tenantId, caseId, comparisonSetId, proposalId, selecti
   const required = {tenantId,caseId,comparisonSetId,proposalId,selectionRequestKey};
   const missing = Object.entries(required).filter(([,v]) => !clean(v,300)).map(([k]) => k);
   if (missing.length) return { ok:false, code:'SELECTION_REQUIRED_FIELDS', missing };
-  const selectionId = stableId('sel', [tenantId,caseId,comparisonSetId,proposalId,selectionRequestKey]);
+  const normalizedTenantId = clean(tenantId,180);
+  const normalizedCaseId = clean(caseId,180);
+  const selectionRequestId = stableId('selreq', [normalizedTenantId,normalizedCaseId,clean(selectionRequestKey,320)]);
+  const selectionId = stableId('sel', [normalizedTenantId,normalizedCaseId,selectionRequestId]);
   return {
     ok:true,
     value:{
       schemaVersion: VERSION,
-      tenantId: clean(tenantId,180),
+      tenantId: normalizedTenantId,
       selectionId,
-      caseId: clean(caseId,180),
+      selectionRequestId,
+      caseId: normalizedCaseId,
       comparisonSetId: clean(comparisonSetId,180),
       proposalId: clean(proposalId,180),
       explicitUserChoice: true,
