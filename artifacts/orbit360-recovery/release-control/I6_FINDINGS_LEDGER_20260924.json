@@ -2277,7 +2277,13 @@
       ],
       "semanticProvenanceSourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R4_SEMANTIC_PROVENANCE_SOURCE_FIX_20261001.json",
       "semanticProvenanceSourceFixReceiptBlobSha": "4c214810a3897bab60fb757add6cbbf69fc3bca9",
-      "compositionLockBlobSha": "dd3d1856167919dcc418a122c6ecbe997aa65636"
+      "compositionLockBlobSha": "3d843f77ce56f66b02e0f2878a46d4ab2c843be8",
+      "r4p1CompositionBlockBindingRepair": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R4P1_COMPOSITION_BLOCK_BINDING_REPAIR_20261001.json",
+        "blobSha": "6c10b68b1b6bedb368d6b31d9f3621b9225510c1",
+        "status": "QA_GOVERNANCE_MECHANISM_REPAIRED_PENDING_EXACT_PREVIEW",
+        "productSourceChanged": false
+      }
     },
     {
       "id": "B3-006",
@@ -5887,7 +5893,7 @@
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "c310388a85374f1aeea4d2ca42a564f96c5a3a64",
+    "compositionLockBlobSha": "3d843f77ce56f66b02e0f2878a46d4ab2c843be8",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
