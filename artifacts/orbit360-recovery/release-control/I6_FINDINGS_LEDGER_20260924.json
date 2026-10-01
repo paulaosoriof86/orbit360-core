@@ -850,7 +850,13 @@
       "residualColdDecision": "NO_ADDITIONAL_COBROS_SOURCE_CHANGE_BEFORE_TARGETED_HUMAN_PROOF",
       "targetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_TARGETED_VISUAL_PERFORMANCE_PASS_20260929.json",
       "humanAcceptance": "PASS",
-      "closedAt": "2026-09-30T01:14:00Z"
+      "closedAt": "2026-09-30T01:14:00Z",
+      "postB3005HumanPerformanceObservation": {
+        "recordedAt": "2026-10-01",
+        "receiptDetailApproxSeconds": 6,
+        "cobrosListApproxSeconds": 4,
+        "disposition": "OBSERVE_NO_REOPEN_WITHOUT_CAUSAL_REGRESSION"
+      }
     },
     {
       "id": "B3-003",
@@ -2151,7 +2157,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "TARGETED_HUMAN_REJECTED_SOURCE_REMEDIATION_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "businessRulesFrozen": true,
@@ -2167,8 +2173,8 @@
       "paymentLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
       "entryBlockedBy": null,
       "entryUnblockedBy": "B3-004 CLOSED_PASS",
-      "nextAction": "B3_005_TARGETED_HUMAN_VISUAL",
-      "productMutationAuthorized": false,
+      "nextAction": "B3_005_SEMANTIC_PROVENANCE_SOURCE_FIX",
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
@@ -2198,7 +2204,7 @@
         ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "cf030cd04bae80c3382132bc5f29ed0bdd5b6897"
       },
       "configMutationAuthorized": false,
-      "machineProofInvalidatedBySourceChange": false,
+      "machineProofInvalidatedBySourceChange": true,
       "currentCandidateEligibleForPromotion": false,
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_SOURCE_CONTRACT_PASS_20261001.json",
       "sourceContractReceiptBlobSha": "050a2fb2d174d2f9e6212ec7c5a53ecd3a9f24e2",
@@ -2258,7 +2264,15 @@
         "productSourceChanged": false
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_MACHINE_PASS_20261001.json",
-      "machineProofReceiptBlobSha": "0ba1ec5e047d18f1add881a8c05f0d43a9477ece"
+      "machineProofReceiptBlobSha": "0ba1ec5e047d18f1add881a8c05f0d43a9477ece",
+      "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_REJECTION_SEMANTIC_PROVENANCE_20261001.json",
+      "visualRejectionReceiptBlobSha": "cfffbce486fd132842c0a3569f1e3a0c8ceec136",
+      "visualRootCause": "UI_STATE_LABELS_EVALUATE_RECONCILIATION_BEFORE_PAYMENT_PROVENANCE_SO_PAID_INFERRED_COLLAPSES_INTO_CONCILIADO",
+      "authorizedVisualRemediationFiles": [
+        "orbit360-platform/modules/cobros.js",
+        "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "tools/gravicentra-i6-5-b3-005-contract.mjs"
+      ]
     },
     {
       "id": "B3-006",
@@ -2316,6 +2330,15 @@
             "Cobros KPI reality also questioned; diagnose authority/denominators without fixing inside B3-004"
           ],
           "disposition": "PRESERVE_FOR_B3_008_AUTHORITY_DIAGNOSTIC"
+        },
+        {
+          "recordedAt": "2026-10-01",
+          "source": "B3-005 targeted human validation",
+          "evidence": [
+            "Recibos/Cobros visible values do not reconcile with five installments already paid/inferred/conciliated.",
+            "Preserve KPI reality discrepancy outside B3-005 unless a causal dependency is demonstrated."
+          ],
+          "disposition": "PRESERVE_FOR_B3_008_KPI_REALITY"
         }
       ]
     },
@@ -5853,7 +5876,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_005_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "B3_005_TARGETED_HUMAN_REJECTED_SOURCE_REMEDIATION_AUTHORIZED",
     "activeFindingId": "B3-005",
     "priorFindingId": "B3-004",
     "priorFindingStatus": "CLOSED_PASS",
@@ -5882,6 +5905,7 @@
     "r3CompositionExactSetRepairBlobSha": "83ff0f9b7ee0bed8be80467a39919404dc11272f",
     "r3p1FullTreeCompositionRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3P1_FULL_TREE_COMPOSITION_REPAIR_20261001.json",
     "r3p1FullTreeCompositionRepairBlobSha": "1d336d3d9339da82be8147332a1e9d963441353c",
-    "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_MACHINE_PASS_20261001.json"
+    "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_MACHINE_PASS_20261001.json",
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_REJECTION_SEMANTIC_PROVENANCE_20261001.json"
   }
 }
