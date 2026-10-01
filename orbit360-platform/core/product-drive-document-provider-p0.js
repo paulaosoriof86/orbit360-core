@@ -17,6 +17,7 @@
     catch (_) { return ''; }
   };
   const isPreview = () => /--/.test(String(location.hostname || ''));
+  const stagedByRef = new Map();
   const state = {
     probed: false,
     probing: null,
@@ -177,10 +178,13 @@
     let base64;
     try { base64 = await toBase64(file); }
     catch (error) { return { ok: false, status: /TOO_LARGE/.test(String(error && error.message)) ? 'archivo_demasiado_grande' : 'lectura_fallida', message: /TOO_LARGE/.test(String(error && error.message)) ? 'El archivo supera el límite de 15 MB.' : 'No fue posible leer el archivo.' }; }
-    const payload = Object.assign(requestBase(extra), { name: file.name || (extra && extra.nombre) || 'Documento', mimeType: file.type || 'application/octet-stream', size: file.size || 0, base64, provisional: !!(extra && extra.provisional) });
+    const autoStage = !!(extra && String(extra.sourceModule || '').toLowerCase() === 'cobros');
+    const payload = Object.assign(requestBase(extra), { name: file.name || (extra && extra.nombre) || 'Documento', mimeType: file.type || 'application/octet-stream', size: file.size || 0, base64, provisional: !!(extra && extra.provisional) || autoStage });
     try {
       const out = await call(names.upload, payload, names.region);
       if (!out || out.ok !== true || !(out.documentRef || out.driveUrl || out.externalUrl)) return Object.assign({ ok: false, status: 'sin_readback', message: 'Drive no confirmó el documento.' }, out || {});
+      const ref = driveFileId(out);
+      if (ref && out.provisional === true) stagedByRef.set(ref, Object.assign({}, extra || {}, { clientFolderId: out.clientFolderId || '', stagingFolderId: out.stagingFolderId || out.folderId || '', documentRef: ref }));
       return out;
     } catch (error) {
       const raw = String(error && (error.code || error.message) || '');
@@ -220,12 +224,18 @@
     }
   }
 
+  function lifecycleExtra(ref, extra) {
+    const id = driveFileId(ref), staged = id ? stagedByRef.get(id) : null;
+    return Object.assign({}, staged || {}, extra || {});
+  }
   async function finalize(ref, extra) {
     const id = driveFileId(ref);
     if (!id) return { ok: false, status: 'sin_referencia' };
-    const names = callableNames();
+    const ctx = lifecycleExtra(id, extra), names = callableNames();
     try {
-      return await call(names.finalize, Object.assign(requestBase(extra), { documentRef: id, clientFolderId: String(extra && extra.clientFolderId || ''), stagingFolderId: String(extra && extra.stagingFolderId || '') }), names.region);
+      const out = await call(names.finalize, Object.assign(requestBase(ctx), { documentRef: id, clientFolderId: String(ctx.clientFolderId || ''), stagingFolderId: String(ctx.stagingFolderId || '') }), names.region);
+      if (out && out.ok === true) stagedByRef.delete(id);
+      return out;
     } catch (error) {
       return { ok: false, status: 'finalize_failed', code: String(error && (error.code || error.message) || '') };
     }
@@ -233,16 +243,21 @@
   async function quarantine(ref, extra) {
     const id = driveFileId(ref);
     if (!id) return { ok: true, status: 'nothing_to_quarantine' };
-    const names = callableNames();
+    const ctx = lifecycleExtra(id, extra), names = callableNames();
     try {
-      return await call(names.quarantine, Object.assign(requestBase(extra), { documentRef: id, clientFolderId: String(extra && extra.clientFolderId || ''), stagingFolderId: String(extra && extra.stagingFolderId || '') }), names.region);
+      const out = await call(names.quarantine, Object.assign(requestBase(ctx), { documentRef: id, clientFolderId: String(ctx.clientFolderId || ''), stagingFolderId: String(ctx.stagingFolderId || '') }), names.region);
+      if (out && out.ok === true) stagedByRef.delete(id);
+      return out;
     } catch (error) {
       return { ok: false, status: 'quarantine_failed', code: String(error && (error.code || error.message) || '') };
     }
   }
+  function pendingDocument(ref) {
+    const id=driveFileId(ref); return id && stagedByRef.has(id) ? Object.assign({}, stagedByRef.get(id)) : null;
+  }
 
   const provider = {
-    resolve, download, upload, finalize, quarantine, connect, bootstrap,
+    resolve, download, upload, finalize, quarantine, pendingDocument, connect, bootstrap,
     uploadStatus: () => {
       const stale = Date.now() - state.lastProbeAt > 30000;
       if (!state.probing && (!state.probed || stale)) setTimeout(() => probe(true), 0);
@@ -270,8 +285,8 @@
   document.addEventListener('orbit:active-role-changed', () => { state.probed = false; probe(true); });
 
   Orbit.productDriveDocumentProviderP0 = Object.freeze({
-    VERSION: 'b3-004-r10-20260930.2-payment-expedient-binding',
-    connect, bootstrap, probe, upload, finalize, quarantine, resolve, download,
+    VERSION: 'b3-004-r10-20260930.3-payment-staged-lifecycle',
+    connect, bootstrap, probe, upload, finalize, quarantine, pendingDocument, resolve, download,
     status: () => Object.assign({}, state.status),
     previewIsolated: isPreview(),
     oauthDelegated: false,
