@@ -72,6 +72,8 @@ const tenant=read('functions/tenant-domain-config.js');
 const client=read('orbit360-platform/core/cobros-reconciliation-domain-client.js');
 const cobrosUi=read('orbit360-platform/modules/cobros.js');
 const receiptUi=read('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js');
+new Function(cobrosUi);
+new Function(receiptUi);
 const lock=JSON.parse(read('artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json'));
 need(server.includes("reconcile_evidence")&&server.includes("planEvidence")&&server.includes("AUTO_COMMITTED_HIGH_CONFIDENCE"),'B3_005_SERVER_OWNER_MISSING');
 need(server.includes("inferenceProvenance")&&server.includes("APPLIED_INFERRED")&&server.includes("deterministicCobroId"),'B3_005_INFERENCE_PROVENANCE_IDEMPOTENCY_MISSING');
