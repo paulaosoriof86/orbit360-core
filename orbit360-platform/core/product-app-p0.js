@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-clean-20261001.b3004r12p12';
+  var VERSION='fase-a-i2-clean-20261001.b3004r12p14';
   var state={initialized:false,activating:false,started:false,routerStarted:false,tenantContextReady:false,operationalWriteReady:false,lastError:''};
   var activationPromise=null;
 
@@ -76,6 +76,10 @@
       if(!result||result.ok!==true||result.ready!==true||result.writeAuthorized!==false)throw new Error('PRODUCT_READONLY_BOOTSTRAP_NOT_READY');
       var ps=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
       if(ps.ready!==true||ps.status!=='ready-read-only'||ps.noFallback!==true||ps.writeEnabled!==false)throw new Error('PRODUCT_STORE_NOT_READY');
+
+      // Non-blocking overlap: critical Cliente360/Cobros dependencies begin loading
+      // while tenant/session owners finish activation. They remain optional for startup.
+      prewarmCriticalRoutes();
 
       var tenantBridge=Orbit.productTenantRuntimeContextP0;
       if(!tenantBridge||typeof tenantBridge.install!=='function')throw new Error('PRODUCT_TENANT_CONTEXT_BRIDGE_MISSING');

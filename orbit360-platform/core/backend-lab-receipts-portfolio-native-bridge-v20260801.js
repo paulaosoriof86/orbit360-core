@@ -439,13 +439,13 @@
         OrbitRuntimeDiagnostics.directReceiptHydration={status:'opened',clientId:cid,receiptId:receiptId,attempts:attempts,elapsedMs:Math.max(0,((w.performance&&performance.now)?performance.now():Date.now())-started),writes:0};
         return;
       }
-      if(attempts>=60){
+      if(attempts>=150){
         if(directReceiptTimer){clearInterval(directReceiptTimer);directReceiptTimer=null;}
         w.OrbitRuntimeDiagnostics=w.OrbitRuntimeDiagnostics||{};
         OrbitRuntimeDiagnostics.directReceiptHydration={status:'timeout',clientId:cid,receiptId:receiptId,attempts:attempts,elapsedMs:Math.max(0,((w.performance&&performance.now)?performance.now():Date.now())-started),writes:0};
       }
     };
-    tick();if(!document.querySelector('[data-rp-receipt-detail-id="'+receiptId.replace(/"/g,'')+'"]'))directReceiptTimer=setInterval(tick,250);
+    tick();if(!document.querySelector('[data-rp-receipt-detail-id="'+receiptId.replace(/"/g,'')+'"]'))directReceiptTimer=setInterval(tick,100);
     return true;
   }
 
@@ -496,7 +496,7 @@
   }
   function boot(){
     reconcileOwners();watchDirectReceiptRoute();
-    setTimeout(function(){scheduleReconcile(0);watchDirectReceiptRoute();},250);
+    setTimeout(function(){scheduleReconcile(0);watchDirectReceiptRoute();},100);
     setTimeout(function(){if(!status.ready)scheduleReconcile(0);watchDirectReceiptRoute();},1000);
   }
 

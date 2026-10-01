@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P14_DIRECT_COLD_PREFETCH_POLL_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "findingId": "B3-004",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "parentHead": "343f26588035d86bf5f5ed444b8537208c88903b",
+  "failedRunId": 36907136628,
+  "failedJobId": 110520589994,
+  "observed": {
+    "directReceiptUsableMs": 3206,
+    "thresholdMs": 3000,
+    "overByMs": 206,
+    "exactReadbackPass": true,
+    "sourceContractPass": true,
+    "liveUnchanged": true
+  },
+  "rootCause": "CRITICAL_CLIENTE360_COBROS_PREWARM_STARTED_ONLY_AFTER_APP_START_AND_DIRECT_RECEIPT_FALLBACK_POLL_USED_250MS_CADENCE",
+  "remediation": {
+    "earlyPrewarmAfterPrimaryStoreReady": true,
+    "blockingRequiredCollectionsStillOne": true,
+    "directReceiptPollMs": 100,
+    "directReceiptPollAttempts": 150,
+    "pollHorizonMs": 15000,
+    "bootstrapRetryMs": 100,
+    "thresholdRelaxed": false
+  },
+  "productBlobs": {
+    "orbit360-platform/core/product-app-p0.js": "b58593eda9bb395f1a523558efe085e3333d9ac2",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "34ad04825c66dd6e5404e5c3f72666c88a720b5d",
+    "orbit360-platform/index.html": "02972292806443ebdf0b62e2539441f964e9ad90"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "e5dc1ae490a401008f6c55549e13d1848b2bac25"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}
