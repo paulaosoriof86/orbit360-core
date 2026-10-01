@@ -10,7 +10,7 @@ const { __opsLeadsProductDomain } = require('./product-ops-leads-domain');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'gravicentra-drive-document-domain-v4-r86-secret-bound-oauth-client';
+const VERSION = 'gravicentra-drive-document-domain-v5-r10-payment-expedient-binding';
 const PROJECT_ID = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'ays-orbit-360-lab';
 const SERVICE_ACCOUNT = process.env.ORBIT360_SECRETS_SERVICE_ACCOUNT || 'orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com';
 const DRIVE_OAUTH_CLIENT_PREVIEW_SECRET = 'ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW';
@@ -349,11 +349,29 @@ async function finalizeDocument(request,previewOnly){
   const moved=stagingFolderId===clientFolderId?meta:await moveDriveFile(fileId,stagingFolderId,clientFolderId,accessToken);
   if(!moved||!Array.isArray(moved.parents)||!moved.parents.includes(clientFolderId))throw new HttpsError('internal','Drive no confirmó el vínculo final del documento.');
   const canonicalFolderUrl='https://drive.google.com/drive/folders/'+clientFolderId;
-  await target.ref.set({driveFolderId:clientFolderId,driveLink:canonicalFolderUrl,driveUrl:canonicalFolderUrl,driveRepository:'Google Drive',driveLinkedAt:new Date().toISOString()},{merge:true});
+  const binding={
+    documentRef:fileId,
+    fileId,
+    nombre:clean(meta.name,240)||'Documento',
+    mimeType:clean(meta.mimeType,160)||'application/octet-stream',
+    categoria:clean(input.categoria||input.documentType||'payment_evidence',120)||'payment_evidence',
+    polizaId:clean(input.polizaId,180),
+    receiptId:clean(input.receiptId,180),
+    sourceModule:clean(input.sourceModule||'cobros',80)||'cobros'
+  };
+  await target.ref.set({
+    driveFolderId:clientFolderId,
+    driveLink:canonicalFolderUrl,
+    driveUrl:canonicalFolderUrl,
+    driveRepository:'Google Drive',
+    driveLinkedAt:new Date().toISOString(),
+    documentos:FieldValue.arrayUnion(binding)
+  },{merge:true});
   const rb=await target.ref.get(),row=rb.exists?(rb.data()||{}):{};
-  if(clean(row.driveFolderId,180)!==clientFolderId)throw new HttpsError('internal','No fue posible confirmar el vínculo documental del expediente.');
+  const bound=refsFrom(row);
+  if(clean(row.driveFolderId,180)!==clientFolderId||!bound.has(fileId))throw new HttpsError('internal','No fue posible confirmar el vínculo documental del expediente.');
   await audit(tenantId,target.actor,'drive.document_finalize',{clientId,documentRef:fileId,outcome:'ok'},previewOnly);
-  return{ok:true,status:'finalized',documentRef:fileId,fileId,clientFolderId,canonicalReadback:true,backendPersistent:true,previewIsolated:previewOnly===true};
+  return{ok:true,status:'finalized',documentRef:fileId,fileId,clientFolderId,receiptId:binding.receiptId,polizaId:binding.polizaId,canonicalReadback:true,backendPersistent:true,previewIsolated:previewOnly===true};
 }
 async function quarantineDocument(request,previewOnly){
   const input=request.data||{},tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
