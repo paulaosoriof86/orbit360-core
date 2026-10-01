@@ -1,0 +1,111 @@
+name: CotComp S4.65 W5 selector-binding preflight source-only
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s465-w5-binding-preflight-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s465-w5-binding-preflight-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s465-w5-binding-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.65 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s465-w5-binding-preflight-sourceonly.json
+          jq -e '
+            .authorization=="S465_W5_SOURCE_ONLY_BINDING_PREFLIGHT" and
+            .projectId=="ays-orbit-360-lab" and
+            .stage=="W5" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .realData==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA and S4.65 tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-w5-binding-preflight-s465.js
+          node --check cotcomp-w5-binding-preflight-s465.test.js
+          node --test cotcomp-w5-binding-preflight-s465.test.js
+
+      - name: Build and enforce S4.65 receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s465/evidence"
+          node <<'NODE'
+          const fs=require('fs');
+          const s=require('./functions/cotcomp-w5-binding-preflight-s465');
+          const r=s.syntheticProof();
+          const out={
+            schemaVersion:'ays-cotcomp-s465-w5-binding-preflight-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',
+            stage:'W5',
+            commitmentMechanismReady:r.gate.commitmentMechanismReady,
+            selectorCommitmentsValid:r.gate.selectorCommitmentsValid,
+            commitments:r.packet.commitments,
+            rawSelectorsPersisted:r.packet.rawSelectorsPersisted,
+            rawSelectorsReturned:r.packet.rawSelectorsReturned,
+            remainingBlockers:r.gate.remainingBlockers,
+            executionAllowed:r.gate.executionAllowed,
+            realDataAllowed:r.gate.realDataAllowed,
+            productionAllowed:r.gate.productionAllowed,
+            boundaries:{
+              appDataReadsExecuted:0,
+              appDataWritesExecuted:0,
+              realDataTouched:false,
+              productionTouched:false
+            }
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s465/evidence/S465_W5_BINDING_PREFLIGHT_RECEIPT.json',JSON.stringify(out,null,2));
+          NODE
+          R="$RUNNER_TEMP/s465/evidence/S465_W5_BINDING_PREFLIGHT_RECEIPT.json"
+          jq -e '
+            .commitmentMechanismReady==true and
+            .selectorCommitmentsValid==true and
+            .rawSelectorsPersisted==false and
+            .rawSelectorsReturned==false and
+            .remainingBlockers==["OWNER_W5_REAL_DATA_AUTHORIZATION_REQUIRED"] and
+            .executionAllowed==false and
+            .realDataAllowed==false and
+            .productionAllowed==false and
+            .boundaries.appDataReadsExecuted==0 and
+            .boundaries.appDataWritesExecuted==0 and
+            .boundaries.realDataTouched==false and
+            .boundaries.productionTouched==false
+          ' "$R" >/dev/null
+
+      - name: Upload S4.65 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s465-w5-binding-preflight-${{ github.run_id }}
+          path: ${{ runner.temp }}/s465/evidence/S465_W5_BINDING_PREFLIGHT_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
