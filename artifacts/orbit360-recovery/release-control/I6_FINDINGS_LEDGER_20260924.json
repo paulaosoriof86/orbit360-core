@@ -1750,6 +1750,13 @@
         "compositionLockBlobSha": "37c8527e8e121b35b66901af6f1cafda689d26ea",
         "classification": "QA_DIAGNOSTIC_ONLY",
         "productSourceChanged": false
+      },
+      "r12p10p2ContractFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P2_STALE_TRANSPORT_CONTRACT_FIX_20261001.json",
+        "blobSha": "4b422ec01876e5a8c60a561f3a174106121c30de",
+        "compositionLockBlobSha": "aa86e940a17840f05c91639057d7076679b13393",
+        "classification": "QA_CONTRACT_STALE_ASSERTION",
+        "productSourceChanged": false
       }
     },
     {

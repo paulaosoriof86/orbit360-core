@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P10P2_STALE_TRANSPORT_CONTRACT_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "4e44e1b6ebf1c0e4ccef6f1b524df7f53a955e4d",
+  "failedRunId": 36854201087,
+  "failedJobId": 110342885654,
+  "classification": "QA_CONTRACT_STALE_ASSERTION",
+  "cause": "R12P5 transport diagnostic names were superseded by stronger R12P10P1 upload-then-payment transport diagnostics, but the validator still required the old literals.",
+  "remediation": "Update validator to require the stronger current diagnostic contract; no product source change.",
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "859e0d9959a342821b68c4af5dc89ff1fe2e81fd"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}
