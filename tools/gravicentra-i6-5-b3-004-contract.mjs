@@ -263,6 +263,8 @@ need(documentDomain.includes('function exactB3004HumanPreviewClient')&&documentD
 need(documentDomain.includes("if(!exactPreviewQa&&!d.withinScope(actor,'clientes','cliente360',row))"),'B3_004_R12P10P3_DOCUMENT_SCOPE_GUARD_RELAXED_OR_MISSING');
 need(documentDomain.includes("authorizeTarget(request,tenantId,input,'write',previewOnly)")&&documentDomain.includes("authorizeTarget(request,tenantId,input,mode||'read',previewOnly)"),'B3_004_R12P10P3_DOCUMENT_PREVIEW_CONTEXT_NOT_PROPAGATED');
 console.log('B3_004_R12P10P3_EXACT_DOCUMENT_QA_SCOPE_CONTRACT=PASS');
+need(uiProofR12.includes('B3_004_R12_DOCUMENT_READBACK=')&&uiProofR12.includes('paymentResult')&&uiProofR12.includes('invoiceResult')&&uiProofR12.includes('readTransportStart'),'B3_004_R12P10P4_DOCUMENT_READBACK_DIAGNOSTIC_MISSING');
+console.log('B3_004_R12P10P4_DOCUMENT_READBACK_DIAGNOSTIC_CONTRACT=PASS');
 need(crmBridgeR9.includes('function exactB3004QaScopeBypass(target)')&&crmBridgeR9.includes("target.collection!=='recibosEsperados'")&&crmBridgeR9.includes("record.__syntheticHumanQa===true")&&crmBridgeR9.includes("String(record.__syntheticGate||'')==='B3-004-R12'"),'B3_004_R12P9_EXACT_QA_SCOPE_BYPASS_GUARD_MISSING');
 need(crmBridgeR9.includes("if(target&&!exactB3004QaScopeBypass(target)&&!A.canView(target.collection,target.record,'cobros'))"),'B3_004_R12P9_PAYMENT_SCOPE_WRAPPER_STILL_BLOCKS_EXACT_QA');
 need(crmBridgeR9.includes("if(permission&&!A.can('cobros',permission))"),'B3_004_R12P9_PERMISSION_GUARD_RELAXED');

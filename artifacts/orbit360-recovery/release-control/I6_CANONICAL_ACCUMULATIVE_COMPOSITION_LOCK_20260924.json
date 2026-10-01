@@ -403,15 +403,14 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P10P3",
-    "reason": "EXACT_DOCUMENT_QA_SCOPE_FIX_AFTER_UI_UPLOAD_403",
-    "changedProductFiles": [
-      "functions/document-drive-domain.js"
-    ],
+    "gate": "I6.5-B3-004-R12P10P4",
+    "reason": "POST_RELOAD_DOCUMENT_READBACK_DIAGNOSTIC_ONLY",
+    "changedProductFiles": [],
     "changedQaFiles": [
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -1103,5 +1102,18 @@
     "reimport": false,
     "live": false,
     "b3005": false
+  },
+  "b3004R12P10P4DocumentReadbackDiagnostic": {
+    "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36855332892,
+    "failedJobId": 110346538162,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P4_DOCUMENT_READBACK_DIAGNOSTIC_20261001.json",
+    "receiptBlobSha": "7496453a5f15e3c0a82cb560a5b3cd2701d517f6",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "3a46ae58260a2009e78b4a719be20eca3fdc3cef",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "b411a6e611b08ecaab6de1c779b38bf1b57123a8"
+    },
+    "productSourceChanged": false
   }
 }

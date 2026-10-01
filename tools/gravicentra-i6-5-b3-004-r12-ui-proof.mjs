@@ -248,14 +248,28 @@ try{
   need(clean(reloaded[0].paymentSupportDocumentRef)===clean(applied[0].paymentSupportDocumentRef),'B3_004_R12_PAYMENT_SUPPORT_NOT_DURABLE_AFTER_RELOAD');
   need(clean(reloaded[0].invoiceDocumentRef)===clean(applied[0].invoiceDocumentRef),'B3_004_R12_INVOICE_NOT_DURABLE_AFTER_RELOAD');
   proof.assertions.browserReloadDurability=true;
+  const readTransportStart=proof.transportEvents.length;
   const docReadback=await page.evaluate(async ({paymentRef,invoiceRef,ids})=>{
     const dp=window.Orbit?.productDriveDocumentProviderP0;
-    if(!dp||typeof dp.resolve!=='function')return{payment:false,invoice:false,provider:false};
+    const runtime=window.Orbit?.productRuntimeBrowserProvidersP0?.status?.()||{};
+    const role=String(window.Orbit?.session?.rol?.()||'');
+    if(!dp||typeof dp.resolve!=='function')return{payment:false,invoice:false,provider:false,runtime,role};
     const ctx={clienteId:ids.client,polizaId:ids.policy,receiptId:ids.receipt,sourceModule:'cobros'};
     const [p,i]=await Promise.all([dp.resolve(paymentRef,ctx),dp.resolve(invoiceRef,ctx)]);
-    return{provider:true,payment:!!(p&&p.ok===true&&p.backendPersistent===true),invoice:!!(i&&i.ok===true&&i.backendPersistent===true)};
+    const safe=x=>({
+      ok:x?.ok===true,
+      status:String(x?.status||''),
+      code:String(x?.code||''),
+      message:String(x?.message||'').slice(0,500),
+      backendPersistent:x?.backendPersistent===true,
+      documentRef:String(x?.documentRef||x?.fileId||''),
+      mimeType:String(x?.mimeType||'')
+    });
+    return{provider:true,payment:!!(p&&p.ok===true&&p.backendPersistent===true),invoice:!!(i&&i.ok===true&&i.backendPersistent===true),paymentResult:safe(p),invoiceResult:safe(i),runtime,role};
   },{paymentRef:clean(reloaded[0].paymentSupportDocumentRef),invoiceRef:clean(reloaded[0].invoiceDocumentRef),ids});
-  need(docReadback.provider&&docReadback.payment&&docReadback.invoice,'B3_004_R12_DRIVE_READBACK_AFTER_RELOAD_FAILED:'+JSON.stringify(docReadback));
+  proof.documentReadbackDiagnostic={...docReadback,transport:proof.transportEvents.slice(readTransportStart)};
+  console.log('B3_004_R12_DOCUMENT_READBACK='+JSON.stringify(proof.documentReadbackDiagnostic));
+  need(docReadback.provider&&docReadback.payment&&docReadback.invoice,'B3_004_R12_DRIVE_READBACK_AFTER_RELOAD_FAILED:'+JSON.stringify(proof.documentReadbackDiagnostic));
   proof.assertions.browserDriveReadbackAfterReload=true;
   proof.documents={paymentSupportDocumentRef:clean(reloaded[0].paymentSupportDocumentRef),invoiceDocumentRef:clean(reloaded[0].invoiceDocumentRef)};
   const cleanupDocs=await page.evaluate(async ({paymentRef,invoiceRef,ids})=>{

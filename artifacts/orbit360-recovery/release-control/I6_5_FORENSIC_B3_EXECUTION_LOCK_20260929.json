@@ -678,6 +678,11 @@
       "blobSha": "108880cb485466b8ef2b6a381280cb53838e3d19",
       "rootCause": "DOCUMENT_DRIVE_PREVIEW_UPLOAD_AUTHORIZED_TARGET_APPLIED_NORMAL_CLIENT_SCOPE_BEFORE_EXACT_B3004HUMAN_QA_CLASSIFICATION",
       "productSourceChanged": true
+    },
+    "r12p10p4Diagnostic": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P4_DOCUMENT_READBACK_DIAGNOSTIC_20261001.json",
+      "blobSha": "7496453a5f15e3c0a82cb560a5b3cd2701d517f6",
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -687,7 +692,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "2c6914f5f764ebe242c6ceb5e88a03da32dd0dfb"
+    "blobSha": "41cbf891cedaae996ff01af4d6207ad8f47b5fd5"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -882,7 +887,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "5ada9cb24039d3f85122677b593259bf1478e1a9"
+    "blobSha": "36ff32e6ba387da770efe8f2addbcbb30b64b4ae"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -1080,6 +1085,18 @@
     "findingsLedgerBlobSha": "2c6914f5f764ebe242c6ceb5e88a03da32dd0dfb",
     "rootCause": "DOCUMENT_DRIVE_PREVIEW_UPLOAD_AUTHORIZED_TARGET_APPLIED_NORMAL_CLIENT_SCOPE_BEFORE_EXACT_B3004HUMAN_QA_CLASSIFICATION",
     "productSourceChanged": true,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p10p4Diagnostic": {
+    "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P4_DOCUMENT_READBACK_DIAGNOSTIC_20261001.json",
+    "blobSha": "7496453a5f15e3c0a82cb560a5b3cd2701d517f6",
+    "compositionLockBlobSha": "36ff32e6ba387da770efe8f2addbcbb30b64b4ae",
+    "findingsLedgerBlobSha": "41cbf891cedaae996ff01af4d6207ad8f47b5fd5",
+    "productSourceChanged": false,
     "noOperationalBusinessWrites": true,
     "noReimport": true,
     "noLive": true,

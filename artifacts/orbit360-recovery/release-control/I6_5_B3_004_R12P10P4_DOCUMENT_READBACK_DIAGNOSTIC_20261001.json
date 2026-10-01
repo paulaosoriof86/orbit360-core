@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P10P4_DOCUMENT_READBACK_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "ee3924f9d39218bb9f056cabae0821f8e218614c",
+  "failedRunId": 36855332892,
+  "failedJobId": 110346538162,
+  "classification": "QA_DIAGNOSTIC_ONLY",
+  "observedFailure": "POST_RELOAD_DOCUMENT_RESOLVE_FALSE_FOR_PAYMENT_AND_INVOICE",
+  "diagnosticPurpose": "CAPTURE_EXACT_DOCUMENT_READ_RESPONSE_AFTER_RELOAD_BEFORE_PRODUCT_MUTATION",
+  "priorPasses": {
+    "uiUploadHttp200": true,
+    "applyPaymentHttp200": true,
+    "finalizeHttp200": true,
+    "normalCobrosMs": 222,
+    "sameCobroAndRefsPersistedBeforeReload": true
+  },
+  "capture": [
+    "payment resolve status/code/message",
+    "invoice resolve status/code/message",
+    "DocumentDriveReadPreview HTTP responses",
+    "runtime readiness",
+    "active role"
+  ],
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "3a46ae58260a2009e78b4a719be20eca3fdc3cef",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "b411a6e611b08ecaab6de1c779b38bf1b57123a8"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

@@ -1765,6 +1765,13 @@
         "classification": "PRODUCT_PREVIEW_QA_DOCUMENT_SCOPE_COMPOSITION_DEFECT",
         "rootCause": "DOCUMENT_DRIVE_PREVIEW_UPLOAD_AUTHORIZED_TARGET_APPLIED_NORMAL_CLIENT_SCOPE_BEFORE_EXACT_B3004HUMAN_QA_CLASSIFICATION",
         "productSourceChanged": true
+      },
+      "r12p10p4Diagnostic": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P4_DOCUMENT_READBACK_DIAGNOSTIC_20261001.json",
+        "blobSha": "7496453a5f15e3c0a82cb560a5b3cd2701d517f6",
+        "compositionLockBlobSha": "36ff32e6ba387da770efe8f2addbcbb30b64b4ae",
+        "classification": "QA_DIAGNOSTIC_ONLY",
+        "productSourceChanged": false
       }
     },
     {
