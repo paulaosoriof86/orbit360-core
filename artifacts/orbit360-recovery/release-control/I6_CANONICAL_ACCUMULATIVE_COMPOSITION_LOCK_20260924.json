@@ -123,7 +123,7 @@
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
     "functions/cobros-reconciliation-domain.js": "b2b839e702475a3f540fcb006cb24be125c14a09",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
-    "functions/document-drive-domain.js": "c0687b789790344c1463d48500b16070078ff9b2",
+    "functions/document-drive-domain.js": "2d3168ec7bc1c654883b71ce9fbe1d5ff0ec2796",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
     "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
@@ -144,7 +144,7 @@
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
-    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "2e7acbc0f3e8c70adc3199cb3ac4a5f5d0f6c16a",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "4e83158b3f595b26796763f4d9446d279c73d37f",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "774c6cbe32be08f23e45f37b8e12e56f9be08bf3",
     "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
@@ -154,7 +154,7 @@
     "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
     "orbit360-platform/core/product-app-p0.js": "b6ccd725f214c666e04299574be4c1fdae3a6b83",
-    "orbit360-platform/core/product-drive-document-provider-p0.js": "30f84e48d94a728c71471902134b0cd657f61a4a",
+    "orbit360-platform/core/product-drive-document-provider-p0.js": "0e72b04f37f60875c5805d569f6b130cda505bce",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "36eb1b3b42fdd7b56d1fbb4bbf42fe13b4a50304",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
@@ -172,13 +172,13 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c4a933f2142af161d8aa4670f2b78834fba59f20",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "a53ab958192cb494efca24a7182aaa6f2b4c5add",
+    "orbit360-platform/index.html": "255d01776ef38f9766339ce2e4cf72d75c0f7309",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "92d76a6c0c839091a57ab442c833c058eefbf9ba",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "16c32a84da9fbfdb765ba6f6803d43d05195dad4",
-    "orbit360-platform/modules/cobros.js": "2533d88e27c43031a3fbd1add96f2cbcdcaaf0f5",
+    "orbit360-platform/modules/cobros.js": "96930fc4b8c80e375202a1bbd8bdc5c68aa9c581",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "716a345304d03f975ae1459a03a9e8c8df5801d4",
@@ -403,19 +403,19 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-09-30",
-    "gate": "I6.5-B3-004",
-    "reason": "PAULA_CLARIFIED_SIGA_MIGRATION_IS_DIRECT_PAYMENT_EVIDENCE_NOT_CLIENT_PORTAL_REPORT",
+    "gate": "I6.5-B3-004-R10",
+    "reason": "PAULA_R10_REAL_PAYMENT_AND_RECONCILIATION_FAILED_ON_REAL_DOCUMENT_PREVIEW_PATH_PLUS_SYNTHETIC_QA_COVERAGE_GAP",
     "changedProductFiles": [
+      "functions/document-drive-domain.js",
+      "orbit360-platform/core/product-drive-document-provider-p0.js",
       "orbit360-platform/core/cobros-reconciliation-domain-client.js",
-      "orbit360-platform/modules/portal-v1142-copyfix.js",
       "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/index.html"
     ],
-    "noDataMutation": true,
+    "noOperationalDataMutation": true,
     "noReimport": true,
-    "noLive": true
+    "noLive": true,
+    "noB3005": true
   },
   "b3004ActionSurfaceFix": {
     "status": "R4_SOURCE_FIXED_PENDING_CONTRACT",
@@ -735,5 +735,34 @@
     "noReimport": true,
     "noLive": true
   },
-  "activeFindingId": "B3-004"
+  "activeFindingId": "B3-004",
+  "b3004R10CausalSourceFix": {
+    "status": "R10_SOURCE_BOUND_PENDING_CONTRACT",
+    "findingId": "B3-004",
+    "rootCauseCodes": [
+      "PREVIEW_DOCUMENT_GUARD_EXCLUDED_B3004QA_AND_OPERATIONAL_HUMAN_CLIENT",
+      "MACHINE_PROOF_USED_FAKE_QA_INVOICE_REFERENCE",
+      "PAYMENT_UI_HID_FAILURE_PHASE_WITH_GENERIC_TOAST",
+      "DOCUMENT_UPLOAD_PRECEDED_BUSINESS_WRITE_WITHOUT_STAGED_RECOVERY_SEMANTICS"
+    ],
+    "productBlobs": {
+      "functions/document-drive-domain.js": "2d3168ec7bc1c654883b71ce9fbe1d5ff0ec2796",
+      "orbit360-platform/core/product-drive-document-provider-p0.js": "0e72b04f37f60875c5805d569f6b130cda505bce",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js": "4e83158b3f595b26796763f4d9446d279c73d37f",
+      "orbit360-platform/modules/cobros.js": "96930fc4b8c80e375202a1bbd8bdc5c68aa9c581",
+      "orbit360-platform/index.html": "255d01776ef38f9766339ce2e4cf72d75c0f7309"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "dc3ffb458a1aa8769367eaf13a070c950099f82a",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "af8774e2112af79ca6a798d09872447d7f971e27",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "872519711224bc9a80b82186c0338e8c3a638786"
+    },
+    "documentLifecycle": "STAGE_UNDER_CLIENT_RECOVERY_NAMESPACE__CANONICAL_WRITE__FINALIZE_OR_QUARANTINE",
+    "machineQaClientPrefix": "b3004qa_",
+    "operationalPreviewWritesAuthorized": false,
+    "noOperationalDataMutation": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  }
 }
