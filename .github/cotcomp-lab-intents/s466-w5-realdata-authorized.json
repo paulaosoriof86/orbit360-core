@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "ays-cotcomp-s466-w5-realdata-authorization-v1.0",
+  "authorization": "S466_W5_LAB_REALDATA_CONTROLLED_PILOT",
+  "authorizedAt": "2026-10-01",
+  "authorizedSourceParent": "838e1789ac745c1fc9eb3ecdd6144ad301328569",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "country": "GT",
+  "journeyId": "GT_AUTO_MOTO_HYBRID",
+  "allowedStages": [
+    "W1",
+    "W2",
+    "W3",
+    "W4"
+  ],
+  "maxQuoteCases": 1,
+  "maxDataSubjects": 1,
+  "maxExistingRecords": 8,
+  "allowedExecutions": 1,
+  "successDisposition": "ROLLBACK_TO_BEFORE_STATE",
+  "healthSensitiveData": false,
+  "providerOrRaterCalls": false,
+  "production": false,
+  "issuance": false,
+  "binding": false,
+  "payment": false,
+  "ownerAuthorizationText": "Autorizo W5 para realizar exclusivamente en ays-orbit-360-lab la selección y prueba controlada de un único caso real bajo el alcance aprobado: Guatemala, GT_AUTO_MOTO_HYBRID, W1–W4, un QuoteCase, un titular, máximo 8 registros, una ejecución y ROLLBACK_TO_BEFORE_STATE; autorizo únicamente las lecturas/escrituras estrictamente necesarias del piloto, con commitments SHA-256 para caso, actor y consentimiento, sin datos de salud, sin provider/rater, sin producción, emisión, binding ni pagos, y con rollback y verificación final obligatorios."
+}
