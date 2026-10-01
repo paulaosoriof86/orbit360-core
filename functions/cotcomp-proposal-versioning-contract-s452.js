@@ -375,13 +375,15 @@ function readiness(){
     if(life.validity.v2.current!==true)blockers.push('CURRENT_VALIDITY_NOT_DERIVABLE');
     if(life.journal.expectedCreatedDocuments!==4||life.journal.expectedVersion2AtomicWrites!==3)blockers.push('ROLLBACK_JOURNAL_INVALID');
   }
+  const technicalW3Ready=blockers.length===0;
   return Object.freeze({
     version:VERSION,
-    sourceContractReady:blockers.length===0,
-    physicalW3Ready:blockers.length===0,
+    sourceContractReady:technicalW3Ready,
+    technicalW3Ready,
+    physicalW3Ready:false,
     physicalW3Allowed:false,
     ownerW3Authorization:false,
-    blockers:Object.freeze(blockers.length?blockers:['OWNER_W3_AUTHORIZATION_REQUIRED']),
+    blockers:Object.freeze(technicalW3Ready?['OWNER_W3_AUTHORIZATION_REQUIRED']:[...blockers,'OWNER_W3_AUTHORIZATION_REQUIRED']),
     executionEnabled:EXECUTION_ENABLED,
     appDataReadsAllowed:APP_DATA_READS_ALLOWED,
     appDataWritesAllowed:APP_DATA_WRITES_ALLOWED,
