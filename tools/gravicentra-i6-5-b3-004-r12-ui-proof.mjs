@@ -24,7 +24,7 @@ async function actor(){
   for(const d of snap.docs){
     const m=d.data()||{},state=norm(m.status||m.estado||'active'),role=norm(m.activeRole||m.rolActivo||m.defaultRole||m.rolDefault||m.rol);
     if(m.active===false||m.activo===false||['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(state)||!privileged.has(role))continue;
-    try{const u=await auth.getUser(d.id);if(!u.disabled)return{uid:u.uid,activeRole:role};}catch{}
+    try{const u=await auth.getUser(d.id);if(!u.disabled)return{uid:u.uid,email:clean(u.email),activeRole:role};}catch{}
   }
   throw new Error('B3_004_R12_PRIVILEGED_ACTIVE_ACTOR_NOT_FOUND');
 }
@@ -49,7 +49,13 @@ try{
   const page=await context.newPage();page.setDefaultTimeout(15000);
   page.on('pageerror',e=>proof.errors.push('page:'+clean(e?.message||e)));
   page.on('console',m=>{if(m.type()==='error')proof.errors.push('console:'+clean(m.text()));});
-  await page.addInitScript(()=>{try{localStorage.setItem('orbit360_confidencialidad','qa-existing-legal-acceptance');}catch{}});
+  const legalScope='user:'+clean(who.email||who.uid);
+  await page.addInitScript(({scope})=>{
+    try{
+      localStorage.setItem('orbit360_confidencialidad','qa-existing-legal-acceptance');
+      localStorage.setItem('orbit360_legal_aceptaciones',JSON.stringify({[scope]:{aceptado:true,version:'2.0',fecha:'2000-01-01T00:00:00.000Z',tipo:'interno',qaEphemeralPriorAcceptance:true}}));
+    }catch{}
+  },{scope:legalScope});
   proof.assertions.legalGatePreconditionSimulated=true;
   await page.goto(target+'/#/cliente360?c='+encodeURIComponent(ids.client)+'&t=recibos',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0&&!!window.Orbit?.modules?.cobros);
@@ -59,6 +65,11 @@ try{
     return Promise.resolve(Orbit.productAppP0.status?.().started?Orbit.productAppP0.status():Orbit.productAppP0.activate());
   },token);
   need(activated?.started===true,'B3_004_R12_PRODUCT_APP_NOT_STARTED');
+  await page.waitForTimeout(650);
+  const legalState=await page.evaluate(scope=>({accepted:window.Orbit?.legal?.yaAcepto?.(scope)===true,overlayCount:document.querySelectorAll('[data-legal-gate]').length}),legalScope);
+  need(legalState.accepted===true,'B3_004_R12_QA_PRIOR_LEGAL_ACCEPTANCE_NOT_RECOGNIZED');
+  need(legalState.overlayCount===0,'B3_004_R12_QA_LEGAL_OVERLAY_STILL_OPEN:'+legalState.overlayCount);
+  proof.assertions.noLegalOverlay=true;
   await page.waitForFunction(id=>!!window.Orbit?.store?.get?.('recibosEsperados',id),ids.receipt);
 
   const normalStart=await page.evaluate(()=>{const t=performance.now();window.__b3004r12NormalNavStart=t;location.hash='#/cobros';return t;});

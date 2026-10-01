@@ -236,6 +236,8 @@ need(cobros.includes('data-b3004-human-qa-mode')&&cobros.includes('qaReceiptId()
 need(humanFixtureR11.includes('b3004human_client_r12')&&humanFixtureR11.includes('qaReceipt=')&&humanFixtureR11.includes('reconciliationRequests'),'B3_004_R12_HUMAN_FIXTURE_LIFECYCLE_MISSING');
 need(uiProofR12.includes("button[data-cobros-action=\"apply\"]")&&uiProofR12.includes("button[data-cobros-action=\"reconcile\"]")&&uiProofR12.includes('client360ToCobrosUsableMs')&&uiProofR12.includes('<=3000'),'B3_004_R12_BROWSER_UI_PROOF_MISSING');
 need(uiProofR12.includes('legalGatePreconditionSimulated')&&uiProofR12.includes("localStorage.setItem('orbit360_confidencialidad'")&&uiProofR12.includes('realPreviewRowsReadOnly')&&uiProofR12.includes('B3_004_R12_REAL_PREVIEW_WRITE_ACTIONS_PRESENT')&&uiProofR12.includes("location.hash='#/cobros'"),'B3_004_R12P3_BROWSER_PRECONDITION_AND_REAL_READONLY_PROOF_MISSING');
+need(uiProofR12.includes("localStorage.setItem('orbit360_legal_aceptaciones'")&&uiProofR12.includes("version:'2.0'")&&uiProofR12.includes('B3_004_R12_QA_PRIOR_LEGAL_ACCEPTANCE_NOT_RECOGNIZED')&&uiProofR12.includes('B3_004_R12_QA_LEGAL_OVERLAY_STILL_OPEN'),'B3_004_R12P4_EFFECTIVE_LEGAL_SCOPE_PRECONDITION_MISSING');
+console.log('B3_004_R12P4_EFFECTIVE_LEGAL_PRECONDITION_CONTRACT=PASS');
 need(uiProofR12.includes('__b3004r12NormalNavStart')&&uiProofR12.includes('qaCobrosUsableMs'),'B3_004_R12P3_NORMAL_AND_QA_PERFORMANCE_SPLIT_MISSING');
 console.log('B3_004_R12P3_BROWSER_HARNESS_PRECONDITION_CONTRACT=PASS');
 need(indexR4.includes('core/router.js?v=20260930-b3004r12'),'B3_004_R12_ROUTER_ASSET_NOT_BUMPED');

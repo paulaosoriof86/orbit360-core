@@ -1654,6 +1654,16 @@
         "qaCobrosUsableMs": 349,
         "realPreviewReadonlyBrowserProofRequired": true,
         "productSourceChanged": false
+      },
+      "r12p4HarnessFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P4_EFFECTIVE_LEGAL_SCOPE_HARNESS_FIX_20260930.json",
+        "blobSha": "c138d1d52bf47d768a420b850f23b11ccb427501",
+        "compositionLockBlobSha": "01bd27de231bc0448685e73179938c08a112ad9f",
+        "classification": "QA_HARNESS_PRECONDITION",
+        "rootCause": "PRODUCT_AUTH_RUNTIME_CALLS_ORBIT_LEGAL_GATE_DIRECTLY_USING_ORBIT360_LEGAL_ACEPTACIONES_SCOPE_AND_DOES_NOT_CONSUME_LEGACY_CONFIDENCIALIDAD_PRECONDITION",
+        "r12p3NormalCliente360ToCobrosUsableMs": 216,
+        "r12p3RealPreviewReadonlyPass": true,
+        "productSourceChanged": false
       }
     },
     {

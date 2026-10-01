@@ -403,8 +403,8 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-09-30",
-    "gate": "I6.5-B3-004-R12P3",
-    "reason": "BROWSER_UI_PROOF_BLOCKED_BY_VALID_LEGAL_GATE_IN_FRESH_AUTOMATION_CONTEXT",
+    "gate": "I6.5-B3-004-R12P4",
+    "reason": "EFFECTIVE_PRODUCT_AUTH_RUNTIME_LEGAL_SCOPE_PRECONDITION_FOR_BROWSER_QA",
     "changedProductFiles": [],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
@@ -883,6 +883,27 @@
     },
     "legalAcceptanceWrite": false,
     "normalRealPreviewReadonlyBrowserProofRequired": true,
+    "productSourceChanged": false,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  },
+  "b3004R12P4EffectiveLegalScopeHarnessFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36816106037,
+    "failedJobId": 110221503371,
+    "rootCause": "PRODUCT_AUTH_RUNTIME_CALLS_ORBIT_LEGAL_GATE_DIRECTLY_USING_ORBIT360_LEGAL_ACEPTACIONES_SCOPE_AND_DOES_NOT_CONSUME_LEGACY_CONFIDENCIALIDAD_PRECONDITION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P4_EFFECTIVE_LEGAL_SCOPE_HARNESS_FIX_20260930.json",
+    "receiptBlobSha": "c138d1d52bf47d768a420b850f23b11ccb427501",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "39994970dcec7b8d1e4268290c1ffafa29c90f03",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "62afedaa9e04d07a42308f57d5b8778ff4f3c539"
+    },
+    "r12p3NormalCliente360ToCobrosUsableMs": 216,
+    "r12p3RealPreviewReadonlyPass": true,
+    "legalAcceptanceWrite": false,
     "productSourceChanged": false,
     "operationalBusinessWrites": false,
     "reimport": false,

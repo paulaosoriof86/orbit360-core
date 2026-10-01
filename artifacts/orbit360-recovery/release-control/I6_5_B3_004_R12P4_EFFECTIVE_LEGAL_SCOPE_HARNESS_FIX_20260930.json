@@ -1,0 +1,40 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P4_EFFECTIVE_LEGAL_SCOPE_HARNESS_FIX_V1",
+  "recordedAt": "2026-09-30",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "4d2fcd8aa4a929717a5f043f1f818e375d29f414",
+  "failedRunId": 36816106037,
+  "failedJobId": 110221503371,
+  "classification": "QA_HARNESS_PRECONDITION",
+  "rootCause": "PRODUCT_AUTH_RUNTIME_CALLS_ORBIT_LEGAL_GATE_DIRECTLY_USING_ORBIT360_LEGAL_ACEPTACIONES_SCOPE_AND_DOES_NOT_CONSUME_LEGACY_CONFIDENCIALIDAD_PRECONDITION",
+  "evidence": {
+    "r12p3NormalCliente360ToCobrosUsableMs": 216,
+    "r12p3RealPreviewRowsRendered": true,
+    "r12p3RealPreviewReadonlyMarkerPresent": true,
+    "r12p3RealPreviewWriteActionsZero": true,
+    "syntheticApplyButtonRenderedVisibleEnabledStable": true,
+    "blockingOverlay": "data-legal-gate=user:<runtime-actor>",
+    "effectiveCaller": "orbit360-platform/core/auth-product-runtime-p0.js showApp -> Orbit.legal.gate(tipo,scopeId)",
+    "effectiveAcceptanceOwner": "orbit360-platform/core/legal.js -> orbit360_legal_aceptaciones / version 2.0",
+    "fixtureCleanupPass": true
+  },
+  "remediation": {
+    "ephemeralBrowserPriorAcceptanceForExactRuntimeScope": true,
+    "bothLegacyAndEffectiveLocalKeysSeeded": true,
+    "waitAndAssertLegalAcceptanceRecognized": true,
+    "assertNoLegalOverlayBeforeCobrosProof": true,
+    "legalAcceptButtonClicked": false,
+    "userLegalRecordWritten": false,
+    "serverWrite": false,
+    "productSourceChanged": false
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "39994970dcec7b8d1e4268290c1ffafa29c90f03",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "62afedaa9e04d07a42308f57d5b8778ff4f3c539"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}
