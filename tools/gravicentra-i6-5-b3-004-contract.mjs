@@ -90,7 +90,7 @@ need(nativeReceiptR4.includes("if(paid){if(advisorRole())return{kind:'applied',l
 need(cobros.includes('data-cobros-action="apply"'),'B3_004_GLOBAL_APPLY_ACTION_MARKER_MISSING');
 need(cobros.includes('data-cobros-action="reconcile"'),'B3_004_GLOBAL_RECONCILE_ACTION_MARKER_MISSING');
 need(!cobros.includes('Confirmar cobro'),'B3_004_GLOBAL_CONFIRMAR_COBRO_REMAINS');
-need(indexR4.includes('modules/cobros.js?v=20260930-b3004r11'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cobros.js?v=20260930-b3004r12'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r11'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20260930-b3004r11'),'B3_004_PAYMENT_CLIENT_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r9p1'),'B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
@@ -147,7 +147,7 @@ need(cliente.includes('linkedReceiptIds'),'B3_004_R7_CLIENT_PAYMENT_DEDUPE_MISSI
 need(cliente.includes('data-paid-receipt-evidence'),'B3_004_R7_CLIENT_PAID_RECEIPT_FALLBACK_MISSING');
 need(cliente.includes('Todas las pólizas</option>'),'B3_004_R7_CLIENT_ALL_POLICIES_FILTER_MISSING');
 need(!cliente.includes('activePolicyIds'),'B3_004_R7_CLIENT_ACTIVE_POLICY_PAYMENT_GATE_REMAINS');
-need(indexR4.includes('modules/cobros.js?v=20260930-b3004r11'),'B3_004_R8_COBROS_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cobros.js?v=20260930-b3004r12'),'B3_004_R8_COBROS_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r11'),'B3_004_R7_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_R7_COBROS_VISIBILITY_FILTER_CONTRACT=PASS');
 
@@ -224,10 +224,20 @@ need(documentDomain.includes('b3004human_'),'B3_004_R11_DOCUMENT_HUMAN_FIXTURE_S
 need(hydrationStoreR11.includes('_ensureCollections: ensureCollections')&&hydrationStoreR11.includes('scheduleDeferredNext'),'B3_004_R11_DEMAND_HYDRATION_MISSING');
 need(hydrationContractR11.includes("cobros:['cobros','clientes','polizas','recibosEsperados','carteraPrimas']"),'B3_004_R11_COBROS_ROUTE_DEPS_MISSING');
 need(cobros.includes("const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas']"),'B3_004_R11_COBROS_HARD_DEPS_INVALID');
-need(humanFixtureR11.includes('b3004human_client_r11')&&humanFixtureR11.includes('cleanupRequired:true'),'B3_004_R11_HUMAN_FIXTURE_CONTRACT_MISSING');
-need(indexR4.includes('data/store-firestore-product-readonly-p0.js?v=20260930-b3004r11'),'B3_004_R11_STORE_ASSET_NOT_BUMPED');
+need(humanFixtureR11.includes('b3004human_client_r12')&&humanFixtureR11.includes('cleanupRequired:true'),'B3_004_R12_HUMAN_FIXTURE_CONTRACT_MISSING');
+need(indexR4.includes('data/store-firestore-product-readonly-p0.js?v=20260930-b3004r12'),'B3_004_R11_STORE_ASSET_NOT_BUMPED');
 need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20260930-b3004r11'),'B3_004_R11_RECONCILIATION_ASSET_NOT_BUMPED');
 console.log('B3_004_R11_ROUTING_HUMAN_FIXTURE_PERFORMANCE_CONTRACT=PASS');
+const routerR12=read('orbit360-platform/core/router.js');
+const uiProofR12=read('tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs');
+need(hydrationStoreR11.includes('deferredPauseUntil')&&hydrationStoreR11.includes('Date.now() + 2500'),'B3_004_R12_ROUTE_FOCUS_HYDRATION_PAUSE_MISSING');
+need(routerR12.includes("cobros: ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas']"),'B3_004_R12_ROUTER_REACTIVE_SET_NOT_MINIMAL');
+need(cobros.includes('data-b3004-human-qa-mode')&&cobros.includes('qaReceiptId()')&&cobros.includes('previewGuard(receipt)'),'B3_004_R12_PREVIEW_QA_ISOLATION_MISSING');
+need(humanFixtureR11.includes('b3004human_client_r12')&&humanFixtureR11.includes('qaReceipt=')&&humanFixtureR11.includes('reconciliationRequests'),'B3_004_R12_HUMAN_FIXTURE_LIFECYCLE_MISSING');
+need(uiProofR12.includes("button[data-cobros-action=\"apply\"]")&&uiProofR12.includes("button[data-cobros-action=\"reconcile\"]")&&uiProofR12.includes('client360ToCobrosUsableMs')&&uiProofR12.includes('<=3000'),'B3_004_R12_BROWSER_UI_PROOF_MISSING');
+need(indexR4.includes('core/router.js?v=20260930-b3004r12'),'B3_004_R12_ROUTER_ASSET_NOT_BUMPED');
+need(indexR4.includes('modules/cobros.js?v=20260930-b3004r12'),'B3_004_R12_COBROS_ASSET_NOT_BUMPED');
+console.log('B3_004_R12_HUMAN_PATH_AND_PERFORMANCE_CONTRACT=PASS');
 
 const cliente360R9P1=read('orbit360-platform/modules/cliente360.js');
 need(cliente360R9P1.includes('receiptReturnSummaryCache')&&cliente360R9P1.includes('prepareReceiptReturn')&&cliente360R9P1.includes('summaryForDetail'),'B3_004_R9P1_RECEIPT_RETURN_PREFETCH_MISSING');

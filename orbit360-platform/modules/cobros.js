@@ -14,6 +14,19 @@ Orbit.modules.cobros = (function () {
   function activeRoleNorm(){try{return String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');}catch(e){return'';}}
   function advisorRole(){return ['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial'].includes(activeRoleNorm());}
   function directPaymentRole(){return !advisorRole();}
+  function isPreviewHost(){try{return /--/.test(String(location&&location.hostname||''));}catch(e){return false;}}
+  function previewSyntheticReceiptId(value){return /^b3004(?:qa|human)_/i.test(String(value||'').trim());}
+  function previewCanMutateReceipt(receipt){return !isPreviewHost()||previewSyntheticReceiptId(receipt&&receipt.id);}
+  function previewGuard(receipt){
+    if(previewCanMutateReceipt(receipt))return true;
+    U.toast('Vista previa segura: los registros reales son solo lectura. La prueba de escritura se realiza únicamente sobre el caso QA sintético.');
+    return false;
+  }
+  function qaReceiptId(){
+    if(!isPreviewHost())return '';
+    try{const id=String(Orbit.route&&Orbit.route.params&&Orbit.route.params.qaReceipt||'').trim();return /^b3004human_/i.test(id)?id:'';}catch(e){return'';}
+  }
+  function receiptIdOf(row){return String(row&&(row.receiptId||row.reciboId||(row.__portfolioReceipt?row.id:''))||'').replace(/^portfolio:/,'').trim();}
   const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas'];
 
   const FDEFS = () => [
@@ -41,7 +54,7 @@ Orbit.modules.cobros = (function () {
     const clients = new Map((S().all('clientes') || []).filter(x => x && x.id != null).map(x => [String(x.id), x]));
     const policies = new Map((S().all('polizas') || []).filter(x => x && x.id != null).map(x => [String(x.id), x]));
     const vehicleByPolicy = new Map();
-    (S().all('vehiculos') || []).forEach(v => {
+    (st.fq ? (S().all('vehiculos') || []) : []).forEach(v => {
       const pid = String(v && v.polizaId || '');
       if (pid && !vehicleByPolicy.has(pid)) vehicleByPolicy.set(pid, v);
     });
@@ -260,6 +273,8 @@ Orbit.modules.cobros = (function () {
   }
 
   function render(host, reuseBase) {
+    const qaReceipt=qaReceiptId();
+    if(qaReceipt){st.fq='';st.fest='';st.fase='';st.page=1;}
     const hyd = hydrationState();
     if (!hyd.ready) {
       const blocked = hyd.failed.length > 0;
@@ -281,7 +296,8 @@ Orbit.modules.cobros = (function () {
     const porConciliar = (cart.currencies || []).reduce((sum, cur) => sum + Number(cart.byCurrency[cur] && cart.byCurrency[cur].porConciliar || 0), 0);
     const authoritative = rows(idx), portfolioOnly = portfolioPaymentRows(idx), reported = reportedRows(idx);
     const crmDirect = reported.filter(x => x.__crmDirectEvidence), paidReceiptFallback = reported.filter(x => x.__paidReceiptEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
-    const allRows = authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
+    const allRowsUnfiltered = authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
+    const allRows = qaReceipt ? allRowsUnfiltered.filter(row => receiptIdOf(row) === qaReceipt) : allRowsUnfiltered;
     const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE));
     if (st.page > totalPages) st.page = totalPages;
     if (st.page < 1) st.page = 1;
@@ -296,6 +312,8 @@ Orbit.modules.cobros = (function () {
 
     host.innerHTML = `<div class="page">
       ${K.bannerFor('cobros', `<button class="btn ghost" onclick="Orbit.modules.cobros.lote()" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📤 Preparar lote</button>`)}
+      ${isPreviewHost()?'<div class="card pad" data-preview-safe-mode="1" style="margin-bottom:12px;border-left:3px solid var(--info)"><b>Vista previa segura</b><div class="muted" style="margin-top:4px">Los registros reales son solo lectura. Las pruebas de escritura solo se habilitan en el caso QA sintético aislado.</div></div>':''}
+      ${qaReceipt?'<div class="card pad" data-b3004-human-qa-mode="1" style="margin-bottom:12px;border-left:3px solid var(--ok)"><b>Prueba QA sintética aislada</b><div class="muted" style="margin-top:4px">Esta vista contiene únicamente el recibo de prueba autorizado; no mezcla clientes reales.</div></div>':''}
       ${K.kpis([
         { label: 'Cartera al día', val: currencyMetric(cart, 'alDia'), color: 'var(--ok)', foot: 'cobros confirmados · sin conversión entre monedas', footTone: 'up' },
         { label: 'Pendiente', val: currencyMetric(cart, 'pend'), color: 'var(--warn)', foot: 'por vencer · por moneda' },
@@ -315,8 +333,8 @@ Orbit.modules.cobros = (function () {
       </div>
 
       <div class="card" style="overflow:visible">
-        ${K.filterBar(FDEFS(), st)}
-        ${stateFilterMenu()}
+        ${qaReceipt?'':K.filterBar(FDEFS(), st)}
+        ${qaReceipt?'':stateFilterMenu()}
         <div style="overflow-x:auto"><table class="tbl">
           <thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Estado</th><th title="Conciliado con Finanzas">Concil.</th><th></th></tr></thead>
           <tbody>${r.map(c => {
@@ -515,6 +533,7 @@ Orbit.modules.cobros = (function () {
     if (!directPaymentRole()) return U.toast('El rol Asesor no puede conciliar pagos.');
     const ctx = paymentContext(cobroOrReceiptId); if (!ctx || !ctx.receipt) return U.toast('No fue posible identificar un único recibo esperado para este cobro.');
     const c = ctx.cobro, receipt = ctx.receipt;
+    if(!previewGuard(receipt)) return false;
     let pm = document.getElementById('cob-conc'); if (pm) pm.remove();
     pm = document.createElement('div'); pm.id = 'cob-conc'; pm.className = 'drawer-back open';
     pm.style.cssText = 'display:grid;place-items:center;z-index:210';
@@ -569,7 +588,7 @@ Orbit.modules.cobros = (function () {
         close(); U.toast(saved&&saved.documentLifecycleOk===false?'✓ Pago conciliado. Un documento quedó en recuperación controlada.':'✓ Pago conciliado y datos actualizados');
         baseCache=null;setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
       } catch(error) {
-        btn.disabled=false; U.toast('No fue posible guardar la aplicación del pago.');
+        console.error('[Gravicentra][Cobros] Aplicación falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},receiptId:receipt.id||''});btn.disabled=false; U.toast(isPreviewHost()?'La prueba Preview no fue aceptada por el servidor. No se guardaron cambios.':'No fue posible guardar la aplicación del pago.');
       }
     };
   }
@@ -580,6 +599,7 @@ Orbit.modules.cobros = (function () {
     const ctx = paymentContext(cobroOrReceiptId);
     if (!ctx || !ctx.receipt) return U.toast('No fue posible identificar un único recibo esperado para reportar el pago.');
     const c=ctx.cobro, receipt=ctx.receipt;
+    if(!previewGuard(receipt)) return false;
     let pm=document.getElementById('cob-report-advisor'); if(pm)pm.remove();
     pm=document.createElement('div');pm.id='cob-report-advisor';pm.className='drawer-back open';pm.style.cssText='display:grid;place-items:center;z-index:210';
     pm.innerHTML='<div class="card" style="width:min(500px,95vw);padding:0;max-height:92vh;overflow:auto">'
@@ -617,6 +637,7 @@ Orbit.modules.cobros = (function () {
     const ctx = paymentContext(cobroId); if (!ctx) return U.toast('El reporte no tiene un recibo único; requiere revisión de relación, no validación manual del pago.');
     const c = ctx.cobro, receipt = ctx.receipt;
     if (!receipt) return U.toast('El reporte no tiene un recibo único; requiere revisión de relación, no validación manual del pago.');
+    if(!previewGuard(receipt)) return false;
     const domain=Orbit.reconciliationDomain;
     if(!domain||typeof domain.reportClientPayment!=='function') return U.toast('Aplicación canónica de pagos no disponible.');
     try {
@@ -640,6 +661,7 @@ Orbit.modules.cobros = (function () {
     if(!ctx) return U.toast('No fue posible identificar un único recibo esperado para registrar el pago.');
     const c=ctx.cobro, receipt=ctx.receipt;
     if(!receipt) return U.toast('No fue posible identificar un único recibo esperado para registrar el pago.');
+    if(!previewGuard(receipt)) return false;
     const p=S().get('polizas',c.polizaId)||{};
     const cli=S().get('clientes',c.clienteId)||{};
     let pm=document.getElementById('cob-pay'); if(pm)pm.remove();
@@ -684,7 +706,7 @@ Orbit.modules.cobros = (function () {
         close();U.toast(docsOk?'✓ Pago registrado':'✓ Pago registrado. Un documento quedó en recuperación controlada.');baseCache=null;
         if(docsOk&&avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
         setTimeout(()=>{const h=document.getElementById('host');if(h)render(h);},350);
-      }catch(error){console.error('[Gravicentra][Cobros] Registrar pago falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},cobroId:c.id||'',receiptId:receipt.id||''});btn.disabled=false;U.toast('No fue posible registrar el pago. No se guardaron cambios.');}
+      }catch(error){console.error('[Gravicentra][Cobros] Registrar pago falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},cobroId:c.id||'',receiptId:receipt.id||''});btn.disabled=false;U.toast(isPreviewHost()?'La prueba Preview no fue aceptada por el servidor. No se guardaron cambios.':'No fue posible registrar el pago. No se guardaron cambios.');}
     };
   }
 

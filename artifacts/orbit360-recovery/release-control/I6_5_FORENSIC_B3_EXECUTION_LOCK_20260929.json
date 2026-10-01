@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
     "boundaries": {
@@ -174,7 +174,7 @@
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
     },
-    "machineProofInvalidatedBySourceChange": false,
+    "machineProofInvalidatedBySourceChange": true,
     "priorMachineProof": {
       "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
       "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
@@ -303,7 +303,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R11_EXACT_PREVIEW",
+    "nextAction": "B3_004_R12_SOURCE_CONTRACT",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -563,6 +563,19 @@
     "r11MachinePass": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R11_MACHINE_PASS_20260930.json",
       "blobSha": "3669c7a825586fe3ab4d52facb1d4dc39c9e2192"
+    },
+    "r12HumanRejection": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_HUMAN_REJECTED_QA_ISOLATION_PERFORMANCE_20260930.json",
+      "blobSha": "fe3077f95a9f6c809863a489a4d9f8226712589f"
+    },
+    "r12SourceFix": {
+      "compositionLockBlobSha": "1810917092d0c67057dd95a8e1b601e57a6ca740",
+      "previewRealRowsReadOnly": true,
+      "qaFixtureIsolated": true,
+      "browserUiProofRequired": true,
+      "client360ToCobrosThresholdMs": 3000,
+      "routeFocusHydration": true,
+      "minimalCobrosReactiveSet": true
     }
   },
   "canonicalComposition": {
@@ -572,10 +585,14 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "8e23f0e0b2fee0eaf03ba5424bd4c1ba8c8e63fa"
+    "blobSha": "cc1c46f0d04b3db63a10580424d1e27d094c038d"
   },
   "nextRequiredProof": [
-    "B3_004_R11_TARGETED_HUMAN_VISUAL_PASS"
+    "B3_004_R12_SOURCE_CONTRACT_PASS",
+    "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_R12_BROWSER_UI_PROOF_PASS",
+    "B3_004_R12_TARGETED_HUMAN_VISUAL_PASS",
+    "B3_004_R12_HUMAN_FIXTURE_CLEANUP_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -762,16 +779,18 @@
     "r8OperationalProofPass": true,
     "cleanupPass": true,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R11_MACHINE_PASS_20260930.json",
-    "receiptBlobSha": "3669c7a825586fe3ab4d52facb1d4dc39c9e2192"
+    "receiptBlobSha": "3669c7a825586fe3ab4d52facb1d4dc39c9e2192",
+    "invalidatedByR12SourceChange": true,
+    "priorR11PreservedAsRejectedEvidenceOnly": true
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "12ae83f53fc0013356369b67feb2d26e086d9124"
+    "blobSha": "1810917092d0c67057dd95a8e1b601e57a6ca740"
   },
   "humanQaAuthorization": {
-    "status": "AUTHORIZED_FOR_B3_004_R11_PREVIEW_ONLY",
+    "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
     "idPrefix": "b3004human_",
-    "cleanupRequiredAfterHumanVisual": true,
+    "cleanupRequiredAfterAutomatedAndHumanVisual": true,
     "operationalBusinessWritesAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false

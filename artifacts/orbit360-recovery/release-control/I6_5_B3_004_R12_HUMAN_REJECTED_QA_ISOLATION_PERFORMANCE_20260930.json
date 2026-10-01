@@ -1,0 +1,50 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12_HUMAN_REJECTION_V1",
+  "recordedAt": "2026-09-30",
+  "status": "HUMAN_REJECTED_MECHANISM_REMEDIATION_REQUIRED",
+  "findingId": "B3-004",
+  "rejectedCandidate": {
+    "sourceSha": "9bb5f2209b8cfe1a9c05fafb597444a11b73ec7b",
+    "buildId": "gi-i65-b3-9bb5f2209b8c-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36801578325-vktjpem6.web.app",
+    "runId": 36801578325,
+    "artifactId": 11136327513,
+    "artifactDigest": "4522ee4541b61dbaed28821605601336de213e0983ded69089fe98f005624ed0"
+  },
+  "humanEvidence": {
+    "observedAt": "2026-09-30",
+    "realClientRowsStillActionableInPreview": true,
+    "observedClient": "KARLA",
+    "applyPaymentModalOpenedOnRealRow": true,
+    "saveToast": "No fue posible registrar el pago. No se guardaron cambios.",
+    "client360ToCobrosApproxMs": 6000,
+    "returnToReceiptsFast": true,
+    "returnMode": "Cliente360 receipts section, not full client listing",
+    "repeatedSameHumanFailureAfterMachinePass": true
+  },
+  "causalFindings": [
+    "PREVIEW_REAL_ROWS_ACTIONABLE_DESPITE_SERVER_WRITE_GUARD",
+    "HUMAN_FIXTURE_NOT_ISOLATED_FROM_REAL_DATA_AND_EXISTING_UI_STATE",
+    "MACHINE_PROOF_BYPASSED_BROWSER_UI_ACTION_PATH",
+    "R11_HUMAN_PERFORMANCE_NOT_MACHINE_GATED",
+    "COBROS_OPTIONAL_HYDRATION_REACTIVE_RENDER_CONTENTION"
+  ],
+  "preservedPass": {
+    "returnToCliente360ReceiptsFast": true,
+    "realCaseReadonlyStructuralIntegrityPass": true,
+    "previewServerRealWriteGuardWorkingAsDesigned": true
+  },
+  "remediationContract": {
+    "previewRealRows": "visible read-only; no write modal on real receipt",
+    "qaFixture": "fresh R12 synthetic fixture isolated through qaReceipt route",
+    "automatedHumanPath": "Playwright clicks same Aplicar pago and Conciliar buttons before human review",
+    "performanceGate": "Cliente360 to usable Cobros <= 3000 ms in automated browser proof",
+    "hydration": "pause irrelevant deferred hydration during route focus; minimal Cobros reactive set",
+    "fixtureLifecycle": "cleanup R11/R12 residues; browser proof; cleanup; recreate fresh fixture for Paula",
+    "humanRetestOnlyAfterBrowserUiProofPass": true,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  }
+}

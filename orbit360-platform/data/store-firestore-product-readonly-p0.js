@@ -9,7 +9,7 @@
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
-  var VERSION = 'p0-20260930-b3004r11-staged-demand-hydration';
+  var VERSION = 'p0-20260930-b3004r12-route-focus-hydration';
   var WRITE_ERROR = 'WRITE_BLOCKED_PRODUCT_READ_ONLY_P0';
   function text(value) { return String(value == null ? '' : value).trim(); }
   function clone(value) { try { return JSON.parse(JSON.stringify(value)); } catch (e) { return value && typeof value === 'object' ? Object.assign({}, value) : value; } }
@@ -23,7 +23,7 @@
     var startupCollections = requestedRequired.length ? requestedRequired.slice() : collections.slice();
     var deferredCollections = collections.filter(function (name) { return startupCollections.indexOf(name) < 0; });
     var authoritativeFirstReadRequired = options.authoritativeFirstReadRequired === true;
-    var listeners = [], unsubscribers = [], cache = {}, prefs = clone(options.initialPrefs || {}), deferredAttached = false, deferredScheduled = false, deferredCursor = 0, attachStarted = {};
+    var listeners = [], unsubscribers = [], cache = {}, prefs = clone(options.initialPrefs || {}), deferredAttached = false, deferredScheduled = false, deferredCursor = 0, deferredPauseUntil = 0, attachStarted = {};
     var state = { version: VERSION, mode: 'product', tenantId: tenantCheck.tenantId || text(options.tenantId), source: 'data/store-firestore-product-readonly-p0.js', noFallback: true, writeEnabled: false, ready: false, status: 'created', attachedCollections: [], observedCollections: [], serverConfirmedCollections: [], cacheOnlyCollections: [], snapshotSources: {}, deniedCollections: [], snapshotErrors: {}, quarantinedRows: {}, queryPlans: {}, lastSnapshotAt: null, requiredStartupCollections: startupCollections.slice(), deferredCollections: deferredCollections.slice(), deferredAttached: false, authoritativeFirstRead: authoritativeFirstReadRequired };
     collections.forEach(function (collection) { cache[collection] = []; state.quarantinedRows[collection] = []; });
     function fail(message) { var error = new Error(message || WRITE_ERROR); error.code = WRITE_ERROR; throw error; }
@@ -43,6 +43,12 @@
     }
     function scheduleDeferredNext() {
       if (deferredAttached || deferredScheduled || !requiredConfirmed()) return;
+      var pauseMs = Math.max(0, deferredPauseUntil - Date.now());
+      if (pauseMs > 0) {
+        deferredScheduled = true;
+        setTimeout(function () { deferredScheduled = false; scheduleDeferredNext(); }, pauseMs);
+        return;
+      }
       while (deferredCursor < deferredCollections.length && attachStarted[deferredCollections[deferredCursor]]) deferredCursor += 1;
       if (deferredCursor >= deferredCollections.length) { deferredAttached = true; state.deferredAttached = true; return; }
       deferredScheduled = true;
@@ -88,6 +94,7 @@
       } catch (error) { recordError(collection, error, 'attach'); return false; }
     }
     function ensureCollections(names) {
+      deferredPauseUntil = Math.max(deferredPauseUntil, Date.now() + 2500);
       var requested = unique(names).filter(function (name) { return collections.indexOf(name) >= 0; });
       requested.forEach(function (name) { if (!attachStarted[name]) attachCollection(name, authoritativeFirstReadRequired); });
       return requested;
@@ -103,7 +110,7 @@
       if (!state.ready && state.status === 'attaching') state.status = 'waiting-authoritative-snapshots';
       return startupCollections.every(function (name) { return !state.snapshotErrors[name] && state.deniedCollections.indexOf(name) < 0; });
     }
-    function detach() { unsubscribers.splice(0).forEach(function (unsubscribe) { try { unsubscribe(); } catch (e) {} }); state.attachedCollections = []; state.observedCollections = []; state.serverConfirmedCollections = []; state.cacheOnlyCollections = []; state.snapshotSources = {}; state.ready = false; state.status = 'detached'; deferredAttached = false; deferredScheduled = false; deferredCursor = 0; attachStarted = {}; state.deferredAttached = false; }
+    function detach() { unsubscribers.splice(0).forEach(function (unsubscribe) { try { unsubscribe(); } catch (e) {} }); state.attachedCollections = []; state.observedCollections = []; state.serverConfirmedCollections = []; state.cacheOnlyCollections = []; state.snapshotSources = {}; state.ready = false; state.status = 'detached'; deferredAttached = false; deferredScheduled = false; deferredCursor = 0; deferredPauseUntil = 0; attachStarted = {}; state.deferredAttached = false; }
     function relationPolicy(row) { var pid = text(row && (row.polizaId || row.policyId)); if (!pid) return null; return (cache.polizas || []).find(function (p) { return text(rowId(p)) === pid; }) || null; }
     function relationClient(row, policy) { var cid = text(row && row.clienteId) || text(policy && policy.clienteId); if (!cid) return null; return (cache.clientes || []).find(function (c) { return text(rowId(c)) === cid; }) || null; }
     function relationValue(kind, row) { var policy = relationPolicy(row), client = relationClient(row, policy); if (kind === 'country') return text(row && (row.pais || row.country)) || text(policy && (policy.pais || policy.country)) || text(client && (client.pais || client.country)); if (kind === 'advisor') return text(row && (row.asesorId || row.advisorId || row.ownerAdvisorId)) || text(policy && (policy.asesorId || policy.advisorId || policy.ownerAdvisorId)) || text(client && (client.asesorId || client.advisorId || client.ownerAdvisorId)); if (kind === 'team') return text(row && (row.equipoId || row.teamId)) || text(policy && (policy.equipoId || policy.teamId)) || text(client && (client.equipoId || client.teamId)); return ''; }
