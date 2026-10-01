@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
+  "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
     "boundaries": {
@@ -304,7 +304,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R15_SOURCE_CONTRACT",
+    "nextAction": "B3_004_R12_EXACT_PREVIEW",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -580,8 +580,8 @@
     },
     "r12ContractPass": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_SOURCE_CONTRACT_PASS_20260930.json",
-      "blobSha": "0596f12cdda0d7d05eb2335ec61f4c817a14a576",
-      "runId": 36926170548
+      "blobSha": "d35e78b91890d884a564a20660d5f0040df007e7",
+      "runId": 36929787247
     },
     "r12BrowserUiFail": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_BROWSER_UI_PROOF_FAIL_20260930.json",
@@ -858,12 +858,11 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "6bc3da0e2ee68daf444bffdc2367237efa9b195f"
+    "blobSha": "1886dbda3b433b91f68234c6161891b783f4dbf5"
   },
   "nextRequiredProof": [
-    "B3_004_R15_SOURCE_CONTRACT_PASS",
-    "B3_004_R15_EXACT_PREVIEW_MACHINE_PASS",
-    "B3_004_R15_TARGETED_HUMAN_VISUAL_PASS"
+    "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_004_R12_TARGETED_HUMAN_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
