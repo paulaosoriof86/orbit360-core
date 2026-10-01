@@ -1,0 +1,30 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R10_SOURCE_CONTRACT_PASS_V1",
+  "recordedAt": "2026-09-30",
+  "status": "PASS_PENDING_EXACT_PREVIEW",
+  "sourceSha": "cd43d98efb98371ac3edce7a80f8c5ca61ab148a",
+  "runId": 36795386515,
+  "findingId": "B3-004",
+  "assertions": {
+    "r8CausalContract": true,
+    "cancelledPolicySyntheticReadModel": true,
+    "scopeModuleAlignment": true,
+    "deleteOwnerRestored": true,
+    "controlledPaidEnrichment": true,
+    "localBackPath": true,
+    "assetBindings": true,
+    "r9HumanRejectionCausalContract": true,
+    "r10RealDocumentContract": true,
+    "r10DocumentLifecycleContract": true,
+    "r10ObservableErrorContract": true,
+    "canonicalPaymentOwnerRestored": true,
+    "relationAwarePaymentGuard": true,
+    "localReceiptBodyBack": true,
+    "paymentEditFieldsExposed": true
+  },
+  "operationalBusinessWrites": false,
+  "syntheticWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

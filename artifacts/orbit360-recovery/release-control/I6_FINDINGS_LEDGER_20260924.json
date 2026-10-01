@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "SOURCE_FIXED_PENDING_CONTRACT",
+      "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R10_SOURCE_CONTRACT",
+      "nextAction": "B3_004_R10_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1529,6 +1529,11 @@
         "reimport": false,
         "live": false,
         "b3005": false
+      },
+      "r10ContractPass": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_SOURCE_CONTRACT_PASS_20260930.json",
+        "blobSha": "af594c2b53fa027d934b149fc40c58f743f8797e",
+        "runId": 36795386515
       }
     },
     {
@@ -5133,7 +5138,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT",
+    "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
@@ -5169,6 +5174,7 @@
     "r9p1SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R9P1_GLOBAL_BACK_CAUSAL_FIX_20260930.json",
     "r10HumanRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_HUMAN_REJECTED_REMEDIATION_REQUIRED_20260930.json",
     "r10HumanRejectionBlobSha": "d14061d6c3c95bf30f4d81caeedaa19c9193483c",
-    "r10SourceFixBound": true
+    "r10SourceFixBound": true,
+    "r10ContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_SOURCE_CONTRACT_PASS_20260930.json"
   }
 }
