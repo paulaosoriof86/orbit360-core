@@ -81,3 +81,23 @@ test('selection compile remains explicit and non-binding',()=>{
 test('executeCompiled fails closed',()=>{
   assert.throws(()=>a.executeCompiled(),/COTCOMP_PERSISTENCE_EXECUTION_DISABLED/);
 });
+
+test('W3 versioned proposal compiles to sanitized atomic dry-run commands only',()=>{
+  const r=a.compileVersionedProposal({
+    tenantId:'alianzas-soluciones',caseId:'qcase_w3',country:'GT',product:'AUTO',currency:'GTQ',
+    insurerId:'ins1',insurerDisplayName:'Insurer',sourceId:'src1',planName:'Plan A',premium:2500,
+    coverages:{},limits:{},sublimits:{},deductibles:{},assistance:{},conditions:[],exclusions:[],
+    validity:{validFrom:'2026-10-01T00:00:00Z',validUntil:'2026-10-31T23:59:59Z'},
+    provenance:{synthetic:true},validationState:'VALIDATED',validatedBy:'qa',validatedAt:'2026-10-01T00:00:00Z',
+    versionNumber:1,requestKey:'w3-v1'
+  });
+  assert.equal(r.ok,true);
+  assert.equal(r.dryRunOnly,true);
+  assert.equal(r.executionEnabled,false);
+  assert.equal(r.writesEnabled,false);
+  assert.equal(r.physicalW3Allowed,false);
+  assert.equal(r.atomic,true);
+  assert.equal(r.commands.length,2);
+  assert.ok(r.commands.every(x=>typeof x.payloadDigest==='string'&&x.payloadDigest.length===64));
+});
+
