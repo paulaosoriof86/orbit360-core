@@ -2003,6 +2003,19 @@
         "qaBlobs": {
           "tools/gravicentra-i6-5-b3-004-contract.mjs": "e5dc1ae490a401008f6c55549e13d1848b2bac25"
         }
+      },
+      "r12p15DirectTimingHarnessFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P15_DIRECT_TIMING_HARNESS_FIX_20261001.json",
+        "blobSha": "b6365aa92dde7120390a5e25609fa7a08c0cb5a9",
+        "failedRunId": 36909046164,
+        "failedMetricMs": 3405,
+        "thresholdMs": 3000,
+        "thresholdRelaxed": false,
+        "productSourceChanged": false,
+        "qaBlobs": {
+          "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "b0678d169ed28c7ca77637e3af3153d28621bcdc",
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "fd6de92e519b20ac1bfcc1495ac0a907329e2866"
+        }
       }
     },
     {
@@ -5694,6 +5707,10 @@
     "r12p14DirectColdFix": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P14_DIRECT_COLD_PREFETCH_POLL_FIX_20261001.json",
       "blobSha": "b6d023042a0d9c60b4cb0eacaef47d151226215e"
+    },
+    "r12p15DirectTimingHarnessFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P15_DIRECT_TIMING_HARNESS_FIX_20261001.json",
+      "blobSha": "b6365aa92dde7120390a5e25609fa7a08c0cb5a9"
     }
   }
 }

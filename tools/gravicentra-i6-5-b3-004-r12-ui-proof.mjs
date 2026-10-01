@@ -94,7 +94,7 @@ try{
     return Promise.resolve(Orbit.productAppP0.status?.().started?Orbit.productAppP0.status():Orbit.productAppP0.activate());
   },token);
   need(activated?.started===true,'B3_004_R12_PRODUCT_APP_NOT_STARTED');
-  await page.waitForTimeout(650);
+  await page.waitForFunction(scope=>window.Orbit?.legal?.yaAcepto?.(scope)===true&&document.querySelectorAll('[data-legal-gate]').length===0,legalScope,{timeout:3000});
   const legalState=await page.evaluate(scope=>({accepted:window.Orbit?.legal?.yaAcepto?.(scope)===true,overlayCount:document.querySelectorAll('[data-legal-gate]').length}),legalScope);
   need(legalState.accepted===true,'B3_004_R12_QA_PRIOR_LEGAL_ACCEPTANCE_NOT_RECOGNIZED');
   need(legalState.overlayCount===0,'B3_004_R12_QA_LEGAL_OVERLAY_STILL_OPEN:'+legalState.overlayCount);

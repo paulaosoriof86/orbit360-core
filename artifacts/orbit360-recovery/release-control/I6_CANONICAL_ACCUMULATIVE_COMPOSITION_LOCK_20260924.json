@@ -403,17 +403,14 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P14",
-    "reason": "DIRECT_COLD_PREFETCH_AND_POLL_OPTIMIZATION",
-    "changedProductFiles": [
-      "orbit360-platform/core/product-app-p0.js",
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/index.html"
-    ],
+    "gate": "I6.5-B3-004-R12P15",
+    "reason": "DIRECT_TIMING_HARNESS_REMOVE_ARTIFICIAL_650MS_SLEEP",
+    "changedProductFiles": [],
     "changedQaFiles": [
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -1418,6 +1415,17 @@
     },
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "e5dc1ae490a401008f6c55549e13d1848b2bac25"
+    },
+    "thresholdMs": 3000,
+    "thresholdRelaxed": false
+  },
+  "b3004R12P15DirectTimingHarnessFix": {
+    "status": "QA_MECHANISM_FIXED_PENDING_EXACT_PREVIEW_RERUN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P15_DIRECT_TIMING_HARNESS_FIX_20261001.json",
+    "receiptBlobSha": "b6365aa92dde7120390a5e25609fa7a08c0cb5a9",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "b0678d169ed28c7ca77637e3af3153d28621bcdc",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "fd6de92e519b20ac1bfcc1495ac0a907329e2866"
     },
     "thresholdMs": 3000,
     "thresholdRelaxed": false

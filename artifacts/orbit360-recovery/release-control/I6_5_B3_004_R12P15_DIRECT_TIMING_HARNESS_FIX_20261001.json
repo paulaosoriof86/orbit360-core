@@ -1,0 +1,30 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P15_DIRECT_TIMING_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "findingId": "B3-004",
+  "status": "QA_MECHANISM_FIXED_PENDING_EXACT_PREVIEW_RERUN",
+  "parentHead": "76b931ab9c80035ad4bb5ab8f4678b2c8d814475",
+  "failedRunId": 36909046164,
+  "failedJobId": 110527282773,
+  "failedMetric": {
+    "directReceiptUsableMs": 3405,
+    "thresholdMs": 3000
+  },
+  "classification": "HARNESS_MEASUREMENT_DEFECT_NOT_YET_PRODUCT_PERFORMANCE_FAILURE",
+  "rootCause": "BROWSER_UI_PROOF_ADDED_UNCONDITIONAL_650MS_POST_ACTIVATION_SETTLE_BEFORE_CHECKING_AN_ALREADY_PREACCEPTED_LEGAL_GATE_AND_INCLUDED_THAT_SLEEP_IN_DIRECT_RECEIPT_USABLE_TIME",
+  "remediation": {
+    "thresholdRelaxed": false,
+    "thresholdMs": 3000,
+    "fixedSleepRemoved": true,
+    "legalGateNowConditionDriven": true,
+    "productSourceChanged": false,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "b0678d169ed28c7ca77637e3af3153d28621bcdc",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "fd6de92e519b20ac1bfcc1495ac0a907329e2866"
+  }
+}

@@ -810,7 +810,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "48bd2c0e65a928e0acc0b77afa4546101c09ffde"
+    "blobSha": "4f83c5f1c7c0ac697c099dff01796e684110bbed"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -943,7 +943,7 @@
     "orbit360-platform/core/product-app-p0.js",
     "orbit360-platform/index.html"
   ],
-  "compositionLockBlobSha": "e023063f92a9eba07bbb25ee26b8ed2d4df1a91b",
+  "compositionLockBlobSha": "60a0458551783029601e6faa8e7588b4b7f53f33",
   "syntheticQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
     "purpose": "B3-004 payment + R8 cross-advisor scope + durable soft-delete readback + cleanup proof",
@@ -1013,7 +1013,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "e023063f92a9eba07bbb25ee26b8ed2d4df1a91b"
+    "blobSha": "60a0458551783029601e6faa8e7588b4b7f53f33"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -1436,6 +1436,17 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "e5dc1ae490a401008f6c55549e13d1848b2bac25"
     },
+    "thresholdRelaxed": false
+  },
+  "r12p15DirectTimingHarnessFix": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P15_DIRECT_TIMING_HARNESS_FIX_20261001.json",
+    "blobSha": "b6365aa92dde7120390a5e25609fa7a08c0cb5a9",
+    "status": "QA_MECHANISM_FIXED_PENDING_EXACT_PREVIEW_RERUN",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "b0678d169ed28c7ca77637e3af3153d28621bcdc",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "fd6de92e519b20ac1bfcc1495ac0a907329e2866"
+    },
+    "thresholdMs": 3000,
     "thresholdRelaxed": false
   }
 }
