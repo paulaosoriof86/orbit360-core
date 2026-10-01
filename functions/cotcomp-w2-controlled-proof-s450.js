@@ -12,6 +12,7 @@ const PROJECT_ID='ays-orbit-360-lab';
 const REGION='us-central1';
 const TENANT_ID='alianzas-soluciones';
 const TARGET_ADVISOR_ID='ase-paula-osorio';
+const TARGET_EMAIL_HASH='9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f';
 const OWNER_CALLABLE='orbit360OpsLeadsCommand';
 const STORAGE_MODE='legacyCompatible';
 
@@ -164,8 +165,22 @@ async function exchangeCustomToken(apiKey,customToken){
 }
 function roleNorm(v){return clean(v,100).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();}
 async function resolveActor(db,auth){
+  const users=[]; let token;
+  do{
+    const page=await auth.listUsers(1000,token);
+    users.push(...page.users);
+    token=page.pageToken;
+  }while(token&&users.length<10000);
+  const targetUsers=users.filter(user=>user.email&&sha(String(user.email).trim().toLowerCase().replace(/\s+/g,''))===TARGET_EMAIL_HASH);
+  if(targetUsers.length!==1)throw new Error('S450_TARGET_AUTH_COUNT_'+targetUsers.length);
+  const user=targetUsers[0];
+  if(user.disabled)throw new Error('S450_TARGET_AUTH_DISABLED');
+
   const snap=await db.collection('tenants').doc(TENANT_ID).collection('members').get();
-  const matches=snap.docs.map(d=>({id:d.id,...(d.data()||{})})).filter(row=>clean(row.advisorId||row.asesorId,180)===TARGET_ADVISOR_ID);
+  const matches=snap.docs.map(d=>({id:d.id,...(d.data()||{})})).filter(row=>{
+    const uid=clean(row.uid||row.userId||row.id,180);
+    return uid===user.uid&&clean(row.advisorId||row.asesorId,180)===TARGET_ADVISOR_ID;
+  });
   if(matches.length!==1)throw new Error('S450_TARGET_MEMBERSHIP_COUNT_'+matches.length);
   const member=matches[0];
   const status=roleNorm(member.status||member.estado);
@@ -175,11 +190,7 @@ async function resolveActor(db,auth){
   const adminRoles=new Set(['superadmin','admintenant','direccion','admin','operativo']);
   const managePerms=new Set(['ops manage','leads manage','gestiones manage','workflow manage']);
   if(!roles.some(r=>adminRoles.has(r))&&!perms.some(p=>managePerms.has(p)))throw new Error('S450_TARGET_CANNOT_MANAGE_WORKFLOW');
-  const uid=clean(member.uid||member.userId||member.id,180);
-  if(!uid)throw new Error('S450_TARGET_UID_MISSING');
-  const user=await auth.getUser(uid);
-  if(user.disabled)throw new Error('S450_TARGET_AUTH_DISABLED');
-  return {uid,memberDocId:matches[0].id};
+  return {uid:user.uid,memberDocId:member.id};
 }
 
 async function cleanupExact(db,fixture,actorUid,baseline){
@@ -336,7 +347,7 @@ async function runProof(){
 }
 
 module.exports=Object.freeze({
-  VERSION,PROJECT_ID,REGION,TENANT_ID,TARGET_ADVISOR_ID,OWNER_CALLABLE,STORAGE_MODE,
+  VERSION,PROJECT_ID,REGION,TENANT_ID,TARGET_ADVISOR_ID,TARGET_EMAIL_HASH,OWNER_CALLABLE,STORAGE_MODE,
   sha,digest,eventId,conflictRequestId,fixtureFor,conflictJournal,commandEnvelope,conflictEnvelope,
   assertExpectedOwned,readJournal,allAbsent,exactSnapshot,runProof
 });
