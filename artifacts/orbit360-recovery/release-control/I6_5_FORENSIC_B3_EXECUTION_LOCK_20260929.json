@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
+  "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
     "boundaries": {
@@ -174,7 +174,7 @@
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
     },
-    "machineProofInvalidatedBySourceChange": true,
+    "machineProofInvalidatedBySourceChange": false,
     "priorMachineProof": {
       "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
       "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
@@ -653,6 +653,10 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P9P2_CONTRACT_VARIABLE_FIX_20261001.json",
       "blobSha": "6f202b1b252748e5b41e9bcbc9f39940a66b8605",
       "productSourceChanged": false
+    },
+    "r12MachinePass": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_MACHINE_PASS_20260930.json",
+      "blobSha": "c2acddae9c1fd524d2db21abf7b7cfbc165ffd6c"
     }
   },
   "canonicalComposition": {
@@ -662,10 +666,9 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "81be8371d58f15dd438db6dd5ce0709b0712ac46"
+    "blobSha": "a7c91777199105453a073281630ba3e4d065c94a"
   },
   "nextRequiredProof": [
-    "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
     "B3_004_R12_TARGETED_HUMAN_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
@@ -840,26 +843,20 @@
     "supersedesBlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244"
   },
   "machineProof": {
-    "sourceSha": "9bb5f2209b8cfe1a9c05fafb597444a11b73ec7b",
-    "buildId": "gi-i65-b3-9bb5f2209b8c-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36801578325-vktjpem6.web.app",
-    "channelId": "gi-b3004-36801578325",
-    "runId": 36801578325,
-    "artifactId": 11136327513,
-    "artifactDigest": "4522ee4541b61dbaed28821605601336de213e0983ded69089fe98f005624ed0",
+    "sourceSha": "6299c8fc891028305400c8b2fdf40eb31f9c142f",
+    "buildId": "gi-i65-b3-6299c8fc8910-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36849615859-mlsfq6m0.web.app",
+    "channelId": "gi-b3004-36849615859",
+    "runId": 36849615859,
+    "artifactId": 11155032467,
+    "artifactDigest": "826f0afa4f78cb8d64b44285293b7384b49a628035337243123647f814f30357",
     "exactReadback": true,
     "backendExactDeploy": true,
     "syntheticProofPass": true,
     "r8OperationalProofPass": true,
     "cleanupPass": true,
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R11_MACHINE_PASS_20260930.json",
-    "receiptBlobSha": "3669c7a825586fe3ab4d52facb1d4dc39c9e2192",
-    "invalidatedByR12SourceChange": true,
-    "priorR11PreservedAsRejectedEvidenceOnly": true,
-    "r12BrowserUiProofRejected": true,
-    "r12BrowserUiFailedRunId": 36805222252,
-    "r12BrowserUiFailedJobId": 110188070507,
-    "invalidatedByR12P1SourceChange": true
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_MACHINE_PASS_20260930.json",
+    "receiptBlobSha": "c2acddae9c1fd524d2db21abf7b7cfbc165ffd6c"
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
