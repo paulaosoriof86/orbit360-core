@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11P7_FIRESTORE_LISTEN_ABORT_AND_TIMING_ADJUDICATION_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "fc44eed4a16e9f263f7774a8728a91948539e676",
+  "failedRunId": 36891163328,
+  "failedJobId": 110467132531,
+  "classification": "QA_HARNESS_BENIGN_FIRESTORE_LISTEN_ABORT_MISCLASSIFIED_AS_FUNCTIONAL_FAILURE",
+  "rootCause": "PLAYWRIGHT_REQUESTFAILED_CAPTURE_CLASSIFIED_FIRESTORE_REALTIME_LISTEN_CHANNEL_NET_ERR_ABORTED_DURING_ROUTE_RELOAD_OR_CONTEXT_LIFECYCLE_AS_A_PRODUCT_FAILURE_DESPITE_ZERO_PAGE_ERRORS_ZERO_CONSOLE_ERRORS_ZERO_HTTP_ERRORS_AND_SUCCESSFUL_CANONICAL_WRITES_READBACK",
+  "evidence": {
+    "client360ToCobrosUsableMs": 162,
+    "criticalHttpErrors": 0,
+    "pageErrors": 0,
+    "relevantConsoleErrors": 0,
+    "onlyRequestFailure": {
+      "host": "firestore.googleapis.com",
+      "path": "/google.firestore.v1.Firestore/Listen/channel",
+      "method": "GET",
+      "failure": "net::ERR_ABORTED"
+    },
+    "applyPaymentPass": true,
+    "reconcileSamePaymentPass": true,
+    "documentReadbackPass": true,
+    "cleanupPass": true
+  },
+  "remediation": {
+    "allowOnlyExactFirestoreListenGetErrAbortedAsBenignLifecycleAbort": true,
+    "allOtherCriticalFirebaseAndSameOriginRequestFailuresRemainFailClosed": true,
+    "actionTimingInstrumentationAdded": true,
+    "productSourceChanged": false
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "f26c5862bc3b72db8472a7f0bc09608a15cb1d00",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "7917e2ffbc47c4800e4e071078e3c7b7ca7ad543"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

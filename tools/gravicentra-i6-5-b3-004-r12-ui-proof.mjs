@@ -85,6 +85,7 @@ try{
   },{scope:legalScope});
   proof.assertions.legalGatePreconditionSimulated=true;
   const directReceiptUrl=target+'/#/cliente360?c='+encodeURIComponent(ids.client)+'&t=recibos&r='+encodeURIComponent(ids.receipt);
+  const directReceiptStartedAt=Date.now();
   await page.goto(directReceiptUrl,{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0&&!!window.Orbit?.modules?.cobros);
   const activated=await page.evaluate(async token=>{
@@ -100,6 +101,7 @@ try{
   proof.assertions.noLegalOverlay=true;
   await page.waitForFunction(id=>!!window.Orbit?.store?.get?.('recibosEsperados',id),ids.receipt);
   await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:15000});
+  proof.timing.directReceiptUsableMs=Date.now()-directReceiptStartedAt;
   const directReceiptSurface=await page.evaluate(id=>{
     const detail=document.querySelector('[data-rp-receipt-detail="1"]'),hero=detail?.querySelector('[data-rp-receipt-hero="1"]');
     const actionRects=[...(hero?.querySelectorAll('.btn')||[])].map(x=>{const r=x.getBoundingClientRect();return{text:String(x.textContent||'').trim(),left:r.left,right:r.right,width:r.width};});
@@ -182,6 +184,7 @@ try{
   },ids.receipt);
   proof.actionContext=actionContext;
   console.log('B3_004_R12_ACTION_CONTEXT='+JSON.stringify(actionContext));
+  const applyOpenStartedAt=Date.now();
   await page.locator('button[data-cobros-action="apply"]').click();
   await page.waitForTimeout(350);
   const modalState=await page.evaluate(()=>({
@@ -192,6 +195,7 @@ try{
   proof.applyModalState=modalState;
   if(!modalState.open)throw new Error('B3_004_R12_APPLY_MODAL_NOT_OPEN:'+JSON.stringify({actionContext,modalState}));
   await page.waitForSelector('#cob-pay');
+  proof.timing.applyOpenMs=Date.now()-applyOpenStartedAt;
   const applyResponsive=await page.evaluate(()=>{
     const modal=document.getElementById('cob-pay'),card=modal?.querySelector('.card'),footer=modal?.querySelector('[data-cobros-modal-footer="apply"]');
     const mr=modal?.getBoundingClientRect(),cr=card?.getBoundingClientRect();
@@ -244,16 +248,20 @@ try{
   need(paymentEvent,'B3_004_R12_APPLY_CALLABLE_NOT_OBSERVED_AFTER_UPLOAD:'+JSON.stringify(proof.applyTransport));
   need(paymentEvent.httpStatus<400&&paymentEvent.ok===true&&!paymentEvent.errorStatus,'B3_004_R12_APPLY_CALLABLE_FAILED:'+JSON.stringify(proof.applyTransport));
   need(uiFailure.payModalOpen===false,'B3_004_R12_APPLY_MODAL_REMAINED_OPEN_AFTER_SUCCESS:'+JSON.stringify(proof.applyTransport));
+  proof.timing.applySaveMs=Date.now()-applyStartedAt;
   const paid=await waitCobro(xs=>xs.length===1&&xs[0].estado==='Pagado');
   need(paid.length===1,'B3_004_R12_PAYMENT_NOT_SINGLE');
   need(clean(paid[0].paymentSupportDocumentRef),'B3_004_R12_PAYMENT_SUPPORT_REF_MISSING_AFTER_UI_UPLOAD');
   proof.assertions.browserApplyPayment=true;
   proof.assertions.browserPaymentSupportPersisted=true;
+  proof.timing.applyPostWriteReadbackMs=Math.max(0,Date.now()-(paymentEvent?.at||applyStartedAt));
   proof.payment={cobroId:paid[0].id,paymentState:paid[0].paymentState||'',applicationState:paid[0].applicationState||'',paymentSupportDocumentRef:clean(paid[0].paymentSupportDocumentRef)};
 
   await page.waitForSelector('button[data-cobros-action="reconcile"]',{timeout:12000});
+  const reconcileOpenStartedAt=Date.now();
   await page.locator('button[data-cobros-action="reconcile"]').click();
   await page.waitForSelector('#cob-conc');
+  proof.timing.reconcileOpenMs=Date.now()-reconcileOpenStartedAt;
   const reconcileResponsive=await page.evaluate(()=>{
     const modal=document.getElementById('cob-conc'),card=modal?.querySelector('.card'),footer=modal?.querySelector('[data-cobros-modal-footer="reconcile"]');
     const cr=card?.getBoundingClientRect();
@@ -286,6 +294,7 @@ try{
   need(clean(applied[0].paymentSupportDocumentRef)!==clean(paid[0].paymentSupportDocumentRef),'B3_004_R12_REPLACEMENT_SUPPORT_REF_DID_NOT_CHANGE');
   need(clean(applied[0].invoiceDocumentRef),'B3_004_R12_INVOICE_REF_MISSING_AFTER_UI_UPLOAD');
   await page.waitForSelector('#cob-conc',{state:'detached',timeout:20000});
+  proof.timing.reconcileSaveMs=Date.now()-reconcileStartedAt;
   await page.waitForTimeout(250);
   const reconcileTransport=proof.transportEvents.slice(reconcileTransportStart);
   const reconcileUploads=reconcileTransport.filter(x=>x.kind==='response'&&/DocumentDriveUploadPreview/i.test(x.fn));
@@ -306,6 +315,7 @@ try{
   need(clean(reloaded[0].invoiceDocumentRef)===clean(applied[0].invoiceDocumentRef),'B3_004_R12_INVOICE_NOT_DURABLE_AFTER_RELOAD');
   proof.assertions.browserReloadDurability=true;
   const readTransportStart=proof.transportEvents.length;
+  const documentReadbackStartedAt=Date.now();
   const docReadback=await page.evaluate(async ({paymentRef,invoiceRef,ids})=>{
     const dp=window.Orbit?.productDriveDocumentProviderP0;
     const runtime=window.Orbit?.productRuntimeBrowserProvidersP0?.status?.()||{};
@@ -328,6 +338,7 @@ try{
   console.log('B3_004_R12_DOCUMENT_READBACK='+JSON.stringify(proof.documentReadbackDiagnostic));
   need(docReadback.provider&&docReadback.payment&&docReadback.invoice,'B3_004_R12_DRIVE_READBACK_AFTER_RELOAD_FAILED:'+JSON.stringify(proof.documentReadbackDiagnostic));
   proof.assertions.browserDriveReadbackAfterReload=true;
+  proof.timing.documentReadbackMs=Date.now()-documentReadbackStartedAt;
   proof.documents={paymentSupportDocumentRef:clean(reloaded[0].paymentSupportDocumentRef),invoiceDocumentRef:clean(reloaded[0].invoiceDocumentRef)};
 
   const directUiStart=Date.now();
@@ -379,9 +390,21 @@ try{
     }catch{return true;}
   };
   const criticalHttpErrors=proof.httpErrors.filter(criticalNetwork);
-  const criticalRequestFailures=proof.requestFailures.filter(criticalNetwork);
+  const benignFirestoreListenAbort=x=>{
+    try{
+      const u=new URL(clean(x.url));
+      return u.hostname.toLowerCase()==='firestore.googleapis.com'
+        && u.pathname==='/google.firestore.v1.Firestore/Listen/channel'
+        && clean(x.method).toUpperCase()==='GET'
+        && clean(x.failure)==='net::ERR_ABORTED';
+    }catch{return false;}
+  };
+  const benignLifecycleAborts=proof.requestFailures.filter(benignFirestoreListenAbort);
+  const criticalRequestFailures=proof.requestFailures.filter(x=>criticalNetwork(x)&&!benignFirestoreListenAbort(x));
   const relevantConsoleErrors=proof.consoleErrors.filter(x=>!/^failed to load resource/i.test(clean(x.text)));
-  proof.errorAdjudication={criticalHttpErrors,criticalRequestFailures,pageErrors:proof.pageErrors,relevantConsoleErrors,rawConsoleErrors:proof.consoleErrors};
+  proof.errorAdjudication={criticalHttpErrors,criticalRequestFailures,benignLifecycleAborts,pageErrors:proof.pageErrors,relevantConsoleErrors,rawConsoleErrors:proof.consoleErrors};
+  proof.timing.documentUploadFinalizeMs=proof.reconcileTransport?.durationMs||0;
+  console.log('B3_004_R12_TIMINGS='+JSON.stringify(proof.timing));
   console.log('B3_004_R12_ERROR_ADJUDICATION='+JSON.stringify(proof.errorAdjudication));
   need(proof.pageErrors.length===0,'B3_004_R12P11P6_PAGE_ERRORS:'+JSON.stringify(proof.pageErrors));
   need(criticalHttpErrors.length===0,'B3_004_R12P11P6_CRITICAL_HTTP_ERRORS:'+JSON.stringify(criticalHttpErrors));

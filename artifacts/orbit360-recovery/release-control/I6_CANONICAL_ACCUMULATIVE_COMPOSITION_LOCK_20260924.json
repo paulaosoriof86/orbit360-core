@@ -403,8 +403,8 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P11P6",
-    "reason": "BROWSER_HARNESS_SCOPE_AND_HTTP_ADJUDICATION",
+    "gate": "I6.5-B3-004-R12P11P7",
+    "reason": "FIRESTORE_LISTEN_ABORT_AND_ACTION_TIMING_ADJUDICATION",
     "changedProductFiles": [],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
@@ -1345,6 +1345,18 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "9dc4ccf5ec7f35765bd1f2336f48b07f3b0c3105",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "b9526fe2be4c5a44fc5d8ceacab4a658906df946"
+    },
+    "productSourceChanged": false
+  },
+  "b3004R12P11P7FirestoreListenAbortTimingAdjudicationFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "rootCause": "PLAYWRIGHT_REQUESTFAILED_CAPTURE_CLASSIFIED_FIRESTORE_REALTIME_LISTEN_CHANNEL_NET_ERR_ABORTED_DURING_ROUTE_RELOAD_OR_CONTEXT_LIFECYCLE_AS_A_PRODUCT_FAILURE_DESPITE_ZERO_PAGE_ERRORS_ZERO_CONSOLE_ERRORS_ZERO_HTTP_ERRORS_AND_SUCCESSFUL_CANONICAL_WRITES_READBACK",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P7_FIRESTORE_LISTEN_ABORT_AND_TIMING_ADJUDICATION_FIX_20261001.json",
+    "receiptBlobSha": "b5dc002ec72d3a59f539ea8032918abd80c6d3dd",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "f26c5862bc3b72db8472a7f0bc09608a15cb1d00",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "7917e2ffbc47c4800e4e071078e3c7b7ca7ad543"
     },
     "productSourceChanged": false
   }
