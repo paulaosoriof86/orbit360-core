@@ -2,6 +2,7 @@
 
 const crypto = require('node:crypto');
 const data = require('./cotcomp-runtime-data-contract');
+const proposalVersioning = require('./cotcomp-proposal-versioning-contract-s452');
 
 const VERSION = 'ays-cotcomp-persistence-plan-s416-v0.1';
 const EXECUTION_ENABLED = false;
@@ -222,12 +223,35 @@ function buildProposalPlan(input = {}) {
     executionEnabled:EXECUTION_ENABLED,
     writesEnabled:WRITES_ENABLED,
     operation:{
-      type:'UPSERT_VERSIONED_PROPOSAL',
+      type:'UPSERT_PROPOSAL_CANDIDATE',
       path:data.pathFor(proposal.value.tenantId,data.ENTITY.PROPOSAL,proposal.value.proposalId),
       payload:proposal.value
     },
     comparisonEligibility:{
       requiredValidationState:'VALIDATED',
+      currentValidityRequired:true,
+      rankingPolicy:'NONE_BY_DEFAULT'
+    }
+  };
+}
+
+function buildVersionedProposalPlan(input = {}) {
+  const versionPlan = proposalVersioning.buildAtomicVersionPlan(input);
+  if (!versionPlan.ok) return versionPlan;
+  return {
+    ok:true,
+    executionEnabled:EXECUTION_ENABLED,
+    writesEnabled:WRITES_ENABLED,
+    physicalW3Allowed:false,
+    atomic:true,
+    requestId:versionPlan.requestId,
+    requestDigest:versionPlan.requestDigest,
+    proposal:versionPlan.proposal,
+    operations:versionPlan.operations,
+    invariants:versionPlan.invariants,
+    comparisonEligibility:{
+      requiredValidationState:'VALIDATED',
+      currentValidityDerivedFromPersistedInterval:true,
       currentValidityRequired:true,
       rankingPolicy:'NONE_BY_DEFAULT'
     }
@@ -262,5 +286,6 @@ module.exports = Object.freeze({
   writeGate,
   buildInitialHandoffPlan,
   buildProposalPlan,
+  buildVersionedProposalPlan,
   buildSelectionPlan
 });
