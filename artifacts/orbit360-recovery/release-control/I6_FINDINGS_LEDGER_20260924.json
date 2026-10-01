@@ -1877,6 +1877,13 @@
         "compositionLockBlobSha": "e9920dfa56d0f004a98323b57884d875f6b2cb8f",
         "classification": "QA_CONTRACT_STALE_ASSET_BINDING",
         "productSourceChanged": false
+      },
+      "r12p11p3p2ContractFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P3P2_STALE_R7_CLIENTE360_ASSET_CONTRACT_FIX_20261001.json",
+        "blobSha": "32403d6cc852f6b8d8796cd7452c51e3269373b6",
+        "compositionLockBlobSha": "3fa9b56b89a7ecbbfdd33ccb50fb63c72bacaec4",
+        "classification": "QA_CONTRACT_STALE_ASSET_BINDING",
+        "productSourceChanged": false
       }
     },
     {

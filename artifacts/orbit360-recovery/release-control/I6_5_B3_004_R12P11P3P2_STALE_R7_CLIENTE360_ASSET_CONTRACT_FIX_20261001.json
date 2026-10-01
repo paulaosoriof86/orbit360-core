@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11P3P2_STALE_R7_CLIENTE360_ASSET_CONTRACT_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "e786992f95c64a133027824887cdb800b8ecdf69",
+  "failedRunId": 36884954631,
+  "failedJobId": 110446030186,
+  "classification": "QA_CONTRACT_STALE_ASSET_BINDING",
+  "cause": "A second historical R7 assertion still required cliente360.js?v=20260930-b3004r11 after the legitimate R12P11P3 asset bump.",
+  "remediation": "Update only that stale R7 asset assertion; product source remains unchanged.",
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "ea6d5cc86c6730b9852e96b13176ff512ee2ccf2"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}
