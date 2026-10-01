@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "ays-cotcomp-s455-w4-remediation-sourceonly-intent-v1.0",
+  "authorization": "S455_W4_SOURCE_ONLY_CONTRACT_REMEDIATION",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "8fe3d57f050ce28d416a584bf7943215bd737e79",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W4",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "production": false,
+  "physicalW4": false,
+  "scope": [
+    "request-bound selection identity",
+    "comparisonSet membership validation",
+    "same-case linkage validation",
+    "current eligible Proposal validation",
+    "selection idempotency contract",
+    "atomic Selection + idempotency + QuoteCase patch",
+    "immutable NOT_ISSUED/NOT_BOUND/NOT_CONFIRMED truth",
+    "dry-run multi-document planner/adapter",
+    "future synthetic setup/retry/conflict/cleanup/final-absence accounting"
+  ]
+}
