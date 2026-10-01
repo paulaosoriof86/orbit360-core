@@ -2151,7 +2151,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-      "status": "READY_DIAGNOSTIC",
+      "status": "DIAGNOSTIC_PASS_SOURCE_FIX_REQUIRED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "businessRulesFrozen": true,
@@ -2166,11 +2166,25 @@
       "paymentLockBlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
       "entryBlockedBy": null,
       "entryUnblockedBy": "B3-004 CLOSED_PASS",
-      "nextAction": "B3_005_DIAGNOSTIC",
-      "productMutationAuthorized": false,
+      "nextAction": "B3_005_SOURCE_FIX",
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
-      "livePromotionAuthorized": false
+      "livePromotionAuthorized": false,
+      "rootCause": "CANONICAL_SINGLE_RECEIPT_WRITE_PRIMITIVE_EXISTS_BUT_HIGH_CONFIDENCE_MULTI_EVIDENCE_INFERENCE_ORCHESTRATOR_AND_CURRENT_TENANT_CONFIG_CONTRACT_ARE_NOT_COMPOSED",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
+      "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75",
+      "authorizedProductFiles": [
+        "functions/cobros-reconciliation-domain.js",
+        "functions/tenant-domain-config.js",
+        "functions/cobros-ledger-contract.js",
+        "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+        "orbit360-platform/core/tenant-domain-config-client.js",
+        "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
+        "orbit360-platform/index.html",
+        "tools/*B3-005*",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+      ]
     },
     {
       "id": "B3-006",
@@ -5765,14 +5779,16 @@
     }
   },
   "currentB3": {
-    "status": "B3_005_READY_DIAGNOSTIC",
+    "status": "B3_005_DIAGNOSTIC_PASS_SOURCE_FIX_REQUIRED",
     "activeFindingId": "B3-005",
     "priorFindingId": "B3-004",
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "cf417c100da2274e160c7b791bc776024732a49d",
+    "compositionLockBlobSha": "f18092c2bbc09c3b2274d1c19ea12f78e6b6554d",
     "noLive": true,
-    "noReimport": true
+    "noReimport": true,
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
+    "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75"
   }
 }

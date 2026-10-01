@@ -403,8 +403,8 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-CLOSE",
-    "reason": "TARGETED_HUMAN_VISUAL_PASS_GOVERNANCE_ONLY_ADVANCE_TO_B3_005",
+    "gate": "I6.5-B3-005-DIAGNOSTIC",
+    "reason": "CAUSAL_DIAGNOSTIC_GOVERNANCE_ONLY",
     "changedProductFiles": [],
     "changedQaFiles": [],
     "productSourceChanged": false,
@@ -1550,5 +1550,22 @@
       "currentScreenshot": "image(20261001-215554).png",
       "note": "User reapplied the synthetic payment because the fixture had been reset by the machine proof; this is expected QA fixture lifecycle, not loss of operational business data."
     }
+  },
+  "b3005CausalDiagnostic": {
+    "status": "DIAGNOSTIC_PASS_SOURCE_FIX_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
+    "receiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75",
+    "rootCause": "CANONICAL_SINGLE_RECEIPT_WRITE_PRIMITIVE_EXISTS_BUT_HIGH_CONFIDENCE_MULTI_EVIDENCE_INFERENCE_ORCHESTRATOR_AND_CURRENT_TENANT_CONFIG_CONTRACT_ARE_NOT_COMPOSED",
+    "authorizedSourceScope": [
+      "functions/cobros-reconciliation-domain.js",
+      "functions/tenant-domain-config.js",
+      "functions/cobros-ledger-contract.js",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+      "orbit360-platform/core/tenant-domain-config-client.js",
+      "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
+      "orbit360-platform/index.html",
+      "tools/*B3-005*",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+    ]
   }
 }

@@ -1,0 +1,115 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-01",
+  "gate": "I6.5-B3-005",
+  "status": "DIAGNOSTIC_PASS_SOURCE_FIX_REQUIRED",
+  "authority": {
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+    "paymentLockBlobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986"
+  },
+  "currentCanonicalOwners": {
+    "serverPaymentOwner": {
+      "path": "functions/cobros-reconciliation-domain.js",
+      "blobSha": "089bb7aa76c823da64e75dfe632c175f025b8a2c"
+    },
+    "reconciliationConfigOwner": {
+      "path": "functions/tenant-domain-config.js",
+      "blobSha": "3aaf2fe9ef818d0afaa079d3d678ba8fcccd359c"
+    },
+    "ledgerContract": {
+      "path": "functions/cobros-ledger-contract.js",
+      "blobSha": "4aa76e65d7c43018f0b2b65108ce8b49756b4711"
+    },
+    "clientCommand": {
+      "path": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+      "blobSha": "ebe950e586683b99abb6d05e01abbc8ed6f1a63c"
+    },
+    "tenantInsurerConfig": {
+      "path": "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
+      "blobSha": "3d837d235b63e56b1ebab9a276a773ec0d5a0c7f"
+    }
+  },
+  "provenExistingCapabilities": [
+    "applyPayment already supports inferred=true, inferredEffectiveDate and PAID_INFERRED for one receipt.",
+    "The server rejects invented paidDate for inferred payments.",
+    "Cobro identity is deterministic by receipt and requests are idempotent.",
+    "Application evidence can enrich an existing payment without creating a second cobro.",
+    "Legacy dry-run inference/multi-evidence algorithms exist and remain reusable as lineage/logic references."
+  ],
+  "causalGaps": [
+    {
+      "id": "B3-005-A",
+      "finding": "Canonical server preview explicitly returns inferenceDisabled=true; there is no server-owned high-confidence inference orchestrator.",
+      "evidence": "functions/cobros-reconciliation-domain.js previewPolicy"
+    },
+    {
+      "id": "B3-005-B",
+      "finding": "Legacy multi-evidence planners are dry-run only (autoApply=false, writes=0) and are not composed into the productive index/runtime.",
+      "evidence": [
+        "orbit360-platform/core/importa-cobros-conciliacion-p0.js",
+        "orbit360-platform/core/importa-cobros-evidencia-temporal-p0.js",
+        "orbit360-platform/core/importa-cobros-matriz-multievidencia-p0.js",
+        "orbit360-platform/core/cobros-proposal-queue-p0.js"
+      ]
+    },
+    {
+      "id": "B3-005-C",
+      "finding": "Reconciliation tenant config contradicts Lock V4: current validator forces humanConfirmationRequired=true and autoApplyThreshold=null.",
+      "evidence": "functions/tenant-domain-config.js validateReconciliation"
+    },
+    {
+      "id": "B3-005-D",
+      "finding": "Current A&S tenant insurer config contains no approved max-installment rule for La Ceiba, Aseguradora General or G&T Seguros.",
+      "evidence": "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js"
+    },
+    {
+      "id": "B3-005-E",
+      "finding": "No canonical server path currently reconciles an explicit N/M source denominator against expected receipt count and performs controlled idempotent schedule correction.",
+      "evidence": "No implementation in current canonical reconciliation owner."
+    },
+    {
+      "id": "B3-005-F",
+      "finding": "Later direct evidence uses the same deterministic cobro identity, but inferred provenance preservation on inferred-to-direct enrichment is not explicitly protected or proved.",
+      "evidence": "functions/cobros-reconciliation-domain.js applyPayment"
+    },
+    {
+      "id": "B3-005-G",
+      "finding": "confirm_application is explicitly blocked in the canonical server owner; historical proposal flows cannot be treated as the final B3-005 write mechanism.",
+      "evidence": "functions/cobros-reconciliation-domain.js unsupportedMutation"
+    }
+  ],
+  "rootCause": "CANONICAL_SINGLE_RECEIPT_WRITE_PRIMITIVE_EXISTS_BUT_HIGH_CONFIDENCE_MULTI_EVIDENCE_INFERENCE_ORCHESTRATOR_AND_CURRENT_TENANT_CONFIG_CONTRACT_ARE_NOT_COMPOSED",
+  "remediationDecision": {
+    "strategy": "REUSE_EXISTING_MATCHING_AND_TEMPORAL_LINEAGE_LOGIC_BUT_MOVE_FINAL_DECISION_AND_WRITES_TO_ONE_SERVER_OWNED_IDEMPOTENT_ENGINE",
+    "noBaselineOverlayRelease": true,
+    "noHumanApprovalForUniqueHighConfidence": true,
+    "ambiguousFailClosed": true,
+    "inferredPaidDateMustRemainUnknown": true,
+    "inferredEffectiveDateUsesScheduledDueDate": true,
+    "laterEvidenceEnrichesSamePayment": true,
+    "insurerPaymentPlanRulesMustBeTenantConfigNotProductHardcode": true
+  },
+  "authorizedSourceScope": [
+    "functions/cobros-reconciliation-domain.js",
+    "functions/tenant-domain-config.js",
+    "functions/cobros-ledger-contract.js",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+    "orbit360-platform/core/tenant-domain-config-client.js",
+    "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
+    "orbit360-platform/index.html",
+    "tools/*B3-005*",
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml"
+  ],
+  "nextRequiredProof": [
+    "B3_005_SOURCE_CONTRACT_PASS",
+    "B3_005_PREVIEW_MACHINE_PASS",
+    "B3_005_TARGETED_HUMAN_VISUAL_PASS"
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3006": false,
+    "b4": false
+  }
+}
