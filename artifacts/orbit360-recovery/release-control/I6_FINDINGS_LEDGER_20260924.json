@@ -1664,6 +1664,14 @@
         "r12p3NormalCliente360ToCobrosUsableMs": 216,
         "r12p3RealPreviewReadonlyPass": true,
         "productSourceChanged": false
+      },
+      "r12p5Diagnostic": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P5_UI_CALLABLE_TRANSPORT_DIAGNOSTIC_20261001.json",
+        "blobSha": "8fa609452e34e3a4b32ecc89edab5f3cbc1725a5",
+        "compositionLockBlobSha": "d15907053be6463b2985ca701775dbe041395ae6",
+        "classification": "QA_DIAGNOSTIC_ONLY",
+        "purpose": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
+        "productSourceChanged": false
       }
     },
     {

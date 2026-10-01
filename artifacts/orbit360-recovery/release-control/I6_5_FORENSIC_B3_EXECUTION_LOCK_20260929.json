@@ -607,6 +607,12 @@
       "blobSha": "c138d1d52bf47d768a420b850f23b11ccb427501",
       "rootCause": "PRODUCT_AUTH_RUNTIME_CALLS_ORBIT_LEGAL_GATE_DIRECTLY_USING_ORBIT360_LEGAL_ACEPTACIONES_SCOPE_AND_DOES_NOT_CONSUME_LEGACY_CONFIDENCIALIDAD_PRECONDITION",
       "productSourceChanged": false
+    },
+    "r12p5Diagnostic": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P5_UI_CALLABLE_TRANSPORT_DIAGNOSTIC_20261001.json",
+      "blobSha": "8fa609452e34e3a4b32ecc89edab5f3cbc1725a5",
+      "purpose": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -616,7 +622,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "5820fd400eb27e404a66dbe35b371ed6eea5e009"
+    "blobSha": "24654006544b3731be289c4bedb8e06aea9d9688"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -817,7 +823,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "01bd27de231bc0448685e73179938c08a112ad9f"
+    "blobSha": "d15907053be6463b2985ca701775dbe041395ae6"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -862,6 +868,19 @@
     "rootCause": "PRODUCT_AUTH_RUNTIME_CALLS_ORBIT_LEGAL_GATE_DIRECTLY_USING_ORBIT360_LEGAL_ACEPTACIONES_SCOPE_AND_DOES_NOT_CONSUME_LEGACY_CONFIDENCIALIDAD_PRECONDITION",
     "r12p3NormalCliente360ToCobrosUsableMs": 216,
     "r12p3RealPreviewReadonlyPass": true,
+    "productSourceChanged": false,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p5Diagnostic": {
+    "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P5_UI_CALLABLE_TRANSPORT_DIAGNOSTIC_20261001.json",
+    "blobSha": "8fa609452e34e3a4b32ecc89edab5f3cbc1725a5",
+    "compositionLockBlobSha": "d15907053be6463b2985ca701775dbe041395ae6",
+    "findingsLedgerBlobSha": "24654006544b3731be289c4bedb8e06aea9d9688",
+    "purpose": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
     "productSourceChanged": false,
     "noOperationalBusinessWrites": true,
     "noReimport": true,

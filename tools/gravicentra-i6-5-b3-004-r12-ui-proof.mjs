@@ -108,7 +108,64 @@ try{
   await page.fill('#pm-paid','2026-09-30');
   await page.selectOption('#pm-metodo',{label:'Transferencia bancaria'});
   const avisar=page.locator('#pm-avisar');if(await avisar.isChecked())await avisar.uncheck();
+  proof.uiCallContext=await page.evaluate(()=>({
+    sessionRole:String(window.Orbit?.session?.rol?.()||''),
+    sessionAdvisorBound:!!String(window.Orbit?.session?.asesorId?.()||''),
+    domainStatus:window.Orbit?.reconciliationDomain?.status?.()||{},
+    productUser:{
+      activeRole:String(window.Orbit?.auth?.productUser?.activeRole||''),
+      roles:[].concat(window.Orbit?.auth?.productUser?.roles||[]).map(String),
+      tenantId:String(window.Orbit?.auth?.productUser?.tenantId||''),
+      advisorBound:!!String(window.Orbit?.auth?.productUser?.advisorId||'')
+    }
+  }));
+  const callableResponsePromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360CobrosReconciliationCommandPreview/i.test(resp.url()),{timeout:12000}).catch(()=>null);
   await page.click('#pm-ok');
+  const callableResponse=await callableResponsePromise;
+  if(callableResponse){
+    let requestBody={},responseBody={},responseText='';
+    try{requestBody=JSON.parse(callableResponse.request().postData()||'{}');}catch{}
+    try{responseText=await callableResponse.text();responseBody=JSON.parse(responseText||'{}');}catch{}
+    const data=requestBody&&requestBody.data||{};
+    const payload=data&&data.payload||{};
+    const safeResult=responseBody&&responseBody.result||{};
+    const safeError=responseBody&&responseBody.error||{};
+    proof.applyTransport={
+      httpStatus:callableResponse.status(),
+      operation:String(data.operation||''),
+      activeRole:String(data.activeRole||''),
+      tenantId:String(data.tenantId||''),
+      receiptId:String(payload.receiptId||payload.reciboId||''),
+      sourceType:String(payload.sourceType||''),
+      amount:payload.amount==null?null:Number(payload.amount),
+      responseResult:{
+        ok:safeResult&&safeResult.ok===true,
+        reused:safeResult&&safeResult.reused===true,
+        operation:String(safeResult&&safeResult.operation||''),
+        receiptId:String(safeResult&&safeResult.receiptId||''),
+        cobroId:String(safeResult&&safeResult.cobroId||''),
+        paymentState:String(safeResult&&safeResult.paymentState||''),
+        applicationState:String(safeResult&&safeResult.applicationState||'')
+      },
+      responseError:{
+        status:String(safeError&&safeError.status||''),
+        message:String(safeError&&safeError.message||'').slice(0,500)
+      }
+    };
+    console.log('B3_004_R12_APPLY_TRANSPORT='+JSON.stringify(proof.applyTransport));
+    need(callableResponse.status()<400,'B3_004_R12_APPLY_CALLABLE_HTTP_ERROR:'+JSON.stringify(proof.applyTransport));
+    need(!(safeError&&Object.keys(safeError).length),'B3_004_R12_APPLY_CALLABLE_ERROR:'+JSON.stringify(proof.applyTransport));
+    need(safeResult&&safeResult.ok===true,'B3_004_R12_APPLY_CALLABLE_NO_OK_RESULT:'+JSON.stringify(proof.applyTransport));
+  }else{
+    const uiFailure=await page.evaluate(()=>({
+      payModalOpen:!!document.getElementById('cob-pay'),
+      payButtonDisabled:!!document.querySelector('#pm-ok')?.disabled,
+      toasts:[...document.querySelectorAll('.ciclo-toast,.toast,[role="alert"]')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(-5)
+    }));
+    proof.applyTransport={callableObserved:false,uiFailure};
+    console.log('B3_004_R12_APPLY_TRANSPORT='+JSON.stringify(proof.applyTransport));
+    throw new Error('B3_004_R12_APPLY_CALLABLE_NOT_OBSERVED:'+JSON.stringify(uiFailure));
+  }
   const paid=await waitCobro(xs=>xs.length===1&&xs[0].estado==='Pagado');
   need(paid.length===1,'B3_004_R12_PAYMENT_NOT_SINGLE');
   proof.assertions.browserApplyPayment=true;

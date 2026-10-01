@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P5_UI_CALLABLE_TRANSPORT_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "6509540fc65e4d01d9ff420b585674b9faeb05c4",
+  "failedRunId": 36816681417,
+  "failedJobId": 110223274177,
+  "classification": "QA_DIAGNOSTIC_ONLY",
+  "observedFailure": "B3_004_R12_COBRO_READBACK_TIMEOUT_EMPTY_AFTER_UI_SAVE",
+  "priorEvidence": {
+    "normalCliente360ToCobrosUsableMs": 142,
+    "realPreviewReadonlyPass": true,
+    "syntheticApplyButtonRenderedAndClicked": true,
+    "legalGateResolved": true,
+    "backendDirectPreviewProofPass": true,
+    "browserCobroReadback": []
+  },
+  "diagnosticPurpose": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
+  "capture": [
+    "effective session role",
+    "reconciliation domain status",
+    "product membership role projection",
+    "Preview callable HTTP request functional fields",
+    "Preview callable HTTP status",
+    "sanitized callable result/error",
+    "whether callable was observed at all"
+  ],
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false,
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "0a9b4a30170c0c3f82f7e9b5e6649b149f9ee12b",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "af53cce002a762f00353d98d1d7254e1908031e8"
+  }
+}

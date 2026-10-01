@@ -402,9 +402,9 @@
     "livePromotion": false
   },
   "lastAuthorizedMutation": {
-    "date": "2026-09-30",
-    "gate": "I6.5-B3-004-R12P4",
-    "reason": "EFFECTIVE_PRODUCT_AUTH_RUNTIME_LEGAL_SCOPE_PRECONDITION_FOR_BROWSER_QA",
+    "date": "2026-10-01",
+    "gate": "I6.5-B3-004-R12P5",
+    "reason": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
     "changedProductFiles": [],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
@@ -904,6 +904,23 @@
     "r12p3NormalCliente360ToCobrosUsableMs": 216,
     "r12p3RealPreviewReadonlyPass": true,
     "legalAcceptanceWrite": false,
+    "productSourceChanged": false,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  },
+  "b3004R12P5UiCallableTransportDiagnostic": {
+    "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36816681417,
+    "failedJobId": 110223274177,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P5_UI_CALLABLE_TRANSPORT_DIAGNOSTIC_20261001.json",
+    "receiptBlobSha": "8fa609452e34e3a4b32ecc89edab5f3cbc1725a5",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "0a9b4a30170c0c3f82f7e9b5e6649b149f9ee12b",
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "af53cce002a762f00353d98d1d7254e1908031e8"
+    },
     "productSourceChanged": false,
     "operationalBusinessWrites": false,
     "reimport": false,

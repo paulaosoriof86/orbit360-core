@@ -237,6 +237,9 @@ need(humanFixtureR11.includes('b3004human_client_r12')&&humanFixtureR11.includes
 need(uiProofR12.includes("button[data-cobros-action=\"apply\"]")&&uiProofR12.includes("button[data-cobros-action=\"reconcile\"]")&&uiProofR12.includes('client360ToCobrosUsableMs')&&uiProofR12.includes('<=3000'),'B3_004_R12_BROWSER_UI_PROOF_MISSING');
 need(uiProofR12.includes('legalGatePreconditionSimulated')&&uiProofR12.includes("localStorage.setItem('orbit360_confidencialidad'")&&uiProofR12.includes('realPreviewRowsReadOnly')&&uiProofR12.includes('B3_004_R12_REAL_PREVIEW_WRITE_ACTIONS_PRESENT')&&uiProofR12.includes("location.hash='#/cobros'"),'B3_004_R12P3_BROWSER_PRECONDITION_AND_REAL_READONLY_PROOF_MISSING');
 need(uiProofR12.includes("localStorage.setItem('orbit360_legal_aceptaciones'")&&uiProofR12.includes("version:'2.0'")&&uiProofR12.includes('B3_004_R12_QA_PRIOR_LEGAL_ACCEPTANCE_NOT_RECOGNIZED')&&uiProofR12.includes('B3_004_R12_QA_LEGAL_OVERLAY_STILL_OPEN'),'B3_004_R12P4_EFFECTIVE_LEGAL_SCOPE_PRECONDITION_MISSING');
+need(uiProofR12.includes('B3_004_R12_APPLY_TRANSPORT=')&&uiProofR12.includes('B3_004_R12_APPLY_CALLABLE_HTTP_ERROR')&&uiProofR12.includes('B3_004_R12_APPLY_CALLABLE_ERROR')&&uiProofR12.includes('B3_004_R12_APPLY_CALLABLE_NO_OK_RESULT')&&uiProofR12.includes('B3_004_R12_APPLY_CALLABLE_NOT_OBSERVED'),'B3_004_R12P5_UI_CALLABLE_TRANSPORT_DIAGNOSTIC_MISSING');
+need(uiProofR12.includes('domainStatus')&&uiProofR12.includes('sessionRole')&&uiProofR12.includes('productUser'),'B3_004_R12P5_UI_ROLE_CONTEXT_DIAGNOSTIC_MISSING');
+console.log('B3_004_R12P5_UI_CALLABLE_DIAGNOSTIC_CONTRACT=PASS');
 console.log('B3_004_R12P4_EFFECTIVE_LEGAL_PRECONDITION_CONTRACT=PASS');
 need(uiProofR12.includes('__b3004r12NormalNavStart')&&uiProofR12.includes('qaCobrosUsableMs'),'B3_004_R12P3_NORMAL_AND_QA_PERFORMANCE_SPLIT_MISSING');
 console.log('B3_004_R12P3_BROWSER_HARNESS_PRECONDITION_CONTRACT=PASS');

@@ -3190,7 +3190,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "afc38e6fb9159155cc7467a8e814c47597638df6",
+      "executionLockBlobSha": "77dd116c059660277bf00d0142c5e44b70915aa4",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3221,7 +3221,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "5820fd400eb27e404a66dbe35b371ed6eea5e009",
+      "findingLedgerBlobSha": "24654006544b3731be289c4bedb8e06aea9d9688",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "diagnosticRunId": 36658190622,
@@ -3431,7 +3431,7 @@
       "provenanceFixReceiptBlobSha": "5ac0ce337999abbec288b3ac5efa738e9aedab60",
       "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_PROVENANCE_CONTRACT_PASS_20260930.json",
       "paymentProvenanceContractReceiptBlobSha": "34f2f5e0aedf6a5a68e4f3c476040349ecf38794",
-      "compositionLockBlobSha": "01bd27de231bc0448685e73179938c08a112ad9f",
+      "compositionLockBlobSha": "d15907053be6463b2985ca701775dbe041395ae6",
       "syntheticQaAuthorization": {
         "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
         "purpose": "ADVISOR_REPORT_CROSS_ADVISOR_OPERATIVE_APPLY_RECONCILE_READBACK_CLEANUP_PROOF",
@@ -4109,15 +4109,32 @@
         "noReimport": true,
         "noLive": true,
         "noB3005": true
+      },
+      "r12p5Diagnostic": {
+        "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P5_UI_CALLABLE_TRANSPORT_DIAGNOSTIC_20261001.json",
+        "blobSha": "8fa609452e34e3a4b32ecc89edab5f3cbc1725a5",
+        "failedRunId": 36816681417,
+        "failedJobId": 110223274177,
+        "purpose": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
+        "qaBlobs": {
+          "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "0a9b4a30170c0c3f82f7e9b5e6649b149f9ee12b",
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "af53cce002a762f00353d98d1d7254e1908031e8"
+        },
+        "productSourceChanged": false,
+        "noOperationalBusinessWrites": true,
+        "noReimport": true,
+        "noLive": true,
+        "noB3005": true
       }
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "01bd27de231bc0448685e73179938c08a112ad9f",
+    "compositionLockBlobSha": "d15907053be6463b2985ca701775dbe041395ae6",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "5820fd400eb27e404a66dbe35b371ed6eea5e009",
+    "findingLedgerBlobSha": "24654006544b3731be289c4bedb8e06aea9d9688",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -4347,6 +4364,20 @@
       "findingsLedgerBlobSha": "5820fd400eb27e404a66dbe35b371ed6eea5e009",
       "executionLockBlobSha": "afc38e6fb9159155cc7467a8e814c47597638df6",
       "rootCause": "PRODUCT_AUTH_RUNTIME_CALLS_ORBIT_LEGAL_GATE_DIRECTLY_USING_ORBIT360_LEGAL_ACEPTACIONES_SCOPE_AND_DOES_NOT_CONSUME_LEGACY_CONFIDENCIALIDAD_PRECONDITION",
+      "productSourceChanged": false,
+      "noOperationalBusinessWrites": true,
+      "noReimport": true,
+      "noLive": true,
+      "noB3005": true
+    },
+    "r12p5Diagnostic": {
+      "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P5_UI_CALLABLE_TRANSPORT_DIAGNOSTIC_20261001.json",
+      "receiptBlobSha": "8fa609452e34e3a4b32ecc89edab5f3cbc1725a5",
+      "compositionLockBlobSha": "d15907053be6463b2985ca701775dbe041395ae6",
+      "findingsLedgerBlobSha": "24654006544b3731be289c4bedb8e06aea9d9688",
+      "executionLockBlobSha": "77dd116c059660277bf00d0142c5e44b70915aa4",
+      "purpose": "CAPTURE_EXACT_BROWSER_UI_CALLABLE_TRANSPORT_AND_EFFECTIVE_ROLE_BEFORE_PRODUCT_MUTATION",
       "productSourceChanged": false,
       "noOperationalBusinessWrites": true,
       "noReimport": true,
