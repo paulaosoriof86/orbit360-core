@@ -1,0 +1,175 @@
+name: CotComp S4.67 deploy one-time LAB intake
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s467-one-time-intake-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s467-intake-deploy-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  COTCOMP_FUNCTION: cotcompPilotIntakeS467
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompPilotIntakeS467
+
+jobs:
+  deploy-one-time-intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.67 deployment intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s467-intake-deploy-authorized.json
+          jq -e '
+            .authorization=="S467_DEPLOY_ONE_TIME_LAB_INTAKE" and
+            .projectId=="ays-orbit-360-lab" and
+            .functionName=="cotcompPilotIntakeS467" and
+            .generalPersistenceRelease==false and
+            .realDataSubmissionByAssistant==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA and S4.67 tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-pilot-intake-s467.js
+          node --check cotcomp-pilot-intake-s467.test.js
+          node --test cotcomp-pilot-intake-s467.test.js
+
+      - name: Prepare exact LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s467/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s467/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Verify intake state unused before deploy
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:'ays-orbit-360-lab'});
+          const db=getFirestore(app);
+          (async()=>{
+            const s=await db.doc('tenants/alianzas-soluciones/cotcomp/pilotIntake/items/s467').get();
+            if(s.exists&&s.data()&&s.data().used===true)throw new Error('S467_INTAKE_ALREADY_CONSUMED');
+            require('fs').writeFileSync(process.env.RUNNER_TEMP+'/s467/evidence/S467_PREDEPLOY_STATE.json',JSON.stringify({
+              projectId:'ays-orbit-360-lab',
+              stateDocumentExists:s.exists,
+              used:s.exists?!!s.data().used:false,
+              appDataWritesExecuted:0
+            },null,2));
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)});
+          NODE
+
+      - name: Deploy only S4.67 intake function to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@15.32.0
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Verify deployed GET and rejected invalid POST
+        shell: bash
+        run: |
+          set -euo pipefail
+          CODE="$(curl -sS -o "$RUNNER_TEMP/s467/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+          grep -q 'Piloto controlado de cotización Auto/Moto' "$RUNNER_TEMP/s467/page.html"
+          grep -q 'No emite pólizas' "$RUNNER_TEMP/s467/page.html"
+          if grep -Eq '<script[^>]+src=|https://[^u]' "$RUNNER_TEMP/s467/page.html"; then
+            echo "Unexpected third-party asset" >&2
+            exit 1
+          fi
+          BAD="$(curl -sS -o "$RUNNER_TEMP/s467/invalid.json" -w '%{http_code}' -X POST "$COTCOMP_URL"             -H 'content-type: application/json'             -H 'x-pilot-key: invalid-token'             --data '{"brand":"x","lineModel":"y","name":"Test","whatsapp":"55555555","email":"test@example.com","requestManagementConsent":true}')"
+          test "$BAD" = "403"
+
+      - name: Verify invalid POST did not consume intake
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:'ays-orbit-360-lab'});
+          const db=getFirestore(app);
+          (async()=>{
+            const s=await db.doc('tenants/alianzas-soluciones/cotcomp/pilotIntake/items/s467').get();
+            if(s.exists&&s.data()&&s.data().used===true)throw new Error('S467_INVALID_POST_CONSUMED_INTAKE');
+            const receipt={
+              schemaVersion:'ays-cotcomp-s467-intake-deploy-receipt-v1.0',
+              projectId:'ays-orbit-360-lab',
+              region:'us-central1',
+              functionName:'cotcompPilotIntakeS467',
+              functionUrl:'https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompPilotIntakeS467',
+              deployed:true,
+              getPagePass:true,
+              invalidBearerRejected:true,
+              oneTimeStateConsumed:false,
+              realDataSubmissionExecutedByWorkflow:false,
+              generalPersistenceReleased:false,
+              productionTouched:false
+            };
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s467/evidence/S467_INTAKE_DEPLOY_RECEIPT.json',JSON.stringify(receipt,null,2));
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)});
+          NODE
+
+      - name: Upload sanitized S4.67 deployment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s467-intake-deploy-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s467/evidence/S467_PREDEPLOY_STATE.json
+            ${{ runner.temp }}/s467/evidence/S467_INTAKE_DEPLOY_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credentials
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s467/firebase-service-account.json"
