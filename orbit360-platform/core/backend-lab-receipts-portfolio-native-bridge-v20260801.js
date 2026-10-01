@@ -341,7 +341,7 @@
     var trace=[sourceRef?cell('Documento de origen',sourceRef):'',match?cell('Validación de coincidencia',match):''].filter(Boolean).join('');
     if(!trace)trace='<div class="muted">Sin detalles técnicos adicionales.</div>';
     var vehicle=[v.marca,v.linea,v.placa].filter(function(x){return x&&!/^(undefined|null)$/i.test(clean(x));}).join(' ');var canEditPlan=!!(p&&p.id&&Orbit.policyReceipts&&typeof Orbit.policyReceipts.canManagePolicies==='function'&&Orbit.policyReceipts.canManagePolicies());
-    target.innerHTML='<div class="page orbit-receipt-fullpage" data-rp-receipt-detail="1" data-rp-owner="v920">'
+    target.innerHTML='<div class="page orbit-receipt-fullpage" data-rp-receipt-detail="1" data-rp-receipt-detail-id="'+esc(r.id)+'" data-rp-owner="v920">'
       +'<div class="crumb" style="margin-bottom:14px"><a href="'+back+'" data-rp-back-local="1" style="color:var(--red)">‹ Volver a Recibos y pagos</a> / Recibo '+esc(r.serie||r.numeroReciboFuente||'')+'</div>'
       +'<div class="card" style="overflow:hidden;margin-bottom:16px;border-left:4px solid var(--red)"><div data-rp-receipt-hero="1" style="padding:20px 22px;background:linear-gradient(135deg,#fff7f8 0%,#f7f4f0 68%,#f4f7fb 100%);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap"><div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.12em">🧾 Recibo esperado · '+esc(r.serie||'—')+'</div><h2 style="color:var(--ink);margin:4px 0;font-family:var(--f-display);font-size:24px;font-weight:800">Póliza '+esc(r.polizaNumero||p.numero||'—')+'</h2><div style="color:var(--ink-2)">'+esc(vehicle||p.ramo||'')+'</div></div><span data-rp-hero-status="1" class="badge '+st.c+'" style="align-self:flex-start;flex:0 0 auto;margin-top:2px">'+esc(st.t)+'</span></div></div>'
       +'<div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🧾 Desglose del recibo</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">'
@@ -409,6 +409,18 @@
     body.insertBefore(note,body.firstChild);
   }
 
+  function ensureDirectReceiptRoute(){
+    var cid=activeClientId(),receiptId=directReceiptId();
+    if(!cid||!receiptId||!storeReady())return false;
+    var existing=document.querySelector('[data-rp-receipt-detail-id="'+receiptId.replace(/"/g,'')+'"]');if(existing)return true;
+    var client=Orbit.store.get('clientes',cid),receipt=Orbit.store.get('recibosEsperados',receiptId);
+    if(!client||!receipt||clean(receipt.clienteId)!==clean(cid))return false;
+    var body=document.getElementById('c360-body'),mod=Orbit.modules&&Orbit.modules.cliente360;
+    if(!body&&mod&&typeof mod.reabrir==='function'){mod.reabrir(cid,'recibos');body=document.getElementById('c360-body');}
+    if(!body)return false;
+    return renderReceiptDetail(receiptId,cid)===true;
+  }
+
   function patchClient(host){
     var cid=activeClientId();if(!cid||!host)return;patchHeader(cid);
     host.querySelectorAll('.ftab').forEach(function(el){
@@ -448,7 +460,7 @@
     return wrappedClient&&wrappedPolicies;
   }
 
-  function reconcileOwners(){installQueryProjection();installVisualBridges();refreshStatus();setTimeout(function(){try{patchClient(document.getElementById('mod-host')||document.getElementById('host'));}catch(e){}},0);}
+  function reconcileOwners(){installQueryProjection();installVisualBridges();refreshStatus();setTimeout(function(){try{var h=document.getElementById('mod-host')||document.getElementById('host');patchClient(h);ensureDirectReceiptRoute();}catch(e){}},0);}
   function scheduleReconcile(delay){
     if(reconcileScheduled)return;
     reconcileScheduled=true;

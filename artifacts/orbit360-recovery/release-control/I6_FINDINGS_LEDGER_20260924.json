@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R12P11_EXACT_PREVIEW",
+      "nextAction": "B3_004_R12P11P1_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1836,6 +1836,18 @@
           "tools/gravicentra-i6-5-b3-004-human-fixture.mjs": "bcd2620995484451734f96f930c2e1e1130ccb80",
           "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "8f0650da3046032a4dc8cd48f31ba09d8784ce03",
           "tools/gravicentra-i6-5-b3-004-contract.mjs": "6714db391b7479e1a3492dfa844188d06c8aa575"
+        }
+      },
+      "r12p11p1SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P1_DIRECT_RECEIPT_HYDRATION_FIX_20261001.json",
+        "blobSha": "fa7da65a4cf75fcc9933124d3cb1956aa44cf33b",
+        "compositionLockBlobSha": "44d5eceb51dfbfd4779262591888e416f180d99c",
+        "productBlobs": {
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "b945ed4b032eab3d5f189c6a675cd459ec81ea31",
+          "orbit360-platform/index.html": "851f1fab524a716b57d8d5793607e2176efd1579"
+        },
+        "qaBlobs": {
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "2f53244e206fd6a834ceb87816496061535c0b31"
         }
       }
     },

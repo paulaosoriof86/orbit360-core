@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11P1_DIRECT_RECEIPT_HYDRATION_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "d470a5b1dda4cd45a111e52c2598f51810fd62aa",
+  "failedRunId": 36863724843,
+  "failedJobId": 110374123919,
+  "classification": "PRODUCT_ROUTING_HYDRATION_COMPOSITION_DEFECT",
+  "rootCause": "DIRECT_RECEIPT_HASH_WAS_PARSED_BUT_CLIENTE360_INITIAL_RENDER_FELL_BACK_TO_LIST_BEFORE_CLIENT_RECEIPT_HYDRATION_AND_NATIVE_BRIDGE_ONLY_PATCHED_EXISTING_DETAIL_SHELL",
+  "evidence": {
+    "directFixtureUrlGenerated": true,
+    "directReceiptSelectorTimedOut": true,
+    "client360ToCobrosUsableMs": "NA",
+    "failureSelector": "[data-rp-receipt-detail=\"1\"]",
+    "fixtureCleanupPass": true
+  },
+  "remediation": {
+    "postHydrationDirectReceiptOwner": true,
+    "exactReceiptClientRelationshipRequired": true,
+    "noBroadScopeBypass": true,
+    "assetVersionBumped": true
+  },
+  "productBlobs": {
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "b945ed4b032eab3d5f189c6a675cd459ec81ea31",
+    "orbit360-platform/index.html": "851f1fab524a716b57d8d5793607e2176efd1579"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "2f53244e206fd6a834ceb87816496061535c0b31"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

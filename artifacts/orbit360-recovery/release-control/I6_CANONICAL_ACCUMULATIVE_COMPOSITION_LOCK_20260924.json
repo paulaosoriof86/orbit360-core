@@ -140,7 +140,7 @@
     "orbit360-platform/core/access-scope.js": "f50156162f59e105d3564c1c3f6036daf03ebd56",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "6decc66566ca6b6fe1761fb0d2db5a108e9d1033",
-    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "9759acf6e7976aa90e7e29fd15db0f4ae051dca6",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "b945ed4b032eab3d5f189c6a675cd459ec81ea31",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
@@ -172,7 +172,7 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "30753007242c482d9a3e6c2c6c438e07bdec0778",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "76804e56317e6ea4874674e5104d74166d597a62",
+    "orbit360-platform/index.html": "851f1fab524a716b57d8d5793607e2176efd1579",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
@@ -403,17 +403,13 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P11",
-    "reason": "TARGETED_HUMAN_MOBILE_DOCUMENT_UX_PERFORMANCE_REMEDIATION",
+    "gate": "I6.5-B3-004-R12P11P1",
+    "reason": "DIRECT_RECEIPT_POST_HYDRATION_ROUTE_OWNER",
     "changedProductFiles": [
-      "orbit360-platform/modules/cobros.js",
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
-      "orbit360-platform/styles/base.css",
       "orbit360-platform/index.html"
     ],
     "changedQaFiles": [
-      "tools/gravicentra-i6-5-b3-004-human-fixture.mjs",
-      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
     "productSourceChanged": true,
@@ -1231,5 +1227,21 @@
     "reimport": false,
     "live": false,
     "b3005": false
+  },
+  "b3004R12P11P1DirectReceiptHydrationFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36863724843,
+    "failedJobId": 110374123919,
+    "rootCause": "DIRECT_RECEIPT_HASH_WAS_PARSED_BUT_CLIENTE360_INITIAL_RENDER_FELL_BACK_TO_LIST_BEFORE_CLIENT_RECEIPT_HYDRATION_AND_NATIVE_BRIDGE_ONLY_PATCHED_EXISTING_DETAIL_SHELL",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P1_DIRECT_RECEIPT_HYDRATION_FIX_20261001.json",
+    "receiptBlobSha": "fa7da65a4cf75fcc9933124d3cb1956aa44cf33b",
+    "productBlobs": {
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "b945ed4b032eab3d5f189c6a675cd459ec81ea31",
+      "orbit360-platform/index.html": "851f1fab524a716b57d8d5793607e2176efd1579"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "2f53244e206fd6a834ceb87816496061535c0b31"
+    }
   }
 }
