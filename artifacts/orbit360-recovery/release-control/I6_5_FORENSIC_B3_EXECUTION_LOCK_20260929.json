@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
+  "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
     "boundaries": {
@@ -175,7 +175,7 @@
       "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
     },
-    "machineProofInvalidatedBySourceChange": true,
+    "machineProofInvalidatedBySourceChange": false,
     "priorMachineProof": {
       "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
       "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
@@ -657,7 +657,7 @@
     },
     "r12MachinePass": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_MACHINE_PASS_20260930.json",
-      "blobSha": "815331750d0f780af8df4c265f967dcfd8bc7114"
+      "blobSha": "8646ddb8ada713a4090bb0d3a532b2f0fcd49e07"
     },
     "r12p10Acceptance": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10_FULL_FIDELITY_UI_DOCUMENT_ACCEPTANCE_20261001.json",
@@ -810,10 +810,9 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "e74eb581dd23f68f0935ceb97a34e60f5d87bcb6"
+    "blobSha": "4c6a11f47dac0a5662f057405b7304a8d19009e6"
   },
   "nextRequiredProof": [
-    "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
     "B3_004_R12_TARGETED_HUMAN_VISUAL_PASS"
   ],
   "preservedB3CarryForward": [
@@ -996,20 +995,20 @@
     "supersedesBlobSha": "4aae6378ca67914ca089e60299e5a2b3b335d244"
   },
   "machineProof": {
-    "sourceSha": "90c4c6c312078d37790a5c84643f4a6972bab469",
-    "buildId": "gi-i65-b3-90c4c6c31207-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36892209969-1etm25yu.web.app",
-    "channelId": "gi-b3004-36892209969",
-    "runId": 36892209969,
-    "artifactId": 11177486929,
-    "artifactDigest": "3d122fdb7c4ab6941ed277588260cbea780c186d2b59ee4be6eb08e1d166ca0a",
+    "sourceSha": "ed367c940122634fecbb0c04193e598c0d043f9b",
+    "buildId": "gi-i65-b3-ed367c940122-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36912945250-w7z40mns.web.app",
+    "channelId": "gi-b3004-36912945250",
+    "runId": 36912945250,
+    "artifactId": 11188940341,
+    "artifactDigest": "4eee83c1d5a0f054a5c40bb117b59e82f860f96eb79a9c9205b0fa84e81ed87d",
     "exactReadback": true,
     "backendExactDeploy": true,
     "syntheticProofPass": true,
     "r8OperationalProofPass": true,
     "cleanupPass": true,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_MACHINE_PASS_20260930.json",
-    "receiptBlobSha": "815331750d0f780af8df4c265f967dcfd8bc7114"
+    "receiptBlobSha": "8646ddb8ada713a4090bb0d3a532b2f0fcd49e07"
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
