@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_R4P1_COMPOSITION_BLOCK_BINDING_REPAIR_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_GOVERNANCE_MECHANISM_REPAIRED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-005",
+  "rootCause": "COMPOSITION_LOCK_CURRENT_BLOCK_WAS_WRITTEN_AS_SUBFINDING_B3_005_INSTEAD_OF_FROZEN_FORENSIC_BLOCK_B3",
+  "before": {
+    "currentBlock": "B3-005",
+    "activeFindingId": "B3-005"
+  },
+  "after": {
+    "currentBlock": "B3",
+    "activeFindingId": "B3-005"
+  },
+  "effect": "RESTORES_CANONICAL_COMPOSITION_ACTIVE_CHECK_AND_EXACT_PRODUCT_DIFF_BLOB_VALIDATION_IN_I6_PREFLIGHT",
+  "productSourceChanged": false,
+  "qaSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "paymentLockChanged": false,
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_005_EXACT_PREVIEW"
+}
