@@ -64,6 +64,7 @@ function auditCurrentModel(){
   const runtimeSource=fs.readFileSync(path.join(__dirname,'cotcomp-runtime-data-contract.js'),'utf8');
   const contractSource=fs.readFileSync(path.join(__dirname,'cotcomp-proposal-contracts.js'),'utf8');
   const persistenceSource=fs.readFileSync(path.join(__dirname,'cotcomp-persistence-plan.js'),'utf8');
+  const proposalBuilderSegment=(runtimeSource.split('function buildProposal')[1]||'').split('function eligibleForComparison')[0]||'';
 
   const findings={
     runtimeBuildUsesCaseId:Object.prototype.hasOwnProperty.call(runtimeProposal.value,'caseId'),
@@ -76,7 +77,7 @@ function auditCurrentModel(){
     proposalPlanPath:plan&&plan.operation&&plan.operation.path||'',
     planHasVersionNumber:/version(No|Number|Index|Id)/.test(persistenceSource),
     runtimeHasSupersedesProposalId:runtimeSource.includes('supersedesProposalId'),
-    runtimeHasStandardCurrentValidityField:/currentValidityConfirmed/.test(runtimeSource),
+    runtimeHasStandardCurrentValidityField:/currentValidityConfirmed/.test(proposalBuilderSegment),
     comparisonCurrentValidityIsExternalContext:contractSource.includes('validityContext.currentValidityConfirmed'),
     proposalPlanHasIdempotencyKey:/buildProposalPlan[\s\S]{0,2500}idempotency/i.test(persistenceSource),
     proposalPlanHasAtomicSupersession:/buildProposalPlan[\s\S]{0,2500}(transaction|atomic|SUPERSEDED)/i.test(persistenceSource)
