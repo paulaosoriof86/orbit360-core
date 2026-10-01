@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P10P1_UPLOAD_PAYMENT_TRANSPORT_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "27022ef0bb4c2da2acd3e44c889fc2ab2a8396d3",
+  "failedRunId": 36853157330,
+  "failedJobId": 110339419517,
+  "classification": "QA_DIAGNOSTIC_ONLY",
+  "observedFailure": "FULL_FIDELITY_UI_FILE_SELECTED_BUT_PAYMENT_CALLABLE_NOT_OBSERVED_WITH_12S_PAYMENT_ONLY_WATCHER",
+  "purpose": "Separate document upload transport from payment transport and capture the exact failure without tokens, headers or file payloads.",
+  "capture": [
+    "DocumentDriveUploadPreview request/response",
+    "CobrosReconciliationCommandPreview request/response",
+    "HTTP status",
+    "sanitized callable error",
+    "UI settle state",
+    "console/page errors"
+  ],
+  "priorMachinePassPreservedAsHistoricalEvidence": true,
+  "priorMachinePassInsufficientForStrengthenedHumanAcceptance": true,
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false,
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "bb08fb2af0269b18282e0c204cb9460e71a3e40a",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "190f5528c846339dd8214ec5bbfbf7a4ba040434"
+  }
+}

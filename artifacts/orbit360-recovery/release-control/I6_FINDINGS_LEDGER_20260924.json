@@ -1743,6 +1743,13 @@
         "compositionLockBlobSha": "a9b294060bd89c69d11cbf3dcb3a9c68f7fcbdf6",
         "productSourceChanged": false,
         "priorMachinePassHistoricalOnly": true
+      },
+      "r12p10p1Diagnostic": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P1_UPLOAD_PAYMENT_TRANSPORT_DIAGNOSTIC_20261001.json",
+        "blobSha": "2a9ba587b7ddaa29c057e72fea3e8017062f166e",
+        "compositionLockBlobSha": "37c8527e8e121b35b66901af6f1cafda689d26ea",
+        "classification": "QA_DIAGNOSTIC_ONLY",
+        "productSourceChanged": false
       }
     },
     {

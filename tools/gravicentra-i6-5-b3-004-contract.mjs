@@ -256,6 +256,9 @@ need(uiProofR12.includes('B3-004-R12-factura.png')&&uiProofR12.includes('B3_004_
 need(uiProofR12.includes('page.reload')&&uiProofR12.includes('B3_004_R12_PAYMENT_SUPPORT_NOT_DURABLE_AFTER_RELOAD')&&uiProofR12.includes('B3_004_R12_DRIVE_READBACK_AFTER_RELOAD_FAILED'),'B3_004_R12P10_UI_DURABILITY_AFTER_RELOAD_MISSING');
 need(uiProofR12.includes('browserDocumentCleanupQuarantined')&&uiProofR12.includes('B3_004_R12_UI_DOCUMENT_CLEANUP_QUARANTINE_FAILED'),'B3_004_R12P10_UI_DOCUMENT_CLEANUP_MISSING');
 console.log('B3_004_R12P10_FULL_FIDELITY_DOCUMENT_UI_PROOF_CONTRACT=PASS');
+need(uiProofR12.includes("DocumentDriveUploadPreview")&&uiProofR12.includes('B3_004_R12_DOCUMENT_UPLOAD_NOT_OBSERVED')&&uiProofR12.includes('B3_004_R12_DOCUMENT_UPLOAD_FAILED'),'B3_004_R12P10P1_DOCUMENT_TRANSPORT_OBSERVABILITY_MISSING');
+need(uiProofR12.includes('B3_004_R12_APPLY_CALLABLE_NOT_OBSERVED_AFTER_UPLOAD')&&uiProofR12.includes('B3_004_R12_APPLY_CALLABLE_FAILED'),'B3_004_R12P10P1_PAYMENT_AFTER_UPLOAD_OBSERVABILITY_MISSING');
+console.log('B3_004_R12P10P1_UPLOAD_THEN_PAYMENT_TRANSPORT_CONTRACT=PASS');
 need(crmBridgeR9.includes('function exactB3004QaScopeBypass(target)')&&crmBridgeR9.includes("target.collection!=='recibosEsperados'")&&crmBridgeR9.includes("record.__syntheticHumanQa===true")&&crmBridgeR9.includes("String(record.__syntheticGate||'')==='B3-004-R12'"),'B3_004_R12P9_EXACT_QA_SCOPE_BYPASS_GUARD_MISSING');
 need(crmBridgeR9.includes("if(target&&!exactB3004QaScopeBypass(target)&&!A.canView(target.collection,target.record,'cobros'))"),'B3_004_R12P9_PAYMENT_SCOPE_WRAPPER_STILL_BLOCKS_EXACT_QA');
 need(crmBridgeR9.includes("if(permission&&!A.can('cobros',permission))"),'B3_004_R12P9_PERMISSION_GUARD_RELAXED');

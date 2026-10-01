@@ -47,8 +47,32 @@ try{
   browser=await chromium.launch({headless:true});
   const context=await browser.newContext({viewport:{width:1500,height:1000}});
   const page=await context.newPage();page.setDefaultTimeout(15000);
+  proof.transportEvents=[];
+  const qaFunctionName=url=>{
+    const m=String(url||'').match(/(orbit360(?:DocumentDrive(?:Upload|Finalize|Quarantine|Read|Download)Preview|CobrosReconciliationCommandPreview))/i);
+    return m?m[1]:'';
+  };
   page.on('pageerror',e=>proof.errors.push('page:'+clean(e?.message||e)));
   page.on('console',m=>{if(m.type()==='error')proof.errors.push('console:'+clean(m.text()));});
+  page.on('request',req=>{
+    const fn=qaFunctionName(req.url());if(!fn||req.method()!=='POST')return;
+    proof.transportEvents.push({kind:'request',fn,at:Date.now()});
+  });
+  page.on('requestfailed',req=>{
+    const fn=qaFunctionName(req.url());if(!fn)return;
+    proof.transportEvents.push({kind:'requestfailed',fn,at:Date.now(),failure:clean(req.failure()?.errorText||'')});
+  });
+  page.on('response',async resp=>{
+    const fn=qaFunctionName(resp.url());if(!fn||resp.request().method()!=='POST')return;
+    let body={};try{body=JSON.parse(await resp.text()||'{}');}catch{}
+    const result=body&&body.result||{},error=body&&body.error||{};
+    proof.transportEvents.push({
+      kind:'response',fn,at:Date.now(),httpStatus:resp.status(),
+      ok:result&&result.ok===true,
+      errorStatus:clean(error&&error.status||''),
+      errorMessage:clean(error&&error.message||'').slice(0,300)
+    });
+  });
   const legalScope='user:'+clean(who.email||who.uid);
   await page.addInitScript(({scope})=>{
     try{
@@ -164,53 +188,28 @@ try{
       advisorBound:!!String(window.Orbit?.auth?.productUser?.advisorId||'')
     }
   }));
-  const callableResponsePromise=page.waitForResponse(resp=>resp.request().method()==='POST'&&/orbit360CobrosReconciliationCommandPreview/i.test(resp.url()),{timeout:12000}).catch(()=>null);
+  const applyStartedAt=Date.now();
   await page.click('#pm-ok');
-  const callableResponse=await callableResponsePromise;
-  if(callableResponse){
-    let requestBody={},responseBody={},responseText='';
-    try{requestBody=JSON.parse(callableResponse.request().postData()||'{}');}catch{}
-    try{responseText=await callableResponse.text();responseBody=JSON.parse(responseText||'{}');}catch{}
-    const data=requestBody&&requestBody.data||{};
-    const payload=data&&data.payload||{};
-    const safeResult=responseBody&&responseBody.result||{};
-    const safeError=responseBody&&responseBody.error||{};
-    proof.applyTransport={
-      httpStatus:callableResponse.status(),
-      operation:String(data.operation||''),
-      activeRole:String(data.activeRole||''),
-      tenantId:String(data.tenantId||''),
-      receiptId:String(payload.receiptId||payload.reciboId||''),
-      sourceType:String(payload.sourceType||''),
-      amount:payload.amount==null?null:Number(payload.amount),
-      responseResult:{
-        ok:safeResult&&safeResult.ok===true,
-        reused:safeResult&&safeResult.reused===true,
-        operation:String(safeResult&&safeResult.operation||''),
-        receiptId:String(safeResult&&safeResult.receiptId||''),
-        cobroId:String(safeResult&&safeResult.cobroId||''),
-        paymentState:String(safeResult&&safeResult.paymentState||''),
-        applicationState:String(safeResult&&safeResult.applicationState||'')
-      },
-      responseError:{
-        status:String(safeError&&safeError.status||''),
-        message:String(safeError&&safeError.message||'').slice(0,500)
-      }
-    };
-    console.log('B3_004_R12_APPLY_TRANSPORT='+JSON.stringify(proof.applyTransport));
-    need(callableResponse.status()<400,'B3_004_R12_APPLY_CALLABLE_HTTP_ERROR:'+JSON.stringify(proof.applyTransport));
-    need(!(safeError&&Object.keys(safeError).length),'B3_004_R12_APPLY_CALLABLE_ERROR:'+JSON.stringify(proof.applyTransport));
-    need(safeResult&&safeResult.ok===true,'B3_004_R12_APPLY_CALLABLE_NO_OK_RESULT:'+JSON.stringify(proof.applyTransport));
-  }else{
-    const uiFailure=await page.evaluate(()=>({
-      payModalOpen:!!document.getElementById('cob-pay'),
-      payButtonDisabled:!!document.querySelector('#pm-ok')?.disabled,
-      toasts:[...document.querySelectorAll('.ciclo-toast,.toast,[role="alert"]')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(-5)
-    }));
-    proof.applyTransport={callableObserved:false,uiFailure};
-    console.log('B3_004_R12_APPLY_TRANSPORT='+JSON.stringify(proof.applyTransport));
-    throw new Error('B3_004_R12_APPLY_CALLABLE_NOT_OBSERVED:'+JSON.stringify(uiFailure));
-  }
+  try{
+    await page.waitForFunction(()=>!document.getElementById('cob-pay')||document.querySelector('#pm-ok')?.disabled===false,null,{timeout:25000});
+  }catch{}
+  await page.waitForTimeout(250);
+  const applyEvents=proof.transportEvents.filter(e=>e.at>=applyStartedAt);
+  const uploadEvent=applyEvents.find(e=>e.kind==='response'&&/DocumentDriveUploadPreview/i.test(e.fn))||null;
+  const paymentEvent=applyEvents.find(e=>e.kind==='response'&&/CobrosReconciliationCommandPreview/i.test(e.fn))||null;
+  const uiFailure=await page.evaluate(()=>({
+    payModalOpen:!!document.getElementById('cob-pay'),
+    payButtonDisabled:!!document.querySelector('#pm-ok')?.disabled,
+    supportName:String(document.querySelector('#pm-support-name')?.textContent||''),
+    toasts:[...document.querySelectorAll('.ciclo-toast,.toast,[role="alert"]')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(-8)
+  }));
+  proof.applyTransport={uploadEvent,paymentEvent,events:applyEvents,uiState:uiFailure,errors:proof.errors.slice(-8)};
+  console.log('B3_004_R12_APPLY_TRANSPORT='+JSON.stringify(proof.applyTransport));
+  need(uploadEvent,'B3_004_R12_DOCUMENT_UPLOAD_NOT_OBSERVED:'+JSON.stringify(proof.applyTransport));
+  need(uploadEvent.httpStatus<400&&uploadEvent.ok===true&&!uploadEvent.errorStatus,'B3_004_R12_DOCUMENT_UPLOAD_FAILED:'+JSON.stringify(proof.applyTransport));
+  need(paymentEvent,'B3_004_R12_APPLY_CALLABLE_NOT_OBSERVED_AFTER_UPLOAD:'+JSON.stringify(proof.applyTransport));
+  need(paymentEvent.httpStatus<400&&paymentEvent.ok===true&&!paymentEvent.errorStatus,'B3_004_R12_APPLY_CALLABLE_FAILED:'+JSON.stringify(proof.applyTransport));
+  need(uiFailure.payModalOpen===false,'B3_004_R12_APPLY_MODAL_REMAINED_OPEN_AFTER_SUCCESS:'+JSON.stringify(proof.applyTransport));
   const paid=await waitCobro(xs=>xs.length===1&&xs[0].estado==='Pagado');
   need(paid.length===1,'B3_004_R12_PAYMENT_NOT_SINGLE');
   need(clean(paid[0].paymentSupportDocumentRef),'B3_004_R12_PAYMENT_SUPPORT_REF_MISSING_AFTER_UI_UPLOAD');
