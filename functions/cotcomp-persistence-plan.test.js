@@ -138,3 +138,24 @@ test('W3 versioned proposal plan is atomic source-only with persisted validity c
   assert.equal(r.comparisonEligibility.rankingPolicy,'NONE_BY_DEFAULT');
 });
 
+test('W4 atomic selection plan verifies linkage and freezes non-binding truth',()=>{
+  const s=require('./cotcomp-selection-contract-s455');
+  const fx=s.syntheticFixture();
+  const r=p.buildAtomicSelectionPlan({
+    tenantId:fx.tenantId,caseId:fx.caseId,
+    comparisonSetId:fx.comparisonSet.comparisonSetId,
+    proposalId:fx.proposal.proposalId,
+    selectionRequestKey:'s455-selection-1',explicitUserChoice:true,
+    comparisonSet:fx.comparisonSet,proposal:fx.proposal,quoteCase:fx.quoteCase,
+    asOf:'2026-10-15T12:00:00Z'
+  });
+  assert.equal(r.ok,true);
+  assert.equal(r.atomic,true);
+  assert.equal(r.physicalW4Allowed,false);
+  assert.equal(r.operations.length,3);
+  assert.equal(r.prerequisiteReadSet.length,3);
+  assert.equal(r.truth.issuanceState,'NOT_ISSUED');
+  assert.equal(r.truth.bindingState,'NOT_BOUND');
+  assert.equal(r.truth.coverageState,'NOT_CONFIRMED');
+});
+
