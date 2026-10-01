@@ -3,6 +3,7 @@
 const crypto = require('node:crypto');
 const data = require('./cotcomp-runtime-data-contract');
 const proposalVersioning = require('./cotcomp-proposal-versioning-contract-s452');
+const selectionContract = require('./cotcomp-selection-contract-s455');
 
 const VERSION = 'ays-cotcomp-persistence-plan-s416-v0.1';
 const EXECUTION_ENABLED = false;
@@ -278,6 +279,25 @@ function buildSelectionPlan(input = {}) {
   };
 }
 
+function buildAtomicSelectionPlan(input = {}) {
+  const plan = selectionContract.buildAtomicSelectionPlan(input);
+  if (!plan.ok) return plan;
+  return {
+    ok:true,
+    executionEnabled:EXECUTION_ENABLED,
+    writesEnabled:WRITES_ENABLED,
+    physicalW4Allowed:false,
+    atomic:true,
+    selectionRequestId:plan.selectionRequestId,
+    requestDigest:plan.requestDigest,
+    selection:plan.selection,
+    prerequisiteReadSet:plan.prerequisiteReadSet,
+    operations:plan.operations,
+    invariants:plan.invariants,
+    truth:plan.truth
+  };
+}
+
 module.exports = Object.freeze({
   VERSION,
   EXECUTION_ENABLED,
@@ -287,5 +307,6 @@ module.exports = Object.freeze({
   buildInitialHandoffPlan,
   buildProposalPlan,
   buildVersionedProposalPlan,
-  buildSelectionPlan
+  buildSelectionPlan,
+  buildAtomicSelectionPlan
 });
