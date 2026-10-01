@@ -43,12 +43,14 @@ async function authenticatedCandidates(memberDocs,auth){
   }
   return out;
 }
-async function signedCallable(auth,clientConfig,actor,label){
+async function signedCallableNamed(auth,clientConfig,actor,label,region,name){
   const token=await auth.createCustomToken(actor.uid);
   const app=initializeClientApp(clientConfig,'b3004-'+label+'-'+runId);
   await signInWithCustomToken(getClientAuth(app),token);
-  return httpsCallable(getFunctions(app,'us-central1'),callableName);
+  return httpsCallable(getFunctions(app,region),name);
 }
+async function signedCallable(auth,clientConfig,actor,label){return signedCallableNamed(auth,clientConfig,actor,label,'us-central1',callableName);}
+async function invokeDoc(callable,payload){const out=await callable(Object.assign({tenantId},payload||{}));return out.data;}
 async function invoke(callable,activeRole,operation,payload,reason){
   const out=await callable({tenantId,activeRole,operation,payload,reason});
   return out.data;
@@ -85,6 +87,11 @@ async function main(){
 
   const operatorCall=await signedCallable(auth,clientConfig,operator,'operator');
   const advisorCall=await signedCallable(auth,clientConfig,advisor,'advisor');
+  const documentUploadCall=await signedCallableNamed(auth,clientConfig,operator,'doc-upload','us-east1','orbit360DocumentDriveUploadPreview');
+  const documentReadCall=await signedCallableNamed(auth,clientConfig,operator,'doc-read','us-east1','orbit360DocumentDriveReadPreview');
+  const documentDownloadCall=await signedCallableNamed(auth,clientConfig,operator,'doc-download','us-east1','orbit360DocumentDriveDownloadPreview');
+  const documentFinalizeCall=await signedCallableNamed(auth,clientConfig,operator,'doc-finalize','us-east1','orbit360DocumentDriveFinalizePreview');
+  const documentQuarantineCall=await signedCallableNamed(auth,clientConfig,operator,'doc-quarantine','us-east1','orbit360DocumentDriveQuarantinePreview');
 
   const suffix=crypto.createHash('sha256').update(runId).digest('hex').slice(0,10);
   const ids={
@@ -113,9 +120,9 @@ async function main(){
       operator:{uid:operator.uid,activeRole:operator.activeRole,advisorId:operator.advisorId},
       crossAdvisor:advisor.advisorId!==operator.advisorId
     },
-    ids,assertions:{},cleanup:{attempted:false,pass:false}
+    ids,assertions:{},documents:{support:null,invoice:null,readPass:false,downloadPass:false,finalizePass:false},cleanup:{attempted:false,pass:false,documentsQuarantined:false}
   };
-  let reportCobroId='',directCobroId='',managementId='';
+  let reportCobroId='',directCobroId='',managementId='',supportDoc=null,invoiceDoc=null,documentsFinalized=false;
   try{
     const batch=db.batch();
     batch.set(refs.client,{id:ids.client,nombre:'B3-004 QA Synthetic R6',pais:'GT',asesorId:advisor.advisorId,__syntheticQa:true,__syntheticRun:runId});
@@ -125,6 +132,15 @@ async function main(){
     batch.set(refs.receiptDirect,{id:ids.receiptDirect,polizaId:ids.policy,clienteId:ids.client,pais:'GT',moneda:'GTQ',cuota:'2/10',vence:'2026-10-30',monto:amountDirect,estado:'Pendiente',estadoOperativo:'futuro_pendiente',asesorId:advisor.advisorId,__syntheticQa:true,__syntheticRun:runId});
     batch.set(refs.portfolioDirect,{id:ids.portfolioDirect,reciboId:ids.receiptDirect,polizaId:ids.policy,clienteId:ids.client,pais:'GT',moneda:'GTQ',monto:amountDirect,estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true,asesorId:advisor.advisorId,__syntheticQa:true,__syntheticRun:runId});
     await batch.commit();
+
+    const pdfBytes=Buffer.from('%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF\n','utf8');
+    const pdfBase64=pdfBytes.toString('base64');
+    supportDoc=await invokeDoc(documentUploadCall,{activeRole:operator.activeRole,clienteId:ids.client,polizaId:ids.policy,name:'b3004qa_payment_support_'+suffix+'.pdf',mimeType:'application/pdf',base64:pdfBase64,provisional:true});
+    invoiceDoc=await invokeDoc(documentUploadCall,{activeRole:operator.activeRole,clienteId:ids.client,polizaId:ids.policy,name:'b3004qa_invoice_'+suffix+'.pdf',mimeType:'application/pdf',base64:pdfBase64,provisional:true});
+    need(supportDoc?.ok===true&&supportDoc?.documentRef&&supportDoc?.stagingFolderId&&supportDoc?.clientFolderId,'B3_004_SUPPORT_DRIVE_STAGE_FAILED');
+    need(invoiceDoc?.ok===true&&invoiceDoc?.documentRef&&invoiceDoc?.stagingFolderId&&invoiceDoc?.clientFolderId,'B3_004_INVOICE_DRIVE_STAGE_FAILED');
+    audit.documents.support={documentRef:supportDoc.documentRef,contentHash:supportDoc.contentHash,stagingFolderId:supportDoc.stagingFolderId,clientFolderId:supportDoc.clientFolderId};
+    audit.documents.invoice={documentRef:invoiceDoc.documentRef,contentHash:invoiceDoc.contentHash,stagingFolderId:invoiceDoc.stagingFolderId,clientFolderId:invoiceDoc.clientFolderId};
 
     const report=await invoke(advisorCall,advisor.activeRole,'report_advisor_payment',{
       receiptId:ids.receiptReport,paidDate,paymentMethod:'Transferencia bancaria',amount:amountReport,note:'B3-004 R6 advisor report'
@@ -146,8 +162,8 @@ async function main(){
     need(advisorApplyDenied,'B3_004_ADVISOR_APPLY_NOT_DENIED');
 
     const applied=await invoke(operatorCall,operator.activeRole,'apply_payment',{
-      receiptId:ids.receiptReport,sourceType:'manual',amount:amountReport
-    },'B3-004 R6 operative validates advisor report');
+      receiptId:ids.receiptReport,sourceType:'manual',amount:amountReport,paymentSupportDocumentRef:supportDoc.documentRef
+    },'B3-004 R10 operative validates advisor report with real Preview support');
     need(applied?.ok===true&&applied.paymentState==='PAID_DIRECT','B3_004_ADVISOR_REPORT_APPLY_FAILED');
     need(applied.paymentOrigin==='ADVISOR_REPORTED_PAYMENT','B3_004_ADVISOR_REPORT_PROVENANCE_LOST');
     reportCobroId=text(applied.cobroId);need(reportCobroId,'B3_004_ADVISOR_REPORT_COBRO_MISSING');
@@ -160,12 +176,28 @@ async function main(){
 
     const reconciled=await invoke(operatorCall,operator.activeRole,'reconcile_payment',{
       receiptId:ids.receiptReport,paymentOriginSource:'insurer_invoice',applicationDate,
-      invoiceNumber:'B3004-R6-'+suffix,invoiceDocumentRef:'qa://invoice/'+suffix,
+      invoiceNumber:'B3004-R10-'+suffix,invoiceDocumentRef:invoiceDoc.documentRef,
       applicationEvidenceType:'INSURER_INVOICE',amount:amountReport
     },'B3-004 R6 individual reconciliation');
     need(reconciled?.cobroId===reportCobroId,'B3_004_RECONCILE_CREATED_SECOND_COBRO');
     need(reconciled?.applicationState==='APPLIED_DIRECT','B3_004_RECONCILE_APPLICATION_STATE_INVALID');
     need(reconciled?.paymentOrigin==='ADVISOR_REPORTED_PAYMENT','B3_004_RECONCILE_REWROTE_ORIGIN');
+
+    const [supportFinalized,invoiceFinalized]=await Promise.all([
+      invokeDoc(documentFinalizeCall,{activeRole:operator.activeRole,clienteId:ids.client,polizaId:ids.policy,documentRef:supportDoc.documentRef,clientFolderId:supportDoc.clientFolderId,stagingFolderId:supportDoc.stagingFolderId}),
+      invokeDoc(documentFinalizeCall,{activeRole:operator.activeRole,clienteId:ids.client,polizaId:ids.policy,documentRef:invoiceDoc.documentRef,clientFolderId:invoiceDoc.clientFolderId,stagingFolderId:invoiceDoc.stagingFolderId})
+    ]);
+    need(supportFinalized?.ok===true&&invoiceFinalized?.ok===true,'B3_004_DOCUMENT_FINALIZE_FAILED');
+    documentsFinalized=true;audit.documents.finalizePass=true;
+    const [supportRead,invoiceRead,supportDownload,invoiceDownload]=await Promise.all([
+      invokeDoc(documentReadCall,{activeRole:operator.activeRole,clienteId:ids.client,polizaId:ids.policy,documentRef:supportDoc.documentRef}),
+      invokeDoc(documentReadCall,{activeRole:operator.activeRole,clienteId:ids.client,polizaId:ids.policy,documentRef:invoiceDoc.documentRef}),
+      invokeDoc(documentDownloadCall,{activeRole:operator.activeRole,clienteId:ids.client,polizaId:ids.policy,documentRef:supportDoc.documentRef}),
+      invokeDoc(documentDownloadCall,{activeRole:operator.activeRole,clienteId:ids.client,polizaId:ids.policy,documentRef:invoiceDoc.documentRef})
+    ]);
+    for(const doc of [supportRead,invoiceRead,supportDownload,invoiceDownload])need(doc?.ok===true&&doc?.base64,'B3_004_DOCUMENT_READ_DOWNLOAD_FAILED');
+    need(Buffer.from(supportRead.base64,'base64').equals(pdfBytes)&&Buffer.from(invoiceRead.base64,'base64').equals(pdfBytes),'B3_004_DOCUMENT_READBACK_BYTES_MISMATCH');
+    audit.documents.readPass=true;audit.documents.downloadPass=true;
 
     const direct=await invoke(operatorCall,operator.activeRole,'apply_payment',{
       receiptId:ids.receiptDirect,sourceType:'manual',paidDate,paymentMethod:'Transferencia bancaria',amount:amountDirect
@@ -187,6 +219,8 @@ async function main(){
     const rr=reportReceiptFinal.data()||{},cc=reportCobroSnap.data()||{},mg=managementFinal.data()||{};
     need(rr.estado==='Pagado'&&rr.paymentOrigin==='ADVISOR_REPORTED_PAYMENT','B3_004_REPORT_RECEIPT_FINAL_INVALID');
     need(cc.paymentEvidenceType==='ADVISOR_REPORTED'&&cc.applicationDate===applicationDate,'B3_004_REPORT_COBRO_FINAL_INVALID');
+    need(cc.paymentSupportDocumentRef===supportDoc.documentRef&&cc.invoiceDocumentRef===invoiceDoc.documentRef,'B3_004_DOCUMENT_REFS_NOT_PERSISTED');
+    need(cc.invoiceNumber==='B3004-R10-'+suffix,'B3_004_INVOICE_NUMBER_NOT_PERSISTED');
     need(mg.estado==='Resuelta'&&mg.paymentReportStatus==='VALIDATED_APPLIED','B3_004_OPS_MANAGEMENT_NOT_RESOLVED');
 
     audit.assertions={
@@ -200,11 +234,27 @@ async function main(){
       idempotentRetry:true,
       singleCobroPerReceipt:true,
       advisorProvenancePreserved:true,
-      paidDateSeparatedFromApplicationDate:true
+      paidDateSeparatedFromApplicationDate:true,
+      realPreviewPaymentSupportUpload:true,
+      realPreviewInvoiceUpload:true,
+      persistentDocumentRefs:true,
+      documentViewerReadPath:true,
+      documentDownloadPath:true,
+      stagedThenFinalizedDocumentLifecycle:true
     };
     audit.status='PASS_PENDING_CLEANUP';
   } finally {
     audit.cleanup.attempted=true;
+    if(supportDoc&&supportDoc.documentRef&&supportDoc.clientFolderId){
+      const from=supportDoc.clientFolderId;
+      const q=await invokeDoc(documentQuarantineCall,{activeRole:operator.activeRole,clienteId:ids.client,polizaId:ids.policy,documentRef:supportDoc.documentRef,clientFolderId:supportDoc.clientFolderId,stagingFolderId:documentsFinalized?from:supportDoc.stagingFolderId}).catch(()=>null);
+      audit.cleanup.documentsQuarantined=!!(q&&q.ok===true&&q.status==='quarantined');
+    }
+    if(invoiceDoc&&invoiceDoc.documentRef&&invoiceDoc.clientFolderId){
+      const from=invoiceDoc.clientFolderId;
+      const q=await invokeDoc(documentQuarantineCall,{activeRole:operator.activeRole,clienteId:ids.client,polizaId:ids.policy,documentRef:invoiceDoc.documentRef,clientFolderId:invoiceDoc.clientFolderId,stagingFolderId:documentsFinalized?from:invoiceDoc.stagingFolderId}).catch(()=>null);
+      audit.cleanup.documentsQuarantined=audit.cleanup.documentsQuarantined&&!!(q&&q.ok===true&&q.status==='quarantined');
+    }
     const deletes=[];
     if(reportCobroId)deletes.push(dataRoot.doc('cobros').collection('items').doc(reportCobroId).delete().catch(()=>null));
     if(directCobroId)deletes.push(dataRoot.doc('cobros').collection('items').doc(directCobroId).delete().catch(()=>null));
@@ -221,7 +271,7 @@ async function main(){
     let remaining=0;
     for(const cobroId of [reportCobroId,directCobroId].filter(Boolean)){if((await dataRoot.doc('cobros').collection('items').doc(cobroId).get()).exists)remaining++;}
     const managementExists=managementId?(await dataRoot.doc('gestiones').collection('items').doc(managementId).get()).exists:false;
-    audit.cleanup.pass=!a.exists&&!b.exists&&!c.exists&&!d.exists&&!e.exists&&!f.exists&&remaining===0&&!managementExists;
+    audit.cleanup.pass=!a.exists&&!b.exists&&!c.exists&&!d.exists&&!e.exists&&!f.exists&&remaining===0&&!managementExists&&audit.cleanup.documentsQuarantined===true;
     if(audit.status==='PASS_PENDING_CLEANUP'&&audit.cleanup.pass)audit.status='PASS';
     fs.writeFileSync(outPath,JSON.stringify(audit,null,2)+'\n');
   }
