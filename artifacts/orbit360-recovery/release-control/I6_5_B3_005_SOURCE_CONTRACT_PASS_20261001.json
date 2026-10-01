@@ -2,8 +2,8 @@
   "schema": "GRAVICENTRA_I6_5_B3_005_SOURCE_CONTRACT_PASS_V1",
   "recordedAt": "2026-10-01",
   "status": "PASS_PENDING_EXACT_PREVIEW",
-  "sourceSha": "f0fa2057eff8d9fede19c5e787a825095f7fd28f",
-  "runId": 36936963048,
+  "sourceSha": "f832944565142b2d1136f52b5e01827169a3e9aa",
+  "runId": 36940259359,
   "findingId": "B3-005",
   "assertions": {
     "serverOwnedInference": true,
