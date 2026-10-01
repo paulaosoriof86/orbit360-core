@@ -940,7 +940,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
@@ -972,7 +972,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
         "orbit360-platform/index.html"
       ],
-      "nextAction": "B3_004_R12_TARGETED_HUMAN_VISUAL",
+      "nextAction": "B3_004_R12P12_CONTRACT_THEN_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SOURCE_CONTRACT_PASS_20260930.json",
       "surfaceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_SURFACE_CONVERGENCE_SOURCE_20260930.json",
@@ -1149,7 +1149,7 @@
         "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "614ad49c368786a0953a5a53bfe6eafb72b010aa",
         "tools/gravicentra-i6-5-b3-004-contract.mjs": "d545959999420d0b0b9cac7e3999968b3b11bb65"
       },
-      "machineProofInvalidatedBySourceChange": false,
+      "machineProofInvalidatedBySourceChange": true,
       "priorMachineProof": {
         "sourceSha": "ab0c4684c8495c8dc3651c3cc5c22e2998e90a29",
         "buildId": "gi-i65-b3-ab0c4684c849-57f234755dc1",
@@ -1927,6 +1927,48 @@
           "tools/gravicentra-i6-5-b3-004-contract.mjs": "7917e2ffbc47c4800e4e071078e3c7b7ca7ad543"
         },
         "productSourceChanged": false
+      },
+      "r12TargetedHumanRejectionR13": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_TARGETED_HUMAN_REJECTION_R13_20261001.json",
+        "blobSha": "2f85413b8bba1aa5e2b7b5262f4fa7a86492e50e",
+        "status": "TARGETED_HUMAN_REJECTED_REMEDIATION_REQUIRED",
+        "blockedBy": [
+          "FRESH_AUTH_DEEP_LINK_FAIL",
+          "PREMATURE_RECONCILED_STATE",
+          "HUMAN_COBROS_COLD_NAVIGATION_10S",
+          "TARGETED_MOBILE_RESPONSIVE_REGRESSION"
+        ],
+        "preservedHumanPass": [
+          "SAVE_PROGRESS_FEEDBACK",
+          "RECONCILE_MODAL_RESPONSIVE",
+          "DOCUMENT_PERSISTENCE",
+          "DOCUMENT_VIEW_DOWNLOAD",
+          "SINGLE_PAYMENT_FLOW"
+        ]
+      },
+      "r12p12CausalFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P12_HUMAN_REJECTION_CAUSAL_SOURCE_FIX_20261001.json",
+        "blobSha": "438a89afa9a1bfc358a9443399d6a95e48290d69",
+        "rootCauses": {
+          "deepLink": "AUTH_PRODUCT_RUNTIME_FORCED_HASH_TO_INICIO_AFTER_FRESH_CREDENTIAL_ACCEPTANCE",
+          "paymentState": "NATIVE_RECEIPT_UI_TREATED_CONCILIADOPAGO_AS_APPLICATION_RECONCILIATION_DESPITE_PENDING_APPLICATIONSTATE",
+          "performance": "B3_004_ROUTE_DEPENDENCY_HYDRATION_PROMOTED_FIVE_COLLECTIONS_TO_BLOCKING_STARTUP_AND_DEFERRED_CRITICAL_COLLECTIONS_UNTIL_ROUTE_ENTRY",
+          "responsive": "INLINE_TWO_COLUMN_GRIDS_AND_STICKY_RECEIPT_ACTION_BYPASSED_MOBILE_LAYOUT_OWNER"
+        },
+        "productBlobs": {
+          "orbit360-platform/core/auth-product-runtime-p0.js": "cb991621489263eaf60040ef3ddf221a69b25c6e",
+          "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "edbb9606a82a5460d71b13d7f513c726a520c22a",
+          "orbit360-platform/modules/inicio.js": "8b31d7021139c71b9e00bd44cb5cd8e1ad753a65",
+          "orbit360-platform/modules/cliente360.js": "cb127dd1eee1fa247d0210b0acd91f17d3e2e441",
+          "orbit360-platform/styles/infra.css": "53fbdb6ac1fcfae91e64e26d8b600acb910d4588",
+          "orbit360-platform/core/product-hydration-required-optional-p0.js": "21f870d3e0e165487843d1d6efa454474fd73563",
+          "orbit360-platform/core/product-app-p0.js": "839511aa977ce98ad615dd13032dd4948539548a",
+          "orbit360-platform/index.html": "e4790479d412d4450f65d95dfda7abf786536b8a"
+        },
+        "qaBlobs": {
+          "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "6aadc776968bfb14e71333e4595bc97b8302963a",
+          "tools/gravicentra-i6-5-b3-004-contract.mjs": "3fdf00c870b3467f580ecdf2c9779870ca84a8d0"
+        }
       }
     },
     {
@@ -1995,7 +2037,18 @@
           "overduePortfolioRows": 529
         },
         "explanation": "Inicio amount cards consume carteraPrimas while current KPI modals labeled Cobros pendientes/vencidos appear to query cobros event states; this explains nonzero cards vs 0 modal rows. Preserve for B3-008."
-      }
+      },
+      "additionalHumanEvidence": [
+        {
+          "recordedAt": "2026-10-01",
+          "source": "B3-004 targeted human validation",
+          "evidence": [
+            "Inicio indicators still do not reflect expected real operational values",
+            "Cobros KPI reality also questioned; diagnose authority/denominators without fixing inside B3-004"
+          ],
+          "disposition": "PRESERVE_FOR_B3_008_AUTHORITY_DIAGNOSTIC"
+        }
+      ]
     },
     {
       "id": "B4-001",
@@ -5531,7 +5584,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "B3_004_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
@@ -5591,6 +5644,14 @@
     "r12p11p7HarnessFix": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P7_FIRESTORE_LISTEN_ABORT_AND_TIMING_ADJUDICATION_FIX_20261001.json",
       "blobSha": "b5dc002ec72d3a59f539ea8032918abd80c6d3dd"
+    },
+    "r12TargetedHumanRejectionR13": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_TARGETED_HUMAN_REJECTION_R13_20261001.json",
+      "blobSha": "2f85413b8bba1aa5e2b7b5262f4fa7a86492e50e"
+    },
+    "r12p12CausalFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P12_HUMAN_REJECTION_CAUSAL_SOURCE_FIX_20261001.json",
+      "blobSha": "438a89afa9a1bfc358a9443399d6a95e48290d69"
     }
   }
 }

@@ -102,6 +102,7 @@ try{
   await page.waitForFunction(id=>!!window.Orbit?.store?.get?.('recibosEsperados',id),ids.receipt);
   await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:15000});
   proof.timing.directReceiptUsableMs=Date.now()-directReceiptStartedAt;
+  need(proof.timing.directReceiptUsableMs<=3000,'B3_004_R12P12_DIRECT_RECEIPT_OVER_3000MS:'+proof.timing.directReceiptUsableMs);
   const directReceiptSurface=await page.evaluate(id=>{
     const detail=document.querySelector('[data-rp-receipt-detail="1"]'),hero=detail?.querySelector('[data-rp-receipt-hero="1"]');
     const actionRects=[...(hero?.querySelectorAll('.btn')||[])].map(x=>{const r=x.getBoundingClientRect();return{text:String(x.textContent||'').trim(),left:r.left,right:r.right,width:r.width};});
@@ -120,6 +121,33 @@ try{
   proof.directReceiptSurface=directReceiptSurface;
   proof.assertions.directReceiptDeepLink=true;
   proof.assertions.mobileReceiptResponsive=true;
+
+  await page.evaluate(()=>{location.hash='#/inicio';});
+  await page.waitForSelector('.inicio-main-grid',{timeout:10000});
+  const inicioMobile=await page.evaluate(()=>{
+    const g=document.querySelector('.inicio-main-grid'),kids=[...(g?.children||[])],a=kids[0]?.getBoundingClientRect(),b=kids[1]?.getBoundingClientRect(),r=g?.getBoundingClientRect();
+    return{viewport:innerWidth,docScroll:document.documentElement.scrollWidth,gridWidth:r?.width||0,first:{left:a?.left||0,top:a?.top||0,right:a?.right||0,bottom:a?.bottom||0},second:{left:b?.left||0,top:b?.top||0,right:b?.right||0,bottom:b?.bottom||0}};
+  });
+  need(inicioMobile.docScroll<=inicioMobile.viewport+2&&inicioMobile.gridWidth<=inicioMobile.viewport+1&&inicioMobile.second.left<=inicioMobile.first.left+2&&inicioMobile.second.top>=inicioMobile.first.bottom-2,'B3_004_R12P12_INICIO_MOBILE_RESPONSIVE_FAIL:'+JSON.stringify(inicioMobile));
+  proof.inicioMobile=inicioMobile;proof.assertions.mobileInicioResponsive=true;
+
+  await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id)+'&t=resumen';},ids.client);
+  await page.waitForSelector('.c360-summary-grid',{timeout:10000});
+  const c360Mobile=await page.evaluate(()=>{
+    const g=document.querySelector('.c360-summary-grid'),kids=[...(g?.children||[])],a=kids[0]?.getBoundingClientRect(),b=kids[1]?.getBoundingClientRect(),r=g?.getBoundingClientRect();
+    return{viewport:innerWidth,docScroll:document.documentElement.scrollWidth,gridWidth:r?.width||0,first:{left:a?.left||0,top:a?.top||0,right:a?.right||0,bottom:a?.bottom||0},second:{left:b?.left||0,top:b?.top||0,right:b?.right||0,bottom:b?.bottom||0}};
+  });
+  need(c360Mobile.docScroll<=c360Mobile.viewport+2&&c360Mobile.gridWidth<=c360Mobile.viewport+1&&c360Mobile.second.left<=c360Mobile.first.left+2&&c360Mobile.second.top>=c360Mobile.first.bottom-2,'B3_004_R12P12_CLIENTE360_MOBILE_RESPONSIVE_FAIL:'+JSON.stringify(c360Mobile));
+  proof.c360Mobile=c360Mobile;proof.assertions.mobileCliente360Responsive=true;
+
+  await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id)+'&t=recibos';},ids.client);
+  await page.waitForSelector('[data-rp-receipts-table="1"]',{timeout:10000});
+  const receiptListMobile=await page.evaluate(()=>{
+    const cell=document.querySelector('[data-rp-receipts-table="1"] .rp-action-cell');
+    return{position:cell?getComputedStyle(cell).position:'',docScroll:document.documentElement.scrollWidth,viewport:innerWidth};
+  });
+  need(receiptListMobile.position!=='sticky'&&receiptListMobile.docScroll<=receiptListMobile.viewport+2,'B3_004_R12P12_RECEIPT_LIST_MOBILE_ACTION_OVERLAY:'+JSON.stringify(receiptListMobile));
+  proof.receiptListMobile=receiptListMobile;proof.assertions.mobileReceiptListResponsive=true;
 
   const normalStart=await page.evaluate(()=>{const t=performance.now();window.__b3004r12NormalNavStart=t;location.hash='#/cobros';return t;});
   await page.waitForSelector('table.tbl tbody tr[data-row-policy-id]');
@@ -257,6 +285,16 @@ try{
   proof.timing.applyPostWriteReadbackMs=Math.max(0,Date.now()-(paymentEvent?.at||applyStartedAt));
   proof.payment={cobroId:paid[0].id,paymentState:paid[0].paymentState||'',applicationState:paid[0].applicationState||'',paymentSupportDocumentRef:clean(paid[0].paymentSupportDocumentRef)};
 
+  await page.evaluate(({client,receipt})=>{location.hash='#/cliente360?c='+encodeURIComponent(client)+'&t=recibos&r='+encodeURIComponent(receipt);},{client:ids.client,receipt:ids.receipt});
+  await page.waitForSelector('[data-rp-receipt-detail="1"]',{timeout:12000});
+  const preReconcileReceipt=await page.evaluate(()=>{
+    const detail=document.querySelector('[data-rp-receipt-detail="1"]');
+    return{text:String(detail?.textContent||''),hash:String(location.hash||'')};
+  });
+  need(/Pendiente de conciliaci[oó]n/i.test(preReconcileReceipt.text)&&!/Cobro conciliado/i.test(preReconcileReceipt.text),'B3_004_R12P12_PREMATURE_RECONCILED_UI_STATE:'+JSON.stringify(preReconcileReceipt));
+  proof.preReconcileReceipt=preReconcileReceipt;proof.assertions.paymentNotPrematurelyReconciled=true;
+  await page.evaluate(receipt=>{location.hash='#/cobros?qaReceipt='+encodeURIComponent(receipt);},ids.receipt);
+  await page.waitForSelector('[data-b3004-human-qa-mode="1"]',{timeout:12000});
   await page.waitForSelector('button[data-cobros-action="reconcile"]',{timeout:12000});
   const reconcileOpenStartedAt=Date.now();
   await page.locator('button[data-cobros-action="reconcile"]').click();
@@ -352,9 +390,10 @@ try{
     invoiceView:!!document.querySelector('[data-rp-document="insurer_invoice"] [data-rp-document-view]'),
     invoiceDownload:!!document.querySelector('[data-rp-document="insurer_invoice"] [data-rp-document-download]'),
     receiptParam:String(window.Orbit?.route?.params?.r||''),
+    reconciledLabel:/Cobro conciliado/i.test(String(document.querySelector('[data-rp-receipt-detail="1"]')?.textContent||'')),
     elapsedMs:Date.now()-start
   }),directUiStart);
-  need(documentUi.paymentView&&documentUi.paymentDownload&&documentUi.invoiceView&&documentUi.invoiceDownload&&documentUi.receiptParam===ids.receipt,'B3_004_R12P11_DOCUMENT_UI_CONTROLS_MISSING:'+JSON.stringify(documentUi));
+  need(documentUi.paymentView&&documentUi.paymentDownload&&documentUi.invoiceView&&documentUi.invoiceDownload&&documentUi.receiptParam===ids.receipt&&documentUi.reconciledLabel===true,'B3_004_R12P11_DOCUMENT_UI_CONTROLS_MISSING:'+JSON.stringify(documentUi));
   proof.documentUi=documentUi;
   proof.assertions.browserDocumentControlsVisible=true;
 

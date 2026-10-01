@@ -88,7 +88,7 @@ Orbit.modules.inicio = (function () {
           <div class="k-foot muted">pólizas por renovar ›</div></button>
       </div>
 
-      <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-top:18px">
+      <div class="inicio-main-grid" style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px">
         <!-- Leaderboard -->
         <div class="card pad">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">

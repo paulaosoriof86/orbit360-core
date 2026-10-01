@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12_TARGETED_HUMAN_REJECTION_R13_V1",
+  "recordedAt": "2026-10-01",
+  "findingId": "B3-004",
+  "status": "TARGETED_HUMAN_REJECTED_REMEDIATION_REQUIRED",
+  "rejectedCandidate": {
+    "sourceSha": "90c4c6c312078d37790a5c84643f4a6972bab469",
+    "buildId": "gi-i65-b3-90c4c6c31207-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36892209969-1etm25yu.web.app",
+    "runId": 36892209969,
+    "artifactId": "11177486929",
+    "artifactDigest": "3d122fdb7c4ab6941ed277588260cbea780c186d2b59ee4be6eb08e1d166ca0a",
+    "machinePassPreservedAsHistoricalEvidence": true,
+    "humanCandidateInvalidated": true
+  },
+  "humanEvidence": {
+    "device": "Android mobile",
+    "deepLink": "FAIL_FRESH_AUTH_REDIRECTED_AWAY_FROM_EXACT_RECEIPT",
+    "cobrosNavigation": "FAIL_APPROX_10_SECONDS",
+    "applyPayment": "PASS_WITH_VISIBLE_SAVING_FEEDBACK_APPROX_15_SECONDS",
+    "reconcileModalResponsive": "PASS",
+    "reconcileWrite": "PASS_APPROX_8_TO_10_SECONDS",
+    "prematureReceiptStatus": "FAIL_SHOWED_COBRO_CONCILIADO_AFTER_PAYMENT_BEFORE_RECONCILIATION",
+    "documentPersistence": "PASS_AFTER_RELOAD",
+    "documentView": "PASS",
+    "documentDownload": "PASS",
+    "inicioResponsive": "FAIL_TWO_COLUMN_CLIPPING",
+    "cliente360Responsive": "FAIL_TARGETED_MOBILE_REGRESSION",
+    "previewRealRowsReadOnly": "EXPECTED_SAFE_PREVIEW_BEHAVIOR_NOT_A_LIVE_REGRESSION"
+  },
+  "disposition": {
+    "blockingInB3004": [
+      "FRESH_AUTH_DEEP_LINK_FAIL",
+      "PREMATURE_RECONCILED_STATE",
+      "HUMAN_COBROS_COLD_NAVIGATION_10S",
+      "TARGETED_MOBILE_RESPONSIVE_REGRESSION"
+    ],
+    "preservedHumanPass": [
+      "SAVE_PROGRESS_FEEDBACK",
+      "RECONCILE_MODAL_RESPONSIVE",
+      "DOCUMENT_PERSISTENCE",
+      "DOCUMENT_VIEW_DOWNLOAD",
+      "SINGLE_PAYMENT_FLOW"
+    ],
+    "carriedToB3008": [
+      "INICIO_REAL_KPI_AUTHORITY",
+      "COBROS_KPI_REALITY_RECONCILIATION_EVIDENCE"
+    ],
+    "b3005Opened": false,
+    "livePromoted": false,
+    "reimport": false
+  }
+}

@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-clean-20260902.2';
+  var VERSION='fase-a-i2-clean-20261001.b3004r12p12';
   var state={initialized:false,activating:false,started:false,routerStarted:false,tenantContextReady:false,operationalWriteReady:false,lastError:''};
   var activationPromise=null;
 
@@ -25,6 +25,11 @@
   }
   function signal(){
     try{document.dispatchEvent(new CustomEvent('orbit:product-app',{detail:status()}));}catch(e){}
+  }
+  function prewarmCriticalRoutes(){
+    var store=Orbit.store;
+    if(!store||typeof store._ensureCollections!=='function')return;
+    try{store._ensureCollections(['clientes','polizas','cobros','recibosEsperados','carteraPrimas']);}catch(e){}
   }
   function fail(message){
     state.lastError=clean(message)||'PRODUCT_APP_ACTIVATION_FAILED';
@@ -102,6 +107,7 @@
       signal();
       try{document.dispatchEvent(new CustomEvent('orbit:auth'));document.dispatchEvent(new CustomEvent('orbit:store'));}catch(e){}
       var defer=window.requestIdleCallback||function(fn){return setTimeout(fn,0);};
+      defer(function(){prewarmCriticalRoutes();},{timeout:350});
       defer(function(){if(Orbit.novedades&&typeof Orbit.novedades.init==='function'){try{Orbit.novedades.init();}catch(e){}}});
       return status();
     }).catch(function(error){

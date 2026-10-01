@@ -882,3 +882,17 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 .tabs:has(.ac-tab){ flex-wrap:wrap; row-gap:8px; }
 .ac-tab{ display:inline-flex; align-items:center; gap:5px; }
 .ac-tab .ac-tab-ico{ font-size:14px; line-height:1; }
+
+
+/* ---------- B3-004 R12P12 · targeted human mobile regression closure ---------- */
+.inicio-main-grid,.c360-summary-grid{min-width:0}
+@media(max-width:760px){
+  .inicio-main-grid,.c360-summary-grid{grid-template-columns:minmax(0,1fr)!important}
+  .inicio-main-grid>*,.c360-summary-grid>*{min-width:0}
+  .fichahdr .fh-top>div{min-width:0!important;max-width:100%}
+}
+@media(max-width:560px){
+  .fh-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fh-kpis>.fh-kpi:last-child:nth-child(odd){grid-column:1 / -1}
+  [data-rp-receipts-table="1"] .rp-action-cell{position:static!important;right:auto!important}
+}

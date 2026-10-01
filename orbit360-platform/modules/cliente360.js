@@ -125,6 +125,9 @@ Orbit.modules.cliente360 = (function () {
     ensureClientNameCaseStyle();
     const p = (Orbit.route && Orbit.route.params) || {};
     const cid = p.c || null;
+    if (cid && S() && typeof S()._ensureCollections === 'function' && (p.r || p.t === 'recibos' || p.t === 'cobros')) {
+      try { S()._ensureCollections(['clientes','polizas','recibosEsperados','carteraPrimas','cobros']); } catch (e) {}
+    }
     if (cid && S().get('clientes', cid)) {
       const requested = S().get('clientes', cid);
       if (requested && String(requested.mergedIntoClientId || '').trim()) {
@@ -504,7 +507,7 @@ Orbit.modules.cliente360 = (function () {
     const totalRamo = Object.values(porRamo).reduce((s, v) => s + v, 0) || 1;
     const ramoCols = ['#C5162E', '#1E2227', '#1f3a5f', '#1f8a4c', '#c9821b', '#6b4ea0', '#0f766e'];
 
-    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    return `<div class="c360-summary-grid" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px">
       <!-- col izq -->
       <div style="display:grid;gap:16px">
         <div class="card pad">
