@@ -35,7 +35,7 @@
   },
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
-  "currentBlock": "B3",
+  "currentBlock": "B3-005",
   "productFileCount": 80,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
@@ -142,7 +142,7 @@
     "orbit360-platform/core/access-scope.js": "f50156162f59e105d3564c1c3f6036daf03ebd56",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "cb991621489263eaf60040ef3ddf221a69b25c6e",
-    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "010f245e8ab10ec2a1db96f164506d8683cef655",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "f98777a40f791612dd88c606a7172ba669a66312",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
@@ -180,7 +180,7 @@
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
     "orbit360-platform/modules/cliente360.js": "cb127dd1eee1fa247d0210b0acd91f17d3e2e441",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495",
-    "orbit360-platform/modules/cobros.js": "b03650daa42675a27a2e39b7b00e980bb66cd81b",
+    "orbit360-platform/modules/cobros.js": "df8d483309fbd27861a5d55e93c69af780f7f0a6",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/conciliaciones.js": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25",
     "orbit360-platform/modules/configuracion.js": "d09d9d0d3976a8207ac79e6355de9aed3ce1512e",
@@ -404,19 +404,10 @@
     "livePromotion": false
   },
   "lastAuthorizedMutation": {
-    "date": "2026-10-01",
-    "gate": "I6.5-B3-005-R3P1-QA",
-    "reason": "REBUILD_CANONICAL_COMPOSITION_FROM_FULL_RECURSIVE_GIT_TREES_NOT_TRUNCATED_COMPARE_FILE_LIST",
-    "changedProductFiles": [],
-    "changedQaFiles": [
-      "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-      "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3P1_FULL_TREE_COMPOSITION_REPAIR_20261001.json"
-    ],
-    "productSourceChanged": false,
-    "noOperationalBusinessMutation": true,
-    "noProductionConfigWrite": true,
-    "noReimport": true,
-    "noLive": true
+    "findingId": "B3-005",
+    "kind": "SEMANTIC_PROVENANCE_SOURCE_FIX",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R4_SEMANTIC_PROVENANCE_SOURCE_FIX_20261001.json",
+    "blobSha": "4c214810a3897bab60fb757add6cbbf69fc3bca9"
   },
   "b3004ActionSurfaceFix": {
     "status": "R4_SOURCE_FIXED_PENDING_CONTRACT",
@@ -736,7 +727,7 @@
     "noReimport": true,
     "noLive": true
   },
-  "activeFindingId": "B3-004",
+  "activeFindingId": "B3-005",
   "b3004R10CausalSourceFix": {
     "status": "FINAL_SOURCE_BOUND_PENDING_EXACT_PREVIEW",
     "findingId": "B3-004",
@@ -1698,5 +1689,20 @@
     "runId": 36937661520,
     "artifactId": 11199021002,
     "artifactDigest": "f127210fcbc5923e0684252716eb0e246679e0d4fdfccb49ab583db2f6a74c6b"
+  },
+  "b3005R4SemanticProvenanceFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R4_SEMANTIC_PROVENANCE_SOURCE_FIX_20261001.json",
+    "blobSha": "4c214810a3897bab60fb757add6cbbf69fc3bca9",
+    "exactProductBlobs": {
+      "orbit360-platform/modules/cobros.js": "df8d483309fbd27861a5d55e93c69af780f7f0a6",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "f98777a40f791612dd88c606a7172ba669a66312"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-005-contract.mjs": "89d1f612f933c5453db4db7f109c8e1027a9aca2"
+    },
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
