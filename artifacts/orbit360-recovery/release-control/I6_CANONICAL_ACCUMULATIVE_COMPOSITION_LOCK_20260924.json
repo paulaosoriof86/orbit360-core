@@ -790,7 +790,7 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "7e4a89acf664b2f9e686b403a22cdc1894c60f65",
       "tools/gravicentra-i6-5-b3-004-human-fixture.mjs": "5d56183cf4228ac768274ec96bf43dad5d551cae",
-      "tools/gravicentra-i6-5-b3-004-r11-realcase-readonly.mjs": "b80a3f41a3916ac4f3694057d12d091faf695a6a",
+      "tools/gravicentra-i6-5-b3-004-r11-realcase-readonly.mjs": "95e40228e441fff6e7c56395d15fda5ac60ceafd",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "537c8bf37363eb10b1f79b6889475f16c64d1dd8"
     },
     "humanQaFixturePrefix": "b3004human_",
@@ -798,6 +798,7 @@
     "operationalPreviewWritesAuthorized": false,
     "live": false,
     "reimport": false,
-    "b3005": false
+    "b3005": false,
+    "realCaseDiagnosticSemantics": "receiptId/polizaId structural integrity blocks; duplicate visible policy number is lineage warning unless it creates receipt/cobro/portfolio ambiguity"
   }
 }

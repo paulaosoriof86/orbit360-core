@@ -1554,7 +1554,7 @@
       },
       "r11SourceFix": {
         "status": "SOURCE_FIXED_PENDING_CONTRACT",
-        "compositionLockBlobSha": "f92449b2ee8a2b9c47e2cb454c83b85e3abf001a",
+        "compositionLockBlobSha": "12ae83f53fc0013356369b67feb2d26e086d9124",
         "previewHostRoutingFixed": true,
         "previewServerSyntheticGuard": true,
         "humanSyntheticFixtureEnabled": true,
@@ -1563,7 +1563,9 @@
         "operationalBusinessWrites": false,
         "reimport": false,
         "live": false,
-        "b3005": false
+        "b3005": false,
+        "realCaseDiagnosticBlobSha": "95e40228e441fff6e7c56395d15fda5ac60ceafd",
+        "duplicatePolicyNumberDisposition": "WARNING_NOT_PAYMENT_BLOCKER"
       },
       "r11ContractPass": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R11_SOURCE_CONTRACT_PASS_20260930.json",
@@ -5177,7 +5179,7 @@
     "activeFindingId": "B3-004",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_COBROS_SHELL_ROOTFIX_20260929.json",
     "receiptBlobSha": "259c9fc3aaf88b004eec58dbf268284d06dadb66",
-    "compositionLockBlobSha": "f92449b2ee8a2b9c47e2cb454c83b85e3abf001a",
+    "compositionLockBlobSha": "12ae83f53fc0013356369b67feb2d26e086d9124",
     "noLive": true,
     "noReimport": true,
     "mechanismRootFix": {

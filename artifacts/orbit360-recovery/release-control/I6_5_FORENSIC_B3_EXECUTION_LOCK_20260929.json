@@ -548,11 +548,12 @@
       "blobSha": "afa39d3862e2d5677f2178b8d0823cd52a618721"
     },
     "r11SourceFix": {
-      "compositionLockBlobSha": "f92449b2ee8a2b9c47e2cb454c83b85e3abf001a",
+      "compositionLockBlobSha": "12ae83f53fc0013356369b67feb2d26e086d9124",
       "previewHostRoutingFixed": true,
       "humanSyntheticFixtureRequired": true,
       "realCaseReadonlyDiagnosticRequired": true,
-      "stagedDemandHydrationRequired": true
+      "stagedDemandHydrationRequired": true,
+      "realCaseDiagnosticBlobSha": "95e40228e441fff6e7c56395d15fda5ac60ceafd"
     },
     "r11ContractPass": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R11_SOURCE_CONTRACT_PASS_20260930.json",
@@ -567,7 +568,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "fda84367208663b528ff705c58a3d8dce7b51b5b"
+    "blobSha": "c5a538445ede7439815bbc891b469b0cdbbe3677"
   },
   "nextRequiredProof": [
     "B3_004_R11_EXACT_PREVIEW_MACHINE_PASS",
@@ -764,7 +765,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "f92449b2ee8a2b9c47e2cb454c83b85e3abf001a"
+    "blobSha": "12ae83f53fc0013356369b67feb2d26e086d9124"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R11_PREVIEW_ONLY",
