@@ -2,7 +2,7 @@
   "schemaVersion": "ays-cotcomp-s467-intake-deploy-intent-v1.0",
   "authorization": "S467_DEPLOY_ONE_TIME_LAB_INTAKE",
   "authorizedAt": "2026-10-01",
-  "authorizedSourceParent": "069e05eac2e6d38f72544f06d2c2f1d7b754df62",
+  "authorizedSourceParent": "796dbbbbce02e406e4d5c93bda59d6dc6e6504a8",
   "projectId": "ays-orbit-360-lab",
   "functionName": "cotcompPilotIntakeS467",
   "journeyId": "GT_AUTO_MOTO_HYBRID",
@@ -20,5 +20,18 @@
     "validate invalid bearer rejection",
     "leave one-time state unused until participant submits",
     "do not submit any real participant data from workflow"
-  ]
+  ],
+  "consentText": "Autorizo gestionar esta solicitud y contactarme",
+  "marketingSeparate": true,
+  "marketingDefault": false,
+  "strictInputAllowlist": [
+    "brand",
+    "lineModel",
+    "name",
+    "whatsapp",
+    "email",
+    "requestManagementConsent"
+  ],
+  "antiAbuse": "ONE_TIME_HIGH_ENTROPY_BEARER_SHA256_PLUS_EXPIRY",
+  "globalAppCheckWeakened": false
 }
