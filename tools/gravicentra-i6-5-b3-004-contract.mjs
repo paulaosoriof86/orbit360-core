@@ -248,6 +248,8 @@ need(reconciliationClientR11.includes('const productContextReady=()=>')&&reconci
 need(reconciliationClientR11.includes("const enabled=()=>productContextReady()||!!((backend().featureFlags||{}).cobrosReconciliationDomainActive===true)"),'B3_004_R12P7_CLIENT_STILL_LAB_FLAG_ONLY');
 need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20261001-b3004r12p7'),'B3_004_R12P7_PAYMENT_CLIENT_ASSET_NOT_BUMPED');
 console.log('B3_004_R12P7_PRODUCT_CONTEXT_CALLABLE_ENABLEMENT_CONTRACT=PASS');
+need(uiProofR12.includes('B3_004_R12_ACTION_CONTEXT=')&&uiProofR12.includes('B3_004_R12_APPLY_MODAL_NOT_OPEN')&&uiProofR12.includes('ownScopedFor')&&uiProofR12.includes('resolveReceiptId'),'B3_004_R12P8_ACTION_CONTEXT_DIAGNOSTIC_MISSING');
+console.log('B3_004_R12P8_ACTION_CONTEXT_DIAGNOSTIC_CONTRACT=PASS');
 console.log('B3_004_R12P4_EFFECTIVE_LEGAL_PRECONDITION_CONTRACT=PASS');
 need(uiProofR12.includes('__b3004r12NormalNavStart')&&uiProofR12.includes('qaCobrosUsableMs'),'B3_004_R12P3_NORMAL_AND_QA_PERFORMANCE_SPLIT_MISSING');
 console.log('B3_004_R12P3_BROWSER_HARNESS_PRECONDITION_CONTRACT=PASS');

@@ -1695,6 +1695,14 @@
         "compositionLockBlobSha": "aea2d563cc19fd2864181a0e633e156fa25c11e3",
         "classification": "QA_CONTRACT_LITERAL_MISMATCH",
         "productSourceChanged": false
+      },
+      "r12p8Diagnostic": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P8_ACTION_CONTEXT_DIAGNOSTIC_20261001.json",
+        "blobSha": "7d48154d254aeb67854e4f6abe58f16eaba6e37a",
+        "compositionLockBlobSha": "7d2cfc5c56d3a0e24abf6671d0af41b148fc89b9",
+        "classification": "QA_DIAGNOSTIC_ONLY",
+        "purpose": "CAPTURE_EXACT_QA_ACTION_CONTEXT_AT_CLICK_AFTER_INTERMITTENT_MODAL_OPEN_FAILURE",
+        "productSourceChanged": false
       }
     },
     {

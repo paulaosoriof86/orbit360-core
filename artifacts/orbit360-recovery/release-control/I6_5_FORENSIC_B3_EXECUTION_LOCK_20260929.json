@@ -630,6 +630,12 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P7P1_CONTRACT_LITERAL_FIX_20261001.json",
       "blobSha": "b9c50d801871e681199861803fd202cb06536c3d",
       "productSourceChanged": false
+    },
+    "r12p8Diagnostic": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P8_ACTION_CONTEXT_DIAGNOSTIC_20261001.json",
+      "blobSha": "7d48154d254aeb67854e4f6abe58f16eaba6e37a",
+      "purpose": "CAPTURE_EXACT_QA_ACTION_CONTEXT_AT_CLICK_AFTER_INTERMITTENT_MODAL_OPEN_FAILURE",
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -639,7 +645,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "b64587ebb3407d7e0120e28ff547f974893de9c0"
+    "blobSha": "280a3d43714964f2c1bac492341d632fda821dab"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -840,7 +846,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "aea2d563cc19fd2864181a0e633e156fa25c11e3"
+    "blobSha": "7d2cfc5c56d3a0e24abf6671d0af41b148fc89b9"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -936,6 +942,19 @@
     "blobSha": "b9c50d801871e681199861803fd202cb06536c3d",
     "compositionLockBlobSha": "aea2d563cc19fd2864181a0e633e156fa25c11e3",
     "findingsLedgerBlobSha": "b64587ebb3407d7e0120e28ff547f974893de9c0",
+    "productSourceChanged": false,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p8Diagnostic": {
+    "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P8_ACTION_CONTEXT_DIAGNOSTIC_20261001.json",
+    "blobSha": "7d48154d254aeb67854e4f6abe58f16eaba6e37a",
+    "compositionLockBlobSha": "7d2cfc5c56d3a0e24abf6671d0af41b148fc89b9",
+    "findingsLedgerBlobSha": "280a3d43714964f2c1bac492341d632fda821dab",
+    "purpose": "CAPTURE_EXACT_QA_ACTION_CONTEXT_AT_CLICK_AFTER_INTERMITTENT_MODAL_OPEN_FAILURE",
     "productSourceChanged": false,
     "noOperationalBusinessWrites": true,
     "noReimport": true,

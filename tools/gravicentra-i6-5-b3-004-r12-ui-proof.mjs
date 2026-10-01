@@ -103,7 +103,47 @@ try{
   need(rows===1,'B3_004_R12_QA_ROUTE_NOT_ISOLATED:'+rows);
   proof.assertions.qaRouteIsolated=true;
 
+  const actionContext=await page.evaluate(id=>{
+    const levels=[];let store=window.Orbit?.store||null,hops=0;
+    while(store&&hops<12){
+      let receipt=null,error='';
+      try{receipt=typeof store.get==='function'?store.get('recibosEsperados',id):null;}catch(e){error=String(e&&e.message||e);}
+      levels.push({
+        hop:hops,
+        ownScopedFor:Object.prototype.hasOwnProperty.call(store,'_scopedFor'),
+        scopedFor:String(store&&store._scopedFor||''),
+        hasGet:typeof store.get==='function',
+        hasAll:typeof store.all==='function',
+        receiptFound:!!receipt,
+        receiptId:String(receipt&&receipt.id||''),
+        synthetic:receipt&&receipt.__syntheticHumanQa===true,
+        gate:String(receipt&&receipt.__syntheticGate||''),
+        error
+      });
+      store=Object.getPrototypeOf(store);hops+=1;
+    }
+    const button=document.querySelector('button[data-cobros-action="apply"]');
+    return{
+      hash:String(location.hash||''),
+      routeName:String(window.Orbit?.route?.name||window.Orbit?.route?.route||''),
+      qaReceipt:String(window.Orbit?.route?.params?.qaReceipt||''),
+      resolveReceiptId:String(window.Orbit?.modules?.cobros?.resolveReceiptId?.(id)||''),
+      scopedReceiptFound:!!window.Orbit?.store?.get?.('recibosEsperados',id),
+      buttonOnclick:String(button?.getAttribute('onclick')||''),
+      levels
+    };
+  },ids.receipt);
+  proof.actionContext=actionContext;
+  console.log('B3_004_R12_ACTION_CONTEXT='+JSON.stringify(actionContext));
   await page.locator('button[data-cobros-action="apply"]').click();
+  await page.waitForTimeout(350);
+  const modalState=await page.evaluate(()=>({
+    open:!!document.getElementById('cob-pay'),
+    routeQaReceipt:String(window.Orbit?.route?.params?.qaReceipt||''),
+    toasts:[...document.querySelectorAll('.ciclo-toast,.toast,[role="alert"]')].map(x=>String(x.textContent||'').trim()).filter(Boolean).slice(-8)
+  }));
+  proof.applyModalState=modalState;
+  if(!modalState.open)throw new Error('B3_004_R12_APPLY_MODAL_NOT_OPEN:'+JSON.stringify({actionContext,modalState}));
   await page.waitForSelector('#cob-pay');
   await page.fill('#pm-paid','2026-09-30');
   await page.selectOption('#pm-metodo',{label:'Transferencia bancaria'});

@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P8_ACTION_CONTEXT_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_DIAGNOSTIC_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "82903e80901d420baa6edfab1482876a4e4d7b68",
+  "failedRunId": 36845922588,
+  "failedJobId": 110316057632,
+  "classification": "QA_DIAGNOSTIC_ONLY",
+  "observedFailure": "APPLY_BUTTON_RENDERED_BUT_COB_PAY_MODAL_NOT_OPEN",
+  "diagnosticPurpose": "CAPTURE_EXACT_QA_ACTION_CONTEXT_AT_CLICK_AFTER_INTERMITTENT_MODAL_OPEN_FAILURE",
+  "capture": [
+    "route qaReceipt at click",
+    "hash",
+    "module resolveReceiptId",
+    "scoped receipt visibility",
+    "store prototype chain exact receipt visibility",
+    "synthetic flags",
+    "button onclick",
+    "post-click modal/toasts"
+  ],
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false,
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs": "3019425d95a1b2d6e713b6ad969d4662e8f0dc6a",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "a9a3c9d7176b7f30bb709ceccad6da7f700034d5"
+  }
+}
