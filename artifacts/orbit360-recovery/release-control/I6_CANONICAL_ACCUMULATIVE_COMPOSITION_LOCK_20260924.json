@@ -403,18 +403,14 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R15P1-QA",
-    "reason": "FIX_QA_FIXTURE_MIME_CONTENT_MISMATCH_AND_STRENGTHEN_CONTRACT",
+    "gate": "I6.5-B3-004-CLOSE",
+    "reason": "TARGETED_HUMAN_VISUAL_PASS_GOVERNANCE_ONLY_ADVANCE_TO_B3_005",
     "changedProductFiles": [],
-    "changedQaFiles": [
-      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
-      "tools/gravicentra-i6-5-b3-004-contract.mjs"
-    ],
+    "changedQaFiles": [],
     "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
-    "noLive": true,
-    "noB3005": true
+    "noLive": true
   },
   "b3004ActionSurfaceFix": {
     "status": "R4_SOURCE_FIXED_PENDING_CONTRACT",
@@ -1535,5 +1531,24 @@
     "contractBlobSha": "87223eb7d19b775f559dcf9a022bb4b724e85392",
     "productSourceChanged": false,
     "productRegressionDemonstrated": false
+  },
+  "b3004R15TargetedHumanVisualPass": {
+    "status": "PASS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
+    "receiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
+    "sourceSha": "4aa23b524d6c0bc3a14a7816e8a996297b5f8e93",
+    "buildId": "gi-i65-b3-4aa23b524d6c-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36930630584-yi5iucr2.web.app",
+    "performanceObservation": {
+      "receiptContextPreservedAfterApply": true,
+      "receiptContextPreservedAfterReconcile": true,
+      "paymentSupportPdfOpensInNewTab": true,
+      "insurerApplicationPdfOpensInNewTab": true,
+      "pdfBehaviorConsistentAcrossBothSurfaces": true,
+      "cobrosEntryApproxSeconds": "3-4",
+      "writeWithPdfApproxSeconds": "5-6",
+      "currentScreenshot": "image(20261001-215554).png",
+      "note": "User reapplied the synthetic payment because the fixture had been reset by the machine proof; this is expected QA fixture lifecycle, not loss of operational business data."
+    }
   }
 }
