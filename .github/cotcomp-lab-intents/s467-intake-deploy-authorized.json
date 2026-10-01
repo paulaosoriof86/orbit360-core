@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "ays-cotcomp-s467-intake-deploy-intent-v1.0",
+  "authorization": "S467_DEPLOY_ONE_TIME_LAB_INTAKE",
+  "authorizedAt": "2026-10-01",
+  "authorizedSourceParent": "069e05eac2e6d38f72544f06d2c2f1d7b754df62",
+  "projectId": "ays-orbit-360-lab",
+  "functionName": "cotcompPilotIntakeS467",
+  "journeyId": "GT_AUTO_MOTO_HYBRID",
+  "oneTimeIntake": true,
+  "generalPersistenceRelease": false,
+  "realDataSubmissionByAssistant": false,
+  "production": false,
+  "providerOrRaterCalls": false,
+  "issuance": false,
+  "binding": false,
+  "payment": false,
+  "healthSensitiveData": false,
+  "scope": [
+    "deploy one-time private LAB intake page",
+    "validate invalid bearer rejection",
+    "leave one-time state unused until participant submits",
+    "do not submit any real participant data from workflow"
+  ]
+}
