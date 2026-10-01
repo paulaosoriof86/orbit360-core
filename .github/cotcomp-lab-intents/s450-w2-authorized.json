@@ -2,7 +2,7 @@
   "schemaVersion": "ays-cotcomp-s450-w2-authorization-v1.0",
   "authorization": "S450_W2_LAB_SYNTHETIC_CONTROLLED_WRITE",
   "authorizedAt": "2026-09-30",
-  "authorizedSourceParent": "a503c1d2bb9296feb938e134c783b0474a8fd8ef",
+  "authorizedSourceParent": "30cbb4d574ac612e1ab82985d709dc3c270b8dfb",
   "projectId": "ays-orbit-360-lab",
   "environment": "LAB",
   "region": "us-central1",
@@ -26,5 +26,8 @@
   "expectedFirstWriteDocuments": 8,
   "expectedCleanupDeletes": 8,
   "expectedNetPersistentDocuments": 0,
-  "ownerAuthorizationText": "Autorizo S4.50/W2 y sus cambios de trazabilidad en orbit360-core y ays-transformacion-digital: ejecutar exclusivamente en ays-orbit-360-lab un proof sintético controlado usando legacyCompatible, con create_business + create_management, journal exacto, readback, retry sin duplicado, prueba de conflicto, cleanup y ausencia final; sin datos reales de clientes o negocios, sin provider delivery y sin producción."
+  "ownerAuthorizationText": "Autorizo S4.50/W2 y sus cambios de trazabilidad en orbit360-core y ays-transformacion-digital: ejecutar exclusivamente en ays-orbit-360-lab un proof sintético controlado usando legacyCompatible, con create_business + create_management, journal exacto, readback, retry sin duplicado, prueba de conflicto, cleanup y ausencia final; sin datos reales de clientes o negocios, sin provider delivery y sin producción.",
+  "retryOfRun": 36795105113,
+  "retryReason": "FIRST_RUN_STOPPED_BEFORE_ANY_W2_WRITE_DUE_DUPLICATE_ADVISOR_IDENTITY_ROWS; ROOTFIX_BINDS_EXACT_CANONICAL_OWNER_AUTH_IDENTITY",
+  "firstRunWriteState": "NO_W2_CALLS_EXECUTED_BEFORE_FAILURE"
 }
