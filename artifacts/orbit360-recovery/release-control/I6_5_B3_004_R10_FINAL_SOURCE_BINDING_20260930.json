@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R10_FINAL_SOURCE_BINDING_V1",
+  "recordedAt": "2026-09-30",
+  "status": "BOUND_FOR_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "dcbfc6045c263ba340a902964c37c498ebc7f4d0",
+  "productBlobs": {
+    "functions/document-drive-domain.js": "b310f9f43bcac08d57ee1fcd62c759beb8c47fc8",
+    "orbit360-platform/core/product-drive-document-provider-p0.js": "cc0224a1e550fb1eb0b9f2e50a8373ec6b952ab9",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "14780fdabad25cd9dd8e214702ee247e073000a8",
+    "orbit360-platform/modules/cobros.js": "df37360557ad3f08fd0c3012443a13db024b5d01",
+    "orbit360-platform/core/importa.js": "a3c2f8ca6717be72247849671e2d44dafa80a3b8",
+    "orbit360-platform/index.html": "4492c9bda2bc5c64908401ee86d3be3c04c5ee00"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "f23da09671a6f5be2c977ed4402ce80dd1b787a8",
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "d95a6e9655b3adb6c3a453ea1f66002becf99122",
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "872519711224bc9a80b82186c0338e8c3a638786"
+  },
+  "assertions": {
+    "latestDocumentExpedientBinding": true,
+    "stagedFinalizeQuarantineLifecycle": true,
+    "paymentEvidenceProposalReader": true,
+    "silentOverwriteForbidden": true,
+    "paidDateAndApplicationDateRemainSeparate": true,
+    "assetCacheBusting": true,
+    "priorMachineProofInvalidated": true
+  },
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  },
+  "nextAction": "B3_004_R10_EXACT_PREVIEW_MACHINE_PASS"
+}

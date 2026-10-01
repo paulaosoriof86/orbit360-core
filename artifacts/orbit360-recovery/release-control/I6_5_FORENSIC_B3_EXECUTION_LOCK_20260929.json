@@ -513,11 +513,26 @@
       "blobSha": "d14061d6c3c95bf30f4d81caeedaa19c9193483c"
     },
     "r10SourceFix": {
-      "compositionLockBlobSha": "7c967f37cf27a6bcc26ff7a7539274ac10d6807e",
+      "compositionLockBlobSha": "9fe58eb5d6164858a7e79a986b53586b32d5fb11",
       "documentProviderPreviewSyntheticOnly": true,
       "realPreviewDocumentProofRequired": true,
       "stagedDocumentLifecycleRequired": true,
-      "quarantineRecoveryRequired": true
+      "quarantineRecoveryRequired": true,
+      "finalSourceBindingReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_FINAL_SOURCE_BINDING_20260930.json",
+      "finalSourceBindingReceiptBlobSha": "94f7d10827ab39b9d02e7e38f79b7fde70788def",
+      "productBlobs": {
+        "functions/document-drive-domain.js": "b310f9f43bcac08d57ee1fcd62c759beb8c47fc8",
+        "orbit360-platform/core/product-drive-document-provider-p0.js": "cc0224a1e550fb1eb0b9f2e50a8373ec6b952ab9",
+        "orbit360-platform/core/cobros-reconciliation-domain-client.js": "14780fdabad25cd9dd8e214702ee247e073000a8",
+        "orbit360-platform/modules/cobros.js": "df37360557ad3f08fd0c3012443a13db024b5d01",
+        "orbit360-platform/core/importa.js": "a3c2f8ca6717be72247849671e2d44dafa80a3b8",
+        "orbit360-platform/index.html": "4492c9bda2bc5c64908401ee86d3be3c04c5ee00"
+      },
+      "qaBlobs": {
+        "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "f23da09671a6f5be2c977ed4402ce80dd1b787a8",
+        "tools/gravicentra-i6-5-b3-004-contract.mjs": "d95a6e9655b3adb6c3a453ea1f66002becf99122",
+        ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "872519711224bc9a80b82186c0338e8c3a638786"
+      }
     },
     "r10ContractPass": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R10_SOURCE_CONTRACT_PASS_20260930.json",
@@ -532,7 +547,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "9cd58f4af23a03e78c2719919cc9ba61760fd7c1"
+    "blobSha": "c50ef829bc0ea1a763828918738bdae1e177bd08"
   },
   "nextRequiredProof": [
     "B3_004_R10_EXACT_PREVIEW_MACHINE_PASS",
@@ -730,6 +745,6 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "7c967f37cf27a6bcc26ff7a7539274ac10d6807e"
+    "blobSha": "9fe58eb5d6164858a7e79a986b53586b32d5fb11"
   }
 }
