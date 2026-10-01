@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_004_VISUAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -3184,13 +3184,13 @@
       "guardPassRunId": 36366524357
     },
     "b3": {
-      "status": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
+      "status": "B3_004_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
       "entryCondition": "B2_PASS",
       "targetPercent": 96,
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "7a6b79aca43399d853b880922d2f1efc2dfa65c2",
+      "executionLockBlobSha": "064f1ec9032b9f8e8b88dae8a39b140ffc2e4db1",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3210,18 +3210,18 @@
         ],
         "productRegressionDemonstrated": false
       },
-      "sourceSha": "6299c8fc891028305400c8b2fdf40eb31f9c142f",
-      "buildId": "gi-i65-b3-6299c8fc8910-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36849615859-mlsfq6m0.web.app",
-      "runId": 36849615859,
-      "artifactId": 11155032467,
-      "artifactDigest": "826f0afa4f78cb8d64b44285293b7384b49a628035337243123647f814f30357",
-      "exactReadback": false,
+      "sourceSha": "4f19a7775b555b385cefb3a74bc63e805d0deb10",
+      "buildId": "gi-i65-b3-4f19a7775b55-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-b3004-36857909461-zg0i93ji.web.app",
+      "runId": 36857909461,
+      "artifactId": 11160805201,
+      "artifactDigest": "65a8c414e6f3f2cd92c7a13819fcc9700819010399b7f2ee61f418caae9f8ab0",
+      "exactReadback": true,
       "contractPass": true,
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "44c9637da0e4a75177225c49ebd9864e2165a0c7",
+      "findingLedgerBlobSha": "0781b1df495e077deea9c841fb9f98dd88370c25",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "diagnosticRunId": 36658190622,
@@ -3343,7 +3343,7 @@
         "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
         "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170"
       },
-      "previewProofPass": false,
+      "previewProofPass": true,
       "b3002RegressionPass": true,
       "paulaVisualAccepted": false,
       "candidateEligibleForPromotion": false,
@@ -3481,7 +3481,7 @@
         "machineProofReceiptBlobSha": "4a51b6638e4a17c508e8c6ef8d138b7ac5a84749"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_MACHINE_PASS_20260930.json",
-      "machineProofReceiptBlobSha": "c2acddae9c1fd524d2db21abf7b7cfbc165ffd6c",
+      "machineProofReceiptBlobSha": "87cc873f81a8519c6f5541dbd0e765320043a0d3",
       "actionSurfaceRemediation": {
         "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
         "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAULA_TARGETED_VISUAL_REJECTION_ACTION_SURFACES_20260930.json",
@@ -4003,7 +4003,7 @@
       },
       "realCaseReadonlyPass": true,
       "humanFixtureReady": true,
-      "humanFixtureUrl": "https://ays-orbit-360-lab--gi-b3004-36849615859-mlsfq6m0.web.app/#/cliente360?c=b3004human_client_r12&t=recibos",
+      "humanFixtureUrl": "https://ays-orbit-360-lab--gi-b3004-36857909461-zg0i93ji.web.app/#/cliente360?c=b3004human_client_r12&t=recibos",
       "r12HumanRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12_HUMAN_REJECTED_QA_ISOLATION_PERFORMANCE_20260930.json",
       "r12HumanRejectionReceiptBlobSha": "fe3077f95a9f6c809863a489a4d9f8226712589f",
       "r12SourceFix": {
@@ -4229,8 +4229,8 @@
         "noLive": true,
         "noB3005": true
       },
-      "humanFixtureCobrosUrl": "https://ays-orbit-360-lab--gi-b3004-36849615859-mlsfq6m0.web.app/#/cobros?qaReceipt=b3004human_receipt_r12",
-      "client360ToCobrosUsableMs": 136,
+      "humanFixtureCobrosUrl": "https://ays-orbit-360-lab--gi-b3004-36857909461-zg0i93ji.web.app/#/cobros?qaReceipt=b3004human_receipt_r12",
+      "client360ToCobrosUsableMs": 138,
       "r12p10Acceptance": {
         "status": "QA_ACCEPTANCE_STRENGTHENED_PENDING_EXACT_PREVIEW",
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10_FULL_FIDELITY_UI_DOCUMENT_ACCEPTANCE_20261001.json",
@@ -4328,7 +4328,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "25375045f8cb2c8fd7e56ceea8641b9ab325ac35",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "44c9637da0e4a75177225c49ebd9864e2165a0c7",
+    "findingLedgerBlobSha": "0781b1df495e077deea9c841fb9f98dd88370c25",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -4340,7 +4340,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B3_004_R12_EXACT_PREVIEW"
+    "nextAction": "B3_004_R12_TARGETED_HUMAN_VISUAL_PASS"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
