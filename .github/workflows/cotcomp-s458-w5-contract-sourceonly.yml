@@ -1,0 +1,127 @@
+name: CotComp S4.58 W5 pilot contract source-only
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s458-w5-pilot-contract-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s458-w5-contract-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s458-w5-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.58 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s458-w5-contract-sourceonly.json
+          jq -e '
+            .authorization=="S458_W5_SOURCE_ONLY_PILOT_CONTRACT" and
+            .projectId=="ays-orbit-360-lab" and
+            .stage=="W5" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .realData==false and
+            .production==false and
+            .physicalW5==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated CotComp QA and S4.58 tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-w5-pilot-contract-s458.js
+          node --check cotcomp-w5-pilot-contract-s458.test.js
+          node --test cotcomp-w5-pilot-contract-s458.test.js
+
+      - name: Build and enforce S4.58 receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s458/evidence"
+          node <<'NODE'
+          const fs=require('fs');
+          const s=require('./functions/cotcomp-w5-pilot-contract-s458');
+          const r=s.sourceReadiness();
+          const out={
+            schemaVersion:'ays-cotcomp-s458-w5-pilot-contract-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',
+            stage:'W5',
+            sourceRemediationPass:r.sourceRemediationPass,
+            technicalW5Ready:r.technicalW5Ready,
+            executionAllowed:r.executionAllowed,
+            realDataAllowed:r.realDataAllowed,
+            remainingBlockers:r.remainingBlockers,
+            controls:r.controls,
+            currentFormalLegalValidationComplete:false,
+            boundaries:{
+              appDataReadsExecuted:0,
+              appDataWritesExecuted:0,
+              realDataTouched:false,
+              productionTouched:false,
+              physicalW5Executed:false
+            }
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s458/evidence/S458_W5_PILOT_CONTRACT_RECEIPT.json',JSON.stringify(out,null,2));
+          console.log('S458_TECHNICAL_W5_READY='+out.technicalW5Ready);
+          console.log('S458_REMAINING_BLOCKERS='+out.remainingBlockers.join(','));
+          NODE
+          R="$RUNNER_TEMP/s458/evidence/S458_W5_PILOT_CONTRACT_RECEIPT.json"
+          jq -e '
+            .sourceRemediationPass==true and
+            .technicalW5Ready==true and
+            .executionAllowed==false and
+            .realDataAllowed==false and
+            .currentFormalLegalValidationComplete==false and
+            .remainingBlockers==[
+              "FORMAL_LEGAL_VALIDATION_REQUIRED",
+              "W5_EXACT_PILOT_SCOPE_REQUIRED",
+              "W5_SUCCESS_PERSISTENCE_DISPOSITION_REQUIRED",
+              "OWNER_W5_REAL_DATA_AUTHORIZATION_REQUIRED"
+            ] and
+            .controls.singleExecution.allowedExecutions==1 and
+            .controls.minimization.maxQuoteCases==1 and
+            .controls.minimization.maxDataSubjects==1 and
+            .controls.observability.evidenceContainsPII==false and
+            .controls.observability.evidenceContainsSecrets==false and
+            .controls.rollbackContainment.failureRequiresRollbackAttempt==true and
+            .controls.hardLocks.productionAllowed==false and
+            .controls.hardLocks.providerOrRaterCallsAllowed==false and
+            .controls.hardLocks.issuanceAllowed==false and
+            .controls.hardLocks.bindingAllowed==false and
+            .controls.hardLocks.paymentAllowed==false and
+            .boundaries.appDataReadsExecuted==0 and
+            .boundaries.appDataWritesExecuted==0 and
+            .boundaries.realDataTouched==false and
+            .boundaries.productionTouched==false
+          ' "$R" >/dev/null
+
+      - name: Upload S4.58 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s458-w5-contract-${{ github.run_id }}
+          path: ${{ runner.temp }}/s458/evidence/S458_W5_PILOT_CONTRACT_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
