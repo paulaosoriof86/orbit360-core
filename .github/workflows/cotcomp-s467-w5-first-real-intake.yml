@@ -24,9 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
-      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-      FIREBASE_SERVICE_ACCOUNT_FALLBACK: \${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
     steps:
       - uses: actions/checkout@v4
@@ -63,8 +63,8 @@ jobs:
           PARENT="$(git rev-parse HEAD^)"
           test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
           mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
-          test "\${#CHANGED[@]}" = "1"
-          test "\${CHANGED[0]}" = "$I"
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
 
       - name: Run accumulated QA plus S4.67 safeguards
         working-directory: functions
@@ -390,12 +390,12 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cotcomp-s467-w5-first-real-intake-\${{ github.run_id }}
+          name: cotcomp-s467-w5-first-real-intake-${{ github.run_id }}
           path: |
-            \${{ runner.temp }}/s467/evidence/predeploy-case-state.json
-            \${{ runner.temp }}/s467/evidence/appcheck-proof.json
-            \${{ runner.temp }}/s467/evidence/postdeploy-case-state.json
-            \${{ runner.temp }}/s467/evidence/S467_W5_FIRST_REAL_INTAKE_READINESS_RECEIPT.json
+            ${{ runner.temp }}/s467/evidence/predeploy-case-state.json
+            ${{ runner.temp }}/s467/evidence/appcheck-proof.json
+            ${{ runner.temp }}/s467/evidence/postdeploy-case-state.json
+            ${{ runner.temp }}/s467/evidence/S467_W5_FIRST_REAL_INTAKE_READINESS_RECEIPT.json
           if-no-files-found: warn
           retention-days: 30
 
