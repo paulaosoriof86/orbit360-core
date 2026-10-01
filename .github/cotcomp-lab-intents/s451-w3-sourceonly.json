@@ -2,7 +2,7 @@
   "schemaVersion": "ays-cotcomp-s451-w3-sourceonly-intent-v1.0",
   "authorization": "S451_W3_SOURCE_ONLY_READINESS",
   "date": "2026-10-01",
-  "authorizedSourceParent": "39d8c52d788ac9a9d2a8104cefd9da3014408333",
+  "authorizedSourceParent": "2c3a09fe923b7660c0850bb119fcaa1750944b66",
   "projectId": "ays-orbit-360-lab",
   "stage": "W3",
   "appDataReads": false,
@@ -18,5 +18,7 @@
     "current-validity persistence readiness",
     "idempotency and atomic supersession readiness",
     "rollback journal readiness"
-  ]
+  ],
+  "retryOfRun": 36795828151,
+  "retryReason": "SOURCE_AUDIT_ROOTFIX_SCOPES_CURRENT_VALIDITY_FIELD_CHECK_TO_PERSISTED_PROPOSAL_BUILDER"
 }
