@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "ays-cotcomp-s463-w5-owner-scope-approval-intent-v1.0",
+  "authorization": "S463_W5_OWNER_SCOPE_APPROVAL_SOURCE_ONLY",
+  "authorizedAt": "2026-10-01",
+  "authorizedSourceParent": "6508ae648640adb6ec0512e31bf6348857b5bdde",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W5",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "production": false,
+  "ownerScopeApproval": {
+    "country": "GT",
+    "journeyId": "GT_AUTO_MOTO_HYBRID",
+    "allowedStages": [
+      "W1",
+      "W2",
+      "W3",
+      "W4"
+    ],
+    "maxQuoteCases": 1,
+    "maxDataSubjects": 1,
+    "maxExistingRecordsTouched": 8,
+    "allowedExecutions": 1,
+    "successDisposition": "ROLLBACK_TO_BEFORE_STATE",
+    "healthSensitiveDataAllowed": false,
+    "realDataExecutionAuthorized": false,
+    "finalW5Authorization": false
+  },
+  "ownerApprovalText": "Apruebo como alcance propuesto del primer piloto W5: Guatemala, GT_AUTO_MOTO_HYBRID, W1–W4, un QuoteCase, un titular, máximo 8 registros existentes, una ejecución y ROLLBACK_TO_BEFORE_STATE, manteniendo datos reales y ejecución W5 bloqueados hasta completar el gate jurídico y la autorización final."
+}
