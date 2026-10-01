@@ -619,6 +619,12 @@
       "blobSha": "4183e495a2ea63a7747fdd8ba709c8c3cc397a31",
       "rootCause": "R12P2_RENDER_BYPASSED_SCOPE_FOR_EXACT_QA_ROW_BUT_PAYMENT_CONTEXT_REENTERED_SCOPED_STORE_ON_CLICK_SO_HANDLER_COULD_NOT_RESOLVE_SYNTHETIC_RECEIPT",
       "productSourceChanged": true
+    },
+    "r12p7SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P7_PRODUCT_CONTEXT_CALLABLE_ENABLEMENT_FIX_20261001.json",
+      "blobSha": "796d1fe8003ab09cc27c771d411a785cfdf1127c",
+      "rootCause": "PRODUCT_ENTRYPOINT_USES_AUTHENTICATED_PRODUCT_TENANT_CONTEXT_BUT_COBROS_CLIENT_ENABLED_ONLY_WHEN_LAB_FEATURE_FLAG_EXISTS_SO_COMMAND_THROWS_BEFORE_NETWORK",
+      "productSourceChanged": true
     }
   },
   "canonicalComposition": {
@@ -628,7 +634,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "4342fd4ed1bd37855e143d47d2f3e5f39c6b786a"
+    "blobSha": "407485cc4d4ad317441ff433b336aafc79943ddf"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -829,7 +835,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "40688eed171808b54232b1c135e3cb6bde7ec6af"
+    "blobSha": "2d0910b710af72134757d9fc67b1ce51b2eede17"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -900,6 +906,19 @@
     "compositionLockBlobSha": "40688eed171808b54232b1c135e3cb6bde7ec6af",
     "findingsLedgerBlobSha": "4342fd4ed1bd37855e143d47d2f3e5f39c6b786a",
     "rootCause": "R12P2_RENDER_BYPASSED_SCOPE_FOR_EXACT_QA_ROW_BUT_PAYMENT_CONTEXT_REENTERED_SCOPED_STORE_ON_CLICK_SO_HANDLER_COULD_NOT_RESOLVE_SYNTHETIC_RECEIPT",
+    "productSourceChanged": true,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p7SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P7_PRODUCT_CONTEXT_CALLABLE_ENABLEMENT_FIX_20261001.json",
+    "blobSha": "796d1fe8003ab09cc27c771d411a785cfdf1127c",
+    "compositionLockBlobSha": "2d0910b710af72134757d9fc67b1ce51b2eede17",
+    "findingsLedgerBlobSha": "407485cc4d4ad317441ff433b336aafc79943ddf",
+    "rootCause": "PRODUCT_ENTRYPOINT_USES_AUTHENTICATED_PRODUCT_TENANT_CONTEXT_BUT_COBROS_CLIENT_ENABLED_ONLY_WHEN_LAB_FEATURE_FLAG_EXISTS_SO_COMMAND_THROWS_BEFORE_NETWORK",
     "productSourceChanged": true,
     "noOperationalBusinessWrites": true,
     "noReimport": true,

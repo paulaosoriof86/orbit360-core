@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
-  const VERSION='orbit360-cobros-reconciliation-client-v8-r11-preview-host-routing';
+  const VERSION='orbit360-cobros-reconciliation-client-v9-r12p7-product-context';
   const text=value=>String(value==null?'':value).trim();
   const low=value=>text(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   function classifyPaymentOrigin(row){
@@ -24,7 +24,11 @@
   const isPreviewHost=()=>/--/.test(String(location&&location.hostname||''));
   const functionName=()=>isPreviewHost()?'orbit360CobrosReconciliationCommandPreview':(text(backend().functionNames&&backend().functionNames.reconciliation)||'orbit360CobrosReconciliationCommand');
   const activeRole=()=>{try{return text(Orbit.session&&Orbit.session.rol&&Orbit.session.rol());}catch(e){return'';}};
-  const enabled=()=>!!((backend().featureFlags||{}).cobrosReconciliationDomainActive===true);
+  const productContextReady=()=>{try{
+    const b=backend(),mode=text(b.mode).toLowerCase(),ctx=window.Orbit&&Orbit.productTenantRuntimeContextP0&&typeof Orbit.productTenantRuntimeContextP0.status==='function'?Orbit.productTenantRuntimeContextP0.status():null;
+    return (mode==='product'||mode==='product-readonly')&&text(b.tenantSource).toLowerCase()==='membership'&&!!(ctx&&ctx.ready===true&&text(ctx.tenantId)&&text(ctx.tenantId)===tenantId());
+  }catch(e){return false;}};
+  const enabled=()=>productContextReady()||!!((backend().featureFlags||{}).cobrosReconciliationDomainActive===true);
   const available=()=>{const p=provider();return!!(enabled()&&tenantId()&&activeRole()&&p&&typeof p.callFunction==='function');};
   function stable(value){if(value==null)return value;if(Array.isArray(value))return value.map(stable);if(typeof value==='object')return Object.fromEntries(Object.keys(value).sort().map(k=>[k,stable(value[k])]));return value;}
   function makeRequestId(operation,payload){const marker=[VERSION,tenantId(),operation,JSON.stringify(stable(payload||{}))].join('|');let hash=2166136261;for(let i=0;i<marker.length;i+=1){hash^=marker.charCodeAt(i);hash=Math.imul(hash,16777619);}return'recui_'+(hash>>>0).toString(16);}
@@ -63,6 +67,6 @@
   function enrichApplication(receiptId,options){options=options||{};return applyPayment(receiptId,{payload:Object.assign({},options.payload||{},{sourceType:options.sourceType||'insurer_invoice'}),reason:options.reason||'Aplicación de aseguradora'});}
   function confirmProposal(proposalId,options){options=options||{};return command('confirm_application',{payload:Object.assign({proposalId},options.payload||{}),reason:options.reason||options.motivo||'Conciliación confirmada por usuario autorizado'});}
   function holdProposal(proposalId,motivo,accionRequerida){return command('hold_proposal',{payload:{proposalId,accionRequerida},reason:motivo});}
-  function status(){return Object.freeze({version:VERSION,functionName:functionName(),tenantId:tenantId(),activeRole:activeRole(),region:region(),enabled:enabled(),available:available(),transport:'firebase-functions-modular'});}
+  function status(){return Object.freeze({version:VERSION,functionName:functionName(),tenantId:tenantId(),activeRole:activeRole(),region:region(),productContextReady:productContextReady(),enabled:enabled(),available:available(),transport:'firebase-functions-modular'});}
   Orbit.reconciliationDomain=Object.freeze({VERSION,enabled,available,classifyPaymentOrigin,command,previewPolicy,applyPayment,reportClientPayment,reportAdvisorPayment,reconcilePayment,enrichApplication,confirmProposal,holdProposal,status});
 })();

@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P7_PRODUCT_CONTEXT_CALLABLE_ENABLEMENT_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "669943d11d93d5b602de4f84d1a5ce5fdfbab49d",
+  "failedRunId": 36844868704,
+  "failedJobId": 110312650787,
+  "classification": "PRODUCT_RUNTIME_COMPOSITION_DEFECT",
+  "rootCause": "PRODUCT_ENTRYPOINT_USES_AUTHENTICATED_PRODUCT_TENANT_CONTEXT_BUT_COBROS_CLIENT_ENABLED_ONLY_WHEN_LAB_FEATURE_FLAG_EXISTS_SO_COMMAND_THROWS_BEFORE_NETWORK",
+  "evidence": {
+    "paymentModalOpened": true,
+    "payButtonReenabled": true,
+    "callableObserved": false,
+    "normalCliente360ToCobrosUsableMs": 167,
+    "productEntrypointExcludesLabRuntime": true,
+    "productTenantContextBridgeInstallsMembershipTenant": true,
+    "cobrosClientPreviouslyRequiredLabFeatureFlag": true,
+    "browserFirestoreWritesRemainDisabled": true,
+    "backendPreviewDirectProofPass": true,
+    "fixtureCleanupPass": true
+  },
+  "remediation": {
+    "productContextReadyRequiresProductMode": true,
+    "productContextReadyRequiresMembershipTenantSource": true,
+    "productContextTenantMustMatchBridge": true,
+    "labFeatureFlagRetainedOnlyAsCompatibility": true,
+    "serverWriteTransport": "firebase-functions-modular",
+    "browserFirestoreWriteAuthorized": false,
+    "previewAliasByHostnamePreserved": true
+  },
+  "changedProductFiles": [
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+    "orbit360-platform/index.html"
+  ],
+  "productBlobs": {
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "ebe950e586683b99abb6d05e01abbc8ed6f1a63c",
+    "orbit360-platform/index.html": "6f330251ccc0702fa0b9130b7261ae21afaf32f2"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "f54467deec9cdb9e3dbfcd72297473ffa185cc44"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

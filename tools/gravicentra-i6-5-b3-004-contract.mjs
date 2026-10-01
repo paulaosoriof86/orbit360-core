@@ -92,7 +92,7 @@ need(cobros.includes('data-cobros-action="reconcile"'),'B3_004_GLOBAL_RECONCILE_
 need(!cobros.includes('Confirmar cobro'),'B3_004_GLOBAL_CONFIRMAR_COBRO_REMAINS');
 need(indexR4.includes('modules/cobros.js?v=20261001-b3004r12p6'),'B3_004_COBROS_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r11'),'B3_004_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
-need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20260930-b3004r11'),'B3_004_PAYMENT_CLIENT_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20261001-b3004r12p7'),'B3_004_PAYMENT_CLIENT_ASSET_VERSION_NOT_BUMPED');
 need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r9p1'),'B3_004_NATIVE_RECEIPT_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_APPLY_VS_RECONCILE_BOUNDARY_CONTRACT=PASS');
 
@@ -226,7 +226,7 @@ need(hydrationContractR11.includes("cobros:['cobros','clientes','polizas','recib
 need(cobros.includes("const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas']"),'B3_004_R11_COBROS_HARD_DEPS_INVALID');
 need(humanFixtureR11.includes('b3004human_client_r12')&&humanFixtureR11.includes('cleanupRequired:true'),'B3_004_R12_HUMAN_FIXTURE_CONTRACT_MISSING');
 need(indexR4.includes('data/store-firestore-product-readonly-p0.js?v=20260930-b3004r12'),'B3_004_R11_STORE_ASSET_NOT_BUMPED');
-need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20260930-b3004r11'),'B3_004_R11_RECONCILIATION_ASSET_NOT_BUMPED');
+need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20261001-b3004r12p7'),'B3_004_R11_RECONCILIATION_ASSET_NOT_BUMPED');
 console.log('B3_004_R11_ROUTING_HUMAN_FIXTURE_PERFORMANCE_CONTRACT=PASS');
 const routerR12=read('orbit360-platform/core/router.js');
 const uiProofR12=read('tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs');
@@ -244,6 +244,10 @@ need(cobros.includes('function qaActionStore(receiptId)')&&cobros.includes('qaRe
 need(cobros.includes("const store = rawId ? qaActionStore(rawId) : S()")&&cobros.includes("store.get('recibosEsperados', rawId)")&&cobros.includes("store.all('carteraPrimas')"),'B3_004_R12P6_PAYMENT_CONTEXT_STILL_SCOPED_FOR_EXACT_QA');
 need(indexR4.includes('modules/cobros.js?v=20261001-b3004r12p6'),'B3_004_R12P6_COBROS_ASSET_NOT_BUMPED');
 console.log('B3_004_R12P6_EXACT_QA_ACTION_CONTEXT_CONTRACT=PASS');
+need(reconciliationClientR11.includes('function productContextReady')&&reconciliationClientR11.includes("mode==='product'||mode==='product-readonly'")&&reconciliationClientR11.includes("text(b.tenantSource).toLowerCase()==='membership'"),'B3_004_R12P7_PRODUCT_CONTEXT_ENABLEMENT_MISSING');
+need(reconciliationClientR11.includes("const enabled=()=>productContextReady()||!!((backend().featureFlags||{}).cobrosReconciliationDomainActive===true)"),'B3_004_R12P7_CLIENT_STILL_LAB_FLAG_ONLY');
+need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20261001-b3004r12p7'),'B3_004_R12P7_PAYMENT_CLIENT_ASSET_NOT_BUMPED');
+console.log('B3_004_R12P7_PRODUCT_CONTEXT_CALLABLE_ENABLEMENT_CONTRACT=PASS');
 console.log('B3_004_R12P4_EFFECTIVE_LEGAL_PRECONDITION_CONTRACT=PASS');
 need(uiProofR12.includes('__b3004r12NormalNavStart')&&uiProofR12.includes('qaCobrosUsableMs'),'B3_004_R12P3_NORMAL_AND_QA_PERFORMANCE_SPLIT_MISSING');
 console.log('B3_004_R12P3_BROWSER_HARNESS_PRECONDITION_CONTRACT=PASS');

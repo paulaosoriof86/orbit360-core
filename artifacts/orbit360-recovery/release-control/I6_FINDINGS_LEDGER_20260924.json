@@ -1680,6 +1680,14 @@
         "classification": "PRODUCT_UI_QA_ISOLATION_COMPOSITION_DEFECT",
         "rootCause": "R12P2_RENDER_BYPASSED_SCOPE_FOR_EXACT_QA_ROW_BUT_PAYMENT_CONTEXT_REENTERED_SCOPED_STORE_ON_CLICK_SO_HANDLER_COULD_NOT_RESOLVE_SYNTHETIC_RECEIPT",
         "productSourceChanged": true
+      },
+      "r12p7SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P7_PRODUCT_CONTEXT_CALLABLE_ENABLEMENT_FIX_20261001.json",
+        "blobSha": "796d1fe8003ab09cc27c771d411a785cfdf1127c",
+        "compositionLockBlobSha": "2d0910b710af72134757d9fc67b1ce51b2eede17",
+        "classification": "PRODUCT_RUNTIME_COMPOSITION_DEFECT",
+        "rootCause": "PRODUCT_ENTRYPOINT_USES_AUTHENTICATED_PRODUCT_TENANT_CONTEXT_BUT_COBROS_CLIENT_ENABLED_ONLY_WHEN_LAB_FEATURE_FLAG_EXISTS_SO_COMMAND_THROWS_BEFORE_NETWORK",
+        "productSourceChanged": true
       }
     },
     {

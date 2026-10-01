@@ -144,7 +144,7 @@
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "b941117613e09e4d5fd6163b84890eaaa8950c55",
-    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "43cd4f99c7bb61876fcd89f5393b8e3fbc83e194",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js": "ebe950e586683b99abb6d05e01abbc8ed6f1a63c",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "774c6cbe32be08f23e45f37b8e12e56f9be08bf3",
     "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
@@ -172,7 +172,7 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "30753007242c482d9a3e6c2c6c438e07bdec0778",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "7c1919cd4a0e5b2e24b42df0e44ec189bc87dca3",
+    "orbit360-platform/index.html": "6f330251ccc0702fa0b9130b7261ae21afaf32f2",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
@@ -403,10 +403,10 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P6",
-    "reason": "EXACT_QA_ACTION_CONTEXT_REENTERED_SCOPED_STORE",
+    "gate": "I6.5-B3-004-R12P7",
+    "reason": "PRODUCT_COBROS_CALLABLE_CLIENT_DEPENDED_ON_LAB_FLAG_IN_PRODUCT_RUNTIME",
     "changedProductFiles": [
-      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js",
       "orbit360-platform/index.html"
     ],
     "changedQaFiles": [
@@ -947,6 +947,28 @@
     "exactPreviewSyntheticOnly": true,
     "realPreviewRowsReadOnly": true,
     "backendGuardUnchanged": true,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
+  },
+  "b3004R12P7ProductContextCallableEnablementFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36844868704,
+    "failedJobId": 110312650787,
+    "rootCause": "PRODUCT_ENTRYPOINT_USES_AUTHENTICATED_PRODUCT_TENANT_CONTEXT_BUT_COBROS_CLIENT_ENABLED_ONLY_WHEN_LAB_FEATURE_FLAG_EXISTS_SO_COMMAND_THROWS_BEFORE_NETWORK",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P7_PRODUCT_CONTEXT_CALLABLE_ENABLEMENT_FIX_20261001.json",
+    "receiptBlobSha": "796d1fe8003ab09cc27c771d411a785cfdf1127c",
+    "productBlobs": {
+      "orbit360-platform/core/cobros-reconciliation-domain-client.js": "ebe950e586683b99abb6d05e01abbc8ed6f1a63c",
+      "orbit360-platform/index.html": "6f330251ccc0702fa0b9130b7261ae21afaf32f2"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "f54467deec9cdb9e3dbfcd72297473ffa185cc44"
+    },
+    "browserFirestoreWriteAuthorized": false,
+    "serverWriteTransport": "firebase-functions",
     "operationalBusinessWrites": false,
     "reimport": false,
     "live": false,
