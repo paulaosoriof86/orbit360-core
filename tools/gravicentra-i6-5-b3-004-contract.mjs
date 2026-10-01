@@ -147,8 +147,8 @@ need(cliente.includes('linkedReceiptIds'),'B3_004_R7_CLIENT_PAYMENT_DEDUPE_MISSI
 need(cliente.includes('data-paid-receipt-evidence'),'B3_004_R7_CLIENT_PAID_RECEIPT_FALLBACK_MISSING');
 need(cliente.includes('Todas las pólizas</option>'),'B3_004_R7_CLIENT_ALL_POLICIES_FILTER_MISSING');
 need(!cliente.includes('activePolicyIds'),'B3_004_R7_CLIENT_ACTIVE_POLICY_PAYMENT_GATE_REMAINS');
-need(indexR4.includes('modules/cobros.js?v=20260930-b3004r10p2'),'B3_004_R8_COBROS_ASSET_VERSION_NOT_BUMPED');
-need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r9p1'),'B3_004_R7_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cobros.js?v=20260930-b3004r11'),'B3_004_R8_COBROS_ASSET_VERSION_NOT_BUMPED');
+need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r11'),'B3_004_R7_CLIENTE360_ASSET_VERSION_NOT_BUMPED');
 console.log('B3_004_R7_COBROS_VISIBILITY_FILTER_CONTRACT=PASS');
 
 const operationalStoreR8=read('orbit360-platform/data/store-firestore-product-operational-p0.js');
@@ -234,6 +234,6 @@ need(cliente360R9P1.includes('receiptReturnSummaryCache')&&cliente360R9P1.includ
 need(nativeReceiptOwner.includes("target.id==='host'")&&nativeReceiptOwner.includes('prepareReceiptReturn(clientIdForBack)'),'B3_004_R9P1_GLOBAL_RECEIPT_PREFETCH_NOT_SCHEDULED');
 need(nativeReceiptOwner.includes("mode:'prefetched_cliente360_receipts'")&&nativeReceiptOwner.includes('summaryPrefetched:true')&&nativeReceiptOwner.includes('routerReload:false'),'B3_004_R9P1_GLOBAL_FAST_BACK_DIAGNOSTIC_MISSING');
 need(nativeReceiptOwner.includes("history.replaceState(history.state||null,'',back)"),'B3_004_R9P1_BACK_STILL_TRIGGERS_HASH_ROUTER');
-need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r9p1'),'B3_004_R9P1_CLIENTE360_ASSET_NOT_BUMPED');
+need(indexR4.includes('modules/cliente360.js?v=20260930-b3004r11'),'B3_004_R9P1_CLIENTE360_ASSET_NOT_BUMPED');
 need(indexR4.includes('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js?v=20260930-b3004r9p1'),'B3_004_R9P1_NATIVE_ASSET_NOT_BUMPED');
 console.log('B3_004_R9P1_GLOBAL_BACK_CONTRACT=PASS');
