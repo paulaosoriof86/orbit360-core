@@ -1,0 +1,174 @@
+name: CotComp S4.56 W4 LAB controlled-write proof
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s456-w4-controlled-write-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s456-w4-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_TENANT_ID: alianzas-soluciones
+
+jobs:
+  s456-w4-controlled-write:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.56 authorization intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s456-w4-authorized.json
+          jq -e '
+            .authorization=="S456_W4_LAB_SYNTHETIC_CONTROLLED_WRITE" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .stage=="W4" and
+            .syntheticOnly==true and
+            .setupQuoteCaseProposalComparisonSet==true and
+            .atomicSelectionIdempotencyQuoteCasePatch==true and
+            .exactReadback==true and
+            .retryZeroWrites==true and
+            .changedPayloadConflictDeny==true and
+            .nonBindingTruthVerification==true and
+            .cleanupRequired==true and
+            .finalAbsenceRequired==true and
+            .realData==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.56 tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-selection-contract-s455.js
+          node --check cotcomp-w4-controlled-proof-s456.js
+          node --check cotcomp-w4-controlled-proof-s456.test.js
+          node --test cotcomp-selection-contract-s455.test.js cotcomp-w4-remediation-verifier-s455.test.js cotcomp-w4-controlled-proof-s456.test.js
+
+      - name: Prepare exact LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s456/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s456/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+          echo "GCLOUD_PROJECT=$COTCOMP_PROJECT_ID" >> "$GITHUB_ENV"
+
+      - name: Execute authorized W4 synthetic controlled-write proof
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          export S456_PROOF_RUN_ID="s456-$GITHUB_RUN_ID"
+          node cotcomp-w4-controlled-proof-s456.js > "$RUNNER_TEMP/s456/evidence/S456_W4_PROOF_RECEIPT.json"
+          jq -e '
+            .projectId=="ays-orbit-360-lab" and .tenantId=="alianzas-soluciones" and .syntheticOnly==true and
+            .setup.writes==3 and .setup.readback==true and
+            .selection.writes==3 and .selection.readback==true and .selection.reused==false and
+            .retry.writes==0 and .retry.reused==true and .retry.stateUnchanged==true and
+            .conflict.writes==0 and .conflict.denied==true and .conflict.stateUnchanged==true and
+            .truth.status=="USER_SELECTED_FOR_CONTINUATION" and
+            .truth.issuanceState=="NOT_ISSUED" and
+            .truth.bindingState=="NOT_BOUND" and
+            .truth.coverageState=="NOT_CONFIRMED" and
+            .quoteCase.status=="USER_SELECTED" and
+            .cleanup.deletes==5 and .cleanup.finalAbsence==true and
+            .writeAccounting.setupWrites==3 and
+            .writeAccounting.selectionWrites==3 and
+            .writeAccounting.retryWrites==0 and
+            .writeAccounting.conflictWrites==0 and
+            .writeAccounting.cleanupDeletes==5 and
+            .writeAccounting.totalAppDataMutations==11 and
+            .writeAccounting.netPersistentDocuments==0 and
+            .boundaries.realDataTouched==false and
+            .boundaries.productionTouched==false and
+            .boundaries.issuanceExecuted==false and
+            .boundaries.bindingExecuted==false
+          ' "$RUNNER_TEMP/s456/evidence/S456_W4_PROOF_RECEIPT.json" >/dev/null
+
+      - name: Independent final-absence verification
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s456/evidence/S456_W4_PROOF_RECEIPT.json','utf8'));
+          const i=r.identifiers;
+          const paths=[
+            'tenants/alianzas-soluciones/cotcomp/quoteCases/items/'+i.caseId,
+            'tenants/alianzas-soluciones/cotcomp/proposals/items/'+i.proposalId,
+            'tenants/alianzas-soluciones/cotcomp/comparisonSets/items/'+i.comparisonSetId,
+            'tenants/alianzas-soluciones/cotcomp/selections/items/'+i.selectionId,
+            'tenants/alianzas-soluciones/cotcomp/idempotency/items/'+i.selectionRequestId
+          ];
+          const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:'ays-orbit-360-lab'});
+          const db=getFirestore(app);
+          (async()=>{
+            const snaps=await Promise.all(paths.map(p=>db.doc(p).get()));
+            const allAbsent=snaps.every(s=>!s.exists);
+            const out={
+              schemaVersion:'ays-cotcomp-s456-independent-final-absence-v1',
+              projectId:'ays-orbit-360-lab',checkedDocuments:5,allAbsent,writesExecuted:0,
+              realDataTouched:false,productionTouched:false
+            };
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s456/evidence/S456_INDEPENDENT_FINAL_ABSENCE.json',JSON.stringify(out,null,2));
+            if(!allAbsent)process.exit(1);
+          })().catch(e=>{console.error(String(e&&e.stack||e));process.exit(1);});
+          NODE
+
+      - name: Upload sanitized S4.56 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s456-w4-proof-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s456/evidence/S456_W4_PROOF_RECEIPT.json
+            ${{ runner.temp }}/s456/evidence/S456_INDEPENDENT_FINAL_ABSENCE.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credentials
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s456/firebase-service-account.json"
