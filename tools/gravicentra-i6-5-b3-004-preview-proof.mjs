@@ -170,8 +170,8 @@ async function main(){
     need(text(applied.linkedManagementId)===managementId,'B3_004_ADVISOR_REPORT_LINK_LOST');
 
     const retry=await invoke(operatorCall,operator.activeRole,'apply_payment',{
-      receiptId:ids.receiptReport,sourceType:'manual',amount:amountReport
-    },'B3-004 R6 operative validates advisor report');
+      receiptId:ids.receiptReport,sourceType:'manual',amount:amountReport,paymentSupportDocumentRef:supportDoc.documentRef
+    },'B3-004 R10 operative validates advisor report with real Preview support');
     need(retry?.cobroId===reportCobroId&&retry?.reused===true,'B3_004_ADVISOR_REPORT_IDEMPOTENT_RETRY_FAILED');
 
     const reconciled=await invoke(operatorCall,operator.activeRole,'reconcile_payment',{
