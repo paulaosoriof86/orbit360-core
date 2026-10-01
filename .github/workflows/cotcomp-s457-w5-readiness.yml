@@ -1,0 +1,117 @@
+name: CotComp S4.57 W5 real-data source-only readiness
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s457-w5-realdata-readiness-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s457-w5-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s457-w5-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.57 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s457-w5-sourceonly.json
+          jq -e '
+            .authorization=="S457_W5_SOURCE_ONLY_READINESS" and
+            .projectId=="ays-orbit-360-lab" and
+            .stage=="W5" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .realData==false and
+            .production==false and
+            .physicalW5==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated CotComp QA and S4.57 tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-w5-realdata-readiness-s457.js
+          node --check cotcomp-w5-realdata-readiness-s457.test.js
+          node --test cotcomp-w5-realdata-readiness-s457.test.js
+
+      - name: Build and enforce S4.57 receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s457/evidence"
+          node <<'NODE'
+          const fs=require('fs');
+          const s=require('./functions/cotcomp-w5-realdata-readiness-s457');
+          const r=s.audit();
+          const out={
+            schemaVersion:'ays-cotcomp-s457-w5-readiness-receipt-v1.0',
+            projectId:'ays-orbit-360-lab',stage:'W5',
+            sourceReadinessAuditPass:r.sourceReadinessAuditPass,
+            technicalW5Ready:r.technicalW5Ready,
+            executionAllowed:r.executionAllowed,
+            realDataAllowed:r.realDataAllowed,
+            productionAllowed:r.productionAllowed,
+            legalTruth:r.legalTruth,
+            findings:r.findings,
+            blockers:r.blockers,
+            boundaries:{
+              appDataReadsExecuted:0,
+              appDataWritesExecuted:0,
+              realDataTouched:false,
+              productionTouched:false,
+              physicalW5Executed:false
+            }
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s457/evidence/S457_W5_REALDATA_READINESS_RECEIPT.json',JSON.stringify(out,null,2));
+          console.log('S457_LEGAL_VALIDATION_COMPLETE='+out.legalTruth.formalLegalValidationComplete);
+          console.log('S457_BLOCKERS='+out.blockers.join(','));
+          NODE
+          R="$RUNNER_TEMP/s457/evidence/S457_W5_REALDATA_READINESS_RECEIPT.json"
+          jq -e '
+            .sourceReadinessAuditPass==true and
+            .technicalW5Ready==false and
+            .executionAllowed==false and
+            .realDataAllowed==false and
+            .productionAllowed==false and
+            .legalTruth.formalLegalValidationComplete==false and
+            .legalTruth.gtPacketComplete==false and
+            .legalTruth.coPacketComplete==false and
+            (.blockers|index("FORMAL_LEGAL_VALIDATION_REQUIRED"))!=null and
+            (.blockers|index("W5_EXACT_PILOT_SCOPE_REQUIRED"))!=null and
+            (.blockers|index("W5_SUCCESS_PERSISTENCE_DISPOSITION_REQUIRED"))!=null and
+            (.blockers|index("OWNER_W5_REAL_DATA_AUTHORIZATION_REQUIRED"))!=null and
+            .boundaries.appDataReadsExecuted==0 and
+            .boundaries.appDataWritesExecuted==0 and
+            .boundaries.realDataTouched==false and
+            .boundaries.productionTouched==false
+          ' "$R" >/dev/null
+
+      - name: Upload S4.57 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s457-w5-readiness-${{ github.run_id }}
+          path: ${{ runner.temp }}/s457/evidence/S457_W5_REALDATA_READINESS_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
