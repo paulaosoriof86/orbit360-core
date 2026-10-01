@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "ays-cotcomp-s462-w5-pilot-candidate-sourceonly-intent-v1.0",
+  "authorization": "S462_W5_SOURCE_ONLY_PILOT_CANDIDATE",
+  "date": "2026-10-01",
+  "authorizedSourceParent": "3c6f84da0b8ea9e85fa95038d4253253172680cc",
+  "projectId": "ays-orbit-360-lab",
+  "stage": "W5",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "production": false,
+  "scope": [
+    "recommend lowest-risk first W5 pilot candidate",
+    "recommend GT_AUTO_MOTO_HYBRID",
+    "recommend W1-W4 full controlled path",
+    "recommend one QuoteCase and one data subject",
+    "recommend rollback-to-before-state for first real-data pilot",
+    "leave exact case/actor/consent commitments and Owner authorization unset"
+  ]
+}
