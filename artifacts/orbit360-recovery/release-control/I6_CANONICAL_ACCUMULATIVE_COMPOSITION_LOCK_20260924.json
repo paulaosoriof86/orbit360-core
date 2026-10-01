@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B3",
-  "productFileCount": 78,
+  "productFileCount": 75,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "functions/bootstrap.js",
@@ -112,10 +112,7 @@
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
     "orbit360-platform/modules/portal-v1142-copyfix.js",
     "orbit360-platform/modules/portal.js",
-    "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
-    "orbit360-platform/modules/siniestros.js",
-    "orbit360-platform/product-runtime-config.js",
-    "orbit360-platform/styles/base.css"
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
   ],
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
@@ -192,10 +189,7 @@
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "cafbaa33a3f23d30ec773df3b569ecf12e891e6e",
     "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
     "orbit360-platform/modules/portal.js": "fc23c03e4c59c256be81553e472dee6d2d4ef895",
-    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "d329ed1c822d42803bf2eb38c34873218d63faad",
-    "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
-    "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
-    "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65"
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "d329ed1c822d42803bf2eb38c34873218d63faad"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -401,21 +395,14 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-005-R2",
-    "reason": "ADD_BANTRAB_STANDARD_10_EXPLICIT_EXCEPTION_12_AND_FICOHSA_MAX_10_BEFORE_EXACT_PREVIEW",
-    "changedProductFiles": [
-      "functions/payment-inference-engine.js",
-      "functions/cobros-reconciliation-domain.js",
-      "functions/tenant-domain-config.js"
-    ],
+    "gate": "I6.5-B3-005-R3-QA",
+    "reason": "RECONCILE_CANONICAL_COMPOSITION_TO_EXACT_75_FILE_PRODUCT_DIFF_AFTER_V6_CONTRACT_PASS",
+    "changedProductFiles": [],
     "changedQaFiles": [
-      "tools/gravicentra-i6-5-b3-005-contract.mjs",
-      "tools/gravicentra-i6-5-b3-005-preview-proof.mjs",
-      ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
-      "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R2_PAYMENT_PLAN_RULES_V6_20261001.json",
-      "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json"
+      "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json"
     ],
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noProductionConfigWrite": true,
     "noReimport": true,
@@ -1661,5 +1648,17 @@
     },
     "priorSourceContractInvalidated": true,
     "priorExactPreviewInvalidated": true
+  },
+  "b3005R3CompositionExactSetRepair": {
+    "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json",
+    "receiptBlobSha": "83ff0f9b7ee0bed8be80467a39919404dc11272f",
+    "actualProductDiffCount": 75,
+    "removedFromDeclaration": [
+      "orbit360-platform/modules/siniestros.js",
+      "orbit360-platform/product-runtime-config.js",
+      "orbit360-platform/styles/base.css"
+    ],
+    "productSourceChanged": false
   }
 }

@@ -1,0 +1,27 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_R3_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_V1",
+  "recordedAt": "2026-10-01",
+  "gate": "I6.5-B3-005",
+  "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
+  "parentSha": "eca982488d66f0f2862cf6fe200800108e8b55fb",
+  "observedGuardFailure": {
+    "runId": 36936962967,
+    "jobId": 110619363291,
+    "code": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT"
+  },
+  "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+  "actualProductDiffCount": 75,
+  "priorDeclaredProductCount": 78,
+  "removedFromDeclarationBecauseNoLongerDifferentFromBaseline": [
+    "orbit360-platform/modules/siniestros.js",
+    "orbit360-platform/product-runtime-config.js",
+    "orbit360-platform/styles/base.css"
+  ],
+  "sourceContractPassPreserved": true,
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "productionConfigWrites": false,
+  "reimport": false,
+  "live": false,
+  "nextRequiredProof": "B3_005_PREVIEW_MACHINE_PASS"
+}

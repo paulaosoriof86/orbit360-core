@@ -71,6 +71,12 @@
     "r2PaymentPlanRulesV6": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R2_PAYMENT_PLAN_RULES_V6_20261001.json",
       "blobSha": "265d7f28fb2b409569f803bd8e2e49d6b486d1a2"
+    },
+    "r3CompositionExactSetRepair": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3_CANONICAL_COMPOSITION_EXACT_SET_REPAIR_20261001.json",
+      "blobSha": "83ff0f9b7ee0bed8be80467a39919404dc11272f",
+      "compositionLockBlobSha": "4d207849564950a19f57f706978c5fa672d0f9fa",
+      "productSourceChanged": false
     }
   },
   "canonicalComposition": {
@@ -80,7 +86,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "6943796290584a39797f57a834bd2d2ed56710ea"
+    "blobSha": "e6461afb376ec70c6e8ac96fc64087c15971214c"
   },
   "nextRequiredProof": [
     "B3_005_PREVIEW_MACHINE_PASS",
@@ -273,7 +279,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "9f154f0471afc1da3826bf5af931cbe00b20f86b"
+    "blobSha": "4d207849564950a19f57f706978c5fa672d0f9fa"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
