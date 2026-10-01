@@ -43,6 +43,9 @@
       entidadId: String(extra && extra.entidadId || ''),
       clienteId: String(extra && (extra.clienteId || extra.clientId) || ''),
       polizaId: String(extra && (extra.polizaId || extra.policyId) || ''),
+      receiptId: String(extra && (extra.receiptId || extra.reciboId) || ''),
+      sourceModule: String(extra && extra.sourceModule || ''),
+      documentType: String(extra && extra.documentType || ''),
       categoria: String(extra && extra.categoria || ''),
       nombre: String(extra && extra.nombre || '')
     };
@@ -267,7 +270,7 @@
   document.addEventListener('orbit:active-role-changed', () => { state.probed = false; probe(true); });
 
   Orbit.productDriveDocumentProviderP0 = Object.freeze({
-    VERSION: 'b3-004-r10-20260930.1-payment-document-staging',
+    VERSION: 'b3-004-r10-20260930.2-payment-expedient-binding',
     connect, bootstrap, probe, upload, finalize, quarantine, resolve, download,
     status: () => Object.assign({}, state.status),
     previewIsolated: isPreview(),
