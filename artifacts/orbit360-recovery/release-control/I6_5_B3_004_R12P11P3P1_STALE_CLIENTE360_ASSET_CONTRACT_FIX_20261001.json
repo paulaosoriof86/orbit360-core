@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11P3P1_STALE_CLIENTE360_ASSET_CONTRACT_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "41cabb15f2ced99f729fd6438304ca7aa98d6497",
+  "failedRunId": 36884586120,
+  "failedJobId": 110444889869,
+  "classification": "QA_CONTRACT_STALE_ASSET_BINDING",
+  "cause": "Source contract still required cliente360.js?v=20260930-b3004r11 after R12P11P3 legitimately bumped the product asset to 20261001-b3004r12p11p3.",
+  "remediation": "Update only the stale contract assertion; product source is unchanged.",
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "9c57824bdc84f26f716b421d653ab8aabfceef51"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

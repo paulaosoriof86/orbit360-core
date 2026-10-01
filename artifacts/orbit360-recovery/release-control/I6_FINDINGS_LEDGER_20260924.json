@@ -1870,6 +1870,13 @@
         "rootCause": "CLIENTE360_ROUTED_CLIENT_OWNER_FELL_BACK_TO_LIST_WHEN_ROUTE_CLIENT_WAS_NOT_YET_HYDRATED_AND_DID_NOT_REENTER_DETAIL_AFTER_STORE_HYDRATION",
         "genericAnyClientRoute": true,
         "productSourceChanged": true
+      },
+      "r12p11p3p1ContractFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P3P1_STALE_CLIENTE360_ASSET_CONTRACT_FIX_20261001.json",
+        "blobSha": "3373e12a22d83f2ef7330de1b80e98c224209d91",
+        "compositionLockBlobSha": "e9920dfa56d0f004a98323b57884d875f6b2cb8f",
+        "classification": "QA_CONTRACT_STALE_ASSET_BINDING",
+        "productSourceChanged": false
       }
     },
     {

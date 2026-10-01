@@ -403,16 +403,13 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P11P3",
-    "reason": "CLIENTE360_GENERIC_ROUTE_HYDRATION_OWNER_FIX_AFTER_DIRECT_RECEIPT_TIMEOUT",
-    "changedProductFiles": [
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/index.html"
-    ],
+    "gate": "I6.5-B3-004-R12P11P3P1",
+    "reason": "STALE_CLIENTE360_ASSET_CONTRACT_ONLY",
+    "changedProductFiles": [],
     "changedQaFiles": [
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -1281,5 +1278,17 @@
     "reimport": false,
     "live": false,
     "b3005": false
+  },
+  "b3004R12P11P3P1StaleCliente360AssetContractFix": {
+    "status": "QA_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36884586120,
+    "failedJobId": 110444889869,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P3P1_STALE_CLIENTE360_ASSET_CONTRACT_FIX_20261001.json",
+    "receiptBlobSha": "3373e12a22d83f2ef7330de1b80e98c224209d91",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "9c57824bdc84f26f716b421d653ab8aabfceef51"
+    },
+    "productSourceChanged": false
   }
 }
