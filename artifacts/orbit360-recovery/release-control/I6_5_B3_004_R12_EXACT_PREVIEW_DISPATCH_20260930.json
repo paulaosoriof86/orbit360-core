@@ -1,0 +1,16 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12_EXACT_PREVIEW_DISPATCH_V1",
+  "recordedAt": "2026-09-30",
+  "status": "DISPATCH_ONLY",
+  "findingId": "B3-004",
+  "sourceContractPassHead": "e92e80df0733ff2cc006fe76a6775444f5d133ce",
+  "reason": "Workflow-created contract PASS commit does not recursively trigger a successor push workflow; dispatch Exact Preview without product/data mutation.",
+  "expectedControlState": "B3_004_CANDIDATE_PENDING_EXACT_PREVIEW",
+  "boundaries": {
+    "productSourceChanged": false,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3005": false
+  }
+}
