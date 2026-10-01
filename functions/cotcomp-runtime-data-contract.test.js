@@ -119,3 +119,29 @@ test('PII policy forbids URL/analytics and binds to Owner S4.26 internal retenti
   assert.equal(c.PII_POLICY.retention.rawTokenPersistenceAllowed,false);
   assert.equal(c.PII_POLICY.retention.convertedCaseGovernance,'GRAVICENTRA_CLIENT_POLICY_GOVERNANCE');
 });
+
+test('selection identity is request-bound so changed proposal cannot silently create a second selection identity', () => {
+  const base={
+    tenantId:'alianzas-soluciones',caseId:'qcase_1',comparisonSetId:'cmp_1',
+    selectionRequestKey:'sel-req-stable',explicitUserChoice:true
+  };
+  const a=c.buildSelection({...base,proposalId:'p1'});
+  const b=c.buildSelection({...base,proposalId:'p2'});
+  assert.equal(a.ok,true);
+  assert.equal(b.ok,true);
+  assert.equal(a.value.selectionRequestId,b.value.selectionRequestId);
+  assert.equal(a.value.selectionId,b.value.selectionId);
+  assert.notEqual(a.value.proposalId,b.value.proposalId);
+  assert.match(a.value.selectionRequestId,/^selreq_/);
+});
+
+test('selection request key itself is not persisted in selection payload', () => {
+  const r=c.buildSelection({
+    tenantId:'alianzas-soluciones',caseId:'qcase_1',comparisonSetId:'cmp_1',
+    proposalId:'p1',selectionRequestKey:'opaque-client-key',explicitUserChoice:true
+  });
+  assert.equal(r.ok,true);
+  assert.equal(Object.prototype.hasOwnProperty.call(r.value,'selectionRequestKey'),false);
+  assert.equal(typeof r.value.selectionRequestId,'string');
+});
+
