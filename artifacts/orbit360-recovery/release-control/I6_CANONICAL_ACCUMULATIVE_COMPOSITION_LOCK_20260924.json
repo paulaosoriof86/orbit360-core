@@ -172,11 +172,11 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "30753007242c482d9a3e6c2c6c438e07bdec0778",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "959e5ef310a6b56bff56901c87a0538bb0cc8521",
+    "orbit360-platform/index.html": "5175ba43a2037ebbb9d442de2a16c67b4bbaf816",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
-    "orbit360-platform/modules/cliente360.js": "b6d242922133ee37e8ee4f850947fabdb693ac93",
+    "orbit360-platform/modules/cliente360.js": "512916ed92f1c89a960a127a05df69a14a71edba",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495",
     "orbit360-platform/modules/cobros.js": "94db703a9232066d2284d5eebc6aac5b08b8009a",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
@@ -403,10 +403,10 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P11P2",
-    "reason": "DIRECT_RECEIPT_HYDRATION_BOUNDED_RETRY",
+    "gate": "I6.5-B3-004-R12P11P3",
+    "reason": "CLIENTE360_GENERIC_ROUTE_HYDRATION_OWNER_FIX_AFTER_DIRECT_RECEIPT_TIMEOUT",
     "changedProductFiles": [
-      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/index.html"
     ],
     "changedQaFiles": [
@@ -1259,5 +1259,27 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "5338287653afcf89c3df6c4a727bcac04ed46828"
     }
+  },
+  "b3004R12P11P3ClientRouteHydrationOwnerFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36865733821,
+    "failedJobId": 110380935574,
+    "rootCause": "CLIENTE360_ROUTED_CLIENT_OWNER_FELL_BACK_TO_LIST_WHEN_ROUTE_CLIENT_WAS_NOT_YET_HYDRATED_AND_DID_NOT_REENTER_DETAIL_AFTER_STORE_HYDRATION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P3_CLIENT_ROUTE_HYDRATION_OWNER_FIX_20261001.json",
+    "receiptBlobSha": "c2aa09b3e500a380f5fb986aca9e6e49a35ad6bc",
+    "productBlobs": {
+      "orbit360-platform/modules/cliente360.js": "512916ed92f1c89a960a127a05df69a14a71edba",
+      "orbit360-platform/index.html": "5175ba43a2037ebbb9d442de2a16c67b4bbaf816"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "b9f260e1ad75a24fd51b247a6bbc645282e4a6d0"
+    },
+    "genericAnyClientRoute": true,
+    "noQaSpecificClientBypass": true,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
   }
 }

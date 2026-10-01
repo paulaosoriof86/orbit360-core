@@ -21,6 +21,24 @@ Orbit.modules.cliente360 = (function () {
   let filtros = { q: '', pais: '', tipo: '', asesor: '', seg: '' };
   let tab = 'resumen';
   let shownCid = null; // cliente actualmente abierto (para resetear pestaña al cambiar)
+  let pendingRouteHydration = null;
+  function waitForRoutedClient(cid) {
+    const id=String(cid||'').trim(); if(!id) return false;
+    if(pendingRouteHydration&&pendingRouteHydration.cid===id) return true;
+    if(pendingRouteHydration&&pendingRouteHydration.off){try{pendingRouteHydration.off();}catch(_){}}
+    const state={cid:id,tries:0,off:null,timer:null}; pendingRouteHydration=state;
+    const finish=()=>{if(state.off){try{state.off();}catch(_){}state.off=null;}if(state.timer){clearInterval(state.timer);state.timer=null;}if(pendingRouteHydration===state)pendingRouteHydration=null;};
+    const retry=()=>{
+      state.tries+=1;
+      const p=(Orbit.route&&Orbit.route.params)||{};
+      if(String(p.c||'').trim()!==id){finish();return;}
+      if(S().get('clientes',id)){finish();try{render(host);}catch(_){}return;}
+      if(state.tries>=80)finish();
+    };
+    try{if(S()&&typeof S()._ensureCollections==='function')S()._ensureCollections(['clientes','polizas','recibosEsperados','carteraPrimas','cobros']);}catch(_){}
+    try{if(S()&&typeof S().on==='function')state.off=S().on('*',()=>retry());}catch(_){}
+    state.timer=setInterval(retry,250); retry(); return true;
+  }
   const receiptReturnSummaryCache = new Map();
   const RECEIPT_RETURN_DEPS = ['clientes','polizas','cobros','recibosEsperados','carteraPrimas','comisiones','asesores'];
   function receiptReturnReady() {
@@ -121,6 +139,10 @@ Orbit.modules.cliente360 = (function () {
       else if (cid !== shownCid) tab = 'resumen';
       shownCid = cid;
       detalle(cid);
+    } else if (cid) {
+      shownCid = null;
+      host.innerHTML = '<div class="page"><div class="card pad" data-c360-route-loading="1"><b>Cargando cliente…</b><div class="muted" style="margin-top:5px">Estamos preparando el expediente solicitado.</div></div></div>';
+      waitForRoutedClient(cid);
     } else {
       shownCid = null;
       lista();

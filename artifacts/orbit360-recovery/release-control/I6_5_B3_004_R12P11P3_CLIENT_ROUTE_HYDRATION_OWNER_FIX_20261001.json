@@ -1,0 +1,51 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P11P3_CLIENT_ROUTE_HYDRATION_OWNER_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "d87b3a4fb474d9670652a9860630ddfe6b0e4906",
+  "failedRunId": 36865733821,
+  "failedJobId": 110380935574,
+  "classification": "PRODUCT_ROUTING_HYDRATION_OWNER_DEFECT",
+  "rootCause": "CLIENTE360_ROUTED_CLIENT_OWNER_FELL_BACK_TO_LIST_WHEN_ROUTE_CLIENT_WAS_NOT_YET_HYDRATED_AND_DID_NOT_REENTER_DETAIL_AFTER_STORE_HYDRATION",
+  "evidence": {
+    "priorDeepLinkGenerated": true,
+    "receiptReachedStore": true,
+    "directReceiptDetailSelectorTimedOut": true,
+    "failureSelector": "[data-rp-receipt-detail=\"1\"]",
+    "priorP11P1P2BridgeRetriesInsufficient": true,
+    "fixtureCleanupPass": true
+  },
+  "remediation": {
+    "genericAnyClientRoute": true,
+    "cliente360OwnsPendingRouteHydration": true,
+    "routeClientLoadingState": true,
+    "boundedRetryEveryMs": 250,
+    "maxAttempts": 80,
+    "explicitCollections": [
+      "clientes",
+      "polizas",
+      "recibosEsperados",
+      "carteraPrimas",
+      "cobros"
+    ],
+    "reenterCliente360RenderWhenClientArrives": true,
+    "noQaSpecificClientBypass": true,
+    "bridgeDirectReceiptRelationshipGuardPreserved": true
+  },
+  "changedProductFiles": [
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/index.html"
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/cliente360.js": "512916ed92f1c89a960a127a05df69a14a71edba",
+    "orbit360-platform/index.html": "5175ba43a2037ebbb9d442de2a16c67b4bbaf816"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "b9f260e1ad75a24fd51b247a6bbc645282e4a6d0"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

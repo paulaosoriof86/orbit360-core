@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-004",
     "title": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
-    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
     "boundaries": {
@@ -304,7 +304,7 @@
       "tools/gravicentra-i6-5-b3-004-preview-proof.mjs": "01612122193e10e084ff3df49f69e126b86baee3"
     },
     "r6RemediationAuthorizationStatus": "CONSUMED_SOURCE_FIX_COMMITTED",
-    "nextAction": "B3_004_R12P11P2_EXACT_PREVIEW",
+    "nextAction": "B3_004_R12P11_EXACT_PREVIEW_MOBILE_BROWSER",
     "r6ValidatorRepair": {
       "status": "VALIDATOR_REPAIRED_PENDING_RERUN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_STALE_CONTRACT_REPAIR_20260930.json",
@@ -748,6 +748,13 @@
       "qaBlobs": {
         "tools/gravicentra-i6-5-b3-004-contract.mjs": "5338287653afcf89c3df6c4a727bcac04ed46828"
       }
+    },
+    "r12p11p3SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P3_CLIENT_ROUTE_HYDRATION_OWNER_FIX_20261001.json",
+      "blobSha": "c2aa09b3e500a380f5fb986aca9e6e49a35ad6bc",
+      "rootCause": "CLIENTE360_ROUTED_CLIENT_OWNER_FELL_BACK_TO_LIST_WHEN_ROUTE_CLIENT_WAS_NOT_YET_HYDRATED_AND_DID_NOT_REENTER_DETAIL_AFTER_STORE_HYDRATION",
+      "genericAnyClientRoute": true,
+      "productSourceChanged": true
     }
   },
   "canonicalComposition": {
@@ -757,10 +764,10 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "6b7eccd6d5b114b36245874e9fa5bb75161915fa"
+    "blobSha": "cd8956f6da9957f3fde46a00f00d0c7486ae18f9"
   },
   "nextRequiredProof": [
-    "B3_004_R12P11P2_SOURCE_CONTRACT_PASS",
+    "B3_004_R12P11P3_SOURCE_CONTRACT_PASS",
     "B3_004_R12P11_EXACT_PREVIEW_MOBILE_BROWSER_PASS",
     "B3_004_R12_TARGETED_HUMAN_VISUAL_PASS"
   ],
@@ -956,7 +963,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "f07fb91cb7999ce47026908e4443d70a3cafda80"
+    "blobSha": "ac71103ad95f0917fd0701dc48e056f5c95304bd"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -1191,6 +1198,20 @@
     "compositionLockBlobSha": "25375045f8cb2c8fd7e56ceea8641b9ab325ac35",
     "findingsLedgerBlobSha": "44c9637da0e4a75177225c49ebd9864e2165a0c7",
     "rootCause": "POST_RELOAD_QA_CLEANUP_CALLED_QUARANTINE_AFTER_DOCUMENTS_WERE_FINALIZED_BUT_QUARANTINE_ONLY_ACCEPTED_STAGING_PARENTS",
+    "productSourceChanged": true,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p11p3SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P11P3_CLIENT_ROUTE_HYDRATION_OWNER_FIX_20261001.json",
+    "blobSha": "c2aa09b3e500a380f5fb986aca9e6e49a35ad6bc",
+    "compositionLockBlobSha": "ac71103ad95f0917fd0701dc48e056f5c95304bd",
+    "findingsLedgerBlobSha": "cd8956f6da9957f3fde46a00f00d0c7486ae18f9",
+    "rootCause": "CLIENTE360_ROUTED_CLIENT_OWNER_FELL_BACK_TO_LIST_WHEN_ROUTE_CLIENT_WAS_NOT_YET_HYDRATED_AND_DID_NOT_REENTER_DETAIL_AFTER_STORE_HYDRATION",
+    "genericAnyClientRoute": true,
     "productSourceChanged": true,
     "noOperationalBusinessWrites": true,
     "noReimport": true,
