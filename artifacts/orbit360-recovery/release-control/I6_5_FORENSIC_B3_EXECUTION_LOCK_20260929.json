@@ -636,6 +636,13 @@
       "blobSha": "7d48154d254aeb67854e4f6abe58f16eaba6e37a",
       "purpose": "CAPTURE_EXACT_QA_ACTION_CONTEXT_AT_CLICK_AFTER_INTERMITTENT_MODAL_OPEN_FAILURE",
       "productSourceChanged": false
+    },
+    "r12p9SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P9_EXACT_QA_SCOPE_WRAPPER_FIX_20261001.json",
+      "blobSha": "0055e4eca48cae173e265e760a42230523d37755",
+      "rootCause": "CRM_V1198_PAYMENT_ACTION_WRAPPER_REAPPLIED_NORMAL_SCOPE_TO_EXACT_SYNTHETIC_QA_RECEIPT_AND_BLOCKED_BEFORE_CANONICAL_COBROS_HANDLER",
+      "permissionGuardPreserved": true,
+      "productSourceChanged": true
     }
   },
   "canonicalComposition": {
@@ -645,7 +652,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "280a3d43714964f2c1bac492341d632fda821dab"
+    "blobSha": "6a9d13a13cfb7364a516340e63fdd8ce680a659c"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -846,7 +853,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "7d2cfc5c56d3a0e24abf6671d0af41b148fc89b9"
+    "blobSha": "e64545160fa1f4bdc160e2b98f50aec1555d68b8"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -956,6 +963,20 @@
     "findingsLedgerBlobSha": "280a3d43714964f2c1bac492341d632fda821dab",
     "purpose": "CAPTURE_EXACT_QA_ACTION_CONTEXT_AT_CLICK_AFTER_INTERMITTENT_MODAL_OPEN_FAILURE",
     "productSourceChanged": false,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p9SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P9_EXACT_QA_SCOPE_WRAPPER_FIX_20261001.json",
+    "blobSha": "0055e4eca48cae173e265e760a42230523d37755",
+    "compositionLockBlobSha": "e64545160fa1f4bdc160e2b98f50aec1555d68b8",
+    "findingsLedgerBlobSha": "6a9d13a13cfb7364a516340e63fdd8ce680a659c",
+    "rootCause": "CRM_V1198_PAYMENT_ACTION_WRAPPER_REAPPLIED_NORMAL_SCOPE_TO_EXACT_SYNTHETIC_QA_RECEIPT_AND_BLOCKED_BEFORE_CANONICAL_COBROS_HANDLER",
+    "permissionGuardPreserved": true,
+    "productSourceChanged": true,
     "noOperationalBusinessWrites": true,
     "noReimport": true,
     "noLive": true,

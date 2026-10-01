@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P9_EXACT_QA_SCOPE_WRAPPER_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "e20a467918149d0b1c3eab6572a01c5a8a8f4884",
+  "failedRunId": 36846818294,
+  "failedJobId": 110319031245,
+  "classification": "PRODUCT_UI_SCOPE_WRAPPER_COMPOSITION_DEFECT",
+  "rootCause": "CRM_V1198_PAYMENT_ACTION_WRAPPER_REAPPLIED_NORMAL_SCOPE_TO_EXACT_SYNTHETIC_QA_RECEIPT_AND_BLOCKED_BEFORE_CANONICAL_COBROS_HANDLER",
+  "evidence": {
+    "qaReceipt": "b3004human_receipt_r12",
+    "syntheticReceiptFound": true,
+    "syntheticFlagsValid": true,
+    "actionButtonOnclickCorrect": true,
+    "scopedReceiptFound": true,
+    "observedToast": "Registro fuera de tu alcance",
+    "blockingOwner": "orbit360-platform/modules/crm-v1198-operational-bridge.js guardPaymentAction",
+    "normalCliente360ToCobrosUsableMs": 175,
+    "fixtureCleanupPass": true
+  },
+  "remediation": {
+    "exactPreviewSyntheticOnly": true,
+    "exactRouteMatchRequired": true,
+    "exactPrefix": "b3004human_",
+    "exactFixtureGate": "B3-004-R12",
+    "onlyScopeCheckBypassed": true,
+    "cobrosPermissionGuardStillRequired": true,
+    "realPreviewRowsUnchanged": true,
+    "backendGuardUnchanged": true
+  },
+  "changedProductFiles": [
+    "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+    "orbit360-platform/index.html"
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/crm-v1198-operational-bridge.js": "dcb057e1a22b21ed5a02661033678dc1ccbd9c0d",
+    "orbit360-platform/index.html": "eeab5d3594175cb5f5a32f7cbfdd563b908eb0df"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "1747d0f07f6e244dc73f7e7b6939a9ce2bd5bb19"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

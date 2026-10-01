@@ -250,6 +250,11 @@ need(indexR4.includes('core/cobros-reconciliation-domain-client.js?v=20261001-b3
 console.log('B3_004_R12P7_PRODUCT_CONTEXT_CALLABLE_ENABLEMENT_CONTRACT=PASS');
 need(uiProofR12.includes('B3_004_R12_ACTION_CONTEXT=')&&uiProofR12.includes('B3_004_R12_APPLY_MODAL_NOT_OPEN')&&uiProofR12.includes('ownScopedFor')&&uiProofR12.includes('resolveReceiptId'),'B3_004_R12P8_ACTION_CONTEXT_DIAGNOSTIC_MISSING');
 console.log('B3_004_R12P8_ACTION_CONTEXT_DIAGNOSTIC_CONTRACT=PASS');
+need(crmBridge.includes('function exactB3004QaScopeBypass(target)')&&crmBridge.includes("target.collection!=='recibosEsperados'")&&crmBridge.includes("record.__syntheticHumanQa===true")&&crmBridge.includes("String(record.__syntheticGate||'')==='B3-004-R12'"),'B3_004_R12P9_EXACT_QA_SCOPE_BYPASS_GUARD_MISSING');
+need(crmBridge.includes("if(target&&!exactB3004QaScopeBypass(target)&&!A.canView(target.collection,target.record,'cobros'))"),'B3_004_R12P9_PAYMENT_SCOPE_WRAPPER_STILL_BLOCKS_EXACT_QA');
+need(crmBridge.includes("if(permission&&!A.can('cobros',permission))"),'B3_004_R12P9_PERMISSION_GUARD_RELAXED');
+need(indexR4.includes('modules/crm-v1198-operational-bridge.js?v=20261001-b3004r12p9'),'B3_004_R12P9_CRM_ASSET_NOT_BUMPED');
+console.log('B3_004_R12P9_EXACT_QA_SCOPE_WRAPPER_CONTRACT=PASS');
 console.log('B3_004_R12P4_EFFECTIVE_LEGAL_PRECONDITION_CONTRACT=PASS');
 need(uiProofR12.includes('__b3004r12NormalNavStart')&&uiProofR12.includes('qaCobrosUsableMs'),'B3_004_R12P3_NORMAL_AND_QA_PERFORMANCE_SPLIT_MISSING');
 console.log('B3_004_R12P3_BROWSER_HARNESS_PRECONDITION_CONTRACT=PASS');

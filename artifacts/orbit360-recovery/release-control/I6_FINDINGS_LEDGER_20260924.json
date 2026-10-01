@@ -1703,6 +1703,15 @@
         "classification": "QA_DIAGNOSTIC_ONLY",
         "purpose": "CAPTURE_EXACT_QA_ACTION_CONTEXT_AT_CLICK_AFTER_INTERMITTENT_MODAL_OPEN_FAILURE",
         "productSourceChanged": false
+      },
+      "r12p9SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P9_EXACT_QA_SCOPE_WRAPPER_FIX_20261001.json",
+        "blobSha": "0055e4eca48cae173e265e760a42230523d37755",
+        "compositionLockBlobSha": "e64545160fa1f4bdc160e2b98f50aec1555d68b8",
+        "classification": "PRODUCT_UI_SCOPE_WRAPPER_COMPOSITION_DEFECT",
+        "rootCause": "CRM_V1198_PAYMENT_ACTION_WRAPPER_REAPPLIED_NORMAL_SCOPE_TO_EXACT_SYNTHETIC_QA_RECEIPT_AND_BLOCKED_BEFORE_CANONICAL_COBROS_HANDLER",
+        "permissionGuardPreserved": true,
+        "productSourceChanged": true
       }
     },
     {
