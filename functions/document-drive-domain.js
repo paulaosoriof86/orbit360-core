@@ -382,10 +382,20 @@ async function quarantineDocument(request,previewOnly){
   const target=await authorizeTarget(request,tenantId,input,'write',previewOnly),clientId=target.clientId;
   if(previewOnly===true&&!previewSyntheticClient(clientId))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
   const fileId=clean(input.documentRef||input.fileId||input.archivoRef,180)||driveIdFromUrl(input.driveUrl||input.externalUrl||input.url||'');
-  const clientFolderId=clean(input.clientFolderId,180),stagingFolderId=clean(input.stagingFolderId||input.folderId,180);
-  if(!fileId||!clientFolderId||!stagingFolderId)throw new HttpsError('invalid-argument','Referencia provisional incompleta.');
+  const clientFolderId=clean(input.clientFolderId,180)||clean(target.row&&target.row.driveFolderId,180);
+  const stagingFolderId=clean(input.stagingFolderId||input.folderId,180);
+  if(!fileId||!clientFolderId)throw new HttpsError('invalid-argument','Referencia documental incompleta.');
   const auth=await tenantDriveToken(tenantId,previewOnly),accessToken=auth.accessToken,meta=await getMeta(fileId,accessToken),parents=Array.isArray(meta&&meta.parents)?meta.parents:[];
-  if(!meta||meta.trashed===true)throw new HttpsError('not-found','Documento provisional no disponible.');
+  if(!meta||meta.trashed===true)throw new HttpsError('not-found','Documento no disponible.');
+  const exactFinalizedQa=previewOnly===true&&target.exactPreviewQa===true&&parents.includes(clientFolderId);
+  if(exactFinalizedQa){
+    const quarantine=await ensureFolder(clientFolderId,'_PAGOS_REQUIEREN_RECUPERACION',accessToken);
+    const moved=await moveDriveFile(fileId,clientFolderId,quarantine.id,accessToken);
+    if(!moved||!Array.isArray(moved.parents)||!moved.parents.includes(quarantine.id))throw new HttpsError('internal','Drive no confirmó la cuarentena del documento QA finalizado.');
+    await audit(tenantId,target.actor,'drive.document_quarantine',{clientId,documentRef:fileId,outcome:'quarantined_finalized_qa'},previewOnly);
+    return{ok:true,status:'quarantined_finalized_qa',documentRef:fileId,fileId,quarantineFolderId:quarantine.id,quarantined:true,backendPersistent:true,previewIsolated:true};
+  }
+  if(!stagingFolderId)throw new HttpsError('invalid-argument','Referencia provisional incompleta.');
   if(!parents.includes(stagingFolderId))return{ok:true,status:'already_outside_staging',documentRef:fileId,fileId,quarantined:false,backendPersistent:true};
   const quarantine=await ensureFolder(clientFolderId,'_PAGOS_REQUIEREN_RECUPERACION',accessToken);
   const moved=await moveDriveFile(fileId,stagingFolderId,quarantine.id,accessToken);

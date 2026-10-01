@@ -1,0 +1,40 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_004_R12P10P6_EXACT_FINALIZED_QA_CLEANUP_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-004",
+  "parentHead": "5c2c5bf3adaa5816a38ce9c16c00f91767f30b6c",
+  "failedRunId": 36857006119,
+  "failedJobId": 110351940959,
+  "classification": "PRODUCT_PREVIEW_QA_CLEANUP_COMPOSITION_DEFECT",
+  "rootCause": "POST_RELOAD_QA_CLEANUP_CALLED_QUARANTINE_AFTER_DOCUMENTS_WERE_FINALIZED_BUT_QUARANTINE_ONLY_ACCEPTED_STAGING_PARENTS",
+  "evidence": {
+    "twoUiUploadsPass": true,
+    "twoUiFinalizesPass": true,
+    "paymentReadAfterReload": true,
+    "invoiceReadAfterReload": true,
+    "paymentReadHttp200": true,
+    "invoiceReadHttp200": true,
+    "onlyFailure": "UI_DOCUMENT_CLEANUP_QUARANTINE_FAILED"
+  },
+  "remediation": {
+    "exactPreviewHumanFixtureOnly": true,
+    "finalizedQaDocumentCleanupAllowed": true,
+    "normalStagingQuarantineGuardPreserved": true,
+    "productionBehaviorUnchanged": true,
+    "realClientBehaviorUnchanged": true
+  },
+  "changedProductFiles": [
+    "functions/document-drive-domain.js"
+  ],
+  "productBlobs": {
+    "functions/document-drive-domain.js": "253b7074c86bb6ce800cc933d10242e9b6096f0a"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-004-contract.mjs": "d768192151a698536e57246b1f0af3f58e0fd54c"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3005": false
+}

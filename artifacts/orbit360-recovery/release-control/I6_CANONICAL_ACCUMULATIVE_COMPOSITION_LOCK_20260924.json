@@ -123,7 +123,7 @@
     "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
     "functions/cobros-reconciliation-domain.js": "089bb7aa76c823da64e75dfe632c175f025b8a2c",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
-    "functions/document-drive-domain.js": "f7bc47c4b0e46064ed49b947c5881b57273b66fc",
+    "functions/document-drive-domain.js": "253b7074c86bb6ce800cc933d10242e9b6096f0a",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
     "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
@@ -403,14 +403,15 @@
   },
   "lastAuthorizedMutation": {
     "date": "2026-10-01",
-    "gate": "I6.5-B3-004-R12P10P5",
-    "reason": "HARNESS_RELOAD_RACED_SEQUENTIAL_DOCUMENT_FINALIZE",
-    "changedProductFiles": [],
+    "gate": "I6.5-B3-004-R12P10P6",
+    "reason": "EXACT_FINALIZED_QA_DOCUMENT_CLEANUP_AFTER_DURABILITY_PROOF",
+    "changedProductFiles": [
+      "functions/document-drive-domain.js"
+    ],
     "changedQaFiles": [
-      "tools/gravicentra-i6-5-b3-004-r12-ui-proof.mjs",
       "tools/gravicentra-i6-5-b3-004-contract.mjs"
     ],
-    "productSourceChanged": false,
+    "productSourceChanged": true,
     "noOperationalBusinessMutation": true,
     "noReimport": true,
     "noLive": true,
@@ -1129,5 +1130,26 @@
       "tools/gravicentra-i6-5-b3-004-contract.mjs": "fd9a88d8e605dfd7f85ec9075bc16434818c6e21"
     },
     "productSourceChanged": false
+  },
+  "b3004R12P10P6ExactFinalizedQaCleanupFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "findingId": "B3-004",
+    "failedRunId": 36857006119,
+    "failedJobId": 110351940959,
+    "rootCause": "POST_RELOAD_QA_CLEANUP_CALLED_QUARANTINE_AFTER_DOCUMENTS_WERE_FINALIZED_BUT_QUARANTINE_ONLY_ACCEPTED_STAGING_PARENTS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P6_EXACT_FINALIZED_QA_CLEANUP_FIX_20261001.json",
+    "receiptBlobSha": "7fec0b0abc3c67a098e3add4c8d2cfc965116129",
+    "productBlobs": {
+      "functions/document-drive-domain.js": "253b7074c86bb6ce800cc933d10242e9b6096f0a"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-004-contract.mjs": "d768192151a698536e57246b1f0af3f58e0fd54c"
+    },
+    "normalStagingGuardPreserved": true,
+    "productSourceChanged": true,
+    "operationalBusinessWrites": false,
+    "reimport": false,
+    "live": false,
+    "b3005": false
   }
 }

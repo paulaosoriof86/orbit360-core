@@ -1780,6 +1780,14 @@
         "classification": "QA_HARNESS_RACE",
         "rootCause": "HARNESS_RELOADED_AFTER_FIRESTORE_RECONCILIATION_READBACK_BEFORE_SEQUENTIAL_DOCUMENT_FINALIZATION_COMPLETED_ABORTING_SECOND_INVOICE_FINALIZE",
         "productSourceChanged": false
+      },
+      "r12p10p6SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P6_EXACT_FINALIZED_QA_CLEANUP_FIX_20261001.json",
+        "blobSha": "7fec0b0abc3c67a098e3add4c8d2cfc965116129",
+        "compositionLockBlobSha": "25375045f8cb2c8fd7e56ceea8641b9ab325ac35",
+        "classification": "PRODUCT_PREVIEW_QA_CLEANUP_COMPOSITION_DEFECT",
+        "rootCause": "POST_RELOAD_QA_CLEANUP_CALLED_QUARANTINE_AFTER_DOCUMENTS_WERE_FINALIZED_BUT_QUARANTINE_ONLY_ACCEPTED_STAGING_PARENTS",
+        "productSourceChanged": true
       }
     },
     {

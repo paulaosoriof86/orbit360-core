@@ -689,6 +689,12 @@
       "blobSha": "4c8a11549fc6418f269137fb58a98acc6284b85d",
       "rootCause": "HARNESS_RELOADED_AFTER_FIRESTORE_RECONCILIATION_READBACK_BEFORE_SEQUENTIAL_DOCUMENT_FINALIZATION_COMPLETED_ABORTING_SECOND_INVOICE_FINALIZE",
       "productSourceChanged": false
+    },
+    "r12p10p6SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P6_EXACT_FINALIZED_QA_CLEANUP_FIX_20261001.json",
+      "blobSha": "7fec0b0abc3c67a098e3add4c8d2cfc965116129",
+      "rootCause": "POST_RELOAD_QA_CLEANUP_CALLED_QUARANTINE_AFTER_DOCUMENTS_WERE_FINALIZED_BUT_QUARANTINE_ONLY_ACCEPTED_STAGING_PARENTS",
+      "productSourceChanged": true
     }
   },
   "canonicalComposition": {
@@ -698,7 +704,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "67e75a5cd1fc71300845f250129ceb9d1360a066"
+    "blobSha": "44c9637da0e4a75177225c49ebd9864e2165a0c7"
   },
   "nextRequiredProof": [
     "B3_004_R12_EXACT_PREVIEW_MACHINE_PASS",
@@ -893,7 +899,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "aff7c8ee4c0bc8780eff730a1a4b2379cbf3f3c2"
+    "blobSha": "25375045f8cb2c8fd7e56ceea8641b9ab325ac35"
   },
   "humanQaAuthorization": {
     "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
@@ -1116,6 +1122,19 @@
     "findingsLedgerBlobSha": "67e75a5cd1fc71300845f250129ceb9d1360a066",
     "rootCause": "HARNESS_RELOADED_AFTER_FIRESTORE_RECONCILIATION_READBACK_BEFORE_SEQUENTIAL_DOCUMENT_FINALIZATION_COMPLETED_ABORTING_SECOND_INVOICE_FINALIZE",
     "productSourceChanged": false,
+    "noOperationalBusinessWrites": true,
+    "noReimport": true,
+    "noLive": true,
+    "noB3005": true
+  },
+  "r12p10p6SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P6_EXACT_FINALIZED_QA_CLEANUP_FIX_20261001.json",
+    "blobSha": "7fec0b0abc3c67a098e3add4c8d2cfc965116129",
+    "compositionLockBlobSha": "25375045f8cb2c8fd7e56ceea8641b9ab325ac35",
+    "findingsLedgerBlobSha": "44c9637da0e4a75177225c49ebd9864e2165a0c7",
+    "rootCause": "POST_RELOAD_QA_CLEANUP_CALLED_QUARANTINE_AFTER_DOCUMENTS_WERE_FINALIZED_BUT_QUARANTINE_ONLY_ACCEPTED_STAGING_PARENTS",
+    "productSourceChanged": true,
     "noOperationalBusinessWrites": true,
     "noReimport": true,
     "noLive": true,

@@ -3190,7 +3190,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-004",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "620e5ee54756e360c89ff5d10a14953b7f8f6a5e",
+      "executionLockBlobSha": "7a6b79aca43399d853b880922d2f1efc2dfa65c2",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_PAYMENT_OWNER_SOURCE_FOUNDATION_20260930.json",
       "sourceFixReceiptBlobSha": "fa13e83a52efaaf699818aa23e4fb9fde8e5041b",
       "productMutationAuthorized": false,
@@ -3221,7 +3221,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "67e75a5cd1fc71300845f250129ceb9d1360a066",
+      "findingLedgerBlobSha": "44c9637da0e4a75177225c49ebd9864e2165a0c7",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_CANONICAL_PAYMENT_OWNER_DIAGNOSTIC_20260930.json",
       "diagnosticRunId": 36658190622,
@@ -3431,7 +3431,7 @@
       "provenanceFixReceiptBlobSha": "5ac0ce337999abbec288b3ac5efa738e9aedab60",
       "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_PROVENANCE_CONTRACT_PASS_20260930.json",
       "paymentProvenanceContractReceiptBlobSha": "34f2f5e0aedf6a5a68e4f3c476040349ecf38794",
-      "compositionLockBlobSha": "aff7c8ee4c0bc8780eff730a1a4b2379cbf3f3c2",
+      "compositionLockBlobSha": "25375045f8cb2c8fd7e56ceea8641b9ab325ac35",
       "syntheticQaAuthorization": {
         "status": "AUTHORIZED_FOR_B3_004_PREVIEW_ONLY",
         "purpose": "ADVISOR_REPORT_CROSS_ADVISOR_OPERATIVE_APPLY_RECONCILE_READBACK_CLEANUP_PROOF",
@@ -4309,15 +4309,26 @@
         "noReimport": true,
         "noLive": true,
         "noB3005": true
+      },
+      "r12p10p6SourceFix": {
+        "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P6_EXACT_FINALIZED_QA_CLEANUP_FIX_20261001.json",
+        "blobSha": "7fec0b0abc3c67a098e3add4c8d2cfc965116129",
+        "rootCause": "POST_RELOAD_QA_CLEANUP_CALLED_QUARANTINE_AFTER_DOCUMENTS_WERE_FINALIZED_BUT_QUARANTINE_ONLY_ACCEPTED_STAGING_PARENTS",
+        "productSourceChanged": true,
+        "noOperationalBusinessWrites": true,
+        "noReimport": true,
+        "noLive": true,
+        "noB3005": true
       }
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "aff7c8ee4c0bc8780eff730a1a4b2379cbf3f3c2",
+    "compositionLockBlobSha": "25375045f8cb2c8fd7e56ceea8641b9ab325ac35",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "67e75a5cd1fc71300845f250129ceb9d1360a066",
+    "findingLedgerBlobSha": "44c9637da0e4a75177225c49ebd9864e2165a0c7",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -4698,6 +4709,16 @@
       "executionLockBlobSha": "620e5ee54756e360c89ff5d10a14953b7f8f6a5e",
       "rootCause": "HARNESS_RELOADED_AFTER_FIRESTORE_RECONCILIATION_READBACK_BEFORE_SEQUENTIAL_DOCUMENT_FINALIZATION_COMPLETED_ABORTING_SECOND_INVOICE_FINALIZE",
       "productSourceChanged": false
+    },
+    "r12p10p6SourceFix": {
+      "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R12P10P6_EXACT_FINALIZED_QA_CLEANUP_FIX_20261001.json",
+      "receiptBlobSha": "7fec0b0abc3c67a098e3add4c8d2cfc965116129",
+      "compositionLockBlobSha": "25375045f8cb2c8fd7e56ceea8641b9ab325ac35",
+      "findingsLedgerBlobSha": "44c9637da0e4a75177225c49ebd9864e2165a0c7",
+      "executionLockBlobSha": "7a6b79aca43399d853b880922d2f1efc2dfa65c2",
+      "rootCause": "POST_RELOAD_QA_CLEANUP_CALLED_QUARANTINE_AFTER_DOCUMENTS_WERE_FINALIZED_BUT_QUARANTINE_ONLY_ACCEPTED_STAGING_PARENTS",
+      "productSourceChanged": true
     }
   }
 }
