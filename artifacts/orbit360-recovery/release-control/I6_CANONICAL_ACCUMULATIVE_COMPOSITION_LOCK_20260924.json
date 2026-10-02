@@ -176,11 +176,11 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "30753007242c482d9a3e6c2c6c438e07bdec0778",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "6fc2260f68ed0b471e560d9a903d8958d4e6a934",
+    "orbit360-platform/index.html": "399253744f41e0e58210d4a0b238569a8e3143d0",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
-    "orbit360-platform/modules/cliente360.js": "932367c6627df776779b56237522d5b3ab388905",
+    "orbit360-platform/modules/cliente360.js": "865de63de5d8ed37c20be6108abc037266713293",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495",
     "orbit360-platform/modules/cobros.js": "0ec0cc969a6b429c511ce6256abd38df3bd468fe",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
@@ -413,12 +413,12 @@
     "livePromotion": false
   },
   "lastAuthorizedMutation": {
-    "status": "B3_008_R2P1_REALIZED_PAYMENT_PROJECTION_FIX",
+    "status": "B3_008_R2P9_CLIENT360_PROGRESSIVE_FIRST_PAINT",
     "findingId": "B3-008",
-    "parentHead": "1da81738f42d919dd889ccc99729e7122fc0d0b0",
+    "parentHead": "dbc31639a20bac17cd9dbfe2bc9517c279bd195c",
     "productBlobs": {
-      "orbit360-platform/core/queries.js": "20c23dd7350f34984ed1f423bd2a3753a6bc43ce",
-      "orbit360-platform/index.html": "6fc2260f68ed0b471e560d9a903d8958d4e6a934"
+      "orbit360-platform/modules/cliente360.js": "865de63de5d8ed37c20be6108abc037266713293",
+      "orbit360-platform/index.html": "399253744f41e0e58210d4a0b238569a8e3143d0"
     },
     "noDataMutation": true,
     "noReimport": true,
@@ -1939,5 +1939,18 @@
       "orbit360-platform/index.html": "6fc2260f68ed0b471e560d9a903d8958d4e6a934"
     },
     "qaContractBlobSha": "eae48dc85e161893de36e4b7086d8f243c6dbc4b"
+  },
+  "b3008R2P9Client360ProgressiveFirstPaint": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P9_CLIENT360_PROGRESSIVE_FIRST_PAINT_SOURCE_FIX_20261002.json",
+    "blobSha": "27014d9c995dff6b83d4770e99b23acbc77db4e4",
+    "productBlobs": {
+      "orbit360-platform/modules/cliente360.js": "865de63de5d8ed37c20be6108abc037266713293",
+      "orbit360-platform/index.html": "399253744f41e0e58210d4a0b238569a8e3143d0"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-008-contract.mjs": "a92e71eed5a6d50ee46c8874b734df71389ec583",
+      "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "10a161942f94cd5ec1e913a7379bfafa2574deb0"
+    }
   }
 }

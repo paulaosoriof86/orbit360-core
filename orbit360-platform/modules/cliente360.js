@@ -82,7 +82,7 @@ Orbit.modules.cliente360 = (function () {
     if (!store || store.__productReadOnlyP0 !== true || typeof store._productStatus !== 'function') return true;
     const ps = store._productStatus() || {};
     const confirmed = ps.serverConfirmedCollections || [];
-    return ['clientes','polizas'].every(name => confirmed.includes(name));
+    return ['clientes'].every(name => confirmed.includes(name));
   }
   function scheduleClientListReadyRender(delay) {
     if (!listWaitingForReady || listReadyTimer) return;
@@ -175,13 +175,14 @@ Orbit.modules.cliente360 = (function () {
     const renderStartedAt = perfNow();
     const summaryStartedAt = perfNow();
     const batchRunner = Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function' ? Orbit.clientProjection.withReadBatch : null;
-    const listBatch = batchRunner ? batchRunner(['clientes', 'polizas'], source => ({
-      clientes: source.clientes || [],
-      polizas: source.polizas || []
-    })) : null;
-    const clientesRaw = listBatch ? listBatch.clientes : S().all('clientes');
+    const clientBatch = batchRunner ? batchRunner(['clientes'], source => ({ clientes: source.clientes || [] })) : null;
+    const clientesRaw = clientBatch ? clientBatch.clientes : S().all('clientes');
     const clientes = (clientesRaw || []).filter(c => !(c && (c.fusionado === true || String(c.mergedIntoClientId || '').trim())));
-    const policiesForList = listBatch ? listBatch.polizas : S().all('polizas');
+    const policyReadiness = dataReadiness(['polizas']);
+    if (policyReadiness === 'pending') ensureDataCollections(['polizas']);
+    const policiesForList = policyReadiness === 'ready'
+      ? (batchRunner ? batchRunner(['polizas'], source => source.polizas || []) : S().all('polizas'))
+      : [];
     const asesores = S().all('asesores');
     const advisorById = new Map(asesores.filter(a => a && a.id != null).map(a => [a.id, a]));
     const policyByClient = new Map();
@@ -194,7 +195,7 @@ Orbit.modules.cliente360 = (function () {
     policiesForList.forEach(p => { if (p) addRelated(policyByClient, p.clienteId, p); });
     const portfolioReadiness = dataReadiness(['carteraPrimas']);
     if (portfolioReadiness === 'pending') ensureDataCollections(['carteraPrimas']);
-    const canonicalSummaryIndex = portfolioReadiness === 'ready' && q.clientesResumenIndex ? q.clientesResumenIndex() : null;
+    const canonicalSummaryIndex = policyReadiness === 'ready' && portfolioReadiness === 'ready' && q.clientesResumenIndex ? q.clientesResumenIndex() : null;
     const summaryCacheMs = perfNow() - summaryStartedAt;
     const rows = clientes.filter(c =>
       (!f.q || (c.nombre + ' ' + c.email + ' ' + c.identificacion).toLowerCase().includes(f.q.toLowerCase())) &&
@@ -209,11 +210,12 @@ Orbit.modules.cliente360 = (function () {
     const pageStart = (listPage - 1) * LIST_PAGE_SIZE;
     const visibleRows = rows.slice(pageStart, pageStart + LIST_PAGE_SIZE);
     const resumenDe = c => {
+      if (policyReadiness !== 'ready') return { moneda: c ? c.moneda : 'GTQ', nPolizas: null, nVigentes: null, primaAnual: null, pendiente: null, vencido: null, salud: null, readiness: 'pending', policyReadiness };
       const pol = policyByClient.get(c.id) || [];
       const vigentes = pol.filter(esRenovable);
       const primaAnual = vigentes.reduce((s, p) => s + (policyTotal(p) || 0), 0);
       const canonical = canonicalSummaryIndex && canonicalSummaryIndex.get(c.id);
-      return canonical || { moneda: c ? c.moneda : 'GTQ', nPolizas: pol.length, nVigentes: vigentes.length, primaAnual, pendiente: null, vencido: null, salud: null, readiness: portfolioReadiness };
+      return canonical || { moneda: c ? c.moneda : 'GTQ', nPolizas: pol.length, nVigentes: vigentes.length, primaAnual, pendiente: null, vencido: null, salud: null, readiness: portfolioReadiness, policyReadiness };
     };
     const summaryAggregateStartedAt = perfNow();
     const clientById = new Map(clientes.filter(c => c && c.id != null).map(c => [c.id, c]));
@@ -228,13 +230,15 @@ Orbit.modules.cliente360 = (function () {
       primaNetaVigentePorMoneda[moneda] = (primaNetaVigentePorMoneda[moneda] || 0) + neta;
     });
     const primaNetaVigenteKeys = Object.keys(primaNetaVigentePorMoneda);
-    const primaNetaVigenteHtml = primaNetaVigenteKeys.sort((a, b) => {
-      const rank = x => x === 'GTQ' ? 0 : x === 'COP' ? 1 : 2;
-      return rank(a) - rank(b) || a.localeCompare(b);
-    }).map(moneda => '<span style="display:block;font-size:' + (primaNetaVigenteKeys.length > 1 ? '14px' : '22px') + '">' + U.esc(moneda) + ' ' + Number(primaNetaVigentePorMoneda[moneda] || 0).toLocaleString('es-GT', { maximumFractionDigits: 0 }) + '</span>').join('') || '<span class="muted">Sin valores</span>';
-    const activePolicyCount = policiesForList.filter(esRenovable).length;
-    const totalPolicyCount = policiesForList.length;
-    const renewals45Count = policiesForList.filter(p => { const d = U.daysFromNow(p.vigenciaFin); return esRenovable(p) && d != null && d >= 0 && d <= 45; }).length;
+    const primaNetaVigenteHtml = policyReadiness !== 'ready'
+      ? '<span class="muted" data-c360-policy-readiness="' + U.esc(policyReadiness) + '">Actualizando datos</span>'
+      : (primaNetaVigenteKeys.sort((a, b) => {
+          const rank = x => x === 'GTQ' ? 0 : x === 'COP' ? 1 : 2;
+          return rank(a) - rank(b) || a.localeCompare(b);
+        }).map(moneda => '<span style="display:block;font-size:' + (primaNetaVigenteKeys.length > 1 ? '14px' : '22px') + '">' + U.esc(moneda) + ' ' + Number(primaNetaVigentePorMoneda[moneda] || 0).toLocaleString('es-GT', { maximumFractionDigits: 0 }) + '</span>').join('') || '<span class="muted">Sin valores</span>');
+    const activePolicyCount = policyReadiness === 'ready' ? policiesForList.filter(esRenovable).length : null;
+    const totalPolicyCount = policyReadiness === 'ready' ? policiesForList.length : null;
+    const renewals45Count = policyReadiness === 'ready' ? policiesForList.filter(p => { const d = U.daysFromNow(p.vigenciaFin); return esRenovable(p) && d != null && d >= 0 && d <= 45; }).length : null;
     const summaryAggregateMs = perfNow() - summaryAggregateStartedAt;
 
     const rowsBuildStartedAt = perfNow();
@@ -255,8 +259,8 @@ Orbit.modules.cliente360 = (function () {
                 <div class="muted" style="font-size:11.5px">${U.esc(U.text(c.tipo, 'Pendiente de completar'))} · ${U.esc(U.text(c.ciudad, 'Pendiente de completar'))} · ${U.esc(U.text(c.pais, 'Pendiente de completar'))}</div></div>
               </div></td>
               <td><div style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${ase ? ase.color : '#999'}"></span>${U.esc(ase ? ase.nombre : '—')}</div></td>
-              <td class="num">${r.nVigentes}<span class="muted">/${r.nPolizas}</span></td>
-              <td class="num">${U.money(r.primaAnual, r.moneda)}</td>
+              <td class="num">${policyReadiness === 'ready' ? r.nVigentes + '<span class="muted">/' + r.nPolizas + '</span>' : '<span class="muted" data-c360-policy-row-readiness="' + U.esc(policyReadiness) + '">Actualizando</span>'}</td>
+              <td class="num">${policyReadiness === 'ready' ? U.money(r.primaAnual, r.moneda) : '<span class="muted">Actualizando</span>'}</td>
               <td>${cartera}</td>
               <td>${salud}</td>
               <td style="text-align:right;color:var(--ink-3)">›</td>
@@ -270,9 +274,9 @@ Orbit.modules.cliente360 = (function () {
 
       <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
         <button class="kpi kpi-click" onclick="Orbit.modules.cliente360.render(document.getElementById('mod-host'))" title="Ver todos"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${clientes.length}</div><div class="k-foot muted">${clientes.filter(c => c.tipo === 'Empresa').length} empresas · ${clientes.filter(c => c.tipo === 'Persona').length} personas</div></button>
-        <button class="kpi kpi-click" onclick="Orbit.kpi('polizas-vigentes')" title="Ver pólizas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${activePolicyCount}</div><div class="k-foot muted">de ${totalPolicyCount} históricas</div></button>
+        <button class="kpi kpi-click" onclick="Orbit.kpi('polizas-vigentes')" title="Ver pólizas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${policyReadiness === 'ready' ? activePolicyCount : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'de ' + totalPolicyCount + ' históricas' : 'Actualizando pólizas'}</div></button>
         <div class="kpi"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima neta vigente</div><div class="k-val">${primaNetaVigenteHtml}</div><div class="k-foot muted">Separada por moneda; no se suman GTQ y COP</div></div>
-        <div class="kpi"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Por renovar ≤45 d</div><div class="k-val">${renewals45Count}</div><div class="k-foot muted">requieren gestión</div></div>
+        <div class="kpi"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Por renovar ≤45 d</div><div class="k-val">${policyReadiness === 'ready' ? renewals45Count : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'requieren gestión' : 'Actualizando pólizas'}</div></div>
       </div>
 
       <div class="card" style="overflow:hidden">
@@ -326,7 +330,7 @@ Orbit.modules.cliente360 = (function () {
     OrbitRuntimeDiagnostics.cliente360 = Object.assign({}, OrbitRuntimeDiagnostics.cliente360 || {}, {
       version: '20260817.2-bounded-first-paint',
       renderMs: totalMs,
-      list: { bounded: true, batchRead: !!listBatch, firstPaintSummaryRows: visibleRows.length, firstPaintCommissionRows: 0, firstPaintPolicyRows: policiesForList.length, firstPaintCollectionRows: portfolioReadiness === 'ready' ? (S().all('carteraPrimas') || []).length : 0, portfolioReadiness, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
+      list: { bounded: true, batchRead: !!clientBatch, firstPaintSummaryRows: visibleRows.length, firstPaintCommissionRows: 0, firstPaintPolicyRows: policiesForList.length, firstPaintCollectionRows: portfolioReadiness === 'ready' ? (S().all('carteraPrimas') || []).length : 0, policyReadiness, portfolioReadiness, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
     });
   }
 

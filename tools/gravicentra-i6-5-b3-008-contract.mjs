@@ -38,7 +38,9 @@ need(src.inicio.includes("q.clientesScoped"),'B3_008_INICIO_CLIENT_SCOPE_MISSING
 need(src.inicio.includes("q.polizasScoped"),'B3_008_INICIO_POLICY_SCOPE_MISSING');
 need(src.inicio.includes("data-values="),'B3_008_INDEPENDENT_VALUE_MARKERS_MISSING');
 
-need(src.cliente.includes("return ['clientes','polizas'].every"),'B3_008_CLIENT_LIST_PRIMARY_READINESS_INVALID');
+need(src.cliente.includes("return ['clientes'].every"),'B3_008_CLIENT_LIST_PRIMARY_READINESS_INVALID');
+need(src.cliente.includes("const policyReadiness = dataReadiness(['polizas'])"),'B3_008_CLIENT_LIST_PROGRESSIVE_POLICY_READINESS_MISSING');
+need(src.cliente.includes("Actualizando pólizas"),'B3_008_CLIENT_LIST_POLICY_FAIL_CLOSED_COPY_MISSING');
 need(src.cliente.includes("ensureDataCollections(['clientes','polizas','asesores','carteraPrimas'])"),'B3_008_CLIENT_LIST_PREWARM_MISSING');
 need(src.cliente.includes('data-c360-list-ready="1"'),'B3_008_CLIENT_LIST_READY_MARKER_MISSING');
 

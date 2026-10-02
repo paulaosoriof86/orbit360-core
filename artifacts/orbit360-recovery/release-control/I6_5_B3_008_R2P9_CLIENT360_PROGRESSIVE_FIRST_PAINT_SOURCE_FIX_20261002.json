@@ -1,0 +1,42 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P9_CLIENT360_PROGRESSIVE_FIRST_PAINT_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B3-008",
+  "failedRunId": 37030094543,
+  "failedSourceSha": "dbc31639a20bac17cd9dbfe2bc9517c279bd195c",
+  "classification": "PRODUCT_PERFORMANCE_DEFECT",
+  "evidence": {
+    "userObservedSeconds": "~50",
+    "machineObservationWindowMs": 15000,
+    "listEventuallyRendered": true,
+    "renderedRows": 40,
+    "totalClients": 439,
+    "totalPolicies": 1419,
+    "internalRenderMs": 44.8,
+    "loadingAtDiagnostic": false,
+    "pageErrors": 0,
+    "consoleErrors": 0
+  },
+  "rootCause": "Cliente360 list gate required authoritative server confirmation of both clientes and the full polizas collection before first paint. The list itself only needs clientes; policy-derived fields were incorrectly coupled to the primary list readiness.",
+  "fix": [
+    "Primary Cliente360 list readiness now depends only on authoritative clientes.",
+    "Polizas is prefetched but becomes a progressive secondary dependency.",
+    "Until polizas is authoritative, policy count, active-policy KPI, net premium, renewals and row policy metrics render explicit Actualizando states instead of false zeros.",
+    "Canonical financial/health summary activates only after both policy and portfolio readiness are confirmed.",
+    "Existing <=6s route-to-usable acceptance remains unchanged."
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/cliente360.js": "865de63de5d8ed37c20be6108abc037266713293",
+    "orbit360-platform/index.html": "399253744f41e0e58210d4a0b238569a8e3143d0"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-008-contract.mjs": "a92e71eed5a6d50ee46c8874b734df71389ec583",
+    "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "10a161942f94cd5ec1e913a7379bfafa2574deb0"
+  },
+  "operationalBusinessWrites": false,
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}

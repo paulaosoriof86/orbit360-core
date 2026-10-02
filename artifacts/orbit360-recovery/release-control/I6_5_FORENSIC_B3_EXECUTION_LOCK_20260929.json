@@ -59,7 +59,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "9207bf57d03afbbf1f494d05b51b01c9d0abf95f"
+    "blobSha": "d7120cc9e690b3d2ea6cd2bd9d49cd32efdc377e"
   },
   "nextRequiredProof": [
     "B3_008_R2_INDEPENDENT_REALITY_MACHINE_PROOF",
@@ -251,7 +251,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "28f409fd8d0885c7fa89cc386c0006eae5dd8480"
+    "blobSha": "ad4eef9158b3668c11e3f7e88fe45cc885d37bed"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
@@ -772,14 +772,14 @@
     "forbiddenSyntheticPaymentCollection": "cobros"
   },
   "b3008Executor": {
-    "status": "ARMED_FOR_EXACT_PREVIEW_R2P8",
+    "status": "ARMED_FOR_EXACT_PREVIEW_R2P9",
     "qaBlobs": {
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "8d3dc8325cf5b74fa30a8f8646e894a8295534e3",
       "tools/gravicentra-i6-5-b3-008-contract.mjs": "868d4ddf85ed7404786d1290d2aa4447a3ff845b",
       "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "f0d0bdfb6f69e6ce6fdf638eb9c203a419bfb90a",
       ".github/workflows/gravicentra-b3-008-executor.yml": "a607e4f60a44907361ccb972aa6519b07c5a08dd"
     },
-    "productSourceChanged": false,
+    "productSourceChanged": true,
     "operationalBusinessWritesAuthorized": false,
     "reimportAuthorized": false,
     "liveHostingPromotionAuthorized": false,
@@ -793,7 +793,7 @@
     "workflowPath": ".github/workflows/gravicentra-b3-008-executor.yml",
     "workflowBlobSha": "2550cbb4fd13e261faeeb07bc3746739d7be1f67",
     "contractPath": "tools/gravicentra-i6-5-b3-008-contract.mjs",
-    "contractBlobSha": "eae48dc85e161893de36e4b7086d8f243c6dbc4b",
+    "contractBlobSha": "a92e71eed5a6d50ee46c8874b734df71389ec583",
     "proofPath": "tools/gravicentra-i6-5-b3-008-preview-proof.mjs",
     "proofBlobSha": "10a161942f94cd5ec1e913a7379bfafa2574deb0"
   },
@@ -871,5 +871,12 @@
     "failedRunId": 37029437270,
     "classification": "HARNESS_MEASUREMENT_BOUNDARY_TOO_TIGHT_TO_CLASSIFY",
     "productRegressionDemonstrated": false
+  },
+  "b3008R2P9": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P9_CLIENT360_PROGRESSIVE_FIRST_PAINT_SOURCE_FIX_20261002.json",
+    "blobSha": "27014d9c995dff6b83d4770e99b23acbc77db4e4",
+    "classification": "PRODUCT_PERFORMANCE_DEFECT",
+    "productRegressionDemonstrated": true
   }
 }
