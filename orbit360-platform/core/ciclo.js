@@ -71,58 +71,44 @@ Orbit.ciclo = (function () {
   }
   const PROB = { nuevo: 10, contactado: 25, cotizando: 45, propuesta: 65, negociacion: 78, inspeccion: 85, emision: 92, emitido: 100, perdido: 0 };
 
-  /** Mueve un negocio a otra etapa, ejecutando automatizaciones. */
-  function setEtapa(id, etapaId) {
+  /** Mueve un negocio a otra etapa y espera commit/readback canónico. */
+  async function setEtapa(id, etapaId) {
     const n = S().get('negocios', id); if (!n || n.etapa === etapaId) return n;
+    if (!S().updateDurable) throw new Error('OPS_BUSINESS_DURABLE_WRITE_REQUIRED');
     const de = n.etapa;
     const patch = { etapa: etapaId, prob: PROB[etapaId], actualizado: today() };
-    // automatización: cadencia de seguimiento al entrar a Propuesta
-    if (etapaId === 'propuesta' && !n.cadenciaActiva) {
-      patch.cadenciaActiva = true; patch.cadencia = CADENCIA[1];
-      log(n, 'Automatización', '', 'Cadencia de seguimiento activada', 'auto');
+    if (etapaId === 'propuesta') {
+      patch.cadenciaActiva = true;
+      patch.cadencia = CADENCIA.slice();
+      patch.proximoToque = inDays(3);
     }
-    if (etapaId === 'cotizando' && !n.nroCotizacion) patch.nroCotizacion = 'COT-' + Math.floor(1000 + Math.random() * 9000);
-    if (etapaId === 'inspeccion' || etapaId === 'emision') patch.decision = etapaId;
     log(n, 'Etapa', de, etapaId, 'manual');
-    Object.assign(n, patch);
-    S().update('negocios', id, n);
-    // emisión → crear cliente
-    if (etapaId === 'emitido') emitir(id);
-    return n;
+    patch.bitacora = n.bitacora;
+    await S().updateDurable('negocios', id, patch);
+    return S().get('negocios', id) || Object.assign({}, n, patch);
   }
 
   /** Decisión en Cierre (Leads): pasa a Inspección o Emisión → reaparece en Ops. */
-  function decidirCierre(id, dest) { return setEtapa(id, dest === 'inspeccion' ? 'inspeccion' : 'emision'); }
+  async function decidirCierre(id, dest) { return setEtapa(id, dest === 'inspeccion' ? 'inspeccion' : 'emision'); }
 
-  function perder(id, motivo) {
-    const n = S().get('negocios', id); if (!n) return;
+  async function perder(id, motivo) {
+    const n = S().get('negocios', id); if (!n) return null;
+    if (!S().updateDurable) throw new Error('OPS_BUSINESS_DURABLE_WRITE_REQUIRED');
     log(n, 'Resultado', n.etapa, 'Perdido' + (motivo ? ' · ' + motivo : ''), 'manual');
-    S().update('negocios', id, { etapa: 'perdido', prob: 0, motivoPerdido: motivo || '', actualizado: today() });
+    await S().updateDurable('negocios', id, { etapa: 'perdido', prob: 0, motivoPerdido: motivo || '', actualizado: today(), bitacora: n.bitacora });
+    return S().get('negocios', id);
   }
-  function archivar(id) {
-    const n = S().get('negocios', id); if (!n) return;
+  async function archivar(id) {
+    const n = S().get('negocios', id); if (!n) return null;
+    if (!S().updateDurable) throw new Error('OPS_BUSINESS_DURABLE_WRITE_REQUIRED');
     log(n, 'Archivo', '', 'Archivado', 'manual');
-    S().update('negocios', id, { archivado: true });
+    await S().updateDurable('negocios', id, { archivado: true, bitacora: n.bitacora, actualizado: today() });
+    return S().get('negocios', id);
   }
 
-  /** Emitir: crea el cliente heredando datos + activa cadencia de encuestas. */
-  function emitir(id) {
-    const n = S().get('negocios', id); if (!n) return;
-    if (n.clienteIdCreado) return; // ya creado
-    const nuevoId = 'cli' + Date.now().toString().slice(-7);
-    const cli = {
-      id: nuevoId, tipo: n.tipo || 'Persona', nombre: n.nombre, pais: n.pais,
-      moneda: n.moneda, ciudad: '', departamento: '', direccion: '',
-      identificacion: '', email: n.email || '', telefono: n.telefono || '',
-      asesorId: n.asesorId, segmento: 'Nuevo', canal: n.canal || 'Leads', sexo: '', fechaNac: '',
-      contactoAlt: '', fechaAlta: today(), cumple: '', etiquetas: ['Nuevo'],
-      driveLink: '', notas: 'Cliente creado desde el ciclo comercial (negocio ' + n.id + ').',
-      encuestasActivas: true
-    };
-    S().insert('clientes', cli);
-    S().insert('actividades', { id: 'act' + Date.now(), clienteId: nuevoId, asesorId: n.asesorId, tipo: 'sistema', icon: '🏆', fecha: today(), titulo: 'Cliente creado al emitir', detalle: 'Negocio ganado: ' + n.producto + '. Cadencia de encuestas de satisfacción activada.' });
-    log(n, 'Automatización', '', 'Cliente creado + cadencia de encuestas', 'auto');
-    S().update('negocios', id, { clienteIdCreado: nuevoId, etapa: 'emitido', prob: 100, bitacora: n.bitacora });
+  /** Emisión productiva: el servidor canónico crea/vincula cliente y actividad de emisión. */
+  async function emitir(id) {
+    return setEtapa(id, 'emitido');
   }
 
   /* ===================== gestiones (Ops admin/renov) ===================== */
@@ -149,7 +135,7 @@ Orbit.ciclo = (function () {
     return out;
   }
   function crearGestion(g) {
-    return S().insert('gestiones', gestionPayload(g));
+    return crearGestionDurable(g);
   }
   async function crearGestionDurable(g) {
     if (!S().insertDurable) throw new Error('OPS_MANAGEMENT_DURABLE_WRITE_REQUIRED');
