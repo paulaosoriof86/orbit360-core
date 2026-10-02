@@ -155,7 +155,16 @@ try{
 }catch(e){
   proof.status='FAIL';proof.error=clean(e?.stack||e);throw e;
 }finally{
-  try{await cleanup();}catch(e){proof.cleanupError=clean(e?.stack||e);if(proof.status==='PASS')proof.status='FAIL';}
+  try{
+    await cleanup();
+    const remaining=[];
+    for(const id of ids){if((await tenant.collection('data').doc('gestiones').collection('items').doc(id).get()).exists)remaining.push(id);}
+    const evLeft=await tenant.collection('workflowEvents').where('entityId','in',ids).get();
+    proof.syntheticFinalAbsent=remaining.length===0&&evLeft.empty;
+    proof.remainingSyntheticIds=remaining;
+    proof.remainingSyntheticEvents=evLeft.size;
+    if(!proof.syntheticFinalAbsent&&proof.status==='PASS')proof.status='FAIL';
+  }catch(e){proof.cleanupError=clean(e?.stack||e);proof.syntheticFinalAbsent=false;if(proof.status==='PASS')proof.status='FAIL';}
   try{if(browser)await browser.close();}catch{}
   fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
 }
