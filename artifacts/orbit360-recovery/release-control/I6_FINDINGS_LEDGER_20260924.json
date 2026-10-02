@@ -2594,6 +2594,14 @@
         "blobSha": "27014d9c995dff6b83d4770e99b23acbc77db4e4",
         "classification": "PRODUCT_PERFORMANCE_DEFECT",
         "productRegressionDemonstrated": true
+      },
+      "r2p10": {
+        "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P10_RUNTIME_ONLY_READINESS_HARNESS_FIX_20261002.json",
+        "blobSha": "8aebd5af056139c40d32015d0ed6585ac1c47b3e",
+        "failedRunId": 37031406639,
+        "classification": "HARNESS_ONLY_FALSE_NEGATIVE_AFTER_PRODUCT_FIRST_PAINT_FIX",
+        "productRegressionDemonstrated": false
       }
     },
     {
@@ -6083,6 +6091,8 @@
     "r2p8ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P8_MEASURE_ACTUAL_ROUTE_LATENCY_HARNESS_FIX_20261002.json",
     "r2p8ReceiptBlobSha": "11880de699aa856f569f1d5b9cc3469855ec3feb",
     "r2p9ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P9_CLIENT360_PROGRESSIVE_FIRST_PAINT_SOURCE_FIX_20261002.json",
-    "r2p9ReceiptBlobSha": "27014d9c995dff6b83d4770e99b23acbc77db4e4"
+    "r2p9ReceiptBlobSha": "27014d9c995dff6b83d4770e99b23acbc77db4e4",
+    "r2p10ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P10_RUNTIME_ONLY_READINESS_HARNESS_FIX_20261002.json",
+    "r2p10ReceiptBlobSha": "8aebd5af056139c40d32015d0ed6585ac1c47b3e"
   }
 }

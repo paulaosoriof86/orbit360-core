@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P10_RUNTIME_ONLY_READINESS_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B3-008",
+  "failedRunId": 37031406639,
+  "failedSourceSha": "b05942bb70307c0aa75509dfbd10c6222abf12b4",
+  "classification": "HARNESS_ONLY_FALSE_NEGATIVE_AFTER_PRODUCT_FIRST_PAINT_FIX",
+  "evidence": {
+    "cliente360Route": "cliente360",
+    "renderedRows": 40,
+    "totalClients": 439,
+    "totalPolicies": 1419,
+    "internalRenderMs": 65.8,
+    "loading": false,
+    "denied": false,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "exactPreviewReadback": "PASS",
+    "syntheticFixtureCleanup": "PASS"
+  },
+  "rootCause": "The browser proof still coupled readiness to a brittle DOM text-sequence predicate after runtime telemetry already proved Cliente360 had rendered usable rows.",
+  "fix": [
+    "Cliente360 readiness now uses route key + OrbitRuntimeDiagnostics renderedRows + absence of loading/denied state.",
+    "Cobros readiness now uses its canonical data-cobros-core-ready marker + route key + absence of hydration-loading state.",
+    "The 15s observation window remains separate from the <=6s acceptance threshold, so genuine latency still fails closed."
+  ],
+  "proofBlobSha": "9e079162e4341169490d86709c4614b4d9ac4f35",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}
