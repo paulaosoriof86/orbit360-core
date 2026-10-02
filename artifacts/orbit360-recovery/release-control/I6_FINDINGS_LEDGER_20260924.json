@@ -2428,7 +2428,7 @@
         "image(20260930-011108).png"
       ],
       "rootCause": "READINESS_OWNER_MISMATCH_AND_CAUSAL_SECOND_WRITERS_CONFIRMED",
-      "nextAction": "B3_008_CLIENT360_CAUSAL_DIAGNOSTIC_EXACT_PREVIEW",
+      "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
       "diagnosticClue": {
         "fromGate": "B3-003",
         "authoritativeCounts": {
@@ -6020,7 +6020,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_008_CLIENT360_CAUSAL_DIAGNOSTIC_PENDING",
+    "status": "B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B3-008",
     "priorFindingId": "B3-007",
     "priorFindingStatus": "CLOSED_PASS",
