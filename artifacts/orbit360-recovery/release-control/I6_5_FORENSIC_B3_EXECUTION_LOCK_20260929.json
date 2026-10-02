@@ -59,7 +59,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "43d0a8b20467cb82413af00576787bf0e479b4c4"
+    "blobSha": "711ce5752b3d790a85125cd9a552bb2c66355254"
   },
   "nextRequiredProof": [
     "B3_008_R2_INDEPENDENT_REALITY_MACHINE_PROOF",
@@ -772,7 +772,7 @@
     "forbiddenSyntheticPaymentCollection": "cobros"
   },
   "b3008Executor": {
-    "status": "ARMED_FOR_CLIENT360_CAUSAL_DIAGNOSTIC_R2P5",
+    "status": "ARMED_FOR_EXACT_PREVIEW_R2P4",
     "qaBlobs": {
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "8d3dc8325cf5b74fa30a8f8646e894a8295534e3",
       "tools/gravicentra-i6-5-b3-008-contract.mjs": "868d4ddf85ed7404786d1290d2aa4447a3ff845b",
@@ -791,11 +791,11 @@
       "productSourceChanged": false
     },
     "workflowPath": ".github/workflows/gravicentra-b3-008-executor.yml",
-    "workflowBlobSha": "6acee26bb2f1cf61e18f0b9cb9985365173fe71e",
+    "workflowBlobSha": "68f3fbef528f0c8d9534f802d77307733ae38266",
     "contractPath": "tools/gravicentra-i6-5-b3-008-contract.mjs",
     "contractBlobSha": "eae48dc85e161893de36e4b7086d8f243c6dbc4b",
     "proofPath": "tools/gravicentra-i6-5-b3-008-preview-proof.mjs",
-    "proofBlobSha": "c81c4641cb75d6234d8baf35b9c6e6bf7a7c8c9e"
+    "proofBlobSha": "bb2330a91ffa40ee23b1bafa3889e0ca36db55ff"
   },
   "b3008R2": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -828,12 +828,12 @@
     "productRegressionDemonstrated": false
   },
   "b3008R2P4": {
-    "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
-    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P4_ROUTE_HELPER_REMOVAL_20261002.json",
-    "blobSha": "4e266024739c40306cc37caa207b4cc2897ffd31",
-    "failedRunId": 37015532999,
-    "classification": "HARNESS_ONLY_PERFORMANCE_MEASUREMENT_BLOCKER",
-    "productRegressionDemonstrated": false
+    "status": "QA_HARNESS_AND_SYNTHETIC_CLEANUP_ARMED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P4_USABLE_SURFACE_AND_SYNTHETIC_CLEANUP_FIX_20261002.json",
+    "blobSha": "ad9e60e45f526b2515fd8ada4b96296e66d6327e",
+    "failedRunId": 37019929997,
+    "productSourceChanged": false,
+    "syntheticQaCleanupWritesAuthorized": true
   },
   "b3008R2P5": {
     "status": "QA_DIAGNOSTIC_ARMED_PENDING_EXACT_PREVIEW",
@@ -842,5 +842,11 @@
     "failedRunId": 37019116003,
     "classification": "PRODUCT_PERFORMANCE_FAILURE_CONFIRMED_DIAGNOSTIC_CAUSE_PENDING",
     "productRegressionDemonstrated": true
+  },
+  "syntheticQaCleanup": {
+    "authorized": true,
+    "scope": "KNOWN_B3_004_HUMAN_FIXTURE_EXACT_IDS_ONLY",
+    "operationalBusinessWrites": false,
+    "reimport": false
   }
 }

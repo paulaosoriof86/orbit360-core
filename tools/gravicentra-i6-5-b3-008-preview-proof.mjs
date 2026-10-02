@@ -142,7 +142,12 @@ try{
 
   let t=Date.now();await route(page,'cliente360');
   try{
-    await page.waitForSelector('[data-c360-list-ready="1"]',{timeout:6000});
+    await page.waitForFunction(()=> {
+      const host=document.getElementById('host');
+      if(!host) return false;
+      if(document.querySelector('[data-c360-authoritative-loading="1"]')||document.querySelector('.modstate')) return false;
+      return !!document.querySelector('.c360-client-name') && /CLIENTES/i.test(String(host.innerText||''));
+    },null,{timeout:6000});
   }catch(error){
     const diag=await page.evaluate(()=>({
       hash:String(location.hash||''),
@@ -160,7 +165,18 @@ try{
   }
   proof.performance.client360ListMs=Date.now()-t;
   need(proof.performance.client360ListMs<=6000,'B3_008_CLIENT360_LIST_TOO_SLOW:'+proof.performance.client360ListMs);
+  const syntheticResidue=await page.evaluate(()=>({
+    markerPresent:!!document.querySelector('[data-c360-list-ready="1"]'),
+    client:!!(Orbit.store&&Orbit.store.get&&Orbit.store.get('clientes','b3004human_client_r12')),
+    policy:!!(Orbit.store&&Orbit.store.get&&Orbit.store.get('polizas','b3004human_policy_r12')),
+    receipt:!!(Orbit.store&&Orbit.store.get&&Orbit.store.get('recibosEsperados','b3004human_receipt_r12')),
+    portfolio:!!(Orbit.store&&Orbit.store.get&&Orbit.store.get('carteraPrimas','b3004human_portfolio_r12')),
+    visible:/QA HUMANA B3-004|b3004human_/i.test(String(document.getElementById('host')?.innerText||''))
+  }));
+  need(!syntheticResidue.client&&!syntheticResidue.policy&&!syntheticResidue.receipt&&!syntheticResidue.portfolio&&!syntheticResidue.visible,'B3_008_B3004_SYNTHETIC_RESIDUE:'+JSON.stringify(syntheticResidue));
+  proof.syntheticResidueCheck=syntheticResidue;
   proof.assertions.clientListPerformance=true;
+  proof.assertions.b3004SyntheticFixtureAbsent=true;
 
   t=Date.now();await route(page,'cobros');await page.waitForSelector('[data-cobros-core-ready="1"]',{timeout:6000});proof.performance.cobrosCoreMs=Date.now()-t;
   need(proof.performance.cobrosCoreMs<=6000,'B3_008_COBROS_CORE_TOO_SLOW:'+proof.performance.cobrosCoreMs);

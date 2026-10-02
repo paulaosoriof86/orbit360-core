@@ -1,0 +1,48 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P4_USABLE_SURFACE_AND_SYNTHETIC_CLEANUP_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_AND_SYNTHETIC_CLEANUP_ARMED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-008",
+  "failedRunId": 37019929997,
+  "failedSourceSha": "5d32ff2e4058127ab68cac8dc4a23d8da90c0ea7",
+  "classification": [
+    "HARNESS_READINESS_MARKER_FALSE_NEGATIVE",
+    "SYNTHETIC_QA_RESIDUE_CONFIRMED"
+  ],
+  "evidence": {
+    "cliente360Rendered": true,
+    "routeKey": "cliente360",
+    "role": "Dirección",
+    "canView": true,
+    "loading": false,
+    "denied": false,
+    "visibleClientCount": 440,
+    "syntheticVisible": "QA HUMANA B3-004 · NO ES CLIENTE REAL"
+  },
+  "rootCauses": [
+    "Harness required data-c360-list-ready marker even though the usable Cliente360 list was already rendered.",
+    "Known B3-004 human QA fixture b3004human_client_r12 and related policy/receipt/portfolio remained in tenant data after prior visual QA."
+  ],
+  "remediation": [
+    "Measure Cliente360 usability from real visible list content and absence of loading/denied state within 6 seconds.",
+    "Run the existing exact-ID B3-004 cleanup routine before the read-only browser proof.",
+    "Verify client, policy, receipt and portfolio synthetic IDs are absent from store and not visible.",
+    "Preserve B3-007 targeted Cronograma synthetic-residue visual check."
+  ],
+  "knownSyntheticIds": {
+    "client": "b3004human_client_r12",
+    "policy": "b3004human_policy_r12",
+    "receipt": "b3004human_receipt_r12",
+    "portfolio": "b3004human_portfolio_r12"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "bb2330a91ffa40ee23b1bafa3889e0ca36db55ff",
+    ".github/workflows/gravicentra-b3-008-executor.yml": "68f3fbef528f0c8d9534f802d77307733ae38266"
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "syntheticQaCleanupWritesAuthorized": true,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}

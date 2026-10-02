@@ -229,6 +229,17 @@ jobs:
           print('B3_008_HOSTING_READBACK=PASS')
           PY
 
+      - name: Cleanup known B3-004 synthetic human fixture
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B3_004_HUMAN_FIXTURE_MODE: cleanup
+          B3_004_HUMAN_FIXTURE_OUT: ${{ runner.temp }}/b3-004-human-fixture-cleanup.json
+          B3_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b3-004-human-fixture.mjs
+          node -e "const x=require(process.env.B3_004_HUMAN_FIXTURE_OUT);if(x.status!=='CLEANED')process.exit(1);console.log('B3_004_SYNTHETIC_FIXTURE_CLEANUP=PASS')"
+
       - name: Read-only browser reality proof
         if: steps.gate.outputs.run == 'true'
         env:
@@ -237,7 +248,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b3-008-preview-proof.mjs
-          node -e "const x=require(process.env.B3_008_PROOF_OUT);const a=x.assertions||{};if(x.status!=='PASS'||a.monthlyProductionIndependent!==true||a.financialRealityIndependent!==true||a.noSyntheticMetaPct!==true||a.advisorMissingMetaFailClosed!==true||a.countryScope!==true||a.clientListPerformance!==true||a.cobrosCorePerformance!==true||a.sigaDirectIncluded!==true||a.polizasCountryScope!==true||a.healthStable!==true||a.b3007SyntheticResidueAbsent!==true||x.operationalBusinessWrites!==0)process.exit(1);console.log('B3_008_R2_PREVIEW_MACHINE_PROOF=PASS')"
+          node -e "const x=require(process.env.B3_008_PROOF_OUT);const a=x.assertions||{};if(x.status!=='PASS'||a.monthlyProductionIndependent!==true||a.financialRealityIndependent!==true||a.noSyntheticMetaPct!==true||a.advisorMissingMetaFailClosed!==true||a.countryScope!==true||a.clientListPerformance!==true||a.cobrosCorePerformance!==true||a.sigaDirectIncluded!==true||a.polizasCountryScope!==true||a.healthStable!==true||a.b3007SyntheticResidueAbsent!==true||a.b3004SyntheticFixtureAbsent!==true||x.operationalBusinessWrites!==0)process.exit(1);console.log('B3_008_R2_PREVIEW_MACHINE_PROOF=PASS')"
 
       - name: Upload immutable package and proof
         if: steps.gate.outputs.run == 'true'
@@ -248,6 +259,7 @@ jobs:
           path: |
             ${{ runner.temp }}/b3-008-package
             ${{ runner.temp }}/b3-008-preview-proof.json
+            ${{ runner.temp }}/b3-004-human-fixture-cleanup.json
           include-hidden-files: true
           compression-level: 0
           if-no-files-found: error
