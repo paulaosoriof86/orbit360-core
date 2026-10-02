@@ -116,7 +116,7 @@ try{
   ].join('\n');
 
   await page.evaluate(()=>Orbit.importa.open('polizas'));
-  await page.waitForSelector('#imp-file');
+  await page.waitForSelector('#imp-file',{state:'attached'});
   await page.locator('#imp-file').setInputFiles({name:'b3006-policy-import.csv',mimeType:'text/csv',buffer:Buffer.from(csv,'utf8')});
   await page.waitForSelector('#imp-next2',{timeout:10000});
   await page.click('#imp-next2');
