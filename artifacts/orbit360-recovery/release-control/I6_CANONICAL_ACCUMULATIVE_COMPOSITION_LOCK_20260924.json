@@ -1831,5 +1831,12 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "b3007SourceContract": {
+    "status": "PASS_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_SOURCE_CONTRACT_PASS_20261001.json",
+    "blobSha": "096745a0ddcedc5d940c15c99c375108db808a52",
+    "sourceSha": "e9adca71bba27e439b92f1492bfda76dc2baa121",
+    "executionMode": "DIRECT_GITHUB_BLOB_CONTRACT_EQUIVALENT"
   }
 }
