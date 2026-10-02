@@ -1,0 +1,26 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_007_QA_HARNESS_CLEANUP_ID_REPAIR_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_HARNESS_FIXED_RERUN_REQUIRED",
+  "findingId": "B3-007",
+  "failedRunId": 36953558714,
+  "failedJobId": 110671509473,
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3007-36953558714-3gx1wmft.web.app",
+  "candidateSourceSha": "ce2641e365db99c6a297d947cd1e4412ce00d361",
+  "exactHostingReadback": true,
+  "productFailure": false,
+  "syntheticWritesExecutedBeforeFailure": false,
+  "qaFailure": {
+    "code": "FIRESTORE_CLEANUP_DIRECT_ID_UNDEFINED",
+    "evidence": "Initial pre-fixture cleanup called CollectionReference.doc(undefined) for collections without direct fixture IDs; failure occurred before fixture creation.",
+    "fix": "Use an explicit directIds map only for collections with deterministic fixture IDs; query client/policy-linked collections separately."
+  },
+  "changedQaFile": "tools/gravicentra-i6-5-b3-007-preview-proof.mjs",
+  "changedQaBlobSha": "a6d65577455e405f51f157fee19fd0cc8fbe57bc",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "disposition": "REJECT_FAILED_QA_CANDIDATE_AND_RERUN_EXACT_PREVIEW",
+  "nextAction": "B3_007_EXACT_PREVIEW"
+}
