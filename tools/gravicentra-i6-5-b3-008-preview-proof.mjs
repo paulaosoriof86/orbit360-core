@@ -163,7 +163,7 @@ try{
   proof.assertions.noSyntheticMetaPct=true;
   proof.assertions.advisorMissingMetaFailClosed=true;
 
-  await setCountry(page,'GT');await route(page,'inicio');await waitConfirmed(page,['asesores','metas'],12000);await page.waitForSelector('[data-inicio-reality-ready="1"]');
+  await setCountry(page,'GT');await route(page,'inicio');await waitConfirmed(page,['asesores','metas'],12000);await route(page,'inicio');await page.waitForSelector('[data-inicio-reality-ready="1"][data-readiness], [data-inicio-reality-ready="1"]');
   const metaGT=await page.evaluate(()=>{
     const rows=Orbit.store?.all?.('metas')||[],month=Orbit.q.currentMonthKey(),advisors=Orbit.store?.all?.('asesores')||[];
     const ids=new Set(advisors.filter(a=>String(a?.paisDefault||a?.pais||'').toUpperCase()==='GT').map(a=>String(a.id||'')));
