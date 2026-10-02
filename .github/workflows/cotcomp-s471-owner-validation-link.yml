@@ -1,0 +1,174 @@
+name: CotComp S4.71 deploy owner validation link
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s471-owner-validation-link-20261002
+    paths:
+      - '.github/cotcomp-lab-intents/s471-owner-validation-link-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  COTCOMP_FUNCTION: cotcompPilotProposalValidationS471
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompPilotProposalValidationS471
+
+jobs:
+  deploy-owner-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.71 deployment intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s471-owner-validation-link-authorized.json
+          jq -e '
+            .authorization=="S471_DEPLOY_OWNER_VALIDATION_LINK" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .functionName=="cotcompPilotProposalValidationS471" and
+            .ownerSubmissionByAssistant==false and
+            .proposalWrites==false and
+            .comparisonSetWrites==false and
+            .selectionWrites==false and
+            .providerOrRater==false and
+            .production==false and
+            .issuance==false and
+            .binding==false and
+            .payment==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA and S4.71 tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-pilot-proposal-validation-s471.js
+          node --check cotcomp-pilot-proposal-validation-s471.test.js
+          node --test cotcomp-pilot-proposal-validation-s471.test.js
+
+      - name: Prepare exact LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s471/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s471/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Verify validation state unused before deploy
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const v=require('./cotcomp-pilot-proposal-validation-s471');
+          const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:v.PROJECT_ID});
+          const db=getFirestore(app);
+          (async()=>{
+            const s=await db.doc(v.STATE_PATH).get();
+            if(s.exists&&s.data()&&s.data().used===true)throw new Error('S471_VALIDATION_ALREADY_CONSUMED');
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s471/evidence/S471_PREDEPLOY_STATE.json',JSON.stringify({
+              projectId:v.PROJECT_ID,stateDocumentExists:s.exists,used:s.exists?!!s.data().used:false,appDataWritesExecuted:0
+            },null,2));
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)});
+          NODE
+
+      - name: Deploy only S4.71 validation function to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global firebase-tools@15.32.0
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Verify deployed GET and rejected invalid POST
+        shell: bash
+        run: |
+          set -euo pipefail
+          CODE="$(curl -sS -o "$RUNNER_TEMP/s471/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+          grep -q 'Validación de cotizaciones reales' "$RUNNER_TEMP/s471/page.html"
+          grep -q 'Aseguate Premium' "$RUNNER_TEMP/s471/page.html"
+          grep -q 'Aseguate Plus' "$RUNNER_TEMP/s471/page.html"
+          grep -q 'MAPFRE Seguros Guatemala' "$RUNNER_TEMP/s471/page.html"
+          grep -q 'no selecciona una póliza' "$RUNNER_TEMP/s471/page.html"
+          BAD="$(curl -sS -o "$RUNNER_TEMP/s471/invalid.json" -w '%{http_code}' -X POST "$COTCOMP_URL"             -H 'content-type: application/json'             -H 'x-pilot-key: invalid-token'             --data '{"documentaryValidation":true,"controlledExecutionAuthorization":true}')"
+          test "$BAD" = "403"
+
+      - name: Verify invalid POST did not consume validation
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const v=require('./cotcomp-pilot-proposal-validation-s471');
+          const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:v.PROJECT_ID});
+          const db=getFirestore(app);
+          (async()=>{
+            const s=await db.doc(v.STATE_PATH).get();
+            if(s.exists&&s.data()&&s.data().used===true)throw new Error('S471_INVALID_POST_CONSUMED_VALIDATION');
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s471/evidence/S471_DEPLOY_RECEIPT.json',JSON.stringify({
+              schemaVersion:'ays-cotcomp-s471-deploy-receipt-v1.0',
+              projectId:v.PROJECT_ID,region:v.REGION,functionName:v.FUNCTION_NAME,
+              functionUrl:process.env.COTCOMP_URL,deployed:true,getPagePass:true,invalidBearerRejected:true,
+              validationStateConsumed:false,ownerSubmissionExecutedByWorkflow:false,
+              proposalWrites:0,comparisonSetWrites:0,selectionWrites:0,
+              providerOrRaterCalls:0,productionTouched:false,issuance:false,binding:false,payment:false
+            },null,2));
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)});
+          NODE
+
+      - name: Upload sanitized S4.71 deployment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s471-owner-validation-link-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s471/evidence/S471_PREDEPLOY_STATE.json
+            ${{ runner.temp }}/s471/evidence/S471_DEPLOY_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credentials
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s471/firebase-service-account.json"
