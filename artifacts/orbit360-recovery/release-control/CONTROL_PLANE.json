@@ -3190,7 +3190,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-008",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "07acd9afe97f69cc45c258503c38af02a64541d8",
+      "executionLockBlobSha": "9b361ff00abaa252da05f273d0b6cdbb53b94d64",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_MINIMAL_SOURCE_FIX_20261001.json",
       "sourceFixReceiptBlobSha": "7803b5f614792e6d80df1e1e1d3f22488d44a641",
       "productMutationAuthorized": false,
@@ -4766,7 +4766,18 @@
       "metricRegistryBuildAuthorized": false,
       "canonicalReleaseManifestProjectionBuildAuthorized": false,
       "semanticFailClosedState": "BUSINESS_SEMANTIC_DECISION_REQUIRED",
-      "sourceFixSourceHead": "d5a0d10e11c3f30ef237dac9c8a21321c266b249"
+      "sourceFixSourceHead": "d5a0d10e11c3f30ef237dac9c8a21321c266b249",
+      "b3008Executor": {
+        "status": "ARMED_FOR_EXACT_PREVIEW",
+        "workflowPath": ".github/workflows/gravicentra-b3-008-executor.yml",
+        "workflowBlobSha": "a607e4f60a44907361ccb972aa6519b07c5a08dd",
+        "contractPath": "tools/gravicentra-i6-5-b3-008-contract.mjs",
+        "contractBlobSha": "868d4ddf85ed7404786d1290d2aa4447a3ff845b",
+        "proofPath": "tools/gravicentra-i6-5-b3-008-preview-proof.mjs",
+        "proofBlobSha": "eac6bce09b593e4fad022fbc42702c415d14d991",
+        "guardBlobSha": "8d3dc8325cf5b74fa30a8f8646e894a8295534e3",
+        "productSourceChanged": false
+      }
     }
   },
   "canonicalAccumulationControl": {
@@ -4974,7 +4985,7 @@
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
     "compositionLockBlobSha": "6cb0ac5e89ff3c03f8136a85398f5059a65e1379",
     "findingLedgerBlobSha": "ea0343d97de0023e00a47020fa9a1370165e32fc",
-    "executionLockBlobSha": "07acd9afe97f69cc45c258503c38af02a64541d8",
+    "executionLockBlobSha": "9b361ff00abaa252da05f273d0b6cdbb53b94d64",
     "noLive": true,
     "noReimport": true,
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
