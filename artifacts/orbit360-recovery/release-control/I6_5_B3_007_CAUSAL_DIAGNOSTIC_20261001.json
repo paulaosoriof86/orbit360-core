@@ -1,0 +1,73 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_007_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-01",
+  "status": "PRODUCT_COMPOSITION_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
+  "findingId": "B3-007",
+  "requirement": "Cronograma consumes real pending obligations from receipts/portfolio.",
+  "classification": "PRODUCT_COMPOSITION_DEFECT",
+  "rootCause": "CRONOGRAMA_PENDING_OBLIGATION_READ_OWNER_IS_LEGACY_COBROS_AND_CRONOGRAMA_SOURCE_WAS_NOT_TRACKED_IN_THE_ACCUMULATIVE_PRODUCT_SET",
+  "evidence": {
+    "cronograma": {
+      "file": "orbit360-platform/modules/cronograma.js",
+      "blobSha": "61ab769667e7b34b9fd2b046a2c9c974fbec9924",
+      "behavior": "eventos() reads S().all('cobros') and treats Pendiente/Vencido payment-domain rows as the premium obligation calendar."
+    },
+    "canonicalPortfolioAdapter": {
+      "file": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+      "blobSha": "b72b1320b537501e56ad20733a6d1eef21b87495",
+      "behavior": "portfolioRows() reads server-confirmed carteraPrimas with active-policy, country and access filtering and canonical due-date semantics."
+    },
+    "canonicalReceiptOwner": {
+      "file": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "behavior": "recibosEsperados/carteraPrimas are the calendar/portfolio domains; cobros conciliados are administered separately."
+    },
+    "b3006Closure": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CLOSED_PASS_20261001.json",
+      "blobSha": "a2d2f72100eac2269a4419c187f1d402f7c516b3",
+      "fact": "A valid imported policy now creates policy + expected receipts + portfolio with zero cobros without payment evidence."
+    },
+    "compositionGap": {
+      "file": "orbit360-platform/modules/cronograma.js",
+      "loadedByIndex": true,
+      "presentInAccumulatedProductFiles": false
+    }
+  },
+  "impact": [
+    "New canonical obligations can be absent from Cronograma until a payment-domain cobro exists.",
+    "The UI labels an obligation as Cobro even when no payment evidence exists.",
+    "Role/country filtering can diverge from the canonical portfolio adapter.",
+    "A loaded product owner was outside the cumulative exact product set, weakening anti-regression coverage."
+  ],
+  "minimalFix": {
+    "authorizedProductFiles": [
+      "orbit360-platform/modules/cronograma.js",
+      "orbit360-platform/index.html"
+    ],
+    "canonicalReadOwner": "Orbit.cobrosCarteraProjectionAdapter.portfolioRows",
+    "requirements": [
+      "Cronograma pending premium events come from the canonical server-confirmed portfolio adapter, not legacy cobros.",
+      "A pending obligation with zero cobros must still appear.",
+      "Event language must describe a pending receipt/obligation, not a confirmed cobro.",
+      "Clicking the obligation opens the linked expected-receipt detail in Cliente360.",
+      "Country/role scope is inherited from the canonical portfolio adapter.",
+      "No operational writes are introduced by Cronograma.",
+      "cronograma.js is added to the cumulative exact product file set and its index asset binding is refreshed."
+    ]
+  },
+  "proofRequired": [
+    "Source contract proves Cronograma no longer uses cobros as pending-obligation source.",
+    "Synthetic Preview fixture with carteraPrimas+recibosEsperados and zero cobros appears in Cronograma.",
+    "Click opens the exact linked receipt route.",
+    "Zero cobros remains zero.",
+    "Exact Hosting readback passes.",
+    "Synthetic cleanup returns all fixture collections to zero."
+  ],
+  "boundaries": {
+    "operationalBusinessWritesAuthorized": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3008": false
+  },
+  "nextAction": "B3_007_SOURCE_FIX"
+}
