@@ -1,0 +1,71 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_V1",
+  "recordedAt": "2026-10-02",
+  "status": "PASS",
+  "gate": "I6.5-B3-008",
+  "authority": "PAULA_TARGETED_VISUAL_ACCEPTANCE",
+  "parentHead": "d72c21e0bf2485bca0d22a25cb9b9fbe10a53bfe",
+  "exactPreview": {
+    "sourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "buildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
+    "runId": 37061984102,
+    "artifactId": 11250418215,
+    "artifactDigest": "449b152a760f931d1a1a3074880f7ae4ca4aac24bb751129205f03bacd1f756f"
+  },
+  "humanEvidence": {
+    "accepted": true,
+    "userStatement": "todo lo veo bien",
+    "screenshotCount": 9,
+    "screenshots": [
+      "image(20261002-213947).png",
+      "image(20261002-214629).png",
+      "image(20261002-214927).png",
+      "image(20261002-214944).png",
+      "image(20261002-215007).png",
+      "image(20261002-215132).png",
+      "image(20261002-215155).png",
+      "image(20261002-215210).png",
+      "image(20261002-215246).png"
+    ],
+    "acceptedSurfaces": [
+      "Cobros y cartera KPIs, aging, list and filters",
+      "Pending and overdue detail modals",
+      "Inicio KPIs and financial detail modals",
+      "Inicio to Cobros navigation"
+    ],
+    "observedSemantics": {
+      "confirmedPayments": 1243,
+      "pendingReconciliation": 1238,
+      "reconciled": 5,
+      "pendingObligations": 764,
+      "overdueObligations": 551,
+      "pendingGTQ": 8058,
+      "overdueGTQ": 7591
+    }
+  },
+  "machineEvidence": {
+    "machinePassReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_20261002.json",
+    "machinePassReceiptBlobSha": "543059b5a6ce3ece278c3afc78f35b0865277ae3",
+    "r5p8AdjudicationPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8_DIAGNOSTIC_ADJUDICATION_20261002.json",
+    "r5p8AdjudicationBlobSha": "1ecde62fd986a965af728b5573877d2d56ae4476",
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "operationalBusinessWrites": 0,
+    "dataWrites": false,
+    "reimport": false,
+    "livePromoted": false
+  },
+  "conclusion": {
+    "findingId": "B3-008",
+    "findingStatus": "CLOSED_PASS",
+    "b3ReadinessPercent": 96,
+    "nextAction": "B4_ENTRY_GUARD"
+  },
+  "boundaries": {
+    "noLive": true,
+    "noReimport": true,
+    "noOperationalBusinessWrites": true,
+    "noProductSourceChange": true
+  }
+}
