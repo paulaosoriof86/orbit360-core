@@ -177,12 +177,17 @@ Orbit.modules.cliente360 = (function () {
     const batchRunner = Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function' ? Orbit.clientProjection.withReadBatch : null;
     const clientBatch = batchRunner ? batchRunner(['clientes'], source => ({ clientes: source.clientes || [] })) : null;
     const clientesRaw = clientBatch ? clientBatch.clientes : S().all('clientes');
-    const clientes = (clientesRaw || []).filter(c => !(c && (c.fusionado === true || String(c.mergedIntoClientId || '').trim())));
+    const clientesAll = (clientesRaw || []).filter(c => !(c && (c.fusionado === true || String(c.mergedIntoClientId || '').trim())));
+    const globalCountry = String(Orbit.pais || 'TODOS').toUpperCase();
+    const clientes = clientesAll.filter(c => globalCountry === 'TODOS' || String(c && c.pais || '').toUpperCase() === globalCountry);
     const policyReadiness = dataReadiness(['polizas']);
     if (policyReadiness === 'pending') ensureDataCollections(['polizas']);
-    const policiesForList = policyReadiness === 'ready'
+    const policiesRaw = policyReadiness === 'ready'
       ? (batchRunner ? batchRunner(['polizas'], source => source.polizas || []) : S().all('polizas'))
       : [];
+    const policiesForList = policyReadiness === 'ready' && globalCountry !== 'TODOS' && q.polizasScoped
+      ? q.polizasScoped()
+      : policiesRaw;
     const asesores = S().all('asesores');
     const advisorById = new Map(asesores.filter(a => a && a.id != null).map(a => [a.id, a]));
     const policyByClient = new Map();
@@ -204,6 +209,8 @@ Orbit.modules.cliente360 = (function () {
       (!f.asesor || c.asesorId === f.asesor) &&
       (!f.seg || c.segmento === f.seg)
     );
+    const kpiClientIds = new Set(rows.map(c => String(c && c.id || '')).filter(Boolean));
+    const policiesForKpi = policiesForList.filter(p => p && kpiClientIds.has(String(p.clienteId || '')));
     const pageCount = Math.max(1, Math.ceil(rows.length / LIST_PAGE_SIZE));
     if (listPage > pageCount) listPage = pageCount;
     if (listPage < 1) listPage = 1;
@@ -220,7 +227,7 @@ Orbit.modules.cliente360 = (function () {
     const summaryAggregateStartedAt = perfNow();
     const clientById = new Map(clientes.filter(c => c && c.id != null).map(c => [c.id, c]));
     const primaNetaVigentePorMoneda = {};
-    policiesForList.forEach(p => {
+    policiesForKpi.forEach(p => {
       if (!esRenovable(p)) return;
       const cli = clientById.get(p.clienteId);
       if (!cli) return;
@@ -236,9 +243,10 @@ Orbit.modules.cliente360 = (function () {
           const rank = x => x === 'GTQ' ? 0 : x === 'COP' ? 1 : 2;
           return rank(a) - rank(b) || a.localeCompare(b);
         }).map(moneda => '<span style="display:block;font-size:' + (primaNetaVigenteKeys.length > 1 ? '14px' : '22px') + '">' + U.esc(moneda) + ' ' + Number(primaNetaVigentePorMoneda[moneda] || 0).toLocaleString('es-GT', { maximumFractionDigits: 0 }) + '</span>').join('') || '<span class="muted">Sin valores</span>');
-    const activePolicyCount = policyReadiness === 'ready' ? policiesForList.filter(esRenovable).length : null;
-    const totalPolicyCount = policyReadiness === 'ready' ? policiesForList.length : null;
-    const renewals45Count = policyReadiness === 'ready' ? policiesForList.filter(p => { const d = U.daysFromNow(p.vigenciaFin); return esRenovable(p) && d != null && d >= 0 && d <= 45; }).length : null;
+    const activePolicyCount = policyReadiness === 'ready' ? policiesForKpi.filter(esRenovable).length : null;
+    const totalPolicyCount = policyReadiness === 'ready' ? policiesForKpi.length : null;
+    const renewals45Policies = policyReadiness === 'ready' ? policiesForKpi.filter(p => { const d = U.daysFromNow(p.vigenciaFin); return esRenovable(p) && d != null && d >= 0 && d <= 45; }) : [];
+    const renewals45Count = policyReadiness === 'ready' ? renewals45Policies.length : null;
     const summaryAggregateMs = perfNow() - summaryAggregateStartedAt;
 
     const rowsBuildStartedAt = perfNow();
@@ -272,11 +280,11 @@ Orbit.modules.cliente360 = (function () {
     host.innerHTML = `<div class="page" data-c360-list-ready="1">
       ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevoCliente()">+ Nuevo cliente</button>`)}
 
-      <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
-        <button class="kpi kpi-click" onclick="Orbit.modules.cliente360.render(document.getElementById('mod-host'))" title="Ver todos"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${clientes.length}</div><div class="k-foot muted">${clientes.filter(c => c.tipo === 'Empresa').length} empresas · ${clientes.filter(c => c.tipo === 'Persona').length} personas</div></button>
-        <button class="kpi kpi-click" onclick="Orbit.kpi('polizas-vigentes')" title="Ver pólizas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${policyReadiness === 'ready' ? activePolicyCount : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'de ' + totalPolicyCount + ' históricas' : 'Actualizando pólizas'}</div></button>
-        <div class="kpi"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima neta vigente</div><div class="k-val">${primaNetaVigenteHtml}</div><div class="k-foot muted">Separada por moneda; no se suman GTQ y COP</div></div>
-        <div class="kpi"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Por renovar ≤45 d</div><div class="k-val">${policyReadiness === 'ready' ? renewals45Count : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'requieren gestión' : 'Actualizando pólizas'}</div></div>
+      <div class="kpi-row" data-c360-kpi-scope="${globalCountry}" data-c360-kpi-client-count="${rows.length}" data-c360-kpi-active-count="${activePolicyCount==null?'':activePolicyCount}" data-c360-kpi-policy-count="${totalPolicyCount==null?'':totalPolicyCount}" data-c360-kpi-renew-count="${renewals45Count==null?'':renewals45Count}" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+        <button class="kpi kpi-click" data-c360-kpi="clients" title="Ver clientes del universo actual"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${rows.length}</div><div class="k-foot muted">${rows.filter(c => c.tipo === 'Empresa').length} empresas · ${rows.filter(c => c.tipo === 'Persona').length} personas ›</div></button>
+        <button class="kpi kpi-click" data-c360-kpi="active" title="Ver pólizas activas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${policyReadiness === 'ready' ? activePolicyCount : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'de ' + totalPolicyCount + ' históricas ›' : 'Actualizando pólizas'}</div></button>
+        <button class="kpi kpi-click" data-c360-kpi="premium" title="Ver detalle de prima vigente"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima neta vigente</div><div class="k-val">${primaNetaVigenteHtml}</div><div class="k-foot muted">Separada por moneda; no se suman GTQ y COP ›</div></button>
+        <button class="kpi kpi-click" data-c360-kpi="renewals" title="Ver renovaciones próximas"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Por renovar ≤45 d</div><div class="k-val">${policyReadiness === 'ready' ? renewals45Count : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'requieren gestión ›' : 'Actualizando pólizas'}</div></button>
       </div>
 
       <div class="card" style="overflow:hidden">
@@ -309,6 +317,18 @@ Orbit.modules.cliente360 = (function () {
     </div>`;
 
     const innerHtmlMs = perfNow() - innerHtmlStartedAt;
+    const showPolicyKpi = kind => {
+      if (kind === 'clients') { const table=host.querySelector('.tbl'); if(table)table.scrollIntoView({behavior:'smooth',block:'start'}); return; }
+      if (policyReadiness !== 'ready') return c360toast('Las pólizas todavía se están actualizando.');
+      const list = kind === 'renewals' ? renewals45Policies : policiesForKpi.filter(esRenovable);
+      const title = kind === 'renewals' ? 'Por renovar ≤45 d' : kind === 'premium' ? 'Prima neta vigente' : 'Pólizas activas';
+      let back=document.getElementById('c360-kpi-detail');if(back)back.remove();
+      back=document.createElement('div');back.id='c360-kpi-detail';back.className='drawer-back open';back.style.cssText='display:grid;place-items:center;z-index:96';back.setAttribute('data-row-count',String(list.length));
+      const body=list.slice(0,250).map(p=>{const cli=clientById.get(p.clienteId)||{};const cur=p.moneda||p.divisa||cli.moneda||'';const net=U.finiteNumber(p.primaNeta!=null?p.primaNeta:p.prima);return `<tr class="clickable" data-client="${U.esc(p.clienteId||'')}"><td>${U.esc(cli.nombre||'—')}</td><td>${U.esc(p.numero||'—')}</td><td>${U.esc(p.ramo||p.producto||'—')}</td><td>${net==null?'Sin monto fuente':U.money(net,cur)}</td><td>${U.fmtDate(p.vigenciaFin)}</td><td>${U.esc(p.estado||'—')}</td></tr>`;}).join('');
+      back.innerHTML=`<div class="card" style="width:min(900px,96vw);max-height:88vh;overflow:auto;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"><b>${title} · ${list.length}</b><button class="imp-x" data-close>✕</button></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Cliente</th><th>Póliza</th><th>Ramo</th><th>Prima neta</th><th>Vence</th><th>Estado</th></tr></thead><tbody>${body||'<tr><td colspan="6" class="muted" style="text-align:center;padding:24px">Sin registros.</td></tr>'}</tbody></table></div>${list.length>250?'<div class="muted" style="padding:10px 20px">Se muestran los primeros 250 registros; usa los filtros de la vista para acotar el universo.</div>':''}</div>`;
+      document.body.appendChild(back);const close=()=>back.remove();back.querySelector('[data-close]').onclick=close;back.onclick=e=>{if(e.target===back)close();};back.querySelectorAll('[data-client]').forEach(tr=>tr.onclick=()=>{const cid=tr.getAttribute('data-client');close();if(cid)location.hash='#/cliente360?c='+encodeURIComponent(cid);});
+    };
+    host.querySelectorAll('[data-c360-kpi]').forEach(btn=>btn.addEventListener('click',()=>showPolicyKpi(btn.getAttribute('data-c360-kpi'))));
     const bindingStartedAt = perfNow();
     const reb = () => { tab = 'resumen'; listPage = 1; lista(); };
     bind('f-q', 'input', v => { filtros.q = v; }, true);

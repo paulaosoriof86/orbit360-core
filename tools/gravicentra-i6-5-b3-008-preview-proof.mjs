@@ -80,10 +80,10 @@ async function measureUsableRoute(page,key,isUsable,timeout=15000){
   while(Date.now()<deadline){
     last=await page.evaluate(({key,isUsable})=>{
       const host=document.getElementById('host'),routeKey=String(window.Orbit&&Orbit.route&&Orbit.route.key||'');
-      const loading=!!document.querySelector(key==='cliente360'?'[data-c360-authoritative-loading="1"]':'[data-cobros-hydration-loading="1"]');
+      const loading=key==='cliente360'?!!document.querySelector('[data-c360-authoritative-loading="1"]'):key==='cobros'?!!document.querySelector('[data-cobros-hydration-loading="1"]'):false;
       const denied=!!document.querySelector('.modstate');
       const rows=host?host.querySelectorAll('tbody tr').length:0;
-      const marker=key==='cobros'?!!document.querySelector('[data-cobros-core-ready="1"]'):false;
+      const marker=key==='cobros'?!!document.querySelector('[data-cobros-core-ready="1"]'):key==='cronograma'?!!document.querySelector('[data-cronograma-ready="1"]'):false;
       const diag=window.OrbitRuntimeDiagnostics&&window.OrbitRuntimeDiagnostics.cliente360&&window.OrbitRuntimeDiagnostics.cliente360.list;
       const usable=key==='cliente360'
         ? routeKey===key&&!loading&&!denied&&rows>0
@@ -163,6 +163,22 @@ try{
   proof.assertions.noSyntheticMetaPct=true;
   proof.assertions.advisorMissingMetaFailClosed=true;
 
+  await setCountry(page,'GT');await route(page,'inicio');await waitConfirmed(page,['asesores','metas'],12000);await page.waitForSelector('[data-inicio-reality-ready="1"]');
+  const metaGT=await page.evaluate(()=>{
+    const rows=Orbit.store?.all?.('metas')||[],month=Orbit.q.currentMonthKey(),advisors=Orbit.store?.all?.('asesores')||[];
+    const ids=new Set(advisors.filter(a=>String(a?.paisDefault||a?.pais||'').toUpperCase()==='GT').map(a=>String(a.id||'')));
+    const scoped=rows.filter(m=>m&&ids.has(String(m.asesorId||''))&&String(m.mes||m.periodo||'').slice(0,7)===month&&String(m.pais||'').toUpperCase()==='GT');
+    const byAid=new Map();for(const m of scoped){const a=String(m.asesorId||'');if(!byAid.has(a))byAid.set(a,{nueva:0,renovada:0,recaudo:0});if(['nueva','renovada','recaudo'].includes(String(m.tipo||'')))byAid.get(a)[m.tipo]+=Number(m.valor)||0;}
+    let production=0,recaudo=0,participants=0;for(const x of byAid.values()){const p=x.nueva+x.renovada;if(p>0){production+=p;participants++;}if(x.recaudo>0)recaudo+=x.recaudo;}
+    const prod=document.querySelector('[data-inicio-monthly="production"]'),rec=document.querySelector('[data-inicio-monthly="recaudo"]');
+    return{expectedProduction:production,expectedRecaudo:recaudo,participants,domProduction:Number(prod?.getAttribute('data-meta-value')||0),domRecaudo:Number(rec?.getAttribute('data-meta-value')||0),prodState:prod?.getAttribute('data-meta-state')||'',recState:rec?.getAttribute('data-meta-state')||''};
+  });
+  need(metaGT.participants>0,'B3_008_NO_CONFIGURED_GT_META_FIXTURE');
+  need(eq(metaGT.domProduction,metaGT.expectedProduction)&&metaGT.prodState==='configured','B3_008_PRODUCTION_META_SCHEMA_MISMATCH:'+JSON.stringify(metaGT));
+  need(eq(metaGT.domRecaudo,metaGT.expectedRecaudo)&&metaGT.recState==='configured','B3_008_COLLECTION_META_SCHEMA_MISMATCH:'+JSON.stringify(metaGT));
+  proof.metaGT=metaGT;proof.assertions.metaSchemaAligned=true;
+
+  await setCountry(page,'TODOS');
   const clientPerf=await measureUsableRoute(page,'cliente360','table-row',15000);
   proof.performance.client360ListMs=clientPerf.ms;
   proof.client360UsableState=clientPerf.state;
@@ -180,11 +196,27 @@ try{
   proof.assertions.clientListPerformance=true;
   proof.assertions.b3004SyntheticFixtureAbsent=true;
 
+  await setCountry(page,'CO');await route(page,'cliente360');await waitConfirmed(page,['clientes','polizas','carteraPrimas'],12000);await page.waitForSelector('[data-c360-list-ready="1"]');
+  const truthClientCO=await independent(page);
+  const c360CO=await page.evaluate(()=>{const e=document.querySelector('[data-c360-kpi-scope]');return{scope:e?.getAttribute('data-c360-kpi-scope')||'',clients:Number(e?.getAttribute('data-c360-kpi-client-count')),active:Number(e?.getAttribute('data-c360-kpi-active-count')),policies:Number(e?.getAttribute('data-c360-kpi-policy-count')),renew:Number(e?.getAttribute('data-c360-kpi-renew-count')),clickable:[...document.querySelectorAll('[data-c360-kpi]')].length};});
+  need(c360CO.scope==='CO'&&c360CO.clients===truthClientCO.clientCount&&c360CO.active===truthClientCO.activePolicyCount,'B3_008_CLIENT360_COUNTRY_KPI_MISMATCH:'+JSON.stringify({c360CO,truthClientCO}));
+  need(c360CO.clickable===4,'B3_008_CLIENT360_KPI_CLICKABILITY_MISSING:'+JSON.stringify(c360CO));
+  proof.client360CO=c360CO;proof.assertions.client360CountryKpis=true;proof.assertions.kpiDetailSurfaces=true;
+
+  await setCountry(page,'TODOS');
   const cobrosPerf=await measureUsableRoute(page,'cobros','core-marker',15000);
   proof.performance.cobrosCoreMs=cobrosPerf.ms;
   proof.cobrosUsableState=cobrosPerf.state;
   need(proof.performance.cobrosCoreMs<=6000,'B3_008_COBROS_CORE_TOO_SLOW:'+proof.performance.cobrosCoreMs+':'+JSON.stringify(cobrosPerf.state));
   proof.assertions.cobrosCorePerformance=true;
+
+  await setCountry(page,'TODOS');await route(page,'inicio');await page.waitForSelector('[data-inicio-reality-ready="1"]');
+  const detailOwner=await page.evaluate(()=>{document.querySelector('[data-inicio-metric="cobros-confirmados"]')?.click();return{expected:Orbit.q.cobrosConfirmadosRows?.().length||0};});
+  await page.waitForSelector('#inicio-financial-kpi[data-inicio-financial-kpi="confirmed"]');
+  const detailCount=Number(await page.locator('#inicio-financial-kpi').getAttribute('data-row-count'));
+  need(detailCount===detailOwner.expected,'B3_008_INICIO_CONFIRMED_DETAIL_OWNER_MISMATCH:'+JSON.stringify({detailCount,expected:detailOwner.expected}));
+  await page.locator('#inicio-financial-kpi [data-close]').click();
+  proof.inicioConfirmedDetail={count:detailCount};proof.assertions.inicioCanonicalDetailOwner=true;
 
   await setCountry(page,'CO');await route(page,'inicio');
   await waitConfirmed(page,['clientes','polizas','cobros','recibosEsperados','carteraPrimas'],12000);
@@ -233,11 +265,14 @@ try{
   need(h1===Number(healthTarget.expected)&&h2===Number(healthTarget.expected),'B3_008_HEALTH_INDEPENDENT_MISMATCH:'+JSON.stringify({target:healthTarget,first:h1,stable:h2}));
   proof.health={target:healthTarget,first:h1,stable:h2,independentExpected:Number(healthTarget.expected)};proof.assertions.healthStable=true;proof.assertions.healthIndependentRealClient=true;
 
-  await route(page,'cronograma');await page.waitForTimeout(800);
+  await setCountry(page,'TODOS');
+  const chronoPerf=await measureUsableRoute(page,'cronograma','marker',12000);
+  proof.performance.cronogramaMs=chronoPerf.ms;
+  need(proof.performance.cronogramaMs<=6000,'B3_007_CRONOGRAMA_TOO_SLOW:'+proof.performance.cronogramaMs);
   const chrono=await page.evaluate(()=>String(document.getElementById('host')?.innerText||''));
   const residue=/QA HUMANA B3|b300[0-9]/i.test(chrono);
   need(!residue,'B3_007_SYNTHETIC_RESIDUE_VISIBLE');
-  proof.b3007={syntheticResidueVisible:false,humanVisualStillRequired:true};proof.assertions.b3007SyntheticResidueAbsent=true;
+  proof.b3007={syntheticResidueVisible:false,humanVisualStillRequired:true,cronogramaMs:proof.performance.cronogramaMs};proof.assertions.b3007SyntheticResidueAbsent=true;proof.assertions.cronogramaPerformance=true;
 
   need(proof.pageErrors.length===0,'B3_008_PAGE_ERRORS:'+proof.pageErrors.join('|'));
   need(proof.consoleErrors.length===0,'B3_008_CONSOLE_ERRORS:'+proof.consoleErrors.join('|'));

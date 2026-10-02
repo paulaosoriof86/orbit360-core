@@ -19,22 +19,34 @@ Orbit.modules.cronograma = (function () {
     try { return !!(a && typeof a.confirmed === 'function' && a.confirmed() && q && typeof q.recibosEsperadosDe === 'function'); }
     catch (e) { return false; }
   }
-  function linkedReceipt(row) {
+  function receiptIndex() {
+    const byId=new Map(), byPolicySeq=new Map(), idsByClient=new Map();
+    (S().all('recibosEsperados')||[]).forEach(r=>{
+      if(!r)return;
+      const id=String(r.id||''),pid=String(r.polizaId||''),seq=String(r.secuencia||r.cuota||''),cid=String(r.clienteId||'');
+      if(id)byId.set(id,r);
+      if(pid&&!byPolicySeq.has(pid+'|'+seq))byPolicySeq.set(pid+'|'+seq,r);
+      if(cid&&id){let set=idsByClient.get(cid);if(!set){set=new Set();idsByClient.set(cid,set);}set.add(id);}
+    });
+    return {byId,byPolicySeq,idsByClient};
+  }
+  function linkedReceipt(row, index) {
     if (!row) return null;
+    const idx=index||receiptIndex();
     const rid = String(row.reciboId || row.receiptId || '').trim();
-    if (rid) return S().get('recibosEsperados', rid) || null;
+    if (rid) return idx.byId.get(rid) || null;
     const pid = String(row.polizaId || '').trim(), seq = String(row.secuencia || row.cuota || '').trim();
     if (!pid) return null;
-    return (S().all('recibosEsperados') || []).find(r => r && String(r.polizaId || '').trim() === pid && (!seq || String(r.secuencia || r.cuota || '').trim() === seq)) || null;
+    return idx.byPolicySeq.get(pid+'|'+seq) || idx.byPolicySeq.get(pid+'|') || null;
   }
-  function pendingObligations() {
-    const a = portfolioAdapter();
+  function pendingObligations(index) {
+    const a = portfolioAdapter(), idx=index||receiptIndex();
     if (!obligationsReady() || !a || typeof a.portfolioRows !== 'function') return [];
     return (a.portfolioRows('') || []).filter(row => {
-      const rec = linkedReceipt(row), cid = String((row && row.clienteId) || (rec && rec.clienteId) || '').trim();
+      const rec = linkedReceipt(row,idx), cid = String((row && row.clienteId) || (rec && rec.clienteId) || '').trim();
       if (!rec || !cid || !paisOK(cid)) return false;
-      const current = q.recibosEsperadosDe(cid) || [];
-      return current.some(x => x && x.id === rec.id);
+      const ids=idx.idsByClient.get(cid);
+      return !!(ids && ids.has(String(rec.id||'')));
     });
   }
   function obligationDue(row) {
@@ -50,10 +62,10 @@ Orbit.modules.cronograma = (function () {
 
   /* eventos del CRM + tareas manuales, por fecha YYYY-MM-DD */
   function eventos() {
-    const ev = {};
+    const ev = {}, receiptIdx=receiptIndex();
     const add = (fecha, e) => { if (!fecha) return; (ev[fecha] = ev[fecha] || []).push(e); };
-    pendingObligations().forEach(row => {
-      const rec = linkedReceipt(row), cid = String(row.clienteId || (rec && rec.clienteId) || '').trim();
+    pendingObligations(receiptIdx).forEach(row => {
+      const rec = linkedReceipt(row,receiptIdx), cid = String(row.clienteId || (rec && rec.clienteId) || '').trim();
       const client = S().get('clientes', cid) || {}, policy = S().get('polizas', row.polizaId || (rec && rec.polizaId)) || {};
       const label = 'Recibo pendiente · ' + (client.nombre || 'Cliente') + (policy.numero ? ' · ' + policy.numero : '');
       add(obligationDue(row), { tipo: 'recibo', icon: '🧾', color: '#c9821b', t: label, go: () => openObligation(row) });
@@ -69,7 +81,7 @@ Orbit.modules.cronograma = (function () {
 
   function draw() {
     const ev = eventos();
-    host.innerHTML = `<div class="page">
+    host.innerHTML = `<div class="page" data-cronograma-ready="1">
       ${K.banner({ icon: '📅', title: 'Cronograma', sub: 'Agenda de vencimientos y tareas del equipo', features: [], actions: `<button class="btn primary" id="cr-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Tarea</button>` })}
       <div class="cr-bar">
         <div class="mk-nav"><button class="mk-navb" id="cr-prev">‹</button><b id="cr-title" style="font-family:var(--f-display);font-size:17px;min-width:200px;text-align:center">${titulo()}</b><button class="mk-navb" id="cr-next">›</button></div>

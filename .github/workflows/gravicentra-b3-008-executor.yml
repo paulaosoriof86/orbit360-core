@@ -248,7 +248,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b3-008-preview-proof.mjs
-          node -e "const x=require(process.env.B3_008_PROOF_OUT);const a=x.assertions||{};if(x.status!=='PASS'||a.monthlyProductionIndependent!==true||a.financialRealityIndependent!==true||a.noSyntheticMetaPct!==true||a.advisorMissingMetaFailClosed!==true||a.countryScope!==true||a.clientListPerformance!==true||a.cobrosCorePerformance!==true||a.sigaDirectIncluded!==true||a.polizasCountryScope!==true||a.healthStable!==true||a.healthIndependentRealClient!==true||a.b3007SyntheticResidueAbsent!==true||a.b3004SyntheticFixtureAbsent!==true||x.operationalBusinessWrites!==0)process.exit(1);console.log('B3_008_R2_PREVIEW_MACHINE_PROOF=PASS')"
+          node -e "const x=require(process.env.B3_008_PROOF_OUT);const a=x.assertions||{};if(x.status!=='PASS'||a.monthlyProductionIndependent!==true||a.financialRealityIndependent!==true||a.noSyntheticMetaPct!==true||a.advisorMissingMetaFailClosed!==true||a.metaSchemaAligned!==true||a.countryScope!==true||a.clientListPerformance!==true||a.client360CountryKpis!==true||a.kpiDetailSurfaces!==true||a.cobrosCorePerformance!==true||a.inicioCanonicalDetailOwner!==true||a.sigaDirectIncluded!==true||a.polizasCountryScope!==true||a.healthStable!==true||a.healthIndependentRealClient!==true||a.b3007SyntheticResidueAbsent!==true||a.cronogramaPerformance!==true||a.b3004SyntheticFixtureAbsent!==true||x.operationalBusinessWrites!==0)process.exit(1);console.log('B3_008_R2_PREVIEW_MACHINE_PROOF=PASS')"
 
       - name: Upload immutable package and proof
         if: steps.gate.outputs.run == 'true'

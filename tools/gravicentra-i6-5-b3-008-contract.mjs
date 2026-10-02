@@ -11,6 +11,7 @@ const paths={
   inicio:'orbit360-platform/modules/inicio.js',
   cobros:'orbit360-platform/modules/cobros.js',
   polizas:'orbit360-platform/modules/polizas.js',
+  cronograma:'orbit360-platform/modules/cronograma.js',
   router:'orbit360-platform/core/router.js',
   store:'orbit360-platform/data/store-firestore-product-readonly-p0.js',
   crm:'orbit360-platform/modules/crm-v1198-operational-bridge.js',
@@ -21,7 +22,7 @@ const src=Object.fromEntries(Object.entries(paths).map(([k,p])=>[k,read(p)]));
 const composition=JSON.parse(read('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json'));
 const control=JSON.parse(read('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));
 
-for(const k of ['queries','cliente','inicio','cobros','polizas','router','store','crm','detailGuard']) new Function(src[k]);
+for(const k of ['queries','cliente','inicio','cobros','polizas','cronograma','router','store','crm','detailGuard']) new Function(src[k]);
 need(src.crm.includes("crmBridgeMode: 'permission-only'"),'B3_008_CRM_BRIDGE_SECOND_KPI_WRITER_PRESENT');
 need(src.detailGuard.includes('delegatedToCanonicalQueries: true'),'B3_008_DETAIL_GUARD_SECOND_SUMMARY_WRITER_PRESENT');
 need(!src.detailGuard.includes("q.clienteResumen = function"),'B3_008_DETAIL_GUARD_OVERRIDES_CANONICAL_SUMMARY');
@@ -33,6 +34,8 @@ need(src.queries.includes('function realizedPaymentRows()'),'B3_008_REALIZED_PAY
 need(src.queries.includes('function produccionMesPorMoneda('),'B3_008_MONTHLY_PRODUCTION_OWNER_MISSING');
 need(src.queries.includes('function recaudoMesPorMoneda('),'B3_008_MONTHLY_COLLECTION_OWNER_MISSING');
 need(src.queries.includes('function leaderboardMes('),'B3_008_MONTHLY_ADVISOR_OWNER_MISSING');
+need(src.queries.includes('function metaAdvisorMes('),'B3_008_MONTHLY_META_SCHEMA_OWNER_MISSING');
+need(src.queries.includes('function cobrosConfirmadosRows()'),'B3_008_CONFIRMED_DETAIL_OWNER_MISSING');
 need(src.queries.includes('function polizasScoped()'),'B3_008_POLICY_COUNTRY_SCOPE_OWNER_MISSING');
 need(src.queries.includes('function clientesScoped()'),'B3_008_CLIENT_COUNTRY_SCOPE_OWNER_MISSING');
 need((src.queries.match(/const cob = realizedPaymentRows\(\)\.filter/g)||[]).length>=2,'B3_008_FINANCIAL_KPI_NOT_REALIZED_PAYMENT_BASED');
@@ -45,27 +48,41 @@ need(src.inicio.includes("data-meta-state="),'B3_008_META_FAIL_CLOSED_MARKER_MIS
 need(src.inicio.includes("q.clientesScoped"),'B3_008_INICIO_CLIENT_SCOPE_MISSING');
 need(src.inicio.includes("q.polizasScoped"),'B3_008_INICIO_POLICY_SCOPE_MISSING');
 need(src.inicio.includes("data-values="),'B3_008_INDEPENDENT_VALUE_MARKERS_MISSING');
+need(src.inicio.includes("data-meta-value="),'B3_008_META_TARGET_MARKER_MISSING');
+need(src.inicio.includes("Cobros confirmados"),'B3_008_CONFIRMED_SEMANTIC_LABEL_MISSING');
+need(src.inicio.includes("q.cobrosConfirmadosRows"),'B3_008_CONFIRMED_MODAL_CANONICAL_OWNER_MISSING');
 
 need(src.cliente.includes("return ['clientes'].every"),'B3_008_CLIENT_LIST_PRIMARY_READINESS_INVALID');
 need(src.cliente.includes("const policyReadiness = dataReadiness(['polizas'])"),'B3_008_CLIENT_LIST_PROGRESSIVE_POLICY_READINESS_MISSING');
 need(src.cliente.includes("Actualizando pólizas"),'B3_008_CLIENT_LIST_POLICY_FAIL_CLOSED_COPY_MISSING');
 need(src.cliente.includes("ensureDataCollections(['clientes','polizas','asesores','carteraPrimas'])"),'B3_008_CLIENT_LIST_PREWARM_MISSING');
 need(src.cliente.includes('data-c360-list-ready="1"'),'B3_008_CLIENT_LIST_READY_MARKER_MISSING');
+need(src.cliente.includes('data-c360-kpi-scope='),'B3_008_CLIENT360_KPI_COUNTRY_SCOPE_MARKER_MISSING');
+need((src.cliente.match(/data-c360-kpi="/g)||[]).length===4,'B3_008_CLIENT360_ALL_KPIS_NOT_CLICKABLE');
 need(src.index.includes('data/store-firestore-product-readonly-p0.js?v=20261002-b3008r4'),'B3_008_INDEXED_STORE_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/crm-v1198-operational-bridge.js?v=20261002-b3008r4'),'B3_008_CRM_CANONICAL_OWNER_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/policy-receipts-v1199-detail-guard.js?v=20261002-b3008r4'),'B3_008_DETAIL_GUARD_CANONICAL_OWNER_ASSET_BINDING_MISSING');
+need(src.index.includes('core/queries.js?v=20261002-b3008r5'),'B3_008_R5_QUERY_ASSET_BINDING_MISSING');
+need(src.index.includes('modules/inicio.js?v=20261002-b3008r5'),'B3_008_R5_INICIO_ASSET_BINDING_MISSING');
+need(src.index.includes('modules/cliente360.js?v=20261002-b3008r5'),'B3_008_R5_CLIENTE360_ASSET_BINDING_MISSING');
+need(src.index.includes('modules/cronograma.js?v=20261002-b3008r5'),'B3_007_R5_CRONOGRAMA_ASSET_BINDING_MISSING');
 
 need(src.cobros.includes("const CORE_HYDRATION_DEPS = ['cobros', 'clientes', 'polizas']"),'B3_008_COBROS_CORE_PROGRESSIVE_HYDRATION_MISSING');
 need(src.cobros.includes("const FINANCIAL_HYDRATION_DEPS = ['recibosEsperados', 'carteraPrimas']"),'B3_008_COBROS_FINANCIAL_DEPS_MISSING');
 need(src.cobros.includes('data-cobros-core-ready="1"'),'B3_008_COBROS_CORE_READY_MARKER_MISSING');
 need(src.cobros.includes('data-cobros-financial-readiness='),'B3_008_COBROS_FINANCIAL_READINESS_MARKER_MISSING');
 need(src.cobros.includes('Actualizando datos'),'B3_008_COBROS_PARTIAL_ZERO_GUARD_MISSING');
+need(src.cobros.includes("Orbit.modules.cobros.kpi('confirmed')"),'B3_008_COBROS_CONFIRMED_KPI_DETAIL_MISSING');
+need(src.cobros.includes("Orbit.modules.cobros.kpi('pending')"),'B3_008_COBROS_PENDING_KPI_DETAIL_MISSING');
+need(src.cobros.includes("Orbit.modules.cobros.kpi('overdue')"),'B3_008_COBROS_OVERDUE_KPI_DETAIL_MISSING');
 
 need(src.polizas.includes("const all = q.polizasScoped ? q.polizasScoped()"),'B3_008_POLIZAS_COUNTRY_SCOPE_MISSING');
 need(src.polizas.includes("st.fkind === 'active' ? isActivePolicy(p)"),'B3_008_POLIZAS_ACTIVE_KPI_FILTER_MISMATCH');
 need(src.polizas.includes("label: 'Pólizas activas'"),'B3_008_POLIZAS_ACTIVE_LABEL_MISSING');
+need(src.cronograma.includes('function receiptIndex()'),'B3_007_CRONOGRAMA_INDEX_MISSING');
+need(src.cronograma.includes('data-cronograma-ready="1"'),'B3_007_CRONOGRAMA_READY_MARKER_MISSING');
 
-for(const p of [paths.queries,paths.cliente,paths.inicio,paths.cobros,paths.polizas,paths.store,paths.crm,paths.detailGuard,paths.index]){
+for(const p of [paths.queries,paths.cliente,paths.inicio,paths.cobros,paths.polizas,paths.cronograma,paths.store,paths.crm,paths.detailGuard,paths.index]){
   need(composition.productFileBlobs?.[p]===git('hash-object',p),'B3_008_COMPOSITION_BLOB_DRIFT:'+p);
 }
 need(control.currentB3?.status==='B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW','B3_008_CONTROL_STATUS_INVALID');

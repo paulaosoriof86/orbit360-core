@@ -374,12 +374,12 @@ Orbit.modules.cobros = (function () {
       ${isPreviewHost()?'<div class="card pad" data-preview-safe-mode="1" style="margin-bottom:12px;border-left:3px solid var(--info)"><b>Vista previa segura</b><div class="muted" style="margin-top:4px">Los registros reales son solo lectura. Las pruebas de escritura solo se habilitan en el caso QA sintético aislado.</div></div>':''}
       ${qaReceipt?'<div class="card pad" data-b3004-human-qa-mode="1" style="margin-bottom:12px;border-left:3px solid var(--ok)"><b>Prueba QA sintética aislada</b><div class="muted" style="margin-top:4px">Esta vista contiene únicamente el recibo de prueba autorizado; no mezcla clientes reales.</div></div>':''}
       ${K.kpis(hyd.financialReady ? [
-        { label: 'Cartera al día', val: currencyMetric(cart, 'alDia'), color: 'var(--ok)', foot: 'cobros confirmados · sin conversión entre monedas', footTone: 'up' },
-        { label: 'Pendiente', val: currencyMetric(cart, 'pend'), color: 'var(--warn)', foot: 'por vencer · por moneda' },
-        { label: 'Vencido', val: currencyMetric(cart, 'venc'), color: 'var(--danger)', foot: 'en gestión · por moneda', footTone: 'down' },
-        { label: 'Por conciliar', onclick: "location.hash='#/cobros'", val: porConciliar, color: 'var(--info)', foot: 'cobros confirmados sin conciliación' }
+        { label: 'Cobros confirmados', onclick: "Orbit.modules.cobros.kpi('confirmed')", val: currencyMetric(cart, 'alDia'), color: 'var(--ok)', foot: 'pagos confirmados · sin conversión entre monedas', footTone: 'up' },
+        { label: 'Pendiente', onclick: "Orbit.modules.cobros.kpi('pending')", val: currencyMetric(cart, 'pend'), color: 'var(--warn)', foot: 'obligaciones por vencer · por moneda' },
+        { label: 'Vencido', onclick: "Orbit.modules.cobros.kpi('overdue')", val: currencyMetric(cart, 'venc'), color: 'var(--danger)', foot: 'obligaciones vencidas · por moneda', footTone: 'down' },
+        { label: 'Por conciliar', onclick: "Orbit.modules.cobros.kpi('reconcile')", val: porConciliar, color: 'var(--info)', foot: 'cobros confirmados sin conciliación' }
       ] : [
-        { label: 'Cartera al día', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando pagos y recibos' },
+        { label: 'Cobros confirmados', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando pagos y recibos' },
         { label: 'Pendiente', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando cartera' },
         { label: 'Vencido', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando cartera' },
         { label: 'Por conciliar', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando pagos' }
@@ -787,6 +787,20 @@ Orbit.modules.cobros = (function () {
     };
   }
 
+  function kpi(kind) {
+    const ready=hydrationState().financialReady;
+    if(!ready)return U.toast('Los indicadores todavía se están actualizando.');
+    const confirmed=q.cobrosConfirmadosRows?q.cobrosConfirmadosRows():[];
+    const rows=kind==='confirmed'?confirmed:kind==='pending'?(q.carteraPendienteRows?q.carteraPendienteRows():[]):kind==='overdue'?(q.carteraVencidaRows?q.carteraVencidaRows():[]):confirmed.filter(r=>r&&r.conciliado!==true);
+    const title=kind==='confirmed'?'Cobros confirmados':kind==='pending'?'Pendiente':kind==='overdue'?'Vencido':'Por conciliar';
+    const receipts=new Map((S().all('recibosEsperados')||[]).filter(r=>r&&r.id!=null).map(r=>[String(r.id),r]));
+    let back=document.getElementById('cobros-kpi-detail');if(back)back.remove();
+    back=document.createElement('div');back.id='cobros-kpi-detail';back.className='drawer-back open';back.style.cssText='display:grid;place-items:center;z-index:110';back.setAttribute('data-row-count',String(rows.length));
+    const body=rows.slice(0,300).map(r=>{const rec=receipts.get(String(r.reciboId||r.receiptId||''))||{};const cid=r.clienteId||rec.clienteId||'',cli=S().get('clientes',cid)||{};const p=S().get('polizas',r.polizaId||rec.polizaId)||{};const raw=r.monto!=null?r.monto:r.saldo!=null?r.saldo:rec.primaTotal!=null?rec.primaTotal:rec.montoTotal;const cur=r.moneda||rec.moneda||p.moneda||cli.moneda||'';const due=kind==='confirmed'?(r.fechaPago||r.paidDate||r.inferredEffectiveDate||''):(r.vence||r.fechaVencimiento||r.fechaLimite||rec.fechaLimite||rec.vence||'');return `<tr><td>${U.esc(cli.nombre||'—')}</td><td>${U.esc(p.numero||'—')}</td><td>${U.esc(r.cuota||r.secuencia||rec.cuota||rec.secuencia||'—')}</td><td>${U.finiteNumber(raw)==null?'Sin monto fuente':U.money(raw,cur)}</td><td>${U.fmtDate(due)}</td></tr>`;}).join('');
+    back.innerHTML=`<div class="card" style="width:min(860px,96vw);max-height:88vh;overflow:auto;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"><b>${title} · ${rows.length}</b><button class="imp-x" data-close>✕</button></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Cliente</th><th>Póliza</th><th>Cuota</th><th>Monto</th><th>Fecha</th></tr></thead><tbody>${body||'<tr><td colspan="5" class="muted" style="text-align:center;padding:24px">Sin registros.</td></tr>'}</tbody></table></div>${rows.length>300?'<div class="muted" style="padding:10px 20px">Se muestran los primeros 300 registros; usa filtros para acotar el universo.</div>':''}</div>`;
+    document.body.appendChild(back);const close=()=>back.remove();back.querySelector('[data-close]').onclick=close;back.onclick=e=>{if(e.target===back)close();};
+  }
+
   /* ---- Preparación de cobro por LOTE (selecciona recibos pendientes/vencidos) ---- */
   function lote() {
     const idx = buildIndex();
@@ -838,5 +852,5 @@ Orbit.modules.cobros = (function () {
     paint();
   }
 
-  return { render, detalle, reportarPago, aplicarPago, validarReporte, conciliarFactura, resolveReceiptId, lote, pagina };
+  return { render, detalle, reportarPago, aplicarPago, validarReporte, conciliarFactura, resolveReceiptId, lote, pagina, kpi };
 })();

@@ -289,20 +289,34 @@ Orbit.q = (function () {
     });
     return out;
   }
+  function metaAdvisorMes(asesorId, monthKey, country) {
+    const key = String(monthKey || currentMonthKey()).slice(0, 7);
+    const wantedCountry = countryCode(country || paisActivo());
+    const rows = (S().all('metas') || []).filter(m =>
+      m && String(m.asesorId || '') === String(asesorId || '') &&
+      String(m.mes || m.periodo || '').slice(0, 7) === key &&
+      (!wantedCountry || countryCode(m.pais) === wantedCountry)
+    );
+    const explicit = rows.filter(m => ['nueva','renovada','recaudo'].includes(String(m.tipo || '')));
+    const sum = type => explicit.filter(m => String(m.tipo || '') === type).reduce((s,m) => s + amount(m.valor), 0);
+    const nueva = sum('nueva'), renovada = sum('renovada'), recaudo = sum('recaudo');
+    const produccion = nueva + renovada;
+    return { nueva, renovada, recaudo, produccion, explicit: explicit.length > 0, pais: wantedCountry || '' };
+  }
   function leaderboardMes(monthKey) {
     const key = String(monthKey || currentMonthKey()).slice(0, 7);
-    const metas = (S().all('metas') || []).filter(m => String(m && m.mes || '').slice(0, 7) === key && m && m.asesorId);
-    return (S().all('asesores') || []).map(a => {
+    const activeCountry = paisActivo();
+    return (S().all('asesores') || []).filter(a => !activeCountry || countryCode(a && (a.paisDefault || a.pais)) === activeCountry).map(a => {
       const byCurrency = produccionMesPorMoneda(key, a.id);
-      const metaRow = metas.find(m => m.asesorId === a.id && m.tipo === 'prima');
-      const explicit = finite(metaRow && metaRow.valor);
+      const target = metaAdvisorMes(a.id, key, activeCountry || countryCode(a && (a.paisDefault || a.pais)));
       const base = finite(a && a.metaPrima);
-      const metaPrima = explicit != null && explicit > 0 ? explicit : (base != null && base > 0 ? base : null);
+      const metaPrima = target.explicit ? (target.produccion > 0 ? target.produccion : null) : (base != null && base > 0 ? base : null);
       const currencies = Object.keys(byCurrency).filter(cur => Math.abs(Number(byCurrency[cur]) || 0) > 0);
-      const expectedCurrency = countryCode(a && a.pais) === 'CO' ? 'COP' : countryCode(a && a.pais) === 'GT' ? 'GTQ' : (currencies.length === 1 ? currencies[0] : '');
+      const expectedCountry = activeCountry || countryCode(a && (a.paisDefault || a.pais));
+      const expectedCurrency = expectedCountry === 'CO' ? 'COP' : expectedCountry === 'GT' ? 'GTQ' : (currencies.length === 1 ? currencies[0] : '');
       const prima = expectedCurrency ? amount(byCurrency[expectedCurrency]) : 0;
       const pct = metaPrima && expectedCurrency ? Math.max(0, Math.min(140, Math.round(prima / metaPrima * 100))) : null;
-      return { asesor: a, byCurrency, prima, pct, metaPrima, metaDisponible: metaPrima != null, moneda: expectedCurrency };
+      return { asesor: a, byCurrency, prima, pct, metaPrima, metaDisponible: metaPrima != null, moneda: expectedCurrency, metaNueva: target.nueva, metaRenovada: target.renovada, metaRecaudo: target.recaudo };
     }).sort((x, y) => y.prima - x.prima);
   }
 
@@ -319,6 +333,11 @@ Orbit.q = (function () {
   }
   function carteraPendienteRows() { return carteraRowsScoped().filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)); }
   function carteraVencidaRows() { return carteraRowsScoped().filter(portfolioIsOverdue); }
+  function cobrosConfirmadosRows() {
+    const clients = clientIndex();
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
+    return realizedPaymentRows().filter(r => rowPais(r, clients, policies) && confirmedCobro(r));
+  }
 
   /** Cartera Primas es la autoridad de pendiente/vencido; Cobros solo aporta recaudo confirmado. */
   function carteraGlobal() {
@@ -464,8 +483,8 @@ Orbit.q = (function () {
 
   return {
     asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
-    clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
-    clientesScoped, polizasScoped, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, leaderboardMes,
+    clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, cobrosConfirmadosRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
+    clientesScoped, polizasScoped, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, metaAdvisorMes, leaderboardMes,
     agingVencido, agingVencidoPorMoneda, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();

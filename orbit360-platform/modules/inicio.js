@@ -36,32 +36,60 @@ Orbit.modules.inicio = (function () {
     const txt=readiness==='unavailable'?'No disponible':'Actualizando datos';
     return `<div data-inicio-dial="${label}" data-readiness="${readiness}" style="width:118px;min-height:118px;display:grid;place-items:center;text-align:center;border:1px solid var(--line);border-radius:50%;color:var(--ink-3);font-size:12px;font-weight:600">${txt}</div>`;
   }
+  function receiptIndex() {
+    const byId=new Map(), byPolicySeq=new Map();
+    (Orbit.store.all('recibosEsperados')||[]).forEach(r=>{
+      if(!r)return;
+      if(r.id!=null)byId.set(String(r.id),r);
+      const pid=String(r.polizaId||''),seq=String(r.secuencia||r.cuota||'');
+      if(pid)byPolicySeq.set(pid+'|'+seq,r);
+    });
+    return {byId,byPolicySeq};
+  }
   function openFinancialKpi(kind) {
     const isConfirmed=kind==='confirmed';
-    const state=dataReadiness(isConfirmed?['clientes','cobros']:['clientes','polizas','carteraPrimas']);
-    if(isConfirmed && state==='ready') return Orbit.kpi('cobros-pagados');
+    const state=dataReadiness(isConfirmed?['clientes','polizas','cobros','recibosEsperados']:['clientes','polizas','carteraPrimas','recibosEsperados']);
+    const rows=state==='ready'?(isConfirmed?(q.cobrosConfirmadosRows?q.cobrosConfirmadosRows():[]):(kind==='pending'?q.carteraPendienteRows():q.carteraVencidaRows())):[];
     const title=kind==='pending'?'Pendiente de cobro':kind==='overdue'?'Cartera vencida':'Cobros confirmados';
-    const rows=state==='ready'?(kind==='pending'?q.carteraPendienteRows():q.carteraVencidaRows()):[];
     let back=document.getElementById('inicio-financial-kpi'); if(back)back.remove();
     back=document.createElement('div');back.id='inicio-financial-kpi';back.className='drawer-back open';
     back.setAttribute('data-inicio-financial-kpi',kind);back.setAttribute('data-readiness',state);back.setAttribute('data-row-count',String(rows.length));
     back.style.cssText='display:grid;place-items:center;z-index:96';
+    const rx=receiptIndex();
+    const resolveReceipt=row=>{
+      const rid=String(row&&((row.reciboId||row.receiptId))||'');
+      if(rid&&rx.byId.has(rid))return rx.byId.get(rid);
+      const pid=String(row&&row.polizaId||''),seq=String(row&&(row.secuencia||row.cuota)||'');
+      return rx.byPolicySeq.get(pid+'|'+seq)||null;
+    };
     const rowHtml=rows.map((row,i)=>{
-      const cid=row.clienteId||(q.policyLinkedClientId?q.policyLinkedClientId(row):'');
+      const rec=resolveReceipt(row);
+      const cid=row.clienteId||(rec&&rec.clienteId)||(q.policyLinkedClientId?q.policyLinkedClientId(row):'');
       const cli=cid?Orbit.store.get('clientes',cid):null;
-      const due=row.vence||row.fechaVencimiento||row.fechaLimite||'';
-      const value=row.monto!=null?row.monto:row.saldo;
-      const label=kind==='overdue'?'Vencido':'Pendiente';
-      return `<tr class="clickable" data-r="${i}" data-client="${U.esc(cid||'')}"><td>${U.esc(cli?cli.nombre:'—')}</td><td>${U.esc(row.cuota||row.secuencia||'—')}</td><td>${U.money(value,row.moneda)}</td><td>${U.fmtDate(due)}</td><td><span class="badge ${label==='Vencido'?'danger':'warn'}">${label}</span></td></tr>`;
+      const due=isConfirmed?(row.fechaPago||row.paidDate||row.inferredEffectiveDate||row.vence||''):(row.vence||row.fechaVencimiento||row.fechaLimite||(rec&&(rec.fechaLimite||rec.vence))||'');
+      const rawValue=row.monto!=null?row.monto:row.saldo!=null?row.saldo:(rec&&(rec.primaTotal!=null?rec.primaTotal:rec.montoTotal!=null?rec.montoTotal:rec.monto));
+      const cur=row.moneda||(rec&&rec.moneda)||'';
+      const cuota=row.cuota||row.secuencia||(rec&&(rec.cuota||rec.secuencia))||'—';
+      const label=isConfirmed?'Pagado':kind==='overdue'?'Vencido':'Pendiente';
+      const amountText=U.finiteNumber(rawValue)==null?'Sin monto fuente':U.money(rawValue,cur);
+      return `<tr class="clickable" data-r="${i}" data-client="${U.esc(cid||'')}"><td>${U.esc(cli?cli.nombre:'—')}</td><td>${U.esc(cuota)}</td><td>${U.esc(amountText)}</td><td>${U.fmtDate(due)}</td><td><span class="badge ${label==='Vencido'?'danger':label==='Pendiente'?'warn':'ok'}">${label}</span></td></tr>`;
     }).join('');
     back.innerHTML=state!=='ready'
       ? `<div class="card" style="width:min(560px,96vw);padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"><b>${title}</b><button class="imp-x" data-close>✕</button></div><div class="muted" data-kpi-pending="1" style="padding:26px;text-align:center">${state==='unavailable'?'Información no disponible para este acceso.':'Actualizando datos… Estamos esperando confirmación del servidor.'}</div></div>`
-      : `<div class="card" style="width:min(760px,96vw);max-height:88vh;overflow:auto;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"><b>${title} · ${rows.length}</b><button class="imp-x" data-close>✕</button></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Cliente</th><th>Cuota</th><th>Monto</th><th>Vence</th><th>Estado</th></tr></thead><tbody>${rowHtml||'<tr><td colspan="5" class="muted" style="text-align:center;padding:24px">Sin registros.</td></tr>'}</tbody></table></div></div>`;
+      : `<div class="card" style="width:min(820px,96vw);max-height:88vh;overflow:auto;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"><b>${title} · ${rows.length}</b><button class="imp-x" data-close>✕</button></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Cliente</th><th>Cuota</th><th>Monto</th><th>${isConfirmed?'Fecha efectiva':'Vence'}</th><th>Estado</th></tr></thead><tbody>${rowHtml||'<tr><td colspan="5" class="muted" style="text-align:center;padding:24px">Sin registros.</td></tr>'}</tbody></table></div></div>`;
     document.body.appendChild(back);
     const close=()=>back.remove();
     back.querySelectorAll('[data-close]').forEach(x=>x.onclick=close);
     back.onclick=e=>{if(e.target===back)close();};
     back.querySelectorAll('[data-client]').forEach(tr=>tr.onclick=()=>{const cid=tr.getAttribute('data-client');close();if(cid)location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&t=recibos';});
+  }
+  function openRenewalsKpi() {
+    const rows=q.renovacionesProximas?q.renovacionesProximas(45):[];
+    let back=document.getElementById('inicio-renewals-kpi');if(back)back.remove();
+    back=document.createElement('div');back.id='inicio-renewals-kpi';back.className='drawer-back open';back.style.cssText='display:grid;place-items:center;z-index:96';back.setAttribute('data-row-count',String(rows.length));
+    const body=rows.map(p=>{const cli=Orbit.store.get('clientes',p.clienteId)||{};const d=U.daysFromNow(p.vigenciaFin);const cur=p.moneda||cli.moneda||'';const net=U.finiteNumber(p.primaNeta!=null?p.primaNeta:p.prima);return `<tr class="clickable" data-client="${U.esc(p.clienteId||'')}"><td>${U.esc(cli.nombre||'—')}</td><td>${U.esc(p.numero||'—')}</td><td>${U.esc(p.ramo||p.producto||'—')}</td><td>${net==null?'Sin monto fuente':U.money(net,cur)}</td><td>${U.fmtDate(p.vigenciaFin)}</td><td>${d==null?'—':d+' d'}</td></tr>`;}).join('');
+    back.innerHTML=`<div class="card" style="width:min(860px,96vw);max-height:88vh;overflow:auto;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"><b>Renovaciones ≤45 d · ${rows.length}</b><button class="imp-x" data-close>✕</button></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Cliente</th><th>Póliza</th><th>Ramo</th><th>Prima neta</th><th>Vence</th><th>Faltan</th></tr></thead><tbody>${body||'<tr><td colspan="6" class="muted" style="text-align:center;padding:24px">Sin renovaciones próximas.</td></tr>'}</tbody></table></div></div>`;
+    document.body.appendChild(back);const close=()=>back.remove();back.querySelector('[data-close]').onclick=close;back.onclick=e=>{if(e.target===back)close();};back.querySelectorAll('[data-client]').forEach(tr=>tr.onclick=()=>{const cid=tr.getAttribute('data-client');close();if(cid)location.hash='#/cliente360?c='+encodeURIComponent(cid);});
   }
 
   function render(host) {
@@ -81,11 +109,13 @@ Orbit.modules.inicio = (function () {
     const escAttr=value=>U.esc(encodeURIComponent(JSON.stringify(value||{})));
     const moneyMap=map=>{const keys=Object.keys(map||{}).sort((a,b)=>(a==='GTQ'?0:a==='COP'?1:2)-(b==='GTQ'?0:b==='COP'?1:2)||a.localeCompare(b));if(!keys.length)return'Sin movimientos';return keys.map(cur=>'<span style="display:block;white-space:nowrap">'+U.esc(U.moneyShort(map[cur]||0,cur))+' '+U.esc(cur)+'</span>').join('');};
     const metricMap=field=>{const out={};Object.keys(cart.byCurrency||{}).forEach(cur=>{out[cur]=Number(cart.byCurrency[cur]&&cart.byCurrency[cur][field]||0);});return out;};
-    const configuredMeta=tipo=>{if(metaReadiness!=='ready'||!activeCurrency)return null;const exact=metasMes.find(m=>m&&m.tipo===tipo&&!m.asesorId&&(!m.pais||activeCountry==='TODOS'||String(m.pais).toUpperCase()===activeCountry));const n=U.finiteNumber(exact&&exact.valor);if(n!=null&&n>0)return n;if(tipo==='prima'&&advisors.length){const vals=advisors.map(a=>U.finiteNumber(a&&a.metaPrima));if(vals.every(v=>v!=null&&v>0))return vals.reduce((s,v)=>s+v,0);}return null;};
+    const configuredMeta=tipo=>{if(metaReadiness!=='ready'||!activeCurrency)return null;const curOf=m=>String(m&&m.moneda||'').toUpperCase()||(String(m&&m.pais||'').toUpperCase()==='CO'?'COP':String(m&&m.pais||'').toUpperCase()==='GT'?'GTQ':'');const advisorIds=new Set(advisors.map(a=>String(a&&a.id||'')).filter(Boolean));const scoped=metasMes.filter(m=>m&&m.asesorId&&advisorIds.has(String(m.asesorId))&&curOf(m)===activeCurrency);if(tipo==='prima'){let total=0,participants=0;advisors.forEach(a=>{const aid=String(a&&a.id||'');const rows=scoped.filter(m=>String(m.asesorId)===aid);const explicit=rows.some(m=>['nueva','renovada','recaudo'].includes(String(m.tipo||'')));const prod=rows.filter(m=>['nueva','renovada'].includes(String(m.tipo||''))).reduce((s,m)=>s+(U.finiteNumber(m.valor)||0),0);if(explicit){if(prod>0){total+=prod;participants++;}}else{const legacy=U.finiteNumber(a&&a.metaPrima);if(legacy!=null&&legacy>0){total+=legacy;participants++;}}});if(participants>0)return total;}if(tipo==='recaudo'){const vals=scoped.filter(m=>String(m.tipo||'')==='recaudo').map(m=>U.finiteNumber(m.valor)).filter(v=>v!=null&&v>0);if(vals.length)return vals.reduce((s,v)=>s+v,0);}const exact=metasMes.find(m=>m&&m.tipo===tipo&&!m.asesorId&&curOf(m)===activeCurrency);const n=U.finiteNumber(exact&&exact.valor);return n!=null&&n>0?n:null;};
     const metaPrima=configuredMeta('prima'),metaRec=configuredMeta('recaudo'),prodValue=activeCurrency?Number(production[activeCurrency]||0):null,recValue=activeCurrency?Number(recaudoMes[activeCurrency]||0):null;
     const pctPrima=metaPrima&&prodValue!=null?Math.max(0,Math.min(140,Math.round(prodValue/metaPrima*100))):null,pctRec=metaRec&&recValue!=null?Math.max(0,Math.min(140,Math.round(recValue/metaRec*100))):null;
-    const targetDial=(kind,label,map,pct,meta)=>{const state=!activeCurrency?'currency-required':metaReadiness!=='ready'?'loading':meta?'configured':'missing',pctText=pct==null?'—':pct+'%',deg=pct==null?0:Math.max(0,Math.min(100,pct))*3.6,note=state==='currency-required'?'Selecciona un país para comparar con meta':state==='loading'?'Actualizando meta':state==='missing'?'Meta no configurada':'Meta '+U.moneyShort(meta,activeCurrency);return '<div data-inicio-monthly="'+kind+'" data-values="'+escAttr(map)+'" data-meta-state="'+state+'" data-pct="'+(pct==null?'':pct)+'" style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--red) '+deg+'deg,var(--line) '+deg+'deg)"><div style="width:90px;height:90px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center;box-shadow:inset 0 0 0 1px var(--line)"><div><div style="font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--ink)">'+pctText+'</div><div style="font-size:10px;color:var(--ink-3);font-family:var(--f-mono)">'+moneyMap(map)+'</div></div></div></div><div style="font-size:12px;color:var(--ink-2);font-weight:600">'+label+'</div><div class="muted" style="font-size:10.5px;text-align:center;max-width:150px">'+note+'</div></div>';};
+    const targetDial=(kind,label,map,pct,meta)=>{const state=!activeCurrency?'currency-required':metaReadiness!=='ready'?'loading':meta?'configured':'missing',pctText=pct==null?'—':pct+'%',deg=pct==null?0:Math.max(0,Math.min(100,pct))*3.6,note=state==='currency-required'?'Selecciona un país para comparar con meta':state==='loading'?'Actualizando meta':state==='missing'?'Meta no configurada':'Meta '+U.moneyShort(meta,activeCurrency);return '<div data-inicio-monthly="'+kind+'" data-values="'+escAttr(map)+'" data-meta-state="'+state+'" data-meta-value="'+(meta==null?'':meta)+'" data-pct="'+(pct==null?'':pct)+'" style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--red) '+deg+'deg,var(--line) '+deg+'deg)"><div style="width:90px;height:90px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center;box-shadow:inset 0 0 0 1px var(--line)"><div><div style="font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--ink)">'+pctText+'</div><div style="font-size:10px;color:var(--ink-3);font-family:var(--f-mono)">'+moneyMap(map)+'</div></div></div></div><div style="font-size:12px;color:var(--ink-2);font-weight:600">'+label+'</div><div class="muted" style="font-size:10.5px;text-align:center;max-width:150px">'+note+'</div></div>';};
     const confirmedMap=metricMap('alDia'),pendingMap=metricMap('pend'),overdueMap=metricMap('venc');
+    const confirmedRows=paymentReadiness==='ready'&&q.cobrosConfirmadosRows?q.cobrosConfirmadosRows():[],pendingRows=portfolioReadiness==='ready'&&q.carteraPendienteRows?q.carteraPendienteRows():[],overdueRows=portfolioReadiness==='ready'&&q.carteraVencidaRows?q.carteraVencidaRows():[];
+    const valuedCount=rows=>rows.filter(r=>U.finiteNumber(r&&r.monto)!=null||U.finiteNumber(r&&r.saldo)!=null).length;
     const diasMes=new Date(U.now().getFullYear(),U.now().getMonth()+1,0).getDate()-U.now().getDate();
 
     host.innerHTML=`<div class="page" data-inicio-reality-ready="1">
@@ -96,10 +126,10 @@ Orbit.modules.inicio = (function () {
         ${paymentReadiness==='ready'?targetDial('recaudo','Recaudo confirmado del mes',recaudoMes,pctRec,metaRec):pendingDial('Recaudo confirmado del mes',paymentReadiness)}
       </div>
       <div class="kpi-row" style="margin-top:18px">
-        <button class="kpi kpi-click" data-inicio-metric="cobros-confirmados" data-readiness="${paymentReadiness}" data-values="${escAttr(confirmedMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('confirmed')" title="Ver cobros confirmados"><div class="k-accent" style="background:${paymentReadiness==='ready'?'var(--red)':'var(--line)'}"></div><div class="k-label">Cartera al día</div><div class="k-val">${paymentReadiness==='ready'?moneyMap(confirmedMap):(paymentReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot ${paymentReadiness==='ready'?'up':'muted'}">${paymentReadiness==='ready'?'cobros confirmados ›':'Esperando confirmación del servidor'}</div></button>
-        <button class="kpi kpi-click" data-inicio-metric="cartera-pendiente" data-readiness="${portfolioReadiness}" data-values="${escAttr(pendingMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('pending')" title="Ver pendiente de cobro"><div class="k-accent" style="background:${portfolioReadiness==='ready'?'var(--warn)':'var(--line)'}"></div><div class="k-label">Pendiente de cobro</div><div class="k-val">${portfolioReadiness==='ready'?moneyMap(pendingMap):(portfolioReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot muted">${portfolioReadiness==='ready'?'cuotas por vencer ›':'Esperando confirmación del servidor'}</div></button>
-        <button class="kpi kpi-click" data-inicio-metric="cartera-vencida" data-readiness="${portfolioReadiness}" data-values="${escAttr(overdueMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('overdue')" title="Ver cartera vencida"><div class="k-accent" style="background:${portfolioReadiness==='ready'?'var(--danger)':'var(--line)'}"></div><div class="k-label">Cartera vencida</div><div class="k-val">${portfolioReadiness==='ready'?moneyMap(overdueMap):(portfolioReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot ${portfolioReadiness==='ready'?'down':'muted'}">${portfolioReadiness==='ready'?'requiere gestión ›':'Esperando confirmación del servidor'}</div></button>
-        <button class="kpi kpi-click" onclick="Orbit.kpi('renov-proximas')" title="Ver renovaciones"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Renovaciones ≤45 d</div><div class="k-val">${renov.length}</div><div class="k-foot muted">pólizas por renovar ›</div></button>
+        <button class="kpi kpi-click" data-inicio-metric="cobros-confirmados" data-readiness="${paymentReadiness}" data-values="${escAttr(confirmedMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('confirmed')" title="Ver cobros confirmados"><div class="k-accent" style="background:${paymentReadiness==='ready'?'var(--red)':'var(--line)'}"></div><div class="k-label">Cobros confirmados</div><div class="k-val">${paymentReadiness==='ready'?moneyMap(confirmedMap):(paymentReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot ${paymentReadiness==='ready'?'up':'muted'}">${paymentReadiness==='ready'?confirmedRows.length+' pagos confirmados ›':'Esperando confirmación del servidor'}</div></button>
+        <button class="kpi kpi-click" data-inicio-metric="cartera-pendiente" data-readiness="${portfolioReadiness}" data-values="${escAttr(pendingMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('pending')" title="Ver pendiente de cobro"><div class="k-accent" style="background:${portfolioReadiness==='ready'?'var(--warn)':'var(--line)'}"></div><div class="k-label">Pendiente de cobro</div><div class="k-val">${portfolioReadiness==='ready'?moneyMap(pendingMap):(portfolioReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot muted">${portfolioReadiness==='ready'?pendingRows.length+' obligaciones · '+valuedCount(pendingRows)+' con monto ›':'Esperando confirmación del servidor'}</div></button>
+        <button class="kpi kpi-click" data-inicio-metric="cartera-vencida" data-readiness="${portfolioReadiness}" data-values="${escAttr(overdueMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('overdue')" title="Ver cartera vencida"><div class="k-accent" style="background:${portfolioReadiness==='ready'?'var(--danger)':'var(--line)'}"></div><div class="k-label">Cartera vencida</div><div class="k-val">${portfolioReadiness==='ready'?moneyMap(overdueMap):(portfolioReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot ${portfolioReadiness==='ready'?'down':'muted'}">${portfolioReadiness==='ready'?overdueRows.length+' obligaciones · '+valuedCount(overdueRows)+' con monto ›':'Esperando confirmación del servidor'}</div></button>
+        <button class="kpi kpi-click" onclick="Orbit.modules.inicio.openRenewalsKpi()" title="Ver renovaciones"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Renovaciones ≤45 d</div><div class="k-val">${renov.length}</div><div class="k-foot muted">pólizas por renovar ›</div></button>
       </div>
       <div class="inicio-main-grid" style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px">
         <div class="card pad"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><b style="font-family:var(--f-display);font-size:16px">Avance por asesor</b><span class="muted" style="font-size:12px">producción neta del mes vs meta configurada</span></div>
@@ -143,5 +173,5 @@ Orbit.modules.inicio = (function () {
     </div>`;
   }
 
-  return { render, openFinancialKpi };
+  return { render, openFinancialKpi, openRenewalsKpi };
 })();
