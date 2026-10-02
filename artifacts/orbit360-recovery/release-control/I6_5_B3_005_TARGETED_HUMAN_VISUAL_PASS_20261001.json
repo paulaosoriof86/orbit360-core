@@ -1,0 +1,63 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_TARGETED_HUMAN_VISUAL_PASS_V1",
+  "status": "PASS",
+  "recordedAt": "2026-10-01",
+  "gate": "I6.5-B3-005",
+  "authority": "PAULA_TARGETED_VISUAL_ACCEPTANCE",
+  "preview": {
+    "sourceSha": "b3e140c510de785a649f459d5f24434630cc9784",
+    "buildId": "gi-i65-b3-b3e140c510de-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-b3005-36941873726-1ctytocb.web.app",
+    "runId": 36941873726,
+    "artifactId": 11200402783,
+    "artifactDigest": "c8c8892a843009906fb7b30ac094c61964690db0010efbb6631a51ac21b8b28d"
+  },
+  "humanEvidence": {
+    "screenshots": [
+      "image(20261002-000002).png",
+      "image(20261002-000045).png",
+      "image(20261002-000252).png"
+    ],
+    "inferredReceipt": {
+      "receipt": "b3005human_policy_r1_receipt_02",
+      "paymentLabel": "Pago inferido",
+      "reconciliationLabel": "Cobro conciliado",
+      "actualPaidDate": "No informada",
+      "inferredEffectiveDate": "15 feb 2026",
+      "sourceEvidence": "b3005human_invoice_r1"
+    },
+    "directAnchor": {
+      "receipt": "b3005human_policy_r1_receipt_05",
+      "paymentLabel": "Pago confirmado",
+      "reconciliationLabel": "Cobro conciliado",
+      "actualPaidDate": "No informada",
+      "applicationDate": "20 may 2026",
+      "invoiceNumber": "B3005-HUMAN-001",
+      "provenanceVisible": true
+    },
+    "list": {
+      "installments1to4": "Pago inferido",
+      "installment5": "Pago confirmado",
+      "installments6to10": "Por vencer"
+    }
+  },
+  "adjudication": {
+    "targetedDiscriminantsPass": true,
+    "priorSemanticRejectionResolved": true,
+    "paymentProvenanceSeparatedFromReconciliation": true,
+    "temporalSemanticsVisible": true,
+    "evidenceProvenanceVisible": true
+  },
+  "separateFindingObserved": {
+    "findingId": "B3-008",
+    "issue": "Cliente360 Salud/KPIs render provisional values before receipt/portfolio hydration and then change.",
+    "disposition": "PRESERVE_SEPARATELY_DO_NOT_REOPEN_B3_005"
+  },
+  "boundaries": {
+    "livePromoted": false,
+    "reimport": false,
+    "operationalBusinessWrites": false,
+    "b3006Writes": false
+  },
+  "next": "B3_005_FIXTURE_CLEANUP_THEN_B3_006"
+}
