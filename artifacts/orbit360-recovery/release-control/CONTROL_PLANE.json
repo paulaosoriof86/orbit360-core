@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_ENTRY_GUARD",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_001_DIAGNOSTIC",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -1955,7 +1955,7 @@
     "addendumPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_ADDENDUM_20260919.md",
     "forensicAuditPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_AUDIT_20260919.json",
     "candidateMode": "ONE_ACCUMULATIVE_INCREMENTAL_CANDIDATE",
-    "currentBlock": "B3",
+    "currentBlock": "B4",
     "currentReadinessPercent": 96,
     "nextTargetPercent": 100,
     "previewAfterEveryBlockRequired": true,
@@ -4851,17 +4851,37 @@
       },
       "dashboardRealityClosed": true,
       "b2LedgerSealReconciled": true
+    },
+    "b4": {
+      "status": "B4_ACTIVE_B4_001_READONLY_DIAGNOSTIC",
+      "entryCondition": "PASS",
+      "targetPercent": 100,
+      "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
+      "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
+      "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
+      "executionLockBlobSha": "495776adbc905cefbc13d51e915a585be3004f81",
+      "compositionLockBlobSha": "8fc3f8aa028417981241318c2d3cc33cccc47a9d",
+      "findingLedgerBlobSha": "0b9d4e8169547f8799332af351837193a24f72b0",
+      "activeFindingId": "B4-001",
+      "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+      "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
+      "baselinePreviewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
+      "productMutationAuthorized": false,
+      "dataMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false,
+      "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC"
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "e152ce99a9ecff9cc89c17fa45e9304da71f69e6",
+    "compositionLockBlobSha": "8fc3f8aa028417981241318c2d3cc33cccc47a9d",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "5769dd62e0d6ca8175b7a3740ce6176feaf29be6",
+    "findingLedgerBlobSha": "0b9d4e8169547f8799332af351837193a24f72b0",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
-    "activeBlock": "B3",
+    "activeBlock": "B4",
     "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
     "productFileCount": 79,
@@ -4870,7 +4890,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B4_ENTRY_GUARD"
+    "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
@@ -5160,5 +5180,16 @@
     "sourceFixReceiptBlobSha": "78a38dd979a9ffd70923a31e9567842aad0b8823",
     "noLive": true,
     "noReimport": true
+  },
+  "currentB4": {
+    "status": "B4_ACTIVE_B4_001_READONLY_DIAGNOSTIC",
+    "activeFindingId": "B4-001",
+    "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
+    "executionLockBlobSha": "495776adbc905cefbc13d51e915a585be3004f81",
+    "compositionLockBlobSha": "8fc3f8aa028417981241318c2d3cc33cccc47a9d",
+    "findingLedgerBlobSha": "0b9d4e8169547f8799332af351837193a24f72b0",
+    "noLive": true,
+    "noReimport": true,
+    "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC"
   }
 }
