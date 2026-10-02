@@ -4839,7 +4839,8 @@
       "r5p7ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P7_POLICY_CURRENCY_AND_DEEP_FINANCIAL_AUDIT_ARM_20261002.json",
       "r5p7ReceiptBlobSha": "c0d8adc5e30a9e7b462964ef0ccbf24f22c9e760",
       "r5p8DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8_RECEIPT_LINEAGE_AND_TARIFF_DIAGNOSTIC_ARM_20261002.json",
-      "r5p8DiagnosticBlobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a"
+      "r5p8DiagnosticBlobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a",
+      "r5p8HarnessFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8A_DIAGNOSTIC_HARNESS_SYNTAX_FIX_20261002.json"
     }
   },
   "canonicalAccumulationControl": {
@@ -5115,7 +5116,12 @@
     "r5p7ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P7_POLICY_CURRENCY_AND_DEEP_FINANCIAL_AUDIT_ARM_20261002.json",
     "r5p7ReceiptBlobSha": "c0d8adc5e30a9e7b462964ef0ccbf24f22c9e760",
     "r5p8DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8_RECEIPT_LINEAGE_AND_TARIFF_DIAGNOSTIC_ARM_20261002.json",
-    "r5p8DiagnosticBlobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a"
+    "r5p8DiagnosticBlobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a",
+    "r5p8HarnessFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8A_DIAGNOSTIC_HARNESS_SYNTAX_FIX_20261002.json",
+      "blobSha": "de66a24bac043c9ad184e6e294b9dff76a5bc13e",
+      "failedRunId": 37061725181
+    }
   },
   "paulaVisualReview20261002B3008R2": {
     "decision": "REJECTED_REMEDIATION_REQUIRED",

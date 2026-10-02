@@ -1,0 +1,16 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P8A_DIAGNOSTIC_HARNESS_SYNTAX_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "failedRunId": 37061725181,
+  "failedJobId": 111019713091,
+  "classification": "QA_HARNESS_ONLY",
+  "productRegressionDemonstrated": false,
+  "cause": "R5P8 diagnostic proof contained one extra closing brace before the premium-rules section.",
+  "fix": "Removed only the extra harness brace; product source unchanged.",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": 0,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "RERUN_B3_008_R5P8_EXACT_PREVIEW"
+}
