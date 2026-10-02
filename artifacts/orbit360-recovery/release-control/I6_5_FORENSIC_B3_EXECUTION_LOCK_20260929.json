@@ -85,7 +85,7 @@
       "blobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a"
     },
     "humanVisualAcceptanceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
-    "humanVisualAcceptanceReceiptBlobSha": "d501880ac4f5900c6509570d3061c954bcf49145"
+    "humanVisualAcceptanceReceiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -94,7 +94,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "2df42de59132bbdf8d1c95b183146d6c06a6c2b3"
+    "blobSha": "a0236e1eff267cef0dabfa77572ab164c7ac5eec"
   },
   "nextRequiredProof": [
     "B4_ENTRY_GUARD"
@@ -283,7 +283,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "48f7779752a54c6faa34b7ebb24907134c91ee72"
+    "blobSha": "e152ce99a9ecff9cc89c17fa45e9304da71f69e6"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
@@ -980,9 +980,15 @@
     "status": "PASS",
     "authority": "PAULA_TARGETED_VISUAL_ACCEPTANCE",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
-    "receiptBlobSha": "d501880ac4f5900c6509570d3061c954bcf49145",
+    "receiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
     "exactPreviewSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
     "exactPreviewBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
     "exactPreviewRunId": 37061984102
+  },
+  "reportedPaymentCarryAdjudication": {
+    "status": "CLOSED_PASS_BY_EXISTING_EVIDENCE",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_CARRY_REPORTED_PAYMENT_PRESENTATION_R4_ADJUDICATION_PASS_20261002.json",
+    "receiptBlobSha": "854c05ca68c2c9e359e42f1de2f1f5b4f8d54689",
+    "productSourceChanged": false
   }
 }
