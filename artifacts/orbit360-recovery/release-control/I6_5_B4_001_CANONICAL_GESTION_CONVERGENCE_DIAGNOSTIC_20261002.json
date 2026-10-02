@@ -1,0 +1,120 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-02",
+  "status": "CAUSAL_PRODUCT_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
+  "findingId": "B4-001",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "governance": {
+    "controlPlaneBlobSha": "9588895311abda3e8002dafb5d1d62182d5ca4ad",
+    "findingsLedgerBlobSha": "0b9d4e8169547f8799332af351837193a24f72b0",
+    "b4ExecutionLockBlobSha": "495776adbc905cefbc13d51e915a585be3004f81",
+    "compositionLockBlobSha": "8fc3f8aa028417981241318c2d3cc33cccc47a9d"
+  },
+  "productBaseline": {
+    "sourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "files": [
+      {
+        "path": "orbit360-platform/core/ciclo.js",
+        "blobSha": "b941117613e09e4d5fd6163b84890eaaa8950c55"
+      },
+      {
+        "path": "orbit360-platform/modules/portal.js",
+        "blobSha": "fc23c03e4c59c256be81553e472dee6d2d4ef895"
+      },
+      {
+        "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "blobSha": "6c07e51966984f7bf52d2e7618c884301eefb404"
+      },
+      {
+        "path": "functions/product-ops-leads-domain.js",
+        "blobSha": "fe5307b171a9d51e3f449f0dd2b5aba6fbcbb341"
+      },
+      {
+        "path": "orbit360-platform/core/ops-leads-domain-client.js",
+        "blobSha": "e50225962284a0747769d0809e906cab96f2e60b"
+      },
+      {
+        "path": "orbit360-platform/modules/ops.js",
+        "blobSha": "c7fc79145d2cf54563ead5d68df131e009381dd5"
+      },
+      {
+        "path": "orbit360-platform/modules/leads.js",
+        "blobSha": "e25b6ea1660a415e3ebdba3c22ccfcd8e1236765"
+      },
+      {
+        "path": "orbit360-platform/modules/cliente360.js",
+        "blobSha": "b93816e89f8ebe5055052e0f6d48f6ed9aa39ef1"
+      }
+    ]
+  },
+  "preservedGoodArchitecture": [
+    "Product browser Firestore store is read-only.",
+    "Durable negocios/gestiones writes cross server-owned Firebase Functions through product operational facade.",
+    "Server domain uses the same canonical gestiones/negocios path and enforces active-role/advisor scope.",
+    "Ops and Cliente360 management modal already use crearGestionDurable with server readback.",
+    "Server domain already supports explicit portal_request and post-commit outbox creation."
+  ],
+  "defects": [
+    {
+      "id": "B4-001-D1",
+      "class": "OPTIMISTIC_CRITICAL_TRANSITION",
+      "file": "orbit360-platform/core/ciclo.js",
+      "evidence": "setEtapa/perder/archivar, several negocio/gestion actions and nuevoNegocio use S().update/S().insert and UI continues before server commit/readback.",
+      "impact": "A server rejection can occur after UI has already advanced or displayed success-like state; this violates B4 critical-transition and canonical-readback contract."
+    },
+    {
+      "id": "B4-001-D2",
+      "class": "PORTAL_OPERATION_DISCONNECT_AND_FALSE_SUCCESS",
+      "file": "orbit360-platform/modules/portal.js",
+      "evidence": "solicitar() calls Orbit.ciclo.crearGestion() (non-durable), inserts activity immediately and closes with success toast without awaiting canonical management commit.",
+      "impact": "Portal can report success before canonical gestion is confirmed; activity/gestion can diverge."
+    },
+    {
+      "id": "B4-001-D3",
+      "class": "UNREACHABLE_PORTAL_REQUEST_SEMANTICS",
+      "file": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "evidence": "workflowOperation maps every gestiones insert to create_management even though server domain supports portal_request.",
+      "impact": "Portal-origin management does not carry the explicit server operation that drives portal-specific canonical event/outbox semantics."
+    },
+    {
+      "id": "B4-001-D4",
+      "class": "HARDCODED_ADVISOR_FALLBACK",
+      "file": "orbit360-platform/core/ciclo.js",
+      "evidence": "nuevoNegocio advisor selector uses hardcoded fallback ase001 when session advisor is unavailable.",
+      "impact": "Violates no-hardcoded-person/tenant rule and can bind a business to a non-authoritative advisor."
+    }
+  ],
+  "rootCause": "The current product has one server-owned canonical write layer, but legacy UI control flow still treats optimistic store methods as committed outcomes and the Portal path does not select the portal_request domain operation.",
+  "remediationScope": {
+    "allowedProductFiles": [
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/portal.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js"
+    ],
+    "backendChangeRequired": false,
+    "dataMigrationRequired": false,
+    "reimportRequired": false,
+    "objective": [
+      "Critical Ops/Leads/management actions await durable server commit/readback before success UI.",
+      "Portal request uses durable canonical gestion creation and maps to portal_request.",
+      "Remove hardcoded advisor fallback.",
+      "Preserve one gestiones/negocios owner, existing role scopes and server domain."
+    ]
+  },
+  "requiredProof": [
+    "Static contract: no hardcoded ase001 fallback and Portal insert maps to portal_request.",
+    "Preview synthetic cross-entry: Ops and Cliente360 create exactly one canonical gestion each after server readback.",
+    "Preview synthetic Portal request creates exactly one canonical gestion and no success is emitted before confirmed commit.",
+    "Role scope regression for Asesor/Comercial own and Operativo/Admin/Direccion configured scope.",
+    "No duplicate gestion across Ops/Cliente360/Portal projections; cleanup complete.",
+    "No relevant page/console/request errors."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_001_MINIMAL_SOURCE_FIX"
+}
