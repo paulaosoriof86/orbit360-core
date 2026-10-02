@@ -2295,11 +2295,11 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Controlled policy import creates policy + expected receipts + portfolio, never confirmed cobro without evidence.",
-      "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
-      "blocking": true,
+      "status": "CLOSED_PASS",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
       "entryUnblockedBy": "B3-005 CLOSED_PASS",
-      "nextAction": "B3_006_EXACT_PREVIEW",
+      "nextAction": "B3-007",
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
@@ -2344,16 +2344,25 @@
         "status": "QA_HARNESS_FIXED_RERUN_REQUIRED",
         "failedRunId": 36952075577,
         "productFailure": false
-      }
+      },
+      "closureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CLOSED_PASS_20261001.json",
+      "closureReceiptBlobSha": "a2d2f72100eac2269a4419c187f1d402f7c516b3",
+      "cleanupPass": true
     },
     {
       "id": "B3-007",
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Cronograma consumes real pending obligations from receipts/portfolio.",
-      "status": "NOT_STARTED",
+      "status": "DIAGNOSTIC_ACTIVE",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "entryUnblockedBy": "B3-006 CLOSED_PASS",
+      "nextAction": "B3_007_DIAGNOSTIC",
+      "productMutationAuthorized": false,
+      "dataMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false
     },
     {
       "id": "B3-008",
@@ -5959,11 +5968,13 @@
     }
   },
   "currentB3": {
-    "status": "B3_006_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
-    "activeFindingId": "B3-006",
-    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_CONTRACT_PASS_20261001.json",
-    "sourceContractReceiptBlobSha": "6b3d4c7d73665c3d2aef67f8998d59ff03a099ca",
-    "compositionLockBlobSha": "e1b95b51dbbae03ea18478d570a2c880847e9b6d",
+    "status": "B3_007_DIAGNOSTIC_ACTIVE",
+    "activeFindingId": "B3-007",
+    "priorFindingId": "B3-006",
+    "priorFindingStatus": "CLOSED_PASS",
+    "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CLOSED_PASS_20261001.json",
+    "priorClosureReceiptBlobSha": "a2d2f72100eac2269a4419c187f1d402f7c516b3",
+    "compositionLockBlobSha": "33fbdece4cf7e589986ebd392484d8fbe72444b6",
     "noLive": true,
     "noReimport": true
   }

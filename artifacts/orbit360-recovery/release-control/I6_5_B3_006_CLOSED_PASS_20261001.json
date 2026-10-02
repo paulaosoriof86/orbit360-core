@@ -1,0 +1,40 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_006_CLOSED_PASS_V1",
+  "recordedAt": "2026-10-02T01:47:13.103Z",
+  "status": "CLOSED_PASS",
+  "findingId": "B3-006",
+  "sourceSha": "d3a015ffa4f7b6ef4cc96facbe1df5e38a29ea72",
+  "buildId": "gi-i65-b3-d3a015ffa4f7-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3006-36952417190-8ha7wtmu.web.app",
+  "channelId": "gi-b3006-36952417190",
+  "runId": 36952417190,
+  "artifactId": 11203903632,
+  "artifactDigest": "029a23fe72d82d5eaeb04b442041aa155e9c33a22664d7713784a8d10ca6c54e",
+  "exactHostingReadback": true,
+  "browserImportProof": true,
+  "canonicalPolicyCreated": true,
+  "expectedReceiptsCreated": true,
+  "portfolioCreated": true,
+  "zeroCobrosWithoutEvidence": true,
+  "invalidRowFailClosed": true,
+  "cleanupPass": true,
+  "cleanup": {
+    "deletedRefs": 6,
+    "readback": {
+      "validPolicy": 0,
+      "invalidPolicy": 0,
+      "polizas": 0,
+      "recibosEsperados": 0,
+      "carteraPrimas": 0,
+      "cobros": 0,
+      "actividades": 0,
+      "client": 0,
+      "insurer": 0
+    },
+    "pass": true
+  },
+  "livePromoted": false,
+  "reimport": false,
+  "operationalBusinessWrites": false,
+  "nextFindingId": "B3-007"
+}

@@ -732,7 +732,7 @@
     "noReimport": true,
     "noLive": true
   },
-  "activeFindingId": "B3-006",
+  "activeFindingId": "B3-007",
   "b3004R10CausalSourceFix": {
     "status": "FINAL_SOURCE_BOUND_PENDING_EXACT_PREVIEW",
     "findingId": "B3-004",
@@ -1794,5 +1794,18 @@
     "status": "QA_HARNESS_FIXED_RERUN_REQUIRED",
     "failedRunId": 36952075577,
     "productSourceChanged": false
+  },
+  "b3006Closure": {
+    "status": "CLOSED_PASS",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CLOSED_PASS_20261001.json",
+    "blobSha": "a2d2f72100eac2269a4419c187f1d402f7c516b3",
+    "sourceSha": "d3a015ffa4f7b6ef4cc96facbe1df5e38a29ea72",
+    "buildId": "gi-i65-b3-d3a015ffa4f7-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3006-36952417190-8ha7wtmu.web.app",
+    "runId": 36952417190,
+    "artifactId": 11203903632,
+    "artifactDigest": "029a23fe72d82d5eaeb04b442041aa155e9c33a22664d7713784a8d10ca6c54e",
+    "productSourceChanged": true,
+    "cleanupPass": true
   }
 }
