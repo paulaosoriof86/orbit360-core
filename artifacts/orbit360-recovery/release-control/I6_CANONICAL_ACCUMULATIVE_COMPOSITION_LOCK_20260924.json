@@ -732,7 +732,7 @@
     "noReimport": true,
     "noLive": true
   },
-  "activeFindingId": "B3-005",
+  "activeFindingId": "B3-006",
   "b3004R10CausalSourceFix": {
     "status": "FINAL_SOURCE_BOUND_PENDING_EXACT_PREVIEW",
     "findingId": "B3-004",
@@ -1739,5 +1739,12 @@
     "owner": "orbit360-platform/modules/cliente360.js",
     "classification": "BLOCKS_CURRENT_PRODUCTION",
     "productSourceChanged": false
+  },
+  "b3005Closure": {
+    "status": "CLOSED_PASS",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CLOSED_PASS_20261001.json",
+    "blobSha": "66e41c3b6de7de6681dea371784a5f1bf0990f2a",
+    "productSourceChanged": false,
+    "cleanupPass": true
   }
 }

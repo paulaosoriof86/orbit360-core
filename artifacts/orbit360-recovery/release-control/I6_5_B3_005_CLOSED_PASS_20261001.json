@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_005_CLOSED_PASS_V1",
+  "recordedAt": "2026-10-01",
+  "status": "CLOSED_PASS",
+  "findingId": "B3-005",
+  "humanVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
+  "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_MACHINE_PASS_20261001.json",
+  "sourceSha": "b3e140c510de785a649f459d5f24434630cc9784",
+  "buildId": "gi-i65-b3-b3e140c510de-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3005-36941873726-1ctytocb.web.app",
+  "runId": 36941873726,
+  "artifactId": 11200402783,
+  "artifactDigest": "c8c8892a843009906fb7b30ac094c61964690db0010efbb6631a51ac21b8b28d",
+  "exactHostingReadback": true,
+  "targetedHumanVisualPass": true,
+  "cleanup": {
+    "schema": "GRAVICENTRA_I6_5_B3_005_HUMAN_FIXTURE_CLEANUP_PROOF_V1",
+    "status": "PASS",
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "counts": {
+      "cobros": 0,
+      "poliza": 0,
+      "cliente": 0,
+      "request": 0,
+      "events": 0,
+      "receipts": 0,
+      "portfolio": 0
+    }
+  },
+  "livePromoted": false,
+  "reimport": false,
+  "operationalBusinessWrites": false,
+  "nextFindingId": "B3-006"
+}
