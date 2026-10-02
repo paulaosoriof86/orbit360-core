@@ -62,6 +62,14 @@ Orbit.q = (function () {
     const state = textNorm(row && row.estado);
     return state === 'pagado' || state === 'conciliado' || row && row.conciliado === true;
   }
+  // B3-008: la fórmula aprobada de Salud vive en un único owner.
+  function saludCliente(cli, vigentes, vencido) {
+    let salud = 70;
+    salud += Math.min(20, (vigentes || []).length * 6);
+    salud -= vencido > 0 ? 25 : 0;
+    salud += cli && cli.segmento === 'Premium' ? 8 : 0;
+    return Math.max(8, Math.min(100, salud));
+  }
 
   /** Resumen 360 de un cliente: dominios financieros separados. */
   function clienteResumen(cliId) {
@@ -80,11 +88,7 @@ Orbit.q = (function () {
     const recibosVencidos = rec.filter(expectedReceiptIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
     const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
     const porRenovar = pol.filter(p => p.estado === 'Por renovar').length;
-    let salud = 70;
-    salud += Math.min(20, vigentes.length * 6);
-    salud -= vencido > 0 ? 25 : 0;
-    salud += cli && cli.segmento === 'Premium' ? 8 : 0;
-    salud = Math.max(8, Math.min(100, salud));
+    const salud = saludCliente(cli, vigentes, vencido);
     return {
       cli, pol, rec, car, cob, com,
       moneda: cli ? cli.moneda : 'GTQ',
@@ -131,11 +135,7 @@ Orbit.q = (function () {
       const recibosVencidos = rec.filter(expectedReceiptIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
       const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
       const porRenovar = pol.filter(p => p.estado === 'Por renovar').length;
-      let salud = 70;
-      salud += Math.min(20, vigentes.length * 6);
-      salud -= vencido > 0 ? 25 : 0;
-      salud += cli.segmento === 'Premium' ? 8 : 0;
-      salud = Math.max(8, Math.min(100, salud));
+      const salud = saludCliente(cli, vigentes, vencido);
       index.set(cli.id, {
         cli, pol, rec, car, cob, com,
         moneda: cli.moneda,
@@ -185,15 +185,30 @@ Orbit.q = (function () {
     return !p || (countryCode(p2 && p2.pais) || countryCode(cli && cli.pais)) === p;
   }
 
+  function carteraPendienteDe(cliId) {
+    return carteraPrimasDe(cliId).filter(r => portfolioOpen(r) && !portfolioIsOverdue(r));
+  }
+  function carteraVencidaDe(cliId) {
+    return carteraPrimasDe(cliId).filter(portfolioIsOverdue);
+  }
+  function carteraRowsScoped() {
+    const clients = clientIndex();
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
+    return (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));
+  }
+  function carteraPendienteRows() { return carteraRowsScoped().filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)); }
+  function carteraVencidaRows() { return carteraRowsScoped().filter(portfolioIsOverdue); }
+
   /** Cartera Primas es la autoridad de pendiente/vencido; Cobros solo aporta recaudo confirmado. */
   function carteraGlobal() {
     const clients = clientIndex();
     const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
     const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients, policies));
-    const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));
+    const pendingRows = carteraPendienteRows();
+    const overdueRows = carteraVencidaRows();
     const alDia = cob.filter(confirmedCobro).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
-    const pend = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
-    const venc = car.filter(portfolioIsOverdue).reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
+    const pend = pendingRows.reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
+    const venc = overdueRows.reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
     return { alDia, pend, venc, moneda: monedaPais(), source: 'cobros+carteraPrimas' };
   }
   function currencyCodeFor(row, clients, policies) {
@@ -326,8 +341,8 @@ Orbit.q = (function () {
   function postRecaudo(/* cobro, fecha, metodo */) { return; }
 
   return {
-    asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
-    clienteResumen, clientesResumenIndex, carteraGlobal, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
-    agingVencido, agingVencidoPorMoneda, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
+    asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
+    clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
+    agingVencido, agingVencidoPorMoneda, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();
