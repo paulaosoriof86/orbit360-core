@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_007_PRODUCT_COMPOSITION_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
+  "status": "B3_007_SOURCE_FIXED_PENDING_CONTRACT",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-007",
     "title": "Cronograma consumes real pending obligations from receipts/portfolio.",
-    "status": "PRODUCT_COMPOSITION_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
     "blocking": true,
     "rootCause": "CRONOGRAMA_PENDING_OBLIGATION_READ_OWNER_IS_LEGACY_COBROS_AND_CRONOGRAMA_SOURCE_WAS_NOT_TRACKED_IN_THE_ACCUMULATIVE_PRODUCT_SET",
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CAUSAL_DIAGNOSTIC_20261001.json",
@@ -30,12 +30,27 @@
       "configWritesAuthorized": false,
       "reimportAuthorized": false,
       "liveHostingPromotionAuthorized": false,
-      "productMutationAuthorized": true
+      "productMutationAuthorized": false
     },
-    "nextAction": "B3_007_SOURCE_FIX",
+    "nextAction": "B3_007_SOURCE_CONTRACT",
     "causalDependencies": {
       "routerHydration": "orbit360-platform/core/router.js"
-    }
+    },
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_SOURCE_FIX_20261001.json",
+    "sourceFixReceiptBlobSha": "33208aacaa62666404094dbaad80f59c1266d00c",
+    "sourceBlobs": {
+      "orbit360-platform/modules/cronograma.js": "b44a82b4af474132d0dcfd673731b16c572496b5",
+      "orbit360-platform/core/router.js": "645c1bddf6a8990777a84985a34206afe930e0a3",
+      "orbit360-platform/index.html": "c1cd2247a87724196010044554c959f00f22d1d3",
+      "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-007-contract.mjs": "7ba3135ab6ecd210a4154a7c851e10f92d4e6ddc",
+      "tools/gravicentra-i6-5-b3-007-preview-proof.mjs": "8682abeaa50fbe7f982292890997ba1502c972a0",
+      ".github/workflows/gravicentra-b3-007-executor.yml": "deee88f5601819b87e0db455284529fba6c3b026",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs": "3e3c5cb298fd3f14a65fb59bb4fea72d0e693c65"
+    },
+    "candidateEligibleForPromotion": false
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -44,7 +59,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "b6c48d327f0af0b40930fb1d2f25548a7319c1b1"
+    "blobSha": "bb7422fb606903dde1f588a5a329e3969beca3d0"
   },
   "nextRequiredProof": [
     "B3_007_SOURCE_CONTRACT_PASS",
@@ -235,7 +250,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "33fbdece4cf7e589986ebd392484d8fbe72444b6"
+    "blobSha": "8a68c8b713aaaa64a4cf712868a1e28a5e412892"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
@@ -732,6 +747,26 @@
       "recibosEsperados",
       "carteraPrimas",
       "actividades"
+    ],
+    "forbiddenSyntheticPaymentCollection": "cobros"
+  },
+  "b3007SyntheticQaAuthorization": {
+    "status": "AUTHORIZED_FOR_B3_007_PREVIEW_ONLY",
+    "scope": "B3-007 synthetic expected-receipt/portfolio obligation rendered through normal Cronograma UI",
+    "syntheticBusinessWritesAuthorized": true,
+    "operationalBusinessWritesAuthorized": false,
+    "previewConfigWritesAuthorized": false,
+    "productionConfigWritesAuthorized": false,
+    "cleanupRequired": true,
+    "liveHostingPromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "b3008Authorized": false,
+    "allowedSyntheticCollections": [
+      "clientes",
+      "aseguradoras",
+      "polizas",
+      "recibosEsperados",
+      "carteraPrimas"
     ],
     "forbiddenSyntheticPaymentCollection": "cobros"
   }
