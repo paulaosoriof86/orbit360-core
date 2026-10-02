@@ -14,7 +14,7 @@
   },
   "qaFiles": {
     "tools/gravicentra-i6-5-b3-007-contract.mjs": "7ba3135ab6ecd210a4154a7c851e10f92d4e6ddc",
-    "tools/gravicentra-i6-5-b3-007-preview-proof.mjs": "8682abeaa50fbe7f982292890997ba1502c972a0",
+    "tools/gravicentra-i6-5-b3-007-preview-proof.mjs": "a6d65577455e405f51f157fee19fd0cc8fbe57bc",
     ".github/workflows/gravicentra-b3-007-executor.yml": "deee88f5601819b87e0db455284529fba6c3b026",
     "tools/gravicentra-i6-control-plane-guard-v1.mjs": "3e3c5cb298fd3f14a65fb59bb4fea72d0e693c65"
   },
@@ -35,5 +35,22 @@
     "b3008": false
   },
   "proofPlan": "SOURCE_CONTRACT -> EXACT_PREVIEW -> SERVER_CONFIRMED_ZERO_COBRO_OBLIGATION_VISIBLE -> EXACT_RECEIPT_ROUTE -> CLEANUP_ZERO_RESIDUE",
-  "nextAction": "B3_007_SOURCE_CONTRACT"
+  "nextAction": "B3_007_SOURCE_CONTRACT",
+  "qaHarnessRepair": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_QA_HARNESS_CLEANUP_ID_REPAIR_20261001.json",
+    "blobSha": "1193375824bbf528048328cdf7a2fb9dc29243ba",
+    "status": "QA_HARNESS_FIXED_RERUN_REQUIRED",
+    "productSourceChanged": false
+  },
+  "failedQaCandidates": [
+    {
+      "runId": 36953558714,
+      "sourceSha": "ce2641e365db99c6a297d947cd1e4412ce00d361",
+      "previewUrl": "https://ays-orbit-360-lab--gi-b3007-36953558714-3gx1wmft.web.app",
+      "exactReadback": true,
+      "productFailure": false,
+      "syntheticWritesExecuted": false,
+      "reason": "FIRESTORE_CLEANUP_DIRECT_ID_UNDEFINED"
+    }
+  ]
 }
