@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_007_SOURCE_FIXED_PENDING_CONTRACT",
+  "status": "B3_007_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-007",
     "title": "Cronograma consumes real pending obligations from receipts/portfolio.",
-    "status": "SOURCE_FIXED_PENDING_CONTRACT",
+    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
     "blocking": true,
     "rootCause": "CRONOGRAMA_PENDING_OBLIGATION_READ_OWNER_IS_LEGACY_COBROS_AND_CRONOGRAMA_SOURCE_WAS_NOT_TRACKED_IN_THE_ACCUMULATIVE_PRODUCT_SET",
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CAUSAL_DIAGNOSTIC_20261001.json",
@@ -32,7 +32,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_007_SOURCE_CONTRACT",
+    "nextAction": "B3_007_EXACT_PREVIEW",
     "causalDependencies": {
       "routerHydration": "orbit360-platform/core/router.js"
     },
@@ -50,7 +50,9 @@
       ".github/workflows/gravicentra-b3-007-executor.yml": "deee88f5601819b87e0db455284529fba6c3b026",
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "3e3c5cb298fd3f14a65fb59bb4fea72d0e693c65"
     },
-    "candidateEligibleForPromotion": false
+    "candidateEligibleForPromotion": false,
+    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_SOURCE_CONTRACT_PASS_20261001.json",
+    "sourceContractReceiptBlobSha": "096745a0ddcedc5d940c15c99c375108db808a52"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -59,10 +61,9 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "bb7422fb606903dde1f588a5a329e3969beca3d0"
+    "blobSha": "08d31417c0d37b9e63c6647cd18cc1b632bdcb0d"
   },
   "nextRequiredProof": [
-    "B3_007_SOURCE_CONTRACT_PASS",
     "B3_007_EXACT_PREVIEW_MACHINE_PASS",
     "B3_007_SYNTHETIC_CLEANUP_PASS"
   ],
@@ -250,7 +251,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "8a68c8b713aaaa64a4cf712868a1e28a5e412892"
+    "blobSha": "9f6719081b1a9a40cdc94384b4ffd12897c5479f"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
