@@ -1750,7 +1750,7 @@
   "b3006SourceFix": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_FIX_20261001.json",
-    "blobSha": "b470356dd38a5821f6aeb031c1c56a547c512f1d",
+    "blobSha": "53c13b0cd7f06c5a57c823bd9b4ff8e9c51d0702",
     "productBlobs": {
       "orbit360-platform/core/importa.js": "99ca3de8d60d3a26c97067c056fdc383d8fdd15f",
       "orbit360-platform/index.html": "8708ddfcbfd569dc4457ca7c329c3433264cb567"
@@ -1762,7 +1762,7 @@
     },
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-006-contract.mjs": "16b6c1c379b1ba96b7df1db29f9cfb8e643d2071",
-      "tools/gravicentra-i6-5-b3-006-preview-proof.mjs": "e5ad05ae396f44d2a89133648a1fe52353a8062c",
+      "tools/gravicentra-i6-5-b3-006-preview-proof.mjs": "418a82053e05addb64ddd82f8c28f85fb56cd97b",
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "74a499fba8f5611f1959d5ced309a62680fe9815",
       ".github/workflows/gravicentra-b3-006-executor.yml": "ba6d31ecf9966290faab9c02080c45c944d90e96"
     },
@@ -1786,6 +1786,13 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_EXECUTOR_ISOLATION_REPAIR_20261001.json",
     "blobSha": "112b9eb5fe32578cfe3cc5b6db6a7f0f3f0e4a44",
     "isolatedExecutorBlobSha": "ba6d31ecf9966290faab9c02080c45c944d90e96",
+    "productSourceChanged": false
+  },
+  "b3006QaHarnessRepair": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_QA_HARNESS_FILE_INPUT_REPAIR_20261001.json",
+    "blobSha": "55fb240468098a4166aa314fd76d21f4534dc3cb",
+    "status": "QA_HARNESS_FIXED_RERUN_REQUIRED",
+    "failedRunId": 36952075577,
     "productSourceChanged": false
   }
 }
