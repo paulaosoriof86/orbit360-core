@@ -94,7 +94,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "a0236e1eff267cef0dabfa77572ab164c7ac5eec"
+    "blobSha": "5769dd62e0d6ca8175b7a3740ce6176feaf29be6"
   },
   "nextRequiredProof": [
     "B4_ENTRY_GUARD"
@@ -990,5 +990,16 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_CARRY_REPORTED_PAYMENT_PRESENTATION_R4_ADJUDICATION_PASS_20261002.json",
     "receiptBlobSha": "854c05ca68c2c9e359e42f1de2f1f5b4f8d54689",
     "productSourceChanged": false
+  },
+  "b2LedgerSealReconciliation": {
+    "status": "PASS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+    "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+    "normalizedFindingCount": 40
+  },
+  "dashboardRealityClosure": {
+    "status": "PASS",
+    "machineReceiptBlobSha": "543059b5a6ce3ece278c3afc78f35b0865277ae3",
+    "visualReceiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3"
   }
 }
