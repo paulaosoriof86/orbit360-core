@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_006_PRODUCT_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
+  "status": "B3_006_SOURCE_FIXED_PENDING_CONTRACT",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,16 +14,16 @@
   "activeFinding": {
     "id": "B3-006",
     "title": "Controlled policy import creates policy + expected receipts + portfolio, never confirmed cobro without evidence.",
-    "status": "PRODUCT_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT",
     "blocking": true,
     "boundaries": {
       "businessWritesAuthorized": false,
       "configWritesAuthorized": false,
       "reimportAuthorized": false,
       "liveHostingPromotionAuthorized": false,
-      "productMutationAuthorized": true
+      "productMutationAuthorized": false
     },
-    "nextAction": "B3_006_SOURCE_FIX",
+    "nextAction": "B3_006_SOURCE_CONTRACT",
     "rootCause": "POLICY_IMPORT_BYPASSES_CANONICAL_POLICY_RECEIPTS_OWNER_AND_PERFORMS_FIRE_AND_FORGET_NON_ATOMIC_POLICY_PLUS_LEGACY_COBROS_WRITES",
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CAUSAL_DIAGNOSTIC_20261001.json",
     "diagnosticReceiptBlobSha": "4907e6f630ae4a936875e71321a393eef573cdf4",
@@ -31,7 +31,21 @@
       "orbit360-platform/core/importa.js",
       "orbit360-platform/index.html"
     ],
-    "canonicalOwner": "orbit360-platform/core/policy-receipts-engine.js"
+    "canonicalOwner": "orbit360-platform/core/policy-receipts-engine.js",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_FIX_20261001.json",
+    "sourceFixReceiptBlobSha": "8b80b9107aca076764037306fa7178b2b4c63e16",
+    "sourceBlobs": {
+      "orbit360-platform/core/importa.js": "99ca3de8d60d3a26c97067c056fdc383d8fdd15f",
+      "orbit360-platform/index.html": "8708ddfcbfd569dc4457ca7c329c3433264cb567",
+      "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b3-006-contract.mjs": "16b6c1c379b1ba96b7df1db29f9cfb8e643d2071",
+      "tools/gravicentra-i6-5-b3-006-preview-proof.mjs": "37828b3003cf9e955a90c7359a2c061fce376839",
+      ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "1b4e54329db22c7ab84fc0b3a483b34331bad3e2",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs": "74a499fba8f5611f1959d5ced309a62680fe9815"
+    },
+    "candidateEligibleForPromotion": false
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -40,7 +54,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "3a1b08108756d5875afe0d697aab1992f7824dd4"
+    "blobSha": "0b39e95b2f3b77203d379168b9ef05efcfba70cd"
   },
   "nextRequiredProof": [
     "B3_006_SOURCE_CONTRACT_PASS",
@@ -231,7 +245,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "d7a5d444097f4bee45ece06f5ef885376cc0021e"
+    "blobSha": "72706f9fb424c1e1e40510e60333558d42dfc8af"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
@@ -709,5 +723,26 @@
     "blobSha": "1746189469392b51b051c5fae61dc6e6245e5773",
     "classification": "BLOCKS_CURRENT_PRODUCTION",
     "deferredTo": "B3-008"
+  },
+  "b3006SyntheticQaAuthorization": {
+    "status": "AUTHORIZED_FOR_B3_006_PREVIEW_ONLY",
+    "scope": "B3-006 controlled synthetic policy CSV import through normal product UI and exact readback",
+    "syntheticBusinessWritesAuthorized": true,
+    "operationalBusinessWritesAuthorized": false,
+    "previewConfigWritesAuthorized": false,
+    "productionConfigWritesAuthorized": false,
+    "cleanupRequired": true,
+    "liveHostingPromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "b3007Authorized": false,
+    "allowedSyntheticCollections": [
+      "clientes",
+      "aseguradoras",
+      "polizas",
+      "recibosEsperados",
+      "carteraPrimas",
+      "actividades"
+    ],
+    "forbiddenSyntheticPaymentCollection": "cobros"
   }
 }
