@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P4_ROUTE_HELPER_REMOVAL_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B3-008",
+  "failedRunId": 37015532999,
+  "failedSourceSha": "67f00a209cd4e7aba8644a90801933beb097ec7b",
+  "classification": "HARNESS_ONLY_PERFORMANCE_MEASUREMENT_BLOCKER",
+  "productRegressionDemonstrated": false,
+  "productSourceChanged": false,
+  "failure": "The helper still enforced a 2-second hash equality wait before the authoritative module-ready selector, so it could fail before measuring the product surface.",
+  "fix": "The route helper now only requests navigation and returns the immediate hash for diagnostics. Cliente360 and Cobros are judged solely by their module-specific ready selectors with the existing 6-second bound.",
+  "proofBlobSha": "e5b1363d9ce96073068f1261fd49ce5434166d4b",
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}

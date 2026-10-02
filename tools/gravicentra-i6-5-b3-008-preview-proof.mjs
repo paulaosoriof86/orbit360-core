@@ -59,8 +59,12 @@ async function setCountry(page,country){
   },country);
 }
 async function route(page,key){
-  await page.evaluate(key=>{const target='#/'+key;if(location.hash!==target)location.hash=target;else if(Orbit.router&&Orbit.router.go)Orbit.router.go(key);},key);
-  await page.waitForFunction(key=>location.hash==='#/'+key,key,{timeout:2000});
+  return page.evaluate(key=>{
+    const target='#/'+key;
+    if(location.hash!==target) location.hash=target;
+    else if(Orbit.router&&Orbit.router.go) Orbit.router.go(key);
+    return {requested:target,actual:String(location.hash||'')};
+  },key);
 }
 async function ensure(page,names){
   await page.evaluate(names=>{try{Orbit.store?._ensureCollections?.(names);}catch{}},names);

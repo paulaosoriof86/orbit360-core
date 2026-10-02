@@ -3190,7 +3190,7 @@
       "livePromoted": false,
       "activeFindingId": "B3-008",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "1023d6b7a8aa1ce888dab72d8448cfe5def3e75e",
+      "executionLockBlobSha": "c609be1960d9d4249e5c2590af95f6f485885d41",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_MINIMAL_SOURCE_FIX_20261001.json",
       "sourceFixReceiptBlobSha": "7803b5f614792e6d80df1e1e1d3f22488d44a641",
       "productMutationAuthorized": false,
@@ -3215,7 +3215,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "481327a2cae8c9ae70d6ca5237ed2d4e7c42a5d3",
+      "findingLedgerBlobSha": "55a98dd846251fd837462d96926e30f996b05c4d",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_CAUSAL_DIAGNOSTIC_AND_SOURCE_AUTH_20261001.json",
       "diagnosticRunId": 36658190622,
@@ -4792,7 +4792,9 @@
       "r2p2ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P2_INDEPENDENT_PORTFOLIO_HARNESS_FIX_20261002.json",
       "r2p2ReceiptBlobSha": "5b7ae401aab08467ee6bc253db0e8a3cc7caf111",
       "r2p3ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P3_ROUTE_TIMING_HARNESS_FIX_20261002.json",
-      "r2p3ReceiptBlobSha": "470a67d0d8ad3803b99ac7c8f6606986cc73f13b"
+      "r2p3ReceiptBlobSha": "470a67d0d8ad3803b99ac7c8f6606986cc73f13b",
+      "r2p4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P4_ROUTE_HELPER_REMOVAL_20261002.json",
+      "r2p4ReceiptBlobSha": "4e266024739c40306cc37caa207b4cc2897ffd31"
     }
   },
   "canonicalAccumulationControl": {
@@ -4800,7 +4802,7 @@
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "compositionLockBlobSha": "28f409fd8d0885c7fa89cc386c0006eae5dd8480",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "481327a2cae8c9ae70d6ca5237ed2d4e7c42a5d3",
+    "findingLedgerBlobSha": "55a98dd846251fd837462d96926e30f996b05c4d",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -4999,8 +5001,8 @@
     "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CLOSED_PASS_20261001.json",
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
     "compositionLockBlobSha": "28f409fd8d0885c7fa89cc386c0006eae5dd8480",
-    "findingLedgerBlobSha": "481327a2cae8c9ae70d6ca5237ed2d4e7c42a5d3",
-    "executionLockBlobSha": "1023d6b7a8aa1ce888dab72d8448cfe5def3e75e",
+    "findingLedgerBlobSha": "55a98dd846251fd837462d96926e30f996b05c4d",
+    "executionLockBlobSha": "c609be1960d9d4249e5c2590af95f6f485885d41",
     "noLive": true,
     "noReimport": true,
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
@@ -5023,7 +5025,9 @@
     "r2p2ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P2_INDEPENDENT_PORTFOLIO_HARNESS_FIX_20261002.json",
     "r2p2ReceiptBlobSha": "5b7ae401aab08467ee6bc253db0e8a3cc7caf111",
     "r2p3ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P3_ROUTE_TIMING_HARNESS_FIX_20261002.json",
-    "r2p3ReceiptBlobSha": "470a67d0d8ad3803b99ac7c8f6606986cc73f13b"
+    "r2p3ReceiptBlobSha": "470a67d0d8ad3803b99ac7c8f6606986cc73f13b",
+    "r2p4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P4_ROUTE_HELPER_REMOVAL_20261002.json",
+    "r2p4ReceiptBlobSha": "4e266024739c40306cc37caa207b4cc2897ffd31"
   },
   "paulaVisualReview20261002B3008R2": {
     "decision": "REJECTED_REMEDIATION_REQUIRED",
