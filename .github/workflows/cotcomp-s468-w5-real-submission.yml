@@ -75,6 +75,8 @@ jobs:
           npm run check
           npm run test:cotcomp
           node --check cotcomp-w5-real-submission-s468.js
+          node --check cotcomp-w5-real-submission-s468.test.js
+          node --test cotcomp-w5-real-submission-s468.test.js
 
       - name: Prepare exact LAB credentials
         shell: bash
@@ -287,6 +289,7 @@ jobs:
             .w1.status=="PASS" and
             .w2.status=="PASS" and
             .w2.createdDocuments==8 and
+            (.w2.storageMode=="legacyCompatible" or .w2.storageMode=="canonicalV2") and
             .w2.retryWrites==0 and
             .w2.duplicateCreated==false and
             .w2.providerDeliveryExecuted==false and
