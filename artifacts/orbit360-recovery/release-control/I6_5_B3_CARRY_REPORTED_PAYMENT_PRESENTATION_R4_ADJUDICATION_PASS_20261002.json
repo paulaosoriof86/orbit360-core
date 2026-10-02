@@ -1,0 +1,64 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_CARRY_REPORTED_PAYMENT_PRESENTATION_R4_ADJUDICATION_PASS_V1",
+  "recordedAt": "2026-10-02",
+  "status": "PASS_EXISTING_EVIDENCE_NO_PRODUCT_CHANGE",
+  "findingId": "B3-CARRY-REPORTED-PAYMENT-PRESENTATION-R4",
+  "purpose": "Resolve stale blocking ledger state using already-accredited B3-004 payment provenance/surface evidence plus current B3-008 exact Preview evidence; no new product work or data mutation.",
+  "requiredProofFromLedger": "Client with reported payment evidence appears in Cobros as non-confirmed evidence; confirmed cobro count remains unchanged unless authoritative payment confirmation exists.",
+  "evidence": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_20260930.json",
+      "blobSha": "1dc8409f9e5617c7e65a252969281f4995aa1760",
+      "status": "PASS",
+      "proves": [
+        "Migrated SIGA/CRM direct-payment evidence is distinct from future client-portal reports.",
+        "Legacy copyfix no longer rewrites canonical payment-state labels."
+      ]
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
+      "blobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
+      "status": "PASS",
+      "proves": [
+        "B3-004 final targeted human visual acceptance on canonical payment/reconciliation surfaces.",
+        "Payment/apply/reconcile context remains coherent without duplicate operational records."
+      ]
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_20261002.json",
+      "blobSha": "543059b5a6ce3ece278c3afc78f35b0865277ae3",
+      "status": "MACHINE_PASS",
+      "assertions": [
+        "sigaDirectIncluded",
+        "cobrosCountSemantics",
+        "cobrosCountryCountPartition"
+      ],
+      "counts": {
+        "confirmed": 1243,
+        "pendingReconciliation": 1238,
+        "reconciled": 5
+      }
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+      "blobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
+      "status": "PASS",
+      "authority": "PAULA_TARGETED_VISUAL_ACCEPTANCE",
+      "observation": "Current exact Preview visibly distinguishes Pago registrado en SIGA, Pendiente de conciliación and Conciliado; Paula accepted the targeted surfaces."
+    }
+  ],
+  "adjudication": {
+    "rootCauseResolvedBy": "B3-004 canonical payment origin/state model and surface convergence",
+    "staleLedgerState": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
+    "finalDisposition": "CLOSED_PASS_BY_EXISTING_B3_004_AND_B3_008_EVIDENCE",
+    "blocking": false,
+    "productSourceChanged": false,
+    "rebuildRequired": false,
+    "newPreviewRequired": false,
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "RECHECK_B4_ENTRY_GUARD"
+}
