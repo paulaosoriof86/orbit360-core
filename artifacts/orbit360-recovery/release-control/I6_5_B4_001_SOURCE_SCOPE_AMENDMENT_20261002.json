@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_001_SOURCE_SCOPE_AMENDMENT_V1",
+  "recordedAt": "2026-10-02",
+  "status": "AUTHORIZED_CAUSAL_COMPOSITION_FILE_ONLY",
+  "findingId": "B4-001",
+  "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC_20261002.json",
+  "diagnosticReceiptBlobSha": "dfb8aa09cbdc6bcc09c6555854a0e135e4bd1700",
+  "priorAllowedProductFiles": [
+    "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/modules/portal.js",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js"
+  ],
+  "addedFile": "orbit360-platform/index.html",
+  "reason": "The three changed browser product files are cache-versioned from the canonical index. Source changed after the prior build, so index asset query identities must change before the immutable successor build; otherwise exact Hosting readback can serve stale browser bytes despite corrected source.",
+  "boundaries": {
+    "noAdditionalFunctionalScope": true,
+    "backendChange": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_001_INDEX_ASSET_IDENTITY_UPDATE"
+}
