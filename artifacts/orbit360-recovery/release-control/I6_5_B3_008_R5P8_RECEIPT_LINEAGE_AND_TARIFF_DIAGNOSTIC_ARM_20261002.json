@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P8_RECEIPT_LINEAGE_AND_TARIFF_DIAGNOSTIC_ARM_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_ONLY_READONLY_DIAGNOSTIC_ARMED",
+  "findingId": "B3-008",
+  "sourceParent": "cf37aef8108efa1dd55fc933225fd231bfb7e6bf",
+  "objectives": [
+    "Identify the one active policy without receipt rows.",
+    "Classify all seven multi-denominator receipt packages by source/provenance.",
+    "Test deterministic contractual-calendar candidates using policy cuotas or frequency plus physical x/n denominator.",
+    "Separate no-denominator payment evidence from contractual calendar rows without mutating data.",
+    "Audit canonical tariff configuration sources: configuracionesTarifa, embedded tarifasConfiguradas and legacy cotTasasValidadas."
+  ],
+  "productSourceChanged": false,
+  "operationalBusinessWrites": 0,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B3_008_READONLY_DIAGNOSTIC_EXACT_PREVIEW"
+}
