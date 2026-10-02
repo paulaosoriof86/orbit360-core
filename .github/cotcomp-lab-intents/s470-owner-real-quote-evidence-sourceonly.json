@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "ays-cotcomp-s470-owner-real-quote-evidence-sourceonly-intent-v1.0",
+  "authorization": "S470_OWNER_REAL_QUOTE_EVIDENCE_SOURCEONLY",
+  "authorizedSourceParent": "4a97c6794de31724e084431bc5e0e36fc8aca06e",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "journeyId": "GT_AUTO_MOTO_HYBRID",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "realData": false,
+  "providerOrRater": false,
+  "production": false,
+  "issuance": false,
+  "binding": false,
+  "payment": false
+}
