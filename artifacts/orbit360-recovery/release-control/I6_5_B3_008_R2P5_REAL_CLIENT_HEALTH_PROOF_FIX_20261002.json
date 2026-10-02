@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P5_REAL_CLIENT_HEALTH_PROOF_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B3-008",
+  "parentHead": "ed238540c768c7f06c6d6ef39533f2b6762b918d",
+  "classification": "HARNESS_ONLY_PREEMPTIVE_FIX",
+  "rootCause": "The health proof still depended on the known B3-004 synthetic client producing health=51. Once that fixture is correctly deleted, the proof would falsely fail.",
+  "fix": "Select a non-synthetic real client, calculate expected health independently from active-policy count, overdue portfolio state and Premium segment, then verify the UI value is stable and equal to that independent expectation.",
+  "proofBlobSha": "37f8e974501bdea2587543beb26e48fbd90aae04",
+  "workflowBlobSha": "2550cbb4fd13e261faeeb07bc3746739d7be1f67",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "syntheticQaCleanupWritesAuthorized": true,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}

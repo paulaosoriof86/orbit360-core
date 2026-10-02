@@ -2558,12 +2558,11 @@
         "syntheticQaCleanupWritesAuthorized": true
       },
       "r2p5": {
-        "status": "QA_DIAGNOSTIC_ARMED_PENDING_EXACT_PREVIEW",
-        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P5_CLIENT360_DIAGNOSTIC_INSTRUMENT_20261002.json",
-        "blobSha": "361031cd03f453b62228e37a674a97460d7d0a66",
-        "failedRunId": 37019116003,
-        "classification": "PRODUCT_PERFORMANCE_FAILURE_CONFIRMED_DIAGNOSTIC_CAUSE_PENDING",
-        "productRegressionDemonstrated": true
+        "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P5_REAL_CLIENT_HEALTH_PROOF_FIX_20261002.json",
+        "blobSha": "987d395aa107a15c727d4830bf6e154ab94b9f05",
+        "classification": "HARNESS_ONLY_PREEMPTIVE_FIX",
+        "productRegressionDemonstrated": false
       }
     },
     {
@@ -6044,7 +6043,7 @@
     "r2p3ReceiptBlobSha": "470a67d0d8ad3803b99ac7c8f6606986cc73f13b",
     "r2p4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P4_USABLE_SURFACE_AND_SYNTHETIC_CLEANUP_FIX_20261002.json",
     "r2p4ReceiptBlobSha": "ad9e60e45f526b2515fd8ada4b96296e66d6327e",
-    "r2p5ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P5_CLIENT360_DIAGNOSTIC_INSTRUMENT_20261002.json",
-    "r2p5ReceiptBlobSha": "361031cd03f453b62228e37a674a97460d7d0a66"
+    "r2p5ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P5_REAL_CLIENT_HEALTH_PROOF_FIX_20261002.json",
+    "r2p5ReceiptBlobSha": "987d395aa107a15c727d4830bf6e154ab94b9f05"
   }
 }

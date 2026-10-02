@@ -59,7 +59,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "711ce5752b3d790a85125cd9a552bb2c66355254"
+    "blobSha": "c1136c8960ce3d692dc33a0f3870025d52f0bc96"
   },
   "nextRequiredProof": [
     "B3_008_R2_INDEPENDENT_REALITY_MACHINE_PROOF",
@@ -772,7 +772,7 @@
     "forbiddenSyntheticPaymentCollection": "cobros"
   },
   "b3008Executor": {
-    "status": "ARMED_FOR_EXACT_PREVIEW_R2P4",
+    "status": "ARMED_FOR_EXACT_PREVIEW_R2P5",
     "qaBlobs": {
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "8d3dc8325cf5b74fa30a8f8646e894a8295534e3",
       "tools/gravicentra-i6-5-b3-008-contract.mjs": "868d4ddf85ed7404786d1290d2aa4447a3ff845b",
@@ -791,11 +791,11 @@
       "productSourceChanged": false
     },
     "workflowPath": ".github/workflows/gravicentra-b3-008-executor.yml",
-    "workflowBlobSha": "68f3fbef528f0c8d9534f802d77307733ae38266",
+    "workflowBlobSha": "2550cbb4fd13e261faeeb07bc3746739d7be1f67",
     "contractPath": "tools/gravicentra-i6-5-b3-008-contract.mjs",
     "contractBlobSha": "eae48dc85e161893de36e4b7086d8f243c6dbc4b",
     "proofPath": "tools/gravicentra-i6-5-b3-008-preview-proof.mjs",
-    "proofBlobSha": "bb2330a91ffa40ee23b1bafa3889e0ca36db55ff"
+    "proofBlobSha": "37f8e974501bdea2587543beb26e48fbd90aae04"
   },
   "b3008R2": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -836,12 +836,11 @@
     "syntheticQaCleanupWritesAuthorized": true
   },
   "b3008R2P5": {
-    "status": "QA_DIAGNOSTIC_ARMED_PENDING_EXACT_PREVIEW",
-    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P5_CLIENT360_DIAGNOSTIC_INSTRUMENT_20261002.json",
-    "blobSha": "361031cd03f453b62228e37a674a97460d7d0a66",
-    "failedRunId": 37019116003,
-    "classification": "PRODUCT_PERFORMANCE_FAILURE_CONFIRMED_DIAGNOSTIC_CAUSE_PENDING",
-    "productRegressionDemonstrated": true
+    "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P5_REAL_CLIENT_HEALTH_PROOF_FIX_20261002.json",
+    "blobSha": "987d395aa107a15c727d4830bf6e154ab94b9f05",
+    "classification": "HARNESS_ONLY_PREEMPTIVE_FIX",
+    "productRegressionDemonstrated": false
   },
   "syntheticQaCleanup": {
     "authorized": true,

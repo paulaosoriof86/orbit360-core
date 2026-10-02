@@ -209,16 +209,26 @@ try{
   await ensure(page,['clientes','polizas','carteraPrimas']);
   await waitConfirmed(page,['clientes','polizas','carteraPrimas'],12000);
   const healthTarget=await page.evaluate(()=>{
-    const clients=Orbit.store?.all?.('clientes')||[];
-    for(const c of clients){try{const r=Orbit.q.clienteResumen(c.id);if(Number(r?.salud)===51&&Number(r?.vencido)>0&&Number(r?.nVigentes)===1&&String(c?.segmento||'').toLowerCase()!=='premium')return{id:String(c.id),name:String(c.nombre||'')};}catch{}}
-    return{id:'',name:''};
+    const clients=(Orbit.store?.all?.('clientes')||[]).filter(c=>c&&c.id&&!c.__syntheticHumanQa&&!/QA HUMANA|b300/i.test(String(c.nombre||c.id||'')));
+    const policies=Orbit.store?.all?.('polizas')||[],portfolio=Orbit.store?.all?.('carteraPrimas')||[];
+    const now=Orbit.ui?.now?Orbit.ui.now():new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    const open=r=>{const st=String(r?.estadoCartera||r?.estado||'').trim().toLowerCase();return r?.conciliadoPago!==true&&!['pagado','cobrado','cerrado','anulado','cancelado','cancelada'].includes(st);};
+    const overdue=r=>{if(!open(r))return false;const raw=r?.vence||r?.fechaVencimiento||r?.fechaLimite||'';if(!raw)return false;const d=new Date(String(raw).slice(0,10)+'T00:00:00');return !Number.isNaN(d.getTime())&&d<today;};
+    for(const c of clients){
+      const pol=policies.filter(p=>p&&String(p.clienteId||'')===String(c.id)),active=pol.filter(p=>p.estado==='Vigente'||p.estado==='Por renovar');
+      if(!pol.length)continue;
+      const vencido=portfolio.some(x=>x&&String(x.clienteId||'')===String(c.id)&&overdue(x));
+      const expected=Math.max(8,Math.min(100,70+Math.min(20,active.length*6)-(vencido?25:0)+(c.segmento==='Premium'?8:0)));
+      return{id:String(c.id),name:String(c.nombre||''),expected,nVigentes:active.length,hasOverdue:vencido,premium:c.segmento==='Premium'};
+    }
+    return{id:'',name:'',expected:null};
   });
-  need(healthTarget.id,'B3_008_NO_HEALTH51_TARGET');
+  need(healthTarget.id&&Number.isFinite(Number(healthTarget.expected)),'B3_008_NO_REAL_HEALTH_TARGET');
   await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id);},healthTarget.id);
   await page.waitForFunction(()=>document.querySelector('[data-c360-health="1"][data-readiness="ready"][data-value]'),null,{timeout:12000});
   const h1=Number(await page.locator('[data-c360-health="1"]').getAttribute('data-value'));await page.waitForTimeout(900);const h2=Number(await page.locator('[data-c360-health="1"]').getAttribute('data-value'));
-  need(h1===51&&h2===51,'B3_008_HEALTH_NOT_STABLE_51:'+h1+':'+h2);
-  proof.health={target:healthTarget,first:h1,stable:h2};proof.assertions.healthStable=true;
+  need(h1===Number(healthTarget.expected)&&h2===Number(healthTarget.expected),'B3_008_HEALTH_INDEPENDENT_MISMATCH:'+JSON.stringify({target:healthTarget,first:h1,stable:h2}));
+  proof.health={target:healthTarget,first:h1,stable:h2,independentExpected:Number(healthTarget.expected)};proof.assertions.healthStable=true;proof.assertions.healthIndependentRealClient=true;
 
   await route(page,'cronograma');await page.waitForTimeout(800);
   const chrono=await page.evaluate(()=>String(document.getElementById('host')?.innerText||''));
