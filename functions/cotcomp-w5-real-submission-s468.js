@@ -122,7 +122,7 @@ function consentCommitment(caseId,d){
     generalPersistenceReleased:d.pilotIntake&&d.pilotIntake.generalPersistenceReleased===true
   });
 }
-function deriveProjection(runId,caseId,correlationId){
+function deriveProjection(runId,caseId,correlationId,quoteCasePath){
   const seed=sha([TENANT_ID,caseId,correlationId,runId,'S468_W2'].join('|'));
   const businessId='w5biz_'+seed.slice(0,24);
   const managementId='w5mgmt_'+seed.slice(24,48);
@@ -142,7 +142,7 @@ function deriveProjection(runId,caseId,correlationId){
       caseId,
       journeyId:JOURNEY_ID,
       correlationId,
-      quoteCasePath:'',
+      quoteCasePath:clean(quoteCasePath,500),
       selectedProposalId:'',
       intakeStatus:'lead_recibido'
     }
@@ -161,7 +161,7 @@ function deriveProjection(runId,caseId,correlationId){
       caseId,
       journeyId:JOURNEY_ID,
       correlationId,
-      quoteCasePath:'',
+      quoteCasePath:clean(quoteCasePath,500),
       selectedProposalId:'',
       intakeStatus:'lead_recibido'
     }
@@ -267,6 +267,21 @@ async function cleanupExact(db,paths,baseline){
     return {deleted:paths.length};
   });
 }
+async function cleanupCreatedSubset(db,paths){
+  const current=await readPaths(db,paths);
+  const present=current.filter(x=>x.exists);
+  if(!present.length)return {deleted:0};
+  return db.runTransaction(async tx=>{
+    const snaps=[];
+    for(const row of present)snaps.push({row,snap:await tx.get(db.doc(row.path))});
+    for(const item of snaps){
+      if(!item.snap.exists)throw new Error('S468_PARTIAL_ROLLBACK_PATH_DISAPPEARED');
+      if(digest(item.snap.data())!==item.row.digest)throw new Error('S468_PARTIAL_ROLLBACK_DIGEST_MISMATCH');
+    }
+    for(const item of snaps)tx.delete(db.doc(item.row.path));
+    return {deleted:snaps.length};
+  });
+}
 async function discoverRealCase(db){
   const quotePath=data.pathFor(TENANT_ID,data.ENTITY.QUOTE_CASE);
   const snap=await db.collection(quotePath).where('journeyId','==',JOURNEY_ID).limit(MAX_SCAN).get();
@@ -335,14 +350,14 @@ async function run(){
   };
   for(const value of Object.values(commitments))if(!/^[a-f0-9]{64}$/.test(value))throw new Error('S468_COMMITMENT_INVALID');
 
-  const projection=deriveProjection(runId,caseId,clean(caseData.correlationId,180));
+  const projection=deriveProjection(runId,caseId,clean(caseData.correlationId,180),casePath);
   const paths=journalPaths(projection);
   const initial=await readPaths(db,paths);
   if(!allAbsent(initial))throw new Error('S468_W2_TARGET_PATHS_NOT_CLEAN');
 
   const customToken=await auth.createCustomToken(actor.uid,{s468W5Pilot:true,tenantId:TENANT_ID});
   const idToken=await exchangeCustomToken(apiKey,customToken);
-  let created=false;
+  let writesStarted=false;
   let baseline=null;
   try{
     const calls=[
@@ -353,9 +368,9 @@ async function run(){
     for(const c of calls){
       const r=await invokeOwner(idToken,commandEnvelope(c.op,c.entityId,c.requestId,c.payload));
       if(!r.ok||!r.result||r.result.ok!==true)throw new Error('S468_W2_FIRST_CALL_FAILED');
+      writesStarted=true;
       first.push({operation:c.op,reused:r.result.reused===true,httpStatus:r.httpStatus});
     }
-    created=true;
     baseline=await readPaths(db,paths);
     verifyOwnedJournal(baseline,projection,actor.uid);
 
@@ -510,9 +525,12 @@ async function run(){
       }
     };
   }catch(e){
-    if(created&&baseline){
+    if(writesStarted){
       try{
-        await cleanupExact(db,paths,baseline);
+        if(baseline)await cleanupExact(db,paths,baseline);
+        else await cleanupCreatedSubset(db,paths);
+        const afterFailureCleanup=await readPaths(db,paths);
+        if(!allAbsent(afterFailureCleanup))throw new Error('S468_PARTIAL_ROLLBACK_FINAL_ABSENCE_FAILED');
       }catch(_){
         throw new Error('S468_EXECUTION_AND_ROLLBACK_FAILED');
       }
@@ -524,7 +542,7 @@ async function run(){
 module.exports=Object.freeze({
   VERSION,PROJECT_ID,REGION,TENANT_ID,JOURNEY_ID,COUNTRY,TARGET_ADVISOR_ID,OWNER_CALLABLE,MAX_SCAN,AS_OF,CONSENT_TEXT,
   clean,sha,digest,eventId,intakeEligible,healthSensitiveAbsent,caseCommitment,actorCommitment,consentCommitment,
-  deriveProjection,journalPaths,allAbsent,run
+  deriveProjection,journalPaths,allAbsent,cleanupCreatedSubset,run
 });
 
 if(require.main===module){
