@@ -767,17 +767,23 @@
     "forbiddenSyntheticPaymentCollection": "cobros"
   },
   "b3008Executor": {
-    "status": "ARMED_FOR_EXACT_PREVIEW",
+    "status": "ARMED_FOR_EXACT_PREVIEW_RETRY",
     "qaBlobs": {
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "8d3dc8325cf5b74fa30a8f8646e894a8295534e3",
       "tools/gravicentra-i6-5-b3-008-contract.mjs": "868d4ddf85ed7404786d1290d2aa4447a3ff845b",
-      "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "eac6bce09b593e4fad022fbc42702c415d14d991",
+      "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "f0d0bdfb6f69e6ce6fdf638eb9c203a419bfb90a",
       ".github/workflows/gravicentra-b3-008-executor.yml": "a607e4f60a44907361ccb972aa6519b07c5a08dd"
     },
     "productSourceChanged": false,
     "operationalBusinessWritesAuthorized": false,
     "reimportAuthorized": false,
     "liveHostingPromotionAuthorized": false,
-    "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+    "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
+    "targetSelectionRepair": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_QA_TARGET_SELECTION_REPAIR_20261002.json",
+      "blobSha": "9a9d9280f677cd6fe70693f8ec00716539b7f449",
+      "failedRunId": 36965960247,
+      "productSourceChanged": false
+    }
   }
 }
