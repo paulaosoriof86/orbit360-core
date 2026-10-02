@@ -30,6 +30,11 @@
       "file": "orbit360-platform/modules/cronograma.js",
       "loadedByIndex": true,
       "presentInAccumulatedProductFiles": false
+    },
+    "routerHydration": {
+      "file": "orbit360-platform/core/router.js",
+      "finding": "REACTIVE_COLLECTIONS has no cronograma entry, so a render before portfolio hydration can remain stale after server-confirmed receipts/portfolio arrive.",
+      "remediation": "Bind Cronograma to clientes/polizas/recibosEsperados/carteraPrimas/cobros/gestiones/tareas refresh events."
     }
   },
   "impact": [
@@ -41,6 +46,7 @@
   "minimalFix": {
     "authorizedProductFiles": [
       "orbit360-platform/modules/cronograma.js",
+      "orbit360-platform/core/router.js",
       "orbit360-platform/index.html"
     ],
     "canonicalReadOwner": "Orbit.cobrosCarteraProjectionAdapter.portfolioRows",
@@ -51,7 +57,8 @@
       "Clicking the obligation opens the linked expected-receipt detail in Cliente360.",
       "Country/role scope is inherited from the canonical portfolio adapter.",
       "No operational writes are introduced by Cronograma.",
-      "cronograma.js is added to the cumulative exact product file set and its index asset binding is refreshed."
+      "cronograma.js is added to the cumulative exact product file set and its index asset binding is refreshed.",
+      "Cronograma rerenders when its authoritative receipt/portfolio dependencies hydrate or change."
     ]
   },
   "proofRequired": [
