@@ -298,7 +298,11 @@ Orbit.modules.cobros = (function () {
   function safeMoney(value, currency, short) {
     const cur = String(currency || '').trim().toUpperCase() || 'SIN_MONEDA';
     if (cur === 'SIN_MONEDA') return 'Sin moneda · ' + Math.round(Number(value) || 0).toLocaleString('es-GT');
-    if (cur === 'GTQ' || cur === 'COP' || cur === 'USD') return (short ? U.moneyShort(value, cur) : U.money(value, cur)) + ' ' + cur;
+    if (cur === 'GTQ' || cur === 'COP' || cur === 'USD') {
+      const n = U.finiteNumber(value);
+      const compact = short && n != null && Math.abs(n) >= 100000;
+      return (compact ? U.moneyShort(value, cur) : U.money(value, cur)) + ' ' + cur;
+    }
     const n = U.finiteNumber(value);
     return cur + ' ' + (n == null ? '—' : Math.round(n).toLocaleString('es-GT'));
   }
@@ -350,7 +354,9 @@ Orbit.modules.cobros = (function () {
     const idx = model.idx;
     const cart = model.cart;
     const aging = model.aging;
-    const porConciliar = hyd.financialReady ? (cart.currencies || []).reduce((sum, cur) => sum + Number(cart.byCurrency[cur] && cart.byCurrency[cur].porConciliar || 0), 0) : null;
+    const porConciliar = hyd.financialReady ? Number(cart.porConciliarCount != null ? cart.porConciliarCount : (cart.currencies || []).reduce((sum, cur) => sum + Number(cart.byCurrency[cur] && cart.byCurrency[cur].porConciliar || 0), 0)) : null;
+    const confirmedCount = hyd.financialReady ? Number(cart.confirmedCount || 0) : null;
+    const reconciledCount = hyd.financialReady ? Number(cart.reconciledCount || 0) : null;
     const qaSurfaceRow = qaReceipt ? qaReceiptSurfaceRow(qaReceipt) : null;
     const authoritative = qaReceipt ? [] : rows(idx), portfolioOnly = qaReceipt || !hyd.financialReady ? [] : portfolioPaymentRows(idx), reported = qaReceipt || !hyd.financialReady ? [] : reportedRows(idx);
     const crmDirect = reported.filter(x => x.__crmDirectEvidence), paidReceiptFallback = reported.filter(x => x.__paidReceiptEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
@@ -369,22 +375,22 @@ Orbit.modules.cobros = (function () {
     const agingCols = { '1-30': '#c9821b', '31-60': '#d9602e', '61-90': '#b5253b', '90+': '#7e1220' };
     const truthAttr = hyd.financialReady ? U.esc(encodeURIComponent(JSON.stringify(cart.byCurrency || {}))) : '';
 
-    host.innerHTML = `<div class="page" data-cobros-core-ready="1" data-cobros-financial-readiness="${hyd.financialReady?'ready':(hyd.financialFailed.length?'unavailable':'pending')}" data-cobros-truth="${truthAttr}">
+    host.innerHTML = `<div class="page" data-cobros-core-ready="1" data-cobros-financial-readiness="${hyd.financialReady?'ready':(hyd.financialFailed.length?'unavailable':'pending')}" data-cobros-truth="${truthAttr}" data-cobros-confirmed-count="${confirmedCount==null?'':confirmedCount}" data-cobros-pending-reconcile-count="${porConciliar==null?'':porConciliar}" data-cobros-reconciled-count="${reconciledCount==null?'':reconciledCount}" data-cobros-kpi-small-exact="1">
       ${K.bannerFor('cobros', `<button class="btn ghost" onclick="Orbit.modules.cobros.lote()" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📤 Preparar lote</button>`)}
       ${isPreviewHost()?'<div class="card pad" data-preview-safe-mode="1" style="margin-bottom:12px;border-left:3px solid var(--info)"><b>Vista previa segura</b><div class="muted" style="margin-top:4px">Los registros reales son solo lectura. Las pruebas de escritura solo se habilitan en el caso QA sintético aislado.</div></div>':''}
       ${qaReceipt?'<div class="card pad" data-b3004-human-qa-mode="1" style="margin-bottom:12px;border-left:3px solid var(--ok)"><b>Prueba QA sintética aislada</b><div class="muted" style="margin-top:4px">Esta vista contiene únicamente el recibo de prueba autorizado; no mezcla clientes reales.</div></div>':''}
       ${K.kpis(hyd.financialReady ? [
-        { label: 'Cobros confirmados', onclick: "Orbit.modules.cobros.kpi('confirmed')", val: currencyMetric(cart, 'alDia'), color: 'var(--ok)', foot: 'pagos confirmados · sin conversión entre monedas', footTone: 'up' },
+        { label: 'Cobros confirmados', onclick: "Orbit.modules.cobros.kpi('confirmed')", val: currencyMetric(cart, 'alDia'), color: 'var(--ok)', foot: confirmedCount + ' pagos confirmados · sin conversión entre monedas', footTone: 'up' },
         { label: 'Pendiente', onclick: "Orbit.modules.cobros.kpi('pending')", val: currencyMetric(cart, 'pend'), color: 'var(--warn)', foot: 'obligaciones por vencer · por moneda' },
         { label: 'Vencido', onclick: "Orbit.modules.cobros.kpi('overdue')", val: currencyMetric(cart, 'venc'), color: 'var(--danger)', foot: 'obligaciones vencidas · por moneda', footTone: 'down' },
-        { label: 'Por conciliar', onclick: "Orbit.modules.cobros.kpi('reconcile')", val: porConciliar, color: 'var(--info)', foot: 'cobros confirmados sin conciliación' }
+        { label: 'Por conciliar', onclick: "Orbit.modules.cobros.kpi('reconcile')", val: porConciliar, color: 'var(--info)', foot: porConciliar + ' de ' + confirmedCount + ' confirmados · ' + reconciledCount + ' ya conciliados' }
       ] : [
         { label: 'Cobros confirmados', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando pagos y recibos' },
         { label: 'Pendiente', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando cartera' },
         { label: 'Vencido', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando cartera' },
         { label: 'Por conciliar', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando pagos' }
       ])}
-      ${crmDirect.length ? `<div class="card" data-siga-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--ok)"><b>${crmDirect.length} pago(s) registrados en SIGA</b><div class="muted" style="font-size:12px;margin-top:3px">Son evidencia directa de pagos ya efectuados. No requieren aplicación manual; conservan conciliación automática por lote y también acción individual <b>Conciliar</b>.</div></div>` : ''}
+      ${crmDirect.length ? `<div class="card" data-siga-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--ok)"><b>${crmDirect.length} pagos registrados en SIGA</b><div class="muted" style="font-size:12px;margin-top:3px">Son evidencia directa de pagos ya efectuados. En el universo actual hay <b>${crmDirect.filter(x=>!x.conciliado).length}</b> pendientes de conciliación y <b>${crmDirect.filter(x=>x.conciliado).length}</b> ya conciliados. No requieren aplicación manual.</div></div>` : ''}
       ${advisorReported.length ? `<div class="card" data-advisor-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${advisorReported.length} pago(s) reportado(s) por asesor</b><div class="muted" style="font-size:12px;margin-top:3px">El reporte no aplica el pago. Operativo valida la correspondencia desde Ops y luego aplica el mismo pago sin duplicarlo.</div></div>` : ''}
       ${clientReported.length ? `<div class="card" data-reported-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${clientReported.length} pago(s) reportado(s) realmente desde portal</b><div class="muted" style="font-size:12px;margin-top:3px">Cuando el recibo coincide de forma única y válida, el pago se aplica automáticamente. Solo los casos ambiguos o contradictorios quedan para revisión.</div></div>` : ''}
 

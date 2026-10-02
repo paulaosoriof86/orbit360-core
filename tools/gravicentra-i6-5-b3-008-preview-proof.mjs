@@ -123,7 +123,9 @@ async function independent(page){
     const scopedClients=clients.filter(c=>inCountry(cc(c.pais))),scopedClientIds=new Set(scopedClients.map(c=>String(c.id||'')));
     const clientPolicies=policies.filter(p=>scopedClientIds.has(String(p&&p.clienteId||''))),clientActive=clientPolicies.filter(p=>['Vigente','Por renovar'].includes(p.estado));
     const scopedPolicies=policies.filter(p=>inCountry(policyCountry(p))),active=scopedPolicies.filter(p=>['Vigente','Por renovar'].includes(p.estado));
-    return{country,month,production:prod,realizedAll,monthlyPaid,pending:pend,overdue:venc,directCount:direct.length,directAmount:direct.reduce((s,r)=>s+(Number(r.monto)||0),0),clientCount:scopedClients.length,clientPolicyCount:clientPolicies.length,clientActivePolicyCount:clientActive.length,policyCount:scopedPolicies.length,activePolicyCount:active.length};
+    const confirmedCount=realized.length,porConciliarCount=realized.filter(r=>r&&r.conciliado!==true).length,reconciledCount=realized.filter(r=>r&&r.conciliado===true).length;
+    const unexpectedCurrencyRows=country==='TODOS'?[]:realized.filter(r=>{const cur=cc(r.moneda||pm.get(String(r.polizaId||''))?.moneda);return country==='GT'?cur==='COP':country==='CO'?cur==='GTQ':false;}).map(r=>({id:String(r.id||''),receiptId:String(r.receiptId||''),polizaId:String(r.polizaId||''),clienteId:String(r.clienteId||''),moneda:cc(r.moneda||pm.get(String(r.polizaId||''))?.moneda),monto:Number(r.monto)||0,conciliado:r.conciliado===true})).slice(0,25);
+    return{country,month,production:prod,realizedAll,monthlyPaid,pending:pend,overdue:venc,confirmedCount,porConciliarCount,reconciledCount,directCount:direct.length,directAmount:direct.reduce((s,r)=>s+(Number(r.monto)||0),0),unexpectedCurrencyRows,clientCount:scopedClients.length,clientPolicyCount:clientPolicies.length,clientActivePolicyCount:clientActive.length,policyCount:scopedPolicies.length,activePolicyCount:active.length};
   });
 }
 function attrMap(encoded){try{return JSON.parse(decodeURIComponent(encoded||''));}catch{return{};}}
@@ -204,13 +206,21 @@ try{
   need(c360CO.scope==='CO'&&c360CO.clients===truthClientCO.clientCount&&c360CO.active===truthClientCO.clientActivePolicyCount&&c360CO.policies===truthClientCO.clientPolicyCount,'B3_008_CLIENT360_COUNTRY_KPI_MISMATCH:'+JSON.stringify({c360CO,truthClientCO}));
   need(c360CO.clickable===4,'B3_008_CLIENT360_KPI_CLICKABILITY_MISSING:'+JSON.stringify(c360CO));
   proof.client360CO=c360CO;
+  await setCountry(page,'GT');await route(page,'cliente360');await waitConfirmed(page,['clientes','polizas','carteraPrimas'],12000);await page.waitForSelector('[data-c360-list-ready="1"]');
+  const truthClientGT=await independent(page);
+  const c360GT=await page.evaluate(()=>{const e=document.querySelector('[data-c360-kpi-scope]');return{scope:e?.getAttribute('data-c360-kpi-scope')||'',clients:Number(e?.getAttribute('data-c360-kpi-client-count')),active:Number(e?.getAttribute('data-c360-kpi-active-count')),policies:Number(e?.getAttribute('data-c360-kpi-policy-count')),renew:Number(e?.getAttribute('data-c360-kpi-renew-count'))};});
+  need(c360GT.scope==='GT'&&c360GT.clients===truthClientGT.clientCount&&c360GT.active===truthClientGT.clientActivePolicyCount&&c360GT.policies===truthClientGT.clientPolicyCount,'B3_008_CLIENT360_GT_KPI_MISMATCH:'+JSON.stringify({c360GT,truthClientGT}));
+  proof.client360GT=c360GT;proof.assertions.client360GTCountryKpis=true;
 
   await setCountry(page,'TODOS');await route(page,'cliente360');await waitConfirmed(page,['clientes','polizas','carteraPrimas'],12000);await page.waitForSelector('[data-c360-list-ready="1"]');
   await page.selectOption('#f-pais','CO');
   await page.waitForFunction(()=>document.querySelector('[data-c360-filter-country="CO"]'));
   const c360InternalCO=await page.evaluate(()=>{const e=document.querySelector('[data-c360-kpi-scope]');return{scope:e?.getAttribute('data-c360-kpi-scope')||'',filter:e?.getAttribute('data-c360-filter-country')||'',clients:Number(e?.getAttribute('data-c360-kpi-client-count')),active:Number(e?.getAttribute('data-c360-kpi-active-count')),policies:Number(e?.getAttribute('data-c360-kpi-policy-count'))};});
   need(c360InternalCO.scope==='TODOS'&&c360InternalCO.filter==='CO'&&c360InternalCO.clients===truthClientCO.clientCount&&c360InternalCO.active===truthClientCO.clientActivePolicyCount&&c360InternalCO.policies===truthClientCO.clientPolicyCount,'B3_008_CLIENT360_INTERNAL_COUNTRY_KPI_MISMATCH:'+JSON.stringify({c360InternalCO,truthClientCO}));
-  proof.client360InternalCO=c360InternalCO;proof.assertions.client360CountryKpis=true;proof.assertions.client360InternalCountryKpis=true;proof.assertions.kpiDetailSurfaces=true;
+  proof.client360InternalCO=c360InternalCO;
+  const countryPartition=await page.evaluate(()=>{const clients=Orbit.store?.all?.('clientes')||[],cc=v=>String(v||'').trim().toUpperCase();return{total:clients.length,gt:clients.filter(c=>cc(c?.pais)==='GT').length,co:clients.filter(c=>cc(c?.pais)==='CO').length,other:clients.filter(c=>!['GT','CO'].includes(cc(c?.pais))).length};});
+  need(countryPartition.total===countryPartition.gt+countryPartition.co+countryPartition.other&&countryPartition.gt===truthClientGT.clientCount&&countryPartition.co===truthClientCO.clientCount,'B3_008_CLIENT_COUNTRY_PARTITION_MISMATCH:'+JSON.stringify({countryPartition,truthClientGT,truthClientCO}));
+  proof.clientCountryPartition=countryPartition;proof.assertions.client360CountryKpis=true;proof.assertions.client360InternalCountryKpis=true;proof.assertions.clientCountryPartition=true;proof.assertions.kpiDetailSurfaces=true;
 
   await setCountry(page,'TODOS');
   const cobrosPerf=await measureUsableRoute(page,'cobros','core-marker',15000);
@@ -218,6 +228,10 @@ try{
   proof.cobrosUsableState=cobrosPerf.state;
   need(proof.performance.cobrosCoreMs<=6000,'B3_008_COBROS_CORE_TOO_SLOW:'+proof.performance.cobrosCoreMs+':'+JSON.stringify(cobrosPerf.state));
   proof.assertions.cobrosCorePerformance=true;
+  const cobrosAllCounts=await page.evaluate(()=>{const e=document.querySelector('[data-cobros-core-ready="1"]');return{confirmed:Number(e?.getAttribute('data-cobros-confirmed-count')),porConciliar:Number(e?.getAttribute('data-cobros-pending-reconcile-count')),reconciled:Number(e?.getAttribute('data-cobros-reconciled-count')),smallExact:e?.getAttribute('data-cobros-kpi-small-exact')||''};});
+  need(cobrosAllCounts.confirmed===truthAll.confirmedCount&&cobrosAllCounts.porConciliar===truthAll.porConciliarCount&&cobrosAllCounts.reconciled===truthAll.reconciledCount&&cobrosAllCounts.confirmed===cobrosAllCounts.porConciliar+cobrosAllCounts.reconciled,'B3_008_COBROS_COUNT_SEMANTICS_MISMATCH:'+JSON.stringify({dom:cobrosAllCounts,truth:truthAll}));
+  need(cobrosAllCounts.smallExact==='1','B3_008_COBROS_SMALL_AMOUNT_EXACT_MARKER_MISSING');
+  proof.cobrosAllCounts=cobrosAllCounts;proof.assertions.cobrosCountSemantics=true;proof.assertions.cobrosSmallAmountClarity=true;
 
   await setCountry(page,'TODOS');await route(page,'inicio');await page.waitForSelector('[data-inicio-reality-ready="1"]');
   const detailOwner=await page.evaluate(()=>{document.querySelector('[data-inicio-metric="cobros-confirmados"]')?.click();return{expected:Orbit.q.cobrosConfirmadosRows?.().length||0};});
@@ -248,6 +262,13 @@ try{
   need(polCO.total===truthCO.policyCount&&polCO.active===truthCO.activePolicyCount,'B3_008_POLIZAS_COUNTRY_SCOPE_MISMATCH:'+JSON.stringify({polCO,truthCO}));
   proof.assertions.polizasCountryScope=true;
   proof.countries.CO={truth:truthCO,counts:coCounts,cobros:cobrosCO.truth,polizas:polCO};
+
+  await setCountry(page,'GT');await route(page,'cobros');await page.waitForFunction(()=>document.querySelector('[data-cobros-financial-readiness="ready"]'),null,{timeout:12000});
+  const truthGT=await independent(page);
+  const cobrosGT=await page.evaluate(()=>{const e=document.querySelector('[data-cobros-core-ready="1"]');let truth={};try{truth=JSON.parse(decodeURIComponent(e?.getAttribute('data-cobros-truth')||''));}catch{}return{truth,confirmed:Number(e?.getAttribute('data-cobros-confirmed-count')),porConciliar:Number(e?.getAttribute('data-cobros-pending-reconcile-count')),reconciled:Number(e?.getAttribute('data-cobros-reconciled-count'))};});
+  need(cobrosGT.confirmed===truthGT.confirmedCount&&cobrosGT.porConciliar===truthGT.porConciliarCount&&cobrosGT.reconciled===truthGT.reconciledCount,'B3_008_COBROS_GT_COUNT_MISMATCH:'+JSON.stringify({cobrosGT,truthGT}));
+  need(truthGT.porConciliarCount+truthCO.porConciliarCount===truthAll.porConciliarCount,'B3_008_COBROS_COUNTRY_RECONCILE_PARTITION_MISMATCH:'+JSON.stringify({all:truthAll.porConciliarCount,gt:truthGT.porConciliarCount,co:truthCO.porConciliarCount}));
+  proof.countries.GT={truth:truthGT,cobros:cobrosGT};proof.assertions.cobrosCountryCountPartition=true;
 
   await setCountry(page,'TODOS');await route(page,'cliente360');
   await ensure(page,['clientes','polizas','carteraPrimas']);

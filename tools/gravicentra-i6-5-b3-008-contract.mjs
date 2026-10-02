@@ -39,6 +39,8 @@ need(src.queries.includes('function recaudoMesPorMoneda('),'B3_008_MONTHLY_COLLE
 need(src.queries.includes('function leaderboardMes('),'B3_008_MONTHLY_ADVISOR_OWNER_MISSING');
 need(src.queries.includes('function metaAdvisorMes('),'B3_008_MONTHLY_META_SCHEMA_OWNER_MISSING');
 need(src.queries.includes('function cobrosConfirmadosRows()'),'B3_008_CONFIRMED_DETAIL_OWNER_MISSING');
+need(src.queries.includes('confirmedCount'),'B3_008_CONFIRMED_COUNT_OWNER_MISSING');
+need(src.queries.includes('reconciledCount: Math.max(0, confirmedCount - porConciliarCount)'),'B3_008_RECONCILED_COUNT_OWNER_MISSING');
 need(src.queries.includes('function polizasScoped()'),'B3_008_POLICY_COUNTRY_SCOPE_OWNER_MISSING');
 need(src.queries.includes('function clientesScoped()'),'B3_008_CLIENT_COUNTRY_SCOPE_OWNER_MISSING');
 need((src.queries.match(/const cob = realizedPaymentRows\(\)\.filter/g)||[]).length>=2,'B3_008_FINANCIAL_KPI_NOT_REALIZED_PAYMENT_BASED');
@@ -54,6 +56,7 @@ need(src.inicio.includes("data-values="),'B3_008_INDEPENDENT_VALUE_MARKERS_MISSI
 need(src.inicio.includes("data-meta-value="),'B3_008_META_TARGET_MARKER_MISSING');
 need(src.inicio.includes("Cobros confirmados"),'B3_008_CONFIRMED_SEMANTIC_LABEL_MISSING');
 need(src.inicio.includes("q.cobrosConfirmadosRows"),'B3_008_CONFIRMED_MODAL_CANONICAL_OWNER_MISSING');
+need(src.inicio.includes('financialMoneyMap'),'B3_008_FINANCIAL_SMALL_AMOUNT_CLARITY_MISSING');
 
 need(src.cliente.includes("return ['clientes'].every"),'B3_008_CLIENT_LIST_PRIMARY_READINESS_INVALID');
 need(src.cliente.includes("const policyReadiness = dataReadiness(['polizas'])"),'B3_008_CLIENT_LIST_PROGRESSIVE_POLICY_READINESS_MISSING');
@@ -67,9 +70,10 @@ need((src.cliente.match(/class="kpi kpi-click" data-c360-kpi="/g)||[]).length===
 need(src.index.includes('data/store-firestore-product-readonly-p0.js?v=20261002-b3008r4'),'B3_008_INDEXED_STORE_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/crm-v1198-operational-bridge.js?v=20261002-b3008r4'),'B3_008_CRM_CANONICAL_OWNER_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/policy-receipts-v1199-detail-guard.js?v=20261002-b3008r4'),'B3_008_DETAIL_GUARD_CANONICAL_OWNER_ASSET_BINDING_MISSING');
-need(src.index.includes('core/queries.js?v=20261002-b3008r5'),'B3_008_R5_QUERY_ASSET_BINDING_MISSING');
-need(src.index.includes('modules/inicio.js?v=20261002-b3008r5'),'B3_008_R5_INICIO_ASSET_BINDING_MISSING');
+need(src.index.includes('core/queries.js?v=20261002-b3008r5p5'),'B3_008_R5P5_QUERY_ASSET_BINDING_MISSING');
+need(src.index.includes('modules/inicio.js?v=20261002-b3008r5p5'),'B3_008_R5P5_INICIO_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/cliente360.js?v=20261002-b3008r5p1'),'B3_008_R5P1_CLIENTE360_ASSET_BINDING_MISSING');
+need(src.index.includes('modules/cobros.js?v=20261002-b3008r5p5'),'B3_008_R5P5_COBROS_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/cronograma.js?v=20261002-b3008r5p4'),'B3_007_R5P4_CRONOGRAMA_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/cobros-cartera-i65-closure-bridge.js?v=20261002-b3008r5p4'),'B3_008_R5P4_PORTFOLIO_ADAPTER_ASSET_BINDING_MISSING');
 
@@ -81,6 +85,10 @@ need(src.cobros.includes('Actualizando datos'),'B3_008_COBROS_PARTIAL_ZERO_GUARD
 need(src.cobros.includes("Orbit.modules.cobros.kpi('confirmed')"),'B3_008_COBROS_CONFIRMED_KPI_DETAIL_MISSING');
 need(src.cobros.includes("Orbit.modules.cobros.kpi('pending')"),'B3_008_COBROS_PENDING_KPI_DETAIL_MISSING');
 need(src.cobros.includes("Orbit.modules.cobros.kpi('overdue')"),'B3_008_COBROS_OVERDUE_KPI_DETAIL_MISSING');
+need(src.cobros.includes('data-cobros-confirmed-count='),'B3_008_COBROS_CONFIRMED_COUNT_MARKER_MISSING');
+need(src.cobros.includes('data-cobros-pending-reconcile-count='),'B3_008_COBROS_RECONCILE_COUNT_MARKER_MISSING');
+need(src.cobros.includes('data-cobros-kpi-small-exact="1"'),'B3_008_COBROS_SMALL_EXACT_MARKER_MISSING');
+need(src.cobros.includes('Math.abs(n) >= 100000'),'B3_008_COBROS_SMALL_AMOUNT_EXACT_FORMAT_MISSING');
 
 need(src.polizas.includes("const all = q.polizasScoped ? q.polizasScoped()"),'B3_008_POLIZAS_COUNTRY_SCOPE_MISSING');
 need(src.polizas.includes("st.fkind === 'active' ? isActivePolicy(p)"),'B3_008_POLIZAS_ACTIVE_KPI_FILTER_MISMATCH');

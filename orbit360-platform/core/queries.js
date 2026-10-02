@@ -365,11 +365,16 @@ Orbit.q = (function () {
     const cob = realizedPaymentRows().filter(c => rowPais(c, clients, policies));
     const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));
     const byCurrency = {};
+    let confirmedCount = 0, porConciliarCount = 0;
     const ensure = cur => byCurrency[cur] || (byCurrency[cur] = emptyPortfolioCurrency());
     cob.filter(confirmedCobro).forEach(c => {
+      confirmedCount += 1;
       const cur = currencyCodeFor(c, clients, policies);
       ensure(cur).alDia += amount(c.monto);
-      if (!c.conciliado) ensure(cur).porConciliar += 1;
+      if (!c.conciliado) {
+        ensure(cur).porConciliar += 1;
+        porConciliarCount += 1;
+      }
     });
     car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).forEach(r => {
       const cur = currencyCodeFor(r, clients, policies);
@@ -382,6 +387,9 @@ Orbit.q = (function () {
     return {
       byCurrency,
       currencies: Object.keys(byCurrency).sort(),
+      confirmedCount,
+      porConciliarCount,
+      reconciledCount: Math.max(0, confirmedCount - porConciliarCount),
       country: paisActivo() || 'TODOS',
       source: 'cobros+carteraPrimas',
       crossCurrencyConversion: false,
