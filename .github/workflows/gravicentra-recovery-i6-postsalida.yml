@@ -7673,3 +7673,74 @@ jobs:
       - name: B3-005 human close failure remains fail-closed
         if: ${{ failure() && steps.gate.outputs.run == 'true' }}
         run: echo "B3_005_HUMAN_CLOSE_FAILED_NO_LIVE_NO_REIMPORT_NO_B3006_WRITES"
+
+  i65-b3-006-exact-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      HOSTING_SITE: ays-orbit-360-lab
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Execute B3-006 exact Preview proof
+        id: b3006
+        shell: bash
+        run: bash tools/gravicentra-i6-5-b3-006-executor.sh
+      - name: Upload immutable B3-006 package and proof
+        if: steps.b3006.outputs.run == 'true'
+        id: artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b3-006-preview-${{ github.run_id }}
+          path: |
+            ${{ steps.b3006.outputs.package_path }}
+            ${{ steps.b3006.outputs.proof_path }}
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+      - name: Freeze B3-006 CLOSED_PASS and open B3-007
+        if: steps.b3006.outputs.run == 'true'
+        env:
+          B3_SOURCE_SHA: ${{ steps.b3006.outputs.source_sha }}
+          B3_BUILD_ID: ${{ steps.b3006.outputs.build_id }}
+          B3_PREVIEW_URL: ${{ steps.b3006.outputs.preview_url }}
+          B3_CHANNEL_ID: ${{ steps.b3006.outputs.channel_id }}
+          B3_PROOF: ${{ steps.b3006.outputs.proof_path }}
+          B3_HOSTED_PAYLOAD_DIGEST: ${{ steps.b3006.outputs.hosted_payload_digest }}
+          B3_BACKEND_SOURCE_DIGEST: ${{ steps.b3006.outputs.backend_source_digest }}
+          B3_BUNDLE_DIGEST: ${{ steps.b3006.outputs.bundle_digest }}
+          B3_ARTIFACT_ID: ${{ steps.artifact.outputs.artifact-id }}
+          B3_ARTIFACT_DIGEST: ${{ steps.artifact.outputs.artifact-digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          git reset --hard "origin/$GITHUB_REF_NAME"
+          test "$(git rev-parse HEAD)" = "$B3_SOURCE_SHA"
+          node tools/gravicentra-i6-5-b3-006-freeze.mjs
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          git add artifacts/orbit360-recovery/release-control/I6_5_B3_006_CLOSED_PASS_20261001.json
+          git add artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json
+          git add artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+          git add artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json
+          git add artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "close(i6.5 B3-006): controlled policy import pass and open B3-007"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: B3-006 failure remains fail-closed
+        if: failure() && steps.b3006.outputs.run == 'true'
+        run: echo "B3_006_FAILED_NO_OPERATIONAL_REIMPORT_NO_LIVE_NO_B3007_WRITES"
+
