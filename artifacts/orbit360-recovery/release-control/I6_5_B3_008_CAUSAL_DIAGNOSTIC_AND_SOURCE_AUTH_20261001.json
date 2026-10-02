@@ -1,0 +1,70 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_CAUSAL_DIAGNOSTIC_AND_SOURCE_AUTH_V1",
+  "recordedAt": "2026-10-01",
+  "status": "DIAGNOSTIC_PASS_SOURCE_FIX_AUTHORIZED",
+  "findingId": "B3-008",
+  "classification": "PRODUCT",
+  "headBeforeAuthorization": "f3b9e9bc2c0f289d48ee752d0c902941a2439dde",
+  "scopeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
+  "scopeLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
+  "causalProof": {
+    "cliente360": {
+      "rootCause": "CLIENTE360_PUBLISHES_HEALTH_AND_DEPENDENT_FINANCIAL_KPIS_BEFORE_REQUIRED_SERVER_CONFIRMATION_AND_LIST_HAS_DUPLICATE_COBROS_BASED_HEALTH_OWNER",
+      "canonicalFormulaOwner": "orbit360-platform/core/queries.js",
+      "acceptedFormulaCommit": "842f762f199f4c7dbf13062a33ca220d92398c51",
+      "acceptedFormulaBlob": "341b0da2b9671c2791a091bee737b36a25bf81a2",
+      "currentFormulaBlob": "47d8aa225ee0d57668684ba34737192bef76fc39",
+      "formulaSemanticsUnchanged": true,
+      "exactHealthDependencies": [
+        "clientes",
+        "polizas",
+        "carteraPrimas"
+      ],
+      "fullHeaderDependencies": [
+        "clientes",
+        "polizas",
+        "carteraPrimas",
+        "cobros",
+        "comisiones"
+      ],
+      "observedFinal51CoherentWithApprovedFormula": true,
+      "businessSemanticDecisionRequired": false
+    },
+    "inicio": {
+      "rootCause": "INICIO_CARDS_USE_CARTERAPRIMAS_WHILE_DETAIL_MODALS_QUERY_COBROS_PENDING_OR_OVERDUE_STATES_AND_RENDER_CAN_PRECEDE_AUTHORITATIVE_PORTFOLIO_CONFIRMATION",
+      "canonicalPendingOverdueDomain": "carteraPrimas",
+      "confirmedCollectionDomain": "cobros",
+      "observedAuthoritativeCounts": {
+        "confirmedCobros": 5,
+        "pendingPortfolioRows": 788,
+        "overduePortfolioRows": 529
+      }
+    },
+    "reactivity": {
+      "rootCause": "ROUTER_REACTIVE_COLLECTIONS_OMIT_CARTERAPRIMAS_AND_OTHER_FINANCIAL_DEPENDENCIES_FOR_INICIO_CLIENTE360_SO_SERVER_CONFIRMATION_MAY_NOT_RERENDER_AFFECTED_SURFACE"
+    }
+  },
+  "authorizedProductFiles": [
+    "orbit360-platform/core/queries.js",
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/modules/inicio.js",
+    "orbit360-platform/core/crmkit.js",
+    "orbit360-platform/core/router.js"
+  ],
+  "remediationContract": [
+    "Preserve the approved Health formula exactly; centralize consumption on the canonical query owner.",
+    "Use serverConfirmedCollections as the readiness boundary; never publish definitive number/color from incomplete required dependencies.",
+    "Cliente360 list/detail must consume carteraPrimas for portfolio pending/overdue state; cobros remains confirmed payment evidence.",
+    "Inicio cards and their detail modals must consume the same canonical domain and country/role-scoped rows.",
+    "Add only the reactive dependencies required to rerender after authoritative confirmation.",
+    "No Metric Registry, no broad dashboard audit, no redesign, no data reimport."
+  ],
+  "boundaries": {
+    "dataMutationAuthorized": false,
+    "operationalBusinessWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "syntheticWritesAuthorized": false
+  },
+  "nextAction": "B3_008_MINIMAL_SOURCE_FIX_AND_CONTRACT"
+}

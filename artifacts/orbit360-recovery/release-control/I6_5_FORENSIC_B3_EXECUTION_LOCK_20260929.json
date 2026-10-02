@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_008_DIAGNOSTIC_ACTIVE",
+  "status": "B3_008_SOURCE_FIX_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,23 +14,32 @@
   "activeFinding": {
     "id": "B3-008",
     "title": "Dashboard Inicio reality reconciliation closed before B4.",
-    "status": "DIAGNOSTIC_ACTIVE",
+    "status": "SOURCE_FIX_AUTHORIZED",
     "blocking": true,
     "boundaries": {
       "businessWritesAuthorized": false,
       "configWritesAuthorized": false,
       "reimportAuthorized": false,
       "liveHostingPromotionAuthorized": false,
-      "productMutationAuthorized": false
+      "productMutationAuthorized": true
     },
-    "nextAction": "B3_008_DIAGNOSTIC",
+    "nextAction": "B3_008_MINIMAL_SOURCE_FIX_AND_CONTRACT",
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
     "scopeAndClosureLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
     "diagnosticScope": "READINESS_HYDRATION_AND_ONLY_NECESSARY_SEMANTIC_CORRECTION",
     "broadDashboardAuditAuthorized": false,
     "metricRegistryBuildAuthorized": false,
     "releaseManifestProjectionBuildAuthorized": false,
-    "semanticFailClosedState": "BUSINESS_SEMANTIC_DECISION_REQUIRED"
+    "semanticFailClosedState": "BUSINESS_SEMANTIC_DECISION_REQUIRED",
+    "authorizedProductFiles": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/core/crmkit.js",
+      "orbit360-platform/core/router.js"
+    ],
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_CAUSAL_DIAGNOSTIC_AND_SOURCE_AUTH_20261001.json",
+    "diagnosticReceiptBlobSha": "1d9721eff019225c018158be57546a0c0ec063b8"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -39,13 +48,13 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "212e285b37c574e51365b81f8eba7b76114bfd3c"
+    "blobSha": "dc7f91f0d0c459ad69d7605c0e0e37318bf2938f"
   },
   "nextRequiredProof": [
-    "B3_008_CAUSAL_DEPENDENCY_AND_READINESS_MAP",
-    "B3_008_EFFECTIVE_FORMULA_AND_CANONICAL_OWNER_PROOF",
-    "B3_008_SEMANTIC_AUTHORITY_OR_BUSINESS_SEMANTIC_DECISION_REQUIRED",
+    "B3_008_MINIMAL_SOURCE_CONTRACT_PASS",
+    "B3_008_EXACT_PREVIEW_READBACK_PASS",
     "B3_008_NO_PREMATURE_DEFINITIVE_VALUE_PROOF",
+    "B3_008_CARD_MODAL_CANONICAL_OWNER_PROOF",
     "B3_008_NO_SECOND_WRITER_PROOF",
     "B3_008_CONTEXT_SWITCH_RELOAD_MOBILE_DESKTOP_PROOF",
     "B3_008_TARGETED_PAULA_VISUAL_ACCEPTANCE"
