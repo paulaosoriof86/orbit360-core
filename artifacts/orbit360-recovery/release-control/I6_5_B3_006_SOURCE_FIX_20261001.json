@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_006_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT",
+  "findingId": "B3-006",
+  "rootCause": "POLICY_IMPORT_BYPASSES_CANONICAL_POLICY_RECEIPTS_OWNER_AND_PERFORMS_FIRE_AND_FORGET_NON_ATOMIC_POLICY_PLUS_LEGACY_COBROS_WRITES",
+  "changedProductFiles": {
+    "orbit360-platform/core/importa.js": "99ca3de8d60d3a26c97067c056fdc383d8fdd15f",
+    "orbit360-platform/index.html": "8708ddfcbfd569dc4457ca7c329c3433264cb567"
+  },
+  "canonicalOwner": {
+    "file": "orbit360-platform/core/policy-receipts-engine.js",
+    "blobSha": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
+    "changed": false
+  },
+  "qaFiles": {
+    "tools/gravicentra-i6-5-b3-006-contract.mjs": "16b6c1c379b1ba96b7df1db29f9cfb8e643d2071",
+    "tools/gravicentra-i6-5-b3-006-preview-proof.mjs": "37828b3003cf9e955a90c7359a2c061fce376839",
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "1b4e54329db22c7ab84fc0b3a483b34331bad3e2",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs": "74a499fba8f5611f1959d5ced309a62680fe9815"
+  },
+  "remediation": [
+    "Policy import create/update is routed through Orbit.policyReceipts.",
+    "Canonical create/update completion is awaited before the importer reports success.",
+    "Legacy policy-import afterInsert cobros generation is disabled.",
+    "Policy import scope now declares polizas + recibosEsperados + carteraPrimas and excludes cobros as payment evidence.",
+    "Importer aliases are normalized to the canonical policy contract.",
+    "Rejected canonical rows are counted and remain fail-closed without fallback writes.",
+    "Index binds the new importa.js asset to avoid stale browser source."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3007": false,
+    "b3008": false
+  },
+  "proofPlan": "SOURCE_CONTRACT -> ONE_EXACT_PREVIEW -> BROWSER_CSV_IMPORT -> FIRESTORE_READBACK -> ZERO_COBROS -> INVALID_ROW_FAIL_CLOSED -> CLEANUP_ZERO_RESIDUE",
+  "nextAction": "B3_006_SOURCE_CONTRACT"
+}
