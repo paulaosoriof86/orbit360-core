@@ -1773,5 +1773,12 @@
       "status": "QA_ONLY",
       "productSourceChanged": false
     }
+  },
+  "b3006SourceContract": {
+    "status": "PASS_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_CONTRACT_PASS_20261001.json",
+    "blobSha": "6b3d4c7d73665c3d2aef67f8998d59ff03a099ca",
+    "sourceSha": "c702fca82731a3c13a92da70e8c7514611ed0976",
+    "executionMode": "DIRECT_GITHUB_BLOB_CONTRACT_EQUIVALENT"
   }
 }
