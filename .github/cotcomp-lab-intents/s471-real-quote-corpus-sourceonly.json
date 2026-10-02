@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"ays-cotcomp-s471-real-quote-corpus-sourceonly-intent-v1.0",
+  "authorization":"S471_REAL_QUOTE_CORPUS_SOURCEONLY",
+  "authorizedSourceParent":"6626bf0b6bc7f9d99853d148c0cf79a508ad8723",
+  "appDataReads":false,
+  "appDataWrites":false,
+  "realData":false,
+  "providerOrRater":false,
+  "production":false
+}
