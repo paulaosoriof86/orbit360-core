@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P7_STABLE_USABLE_SURFACE_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B3-008",
+  "failedRunId": 37028657735,
+  "failedSourceSha": "d56594f6e7d17ad4eb281b40bdde5ac5b88f4678",
+  "classification": "HARNESS_ONLY_FALSE_NEGATIVE",
+  "evidence": {
+    "cliente360Route": "cliente360",
+    "visibleClients": 439,
+    "visiblePoliciesHistorical": 1419,
+    "loading": false,
+    "denied": false,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "b3004SyntheticCleanup": "PASS"
+  },
+  "rootCause": "The harness still depended on a presentation-class selector that was not stable after the operational wrapper, despite the complete Cliente 360 table being visible.",
+  "fix": [
+    "Cliente 360 usability now relies on host table rows or runtime renderedRows plus stable functional headings.",
+    "Cobros core usability is also measured through visible table rows and business headings, not a single root data marker."
+  ],
+  "proofBlobSha": "a95898ec4fd8f847c7d09db8ab9b3d22bde4bb15",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}

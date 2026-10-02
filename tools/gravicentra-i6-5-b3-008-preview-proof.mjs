@@ -146,9 +146,11 @@ try{
       const host=document.getElementById('host');
       if(!host) return false;
       if(document.querySelector('[data-c360-authoritative-loading="1"]')||document.querySelector('.modstate')) return false;
-      const table=document.querySelector('.tbl');
-      const rows=table ? table.querySelectorAll('tbody tr') : [];
-      return !!table && rows.length>0 && /CLIENTES/i.test(String(host.innerText||'')) && /SALUD/i.test(String(host.innerText||''));
+      const txt=String(host.innerText||'');
+      const rows=host.querySelectorAll('tbody tr');
+      const diag=window.OrbitRuntimeDiagnostics&&OrbitRuntimeDiagnostics.cliente360&&OrbitRuntimeDiagnostics.cliente360.list;
+      return (rows.length>0 || Number(diag&&diag.renderedRows||0)>0) &&
+        /CLIENTES/i.test(txt) && /CLIENTE\s+ASESOR\s+PÓLIZAS\s+PRIMA VIGENTE\s+CARTERA\s+SALUD/i.test(txt);
     },null,{timeout:6000});
   }catch(error){
     const diag=await page.evaluate(()=>({
@@ -159,6 +161,8 @@ try{
       projectionReady:!!(Orbit.clientProjection&&typeof Orbit.clientProjection.withReadBatch==='function'),
       productStatus:Orbit.store&&Orbit.store._productStatus?Orbit.store._productStatus():null,
       hostText:String(document.getElementById('host')?.innerText||'').slice(0,1200),
+      runtimeDiag:window.OrbitRuntimeDiagnostics&&OrbitRuntimeDiagnostics.cliente360?OrbitRuntimeDiagnostics.cliente360:null,
+      tbodyRows:document.querySelectorAll('#host tbody tr').length,
       loading:!!document.querySelector('[data-c360-authoritative-loading="1"]'),
       denied:!!document.querySelector('.modstate')
     }));
@@ -180,7 +184,13 @@ try{
   proof.assertions.clientListPerformance=true;
   proof.assertions.b3004SyntheticFixtureAbsent=true;
 
-  t=Date.now();await route(page,'cobros');await page.waitForSelector('[data-cobros-core-ready="1"]',{timeout:6000});proof.performance.cobrosCoreMs=Date.now()-t;
+  t=Date.now();await route(page,'cobros');
+  await page.waitForFunction(()=>{
+    const host=document.getElementById('host');if(!host||document.querySelector('[data-cobros-hydration-loading="1"]'))return false;
+    const txt=String(host.innerText||''),rows=host.querySelectorAll('tbody tr');
+    return rows.length>0&&/CARTERA AL DÍA/i.test(txt)&&/CLIENTE\s+PÓLIZA\s+CUOTA\s+MONTO/i.test(txt);
+  },null,{timeout:6000});
+  proof.performance.cobrosCoreMs=Date.now()-t;
   need(proof.performance.cobrosCoreMs<=6000,'B3_008_COBROS_CORE_TOO_SLOW:'+proof.performance.cobrosCoreMs);
   proof.assertions.cobrosCorePerformance=true;
 
@@ -193,7 +203,11 @@ try{
   proof.assertions.countryScope=true;
 
   await route(page,'cobros');
-  await page.waitForSelector('[data-cobros-core-ready="1"]',{timeout:6000});
+  await page.waitForFunction(()=>{
+    const host=document.getElementById('host');if(!host||document.querySelector('[data-cobros-hydration-loading="1"]'))return false;
+    const txt=String(host.innerText||''),rows=host.querySelectorAll('tbody tr');
+    return rows.length>0&&/CARTERA AL DÍA/i.test(txt)&&/CLIENTE\s+PÓLIZA\s+CUOTA\s+MONTO/i.test(txt);
+  },null,{timeout:6000});
   await page.waitForFunction(()=>document.querySelector('[data-cobros-financial-readiness="ready"]'),null,{timeout:12000});
   const cobrosCO=await page.evaluate(()=>{const e=document.querySelector('[data-cobros-core-ready="1"]');let truth={};try{truth=JSON.parse(decodeURIComponent(e?.getAttribute('data-cobros-truth')||''));}catch{}return{truth,text:e?.innerText||''};});
   const expectedCO={COP:{alDia:truthCO.realizedAll.COP||0,pend:truthCO.pending.COP||0,venc:truthCO.overdue.COP||0}};

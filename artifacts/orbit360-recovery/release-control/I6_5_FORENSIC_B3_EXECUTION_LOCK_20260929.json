@@ -59,7 +59,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "30266ec4f7c204234510f4cf3371d3023619e7e2"
+    "blobSha": "95e317cf79735223738e12ca4385c47cb4031501"
   },
   "nextRequiredProof": [
     "B3_008_R2_INDEPENDENT_REALITY_MACHINE_PROOF",
@@ -772,7 +772,7 @@
     "forbiddenSyntheticPaymentCollection": "cobros"
   },
   "b3008Executor": {
-    "status": "ARMED_FOR_EXACT_PREVIEW_R2P6",
+    "status": "ARMED_FOR_EXACT_PREVIEW_R2P7",
     "qaBlobs": {
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "8d3dc8325cf5b74fa30a8f8646e894a8295534e3",
       "tools/gravicentra-i6-5-b3-008-contract.mjs": "868d4ddf85ed7404786d1290d2aa4447a3ff845b",
@@ -795,7 +795,7 @@
     "contractPath": "tools/gravicentra-i6-5-b3-008-contract.mjs",
     "contractBlobSha": "eae48dc85e161893de36e4b7086d8f243c6dbc4b",
     "proofPath": "tools/gravicentra-i6-5-b3-008-preview-proof.mjs",
-    "proofBlobSha": "6e4d4395ac35c5f62e175fe9c154cc61e197cba8"
+    "proofBlobSha": "a95898ec4fd8f847c7d09db8ab9b3d22bde4bb15"
   },
   "b3008R2": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -853,6 +853,14 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P6_CLIENT360_USABLE_SELECTOR_HARNESS_FIX_20261002.json",
     "blobSha": "e6b6c05ed35f6c32983c2b7cdc660a611615d0b9",
     "failedRunId": 37027839823,
+    "classification": "HARNESS_ONLY_FALSE_NEGATIVE",
+    "productRegressionDemonstrated": false
+  },
+  "b3008R2P7": {
+    "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P7_STABLE_USABLE_SURFACE_HARNESS_FIX_20261002.json",
+    "blobSha": "03680478a4e6ac0051fb7351ce2f30c85fb642a7",
+    "failedRunId": 37028657735,
     "classification": "HARNESS_ONLY_FALSE_NEGATIVE",
     "productRegressionDemonstrated": false
   }

@@ -2571,6 +2571,14 @@
         "failedRunId": 37027839823,
         "classification": "HARNESS_ONLY_FALSE_NEGATIVE",
         "productRegressionDemonstrated": false
+      },
+      "r2p7": {
+        "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P7_STABLE_USABLE_SURFACE_HARNESS_FIX_20261002.json",
+        "blobSha": "03680478a4e6ac0051fb7351ce2f30c85fb642a7",
+        "failedRunId": 37028657735,
+        "classification": "HARNESS_ONLY_FALSE_NEGATIVE",
+        "productRegressionDemonstrated": false
       }
     },
     {
@@ -6054,6 +6062,8 @@
     "r2p5ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P5_REAL_CLIENT_HEALTH_PROOF_FIX_20261002.json",
     "r2p5ReceiptBlobSha": "987d395aa107a15c727d4830bf6e154ab94b9f05",
     "r2p6ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P6_CLIENT360_USABLE_SELECTOR_HARNESS_FIX_20261002.json",
-    "r2p6ReceiptBlobSha": "e6b6c05ed35f6c32983c2b7cdc660a611615d0b9"
+    "r2p6ReceiptBlobSha": "e6b6c05ed35f6c32983c2b7cdc660a611615d0b9",
+    "r2p7ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P7_STABLE_USABLE_SURFACE_HARNESS_FIX_20261002.json",
+    "r2p7ReceiptBlobSha": "03680478a4e6ac0051fb7351ce2f30c85fb642a7"
   }
 }
