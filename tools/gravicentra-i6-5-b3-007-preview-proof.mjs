@@ -48,8 +48,9 @@ async function queryItems(collection,field,value){
 }
 async function cleanup(){
   const refs=[],seen=new Set();
-  for(const coll of ['clientes','aseguradoras','polizas','recibosEsperados','carteraPrimas','cobros','actividades']){
-    const direct=await root.doc(coll).collection('items').doc(ids[coll==='clientes'?'client':coll==='aseguradoras'?'insurer':coll==='polizas'?'policy':coll==='recibosEsperados'?'receipt':coll==='carteraPrimas'?'portfolio':'__none__']).get().catch(()=>null);
+  const directIds={clientes:ids.client,aseguradoras:ids.insurer,polizas:ids.policy,recibosEsperados:ids.receipt,carteraPrimas:ids.portfolio};
+  for(const [coll,id] of Object.entries(directIds)){
+    const direct=await root.doc(coll).collection('items').doc(id).get().catch(()=>null);
     if(direct&&direct.exists){seen.add(direct.ref.path);refs.push(direct.ref);}
   }
   for(const coll of ['polizas','recibosEsperados','carteraPrimas','cobros','actividades']){
