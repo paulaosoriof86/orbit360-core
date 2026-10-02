@@ -37,9 +37,15 @@ test('S4.68 journals exactly eight temporary W2 owner side effects in either sto
   assert.equal(s.allPotentialJournalPaths(p).length,10);
 });
 
-test('S4.68 fails closed on health-sensitive keys',()=>{
-  assert.equal(s.healthSensitiveAbsent({capturedFields:{brand:'A',lineModel:'B'},contact:{name:'x'}}),true);
+test('S4.68 fails closed on health-sensitive keys without false positives on management consent',()=>{
+  assert.equal(s.healthSensitiveAbsent({
+    capturedFields:{brand:'A',lineModel:'B'},
+    contact:{name:'x'},
+    consents:{requestManagement:true,requestManagementText:'Autorizo gestionar esta solicitud y contactarme'}
+  }),true);
+  assert.equal(s.healthSensitiveAbsent({managementNote:'ok',capturedFields:{brand:'A',lineModel:'B'}}),true);
   assert.equal(s.healthSensitiveAbsent({capturedFields:{brand:'A',lineModel:'B',dateOfBirth:'2000-01-01'}}),false);
+  assert.equal(s.healthSensitiveAbsent({capturedFields:{brand:'A',lineModel:'B',age:30}}),false);
   assert.equal(s.healthSensitiveAbsent({medical:{diagnosis:'x'}}),false);
 });
 
