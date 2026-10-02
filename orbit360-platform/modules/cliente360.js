@@ -185,9 +185,10 @@ Orbit.modules.cliente360 = (function () {
     const policiesRaw = policyReadiness === 'ready'
       ? (batchRunner ? batchRunner(['polizas'], source => source.polizas || []) : S().all('polizas'))
       : [];
-    const policiesForList = policyReadiness === 'ready' && globalCountry !== 'TODOS' && q.polizasScoped
-      ? q.polizasScoped()
-      : policiesRaw;
+    // Cliente 360 is client-centric: once the visible client universe is scoped,
+    // include every policy linked to those clients. Policy-country discrepancies
+    // remain visible for validation instead of silently dropping client history.
+    const policiesForList = policiesRaw;
     const asesores = S().all('asesores');
     const advisorById = new Map(asesores.filter(a => a && a.id != null).map(a => [a.id, a]));
     const policyByClient = new Map();
@@ -280,7 +281,7 @@ Orbit.modules.cliente360 = (function () {
     host.innerHTML = `<div class="page" data-c360-list-ready="1">
       ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevoCliente()">+ Nuevo cliente</button>`)}
 
-      <div class="kpi-row" data-c360-kpi-scope="${globalCountry}" data-c360-kpi-client-count="${rows.length}" data-c360-kpi-active-count="${activePolicyCount==null?'':activePolicyCount}" data-c360-kpi-policy-count="${totalPolicyCount==null?'':totalPolicyCount}" data-c360-kpi-renew-count="${renewals45Count==null?'':renewals45Count}" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+      <div class="kpi-row" data-c360-kpi-scope="${globalCountry}" data-c360-filter-country="${f.pais || ''}" data-c360-kpi-client-count="${rows.length}" data-c360-kpi-active-count="${activePolicyCount==null?'':activePolicyCount}" data-c360-kpi-policy-count="${totalPolicyCount==null?'':totalPolicyCount}" data-c360-kpi-renew-count="${renewals45Count==null?'':renewals45Count}" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
         <button class="kpi kpi-click" data-c360-kpi="clients" title="Ver clientes del universo actual"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${rows.length}</div><div class="k-foot muted">${rows.filter(c => c.tipo === 'Empresa').length} empresas · ${rows.filter(c => c.tipo === 'Persona').length} personas ›</div></button>
         <button class="kpi kpi-click" data-c360-kpi="active" title="Ver pólizas activas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${policyReadiness === 'ready' ? activePolicyCount : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'de ' + totalPolicyCount + ' históricas ›' : 'Actualizando pólizas'}</div></button>
         <button class="kpi kpi-click" data-c360-kpi="premium" title="Ver detalle de prima vigente"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima neta vigente</div><div class="k-val">${primaNetaVigenteHtml}</div><div class="k-foot muted">Separada por moneda; no se suman GTQ y COP ›</div></button>
