@@ -1,84 +1,89 @@
 {
-  "schema": "GRAVICENTRA_I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_V1",
-  "recordedAt": "2026-10-02T04:52:08.514Z",
+  "schema": "GRAVICENTRA_I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_V2",
+  "recordedAt": "2026-10-02T16:58:52.805Z",
   "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
   "findingId": "B3-008",
-  "sourceSha": "cdc9fd6a8391efd3617460670d7987bb25fc8ec9",
-  "buildId": "gi-i65-b3-cdc9fd6a8391-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-b3008-36966271470-jel4pdom.web.app",
-  "channelId": "gi-b3008-36966271470",
-  "runId": 36966271470,
-  "artifactId": 11210490341,
-  "artifactDigest": "e98695d409ac2cb583ba67eb754e8aca7102559f0cd02756790541611a819a3f",
+  "sourceSha": "1d737909cec206b2d373a67e4fe2d5b3e62932ef",
+  "buildId": "gi-i65-b3-1d737909cec2-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37037211169-wjjgvw6x.web.app",
+  "channelId": "gi-b3008-37037211169",
+  "runId": 37037211169,
+  "artifactId": 11240267912,
+  "artifactDigest": "31f5effb54f6f396384137d7d0e95f192416e70a48fe4252940545fd0b4d0eb0",
   "exactHostingReadback": true,
   "assertions": {
-    "noPrematureDefinitiveHealth": true,
-    "finalHealth51": true,
-    "noSecondWriter": true,
-    "cardModalCanonicalOwner": true,
-    "reloadCoherent": true,
-    "mobileDesktopSameSemantics": true
+    "monthlyProductionIndependent": true,
+    "financialRealityIndependent": true,
+    "noSyntheticMetaPct": true,
+    "advisorMissingMetaFailClosed": true,
+    "clientListPerformance": true,
+    "b3004SyntheticFixtureAbsent": true,
+    "cobrosCorePerformance": true,
+    "countryScope": true,
+    "sigaDirectIncluded": true,
+    "polizasCountryScope": true,
+    "healthStable": true,
+    "healthIndependentRealClient": true,
+    "b3007SyntheticResidueAbsent": true
   },
-  "target": {
-    "clientId": "b3004human_client_r12",
-    "clientName": "QA HUMANA B3-004 · NO ES CLIENTE REAL",
-    "expectedHealth": 51
+  "performance": {
+    "client360ListMs": 348,
+    "cobrosCoreMs": 1576
   },
-  "desktop": {
-    "domHealth": 51,
-    "summaryHealth": 51,
-    "vencido": 111.11,
-    "nVigentes": 1,
-    "observations": [
-      {
-        "text": "CalculandoSalud",
-        "readiness": "pending",
-        "value": "",
-        "carteraConfirmed": false
+  "countries": {
+    "CO": {
+      "truth": {
+        "country": "CO",
+        "month": "2026-10",
+        "production": {},
+        "realizedAll": {
+          "COP": 205763487.04000002
+        },
+        "monthlyPaid": {},
+        "pending": {},
+        "overdue": {
+          "COP": 0
+        },
+        "directCount": 42,
+        "directAmount": 205763487.04000002,
+        "clientCount": 17,
+        "policyCount": 124,
+        "activePolicyCount": 27
       },
-      {
-        "text": "51Salud",
-        "readiness": "ready",
-        "value": "51",
-        "carteraConfirmed": true
-      }
-    ],
-    "confirmed": [
-      "clientes",
-      "polizas",
-      "cobros",
-      "recibosEsperados",
-      "carteraPrimas",
-      "aseguradoras"
-    ],
-    "inicio": {
-      "expected": {
-        "confirmed": 2854.7200000000003,
-        "pending": 8058.0199999999995,
-        "overdue": 7590.869999999999
+      "counts": {
+        "clients": 17,
+        "policies": 124
       },
-      "dom": {
-        "confirmed": 2854.7200000000003,
-        "pending": 8058.0199999999995,
-        "overdue": 7590.869999999999
+      "cobros": {
+        "COP": {
+          "alDia": 205763487.04000002,
+          "pend": 0,
+          "venc": 0,
+          "porConciliar": 42
+        }
       },
-      "pendingRows": 768,
-      "overdueRows": 547,
-      "modalCounts": {
-        "pending": 768,
-        "overdue": 547
+      "polizas": {
+        "total": 124,
+        "active": 27
       }
     }
   },
-  "reload": {
-    "health": 51,
-    "pass": true
+  "health": {
+    "target": {
+      "id": "cli_pol_0bdd4dd5292184d861a51f98ca56",
+      "name": "SILVIA VANESA HERNÁNDEZ CAJAS",
+      "expected": 84,
+      "nVigentes": 1,
+      "hasOverdue": false,
+      "premium": true
+    },
+    "first": 84,
+    "stable": 84,
+    "independentExpected": 84
   },
-  "mobile": {
-    "health": 51,
-    "readiness": "ready",
-    "scrollWidth": 390,
-    "clientWidth": 390
+  "b3007": {
+    "syntheticResidueVisible": false,
+    "humanVisualStillRequired": true
   },
   "pageErrors": [],
   "consoleErrors": [],
@@ -86,5 +91,5 @@
   "dataWrites": false,
   "reimport": false,
   "livePromoted": false,
-  "nextAction": "B3_008_TARGETED_PAULA_VISUAL"
+  "nextAction": "B3_008_TARGETED_PAULA_VISUAL_WITH_B3_007_CRONOGRAMA"
 }
