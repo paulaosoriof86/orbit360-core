@@ -12,7 +12,13 @@ Orbit.modules.cronograma = (function () {
   const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-  function paisOK(cid) { const c = S().get('clientes', cid); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }
+  function paisOK(cid, idx) { const c = idx && idx.clientById ? idx.clientById.get(String(cid || '')) : S().get('clientes', cid); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }
+  function relationIndex() {
+    const clientById=new Map(),policyById=new Map();
+    (S().all('clientes')||[]).forEach(c=>{if(c&&c.id!=null)clientById.set(String(c.id),c);});
+    (S().all('polizas')||[]).forEach(p=>{if(p&&p.id!=null)policyById.set(String(p.id),p);});
+    return {clientById,policyById};
+  }
   function portfolioAdapter() { return Orbit.cobrosCarteraProjectionAdapter || null; }
   function obligationsReady() {
     const a = portfolioAdapter();
@@ -62,15 +68,15 @@ Orbit.modules.cronograma = (function () {
 
   /* eventos del CRM + tareas manuales, por fecha YYYY-MM-DD */
   function eventos() {
-    const ev = {}, receiptIdx=receiptIndex();
+    const ev = {}, receiptIdx=receiptIndex(), rel=relationIndex();
     const add = (fecha, e) => { if (!fecha) return; (ev[fecha] = ev[fecha] || []).push(e); };
     pendingObligations(receiptIdx).forEach(row => {
       const rec = linkedReceipt(row,receiptIdx), cid = String(row.clienteId || (rec && rec.clienteId) || '').trim();
-      const client = S().get('clientes', cid) || {}, policy = S().get('polizas', row.polizaId || (rec && rec.polizaId)) || {};
+      const client = rel.clientById.get(cid) || {}, policy = rel.policyById.get(String(row.polizaId || (rec && rec.polizaId) || '')) || {};
       const label = 'Recibo pendiente · ' + (client.nombre || 'Cliente') + (policy.numero ? ' · ' + policy.numero : '');
       add(obligationDue(row), { tipo: 'recibo', icon: '🧾', color: '#c9821b', t: label, go: () => openObligation(row) });
     });
-    (q.renovacionesProximas ? q.renovacionesProximas(90) : []).filter(p => paisOK(p.clienteId)).forEach(p => add(p.vigenciaFin, { tipo: 'renov', icon: '🔄', color: '#0f766e', t: 'Renueva ' + p.numero, go: () => Orbit.modules.cliente360.verPoliza(p.id) }));
+    (q.renovacionesProximas ? q.renovacionesProximas(90) : []).filter(p => paisOK(p.clienteId,rel)).forEach(p => add(p.vigenciaFin, { tipo: 'renov', icon: '🔄', color: '#0f766e', t: 'Renueva ' + p.numero, go: () => Orbit.modules.cliente360.verPoliza(p.id) }));
     S().all('gestiones').filter(g => !g.archivado).forEach(g => add(g.vence, { tipo: 'gestion', icon: '🗂', color: '#1f3a5f', t: (g.titulo || g.tipo), go: () => Orbit.ciclo && Orbit.ciclo.openGestion && Orbit.ciclo.openGestion(g.id) }));
     S().all('tareas').forEach(tk => add(tk.fecha, { tipo: 'tarea', icon: tk.done ? '✅' : '📌', color: '#C5162E', t: tk.t, go: () => toggleTarea(tk.id), id: tk.id }));
     return ev;

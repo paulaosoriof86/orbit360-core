@@ -16,18 +16,21 @@ const paths={
   store:'orbit360-platform/data/store-firestore-product-readonly-p0.js',
   crm:'orbit360-platform/modules/crm-v1198-operational-bridge.js',
   detailGuard:'orbit360-platform/modules/policy-receipts-v1199-detail-guard.js',
+  portfolioAdapter:'orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js',
   index:'orbit360-platform/index.html'
 };
 const src=Object.fromEntries(Object.entries(paths).map(([k,p])=>[k,read(p)]));
 const composition=JSON.parse(read('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json'));
 const control=JSON.parse(read('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));
 
-for(const k of ['queries','cliente','inicio','cobros','polizas','cronograma','router','store','crm','detailGuard']) new Function(src[k]);
+for(const k of ['queries','cliente','inicio','cobros','polizas','cronograma','router','store','crm','detailGuard','portfolioAdapter']) new Function(src[k]);
 need(src.crm.includes("crmBridgeMode: 'permission-only'"),'B3_008_CRM_BRIDGE_SECOND_KPI_WRITER_PRESENT');
 need(src.detailGuard.includes('delegatedToCanonicalQueries: true'),'B3_008_DETAIL_GUARD_SECOND_SUMMARY_WRITER_PRESENT');
 need(!src.detailGuard.includes("q.clienteResumen = function"),'B3_008_DETAIL_GUARD_OVERRIDES_CANONICAL_SUMMARY');
 need(src.store.includes('function buildRelationIndexes()'),'B3_008_RELATION_INDEX_OWNER_MISSING');
 need(src.store.includes('indexedRelationConstraintMatches'),'B3_008_RELATION_FILTER_STILL_LINEAR_LOOKUP');
+need(src.portfolioAdapter.includes('function relationIndexes(q)'),'B3_008_PORTFOLIO_ADAPTER_RELATION_INDEX_MISSING');
+need(!src.portfolioAdapter.includes("S().get('polizas',r&&r.polizaId)"),'B3_008_PORTFOLIO_ADAPTER_LINEAR_POLICY_LOOKUP_REMAINS');
 
 need((src.queries.match(/function saludCliente\s*\(/g)||[]).length===1,'B3_008_HEALTH_OWNER_CARDINALITY');
 need(src.queries.includes('function realizedPaymentRows()'),'B3_008_REALIZED_PAYMENT_OWNER_MISSING');
@@ -67,7 +70,8 @@ need(src.index.includes('modules/policy-receipts-v1199-detail-guard.js?v=2026100
 need(src.index.includes('core/queries.js?v=20261002-b3008r5'),'B3_008_R5_QUERY_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/inicio.js?v=20261002-b3008r5'),'B3_008_R5_INICIO_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/cliente360.js?v=20261002-b3008r5p1'),'B3_008_R5P1_CLIENTE360_ASSET_BINDING_MISSING');
-need(src.index.includes('modules/cronograma.js?v=20261002-b3008r5'),'B3_007_R5_CRONOGRAMA_ASSET_BINDING_MISSING');
+need(src.index.includes('modules/cronograma.js?v=20261002-b3008r5p4'),'B3_007_R5P4_CRONOGRAMA_ASSET_BINDING_MISSING');
+need(src.index.includes('modules/cobros-cartera-i65-closure-bridge.js?v=20261002-b3008r5p4'),'B3_008_R5P4_PORTFOLIO_ADAPTER_ASSET_BINDING_MISSING');
 
 need(src.cobros.includes("const CORE_HYDRATION_DEPS = ['cobros', 'clientes', 'polizas']"),'B3_008_COBROS_CORE_PROGRESSIVE_HYDRATION_MISSING');
 need(src.cobros.includes("const FINANCIAL_HYDRATION_DEPS = ['recibosEsperados', 'carteraPrimas']"),'B3_008_COBROS_FINANCIAL_DEPS_MISSING');
@@ -82,9 +86,10 @@ need(src.polizas.includes("const all = q.polizasScoped ? q.polizasScoped()"),'B3
 need(src.polizas.includes("st.fkind === 'active' ? isActivePolicy(p)"),'B3_008_POLIZAS_ACTIVE_KPI_FILTER_MISMATCH');
 need(src.polizas.includes("label: 'Pólizas activas'"),'B3_008_POLIZAS_ACTIVE_LABEL_MISSING');
 need(src.cronograma.includes('function receiptIndex()'),'B3_007_CRONOGRAMA_INDEX_MISSING');
+need(src.cronograma.includes('function relationIndex()'),'B3_007_CRONOGRAMA_RELATION_INDEX_MISSING');
 need(src.cronograma.includes('data-cronograma-ready="1"'),'B3_007_CRONOGRAMA_READY_MARKER_MISSING');
 
-for(const p of [paths.queries,paths.cliente,paths.inicio,paths.cobros,paths.polizas,paths.cronograma,paths.store,paths.crm,paths.detailGuard,paths.index]){
+for(const p of [paths.queries,paths.cliente,paths.inicio,paths.cobros,paths.polizas,paths.cronograma,paths.store,paths.crm,paths.detailGuard,paths.portfolioAdapter,paths.index]){
   need(composition.productFileBlobs?.[p]===git('hash-object',p),'B3_008_COMPOSITION_BLOB_DRIFT:'+p);
 }
 need(control.currentB3?.status==='B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW','B3_008_CONTROL_STATUS_INVALID');
