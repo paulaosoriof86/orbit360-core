@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P6A_GOVERNANCE_LOCK_REBIND_V1",
+  "recordedAt": "2026-10-02",
+  "failedRunId": 37056917634,
+  "failedJobId": 111003765771,
+  "failureCode": "I6_5_B3_LOCK_DRIFT",
+  "classification": "GOVERNANCE_POINTER_DRIFT_ONLY",
+  "productRegressionDemonstrated": false,
+  "cause": "R5P6 updated the B3 execution lock and findings ledger but CONTROL_PLANE still referenced the prior lock/finding blobs.",
+  "fix": {
+    "executionLockBlobSha": "164e2c289614f4e230029cf496aa7e1d99eb658e",
+    "findingLedgerBlobSha": "799ab620c5df97bbc66d255e00e3d7c40c2ad763",
+    "compositionLockBlobSha": "3efbc6dd063793daee2b233dfa635b8ed52af72d"
+  },
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}
