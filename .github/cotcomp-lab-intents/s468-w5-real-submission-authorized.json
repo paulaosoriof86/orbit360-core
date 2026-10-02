@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s468-w5-real-submission-authorization-v1.0",
   "authorization": "S468_CONTINUE_EXISTING_W5_AFTER_REAL_SUBMISSION",
-  "authorizedSourceParent": "79efc0946f21b5ca6ddbda891fc6cca105208bad",
+  "authorizedSourceParent": "05281b11701613aaacc1e71d122a6527d57fdb71",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "country": "GT",
@@ -9,7 +9,12 @@
   "maxQuoteCases": 1,
   "maxDataSubjects": 1,
   "allowedExecutions": 1,
-  "stages": ["W1", "W2", "W3", "W4"],
+  "stages": [
+    "W1",
+    "W2",
+    "W3",
+    "W4"
+  ],
   "successDisposition": "ROLLBACK_TO_BEFORE_STATE",
   "generalPersistenceRelease": false,
   "healthSensitiveData": false,
@@ -17,5 +22,10 @@
   "production": false,
   "issuance": false,
   "binding": false,
-  "payment": false
+  "payment": false,
+  "priorWorkflowRun": 37027957867,
+  "priorOutcome": "PREWRITE_BLOCKED_HEALTH_KEY_FALSE_POSITIVE",
+  "priorPilotExecuted": false,
+  "priorAppDataWrites": 0,
+  "remediation": "TOKEN_AWARE_HEALTH_KEY_DETECTOR"
 }
