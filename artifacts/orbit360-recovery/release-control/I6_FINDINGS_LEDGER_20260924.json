@@ -21,8 +21,10 @@
   "counts": {
     "total": 165,
     "b2HumanFindings": 61,
-    "currentBlocking": 82,
-    "countingNote": "Final human review 2026-09-29 reopens B2 with R96-R102; prior unaffected PASS preserved. Five B3 carries frozen; existing dashboard/email debt preserved. No LIVE/B3/reimport."
+    "currentBlocking": 7,
+    "countingNote": "B2 stale pre-seal statuses reconciled to formal B2_PASS; Dashboard closed by B3-008 exact machine + Paula visual evidence. B4 NOT_STARTED blockers remain expected.",
+    "currentBlockingB2B3": 0,
+    "lastReconciledAt": "2026-10-02"
   },
   "findings": [
     {
@@ -410,11 +412,20 @@
       ],
       "rootCause": "Mixed-scope aggregation was previously demonstrated; active-role scope fix passed but final dashboard reality closure remains open.",
       "remediation": "Close before B4 promotion; no reimport.",
-      "status": "OPEN_BLOCKING_FINAL_PROMOTION",
-      "blocking": true,
+      "status": "CLOSED_PASS_BY_B3_008_EXACT_REALITY_AND_PAULA_VISUAL",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
       "latestVisual": "R8: portfolio counts render, but monthly/advisor target reality remains not accepted as canonical.",
-      "deferTo": "B3-008 / required before B4"
+      "deferTo": "B3-008 / required before B4",
+      "historicalStatusBeforeB3008": "OPEN_BLOCKING_FINAL_PROMOTION",
+      "closureProof": {
+        "machineReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_20261002.json",
+        "machineReceiptBlobSha": "543059b5a6ce3ece278c3afc78f35b0865277ae3",
+        "visualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+        "visualReceiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
+        "exactCandidateSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3"
+      },
+      "finalDisposition": "CLOSED_BEFORE_B4_ENTRY_NO_REIMPORT"
     },
     {
       "id": "B2-H01",
@@ -425,9 +436,15 @@
       "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "rootCause": "Inline field values used font-weight 650 almost universally and premium rows used generalized <b>, flattening hierarchy.",
       "remediation": "Body values reduced to medium weight; premium rows use ordinary values with strong total only; title/KPI hierarchy preserved.",
-      "status": "PAULA_VISUAL_REJECTED_R3_HIERARCHY_STILL_OPEN",
-      "blocking": true,
-      "closureProof": "Authenticated side-by-side desktop/mobile Cliente360-Aseguradoras-Poliza-Vehiculo-Recibo visual audit.",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
       "mayDisappearWithoutDisposition": false,
       "technicalEvidence": {
         "runId": 36162989052,
@@ -435,7 +452,8 @@
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
       },
       "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
-      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00",
+      "historicalStatusBeforeB2Seal": "PAULA_VISUAL_REJECTED_R3_HIERARCHY_STILL_OPEN"
     },
     {
       "id": "B2-H02",
@@ -493,9 +511,15 @@
       "owner": "canonical Firestore read models + relationship audit tool",
       "rootCause": "Policy detail resolves a vehicle by exact vehicle.polizaId while Cliente360 lists vehicles by clienteId. A client can therefore have vehicle records while one specific policy has no physical vehicle link.",
       "remediation": "Do not auto-merge or relink historical data. Show the distinction explicitly and link to client vehicles; prevent future renewal gaps by snapshotting one unambiguous source vehicle into the new renewal policy.",
-      "status": "PAULA_VISUAL_REJECTED_R3_PHYSICAL_RELATION_AUDIT_REQUIRED",
-      "blocking": true,
-      "closureProof": "Artifact evidence with hashed IDs, states, links, receipt/portfolio counts and classification; no merge/delete.",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
       "mayDisappearWithoutDisposition": false,
       "technicalEvidence": {
         "runId": 36162989052,
@@ -503,7 +527,8 @@
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
       },
       "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
-      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00",
+      "historicalStatusBeforeB2Seal": "PAULA_VISUAL_REJECTED_R3_PHYSICAL_RELATION_AUDIT_REQUIRED"
     },
     {
       "id": "B2-H06",
@@ -528,9 +553,15 @@
       "owner": "cliente360.js + policy-receipts-v1199-detail-guard.js",
       "rootCause": "Legacy row/identity renderers allowed literal string 'undefined'/'null' to pass through.",
       "remediation": "Vehicle labels and row values normalize null/undefined literals to neutral display values; identity concatenation filters invalid literals.",
-      "status": "PAULA_VISUAL_REJECTED_R3_LITERAL_INVALID_VALUE_REPRODUCED",
-      "blocking": true,
-      "closureProof": "Authenticated vehicle cards/detail no literal undefined/null.",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
       "mayDisappearWithoutDisposition": false,
       "closedBy": {
         "runId": 36162989052,
@@ -539,7 +570,8 @@
         "evidence": "EXACT_AUTHENTICATED_PREVIEW_PASS"
       },
       "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
-      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00",
+      "historicalStatusBeforeB2Seal": "PAULA_VISUAL_REJECTED_R3_LITERAL_INVALID_VALUE_REPRODUCED"
     },
     {
       "id": "B2-H08",
@@ -550,9 +582,15 @@
       "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "rootCause": "Cliente360 rendered legacy receipts first; canonical bridge replaced it in setTimeout(0), creating a visible partial-state race.",
       "remediation": "Canonical patch/render now executes synchronously after the original tab/render handler; canonical owner keeps stable loading state until both receipt and portfolio collections are server-confirmed.",
-      "status": "PAULA_VISUAL_REJECTED_R3_FALSE_ZERO_HYDRATION_REPRODUCED",
-      "blocking": true,
-      "closureProof": "Authenticated cold route/tab/reload; no partial row count before canonical dataset.",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
       "mayDisappearWithoutDisposition": false,
       "technicalEvidence": {
         "runId": 36162989052,
@@ -560,7 +598,8 @@
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
       },
       "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
-      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00",
+      "historicalStatusBeforeB2Seal": "PAULA_VISUAL_REJECTED_R3_FALSE_ZERO_HYDRATION_REPRODUCED"
     },
     {
       "id": "B2-H09",
@@ -571,9 +610,15 @@
       "owner": "backend-lab-receipts-portfolio-native-bridge-v20260801.js",
       "rootCause": "UI printed raw provenance fields/codes and separate state/reconciliation badges even when semantically identical; hero used unrelated dark treatment.",
       "remediation": "Soft mature-family hero; medium body typography; deduplicated badges; raw authority/match codes suppressed; operational labels for update date/document/match.",
-      "status": "PAULA_VISUAL_REJECTED_R3_PROVENANCE_STILL_PRIMARY",
-      "blocking": true,
-      "closureProof": "Authenticated receipt detail desktop/mobile; no release/gate/validator/internal codes or duplicate payment status.",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
       "mayDisappearWithoutDisposition": false,
       "technicalEvidence": {
         "runId": 36162989052,
@@ -581,7 +626,8 @@
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
       },
       "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
-      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00",
+      "historicalStatusBeforeB2Seal": "PAULA_VISUAL_REJECTED_R3_PROVENANCE_STILL_PRIMARY"
     },
     {
       "id": "B2-H10",
@@ -592,9 +638,15 @@
       "owner": "modules/aseguradoras.js",
       "rootCause": "Logo URL editing existed in source but was buried inside the Resumen edit form and was not discoverable in the human flow.",
       "remediation": "Expose an explicit Cambiar logo action while preserving the HTTPS-only durable logo contract.",
-      "status": "PAULA_VISUAL_REJECTED_R3_FILE_UPLOAD_REQUIRED",
-      "blocking": true,
-      "closureProof": "Synthetic insurer logo URL save -> canonical backend readback -> reload -> image rendered.",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
       "mayDisappearWithoutDisposition": false,
       "technicalEvidence": {
         "runId": 36162989052,
@@ -602,7 +654,8 @@
         "buildId": "gi-i65-b2-ac78fd8fcdfb-57f234755dc1"
       },
       "lastReviewOrigin": "PAULA_VISUAL_REVIEW_20260925_R3",
-      "lastReviewedAt": "2026-09-25T11:43:00-06:00"
+      "lastReviewedAt": "2026-09-25T11:43:00-06:00",
+      "historicalStatusBeforeB2Seal": "PAULA_VISUAL_REJECTED_R3_FILE_UPLOAD_REQUIRED"
     },
     {
       "id": "B2-H11",
@@ -2825,10 +2878,18 @@
       ],
       "rootCause": "Independent inline premium grid/value weights were outside the mature detail hierarchy; fixed by the existing detail owner plus base.css contract.",
       "remediation": "Unify full 'Prima y condiciones de pago' hierarchy with mature Cliente360/Aseguradoras family without a second CSS family.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "requiredProof": "Exact Preview: labels/body/dividers/weights in Datos de póliza and Prima/condiciones share canonical hierarchy; automated DOM discriminant + Paula visual pass.",
-      "sourceFixDate": "2026-09-25"
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R25-POLICY-CALENDAR-Q006-TOLERANCE-R3",
@@ -2841,10 +2902,18 @@
       ],
       "rootCause": "Renderer hardcoded 0.005; protected reconciliation config defines amountTolerance with canonical default 0.02, so Q0.06 remains a real warning.",
       "remediation": "Do not hide Q0.06. Determine approved rounding tolerance; only suppress reconciliation when contract proves difference is within tolerance.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "requiredProof": "Source/contract evidence for tolerance + deterministic fixture around threshold + exact Preview rendering.",
-      "sourceFixDate": "2026-09-25"
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R26-VEHICLE-EDITOR-PREFILL-DESTRUCTIVE-WRITE-R3",
@@ -2857,10 +2926,18 @@
       ],
       "rootCause": "Detail normalized legacy aliases while editor read raw canonical keys and rebuilt a full subset; fixed by shared normalizeVehicle plus sparse changed-fields write.",
       "remediation": "Make editor hydrate every existing canonical/authorized alias field and preserve untouched fields on partial edit.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "requiredProof": "P853FFX: detail values == editor initial values; edit one innocuous field; server commit/readback/reload preserves every other value and same vehicle.id.",
-      "sourceFixDate": "2026-09-25"
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R27-POLICY-VEHICLE-RENEWAL-PHYSICAL-ID-R3",
@@ -2874,10 +2951,18 @@
       ],
       "rootCause": "Physical audit proved multiple policy versions and historical same-plate vehicle IDs; existing issuance owner already snapshots risk on renewal and links genealogy by physical IDs. Manual reconciliation now preserves the historical source and creates an idempotent versioned relation.",
       "remediation": "Resolve relationship by physical policyId/vehicleId and approved renewal genealogy; never by visible policy number or client alone. Add explicit idempotent link action when eligible.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "requiredProof": "Oscar/91-0169567 read-only physical genealogy; explicit vehicleId→policyId linking contract; historical relation preserved; readback/reload idempotent.",
-      "sourceFixDate": "2026-09-25"
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R28-VEHICLE-IDENTITY-CANDIDATE-DEDUP-R3",
@@ -2890,10 +2975,18 @@
       ],
       "rootCause": "Candidate projection did not distinguish physical identity/history strongly enough; fixed by dedupe on vehicle.id and policy-context labels.",
       "remediation": "Deduplicate link candidates by vehicle.id only; same-label distinct IDs must show distinguishing context and remain unmerged pending integrity evidence.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "requiredProof": "Oscar's five physical vehicle IDs classified; zero repeated candidate for same vehicle.id; distinct same-plate IDs remain distinguishable; no delete/merge writes.",
-      "sourceFixDate": "2026-09-25"
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R29-LITERAL-INVALID-VEHICLE-VALUE-R3",
@@ -2906,10 +2999,18 @@
       ],
       "rootCause": "Raw candidate/editor projections could surface alias gaps; fixed by the canonical vehicle normalizer and shown-value guard.",
       "remediation": "Eliminate literal undefined/null/[object Object] across all vehicle cards/details using canonical display sanitizer without hiding source integrity issues.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "requiredProof": "Automatic scan + visual proof across all five Oscar vehicles: zero literal undefined/null/[object Object].",
-      "sourceFixDate": "2026-09-25"
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R30-RECEIPTS-FALSE-ZERO-HYDRATION-R3",
@@ -2921,10 +3022,18 @@
       ],
       "rootCause": "Cliente360 legacy receipt tab could paint its cobros-based empty state before receiptsPortfolioProjection became owner; fixed by readiness gate on serverConfirmedCollections.",
       "remediation": "Use explicit pending/skeleton state until canonical hydration completes; never render final empty state/count 0 before ready.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "requiredProof": "Cold load, hard refresh, Cliente360→Recibos and role change: first paint/state transitions show loading until ready; no false empty; final count stable.",
-      "sourceFixDate": "2026-09-25"
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R31-RECEIPT-PROVENANCE-OPERATIONAL-UI-R3",
@@ -2937,10 +3046,18 @@
       ],
       "rootCause": "Technical source/match metadata was rendered as a primary card; moved to collapsed audit details while operational as-of remains primary.",
       "remediation": "Preserve provenance physically but move filename/row/match validation to collapsed audit/technical details; use natural operational labels such as Descuento / ajuste where semantically correct.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "requiredProof": "Exact Preview main operational view has no filename#row/raw provenance labels; audit detail retains provenance; business information preserved.",
-      "sourceFixDate": "2026-09-25"
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R32-INSURER-LOGO-FILE-UPLOAD-R3",
@@ -2953,10 +3070,18 @@
       ],
       "rootCause": "No real upload owner existed; Storage was read-only client-side. Extended the existing product operational server owner with authenticated insurer-logo upload and canonical Firestore readback. Preview isolation completed with orbit360ProductAssetUploadPreview@us-east1 restricted to synthetic B2 insurer IDs; production callable remains undeployed.",
       "remediation": "Reuse approved storage/asset owner for local file select→preview→server commit→persisted asset ref/URL→reload; HTTPS URL remains advanced alternative.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "requiredProof": "File upload→preview→server commit→persisted URL/asset ref→reload same logo→replace; no Data URL/localStorage authority; password/reveal regression PASS.",
-      "sourceFixDate": "2026-09-25"
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R3-001-POLICY-PREMIUM-HIERARCHY",
@@ -2969,10 +3094,17 @@
       ],
       "rootCause": "Independent inline premium grid/value weights were outside the mature detail hierarchy; fixed by the existing detail owner plus base.css contract.",
       "remediation": "Normalize the entire section with existing mature-family tokens: strong section/subsection labels, lighter body/value hierarchy, consistent spacing/dividers, without introducing a parallel CSS family.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
-      "closureProof": "Authenticated exact Preview desktop/mobile comparison against Cliente360 and mature Aseguradoras modal; titles/subtitles clearly stronger than body, values no longer dominate, no new CSS family.",
-      "sourceFixDate": "2026-09-25"
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS"
     },
     {
       "id": "B2-R3-002-POLICY-SCHEDULE-ROUNDING-TOLERANCE",
@@ -2985,10 +3117,17 @@
       ],
       "rootCause": "Renderer hardcoded 0.005; protected reconciliation config defines amountTolerance with canonical default 0.02, so Q0.06 remains a real warning.",
       "remediation": "Locate the approved monetary rounding/reconciliation contract. Keep the warning fail-closed unless the approved tolerance proves the delta is rounding-only; never suppress it by intuition.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
-      "closureProof": "Physical approved tolerance/rounding contract identified and discriminant cases below/at/above tolerance pass on exact Preview; Q0.06 classified by that contract.",
-      "sourceFixDate": "2026-09-25"
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS"
     },
     {
       "id": "B2-R3-003-VEHICLE-EDITOR-READWRITE-SCHEMA",
@@ -3002,10 +3141,17 @@
       ],
       "rootCause": "Detail normalized legacy aliases while editor read raw canonical keys and rebuilt a full subset; fixed by shared normalizeVehicle plus sparse changed-fields write.",
       "remediation": "Create one canonical vehicle read/write normalizer for editor hydration and merge-preserving same-ID update. Existing values not explicitly changed must survive semantically unchanged.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
-      "closureProof": "Authenticated synthetic/controlled vehicle with every supported field: detail === initial editor values; edit one innocuous field; server readback + reload preserve every other field and same vehicle.id.",
-      "sourceFixDate": "2026-09-25"
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS"
     },
     {
       "id": "B2-R3-004-POLICY-VEHICLE-VERSIONED-RELATIONSHIP",
@@ -3019,10 +3165,17 @@
       ],
       "rootCause": "Read-only audit proved versioned physical policy and vehicle records; existing renewal implementation snapshots vehicle risk rather than moving the historical vehicle. Explicit manual linking now creates a versioned relation when source already belongs to a historical policy.",
       "remediation": "Preserve all historical IDs. Relationship UI and commands must use explicit physical policyId + vehicleId. Renewal behavior follows the approved snapshot/versioning contract; no linking, merging or deleting by policy number, client, label or plate.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
-      "closureProof": "Exact physical-ID discriminant plus synthetic Preview link/versioning test: explicit before-confirmation identities, server-owned idempotent write, audit/readback/reload, history preserved; Oscar production/business records remain read-only in B2.",
-      "sourceFixDate": "2026-09-25"
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS"
     },
     {
       "id": "B2-R3-005-VEHICLE-CANDIDATE-IDENTITY-DEDUP",
@@ -3035,10 +3188,17 @@
       ],
       "rootCause": "Five physical vehicle IDs include four same-plate historical KIA records; candidates now dedupe only identical vehicle.id and show physical/history context.",
       "remediation": "Deduplicate candidate projection strictly by vehicle.id. Never fuse distinct IDs by plate/label; when same plate has multiple IDs, show policy vigency/state/context so a user can distinguish history.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
-      "closureProof": "Automated and visual exact Preview: zero repeated candidate for same vehicle.id; distinct IDs sharing a plate remain separate with disambiguating context; no merge/delete.",
-      "sourceFixDate": "2026-09-25"
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS"
     },
     {
       "id": "B2-R3-006-RECEIPT-HYDRATION-FALSE-ZERO",
@@ -3052,10 +3212,17 @@
       ],
       "rootCause": "Legacy Cliente360 empty-state raced ahead of canonical receipt hydration; readiness gate now shows loading until recibosEsperados and carteraPrimas are server-confirmed.",
       "remediation": "Make hydration readiness authoritative before any receipts empty-state/count render. First paint while canonical read is pending must be loading/skeleton, never business-empty.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
-      "closureProof": "Authenticated cold load, hard refresh, Cliente360→Recibos and role switch: state trace contains pending/loading→final only, never false empty; final count stable after hydration.",
-      "sourceFixDate": "2026-09-25"
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS"
     },
     {
       "id": "B2-R3-007-RECEIPT-PROVENANCE-PRESENTATION",
@@ -3067,10 +3234,17 @@
       ],
       "rootCause": "Technical sourceRef/matchQuality was primary UI; moved behind collapsed audit details.",
       "remediation": "Retain provenance physically but move technical source details to collapsed Audit/Detalles de origen/Información técnica. Keep useful business information in the primary view and use natural operational labels such as Descuento/ajuste where semantics match.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
-      "closureProof": "Exact Preview receipt detail/table: no filename#row or internal provenance code in primary operational view; audit disclosure retains traceability and is role-appropriate.",
-      "sourceFixDate": "2026-09-25"
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS"
     },
     {
       "id": "B2-R3-008-INSURER-LOGO-FILE-UPLOAD",
@@ -3083,10 +3257,17 @@
       ],
       "rootCause": "No existing file upload owner was wired. The existing product operational server owner now accepts validated image upload, persists Storage asset and insurer URL/ref, then performs canonical readback. Preview isolation completed with orbit360ProductAssetUploadPreview@us-east1 restricted to synthetic B2 insurer IDs; production callable remains undeployed.",
       "remediation": "Reuse an already-approved product asset/storage owner if present. Add file selection + preview + durable server asset reference + reload/replacement; keep HTTPS URL only as advanced alternative and remove technical browser-storage copy from business UI.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
-      "blocking": true,
-      "closureProof": "Authenticated file upload→server commit→persisted HTTPS asset/ref→reload same logo→replace logo→reload; no Data URL/localStorage authority; password/reveal regression remains PASS.",
-      "sourceFixDate": "2026-09-25"
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      },
+      "sourceFixDate": "2026-09-25",
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS"
     },
     {
       "id": "B2-R3-009-ACADEMIA-HUMAN-PASS",
@@ -3138,10 +3319,18 @@
       "rootCause": "Asesor base omitía Comparativo aunque el acceso aprobado lo exige.",
       "remediation": "Comparativo en baseline Asesor; matriz explícita conserva precedencia.",
       "requiredProof": "Asesor muestra Comparativo y scope own sin leaks.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
-      "blocking": true
+      "blocking": false,
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R34-ASESOR-OPS-FALSE-SUCCESS-R4",
@@ -3149,10 +3338,10 @@
       "rootCause": "Effective current owners still used optimistic Orbit.store insert: core/ciclo.js returned before server commit, and renewal bridge immediately redirected/toasted. Backend rejection in protected Preview rolled back the pending row after UI had implied success.",
       "remediation": "Use awaited crearGestionDurable -> server-owned workflow command -> canonical readback before any success/notification. Preview real-data rejection must be explicit.",
       "requiredProof": "Synthetic authenticated management create from Cliente360/Renovaciones -> server commit -> canonical readback -> visible exactly once in Ops -> reload -> cleanup; real Preview action must explicitly report no write.",
-      "status": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
-      "blocking": true,
+      "blocking": false,
       "sourceFix": {
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R8_VISUAL_REVIEW_OPS_DURABILITY_20260926.json",
         "receiptBlobSha": "185abfa73b4f2f6c723273e913b74a2ef77d2c2e",
@@ -3170,7 +3359,15 @@
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
       "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "r14ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R14_ADVISOR_WRITE_ROLE_SYNC_20260927.json",
-      "r14ReceiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f"
+      "r14ReceiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f",
+      "historicalStatusBeforeB2Seal": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R35-VEHICLE-HISTORY-PROJECTION-R4",
@@ -3178,10 +3375,18 @@
       "rootCause": "Versiones históricas físicas se mostraban como tarjetas equivalentes y escapaba undefined.",
       "remediation": "Agrupar presentación por placa sin fusionar/borrar IDs y sanitizar literales.",
       "requiredProof": "Oscar sin undefined/null/object; historia física accesible por vigencia/ID.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
-      "blocking": true
+      "blocking": false,
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R36-POLICY-VEHICLE-ROLE-VERSION-CONTEXT-R4",
@@ -3189,10 +3394,18 @@
       "rootCause": "Asesor veía acción mutante que no podía ejecutar y faltaba contexto de vigencia física.",
       "remediation": "Linker now applies canLink to visible UI: Asesor receives read-only state with no save action; header exposes vigency + Policy ID; versioned relation engine remains unchanged.",
       "requiredProof": "Asesor solo consulta; rol autorizado conserva vínculo versionado.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
-      "blocking": true
+      "blocking": false,
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R37-INSURER-LOGO-PREVIEW-ISOLATION-TRUTH-R4",
@@ -3200,10 +3413,18 @@
       "rootCause": "Preview protegía aseguradoras reales pero UI parecía fallo de guardado.",
       "remediation": "Mantener aislamiento y explicarlo; persistencia se valida con fixture B2.",
       "requiredProof": "Real: no write explicado. Sintética: upload→reload→replace.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
-      "blocking": true
+      "blocking": false,
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R38-RECEIPTS-HYDRATION-R4",
@@ -3211,10 +3432,18 @@
       "rootCause": "Capturas estáticas no prueban desaparición de falso 0 durante hidratación.",
       "remediation": "Mantener readiness gate y exigir traza cold-load.",
       "requiredProof": "Loading→final sin 0 falso; conteo estable.",
-      "status": "PROOF_PENDING_NO_NEW_SOURCE_DEFECT_DEMONSTRATED",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
       "block": "B2",
       "source": "PAULA_VISUAL_REVIEW_20260925_R4",
-      "blocking": true
+      "blocking": false,
+      "historicalStatusBeforeB2Seal": "PROOF_PENDING_NO_NEW_SOURCE_DEFECT_DEMONSTRATED",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B3-CARRY-REPORTED-PAYMENT-PRESENTATION-R4",
@@ -4048,8 +4277,8 @@
       "rootCause": "renewals-v1200-operational-bridge invokes optimistic Orbit.ciclo.crearGestion; core/ciclo crearGestion uses non-awaited S().insert.",
       "remediation": "Await server-owned create_management + canonical readback before normal success. Preserve approved Renew -> Cotizador/Comparativo -> accepted offer -> Ops issuance -> real renewed policy workflow.",
       "requiredProof": "Synthetic renewal_proposals + renewal_accepted management commit/readback; each appears once in Ops after reload; accepted panel exposes issuance/direct-registration branches; cleanup.",
-      "status": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "sourceFix": {
         "orbit360-platform/core/ciclo.js": "998669e654c615ce038aae10b72cba857c15e65d",
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "efe54d0974d1374e7c06a62bf15857e4b8fc6f9e"
@@ -4068,7 +4297,15 @@
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
       "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "r14ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R14_ADVISOR_WRITE_ROLE_SYNC_20260927.json",
-      "r14ReceiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f"
+      "r14ReceiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f",
+      "historicalStatusBeforeB2Seal": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
@@ -4094,8 +4331,8 @@
       "rootCause": "Legacy renewal bridge encoded 'create/reuse management and open Cotizador' as one action, and Cliente360 Renovar delegated to solicitarPropuestas.",
       "remediation": "Separate proposal, direct-quote and accepted-renewal actions; make Ops the canonical decision owner; add direct firm-renewal engine and version-safe duplicate contract.",
       "requiredProof": "Exact immutable Preview functional proof + authenticated general proof + Paula visual: three renewal actions by role; Propuestas/Renovar do not auto-open Cotizador; Ops accepted panel exposes issuance/direct registration; no optimistic persistence claim in protected Preview.",
-      "status": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "noReimport": true,
       "noLive": true,
       "noB3": true,
@@ -4115,7 +4352,15 @@
       "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
+      "historicalStatusBeforeB2Seal": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R63-RENEWAL-ACTION-SEMANTICS-R9",
@@ -4124,8 +4369,8 @@
       "surface": "Renovaciones/Cliente360/Ops",
       "classification": "BUSINESS_RULE_PREVALENT",
       "finding": "Renewal actions must be semantically separated: Propuestas creates Ops proposal management; Pedir renovar creates accepted-renewal management after client approval; Cotizar is separate and advisor-forbidden; Ops handles issuance request or direct firm-renewal registration.",
-      "status": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_RENEWAL_SEMANTICS_PREVALENT_20260926.json",
       "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noReimport": true,
@@ -4135,7 +4380,15 @@
       "r12ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "r12ReceiptBlobSha": "c9fc0a41c44497d287557495205a344487ba03ae",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
+      "historicalStatusBeforeB2Seal": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R64-RENEWALS-DUAL-PASS-VISUAL-AUTHORITY-R10",
@@ -4166,8 +4419,8 @@
       "rootCause": "The harness validated source contracts and advisor Ops visibility but had no server-owned synthetic management E2E discriminant.",
       "remediation": "Strengthen authenticated harness with b2-ges/b2-neg canonical writes, readback, one-card projection, accepted-renewal branches, reload idempotency and cleanup.",
       "requiredProof": "New exact immutable Preview authenticated run passes OPS_LEADS_SYNTHETIC_E2E_PASS and cleanup leaves zero synthetic data/workflow residue.",
-      "status": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "harnessBlobSha": "ab1fdb808fb255be3f490a500c63705a23bba32e",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R11_OPS_LEADS_AUTH_PROOF_GAP_20260926.json",
       "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
@@ -4178,7 +4431,15 @@
       "authFailureRunId": 36270785111,
       "authFailureClassification": "POST_RELOAD_BROWSER_VISIBILITY_TIMEOUT",
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
-      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912"
+      "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
+      "historicalStatusBeforeB2Seal": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R66-PREVIEW-UAT-WRITE-CAPABILITY-R12",
@@ -4190,8 +4451,8 @@
       "rootCause": "El endurecimiento de seguridad B2 convirtió el Preview de workflow en read-only para registros no sintéticos.",
       "remediation": "Permitir creación autenticada y role-scoped en Preview; solo registros creados en Preview pueden modificarse; suprimir notificaciones externas y auditar previewWrite.",
       "requiredProof": "Propuestas, Pedir renovar y Gestión desde Cliente360 persisten y aparecen una sola vez en Ops; negocio de prueba se sincroniza Leads↔Ops; reload conserva; cero outbox externo.",
-      "status": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R12_PREVIEW_UAT_WRITE_MODE_20260926.json",
       "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
@@ -4202,7 +4463,15 @@
       "r13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
       "r13ReceiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "r14ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R14_ADVISOR_WRITE_ROLE_SYNC_20260927.json",
-      "r14ReceiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f"
+      "r14ReceiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f",
+      "historicalStatusBeforeB2Seal": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R67-OPS-MANAGEMENT-COUNTRY-RELOAD-R13",
@@ -4212,12 +4481,20 @@
       "classification": "PRODUCT_DEFECT",
       "finding": "Canonical gestiones persisted but disappeared after reload because product Ops query requires pais and created managements lacked pais. Fixed by enriching from linked policy/client and persisting pais/moneda/producto.",
       "requiredProof": "Create management -> canonical readback -> hard reload -> visible exactly once in Ops.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
       "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R68-RENEWAL-PROPOSALS-PREMATURE-CREATE-R13",
@@ -4227,12 +4504,20 @@
       "classification": "PRODUCT_DEFECT",
       "finding": "Propuestas created Ops work before the user completed/confirmed its management form. Fixed with explicit pre-create modal and no persistence until confirmation.",
       "requiredProof": "Open Propuestas and cancel -> zero management; confirm -> exactly one management.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
       "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R69-DIRECT-RENEWAL-RECEIPTS-PREMIUM-R13",
@@ -4242,12 +4527,20 @@
       "classification": "PRODUCT_DEFECT",
       "finding": "Direct renewal could prefill Mensual + 1 receipt from inconsistent source cuotas. Fixed with a coherent frequency-derived default in the renewal UI; monthly custom receipt count remains editable under the approved engine contract, while fixed frequencies continue deriving their canonical count from frequency; premium components/IVA and live total preview are editable/visible.",
       "requiredProof": "Source Mensual + inconsistent cuotas does not prefill one receipt; user can set a monthly custom count and exact receipts are generated; fixed frequencies keep canonical frequency counts; premium component edits recalc/persist.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
       "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R70-FIRM-RENEWAL-SUPPORT-R13",
@@ -4257,12 +4550,20 @@
       "classification": "PRODUCT_DEFECT",
       "finding": "Firm-renewal document was an unconstrained text field that accepted placeholder text. Clarified as traceable insurer support and reject placeholder/too-short values.",
       "requiredProof": "Placeholder support rejected; traceable reference accepted and persisted.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
       "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R71-OPS-CHECKLIST-FEEDBACK-MODAL-R13",
@@ -4272,12 +4573,20 @@
       "classification": "PRODUCT_DEFECT",
       "finding": "Ops modal closed on backdrop click, checklist changes lacked durable feedback, and renewal proposal management lacked compare/send/feedback path. Backdrop close disabled; checklist uses durable write + bitacora/notification; compare/send and feedback actions added.",
       "requiredProof": "Backdrop click does not close; checklist persists/reloads with bitacora/notification; compare/send and feedback path available.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
-      "blocking": true,
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
+      "blocking": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R13_RENEWAL_OPS_UAT_FIXES_20260927.json",
       "receiptBlobSha": "b9ce26f981f6251831c75839808981b1ecde9912",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R72-ADVISOR-WRITE-ACTIVE-ROLE-DESYNC-R14",
@@ -4285,16 +4594,24 @@
       "source": "PAULA_MANUAL_UAT_20260927",
       "surface": "Cliente360/Renovaciones/Ops",
       "classification": "PRODUCT_DEFECT_ROLE_AUTHORITY_DESYNC",
-      "blocking": true,
+      "blocking": false,
       "finding": "El rol activo visible Asesor y el rol usado por la capa de escritura divergían; create_management self-service se bloqueaba antes del backend.",
       "rootCause": "store-firestore-product-operational-p0 member() usaba Orbit.auth.productUser.activeRole en lugar de Orbit.session.rol().",
       "remediation": "Vincular la escritura al rol de sesión canónico y probar create_management autenticado con Asesor.",
       "requiredProof": "Asesor dentro de own-scope puede crear Propuestas/Pedir renovar/Gestión, aparece una vez en Ops y persiste tras reload.",
-      "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "status": "CLOSED_BY_B2_FORMAL_SEAL",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_R14_ADVISOR_WRITE_ROLE_SYNC_20260927.json",
       "receiptBlobSha": "20b3680ed2cd36a62b15b12873f7e4e535cd833f",
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "historicalStatusBeforeB2Seal": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "closureProof": {
+        "type": "B2_FORMAL_SEAL_RECONCILIATION",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+        "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+        "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+        "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
+      }
     },
     {
       "id": "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
@@ -6148,7 +6465,7 @@
     "humanRejectionReceiptBlobSha": "c668a2f36577884b6056e17a8eea9c5b5a45c690",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2_REALITY_PERFORMANCE_SOURCE_FIX_20261002.json",
     "sourceFixReceiptBlobSha": "78a38dd979a9ffd70923a31e9567842aad0b8823",
-    "b3007HumanVisualStatus": "PENDING_TARGETED_PAULA_VISUAL_ON_NEXT_EXACT_PREVIEW",
+    "b3007HumanVisualStatus": "PASS_PAULA_TARGETED_VISUAL_20261002",
     "r2p1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P1_REALIZED_PAYMENT_PROJECTION_FIX_20261002.json",
     "r2p1ReceiptBlobSha": "c4fdae72f55b957dcd5a2fc2ae1eed7db24ceaa9",
     "r2p2ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P2_INDEPENDENT_PORTFOLIO_HARNESS_FIX_20261002.json",
@@ -6190,6 +6507,13 @@
     "b3008HumanVisualReceiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
     "nextAction": "B4_ENTRY_GUARD",
     "reportedPaymentCarryStatus": "CLOSED_PASS_BY_EXISTING_EVIDENCE",
-    "reportedPaymentCarryReceiptBlobSha": "854c05ca68c2c9e359e42f1de2f1f5b4f8d54689"
+    "reportedPaymentCarryReceiptBlobSha": "854c05ca68c2c9e359e42f1de2f1f5b4f8d54689",
+    "dashboardRealityStatus": "CLOSED_PASS_BY_B3_008",
+    "b2LedgerSealReconciliation": {
+      "status": "PASS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_LEDGER_SEAL_RECONCILIATION_20261002.json",
+      "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+      "normalizedFindingCount": 40
+    }
   }
 }
