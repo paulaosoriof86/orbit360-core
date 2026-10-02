@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_QA_TARGET_SELECTION_REPAIR_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW",
+  "failedRunId": 36965960247,
+  "failedStep": "Read-only browser reality proof",
+  "failureCode": "B3_008_FINAL_HEALTH_NOT_51:76:76",
+  "classification": "HARNESS_TARGET_SELECTION_SCOPE_MISMATCH",
+  "rootCause": "The harness selected a candidate from administrative Firestore rows without applying the effective product/session projection; the selected portfolio row was not authoritative in the browser session scope, so canonical Health was 76 rather than 51.",
+  "fix": "Discover the Health=51 target from Orbit.q.clienteResumen inside the authenticated canonical product session, then open a fresh direct-route context to test readiness, final Health, reload and mobile semantics.",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "proofPath": "tools/gravicentra-i6-5-b3-008-preview-proof.mjs",
+  "proofBlobSha": "f0d0bdfb6f69e6ce6fdf638eb9c203a419bfb90a"
+}
