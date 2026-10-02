@@ -1,0 +1,64 @@
+{
+  "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
+  "recordedAt": "2026-10-02",
+  "status": "B4_ACTIVE_B4_001_READONLY_DIAGNOSTIC",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "block": "B4",
+  "entryGuard": {
+    "status": "PASS",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
+    "blobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b"
+  },
+  "baseline": {
+    "readinessPercent": 96,
+    "targetPercent": 100,
+    "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "buildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
+    "artifactId": 11250418215,
+    "artifactDigest": "449b152a760f931d1a1a3074880f7ae4ca4aac24bb751129205f03bacd1f756f",
+    "paulaVisualAccepted": true
+  },
+  "scope": [
+    "Ops/Leads canonical synchronization and role scoping; remove touched hardcoded advisor defaults and optimistic-only critical transitions.",
+    "Gestiones created from Cliente 360, Client Portal, Leads and Ops converge to one canonical record.",
+    "Portal consumes same client/policy/receipt/payment state; no alternate persistence owner.",
+    "Notifications/automation execute only after committed domain events with retry/failure visibility and no duplicate records.",
+    "Targeted regression closure for Renovaciones, Cancelaciones, Siniestros and Cronograma.",
+    "Authenticated module x role x viewport E2E matrix.",
+    "Same immutable accumulated artifact Preview -> Paula visual acceptance -> LIVE -> exact readback -> freeze/rollback."
+  ],
+  "acceptance": [
+    "Comercial/Asesor own-scope and Operativo/Admin/Direccion configured-scope behavior.",
+    "Cross-entry gestion appears once across all authorized projections.",
+    "No relevant console/page/same-origin request errors.",
+    "Paula visual acceptance on exact final Preview before LIVE."
+  ],
+  "activeFinding": {
+    "id": "B4-001",
+    "title": "Ops/Leads/Cliente360/Portal gestiones converge to one canonical record with role scopes.",
+    "status": "ACTIVE_READONLY_DIAGNOSTIC",
+    "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC"
+  },
+  "rules": {
+    "preserveB1B2B3Pass": true,
+    "noBroadRediscovery": true,
+    "identifyEffectiveRuntimeOwnerBeforeMutation": true,
+    "oneCanonicalGestionRequired": true,
+    "noHardcodedPeople": true,
+    "noReimport": true,
+    "productMutationRequiresCausalDefect": true,
+    "sourceChangeRequiresNewImmutableCandidate": true,
+    "livePromotionForbiddenUntilB4FinalAcceptance": true
+  },
+  "boundaries": {
+    "businessWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "productMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false
+  },
+  "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC"
+}
