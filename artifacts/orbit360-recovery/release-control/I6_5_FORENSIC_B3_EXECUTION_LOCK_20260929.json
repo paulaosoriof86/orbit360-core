@@ -94,7 +94,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "710f83df66fa29e5380cf20b026551143add59d9"
+    "blobSha": "2df42de59132bbdf8d1c95b183146d6c06a6c2b3"
   },
   "nextRequiredProof": [
     "B4_ENTRY_GUARD"
@@ -283,7 +283,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "546b22831be945aec3a2d2a16c2bff226ef9248f"
+    "blobSha": "48f7779752a54c6faa34b7ebb24907134c91ee72"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
@@ -975,5 +975,14 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P7_POLICY_CURRENCY_AND_DEEP_FINANCIAL_AUDIT_ARM_20261002.json",
     "blobSha": "c0d8adc5e30a9e7b462964ef0ccbf24f22c9e760",
     "compositionLockBlobSha": "637852100be44036d8569aeb4b9090793ada4b28"
+  },
+  "humanAcceptance": {
+    "status": "PASS",
+    "authority": "PAULA_TARGETED_VISUAL_ACCEPTANCE",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+    "receiptBlobSha": "d501880ac4f5900c6509570d3061c954bcf49145",
+    "exactPreviewSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "exactPreviewBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
+    "exactPreviewRunId": 37061984102
   }
 }
