@@ -1,0 +1,25 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_006_QA_HARNESS_FILE_INPUT_REPAIR_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_HARNESS_FIXED_RERUN_REQUIRED",
+  "findingId": "B3-006",
+  "failedRunId": 36952075577,
+  "failedJobId": 110666982018,
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3006-36952075577-j19woh3e.web.app",
+  "candidateSourceSha": "d6db9c2c2af48134a8220dfb44e308db41675e6e",
+  "exactHostingReadback": true,
+  "productFailure": false,
+  "qaFailure": {
+    "code": "PLAYWRIGHT_WAITED_FOR_VISIBLE_HIDDEN_FILE_INPUT",
+    "evidence": "locator #imp-file resolved repeatedly to hidden input; timeout occurred before file selection",
+    "fix": "wait for #imp-file state=attached; setInputFiles supports hidden file inputs"
+  },
+  "changedQaFile": "tools/gravicentra-i6-5-b3-006-preview-proof.mjs",
+  "changedQaBlobSha": "418a82053e05addb64ddd82f8c28f85fb56cd97b",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "disposition": "REJECT_FAILED_QA_CANDIDATE_AND_RERUN_EXACT_PREVIEW",
+  "nextAction": "B3_006_EXACT_PREVIEW"
+}
