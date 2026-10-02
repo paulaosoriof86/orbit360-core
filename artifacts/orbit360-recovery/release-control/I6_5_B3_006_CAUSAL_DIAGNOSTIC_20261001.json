@@ -1,0 +1,66 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_006_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-01",
+  "status": "PRODUCT_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
+  "findingId": "B3-006",
+  "classification": "PRODUCT_DEFECT",
+  "requirement": "Controlled policy import creates policy + expected receipts + portfolio, never confirmed cobro without evidence.",
+  "rootCause": "POLICY_IMPORT_BYPASSES_CANONICAL_POLICY_RECEIPTS_OWNER_AND_PERFORMS_FIRE_AND_FORGET_NON_ATOMIC_POLICY_PLUS_LEGACY_COBROS_WRITES",
+  "evidence": {
+    "legacyImporter": {
+      "file": "orbit360-platform/core/importa.js",
+      "blobSha": "a3c2f8ca6717be72247849671e2d44dafa80a3b8",
+      "behavior": [
+        "applyImport inserts/updates the polizas collection directly through Orbit.store.",
+        "polizas.afterInsert generates installment rows directly in cobros with estado=Pendiente and conciliado=false.",
+        "The import path does not call Orbit.policyReceipts.createPolicy/updatePolicy.",
+        "The direct Orbit.store insert/update path is optimistic and starts individual server calls without awaiting an atomic business transaction."
+      ]
+    },
+    "canonicalOwner": {
+      "file": "orbit360-platform/core/policy-receipts-engine.js",
+      "blobSha": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
+      "behavior": [
+        "createPolicy/updatePolicy build one atomic mutation plan.",
+        "The atomic plan writes polizas + recibosEsperados + carteraPrimas + activity.",
+        "The canonical plan does not create cobros; payment evidence remains a separate domain.",
+        "batchDurable requires canonical server readback for the complete mutation set."
+      ]
+    }
+  },
+  "impact": "A policy imported through the legacy route can persist independently from its expected receipt/portfolio schedule and can create legacy cobros rows that are not payment evidence. This violates the canonical domain boundary and durable all-or-nothing contract.",
+  "minimalFix": {
+    "authorizedProductFiles": [
+      "orbit360-platform/core/importa.js",
+      "orbit360-platform/index.html"
+    ],
+    "canonicalOwnerReused": "orbit360-platform/core/policy-receipts-engine.js",
+    "ownerChangeRequired": false,
+    "requirements": [
+      "Route policy import creates/updates through Orbit.policyReceipts.createPolicy/updatePolicy.",
+      "Await durable completion before reporting success or closing the importer.",
+      "Remove policy-import creation of legacy cobros rows.",
+      "Policy import scope declares polizas + recibosEsperados + carteraPrimas and explicitly excludes cobros.",
+      "Normalize importer field aliases to the canonical policy contract.",
+      "Fail closed when the canonical owner is unavailable or rejects a row."
+    ]
+  },
+  "proofRequired": [
+    "Source contract proves no policy import afterInsert writes cobros.",
+    "Controlled valid synthetic import creates one policy and the expected recibosEsperados + carteraPrimas.",
+    "Controlled import creates zero cobros for that policy.",
+    "All created rows share the same policy relation and authoritative tenant scope.",
+    "Invalid/ambiguous controlled case fails closed without confirmed payment creation.",
+    "Cleanup returns synthetic residue to zero."
+  ],
+  "boundaries": {
+    "operationalBusinessWritesAuthorized": false,
+    "syntheticPreviewWritesAuthorized": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b3007": false,
+    "b3008": false
+  },
+  "nextAction": "B3_006_SOURCE_FIX"
+}
