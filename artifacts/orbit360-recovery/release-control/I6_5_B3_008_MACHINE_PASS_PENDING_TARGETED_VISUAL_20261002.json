@@ -1,34 +1,41 @@
 {
   "schema": "GRAVICENTRA_I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_V2",
-  "recordedAt": "2026-10-02T16:58:52.805Z",
+  "recordedAt": "2026-10-02T18:41:26.241Z",
   "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
   "findingId": "B3-008",
-  "sourceSha": "1d737909cec206b2d373a67e4fe2d5b3e62932ef",
-  "buildId": "gi-i65-b3-1d737909cec2-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37037211169-wjjgvw6x.web.app",
-  "channelId": "gi-b3008-37037211169",
-  "runId": 37037211169,
-  "artifactId": 11240267912,
-  "artifactDigest": "31f5effb54f6f396384137d7d0e95f192416e70a48fe4252940545fd0b4d0eb0",
+  "sourceSha": "7c358ce8d4a046cc90667075e85d38bb2f351067",
+  "buildId": "gi-i65-b3-7c358ce8d4a0-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37048839666-wt0u29xx.web.app",
+  "channelId": "gi-b3008-37048839666",
+  "runId": 37048839666,
+  "artifactId": 11245058697,
+  "artifactDigest": "4e696df41094326f961c9d9f9a2a6a80a4107924b3ebc10421bc8cd18d565cc9",
   "exactHostingReadback": true,
   "assertions": {
     "monthlyProductionIndependent": true,
     "financialRealityIndependent": true,
     "noSyntheticMetaPct": true,
     "advisorMissingMetaFailClosed": true,
+    "metaSchemaAligned": true,
     "clientListPerformance": true,
     "b3004SyntheticFixtureAbsent": true,
+    "client360CountryKpis": true,
+    "client360InternalCountryKpis": true,
+    "kpiDetailSurfaces": true,
     "cobrosCorePerformance": true,
+    "inicioCanonicalDetailOwner": true,
     "countryScope": true,
     "sigaDirectIncluded": true,
     "polizasCountryScope": true,
     "healthStable": true,
     "healthIndependentRealClient": true,
-    "b3007SyntheticResidueAbsent": true
+    "b3007SyntheticResidueAbsent": true,
+    "cronogramaPerformance": true
   },
   "performance": {
-    "client360ListMs": 348,
-    "cobrosCoreMs": 1576
+    "client360ListMs": 447,
+    "cobrosCoreMs": 2489,
+    "cronogramaMs": 2152
   },
   "countries": {
     "CO": {
@@ -47,6 +54,8 @@
         "directCount": 42,
         "directAmount": 205763487.04000002,
         "clientCount": 17,
+        "clientPolicyCount": 76,
+        "clientActivePolicyCount": 9,
         "policyCount": 124,
         "activePolicyCount": 27
       },
@@ -83,7 +92,8 @@
   },
   "b3007": {
     "syntheticResidueVisible": false,
-    "humanVisualStillRequired": true
+    "humanVisualStillRequired": true,
+    "cronogramaMs": 2152
   },
   "pageErrors": [],
   "consoleErrors": [],

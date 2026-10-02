@@ -2415,7 +2415,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Dashboard Inicio reality reconciliation closed before B4.",
-      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2429,7 +2429,7 @@
         "image(20260930-011108).png"
       ],
       "rootCause": "READINESS_OWNER_MISMATCH_AND_CAUSAL_SECOND_WRITERS_CONFIRMED",
-      "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B3_008_TARGETED_PAULA_VISUAL",
       "diagnosticClue": {
         "fromGate": "B3-003",
         "authoritativeCounts": {
@@ -2510,7 +2510,7 @@
       "sourceFixReceiptBlobSha": "7803b5f614792e6d80df1e1e1d3f22488d44a641",
       "sourceFixSourceHead": "d5a0d10e11c3f30ef237dac9c8a21321c266b249",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_20261002.json",
-      "machineProofReceiptBlobSha": "e22920c82ad26efe7d568b6c4bdf752d08dec553",
+      "machineProofReceiptBlobSha": "62cfc445d4a06ef4683ca71f9845a652ac406510",
       "currentCandidateEligibleForPromotion": false,
       "machineProofInvalidatedByHumanEvidence": true,
       "r2HumanRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_REJECTION_R2_REALITY_PERFORMANCE_20261002.json",
@@ -6100,13 +6100,13 @@
     }
   },
   "currentB3": {
-    "status": "B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B3_008_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
     "activeFindingId": "B3-008",
     "priorFindingId": "B3-007",
     "priorFindingStatus": "CLOSED_PASS",
     "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CLOSED_PASS_20261001.json",
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
-    "compositionLockBlobSha": "a58c58ae187c63492530d87fdb0a48718b920eb7",
+    "compositionLockBlobSha": "1619c8c08e8ab0549c181f95b41bcb5ea1fa6954",
     "noLive": true,
     "noReimport": true,
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
