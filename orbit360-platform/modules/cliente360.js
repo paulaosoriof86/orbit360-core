@@ -82,7 +82,7 @@ Orbit.modules.cliente360 = (function () {
     if (!store || store.__productReadOnlyP0 !== true || typeof store._productStatus !== 'function') return true;
     const ps = store._productStatus() || {};
     const confirmed = ps.serverConfirmedCollections || [];
-    return ['clientes','polizas','asesores'].every(name => confirmed.includes(name));
+    return ['clientes','polizas'].every(name => confirmed.includes(name));
   }
   function scheduleClientListReadyRender(delay) {
     if (!listWaitingForReady || listReadyTimer) return;
@@ -93,7 +93,7 @@ Orbit.modules.cliente360 = (function () {
     }, Math.max(0, Number(delay) || 0));
   }
   function renderClientListLoading() {
-    host.innerHTML = `<div class="page">${Orbit.kit.bannerFor('cliente360', '')}<div class="card pad" data-c360-authoritative-loading="1"><b>Cargando cartera de clientes…</b><div class="muted" style="margin-top:5px">Validando clientes, pólizas, cobros y asesores antes de mostrar indicadores.</div></div></div>`;
+    host.innerHTML = `<div class="page">${Orbit.kit.bannerFor('cliente360', '')}<div class="card pad" data-c360-authoritative-loading="1"><b>Cargando cartera de clientes…</b><div class="muted" style="margin-top:5px">Confirmando clientes y pólizas. Los indicadores financieros se completan en segundo plano sin bloquear la lista.</div></div></div>`;
   }
   function ensureClientNameCaseStyle() {
     if (document.getElementById('c360-client-name-case-style')) return;
@@ -164,6 +164,7 @@ Orbit.modules.cliente360 = (function () {
      ========================================================= */
   function lista() {
     const f = filtros;
+    ensureDataCollections(['clientes','polizas','asesores','carteraPrimas']);
     if (!clientListDataReady()) {
       listWaitingForReady = true;
       renderClientListLoading();
@@ -264,7 +265,7 @@ Orbit.modules.cliente360 = (function () {
     const rowsBuildMs = perfNow() - rowsBuildStartedAt;
     const innerHtmlStartedAt = perfNow();
 
-    host.innerHTML = `<div class="page">
+    host.innerHTML = `<div class="page" data-c360-list-ready="1">
       ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevoCliente()">+ Nuevo cliente</button>`)}
 
       <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">

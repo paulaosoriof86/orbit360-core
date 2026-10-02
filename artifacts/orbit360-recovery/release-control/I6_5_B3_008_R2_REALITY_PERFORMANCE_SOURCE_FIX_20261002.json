@@ -1,0 +1,55 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2_REALITY_PERFORMANCE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B3-008",
+  "parentHead": "45078730e1bc9398227b3aa213152ea56a732583",
+  "sourceBinding": "ATOMIC_COMMIT_HEAD",
+  "humanRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_REJECTION_R2_REALITY_PERFORMANCE_20261002.json",
+  "humanRejectionReceiptBlobSha": "c668a2f36577884b6056e17a8eea9c5b5a45c690",
+  "rootCauses": [
+    "INICIO_SYNTHETIC_TARGET_FALLBACK_ACTIVE_PREMIUM_TIMES_1_10_CREATES_MECHANICAL_91_PERCENT",
+    "INICIO_MONTHLY_SECTION_USES_TOTAL_ACTIVE_PORTFOLIO_INSTEAD_OF_MONTHLY_PRODUCTION",
+    "ADVISOR_PROGRESS_USES_SEPARATE_TARGET_AUTHORITY_AND_FALSE_ZERO_WHEN_TARGET_MISSING",
+    "REALIZED_DIRECT_SIGA_PAYMENT_EVIDENCE_VISIBLE_IN_COBROS_ROWS_BUT_EXCLUDED_FROM_TOP_KPI_OWNER",
+    "CLIENT360_LIST_WAITS_FOR_OPTIONAL_ADVISOR_DEPENDENCY_WITHOUT_PRIMARY_DEPENDENCY_ENSURE",
+    "COBROS_FULL_FINANCIAL_HYDRATION_BLOCKS_CORE_LIST",
+    "POLIZAS_KPIS_AND_ROWS_IGNORE_ACTIVE_COUNTRY_SCOPE",
+    "B3_008_MACHINE_PROOF_COMPARED_DOM_TO_SAME_RUNTIME_FORMULA_INSTEAD_OF_INDEPENDENT_SOURCE_RECONCILIATION"
+  ],
+  "remediation": [
+    "Remove synthetic 1.10 and 0.85 target fallbacks; absent targets render fail-closed.",
+    "Use current-month net production by vigenciaInicio, matching existing Insights temporal semantics.",
+    "Use confirmed payment effective date for monthly collection; never reconciliation/discovery date.",
+    "Project realized payments from confirmed cobros plus authoritative/applied receipt evidence with deduplication.",
+    "Separate currencies and require country/single-currency context before target percentages.",
+    "Scope Inicio, Pólizas and renewal KPI counts by active country.",
+    "Client360 list blocks only on clientes+polizas and prewarms advisor/portfolio data.",
+    "Cobros exposes core list before deferred receipts/portfolio finish; partial financial KPIs stay neutral.",
+    "Replace self-referential proof with independent store-derived reconciliation and performance/country tests."
+  ],
+  "changedProductFiles": {
+    "orbit360-platform/core/queries.js": "b018c282eff90f03095beb06d107c02b7e9a9eb2",
+    "orbit360-platform/modules/inicio.js": "6228d5bd8af34dbf6e0e3afb93d1f7b1fbb9cd22",
+    "orbit360-platform/modules/cliente360.js": "932367c6627df776779b56237522d5b3ab388905",
+    "orbit360-platform/modules/cobros.js": "0ec0cc969a6b429c511ce6256abd38df3bd468fe",
+    "orbit360-platform/modules/polizas.js": "390dd12393d1ac894b844a795093d2c5969f33d5",
+    "orbit360-platform/index.html": "e097954c8eab316c4790e2958df2b5985063c966"
+  },
+  "changedQaFiles": {
+    "tools/gravicentra-i6-5-b3-008-contract.mjs": "6592363c9a8e57aee4b261d6243ab8fb56cb4476",
+    "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "d6cd4d2cf155d2f504858a9eb66faddc5c1ab3fd",
+    ".github/workflows/gravicentra-b3-008-executor.yml": "6acee26bb2f1cf61e18f0b9cb9985365173fe71e"
+  },
+  "b3007VisualDebt": "PRESERVED_FOR_NEXT_EXACT_PREVIEW_HUMAN_CHECK",
+  "boundaries": {
+    "operationalBusinessWrites": false,
+    "dataWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "newRepo": false,
+    "newBranch": false,
+    "newFirebase": false
+  },
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}

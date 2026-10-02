@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_008_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+  "status": "B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-008",
     "title": "Dashboard Inicio reality reconciliation closed before B4.",
-    "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
     "boundaries": {
       "businessWritesAuthorized": false,
@@ -23,7 +23,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_008_TARGETED_PAULA_VISUAL",
+    "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
     "scopeAndClosureLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
     "diagnosticScope": "READINESS_HYDRATION_AND_ONLY_NECESSARY_SEMANTIC_CORRECTION",
@@ -35,8 +35,10 @@
       "orbit360-platform/core/queries.js",
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/inicio.js",
-      "orbit360-platform/core/crmkit.js",
-      "orbit360-platform/core/router.js"
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/polizas.js",
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/index.html"
     ],
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_CAUSAL_DIAGNOSTIC_AND_SOURCE_AUTH_20261001.json",
     "diagnosticReceiptBlobSha": "1d9721eff019225c018158be57546a0c0ec063b8",
@@ -44,7 +46,11 @@
     "sourceFixReceiptBlobSha": "7803b5f614792e6d80df1e1e1d3f22488d44a641",
     "sourceHead": "d5a0d10e11c3f30ef237dac9c8a21321c266b249",
     "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_20261002.json",
-    "machineProofReceiptBlobSha": "f2504d8c1736b16c56e58cc31510307bc81222ef"
+    "machineProofReceiptBlobSha": "f2504d8c1736b16c56e58cc31510307bc81222ef",
+    "r2HumanRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_REJECTION_R2_REALITY_PERFORMANCE_20261002.json",
+    "r2HumanRejectionReceiptBlobSha": "c668a2f36577884b6056e17a8eea9c5b5a45c690",
+    "r2SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2_REALITY_PERFORMANCE_SOURCE_FIX_20261002.json",
+    "r2SourceFixReceiptBlobSha": "78a38dd979a9ffd70923a31e9567842aad0b8823"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -53,10 +59,13 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "922c144b6775f9a64c66b1758bed427eefdbb8a8"
+    "blobSha": "e8b14ae7ab521dd417c36f947c1e0a411d65cb51"
   },
   "nextRequiredProof": [
-    "B3_008_TARGETED_PAULA_VISUAL_ACCEPTANCE"
+    "B3_008_R2_INDEPENDENT_REALITY_MACHINE_PROOF",
+    "B3_008_R2_CLIENT360_AND_COBROS_PERFORMANCE_PROOF",
+    "B3_007_TARGETED_PAULA_VISUAL_CRONOGRAMA",
+    "B3_008_TARGETED_PAULA_VISUAL_INICIO_CLIENTE360_COBROS_POLIZAS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -242,7 +251,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "9dc13575cc197e946867f82d12f3f644dd556e31"
+    "blobSha": "c7bddf0262035d7bbe0deaf0611590b795d79b0e"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
@@ -763,14 +772,14 @@
     "forbiddenSyntheticPaymentCollection": "cobros"
   },
   "b3008Executor": {
-    "status": "ARMED_FOR_EXACT_PREVIEW_RETRY",
+    "status": "ARMED_FOR_EXACT_PREVIEW_R2_REALITY_PERFORMANCE",
     "qaBlobs": {
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "8d3dc8325cf5b74fa30a8f8646e894a8295534e3",
       "tools/gravicentra-i6-5-b3-008-contract.mjs": "868d4ddf85ed7404786d1290d2aa4447a3ff845b",
       "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "f0d0bdfb6f69e6ce6fdf638eb9c203a419bfb90a",
       ".github/workflows/gravicentra-b3-008-executor.yml": "a607e4f60a44907361ccb972aa6519b07c5a08dd"
     },
-    "productSourceChanged": false,
+    "productSourceChanged": true,
     "operationalBusinessWritesAuthorized": false,
     "reimportAuthorized": false,
     "liveHostingPromotionAuthorized": false,
@@ -780,6 +789,19 @@
       "blobSha": "9a9d9280f677cd6fe70693f8ec00716539b7f449",
       "failedRunId": 36965960247,
       "productSourceChanged": false
-    }
+    },
+    "workflowPath": ".github/workflows/gravicentra-b3-008-executor.yml",
+    "workflowBlobSha": "6acee26bb2f1cf61e18f0b9cb9985365173fe71e",
+    "contractPath": "tools/gravicentra-i6-5-b3-008-contract.mjs",
+    "contractBlobSha": "6592363c9a8e57aee4b261d6243ab8fb56cb4476",
+    "proofPath": "tools/gravicentra-i6-5-b3-008-preview-proof.mjs",
+    "proofBlobSha": "d6cd4d2cf155d2f504858a9eb66faddc5c1ab3fd"
+  },
+  "b3008R2": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "rejectedSourceSha": "cdc9fd6a8391efd3617460670d7987bb25fc8ec9",
+    "humanRejectionReceiptBlobSha": "c668a2f36577884b6056e17a8eea9c5b5a45c690",
+    "sourceFixReceiptBlobSha": "78a38dd979a9ffd70923a31e9567842aad0b8823",
+    "b3007HumanVisualDebt": "PENDING_TARGETED_PAULA_VISUAL"
   }
 }

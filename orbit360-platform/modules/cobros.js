@@ -66,7 +66,9 @@ Orbit.modules.cobros = (function () {
     return raw;
   }
   function previewReadonlyBadge(c){return '<span class="badge neutral" data-preview-readonly-row="'+U.esc(receiptIdOf(c))+'">Solo lectura</span>';}
-  const HYDRATION_DEPS = ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas'];
+  const CORE_HYDRATION_DEPS = ['cobros', 'clientes', 'polizas'];
+  const FINANCIAL_HYDRATION_DEPS = ['recibosEsperados', 'carteraPrimas'];
+  const HYDRATION_DEPS = CORE_HYDRATION_DEPS.concat(FINANCIAL_HYDRATION_DEPS);
 
   const FDEFS = () => [
     { id: 'fq', type: 'search', ph: 'Buscar cliente, póliza o placa…' },
@@ -86,7 +88,9 @@ Orbit.modules.cobros = (function () {
     const errors = s.snapshotErrors && typeof s.snapshotErrors === 'object' ? s.snapshotErrors : {};
     const failed = HYDRATION_DEPS.filter(name => denied.includes(name) || !!errors[name]);
     const missing = HYDRATION_DEPS.filter(name => !confirmed.includes(name) && !failed.includes(name));
-    return { ready: missing.length === 0 && failed.length === 0, missing, failed, confirmed };
+    const coreFailed = CORE_HYDRATION_DEPS.filter(name => failed.includes(name)), coreMissing = CORE_HYDRATION_DEPS.filter(name => missing.includes(name));
+    const financialFailed = FINANCIAL_HYDRATION_DEPS.filter(name => failed.includes(name)), financialMissing = FINANCIAL_HYDRATION_DEPS.filter(name => missing.includes(name));
+    return { ready: missing.length === 0 && failed.length === 0, coreReady: coreMissing.length === 0 && coreFailed.length === 0, financialReady: financialMissing.length === 0 && financialFailed.length === 0, missing, failed, coreMissing, coreFailed, financialMissing, financialFailed, confirmed };
   }
 
   function buildIndex() {
@@ -329,26 +333,26 @@ Orbit.modules.cobros = (function () {
     const qaReceipt=qaReceiptId();
     if(qaReceipt){st.fq='';st.fest='';st.fase='';st.page=1;}
     const hyd = hydrationState();
-    if (!hyd.ready) {
-      const blocked = hyd.failed.length > 0;
+    if (!hyd.coreReady) {
+      const blocked = hyd.coreFailed.length > 0;
       host.innerHTML = `<div class="page">
         ${K.bannerFor('cobros', `<button class="btn ghost" onclick="Orbit.modules.cobros.lote()" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📤 Preparar lote</button>`)}
         <div class="card pad" data-cobros-hydration-loading="1" style="display:grid;gap:8px">
           <b style="font-family:var(--f-display);font-size:15px">${blocked ? 'No fue posible completar la carga de Cobros y cartera' : 'Cargando Cobros y cartera…'}</b>
-          <div class="muted" style="font-size:12.5px">${blocked ? 'La lectura quedó bloqueada para: ' + hyd.failed.map(U.esc).join(', ') + '. No se muestran ceros parciales.' : 'Preparando clientes, pólizas, recibos y cartera. La pantalla se habilitará cuando la lectura esté completa.'}</div>
+          <div class="muted" style="font-size:12.5px">${blocked ? 'La lectura quedó bloqueada para: ' + hyd.coreFailed.map(U.esc).join(', ') + '. No se muestran ceros parciales.' : 'Preparando clientes, pólizas y cobros. Recibos y cartera se completan después sin bloquear el listado.'}</div>
         </div>
       </div>`;
       return;
     }
 
     if (st.fq) { try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(['vehiculos']); } catch(e) {} }
-    const model = baseModel(reuseBase === true);
+    const model = hyd.financialReady ? baseModel(reuseBase === true) : {country:activeCountry(),idx:buildIndex(),cart:null,aging:null};
     const idx = model.idx;
     const cart = model.cart;
     const aging = model.aging;
-    const porConciliar = (cart.currencies || []).reduce((sum, cur) => sum + Number(cart.byCurrency[cur] && cart.byCurrency[cur].porConciliar || 0), 0);
+    const porConciliar = hyd.financialReady ? (cart.currencies || []).reduce((sum, cur) => sum + Number(cart.byCurrency[cur] && cart.byCurrency[cur].porConciliar || 0), 0) : null;
     const qaSurfaceRow = qaReceipt ? qaReceiptSurfaceRow(qaReceipt) : null;
-    const authoritative = qaReceipt ? [] : rows(idx), portfolioOnly = qaReceipt ? [] : portfolioPaymentRows(idx), reported = qaReceipt ? [] : reportedRows(idx);
+    const authoritative = qaReceipt ? [] : rows(idx), portfolioOnly = qaReceipt || !hyd.financialReady ? [] : portfolioPaymentRows(idx), reported = qaReceipt || !hyd.financialReady ? [] : reportedRows(idx);
     const crmDirect = reported.filter(x => x.__crmDirectEvidence), paidReceiptFallback = reported.filter(x => x.__paidReceiptEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
     const allRowsUnfiltered = qaReceipt ? (qaSurfaceRow ? [qaSurfaceRow] : []) : authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
     const allRows = qaReceipt ? allRowsUnfiltered.filter(row => receiptIdOf(row) === qaReceipt) : allRowsUnfiltered;
@@ -363,16 +367,22 @@ Orbit.modules.cobros = (function () {
       (clientReported.length ? ' · ' + clientReported.length + ' reportes de cliente' : '') +
       (allRows.length ? ' · ' + (from + 1) + '–' + Math.min(from + PAGE_SIZE, allRows.length) + ' de ' + allRows.length : '');
     const agingCols = { '1-30': '#c9821b', '31-60': '#d9602e', '61-90': '#b5253b', '90+': '#7e1220' };
+    const truthAttr = hyd.financialReady ? U.esc(encodeURIComponent(JSON.stringify(cart.byCurrency || {}))) : '';
 
-    host.innerHTML = `<div class="page">
+    host.innerHTML = `<div class="page" data-cobros-core-ready="1" data-cobros-financial-readiness="${hyd.financialReady?'ready':(hyd.financialFailed.length?'unavailable':'pending')}" data-cobros-truth="${truthAttr}">
       ${K.bannerFor('cobros', `<button class="btn ghost" onclick="Orbit.modules.cobros.lote()" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📤 Preparar lote</button>`)}
       ${isPreviewHost()?'<div class="card pad" data-preview-safe-mode="1" style="margin-bottom:12px;border-left:3px solid var(--info)"><b>Vista previa segura</b><div class="muted" style="margin-top:4px">Los registros reales son solo lectura. Las pruebas de escritura solo se habilitan en el caso QA sintético aislado.</div></div>':''}
       ${qaReceipt?'<div class="card pad" data-b3004-human-qa-mode="1" style="margin-bottom:12px;border-left:3px solid var(--ok)"><b>Prueba QA sintética aislada</b><div class="muted" style="margin-top:4px">Esta vista contiene únicamente el recibo de prueba autorizado; no mezcla clientes reales.</div></div>':''}
-      ${K.kpis([
+      ${K.kpis(hyd.financialReady ? [
         { label: 'Cartera al día', val: currencyMetric(cart, 'alDia'), color: 'var(--ok)', foot: 'cobros confirmados · sin conversión entre monedas', footTone: 'up' },
         { label: 'Pendiente', val: currencyMetric(cart, 'pend'), color: 'var(--warn)', foot: 'por vencer · por moneda' },
         { label: 'Vencido', val: currencyMetric(cart, 'venc'), color: 'var(--danger)', foot: 'en gestión · por moneda', footTone: 'down' },
         { label: 'Por conciliar', onclick: "location.hash='#/cobros'", val: porConciliar, color: 'var(--info)', foot: 'cobros confirmados sin conciliación' }
+      ] : [
+        { label: 'Cartera al día', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando pagos y recibos' },
+        { label: 'Pendiente', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando cartera' },
+        { label: 'Vencido', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando cartera' },
+        { label: 'Por conciliar', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando pagos' }
       ])}
       ${crmDirect.length ? `<div class="card" data-siga-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--ok)"><b>${crmDirect.length} pago(s) registrados en SIGA</b><div class="muted" style="font-size:12px;margin-top:3px">Son evidencia directa de pagos ya efectuados. No requieren aplicación manual; conservan conciliación automática por lote y también acción individual <b>Conciliar</b>.</div></div>` : ''}
       ${advisorReported.length ? `<div class="card" data-advisor-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${advisorReported.length} pago(s) reportado(s) por asesor</b><div class="muted" style="font-size:12px;margin-top:3px">El reporte no aplica el pago. Operativo valida la correspondencia desde Ops y luego aplica el mismo pago sin duplicarlo.</div></div>` : ''}
@@ -383,7 +393,7 @@ Orbit.modules.cobros = (function () {
           <b style="font-family:var(--f-display);font-size:15px">Antigüedad de cartera vencida (aging)</b>
           <span class="muted" style="font-size:12px">País: ${U.esc(aging.country === 'TODOS' ? 'Todos los países' : aging.country)} · importes separados por moneda</span>
         </div>
-        ${agingCurrencyBlocks(aging, agingCols)}
+        ${hyd.financialReady ? agingCurrencyBlocks(aging, agingCols) : '<div class="muted" data-cobros-aging-pending="1" style="font-size:12.5px;margin-top:12px">Actualizando cartera vencida…</div>'}
       </div>
 
       <div class="card" style="overflow:visible">

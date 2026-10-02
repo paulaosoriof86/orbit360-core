@@ -65,118 +65,48 @@ Orbit.modules.inicio = (function () {
   }
 
   function render(host) {
-    const clientReadiness=dataReadiness(['clientes']);
-    const policyReadiness=dataReadiness(['clientes','polizas']);
-    const paymentReadiness=dataReadiness(['clientes','polizas','cobros']);
-    const portfolioReadiness=dataReadiness(['clientes','polizas','carteraPrimas']);
-    const cart = q.carteraGlobal();
-    const prima = q.primaVigenteGlobal();
-    const renov = q.renovacionesProximas(45);
-    const venc = portfolioReadiness === 'ready' && q.carteraVencidaRows ? q.carteraVencidaRows() : [];
-    const board = q.leaderboard();
-    const clientes = Orbit.store.all('clientes');
-    const polizas = Orbit.store.all('polizas');
+    try { if (Orbit.store && typeof Orbit.store._ensureCollections === 'function') Orbit.store._ensureCollections(['clientes','polizas','asesores','metas','cobros','recibosEsperados','carteraPrimas']); } catch (_) {}
+    const clientReadiness=dataReadiness(['clientes']), policyReadiness=dataReadiness(['clientes','polizas']), productionReadiness=dataReadiness(['clientes','polizas']), metaReadiness=dataReadiness(['asesores','metas']), paymentReadiness=dataReadiness(['clientes','polizas','cobros','recibosEsperados','carteraPrimas']), portfolioReadiness=dataReadiness(['clientes','polizas','carteraPrimas']);
+    const mesKey=q.currentMonthKey?q.currentMonthKey():U.monthKey();
+    const production=productionReadiness==='ready'&&q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey):{};
+    const recaudoMes=paymentReadiness==='ready'&&q.recaudoMesPorMoneda?q.recaudoMesPorMoneda(mesKey):{};
+    const cart=paymentReadiness==='ready'&&q.carteraGlobalPorMoneda?q.carteraGlobalPorMoneda():{byCurrency:{},currencies:[]};
+    const renov=q.renovacionesProximas(45), venc=portfolioReadiness==='ready'&&q.carteraVencidaRows?q.carteraVencidaRows():[];
+    const board=productionReadiness==='ready'&&metaReadiness==='ready'&&q.leaderboardMes?q.leaderboardMes(mesKey):[];
+    const clientes=q.clientesScoped?q.clientesScoped():Orbit.store.all('clientes'), polizas=q.polizasScoped?q.polizasScoped():Orbit.store.all('polizas');
+    const metasMes=(Orbit.store.all('metas')||[]).filter(m=>String(m&&m.mes||'').slice(0,7)===mesKey);
+    const activeCountry=String(Orbit.pais||'TODOS').toUpperCase(), advisors=(Orbit.store.all('asesores')||[]).filter(a=>activeCountry==='TODOS'||String(a&&a.pais||'').toUpperCase()===activeCountry);
+    const mapKeys=map=>Object.keys(map||{}).filter(cur=>Math.abs(Number(map[cur])||0)>0), singleCurrency=map=>{const k=mapKeys(map);return k.length===1?k[0]:'';};
+    const activeCurrency=activeCountry==='CO'?'COP':activeCountry==='GT'?'GTQ':(singleCurrency(production)||singleCurrency(recaudoMes));
+    const escAttr=value=>U.esc(encodeURIComponent(JSON.stringify(value||{})));
+    const moneyMap=map=>{const keys=Object.keys(map||{}).sort((a,b)=>(a==='GTQ'?0:a==='COP'?1:2)-(b==='GTQ'?0:b==='COP'?1:2)||a.localeCompare(b));if(!keys.length)return'Sin movimientos';return keys.map(cur=>'<span style="display:block;white-space:nowrap">'+U.esc(U.moneyShort(map[cur]||0,cur))+' '+U.esc(cur)+'</span>').join('');};
+    const metricMap=field=>{const out={};Object.keys(cart.byCurrency||{}).forEach(cur=>{out[cur]=Number(cart.byCurrency[cur]&&cart.byCurrency[cur][field]||0);});return out;};
+    const configuredMeta=tipo=>{if(metaReadiness!=='ready'||!activeCurrency)return null;const exact=metasMes.find(m=>m&&m.tipo===tipo&&!m.asesorId&&(!m.pais||activeCountry==='TODOS'||String(m.pais).toUpperCase()===activeCountry));const n=U.finiteNumber(exact&&exact.valor);if(n!=null&&n>0)return n;if(tipo==='prima'&&advisors.length){const vals=advisors.map(a=>U.finiteNumber(a&&a.metaPrima));if(vals.every(v=>v!=null&&v>0))return vals.reduce((s,v)=>s+v,0);}return null;};
+    const metaPrima=configuredMeta('prima'),metaRec=configuredMeta('recaudo'),prodValue=activeCurrency?Number(production[activeCurrency]||0):null,recValue=activeCurrency?Number(recaudoMes[activeCurrency]||0):null;
+    const pctPrima=metaPrima&&prodValue!=null?Math.max(0,Math.min(140,Math.round(prodValue/metaPrima*100))):null,pctRec=metaRec&&recValue!=null?Math.max(0,Math.min(140,Math.round(recValue/metaRec*100))):null;
+    const targetDial=(kind,label,map,pct,meta)=>{const state=!activeCurrency?'currency-required':metaReadiness!=='ready'?'loading':meta?'configured':'missing',pctText=pct==null?'—':pct+'%',deg=pct==null?0:Math.max(0,Math.min(100,pct))*3.6,note=state==='currency-required'?'Selecciona un país para comparar con meta':state==='loading'?'Actualizando meta':state==='missing'?'Meta no configurada':'Meta '+U.moneyShort(meta,activeCurrency);return '<div data-inicio-monthly="'+kind+'" data-values="'+escAttr(map)+'" data-meta-state="'+state+'" data-pct="'+(pct==null?'':pct)+'" style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--red) '+deg+'deg,var(--line) '+deg+'deg)"><div style="width:90px;height:90px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center;box-shadow:inset 0 0 0 1px var(--line)"><div><div style="font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--ink)">'+pctText+'</div><div style="font-size:10px;color:var(--ink-3);font-family:var(--f-mono)">'+moneyMap(map)+'</div></div></div></div><div style="font-size:12px;color:var(--ink-2);font-weight:600">'+label+'</div><div class="muted" style="font-size:10.5px;text-align:center;max-width:150px">'+note+'</div></div>';};
+    const confirmedMap=metricMap('alDia'),pendingMap=metricMap('pend'),overdueMap=metricMap('venc');
+    const diasMes=new Date(U.now().getFullYear(),U.now().getMonth()+1,0).getDate()-U.now().getDate();
 
-    // metas mensuales: autoadministrables desde la colección 'metas' (mes actual).
-    // Fallback SIN literales: meta de empresa = suma de metas por asesor (dato real); recaudo = 85% de esa meta.
-    const mesKey = U.monthKey();
-    const metasMes = (Orbit.store.all('metas') || []).filter(m => (m.mes || '') === mesKey);
-    const gMeta = (tipo, def) => { const r = metasMes.find(m => m.tipo === tipo && !m.asesorId); return r && r.valor ? +r.valor : def; };
-    const metaEmpresa = Orbit.store.all('asesores').reduce((s, a) => s + (U.finiteNumber(a.metaPrima) || 0), 0) || Math.round((U.finiteNumber(prima) || 0) * 1.1);
-    const metaPrima = gMeta('prima', metaEmpresa), pctPrima = metaPrima ? Math.min(100, Math.round(prima / metaPrima * 100)) : 0;
-    const recaudo = cart.alDia, metaRec = gMeta('recaudo', Math.round(metaPrima * 0.85)), pctRec = metaRec ? Math.min(100, Math.round(recaudo / metaRec * 100)) : 0;
-    const diasMes = new Date(U.now().getFullYear(), U.now().getMonth() + 1, 0).getDate() - U.now().getDate();
-
-    host.innerHTML = `<div class="page">
-      ${Orbit.kit.banner({ icon: '🌅', title: 'Buen día', sub: 'esto es lo importante hoy', features: ['Metas del mes', 'Prioridades', 'Avance por asesor'], actions: `<button class="btn primary" onclick="location.hash='#/cliente360'">Abrir Cliente 360 →</button>` })}
-
-      <!-- Metas del mes -->
+    host.innerHTML=`<div class="page" data-inicio-reality-ready="1">
+      ${Orbit.kit.banner({icon:'🌅',title:'Buen día',sub:'esto es lo importante hoy',features:['Metas del mes','Prioridades','Avance por asesor'],actions:`<button class="btn primary" onclick="location.hash='#/cliente360'">Abrir Cliente 360 →</button>`})}
       <div class="card" style="margin-top:18px;padding:22px 24px;display:flex;gap:30px;align-items:center;flex-wrap:wrap;border-top:3px solid var(--red)">
-        <div style="flex:1;min-width:200px">
-          <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · ${U.monthLabel()}</div>
-          <div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Vamos en camino</div>
-          <div style="color:var(--ink-2);font-size:13.5px;margin-top:6px;line-height:1.5">
-            Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. La prima vigente y el recaudo confirmado se calculan desde las pólizas y cobros reales del CRM.</div>
-          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-            <span class="badge neutral" data-inicio-count="clientes" data-readiness="${clientReadiness}">${clientReadiness === 'ready' ? clientes.length + ' clientes' : 'Actualizando clientes'}</span>
-            <span class="badge neutral" data-inicio-count="polizas" data-readiness="${policyReadiness}">${policyReadiness === 'ready' ? polizas.length + ' pólizas' : 'Actualizando pólizas'}</span>
-            <span class="badge ${portfolioReadiness === 'ready' ? 'danger' : 'neutral'}" data-inicio-count="cartera-vencida" data-readiness="${portfolioReadiness}">${portfolioReadiness === 'ready' ? venc.length + ' registros vencidos en cartera' : 'Actualizando cartera'}</span>
-          </div>
-        </div>
-        ${policyReadiness === 'ready' ? dial(pctPrima, 'Prima vigente', U.moneyShort(prima, Orbit.q.monedaPais())) : pendingDial('Prima vigente', policyReadiness)}
-        ${paymentReadiness === 'ready' ? dial(pctRec, 'Recaudo confirmado', U.moneyShort(recaudo, Orbit.q.monedaPais())) : pendingDial('Recaudo confirmado', paymentReadiness)}
+        <div style="flex:1;min-width:200px"><div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · ${U.monthLabel()}</div><div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Avance real del mes</div><div style="color:var(--ink-2);font-size:13.5px;margin-top:6px;line-height:1.5">Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje.</div><div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><span class="badge neutral" data-inicio-count="clientes" data-readiness="${clientReadiness}">${clientReadiness==='ready'?clientes.length+' clientes':'Actualizando clientes'}</span><span class="badge neutral" data-inicio-count="polizas" data-readiness="${policyReadiness}">${policyReadiness==='ready'?polizas.length+' pólizas':'Actualizando pólizas'}</span><span class="badge ${portfolioReadiness==='ready'?'danger':'neutral'}" data-inicio-count="cartera-vencida" data-readiness="${portfolioReadiness}">${portfolioReadiness==='ready'?venc.length+' registros vencidos en cartera':'Actualizando cartera'}</span></div></div>
+        ${productionReadiness==='ready'?targetDial('production','Producción neta del mes',production,pctPrima,metaPrima):pendingDial('Producción neta del mes',productionReadiness)}
+        ${paymentReadiness==='ready'?targetDial('recaudo','Recaudo confirmado del mes',recaudoMes,pctRec,metaRec):pendingDial('Recaudo confirmado del mes',paymentReadiness)}
       </div>
-
-      <!-- KPIs clicables -->
       <div class="kpi-row" style="margin-top:18px">
-        <button class="kpi kpi-click" data-inicio-metric="cobros-confirmados" data-readiness="${paymentReadiness}" onclick="Orbit.modules.inicio.openFinancialKpi('confirmed')" title="Ver cobros confirmados">
-          <div class="k-accent" style="background:${paymentReadiness === 'ready' ? 'var(--red)' : 'var(--line)'}"></div>
-          <div class="k-label">Cartera al día</div>
-          <div class="k-val" data-value="${paymentReadiness === 'ready' ? cart.alDia : ''}">${paymentReadiness === 'ready' ? U.moneyShort(cart.alDia, Orbit.q.monedaPais()) : (paymentReadiness === 'unavailable' ? 'No disponible' : 'Actualizando datos')}</div>
-          <div class="k-foot ${paymentReadiness === 'ready' ? 'up' : 'muted'}">${paymentReadiness === 'ready' ? '▲ cobros confirmados ›' : 'Esperando confirmación del servidor'}</div></button>
-        <button class="kpi kpi-click" data-inicio-metric="cartera-pendiente" data-readiness="${portfolioReadiness}" onclick="Orbit.modules.inicio.openFinancialKpi('pending')" title="Ver pendiente de cobro" style="border-color:${portfolioReadiness === 'ready' ? 'var(--warn)' : 'var(--line)'}">
-          <div class="k-accent" style="background:${portfolioReadiness === 'ready' ? 'var(--warn)' : 'var(--line)'}"></div>
-          <div class="k-label">Pendiente de cobro</div>
-          <div class="k-val" data-value="${portfolioReadiness === 'ready' ? cart.pend : ''}">${portfolioReadiness === 'ready' ? U.moneyShort(cart.pend, Orbit.q.monedaPais()) : (portfolioReadiness === 'unavailable' ? 'No disponible' : 'Actualizando datos')}</div>
-          <div class="k-foot muted">${portfolioReadiness === 'ready' ? 'cuotas por vencer ›' : 'Esperando confirmación del servidor'}</div></button>
-        <button class="kpi kpi-click" data-inicio-metric="cartera-vencida" data-readiness="${portfolioReadiness}" onclick="Orbit.modules.inicio.openFinancialKpi('overdue')" title="Ver cartera vencida">
-          <div class="k-accent" style="background:${portfolioReadiness === 'ready' ? 'var(--danger)' : 'var(--line)'}"></div>
-          <div class="k-label">Cartera vencida</div>
-          <div class="k-val" data-value="${portfolioReadiness === 'ready' ? cart.venc : ''}">${portfolioReadiness === 'ready' ? U.moneyShort(cart.venc, Orbit.q.monedaPais()) : (portfolioReadiness === 'unavailable' ? 'No disponible' : 'Actualizando datos')}</div>
-          <div class="k-foot ${portfolioReadiness === 'ready' ? 'down' : 'muted'}">${portfolioReadiness === 'ready' ? '▼ requiere gestión ›' : 'Esperando confirmación del servidor'}</div></button>
-        <button class="kpi kpi-click" onclick="Orbit.kpi('renov-proximas')" title="Ver renovaciones">
-          <div class="k-accent" style="background:var(--info)"></div>
-          <div class="k-label">Renovaciones ≤45 d</div>
-          <div class="k-val">${renov.length}</div>
-          <div class="k-foot muted">pólizas por renovar ›</div></button>
+        <button class="kpi kpi-click" data-inicio-metric="cobros-confirmados" data-readiness="${paymentReadiness}" data-values="${escAttr(confirmedMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('confirmed')" title="Ver cobros confirmados"><div class="k-accent" style="background:${paymentReadiness==='ready'?'var(--red)':'var(--line)'}"></div><div class="k-label">Cartera al día</div><div class="k-val">${paymentReadiness==='ready'?moneyMap(confirmedMap):(paymentReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot ${paymentReadiness==='ready'?'up':'muted'}">${paymentReadiness==='ready'?'cobros confirmados ›':'Esperando confirmación del servidor'}</div></button>
+        <button class="kpi kpi-click" data-inicio-metric="cartera-pendiente" data-readiness="${portfolioReadiness}" data-values="${escAttr(pendingMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('pending')" title="Ver pendiente de cobro"><div class="k-accent" style="background:${portfolioReadiness==='ready'?'var(--warn)':'var(--line)'}"></div><div class="k-label">Pendiente de cobro</div><div class="k-val">${portfolioReadiness==='ready'?moneyMap(pendingMap):(portfolioReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot muted">${portfolioReadiness==='ready'?'cuotas por vencer ›':'Esperando confirmación del servidor'}</div></button>
+        <button class="kpi kpi-click" data-inicio-metric="cartera-vencida" data-readiness="${portfolioReadiness}" data-values="${escAttr(overdueMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('overdue')" title="Ver cartera vencida"><div class="k-accent" style="background:${portfolioReadiness==='ready'?'var(--danger)':'var(--line)'}"></div><div class="k-label">Cartera vencida</div><div class="k-val">${portfolioReadiness==='ready'?moneyMap(overdueMap):(portfolioReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot ${portfolioReadiness==='ready'?'down':'muted'}">${portfolioReadiness==='ready'?'requiere gestión ›':'Esperando confirmación del servidor'}</div></button>
+        <button class="kpi kpi-click" onclick="Orbit.kpi('renov-proximas')" title="Ver renovaciones"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Renovaciones ≤45 d</div><div class="k-val">${renov.length}</div><div class="k-foot muted">pólizas por renovar ›</div></button>
       </div>
-
       <div class="inicio-main-grid" style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px">
-        <!-- Leaderboard -->
-        <div class="card pad">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-            <b style="font-family:var(--f-display);font-size:16px">Avance por asesor</b>
-            <span class="muted" style="font-size:12px">prima vigente vs meta</span>
-          </div>
-          ${board.map(b => `
-            <div class="clickable" onclick="location.hash='#/insights'" title="Ver analítica de metas por asesor" style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-2);cursor:pointer">
-              ${U.avatar(b.asesor.nombre, b.asesor.color, 'md')}
-              <div style="flex:1;min-width:0">
-                <div style="display:flex;justify-content:space-between;font-size:13.5px">
-                  <b>${U.esc(b.asesor.nombre)}</b><span class="mono">${U.moneyShort(b.prima, Orbit.q.monedaPais())}</span>
-                </div>
-                <div class="bar" style="margin-top:6px"><i style="width:${Math.min(100, b.pct)}%"></i></div>
-              </div>
-              <span class="badge ${b.pct >= 100 ? 'ok' : b.pct >= 70 ? 'warn' : 'neutral'}" style="min-width:46px;justify-content:center">${b.pct}%</span>
-            </div>`).join('')}
+        <div class="card pad"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><b style="font-family:var(--f-display);font-size:16px">Avance por asesor</b><span class="muted" style="font-size:12px">producción neta del mes vs meta configurada</span></div>
+          ${(productionReadiness==='ready'&&metaReadiness==='ready'?board:[]).map(b=>{const pct=b.pct==null?null:b.pct,metaState=b.metaDisponible?'configured':'missing',amountHtml=moneyMap(b.byCurrency||{});return `<div class="clickable" data-inicio-advisor-id="${U.esc(b.asesor.id||'')}" data-values="${escAttr(b.byCurrency||{})}" data-meta-state="${metaState}" data-pct="${pct==null?'':pct}" onclick="location.hash='#/insights'" style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-2);cursor:pointer">${U.avatar(b.asesor.nombre,b.asesor.color,'md')}<div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;font-size:13.5px;gap:8px"><b>${U.esc(b.asesor.nombre)}</b><span class="mono" style="text-align:right">${amountHtml}</span></div><div class="bar" style="margin-top:6px"><i style="width:${pct==null?0:Math.min(100,pct)}%"></i></div>${pct==null?'<div class="muted" style="font-size:10.5px;margin-top:3px">Meta no configurada</div>':''}</div><span class="badge ${pct==null?'neutral':pct>=100?'ok':pct>=70?'warn':'neutral'}" style="min-width:46px;justify-content:center">${pct==null?'—':pct+'%'}</span></div>`;}).join('')||'<div class="muted" style="padding:14px 0">Actualizando producción y metas del equipo…</div>'}
         </div>
-
-        <!-- Alertas -->
-        <div class="card pad">
-          <b style="font-family:var(--f-display);font-size:16px">Prioridades</b>
-          <div style="margin-top:12px;display:grid;gap:9px">
-            ${renov.slice(0, 4).map(p => {
-              const cli = Orbit.store.get('clientes', p.clienteId);
-              const d = U.daysFromNow(p.vigenciaFin);
-              return `<div class="clickable" onclick="location.hash='#/cliente360?c=${p.clienteId}'" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--warn-soft);border-radius:var(--r-sm);cursor:pointer">
-                <span style="font-size:16px">🔄</span>
-                <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(cli ? cli.nombre : '—')}</div>
-                <div class="muted" style="font-size:11.5px">${U.esc(p.ramo)} · renueva en ${d} d</div></div>
-              </div>`;
-            }).join('')}
-            ${venc.slice(0, 3).map(c => {
-              const cli = Orbit.store.get('clientes', c.clienteId);
-              return `<div class="clickable" onclick="location.hash='#/cliente360?c=${c.clienteId}'" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--danger-soft);border-radius:var(--r-sm);cursor:pointer">
-                <span style="font-size:16px">⚠</span>
-                <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(cli ? cli.nombre : '—')}</div>
-                <div class="muted" style="font-size:11.5px">cuota ${U.esc(U.text(c.cuota))} vencida · ${U.money(c.monto, c.moneda)}</div></div>
-              </div>`;
-            }).join('')}
-          </div>
-        </div>
+        <div class="card pad"><b style="font-family:var(--f-display);font-size:16px">Prioridades</b><div style="margin-top:12px;display:grid;gap:9px">${renov.slice(0,4).map(p=>{const cli=Orbit.store.get('clientes',p.clienteId),d=U.daysFromNow(p.vigenciaFin);return `<div class="clickable" onclick="location.hash='#/cliente360?c=${p.clienteId}'" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--warn-soft);border-radius:var(--r-sm);cursor:pointer"><span style="font-size:16px">🔄</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${U.esc(cli?cli.nombre:'—')}</div><div class="muted" style="font-size:11.5px">${U.esc(p.ramo)} · renueva en ${d} d</div></div></div>`;}).join('')}${venc.slice(0,3).map(c=>{const cli=Orbit.store.get('clientes',c.clienteId);return `<div class="clickable" onclick="location.hash='#/cliente360?c=${c.clienteId}'" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--danger-soft);border-radius:var(--r-sm);cursor:pointer"><span style="font-size:16px">⚠</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${U.esc(cli?cli.nombre:'—')}</div><div class="muted" style="font-size:11.5px">cuota ${U.esc(U.text(c.cuota))} vencida · ${U.money(c.monto,c.moneda)}</div></div></div>`;}).join('')}</div></div>
       </div>
-
-      <!-- Seguimientos de hoy (manuales, por WhatsApp) -->
       ${seguimientosHoy()}
     </div>`;
   }

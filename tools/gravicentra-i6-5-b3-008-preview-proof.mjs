@@ -12,15 +12,18 @@ const need=(v,c)=>{if(!v)throw new Error(c);};
 const clean=v=>String(v==null?'':v).trim();
 const norm=v=>clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 const privileged=new Set(['direccion','superadmin','super_admin','admintenant','admin_tenant','admin']);
-
+const eq=(a,b)=>Math.abs(Number(a)-Number(b))<0.005;
+const mapsEqual=(a,b)=>{
+  const keys=[...new Set(Object.keys(a||{}).concat(Object.keys(b||{})))];
+  return keys.every(k=>eq(a&&a[k]||0,b&&b[k]||0));
+};
 need(target,'B3_008_PREVIEW_URL_MISSING');
+
 const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId});
 const db=getFirestore(app),auth=getAuth(app),tenant=db.collection('tenants').doc(tenantId);
 
 async function actor(){
-  const snap=await tenant.collection('members').get();
-  const order=['direccion','superadmin','super_admin','admintenant','admin_tenant','admin'];
-  const candidates=[];
+  const snap=await tenant.collection('members').get(),order=['direccion','superadmin','super_admin','admintenant','admin_tenant','admin'],candidates=[];
   for(const d of snap.docs){
     const m=d.data()||{},state=norm(m.status||m.estado||'active');
     const roles=[m.activeRole,m.rolActivo,m.defaultRole,m.rolDefault,m.rol].concat(m.roles||[],m.assignedRoles||[],m.rolesAsignados||[]).map(norm).filter(Boolean);
@@ -31,7 +34,6 @@ async function actor(){
   need(candidates.length,'B3_008_PRIVILEGED_ACTOR_NOT_FOUND');
   return candidates.sort((a,b)=>order.indexOf(a.activeRole)-order.indexOf(b.activeRole))[0];
 }
-
 async function applyLegal(page,who){
   const scope='user:'+clean(who.email||who.uid);
   await page.addInitScript(({scope})=>{try{
@@ -49,128 +51,146 @@ async function boot(page,token){
   },token);
   need(x.uid&&x.started,'B3_008_PRODUCT_SESSION_NOT_STARTED');
 }
-async function findCanonicalHealth51(browser,who,token,proof){
-  const context=await browser.newContext({viewport:{width:1440,height:1000}});
-  const page=await context.newPage();page.setDefaultTimeout(30000);
-  await applyLegal(page,who);
-  await page.goto(target+'/#/inicio',{waitUntil:'domcontentloaded'});
-  await boot(page,token);
-  await page.waitForFunction(()=>['clientes','polizas','carteraPrimas'].every(k=>[].concat(Orbit.store?._productStatus?.()?.serverConfirmedCollections||[]).includes(k)),null,{timeout:30000});
-  const targetRow=await page.evaluate(()=>{
-    const simpleNorm=v=>String(v==null?'':v).trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
-    const clients=Orbit.store?.all?.('clientes')||[];
-    const dist={};
-    for(const c of clients){
-      try{
-        const r=Orbit.q.clienteResumen(c.id);
-        const h=Number(r?.salud);dist[h]=(dist[h]||0)+1;
-        if(h===51&&Number(r?.vencido)>0&&Number(r?.nVigentes)===1&&simpleNorm(c?.segmento)!=='premium'){
-          return{clientId:String(c.id),clientName:String(c.nombre||''),health:h,vencido:Number(r.vencido),nVigentes:Number(r.nVigentes),nPolizas:Number(r.nPolizas),segmento:String(c.segmento||''),distribution:dist};
-        }
-      }catch{}
-    }
-    return{clientId:'',distribution:dist};
-  });
-  proof.discovery=targetRow;
-  await context.close();
-  need(targetRow.clientId,'B3_008_NO_CANONICAL_HEALTH51_TARGET:'+JSON.stringify(targetRow.distribution));
-  return targetRow;
+async function setCountry(page,country){
+  await page.evaluate(country=>{
+    window.Orbit.pais=country;
+    try{localStorage.setItem('orbit360_pais',country);}catch{}
+    try{document.dispatchEvent(new CustomEvent('orbit:pais',{detail:{pais:country}}));}catch{}
+  },country);
 }
+async function route(page,key){
+  await page.evaluate(key=>{if(Orbit.router&&Orbit.router.go)Orbit.router.go(key);else location.hash='#/'+key;},key);
+  await page.waitForFunction(key=>Orbit.route?.key===key,key);
+}
+async function ensure(page,names){
+  await page.evaluate(names=>{try{Orbit.store?._ensureCollections?.(names);}catch{}},names);
+}
+async function waitConfirmed(page,names,timeout=15000){
+  await page.waitForFunction(names=>{const c=[].concat(Orbit.store?._productStatus?.()?.serverConfirmedCollections||[]);return names.every(x=>c.includes(x));},names,{timeout});
+}
+async function independent(page){
+  return page.evaluate(()=>{
+    const rows=name=>Orbit.store?.all?.(name)||[],country=String(Orbit.pais||'TODOS').toUpperCase(),now=Orbit.ui?.now?Orbit.ui.now():new Date();
+    const month=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    const clients=rows('clientes'),policies=rows('polizas'),receipts=rows('recibosEsperados'),portfolio=rows('carteraPrimas'),cobros=rows('cobros');
+    const cm=new Map(clients.filter(x=>x&&x.id!=null).map(x=>[String(x.id),x])),pm=new Map(policies.filter(x=>x&&x.id!=null).map(x=>[String(x.id),x]));
+    const cc=v=>String(v||'').trim().toUpperCase();
+    const policyCountry=p=>cc(p&&p.pais)||cc(cm.get(String(p&&p.clienteId||''))?.pais);
+    const rowCountry=r=>{const p=pm.get(String(r&&r.polizaId||'')),cid=String(r&&r.clienteId||p?.clienteId||'');return cc(p?.pais)||cc(r&&r.pais)||cc(cm.get(cid)?.pais);};
+    const inCountry=c=>country==='TODOS'||c===country;
+    const money=(out,cur,v)=>{cur=cc(cur)||'SIN_MONEDA';out[cur]=(out[cur]||0)+(Number(v)||0);};
+    const prod={};policies.filter(p=>inCountry(policyCountry(p))&&String(p.vigenciaInicio||'').slice(0,7)===month).forEach(p=>money(prod,p.moneda||p.divisa||cm.get(String(p.clienteId||''))?.moneda,p.primaNeta!=null?p.primaNeta:p.prima));
+    const paid=c=>{const s=String(c&&c.estado||'').toLowerCase();return s==='pagado'||s==='conciliado'||c&&c.conciliado===true;};
+    const source=r=>String([r?.evidenceType,r?.sourceType,r?.paymentOrigin,r?.paymentOriginKind,r?.fuenteAutoridad,r?.origenAutoridad,r?.fuenteConciliacion,r?.authority].filter(Boolean).join('|')).toLowerCase();
+    const origin=r=>/advisor[_ -]?reported|asesor[_ -]?reportado|advisor[_ -]?payment/.test(source(r))?'ADVISOR_REPORTED':/client[_ -]?reported|client[_ -]?portal|cliente[_ -]?portal/.test(source(r))?'CLIENT_PORTAL':/cobros[_ -]?realizados|direct[_ -]?payment[_ -]?reported[_ -]?crm|(^|[| _-])(siga|crm)([| _-]|$)/.test(source(r))?'CRM_DIRECT':'UNKNOWN';
+    const applied=r=>{const s=String(r?.estado||'').toLowerCase(),ps=String(r?.paymentState||'').toUpperCase(),op=String(r?.estadoOperativo||'').toLowerCase().replace(/\s+/g,'_');return s==='pagado'||ps.startsWith('PAID_')||['pagado','pago_inferido','pago_reportado_aplicado','pago_reportado_asesor_aplicado'].includes(op)||!!(r&&(r.cobroId||r.paidDate||r.fechaPago));};
+    const confirmed=cobros.filter(paid),linked=new Set(confirmed.map(c=>String(c.reciboId||c.receiptId||'')).filter(Boolean)),cids=new Set(confirmed.map(c=>String(c.id||'')).filter(Boolean));
+    const projected=receipts.filter(r=>{if(!r)return false;const id=String(r.id||''),cid=String(r.cobroId||'');if(id&&linked.has(id))return false;if(cid&&cids.has(cid))return false;return applied(r)||origin(r)==='CRM_DIRECT';}).map(r=>{const p=pm.get(String(r.polizaId||''))||{};return{id:'receipt-payment:'+String(r.id||''),receiptId:r.id,clienteId:r.clienteId||p.clienteId||'',polizaId:r.polizaId||'',pais:r.pais||p.pais||'',monto:r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:r.monto),moneda:r.moneda||p.moneda||'',fechaPago:r.fechaPago||r.paidDate||r.inferredEffectiveDate||'',conciliado:r.conciliado===true||String(r.applicationState||'').toUpperCase()==='APPLIED_DIRECT',origin:origin(r),__projected:true};});
+    const realized=confirmed.concat(projected).filter(r=>inCountry(rowCountry(r)));
+    const realizedAll={},monthlyPaid={};realized.forEach(r=>{money(realizedAll,r.moneda||pm.get(String(r.polizaId||''))?.moneda,r.monto);if(String(r.fechaPago||r.paidDate||r.inferredEffectiveDate||'').slice(0,7)===month)money(monthlyPaid,r.moneda||pm.get(String(r.polizaId||''))?.moneda,r.monto);});
+    const open=r=>{const s=String(r?.estadoCartera||r?.estado||'').toLowerCase();return r?.conciliadoPago!==true&&!['pagado','cobrado','cerrado','anulado','cancelado','cancelada'].includes(s);};
+    const due=r=>r?.vence||r?.fechaVencimiento||r?.fechaLimite||'';
+    const overdue=r=>{if(!open(r))return false;const d=due(r);if(!d)return false;const dt=new Date(String(d).slice(0,10)+'T00:00:00');const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());return dt<today;};
+    const pend={},venc={};portfolio.filter(r=>inCountry(rowCountry(r))).forEach(r=>{if(!open(r))return;money(overdue(r)?venc:pend,r.moneda||pm.get(String(r.polizaId||''))?.moneda,r.monto!=null?r.monto:r.saldo);});
+    const direct=projected.filter(r=>r.origin==='CRM_DIRECT'&&inCountry(rowCountry(r)));
+    const scopedPolicies=policies.filter(p=>inCountry(policyCountry(p))),active=scopedPolicies.filter(p=>['Vigente','Por renovar'].includes(p.estado));
+    return{country,month,production:prod,realizedAll,monthlyPaid,pending:pend,overdue:venc,directCount:direct.length,directAmount:direct.reduce((s,r)=>s+(Number(r.monto)||0),0),clientCount:clients.filter(c=>inCountry(cc(c.pais))).length,policyCount:scopedPolicies.length,activePolicyCount:active.length};
+  });
+}
+function attrMap(encoded){try{return JSON.parse(decodeURIComponent(encoded||''));}catch{return{};}}
 
-const who=await actor();
-const token=await auth.createCustomToken(who.uid,{b3008ReadOnlyQa:true});
-const proof={schema:'GRAVICENTRA_I6_5_B3_008_PREVIEW_PROOF_V2',status:'RUNNING',projectId,tenantId,previewUrl:target,actor:{activeRole:who.activeRole},assertions:{},discovery:null,target:null,desktop:{},reload:{},mobile:{},pageErrors:[],consoleErrors:[],operationalBusinessWrites:0,reimport:false,livePromoted:false};
+const who=await actor(),token=await auth.createCustomToken(who.uid,{b3008ReadOnlyQa:true});
+const proof={schema:'GRAVICENTRA_I6_5_B3_008_R2_REALITY_PERFORMANCE_PROOF_V1',status:'RUNNING',projectId,tenantId,previewUrl:target,actor:{activeRole:who.activeRole},assertions:{},performance:{},countries:{},health:{},b3007:{},pageErrors:[],consoleErrors:[],operationalBusinessWrites:0,reimport:false,livePromoted:false};
 let browser;
 try{
   browser=await chromium.launch({headless:true});
-  const selected=await findCanonicalHealth51(browser,who,token,proof);
-  const cid=clean(selected.clientId);
-  proof.target={clientId:cid,clientName:selected.clientName,expectedHealth:51};
-
-  const context=await browser.newContext({viewport:{width:1440,height:1000}});
+  const context=await browser.newContext({viewport:{width:390,height:844}});
   const page=await context.newPage();page.setDefaultTimeout(30000);
   page.on('pageerror',e=>proof.pageErrors.push(clean(e?.message||e)));
   page.on('console',m=>{if(m.type()==='error')proof.consoleErrors.push(clean(m.text()));});
   await applyLegal(page,who);
-  await page.goto(target+'/#/cliente360?c='+encodeURIComponent(cid),{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>!!window.Orbit?.modules?.cliente360&&!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0);
-  await page.evaluate(()=>{
-    window.__b3008HealthObs=[];
-    const capture=()=>{
-      const el=document.querySelector('[data-c360-health="1"]');
-      if(!el)return;
-      let confirmed=[];
-      try{confirmed=[].concat(Orbit.store?._productStatus?.()?.serverConfirmedCollections||[]);}catch{}
-      const item={text:(el.textContent||'').trim(),readiness:el.getAttribute('data-readiness')||'',value:el.getAttribute('data-value')||'',carteraConfirmed:confirmed.includes('carteraPrimas')};
-      const last=window.__b3008HealthObs[window.__b3008HealthObs.length-1];
-      if(!last||JSON.stringify(last)!==JSON.stringify(item))window.__b3008HealthObs.push(item);
-    };
-    window.__b3008Mo=new MutationObserver(capture);
-    window.__b3008Mo.observe(document.documentElement,{subtree:true,childList:true,attributes:true});
-    capture();
-  });
+  await page.goto(target+'/#/inicio',{waitUntil:'domcontentloaded'});
   await boot(page,token);
-  await page.waitForFunction(id=>!!Orbit.store?.get?.('clientes',id),cid);
-  await page.waitForFunction(()=>[].concat(Orbit.store?._productStatus?.()?.serverConfirmedCollections||[]).includes('carteraPrimas'));
-  await page.waitForFunction(()=>document.querySelector('[data-c360-health="1"][data-readiness="ready"][data-value]'));
-  const desktop=await page.evaluate(id=>{
-    const el=document.querySelector('[data-c360-health="1"]');
-    const summary=Orbit.q.clienteResumen(id);
-    return{domHealth:Number(el?.getAttribute('data-value')),summaryHealth:Number(summary?.salud),vencido:Number(summary?.vencido),nVigentes:Number(summary?.nVigentes),observations:[].concat(window.__b3008HealthObs||[]),confirmed:[].concat(Orbit.store?._productStatus?.()?.serverConfirmedCollections||[])};
-  },cid);
-  proof.desktop=desktop;
-  need(desktop.domHealth===51&&desktop.summaryHealth===51&&desktop.vencido>0&&desktop.nVigentes===1,'B3_008_FINAL_HEALTH_NOT_CANONICAL_51:'+JSON.stringify(desktop));
-  need(desktop.observations.every(x=>!x.value||(x.readiness==='ready'&&x.carteraConfirmed===true)),'B3_008_PREMATURE_DEFINITIVE_HEALTH');
-  proof.assertions.noPrematureDefinitiveHealth=true;
-  proof.assertions.finalHealth51=true;
+  await setCountry(page,'TODOS');
+  await ensure(page,['clientes','polizas','asesores','metas','cobros','recibosEsperados','carteraPrimas']);
+  await waitConfirmed(page,['clientes','polizas','cobros','recibosEsperados','carteraPrimas'],15000);
+  await route(page,'inicio');
+  await page.waitForSelector('[data-inicio-reality-ready="1"]');
 
-  await page.waitForTimeout(1200);
-  const stable=await page.evaluate(()=>Number(document.querySelector('[data-c360-health="1"]')?.getAttribute('data-value')));
-  need(stable===51,'B3_008_SECOND_WRITER_OVERWRITE:'+stable);
-  proof.assertions.noSecondWriter=true;
-
-  await page.evaluate(()=>Orbit.router.go('inicio'));
-  await page.waitForFunction(()=>Orbit.route?.key==='inicio');
-  await page.waitForFunction(()=>['cartera-pendiente','cartera-vencida','cobros-confirmados'].every(k=>document.querySelector('[data-inicio-metric="'+k+'"][data-readiness="ready"]')),null,{timeout:30000});
-  const inicio=await page.evaluate(()=>{
-    const cart=Orbit.q.carteraGlobal();
-    const val=k=>Number(document.querySelector('[data-inicio-metric="'+k+'"] .k-val')?.getAttribute('data-value'));
-    return{expected:{confirmed:cart.alDia,pending:cart.pend,overdue:cart.venc},dom:{confirmed:val('cobros-confirmados'),pending:val('cartera-pendiente'),overdue:val('cartera-vencida')},pendingRows:Orbit.q.carteraPendienteRows().length,overdueRows:Orbit.q.carteraVencidaRows().length};
+  const truthAll=await independent(page);
+  const inicioDom=await page.evaluate(()=>{
+    const map=s=>{const e=document.querySelector(s);try{return JSON.parse(decodeURIComponent(e?.getAttribute('data-values')||''));}catch{return{};}};
+    const prod=document.querySelector('[data-inicio-monthly="production"]'),rec=document.querySelector('[data-inicio-monthly="recaudo"]');
+    const missingAdvisor=[...document.querySelectorAll('[data-inicio-advisor-id][data-meta-state="missing"]')].map(e=>({id:e.getAttribute('data-inicio-advisor-id'),pct:e.getAttribute('data-pct'),text:e.textContent||''}));
+    return{production:map('[data-inicio-monthly="production"]'),recaudo:map('[data-inicio-monthly="recaudo"]'),confirmed:map('[data-inicio-metric="cobros-confirmados"]'),pending:map('[data-inicio-metric="cartera-pendiente"]'),overdue:map('[data-inicio-metric="cartera-vencida"]'),prodMetaState:prod?.getAttribute('data-meta-state')||'',prodPct:prod?.getAttribute('data-pct')||'',recaudoMetaState:rec?.getAttribute('data-meta-state')||'',recaudoPct:rec?.getAttribute('data-pct')||'',missingAdvisor};
   });
-  const eq=(a,b)=>Math.abs(Number(a)-Number(b))<0.000001;
-  need(eq(inicio.expected.confirmed,inicio.dom.confirmed)&&eq(inicio.expected.pending,inicio.dom.pending)&&eq(inicio.expected.overdue,inicio.dom.overdue),'B3_008_INICIO_CARD_CANONICAL_VALUE_MISMATCH:'+JSON.stringify(inicio));
-  await page.evaluate(()=>Orbit.modules.inicio.openFinancialKpi('pending'));
-  const pendCount=Number(await page.locator('#inicio-financial-kpi').getAttribute('data-row-count'));
-  need(pendCount===inicio.pendingRows,'B3_008_PENDING_CARD_MODAL_COUNT_MISMATCH:'+pendCount+':'+inicio.pendingRows);
-  await page.locator('#inicio-financial-kpi [data-close]').first().click();
-  await page.evaluate(()=>Orbit.modules.inicio.openFinancialKpi('overdue'));
-  const overdueCount=Number(await page.locator('#inicio-financial-kpi').getAttribute('data-row-count'));
-  need(overdueCount===inicio.overdueRows,'B3_008_OVERDUE_CARD_MODAL_COUNT_MISMATCH:'+overdueCount+':'+inicio.overdueRows);
-  await page.locator('#inicio-financial-kpi [data-close]').first().click();
-  proof.desktop.inicio={...inicio,modalCounts:{pending:pendCount,overdue:overdueCount}};
-  proof.assertions.cardModalCanonicalOwner=true;
+  need(mapsEqual(inicioDom.production,truthAll.production),'B3_008_MONTHLY_PRODUCTION_REALITY_MISMATCH:'+JSON.stringify({dom:inicioDom.production,truth:truthAll.production}));
+  need(mapsEqual(inicioDom.recaudo,truthAll.monthlyPaid),'B3_008_MONTHLY_RECAUDO_REALITY_MISMATCH:'+JSON.stringify({dom:inicioDom.recaudo,truth:truthAll.monthlyPaid}));
+  need(mapsEqual(inicioDom.confirmed,truthAll.realizedAll),'B3_008_CONFIRMED_REALITY_MISMATCH:'+JSON.stringify({dom:inicioDom.confirmed,truth:truthAll.realizedAll}));
+  need(mapsEqual(inicioDom.pending,truthAll.pending)&&mapsEqual(inicioDom.overdue,truthAll.overdue),'B3_008_PORTFOLIO_REALITY_MISMATCH');
+  need(!['missing','currency-required'].includes(inicioDom.prodMetaState)||inicioDom.prodPct==='','B3_008_SYNTHETIC_PRODUCTION_PERCENT');
+  need(!['missing','currency-required'].includes(inicioDom.recaudoMetaState)||inicioDom.recaudoPct==='','B3_008_SYNTHETIC_RECAUDO_PERCENT');
+  need(inicioDom.missingAdvisor.every(x=>x.pct===''&&!/\b0%\b/.test(x.text)),'B3_008_ADVISOR_MISSING_META_FALSE_ZERO');
+  proof.assertions.monthlyProductionIndependent=true;
+  proof.assertions.financialRealityIndependent=true;
+  proof.assertions.noSyntheticMetaPct=true;
+  proof.assertions.advisorMissingMetaFailClosed=true;
 
-  await page.goto(target+'/#/cliente360?c='+encodeURIComponent(cid),{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('[data-c360-health="1"][data-readiness="ready"][data-value]'),null,{timeout:30000});
-  const reloadHealth=Number(await page.locator('[data-c360-health="1"]').getAttribute('data-value'));
-  need(reloadHealth===51,'B3_008_RELOAD_HEALTH_DRIFT:'+reloadHealth);
-  proof.reload={health:reloadHealth,pass:true};proof.assertions.reloadCoherent=true;
+  let t=Date.now();await route(page,'cliente360');await page.waitForSelector('[data-c360-list-ready="1"]',{timeout:6000});proof.performance.client360ListMs=Date.now()-t;
+  need(proof.performance.client360ListMs<=6000,'B3_008_CLIENT360_LIST_TOO_SLOW:'+proof.performance.client360ListMs);
+  proof.assertions.clientListPerformance=true;
 
-  await page.setViewportSize({width:390,height:844});
-  await page.goto(target+'/#/cliente360?c='+encodeURIComponent(cid),{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('[data-c360-health="1"][data-readiness="ready"][data-value]'),null,{timeout:30000});
-  const mobile=await page.evaluate(()=>{const el=document.querySelector('[data-c360-health="1"]');return{health:Number(el?.getAttribute('data-value')),readiness:el?.getAttribute('data-readiness'),scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth};});
-  need(mobile.health===51&&mobile.readiness==='ready','B3_008_MOBILE_HEALTH_SEMANTIC_DRIFT:'+JSON.stringify(mobile));
-  need(mobile.scrollWidth<=mobile.clientWidth+4,'B3_008_MOBILE_PAGE_OVERFLOW:'+mobile.scrollWidth+':'+mobile.clientWidth);
-  proof.mobile=mobile;proof.assertions.mobileDesktopSameSemantics=true;
+  t=Date.now();await route(page,'cobros');await page.waitForSelector('[data-cobros-core-ready="1"]',{timeout:6000});proof.performance.cobrosCoreMs=Date.now()-t;
+  need(proof.performance.cobrosCoreMs<=6000,'B3_008_COBROS_CORE_TOO_SLOW:'+proof.performance.cobrosCoreMs);
+  proof.assertions.cobrosCorePerformance=true;
+
+  await setCountry(page,'CO');await route(page,'inicio');
+  await waitConfirmed(page,['clientes','polizas','cobros','recibosEsperados','carteraPrimas'],12000);
+  await page.waitForSelector('[data-inicio-reality-ready="1"]');
+  const truthCO=await independent(page);
+  const coCounts=await page.evaluate(()=>({clients:parseInt(document.querySelector('[data-inicio-count="clientes"]')?.textContent)||0,policies:parseInt(document.querySelector('[data-inicio-count="polizas"]')?.textContent)||0}));
+  need(coCounts.clients===truthCO.clientCount&&coCounts.policies===truthCO.policyCount,'B3_008_INICIO_COUNTRY_COUNTS_MISMATCH:'+JSON.stringify({coCounts,truthCO}));
+  proof.assertions.countryScope=true;
+
+  await route(page,'cobros');
+  await page.waitForSelector('[data-cobros-core-ready="1"]',{timeout:6000});
+  await page.waitForFunction(()=>document.querySelector('[data-cobros-financial-readiness="ready"]'),null,{timeout:12000});
+  const cobrosCO=await page.evaluate(()=>{const e=document.querySelector('[data-cobros-core-ready="1"]');let truth={};try{truth=JSON.parse(decodeURIComponent(e?.getAttribute('data-cobros-truth')||''));}catch{}return{truth,text:e?.innerText||''};});
+  const expectedCO={COP:{alDia:truthCO.realizedAll.COP||0,pend:truthCO.pending.COP||0,venc:truthCO.overdue.COP||0}};
+  need(eq(cobrosCO.truth?.COP?.alDia||0,expectedCO.COP.alDia)&&eq(cobrosCO.truth?.COP?.pend||0,expectedCO.COP.pend)&&eq(cobrosCO.truth?.COP?.venc||0,expectedCO.COP.venc),'B3_008_COBROS_CO_TRUTH_MISMATCH:'+JSON.stringify({dom:cobrosCO.truth,expectedCO}));
+  if(truthCO.directCount>0&&truthCO.directAmount>0)need((cobrosCO.truth?.COP?.alDia||0)>0,'B3_008_SIGA_DIRECT_VISIBLE_BUT_KPI_ZERO');
+  proof.assertions.sigaDirectIncluded=true;
+
+  await route(page,'polizas');await page.waitForSelector('[data-polizas-kpi-ready="1"]');
+  const polCO=await page.evaluate(()=>{const e=document.querySelector('[data-polizas-kpi-ready="1"]');return{total:Number(e?.getAttribute('data-polizas-total')),active:Number(e?.getAttribute('data-polizas-active'))};});
+  need(polCO.total===truthCO.policyCount&&polCO.active===truthCO.activePolicyCount,'B3_008_POLIZAS_COUNTRY_SCOPE_MISMATCH:'+JSON.stringify({polCO,truthCO}));
+  proof.assertions.polizasCountryScope=true;
+  proof.countries.CO={truth:truthCO,counts:coCounts,cobros:cobrosCO.truth,polizas:polCO};
+
+  await setCountry(page,'TODOS');await route(page,'cliente360');
+  await ensure(page,['clientes','polizas','carteraPrimas']);
+  await waitConfirmed(page,['clientes','polizas','carteraPrimas'],12000);
+  const healthTarget=await page.evaluate(()=>{
+    const clients=Orbit.store?.all?.('clientes')||[];
+    for(const c of clients){try{const r=Orbit.q.clienteResumen(c.id);if(Number(r?.salud)===51&&Number(r?.vencido)>0&&Number(r?.nVigentes)===1&&String(c?.segmento||'').toLowerCase()!=='premium')return{id:String(c.id),name:String(c.nombre||'')};}catch{}}
+    return{id:'',name:''};
+  });
+  need(healthTarget.id,'B3_008_NO_HEALTH51_TARGET');
+  await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id);},healthTarget.id);
+  await page.waitForFunction(()=>document.querySelector('[data-c360-health="1"][data-readiness="ready"][data-value]'),null,{timeout:12000});
+  const h1=Number(await page.locator('[data-c360-health="1"]').getAttribute('data-value'));await page.waitForTimeout(900);const h2=Number(await page.locator('[data-c360-health="1"]').getAttribute('data-value'));
+  need(h1===51&&h2===51,'B3_008_HEALTH_NOT_STABLE_51:'+h1+':'+h2);
+  proof.health={target:healthTarget,first:h1,stable:h2};proof.assertions.healthStable=true;
+
+  await route(page,'cronograma');await page.waitForTimeout(800);
+  const chrono=await page.evaluate(()=>String(document.getElementById('host')?.innerText||''));
+  const residue=/QA HUMANA B3|b300[0-9]/i.test(chrono);
+  need(!residue,'B3_007_SYNTHETIC_RESIDUE_VISIBLE');
+  proof.b3007={syntheticResidueVisible:false,humanVisualStillRequired:true};proof.assertions.b3007SyntheticResidueAbsent=true;
 
   need(proof.pageErrors.length===0,'B3_008_PAGE_ERRORS:'+proof.pageErrors.join('|'));
+  need(proof.consoleErrors.length===0,'B3_008_CONSOLE_ERRORS:'+proof.consoleErrors.join('|'));
   proof.status='PASS';
   await context.close();
-}catch(e){
-  proof.status='FAIL';proof.error=clean(e?.stack||e);
-  throw e;
-}finally{
-  try{if(browser)await browser.close();}catch{}
-  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
-}
+}catch(e){proof.status='FAIL';proof.error=clean(e?.stack||e);throw e;}
+finally{try{if(browser)await browser.close();}catch{}fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');}

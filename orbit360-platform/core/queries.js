@@ -62,6 +62,27 @@ Orbit.q = (function () {
     const state = textNorm(row && row.estado);
     return state === 'pagado' || state === 'conciliado' || row && row.conciliado === true;
   }
+  function paymentOriginKind(row) {
+    try {
+      if (Orbit.reconciliationDomain && typeof Orbit.reconciliationDomain.classifyPaymentOrigin === 'function') return Orbit.reconciliationDomain.classifyPaymentOrigin(row);
+    } catch (_) {}
+    const source = String([
+      row && row.evidenceType, row && row.sourceType, row && row.paymentOrigin, row && row.paymentOriginKind,
+      row && row.fuenteAutoridad, row && row.origenAutoridad, row && row.fuenteConciliacion, row && row.authority
+    ].filter(Boolean).join('|')).toLowerCase();
+    if (/advisor[_ -]?reported|asesor[_ -]?reportado|advisor[_ -]?payment/.test(source)) return 'ADVISOR_REPORTED';
+    if (/client[_ -]?reported|client[_ -]?portal|cliente[_ -]?portal/.test(source)) return 'CLIENT_PORTAL';
+    if (/cobros[_ -]?realizados|direct[_ -]?payment[_ -]?reported[_ -]?crm|(^|[| _-])(siga|crm)([| _-]|$)/.test(source)) return 'CRM_DIRECT';
+    return 'UNKNOWN';
+  }
+  function receiptHasAppliedPayment(row) {
+    const state = textNorm(row && row.estado);
+    const paymentState = String(row && row.paymentState || '').trim().toUpperCase();
+    const op = textNorm(row && row.estadoOperativo).replace(/\s+/g, '_');
+    return state === 'pagado' || paymentState.startsWith('PAID_') ||
+      ['pagado','pago_inferido','pago_reportado_aplicado','pago_reportado_asesor_aplicado'].includes(op) ||
+      !!(row && (row.cobroId || row.paidDate || row.fechaPago));
+  }
   // B3-008: la fórmula aprobada de Salud vive en un único owner.
   function saludCliente(cli, vigentes, vencido) {
     let salud = 70;
@@ -78,10 +99,11 @@ Orbit.q = (function () {
     const rec = recibosEsperadosDe(cliId);
     const car = carteraPrimasDe(cliId);
     const cob = cobrosDe(cliId);
+    const realized = realizedPaymentRows().filter(c => c && c.clienteId === cliId);
     const com = comisionesDe(cliId);
     const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
     const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);
-    const cobrado = cob.filter(confirmedCobro).reduce((s, c) => s + amount(c.monto), 0);
+    const cobrado = realized.reduce((s, c) => s + amount(c.monto), 0);
     const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
     const vencido = car.filter(portfolioIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
     const recibosPendientes = rec.filter(r => expectedReceiptOpen(r) && !expectedReceiptIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
@@ -105,8 +127,9 @@ Orbit.q = (function () {
     const recibos = S().all('recibosEsperados') || [];
     const cartera = S().all('carteraPrimas') || [];
     const cobros = S().all('cobros') || [];
+    const realized = realizedPaymentRows();
     const comisiones = S().all('comisiones') || [];
-    const polByClient = new Map(), polById = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), comByClient = new Map();
+    const polByClient = new Map(), polById = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), realizedByClient = new Map(), comByClient = new Map();
     const add = (map, id, row) => {
       if (id == null) return;
       if (!map.has(id)) map.set(id, []);
@@ -116,6 +139,7 @@ Orbit.q = (function () {
     recibos.forEach(r => { const p = r && polById.get(r.polizaId); if (p) add(recByClient, p.clienteId, r); });
     cartera.forEach(r => { const p = r && polById.get(r.polizaId); if (p) add(carByClient, p.clienteId, r); });
     cobros.forEach(c => add(cobByClient, c.clienteId, c));
+    realized.forEach(c => add(realizedByClient, c.clienteId, c));
     comisiones.forEach(c => add(comByClient, c.clienteId, c));
 
     const index = new Map();
@@ -125,10 +149,11 @@ Orbit.q = (function () {
       const rec = recByClient.get(cli.id) || [];
       const car = carByClient.get(cli.id) || [];
       const cob = cobByClient.get(cli.id) || [];
+      const realizedCob = realizedByClient.get(cli.id) || [];
       const com = comByClient.get(cli.id) || [];
       const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
       const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);
-      const cobrado = cob.filter(confirmedCobro).reduce((s, c) => s + amount(c.monto), 0);
+      const cobrado = realizedCob.reduce((s, c) => s + amount(c.monto), 0);
       const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
       const vencido = car.filter(portfolioIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
       const recibosPendientes = rec.filter(r => expectedReceiptOpen(r) && !expectedReceiptIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
@@ -184,6 +209,101 @@ Orbit.q = (function () {
     const p = paisActivo();
     return !p || (countryCode(p2 && p2.pais) || countryCode(cli && cli.pais)) === p;
   }
+  function clientesScoped() {
+    const p = paisActivo();
+    return (S().all('clientes') || []).filter(c => !p || countryCode(c && c.pais) === p);
+  }
+  function polizasScoped() {
+    const clients = clientIndex();
+    return (S().all('polizas') || []).filter(p => polPais(p, clients));
+  }
+  function realizedPaymentRows() {
+    const cobros = (S().all('cobros') || []).filter(confirmedCobro);
+    const linkedReceiptIds = new Set(cobros.map(c => String(c && (c.reciboId || c.receiptId) || '').trim()).filter(Boolean));
+    const cobroIds = new Set(cobros.map(c => String(c && c.id || '').trim()).filter(Boolean));
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
+    const projected = (S().all('recibosEsperados') || []).filter(r => {
+      if (!r) return false;
+      const rid = String(r.id || '').trim();
+      if (rid && linkedReceiptIds.has(rid)) return false;
+      const cobroId = String(r.cobroId || '').trim();
+      if (cobroId && cobroIds.has(cobroId)) return false;
+      return receiptHasAppliedPayment(r) || paymentOriginKind(r) === 'CRM_DIRECT';
+    }).map(r => {
+      const policy = policies.get(r.polizaId) || {};
+      const origin = paymentOriginKind(r);
+      const applicationState = String(r.applicationState || '').trim().toUpperCase();
+      return {
+        id: 'receipt-payment:' + String(r.id || ''),
+        receiptId: r.id,
+        clienteId: r.clienteId || policy.clienteId || '',
+        polizaId: r.polizaId || '',
+        asesorId: r.asesorId || policy.asesorId || '',
+        pais: r.pais || policy.pais || '',
+        monto: r.primaTotal != null ? r.primaTotal : (r.montoTotal != null ? r.montoTotal : r.monto),
+        moneda: r.moneda || policy.moneda || '',
+        fechaPago: r.fechaPago || r.paidDate || r.inferredEffectiveDate || '',
+        paidDate: r.paidDate || '',
+        inferredEffectiveDate: r.inferredEffectiveDate || '',
+        conciliado: r.conciliado === true || applicationState === 'APPLIED_DIRECT',
+        paymentOriginKind: origin,
+        paymentState: r.paymentState || (origin === 'CRM_DIRECT' ? 'PAID_DIRECT' : 'PAID_INFERRED'),
+        __projectedConfirmedPayment: true
+      };
+    });
+    return cobros.concat(projected);
+  }
+  function currentMonthKey() {
+    const d = U.now ? U.now() : new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  }
+  function paymentBusinessDate(row) {
+    return String(row && (row.fechaPago || row.paidDate || row.inferredEffectiveDate) || '').slice(0, 10);
+  }
+  function produccionMesPorMoneda(monthKey, advisorId) {
+    const key = String(monthKey || currentMonthKey()).slice(0, 7);
+    const out = {};
+    polizasScoped().forEach(p => {
+      if (!p || String(p.vigenciaInicio || '').slice(0, 7) !== key) return;
+      if (advisorId && p.asesorId !== advisorId) return;
+      const n = finite(p.primaNeta != null ? p.primaNeta : p.prima);
+      if (n == null) return;
+      const cli = p.clienteId != null ? S().get('clientes', p.clienteId) : null;
+      const cur = String(p.moneda || p.divisa || (cli && cli.moneda) || 'SIN_MONEDA').trim().toUpperCase() || 'SIN_MONEDA';
+      out[cur] = (out[cur] || 0) + n;
+    });
+    return out;
+  }
+  function recaudoMesPorMoneda(monthKey) {
+    const key = String(monthKey || currentMonthKey()).slice(0, 7);
+    const clients = clientIndex();
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
+    const out = {};
+    realizedPaymentRows().filter(r => rowPais(r, clients, policies)).forEach(r => {
+      if (paymentBusinessDate(r).slice(0, 7) !== key) return;
+      const n = finite(r.monto);
+      if (n == null) return;
+      const cur = currencyCodeFor(r, clients, policies);
+      out[cur] = (out[cur] || 0) + n;
+    });
+    return out;
+  }
+  function leaderboardMes(monthKey) {
+    const key = String(monthKey || currentMonthKey()).slice(0, 7);
+    const metas = (S().all('metas') || []).filter(m => String(m && m.mes || '').slice(0, 7) === key && m && m.asesorId);
+    return (S().all('asesores') || []).map(a => {
+      const byCurrency = produccionMesPorMoneda(key, a.id);
+      const metaRow = metas.find(m => m.asesorId === a.id && m.tipo === 'prima');
+      const explicit = finite(metaRow && metaRow.valor);
+      const base = finite(a && a.metaPrima);
+      const metaPrima = explicit != null && explicit > 0 ? explicit : (base != null && base > 0 ? base : null);
+      const currencies = Object.keys(byCurrency).filter(cur => Math.abs(Number(byCurrency[cur]) || 0) > 0);
+      const expectedCurrency = countryCode(a && a.pais) === 'CO' ? 'COP' : countryCode(a && a.pais) === 'GT' ? 'GTQ' : (currencies.length === 1 ? currencies[0] : '');
+      const prima = expectedCurrency ? amount(byCurrency[expectedCurrency]) : 0;
+      const pct = metaPrima && expectedCurrency ? Math.max(0, Math.min(140, Math.round(prima / metaPrima * 100))) : null;
+      return { asesor: a, byCurrency, prima, pct, metaPrima, metaDisponible: metaPrima != null, moneda: expectedCurrency };
+    }).sort((x, y) => y.prima - x.prima);
+  }
 
   function carteraPendienteDe(cliId) {
     return carteraPrimasDe(cliId).filter(r => portfolioOpen(r) && !portfolioIsOverdue(r));
@@ -203,7 +323,7 @@ Orbit.q = (function () {
   function carteraGlobal() {
     const clients = clientIndex();
     const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
-    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients, policies));
+    const cob = realizedPaymentRows().filter(c => rowPais(c, clients, policies));
     const pendingRows = carteraPendienteRows();
     const overdueRows = carteraVencidaRows();
     const alDia = cob.filter(confirmedCobro).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
@@ -222,7 +342,7 @@ Orbit.q = (function () {
   function carteraGlobalPorMoneda() {
     const clients = clientIndex();
     const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
-    const cob = (S().all('cobros') || []).filter(c => rowPais(c, clients, policies));
+    const cob = realizedPaymentRows().filter(c => rowPais(c, clients, policies));
     const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));
     const byCurrency = {};
     const ensure = cur => byCurrency[cur] || (byCurrency[cur] = emptyPortfolioCurrency());
@@ -283,9 +403,10 @@ Orbit.q = (function () {
   }
   function renovacionesProximas(dias) {
     dias = dias || 45;
+    const clients = clientIndex();
     return S().where('polizas', p => {
       const d = U.daysFromNow(p.vigenciaFin);
-      return (p.estado === 'Vigente' || p.estado === 'Por renovar') && d != null && d >= 0 && d <= dias;
+      return polPais(p, clients) && (p.estado === 'Vigente' || p.estado === 'Por renovar') && d != null && d >= 0 && d <= dias;
     }).sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
   }
   /** Nombre conservado por compatibilidad: retorna obligaciones esperadas vencidas, no Cobros reales. */
@@ -343,6 +464,7 @@ Orbit.q = (function () {
   return {
     asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
+    clientesScoped, polizasScoped, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, leaderboardMes,
     agingVencido, agingVencidoPorMoneda, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();

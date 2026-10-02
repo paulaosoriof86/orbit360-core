@@ -63,14 +63,14 @@ Orbit.modules.polizas = (function () {
     return { clientsById, vehiclesByPolicy };
   }
 
-  function rows(I) {
-    return (S().all('polizas') || []).filter(p => {
+  function rows(I, source) {
+    return (source || S().all('polizas') || []).filter(p => {
       const cli = I.clientsById.get(p.clienteId) || null;
       const veh = I.vehiclesByPolicy.get(p.id) || null;
       const placa = (veh && (veh.placa || veh.placaNormalizada || veh.placaFuente)) || p.placa || '';
       const clienteTxt = cli ? [cli.nombre, cli.identificacion, cli.email, cli.telefono].filter(Boolean).join(' ') : '';
       const txt = [p.numero, p.producto, p.subramo, clienteTxt, placa, veh && veh.marca, veh && veh.linea].filter(Boolean).join(' ').toLowerCase();
-      const grouped = !st.fkind || (st.fkind === 'renewals45' ? isRenewalWithin45Days(p) : st.fkind === 'historical' ? isHistoricalNoPortfolio(p) : true);
+      const grouped = !st.fkind || (st.fkind === 'renewals45' ? isRenewalWithin45Days(p) : st.fkind === 'historical' ? isHistoricalNoPortfolio(p) : st.fkind === 'active' ? isActivePolicy(p) : true);
       return grouped && (!st.fq || txt.includes(st.fq.toLowerCase())) &&
         (!st.framo || p.ramo === st.framo) &&
         (!st.fasg || p.aseguradoraId === st.fasg) &&
@@ -80,23 +80,24 @@ Orbit.modules.polizas = (function () {
   }
 
   function render(host) {
-    const all = S().all('polizas') || [];
+    try { if(S()&&typeof S()._ensureCollections==='function') S()._ensureCollections(['polizas','clientes']); } catch (_) {}
+    const all = q.polizasScoped ? q.polizasScoped() : (S().all('polizas') || []);
     const I = buildIndexes();
     const vig = all.filter(isActivePolicy);
     const primaVigentePorMoneda = premiumByCurrency(all);
     const renovaciones45 = all.filter(isRenewalWithin45Days);
     const historicasSinCartera = all.filter(isHistoricalNoPortfolio);
-    const r = rows(I);
+    const r = rows(I, all);
     const pages = Math.max(1, Math.ceil(r.length / PAGE_SIZE));
     if (st.page >= pages) st.page = 0;
     const start = st.page * PAGE_SIZE;
     const shown = r.slice(start, start + PAGE_SIZE).slice(0, PAGE_SIZE);
     st.__count = r.length + ' de ' + all.length;
 
-    host.innerHTML = `<div class="page">
+    host.innerHTML = `<div class="page" data-polizas-kpi-ready="1" data-polizas-total="${all.length}" data-polizas-active="${vig.length}" data-polizas-renew45="${renovaciones45.length}" data-polizas-historical="${historicasSinCartera.length}">
       ${K.bannerFor('polizas', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevaPoliza()">+ Nueva póliza</button>`)}
       ${K.kpis([
-        { label: 'Pólizas vigentes', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'activas en cartera', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
+        { label: 'Pólizas activas', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'Vigente + Por renovar', onclick: "Orbit.modules.polizas.filtrarGrupo('active')" },
         { label: 'Prima neta vigente', val: premiumByCurrencyHtml(primaVigentePorMoneda), color: 'var(--ok)', foot: 'separada por moneda · no se suman GTQ y COP', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
         { label: 'Por renovar ≤45 d', val: renovaciones45.length, color: 'var(--warn)', foot: 'vigentes con vencimiento en 0–45 días', onclick: "Orbit.modules.polizas.filtrarGrupo('renewals45')" },
         { label: 'Histórico / sin cartera', onclick: "Orbit.modules.polizas.filtrarGrupo('historical')", val: historicasSinCartera.length, color: 'var(--danger)', foot: 'ediciones no vigentes sin cartera activa' }

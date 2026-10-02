@@ -1,0 +1,75 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_PAULA_VISUAL_REJECTION_R2_REALITY_PERFORMANCE_V1",
+  "recordedAt": "2026-10-02T06:43:00-06:00",
+  "status": "PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED",
+  "findingId": "B3-008",
+  "reviewedCandidate": {
+    "sourceSha": "cdc9fd6a8391efd3617460670d7987bb25fc8ec9",
+    "buildId": "gi-i65-b3-cdc9fd6a8391-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3008-36966271470-jel4pdom.web.app",
+    "runId": 36966271470,
+    "artifactId": 11210490341,
+    "artifactDigest": "e98695d409ac2cb583ba67eb754e8aca7102559f0cd02756790541611a819a3f"
+  },
+  "observations": [
+    {
+      "id": "B3-008-R2-01",
+      "surface": "Inicio",
+      "classification": "BLOCKS_CURRENT_PRODUCTION",
+      "evidence": "A missing configured target falls back to active premium multiplied by 1.10, mechanically producing about 91%."
+    },
+    {
+      "id": "B3-008-R2-02",
+      "surface": "Inicio / Avance por asesor",
+      "classification": "BLOCKS_CURRENT_PRODUCTION",
+      "evidence": "Nonzero production is shown with 0% when advisor target is missing or invalid."
+    },
+    {
+      "id": "B3-008-R2-03",
+      "surface": "Inicio",
+      "classification": "BLOCKS_CURRENT_PRODUCTION",
+      "evidence": "Monthly section uses total active portfolio premium instead of current-month production."
+    },
+    {
+      "id": "B3-008-R2-04",
+      "surface": "Cliente 360",
+      "classification": "BLOCKS_CURRENT_PRODUCTION",
+      "evidence": "Human wait exceeded 50 seconds while indicators remained loading."
+    },
+    {
+      "id": "B3-008-R2-05",
+      "surface": "Cobros",
+      "classification": "BLOCKS_CURRENT_PRODUCTION",
+      "evidence": "Human wait remains approximately 9-10 seconds before list is usable."
+    },
+    {
+      "id": "B3-008-R2-06",
+      "surface": "Cobros Colombia",
+      "classification": "BLOCKS_CURRENT_PRODUCTION",
+      "evidence": "Direct SIGA payment evidence is visible while financial KPI remains zero because the KPI owner excludes authoritative payment evidence projected from receipts."
+    },
+    {
+      "id": "B3-008-R2-07",
+      "surface": "Pólizas",
+      "classification": "BLOCKS_CURRENT_PRODUCTION",
+      "evidence": "Global policy KPI/list owner does not apply active-country scope."
+    }
+  ],
+  "b3007ProcessDebt": {
+    "technicalClosurePreserved": true,
+    "productRegressionDemonstrated": false,
+    "humanVisualRequired": true,
+    "status": "PENDING_TARGETED_PAULA_VISUAL_ON_NEXT_EXACT_PREVIEW",
+    "scope": [
+      "Canonical receipts/portfolio obligations",
+      "No synthetic QA residue",
+      "No legacy invented pending items",
+      "Correct client/policy/receipt routing"
+    ]
+  },
+  "machinePassDisposition": "INVALIDATED_FOR_B3_008_ACCEPTANCE_BY_HUMAN_EVIDENCE",
+  "noLive": true,
+  "noReimport": true,
+  "dataWrites": false,
+  "nextAction": "CAUSAL_R2_SOURCE_FIX_IN_SAME_B3_008"
+}

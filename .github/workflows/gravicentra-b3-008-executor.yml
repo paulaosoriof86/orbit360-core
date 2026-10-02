@@ -83,6 +83,8 @@ jobs:
           node --check orbit360-platform/core/queries.js
           node --check orbit360-platform/modules/cliente360.js
           node --check orbit360-platform/modules/inicio.js
+          node --check orbit360-platform/modules/cobros.js
+          node --check orbit360-platform/modules/polizas.js
           node --check orbit360-platform/core/router.js
           node --check tools/gravicentra-i6-5-b3-008-contract.mjs
           node --check tools/gravicentra-i6-5-b3-008-preview-proof.mjs
@@ -235,7 +237,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b3-008-preview-proof.mjs
-          node -e "const x=require(process.env.B3_008_PROOF_OUT);if(x.status!=='PASS'||x.assertions?.noPrematureDefinitiveHealth!==true||x.assertions?.finalHealth51!==true||x.assertions?.noSecondWriter!==true||x.assertions?.cardModalCanonicalOwner!==true||x.assertions?.reloadCoherent!==true||x.assertions?.mobileDesktopSameSemantics!==true||x.operationalBusinessWrites!==0)process.exit(1);console.log('B3_008_PREVIEW_MACHINE_PROOF=PASS')"
+          node -e "const x=require(process.env.B3_008_PROOF_OUT);const a=x.assertions||{};if(x.status!=='PASS'||a.monthlyProductionIndependent!==true||a.financialRealityIndependent!==true||a.noSyntheticMetaPct!==true||a.advisorMissingMetaFailClosed!==true||a.countryScope!==true||a.clientListPerformance!==true||a.cobrosCorePerformance!==true||a.sigaDirectIncluded!==true||a.polizasCountryScope!==true||a.healthStable!==true||a.b3007SyntheticResidueAbsent!==true||x.operationalBusinessWrites!==0)process.exit(1);console.log('B3_008_R2_PREVIEW_MACHINE_PROOF=PASS')"
 
       - name: Upload immutable package and proof
         if: steps.gate.outputs.run == 'true'
@@ -269,7 +271,7 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),p=JSON.parse(fs.readFileSync(process.env.B3_PROOF,'utf8'));
           if(p.status!=='PASS'||p.operationalBusinessWrites!==0)throw Error('B3_008_PROOF_NOT_PASS');
-          const rr={schema:'GRAVICENTRA_I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_V1',recordedAt:new Date().toISOString(),status:'MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL',findingId:'B3-008',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B3_BUILD_ID,previewUrl:process.env.B3_PREVIEW_URL,channelId:process.env.B3_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B3_ARTIFACT_ID),artifactDigest:process.env.B3_ARTIFACT_DIGEST||'',exactHostingReadback:true,assertions:p.assertions,target:p.target,desktop:p.desktop,reload:p.reload,mobile:p.mobile,pageErrors:p.pageErrors,consoleErrors:p.consoleErrors,operationalBusinessWrites:0,dataWrites:false,reimport:false,livePromoted:false,nextAction:'B3_008_TARGETED_PAULA_VISUAL'};
+          const rr={schema:'GRAVICENTRA_I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_V2',recordedAt:new Date().toISOString(),status:'MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL',findingId:'B3-008',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B3_BUILD_ID,previewUrl:process.env.B3_PREVIEW_URL,channelId:process.env.B3_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B3_ARTIFACT_ID),artifactDigest:process.env.B3_ARTIFACT_DIGEST||'',exactHostingReadback:true,assertions:p.assertions,performance:p.performance,countries:p.countries,health:p.health,b3007:p.b3007,pageErrors:p.pageErrors,consoleErrors:p.consoleErrors,operationalBusinessWrites:0,dataWrites:false,reimport:false,livePromoted:false,nextAction:'B3_008_TARGETED_PAULA_VISUAL_WITH_B3_007_CRONOGRAMA'};
           fs.writeFileSync(process.env.RECEIPT,JSON.stringify(rr,null,2)+'\n');
           NODE
           RECEIPT_BLOB=$(git hash-object "$RECEIPT"); export RECEIPT_BLOB
