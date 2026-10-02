@@ -3190,9 +3190,9 @@
       "livePromoted": false,
       "activeFindingId": "B3-006",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "be8d5d03f987ef511193279bcf22b83e5dc248ca",
+      "executionLockBlobSha": "81a4d02d00fb748e2ed1b377e4bd425f686e5551",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_FIX_20261001.json",
-      "sourceFixReceiptBlobSha": "b470356dd38a5821f6aeb031c1c56a547c512f1d",
+      "sourceFixReceiptBlobSha": "53c13b0cd7f06c5a57c823bd9b4ff8e9c51d0702",
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
@@ -3221,7 +3221,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "0b372dc4e9e6fcdde33af433f9914c82e38909d6",
+      "findingLedgerBlobSha": "94ffeb719bea5202111150a5298d0b4573e8124b",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CAUSAL_DIAGNOSTIC_20261001.json",
       "diagnosticRunId": 36658190622,
@@ -3435,7 +3435,7 @@
       "provenanceFixReceiptBlobSha": "5ac0ce337999abbec288b3ac5efa738e9aedab60",
       "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_PROVENANCE_CONTRACT_PASS_20260930.json",
       "paymentProvenanceContractReceiptBlobSha": "34f2f5e0aedf6a5a68e4f3c476040349ecf38794",
-      "compositionLockBlobSha": "b4f495e2b2fbb765ace97eb1a716f642af4f23fb",
+      "compositionLockBlobSha": "e1b95b51dbbae03ea18478d570a2c880847e9b6d",
       "syntheticQaAuthorization": {
         "status": "AUTHORIZED_FOR_B3_005_PREVIEW_ONLY",
         "scope": "B3-005 exact Preview inference engine proof and one retained synthetic human fixture",
@@ -4733,18 +4733,31 @@
         "workflowBlobSha": "ba6d31ecf9966290faab9c02080c45c944d90e96"
       },
       "exactPreviewDispatch": {
-        "status": "REQUESTED",
+        "status": "REQUESTED_AFTER_QA_HARNESS_FIX",
         "executor": ".github/workflows/gravicentra-b3-006-executor.yml",
         "productSourceChanged": false
+      },
+      "qaHarnessRepair": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_QA_HARNESS_FILE_INPUT_REPAIR_20261001.json",
+        "blobSha": "55fb240468098a4166aa314fd76d21f4534dc3cb",
+        "failedRunId": 36952075577,
+        "productFailure": false
+      },
+      "rejectedExactPreviewCandidate": {
+        "runId": 36952075577,
+        "sourceSha": "d6db9c2c2af48134a8220dfb44e308db41675e6e",
+        "previewUrl": "https://ays-orbit-360-lab--gi-b3006-36952075577-j19woh3e.web.app",
+        "exactReadback": true,
+        "reason": "PLAYWRIGHT_WAITED_FOR_VISIBLE_HIDDEN_FILE_INPUT"
       }
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "b4f495e2b2fbb765ace97eb1a716f642af4f23fb",
+    "compositionLockBlobSha": "e1b95b51dbbae03ea18478d570a2c880847e9b6d",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "0b372dc4e9e6fcdde33af433f9914c82e38909d6",
+    "findingLedgerBlobSha": "94ffeb719bea5202111150a5298d0b4573e8124b",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B3",
@@ -4940,9 +4953,9 @@
     "activeFindingId": "B3-006",
     "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_CONTRACT_PASS_20261001.json",
     "sourceContractReceiptBlobSha": "6b3d4c7d73665c3d2aef67f8998d59ff03a099ca",
-    "compositionLockBlobSha": "b4f495e2b2fbb765ace97eb1a716f642af4f23fb",
-    "findingLedgerBlobSha": "0b372dc4e9e6fcdde33af433f9914c82e38909d6",
-    "executionLockBlobSha": "be8d5d03f987ef511193279bcf22b83e5dc248ca",
+    "compositionLockBlobSha": "e1b95b51dbbae03ea18478d570a2c880847e9b6d",
+    "findingLedgerBlobSha": "94ffeb719bea5202111150a5298d0b4573e8124b",
+    "executionLockBlobSha": "81a4d02d00fb748e2ed1b377e4bd425f686e5551",
     "noLive": true,
     "noReimport": true
   }
