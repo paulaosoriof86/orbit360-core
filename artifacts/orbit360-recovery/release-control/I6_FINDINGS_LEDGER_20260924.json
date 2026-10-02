@@ -2354,11 +2354,11 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Cronograma consumes real pending obligations from receipts/portfolio.",
-      "status": "SOURCE_FIXED_PENDING_CONTRACT",
+      "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "entryUnblockedBy": "B3-006 CLOSED_PASS",
-      "nextAction": "B3_007_SOURCE_CONTRACT",
+      "nextAction": "B3_007_EXACT_PREVIEW",
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
@@ -2389,8 +2389,10 @@
         ".github/workflows/gravicentra-b3-007-executor.yml": "deee88f5601819b87e0db455284529fba6c3b026",
         "tools/gravicentra-i6-control-plane-guard-v1.mjs": "3e3c5cb298fd3f14a65fb59bb4fea72d0e693c65"
       },
-      "compositionLockBlobSha": "8a68c8b713aaaa64a4cf712868a1e28a5e412892",
-      "currentCandidateEligibleForPromotion": false
+      "compositionLockBlobSha": "9f6719081b1a9a40cdc94384b4ffd12897c5479f",
+      "currentCandidateEligibleForPromotion": false,
+      "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_SOURCE_CONTRACT_PASS_20261001.json",
+      "sourceContractReceiptBlobSha": "096745a0ddcedc5d940c15c99c375108db808a52"
     },
     {
       "id": "B3-008",
@@ -5996,11 +5998,11 @@
     }
   },
   "currentB3": {
-    "status": "B3_007_SOURCE_FIXED_PENDING_CONTRACT",
+    "status": "B3_007_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
     "activeFindingId": "B3-007",
-    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_SOURCE_FIX_20261001.json",
-    "sourceFixReceiptBlobSha": "33208aacaa62666404094dbaad80f59c1266d00c",
-    "compositionLockBlobSha": "8a68c8b713aaaa64a4cf712868a1e28a5e412892",
+    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_SOURCE_CONTRACT_PASS_20261001.json",
+    "sourceContractReceiptBlobSha": "096745a0ddcedc5d940c15c99c375108db808a52",
+    "compositionLockBlobSha": "9f6719081b1a9a40cdc94384b4ffd12897c5479f",
     "noLive": true,
     "noReimport": true
   }
