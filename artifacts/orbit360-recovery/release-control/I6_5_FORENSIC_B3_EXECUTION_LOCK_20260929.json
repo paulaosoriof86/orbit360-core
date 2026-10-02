@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_007_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+  "status": "B3_008_DIAGNOSTIC_ACTIVE",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -12,19 +12,10 @@
     "b2FinalHead": "0ff9dbc6da4874f43443b5b7573e8eff9f7f657d"
   },
   "activeFinding": {
-    "id": "B3-007",
-    "title": "Cronograma consumes real pending obligations from receipts/portfolio.",
-    "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
+    "id": "B3-008",
+    "title": "Dashboard Inicio reality reconciliation closed before B4.",
+    "status": "DIAGNOSTIC_ACTIVE",
     "blocking": true,
-    "rootCause": "CRONOGRAMA_PENDING_OBLIGATION_READ_OWNER_IS_LEGACY_COBROS_AND_CRONOGRAMA_SOURCE_WAS_NOT_TRACKED_IN_THE_ACCUMULATIVE_PRODUCT_SET",
-    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CAUSAL_DIAGNOSTIC_20261001.json",
-    "diagnosticReceiptBlobSha": "b8d1a8807c51485c8e9ff0eb2787b14f5ca75ac9",
-    "authorizedProductFiles": [
-      "orbit360-platform/modules/cronograma.js",
-      "orbit360-platform/core/router.js",
-      "orbit360-platform/index.html"
-    ],
-    "canonicalReadOwner": "Orbit.cobrosCarteraProjectionAdapter.portfolioRows",
     "boundaries": {
       "businessWritesAuthorized": false,
       "configWritesAuthorized": false,
@@ -32,32 +23,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_007_EXACT_PREVIEW",
-    "causalDependencies": {
-      "routerHydration": "orbit360-platform/core/router.js"
-    },
-    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_SOURCE_FIX_20261001.json",
-    "sourceFixReceiptBlobSha": "a8e84725766dd00bcde06affd29814c892fdab0b",
-    "sourceBlobs": {
-      "orbit360-platform/modules/cronograma.js": "b44a82b4af474132d0dcfd673731b16c572496b5",
-      "orbit360-platform/core/router.js": "645c1bddf6a8990777a84985a34206afe930e0a3",
-      "orbit360-platform/index.html": "c1cd2247a87724196010044554c959f00f22d1d3",
-      "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495"
-    },
-    "qaBlobs": {
-      "tools/gravicentra-i6-5-b3-007-contract.mjs": "7ba3135ab6ecd210a4154a7c851e10f92d4e6ddc",
-      "tools/gravicentra-i6-5-b3-007-preview-proof.mjs": "a6d65577455e405f51f157fee19fd0cc8fbe57bc",
-      ".github/workflows/gravicentra-b3-007-executor.yml": "deee88f5601819b87e0db455284529fba6c3b026",
-      "tools/gravicentra-i6-control-plane-guard-v1.mjs": "3e3c5cb298fd3f14a65fb59bb4fea72d0e693c65"
-    },
-    "candidateEligibleForPromotion": false,
-    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_SOURCE_CONTRACT_PASS_20261001.json",
-    "sourceContractReceiptBlobSha": "096745a0ddcedc5d940c15c99c375108db808a52",
-    "qaHarnessRepair": {
-      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_QA_HARNESS_CLEANUP_ID_REPAIR_20261001.json",
-      "blobSha": "1193375824bbf528048328cdf7a2fb9dc29243ba",
-      "failedRunId": 36953558714
-    }
+    "nextAction": "B3_008_DIAGNOSTIC"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -66,11 +32,10 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "dac00ecde81213dceb277442d7828d97f3b09a0f"
+    "blobSha": "5d23caca2d16fa603edacb81b8fdf3d836dceb9e"
   },
   "nextRequiredProof": [
-    "B3_007_EXACT_PREVIEW_MACHINE_PASS",
-    "B3_007_SYNTHETIC_CLEANUP_PASS"
+    "B3_008_CAUSAL_DIAGNOSTIC"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -170,10 +135,10 @@
   },
   "boundaryNote": "B3-003 two-owner causal source fix committed. Only immutable build, isolated Preview, exact readback and read-only proofs are authorized.",
   "priorFinding": {
-    "id": "B3-006",
+    "id": "B3-007",
     "status": "CLOSED_PASS",
-    "closureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CLOSED_PASS_20261001.json",
-    "closureReceiptBlobSha": "a2d2f72100eac2269a4419c187f1d402f7c516b3"
+    "closureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CLOSED_PASS_20261001.json",
+    "closureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e"
   },
   "b3003Closure": {
     "status": "CLOSED_PASS",
@@ -256,7 +221,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "7924195620a501e3836560ec9d78de6f82e5a785"
+    "blobSha": "9c1d0c39d36d3725cf51782e5ea88cc06d30698f"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
