@@ -33,7 +33,7 @@
     ],
     "canonicalOwner": "orbit360-platform/core/policy-receipts-engine.js",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_FIX_20261001.json",
-    "sourceFixReceiptBlobSha": "8b80b9107aca076764037306fa7178b2b4c63e16",
+    "sourceFixReceiptBlobSha": "154b430960a0b247e411df57eb755933070c18ac",
     "sourceBlobs": {
       "orbit360-platform/core/importa.js": "99ca3de8d60d3a26c97067c056fdc383d8fdd15f",
       "orbit360-platform/index.html": "8708ddfcbfd569dc4457ca7c329c3433264cb567",
@@ -41,7 +41,7 @@
     },
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-006-contract.mjs": "16b6c1c379b1ba96b7df1db29f9cfb8e643d2071",
-      "tools/gravicentra-i6-5-b3-006-preview-proof.mjs": "37828b3003cf9e955a90c7359a2c061fce376839",
+      "tools/gravicentra-i6-5-b3-006-preview-proof.mjs": "e5ad05ae396f44d2a89133648a1fe52353a8062c",
       ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "1b4e54329db22c7ab84fc0b3a483b34331bad3e2",
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "74a499fba8f5611f1959d5ced309a62680fe9815"
     },
@@ -54,7 +54,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "0b39e95b2f3b77203d379168b9ef05efcfba70cd"
+    "blobSha": "6729236de92cab583df563e87919b1293df644e1"
   },
   "nextRequiredProof": [
     "B3_006_SOURCE_CONTRACT_PASS",
@@ -245,7 +245,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "72706f9fb424c1e1e40510e60333558d42dfc8af"
+    "blobSha": "8200cd20209aafca97797e28e08acca643fdbb37"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
