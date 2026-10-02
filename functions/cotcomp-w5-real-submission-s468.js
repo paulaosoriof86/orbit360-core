@@ -176,10 +176,18 @@ function deriveProjection(runId,caseId,correlationId,quoteCasePath){
     managementEventId:eventId(managementRequestId)
   };
 }
-function journalPaths(p){
+function normalizeStorageMode(value){
+  return value==='canonicalV2' ? 'canonicalV2' : 'legacyCompatible';
+}
+function workflowEntityPath(storageMode,collection,id){
+  return normalizeStorageMode(storageMode)==='canonicalV2'
+    ? 'tenants/'+TENANT_ID+'/workflow/'+collection+'/items/'+id
+    : 'tenantId/'+TENANT_ID+'/'+collection+'/'+id;
+}
+function journalPaths(p,storageMode='legacyCompatible'){
   return [
-    'tenantId/'+TENANT_ID+'/negocios/'+p.businessId,
-    'tenantId/'+TENANT_ID+'/gestiones/'+p.managementId,
+    workflowEntityPath(storageMode,'negocios',p.businessId),
+    workflowEntityPath(storageMode,'gestiones',p.managementId),
     'tenants/'+TENANT_ID+'/workflowEvents/'+p.businessEventId,
     'tenants/'+TENANT_ID+'/workflowEvents/'+p.managementEventId,
     'tenants/'+TENANT_ID+'/workflowRequests/'+p.businessRequestId,
@@ -187,6 +195,12 @@ function journalPaths(p){
     'tenants/'+TENANT_ID+'/notificationOutbox/'+p.businessEventId,
     'tenants/'+TENANT_ID+'/notificationOutbox/'+p.managementEventId
   ];
+}
+function allPotentialJournalPaths(p){
+  return Array.from(new Set([
+    ...journalPaths(p,'legacyCompatible'),
+    ...journalPaths(p,'canonicalV2')
+  ]));
 }
 async function readPaths(db,paths){
   const rows=[];
@@ -242,11 +256,11 @@ async function resolveActor(db,auth){
 function commandEnvelope(op,entityId,requestId,payload){
   return {tenantId:TENANT_ID,operation:op,entityId,requestId,reason:'CotComp S4.68 W5 real controlled pilot',payload};
 }
-function verifyOwnedJournal(rows,p,actorUid){
+function verifyOwnedJournal(rows,p,actorUid,storageMode){
   const byPath=Object.fromEntries(rows.map(r=>[r.path,r]));
   for(const row of rows)if(!row.exists)throw new Error('S468_W2_JOURNAL_MISSING');
-  const entityBusiness=byPath['tenantId/'+TENANT_ID+'/negocios/'+p.businessId].data;
-  const entityManagement=byPath['tenantId/'+TENANT_ID+'/gestiones/'+p.managementId].data;
+  const entityBusiness=byPath[workflowEntityPath(storageMode,'negocios',p.businessId)].data;
+  const entityManagement=byPath[workflowEntityPath(storageMode,'gestiones',p.managementId)].data;
   if(!entityBusiness.cotcompRef||clean(entityBusiness.cotcompRef.caseId,180)!==clean(p.businessPayload.cotcompRef.caseId,180))throw new Error('S468_W2_BUSINESS_LINK_INVALID');
   if(!entityManagement.cotcompRef||clean(entityManagement.cotcompRef.caseId,180)!==clean(p.managementPayload.cotcompRef.caseId,180))throw new Error('S468_W2_MANAGEMENT_LINK_INVALID');
   if(clean(entityBusiness.createdByUid,180)!==actorUid||clean(entityManagement.createdByUid,180)!==actorUid)throw new Error('S468_W2_ACTOR_INVALID');
@@ -291,9 +305,16 @@ async function discoverRealCase(db){
   return {quotePath,rows,intakeRows,eligible};
 }
 async function countPreexistingWorkflowProjection(db,caseId){
-  const business=await db.collection('tenantId').doc(TENANT_ID).collection('negocios').where('cotcompRef.caseId','==',caseId).limit(MAX_SCAN).get();
-  const management=await db.collection('tenantId').doc(TENANT_ID).collection('gestiones').where('cotcompRef.caseId','==',caseId).limit(MAX_SCAN).get();
-  return {business:business.size,management:management.size};
+  const legacyBusiness=await db.collection('tenantId').doc(TENANT_ID).collection('negocios').where('cotcompRef.caseId','==',caseId).limit(MAX_SCAN).get();
+  const legacyManagement=await db.collection('tenantId').doc(TENANT_ID).collection('gestiones').where('cotcompRef.caseId','==',caseId).limit(MAX_SCAN).get();
+  const canonicalBusiness=await db.collection('tenants').doc(TENANT_ID).collection('workflow').doc('negocios').collection('items').where('cotcompRef.caseId','==',caseId).limit(MAX_SCAN).get();
+  const canonicalManagement=await db.collection('tenants').doc(TENANT_ID).collection('workflow').doc('gestiones').collection('items').where('cotcompRef.caseId','==',caseId).limit(MAX_SCAN).get();
+  return {
+    business:legacyBusiness.size+canonicalBusiness.size,
+    management:legacyManagement.size+canonicalManagement.size,
+    legacy:{business:legacyBusiness.size,management:legacyManagement.size},
+    canonical:{business:canonicalBusiness.size,management:canonicalManagement.size}
+  };
 }
 async function discoverExistingRealProposals(db,caseId){
   const proposalPath=data.pathFor(TENANT_ID,data.ENTITY.PROPOSAL);
@@ -351,13 +372,15 @@ async function run(){
   for(const value of Object.values(commitments))if(!/^[a-f0-9]{64}$/.test(value))throw new Error('S468_COMMITMENT_INVALID');
 
   const projection=deriveProjection(runId,caseId,clean(caseData.correlationId,180),casePath);
-  const paths=journalPaths(projection);
-  const initial=await readPaths(db,paths);
+  const allPossiblePaths=allPotentialJournalPaths(projection);
+  const initial=await readPaths(db,allPossiblePaths);
   if(!allAbsent(initial))throw new Error('S468_W2_TARGET_PATHS_NOT_CLEAN');
 
   const customToken=await auth.createCustomToken(actor.uid,{s468W5Pilot:true,tenantId:TENANT_ID});
   const idToken=await exchangeCustomToken(apiKey,customToken);
-  let writesStarted=false;
+  let writeAttempted=false;
+  let activeStorageMode=null;
+  let paths=null;
   let baseline=null;
   try{
     const calls=[
@@ -366,13 +389,18 @@ async function run(){
     ];
     const first=[];
     for(const c of calls){
+      writeAttempted=true;
       const r=await invokeOwner(idToken,commandEnvelope(c.op,c.entityId,c.requestId,c.payload));
       if(!r.ok||!r.result||r.result.ok!==true)throw new Error('S468_W2_FIRST_CALL_FAILED');
-      writesStarted=true;
-      first.push({operation:c.op,reused:r.result.reused===true,httpStatus:r.httpStatus});
+      const returnedMode=normalizeStorageMode(r.result.storageMode);
+      if(activeStorageMode&&activeStorageMode!==returnedMode)throw new Error('S468_W2_STORAGE_MODE_CHANGED_DURING_RUN');
+      activeStorageMode=returnedMode;
+      first.push({operation:c.op,reused:r.result.reused===true,httpStatus:r.httpStatus,storageMode:returnedMode});
     }
+    if(!activeStorageMode)throw new Error('S468_W2_STORAGE_MODE_UNRESOLVED');
+    paths=journalPaths(projection,activeStorageMode);
     baseline=await readPaths(db,paths);
-    verifyOwnedJournal(baseline,projection,actor.uid);
+    verifyOwnedJournal(baseline,projection,actor.uid,activeStorageMode);
 
     const retry=[];
     for(const c of calls){
@@ -461,6 +489,7 @@ async function run(){
       w2:{
         status:'PASS',
         ownerCallable:OWNER_CALLABLE,
+        storageMode:activeStorageMode,
         firstCalls:first,
         createdDocuments:8,
         exactReadback:true,
@@ -525,11 +554,11 @@ async function run(){
       }
     };
   }catch(e){
-    if(writesStarted){
+    if(writeAttempted){
       try{
-        if(baseline)await cleanupExact(db,paths,baseline);
-        else await cleanupCreatedSubset(db,paths);
-        const afterFailureCleanup=await readPaths(db,paths);
+        if(baseline&&paths)await cleanupExact(db,paths,baseline);
+        else await cleanupCreatedSubset(db,allPossiblePaths);
+        const afterFailureCleanup=await readPaths(db,allPossiblePaths);
         if(!allAbsent(afterFailureCleanup))throw new Error('S468_PARTIAL_ROLLBACK_FINAL_ABSENCE_FAILED');
       }catch(_){
         throw new Error('S468_EXECUTION_AND_ROLLBACK_FAILED');
@@ -542,7 +571,7 @@ async function run(){
 module.exports=Object.freeze({
   VERSION,PROJECT_ID,REGION,TENANT_ID,JOURNEY_ID,COUNTRY,TARGET_ADVISOR_ID,OWNER_CALLABLE,MAX_SCAN,AS_OF,CONSENT_TEXT,
   clean,sha,digest,eventId,intakeEligible,healthSensitiveAbsent,caseCommitment,actorCommitment,consentCommitment,
-  deriveProjection,journalPaths,allAbsent,cleanupCreatedSubset,run
+  deriveProjection,normalizeStorageMode,workflowEntityPath,journalPaths,allPotentialJournalPaths,allAbsent,cleanupCreatedSubset,run
 });
 
 if(require.main===module){
