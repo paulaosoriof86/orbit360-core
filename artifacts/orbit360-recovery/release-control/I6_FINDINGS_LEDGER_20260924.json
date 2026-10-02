@@ -5,7 +5,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "purpose": "Prevent any visual, functional, data, permission, release or deferred finding from being lost between iterations.",
-  "activeBlock": "B3",
+  "activeBlock": "B4",
   "rules": {
     "stableIdRequired": true,
     "ownerRequired": true,
@@ -2728,9 +2728,12 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Ops/Leads/Cliente360/Portal gestiones converge to one canonical record with role scopes.",
-      "status": "NOT_STARTED",
+      "status": "ACTIVE_READONLY_DIAGNOSTIC",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC",
+      "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
+      "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b"
     },
     {
       "id": "B4-002",
@@ -6515,5 +6518,19 @@
       "receiptBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
       "normalizedFindingCount": 40
     }
+  },
+  "currentB4": {
+    "status": "B4_ACTIVE_B4_001_READONLY_DIAGNOSTIC",
+    "activeFindingId": "B4-001",
+    "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
+    "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
+    "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
+    "executionLockBlobSha": "f082edc57e939c98a0fe2086a3e444481793bf05",
+    "compositionLockBlobSha": "8fc3f8aa028417981241318c2d3cc33cccc47a9d",
+    "readinessPercent": 96,
+    "targetPercent": 100,
+    "noLive": true,
+    "noReimport": true,
+    "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC"
   }
 }
