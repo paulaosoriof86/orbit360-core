@@ -28,6 +28,7 @@ need(src.queries.includes('function leaderboardMes('),'B3_008_MONTHLY_ADVISOR_OW
 need(src.queries.includes('function polizasScoped()'),'B3_008_POLICY_COUNTRY_SCOPE_OWNER_MISSING');
 need(src.queries.includes('function clientesScoped()'),'B3_008_CLIENT_COUNTRY_SCOPE_OWNER_MISSING');
 need((src.queries.match(/const cob = realizedPaymentRows\(\)\.filter/g)||[]).length>=2,'B3_008_FINANCIAL_KPI_NOT_REALIZED_PAYMENT_BASED');
+need(src.queries.includes("estado: 'Pagado'"),'B3_008_PROJECTED_CONFIRMED_PAYMENT_STATE_MISSING');
 
 need(!src.inicio.includes('Math.round((U.finiteNumber(prima) || 0) * 1.1)'),'B3_008_SYNTHETIC_91_FALLBACK_REMAINS');
 need(!src.inicio.includes("metaRec = gMeta('recaudo', Math.round(metaPrima * 0.85))"),'B3_008_SYNTHETIC_RECAUDO_META_REMAINS');

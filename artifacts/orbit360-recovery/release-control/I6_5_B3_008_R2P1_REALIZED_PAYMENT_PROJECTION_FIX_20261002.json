@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P1_REALIZED_PAYMENT_PROJECTION_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B3-008",
+  "failedRunId": 37013510594,
+  "failedSourceSha": "1da81738f42d919dd889ccc99729e7122fc0d0b0",
+  "classification": "PRODUCT_DEFECT_CONFIRMED_BY_INDEPENDENT_REALITY_PROOF",
+  "failureCode": "B3_008_CONFIRMED_REALITY_MISMATCH",
+  "evidence": {
+    "dom": {
+      "GTQ": 2854.7200000000003,
+      "COP": 0
+    },
+    "independentTruth": {
+      "GTQ": 849969.6499999973,
+      "COP": 205764957.04000002
+    }
+  },
+  "rootCause": "REALIZED_PAYMENT_PROJECTION_CREATED_AUTHORITATIVE_OR_APPLIED_RECEIPT_PAYMENT_ROWS_WITHOUT_ESTADO_PAGADO_THEN_CARTERA_GLOBAL_FILTERED_THEM_AGAIN_THROUGH_CONFIRMEDCOBRO",
+  "fix": "Projected realized-payment rows now carry estado=Pagado; downstream confirmed-payment filter preserves them. Query asset cache key bumped.",
+  "productBlobs": {
+    "orbit360-platform/core/queries.js": "20c23dd7350f34984ed1f423bd2a3753a6bc43ce",
+    "orbit360-platform/index.html": "6fc2260f68ed0b471e560d9a903d8958d4e6a934"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-008-contract.mjs": "eae48dc85e161893de36e4b7086d8f243c6dbc4b"
+  },
+  "productWrites": 0,
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}

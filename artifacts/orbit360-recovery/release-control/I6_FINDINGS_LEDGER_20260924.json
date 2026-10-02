@@ -2525,7 +2525,14 @@
         "COBROS_FULL_FINANCIAL_HYDRATION_BLOCKING_CORE_LIST",
         "POLIZAS_COUNTRY_SCOPE_OMISSION",
         "SELF_REFERENTIAL_MACHINE_PROOF"
-      ]
+      ],
+      "r2p1": {
+        "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P1_REALIZED_PAYMENT_PROJECTION_FIX_20261002.json",
+        "blobSha": "c4fdae72f55b957dcd5a2fc2ae1eed7db24ceaa9",
+        "failedRunId": 37013510594,
+        "classification": "PRODUCT_DEFECT_CONFIRMED_BY_INDEPENDENT_REALITY_PROOF"
+      }
     },
     {
       "id": "B4-001",
@@ -5987,7 +5994,7 @@
     "priorFindingStatus": "CLOSED_PASS",
     "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CLOSED_PASS_20261001.json",
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
-    "compositionLockBlobSha": "c7bddf0262035d7bbe0deaf0611590b795d79b0e",
+    "compositionLockBlobSha": "28f409fd8d0885c7fa89cc386c0006eae5dd8480",
     "noLive": true,
     "noReimport": true,
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
@@ -5996,6 +6003,8 @@
     "humanRejectionReceiptBlobSha": "c668a2f36577884b6056e17a8eea9c5b5a45c690",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2_REALITY_PERFORMANCE_SOURCE_FIX_20261002.json",
     "sourceFixReceiptBlobSha": "78a38dd979a9ffd70923a31e9567842aad0b8823",
-    "b3007HumanVisualStatus": "PENDING_TARGETED_PAULA_VISUAL_ON_NEXT_EXACT_PREVIEW"
+    "b3007HumanVisualStatus": "PENDING_TARGETED_PAULA_VISUAL_ON_NEXT_EXACT_PREVIEW",
+    "r2p1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P1_REALIZED_PAYMENT_PROJECTION_FIX_20261002.json",
+    "r2p1ReceiptBlobSha": "c4fdae72f55b957dcd5a2fc2ae1eed7db24ceaa9"
   }
 }

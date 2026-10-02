@@ -164,7 +164,7 @@
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
-    "orbit360-platform/core/queries.js": "b018c282eff90f03095beb06d107c02b7e9a9eb2",
+    "orbit360-platform/core/queries.js": "20c23dd7350f34984ed1f423bd2a3753a6bc43ce",
     "orbit360-platform/core/record-delete.js": "749722f8482db5a72b72ac9b64dbcac08af86b82",
     "orbit360-platform/core/router.js": "40bcfe6c7ab090b372dd637a819b83671b021938",
     "orbit360-platform/core/tenant-access-policy-contract-p0.js": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
@@ -176,7 +176,7 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "30753007242c482d9a3e6c2c6c438e07bdec0778",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "e097954c8eab316c4790e2958df2b5985063c966",
+    "orbit360-platform/index.html": "6fc2260f68ed0b471e560d9a903d8958d4e6a934",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
@@ -413,16 +413,12 @@
     "livePromotion": false
   },
   "lastAuthorizedMutation": {
-    "status": "B3_008_R2_CAUSAL_SOURCE_FIX_ATOMIC",
+    "status": "B3_008_R2P1_REALIZED_PAYMENT_PROJECTION_FIX",
     "findingId": "B3-008",
-    "parentHead": "45078730e1bc9398227b3aa213152ea56a732583",
+    "parentHead": "1da81738f42d919dd889ccc99729e7122fc0d0b0",
     "productBlobs": {
-      "orbit360-platform/core/queries.js": "b018c282eff90f03095beb06d107c02b7e9a9eb2",
-      "orbit360-platform/modules/inicio.js": "6228d5bd8af34dbf6e0e3afb93d1f7b1fbb9cd22",
-      "orbit360-platform/modules/cliente360.js": "932367c6627df776779b56237522d5b3ab388905",
-      "orbit360-platform/modules/cobros.js": "0ec0cc969a6b429c511ce6256abd38df3bd468fe",
-      "orbit360-platform/modules/polizas.js": "390dd12393d1ac894b844a795093d2c5969f33d5",
-      "orbit360-platform/index.html": "e097954c8eab316c4790e2958df2b5985063c966"
+      "orbit360-platform/core/queries.js": "20c23dd7350f34984ed1f423bd2a3753a6bc43ce",
+      "orbit360-platform/index.html": "6fc2260f68ed0b471e560d9a903d8958d4e6a934"
     },
     "noDataMutation": true,
     "noReimport": true,
@@ -1932,5 +1928,16 @@
       ".github/workflows/gravicentra-b3-008-executor.yml": "6acee26bb2f1cf61e18f0b9cb9985365173fe71e"
     },
     "b3007VisualDebt": "PENDING_TARGETED_PAULA_VISUAL"
+  },
+  "b3008R2P1RealizedPaymentProjectionFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P1_REALIZED_PAYMENT_PROJECTION_FIX_20261002.json",
+    "blobSha": "c4fdae72f55b957dcd5a2fc2ae1eed7db24ceaa9",
+    "failedRunId": 37013510594,
+    "productBlobs": {
+      "orbit360-platform/core/queries.js": "20c23dd7350f34984ed1f423bd2a3753a6bc43ce",
+      "orbit360-platform/index.html": "6fc2260f68ed0b471e560d9a903d8958d4e6a934"
+    },
+    "qaContractBlobSha": "eae48dc85e161893de36e4b7086d8f243c6dbc4b"
   }
 }

@@ -248,6 +248,7 @@ Orbit.q = (function () {
         conciliado: r.conciliado === true || applicationState === 'APPLIED_DIRECT',
         paymentOriginKind: origin,
         paymentState: r.paymentState || (origin === 'CRM_DIRECT' ? 'PAID_DIRECT' : 'PAID_INFERRED'),
+        estado: 'Pagado',
         __projectedConfirmedPayment: true
       };
     });
