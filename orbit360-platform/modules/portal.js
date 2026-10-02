@@ -295,7 +295,7 @@ Orbit.modules.portal = (function () {
         if (submit) { submit.disabled = false; submit.textContent = 'Enviar solicitud'; }
         toast('No fue posible confirmar la solicitud. No se registró un falso éxito.');
       }
-
+    }, 'Enviar solicitud');
   }
 
   function detPoliza(polId) {
