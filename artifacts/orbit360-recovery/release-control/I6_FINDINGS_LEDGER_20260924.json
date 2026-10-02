@@ -2354,15 +2354,23 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Cronograma consumes real pending obligations from receipts/portfolio.",
-      "status": "DIAGNOSTIC_ACTIVE",
+      "status": "PRODUCT_COMPOSITION_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "entryUnblockedBy": "B3-006 CLOSED_PASS",
-      "nextAction": "B3_007_DIAGNOSTIC",
-      "productMutationAuthorized": false,
+      "nextAction": "B3_007_SOURCE_FIX",
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
-      "livePromotionAuthorized": false
+      "livePromotionAuthorized": false,
+      "rootCause": "CRONOGRAMA_PENDING_OBLIGATION_READ_OWNER_IS_LEGACY_COBROS_AND_CRONOGRAMA_SOURCE_WAS_NOT_TRACKED_IN_THE_ACCUMULATIVE_PRODUCT_SET",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CAUSAL_DIAGNOSTIC_20261001.json",
+      "diagnosticReceiptBlobSha": "04d2d9166d4f78b6d2819bc2c4c2fefa901ee2d8",
+      "authorizedProductFiles": [
+        "orbit360-platform/modules/cronograma.js",
+        "orbit360-platform/index.html"
+      ],
+      "canonicalReadOwner": "Orbit.cobrosCarteraProjectionAdapter.portfolioRows"
     },
     {
       "id": "B3-008",
@@ -5968,13 +5976,10 @@
     }
   },
   "currentB3": {
-    "status": "B3_007_DIAGNOSTIC_ACTIVE",
+    "status": "B3_007_PRODUCT_COMPOSITION_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
     "activeFindingId": "B3-007",
-    "priorFindingId": "B3-006",
-    "priorFindingStatus": "CLOSED_PASS",
-    "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CLOSED_PASS_20261001.json",
-    "priorClosureReceiptBlobSha": "a2d2f72100eac2269a4419c187f1d402f7c516b3",
-    "compositionLockBlobSha": "33fbdece4cf7e589986ebd392484d8fbe72444b6",
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CAUSAL_DIAGNOSTIC_20261001.json",
+    "diagnosticReceiptBlobSha": "04d2d9166d4f78b6d2819bc2c4c2fefa901ee2d8",
     "noLive": true,
     "noReimport": true
   }
