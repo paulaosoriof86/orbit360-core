@@ -18,9 +18,10 @@
     "blocking": true,
     "rootCause": "CRONOGRAMA_PENDING_OBLIGATION_READ_OWNER_IS_LEGACY_COBROS_AND_CRONOGRAMA_SOURCE_WAS_NOT_TRACKED_IN_THE_ACCUMULATIVE_PRODUCT_SET",
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CAUSAL_DIAGNOSTIC_20261001.json",
-    "diagnosticReceiptBlobSha": "04d2d9166d4f78b6d2819bc2c4c2fefa901ee2d8",
+    "diagnosticReceiptBlobSha": "b8d1a8807c51485c8e9ff0eb2787b14f5ca75ac9",
     "authorizedProductFiles": [
       "orbit360-platform/modules/cronograma.js",
+      "orbit360-platform/core/router.js",
       "orbit360-platform/index.html"
     ],
     "canonicalReadOwner": "Orbit.cobrosCarteraProjectionAdapter.portfolioRows",
@@ -31,7 +32,10 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": true
     },
-    "nextAction": "B3_007_SOURCE_FIX"
+    "nextAction": "B3_007_SOURCE_FIX",
+    "causalDependencies": {
+      "routerHydration": "orbit360-platform/core/router.js"
+    }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -40,7 +44,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "6908d215205c9d63194dddf10e8ea00cf30717d2"
+    "blobSha": "b6c48d327f0af0b40930fb1d2f25548a7319c1b1"
   },
   "nextRequiredProof": [
     "B3_007_SOURCE_CONTRACT_PASS",
