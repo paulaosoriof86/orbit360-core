@@ -1,15 +1,15 @@
 {
   "schema": "GRAVICENTRA_I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_V2",
-  "recordedAt": "2026-10-02T19:37:51.926Z",
+  "recordedAt": "2026-10-02T19:58:23.948Z",
   "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
   "findingId": "B3-008",
-  "sourceSha": "97793b9109a0d540dcd47afb627678bf0fef3878",
-  "buildId": "gi-i65-b3-97793b9109a0-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37054637598-pvoo7t15.web.app",
-  "channelId": "gi-b3008-37054637598",
-  "runId": 37054637598,
-  "artifactId": 11248566469,
-  "artifactDigest": "4a033aa81873178f58b88325b980b2c2cbd75932e5a3cb0476b551ee562d2f8f",
+  "sourceSha": "94bd801603e95c7f8d66f18b592aa8c2b6554529",
+  "buildId": "gi-i65-b3-94bd801603e9-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37057293110-5sc2109a.web.app",
+  "channelId": "gi-b3008-37057293110",
+  "runId": 37057293110,
+  "artifactId": 11249455379,
+  "artifactDigest": "87f586cc0ec7fddd6020a141dce560f69517ef56e2c8cb00ba891e3c588c6edd",
   "exactHostingReadback": true,
   "assertions": {
     "monthlyProductionIndependent": true,
@@ -38,9 +38,9 @@
     "cronogramaPerformance": true
   },
   "performance": {
-    "client360ListMs": 327,
-    "cobrosCoreMs": 1822,
-    "cronogramaMs": 1575
+    "client360ListMs": 474,
+    "cobrosCoreMs": 2491,
+    "cronogramaMs": 2140
   },
   "countries": {
     "CO": {
@@ -117,7 +117,42 @@
             "clienteId": "cli_siga_3c96785d46080aa47e",
             "moneda": "COP",
             "monto": 147,
-            "conciliado": false
+            "conciliado": false,
+            "payment": {
+              "pais": "GT",
+              "moneda": "COP",
+              "monto": 147,
+              "origin": "CRM_DIRECT",
+              "__projected": true
+            },
+            "receipt": {
+              "moneda": "COP",
+              "primaNeta": 125,
+              "primaTotal": 147,
+              "fechaLimite": "2026-02-18",
+              "estadoOperativo": "pago_reportado",
+              "fuenteAutoridad": "SIGA",
+              "sourceRef": "Recibos por fecha límite.xlsx"
+            },
+            "policy": {
+              "numero": "UTO-1000001645",
+              "pais": "GT",
+              "moneda": "GTQ",
+              "estado": "Vigente",
+              "aseguradoraId": "gt-seguros-ficohsa",
+              "ramo": "VEHICULOS",
+              "producto": "Auto Individual",
+              "primaNeta": 1250,
+              "primaTotal": 1470,
+              "formaPago": "Transferencia",
+              "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+            },
+            "client": {
+              "pais": "GT",
+              "moneda": "GTQ",
+              "tipo": "natural",
+              "importBatchId": "initial_ays-initial-lab-v1_20260716004512"
+            }
           },
           {
             "id": "receipt-payment:rec_4deb38f07beacb5e0793488f",
@@ -126,7 +161,42 @@
             "clienteId": "cli_siga_3c96785d46080aa47e",
             "moneda": "COP",
             "monto": 147,
-            "conciliado": false
+            "conciliado": false,
+            "payment": {
+              "pais": "GT",
+              "moneda": "COP",
+              "monto": 147,
+              "origin": "CRM_DIRECT",
+              "__projected": true
+            },
+            "receipt": {
+              "moneda": "COP",
+              "primaNeta": 125,
+              "primaTotal": 147,
+              "fechaLimite": "2026-05-18",
+              "estadoOperativo": "pago_reportado",
+              "fuenteAutoridad": "SIGA",
+              "sourceRef": "Recibos por fecha límite.xlsx"
+            },
+            "policy": {
+              "numero": "UTO-1000001645",
+              "pais": "GT",
+              "moneda": "GTQ",
+              "estado": "Vigente",
+              "aseguradoraId": "gt-seguros-ficohsa",
+              "ramo": "VEHICULOS",
+              "producto": "Auto Individual",
+              "primaNeta": 1250,
+              "primaTotal": 1470,
+              "formaPago": "Transferencia",
+              "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+            },
+            "client": {
+              "pais": "GT",
+              "moneda": "GTQ",
+              "tipo": "natural",
+              "importBatchId": "initial_ays-initial-lab-v1_20260716004512"
+            }
           },
           {
             "id": "receipt-payment:rec_6c1b33b3dfab0f9cecda2a50",
@@ -135,7 +205,42 @@
             "clienteId": "cli_siga_3c96785d46080aa47e",
             "moneda": "COP",
             "monto": 147,
-            "conciliado": false
+            "conciliado": false,
+            "payment": {
+              "pais": "GT",
+              "moneda": "COP",
+              "monto": 147,
+              "origin": "CRM_DIRECT",
+              "__projected": true
+            },
+            "receipt": {
+              "moneda": "COP",
+              "primaNeta": 125,
+              "primaTotal": 147,
+              "fechaLimite": "2026-08-18",
+              "estadoOperativo": "pendiente_vencido",
+              "fuenteAutoridad": "SIGA",
+              "sourceRef": "Recibos por fecha límite.xlsx"
+            },
+            "policy": {
+              "numero": "UTO-1000001645",
+              "pais": "GT",
+              "moneda": "GTQ",
+              "estado": "Vigente",
+              "aseguradoraId": "gt-seguros-ficohsa",
+              "ramo": "VEHICULOS",
+              "producto": "Auto Individual",
+              "primaNeta": 1250,
+              "primaTotal": 1470,
+              "formaPago": "Transferencia",
+              "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+            },
+            "client": {
+              "pais": "GT",
+              "moneda": "GTQ",
+              "tipo": "natural",
+              "importBatchId": "initial_ays-initial-lab-v1_20260716004512"
+            }
           },
           {
             "id": "receipt-payment:rec_9a8100e0ad1c415a88946501",
@@ -144,7 +249,42 @@
             "clienteId": "cli_siga_3c96785d46080aa47e",
             "moneda": "COP",
             "monto": 147,
-            "conciliado": false
+            "conciliado": false,
+            "payment": {
+              "pais": "GT",
+              "moneda": "COP",
+              "monto": 147,
+              "origin": "CRM_DIRECT",
+              "__projected": true
+            },
+            "receipt": {
+              "moneda": "COP",
+              "primaNeta": 125,
+              "primaTotal": 147,
+              "fechaLimite": "2026-03-18",
+              "estadoOperativo": "pago_reportado",
+              "fuenteAutoridad": "SIGA",
+              "sourceRef": "Recibos por fecha límite.xlsx"
+            },
+            "policy": {
+              "numero": "UTO-1000001645",
+              "pais": "GT",
+              "moneda": "GTQ",
+              "estado": "Vigente",
+              "aseguradoraId": "gt-seguros-ficohsa",
+              "ramo": "VEHICULOS",
+              "producto": "Auto Individual",
+              "primaNeta": 1250,
+              "primaTotal": 1470,
+              "formaPago": "Transferencia",
+              "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+            },
+            "client": {
+              "pais": "GT",
+              "moneda": "GTQ",
+              "tipo": "natural",
+              "importBatchId": "initial_ays-initial-lab-v1_20260716004512"
+            }
           },
           {
             "id": "receipt-payment:rec_9aea38fe555ba7505242be88",
@@ -153,7 +293,42 @@
             "clienteId": "cli_siga_3c96785d46080aa47e",
             "moneda": "COP",
             "monto": 147,
-            "conciliado": false
+            "conciliado": false,
+            "payment": {
+              "pais": "GT",
+              "moneda": "COP",
+              "monto": 147,
+              "origin": "CRM_DIRECT",
+              "__projected": true
+            },
+            "receipt": {
+              "moneda": "COP",
+              "primaNeta": 125,
+              "primaTotal": 147,
+              "fechaLimite": "2026-01-18",
+              "estadoOperativo": "pago_reportado",
+              "fuenteAutoridad": "SIGA",
+              "sourceRef": "Recibos por fecha límite.xlsx"
+            },
+            "policy": {
+              "numero": "UTO-1000001645",
+              "pais": "GT",
+              "moneda": "GTQ",
+              "estado": "Vigente",
+              "aseguradoraId": "gt-seguros-ficohsa",
+              "ramo": "VEHICULOS",
+              "producto": "Auto Individual",
+              "primaNeta": 1250,
+              "primaTotal": 1470,
+              "formaPago": "Transferencia",
+              "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+            },
+            "client": {
+              "pais": "GT",
+              "moneda": "GTQ",
+              "tipo": "natural",
+              "importBatchId": "initial_ays-initial-lab-v1_20260716004512"
+            }
           },
           {
             "id": "receipt-payment:rec_a20f702abb2f6098d6274f54",
@@ -162,7 +337,42 @@
             "clienteId": "cli_siga_3c96785d46080aa47e",
             "moneda": "COP",
             "monto": 147,
-            "conciliado": false
+            "conciliado": false,
+            "payment": {
+              "pais": "GT",
+              "moneda": "COP",
+              "monto": 147,
+              "origin": "CRM_DIRECT",
+              "__projected": true
+            },
+            "receipt": {
+              "moneda": "COP",
+              "primaNeta": 125,
+              "primaTotal": 147,
+              "fechaLimite": "2026-09-18",
+              "estadoOperativo": "pendiente_vencido",
+              "fuenteAutoridad": "SIGA",
+              "sourceRef": "Recibos por fecha límite.xlsx"
+            },
+            "policy": {
+              "numero": "UTO-1000001645",
+              "pais": "GT",
+              "moneda": "GTQ",
+              "estado": "Vigente",
+              "aseguradoraId": "gt-seguros-ficohsa",
+              "ramo": "VEHICULOS",
+              "producto": "Auto Individual",
+              "primaNeta": 1250,
+              "primaTotal": 1470,
+              "formaPago": "Transferencia",
+              "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+            },
+            "client": {
+              "pais": "GT",
+              "moneda": "GTQ",
+              "tipo": "natural",
+              "importBatchId": "initial_ays-initial-lab-v1_20260716004512"
+            }
           },
           {
             "id": "receipt-payment:rec_b13b7ba15522cff2782dd211",
@@ -171,7 +381,42 @@
             "clienteId": "cli_siga_3c96785d46080aa47e",
             "moneda": "COP",
             "monto": 147,
-            "conciliado": false
+            "conciliado": false,
+            "payment": {
+              "pais": "GT",
+              "moneda": "COP",
+              "monto": 147,
+              "origin": "CRM_DIRECT",
+              "__projected": true
+            },
+            "receipt": {
+              "moneda": "COP",
+              "primaNeta": 125,
+              "primaTotal": 147,
+              "fechaLimite": "2025-12-18",
+              "estadoOperativo": "pago_reportado",
+              "fuenteAutoridad": "SIGA",
+              "sourceRef": "Cobranza Efectuada desde 2024.xlsx"
+            },
+            "policy": {
+              "numero": "UTO-1000001645",
+              "pais": "GT",
+              "moneda": "GTQ",
+              "estado": "Vigente",
+              "aseguradoraId": "gt-seguros-ficohsa",
+              "ramo": "VEHICULOS",
+              "producto": "Auto Individual",
+              "primaNeta": 1250,
+              "primaTotal": 1470,
+              "formaPago": "Transferencia",
+              "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+            },
+            "client": {
+              "pais": "GT",
+              "moneda": "GTQ",
+              "tipo": "natural",
+              "importBatchId": "initial_ays-initial-lab-v1_20260716004512"
+            }
           },
           {
             "id": "receipt-payment:rec_b9eab33a0c2a41b10fde2e7a",
@@ -180,7 +425,42 @@
             "clienteId": "cli_siga_3c96785d46080aa47e",
             "moneda": "COP",
             "monto": 147,
-            "conciliado": false
+            "conciliado": false,
+            "payment": {
+              "pais": "GT",
+              "moneda": "COP",
+              "monto": 147,
+              "origin": "CRM_DIRECT",
+              "__projected": true
+            },
+            "receipt": {
+              "moneda": "COP",
+              "primaNeta": 125,
+              "primaTotal": 147,
+              "fechaLimite": "2026-04-18",
+              "estadoOperativo": "pago_reportado",
+              "fuenteAutoridad": "SIGA",
+              "sourceRef": "Recibos por fecha límite.xlsx"
+            },
+            "policy": {
+              "numero": "UTO-1000001645",
+              "pais": "GT",
+              "moneda": "GTQ",
+              "estado": "Vigente",
+              "aseguradoraId": "gt-seguros-ficohsa",
+              "ramo": "VEHICULOS",
+              "producto": "Auto Individual",
+              "primaNeta": 1250,
+              "primaTotal": 1470,
+              "formaPago": "Transferencia",
+              "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+            },
+            "client": {
+              "pais": "GT",
+              "moneda": "GTQ",
+              "tipo": "natural",
+              "importBatchId": "initial_ays-initial-lab-v1_20260716004512"
+            }
           },
           {
             "id": "receipt-payment:rec_c0469d81d70baf22a00a405d",
@@ -189,7 +469,42 @@
             "clienteId": "cli_siga_3c96785d46080aa47e",
             "moneda": "COP",
             "monto": 147,
-            "conciliado": false
+            "conciliado": false,
+            "payment": {
+              "pais": "GT",
+              "moneda": "COP",
+              "monto": 147,
+              "origin": "CRM_DIRECT",
+              "__projected": true
+            },
+            "receipt": {
+              "moneda": "COP",
+              "primaNeta": 125,
+              "primaTotal": 147,
+              "fechaLimite": "2026-06-18",
+              "estadoOperativo": "pago_reportado",
+              "fuenteAutoridad": "SIGA",
+              "sourceRef": "Recibos por fecha límite.xlsx"
+            },
+            "policy": {
+              "numero": "UTO-1000001645",
+              "pais": "GT",
+              "moneda": "GTQ",
+              "estado": "Vigente",
+              "aseguradoraId": "gt-seguros-ficohsa",
+              "ramo": "VEHICULOS",
+              "producto": "Auto Individual",
+              "primaNeta": 1250,
+              "primaTotal": 1470,
+              "formaPago": "Transferencia",
+              "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+            },
+            "client": {
+              "pais": "GT",
+              "moneda": "GTQ",
+              "tipo": "natural",
+              "importBatchId": "initial_ays-initial-lab-v1_20260716004512"
+            }
           },
           {
             "id": "receipt-payment:rec_f76c731ac75541b60408beb8",
@@ -198,7 +513,42 @@
             "clienteId": "cli_siga_3c96785d46080aa47e",
             "moneda": "COP",
             "monto": 147,
-            "conciliado": false
+            "conciliado": false,
+            "payment": {
+              "pais": "GT",
+              "moneda": "COP",
+              "monto": 147,
+              "origin": "CRM_DIRECT",
+              "__projected": true
+            },
+            "receipt": {
+              "moneda": "COP",
+              "primaNeta": 125,
+              "primaTotal": 147,
+              "fechaLimite": "2026-07-18",
+              "estadoOperativo": "pago_reportado",
+              "fuenteAutoridad": "SIGA",
+              "sourceRef": "Recibos por fecha límite.xlsx"
+            },
+            "policy": {
+              "numero": "UTO-1000001645",
+              "pais": "GT",
+              "moneda": "GTQ",
+              "estado": "Vigente",
+              "aseguradoraId": "gt-seguros-ficohsa",
+              "ramo": "VEHICULOS",
+              "producto": "Auto Individual",
+              "primaNeta": 1250,
+              "primaTotal": 1470,
+              "formaPago": "Transferencia",
+              "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+            },
+            "client": {
+              "pais": "GT",
+              "moneda": "GTQ",
+              "tipo": "natural",
+              "importBatchId": "initial_ays-initial-lab-v1_20260716004512"
+            }
           }
         ],
         "clientCount": 416,
@@ -244,7 +594,7 @@
   "b3007": {
     "syntheticResidueVisible": false,
     "humanVisualStillRequired": true,
-    "cronogramaMs": 1575
+    "cronogramaMs": 2140
   },
   "pageErrors": [],
   "consoleErrors": [],
