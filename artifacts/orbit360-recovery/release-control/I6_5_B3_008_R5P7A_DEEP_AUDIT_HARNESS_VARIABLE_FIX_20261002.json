@@ -1,0 +1,15 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P7A_DEEP_AUDIT_HARNESS_VARIABLE_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "failedRunId": 37058637053,
+  "failedJobId": 111009443330,
+  "classification": "HARNESS_ONLY_REFERENCE_ERROR",
+  "productRegressionDemonstrated": false,
+  "failure": "ReferenceError: noDenominatorOverlap is not defined",
+  "fix": "Return the declared noDenomOverlap counter under the noDenominatorOverlap output key.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "RERUN_B3_008_EXACT_PREVIEW"
+}
