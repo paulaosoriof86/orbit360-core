@@ -25,11 +25,54 @@ Orbit.modules.inicio = (function () {
     </div>`;
   }
 
+  function dataReadiness(names) {
+    const store=Orbit.store;
+    if(!store || store.__productReadOnlyP0 !== true || typeof store._productStatus !== 'function') return 'ready';
+    const ps=store._productStatus()||{}, confirmed=[].concat(ps.serverConfirmedCollections||[]), denied=[].concat(ps.deniedCollections||[]);
+    if(names.some(name=>denied.includes(name))) return 'unavailable';
+    return names.every(name=>confirmed.includes(name)) ? 'ready' : 'pending';
+  }
+  function pendingDial(label, readiness) {
+    const txt=readiness==='unavailable'?'No disponible':'Actualizando datos';
+    return `<div data-inicio-dial="${label}" data-readiness="${readiness}" style="width:118px;min-height:118px;display:grid;place-items:center;text-align:center;border:1px solid var(--line);border-radius:50%;color:var(--ink-3);font-size:12px;font-weight:600">${txt}</div>`;
+  }
+  function openFinancialKpi(kind) {
+    const isConfirmed=kind==='confirmed';
+    const state=dataReadiness(isConfirmed?['clientes','cobros']:['clientes','polizas','carteraPrimas']);
+    if(isConfirmed && state==='ready') return Orbit.kpi('cobros-pagados');
+    const title=kind==='pending'?'Pendiente de cobro':kind==='overdue'?'Cartera vencida':'Cobros confirmados';
+    const rows=state==='ready'?(kind==='pending'?q.carteraPendienteRows():q.carteraVencidaRows()):[];
+    let back=document.getElementById('inicio-financial-kpi'); if(back)back.remove();
+    back=document.createElement('div');back.id='inicio-financial-kpi';back.className='drawer-back open';
+    back.setAttribute('data-inicio-financial-kpi',kind);back.setAttribute('data-readiness',state);back.setAttribute('data-row-count',String(rows.length));
+    back.style.cssText='display:grid;place-items:center;z-index:96';
+    const rowHtml=rows.map((row,i)=>{
+      const cid=row.clienteId||(q.policyLinkedClientId?q.policyLinkedClientId(row):'');
+      const cli=cid?Orbit.store.get('clientes',cid):null;
+      const due=row.vence||row.fechaVencimiento||row.fechaLimite||'';
+      const value=row.monto!=null?row.monto:row.saldo;
+      const label=kind==='overdue'?'Vencido':'Pendiente';
+      return `<tr class="clickable" data-r="${i}" data-client="${U.esc(cid||'')}"><td>${U.esc(cli?cli.nombre:'—')}</td><td>${U.esc(row.cuota||row.secuencia||'—')}</td><td>${U.money(value,row.moneda)}</td><td>${U.fmtDate(due)}</td><td><span class="badge ${label==='Vencido'?'danger':'warn'}">${label}</span></td></tr>`;
+    }).join('');
+    back.innerHTML=state!=='ready'
+      ? `<div class="card" style="width:min(560px,96vw);padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"><b>${title}</b><button class="imp-x" data-close>✕</button></div><div class="muted" data-kpi-pending="1" style="padding:26px;text-align:center">${state==='unavailable'?'Información no disponible para este acceso.':'Actualizando datos… Estamos esperando confirmación del servidor.'}</div></div>`
+      : `<div class="card" style="width:min(760px,96vw);max-height:88vh;overflow:auto;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"><b>${title} · ${rows.length}</b><button class="imp-x" data-close>✕</button></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Cliente</th><th>Cuota</th><th>Monto</th><th>Vence</th><th>Estado</th></tr></thead><tbody>${rowHtml||'<tr><td colspan="5" class="muted" style="text-align:center;padding:24px">Sin registros.</td></tr>'}</tbody></table></div></div>`;
+    document.body.appendChild(back);
+    const close=()=>back.remove();
+    back.querySelectorAll('[data-close]').forEach(x=>x.onclick=close);
+    back.onclick=e=>{if(e.target===back)close();};
+    back.querySelectorAll('[data-client]').forEach(tr=>tr.onclick=()=>{const cid=tr.getAttribute('data-client');close();if(cid)location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&t=recibos';});
+  }
+
   function render(host) {
+    const clientReadiness=dataReadiness(['clientes']);
+    const policyReadiness=dataReadiness(['clientes','polizas']);
+    const paymentReadiness=dataReadiness(['clientes','polizas','cobros']);
+    const portfolioReadiness=dataReadiness(['clientes','polizas','carteraPrimas']);
     const cart = q.carteraGlobal();
     const prima = q.primaVigenteGlobal();
     const renov = q.renovacionesProximas(45);
-    const venc = q.cobrosVencidos();
+    const venc = portfolioReadiness === 'ready' && q.carteraVencidaRows ? q.carteraVencidaRows() : [];
     const board = q.leaderboard();
     const clientes = Orbit.store.all('clientes');
     const polizas = Orbit.store.all('polizas');
@@ -55,32 +98,32 @@ Orbit.modules.inicio = (function () {
           <div style="color:var(--ink-2);font-size:13.5px;margin-top:6px;line-height:1.5">
             Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. La prima vigente y el recaudo confirmado se calculan desde las pólizas y cobros reales del CRM.</div>
           <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-            <span class="badge neutral">${clientes.length} clientes</span>
-            <span class="badge neutral">${polizas.length} pólizas</span>
-            <span class="badge danger">${venc.length} registros vencidos en cartera</span>
+            <span class="badge neutral" data-inicio-count="clientes" data-readiness="${clientReadiness}">${clientReadiness === 'ready' ? clientes.length + ' clientes' : 'Actualizando clientes'}</span>
+            <span class="badge neutral" data-inicio-count="polizas" data-readiness="${policyReadiness}">${policyReadiness === 'ready' ? polizas.length + ' pólizas' : 'Actualizando pólizas'}</span>
+            <span class="badge ${portfolioReadiness === 'ready' ? 'danger' : 'neutral'}" data-inicio-count="cartera-vencida" data-readiness="${portfolioReadiness}">${portfolioReadiness === 'ready' ? venc.length + ' registros vencidos en cartera' : 'Actualizando cartera'}</span>
           </div>
         </div>
-        ${dial(pctPrima, 'Prima vigente', U.moneyShort(prima, Orbit.q.monedaPais()))}
-        ${dial(pctRec, 'Recaudo confirmado', U.moneyShort(recaudo, Orbit.q.monedaPais()))}
+        ${policyReadiness === 'ready' ? dial(pctPrima, 'Prima vigente', U.moneyShort(prima, Orbit.q.monedaPais())) : pendingDial('Prima vigente', policyReadiness)}
+        ${paymentReadiness === 'ready' ? dial(pctRec, 'Recaudo confirmado', U.moneyShort(recaudo, Orbit.q.monedaPais())) : pendingDial('Recaudo confirmado', paymentReadiness)}
       </div>
 
       <!-- KPIs clicables -->
       <div class="kpi-row" style="margin-top:18px">
-        <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pagados')" title="Ver cobros confirmados">
-          <div class="k-accent"></div>
+        <button class="kpi kpi-click" data-inicio-metric="cobros-confirmados" data-readiness="${paymentReadiness}" onclick="Orbit.modules.inicio.openFinancialKpi('confirmed')" title="Ver cobros confirmados">
+          <div class="k-accent" style="background:${paymentReadiness === 'ready' ? 'var(--red)' : 'var(--line)'}"></div>
           <div class="k-label">Cartera al día</div>
-          <div class="k-val">${U.moneyShort(cart.alDia, Orbit.q.monedaPais())}</div>
-          <div class="k-foot up">▲ cobros confirmados ›</div></button>
-        <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-pendientes')" title="Ver pendiente de cobro" style="border-color:var(--warn)">
-          <div class="k-accent" style="background:var(--warn)"></div>
+          <div class="k-val" data-value="${paymentReadiness === 'ready' ? cart.alDia : ''}">${paymentReadiness === 'ready' ? U.moneyShort(cart.alDia, Orbit.q.monedaPais()) : (paymentReadiness === 'unavailable' ? 'No disponible' : 'Actualizando datos')}</div>
+          <div class="k-foot ${paymentReadiness === 'ready' ? 'up' : 'muted'}">${paymentReadiness === 'ready' ? '▲ cobros confirmados ›' : 'Esperando confirmación del servidor'}</div></button>
+        <button class="kpi kpi-click" data-inicio-metric="cartera-pendiente" data-readiness="${portfolioReadiness}" onclick="Orbit.modules.inicio.openFinancialKpi('pending')" title="Ver pendiente de cobro" style="border-color:${portfolioReadiness === 'ready' ? 'var(--warn)' : 'var(--line)'}">
+          <div class="k-accent" style="background:${portfolioReadiness === 'ready' ? 'var(--warn)' : 'var(--line)'}"></div>
           <div class="k-label">Pendiente de cobro</div>
-          <div class="k-val">${U.moneyShort(cart.pend, Orbit.q.monedaPais())}</div>
-          <div class="k-foot muted">cuotas por vencer ›</div></button>
-        <button class="kpi kpi-click" onclick="Orbit.kpi('cobros-vencidos')" title="Ver cartera vencida">
-          <div class="k-accent" style="background:var(--danger)"></div>
+          <div class="k-val" data-value="${portfolioReadiness === 'ready' ? cart.pend : ''}">${portfolioReadiness === 'ready' ? U.moneyShort(cart.pend, Orbit.q.monedaPais()) : (portfolioReadiness === 'unavailable' ? 'No disponible' : 'Actualizando datos')}</div>
+          <div class="k-foot muted">${portfolioReadiness === 'ready' ? 'cuotas por vencer ›' : 'Esperando confirmación del servidor'}</div></button>
+        <button class="kpi kpi-click" data-inicio-metric="cartera-vencida" data-readiness="${portfolioReadiness}" onclick="Orbit.modules.inicio.openFinancialKpi('overdue')" title="Ver cartera vencida">
+          <div class="k-accent" style="background:${portfolioReadiness === 'ready' ? 'var(--danger)' : 'var(--line)'}"></div>
           <div class="k-label">Cartera vencida</div>
-          <div class="k-val">${U.moneyShort(cart.venc, Orbit.q.monedaPais())}</div>
-          <div class="k-foot down">▼ requiere gestión ›</div></button>
+          <div class="k-val" data-value="${portfolioReadiness === 'ready' ? cart.venc : ''}">${portfolioReadiness === 'ready' ? U.moneyShort(cart.venc, Orbit.q.monedaPais()) : (portfolioReadiness === 'unavailable' ? 'No disponible' : 'Actualizando datos')}</div>
+          <div class="k-foot ${portfolioReadiness === 'ready' ? 'down' : 'muted'}">${portfolioReadiness === 'ready' ? '▼ requiere gestión ›' : 'Esperando confirmación del servidor'}</div></button>
         <button class="kpi kpi-click" onclick="Orbit.kpi('renov-proximas')" title="Ver renovaciones">
           <div class="k-accent" style="background:var(--info)"></div>
           <div class="k-label">Renovaciones ≤45 d</div>
@@ -170,5 +213,5 @@ Orbit.modules.inicio = (function () {
     </div>`;
   }
 
-  return { render };
+  return { render, openFinancialKpi };
 })();
