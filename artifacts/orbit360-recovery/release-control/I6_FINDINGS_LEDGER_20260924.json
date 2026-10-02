@@ -2728,12 +2728,22 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Ops/Leads/Cliente360/Portal gestiones converge to one canonical record with role scopes.",
-      "status": "ACTIVE_READONLY_DIAGNOSTIC",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC",
+      "nextAction": "B4_001_CONTRACT_AND_EXACT_PREVIEW",
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
-      "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b"
+      "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
+      "rootCause": "LEGACY_OPTIMISTIC_UI_CONTROL_FLOW_AND_PORTAL_OPERATION_MAPPING_GAP",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC_20261002.json",
+      "diagnosticReceiptBlobSha": "dfb8aa09cbdc6bcc09c6555854a0e135e4bd1700",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_MINIMAL_SOURCE_FIX_20261002.json",
+      "sourceFixReceiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9",
+      "currentCandidateEligibleForPromotion": false,
+      "productMutationAuthorized": false,
+      "dataMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "livePromotionAuthorized": false
     },
     {
       "id": "B4-002",
@@ -6520,17 +6530,17 @@
     }
   },
   "currentB4": {
-    "status": "B4_ACTIVE_B4_001_READONLY_DIAGNOSTIC",
+    "status": "B4_001_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-001",
     "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "executionLockBlobSha": "f082edc57e939c98a0fe2086a3e444481793bf05",
-    "compositionLockBlobSha": "8fc3f8aa028417981241318c2d3cc33cccc47a9d",
+    "compositionLockBlobSha": "cb9e8c79d0ee4ab20771879de411f73c256aca87",
     "readinessPercent": 96,
     "targetPercent": 100,
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC"
+    "nextAction": "B4_001_CONTRACT_AND_EXACT_PREVIEW"
   }
 }
