@@ -1,0 +1,30 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P6_CLIENT360_USABLE_SELECTOR_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B3-008",
+  "failedRunId": 37027839823,
+  "failedSourceSha": "126af8985eab30a182c34e1e06ffa9082539ca2e",
+  "classification": "HARNESS_ONLY_FALSE_NEGATIVE",
+  "evidence": {
+    "routeKey": "cliente360",
+    "canView": true,
+    "loading": false,
+    "denied": false,
+    "visibleClients": 439,
+    "visiblePoliciesHistorical": 1419,
+    "syntheticB3004FixtureCleanup": "PASS",
+    "pageErrors": 0,
+    "consoleErrors": 0
+  },
+  "rootCause": "The proof required a CSS class-specific client-row selector even though the Cliente 360 table was visibly rendered and usable. Wrapper/enhancement timing made that selector unreliable.",
+  "fix": "Define Cliente 360 usable state by stable functional evidence: rendered .tbl with at least one tbody row, CLIENTES and SALUD headings present, and no loading or denied state.",
+  "proofBlobSha": "6e4d4395ac35c5f62e175fe9c154cc61e197cba8",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "syntheticQaCleanupWritesAuthorized": false,
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}

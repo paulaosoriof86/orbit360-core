@@ -146,7 +146,9 @@ try{
       const host=document.getElementById('host');
       if(!host) return false;
       if(document.querySelector('[data-c360-authoritative-loading="1"]')||document.querySelector('.modstate')) return false;
-      return !!document.querySelector('.c360-client-name') && /CLIENTES/i.test(String(host.innerText||''));
+      const table=document.querySelector('.tbl');
+      const rows=table ? table.querySelectorAll('tbody tr') : [];
+      return !!table && rows.length>0 && /CLIENTES/i.test(String(host.innerText||'')) && /SALUD/i.test(String(host.innerText||''));
     },null,{timeout:6000});
   }catch(error){
     const diag=await page.evaluate(()=>({
