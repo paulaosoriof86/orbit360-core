@@ -2667,7 +2667,7 @@
       },
       "paulaVisualAccepted": true,
       "humanVisualAcceptanceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
-      "humanVisualAcceptanceReceiptBlobSha": "d501880ac4f5900c6509570d3061c954bcf49145",
+      "humanVisualAcceptanceReceiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
       "closureDisposition": "B3_008_TARGETED_VISUAL_ACCEPTED_EXACT_MACHINE_CANDIDATE"
     },
     {
@@ -3223,10 +3223,19 @@
       "surface": "Cobros/Recibos",
       "rootCause": "Pago reportado pendiente de conciliación no equivale a cobro aplicado, pero Cobros no expone bien esa evidencia.",
       "remediation": "Surface payment evidence in Cobros without fabricating a confirmed cobro: distinguish Pago reportado por conciliar / Cobro confirmado / Cobro conciliado and preserve source semantics.",
-      "status": "SOURCE_FIXED_PENDING_NEW_PREVIEW_PROOF",
-      "blocking": true,
+      "status": "CLOSED_PASS_BY_EXISTING_B3_004_AND_B3_008_EVIDENCE",
+      "blocking": false,
       "requiredProof": "Cliente with reported payment evidence shows it in Cobros as non-confirmed evidence; confirmed cobro count remains unchanged unless authoritative payment confirmation exists.",
-      "effectiveOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js"
+      "effectiveOwner": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+      "closureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_CARRY_REPORTED_PAYMENT_PRESENTATION_R4_ADJUDICATION_PASS_20261002.json",
+      "closureReceiptBlobSha": "854c05ca68c2c9e359e42f1de2f1f5b4f8d54689",
+      "closureEvidence": [
+        "I6_5_B3_004_R5_CRM_MIGRATION_ORIGIN_CONTRACT_PASS_20260930",
+        "I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001",
+        "I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_20261002",
+        "I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002"
+      ],
+      "nextAction": "NONE_CLOSED"
     },
     {
       "id": "B2-R38-FIREBASE-STORAGE-ASSET-BUCKET-MISSING",
@@ -6130,7 +6139,7 @@
     "priorFindingStatus": "CLOSED_PASS",
     "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CLOSED_PASS_20261001.json",
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
-    "compositionLockBlobSha": "48f7779752a54c6faa34b7ebb24907134c91ee72",
+    "compositionLockBlobSha": "e152ce99a9ecff9cc89c17fa45e9304da71f69e6",
     "noLive": true,
     "noReimport": true,
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
@@ -6178,7 +6187,9 @@
     "r5p8DiagnosticBlobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a",
     "b3008HumanVisualStatus": "PASS_PAULA_TARGETED_VISUAL_20261002",
     "b3008HumanVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
-    "b3008HumanVisualReceiptBlobSha": "d501880ac4f5900c6509570d3061c954bcf49145",
-    "nextAction": "B4_ENTRY_GUARD"
+    "b3008HumanVisualReceiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
+    "nextAction": "B4_ENTRY_GUARD",
+    "reportedPaymentCarryStatus": "CLOSED_PASS_BY_EXISTING_EVIDENCE",
+    "reportedPaymentCarryReceiptBlobSha": "854c05ca68c2c9e359e42f1de2f1f5b4f8d54689"
   }
 }
