@@ -1,0 +1,26 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P5A_CLIENT360_MERGED_CLIENT_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_RERUN_REQUIRED",
+  "failedRunId": 37054637598,
+  "failedJobId": 110996208650,
+  "classification": "HARNESS_ONLY_FALSE_NEGATIVE",
+  "productRegressionDemonstrated": false,
+  "rootCause": "Independent proof counted three merged/fused GT client records that Cliente360 intentionally excludes from its canonical visible client universe.",
+  "observed": {
+    "cliente360GT": {
+      "domClients": 416,
+      "domActivePolicies": 205,
+      "domLinkedPolicyHistory": 1331
+    },
+    "independentRawGTClients": 419,
+    "delta": 3
+  },
+  "fix": "Independent Cliente360 truth and client-country partition now exclude fusionado===true and non-empty mergedIntoClientId, matching the canonical Cliente360 universe while leaving policy/cobros truth independent.",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": 0,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "RERUN_FAILED_B3_008_EXACT_PREVIEW"
+}

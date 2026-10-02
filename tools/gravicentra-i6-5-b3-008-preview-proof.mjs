@@ -120,7 +120,8 @@ async function independent(page){
     const overdue=r=>{if(!open(r))return false;const d=due(r);if(!d)return false;const dt=new Date(String(d).slice(0,10)+'T00:00:00');const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());return dt<today;};
     const pend={},venc={};portfolio.forEach(r=>{const p=pm.get(String(r&&r.polizaId||''));if(!p||!inCountry(rowCountry(r))||!open(r))return;const cli=cm.get(String(r&&r.clienteId||p.clienteId||''));money(overdue(r)?venc:pend,r.moneda||p.moneda||cli?.moneda,r.monto!=null?r.monto:r.saldo);});
     const direct=projected.filter(r=>r.origin==='CRM_DIRECT'&&inCountry(rowCountry(r)));
-    const scopedClients=clients.filter(c=>inCountry(cc(c.pais))),scopedClientIds=new Set(scopedClients.map(c=>String(c.id||'')));
+    const canonicalClients=clients.filter(c=>!(c&&(c.fusionado===true||String(c.mergedIntoClientId||'').trim())));
+    const scopedClients=canonicalClients.filter(c=>inCountry(cc(c.pais))),scopedClientIds=new Set(scopedClients.map(c=>String(c.id||'')));
     const clientPolicies=policies.filter(p=>scopedClientIds.has(String(p&&p.clienteId||''))),clientActive=clientPolicies.filter(p=>['Vigente','Por renovar'].includes(p.estado));
     const scopedPolicies=policies.filter(p=>inCountry(policyCountry(p))),active=scopedPolicies.filter(p=>['Vigente','Por renovar'].includes(p.estado));
     const confirmedCount=realized.length,porConciliarCount=realized.filter(r=>r&&r.conciliado!==true).length,reconciledCount=realized.filter(r=>r&&r.conciliado===true).length;
@@ -218,7 +219,7 @@ try{
   const c360InternalCO=await page.evaluate(()=>{const e=document.querySelector('[data-c360-kpi-scope]');return{scope:e?.getAttribute('data-c360-kpi-scope')||'',filter:e?.getAttribute('data-c360-filter-country')||'',clients:Number(e?.getAttribute('data-c360-kpi-client-count')),active:Number(e?.getAttribute('data-c360-kpi-active-count')),policies:Number(e?.getAttribute('data-c360-kpi-policy-count'))};});
   need(c360InternalCO.scope==='TODOS'&&c360InternalCO.filter==='CO'&&c360InternalCO.clients===truthClientCO.clientCount&&c360InternalCO.active===truthClientCO.clientActivePolicyCount&&c360InternalCO.policies===truthClientCO.clientPolicyCount,'B3_008_CLIENT360_INTERNAL_COUNTRY_KPI_MISMATCH:'+JSON.stringify({c360InternalCO,truthClientCO}));
   proof.client360InternalCO=c360InternalCO;
-  const countryPartition=await page.evaluate(()=>{const clients=Orbit.store?.all?.('clientes')||[],cc=v=>String(v||'').trim().toUpperCase();return{total:clients.length,gt:clients.filter(c=>cc(c?.pais)==='GT').length,co:clients.filter(c=>cc(c?.pais)==='CO').length,other:clients.filter(c=>!['GT','CO'].includes(cc(c?.pais))).length};});
+  const countryPartition=await page.evaluate(()=>{const all=Orbit.store?.all?.('clientes')||[],clients=all.filter(c=>!(c&&(c.fusionado===true||String(c.mergedIntoClientId||'').trim()))),cc=v=>String(v||'').trim().toUpperCase();return{total:clients.length,rawTotal:all.length,excludedMerged:all.length-clients.length,gt:clients.filter(c=>cc(c?.pais)==='GT').length,co:clients.filter(c=>cc(c?.pais)==='CO').length,other:clients.filter(c=>!['GT','CO'].includes(cc(c?.pais))).length};});
   need(countryPartition.total===countryPartition.gt+countryPartition.co+countryPartition.other&&countryPartition.gt===truthClientGT.clientCount&&countryPartition.co===truthClientCO.clientCount,'B3_008_CLIENT_COUNTRY_PARTITION_MISMATCH:'+JSON.stringify({countryPartition,truthClientGT,truthClientCO}));
   proof.clientCountryPartition=countryPartition;proof.assertions.client360CountryKpis=true;proof.assertions.client360InternalCountryKpis=true;proof.assertions.clientCountryPartition=true;proof.assertions.kpiDetailSurfaces=true;
 
