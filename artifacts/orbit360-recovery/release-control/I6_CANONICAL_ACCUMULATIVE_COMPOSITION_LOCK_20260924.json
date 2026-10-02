@@ -176,11 +176,11 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "e4f523d18dec8594a53c15132cd29ce1c26b2d48",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "d86e77a31146ae48d8f972f7731229a203899a61",
+    "orbit360-platform/index.html": "e7ed66e1434f5fea3049e87456b0ebac1cbc96ca",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
-    "orbit360-platform/modules/cliente360.js": "670f8f8daa76cae73c9ff18f86915c9172c4eb5d",
+    "orbit360-platform/modules/cliente360.js": "b93816e89f8ebe5055052e0f6d48f6ed9aa39ef1",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495",
     "orbit360-platform/modules/cobros.js": "1f3954d93246c898c78d4cbfa83ea93f9c93a146",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
@@ -1980,5 +1980,14 @@
     "preservedPriorPasses": true,
     "noReimport": true,
     "noLive": true
+  },
+  "b3008R5P3": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P3_CLIENT360_CLIENT_CENTRIC_SCOPE_FIX_20261002.json",
+    "blobSha": "26d0979dbfa52693ab4764ec91121adab4a6f1e8",
+    "sourceFixCommit": "b0480613556a8c16c0b54eb5ceeb341702caec8d",
+    "semanticOwner": "CLIENTE360_CLIENT_CENTRIC",
+    "noLive": true,
+    "noReimport": true
   }
 }

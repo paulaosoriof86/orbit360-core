@@ -56,6 +56,11 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_REJECTION_R3_SOURCE_FIX_R5_20261002.json",
       "blobSha": "d68ea51817d2cde1e0b891635e513f3b613e6dcf",
       "sourceFixCommit": "92c34569ad4f819d384660f21fef473f328ae5c2"
+    },
+    "r5p3": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P3_CLIENT360_CLIENT_CENTRIC_SCOPE_FIX_20261002.json",
+      "blobSha": "26d0979dbfa52693ab4764ec91121adab4a6f1e8",
+      "sourceFixCommit": "b0480613556a8c16c0b54eb5ceeb341702caec8d"
     }
   },
   "canonicalComposition": {
@@ -65,7 +70,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "5761569e3bf521713246f47f72128c1896e11f59"
+    "blobSha": "68f3999cec0f9224514896e3bf5454132ac1a02a"
   },
   "nextRequiredProof": [
     "B3_008_R5_SOURCE_CONTRACT_PASS",
@@ -257,7 +262,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "ba7acf3a73367754af155afa821976c5d97961f9"
+    "blobSha": "2e77abdc9947b8030852cd5c0dc03d92271e66a3"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
@@ -919,5 +924,11 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_REJECTION_R3_SOURCE_FIX_R5_20261002.json",
     "blobSha": "d68ea51817d2cde1e0b891635e513f3b613e6dcf",
     "sourceFixCommit": "92c34569ad4f819d384660f21fef473f328ae5c2"
+  },
+  "b3008R5P3": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P3_CLIENT360_CLIENT_CENTRIC_SCOPE_FIX_20261002.json",
+    "blobSha": "26d0979dbfa52693ab4764ec91121adab4a6f1e8",
+    "sourceFixCommit": "b0480613556a8c16c0b54eb5ceeb341702caec8d"
   }
 }

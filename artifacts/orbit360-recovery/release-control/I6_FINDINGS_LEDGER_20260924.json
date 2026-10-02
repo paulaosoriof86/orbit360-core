@@ -2632,7 +2632,13 @@
         "INICIO_CONFIRMED_CARD_AND_DETAIL_HAD_DIFFERENT_METRIC_OWNERS",
         "CRONOGRAMA_PENDING_OBLIGATION_LINKING_RESCANNED_RECEIPTS_PER_ROW",
         "KPI_DETAIL_AFFORDANCE_INCOMPLETE_ON_CLIENTE360_AND_COBROS"
-      ]
+      ],
+      "r5p3": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P3_CLIENT360_CLIENT_CENTRIC_SCOPE_FIX_20261002.json",
+        "blobSha": "26d0979dbfa52693ab4764ec91121adab4a6f1e8",
+        "sourceFixCommit": "b0480613556a8c16c0b54eb5ceeb341702caec8d",
+        "classification": "PRODUCT_SEMANTIC_SCOPE_DEFECT_CONFIRMED_BY_INDEPENDENT_PROOF"
+      }
     },
     {
       "id": "B4-001",
@@ -6094,7 +6100,7 @@
     "priorFindingStatus": "CLOSED_PASS",
     "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CLOSED_PASS_20261001.json",
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
-    "compositionLockBlobSha": "ba7acf3a73367754af155afa821976c5d97961f9",
+    "compositionLockBlobSha": "2e77abdc9947b8030852cd5c0dc03d92271e66a3",
     "noLive": true,
     "noReimport": true,
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
@@ -6127,6 +6133,8 @@
     "r3ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R3_INDEXED_RELATION_PERFORMANCE_SOURCE_FIX_20261002.json",
     "r3ReceiptBlobSha": "ecf200f8d2b4661e6b7fce68ff6e05fe5a9f0d9d",
     "r3p1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R3P1_DIRECT_ROUTE_LATENCY_PROBE_HARNESS_FIX_20261002.json",
-    "r3p1ReceiptBlobSha": "7450fe762fc4ee3128444ed99d3d62598ce43897"
+    "r3p1ReceiptBlobSha": "7450fe762fc4ee3128444ed99d3d62598ce43897",
+    "r5p3ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P3_CLIENT360_CLIENT_CENTRIC_SCOPE_FIX_20261002.json",
+    "r5p3ReceiptBlobSha": "26d0979dbfa52693ab4764ec91121adab4a6f1e8"
   }
 }

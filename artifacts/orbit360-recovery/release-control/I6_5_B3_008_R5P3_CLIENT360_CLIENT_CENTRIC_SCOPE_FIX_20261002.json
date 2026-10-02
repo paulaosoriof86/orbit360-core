@@ -1,0 +1,52 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P3_CLIENT360_CLIENT_CENTRIC_SCOPE_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B3-008",
+  "classification": "PRODUCT_SEMANTIC_SCOPE_DEFECT_CONFIRMED_BY_INDEPENDENT_PROOF",
+  "failedRunId": 37046000533,
+  "failedJobId": 110969551615,
+  "sourceFixCommit": "b0480613556a8c16c0b54eb5ceeb341702caec8d",
+  "observed": {
+    "selectedCountry": "CO",
+    "cliente360": {
+      "clients": 17,
+      "activePolicies": 9,
+      "linkedPolicies": 75,
+      "clickableTopKpis": 4
+    },
+    "policyCentricTruth": {
+      "policies": 124,
+      "activePolicies": 27
+    }
+  },
+  "rootCause": "CLIENTE360_REUSED_POLICY_COUNTRY_SCOPE_AFTER_CLIENT_SCOPE_AND_THEREFORE_DROPPED_POLICY_HISTORY_LINKED_TO_VISIBLE_CLIENTS_WHEN_POLICY_AND_CLIENT_COUNTRY_METADATA_DIFFERED",
+  "semanticDecision": {
+    "owner": "CLIENTE360_CLIENT_CENTRIC",
+    "rule": "Country filters define the visible client universe first. Cliente360 KPIs and history then use every policy linked to those visible clients. Policy/client country discrepancies remain visible for validation and are not silently discarded.",
+    "internalCountryFilterMustScopeKpis": true,
+    "globalCountryFilterMustScopeKpis": true,
+    "polizasModuleRemainsPolicyCentric": true
+  },
+  "changedProductFiles": {
+    "orbit360-platform/modules/cliente360.js": "b93816e89f8ebe5055052e0f6d48f6ed9aa39ef1",
+    "orbit360-platform/index.html": "e7ed66e1434f5fea3049e87456b0ebac1cbc96ca"
+  },
+  "qaUpdates": {
+    "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "8a2464ec7fb6dd85af36863e384a43fbb637d0c9",
+    "tools/gravicentra-i6-5-b3-008-contract.mjs": "a42d4000fc3a00954b1350f6ed75c4747dd6e09c",
+    ".github/workflows/gravicentra-b3-008-executor.yml": "424e0b9761da8c0a17418cb70fb0046c7920933e"
+  },
+  "priorHarnessFixes": [
+    "I6_5_B3_008_R5P1_QA_CONTRACT_CARDINALITY_FIX_20261002.json",
+    "I6_5_B3_008_R5P2_META_READINESS_RERENDER_HARNESS_FIX_20261002.json"
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4Advance": false
+  },
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}
