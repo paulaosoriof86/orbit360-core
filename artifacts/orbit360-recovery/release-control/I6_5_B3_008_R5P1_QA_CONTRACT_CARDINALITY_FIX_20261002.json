@@ -1,0 +1,16 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P1_QA_CONTRACT_CARDINALITY_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_RERUN_REQUIRED",
+  "failedRunId": 37046000533,
+  "failedJobId": 110967464968,
+  "classification": "HARNESS_ONLY_FALSE_NEGATIVE",
+  "productRegressionDemonstrated": false,
+  "rootCause": "Contract counted pre-existing Cliente360 detail KPI markers in addition to the four new top-level KPI buttons.",
+  "fix": "Count only class=\"kpi kpi-click\" data-c360-kpi markers.",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "RERUN_FAILED_B3_008_EXACT_PREVIEW"
+}

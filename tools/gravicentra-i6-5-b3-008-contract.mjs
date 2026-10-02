@@ -58,7 +58,7 @@ need(src.cliente.includes("Actualizando pólizas"),'B3_008_CLIENT_LIST_POLICY_FA
 need(src.cliente.includes("ensureDataCollections(['clientes','polizas','asesores','carteraPrimas'])"),'B3_008_CLIENT_LIST_PREWARM_MISSING');
 need(src.cliente.includes('data-c360-list-ready="1"'),'B3_008_CLIENT_LIST_READY_MARKER_MISSING');
 need(src.cliente.includes('data-c360-kpi-scope='),'B3_008_CLIENT360_KPI_COUNTRY_SCOPE_MARKER_MISSING');
-need((src.cliente.match(/data-c360-kpi="/g)||[]).length===4,'B3_008_CLIENT360_ALL_KPIS_NOT_CLICKABLE');
+need((src.cliente.match(/class="kpi kpi-click" data-c360-kpi="/g)||[]).length===4,'B3_008_CLIENT360_ALL_KPIS_NOT_CLICKABLE');
 need(src.index.includes('data/store-firestore-product-readonly-p0.js?v=20261002-b3008r4'),'B3_008_INDEXED_STORE_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/crm-v1198-operational-bridge.js?v=20261002-b3008r4'),'B3_008_CRM_CANONICAL_OWNER_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/policy-receipts-v1199-detail-guard.js?v=20261002-b3008r4'),'B3_008_DETAIL_GUARD_CANONICAL_OWNER_ASSET_BINDING_MISSING');
