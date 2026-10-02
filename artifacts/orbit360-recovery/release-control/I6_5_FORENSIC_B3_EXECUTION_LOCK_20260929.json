@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_008_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+  "status": "B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-008",
     "title": "Dashboard Inicio reality reconciliation closed before B4.",
-    "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
     "boundaries": {
       "businessWritesAuthorized": false,
@@ -23,7 +23,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_008_TARGETED_PAULA_VISUAL",
+    "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
     "scopeAndClosureLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
     "diagnosticScope": "READINESS_HYDRATION_AND_ONLY_NECESSARY_SEMANTIC_CORRECTION",
@@ -79,6 +79,10 @@
     "r5p7": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P7_POLICY_CURRENCY_AND_DEEP_FINANCIAL_AUDIT_ARM_20261002.json",
       "blobSha": "c0d8adc5e30a9e7b462964ef0ccbf24f22c9e760"
+    },
+    "r5p8Diagnostic": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8_RECEIPT_LINEAGE_AND_TARIFF_DIAGNOSTIC_ARM_20261002.json",
+      "blobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a"
     }
   },
   "canonicalComposition": {
@@ -88,10 +92,11 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "ec6ef432a4fd6266cd246ccc904ff46618191a5c"
+    "blobSha": "e1f5ac7f7677fb4a80c5c1f5b358409f96d4a760"
   },
   "nextRequiredProof": [
-    "B3_008_TARGETED_PAULA_VISUAL_ACCEPTANCE"
+    "B3_008_R5P8_READONLY_RECEIPT_LINEAGE_DIAGNOSTIC",
+    "B3_008_R5P8_TARIFF_AUTHORITY_DIAGNOSTIC"
   ],
   "preservedB3CarryForward": [
     "B3-002",
