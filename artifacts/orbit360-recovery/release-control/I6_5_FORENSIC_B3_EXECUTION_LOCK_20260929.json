@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_008_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+  "status": "B3_PASS_PENDING_B4_ENTRY_GUARD",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,8 +14,8 @@
   "activeFinding": {
     "id": "B3-008",
     "title": "Dashboard Inicio reality reconciliation closed before B4.",
-    "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
-    "blocking": true,
+    "status": "CLOSED_PASS",
+    "blocking": false,
     "boundaries": {
       "businessWritesAuthorized": false,
       "configWritesAuthorized": false,
@@ -23,7 +23,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_008_TARGETED_PAULA_VISUAL",
+    "nextAction": "B4_ENTRY_GUARD",
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
     "scopeAndClosureLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
     "diagnosticScope": "READINESS_HYDRATION_AND_ONLY_NECESSARY_SEMANTIC_CORRECTION",
@@ -83,7 +83,9 @@
     "r5p8Diagnostic": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8_RECEIPT_LINEAGE_AND_TARIFF_DIAGNOSTIC_ARM_20261002.json",
       "blobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a"
-    }
+    },
+    "humanVisualAcceptanceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+    "humanVisualAcceptanceReceiptBlobSha": "d501880ac4f5900c6509570d3061c954bcf49145"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -95,7 +97,7 @@
     "blobSha": "710f83df66fa29e5380cf20b026551143add59d9"
   },
   "nextRequiredProof": [
-    "B3_008_TARGETED_PAULA_VISUAL_ACCEPTANCE"
+    "B4_ENTRY_GUARD"
   ],
   "preservedB3CarryForward": [
     "B3-002",
