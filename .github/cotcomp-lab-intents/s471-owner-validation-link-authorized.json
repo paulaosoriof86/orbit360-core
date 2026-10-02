@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "ays-cotcomp-s471-owner-validation-link-intent-v1.0",
+  "authorization": "S471_DEPLOY_OWNER_VALIDATION_LINK",
+  "authorizedSourceParent": "f5f19f8b767b943fad62632882f468866d875c81",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "functionName": "cotcompPilotProposalValidationS471",
+  "ownerSubmissionByAssistant": false,
+  "proposalWrites": false,
+  "comparisonSetWrites": false,
+  "selectionWrites": false,
+  "providerOrRater": false,
+  "production": false,
+  "issuance": false,
+  "binding": false,
+  "payment": false
+}
