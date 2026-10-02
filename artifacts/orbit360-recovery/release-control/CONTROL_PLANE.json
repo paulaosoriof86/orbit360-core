@@ -3190,9 +3190,9 @@
       "livePromoted": false,
       "activeFindingId": "B3-006",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json",
-      "executionLockBlobSha": "bd0afab62d8183374b9aad63e123f7688131c72a",
+      "executionLockBlobSha": "d6fbff4432f8e3325f8fbb0ce111febfe89deeab",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_FIX_20261001.json",
-      "sourceFixReceiptBlobSha": "8b80b9107aca076764037306fa7178b2b4c63e16",
+      "sourceFixReceiptBlobSha": "154b430960a0b247e411df57eb755933070c18ac",
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
@@ -3221,7 +3221,7 @@
       "b3001Status": "PASS",
       "b3001TargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_001_TARGETED_VISUAL_PASS_AND_FINDINGS_20260929.json",
       "b3001TargetedVisualReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
-      "findingLedgerBlobSha": "0b39e95b2f3b77203d379168b9ef05efcfba70cd",
+      "findingLedgerBlobSha": "6729236de92cab583df563e87919b1293df644e1",
       "performanceObservation": "Approx. 10 seconds to enter Cobros on exact B3 Preview.",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CAUSAL_DIAGNOSTIC_20261001.json",
       "diagnosticRunId": 36658190622,
@@ -3435,7 +3435,7 @@
       "provenanceFixReceiptBlobSha": "5ac0ce337999abbec288b3ac5efa738e9aedab60",
       "paymentProvenanceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R6_1_PROVENANCE_CONTRACT_PASS_20260930.json",
       "paymentProvenanceContractReceiptBlobSha": "34f2f5e0aedf6a5a68e4f3c476040349ecf38794",
-      "compositionLockBlobSha": "72706f9fb424c1e1e40510e60333558d42dfc8af",
+      "compositionLockBlobSha": "8200cd20209aafca97797e28e08acca643fdbb37",
       "syntheticQaAuthorization": {
         "status": "AUTHORIZED_FOR_B3_005_PREVIEW_ONLY",
         "scope": "B3-005 exact Preview inference engine proof and one retained synthetic human fixture",
@@ -4632,7 +4632,7 @@
       "r1ReceiptBlobSha": "a7a3758b4519ecdae708a77514161e76df13f7bc",
       "qaBlobs": {
         "tools/gravicentra-i6-5-b3-006-contract.mjs": "16b6c1c379b1ba96b7df1db29f9cfb8e643d2071",
-        "tools/gravicentra-i6-5-b3-006-preview-proof.mjs": "37828b3003cf9e955a90c7359a2c061fce376839",
+        "tools/gravicentra-i6-5-b3-006-preview-proof.mjs": "e5ad05ae396f44d2a89133648a1fe52353a8062c",
         ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "1b4e54329db22c7ab84fc0b3a483b34331bad3e2",
         "tools/gravicentra-i6-control-plane-guard-v1.mjs": "74a499fba8f5611f1959d5ced309a62680fe9815"
       },
@@ -4721,7 +4721,11 @@
       "b3005TargetedVisualReceiptBlobSha": "9458db64710a21f658d7f93329ad3fd7f905b29c",
       "b3005ClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CLOSED_PASS_20261001.json",
       "b3005ClosureReceiptBlobSha": "66e41c3b6de7de6681dea371784a5f1bf0990f2a",
-      "canonicalOwner": "orbit360-platform/core/policy-receipts-engine.js"
+      "canonicalOwner": "orbit360-platform/core/policy-receipts-engine.js",
+      "qaCleanupHardening": {
+        "status": "QA_ONLY_FULL_SYNTHETIC_RESIDUE_READBACK",
+        "productSourceChanged": false
+      }
     }
   },
   "canonicalAccumulationControl": {
@@ -4925,9 +4929,9 @@
     "activeFindingId": "B3-006",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_FIX_20261001.json",
     "sourceFixReceiptBlobSha": "8b80b9107aca076764037306fa7178b2b4c63e16",
-    "compositionLockBlobSha": "72706f9fb424c1e1e40510e60333558d42dfc8af",
-    "findingLedgerBlobSha": "0b39e95b2f3b77203d379168b9ef05efcfba70cd",
-    "executionLockBlobSha": "bd0afab62d8183374b9aad63e123f7688131c72a",
+    "compositionLockBlobSha": "8200cd20209aafca97797e28e08acca643fdbb37",
+    "findingLedgerBlobSha": "6729236de92cab583df563e87919b1293df644e1",
+    "executionLockBlobSha": "d6fbff4432f8e3325f8fbb0ce111febfe89deeab",
     "noLive": true,
     "noReimport": true
   }
