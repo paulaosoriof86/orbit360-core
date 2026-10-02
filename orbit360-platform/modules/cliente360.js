@@ -66,6 +66,15 @@ Orbit.modules.cliente360 = (function () {
   let listWaitingForReady = false;
   let listReadyTimer = null;
   const perfNow = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
+  function dataReadiness(names) {
+    const store = S();
+    if (!store || store.__productReadOnlyP0 !== true || typeof store._productStatus !== 'function') return 'ready';
+    const ps = store._productStatus() || {}, confirmed = [].concat(ps.serverConfirmedCollections || []), denied = [].concat(ps.deniedCollections || []);
+    if (names.some(name => denied.includes(name))) return 'unavailable';
+    return names.every(name => confirmed.includes(name)) ? 'ready' : 'pending';
+  }
+  function ensureDataCollections(names) { try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(names); } catch (_) {} }
+  const DETAIL_DATA_DEPS = ['clientes','polizas','recibosEsperados','carteraPrimas','cobros','comisiones','asesores'];
   function clientListDataReady() {
     const store = S();
     const projectionReady = !!(Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function');
@@ -73,7 +82,7 @@ Orbit.modules.cliente360 = (function () {
     if (!store || store.__productReadOnlyP0 !== true || typeof store._productStatus !== 'function') return true;
     const ps = store._productStatus() || {};
     const confirmed = ps.serverConfirmedCollections || [];
-    return ['clientes','polizas','cobros','asesores'].every(name => confirmed.includes(name));
+    return ['clientes','polizas','asesores'].every(name => confirmed.includes(name));
   }
   function scheduleClientListReadyRender(delay) {
     if (!listWaitingForReady || listReadyTimer) return;
@@ -115,7 +124,7 @@ Orbit.modules.cliente360 = (function () {
   window.addEventListener('orbit:store:emit', event => {
     if (!listWaitingForReady) return;
     const collection = event && event.detail && event.detail.collection;
-    if (!collection || ['*','clientes','polizas','cobros','asesores'].includes(collection)) scheduleClientListReadyRender(0);
+    if (!collection || ['*','clientes','polizas','carteraPrimas','cobros','asesores'].includes(collection)) scheduleClientListReadyRender(0);
   });
   window.addEventListener('orbit:lab:canonical-view-hydrated', () => scheduleClientListReadyRender(0));
 
@@ -125,9 +134,7 @@ Orbit.modules.cliente360 = (function () {
     ensureClientNameCaseStyle();
     const p = (Orbit.route && Orbit.route.params) || {};
     const cid = p.c || null;
-    if (cid && S() && typeof S()._ensureCollections === 'function' && (p.r || p.t === 'recibos' || p.t === 'cobros')) {
-      try { S()._ensureCollections(['clientes','polizas','recibosEsperados','carteraPrimas','cobros']); } catch (e) {}
-    }
+    if (cid) ensureDataCollections(DETAIL_DATA_DEPS);
     if (cid && S().get('clientes', cid)) {
       const requested = S().get('clientes', cid);
       if (requested && String(requested.mergedIntoClientId || '').trim()) {
@@ -167,19 +174,16 @@ Orbit.modules.cliente360 = (function () {
     const renderStartedAt = perfNow();
     const summaryStartedAt = perfNow();
     const batchRunner = Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function' ? Orbit.clientProjection.withReadBatch : null;
-    const listBatch = batchRunner ? batchRunner(['clientes', 'polizas', 'cobros'], source => ({
+    const listBatch = batchRunner ? batchRunner(['clientes', 'polizas'], source => ({
       clientes: source.clientes || [],
-      polizas: source.polizas || [],
-      cobros: source.cobros || []
+      polizas: source.polizas || []
     })) : null;
     const clientesRaw = listBatch ? listBatch.clientes : S().all('clientes');
     const clientes = (clientesRaw || []).filter(c => !(c && (c.fusionado === true || String(c.mergedIntoClientId || '').trim())));
     const policiesForList = listBatch ? listBatch.polizas : S().all('polizas');
-    const collectionsForList = listBatch ? listBatch.cobros : S().all('cobros');
     const asesores = S().all('asesores');
     const advisorById = new Map(asesores.filter(a => a && a.id != null).map(a => [a.id, a]));
     const policyByClient = new Map();
-    const collectionByClient = new Map();
     const addRelated = (map, clientId, row) => {
       if (clientId == null) return;
       let bucket = map.get(clientId);
@@ -187,7 +191,9 @@ Orbit.modules.cliente360 = (function () {
       bucket.push(row);
     };
     policiesForList.forEach(p => { if (p) addRelated(policyByClient, p.clienteId, p); });
-    collectionsForList.forEach(c => { if (c) addRelated(collectionByClient, c.clienteId, c); });
+    const portfolioReadiness = dataReadiness(['carteraPrimas']);
+    if (portfolioReadiness === 'pending') ensureDataCollections(['carteraPrimas']);
+    const canonicalSummaryIndex = portfolioReadiness === 'ready' && q.clientesResumenIndex ? q.clientesResumenIndex() : null;
     const summaryCacheMs = perfNow() - summaryStartedAt;
     const rows = clientes.filter(c =>
       (!f.q || (c.nombre + ' ' + c.email + ' ' + c.identificacion).toLowerCase().includes(f.q.toLowerCase())) &&
@@ -203,17 +209,10 @@ Orbit.modules.cliente360 = (function () {
     const visibleRows = rows.slice(pageStart, pageStart + LIST_PAGE_SIZE);
     const resumenDe = c => {
       const pol = policyByClient.get(c.id) || [];
-      const cob = collectionByClient.get(c.id) || [];
       const vigentes = pol.filter(esRenovable);
       const primaAnual = vigentes.reduce((s, p) => s + (policyTotal(p) || 0), 0);
-      const pendiente = cob.filter(x => x.estado === 'Pendiente').reduce((s, x) => s + (U.finiteNumber(x.monto) || 0), 0);
-      const vencido = cob.filter(x => x.estado === 'Vencido').reduce((s, x) => s + (U.finiteNumber(x.monto) || 0), 0);
-      let salud = 70;
-      salud += Math.min(20, vigentes.length * 6);
-      salud -= vencido > 0 ? 25 : 0;
-      salud += c && c.segmento === 'Premium' ? 8 : 0;
-      salud = Math.max(8, Math.min(100, salud));
-      return { moneda: c ? c.moneda : 'GTQ', nPolizas: pol.length, nVigentes: vigentes.length, primaAnual, pendiente, vencido, salud };
+      const canonical = canonicalSummaryIndex && canonicalSummaryIndex.get(c.id);
+      return canonical || { moneda: c ? c.moneda : 'GTQ', nPolizas: pol.length, nVigentes: vigentes.length, primaAnual, pendiente: null, vencido: null, salud: null, readiness: portfolioReadiness };
     };
     const summaryAggregateStartedAt = perfNow();
     const clientById = new Map(clientes.filter(c => c && c.id != null).map(c => [c.id, c]));
@@ -241,7 +240,13 @@ Orbit.modules.cliente360 = (function () {
     const rowsHtml = visibleRows.map(c => {
             const r = resumenDe(c);
             const ase = advisorById.get(c.asesorId) || null;
-            const cartera = r.vencido > 0 ? `<span class="badge danger">Vencida ${U.moneyShort(r.vencido, r.moneda)}</span>` : r.pendiente > 0 ? `<span class="badge warn">Al día</span>` : `<span class="badge ok">Al día</span>`;
+            const financialReady = r.salud != null && r.vencido != null;
+            const cartera = !financialReady
+              ? `<span class="badge neutral" data-c360-list-portfolio-readiness="${portfolioReadiness}">${portfolioReadiness === 'unavailable' ? 'No disponible' : 'Actualizando datos'}</span>`
+              : r.vencido > 0 ? `<span class="badge danger">Vencida ${U.moneyShort(r.vencido, r.moneda)}</span>` : r.pendiente > 0 ? `<span class="badge warn">Al día</span>` : `<span class="badge ok">Al día</span>`;
+            const salud = financialReady
+              ? `<div data-c360-list-health="1" data-readiness="ready" data-value="${r.salud}" style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:54px"><i style="width:${r.salud}%;background:${r.salud >= 70 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : r.salud >= 45 ? 'linear-gradient(90deg,#c9821b,#e0a23c)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div><span class="mono" style="font-size:12px">${r.salud}</span></div>`
+              : `<span class="muted" data-c360-list-health="1" data-readiness="${portfolioReadiness}">${portfolioReadiness === 'unavailable' ? 'No disponible' : 'Calculando'}</span>`;
             return `<tr class="clickable" onclick="location.hash='#/cliente360?c=${c.id}'">
               <td><div style="display:flex;align-items:center;gap:11px">
                 ${U.avatar(c.nombre, c.tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'md')}
@@ -252,7 +257,7 @@ Orbit.modules.cliente360 = (function () {
               <td class="num">${r.nVigentes}<span class="muted">/${r.nPolizas}</span></td>
               <td class="num">${U.money(r.primaAnual, r.moneda)}</td>
               <td>${cartera}</td>
-              <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:54px"><i style="width:${r.salud}%;background:${r.salud >= 70 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : r.salud >= 45 ? 'linear-gradient(90deg,#c9821b,#e0a23c)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div><span class="mono" style="font-size:12px">${r.salud}</span></div></td>
+              <td>${salud}</td>
               <td style="text-align:right;color:var(--ink-3)">›</td>
             </tr>`;
           }).join('');
@@ -320,7 +325,7 @@ Orbit.modules.cliente360 = (function () {
     OrbitRuntimeDiagnostics.cliente360 = Object.assign({}, OrbitRuntimeDiagnostics.cliente360 || {}, {
       version: '20260817.2-bounded-first-paint',
       renderMs: totalMs,
-      list: { bounded: true, batchRead: !!listBatch, firstPaintSummaryRows: visibleRows.length, firstPaintCommissionRows: 0, firstPaintPolicyRows: policiesForList.length, firstPaintCollectionRows: collectionsForList.length, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
+      list: { bounded: true, batchRead: !!listBatch, firstPaintSummaryRows: visibleRows.length, firstPaintCommissionRows: 0, firstPaintPolicyRows: policiesForList.length, firstPaintCollectionRows: portfolioReadiness === 'ready' ? (S().all('carteraPrimas') || []).length : 0, portfolioReadiness, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
     });
   }
 
@@ -351,7 +356,12 @@ Orbit.modules.cliente360 = (function () {
       ['resumen', 'Resumen', '📊'], ['polizas', 'Pólizas', '📑'], ['vehiculos', 'Vehículos', '🚗'], ['cobros', 'Cobros', '💳'],
       ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['documentos', 'Documentos', '📎'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']
     ];
-    const saludCol = r.salud >= 70 ? '#1f8a4c' : r.salud >= 45 ? '#c9821b' : '#C5162E';
+    const policyReadiness = dataReadiness(['clientes','polizas']);
+    const healthReadiness = dataReadiness(['clientes','polizas','carteraPrimas']);
+    const paymentReadiness = dataReadiness(['clientes','cobros']);
+    const commissionReadiness = dataReadiness(['clientes','comisiones']);
+    const healthReady = healthReadiness === 'ready';
+    const saludCol = healthReady ? (r.salud >= 70 ? '#1f8a4c' : r.salud >= 45 ? '#c9821b' : '#C5162E') : 'var(--ink-3)';
     const waNum = (c.telefono || '').replace(/[^0-9]/g, '');
     const waMsg = encodeURIComponent('Hola ' + c.nombre.split(' ')[0] + ', te saluda tu asesor.');
 
@@ -395,12 +405,9 @@ Orbit.modules.cliente360 = (function () {
           </div>
           <!-- salud + acciones -->
           <div style="text-align:center;min-width:130px">
-            <div class="fh-salud" style="background:conic-gradient(${saludCol} ${r.salud * 3.6}deg, #ececec ${r.salud * 3.6}deg)">
-              <div class="fh-salud-in">
-                <div style="font-family:var(--f-display);font-weight:800;font-size:27px;color:${saludCol}">${r.salud}</div>
-                <div style="font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em">Salud</div>
-              </div>
-            </div>
+            ${healthReady
+              ? `<div class="fh-salud" data-c360-health="1" data-readiness="ready" data-value="${r.salud}" style="background:conic-gradient(${saludCol} ${r.salud * 3.6}deg, #ececec ${r.salud * 3.6}deg)"><div class="fh-salud-in"><div style="font-family:var(--f-display);font-weight:800;font-size:27px;color:${saludCol}">${r.salud}</div><div style="font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em">Salud</div></div></div>`
+              : `<div class="fh-salud" data-c360-health="1" data-readiness="${healthReadiness}" style="background:var(--surface)"><div class="fh-salud-in"><div style="font-family:var(--f-display);font-weight:700;font-size:12px;color:var(--ink-3)">${healthReadiness === 'unavailable' ? 'No disponible' : 'Calculando'}</div><div style="font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em">Salud</div></div></div>`}
             <div style="display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap">
               <a class="btn ghost sm" title="Enviar WhatsApp" href="https://wa.me/${waNum}?text=${waMsg}" target="_blank" rel="noopener" style="color:#1f8a4c">💬 WA</a>
               <button class="btn ghost sm" title="Redactar correo (se asocia al cliente)" onclick="window.__orbitCompose={para:'${U.esc(c.email || '')}',asunto:'',cuerpo:'',clienteId:'${cid}',vinculo:{tipo:'cliente',id:'${cid}',label:'${U.esc(c.nombre)}'}};location.hash='#/correo'" style="color:#2563a8">✉ Correo</button>
@@ -413,11 +420,11 @@ Orbit.modules.cliente360 = (function () {
 
         <!-- KPI band -->
         <div class="fh-kpis">
-          ${kpiCell('Pólizas vigentes', r.nVigentes + ' <small>/ ' + r.nPolizas + '</small>', '', '📑')}
-          ${kpiCell('Prima anual', U.money(r.primaAnual, r.moneda), '', '💰')}
-          ${kpiCell('Cartera al día', U.money(r.cobrado, r.moneda), 'ok', '✅')}
-          ${kpiCell('Cartera vencida', U.money(r.vencido, r.moneda), r.vencido > 0 ? 'danger' : '', '⚠')}
-          ${kpiCell('Comisión generada', U.money(r.comisionGen, r.moneda), '', '💼')}
+          ${kpiMetricCell('Pólizas vigentes', r.nVigentes + ' <small>/ ' + r.nPolizas + '</small>', '', '📑', policyReadiness)}
+          ${kpiMetricCell('Prima anual', U.money(r.primaAnual, r.moneda), '', '💰', policyReadiness)}
+          ${kpiMetricCell('Cartera al día', U.money(r.cobrado, r.moneda), 'ok', '✅', paymentReadiness)}
+          ${kpiMetricCell('Cartera vencida', U.money(r.vencido, r.moneda), r.vencido > 0 ? 'danger' : '', '⚠', healthReadiness)}
+          ${kpiMetricCell('Comisión generada', U.money(r.comisionGen, r.moneda), '', '💼', commissionReadiness)}
         </div>
       </div>
 
@@ -461,16 +468,26 @@ Orbit.modules.cliente360 = (function () {
     setTimeout(upd, 30);
   }
 
-  function kpiCell(label, val, tone, icon) {
+  function kpiCell(label, val, tone, icon, readiness) {
     const col = tone === 'ok' ? 'var(--ok)' : tone === 'danger' ? 'var(--danger)' : 'var(--ink)';
     const ac = tone === 'ok' ? 'var(--ok)' : tone === 'danger' ? 'var(--danger)' : 'var(--red)';
-    return `<div class="fh-kpi"><span class="fh-kpi-ac" style="background:${ac}"></span>
+    return `<div class="fh-kpi" data-c360-kpi="${U.esc(label)}" data-readiness="${readiness || 'ready'}"><span class="fh-kpi-ac" style="background:${ac}"></span>
       <div class="fh-kpi-lab">${icon ? `<span>${icon}</span>` : ''}${label}</div>
       <div class="fh-kpi-val" style="color:${col}">${val}</div></div>`;
+  }
+  function kpiMetricCell(label, val, tone, icon, readiness) {
+    if (readiness === 'ready') return kpiCell(label, val, tone, icon, 'ready');
+    const state = readiness === 'unavailable' ? 'No disponible' : 'Actualizando datos';
+    return `<div class="fh-kpi" data-c360-kpi="${U.esc(label)}" data-readiness="${readiness}"><span class="fh-kpi-ac" style="background:var(--line)"></span><div class="fh-kpi-lab">${icon ? `<span>${icon}</span>` : ''}${label}</div><div class="fh-kpi-val muted" style="font-size:13px">${state}</div></div>`;
   }
 
   function renderTab(cid, r) {
     const body = document.getElementById('c360-body');
+    const coreFinancialReadiness = dataReadiness(['clientes','polizas','carteraPrimas','cobros']);
+    if ((tab === 'resumen' || tab === 'cobros') && coreFinancialReadiness !== 'ready') {
+      body.innerHTML = `<div class="card pad" data-c360-financial-pending="1" data-readiness="${coreFinancialReadiness}"><b>${coreFinancialReadiness === 'unavailable' ? 'Información no disponible para este acceso' : 'Actualizando datos…'}</b><div class="muted" style="margin-top:5px">Estamos confirmando pólizas, cartera y pagos antes de mostrar un resultado definitivo.</div></div>`;
+      return;
+    }
     if (tab === 'resumen') body.innerHTML = tabResumen(cid, r);
     else if (tab === 'polizas') body.innerHTML = tabPolizas(cid, r);
     else if (tab === 'vehiculos') body.innerHTML = tabVehiculos(cid, r);
@@ -500,7 +517,7 @@ Orbit.modules.cliente360 = (function () {
   function tabResumen(cid, r) {
     const acts = q.actividadesDe(cid).slice(0, 4);
     const proxRenov = r.pol.filter(p => p.estado === 'Por renovar').sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')))[0];
-    const proxCobro = r.cob.filter(c => c.estado === 'Pendiente').sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')))[0];
+    const proxCobro = (q.carteraPendienteDe ? q.carteraPendienteDe(cid) : []).sort((a, b) => String(a.vence||a.fechaVencimiento||a.fechaLimite||'').localeCompare(String(b.vence||b.fechaVencimiento||b.fechaLimite||'')))[0];
     // distribución por ramo
     const porRamo = {};
     r.pol.filter(esRenovable).forEach(p => porRamo[p.ramo] = (porRamo[p.ramo] || 0) + (policyTotal(p) || 0));
@@ -514,7 +531,7 @@ Orbit.modules.cliente360 = (function () {
           <b style="font-family:var(--f-display);font-size:15px">Próximas acciones</b>
           <div style="margin-top:12px;display:grid;gap:10px">
             ${proxRenov ? actionRow('🔄', 'Renovación', `${proxRenov.ramo} · ${proxRenov.numero}`, U.fmtDate(proxRenov.vigenciaFin), 'warn') : actionRow('✓', 'Sin renovaciones próximas', 'Cartera al día', '', 'ok')}
-            ${proxCobro ? actionRow('💳', 'Próximo cobro', `Cuota ${proxCobro.cuota} · ${U.money(proxCobro.monto, proxCobro.moneda)}`, U.fmtDate(proxCobro.vence), 'info') : actionRow('✓', 'Sin cobros pendientes', 'Cartera al día', '', 'ok')}
+            ${proxCobro ? actionRow('💳', 'Próxima cuota', `Cuota ${proxCobro.cuota || proxCobro.secuencia || '—'} · ${U.money(proxCobro.monto != null ? proxCobro.monto : proxCobro.saldo, proxCobro.moneda)}`, U.fmtDate(proxCobro.vence || proxCobro.fechaVencimiento || proxCobro.fechaLimite), 'info') : actionRow('✓', 'Sin cuotas pendientes', 'Cartera al día', '', 'ok')}
             ${r.vencido > 0 ? actionRow('⚠', 'Cartera vencida', U.money(r.vencido, r.moneda) + ' por gestionar', 'urgente', 'danger') : ''}
           </div>
         </div>
