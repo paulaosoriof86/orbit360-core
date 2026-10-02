@@ -13,13 +13,18 @@ const paths={
   polizas:'orbit360-platform/modules/polizas.js',
   router:'orbit360-platform/core/router.js',
   store:'orbit360-platform/data/store-firestore-product-readonly-p0.js',
+  crm:'orbit360-platform/modules/crm-v1198-operational-bridge.js',
+  detailGuard:'orbit360-platform/modules/policy-receipts-v1199-detail-guard.js',
   index:'orbit360-platform/index.html'
 };
 const src=Object.fromEntries(Object.entries(paths).map(([k,p])=>[k,read(p)]));
 const composition=JSON.parse(read('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json'));
 const control=JSON.parse(read('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));
 
-for(const k of ['queries','cliente','inicio','cobros','polizas','router','store']) new Function(src[k]);
+for(const k of ['queries','cliente','inicio','cobros','polizas','router','store','crm','detailGuard']) new Function(src[k]);
+need(src.crm.includes("crmBridgeMode: 'permission-only'"),'B3_008_CRM_BRIDGE_SECOND_KPI_WRITER_PRESENT');
+need(src.detailGuard.includes('delegatedToCanonicalQueries: true'),'B3_008_DETAIL_GUARD_SECOND_SUMMARY_WRITER_PRESENT');
+need(!src.detailGuard.includes("q.clienteResumen = function"),'B3_008_DETAIL_GUARD_OVERRIDES_CANONICAL_SUMMARY');
 need(src.store.includes('function buildRelationIndexes()'),'B3_008_RELATION_INDEX_OWNER_MISSING');
 need(src.store.includes('indexedRelationConstraintMatches'),'B3_008_RELATION_FILTER_STILL_LINEAR_LOOKUP');
 
@@ -47,6 +52,8 @@ need(src.cliente.includes("Actualizando pólizas"),'B3_008_CLIENT_LIST_POLICY_FA
 need(src.cliente.includes("ensureDataCollections(['clientes','polizas','asesores','carteraPrimas'])"),'B3_008_CLIENT_LIST_PREWARM_MISSING');
 need(src.cliente.includes('data-c360-list-ready="1"'),'B3_008_CLIENT_LIST_READY_MARKER_MISSING');
 need(src.index.includes('data/store-firestore-product-readonly-p0.js?v=20261002-b3008r4'),'B3_008_INDEXED_STORE_ASSET_BINDING_MISSING');
+need(src.index.includes('modules/crm-v1198-operational-bridge.js?v=20261002-b3008r4'),'B3_008_CRM_CANONICAL_OWNER_ASSET_BINDING_MISSING');
+need(src.index.includes('modules/policy-receipts-v1199-detail-guard.js?v=20261002-b3008r4'),'B3_008_DETAIL_GUARD_CANONICAL_OWNER_ASSET_BINDING_MISSING');
 
 need(src.cobros.includes("const CORE_HYDRATION_DEPS = ['cobros', 'clientes', 'polizas']"),'B3_008_COBROS_CORE_PROGRESSIVE_HYDRATION_MISSING');
 need(src.cobros.includes("const FINANCIAL_HYDRATION_DEPS = ['recibosEsperados', 'carteraPrimas']"),'B3_008_COBROS_FINANCIAL_DEPS_MISSING');
@@ -58,7 +65,7 @@ need(src.polizas.includes("const all = q.polizasScoped ? q.polizasScoped()"),'B3
 need(src.polizas.includes("st.fkind === 'active' ? isActivePolicy(p)"),'B3_008_POLIZAS_ACTIVE_KPI_FILTER_MISMATCH');
 need(src.polizas.includes("label: 'Pólizas activas'"),'B3_008_POLIZAS_ACTIVE_LABEL_MISSING');
 
-for(const p of [paths.queries,paths.cliente,paths.inicio,paths.cobros,paths.polizas,paths.store,paths.index]){
+for(const p of [paths.queries,paths.cliente,paths.inicio,paths.cobros,paths.polizas,paths.store,paths.crm,paths.detailGuard,paths.index]){
   need(composition.productFileBlobs?.[p]===git('hash-object',p),'B3_008_COMPOSITION_BLOB_DRIFT:'+p);
 }
 need(control.currentB3?.status==='B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW','B3_008_CONTROL_STATUS_INVALID');

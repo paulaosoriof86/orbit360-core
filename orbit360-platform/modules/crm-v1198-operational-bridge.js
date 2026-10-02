@@ -113,6 +113,20 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
 
   function enhanceClientList(host) {
     if (!host || routeParams().c) return;
+    // B3-008: Cliente360 base is the canonical KPI/read-model owner.
+    // This bridge only enforces action/scope affordances on the canonical list.
+    if (host.querySelector('[data-c360-list-ready="1"]')) {
+      const newButton = Array.from(host.querySelectorAll('button')).find(b => /Nuevo cliente/i.test(b.textContent || ''));
+      if (newButton && !A.can('cliente360', 'create')) newButton.remove();
+      const advisorFilter = host.querySelector('#f-ase');
+      if (advisorFilter && A.dataScope('cliente360') === 'own') advisorFilter.remove();
+      window.OrbitRuntimeDiagnostics = window.OrbitRuntimeDiagnostics || {};
+      OrbitRuntimeDiagnostics.cliente360 = Object.assign({}, OrbitRuntimeDiagnostics.cliente360 || {}, {
+        crmBridgeMode: 'permission-only',
+        crmBridgeCanonicalKpiOwner: true
+      });
+      return;
+    }
     const scopedClients = scopedRows('clientes', 'cliente360');
     const scopedPolicies = scopedRows('polizas', 'cliente360');
     const policyClientIds = new Set(scopedPolicies.map(p => String(p && p.clienteId || '')).filter(Boolean));

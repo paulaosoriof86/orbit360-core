@@ -155,37 +155,17 @@ Orbit.modules = Orbit.modules || {};
 
   const q = Orbit.q || {};
   const originalClientSummary = typeof q.clienteResumen === 'function' ? q.clienteResumen.bind(q) : null;
+  // B3-008: core/queries.js owns canonical Cliente360 financial semantics.
+  // This visual/detail guard must not replace cartera/receipt-aware summary logic
+  // with its legacy cobros-only summary.
   if (originalClientSummary && !q.__clientSummaryV1199c) {
-    q.clienteResumen = function (clientId) {
-      if (summaries.has(clientId)) return summaries.get(clientId);
-      const I = idx();
-      const rawCli = (I.clientsById && I.clientsById.get(clientId)) || S().get('clientes', clientId);
-      const cli = rawCli && Orbit.clientProjection && typeof Orbit.clientProjection.project === 'function' ? Orbit.clientProjection.project(rawCli) : rawCli;
-      const pol = (I.policiesByClient && I.policiesByClient.get(clientId)) || [];
-      const cob = (I.cobrosByClient && I.cobrosByClient.get(clientId)) || [];
-      const com = (I.comisionesByClient && I.comisionesByClient.get(clientId)) || [];
-      const vigentes = pol.filter(activePolicy);
-      const primaNetaAnual = vigentes.reduce((sum, p) => sum + (numberOrNull(p.primaNeta) || 0), 0);
-      const primaTotalAnual = vigentes.reduce((sum, p) => sum + (numberOrNull(first(p.primaTotal, p.prima)) || 0), 0);
-      const sumState = state => cob.filter(c => c.estado === state).reduce((sum, c) => sum + (numberOrNull(first(c.monto, c.montoTotal, c.total)) || 0), 0);
-      const cobrado = sumState('Pagado'), pendiente = sumState('Pendiente'), vencido = sumState('Vencido');
-      const comisionGen = com.reduce((sum, c) => sum + (numberOrNull(c.monto) || 0), 0);
-      let salud = 70 + Math.min(20, vigentes.length * 6) - (vencido > 0 ? 25 : 0) + (cli && cli.segmento === 'Premium' ? 8 : 0);
-      salud = Math.max(8, Math.min(100, salud));
-      const out = { cli, pol, cob, com, moneda: cli ? cli.moneda : 'GTQ', nPolizas: pol.length, nVigentes: vigentes.length, primaAnual:primaTotalAnual, primaNetaAnual, primaTotalAnual, cobrado, pendiente, vencido, comisionGen, porRenovar: pol.filter(p => p.estado === 'Por renovar').length, salud };
-      summaries.set(clientId, out);
-      return out;
+    q.__clientSummaryV1199c = {
+      original: originalClientSummary,
+      indexed: typeof q.clientesResumenIndex === 'function',
+      indexedAll: typeof q.clientesResumenIndex === 'function',
+      delegatedToCanonicalQueries: true,
+      secondWriter: false
     };
-    q.clientesResumenIndex = function () {
-      const I = idx();
-      const clients = (I && I.clients) || [];
-      clients.forEach(rawCli => {
-        const clientId = rawCli && rawCli.id;
-        if (clientId && !summaries.has(clientId)) q.clienteResumen(clientId);
-      });
-      return new Map(summaries);
-    };
-    q.__clientSummaryV1199c = { original: originalClientSummary, indexed: true, indexedAll: true };
   }
 
   function section(title, body, cls) {

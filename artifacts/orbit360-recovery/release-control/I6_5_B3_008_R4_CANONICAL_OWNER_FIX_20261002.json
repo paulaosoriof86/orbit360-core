@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R4_V1",
+  "recordedAt": "2026-10-02",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-008",
+  "parentHead": "94629b071719fb52f060ea024a429c07bc4a47b7",
+  "failedRunId": 37033967229,
+  "classification": "PRODUCT_COMPOSITION_DEFECT_CONFIRMED",
+  "evidence": {
+    "canonicalRenderMs": 54.8,
+    "wallClockMs": 15503,
+    "rows": 40,
+    "totalClients": 439,
+    "pageErrors": 0,
+    "consoleErrors": 0
+  },
+  "rootCause": "Cliente360 had duplicate post-render KPI/summary ownership outside the canonical module/query owner.",
+  "fix": [
+    "crm-v1198 becomes permission-only on the canonical Cliente360 list",
+    "policy-receipts detail guard delegates Cliente360 summaries to core queries",
+    "asset keys bumped",
+    "contract rejects second writers"
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/crm-v1198-operational-bridge.js": "0ec76280098c2f47982779fbd8d3a220745ea912",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "6f335e6b08c2d26b4ad21f53e225b0f132a9089d",
+    "orbit360-platform/index.html": "84f84b20d64a4eb92a3bf19de52d2de7f8d27f10"
+  },
+  "qaBlob": "c418ccde4e8238c77271e6203beb030c7165779f",
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW"
+}
