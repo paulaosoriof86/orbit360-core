@@ -1,0 +1,64 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_001_MINIMAL_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-001",
+  "parentCertifiedB3SourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+  "sourceHeadBeforeGovernanceSeal": "459612c14995f98d0c6d964272ad525f69fca0b1",
+  "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC_20261002.json",
+  "diagnosticReceiptBlobSha": "dfb8aa09cbdc6bcc09c6555854a0e135e4bd1700",
+  "scopeAmendmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_SOURCE_SCOPE_AMENDMENT_20261002.json",
+  "scopeAmendmentBlobSha": "275757f4e4f19a615e04c2ad769b864213bc6a67",
+  "productFiles": [
+    {
+      "path": "orbit360-platform/core/ciclo.js",
+      "blobSha": "b78f93b1640f444db90da0f4d73ccf098ac0ea8d"
+    },
+    {
+      "path": "orbit360-platform/modules/portal.js",
+      "blobSha": "957cefe0647bff2b350e5b3f0f78ef7a9e97703f"
+    },
+    {
+      "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "blobSha": "f24b1ad6a083273929b032fe4b84d15cd7a2a74e"
+    },
+    {
+      "path": "orbit360-platform/index.html",
+      "blobSha": "030e5c7c35b4624d2ced050b6cb3c6d9cc8515b8"
+    }
+  ],
+  "qaFiles": [
+    {
+      "path": "tools/gravicentra-i6-5-b4-001-contract.mjs",
+      "blobSha": "b7bcba6871a1dbc12103dabad528886e54990bc6"
+    },
+    {
+      "path": "tools/gravicentra-i6-5-b4-001-preview-proof.mjs",
+      "blobSha": "bffa0af3f36169df5b07d55af58242572931d41b"
+    },
+    {
+      "path": ".github/workflows/gravicentra-b4-001-executor.yml",
+      "blobSha": "d3831cf8b190b617c7781a42a9e11a3202e6b64f"
+    }
+  ],
+  "changes": [
+    "Portal-origin management inserts now select the canonical portal_request server operation.",
+    "Portal request UI awaits canonical management readback before success and uses durable activity writes.",
+    "Ops/Leads business stage, close, archive, checklist, comments and save actions await durable server commit/readback.",
+    "Management checklist/resolution/reopen/archive actions await durable commit before downstream success behavior.",
+    "New business/lead creation is durable and the hardcoded ase001 advisor fallback is removed.",
+    "Canonical index asset identities were advanced for the three changed browser owners."
+  ],
+  "backendSourceChanged": false,
+  "dataMigration": false,
+  "reimport": false,
+  "livePromotion": false,
+  "operationalBusinessWrites": 0,
+  "syntheticQaAuthorization": {
+    "status": "AUTHORIZED_FOR_B4_001_PREVIEW_ONLY",
+    "scope": "Three exact gestiones fixtures (Ops, Cliente360, Portal) plus idempotency/fail-closed check and complete cleanup.",
+    "realBusinessWritesForbidden": true,
+    "cleanupRequired": true
+  },
+  "nextAction": "B4_001_CONTRACT_AND_EXACT_PREVIEW"
+}
