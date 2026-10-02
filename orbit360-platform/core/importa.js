@@ -309,18 +309,9 @@ Orbit.importa = (function () {
         }
         delete rec.clienteNombre; delete rec.aseguradoraNombre; return rec;
       },
-      /* MIGRACIÓN: recibos SOLO si la póliza es Vigente/Por renovar, con país+moneda+forma de pago
-         confiables y sin marca de validación. Cualquier ambigüedad → sin cartera (P0-04). */
-      afterInsert(rec) {
-        if (!Orbit.primas || !rec.clienteId) return;
-        const confiable = (rec.estado === 'Vigente' || rec.estado === 'Por renovar') && rec.pais && rec.moneda && rec.formaPago && !rec.requiereValidacion && rec.primaNeta > 0;
-        if (!confiable) return; // histórico / incompleto: sin recibos en cartera
-        const frac = Orbit.primas.cuotasDe(rec.frecuencia) > 1;
-        const d = Orbit.primas.desglose(rec.primaNeta, rec.pais, { fraccionado: frac });
-        Orbit.primas.recibos(d, { frecuencia: rec.frecuencia, vigenciaInicio: rec.vigenciaIni || (Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10)), comAseguradoraPct: rec.comAseguradoraPct, comVendedorPct: rec.comVendedorPct }).forEach((r, i) => {
-          Orbit.store.insert('cobros', { id: 'cob_imp_' + rec.id + '_' + i, polizaId: rec.id, clienteId: rec.clienteId, asesorId: rec.asesorId, cuota: r.n, monto: r.total, moneda: rec.moneda, neta: r.neta, gastosEmision: r.gastosEmision, gastosFinan: r.gastosFinan, otros: r.otros, iva: r.iva, comAseguradora: r.comAseguradora, comVendedor: r.comVendedor, vence: r.vence, fechaLimite: r.fechaLimite, fechaPago: null, estado: 'Pendiente', metodo: null, conducto: rec.formaPago, conciliado: false, importado: true });
-        });
-      }
+      /* B3-006: la importación de pólizas NO crea cobros. El plan de recibos/cartera
+         pertenece al owner canónico Orbit.policyReceipts y se persiste atómicamente. */
+      afterInsert() { return; }
     },
     'vehiculos': {
       coll: 'vehiculos', label: 'Vehículos', dedup: ['placa'],
@@ -604,7 +595,57 @@ Orbit.importa = (function () {
     const rows = (p.rows.length ? p.rows.slice(0, 8) : [['(no se detectó estructura tabular en el archivo)']]);
     return { cols, rows, total: p.rows.length, mapped: 0, totalCols: p.headers.length, raw: true };
   }
-  function applyImport(kind) {
+  function canonicalPolicyImportPayload(rec) {
+    const out = Object.assign({}, rec || {});
+    out.vigenciaInicio = out.vigenciaInicio || out.vigenciaIni || '';
+    if (out.gastosEmision == null && out.gastos != null) out.gastosEmision = out.gastos;
+    out.conducto = out.conducto || out.formaPago || '';
+    out.fuente = 'importacion_poliza_controlada';
+    out.importado = true;
+    delete out.vigenciaIni;
+    delete out.gastos;
+    delete out._row;
+    delete out._sheet;
+    delete out._source;
+    return out;
+  }
+
+  async function applyPolicyImport(cfg, idx) {
+    const engine = Orbit.policyReceipts;
+    if (!engine || typeof engine.createPolicy !== 'function' || typeof engine.updatePolicy !== 'function') {
+      throw new Error('IMPORT_POLICY_CANONICAL_OWNER_UNAVAILABLE');
+    }
+    let created = 0, updated = 0, rejected = 0;
+    const errors = [];
+    for (let ri = 0; ri < state.parsed.rows.length; ri += 1) {
+      const cells = state.parsed.rows[ri], rec = {};
+      Object.keys(idx).forEach(f => { const v = cells[idx[f]]; if (v != null && v !== '') rec[f] = v; });
+      copyRowMeta(cells, rec);
+      if (!Object.keys(rec).length) continue;
+      if (cfg.build) cfg.build(rec);
+      if (rec._excluir) continue;
+      const payload = canonicalPolicyImportPayload(rec);
+      const existing = payload.numero ? Orbit.store.all('polizas').find(row => norm(row.numero) === norm(payload.numero)) : null;
+      const reason = 'Importación controlada de póliza';
+      let result;
+      try {
+        result = existing
+          ? await engine.updatePolicy(existing.id, payload, { motivo: reason })
+          : await engine.createPolicy(payload, { motivo: reason });
+      } catch (error) {
+        result = { ok: false, errors: [String(error && (error.code || error.message) || error)] };
+      }
+      if (!result || result.ok !== true || result.atomicServerCommit !== true) {
+        rejected += 1;
+        errors.push({ row: ri + 1, numero: payload.numero || '', errors: [].concat(result && result.errors || ['importacion_no_confirmada']) });
+        continue;
+      }
+      if (existing) updated += 1; else created += 1;
+    }
+    return { created, updated, rejected, errors, canonicalOwner: 'Orbit.policyReceipts', atomic: true };
+  }
+
+  async function applyImport(kind) {
     const cfg = IMPORT_MAP[kind]; if (!cfg || !state.parsed) return { created: 0, updated: 0 };
     // P0-04/P1-03: 'documentos' NUNCA modifica clientes directo. Genera un PARCHE PENDIENTE con diff.
     if (kind === 'documentos' || cfg.docPatch) {
@@ -628,6 +669,7 @@ Orbit.importa = (function () {
     // Guarda de alcance: una fuente NUNCA escribe fuera de su colección declarada (Prioridad 2).
     if (!scopeGuard(kind, cfg.coll)) { impToast('⛔ Bloqueado por alcance: esta fuente no puede crear ' + cfg.coll); return { created: 0, updated: 0 }; }
     const idx = mapHeaders(kind, state.parsed.headers); if (!Object.keys(idx).length) return { created: 0, updated: 0 };
+    if (kind === 'polizas') return await applyPolicyImport(cfg, idx);
     // Modo expediente: completar el cliente abierto (no crear uno nuevo)
     if (cfg.scopedUpdate && state.scope && state.scope.cid) {
       const cells = state.parsed.rows[0] || [];
@@ -764,7 +806,7 @@ Orbit.importa = (function () {
      defensiva en applyImport (una fuente nunca escribe fuera de su alcance). */
   const SCOPE = {
     'clientes': { crea: ['clientes'], label: ['Clientes'], no: ['Pólizas', 'Cobros / cartera', 'Finanzas'] },
-    'polizas': { crea: ['polizas', 'cobros'], label: ['Pólizas', 'Recibos SOLO si vigente/por renovar con forma de pago'], no: ['Clientes nuevos por inferencia', 'Cartera de pólizas canceladas/vencidas'] },
+    'polizas': { crea: ['polizas', 'recibosEsperados', 'carteraPrimas'], label: ['Pólizas', 'Recibos esperados', 'Cartera de primas'], no: ['Clientes nuevos por inferencia', 'Cobros confirmados sin evidencia', 'Cartera de pólizas canceladas/vencidas'] },
     'vehiculos': { crea: ['vehiculos'], label: ['Vehículos'], no: ['Clientes', 'Pólizas'] },
     'estados-cuenta': { crea: ['cobros'], label: ['Recibos / cobros + conciliación'], no: ['Pólizas', 'Clientes'] },
     'planillas-comision': { crea: ['comisiones'], label: ['Comisiones + conciliación'], no: ['Clientes', 'Pólizas', 'Cobros'] },
@@ -1301,8 +1343,8 @@ Orbit.importa = (function () {
         const r = applyConciliacion(kind);
         msg += (msg ? ' · ' : '✓ ') + 'Conciliación: ' + r.creados + ' referencias creadas · ' + r.propuestas + ' propuestas para revisión';
       } else if (state.parsed && state.modo !== 'documental' && IMPORT_MAP[kind]) {
-        const r = applyImport(kind);
-        msg += (msg ? ' · ' : '✓ ') + r.created + ' creados · ' + r.updated + ' actualizados en ' + IMPORT_MAP[kind].label;
+        const r = await applyImport(kind);
+        msg += (msg ? ' · ' : '✓ ') + r.created + ' creados · ' + r.updated + ' actualizados en ' + IMPORT_MAP[kind].label + (r.rejected ? ' · ' + r.rejected + ' requieren revisión' : '');
       }
       if (kind === 'planillas-comision' && state.detectedRates && state.tarifasConfiables && state.aplicarTarifas && Orbit.comeng) {
         const validas = state.detectedRates.filter(r => r.valido && r.aseguradoraId);
