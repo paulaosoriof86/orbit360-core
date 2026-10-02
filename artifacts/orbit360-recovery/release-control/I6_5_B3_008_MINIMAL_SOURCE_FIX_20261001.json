@@ -1,0 +1,45 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_MINIMAL_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-01",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B3-008",
+  "authorizationCommit": "bed3298a219d35b518d24f0a5a84d46557083df0",
+  "sourceHead": "d5a0d10e11c3f30ef237dac9c8a21321c266b249",
+  "classification": "PRODUCT",
+  "productFiles": {
+    "orbit360-platform/core/queries.js": "6857b531764c126c995e5641990a791a7db03caa",
+    "orbit360-platform/modules/cliente360.js": "e94f9d42f0b1d168ec2f7ba731b454e652d08ff6",
+    "orbit360-platform/modules/inicio.js": "232c9707bf3efaba2ffcc6fdc2e671d09e22c916",
+    "orbit360-platform/core/router.js": "40bcfe6c7ab090b372dd637a819b83671b021938"
+  },
+  "explicitlyNotMutated": [
+    "orbit360-platform/core/crmkit.js"
+  ],
+  "rootCauses": [
+    "Cliente360 published Health and dependent financial KPIs before authoritative server confirmation.",
+    "Cliente360 list had a duplicate cobros-based Health/portfolio calculation instead of canonical carteraPrimas semantics.",
+    "Inicio amount cards consumed carteraPrimas while their detail path used cobros event-state semantics.",
+    "Router omitted causal financial collections from Inicio/Cliente360 reactive rerender dependencies."
+  ],
+  "remediation": [
+    "Preserve approved Health formula exactly and centralize it in core/queries.js.",
+    "Use carteraPrimas as canonical pending/overdue row owner and cobros only for confirmed payments.",
+    "Render neutral pre-ready states instead of definitive number/color.",
+    "Use Inicio-owned portfolio drilldown so no untracked product owner is added to the composition lock.",
+    "Rerender affected surfaces when canonical financial collections server-confirm."
+  ],
+  "semanticPreservation": {
+    "healthFormulaChanged": false,
+    "observedFinal51RemainsSupported": true,
+    "businessSemanticDecisionRequired": false
+  },
+  "boundaries": {
+    "businessWrites": false,
+    "dataWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "metricRegistry": false,
+    "broadDashboardAudit": false
+  },
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}
