@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 const CONTROL='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
 const LOCK='artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json';
 const FINDINGS='artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json';
@@ -8,6 +9,8 @@ const need=(v,c)=>{if(!v)throw new Error(c);};
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const write=(p,v)=>fs.writeFileSync(p,JSON.stringify(v,null,2)+'\n');
 const env=k=>String(process.env[k]||'').trim();
+const blob=p=>{const b=fs.readFileSync(p);return crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+b.length+'\0'),b])).digest('hex');};
+
 const proof=read(env('B3_PROOF'));
 need(proof.status==='PASS','B3_006_PROOF_NOT_PASS');
 need(proof.cleanup?.pass===true,'B3_006_CLEANUP_NOT_PASS');
@@ -17,14 +20,52 @@ need(proof.assertions?.expectedReceiptsCreated===true,'B3_006_RECEIPTS_NOT_PROVE
 need(proof.assertions?.portfolioCreated===true,'B3_006_PORTFOLIO_NOT_PROVEN');
 need(proof.assertions?.zeroCobrosWithoutEvidence===true,'B3_006_ZERO_COBROS_NOT_PROVEN');
 need(proof.assertions?.invalidRowFailClosed===true,'B3_006_FAIL_CLOSED_NOT_PROVEN');
-const receipt={schema:'GRAVICENTRA_I6_5_B3_006_CLOSED_PASS_V1',recordedAt:'2026-10-01',status:'CLOSED_PASS',findingId:'B3-006',sourceSha:env('B3_SOURCE_SHA'),buildId:env('B3_BUILD_ID'),previewUrl:env('B3_PREVIEW_URL'),channelId:env('B3_CHANNEL_ID'),runId:Number(env('GITHUB_RUN_ID')),artifactId:Number(env('B3_ARTIFACT_ID')),artifactDigest:env('B3_ARTIFACT_DIGEST'),hostedPayloadDigest:env('B3_HOSTED_PAYLOAD_DIGEST'),backendSourceDigest:env('B3_BACKEND_SOURCE_DIGEST'),bundleDigest:env('B3_BUNDLE_DIGEST'),exactHostingReadback:true,browserImportProof:true,canonicalPolicyCreated:true,expectedReceiptsCreated:true,portfolioCreated:true,zeroCobrosWithoutEvidence:true,invalidRowFailClosed:true,cleanupPass:true,cleanup:proof.cleanup,livePromoted:false,reimport:false,operationalBusinessWrites:false,nextFindingId:'B3-007'};
+
+const receipt={schema:'GRAVICENTRA_I6_5_B3_006_CLOSED_PASS_V1',recordedAt:'2026-10-01',status:'CLOSED_PASS',findingId:'B3-006',
+  sourceSha:env('B3_SOURCE_SHA'),buildId:env('B3_BUILD_ID'),previewUrl:env('B3_PREVIEW_URL'),channelId:env('B3_CHANNEL_ID'),
+  runId:Number(env('GITHUB_RUN_ID')),artifactId:Number(env('B3_ARTIFACT_ID')),artifactDigest:env('B3_ARTIFACT_DIGEST'),
+  hostedPayloadDigest:env('B3_HOSTED_PAYLOAD_DIGEST'),backendSourceDigest:env('B3_BACKEND_SOURCE_DIGEST'),bundleDigest:env('B3_BUNDLE_DIGEST'),
+  exactHostingReadback:true,browserImportProof:true,canonicalPolicyCreated:true,expectedReceiptsCreated:true,portfolioCreated:true,
+  zeroCobrosWithoutEvidence:true,invalidRowFailClosed:true,cleanupPass:true,cleanup:proof.cleanup,
+  livePromoted:false,reimport:false,operationalBusinessWrites:false,nextFindingId:'B3-007'};
 write(RECEIPT,receipt);
-const c=read(COMPOSITION);c.activeFindingId='B3-007';c.b3006Closure={status:'CLOSED_PASS',path:RECEIPT,sourceSha:receipt.sourceSha,buildId:receipt.buildId,previewUrl:receipt.previewUrl,runId:receipt.runId,artifactId:receipt.artifactId,artifactDigest:receipt.artifactDigest,productSourceChanged:true,cleanupPass:true};write(COMPOSITION,c);
-const f=read(FINDINGS),f6=(f.findings||[]).find(x=>x.id==='B3-006'),f7=(f.findings||[]).find(x=>x.id==='B3-007');need(f6&&f7,'B3_006_007_FINDING_MISSING');
-Object.assign(f6,{status:'CLOSED_PASS',blocking:false,nextAction:'B3-007',closureReceiptPath:RECEIPT,currentCandidateEligibleForPromotion:false,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,cleanupPass:true});
+const receiptBlob=blob(RECEIPT);
+
+const c=read(COMPOSITION);
+c.activeFindingId='B3-007';
+c.b3006Closure={status:'CLOSED_PASS',path:RECEIPT,blobSha:receiptBlob,sourceSha:receipt.sourceSha,buildId:receipt.buildId,previewUrl:receipt.previewUrl,runId:receipt.runId,artifactId:receipt.artifactId,artifactDigest:receipt.artifactDigest,productSourceChanged:true,cleanupPass:true};
+write(COMPOSITION,c);
+const compositionBlob=blob(COMPOSITION);
+
+const f=read(FINDINGS),f6=(f.findings||[]).find(x=>x.id==='B3-006'),f7=(f.findings||[]).find(x=>x.id==='B3-007');
+need(f6&&f7,'B3_006_007_FINDING_MISSING');
+Object.assign(f6,{status:'CLOSED_PASS',blocking:false,nextAction:'B3-007',closureReceiptPath:RECEIPT,closureReceiptBlobSha:receiptBlob,currentCandidateEligibleForPromotion:false,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,cleanupPass:true,compositionLockBlobSha:compositionBlob});
 Object.assign(f7,{status:'DIAGNOSTIC_ACTIVE',blocking:true,entryUnblockedBy:'B3-006 CLOSED_PASS',nextAction:'B3_007_DIAGNOSTIC',productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false});
-f.currentB3={status:'B3_007_DIAGNOSTIC_ACTIVE',activeFindingId:'B3-007',priorFindingId:'B3-006',priorFindingStatus:'CLOSED_PASS',priorClosureReceiptPath:RECEIPT,noLive:true,noReimport:true};write(FINDINGS,f);
-const l=read(LOCK);l.status='B3_007_DIAGNOSTIC_ACTIVE';l.priorFinding={id:'B3-006',status:'CLOSED_PASS',closureReceiptPath:RECEIPT};l.activeFinding={id:'B3-007',title:f7.finding,status:'DIAGNOSTIC_ACTIVE',blocking:true,boundaries:{businessWritesAuthorized:false,configWritesAuthorized:false,reimportAuthorized:false,liveHostingPromotionAuthorized:false,productMutationAuthorized:false},nextAction:'B3_007_DIAGNOSTIC'};l.nextRequiredProof=['B3_007_CAUSAL_DIAGNOSTIC'];write(LOCK,l);
-const p=read(CONTROL),b=p.i65ForensicRemediationPlan.b3;Object.assign(b,{status:'B3_007_DIAGNOSTIC_ACTIVE',activeFindingId:'B3-007',b3006Status:'CLOSED_PASS',b3006ClosureReceiptPath:RECEIPT,sourceSha:receipt.sourceSha,buildId:receipt.buildId,previewUrl:receipt.previewUrl,runId:receipt.runId,artifactId:receipt.artifactId,artifactDigest:receipt.artifactDigest,exactReadback:true,contractPass:true,previewProofPass:true,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,candidateEligibleForPromotion:false,livePromoted:false,nextAction:'B3_007_DIAGNOSTIC'});
-p.currentB3={status:'B3_007_DIAGNOSTIC_ACTIVE',activeFindingId:'B3-007',priorFindingId:'B3-006',priorFindingStatus:'CLOSED_PASS',priorClosureReceiptPath:RECEIPT,noLive:true,noReimport:true};p.nextAction='I6_5_FORENSIC_REMEDIATION_B3_007_DIAGNOSTIC';p.canonicalAccumulationControl={...(p.canonicalAccumulationControl||{}),nextAction:'B3_007_DIAGNOSTIC'};write(CONTROL,p);
+f.currentB3={status:'B3_007_DIAGNOSTIC_ACTIVE',activeFindingId:'B3-007',priorFindingId:'B3-006',priorFindingStatus:'CLOSED_PASS',priorClosureReceiptPath:RECEIPT,priorClosureReceiptBlobSha:receiptBlob,compositionLockBlobSha:compositionBlob,noLive:true,noReimport:true};
+write(FINDINGS,f);
+const findingsBlob=blob(FINDINGS);
+
+const l=read(LOCK);
+l.status='B3_007_DIAGNOSTIC_ACTIVE';
+l.priorFinding={id:'B3-006',status:'CLOSED_PASS',closureReceiptPath:RECEIPT,closureReceiptBlobSha:receiptBlob};
+l.activeFinding={id:'B3-007',title:f7.finding,status:'DIAGNOSTIC_ACTIVE',blocking:true,boundaries:{businessWritesAuthorized:false,configWritesAuthorized:false,reimportAuthorized:false,liveHostingPromotionAuthorized:false,productMutationAuthorized:false},nextAction:'B3_007_DIAGNOSTIC'};
+l.nextRequiredProof=['B3_007_CAUSAL_DIAGNOSTIC'];
+l.compositionLock={...(l.compositionLock||{}),blobSha:compositionBlob};
+l.findingLedger={...(l.findingLedger||{}),blobSha:findingsBlob};
+write(LOCK,l);
+const lockBlob=blob(LOCK);
+
+const p=read(CONTROL),b=p.i65ForensicRemediationPlan.b3;
+Object.assign(b,{status:'B3_007_DIAGNOSTIC_ACTIVE',activeFindingId:'B3-007',b3006Status:'CLOSED_PASS',b3006ClosureReceiptPath:RECEIPT,b3006ClosureReceiptBlobSha:receiptBlob,
+  sourceSha:receipt.sourceSha,buildId:receipt.buildId,previewUrl:receipt.previewUrl,runId:receipt.runId,artifactId:receipt.artifactId,artifactDigest:receipt.artifactDigest,
+  exactReadback:true,contractPass:true,previewProofPass:true,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,candidateEligibleForPromotion:false,livePromoted:false,nextAction:'B3_007_DIAGNOSTIC',
+  executionLockBlobSha:lockBlob,findingLedgerBlobSha:findingsBlob,compositionLockBlobSha:compositionBlob});
+p.currentB3={status:'B3_007_DIAGNOSTIC_ACTIVE',activeFindingId:'B3-007',priorFindingId:'B3-006',priorFindingStatus:'CLOSED_PASS',priorClosureReceiptPath:RECEIPT,priorClosureReceiptBlobSha:receiptBlob,compositionLockBlobSha:compositionBlob,findingLedgerBlobSha:findingsBlob,executionLockBlobSha:lockBlob,noLive:true,noReimport:true};
+p.nextAction='I6_5_FORENSIC_REMEDIATION_B3_007_DIAGNOSTIC';
+p.canonicalAccumulationControl={...(p.canonicalAccumulationControl||{}),compositionLockBlobSha:compositionBlob,findingLedgerBlobSha:findingsBlob,nextAction:'B3_007_DIAGNOSTIC'};
+write(CONTROL,p);
 console.log('B3_006_FREEZE=CLOSED_PASS_OPEN_B3_007');
+console.log('B3_006_RECEIPT_BLOB='+receiptBlob);
+console.log('B3_006_COMPOSITION_BLOB='+compositionBlob);
+console.log('B3_006_FINDINGS_BLOB='+findingsBlob);
+console.log('B3_006_LOCK_BLOB='+lockBlob);
