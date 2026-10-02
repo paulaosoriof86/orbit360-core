@@ -16,8 +16,8 @@
   "qaFiles": {
     "tools/gravicentra-i6-5-b3-006-contract.mjs": "16b6c1c379b1ba96b7df1db29f9cfb8e643d2071",
     "tools/gravicentra-i6-5-b3-006-preview-proof.mjs": "e5ad05ae396f44d2a89133648a1fe52353a8062c",
-    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "1b4e54329db22c7ab84fc0b3a483b34331bad3e2",
-    "tools/gravicentra-i6-control-plane-guard-v1.mjs": "74a499fba8f5611f1959d5ced309a62680fe9815"
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs": "74a499fba8f5611f1959d5ced309a62680fe9815",
+    ".github/workflows/gravicentra-b3-006-executor.yml": "ba6d31ecf9966290faab9c02080c45c944d90e96"
   },
   "remediation": [
     "Policy import create/update is routed through Orbit.policyReceipts.",
@@ -41,6 +41,15 @@
   "qaReconciliation": {
     "status": "QA_CLEANUP_HARDENED_NO_PRODUCT_SOURCE_CHANGE",
     "reason": "Synthetic activity rows are client-scoped rather than guaranteed policy-scoped; cleanup now deletes and readbacks all B3-006 synthetic client-linked rows.",
+    "productSourceChanged": false
+  },
+  "supersededQaFiles": {
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "1b4e54329db22c7ab84fc0b3a483b34331bad3e2"
+  },
+  "qaMechanismRepair": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_EXECUTOR_ISOLATION_REPAIR_20261001.json",
+    "blobSha": "112b9eb5fe32578cfe3cc5b6db6a7f0f3f0e4a44",
+    "status": "QA_EXECUTION_MECHANISM_REPAIRED",
     "productSourceChanged": false
   }
 }
