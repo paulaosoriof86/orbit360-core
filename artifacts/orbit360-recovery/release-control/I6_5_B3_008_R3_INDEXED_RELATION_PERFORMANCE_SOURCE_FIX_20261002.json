@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R3_INDEXED_RELATION_PERFORMANCE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B3-008",
+  "parentHead": "68ffd4d06b18505383285f52f26bb3a0503aa97e",
+  "failedRunId": 37032410863,
+  "failedSourceSha": "68ffd4d06b18505383285f52f26bb3a0503aa97e",
+  "classification": "PRODUCT_PERFORMANCE_DEFECT_CONFIRMED",
+  "measuredEvidence": {
+    "cliente360RenderedRows": 40,
+    "totalClients": 439,
+    "totalPolicies": 1419,
+    "summaryCacheMs": 54845.3,
+    "totalRenderMs": 54855.6,
+    "pageErrors": 0,
+    "consoleErrors": 0
+  },
+  "rootCause": "Firestore read-only store relation-scoped logicalRows resolved policy/client relations with Array.find for every row and every relational constraint. Receipt/portfolio/payment collections therefore multiplied scans across 1419 policies and 439 clients; Cliente360 clientesResumenIndex inherited this cost.",
+  "fix": [
+    "Build policyById/clientById relation maps once per relation-filter invocation.",
+    "Resolve __relation_country__/advisor/team in O(1) map lookups rather than repeated linear Array.find scans.",
+    "Preserve the same query-plan semantics and read-only boundary.",
+    "Bump the store asset cache key so Preview loads the indexed implementation."
+  ],
+  "productBlobs": {
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "e4f523d18dec8594a53c15132cd29ce1c26b2d48",
+    "orbit360-platform/index.html": "4c6f0cb39ee8d9b679befc915c227ebb60475ca1"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b3-008-contract.mjs": "d39a97c905b7eac8ee9785211e9ee93c5214e8bc"
+  },
+  "operationalBusinessWrites": false,
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}

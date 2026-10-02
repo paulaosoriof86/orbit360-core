@@ -9,7 +9,7 @@
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
-  var VERSION = 'p0-20260930-b3004r12-route-focus-hydration';
+  var VERSION = 'p0-20261002-b3008r4-indexed-relations';
   var WRITE_ERROR = 'WRITE_BLOCKED_PRODUCT_READ_ONLY_P0';
   function text(value) { return String(value == null ? '' : value).trim(); }
   function clone(value) { try { return JSON.parse(JSON.stringify(value)); } catch (e) { return value && typeof value === 'object' ? Object.assign({}, value) : value; } }
@@ -111,11 +111,38 @@
       return startupCollections.every(function (name) { return !state.snapshotErrors[name] && state.deniedCollections.indexOf(name) < 0; });
     }
     function detach() { unsubscribers.splice(0).forEach(function (unsubscribe) { try { unsubscribe(); } catch (e) {} }); state.attachedCollections = []; state.observedCollections = []; state.serverConfirmedCollections = []; state.cacheOnlyCollections = []; state.snapshotSources = {}; state.ready = false; state.status = 'detached'; deferredAttached = false; deferredScheduled = false; deferredCursor = 0; deferredPauseUntil = 0; attachStarted = {}; state.deferredAttached = false; }
-    function relationPolicy(row) { var pid = text(row && (row.polizaId || row.policyId)); if (!pid) return null; return (cache.polizas || []).find(function (p) { return text(rowId(p)) === pid; }) || null; }
-    function relationClient(row, policy) { var cid = text(row && row.clienteId) || text(policy && policy.clienteId); if (!cid) return null; return (cache.clientes || []).find(function (c) { return text(rowId(c)) === cid; }) || null; }
-    function relationValue(kind, row) { var policy = relationPolicy(row), client = relationClient(row, policy); if (kind === 'country') return text(row && (row.pais || row.country)) || text(policy && (policy.pais || policy.country)) || text(client && (client.pais || client.country)); if (kind === 'advisor') return text(row && (row.asesorId || row.advisorId || row.ownerAdvisorId)) || text(policy && (policy.asesorId || policy.advisorId || policy.ownerAdvisorId)) || text(client && (client.asesorId || client.advisorId || client.ownerAdvisorId)); if (kind === 'team') return text(row && (row.equipoId || row.teamId)) || text(policy && (policy.equipoId || policy.teamId)) || text(client && (client.equipoId || client.teamId)); return ''; }
-    function relationConstraintMatches(row, constraint) { var field = text(constraint && constraint.field), kind = field === '__relation_country__' ? 'country' : field === '__relation_advisor__' ? 'advisor' : field === '__relation_team__' ? 'team' : ''; if (!kind) return true; var value = relationValue(kind, row); if (!value) return false; if (constraint.op === '==') return value === text(constraint.value); if (constraint.op === 'in') return Array.isArray(constraint.value) && constraint.value.map(text).indexOf(value) >= 0; if (constraint.op === 'array-contains') return Array.isArray(value) && value.indexOf(constraint.value) >= 0; return false; }
-    function logicalRows(collection) { var source = cache[collection] || [], plan = state.queryPlans[collection] || {}, constraints = (plan.constraints || []).filter(function (item) { return String(item && item.field || '').indexOf('__relation_') === 0; }); if (!constraints.length) return source; return source.filter(function (row) { return constraints.every(function (constraint) { return relationConstraintMatches(row, constraint); }); }); }
+    function buildRelationIndexes() {
+      var policyById = new Map(), clientById = new Map();
+      (cache.polizas || []).forEach(function (p) { var id = text(rowId(p)); if (id) policyById.set(id, p); });
+      (cache.clientes || []).forEach(function (c) { var id = text(rowId(c)); if (id) clientById.set(id, c); });
+      return { policyById: policyById, clientById: clientById };
+    }
+    function indexedRelationValue(kind, row, indexes) {
+      var pid = text(row && (row.polizaId || row.policyId));
+      var policy = pid ? indexes.policyById.get(pid) || null : null;
+      var cid = text(row && row.clienteId) || text(policy && policy.clienteId);
+      var client = cid ? indexes.clientById.get(cid) || null : null;
+      if (kind === 'country') return text(row && (row.pais || row.country)) || text(policy && (policy.pais || policy.country)) || text(client && (client.pais || client.country));
+      if (kind === 'advisor') return text(row && (row.asesorId || row.advisorId || row.ownerAdvisorId)) || text(policy && (policy.asesorId || policy.advisorId || policy.ownerAdvisorId)) || text(client && (client.asesorId || client.advisorId || client.ownerAdvisorId));
+      if (kind === 'team') return text(row && (row.equipoId || row.teamId)) || text(policy && (policy.equipoId || policy.teamId)) || text(client && (client.equipoId || client.teamId));
+      return '';
+    }
+    function indexedRelationConstraintMatches(row, constraint, indexes) {
+      var field = text(constraint && constraint.field), kind = field === '__relation_country__' ? 'country' : field === '__relation_advisor__' ? 'advisor' : field === '__relation_team__' ? 'team' : '';
+      if (!kind) return true;
+      var value = indexedRelationValue(kind, row, indexes);
+      if (!value) return false;
+      if (constraint.op === '==') return value === text(constraint.value);
+      if (constraint.op === 'in') return Array.isArray(constraint.value) && constraint.value.map(text).indexOf(value) >= 0;
+      if (constraint.op === 'array-contains') return Array.isArray(value) && value.indexOf(constraint.value) >= 0;
+      return false;
+    }
+    function logicalRows(collection) {
+      var source = cache[collection] || [], plan = state.queryPlans[collection] || {}, constraints = (plan.constraints || []).filter(function (item) { return String(item && item.field || '').indexOf('__relation_') === 0; });
+      if (!constraints.length) return source;
+      var indexes = buildRelationIndexes();
+      return source.filter(function (row) { return constraints.every(function (constraint) { return indexedRelationConstraintMatches(row, constraint, indexes); }); });
+    }
     function all(collection) { return logicalRows(collection).map(clone); }
     function get(collection, id) { var row = (cache[collection] || []).find(function (item) { return rowId(item) === id; }); return row ? clone(row) : null; }
     function where(collection, fieldOrPredicate, opOrValue, maybeValue) { var source = cache[collection] || [], matches; if (typeof fieldOrPredicate === 'function') matches = source.filter(fieldOrPredicate); else if (fieldOrPredicate && typeof fieldOrPredicate === 'object') matches = source.filter(function (row) { return Object.keys(fieldOrPredicate).every(function (key) { return row[key] === fieldOrPredicate[key]; }); }); else { var field = fieldOrPredicate, op = arguments.length >= 4 ? opOrValue : '==', value = arguments.length >= 4 ? maybeValue : opOrValue; matches = source.filter(function (row) { if (op === '==' || op === '=') return row[field] === value; if (op === '!=') return row[field] !== value; if (op === '>') return row[field] > value; if (op === '>=') return row[field] >= value; if (op === '<') return row[field] < value; if (op === '<=') return row[field] <= value; if (op === 'array-contains') return Array.isArray(row[field]) && row[field].indexOf(value) >= 0; return false; }); } return matches.map(clone); }

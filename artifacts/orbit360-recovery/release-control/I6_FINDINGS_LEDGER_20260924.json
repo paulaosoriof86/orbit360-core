@@ -2602,6 +2602,14 @@
         "failedRunId": 37031406639,
         "classification": "HARNESS_ONLY_FALSE_NEGATIVE_AFTER_PRODUCT_FIRST_PAINT_FIX",
         "productRegressionDemonstrated": false
+      },
+      "r3": {
+        "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R3_INDEXED_RELATION_PERFORMANCE_SOURCE_FIX_20261002.json",
+        "blobSha": "ecf200f8d2b4661e6b7fce68ff6e05fe5a9f0d9d",
+        "failedRunId": 37032410863,
+        "classification": "PRODUCT_PERFORMANCE_DEFECT_CONFIRMED",
+        "rootCause": "Firestore read-only store relation-scoped logicalRows resolved policy/client relations with Array.find for every row and every relational constraint. Receipt/portfolio/payment collections therefore multiplied scans across 1419 policies and 439 clients; Cliente360 clientesResumenIndex inherited this cost."
       }
     },
     {
@@ -6064,7 +6072,7 @@
     "priorFindingStatus": "CLOSED_PASS",
     "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CLOSED_PASS_20261001.json",
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
-    "compositionLockBlobSha": "ad4eef9158b3668c11e3f7e88fe45cc885d37bed",
+    "compositionLockBlobSha": "de1bd6943c5dab44ee49870cd8e755d6e468b9e1",
     "noLive": true,
     "noReimport": true,
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
@@ -6093,6 +6101,8 @@
     "r2p9ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P9_CLIENT360_PROGRESSIVE_FIRST_PAINT_SOURCE_FIX_20261002.json",
     "r2p9ReceiptBlobSha": "27014d9c995dff6b83d4770e99b23acbc77db4e4",
     "r2p10ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P10_RUNTIME_ONLY_READINESS_HARNESS_FIX_20261002.json",
-    "r2p10ReceiptBlobSha": "8aebd5af056139c40d32015d0ed6585ac1c47b3e"
+    "r2p10ReceiptBlobSha": "8aebd5af056139c40d32015d0ed6585ac1c47b3e",
+    "r3ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R3_INDEXED_RELATION_PERFORMANCE_SOURCE_FIX_20261002.json",
+    "r3ReceiptBlobSha": "ecf200f8d2b4661e6b7fce68ff6e05fe5a9f0d9d"
   }
 }
