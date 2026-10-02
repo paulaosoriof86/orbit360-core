@@ -2610,6 +2610,14 @@
         "failedRunId": 37032410863,
         "classification": "PRODUCT_PERFORMANCE_DEFECT_CONFIRMED",
         "rootCause": "Firestore read-only store relation-scoped logicalRows resolved policy/client relations with Array.find for every row and every relational constraint. Receipt/portfolio/payment collections therefore multiplied scans across 1419 policies and 439 clients; Cliente360 clientesResumenIndex inherited this cost."
+      },
+      "r3p1": {
+        "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R3P1_DIRECT_ROUTE_LATENCY_PROBE_HARNESS_FIX_20261002.json",
+        "blobSha": "7450fe762fc4ee3128444ed99d3d62598ce43897",
+        "failedRunId": 37033269417,
+        "classification": "HARNESS_ONLY_READINESS_DETECTION_AFTER_PERFORMANCE_FIX",
+        "productRegressionDemonstrated": false
       }
     },
     {
@@ -6103,6 +6111,8 @@
     "r2p10ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P10_RUNTIME_ONLY_READINESS_HARNESS_FIX_20261002.json",
     "r2p10ReceiptBlobSha": "8aebd5af056139c40d32015d0ed6585ac1c47b3e",
     "r3ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R3_INDEXED_RELATION_PERFORMANCE_SOURCE_FIX_20261002.json",
-    "r3ReceiptBlobSha": "ecf200f8d2b4661e6b7fce68ff6e05fe5a9f0d9d"
+    "r3ReceiptBlobSha": "ecf200f8d2b4661e6b7fce68ff6e05fe5a9f0d9d",
+    "r3p1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R3P1_DIRECT_ROUTE_LATENCY_PROBE_HARNESS_FIX_20261002.json",
+    "r3p1ReceiptBlobSha": "7450fe762fc4ee3128444ed99d3d62598ce43897"
   }
 }

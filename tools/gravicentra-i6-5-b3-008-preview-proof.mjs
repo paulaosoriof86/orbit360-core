@@ -72,6 +72,29 @@ async function ensure(page,names){
 async function waitConfirmed(page,names,timeout=15000){
   await page.waitForFunction(names=>{const c=[].concat(Orbit.store?._productStatus?.()?.serverConfirmedCollections||[]);return names.every(x=>c.includes(x));},names,{timeout});
 }
+async function measureUsableRoute(page,key,isUsable,timeout=15000){
+  const started=Date.now();
+  await route(page,key);
+  const deadline=started+timeout;
+  let last=null;
+  while(Date.now()<deadline){
+    last=await page.evaluate(({key,isUsable})=>{
+      const host=document.getElementById('host'),routeKey=String(window.Orbit&&Orbit.route&&Orbit.route.key||'');
+      const loading=!!document.querySelector(key==='cliente360'?'[data-c360-authoritative-loading="1"]':'[data-cobros-hydration-loading="1"]');
+      const denied=!!document.querySelector('.modstate');
+      const rows=host?host.querySelectorAll('tbody tr').length:0;
+      const marker=key==='cobros'?!!document.querySelector('[data-cobros-core-ready="1"]'):false;
+      const diag=window.OrbitRuntimeDiagnostics&&window.OrbitRuntimeDiagnostics.cliente360&&window.OrbitRuntimeDiagnostics.cliente360.list;
+      const usable=key==='cliente360'
+        ? routeKey===key&&!loading&&!denied&&rows>0
+        : routeKey===key&&!loading&&!denied&&marker;
+      return{usable,routeKey,loading,denied,rows,marker,diag:diag?{renderedRows:Number(diag.renderedRows||0),totalRows:Number(diag.totalRows||0),totalMs:Number(diag.totalMs||0)}:null};
+    },{key,isUsable:String(isUsable||'')});
+    if(last&&last.usable) return{ms:Date.now()-started,state:last};
+    await page.waitForTimeout(100);
+  }
+  throw new Error('B3_008_'+key.toUpperCase()+'_NOT_READY:'+JSON.stringify(last));
+}
 async function independent(page){
   return page.evaluate(()=>{
     const rows=name=>Orbit.store?.all?.(name)||[],country=String(Orbit.pais||'TODOS').toUpperCase(),now=Orbit.ui?.now?Orbit.ui.now():new Date();
@@ -140,34 +163,10 @@ try{
   proof.assertions.noSyntheticMetaPct=true;
   proof.assertions.advisorMissingMetaFailClosed=true;
 
-  let t=Date.now();await route(page,'cliente360');
-  try{
-    await page.waitForFunction(()=> {
-      const diag=window.OrbitRuntimeDiagnostics&&window.OrbitRuntimeDiagnostics.cliente360&&window.OrbitRuntimeDiagnostics.cliente360.list;
-      return String(window.Orbit&&Orbit.route&&Orbit.route.key||'')==='cliente360' &&
-        Number(diag&&diag.renderedRows||0)>0 &&
-        !document.querySelector('[data-c360-authoritative-loading="1"]') &&
-        !document.querySelector('.modstate');
-    },null,{timeout:15000});
-  }catch(error){
-    const diag=await page.evaluate(()=>({
-      hash:String(location.hash||''),
-      routeKey:String(Orbit.route&&Orbit.route.key||''),
-      role:String(Orbit.session&&Orbit.session.rol?Orbit.session.rol():''),
-      canView:!!(Orbit.access&&Orbit.access.can&&Orbit.access.can('cliente360','view')),
-      projectionReady:!!(Orbit.clientProjection&&typeof Orbit.clientProjection.withReadBatch==='function'),
-      productStatus:Orbit.store&&Orbit.store._productStatus?Orbit.store._productStatus():null,
-      hostText:String(document.getElementById('host')?.innerText||'').slice(0,1200),
-      runtimeDiag:window.OrbitRuntimeDiagnostics&&OrbitRuntimeDiagnostics.cliente360?OrbitRuntimeDiagnostics.cliente360:null,
-      tbodyRows:document.querySelectorAll('#host tbody tr').length,
-      loading:!!document.querySelector('[data-c360-authoritative-loading="1"]'),
-      denied:!!document.querySelector('.modstate')
-    }));
-    proof.client360Diagnostic=diag;
-    throw new Error('B3_008_CLIENT360_NOT_READY:'+JSON.stringify(diag)+':PAGE_ERRORS='+JSON.stringify(proof.pageErrors)+':CONSOLE_ERRORS='+JSON.stringify(proof.consoleErrors.slice(-10)));
-  }
-  proof.performance.client360ListMs=Date.now()-t;
-  need(proof.performance.client360ListMs<=6000,'B3_008_CLIENT360_LIST_TOO_SLOW:'+proof.performance.client360ListMs);
+  const clientPerf=await measureUsableRoute(page,'cliente360','table-row',15000);
+  proof.performance.client360ListMs=clientPerf.ms;
+  proof.client360UsableState=clientPerf.state;
+  need(proof.performance.client360ListMs<=6000,'B3_008_CLIENT360_LIST_TOO_SLOW:'+proof.performance.client360ListMs+':'+JSON.stringify(clientPerf.state));
   const syntheticResidue=await page.evaluate(()=>({
     markerPresent:!!document.querySelector('[data-c360-list-ready="1"]'),
     client:!!(Orbit.store&&Orbit.store.get&&Orbit.store.get('clientes','b3004human_client_r12')),
@@ -181,14 +180,10 @@ try{
   proof.assertions.clientListPerformance=true;
   proof.assertions.b3004SyntheticFixtureAbsent=true;
 
-  t=Date.now();await route(page,'cobros');
-  await page.waitForFunction(()=>{
-    return String(window.Orbit&&Orbit.route&&Orbit.route.key||'')==='cobros' &&
-      !!document.querySelector('[data-cobros-core-ready="1"]') &&
-      !document.querySelector('[data-cobros-hydration-loading="1"]');
-  },null,{timeout:15000});
-  proof.performance.cobrosCoreMs=Date.now()-t;
-  need(proof.performance.cobrosCoreMs<=6000,'B3_008_COBROS_CORE_TOO_SLOW:'+proof.performance.cobrosCoreMs);
+  const cobrosPerf=await measureUsableRoute(page,'cobros','core-marker',15000);
+  proof.performance.cobrosCoreMs=cobrosPerf.ms;
+  proof.cobrosUsableState=cobrosPerf.state;
+  need(proof.performance.cobrosCoreMs<=6000,'B3_008_COBROS_CORE_TOO_SLOW:'+proof.performance.cobrosCoreMs+':'+JSON.stringify(cobrosPerf.state));
   proof.assertions.cobrosCorePerformance=true;
 
   await setCountry(page,'CO');await route(page,'inicio');
@@ -199,12 +194,7 @@ try{
   need(coCounts.clients===truthCO.clientCount&&coCounts.policies===truthCO.policyCount,'B3_008_INICIO_COUNTRY_COUNTS_MISMATCH:'+JSON.stringify({coCounts,truthCO}));
   proof.assertions.countryScope=true;
 
-  await route(page,'cobros');
-  await page.waitForFunction(()=>{
-    return String(window.Orbit&&Orbit.route&&Orbit.route.key||'')==='cobros' &&
-      !!document.querySelector('[data-cobros-core-ready="1"]') &&
-      !document.querySelector('[data-cobros-hydration-loading="1"]');
-  },null,{timeout:15000});
+  await measureUsableRoute(page,'cobros','core-marker',15000);
   await page.waitForFunction(()=>document.querySelector('[data-cobros-financial-readiness="ready"]'),null,{timeout:12000});
   const cobrosCO=await page.evaluate(()=>{const e=document.querySelector('[data-cobros-core-ready="1"]');let truth={};try{truth=JSON.parse(decodeURIComponent(e?.getAttribute('data-cobros-truth')||''));}catch{}return{truth,text:e?.innerText||''};});
   const expectedCO={COP:{alDia:truthCO.realizedAll.COP||0,pend:truthCO.pending.COP||0,venc:truthCO.overdue.COP||0}};

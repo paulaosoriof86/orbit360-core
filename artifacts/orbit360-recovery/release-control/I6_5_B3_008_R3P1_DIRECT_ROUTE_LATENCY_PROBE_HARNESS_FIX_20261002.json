@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R3P1_DIRECT_ROUTE_LATENCY_PROBE_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B3-008",
+  "failedRunId": 37033269417,
+  "failedSourceSha": "b08e8b35a2f0163871467123e1530f910b08a6f2",
+  "classification": "HARNESS_ONLY_READINESS_DETECTION_AFTER_PERFORMANCE_FIX",
+  "evidence": {
+    "previousSummaryCacheMs": 54845.3,
+    "postFixSummaryCacheMs": 65.3,
+    "postFixInternalRenderMs": 70,
+    "visibleRows": 40,
+    "totalClients": 439,
+    "pageErrors": 0,
+    "consoleErrors": 0
+  },
+  "rootCause": "The existing browser wait predicate still missed a surface that was visibly rendered after the product performance fix, so it could not distinguish route latency from readiness-predicate failure.",
+  "fix": [
+    "Measure wall-clock route latency directly with 100ms polling.",
+    "Cliente360 is usable when route is cliente360, at least one table row exists, no loading and no denial.",
+    "Cobros is usable when route is cobros, canonical data-cobros-core-ready exists, no hydration loading and no denial.",
+    "Keep <=6000ms as the acceptance threshold and 15000ms only as the observation ceiling."
+  ],
+  "proofBlobSha": "eacd2e61b2fa38c5549a36b2b4703959b2dccb38",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}

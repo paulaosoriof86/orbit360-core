@@ -59,7 +59,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "6ead5d54c1b32e433de4dc7018653a06b81e043f"
+    "blobSha": "7962ee43d440346ff2c853e570ffa5d9fbd12bf7"
   },
   "nextRequiredProof": [
     "B3_008_R2_INDEPENDENT_REALITY_MACHINE_PROOF",
@@ -772,14 +772,14 @@
     "forbiddenSyntheticPaymentCollection": "cobros"
   },
   "b3008Executor": {
-    "status": "ARMED_FOR_EXACT_PREVIEW_R3_INDEXED_RELATIONS",
+    "status": "ARMED_FOR_EXACT_PREVIEW_R3P1_DIRECT_ROUTE_LATENCY",
     "qaBlobs": {
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "8d3dc8325cf5b74fa30a8f8646e894a8295534e3",
       "tools/gravicentra-i6-5-b3-008-contract.mjs": "868d4ddf85ed7404786d1290d2aa4447a3ff845b",
       "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "f0d0bdfb6f69e6ce6fdf638eb9c203a419bfb90a",
       ".github/workflows/gravicentra-b3-008-executor.yml": "a607e4f60a44907361ccb972aa6519b07c5a08dd"
     },
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "operationalBusinessWritesAuthorized": false,
     "reimportAuthorized": false,
     "liveHostingPromotionAuthorized": false,
@@ -795,7 +795,7 @@
     "contractPath": "tools/gravicentra-i6-5-b3-008-contract.mjs",
     "contractBlobSha": "d39a97c905b7eac8ee9785211e9ee93c5214e8bc",
     "proofPath": "tools/gravicentra-i6-5-b3-008-preview-proof.mjs",
-    "proofBlobSha": "9e079162e4341169490d86709c4614b4d9ac4f35"
+    "proofBlobSha": "eacd2e61b2fa38c5549a36b2b4703959b2dccb38"
   },
   "b3008R2": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -899,5 +899,13 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-008-contract.mjs": "d39a97c905b7eac8ee9785211e9ee93c5214e8bc"
     }
+  },
+  "b3008R3P1": {
+    "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R3P1_DIRECT_ROUTE_LATENCY_PROBE_HARNESS_FIX_20261002.json",
+    "blobSha": "7450fe762fc4ee3128444ed99d3d62598ce43897",
+    "failedRunId": 37033269417,
+    "classification": "HARNESS_ONLY_READINESS_DETECTION_AFTER_PERFORMANCE_FIX",
+    "productRegressionDemonstrated": false
   }
 }
