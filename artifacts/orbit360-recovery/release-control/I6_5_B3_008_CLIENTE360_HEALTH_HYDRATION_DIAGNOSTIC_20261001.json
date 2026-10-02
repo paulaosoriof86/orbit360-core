@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_CLIENTE360_HEALTH_HYDRATION_DIAGNOSTIC_V1",
+  "status": "CAUSAL_DIAGNOSTIC_RECORDED_DEFER_TO_B3_008",
+  "recordedAt": "2026-10-01",
+  "findingId": "B3-008",
+  "classification": "BLOCKS_CURRENT_PRODUCTION",
+  "blockerCountImpact": "NO_NEW_BLOCKER_EXISTING_B3_008_REMAINS_ONE_BLOCKING_FINDING",
+  "sourceEvidence": {
+    "screenshots": [
+      "image(20261002-000201).png",
+      "image(20261002-000222).png"
+    ],
+    "owner": "orbit360-platform/modules/cliente360.js",
+    "ownerBlobSha": "cb127dd1eee1fa247d0210b0acd91f17d3e2e441"
+  },
+  "observedSequence": [
+    "Before receipts/portfolio are confirmed, Cliente360 renders Salud=70, policy KPIs 0 and a visible 'Cargando recibos…' state.",
+    "After receipt/portfolio hydration, the same client renders Salud=51, 1/1 policies and Q1,000 cartera exigible."
+  ],
+  "demonstratedCause": {
+    "formula": "salud starts at 70; +min(20, vigentes*6); -25 when vencido>0; +8 Premium; clamp 8..100",
+    "observedMath": "70 + 6 (one renewable policy) - 25 (overdue/exigible portfolio) = 51",
+    "defect": "DETAIL_HEADER_AND_HEALTH_RENDER_BEFORE_REQUIRED_FINANCIAL_DEPENDENCIES_ARE_SERVER_CONFIRMED",
+    "loadingOwnerAlreadyExists": "Receipts tab checks serverConfirmedCollections for recibosEsperados and carteraPrimas, but header Salud/KPIs do not use the same readiness gate."
+  },
+  "risk": "A prominent client-health metric can temporarily present an authoritative-looking but incomplete value and color, which can support an incorrect operational prioritization.",
+  "remediationContract": [
+    "Do not render a numeric/color Health score from incomplete dependent collections.",
+    "Show a neutral loading/calculating state until the metric's required collections are confirmed.",
+    "Dependent header KPIs must follow the same authoritative readiness contract.",
+    "Do not change the business formula inside this diagnostic; reconcile metric authority in B3-008.",
+    "Do not reopen B3-002 absent a reproducible performance regression."
+  ],
+  "deferredExecution": "B3-008",
+  "productMutationNow": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false
+}
