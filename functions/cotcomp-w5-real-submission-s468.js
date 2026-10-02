@@ -86,14 +86,34 @@ function intakeEligible(row){
     d.pilotIntake.generalPersistenceReleased===false;
 }
 function healthSensitiveAbsent(d){
-  const forbidden=/health|salud|medical|medic|diagnos|disease|condition|dob|birth|age|edad|maternity|pregnan|spouse|dependent/i;
-  function walk(v,path=[]){
+  const forbiddenTokens=new Set([
+    'health','salud','medical','medic','diagnosis','diagnostic','disease','condition',
+    'dob','birth','age','edad','maternity','pregnancy','pregnant','spouse','dependent'
+  ]);
+  function keyTokens(key){
+    return String(key==null?'':key)
+      .replace(/([a-z0-9])([A-Z])/g,'$1_$2')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean);
+  }
+  function sensitiveKey(key){
+    const tokens=keyTokens(key);
+    if(tokens.some(t=>forbiddenTokens.has(t)))return true;
+    const compact=tokens.join('');
+    return [
+      'dateofbirth','birthdate','medicalhistory','healthhistory','healthcondition',
+      'medicalcondition','diagnosiscode'
+    ].includes(compact);
+  }
+  function walk(v){
     if(v==null)return true;
-    if(Array.isArray(v))return v.every((x,i)=>walk(x,path.concat(String(i))));
+    if(Array.isArray(v))return v.every(walk);
     if(typeof v==='object'){
       for(const [k,val] of Object.entries(v)){
-        if(forbidden.test(k))return false;
-        if(!walk(val,path.concat(k)))return false;
+        if(sensitiveKey(k))return false;
+        if(!walk(val))return false;
       }
     }
     return true;
