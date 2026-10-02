@@ -140,7 +140,25 @@ try{
   proof.assertions.noSyntheticMetaPct=true;
   proof.assertions.advisorMissingMetaFailClosed=true;
 
-  let t=Date.now();await route(page,'cliente360');await page.waitForSelector('[data-c360-list-ready="1"]',{timeout:6000});proof.performance.client360ListMs=Date.now()-t;
+  let t=Date.now();await route(page,'cliente360');
+  try{
+    await page.waitForSelector('[data-c360-list-ready="1"]',{timeout:6000});
+  }catch(error){
+    const diag=await page.evaluate(()=>({
+      hash:String(location.hash||''),
+      routeKey:String(Orbit.route&&Orbit.route.key||''),
+      role:String(Orbit.session&&Orbit.session.rol?Orbit.session.rol():''),
+      canView:!!(Orbit.access&&Orbit.access.can&&Orbit.access.can('cliente360','view')),
+      projectionReady:!!(Orbit.clientProjection&&typeof Orbit.clientProjection.withReadBatch==='function'),
+      productStatus:Orbit.store&&Orbit.store._productStatus?Orbit.store._productStatus():null,
+      hostText:String(document.getElementById('host')?.innerText||'').slice(0,1200),
+      loading:!!document.querySelector('[data-c360-authoritative-loading="1"]'),
+      denied:!!document.querySelector('.modstate')
+    }));
+    proof.client360Diagnostic=diag;
+    throw new Error('B3_008_CLIENT360_NOT_READY:'+JSON.stringify(diag)+':PAGE_ERRORS='+JSON.stringify(proof.pageErrors)+':CONSOLE_ERRORS='+JSON.stringify(proof.consoleErrors.slice(-10)));
+  }
+  proof.performance.client360ListMs=Date.now()-t;
   need(proof.performance.client360ListMs<=6000,'B3_008_CLIENT360_LIST_TOO_SLOW:'+proof.performance.client360ListMs);
   proof.assertions.clientListPerformance=true;
 

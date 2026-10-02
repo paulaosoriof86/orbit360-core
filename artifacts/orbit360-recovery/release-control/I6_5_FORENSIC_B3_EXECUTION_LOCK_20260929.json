@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B3_008_CLIENT360_CAUSAL_DIAGNOSTIC_PENDING",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-008",
     "title": "Dashboard Inicio reality reconciliation closed before B4.",
-    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "CLIENT360_CAUSAL_DIAGNOSTIC_PENDING",
     "blocking": true,
     "boundaries": {
       "businessWritesAuthorized": false,
@@ -23,7 +23,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "B3_008_CLIENT360_CAUSAL_DIAGNOSTIC_EXACT_PREVIEW",
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
     "scopeAndClosureLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
     "diagnosticScope": "READINESS_HYDRATION_AND_ONLY_NECESSARY_SEMANTIC_CORRECTION",
@@ -59,7 +59,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "55a98dd846251fd837462d96926e30f996b05c4d"
+    "blobSha": "e1b660906d46e6bb2db6e6e9a71f0837f3a39476"
   },
   "nextRequiredProof": [
     "B3_008_R2_INDEPENDENT_REALITY_MACHINE_PROOF",
@@ -772,7 +772,7 @@
     "forbiddenSyntheticPaymentCollection": "cobros"
   },
   "b3008Executor": {
-    "status": "ARMED_FOR_EXACT_PREVIEW_R2P4",
+    "status": "ARMED_FOR_CLIENT360_CAUSAL_DIAGNOSTIC_R2P5",
     "qaBlobs": {
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "8d3dc8325cf5b74fa30a8f8646e894a8295534e3",
       "tools/gravicentra-i6-5-b3-008-contract.mjs": "868d4ddf85ed7404786d1290d2aa4447a3ff845b",
@@ -795,7 +795,7 @@
     "contractPath": "tools/gravicentra-i6-5-b3-008-contract.mjs",
     "contractBlobSha": "eae48dc85e161893de36e4b7086d8f243c6dbc4b",
     "proofPath": "tools/gravicentra-i6-5-b3-008-preview-proof.mjs",
-    "proofBlobSha": "e5b1363d9ce96073068f1261fd49ce5434166d4b"
+    "proofBlobSha": "c81c4641cb75d6234d8baf35b9c6e6bf7a7c8c9e"
   },
   "b3008R2": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -834,5 +834,13 @@
     "failedRunId": 37015532999,
     "classification": "HARNESS_ONLY_PERFORMANCE_MEASUREMENT_BLOCKER",
     "productRegressionDemonstrated": false
+  },
+  "b3008R2P5": {
+    "status": "QA_DIAGNOSTIC_ARMED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P5_CLIENT360_DIAGNOSTIC_INSTRUMENT_20261002.json",
+    "blobSha": "361031cd03f453b62228e37a674a97460d7d0a66",
+    "failedRunId": 37019116003,
+    "classification": "PRODUCT_PERFORMANCE_FAILURE_CONFIRMED_DIAGNOSTIC_CAUSE_PENDING",
+    "productRegressionDemonstrated": true
   }
 }

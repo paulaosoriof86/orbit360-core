@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P5_CLIENT360_DIAGNOSTIC_INSTRUMENT_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_DIAGNOSTIC_ARMED_PENDING_EXACT_PREVIEW",
+  "findingId": "B3-008",
+  "failedRunId": 37019116003,
+  "failedSourceSha": "93ab3610e839be12a8926a9acddd13d959f2d873",
+  "classification": "PRODUCT_PERFORMANCE_FAILURE_CONFIRMED_DIAGNOSTIC_CAUSE_PENDING",
+  "productRegressionDemonstrated": true,
+  "evidence": "Cliente360 usable marker did not appear within the 6-second contract after route helper precondition was removed.",
+  "diagnosticFields": [
+    "hash",
+    "routeKey",
+    "activeRole",
+    "cliente360 view permission",
+    "clientProjection availability",
+    "server-confirmed collections/product status",
+    "host text",
+    "loading/denied marker",
+    "page errors",
+    "console errors"
+  ],
+  "productSourceChanged": false,
+  "proofBlobSha": "c81c4641cb75d6234d8baf35b9c6e6bf7a7c8c9e",
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_CLIENT360_CAUSAL_DIAGNOSTIC_EXACT_PREVIEW"
+}
