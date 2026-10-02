@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_006_DIAGNOSTIC_ACTIVE",
+  "status": "B3_006_PRODUCT_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,16 +14,24 @@
   "activeFinding": {
     "id": "B3-006",
     "title": "Controlled policy import creates policy + expected receipts + portfolio, never confirmed cobro without evidence.",
-    "status": "DIAGNOSTIC_ACTIVE",
+    "status": "PRODUCT_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
     "blocking": true,
     "boundaries": {
       "businessWritesAuthorized": false,
       "configWritesAuthorized": false,
       "reimportAuthorized": false,
       "liveHostingPromotionAuthorized": false,
-      "productMutationAuthorized": false
+      "productMutationAuthorized": true
     },
-    "nextAction": "B3_006_DIAGNOSTIC"
+    "nextAction": "B3_006_SOURCE_FIX",
+    "rootCause": "POLICY_IMPORT_BYPASSES_CANONICAL_POLICY_RECEIPTS_OWNER_AND_PERFORMS_FIRE_AND_FORGET_NON_ATOMIC_POLICY_PLUS_LEGACY_COBROS_WRITES",
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CAUSAL_DIAGNOSTIC_20261001.json",
+    "diagnosticReceiptBlobSha": "4907e6f630ae4a936875e71321a393eef573cdf4",
+    "authorizedProductFiles": [
+      "orbit360-platform/core/importa.js",
+      "orbit360-platform/index.html"
+    ],
+    "canonicalOwner": "orbit360-platform/core/policy-receipts-engine.js"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -32,10 +40,12 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "7675a38bb68d26d0a1a9e896219e77cc411f7693"
+    "blobSha": "3a1b08108756d5875afe0d697aab1992f7824dd4"
   },
   "nextRequiredProof": [
-    "B3_006_CAUSAL_DIAGNOSTIC"
+    "B3_006_SOURCE_CONTRACT_PASS",
+    "B3_006_EXACT_PREVIEW_MACHINE_PASS",
+    "B3_006_SYNTHETIC_CLEANUP_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
