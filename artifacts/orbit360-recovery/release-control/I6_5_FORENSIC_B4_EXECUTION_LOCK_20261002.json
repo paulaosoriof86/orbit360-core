@@ -60,5 +60,13 @@
     "reimportAuthorized": false,
     "livePromotionAuthorized": false
   },
-  "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC"
+  "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC",
+  "compositionLock": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "blobSha": "8fc3f8aa028417981241318c2d3cc33cccc47a9d"
+  },
+  "findingLedger": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "blobSha": "0b9d4e8169547f8799332af351837193a24f72b0"
+  }
 }
