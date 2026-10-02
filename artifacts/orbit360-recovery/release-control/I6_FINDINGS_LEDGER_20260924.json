@@ -2157,7 +2157,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-      "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+      "status": "TARGETED_VISUAL_PASS_PENDING_CLEANUP",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "businessRulesFrozen": true,
@@ -2173,7 +2173,7 @@
       "paymentLockBlobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
       "entryBlockedBy": null,
       "entryUnblockedBy": "B3-004 CLOSED_PASS",
-      "nextAction": "B3_005_TARGETED_HUMAN_VISUAL",
+      "nextAction": "B3_005_FIXTURE_CLEANUP",
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
@@ -2283,7 +2283,9 @@
         "blobSha": "6c10b68b1b6bedb368d6b31d9f3621b9225510c1",
         "status": "QA_GOVERNANCE_MECHANISM_REPAIRED_PENDING_EXACT_PREVIEW",
         "productSourceChanged": false
-      }
+      },
+      "targetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
+      "targetedVisualReceiptBlobSha": "9458db64710a21f658d7f93329ad3fd7f905b29c"
     },
     {
       "id": "B3-006",
@@ -2350,8 +2352,28 @@
             "Preserve KPI reality discrepancy outside B3-005 unless a causal dependency is demonstrated."
           ],
           "disposition": "PRESERVE_FOR_B3_008_KPI_REALITY"
+        },
+        {
+          "recordedAt": "2026-10-01",
+          "source": "B3-005 targeted human validation / Cliente360",
+          "evidence": [
+            "Cliente360 shows Salud 70 and zero policy/portfolio KPIs while receipts are still loading.",
+            "After authoritative policy/receipt/portfolio hydration the same client shows Salud 51, 1/1 policy and Q1,000 cartera exigible."
+          ],
+          "causalDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_CLIENTE360_HEALTH_HYDRATION_DIAGNOSTIC_20261001.json",
+          "causalDiagnosticBlobSha": "1746189469392b51b051c5fae61dc6e6245e5773",
+          "classification": "BLOCKS_CURRENT_PRODUCTION",
+          "disposition": "PRESERVE_FOR_B3_008; NO_NEW_FINDING; DOES_NOT_REOPEN_B3_002_OR_B3_005"
         }
-      ]
+      ],
+      "relatedCliente360Hydration": {
+        "status": "CAUSAL_DIAGNOSTIC_RECORDED",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_CLIENTE360_HEALTH_HYDRATION_DIAGNOSTIC_20261001.json",
+        "blobSha": "1746189469392b51b051c5fae61dc6e6245e5773",
+        "owner": "orbit360-platform/modules/cliente360.js",
+        "rootCause": "DETAIL_HEADER_AND_HEALTH_RENDER_BEFORE_REQUIRED_FINANCIAL_DEPENDENCIES_ARE_SERVER_CONFIRMED",
+        "remediationContract": "Gate numeric/color Health and dependent KPIs on authoritative readiness; reconcile metric authority in B3-008."
+      }
     },
     {
       "id": "B4-001",
@@ -5887,13 +5909,13 @@
     }
   },
   "currentB3": {
-    "status": "B3_005_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "B3_005_TARGETED_VISUAL_PASS_PENDING_CLEANUP",
     "activeFindingId": "B3-005",
     "priorFindingId": "B3-004",
     "priorFindingStatus": "CLOSED_PASS",
     "priorTargetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_004_R15_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
     "priorTargetedVisualReceiptBlobSha": "62a01e96e82cb1526cdb48b333d8252828346987",
-    "compositionLockBlobSha": "76bbc41619f3b1aeb9734a9a36aeffb7be7089ca",
+    "compositionLockBlobSha": "82abac6bcb7af469d92e7ccbba5aed4ccfffff51",
     "noLive": true,
     "noReimport": true,
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
@@ -5917,6 +5939,8 @@
     "r3p1FullTreeCompositionRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R3P1_FULL_TREE_COMPOSITION_REPAIR_20261001.json",
     "r3p1FullTreeCompositionRepairBlobSha": "1d336d3d9339da82be8147332a1e9d963441353c",
     "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_MACHINE_PASS_20261001.json",
-    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_REJECTION_SEMANTIC_PROVENANCE_20261001.json"
+    "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_REJECTION_SEMANTIC_PROVENANCE_20261001.json",
+    "targetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
+    "targetedVisualReceiptBlobSha": "9458db64710a21f658d7f93329ad3fd7f905b29c"
   }
 }
