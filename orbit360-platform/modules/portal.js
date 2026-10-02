@@ -254,25 +254,48 @@ Orbit.modules.portal = (function () {
     const html = `<label class="ce-l">Tipo de solicitud<select id="ps-tipo" class="o-sel">${tipos.map(t => `<option ${t === tipoPre ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
       <label class="ce-l" style="margin-top:10px">Detalle<textarea id="ps-det" class="o-sel" style="min-height:70px;resize:vertical;padding:9px 11px" placeholder="Cuéntanos qué necesitas…"></textarea></label>
       <div class="cfg-note" style="margin-top:10px">Tu solicitud llega al equipo (Orbit Ops). WhatsApp/correo quedan pendientes de canal conectado.</div>`;
-    const back = drawer('🗂 Solicitar una gestión', html, () => {
+    const back = drawer('🗂 Solicitar una gestión', html, async () => {
+      const submit = back.querySelector('#dr-ok');
+      if (submit && submit.disabled) return;
+      if (submit) { submit.disabled = true; submit.textContent = 'Guardando…'; }
       const tipo = back.querySelector('#ps-tipo').value, det = back.querySelector('#ps-det').value.trim();
       const esSiniestro = /reclamo|siniestro/i.test(tipo);
       let reclamoId = '';
-      if (esSiniestro) {
-        const pol = q.polizasDe(clienteId).filter(esPolizaActivaPortal)[0];
-        reclamoId = 'rcl' + Date.now();
-        const num = 'SIN-' + new Date().getFullYear() + '-' + String(S().all('reclamos').length + 1).padStart(4, '0');
-        S().insert('reclamos', {
-          id: reclamoId, numero: num, clienteId, polizaId: pol ? pol.id : '', aseguradoraId: pol ? pol.aseguradoraId : '',
-          tipo: 'Reclamo reportado', estado: 'Reportado', prioridad: 'Media', origen: 'portal',
-          fecha: Orbit.ui.today(), responsable: cli.asesorId || '', montoReclamado: 0, montoAprobado: 0,
-          descripcion: det, bitacora: [{ ts: Orbit.ui.today(), t: 'Reportado por el cliente desde el Portal', quien: cli.nombre }]
+      try {
+        if (!S().insertDurable || !Orbit.ciclo || typeof Orbit.ciclo.crearGestionDurable !== 'function') throw new Error('PORTAL_DURABLE_WORKFLOW_REQUIRED');
+        if (esSiniestro) {
+          const pol = q.polizasDe(clienteId).filter(esPolizaActivaPortal)[0];
+          reclamoId = 'rcl' + Date.now();
+          const num = 'SIN-' + new Date().getFullYear() + '-' + String(S().all('reclamos').length + 1).padStart(4, '0');
+          await S().insertDurable('reclamos', {
+            id: reclamoId, numero: num, clienteId, polizaId: pol ? pol.id : '', aseguradoraId: pol ? pol.aseguradoraId : '',
+            tipo: 'Reclamo reportado', estado: 'Reportado', prioridad: 'Media', origen: 'portal',
+            fecha: Orbit.ui.today(), responsable: cli.asesorId || '', montoReclamado: 0, montoAprobado: 0,
+            descripcion: det, bitacora: [{ ts: Orbit.ui.today(), t: 'Reportado por el cliente desde el Portal', quien: cli.nombre }]
+          });
+        }
+        const gestion = await Orbit.ciclo.crearGestionDurable({
+          lista: 'Gestiones Admin', tipo, titulo: tipo + ' · ' + cli.nombre, clienteId,
+          asesorId: cli.asesorId, prioridad: esSiniestro ? 'Alta' : 'Media', vence: Orbit.ui.today(),
+          nota: det, origen: 'Portal del cliente', reclamoId,
+          checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'En gestión', done: false }]
         });
+        if (!gestion || !gestion.id) throw new Error('PORTAL_MANAGEMENT_CANONICAL_READBACK_REQUIRED');
+        await S().insertDurable('actividades', {
+          id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId,
+          tipo: esSiniestro ? 'siniestro' : 'sistema', icon: esSiniestro ? '🚨' : '🙋',
+          fecha: Orbit.ui.today(), titulo: esSiniestro ? 'Siniestro reportado por el cliente' : ('Solicitud del cliente: ' + tipo),
+          detalle: det + ' · Portal → Ops' + (reclamoId ? ' + Siniestros' : ''),
+          reclamoId, gestionId: gestion.id
+        });
+        back.remove();
+        toast(esSiniestro ? '✓ Siniestro y gestión confirmados para seguimiento' : '✓ Solicitud confirmada para el equipo');
+        render(host);
+      } catch (error) {
+        if (submit) { submit.disabled = false; submit.textContent = 'Enviar solicitud'; }
+        toast('No fue posible confirmar la solicitud. No se registró un falso éxito.');
       }
-      if (Orbit.ciclo && Orbit.ciclo.crearGestion) Orbit.ciclo.crearGestion({ lista: 'Gestiones Admin', tipo, titulo: tipo + ' · ' + cli.nombre, clienteId, asesorId: cli.asesorId, prioridad: esSiniestro ? 'Alta' : 'Media', vence: Orbit.ui.today(), nota: det, origen: 'Portal del cliente', reclamoId, checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'En gestión', done: false }] });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId, tipo: esSiniestro ? 'siniestro' : 'sistema', icon: esSiniestro ? '🚨' : '🙋', fecha: Orbit.ui.today(), titulo: esSiniestro ? 'Siniestro reportado por el cliente' : ('Solicitud del cliente: ' + tipo), detalle: det + ' · Portal → Ops' + (reclamoId ? ' + Siniestros' : ''), reclamoId });
-      back.remove(); toast(esSiniestro ? '✓ Siniestro reportado · el equipo le dará seguimiento' : '✓ Solicitud registrada para el equipo'); render(host);
-    }, 'Enviar solicitud');
+
   }
 
   function detPoliza(polId) {
