@@ -340,26 +340,46 @@ Orbit.ciclo = (function () {
       </div>`;
     const back = modal(html, 980);
 
-    // stepper jump
-    back.querySelectorAll('.cstep').forEach(b => b.addEventListener('click', () => { setEtapa(id, b.dataset.etapa); refresh(); openNegocio(id); }));
+    // stepper jump: no UI success before canonical commit/readback.
+    back.querySelectorAll('.cstep').forEach(b => b.addEventListener('click', async () => {
+      if (b.disabled) return; b.disabled = true;
+      try { await setEtapa(id, b.dataset.etapa); refresh(); openNegocio(id); }
+      catch (error) { b.disabled = false; U.toast('No fue posible confirmar el cambio de etapa.'); }
+    }));
     // stage actions
     back.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', async () => {
-      const a = b.dataset.act;
-      if (a === 'perder') { const m = await Orbit.ui.prompt('Motivo de pérdida (opcional):', { title: 'Marcar como perdido', ok: 'Marcar perdido' }); if (m === null) return; perder(id, m); }
-      else if (a === 'archivar') { archivar(id); back.remove(); refresh(); return; }
-      else if (a === 'insp') decidirCierre(id, 'inspeccion');
-      else if (a === 'emis') decidirCierre(id, 'emision');
-      else setEtapa(id, a);
-      refresh(); openNegocio(id);
+      if (b.disabled) return;
+      const a = b.dataset.act; b.disabled = true;
+      try {
+        if (a === 'perder') { const m = await Orbit.ui.prompt('Motivo de pérdida (opcional):', { title: 'Marcar como perdido', ok: 'Marcar perdido' }); if (m === null) { b.disabled = false; return; } await perder(id, m); }
+        else if (a === 'archivar') { await archivar(id); back.remove(); refresh(); return; }
+        else if (a === 'insp') await decidirCierre(id, 'inspeccion');
+        else if (a === 'emis') await decidirCierre(id, 'emision');
+        else await setEtapa(id, a);
+        refresh(); openNegocio(id);
+      } catch (error) { b.disabled = false; U.toast('No fue posible confirmar la operación.'); }
     }));
     // checklist
-    back.querySelectorAll('[data-chk]').forEach(c => c.addEventListener('change', () => {
-      const i = +c.dataset.chk; n.checklist[i].done = c.checked; S().update('negocios', id, { checklist: n.checklist }); refresh();
+    back.querySelectorAll('[data-chk]').forEach(c => c.addEventListener('change', async () => {
+      const i = +c.dataset.chk, before = !c.checked; n.checklist[i].done = c.checked; c.disabled = true;
+      try { await S().updateDurable('negocios', id, { checklist: n.checklist }); refresh(); }
+      catch (error) { n.checklist[i].done = before; c.checked = before; U.toast('No fue posible guardar el checklist.'); }
+      c.disabled = false;
     }));
     const cadd = back.querySelector('#ng-chk-add');
-    if (cadd) cadd.addEventListener('click', () => { const v = back.querySelector('#ng-chk-new').value.trim(); if (!v) return; n.checklist = n.checklist || []; n.checklist.push({ t: v, done: false }); S().update('negocios', id, { checklist: n.checklist }); openNegocio(id); });
+    if (cadd) cadd.addEventListener('click', async () => {
+      const v = back.querySelector('#ng-chk-new').value.trim(); if (!v) return;
+      const prior = (n.checklist || []).slice(); n.checklist = prior.concat([{ t: v, done: false }]); cadd.disabled = true;
+      try { await S().updateDurable('negocios', id, { checklist: n.checklist }); openNegocio(id); }
+      catch (error) { n.checklist = prior; cadd.disabled = false; U.toast('No fue posible guardar el checklist.'); }
+    });
     const comadd = back.querySelector('#ng-com-add');
-    if (comadd) comadd.addEventListener('click', () => { const v = back.querySelector('#ng-com-new').value.trim(); if (!v) return; n.comentarios = n.comentarios || []; n.comentarios.push({ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), texto: v }); S().update('negocios', id, { comentarios: n.comentarios }); openNegocio(id); });
+    if (comadd) comadd.addEventListener('click', async () => {
+      const v = back.querySelector('#ng-com-new').value.trim(); if (!v) return;
+      const prior = (n.comentarios || []).slice(); n.comentarios = prior.concat([{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), texto: v }]); comadd.disabled = true;
+      try { await S().updateDurable('negocios', id, { comentarios: n.comentarios }); openNegocio(id); }
+      catch (error) { n.comentarios = prior; comadd.disabled = false; U.toast('No fue posible guardar el comentario.'); }
+    });
     // delete
     const ngDelete = back.querySelector('#ng-delete');
     if (ngDelete) ngDelete.addEventListener('click', async () => {
@@ -374,16 +394,19 @@ Orbit.ciclo = (function () {
       ngDelete.disabled = false;
     });
     // save
-    back.querySelector('#ng-save').addEventListener('click', () => {
-      const g = sid => (back.querySelector('#' + sid) || {}).value;
-      S().update('negocios', id, {
-        nombre: g('ng-nombre') || n.nombre, tipo: g('ng-tipo'), telefono: g('ng-tel'), email: g('ng-email'),
-        pais: g('ng-pais'), moneda: g('ng-pais') === 'CO' ? 'COP' : 'GTQ', canal: g('ng-canal'),
-        producto: g('ng-prod'), ramo: g('ng-ramo'), aseguradoraId: g('ng-asg'), asesorId: g('ng-ase'),
-        primaEst: +g('ng-prima') || n.primaEst, prioridad: g('ng-prio'), nroCotizacion: g('ng-cot'),
-        proximoToque: g('ng-toque') || n.proximoToque, descripcion: g('ng-desc'), colLeads: (back.querySelector('#ng-col') || {}).value || '', actualizado: today()
-      });
-      back.remove(); refresh();
+    back.querySelector('#ng-save').addEventListener('click', async () => {
+      const save = back.querySelector('#ng-save'), g = sid => (back.querySelector('#' + sid) || {}).value;
+      if (save.disabled) return; save.disabled = true;
+      try {
+        await S().updateDurable('negocios', id, {
+          nombre: g('ng-nombre') || n.nombre, tipo: g('ng-tipo'), telefono: g('ng-tel'), email: g('ng-email'),
+          pais: g('ng-pais'), moneda: g('ng-pais') === 'CO' ? 'COP' : 'GTQ', canal: g('ng-canal'),
+          producto: g('ng-prod'), ramo: g('ng-ramo'), aseguradoraId: g('ng-asg'), asesorId: g('ng-ase'),
+          primaEst: +g('ng-prima') || n.primaEst, prioridad: g('ng-prio'), nroCotizacion: g('ng-cot'),
+          proximoToque: g('ng-toque') || n.proximoToque, descripcion: g('ng-desc'), colLeads: (back.querySelector('#ng-col') || {}).value || '', actualizado: today()
+        });
+        back.remove(); refresh();
+      } catch (error) { save.disabled = false; U.toast('No fue posible confirmar los cambios del negocio.'); }
     });
   }
 
