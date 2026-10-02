@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_006_SOURCE_CONTRACT_PASS_V1",
+  "recordedAt": "2026-10-01",
+  "status": "PASS_PENDING_EXACT_PREVIEW",
+  "sourceSha": "c702fca82731a3c13a92da70e8c7514611ed0976",
+  "findingId": "B3-006",
+  "executionMode": "DIRECT_GITHUB_BLOB_CONTRACT_EQUIVALENT",
+  "assertions": {
+    "importerSyntaxParse": true,
+    "canonicalEngineSyntaxParse": true,
+    "policyImportCanonicalOwner": true,
+    "policyCreateUpdateAwaited": true,
+    "atomicServerCommitRequired": true,
+    "expectedReceiptsDomain": true,
+    "portfolioDomain": true,
+    "noPolicyImportCobroWrite": true,
+    "canonicalAtomicPlanHasNoCobros": true,
+    "scopeBoundaryUpdated": true,
+    "assetBindingUpdated": true,
+    "cleanupQaFullResidueReadbackBound": true
+  },
+  "exactBlobs": {
+    "orbit360-platform/core/importa.js": "99ca3de8d60d3a26c97067c056fdc383d8fdd15f",
+    "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
+    "orbit360-platform/index.html": "8708ddfcbfd569dc4457ca7c329c3433264cb567",
+    "tools/gravicentra-i6-5-b3-006-preview-proof.mjs": "e5ad05ae396f44d2a89133648a1fe52353a8062c"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3007": false,
+  "nextAction": "B3_006_EXACT_PREVIEW"
+}
