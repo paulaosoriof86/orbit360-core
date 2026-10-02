@@ -11,5 +11,6 @@ module.exports = Object.assign(
   require('./index'),
   require('./bank-accounts'),
   require('./cotcomp-runtime-entry-s438'),
-  require('./cotcomp-pilot-intake-s467')
+  require('./cotcomp-pilot-intake-s467'),
+  require('./cotcomp-pilot-proposal-validation-s471')
 );
