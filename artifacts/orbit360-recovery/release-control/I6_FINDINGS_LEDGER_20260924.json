@@ -2478,7 +2478,19 @@
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
-      "livePromotionAuthorized": false
+      "livePromotionAuthorized": false,
+      "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
+      "scopeAndClosureLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
+      "diagnosticScope": "READINESS_HYDRATION_AND_ONLY_NECESSARY_SEMANTIC_CORRECTION",
+      "broadDashboardAuditAuthorized": false,
+      "metricRegistryDisposition": "POSTPRODUCTION_HARDENING",
+      "canonicalReleaseManifestProjectionDisposition": "POSTPRODUCTION_HARDENING_UNLESS_PROMOTION_INDISPENSABLE",
+      "semanticFailClosedState": "BUSINESS_SEMANTIC_DECISION_REQUIRED",
+      "preReadyUiState": [
+        "CALCULANDO",
+        "ACTUALIZANDO DATOS"
+      ],
+      "triageRule": "HALLAZGO->CAUSALIDAD->BLOCKS_CURRENT_PRODUCTION/POSTPRODUCTION_HARDENING/PHASE_B; ONLY BLOCKS_CURRENT_PRODUCTION ENTERS ACTIVE GATE"
     },
     {
       "id": "B4-001",
@@ -6022,6 +6034,8 @@
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
     "compositionLockBlobSha": "9c1d0c39d36d3725cf51782e5ea88cc06d30698f",
     "noLive": true,
-    "noReimport": true
+    "noReimport": true,
+    "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
+    "scopeAndClosureLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6"
   }
 }
