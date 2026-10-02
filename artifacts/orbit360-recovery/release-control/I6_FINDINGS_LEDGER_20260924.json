@@ -2540,6 +2540,14 @@
         "failedRunId": 37014118190,
         "classification": "HARNESS_ONLY",
         "productRegressionDemonstrated": false
+      },
+      "r2p3": {
+        "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P3_ROUTE_TIMING_HARNESS_FIX_20261002.json",
+        "blobSha": "470a67d0d8ad3803b99ac7c8f6606986cc73f13b",
+        "failedRunId": 37014655642,
+        "classification": "HARNESS_ONLY_PERFORMANCE_MEASUREMENT_BLOCKER",
+        "productRegressionDemonstrated": false
       }
     },
     {
@@ -6015,6 +6023,8 @@
     "r2p1ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P1_REALIZED_PAYMENT_PROJECTION_FIX_20261002.json",
     "r2p1ReceiptBlobSha": "c4fdae72f55b957dcd5a2fc2ae1eed7db24ceaa9",
     "r2p2ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P2_INDEPENDENT_PORTFOLIO_HARNESS_FIX_20261002.json",
-    "r2p2ReceiptBlobSha": "5b7ae401aab08467ee6bc253db0e8a3cc7caf111"
+    "r2p2ReceiptBlobSha": "5b7ae401aab08467ee6bc253db0e8a3cc7caf111",
+    "r2p3ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P3_ROUTE_TIMING_HARNESS_FIX_20261002.json",
+    "r2p3ReceiptBlobSha": "470a67d0d8ad3803b99ac7c8f6606986cc73f13b"
   }
 }

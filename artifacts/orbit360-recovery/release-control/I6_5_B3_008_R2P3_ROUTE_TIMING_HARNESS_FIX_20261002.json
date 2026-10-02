@@ -1,0 +1,19 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P3_ROUTE_TIMING_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B3-008",
+  "failedRunId": 37014655642,
+  "failedSourceSha": "5aec2a22d0fbab704868ea4fdbef0e8901724636",
+  "classification": "HARNESS_ONLY_PERFORMANCE_MEASUREMENT_BLOCKER",
+  "failure": "page.waitForFunction Orbit.route.key timeout 30000ms before performance selector threshold",
+  "productRegressionDemonstrated": false,
+  "productSourceChanged": false,
+  "rootCause": "The shared route helper waited up to 30 seconds for Orbit.route.key before the dedicated 6-second Cliente360/Cobros usable-surface assertion could run, so a helper timeout masked the actual product-performance measurement.",
+  "fix": "Route helper now confirms only hash navigation with a 2-second bound; the module-specific ready selector remains the authoritative <=6-second performance gate.",
+  "proofBlobSha": "6e3df87659ca6bce93846b2ea404d2d620f88776",
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}
