@@ -1,0 +1,45 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P4_CRONOGRAMA_INDEXED_RELATION_PERFORMANCE_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B3-008",
+  "carriesB3007PerformanceDebt": true,
+  "failedRunId": 37047445704,
+  "failedJobId": 110972263452,
+  "observedCronogramaMs": 6525,
+  "requiredCronogramaMsMax": 6000,
+  "classification": "PRODUCT_PERFORMANCE_DEFECT",
+  "rootCause": [
+    "cobros-cartera-i65-closure-bridge resolved policy/client relationships with store.get() inside per-row filters",
+    "store.get() performs a linear cache scan",
+    "Cronograma then repeated client/policy store.get() calls while materializing each pending obligation",
+    "This created repeated relation scans over the same already-loaded collections"
+  ],
+  "remediation": {
+    "strategy": "Build per-render relation indexes once and reuse O(1) lookups across cartera, cobros, recibos and Cronograma event materialization.",
+    "productFiles": {
+      "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
+      "orbit360-platform/modules/cronograma.js": "471c84f43de3a86e8b5ad02dcddc24a2a9bc6dcb",
+      "orbit360-platform/index.html": "cd69e376e40d9b84ccc584fda67e25eaa1afb395"
+    },
+    "qaFiles": {
+      "tools/gravicentra-i6-5-b3-008-contract.mjs": "b2d1bfc70e579ead63cd7d08ed9c7b3d9dbf5679"
+    }
+  },
+  "preservedSemantics": [
+    "No source data changed",
+    "No reimport",
+    "No LIVE promotion",
+    "Same country/access filters",
+    "Same pending-obligation eligibility",
+    "Same B3-007 synthetic residue guard"
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4Advance": false
+  },
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}
