@@ -163,9 +163,9 @@
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
-    "orbit360-platform/core/queries.js": "47d8aa225ee0d57668684ba34737192bef76fc39",
+    "orbit360-platform/core/queries.js": "6857b531764c126c995e5641990a791a7db03caa",
     "orbit360-platform/core/record-delete.js": "749722f8482db5a72b72ac9b64dbcac08af86b82",
-    "orbit360-platform/core/router.js": "645c1bddf6a8990777a84985a34206afe930e0a3",
+    "orbit360-platform/core/router.js": "40bcfe6c7ab090b372dd637a819b83671b021938",
     "orbit360-platform/core/tenant-access-policy-contract-p0.js": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
     "orbit360-platform/core/tenant-access-policy-effective-p0.js": "56e515206ff18e3baabcfd66b217b4985f1288ad",
     "orbit360-platform/core/tenant-access-policy-product-p0.js": "045322231523ec624c6f19efea1a66c204b962bc",
@@ -179,7 +179,7 @@
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
-    "orbit360-platform/modules/cliente360.js": "cb127dd1eee1fa247d0210b0acd91f17d3e2e441",
+    "orbit360-platform/modules/cliente360.js": "e94f9d42f0b1d168ec2f7ba731b454e652d08ff6",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495",
     "orbit360-platform/modules/cobros.js": "df8d483309fbd27861a5d55e93c69af780f7f0a6",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
@@ -189,7 +189,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "8b31d7021139c71b9e00bd44cb5cd8e1ad753a65",
+    "orbit360-platform/modules/inicio.js": "232c9707bf3efaba2ffcc6fdc2e671d09e22c916",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "c4382238964ba18ac9e0669f4e01dd0897681d62",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "cafbaa33a3f23d30ec773df3b569ecf12e891e6e",
@@ -411,10 +411,16 @@
     "livePromotion": false
   },
   "lastAuthorizedMutation": {
-    "findingId": "B3-007",
-    "kind": "CRONOGRAMA_CANONICAL_PORTFOLIO_OWNER_FIX",
-    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_SOURCE_FIX_20261001.json",
-    "blobSha": "33208aacaa62666404094dbaad80f59c1266d00c"
+    "findingId": "B3-008",
+    "classification": "PRODUCT",
+    "authorizedFiles": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/core/router.js"
+    ],
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_MINIMAL_SOURCE_FIX_20261001.json",
+    "receiptBlobSha": "7803b5f614792e6d80df1e1e1d3f22488d44a641"
   },
   "b3004ActionSurfaceFix": {
     "status": "R4_SOURCE_FIXED_PENDING_CONTRACT",
@@ -1864,6 +1870,21 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
     "blobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
     "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "b3008SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_MINIMAL_SOURCE_FIX_20261001.json",
+    "blobSha": "7803b5f614792e6d80df1e1e1d3f22488d44a641",
+    "sourceHead": "d5a0d10e11c3f30ef237dac9c8a21321c266b249",
+    "productFiles": {
+      "orbit360-platform/core/queries.js": "6857b531764c126c995e5641990a791a7db03caa",
+      "orbit360-platform/modules/cliente360.js": "e94f9d42f0b1d168ec2f7ba731b454e652d08ff6",
+      "orbit360-platform/modules/inicio.js": "232c9707bf3efaba2ffcc6fdc2e671d09e22c916",
+      "orbit360-platform/core/router.js": "40bcfe6c7ab090b372dd637a819b83671b021938"
+    },
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
