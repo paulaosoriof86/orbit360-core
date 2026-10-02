@@ -2295,15 +2295,23 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Controlled policy import creates policy + expected receipts + portfolio, never confirmed cobro without evidence.",
-      "status": "DIAGNOSTIC_ACTIVE",
+      "status": "PRODUCT_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "entryUnblockedBy": "B3-005 CLOSED_PASS",
-      "nextAction": "B3_006_DIAGNOSTIC",
-      "productMutationAuthorized": false,
+      "nextAction": "B3_006_SOURCE_FIX",
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
-      "livePromotionAuthorized": false
+      "livePromotionAuthorized": false,
+      "rootCause": "POLICY_IMPORT_BYPASSES_CANONICAL_POLICY_RECEIPTS_OWNER_AND_PERFORMS_FIRE_AND_FORGET_NON_ATOMIC_POLICY_PLUS_LEGACY_COBROS_WRITES",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CAUSAL_DIAGNOSTIC_20261001.json",
+      "diagnosticReceiptBlobSha": "4907e6f630ae4a936875e71321a393eef573cdf4",
+      "authorizedProductFiles": [
+        "orbit360-platform/core/importa.js",
+        "orbit360-platform/index.html"
+      ],
+      "canonicalOwner": "orbit360-platform/core/policy-receipts-engine.js"
     },
     {
       "id": "B3-007",
@@ -5918,7 +5926,7 @@
     }
   },
   "currentB3": {
-    "status": "B3_006_DIAGNOSTIC_ACTIVE",
+    "status": "B3_006_PRODUCT_DEFECT_CONFIRMED_SOURCE_FIX_AUTHORIZED",
     "activeFindingId": "B3-006",
     "priorFindingId": "B3-005",
     "priorFindingStatus": "CLOSED_PASS",
@@ -5926,6 +5934,8 @@
     "priorClosureReceiptBlobSha": "66e41c3b6de7de6681dea371784a5f1bf0990f2a",
     "compositionLockBlobSha": "d7a5d444097f4bee45ece06f5ef885376cc0021e",
     "noLive": true,
-    "noReimport": true
+    "noReimport": true,
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_CAUSAL_DIAGNOSTIC_20261001.json",
+    "diagnosticReceiptBlobSha": "4907e6f630ae4a936875e71321a393eef573cdf4"
   }
 }
