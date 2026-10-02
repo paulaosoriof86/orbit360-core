@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P7_POLICY_CURRENCY_AND_DEEP_FINANCIAL_AUDIT_ARM_V1",
+  "recordedAt": "2026-10-02",
+  "findingId": "B3-008",
+  "status": "SOURCE_FIXED_DEEP_AUDIT_ARMED_PENDING_EXACT_PREVIEW",
+  "rootCause": "I6.5 receipt source rows could carry a currency inconsistent with the frozen I6.4 linked policy currency; KPI projection trusted receipt currency first even though I6.5 source authority explicitly forbids receipt sources from regressing policy currency.",
+  "observed": {
+    "policyNumber": "UTO-1000001645",
+    "policyCountry": "GT",
+    "policyCurrency": "GTQ",
+    "sourceReceiptCurrency": "COP",
+    "affectedReceiptRows": 10,
+    "eachAmount": 147,
+    "sourceRefs": [
+      "Recibos por fecha límite.xlsx",
+      "Cobranza Efectuada desde 2024.xlsx"
+    ]
+  },
+  "remediation": "Linked financial projections resolve policy currency first while retaining sourceMoneda/currencyValidation provenance. Exact Preview proof additionally performs a global receipt-calendar lineage audit and premium/tax/tariff-rule diagnostic before B3 closure.",
+  "productBlobs": {
+    "queries": "7ff1b3cdf9091ffcab864a247433e19c2f1d06be",
+    "index": "f88b61d75ac544f1f16d014d5f47f8f7051dac04"
+  },
+  "qaBlobs": {
+    "proof": "e798f7c8f4774962948b4ad49766862e4ab85225",
+    "contract": "97a732224eee05b8953949bbd8401a63082ae46a",
+    "workflow": "387e5c4cda4db0e4518af59d52a60285bb666d2f"
+  },
+  "compositionLockBlobSha": "637852100be44036d8569aeb4b9090793ada4b28",
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4Advance": false
+  },
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}

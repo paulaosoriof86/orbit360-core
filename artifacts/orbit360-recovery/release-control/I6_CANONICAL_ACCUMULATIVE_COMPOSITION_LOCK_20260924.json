@@ -164,7 +164,7 @@
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
-    "orbit360-platform/core/queries.js": "f601760d82154ca5281149e659148706e34d5c00",
+    "orbit360-platform/core/queries.js": "7ff1b3cdf9091ffcab864a247433e19c2f1d06be",
     "orbit360-platform/core/record-delete.js": "749722f8482db5a72b72ac9b64dbcac08af86b82",
     "orbit360-platform/core/router.js": "40bcfe6c7ab090b372dd637a819b83671b021938",
     "orbit360-platform/core/tenant-access-policy-contract-p0.js": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
@@ -176,7 +176,7 @@
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "6c07e51966984f7bf52d2e7618c884301eefb404",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "e4f523d18dec8594a53c15132cd29ce1c26b2d48",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "0ce72f4d5e6f4e4ec3f7f233d2d08d271c2ef14d",
+    "orbit360-platform/index.html": "f88b61d75ac544f1f16d014d5f47f8f7051dac04",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "059722a945a53b963fb3a5daca69c8c4d14c1563",
     "orbit360-platform/modules/cancelaciones.js": "0f21d0436ed4669b022169b3ab1176099c117f71",
@@ -2005,6 +2005,15 @@
     "blobSha": "d70b3e595a99a4076ae02e893c8efae05f3b9f9a",
     "sourceFixCommit": "2eeec5f92aa1cbd9b00d2950eb00988a1cb66648",
     "scope": "COBROS_KPI_SEMANTICS_AND_SMALL_AMOUNT_CLARITY",
+    "noLive": true,
+    "noReimport": true
+  },
+  "b3008R5P7": {
+    "status": "SOURCE_AND_DEEP_FINANCIAL_AUDIT_ARMED_PENDING_EXACT_PREVIEW",
+    "sourceParent": "a6b1c46400fde9fd0bbdb013df187bce0a0c3fa5",
+    "currencyAuthority": "POLICY_CURRENCY_FOR_LINKED_FINANCIAL_ROWS",
+    "receiptCalendarAudit": true,
+    "premiumRulesAudit": true,
     "noLive": true,
     "noReimport": true
   }

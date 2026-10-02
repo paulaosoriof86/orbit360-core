@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_008_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+  "status": "B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-008",
     "title": "Dashboard Inicio reality reconciliation closed before B4.",
-    "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
     "boundaries": {
       "businessWritesAuthorized": false,
@@ -23,7 +23,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_008_TARGETED_PAULA_VISUAL",
+    "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
     "scopeAndClosureLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
     "diagnosticScope": "READINESS_HYDRATION_AND_ONLY_NECESSARY_SEMANTIC_CORRECTION",
@@ -75,6 +75,10 @@
     "r5p6Diagnostic": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P6_GT_COP_PROVENANCE_DIAGNOSTIC_ARM_20261002.json",
       "blobSha": "9d4f88fe72898c61a21649b18c188878b04d8f1d"
+    },
+    "r5p7": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P7_POLICY_CURRENCY_AND_DEEP_FINANCIAL_AUDIT_ARM_20261002.json",
+      "blobSha": "c0d8adc5e30a9e7b462964ef0ccbf24f22c9e760"
     }
   },
   "canonicalComposition": {
@@ -84,7 +88,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "236c27cafb33d3b21034a6f89cf2b3cb2c637aa6"
+    "blobSha": "341c36179d7acfff2bd324c94ec2e47ff9ca47b7"
   },
   "nextRequiredProof": [
     "B3_008_TARGETED_PAULA_VISUAL_ACCEPTANCE"
@@ -273,7 +277,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "c69e89cadcc546c32b06153b990ee8988a0b075b"
+    "blobSha": "637852100be44036d8569aeb4b9090793ada4b28"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
@@ -959,5 +963,11 @@
     "status": "READONLY_PROVENANCE_DIAGNOSTIC_ARMED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P6_GT_COP_PROVENANCE_DIAGNOSTIC_ARM_20261002.json",
     "blobSha": "9d4f88fe72898c61a21649b18c188878b04d8f1d"
+  },
+  "b3008R5P7": {
+    "status": "SOURCE_FIXED_DEEP_AUDIT_ARMED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P7_POLICY_CURRENCY_AND_DEEP_FINANCIAL_AUDIT_ARM_20261002.json",
+    "blobSha": "c0d8adc5e30a9e7b462964ef0ccbf24f22c9e760",
+    "compositionLockBlobSha": "637852100be44036d8569aeb4b9090793ada4b28"
   }
 }

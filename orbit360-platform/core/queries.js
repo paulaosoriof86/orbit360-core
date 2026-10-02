@@ -239,9 +239,11 @@ Orbit.q = (function () {
         clienteId: r.clienteId || policy.clienteId || '',
         polizaId: r.polizaId || '',
         asesorId: r.asesorId || policy.asesorId || '',
-        pais: r.pais || policy.pais || '',
+        pais: policy.pais || r.pais || '',
         monto: r.primaTotal != null ? r.primaTotal : (r.montoTotal != null ? r.montoTotal : r.monto),
-        moneda: r.moneda || policy.moneda || '',
+        moneda: policy.moneda || policy.divisa || r.moneda || '',
+        sourceMoneda: r.moneda || '',
+        currencyValidation: (policy.moneda && r.moneda && countryCode(policy.moneda) !== countryCode(r.moneda)) ? 'REQUIERE_VALIDACION' : 'OK',
         fechaPago: r.fechaPago || r.paidDate || r.inferredEffectiveDate || '',
         paidDate: r.paidDate || '',
         inferredEffectiveDate: r.inferredEffectiveDate || '',
@@ -356,7 +358,7 @@ Orbit.q = (function () {
     const policy = row.polizaId != null ? (policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId)) : null;
     const clientId = row.clienteId != null ? row.clienteId : (policy && policy.clienteId);
     const client = clientId != null ? (clients instanceof Map ? clients.get(clientId) : S().get('clientes', clientId)) : null;
-    return String(row.moneda || (policy && policy.moneda) || (client && client.moneda) || '').trim().toUpperCase() || 'SIN_MONEDA';
+    return String((policy && (policy.moneda || policy.divisa)) || row.moneda || (client && client.moneda) || '').trim().toUpperCase() || 'SIN_MONEDA';
   }
   function emptyPortfolioCurrency() { return { alDia: 0, pend: 0, venc: 0, porConciliar: 0 }; }
   function carteraGlobalPorMoneda() {

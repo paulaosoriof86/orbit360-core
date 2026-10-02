@@ -40,6 +40,8 @@ need(src.queries.includes('function leaderboardMes('),'B3_008_MONTHLY_ADVISOR_OW
 need(src.queries.includes('function metaAdvisorMes('),'B3_008_MONTHLY_META_SCHEMA_OWNER_MISSING');
 need(src.queries.includes('function cobrosConfirmadosRows()'),'B3_008_CONFIRMED_DETAIL_OWNER_MISSING');
 need(src.queries.includes('confirmedCount'),'B3_008_CONFIRMED_COUNT_OWNER_MISSING');
+need(src.queries.includes("return String((policy && (policy.moneda || policy.divisa)) || row.moneda"),'B3_008_POLICY_CURRENCY_AUTHORITY_MISSING');
+need(src.queries.includes("sourceMoneda: r.moneda || ''"),'B3_008_SOURCE_CURRENCY_PROVENANCE_MISSING');
 need(src.queries.includes('reconciledCount: Math.max(0, confirmedCount - porConciliarCount)'),'B3_008_RECONCILED_COUNT_OWNER_MISSING');
 need(src.queries.includes('function polizasScoped()'),'B3_008_POLICY_COUNTRY_SCOPE_OWNER_MISSING');
 need(src.queries.includes('function clientesScoped()'),'B3_008_CLIENT_COUNTRY_SCOPE_OWNER_MISSING');
@@ -70,7 +72,7 @@ need((src.cliente.match(/class="kpi kpi-click" data-c360-kpi="/g)||[]).length===
 need(src.index.includes('data/store-firestore-product-readonly-p0.js?v=20261002-b3008r4'),'B3_008_INDEXED_STORE_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/crm-v1198-operational-bridge.js?v=20261002-b3008r4'),'B3_008_CRM_CANONICAL_OWNER_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/policy-receipts-v1199-detail-guard.js?v=20261002-b3008r4'),'B3_008_DETAIL_GUARD_CANONICAL_OWNER_ASSET_BINDING_MISSING');
-need(src.index.includes('core/queries.js?v=20261002-b3008r5p5'),'B3_008_R5P5_QUERY_ASSET_BINDING_MISSING');
+need(src.index.includes('core/queries.js?v=20261002-b3008r5p7'),'B3_008_R5P7_QUERY_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/inicio.js?v=20261002-b3008r5p5'),'B3_008_R5P5_INICIO_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/cliente360.js?v=20261002-b3008r5p1'),'B3_008_R5P1_CLIENTE360_ASSET_BINDING_MISSING');
 need(src.index.includes('modules/cobros.js?v=20261002-b3008r5p5'),'B3_008_R5P5_COBROS_ASSET_BINDING_MISSING');
@@ -96,6 +98,7 @@ need(src.polizas.includes("label: 'Pólizas activas'"),'B3_008_POLIZAS_ACTIVE_LA
 need(src.cronograma.includes('function receiptIndex()'),'B3_007_CRONOGRAMA_INDEX_MISSING');
 need(src.cronograma.includes('function relationIndex()'),'B3_007_CRONOGRAMA_RELATION_INDEX_MISSING');
 need(src.cronograma.includes('data-cronograma-ready="1"'),'B3_007_CRONOGRAMA_READY_MARKER_MISSING');
+need(src.index.includes('core/primas.js?v1291'),'B3_008_PREMIUM_ENGINE_NOT_LOADED');
 
 for(const p of [paths.queries,paths.cliente,paths.inicio,paths.cobros,paths.polizas,paths.cronograma,paths.store,paths.crm,paths.detailGuard,paths.portfolioAdapter,paths.index]){
   need(composition.productFileBlobs?.[p]===git('hash-object',p),'B3_008_COMPOSITION_BLOB_DRIFT:'+p);

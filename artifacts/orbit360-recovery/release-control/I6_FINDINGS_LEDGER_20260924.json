@@ -2415,7 +2415,7 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Dashboard Inicio reality reconciliation closed before B4.",
-      "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2429,7 +2429,7 @@
         "image(20260930-011108).png"
       ],
       "rootCause": "READINESS_OWNER_MISMATCH_AND_CAUSAL_SECOND_WRITERS_CONFIRMED",
-      "nextAction": "B3_008_TARGETED_PAULA_VISUAL",
+      "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
       "diagnosticClue": {
         "fromGate": "B3-003",
         "authoritativeCounts": {
@@ -2654,6 +2654,11 @@
       "r5p6Diagnostic": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P6_GT_COP_PROVENANCE_DIAGNOSTIC_ARM_20261002.json",
         "blobSha": "9d4f88fe72898c61a21649b18c188878b04d8f1d"
+      },
+      "r5p7": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P7_POLICY_CURRENCY_AND_DEEP_FINANCIAL_AUDIT_ARM_20261002.json",
+        "blobSha": "c0d8adc5e30a9e7b462964ef0ccbf24f22c9e760",
+        "compositionLockBlobSha": "637852100be44036d8569aeb4b9090793ada4b28"
       }
     },
     {
@@ -6110,13 +6115,13 @@
     }
   },
   "currentB3": {
-    "status": "B3_008_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+    "status": "B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B3-008",
     "priorFindingId": "B3-007",
     "priorFindingStatus": "CLOSED_PASS",
     "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CLOSED_PASS_20261001.json",
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
-    "compositionLockBlobSha": "c69e89cadcc546c32b06153b990ee8988a0b075b",
+    "compositionLockBlobSha": "637852100be44036d8569aeb4b9090793ada4b28",
     "noLive": true,
     "noReimport": true,
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
@@ -6157,6 +6162,8 @@
     "r5p5ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_R4_COBROS_KPI_CLARITY_FIX_R5P5_20261002.json",
     "r5p5ReceiptBlobSha": "d70b3e595a99a4076ae02e893c8efae05f3b9f9a",
     "r5p6DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P6_GT_COP_PROVENANCE_DIAGNOSTIC_ARM_20261002.json",
-    "r5p6DiagnosticBlobSha": "9d4f88fe72898c61a21649b18c188878b04d8f1d"
+    "r5p6DiagnosticBlobSha": "9d4f88fe72898c61a21649b18c188878b04d8f1d",
+    "r5p7ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P7_POLICY_CURRENCY_AND_DEEP_FINANCIAL_AUDIT_ARM_20261002.json",
+    "r5p7ReceiptBlobSha": "c0d8adc5e30a9e7b462964ef0ccbf24f22c9e760"
   }
 }
