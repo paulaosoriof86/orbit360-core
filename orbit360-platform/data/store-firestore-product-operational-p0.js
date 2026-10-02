@@ -157,7 +157,10 @@
       return'update_business';
     }
     if(collection==='gestiones'){
-      if(action==='insert')return'create_management';
+      if(action==='insert'){
+        var origin=text(row&&row.origen).toLowerCase();
+        return /portal|solicitud del cliente/.test(origin)?'portal_request':'create_management';
+      }
       if(action==='remove'||(prior&&prior.archivado!==true&&row&&row.archivado===true))return'archive_management';
       if(action==='update'&&prior&&row&&text(prior.estado)!=='Resuelta'&&text(row.estado)==='Resuelta')return'resolve_management';
       if(action==='update'&&prior&&row&&text(prior.estado)==='Resuelta'&&text(row.estado)!=='Resuelta')return'reopen_management';
@@ -178,6 +181,7 @@
     if(operation==='resolve_management')return'Resolución de gestión desde Orbit.store';
     if(operation==='reopen_management')return'Reapertura de gestión desde Orbit.store';
     if(operation==='assign_management')return'Asignación de gestión desde Orbit.store';
+    if(operation==='portal_request')return'Solicitud de gestión desde Portal del Cliente';
     return operation.indexOf('business')>=0?'Actualización de negocio desde Orbit.store':'Actualización de gestión desde Orbit.store';
   }
   function callDurable(action,collection,id,payload,prior){
