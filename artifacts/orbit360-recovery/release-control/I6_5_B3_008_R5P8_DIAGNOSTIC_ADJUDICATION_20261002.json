@@ -1,0 +1,478 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P8_DIAGNOSTIC_ADJUDICATION_V1",
+  "recordedAt": "2026-10-02",
+  "status": "READONLY_DIAGNOSTIC_CLASSIFIED_NO_PRODUCT_SOURCE_CHANGE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headBefore": "f44c20ed34374e33f090266f559116c293d5c73c",
+  "controlPlaneBlobBefore": "7cdbf2ba543effa0e07268eed3fc83fe25079e63",
+  "findingId": "B3-008",
+  "machineCandidate": {
+    "sourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "buildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
+    "runId": 37061984102,
+    "artifactId": 11250418215,
+    "artifactDigest": "449b152a760f931d1a1a3074880f7ae4ca4aac24bb751129205f03bacd1f756f",
+    "proofFileSha256": "b7ef8d5359d1c1626038089b494de52a1d68e75d20ba11cc3608987f41154c5b"
+  },
+  "method": {
+    "source": "Existing R5P8 proof inside certified artifact; no new broad scan executed.",
+    "inactiveRowsExcludedByHarness": "superseded=true OR calendarActive=false OR estado in [anulado,superseded,reemplazado]",
+    "expectedInstallments": "policy.cuotas when explicit, otherwise frequency mapping",
+    "deterministicCandidate": "matching physical x/n denominator to expected installments; single denominator fallback only when unique",
+    "tolerance": "receipt-calendar total mismatch when absolute difference >= 0.02",
+    "noMutation": true
+  },
+  "receiptCalendarSummary": {
+    "activePolicies": 226,
+    "withPhysicalReceipts": 225,
+    "missingPhysicalReceipts": 1,
+    "rawMultiDenominatorPolicies": 7,
+    "originalTotalMismatch": 73,
+    "deterministicCandidateExact": 152,
+    "deterministicCandidateCountMismatch": 25,
+    "deterministicCandidateTotalMismatch": 58,
+    "currencyConflictRowsObserved": 10,
+    "currencyAuthorityAlreadyAdjudicated": "PASS_CANONICAL_POLICY_CURRENCY"
+  },
+  "missingPolicy": {
+    "category": "AMBIGUOUS_FAIL_CLOSED",
+    "policyId": "pol_c6dd04d8bf31fceea1222290dcfa",
+    "numero": "AUTO-45497",
+    "pais": "GT",
+    "moneda": "GTQ",
+    "frecuencia": "",
+    "cuotas": null,
+    "primaTotal": 3600.15,
+    "disposition": "Do not fabricate a calendar; contractual frequency/installment authority is absent."
+  },
+  "issueClassifications": {
+    "PAYMENT_EVIDENCE_NOT_CALENDAR": [
+      {
+        "policyId": "pol_06aaa35ca240ce819161b3e75f66",
+        "numero": "91-8264656"
+      },
+      {
+        "policyId": "pol_0bd8fa03ea2ab63c2264bf917e71",
+        "numero": "02-01-753-2780-0"
+      },
+      {
+        "policyId": "pol_30759e9c3cc06ce4d4b40eb23a43",
+        "numero": "91-8301043"
+      },
+      {
+        "policyId": "pol_32c822c08d2f457f6e5c27dab464",
+        "numero": "91-8282111"
+      },
+      {
+        "policyId": "pol_4773480dde15659f114b5f53875a",
+        "numero": "91-8276951"
+      },
+      {
+        "policyId": "pol_61535888be59a3068996a8da1657",
+        "numero": "91-8350081"
+      },
+      {
+        "policyId": "pol_728f521bfd759e7b308b5b1f0aec",
+        "numero": "91-9111020"
+      },
+      {
+        "policyId": "pol_87b756fc84922f1d44d414c25b87",
+        "numero": "91-8344741"
+      },
+      {
+        "policyId": "pol_9a27702923d27c235bab8f765ec1",
+        "numero": "91-8314685"
+      },
+      {
+        "policyId": "pol_c1a7c6218eb02f9ab8be24c89b5a",
+        "numero": "91-8350767"
+      },
+      {
+        "policyId": "pol_cb4b31f502d60ab55ac5e1d6971a",
+        "numero": "SC-79849"
+      },
+      {
+        "policyId": "pol_f86bac81b0079a6b0e2730f2f031",
+        "numero": "91-8343059"
+      },
+      {
+        "policyId": "pol_ff1367137d6cf43c19a2c57ee424",
+        "numero": "91-4142561"
+      }
+    ],
+    "SOURCE_DATA_QUALITY_ONLY": [
+      {
+        "policyId": "pol_0741b6472b44fc51a1a38ce2c441",
+        "numero": "91-0169567"
+      },
+      {
+        "policyId": "pol_0841eb2f31e7df38b79a0522da1d",
+        "numero": "70682"
+      },
+      {
+        "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "numero": "91-234395"
+      },
+      {
+        "policyId": "pol_12d59bfd08d383965c0838620ea8",
+        "numero": "AUTO 38308"
+      },
+      {
+        "policyId": "pol_145c1f650e2b61130916d54aa4d3",
+        "numero": "AUTO-1000000187"
+      },
+      {
+        "policyId": "pol_200528c9362da998753ae8456b5d",
+        "numero": "VA-41977"
+      },
+      {
+        "policyId": "pol_22620de6c498934a287f867f9485",
+        "numero": "100061"
+      },
+      {
+        "policyId": "pol_243608bce078afdf9640c8554ac4",
+        "numero": "10738"
+      },
+      {
+        "policyId": "pol_3490627f33ed3b184517505e8d2d",
+        "numero": "91-9107739"
+      },
+      {
+        "policyId": "pol_367925bf3d72cbbb4d2391000353",
+        "numero": "91-4143202"
+      },
+      {
+        "policyId": "pol_386e7b161cc2a76186380d804ee4",
+        "numero": "91-8302768"
+      },
+      {
+        "policyId": "pol_3ddc9e613f40252f02b2e122072d",
+        "numero": "91-8324489"
+      },
+      {
+        "policyId": "pol_3eb983f8f26e70bf93d01f1e1862",
+        "numero": "91-8299001"
+      },
+      {
+        "policyId": "pol_532ac4945e5bbf0fea4be4c7c029",
+        "numero": "GMCO-26802"
+      },
+      {
+        "policyId": "pol_59909e3b0b334ef681fbe31a5baf",
+        "numero": "3002600002453"
+      },
+      {
+        "policyId": "pol_5e55c72bf730c34eacaaf2513f9e",
+        "numero": "VA-58517"
+      },
+      {
+        "policyId": "pol_5edeef7751e993f1ad9467da7d3d",
+        "numero": "91-8315353"
+      },
+      {
+        "policyId": "pol_6a1ebe25900138e020c1db7abd44",
+        "numero": "AUTO37856"
+      },
+      {
+        "policyId": "pol_714c772aa59bd2e0b0a338ae7693",
+        "numero": "91-9105495"
+      },
+      {
+        "policyId": "pol_752907bff667a77ba07189e8274f",
+        "numero": "91-8334771"
+      },
+      {
+        "policyId": "pol_80dd5b48f21e536042d65003e682",
+        "numero": "3002100014117"
+      },
+      {
+        "policyId": "pol_841e35aca5a66214ceaeeb4e3da9",
+        "numero": "3002400057714"
+      },
+      {
+        "policyId": "pol_85c00e535acb2e4b93ef873d4776",
+        "numero": "91-8332808"
+      },
+      {
+        "policyId": "pol_9216bfdadaec20d1075f1b4008dd",
+        "numero": "91-8342593"
+      },
+      {
+        "policyId": "pol_9634d32ec97e4dc93fef8f194677",
+        "numero": "1-AP-20890"
+      },
+      {
+        "policyId": "pol_9b27eb5e63683fd6f9b36c37b5d9",
+        "numero": "A-58028"
+      },
+      {
+        "policyId": "pol_9d33c2ec87721eac71b1a47551fe",
+        "numero": "VA-57280"
+      },
+      {
+        "policyId": "pol_a44e1495a4d3a925eb74075f5b7a",
+        "numero": "040501014498-1"
+      },
+      {
+        "policyId": "pol_a8af35f6f7856dc026ef05a71252",
+        "numero": "91-8278775"
+      },
+      {
+        "policyId": "pol_b39a58e5c216d8fb0f9fca4da4d6",
+        "numero": "91-8357452"
+      },
+      {
+        "policyId": "pol_c0214ae6627e1eb400f17d3951ce",
+        "numero": "91-4142679"
+      },
+      {
+        "policyId": "pol_c23dd5e9d7d5e8056c6dd907c48f",
+        "numero": "VA-48941"
+      },
+      {
+        "policyId": "pol_cb170c67cabb6330be62fcfb12d6",
+        "numero": "1-AP-21167"
+      },
+      {
+        "policyId": "pol_cb7a20b411cd4ee13ba1bcc24faa",
+        "numero": "91-8282008"
+      },
+      {
+        "policyId": "pol_cdc32b549eb7c0732a9ef8b1626e",
+        "numero": "39012"
+      },
+      {
+        "policyId": "pol_d1b141d1f226847fe90c0b40d056",
+        "numero": "3002100014247"
+      },
+      {
+        "policyId": "pol_d5e61976a38be76ba5e3c1e12575",
+        "numero": "91-8342189"
+      },
+      {
+        "policyId": "pol_d6ffb6b1f5c8a6990b7228c263e4",
+        "numero": "AUTO-526844"
+      },
+      {
+        "policyId": "pol_d957242209c31974d11137e90dea",
+        "numero": "91-8326660"
+      },
+      {
+        "policyId": "pol_dda1a827b1c4443567870abeee8e",
+        "numero": "1000163"
+      },
+      {
+        "policyId": "pol_de85862415049fabe870315c16fe",
+        "numero": "91-8331591"
+      },
+      {
+        "policyId": "pol_ded51ce85b30b3a28311ffdc8ad6",
+        "numero": "91-8325710"
+      },
+      {
+        "policyId": "pol_e264eeec83f598c5d6afdb7a59d4",
+        "numero": "3002600004525"
+      },
+      {
+        "policyId": "pol_f6e33d0eb6220ae590f87ff9f47f",
+        "numero": "91-9105499"
+      }
+    ],
+    "AMBIGUOUS_FAIL_CLOSED": [
+      {
+        "policyId": "pol_1c9927a858f64edbddd1508f555e",
+        "numero": "AUTO39865"
+      },
+      {
+        "policyId": "pol_22f37fc24c35f96898f373812dac",
+        "numero": "226125562"
+      },
+      {
+        "policyId": "pol_657dcbf1c675195900ed1beae695",
+        "numero": "AUTO-40385"
+      },
+      {
+        "policyId": "pol_65b64923aa22719fe019e0b252b6",
+        "numero": "AUTO-510656"
+      },
+      {
+        "policyId": "pol_6fc005003a2ba6d52bdba67188ed",
+        "numero": "UTO-1000001645"
+      },
+      {
+        "policyId": "pol_7488654cc15a5343488c78f96666",
+        "numero": "AUTO40740"
+      },
+      {
+        "policyId": "pol_75e192fe7cf51d253f19c9665237",
+        "numero": "226125806"
+      },
+      {
+        "policyId": "pol_7ff7aa525e7c04d00e550671ebf2",
+        "numero": "125-00010777"
+      },
+      {
+        "policyId": "pol_899d7d4b5334ec9425f55772fffc",
+        "numero": "AUTO40322"
+      },
+      {
+        "policyId": "pol_94d20634e697386f95344a733904",
+        "numero": "VA125-00010743"
+      },
+      {
+        "policyId": "pol_c23d92f9ad369764181b595edb2b",
+        "numero": "225118528"
+      },
+      {
+        "policyId": "pol_c48c0b1d4e940f80dffacbc37959",
+        "numero": "225121356"
+      },
+      {
+        "policyId": "pol_c721866d906e77e1b42e409cd27b",
+        "numero": "91-8349954"
+      },
+      {
+        "policyId": "pol_d73f953551fbd4a5ab5adde5d951",
+        "numero": "AUTO-527776"
+      },
+      {
+        "policyId": "pol_d7d25c6f025173195c22681927fe",
+        "numero": "AUTO40191"
+      },
+      {
+        "policyId": "pol_dd979b03fdafabefa77c48cd496c",
+        "numero": "AUTO40486"
+      },
+      {
+        "policyId": "pol_e1d5a90eee17aa3fcca2a747c112",
+        "numero": "225116489"
+      }
+    ]
+  },
+  "issueClassificationCounts": {
+    "PAYMENT_EVIDENCE_NOT_CALENDAR": 13,
+    "SOURCE_DATA_QUALITY_ONLY": 44,
+    "AMBIGUOUS_FAIL_CLOSED": 17,
+    "totalIssues": 74
+  },
+  "multiDenominatorPolicies": [
+    {
+      "policyId": "pol_306889d1db780fdca29081587017",
+      "numero": "AUTO40116",
+      "denominators": [
+        10,
+        12
+      ],
+      "category": "AMBIGUOUS_FAIL_CLOSED",
+      "reason": "Competing physical schedules; monthly implies 12 but no explicit superseded marker authorizes deleting the 10-installment package."
+    },
+    {
+      "policyId": "pol_48777107ffb7ce1b8e82cbbdac37",
+      "numero": "91-8353989",
+      "denominators": [
+        10,
+        12
+      ],
+      "category": "AMBIGUOUS_FAIL_CLOSED",
+      "reason": "Competing denominated packages plus no-denominator rows; no explicit superseded authority."
+    },
+    {
+      "policyId": "pol_67b45fec23a302374bcd9fb5c661",
+      "numero": "AUTO-40727",
+      "denominators": [
+        10,
+        12
+      ],
+      "category": "AMBIGUOUS_FAIL_CLOSED",
+      "reason": "Competing physical schedules; do not silently choose/delete without source authority."
+    },
+    {
+      "policyId": "pol_780b1ceea5b5990cb8388bbfc1f1",
+      "numero": "AUTO40844",
+      "denominators": [
+        10,
+        1
+      ],
+      "category": "PAYMENT_EVIDENCE_NOT_CALENDAR",
+      "reason": "The 1/1 row is CRM_DIRECT pago_reportado evidence equal to the policy total while the 10-row package is the pending schedule; keep evidence separate from calendar."
+    },
+    {
+      "policyId": "pol_9566b7e2e4b05209ba7b5a629a9c",
+      "numero": "225116618",
+      "denominators": [
+        12,
+        10
+      ],
+      "category": "AMBIGUOUS_FAIL_CLOSED",
+      "reason": "Competing physical schedules; no explicit superseded marker."
+    },
+    {
+      "policyId": "pol_c721866d906e77e1b42e409cd27b",
+      "numero": "91-8349954",
+      "denominators": [
+        2,
+        1
+      ],
+      "category": "AMBIGUOUS_FAIL_CLOSED",
+      "reason": "Monthly policy but denominators 2 and 1 plus no-denominator rows; no deterministic contractual calendar candidate."
+    },
+    {
+      "policyId": "pol_edccd992648d194fac6aadc0f7e4",
+      "numero": "AUTO40748",
+      "denominators": [
+        10,
+        12
+      ],
+      "category": "AMBIGUOUS_FAIL_CLOSED",
+      "reason": "Competing physical schedules; no explicit superseded marker."
+    }
+  ],
+  "premiumAndTariffAuthority": {
+    "mathEngine": {
+      "category": "PASS_CANONICAL",
+      "formulaAudited": 7,
+      "formulaMismatch": 0,
+      "taxPctMismatch": 0,
+      "note": "This certifies only arithmetic consistency where enough contractual components existed; it does not certify insurer/product tariff rates."
+    },
+    "tariffConfiguration": {
+      "category": "CONFIGURATION_AUTHORITY_MISSING",
+      "configuracionesTarifa": 0,
+      "configuracionesTarifaValid": 0,
+      "embeddedTarifasConfiguradas": 0,
+      "embeddedTarifasConfiguradasValid": 0,
+      "legacyCotTasasValidadas": 0,
+      "tariffSamplesWithSourceVersionValidity": 0,
+      "countryDefaultsObserved": {
+        "GT": {
+          "iva": 12,
+          "recargoFinanciero": 5,
+          "gastosEmision": 0
+        },
+        "CO": {
+          "iva": 19,
+          "recargoFinanciero": 6,
+          "gastosEmision": 0
+        }
+      },
+      "disposition": "Do not certify or invent insurer/ramo/product/frequency tariff percentages. Hold tariff-dependent validation until canonical configuration/document authority exists."
+    }
+  },
+  "categoriesNotObservedAsFinalR5P8Disposition": {
+    "HISTORICAL_SUPERSEDED": "Explicit superseded/inactive rows were already excluded by the R5P8 harness; no remaining finding was reclassified here solely as historical.",
+    "PRODUCT_LOGIC_DEFECT": "NONE_DEMONSTRATED_BY_R5P8"
+  },
+  "releaseDisposition": {
+    "productSourceChangedByAdjudication": false,
+    "rebuildRequired": false,
+    "certifiedArtifactPreserved": true,
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4Authorized": false,
+    "nextAction": "B3_008_TARGETED_PAULA_VISUAL; keep ambiguous receipt/calendar cases and tariff authority gap fail-closed."
+  }
+}
