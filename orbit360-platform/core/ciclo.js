@@ -512,13 +512,17 @@ Orbit.ciclo = (function () {
       }
     }));
     const cadd = back.querySelector('#gs-chk-add');
-    if (cadd) cadd.addEventListener('click', () => { const v = back.querySelector('#gs-chk-new').value.trim(); if (!v) return; g.checklist = g.checklist || []; g.checklist.push({ t: v, done: false }); S().update('gestiones', id, { checklist: g.checklist }); openGestion(id); });
+    if (cadd) cadd.addEventListener('click', async () => {
+      const v = back.querySelector('#gs-chk-new').value.trim(); if (!v) return;
+      const prior = (g.checklist || []).slice(); g.checklist = prior.concat([{ t: v, done: false }]); cadd.disabled = true;
+      try { await S().updateDurable('gestiones', id, { checklist: g.checklist, actualizado: today() }); openGestion(id); }
+      catch (error) { g.checklist = prior; cadd.disabled = false; U.toast('No fue posible guardar el checklist.'); }
+    });
     back.querySelectorAll('[data-gact]').forEach(b => b.addEventListener('click', async () => {
       const a = b.dataset.gact;
-      if (a === 'resolver') { log(g, 'Estado', g.estado, 'Resuelta', 'manual'); S().update('gestiones', id, { estado: 'Resuelta', bitacora: g.bitacora }); const cl = S().get('clientes', g.clienteId); notify({ tipo: 'gestion', titulo: 'Gestión resuelta · ' + (g.titulo || g.tipo), detalle: cl ? cl.nombre : '', para: (ase || {}).nombre, tel: cl ? cl.telefono : '', email: cl ? cl.email : '' }); if (cl && Orbit.notify) { Orbit.notify.pedir(cl.id, { tipo: 'Respuesta de gestión', icon: '✅', asunto: 'Actualización de tu gestión · ' + (g.tipo || ''), mensaje: 'Hola ' + cl.nombre + ', tu solicitud "' + (g.titulo || g.tipo) + '" ha sido resuelta. ' + (g.resultado ? g.resultado + ' ' : '') + 'Quedamos atentos a cualquier consulta.', onSent: () => openGestion(id) }); } else { openGestion(id); } }
-      else if (a === 'reabrir') { S().update('gestiones', id, { estado: 'Pendiente' }); openGestion(id); }
-      else if (a === 'archivar') { S().update('gestiones', id, { archivado: true }); back.remove(); }
-      else if (a === 'eliminar') {
+      if (a === 'cliente') { back.remove(); location.hash = '#/cliente360?c=' + g.clienteId; return; }
+      if (b.disabled) return;
+      if (a === 'eliminar') {
         if (!Orbit.recordDelete) { U.toast('Eliminación canónica no disponible.'); return; }
         b.disabled = true;
         try {
@@ -530,8 +534,27 @@ Orbit.ciclo = (function () {
         b.disabled = false;
         return;
       }
-      else if (a === 'cliente') { back.remove(); location.hash = '#/cliente360?c=' + g.clienteId; }
-      refresh();
+      b.disabled = true;
+      try {
+        if (a === 'resolver') {
+          log(g, 'Estado', g.estado, 'Resuelta', 'manual');
+          await S().updateDurable('gestiones', id, { estado: 'Resuelta', bitacora: g.bitacora, actualizado: today() });
+          const cl = S().get('clientes', g.clienteId);
+          notify({ tipo: 'gestion', titulo: 'Gestión resuelta · ' + (g.titulo || g.tipo), detalle: cl ? cl.nombre : '', para: (ase || {}).nombre, tel: cl ? cl.telefono : '', email: cl ? cl.email : '' });
+          if (cl && Orbit.notify) Orbit.notify.pedir(cl.id, { tipo: 'Respuesta de gestión', icon: '✅', asunto: 'Actualización de tu gestión · ' + (g.tipo || ''), mensaje: 'Hola ' + cl.nombre + ', tu solicitud "' + (g.titulo || g.tipo) + '" ha sido resuelta. ' + (g.resultado ? g.resultado + ' ' : '') + 'Quedamos atentos a cualquier consulta.', onSent: () => openGestion(id) });
+          else openGestion(id);
+        } else if (a === 'reabrir') {
+          await S().updateDurable('gestiones', id, { estado: 'Pendiente', actualizado: today() });
+          openGestion(id);
+        } else if (a === 'archivar') {
+          await S().updateDurable('gestiones', id, { archivado: true, actualizado: today() });
+          back.remove();
+        }
+        refresh();
+      } catch (error) {
+        b.disabled = false;
+        U.toast('No fue posible confirmar la operación de la gestión.');
+      }
     }));
     back.querySelector('#gs-save').addEventListener('click', async () => {
       const v = sid => (back.querySelector('#' + sid) || {}).value;
@@ -908,21 +931,24 @@ Orbit.ciclo = (function () {
           ${fInput('Producto', 'nn-prod', '')}
           ${fInput('Ramo', 'nn-ramo', 'Auto')}
           ${fInput('Prima estimada', 'nn-prima', 0, 'number')}
-          ${fSelectOpt('Asesor', 'nn-ase', asesores.map(a => [a.id, a.nombre]), Orbit.session ? Orbit.session.asesorId() : 'ase001')}
+          ${fSelectOpt('Asesor', 'nn-ase', asesores.map(a => [a.id, a.nombre]), (Orbit.session && Orbit.session.asesorId ? (Orbit.session.asesorId() || '') : ''))}
         </div>
         ${fSelect('Punto de ingreso', 'nn-ingreso', ['Leads (interés, sin cotizar)', 'Ops (pide cotización)'], 'Ops (pide cotización)')}
         <label class="ce-l">Descripción / detalle del riesgo<textarea id="nn-desc" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px"></textarea></label>
       </div>
       <div class="ciclo-foot"><div></div><div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="nn-ok">Crear</button></div></div>`;
     const back = modal(html, 640);
-    back.querySelector('#nn-ok').addEventListener('click', () => {
+    back.querySelector('#nn-ok').addEventListener('click', async () => {
+      const save = back.querySelector('#nn-ok');
+      if (save.disabled) return;
       const v = sid => (back.querySelector('#' + sid) || {}).value;
       const ingresoOps = v('nn-ingreso').indexOf('Ops') === 0;
-      const pais = v('nn-pais');
+      const pais = v('nn-pais'), asesorId = v('nn-ase');
+      if (!asesorId) return U.toast('Selecciona un asesor responsable.');
       const n = {
         id: 'neg' + Date.now().toString().slice(-7), nombre: v('nn-nombre') || 'Prospecto', tipo: v('nn-tipo'),
         etapa: ingresoOps ? 'cotizando' : 'nuevo', prob: ingresoOps ? 45 : 10,
-        asesorId: v('nn-ase'), canal: v('nn-canal'), pais, moneda: pais === 'CO' ? 'COP' : 'GTQ',
+        asesorId, canal: v('nn-canal'), pais, moneda: pais === 'CO' ? 'COP' : 'GTQ',
         producto: v('nn-prod') || 'Por definir', ramo: v('nn-ramo') || 'Auto', aseguradoraId: '',
         telefono: v('nn-tel'), email: v('nn-email'), primaEst: +v('nn-prima') || 0,
         descripcion: v('nn-desc'), notas: '', cadencia: '', cadenciaActiva: false,
@@ -933,7 +959,17 @@ Orbit.ciclo = (function () {
         bitacora: [{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Ingreso (' + (ingresoOps ? 'Ops' : 'Leads') + ')', origen: 'manual' }],
         comentarios: [], origen: ingresoOps ? 'Ops' : 'Leads', creado: today(), actualizado: today()
       };
-      S().insert('negocios', n); back.remove(); refresh(); openNegocio(n.id);
+      save.disabled = true; const original = save.textContent; save.textContent = 'Guardando…';
+      try {
+        if (!S().insertDurable) throw new Error('OPS_BUSINESS_DURABLE_WRITE_REQUIRED');
+        await S().insertDurable('negocios', n);
+        const confirmed = S().get('negocios', n.id);
+        if (!confirmed) throw new Error('OPS_BUSINESS_DURABLE_READBACK_MISSING');
+        back.remove(); refresh(); openNegocio(n.id);
+      } catch (error) {
+        save.disabled = false; save.textContent = original;
+        U.toast('No fue posible confirmar el nuevo ingreso. No se registró un falso éxito.');
+      }
     });
   }
   function nuevaGestion() {
