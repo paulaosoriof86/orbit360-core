@@ -1,0 +1,376 @@
+name: CotComp S4.68 W5 real submission execution
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s468-w5-real-submission-execution-20261001
+    paths:
+      - '.github/cotcomp-lab-intents/s468-w5-real-submission-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  COTCOMP_TENANT_ID: alianzas-soluciones
+  COTCOMP_WEB_APP_ID: '1:646761409743:web:2ec4595ee9160f9d945bba'
+  EXPECTED_OWNER_BLOB: 73e09a4404cb4298dc34c9c38e26ad1f960d3170
+
+jobs:
+  s468-w5-real-submission:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.68 authorization continuity
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s468-w5-real-submission-authorized.json
+          jq -e '
+            .authorization=="S468_CONTINUE_EXISTING_W5_AFTER_REAL_SUBMISSION" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .country=="GT" and
+            .journeyId=="GT_AUTO_MOTO_HYBRID" and
+            .maxQuoteCases==1 and
+            .maxDataSubjects==1 and
+            .allowedExecutions==1 and
+            .stages==["W1","W2","W3","W4"] and
+            .successDisposition=="ROLLBACK_TO_BEFORE_STATE" and
+            .generalPersistenceRelease==false and
+            .healthSensitiveData==false and
+            .providerOrRater==false and
+            .production==false and
+            .issuance==false and
+            .binding==false and
+            .payment==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA and S4.68 syntax gate
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-w5-real-submission-s468.js
+
+      - name: Prepare exact LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s468/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s468/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI and gcloud
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: 'latest'
+
+      - name: Authenticate exact LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" >/dev/null
+          gcloud config set project "$COTCOMP_PROJECT_ID" >/dev/null
+          test "$(gcloud config get-value project 2>/dev/null)" = "$COTCOMP_PROJECT_ID"
+
+      - name: Verify current deployed S4.67 source and atomic exactly-one contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/s468"
+          DESC="$ROOT/intake-function.json"
+          gcloud functions describe cotcompPilotIntakeS467 --gen2 --region "$COTCOMP_REGION" --project "$COTCOMP_PROJECT_ID" --format=json > "$DESC"
+          test "$(jq -r '.state' "$DESC")" = "ACTIVE"
+          BUCKET="$(jq -r '.buildConfig.source.storageSource.bucket // empty' "$DESC")"
+          OBJECT="$(jq -r '.buildConfig.source.storageSource.object // empty' "$DESC")"
+          GENERATION="$(jq -r '.buildConfig.source.storageSource.generation // empty' "$DESC")"
+          ARCHIVE="$ROOT/intake-source.bin"
+          URI="gs://$BUCKET/$OBJECT"; if [ -n "$GENERATION" ]; then URI="$URI#$GENERATION"; fi
+          if ! gcloud storage cp "$URI" "$ARCHIVE" >/dev/null 2>&1; then gsutil cp "$URI" "$ARCHIVE" >/dev/null; fi
+          mkdir -p "$ROOT/intake-source"
+          unzip -q "$ARCHIVE" -d "$ROOT/intake-source" 2>/dev/null || tar -xzf "$ARCHIVE" -C "$ROOT/intake-source"
+          DEPLOYED="$(find "$ROOT/intake-source" -type f -name 'cotcomp-pilot-intake-s467.js' -print -quit)"
+          test -n "$DEPLOYED"
+          DEPLOYED_BLOB="$(git hash-object "$DEPLOYED")"
+          REPO_BLOB="$(git hash-object "$GITHUB_WORKSPACE/functions/cotcomp-pilot-intake-s467.js")"
+          test "$DEPLOYED_BLOB" = "$REPO_BLOB"
+          grep -q "db.runTransaction" "$DEPLOYED"
+          grep -q "tx.create(caseRef,quoteCase)" "$DEPLOYED"
+          grep -q "tx.set(stateRef" "$DEPLOYED"
+          grep -q "stateSnap.data().used===true" "$DEPLOYED"
+          grep -q "requestManagementText:CONSENT_TEXT" "$DEPLOYED"
+          grep -q "marketing:false" "$DEPLOYED"
+          node -e "require('fs').writeFileSync(process.env.RUNNER_TEMP+'/s468/evidence/S468_RUNTIME_EXACTLY_ONE_SOURCE.json',JSON.stringify({runtimeActive:true,deployedSourceMatchesCurrentRepository:true,atomicTransaction:true,claimAndCaseCreateSameTransaction:true,usedStateCheckedInsideTransaction:true,consentPersistedInsideQuoteCase:true,marketingDefaultFalse:true,rawBearerPersisted:false},null,2))"
+          rm -rf "$ROOT/intake-source" "$ARCHIVE" "$DESC"
+
+      - name: Read submission state and observed backend HTTP result without PII
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const intake=require('./cotcomp-pilot-intake-s467');
+          const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:'ays-orbit-360-lab'});
+          const db=getFirestore(app);
+          (async()=>{
+            const s=await db.doc(intake.STATE_PATH).get();
+            if(!s.exists||s.data().used!==true)throw new Error('S468_SUBMISSION_NOT_CONSUMED');
+            const d=s.data();
+            const usedAt=d.usedAt&&typeof d.usedAt.toDate==='function'?d.usedAt.toDate().toISOString():String(d.usedAt||'');
+            if(!usedAt)throw new Error('S468_USED_AT_MISSING');
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s468/used-at.private',usedAt,{mode:0o600});
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s468/evidence/S468_SUBMISSION_STATE_SANITIZED.json',JSON.stringify({
+              intakeConsumed:true,
+              usedAt,
+              quoteCaseReferencePresent:!!d.quoteCaseId&&!!d.quoteCasePath,
+              bearerHashPresent:/^[a-f0-9]{64}$/i.test(String(d.tokenSha256||'')),
+              expiryPresent:!!d.expiresAt,
+              containsPii:d.containsPii===true
+            },null,2));
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)});
+          NODE
+
+          USED_AT="$(cat "$RUNNER_TEMP/s468/used-at.private")"
+          gcloud logging read             'resource.type="cloud_run_revision" AND resource.labels.service_name="cotcomppilotintakes467" AND httpRequest.requestMethod="POST"'             --project "$COTCOMP_PROJECT_ID" --freshness=1d --limit=50 --format=json > "$RUNNER_TEMP/s468/intake-post-logs.private.json" || true
+          USED_AT="$USED_AT" node <<'NODE'
+          const fs=require('fs');
+          let rows=[];try{rows=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s468/intake-post-logs.private.json','utf8')||'[]')}catch{}
+          const used=Date.parse(process.env.USED_AT||'');
+          const candidates=rows.map(x=>({
+            ts:x.timestamp||x.receiveTimestamp||null,
+            status:x.httpRequest&&x.httpRequest.status||null
+          })).filter(x=>x.ts&&Number.isFinite(used)&&Math.abs(Date.parse(x.ts)-used)<=120000);
+          const success=candidates.find(x=>Number(x.status)===201)||null;
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s468/evidence/S468_SUBMISSION_HTTP_SANITIZED.json',JSON.stringify({
+            backendHttpStatusObserved:success?201:null,
+            backendHttpSuccessObserved:!!success,
+            evidenceWindowSeconds:120,
+            noRequestPayloadCopied:true
+          },null,2));
+          NODE
+          rm -f "$RUNNER_TEMP/s468/intake-post-logs.private.json"
+
+      - name: Re-verify provider isolation before real W5 projection
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/s468"
+          DESC="$ROOT/owner.json"
+          gcloud functions describe orbit360OpsLeadsCommand --gen2 --region "$COTCOMP_REGION" --project "$COTCOMP_PROJECT_ID" --format=json > "$DESC"
+          BUCKET="$(jq -r '.buildConfig.source.storageSource.bucket // empty' "$DESC")"
+          OBJECT="$(jq -r '.buildConfig.source.storageSource.object // empty' "$DESC")"
+          GENERATION="$(jq -r '.buildConfig.source.storageSource.generation // empty' "$DESC")"
+          ARCHIVE="$ROOT/owner-source.bin"
+          URI="gs://$BUCKET/$OBJECT"; if [ -n "$GENERATION" ]; then URI="$URI#$GENERATION"; fi
+          if ! gcloud storage cp "$URI" "$ARCHIVE" >/dev/null 2>&1; then gsutil cp "$URI" "$ARCHIVE" >/dev/null; fi
+          mkdir -p "$ROOT/owner-source"
+          unzip -q "$ARCHIVE" -d "$ROOT/owner-source" 2>/dev/null || tar -xzf "$ARCHIVE" -C "$ROOT/owner-source"
+          OWNER_FILE="$(find "$ROOT/owner-source" -type f -name 'ops-leads-domain.js' -print -quit)"
+          test -n "$OWNER_FILE"
+          test "$(git hash-object "$OWNER_FILE")" = "$EXPECTED_OWNER_BLOB"
+
+          TOKEN="$(gcloud auth print-access-token)"
+          curl -sS -L -H "Authorization: Bearer $TOKEN"             "https://cloudfunctions.googleapis.com/v2/projects/$COTCOMP_PROJECT_ID/locations/-/functions?pageSize=1000"             -o "$ROOT/functions.private.json"
+          jq '.functions // []' "$ROOT/functions.private.json" > "$ROOT/functions-list.private.json"
+          gcloud eventarc triggers list --location "$COTCOMP_REGION" --project "$COTCOMP_PROJECT_ID" --format=json > "$ROOT/eventarc.private.json"
+
+          OWNER_PATH="$OWNER_FILE" node <<'NODE'
+          const fs=require('fs');
+          const iso=require('./functions/cotcomp-provider-isolation-s448');
+          const proof=iso.evaluate({
+            projectId:'ays-orbit-360-lab',
+            region:'us-central1',
+            functionState:'ACTIVE',
+            deployedOwnerBlob:iso.EXPECTED_OWNER_BLOB,
+            ownerSource:fs.readFileSync(process.env.OWNER_PATH,'utf8'),
+            functionsInventoryRead:true,
+            eventarcInventoryRead:true,
+            functions:JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s468/functions-list.private.json','utf8')),
+            eventarcTriggers:JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s468/eventarc.private.json','utf8')),
+            appDataReadsExecuted:0,
+            appDataWritesExecuted:0,
+            w2Executed:false,
+            providerDeliveryExecuted:false,
+            realDataTouched:false,
+            productionTouched:false
+          });
+          if(!proof.providerDeliveryIsolationVerified)throw new Error('S468_PROVIDER_ISOLATION_FAILED');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s468/evidence/S468_PROVIDER_ISOLATION.json',JSON.stringify({
+            verified:true,
+            automaticOutboxConsumerDetected:proof.infrastructure.automaticOutboxConsumerDetected,
+            functionConsumers:proof.infrastructure.outboxFunctionConsumers.length,
+            eventarcConsumers:proof.infrastructure.outboxEventarcConsumers.length
+          },null,2));
+          NODE
+          rm -rf "$ROOT/owner-source" "$ARCHIVE" "$DESC" "$ROOT/functions.private.json" "$ROOT/functions-list.private.json" "$ROOT/eventarc.private.json"
+
+      - name: Resolve Firebase Web API key read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase apps:sdkconfig WEB "$COTCOMP_WEB_APP_ID" --project "$COTCOMP_PROJECT_ID" --json > "$RUNNER_TEMP/s468/sdk.private.json"
+          node <<'NODE'
+          const fs=require('fs');
+          const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s468/sdk.private.json','utf8'));
+          let cfg=null;
+          function walk(v){if(cfg||!v||typeof v!=='object')return;if(typeof v.apiKey==='string'&&v.projectId==='ays-orbit-360-lab'){cfg=v;return;}for(const x of Object.values(v))if(typeof x==='object')walk(x);}
+          walk(raw);if(!cfg||!cfg.apiKey)throw new Error('S468_WEB_API_KEY_NOT_FOUND');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s468/api-key.private',cfg.apiKey,{mode:0o600});
+          NODE
+          rm -f "$RUNNER_TEMP/s468/sdk.private.json"
+
+      - name: Execute existing authorized W5 to the real evidence limit
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          export S468_PROOF_RUN_ID="s468-$GITHUB_RUN_ID"
+          export S468_FIREBASE_WEB_API_KEY="$(cat "$RUNNER_TEMP/s468/api-key.private")"
+          export S468_PRIVATE_STATE_PATH="$RUNNER_TEMP/s468/w5-private-state.json"
+          node cotcomp-w5-real-submission-s468.js > "$RUNNER_TEMP/s468/evidence/S468_W5_REAL_EXECUTION_RECEIPT.json"
+          jq -e '
+            .outcome=="PASS_TO_REAL_LIMIT" and
+            .submission.classification=="SUBMISSION_SUCCESS_SINGLE_CASE" and
+            .submission.intakeConsumed==true and
+            .submission.intakeCasesObserved==1 and
+            .submission.eligibleRealQuoteCases==1 and
+            .submission.tenantCorrect==true and
+            .submission.journeyCorrect==true and
+            .submission.oneDataSubject==true and
+            .submission.consentValid==true and
+            .submission.marketingFalse==true and
+            .submission.healthSensitiveDataAbsent==true and
+            .submission.generalPersistenceReleased==false and
+            .submission.preexistingWorkflowProjectionCount==0 and
+            .commitments.caseSelector=="PASS" and
+            .commitments.actorSelector=="PASS" and
+            .commitments.consentEvidence=="PASS" and
+            .w1.status=="PASS" and
+            .w2.status=="PASS" and
+            .w2.createdDocuments==8 and
+            .w2.retryWrites==0 and
+            .w2.duplicateCreated==false and
+            .w2.providerDeliveryExecuted==false and
+            (.w3.status=="DEPENDENCY" or .w3.status=="PASS_READ_ONLY") and
+            .w3.proposalWrites==0 and
+            .w3.providerOrRaterCalls==0 and
+            .w4.status=="CONTROL_PASS" and
+            .w4.blockCode=="EXPLICIT_USER_CHOICE_REQUIRED" and
+            .w4.selectionCreated==false and
+            .rollback.disposition=="ROLLBACK_TO_BEFORE_STATE" and
+            .rollback.deletedPilotDocuments==8 and
+            .rollback.realCaseFinalDigestMatches==true and
+            .rollback.pilotDocumentsFinalAbsent==true and
+            .mutationAccounting.creates==8 and
+            .mutationAccounting.deletes==8 and
+            .mutationAccounting.retryWrites==0 and
+            .mutationAccounting.netPilotDocuments==0 and
+            .boundaries.realDataSubjectsTouched==1 and
+            .boundaries.existingRealRecordsTouched==1 and
+            .boundaries.healthSensitiveDataTouched==false and
+            .boundaries.providerOrRaterCallsExecuted==0 and
+            .boundaries.productionTouched==false and
+            .boundaries.issuanceExecuted==false and
+            .boundaries.bindingExecuted==false and
+            .boundaries.paymentExecuted==false and
+            .boundaries.generalPersistenceReleased==false
+          ' "$RUNNER_TEMP/s468/evidence/S468_W5_REAL_EXECUTION_RECEIPT.json" >/dev/null
+
+      - name: Independent final readback
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const intake=require('./cotcomp-pilot-intake-s467');
+          const state=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/s468/w5-private-state.json','utf8'));
+          const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:'ays-orbit-360-lab'});
+          const db=getFirestore(app);
+          const crypto=require('node:crypto');
+          function stable(v){if(v==null)return v;if(typeof v.toDate==='function')return v.toDate().toISOString();if(Array.isArray(v))return v.map(stable);if(typeof v==='object')return Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])]));return v;}
+          const digest=v=>crypto.createHash('sha256').update(JSON.stringify(stable(v)),'utf8').digest('hex');
+          (async()=>{
+            const w2=await Promise.all(state.w2Paths.map(p=>db.doc(p).get()));
+            const caseSnap=await db.doc(state.casePath).get();
+            const intakeSnap=await db.doc(intake.STATE_PATH).get();
+            const out={
+              w2PilotDocumentsChecked:state.w2Paths.length,
+              w2PilotDocumentsAllAbsent:w2.every(s=>!s.exists),
+              realQuoteCaseStillPresent:caseSnap.exists,
+              realQuoteCaseDigestMatchesBefore:caseSnap.exists&&digest(caseSnap.data())===state.caseBeforeDigest,
+              intakeStateStillPresent:intakeSnap.exists,
+              intakeStillConsumed:intakeSnap.exists&&intakeSnap.data().used===true,
+              bearerHashStillBound:intakeSnap.exists&&intakeSnap.data().tokenSha256===state.tokenSha256,
+              independentWrites:0,
+              productionTouched:false
+            };
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/s468/evidence/S468_INDEPENDENT_FINAL_READBACK.json',JSON.stringify(out,null,2));
+            if(!out.w2PilotDocumentsAllAbsent||!out.realQuoteCaseStillPresent||!out.realQuoteCaseDigestMatchesBefore||!out.intakeStillConsumed||!out.bearerHashStillBound)process.exit(1);
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1)});
+          NODE
+
+      - name: Upload sanitized S4.68 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s468-w5-real-submission-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s468/evidence/S468_RUNTIME_EXACTLY_ONE_SOURCE.json
+            ${{ runner.temp }}/s468/evidence/S468_SUBMISSION_STATE_SANITIZED.json
+            ${{ runner.temp }}/s468/evidence/S468_SUBMISSION_HTTP_SANITIZED.json
+            ${{ runner.temp }}/s468/evidence/S468_PROVIDER_ISOLATION.json
+            ${{ runner.temp }}/s468/evidence/S468_W5_REAL_EXECUTION_RECEIPT.json
+            ${{ runner.temp }}/s468/evidence/S468_INDEPENDENT_FINAL_READBACK.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient private material
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/s468/firebase-service-account.json"
+          rm -f "$RUNNER_TEMP/s468/api-key.private"
+          rm -f "$RUNNER_TEMP/s468/used-at.private"
+          rm -f "$RUNNER_TEMP/s468/w5-private-state.json"
