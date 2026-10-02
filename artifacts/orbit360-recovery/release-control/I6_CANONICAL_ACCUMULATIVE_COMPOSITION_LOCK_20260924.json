@@ -262,7 +262,12 @@
     "dataMutation": false,
     "reimport": false,
     "live": false,
-    "b3005": false
+    "b3005": false,
+    "b3005HumanCloseTransition": {
+      "workflowBlobSha": "9047974d48fb4348f40a2790072a0d6830faedd6",
+      "guardBlobSha": "adb197c0e9dca7a8f546ab2f67a045db0a3d943e",
+      "productSourceChanged": false
+    }
   },
   "b3002PerformanceFix": {
     "status": "CAUSAL_SOURCE_FIX_BOUND",
@@ -1717,6 +1722,22 @@
       "currentBlock": "B3",
       "activeFindingId": "B3-005"
     },
+    "productSourceChanged": false
+  },
+  "b3005TargetedHumanVisualPass": {
+    "status": "PASS_PENDING_CLEANUP",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
+    "blobSha": "9458db64710a21f658d7f93329ad3fd7f905b29c",
+    "sourceSha": "b3e140c510de785a649f459d5f24434630cc9784",
+    "buildId": "gi-i65-b3-b3e140c510de-57f234755dc1",
+    "productSourceChanged": false
+  },
+  "b3008Cliente360HealthHydrationDiagnostic": {
+    "status": "CAUSAL_DIAGNOSTIC_RECORDED_DEFER_TO_B3_008",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_CLIENTE360_HEALTH_HYDRATION_DIAGNOSTIC_20261001.json",
+    "blobSha": "1746189469392b51b051c5fae61dc6e6245e5773",
+    "owner": "orbit360-platform/modules/cliente360.js",
+    "classification": "BLOCKS_CURRENT_PRODUCTION",
     "productSourceChanged": false
   }
 }
