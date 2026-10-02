@@ -2295,11 +2295,11 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Controlled policy import creates policy + expected receipts + portfolio, never confirmed cobro without evidence.",
-      "status": "SOURCE_FIXED_PENDING_CONTRACT",
+      "status": "CONTRACT_PASS_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "entryUnblockedBy": "B3-005 CLOSED_PASS",
-      "nextAction": "B3_006_SOURCE_CONTRACT",
+      "nextAction": "B3_006_EXACT_PREVIEW",
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
@@ -2325,12 +2325,14 @@
         ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "1b4e54329db22c7ab84fc0b3a483b34331bad3e2",
         "tools/gravicentra-i6-control-plane-guard-v1.mjs": "74a499fba8f5611f1959d5ced309a62680fe9815"
       },
-      "compositionLockBlobSha": "8200cd20209aafca97797e28e08acca643fdbb37",
+      "compositionLockBlobSha": "ea4ba60111f565153c736a208d5f96cef33c6d46",
       "currentCandidateEligibleForPromotion": false,
       "qaCleanupHardening": {
         "status": "QA_ONLY_FULL_SYNTHETIC_RESIDUE_READBACK",
         "productSourceChanged": false
-      }
+      },
+      "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_CONTRACT_PASS_20261001.json",
+      "sourceContractReceiptBlobSha": "6b3d4c7d73665c3d2aef67f8998d59ff03a099ca"
     },
     {
       "id": "B3-007",
@@ -5945,11 +5947,11 @@
     }
   },
   "currentB3": {
-    "status": "B3_006_SOURCE_FIXED_PENDING_CONTRACT",
+    "status": "B3_006_CONTRACT_PASS_PENDING_EXACT_PREVIEW",
     "activeFindingId": "B3-006",
-    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_FIX_20261001.json",
-    "sourceFixReceiptBlobSha": "8b80b9107aca076764037306fa7178b2b4c63e16",
-    "compositionLockBlobSha": "8200cd20209aafca97797e28e08acca643fdbb37",
+    "sourceContractReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_006_SOURCE_CONTRACT_PASS_20261001.json",
+    "sourceContractReceiptBlobSha": "6b3d4c7d73665c3d2aef67f8998d59ff03a099ca",
+    "compositionLockBlobSha": "ea4ba60111f565153c736a208d5f96cef33c6d46",
     "noLive": true,
     "noReimport": true
   }
