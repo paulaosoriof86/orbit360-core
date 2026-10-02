@@ -2415,8 +2415,8 @@
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Dashboard Inicio reality reconciliation closed before B4.",
-      "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
-      "blocking": true,
+      "status": "CLOSED_PASS",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
         "Inicio card 'Pendiente de cobro' shows Q10K while its modal 'Cobros pendientes' shows 0 records.",
@@ -2429,7 +2429,7 @@
         "image(20260930-011108).png"
       ],
       "rootCause": "READINESS_OWNER_MISMATCH_AND_CAUSAL_SECOND_WRITERS_CONFIRMED",
-      "nextAction": "B3_008_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_ENTRY_GUARD",
       "diagnosticClue": {
         "fromGate": "B3-003",
         "authoritativeCounts": {
@@ -2512,7 +2512,7 @@
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_20261002.json",
       "machineProofReceiptBlobSha": "543059b5a6ce3ece278c3afc78f35b0865277ae3",
       "currentCandidateEligibleForPromotion": false,
-      "machineProofInvalidatedByHumanEvidence": true,
+      "machineProofInvalidatedByHumanEvidence": false,
       "r2HumanRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_REJECTION_R2_REALITY_PERFORMANCE_20261002.json",
       "r2HumanRejectionReceiptBlobSha": "c668a2f36577884b6056e17a8eea9c5b5a45c690",
       "r2SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2_REALITY_PERFORMANCE_SOURCE_FIX_20261002.json",
@@ -2664,7 +2664,11 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8_RECEIPT_LINEAGE_AND_TARIFF_DIAGNOSTIC_ARM_20261002.json",
         "blobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a",
         "qaOnly": true
-      }
+      },
+      "paulaVisualAccepted": true,
+      "humanVisualAcceptanceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+      "humanVisualAcceptanceReceiptBlobSha": "d501880ac4f5900c6509570d3061c954bcf49145",
+      "closureDisposition": "B3_008_TARGETED_VISUAL_ACCEPTED_EXACT_MACHINE_CANDIDATE"
     },
     {
       "id": "B4-001",
@@ -6120,13 +6124,13 @@
     }
   },
   "currentB3": {
-    "status": "B3_008_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
-    "activeFindingId": "B3-008",
+    "status": "B3_PASS_PENDING_B4_ENTRY_GUARD",
+    "activeFindingId": null,
     "priorFindingId": "B3-007",
     "priorFindingStatus": "CLOSED_PASS",
     "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CLOSED_PASS_20261001.json",
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
-    "compositionLockBlobSha": "546b22831be945aec3a2d2a16c2bff226ef9248f",
+    "compositionLockBlobSha": "48f7779752a54c6faa34b7ebb24907134c91ee72",
     "noLive": true,
     "noReimport": true,
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
@@ -6171,6 +6175,10 @@
     "r5p7ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P7_POLICY_CURRENCY_AND_DEEP_FINANCIAL_AUDIT_ARM_20261002.json",
     "r5p7ReceiptBlobSha": "c0d8adc5e30a9e7b462964ef0ccbf24f22c9e760",
     "r5p8DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8_RECEIPT_LINEAGE_AND_TARIFF_DIAGNOSTIC_ARM_20261002.json",
-    "r5p8DiagnosticBlobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a"
+    "r5p8DiagnosticBlobSha": "c181d9b077261097150138d3ab0e2d85c29d8d4a",
+    "b3008HumanVisualStatus": "PASS_PAULA_TARGETED_VISUAL_20261002",
+    "b3008HumanVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+    "b3008HumanVisualReceiptBlobSha": "d501880ac4f5900c6509570d3061c954bcf49145",
+    "nextAction": "B4_ENTRY_GUARD"
   }
 }
