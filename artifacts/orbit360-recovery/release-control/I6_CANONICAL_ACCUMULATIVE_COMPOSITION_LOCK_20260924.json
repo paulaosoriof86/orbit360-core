@@ -1858,5 +1858,14 @@
     "artifactDigest": "644b3f0c07bf2b80ddea7f7009fe2c225c3895a08cd657043f4f6387b9c4996e",
     "productSourceChanged": true,
     "cleanupPass": true
+  },
+  "b3008ScopeAndClosureLock": {
+    "status": "FROZEN_ACTIVE",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
+    "blobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
