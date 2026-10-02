@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_ENTRY_GUARD_PASS_V1",
+  "recordedAt": "2026-10-02",
+  "status": "PASS",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "frozenPlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
+  "entryCondition": "B3 accepted at 96% + Dashboard reality closed + finding ledger has no unresolved B2/B3 blockers.",
+  "evidence": {
+    "controlPlaneBlobSha": "fb60111c8ef508030a2e1ae8f8b277e7ad29ae22",
+    "findingsLedgerBlobSha": "5769dd62e0d6ca8175b7a3740ce6176feaf29be6",
+    "b3ExecutionLockBlobSha": "5b16b6f6575b8d154a707ef66fdd46b4a1149f79",
+    "compositionLockBlobSha": "e152ce99a9ecff9cc89c17fa45e9304da71f69e6",
+    "b2Status": "B2_PASS",
+    "b3Status": "B3_PASS_PENDING_B4_ENTRY_GUARD",
+    "readinessPercent": 96,
+    "b3008Status": "CLOSED_PASS",
+    "b3008PaulaVisualAccepted": true,
+    "b3008VisualReceiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
+    "dashboardStatus": "CLOSED_PASS_BY_B3_008_EXACT_REALITY_AND_PAULA_VISUAL",
+    "unresolvedB2B3BlockingFindings": 0,
+    "b2LedgerSealReconciliationBlobSha": "3e197a739971ce44736904ecb499f5eadce085e3",
+    "reportedPaymentCarryAdjudicationBlobSha": "854c05ca68c2c9e359e42f1de2f1f5b4f8d54689"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4EntryOnly": true
+  },
+  "result": {
+    "b4EntryAuthorized": true,
+    "readinessPercent": 96,
+    "nextTargetPercent": 100,
+    "firstFindingId": "B4-001",
+    "nextAction": "B4_001_CANONICAL_GESTION_CONVERGENCE_DIAGNOSTIC"
+  }
+}
