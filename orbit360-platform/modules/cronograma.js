@@ -1,7 +1,7 @@
 /* ============================================================
    Orbit 360 · Cronograma (agenda día / semana / mes)
-   Reúne en un calendario los vencimientos del CRM (cobros,
-   renovaciones, gestiones) + tareas manuales editables. Cada
+   Reúne en un calendario las obligaciones reales de cartera,
+   renovaciones, gestiones + tareas manuales editables. Cada
    ítem es clicable y abre su detalle o ficha. Datos en vivo.
    ============================================================ */
 window.Orbit = window.Orbit || {};
@@ -13,12 +13,51 @@ Orbit.modules.cronograma = (function () {
   const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
   function paisOK(cid) { const c = S().get('clientes', cid); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }
+  function portfolioAdapter() { return Orbit.cobrosCarteraProjectionAdapter || null; }
+  function obligationsReady() {
+    const a = portfolioAdapter();
+    try { return !!(a && typeof a.confirmed === 'function' && a.confirmed() && q && typeof q.recibosEsperadosDe === 'function'); }
+    catch (e) { return false; }
+  }
+  function linkedReceipt(row) {
+    if (!row) return null;
+    const rid = String(row.reciboId || row.receiptId || '').trim();
+    if (rid) return S().get('recibosEsperados', rid) || null;
+    const pid = String(row.polizaId || '').trim(), seq = String(row.secuencia || row.cuota || '').trim();
+    if (!pid) return null;
+    return (S().all('recibosEsperados') || []).find(r => r && String(r.polizaId || '').trim() === pid && (!seq || String(r.secuencia || r.cuota || '').trim() === seq)) || null;
+  }
+  function pendingObligations() {
+    const a = portfolioAdapter();
+    if (!obligationsReady() || !a || typeof a.portfolioRows !== 'function') return [];
+    return (a.portfolioRows('') || []).filter(row => {
+      const rec = linkedReceipt(row), cid = String((row && row.clienteId) || (rec && rec.clienteId) || '').trim();
+      if (!rec || !cid || !paisOK(cid)) return false;
+      const current = q.recibosEsperadosDe(cid) || [];
+      return current.some(x => x && x.id === rec.id);
+    });
+  }
+  function obligationDue(row) {
+    const rp = Orbit.receiptsPortfolioProjectionV920 || Orbit.receiptsPortfolioProjection || {};
+    if (rp && typeof rp.dueDate === 'function') return rp.dueDate(row);
+    return row && (row.fechaLimite || row.vence || row.fechaVencimiento) || '';
+  }
+  function openObligation(row) {
+    const rec = linkedReceipt(row), cid = String((row && row.clienteId) || (rec && rec.clienteId) || '').trim();
+    if (!rec || !rec.id || !cid) { try { U.toast('No fue posible abrir el recibo vinculado.'); } catch (e) {} return; }
+    window.location.hash = '#/cliente360?c=' + encodeURIComponent(cid) + '&t=recibos&r=' + encodeURIComponent(rec.id);
+  }
 
   /* eventos del CRM + tareas manuales, por fecha YYYY-MM-DD */
   function eventos() {
     const ev = {};
     const add = (fecha, e) => { if (!fecha) return; (ev[fecha] = ev[fecha] || []).push(e); };
-    S().all('cobros').filter(c => (c.estado === 'Pendiente' || c.estado === 'Vencido') && paisOK(c.clienteId)).forEach(c => add(c.vence, { tipo: 'cobro', icon: '💳', color: '#c9821b', t: 'Cobro · ' + ((S().get('clientes', c.clienteId) || {}).nombre || ''), go: () => Orbit.modules.cobros.detalle(c.id) }));
+    pendingObligations().forEach(row => {
+      const rec = linkedReceipt(row), cid = String(row.clienteId || (rec && rec.clienteId) || '').trim();
+      const client = S().get('clientes', cid) || {}, policy = S().get('polizas', row.polizaId || (rec && rec.polizaId)) || {};
+      const label = 'Recibo pendiente · ' + (client.nombre || 'Cliente') + (policy.numero ? ' · ' + policy.numero : '');
+      add(obligationDue(row), { tipo: 'recibo', icon: '🧾', color: '#c9821b', t: label, go: () => openObligation(row) });
+    });
     (q.renovacionesProximas ? q.renovacionesProximas(90) : []).filter(p => paisOK(p.clienteId)).forEach(p => add(p.vigenciaFin, { tipo: 'renov', icon: '🔄', color: '#0f766e', t: 'Renueva ' + p.numero, go: () => Orbit.modules.cliente360.verPoliza(p.id) }));
     S().all('gestiones').filter(g => !g.archivado).forEach(g => add(g.vence, { tipo: 'gestion', icon: '🗂', color: '#1f3a5f', t: (g.titulo || g.tipo), go: () => Orbit.ciclo && Orbit.ciclo.openGestion && Orbit.ciclo.openGestion(g.id) }));
     S().all('tareas').forEach(tk => add(tk.fecha, { tipo: 'tarea', icon: tk.done ? '✅' : '📌', color: '#C5162E', t: tk.t, go: () => toggleTarea(tk.id), id: tk.id }));
@@ -99,5 +138,5 @@ Orbit.modules.cronograma = (function () {
     draw();
   }
 
-  return { render };
+  return { render, __b3007: Object.freeze({ obligationsReady, pendingObligations, linkedReceipt, openObligation }) };
 })();
