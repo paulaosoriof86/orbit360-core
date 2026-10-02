@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_005_PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+  "status": "B3_005_TARGETED_VISUAL_PASS_PENDING_CLEANUP",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-005",
     "title": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
-    "status": "PREVIEW_MACHINE_PASS_PENDING_TARGETED_VISUAL",
+    "status": "TARGETED_VISUAL_PASS_PENDING_CLEANUP",
     "blocking": true,
     "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
     "requiredProof": [
@@ -32,7 +32,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_005_TARGETED_HUMAN_VISUAL",
+    "nextAction": "B3_005_FIXTURE_CLEANUP",
     "rootCause": "CANONICAL_SINGLE_RECEIPT_WRITE_PRIMITIVE_EXISTS_BUT_HIGH_CONFIDENCE_MULTI_EVIDENCE_INFERENCE_ORCHESTRATOR_AND_CURRENT_TENANT_CONFIG_CONTRACT_ARE_NOT_COMPOSED",
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_CAUSAL_DIAGNOSTIC_20261001.json",
     "diagnosticReceiptBlobSha": "55fe380ad2224167e471d4446c09a0548e8f1c75",
@@ -88,7 +88,9 @@
     "r4p1CompositionBlockBindingRepair": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_R4P1_COMPOSITION_BLOCK_BINDING_REPAIR_20261001.json",
       "blobSha": "6c10b68b1b6bedb368d6b31d9f3621b9225510c1"
-    }
+    },
+    "targetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
+    "targetedVisualReceiptBlobSha": "9458db64710a21f658d7f93329ad3fd7f905b29c"
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -97,10 +99,11 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "77b42963d63cdad9aed18d0a547076430feaa55a"
+    "blobSha": "52521f640f9ac68f0986f0501bde105a435be558"
   },
   "nextRequiredProof": [
-    "B3_005_TARGETED_HUMAN_VISUAL_PASS"
+    "B3_005_HUMAN_FIXTURE_CLEANUP_ZERO_RESIDUE",
+    "B3_005_CLOSED_PASS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -286,15 +289,18 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "76bbc41619f3b1aeb9734a9a36aeffb7be7089ca"
+    "blobSha": "82abac6bcb7af469d92e7ccbba5aed4ccfffff51"
   },
   "humanQaAuthorization": {
-    "status": "AUTHORIZED_FOR_B3_004_R12_PREVIEW_ONLY",
+    "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
     "idPrefix": "b3004human_",
     "cleanupRequiredAfterAutomatedAndHumanVisual": true,
     "operationalBusinessWritesAuthorized": false,
     "reimportAuthorized": false,
-    "livePromotionAuthorized": false
+    "livePromotionAuthorized": false,
+    "targetedVisualReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_005_TARGETED_HUMAN_VISUAL_PASS_20261001.json",
+    "targetedVisualReceiptBlobSha": "9458db64710a21f658d7f93329ad3fd7f905b29c",
+    "cleanupScript": "tools/gravicentra-i6-5-b3-005-human-cleanup.mjs"
   },
   "r12p2SourceFix": {
     "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
@@ -755,5 +761,11 @@
     "status": "QA_GOVERNANCE_MECHANISM_FIXED_PENDING_EXACT_PREVIEW",
     "compositionLockBlobSha": "1eb22269831d2ace6ea3eff434739b9e57d7632e",
     "productSourceChanged": false
+  },
+  "b3008Cliente360HealthHydration": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_CLIENTE360_HEALTH_HYDRATION_DIAGNOSTIC_20261001.json",
+    "blobSha": "1746189469392b51b051c5fae61dc6e6245e5773",
+    "classification": "BLOCKS_CURRENT_PRODUCTION",
+    "deferredTo": "B3-008"
   }
 }
