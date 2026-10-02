@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_006_EXECUTOR_ISOLATION_REPAIR_V1",
+  "recordedAt": "2026-10-01",
+  "status": "QA_EXECUTION_MECHANISM_REPAIRED",
+  "findingId": "B3-006",
+  "rootCause": "B3_006_JOBS_APPENDED_TO_500KB_MONOLITHIC_I6_WORKFLOW_PRODUCED_INVALID_WORKFLOW_ZERO_JOB_FAILURE",
+  "evidence": {
+    "failedWorkflowRunId": 36946056586,
+    "failedHead": "636e8f95582bab6a7e75882c42f6b03e510814fe",
+    "failedWorkflowPath": ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+    "failurePattern": "workflow run conclusion=failure with zero jobs/check runs",
+    "restoredMonolithBlobSha": "e635c1ba0f84d874ac80afe0229aebd428d0f7d4",
+    "isolatedExecutorPath": ".github/workflows/gravicentra-b3-006-executor.yml",
+    "isolatedExecutorBlobSha": "ba6d31ecf9966290faab9c02080c45c944d90e96"
+  },
+  "decision": "B3-006 exact Preview runs in isolated executor; monolithic I6 workflow remains without B3-006 appended jobs.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B3_006_EXACT_PREVIEW"
+}
