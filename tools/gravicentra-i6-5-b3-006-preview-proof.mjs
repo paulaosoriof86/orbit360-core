@@ -43,22 +43,23 @@ async function queryItems(collection,field,value){
   return s.docs.map(d=>({id:d.id,...d.data(),__ref:d.ref}));
 }
 async function cleanup(){
-  const policies=[...(await queryItems('polizas','numero',ids.policyNumber)),...(await queryItems('polizas','numero',ids.invalidPolicyNumber))];
-  const policyIds=[...new Set(policies.map(x=>x.id))];
-  const refs=[];
-  for(const p of policies)refs.push(p.__ref);
-  for(const pid of policyIds){
-    for(const coll of ['recibosEsperados','carteraPrimas','cobros','actividades']){
-      const rows=await queryItems(coll,'polizaId',pid).catch(()=>[]);
-      rows.forEach(x=>refs.push(x.__ref));
-    }
+  const refs=[],seen=new Set();
+  for(const coll of ['polizas','recibosEsperados','carteraPrimas','cobros','actividades']){
+    const rows=await queryItems(coll,'clienteId',ids.client).catch(()=>[]);
+    rows.forEach(x=>{const key=x.__ref.path;if(!seen.has(key)){seen.add(key);refs.push(x.__ref);}});
   }
-  refs.push(root.doc('clientes').collection('items').doc(ids.client));
-  refs.push(root.doc('aseguradoras').collection('items').doc(ids.insurer));
+  for(const number of [ids.policyNumber,ids.invalidPolicyNumber]){
+    const rows=await queryItems('polizas','numero',number).catch(()=>[]);
+    rows.forEach(x=>{const key=x.__ref.path;if(!seen.has(key)){seen.add(key);refs.push(x.__ref);}});
+  }
+  for(const ref of [
+    root.doc('clientes').collection('items').doc(ids.client),
+    root.doc('aseguradoras').collection('items').doc(ids.insurer)
+  ]){const key=ref.path;if(!seen.has(key)){seen.add(key);refs.push(ref);}}
   for(let i=0;i<refs.length;i+=350){
     const batch=db.batch();refs.slice(i,i+350).forEach(ref=>batch.delete(ref));await batch.commit();
   }
-  return {policyIds,deletedRefs:refs.length};
+  return {deletedRefs:refs.length};
 }
 async function waitPolicy(number,timeout=15000){
   const end=Date.now()+timeout;
@@ -161,9 +162,11 @@ try{
   proof.cleanup=await cleanup().catch(error=>({error:clean(error?.message||error)}));
   const validAfter=await queryItems('polizas','numero',ids.policyNumber).catch(()=>[]);
   const invalidAfter=await queryItems('polizas','numero',ids.invalidPolicyNumber).catch(()=>[]);
+  const byClientAfter={};
+  for(const coll of ['polizas','recibosEsperados','carteraPrimas','cobros','actividades'])byClientAfter[coll]=(await queryItems(coll,'clienteId',ids.client).catch(()=>[])).length;
   const clientAfter=await root.doc('clientes').collection('items').doc(ids.client).get().catch(()=>({exists:true}));
   const insurerAfter=await root.doc('aseguradoras').collection('items').doc(ids.insurer).get().catch(()=>({exists:true}));
-  proof.cleanup.readback={validPolicy:validAfter.length,invalidPolicy:invalidAfter.length,client:clientAfter.exists?1:0,insurer:insurerAfter.exists?1:0};
+  proof.cleanup.readback={validPolicy:validAfter.length,invalidPolicy:invalidAfter.length,...byClientAfter,client:clientAfter.exists?1:0,insurer:insurerAfter.exists?1:0};
   proof.cleanup.pass=Object.values(proof.cleanup.readback).every(v=>v===0);
   if(proof.status==='PASS'&&!proof.cleanup.pass){proof.status='FAIL';proof.failure='B3_006_CLEANUP_RESIDUE:'+JSON.stringify(proof.cleanup.readback);}
   fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
