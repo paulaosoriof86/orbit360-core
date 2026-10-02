@@ -1813,7 +1813,7 @@
   "b3007SourceFix": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_SOURCE_FIX_20261001.json",
-    "blobSha": "33208aacaa62666404094dbaad80f59c1266d00c",
+    "blobSha": "a8e84725766dd00bcde06affd29814c892fdab0b",
     "productBlobs": {
       "orbit360-platform/modules/cronograma.js": "b44a82b4af474132d0dcfd673731b16c572496b5",
       "orbit360-platform/core/router.js": "645c1bddf6a8990777a84985a34206afe930e0a3",
@@ -1824,7 +1824,7 @@
     },
     "qaBlobs": {
       "tools/gravicentra-i6-5-b3-007-contract.mjs": "7ba3135ab6ecd210a4154a7c851e10f92d4e6ddc",
-      "tools/gravicentra-i6-5-b3-007-preview-proof.mjs": "8682abeaa50fbe7f982292890997ba1502c972a0",
+      "tools/gravicentra-i6-5-b3-007-preview-proof.mjs": "a6d65577455e405f51f157fee19fd0cc8fbe57bc",
       ".github/workflows/gravicentra-b3-007-executor.yml": "deee88f5601819b87e0db455284529fba6c3b026",
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "3e3c5cb298fd3f14a65fb59bb4fea72d0e693c65"
     },
@@ -1838,5 +1838,12 @@
     "blobSha": "096745a0ddcedc5d940c15c99c375108db808a52",
     "sourceSha": "e9adca71bba27e439b92f1492bfda76dc2baa121",
     "executionMode": "DIRECT_GITHUB_BLOB_CONTRACT_EQUIVALENT"
+  },
+  "b3007QaHarnessRepair": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_QA_HARNESS_CLEANUP_ID_REPAIR_20261001.json",
+    "blobSha": "1193375824bbf528048328cdf7a2fb9dc29243ba",
+    "status": "QA_HARNESS_FIXED_RERUN_REQUIRED",
+    "failedRunId": 36953558714,
+    "productSourceChanged": false
   }
 }
