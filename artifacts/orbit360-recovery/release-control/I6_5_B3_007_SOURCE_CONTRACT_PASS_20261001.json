@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_007_SOURCE_CONTRACT_PASS_V1",
+  "recordedAt": "2026-10-01",
+  "status": "PASS_PENDING_EXACT_PREVIEW",
+  "sourceSha": "e9adca71bba27e439b92f1492bfda76dc2baa121",
+  "findingId": "B3-007",
+  "executionMode": "DIRECT_GITHUB_BLOB_CONTRACT_EQUIVALENT",
+  "assertions": {
+    "cronogramaNoLegacyCobrosPendingOwner": true,
+    "canonicalPortfolioAdapter": true,
+    "currentExpectedReceiptClassification": true,
+    "pendingReceiptSemanticLabel": true,
+    "exactReceiptDetailRoute": true,
+    "canonicalCountryRoleScope": true,
+    "reactiveHydrationDependencies": true,
+    "assetBindingsUpdated": true
+  },
+  "exactBlobs": {
+    "orbit360-platform/modules/cronograma.js": "b44a82b4af474132d0dcfd673731b16c572496b5",
+    "orbit360-platform/core/router.js": "645c1bddf6a8990777a84985a34206afe930e0a3",
+    "orbit360-platform/index.html": "c1cd2247a87724196010044554c959f00f22d1d3",
+    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "b72b1320b537501e56ad20733a6d1eef21b87495"
+  },
+  "operationalBusinessWrites": false,
+  "reimport": false,
+  "live": false,
+  "b3008": false,
+  "nextAction": "B3_007_EXACT_PREVIEW"
+}
