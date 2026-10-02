@@ -1,0 +1,161 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_PAULA_VISUAL_R4_COBROS_KPI_CLARITY_FIX_R5P5_V1",
+  "recordedAt": "2026-10-02",
+  "findingId": "B3-008",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "priorMachineCandidate": {
+    "sourceSha": "7c358ce8d4a046cc90667075e85d38bb2f351067",
+    "machinePassCommit": "bf0ed58637f9c79084759d2847bc7ef171f704ae",
+    "buildId": "gi-i65-b3-7c358ce8d4a0-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37048839666-wt0u29xx.web.app",
+    "runId": 37048839666,
+    "artifactId": 11245058697,
+    "artifactDigest": "4e696df41094326f961c9d9f9a2a6a80a4107924b3ebc10421bc8cd18d565cc9"
+  },
+  "targetedHumanEvidence": {
+    "cronograma": {
+      "status": "HUMAN_VISUAL_PASS",
+      "observation": "Paula reports Cronograma now opens quickly; screenshot shows populated October calendar with no visible QA HUMANA B3 residue.",
+      "priorMachineMs": 2152
+    },
+    "cliente360": {
+      "status": "HUMAN_VISUAL_PASS_WITH_DATA_QUALITY_OBSERVATION",
+      "GT": {
+        "clients": 416,
+        "companies": 16,
+        "people": 400,
+        "activePolicies": 205,
+        "linkedPolicyHistory": 1331,
+        "renew45": 11,
+        "premiumByCurrency": {
+          "GTQ": 625119,
+          "COP": 7977451
+        }
+      },
+      "CO": {
+        "clients": 17,
+        "companies": 7,
+        "people": 10,
+        "activePolicies": 9,
+        "linkedPolicyHistory": 76,
+        "renew45": 0,
+        "premiumByCurrency": {
+          "COP": 73920141
+        }
+      },
+      "countryPendingClients": 6,
+      "arithmetic": [
+        "416 + 17 + 6 = 439 total clients",
+        "16 + 400 = 416 GT clients",
+        "7 + 10 = 17 CO clients"
+      ],
+      "semanticOwner": "CLIENTE360_CLIENT_CENTRIC",
+      "note": "Mixed COP under GT client scope remains visible and is not hidden; it is a source/data-quality observation, not proven arithmetic failure."
+    },
+    "polizas": {
+      "status": "HUMAN_VISUAL_PASS",
+      "GT": {
+        "total": 1295,
+        "active": 199,
+        "renew45": 10,
+        "historicalNoActivePortfolio": 1094,
+        "premiumByCurrency": {
+          "GTQ": 635719
+        }
+      },
+      "CO": {
+        "total": 124,
+        "active": 27,
+        "renew45": 1,
+        "historicalNoActivePortfolio": 97,
+        "premiumByCurrency": {
+          "COP": 175456570
+        }
+      },
+      "TODOS": {
+        "total": 1419,
+        "active": 226,
+        "renew45": 11,
+        "historicalNoActivePortfolio": 1191,
+        "premiumByCurrency": {
+          "GTQ": 635719,
+          "COP": 175456570
+        }
+      },
+      "arithmetic": [
+        "1295 + 124 = 1419",
+        "199 + 27 = 226",
+        "10 + 1 = 11",
+        "1094 + 97 = 1191"
+      ]
+    },
+    "cobros": {
+      "status": "HUMAN_VISUAL_PARTIAL_REJECT_CLARITY",
+      "TODOS": {
+        "confirmedPayments": 1243,
+        "porConciliar": 1238,
+        "pendingObligations": 764,
+        "overdueObligations": 551,
+        "confirmedByCurrencyVisible": {
+          "GTQ": "Q850K",
+          "COP": "$205.8M"
+        }
+      },
+      "GT": {
+        "porConciliar": 1196,
+        "confirmedByCurrencyVisible": {
+          "GTQ": "Q850K",
+          "COP": "$1K"
+        },
+        "pendingVisible": "Q8K GTQ",
+        "overdueVisible": "Q8K GTQ",
+        "agingExactOverdueGTQ": 7591
+      },
+      "CO": {
+        "porConciliar": 42,
+        "confirmedByCurrencyVisible": {
+          "COP": "$205.8M"
+        },
+        "pendingCOP": 0,
+        "overdueCOP": 0
+      },
+      "arithmetic": [
+        "1196 + 42 = 1238 por conciliar",
+        "1243 confirmed - 1238 por conciliar = 5 already reconciled under canonical semantics"
+      ],
+      "rootCauseOfPerceivedMismatch": [
+        "Por conciliar is not total confirmed; canonical owner counts only confirmed rows with conciliado != true.",
+        "Small pending/overdue amounts were abbreviated with moneyShort, so different exact values both rendered as Q8K."
+      ],
+      "dataQualityObservation": "GT scope contains a small COP confirmed amount. Country and currency are intentionally independent dimensions; the row remains visible for source validation and is not silently converted or hidden."
+    }
+  },
+  "r5p5Remediation": {
+    "sourceFixCommit": "2eeec5f92aa1cbd9b00d2950eb00988a1cb66648",
+    "productFiles": {
+      "orbit360-platform/core/queries.js": "f601760d82154ca5281149e659148706e34d5c00",
+      "orbit360-platform/modules/inicio.js": "e7b6fcf58fe7a90db82db788e75e28b3ea0bd5ea",
+      "orbit360-platform/modules/cobros.js": "866570f35d87f8d4d7709736058831a218cb461e",
+      "orbit360-platform/index.html": "0ce72f4d5e6f4e4ec3f7f233d2d08d271c2ef14d"
+    },
+    "qaFiles": {
+      "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "3390212474341dcf7bebbea962fa56fd03f94ac3",
+      "tools/gravicentra-i6-5-b3-008-contract.mjs": "9ca4fb772b4159dfff6a74844d545c06e990c042",
+      ".github/workflows/gravicentra-b3-008-executor.yml": "dcb9dcf16b6508d88e31fa378c4af369414b7783"
+    },
+    "changes": [
+      "Canonical confirmed/por-conciliar/reconciled counts now travel with carteraGlobalPorMoneda.",
+      "Cobros shows count semantics explicitly instead of making 1238 appear to be the total confirmed universe.",
+      "Small financial KPI amounts under 100000 render exact instead of rounded K shorthand in Inicio/Cobros.",
+      "Preview proof now checks GT and CO client-country KPI scope, client partition, Cobros count identity and GT+CO por-conciliar partition."
+    ]
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4Advance": false
+  },
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}
