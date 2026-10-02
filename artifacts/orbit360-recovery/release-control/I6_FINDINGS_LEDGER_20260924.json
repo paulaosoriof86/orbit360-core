@@ -2405,16 +2405,17 @@
       "closureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
       "cleanupPass": true,
       "humanVisualRequired": true,
-      "humanVisualStatus": "PENDING_TARGETED_PAULA_VISUAL_ON_NEXT_EXACT_PREVIEW",
+      "humanVisualStatus": "PENDING_TARGETED_PAULA_VISUAL_AFTER_B3_008_CRONOGRAMA_PERFORMANCE_FIX",
       "technicalClosurePreserved": true,
-      "productRegressionDemonstrated": false
+      "productRegressionDemonstrated": true,
+      "performanceRegressionHandledAs": "CAUSAL_DEPENDENCY_INSIDE_ACTIVE_B3_008_NO_REOPEN"
     },
     {
       "id": "B3-008",
       "block": "B3",
       "source": "FROZEN_PLAN",
       "finding": "Dashboard Inicio reality reconciliation closed before B4.",
-      "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2428,7 +2429,7 @@
         "image(20260930-011108).png"
       ],
       "rootCause": "READINESS_OWNER_MISMATCH_AND_CAUSAL_SECOND_WRITERS_CONFIRMED",
-      "nextAction": "B3_008_TARGETED_PAULA_VISUAL",
+      "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
       "diagnosticClue": {
         "fromGate": "B3-003",
         "authoritativeCounts": {
@@ -2618,7 +2619,20 @@
         "failedRunId": 37033269417,
         "classification": "HARNESS_ONLY_READINESS_DETECTION_AFTER_PERFORMANCE_FIX",
         "productRegressionDemonstrated": false
-      }
+      },
+      "r3HumanRejectionAndR5SourceFix": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_REJECTION_R3_SOURCE_FIX_R5_20261002.json",
+        "blobSha": "d68ea51817d2cde1e0b891635e513f3b613e6dcf",
+        "sourceFixCommit": "92c34569ad4f819d384660f21fef473f328ae5c2"
+      },
+      "r5RootCauses": [
+        "META_SCHEMA_READER_WRITER_MISMATCH_INICIO_EXPECTED_PRIMA_BUT_EQUIPO_WRITES_NUEVA_RENOVADA_RECAUDO",
+        "CLIENTE360_GLOBAL_COUNTRY_SCOPE_NOT_APPLIED_TO_CLIENT_AND_KPI_BASES",
+        "CLIENTE360_INTERNAL_FILTER_ROWS_AND_KPI_UNIVERSES_DIVERGED",
+        "INICIO_CONFIRMED_CARD_AND_DETAIL_HAD_DIFFERENT_METRIC_OWNERS",
+        "CRONOGRAMA_PENDING_OBLIGATION_LINKING_RESCANNED_RECEIPTS_PER_ROW",
+        "KPI_DETAIL_AFFORDANCE_INCOMPLETE_ON_CLIENTE360_AND_COBROS"
+      ]
     },
     {
       "id": "B4-001",
@@ -6074,13 +6088,13 @@
     }
   },
   "currentB3": {
-    "status": "B3_008_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+    "status": "B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B3-008",
     "priorFindingId": "B3-007",
     "priorFindingStatus": "CLOSED_PASS",
     "priorClosureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_007_CLOSED_PASS_20261001.json",
     "priorClosureReceiptBlobSha": "c719c547c7ebc7ed30ecc9bbcba9ee0c9c9eb27e",
-    "compositionLockBlobSha": "80dd480b3d7e9be3189b13d5022f1d7e9a7b624f",
+    "compositionLockBlobSha": "ba7acf3a73367754af155afa821976c5d97961f9",
     "noLive": true,
     "noReimport": true,
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",

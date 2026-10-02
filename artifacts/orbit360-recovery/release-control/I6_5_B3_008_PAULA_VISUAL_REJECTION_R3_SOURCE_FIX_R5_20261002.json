@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_PAULA_VISUAL_REJECTION_R3_SOURCE_FIX_R5_V1",
+  "recordedAt": "2026-10-02",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B3-008",
+  "sourceHeadBefore": "b61885f7c96b8bed8b149ad3dd415cb256bc9021",
+  "sourceFixCommit": "92c34569ad4f819d384660f21fef473f328ae5c2",
+  "humanEvidence": {
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37037211169-wjjgvw6x.web.app",
+    "observations": [
+      "Equipo y permisos > Metas contains October 2026 GT targets for Paula: 40000 new production, 40000 renewal production, 50000 collection; Inicio incorrectly displayed Meta no configurada.",
+      "Freelance advisors can legitimately have no monthly target; zero target must not invalidate team target.",
+      "Cronograma blocked the browser and took approximately 50 seconds to open.",
+      "Cliente360 opened immediately and Health remained stable, but global country selector did not scope Cliente360 and internal country filter did not scope KPIs.",
+      "Inicio Cobros confirmados card and its detail used different owners; card represented the realized-payment projection while legacy detail exposed only five cobros rows.",
+      "Inicio pending/overdue details contained obligations without source amount; totals must not imply complete quantified universe.",
+      "All visible KPI cards on affected surfaces must expose detail or filtered supporting universe.",
+      "Cobros opened in approximately 3 seconds; country change approximately 4 seconds; Guatemala exposed a residual COP amount that must remain visible/fail-closed pending source validation rather than be hidden."
+    ]
+  },
+  "causalFindings": [
+    "META_SCHEMA_READER_WRITER_MISMATCH_INICIO_EXPECTED_PRIMA_BUT_EQUIPO_WRITES_NUEVA_RENOVADA_RECAUDO",
+    "CLIENTE360_GLOBAL_COUNTRY_SCOPE_NOT_APPLIED_TO_CLIENT_AND_KPI_BASES",
+    "CLIENTE360_INTERNAL_FILTER_ROWS_AND_KPI_UNIVERSES_DIVERGED",
+    "INICIO_CONFIRMED_CARD_AND_DETAIL_HAD_DIFFERENT_METRIC_OWNERS",
+    "CRONOGRAMA_PENDING_OBLIGATION_LINKING_RESCANNED_RECEIPTS_PER_ROW",
+    "KPI_DETAIL_AFFORDANCE_INCOMPLETE_ON_CLIENTE360_AND_COBROS"
+  ],
+  "remediation": {
+    "metaSemantics": "Production target = nueva + renovada. Recaudo target = recaudo. Explicit 0/0/0 means Sin meta and is excluded from participation for that month/country.",
+    "changedFiles": {
+      "orbit360-platform/core/queries.js": "2f203233d547ed86327a5c779fae4ce33613e416",
+      "orbit360-platform/modules/inicio.js": "d0b01e6e939aee7fcc9cec186c5cbc37c1c3cbe9",
+      "orbit360-platform/modules/cliente360.js": "670f8f8daa76cae73c9ff18f86915c9172c4eb5d",
+      "orbit360-platform/modules/cronograma.js": "70878dfd292cc4653824bc4df3e7048f6a12b183",
+      "orbit360-platform/modules/cobros.js": "1f3954d93246c898c78d4cbfa83ea93f9c93a146",
+      "orbit360-platform/index.html": "d86e77a31146ae48d8f972f7731229a203899a61"
+    },
+    "qaFiles": {
+      "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "e90a2dde1b455961f8810d10d489cb3cfecaabf9",
+      "tools/gravicentra-i6-5-b3-008-contract.mjs": "1ed2d5f483c55070d9b866119566fe6d0c0525b5",
+      ".github/workflows/gravicentra-b3-008-executor.yml": "e635a3f81ee6025fcc611ed176c56e77638e4f86"
+    }
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4Advance": false
+  },
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}

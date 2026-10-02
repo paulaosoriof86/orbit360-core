@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_008_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+  "status": "B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-008",
     "title": "Dashboard Inicio reality reconciliation closed before B4.",
-    "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
     "boundaries": {
       "businessWritesAuthorized": false,
@@ -23,7 +23,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_008_TARGETED_PAULA_VISUAL",
+    "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
     "scopeAndClosureLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
     "diagnosticScope": "READINESS_HYDRATION_AND_ONLY_NECESSARY_SEMANTIC_CORRECTION",
@@ -37,6 +37,7 @@
       "orbit360-platform/modules/inicio.js",
       "orbit360-platform/modules/cobros.js",
       "orbit360-platform/modules/polizas.js",
+      "orbit360-platform/modules/cronograma.js",
       "orbit360-platform/core/router.js",
       "orbit360-platform/index.html"
     ],
@@ -50,7 +51,12 @@
     "r2HumanRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_REJECTION_R2_REALITY_PERFORMANCE_20261002.json",
     "r2HumanRejectionReceiptBlobSha": "c668a2f36577884b6056e17a8eea9c5b5a45c690",
     "r2SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2_REALITY_PERFORMANCE_SOURCE_FIX_20261002.json",
-    "r2SourceFixReceiptBlobSha": "78a38dd979a9ffd70923a31e9567842aad0b8823"
+    "r2SourceFixReceiptBlobSha": "78a38dd979a9ffd70923a31e9567842aad0b8823",
+    "r3HumanRejectionAndR5SourceFix": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_REJECTION_R3_SOURCE_FIX_R5_20261002.json",
+      "blobSha": "d68ea51817d2cde1e0b891635e513f3b613e6dcf",
+      "sourceFixCommit": "92c34569ad4f819d384660f21fef473f328ae5c2"
+    }
   },
   "canonicalComposition": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -59,10 +65,13 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "f25ae600bfc459047844fe73d4b92c6f145458a3"
+    "blobSha": "5761569e3bf521713246f47f72128c1896e11f59"
   },
   "nextRequiredProof": [
-    "B3_008_TARGETED_PAULA_VISUAL_ACCEPTANCE"
+    "B3_008_R5_SOURCE_CONTRACT_PASS",
+    "B3_008_R5_INDEPENDENT_REALITY_PERFORMANCE_MACHINE_PROOF",
+    "B3_007_TARGETED_PAULA_VISUAL_CRONOGRAMA",
+    "B3_008_TARGETED_PAULA_VISUAL_INICIO_CLIENTE360_COBROS_POLIZAS"
   ],
   "preservedB3CarryForward": [
     "B3-002",
@@ -248,7 +257,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "80dd480b3d7e9be3189b13d5022f1d7e9a7b624f"
+    "blobSha": "ba7acf3a73367754af155afa821976c5d97961f9"
   },
   "humanQaAuthorization": {
     "status": "TARGETED_VISUAL_ACCEPTED_CLEANUP_REQUIRED",
@@ -904,5 +913,11 @@
     "failedRunId": 37033269417,
     "classification": "HARNESS_ONLY_READINESS_DETECTION_AFTER_PERFORMANCE_FIX",
     "productRegressionDemonstrated": false
+  },
+  "b3008R5": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_REJECTION_R3_SOURCE_FIX_R5_20261002.json",
+    "blobSha": "d68ea51817d2cde1e0b891635e513f3b613e6dcf",
+    "sourceFixCommit": "92c34569ad4f819d384660f21fef473f328ae5c2"
   }
 }
