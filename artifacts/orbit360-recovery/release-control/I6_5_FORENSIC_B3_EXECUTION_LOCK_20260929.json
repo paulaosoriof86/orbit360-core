@@ -4,7 +4,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B3",
-  "status": "B3_008_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+  "status": "B3_008_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "entryCondition": {
     "b2Status": "B2_PASS",
     "b2CleanupReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
@@ -14,7 +14,7 @@
   "activeFinding": {
     "id": "B3-008",
     "title": "Dashboard Inicio reality reconciliation closed before B4.",
-    "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
     "boundaries": {
       "businessWritesAuthorized": false,
@@ -23,7 +23,7 @@
       "liveHostingPromotionAuthorized": false,
       "productMutationAuthorized": false
     },
-    "nextAction": "B3_008_TARGETED_PAULA_VISUAL",
+    "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW",
     "scopeAndClosureLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_20261001.json",
     "scopeAndClosureLockBlobSha": "160b41b8d4da8541d9dd743df93f8badeb4243b6",
     "diagnosticScope": "READINESS_HYDRATION_AND_ONLY_NECESSARY_SEMANTIC_CORRECTION",
@@ -71,6 +71,10 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_R4_COBROS_KPI_CLARITY_FIX_R5P5_20261002.json",
       "blobSha": "d70b3e595a99a4076ae02e893c8efae05f3b9f9a",
       "sourceFixCommit": "2eeec5f92aa1cbd9b00d2950eb00988a1cb66648"
+    },
+    "r5p6Diagnostic": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P6_GT_COP_PROVENANCE_DIAGNOSTIC_ARM_20261002.json",
+      "blobSha": "9d4f88fe72898c61a21649b18c188878b04d8f1d"
     }
   },
   "canonicalComposition": {
@@ -950,5 +954,10 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_PAULA_VISUAL_R4_COBROS_KPI_CLARITY_FIX_R5P5_20261002.json",
     "blobSha": "d70b3e595a99a4076ae02e893c8efae05f3b9f9a",
     "sourceFixCommit": "2eeec5f92aa1cbd9b00d2950eb00988a1cb66648"
+  },
+  "b3008R5P6": {
+    "status": "READONLY_PROVENANCE_DIAGNOSTIC_ARMED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P6_GT_COP_PROVENANCE_DIAGNOSTIC_ARM_20261002.json",
+    "blobSha": "9d4f88fe72898c61a21649b18c188878b04d8f1d"
   }
 }

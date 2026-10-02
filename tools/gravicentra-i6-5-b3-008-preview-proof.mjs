@@ -125,7 +125,20 @@ async function independent(page){
     const clientPolicies=policies.filter(p=>scopedClientIds.has(String(p&&p.clienteId||''))),clientActive=clientPolicies.filter(p=>['Vigente','Por renovar'].includes(p.estado));
     const scopedPolicies=policies.filter(p=>inCountry(policyCountry(p))),active=scopedPolicies.filter(p=>['Vigente','Por renovar'].includes(p.estado));
     const confirmedCount=realized.length,porConciliarCount=realized.filter(r=>r&&r.conciliado!==true).length,reconciledCount=realized.filter(r=>r&&r.conciliado===true).length;
-    const unexpectedCurrencyRows=country==='TODOS'?[]:realized.filter(r=>{const cur=cc(r.moneda||pm.get(String(r.polizaId||''))?.moneda);return country==='GT'?cur==='COP':country==='CO'?cur==='GTQ':false;}).map(r=>({id:String(r.id||''),receiptId:String(r.receiptId||''),polizaId:String(r.polizaId||''),clienteId:String(r.clienteId||''),moneda:cc(r.moneda||pm.get(String(r.polizaId||''))?.moneda),monto:Number(r.monto)||0,conciliado:r.conciliado===true})).slice(0,25);
+    const unexpectedCurrencyRows=country==='TODOS'?[]:realized.filter(r=>{const cur=cc(r.moneda||pm.get(String(r.polizaId||''))?.moneda);return country==='GT'?cur==='COP':country==='CO'?cur==='GTQ':false;}).map(r=>{
+      const rid=String(r.receiptId||''),pid=String(r.polizaId||''),cid=String(r.clienteId||'');
+      const rec=receipts.find(x=>String(x&&x.id||'')===rid)||{};
+      const pol=pm.get(pid)||{};
+      const cli=cm.get(cid)||{};
+      const pick=(x,keys)=>{const out={};for(const k of keys){const v=x&&x[k];if(v!==undefined&&v!==null&&String(v)!=='')out[k]=v;}return out;};
+      return{
+        id:String(r.id||''),receiptId:rid,polizaId:pid,clienteId:cid,moneda:cc(r.moneda||pol.moneda),monto:Number(r.monto)||0,conciliado:r.conciliado===true,
+        payment:pick(r,['pais','moneda','monto','fechaPago','paidDate','inferredEffectiveDate','origin','__projected']),
+        receipt:pick(rec,['pais','moneda','secuencia','cuota','primaNeta','gastosEmision','gastosFinan','otros','iva','primaTotal','montoTotal','fechaLimite','vence','estado','estadoOperativo','evidenceType','sourceType','paymentOrigin','paymentOriginKind','fuenteAutoridad','origenAutoridad','fuenteConciliacion','authority','sourceRef','source_ref','fuenteOrigen','origen','batchId','importBatchId','sourceRow','sourceFile']),
+        policy:pick(pol,['numero','pais','moneda','estado','aseguradoraId','ramo','producto','primaNeta','gastosEmision','gastosFinan','otros','iva','ivaMonto','primaTotal','formaPago','frecuenciaPago','periodicidad','sourceRef','source_ref','fuenteOrigen','origen','batchId','importBatchId','sourceRow','sourceFile']),
+        client:pick(cli,['pais','moneda','tipo','segmento','sourceRef','source_ref','fuenteOrigen','origen','batchId','importBatchId','sourceRow','sourceFile'])
+      };
+    }).slice(0,25);
     return{country,month,production:prod,realizedAll,monthlyPaid,pending:pend,overdue:venc,confirmedCount,porConciliarCount,reconciledCount,directCount:direct.length,directAmount:direct.reduce((s,r)=>s+(Number(r.monto)||0),0),unexpectedCurrencyRows,clientCount:scopedClients.length,clientPolicyCount:clientPolicies.length,clientActivePolicyCount:clientActive.length,policyCount:scopedPolicies.length,activePolicyCount:active.length};
   });
 }

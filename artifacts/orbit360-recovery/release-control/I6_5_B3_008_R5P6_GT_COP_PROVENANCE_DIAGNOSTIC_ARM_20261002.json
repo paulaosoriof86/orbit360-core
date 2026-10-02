@@ -1,0 +1,26 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R5P6_GT_COP_PROVENANCE_DIAGNOSTIC_ARM_V1",
+  "recordedAt": "2026-10-02",
+  "findingId": "B3-008",
+  "status": "READONLY_DIAGNOSTIC_ARMED",
+  "sourceMachinePassCommit": "00be8a5775502c3294cb42ea8a132e356ceee745",
+  "observation": {
+    "country": "GT",
+    "unexpectedCurrency": "COP",
+    "affectedProjectedPayments": 10,
+    "eachAmountCOP": 147,
+    "totalCOP": 1470,
+    "commonPolicyId": "pol_6fc005003a2ba6d52bdba67188ed",
+    "commonClientId": "cli_siga_3c96785d46080aa47e"
+  },
+  "objective": "Read back linked receipt/policy/client/payment provenance from the exact authenticated Preview without writes, reimport or data mutation, so the country-currency discrepancy can be classified as source truth, importer mapping defect, or projection defect.",
+  "boundaries": {
+    "productSourceChanged": false,
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4Advance": false
+  },
+  "nextAction": "B3_008_CONTRACT_AND_EXACT_PREVIEW"
+}
