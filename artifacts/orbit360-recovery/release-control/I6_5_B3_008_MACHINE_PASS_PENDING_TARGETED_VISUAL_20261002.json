@@ -1,15 +1,15 @@
 {
   "schema": "GRAVICENTRA_I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_V2",
-  "recordedAt": "2026-10-02T18:41:26.241Z",
+  "recordedAt": "2026-10-02T19:37:51.926Z",
   "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
   "findingId": "B3-008",
-  "sourceSha": "7c358ce8d4a046cc90667075e85d38bb2f351067",
-  "buildId": "gi-i65-b3-7c358ce8d4a0-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37048839666-wt0u29xx.web.app",
-  "channelId": "gi-b3008-37048839666",
-  "runId": 37048839666,
-  "artifactId": 11245058697,
-  "artifactDigest": "4e696df41094326f961c9d9f9a2a6a80a4107924b3ebc10421bc8cd18d565cc9",
+  "sourceSha": "97793b9109a0d540dcd47afb627678bf0fef3878",
+  "buildId": "gi-i65-b3-97793b9109a0-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37054637598-pvoo7t15.web.app",
+  "channelId": "gi-b3008-37054637598",
+  "runId": 37054637598,
+  "artifactId": 11248566469,
+  "artifactDigest": "4a033aa81873178f58b88325b980b2c2cbd75932e5a3cb0476b551ee562d2f8f",
   "exactHostingReadback": true,
   "assertions": {
     "monthlyProductionIndependent": true,
@@ -19,23 +19,28 @@
     "metaSchemaAligned": true,
     "clientListPerformance": true,
     "b3004SyntheticFixtureAbsent": true,
+    "client360GTCountryKpis": true,
     "client360CountryKpis": true,
     "client360InternalCountryKpis": true,
+    "clientCountryPartition": true,
     "kpiDetailSurfaces": true,
     "cobrosCorePerformance": true,
+    "cobrosCountSemantics": true,
+    "cobrosSmallAmountClarity": true,
     "inicioCanonicalDetailOwner": true,
     "countryScope": true,
     "sigaDirectIncluded": true,
     "polizasCountryScope": true,
+    "cobrosCountryCountPartition": true,
     "healthStable": true,
     "healthIndependentRealClient": true,
     "b3007SyntheticResidueAbsent": true,
     "cronogramaPerformance": true
   },
   "performance": {
-    "client360ListMs": 447,
-    "cobrosCoreMs": 2489,
-    "cronogramaMs": 2152
+    "client360ListMs": 327,
+    "cobrosCoreMs": 1822,
+    "cronogramaMs": 1575
   },
   "countries": {
     "CO": {
@@ -51,8 +56,12 @@
         "overdue": {
           "COP": 0
         },
+        "confirmedCount": 42,
+        "porConciliarCount": 42,
+        "reconciledCount": 0,
         "directCount": 42,
         "directAmount": 205763487.04000002,
+        "unexpectedCurrencyRows": [],
         "clientCount": 17,
         "clientPolicyCount": 76,
         "clientActivePolicyCount": 9,
@@ -75,6 +84,148 @@
         "total": 124,
         "active": 27
       }
+    },
+    "GT": {
+      "truth": {
+        "country": "GT",
+        "month": "2026-10",
+        "production": {
+          "GTQ": 7900
+        },
+        "realizedAll": {
+          "GTQ": 849858.5399999974,
+          "COP": 1470
+        },
+        "monthlyPaid": {},
+        "pending": {
+          "GTQ": 8058.0199999999995
+        },
+        "overdue": {
+          "GTQ": 7590.869999999999,
+          "COP": 0
+        },
+        "confirmedCount": 1201,
+        "porConciliarCount": 1196,
+        "reconciledCount": 5,
+        "directCount": 1196,
+        "directAmount": 848584.9299999973,
+        "unexpectedCurrencyRows": [
+          {
+            "id": "receipt-payment:rec_44181f3e9b7373ac58003402",
+            "receiptId": "rec_44181f3e9b7373ac58003402",
+            "polizaId": "pol_6fc005003a2ba6d52bdba67188ed",
+            "clienteId": "cli_siga_3c96785d46080aa47e",
+            "moneda": "COP",
+            "monto": 147,
+            "conciliado": false
+          },
+          {
+            "id": "receipt-payment:rec_4deb38f07beacb5e0793488f",
+            "receiptId": "rec_4deb38f07beacb5e0793488f",
+            "polizaId": "pol_6fc005003a2ba6d52bdba67188ed",
+            "clienteId": "cli_siga_3c96785d46080aa47e",
+            "moneda": "COP",
+            "monto": 147,
+            "conciliado": false
+          },
+          {
+            "id": "receipt-payment:rec_6c1b33b3dfab0f9cecda2a50",
+            "receiptId": "rec_6c1b33b3dfab0f9cecda2a50",
+            "polizaId": "pol_6fc005003a2ba6d52bdba67188ed",
+            "clienteId": "cli_siga_3c96785d46080aa47e",
+            "moneda": "COP",
+            "monto": 147,
+            "conciliado": false
+          },
+          {
+            "id": "receipt-payment:rec_9a8100e0ad1c415a88946501",
+            "receiptId": "rec_9a8100e0ad1c415a88946501",
+            "polizaId": "pol_6fc005003a2ba6d52bdba67188ed",
+            "clienteId": "cli_siga_3c96785d46080aa47e",
+            "moneda": "COP",
+            "monto": 147,
+            "conciliado": false
+          },
+          {
+            "id": "receipt-payment:rec_9aea38fe555ba7505242be88",
+            "receiptId": "rec_9aea38fe555ba7505242be88",
+            "polizaId": "pol_6fc005003a2ba6d52bdba67188ed",
+            "clienteId": "cli_siga_3c96785d46080aa47e",
+            "moneda": "COP",
+            "monto": 147,
+            "conciliado": false
+          },
+          {
+            "id": "receipt-payment:rec_a20f702abb2f6098d6274f54",
+            "receiptId": "rec_a20f702abb2f6098d6274f54",
+            "polizaId": "pol_6fc005003a2ba6d52bdba67188ed",
+            "clienteId": "cli_siga_3c96785d46080aa47e",
+            "moneda": "COP",
+            "monto": 147,
+            "conciliado": false
+          },
+          {
+            "id": "receipt-payment:rec_b13b7ba15522cff2782dd211",
+            "receiptId": "rec_b13b7ba15522cff2782dd211",
+            "polizaId": "pol_6fc005003a2ba6d52bdba67188ed",
+            "clienteId": "cli_siga_3c96785d46080aa47e",
+            "moneda": "COP",
+            "monto": 147,
+            "conciliado": false
+          },
+          {
+            "id": "receipt-payment:rec_b9eab33a0c2a41b10fde2e7a",
+            "receiptId": "rec_b9eab33a0c2a41b10fde2e7a",
+            "polizaId": "pol_6fc005003a2ba6d52bdba67188ed",
+            "clienteId": "cli_siga_3c96785d46080aa47e",
+            "moneda": "COP",
+            "monto": 147,
+            "conciliado": false
+          },
+          {
+            "id": "receipt-payment:rec_c0469d81d70baf22a00a405d",
+            "receiptId": "rec_c0469d81d70baf22a00a405d",
+            "polizaId": "pol_6fc005003a2ba6d52bdba67188ed",
+            "clienteId": "cli_siga_3c96785d46080aa47e",
+            "moneda": "COP",
+            "monto": 147,
+            "conciliado": false
+          },
+          {
+            "id": "receipt-payment:rec_f76c731ac75541b60408beb8",
+            "receiptId": "rec_f76c731ac75541b60408beb8",
+            "polizaId": "pol_6fc005003a2ba6d52bdba67188ed",
+            "clienteId": "cli_siga_3c96785d46080aa47e",
+            "moneda": "COP",
+            "monto": 147,
+            "conciliado": false
+          }
+        ],
+        "clientCount": 416,
+        "clientPolicyCount": 1331,
+        "clientActivePolicyCount": 205,
+        "policyCount": 1295,
+        "activePolicyCount": 199
+      },
+      "cobros": {
+        "truth": {
+          "GTQ": {
+            "alDia": 849858.5399999974,
+            "pend": 8058.0199999999995,
+            "venc": 7590.869999999999,
+            "porConciliar": 1186
+          },
+          "COP": {
+            "alDia": 1470,
+            "pend": 0,
+            "venc": 0,
+            "porConciliar": 10
+          }
+        },
+        "confirmed": 1201,
+        "porConciliar": 1196,
+        "reconciled": 5
+      }
     }
   },
   "health": {
@@ -93,7 +244,7 @@
   "b3007": {
     "syntheticResidueVisible": false,
     "humanVisualStillRequired": true,
-    "cronogramaMs": 2152
+    "cronogramaMs": 1575
   },
   "pageErrors": [],
   "consoleErrors": [],
