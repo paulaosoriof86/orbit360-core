@@ -1,0 +1,172 @@
+name: CotComp S4.72 real Proposal Comparison rollback
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s472-real-proposal-comparison-rollback-20261002
+    paths:
+      - '.github/cotcomp-lab-intents/s472-real-proposal-comparison-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  COTCOMP_TENANT_ID: alianzas-soluciones
+  COTCOMP_WEB_APP_ID: '1:646761409743:web:2ec4595ee9160f9d945bba'
+  EXPECTED_OWNER_BLOB: 73e09a4404cb4298dc34c9c38e26ad1f960d3170
+
+jobs:
+  s472-controlled-real-w3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.72 one-execution intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s472-real-proposal-comparison-authorized.json
+          jq -e '
+            .authorization=="S472_EXECUTE_OWNER_AUTHORIZED_REAL_PROPOSAL_COMPARISON" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .journeyId=="GT_AUTO_MOTO_HYBRID" and
+            .maxProposals==3 and
+            .maxComparisonSets==1 and
+            .allowedExecutions==1 and
+            .rollbackRequired==true and
+            .selectionAllowed==false and
+            .providerOrRater==false and
+            .production==false and
+            .issuance==false and
+            .binding==false and
+            .payment==false and
+            .generalPersistenceRelease==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.72 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-w5-proposal-comparison-s472.js
+          node --check cotcomp-w5-proposal-comparison-s472.test.js
+          node --test cotcomp-w5-proposal-comparison-s472.test.js
+
+      - name: Prepare exact LAB credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s472/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s472/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Execute Owner-authorized real Proposal Comparison proof
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          export S472_PRIVATE_STATE_PATH="$RUNNER_TEMP/s472/private.json"
+          export S472_RECEIPT_PATH="$RUNNER_TEMP/s472/evidence/S472_REAL_PROPOSAL_COMPARISON_RECEIPT.json"
+          export S472_INDEPENDENT_READBACK_PATH="$RUNNER_TEMP/s472/evidence/S472_INDEPENDENT_FINAL_READBACK.json"
+          export S472_RUN_ID="$GITHUB_RUN_ID"
+          export S472_SOURCE_SHA="$GITHUB_SHA"
+          node cotcomp-w5-proposal-comparison-s472.js
+
+      - name: Independent final absence and recovery check
+        if: always()
+        working-directory: functions
+        shell: bash
+        env:
+          S472_MODE: recover
+        run: |
+          set -euo pipefail
+          export S472_PRIVATE_STATE_PATH="$RUNNER_TEMP/s472/private.json"
+          export S472_INDEPENDENT_READBACK_PATH="$RUNNER_TEMP/s472/evidence/S472_INDEPENDENT_FINAL_READBACK.json"
+          node cotcomp-w5-proposal-comparison-s472.js
+
+      - name: Assert successful physical result
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '
+            .outcome=="PASS_ROLLBACK_COMPLETE" and
+            .authorization.ownerHumanValidationVerified==true and
+            .authorization.secondControlledExecutionAuthorizationVerified==true and
+            .authorization.secondExecutionConsumed==true and
+            .w3.status=="PASS" and
+            .w3.realDocumentaryProposalCount==3 and
+            .w3.validatedCurrentProposalCount==3 and
+            .w3.providerOrRaterCalls==0 and
+            .comparison.status=="PASS" and
+            .comparison.alternatives==3 and
+            .comparison.rankingPolicy=="NONE_BY_DEFAULT" and
+            .comparison.silentWeighting==false and
+            .w4.status=="CONTROL_PASS" and
+            .w4.blockCode=="EXPLICIT_USER_CHOICE_REQUIRED" and
+            .w4.selectionCreated==false and
+            .rollback.temporaryDocumentsCreated==7 and
+            .rollback.temporaryDocumentsDeleted==7 and
+            .rollback.finalTemporaryDocuments==0 and
+            .case.digestUnchanged==true and
+            .boundaries.productionTouched==false
+          ' "$RUNNER_TEMP/s472/evidence/S472_REAL_PROPOSAL_COMPARISON_RECEIPT.json" >/dev/null
+          jq -e '
+            .temporaryDocumentsChecked==7 and
+            .finalTemporaryDocuments==0 and
+            .quoteCasePresent==true and
+            .quoteCaseDigestUnchanged==true and
+            .secondExecutionConsumed==true and
+            .secondExecutionStatus=="PASS_ROLLBACK_COMPLETE" and
+            .productionTouched==false
+          ' "$RUNNER_TEMP/s472/evidence/S472_INDEPENDENT_FINAL_READBACK.json" >/dev/null
+
+      - name: Upload sanitized S4.72 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s472-real-proposal-comparison-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s472/evidence/S472_REAL_PROPOSAL_COMPARISON_RECEIPT.json
+            ${{ runner.temp }}/s472/evidence/S472_INDEPENDENT_FINAL_READBACK.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient private material
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/s472/firebase-service-account.json"
+          rm -f "$RUNNER_TEMP/s472/private.json"
