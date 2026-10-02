@@ -1,0 +1,90 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_MACHINE_PASS_PENDING_TARGETED_VISUAL_V1",
+  "recordedAt": "2026-10-02T04:52:08.514Z",
+  "status": "MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+  "findingId": "B3-008",
+  "sourceSha": "cdc9fd6a8391efd3617460670d7987bb25fc8ec9",
+  "buildId": "gi-i65-b3-cdc9fd6a8391-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-b3008-36966271470-jel4pdom.web.app",
+  "channelId": "gi-b3008-36966271470",
+  "runId": 36966271470,
+  "artifactId": 11210490341,
+  "artifactDigest": "e98695d409ac2cb583ba67eb754e8aca7102559f0cd02756790541611a819a3f",
+  "exactHostingReadback": true,
+  "assertions": {
+    "noPrematureDefinitiveHealth": true,
+    "finalHealth51": true,
+    "noSecondWriter": true,
+    "cardModalCanonicalOwner": true,
+    "reloadCoherent": true,
+    "mobileDesktopSameSemantics": true
+  },
+  "target": {
+    "clientId": "b3004human_client_r12",
+    "clientName": "QA HUMANA B3-004 · NO ES CLIENTE REAL",
+    "expectedHealth": 51
+  },
+  "desktop": {
+    "domHealth": 51,
+    "summaryHealth": 51,
+    "vencido": 111.11,
+    "nVigentes": 1,
+    "observations": [
+      {
+        "text": "CalculandoSalud",
+        "readiness": "pending",
+        "value": "",
+        "carteraConfirmed": false
+      },
+      {
+        "text": "51Salud",
+        "readiness": "ready",
+        "value": "51",
+        "carteraConfirmed": true
+      }
+    ],
+    "confirmed": [
+      "clientes",
+      "polizas",
+      "cobros",
+      "recibosEsperados",
+      "carteraPrimas",
+      "aseguradoras"
+    ],
+    "inicio": {
+      "expected": {
+        "confirmed": 2854.7200000000003,
+        "pending": 8058.0199999999995,
+        "overdue": 7590.869999999999
+      },
+      "dom": {
+        "confirmed": 2854.7200000000003,
+        "pending": 8058.0199999999995,
+        "overdue": 7590.869999999999
+      },
+      "pendingRows": 768,
+      "overdueRows": 547,
+      "modalCounts": {
+        "pending": 768,
+        "overdue": 547
+      }
+    }
+  },
+  "reload": {
+    "health": 51,
+    "pass": true
+  },
+  "mobile": {
+    "health": 51,
+    "readiness": "ready",
+    "scrollWidth": 390,
+    "clientWidth": 390
+  },
+  "pageErrors": [],
+  "consoleErrors": [],
+  "operationalBusinessWrites": 0,
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_TARGETED_PAULA_VISUAL"
+}
