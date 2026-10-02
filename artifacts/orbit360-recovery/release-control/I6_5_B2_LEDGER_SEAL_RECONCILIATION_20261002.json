@@ -1,0 +1,254 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B2_LEDGER_SEAL_RECONCILIATION_V1",
+  "recordedAt": "2026-10-02",
+  "status": "PASS_GOVERNANCE_RECONCILIATION_NO_PRODUCT_CHANGE",
+  "purpose": "Reconcile stale pre-seal B2 finding statuses with the already-formal B2_PASS seal without reopening B2 or repeating accepted work.",
+  "authority": {
+    "controlPlaneBlobBefore": "57c9d7616a9ae1db2d4d0b74c0d93b98667e3dfa",
+    "b2Status": "B2_PASS",
+    "terminalHumanRetest": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B2_R102_TARGETED_HUMAN_RETEST_PASS_20260929.json",
+      "blobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
+      "decision": "PASS",
+      "finalTargetedHumanUat": {
+        "permissions": "PASS",
+        "multirole": "PASS",
+        "userMobile": "PASS",
+        "opsDocumentMobile": "PASS",
+        "insurerLogoR102": "PASS"
+      }
+    },
+    "terminalCleanup": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B2_FINAL_HUMAN_FIXTURE_CLEANUP_20260929.json",
+      "blobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8",
+      "status": "PASS",
+      "firestoreResidual": 0,
+      "storageResidual": 0,
+      "previewConfigResidual": 0
+    }
+  },
+  "explicitCarryForward": [
+    "DASHBOARD-INICIO-001",
+    "B3-CARRY-OPS-HYDRATION-EMPTY-FLASH-20260929",
+    "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
+    "B3-CARRY-VEHICLE-CANONICAL-IDENTITY-20260929",
+    "B3-CARRY-OPS-CATALOG-ADMIN-20260929",
+    "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
+    "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
+    "B1-EMAIL-DELIVERY-001"
+  ],
+  "rule": "Only stale blocking findings whose block is exactly B2, are not already PASS/CLOSED/DEFERRED, are not explicit carry-forward items, and are not B3-CARRY items are normalized to the formal B2 seal.",
+  "affectedCount": 40,
+  "affected": [
+    {
+      "id": "B2-H01",
+      "priorStatus": "PAULA_VISUAL_REJECTED_R3_HIERARCHY_STILL_OPEN",
+      "source": "PAULA_VISUAL_REVIEW_20260924"
+    },
+    {
+      "id": "B2-H05",
+      "priorStatus": "PAULA_VISUAL_REJECTED_R3_PHYSICAL_RELATION_AUDIT_REQUIRED",
+      "source": "PAULA_VISUAL_REVIEW_20260924"
+    },
+    {
+      "id": "B2-H07",
+      "priorStatus": "PAULA_VISUAL_REJECTED_R3_LITERAL_INVALID_VALUE_REPRODUCED",
+      "source": "PAULA_VISUAL_REVIEW_20260924"
+    },
+    {
+      "id": "B2-H08",
+      "priorStatus": "PAULA_VISUAL_REJECTED_R3_FALSE_ZERO_HYDRATION_REPRODUCED",
+      "source": "PAULA_VISUAL_REVIEW_20260924"
+    },
+    {
+      "id": "B2-H09",
+      "priorStatus": "PAULA_VISUAL_REJECTED_R3_PROVENANCE_STILL_PRIMARY",
+      "source": "PAULA_VISUAL_REVIEW_20260924"
+    },
+    {
+      "id": "B2-H10",
+      "priorStatus": "PAULA_VISUAL_REJECTED_R3_FILE_UPLOAD_REQUIRED",
+      "source": "PAULA_VISUAL_REVIEW_20260924"
+    },
+    {
+      "id": "B2-R24-POLICY-PAYMENT-VISUAL-HIERARCHY-R3",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R25-POLICY-CALENDAR-Q006-TOLERANCE-R3",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R26-VEHICLE-EDITOR-PREFILL-DESTRUCTIVE-WRITE-R3",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R27-POLICY-VEHICLE-RENEWAL-PHYSICAL-ID-R3",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R28-VEHICLE-IDENTITY-CANDIDATE-DEDUP-R3",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R29-LITERAL-INVALID-VEHICLE-VALUE-R3",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R30-RECEIPTS-FALSE-ZERO-HYDRATION-R3",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R31-RECEIPT-PROVENANCE-OPERATIONAL-UI-R3",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R32-INSURER-LOGO-FILE-UPLOAD-R3",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R3-001-POLICY-PREMIUM-HIERARCHY",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R3-002-POLICY-SCHEDULE-ROUNDING-TOLERANCE",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R3-003-VEHICLE-EDITOR-READWRITE-SCHEMA",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R3-004-POLICY-VEHICLE-VERSIONED-RELATIONSHIP",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R3-005-VEHICLE-CANDIDATE-IDENTITY-DEDUP",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R3-006-RECEIPT-HYDRATION-FALSE-ZERO",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R3-007-RECEIPT-PROVENANCE-PRESENTATION",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R3-008-INSURER-LOGO-FILE-UPLOAD",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3"
+    },
+    {
+      "id": "B2-R33-ASESOR-COMPARATIVO-AUTHORITY-R4",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4"
+    },
+    {
+      "id": "B2-R34-ASESOR-OPS-FALSE-SUCCESS-R4",
+      "priorStatus": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4"
+    },
+    {
+      "id": "B2-R35-VEHICLE-HISTORY-PROJECTION-R4",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4"
+    },
+    {
+      "id": "B2-R36-POLICY-VEHICLE-ROLE-VERSION-CONTEXT-R4",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4"
+    },
+    {
+      "id": "B2-R37-INSURER-LOGO-PREVIEW-ISOLATION-TRUTH-R4",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_PREVIEW_DISCRIMINANTS",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4"
+    },
+    {
+      "id": "B2-R38-RECEIPTS-HYDRATION-R4",
+      "priorStatus": "PROOF_PENDING_NO_NEW_SOURCE_DEFECT_DEMONSTRATED",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4"
+    },
+    {
+      "id": "B2-R62-RENEWAL-OPS-MANAGEMENT-DURABILITY-R8",
+      "priorStatus": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_VISUAL_REVIEW_R8"
+    },
+    {
+      "id": "B2-R63-RENEWAL-WORKFLOW-SEMANTIC-CONTRACT-R9",
+      "priorStatus": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_EXPLICIT_BUSINESS_RULE_R9"
+    },
+    {
+      "id": "B2-R63-RENEWAL-ACTION-SEMANTICS-R9",
+      "priorStatus": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_EXPLICIT_BUSINESS_RULE_20260926"
+    },
+    {
+      "id": "B2-R65-OPS-LEADS-AUTH-E2E-COVERAGE-GAP-R11",
+      "priorStatus": "R13_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "FORENSIC_QA_AUDIT_R11"
+    },
+    {
+      "id": "B2-R66-PREVIEW-UAT-WRITE-CAPABILITY-R12",
+      "priorStatus": "R14_ROOT_CAUSE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_EXPLICIT_UAT_REQUIREMENT_20260926"
+    },
+    {
+      "id": "B2-R67-OPS-MANAGEMENT-COUNTRY-RELOAD-R13",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_VISUAL_UAT_20260927"
+    },
+    {
+      "id": "B2-R68-RENEWAL-PROPOSALS-PREMATURE-CREATE-R13",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_VISUAL_UAT_20260927"
+    },
+    {
+      "id": "B2-R69-DIRECT-RENEWAL-RECEIPTS-PREMIUM-R13",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_VISUAL_UAT_20260927"
+    },
+    {
+      "id": "B2-R70-FIRM-RENEWAL-SUPPORT-R13",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_VISUAL_UAT_20260927"
+    },
+    {
+      "id": "B2-R71-OPS-CHECKLIST-FEEDBACK-MODAL-R13",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_VISUAL_UAT_20260927"
+    },
+    {
+      "id": "B2-R72-ADVISOR-WRITE-ACTIVE-ROLE-DESYNC-R14",
+      "priorStatus": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW_AUTH_AND_PAULA_UAT",
+      "source": "PAULA_MANUAL_UAT_20260927"
+    }
+  ],
+  "disposition": "CLOSED_BY_B2_FORMAL_SEAL_PRESERVING_PRIOR_STATUS_AND_HISTORY",
+  "boundaries": {
+    "productSourceChanged": false,
+    "rebuild": false,
+    "newPreview": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "RECHECK_B4_ENTRY_GUARD"
+}
