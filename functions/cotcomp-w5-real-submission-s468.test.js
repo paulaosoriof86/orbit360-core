@@ -22,14 +22,19 @@ test('S4.68 projection carries the exact QuoteCase path into both cotcomp refs',
   assert.equal(p.managementPayload.cotcompRef.caseId,'qcase_test');
 });
 
-test('S4.68 journals exactly eight temporary W2 owner side effects',()=>{
+test('S4.68 journals exactly eight temporary W2 owner side effects in either storage mode',()=>{
   const p=s.deriveProjection('s468-test','qcase_test','corr_test','case-path');
-  const paths=s.journalPaths(p);
-  assert.equal(paths.length,8);
-  assert.equal(new Set(paths).size,8);
-  assert.equal(paths.filter(x=>x.includes('/notificationOutbox/')).length,2);
-  assert.equal(paths.filter(x=>x.includes('/workflowEvents/')).length,2);
-  assert.equal(paths.filter(x=>x.includes('/workflowRequests/')).length,2);
+  for(const mode of ['legacyCompatible','canonicalV2']){
+    const paths=s.journalPaths(p,mode);
+    assert.equal(paths.length,8);
+    assert.equal(new Set(paths).size,8);
+    assert.equal(paths.filter(x=>x.includes('/notificationOutbox/')).length,2);
+    assert.equal(paths.filter(x=>x.includes('/workflowEvents/')).length,2);
+    assert.equal(paths.filter(x=>x.includes('/workflowRequests/')).length,2);
+  }
+  assert.match(s.workflowEntityPath('legacyCompatible','negocios','x'),/^tenantId\//);
+  assert.match(s.workflowEntityPath('canonicalV2','negocios','x'),/^tenants\//);
+  assert.equal(s.allPotentialJournalPaths(p).length,10);
 });
 
 test('S4.68 fails closed on health-sensitive keys',()=>{
@@ -57,8 +62,9 @@ test('S4.68 commitments expose only SHA-256 material',()=>{
 
 test('S4.68 source contains partial-write rollback before full baseline exists',()=>{
   const source=fs.readFileSync(require.resolve('./cotcomp-w5-real-submission-s468'),'utf8');
-  assert.match(source,/writesStarted=true;/);
-  assert.match(source,/cleanupCreatedSubset\(db,paths\)/);
+  assert.match(source,/writeAttempted=true;/);
+  assert.match(source,/cleanupCreatedSubset\(db,allPossiblePaths\)/);
   assert.match(source,/S468_PARTIAL_ROLLBACK_FINAL_ABSENCE_FAILED/);
+  assert.match(source,/S468_W2_STORAGE_MODE_CHANGED_DURING_RUN/);
   assert.doesNotMatch(source,/let created=false;/);
 });
