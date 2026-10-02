@@ -742,7 +742,7 @@
     "noReimport": true,
     "noLive": true
   },
-  "activeFindingId": "B3-008",
+  "activeFindingId": null,
   "b3004R10CausalSourceFix": {
     "status": "FINAL_SOURCE_BOUND_PENDING_EXACT_PREVIEW",
     "findingId": "B3-004",
@@ -2016,5 +2016,29 @@
     "premiumRulesAudit": true,
     "noLive": true,
     "noReimport": true
+  },
+  "b3008HumanVisualPass": {
+    "status": "PASS",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+    "blobSha": "d501880ac4f5900c6509570d3061c954bcf49145",
+    "sourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "buildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
+    "runId": 37061984102,
+    "artifactId": 11250418215,
+    "artifactDigest": "449b152a760f931d1a1a3074880f7ae4ca4aac24bb751129205f03bacd1f756f",
+    "acceptedBy": "Paula",
+    "productSourceChanged": false,
+    "operationalBusinessWrites": 0,
+    "livePromoted": false
+  },
+  "b3Closure": {
+    "status": "B3_PASS_PENDING_B4_ENTRY_GUARD",
+    "readinessPercent": 96,
+    "visualAcceptanceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+    "visualAcceptanceReceiptBlobSha": "d501880ac4f5900c6509570d3061c954bcf49145",
+    "noLive": true,
+    "noReimport": true,
+    "nextAction": "B4_ENTRY_GUARD"
   }
 }
