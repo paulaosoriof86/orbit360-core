@@ -1,0 +1,30 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P8_MEASURE_ACTUAL_ROUTE_LATENCY_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B3-008",
+  "failedRunId": 37029437270,
+  "failedSourceSha": "cabc4f6545fd47412871052bd4c79af8cf5570cd",
+  "classification": "HARNESS_MEASUREMENT_BOUNDARY_TOO_TIGHT_TO_CLASSIFY",
+  "evidence": {
+    "cliente360RenderedRows": 40,
+    "cliente360TotalRows": 439,
+    "cliente360InternalRenderMs": 36.2,
+    "loading": false,
+    "denied": false,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "observedUsableStateImmediatelyAfterSixSecondTimeout": true
+  },
+  "rootCause": "The harness observation window ended at the same 6s value used as the acceptance threshold, so it could not distinguish a true >6s performance regression from a boundary race.",
+  "fix": "Observe usable Cliente360/Cobros state for up to 15s, but preserve the acceptance threshold at <=6000ms using the measured route-to-usable elapsed time.",
+  "proofBlobSha": "10a161942f94cd5ec1e913a7379bfafa2574deb0",
+  "acceptanceThresholdMs": 6000,
+  "observationWindowMs": 15000,
+  "productSourceChanged": false,
+  "operationalBusinessWrites": false,
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}
