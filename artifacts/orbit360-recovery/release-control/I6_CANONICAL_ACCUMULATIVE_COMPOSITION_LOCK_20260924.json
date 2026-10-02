@@ -2020,7 +2020,7 @@
   "b3008HumanVisualPass": {
     "status": "PASS",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
-    "blobSha": "d501880ac4f5900c6509570d3061c954bcf49145",
+    "blobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
     "sourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
     "buildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
     "previewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
@@ -2036,9 +2036,18 @@
     "status": "B3_PASS_PENDING_B4_ENTRY_GUARD",
     "readinessPercent": 96,
     "visualAcceptanceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
-    "visualAcceptanceReceiptBlobSha": "d501880ac4f5900c6509570d3061c954bcf49145",
+    "visualAcceptanceReceiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
     "noLive": true,
     "noReimport": true,
     "nextAction": "B4_ENTRY_GUARD"
+  },
+  "b3CarryAdjudications": {
+    "reportedPaymentPresentationR4": {
+      "status": "CLOSED_PASS_BY_EXISTING_EVIDENCE",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_CARRY_REPORTED_PAYMENT_PRESENTATION_R4_ADJUDICATION_PASS_20261002.json",
+      "blobSha": "854c05ca68c2c9e359e42f1de2f1f5b4f8d54689",
+      "productSourceChanged": false,
+      "operationalBusinessWrites": 0
+    }
   }
 }
