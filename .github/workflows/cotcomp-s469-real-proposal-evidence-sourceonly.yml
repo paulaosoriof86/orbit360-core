@@ -1,0 +1,111 @@
+name: CotComp S4.69 real Proposal evidence source-only
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s469-real-proposal-evidence-sourceonly-20261002
+    paths:
+      - '.github/cotcomp-lab-intents/s469-real-proposal-evidence-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s469-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.69 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s469-real-proposal-evidence-sourceonly.json
+          jq -e '
+            .authorization=="S469_REAL_PROPOSAL_EVIDENCE_SOURCEONLY" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .journeyId=="GT_AUTO_MOTO_HYBRID" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .realData==false and
+            .providerOrRater==false and
+            .production==false and
+            .issuance==false and
+            .binding==false and
+            .payment==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.69 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-real-proposal-evidence-s469.js
+          node --check cotcomp-real-proposal-evidence-s469.test.js
+          node --test cotcomp-real-proposal-evidence-s469.test.js
+
+      - name: Generate sanitized S4.69 receipt
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s469"
+          node <<'NODE'
+          const fs=require('fs');
+          const s=require('./cotcomp-real-proposal-evidence-s469');
+          const r=s.readiness();
+          if(!r.sourceContractReady)throw new Error('S469_SOURCE_CONTRACT_NOT_READY');
+          if(r.currentDependency!=='REAL_VALIDATED_PROPOSAL_EVIDENCE_REQUIRED')throw new Error('S469_DEPENDENCY_TRUTH_INVALID');
+          if(r.executionEnabled||r.appDataReadsAllowed||r.appDataWritesAllowed||r.providerOrRaterCallsAllowed||r.productionAllowed)throw new Error('S469_BOUNDARY_INVALID');
+          if(r.realProposalCreated||r.realDataTouched)throw new Error('S469_REAL_DATA_FORBIDDEN');
+          const receipt={
+            schemaVersion:'ays-cotcomp-s469-real-proposal-evidence-sourceonly-receipt-v1.0',
+            sourceSha:process.env.GITHUB_SHA,
+            sourceContractReady:true,
+            currentDependency:r.currentDependency,
+            acceptableEvidenceOrigins:r.acceptableEvidenceOrigins,
+            reusesExistingProposalVersioningContract:true,
+            newProposalModelCreated:false,
+            bareManualPremiumEligible:false,
+            humanValidationRequired:true,
+            documentaryCommitmentRequired:true,
+            rawPiiAllowed:false,
+            rawDocumentInCotCompAllowed:false,
+            appDataReads:0,
+            appDataWrites:0,
+            realDataTouched:false,
+            realProposalCreated:false,
+            providerOrRaterCalls:0,
+            productionTouched:false,
+            issuance:false,
+            binding:false,
+            payment:false,
+            generalPersistenceReleased:false
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s469/S469_REAL_PROPOSAL_EVIDENCE_SOURCEONLY_RECEIPT.json',JSON.stringify(receipt,null,2));
+          NODE
+
+      - name: Upload sanitized S4.69 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s469-real-proposal-evidence-sourceonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/s469/S469_REAL_PROPOSAL_EVIDENCE_SOURCEONLY_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
