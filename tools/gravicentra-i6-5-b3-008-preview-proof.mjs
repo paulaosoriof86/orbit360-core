@@ -91,7 +91,7 @@ async function independent(page){
     const open=r=>{const s=String(r?.estadoCartera||r?.estado||'').toLowerCase();return r?.conciliadoPago!==true&&!['pagado','cobrado','cerrado','anulado','cancelado','cancelada'].includes(s);};
     const due=r=>r?.vence||r?.fechaVencimiento||r?.fechaLimite||'';
     const overdue=r=>{if(!open(r))return false;const d=due(r);if(!d)return false;const dt=new Date(String(d).slice(0,10)+'T00:00:00');const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());return dt<today;};
-    const pend={},venc={};portfolio.filter(r=>inCountry(rowCountry(r))).forEach(r=>{if(!open(r))return;money(overdue(r)?venc:pend,r.moneda||pm.get(String(r.polizaId||''))?.moneda,r.monto!=null?r.monto:r.saldo);});
+    const pend={},venc={};portfolio.forEach(r=>{const p=pm.get(String(r&&r.polizaId||''));if(!p||!inCountry(rowCountry(r))||!open(r))return;const cli=cm.get(String(r&&r.clienteId||p.clienteId||''));money(overdue(r)?venc:pend,r.moneda||p.moneda||cli?.moneda,r.monto!=null?r.monto:r.saldo);});
     const direct=projected.filter(r=>r.origin==='CRM_DIRECT'&&inCountry(rowCountry(r)));
     const scopedPolicies=policies.filter(p=>inCountry(policyCountry(p))),active=scopedPolicies.filter(p=>['Vigente','Por renovar'].includes(p.estado));
     return{country,month,production:prod,realizedAll,monthlyPaid,pending:pend,overdue:venc,directCount:direct.length,directAmount:direct.reduce((s,r)=>s+(Number(r.monto)||0),0),clientCount:clients.filter(c=>inCountry(cc(c.pais))).length,policyCount:scopedPolicies.length,activePolicyCount:active.length};
@@ -127,7 +127,7 @@ try{
   need(mapsEqual(inicioDom.production,truthAll.production),'B3_008_MONTHLY_PRODUCTION_REALITY_MISMATCH:'+JSON.stringify({dom:inicioDom.production,truth:truthAll.production}));
   need(mapsEqual(inicioDom.recaudo,truthAll.monthlyPaid),'B3_008_MONTHLY_RECAUDO_REALITY_MISMATCH:'+JSON.stringify({dom:inicioDom.recaudo,truth:truthAll.monthlyPaid}));
   need(mapsEqual(inicioDom.confirmed,truthAll.realizedAll),'B3_008_CONFIRMED_REALITY_MISMATCH:'+JSON.stringify({dom:inicioDom.confirmed,truth:truthAll.realizedAll}));
-  need(mapsEqual(inicioDom.pending,truthAll.pending)&&mapsEqual(inicioDom.overdue,truthAll.overdue),'B3_008_PORTFOLIO_REALITY_MISMATCH');
+  need(mapsEqual(inicioDom.pending,truthAll.pending)&&mapsEqual(inicioDom.overdue,truthAll.overdue),'B3_008_PORTFOLIO_REALITY_MISMATCH:'+JSON.stringify({domPending:inicioDom.pending,truthPending:truthAll.pending,domOverdue:inicioDom.overdue,truthOverdue:truthAll.overdue}));
   need(!['missing','currency-required'].includes(inicioDom.prodMetaState)||inicioDom.prodPct==='','B3_008_SYNTHETIC_PRODUCTION_PERCENT');
   need(!['missing','currency-required'].includes(inicioDom.recaudoMetaState)||inicioDom.recaudoPct==='','B3_008_SYNTHETIC_RECAUDO_PERCENT');
   need(inicioDom.missingAdvisor.every(x=>x.pct===''&&!/\b0%\b/.test(x.text)),'B3_008_ADVISOR_MISSING_META_FALSE_ZERO');

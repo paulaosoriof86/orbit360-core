@@ -1,0 +1,19 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_R2P2_INDEPENDENT_PORTFOLIO_HARNESS_FIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B3-008",
+  "failedRunId": 37014118190,
+  "failedSourceSha": "52dd582c9c086ccccc422842f3b83184ab10862c",
+  "classification": "HARNESS_ONLY_INDEPENDENT_EXPECTATION_RELATIONSHIP_AND_CURRENCY_FALLBACK_GAP",
+  "failureCode": "B3_008_PORTFOLIO_REALITY_MISMATCH",
+  "productRegressionDemonstrated": false,
+  "rootCause": "Independent proof included orphan/unlinked portfolio rows and omitted client currency fallback, while the product contract counts only policy-linked portfolio rows and resolves currency row>policy>client.",
+  "fix": "Independent expectation now requires a linked policy, applies the same documented data lineage boundary without calling product KPI functions, and resolves currency from row then policy then client. Failure output now includes both maps.",
+  "proofBlobSha": "1f0afb4e118b2e85353681495c9b715fa92cf2ca",
+  "productSourceChanged": false,
+  "dataWrites": false,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B3_008_EXACT_PREVIEW_RETRY"
+}

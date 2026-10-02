@@ -59,7 +59,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "6a686f076c6b9b6d0e1790663b3cadd9827e6cc6"
+    "blobSha": "c48dd68e3ff6deff52b440947fb9c35ead468f6c"
   },
   "nextRequiredProof": [
     "B3_008_R2_INDEPENDENT_REALITY_MACHINE_PROOF",
@@ -772,14 +772,14 @@
     "forbiddenSyntheticPaymentCollection": "cobros"
   },
   "b3008Executor": {
-    "status": "ARMED_FOR_EXACT_PREVIEW_R2P1",
+    "status": "ARMED_FOR_EXACT_PREVIEW_R2P2",
     "qaBlobs": {
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "8d3dc8325cf5b74fa30a8f8646e894a8295534e3",
       "tools/gravicentra-i6-5-b3-008-contract.mjs": "868d4ddf85ed7404786d1290d2aa4447a3ff845b",
       "tools/gravicentra-i6-5-b3-008-preview-proof.mjs": "f0d0bdfb6f69e6ce6fdf638eb9c203a419bfb90a",
       ".github/workflows/gravicentra-b3-008-executor.yml": "a607e4f60a44907361ccb972aa6519b07c5a08dd"
     },
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "operationalBusinessWritesAuthorized": false,
     "reimportAuthorized": false,
     "liveHostingPromotionAuthorized": false,
@@ -795,7 +795,7 @@
     "contractPath": "tools/gravicentra-i6-5-b3-008-contract.mjs",
     "contractBlobSha": "eae48dc85e161893de36e4b7086d8f243c6dbc4b",
     "proofPath": "tools/gravicentra-i6-5-b3-008-preview-proof.mjs",
-    "proofBlobSha": "d6cd4d2cf155d2f504858a9eb66faddc5c1ab3fd"
+    "proofBlobSha": "1f0afb4e118b2e85353681495c9b715fa92cf2ca"
   },
   "b3008R2": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -810,5 +810,13 @@
     "blobSha": "c4fdae72f55b957dcd5a2fc2ae1eed7db24ceaa9",
     "failedRunId": 37013510594,
     "classification": "PRODUCT_DEFECT_CONFIRMED_BY_INDEPENDENT_REALITY_PROOF"
+  },
+  "b3008R2P2": {
+    "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P2_INDEPENDENT_PORTFOLIO_HARNESS_FIX_20261002.json",
+    "blobSha": "5b7ae401aab08467ee6bc253db0e8a3cc7caf111",
+    "failedRunId": 37014118190,
+    "classification": "HARNESS_ONLY",
+    "productRegressionDemonstrated": false
   }
 }
