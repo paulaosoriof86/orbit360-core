@@ -1,0 +1,136 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_008_SCOPE_AND_CLOSURE_LOCK_V1",
+  "recordedAt": "2026-10-01",
+  "status": "FROZEN_ACTIVE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "physicalEntry": {
+    "head": "e9bac2969c834e2d28cb4916e278b73c9c6e35c7",
+    "controlPlaneBlobSha": "bf5ac45fa29324118582a146238b4984974cec94",
+    "b3006Status": "CLOSED_PASS",
+    "b3007Status": "CLOSED_PASS",
+    "b3008Status": "DIAGNOSTIC_ACTIVE",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B3_008_DIAGNOSTIC",
+    "candidateEligibleForPromotion": false,
+    "livePromoted": false
+  },
+  "objective": "Close only material reality/readiness defects that can make the UI present unsupported state as definitive, then continue immediately with the physically authorized successor gate and reach production in the fewest safe cycles.",
+  "scopeBoundary": {
+    "included": [
+      "READINESS_HYDRATION defects that publish definitive-looking value/color before required authoritative dependencies are server-confirmed.",
+      "SEMANTIC_FORMULA defects only when required to prevent a materially wrong current operational decision.",
+      "Current B3-008 Inicio/Cliente360 KPI reality inconsistencies already preserved in the finding ledger."
+    ],
+    "excluded": [
+      "General dashboard audit.",
+      "Inicio redesign.",
+      "Full Insights or Reports work.",
+      "New KPIs.",
+      "Transversal Metric Registry implementation.",
+      "General analytics perfection or benchmark incorporation.",
+      "Postproduction hardening unless a causal current-production blocker is proven."
+    ],
+    "noBroadRediscovery": true
+  },
+  "problemSeparation": {
+    "A_READINESS_HYDRATION": {
+      "inCurrentGate": true,
+      "question": "Does the UI publish an apparently definitive value/color before all required authoritative data is available?",
+      "requiredDisposition": "BLOCKS_CURRENT_PRODUCTION when yes."
+    },
+    "B_SEMANTIC_FORMULA": {
+      "inCurrentGate": "ONLY_IF_NEEDED_TO_AVOID_CURRENT_MATERIAL_DECISION_ERROR",
+      "question": "Does the final value use the approved business definition?",
+      "failClosed": "If the definition is not authoritative, set BUSINESS_SEMANTIC_DECISION_REQUIRED and do not invent it."
+    },
+    "C_TRANSVERSAL_METRIC_ARCHITECTURE": {
+      "inCurrentGate": false,
+      "defaultClassification": "POSTPRODUCTION_HARDENING",
+      "exception": "Only enters B3-008 if physically demonstrated as causal to a current blocking wrong result or second-writer overwrite."
+    }
+  },
+  "health70To51": {
+    "knownCausalDiagnostic": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_CLIENTE360_HEALTH_HYDRATION_DIAGNOSTIC_20261001.json",
+      "blobSha": "1746189469392b51b051c5fae61dc6e6245e5773",
+      "demonstratedReadinessDefect": "DETAIL_HEADER_AND_HEALTH_RENDER_BEFORE_REQUIRED_FINANCIAL_DEPENDENCIES_ARE_SERVER_CONFIRMED"
+    },
+    "mustProveBeforeFix": [
+      "Exact required dependencies.",
+      "Exact readiness/server-confirmation boundary for each dependency.",
+      "Effective final formula.",
+      "Canonical metric owner.",
+      "Whether 51 is actually correct under approved business semantics."
+    ],
+    "forbiddenInterpretation": "Do not optimize 70 so it reaches 51 faster.",
+    "preReadyPresentation": {
+      "definitiveNumberForbidden": true,
+      "definitiveColorForbidden": true,
+      "neutralState": [
+        "CALCULANDO",
+        "ACTUALIZANDO DATOS"
+      ]
+    },
+    "semanticFailClosed": "BUSINESS_SEMANTIC_DECISION_REQUIRED"
+  },
+  "closureContract": {
+    "requirements": [
+      "No affected indicator publishes a definitive value before its required inputs are confirmed.",
+      "Readiness is explicit and neutral while dependencies are incomplete.",
+      "Final value is coherent with the available authoritative source and approved semantics.",
+      "No second writer overwrites the canonical result.",
+      "Country, role or context change cannot temporarily show values from the previous context as current.",
+      "Reload/readback preserves coherence.",
+      "Mobile and desktop communicate the same readiness/final-state semantics.",
+      "Paula validates only the affected surfaces.",
+      "No causal regression of prior CLOSED_PASS findings."
+    ],
+    "sufficientForClosure": true,
+    "fullAnalyticsAuditRequired": false
+  },
+  "findingTriageRule": {
+    "mandatorySequence": [
+      "HALLAZGO",
+      "CAUSALIDAD",
+      "CLASSIFICATION"
+    ],
+    "classifications": [
+      "BLOCKS_CURRENT_PRODUCTION",
+      "POSTPRODUCTION_HARDENING",
+      "PHASE_B"
+    ],
+    "activeGateAdmission": "ONLY_BLOCKS_CURRENT_PRODUCTION"
+  },
+  "postproductionHardening": [
+    {
+      "id": "POST_METRIC_REGISTRY",
+      "classification": "POSTPRODUCTION_HARDENING",
+      "scope": "Transversal shared metric definitions for Inicio, Insights and Reportes.",
+      "buildNow": false,
+      "conditionToPullForward": "Only if B3-008 proves it is causally indispensable to close a current blocking second-writer/authority defect."
+    },
+    {
+      "id": "POST_CANONICAL_RELEASE_MANIFEST_PROJECTION",
+      "classification": "POSTPRODUCTION_HARDENING",
+      "scope": "Single derived release projection over existing authorities; never a new authority.",
+      "buildNow": false,
+      "conditionToPullForward": "Only if physically indispensable to promote the current successor candidate safely."
+    }
+  ],
+  "afterB3008": {
+    "newTransversalAuditForbidden": true,
+    "lastImprovementsRoundForbidden": true,
+    "postproductionHardeningBeforeSuccessorGateForbidden": true,
+    "benchmarkItemsBeforeSuccessorGateForbidden": true,
+    "action": "Continue immediately with the next physically authorized plan step."
+  },
+  "boundaries": {
+    "productMutationAuthorizedByThisLock": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "newRepoOrFirebaseAuthorized": false,
+    "newMethodologyAuthorized": false,
+    "reopenPriorPassWithoutCausalRegression": false
+  }
+}
