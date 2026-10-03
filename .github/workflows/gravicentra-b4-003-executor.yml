@@ -258,7 +258,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b4-003-preview-proof.mjs
-          node -e "const x=require(process.env.B4_003_PROOF_OUT),a=x.assertions||{};if(x.status!=='PASS'||a.insurerKnowledgeVisible!==true||a.multiProductKnowledgeRoadmapVisible!==true||a.noDelayedRenewalRenderMutation!==true||a.renewalCampaignDurableReadback!==true||a.cancelationDurableReadback!==true||a.recoveryLinkagePreserved!==true||a.recoveryIdempotentRetry!==true||a.previewGeneralWriteIsolation!==true||a.cancellationProjectionConsistent!==true||a.qaResidueReadOnlyAdjudicated!==true||a.cleanupComplete!==true||x.syntheticFinalAbsent!==true)process.exit(1);console.log('B4_003_PREVIEW_PROOF=PASS')"
+          node -e "const x=require(process.env.B4_003_PROOF_OUT),a=x.assertions||{};if(x.status!=='PASS'||a.quoteAuthorityContractHosted!==true||a.manualFinancialInferenceRemoved!==true||a.insurerKnowledgeVisible!==true||a.multiProductKnowledgeRoadmapVisible!==true||a.noDelayedRenewalRenderMutation!==true||a.renewalCampaignDurableReadback!==true||a.cancelationDurableReadback!==true||a.recoveryLinkagePreserved!==true||a.recoveryIdempotentRetry!==true||a.previewGeneralWriteIsolation!==true||a.cancellationProjectionConsistent!==true||a.qaResidueReadOnlyAdjudicated!==true||a.cleanupComplete!==true||x.syntheticFinalAbsent!==true)process.exit(1);console.log('B4_003_PREVIEW_PROOF=PASS')"
 
       - name: Adjudicate and clean exact historical B2 QA residue
         if: steps.gate.outputs.run == 'true'
