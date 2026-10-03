@@ -486,6 +486,70 @@ try{
  need(proof.clientTabs.maxScroll===0||proof.clientTabs.hasPrev===true,'B4_003_CLIENT360_LEFT_TAB_CONTROL_NOT_ACTIVATED');
  proof.assertions.client360BidirectionalTabs=true;
 
+ // R13: Pólizas route, search and direct detail must stay bounded and hydration-safe.
+ await page.waitForFunction(()=>{
+   const s=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
+   const confirmed=s.serverConfirmedCollections||[];
+   return ['clientes','polizas','vehiculos'].every(x=>confirmed.includes(x));
+ },null,{timeout:30000});
+ await page.evaluate(()=>{Orbit.pais='TODOS';});
+ const policyRouteStarted=Date.now();
+ await page.evaluate(()=>{location.hash='#/polizas';});
+ await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='polizas',null,{timeout:10000});
+ await page.waitForSelector('#host .tbl',{timeout:10000});
+ const policyRouteMs=Date.now()-policyRouteStarted;
+ need(policyRouteMs<2500,'B4_003_R13_POLICY_ROUTE_TOO_SLOW:'+policyRouteMs);
+ need((await page.locator('[data-polizas-relations-loading]').count())===0,'B4_003_R13_POLICY_ROUTE_STUCK_LOADING');
+ const policySearchNumber='B4-003-REN-'+run;
+ const policySearchStarted=Date.now();
+ await page.fill('#fq',policySearchNumber);
+ await page.waitForFunction(num=>{
+   const count=String(document.getElementById('fb-count')?.textContent||'').trim();
+   const rows=Array.from(document.querySelectorAll('#host .tbl tbody tr')).filter(r=>String(r.innerText||'').includes(num));
+   return document.getElementById('fq')?.value===num&&/^1\s+de\s+/i.test(count)&&rows.length===1;
+ },policySearchNumber,{timeout:10000});
+ const policySearchMs=Date.now()-policySearchStarted;
+ need(policySearchMs<2500,'B4_003_R13_POLICY_SEARCH_TOO_SLOW:'+policySearchMs);
+ const policyDetailStarted=Date.now();
+ const searchRow=page.locator('#host .tbl tbody tr').filter({hasText:policySearchNumber}).first();
+ await searchRow.click();
+ await page.waitForSelector('[data-policy-fullpage="1"]',{timeout:10000});
+ const policyDetailMs=Date.now()-policyDetailStarted;
+ need(policyDetailMs<2500,'B4_003_R13_POLICY_DETAIL_TOO_SLOW:'+policyDetailMs);
+ proof.r13PolicyPerformance={routeMs:policyRouteMs,searchMs:policySearchMs,detailMs:policyDetailMs,searchNumber:policySearchNumber};
+ proof.assertions.policyRouteUnder2500ms=true;
+ proof.assertions.policySearchUnder2500ms=true;
+ proof.assertions.policyDetailUnder2500ms=true;
+
+ await page.addInitScript(({policyNumber,clientName})=>{
+   window.__R13_POLICY_FLICKER__={states:[],destructive:false};
+   window.addEventListener('DOMContentLoaded',()=>{
+     let queued=false;
+     const sample=()=>{
+       queued=false;
+       const h=document.getElementById('host');if(!h)return;
+       const text=String(h.innerText||'');
+       const loading=!!h.querySelector('[data-polizas-relations-loading]');
+       const hasPolicy=text.includes(policyNumber),hasClient=text.includes(clientName);
+       if(window.__R13_POLICY_FLICKER__.states.length<120)window.__R13_POLICY_FLICKER__.states.push({loading,hasPolicy,hasClient,route:String(location.hash||'')});
+       if(hasPolicy&&!hasClient&&!loading)window.__R13_POLICY_FLICKER__.destructive=true;
+     };
+     const obs=new MutationObserver(()=>{if(!queued){queued=true;setTimeout(sample,0);}});
+     obs.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+     setTimeout(()=>{sample();obs.disconnect();},12000);
+   },{once:true});
+ },{policyNumber:policySearchNumber,clientName:'B4-003 QA Cliente'});
+ await page.evaluate(()=>{location.hash='#/polizas';});
+ await page.reload({waitUntil:'domcontentloaded'});
+ await bootProduct(page,token);
+ await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='polizas',null,{timeout:10000});
+ await page.waitForSelector('#host .tbl',{timeout:30000});
+ await page.waitForTimeout(250);
+ const flicker=await page.evaluate(()=>window.__R13_POLICY_FLICKER__||{states:[],destructive:true});
+ proof.r13PolicyPerformance.refreshFlicker=flicker;
+ need(flicker.destructive===false,'B4_003_R13_REFRESH_CLIENT_DESTRUCTIVE_FLICKER');
+ proof.assertions.policyRefreshCoherentHydration=true;
+
  await page.waitForFunction(()=>{
    const s=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
    const confirmed=s.serverConfirmedCollections||[];
