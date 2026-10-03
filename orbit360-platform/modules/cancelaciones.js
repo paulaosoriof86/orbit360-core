@@ -14,19 +14,53 @@ Orbit.modules.cancelaciones = (function () {
   function allSafe(col) { try { return S().all(col) || []; } catch (e) { return []; } }
   function countryCode(value) { return String(value == null ? '' : value).trim().toUpperCase(); }
   function activeCountry() { const p=countryCode(Orbit.pais); return p && p!=='TODOS' ? p : ''; }
-  function linkedPolicy(c) { return c && c.polizaId ? S().get('polizas', c.polizaId) : null; }
-  function linkedClient(c,p) { const id=c&&c.clienteId || p&&p.clienteId; return id ? S().get('clientes', id) : null; }
-  function recordCountry(c) { const p=linkedPolicy(c),cli=linkedClient(c,p); return countryCode(c&&c.pais || p&&p.pais || cli&&cli.pais); }
-  function recordCurrency(c) { const p=linkedPolicy(c),cli=linkedClient(c,p); return countryCode(c&&c.moneda || p&&p.moneda || p&&p.divisa || cli&&cli.moneda) || 'GTQ'; }
-  function inActiveCountry(c) { const p=activeCountry(); return !p || recordCountry(c)===p; }
-  function policyInActiveCountry(p) { const wanted=activeCountry(); if(!wanted)return true; const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null; return countryCode(p&&p.pais || cli&&cli.pais)===wanted; }
-  function lostByCurrency(rows) { const out={}; (rows||[]).forEach(c=>{const cur=recordCurrency(c),n=Number(c&&c.valorPerdido)||0;out[cur]=(out[cur]||0)+n;}); return out; }
+  function relationIndex() {
+    const policies = allSafe('polizas'), clients = allSafe('clientes');
+    return {
+      policies,
+      policyById: new Map(policies.filter(p => p && p.id != null).map(p => [String(p.id), p])),
+      clientById: new Map(clients.filter(c => c && c.id != null).map(c => [String(c.id), c]))
+    };
+  }
+  function linkedPolicy(c, I) {
+    const id = c && c.polizaId;
+    if (!id) return null;
+    return I && I.policyById ? (I.policyById.get(String(id)) || null) : S().get('polizas', id);
+  }
+  function linkedClient(c, p, I) {
+    const id = c && c.clienteId || p && p.clienteId;
+    if (!id) return null;
+    return I && I.clientById ? (I.clientById.get(String(id)) || null) : S().get('clientes', id);
+  }
+  function recordCountry(c, I) {
+    const p=linkedPolicy(c,I),cli=linkedClient(c,p,I);
+    return countryCode(c&&c.pais || p&&p.pais || p&&p.country || cli&&cli.pais || cli&&cli.country);
+  }
+  function recordCurrency(c, I) {
+    const p=linkedPolicy(c,I),cli=linkedClient(c,p,I);
+    return countryCode(c&&c.moneda || p&&p.moneda || p&&p.divisa || cli&&cli.moneda) || 'GTQ';
+  }
+  function inActiveCountry(c, I) { const p=activeCountry(); return !p || recordCountry(c,I)===p; }
+  function policyInActiveCountry(p, I) {
+    const wanted=activeCountry(); if(!wanted)return true;
+    const cli=p&&p.clienteId ? linkedClient(null,p,I) : null;
+    return countryCode(p&&p.pais || p&&p.country || cli&&cli.pais || cli&&cli.country)===wanted;
+  }
+  function lostByCurrency(rows, I) {
+    const out={};
+    (rows||[]).forEach(c=>{const cur=recordCurrency(c,I),n=Number(c&&c.valorPerdido)||0;out[cur]=(out[cur]||0)+n;});
+    return out;
+  }
   function moneyMapHtml(map) { const keys=Object.keys(map||{}).filter(k=>Math.abs(Number(map[k])||0)>0); return keys.length ? keys.map(k=>'<span style="display:block;font-size:'+(keys.length>1?'13px':'21px')+'">'+U.esc(k)+' '+Number(map[k]).toLocaleString('es-GT',{maximumFractionDigits:0})+'</span>').join('') : '0'; }
-  function clientPolicyCell(c) {
-    const p=linkedPolicy(c),cli=linkedClient(c,p); if(!cli)return '—';
-    const nombre=cli.nombre||'Cliente',tipo=cli.tipo||'Pendiente de completar',pais=cli.pais||'';
-    const meta=pais?U.esc(tipo)+' · '+U.esc(pais):U.esc(tipo);
-    return '<a data-cancel-client-link href="#/cliente360?c='+encodeURIComponent(cli.id||c.clienteId||'')+'&t=polizas" style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="event.stopPropagation()">'+
+  function clientPolicyCell(c, I) {
+    const p=linkedPolicy(c,I),cli=linkedClient(c,p,I); if(!cli)return '—';
+    const nombre=cli.nombre||'Cliente',tipo=cli.tipo||'Pendiente de completar';
+    const clientCountry=countryCode(cli.pais||cli.country), operationCountry=recordCountry(c,I);
+    const countryMeta=operationCountry&&clientCountry&&operationCountry!==clientCountry
+      ? 'Cliente '+clientCountry+' · operación '+operationCountry
+      : (operationCountry||clientCountry);
+    const meta=countryMeta?U.esc(tipo)+' · '+U.esc(countryMeta):U.esc(tipo);
+    return '<a data-cancel-client-link data-cancel-client-country="'+U.esc(clientCountry)+'" data-cancel-operation-country="'+U.esc(operationCountry)+'" href="#/cliente360?c='+encodeURIComponent(cli.id||c.clienteId||'')+'&t=polizas" style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="event.stopPropagation()">'+
       U.avatar(nombre,tipo==='Empresa'?'#1E2227':'#C5162E','sm')+
       '<span style="min-width:0"><span style="font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">'+U.esc(nombre)+'</span><span class="muted" style="font-size:11px">'+meta+'</span></span></a>';
   }
@@ -57,23 +91,25 @@ Orbit.modules.cancelaciones = (function () {
       __policyCancellationProjection: true
     };
   }
-  function effectiveCancelations() {
+  function effectiveCancelations(I) {
     const explicit = allSafe('cancelaciones');
     const explicitPolicies = new Set(explicit.map(c => String(c && c.polizaId || '')).filter(Boolean));
-    const projected = allSafe('polizas').filter(isCancelledPolicy).filter(p => p && p.id && !explicitPolicies.has(String(p.id))).map(policyCancellation);
-    return explicit.concat(projected).filter(inActiveCountry);
+    const policyRows = I && I.policies ? I.policies : allSafe('polizas');
+    const projected = policyRows.filter(isCancelledPolicy).filter(p => p && p.id && !explicitPolicies.has(String(p.id))).map(policyCancellation);
+    return explicit.concat(projected).filter(c => inActiveCountry(c,I));
   }
   function cancellationById(id, policyId) {
+    const I=relationIndex();
     const explicit = S().get('cancelaciones', id);
-    if (explicit && inActiveCountry(explicit)) return explicit;
-    const all=effectiveCancelations(), direct=all.find(c => c.id === id);
+    if (explicit && inActiveCountry(explicit,I)) return explicit;
+    const all=effectiveCancelations(I), direct=all.find(c => c.id === id);
     if (direct) return direct;
     const wanted=String(policyId||'');
     return wanted ? (all.find(c => String(c&&c.polizaId||'')===wanted) || null) : null;
   }
 
-  const FDEFS = () => [
-    { id: 'fmot', type: 'select', ph: 'Motivo', options: [...new Set(effectiveCancelations().map(c => c.motivo).filter(Boolean))].map(v => ({ v, t: v })) },
+  const FDEFS = rows => [
+    { id: 'fmot', type: 'select', ph: 'Motivo', options: [...new Set((rows||[]).map(c => c.motivo).filter(Boolean))].map(v => ({ v, t: v })) },
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
   ];
   function findNegocio(c) {
@@ -84,21 +120,23 @@ Orbit.modules.cancelaciones = (function () {
   }
 
   function render(host) {
-    const all = effectiveCancelations();
+    const I = relationIndex();
+    const all = effectiveCancelations(I);
     const porMotivo = {};
     all.forEach(c => { porMotivo[c.motivo] = (porMotivo[c.motivo] || 0) + 1; });
     const motTot = all.length || 1;
-    const perdidoPorMoneda = lostByCurrency(all);
-    const polizasBase = allSafe('polizas').filter(policyInActiveCountry);
+    const perdidoPorMoneda = lostByCurrency(all,I);
+    const polizasBase = I.policies.filter(p => policyInActiveCountry(p,I));
     const motCols = ['#7e1220', '#b5253b', '#c9821b', '#6b4ea0', '#1f3a5f'];
+    const defs = FDEFS(all);
 
     const rows = all.filter(c => {
-      const p = S().get('polizas', c.polizaId);
+      const p = linkedPolicy(c,I);
       return (!st.fmot || c.motivo === st.fmot) && (!st.fase || (p && p.asesorId === st.fase));
     }).sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
     st.__count = rows.length + ' de ' + all.length;
 
-    host.innerHTML = `<div class="page">
+    host.innerHTML = `<div class="page" data-cancel-indexed-relations="1">
       ${K.bannerFor('cancelaciones', '')}
       ${K.kpis([
         { label: 'Canceladas', onclick: "Orbit.modules.cancelaciones.detalleKpi('canceladas')", val: all.length, color: 'var(--danger)', foot: 'histórico' },
@@ -118,23 +156,34 @@ Orbit.modules.cancelaciones = (function () {
         </div>
       </div>
       <div class="card" style="overflow:hidden">
-        ${K.filterBar(FDEFS(), st)}
+        ${K.filterBar(defs, st)}
         <div style="overflow-x:auto"><table class="tbl">
-          <thead><tr><th>Fecha</th><th>Cliente</th><th>Póliza</th><th>Ramo</th><th>Motivo</th><th class="num">Valor perdido</th></tr></thead>
+          <thead><tr><th>Fecha</th><th>Cliente</th><th>Póliza</th><th>Ramo</th><th>Motivo</th><th class="num">Valor perdido</th><th>Acción</th></tr></thead>
           <tbody>${rows.map(c => {
-            const p = S().get('polizas', c.polizaId);
-            return `<tr class="clickable" data-cancel-country="${U.esc(recordCountry(c))}" data-cancel-policy="${U.esc(c.polizaId||'')}" onclick="Orbit.modules.cancelaciones.detalle('${String(c.id||'').replace(/'/g,"\\'")}','${String(c.polizaId||'').replace(/'/g,"\\'")}')">
+            const p = linkedPolicy(c,I);
+            const opCountry=recordCountry(c,I);
+            return `<tr data-cancel-country="${U.esc(opCountry)}" data-cancel-policy="${U.esc(c.polizaId||'')}">
               <td style="font-size:12.5px">${U.fmtDate(c.fecha)}</td>
-              <td>${clientPolicyCell(c)}</td>
-              <td><span class="mono" style="font-size:12px">${p ? p.numero : '—'}</span></td>
-              <td>${p ? p.ramo : '—'}</td>
+              <td>${clientPolicyCell(c,I)}</td>
+              <td>${p ? `<button type="button" data-cancel-policy-link="${U.esc(String(p.id||''))}" class="mono" style="font-size:12px;font-weight:600;border:0;background:none;color:var(--ink);padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px">${U.esc(p.numero||'—')}</button>` : '—'}</td>
+              <td>${p ? U.esc(p.ramo||'—') : '—'}</td>
               <td><span class="badge danger">${U.esc(c.motivo)}</span></td>
-              <td class="num">${U.money(c.valorPerdido, recordCurrency(c))}</td>
+              <td class="num">${U.money(c.valorPerdido, recordCurrency(c,I))}</td>
+              <td><button type="button" class="btn ghost sm" data-cancel-open="${U.esc(String(c.id||''))}" data-cancel-open-policy="${U.esc(String(c.polizaId||''))}">Ver cancelación</button></td>
             </tr>`;
-          }).join('') || `<tr><td colspan="6" class="muted" style="text-align:center;padding:30px">Sin cancelaciones.</td></tr>`}</tbody>
+          }).join('') || `<tr><td colspan="7" class="muted" style="text-align:center;padding:30px">Sin cancelaciones.</td></tr>`}</tbody>
         </table></div>
       </div></div>`;
-    K.wireFilters(FDEFS(), st, () => render(host));
+    K.wireFilters(defs, st, () => render(host));
+    host.querySelectorAll('[data-cancel-open]').forEach(btn => btn.addEventListener('click', () => detalle(btn.dataset.cancelOpen, btn.dataset.cancelOpenPolicy)));
+    host.querySelectorAll('[data-cancel-policy-link]').forEach(btn => btn.addEventListener('click', () => {
+      const pid=btn.dataset.cancelPolicyLink;
+      if(Orbit.modules.cliente360&&typeof Orbit.modules.cliente360.verPoliza==='function') Orbit.modules.cliente360.verPoliza(pid);
+      else {
+        const p=I.policyById.get(String(pid));
+        if(p) location.hash='#/cliente360?c='+encodeURIComponent(p.clienteId||'')+'&p='+encodeURIComponent(pid);
+      }
+    }));
   }
 
   function detalleKpi(kind) {
