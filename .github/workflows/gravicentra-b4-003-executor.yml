@@ -63,9 +63,9 @@ jobs:
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const l=JSON.parse(fs.readFileSync(process.env.B4_LOCK,'utf8'));
           const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW'
-            && /^B4_003_SOURCE_FIXED_R4_/.test(String(c.currentB4?.status||''))
-            && /^B4_003_SOURCE_FIXED_R4_/.test(String(c.i65ForensicRemediationPlan?.b4?.status||''))
-            && /^B4_003_SOURCE_FIXED_R4_/.test(String(l.status||''))
+            && /^B4_003_SOURCE_FIXED_R5_/.test(String(c.currentB4?.status||''))
+            && /^B4_003_SOURCE_FIXED_R5_/.test(String(c.i65ForensicRemediationPlan?.b4?.status||''))
+            && /^B4_003_SOURCE_FIXED_R5_/.test(String(l.status||''))
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
             && l.boundaries?.syntheticQaWritesAuthorized===true
@@ -359,8 +359,8 @@ jobs:
           LOCK_BLOB=$(git hash-object "$B4_LOCK"); export LOCK_BLOB
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.CONTROL,o=JSON.parse(fs.readFileSync(p,'utf8')),b=o.i65ForensicRemediationPlan.b4;
-          Object.assign(b,{status:'B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL',activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactReadback:true,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false,syntheticQaWritesAuthorized:false,nextAction:'B4_004_SINIESTROS_CRONOGRAMA_DIAGNOSTIC'});
-          o.currentB4={...(o.currentB4||{}),status:'B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL',activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,noLive:true,noReimport:true,nextAction:'B4_004_SINIESTROS_CRONOGRAMA_DIAGNOSTIC'};
+          Object.assign(b,{status:'B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL',activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactReadback:true,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false,syntheticQaWritesAuthorized:false,nextAction:'B4_003_TARGETED_PAULA_VISUAL'});
+          o.currentB4={...(o.currentB4||{}),status:'B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL',activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,noLive:true,noReimport:true,nextAction:'B4_003_TARGETED_PAULA_VISUAL'};
           o.nextAction='I6_5_FORENSIC_REMEDIATION_B4_003_TARGETED_PAULA_VISUAL';
           o.canonicalAccumulationControl={...(o.canonicalAccumulationControl||{}),activeBlock:'B4',activeFindingId:'B4-003',compositionLockBlobSha:process.env.COMPOSITION_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,nextAction:'B4_003_TARGETED_PAULA_VISUAL'};
           fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
