@@ -105,6 +105,9 @@ need(policyBridge.includes('data-renewable')&&policyBridge.includes("renovable: 
 need(/function\s+relationDataReady\s*\(/.test(policy)&&/data-polizas-relations-loading="1"/.test(policy),'B4_003_R13_POLICY_RELATION_READINESS_MISSING');
 need(/searchTextByPolicy/.test(policy)&&/searchTimer=setTimeout/.test(policy)&&/},180\)/.test(policy),'B4_003_R13_POLICY_INDEXED_DEBOUNCED_SEARCH_MISSING');
 need(/const policies = S\(\)\.all\('polizas'\)/.test(policy)&&/const clients = S\(\)\.all\('clientes'\)/.test(policy)&&/insurersById/.test(policy)&&/advisorsById/.test(policy),'B4_003_R13_POLICY_SINGLE_READ_RELATION_INDEX_MISSING');
+const policyFirstPaintBlock=(policy.match(/function buildIndexes\(\) \{[\s\S]*?\n  \}\n\n  function ensureBasicSearchIndex/)||[''])[0];
+need(policyFirstPaintBlock&&!/all\('vehiculos'\)/.test(policyFirstPaintBlock)&&!/searchTextByPolicy/.test(policyFirstPaintBlock),'B4_003_R13P3_POLICY_FIRST_PAINT_SEARCH_WORK_REMAINS');
+need(/function\s+ensureBasicSearchIndex\s*\(/.test(policy)&&/function\s+ensureVehicleSearchIndex\s*\(/.test(policy)&&/const vehicles=S\(\)\.all\('vehiculos'\)/.test(policy),'B4_003_R13P3_POLICY_LAZY_SEARCH_INDEX_MISSING');
 need(/function\s+policiesForActiveCountry\s*\(/.test(policy)&&/function\s+clientCell\s*\(/.test(policy)&&/function\s+insurerCell\s*\(/.test(policy)&&/function\s+advisorCell\s*\(/.test(policy),'B4_003_R13_POLICY_INDEXED_FIRST_PAINT_MISSING');
 need(/function\s+rerender\s*\(/.test(policy)&&/Orbit\.access\.withScope\(MODULE_KEY/.test(policy),'B4_003_R13_POLICY_RERENDER_SCOPE_GUARD_MISSING');
 need(!/q\.polizasScoped\s*\?\s*q\.polizasScoped\(\)/.test(policy),'B4_003_R13_POLICY_DUPLICATE_SCOPED_READ_REMAINS');
@@ -139,7 +142,7 @@ need(/renewals-v1200-operational-bridge\.js\?v=20261003-b4003r11/.test(index),'B
 need(/renewals-v1200-permission-guard\.js\?v=20261003-b4003r2/.test(index),'B4_003_PERMISSION_CACHE_BINDING_MISSING');
 need(/renewals-v1201-issued-filter\.js\?v=20261003-b4003r2/.test(index),'B4_003_ISSUED_CACHE_BINDING_MISSING');
 need(/cancelaciones\.js\?v=20261003-b4003r13/.test(index),'B4_003_CANCEL_R13_CACHE_BINDING_MISSING');
-need(/modules\/polizas\.js\?v=20261003-b4003r13p2/.test(index),'B4_003_POLICY_R13_CACHE_BINDING_MISSING');
+need(/modules\/polizas\.js\?v=20261003-b4003r13p3/.test(index),'B4_003_POLICY_R13_CACHE_BINDING_MISSING');
 need(/core\/access-scope\.js\?v=20261003-b4003r5/.test(index),'B4_003_ACCESS_SCOPE_CACHE_BINDING_MISSING');
 need(/modules\/cronograma\.js\?v=20261003-b4003r5/.test(index),'B4_003_CRONOGRAMA_CACHE_BINDING_MISSING');
 need(/store-firestore-product-operational-p0\.js\?v=20261003-b4003r3/.test(index),'B4_003_STORE_CACHE_BINDING_MISSING');
