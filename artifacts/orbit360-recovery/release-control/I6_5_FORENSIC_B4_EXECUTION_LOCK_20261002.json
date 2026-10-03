@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-03",
-  "status": "B4_003_SOURCE_FIXED_R12_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "SOURCE_FIXED_R12_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
     "blocking": true,
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
-    "humanVisualStatus": "REJECTED_R11_PENDING_RETEST",
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "humanVisualStatus": "PENDING",
     "knowledgePreview": true
   },
   "rules": {
@@ -88,21 +88,21 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": true,
+    "syntheticQaWritesAuthorized": false,
     "syntheticQaScope": "B4-003 R11 exact Preview only; synthetic rows only; mandatory cleanup/readback; no real operational record mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
     "providerDeploymentAuthorized": false,
     "findingContinuityGuardRequired": true
   },
-  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "935f0939266702cbe330d0c3c156c39dffa2c08d"
+    "blobSha": "1576ec82cf8aed7b31aa38d47160b9621ae03c36"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "1a11f662147d58cbde488228f83cc5e14e0243a1"
+    "blobSha": "c2d3d700916e01bfcc5cf9376d478fec9c611f57"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -119,7 +119,18 @@
   "nextRequiredProof": [
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "candidate": null,
+  "candidate": {
+    "sourceSha": "e7071dcd492d2a55d7feb5b5c1938861bc00114b",
+    "buildId": "gi-i65-b4-e7071dcd492d-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37153635447-6wnebg4z.web.app",
+    "runId": 37153635447,
+    "artifactId": 11284254512,
+    "artifactDigest": "40cbdb9343f5b1633a89b5a78a003db72104ca765139549d2c9a73cdf7303fb3",
+    "hostedPayloadDigest": "7a76d4d8972eea1f14f97993ccbc093c7f3dbd06c6b4a3d397c2b1cd6323d4ac",
+    "backendSourceDigest": "d1c2d3dc19a9120dd12c21346f99379c17ed016a417ad397aadad6e865db255d",
+    "bundleDigest": "fca2537159bd2e2841c4c7cd65f3b390ce1c71629198cc456ba68141b190b546",
+    "exactReadback": true
+  },
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
