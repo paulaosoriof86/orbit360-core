@@ -18,7 +18,7 @@
   },
   "sourceFix": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
-    "blobSha": "bc57c45ddbb0849ab633f3eb17bd23c61f0f0d57"
+    "blobSha": "e9a691af94578af9313b3e47fcb7c55cafc3660d"
   },
   "policyVisualLineage": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_VISUAL_LINEAGE_PROOF_20261003.json",
@@ -27,15 +27,15 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "e0dab605d6b5d3a6808bd0d160d4674204a57714"
+    "blobSha": "13f366697414add7277a7d487de6149c84ec8f07"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "0963ba41a16dd94b38ecbf611941526ff136c789"
+    "blobSha": "6839bd57df7e1308f31c00e7086a6c6a0f8a3503"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "c4605190a92a64524a60a89bbf3074816f6d5e0b",
+    "blobSha": "cef61735351dd7a4edffaf479f92309526745ce4",
     "inventoryCount": 191,
     "attentionCount": 86,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
