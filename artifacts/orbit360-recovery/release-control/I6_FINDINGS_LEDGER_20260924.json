@@ -6769,14 +6769,18 @@
         "orbit360-platform/modules/cancelaciones.js",
         "orbit360-platform/core/app-base.js"
       ],
-      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Authenticated exact Preview country switch settles <=2500 ms with no delayed mutation/stale rows.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "classification": "PRODUCT_PERFORMANCE_DEFECT_DEMONSTRATED",
+      "rootCauseCode": "CANCELATION_RENDER_REPEATED_LINEAR_RELATION_LOOKUPS_UNDER_FULL_COUNTRY_RERENDER",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
     },
     {
       "id": "B4-003-R13-02-CANCEL-NONCLIENT-DEEPLINK",
@@ -6789,14 +6793,18 @@
         "orbit360-platform/modules/cancelaciones.js",
         "orbit360-platform/modules/cliente360.js"
       ],
-      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Every intentionally interactive datum opens its canonical target; non-interactive cells do not imply clickability.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "classification": "PRODUCT_INTERACTION_IDENTITY_DEFECT_DEMONSTRATED",
+      "rootCauseCode": "ROW_WIDE_SINGLE_TARGET_OVER_MULTIPLE_BUSINESS_IDENTITIES",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
     },
     {
       "id": "B4-003-R13-03-CANCEL-COUNTRY-IDENTITY-INTEGRITY",
@@ -6809,14 +6817,18 @@
         "orbit360-platform/modules/cancelaciones.js",
         "orbit360-platform/modules/cliente360.js"
       ],
-      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "KPI/list/row identity use one documented country authority or explicitly model cross-country relation without leakage.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "classification": "PRODUCT_SCOPE_PRESENTATION_MISMATCH_DEMONSTRATED",
+      "rootCauseCode": "OPERATION_COUNTRY_AUTHORITY_AND_CLIENT_IDENTITY_COUNTRY_CONFLATED",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
     },
     {
       "id": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
@@ -6830,14 +6842,18 @@
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
         "orbit360-platform/modules/renewals-v1201-issued-filter.js"
       ],
-      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "status": "READONLY_RUNTIME_DISTRIBUTION_PROOF_REQUIRED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Real source-backed renewal pipeline repopulates by canonical eligibility/country/horizon and is proven on exact Preview.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_R13_RENEWAL_REAL_DISTRIBUTION_PROOF",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "classification": "RUNTIME_DATA_SEMANTIC_DISTRIBUTION_PROOF_REQUIRED",
+      "rootCauseCode": "REAL_RENEWABILITY_YES_NO_UNKNOWN_DISTRIBUTION_NOT_YET_PROVEN",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
     },
     {
       "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
@@ -6850,14 +6866,18 @@
         "orbit360-platform/modules/polizas.js",
         "orbit360-platform/core/router.js"
       ],
-      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Authenticated route and first usable render meet performance budget without browser unresponsive dialog.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "classification": "PRODUCT_PERFORMANCE_DEFECT_DEMONSTRATED",
+      "rootCauseCode": "POLICY_ROUTE_REBUILDS_FULL_RELATIONAL_SEARCH_STATE_BEFORE_BOUNDED_FIRST_PAINT",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
     },
     {
       "id": "B4-003-R13-06-POLICY-SEARCH-FREEZE",
@@ -6869,14 +6889,18 @@
       "owner": [
         "orbit360-platform/modules/polizas.js"
       ],
-      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Search is bounded/indexed/debounced and remains interactive over full corpus; no full render/scan per keystroke.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "classification": "PRODUCT_PERFORMANCE_DEFECT_DEMONSTRATED",
+      "rootCauseCode": "FULL_POLICY_ROUTE_RENDER_PER_KEYSTROKE_WITHOUT_DEBOUNCE_OR_REUSED_SEARCH_INDEX",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
     },
     {
       "id": "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
@@ -6890,14 +6914,18 @@
         "orbit360-platform/modules/cliente360.js",
         "orbit360-platform/core/router.js"
       ],
-      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Direct policy detail navigation is deterministic, preserves context and has no full-page stall.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "classification": "PRODUCT_DETAIL_HYDRATION_PERFORMANCE_DEFECT_DEMONSTRATED",
+      "rootCauseCode": "DIRECT_POLICY_DETAIL_DOES_GLOBAL_RELATION_WORK_DURING_INCREMENTAL_HYDRATION",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
     },
     {
       "id": "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
@@ -6910,14 +6938,18 @@
         "orbit360-platform/core/router.js",
         "orbit360-platform/data/store-firestore-product-operational-p0.js"
       ],
-      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "No destructive intermediate projection; loading state preserves stable relations until hydration is coherent.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "classification": "PRODUCT_HYDRATION_PRESENTATION_DEFECT_DEMONSTRATED",
+      "rootCauseCode": "RELATIONAL_UI_PAINTS_BEFORE_CLIENT_POLICY_DEPENDENCIES_ARE_COHERENT",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
     },
     {
       "id": "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
@@ -6930,14 +6962,18 @@
         "orbit360-platform/modules/polizas.js",
         "orbit360-platform/styles/infra.css"
       ],
-      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "status": "APPROVED_VISUAL_LINEAGE_PROOF_REQUIRED_NO_MUTATION",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Recover latest approved visual lineage and prove structure/density/hierarchy/labels/responsive match; no redesign from memory.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_R13_POLICY_VISUAL_LINEAGE_PROOF",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "classification": "APPROVED_VISUAL_LINEAGE_PARTIALLY_RECOVERED_SOURCE_FIX_HELD",
+      "rootCauseCode": "EXACT_VISUAL_DELTA_NOT_YET_PROVEN",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
     },
     {
       "id": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
@@ -6950,14 +6986,18 @@
         "orbit360-platform/modules/aseguradoras.js",
         "orbit360-platform/core/importa.js"
       ],
-      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "status": "SOURCE_CONTRACT_PRESENT_CONTROLLED_PREVIEW_E2E_REQUIRED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Controlled disposable file proves Drive readback, exact insurer/source provenance, reload persistence, fail-closed downstream enablement and cleanup/rollback.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_R13_INSURER_DRIVE_CONTROLLED_E2E",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "classification": "E2E_PROOF_REQUIRED_SOURCE_CONTRACT_PRESENT",
+      "rootCauseCode": "NO_SOURCE_DEFECT_DEMONSTRATED_E2E_NOT_YET_PROVEN",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
     }
   ],
   "phaseBBacklog": [
@@ -7381,5 +7421,6 @@
     "nextFindingHeld": "B4-004",
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
-  }
+  },
+  "lastUpdatedAt": "2026-10-03"
 }
