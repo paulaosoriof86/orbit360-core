@@ -1,0 +1,104 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_DIAGNOSTIC_ADJUDICATION_V1",
+  "recordedAt": "2026-10-03",
+  "status": "CAUSES_RECONCILED_NARROW_SOURCE_FIX_AUTHORIZED",
+  "findingId": "B4-003",
+  "canonicalDiagnostic": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
+    "blobSha": "b6aa15478a30a70a839e06cef8037f527480a13c",
+    "classification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED"
+  },
+  "recoveryLinkScopeAmendment": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SOURCE_SCOPE_AMENDMENT_20261003.json",
+    "blobSha": "1845e918522d874ac3129754528a78b3c420806a",
+    "rootCauseExtension": "CANCELATION_RECOVERY_LINK_FIELDS_DROPPED_BY_CANONICAL_WORKFLOW_SANITIZER"
+  },
+  "supplementalRuntimeEvidence": {
+    "runId": 37084869163,
+    "artifactId": 11259887728,
+    "artifactDigest": "482545716f96b8ca6e574c07d9f6df64fd44e67fcfc6d7adee10f549c68078ea",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37084067150-984oh27l.web.app",
+    "sourceSha": "5aadca4b622022c64186c1e540305d22ebc9a7c2",
+    "browser": {
+      "status": "PASS_READONLY",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "renewalsDelayedDomChanged": true,
+      "renewalsDelayedTextChanged": true,
+      "mutationCount": 330,
+      "textBeforeSummary": "<=15d 6; GTQ 90,079",
+      "textAfterSummary": "<=15d 5; GTQ 87,379; renewed policies excluded"
+    }
+  },
+  "causes": [
+    {
+      "code": "CANCELATIONS_OPTIMISTIC_CRITICAL_WRITES_WITHOUT_AWAITED_READBACK",
+      "disposition": "PRODUCT_SOURCE_FIX",
+      "owner": "orbit360-platform/modules/cancelaciones.js"
+    },
+    {
+      "code": "RENEWAL_CAMPAIGN_OPTIMISTIC_WRITES_WITHOUT_AWAITED_READBACK",
+      "disposition": "PRODUCT_SOURCE_FIX",
+      "owner": "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+    },
+    {
+      "code": "CANCELATION_RECOVERY_LINK_FIELDS_DROPPED_BY_CANONICAL_WORKFLOW_SANITIZER",
+      "disposition": "PRODUCT_SOURCE_FIX",
+      "owner": "functions/product-ops-leads-domain.js"
+    },
+    {
+      "code": "RENEWALS_MULTI_PASS_RENDER_REINTRODUCED",
+      "disposition": "PRODUCT_SOURCE_FIX",
+      "owners": [
+        "orbit360-platform/modules/renewals-v1200-permission-guard.js",
+        "orbit360-platform/modules/renewals-v1201-issued-filter.js"
+      ]
+    },
+    {
+      "code": "RENEWALS_LEGACY_OWNER_REMAINS_SHADOWED",
+      "disposition": "OWNER_CONSOLIDATION_IN_B4_003",
+      "owner": "orbit360-platform/modules/renovaciones.js"
+    }
+  ],
+  "cacheBindingOwner": "orbit360-platform/index.html",
+  "allowedProductFiles": [
+    "functions/product-ops-leads-domain.js",
+    "orbit360-platform/modules/renovaciones.js",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+    "orbit360-platform/modules/renewals-v1200-permission-guard.js",
+    "orbit360-platform/modules/renewals-v1201-issued-filter.js",
+    "orbit360-platform/modules/cancelaciones.js",
+    "orbit360-platform/index.html"
+  ],
+  "runtimeIntegrityCarry": {
+    "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
+    "operationalMutationAuthorized": false,
+    "observedOrphanRenewalChildren": [
+      {
+        "id": "pol_mulsmxsk",
+        "renuevaDe": "b2-r9195-policy-36489784713",
+        "numero": "B2-REN-36489784713"
+      },
+      {
+        "id": "pol_mulssmuz",
+        "renuevaDe": "b2-r9195-policy-36490245512",
+        "numero": "B2-REN-36490245512"
+      },
+      {
+        "id": "pol_mulsxofx",
+        "renuevaDe": "b2-r9195-policy-36490640789",
+        "numero": "B2-REN-36490640789"
+      }
+    ],
+    "note": "Names and parent IDs identify prior B2 QA lineage, but no deletion is authorized by this receipt. Exact provenance/dependent-row readback is required before any cleanup."
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "configWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productMutationAuthorized": true
+  },
+  "nextAction": "B4_003_CAUSAL_SOURCE_FIX"
+}

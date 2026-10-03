@@ -2795,7 +2795,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Targeted regression closure for Renovaciones and Cancelaciones.",
-      "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+      "status": "CAUSES_RECONCILED_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2808,18 +2808,30 @@
         "Role/country scope, persistence/readback and regression are verified."
       ],
       "nextAction": "B4_003_CAUSAL_SOURCE_FIX",
-      "rootCause": "RENEWALS_CANCELATIONS_CRITICAL_WRITES_COMPLETE_UI_BEFORE_SERVER_READBACK",
+      "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
-        "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
-        "diagnosticBlobSha": "25c3c9cb2479d933bc362fe4dfd8616d100b78ed",
+        "canonicalDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
+        "canonicalDiagnosticBlobSha": "b6aa15478a30a70a839e06cef8037f527480a13c",
+        "adjudicationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DIAGNOSTIC_ADJUDICATION_20261003.json",
+        "adjudicationBlobSha": "673b47a036eb5f87c5e0e9dbf5d2abd709202b8f",
+        "supplementalRunId": 37084869163,
+        "supplementalArtifactId": 11259887728,
+        "supplementalArtifactDigest": "482545716f96b8ca6e574c07d9f6df64fd44e67fcfc6d7adee10f549c68078ea",
         "blockingFindings": [
           "CANCELATIONS_OPTIMISTIC_CRITICAL_WRITES_WITHOUT_AWAITED_READBACK",
-          "RENEWAL_CAMPAIGN_OPTIMISTIC_WRITES_WITHOUT_AWAITED_READBACK"
+          "RENEWAL_CAMPAIGN_OPTIMISTIC_WRITES_WITHOUT_AWAITED_READBACK",
+          "CANCELATION_RECOVERY_LINK_FIELDS_DROPPED_BY_CANONICAL_WORKFLOW_SANITIZER",
+          "RENEWALS_MULTI_PASS_RENDER_REINTRODUCED",
+          "RENEWALS_LEGACY_OWNER_REMAINS_SHADOWED"
         ]
       },
       "allowedProductFiles": [
+        "functions/product-ops-leads-domain.js",
+        "orbit360-platform/modules/renovaciones.js",
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+        "orbit360-platform/modules/renewals-v1200-permission-guard.js",
+        "orbit360-platform/modules/renewals-v1201-issued-filter.js",
         "orbit360-platform/modules/cancelaciones.js",
         "orbit360-platform/index.html"
       ]
@@ -4083,7 +4095,7 @@
       "block": "B4",
       "title": "Renewal flow has competing legacy and operational owners and must be consolidated into one canonical end-to-end owner.",
       "classification": "OWNER_CONSOLIDATION_REQUIRED",
-      "status": "FROZEN_CARRY_FORWARD_B4",
+      "status": "ACTIVE_IN_B4_003_SOURCE_FIX",
       "invariant": "Current policy -> renewal management -> risk/conditions -> quotes -> comparison -> client decision -> new vigency -> receipts/portfolio -> bidirectional history -> Ops/Leads/Cliente360 sync."
     },
     {
@@ -6594,5 +6606,27 @@
     "noLive": true,
     "noReimport": true,
     "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC"
+  },
+  "b4003QaResidueCarry": {
+    "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
+    "operationalMutationAuthorized": false,
+    "observedOrphanRenewalChildren": [
+      {
+        "id": "pol_mulsmxsk",
+        "renuevaDe": "b2-r9195-policy-36489784713",
+        "numero": "B2-REN-36489784713"
+      },
+      {
+        "id": "pol_mulssmuz",
+        "renuevaDe": "b2-r9195-policy-36490245512",
+        "numero": "B2-REN-36490245512"
+      },
+      {
+        "id": "pol_mulsxofx",
+        "renuevaDe": "b2-r9195-policy-36490640789",
+        "numero": "B2-REN-36490640789"
+      }
+    ],
+    "note": "Names and parent IDs identify prior B2 QA lineage, but no deletion is authorized by this receipt. Exact provenance/dependent-row readback is required before any cleanup."
   }
 }

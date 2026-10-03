@@ -2062,9 +2062,9 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_003_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "status": "B4_003_CAUSES_RECONCILED_SOURCE_FIX_AUTHORIZED",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-    "lockBlobSha": "0b0b6b2b2789f5ab83e1e87a4bfce68da19efddd",
+    "lockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
     "productSourceChanged": true,
     "noLive": true,
@@ -2119,7 +2119,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "2b827164173b9eabdbb7d0ad8129880944dbed0f",
+  "findingLedgerBlobSha": "1a6dc82a12588e7aa82376374065e8e474c58c70",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2167,16 +2167,44 @@
     "externalProviderSimulation": false
   },
   "b4003Diagnostic": {
-    "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "status": "CAUSES_RECONCILED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
-    "blobSha": "25c3c9cb2479d933bc362fe4dfd8616d100b78ed",
+    "blobSha": "b6aa15478a30a70a839e06cef8037f527480a13c",
+    "adjudicationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DIAGNOSTIC_ADJUDICATION_20261003.json",
+    "adjudicationBlobSha": "673b47a036eb5f87c5e0e9dbf5d2abd709202b8f",
     "classification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
-    "rootCause": "RENEWALS_CANCELATIONS_CRITICAL_WRITES_COMPLETE_UI_BEFORE_SERVER_READBACK",
+    "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS",
     "allowedProductFiles": [
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/modules/renovaciones.js",
       "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "orbit360-platform/modules/renewals-v1200-permission-guard.js",
+      "orbit360-platform/modules/renewals-v1201-issued-filter.js",
       "orbit360-platform/modules/cancelaciones.js",
       "orbit360-platform/index.html"
     ],
+    "qaResidueCarry": {
+      "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
+      "operationalMutationAuthorized": false,
+      "observedOrphanRenewalChildren": [
+        {
+          "id": "pol_mulsmxsk",
+          "renuevaDe": "b2-r9195-policy-36489784713",
+          "numero": "B2-REN-36489784713"
+        },
+        {
+          "id": "pol_mulssmuz",
+          "renuevaDe": "b2-r9195-policy-36490245512",
+          "numero": "B2-REN-36490245512"
+        },
+        {
+          "id": "pol_mulsxofx",
+          "renuevaDe": "b2-r9195-policy-36490640789",
+          "numero": "B2-REN-36490640789"
+        }
+      ],
+      "note": "Names and parent IDs identify prior B2 QA lineage, but no deletion is authorized by this receipt. Exact provenance/dependent-row readback is required before any cleanup."
+    },
     "noOperationalDataWrites": true,
     "noReimport": true,
     "noLive": true

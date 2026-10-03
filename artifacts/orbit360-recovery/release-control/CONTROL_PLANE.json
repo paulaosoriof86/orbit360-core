@@ -4853,15 +4853,15 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+      "status": "B4_003_CAUSES_RECONCILED_SOURCE_FIX_AUTHORIZED",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "5a287d5375406a87f564c72e18f95f7e863ae4b9",
-      "compositionLockBlobSha": "6198a6ae8121f6313c8efb193a60fee14f20cce0",
-      "findingLedgerBlobSha": "126cd3443b269c97b482134c515a7759da210af4",
+      "executionLockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
+      "compositionLockBlobSha": "d9c73288bfc13fafe8556a8d803a150e7ab16a1c",
+      "findingLedgerBlobSha": "1a6dc82a12588e7aa82376374065e8e474c58c70",
       "activeFindingId": "B4-003",
       "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
@@ -4982,16 +4982,46 @@
         "livePromotion": false
       },
       "b4003Diagnostic": {
-        "status": "CAUSE_DEMONSTRATED",
+        "status": "CAUSES_RECONCILED",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
-        "receiptBlobSha": "25c3c9cb2479d933bc362fe4dfd8616d100b78ed",
+        "receiptBlobSha": "b6aa15478a30a70a839e06cef8037f527480a13c",
+        "adjudicationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DIAGNOSTIC_ADJUDICATION_20261003.json",
+        "adjudicationBlobSha": "673b47a036eb5f87c5e0e9dbf5d2abd709202b8f",
         "classification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
-        "rootCause": "RENEWALS_CANCELATIONS_CRITICAL_WRITES_COMPLETE_UI_BEFORE_SERVER_READBACK",
+        "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS",
         "allowedProductFiles": [
+          "functions/product-ops-leads-domain.js",
+          "orbit360-platform/modules/renovaciones.js",
           "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+          "orbit360-platform/modules/renewals-v1200-permission-guard.js",
+          "orbit360-platform/modules/renewals-v1201-issued-filter.js",
           "orbit360-platform/modules/cancelaciones.js",
           "orbit360-platform/index.html"
         ],
+        "supplementalRunId": 37084869163,
+        "supplementalArtifactId": 11259887728,
+        "qaResidueCarry": {
+          "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
+          "operationalMutationAuthorized": false,
+          "observedOrphanRenewalChildren": [
+            {
+              "id": "pol_mulsmxsk",
+              "renuevaDe": "b2-r9195-policy-36489784713",
+              "numero": "B2-REN-36489784713"
+            },
+            {
+              "id": "pol_mulssmuz",
+              "renuevaDe": "b2-r9195-policy-36490245512",
+              "numero": "B2-REN-36490245512"
+            },
+            {
+              "id": "pol_mulsxofx",
+              "renuevaDe": "b2-r9195-policy-36490640789",
+              "numero": "B2-REN-36490640789"
+            }
+          ],
+          "note": "Names and parent IDs identify prior B2 QA lineage, but no deletion is authorized by this receipt. Exact provenance/dependent-row readback is required before any cleanup."
+        },
         "operationalBusinessWrites": 0,
         "dataMutation": false,
         "reimport": false,
@@ -5002,9 +5032,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "6198a6ae8121f6313c8efb193a60fee14f20cce0",
+    "compositionLockBlobSha": "d9c73288bfc13fafe8556a8d803a150e7ab16a1c",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "126cd3443b269c97b482134c515a7759da210af4",
+    "findingLedgerBlobSha": "1a6dc82a12588e7aa82376374065e8e474c58c70",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B4",
@@ -5309,12 +5339,12 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "status": "B4_003_CAUSES_RECONCILED_SOURCE_FIX_AUTHORIZED",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "5a287d5375406a87f564c72e18f95f7e863ae4b9",
-    "compositionLockBlobSha": "6198a6ae8121f6313c8efb193a60fee14f20cce0",
-    "findingLedgerBlobSha": "126cd3443b269c97b482134c515a7759da210af4",
+    "executionLockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
+    "compositionLockBlobSha": "d9c73288bfc13fafe8556a8d803a150e7ab16a1c",
+    "findingLedgerBlobSha": "1a6dc82a12588e7aa82376374065e8e474c58c70",
     "noLive": true,
     "noReimport": true,
     "nextAction": "B4_003_CAUSAL_SOURCE_FIX",
@@ -5421,16 +5451,46 @@
       "livePromotion": false
     },
     "b4003Diagnostic": {
-      "status": "CAUSE_DEMONSTRATED",
+      "status": "CAUSES_RECONCILED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
-      "receiptBlobSha": "25c3c9cb2479d933bc362fe4dfd8616d100b78ed",
+      "receiptBlobSha": "b6aa15478a30a70a839e06cef8037f527480a13c",
+      "adjudicationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DIAGNOSTIC_ADJUDICATION_20261003.json",
+      "adjudicationBlobSha": "673b47a036eb5f87c5e0e9dbf5d2abd709202b8f",
       "classification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
-      "rootCause": "RENEWALS_CANCELATIONS_CRITICAL_WRITES_COMPLETE_UI_BEFORE_SERVER_READBACK",
+      "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS",
       "allowedProductFiles": [
+        "functions/product-ops-leads-domain.js",
+        "orbit360-platform/modules/renovaciones.js",
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+        "orbit360-platform/modules/renewals-v1200-permission-guard.js",
+        "orbit360-platform/modules/renewals-v1201-issued-filter.js",
         "orbit360-platform/modules/cancelaciones.js",
         "orbit360-platform/index.html"
       ],
+      "supplementalRunId": 37084869163,
+      "supplementalArtifactId": 11259887728,
+      "qaResidueCarry": {
+        "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
+        "operationalMutationAuthorized": false,
+        "observedOrphanRenewalChildren": [
+          {
+            "id": "pol_mulsmxsk",
+            "renuevaDe": "b2-r9195-policy-36489784713",
+            "numero": "B2-REN-36489784713"
+          },
+          {
+            "id": "pol_mulssmuz",
+            "renuevaDe": "b2-r9195-policy-36490245512",
+            "numero": "B2-REN-36490245512"
+          },
+          {
+            "id": "pol_mulsxofx",
+            "renuevaDe": "b2-r9195-policy-36490640789",
+            "numero": "B2-REN-36490640789"
+          }
+        ],
+        "note": "Names and parent IDs identify prior B2 QA lineage, but no deletion is authorized by this receipt. Exact provenance/dependent-row readback is required before any cleanup."
+      },
       "operationalBusinessWrites": 0,
       "dataMutation": false,
       "reimport": false,
