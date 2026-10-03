@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+  "sourceHead": "293d4b7dc91aa8b72d02d2493b5f800660e9e5fe",
+  "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_CAUSAL_DIAGNOSTIC_20261003.json",
+  "diagnosticReceiptBlobSha": "db13f0b8bf0a200bac53033b090db798f684854c",
+  "failedRunId": 37162367038,
+  "failedJobId": 111318262858,
+  "failureCode": "B4_003_R13_POLICY_ROUTE_EVENT_LOOP_STALL",
+  "productBlobs": {
+    "orbit360-platform/modules/polizas.js": "56a1c67d976a96e047cbc98b38e60920b102614d",
+    "orbit360-platform/index.html": "dc9dc2ee100bd146cf99574e2eb64826a85f0976"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "1b2a405b6431e2cb79a6cbccaa8afb8b943352db"
+  },
+  "changes": [
+    "Pólizas reads each scoped polizas/clientes/vehiculos/aseguradoras/asesores collection once per index revision.",
+    "Country filtering, search text, filter options and visible relation cells consume the same in-memory index.",
+    "The first 100 rows no longer perform K.clienteCell/K.aseguradoraCell/K.asesorCell per-row store.get lookups.",
+    "Direct filter/pagination/search rerenders re-enter the canonical Polizas access scope.",
+    "Approved table hierarchy/labels/actions remain unchanged; only relation data resolution and cache binding changed."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "visualRedesign": false
+  },
+  "nextAction": "B4_003_R13P2_CONTRACT_AND_EXACT_PREVIEW"
+}
