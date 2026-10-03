@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R10_COMPOSITION_EXACT_SET_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "QA_GOVERNANCE_COMPOSITION_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "failedRunId": 37135439793,
+  "failedJobId": 111238959472,
+  "failedStep": "Gate exact B4-003 Preview",
+  "failureCode": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT",
+  "rootCause": "R9 insurer-knowledge files and R10 Quote Authority product files were committed and authorized, but the canonical accumulative composition exact product-file set/blob binding was not refreshed from the certified baseline. Governance correctly failed closed before build/deploy.",
+  "remediation": "Recompute exact non-governance product diff from certified baseline 4bf67a3738751fe2432a130fd23254a6f1c7d16e to current recovery HEAD using Git trees; bind exact 94-file set and current blob SHAs; update ledger/lock/control blob references; retry exact Preview.",
+  "certifiedBaselineSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+  "observedCandidateHead": "31694b444879717058c63ed675fc0b26876bcda3",
+  "exactProductFileCount": 94,
+  "addedSincePriorComposition": [
+    "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
+    "orbit360-platform/core/quote-authority-contract-v1.js",
+    "orbit360-platform/core/quote-comparison-contracts-v1203.js",
+    "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js",
+    "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
+    "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js",
+    "orbit360-platform/modules/cotizador-v1203-source-gate.js"
+  ],
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "previewDeployed": false,
+    "operationalBusinessWrites": 0
+  },
+  "nextAction": "REFRESH_CANONICAL_COMPOSITION_EXACT_SET_AND_RETRY_B4_003_R10"
+}
