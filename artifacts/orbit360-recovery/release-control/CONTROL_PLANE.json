@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4853,28 +4853,28 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_R13_CAUSAL_DIAGNOSTIC_EXPANDED_NARROW_SOURCE_FIX_AUTHORIZED",
+      "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-      "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "d2f24eb0ab4b909b5cf91e2fc6acfc3aedb71efb",
-      "compositionLockBlobSha": "fd09f8ec9ac14ac51cc6f89f3707a2e49af0032e",
-      "findingLedgerBlobSha": "7ae79ed136245b8366ad78cfa368b4e8dbbaa8c2",
+      "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
+      "executionLockBlobSha": "2b513bf8c6a2098e966c6ecc81e1c32bd1822c73",
+      "compositionLockBlobSha": "13f366697414add7277a7d487de6149c84ec8f07",
+      "findingLedgerBlobSha": "6839bd57df7e1308f31c00e7086a6c6a0f8a3503",
       "activeFindingId": "B4-003",
       "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
       "baselinePreviewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
-      "productMutationAuthorized": true,
+      "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
-      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R11_SOURCE_FIX_20261003.json",
-      "sourceFixReceiptBlobSha": "1d2e940bad50e2bef141482494097ef5938ba8d4",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
+      "sourceFixReceiptBlobSha": "e9a691af94578af9313b3e47fcb7c55cafc3660d",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
-      "syntheticQaWritesAuthorized": false,
+      "syntheticQaWritesAuthorized": true,
       "previewDispatchRequest": {
         "status": "RETRY_AFTER_R10_RUNTIME_REACHABILITY_ROOTFIX",
         "findingId": "B4-003",
@@ -5172,7 +5172,7 @@
       "priorMachinePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37136776942-5498wth2.web.app",
       "humanVisualStatus": "REJECTED_R13",
       "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-      "continuityRegisterBlobSha": "d31e6561c2d1dac7f62c463099f98aa925f20a1e",
+      "continuityRegisterBlobSha": "cef61735351dd7a4edffaf479f92309526745ce4",
       "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
       "continuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
       "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -5271,15 +5271,33 @@
         "allowedProductFiles": [
           "orbit360-platform/core/importa.js"
         ]
+      },
+      "syntheticQaScope": "Exact B4-003 Preview only: disposable B4003 synthetic renewal, cancellation, information-health and insurer-document fixtures with mandatory cleanup/readback; no real operational row mutation.",
+      "r13SourceFix": {
+        "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
+        "receiptBlobSha": "e9a691af94578af9313b3e47fcb7c55cafc3660d",
+        "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
+        "executionLockBlobSha": "2b513bf8c6a2098e966c6ecc81e1c32bd1822c73",
+        "visualLineageReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_VISUAL_LINEAGE_PROOF_20261003.json",
+        "visualLineageReceiptBlobSha": "241a16d434c9d7eb94246a81925e9cbedd183824",
+        "compositionLockBlobSha": "13f366697414add7277a7d487de6149c84ec8f07",
+        "findingLedgerBlobSha": "6839bd57df7e1308f31c00e7086a6c6a0f8a3503",
+        "continuityRegisterBlobSha": "cef61735351dd7a4edffaf479f92309526745ce4",
+        "productSourceChanged": true,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false,
+        "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
       }
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "fd09f8ec9ac14ac51cc6f89f3707a2e49af0032e",
+    "compositionLockBlobSha": "13f366697414add7277a7d487de6149c84ec8f07",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "88c8f75e24f9371f1af338e3ad51b310e3bdefbd",
+    "findingLedgerBlobSha": "6839bd57df7e1308f31c00e7086a6c6a0f8a3503",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B4",
@@ -5291,9 +5309,9 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
-    "findingContinuityRegisterBlobSha": "77e677bb3b69a6a5fd87270553699747ad242a7a",
+    "findingContinuityRegisterBlobSha": "cef61735351dd7a4edffaf479f92309526745ce4",
     "findingContinuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23"
   },
   "antiInterruptionControl": {
@@ -5586,16 +5604,16 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_R13_CAUSAL_DIAGNOSTIC_EXPANDED_NARROW_SOURCE_FIX_AUTHORIZED",
+    "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "d2f24eb0ab4b909b5cf91e2fc6acfc3aedb71efb",
-    "compositionLockBlobSha": "fd09f8ec9ac14ac51cc6f89f3707a2e49af0032e",
-    "findingLedgerBlobSha": "7ae79ed136245b8366ad78cfa368b4e8dbbaa8c2",
+    "executionLockBlobSha": "2b513bf8c6a2098e966c6ecc81e1c32bd1822c73",
+    "compositionLockBlobSha": "13f366697414add7277a7d487de6149c84ec8f07",
+    "findingLedgerBlobSha": "6839bd57df7e1308f31c00e7086a6c6a0f8a3503",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
-    "sourceFixReceiptBlobSha": "1d2e940bad50e2bef141482494097ef5938ba8d4",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "sourceFixReceiptBlobSha": "e9a691af94578af9313b3e47fcb7c55cafc3660d",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
       "status": "RETRY_AFTER_R10_RUNTIME_REACHABILITY_ROOTFIX",
@@ -5654,7 +5672,7 @@
       "reimport": false,
       "livePromotion": false
     },
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -5806,7 +5824,7 @@
       "reimport": false,
       "livePromotion": false
     },
-    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R11_SOURCE_FIX_20261003.json",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
     "b4003SourceFixR4": {
       "status": "SOURCE_FIXED_R4_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
@@ -5874,7 +5892,7 @@
     "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
     "humanVisualStatus": "REJECTED_R13",
     "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "continuityRegisterBlobSha": "d31e6561c2d1dac7f62c463099f98aa925f20a1e",
+    "continuityRegisterBlobSha": "cef61735351dd7a4edffaf479f92309526745ce4",
     "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "continuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
     "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -5956,7 +5974,7 @@
       "productSourceChanged": false,
       "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
     },
-    "syntheticQaScope": "R13-10 only: exact Preview disposable B4 insurer/document test with mandatory cleanup/readback; no real operational insurer/client mutation.",
+    "syntheticQaScope": "Exact B4-003 Preview only: disposable B4003 synthetic renewal, cancellation, information-health and insurer-document fixtures with mandatory cleanup/readback; no real operational row mutation.",
     "r13CausalDiagnostic": {
       "status": "READONLY_DIAGNOSTIC_COMPLETE",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
@@ -5997,10 +6015,28 @@
       "allowedProductFiles": [
         "orbit360-platform/core/importa.js"
       ]
+    },
+    "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
+    "r13SourceFix": {
+      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
+      "receiptBlobSha": "e9a691af94578af9313b3e47fcb7c55cafc3660d",
+      "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
+      "executionLockBlobSha": "2b513bf8c6a2098e966c6ecc81e1c32bd1822c73",
+      "visualLineageReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_VISUAL_LINEAGE_PROOF_20261003.json",
+      "visualLineageReceiptBlobSha": "241a16d434c9d7eb94246a81925e9cbedd183824",
+      "compositionLockBlobSha": "13f366697414add7277a7d487de6149c84ec8f07",
+      "findingLedgerBlobSha": "6839bd57df7e1308f31c00e7086a6c6a0f8a3503",
+      "continuityRegisterBlobSha": "cef61735351dd7a4edffaf479f92309526745ce4",
+      "productSourceChanged": true,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
     }
   },
   "b4VisualAcceptanceControl": {
-    "status": "REJECTED_R13",
+    "status": "REJECTED_R13_PENDING_NEW_EXACT_PREVIEW",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
     "receiptBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
     "cumulativeReviewThrough": [
@@ -6055,7 +6091,7 @@
   "findingContinuityControl": {
     "status": "ENFORCED_FAIL_CLOSED",
     "registerPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "registerBlobSha": "d31e6561c2d1dac7f62c463099f98aa925f20a1e",
+    "registerBlobSha": "cef61735351dd7a4edffaf479f92309526745ce4",
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "guardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
     "inventoryCount": 191,
