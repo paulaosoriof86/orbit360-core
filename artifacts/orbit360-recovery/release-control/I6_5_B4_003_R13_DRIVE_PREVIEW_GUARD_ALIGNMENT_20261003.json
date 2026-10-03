@@ -1,0 +1,24 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_DRIVE_PREVIEW_GUARD_ALIGNMENT_V1",
+  "recordedAt": "2026-10-03",
+  "status": "CAUSE_DEMONSTRATED_NARROW_PREVIEW_GUARD_FIX_AUTHORIZED",
+  "findingId": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+  "parentDriveDiagnosticBlobSha": "9024c81170ac810c35b5ef461ef3700c6b35c226",
+  "rootCause": "INSURER_IMPORT_PREVIEW_GUARD_DOES_NOT_RECOGNIZE_CANONICAL_B4003QA_SYNTHETIC_ID",
+  "evidence": {
+    "importerPath": "orbit360-platform/core/importa.js",
+    "importerBlobSha": "15c2458eafd596d63b6ebf9be565f27f2d2881c6",
+    "productOperationalPreviewRule": "B4003QA_SYNTHETIC_IDS_ONLY",
+    "fact": "Importer currently accepts insurer Preview writes only for /^b4[-_]/ while the canonical operational Preview writer accepts B4 fixtures as b4003qa_. The two fail-closed guards therefore reject each other's safe fixture identity."
+  },
+  "allowedProductFiles": [
+    "orbit360-platform/core/importa.js"
+  ],
+  "requiredFix": "Accept b4003qa_ insurer IDs in the existing Preview-only document guard while keeping every real insurer ID denied.",
+  "boundaries": {
+    "realInsurerWritesAuthorized": false,
+    "dataReimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_R13_DRIVE_PREVIEW_GUARD_NARROW_FIX"
+}
