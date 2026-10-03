@@ -1,0 +1,107 @@
+name: CotComp S4.74 vehicle catalog source governance
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s474-vehicle-catalog-source-governance-20261002
+    paths:
+      - '.github/cotcomp-lab-intents/s474-vehicle-catalog-source-governance.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s474-source-governance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.74 source-governance intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s474-vehicle-catalog-source-governance.json
+          jq -e '
+            .authorization=="S474_VEHICLE_CATALOG_SOURCE_GOVERNANCE" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .journeyId=="GT_AUTO_MOTO_HYBRID" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .deployment==false and
+            .providerOrRater==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.74 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-vehicle-catalog-source-governance-s474.js
+          node --check cotcomp-vehicle-catalog-source-governance-s474.test.js
+          node --test cotcomp-vehicle-catalog-source-governance-s474.test.js
+
+      - name: Generate sanitized S4.74 receipt
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s474"
+          node <<'NODE'
+          const fs=require('fs');
+          const s=require('./cotcomp-vehicle-catalog-source-governance-s474');
+          const r=s.readiness();
+          const p=s.sourcePolicy();
+          if(!r.sourceGovernanceReady)throw new Error('S474_SOURCE_GOVERNANCE_NOT_READY');
+          if(p.canonicalIdentityBaseline!=='SAT_GT_2026')throw new Error('S474_PRIMARY_SOURCE_INVALID');
+          if(p.quoteEligibilitySource!=='INSURER_PROVIDER_CATALOGS')throw new Error('S474_PROVIDER_OVERLAY_INVALID');
+          if(p.secondaryNormalizationSource!=='NHTSA_VPIC')throw new Error('S474_SECONDARY_SOURCE_INVALID');
+          if(r.satSnapshotMaterialized||r.publicDropdownCatalogReady)throw new Error('S474_FALSE_RELEASE_STATE');
+          if(r.nextBlocker!=='SAT_2026_CATALOG_SNAPSHOT_INGESTION_REQUIRED')throw new Error('S474_BLOCKER_INVALID');
+          if(r.providerOrRaterCalls!==0||r.appDataReads!==0||r.appDataWrites!==0||r.deployment||r.productionTouched)throw new Error('S474_BOUNDARY_INVALID');
+          const receipt={
+            schemaVersion:'ays-cotcomp-s474-vehicle-catalog-source-governance-receipt-v1.0',
+            sourceSha:process.env.GITHUB_SHA,
+            sourceGovernanceReady:true,
+            canonicalIdentityBaseline:'SAT_GT_2026',
+            secondaryNormalization:'NHTSA_VPIC',
+            quoteEligibilityOverlay:'INSURER_PROVIDER_CATALOGS',
+            reviewedAliasLayer:'AYS_REVIEWED_ALIASES',
+            yearControlStrategy:'SEPARATE_NUMERIC_SELECT',
+            modelYearExistenceHardValidation:false,
+            satSnapshotMaterialized:false,
+            publicDropdownCatalogReady:false,
+            nextBlocker:'SAT_2026_CATALOG_SNAPSHOT_INGESTION_REQUIRED',
+            providerOrRaterCalls:0,
+            appDataReads:0,
+            appDataWrites:0,
+            deployment:false,
+            productionTouched:false
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/s474/S474_VEHICLE_CATALOG_SOURCE_GOVERNANCE_RECEIPT.json',JSON.stringify(receipt,null,2));
+          NODE
+
+      - name: Upload sanitized S4.74 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s474-vehicle-catalog-source-governance-${{ github.run_id }}
+          path: ${{ runner.temp }}/s474/S474_VEHICLE_CATALOG_SOURCE_GOVERNANCE_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
