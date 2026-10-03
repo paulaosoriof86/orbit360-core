@@ -9,7 +9,14 @@ Orbit.modules.renovaciones = (function () {
   const countryCode = v => String(v == null ? '' : v).trim().toUpperCase();
   const policyCountry = p => { const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null; return countryCode(p&&p.pais || cli&&cli.pais); };
   const selectedCountry = p => { const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; };
-  const esRenovable = p => p && selectedCountry(p) && (p.estado === 'Vigente' || p.estado === 'Por renovar') && !p.renovadaPor && String(p.renovacionEstado || '').toLowerCase() !== 'renovada';
+  const renewabilityState = p => {
+    if(!p || !Object.prototype.hasOwnProperty.call(p,'renovable') || p.renovable==null || String(p.renovable).trim()==='') return 'UNKNOWN';
+    const v=String(p.renovable).trim().toLowerCase();
+    if(p.renovable===true || ['true','si','sí','renovable'].includes(v)) return 'YES';
+    if(p.renovable===false || ['false','no','no renovable'].includes(v)) return 'NO';
+    return 'UNKNOWN';
+  };
+  const esRenovable = p => p && renewabilityState(p)==='YES' && selectedCountry(p) && (p.estado === 'Vigente' || p.estado === 'Por renovar') && !p.renovadaPor && String(p.renovacionEstado || '').toLowerCase() !== 'renovada';
 
   function buckets() {
     const cols = [

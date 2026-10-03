@@ -64,7 +64,7 @@ jobs:
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const l=JSON.parse(fs.readFileSync(process.env.B4_LOCK,'utf8'));
-          const sourceFixed=v=>/^B4_003_SOURCE_FIXED_R(?:5|9|10)_/.test(String(v||''));
+          const sourceFixed=v=>/^B4_003_SOURCE_FIXED_R(?:5|9|10|11)_/.test(String(v||''));
           const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW'
             && sourceFixed(c.currentB4?.status)
             && sourceFixed(c.i65ForensicRemediationPlan?.b4?.status)
@@ -102,6 +102,9 @@ jobs:
           node --check orbit360-platform/modules/renewals-v1200-permission-guard.js
           node --check orbit360-platform/modules/renewals-v1201-issued-filter.js
           node --check orbit360-platform/modules/cancelaciones.js
+          node --check orbit360-platform/modules/policy-receipts-v1199-bridge.js
+          node --check orbit360-platform/modules/cliente360.js
+          node --check orbit360-platform/modules/calidad.js
           cd functions
           npm ci --ignore-scripts --no-audit --no-fund >/dev/null
           npm run check

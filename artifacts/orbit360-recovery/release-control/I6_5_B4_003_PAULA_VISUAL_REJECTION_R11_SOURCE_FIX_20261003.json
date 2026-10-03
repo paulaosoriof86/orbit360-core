@@ -1,0 +1,106 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_PAULA_VISUAL_REJECTION_R11_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "authority": "PAULA_TARGETED_VISUAL_REJECTION_20261003",
+  "sourceHeadBefore": "6c7dd0e46e0443d4fbeb27d8fd0caa43ef8dc62a",
+  "humanVisualStatus": "REJECTED_R11_PENDING_RETEST",
+  "visualFindings": [
+    {
+      "id": "B4-003-V11-1",
+      "code": "CANCELATION_VISIBLE_ROW_IDENTITY_DEEPLINK_FAILURE",
+      "evidence": "Visible Cancelaciones rows could still return Registro fuera de tu alcance when non-client row data was selected; client navigation opened Cliente 360 Resumen instead of the policy context.",
+      "rootCause": "Detail resolution depended on cancellation id only, while projected/stale row identity could be reconstructed from policy identity; generic client cell omitted t=polizas.",
+      "sourceResolution": "Detail now falls back by canonical polizaId and cancellation client links open Cliente 360 directly on Pólizas. Historical cancelled-policy projection remains canonical."
+    },
+    {
+      "id": "B4-003-V11-2",
+      "code": "CLIENT360_TABS_LEFT_NAVIGATION_MISSING",
+      "evidence": "After horizontal tab movement, no left navigation control was available.",
+      "rootCause": "Owner tracked has-prev state but rendered only the right ftab-more control.",
+      "sourceResolution": "A symmetric ftab-prev control is rendered and wired to negative horizontal scroll; existing has-prev state controls visibility."
+    },
+    {
+      "id": "B4-003-V11-3",
+      "code": "RENEWABILITY_TRI_STATE_FAIL_OPEN",
+      "evidence": "A policy visibly marked Renovabilidad pendiente de validar was present in Renovaciones.",
+      "rootCause": "Base and operational renewal owners filtered status/renewed state but ignored the canonical renovable tri-state.",
+      "sourceResolution": "Both renewal owners now require explicit renewable YES. UNKNOWN and NO remain fail-closed outside the renewal pipeline."
+    },
+    {
+      "id": "B4-003-V11-4",
+      "code": "POLICY_EDITOR_SOURCE_TAXONOMY_SILENT_REPLACEMENT",
+      "evidence": "Policy detail showed Accidentes y Enfermedades / Accidentes while edit form displayed Automóviles / Vehículo Liviano.",
+      "rootCause": "Editor select options were built only from catalog; an existing source ramo/product absent from that catalog silently fell to the first option.",
+      "sourceResolution": "Existing source ramo/product are preserved as explicit select options when absent from the current catalog; editor also exposes Renovabilidad tri-state."
+    },
+    {
+      "id": "B4-003-V11-5",
+      "code": "QUALITY_COUNTRY_SCOPE_AND_RENDER_PATH_DEFECT",
+      "evidence": "Changing global country did not change Calidad KPIs/list and GT rows remained under Colombia; user-observed route/country changes took about 10-12 seconds.",
+      "rootCause": "Calidad used all clients without Orbit.pais filtering and performed per-client active-policy/evidence work on every render.",
+      "sourceResolution": "Calidad now filters by explicit active country, indexes active-policy client ids once per render, and evaluates country evidence only when country is unresolved. Exact Preview proof measures the synchronous render path."
+    },
+    {
+      "id": "B4-003-V11-6",
+      "code": "CANCELATION_CHURN_LABEL_OVERCLAIM",
+      "evidence": "UI called a historical cancellation-to-policy ratio Tasa de fuga without a time cohort.",
+      "rootCause": "Label exceeded the semantics of the implemented historical ratio.",
+      "sourceResolution": "Metric is relabeled Canceladas / cartera with explicit historical accumulated semantics; no temporal churn claim is made."
+    }
+  ],
+  "openCarry": [
+    {
+      "code": "POLICY_PREMIUM_VS_RECEIPT_CALENDAR_MISMATCH",
+      "status": "OPEN_BLOCKING_FROZEN_INFORMATION_HEALTH",
+      "evidence": "Paula screenshot showed contractual policy total Q407.01 while current receipt calendar showed Q542.68.",
+      "rule": "Do not infer or rewrite either value. Existing policy detail warning remains; exact source/reconciliation belongs to Information Health."
+    },
+    {
+      "code": "INSURER_DOCUMENT_INGESTION_AND_ROLE_AWARE_AI_CONTRACT",
+      "status": "OPEN_CARRY_NO_UNSAFE_ENABLEMENT",
+      "rule": "Insurer documents/examples may feed normalized source-backed knowledge, but automatic Cotizador/Comparativo enablement and role-aware IA retrieval require explicit validated contracts. No blind training or permission bypass."
+    },
+    {
+      "code": "INSURER_MULTI_PRODUCT_KNOWLEDGE_EXPANSION",
+      "status": "JIT_SOURCE_BACKED_PENDING",
+      "rule": "AseGuate/Columna current evidence is preserved; other insurer/product combinations remain pending source and must fail closed rather than receive generic values."
+    }
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/cancelaciones.js": "b47e56a636f827abdc68c34dcda333980d903985",
+    "orbit360-platform/modules/renovaciones.js": "204f53b90b6cf6e486aed042fbb46deeb7ca6c24",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "e4f76131f234393eb93a364f6d0fdb92874a9a3e",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "20215f7bfcbf8db84722b10a2a1a01da383dfe35",
+    "orbit360-platform/modules/cliente360.js": "cdc6d807abf91efdcd0585e022e935d39c18e40b",
+    "orbit360-platform/modules/calidad.js": "0adb548b762250bca2648f63038fadf6a335aabf",
+    "orbit360-platform/styles/infra.css": "d9ebaf7fd7e594c98bd0526e544188fc96ce1552",
+    "orbit360-platform/index.html": "8d11c49afdc5fc01c8b552ab2911f6a668f0a358"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "317a7d875fb5ef810d219deafbfd54a50fd1b20f",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "248af8344d7f9e75ba4446a1f42e19a5e5f051f0",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "9f7e8642e0bfbc3ab8f9cf7dbe5eaebc4340d441"
+  },
+  "exactPreviewRequiredProof": [
+    "Cancelaciones visible row opens canonical detail even with stale/projected cancellation id when policy identity is known.",
+    "Cancelaciones client link opens Cliente 360 Pólizas.",
+    "Unknown renewability does not enter Renovaciones.",
+    "Policy editor preserves non-catalog source ramo/product and exposes tri-state renewability.",
+    "Cliente 360 provides bidirectional tab navigation.",
+    "Calidad respects global country and its synchronous render path remains below 2500 ms in exact Preview harness.",
+    "Existing B4-003 durable renewal/cancellation write readback, preview isolation, knowledge visibility, quote authority and cleanup proofs remain PASS."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "realBusinessDataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "syntheticQaWritesOnly": true,
+    "productSourceChanged": true,
+    "cotcompRealTransportAuthorized": false,
+    "providerDeploymentAuthorized": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

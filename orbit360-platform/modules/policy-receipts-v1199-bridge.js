@@ -60,6 +60,13 @@ Orbit.modules = Orbit.modules || {};
   function linkedInsurers(country) { return (S().all('aseguradoras') || []).filter(a => a.vinculada !== false && (a.pais === country || [].concat(a.paises || []).includes(country))); }
   function ramos(country) { try { return Orbit.cat.ramosDe(country) || []; } catch (e) { return []; } }
   function subramos(country, ramo) { try { return Orbit.cat.subramosDe(country, ramo) || []; } catch (e) { return []; } }
+  function renewabilityState(p) {
+    if(!p || !Object.prototype.hasOwnProperty.call(p,'renovable') || p.renovable==null || String(p.renovable).trim()==='') return 'UNKNOWN';
+    const v=String(p.renovable).trim().toLowerCase();
+    if(p.renovable===true || ['true','si','sí','renovable'].includes(v)) return 'YES';
+    if(p.renovable===false || ['false','no','no renovable'].includes(v)) return 'NO';
+    return 'UNKNOWN';
+  }
   function money(cur, n) { return U.money ? U.money(+n || 0, cur || '') : (cur + ' ' + (+n || 0)); }
 
   function countryTaxPct(country) {
@@ -107,8 +114,12 @@ Orbit.modules = Orbit.modules || {};
     const end = existing && existing.vigenciaFin || plusYear(start);
     const country = existing && existing.pais || selectedClient.pais;
     const cur = existing && existing.moneda || A.currencyFor(country);
-    const rs = ramos(country), initialRamo = existing && existing.ramo || rs[0] || '';
-    const initialSubs = subramos(country, initialRamo), insurers = linkedInsurers(country);
+    const rs = ramos(country).slice(), initialRamo = existing && existing.ramo || rs[0] || '';
+    if (initialRamo && !rs.includes(initialRamo)) rs.unshift(initialRamo);
+    const initialProduct = existing && (existing.producto || existing.subramo) || '';
+    const initialSubs = subramos(country, initialRamo).slice();
+    if (initialProduct && !initialSubs.includes(initialProduct)) initialSubs.unshift(initialProduct);
+    const insurers = linkedInsurers(country);
     const advisors = S().all('asesores') || [];
     const existingVehicleRaw = existing ? ((S().all('vehiculos') || []).find(v => v.polizaId === existing.id && String(v.estado || '').toLowerCase() !== 'histórico') || null) : null;
     const existingVehicle = existingVehicleRaw && E.normalizeVehicle ? E.normalizeVehicle(existingVehicleRaw) : existingVehicleRaw;
@@ -132,6 +143,7 @@ Orbit.modules = Orbit.modules || {};
           <label class="ce-l">Aseguradora *<select class="o-sel" data-insurer>${insurers.map(a => `<option value="${esc(a.id)}" ${existing && a.id === existing.aseguradoraId ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">N.º real de póliza *<input class="o-sel" data-number value="${esc(existing && existing.numero || '')}" placeholder="No se genera un número ficticio"></label>
           <label class="ce-l">Estado *<select class="o-sel" data-status>${status.map(x => `<option ${existing && x === existing.estado ? 'selected' : (!existing && x === 'Vigente' ? 'selected' : '')}>${x}</option>`).join('')}</select></label>
+          <label class="ce-l">Renovabilidad *<select class="o-sel" data-renewable><option value="" ${renewabilityState(existing)==='UNKNOWN'?'selected':''}>Pendiente de validar</option><option value="yes" ${renewabilityState(existing)==='YES'?'selected':''}>Renovable</option><option value="no" ${renewabilityState(existing)==='NO'?'selected':''}>No renovable</option></select></label>
           <label class="ce-l">Ramo *<select class="o-sel" data-ramo>${rs.map(x => `<option ${x === initialRamo ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
           <label class="ce-l">Producto / subramo *<select class="o-sel" data-product>${initialSubs.map(x => `<option ${existing && (existing.producto === x || existing.subramo === x) ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
         </div>
@@ -175,10 +187,14 @@ Orbit.modules = Orbit.modules || {};
       $('[data-country]').value = country2 + ' · ' + currency2;
       const taxNote = $('[data-tax-note]'); if (taxNote) taxNote.textContent = 'IVA ' + countryTaxPct(country2) + '% según país. Emisión, asistencia y recargo continúan editables para conservar excepciones reales.';
       insurerEl.innerHTML = linkedInsurers(country2).map(a => `<option value="${esc(a.id)}">${esc(a.nombre)}</option>`).join('');
-      ramoEl.innerHTML = ramos(country2).map(x => `<option>${esc(x)}</option>`).join(''); refreshProducts();
+      ramoEl.innerHTML = ramos(country2).map(x => `<option>${esc(x)}</option>`).join(''); refreshProducts('');
     }
-    function refreshProducts() {
-      productEl.innerHTML = subramos(client().pais, ramoEl.value).map(x => `<option>${esc(x)}</option>`).join('');
+    function refreshProducts(preferred) {
+      const current = preferred != null ? String(preferred) : String(productEl.value || '');
+      const options = subramos(client().pais, ramoEl.value).slice();
+      if (current && !options.includes(current)) options.unshift(current);
+      productEl.innerHTML = options.map(x => `<option>${esc(x)}</option>`).join('');
+      if (current && options.includes(current)) productEl.value = current;
       $('[data-vehicle]').style.display = /auto|veh/i.test(ramoEl.value) ? '' : 'none'; preview();
     }
     function syncInstallments() {
@@ -202,7 +218,7 @@ Orbit.modules = Orbit.modules || {};
       return {
         id: existing && existing.id, tenantId: existing && existing.tenantId || A.tenantId(), clienteId: c.id, asesorId: advisorEl && advisorEl.value || c.asesorId,
         pais: country2, moneda: currency2, aseguradoraId: insurerEl.value, numero: $('[data-number]').value.trim(), estado: $('[data-status]').value,
-        ramo: ramoEl.value, subramo: productEl.value, producto: productEl.value, vigenciaInicio: $('[data-start]').value, vigenciaFin: $('[data-end]').value,
+        ramo: ramoEl.value, subramo: productEl.value, producto: productEl.value, renovable: $('[data-renewable]').value==='yes' ? true : ($('[data-renewable]').value==='no' ? false : null), vigenciaInicio: $('[data-start]').value, vigenciaFin: $('[data-end]').value,
         frecuencia: $('[data-frequency]').value, formaPago: $('[data-payment-form]').value, conducto: $('[data-conduct]').value,
         cuotas: +$('[data-installments]').value || 1, ivaPct: countryTaxPct(country2), primaNeta: +$('[data-net]').value || 0, gastosEmision: +$('[data-issue]').value || 0,
         otros: +$('[data-other]').value || 0, recargoFinPct: +$('[data-surcharge]').value || 0, sumaAsegurada: +$('[data-sum]').value || 0,
@@ -253,7 +269,7 @@ Orbit.modules = Orbit.modules || {};
         save.disabled = false; save.textContent = originalText;
       }
     });
-    refreshProducts(); syncInstallments(); preview();
+    refreshProducts(initialProduct); syncInstallments(); preview();
   }
 
   function openVehicleForm(vehicleId) {

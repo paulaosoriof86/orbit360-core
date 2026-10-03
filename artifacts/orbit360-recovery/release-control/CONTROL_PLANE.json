@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_TARGETED_PAULA_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4853,28 +4853,28 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "B4_003_SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "4b5bb1b75a0e345b61875d1feba1223db2d0a3f8",
-      "compositionLockBlobSha": "1c0bdd60a98d6c3cd9836d74d9031fe3b3339f8a",
-      "findingLedgerBlobSha": "c424e26fadaffd10b123c4325be70205d93eb41f",
+      "executionLockBlobSha": "235774389e3ca80bf40abccd9c9325293c122a84",
+      "compositionLockBlobSha": "e776af4714b951649b751f05371c0a824a2b66cf",
+      "findingLedgerBlobSha": "4e29a823a1bb73116e64b16b58bcae750751c9df",
       "activeFindingId": "B4-003",
       "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
       "baselinePreviewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
-      "productMutationAuthorized": false,
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
-      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R5_SOURCE_FIX_20261003.json",
-      "sourceFixReceiptBlobSha": "cc2b950989344acfdade4a38dcc537c088b1819a",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R11_SOURCE_FIX_20261003.json",
+      "sourceFixReceiptBlobSha": "1d2e940bad50e2bef141482494097ef5938ba8d4",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
-      "syntheticQaWritesAuthorized": false,
+      "syntheticQaWritesAuthorized": true,
       "previewDispatchRequest": {
         "status": "RETRY_AFTER_R10_RUNTIME_REACHABILITY_ROOTFIX",
         "findingId": "B4-003",
@@ -5163,29 +5163,34 @@
       "providerDeploymentAuthorized": false,
       "r10CompositionRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_COMPOSITION_EXACT_SET_ROOTFIX_20261003.json",
       "r10CompositionRootFixBlobSha": "4cc32b403ad0506f53e473fc620151f0dc8a02c5",
-      "compositionExactSetCount": 94,
+      "compositionExactSetCount": 95,
       "r10RuntimeReachabilityRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_20261003.json",
-      "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea"
+      "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
+      "sourceChangedAfterPriorMachinePass": true,
+      "priorMachineSourceSha": "dccf7ac21cd6d4e914291787b356e3dfe18aa372",
+      "priorMachineBuildId": "gi-i65-b4-dccf7ac21cd6-57f234755dc1",
+      "priorMachinePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37136776942-5498wth2.web.app",
+      "humanVisualStatus": "REJECTED_R11_PENDING_RETEST"
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "1c0bdd60a98d6c3cd9836d74d9031fe3b3339f8a",
+    "compositionLockBlobSha": "e776af4714b951649b751f05371c0a824a2b66cf",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "c424e26fadaffd10b123c4325be70205d93eb41f",
+    "findingLedgerBlobSha": "4e29a823a1bb73116e64b16b58bcae750751c9df",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B4",
     "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
-    "productFileCount": 79,
+    "productFileCount": 95,
     "rootCause": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
     "definitiveFix": "SINGLE_MACHINE_AUTHORITATIVE_EXACT_SET_AND_BLOB_BOUND_COMPOSITION",
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003"
   },
   "antiInterruptionControl": {
@@ -5478,16 +5483,16 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "4b5bb1b75a0e345b61875d1feba1223db2d0a3f8",
-    "compositionLockBlobSha": "1c0bdd60a98d6c3cd9836d74d9031fe3b3339f8a",
-    "findingLedgerBlobSha": "c424e26fadaffd10b123c4325be70205d93eb41f",
+    "executionLockBlobSha": "235774389e3ca80bf40abccd9c9325293c122a84",
+    "compositionLockBlobSha": "e776af4714b951649b751f05371c0a824a2b66cf",
+    "findingLedgerBlobSha": "4e29a823a1bb73116e64b16b58bcae750751c9df",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
-    "sourceFixReceiptBlobSha": "cc2b950989344acfdade4a38dcc537c088b1819a",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "sourceFixReceiptBlobSha": "1d2e940bad50e2bef141482494097ef5938ba8d4",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
       "status": "RETRY_AFTER_R10_RUNTIME_REACHABILITY_ROOTFIX",
@@ -5698,7 +5703,7 @@
       "reimport": false,
       "livePromotion": false
     },
-    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R5_SOURCE_FIX_20261003.json",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R11_SOURCE_FIX_20261003.json",
     "b4003SourceFixR4": {
       "status": "SOURCE_FIXED_R4_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
@@ -5760,12 +5765,13 @@
     "providerDeploymentAuthorized": false,
     "r10CompositionRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_COMPOSITION_EXACT_SET_ROOTFIX_20261003.json",
     "r10CompositionRootFixBlobSha": "4cc32b403ad0506f53e473fc620151f0dc8a02c5",
-    "compositionExactSetCount": 94,
+    "compositionExactSetCount": 95,
     "r10RuntimeReachabilityRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_20261003.json",
-    "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea"
+    "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
+    "humanVisualStatus": "REJECTED_R11_PENDING_RETEST"
   },
   "b4VisualAcceptanceControl": {
-    "status": "R10_EXACT_PREVIEW_PENDING",
+    "status": "R11_EXACT_PREVIEW_PENDING",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
     "receiptBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
     "cumulativeReviewThrough": [
@@ -5775,8 +5781,8 @@
     ],
     "b4001HumanVisualStatus": "PENDING_CUMULATIVE_REVIEW",
     "b4002HumanVisualStatus": "PENDING_CUMULATIVE_REVIEW",
-    "b4003HumanVisualStatus": "PENDING_R10_EXACT_PREVIEW",
-    "b4004HeldUntil": "B4_003_R10_TARGETED_PAULA_VISUAL_PASS",
+    "b4003HumanVisualStatus": "REJECTED_R11_PENDING_RETEST",
+    "b4004HeldUntil": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "machinePassDoesNotAdvanceFinding": true
   },
   "b3FinancialVisualFeedbackCarry": {

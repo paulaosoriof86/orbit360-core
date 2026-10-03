@@ -562,9 +562,10 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 .ficha-tabs-wrap::after{right:0;background:linear-gradient(270deg,var(--surface),transparent)}
 .ficha-tabs-wrap.has-prev::before{opacity:1}
 .ficha-tabs-wrap.has-more::after{opacity:1}
-.ftab-more{position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:18px;font-weight:700;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:var(--sh-2)}
-.ficha-tabs-wrap.has-more .ftab-more{display:flex}
-.ftab-more:hover{border-color:var(--red);color:var(--red)}
+.ftab-more,.ftab-prev{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:18px;font-weight:700;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:var(--sh-2)}
+.ftab-more{right:0}.ftab-prev{left:0}
+.ficha-tabs-wrap.has-more .ftab-more,.ficha-tabs-wrap.has-prev .ftab-prev{display:flex}
+.ftab-more:hover,.ftab-prev:hover{border-color:var(--red);color:var(--red)}
 
 /* ---------- KANBAN: cabecera de lista con emoji + color ---------- */
 .kcol-h2{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--card);border-top-left-radius:var(--r-md);border-top-right-radius:var(--r-md);border-top:3px solid var(--lc);border-bottom:1px solid var(--line)}

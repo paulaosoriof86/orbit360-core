@@ -456,6 +456,7 @@ Orbit.modules.cliente360 = (function () {
 
       <!-- tabs -->
       <div class="ficha-tabs-wrap">
+        <button class="ftab-prev" id="ftab-prev" aria-label="Ver pestañas anteriores">‹</button>
         <div class="ficha-tabs" id="ficha-tabs">
           ${tabs.map(t => `<div class="ftab ${tab === t[0] ? 'active' : ''}" data-tab="${t[0]}"><span class="fi">${t[2]}</span>${t[1]}</div>`).join('')}
         </div>
@@ -478,7 +479,8 @@ Orbit.modules.cliente360 = (function () {
     const wrap = document.querySelector('.ficha-tabs-wrap');
     const strip = document.getElementById('ficha-tabs');
     const more = document.getElementById('ftab-more');
-    if (!wrap || !strip || !more) return;
+    const prev = document.getElementById('ftab-prev');
+    if (!wrap || !strip || !more || !prev) return;
     const upd = () => {
       const overflow = strip.scrollWidth - strip.clientWidth;
       const atEnd = strip.scrollLeft >= overflow - 2;
@@ -488,6 +490,7 @@ Orbit.modules.cliente360 = (function () {
     strip.addEventListener('scroll', upd);
     window.addEventListener('resize', upd);
     more.addEventListener('click', () => strip.scrollBy({ left: strip.clientWidth * 0.7, behavior: 'smooth' }));
+    prev.addEventListener('click', () => strip.scrollBy({ left: -strip.clientWidth * 0.7, behavior: 'smooth' }));
     // llevar la pestaña activa a la vista
     const act = strip.querySelector('.ftab.active');
     if (act) { const off = act.offsetLeft - 12; if (off > strip.scrollLeft + strip.clientWidth - act.offsetWidth || off < strip.scrollLeft) strip.scrollLeft = off; }

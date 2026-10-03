@@ -22,8 +22,15 @@ Orbit.modules = Orbit.modules || {};
   function countryCode(v) { return String(v == null ? '' : v).trim().toUpperCase(); }
   function policyCountry(p) { const c=p&&p.clienteId?S().get('clientes',p.clienteId):null; return countryCode(p&&p.pais || c&&c.pais); }
   function selectedCountry(p) { const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; }
+  function renewabilityState(p) {
+    if(!p || !Object.prototype.hasOwnProperty.call(p,'renovable') || p.renovable==null || String(p.renovable).trim()==='') return 'UNKNOWN';
+    const v=String(p.renovable).trim().toLowerCase();
+    if(p.renovable===true || ['true','si','sí','renovable'].includes(v)) return 'YES';
+    if(p.renovable===false || ['false','no','no renovable'].includes(v)) return 'NO';
+    return 'UNKNOWN';
+  }
   function daysUntil(s) { if (!s) return null; const d=new Date(s+'T00:00:00'),n=new Date();n.setHours(0,0,0,0);return Math.ceil((d-n)/86400000); }
-  function active(p) { return p && ['vigente','porrenovar'].includes(norm(p.estado)) && !p.renovadaPor && norm(p.renovacionEstado) !== 'renovada'; }
+  function active(p) { return p && renewabilityState(p)==='YES' && ['vigente','porrenovar'].includes(norm(p.estado)) && !p.renovadaPor && norm(p.renovacionEstado) !== 'renovada'; }
   function policies(limit) {
     return A.filter('polizas', S().all('polizas') || [], 'renovaciones').filter(p => {
       if (!active(p) || !selectedCountry(p)) return false;

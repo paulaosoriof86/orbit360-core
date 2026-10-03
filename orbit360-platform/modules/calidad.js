@@ -13,7 +13,10 @@ Orbit.modules.calidad = (function () {
   let st = { ffalta: '', soloVig: false, asesor: '' };
 
   function clean(v) { return String(v == null ? '' : v).trim(); }
+  function countryCode(v) { return clean(v).toUpperCase(); }
+  function activeCountry() { const p=countryCode(Orbit.pais); return p && p!=='TODOS' ? p : ''; }
   function validCountry(v) { return ['GT', 'CO'].includes(clean(v).toUpperCase()); }
+  function inActiveCountry(c) { const wanted=activeCountry(); return !wanted || countryCode(c&&c.pais)===wanted; }
   function expectedCurrency(country) { return country === 'GT' ? 'GTQ' : country === 'CO' ? 'COP' : ''; }
   function countryLabel(value) { return value === 'GT' ? 'Guatemala' : value === 'CO' ? 'Colombia' : 'País por validar'; }
   function evidenceFor(c) {
@@ -57,8 +60,18 @@ Orbit.modules.calidad = (function () {
   }
 
   function render(host) {
-    const clients = S().all('clientes') || [];
-    const all = clients.map(c => ({ c, f: faltantes(c), vig: tieneVigente(c.id), evidence: evidenceFor(c) })).filter(x => x.f.length > 0);
+    const clients = (S().all('clientes') || []).filter(inActiveCountry);
+    const clientIds = new Set(clients.map(c => c.id).filter(Boolean));
+    const vigenteClientIds = new Set();
+    (S().all('polizas') || []).forEach(p => {
+      if (!p || !clientIds.has(p.clienteId)) return;
+      const state=clean(p.estado).toLowerCase().replace(/\s+/g,'');
+      if (state==='vigente' || state==='porrenovar') vigenteClientIds.add(p.clienteId);
+    });
+    const all = clients.map(c => {
+      const f=faltantes(c), needsCountry=f.some(x=>x.k==='pais');
+      return { c, f, vig: vigenteClientIds.has(c.id), evidence: needsCountry ? evidenceFor(c) : { suggestedCountry:'', conflict:false, sources:[] } };
+    }).filter(x => x.f.length > 0);
     const conVig = all.filter(x => x.vig);
     const advisors = advisorOptions(clients);
     if (st.asesor && !advisors.some(a => a.id === st.asesor)) st.asesor = '';
@@ -99,7 +112,7 @@ Orbit.modules.calidad = (function () {
             const accion = phone ? `<a class="btn ghost sm" style="color:#1f8a4c" href="https://wa.me/${wa}?text=${encodeURIComponent('Hola ' + clean(c.nombre).split(' ')[0] + ', para mantener tu información al día necesitamos actualizar algunos datos. ¿Nos ayudás?')}" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 Preparar WA</a>`
               : c.email ? `<button class="btn ghost sm" onclick="event.stopPropagation();window.__orbitCompose={para:'${U.esc(c.email)}',asunto:'Actualización de datos · ${U.esc(c.nombre)}',cuerpo:'',clienteId:'${c.id}',vinculo:{tipo:'cliente',id:'${c.id}',label:'${U.esc(c.nombre)}'}};location.hash='#/correo'">✉ Preparar correo</button>`
               : `<button class="btn ghost sm" disabled>Sin canal</button>`;
-            return `<tr class="clickable" onclick="location.hash='#/cliente360?c=${c.id}&t=resumen'"><td>${K.clienteCell(c.id)}</td><td>${K.asesorCell(c.asesorId)}</td><td>${faltaTxt}</td><td>${evidenceTxt}</td><td>${vig ? '<span class="badge ok">Sí</span>' : '<span class="muted">Pendiente de pólizas / sin vigente</span>'}</td><td>${canal}</td><td style="text-align:right;white-space:nowrap"><button class="btn primary sm" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}',{focus:'${f[0] && f[0].k || ''}'})">✏ Completar</button> ${accion}</td></tr>`;
+            return `<tr class="clickable" data-quality-country="${U.esc(countryCode(c.pais))}" onclick="location.hash='#/cliente360?c=${c.id}&t=resumen'"><td>${K.clienteCell(c.id)}</td><td>${K.asesorCell(c.asesorId)}</td><td>${faltaTxt}</td><td>${evidenceTxt}</td><td>${vig ? '<span class="badge ok">Sí</span>' : '<span class="muted">Pendiente de pólizas / sin vigente</span>'}</td><td>${canal}</td><td style="text-align:right;white-space:nowrap"><button class="btn primary sm" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}',{focus:'${f[0] && f[0].k || ''}'})">✏ Completar</button> ${accion}</td></tr>`;
           }).join('') || `<tr><td colspan="7" class="muted" style="text-align:center;padding:30px">No hay expedientes incompletos con los filtros actuales.</td></tr>`}</tbody></table></div>
       </div>
       <div class="cfg-note" style="margin-top:14px">Prioridad: país/moneda › contacto › correo/documento › ubicación › datos complementarios. Completar vacíos no permite reasignar, fusionar, borrar ni modificar pólizas o cobros.</div>

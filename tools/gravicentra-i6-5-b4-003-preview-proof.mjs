@@ -19,6 +19,7 @@ const db=getFirestore(app),auth=getAuth(app),tenant=db.collection('tenants').doc
 const ids={
  client:'b4003qa_client_'+run,
  renewalPolicy:'b4003qa_policy_renew_'+run,
+ unknownRenewPolicy:'b4003qa_policy_unknown_'+run,
  cancelPolicy:'b4003qa_policy_cancel_'+run,
  cancelation:'b4003qa_cancel_'+run
 };
@@ -48,7 +49,8 @@ async function seed(who){
  const today=new Date(),end=new Date(today.getTime()+10*86400000),endS=end.toISOString().slice(0,10),startS=today.toISOString().slice(0,10);
  const common={tenantId,__syntheticQa:true,ownerUid:who.uid,ownerEmail:who.email,createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()};
  await ref('clientes',ids.client).set({...common,id:ids.client,nombre:'B4-003 QA Cliente',tipo:'Persona',pais:'GT',moneda:'GTQ',asesorId:who.advisorId||'qa',email:'b4003qa@example.invalid',telefono:''},{merge:false});proof.syntheticWrites++;
- await ref('polizas',ids.renewalPolicy).set({...common,id:ids.renewalPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-REN-'+run,estado:'Vigente',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:1000,primaNeta:900},{merge:false});proof.syntheticWrites++;
+ await ref('polizas',ids.renewalPolicy).set({...common,id:ids.renewalPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-REN-'+run,estado:'Vigente',renovable:true,pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:1000,primaNeta:900},{merge:false});proof.syntheticWrites++;
+ await ref('polizas',ids.unknownRenewPolicy).set({...common,id:ids.unknownRenewPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-UNKNOWN-'+run,estado:'Vigente',pais:'GT',moneda:'GTQ',ramo:'ACCIDENTES QA FUENTE',producto:'PRODUCTO QA FUENTE',subramo:'PRODUCTO QA FUENTE',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:650,primaNeta:600},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.cancelPolicy).set({...common,id:ids.cancelPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-CAN-'+run,estado:'Cancelada',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:800,primaNeta:700},{merge:false});proof.syntheticWrites++;
  await ref('cancelaciones',ids.cancelation).set({...common,id:ids.cancelation,clienteId:ids.client,polizaId:ids.cancelPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',fecha:startS,motivo:'Prueba sintética B4-003',valorPerdido:700,recuperacion:'Pendiente de contacto',recuperada:false},{merge:false});proof.syntheticWrites++;
 }
@@ -118,7 +120,7 @@ async function cancellationEvidence(){
  proof.assertions.cancellationProjectionConsistent=(cancelled.length===0);
 }
 async function cleanup(startMs){
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['polizas',ids.renewalPolicy],['polizas',ids.cancelPolicy],['clientes',ids.client]]){
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['clientes',ids.client]]){
   const r=ref(c,id);if((await r.get()).exists){await r.delete();proof.cleanupWrites++;}
  }
  for(const col of ['workflowEvents','operationalEvents']){
@@ -278,15 +280,18 @@ try{
    Orbit.pais='GT';Orbit.modules.renovaciones.render(h);
    const renewGT=countries('[data-renewal-country]','data-renewal-country');
    const syntheticRenewVisibleGT=!!h.querySelector('[data-renewal-policy="'+ids.renewalPolicy+'"]');
+   const unknownRenewVisibleGT=!!h.querySelector('[data-renewal-policy="'+ids.unknownRenewPolicy+'"]');
    const actionLayout=h.querySelector('[data-renewal-policy="'+ids.renewalPolicy+'"] [data-renewal-actions-layout]')?.getAttribute('data-renewal-actions-layout')||'';
    Orbit.pais='CO';Orbit.modules.renovaciones.render(h);
    const renewCO=countries('[data-renewal-country]','data-renewal-country');
    Orbit.pais=previous;
-   return{cancelGT,cancelCO,renewGT,renewCO,syntheticCancelVisibleGT,syntheticRenewVisibleGT,cancelKpiDetailOpen,actionLayout};
+   return{cancelGT,cancelCO,renewGT,renewCO,syntheticCancelVisibleGT,syntheticRenewVisibleGT,unknownRenewVisibleGT,cancelKpiDetailOpen,actionLayout};
  },ids);
  need(proof.visualScope.cancelGT.every(x=>x==='GT')&&proof.visualScope.cancelCO.every(x=>x==='CO'),'B4_003_CANCEL_SELECTED_COUNTRY_SCOPE_LEAK');
  need(proof.visualScope.renewGT.every(x=>x==='GT')&&proof.visualScope.renewCO.every(x=>x==='CO'),'B4_003_RENEW_SELECTED_COUNTRY_SCOPE_LEAK');
  need(proof.visualScope.syntheticCancelVisibleGT===true&&proof.visualScope.syntheticRenewVisibleGT===true,'B4_003_GT_SYNTHETIC_SCOPE_MISSING');
+ need(proof.visualScope.unknownRenewVisibleGT===false,'B4_003_UNKNOWN_RENEWABILITY_MUST_FAIL_CLOSED');
+ proof.assertions.renewabilityTriStateFailClosed=true;
  need(proof.visualScope.cancelKpiDetailOpen===true,'B4_003_CANCEL_KPI_DETAIL_MISSING');
  need(proof.visualScope.actionLayout==='grid2','B4_003_RENEW_ACTION_LAYOUT_NOT_COMPACT');
  proof.assertions.cancelSelectedCountryScope=true;
@@ -306,6 +311,59 @@ try{
    proof.assertions.cancellationProjectionConsistent=projection.visible===true&&projection.emptyState===false;
    need(proof.assertions.cancellationProjectionConsistent,'B4_003_CANONICAL_POLICY_CANCELATION_NOT_PROJECTED');
  }
+
+ // R11: prove the exact visual-rejection causes are fixed without touching real business rows.
+ proof.r11Browser=await page.evaluate(ids=>{
+   const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';
+   Orbit.pais='GT';
+   Orbit.modules.cancelaciones.render(h);
+   const clientLink=h.querySelector('[data-cancel-policy="'+ids.cancelPolicy+'"] [data-cancel-client-link]');
+   const clientHref=clientLink?String(clientLink.getAttribute('href')||''):'';
+   Orbit.modules.cancelaciones.detalle('stale_'+ids.cancelation,ids.cancelPolicy);
+   const cancellationFallbackOpened=!!document.getElementById('c360-edit');
+   document.getElementById('c360-edit')?.remove();
+   const t0=performance.now();Orbit.modules.calidad.render(h);const qualityGtMs=performance.now()-t0;
+   const qualityGT=Array.from(h.querySelectorAll('[data-quality-country]')).map(x=>String(x.getAttribute('data-quality-country')||'').toUpperCase()).filter(Boolean);
+   Orbit.pais='CO';const t1=performance.now();Orbit.modules.calidad.render(h);const qualityCoMs=performance.now()-t1;
+   const qualityCO=Array.from(h.querySelectorAll('[data-quality-country]')).map(x=>String(x.getAttribute('data-quality-country')||'').toUpperCase()).filter(Boolean);
+   Orbit.pais=previous;
+   return{clientHref,cancellationFallbackOpened,qualityGT,qualityCO,qualityGtMs,qualityCoMs};
+ },ids);
+ need(proof.r11Browser.cancellationFallbackOpened===true,'B4_003_CANCEL_STALE_ID_POLICY_FALLBACK_FAILED');
+ need(/[#/]cliente360\?c=.*[&]t=polizas/.test(proof.r11Browser.clientHref),'B4_003_CANCEL_CLIENT_MUST_OPEN_POLICIES_TAB');
+ need(proof.r11Browser.qualityGT.every(x=>x==='GT')&&proof.r11Browser.qualityCO.every(x=>x==='CO'),'B4_003_QUALITY_SELECTED_COUNTRY_SCOPE_LEAK');
+ need(proof.r11Browser.qualityGtMs<2500&&proof.r11Browser.qualityCoMs<2500,'B4_003_QUALITY_SYNC_RENDER_TOO_SLOW');
+ proof.assertions.cancelDeepLinkIdentity=true;
+ proof.assertions.cancelClientOpensPolicies=true;
+ proof.assertions.qualitySelectedCountryScope=true;
+ proof.assertions.qualityRenderPathUnder2500ms=true;
+
+ await page.evaluate(id=>Orbit.modules.cliente360.editarPoliza(id),ids.unknownRenewPolicy);
+ await page.waitForSelector('#policy-v1199 [data-ramo]',{timeout:10000});
+ proof.policyEditorPreservation=await page.evaluate(()=>({
+   ramo:String(document.querySelector('#policy-v1199 [data-ramo]')?.value||''),
+   producto:String(document.querySelector('#policy-v1199 [data-product]')?.value||''),
+   renovable:String(document.querySelector('#policy-v1199 [data-renewable]')?.value||'')
+ }));
+ need(proof.policyEditorPreservation.ramo==='ACCIDENTES QA FUENTE','B4_003_POLICY_EDITOR_RAMO_SOURCE_VALUE_REPLACED');
+ need(proof.policyEditorPreservation.producto==='PRODUCTO QA FUENTE','B4_003_POLICY_EDITOR_PRODUCT_SOURCE_VALUE_REPLACED');
+ need(proof.policyEditorPreservation.renovable==='','B4_003_POLICY_EDITOR_UNKNOWN_RENEWABILITY_NOT_PRESERVED');
+ proof.assertions.policyEditorPreservesSourceTaxonomy=true;
+ proof.assertions.policyEditorExposesRenewabilityTriState=true;
+ await page.evaluate(()=>document.getElementById('policy-v1199')?.remove());
+
+ await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id)+'&t=polizas';},ids.client);
+ await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='cliente360',null,{timeout:10000});
+ await page.waitForSelector('#ficha-tabs',{timeout:10000});
+ proof.clientTabs=await page.evaluate(()=>{
+   const strip=document.getElementById('ficha-tabs'),prev=document.getElementById('ftab-prev');
+   const max=Math.max(0,strip.scrollWidth-strip.clientWidth);
+   if(max>0){strip.scrollLeft=Math.min(max,Math.max(80,strip.clientWidth*.35));strip.dispatchEvent(new Event('scroll'));}
+   return{prevExists:!!prev,maxScroll:max,hasPrev:!!strip.closest('.ficha-tabs-wrap')?.classList.contains('has-prev')};
+ });
+ need(proof.clientTabs.prevExists===true,'B4_003_CLIENT360_LEFT_TAB_CONTROL_MISSING');
+ need(proof.clientTabs.maxScroll===0||proof.clientTabs.hasPrev===true,'B4_003_CLIENT360_LEFT_TAB_CONTROL_NOT_ACTIVATED');
+ proof.assertions.client360BidirectionalTabs=true;
 
  await page.waitForFunction(()=>{
    const s=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
@@ -370,11 +428,11 @@ try{
  if(browser)await browser.close().catch(()=>{});
  await cleanup(startMs).catch(e=>proof.cleanupError=clean(e&&e.message||e));
  const checks=[];
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['polizas',ids.renewalPolicy],['polizas',ids.cancelPolicy],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
  proof.syntheticFinalAbsent=checks.every(x=>x===false);
  proof.assertions.cleanupComplete=proof.syntheticFinalAbsent;
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
 }
 if(proof.status!=='PASS'||proof.syntheticFinalAbsent!==true)process.exitCode=1;
 console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors},null,2));
-// R10 contract-harness status rootfix trigger: 2026-10-03
+// R11 Paula visual rejection remediation proof: 2026-10-03

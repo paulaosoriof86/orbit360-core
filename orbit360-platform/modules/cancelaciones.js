@@ -22,6 +22,14 @@ Orbit.modules.cancelaciones = (function () {
   function policyInActiveCountry(p) { const wanted=activeCountry(); if(!wanted)return true; const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null; return countryCode(p&&p.pais || cli&&cli.pais)===wanted; }
   function lostByCurrency(rows) { const out={}; (rows||[]).forEach(c=>{const cur=recordCurrency(c),n=Number(c&&c.valorPerdido)||0;out[cur]=(out[cur]||0)+n;}); return out; }
   function moneyMapHtml(map) { const keys=Object.keys(map||{}).filter(k=>Math.abs(Number(map[k])||0)>0); return keys.length ? keys.map(k=>'<span style="display:block;font-size:'+(keys.length>1?'13px':'21px')+'">'+U.esc(k)+' '+Number(map[k]).toLocaleString('es-GT',{maximumFractionDigits:0})+'</span>').join('') : '0'; }
+  function clientPolicyCell(c) {
+    const p=linkedPolicy(c),cli=linkedClient(c,p); if(!cli)return '—';
+    const nombre=cli.nombre||'Cliente',tipo=cli.tipo||'Pendiente de completar',pais=cli.pais||'';
+    const meta=pais?U.esc(tipo)+' · '+U.esc(pais):U.esc(tipo);
+    return '<a data-cancel-client-link href="#/cliente360?c='+encodeURIComponent(cli.id||c.clienteId||'')+'&t=polizas" style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="event.stopPropagation()">'+
+      U.avatar(nombre,tipo==='Empresa'?'#1E2227':'#C5162E','sm')+
+      '<span style="min-width:0"><span style="font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">'+U.esc(nombre)+'</span><span class="muted" style="font-size:11px">'+meta+'</span></span></a>';
+  }
   function normState(value) {
     return String(value == null ? '' : value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
   }
@@ -55,10 +63,13 @@ Orbit.modules.cancelaciones = (function () {
     const projected = allSafe('polizas').filter(isCancelledPolicy).filter(p => p && p.id && !explicitPolicies.has(String(p.id))).map(policyCancellation);
     return explicit.concat(projected).filter(inActiveCountry);
   }
-  function cancellationById(id) {
+  function cancellationById(id, policyId) {
     const explicit = S().get('cancelaciones', id);
     if (explicit && inActiveCountry(explicit)) return explicit;
-    return effectiveCancelations().find(c => c.id === id) || null;
+    const all=effectiveCancelations(), direct=all.find(c => c.id === id);
+    if (direct) return direct;
+    const wanted=String(policyId||'');
+    return wanted ? (all.find(c => String(c&&c.polizaId||'')===wanted) || null) : null;
   }
 
   const FDEFS = () => [
@@ -93,7 +104,7 @@ Orbit.modules.cancelaciones = (function () {
         { label: 'Canceladas', onclick: "Orbit.modules.cancelaciones.detalleKpi('canceladas')", val: all.length, color: 'var(--danger)', foot: 'histórico' },
         { label: 'Valor perdido', onclick: "Orbit.modules.cancelaciones.detalleKpi('valor')", val: moneyMapHtml(perdidoPorMoneda), color: 'var(--danger)', foot: 'prima anual · por moneda', footTone: 'down' },
         { label: 'Motivo principal', onclick: "Orbit.modules.cancelaciones.detalleKpi('motivo')", val: '<span style="font-size:16px">' + (Object.entries(porMotivo).sort((a, b) => b[1] - a[1])[0] || ['—'])[0] + '</span>', color: 'var(--warn)', foot: 'más frecuente' },
-        { label: 'Tasa de fuga', onclick: "Orbit.modules.cancelaciones.detalleKpi('tasa')", val: Math.round(all.length / (polizasBase.length || 1) * 100) + '%', color: 'var(--info)', foot: 'sobre cartera del país seleccionado' }
+        { label: 'Canceladas / cartera', onclick: "Orbit.modules.cancelaciones.detalleKpi('tasa')", val: Math.round(all.length / (polizasBase.length || 1) * 100) + '%', color: 'var(--info)', foot: 'histórico acumulado · no es churn temporal' }
       ])}
       <div class="card pad" style="margin-bottom:16px">
         <b style="font-family:var(--f-display);font-size:15px">Motivos de cancelación</b>
@@ -112,9 +123,9 @@ Orbit.modules.cancelaciones = (function () {
           <thead><tr><th>Fecha</th><th>Cliente</th><th>Póliza</th><th>Ramo</th><th>Motivo</th><th class="num">Valor perdido</th></tr></thead>
           <tbody>${rows.map(c => {
             const p = S().get('polizas', c.polizaId);
-            return `<tr class="clickable" data-cancel-country="${U.esc(recordCountry(c))}" onclick="Orbit.modules.cancelaciones.detalle('${c.id}')">
+            return `<tr class="clickable" data-cancel-country="${U.esc(recordCountry(c))}" data-cancel-policy="${U.esc(c.polizaId||'')}" onclick="Orbit.modules.cancelaciones.detalle('${String(c.id||'').replace(/'/g,"\\'")}','${String(c.polizaId||'').replace(/'/g,"\\'")}')">
               <td style="font-size:12.5px">${U.fmtDate(c.fecha)}</td>
-              <td>${K.clienteCell(c.clienteId)}</td>
+              <td>${clientPolicyCell(c)}</td>
               <td><span class="mono" style="font-size:12px">${p ? p.numero : '—'}</span></td>
               <td>${p ? p.ramo : '—'}</td>
               <td><span class="badge danger">${U.esc(c.motivo)}</span></td>
@@ -132,16 +143,16 @@ Orbit.modules.cancelaciones = (function () {
     let body='';
     if(kind==='valor') body=Object.keys(currencies).sort().map(cur=>'<div class="asg197-detail-row"><span><b>'+U.esc(cur)+'</b><small>'+all.filter(c=>recordCurrency(c)===cur).length+' cancelación(es)</small></span><span>'+U.money(currencies[cur],cur)+'</span></div>').join('')||'<div class="empty">Sin valor perdido para este alcance.</div>';
     else if(kind==='motivo') body='<div class="asg197-detail-row"><span><b>'+U.esc(top[0])+'</b><small>Motivo más frecuente en el país seleccionado</small></span><span>'+top[1]+'</span></div>';
-    else if(kind==='tasa') body='<div class="asg197-detail-row"><span><b>'+all.length+' canceladas / '+pols.length+' pólizas</b><small>El indicador respeta país y alcance activos; no mezcla GT y CO.</small></span><span>'+Math.round(all.length/(pols.length||1)*100)+'%</span></div>';
+    else if(kind==='tasa') body='<div class="asg197-detail-row"><span><b>'+all.length+' canceladas / '+pols.length+' pólizas</b><small>Relación histórica acumulada; respeta país y alcance, pero no representa una tasa temporal de fuga.</small></span><span>'+Math.round(all.length/(pols.length||1)*100)+'%</span></div>';
     else body=all.slice(0,100).map(c=>{const p=linkedPolicy(c)||{},cli=linkedClient(c,p)||{};return '<button class="asg197-detail-row" data-cancel-open="'+U.esc(c.id)+'"><span><b>'+U.esc(cli.nombre||'Cliente')+' · '+U.esc(p.numero||'Póliza')+'</b><small>'+U.esc(recordCountry(c))+' · '+U.esc(c.motivo||'Sin motivo registrado')+'</small></span><span>'+U.money(c.valorPerdido,recordCurrency(c))+'</span></button>';}).join('')||'<div class="empty">Sin cancelaciones para este alcance.</div>';
     let back=document.getElementById('cancelation-kpi-detail'); if(back)back.remove(); back=document.createElement('div');back.id='cancelation-kpi-detail';back.className='drawer-back open';back.style.cssText='display:grid;place-items:center;z-index:230';
-    const titles={canceladas:'Cancelaciones del alcance',valor:'Valor perdido por moneda',motivo:'Motivo principal',tasa:'Tasa de fuga'};
+    const titles={canceladas:'Cancelaciones del alcance',valor:'Valor perdido por moneda',motivo:'Motivo principal',tasa:'Relación canceladas / cartera'};
     back.innerHTML='<div class="card" style="width:min(760px,96vw);max-height:90vh;display:flex;flex-direction:column;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px"><div><small class="muted">Cancelaciones</small><b style="display:block;font-family:var(--f-display);font-size:17px">'+U.esc(titles[kind]||'Detalle')+'</b></div><button class="imp-x" data-close>✕</button></div><div style="padding:12px 18px 18px;overflow:auto;flex:1">'+body+'</div><div style="padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn ghost" data-close>Cerrar</button></div></div>';
     document.body.appendChild(back); const close=()=>back.remove(); back.querySelectorAll('[data-close]').forEach(x=>x.onclick=close); back.addEventListener('click',e=>{if(e.target===back)close();}); back.querySelectorAll('[data-cancel-open]').forEach(x=>x.onclick=()=>{const id=x.dataset.cancelOpen;close();detalle(id);});
   }
 
-  function detalle(canId) {
-    const c = cancellationById(canId); if (!c) { U.toast('Registro fuera de tu alcance'); return; }
+  function detalle(canId, policyId) {
+    const c = cancellationById(canId, policyId); if (!c) { U.toast('Registro fuera de tu alcance'); return; }
     const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
     const asg = p ? q.aseguradora(p.aseguradoraId) : null, ase = q.asesor((p && p.asesorId) || (cli && cli.asesorId));
     const cur = recordCurrency(c);

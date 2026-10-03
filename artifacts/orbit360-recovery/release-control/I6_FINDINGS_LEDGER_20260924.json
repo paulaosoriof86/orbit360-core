@@ -2803,19 +2803,30 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
-        "2026-09-30 clarification: Cancelaciones module is visible; the problem is that operational cancellation information is not populated/displayed."
+        "2026-09-30 clarification: Cancelaciones module is visible; the problem is that operational cancellation information is not populated/displayed.",
+        "2026-10-03 Paula visual: Cancelaciones visible row could still report Registro fuera de tu alcance; client link opened Resumen instead of Pólizas.",
+        "2026-10-03 Paula visual: Cliente 360 had rightward tab movement but no left navigation affordance.",
+        "2026-10-03 Paula visual: policy with Renovabilidad pendiente de validar appeared in Renovaciones.",
+        "2026-10-03 Paula visual: policy detail Accidentes y Enfermedades / Accidentes opened edit modal as Automóviles / Vehículo Liviano, demonstrating silent catalog fallback.",
+        "2026-10-03 Paula visual: Calidad de datos took about 10–12 seconds and did not honor selected country in KPI/list.",
+        "2026-10-03 Paula visual: policy total Q407.01 versus calendar Q542.68 is preserved as an Information Health mismatch; no inferred rewrite authorized."
       ],
       "requiredProof": [
         "Cancelaciones route remains visible to authorized roles.",
         "Real cancellation records/status derived from canonical policy/cancellation events are populated and visible where source evidence exists.",
         "No empty module caused by alternate collection/owner or missing projection.",
-        "Role/country scope, persistence/readback and regression are verified."
+        "Role/country scope, persistence/readback and regression are verified.",
+        "Exact Preview: cancellation detail resolves by canonical policy identity when cancellation id is stale/projected and client link opens Cliente 360 Pólizas.",
+        "Exact Preview: unknown renewability remains outside Renewals; explicit YES is required.",
+        "Exact Preview: policy editor preserves source ramo/product absent from current catalog and exposes renewability tri-state.",
+        "Exact Preview: Cliente 360 has bidirectional tab navigation.",
+        "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2844,7 +2855,11 @@
         "orbit360-platform/modules/renewals-v1200-permission-guard.js",
         "orbit360-platform/modules/renewals-v1201-issued-filter.js",
         "orbit360-platform/modules/cancelaciones.js",
-        "orbit360-platform/index.html"
+        "orbit360-platform/index.html",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/styles/infra.css"
       ],
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_20261003.json",
       "sourceFixReceiptBlobSha": "f05e04e6184a3e8ffa49eead631d94cbb68bb1c4",
@@ -2855,7 +2870,7 @@
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
       "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
-      "humanVisualStatus": "PENDING",
+      "humanVisualStatus": "REJECTED_R11_PENDING_RETEST",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_20261003.json",
@@ -2890,9 +2905,17 @@
       "cotcompRealTransportAuthorized": false,
       "r10CompositionRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_COMPOSITION_EXACT_SET_ROOTFIX_20261003.json",
       "r10CompositionRootFixBlobSha": "4cc32b403ad0506f53e473fc620151f0dc8a02c5",
-      "compositionExactSetCount": 94,
+      "compositionExactSetCount": 95,
       "r10RuntimeReachabilityRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_20261003.json",
-      "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea"
+      "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
+      "visualRejectionR11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R11_SOURCE_FIX_20261003.json",
+      "visualRejectionR11ReceiptBlobSha": "1d2e940bad50e2bef141482494097ef5938ba8d4",
+      "policyPremiumVsCalendarMismatchStatus": "OPEN_BLOCKING_FROZEN_INFORMATION_HEALTH",
+      "policyEditorSourceTaxonomyStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
+      "renewabilityTriStateStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
+      "qualityCountryPerformanceStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
+      "cancelationIdentityStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
+      "client360BidirectionalTabsStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW"
     },
     {
       "id": "B4-004",
@@ -6350,15 +6373,20 @@
     "rule": "Only these human-visible items require Paula confirmation before B2 acceptance; technical findings already closed may not be reopened without reproducible causal regression."
   },
   "currentHumanReview": {
-    "date": "2026-10-02",
-    "recordedAt": "2026-10-02T06:43:00-06:00",
-    "origin": "PAULA_B3_008_R2_REALITY_PERFORMANCE_VISUAL",
-    "decision": "B3_008_REJECTED_REMEDIATION_REQUIRED",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-b3008-36966271470-jel4pdom.web.app",
-    "exactSourceSha": "cdc9fd6a8391efd3617460670d7987bb25fc8ec9",
-    "blockingFindingId": "B3-008",
-    "b3007TechnicalPassPreserved": true,
-    "b3007VisualPending": true,
+    "date": "2026-10-03",
+    "origin": "PAULA_B4_003_TARGETED_VISUAL_R11",
+    "decision": "B4_003_REJECTED_SOURCE_REMEDIATION_REQUIRED",
+    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37136776942-5498wth2.web.app",
+    "exactSourceSha": "dccf7ac21cd6d4e914291787b356e3dfe18aa372",
+    "blockingFindingId": "B4-003",
+    "findings": [
+      "CANCELATION_IDENTITY_DEEPLINK",
+      "CLIENT360_LEFT_TAB_NAV",
+      "RENEWABILITY_FAIL_OPEN",
+      "POLICY_EDITOR_TAXONOMY_FALLBACK",
+      "QUALITY_COUNTRY_PERFORMANCE",
+      "POLICY_PREMIUM_CALENDAR_INFORMATION_HEALTH"
+    ],
     "noLive": true,
     "noReimport": true
   },
@@ -6653,7 +6681,7 @@
     }
   },
   "currentB4": {
-    "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_RUNTIME_REACHABLE",
+    "status": "B4_003_SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
@@ -6682,9 +6710,11 @@
     "quoteAuthorityContractVersion": "gravicentra-quote-authority-v1",
     "r10CompositionRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_COMPOSITION_EXACT_SET_ROOTFIX_20261003.json",
     "r10CompositionRootFixBlobSha": "4cc32b403ad0506f53e473fc620151f0dc8a02c5",
-    "compositionExactSetCount": 94,
+    "compositionExactSetCount": 95,
     "r10RuntimeReachabilityRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_20261003.json",
-    "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea"
+    "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
+    "visualRejectionR11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R11_SOURCE_FIX_20261003.json",
+    "visualRejectionR11ReceiptBlobSha": "1d2e940bad50e2bef141482494097ef5938ba8d4"
   },
   "b4003QaResidueCarry": {
     "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
@@ -6718,6 +6748,7 @@
       "B4-003"
     ],
     "nextFindingHeld": "B4-004",
-    "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS"
+    "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
+    "currentB4003HumanStatus": "REJECTED_R11_PENDING_RETEST"
   }
 }
