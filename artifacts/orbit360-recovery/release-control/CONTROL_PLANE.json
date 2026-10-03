@@ -4970,6 +4970,16 @@
         "dataMutation": false,
         "reimport": false,
         "livePromotion": false
+      },
+      "b4003DiagnosticDispatch": {
+        "status": "REQUESTED",
+        "findingId": "B4-003",
+        "authority": "USER_CONTINUE",
+        "target": "B4_003_RENEWALS_CANCELATIONS_READONLY_DIAGNOSTIC",
+        "productSourceChanged": false,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false
       }
     }
   },
@@ -5380,6 +5390,16 @@
         "functions/ops-advisor-inbox.js": "23f2bef28af857fbd3ac2349a934771809d3f228"
       },
       "operationalBusinessWrites": 0,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
+    },
+    "b4003DiagnosticDispatch": {
+      "status": "REQUESTED",
+      "findingId": "B4-003",
+      "authority": "USER_CONTINUE",
+      "target": "B4_003_RENEWALS_CANCELATIONS_READONLY_DIAGNOSTIC",
+      "productSourceChanged": false,
       "dataMutation": false,
       "reimport": false,
       "livePromotion": false
