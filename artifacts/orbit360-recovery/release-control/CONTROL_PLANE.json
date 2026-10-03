@@ -4928,7 +4928,19 @@
       "hostedPayloadDigest": "b44791dddfe3d50c42374d534b0af8b02bdb1b10c51b2154923a8c28e60e7042",
       "backendSourceDigest": "3970cb67659f54535e7cdb5f30bd5fdb732a6fbd47890140af63ad82ab054241",
       "bundleDigest": "431445527957a34b434cefba86b9b49cef02a2b7c3241ca3c978fd925e13db10",
-      "exactReadback": true
+      "exactReadback": true,
+      "b4002DiagnosticDispatch": {
+        "status": "RETRY_AFTER_QA_IMPORT_RESOLUTION_FIX",
+        "findingId": "B4-002",
+        "failedRunId": 37081962686,
+        "failedJobId": 111084228240,
+        "failureCode": "MODULE_NOT_FOUND_FIREBASE_ADMIN_APP",
+        "diagnosticToolBlobSha": "8a897252f7ce7beb06d0768d453196d4813737e6",
+        "productSourceChanged": false,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false
+      }
     }
   },
   "canonicalAccumulationControl": {
@@ -5294,6 +5306,18 @@
       "productSourceChanged": false,
       "noLive": true,
       "noReimport": true
+    },
+    "b4002DiagnosticDispatch": {
+      "status": "RETRY_AFTER_QA_IMPORT_RESOLUTION_FIX",
+      "findingId": "B4-002",
+      "failedRunId": 37081962686,
+      "failedJobId": 111084228240,
+      "failureCode": "MODULE_NOT_FOUND_FIREBASE_ADMIN_APP",
+      "diagnosticToolBlobSha": "8a897252f7ce7beb06d0768d453196d4813737e6",
+      "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
     }
   }
 }
