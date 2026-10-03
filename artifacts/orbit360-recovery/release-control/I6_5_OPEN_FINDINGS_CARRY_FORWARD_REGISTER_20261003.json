@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-03",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "c2d3d700916e01bfcc5cf9376d478fec9c611f57",
-  "expectedLedgerNextBlobSha": "36cd00a66ae1038f28fcfeed99eb0d4906f69e85",
+  "sourceLedgerPreviousBlobSha": "36cd00a66ae1038f28fcfeed99eb0d4906f69e85",
+  "expectedLedgerNextBlobSha": "88c8f75e24f9371f1af338e3ad51b310e3bdefbd",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -16,8 +16,8 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 181,
-  "attentionCount": 76,
+  "inventoryCount": 191,
+  "attentionCount": 86,
   "inventory": [
     {
       "id": "MECH-HARNESS-005",
@@ -563,13 +563,13 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R13_DIAGNOSTIC_REQUIRED",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
-      "closureCondition": "R12 source fix + exact Preview + targeted Paula visual PASS; all blocking B4-003 children explicitly disposed.",
+      "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
       "source": "LEDGER",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
     },
     {
       "id": "B4-004",
@@ -1987,24 +1987,24 @@
     {
       "id": "B4-003-R11-02-CANCELATION-CLIENT-POLICY-CONTEXT",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_R13_PRESERVE",
+      "blocking": false,
       "owner": "cancelaciones.js + cliente360.js",
       "targetGate": "B4-003",
       "closureCondition": "Client link opens Cliente360 Pólizas + Paula visual pass",
       "source": "PAULA_R11_OR_QA_R11A",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+      "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION"
     },
     {
       "id": "B4-003-R11-03-CLIENT360-LEFT-TAB-NAV",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_R13_PRESERVE",
+      "blocking": false,
       "owner": "cliente360.js + infra.css",
       "targetGate": "B4-003",
       "closureCondition": "Bidirectional tab navigation machine + Paula visual pass",
       "source": "PAULA_R11_OR_QA_R11A",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+      "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION"
     },
     {
       "id": "B4-003-R11-04-RENEWABILITY-FAIL-CLOSED",
@@ -2031,24 +2031,24 @@
     {
       "id": "B4-003-R11-06-QUALITY-COUNTRY-SCOPE",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_R13_PRESERVE",
+      "blocking": false,
       "owner": "calidad.js",
       "targetGate": "B4-003",
       "closureCondition": "GT/CO/Todos KPIs and rows respect selected country",
       "source": "PAULA_R11_OR_QA_R11A",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+      "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION"
     },
     {
       "id": "B4-003-R11-07-QUALITY-PERFORMANCE",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_R13_PRESERVE",
+      "blocking": false,
       "owner": "calidad.js + product store",
       "targetGate": "B4-003",
       "closureCondition": "No 10–12s blocking; authenticated route/country switch performance proof",
       "source": "PAULA_R11_OR_QA_R11A",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+      "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION"
     },
     {
       "id": "B4-003-R11-08-CANCELATION-RATIO-SEMANTICS",
@@ -2144,6 +2144,116 @@
       "closureCondition": "Visible-row user-path proof passes; static fallback contract stays enforced",
       "source": "PAULA_R11_OR_QA_R11A",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+    },
+    {
+      "id": "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
+      "block": "B4",
+      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "owner": "orbit360-platform/modules/cancelaciones.js + orbit360-platform/core/app-base.js",
+      "targetGate": "B4-003",
+      "closureCondition": "Authenticated exact Preview country switch settles <=2500 ms with no delayed mutation/stale rows.",
+      "source": "PAULA_R13",
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+    },
+    {
+      "id": "B4-003-R13-02-CANCEL-NONCLIENT-DEEPLINK",
+      "block": "B4",
+      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "owner": "orbit360-platform/modules/cancelaciones.js + orbit360-platform/modules/cliente360.js",
+      "targetGate": "B4-003",
+      "closureCondition": "Every intentionally interactive datum opens its canonical target; non-interactive cells do not imply clickability.",
+      "source": "PAULA_R13",
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+    },
+    {
+      "id": "B4-003-R13-03-CANCEL-COUNTRY-IDENTITY-INTEGRITY",
+      "block": "B4",
+      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "owner": "orbit360-platform/modules/cancelaciones.js + orbit360-platform/modules/cliente360.js",
+      "targetGate": "B4-003",
+      "closureCondition": "KPI/list/row identity use one documented country authority or explicitly model cross-country relation without leakage.",
+      "source": "PAULA_R13",
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+    },
+    {
+      "id": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+      "block": "B4",
+      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "owner": "orbit360-platform/modules/renovaciones.js + orbit360-platform/modules/renewals-v1200-operational-bridge.js + orbit360-platform/modules/renewals-v1201-issued-filter.js",
+      "targetGate": "B4-003",
+      "closureCondition": "Real source-backed renewal pipeline repopulates by canonical eligibility/country/horizon and is proven on exact Preview.",
+      "source": "PAULA_R13",
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+    },
+    {
+      "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+      "block": "B4",
+      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "owner": "orbit360-platform/modules/polizas.js + orbit360-platform/core/router.js",
+      "targetGate": "B4-003",
+      "closureCondition": "Authenticated route and first usable render meet performance budget without browser unresponsive dialog.",
+      "source": "PAULA_R13",
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+    },
+    {
+      "id": "B4-003-R13-06-POLICY-SEARCH-FREEZE",
+      "block": "B4",
+      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "owner": "orbit360-platform/modules/polizas.js",
+      "targetGate": "B4-003",
+      "closureCondition": "Search is bounded/indexed/debounced and remains interactive over full corpus; no full render/scan per keystroke.",
+      "source": "PAULA_R13",
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+    },
+    {
+      "id": "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
+      "block": "B4",
+      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "owner": "orbit360-platform/modules/polizas.js + orbit360-platform/modules/cliente360.js + orbit360-platform/core/router.js",
+      "targetGate": "B4-003",
+      "closureCondition": "Direct policy detail navigation is deterministic, preserves context and has no full-page stall.",
+      "source": "PAULA_R13",
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+    },
+    {
+      "id": "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
+      "block": "B4",
+      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "owner": "orbit360-platform/core/router.js + orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "targetGate": "B4-003",
+      "closureCondition": "No destructive intermediate projection; loading state preserves stable relations until hydration is coherent.",
+      "source": "PAULA_R13",
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+    },
+    {
+      "id": "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
+      "block": "B4",
+      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "owner": "orbit360-platform/modules/polizas.js + orbit360-platform/styles/infra.css",
+      "targetGate": "B4-003",
+      "closureCondition": "Recover latest approved visual lineage and prove structure/density/hierarchy/labels/responsive match; no redesign from memory.",
+      "source": "PAULA_R13",
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+    },
+    {
+      "id": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+      "block": "B4",
+      "status": "OPEN_BLOCKING_R13_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "owner": "orbit360-platform/modules/aseguradoras.js + orbit360-platform/core/importa.js",
+      "targetGate": "B4-003",
+      "closureCondition": "Controlled disposable file proves Drive readback, exact insurer/source provenance, reload persistence, fail-closed downstream enablement and cleanup/rollback.",
+      "source": "PAULA_R13",
+      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
     }
   ],
   "attentionIds": [
@@ -2222,9 +2332,30 @@
     "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE",
     "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
     "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF",
-    "B4-003-R11A-QA-01-VISIBLE-ROW-DISCRIMINANT"
+    "B4-003-R11A-QA-01-VISIBLE-ROW-DISCRIMINANT",
+    "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
+    "B4-003-R13-02-CANCEL-NONCLIENT-DEEPLINK",
+    "B4-003-R13-03-CANCEL-COUNTRY-IDENTITY-INTEGRITY",
+    "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+    "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+    "B4-003-R13-06-POLICY-SEARCH-FREEZE",
+    "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
+    "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
+    "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
+    "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD"
   ],
   "criticalCurrentReviewIds": [
+    "B4-003",
+    "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
+    "B4-003-R13-02-CANCEL-NONCLIENT-DEEPLINK",
+    "B4-003-R13-03-CANCEL-COUNTRY-IDENTITY-INTEGRITY",
+    "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+    "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+    "B4-003-R13-06-POLICY-SEARCH-FREEZE",
+    "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
+    "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
+    "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
+    "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
     "B4-003-R11-01-CANCELATION-ROW-DETAIL",
     "B4-003-R11-02-CANCELATION-CLIENT-POLICY-CONTEXT",
     "B4-003-R11-03-CLIENT360-LEFT-TAB-NAV",
@@ -2252,11 +2383,7 @@
     "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
     "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
   ],
-  "b4AdvanceRule": {
-    "heldNextFinding": "B4-004",
-    "requiredHumanStatus": "B4_003_TARGETED_PAULA_VISUAL_PASS",
-    "requiredCurrentCriticalDisposition": "All blocking criticalCurrentReviewIds must be CLOSED/PASS with evidence before B4-004."
-  },
+  "b4AdvanceRule": "B4-004 remains held until all R13 blocking B4-003 findings have explicit disposition and Paula targeted visual PASS.",
   "liveRule": {
     "required": "Every attention item marked/derived as pre-live debt must have explicit final disposition; no silent omission.",
     "noLiveUntilB4_007": true
@@ -2266,5 +2393,7 @@
   "r12SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_SOURCE_FIX_20261003.json",
   "r12SourceFixBlobSha": "663b9846af14ce18097f08f2fc85296ac00f181f",
   "machinePassVisualStateReconciliationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_VISUAL_STATE_RECONCILIATION_20261003.json",
-  "machinePassVisualStateReconciliationBlobSha": "cda0b3cfcd3c89e8312ba13636075ee1f84e2e48"
+  "machinePassVisualStateReconciliationBlobSha": "cda0b3cfcd3c89e8312ba13636075ee1f84e2e48",
+  "r13VisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
+  "r13VisualRejectionBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
 }

@@ -1,0 +1,122 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_V1",
+  "recordedAt": "2026-10-03T16:24:00-06:00",
+  "status": "PAULA_VISUAL_REJECTED_R13_DIAGNOSTIC_REQUIRED",
+  "findingId": "B4-003",
+  "preview": {
+    "sourceSha": "e7071dcd492d2a55d7feb5b5c1938861bc00114b",
+    "buildId": "gi-i65-b4-e7071dcd492d-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37153635447-6wnebg4z.web.app",
+    "runId": 37153635447,
+    "machinePassReceiptBlobSha": "ddced2eb79c916c80fd9acd80eeca6b5c9196f09"
+  },
+  "authority": "PAULA_TARGETED_VISUAL_REVIEW_20261003",
+  "visualPasses": [
+    {
+      "id": "R13-PASS-01",
+      "surface": "Cancelaciones",
+      "finding": "Initial Cancelaciones route now opens quickly.",
+      "regressionRule": "Do not reopen unless reproduced."
+    },
+    {
+      "id": "R13-PASS-02",
+      "surface": "Cancelaciones→Cliente360",
+      "finding": "Client click now opens Cliente 360 directly in policy context.",
+      "regressionRule": "Preserve."
+    },
+    {
+      "id": "R13-PASS-03",
+      "surface": "Cliente360",
+      "finding": "Tab/menu navigation now moves both left and right.",
+      "regressionRule": "Preserve."
+    },
+    {
+      "id": "R13-PASS-04",
+      "surface": "Calidad de datos",
+      "finding": "Route now opens quickly and selected-country switch is quick.",
+      "regressionRule": "Preserve."
+    },
+    {
+      "id": "R13-PASS-05",
+      "surface": "Aseguradoras",
+      "finding": "Insurer knowledge and source-backed observed knowledge are visible.",
+      "regressionRule": "Preserve."
+    }
+  ],
+  "blockingFindings": [
+    {
+      "id": "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
+      "surface": "Cancelaciones",
+      "observation": "Changing selected country still takes about 10 seconds.",
+      "requiredProof": "Authenticated exact Preview country switch settles in <=2500 ms without delayed mutation or stale rows."
+    },
+    {
+      "id": "B4-003-R13-02-CANCEL-NONCLIENT-DEEPLINK",
+      "surface": "Cancelaciones",
+      "observation": "Client deep-link works, but clicking other row data still does not open the corresponding record and can still end in 'Registro fuera de tu alcance'.",
+      "requiredProof": "Each intentionally interactive datum has canonical target/identity and opens it; non-interactive cells must not imply clickability."
+    },
+    {
+      "id": "B4-003-R13-03-CANCEL-COUNTRY-IDENTITY-INTEGRITY",
+      "surface": "Cancelaciones",
+      "observation": "With Colombia selected, visible rows include client identity labels marked GT; this must be adjudicated against the canonical country authority rather than silently accepted.",
+      "requiredProof": "Country KPI/list/row identity use one documented authority or explicitly explain cross-country relationship; no mixed-scope leakage."
+    },
+    {
+      "id": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+      "surface": "Renovaciones",
+      "observation": "Renewals disappeared in Paula review: all four buckets and premium in management rendered 0 in Todos los países.",
+      "requiredProof": "Real source-backed renewal pipeline repopulates by canonical eligibility, country and horizon; no synthetic-only machine proof."
+    },
+    {
+      "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+      "surface": "Pólizas",
+      "observation": "Entering Pólizas blocked the page and took >10 seconds.",
+      "requiredProof": "Authenticated first route/render under agreed performance budget with no browser unresponsive dialog."
+    },
+    {
+      "id": "B4-003-R13-06-POLICY-SEARCH-FREEZE",
+      "surface": "Pólizas",
+      "observation": "Searching for a policy caused the browser to freeze for approximately five minutes.",
+      "requiredProof": "Search over full policy corpus is indexed/debounced/bounded, responds interactively and does not scan/render the complete corpus per keystroke."
+    },
+    {
+      "id": "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
+      "surface": "Pólizas→Cliente360 policy detail",
+      "observation": "Selecting a policy remained slow and required refresh before the detail became usable.",
+      "requiredProof": "Direct detail navigation is deterministic, no full-page stall, and hydration preserves route context."
+    },
+    {
+      "id": "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
+      "surface": "Hydration / Cliente relations",
+      "observation": "After refresh, client names disappeared temporarily and then reappeared.",
+      "requiredProof": "No visible destructive intermediate projection; client/policy relations render from coherent hydration state or explicit non-destructive loading state."
+    },
+    {
+      "id": "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
+      "surface": "Pólizas list",
+      "observation": "The list visual identity is different from the approved/expected presentation.",
+      "requiredProof": "Recover latest approved visual lineage and compare structure, density, hierarchy, labels and responsive behavior; do not redesign from memory."
+    },
+    {
+      "id": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+      "surface": "Aseguradoras / Documentos y Drive / Tarifas y conocimiento",
+      "observation": "Upload entry points are visible, but no end-to-end proof yet confirms that a real permitted test document reaches Drive, is linked to the exact insurer, persists after reload and appears with correct provenance/status.",
+      "requiredProof": "Controlled Preview/LAB test with approved disposable file: upload→Drive readback→canonical insurer.docs/source linkage→reload persistence→no automatic Cotizador/Comparativo/IA enablement→cleanup/rollback if synthetic."
+    }
+  ],
+  "crossChecks": [
+    "Aseguradoras Documentos y Drive currently can show 'Sin documentos cargados' while source-backed knowledge exists under Tarifas y conocimiento; determine whether this is intentional semantic separation or an inconsistent projection.",
+    "Machine PASS assertions must be strengthened where Paula's real visual path contradicted them, especially Renewals and Cancelaciones country behavior.",
+    "Do not treat machine PASS as human acceptance."
+  ],
+  "boundaries": {
+    "b4004Held": true,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "operationalBusinessWritesAuthorized": false,
+    "productMutationAuthorized": false,
+    "controlledSyntheticDriveUploadMayBeAuthorizedOnlyAfterDiagnostic": true
+  },
+  "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+}

@@ -2153,7 +2153,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "36cd00a66ae1038f28fcfeed99eb0d4906f69e85",
+  "findingLedgerBlobSha": "88c8f75e24f9371f1af338e3ad51b310e3bdefbd",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2583,5 +2583,15 @@
     "runId": 37153635447,
     "productSourceChanged": false,
     "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+  },
+  "b4003VisualRejectionR13": {
+    "status": "PAULA_VISUAL_REJECTED_R13_DIAGNOSTIC_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
+    "receiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+    "machinePassReceiptBlobSha": "ddced2eb79c916c80fd9acd80eeca6b5c9196f09",
+    "continuityRegisterBlobSha": "77e677bb3b69a6a5fd87270553699747ad242a7a",
+    "newBlockingFindingCount": 10,
+    "productSourceChanged": false,
+    "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
   }
 }
