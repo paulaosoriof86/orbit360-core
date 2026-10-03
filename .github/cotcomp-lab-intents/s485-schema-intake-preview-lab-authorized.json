@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s485-schema-intake-preview-lab-intent-v1.0",
   "authorization": "S485_DEPLOY_SCHEMA_DRIVEN_INTAKE_PREVIEW",
-  "authorizedSourceParent": "674db0847cb9966ba7db645e719488df4c8ff915",
+  "authorizedSourceParent": "836ea6e0008cd4665d498e6f085cebfa45346dc4",
   "providerContractVersion": "gravicentra-quote-authority-v1",
   "projectId": "ays-orbit-360-lab",
   "functionName": "cotcompSchemaDrivenIntakePreviewS485",
