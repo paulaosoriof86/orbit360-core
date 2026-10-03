@@ -1,0 +1,13 @@
+{
+  "schemaVersion":"ays-cotcomp-s473-risk-identity-catalog-sourceonly-intent-v1.0",
+  "authorization":"S473_RISK_IDENTITY_CATALOG_SOURCEONLY",
+  "authorizedSourceParent":"bf541e9b683ab8b4f0d7e4ff23c7a07d5b70cf27",
+  "projectId":"ays-orbit-360-lab",
+  "tenantId":"alianzas-soluciones",
+  "journeyId":"GT_AUTO_MOTO_HYBRID",
+  "appDataReads":false,
+  "appDataWrites":false,
+  "deployment":false,
+  "providerOrRater":false,
+  "production":false
+}
