@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s484-provider-contract-sourceonly-intent-v1.0",
   "authorization": "S484_SOURCE_ONLY_PROVIDER_CONTRACT_SCHEMA_DRIVEN",
-  "authorizedSourceParent": "deec4d28fe49547e478ae9c2b9377be0bb8a5579",
+  "authorizedSourceParent": "9b37377fa5253a0d188440d542610202c3a44c1c",
   "providerContractVersion": "gravicentra-quote-authority-v1",
   "authority": "GRAVICENTRA",
   "transport": "FIXTURE_SOURCE_ONLY",
