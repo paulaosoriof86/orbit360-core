@@ -1,0 +1,90 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B3_FINANCIAL_VISUAL_FEEDBACK_CARRY_V1",
+  "recordedAt": "2026-10-03T04:31:00Z",
+  "status": "PENDING_PAULA_FEEDBACK_AND_TARGETED_VISUAL",
+  "purpose": "Preserve financial findings that were machine-audited during B3 but were not explicitly reported to Paula before B4 advance.",
+  "authority": {
+    "r5p8Path": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8_DIAGNOSTIC_ADJUDICATION_20261002.json",
+    "r5p8BlobSha": "1ecde62fd986a965af728b5573877d2d56ae4476",
+    "b3VisualPassPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+    "b3VisualPassBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3"
+  },
+  "receiptsAndPortfolio": {
+    "activePolicies": 226,
+    "withPhysicalReceipts": 225,
+    "missingPhysicalReceipts": 1,
+    "missingPolicy": {
+      "numero": "AUTO-45497",
+      "primaTotal": 3600.15,
+      "moneda": "GTQ",
+      "reason": "No contractual frequency/installment authority; calendar must not be fabricated."
+    },
+    "sourceIntakeHolds": 36,
+    "sourceIntakeHoldBreakdown": {
+      "noExactI64Edition": 34,
+      "futurePolicy": 2
+    },
+    "ambiguousBaseReceiptKeysWithMultipleAmounts": 12,
+    "baseKeysWithMultipleNonblankEndosos": 7,
+    "multiDenominatorPolicies": 7,
+    "multiDenominatorDisposition": {
+      "ambiguousFailClosed": 6,
+      "paymentEvidenceNotCalendar": 1
+    },
+    "r5p8IssueCounts": {
+      "paymentEvidenceNotCalendar": 13,
+      "sourceDataQualityOnly": 44,
+      "ambiguousFailClosed": 17,
+      "totalIssues": 74
+    },
+    "note": "These categories are diagnostic classifications and may overlap with receipt-calendar mismatch counts; they are not a simple additive duplicate count."
+  },
+  "premiumAndTariff": {
+    "arithmeticFormulaAudited": 7,
+    "arithmeticFormulaMismatch": 0,
+    "taxPctMismatch": 0,
+    "canonicalTariffConfigurationPresent": false,
+    "canonicalTariffConfigCounts": {
+      "configuracionesTarifa": 0,
+      "embeddedTarifasConfiguradas": 0,
+      "legacyCotTasasValidadas": 0,
+      "tariffSamplesWithSourceVersionValidity": 0
+    },
+    "observedCountryDefaults": {
+      "GT": {
+        "iva": 12,
+        "recargoFinanciero": 5,
+        "gastosEmision": 0
+      },
+      "CO": {
+        "iva": 19,
+        "recargoFinanciero": 6,
+        "gastosEmision": 0
+      }
+    },
+    "disposition": "Arithmetic is internally consistent where contractual components exist, but insurer/ramo/product/frequency tariff percentages are not certified because canonical tariff authority is missing."
+  },
+  "currencyFinding": {
+    "policyNumber": "UTO-1000001645",
+    "policyCountry": "GT",
+    "canonicalPolicyCurrency": "GTQ",
+    "sourceReceiptCurrency": "COP",
+    "affectedReceiptRows": 10,
+    "eachAmount": 147,
+    "remediation": "Policy currency governs linked financial projection; source currency remains provenance only."
+  },
+  "visualReviewRequired": [
+    "Cobros/cartera list: verify duplicate-looking rows are distinguishable by policy/receipt/endoso/amount and not silently collapsed.",
+    "Policy detail: verify installments/receipts correspond to the policy and do not show fabricated calendar for AUTO-45497.",
+    "Policy premium presentation: verify displayed currency follows canonical policy currency.",
+    "Any premium/tax breakdown shown must not imply insurer tariff certification where canonical tariff configuration is absent."
+  ],
+  "boundaries": {
+    "productSourceChanged": false,
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "carryInto": "B4_003_TARGETED_PAULA_VISUAL"
+}
