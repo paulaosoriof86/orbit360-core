@@ -1,0 +1,43 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-03",
+  "status": "FUNCTIONAL_DEFECT_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
+  "findingId": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+  "failedRuns": [
+    {
+      "runId": 37162934941,
+      "measuredRouteMs": 5530
+    },
+    {
+      "runId": 37162960883,
+      "measuredRouteMs": 9356
+    }
+  ],
+  "currentHead": "15912860d324d7141b007456d677080d78f5a5ba",
+  "currentPolicyBlob": "56a1c67d976a96e047cbc98b38e60920b102614d",
+  "evidence": [
+    "Contract, syntax, LIVE-unchanged, immutable package and exact Hosting readback all passed before browser proof.",
+    "The P2 route still exceeded the 2500ms acceptance budget twice, so the defect remains reproducible.",
+    "buildIndexes() still deep-clones the complete vehiculos collection and builds vehicle-enriched search text for every policy before first paint even when no search query exists.",
+    "The product read store clones each all(collection) row, making search-only vehicle work a synchronous first-paint cost."
+  ],
+  "rootCause": "POLICY_FIRST_PAINT_BUILDS_SEARCH_ONLY_VEHICLE_AND_FULL_SEARCH_INDEX_BEFORE_ANY_QUERY",
+  "allowedProductFiles": [
+    "orbit360-platform/modules/polizas.js",
+    "orbit360-platform/index.html"
+  ],
+  "requiredFix": [
+    "Remove vehiculos read and full searchTextByPolicy construction from the no-query first-paint path.",
+    "Build basic policy/client search text lazily only when fq is non-empty.",
+    "Load/index vehicles lazily only if the normalized query does not match policy/client text.",
+    "Preserve table hierarchy, labels, filters, role scope, pagination and approved visual lineage."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "visualRedesign": false
+  },
+  "nextAction": "B4_003_R13_POLICY_RENDER_LAZY_SEARCH_SOURCE_FIX"
+}
