@@ -25,7 +25,7 @@ const ids={
  healthReceipt1:'b4003qa_receipt_health_1_'+run,
  healthReceipt2:'b4003qa_receipt_health_2_'+run,
  cancelation:'b4003qa_cancel_'+run,
- insurer:'b4_r13_insurer_'+run
+ insurer:'b4003qa_insurer_'+run
 };
 ids.renewActivity='act_ren_'+ids.renewalPolicy+'_'+new Date().toISOString().slice(0,10).replace(/-/g,'');
 ids.cancelActivity='act_rec_'+ids.cancelation;
@@ -74,7 +74,7 @@ async function bootProduct(page,token){
  const state=await page.evaluate(async token=>{
    const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
    if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);
-   const requested=['clientes','polizas','recibosEsperados','cancelaciones','negocios','gestiones'];
+   const requested=['clientes','polizas','vehiculos','recibosEsperados','cancelaciones','negocios','gestiones','aseguradoras'];
    const forced={called:false,phase:'',requested:[]};
    const forceCollections=(event)=>{
      try{
@@ -118,8 +118,12 @@ async function residueReadback(){
  proof.assertions.qaResidueReadOnlyAdjudicated=true;
 }
 async function renewalDistributionReadback(){
- const snap=await tenant.collection('data').doc('polizas').collection('items').get();
+ const [snap,clientSnap]=await Promise.all([
+  tenant.collection('data').doc('polizas').collection('items').get(),
+  tenant.collection('data').doc('clientes').collection('items').get()
+ ]);
  const now=new Date();now.setHours(0,0,0,0);
+ const clientById=new Map(clientSnap.docs.map(d=>[d.id,{id:d.id,...d.data()}]));
  const rows=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!String(x.id).startsWith('b4003qa_')&&!String(x.id).startsWith('b4_')&&x.__syntheticQa!==true);
  const state=p=>{
   if(!Object.prototype.hasOwnProperty.call(p,'renovable')||p.renovable==null||clean(p.renovable)==='')return'UNKNOWN';
@@ -128,12 +132,13 @@ async function renewalDistributionReadback(){
   if(p.renovable===false||['false','no','no renovable'].includes(v))return'NO';
   return'UNKNOWN';
  };
- const active=p=>['Vigente','Por renovar'].includes(clean(p.estado))&&!p.renovadaPor&&norm(p.renovacionEstado)!=='renovada';
+ const active=p=>['vigente','porrenovar'].includes(norm(p.estado))&&!p.renovadaPor&&norm(p.renovacionEstado)!=='renovada';
  const days=p=>{const raw=clean(p.vigenciaFin);if(!raw)return null;const d=new Date(raw+'T00:00:00');return Number.isFinite(d.getTime())?Math.ceil((d-now)/86400000):null;};
  const byState={YES:0,NO:0,UNKNOWN:0},byCountry={},buckets={vencidas:0,d15:0,d45:0,d90:0},eligible=[];
  rows.forEach(p=>{
   const rs=state(p);byState[rs]=(byState[rs]||0)+1;
-  const country=clean(p.pais||p.country||'SIN_PAIS').toUpperCase()||'SIN_PAIS';
+  const cli=clientById.get(clean(p.clienteId))||{};
+  const country=clean(p.pais||p.country||cli.pais||cli.country||'SIN_PAIS').toUpperCase()||'SIN_PAIS';
   byCountry[country]=byCountry[country]||{YES:0,NO:0,UNKNOWN:0,eligible90:0};
   byCountry[country][rs]=(byCountry[country][rs]||0)+1;
   if(rs!=='YES'||!active(p))return;
@@ -142,7 +147,7 @@ async function renewalDistributionReadback(){
   byCountry[country].eligible90++;
   if(d<0)buckets.vencidas++;else if(d<=15)buckets.d15++;else if(d<=45)buckets.d45++;else buckets.d90++;
  });
- proof.realRenewalDistribution={policyCount:rows.length,byState,byCountry,buckets,eligibleCount:eligible.length,sample:eligible.slice(0,30),readOnly:true};
+ proof.realRenewalDistribution={policyCount:rows.length,byState,byCountry,buckets,eligibleCount:eligible.length,eligibleIds:eligible.map(x=>x.id),sample:eligible.slice(0,30),readOnly:true};
  proof.assertions.realRenewalDistributionReadOnly=true;
 }
 async function cancellationEvidence(){
