@@ -14,7 +14,7 @@ Orbit.access = (function () {
   var OP_COLLS = {
     clientes: 'cliente360', polizas: 'polizas', vehiculos: 'polizas',
     recibosEsperados: 'cobros', carteraPrimas: 'cobros', cobros: 'cobros',
-    renovaciones: 'renovaciones', reclamos: 'siniestros', siniestros: 'siniestros',
+    renovaciones: 'renovaciones', cancelaciones: 'cancelaciones', reclamos: 'siniestros', siniestros: 'siniestros',
     comisiones: 'comisiones', negocios: 'negocios', gestiones: 'ops',
     actividades: 'cliente360', parchesPendientes: 'ops', correos: 'correo',
     asesores: 'inicio', metas: 'inicio'
