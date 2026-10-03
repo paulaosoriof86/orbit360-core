@@ -37,7 +37,7 @@ function norm(v){return clean(v,160).normalize('NFD').replace(/[\u0300-\u036f]/g
 function safeName(v){return clean(v,180).replace(/[\\/:*?"<>|\u0000-\u001f]+/g,' ').replace(/\s+/g,' ').trim()||'Documento';}
 function sha(v){return crypto.createHash('sha256').update(String(v??''),'utf8').digest('hex');}
 function previewSyntheticClient(clientId){return /^(?:b2[-_]|b3004qa_|b3004human_|b4003qa_)/i.test(clean(clientId,180));}
-function previewSyntheticInsurer(insurerId,row){return /^b4[-_]/i.test(clean(insurerId,180))&&row&&row.__syntheticQa===true;}
+function previewSyntheticInsurer(insurerId,row){return /^(?:b4003qa_|b4[-_])/i.test(clean(insurerId,180))&&row&&row.__syntheticQa===true;}
 function previewSyntheticTarget(target){
   if(!target)return false;
   if(target.entityType==='aseguradora')return target.previewSyntheticQa===true;
