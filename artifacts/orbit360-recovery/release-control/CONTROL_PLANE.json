@@ -5126,7 +5126,8 @@
         "b4003HumanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
         "b4004HeldUntil": "B4_003_TARGETED_PAULA_VISUAL_PASS",
         "machinePassDoesNotAdvanceFinding": true
-      }
+      },
+      "b3FinancialVisualFeedbackCarryBlobSha": "ba6fae487eaa07b307d974f923bf38252465a0c2"
     }
   },
   "canonicalAccumulationControl": {
@@ -5696,7 +5697,8 @@
       "b4003HumanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
       "b4004HeldUntil": "B4_003_TARGETED_PAULA_VISUAL_PASS",
       "machinePassDoesNotAdvanceFinding": true
-    }
+    },
+    "b3FinancialVisualFeedbackCarryBlobSha": "ba6fae487eaa07b307d974f923bf38252465a0c2"
   },
   "b4VisualAcceptanceControl": {
     "status": "ENFORCED",
@@ -5712,5 +5714,11 @@
     "b4003HumanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
     "b4004HeldUntil": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "machinePassDoesNotAdvanceFinding": true
+  },
+  "b3FinancialVisualFeedbackCarry": {
+    "status": "PENDING_PAULA_FEEDBACK_AND_TARGETED_VISUAL",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_FINANCIAL_VISUAL_FEEDBACK_CARRY_20261003.json",
+    "blobSha": "ba6fae487eaa07b307d974f923bf38252465a0c2",
+    "carryInto": "B4_003_TARGETED_PAULA_VISUAL"
   }
 }
