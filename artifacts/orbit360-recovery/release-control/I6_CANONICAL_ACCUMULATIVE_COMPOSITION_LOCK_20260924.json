@@ -2068,7 +2068,7 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_003_R8_PACKET_1_REQUESTED_SOURCE_EXTRACTION_CONTINUES",
+    "status": "B4_003_SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "lockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -2076,7 +2076,7 @@
     "noLive": true,
     "noReimport": true,
     "activeFindingId": "B4-003",
-    "nextAction": "B4_003_R8_WAIT_PACKET_1_WHILE_CONTINUING_AVAILABLE_SOURCE_EXTRACTION",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
     "sourceSha": "9ad8efe1b68589e57a5f6c8eb449690a75b31e14",
     "buildId": "gi-i65-b4-9ad8efe1b685-57f234755dc1",
@@ -2089,7 +2089,8 @@
     "r4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
     "r4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
     "visualAcceptanceRequiredBeforeAdvance": true,
-    "visualAcceptanceNextAction": "B4_003_TARGETED_PAULA_VISUAL"
+    "visualAcceptanceNextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "productMutationAuthorized": true
   },
   "b4001SourceFix": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -2378,5 +2379,19 @@
     "blobSha": "fdfc74f663f7ff722f49cc8ddd60120a36eab4e8",
     "paulaSourceUploadStatus": "PACKET_1_REQUESTED",
     "paulaFinancialManualActionStatus": "DO_NOT_START_YET"
+  },
+  "b4003R9InsurerKnowledgePreview": {
+    "status": "SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
+    "authorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_PREVIEW_AUTHORIZATION_LOCK_20261003.json",
+    "authorizationLockBlobSha": "e26ce6ddd4032bf04bda1458513e2564f6e65f9e",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_SOURCE_FIX_20261003.json",
+    "sourceFixReceiptBlobSha": "988c42f1ab11e8f5957086e4acd22ff4a991d4ff",
+    "visibleTarget": "Aseguradoras > ficha > Tarifas y conocimiento",
+    "libraryManifest": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_ASEGURADORAS_MANIFIESTO_2026-10-03.md",
+    "multiProduct": true,
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }
