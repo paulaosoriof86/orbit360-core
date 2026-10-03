@@ -183,6 +183,35 @@ try{
  need(proof.hydrationDiagnostic.backendCancelPolicyExists===true,'B4_003_CANCEL_POLICY_BACKEND_SEED_MISSING');
  need(proof.hydrationDiagnostic.cancelStorePresent===true,'B4_003_CANCELATION_HYDRATION_DIAGNOSTIC_FAIL');
  proof.assertions.authenticatedHydration=true;
+ proof.visualScope=await page.evaluate(ids=>{
+   const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';
+   const countries=(selector,attr)=>Array.from(h.querySelectorAll(selector)).map(el=>String(el.getAttribute(attr)||'').toUpperCase()).filter(Boolean);
+   Orbit.pais='GT';Orbit.modules.cancelaciones.render(h);
+   const cancelGT=countries('[data-cancel-country]','data-cancel-country');
+   const syntheticCancelVisibleGT=cancelGT.includes('GT');
+   Orbit.modules.cancelaciones.detalleKpi('valor');
+   const cancelKpiDetailOpen=!!document.getElementById('cancelation-kpi-detail');
+   document.getElementById('cancelation-kpi-detail')?.remove();
+   Orbit.pais='CO';Orbit.modules.cancelaciones.render(h);
+   const cancelCO=countries('[data-cancel-country]','data-cancel-country');
+   Orbit.pais='GT';Orbit.modules.renovaciones.render(h);
+   const renewGT=countries('[data-renewal-country]','data-renewal-country');
+   const syntheticRenewVisibleGT=!!h.querySelector('[data-renewal-policy="'+ids.renewalPolicy+'"]');
+   const actionLayout=h.querySelector('[data-renewal-policy="'+ids.renewalPolicy+'"] [data-renewal-actions-layout]')?.getAttribute('data-renewal-actions-layout')||'';
+   Orbit.pais='CO';Orbit.modules.renovaciones.render(h);
+   const renewCO=countries('[data-renewal-country]','data-renewal-country');
+   Orbit.pais=previous;
+   return{cancelGT,cancelCO,renewGT,renewCO,syntheticCancelVisibleGT,syntheticRenewVisibleGT,cancelKpiDetailOpen,actionLayout};
+ },ids);
+ need(proof.visualScope.cancelGT.every(x=>x==='GT')&&proof.visualScope.cancelCO.every(x=>x==='CO'),'B4_003_CANCEL_SELECTED_COUNTRY_SCOPE_LEAK');
+ need(proof.visualScope.renewGT.every(x=>x==='GT')&&proof.visualScope.renewCO.every(x=>x==='CO'),'B4_003_RENEW_SELECTED_COUNTRY_SCOPE_LEAK');
+ need(proof.visualScope.syntheticCancelVisibleGT===true&&proof.visualScope.syntheticRenewVisibleGT===true,'B4_003_GT_SYNTHETIC_SCOPE_MISSING');
+ need(proof.visualScope.cancelKpiDetailOpen===true,'B4_003_CANCEL_KPI_DETAIL_MISSING');
+ need(proof.visualScope.actionLayout==='grid2','B4_003_RENEW_ACTION_LAYOUT_NOT_COMPACT');
+ proof.assertions.cancelSelectedCountryScope=true;
+ proof.assertions.renewalSelectedCountryScope=true;
+ proof.assertions.cancelKpiDetails=true;
+ proof.assertions.renewalCompactActions=true;
  if(proof.runtimeCancellationEvidence.cancelledPolicyCount>0){
    const probe=proof.runtimeCancellationEvidence.projectionProbe;
    need(probe&&clean(probe.numero),'B4_003_REAL_CANCELATION_PROJECTION_PROBE_MISSING');
@@ -266,4 +295,4 @@ try{
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
 }
 if(proof.status!=='PASS'||proof.syntheticFinalAbsent!==true)process.exitCode=1;
-console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors},null,2));
+console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors},null,2));
