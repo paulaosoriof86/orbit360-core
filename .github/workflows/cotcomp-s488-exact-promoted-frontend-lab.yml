@@ -119,6 +119,18 @@ jobs:
           grep -q 'display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 18px;border-radius:12px' "$E/page.html"
           grep -q 'Salud / gastos médicos' "$E/page.html"
           grep -q 'Otros / no sé cuál necesito' "$E/page.html"
+          grep -q 'Marca y modelo' "$E/page.html"
+          grep -q 'Toyota Hilux 2021' "$E/page.html"
+          grep -q 'Suma asegurada estimada' "$E/page.html"
+          grep -q 'Deducible preferido' "$E/page.html"
+          grep -q 'Validar propuestas →' "$E/page.html"
+          grep -q 'COMPARACIÓN EN CAPAS · SOLO PROPUESTAS VALIDADAS' "$E/page.html"
+          grep -q 'A&S SUGIERE' "$E/page.html"
+          grep -q 'POR QUÉ SUGERIMOS B' "$E/page.html"
+          grep -q 'Propuesta C · requiere revisión' "$E/page.html"
+          grep -q 'FUERA DE LA COMPARACIÓN' "$E/page.html"
+          grep -q 'DÉJANOS CÓMO CONTACTARTE' "$E/page.html"
+          grep -q 'WhatsApp o correo' "$E/page.html"
 
           ! grep -q 'class="route"' "$E/page.html"
           ! grep -q 'route-grid' "$E/page.html"
@@ -138,6 +150,10 @@ jobs:
             recoveredFourPhaseRail:true,
             recoveredEightStageAutoFlow:true,
             recoveredInlineProductControls:true,
+            recoveredPreBackendDataSurface:true,
+            recoveredValidationGate:true,
+            recoveredComparisonRecommendationSurface:true,
+            recoveredHybridContactSurface:true,
             productCompletenessExtendedInExistingControl:true,
             fixtureOnly:true,
             providerDeploymentAuthorized:false,
