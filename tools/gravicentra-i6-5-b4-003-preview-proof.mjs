@@ -131,7 +131,37 @@ try{
  await page.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
  await bootProduct(page,token);
  await page.waitForFunction(id=>!!window.Orbit?.store?.get('polizas',id),ids.renewalPolicy,{timeout:30000});
- await page.waitForFunction(id=>!!window.Orbit?.store?.get('cancelaciones',id),ids.cancelation,{timeout:30000});
+ const backendCancelation=(await ref('cancelaciones',ids.cancelation).get());
+ const backendCancelPolicy=(await ref('polizas',ids.cancelPolicy).get());
+ await page.waitForTimeout(1200);
+ proof.hydrationDiagnostic=await page.evaluate(ids=>{
+   const member=Orbit.auth&&Orbit.auth.productUser||{};
+   const status=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
+   let cancelPlan=null,policyPlan=null;
+   try{cancelPlan=Orbit.tenantAccessPolicyProductP0?.queryConstraints?.('cancelaciones',member,{tenantId:member.tenantId})||null;}catch(e){cancelPlan={error:String(e&&e.message||e)};}
+   try{policyPlan=Orbit.tenantAccessPolicyProductP0?.queryConstraints?.('polizas',member,{tenantId:member.tenantId})||null;}catch(e){policyPlan={error:String(e&&e.message||e)};}
+   return{
+     activeRole:String(member.activeRole||''),
+     sessionRole:String(Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():''),
+     assignedRoles:Array.isArray(member.roles)?member.roles.slice():[],
+     advisorBound:!!member.advisorId,
+     cancelPlan,
+     policyPlan,
+     cancelStorePresent:!!Orbit.store?.get('cancelaciones',ids.cancelation),
+     policyStorePresent:!!Orbit.store?.get('polizas',ids.renewalPolicy),
+     cancelServerConfirmed:(status.serverConfirmedCollections||[]).includes('cancelaciones'),
+     cancelDenied:(status.deniedCollections||[]).includes('cancelaciones'),
+     cancelSnapshotError:status.snapshotErrors&&status.snapshotErrors.cancelaciones||'',
+     cancelAttached:(status.attachedCollections||[]).includes('cancelaciones'),
+     optionalMissing:(status.optionalMissing||[]).slice()
+   };
+ },ids);
+ proof.hydrationDiagnostic.backendCancelationExists=backendCancelation.exists;
+ proof.hydrationDiagnostic.backendCancelPolicyExists=backendCancelPolicy.exists;
+ console.log('B4_003_CANCELATION_STORE_HYDRATION_CAUSAL_DIAGNOSTIC='+JSON.stringify(proof.hydrationDiagnostic));
+ need(proof.hydrationDiagnostic.backendCancelationExists===true,'B4_003_CANCELATION_BACKEND_SEED_MISSING');
+ need(proof.hydrationDiagnostic.backendCancelPolicyExists===true,'B4_003_CANCEL_POLICY_BACKEND_SEED_MISSING');
+ need(proof.hydrationDiagnostic.cancelStorePresent===true,'B4_003_CANCELATION_HYDRATION_DIAGNOSTIC_FAIL');
  proof.assertions.authenticatedHydration=true;
 
  await page.evaluate(()=>{const h=document.getElementById('host');Orbit.modules.renovaciones.render(h);});
