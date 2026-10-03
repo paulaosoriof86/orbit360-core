@@ -1,0 +1,265 @@
+name: CotComp S4.79 LAB vehicle catalog delivery
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s479-catalog-delivery-lab-20261003
+    paths:
+      - '.github/cotcomp-lab-intents/s479-catalog-delivery-lab-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_REGION: us-central1
+  COTCOMP_FUNCTION: cotcompVehicleCatalogS479
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompVehicleCatalogS479
+
+jobs:
+  s479-deliver-catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.79 deployment intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s479-catalog-delivery-lab-authorized.json
+          jq -e '
+            .authorization=="S479_DEPLOY_LAB_CATALOG_DELIVERY" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .functionName=="cotcompVehicleCatalogS479" and
+            .catalogDigestSha256=="89a77e66025945d015cc51704441a97437286022cafeef4995962fd750358df8" and
+            .expectedEntries==2216 and
+            .expectedBrands==119 and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .providerOrRater==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.79 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-vehicle-catalog-delivery-s479.js
+          node --check cotcomp-vehicle-catalog-delivery-s479.test.js
+          node --test cotcomp-vehicle-catalog-delivery-s479.test.js
+
+      - name: Install deterministic build dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+          npm install --global firebase-tools@15.32.0
+
+      - name: Rebuild pinned SAT source and generate deploy-only public catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s479/evidence"
+          mkdir -p functions/data
+          URL='https://portal.sat.gob.gt/portal/descarga/1895/legislacion-aduanera/91646/tabla-de-valores-iva-iprima-2026'
+          PDF="$RUNNER_TEMP/s479/source.pdf"
+          TXT="$RUNNER_TEMP/s479/source.txt"
+          CAT="$GITHUB_WORKSPACE/functions/data/cotcomp-vehicle-public-catalog-s479.json"
+          RECEIPT="$RUNNER_TEMP/s479/evidence/S479_CATALOG_BUILD_RECEIPT.json"
+
+          curl -fL --retry 3 --retry-delay 2 --connect-timeout 20 --max-time 120 -sS -o "$PDF" "$URL"
+          test "$(sha256sum "$PDF" | awk '{print $1}')" = "ea15f79900e013bc3c397c23a154802fc2f62f8de3bf056b53003e03b85ec373"
+          pdftotext -layout -enc UTF-8 "$PDF" "$TXT"
+
+          cd functions
+          node - "$TXT" "$CAT" "$RECEIPT" <<'NODE'
+          const fs=require('fs');
+          const s476=require('./cotcomp-sat2026-normalized-catalog-s476');
+          const s478=require('./cotcomp-first-release-vehicle-scope-s478');
+          const s479=require('./cotcomp-vehicle-catalog-delivery-s479');
+          const [txtPath,catPath,receiptPath]=process.argv.slice(2);
+          const parsed=s476.parseText(fs.readFileSync(txtPath,'utf8'));
+          const full=s476.buildCatalog(parsed.rows);
+          const valid=s476.validatePhysicalCatalog(full);
+          if(!valid.ok)throw new Error('S479_BASE_CATALOG_INVALID:'+valid.errors.join(','));
+          if(full.catalogDigestSha256!==s479.EXPECTED_CATALOG_DIGEST)throw new Error('S479_BASE_DIGEST_MISMATCH');
+          const allowed=new Set(s478.allAllowedTypes());
+          const entries=full.entries
+            .filter(e=>allowed.has(e.type))
+            .map(e=>({
+              typeId:e.typeId,type:e.type,
+              brandId:e.brandId,brand:e.brand,
+              modelId:e.modelId,line:e.line
+            }));
+          const body={
+            schemaVersion:'ays-cotcomp-vehicle-public-catalog-v1.0',
+            catalogVersion:full.catalogVersion,
+            catalogDigestSha256:full.catalogDigestSha256,
+            sourceRawSha256:s476.SOURCE_RAW_SHA256,
+            allowedSatTypes:s478.allAllowedTypes(),
+            entries,
+            publicSubsetDigestSha256:''
+          };
+          body.publicSubsetDigestSha256=s479.computePublicSubsetDigest(body);
+          const vv=s479.validateCatalog(body);
+          if(!vv.ok)throw new Error('S479_PUBLIC_CATALOG_INVALID:'+vv.errors.join(','));
+          fs.writeFileSync(catPath,JSON.stringify(body));
+          const brands=new Set(entries.map(e=>e.brandId));
+          const counts=Object.fromEntries(body.allowedSatTypes.map(t=>[t,entries.filter(e=>e.type===t).length]));
+          const receipt={
+            schemaVersion:'ays-cotcomp-s479-catalog-build-receipt-v1.0',
+            sourceRawSha256:s476.SOURCE_RAW_SHA256,
+            sourceCatalogVersion:full.catalogVersion,
+            sourceCatalogDigestSha256:full.catalogDigestSha256,
+            publicSubsetDigestSha256:body.publicSubsetDigestSha256,
+            entryCount:entries.length,
+            brandCount:brands.size,
+            typeCounts:counts,
+            allowedSatTypes:body.allowedSatTypes,
+            taxValuesIncluded:false,
+            appDataReads:0,
+            appDataWrites:0,
+            providerOrRaterCalls:0,
+            productionTouched:false
+          };
+          fs.writeFileSync(receiptPath,JSON.stringify(receipt,null,2));
+          NODE
+
+          test "$(jq -r '.entryCount' "$RECEIPT")" = "2216"
+          test "$(jq -r '.brandCount' "$RECEIPT")" = "119"
+          test "$(jq -r '.typeCounts.AUTOMOVIL' "$RECEIPT")" = "824"
+          test "$(jq -r '.typeCounts.CAMIONETA' "$RECEIPT")" = "612"
+          test "$(jq -r '.typeCounts["PICK UP"]' "$RECEIPT")" = "379"
+          test "$(jq -r '.typeCounts.MOTO' "$RECEIPT")" = "401"
+
+      - name: Prepare exact LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s479/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Deploy only S4.79 catalog function to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physically verify read-only catalog delivery
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s479/evidence"
+          curl -fsS "$COTCOMP_URL?op=meta" -o "$E/meta.json"
+          jq -e '
+            .ok==true and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .catalogDigestSha256=="89a77e66025945d015cc51704441a97437286022cafeef4995962fd750358df8" and
+            .entryCount==2216 and .brandCount==119 and
+            .providerEligibilityEmbedded==false and
+            .appDataSource==false and .labOnly==true
+          ' "$E/meta.json" >/dev/null
+
+          curl -fsS "$COTCOMP_URL?op=brands&vehicleClass=AUTO_LIGHT&q=TOYOTA&limit=20" -o "$E/brands.json"
+          BRAND_ID="$(jq -r '.items[] | select(.label=="TOYOTA") | .brandId' "$E/brands.json" | head -n1)"
+          test -n "$BRAND_ID"
+
+          curl -fsS --get "$COTCOMP_URL"             --data-urlencode "op=models"             --data-urlencode "vehicleClass=AUTO_LIGHT"             --data-urlencode "brandId=$BRAND_ID"             --data-urlencode "q=COROLLA"             --data-urlencode "limit=100"             -o "$E/models.json"
+          MODEL_ID="$(jq -r '.items[] | select(.label=="COROLLA") | .modelId' "$E/models.json" | head -n1)"
+          test -n "$MODEL_ID"
+
+          curl -fsS "$COTCOMP_URL?op=years" -o "$E/years.json"
+          jq -e '.ok==true and (.items|index(2006)!=null) and .policy=="DECLARED_YEAR_NOT_HARD_MODEL_YEAR_EXISTENCE"' "$E/years.json" >/dev/null
+
+          curl -fsS --get "$COTCOMP_URL"             --data-urlencode "op=resolve"             --data-urlencode "vehicleClass=AUTO_LIGHT"             --data-urlencode "brandId=$BRAND_ID"             --data-urlencode "modelId=$MODEL_ID"             --data-urlencode "vehicleYear=2006"             -o "$E/resolve.json"
+          jq -e '
+            .ok==true and
+            .vehicleIdentity.brandLabel=="TOYOTA" and
+            .vehicleIdentity.modelLabel=="COROLLA" and
+            .vehicleIdentity.year==2006 and
+            .providerEligibilityEmbedded==false
+          ' "$E/resolve.json" >/dev/null
+
+          POST_CODE="$(curl -sS -o "$E/post.json" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+
+          ORIGIN_CODE="$(curl -sS -o "$E/origin.json" -w '%{http_code}' -H 'Origin: https://example.com' "$COTCOMP_URL?op=meta")"
+          test "$ORIGIN_CODE" = "403"
+
+          LAB_ORIGIN_CODE="$(curl -sS -o "$E/lab-origin.json" -w '%{http_code}' -H 'Origin: https://ays-orbit-360-lab.web.app' "$COTCOMP_URL?op=meta")"
+          test "$LAB_ORIGIN_CODE" = "200"
+
+          jq -n             --arg url "$COTCOMP_URL"             --arg subset "$(jq -r '.publicSubsetDigestSha256' "$E/meta.json")"             '{
+              schemaVersion:"ays-cotcomp-s479-physical-delivery-receipt-v1.0",
+              functionUrl:$url,
+              deployed:true,
+              metaPass:true,
+              brandSearchPass:true,
+              dependentModelSearchPass:true,
+              year2006Pass:true,
+              resolveCorolla2006Pass:true,
+              postRejected:true,
+              unknownOriginRejected:true,
+              labOriginAccepted:true,
+              publicSubsetDigestSha256:$subset,
+              appDataReads:0,
+              appDataWrites:0,
+              providerOrRaterCalls:0,
+              productionTouched:false,
+              globalAppCheckConfigurationChanged:false
+            }' > "$E/S479_PHYSICAL_DELIVERY_RECEIPT.json"
+
+      - name: Upload sanitized S4.79 deployment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s479-catalog-delivery-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s479/evidence/S479_CATALOG_BUILD_RECEIPT.json
+            ${{ runner.temp }}/s479/evidence/S479_PHYSICAL_DELIVERY_RECEIPT.json
+            ${{ runner.temp }}/s479/evidence/meta.json
+            ${{ runner.temp }}/s479/evidence/brands.json
+            ${{ runner.temp }}/s479/evidence/models.json
+            ${{ runner.temp }}/s479/evidence/years.json
+            ${{ runner.temp }}/s479/evidence/resolve.json
+            ${{ github.workspace }}/functions/data/cotcomp-vehicle-public-catalog-s479.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient deployment credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s479/firebase-service-account.json"
