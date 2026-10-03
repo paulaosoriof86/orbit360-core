@@ -107,7 +107,8 @@
     "orbit360-platform/modules/cotizador-v1203-source-gate.js",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
     "tools/gravicentra-quote-authority-contract-v1.mjs",
-    ".github/workflows/gravicentra-b4-003-executor.yml"
+    ".github/workflows/gravicentra-b4-003-executor.yml",
+    "orbit360-platform/index.html"
   ],
   "boundaries": {
     "operationalBusinessWritesAuthorized": false,
@@ -127,5 +128,12 @@
     "Explicit SelectionHandoff idempotency/correlation proven.",
     "Isolated LAB transport proof before any production connection."
   ],
-  "nextAction": "R10_APPLY_INCREMENTAL_SOURCE_GUARDS_AND_FREEZE_CONTRACT"
+  "nextAction": "R10_WIRE_CONTRACT_RUNTIME_REACHABILITY_AND_RETRY_EXACT_PREVIEW",
+  "runtimeReachabilityAdjustment": {
+    "status": "AUTHORIZED_MINIMAL",
+    "reason": "Exact Preview proved the contract file was source-valid but not reachable by the canonical product dependency closure. Add one canonical index script reference so the frozen contract is hosted and available without enabling provider transport.",
+    "file": "orbit360-platform/index.html",
+    "providerDeploymentAuthorized": false,
+    "cotcompRealTransportAuthorized": false
+  }
 }
