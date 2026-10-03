@@ -11,12 +11,50 @@ Orbit.modules.cancelaciones = (function () {
   const ACTIVAS = ['Pendiente de contacto', 'Llamada de retención agendada', 'Oferta de mejora enviada', 'En negociación'];
   const FINALES = ['Recuperada', 'No recuperable'];
 
+  function allSafe(col) { try { return S().all(col) || []; } catch (e) { return []; } }
+  function normState(value) {
+    return String(value == null ? '' : value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  }
+  function isCancelledPolicy(p) {
+    return ['cancelada', 'cancelado', 'anulada', 'anulado'].includes(normState(p && (p.estado || p.status)));
+  }
+  function projectionId(policyId) {
+    return 'can_pol_' + String(policyId || '').replace(/[^A-Za-z0-9._:-]/g, '_');
+  }
+  function policyCancellation(p) {
+    const premium = p && p.prima != null ? p.prima : (p && p.primaTotal != null ? p.primaTotal : (p && p.primaNeta != null ? p.primaNeta : 0));
+    return {
+      id: projectionId(p && p.id),
+      tenantId: p && p.tenantId,
+      polizaId: p && p.id,
+      clienteId: p && p.clienteId,
+      asesorId: p && (p.asesorId || p.advisorId || p.ownerAdvisorId),
+      pais: p && (p.pais || p.country),
+      moneda: p && p.moneda,
+      fecha: p && (p.fechaCancelacion || p.cancellationDate || ''),
+      motivo: p && (p.motivoCancelacion || p.cancellationReason || '') || 'Sin motivo registrado',
+      valorPerdido: premium,
+      recuperacion: 'Pendiente de contacto',
+      recuperada: false,
+      __policyCancellationProjection: true
+    };
+  }
+  function effectiveCancelations() {
+    const explicit = allSafe('cancelaciones');
+    const explicitPolicies = new Set(explicit.map(c => String(c && c.polizaId || '')).filter(Boolean));
+    const projected = allSafe('polizas').filter(isCancelledPolicy).filter(p => p && p.id && !explicitPolicies.has(String(p.id))).map(policyCancellation);
+    return explicit.concat(projected);
+  }
+  function cancellationById(id) {
+    const explicit = S().get('cancelaciones', id);
+    if (explicit) return explicit;
+    return effectiveCancelations().find(c => c.id === id) || null;
+  }
+
   const FDEFS = () => [
-    { id: 'fmot', type: 'select', ph: 'Motivo', options: [...new Set(S().all('cancelaciones').map(c => c.motivo))].map(v => ({ v, t: v })) },
+    { id: 'fmot', type: 'select', ph: 'Motivo', options: [...new Set(effectiveCancelations().map(c => c.motivo).filter(Boolean))].map(v => ({ v, t: v })) },
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
   ];
-
-  function allSafe(col) { try { return S().all(col) || []; } catch (e) { return []; } }
   function findNegocio(c) {
     return allSafe('negocios').find(n => n.cancelacionId === c.id || (n.origen === 'Recuperación' && n.clienteId === c.clienteId && n.polizaId === c.polizaId && !n.archivado));
   }
@@ -25,7 +63,7 @@ Orbit.modules.cancelaciones = (function () {
   }
 
   function render(host) {
-    const all = S().all('cancelaciones');
+    const all = effectiveCancelations();
     const porMotivo = {};
     all.forEach(c => { porMotivo[c.motivo] = (porMotivo[c.motivo] || 0) + 1; });
     const motTot = all.length || 1;
@@ -78,7 +116,7 @@ Orbit.modules.cancelaciones = (function () {
   }
 
   function detalle(canId) {
-    const c = S().get('cancelaciones', canId); if (!c) return;
+    const c = cancellationById(canId); if (!c) return;
     const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
     const asg = p ? q.aseguradora(p.aseguradoraId) : null, ase = q.asesor((p && p.asesorId) || (cli && cli.asesorId));
     const cur = (cli && cli.moneda) || 'GTQ';
@@ -118,7 +156,7 @@ Orbit.modules.cancelaciones = (function () {
         </div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
-        <button class="btn ghost" id="cx-delete" style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>
+        ${c.__policyCancellationProjection ? '' : '<button class="btn ghost" id="cx-delete" style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>'}
         ${p ? `<button class="btn ghost" onclick="Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
         <button class="btn primary" id="cx-save">Guardar</button>
       </div>
@@ -159,7 +197,14 @@ Orbit.modules.cancelaciones = (function () {
       const patch = { recuperacion: rec, recuperada: rec === 'Recuperada', notaRecuperacion: nota || motivo };
       const original = save.textContent; save.disabled = true; save.textContent = 'Guardando…';
       try {
-        await S().updateDurable('cancelaciones', canId, patch);
+        if (c.__policyCancellationProjection === true) {
+          const materialized = Object.assign({}, c, patch);
+          delete materialized.__policyCancellationProjection;
+          await S().insertDurable('cancelaciones', materialized);
+          c.__policyCancellationProjection = false;
+        } else {
+          await S().updateDurable('cancelaciones', canId, patch);
+        }
         if (c.clienteId) {
           const activityId = 'act_rec_' + String(canId).replace(/[^A-Za-z0-9._:-]/g, '_');
           const activity = { id: activityId, clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'recuperacion', icon: rec === 'Recuperada' ? '✅' : '♻', fecha, titulo: 'Recuperación: ' + rec, detalle: (p ? p.numero + ' · ' : '') + (nota || motivo || rec), __syntheticQa: c.__syntheticQa === true };
