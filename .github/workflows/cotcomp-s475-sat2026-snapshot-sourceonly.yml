@@ -1,0 +1,148 @@
+name: CotComp S4.75 SAT 2026 source snapshot
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s475-sat2026-snapshot-sourceonly-20261002
+    paths:
+      - '.github/cotcomp-lab-intents/s475-sat2026-snapshot-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s475-snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.75 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s475-sat2026-snapshot-sourceonly.json
+          jq -e '
+            .authorization=="S475_SAT2026_SNAPSHOT_SOURCEONLY" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .deployment==false and
+            .providerOrRater==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.75 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-sat2026-snapshot-s475.js
+          node --check cotcomp-sat2026-snapshot-s475.test.js
+          node --test cotcomp-sat2026-snapshot-s475.test.js
+
+      - name: Install deterministic PDF text dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Fetch exact official SAT 2026 source and materialize snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s475"
+          URL='https://portal.sat.gob.gt/portal/descarga/1895/legislacion-aduanera/91646/tabla-de-valores-iva-iprima-2026'
+          PDF="$RUNNER_TEMP/s475/SAT_GT_2026_IPRIMA_91646.pdf"
+          TXT="$RUNNER_TEMP/s475/SAT_GT_2026_IPRIMA_91646.txt"
+          RECEIPT="$RUNNER_TEMP/s475/S475_SAT2026_SNAPSHOT_RECEIPT.json"
+
+          HTTP="$(curl -fL --retry 3 --retry-delay 2 --connect-timeout 20 --max-time 120 -sS -o "$PDF" -w '%{http_code}' "$URL")"
+          test "$HTTP" = "200"
+          test "$(head -c 4 "$PDF")" = "%PDF"
+
+          pdftotext -layout -enc UTF-8 "$PDF" "$TXT"
+          test -s "$TXT"
+
+          RAW_SHA="$(sha256sum "$PDF" | awk '{print $1}')"
+          TEXT_SHA="$(sha256sum "$TXT" | awk '{print $1}')"
+          RAW_BYTES="$(stat -c '%s' "$PDF")"
+          PAGES="$(pdfinfo "$PDF" | awk -F: '/^Pages:/ {gsub(/ /,"",$2); print $2}')"
+          test "$RAW_BYTES" -gt 100000
+          test "$PAGES" -gt 1
+
+          python3 - "$TXT" "$RECEIPT" "$HTTP" "$RAW_SHA" "$TEXT_SHA" "$RAW_BYTES" "$PAGES" <<'PY'
+          import json,re,sys,unicodedata
+          txt_path,out_path,http,raw_sha,text_sha,raw_bytes,pages=sys.argv[1:]
+          text=open(txt_path,'r',encoding='utf-8',errors='replace').read()
+          def norm(s):
+              s=unicodedata.normalize('NFD',s)
+              s=''.join(ch for ch in s if unicodedata.category(ch)!='Mn')
+              return re.sub(r'\s+',' ',s).upper().strip()
+          n=norm(text)
+          title='TABLA DE VALORES IMPONIBLES DEL IMPUESTO AL VALOR AGREGADO E IMPUESTO ESPECIFICO A LA PRIMERA MATRICULA PARA IMPORTACION DE VEHICULOS AUTOMOTORES TERRESTRES USADOS PARA EL ANO 2026'
+          title_pass=title in n
+          header_pass=('TIPO MARCA LINEA' in n and 'COMBUSTIBLE' in n and 'ASIENTOS' in n)
+          sample_pass=bool(re.search(r'AUTOMOVIL\s+TOYOTA\s+COROLLA(?:\s|$)',n))
+          receipt={
+            'schemaVersion':'ays-cotcomp-s475-sat2026-snapshot-receipt-v1.0',
+            'sourceId':'SAT_GT_2026_IPRIMA_TABLE_91646',
+            'sourceUrl':'https://portal.sat.gob.gt/portal/descarga/1895/legislacion-aduanera/91646/tabla-de-valores-iva-iprima-2026',
+            'authority':'SAT_GUATEMALA','jurisdiction':'GT','year':2026,
+            'httpStatus':int(http),'pdfMagicPass':True,
+            'titlePass':title_pass,'headerPass':header_pass,
+            'sampleToyotaCorollaPass':sample_pass,
+            'rawBytes':int(raw_bytes),'pageCount':int(pages),
+            'rawSha256':raw_sha,'textSha256':text_sha,
+            'snapshotMaterialized':True,
+            'normalizedCatalogBuilt':False,
+            'publicDropdownReleased':False,
+            'appDataReads':0,'appDataWrites':0,
+            'providerOrRaterCalls':0,'productionTouched':False
+          }
+          open(out_path,'w',encoding='utf-8').write(json.dumps(receipt,indent=2,ensure_ascii=False))
+          if not (title_pass and header_pass and sample_pass):
+              raise SystemExit('SAT_SOURCE_CONTENT_VERIFICATION_FAILED')
+          PY
+
+      - name: Validate physical S4.75 receipt
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          RECEIPT="$RUNNER_TEMP/s475/S475_SAT2026_SNAPSHOT_RECEIPT.json"
+          node - "$RECEIPT" <<'NODE'
+          const fs=require('fs');
+          const s=require('./cotcomp-sat2026-snapshot-s475');
+          const r=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          const v=s.validateReceipt(r);
+          if(!v.ok)throw new Error('S475_RECEIPT_INVALID:'+v.errors.join(','));
+          NODE
+
+      - name: Upload official public-source snapshot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s475-sat2026-snapshot-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s475/SAT_GT_2026_IPRIMA_91646.pdf
+            ${{ runner.temp }}/s475/SAT_GT_2026_IPRIMA_91646.txt
+            ${{ runner.temp }}/s475/S475_SAT2026_SNAPSHOT_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
