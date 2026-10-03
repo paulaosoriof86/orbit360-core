@@ -1,0 +1,42 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-03",
+  "status": "FUNCTIONAL_DEFECT_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
+  "findingId": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+  "failedRunId": 37162367038,
+  "failedJobId": 111318262858,
+  "candidateSourceSha": "4d7360cff2a4dab9b3abc5174a445dbd25a49feb",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37162367038-dmuy3clv.web.app",
+  "failureCode": "B4_003_R13_POLICY_ROUTE_EVENT_LOOP_STALL",
+  "runtimeEvidence": {
+    "hostingReadback": "PASS",
+    "contractAndSyntax": "PASS",
+    "liveUnchanged": "PASS",
+    "failureLocation": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs:498",
+    "failure": "page.waitForFunction waiting for Orbit.route.key==='polizas' timed out after 10000 ms",
+    "interpretation": "router assigns Orbit.route before invoking the synchronous module render; Playwright could not execute the waiter while the route render occupied the page event loop, reproducing the human >10 s stall family."
+  },
+  "sourceEvidence": {
+    "polizasBlobSha": "68eeb3f15bf608f37090d74853704f0ced804565",
+    "accessScopeBlobSha": "5fd5aabdbe0e7b613ae55161be01aa17b5174769",
+    "crmkitObservation": [
+      "Initial Pólizas render calls q.polizasScoped, then buildIndexes, then FDEFS twice.",
+      "That path performs repeated scoped all() reads/clones of polizas/clientes/vehiculos/aseguradoras/asesores before first paint.",
+      "The first 100 visible rows additionally resolve client, insurer and advisor through per-row store.get/access checks."
+    ]
+  },
+  "rootCause": "POLICY_FIRST_PAINT_REPEATED_SCOPED_COLLECTION_CLONES_AND_PER_ROW_RELATION_LOOKUPS",
+  "allowedProductFiles": [
+    "orbit360-platform/modules/polizas.js",
+    "orbit360-platform/index.html"
+  ],
+  "requiredFix": "Read each required scoped collection once per index revision, derive country-filtered policies/options/relation cells from the same in-memory indexes, preserve exact table/UI semantics and debounce, and keep permission scoping on all direct rerenders.",
+  "boundaries": {
+    "businessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "visualRedesign": false
+  },
+  "nextAction": "B4_003_R13_POLICY_RENDER_SINGLE_READ_INDEX_SOURCE_FIX"
+}
