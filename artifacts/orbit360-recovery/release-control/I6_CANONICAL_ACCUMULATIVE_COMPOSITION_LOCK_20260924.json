@@ -2151,7 +2151,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "278736c32b336b76077d9b6e30773965c74af873",
+  "findingLedgerBlobSha": "8c44c64b42e13096fe68bc4fb7f7d19d512bec68",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2491,5 +2491,13 @@
     "continuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
     "productSourceChanged": false,
     "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY"
+  },
+  "b4003R12Diagnostic": {
+    "status": "CAUSES_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
+    "receiptBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
+    "continuityRegisterBlobSha": "03e9fadd53ffaf9d86262c5d3edf27e0635747a0",
+    "productSourceChanged": false,
+    "nextAction": "B4_003_SOURCE_FIX"
   }
 }

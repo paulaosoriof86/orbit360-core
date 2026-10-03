@@ -2803,7 +2803,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "R12_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2826,7 +2826,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_SOURCE_FIX",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2859,7 +2859,14 @@
         "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
         "orbit360-platform/modules/cliente360.js",
         "orbit360-platform/modules/calidad.js",
-        "orbit360-platform/styles/infra.css"
+        "orbit360-platform/styles/infra.css",
+        "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/core/importa.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+        "tools/gravicentra-i6-5-b4-003-contract.mjs",
+        ".github/workflows/gravicentra-b4-003-executor.yml"
       ],
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_20261003.json",
       "sourceFixReceiptBlobSha": "f05e04e6184a3e8ffa49eead631d94cbb68bb1c4",
@@ -2935,7 +2942,9 @@
         "B4-003-R11A-QA-01-VISIBLE-ROW-DISCRIMINANT"
       ],
       "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
-      "qaHarnessR11aReceiptBlobSha": "7399b828c3feea6ac52b8625acf9c709c118d419"
+      "qaHarnessR11aReceiptBlobSha": "7399b828c3feea6ac52b8625acf9c709c118d419",
+      "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
+      "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c"
     },
     {
       "id": "B4-004",
@@ -6501,11 +6510,14 @@
         "orbit360-platform/core/policy-receipts-engine.js",
         "orbit360-platform/modules/calidad.js"
       ],
-      "status": "OPEN_BLOCKING_FROZEN_INFORMATION_HEALTH",
+      "status": "CAUSE_DEMONSTRATED_INFORMATION_HEALTH_PROJECTION_REQUIRED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Identify authoritative source/lineage and reconcile or explicitly quarantine mismatch; no inferred rewrite; sum of active schedule must reconcile to contractual total within approved tolerance.",
-      "preLiveRequired": true
+      "preLiveRequired": true,
+      "nextAction": "B4_003_SOURCE_FIX",
+      "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
+      "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c"
     },
     {
       "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
@@ -6519,11 +6531,14 @@
         "orbit360-platform/core/importa.js",
         "orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js"
       ],
-      "status": "OPEN_REQUIRES_RUNTIME_AND_UX_PROOF",
+      "status": "CAUSE_DEMONSTRATED_INSURER_SCOPE_AND_DURABLE_SOURCE_BINDING_REQUIRED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Preview demonstrates each supported document class upload/import path, durable source/provenance, normalized insurer+country+ramo+product+plan+version scope, and fail-closed enablement.",
-      "preLiveRequired": true
+      "preLiveRequired": true,
+      "nextAction": "B4_003_SOURCE_FIX",
+      "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
+      "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c"
     },
     {
       "id": "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
@@ -6536,11 +6551,14 @@
         "orbit360-platform/modules/aseguradoras.js",
         "orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js"
       ],
-      "status": "OPEN_REQUIRES_CAUSAL_RECONCILIATION",
+      "status": "CAUSE_DEMONSTRATED_SHADOW_KPI_OWNER",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Counters and visible source list derive from one explained canonical scope and agree, or labels are changed to reflect their actual distinct semantics.",
-      "preLiveRequired": true
+      "preLiveRequired": true,
+      "nextAction": "B4_003_SOURCE_FIX",
+      "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
+      "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c"
     },
     {
       "id": "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE",
@@ -6974,7 +6992,7 @@
     }
   },
   "currentB4": {
-    "status": "B4_003_SOURCE_FIXED_R11_QA_HARNESS_REPAIRED_R11A_PENDING_EXACT_PREVIEW",
+    "status": "B4_003_R12_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "activeFindingId": "B4-003",
     "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
@@ -6983,7 +7001,7 @@
     "targetPercent": 100,
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY",
+    "nextAction": "B4_003_SOURCE_FIX",
     "cumulativeFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
     "cumulativeFreezeBlobSha": "37f015ea5262df68ac0838b57b1de61c1b0b25a7",
     "informationHealthAndInsurerKnowledgeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
@@ -7009,7 +7027,9 @@
     "humanVisualStatus": "REJECTED_R11_PENDING_RETEST",
     "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
     "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
-    "qaHarnessR11aReceiptBlobSha": "7399b828c3feea6ac52b8625acf9c709c118d419"
+    "qaHarnessR11aReceiptBlobSha": "7399b828c3feea6ac52b8625acf9c709c118d419",
+    "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
+    "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c"
   },
   "b4003QaResidueCarry": {
     "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
@@ -7034,7 +7054,7 @@
     "note": "Names and parent IDs identify prior B2 QA lineage, but no deletion is authorized by this receipt. Exact provenance/dependent-row readback is required before any cleanup."
   },
   "b4VisualAcceptanceControl": {
-    "status": "R11A_EXACT_PREVIEW_PENDING",
+    "status": "R12_SOURCE_FIX_ACTIVE",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
     "receiptBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
     "cumulativeReviewThrough": [

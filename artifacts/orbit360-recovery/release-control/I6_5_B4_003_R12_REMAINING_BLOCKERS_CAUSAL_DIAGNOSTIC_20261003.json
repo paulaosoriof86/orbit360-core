@@ -1,0 +1,86 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-03",
+  "status": "CAUSES_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
+  "findingId": "B4-003",
+  "parentHead": "030838c202b7972da3788988bf784b037c2b9ca5",
+  "authority": "PAULA_CONTINUE_WITH_NO_FINDING_LOSS",
+  "blockers": [
+    {
+      "findingId": "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
+      "classification": "SHADOWED_LEGACY_VISUAL_OWNER",
+      "evidence": {
+        "file": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+        "blob": "8ae9f59acb79547cd3772582fcb316a981aa66ec",
+        "behavior": "enhanceKnowledge() computes Fuentes/Propuestas/Pendientes/Referencias only from insurer.docs.",
+        "canonicalOwner": "orbit360-platform/modules/aseguradoras.js",
+        "canonicalBehavior": "knowledgeSources(row) merges mapped tenant summary, persisted knowledge and insurer.docs.",
+        "observedMachineReadback": "AseGuate and Columna source-backed knowledge is visible while the legacy KPI strip reports zero."
+      },
+      "rootCause": "The KPI strip is a second visual owner with a narrower data source than the canonical knowledge owner.",
+      "requiredFix": "Delegate KPI semantics to the canonical knowledgeSources/evaluarFuente contract or remove the duplicate strip. Do not reimport data."
+    },
+    {
+      "findingId": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
+      "classification": "INSURER_SCOPE_AND_DURABLE_SOURCE_BINDING_GAP",
+      "evidence": {
+        "importerFile": "orbit360-platform/core/importa.js",
+        "importerBlob": "99ca3de8d60d3a26c97067c056fdc383d8fdd15f",
+        "moduleFile": "orbit360-platform/modules/aseguradoras.js",
+        "moduleBlob": "7bd0b6bcc93e3ebaac16200279061f87fef28946",
+        "facts": [
+          "docs-aseguradora defaults to documental mode.",
+          "docs-aseguradora SCOPE creates no structured collection.",
+          "Aseguradoras opens docs-aseguradora without aseguradoraId scope.",
+          "Drive readback path only durably links client documents; insurer documents are not durably bound back to insurer.docs.",
+          "UI copy says intelligent mode feeds Cotizador/Comparativo/IA although there is no durable product write path proving that claim."
+        ]
+      },
+      "rootCause": "The raw-document uploader and the canonical insurer knowledge model are not connected by an insurer-scoped durable source registration contract.",
+      "requiredFix": "Pass exact insurer scope from Aseguradoras, require source classification, persist Drive-confirmed metadata into the insurer's canonical docs after readback, mark it requires validation, and keep Cotizador/Comparativo/IA enablement fail-closed."
+    },
+    {
+      "findingId": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+      "classification": "DETECTED_BUT_NOT_PROJECTED_IN_INFORMATION_HEALTH",
+      "evidence": {
+        "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "blob": "6f335e6b08c2d26b4ad21f53e225b0f132a9089d",
+        "behavior": "premiumBreakdown() and receiptSchedule() already compute policy total, active receipt schedule total and tolerance; policy page warns on material delta.",
+        "qualityOwner": "orbit360-platform/modules/calidad.js",
+        "qualityBlob": "0adb548b762250bca2648f63038fadf6a335aabf",
+        "gap": "#/calidad currently projects client completeness only and does not surface policy/calendar financial integrity."
+      },
+      "rootCause": "Financial integrity is detected locally in policy detail but is not consumed by the canonical Information Health surface.",
+      "requiredFix": "Expose the existing read-only receiptSchedule/premiumBreakdown helper and add a read-only financial-integrity section to #/calidad linking directly to the exact policy. Never infer or rewrite either amount."
+    }
+  ],
+  "allowedProductFiles": [
+    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/core/importa.js",
+    "orbit360-platform/modules/calidad.js",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "orbit360-platform/index.html",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    ".github/workflows/gravicentra-b4-003-executor.yml"
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "operationalBusinessWrites": 0,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaOnlyForExactPreview": true,
+    "cotcompRealTransportAuthorized": false,
+    "providerDeploymentAuthorized": false
+  },
+  "retainedCarries": [
+    "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE",
+    "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE",
+    "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+    "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF"
+  ],
+  "nextAction": "B4_003_SOURCE_FIX"
+}

@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-03",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "4e29a823a1bb73116e64b16b58bcae750751c9df",
-  "expectedLedgerNextBlobSha": "278736c32b336b76077d9b6e30773965c74af873",
+  "sourceLedgerPreviousBlobSha": "872e351991e566261891765bfd4c0fd57ec678c2",
+  "expectedLedgerNextBlobSha": "8c44c64b42e13096fe68bc4fb7f7d19d512bec68",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -563,21 +563,11 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "SOURCE_FIXED_R11_QA_HARNESS_REPAIRED_R11A_PENDING_EXACT_PREVIEW",
+      "status": "R12_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
-      "closureCondition": [
-        "Cancelaciones route remains visible to authorized roles.",
-        "Real cancellation records/status derived from canonical policy/cancellation events are populated and visible where source evidence exists.",
-        "No empty module caused by alternate collection/owner or missing projection.",
-        "Role/country scope, persistence/readback and regression are verified.",
-        "Exact Preview: cancellation detail resolves by canonical policy identity when cancellation id is stale/projected and client link opens Cliente 360 Pólizas.",
-        "Exact Preview: unknown renewability remains outside Renewals; explicit YES is required.",
-        "Exact Preview: policy editor preserves source ramo/product absent from current catalog and exposes renewability tri-state.",
-        "Exact Preview: Cliente 360 has bidirectional tab navigation.",
-        "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
-      ],
+      "closureCondition": "R12 source fix + exact Preview + targeted Paula visual PASS; all blocking B4-003 children explicitly disposed.",
       "source": "LEDGER"
     },
     {
@@ -2065,7 +2055,7 @@
     {
       "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
       "block": "B4",
-      "status": "OPEN_BLOCKING_FROZEN_INFORMATION_HEALTH",
+      "status": "CAUSE_DEMONSTRATED_INFORMATION_HEALTH_PROJECTION_REQUIRED",
       "blocking": true,
       "owner": "policy receipts + calidad",
       "targetGate": "B4-003",
@@ -2075,7 +2065,7 @@
     {
       "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
       "block": "B4",
-      "status": "OPEN_REQUIRES_RUNTIME_AND_UX_PROOF",
+      "status": "CAUSE_DEMONSTRATED_INSURER_SCOPE_AND_DURABLE_SOURCE_BINDING_REQUIRED",
       "blocking": true,
       "owner": "aseguradoras + importa + knowledge runtime",
       "targetGate": "B4-003",
@@ -2085,7 +2075,7 @@
     {
       "id": "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
       "block": "B4",
-      "status": "OPEN_REQUIRES_CAUSAL_RECONCILIATION",
+      "status": "CAUSE_DEMONSTRATED_SHADOW_KPI_OWNER",
       "blocking": true,
       "owner": "aseguradoras + knowledge panel",
       "targetGate": "B4-003",
@@ -2257,5 +2247,7 @@
   "liveRule": {
     "required": "Every attention item marked/derived as pre-live debt must have explicit final disposition; no silent omission.",
     "noLiveUntilB4_007": true
-  }
+  },
+  "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
+  "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c"
 }

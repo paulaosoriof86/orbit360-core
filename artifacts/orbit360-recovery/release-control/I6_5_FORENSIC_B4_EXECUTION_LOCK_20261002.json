@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-03",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R12_SOURCE_FIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "R12_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "blocking": true,
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING",
+    "nextAction": "B4_003_SOURCE_FIX",
+    "humanVisualStatus": "REJECTED_R11_PENDING_RETEST",
     "knowledgePreview": true
   },
   "rules": {
@@ -59,7 +59,7 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "allowedProductFiles": [
       "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js",
       "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
@@ -81,25 +81,28 @@
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/calidad.js",
       "orbit360-platform/styles/infra.css",
-      "tools/gravicentra-i6-5-b4-003-contract.mjs"
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+      "orbit360-platform/core/importa.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "B4-003 R11 exact Preview only; synthetic rows only; mandatory cleanup/readback; no real operational record mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
     "providerDeploymentAuthorized": false,
     "findingContinuityGuardRequired": true
   },
-  "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+  "nextAction": "B4_003_SOURCE_FIX",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "2f57bcaba675926a1e84f8c0a7befa8f22831750"
+    "blobSha": "8ac154f2b51d9a5935fc5f0caca901b60876ad22"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "872e351991e566261891765bfd4c0fd57ec678c2"
+    "blobSha": "8c44c64b42e13096fe68bc4fb7f7d19d512bec68"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -126,7 +129,8 @@
     "hostedPayloadDigest": "67d9b48c20da99d2f5b443ac9404f76a1f5c156f1ce9ecbcd1b7e2222a1a3d22",
     "backendSourceDigest": "d1c2d3dc19a9120dd12c21346f99379c17ed016a417ad397aadad6e865db255d",
     "bundleDigest": "e5ec7ff53e3a0755c6f55b1efc24d8fee9800b583287be9b2a4d22bf5d04132b",
-    "exactReadback": true
+    "exactReadback": true,
+    "status": "SUPERSEDED_BY_R12_SOURCE_FIX_AUTHORIZATION"
   },
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED",
@@ -387,7 +391,7 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "e55b362ea481b056ac5949379b68fca88717a579",
+    "blobSha": "03e9fadd53ffaf9d86262c5d3edf27e0635747a0",
     "inventoryCount": 181,
     "attentionCount": 76,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
@@ -403,5 +407,21 @@
     "replacementProof": "VISIBLE_ROW_CLICK_TO_DETAIL",
     "proofBlobSha": "a87a013f6ba8a1183bce8555a08af9f236872137",
     "productSourceChanged": false
+  },
+  "r12Diagnostic": {
+    "status": "CAUSES_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
+    "receiptBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
+    "allowedProductFiles": [
+      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/core/importa.js",
+      "orbit360-platform/modules/calidad.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/index.html",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ]
   }
 }
