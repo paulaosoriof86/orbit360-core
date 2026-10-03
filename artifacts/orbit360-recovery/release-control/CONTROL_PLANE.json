@@ -5858,5 +5858,13 @@
     "inventoryCount": 181,
     "attentionCount": 76,
     "rule": "No finding may disappear or advance without explicit evidence-backed disposition; closed modules are not reopened solely by tracking."
+  },
+  "r12ExactPreviewRetrigger": {
+    "status": "REQUESTED_AFTER_CANCELLED_PRE_JOB_RUN",
+    "priorCancelledRunId": 37151004146,
+    "retriggerReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_EXACT_PREVIEW_RETRIGGER_20261003.json",
+    "retriggerReceiptBlobSha": "5e83f075521e1c7cd06b6ed62c6f2606cfcf983a",
+    "productSourceChanged": false,
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   }
 }
