@@ -587,7 +587,7 @@ Orbit.modules = Orbit.modules || {};
 
   Orbit.policyVehicleReadModelV1199c = {
     version: '20260731.1', ownerRevision:'20260731.4-human-visual',
-    policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, premiumBreakdown, reconciliationTolerance, openVehicleLinker, vehicleCandidates, renewalEligible, startRenewal, deletePolicy, deleteVehicle,
+    policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, receiptSchedule, premiumBreakdown, reconciliationTolerance, openVehicleLinker, vehicleCandidates, renewalEligible, startRenewal, deletePolicy, deleteVehicle,
     fullPagePolicy: true, fullPageVehicle: true,
     indexedClientSummary: true,
     writesStore: false,

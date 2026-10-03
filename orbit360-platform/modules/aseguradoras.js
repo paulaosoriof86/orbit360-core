@@ -908,8 +908,9 @@ Orbit.modules.aseguradoras = (function () {
     const docs = a.docs || [];
     return `<div class="asg-sec">
       <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Documentos y Drive ${editing ? '<button class="btn ghost sm" id="af-add-doc">+ Documento</button>' : ''}</div>
+      <div class="cfg-note" style="margin-bottom:9px"><b>Fuentes de la aseguradora:</b> aquí puedes cargar formularios, clausulados, condiciones, pólizas o cotizaciones de ejemplo, manuales y circulares. El archivo se registra con la aseguradora y queda pendiente de validación; no habilita cálculos automáticamente.</div>
       <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="muted" style="font-size:12px">Sin documentos cargados.</div>'}</div>
-      ${editing ? '<button class="btn ghost sm" id="af-imp-doc" style="margin-top:9px">✨ Importar documentos (mapeo inteligente)</button>' : ''}
+      ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc" style="margin-top:9px">📁 Cargar formulario, póliza o cotización de ejemplo</button>' : ''}
     </div>`;
   }
   function docRow(d, i, editing, a) {
@@ -947,7 +948,7 @@ Orbit.modules.aseguradoras = (function () {
       ${extraKnowledgeHtml(a)}
       ${knowledgeFactsHtml(a)}
       ${knowledgeRoadmapHtml(a)}
-      ${editing ? '<button class="btn ghost sm" id="af-imp-doc2" style="margin-top:12px">✨ Importar documento tarifario</button>' : ''}
+      ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc2" style="margin-top:12px">📊 Cargar tarifario / Excel de cotizador</button>' : ''}
       ${ramos.length ? tablaTasasRamo(a, ramoSel, editing) : '<div class="cfg-note" style="margin-top:12px">Agregá al menos un ramo en la pestaña Productos y planes para configurar su tabla de tasas automáticas.</div>'}
     </div>`;
   }
@@ -1018,7 +1019,20 @@ Orbit.modules.aseguradoras = (function () {
         const url = URL.createObjectURL(file); preview.innerHTML = '<img src="'+url+'" alt="Vista previa del logo" style="max-width:180px;max-height:70px;object-fit:contain">'; const img=preview.querySelector('img'); if(img)img.addEventListener('load',()=>URL.revokeObjectURL(url),{once:true});
       });
     }
-    if (!editing) return; // en modo vista no hay nada que mutar
+    const openInsurerSource = (intent, category) => {
+      if (!canEdit()) return;
+      const liveRow = S().get('aseguradoras', id) || data || {};
+      const ramo = intent === 'tarifa' ? (tarifaRamoSel[id] || (liveRow.ramos || [])[0] || '') : '';
+      Orbit.importa.open('docs-aseguradora', {
+        documentIntent: intent,
+        docCategory: category,
+        scope: { aseguradoraId: id, aseguradoraNombre: liveRow.nombre || '', pais: liveRow.pais || '', moneda: liveRow.pais === 'GT' ? 'GTQ' : liveRow.pais === 'CO' ? 'COP' : '', ramo: ramo },
+        onDone: () => ficha(id, false, true)
+      });
+    };
+    const uploadDoc = body.querySelector('#af-imp-doc'); if (uploadDoc) uploadDoc.addEventListener('click', () => openInsurerSource('documento', 'Formulario'));
+    const uploadTariff = body.querySelector('#af-imp-doc2'); if (uploadTariff) uploadTariff.addEventListener('click', () => openInsurerSource('tarifa', 'Tarifario'));
+    if (!editing) return; // las cargas documentales son acciones separadas; los campos de ficha siguen solo en edición
 
     body.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
       const [key, idx] = b.dataset.del.split(':');
@@ -1105,10 +1119,8 @@ Orbit.modules.aseguradoras = (function () {
     }
     if (t === 'documentos') {
       const add = body.querySelector('#af-add-doc'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.docs = (draft.docs || []).concat([{ id: 'doc' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), nombre: 'Documento.pdf', cat: 'Formulario', estado: 'Documento recibido', pais: draft.pais, moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', ramo: '' }]); selectTab('documentos'); });
-      const imp = body.querySelector('#af-imp-doc'); if (imp) imp.addEventListener('click', () => { if (!canEdit()) return; document.getElementById('asg-ficha').remove(); Orbit.importa.open('docs-aseguradora', { onDone: reload }); });
     }
     if (t === 'tarifas') {
-      const imp = body.querySelector('#af-imp-doc2'); if (imp) imp.addEventListener('click', () => { if (!canEdit()) return; document.getElementById('asg-ficha').remove(); Orbit.importa.open('docs-aseguradora', { onDone: reload }); });
       const sel = body.querySelector('#tf-ramo'); if (sel) sel.addEventListener('change', () => { snapshotTab(); tarifaRamoSel[id] = sel.value; selectTab('tarifas'); });
       const add = body.querySelector('#tf-add'); if (add) add.addEventListener('click', () => { snapshotTab(); const ramo = tarifaRamoSel[id] || (draft.ramos || [])[0]; draft.cotTasas = draft.cotTasas || {}; draft.cotTasas[ramo] = draft.cotTasas[ramo] || { auto: [] }; draft.cotTasas[ramo].auto = (draft.cotTasas[ramo].auto || []).concat([{ hasta: 0, tasa: 0, min: 0 }]); selectTab('tarifas'); });
       body.querySelectorAll('[data-tf-del]').forEach(b => b.addEventListener('click', () => { snapshotTab(); const ramo = tarifaRamoSel[id] || (draft.ramos || [])[0]; if (draft.cotTasas && draft.cotTasas[ramo]) draft.cotTasas[ramo].auto.splice(+b.dataset.tfDel, 1); selectTab('tarifas'); }));

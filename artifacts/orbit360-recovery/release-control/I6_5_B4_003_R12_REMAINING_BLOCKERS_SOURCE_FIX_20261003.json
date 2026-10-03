@@ -1,0 +1,50 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R12_REMAINING_BLOCKERS_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R12_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "parentHead": "5e828903e413ec26ad50b9427b6b7a88331946dd",
+  "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
+  "diagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
+  "changes": {
+    "insurerKnowledgeCounters": "Legacy KPI overlay now delegates to canonical insurer knowledgeSources and uses non-conflicting semantics: related sources, mapped/validated, requires review, confirmed file.",
+    "insurerSourceIngestion": "Aseguradora upload entry points now pass exact insurer scope. Documentary importer classifies insurer sources, binds Drive-confirmed metadata durably to aseguradoras.docs, requires validation, and never auto-enables Cotizador/Comparativo/IA.",
+    "informationHealth": "Existing canonical policy/receipt reconciliation helper is exported read-only and #/calidad projects material policy-vs-calendar mismatches with direct policy link and no inferred rewrite."
+  },
+  "productBlobs": {
+    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "bc614613875bef19f4f9a0b3129b4f9dd978837f",
+    "orbit360-platform/modules/aseguradoras.js": "1e6b93422833f450d02616807479159ddf8a099b",
+    "orbit360-platform/core/importa.js": "15c2458eafd596d63b6ebf9be565f27f2d2881c6",
+    "orbit360-platform/modules/calidad.js": "334a9626682417210cae93b9eb02f3cca6662db4",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "474685ad0d393b25e94359ab0f21efb8a544dcd6",
+    "orbit360-platform/index.html": "bf600ddae166a3987f77d3fc5207955d510d05eb"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "719a12885bf5155eb3eedb305e15e6a817bc1fd7",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "36e58a7d54bf5457d3dce51a14f04d843da624d9",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "35f4c3036e02952ce0ba62d0556225e39af5a89c"
+  },
+  "requiredExactPreview": [
+    "Canonical insurer knowledge counter equals canonical visible source universe and is non-zero for AseGuate evidence.",
+    "Tariff/document upload actions carry exact aseguradoraId scope without performing a real upload in Preview.",
+    "Synthetic policy total 407.01 vs active receipt calendar 542.68 appears in Information Health unchanged, with delta 135.67 and direct policy link.",
+    "All prior B4-003 assertions remain PASS; synthetic rows are cleaned; zero real operational writes."
+  ],
+  "retainedOpenCarries": [
+    "Role-aware IA retrieval over canonical knowledge remains PRELIVE carry; no permission bypass or blind model training.",
+    "Multiproduct insurer knowledge remains source-backed JIT; unsupported insurer×product combinations stay Pendiente de fuente.",
+    "Insurer tariff source backlog remains visible and versioned.",
+    "CotComp real transport remains unauthorized until separate LAB transport proof."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "productSourceChanged": true,
+    "syntheticQaWritesAuthorized": true,
+    "cotcompRealTransportAuthorized": false,
+    "providerDeploymentAuthorized": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

@@ -97,6 +97,9 @@ jobs:
           node --check orbit360-platform/core/quote-comparison-contracts-v1203.js
           node --check orbit360-platform/modules/cotizador-v1203-source-gate.js
           node --check orbit360-platform/modules/aseguradoras.js
+          node --check orbit360-platform/core/client-insurer-visual-contract-v20260720.js
+          node --check orbit360-platform/core/importa.js
+          node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
           node --check orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js
           node --check orbit360-platform/modules/renovaciones.js
           node --check orbit360-platform/modules/renewals-v1200-operational-bridge.js

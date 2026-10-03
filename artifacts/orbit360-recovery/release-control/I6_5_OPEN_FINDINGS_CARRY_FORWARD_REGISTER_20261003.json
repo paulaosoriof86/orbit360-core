@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-03",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "872e351991e566261891765bfd4c0fd57ec678c2",
-  "expectedLedgerNextBlobSha": "8c44c64b42e13096fe68bc4fb7f7d19d512bec68",
+  "sourceLedgerPreviousBlobSha": "8c44c64b42e13096fe68bc4fb7f7d19d512bec68",
+  "expectedLedgerNextBlobSha": "85ca96022a377ffa3d049334a1b9c37e30b12dff",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -563,7 +563,7 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "R12_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R12_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
@@ -2055,7 +2055,7 @@
     {
       "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
       "block": "B4",
-      "status": "CAUSE_DEMONSTRATED_INFORMATION_HEALTH_PROJECTION_REQUIRED",
+      "status": "SOURCE_FIXED_R12_INFORMATION_HEALTH_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "owner": "policy receipts + calidad",
       "targetGate": "B4-003",
@@ -2065,7 +2065,7 @@
     {
       "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
       "block": "B4",
-      "status": "CAUSE_DEMONSTRATED_INSURER_SCOPE_AND_DURABLE_SOURCE_BINDING_REQUIRED",
+      "status": "SOURCE_FIXED_R12_INSURER_BINDING_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "owner": "aseguradoras + importa + knowledge runtime",
       "targetGate": "B4-003",
@@ -2075,7 +2075,7 @@
     {
       "id": "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
       "block": "B4",
-      "status": "CAUSE_DEMONSTRATED_SHADOW_KPI_OWNER",
+      "status": "SOURCE_FIXED_R12_CANONICAL_COUNTERS_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "owner": "aseguradoras + knowledge panel",
       "targetGate": "B4-003",
@@ -2249,5 +2249,7 @@
     "noLiveUntilB4_007": true
   },
   "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
-  "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c"
+  "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
+  "r12SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_SOURCE_FIX_20261003.json",
+  "r12SourceFixBlobSha": "663b9846af14ce18097f08f2fc85296ac00f181f"
 }

@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B4",
-  "productFileCount": 95,
+  "productFileCount": 96,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
@@ -67,6 +67,7 @@
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
     "orbit360-platform/core/backend-resource-contracts.js",
     "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
     "orbit360-platform/core/cobros-reconciliation-domain-client.js",
     "orbit360-platform/core/comisiones-eng.js",
     "orbit360-platform/core/config.js",
@@ -168,7 +169,7 @@
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "774c6cbe32be08f23e45f37b8e12e56f9be08bf3",
     "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
-    "orbit360-platform/core/importa.js": "99ca3de8d60d3a26c97067c056fdc383d8fdd15f",
+    "orbit360-platform/core/importa.js": "15c2458eafd596d63b6ebf9be565f27f2d2881c6",
     "orbit360-platform/core/issuance-workflow-v1201-refinements.js": "47a9d68bef8cb60a00a057375efdf443c2ff2de2",
     "orbit360-platform/core/issuance-workflow-v1201.js": "ab138f218e041b41ac737ff250c7e808edc8c030",
     "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
@@ -197,9 +198,9 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "8d11c49afdc5fc01c8b552ab2911f6a668f0a358",
+    "orbit360-platform/index.html": "bf600ddae166a3987f77d3fc5207955d510d05eb",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
-    "orbit360-platform/modules/aseguradoras.js": "7bd0b6bcc93e3ebaac16200279061f87fef28946",
+    "orbit360-platform/modules/aseguradoras.js": "1e6b93422833f450d02616807479159ddf8a099b",
     "orbit360-platform/modules/cancelaciones.js": "b47e56a636f827abdc68c34dcda333980d903985",
     "orbit360-platform/modules/cliente360.js": "cdc6d807abf91efdcd0585e022e935d39c18e40b",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
@@ -216,7 +217,7 @@
     "orbit360-platform/modules/inicio.js": "e7b6fcf58fe7a90db82db788e75e28b3ea0bd5ea",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "20215f7bfcbf8db84722b10a2a1a01da383dfe35",
-    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "6f335e6b08c2d26b4ad21f53e225b0f132a9089d",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "474685ad0d393b25e94359ab0f21efb8a544dcd6",
     "orbit360-platform/modules/polizas.js": "390dd12393d1ac894b844a795093d2c5969f33d5",
     "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
     "orbit360-platform/modules/portal.js": "957cefe0647bff2b350e5b3f0f78ef7a9e97703f",
@@ -229,7 +230,8 @@
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
     "orbit360-platform/styles/infra.css": "d9ebaf7fd7e594c98bd0526e544188fc96ce1552",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
-    "orbit360-platform/modules/calidad.js": "0adb548b762250bca2648f63038fadf6a335aabf"
+    "orbit360-platform/modules/calidad.js": "334a9626682417210cae93b9eb02f3cca6662db4",
+    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "bc614613875bef19f4f9a0b3129b4f9dd978837f"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -2151,7 +2153,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "8c44c64b42e13096fe68bc4fb7f7d19d512bec68",
+  "findingLedgerBlobSha": "85ca96022a377ffa3d049334a1b9c37e30b12dff",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2499,5 +2501,30 @@
     "continuityRegisterBlobSha": "03e9fadd53ffaf9d86262c5d3edf27e0635747a0",
     "productSourceChanged": false,
     "nextAction": "B4_003_SOURCE_FIX"
+  },
+  "b4003SourceFixR12": {
+    "status": "SOURCE_FIXED_R12_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_SOURCE_FIX_20261003.json",
+    "receiptBlobSha": "663b9846af14ce18097f08f2fc85296ac00f181f",
+    "diagnosticReceiptBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
+    "productBlobs": {
+      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "bc614613875bef19f4f9a0b3129b4f9dd978837f",
+      "orbit360-platform/modules/aseguradoras.js": "1e6b93422833f450d02616807479159ddf8a099b",
+      "orbit360-platform/core/importa.js": "15c2458eafd596d63b6ebf9be565f27f2d2881c6",
+      "orbit360-platform/modules/calidad.js": "334a9626682417210cae93b9eb02f3cca6662db4",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "474685ad0d393b25e94359ab0f21efb8a544dcd6",
+      "orbit360-platform/index.html": "bf600ddae166a3987f77d3fc5207955d510d05eb"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "719a12885bf5155eb3eedb305e15e6a817bc1fd7",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "36e58a7d54bf5457d3dce51a14f04d843da624d9",
+      ".github/workflows/gravicentra-b4-003-executor.yml": "35f4c3036e02952ce0ba62d0556225e39af5a89c"
+    },
+    "continuityRegisterBlobSha": "87e25c43c20807333025b620c1c41603aaf74ff7",
+    "productSourceChanged": true,
+    "noLive": true,
+    "noReimport": true,
+    "dataMutation": false,
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   }
 }

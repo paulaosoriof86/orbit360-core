@@ -796,7 +796,7 @@ Orbit.importa = (function () {
     'facturas': { icon: '🧾', title: 'Importar facturas', desc: 'Adjunta facturas al expediente; se extraen número, fecha, monto y se vinculan a la póliza.', cols: ['Factura', 'Fecha', 'Monto', 'Póliza'], sample: [['FAC-2041', '2026-05-12', 'Q 8,400', 'GT-AT-48210'], ['FAC-2042', '2026-05-30', 'Q 700', 'GT-AT-48210']] },
     'documentos': { icon: '📎', title: 'Importar documentos', desc: 'Carga documentos del expediente. El sistema extrae posibles datos y propone cambios para revisión/aprobación; no modifica clientes ni pólizas directamente.', cols: ['Documento', 'Tipo detectado', 'Dato extraído'], sample: [['dpi_frente.jpg', 'DPI', 'Dirección, fecha nac.'], ['rtu_2026.pdf', 'RTU', 'Razón social, NIT'], ['poliza_auto.pdf', 'Póliza', 'Vehículo, vigencia']] },
     'bitacora-reclamos': { icon: '🚨', title: 'Importar bitácora de siniestros', desc: 'Carga la bitácora de reclamos que envía la aseguradora (uno o varios clientes). Cada reclamo se vincula a su póliza y queda en la ficha del cliente correspondiente.', cols: ['Siniestro', 'Póliza', 'Tipo', 'Estado'], sample: [['SIN-48210', 'GT-AT-48210', 'Colisión', 'En análisis'], ['SIN-77310', 'GT-AT-77310', 'Robo parcial', 'Aprobado'], ['SIN-91733', 'CO-PA-91733', 'Daños a terceros', 'Documentación']] },
-    'docs-aseguradora': { icon: '🏢', title: 'Importar documentos de aseguradora', desc: 'Carga tarifas, formularios, cotizaciones y pólizas de ejemplo. En modo inteligente, alimenta el Cotizador, el Comparativo y la IA; en modo documental, solo se almacenan para consulta.', cols: ['Documento', 'Categoría detectada', 'Uso'], sample: [['tarifario_2026.pdf', 'Tarifas', 'Cotizador / Comparativo'], ['formulario_auto.pdf', 'Formularios', 'Requisitos de emisión'], ['cotizacion_ejemplo.pdf', 'Cotización ejemplo', 'Entrenar IA']] }
+    'docs-aseguradora': { icon: '🏢', title: 'Registrar fuente de aseguradora', desc: 'Carga tarifarios, Excel de cotizador, formularios, clausulados, cotizaciones o pólizas de ejemplo y otros documentos. Primero se confirma el archivo en Drive y luego se registra como fuente de la aseguradora pendiente de validación. Ningún documento habilita Cotizador, Comparativo o IA automáticamente.', cols: ['Documento', 'Tipo de fuente', 'Estado'], sample: [['tarifario_2026.xlsx', 'Tarifario / cotizador', 'Pendiente de validación'], ['formulario_auto.pdf', 'Formulario / requisitos', 'Pendiente de validación'], ['cotizacion_ejemplo.pdf', 'Cotización ejemplo', 'Pendiente de validación']] }
   };
 
   let state = null;
@@ -877,7 +877,7 @@ Orbit.importa = (function () {
     const meta = KINDS[kind] || KINDS['clientes'];
     // docs-aseguradora es documental (guarda archivos; no escribe registros estructurados a ciegas) — P0-06.
     const modoIni = (kind === 'docs-aseguradora') ? 'documental' : ((opts && opts.modo) || 'inteligente');
-    state = { kind, meta, step: 1, opts: opts || {}, multi: opts && opts.multi, scope: opts && opts.scope, modo: modoIni, files: [] };
+    state = { kind, meta, step: 1, opts: opts || {}, multi: opts && opts.multi, scope: opts && opts.scope, modo: modoIni, files: [], insurerDocCategory: clean(opts && opts.docCategory) || 'Formulario', insurerDocRamo: clean(opts && opts.scope && opts.scope.ramo), insurerDocProducto: clean(opts && opts.scope && opts.scope.producto), insurerDocVersion: '' };
     document.getElementById('imp-back').classList.add('open');
     document.getElementById('imp-drawer').classList.add('open');
     paint();
@@ -904,11 +904,11 @@ Orbit.importa = (function () {
 
   function step1(m) {
     if (state.processing) return `<div style="text-align:center;padding:48px 16px"><div class="imp-spinner"></div><div style="font-family:var(--f-display);font-weight:700;font-size:16px;margin-top:16px">${U.esc(state.processing)}</div><p class="muted" style="font-size:13px;margin-top:6px">Procesando <b>${U.esc(state.files[0] || '')}</b> en tu navegador…</p></div>`;
+    const insurerSource = state.kind === 'docs-aseguradora';
+    const sourceFields = insurerSource ? `<div class="card" style="padding:12px;margin-bottom:12px"><div style="font-weight:800;margin-bottom:8px">Clasificar fuente</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px"><label class="ce-l">Tipo de fuente<select class="o-sel" id="imp-insurer-cat">${['Tarifario','Cotizador Excel','Formulario','Clausulado','Condiciones','Cotización ejemplo','Póliza ejemplo','Manual','Circular','Otro'].map(x=>`<option ${x===state.insurerDocCategory?'selected':''}>${U.esc(x)}</option>`).join('')}</select></label><label class="ce-l">Ramo / línea<input class="o-sel" id="imp-insurer-ramo" value="${U.esc(state.insurerDocRamo||'')}" placeholder="Ej. Automóviles"></label><label class="ce-l">Producto / plan<input class="o-sel" id="imp-insurer-producto" value="${U.esc(state.insurerDocProducto||'')}" placeholder="Ej. Vehículos / Premium"></label><label class="ce-l">Versión / vigencia de fuente<input class="o-sel" id="imp-insurer-version" value="${U.esc(state.insurerDocVersion||'')}" placeholder="Ej. 2026 / v1.4"></label></div><div class="cfg-note" style="margin-top:9px"><b>${U.esc(state.scope&&state.scope.aseguradoraNombre||'Aseguradora')}:</b> el archivo quedará vinculado a esta aseguradora como <b>Documento recibido · requiere validación</b>. Registrar la fuente no activa cálculos automáticos.</div></div>` : '';
     return `${scopeBanner(state.kind)}<p class="imp-desc">${U.esc(m.desc)}</p>
-      <div class="imp-mode" id="imp-mode">
-        <button class="imp-mode-b ${state.modo !== 'documental' ? 'on' : ''}" data-modo="inteligente">✨ Inteligente<small>extrae y mapea a los módulos</small></button>
-        <button class="imp-mode-b ${state.modo === 'documental' ? 'on' : ''}" data-modo="documental">📁 Documental<small>solo almacena para consulta</small></button>
-      </div>
+      ${insurerSource ? '' : `<div class="imp-mode" id="imp-mode"><button class="imp-mode-b ${state.modo !== 'documental' ? 'on' : ''}" data-modo="inteligente">✨ Inteligente<small>extrae y mapea a los módulos</small></button><button class="imp-mode-b ${state.modo === 'documental' ? 'on' : ''}" data-modo="documental">📁 Documental<small>solo almacena para consulta</small></button></div>`}
+      ${sourceFields}
       <div class="imp-drop" id="imp-drop">
         <div style="font-size:40px">⬆️</div>
         <div style="font-weight:700;font-family:var(--f-display);font-size:16px;margin-top:6px">Arrastra ${state.multi ? 'tus archivos' : 'tu archivo'} aquí</div>
@@ -1083,12 +1083,18 @@ Orbit.importa = (function () {
     const files = Array.from(state.filesReal || []);
     if (!files.length) return { ok: false, status: 'sin_archivos', message: 'Selecciona al menos un archivo.' };
     const cid = state.scope && state.scope.cid || '';
+    const insurerId = state.scope && state.scope.aseguradoraId || '';
+    if (/--/.test(String(location.hostname || '')) && insurerId && !/^b4[-_]/i.test(String(insurerId))) {
+      return { ok: false, status: 'preview_protected_operational_insurer', message: 'Preview protege las aseguradoras operativas reales. La carga documental se valida sin escribir sobre la ficha real y se habilita con el mismo artifact al promover.' };
+    }
     if (/--/.test(String(location.hostname || '')) && cid && !/^b2[-_]/i.test(String(cid))) {
       return { ok: false, status: 'preview_protected_operational_client', message: 'Preview protege los expedientes operativos reales. La carga Drive se valida con un cliente sintético B2 y se habilita con el mismo flujo al promover el artifact.' };
     }
     const secure = Orbit.secureResources;
+    const entityType = cid ? 'cliente' : insurerId ? 'aseguradora' : state.kind;
+    const entityId = cid || insurerId || '';
     const status = secure && secure.documentUploadStatus
-      ? secure.documentUploadStatus({ entidad: cid ? 'cliente' : state.kind, entidadId: cid })
+      ? secure.documentUploadStatus({ entidad: entityType, entidadId: entityId })
       : { available: false, status: 'pendiente_conexion' };
     if (!status || status.available !== true || !secure || typeof secure.uploadDocument !== 'function') {
       return { ok: false, status: 'pendiente_conexion', message: 'Drive no tiene un proveedor de carga confirmado. No se guardó ningún archivo.' };
@@ -1097,10 +1103,15 @@ Orbit.importa = (function () {
     const out = [];
     for (const file of files) {
       const uploaded = await secure.uploadDocument(file, {
-        entidad: cid ? 'cliente' : state.kind,
-        entidadId: cid || '',
+        entidad: entityType,
+        entidadId: entityId,
         clienteId: cid,
-        categoria: state.kind === 'documentos' ? 'expediente_cliente' : state.kind,
+        aseguradoraId: insurerId,
+        categoria: state.kind === 'documentos' ? 'expediente_cliente' : state.kind === 'docs-aseguradora' ? 'fuente_aseguradora' : state.kind,
+        tipoFuente: state.kind === 'docs-aseguradora' ? state.insurerDocCategory : '',
+        ramo: state.kind === 'docs-aseguradora' ? state.insurerDocRamo : '',
+        producto: state.kind === 'docs-aseguradora' ? state.insurerDocProducto : '',
+        versionFuente: state.kind === 'docs-aseguradora' ? state.insurerDocVersion : '',
         nombre: file.name
       });
       if (!uploaded || uploaded.ok !== true || !(uploaded.documentRef || uploaded.driveUrl || uploaded.externalUrl || uploaded.url)) {
@@ -1116,7 +1127,18 @@ Orbit.importa = (function () {
         size: file.size,
         origen: uploaded.origen || uploaded.repository || 'Drive',
         clienteId: cid,
-        categoria: state.kind === 'documentos' ? 'expediente_cliente' : state.kind,
+        aseguradoraId: insurerId,
+        cat: state.kind === 'docs-aseguradora' ? state.insurerDocCategory : '',
+        tipo: state.kind === 'docs-aseguradora' ? state.insurerDocCategory : '',
+        pais: state.kind === 'docs-aseguradora' ? clean(state.scope && state.scope.pais) : '',
+        moneda: state.kind === 'docs-aseguradora' ? clean(state.scope && state.scope.moneda) : '',
+        ramo: state.kind === 'docs-aseguradora' ? state.insurerDocRamo : '',
+        producto: state.kind === 'docs-aseguradora' ? state.insurerDocProducto : '',
+        version: state.kind === 'docs-aseguradora' ? state.insurerDocVersion : '',
+        estado: state.kind === 'docs-aseguradora' ? 'Documento recibido' : '',
+        requiereValidacion: state.kind === 'docs-aseguradora',
+        archivoDisponible: true,
+        categoria: state.kind === 'documentos' ? 'expediente_cliente' : state.kind === 'docs-aseguradora' ? 'fuente_aseguradora' : state.kind,
         clientFolderId: uploaded.clientFolderId || '',
         clientFolderUrl: uploaded.clientFolderUrl || '',
         driveUserEmail: uploaded.driveUserEmail || '',
@@ -1126,6 +1148,24 @@ Orbit.importa = (function () {
       });
     }
 
+    if (insurerId) {
+      const insurer = Orbit.store.get('aseguradoras', insurerId);
+      if (!insurer || !Orbit.store.updateDurable) return { ok: false, status: 'aseguradora_sin_persistencia', message: 'El archivo llegó a Drive pero no se pudo confirmar el vínculo con la aseguradora.', uploaded: out };
+      const previous = Array.isArray(insurer.docs) ? insurer.docs.slice() : [];
+      const key = d => String(d.documentRef || d.driveUrl || d.externalUrl || d.url || '').trim();
+      const merged = previous.slice();
+      out.forEach(doc => {
+        const k = key(doc), at = k ? merged.findIndex(x => key(x) === k) : -1;
+        if (at >= 0) merged[at] = Object.assign({}, merged[at], doc);
+        else merged.push(doc);
+      });
+      await Orbit.store.updateDurable('aseguradoras', insurerId, { docs: merged, conocimientoActualizadoAt: new Date().toISOString() });
+      const readback = Orbit.store.get('aseguradoras', insurerId);
+      const rb = readback && Array.isArray(readback.docs) ? readback.docs : [];
+      if (!out.every(doc => rb.some(x => key(x) && key(x) === key(doc)))) {
+        return { ok: false, status: 'insurer_link_readback_missing', message: 'Drive confirmó el archivo, pero la ficha de la aseguradora no confirmó todos los vínculos.', uploaded: out };
+      }
+    }
     if (cid) {
       const cli = Orbit.store.get('clientes', cid);
       if (!cli || !Orbit.store.updateDurable) return { ok: false, status: 'cliente_sin_persistencia', message: 'El archivo llegó a Drive pero no se pudo confirmar el vínculo con el expediente.', uploaded: out };
@@ -1163,6 +1203,11 @@ Orbit.importa = (function () {
     const dr = document.getElementById('imp-drawer');
     const drop = dr.querySelector('#imp-drop');
     dr.querySelectorAll('.imp-mode-b').forEach(b => b.addEventListener('click', () => { state.modo = b.dataset.modo; paint(); }));
+    const insurerCat=dr.querySelector('#imp-insurer-cat'),insurerRamo=dr.querySelector('#imp-insurer-ramo'),insurerProducto=dr.querySelector('#imp-insurer-producto'),insurerVersion=dr.querySelector('#imp-insurer-version');
+    if(insurerCat) insurerCat.addEventListener('change',e=>state.insurerDocCategory=e.target.value);
+    if(insurerRamo) insurerRamo.addEventListener('input',e=>state.insurerDocRamo=e.target.value);
+    if(insurerProducto) insurerProducto.addEventListener('input',e=>state.insurerDocProducto=e.target.value);
+    if(insurerVersion) insurerVersion.addEventListener('input',e=>state.insurerDocVersion=e.target.value);
     const fileInput = dr.querySelector('#imp-file');
     if (fileInput) fileInput.addEventListener('change', e => {
       const files = [...e.target.files];

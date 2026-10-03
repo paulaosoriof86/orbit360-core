@@ -21,6 +21,9 @@ const ids={
  renewalPolicy:'b4003qa_policy_renew_'+run,
  unknownRenewPolicy:'b4003qa_policy_unknown_'+run,
  cancelPolicy:'b4003qa_policy_cancel_'+run,
+ healthPolicy:'b4003qa_policy_health_'+run,
+ healthReceipt1:'b4003qa_receipt_health_1_'+run,
+ healthReceipt2:'b4003qa_receipt_health_2_'+run,
  cancelation:'b4003qa_cancel_'+run
 };
 ids.renewActivity='act_ren_'+ids.renewalPolicy+'_'+new Date().toISOString().slice(0,10).replace(/-/g,'');
@@ -52,6 +55,9 @@ async function seed(who){
  await ref('polizas',ids.renewalPolicy).set({...common,id:ids.renewalPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-REN-'+run,estado:'Vigente',renovable:true,pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:1000,primaNeta:900},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.unknownRenewPolicy).set({...common,id:ids.unknownRenewPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-UNKNOWN-'+run,estado:'Vigente',pais:'GT',moneda:'GTQ',ramo:'ACCIDENTES QA FUENTE',producto:'PRODUCTO QA FUENTE',subramo:'PRODUCTO QA FUENTE',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:650,primaNeta:600},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.cancelPolicy).set({...common,id:ids.cancelPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-CAN-'+run,estado:'Cancelada',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:800,primaNeta:700},{merge:false});proof.syntheticWrites++;
+ await ref('polizas',ids.healthPolicy).set({...common,id:ids.healthPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-HEALTH-'+run,estado:'Vigente',renovable:false,pais:'GT',moneda:'GTQ',ramo:'Accidentes',producto:'Accidentes',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:407.01,primaTotal:407.01,primaNeta:346.09,cuotas:2},{merge:false});proof.syntheticWrites++;
+ await ref('recibosEsperados',ids.healthReceipt1).set({...common,id:ids.healthReceipt1,clienteId:ids.client,polizaId:ids.healthPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',cuota:'1 / 2',serie:'1 / 2',fechaLimite:startS,primaTotal:271.34,montoTotal:271.34,monto:271.34,estado:'Pendiente'},{merge:false});proof.syntheticWrites++;
+ await ref('recibosEsperados',ids.healthReceipt2).set({...common,id:ids.healthReceipt2,clienteId:ids.client,polizaId:ids.healthPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',cuota:'2 / 2',serie:'2 / 2',fechaLimite:endS,primaTotal:271.34,montoTotal:271.34,monto:271.34,estado:'Pendiente'},{merge:false});proof.syntheticWrites++;
  await ref('cancelaciones',ids.cancelation).set({...common,id:ids.cancelation,clienteId:ids.client,polizaId:ids.cancelPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',fecha:startS,motivo:'Prueba sintética B4-003',valorPerdido:700,recuperacion:'Pendiente de contacto',recuperada:false},{merge:false});proof.syntheticWrites++;
 }
 async function applyLegal(page,who){
@@ -66,7 +72,7 @@ async function bootProduct(page,token){
  const state=await page.evaluate(async token=>{
    const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
    if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);
-   const requested=['clientes','polizas','cancelaciones','negocios','gestiones'];
+   const requested=['clientes','polizas','recibosEsperados','cancelaciones','negocios','gestiones'];
    const forced={called:false,phase:'',requested:[]};
    const forceCollections=(event)=>{
      try{
@@ -120,7 +126,7 @@ async function cancellationEvidence(){
  proof.assertions.cancellationProjectionConsistent=(cancelled.length===0);
 }
 async function cleanup(startMs){
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['clientes',ids.client]]){
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['clientes',ids.client]]){
   const r=ref(c,id);if((await r.get()).exists){await r.delete();proof.cleanupWrites++;}
  }
  for(const col of ['workflowEvents','operationalEvents']){
@@ -264,6 +270,34 @@ try{
  proof.insurerKnowledge={knowledgeProbe,aseguate:aseguateKnowledge,columna:columnaKnowledge};
  proof.assertions.insurerKnowledgeVisible=true;
  proof.assertions.multiProductKnowledgeRoadmapVisible=true;
+
+ // R12: knowledge counters and upload actions must share the canonical insurer knowledge owner.
+ await page.evaluate(id=>{document.getElementById('asg-ficha')?.remove();Orbit.modules.aseguradoras.ficha(id);},knowledgeProbe.aseguateId);
+ await page.waitForSelector('#asg-ficha [data-tab="tarifas"]',{timeout:10000});
+ await page.click('#asg-ficha [data-tab="tarifas"]');
+ await page.waitForSelector('#asg-ficha .m1-knowledge-summary[data-knowledge-source="canonical"]',{timeout:10000});
+ proof.r12InsurerKnowledge=await page.evaluate(id=>{
+   const insurer=Orbit.store.get('aseguradoras',id),api=Orbit.modules.aseguradoras._fuentes;
+   const canonical=api.knowledgeSources(insurer)||[];
+   const box=document.querySelector('#asg-ficha .m1-knowledge-summary[data-knowledge-source="canonical"]');
+   const metrics=Array.from(box.querySelectorAll(':scope > div')).map(x=>({label:String(x.querySelector('span')?.textContent||'').trim(),value:Number(x.querySelector('b')?.textContent||0)}));
+   const originalOpen=Orbit.importa.open,captures=[];
+   Orbit.importa.open=(kind,opts)=>{captures.push({kind,scope:opts&&opts.scope||{},documentIntent:opts&&opts.documentIntent||'',docCategory:opts&&opts.docCategory||''});};
+   document.querySelector('#asg-ficha #af-imp-doc2')?.click();
+   document.querySelector('#asg-ficha [data-tab="documentos"]')?.click();
+   document.querySelector('#asg-ficha #af-imp-doc')?.click();
+   Orbit.importa.open=originalOpen;
+   return{canonicalCount:canonical.length,metrics,captures,text:String(box.innerText||'')};
+ },knowledgeProbe.aseguateId);
+ const related=proof.r12InsurerKnowledge.metrics.find(x=>x.label==='Fuentes relacionadas');
+ need(!!related&&related.value===proof.r12InsurerKnowledge.canonicalCount&&related.value>0,'B4_003_R12_INSURER_KPI_CANONICAL_COUNT_MISMATCH');
+ need(!/Fuentes registradas\s*0/i.test(proof.r12InsurerKnowledge.text),'B4_003_R12_SHADOW_ZERO_KPI_REMAINS');
+ const tariffCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='tarifa');
+ const docCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='documento');
+ need(tariffCapture?.kind==='docs-aseguradora'&&tariffCapture?.scope?.aseguradoraId===knowledgeProbe.aseguateId&&tariffCapture?.docCategory==='Tarifario','B4_003_R12_TARIFF_IMPORT_INSURER_SCOPE_MISSING');
+ need(docCapture?.kind==='docs-aseguradora'&&docCapture?.scope?.aseguradoraId===knowledgeProbe.aseguateId&&docCapture?.docCategory==='Formulario','B4_003_R12_DOCUMENT_IMPORT_INSURER_SCOPE_MISSING');
+ proof.assertions.insurerKnowledgeCountersCanonical=true;
+ proof.assertions.insurerImportScopeBound=true;
  await page.evaluate(()=>document.getElementById('asg-ficha')?.remove());
 
  proof.visualScope=await page.evaluate(ids=>{
@@ -339,6 +373,21 @@ try{
  proof.assertions.cancelClientOpensPolicies=true;
  proof.assertions.qualitySelectedCountryScope=true;
  proof.assertions.qualityRenderPathUnder2500ms=true;
+
+ // R12: information health surfaces policy/calendar mismatch without rewriting either source value.
+ proof.r12InformationHealth=await page.evaluate(ids=>{
+   const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';Orbit.pais='GT';Orbit.modules.calidad.render(h);
+   const issue=(Orbit.modules.calidad.financialIntegrityIssues?.()||[]).find(x=>x.p&&x.p.id===ids.healthPolicy);
+   const row=h.querySelector('[data-information-health-policy="'+ids.healthPolicy+'"]');
+   const text=String(row&&row.innerText||'').replace(/\s+/g,' ').trim();
+   Orbit.pais=previous;
+   return{issue:issue?{total:issue.total,schedule:issue.schedule,delta:issue.delta,receipts:issue.receipts}:null,rowVisible:!!row,rowText:text};
+ },ids);
+ need(proof.r12InformationHealth.rowVisible===true,'B4_003_R12_INFORMATION_HEALTH_ROW_MISSING');
+ need(Math.abs(proof.r12InformationHealth.issue?.total-407.01)<0.001&&Math.abs(proof.r12InformationHealth.issue?.schedule-542.68)<0.001,'B4_003_R12_INFORMATION_HEALTH_VALUES_CHANGED');
+ need(Math.abs(proof.r12InformationHealth.issue?.delta-135.67)<0.001,'B4_003_R12_INFORMATION_HEALTH_DELTA_INVALID');
+ proof.assertions.informationHealthFinancialMismatchVisible=true;
+ proof.assertions.informationHealthNoInference=true;
 
  await page.evaluate(id=>Orbit.modules.cliente360.editarPoliza(id),ids.unknownRenewPolicy);
  await page.waitForSelector('#policy-v1199 [data-ramo]',{timeout:10000});
@@ -430,11 +479,11 @@ try{
  if(browser)await browser.close().catch(()=>{});
  await cleanup(startMs).catch(e=>proof.cleanupError=clean(e&&e.message||e));
  const checks=[];
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
  proof.syntheticFinalAbsent=checks.every(x=>x===false);
  proof.assertions.cleanupComplete=proof.syntheticFinalAbsent;
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
 }
 if(proof.status!=='PASS'||proof.syntheticFinalAbsent!==true)process.exitCode=1;
 console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors},null,2));
-// R11 Paula visual rejection remediation proof: 2026-10-03
+// R12 remaining B4-003 blocker proof: 2026-10-03
