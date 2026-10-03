@@ -5263,6 +5263,14 @@
         ],
         "previewFunctionsOnly": true,
         "productionFunctions": false
+      },
+      "r13DrivePreviewGuardAlignment": {
+        "status": "CAUSE_DEMONSTRATED_NARROW_PREVIEW_GUARD_FIX_AUTHORIZED",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_DRIVE_PREVIEW_GUARD_ALIGNMENT_20261003.json",
+        "receiptBlobSha": "e642e4d356c568b18340053f659b103cbe6a5e59",
+        "allowedProductFiles": [
+          "orbit360-platform/core/importa.js"
+        ]
       }
     }
   },
@@ -5981,6 +5989,14 @@
       ],
       "previewFunctionsOnly": true,
       "productionFunctions": false
+    },
+    "r13DrivePreviewGuardAlignment": {
+      "status": "CAUSE_DEMONSTRATED_NARROW_PREVIEW_GUARD_FIX_AUTHORIZED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_DRIVE_PREVIEW_GUARD_ALIGNMENT_20261003.json",
+      "receiptBlobSha": "e642e4d356c568b18340053f659b103cbe6a5e59",
+      "allowedProductFiles": [
+        "orbit360-platform/core/importa.js"
+      ]
     }
   },
   "b4VisualAcceptanceControl": {
