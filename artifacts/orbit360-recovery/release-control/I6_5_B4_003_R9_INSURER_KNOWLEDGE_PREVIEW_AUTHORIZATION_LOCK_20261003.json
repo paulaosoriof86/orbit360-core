@@ -1,0 +1,91 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R9_INSURER_KNOWLEDGE_PREVIEW_AUTHORIZATION_LOCK_V1",
+  "recordedAt": "2026-10-03",
+  "sourceHead": "04ff0a2c1102ccffec1dd893f7a27a11503558ef",
+  "status": "FROZEN_AUTHORIZED_R9_INSURER_KNOWLEDGE_PREVIEW",
+  "authority": "PAULA_EXPLICIT_REQUEST_20261003",
+  "findingId": "B4-003",
+  "decisions": {
+    "visibleInPreview": true,
+    "canonicalSurface": "Aseguradoras > ficha > Tarifas y conocimiento",
+    "informationHealthSurface": "Calidad/Salud de la información remains the residual human-action owner",
+    "sourcePreservation": "Raw insurer source files remain in persistent Library; GitHub stores sanitized knowledge/rules/source references and QA evidence.",
+    "crossProjectCorpusReuse": {
+      "enabled": true,
+      "libraryRoot": "/A&S Transformacion Digital/CotComp/Evidencia Cotizaciones Reales/2026-09-2026/",
+      "corpusManifest": "AYS_COTCOMP_BIBLIOTECA_PERSISTENTE_CORPUS_COTIZACIONES_2026-10-02_v2.md",
+      "rule": "Reuse only same-risk evidence for quote/comparison; for insurer knowledge, quote samples may establish observed insurer/product facts without being reused as another client's proposal."
+    },
+    "manualLoadPolicy": "Notify Paula only when a source or business confirmation is actually required. Do not make Paula transcribe tables that can be extracted.",
+    "productCoveragePolicy": "Knowledge program is multi-product, not Auto-only. Request sources just-in-time by insurer/product after current vehicle anchors are integrated.",
+    "productDomains": {
+      "GT": [
+        "Automóviles",
+        "Vida",
+        "Gastos Médicos",
+        "Incendio y Líneas Aliadas",
+        "Daños",
+        "Fianzas",
+        "Transporte",
+        "Responsabilidad Civil",
+        "Accidentes Personales"
+      ],
+      "CO": [
+        "Automóviles",
+        "Vida",
+        "Salud",
+        "Incendio y Terremoto",
+        "Daños",
+        "Cumplimiento",
+        "Transporte",
+        "Responsabilidad Civil",
+        "ARL / Riesgos Laborales"
+      ]
+    },
+    "noSilentDefault": "No generic premium, issuance expense or installment surcharge may be applied when insurer/product/version authority is missing.",
+    "noAutoEnable": "Stored or parsed knowledge never enables automatic quoting by itself."
+  },
+  "newlyProvidedSources": [
+    "Tasas AseGuate.xlsx",
+    "AseGuate quotation sample 2026-09-30",
+    "AseGuate policy AUTO-38594 with 10-payment premium integration",
+    "Cotizador VA 2026 V1.4.xlsx (Seguros Columna)",
+    "Columna current quote samples for CRV and Pulsar",
+    "Columna policy VA-41977",
+    "AXA Colpatria auto policy samples 10104 and 9414/LNU485",
+    "Previsora auto policy sample 3117159",
+    "SBS auto policy sample 2215841 (received; extraction pending because source is protected)"
+  ],
+  "libraryPersistence": {
+    "newFolder": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/",
+    "existingCorpusRoot": "/A&S Transformacion Digital/CotComp/Evidencia Cotizaciones Reales/2026-09-2026/",
+    "duplicateRule": "Do not duplicate quote PDFs already present in the CotComp corpus; reference them from the insurer knowledge manifest."
+  },
+  "authorizedProductFiles": [
+    "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js",
+    "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    ".github/workflows/gravicentra-b4-003-executor.yml"
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "scopeLimitedToAuthorizedFiles": true,
+    "operationalBusinessWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "syntheticQaWritesAuthorized": true
+  },
+  "acceptance": [
+    "Preview shows source-backed insurer knowledge in the insurer profile.",
+    "AseGuate and Columna premium/payment facts are visibly source-qualified.",
+    "CO sample facts remain sample/product scoped, not universal defaults.",
+    "Product-domain roadmap visibly demonstrates non-Auto scope.",
+    "No source fact auto-enables Cotizador or Comparativo.",
+    "No page errors/console errors attributable to knowledge UI.",
+    "Exact immutable Preview readback passes before Paula visual acceptance."
+  ],
+  "nextAction": "R9_IMPLEMENT_KNOWLEDGE_DELTA_AND_EXACT_PREVIEW"
+}
