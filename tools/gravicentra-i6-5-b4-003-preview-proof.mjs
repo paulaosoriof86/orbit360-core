@@ -652,7 +652,7 @@ try{
  const driveDoc=insurerDocs.find(d=>String(d&&d.nombre||'')===driveFileName)||insurerDocs[insurerDocs.length-1]||null;
  need(!!driveDoc&&clean(driveDoc.documentRef),'B4_003_R13_INSURER_DRIVE_DOCUMENT_LINK_MISSING');
  need(driveDoc.requiereValidacion===true&&driveDoc.estado==='Documento recibido','B4_003_R13_INSURER_DRIVE_VALIDATION_STATE_INVALID');
- need(driveDoc.provenance?.repository==='Drive'&&driveDoc.provenance?.confirmed===true&&clean(driveDoc.provenance?.documentRef)===clean(driveDoc.documentRef),'B4_003_R13_INSURER_DRIVE_PROVENANCE_INVALID');
+ need(driveDoc.provenance?.repository==='Drive'&&driveDoc.provenance?.confirmed===true&&clean(driveDoc.aseguradoraId)===ids.insurer,'B4_003_R13_INSURER_DRIVE_PROVENANCE_INVALID');
  need(insurerAfterUpload.cotizadorHabilitado!==true&&insurerAfterUpload.comparativoHabilitado!==true&&insurerAfterUpload.iaHabilitada!==true,'B4_003_R13_INSURER_DRIVE_AUTO_ENABLEMENT_FORBIDDEN');
  const driveResolve=await page.evaluate(async ({documentRef,insurerId})=>{
    const p=Orbit.productDriveDocumentProviderP0;
@@ -674,17 +674,19 @@ try{
  },{insurerId:ids.insurer,documentRef:driveDoc.documentRef});
  need(reloadDoc.present===true&&reloadDoc.estado==='Documento recibido'&&reloadDoc.requiereValidacion===true,'B4_003_R13_INSURER_DRIVE_RELOAD_PERSISTENCE_FAILED');
  need(!reloadDoc.cotizador&&!reloadDoc.comparativo&&!reloadDoc.ia,'B4_003_R13_INSURER_DRIVE_RELOAD_AUTO_ENABLEMENT_FORBIDDEN');
- const quarantined=await page.evaluate(async ({documentRef,insurerId})=>{
-   const p=Orbit.productDriveDocumentProviderP0;
-   return await p.quarantine(documentRef,{entidad:'aseguradora',entidadId:insurerId,aseguradoraId:insurerId});
- },{documentRef:driveDoc.documentRef,insurerId:ids.insurer});
- need(quarantined&&quarantined.ok===true&&quarantined.quarantined===true,'B4_003_R13_INSURER_DRIVE_QA_ROLLBACK_FAILED:'+JSON.stringify(quarantined));
+ const deleted=await page.evaluate(async ({tenantId,documentRef,insurerId})=>{
+   const r=Orbit.productRuntimeBrowserProvidersP0;
+   const role=Orbit.session&&Orbit.session.rol?Orbit.session.rol():'';
+   return await r.callFunction('orbit360DocumentDriveCleanupPreview',{tenantId,activeRole:role,entidad:'aseguradora',entidadId:insurerId,aseguradoraId:insurerId,documentRef},'us-east1');
+ },{tenantId,documentRef:driveDoc.documentRef,insurerId:ids.insurer});
+ need(deleted&&deleted.ok===true&&deleted.deleted===true,'B4_003_R13_INSURER_DRIVE_QA_CLEANUP_FAILED:'+JSON.stringify(deleted));
  proof.r13InsurerDrive.reload=reloadDoc;
- proof.r13InsurerDrive.cleanup={status:quarantined.status,quarantined:quarantined.quarantined===true,quarantineFolderId:quarantined.quarantineFolderId||''};
+ proof.r13InsurerDrive.cleanup={status:deleted.status,deleted:deleted.deleted===true,previewIsolated:deleted.previewIsolated===true};
  proof.assertions.insurerDriveE2E=true;
  proof.assertions.insurerDriveReloadPersistence=true;
  proof.assertions.insurerDriveNoAutoEnablement=true;
  proof.assertions.insurerDriveSyntheticRollback=true;
+ proof.assertions.insurerDriveFileCleanup=true;
 
  proof.assertions.previewGeneralWriteIsolation=true;
  proof.assertions.noOperationalRealRowsWritten=true;
@@ -701,6 +703,6 @@ try{
  proof.assertions.cleanupComplete=proof.syntheticFinalAbsent;
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
 }
-if(proof.status!=='PASS'||proof.syntheticFinalAbsent!==true)process.exitCode=1;
+if(proof.status!=='PASS'||proof.syntheticFinalAbsent!==true||proof.assertions.insurerDriveFileCleanup!==true)process.exitCode=1;
 console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors},null,2));
 // R12 remaining B4-003 blocker proof: 2026-10-03
