@@ -197,15 +197,22 @@ try{
    need(proof.assertions.cancellationProjectionConsistent,'B4_003_CANONICAL_POLICY_CANCELATION_NOT_PROJECTED');
  }
 
- await page.evaluate(()=>{const h=document.getElementById('host');Orbit.modules.renovaciones.render(h);});
+ await page.waitForFunction(()=>{
+   const s=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
+   const confirmed=s.serverConfirmedCollections||[];
+   return ['clientes','polizas','gestiones'].every(x=>confirmed.includes(x));
+ },null,{timeout:30000});
+ await page.evaluate(()=>{location.hash='#/renovaciones';});
+ await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='renovaciones',null,{timeout:10000});
  await page.waitForTimeout(500);
  const stable=await page.evaluate(async()=>{
    const h=document.getElementById('host'),before=h.innerText,count={n:0};
    const obs=new MutationObserver(m=>count.n+=m.length);obs.observe(h,{subtree:true,childList:true,characterData:true});
    await new Promise(r=>setTimeout(r,350));
-   obs.disconnect();return{before,after:h.innerText,mutations:count.n};
+   obs.disconnect();return{before,after:h.innerText,mutations:count.n,route:String(Orbit.route&&Orbit.route.key||'')};
  });
- proof.renewalRenderStability={mutationCount:stable.mutations,textStable:stable.before===stable.after};
+ proof.renewalRenderStability={mutationCount:stable.mutations,textStable:stable.before===stable.after,route:stable.route};
+ need(stable.route==='renovaciones','B4_003_RENEWAL_ROUTE_NOT_ACTIVE');
  need(stable.before===stable.after&&stable.mutations===0,'B4_003_RENEWAL_DELAYED_RENDER_MUTATION');
  proof.assertions.noDelayedRenewalRenderMutation=true;
 
