@@ -1,12 +1,12 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_V1",
-  "recordedAt": "2026-10-03T00:26:43.473Z",
+  "recordedAt": "2026-10-03T00:27:57.224Z",
   "status": "READONLY_DIAGNOSTIC_COMPLETE",
   "findingId": "B4-002",
   "mode": "READ_ONLY_NO_PRODUCT_OR_DATA_WRITES",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "sourceSha": "497b6af1678115377391d339b55d13e21e5980c0",
+  "sourceSha": "32af94ba8a2655b8db56182e4c00a92b5fdb9b53",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "runtime": {
@@ -425,11 +425,12 @@
     ]
   },
   "sourceAudit": {
-    "canonicalOutboxCreatedInsideDomainTransaction": false,
+    "canonicalOutboxCreatedInsideDomainTransaction": true,
     "previewSuppressesExternalNotificationOutbox": true,
     "files": [
       {
         "path": "functions/cotcomp-workflow-owner-patch.test.js",
+        "mentionsOutbox": true,
         "writesOutbox": true,
         "readsOutbox": false,
         "firestoreTrigger": false,
@@ -438,187 +439,8 @@
         "deliveryCompletionFields": false
       },
       {
-        "path": "functions/node_modules/@firebase/database/dist/index.cjs.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": true
-      },
-      {
-        "path": "functions/node_modules/@firebase/database/dist/index.esm.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": true
-      },
-      {
-        "path": "functions/node_modules/@firebase/database/dist/index.node.cjs.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": true
-      },
-      {
-        "path": "functions/node_modules/@firebase/database/dist/index.standalone.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": true
-      },
-      {
-        "path": "functions/node_modules/@firebase/database/dist/node-esm/index.node.esm.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": true
-      },
-      {
-        "path": "functions/node_modules/@firebase/database-compat/dist/index.standalone.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": true
-      },
-      {
-        "path": "functions/node_modules/@google-cloud/firestore/build/src/backoff.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/@google-cloud/firestore/build/src/index.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": true
-      },
-      {
-        "path": "functions/node_modules/@google-cloud/firestore/build/src/recursive-delete.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/@google-cloud/firestore/build/src/transaction.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/@google-cloud/firestore/node_modules/google-gax/build/src/normalCalls/retries.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-pick-first.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-round-robin.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-weighted-round-robin.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/firebase-functions/lib/common/providers/tasks.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/firebase-functions/lib/runtime/manifest.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": true
-      },
-      {
-        "path": "functions/node_modules/firebase-functions/lib/v1/cloud-functions.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/firebase-functions/lib/v2/providers/firestore.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": false,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/firebase-functions/lib/v2/providers/scheduler.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
-        "path": "functions/node_modules/google-gax/build/src/normalCalls/retries.js",
-        "writesOutbox": false,
-        "readsOutbox": false,
-        "firestoreTrigger": false,
-        "scheduledProcessor": false,
-        "retryFields": true,
-        "deliveryCompletionFields": false
-      },
-      {
         "path": "functions/ops-advisor-inbox.js",
+        "mentionsOutbox": true,
         "writesOutbox": false,
         "readsOutbox": true,
         "firestoreTrigger": false,
@@ -628,7 +450,8 @@
       },
       {
         "path": "functions/ops-leads-domain.js",
-        "writesOutbox": false,
+        "mentionsOutbox": true,
+        "writesOutbox": true,
         "readsOutbox": true,
         "firestoreTrigger": false,
         "scheduledProcessor": false,
@@ -637,16 +460,18 @@
       },
       {
         "path": "functions/product-operational-domain.js",
+        "mentionsOutbox": false,
         "writesOutbox": false,
         "readsOutbox": false,
         "firestoreTrigger": false,
         "scheduledProcessor": false,
-        "retryFields": true,
+        "retryFields": false,
         "deliveryCompletionFields": false
       },
       {
         "path": "functions/product-ops-leads-domain.js",
-        "writesOutbox": false,
+        "mentionsOutbox": true,
+        "writesOutbox": true,
         "readsOutbox": true,
         "firestoreTrigger": false,
         "scheduledProcessor": false,
@@ -656,39 +481,18 @@
     ],
     "processorOwners": [],
     "retryOwners": [],
-    "statusVisibilityOwners": [
-      "functions/node_modules/@firebase/database/dist/index.cjs.js",
-      "functions/node_modules/@firebase/database/dist/index.esm.js",
-      "functions/node_modules/@firebase/database/dist/index.node.cjs.js",
-      "functions/node_modules/@firebase/database/dist/index.standalone.js",
-      "functions/node_modules/@firebase/database/dist/node-esm/index.node.esm.js",
-      "functions/node_modules/@firebase/database-compat/dist/index.standalone.js",
-      "functions/node_modules/@google-cloud/firestore/build/src/backoff.js",
-      "functions/node_modules/@google-cloud/firestore/build/src/index.js",
-      "functions/node_modules/@google-cloud/firestore/build/src/recursive-delete.js",
-      "functions/node_modules/@google-cloud/firestore/build/src/transaction.js",
-      "functions/node_modules/@google-cloud/firestore/node_modules/google-gax/build/src/normalCalls/retries.js",
-      "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-pick-first.js",
-      "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-round-robin.js",
-      "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-weighted-round-robin.js",
-      "functions/node_modules/firebase-functions/lib/common/providers/tasks.js",
-      "functions/node_modules/firebase-functions/lib/runtime/manifest.js",
-      "functions/node_modules/firebase-functions/lib/v1/cloud-functions.js",
-      "functions/node_modules/firebase-functions/lib/v2/providers/scheduler.js",
-      "functions/node_modules/google-gax/build/src/normalCalls/retries.js",
-      "functions/product-operational-domain.js"
-    ],
+    "statusVisibilityOwners": [],
     "observedStatuses": [
       "pending_provider"
     ]
   },
   "assertions": {
-    "postCommitBoundaryRepresentedByTransactionalOutbox": false,
+    "postCommitBoundaryRepresentedByTransactionalOutbox": true,
     "duplicateOutboxDocumentsNotObserved": true,
     "outboxEventReferentialIntegrity": true,
     "dispatcherOwnerExists": false,
     "retryOwnerExists": false,
-    "failureAndRetryVisibilityExists": true
+    "failureAndRetryVisibilityExists": false
   },
   "classification": "PRODUCT_BACKEND_NOTIFICATION_DELIVERY_GAP",
   "causalConclusion": "The canonical domain writes a deterministic outbox atomically with the committed event, but no executable notificationOutbox dispatcher/retry owner with delivery failure visibility is present in the active functions source.",
