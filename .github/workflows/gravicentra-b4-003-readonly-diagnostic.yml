@@ -1,0 +1,140 @@
+name: Gravicentra B4-003 Renewals Cancellations Diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - '.github/workflows/gravicentra-b4-003-readonly-diagnostic.yml'
+      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gravicentra-b4-003-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  b4-003-readonly-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      B4_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json
+      RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_READONLY_DIAGNOSTIC_20261003.json
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve exact B4-003 diagnostic head
+        id: gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          git reset --hard "origin/$GITHUB_REF_NAME"
+          CANDIDATE_SOURCE_SHA=$(git rev-parse HEAD)
+          echo "CANDIDATE_SOURCE_SHA=$CANDIDATE_SOURCE_SHA" >> "$GITHUB_ENV"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const l=JSON.parse(fs.readFileSync(process.env.B4_LOCK,'utf8'));
+          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_DIAGNOSTIC'
+            && c.currentB4?.status==='B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC'
+            && c.currentB4?.activeFindingId==='B4-003'
+            && l.status==='B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.productMutationAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          const url=c.currentB4?.previewUrl||c.i65ForensicRemediationPlan?.b4?.previewUrl||'';
+          if(!url)throw Error('B4_003_ACCEPTED_PREVIEW_URL_MISSING');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'preview_url='+url+'\n');
+          console.log('B4_003_DIAGNOSTIC_MODE='+(ok?'RUN':'NOOP'));
+          NODE
+
+      - name: Assert LIVE unchanged
+        if: steps.gate.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+
+      - name: Prepare read-only Firebase and browser
+        if: steps.gate.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b4-003-auth"
+          mkdir -p "$ROOT"
+          export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          for i,k in enumerate(['SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT']):
+              raw=os.environ.get(k,'')
+              if not raw: continue
+              try: d=json.loads(raw)
+              except Exception: continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/'service-account.json'
+                  p.write_text(json.dumps(d))
+                  p.chmod(0o600)
+                  print(str(p))
+                  break
+          else:
+              raise SystemExit('B4_003_SERVICE_ACCOUNT_NOT_FOUND')
+          PY
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$ROOT/service-account.json" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Execute B4-003 read-only diagnostic
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B4_PREVIEW_URL: ${{ steps.gate.outputs.preview_url }}
+          B4_003_DIAGNOSTIC_OUT: ${{ runner.temp }}/b4-003-diagnostic.json
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-5-b4-003-renewals-cancellations-diagnostic.mjs
+          node tools/gravicentra-i6-5-b4-003-renewals-cancellations-diagnostic.mjs
+          test -s "$B4_003_DIAGNOSTIC_OUT"
+
+      - name: Upload B4-003 diagnostic evidence
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-readonly-diagnostic-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-diagnostic.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Freeze B4-003 read-only diagnostic
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B4_003_DIAGNOSTIC_OUT: ${{ runner.temp }}/b4-003-diagnostic.json
+        run: |
+          set -euo pipefail
+          cp "$B4_003_DIAGNOSTIC_OUT" "$RECEIPT"
+          git config user.name "gravicentra-release-bot"
+          git config user.email "gravicentra-release-bot@users.noreply.github.com"
+          git add "$RECEIPT"
+          if git diff --cached --quiet; then
+            echo "B4_003_RECEIPT_UNCHANGED"
+            exit 0
+          fi
+          git commit -m "diag(i6.5 B4-003): freeze renewals cancellations evidence"
+          git push origin "HEAD:$GITHUB_REF_NAME"
