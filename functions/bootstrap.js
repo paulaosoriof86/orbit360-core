@@ -15,5 +15,6 @@ module.exports = Object.assign(
   require('./cotcomp-pilot-proposal-validation-s471'),
   require('./cotcomp-vehicle-catalog-delivery-s479'),
   require('./cotcomp-vehicle-dropdown-preview-s480'),
-  require('./cotcomp-vehicle-combobox-preview-s480a')
+  require('./cotcomp-vehicle-combobox-preview-s480a'),
+  require('./cotcomp-schema-driven-intake-preview-s485')
 );
