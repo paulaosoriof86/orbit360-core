@@ -150,6 +150,29 @@ try{
  await applyLegal(page,who);
  await page.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
  await bootProduct(page,token);
+ const quoteAuthorityHosted=await page.evaluate(async()=>{
+   const [contractRes,gateRes]=await Promise.all([
+     fetch('/core/quote-authority-contract-v1.js?b4r10='+Date.now(),{cache:'no-store'}),
+     fetch('/modules/cotizador-v1203-source-gate.js?b4r10='+Date.now(),{cache:'no-store'})
+   ]);
+   const contract=contractRes.ok?await contractRes.text():'';
+   const gate=gateRes.ok?await gateRes.text():'';
+   return{
+     contractStatus:contractRes.status,
+     gateStatus:gateRes.status,
+     contractVersion:contract.includes('gravicentra-quote-authority-v1'),
+     noManualNetInference:!gate.includes('total / (1 + taxPct / 100)'),
+     noPdfNetInference:!gate.includes("total / (1 + (context.pais === 'CO' ? .19 : .12))"),
+     amountBasisReview:gate.includes("basis === 'requires_validation'")
+   };
+ });
+ need(quoteAuthorityHosted.contractStatus===200&&quoteAuthorityHosted.gateStatus===200,'B4_003_R10_QUOTE_AUTHORITY_FILES_NOT_HOSTED');
+ need(quoteAuthorityHosted.contractVersion===true,'B4_003_R10_QUOTE_AUTHORITY_VERSION_NOT_HOSTED');
+ need(quoteAuthorityHosted.noManualNetInference===true&&quoteAuthorityHosted.noPdfNetInference===true,'B4_003_R10_UNSAFE_FINANCIAL_INFERENCE_HOSTED');
+ need(quoteAuthorityHosted.amountBasisReview===true,'B4_003_R10_AMOUNT_BASIS_REVIEW_NOT_HOSTED');
+ proof.quoteAuthorityHosted=quoteAuthorityHosted;
+ proof.assertions.quoteAuthorityContractHosted=true;
+ proof.assertions.manualFinancialInferenceRemoved=true;
  await page.waitForFunction(id=>!!window.Orbit?.store?.get('polizas',id),ids.renewalPolicy,{timeout:30000});
  const backendCancelation=(await ref('cancelaciones',ids.cancelation).get());
  const backendCancelPolicy=(await ref('polizas',ids.cancelPolicy).get());
