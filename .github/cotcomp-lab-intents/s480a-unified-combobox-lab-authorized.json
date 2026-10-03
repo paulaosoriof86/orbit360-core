@@ -1,0 +1,16 @@
+{
+  "schemaVersion":"ays-cotcomp-s480a-unified-combobox-lab-intent-v1.0",
+  "authorization":"S480A_DEPLOY_UNIFIED_COMBOBOX_PREVIEW",
+  "authorizedSourceParent":"fce0f8d7ea359f7f89fd8d9a87c6f53d09953eff",
+  "projectId":"ays-orbit-360-lab",
+  "tenantId":"alianzas-soluciones",
+  "functionName":"cotcompVehicleComboboxPreviewS480A",
+  "catalogFunctionName":"cotcompVehicleCatalogS479",
+  "uxOnly":true,
+  "appDataReads":false,
+  "appDataWrites":false,
+  "piiFields":false,
+  "quoteCaseWrites":false,
+  "providerOrRater":false,
+  "production":false
+}
