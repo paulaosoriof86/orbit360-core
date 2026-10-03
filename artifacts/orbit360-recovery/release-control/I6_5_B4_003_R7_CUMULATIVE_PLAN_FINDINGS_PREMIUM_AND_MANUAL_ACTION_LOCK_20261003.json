@@ -1,0 +1,197 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_V1",
+  "recordedAt": "2026-10-03",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "d2f36fe70a8ce4b45a948100bfb86239a4982230",
+  "authority": "PAULA_EXPLICIT_FREEZE_REQUEST_20261003",
+  "status": "FROZEN_ACTIVE_B4_003_R7_REMEDIATION",
+  "activeFindingId": "B4-003",
+  "b4004Held": true,
+  "purpose": "Freeze all currently known B4-003 visual/functional findings, premium-calculation contract, policy-lifecycle criteria and the exact Paula/manual-action handoff so nothing depends on chat memory.",
+  "predecessor": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R6_POLICY_LIFECYCLE_ADJUDICATION_20261003.json",
+    "blobSha": "0fcdbf31d2c72a156853e2c7adaf692fd0a39c90",
+    "disposition": "PRESERVED_AND_INCORPORATED_NOT_SUPERSEDED_AS_EVIDENCE"
+  },
+  "cumulativeFindings": [
+    {
+      "id": "B4-003-R6-01",
+      "status": "OPEN_BLOCKING",
+      "title": "Projected cancellation rows cannot open detail from policy/row routes.",
+      "closure": "Authoritative policyId resolution; row/client/policy click paths converge; exact Preview human proof."
+    },
+    {
+      "id": "B4-003-R6-02",
+      "status": "OPEN_BLOCKING",
+      "title": "Cliente 360 horizontal tab scrollbar/navigation affordance regression.",
+      "closure": "Restore visible usable horizontal navigation while preserving current tabs."
+    },
+    {
+      "id": "B4-003-R6-03",
+      "status": "OPEN_NONBLOCKING_PREPROD_SEMANTIC",
+      "title": "Cancellation 'Tasa de fuga' is not a defined cohort/time-window churn rate.",
+      "closure": "Truthful rename or explicit cohort/window denominator."
+    },
+    {
+      "id": "B4-003-R6-04",
+      "status": "OPEN_DATA_QUALITY_NONBLOCKING",
+      "title": "Client master country can disagree with policy country.",
+      "closure": "Do not infer client residence from policy; audit against authoritative client source and surface mismatch."
+    },
+    {
+      "id": "B4-003-R6-05",
+      "status": "OPEN_BLOCKING",
+      "title": "Renewability not canonical across create/import/renewal surfaces.",
+      "closure": "Tri-state Renovable/No renovable/Por validar; false never enters renewal queue/campaign/cronogram; unknown fail-closed; imports do not default true without authority."
+    },
+    {
+      "id": "B4-003-R6-06",
+      "status": "OPEN_BLOCKING",
+      "title": "Certificates, monthly declarations and policy-linked annexes are not first-class child movements.",
+      "closure": "Master policy remains one policy; certificates/declarations/annexes are linked children with type, period/unique flag, effective date, reference/document, risk detail and optional premium delta; approved risk/policy modifications use canonical endoso workflow."
+    },
+    {
+      "id": "B4-003-R6-07",
+      "status": "OPEN_BLOCKING",
+      "title": "Commercial client, insured/titular/tomador and optional contact are conflated.",
+      "closure": "Persist real commercial client separately; contact defaults to real client but may be separate durable relation; policy parties do not overwrite CRM client identity."
+    },
+    {
+      "id": "B4-003-R6-08",
+      "status": "OPEN_NONBLOCKING_PREPROD",
+      "title": "New-client creation does not proactively match/link/create Drive expediente.",
+      "closure": "After durable client creation: unique match=>link, no match=>create, ambiguous=>fail closed; Drive failure does not roll back client."
+    },
+    {
+      "id": "B4-003-R6-09",
+      "status": "OPEN_DATA_QUALITY_NONBLOCKING",
+      "title": "Historical cancellation reason missing for projected cancellations.",
+      "closure": "Future cancellation requires date+reason; historical gaps remain explicit/editable and are never fabricated."
+    },
+    {
+      "id": "B4-003-R7-10",
+      "status": "OPEN_BLOCKING",
+      "title": "Premium calculation has arithmetic owner but no safe canonical rate authority.",
+      "evidence": {
+        "premiumEnginePath": "orbit360-platform/core/primas.js",
+        "premiumEngineBlobSha": "507735bbd809546f97dbb5fec166a30d68fc2c93",
+        "receiptEnginePath": "orbit360-platform/core/policy-receipts-engine.js",
+        "receiptEngineBlobSha": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
+        "auditPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P8_DIAGNOSTIC_ADJUDICATION_20261002.json",
+        "auditBlobSha": "1ecde62fd986a965af728b5573877d2d56ae4476"
+      },
+      "demonstratedFacts": [
+        "Current engine arithmetic is primaNeta + gastosEmision + gastosFinancieros + otros = baseGravable; IVA = baseGravable * ivaPct; primaTotal = baseGravable + IVA.",
+        "Financial surcharge is calculated as primaNeta * recargoFinPct only when fraccionado.",
+        "Receipt splitting preserves total by placing component/IVA rounding residue in the final applicable receipt.",
+        "B3 financial audit recomputed 7 complete samples with 0 formula mismatch and 0 IVA mismatch.",
+        "Tariff diagnostic found zero valid canonical configuracionesTarifa, zero valid embedded tariff configurations and zero tariff samples with source/version/validity authority.",
+        "core/primas.js falls back to generic IVA=12 and recargoFinanciero=5 if no country config exists, while the canonical policy form falls back to CO IVA=19 / otherwise 12 and blank recargo becomes 0. These paths are not a safe contractual authority."
+      ],
+      "frozenContract": {
+        "sourceHierarchy": [
+          "Authoritative insurer/policy document or approved imported source values.",
+          "Canonical tariff configuration keyed by country + insurer + ramo/subramo/product + payment frequency/conditions + validity/version/source.",
+          "Explicit user-entered components/rates with audit reason when source legitimately requires manual entry.",
+          "Generic country defaults are display aids only and MUST NOT certify or silently create insurer/product contractual amounts."
+        ],
+        "totalRule": "If authoritative source provides primaTotal, preserve that contractual total. Do not overwrite it merely because components are missing.",
+        "componentValidationRule": "If authoritative source provides complete components/rates, recompute and compare. A material mismatch is an exception requiring resolution; do not silently overwrite source.",
+        "incompleteRule": "If primaNeta exists but one or more required contractual rates/components are unknown, do not fabricate primaTotal from generic defaults. Mark calculation pending/needs authority.",
+        "calculatedRule": "When all required components are authoritative, calculate total from the explicit signed components and tax base defined by that product configuration; display source total and calculated total separately until they reconcile.",
+        "installmentRule": "The sum of generated receipts must equal the authoritative/canonical primaTotal exactly; rounding residual is assigned deterministically to the last applicable installment and never creates an extra receipt.",
+        "paymentPlanRule": "Frequency determines expected installments unless authoritative source explicitly overrides; monthly may have an explicit installment count. Competing physical calendars remain fail-closed until authority resolves them.",
+        "currencyRule": "Policy canonical currency governs linked financial projections; source currency is preserved as provenance and conflicts are flagged.",
+        "productionRule": "Existing policy viewing is not blocked by missing tariff tables. New/edit policy auto-calculation IS blocked from inventing a total when rate/component authority is missing. Explicit authoritative total/components may still be persisted with audit."
+      }
+    },
+    {
+      "id": "B4-003-R7-11",
+      "status": "OPEN_MANUAL_HANDOFF_CONTROL",
+      "title": "81-case reconciliation must not depend on Paula starting work prematurely.",
+      "closure": "System-first source exhaustion followed by an explicit residual handoff to Paula only when required."
+    }
+  ],
+  "financialReconciliationCarry": {
+    "workbook": "Gravicentra_reconciliacion_81_casos_PARA_COMPLETAR_20261003.xlsx",
+    "totalUniquePolicies": 81,
+    "deterministicAssistantCandidates": 50,
+    "initiallySourceDependentCandidates": 31,
+    "currentPaulaAction": "DO_NOT_START_YET",
+    "productionBlockingByMissingSource": false,
+    "systemFirstActions": [
+      "Resolve the 50 deterministic cases by controlled diff/readback; Paula does not research these.",
+      "Before asking Paula about any of the 31, inspect already available Project/GitHub/source files for prima total, frequency, installment count, competing schedules and insurer evidence.",
+      "Produce a residual list containing only unresolved policies, the exact missing field, acceptable evidence and proposed correction.",
+      "No ambiguous operational data write is authorized before source/Paula confirmation."
+    ],
+    "paulaStartCondition": "Paula starts manual work ONLY after ChatGPT explicitly says MANUAL_ACTION_START and supplies the residual list after source exhaustion.",
+    "paulaInputProtocol": "For each residual case Paula only supplies/marks what is missing (e.g. prima total, frequency, installment count, which package is current, and source/reference). She does not recalculate or reconcile the database.",
+    "assistantAfterPaulaInput": "Validate coherence, generate dry-run exact diff, show before/after, obtain authorization for operational correction if required, write with canonical readback and rollback evidence."
+  },
+  "plan": {
+    "gate": "B4-003",
+    "principle": "No new methodology or iteration. All work remains inside the active B4-003 gate and returns to the frozen plan.",
+    "steps": [
+      {
+        "order": 1,
+        "id": "R7-A",
+        "status": "PASS_THIS_FREEZE",
+        "action": "Freeze cumulative findings, premium contract and manual-action protocol in repo authority."
+      },
+      {
+        "order": 2,
+        "id": "R7-B",
+        "status": "NEXT",
+        "action": "Read-only source exhaustion for the 31 initially source-dependent receipt/premium cases and tariff/config authority; reduce Paula residual list as far as evidence allows."
+      },
+      {
+        "order": 3,
+        "id": "R7-C",
+        "status": "PENDING",
+        "action": "Causal product fixes for cancellation detail identity, Cliente360 tab navigation regression, renewability, policy child movements/certificates, client/contact/party relations, premium rate fail-closed behavior and required semantic KPI fixes."
+      },
+      {
+        "order": 4,
+        "id": "R7-D",
+        "status": "PENDING",
+        "action": "Drive ensure-folder/link flow and nonblocking data-quality surfacing, preserving already approved Drive owner."
+      },
+      {
+        "order": 5,
+        "id": "R7-E",
+        "status": "PENDING",
+        "action": "Exact immutable Preview build/readback + machine proof including no country regression, renewal exclusion for non-renewable policies, premium calculation authority guards, child movements not counted as policies, cancellation detail and Cliente360 scroll."
+      },
+      {
+        "order": 6,
+        "id": "R7-F",
+        "status": "PENDING",
+        "action": "Paula targeted cumulative visual review on one exact Preview. B4-004 remains blocked until PASS."
+      },
+      {
+        "order": 7,
+        "id": "R7-G",
+        "status": "CONDITIONAL_AFTER_SOURCE_EXHAUSTION",
+        "action": "Issue MANUAL_ACTION_START only if residual financial/policy cases remain; Paula handles only that residual list."
+      }
+    ]
+  },
+  "noLossRules": [
+    "No finding is closed by absence from a later prompt/chat.",
+    "Machine PASS does not replace Paula visual acceptance where visual proof is required.",
+    "Missing source information does not by itself block production when the case can remain explicit and fail-closed.",
+    "Known deterministic corrections must be exhausted before asking Paula for manual work.",
+    "No reimport to solve display, routing, scope, calculation, relationship or validator defects.",
+    "No LIVE promotion or B4-004 start while B4-003 R7 remains active."
+  ],
+  "boundaries": {
+    "productMutationAuthorizedByThisFreeze": false,
+    "operationalBusinessWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b4004Authorized": false
+  },
+  "nextAction": "B4_003_R7_SOURCE_EXHAUSTION_THEN_CAUSAL_FIX"
+}
