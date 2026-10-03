@@ -1,0 +1,19 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_PREVIEW_CONCURRENCY_COLLISION_V1",
+  "recordedAt": "2026-10-03",
+  "status": "QA_SCHEDULING_RETRIGGER_AUTHORIZED",
+  "findingId": "B4-003",
+  "cancelledRunId": 37162287332,
+  "cancelledHead": "73b15281e739166fc90da3daa2c8ba834329f88e",
+  "classification": "QA_WORKFLOW_SCHEDULING_COLLISION",
+  "rootCause": "Three B4-003 workflows share concurrency group gravicentra-b4-003-${github.ref} and CONTROL_PLANE pushes trigger dormant diagnostic workflows as well as the exact Preview workflow. GitHub retains only one pending run per concurrency group, so the exact Preview run was cancelled before any job was created while a diagnostic run occupied the group.",
+  "remediation": "Retrigger only the exact Preview executor by a scheduling-only edit to its own workflow path after the source-fixed control state is already frozen. Do not reopen diagnostics or change product source.",
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "businessWrites": 0
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW_RETRIGGER"
+}
