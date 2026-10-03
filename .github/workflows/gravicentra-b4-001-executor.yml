@@ -184,7 +184,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP/b4-001-package/bundle"
-          CHANNEL_ID="gi-b4001-$GITHUB_RUN_ID"
+          CHANNEL_ID="gi-i65-b4-$GITHUB_RUN_ID"
           deploy_channel() {
             set +e
             node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b4-001-preview.json" 2>&1
