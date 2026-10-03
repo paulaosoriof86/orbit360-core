@@ -1,0 +1,13 @@
+{
+  "schemaVersion":"ays-cotcomp-s477-dropdown-adapter-alias-sourceonly-intent-v1.0",
+  "authorization":"S477_DROPDOWN_ADAPTER_ALIAS_SOURCEONLY",
+  "authorizedSourceParent":"e80daa751ceaff94ef60a3dab59564f252348618",
+  "projectId":"ays-orbit-360-lab",
+  "tenantId":"alianzas-soluciones",
+  "catalogDigestSha256":"89a77e66025945d015cc51704441a97437286022cafeef4995962fd750358df8",
+  "appDataReads":false,
+  "appDataWrites":false,
+  "deployment":false,
+  "providerOrRater":false,
+  "production":false
+}
