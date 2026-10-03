@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-02",
-  "status": "B4_003_R7_CUMULATIVE_REMEDIATION_ACTIVE",
+  "status": "B4_003_R8_SOURCE_REUSE_AND_KNOWLEDGE_CONSOLIDATION_ACTIVE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -37,13 +37,13 @@
   ],
   "activeFinding": {
     "id": "B4-003",
-    "title": "Cumulative remediation: cancellation detail, Cliente360 regression, policy lifecycle, premium authority and financial carry.",
-    "status": "B4_003_R7_CUMULATIVE_REMEDIATION_ACTIVE",
+    "title": "Cumulative remediation plus Information Health and insurer tariff knowledge reuse.",
+    "status": "B4_003_R8_SOURCE_REUSE_AND_KNOWLEDGE_CONSOLIDATION_ACTIVE",
     "blocking": true,
-    "nextAction": "B4_003_R7_SOURCE_EXHAUSTION_THEN_CAUSAL_FIX",
+    "nextAction": "B4_003_R8_REUSE_SOURCE_INVENTORY_AND_INSURER_KNOWLEDGE_FASTTRACK",
     "humanVisualStatus": "REJECTED_R6_REMEDIATION_ACTIVE",
-    "cumulativeFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
-    "cumulativeFreezeBlobSha": "37f015ea5262df68ac0838b57b1de61c1b0b25a7"
+    "informationHealthAndInsurerKnowledgeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
+    "informationHealthAndInsurerKnowledgeLockBlobSha": "e0edc10070dee174ed0c3527a29a8b632b1cba69"
   },
   "rules": {
     "preserveB1B2B3Pass": true,
@@ -75,14 +75,14 @@
     "syntheticQaScope": "B4-003 R5 exact Preview only; mandatory cleanup; no operational record mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true
   },
-  "nextAction": "B4_003_R7_SOURCE_EXHAUSTION_THEN_CAUSAL_FIX",
+  "nextAction": "B4_003_R8_REUSE_SOURCE_INVENTORY_AND_INSURER_KNOWLEDGE_FASTTRACK",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "28fc6d606267087af67c0fcf7c1a4baeb31eece0"
+    "blobSha": "4fa2c3717613b7f8fab9a4a37dec4bd8c4e17cdc"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "9e7e50a7990b22d6300d4f3d1e4e5ad10227a55c"
+    "blobSha": "27e1b43e2566bdef0ac395dfd85efc52517e06e8"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -97,10 +97,11 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
-    "B4_003_R7_SOURCE_EXHAUSTION_RECEIPT",
-    "B4_003_R7_CAUSAL_SOURCE_FIX_CONTRACT_PASS",
-    "B4_003_R7_EXACT_PREVIEW_MACHINE_PASS",
-    "B4_003_R7_TARGETED_PAULA_VISUAL_PASS"
+    "B4_003_R8_SOURCE_INVENTORY_RECEIPT",
+    "B4_003_R8_TARIFF_AUTHORITY_GAP_CLASSIFICATION",
+    "B4_003_R8_CAUSAL_SOURCE_FIX_CONTRACT_PASS",
+    "B4_003_R8_EXACT_PREVIEW_MACHINE_PASS",
+    "B4_003_R8_TARGETED_PAULA_VISUAL_PASS"
   ],
   "candidate": {
     "sourceSha": "9ad8efe1b68589e57a5f6c8eb449690a75b31e14",
@@ -274,5 +275,14 @@
     "premiumCalculationContractFrozen": true,
     "paulaManualActionStatus": "DO_NOT_START_YET",
     "sourceExhaustionBeforePaula": true
+  },
+  "r8InformationHealthAndInsurerKnowledge": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
+    "blobSha": "e0edc10070dee174ed0c3527a29a8b632b1cba69",
+    "status": "FROZEN_ACTIVE",
+    "paulaFinancialManualActionStatus": "DO_NOT_START_YET",
+    "paulaSourceUploadStatus": "UPLOAD_ONLY_WHEN_REQUESTED",
+    "informationHealthOwner": "#/calidad",
+    "reuseExistingInsurerKnowledge": true
   }
 }
