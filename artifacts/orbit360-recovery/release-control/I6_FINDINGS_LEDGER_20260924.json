@@ -2745,7 +2745,11 @@
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_MACHINE_PASS_20261002.json",
-      "machineProofReceiptBlobSha": "72ff0e5571358a6585856f5b453d104387138d7b"
+      "machineProofReceiptBlobSha": "72ff0e5571358a6585856f5b453d104387138d7b",
+      "humanVisualStatus": "PENDING_CUMULATIVE_REVIEW",
+      "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
+      "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
+      "machineEvidencePreserved": true
     },
     {
       "id": "B4-002",
@@ -2788,7 +2792,11 @@
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_MACHINE_PASS_20261003.json",
       "machineProofReceiptBlobSha": "7d51a1551d73f144a5e80269ee4a811b2bc23c14",
-      "currentCandidateEligibleForPromotion": false
+      "currentCandidateEligibleForPromotion": false,
+      "humanVisualStatus": "PENDING_CUMULATIVE_REVIEW",
+      "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
+      "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
+      "machineEvidencePreserved": true
     },
     {
       "id": "B4-003",
@@ -2846,7 +2854,10 @@
       "sourceFixR3ReceiptBlobSha": "44f1995c63b852497968b88d738fa5daf63c35b8",
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
-      "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c"
+      "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
+      "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745"
     },
     {
       "id": "B4-004",
@@ -6640,5 +6651,17 @@
       }
     ],
     "note": "Names and parent IDs identify prior B2 QA lineage, but no deletion is authorized by this receipt. Exact provenance/dependent-row readback is required before any cleanup."
+  },
+  "b4VisualAcceptanceControl": {
+    "status": "ENFORCED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
+    "receiptBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
+    "cumulativeReviewThrough": [
+      "B4-001",
+      "B4-002",
+      "B4-003"
+    ],
+    "nextFindingHeld": "B4-004",
+    "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS"
   }
 }
