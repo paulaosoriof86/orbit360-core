@@ -1,0 +1,28 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_MACHINE_PASS_VISUAL_GUARD_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "QA_GOVERNANCE_GUARD_FIXED_PENDING_RECHECK",
+  "findingId": "B4-003",
+  "failedRuns": [
+    37154153119,
+    37154153195
+  ],
+  "failureCode": "I6_5_FORENSIC_B4_ACTION_INVALID",
+  "rootCause": "Machine-pass workflow correctly transitioned CONTROL_PLANE.nextAction to I6_5_FORENSIC_REMEDIATION_B4_003_TARGETED_PAULA_VISUAL, but the central B4 action allowlist ended at B4_003_CONTRACT_AND_EXACT_PREVIEW and jumped directly to B4_004_DIAGNOSTIC.",
+  "fix": {
+    "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+    "priorGuardBlobSha": "265cbe91218045be815ed420278f2c1fcd462557",
+    "guardBlobSha": "7364f9072a8c796af850503600d2bba4977f3fc3",
+    "exactAddedAction": "I6_5_FORENSIC_REMEDIATION_B4_003_TARGETED_PAULA_VISUAL",
+    "broadening": false,
+    "rationale": "Adds only the already-required human visual transition; B4-004 remains held."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "artifactChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+}
