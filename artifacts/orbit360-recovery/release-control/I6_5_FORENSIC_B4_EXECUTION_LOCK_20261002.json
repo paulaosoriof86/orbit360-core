@@ -88,11 +88,11 @@
   "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "e35a50baea3f139f9ce3e65193bd81efc7b4158b"
+    "blobSha": "d9b1a5d73a2cdfd602c59322d4a39e7c29882bcc"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "cdba7ca717fa13ac69aee459c78f3f6afe7eedfe"
+    "blobSha": "e08155df585bf2d0d992e221042fc1146588033b"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -337,5 +337,12 @@
     ],
     "cotcompRealTransportAuthorized": false,
     "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW"
+  },
+  "r10CompositionRootFix": {
+    "status": "PASS_EXACT_SET_REBOUND_PENDING_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_COMPOSITION_EXACT_SET_ROOTFIX_20261003.json",
+    "blobSha": "4cc32b403ad0506f53e473fc620151f0dc8a02c5",
+    "exactProductFileCount": 94,
+    "productSourceChanged": false
   }
 }
