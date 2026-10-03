@@ -424,6 +424,25 @@ async function quarantineDocument(request,previewOnly){
   return{ok:true,status:'quarantined',documentRef:fileId,fileId,quarantineFolderId:quarantine.id,quarantined:true,backendPersistent:true,previewIsolated:previewOnly===true};
 }
 
+async function cleanupPreviewDocument(request){
+  const input=request.data||{},tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
+  const target=await authorizeTarget(request,tenantId,input,'write',true);
+  if(!previewSyntheticTarget(target))throw new HttpsError('permission-denied','La limpieza QA de Drive solo admite expedientes sintéticos de Preview.');
+  const fileId=clean(input.documentRef||input.fileId||input.archivoRef,180)||driveIdFromUrl(input.driveUrl||input.externalUrl||input.url||'');
+  if(!/^[A-Za-z0-9_-]{20,}$/.test(fileId))throw new HttpsError('invalid-argument','Referencia documental inválida.');
+  const bound=new Set([...refsFrom(target.row),...refsFrom(target.management||{})]);
+  if(!bound.has(fileId))throw new HttpsError('permission-denied','El documento QA no pertenece al expediente sintético autorizado.');
+  const auth=await tenantDriveToken(tenantId,true),accessToken=auth.accessToken;
+  const meta=await getMeta(fileId,accessToken);
+  if(!meta||meta.trashed===true)return{ok:true,status:'already_absent',documentRef:fileId,deleted:true,previewIsolated:true};
+  await driveFetch('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(fileId)+'?supportsAllDrives=true',{method:'DELETE'},accessToken);
+  let absent=false;
+  try{await getMeta(fileId,accessToken);}catch(error){absent=/not-found/i.test(String(error&&error.code||error&&error.message||''));}
+  if(!absent)throw new HttpsError('internal','Drive no confirmó la eliminación del documento QA.');
+  await audit(tenantId,target.actor,'drive.document_cleanup_preview',{clientId:target.clientId,entityType:target.entityType,entityId:target.entityId,documentRef:fileId,outcome:'deleted'},true);
+  return{ok:true,status:'deleted_preview_qa',documentRef:fileId,deleted:true,previewIsolated:true,entityType:target.entityType,entityId:target.entityId};
+}
+
 async function readDocument(request,previewOnly,downloadMode){
   const authz=await authorizeDocument(request,previewOnly,'read'),auth=await tenantDriveToken(authz.tenantId,previewOnly),accessToken=auth.accessToken;
   const meta=await getMeta(authz.fileId,accessToken);
@@ -452,5 +471,6 @@ exports.orbit360DocumentDriveReadPreview = onCall(Object.assign({},PREVIEW,{time
 exports.orbit360DocumentDriveDownloadPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'512MiB'}),r=>readDocument(r,true,true));
 exports.orbit360DocumentDriveFinalizePreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'256MiB'}),r=>finalizeDocument(r,true));
 exports.orbit360DocumentDriveQuarantinePreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'256MiB'}),r=>quarantineDocument(r,true));
+exports.orbit360DocumentDriveCleanupPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'256MiB'}),r=>cleanupPreviewDocument(r));
 exports.orbit360DocumentDriveBootstrapPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'256MiB'}),r=>bootstrap(r,true));
 exports.__documentDriveDomain=Object.freeze({VERSION,ROOT_BY_TENANT,MAX_BYTES,ALLOWED_MIME,oauthDelegated:false,tenantPersistentBackend:true,credentialStore:'SecretManager',serviceAccount:SERVICE_ACCOUNT});
