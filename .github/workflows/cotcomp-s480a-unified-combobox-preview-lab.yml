@@ -1,0 +1,175 @@
+name: CotComp S4.80A unified combobox LAB preview
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s480a-unified-combobox-preview-lab-20261003
+    paths:
+      - '.github/cotcomp-lab-intents/s480a-unified-combobox-lab-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompVehicleComboboxPreviewS480A
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompVehicleComboboxPreviewS480A
+
+jobs:
+  s480a-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.80A deployment intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s480a-unified-combobox-lab-authorized.json
+          jq -e '
+            .authorization=="S480A_DEPLOY_UNIFIED_COMBOBOX_PREVIEW" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .functionName=="cotcompVehicleComboboxPreviewS480A" and
+            .catalogFunctionName=="cotcompVehicleCatalogS479" and
+            .uxOnly==true and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .piiFields==false and
+            .quoteCaseWrites==false and
+            .providerOrRater==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.80A safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-vehicle-combobox-preview-s480a.js
+          node --check cotcomp-vehicle-combobox-preview-s480a.test.js
+          node --test cotcomp-vehicle-combobox-preview-s480a.test.js
+
+      - name: Prepare exact LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s480a/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s480a/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Deploy only S4.80A preview function to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physically verify unified combobox preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s480a/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+
+          grep -q 'Objetivo de esta prueba' "$E/page.html"
+          grep -q 'id="brandInput"' "$E/page.html"
+          grep -q 'role="combobox"' "$E/page.html"
+          grep -q 'id="brandList"' "$E/page.html"
+          grep -q 'id="modelInput"' "$E/page.html"
+          grep -q 'id="modelList"' "$E/page.html"
+          grep -q 'aria-autocomplete="list"' "$E/page.html"
+          grep -q 'ArrowDown' "$E/page.html"
+          grep -q 'ArrowUp' "$E/page.html"
+          grep -q 'No encuentro mi marca' "$E/page.html"
+          grep -q 'No encuentro mi línea / modelo' "$E/page.html"
+          grep -q 'id="year"' "$E/page.html"
+          ! grep -q '<label[^>]*>Buscar marca' "$E/page.html"
+          ! grep -q '<label[^>]*>Buscar línea' "$E/page.html"
+          ! grep -q 'WhatsApp' "$E/page.html"
+          ! grep -q 'Correo electrónico' "$E/page.html"
+          ! grep -q 'requestManagement' "$E/page.html"
+
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+
+          CATALOG_URL='https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompVehicleCatalogS479'
+          curl -fsS "$CATALOG_URL?op=brands&vehicleClass=AUTO_LIGHT&q=TOYOTA&limit=20" -o "$E/brands.json"
+          BRAND_ID="$(jq -r '.items[] | select(.label=="TOYOTA") | .brandId' "$E/brands.json" | head -n1)"
+          test -n "$BRAND_ID"
+          curl -fsS --get "$CATALOG_URL"             --data-urlencode "op=models"             --data-urlencode "vehicleClass=AUTO_LIGHT"             --data-urlencode "brandId=$BRAND_ID"             --data-urlencode "q=COROLLA"             --data-urlencode "limit=100"             -o "$E/models.json"
+          jq -e '.items | any(.label=="COROLLA")' "$E/models.json" >/dev/null
+          curl -fsS "$CATALOG_URL?op=years" -o "$E/years.json"
+          jq -e '.items|index(2006)!=null' "$E/years.json" >/dev/null
+
+          jq -n --arg url "$COTCOMP_URL" '{
+            schemaVersion:"ays-cotcomp-s480a-combobox-preview-physical-receipt-v1.0",
+            functionUrl:$url,
+            deployed:true,
+            singleBrandCombobox:true,
+            singleModelCombobox:true,
+            keyboardNavigationPresent:true,
+            missingBrandFallbackPresent:true,
+            missingModelFallbackPresent:true,
+            yearSeparate:true,
+            supportingCatalogToyotaCorolla2006Pass:true,
+            piiFieldsPresent:false,
+            quoteSubmissionPresent:false,
+            postRejected:true,
+            uxOnly:true,
+            appDataReads:0,
+            appDataWrites:0,
+            quoteCaseWrites:0,
+            providerOrRaterCalls:0,
+            productionTouched:false,
+            productionCatalogAuthorityClaimed:false
+          }' > "$E/S480A_COMBOBOX_PREVIEW_PHYSICAL_RECEIPT.json"
+
+      - name: Upload sanitized S4.80A evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s480a-combobox-preview-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s480a/evidence/S480A_COMBOBOX_PREVIEW_PHYSICAL_RECEIPT.json
+            ${{ runner.temp }}/s480a/evidence/page.html
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s480a/firebase-service-account.json"
