@@ -64,12 +64,31 @@ async function bootProduct(page,token){
  const state=await page.evaluate(async token=>{
    const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
    if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);
+   const requested=['clientes','polizas','cancelaciones','negocios','gestiones'];
+   const forced={called:false,phase:'',requested:[]};
+   const forceCollections=(event)=>{
+     try{
+       if(!Orbit.store||typeof Orbit.store._ensureCollections!=='function')return;
+       const attached=Orbit.store._ensureCollections(requested)||[];
+       forced.called=Array.isArray(attached)&&attached.includes('cancelaciones');
+       forced.phase=String(event?.detail?.phase||'available-readonly-store');
+       forced.requested=Array.isArray(attached)?attached.slice():[];
+     }catch(error){forced.error=String(error&&error.message||error);}
+   };
+   window.addEventListener('orbit:product-readonly-bootstrap',forceCollections);
    const s=Orbit.productAppP0.status?.();
-   const activated=await Promise.resolve(s?.started?s:Orbit.productAppP0.activate());
-   try{Orbit.store?._ensureCollections?.(['clientes','polizas','cancelaciones','actividades','negocios','gestiones']);}catch{}
-   return{uid:String(c.auth.currentUser?.uid||''),started:activated?.started===true};
+   let activated;
+   try{
+     activated=await Promise.resolve(s?.started?s:Orbit.productAppP0.activate());
+     forceCollections({detail:{phase:'post-activate'}});
+   }finally{
+     window.removeEventListener('orbit:product-readonly-bootstrap',forceCollections);
+   }
+   return{uid:String(c.auth.currentUser?.uid||''),started:activated?.started===true,forced};
  },token);
  need(state.uid&&state.started,'B4_003_PRODUCT_SESSION_NOT_STARTED');
+ need(state.forced&&state.forced.called===true,'B4_003_READONLY_COLLECTION_FORCE_NOT_REACHED');
+ return state;
 }
 async function residueReadback(){
  const out=[];
