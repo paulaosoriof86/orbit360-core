@@ -88,7 +88,7 @@ Orbit.modules.cronograma = (function () {
   function draw() {
     const ev = eventos();
     host.innerHTML = `<div class="page" data-cronograma-ready="1">
-      ${K.banner({ icon: '📅', title: 'Cronograma', sub: 'Agenda de vencimientos y tareas del equipo', features: [], actions: `<button class="btn primary" id="cr-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Tarea</button>` })}
+      ${K.banner({ icon: '📅', title: 'Cronograma', sub: 'Agenda de renovaciones, recibos, gestiones y tareas del equipo', features: [], actions: `<button class="btn primary" id="cr-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Tarea</button>` })}
       <div class="cr-bar">
         <div class="mk-nav"><button class="mk-navb" id="cr-prev">‹</button><b id="cr-title" style="font-family:var(--f-display);font-size:17px;min-width:200px;text-align:center">${titulo()}</b><button class="mk-navb" id="cr-next">›</button></div>
         <button class="btn ghost sm" id="cr-hoy">Hoy</button>
@@ -104,7 +104,8 @@ Orbit.modules.cronograma = (function () {
     host.querySelectorAll('[data-ev]').forEach((el, i) => el.addEventListener('click', () => { const fn = el._go; if (fn) fn(); }));
     // attach handlers
     let idx = 0; const flat = host.querySelectorAll('[data-ev]');
-    flat.forEach(el => { const f = el.dataset.ev, d = el.dataset.d; const e = (ev[d] || [])[+f]; if (e) el.addEventListener('click', e.go); });
+    flat.forEach(el => { const f = el.dataset.ev, d = el.dataset.d; const e = (ev[d] || []).slice().sort(eventPriority)[+f]; if (e) el.addEventListener('click', e.go); });
+    host.querySelectorAll('[data-more-date]').forEach(el=>el.addEventListener('click',()=>{vista='dia';ref=new Date(el.dataset.moreDate+'T12:00:00');draw();}));
   }
   function titulo() {
     if (vista === 'mes') return MESES[ref.getMonth()] + ' ' + ref.getFullYear();
@@ -116,6 +117,11 @@ Orbit.modules.cronograma = (function () {
   function startOfWeek(d) { const x = new Date(d); let off = x.getDay() - 1; if (off < 0) off = 6; x.setDate(x.getDate() - off); x.setHours(0, 0, 0, 0); return x; }
   function iso(d) { return d.toISOString().slice(0, 10); }
 
+  function eventPriority(a,b) {
+    const rank={renov:0,recibo:1,gestion:2,tarea:3};
+    return (rank[a&&a.tipo]??9)-(rank[b&&b.tipo]??9) || String(a&&a.t||'').localeCompare(String(b&&b.t||''));
+  }
+
   function vMes(ev) {
     const y = ref.getFullYear(), m = ref.getMonth();
     const first = new Date(y, m, 1); let off = first.getDay() - 1; if (off < 0) off = 6;
@@ -125,11 +131,11 @@ Orbit.modules.cronograma = (function () {
     for (let i = 0; i < off; i++) cells += '<div class="mk-cell empty"></div>';
     for (let d = 1; d <= days; d++) {
       const fecha = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const items = ev[fecha] || [];
+      const items = (ev[fecha] || []).slice().sort(eventPriority);
       cells += `<div class="mk-cell ${fecha === hoy ? 'today' : ''}">
         <div class="mk-d">${fecha === hoy ? '<span class="mk-today">' + d + '</span>' : d}${items.length ? `<span class="mk-count">${items.length}</span>` : ''}</div>
         ${items.slice(0, 3).map((e, i) => `<div class="mk-chip" data-ev="${i}" data-d="${fecha}" title="${U.esc(e.t)}" style="--enf:${e.color}"><span class="mk-chip-em">${e.icon}</span><span class="mk-chip-t">${U.esc(e.t)}</span></div>`).join('')}
-        ${items.length > 3 ? `<div class="mk-more">+${items.length - 3}</div>` : ''}
+        ${items.length > 3 ? `<button type="button" class="mk-more" data-more-date="${fecha}">+${items.length - 3} · ver día</button>` : ''}
       </div>`;
     }
     return `<div class="mk-cal"><div class="mk-week">${DIAS.map(d => `<div class="mk-dh">${d}</div>`).join('')}</div><div class="mk-grid">${cells}</div></div>`;
@@ -139,7 +145,7 @@ Orbit.modules.cronograma = (function () {
     let out = '';
     for (let i = 0; i < n; i++) {
       const d = new Date(start); d.setDate(d.getDate() + i); const fecha = iso(d);
-      const items = ev[fecha] || [];
+      const items = (ev[fecha] || []).slice().sort(eventPriority);
       out += `<div class="cr-day"><div class="cr-day-h">${d.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'short' })}${fecha === iso(new Date(U.NOW || Date.now())) ? ' <span class="badge danger" style="font-size:9px">Hoy</span>' : ''}</div>
         ${items.length ? items.map((e, j) => `<div class="cr-ev" data-ev="${j}" data-d="${fecha}"><span class="cr-ev-ic" style="background:${e.color}">${e.icon}</span><b>${U.esc(e.t)}</b><span class="muted" style="margin-left:auto;font-size:11px;text-transform:capitalize">${e.tipo}</span></div>`).join('') : '<div class="muted" style="font-size:12px;padding:4px 0">Sin pendientes.</div>'}
       </div>`;
