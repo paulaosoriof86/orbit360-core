@@ -46,13 +46,37 @@ test('S4.88 preserves original common products and extends completeness inside t
   for(const x of ['Auto','Hogar','Vida','Salud / gastos médicos','Empresa','Transporte / carga','Otros / no sé cuál necesito']) assert.ok(h.includes(x),x);
 });
 
-test('S4.88 preserves Marca -> Línea/modelo -> Año and explicit unknown fallback',()=>{
+test('S4.88.1 restores the pre-backend approved data-step surface exactly',()=>{
   const h=S.html();
-  assert.match(h,/id="brandInput"/);
-  assert.match(h,/id="modelInput"/);
-  assert.match(h,/id="yearSelect"/);
-  assert.match(h,/No encuentro mi marca/);
-  assert.match(h,/No encuentro mi línea \/ modelo/);
+  assert.match(h,/Marca y modelo/);
+  assert.match(h,/Toyota Hilux 2021/);
+  assert.match(h,/Suma asegurada estimada/);
+  assert.match(h,/Q 185,000/);
+  assert.match(h,/Deducible preferido/);
+  assert.match(h,/10% – 20%/);
+  assert.doesNotMatch(h,/id="brandInput"/);
+  assert.doesNotMatch(h,/id="modelInput"/);
+  assert.doesNotMatch(h,/id="yearSelect"/);
+});
+
+test('S4.88.1 restores canonical validation, comparison and recommendation visuals',()=>{
+  const h=S.html();
+  assert.match(h,/Validar propuestas →/);
+  assert.match(h,/COMPARACIÓN EN CAPAS · SOLO PROPUESTAS VALIDADAS/);
+  assert.match(h,/A&S SUGIERE/);
+  assert.match(h,/POR QUÉ SUGERIMOS B/);
+  assert.match(h,/Propuesta C · requiere revisión/);
+  assert.match(h,/FUERA DE LA COMPARACIÓN/);
+  assert.match(h,/Faltan datos para normalizarla — eso no significa que no cubra/);
+});
+
+test('S4.88.1 restores canonical hybrid contact surface while keeping LAB submission local-only',()=>{
+  const h=S.html();
+  assert.match(h,/DÉJANOS CÓMO CONTACTARTE/);
+  assert.match(h,/id="vl-h-nombre"/);
+  assert.match(h,/WhatsApp o correo/);
+  assert.match(h,/Continuar con un asesor/);
+  assert.match(h,/Vista previa · no se envió información/);
 });
 
 test('S4.88 keeps real transport and production out of the recovery preview',()=>{
