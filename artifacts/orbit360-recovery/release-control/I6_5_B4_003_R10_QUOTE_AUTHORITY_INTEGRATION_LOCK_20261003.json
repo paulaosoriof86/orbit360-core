@@ -1,0 +1,131 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R10_QUOTE_AUTHORITY_INTEGRATION_LOCK_V1",
+  "recordedAt": "2026-10-03",
+  "status": "FROZEN_AUTHORIZED_R10_INCREMENTAL_QUOTE_AUTHORITY_INTEGRATION",
+  "authority": "PAULA_EXPLICIT_CROSS_PROJECT_HANDOFF_REQUEST_20261003",
+  "activeFindingId": "B4-003",
+  "baseline": {
+    "gravicentraHeadBeforeR10": "421a356b0dbd0b9f935c8aa1cd5435b558e26572",
+    "gravicentraCurrentHeadAtFreeze": "1dbf8d317b5dcb3d4e66d4a84e069d0f9110381e",
+    "aysTransformacionDigitalHead": "4128feedeb1b957e3dc3d76fe5b8bb085849cfae",
+    "attachedHandoff": "AYS_HANDOFF_GRAVICENTRA_COTCOMP_AUTORIDAD_E_INTEGRACION_v1.0_2026-10-03.docx",
+    "currentCrossProjectHandoff": "AYS_HANDOFF_GRAVICENTRA_COTCOMP_AUTORIDAD_E_INTEGRACION_v1.1_2026-10-03.docx",
+    "handoffDisposition": "V1_0_HISTORICAL_INPUT_V1_1_CURRENT_CROSS_PROJECT_EVIDENCE"
+  },
+  "classifications": [
+    {
+      "id": "single_quote_domain_authority",
+      "status": "ALREADY_EXISTS",
+      "reason": "R8 insurer-knowledge lock and current source already establish one sourced/versioned insurer knowledge authority; R10 makes the provider boundary explicit."
+    },
+    {
+      "id": "p06_multiproduct_rule_model",
+      "status": "ALREADY_EXISTS",
+      "reason": "tariff-rule-proposal-p06.js already models applicability, amountBasis, components, financing and second-gate disabled defaults."
+    },
+    {
+      "id": "p06c_reconciliation_double_add_guards",
+      "status": "ALREADY_EXISTS",
+      "reason": "tariff-quote-reconciliation-p06c.js already reconciles source-backed components and blocks incomplete amount basis/evidence."
+    },
+    {
+      "id": "validation_not_enablement",
+      "status": "ALREADY_EXISTS",
+      "reason": "Knowledge runtime and P06 keep validated rules disabled until explicit enablement/binding."
+    },
+    {
+      "id": "canonical_premium_breakdown_external_contract",
+      "status": "ADJUST",
+      "reason": "Internal fields exist but provider contract needs canonical amountBasis, source-total preservation and explicit insurer-vs-external financing semantics."
+    },
+    {
+      "id": "complete_version_digest_validity_trace",
+      "status": "ADJUST",
+      "reason": "Current trace has IDs/source version/calculatedAt but lacks the full external trace contract."
+    },
+    {
+      "id": "proposal_contract_and_historical_pinning",
+      "status": "ADJUST",
+      "reason": "Normalized quotes exist; R10 freezes stricter Proposal eligibility/current-version/trace semantics."
+    },
+    {
+      "id": "comparison_missing_semantics_without_silent_ranking",
+      "status": "ADJUST",
+      "reason": "Current internal comparison supports weighted recommendation; CotComp-facing projection must return facts without a hidden ranking."
+    },
+    {
+      "id": "explicit_selection_handoff_distinct_from_issuance",
+      "status": "ADOPT",
+      "reason": "Cross-project state separation is compatible with current operational lifecycle and is frozen in R10 provider contract."
+    },
+    {
+      "id": "vehicle_catalog_gravicentra_governance",
+      "status": "ADOPT",
+      "reason": "S4.79/S4.80A remain upstream/LAB fixture; production catalog projection is governed by Gravicentra contract."
+    },
+    {
+      "id": "generic_primas_defaults_as_public_quote_authority",
+      "status": "REJECT",
+      "reason": "R7/R8 already prohibit generic country defaults from certifying insurer/product contractual values."
+    },
+    {
+      "id": "silent_p06_to_legacy_fallback_for_cotcomp",
+      "status": "REJECT",
+      "reason": "CotComp authority path is default-deny; internal compatibility may remain only behind explicit separate gate."
+    },
+    {
+      "id": "legacy_cotTasas_as_competing_public_authority",
+      "status": "REJECT",
+      "reason": "Legacy may remain for compatibility but cannot compete silently in CotComp provider resolution."
+    },
+    {
+      "id": "derive_manual_net_or_tax_from_total_by_country_default",
+      "status": "REJECT",
+      "reason": "Conflicts with R7 authoritative-total rule and handoff amountBasis semantics."
+    },
+    {
+      "id": "internal_weighted_recommendation_as_cotcomp_truth",
+      "status": "REJECT",
+      "reason": "CotComp-facing contract returns comparable facts; public presentation cannot silently infer universal ranking."
+    },
+    {
+      "id": "manifest_quote_selection_transport",
+      "status": "DEPENDENCY",
+      "reason": "Provider-side transport/export is not yet released; contract is frozen first and transport must be separately tested in isolated LAB."
+    },
+    {
+      "id": "current_vehicle_catalog_projection",
+      "status": "DEPENDENCY",
+      "reason": "Gravicentra-governed read-only catalog version/projection is not yet physically materialized."
+    }
+  ],
+  "allowedProductFiles": [
+    "orbit360-platform/core/quote-authority-contract-v1.js",
+    "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js",
+    "orbit360-platform/core/quote-comparison-contracts-v1203.js",
+    "orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js",
+    "orbit360-platform/modules/cotizador-v1203-source-gate.js",
+    "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
+    "tools/gravicentra-quote-authority-contract-v1.mjs",
+    ".github/workflows/gravicentra-b4-003-executor.yml"
+  ],
+  "boundaries": {
+    "operationalBusinessWritesAuthorized": false,
+    "sourceOnlyContractAndGuards": true,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "providerDeploymentAuthorized": false,
+    "cotcompRealTransportAuthorized": false
+  },
+  "requiredBeforeRealCotCompTransport": [
+    "Provider-side contract QA PASS against exact source.",
+    "No generic financial/tax fallback in CotComp authority path.",
+    "Complete Proposal trace/version/digest/validity.",
+    "Immutable historical Proposal pinning proven.",
+    "Configuration change affects only new quote path without CotComp redeploy.",
+    "Explicit SelectionHandoff idempotency/correlation proven.",
+    "Isolated LAB transport proof before any production connection."
+  ],
+  "nextAction": "R10_APPLY_INCREMENTAL_SOURCE_GUARDS_AND_FREEZE_CONTRACT"
+}
