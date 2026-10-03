@@ -168,8 +168,12 @@ Orbit.quoteContracts = (function () {
     const issueExpense = rules.gastosEmisionPct != null ? net * num(rules.gastosEmisionPct) / 100 : num(rules.gastosEmision || rules.gastos_emision);
     const other = num(rules.otros || rules.asistencia || rules.asistenciaFija);
     const baseTax = net + finance + issueExpense + other;
-    const countryTax = Orbit.primas && Orbit.primas.cfgPais ? num(Orbit.primas.cfgPais(context.pais).iva) : (context.pais === 'CO' ? 19 : 12);
-    const taxPct = rules.ivaPct != null ? num(rules.ivaPct) : (rules.iva != null && num(rules.iva) <= 1 ? num(rules.iva) * 100 : (rules.iva != null ? num(rules.iva) : countryTax));
+    // R10: legacy/internal calculator may only calculate tax when the selected
+    // tariff configuration itself carries the tax authority. Country defaults
+    // must never rescue an incomplete insurer/product quote configuration.
+    const hasTaxRule = rules.ivaPct != null || rules.iva != null;
+    if (!hasTaxRule) return { ok:false, errors:['impuesto_tarifa_requerido'] };
+    const taxPct = rules.ivaPct != null ? num(rules.ivaPct) : (num(rules.iva) <= 1 ? num(rules.iva) * 100 : num(rules.iva));
     const tax = baseTax * taxPct / 100;
     const total = baseTax + tax;
     return {
