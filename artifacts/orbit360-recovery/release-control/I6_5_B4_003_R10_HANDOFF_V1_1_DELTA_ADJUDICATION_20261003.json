@@ -1,0 +1,139 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R10_HANDOFF_V1_1_DELTA_ADJUDICATION_V1",
+  "recordedAt": "2026-10-03",
+  "status": "AUDITED_INCREMENTALLY_NO_REBUILD",
+  "activeFindingId": "B4-003",
+  "gravicentraHeadAudited": "98f1d3f2adcad0a0a23e77e0bdb0ed1742298347",
+  "handoff": {
+    "name": "AYS_HANDOFF_GRAVICENTRA_COTCOMP_AUTORIDAD_E_INTEGRACION_v1.1_2026-10-03.docx",
+    "version": "1.1",
+    "disposition": "CURRENT_CROSS_PROJECT_EVIDENCE_NOT_INTERNAL_RELEASE_AUTHORITY"
+  },
+  "authorityRule": "Current recovery/fase-a-clean-20260831 + CONTROL_PLANE + locks + exact source prevail over the handoff's historical forensic branch/head. Handoff may contribute compatible contract requirements but cannot downgrade current Gravicentra authority.",
+  "deltaVsV1_0": [
+    {
+      "id": "17.1_p06_engine",
+      "classification": "ALREADY_EXISTS",
+      "action": "Preserve current P06 rule model; no rebuild."
+    },
+    {
+      "id": "17.1_installments",
+      "classification": "ALREADY_EXISTS",
+      "action": "Preserve installments/surcharge/threshold/provider/conditions/evidence; require external trace/version/validity under Quote Authority v1."
+    },
+    {
+      "id": "17.1_double_tax_fee_guards",
+      "classification": "ALREADY_EXISTS",
+      "action": "Preserve P06C guards."
+    },
+    {
+      "id": "17.1_second_gate",
+      "classification": "ALREADY_EXISTS",
+      "action": "Preserve VALIDATED != ENABLED."
+    },
+    {
+      "id": "17.1_premium_breakdown",
+      "classification": "ADJUST",
+      "action": "Mapped to canonical amountBasis + net/fees/assistance/insurer surcharge/external finance/tax/total/payment options."
+    },
+    {
+      "id": "17.1_manifest_quote_api",
+      "classification": "DEPENDENCY",
+      "action": "Provider-side real transport remains not released; contract frozen first."
+    },
+    {
+      "id": "17.1_trace",
+      "classification": "ADJUST",
+      "action": "Require configurationVersion, tariffVersion, sourceVersion, providerBindingVersion, catalogVersion, rulesDigest, calculatedAt, validityFrom, validityTo, source/rule/binding IDs."
+    },
+    {
+      "id": "17.1_selection_handoff",
+      "classification": "ADOPT",
+      "action": "SelectionHandoff v1 frozen; transport remains dependency."
+    },
+    {
+      "id": "17.2_GRA_COT_001_generic_primas_defaults",
+      "classification": "REJECT",
+      "action": "Generic primas.js values cannot rescue CotComp/public quote; may remain internal operational compatibility only."
+    },
+    {
+      "id": "17.2_GRA_COT_002_country_tax_fallback",
+      "classification": "REJECT",
+      "action": "No 12/19 country fallback to complete an incomplete public quote."
+    },
+    {
+      "id": "17.2_GRA_COT_003_p06_to_legacy",
+      "classification": "REJECT",
+      "action": "CotComp authority path is strict/default-deny; no silent P06->legacy fallback."
+    },
+    {
+      "id": "17.2_GRA_COT_004_cotTasas_competing_authority",
+      "classification": "REJECT",
+      "action": "Legacy cotTasas cannot compete in provider resolution."
+    },
+    {
+      "id": "17.3_visa_cuotas_semantics",
+      "classification": "ADJUST",
+      "action": "Separate insurerSettlementMode, customerPaymentMode, financingProvider, insurerInstallments, externalInstallments, insurerSurcharge, externalFinanceCost."
+    },
+    {
+      "id": "17.4_trace_minimum",
+      "classification": "ALREADY_EXISTS",
+      "action": "Already frozen by GRAVICENTRA QUOTE AUTHORITY CONTRACT v1."
+    },
+    {
+      "id": "17.5_cotcomp_s480a_s483_status",
+      "classification": "DEPENDENCY",
+      "action": "Treat as CotComp-side evidence/context only; not a Gravicentra machine PASS."
+    },
+    {
+      "id": "17.6_define_authoritative_motor",
+      "classification": "ADOPT",
+      "action": "P06/P06C sourced rule path is quote authority; primas.js remains policy/receipt operational helper, not public quote authority."
+    },
+    {
+      "id": "17.6_remove_generic_public_fallbacks",
+      "classification": "ALREADY_EXISTS",
+      "action": "R10 source guards applied."
+    },
+    {
+      "id": "17.6_manifest_quote_selection_provider",
+      "classification": "DEPENDENCY",
+      "action": "Implement/test provider-side transport in isolated LAB after B4-003 exact Preview and owner visual acceptance."
+    },
+    {
+      "id": "17.6_new_rule_without_web_redeploy",
+      "classification": "DEPENDENCY",
+      "action": "Must be proven in LAB before real CotComp transport."
+    },
+    {
+      "id": "17.6_historical_proposal_pinning",
+      "classification": "DEPENDENCY",
+      "action": "Must be proven in LAB before real CotComp transport."
+    },
+    {
+      "id": "17.6_lab_endpoint_handoff",
+      "classification": "DEPENDENCY",
+      "action": "No endpoint handoff until provider-side contract/transport QA passes."
+    }
+  ],
+  "correctionToHandoffPhysicalAudit": {
+    "handoffHistoricalAuditRef": "ays/backend-tenant-lab-v99-20260703 @ 9c95f31461f2eabe9804625b5659bee772f5602a",
+    "contemporaryInterpretation": "Historical/forensic reference only. It is not current Gravicentra release authority.",
+    "currentAuthorityBranch": "recovery/fase-a-clean-20260831"
+  },
+  "frozenContract": {
+    "doc": "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
+    "executable": "orbit360-platform/core/quote-authority-contract-v1.js",
+    "version": "gravicentra-quote-authority-v1",
+    "role": "Gravicentra authority / CotComp consumer"
+  },
+  "noRegression": [
+    "No second rate engine in CotComp.",
+    "No generic financial/tax rescue of incomplete public quotes.",
+    "No retroactive mutation of historical Proposal.",
+    "No implicit Selection.",
+    "No provider deployment or real CotComp transport authorized by this adjudication."
+  ],
+  "nextAction": "B4_003_R10_EXACT_PREVIEW_THEN_PAULA_CUMULATIVE_VISUAL"
+}
