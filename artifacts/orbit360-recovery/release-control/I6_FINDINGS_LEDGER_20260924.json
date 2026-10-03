@@ -2752,10 +2752,32 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Notifications/automation occur only after committed domain events with retry/failure visibility.",
-      "status": "ACTIVE_READONLY_DIAGNOSTIC",
+      "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC"
+      "nextAction": "B4_002_CAUSAL_SOURCE_FIX",
+      "rootCause": "CANONICAL_OUTBOX_HAS_NO_EXECUTABLE_DISPATCH_RETRY_OWNER",
+      "causeClassification": "PRODUCT_BACKEND_NOTIFICATION_DELIVERY_GAP",
+      "evidence": {
+        "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
+        "diagnosticBlobSha": "12183afd6a7a71863e2cd8fd365a847383fc5bee",
+        "workflowEventCount": 110,
+        "notificationOutboxCount": 58,
+        "observedStatus": "pending_provider",
+        "orphanOutboxCount": 0,
+        "duplicateEventIdCount": 0,
+        "transactionalOutbox": true,
+        "dispatcherOwnerExists": false,
+        "retryOwnerExists": false,
+        "failureAndRetryVisibilityExists": false
+      },
+      "remediation": "Add one canonical notificationOutbox processor owner with post-commit trigger, deterministic internal delivery, fail-closed external-channel semantics, retry/failure metadata and idempotent retry; expose retry/failure state through the existing advisor inbox. No external provider may be simulated.",
+      "allowedProductFiles": [
+        "functions/notification-outbox-processor.js",
+        "functions/bootstrap.js",
+        "functions/package.json",
+        "functions/ops-advisor-inbox.js"
+      ]
     },
     {
       "id": "B4-003",
