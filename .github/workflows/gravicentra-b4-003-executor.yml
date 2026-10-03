@@ -397,3 +397,4 @@ jobs:
       - name: Fail closed
         if: failure() && steps.gate.outputs.run == 'true'
         run: echo "B4_003_FAILED_NO_REIMPORT_NO_LIVE"
+# R12 contract harness rootfix trigger 2026-10-03

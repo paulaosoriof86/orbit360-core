@@ -90,7 +90,7 @@ need(policyBridge.includes('data-renewable')&&policyBridge.includes("renovable: 
 need(client360.includes('id="ftab-prev"')&&client360.includes('left: -strip.clientWidth')&&infra.includes('.ftab-prev'),'B4_003_CLIENT360_LEFT_TAB_CONTROL_MISSING');
 need(quality.includes('.filter(inActiveCountry)')&&quality.includes('vigenteClientIds')&&quality.includes('data-quality-country'),'B4_003_QUALITY_COUNTRY_OR_LINEAR_INDEX_MISSING');
 need(!quality.includes("vig: tieneVigente(c.id)"),'B4_003_QUALITY_PER_CLIENT_POLICY_SCAN_REMAINS');
-need(insurerVisual.includes("data.knowledgeSource='canonical'")&&insurerVisual.includes('Fuentes relacionadas')&&insurerVisual.includes('sourceApi.knowledgeSources(insurer)'),'B4_003_R12_INSURER_KPI_SHADOW_OWNER_REMAINS');
+need(insurerVisual.includes("box.dataset.knowledgeSource='canonical'")&&insurerVisual.includes('Fuentes relacionadas')&&insurerVisual.includes('sourceApi.knowledgeSources(insurer)'),'B4_003_R12_INSURER_KPI_SHADOW_OWNER_REMAINS');
 need(insurer.includes('aseguradoraId: id')&&insurer.includes('Cargar tarifario / Excel de cotizador')&&insurer.includes('Cargar formulario, póliza o cotización de ejemplo'),'B4_003_R12_INSURER_UPLOAD_ENTRYPOINT_OR_SCOPE_MISSING');
 need(importer.includes("updateDurable('aseguradoras', insurerId")&&importer.includes('preview_protected_operational_insurer')&&importer.includes('Documento recibido')&&importer.includes("requiereValidacion: state.kind === 'docs-aseguradora'"),'B4_003_R12_INSURER_DURABLE_SOURCE_BINDING_MISSING');
 need(importer.includes('Ningún documento habilita Cotizador, Comparativo o IA automáticamente'),'B4_003_R12_INSURER_IMPORT_AUTO_ENABLE_CLAIM_REMAINS');

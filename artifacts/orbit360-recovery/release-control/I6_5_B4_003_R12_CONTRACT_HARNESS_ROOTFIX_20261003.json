@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R12_CONTRACT_HARNESS_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "QA_CONTRACT_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B4-003",
+  "failedRunId": 37151126306,
+  "failedCode": "B4_003_R12_INSURER_KPI_SHADOW_OWNER_REMAINS",
+  "classification": "QA_STATIC_ASSERTION_TOKEN_MISMATCH_NOT_PRODUCT_DEFECT",
+  "rootCause": "The R12 contract searched for data.knowledgeSource while the implemented DOM assignment is box.dataset.knowledgeSource.",
+  "fix": {
+    "contractPath": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "contractBlobSha": "c1c5edbdc83c4dd2517b7a74e80f09b352596504",
+    "workflowBlobSha": "a3c3f30ffda71934f64a6d017bf1fbd402430c2a",
+    "productSourceChanged": false
+  },
+  "boundaries": {
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
