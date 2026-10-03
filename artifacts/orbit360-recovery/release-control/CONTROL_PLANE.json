@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_DIAGNOSTIC",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_SOURCE_FIX",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4853,7 +4853,7 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC",
+      "status": "B4_003_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
@@ -4866,15 +4866,15 @@
       "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
       "baselinePreviewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
-      "productMutationAuthorized": false,
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC",
+      "nextAction": "B4_003_CAUSAL_SOURCE_FIX",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_MINIMAL_SOURCE_FIX_20261002.json",
       "sourceFixReceiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
-      "syntheticQaWritesAuthorized": false,
+      "syntheticQaWritesAuthorized": true,
       "previewDispatchRequest": {
         "status": "REQUESTED_AFTER_B4_002_EXECUTOR_INSTALL",
         "findingId": "B4-002",
@@ -4980,6 +4980,22 @@
         "dataMutation": false,
         "reimport": false,
         "livePromotion": false
+      },
+      "b4003Diagnostic": {
+        "status": "CAUSE_DEMONSTRATED",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
+        "receiptBlobSha": "25c3c9cb2479d933bc362fe4dfd8616d100b78ed",
+        "classification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
+        "rootCause": "RENEWALS_CANCELATIONS_CRITICAL_WRITES_COMPLETE_UI_BEFORE_SERVER_READBACK",
+        "allowedProductFiles": [
+          "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+          "orbit360-platform/modules/cancelaciones.js",
+          "orbit360-platform/index.html"
+        ],
+        "operationalBusinessWrites": 0,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false
       }
     }
   },
@@ -5000,7 +5016,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC",
+    "nextAction": "B4_003_CAUSAL_SOURCE_FIX",
     "activeFindingId": "B4-003"
   },
   "antiInterruptionControl": {
@@ -5293,7 +5309,7 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC",
+    "status": "B4_003_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "5a287d5375406a87f564c72e18f95f7e863ae4b9",
@@ -5301,7 +5317,7 @@
     "findingLedgerBlobSha": "126cd3443b269c97b482134c515a7759da210af4",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC",
+    "nextAction": "B4_003_CAUSAL_SOURCE_FIX",
     "sourceFixReceiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -5358,7 +5374,7 @@
       "reimport": false,
       "livePromotion": false
     },
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -5400,6 +5416,22 @@
       "authority": "USER_CONTINUE",
       "target": "B4_003_RENEWALS_CANCELATIONS_READONLY_DIAGNOSTIC",
       "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
+    },
+    "b4003Diagnostic": {
+      "status": "CAUSE_DEMONSTRATED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
+      "receiptBlobSha": "25c3c9cb2479d933bc362fe4dfd8616d100b78ed",
+      "classification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
+      "rootCause": "RENEWALS_CANCELATIONS_CRITICAL_WRITES_COMPLETE_UI_BEFORE_SERVER_READBACK",
+      "allowedProductFiles": [
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+        "orbit360-platform/modules/cancelaciones.js",
+        "orbit360-platform/index.html"
+      ],
+      "operationalBusinessWrites": 0,
       "dataMutation": false,
       "reimport": false,
       "livePromotion": false

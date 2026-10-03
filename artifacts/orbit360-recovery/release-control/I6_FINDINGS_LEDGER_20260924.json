@@ -2795,7 +2795,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Targeted regression closure for Renovaciones and Cancelaciones.",
-      "status": "ACTIVE_READONLY_DIAGNOSTIC",
+      "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2807,7 +2807,22 @@
         "No empty module caused by alternate collection/owner or missing projection.",
         "Role/country scope, persistence/readback and regression are verified."
       ],
-      "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC"
+      "nextAction": "B4_003_CAUSAL_SOURCE_FIX",
+      "rootCause": "RENEWALS_CANCELATIONS_CRITICAL_WRITES_COMPLETE_UI_BEFORE_SERVER_READBACK",
+      "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
+      "evidence": {
+        "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
+        "diagnosticBlobSha": "25c3c9cb2479d933bc362fe4dfd8616d100b78ed",
+        "blockingFindings": [
+          "CANCELATIONS_OPTIMISTIC_CRITICAL_WRITES_WITHOUT_AWAITED_READBACK",
+          "RENEWAL_CAMPAIGN_OPTIMISTIC_WRITES_WITHOUT_AWAITED_READBACK"
+        ]
+      },
+      "allowedProductFiles": [
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+        "orbit360-platform/modules/cancelaciones.js",
+        "orbit360-platform/index.html"
+      ]
     },
     {
       "id": "B4-004",

@@ -2062,7 +2062,7 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC",
+    "status": "B4_003_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "lockBlobSha": "0b0b6b2b2789f5ab83e1e87a4bfce68da19efddd",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -2070,7 +2070,7 @@
     "noLive": true,
     "noReimport": true,
     "activeFindingId": "B4-003",
-    "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC",
+    "nextAction": "B4_003_CAUSAL_SOURCE_FIX",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
     "sourceSha": "cb43730733a1c3f68b2bc8a0ec5d7bc4c64159da",
     "buildId": "gi-i65-b4-cb43730733a1-57f234755dc1",
@@ -2165,5 +2165,20 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true,
     "externalProviderSimulation": false
+  },
+  "b4003Diagnostic": {
+    "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
+    "blobSha": "25c3c9cb2479d933bc362fe4dfd8616d100b78ed",
+    "classification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
+    "rootCause": "RENEWALS_CANCELATIONS_CRITICAL_WRITES_COMPLETE_UI_BEFORE_SERVER_READBACK",
+    "allowedProductFiles": [
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "orbit360-platform/modules/cancelaciones.js",
+      "orbit360-platform/index.html"
+    ],
+    "noOperationalDataWrites": true,
+    "noReimport": true,
+    "noLive": true
   }
 }
