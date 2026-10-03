@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_V1",
+  "recordedAt": "2026-10-03T04:00:00Z",
+  "status": "FROZEN",
+  "cause": "B4-001 and B4-002 were physically machine-closed without a separate Paula visual acceptance checkpoint; B4-003 executor still contained automatic advance to B4-004 after machine PASS.",
+  "adjudication": "PRESERVE_MACHINE_EVIDENCE_ADD_HUMAN_VISUAL_GATE",
+  "rules": {
+    "machinePassDoesNotEqualHumanVisualPass": true,
+    "priorMachinePassesPreserved": true,
+    "b4001HumanVisualStatus": "PENDING_CUMULATIVE_REVIEW",
+    "b4002HumanVisualStatus": "PENDING_CUMULATIVE_REVIEW",
+    "b4003HumanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+    "cumulativePreviewRequired": true,
+    "cumulativePreviewCovers": [
+      "B4-001",
+      "B4-002",
+      "B4-003"
+    ],
+    "b4004MayStartOnlyAfter": "B4_003_TARGETED_PAULA_VISUAL_PASS",
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false
+  },
+  "implementation": {
+    "executor": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "machinePassTerminalStatus": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "machinePassNextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "nextFindingHeld": "B4-004"
+  },
+  "noProductSourceChange": true,
+  "noOperationalBusinessWrites": true,
+  "noReimport": true,
+  "noLive": true
+}
