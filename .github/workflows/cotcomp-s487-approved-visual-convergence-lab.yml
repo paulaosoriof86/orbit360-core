@@ -1,0 +1,182 @@
+name: CotComp S4.87 approved visual convergence LAB preview
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s487-approved-visual-convergence-preview-lab-20261003
+    paths:
+      - '.github/cotcomp-lab-intents/s487-approved-visual-convergence-lab-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompApprovedVisualPreviewS487
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompApprovedVisualPreviewS487
+
+jobs:
+  s487-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.87 deployment intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s487-approved-visual-convergence-lab-authorized.json
+          jq -e '
+            .authorization=="S487_DEPLOY_APPROVED_VISUAL_CONVERGENCE_PREVIEW" and
+            .projectId=="ays-orbit-360-lab" and
+            .functionName=="cotcompApprovedVisualPreviewS487" and
+            .promotedVisualParentSha=="50aa4190ae22ad13760f893b9bf37415abe35fb7327e034f66dc565b9b2cbf1d" and
+            .providerContractVersion=="gravicentra-quote-authority-v1" and
+            .productFamilyCount==7 and
+            .fixtureOnly==true and
+            .providerDeploymentAuthorized==false and
+            .cotcompRealTransportAuthorized==false and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .piiFields==false and
+            .quoteCaseWrites==false and
+            .providerOrRater==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.87 visual convergence safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-approved-visual-preview-s487.js
+          node --check cotcomp-approved-visual-preview-s487.test.js
+          node --test cotcomp-gravicentra-provider-contract-s484.test.js
+          node --test cotcomp-product-family-completeness-preview-s486.test.js
+          node --test cotcomp-approved-visual-preview-s487.test.js
+
+      - name: Prepare exact LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s487/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s487/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Deploy only S4.87 preview function to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physically verify approved visual convergence preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s487/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+
+          grep -q 'Compara con criterio, no solo por precio.' "$E/page.html"
+          grep -q 'COTIZAR Y COMPARAR' "$E/page.html"
+          grep -q 'SESIÓN DE COTIZACIÓN' "$E/page.html"
+          grep -q 'RECORRIDO' "$E/page.html"
+          grep -q 'Cotización en línea' "$E/page.html"
+          grep -q 'Con acompañamiento' "$E/page.html"
+          grep -q 'Comparamos solo alternativas normalizadas' "$E/page.html"
+          grep -q "family=Archivo" "$E/page.html"
+          grep -q "family=IBM+Plex+Mono" "$E/page.html"
+          grep -q '#F4F1EA' "$E/page.html"
+          grep -q '#E4002B' "$E/page.html"
+
+          grep -q 'Vehículo y movilidad' "$E/page.html"
+          grep -q 'Hogar' "$E/page.html"
+          grep -q 'Salud / gastos médicos' "$E/page.html"
+          grep -q 'Vida e ingreso' "$E/page.html"
+          grep -q 'Empresa' "$E/page.html"
+          grep -q 'Transporte / carga' "$E/page.html"
+          grep -q 'Otros / no sé cuál necesito' "$E/page.html"
+
+          grep -q 'No encuentro mi marca' "$E/page.html"
+          grep -q 'No encuentro mi línea / modelo' "$E/page.html"
+          ! grep -q 'Vista previa LAB' "$E/page.html"
+          ! grep -q 'Validar selección' "$E/page.html"
+          ! grep -q 'Selección validada' "$E/page.html"
+          ! grep -q 'No se guardó ningún dato' "$E/page.html"
+          ! grep -q 'requestManagement' "$E/page.html"
+
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+
+          CATALOG_URL='https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompVehicleCatalogS479'
+          curl -fsS "$CATALOG_URL?op=brands&vehicleClass=AUTO_LIGHT&q=TOYOTA&limit=20" -o "$E/brands.json"
+          BRAND_ID="$(jq -r '.items[] | select(.label=="TOYOTA") | .brandId' "$E/brands.json" | head -n1)"
+          test -n "$BRAND_ID"
+
+          jq -n --arg url "$COTCOMP_URL" '{
+            schemaVersion:"ays-cotcomp-s487-approved-visual-convergence-physical-receipt-v1.0",
+            functionUrl:$url,
+            deployed:true,
+            promotedVisualParentSha:"50aa4190ae22ad13760f893b9bf37415abe35fb7327e034f66dc565b9b2cbf1d",
+            approvedCotCompSurfaceLanguagePreserved:true,
+            productFamilyCount:7,
+            ownerApprovedVehiclePatternPreserved:true,
+            providerContractVersion:"gravicentra-quote-authority-v1",
+            fixtureOnly:true,
+            providerDeploymentAuthorized:false,
+            cotcompRealTransportAuthorized:false,
+            appDataReads:0,
+            appDataWrites:0,
+            quoteCaseWrites:0,
+            providerOrRaterCalls:0,
+            productionTouched:false
+          }' > "$E/S487_APPROVED_VISUAL_CONVERGENCE_PHYSICAL_RECEIPT.json"
+
+      - name: Upload sanitized S4.87 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s487-approved-visual-convergence-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s487/evidence/S487_APPROVED_VISUAL_CONVERGENCE_PHYSICAL_RECEIPT.json
+            ${{ runner.temp }}/s487/evidence/page.html
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s487/firebase-service-account.json"
