@@ -1,0 +1,106 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_PAULA_VISUAL_REJECTION_R6_POLICY_LIFECYCLE_ADJUDICATION_V1",
+  "recordedAt": "2026-10-03",
+  "sourceHead": "042b731f67ce0995b67176a3d0e4012ca5f77bbf",
+  "authority": "PAULA_TARGETED_VISUAL_AND_OPERATIONAL_REVIEW",
+  "status": "HUMAN_VISUAL_REJECTED_R6_CAUSAL_FIX_REQUIRED",
+  "activeFindingId": "B4-003",
+  "b4004Held": true,
+  "findings": [
+    {
+      "id": "B4-003-R6-01",
+      "classification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
+      "title": "Projected cancellation rows cannot open their cancellation detail",
+      "evidence": "All 489 real cancellation rows are policy-status projections; B4-003 proof reports cancelationRecordCount=0. Human click on projected rows still returns 'Registro fuera de tu alcance'.",
+      "rootCause": "The machine proof exercised a synthetic explicit cancelaciones row, not the real projected-policy row path; row detail lookup is not robustly bound to authoritative policyId.",
+      "blocking": true,
+      "target": "Projected row must open cancellation detail by authoritative policy even when no explicit cancelaciones document exists."
+    },
+    {
+      "id": "B4-003-R6-02",
+      "classification": "VISUAL_REGRESSION_DEMONSTRATED",
+      "title": "Cliente 360 horizontal tab scrollbar/affordance is hidden",
+      "evidence": "Current CSS explicitly sets scrollbar-width:none and hides WebKit scrollbar on .ficha-tabs; Paula reports the previously available navigation affordance is gone.",
+      "blocking": true,
+      "target": "Restore visible, usable horizontal tab navigation without losing existing tabs."
+    },
+    {
+      "id": "B4-003-R6-03",
+      "classification": "SEMANTIC_KPI_DEFECT",
+      "title": "Cancellation 'Tasa de fuga' lacks cohort/time-window semantics",
+      "evidence": "Current implementation is historical cancelled policy editions divided by all policy editions in active country. Counts by country now reconcile (GT 461 + CO 28 = 489) and currencies are separated, but this is not a defined churn cohort.",
+      "blocking": false,
+      "target": "Rename to a truthful historical cancellation ratio or implement an explicit cohort/window before calling it fuga."
+    },
+    {
+      "id": "B4-003-R6-04",
+      "classification": "DATA_QUALITY_CLIENT_MASTER_COUNTRY",
+      "title": "Some client master country labels disagree with policy country",
+      "evidence": "Country filters correctly isolate policies, while some Client cells still display Persona · GT inside Colombia results because the label comes from client master country.",
+      "blocking": false,
+      "target": "Do not infer client country from policy country; resolve against authoritative client source and keep mismatch visible until corrected."
+    },
+    {
+      "id": "B4-003-R6-05",
+      "classification": "PREPRODUCTION_POLICY_LIFECYCLE_CAPABILITY_GAP",
+      "title": "Renewability is not canonical across create/import/renewal surfaces",
+      "evidence": "Policy detail already understands renovable YES/NO/UNKNOWN and legacy Cliente360 edit has a checkbox, but the canonical policy form lacks the control; renewal queries/surfaces ignore it; importer defaults imported policies to renovable=true.",
+      "blocking": true,
+      "target": "Canonical tri-state renewability; no renewal queue/cronogram/campaign for renovable=false; unknown remains fail-closed; imports never force true without source."
+    },
+    {
+      "id": "B4-003-R6-06",
+      "classification": "PREPRODUCTION_POLICY_LIFECYCLE_CAPABILITY_GAP",
+      "title": "Certificates, monthly declarations and policy-linked annexes are not modeled as first-class child movements",
+      "evidence": "Canonical endoso workflow exists for approved modifications, but recurring monthly certificates/declarations are not represented independently from new policies.",
+      "blocking": true,
+      "target": "Keep master policy as policy; store monthly certificates/declarations/annexes as policy-linked child movements/documents with type, period/unique flag, effective date, reference/document, risk detail and optional premium delta. Use canonical endoso workflow for changes that alter policy/risk."
+    },
+    {
+      "id": "B4-003-R6-07",
+      "classification": "CLIENT_RELATIONSHIP_CAPABILITY_GAP",
+      "title": "Client, insured/titular and optional contact are conflated",
+      "evidence": "New-client form has one identity/contact. Edit only has contactoAlt as a combined string. Canonical projection already anticipates contactoPrincipalNombre/Telefono/Correo aliases.",
+      "blocking": true,
+      "target": "Persist real commercial client separately from optional contact; effective contact defaults to real client. Policy relationship can separately identify insured/titular/tomador without changing the CRM client."
+    },
+    {
+      "id": "B4-003-R6-08",
+      "classification": "DRIVE_CREATION_WORKFLOW_GAP",
+      "title": "Client creation does not proactively link/create Drive expediente",
+      "evidence": "Drive backend already creates or links client folder on first confirmed document, and a folder matcher exists, but new-client creation does not call an ensure-folder operation.",
+      "blocking": false,
+      "target": "After canonical client creation, search/match unique existing expediente; link if unique, create if none, fail closed if ambiguous. Drive failure must not roll back client creation; mark expediente pending and retry."
+    },
+    {
+      "id": "B4-003-R6-09",
+      "classification": "CANCELLATION_REASON_DATA_GAP",
+      "title": "Historical cancellation reason is absent for all projected rows",
+      "evidence": "Current projection reads policy motivoCancelacion/cancellationReason; human view shows 'Sin motivo registrado' at 100%.",
+      "blocking": false,
+      "target": "Future cancellation flow must require cancellation date and reason; historical missing reasons remain explicit data-quality items, editable without fabricating values."
+    }
+  ],
+  "acceptedVisualResults": [
+    "Country filter now isolates policy/cancellation universes by selected country.",
+    "Renewals visual layout and country segmentation are acceptable in Paula review.",
+    "Cronograma now exposes renewal events and +N day drill-down acceptably.",
+    "Cancellation KPI modal surfaces open."
+  ],
+  "financialReconciliationCarry": {
+    "workbook": "Gravicentra_reconciliacion_81_casos_PARA_COMPLETAR_20261003.xlsx",
+    "totalUniquePolicies": 81,
+    "assistantDeterministic": 50,
+    "paulaSourceReview": 31,
+    "productionBlockingByMissingSource": false,
+    "rule": "No operational correction is applied from an ambiguous row without Paula/source confirmation; missing source remains fail-closed."
+  },
+  "boundaries": {
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "operationalDataMutationAuthorized": false,
+    "productionPassAuthorized": false,
+    "b4004Authorized": false
+  },
+  "nextAction": "B4_003_R6_CAUSAL_SOURCE_FIX_AND_EXACT_PREVIEW"
+}
