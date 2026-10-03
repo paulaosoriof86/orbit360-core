@@ -5064,6 +5064,19 @@
         "dataMutation": false,
         "reimport": false,
         "livePromotion": false
+      },
+      "b4003HistoricalQaCleanupConditionalAuthorization": {
+        "status": "CONDITIONAL_FAIL_CLOSED",
+        "exactPolicyIds": [
+          "pol_mulsmxsk",
+          "pol_mulssmuz",
+          "pol_mulsxofx"
+        ],
+        "prerequisite": "B4_003 exact Preview read-only proof must classify all three as PROVEN_B2_QA_LINEAGE_NO_DEPENDENTS with missing synthetic parent lineage and zero dependent rows.",
+        "authorizedActionIfPrerequisitePasses": "Delete only the three exact policy documents and record before/after readback. No client, payment, receipt, management or other record deletion is authorized.",
+        "operationalBusinessWrite": false,
+        "reimport": false,
+        "live": false
       }
     }
   },
@@ -5571,6 +5584,19 @@
       "dataMutation": false,
       "reimport": false,
       "livePromotion": false
+    },
+    "b4003HistoricalQaCleanupConditionalAuthorization": {
+      "status": "CONDITIONAL_FAIL_CLOSED",
+      "exactPolicyIds": [
+        "pol_mulsmxsk",
+        "pol_mulssmuz",
+        "pol_mulsxofx"
+      ],
+      "prerequisite": "B4_003 exact Preview read-only proof must classify all three as PROVEN_B2_QA_LINEAGE_NO_DEPENDENTS with missing synthetic parent lineage and zero dependent rows.",
+      "authorizedActionIfPrerequisitePasses": "Delete only the three exact policy documents and record before/after readback. No client, payment, receipt, management or other record deletion is authorized.",
+      "operationalBusinessWrite": false,
+      "reimport": false,
+      "live": false
     }
   }
 }

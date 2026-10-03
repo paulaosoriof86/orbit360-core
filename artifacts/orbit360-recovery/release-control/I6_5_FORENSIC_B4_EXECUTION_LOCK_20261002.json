@@ -109,7 +109,8 @@
     "B4_003_EXACT_PREVIEW_DURABLE_READBACK_PASS",
     "B4_003_NO_DELAYED_RENEWAL_RENDER_MUTATION",
     "B4_003_QA_RESIDUE_READONLY_ADJUDICATION",
-    "B4_003_SYNTHETIC_FINAL_ABSENT"
+    "B4_003_SYNTHETIC_FINAL_ABSENT",
+    "B4_003_PROVEN_B2_QA_RESIDUE_EXACT_CLEANUP_OR_FAIL_CLOSED"
   ],
   "candidate": {
     "sourceSha": "cb43730733a1c3f68b2bc8a0ec5d7bc4c64159da",
@@ -217,5 +218,18 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "b4003HistoricalQaCleanupConditionalAuthorization": {
+    "status": "CONDITIONAL_FAIL_CLOSED",
+    "exactPolicyIds": [
+      "pol_mulsmxsk",
+      "pol_mulssmuz",
+      "pol_mulsxofx"
+    ],
+    "prerequisite": "B4_003 exact Preview read-only proof must classify all three as PROVEN_B2_QA_LINEAGE_NO_DEPENDENTS with missing synthetic parent lineage and zero dependent rows.",
+    "authorizedActionIfPrerequisitePasses": "Delete only the three exact policy documents and record before/after readback. No client, payment, receipt, management or other record deletion is authorized.",
+    "operationalBusinessWrite": false,
+    "reimport": false,
+    "live": false
   }
 }
