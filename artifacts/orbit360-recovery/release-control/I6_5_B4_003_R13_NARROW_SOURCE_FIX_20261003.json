@@ -22,7 +22,7 @@
   "qaBlobs": {
     "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "eb27247980cd6d8c3ff49d87e2f9c0161792da73",
     "tools/gravicentra-i6-5-b4-003-contract.mjs": "b6e296dff55743f3eba0ce98a338ce195fa21e01",
-    ".github/workflows/gravicentra-b4-003-executor.yml": "d11d28e51432ec18fddbf9f3029044e2493debcf"
+    ".github/workflows/gravicentra-b4-003-executor.yml": "333b731f936a3142aed0b315487ad31121a92fb9"
   },
   "remediatedFindings": [
     "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
@@ -64,5 +64,11 @@
     "mandatoryCleanupReadback": true,
     "realOperationalMutation": false
   },
-  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+  "governanceHeadAfterQaAlignment": "10145e7c09e659ae23151f9eb605b8ae184645d4",
+  "qaAlignment": {
+    "exactDriveCleanupCallable": true,
+    "workflowDeploysPreviewCleanupOnly": true,
+    "productionDriveFunctionsDeployment": false
+  }
 }
