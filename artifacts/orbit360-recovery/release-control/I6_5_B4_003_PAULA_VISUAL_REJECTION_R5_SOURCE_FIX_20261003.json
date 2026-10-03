@@ -1,0 +1,68 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_PAULA_VISUAL_REJECTION_R5_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R5_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "authority": "PAULA_TARGETED_VISUAL_REJECTION",
+  "sourceHeadBefore": "bde341ae409f4ef927ffc9e1d73ac4746af76109",
+  "visualFindings": [
+    {
+      "id": "B4-003-V1",
+      "code": "CANCELATIONS_SELECTED_COUNTRY_SCOPE_LEAK",
+      "evidence": "Colombia selected while GT cancellations remained visible; opening a GT row reported record outside scope.",
+      "resolution": "Cancelaciones is scoped and list/KPIs/detail now honor selected country."
+    },
+    {
+      "id": "B4-003-V2",
+      "code": "CANCELATIONS_KPI_NON_INTERACTIVE_AND_CROSS_CURRENCY",
+      "evidence": "KPIs did not expose coherent detail and value lost could mix country/currency scope.",
+      "resolution": "All KPIs expose detail and monetary totals remain separated by currency."
+    },
+    {
+      "id": "B4-003-V3",
+      "code": "RENEWALS_SELECTED_COUNTRY_SCOPE_LEAK",
+      "evidence": "Colombia view displayed GT renewal cards.",
+      "resolution": "Base and operational renewal owners now enforce selected country."
+    },
+    {
+      "id": "B4-003-V4",
+      "code": "RENEWALS_ACTION_LAYOUT_OVERFLOW",
+      "evidence": "Vencidas action buttons were oversized/clipped.",
+      "resolution": "Actions use a compact 2-column grid."
+    },
+    {
+      "id": "B4-003-V5",
+      "code": "CRONOGRAMA_RENEWALS_MASKED_BY_RECEIPT_ORDER",
+      "evidence": "Month view rendered only the first three events, receipts first, and +N was not actionable.",
+      "resolution": "Renewals are prioritized and +N opens the exact day."
+    }
+  ],
+  "financialCarry": {
+    "totalUniquePolicies": 81,
+    "automaticCandidates": 50,
+    "sourceOrManualCandidates": 31,
+    "missingInformationDoesNotByItselfBlockProduction": true,
+    "note": "No operational data rewrite or reimport is authorized by this receipt. Deterministic source-quality normalization remains separate from ambiguous source confirmation."
+  },
+  "productBlobs": {
+    "orbit360-platform/core/access-scope.js": "5fd5aabdbe0e7b613ae55161be01aa17b5174769",
+    "orbit360-platform/modules/cancelaciones.js": "22b710bd31d6d42fd68d073946985ec391266dca",
+    "orbit360-platform/modules/renovaciones.js": "19142663e7e09476f2a80ffbad6ffc6b710d9bd8",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "6445f08ab57ebc69d9b6e9b37d535bf170b84b13",
+    "orbit360-platform/modules/cronograma.js": "c2c5e2cccae88e5c3492aef0e7f109a0a896e5fa",
+    "orbit360-platform/index.html": "83562417b6be231ab7b8b1f5aa17ea0ae24133b2"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "ded6a821ffefcab4f912ae5c8089433aaa52030a",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "2f6920a4f8b284409618bf56c560cbb817061102",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "2790e7100450551121f3b16f40ad1a6414469bdc"
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4Advance": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
