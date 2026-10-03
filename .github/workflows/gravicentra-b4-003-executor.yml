@@ -63,9 +63,9 @@ jobs:
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const l=JSON.parse(fs.readFileSync(process.env.B4_LOCK,'utf8'));
           const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW'
-            && /^B4_003_SOURCE_FIXED_R3_/.test(String(c.currentB4?.status||''))
-            && /^B4_003_SOURCE_FIXED_R3_/.test(String(c.i65ForensicRemediationPlan?.b4?.status||''))
-            && /^B4_003_SOURCE_FIXED_R3_/.test(String(l.status||''))
+            && /^B4_003_SOURCE_FIXED_R4_/.test(String(c.currentB4?.status||''))
+            && /^B4_003_SOURCE_FIXED_R4_/.test(String(c.i65ForensicRemediationPlan?.b4?.status||''))
+            && /^B4_003_SOURCE_FIXED_R4_/.test(String(l.status||''))
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
             && l.boundaries?.syntheticQaWritesAuthorized===true

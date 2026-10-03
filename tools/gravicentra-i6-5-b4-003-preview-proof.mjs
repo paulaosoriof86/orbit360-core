@@ -113,8 +113,9 @@ async function cancellationEvidence(){
  const cancelled=rows.filter(x=>['cancelada','cancelado','anulada','anulado'].includes(norm(x.estado||x.status)));
  const cs=await tenant.collection('data').doc('cancelaciones').collection('items').get();
  const realCancel=cs.docs.filter(d=>!String(d.id).startsWith('b4003qa_')).length;
- proof.runtimeCancellationEvidence={cancelledPolicyCount:cancelled.length,cancelationRecordCount:realCancel,sample:cancelled.slice(0,25).map(x=>({id:x.id,numero:x.numero||'',estado:x.estado||x.status||'',clienteId:x.clienteId||'',pais:x.pais||''}))};
- proof.assertions.cancellationProjectionConsistent=(cancelled.length===0||realCancel>0);
+ const projectionProbe=cancelled.find(x=>clean(x.numero)&&['GT','CO'].includes(clean(x.pais).toUpperCase()))||cancelled.find(x=>clean(x.numero))||null;
+ proof.runtimeCancellationEvidence={cancelledPolicyCount:cancelled.length,cancelationRecordCount:realCancel,canonicalContract:'POLICY_STATUS_PLUS_CANCELLATION_DATE_NO_DOUBLE_INSERT',projectionProbe:projectionProbe?{id:projectionProbe.id,numero:projectionProbe.numero||'',estado:projectionProbe.estado||projectionProbe.status||'',clienteId:projectionProbe.clienteId||'',pais:projectionProbe.pais||''}:null,sample:cancelled.slice(0,25).map(x=>({id:x.id,numero:x.numero||'',estado:x.estado||x.status||'',clienteId:x.clienteId||'',pais:x.pais||''}))};
+ proof.assertions.cancellationProjectionConsistent=(cancelled.length===0);
 }
 async function cleanup(startMs){
  for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['polizas',ids.renewalPolicy],['polizas',ids.cancelPolicy],['clientes',ids.client]]){
@@ -182,6 +183,19 @@ try{
  need(proof.hydrationDiagnostic.backendCancelPolicyExists===true,'B4_003_CANCEL_POLICY_BACKEND_SEED_MISSING');
  need(proof.hydrationDiagnostic.cancelStorePresent===true,'B4_003_CANCELATION_HYDRATION_DIAGNOSTIC_FAIL');
  proof.assertions.authenticatedHydration=true;
+ if(proof.runtimeCancellationEvidence.cancelledPolicyCount>0){
+   const probe=proof.runtimeCancellationEvidence.projectionProbe;
+   need(probe&&clean(probe.numero),'B4_003_REAL_CANCELATION_PROJECTION_PROBE_MISSING');
+   const projection=await page.evaluate(probe=>{
+     const h=document.getElementById('host');
+     Orbit.modules.cancelaciones.render(h);
+     const text=String(h&&h.innerText||'').replace(/\s+/g,' ').trim();
+     return{visible:text.includes(String(probe.numero)),sampleNumber:String(probe.numero),emptyState:text.includes('Sin cancelaciones.'),textSample:text.slice(0,1200)};
+   },probe);
+   proof.runtimeCancellationEvidence.browserProjection=projection;
+   proof.assertions.cancellationProjectionConsistent=projection.visible===true&&projection.emptyState===false;
+   need(proof.assertions.cancellationProjectionConsistent,'B4_003_CANONICAL_POLICY_CANCELATION_NOT_PROJECTED');
+ }
 
  await page.evaluate(()=>{const h=document.getElementById('host');Orbit.modules.renovaciones.render(h);});
  await page.waitForTimeout(500);

@@ -1,0 +1,50 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_V1",
+  "recordedAt": "2026-10-03T03:16:00Z",
+  "status": "SOURCE_FIXED_R4_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "classification": "PRODUCT_READ_MODEL_DEFECT_PLUS_QA_VALIDATOR_DEFECT",
+  "rootCause": "CANONICAL_CANCELATION_LIVES_ON_POLICY_BUT_CANCELATIONS_UI_READS_ONLY_EMPTY_LEGACY_COLLECTION",
+  "failedExactPreview": {
+    "runId": 37092217862,
+    "failureCode": "B4_003_REAL_CANCELATION_SOURCE_WITHOUT_PROJECTION",
+    "discriminants": {
+      "cancelStorePresent": true,
+      "cancelServerConfirmed": true,
+      "optionalMissing": 0,
+      "backendFixtureExists": true
+    }
+  },
+  "canonicalDataEvidence": {
+    "i64SourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json",
+    "i64SourceIntakeBlobSha": "73228ccc746cf372f20def30d6a2257cc7da5897",
+    "cancellationRule": "USE_CANCELLED_REPORT_TO_ENRICH_MATCHING_POLICY_STATUS/CANCELLATION_DATE; NO_DOUBLE_INSERT",
+    "priorB4003Runtime": {
+      "policies": 1419,
+      "cancelations": 0
+    }
+  },
+  "resolution": {
+    "readProjection": "Cancelaciones derives missing rows from canonical policies in cancelled/anulled state while preserving explicit cancellation rows when present.",
+    "writeMaterialization": "A projected cancellation is materialized with insertDurable only when an authorized user performs a real recovery action; no bulk data mutation.",
+    "qaCorrection": "Exact Preview validates a real cancelled policy number on the Cancelaciones surface instead of requiring a duplicate physical cancellation row."
+  },
+  "sourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
+  "productBlobs": {
+    "orbit360-platform/modules/cancelaciones.js": "83e7f317993f2981d20622556e4e0b09481ffe8b",
+    "orbit360-platform/index.html": "ce72b10fc75e1780605e4d1cbcb774a82161d360"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "fed7b9b5b0030d08c13de456d363072243cc3f61",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "2d09c518aca5cece1022dd71816f487abdc0df15",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "a411d9fc688de093d0a3bc086a971c77b1c43215"
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "syntheticQaWritesOnly": true
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
