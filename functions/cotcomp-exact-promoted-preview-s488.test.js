@@ -63,7 +63,7 @@ test('S4.88.1 restores canonical validation, comparison and recommendation visua
   const h=S.html();
   assert.match(h,/Validar propuestas →/);
   assert.match(h,/COMPARACIÓN EN CAPAS · SOLO PROPUESTAS VALIDADAS/);
-  assert.match(h,/A&S SUGIERE/);
+  assert.match(h,/A&amp;S SUGIERE/);
   assert.match(h,/POR QUÉ SUGERIMOS B/);
   assert.match(h,/Propuesta C · requiere revisión/);
   assert.match(h,/FUERA DE LA COMPARACIÓN/);
