@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "7ae79ed136245b8366ad78cfa368b4e8dbbaa8c2",
-  "expectedLedgerNextBlobSha": "5674d85a40721705f253656ca9a0cd68149c43d2",
+  "expectedLedgerNextBlobSha": "f8e89c8a58d0b11e95a5f6583b640b4450a78c53",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -563,13 +563,15 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "PAULA_VISUAL_REJECTED_R13_DIAGNOSTIC_REQUIRED",
+      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
       "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
       "source": "LEDGER",
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "humanVisualStatus": "REJECTED_R13",
+      "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad"
     },
     {
       "id": "B4-004",
@@ -2208,7 +2210,7 @@
     {
       "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
       "block": "B4",
-      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "orbit360-platform/modules/polizas.js + orbit360-platform/core/router.js",
       "targetGate": "B4-003",
@@ -2218,7 +2220,10 @@
       "classification": "PRODUCT_PERFORMANCE_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
-      "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d"
+      "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
+      "runtimeDiagnosticReceiptBlobSha": "db13f0b8bf0a200bac53033b090db798f684854c",
+      "runtimeRootFixReceiptBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
+      "failedRunId": 37162367038
     },
     {
       "id": "B4-003-R13-06-POLICY-SEARCH-FREEZE",
@@ -2442,5 +2447,7 @@
   "r13CausalDiagnosticBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
   "r13SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
   "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
-  "r13PolicyVisualLineageReceiptBlobSha": "241a16d434c9d7eb94246a81925e9cbedd183824"
+  "r13PolicyVisualLineageReceiptBlobSha": "241a16d434c9d7eb94246a81925e9cbedd183824",
+  "r13PolicyRouteRuntimeDiagnosticBlobSha": "db13f0b8bf0a200bac53033b090db798f684854c",
+  "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad"
 }
