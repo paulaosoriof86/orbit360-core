@@ -33,6 +33,17 @@ function clean(v,max=200){return String(v==null?'':v).replace(/\u0000/g,'').trim
 function norm(v){return clean(v,180).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/\s+/g,' ').trim();}
 function sha(v){return crypto.createHash('sha256').update(String(v??''),'utf8').digest('hex');}
 function jsonDigest(v){return sha(JSON.stringify(v));}
+function publicSubsetDigestPayload(catalog={}){
+  return {
+    schemaVersion:catalog.schemaVersion,
+    catalogVersion:catalog.catalogVersion,
+    catalogDigestSha256:catalog.catalogDigestSha256,
+    sourceRawSha256:catalog.sourceRawSha256,
+    allowedSatTypes:catalog.allowedSatTypes,
+    entries:catalog.entries
+  };
+}
+function computePublicSubsetDigest(catalog={}){return jsonDigest(publicSubsetDigestPayload(catalog));}
 function classTypes(vehicleClass){
   const key=clean(vehicleClass,40).toUpperCase();
   if(!key)return ALLOWED_TYPES;
@@ -55,6 +66,7 @@ function validateCatalog(catalog={}){
     if(brands.size!==EXPECTED_BRAND_COUNT)errors.push('BRAND_COUNT_INVALID');
   }
   if(!/^[a-f0-9]{64}$/.test(clean(catalog.publicSubsetDigestSha256,80)))errors.push('PUBLIC_DIGEST_INVALID');
+  else if(catalog.publicSubsetDigestSha256!==computePublicSubsetDigest(catalog))errors.push('PUBLIC_DIGEST_MISMATCH');
   return Object.freeze({ok:errors.length===0,errors:Object.freeze([...new Set(errors)])});
 }
 function loadCatalog(filePath=process.env.COTCOMP_S479_CATALOG_PATH||DEFAULT_DATA_PATH){
@@ -210,6 +222,6 @@ const cotcompVehicleCatalogS479=onRequest({
 module.exports=Object.freeze({
   VERSION,PROJECT_ID,TENANT_ID,REGION,FUNCTION_NAME,EXPECTED_CATALOG_VERSION,EXPECTED_CATALOG_DIGEST,
   EXPECTED_ENTRY_COUNT,EXPECTED_BRAND_COUNT,ALLOWED_TYPES,VEHICLE_CLASSES,MIN_YEAR,MAX_YEAR,
-  ALLOWED_ORIGINS,clean,norm,sha,jsonDigest,classTypes,validateCatalog,loadCatalog,indexCatalog,years,
+  ALLOWED_ORIGINS,clean,norm,sha,jsonDigest,publicSubsetDigestPayload,computePublicSubsetDigest,classTypes,validateCatalog,loadCatalog,indexCatalog,years,
   createHandler,getRuntimeHandler,cotcompVehicleCatalogS479
 });
