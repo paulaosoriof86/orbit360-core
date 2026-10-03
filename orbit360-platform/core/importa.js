@@ -1084,7 +1084,7 @@ Orbit.importa = (function () {
     if (!files.length) return { ok: false, status: 'sin_archivos', message: 'Selecciona al menos un archivo.' };
     const cid = state.scope && state.scope.cid || '';
     const insurerId = state.scope && state.scope.aseguradoraId || '';
-    if (/--/.test(String(location.hostname || '')) && insurerId && !/^b4[-_]/i.test(String(insurerId))) {
+    if (/--/.test(String(location.hostname || '')) && insurerId && !/^(?:b4[-_]|b4003qa_)/i.test(String(insurerId))) {
       return { ok: false, status: 'preview_protected_operational_insurer', message: 'Preview protege las aseguradoras operativas reales. La carga documental se valida sin escribir sobre la ficha real y se habilita con el mismo artifact al promover.' };
     }
     if (/--/.test(String(location.hostname || '')) && cid && !/^b2[-_]/i.test(String(cid))) {
