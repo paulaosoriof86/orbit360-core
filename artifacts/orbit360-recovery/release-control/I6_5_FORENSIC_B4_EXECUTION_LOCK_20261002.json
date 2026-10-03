@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-03",
-  "status": "B4_003_R11A_QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW_RETRY",
+  "status": "B4_003_SOURCE_FIXED_R11_QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones, policy integrity, Information Health and source-backed insurer knowledge.",
-    "status": "SOURCE_FIXED_R11_QA_HARNESS_REPAIRED_R11A_PENDING_EXACT_PREVIEW",
+    "status": "SOURCE_FIXED_R11_QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_R11_PENDING_RETEST",
     "knowledgePreview": true
   },
@@ -92,7 +92,7 @@
     "providerDeploymentAuthorized": false,
     "findingContinuityGuardRequired": true
   },
-  "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY",
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "f2a07f7bb4b11749f286dde5eeb7e87690ad2b34"

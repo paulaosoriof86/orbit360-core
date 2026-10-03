@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R11A_EXACT_PREVIEW_RETRY",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4853,13 +4853,13 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_R11A_QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW_RETRY",
+      "status": "B4_003_SOURCE_FIXED_R11_QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "8ede98b4029b4eb830f9e832b0a07717137b9c81",
+      "executionLockBlobSha": "75d9fc969ed0920b673aa9736b90d97642375ace",
       "compositionLockBlobSha": "f2a07f7bb4b11749f286dde5eeb7e87690ad2b34",
       "findingLedgerBlobSha": "278736c32b336b76077d9b6e30773965c74af873",
       "activeFindingId": "B4-003",
@@ -4870,7 +4870,7 @@
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R11_SOURCE_FIX_20261003.json",
       "sourceFixReceiptBlobSha": "1d2e940bad50e2bef141482494097ef5938ba8d4",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
@@ -5198,7 +5198,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "findingContinuityRegisterBlobSha": "a2870bd5ccb759745d5e7521eb5ae58d6e4eeccf",
     "findingContinuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23"
@@ -5493,15 +5493,15 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_R11A_QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW_RETRY",
+    "status": "B4_003_SOURCE_FIXED_R11_QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "8ede98b4029b4eb830f9e832b0a07717137b9c81",
+    "executionLockBlobSha": "75d9fc969ed0920b673aa9736b90d97642375ace",
     "compositionLockBlobSha": "f2a07f7bb4b11749f286dde5eeb7e87690ad2b34",
     "findingLedgerBlobSha": "278736c32b336b76077d9b6e30773965c74af873",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "sourceFixReceiptBlobSha": "1d2e940bad50e2bef141482494097ef5938ba8d4",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
