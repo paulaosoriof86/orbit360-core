@@ -229,6 +229,7 @@ input:focus,select:focus{outline:3px solid rgba(228,0,43,.14);border-color:#E400
 
 @media(max-width:900px){.workspace{grid-template-columns:1fr}.rail{flex-direction:row;overflow-x:auto;border-right:none;border-bottom:1px solid #E7E2D6;align-items:center}.railhead,.railnote{display:none}}
 @media(max-width:680px){.shell{padding-left:14px;padding-right:14px}.panel{padding:18px}.route-grid,.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.session{display:none}.page-title{font-size:clamp(32px,11vw,46px)}}
+</style>
 
 </head>
 <body>
