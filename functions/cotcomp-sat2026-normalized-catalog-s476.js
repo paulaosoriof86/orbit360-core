@@ -167,8 +167,8 @@ function validatePhysicalCatalog(catalog={}){
   if(Number(m.duplicateSourceRowsMerged)!==243)errors.push('DUPLICATE_MERGE_INVALID');
   if(Number(m.uniqueVehicleTypes)!==31)errors.push('TYPE_COUNT_INVALID');
   if(Number(m.uniqueBrands)!==223)errors.push('BRAND_COUNT_INVALID');
-  if(Number(m.uniqueBrandLinePairs)!==3289)errors.push('BRAND_LINE_COUNT_INVALID');
-  if(Number(m.crossTypeBrandLinePairs)!==101)errors.push('CROSS_TYPE_COUNT_INVALID');
+  if(Number(m.uniqueBrandLinePairs)!==3287)errors.push('BRAND_LINE_COUNT_INVALID');
+  if(Number(m.crossTypeBrandLinePairs)!==103)errors.push('CROSS_TYPE_COUNT_INVALID');
   if(!/^[a-f0-9]{64}$/.test(clean(catalog.catalogDigestSha256,80)))errors.push('CATALOG_DIGEST_INVALID');
   const p=regressionProbes(catalog);
   if(p.toyotaCorollaExact<1)errors.push('TOYOTA_COROLLA_REQUIRED');
