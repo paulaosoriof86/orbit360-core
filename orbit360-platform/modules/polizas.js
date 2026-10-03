@@ -81,35 +81,49 @@ Orbit.modules.polizas = (function () {
     if (indexCache) return indexCache;
     const policies = S().all('polizas') || [];
     const clients = S().all('clientes') || [];
-    const vehicles = S().all('vehiculos') || [];
     const insurers = S().all('aseguradoras') || [];
     const advisors = S().all('asesores') || [];
-    const policyClientIds = new Set(policies.map(p => String(p && p.clienteId || '')).filter(Boolean));
     const clientsById = new Map();
-    clients.forEach(c => {
-      if (!c || c.id == null) return;
-      const projected=(Orbit.clientProjection && Orbit.clientProjection.project)
-        ? Orbit.clientProjection.project(c,{ policyClientIds })
-        : c;
-      clientsById.set(c.id, projected);
-    });
-    const vehiclesByPolicy = new Map();
-    vehicles.forEach(v => { if (v && v.polizaId && !vehiclesByPolicy.has(v.polizaId)) vehiclesByPolicy.set(v.polizaId, v); });
+    clients.forEach(c => { if (c && c.id != null) clientsById.set(c.id, c); });
     const insurersById = new Map(insurers.filter(x=>x&&x.id!=null).map(x=>[x.id,x]));
     const advisorsById = new Map(advisors.filter(x=>x&&x.id!=null).map(x=>[x.id,x]));
-    const searchTextByPolicy = new Map();
-    policies.forEach(p => {
-      if (!p || p.id == null) return;
-      const cli=clientsById.get(p.clienteId) || null, veh=vehiclesByPolicy.get(p.id) || null;
-      const placa=(veh && (veh.placa || veh.placaNormalizada || veh.placaFuente)) || p.placa || '';
-      const clienteTxt=cli ? [cli.nombre,cli.identificacion,cli.email,cli.telefono].filter(Boolean).join(' ') : '';
-      searchTextByPolicy.set(p.id,[p.numero,p.producto,p.subramo,clienteTxt,placa,veh&&veh.marca,veh&&veh.linea].filter(Boolean).join(' ').toLowerCase());
-    });
     const ramoOptions=[...new Set(policies.map(p=>p&&p.ramo).filter(Boolean))].sort().map(r=>({v:r,t:r}));
     const insurerOptions=insurers.filter(a=>a&&a.id!=null).map(a=>({v:a.id,t:a.nombre||a.displayName||a.id}));
     const advisorOptions=advisors.filter(a=>a&&a.id!=null).map(a=>({v:a.id,t:a.nombre||a.id}));
-    indexCache = { policies, clientsById, vehiclesByPolicy, insurersById, advisorsById, searchTextByPolicy, ramoOptions, insurerOptions, advisorOptions };
+    indexCache = {
+      policies, clientsById, insurersById, advisorsById,
+      ramoOptions, insurerOptions, advisorOptions,
+      basicSearchTextByPolicy:null, vehicleSearchTextByPolicy:null
+    };
     return indexCache;
+  }
+
+  function ensureBasicSearchIndex(I) {
+    if (I.basicSearchTextByPolicy) return I.basicSearchTextByPolicy;
+    const out=new Map();
+    I.policies.forEach(p => {
+      if (!p || p.id == null) return;
+      const cli=I.clientsById.get(p.clienteId) || null;
+      const clienteTxt=cli ? [cli.nombre,cli.identificacion,cli.email,cli.telefono].filter(Boolean).join(' ') : '';
+      out.set(p.id,[p.numero,p.ramo,p.producto,p.subramo,clienteTxt,p.placa].filter(Boolean).join(' ').toLowerCase());
+    });
+    I.basicSearchTextByPolicy=out;
+    return out;
+  }
+
+  function ensureVehicleSearchIndex(I) {
+    if (I.vehicleSearchTextByPolicy) return I.vehicleSearchTextByPolicy;
+    const out=new Map();
+    const vehicles=S().all('vehiculos') || [];
+    vehicles.forEach(v => {
+      if (!v || !v.polizaId) return;
+      const text=[v.placa,v.placaNormalizada,v.placaFuente,v.marca,v.linea,v.modelo,v.anio].filter(Boolean).join(' ').toLowerCase();
+      if (!text) return;
+      const key=v.polizaId, previous=out.get(key) || '';
+      out.set(key,(previous+' '+text).trim());
+    });
+    I.vehicleSearchTextByPolicy=out;
+    return out;
   }
 
   function countryCode(v) { return String(v == null ? '' : v).trim().toUpperCase(); }
@@ -140,10 +154,13 @@ Orbit.modules.polizas = (function () {
   }
 
   function rows(I, source) {
-    return (source || S().all('polizas') || []).filter(p => {
-      const txt = I.searchTextByPolicy.get(p.id) || '';
+    const query=String(st.fq||'').trim().toLowerCase();
+    const basic=query ? ensureBasicSearchIndex(I) : null;
+    const vehicle=query ? ensureVehicleSearchIndex(I) : null;
+    return (source || I.policies || []).filter(p => {
+      const searchOk=!query || String(basic.get(p.id)||'').includes(query) || String(vehicle.get(p.id)||'').includes(query);
       const grouped = !st.fkind || (st.fkind === 'renewals45' ? isRenewalWithin45Days(p) : st.fkind === 'historical' ? isHistoricalNoPortfolio(p) : st.fkind === 'active' ? isActivePolicy(p) : true);
-      return grouped && (!st.fq || txt.includes(st.fq.toLowerCase())) &&
+      return grouped && searchOk &&
         (!st.framo || p.ramo === st.framo) &&
         (!st.fasg || p.aseguradoraId === st.fasg) &&
         (!st.fase || p.asesorId === st.fase) &&
@@ -152,7 +169,7 @@ Orbit.modules.polizas = (function () {
   }
 
   function render(host) {
-    try { if(S()&&typeof S()._ensureCollections==='function') S()._ensureCollections(['polizas','clientes','vehiculos']); } catch (_) {}
+    try { if(S()&&typeof S()._ensureCollections==='function') S()._ensureCollections(['polizas','clientes']); } catch (_) {}
     if (!relationDataReady()) {
       host.innerHTML = '<div class="page" data-polizas-relations-loading="1"><div class="card pad"><b>Cargando pólizas…</b><div class="muted" style="margin-top:5px">Estamos preparando clientes y relaciones para mostrar la cartera sin datos incompletos.</div></div></div>';
       return;
