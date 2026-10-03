@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s488-exact-promoted-frontend-lab-intent-v1.0",
   "authorization": "S488_DEPLOY_EXACT_PROMOTED_FRONTEND_RECOVERY",
-  "authorizedSourceParent": "45d0b3d853fdb52675d08d74422b69e6ad5ed2cd",
+  "authorizedSourceParent": "344de55704d23f271c49c64ac7dcfd82895b4c80",
   "projectId": "ays-orbit-360-lab",
   "functionName": "cotcompExactPromotedPreviewS488",
   "promotedFullSha": "50aa4190ae22ad13760f893b9bf37415abe35fb7327e034f66dc565b9b2cbf1d",
