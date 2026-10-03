@@ -64,7 +64,7 @@ jobs:
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const l=JSON.parse(fs.readFileSync(process.env.B4_LOCK,'utf8'));
-          const sourceFixed=v=>/^B4_003_SOURCE_FIXED_R(?:5|9|10|11|12)_/.test(String(v||''));
+          const sourceFixed=v=>/^B4_003_SOURCE_FIXED_R(?:5|9|10|11|12|13)_/.test(String(v||''));
           const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW'
             && sourceFixed(c.currentB4?.status)
             && sourceFixed(c.i65ForensicRemediationPlan?.b4?.status)
@@ -106,6 +106,7 @@ jobs:
           node --check orbit360-platform/modules/renewals-v1200-permission-guard.js
           node --check orbit360-platform/modules/renewals-v1201-issued-filter.js
           node --check orbit360-platform/modules/cancelaciones.js
+          node --check orbit360-platform/modules/polizas.js
           node --check orbit360-platform/modules/policy-receipts-v1199-bridge.js
           node --check orbit360-platform/modules/cliente360.js
           node --check orbit360-platform/modules/calidad.js
@@ -198,8 +199,8 @@ jobs:
           cp -a "$RUNNER_TEMP/b4-003-package/bundle/backend" "$FROOT/backend"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          printf '{"status":"DEPLOYED_EXACT_PREVIEW_ONLY","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360ProductOperationalCommandPreview","orbit360OpsLeadsCommandPreview"],"productionFunctionsDeployed":false,"realBusinessWritesAuthorized":false}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360DocumentDriveStatusPreview,functions:orbit360DocumentDriveUploadPreview,functions:orbit360DocumentDriveReadPreview,functions:orbit360DocumentDriveCleanupPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          printf '{"status":"DEPLOYED_EXACT_PREVIEW_ONLY","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360ProductOperationalCommandPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview","orbit360DocumentDriveReadPreview","orbit360DocumentDriveCleanupPreview"],"productionFunctionsDeployed":false,"realBusinessWritesAuthorized":false}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
 
       - name: Deploy exact package to isolated Preview
         if: steps.gate.outputs.run == 'true'
@@ -266,7 +267,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b4-003-preview-proof.mjs
-          node -e "const x=require(process.env.B4_003_PROOF_OUT),a=x.assertions||{};if(x.status!=='PASS'||a.quoteAuthorityContractHosted!==true||a.manualFinancialInferenceRemoved!==true||a.insurerKnowledgeVisible!==true||a.multiProductKnowledgeRoadmapVisible!==true||a.noDelayedRenewalRenderMutation!==true||a.renewalCampaignDurableReadback!==true||a.cancelationDurableReadback!==true||a.recoveryLinkagePreserved!==true||a.recoveryIdempotentRetry!==true||a.previewGeneralWriteIsolation!==true||a.cancellationProjectionConsistent!==true||a.qaResidueReadOnlyAdjudicated!==true||a.cleanupComplete!==true||x.syntheticFinalAbsent!==true)process.exit(1);console.log('B4_003_PREVIEW_PROOF=PASS')"
+          node -e "const x=require(process.env.B4_003_PROOF_OUT),a=x.assertions||{};if(x.status!=='PASS'||a.quoteAuthorityContractHosted!==true||a.manualFinancialInferenceRemoved!==true||a.insurerKnowledgeVisible!==true||a.multiProductKnowledgeRoadmapVisible!==true||a.noDelayedRenewalRenderMutation!==true||a.renewalCampaignDurableReadback!==true||a.cancelationDurableReadback!==true||a.recoveryLinkagePreserved!==true||a.recoveryIdempotentRetry!==true||a.previewGeneralWriteIsolation!==true||a.cancellationProjectionConsistent!==true||a.qaResidueReadOnlyAdjudicated!==true||a.cancelCountrySwitchUnder2500ms!==true||a.cancelExplicitCanonicalTargets!==true||a.cancelCrossCountryIdentityExplicit!==true||a.policyRouteUnder2500ms!==true||a.policySearchUnder2500ms!==true||a.policyDetailUnder2500ms!==true||a.policyRefreshCoherentHydration!==true||a.realRenewalPipelineRepopulated!==true||a.realRenewalPipelineMatchesCanonicalEligibility!==true||a.insurerDriveE2E!==true||a.insurerDriveReloadPersistence!==true||a.insurerDriveNoAutoEnablement!==true||a.insurerDriveFileCleanup!==true||a.cleanupComplete!==true||x.syntheticFinalAbsent!==true)process.exit(1);console.log('B4_003_PREVIEW_PROOF=PASS')"
 
       - name: Adjudicate and clean exact historical B2 QA residue
         if: steps.gate.outputs.run == 'true'
