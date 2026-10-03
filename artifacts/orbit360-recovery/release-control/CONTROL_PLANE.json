@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R7_SOURCE_EXHAUSTION_THEN_CAUSAL_FIX",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R8_REUSE_SOURCE_INVENTORY_AND_INSURER_KNOWLEDGE_FASTTRACK",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4853,15 +4853,15 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_R7_CUMULATIVE_REMEDIATION_ACTIVE",
+      "status": "B4_003_R8_SOURCE_REUSE_AND_KNOWLEDGE_CONSOLIDATION_ACTIVE",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "5cce34f49404c697a60c4cf2cad4081912634dfb",
-      "compositionLockBlobSha": "28fc6d606267087af67c0fcf7c1a4baeb31eece0",
-      "findingLedgerBlobSha": "9e7e50a7990b22d6300d4f3d1e4e5ad10227a55c",
+      "executionLockBlobSha": "c66948b83008e7c67bbfdc3887f54adcf5ae37d7",
+      "compositionLockBlobSha": "4fa2c3717613b7f8fab9a4a37dec4bd8c4e17cdc",
+      "findingLedgerBlobSha": "27e1b43e2566bdef0ac395dfd85efc52517e06e8",
       "activeFindingId": "B4-003",
       "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
@@ -4870,7 +4870,7 @@
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_R7_SOURCE_EXHAUSTION_THEN_CAUSAL_FIX",
+      "nextAction": "B4_003_R8_REUSE_SOURCE_INVENTORY_AND_INSURER_KNOWLEDGE_FASTTRACK",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R5_SOURCE_FIX_20261003.json",
       "sourceFixReceiptBlobSha": "cc2b950989344acfdade4a38dcc537c088b1819a",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
@@ -5132,15 +5132,29 @@
       "cumulativeFreezeBlobSha": "37f015ea5262df68ac0838b57b1de61c1b0b25a7",
       "premiumCalculationContractFrozen": true,
       "paulaManualActionStatus": "DO_NOT_START_YET",
-      "sourceExhaustionBeforePaula": true
+      "sourceExhaustionBeforePaula": true,
+      "informationHealthAndInsurerKnowledgeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
+      "informationHealthAndInsurerKnowledgeLockBlobSha": "e0edc10070dee174ed0c3527a29a8b632b1cba69",
+      "informationHealthOwner": "#/calidad",
+      "reuseExistingInsurerKnowledge": true,
+      "insurerKnowledgeTransversalTargets": [
+        "Aseguradoras",
+        "Cotizador",
+        "Comparativo",
+        "Pólizas",
+        "Renovaciones",
+        "Calidad"
+      ],
+      "paulaFinancialManualActionStatus": "DO_NOT_START_YET",
+      "paulaSourceUploadStatus": "UPLOAD_ONLY_WHEN_REQUESTED"
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "28fc6d606267087af67c0fcf7c1a4baeb31eece0",
+    "compositionLockBlobSha": "4fa2c3717613b7f8fab9a4a37dec4bd8c4e17cdc",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "9e7e50a7990b22d6300d4f3d1e4e5ad10227a55c",
+    "findingLedgerBlobSha": "27e1b43e2566bdef0ac395dfd85efc52517e06e8",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B4",
@@ -5152,7 +5166,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B4_003_R7_SOURCE_EXHAUSTION_THEN_CAUSAL_FIX",
+    "nextAction": "B4_003_R8_REUSE_SOURCE_INVENTORY_AND_INSURER_KNOWLEDGE_FASTTRACK",
     "activeFindingId": "B4-003"
   },
   "antiInterruptionControl": {
@@ -5445,15 +5459,15 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_R7_CUMULATIVE_REMEDIATION_ACTIVE",
+    "status": "B4_003_R8_SOURCE_REUSE_AND_KNOWLEDGE_CONSOLIDATION_ACTIVE",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "5cce34f49404c697a60c4cf2cad4081912634dfb",
-    "compositionLockBlobSha": "28fc6d606267087af67c0fcf7c1a4baeb31eece0",
-    "findingLedgerBlobSha": "9e7e50a7990b22d6300d4f3d1e4e5ad10227a55c",
+    "executionLockBlobSha": "c66948b83008e7c67bbfdc3887f54adcf5ae37d7",
+    "compositionLockBlobSha": "4fa2c3717613b7f8fab9a4a37dec4bd8c4e17cdc",
+    "findingLedgerBlobSha": "27e1b43e2566bdef0ac395dfd85efc52517e06e8",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R7_SOURCE_EXHAUSTION_THEN_CAUSAL_FIX",
+    "nextAction": "B4_003_R8_REUSE_SOURCE_INVENTORY_AND_INSURER_KNOWLEDGE_FASTTRACK",
     "sourceFixReceiptBlobSha": "cc2b950989344acfdade4a38dcc537c088b1819a",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -5708,10 +5722,15 @@
     "cumulativeFreezeBlobSha": "37f015ea5262df68ac0838b57b1de61c1b0b25a7",
     "premiumCalculationContractFrozen": true,
     "paulaManualActionStatus": "DO_NOT_START_YET",
-    "sourceExhaustionBeforePaula": true
+    "sourceExhaustionBeforePaula": true,
+    "informationHealthAndInsurerKnowledgeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
+    "informationHealthAndInsurerKnowledgeLockBlobSha": "e0edc10070dee174ed0c3527a29a8b632b1cba69",
+    "informationHealthOwner": "#/calidad",
+    "paulaFinancialManualActionStatus": "DO_NOT_START_YET",
+    "paulaSourceUploadStatus": "UPLOAD_ONLY_WHEN_REQUESTED"
   },
   "b4VisualAcceptanceControl": {
-    "status": "R7_REMEDIATION_ACTIVE_AFTER_R6_REJECTION",
+    "status": "R8_REMEDIATION_ACTIVE_AFTER_R6_REJECTION",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
     "receiptBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
     "cumulativeReviewThrough": [
@@ -5722,11 +5741,11 @@
     "b4001HumanVisualStatus": "PENDING_CUMULATIVE_REVIEW",
     "b4002HumanVisualStatus": "PENDING_CUMULATIVE_REVIEW",
     "b4003HumanVisualStatus": "REJECTED_R6_REMEDIATION_ACTIVE",
-    "b4004HeldUntil": "B4_003_R7_TARGETED_PAULA_VISUAL_PASS",
+    "b4004HeldUntil": "B4_003_R8_TARGETED_PAULA_VISUAL_PASS",
     "machinePassDoesNotAdvanceFinding": true
   },
   "b3FinancialVisualFeedbackCarry": {
-    "status": "R7_SYSTEM_FIRST_SOURCE_EXHAUSTION",
+    "status": "R8_SYSTEM_FIRST_SOURCE_REUSE_AND_HEALTH_QUEUE",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B3_FINANCIAL_VISUAL_FEEDBACK_CARRY_20261003.json",
     "blobSha": "ba6fae487eaa07b307d974f923bf38252465a0c2",
     "carryInto": "B4_003_TARGETED_PAULA_VISUAL",
@@ -5737,6 +5756,10 @@
     "paulaManualActionStatus": "DO_NOT_START_YET",
     "sourceExhaustionBeforePaula": true,
     "cumulativeFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
-    "cumulativeFreezeBlobSha": "37f015ea5262df68ac0838b57b1de61c1b0b25a7"
+    "cumulativeFreezeBlobSha": "37f015ea5262df68ac0838b57b1de61c1b0b25a7",
+    "paulaSourceUploadStatus": "UPLOAD_ONLY_WHEN_REQUESTED",
+    "informationHealthOwner": "#/calidad",
+    "informationHealthAndInsurerKnowledgeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
+    "informationHealthAndInsurerKnowledgeLockBlobSha": "e0edc10070dee174ed0c3527a29a8b632b1cba69"
   }
 }
