@@ -1,12 +1,12 @@
 'use strict';
 
-const VERSION='ays-cotcomp-real-quote-corpus-s471-v1.0';
+const VERSION='ays-cotcomp-real-quote-corpus-s471-v1.1';
 
 const CLUSTERS=Object.freeze([
   Object.freeze({
     clusterId:'GT_AUTO_YARIS_2008_37500',
     country:'GT',product:'AUTO',brand:'TOYOTA',lineModel:'YARIS',year:2008,insuredValue:37500,
-    currentW5Case:true,
+    currentW5Case:false,
     sources:Object.freeze([
       Object.freeze({
         insurer:'Aseguradora Guatemalteca',
