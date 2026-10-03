@@ -2035,7 +2035,7 @@
     {
       "id": "B4-003-R11-07-QUALITY-PERFORMANCE",
       "block": "B4",
-      "status": "SOURCE_FIXED_R12P_PENDING_EXACT_RUNTIME_PERFORMANCE_PROOF",
+      "status": "SOURCE_FIXED_R12Q_PENDING_EXACT_RUNTIME_PERFORMANCE_PROOF",
       "blocking": true,
       "owner": "calidad.js + product store",
       "targetGate": "B4-003",

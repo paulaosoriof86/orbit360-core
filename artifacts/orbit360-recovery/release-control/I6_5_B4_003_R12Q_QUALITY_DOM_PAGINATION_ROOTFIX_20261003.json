@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R12Q_QUALITY_DOM_PAGINATION_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R12Q_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003-R11-07-QUALITY-PERFORMANCE",
+  "parentFindingId": "B4-003",
+  "diagnosticRunId": 37153182332,
+  "diagnosticEvidence": {
+    "gt": {
+      "renderMs": 9904.9,
+      "qualityRows": 416,
+      "financialRows": 72
+    },
+    "co": {
+      "renderMs": 486.3,
+      "qualityRows": 17,
+      "financialRows": 2
+    }
+  },
+  "classification": "PRODUCT_DOM_SCALING_REGRESSION",
+  "rootCause": "Calidad rendered the complete filtered client table synchronously. Guatemala produced 416 client rows in one DOM build; Colombia produced 17. Render time scaled with row count.",
+  "fix": {
+    "strategy": "Keep all-country KPIs, filtering and Information Health calculations over the full dataset, but render client rows in deterministic pages of 50.",
+    "productBlobs": {
+      "orbit360-platform/modules/calidad.js": "0d9b9337a1aff1ce9f351663db60ff83c44a99f4",
+      "orbit360-platform/index.html": "a901748f91e8fd970a221b2810093f06810c9872"
+    },
+    "qaBlob": "b00c4dfd31cbc29db3a46c73dab042e460116bc0"
+  },
+  "invariants": [
+    "KPIs use full filtered population, not current page.",
+    "Country scope remains authoritative.",
+    "Filters reset pagination to page 1.",
+    "Country change clamps page to available pages.",
+    "No client, policy, receipt or insurer data is mutated.",
+    "Exact Preview must remain under 2500 ms for GT and CO."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productSourceChanged": true,
+    "syntheticQaWritesOnly": true
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

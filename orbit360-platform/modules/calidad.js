@@ -10,7 +10,7 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.calidad = (function () {
   'use strict';
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store, A = Orbit.access || {};
-  let st = { ffalta: '', soloVig: false, asesor: '' };
+  let st = { ffalta: '', soloVig: false, asesor: '', page: 1, pageSize: 50 };
 
   function clean(v) { return String(v == null ? '' : v).trim(); }
   function countryCode(v) { return clean(v).toUpperCase(); }
@@ -93,6 +93,9 @@ Orbit.modules.calidad = (function () {
     const complete = clients.length ? Math.max(0, Math.round((1 - all.length / clients.length) * 100)) : 100;
     const ownScope = A.dataScope && A.dataScope('calidad') === 'own';
     const financialIssues = financialIntegrityIssues();
+    const pageSize = st.pageSize || 50, pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
+    st.page = Math.max(1, Math.min(st.page || 1, pageCount));
+    const pageStart = (st.page - 1) * pageSize, visibleRows = rows.slice(pageStart, pageStart + pageSize), pageEnd = Math.min(rows.length, pageStart + visibleRows.length);
 
     host.innerHTML = `<div class="page">
       ${K.bannerFor('calidad', `<button class="btn primary" onclick="Orbit.modules.calidad.campana()">📣 Preparar actualización</button>`)}
@@ -114,10 +117,10 @@ Orbit.modules.calidad = (function () {
             ['departamento','Sin departamento'],['ciudad','Sin ciudad'],['direccion','Sin dirección'],['contactoPrincipal','Sin contacto principal'],['fechaNac','Sin fecha nac.']
           ].map(o => `<option value="${o[0]}" ${st.ffalta === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>
           ${advisors.length > 1 && !ownScope ? `<select id="q-asesor" class="o-sel"><option value="">Todos los asesores</option>${advisors.map(a => `<option value="${U.esc(a.id)}" ${st.asesor === a.id ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select>` : ''}
-          <span class="muted" style="margin-left:auto;font-size:12.5px">${rows.length} clientes</span>
+          <span class="muted" style="margin-left:auto;font-size:12.5px">${rows.length} clientes${rows.length ? ' · mostrando ' + (pageStart + 1) + '–' + pageEnd : ''}</span>
         </div>
-        <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Cliente</th><th>Asesor</th><th>Faltan</th><th>Evidencia de país</th><th>Vigente</th><th>Canal</th><th></th></tr></thead>
-          <tbody>${rows.map(({ c, f, vig, evidence }) => {
+        <div style="overflow-x:auto" data-quality-paged="true"><table class="tbl"><thead><tr><th>Cliente</th><th>Asesor</th><th>Faltan</th><th>Evidencia de país</th><th>Vigente</th><th>Canal</th><th></th></tr></thead>
+          <tbody>${visibleRows.map(({ c, f, vig, evidence }) => {
             const phone = clean(c.whatsapp || c.telefono), wa = phone.replace(/[^0-9]/g, '');
             const canal = phone ? '<span class="badge ok">💬 WhatsApp</span>' : c.email ? '<span class="badge info">✉ Correo</span>' : '<span class="badge danger">Sin contacto</span>';
             const faltaTxt = f.sort((a,b) => a.pri - b.pri).map(x => `<span class="badge ${x.pri <= 2 ? 'danger' : x.pri <= 6 ? 'warn' : 'neutral'}">${x.label}</span>`).join(' ');
@@ -127,13 +130,16 @@ Orbit.modules.calidad = (function () {
               : `<button class="btn ghost sm" disabled>Sin canal</button>`;
             return `<tr class="clickable" data-quality-country="${U.esc(countryCode(c.pais))}" onclick="location.hash='#/cliente360?c=${c.id}&t=resumen'"><td>${K.clienteCell(c.id)}</td><td>${K.asesorCell(c.asesorId)}</td><td>${faltaTxt}</td><td>${evidenceTxt}</td><td>${vig ? '<span class="badge ok">Sí</span>' : '<span class="muted">Pendiente de pólizas / sin vigente</span>'}</td><td>${canal}</td><td style="text-align:right;white-space:nowrap"><button class="btn primary sm" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}',{focus:'${f[0] && f[0].k || ''}'})">✏ Completar</button> ${accion}</td></tr>`;
           }).join('') || `<tr><td colspan="7" class="muted" style="text-align:center;padding:30px">No hay expedientes incompletos con los filtros actuales.</td></tr>`}</tbody></table></div>
+        ${rows.length > pageSize ? `<div data-quality-pagination="true" style="display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid var(--line)"><button class="btn ghost sm" id="q-page-prev" ${st.page<=1?'disabled':''}>← Anterior</button><span class="muted" style="font-size:12px">Página ${st.page} de ${pageCount}</span><button class="btn ghost sm" id="q-page-next" ${st.page>=pageCount?'disabled':''}>Siguiente →</button></div>` : ''}
       </div>
       <div class="cfg-note" style="margin-top:14px">Prioridad: país/moneda › contacto › correo/documento › ubicación › datos complementarios. Completar vacíos no permite reasignar, fusionar, borrar ni modificar pólizas o cobros.</div>
     </div>`;
 
-    const vig = document.getElementById('q-vig'); if (vig) vig.addEventListener('change', e => { st.soloVig = e.target.checked; render(host); });
-    const falta = document.getElementById('q-falta'); if (falta) falta.addEventListener('change', e => { st.ffalta = e.target.value; render(host); });
-    const advisor = document.getElementById('q-asesor'); if (advisor) advisor.addEventListener('change', e => { st.asesor = e.target.value; render(host); });
+    const vig = document.getElementById('q-vig'); if (vig) vig.addEventListener('change', e => { st.soloVig = e.target.checked; st.page=1; render(host); });
+    const falta = document.getElementById('q-falta'); if (falta) falta.addEventListener('change', e => { st.ffalta = e.target.value; st.page=1; render(host); });
+    const advisor = document.getElementById('q-asesor'); if (advisor) advisor.addEventListener('change', e => { st.asesor = e.target.value; st.page=1; render(host); });
+    const prev = document.getElementById('q-page-prev'); if(prev) prev.addEventListener('click',()=>{if(st.page>1){st.page--;render(host);}});
+    const next = document.getElementById('q-page-next'); if(next) next.addEventListener('click',()=>{if(st.page<pageCount){st.page++;render(host);}});
   }
 
   function geoOptions(country, department) {
@@ -208,5 +214,5 @@ Orbit.modules.calidad = (function () {
     const mail = rows.filter(x => !clean(x.c.whatsapp || x.c.telefono) && clean(x.c.email)).length;
     U.toast('Actualización preparada:\n\n• ' + wa + ' por WhatsApp Web/canal pendiente de confirmación\n• ' + mail + ' por correo preparado\n• ' + (rows.length - wa - mail) + ' sin canal — requieren gestión.\n\nNo se ha confirmado ningún envío.');
   }
-  return { render, campana, editarInline, faltantes, financialIntegrityIssues, version: '1.219-information-health-performance-r12p' };
+  return { render, campana, editarInline, faltantes, financialIntegrityIssues, version: '1.220-information-health-pagination-r12q' };
 })();
