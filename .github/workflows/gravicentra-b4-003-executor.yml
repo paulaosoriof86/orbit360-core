@@ -1,4 +1,5 @@
 name: Gravicentra B4-003 Renewals Cancelations Preview
+# R13 scheduling-only retrigger after shared B4-003 concurrency collision; product source unchanged.
 
 on:
   workflow_dispatch:
