@@ -2058,15 +2058,15 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_ACTIVE_B4_002_READONLY_DIAGNOSTIC",
+    "status": "B4_002_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-    "lockBlobSha": "e04d669e884ac22855aca44da8a24553d899ae93",
+    "lockBlobSha": "90b71accd2820a30486953dfb6ce448730794dcb",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
     "productSourceChanged": true,
     "noLive": true,
     "noReimport": true,
     "activeFindingId": "B4-002",
-    "nextAction": "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC",
+    "nextAction": "B4_002_CAUSAL_SOURCE_FIX",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
     "sourceSha": "18799ffbb2623dbfd28623774c41abef22f9f75a",
     "buildId": "gi-i65-b4-18799ffbb262-57f234755dc1",
@@ -2114,5 +2114,22 @@
     "productSourceChanged": true,
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
+  },
+  "findingLedgerBlobSha": "f5891609ceaebb08a91ab5ab33d33d538e03bc76",
+  "b4002Diagnostic": {
+    "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
+    "blobSha": "12183afd6a7a71863e2cd8fd365a847383fc5bee",
+    "classification": "PRODUCT_BACKEND_NOTIFICATION_DELIVERY_GAP",
+    "rootCause": "CANONICAL_OUTBOX_HAS_NO_EXECUTABLE_DISPATCH_RETRY_OWNER",
+    "allowedProductFiles": [
+      "functions/notification-outbox-processor.js",
+      "functions/bootstrap.js",
+      "functions/package.json",
+      "functions/ops-advisor-inbox.js"
+    ],
+    "noOperationalDataWrites": true,
+    "noReimport": true,
+    "noLive": true
   }
 }
