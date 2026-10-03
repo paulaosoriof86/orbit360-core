@@ -1,0 +1,166 @@
+name: CotComp S4.88 exact owner baseline recovery LAB
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s488-exact-owner-baseline-recovery-lab-20261003
+    paths:
+      - '.github/cotcomp-lab-intents/s488-exact-owner-baseline-lab-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompExactOwnerApprovedPreviewS488
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompExactOwnerApprovedPreviewS488
+  EXPECTED_SHA256: a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d
+
+jobs:
+  s488-exact-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify exact-recovery intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s488-exact-owner-baseline-lab-authorized.json
+          jq -e '
+            .authorization=="S488_DEPLOY_EXACT_OWNER_BASELINE_RECOVERY" and
+            .projectId=="ays-orbit-360-lab" and
+            .functionName=="cotcompExactOwnerApprovedPreviewS488" and
+            .baselineSha256=="a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d" and
+            .baselineVersions=="S4.10=S4.18_BYTE_IDENTICAL" and
+            .visualDeltaAllowed==false and
+            .fixtureOnly==true and
+            .providerDeploymentAuthorized==false and
+            .cotcompRealTransportAuthorized==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA and exact-byte recovery tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-exact-owner-approved-preview-s488.js
+          node --check cotcomp-exact-owner-approved-preview-s488.test.js
+          node --test cotcomp-exact-owner-approved-preview-s488.test.js
+
+      - name: Verify exact reconstructed asset SHA before deploy
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const S=require('./cotcomp-exact-owner-approved-preview-s488');
+          const x=S.loadExactHtml();
+          console.log(JSON.stringify({
+            sha256:x.digest,
+            chunks:x.files.length,
+            expected:S.EXPECTED_SHA256,
+            exact:x.digest===S.EXPECTED_SHA256
+          },null,2));
+          if(x.digest!==S.EXPECTED_SHA256) process.exit(1);
+          NODE
+
+      - name: Prepare exact LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s488/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s488/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Deploy only exact S4.88 preview to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physically verify exact response bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s488/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+          ACTUAL="$(sha256sum "$E/page.html" | awk '{print $1}')"
+          test "$ACTUAL" = "$EXPECTED_SHA256"
+
+          grep -q 'Empecemos por lo que quieres proteger.' "$E/page.html"
+          grep -q 'Auto / movilidad' "$E/page.html"
+          grep -q 'Gastos Médicos' "$E/page.html"
+          grep -q 'Vida e ingreso' "$E/page.html"
+          grep -q 'Empresa' "$E/page.html"
+          grep -q 'Flotilla / transporte / carga' "$E/page.html"
+          grep -q 'Contrato / obligación / proyecto' "$E/page.html"
+          grep -q 'Revisar póliza existente' "$E/page.html"
+          grep -q 'No estoy seguro' "$E/page.html"
+
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+
+          jq -n --arg url "$COTCOMP_URL" --arg sha "$ACTUAL" '{
+            schemaVersion:"ays-cotcomp-s488-exact-owner-baseline-recovery-v1.0",
+            functionUrl:$url,
+            baselineVersions:"S4.10=S4.18_BYTE_IDENTICAL",
+            expectedSha256:"a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d",
+            servedSha256:$sha,
+            exactByteMatch:($sha=="a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d"),
+            visualDeltaAllowed:false,
+            fixtureOnly:true,
+            providerDeploymentAuthorized:false,
+            cotcompRealTransportAuthorized:false,
+            productionTouched:false
+          }' > "$E/S488_EXACT_OWNER_BASELINE_PHYSICAL_RECEIPT.json"
+
+      - name: Upload sanitized S4.88 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s488-exact-owner-baseline-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s488/evidence/S488_EXACT_OWNER_BASELINE_PHYSICAL_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s488/firebase-service-account.json"
