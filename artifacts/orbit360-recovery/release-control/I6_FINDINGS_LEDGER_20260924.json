@@ -2802,8 +2802,8 @@
       "id": "B4-003",
       "block": "B4",
       "source": "FROZEN_PLAN",
-      "finding": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones, premium/source authority, Information Health and visible insurer knowledge.",
-      "status": "SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
+      "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
+      "status": "SOURCE_FIXED_R10_QUOTE_AUTHORITY_READY",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2880,7 +2880,14 @@
       "r9KnowledgeSourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_SOURCE_FIX_20261003.json",
       "r9KnowledgeSourceFixReceiptBlobSha": "988c42f1ab11e8f5957086e4acd22ff4a991d4ff",
       "r9VisibleInPreview": true,
-      "r9MultiProduct": true
+      "r9MultiProduct": true,
+      "r10QuoteAuthorityAuthorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_INTEGRATION_LOCK_20261003.json",
+      "r10QuoteAuthorityAuthorizationLockBlobSha": "868a78408791bea719f7d07f5d48a0874df1a8da",
+      "r10QuoteAuthoritySourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_SOURCE_FIX_20261003.json",
+      "r10QuoteAuthoritySourceFixReceiptBlobSha": "6400bb9447fa145b6fb8d7c42a1c7dfe4477a4d1",
+      "quoteAuthorityContractPath": "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
+      "quoteAuthorityContractVersion": "gravicentra-quote-authority-v1",
+      "cotcompRealTransportAuthorized": false
     },
     {
       "id": "B4-004",
@@ -2890,7 +2897,7 @@
       "status": "NOT_STARTED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "WAIT_B4_003_R9_PAULA_VISUAL_PASS"
+      "nextAction": "WAIT_B4_003_R10_PAULA_VISUAL_PASS"
     },
     {
       "id": "B4-005",
@@ -6641,13 +6648,13 @@
     }
   },
   "currentB4": {
-    "status": "B4_003_SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
+    "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_READY",
     "activeFindingId": "B4-003",
     "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "executionLockBlobSha": "f082edc57e939c98a0fe2086a3e444481793bf05",
-    "compositionLockBlobSha": "f7f5007edd9a1a378ae600e91f1e68ec9e1bfe91",
+    "compositionLockBlobSha": "e35a50baea3f139f9ce3e65193bd81efc7b4158b",
     "readinessPercent": 96,
     "targetPercent": 100,
     "noLive": true,
@@ -6662,7 +6669,12 @@
     "r9KnowledgeAuthorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_PREVIEW_AUTHORIZATION_LOCK_20261003.json",
     "r9KnowledgeAuthorizationLockBlobSha": "e26ce6ddd4032bf04bda1458513e2564f6e65f9e",
     "r9KnowledgeSourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_SOURCE_FIX_20261003.json",
-    "r9KnowledgeSourceFixReceiptBlobSha": "988c42f1ab11e8f5957086e4acd22ff4a991d4ff"
+    "r9KnowledgeSourceFixReceiptBlobSha": "988c42f1ab11e8f5957086e4acd22ff4a991d4ff",
+    "r10QuoteAuthorityAuthorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_INTEGRATION_LOCK_20261003.json",
+    "r10QuoteAuthorityAuthorizationLockBlobSha": "868a78408791bea719f7d07f5d48a0874df1a8da",
+    "r10QuoteAuthoritySourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_SOURCE_FIX_20261003.json",
+    "r10QuoteAuthoritySourceFixReceiptBlobSha": "6400bb9447fa145b6fb8d7c42a1c7dfe4477a4d1",
+    "quoteAuthorityContractVersion": "gravicentra-quote-authority-v1"
   },
   "b4003QaResidueCarry": {
     "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
