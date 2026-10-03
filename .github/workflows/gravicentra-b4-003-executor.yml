@@ -31,7 +31,7 @@ jobs:
       TENANT_HINT: alianzas-soluciones
       HOSTING_SITE: ays-orbit-360-lab
       CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
-      B4_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json
+      B4_LOCK: artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json
       FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
       COMPOSITION: artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json
     steps:
