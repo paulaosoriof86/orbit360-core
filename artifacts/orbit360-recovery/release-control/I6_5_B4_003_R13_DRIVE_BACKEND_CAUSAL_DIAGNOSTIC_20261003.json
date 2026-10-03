@@ -1,0 +1,60 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_DRIVE_BACKEND_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-03",
+  "status": "CAUSE_DEMONSTRATED_NARROW_BACKEND_FIX_AUTHORIZED",
+  "findingId": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+  "parentDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+  "parentDiagnosticBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
+  "authority": "PAULA_CONTINUE_20261003",
+  "evidence": {
+    "frontendDriveProviderPath": "orbit360-platform/core/product-drive-document-provider-p0.js",
+    "frontendDriveProviderBlobSha": "cc0224a1e550fb1eb0b9f2e50a8373ec6b952ab9",
+    "importerPath": "orbit360-platform/core/importa.js",
+    "importerBlobSha": "15c2458eafd596d63b6ebf9be565f27f2d2881c6",
+    "backendPath": "functions/document-drive-domain.js",
+    "backendBlobSha": "253b7074c86bb6ce800cc933d10242e9b6096f0a",
+    "facts": [
+      "Aseguradoras invokes docs-aseguradora with entidad=aseguradora, entidadId and aseguradoraId.",
+      "The browser Drive provider forwards entidad and entidadId to the backend.",
+      "Backend authorizeTarget only implements gestion/gestiones and otherwise unconditionally resolves a clientes document from clienteId.",
+      "Insurer document requests therefore cannot authorize an aseguradoras record and can fail before Drive upload.",
+      "Backend refsFrom does not include the insurer docs array used by the importer, so insurer readback provenance cannot be authorized even if metadata is durably linked.",
+      "Preview Drive guards are client-ID based and do not recognize the exact synthetic insurer scope required by R13."
+    ]
+  },
+  "rootCause": "DOCUMENT_DRIVE_BACKEND_CLIENT_ONLY_TARGET_AUTHORITY_DOES_NOT_SUPPORT_INSURER_ENTITY_OR_INSURER_DOC_REFS",
+  "allowedProductFiles": [
+    "functions/document-drive-domain.js"
+  ],
+  "requiredFix": [
+    "Add fail-closed aseguradora target authorization through the canonical product operational authorization owner.",
+    "Recognize insurer docs references for readback.",
+    "Permit only exact synthetic b4-/b4_ insurer targets in Preview automated Drive writes, while leaving real insurer Preview writes denied.",
+    "Preserve existing client/management Drive behavior.",
+    "Keep production and Preview callables separate; deploy Preview Drive callables only for exact R13 proof."
+  ],
+  "previewDeploymentAuthorization": {
+    "authorized": true,
+    "productionFunctions": false,
+    "exactPreviewFunctions": [
+      "orbit360DocumentDriveStatusPreview",
+      "orbit360DocumentDriveUploadPreview",
+      "orbit360DocumentDriveReadPreview",
+      "orbit360DocumentDriveDownloadPreview",
+      "orbit360DocumentDriveFinalizePreview",
+      "orbit360DocumentDriveQuarantinePreview"
+    ]
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "realInsurerWritesAuthorized": false,
+    "dataReimport": false,
+    "livePromotion": false,
+    "quoteProviderDeploymentAuthorized": false
+  },
+  "supersedesForFindingOnly": {
+    "priorClassification": "E2E_PROOF_REQUIRED_SOURCE_CONTRACT_PRESENT",
+    "newClassification": "PRODUCT_BACKEND_DOCUMENT_TARGET_AUTHORITY_DEFECT_DEMONSTRATED"
+  },
+  "nextAction": "B4_003_R13_DRIVE_BACKEND_NARROW_SOURCE_FIX"
+}
