@@ -1,0 +1,67 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
+  "recordedAt": "2026-10-03",
+  "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "activeFinding": {
+    "id": "B4-003",
+    "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "blocking": true,
+    "humanVisualStatus": "REJECTED_R13",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "supersedes": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
+    "blobSha": "f89564bcfb821ed3f8c6005aeba027cad56aa720",
+    "reason": "R13 source-fix transition requires a versioned successor lock; historical B4 lock remains preserved as prior state."
+  },
+  "sourceFix": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
+    "blobSha": "bc57c45ddbb0849ab633f3eb17bd23c61f0f0d57"
+  },
+  "policyVisualLineage": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_VISUAL_LINEAGE_PROOF_20261003.json",
+    "blobSha": "241a16d434c9d7eb94246a81925e9cbedd183824",
+    "status": "SOURCE_LINEAGE_RECONCILED_PENDING_EXACT_PREVIEW_AND_PAULA_VISUAL"
+  },
+  "compositionLock": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "blobSha": "e0dab605d6b5d3a6808bd0d160d4674204a57714"
+  },
+  "findingLedger": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "blobSha": "0963ba41a16dd94b38ecbf611941526ff136c789"
+  },
+  "continuityRegister": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
+    "blobSha": "c4605190a92a64524a60a89bbf3074816f6d5e0b",
+    "inventoryCount": 191,
+    "attentionCount": 86,
+    "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
+  },
+  "boundaries": {
+    "businessWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "productMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaScope": "Exact B4-003 Preview only: disposable B4003 synthetic renewal, cancellation, information-health and insurer-document fixtures with mandatory cleanup/readback; no real operational row mutation.",
+    "renewalProductMutationAuthorized": false,
+    "policyVisualMutationAuthorized": false,
+    "realInsurerDriveWritesAuthorized": false,
+    "realClientDriveWritesAuthorized": false,
+    "drivePreviewFunctionDeploymentAuthorized": true,
+    "productionDriveFunctionDeploymentAuthorized": false,
+    "cotcompRealTransportAuthorized": false,
+    "paulaVisualAcceptanceRequiredBeforeAdvance": true
+  },
+  "nextRequiredProof": [
+    "B4_003_R13_CONTRACT_PASS",
+    "B4_003_R13_EXACT_PREVIEW_MACHINE_PASS",
+    "B4_003_TARGETED_PAULA_VISUAL_PASS"
+  ],
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
