@@ -2795,7 +2795,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Targeted regression closure for Renovaciones and Cancelaciones.",
-      "status": "SOURCE_FIXED_R2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "SOURCE_FIXED_R3_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2828,6 +2828,8 @@
       },
       "allowedProductFiles": [
         "functions/product-ops-leads-domain.js",
+        "functions/product-operational-domain.js",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js",
         "orbit360-platform/modules/renovaciones.js",
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
         "orbit360-platform/modules/renewals-v1200-permission-guard.js",
@@ -2838,7 +2840,9 @@
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_20261003.json",
       "sourceFixReceiptBlobSha": "f05e04e6184a3e8ffa49eead631d94cbb68bb1c4",
       "sourceFixR2ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R2_20261003.json",
-      "sourceFixR2ReceiptBlobSha": "5c2d3ff811e1b40f5d805cc55126696c63b09a96"
+      "sourceFixR2ReceiptBlobSha": "5c2d3ff811e1b40f5d805cc55126696c63b09a96",
+      "sourceFixR3ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R3_PREVIEW_ISOLATION_20261003.json",
+      "sourceFixR3ReceiptBlobSha": "44f1995c63b852497968b88d738fa5daf63c35b8"
     },
     {
       "id": "B4-004",
