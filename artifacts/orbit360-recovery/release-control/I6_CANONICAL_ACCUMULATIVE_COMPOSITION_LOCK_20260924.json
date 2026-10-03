@@ -2068,7 +2068,7 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_003_R8_SOURCE_REUSE_AND_KNOWLEDGE_CONSOLIDATION_ACTIVE",
+    "status": "B4_003_R8_PACKET_1_REQUESTED_SOURCE_EXTRACTION_CONTINUES",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "lockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -2076,7 +2076,7 @@
     "noLive": true,
     "noReimport": true,
     "activeFindingId": "B4-003",
-    "nextAction": "B4_003_R8_REUSE_SOURCE_INVENTORY_AND_INSURER_KNOWLEDGE_FASTTRACK",
+    "nextAction": "B4_003_R8_WAIT_PACKET_1_WHILE_CONTINUING_AVAILABLE_SOURCE_EXTRACTION",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
     "sourceSha": "9ad8efe1b68589e57a5f6c8eb449690a75b31e14",
     "buildId": "gi-i65-b4-9ad8efe1b685-57f234755dc1",
@@ -2371,5 +2371,12 @@
     "b4004Held": true,
     "noLive": true,
     "noReimport": true
+  },
+  "b4003R8SourceInventoryPass1": {
+    "status": "SOURCE_INVENTORY_PASS_1_COMPLETE_REQUEST_PACKET_1",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_SOURCE_INVENTORY_PASS_1_20261003.json",
+    "blobSha": "fdfc74f663f7ff722f49cc8ddd60120a36eab4e8",
+    "paulaSourceUploadStatus": "PACKET_1_REQUESTED",
+    "paulaFinancialManualActionStatus": "DO_NOT_START_YET"
   }
 }
