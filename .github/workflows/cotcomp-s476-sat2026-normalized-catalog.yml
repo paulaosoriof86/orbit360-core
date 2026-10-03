@@ -1,0 +1,160 @@
+name: CotComp S4.76 SAT 2026 normalized catalog
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s476-sat2026-normalized-catalog-sourceonly-20261002
+    paths:
+      - '.github/cotcomp-lab-intents/s476-sat2026-normalization-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s476-normalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.76 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s476-sat2026-normalization-sourceonly.json
+          jq -e '
+            .authorization=="S476_SAT2026_NORMALIZATION_SOURCEONLY" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .sourceRawSha256=="ea15f79900e013bc3c397c23a154802fc2f62f8de3bf056b53003e03b85ec373" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .deployment==false and
+            .providerOrRater==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.76 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-sat2026-normalized-catalog-s476.js
+          node --check cotcomp-sat2026-normalized-catalog-s476.test.js
+          node --test cotcomp-sat2026-normalized-catalog-s476.test.js
+
+      - name: Install deterministic PDF text dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Re-fetch pinned SAT source and normalize catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s476"
+          URL='https://portal.sat.gob.gt/portal/descarga/1895/legislacion-aduanera/91646/tabla-de-valores-iva-iprima-2026'
+          PDF="$RUNNER_TEMP/s476/SAT_GT_2026_IPRIMA_91646.pdf"
+          TXT="$RUNNER_TEMP/s476/SAT_GT_2026_IPRIMA_91646.txt"
+          CAT="$RUNNER_TEMP/s476/SAT_GT_2026_NORMALIZED_VEHICLE_CATALOG.json"
+          REC="$RUNNER_TEMP/s476/S476_SAT2026_NORMALIZATION_RECEIPT.json"
+
+          curl -fL --retry 3 --retry-delay 2 --connect-timeout 20 --max-time 120 -sS -o "$PDF" "$URL"
+          RAW_SHA="$(sha256sum "$PDF" | awk '{print $1}')"
+          test "$RAW_SHA" = "ea15f79900e013bc3c397c23a154802fc2f62f8de3bf056b53003e03b85ec373"
+          pdftotext -layout -enc UTF-8 "$PDF" "$TXT"
+          test -s "$TXT"
+
+          cd functions
+          node - "$TXT" "$CAT" "$REC" <<'NODE'
+          const fs=require('fs');
+          const s=require('./cotcomp-sat2026-normalized-catalog-s476');
+          const [txtPath,catPath,recPath]=process.argv.slice(2);
+          const text=fs.readFileSync(txtPath,'utf8');
+          const parsed=s.parseText(text);
+          const catalog=s.buildCatalog(parsed.rows);
+          const validation=s.validatePhysicalCatalog(catalog);
+          if(!validation.ok)throw new Error('S476_PHYSICAL_CATALOG_INVALID:'+validation.errors.join(','));
+          fs.writeFileSync(catPath,JSON.stringify(catalog,null,2));
+          const receipt={
+            schemaVersion:'ays-cotcomp-s476-sat2026-normalization-receipt-v1.0',
+            sourceId:s.SOURCE_ID,
+            sourceRawSha256:s.SOURCE_RAW_SHA256,
+            catalogVersion:s.CATALOG_VERSION,
+            catalogDigestSha256:catalog.catalogDigestSha256,
+            parsedSourceRows:catalog.metrics.parsedSourceRows,
+            uniqueTypeBrandLineEntries:catalog.metrics.uniqueTypeBrandLineEntries,
+            duplicateSourceRowsMerged:catalog.metrics.duplicateSourceRowsMerged,
+            uniqueVehicleTypes:catalog.metrics.uniqueVehicleTypes,
+            uniqueBrands:catalog.metrics.uniqueBrands,
+            uniqueBrandLinePairs:catalog.metrics.uniqueBrandLinePairs,
+            crossTypeBrandLinePairs:catalog.metrics.crossTypeBrandLinePairs,
+            sourceLineCount:parsed.sourceLineCount,
+            rejectedCandidateLines:parsed.rejectedCandidateLines.length,
+            regressionProbes:validation.probes,
+            hardModelYearValidation:false,
+            taxValuesProjectedToPublicCatalog:false,
+            catalogMaterialized:true,
+            publicDropdownReleased:false,
+            quoteEligibilityOverlayBuilt:false,
+            appDataReads:0,
+            appDataWrites:0,
+            providerOrRaterCalls:0,
+            productionTouched:false
+          };
+          fs.writeFileSync(recPath,JSON.stringify(receipt,null,2));
+          NODE
+
+      - name: Assert S4.76 physical normalization
+        shell: bash
+        run: |
+          set -euo pipefail
+          R="$RUNNER_TEMP/s476/S476_SAT2026_NORMALIZATION_RECEIPT.json"
+          jq -e '
+            .sourceRawSha256=="ea15f79900e013bc3c397c23a154802fc2f62f8de3bf056b53003e03b85ec373" and
+            .parsedSourceRows==3679 and
+            .uniqueTypeBrandLineEntries==3436 and
+            .duplicateSourceRowsMerged==243 and
+            .uniqueVehicleTypes==31 and
+            .uniqueBrands==223 and
+            .uniqueBrandLinePairs==3289 and
+            .crossTypeBrandLinePairs==101 and
+            .regressionProbes.toyotaCorollaExact>=1 and
+            .regressionProbes.toyotaYarisExact>=1 and
+            .regressionProbes.mazdaCx5Prefix>=1 and
+            .regressionProbes.hondaCrvCompactPrefix>=1 and
+            .catalogMaterialized==true and
+            .publicDropdownReleased==false and
+            .quoteEligibilityOverlayBuilt==false and
+            .appDataReads==0 and
+            .appDataWrites==0 and
+            .providerOrRaterCalls==0 and
+            .productionTouched==false
+          ' "$R" >/dev/null
+
+      - name: Upload normalized SAT catalog evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s476-sat2026-normalized-catalog-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s476/SAT_GT_2026_NORMALIZED_VEHICLE_CATALOG.json
+            ${{ runner.temp }}/s476/S476_SAT2026_NORMALIZATION_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
