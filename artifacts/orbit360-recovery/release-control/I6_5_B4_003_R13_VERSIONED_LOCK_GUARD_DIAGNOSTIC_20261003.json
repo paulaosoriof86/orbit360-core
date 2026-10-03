@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_VERSIONED_LOCK_GUARD_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-03",
+  "status": "VALIDATOR_STALE_ROOTFIX_AUTHORIZED",
+  "findingId": "B4-003",
+  "failedRunId": 37162057992,
+  "failedJobId": 111317382553,
+  "failureCode": "I6_5_B4_LOCK_DRIFT",
+  "classification": "VALIDATOR_STALE_GOVERNANCE_MECHANISM",
+  "rootCause": "The I6 control-plane guard hardcodes the historical B4 execution-lock path while CONTROL_PLANE now correctly points to the versioned R13 successor lock. The guard therefore compares the successor control binding against the historical file hash and fails before product contract execution.",
+  "allowedQaFiles": [
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "requiredFix": "Resolve the active B4 lock path from CONTROL_PLANE.i65ForensicRemediationPlan.b4.executionLockPath, require it to exist, and compare its exact blob against the control binding. Preserve the historical lock as required evidence.",
+  "boundaries": {
+    "productMutation": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "businessWrites": 0
+  },
+  "nextAction": "B4_003_R13_VERSIONED_LOCK_GUARD_ROOTFIX"
+}
