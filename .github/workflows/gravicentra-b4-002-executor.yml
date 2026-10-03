@@ -1,0 +1,341 @@
+name: Gravicentra B4-002 Notification Processor Preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - '.github/workflows/gravicentra-b4-002-executor.yml'
+      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gravicentra-b4-002-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  b4-002-notification-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      HOSTING_SITE: ays-orbit-360-lab
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      B4_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json
+      FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+      COMPOSITION: artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve exact B4-002 candidate head
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          git reset --hard "origin/$GITHUB_REF_NAME"
+          CANDIDATE_SOURCE_SHA=$(git rev-parse HEAD)
+          REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
+          test "$CANDIDATE_SOURCE_SHA" = "$REMOTE"
+          echo "CANDIDATE_SOURCE_SHA=$CANDIDATE_SOURCE_SHA" >> "$GITHUB_ENV"
+
+      - name: Gate exact B4-002 Preview
+        id: gate
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const l=JSON.parse(fs.readFileSync(process.env.B4_LOCK,'utf8'));
+          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_002_CONTRACT_AND_EXACT_PREVIEW'
+            && c.currentB4?.status==='B4_002_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW'
+            && c.i65ForensicRemediationPlan?.b4?.status==='B4_002_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW'
+            && l.status==='B4_002_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW'
+            && l.activeFinding?.id==='B4-002'
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===true
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('B4_002_PREVIEW_MODE='+(ok?'RUN':'NOOP'));
+          NODE
+
+      - name: Assert LIVE unchanged
+        if: steps.gate.outputs.run == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+
+      - name: Validate B4-002 contract and backend syntax
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-5-b4-002-contract.mjs
+          node --check tools/gravicentra-i6-5-b4-002-preview-proof.mjs
+          cd functions
+          npm ci --ignore-scripts --no-audit --no-fund >/dev/null
+          npm run check
+          cd ..
+          node tools/gravicentra-i6-5-b4-002-contract.mjs | tee "$RUNNER_TEMP/b4-002-contract.json"
+
+      - name: Prepare Firebase and browser dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b4-002-auth"
+          mkdir -p "$ROOT"
+          export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json'
+                  p.write_text(json.dumps(d))
+                  p.chmod(0o600)
+                  rows.append(str(p))
+          if not rows:raise SystemExit('B4_002_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          CROOT="$RUNNER_TEMP/b4-002-firebase-cli"
+          npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CROOT"
+          CLI="$CROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          SEL=''
+          while read -r F; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              SEL="$F"
+              break
+            fi
+          done < "$ROOT/files"
+          test -n "$SEL"
+          cp "$SEL" "$RUNNER_TEMP/b4-002-sa.json"
+          chmod 600 "$RUNNER_TEMP/b4-002-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4-002-sa.json" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Resolve public web config
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps-b4-002.json"
+          export APPS="$RUNNER_TEMP/apps-b4-002.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['APPS']))
+          a=d.get('result') if isinstance(d,dict) else None
+          web=[x for x in (a or []) if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1:raise SystemExit('B4_002_WEB_APP_CARDINALITY:'+str(len(web)))
+          print(web[0].get('appId',''))
+          PY
+          )
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/public-config-b4-002.json"
+          echo "PUBLIC_CONFIG_FILE=$RUNNER_TEMP/public-config-b4-002.json" >> "$GITHUB_ENV"
+
+      - name: Materialize immutable B4-002 package
+        if: steps.gate.outputs.run == 'true'
+        id: build
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/b4-002-branding-snapshot.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/b4-002-branding-snapshot.json"
+          export SOURCE_SHA="$CANDIDATE_SOURCE_SHA"
+          export RELEASE_GATE="I6.5-B4-002"
+          export BUILD_PREFIX="gi-i65-b4"
+          export ENVIRONMENT_REF="firebase-hosting-preview-i6-5-forensic-b4-002"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b4-002-package" "$PUBLIC_CONFIG_FILE" > "$RUNNER_TEMP/b4-002-package-output.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b4-002-package-output.json'));
+          for(const [k,v] of Object.entries({build_id:d.buildId,hosted_payload_digest:d.hostedPayloadDigest,backend_source_digest:d.backendSourceDigest,bundle_digest:d.bundleDigest}))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
+          NODE
+
+      - name: Deploy exact B4-002 Preview notification backend
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          FROOT="$RUNNER_TEMP/b4-002-functions"
+          rm -rf "$FROOT"
+          mkdir -p "$FROOT"
+          cp -a "$RUNNER_TEMP/b4-002-package/bundle/backend" "$FROOT/backend"
+          (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360NotificationOutboxPreviewCreated,functions:orbit360RetryNotificationOutboxPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          printf '{"status":"DEPLOYED_EXACT_PREVIEW_ONLY","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360NotificationOutboxPreviewCreated","orbit360RetryNotificationOutboxPreview"],"productionFunctionsDeployed":false,"operationalBusinessWritesAuthorized":false,"externalProviderSimulation":false}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-002-package/evidence/b4-002-preview-backend-binding.json"
+
+      - name: Deploy exact package to isolated Preview
+        if: steps.gate.outputs.run == 'true'
+        id: preview
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/b4-002-package/bundle"
+          CHANNEL_ID="gi-i65-b4-$GITHUB_RUN_ID"
+          deploy_channel() {
+            set +e
+            node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b4-002-preview.json" 2>&1
+            RC=$?
+            set -e
+            cat "$RUNNER_TEMP/b4-002-preview.json"
+            return "$RC"
+          }
+          if ! deploy_channel; then
+            if grep -Fq "channel quota reached" "$RUNNER_TEMP/b4-002-preview.json"; then
+              node "$GITHUB_WORKSPACE/tools/gravicentra-preview-channel-gc.mjs" "$FIREBASE_CLI_BIN" "$PROJECT_ID" "$CHANNEL_ID" "$GITHUB_WORKSPACE" "gi-"
+              deploy_channel
+            else
+              exit 1
+            fi
+          fi
+          export DEPLOY="$RUNNER_TEMP/b4-002-preview.json"
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['DEPLOY']).read()
+          prod='https://'+os.environ['HOSTING_SITE']+'.web.app'
+          urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
+          if not urls:raise SystemExit('B4_002_PREVIEW_URL_NOT_FOUND')
+          print(urls[-1])
+          PY
+          )
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Exact Hosting Preview readback
+        if: steps.gate.outputs.run == 'true'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+          EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
+        run: |
+          set -euo pipefail
+          export MANIFEST="$RUNNER_TEMP/b4-002-package/evidence/site-manifest.sha256"
+          python3 - <<'PY'
+          import hashlib,json,os,time,urllib.parse,urllib.request
+          rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
+          base=os.environ['TARGET_URL'].rstrip('/')
+          for attempt in range(1,9):
+              bad=[]
+              for want,rel in rows:
+                  try:
+                      req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?b4002='+str(attempt)+'-'+str(int(time.time())),headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store'})
+                      with urllib.request.urlopen(req,timeout=30) as z:got=hashlib.sha256(z.read()).hexdigest()
+                  except Exception as e:got=type(e).__name__
+                  if got!=want:bad.append(rel)
+              with urllib.request.urlopen(base+'/__recovery__/build.json?b4002='+str(time.time()),timeout=30) as z:marker=json.loads(z.read())
+              if not bad and marker.get('sourceSha')==os.environ['CANDIDATE_SOURCE_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID']:break
+              if attempt==8:raise SystemExit('B4_002_READBACK:'+str(bad[:5])+':'+str(marker))
+              time.sleep(3)
+          print('B4_002_HOSTING_READBACK=PASS')
+          PY
+
+      - name: Post-commit notification retry and idempotence proof
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B4_002_PROOF_OUT: ${{ runner.temp }}/b4-002-preview-proof.json
+          B4_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-002-preview-proof.mjs
+          node -e "const x=require(process.env.B4_002_PROOF_OUT);const a=x.assertions||{};if(x.status!=='PASS'||a.postCommitSuccess!==true||a.preCommitDeliveryBlocked!==true||a.retryFailureVisibility!==true||a.explicitRetryPass!==true||a.idempotentRetry!==true||a.externalProviderNotSimulated!==true||a.previewIsolation!==true||a.cleanupComplete!==true||x.syntheticFinalAbsent!==true)process.exit(1);console.log('B4_002_PREVIEW_PROOF=PASS')"
+
+      - name: Upload immutable package and proof
+        if: steps.gate.outputs.run == 'true'
+        id: artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b4-002-preview-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b4-002-package
+            ${{ runner.temp }}/b4-002-preview-proof.json
+            ${{ runner.temp }}/b4-002-contract.json
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Freeze B4-002 machine pass and advance to B4-003
+        if: steps.gate.outputs.run == 'true'
+        env:
+          B4_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          B4_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+          B4_CHANNEL_ID: ${{ steps.preview.outputs.channel_id }}
+          B4_ARTIFACT_ID: ${{ steps.artifact.outputs.artifact-id }}
+          B4_ARTIFACT_DIGEST: ${{ steps.artifact.outputs.artifact-digest }}
+          B4_HOSTED_PAYLOAD_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+          B4_BACKEND_SOURCE_DIGEST: ${{ steps.build.outputs.backend_source_digest }}
+          B4_BUNDLE_DIGEST: ${{ steps.build.outputs.bundle_digest }}
+          B4_PROOF: ${{ runner.temp }}/b4-002-preview-proof.json
+        run: |
+          set -euo pipefail
+          RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B4_002_MACHINE_PASS_20261003.json"
+          export RECEIPT
+          REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
+          test "$REMOTE" = "$CANDIDATE_SOURCE_SHA"
+          node - <<'NODE'
+          const fs=require('node:fs'),p=JSON.parse(fs.readFileSync(process.env.B4_PROOF,'utf8'));
+          if(p.status!=='PASS'||p.syntheticFinalAbsent!==true)throw Error('B4_002_PROOF_NOT_PASS');
+          const rr={schema:'GRAVICENTRA_I6_5_B4_002_MACHINE_PASS_V1',recordedAt:new Date().toISOString(),status:'PASS',findingId:'B4-002',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,channelId:process.env.B4_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactHostingReadback:true,assertions:p.assertions,syntheticQaWrites:p.syntheticWrites||0,cleanupWrites:p.cleanupWrites||0,syntheticFinalAbsent:p.syntheticFinalAbsent===true,pageErrors:p.pageErrors||[],consoleErrors:p.consoleErrors||[],operationalBusinessWrites:0,externalProviderSimulation:false,reimport:false,livePromoted:false,nextAction:'B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC'};
+          fs.writeFileSync(process.env.RECEIPT,JSON.stringify(rr,null,2)+'\n');
+          NODE
+          RECEIPT_BLOB=$(git hash-object "$RECEIPT"); export RECEIPT_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.COMPOSITION,o=JSON.parse(fs.readFileSync(p,'utf8'));
+          o.activeFindingId='B4-003';o.activeBlock='B4';o.currentBlock='B4';
+          o.b4002MachinePass={status:'PASS',path:process.env.RECEIPT,blobSha:process.env.RECEIPT_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',productSourceChanged:true,operationalBusinessWrites:0,syntheticFinalAbsent:true,externalProviderSimulation:false};
+          o.b4Execution={...(o.b4Execution||{}),status:'B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC',activeFindingId:'B4-003',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',noLive:true,noReimport:true,nextAction:'B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC'};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          COMPOSITION_BLOB=$(git hash-object "$COMPOSITION"); export COMPOSITION_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.FINDINGS,o=JSON.parse(fs.readFileSync(p,'utf8'));
+          const f=(o.findings||[]).find(x=>x.id==='B4-002'),n=(o.findings||[]).find(x=>x.id==='B4-003');if(!f||!n)throw Error('B4_FINDING_MISSING');
+          Object.assign(f,{status:'CLOSED_PASS_MACHINE',blocking:false,nextAction:'NONE_CLOSED',machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB,currentCandidateEligibleForPromotion:false});
+          Object.assign(n,{status:'ACTIVE_READONLY_DIAGNOSTIC',blocking:true,nextAction:'B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC'});
+          o.currentB4={...(o.currentB4||{}),status:'B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC',activeFindingId:'B4-003',compositionLockBlobSha:process.env.COMPOSITION_BLOB,noLive:true,noReimport:true,nextAction:'B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC'};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.B4_LOCK,o=JSON.parse(fs.readFileSync(p,'utf8'));
+          o.status='B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC';
+          o.activeFinding={id:'B4-003',title:'Targeted regression closure for Renovaciones and Cancelaciones.',status:'ACTIVE_READONLY_DIAGNOSTIC',blocking:true,nextAction:'B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC'};
+          o.nextAction='B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC';
+          o.nextRequiredProof=['B4_003_RENEWALS_CANCELATIONS_READONLY_DIAGNOSTIC'];
+          o.candidate={sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactReadback:true};
+          o.compositionLock={...(o.compositionLock||{}),blobSha:process.env.COMPOSITION_BLOB};o.findingLedger={...(o.findingLedger||{}),blobSha:process.env.FINDINGS_BLOB};
+          o.boundaries={...(o.boundaries||{}),businessWritesAuthorized:false,syntheticQaWritesAuthorized:false,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          LOCK_BLOB=$(git hash-object "$B4_LOCK"); export LOCK_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,o=JSON.parse(fs.readFileSync(p,'utf8')),b=o.i65ForensicRemediationPlan.b4;
+          Object.assign(b,{status:'B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC',activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactReadback:true,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false,syntheticQaWritesAuthorized:false,nextAction:'B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC'});
+          o.currentB4={...(o.currentB4||{}),status:'B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC',activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,noLive:true,noReimport:true,nextAction:'B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC'};
+          o.nextAction='I6_5_FORENSIC_REMEDIATION_B4_003_DIAGNOSTIC';
+          o.canonicalAccumulationControl={...(o.canonicalAccumulationControl||{}),activeBlock:'B4',activeFindingId:'B4-003',compositionLockBlobSha:process.env.COMPOSITION_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,nextAction:'B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC'};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          git add "$RECEIPT" "$COMPOSITION" "$FINDINGS" "$B4_LOCK" "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "pass(i6.5 B4-002): post-commit notification processor Preview"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+
+      - name: Fail closed
+        if: failure() && steps.gate.outputs.run == 'true'
+        run: echo "B4_002_FAILED_SYNTHETIC_CLEANUP_REQUIRED_NO_REIMPORT_NO_LIVE"
