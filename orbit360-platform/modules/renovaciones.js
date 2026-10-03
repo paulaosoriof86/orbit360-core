@@ -6,7 +6,10 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.renovaciones = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
-  const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar') && !p.renovadaPor && String(p.renovacionEstado || '').toLowerCase() !== 'renovada';
+  const countryCode = v => String(v == null ? '' : v).trim().toUpperCase();
+  const policyCountry = p => { const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null; return countryCode(p&&p.pais || cli&&cli.pais); };
+  const selectedCountry = p => { const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; };
+  const esRenovable = p => p && selectedCountry(p) && (p.estado === 'Vigente' || p.estado === 'Por renovar') && !p.renovadaPor && String(p.renovacionEstado || '').toLowerCase() !== 'renovada';
 
   function buckets() {
     const cols = [
@@ -50,7 +53,7 @@ Orbit.modules.renovaciones = (function () {
               const cli = S().get('clientes', p.clienteId), asg = q.aseguradora(p.aseguradoraId);
               const wa = (cli && cli.telefono || '').replace(/[^0-9]/g, '');
               const waTxt = encodeURIComponent('Hola ' + (cli ? cli.nombre.split(' ')[0] : '') + ', tu póliza ' + p.ramo + ' (' + p.numero + ') vence el ' + U.fmtDate(p.vigenciaFin) + '. ¿Coordinamos la renovación?');
-              return `<div style="border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;background:var(--card)">
+              return `<div data-renewal-policy="${U.esc(p.id)}" data-renewal-country="${U.esc(policyCountry(p))}" style="border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;background:var(--card)">
                 <div class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')" style="cursor:pointer">
                   <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
                     <b style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(cli ? cli.nombre : '—')}</b>
