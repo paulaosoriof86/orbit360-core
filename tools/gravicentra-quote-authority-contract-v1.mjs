@@ -9,7 +9,8 @@ const paths = {
   doc:'docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md'
 };
 const src=Object.fromEntries(Object.entries(paths).map(([k,p])=>[k,fs.readFileSync(p,'utf8')]));
-const sandbox={window:{Orbit:{}},console,Date,URLSearchParams,Set,Map,Array,Object,String,Number,Boolean,Math,JSON,RegExp};
+const orbitGlobal={};
+const sandbox={window:{Orbit:orbitGlobal},Orbit:orbitGlobal,console,Date,URLSearchParams,Set,Map,Array,Object,String,Number,Boolean,Math,JSON,RegExp};
 vm.createContext(sandbox);
 vm.runInContext(src.contract,sandbox,{filename:paths.contract});
 const C=sandbox.window.Orbit.quoteAuthorityContractV1;
