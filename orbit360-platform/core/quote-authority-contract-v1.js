@@ -182,6 +182,24 @@ window.Orbit = window.Orbit || {};
     return { ok: !errors.length, errors: uniq(errors), amountBasis: basis, amounts };
   }
 
+  function validateManifest(manifest, options) {
+    manifest = manifest || {};
+    options = options || {};
+    const errors = [];
+    if (clean(manifest.authorityContractVersion) !== VERSION) errors.push('MANIFEST_CONTRACT_VERSION_MISMATCH');
+    ['configurationVersion','catalogVersion','rulesDigest','generatedAt','validityFrom','validityTo'].forEach(field => {
+      if (!clean(manifest[field])) errors.push('MANIFEST_REQUIRED_' + field);
+    });
+    if (!manifest.capabilities || typeof manifest.capabilities !== 'object') errors.push('MANIFEST_CAPABILITIES_REQUIRED');
+    const from = isoDate(manifest.validityFrom), to = isoDate(manifest.validityTo), at = isoDate(options.at || todayIso());
+    if (from && to && from > to) errors.push('MANIFEST_VALIDITY_RANGE_INVALID');
+    if (options.requireCurrent !== false && at) {
+      if (from && at < from) errors.push('MANIFEST_NOT_YET_EFFECTIVE');
+      if (to && at > to) errors.push('MANIFEST_EXPIRED');
+    }
+    return { ok: !uniq(errors).length, errors: uniq(errors) };
+  }
+
   function validateQuoteRequest(request) {
     request = request || {};
     const errors = [];
@@ -270,6 +288,24 @@ window.Orbit = window.Orbit || {};
     };
   }
 
+  function validateQuoteResult(result, options) {
+    result = result || {};
+    options = options || {};
+    const errors = [];
+    if (clean(result.authorityContractVersion) !== VERSION) errors.push('QUOTE_RESULT_CONTRACT_VERSION_MISMATCH');
+    ['tenantId','correlationId','idempotencyKey','requestDigest'].forEach(field => {
+      if (!clean(result[field])) errors.push('QUOTE_RESULT_REQUIRED_' + field);
+    });
+    const proposals = [].concat(result.proposals || []);
+    if (!proposals.length) errors.push('QUOTE_RESULT_PROPOSALS_REQUIRED');
+    proposals.forEach(proposal => {
+      const check = validateProposal(proposal, { at: options.at, requireComparable: options.requireComparable !== false, requireCurrent: true });
+      check.errors.forEach(code => errors.push(code + ':' + clean(proposal && proposal.proposalId)));
+    });
+    if (result.financialOverride != null || result.webCalculatedPremium != null) errors.push('QUOTE_RESULT_WEB_FINANCIAL_OVERRIDE_FORBIDDEN');
+    return { ok: !uniq(errors).length, errors: uniq(errors), proposals };
+  }
+
   function validateSelectionHandoff(input) {
     input = input || {};
     const errors = [];
@@ -297,8 +333,10 @@ window.Orbit = window.Orbit || {};
     FIELD_AUTHORITY,
     validateTrace,
     validatePremiumBreakdown,
+    validateManifest,
     validateQuoteRequest,
     validateProposal,
+    validateQuoteResult,
     normalizeFact,
     buildComparisonProjection,
     validateSelectionHandoff,
