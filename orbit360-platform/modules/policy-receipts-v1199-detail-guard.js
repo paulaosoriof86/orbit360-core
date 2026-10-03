@@ -136,6 +136,17 @@ Orbit.modules = Orbit.modules || {};
   }
   function idx() { return indexes || rebuildIndexes() || {}; }
   function invalidate() { indexes = null; summaries = new Map(); }
+  function collectionConfirmed(name) {
+    const store=S();
+    if (!store || typeof store._productStatus !== 'function') return true;
+    const status=store._productStatus() || {}, confirmed=status.serverConfirmedCollections || [];
+    return confirmed.indexOf(name) >= 0;
+  }
+  function ensureDetailCollections(names) {
+    const store=S();
+    if (!store || typeof store._ensureCollections !== 'function') return;
+    try { store._ensureCollections(names || []); } catch (e) {}
+  }
 
   function applyVisualAliasesInPlace() {
     if (!S() || typeof S().all !== 'function') return;
@@ -292,7 +303,7 @@ Orbit.modules = Orbit.modules || {};
     return [active, end, start];
   }
   function vehicleCandidates(clientId) {
-    const raw = clientId && idx().vehiclesByClient ? (idx().vehiclesByClient.get(clientId) || []) : [];
+    const raw = clientId ? (S().all('vehiculos') || []).filter(item => item && String(item.clienteId || '') === String(clientId)) : [];
     const groups = new Map();
     raw.filter(item => item && item.id).forEach(item => {
       const key = vehicleIdentity(item);
@@ -353,21 +364,30 @@ Orbit.modules = Orbit.modules || {};
 
   function renderPolicyPage(host, policyId, contextVehicleId) {
     applyVisualAliasesInPlace();
+    ensureDetailCollections(['polizas','clientes','vehiculos','recibosEsperados','aseguradoras','asesores']);
     const p0 = S().get('polizas', policyId);
     if (!p0) { host.innerHTML = '<div class="page"><div class="card pad">Póliza no disponible.</div></div>'; return; }
-    const p = policyVisual(p0), cli = S().get('clientes', p.clienteId) || {}, asg = S().get('aseguradoras', p.aseguradoraId) || {}, ase = S().get('asesores', p.asesorId) || {};
-    const linkedVehicles=((idx().vehiclesByPolicy && idx().vehiclesByPolicy.get(p.id)) || []);
-    const contextVehicle=contextVehicleId?S().get('vehiculos',contextVehicleId):null;
+    const clientReady=collectionConfirmed('clientes');
+    const rawClient=S().get('clientes', p0.clienteId);
+    if (!rawClient && !clientReady) {
+      host.innerHTML = '<div class="page" data-policy-detail-loading="client"><div class="card pad"><b>Cargando póliza…</b><div class="muted" style="margin-top:5px">Estamos confirmando el cliente y sus relaciones antes de mostrar el detalle.</div></div></div>';
+      return;
+    }
+    const vehiclesReady=collectionConfirmed('vehiculos'), receiptsReady=collectionConfirmed('recibosEsperados');
+    const p = policyVisual(p0), cli = rawClient || {}, asg = S().get('aseguradoras', p.aseguradoraId) || {}, ase = S().get('asesores', p.asesorId) || {};
+    const linkedVehicles=vehiclesReady ? (S().all('vehiculos') || []).filter(v => v && safe(v.polizaId) === safe(p.id)) : [];
+    const contextVehicle=vehiclesReady&&contextVehicleId?S().get('vehiculos',contextVehicleId):null;
     const vehicle=contextVehicle&&safe(contextVehicle.polizaId)===safe(p.id)?contextVehicle:linkedVehicles[0];
     const siblings=(S().all('polizas')||[]).filter(x=>x&&safe(x.id)!==safe(p.id)&&safe(x.clienteId)===safe(p.clienteId)&&safe(x.numero).toLowerCase()===safe(p.numero).toLowerCase());
-    const versionLinks=siblings.map(x=>{const rc=receiptSchedule(x.id).rows.length;return '<a class="btn ghost sm" href="#/cliente360?c='+encodeURIComponent(p.clienteId)+'&p='+encodeURIComponent(x.id)+'">'+esc(fmtDate(x.vigenciaInicio))+' → '+esc(fmtDate(x.vigenciaFin))+' · '+rc+' requerimiento(s) vigente(s)</a>';}).join('');
-    const ownReceiptCount=receiptSchedule(p.id).rows.length;
-    const versionContext=(contextVehicleId||siblings.length)?'<div class="cfg-note gi-policy-version-context" data-policy-version-context="1">Vigencia seleccionada: <b>'+esc(fmtDate(p.vigenciaInicio))+' → '+esc(fmtDate(p.vigenciaFin))+'</b>'+(contextVehicleId?' · abierta desde el vehículo seleccionado':'')+' · '+ownReceiptCount+' requerimiento(s) vigente(s).'+(siblings.length?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><span class="muted">Otras vigencias con el mismo número:</span>'+versionLinks+'</div>':'')+'</div>':'';
+    const versionLinks=siblings.map(x=>{const rc=receiptsReady?receiptSchedule(x.id).rows.length:null;return '<a class="btn ghost sm" href="#/cliente360?c='+encodeURIComponent(p.clienteId)+'&p='+encodeURIComponent(x.id)+'">'+esc(fmtDate(x.vigenciaInicio))+' → '+esc(fmtDate(x.vigenciaFin))+' · '+(rc==null?'actualizando recibos':rc+' requerimiento(s) vigente(s)')+'</a>';}).join('');
+    const ownReceiptCount=receiptsReady?receiptSchedule(p.id).rows.length:null;
+    const receiptContext=ownReceiptCount==null?' · actualizando recibos.':' · '+ownReceiptCount+' requerimiento(s) vigente(s).';
+    const versionContext=(contextVehicleId||siblings.length)?'<div class="cfg-note gi-policy-version-context" data-policy-version-context="1">Vigencia seleccionada: <b>'+esc(fmtDate(p.vigenciaInicio))+' → '+esc(fmtDate(p.vigenciaFin))+'</b>'+(contextVehicleId?' · abierta desde el vehículo seleccionado':'')+receiptContext+(siblings.length?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><span class="muted">Otras vigencias con el mismo número:</span>'+versionLinks+'</div>':'')+'</div>':'';
     const cur = p.moneda || cli.moneda || '';
     const pb = premiumBreakdown(p);
     const ivaLabel = p.ivaPct != null ? `IVA / impuestos (${p.ivaPct}%)` : 'IVA / impuestos';
     const back = `#/cliente360?c=${encodeURIComponent(p.clienteId)}&t=polizas`;
-    const scheduleDelta = pb.total != null && pb.scheduleTotal != null ? pb.scheduleTotal - pb.total : null;
+    const scheduleDelta = receiptsReady && pb.total != null && pb.scheduleTotal != null ? pb.scheduleTotal - pb.total : null;
     const scheduleTolerance = reconciliationTolerance();
     const canManage = canEditVehicle();
     const renewAction = renewalEligible(p) ? `<button class="btn primary" onclick="Orbit.policyVehicleReadModelV1199c.startRenewal('${esc(p.id)}')">🔄 Renovar</button>` : '';
@@ -385,7 +405,7 @@ Orbit.modules = Orbit.modules || {};
         <div><span>💰 Prima total</span><b>${esc(moneyDetail(pb.total,cur))}</b></div>
         <div><span>🧾 Prima neta</span><b>${esc(moneyDetail(pb.net,cur))}</b></div>
         <div><span>📆 Vigencia</span><b>${esc(fmtDate(p.vigenciaFin))}</b></div>
-        <div><span>📚 Recibos</span><b>${pb.receipts.length}</b></div>
+        <div><span>📚 Recibos</span><b>${receiptsReady ? pb.receipts.length : '…'}</b></div>
       </div>
       <div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:16px;align-items:start">
         <div style="display:grid;gap:16px;min-width:0">
@@ -394,12 +414,12 @@ Orbit.modules = Orbit.modules || {};
             field('N.º de póliza', p.numero, {mono:true}), field('Estado', p.estado), field('País / moneda', `${p.pais || cli.pais || '—'} · ${cur || '—'}`),
             field('Ramo', p.ramo), field('Subramo / producto', p.subramo || p.producto), field('Tipo de póliza', p.tipoPoliza),
             field('Inicio de vigencia', fmtDate(p.vigenciaInicio)), field('Fin de vigencia', fmtDate(p.vigenciaFin)), field('Renovación', renewabilityHtml(p), {html:true}),
-            field('Suma asegurada', moneyDetail(p.sumaAsegurada, cur)), field('Concepto / riesgo', p.concepto), field('Calidad de información', qualityBlock(p, vehicle), {html:true})
+            field('Suma asegurada', moneyDetail(p.sumaAsegurada, cur)), field('Concepto / riesgo', p.concepto), field('Calidad de información', vehiclesReady ? qualityBlock(p, vehicle) : '<span class="muted">Actualizando relaciones</span>', {html:true})
           ], 3))}
           ${section('💰 Prima y condiciones de pago', `<div class="gi-payment-overview">
             <div class="gi-payment-total"><span>Prima total de póliza</span><b>${esc(moneyDetail(pb.total,cur))}</b><small>Valor contractual de la vigencia</small></div>
             <div class="gi-payment-focus"><span>Prima neta</span><b>${esc(moneyDetail(pb.net,cur))}</b><small>Antes de cargos e impuestos</small></div>
-            <div class="gi-payment-focus"><span>Calendario vigente</span><b>${esc(moneyDetail(pb.scheduleTotal,cur))}</b><small>${pb.receipts.length} recibo(s) proyectado(s)</small></div>
+            <div class="gi-payment-focus"><span>Calendario vigente</span><b>${receiptsReady ? esc(moneyDetail(pb.scheduleTotal,cur)) : 'Actualizando'}</b><small>${receiptsReady ? pb.receipts.length + ' recibo(s) proyectado(s)' : 'Confirmando calendario'}</small></div>
           </div>
           <div class="gi-payment-subtitle">Desglose de prima</div>
           <div class="orbit-premium-grid gi-premium-contract">${[
@@ -410,8 +430,8 @@ Orbit.modules = Orbit.modules || {};
           <div class="gi-payment-conditions">${grid([
             field('Frecuencia', first(p.frecuencia, p.forma)), field('Forma de pago', p.formaPago), field('Conducto', p.conducto)
           ],3)}</div>`)}
-          ${section('🚘 Riesgo asegurado / vehículo', vehicleCard(vehicle, cur, p.id, p.clienteId))}
-          ${section('🧾 Recibos y cartera', receiptRows(p.id, cur))}
+          ${section('🚘 Riesgo asegurado / vehículo', vehiclesReady ? vehicleCard(vehicle, cur, p.id, p.clienteId) : '<div class="muted" data-policy-vehicle-loading="1">Actualizando vehículo y relaciones…</div>')}
+          ${section('🧾 Recibos y cartera', receiptsReady ? receiptRows(p.id, cur) : '<div class="muted" data-policy-receipts-loading="1">Actualizando calendario y cartera…</div>')}
         </div>
         <div style="display:grid;gap:16px;min-width:0">
           ${section('📌 Resumen', `<div style="display:grid;gap:10px">${field('Prima total', moneyDetail(pb.total,cur))}${field('Vigencia', `${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`)}${field('Forma de pago', p.formaPago)}${field('Estado', p.estado)}</div>`)}
