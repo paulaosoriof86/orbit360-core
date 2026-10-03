@@ -1,0 +1,14 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R12_EXACT_PREVIEW_RETRIGGER_V1",
+  "recordedAt": "2026-10-03",
+  "status": "RETRIGGER_REQUESTED_AFTER_WORKFLOW_CANCELLED_BEFORE_JOB",
+  "findingId": "B4-003",
+  "cancelledRunId": 37151004146,
+  "cancelledHead": "088aad23ba93e99611b9ed70d8fad24f2a838cdb",
+  "observation": "The push-triggered B4-003 run was cancelled before any jobs were created while Control Plane Guard was still running. Control Plane Guard later completed PASS.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
