@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-03",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "8c44c64b42e13096fe68bc4fb7f7d19d512bec68",
-  "expectedLedgerNextBlobSha": "85ca96022a377ffa3d049334a1b9c37e30b12dff",
+  "sourceLedgerPreviousBlobSha": "c2d3d700916e01bfcc5cf9376d478fec9c611f57",
+  "expectedLedgerNextBlobSha": "36cd00a66ae1038f28fcfeed99eb0d4906f69e85",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -563,12 +563,13 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "SOURCE_FIXED_R12_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
       "closureCondition": "R12 source fix + exact Preview + targeted Paula visual PASS; all blocking B4-003 children explicitly disposed.",
-      "source": "LEDGER"
+      "source": "LEDGER",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-004",
@@ -1975,112 +1976,123 @@
     {
       "id": "B4-003-R11-01-CANCELATION-ROW-DETAIL",
       "block": "B4",
-      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "orbit360-platform/modules/cancelaciones.js",
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview visible-row click + Paula visual pass",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-02-CANCELATION-CLIENT-POLICY-CONTEXT",
       "block": "B4",
-      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "cancelaciones.js + cliente360.js",
       "targetGate": "B4-003",
       "closureCondition": "Client link opens Cliente360 Pólizas + Paula visual pass",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-03-CLIENT360-LEFT-TAB-NAV",
       "block": "B4",
-      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "cliente360.js + infra.css",
       "targetGate": "B4-003",
       "closureCondition": "Bidirectional tab navigation machine + Paula visual pass",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-04-RENEWABILITY-FAIL-CLOSED",
       "block": "B4",
-      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "renewals owners + policy editor",
       "targetGate": "B4-003",
       "closureCondition": "Only explicit renewable YES enters renewal pipeline",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-05-POLICY-EDITOR-TAXONOMY-PRESERVATION",
       "block": "B4",
-      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "policy-receipts-v1199-bridge.js",
       "targetGate": "B4-003",
       "closureCondition": "Editor preserves source ramo/product and no silent reclassification",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-06-QUALITY-COUNTRY-SCOPE",
       "block": "B4",
-      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "calidad.js",
       "targetGate": "B4-003",
       "closureCondition": "GT/CO/Todos KPIs and rows respect selected country",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-07-QUALITY-PERFORMANCE",
       "block": "B4",
-      "status": "SOURCE_FIXED_R12Q_PENDING_EXACT_RUNTIME_PERFORMANCE_PROOF",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "calidad.js + product store",
       "targetGate": "B4-003",
       "closureCondition": "No 10–12s blocking; authenticated route/country switch performance proof",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-08-CANCELATION-RATIO-SEMANTICS",
       "block": "B4",
-      "status": "SOURCE_FIXED_R11_PENDING_VISUAL_RETEST",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "cancelaciones.js",
       "targetGate": "B4-003",
       "closureCondition": "Historical ratio labeled honestly or temporal churn formally defined",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
       "block": "B4",
-      "status": "SOURCE_FIXED_R12_INFORMATION_HEALTH_PENDING_EXACT_PREVIEW",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "policy receipts + calidad",
       "targetGate": "B4-003",
       "closureCondition": "Source-backed reconciliation/quarantine; no inferred rewrite",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
       "block": "B4",
-      "status": "SOURCE_FIXED_R12_INSURER_BINDING_PENDING_EXACT_PREVIEW",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "aseguradoras + importa + knowledge runtime",
       "targetGate": "B4-003",
       "closureCondition": "Durable source/provenance and normalized ingestion path for tariff/examples/required docs",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
       "block": "B4",
-      "status": "SOURCE_FIXED_R12_CANONICAL_COUNTERS_PENDING_EXACT_PREVIEW",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "aseguradoras + knowledge panel",
       "targetGate": "B4-003",
       "closureCondition": "Header KPIs and visible source list reconcile or semantics are explicit",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     },
     {
       "id": "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE",
@@ -2125,12 +2137,13 @@
     {
       "id": "B4-003-R11A-QA-01-VISIBLE-ROW-DISCRIMINANT",
       "block": "B4",
-      "status": "QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW_RETRY",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
       "targetGate": "B4-003",
       "closureCondition": "Visible-row user-path proof passes; static fallback contract stays enforced",
-      "source": "PAULA_R11_OR_QA_R11A"
+      "source": "PAULA_R11_OR_QA_R11A",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
     }
   ],
   "attentionIds": [
@@ -2251,5 +2264,7 @@
   "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
   "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
   "r12SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_SOURCE_FIX_20261003.json",
-  "r12SourceFixBlobSha": "663b9846af14ce18097f08f2fc85296ac00f181f"
+  "r12SourceFixBlobSha": "663b9846af14ce18097f08f2fc85296ac00f181f",
+  "machinePassVisualStateReconciliationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_VISUAL_STATE_RECONCILIATION_20261003.json",
+  "machinePassVisualStateReconciliationBlobSha": "cda0b3cfcd3c89e8312ba13636075ee1f84e2e48"
 }

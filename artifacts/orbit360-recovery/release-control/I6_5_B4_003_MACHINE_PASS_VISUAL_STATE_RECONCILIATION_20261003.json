@@ -1,0 +1,30 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_MACHINE_PASS_VISUAL_STATE_RECONCILIATION_V1",
+  "recordedAt": "2026-10-03",
+  "status": "MACHINE_PASS_VISUAL_STATE_RECONCILED",
+  "findingId": "B4-003",
+  "authority": {
+    "machinePassReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_20261003.json",
+    "machinePassReceiptBlobSha": "ddced2eb79c916c80fd9acd80eeca6b5c9196f09",
+    "sourceSha": "e7071dcd492d2a55d7feb5b5c1938861bc00114b",
+    "buildId": "gi-i65-b4-e7071dcd492d-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37153635447-6wnebg4z.web.app",
+    "runId": 37153635447
+  },
+  "reason": "Machine pass commit updated the canonical finding and active B4 state, but auxiliary visual-control/current-state mirrors still retained pre-retest R11 labels. This governance-only reconciliation prevents stale state from surviving a resumed conversation.",
+  "reconciledState": {
+    "b4003Status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "nextFindingHeld": "B4-004"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "artifactChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "operationalBusinessWrites": 0
+  },
+  "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+}

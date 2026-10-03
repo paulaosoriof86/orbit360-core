@@ -2153,7 +2153,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "1a11f662147d58cbde488228f83cc5e14e0243a1",
+  "findingLedgerBlobSha": "36cd00a66ae1038f28fcfeed99eb0d4906f69e85",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2571,5 +2571,17 @@
     "continuityRegisterBlobSha": "ebb99e9822f6860cc4205351c84b14be8f2bf762",
     "diagnosticRunId": 37153182332,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "findingContinuityRegisterBlobSha": "2d5df9ce0114c81c8e9e76f55c7c8a93688595c9",
+  "b4003MachinePassVisualStateReconciliation": {
+    "status": "MACHINE_PASS_VISUAL_STATE_RECONCILED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_VISUAL_STATE_RECONCILIATION_20261003.json",
+    "receiptBlobSha": "cda0b3cfcd3c89e8312ba13636075ee1f84e2e48",
+    "sourceSha": "e7071dcd492d2a55d7feb5b5c1938861bc00114b",
+    "buildId": "gi-i65-b4-e7071dcd492d-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37153635447-6wnebg4z.web.app",
+    "runId": 37153635447,
+    "productSourceChanged": false,
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
   }
 }
