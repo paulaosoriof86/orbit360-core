@@ -2068,7 +2068,7 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R7_CUMULATIVE_REMEDIATION_ACTIVE",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "lockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -2076,7 +2076,7 @@
     "noLive": true,
     "noReimport": true,
     "activeFindingId": "B4-003",
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "nextAction": "B4_003_R7_SOURCE_EXHAUSTION_THEN_CAUSAL_FIX",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
     "sourceSha": "9ad8efe1b68589e57a5f6c8eb449690a75b31e14",
     "buildId": "gi-i65-b4-9ad8efe1b685-57f234755dc1",
@@ -2344,6 +2344,18 @@
       "orbit360-platform/modules/cronograma.js": "c2c5e2cccae88e5c3492aef0e7f109a0a896e5fa",
       "orbit360-platform/index.html": "83562417b6be231ab7b8b1f5aa17ea0ae24133b2"
     },
+    "noLive": true,
+    "noReimport": true
+  },
+  "b4003R7CumulativeFreeze": {
+    "status": "FROZEN_ACTIVE_B4_003_R7_REMEDIATION",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
+    "blobSha": "37f015ea5262df68ac0838b57b1de61c1b0b25a7",
+    "premiumCalculationContractFrozen": true,
+    "manualActionProtocolFrozen": true,
+    "paulaManualActionStatus": "DO_NOT_START_YET",
+    "sourceExhaustionRequiredBeforePaula": true,
+    "b4004Held": true,
     "noLive": true,
     "noReimport": true
   }
