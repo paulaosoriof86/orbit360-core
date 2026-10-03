@@ -27,15 +27,15 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "c61fa2e54244544bd8d1045a91dd7ce219c69660"
+    "blobSha": "19bf2c5b66257492326937aabd8c4d17fd806415"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "5674d85a40721705f253656ca9a0cd68149c43d2"
+    "blobSha": "f8e89c8a58d0b11e95a5f6583b640b4450a78c53"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "cfe37d9e32cf4bda577f1454a93470b71c5a3136",
+    "blobSha": "f87e8ce46443170b9e0f902ff8648a8b50e0d377",
     "inventoryCount": 191,
     "attentionCount": 86,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -64,5 +64,15 @@
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
   "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
-  "block": "B4"
+  "block": "B4",
+  "r13PolicyRouteRuntimeRootFix": {
+    "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_ROOTFIX_20261003.json",
+    "blobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
+    "failedRunId": 37162367038,
+    "productSourceChanged": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  }
 }
