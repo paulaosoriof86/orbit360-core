@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-02",
-  "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_READY",
+  "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_RUNTIME_REACHABLE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,7 +38,7 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation including Gravicentra↔CotComp Quote Authority.",
-    "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_READY",
+    "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_RUNTIME_REACHABLE",
     "blocking": true,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "PENDING_R10_EXACT_PREVIEW",
@@ -75,7 +75,8 @@
       "orbit360-platform/core/quote-comparison-contracts-v1203.js",
       "orbit360-platform/modules/cotizador-v1203-source-gate.js",
       "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
-      "tools/gravicentra-quote-authority-contract-v1.mjs"
+      "tools/gravicentra-quote-authority-contract-v1.mjs",
+      "orbit360-platform/index.html"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -88,11 +89,11 @@
   "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "d9b1a5d73a2cdfd602c59322d4a39e7c29882bcc"
+    "blobSha": "7b6fe473b97f5e7891454178ca948df680f8eeb6"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "e08155df585bf2d0d992e221042fc1146588033b"
+    "blobSha": "0cba4b252fe31c9001d13ad00d8865530da8a741"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -320,7 +321,7 @@
   },
   "r10QuoteAuthority": {
     "authorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_INTEGRATION_LOCK_20261003.json",
-    "authorizationLockBlobSha": "868a78408791bea719f7d07f5d48a0874df1a8da",
+    "authorizationLockBlobSha": "1133970e390895a008d761f3936ff9901aea0342",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_SOURCE_FIX_20261003.json",
     "sourceFixReceiptBlobSha": "6400bb9447fa145b6fb8d7c42a1c7dfe4477a4d1",
     "contractPath": "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
@@ -336,7 +337,7 @@
       ".github/workflows/gravicentra-b4-003-executor.yml"
     ],
     "cotcompRealTransportAuthorized": false,
-    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW"
+    "status": "SOURCE_FIXED_RUNTIME_REACHABLE_PENDING_EXACT_PREVIEW"
   },
   "r10CompositionRootFix": {
     "status": "PASS_EXACT_SET_REBOUND_PENDING_PREVIEW",
@@ -344,5 +345,12 @@
     "blobSha": "4cc32b403ad0506f53e473fc620151f0dc8a02c5",
     "exactProductFileCount": 94,
     "productSourceChanged": false
+  },
+  "r10RuntimeReachabilityRootFix": {
+    "status": "SOURCE_FIXED_R10_RUNTIME_REACHABILITY_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_20261003.json",
+    "blobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
+    "indexBlobSha": "9152234459797addeb6d53127e12bc759197b9c2",
+    "failedRunId": 37136324665
   }
 }
