@@ -34,8 +34,8 @@ const workflow=read(paths.workflow),opBackend=read(paths.operationalBackend),sto
 const comp=json(paths.composition),lock=json(paths.lock),control=json(paths.control),r1=json(paths.r1),r2=json(paths.r2),r3=json(paths.r3),r4=json(paths.r4),r5=json(paths.r5),adj=json(paths.adjudication);
 
 need(control.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW','B4_003_CONTROL_NEXT_ACTION_INVALID');
-need(/^B4_003_SOURCE_FIXED_R5_/.test(String(control.currentB4?.status||'')),'B4_003_CONTROL_STATUS_INVALID');
-need(/^B4_003_SOURCE_FIXED_R5_/.test(String(lock.status||''))&&lock.activeFinding?.id==='B4-003','B4_003_LOCK_STATUS_INVALID');
+need(/^B4_003_SOURCE_FIXED_R(?:5|9|10)_/.test(String(control.currentB4?.status||'')),'B4_003_CONTROL_STATUS_INVALID');
+need(/^B4_003_SOURCE_FIXED_R(?:5|9|10)_/.test(String(lock.status||''))&&lock.activeFinding?.id==='B4-003','B4_003_LOCK_STATUS_INVALID');
 need(r1.status==='SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R1_RECEIPT_INVALID');
 need(r2.status==='SOURCE_FIXED_R2_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R2_RECEIPT_INVALID');
 need(r3.status==='SOURCE_FIXED_R3_PREVIEW_ISOLATION_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R3_RECEIPT_INVALID');
