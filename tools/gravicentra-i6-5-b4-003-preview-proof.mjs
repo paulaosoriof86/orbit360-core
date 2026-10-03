@@ -377,3 +377,4 @@ try{
 }
 if(proof.status!=='PASS'||proof.syntheticFinalAbsent!==true)process.exitCode=1;
 console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors},null,2));
+// R10 contract-harness status rootfix trigger: 2026-10-03
