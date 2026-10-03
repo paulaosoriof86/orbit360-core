@@ -107,7 +107,7 @@ function html(){
   const safeManifest=JSON.stringify(manifest).replace(/</g,'\\u003c');
   const safeRoutes=JSON.stringify(ROUTES).replace(/</g,'\\u003c');
 
-  return \`<!doctype html>
+  return `<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -155,7 +155,7 @@ input:focus,select:focus{outline:2px solid rgba(189,17,28,.18);border-color:var(
 </section></main>
 <script>
 (()=>{
- const MANIFEST=\${safeManifest},ROUTES=\${safeRoutes},API='\${CATALOG_PATH}';
+ const MANIFEST=${safeManifest},ROUTES=${safeRoutes},API='${CATALOG_PATH}';
  const grid=document.getElementById('routeGrid'),fields=document.getElementById('fields'),continueBtn=document.getElementById('continueBtn'),stateEl=document.getElementById('state'),assist=document.getElementById('assist');
  let currentRoute=null,currentSchema=null,answers={},assisted=false,brands=[],models=[],selectedBrand=null,selectedModel=null,brandActive=-1,modelActive=-1;
  const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -174,7 +174,7 @@ input:focus,select:focus{outline:2px solid rgba(189,17,28,.18);border-color:var(
  function genericField(f){const id='f_'+f.key,full=(f.type==='TEXT'||f.type==='MONEY')?' full':'';if(f.type==='SELECT'){const opts=((f.ui&&f.ui.options)||[]).map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');return'<div class="field'+full+'" data-wrap="'+esc(f.key)+'"><label for="'+id+'">'+esc(f.label)+'</label><select id="'+id+'" data-key="'+esc(f.key)+'"><option value="">Selecciona una opción</option>'+opts+'</select></div>'}if(f.type==='BOOLEAN')return'<div class="field'+full+'" data-wrap="'+esc(f.key)+'"><label>'+esc(f.label)+'</label><div class="bool"><button type="button" data-bool-key="'+esc(f.key)+'" data-bool-value="true">Sí</button><button type="button" data-bool-key="'+esc(f.key)+'" data-bool-value="false">No</button></div></div>';if(f.type==='MONEY')return'<div class="field full" data-wrap="'+esc(f.key)+'"><label for="'+id+'">'+esc(f.label)+'</label><div class="money"><span>$</span><input id="'+id+'" data-key="'+esc(f.key)+'" inputmode="decimal" type="number" min="0" step="any" placeholder="Valor aproximado"></div><div class="hint">Este dato orienta la solicitud; no calcula una prima en esta vista previa.</div></div>';return'<div class="field'+full+'" data-wrap="'+esc(f.key)+'"><label for="'+id+'">'+esc(f.label)+'</label><input id="'+id+'" data-key="'+esc(f.key)+'" type="'+(f.type==='INTEGER'?'number':'text')+'"></div>'}
  function vehicleField(f){const ctl=up(f.ui&&f.ui.control);if(ctl==='VEHICLE_BRAND_COMBOBOX')return'<div class="field full"><label id="brandLabel" for="brandInput">'+esc(f.label)+'</label><div class="combo" id="brandCombo"><input id="brandInput" autocomplete="off" role="combobox" aria-labelledby="brandLabel" aria-autocomplete="list" aria-expanded="false" aria-controls="brandList" placeholder="Escribe para buscar"><span class="arrow">▼</span><div id="brandList" class="listbox" role="listbox"></div></div><div class="hint">Escribe algunas letras y elige la marca en la misma lista.</div></div>';if(ctl==='VEHICLE_MODEL_COMBOBOX')return'<div class="field full"><label id="modelLabel" for="modelInput">'+esc(f.label)+'</label><div class="combo" id="modelCombo"><input id="modelInput" autocomplete="off" role="combobox" aria-labelledby="modelLabel" aria-autocomplete="list" aria-expanded="false" aria-controls="modelList" placeholder="Selecciona primero la marca" disabled><span class="arrow">▼</span><div id="modelList" class="listbox" role="listbox"></div></div><div class="hint">La lista depende de la marca seleccionada.</div></div>';if(ctl==='VEHICLE_YEAR_SELECT')return'<div class="field full"><label for="yearSelect">'+esc(f.label)+'</label><select id="yearSelect" data-key="'+esc(f.key)+'"><option value="">Selecciona el año</option></select><div class="hint">El año permanece separado del nombre del modelo.</div></div>';return genericField(f)}
  function renderFields(){if(!currentSchema){fields.innerHTML='<div class="field full">Este recorrido necesita revisión asistida.</div>';assisted=true;sync();return}fields.innerHTML=(currentSchema.fields||[]).filter(visible).map(f=>(f.ui&&f.ui.control)?vehicleField(f):genericField(f)).join('');bindGeneric();fields.querySelectorAll('[data-key]').forEach(el=>{const v=answers[el.dataset.key];if(v!==undefined&&v!==null&&typeof v!=='object')el.value=String(v)});fields.querySelectorAll('[data-bool-key]').forEach(btn=>{const k=btn.dataset.boolKey;if(answers[k]!==undefined)btn.classList.toggle('active',String(answers[k])===btn.dataset.boolValue)});bindVehicle();sync()}
- function bindGeneric(){fields.querySelectorAll('[data-key]').forEach(el=>{const save=()=>{answers[el.dataset.key]=el.value;stateEl.textContent='';if((currentSchema?.fields||[]).some(f=>(f.conditions||[]).length))renderFields();sync()};el.addEventListener('input',save);el.addEventListener('change',save)});fields.querySelectorAll('[data-bool-key]').forEach(btn=>btn.addEventListener('click',()=>{const key=btn.dataset.boolKey;answers[key]=btn.dataset.boolValue==='true';stateEl.textContent='';renderFields()}))}
+ function drivesCondition(key){return(currentSchema?.fields||[]).some(f=>(f.conditions||[]).some(c=>c.fieldKey===key))} function bindGeneric(){fields.querySelectorAll('[data-key]').forEach(el=>{const save=()=>{const key=el.dataset.key;answers[key]=el.value;stateEl.textContent='';if(drivesCondition(key))renderFields();else sync()};el.addEventListener('input',save);el.addEventListener('change',save)});fields.querySelectorAll('[data-bool-key]').forEach(btn=>btn.addEventListener('click',()=>{const key=btn.dataset.boolKey;answers[key]=btn.dataset.boolValue==='true';stateEl.textContent='';if(drivesCondition(key))renderFields();else sync()}))}
  function open(list,input){list.classList.add('open');input.setAttribute('aria-expanded','true')}function close(list,input){list.classList.remove('open');input.setAttribute('aria-expanded','false')}
  function fallbackHtml(kind){return kind==='brand'?'<div class="option fallback" role="option" data-fallback="brand">No encuentro mi marca</div>':'<div class="option fallback" role="option" data-fallback="model">No encuentro mi línea / modelo</div>'}
  function renderBrands(){const input=document.getElementById('brandInput'),list=document.getElementById('brandList');if(!input||!list)return;const q=norm(input.value),rows=brands.filter(x=>!q||norm(x.label).includes(q)).slice(0,60);brandActive=-1;list.innerHTML=rows.map((x,i)=>'<div class="option" role="option" id="b'+i+'" data-id="'+esc(x.brandId)+'" data-label="'+esc(x.label)+'">'+esc(x.label)+'</div>').join('')+fallbackHtml('brand');open(list,input)}
@@ -191,7 +191,7 @@ input:focus,select:focus{outline:2px solid rgba(189,17,28,.18);border-color:var(
  routeButtons();selectRoute(ROUTES[0].id);
 })();
 </script>
-</body></html>\`;
+</body></html>`;
 }
 
 function handler(req,res){
