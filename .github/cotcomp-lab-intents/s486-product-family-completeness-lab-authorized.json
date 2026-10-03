@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s486-product-family-completeness-lab-intent-v1.0",
   "authorization": "S486_DEPLOY_PRODUCT_FAMILY_COMPLETENESS_PREVIEW",
-  "authorizedSourceParent": "929a591609a1eacbc6aa584fe3fa41382b56c67d",
+  "authorizedSourceParent": "fe88f9799d7fd96613e4d340658a81b7c04ce881",
   "providerContractVersion": "gravicentra-quote-authority-v1",
   "projectId": "ays-orbit-360-lab",
   "functionName": "cotcompProductFamilyCompletenessPreviewS486",
