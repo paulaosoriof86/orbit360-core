@@ -17,6 +17,7 @@ const paths={
   permission:'orbit360-platform/modules/renewals-v1200-permission-guard.js',
   issued:'orbit360-platform/modules/renewals-v1201-issued-filter.js',
   cancel:'orbit360-platform/modules/cancelaciones.js',
+  policy:'orbit360-platform/modules/polizas.js',
   policyBridge:'orbit360-platform/modules/policy-receipts-v1199-bridge.js',
   policyDetail:'orbit360-platform/modules/policy-receipts-v1199-detail-guard.js',
   client360:'orbit360-platform/modules/cliente360.js',
@@ -24,6 +25,7 @@ const paths={
   insurer:'orbit360-platform/modules/aseguradoras.js',
   insurerVisual:'orbit360-platform/core/client-insurer-visual-contract-v20260720.js',
   importer:'orbit360-platform/core/importa.js',
+  driveBackend:'functions/document-drive-domain.js',
   infra:'orbit360-platform/styles/infra.css',
   index:'orbit360-platform/index.html',
   composition:'artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json',
@@ -37,16 +39,21 @@ const paths={
   r11:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R11_SOURCE_FIX_20261003.json',
   r12diag:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json',
   r12fix:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_SOURCE_FIX_20261003.json',
-  adjudication:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_DIAGNOSTIC_ADJUDICATION_20261003.json'
+  adjudication:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_DIAGNOSTIC_ADJUDICATION_20261003.json',
+  r13diag:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json',
+  r13drive:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_DRIVE_BACKEND_CAUSAL_DIAGNOSTIC_20261003.json',
+  r13guard:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_DRIVE_PREVIEW_GUARD_ALIGNMENT_20261003.json',
+  r13visual:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_VISUAL_LINEAGE_PROOF_20261003.json',
+  r13fix:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json'
 };
 for(const p of Object.values(paths))need(fs.existsSync(p),'B4_003_REQUIRED_FILE_MISSING:'+p);
 
-const workflow=read(paths.workflow),opBackend=read(paths.operationalBackend),store=read(paths.store),accessScope=read(paths.accessScope),cronograma=read(paths.cronograma),base=read(paths.base),bridge=read(paths.bridge),permission=read(paths.permission),issued=read(paths.issued),cancel=read(paths.cancel),policyBridge=read(paths.policyBridge),policyDetail=read(paths.policyDetail),client360=read(paths.client360),quality=read(paths.quality),insurer=read(paths.insurer),insurerVisual=read(paths.insurerVisual),importer=read(paths.importer),infra=read(paths.infra),index=read(paths.index);
-const comp=json(paths.composition),lock=json(paths.lock),control=json(paths.control),r1=json(paths.r1),r2=json(paths.r2),r3=json(paths.r3),r4=json(paths.r4),r5=json(paths.r5),r11=json(paths.r11),r12diag=json(paths.r12diag),r12fix=json(paths.r12fix),adj=json(paths.adjudication);
+const workflow=read(paths.workflow),opBackend=read(paths.operationalBackend),store=read(paths.store),accessScope=read(paths.accessScope),cronograma=read(paths.cronograma),base=read(paths.base),bridge=read(paths.bridge),permission=read(paths.permission),issued=read(paths.issued),cancel=read(paths.cancel),policy=read(paths.policy),policyBridge=read(paths.policyBridge),policyDetail=read(paths.policyDetail),client360=read(paths.client360),quality=read(paths.quality),insurer=read(paths.insurer),insurerVisual=read(paths.insurerVisual),importer=read(paths.importer),driveBackend=read(paths.driveBackend),infra=read(paths.infra),index=read(paths.index);
+const comp=json(paths.composition),lock=json(paths.lock),control=json(paths.control),r1=json(paths.r1),r2=json(paths.r2),r3=json(paths.r3),r4=json(paths.r4),r5=json(paths.r5),r11=json(paths.r11),r12diag=json(paths.r12diag),r12fix=json(paths.r12fix),adj=json(paths.adjudication),r13diag=json(paths.r13diag),r13drive=json(paths.r13drive),r13guard=json(paths.r13guard),r13visual=json(paths.r13visual),r13fix=json(paths.r13fix);
 
 need(control.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW','B4_003_CONTROL_NEXT_ACTION_INVALID');
-need(/^B4_003_SOURCE_FIXED_R(?:5|9|10|11|12)_/.test(String(control.currentB4?.status||'')),'B4_003_CONTROL_STATUS_INVALID');
-need(/^B4_003_SOURCE_FIXED_R(?:5|9|10|11|12)_/.test(String(lock.status||''))&&lock.activeFinding?.id==='B4-003','B4_003_LOCK_STATUS_INVALID');
+need(control.currentB4?.status==='B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_CONTROL_STATUS_INVALID');
+need(lock.status==='B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW'&&lock.activeFinding?.id==='B4-003','B4_003_LOCK_STATUS_INVALID');
 need(r1.status==='SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R1_RECEIPT_INVALID');
 need(r2.status==='SOURCE_FIXED_R2_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R2_RECEIPT_INVALID');
 need(r3.status==='SOURCE_FIXED_R3_PREVIEW_ISOLATION_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R3_RECEIPT_INVALID');
@@ -56,6 +63,11 @@ need(r11.status==='SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_
 need(r12diag.status==='CAUSES_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED','B4_003_R12_DIAGNOSTIC_INVALID');
 need(r12fix.status==='SOURCE_FIXED_R12_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R12_SOURCE_FIX_RECEIPT_INVALID');
 need(adj.status==='CAUSES_RECONCILED_NARROW_SOURCE_FIX_AUTHORIZED','B4_003_ADJUDICATION_INVALID');
+need(r13diag.status==='READONLY_CAUSAL_DIAGNOSTIC_COMPLETE','B4_003_R13_DIAGNOSTIC_INVALID');
+need(r13drive.status==='CAUSE_DEMONSTRATED_NARROW_BACKEND_FIX_AUTHORIZED','B4_003_R13_DRIVE_DIAGNOSTIC_INVALID');
+need(r13guard.status==='CAUSE_DEMONSTRATED_NARROW_PREVIEW_GUARD_FIX_AUTHORIZED','B4_003_R13_DRIVE_GUARD_DIAGNOSTIC_INVALID');
+need(r13visual.status==='SOURCE_LINEAGE_RECONCILED_PENDING_EXACT_PREVIEW_AND_PAULA_VISUAL','B4_003_R13_VISUAL_LINEAGE_INVALID');
+need(r13fix.status==='SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R13_SOURCE_FIX_RECEIPT_INVALID');
 
 need(/BUSINESS_MUTABLE_FIELDS[\s\S]*'polizaId','cancelacionId'/.test(workflow),'B4_003_RECOVERY_BUSINESS_LINK_FIELDS_MISSING');
 need(/MANAGEMENT_MUTABLE_FIELDS[\s\S]*'negocioId','cancelacionId'/.test(workflow),'B4_003_RECOVERY_MANAGEMENT_LINK_FIELD_MISSING');
@@ -80,13 +92,20 @@ need(/No fue posible confirmar la recuperación\. No se registró un falso éxit
 need(/function\s+effectiveCancelations\s*\(/.test(cancel)&&/__policyCancellationProjection/.test(cancel),'B4_003_CANCEL_POLICY_PROJECTION_OWNER_MISSING');
 need(/await\s+S\(\)\.insertDurable\('cancelaciones'/.test(cancel),'B4_003_CANCEL_PROJECTION_MATERIALIZATION_MISSING');
 need(/cancelaciones:\s*'cancelaciones'/.test(accessScope),'B4_003_CANCEL_ACCESS_SCOPE_OWNER_MISSING');
-need(/function\s+activeCountry/.test(cancel)&&/filter\(inActiveCountry\)/.test(cancel),'B4_003_CANCEL_SELECTED_COUNTRY_FILTER_MISSING');
+need(/function\s+activeCountry/.test(cancel)&&/filter\(c\s*=>\s*inActiveCountry\(c,I\)\)/.test(cancel),'B4_003_CANCEL_SELECTED_COUNTRY_FILTER_MISSING');
+need(/function\s+relationIndex\s*\(/.test(cancel)&&/data-cancel-indexed-relations="1"/.test(cancel),'B4_003_R13_CANCEL_RELATION_INDEX_MISSING');
+need(/data-cancel-open=/.test(cancel)&&/data-cancel-policy-link=/.test(cancel),'B4_003_R13_CANCEL_EXPLICIT_TARGETS_MISSING');
+need(/Cliente '\+clientCountry\+' · operación '\+operationCountry/.test(cancel),'B4_003_R13_CANCEL_CROSS_COUNTRY_LABEL_MISSING');
 need(/detalleKpi/.test(cancel)&&/cancelation-kpi-detail/.test(cancel),'B4_003_CANCEL_KPI_DETAIL_OWNER_MISSING');
 need(cancel.includes('function cancellationById(id, policyId)')&&cancel.includes("String(c&&c.polizaId||'')===wanted"),'B4_003_CANCEL_POLICY_IDENTITY_FALLBACK_MISSING');
 need(cancel.includes('data-cancel-client-link')&&cancel.includes('&t=polizas'),'B4_003_CANCEL_CLIENT_POLICY_DEEPLINK_MISSING');
 need(cancel.includes('no es churn temporal')&&cancel.includes('Relación canceladas / cartera'),'B4_003_CANCEL_HISTORICAL_RATIO_LABEL_MISSING');
 need(policyBridge.includes('!rs.includes(initialRamo)')&&policyBridge.includes('!initialSubs.includes(initialProduct)'),'B4_003_POLICY_EDITOR_SOURCE_TAXONOMY_PRESERVATION_MISSING');
 need(policyBridge.includes('data-renewable')&&policyBridge.includes("renovable: $('[data-renewable]').value==='yes'"),'B4_003_POLICY_EDITOR_RENEWABILITY_TRISTATE_MISSING');
+need(/function\s+relationDataReady\s*\(/.test(policy)&&/data-polizas-relations-loading="1"/.test(policy),'B4_003_R13_POLICY_RELATION_READINESS_MISSING');
+need(/searchTextByPolicy/.test(policy)&&/searchTimer=setTimeout/.test(policy)&&/},180\)/.test(policy),'B4_003_R13_POLICY_INDEXED_DEBOUNCED_SEARCH_MISSING');
+need(/function\s+collectionConfirmed\s*\(/.test(policyDetail)&&/data-policy-detail-loading="client"/.test(policyDetail),'B4_003_R13_POLICY_DETAIL_READINESS_MISSING');
+need(/data-policy-vehicle-loading="1"/.test(policyDetail)&&/data-policy-receipts-loading="1"/.test(policyDetail),'B4_003_R13_POLICY_DETAIL_OPTIONAL_LOADING_MISSING');
 need(client360.includes('id="ftab-prev"')&&client360.includes('left: -strip.clientWidth')&&infra.includes('.ftab-prev'),'B4_003_CLIENT360_LEFT_TAB_CONTROL_MISSING');
 need(quality.includes('.filter(inActiveCountry)')&&quality.includes('vigenteClientIds')&&quality.includes('data-quality-country'),'B4_003_QUALITY_COUNTRY_OR_LINEAR_INDEX_MISSING');
 need(!quality.includes("vig: tieneVigente(c.id)"),'B4_003_QUALITY_PER_CLIENT_POLICY_SCAN_REMAINS');
@@ -94,6 +113,11 @@ need(insurerVisual.includes("box.dataset.knowledgeSource='canonical'")&&insurerV
 need(insurer.includes('aseguradoraId: id')&&insurer.includes('Cargar tarifario / Excel de cotizador')&&insurer.includes('Cargar formulario, póliza o cotización de ejemplo'),'B4_003_R12_INSURER_UPLOAD_ENTRYPOINT_OR_SCOPE_MISSING');
 need(importer.includes("updateDurable('aseguradoras', insurerId")&&importer.includes('preview_protected_operational_insurer')&&importer.includes('Documento recibido')&&importer.includes("requiereValidacion: state.kind === 'docs-aseguradora'"),'B4_003_R12_INSURER_DURABLE_SOURCE_BINDING_MISSING');
 need(importer.includes('Ningún documento habilita Cotizador, Comparativo o IA automáticamente'),'B4_003_R12_INSURER_IMPORT_AUTO_ENABLE_CLAIM_REMAINS');
+need(/\^\(\?:b4\[-_\]\|b4003qa_\)/.test(importer)||/b4003qa_/.test(importer),'B4_003_R13_INSURER_PREVIEW_GUARD_ALIGNMENT_MISSING');
+need(/entity==='aseguradora'\|\|entity==='aseguradoras'/.test(driveBackend)&&/canonicalRef\(tenantId,'aseguradoras',insurerId\)/.test(driveBackend),'B4_003_R13_DRIVE_INSURER_TARGET_AUTHORITY_MISSING');
+need(/\['documentos','docs','adjuntos','attachments','files'\]/.test(driveBackend),'B4_003_R13_DRIVE_INSURER_DOC_REFS_MISSING');
+need(/previewSyntheticInsurer/.test(driveBackend)&&/b4003qa_/.test(driveBackend)&&/previewSyntheticTarget/.test(driveBackend),'B4_003_R13_DRIVE_PREVIEW_SYNTHETIC_GUARD_MISSING');
+need(/_GRAVICENTRA_PREVIEW_QA/.test(driveBackend)&&/aseguradoras/.test(driveBackend),'B4_003_R13_DRIVE_PREVIEW_ISOLATION_MISSING');
 need(policyDetail.includes('policyCompleteness, receiptSchedule, financialIntegrityBatch, premiumBreakdown')&&quality.includes('financialIntegrityIssues')&&quality.includes('data-information-health-policy'),'B4_003_R12_INFORMATION_HEALTH_FINANCIAL_PROJECTION_MISSING');
 need(policyDetail.includes("receiptsByPolicy=group(S().all('recibosEsperados')||[],'polizaId')")&&quality.includes('rm.financialIntegrityBatch(policies)')&&!quality.includes('rm.premiumBreakdown(p)'),'B4_003_R12_QUALITY_FINANCIAL_N_SQUARED_PATH_REMAINS');
 need(quality.includes('pageSize: 50')&&quality.includes('visibleRows = rows.slice')&&quality.includes('data-quality-pagination="true"'),'B4_003_R12Q_QUALITY_UNBOUNDED_DOM_ROWS_REMAIN');
@@ -109,20 +133,21 @@ need(/modules\/renovaciones\.js\?v=20261003-b4003r11/.test(index),'B4_003_BASE_C
 need(/renewals-v1200-operational-bridge\.js\?v=20261003-b4003r11/.test(index),'B4_003_BRIDGE_CACHE_BINDING_MISSING');
 need(/renewals-v1200-permission-guard\.js\?v=20261003-b4003r2/.test(index),'B4_003_PERMISSION_CACHE_BINDING_MISSING');
 need(/renewals-v1201-issued-filter\.js\?v=20261003-b4003r2/.test(index),'B4_003_ISSUED_CACHE_BINDING_MISSING');
-need(/cancelaciones\.js\?v=20261003-b4003r11/.test(index),'B4_003_CANCEL_CACHE_BINDING_MISSING');
+need(/cancelaciones\.js\?v=20261003-b4003r13/.test(index),'B4_003_CANCEL_R13_CACHE_BINDING_MISSING');
+need(/modules\/polizas\.js\?v=20261003-b4003r13/.test(index),'B4_003_POLICY_R13_CACHE_BINDING_MISSING');
 need(/core\/access-scope\.js\?v=20261003-b4003r5/.test(index),'B4_003_ACCESS_SCOPE_CACHE_BINDING_MISSING');
 need(/modules\/cronograma\.js\?v=20261003-b4003r5/.test(index),'B4_003_CRONOGRAMA_CACHE_BINDING_MISSING');
 need(/store-firestore-product-operational-p0\.js\?v=20261003-b4003r3/.test(index),'B4_003_STORE_CACHE_BINDING_MISSING');
 need(/modules\/cliente360\.js\?v=20261003-b4003r11/.test(index),'B4_003_CLIENT360_R11_CACHE_BINDING_MISSING');
 need(/modules\/calidad\.js\?v=20261003-b4003r12q/.test(index),'B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING');
 need(/modules\/aseguradoras\.js\?v=20261003-b4003r12/.test(index),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
-need(/core\/importa\.js\?v=20261003-b4003r12/.test(index),'B4_003_IMPORTER_R12_CACHE_BINDING_MISSING');
+need(/core\/importa\.js\?v=20261003-b4003r13/.test(index),'B4_003_IMPORTER_R13_CACHE_BINDING_MISSING');
 need(/core\/client-insurer-visual-contract-v20260720\.js\?v=20261003-b4003r12/.test(index),'B4_003_INSURER_VISUAL_R12_CACHE_BINDING_MISSING');
-need(/modules\/policy-receipts-v1199-detail-guard\.js\?v=20261003-b4003r12p/.test(index),'B4_003_POLICY_DETAIL_R12P_CACHE_BINDING_MISSING');
+need(/modules\/policy-receipts-v1199-detail-guard\.js\?v=20261003-b4003r13/.test(index),'B4_003_POLICY_DETAIL_R13_CACHE_BINDING_MISSING');
 need(/modules\/policy-receipts-v1199-bridge\.js\?v=20261003-b4003r11/.test(index),'B4_003_POLICY_BRIDGE_R11_CACHE_BINDING_MISSING');
 need(/styles\/infra\.css\?v=20261003-b4003r11/.test(index),'B4_003_INFRA_R11_CACHE_BINDING_MISSING');
 
-const productPaths=[paths.workflow,paths.operationalBackend,paths.store,paths.accessScope,paths.cronograma,paths.base,paths.bridge,paths.permission,paths.issued,paths.cancel,paths.policyBridge,paths.policyDetail,paths.client360,paths.quality,paths.insurer,paths.insurerVisual,paths.importer,paths.infra,paths.index];
+const productPaths=[paths.workflow,paths.operationalBackend,paths.store,paths.accessScope,paths.cronograma,paths.base,paths.bridge,paths.permission,paths.issued,paths.cancel,paths.policy,paths.policyBridge,paths.policyDetail,paths.client360,paths.quality,paths.insurer,paths.insurerVisual,paths.importer,paths.driveBackend,paths.infra,paths.index];
 const bindings=Object.fromEntries(productPaths.map(p=>[p,hash(p)]));
 for(const [p,sha] of Object.entries(bindings)){
   need((comp.productFiles||[]).includes(p),'B4_003_COMPOSITION_PATH_MISSING:'+p);
@@ -136,7 +161,8 @@ need(comp.b4003SourceFixR4?.status==='SOURCE_FIXED_R4_PENDING_CONTRACT_AND_EXACT
 need(comp.b4003SourceFixR5?.status==='SOURCE_FIXED_R5_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R5_COMPOSITION_STATE_INVALID');
 need(comp.b4003SourceFixR11?.status==='SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R11_COMPOSITION_STATE_INVALID');
 need(comp.b4003SourceFixR12?.status==='SOURCE_FIXED_R12_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R12_COMPOSITION_STATE_INVALID');
+need(comp.b4003SourceFixR13?.status==='SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R13_COMPOSITION_STATE_INVALID');
 need(lock.boundaries?.businessWritesAuthorized===false&&lock.boundaries?.dataMutationAuthorized===false&&lock.boundaries?.reimportAuthorized===false&&lock.boundaries?.livePromotionAuthorized===false,'B4_003_BOUNDARY_INVALID');
 need(lock.boundaries?.syntheticQaWritesAuthorized===true,'B4_003_SYNTHETIC_QA_NOT_AUTHORIZED');
 
-console.log(JSON.stringify({status:'PASS',contract:'B4_003_RENEWALS_CANCELATIONS_CONTRACT',exactBlobBindings:bindings,singleRenewalActionOwner:paths.bridge,noDelayedRenewalRenderOwners:true,durableRenewalCampaign:true,durableCancelationRecovery:true,previewGeneralWritesIsolated:true,productFileCount:comp.productFileCount},null,2));
+console.log(JSON.stringify({status:'PASS',contract:'B4_003_R13_CONTRACT',exactBlobBindings:bindings,singleRenewalActionOwner:paths.bridge,noDelayedRenewalRenderOwners:true,durableRenewalCampaign:true,durableCancelationRecovery:true,previewGeneralWritesIsolated:true,r13PolicyIndexedSearch:true,r13PolicyCoherentHydration:true,r13CancelIndexedRelations:true,r13InsurerDriveTargetAuthority:true,productFileCount:comp.productFileCount},null,2));
