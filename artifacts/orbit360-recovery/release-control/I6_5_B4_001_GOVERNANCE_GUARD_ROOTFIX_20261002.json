@@ -1,0 +1,43 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_001_GOVERNANCE_GUARD_ROOTFIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_GOVERNANCE_MECHANISM_REPAIRED_PENDING_EXACT_PREVIEW",
+  "findingId": "B4-001",
+  "failedRunId": 37079714389,
+  "failedJobId": 111077312927,
+  "failedHeadSha": "f75f1b709ba1630e87009431b3155d9387b2223b",
+  "failureStep": "Gate exact B4-001 Preview",
+  "failureCode": "I6_5_NEXT_ACTION_INVALID",
+  "classification": "QA_GOVERNANCE_MECHANISM_STALE_B4_TRANSITION_NOT_PRODUCT_FAILURE",
+  "rootCause": [
+    "gravicentra-i6-control-plane-guard-v1.mjs supported B1-B3 forensic actions but had no B4 branch, so valid B4 nextAction fell through to the legacy I6.5 cursor action.",
+    "Canonical composition carried activeBlock=B4 while currentBlock remained B3, which prevented the exact composition guard from activating for B4.",
+    "The four B4-001 product files were in the declared cumulative set but their top-level productFileBlobs still pointed to the accepted B3 blobs."
+  ],
+  "repair": {
+    "guardBlobSha": "2b34d2e739096732d61d2f4b39dcc0c46d56ccde",
+    "compositionBlobSha": "d1b3b07af70f690c1e5a06d438c7027816d4f12e",
+    "b4LockBlobSha": "e04d669e884ac22855aca44da8a24553d899ae93",
+    "compositionBlock": "B4",
+    "updatedProductBlobs": {
+      "orbit360-platform/core/ciclo.js": "b78f93b1640f444db90da0f4d73ccf098ac0ea8d",
+      "orbit360-platform/modules/portal.js": "957cefe0647bff2b350e5b3f0f78ef7a9e97703f",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "f24b1ad6a083273929b032fe4b84d15cd7a2a74e",
+      "orbit360-platform/index.html": "030e5c7c35b4624d2ced050b6cb3c6d9cc8515b8"
+    },
+    "allowedCurrentActions": [
+      "I6_5_FORENSIC_REMEDIATION_B4_001_DIAGNOSTIC",
+      "I6_5_FORENSIC_REMEDIATION_B4_001_CONTRACT_AND_EXACT_PREVIEW",
+      "I6_5_FORENSIC_REMEDIATION_B4_002_DIAGNOSTIC"
+    ]
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "operationalBusinessWrites": 0,
+    "syntheticQaWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_001_CONTRACT_AND_EXACT_PREVIEW"
+}
