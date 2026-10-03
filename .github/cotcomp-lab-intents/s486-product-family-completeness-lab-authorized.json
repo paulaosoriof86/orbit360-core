@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "ays-cotcomp-s486-product-family-completeness-lab-intent-v1.0",
+  "authorization": "S486_DEPLOY_PRODUCT_FAMILY_COMPLETENESS_PREVIEW",
+  "authorizedSourceParent": "929a591609a1eacbc6aa584fe3fa41382b56c67d",
+  "providerContractVersion": "gravicentra-quote-authority-v1",
+  "projectId": "ays-orbit-360-lab",
+  "functionName": "cotcompProductFamilyCompletenessPreviewS486",
+  "productFamilyCount": 7,
+  "schemaDriven": true,
+  "fixtureOnly": true,
+  "providerDeploymentAuthorized": false,
+  "cotcompRealTransportAuthorized": false,
+  "appDataReads": false,
+  "appDataWrites": false,
+  "piiFields": false,
+  "quoteCaseWrites": false,
+  "providerOrRater": false,
+  "production": false
+}
