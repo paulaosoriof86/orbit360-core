@@ -1,0 +1,24 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R10_RUNTIME_REACHABILITY_PENDING_EXACT_PREVIEW",
+  "failedRunId": 37136324665,
+  "failedJobId": 111241484626,
+  "failedStep": "Durable renewals cancelations browser proof",
+  "failureCode": "B4_003_R10_QUOTE_AUTHORITY_VERSION_NOT_HOSTED",
+  "rootCause": "The Quote Authority contract source existed and source QA passed, but the immutable Preview package is dependency-closure based. Because canonical index did not reference core/quote-authority-contract-v1.js, Hosting rewrote the missing path to index.html, yielding HTTP 200 without the contract version marker.",
+  "remediation": "Add one canonical index script reference for quote-authority-contract-v1.js. This makes the pure contract reachable/hosted; it does not enable provider transport, call providers, mutate data, or authorize live.",
+  "authorizationLockBlobSha": "1133970e390895a008d761f3936ff9901aea0342",
+  "productChange": {
+    "path": "orbit360-platform/index.html",
+    "previousBlobSha": "83562417b6be231ab7b8b1f5aa17ea0ae24133b2",
+    "currentBlobSha": "9152234459797addeb6d53127e12bc759197b9c2"
+  },
+  "providerDeploymentAuthorized": false,
+  "cotcompRealTransportAuthorized": false,
+  "operationalBusinessWrites": 0,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "REFRESH_R10_COMPOSITION_BINDINGS_AND_RETRY_EXACT_PREVIEW"
+}
