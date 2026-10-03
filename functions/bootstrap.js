@@ -18,5 +18,6 @@ module.exports = Object.assign(
   require('./cotcomp-vehicle-combobox-preview-s480a'),
   require('./cotcomp-schema-driven-intake-preview-s485'),
   require('./cotcomp-product-family-completeness-preview-s486'),
-  require('./cotcomp-approved-visual-preview-s487')
+  require('./cotcomp-approved-visual-preview-s487'),
+  require('./cotcomp-exact-promoted-preview-s488')
 );
