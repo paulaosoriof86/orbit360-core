@@ -339,14 +339,29 @@ try{
  proof.visualScope=await page.evaluate(ids=>{
    const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';
    const countries=(selector,attr)=>Array.from(h.querySelectorAll(selector)).map(el=>String(el.getAttribute(attr)||'').toUpperCase()).filter(Boolean);
-   Orbit.pais='GT';Orbit.modules.cancelaciones.render(h);
-   const cancelGT=countries('[data-cancel-country]','data-cancel-country');
-   const syntheticCancelVisibleGT=cancelGT.includes('GT');
+   const cancelSnapshot=country=>{
+     Orbit.pais=country;
+     const t=performance.now();Orbit.modules.cancelaciones.render(h);const ms=performance.now()-t;
+     const rows=Array.from(h.querySelectorAll('[data-cancel-country]'));
+     const identities=Array.from(h.querySelectorAll('[data-cancel-client-link]')).map(el=>({
+       client:String(el.getAttribute('data-cancel-client-country')||'').toUpperCase(),
+       operation:String(el.getAttribute('data-cancel-operation-country')||'').toUpperCase(),
+       text:String(el.innerText||'').replace(/\s+/g,' ').trim()
+     }));
+     return{
+       ms,
+       countries:rows.map(el=>String(el.getAttribute('data-cancel-country')||'').toUpperCase()).filter(Boolean),
+       explicitTargets:rows.every(row=>!!row.querySelector('[data-cancel-open]')&&(!String(row.getAttribute('data-cancel-policy')||'')||!!row.querySelector('[data-cancel-policy-link]'))),
+       crossCountryExplicit:identities.filter(x=>x.client&&x.operation&&x.client!==x.operation).every(x=>x.text.includes('Cliente '+x.client)&&x.text.includes('operación '+x.operation)),
+       identitySample:identities.slice(0,20)
+     };
+   };
+   const gt=cancelSnapshot('GT');
+   const syntheticCancelVisibleGT=gt.countries.includes('GT');
    Orbit.modules.cancelaciones.detalleKpi('valor');
    const cancelKpiDetailOpen=!!document.getElementById('cancelation-kpi-detail');
    document.getElementById('cancelation-kpi-detail')?.remove();
-   Orbit.pais='CO';Orbit.modules.cancelaciones.render(h);
-   const cancelCO=countries('[data-cancel-country]','data-cancel-country');
+   const co=cancelSnapshot('CO');
    Orbit.pais='GT';Orbit.modules.renovaciones.render(h);
    const renewGT=countries('[data-renewal-country]','data-renewal-country');
    const syntheticRenewVisibleGT=!!h.querySelector('[data-renewal-policy="'+ids.renewalPolicy+'"]');
@@ -355,9 +370,18 @@ try{
    Orbit.pais='CO';Orbit.modules.renovaciones.render(h);
    const renewCO=countries('[data-renewal-country]','data-renewal-country');
    Orbit.pais=previous;
-   return{cancelGT,cancelCO,renewGT,renewCO,syntheticCancelVisibleGT,syntheticRenewVisibleGT,unknownRenewVisibleGT,cancelKpiDetailOpen,actionLayout};
+   return{
+     cancelGT:gt.countries,cancelCO:co.countries,cancelGtMs:gt.ms,cancelCoMs:co.ms,
+     cancelExplicitTargetsGT:gt.explicitTargets,cancelExplicitTargetsCO:co.explicitTargets,
+     cancelCrossCountryExplicitGT:gt.crossCountryExplicit,cancelCrossCountryExplicitCO:co.crossCountryExplicit,
+     cancelIdentitySampleGT:gt.identitySample,cancelIdentitySampleCO:co.identitySample,
+     renewGT,renewCO,syntheticCancelVisibleGT,syntheticRenewVisibleGT,unknownRenewVisibleGT,cancelKpiDetailOpen,actionLayout
+   };
  },ids);
  need(proof.visualScope.cancelGT.every(x=>x==='GT')&&proof.visualScope.cancelCO.every(x=>x==='CO'),'B4_003_CANCEL_SELECTED_COUNTRY_SCOPE_LEAK');
+ need(proof.visualScope.cancelGtMs<2500&&proof.visualScope.cancelCoMs<2500,'B4_003_R13_CANCEL_COUNTRY_SWITCH_TOO_SLOW:'+JSON.stringify({gtMs:proof.visualScope.cancelGtMs,coMs:proof.visualScope.cancelCoMs}));
+ need(proof.visualScope.cancelExplicitTargetsGT===true&&proof.visualScope.cancelExplicitTargetsCO===true,'B4_003_R13_CANCEL_EXPLICIT_TARGETS_MISSING');
+ need(proof.visualScope.cancelCrossCountryExplicitGT===true&&proof.visualScope.cancelCrossCountryExplicitCO===true,'B4_003_R13_CANCEL_CROSS_COUNTRY_IDENTITY_AMBIGUOUS');
  need(proof.visualScope.renewGT.every(x=>x==='GT')&&proof.visualScope.renewCO.every(x=>x==='CO'),'B4_003_RENEW_SELECTED_COUNTRY_SCOPE_LEAK');
  need(proof.visualScope.syntheticCancelVisibleGT===true&&proof.visualScope.syntheticRenewVisibleGT===true,'B4_003_GT_SYNTHETIC_SCOPE_MISSING');
  need(proof.visualScope.unknownRenewVisibleGT===false,'B4_003_UNKNOWN_RENEWABILITY_MUST_FAIL_CLOSED');
@@ -365,6 +389,9 @@ try{
  need(proof.visualScope.cancelKpiDetailOpen===true,'B4_003_CANCEL_KPI_DETAIL_MISSING');
  need(proof.visualScope.actionLayout==='grid2','B4_003_RENEW_ACTION_LAYOUT_NOT_COMPACT');
  proof.assertions.cancelSelectedCountryScope=true;
+ proof.assertions.cancelCountrySwitchUnder2500ms=true;
+ proof.assertions.cancelExplicitCanonicalTargets=true;
+ proof.assertions.cancelCrossCountryIdentityExplicit=true;
  proof.assertions.renewalSelectedCountryScope=true;
  proof.assertions.cancelKpiDetails=true;
  proof.assertions.renewalCompactActions=true;
@@ -389,8 +416,11 @@ try{
    Orbit.modules.cancelaciones.render(h);
    const row=h.querySelector('[data-cancel-policy="'+ids.cancelPolicy+'"]');
    const clientLink=row?.querySelector('[data-cancel-client-link]')||null;
+   const policyLink=row?.querySelector('[data-cancel-policy-link]')||null;
+   const openButton=row?.querySelector('[data-cancel-open]')||null;
    const clientHref=clientLink?String(clientLink.getAttribute('href')||''):'';
-   if(row) row.click();
+   const rowMisleadingClickable=!!row?.classList.contains('clickable');
+   if(openButton) openButton.click();
    const cancellationVisibleRowOpened=!!document.getElementById('c360-edit');
    document.getElementById('c360-edit')?.remove();
    const t0=performance.now();Orbit.modules.calidad.render(h);const qualityGtMs=performance.now()-t0;
@@ -400,15 +430,17 @@ try{
    const qualityCO=Array.from(h.querySelectorAll('[data-quality-country]')).map(x=>String(x.getAttribute('data-quality-country')||'').toUpperCase()).filter(Boolean);
    const qualityCoRows=h.querySelectorAll('[data-quality-country]').length,financialCoRows=h.querySelectorAll('[data-information-health-policy]').length,financialCoCount=(Orbit.modules.calidad.financialIntegrityIssues?.()||[]).length;
    Orbit.pais=previous;
-   return{clientHref,cancellationVisibleRowOpened,qualityGT,qualityCO,qualityGtMs,qualityCoMs,qualityGtRows,qualityCoRows,financialGtRows,financialCoRows,financialGtCount,financialCoCount};
+   return{clientHref,policyTargetPresent:!!policyLink,explicitCancelTargetPresent:!!openButton,rowMisleadingClickable,cancellationVisibleRowOpened,qualityGT,qualityCO,qualityGtMs,qualityCoMs,qualityGtRows,qualityCoRows,financialGtRows,financialCoRows,financialGtCount,financialCoCount};
  },ids);
  need(proof.r11Browser.cancellationVisibleRowOpened===true,'B4_003_CANCEL_VISIBLE_ROW_DETAIL_FAILED');
+ need(proof.r11Browser.explicitCancelTargetPresent===true&&proof.r11Browser.policyTargetPresent===true&&proof.r11Browser.rowMisleadingClickable===false,'B4_003_R13_CANCEL_TARGET_IDENTITY_FAILED');
  need(/[#/]cliente360\?c=.*[&]t=polizas/.test(proof.r11Browser.clientHref),'B4_003_CANCEL_CLIENT_MUST_OPEN_POLICIES_TAB');
  need(proof.r11Browser.qualityGT.every(x=>x==='GT')&&proof.r11Browser.qualityCO.every(x=>x==='CO'),'B4_003_QUALITY_SELECTED_COUNTRY_SCOPE_LEAK');
  need(proof.r11Browser.qualityGtMs<2500&&proof.r11Browser.qualityCoMs<2500,'B4_003_QUALITY_SYNC_RENDER_TOO_SLOW:'+JSON.stringify({gtMs:proof.r11Browser.qualityGtMs,coMs:proof.r11Browser.qualityCoMs,gtRows:proof.r11Browser.qualityGtRows,coRows:proof.r11Browser.qualityCoRows,financialGtRows:proof.r11Browser.financialGtRows,financialCoRows:proof.r11Browser.financialCoRows,financialGtCount:proof.r11Browser.financialGtCount,financialCoCount:proof.r11Browser.financialCoCount}));
  proof.assertions.cancelVisibleRowDetail=true;
  proof.assertions.cancelDeepLinkIdentity=true;
  proof.assertions.cancelClientOpensPolicies=true;
+ proof.assertions.cancelRowNoMisleadingSingleTarget=true;
  proof.assertions.qualitySelectedCountryScope=true;
  proof.assertions.qualityRenderPathUnder2500ms=true;
 
