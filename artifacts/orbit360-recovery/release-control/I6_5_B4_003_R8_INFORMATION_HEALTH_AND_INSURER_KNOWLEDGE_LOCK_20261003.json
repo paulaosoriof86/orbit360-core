@@ -1,0 +1,245 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_V1",
+  "recordedAt": "2026-10-03",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "bdb79a263816063439cd046c136397e1cd038751",
+  "authority": "PAULA_EXPLICIT_TRANSVERSAL_KNOWLEDGE_AND_INFORMATION_HEALTH_DECISION_20261003",
+  "status": "FROZEN_ACTIVE_B4_003_R8_SOURCE_REUSE_AND_KNOWLEDGE_CONSOLIDATION",
+  "activeFindingId": "B4-003",
+  "b4004Held": true,
+  "predecessor": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
+    "blobSha": "37f015ea5262df68ac0838b57b1de61c1b0b25a7",
+    "disposition": "PRESERVED_AND_EXTENDED"
+  },
+  "decisions": {
+    "informationHealth": {
+      "canonicalOwner": "orbit360-platform/modules/calidad.js",
+      "canonicalOwnerBlobSha": "c8cf5c9acce745ebfd4ae9f7df806fbb2797547d",
+      "routeCompatibility": "#/calidad",
+      "visibleTargetName": "Salud de la información",
+      "rule": "Extend the existing Calidad owner; do not create a parallel quality application or spreadsheet-as-source-of-truth.",
+      "currentScope": "Existing owner covers client completeness/country/currency/contact with source and audit.",
+      "targetScope": [
+        "Clientes: country/currency/contact/identity/location and client↔policy country mismatches.",
+        "Pólizas: renewability, policy master/child lifecycle, missing contractual fields and authoritative source gaps.",
+        "Primas/Recibos: ambiguous calendars, material premium mismatches, missing frequency/installment authority, deterministic corrections pending readback.",
+        "Cancelaciones: missing reason/date and unresolved policy/detail identity.",
+        "Aseguradoras/Tarifas: missing/expired/unvalidated insurer-product tariff authority.",
+        "Drive: missing/ambiguous client or insurer expediente binding."
+      ],
+      "paulaQueueRule": "Only residual issues that require human/source input are shown as Paula actions. Deterministic/system-fix issues remain visible for transparency but are not assigned to Paula.",
+      "issueMinimumFields": [
+        "issueId",
+        "entityType",
+        "entityId",
+        "displayReference",
+        "country",
+        "insurerId/insurerName when applicable",
+        "issueCode",
+        "category",
+        "severity",
+        "productionBlocking",
+        "status",
+        "assignedTo",
+        "exactMissingInformation",
+        "acceptableEvidence",
+        "sourceRefs",
+        "systemAttemptSummary",
+        "recommendedAction",
+        "directNavigation",
+        "createdAt",
+        "updatedAt",
+        "resolvedAt",
+        "resolutionEvidence"
+      ],
+      "statuses": [
+        "SYSTEM_REVIEW",
+        "WAITING_SOURCE",
+        "PAULA_ACTION_REQUIRED",
+        "READY_FOR_CONTROLLED_FIX",
+        "FIXED_PENDING_READBACK",
+        "RESOLVED",
+        "WAIVED_FAIL_CLOSED"
+      ],
+      "userExperience": [
+        "KPIs by open/resolved/waiting source and domain.",
+        "Filters by domain, country, insurer, severity, owner and status.",
+        "Direct link to the exact client/policy/insurer/cancellation record.",
+        "No need for Paula to search a spreadsheet or remember a policy number.",
+        "Resolved items stay auditable; they do not disappear from history."
+      ],
+      "spreadsheetRole": "The 81-case workbook is an export/handoff convenience only, never the canonical queue."
+    },
+    "insurerKnowledge": {
+      "reuseExistingArchitecture": true,
+      "canonicalRuntime": "orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js",
+      "runtimeBlobSha": "8b8703856a36d05e827c73f255499d1b1456fdd7",
+      "canonicalPanel": "orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js",
+      "panelBlobSha": "38b75e8203ceb43f494dec2b26867c9f82079d7d",
+      "tariffReconciliation": "orbit360-platform/core/tariff-quote-reconciliation-p06c.js",
+      "tariffReconciliationBlobSha": "f531c03243128c9c412656a7c0ce25745ac7448f",
+      "historicalDecision": "orbit360-platform/docs/DECISION-MAESTRA-ASEGURADORAS-COTIZADOR-COMPARATIVO-HISTORIALES-IA-TARIFAS-20260710.md",
+      "historicalDecisionBlobSha": "e6bcdf76bac5eb3d093bcce89feedc788d26aabc",
+      "existingKnowledgeSummary": "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20260716.js",
+      "existingKnowledgeSummaryBlobSha": "c205552e962af42ee1752ddff87cec9d29fa425b",
+      "rule": "Insurer knowledge is captured once with source/version/validity and reused by insurer profile, policy validation, quoting, comparison, renewals and future product logic.",
+      "noDuplication": "Do not create a second insurer master, second tariff store or module-local tariff tables.",
+      "sourceTypes": [
+        "official insurer tariff/cotizador Excel",
+        "official insurer quotation PDF/output",
+        "issued policy/certificate/endoso with identifiable insurer/product/period",
+        "official insurer manual/conditions/communication",
+        "authorized online quote output",
+        "versioned manual adjustment with source/reason"
+      ],
+      "lifecycle": [
+        "INGESTED",
+        "PROPOSED_REQUIRES_VALIDATION",
+        "RECONCILED_WITH_EXAMPLE",
+        "HUMAN_VALIDATED",
+        "ENABLED_FOR_QUOTING",
+        "SUPERSEDED_EXPIRED"
+      ],
+      "crossModuleTargets": [
+        "Aseguradoras profile",
+        "Cotizador",
+        "Comparativo",
+        "Pólizas premium validation",
+        "Renovaciones",
+        "Salud de la información"
+      ],
+      "quotingGate": "A document being stored or parsed never enables automatic quoting. Only a validated, versioned, sourced rule/binding can be enabled."
+    }
+  },
+  "businessHeuristicsPendingSource": {
+    "rule": "These are useful business priors supplied by Paula and historical project evidence. They guide source review but are NOT universal executable tariff rules until insurer/product evidence validates them.",
+    "Guatemala": [
+      {
+        "code": "GT_EMISSION_GENERAL_PRIOR",
+        "statement": "Gastos de emisión suelen ser aproximadamente 5% sobre prima neta.",
+        "exceptions": "Columna is reported by Paula as currently not charging this item; other insurer/product exceptions may exist.",
+        "status": "PENDING_INSURER_PRODUCT_SOURCE_VALIDATION"
+      },
+      {
+        "code": "GT_INSTALLMENT_SURCHARGE_GENERAL_PRIOR",
+        "statement": "Fraccionamiento normalmente incrementa el recargo según plazo/número de pagos; Paula reports a usual progression of roughly 1 percentage point by fractional term and about 13% at 12 payments.",
+        "historicalConflict": "July project decision recorded observed 12-month values around 13.3%–13.6%. Therefore 13%, 13.3% and 13.6% are evidence of insurer/product variation, not a universal constant.",
+        "status": "PENDING_INSURER_PRODUCT_FREQUENCY_SOURCE_VALIDATION"
+      },
+      {
+        "code": "GT_TAX",
+        "statement": "IVA 12%.",
+        "status": "BUSINESS_CONFIRMED_BUT_PRODUCT_RULE_MUST_STILL_REFERENCE_COUNTRY_AUTHORITY"
+      }
+    ],
+    "Colombia": [
+      {
+        "code": "CO_INSTALLMENT_SURCHARGE",
+        "statement": "No insurer installment surcharge by default. Policies are usually issued as cash/contado by insurer; financing, when used, is commonly external through finance companies.",
+        "exceptions": "Insurer surcharge is allowed only when explicit source proves an exception.",
+        "status": "DEFAULT_ZERO_FOR_INSURER_SURCHARGE_ONLY_AFTER_PRODUCT_FIX;_EXTERNAL_FINANCING_SEPARATE_DOMAIN"
+      },
+      {
+        "code": "CO_EMISSION",
+        "statement": "Issuance/emission expenses depend on insurer/product; no universal automatic default.",
+        "status": "PENDING_INSURER_PRODUCT_SOURCE_VALIDATION"
+      },
+      {
+        "code": "CO_TAX",
+        "statement": "IVA 19%.",
+        "status": "BUSINESS_CONFIRMED_BUT_PRODUCT_RULE_MUST_STILL_REFERENCE_COUNTRY_AUTHORITY"
+      }
+    ]
+  },
+  "sourceAuthority": {
+    "order": [
+      "Current official insurer tariff/cotizador/contractual document with identifiable version/validity.",
+      "Issued policy/certificate/endoso or official insurer quote that demonstrates actual components for the product/period.",
+      "Official insurer communication/manual with effective date.",
+      "Versioned tenant manual adjustment linked to a source and reason.",
+      "Business heuristic/prior for review only; never silent auto-calculation."
+    ],
+    "reconciliationRule": "A proposed tariff rule must be reconciled against at least one real official output/policy when feasible. Material mismatch remains requires-validation.",
+    "supersessionRule": "New sources create new versions. Prior rules remain historical and auditable; they are not silently overwritten.",
+    "storageRule": "Operational Firestore stores normalized knowledge metadata/rules/status. Original documents remain documentary evidence in Drive/Library/reference provider, avoiding unnecessary binary duplication."
+  },
+  "knownPriorSourceInventory": {
+    "evidenceFile": "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20260716.js",
+    "insurersWithMappedHistoricalSources": [
+      "Aseguradora Guatemalteca: tarifario/cotizador and official vehicle quote examples.",
+      "BAM: health and vehicle Excel cotizadores.",
+      "Aseguradora Rural/Banrural: vehicle and individual medical-expense cotizadores.",
+      "Bantrab: auto and motorcycle cotizadores.",
+      "Seguros Columna: vehicle cotizador.",
+      "Seguros Universales: official Risk Plus quotation example."
+    ],
+    "rule": "Check whether prior physical source remains available before requesting re-upload from Paula."
+  },
+  "ingestionFastTrack": {
+    "objective": "Recover/reuse prior work and close tariff authority with minimal delay to production.",
+    "order": [
+      {
+        "step": 1,
+        "action": "Inventory existing Project/Library/GitHub source references and mark each as AVAILABLE / REFERENCE_ONLY / MISSING / OUTDATED.",
+        "paulaAction": "NONE"
+      },
+      {
+        "step": 2,
+        "action": "Use available sources to extract insurer-country-product-frequency components, formula semantics, exceptions and validity; propose versioned rules and reconcile with real quote/policy examples.",
+        "paulaAction": "NONE"
+      },
+      {
+        "step": 3,
+        "action": "Request only missing evidence in small insurer packets, starting with highest-value/exception-defining cases.",
+        "paulaAction": "UPLOAD_ONLY_WHEN_REQUESTED"
+      },
+      {
+        "step": 4,
+        "action": "After human validation, persist normalized insurer knowledge so it is visible in insurer profile and reusable by Cotizador/Comparativo/Pólizas; no duplicate local configuration.",
+        "paulaAction": "VALIDATE_SUMMARY_NOT_REKEY_DATA"
+      },
+      {
+        "step": 5,
+        "action": "Generate/refresh Salud de la información residual queue. Only unresolved source-dependent records become Paula actions.",
+        "paulaAction": "MANUAL_ACTION_START_ONLY_WHEN_EXPLICITLY_ISSUED"
+      }
+    ],
+    "firstSourcePacketIfMissing": [
+      "Guatemala: one current official AseGuate tariff/cotizador plus one real official quote or issued policy demonstrating payment components.",
+      "Guatemala exception anchor: one current Columna vehicle cotizador/quote/policy demonstrating whether issuance expense is zero and its installment behavior.",
+      "Colombia: one current insurer policy/quote with issuance expense/payment mode to anchor the no-default-surcharge model."
+    ],
+    "fileGuidance": "Prefer original Excel/PDF. Do not manually transcribe tables. Redaction is optional if Paula prefers; source identity, insurer, product, version/date, premium components and payment plan must remain readable."
+  },
+  "productionStrategy": {
+    "urgencyAware": true,
+    "rule": "Do not make completion of every insurer tariff library a prerequisite for go-live.",
+    "mustCloseBeforeGoLive": [
+      "Prevent silent generic premium/recargo defaults from creating unsupported totals.",
+      "Keep missing tariff authority fail-closed and visible in Salud de la información.",
+      "Preserve authoritative totals/components for existing policies.",
+      "Complete current B4-003 blocking functional regressions and exact Preview acceptance."
+    ],
+    "canContinueAfterProductionAccepted": [
+      "Expand insurer/product tariff coverage.",
+      "Resolve nonblocking historical data-quality items with source.",
+      "Add additional insurer calculators/examples and superseding versions."
+    ]
+  },
+  "manualActionPolicy": {
+    "currentStatus": "DO_NOT_START_FINANCIAL_81_CASES_YET",
+    "allowedNow": "Paula may upload requested insurer source documents when asked; this is source contribution, not manual reconciliation.",
+    "triggerForCaseWork": "Only explicit MANUAL_ACTION_START plus a residual Health-of-Information queue/list after system source exhaustion.",
+    "noMemoryDependency": true
+  },
+  "boundaries": {
+    "productMutationAuthorizedByThisLock": false,
+    "operationalBusinessWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b4004Authorized": false
+  },
+  "nextAction": "B4_003_R8_REUSE_SOURCE_INVENTORY_AND_INSURER_KNOWLEDGE_FASTTRACK"
+}
