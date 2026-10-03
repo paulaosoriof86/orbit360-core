@@ -125,7 +125,11 @@ button:disabled{background:#aaa;cursor:not-allowed}
  function open(list,input){list.classList.add('open');input.setAttribute('aria-expanded','true')}
  function close(list,input){list.classList.remove('open');input.setAttribute('aria-expanded','false')}
  function sync(){validate.disabled=!(selectedBrand&&selectedModel&&year.value)}
- function fallbackHtml(kind){return '<div class="option fallback" role="option" data-fallback="'+kind+'">No encuentro '+(kind==='brand'?'mi marca':'mi línea / modelo')+'</div>'}
+ function fallbackHtml(kind){
+   return kind==='brand'
+     ? '<div class="option fallback" role="option" data-fallback="brand">No encuentro mi marca</div>'
+     : '<div class="option fallback" role="option" data-fallback="model">No encuentro mi línea / modelo</div>';
+ }
 
  function renderBrands(){
    const q=norm(brandInput.value);
