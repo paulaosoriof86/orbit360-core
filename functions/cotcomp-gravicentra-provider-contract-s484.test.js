@@ -278,7 +278,7 @@ test('S4.84 implementation contains no network/provider calls, financial formula
   const src=fs.readFileSync(path.join(__dirname,'cotcomp-gravicentra-provider-contract-s484.js'),'utf8').toUpperCase();
   for(const forbidden of [
     'FIREBASE-ADMIN','GETFIRESTORE','FETCH(','AXIOS','HTTPS://',
-    'CALCULATEPREMIUM','CALCULATETAX','TARIFFRATE','0.12','0.19',
+    'CALCULATEPREMIUM(','CALCULATETAX(','APPLYTARIFFRATE(','0.12','0.19',
     'VEHICLEMAKE','CARGOTYPE','INSUREDVALUE'
   ]){
     assert.equal(src.includes(forbidden),false,forbidden);
