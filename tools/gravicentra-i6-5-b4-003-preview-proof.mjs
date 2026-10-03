@@ -569,6 +569,23 @@ try{
  need(stable.before===stable.after&&stable.mutations===0,'B4_003_RENEWAL_DELAYED_RENDER_MUTATION');
  proof.assertions.noDelayedRenewalRenderMutation=true;
 
+ // R13: reconcile the real, non-synthetic renewal universe against the canonical YES-only pipeline.
+ proof.r13RenewalReality=await page.evaluate(ids=>{
+   const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';
+   Orbit.pais='TODOS';Orbit.modules.renovaciones.render(h);
+   const allIds=Array.from(h.querySelectorAll('[data-renewal-policy]')).map(x=>String(x.getAttribute('data-renewal-policy')||'')).filter(Boolean);
+   const realIds=allIds.filter(id=>!id.startsWith('b4003qa_')&&!id.startsWith('b4_'));
+   const kpis=Array.from(h.querySelectorAll('.kpi-row .kpi')).map(x=>({label:String(x.querySelector('.k-label')?.textContent||'').trim(),value:String(x.querySelector('.k-val')?.textContent||'').trim()}));
+   Orbit.pais=previous;
+   return{allIds,realIds,kpis};
+ },ids);
+ need(proof.realRenewalDistribution.eligibleCount>0,'B4_003_R13_REAL_RENEWAL_PIPELINE_EMPTY:'+JSON.stringify(proof.realRenewalDistribution.byState));
+ const expectedRenewals=[...(proof.realRenewalDistribution.eligibleIds||[])].sort();
+ const visibleRenewals=[...proof.r13RenewalReality.realIds].sort();
+ need(JSON.stringify(visibleRenewals)===JSON.stringify(expectedRenewals),'B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH:'+JSON.stringify({expected:expectedRenewals.length,visible:visibleRenewals.length,expectedSample:expectedRenewals.slice(0,20),visibleSample:visibleRenewals.slice(0,20)}));
+ proof.assertions.realRenewalPipelineRepopulated=true;
+ proof.assertions.realRenewalPipelineMatchesCanonicalEligibility=true;
+
  await page.evaluate(()=>Orbit.modules.renovaciones.campana());
  await page.waitForSelector('#renewal-campaign-v1200 [data-prepare]',{timeout:10000});
  await page.evaluate(id=>{
