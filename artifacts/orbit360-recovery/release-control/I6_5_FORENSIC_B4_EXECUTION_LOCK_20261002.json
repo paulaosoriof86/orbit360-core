@@ -252,5 +252,18 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "b4003QaResidueAdjudicatorFix": {
+    "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_QA_RESIDUE_ADJUDICATOR_ROOTFIX_20261003.json",
+    "receiptBlobSha": "766508e675601a2b7acf53de7c1ab0495ecbd00e",
+    "failedRunId": 37093292179,
+    "workflowBlobSha": "14ba25acc689ad0e8e224fc393d92bf671dbe7ac",
+    "residueDisposition": "NOT_DELETED_FAIL_CLOSED",
+    "historicalQaDeletes": 0,
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

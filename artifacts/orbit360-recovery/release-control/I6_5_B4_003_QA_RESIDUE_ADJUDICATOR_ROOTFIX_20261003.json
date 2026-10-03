@@ -1,0 +1,51 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_QA_RESIDUE_ADJUDICATOR_ROOTFIX_V1",
+  "recordedAt": "2026-10-03T03:34:00Z",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B4-003",
+  "failedRunId": 37093292179,
+  "failedStep": "Adjudicate and clean exact historical B2 QA residue",
+  "failureCode": "B4_003_QA_RESIDUE_NOT_SAFE_TO_CLEAN",
+  "rootCause": "CONDITIONAL_FAIL_CLOSED_AUTHORIZATION_MISIMPLEMENTED_AS_GATE_FAILURE",
+  "provenInFailedRun": {
+    "exactHostingReadback": true,
+    "durableBrowserProof": true,
+    "cancellationProjectionConsistent": true,
+    "renewalRenderStable": true,
+    "syntheticFinalAbsent": true,
+    "qaResidueClassification": "AMBIGUOUS_FAIL_CLOSED"
+  },
+  "residueEvidence": {
+    "exactPolicyIds": [
+      "pol_mulsmxsk",
+      "pol_mulssmuz",
+      "pol_mulsxofx"
+    ],
+    "parentsAbsent": true,
+    "patternConsistent": true,
+    "noDependents": false,
+    "dependentRowsPerPolicy": {
+      "recibosEsperados": 2,
+      "carteraPrimas": 2
+    },
+    "dependentRowsTotal": 12,
+    "deleteAuthorized": false,
+    "disposition": "NOT_DELETED_FAIL_CLOSED"
+  },
+  "fix": {
+    "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "priorBlobSha": "a411d9fc688de093d0a3bc086a971c77b1c43215",
+    "fixedBlobSha": "14ba25acc689ad0e8e224fc393d92bf671dbe7ac",
+    "behavior": "Delete the three exact policies only when the frozen zero-dependent prerequisite is proven; otherwise emit auditable NOT_DELETED_FAIL_CLOSED and continue without deletion."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "operationalBusinessWrites": 0,
+    "historicalQaDeletes": 0,
+    "dependentDeletes": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_EXACT_PREVIEW_RETRY_AFTER_QA_ADJUDICATOR_FIX"
+}

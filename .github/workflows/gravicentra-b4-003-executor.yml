@@ -261,7 +261,16 @@ jobs:
           (async()=>{
             const proof=JSON.parse(fs.readFileSync(process.env.B4_003_PROOF,'utf8'));
             const q=proof.qaResidue||{},ids=['pol_mulsmxsk','pol_mulssmuz','pol_mulsxofx'];
-            if(q.classification!=='PROVEN_B2_QA_LINEAGE_NO_DEPENDENTS'||q.patternConsistent!==true||q.parentsAbsent!==true||q.noDependents!==true)throw Error('B4_003_QA_RESIDUE_NOT_SAFE_TO_CLEAN');
+            const safe=q.classification==='PROVEN_B2_QA_LINEAGE_NO_DEPENDENTS'&&q.patternConsistent===true&&q.parentsAbsent===true&&q.noDependents===true;
+            if(!safe){
+              const before=(q.rows||[]).filter(x=>ids.includes(x.id)).map(x=>({id:x.id,exists:x.exists===true,numero:x.numero||'',renuevaDe:x.renuevaDe||'',dependentTotal:Number(x.dependentTotal||0),dependents:x.dependents||{}}));
+              if(before.length!==ids.length||before.some(x=>x.exists!==true))throw Error('B4_003_QA_RESIDUE_ADJUDICATION_INCOMPLETE');
+              const authority={status:'CONDITIONAL_FAIL_CLOSED_NO_DELETE',exactPolicyIds:ids,proofClassification:q.classification,prerequisiteSatisfied:false,operationalBusinessWrite:false};
+              const after=before.map(x=>({id:x.id,exists:true,deleted:false}));
+              fs.writeFileSync(process.env.B4_003_QA_CLEANUP,JSON.stringify({schema:'GRAVICENTRA_I6_5_B4_003_B2_QA_RESIDUE_ADJUDICATION_V1',recordedAt:new Date().toISOString(),status:'NOT_DELETED_FAIL_CLOSED',authority,before,after,deletedCount:0,dependentTotal:before.reduce((s,x)=>s+x.dependentTotal,0),realOperationalRowsDeleted:0,reimport:false,live:false},null,2)+'\n');
+              console.log('B4_003_QA_RESIDUE_FAIL_CLOSED_NO_DELETE=PASS');
+              return;
+            }
             const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:process.env.PROJECT_ID});
             const db=getFirestore(app),base=db.collection('tenants').doc(process.env.TENANT_HINT).collection('data').doc('polizas').collection('items');
             const before=[];
@@ -306,7 +315,7 @@ jobs:
         run: |
           set -euo pipefail
           RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_20261003.json"
-          QA_RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B4_003_B2_QA_RESIDUE_CLEANUP_20261003.json"
+          QA_RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B4_003_B2_QA_RESIDUE_ADJUDICATION_20261003.json"
           export RECEIPT QA_RECEIPT
           REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
           test "$REMOTE" = "$CANDIDATE_SOURCE_SHA"
@@ -314,15 +323,17 @@ jobs:
           QA_BLOB=$(git hash-object "$QA_RECEIPT"); export QA_BLOB
           node - <<'NODE'
           const fs=require('node:fs'),p=JSON.parse(fs.readFileSync(process.env.B4_PROOF,'utf8')),q=JSON.parse(fs.readFileSync(process.env.B4_QA_CLEANUP,'utf8'));
-          if(p.status!=='PASS'||p.syntheticFinalAbsent!==true||q.status!=='PASS'||q.deletedCount!==3)throw Error('B4_003_PROOF_NOT_PASS');
-          const rr={schema:'GRAVICENTRA_I6_5_B4_003_MACHINE_PASS_V1',recordedAt:new Date().toISOString(),status:'PASS',findingId:'B4-003',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,channelId:process.env.B4_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactHostingReadback:true,assertions:p.assertions,renewalRenderStability:p.renewalRenderStability,qaResidue:p.qaResidue,qaResidueCleanupReceiptPath:process.env.QA_RECEIPT,qaResidueCleanupReceiptBlobSha:process.env.QA_BLOB,syntheticQaWrites:p.syntheticWrites||0,cleanupWrites:p.cleanupWrites||0,syntheticFinalAbsent:p.syntheticFinalAbsent===true,pageErrors:p.pageErrors||[],consoleErrors:p.consoleErrors||[],operationalBusinessWrites:0,reimport:false,livePromoted:false,nextAction:'B4_004_SINIESTROS_CRONOGRAMA_DIAGNOSTIC'};
+          const safe=p.qaResidue?.classification==='PROVEN_B2_QA_LINEAGE_NO_DEPENDENTS';
+          const adjudicated=(safe&&q.status==='PASS'&&q.deletedCount===3)||(!safe&&q.status==='NOT_DELETED_FAIL_CLOSED'&&q.deletedCount===0);
+          if(p.status!=='PASS'||p.syntheticFinalAbsent!==true||!adjudicated)throw Error('B4_003_PROOF_NOT_PASS');
+          const rr={schema:'GRAVICENTRA_I6_5_B4_003_MACHINE_PASS_V1',recordedAt:new Date().toISOString(),status:'PASS',findingId:'B4-003',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,channelId:process.env.B4_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactHostingReadback:true,assertions:p.assertions,renewalRenderStability:p.renewalRenderStability,qaResidue:p.qaResidue,qaResidueDisposition:q.status,qaResidueDeletedCount:q.deletedCount,qaResidueAdjudicationReceiptPath:process.env.QA_RECEIPT,qaResidueAdjudicationReceiptBlobSha:process.env.QA_BLOB,syntheticQaWrites:p.syntheticWrites||0,cleanupWrites:p.cleanupWrites||0,syntheticFinalAbsent:p.syntheticFinalAbsent===true,pageErrors:p.pageErrors||[],consoleErrors:p.consoleErrors||[],operationalBusinessWrites:0,reimport:false,livePromoted:false,nextAction:'B4_004_SINIESTROS_CRONOGRAMA_DIAGNOSTIC'};
           fs.writeFileSync(process.env.RECEIPT,JSON.stringify(rr,null,2)+'\n');
           NODE
           RECEIPT_BLOB=$(git hash-object "$RECEIPT"); export RECEIPT_BLOB
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.COMPOSITION,o=JSON.parse(fs.readFileSync(p,'utf8'));
           o.activeFindingId='B4-004';o.activeBlock='B4';o.currentBlock='B4';
-          o.b4003MachinePass={status:'PASS',path:process.env.RECEIPT,blobSha:process.env.RECEIPT_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',operationalBusinessWrites:0,syntheticFinalAbsent:true,qaResidueCleanupBlobSha:process.env.QA_BLOB};
+          o.b4003MachinePass={status:'PASS',path:process.env.RECEIPT,blobSha:process.env.RECEIPT_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',operationalBusinessWrites:0,syntheticFinalAbsent:true,qaResidueAdjudicationBlobSha:process.env.QA_BLOB};
           o.b4Execution={...(o.b4Execution||{}),status:'B4_ACTIVE_B4_004_READONLY_DIAGNOSTIC',activeFindingId:'B4-004',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',noLive:true,noReimport:true,nextAction:'B4_004_SINIESTROS_CRONOGRAMA_DIAGNOSTIC'};
           fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
           NODE
@@ -330,7 +341,7 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.FINDINGS,o=JSON.parse(fs.readFileSync(p,'utf8'));
           const f=(o.findings||[]).find(x=>x.id==='B4-003'),n=(o.findings||[]).find(x=>x.id==='B4-004');if(!f||!n)throw Error('B4_FINDING_MISSING');
-          Object.assign(f,{status:'CLOSED_PASS_MACHINE',blocking:false,nextAction:'NONE_CLOSED',machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB,qaResidueCleanupReceiptPath:process.env.QA_RECEIPT,qaResidueCleanupReceiptBlobSha:process.env.QA_BLOB});
+          Object.assign(f,{status:'CLOSED_PASS_MACHINE',blocking:false,nextAction:'NONE_CLOSED',machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB,qaResidueAdjudicationReceiptPath:process.env.QA_RECEIPT,qaResidueAdjudicationReceiptBlobSha:process.env.QA_BLOB});
           Object.assign(n,{status:'ACTIVE_READONLY_DIAGNOSTIC',blocking:true,nextAction:'B4_004_SINIESTROS_CRONOGRAMA_DIAGNOSTIC'});
           fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
           NODE
