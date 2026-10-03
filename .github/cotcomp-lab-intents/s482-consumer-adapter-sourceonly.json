@@ -1,0 +1,12 @@
+{
+  "schemaVersion":"ays-cotcomp-s482-consumer-adapter-sourceonly-intent-v1.0",
+  "authorization":"S482_SOURCE_ONLY_GRAVICENTRA_CONSUMER_ADAPTER",
+  "authorizedSourceParent":"b3e0eca467068ec59a0c604b7a1b095aaa711a5e",
+  "authority":"GRAVICENTRA",
+  "transport":"SYNTHETIC_ONLY",
+  "firebaseReads":false,
+  "firebaseWrites":false,
+  "providerOrRater":false,
+  "production":false,
+  "deploy":false
+}
