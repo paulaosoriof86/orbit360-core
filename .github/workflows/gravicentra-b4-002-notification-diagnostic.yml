@@ -1,0 +1,131 @@
+name: Gravicentra B4-002 Notification Diagnostic
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - '.github/workflows/gravicentra-b4-002-notification-diagnostic.yml'
+      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gravicentra-b4-002-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  b4-002-readonly-diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve B4-002 diagnostic mode
+        id: mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          git reset --hard "origin/$GITHUB_REF_NAME"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const run=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_002_DIAGNOSTIC'
+            && c.currentB4?.status==='B4_ACTIVE_B4_002_READONLY_DIAGNOSTIC'
+            && c.currentB4?.activeFindingId==='B4-002'
+            && c.currentB4?.noLive===true
+            && c.currentB4?.noReimport===true;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
+          console.log('B4_002_DIAGNOSTIC_MODE='+(run?'RUN':'NOOP'));
+          NODE
+
+      - name: Governance preflight
+        if: steps.mode.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+
+      - name: Install backend dependencies
+        if: steps.mode.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          cd functions
+          npm ci --ignore-scripts --no-audit --no-fund >/dev/null
+
+      - name: Prepare read-only service account
+        if: steps.mode.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b4-002-auth"
+          mkdir -p "$ROOT"
+          export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          for i,k in enumerate(['SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT']):
+              raw=os.environ.get(k,'')
+              if not raw: continue
+              try: d=json.loads(raw)
+              except Exception: continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/'service-account.json'
+                  p.write_text(json.dumps(d))
+                  p.chmod(0o600)
+                  print(str(p))
+                  break
+          else:
+              raise SystemExit('B4_002_SERVICE_ACCOUNT_NOT_FOUND')
+          PY
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$ROOT/service-account.json" >> "$GITHUB_ENV"
+
+      - name: Execute read-only notification diagnostic
+        if: steps.mode.outputs.run == 'true'
+        env:
+          B4_002_DIAGNOSTIC_OUT: ${{ runner.temp }}/b4-002-notification-diagnostic.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-002-notification-diagnostic.cjs
+          test -s "$B4_002_DIAGNOSTIC_OUT"
+
+      - name: Upload diagnostic evidence
+        if: steps.mode.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-002-notification-diagnostic-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-002-notification-diagnostic.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Freeze read-only diagnostic receipt
+        if: steps.mode.outputs.run == 'true'
+        env:
+          B4_002_DIAGNOSTIC_OUT: ${{ runner.temp }}/b4-002-notification-diagnostic.json
+        run: |
+          set -euo pipefail
+          cp "$B4_002_DIAGNOSTIC_OUT" "$RECEIPT"
+          git config user.name "gravicentra-release-bot"
+          git config user.email "gravicentra-release-bot@users.noreply.github.com"
+          git add "$RECEIPT"
+          if git diff --cached --quiet; then
+            echo "B4_002_RECEIPT_UNCHANGED"
+            exit 0
+          fi
+          git commit -m "diag(i6.5 B4-002): freeze post-commit notification evidence"
+          git push origin "HEAD:$GITHUB_REF_NAME"
