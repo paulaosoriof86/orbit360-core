@@ -195,10 +195,26 @@ Orbit.modules = Orbit.modules || {};
     const rows=policies(60);
     const b=modal('renewal-campaign-v1200','Preparar campaña',`<div class="cfg-note" style="margin-bottom:12px">Esta acción prepara seguimientos y los registra. No envía WhatsApp ni correo hasta que el canal esté conectado y verificado.</div>${rows.length?rows.map(p=>row(p,true)).join(''):'<div class="empty">No hay renovaciones dentro de 60 días.</div>'}`,rows.length?'<button class="btn primary" data-prepare>Preparar seguimientos</button>':'');
     const btn=b.querySelector('[data-prepare]');if(!btn)return;
-    btn.onclick=()=>{
+    btn.onclick=async()=>{
       const ids=Array.from(b.querySelectorAll('[data-ren]:checked')).map(x=>x.dataset.ren),date=today();
-      ids.forEach(id=>{const p=S().get('polizas',id),c=p&&S().get('clientes',p.clienteId);if(!p)return;S().update('polizas',p.id,{renovacionSeguimientoPreparado:date,renovacionCanalEstado:'pendiente_conexion'});S().insert('actividades',{id:'act_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,tipo:'renovacion',icon:'📤',fecha:date,titulo:'Seguimiento de renovación preparado',detalle:'Pendiente de canal conectado · '+p.numero+' · '+(c&&c.nombre||'')});});
-      b.remove();U.toast(ids.length+' seguimiento(s) preparados; no enviados');const h=document.getElementById('host');if(h)mod.render(h);
+      if(!ids.length)return U.toast('Selecciona al menos una póliza.');
+      if(!S().batchDurable)return U.toast('Persistencia canónica no disponible.');
+      const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
+      try{
+        const mutations=[];
+        ids.forEach(id=>{
+          const p=S().get('polizas',id),c=p&&S().get('clientes',p.clienteId);if(!p)return;
+          mutations.push({action:'update',collection:'polizas',id:p.id,payload:{renovacionSeguimientoPreparado:date,renovacionCanalEstado:'pendiente_conexion'}});
+          const activityId='act_ren_'+String(p.id).replace(/[^A-Za-z0-9._:-]/g,'_')+'_'+date.replace(/-/g,'');
+          const activity={id:activityId,tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,tipo:'renovacion',icon:'📤',fecha:date,titulo:'Seguimiento de renovación preparado',detalle:'Pendiente de canal conectado · '+p.numero+' · '+(c&&c.nombre||'')};
+          mutations.push({action:S().get('actividades',activityId)?'update':'insert',collection:'actividades',id:activityId,payload:activity});
+        });
+        for(let i=0;i<mutations.length;i+=80)await S().batchDurable(mutations.slice(i,i+80));
+        b.remove();U.toast(ids.length+' seguimiento(s) preparados y confirmados; no enviados');const h=document.getElementById('host');if(h)mod.render(h);
+      }catch(error){
+        btn.disabled=false;btn.textContent=original;
+        U.toast('No fue posible confirmar la preparación. No se registró un falso éxito.');
+      }
     };
   }
 

@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_CAUSAL_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "sourceHeadBefore": "78a445cb555a8802ea4c12ecd26c664916224b9a",
+  "diagnostic": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
+    "blobSha": "25c3c9cb2479d933bc362fe4dfd8616d100b78ed"
+  },
+  "scopeAmendment": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SOURCE_SCOPE_AMENDMENT_20261003.json",
+    "blobSha": "1845e918522d874ac3129754528a78b3c420806a"
+  },
+  "rootCauses": [
+    "RENEWALS_CANCELATIONS_CRITICAL_WRITES_COMPLETE_UI_BEFORE_SERVER_READBACK",
+    "CANCELATION_RECOVERY_LINK_FIELDS_DROPPED_BY_CANONICAL_WORKFLOW_SANITIZER"
+  ],
+  "fixes": [
+    "Renewal campaign awaits canonical batchDurable readback before success.",
+    "Cancelation recovery writes and links await durable readback; modal stays open on failure.",
+    "Canonical workflow sanitizer preserves cancelacionId and recovery policy linkage.",
+    "No direct recovery notification is emitted before commit; B4-002 outbox remains post-commit owner."
+  ],
+  "productBlobs": {
+    "functions/product-ops-leads-domain.js": "221b9f10a91c7e0838737efaef1e49a98fed4987",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "d4592f8d9121975b830b90995d6a4d53d6db86ca",
+    "orbit360-platform/modules/cancelaciones.js": "f917ae2f2b72176c1c8ec917d51456b5bc80bbb1",
+    "orbit360-platform/index.html": "b0f69da7e6ddce459f2df2f5b5d3a06f2f046b07"
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "configWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

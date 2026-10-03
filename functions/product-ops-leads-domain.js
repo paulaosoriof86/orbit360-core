@@ -8,7 +8,7 @@ const { resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'orbit360-ops-leads-product-domain-v7-workflow-resolution-field-parity';
+const VERSION = 'orbit360-ops-leads-product-domain-v8-recovery-linkage-parity';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 const DEFAULT_STAGES = Object.freeze({
@@ -27,17 +27,17 @@ const ADMIN_ROLES = new Set(['superadmin','admintenant','direccion','admin','ope
 const SELF_SERVICE_ROLES = new Set(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial']);
 const MANAGE_PERMISSIONS = new Set(['ops_manage','leads_manage','gestiones_manage','workflow_manage']);
 const BUSINESS_MUTABLE_FIELDS = Object.freeze([
-  'nombre','tipo','email','telefono','asesorId','clienteId','pais','moneda','canal','producto','ramo','aseguradoraId',
+  'nombre','tipo','email','telefono','asesorId','clienteId','polizaId','cancelacionId','pais','moneda','canal','producto','ramo','aseguradoraId',
   'primaEst','prioridad','origen','proximoToque','descripcion','prob','cadenciaActiva','cadencia','nroCotizacion','decision',
   'bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto'
 ]);
 const MANAGEMENT_MUTABLE_FIELDS = Object.freeze([
-  'lista','tipo','titulo','clienteId','polizaId','negocioId','asesorId','aseguradoraId','ramo','pais','moneda','producto','estado','prioridad','vence',
+  'lista','tipo','titulo','clienteId','polizaId','negocioId','cancelacionId','asesorId','aseguradoraId','ramo','pais','moneda','producto','estado','prioridad','vence',
   'proximaAccion','checklist','nota','notas','origen','bitacora','comentarios','creado','actualizado','resultado',
   'adjuntos','documentoCargaPendiente','documentoCargaFallida'
 ]);
-const BUSINESS_CREATE_EXTRA_FIELDS = Object.freeze(['prob','proximoToque','descripcion','cadenciaActiva','cadencia','nroCotizacion','decision','bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto']);
-const MANAGEMENT_CREATE_EXTRA_FIELDS = Object.freeze(['ramo','pais','moneda','producto','vence','proximaAccion','checklist','notas','bitacora','comentarios','creado','actualizado','resultado','adjuntos','documentoCargaPendiente','documentoCargaFallida']);
+const BUSINESS_CREATE_EXTRA_FIELDS = Object.freeze(['polizaId','cancelacionId','prob','proximoToque','descripcion','cadenciaActiva','cadencia','nroCotizacion','decision','bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto']);
+const MANAGEMENT_CREATE_EXTRA_FIELDS = Object.freeze(['cancelacionId','ramo','pais','moneda','producto','vence','proximaAccion','checklist','notas','bitacora','comentarios','creado','actualizado','resultado','adjuntos','documentoCargaPendiente','documentoCargaFallida']);
 const ISSUANCE_MANAGEMENT_FIELDS = Object.freeze(['workflowType','requestKey','operationId','issuanceMode','sourcePolicyId','renewalManagementId','pais','moneda','producto','acceptedOffer','acceptedConfirmed','emissionStage','requiereInspeccion','documentosCompletos','requiereValidacion','validacionAlertas','policyCreatedId','policyNumber','documentRef','resueltaAt','nuevaPolizaId','emisionGestionId']);
 const RENEWAL_MANAGEMENT_FIELDS = Object.freeze(['workflowType','renewalAction','sourcePolicyId','acceptedConfirmed','clientApprovalAt','clientApprovalNote','quoteContext','directRenewalPolicyId','issuanceRequestId','nuevaPolizaId','emisionGestionId']);
 const DELETE_AUDIT_FIELDS = Object.freeze(['deleted','eliminado','archivado','deletedAt','eliminadoAt','deleteReason','motivoEliminacion','deletedByRole','deletedByUid','deletedByEmail','estadoEliminacion','deletedParentCollection','deletedParentId']);

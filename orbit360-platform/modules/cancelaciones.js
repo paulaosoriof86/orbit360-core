@@ -145,6 +145,8 @@ Orbit.modules.cancelaciones = (function () {
       del.disabled = false;
     });
     back.querySelector('#cx-save').addEventListener('click', async () => {
+      const save = back.querySelector('#cx-save');
+      if (save.disabled) return;
       const rec = back.querySelector('#cx-rec').value;
       const nota = back.querySelector('#cx-nota').value.trim();
       let motivo = nota;
@@ -152,48 +154,58 @@ Orbit.modules.cancelaciones = (function () {
         motivo = await Orbit.ui.prompt('Motivo obligatorio para marcar la recuperación como ' + rec + ':', { title: 'Motivo de recuperación' });
         if (!motivo) return;
       }
+      if (!S().updateDurable || !S().insertDurable) return U.toast('Persistencia canónica no disponible.');
       const fecha = hoy();
       const patch = { recuperacion: rec, recuperada: rec === 'Recuperada', notaRecuperacion: nota || motivo };
-      S().update('cancelaciones', canId, patch);
-      if (c.clienteId) S().insert('actividades', { id: 'act' + Date.now(), clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'recuperacion', icon: rec === 'Recuperada' ? '✅' : '♻', fecha, titulo: 'Recuperación: ' + rec, detalle: (p ? p.numero + ' · ' : '') + (nota || motivo || rec) });
-      if (c.clienteId && ACTIVAS.includes(rec)) {
-        const existente = findNegocio(Object.assign({}, c, patch));
-        if (existente) {
-          const notas = (existente.notas ? existente.notas + '\n' : '') + '[' + fecha + '] ' + (nota || rec);
-          S().update('negocios', existente.id, { etapa: existente.etapa, nota: nota || rec, notas, actualizado: fecha, cancelacionId: canId });
-          S().update('cancelaciones', canId, { recuperacionNegocioId: existente.id });
-        } else {
-          const prox = new Date(); prox.setDate(prox.getDate() + 2);
-          const etapaMap = { 'Pendiente de contacto': 'nuevo', 'Llamada de retención agendada': 'contactado', 'Oferta de mejora enviada': 'propuesta', 'En negociación': 'negociacion' };
-          const neg = {
-            id: 'neg' + Date.now().toString().slice(-7), nombre: (cli ? cli.nombre : 'Cliente') + ' · recuperación', tipo: cli ? cli.tipo : 'Persona',
-            etapa: etapaMap[rec] || 'contactado', prob: 30, asesorId: c.asesorId, canal: 'Cliente actual/antiguo',
-            pais: cli ? cli.pais : 'GT', moneda: cli ? cli.moneda : 'GTQ', producto: p ? p.producto : 'Por definir', ramo: p ? p.ramo : 'Auto',
-            aseguradoraId: c.aseguradoraId || (p ? p.aseguradoraId : ''), primaEst: p ? (p.prima || 0) : 0, prioridad: 'Alta',
-            clienteId: c.clienteId, polizaId: c.polizaId, cancelacionId: canId, proximoToque: prox.toISOString().slice(0, 10),
-            checklist: [], nota: nota || rec, notas: nota || '', descripcion: 'Recuperación de póliza cancelada ' + (p ? p.numero : ''),
-            bitacora: [{ ts: fecha + ' 09:00', user: 'Equipo', campo: 'Creación', de: '', a: 'Recuperación desde cancelación', origen: 'cancelaciones' }],
-            comentarios: [], origen: 'Recuperación', creado: fecha, actualizado: fecha, archivado: false
-          };
-          S().insert('negocios', neg);
-          S().update('cancelaciones', canId, { recuperacionNegocioId: neg.id });
-          if (Orbit.ciclo && Orbit.ciclo.notify) { try { Orbit.ciclo.notify({ titulo: 'Recuperación pendiente', para: cli ? cli.nombre : '', canal: 'in-app' }); } catch (e) {} }
+      const original = save.textContent; save.disabled = true; save.textContent = 'Guardando…';
+      try {
+        await S().updateDurable('cancelaciones', canId, patch);
+        if (c.clienteId) {
+          const activityId = 'act_rec_' + String(canId).replace(/[^A-Za-z0-9._:-]/g, '_');
+          const activity = { id: activityId, clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'recuperacion', icon: rec === 'Recuperada' ? '✅' : '♻', fecha, titulo: 'Recuperación: ' + rec, detalle: (p ? p.numero + ' · ' : '') + (nota || motivo || rec) };
+          if (S().get('actividades', activityId)) await S().updateDurable('actividades', activityId, activity);
+          else await S().insertDurable('actividades', activity);
         }
-      } else if (c.clienteId && rec === 'Recuperada') {
-        const existenteG = findGestion(Object.assign({}, c, patch));
-        if (existenteG) {
-          const notas = (existenteG.notas ? existenteG.notas + '\n' : '') + '[' + fecha + '] Recuperación confirmada · ' + (motivo || nota || 'Cliente recuperado');
-          S().update('gestiones', existenteG.id, { notas, estado: existenteG.estado || 'Pendiente', cancelacionId: canId });
-          S().update('cancelaciones', canId, { recuperacionGestionId: existenteG.id });
-        } else if (Orbit.ciclo && Orbit.ciclo.crearGestion) {
-          try {
-            const res = Orbit.ciclo.crearGestion({ tipo: 'Reemisión por recuperación', titulo: 'Reemisión: ' + (p ? p.numero : c.clienteId), clienteId: c.clienteId, polizaId: c.polizaId, asesorId: c.asesorId, nota: motivo || nota || 'Cliente recuperado', origen: 'cancelaciones', cancelacionId: canId });
-            if (res && res.id) S().update('cancelaciones', canId, { recuperacionGestionId: res.id });
-          } catch (e) {}
+        if (c.clienteId && ACTIVAS.includes(rec)) {
+          const existente = findNegocio(Object.assign({}, c, patch));
+          if (existente) {
+            const notas = (existente.notas ? existente.notas + '\n' : '') + '[' + fecha + '] ' + (nota || rec);
+            await S().updateDurable('negocios', existente.id, { etapa: existente.etapa, nota: nota || rec, notas, actualizado: fecha, cancelacionId: canId, polizaId: c.polizaId });
+            await S().updateDurable('cancelaciones', canId, { recuperacionNegocioId: existente.id });
+          } else {
+            const prox = new Date(); prox.setDate(prox.getDate() + 2);
+            const etapaMap = { 'Pendiente de contacto': 'nuevo', 'Llamada de retención agendada': 'contactado', 'Oferta de mejora enviada': 'propuesta', 'En negociación': 'negociacion' };
+            const neg = {
+              id: 'neg_rec_' + String(canId).replace(/[^A-Za-z0-9._:-]/g, '_'), nombre: (cli ? cli.nombre : 'Cliente') + ' · recuperación', tipo: cli ? cli.tipo : 'Persona',
+              etapa: etapaMap[rec] || 'contactado', prob: 30, asesorId: c.asesorId, canal: 'Cliente actual/antiguo',
+              pais: cli ? cli.pais : 'GT', moneda: cli ? cli.moneda : 'GTQ', producto: p ? p.producto : 'Por definir', ramo: p ? p.ramo : 'Auto',
+              aseguradoraId: c.aseguradoraId || (p ? p.aseguradoraId : ''), primaEst: p ? (p.prima || 0) : 0, prioridad: 'Alta',
+              clienteId: c.clienteId, polizaId: c.polizaId, cancelacionId: canId, proximoToque: prox.toISOString().slice(0, 10),
+              checklist: [], nota: nota || rec, notas: nota || '', descripcion: 'Recuperación de póliza cancelada ' + (p ? p.numero : ''),
+              bitacora: [{ ts: fecha + ' 09:00', user: 'Equipo', campo: 'Creación', de: '', a: 'Recuperación desde cancelación', origen: 'cancelaciones' }],
+              comentarios: [], origen: 'Recuperación', creado: fecha, actualizado: fecha, archivado: false
+            };
+            await S().insertDurable('negocios', neg);
+            await S().updateDurable('cancelaciones', canId, { recuperacionNegocioId: neg.id });
+          }
+        } else if (c.clienteId && rec === 'Recuperada') {
+          const existenteG = findGestion(Object.assign({}, c, patch));
+          if (existenteG) {
+            const notas = (existenteG.notas ? existenteG.notas + '\n' : '') + '[' + fecha + '] Recuperación confirmada · ' + (motivo || nota || 'Cliente recuperado');
+            await S().updateDurable('gestiones', existenteG.id, { notas, estado: existenteG.estado || 'Pendiente', cancelacionId: canId });
+            await S().updateDurable('cancelaciones', canId, { recuperacionGestionId: existenteG.id });
+          } else if (Orbit.ciclo && Orbit.ciclo.crearGestion) {
+            const res = await Orbit.ciclo.crearGestion({ tipo: 'Reemisión por recuperación', titulo: 'Reemisión: ' + (p ? p.numero : c.clienteId), clienteId: c.clienteId, polizaId: c.polizaId, asesorId: c.asesorId, nota: motivo || nota || 'Cliente recuperado', origen: 'cancelaciones', cancelacionId: canId });
+            if (!res || !res.id) throw new Error('CANCELATION_RECOVERY_MANAGEMENT_READBACK_REQUIRED');
+            await S().updateDurable('cancelaciones', canId, { recuperacionGestionId: res.id });
+          }
         }
+        const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = rec === 'Recuperada' ? '✅ Cliente recuperado · reemisión confirmada en Ops' : rec === 'No recuperable' ? '⛔ Recuperación cerrada con motivo' : '♻ Acción de recuperación confirmada sin duplicar seguimiento'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+        close();
+      } catch (error) {
+        save.disabled = false; save.textContent = original;
+        U.toast('No fue posible confirmar la recuperación. No se registró un falso éxito.');
       }
-      const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = rec === 'Recuperada' ? '✅ Cliente recuperado · reemisión preparada en Ops' : rec === 'No recuperable' ? '⛔ Recuperación cerrada con motivo' : '♻ Acción de recuperación guardada sin duplicar seguimiento'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
-      close();
     });
   }
 
