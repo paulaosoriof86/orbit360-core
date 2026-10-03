@@ -52,6 +52,25 @@ async function seed(who){
  await ref('polizas',ids.cancelPolicy).set({...common,id:ids.cancelPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-CAN-'+run,estado:'Cancelada',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:800,primaNeta:700},{merge:false});proof.syntheticWrites++;
  await ref('cancelaciones',ids.cancelation).set({...common,id:ids.cancelation,clienteId:ids.client,polizaId:ids.cancelPolicy,asesorId:who.advisorId||'qa',fecha:startS,motivo:'Prueba sintética B4-003',valorPerdido:700,recuperacion:'Pendiente de contacto',recuperada:false},{merge:false});proof.syntheticWrites++;
 }
+async function applyLegal(page,who){
+ const scope='user:'+clean(who.email||who.uid);
+ await page.addInitScript(({scope})=>{try{
+   localStorage.setItem('orbit360_confidencialidad','qa-existing-legal-acceptance');
+   localStorage.setItem('orbit360_legal_aceptaciones',JSON.stringify({[scope]:{aceptado:true,version:'2.0',fecha:'2000-01-01T00:00:00.000Z',tipo:'interno',qaEphemeralPriorAcceptance:true}}));
+ }catch{}},{scope});
+}
+async function bootProduct(page,token){
+ await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+ const state=await page.evaluate(async token=>{
+   const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
+   if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);
+   const s=Orbit.productAppP0.status?.();
+   const activated=await Promise.resolve(s?.started?s:Orbit.productAppP0.activate());
+   try{Orbit.store?._ensureCollections?.(['clientes','polizas','cancelaciones','actividades','negocios','gestiones']);}catch{}
+   return{uid:String(c.auth.currentUser?.uid||''),started:activated?.started===true};
+ },token);
+ need(state.uid&&state.started,'B4_003_PRODUCT_SESSION_NOT_STARTED');
+}
 async function residueReadback(){
  const out=[];
  for(const id of residueIds){
@@ -108,13 +127,11 @@ try{
  page=await context.newPage();
  page.on('pageerror',e=>proof.pageErrors.push(clean(e?.message||e)));
  page.on('console',m=>{if(m.type()==='error')proof.consoleErrors.push(clean(m.text()));});
+ await applyLegal(page,who);
  await page.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
- await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});
- await page.evaluate(async token=>{
-   const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
-   if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);
- },token);
+ await bootProduct(page,token);
  await page.waitForFunction(id=>!!window.Orbit?.store?.get('polizas',id),ids.renewalPolicy,{timeout:30000});
+ await page.waitForFunction(id=>!!window.Orbit?.store?.get('cancelaciones',id),ids.cancelation,{timeout:30000});
  proof.assertions.authenticatedHydration=true;
 
  await page.evaluate(()=>{const h=document.getElementById('host');Orbit.modules.renovaciones.render(h);});
