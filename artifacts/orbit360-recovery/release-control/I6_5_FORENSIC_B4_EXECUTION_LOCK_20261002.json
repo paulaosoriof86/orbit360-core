@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-03",
-  "status": "B4_003_R13_CAUSAL_DIAGNOSTIC_COMPLETE_NARROW_SOURCE_FIX_AUTHORIZED",
+  "status": "B4_003_R13_CAUSAL_DIAGNOSTIC_EXPANDED_NARROW_SOURCE_FIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,7 +38,7 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "R13_CAUSAL_DIAGNOSTIC_COMPLETE_NARROW_SOURCE_FIX_AUTHORIZED",
+    "status": "R13_CAUSAL_DIAGNOSTIC_EXPANDED_NARROW_SOURCE_FIX_AUTHORIZED",
     "blocking": true,
     "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
     "humanVisualStatus": "REJECTED_R13",
@@ -64,7 +64,8 @@
       "orbit360-platform/modules/cancelaciones.js",
       "orbit360-platform/modules/polizas.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "functions/document-drive-domain.js"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -82,7 +83,9 @@
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": false,
     "realInsurerDriveWritesAuthorized": false,
-    "realClientDriveWritesAuthorized": false
+    "realClientDriveWritesAuthorized": false,
+    "drivePreviewFunctionDeploymentAuthorized": true,
+    "drivePreviewProductionFunctionsAuthorized": false
   },
   "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
   "compositionLock": {
@@ -91,7 +94,7 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "12fd1ce7ae09667823268d39a6e753b0b097752a"
+    "blobSha": "7ae79ed136245b8366ad78cfa368b4e8dbbaa8c2"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -385,7 +388,7 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "22ca21cebb91d40d4faeb506a282a8f2bc3f659d",
+    "blobSha": "d31e6561c2d1dac7f62c463099f98aa925f20a1e",
     "inventoryCount": 191,
     "attentionCount": 86,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
@@ -514,5 +517,16 @@
     "reimport": false,
     "livePromotion": false,
     "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS"
+  },
+  "r13DriveBackendDiagnostic": {
+    "status": "CAUSE_DEMONSTRATED_NARROW_BACKEND_FIX_AUTHORIZED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_DRIVE_BACKEND_CAUSAL_DIAGNOSTIC_20261003.json",
+    "receiptBlobSha": "9024c81170ac810c35b5ef461ef3700c6b35c226",
+    "rootCause": "DOCUMENT_DRIVE_BACKEND_CLIENT_ONLY_TARGET_AUTHORITY_DOES_NOT_SUPPORT_INSURER_ENTITY_OR_INSURER_DOC_REFS",
+    "allowedProductFiles": [
+      "functions/document-drive-domain.js"
+    ],
+    "previewFunctionsOnly": true,
+    "productionFunctions": false
   }
 }
