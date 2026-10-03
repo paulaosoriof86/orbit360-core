@@ -1,0 +1,162 @@
+name: CotComp S4.88 exact promoted frontend recovery LAB
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s488-exact-promoted-frontend-recovery-lab-20261003
+    paths:
+      - '.github/cotcomp-lab-intents/s488-exact-promoted-frontend-lab-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompExactPromotedPreviewS488
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompExactPromotedPreviewS488
+
+jobs:
+  s488-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.88 exact recovery intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s488-exact-promoted-frontend-lab-authorized.json
+          jq -e '
+            .authorization=="S488_DEPLOY_EXACT_PROMOTED_FRONTEND_RECOVERY" and
+            .projectId=="ays-orbit-360-lab" and
+            .functionName=="cotcompExactPromotedPreviewS488" and
+            .promotedFullSha=="50aa4190ae22ad13760f893b9bf37415abe35fb7327e034f66dc565b9b2cbf1d" and
+            .promotedCotCompSectionSha=="b97c01a27ac1ee6c16236b6582f0a411287ba3f88f960fca7278b37c35fbf8ed" and
+            .promotedCotCompCssSha=="bc0fe9e165c9a2007b6970e9d79157239fb252457895d2957e96b7ae53780dbf" and
+            .fixtureOnly==true and
+            .providerDeploymentAuthorized==false and
+            .cotcompRealTransportAuthorized==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus exact recovery safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-exact-promoted-preview-s488.js
+          node --check cotcomp-exact-promoted-preview-s488.test.js
+          node --test cotcomp-product-family-completeness-preview-s486.test.js
+          node --test cotcomp-exact-promoted-preview-s488.test.js
+
+      - name: Prepare exact LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s488/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s488/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Deploy only S4.88 preview function to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physically verify exact promoted frontend recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s488/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+
+          grep -q 'COTIZAR Y COMPARAR · GUATEMALA' "$E/page.html"
+          grep -q 'Compara con criterio, no solo por precio.' "$E/page.html"
+          grep -q 'cotizador.aysseguros.com · espacio de trabajo' "$E/page.html"
+          grep -q 'SESIÓN DE COTIZACIÓN' "$E/page.html"
+          grep -q 'Producto y contexto' "$E/page.html"
+          grep -q 'Datos mínimos' "$E/page.html"
+          grep -q 'Alternativas normalizadas' "$E/page.html"
+          grep -q 'Decisión acompañada' "$E/page.html"
+          grep -q 'Consultando mercado' "$E/page.html"
+          grep -q 'Recomendación' "$E/page.html"
+          grep -q 'background:#fff;color:#12110F' "$E/page.html"
+          grep -q 'background:#EDE8DE;color:#5E594F' "$E/page.html"
+          grep -q 'display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 18px;border-radius:12px' "$E/page.html"
+          grep -q 'Salud / gastos médicos' "$E/page.html"
+          grep -q 'Otros / no sé cuál necesito' "$E/page.html"
+
+          ! grep -q 'class="route"' "$E/page.html"
+          ! grep -q 'route-grid' "$E/page.html"
+          ! grep -q 'class="tab active"' "$E/page.html"
+
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+
+          jq -n --arg url "$COTCOMP_URL" '{
+            schemaVersion:"ays-cotcomp-s488-exact-promoted-frontend-physical-receipt-v1.0",
+            functionUrl:$url,
+            deployed:true,
+            promotedFullSha:"50aa4190ae22ad13760f893b9bf37415abe35fb7327e034f66dc565b9b2cbf1d",
+            promotedCotCompSectionSha:"b97c01a27ac1ee6c16236b6582f0a411287ba3f88f960fca7278b37c35fbf8ed",
+            promotedCotCompCssSha:"bc0fe9e165c9a2007b6970e9d79157239fb252457895d2957e96b7ae53780dbf",
+            recoveredApprovedChrome:true,
+            recoveredFourPhaseRail:true,
+            recoveredEightStageAutoFlow:true,
+            recoveredInlineProductControls:true,
+            productCompletenessExtendedInExistingControl:true,
+            fixtureOnly:true,
+            providerDeploymentAuthorized:false,
+            cotcompRealTransportAuthorized:false,
+            productionTouched:false
+          }' > "$E/S488_EXACT_PROMOTED_FRONTEND_PHYSICAL_RECEIPT.json"
+
+      - name: Upload sanitized S4.88 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s488-exact-promoted-frontend-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s488/evidence/S488_EXACT_PROMOTED_FRONTEND_PHYSICAL_RECEIPT.json
+            ${{ runner.temp }}/s488/evidence/page.html
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s488/firebase-service-account.json"
