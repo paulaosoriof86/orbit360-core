@@ -1,0 +1,93 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R9_INSURER_KNOWLEDGE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
+  "findingId": "B4-003",
+  "sourceHead": "92a315aa80a23358793b5524ca1f24596a71a00c",
+  "authorityLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_PREVIEW_AUTHORIZATION_LOCK_20261003.json",
+  "changes": {
+    "currentKnowledgeSummary": "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js",
+    "tenantPointerUpdated": true,
+    "multipleKnowledgeVersionsMerged": true,
+    "sourceBackedFactsVisible": true,
+    "multiProductRoadmapVisible": true,
+    "exactPreviewProofExtended": true,
+    "workflowContractExtended": true
+  },
+  "productBlobs": {
+    "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
+    "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
+    "orbit360-platform/modules/aseguradoras.js": "7bd0b6bcc93e3ebaac16200279061f87fef28946",
+    "tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs": "6aca2794acd554a5e637ff99163774a86842ffd3",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "f466593d39d0bcc6bca128d0060eebfd4d577456",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "87f645887208cd9a33d642945722401f4f9b7da7"
+  },
+  "library": {
+    "persistentManifest": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_ASEGURADORAS_MANIFIESTO_2026-10-03.md",
+    "currentSourcesRoot": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/",
+    "reusedQuoteCorpusRoot": "/A&S Transformacion Digital/CotComp/Evidencia Cotizaciones Reales/2026-09-2026/"
+  },
+  "facts": {
+    "AseGuate": {
+      "status": "SOURCE_AND_POLICY_SAMPLE_BACKED",
+      "issuanceExpense": "5% of net premium in AUTO-38594 sample",
+      "installment": "up to 6 cash-price; 8=5.37%; 10=8.42% in provided tariff; 10-payment policy confirms 8.42%",
+      "vat": "12% according to source composition"
+    },
+    "Columna": {
+      "status": "CALCULATOR_POLICY_AND_QUOTES_BACKED",
+      "issuanceExpense": "0 in reviewed vehicle sources",
+      "installment": "0 insurer surcharge in reviewed 10-payment policy and quote schedules",
+      "vat": "12% in reviewed sources",
+      "prontoPago": "variable by sample; not a universal constant"
+    },
+    "AXAColpatria": {
+      "status": "TWO_AUTO_POLICY_SAMPLES",
+      "expenses": "COP 20,000 observed in both Auto samples",
+      "vat": "19% on premium plus expenses in both samples",
+      "installment": "no insurer installment surcharge evidenced in these samples"
+    },
+    "Previsora": {
+      "status": "AUTO_POLICY_SAMPLE",
+      "expenses": "COP 0 in sample",
+      "vat": "19% on premium in sample",
+      "installment": "no insurer installment surcharge evidenced in sample"
+    },
+    "SBS": {
+      "status": "SOURCE_RECEIVED_EXTRACTION_BLOCKED_BY_PROTECTED_PDF",
+      "remediation": "Request unprotected/exported copy only if needed; never manual transcription."
+    }
+  },
+  "multiProduct": {
+    "GT": [
+      "Automóviles",
+      "Vida",
+      "Gastos Médicos",
+      "Incendio y Líneas Aliadas",
+      "Daños",
+      "Fianzas",
+      "Transporte",
+      "Responsabilidad Civil",
+      "Accidentes Personales"
+    ],
+    "CO": [
+      "Automóviles",
+      "Vida",
+      "Salud",
+      "Incendio y Terremoto",
+      "Daños",
+      "Cumplimiento",
+      "Transporte",
+      "Responsabilidad Civil",
+      "ARL / Riesgos Laborales"
+    ],
+    "acquisitionPolicy": "Just-in-time by insurer/product; missing authority stays fail-closed and visible."
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
