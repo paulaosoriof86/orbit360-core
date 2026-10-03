@@ -2549,5 +2549,14 @@
     "continuityRegisterBlobSha": "1412b64c01b53bcc8556d47cb235640cb0968990",
     "failedRunId": 37151246145,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "b4003R12pPerformanceDiagnostic": {
+    "status": "QA_INSTRUMENTED_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12P_PERFORMANCE_DIAGNOSTIC_INSTRUMENTATION_20261003.json",
+    "receiptBlobSha": "07434c553f903e430b1ac5bb43903dd376b15cad",
+    "proofBlobSha": "e9f7e5ff1e347132a4b2cac0c279595f113ba71e",
+    "failedRunId": 37152810698,
+    "productSourceChanged": false,
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   }
 }

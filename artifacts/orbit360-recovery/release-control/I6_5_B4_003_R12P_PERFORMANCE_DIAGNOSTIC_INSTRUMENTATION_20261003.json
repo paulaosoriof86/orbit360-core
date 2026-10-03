@@ -1,0 +1,15 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R12P_PERFORMANCE_DIAGNOSTIC_INSTRUMENTATION_V1",
+  "recordedAt": "2026-10-03",
+  "status": "QA_INSTRUMENTED_PENDING_EXACT_PREVIEW",
+  "findingId": "B4-003-R11-07-QUALITY-PERFORMANCE",
+  "failedRunId": 37152810698,
+  "failedCode": "B4_003_QUALITY_SYNC_RENDER_TOO_SLOW",
+  "purpose": "Measure GT/CO render time, Calidad row count, and Information Health rendered/total mismatch counts without weakening the 2500 ms gate.",
+  "proofBlobSha": "e9f7e5ff1e347132a4b2cac0c279595f113ba71e",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
