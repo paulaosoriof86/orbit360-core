@@ -11,7 +11,7 @@
     preferredInsurerCountryOrder: ['GT', 'CO'],
     insurersDefaultActive: true,
     insurerDeactivationPolicy: 'manual_with_reason_only',
-    knowledgeSummarySrc: 'data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20260716.js',
+    knowledgeSummarySrc: 'data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js',
     insurers: [
       {
         canonicalKey: 'gt_seguros_bam', internalId: 'ins_gt_seguros_bam',
