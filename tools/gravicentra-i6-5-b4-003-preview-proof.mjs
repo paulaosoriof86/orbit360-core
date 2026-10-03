@@ -183,6 +183,64 @@ try{
  need(proof.hydrationDiagnostic.backendCancelPolicyExists===true,'B4_003_CANCEL_POLICY_BACKEND_SEED_MISSING');
  need(proof.hydrationDiagnostic.cancelStorePresent===true,'B4_003_CANCELATION_HYDRATION_DIAGNOSTIC_FAIL');
  proof.assertions.authenticatedHydration=true;
+
+ await page.evaluate(()=>{ location.hash='#/aseguradoras'; });
+ await page.waitForFunction(()=>window.Orbit?.route?.key==='aseguradoras',null,{timeout:10000});
+ await page.waitForFunction(()=>Array.isArray(window.Orbit?.store?.all('aseguradoras'))&&window.Orbit.store.all('aseguradoras').length>0,null,{timeout:30000});
+ const knowledgeProbe=await page.evaluate(()=>{
+   const rows=Orbit.store.all('aseguradoras')||[];
+   const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+   const pick=re=>rows.find(r=>re.test(norm([r.nombre,r.canonicalName,r.displayName].filter(Boolean).join(' '))))||null;
+   const a=pick(/aseguate|guatemal/),c=pick(/columna/);
+   return{aseguateId:a&&a.id||'',columnaId:c&&c.id||'',count:rows.length};
+ });
+ need(!!knowledgeProbe.aseguateId,'B4_003_R9_ASEGUATE_DIRECTORY_ID_MISSING');
+ need(!!knowledgeProbe.columnaId,'B4_003_R9_COLUMNA_DIRECTORY_ID_MISSING');
+
+ await page.evaluate(id=>Orbit.modules.aseguradoras.ficha(id),knowledgeProbe.aseguateId);
+ await page.waitForSelector('#asg-ficha [data-tab="tarifas"]',{timeout:10000});
+ await page.click('#asg-ficha [data-tab="tarifas"]');
+ await page.waitForFunction(()=>{
+   const t=String(document.querySelector('#asg-ficha #af-body')?.innerText||'');
+   return t.includes('Conocimiento vigente y observado')&&t.includes('5% de prima neta')&&t.includes('8.42%');
+ },null,{timeout:20000});
+ const aseguateKnowledge=await page.evaluate(()=>{
+   const t=String(document.querySelector('#asg-ficha #af-body')?.innerText||'').replace(/\s+/g,' ').trim();
+   return{
+     sourceBacked:t.includes('Tasas AseGuate.xlsx')&&t.includes('Póliza AseGuate AUTO-38594'),
+     issuance:t.includes('5% de prima neta'),
+     installment:t.includes('5.37%')&&t.includes('8.42%'),
+     multiProduct:t.includes('Vida')&&t.includes('Gastos Médicos')&&t.includes('Fianzas')&&t.includes('Transporte'),
+     textSample:t.slice(0,2400)
+   };
+ });
+ need(aseguateKnowledge.sourceBacked===true,'B4_003_R9_ASEGUATE_SOURCE_REFERENCES_NOT_VISIBLE');
+ need(aseguateKnowledge.issuance===true&&aseguateKnowledge.installment===true,'B4_003_R9_ASEGUATE_PREMIUM_KNOWLEDGE_NOT_VISIBLE');
+ need(aseguateKnowledge.multiProduct===true,'B4_003_R9_MULTI_PRODUCT_ROADMAP_NOT_VISIBLE');
+
+ await page.evaluate(id=>{document.getElementById('asg-ficha')?.remove();Orbit.modules.aseguradoras.ficha(id);},knowledgeProbe.columnaId);
+ await page.waitForSelector('#asg-ficha [data-tab="tarifas"]',{timeout:10000});
+ await page.click('#asg-ficha [data-tab="tarifas"]');
+ await page.waitForFunction(()=>{
+   const t=String(document.querySelector('#asg-ficha #af-body')?.innerText||'');
+   return t.includes('Conocimiento vigente y observado')&&t.includes('0% en cotizador/pólizas')&&t.includes('0% en póliza muestra de 10 pagos');
+ },null,{timeout:20000});
+ const columnaKnowledge=await page.evaluate(()=>{
+   const t=String(document.querySelector('#asg-ficha #af-body')?.innerText||'').replace(/\s+/g,' ').trim();
+   return{
+     sourceBacked:t.includes('Cotizador VA 2026 V1.4.xlsx')&&t.includes('Póliza Columna VA-41977'),
+     zeroIssuance:t.includes('0% en cotizador/pólizas'),
+     zeroInstallment:t.includes('0% en póliza muestra de 10 pagos'),
+     textSample:t.slice(0,2400)
+   };
+ });
+ need(columnaKnowledge.sourceBacked===true,'B4_003_R9_COLUMNA_SOURCE_REFERENCES_NOT_VISIBLE');
+ need(columnaKnowledge.zeroIssuance===true&&columnaKnowledge.zeroInstallment===true,'B4_003_R9_COLUMNA_PREMIUM_KNOWLEDGE_NOT_VISIBLE');
+ proof.insurerKnowledge={knowledgeProbe,aseguate:aseguateKnowledge,columna:columnaKnowledge};
+ proof.assertions.insurerKnowledgeVisible=true;
+ proof.assertions.multiProductKnowledgeRoadmapVisible=true;
+ await page.evaluate(()=>document.getElementById('asg-ficha')?.remove());
+
  proof.visualScope=await page.evaluate(ids=>{
    const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';
    const countries=(selector,attr)=>Array.from(h.querySelectorAll(selector)).map(el=>String(el.getAttribute(attr)||'').toUpperCase()).filter(Boolean);
