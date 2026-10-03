@@ -1,0 +1,703 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-03T00:26:43.473Z",
+  "status": "READONLY_DIAGNOSTIC_COMPLETE",
+  "findingId": "B4-002",
+  "mode": "READ_ONLY_NO_PRODUCT_OR_DATA_WRITES",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "497b6af1678115377391d339b55d13e21e5980c0",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "runtime": {
+    "workflowEventCount": 110,
+    "notificationOutboxCount": 58,
+    "notificationStatusCounts": {
+      "pending_provider": 58
+    },
+    "orphanOutboxCount": 0,
+    "orphanOutbox": [],
+    "eventIdMismatchCount": 0,
+    "eventIdMismatch": [],
+    "duplicateEventIdCount": 0,
+    "duplicateEventIds": {},
+    "sample": [
+      {
+        "id": "evt_01ef0cb35f17f3a041e5dca7ae4c",
+        "eventId": "evt_01ef0cb35f17f3a041e5dca7ae4c",
+        "operation": "update_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muisiiy6",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T19:36:08.060Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_052b07259b102e8b548cbbffc561",
+        "eventId": "evt_052b07259b102e8b548cbbffc561",
+        "operation": "update_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muip2g02",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T17:59:37.849Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_0a65d2888e50e693410c3893e0ed",
+        "eventId": "evt_0a65d2888e50e693410c3893e0ed",
+        "operation": "resolve_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muf5oz0k",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-24T06:33:59.476Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_0c7d3c9adb00e78dea1182be7318",
+        "eventId": "evt_0c7d3c9adb00e78dea1182be7318",
+        "operation": "create_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muf3mu8a",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-24T05:36:20.096Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_194af36ce2f6256c6deecc5e9ce5",
+        "eventId": "evt_194af36ce2f6256c6deecc5e9ce5",
+        "operation": "update_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muitfwk6",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T20:02:04.334Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_1d2de1afc709be8b37e3be8d180e",
+        "eventId": "evt_1d2de1afc709be8b37e3be8d180e",
+        "operation": "resolve_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muf5izpq",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-24T06:29:23.695Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_1f217a56560f9609bd9494f98c4d",
+        "eventId": "evt_1f217a56560f9609bd9494f98c4d",
+        "operation": "update_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muhpdag2",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T01:20:19.734Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_1f8306eda3eeeaffe212c55130c1",
+        "eventId": "evt_1f8306eda3eeeaffe212c55130c1",
+        "operation": "resolve_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muitfwk6",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T20:02:06.567Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_2b881f4d02326d19916e13c8d8f2",
+        "eventId": "evt_2b881f4d02326d19916e13c8d8f2",
+        "operation": "update_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muf2gg48",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-24T05:03:20.011Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_30196dba271eadeecba5a319dcbe",
+        "eventId": "evt_30196dba271eadeecba5a319dcbe",
+        "operation": "resolve_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muihbm3z",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T14:22:59.909Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_39c38cc894a93aa6da9a37c54709",
+        "eventId": "evt_39c38cc894a93aa6da9a37c54709",
+        "operation": "create_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muf2gg48",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-24T05:03:19.938Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_42f031e65378d29aff89106193c7",
+        "eventId": "evt_42f031e65378d29aff89106193c7",
+        "operation": "create_management",
+        "entityType": "gestiones",
+        "entityId": "ges9861490",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-24T00:31:07.851Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_47d225a42971e26a58a6b41bab87",
+        "eventId": "evt_47d225a42971e26a58a6b41bab87",
+        "operation": "create_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muf5izpq",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-24T06:29:19.518Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_4beeba6262109b7dd2a4083ee32d",
+        "eventId": "evt_4beeba6262109b7dd2a4083ee32d",
+        "operation": "create_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muisz5rs",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T19:49:02.192Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_4d116b73c7dafbcd0180be600bcb",
+        "eventId": "evt_4d116b73c7dafbcd0180be600bcb",
+        "operation": "update_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muhoy0fs",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T01:08:25.165Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_4ffa716a471c5b20129418a74ef4",
+        "eventId": "evt_4ffa716a471c5b20129418a74ef4",
+        "operation": "create_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muisiiy6",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T19:36:07.057Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_53c99de1a5547201964f97eb4d10",
+        "eventId": "evt_53c99de1a5547201964f97eb4d10",
+        "operation": "resolve_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muf2gg48",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-24T05:03:22.754Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_5897beddae8306f26fbe91856e66",
+        "eventId": "evt_5897beddae8306f26fbe91856e66",
+        "operation": "update_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muirc02n",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T19:03:02.740Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_5a86d6ee2bc02456cd012eaecfc0",
+        "eventId": "evt_5a86d6ee2bc02456cd012eaecfc0",
+        "operation": "update_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muinhtub",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T17:15:38.926Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_622e2676382e472016e48c7adf7a",
+        "eventId": "evt_622e2676382e472016e48c7adf7a",
+        "operation": "create_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muhwejcn",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T04:37:12.228Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_6333d6087188d51e80029ec5fafd",
+        "eventId": "evt_6333d6087188d51e80029ec5fafd",
+        "operation": "create_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muh763wi",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-25T16:50:51.182Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_701f3664ee0cb6ba1bcdd50044ce",
+        "eventId": "evt_701f3664ee0cb6ba1bcdd50044ce",
+        "operation": "update_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muhwmpjz",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T04:43:33.927Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_70328661a2c15f3ac4b7c17b27ab",
+        "eventId": "evt_70328661a2c15f3ac4b7c17b27ab",
+        "operation": "create_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muirc02n",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T19:03:01.966Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_70a5966ad61e16d0b87dfb308299",
+        "eventId": "evt_70a5966ad61e16d0b87dfb308299",
+        "operation": "update_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muhwejcn",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T04:37:13.300Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      },
+      {
+        "id": "evt_7d49565d5a44591cbc04b604c3e1",
+        "eventId": "evt_7d49565d5a44591cbc04b604c3e1",
+        "operation": "resolve_management",
+        "entityType": "gestiones",
+        "entityId": "ges_emi_muisz5rs",
+        "status": "pending_provider",
+        "channels": [
+          "portal",
+          "in_app"
+        ],
+        "createdAt": "2026-09-26T19:49:06.795Z",
+        "attemptCount": null,
+        "lastError": "",
+        "nextAttemptAt": ""
+      }
+    ]
+  },
+  "sourceAudit": {
+    "canonicalOutboxCreatedInsideDomainTransaction": false,
+    "previewSuppressesExternalNotificationOutbox": true,
+    "files": [
+      {
+        "path": "functions/cotcomp-workflow-owner-patch.test.js",
+        "writesOutbox": true,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": false,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/@firebase/database/dist/index.cjs.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": true
+      },
+      {
+        "path": "functions/node_modules/@firebase/database/dist/index.esm.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": true
+      },
+      {
+        "path": "functions/node_modules/@firebase/database/dist/index.node.cjs.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": true
+      },
+      {
+        "path": "functions/node_modules/@firebase/database/dist/index.standalone.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": true
+      },
+      {
+        "path": "functions/node_modules/@firebase/database/dist/node-esm/index.node.esm.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": true
+      },
+      {
+        "path": "functions/node_modules/@firebase/database-compat/dist/index.standalone.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": true
+      },
+      {
+        "path": "functions/node_modules/@google-cloud/firestore/build/src/backoff.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/@google-cloud/firestore/build/src/index.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": true
+      },
+      {
+        "path": "functions/node_modules/@google-cloud/firestore/build/src/recursive-delete.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/@google-cloud/firestore/build/src/transaction.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/@google-cloud/firestore/node_modules/google-gax/build/src/normalCalls/retries.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-pick-first.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-round-robin.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-weighted-round-robin.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/firebase-functions/lib/common/providers/tasks.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/firebase-functions/lib/runtime/manifest.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": true
+      },
+      {
+        "path": "functions/node_modules/firebase-functions/lib/v1/cloud-functions.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/firebase-functions/lib/v2/providers/firestore.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": false,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/firebase-functions/lib/v2/providers/scheduler.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/node_modules/google-gax/build/src/normalCalls/retries.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/ops-advisor-inbox.js",
+        "writesOutbox": false,
+        "readsOutbox": true,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": false,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/ops-leads-domain.js",
+        "writesOutbox": false,
+        "readsOutbox": true,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": false,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/product-operational-domain.js",
+        "writesOutbox": false,
+        "readsOutbox": false,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": true,
+        "deliveryCompletionFields": false
+      },
+      {
+        "path": "functions/product-ops-leads-domain.js",
+        "writesOutbox": false,
+        "readsOutbox": true,
+        "firestoreTrigger": false,
+        "scheduledProcessor": false,
+        "retryFields": false,
+        "deliveryCompletionFields": false
+      }
+    ],
+    "processorOwners": [],
+    "retryOwners": [],
+    "statusVisibilityOwners": [
+      "functions/node_modules/@firebase/database/dist/index.cjs.js",
+      "functions/node_modules/@firebase/database/dist/index.esm.js",
+      "functions/node_modules/@firebase/database/dist/index.node.cjs.js",
+      "functions/node_modules/@firebase/database/dist/index.standalone.js",
+      "functions/node_modules/@firebase/database/dist/node-esm/index.node.esm.js",
+      "functions/node_modules/@firebase/database-compat/dist/index.standalone.js",
+      "functions/node_modules/@google-cloud/firestore/build/src/backoff.js",
+      "functions/node_modules/@google-cloud/firestore/build/src/index.js",
+      "functions/node_modules/@google-cloud/firestore/build/src/recursive-delete.js",
+      "functions/node_modules/@google-cloud/firestore/build/src/transaction.js",
+      "functions/node_modules/@google-cloud/firestore/node_modules/google-gax/build/src/normalCalls/retries.js",
+      "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-pick-first.js",
+      "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-round-robin.js",
+      "functions/node_modules/@grpc/grpc-js/build/src/load-balancer-weighted-round-robin.js",
+      "functions/node_modules/firebase-functions/lib/common/providers/tasks.js",
+      "functions/node_modules/firebase-functions/lib/runtime/manifest.js",
+      "functions/node_modules/firebase-functions/lib/v1/cloud-functions.js",
+      "functions/node_modules/firebase-functions/lib/v2/providers/scheduler.js",
+      "functions/node_modules/google-gax/build/src/normalCalls/retries.js",
+      "functions/product-operational-domain.js"
+    ],
+    "observedStatuses": [
+      "pending_provider"
+    ]
+  },
+  "assertions": {
+    "postCommitBoundaryRepresentedByTransactionalOutbox": false,
+    "duplicateOutboxDocumentsNotObserved": true,
+    "outboxEventReferentialIntegrity": true,
+    "dispatcherOwnerExists": false,
+    "retryOwnerExists": false,
+    "failureAndRetryVisibilityExists": true
+  },
+  "classification": "PRODUCT_BACKEND_NOTIFICATION_DELIVERY_GAP",
+  "causalConclusion": "The canonical domain writes a deterministic outbox atomically with the committed event, but no executable notificationOutbox dispatcher/retry owner with delivery failure visibility is present in the active functions source.",
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "configWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_002_CAUSAL_SOURCE_FIX_REQUIRED"
+}
