@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_PREVIEW_WRITE_ISOLATION_SCOPE_AMENDMENT_V1",
+  "recordedAt": "2026-10-03",
+  "status": "AUTHORIZED_CAUSAL_SCOPE_EXPANSION",
+  "findingId": "B4-003",
+  "rootCauseExtension": "GENERAL_DURABLE_STORE_WRITES_ON_HOSTING_PREVIEW_ROUTE_TO_PRODUCTION_CALLABLE",
+  "evidence": {
+    "browserOwner": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "backendOwner": "functions/product-operational-domain.js",
+    "observedContract": [
+      "Workflow writes select orbit360OpsLeadsCommandPreview on recognized Preview hosts.",
+      "General callDurable and batchDurable always select orbit360ProductOperationalCommand in us-central1, even on the same Preview host.",
+      "B4-003 renewal campaign and cancellation state/activity persistence use general durable writes, so exact Preview proof must not be allowed to touch the production callable."
+    ],
+    "existingPreviewBackend": "orbit360ProductOperationalCommandPreview exists in us-east1 but its synthetic guard only recognizes prior B3-004 fixtures."
+  },
+  "addedProductOwners": [
+    "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "functions/product-operational-domain.js"
+  ],
+  "requiredFix": [
+    "Route general durable calls and batches to orbit360ProductOperationalCommandPreview/us-east1 on recognized isolated Preview hosts.",
+    "Extend the existing preview-only synthetic guard to B4-003 IDs while retaining explicit __syntheticQa=true and fail-closed rejection for real records."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CAUSAL_SOURCE_FIX_R3_PREVIEW_ISOLATION"
+}
