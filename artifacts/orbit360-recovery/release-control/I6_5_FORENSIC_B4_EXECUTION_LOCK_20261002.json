@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-02",
-  "status": "B4_ACTIVE_B4_002_READONLY_DIAGNOSTIC",
+  "status": "B4_002_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,12 @@
   "activeFinding": {
     "id": "B4-002",
     "title": "Notifications and automations occur only after canonical commit.",
-    "status": "ACTIVE_READONLY_DIAGNOSTIC",
+    "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "blocking": true,
-    "nextAction": "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC"
+    "rootCause": "CANONICAL_OUTBOX_HAS_NO_EXECUTABLE_DISPATCH_RETRY_OWNER",
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
+    "diagnosticReceiptBlobSha": "12183afd6a7a71863e2cd8fd365a847383fc5bee",
+    "nextAction": "B4_002_CAUSAL_SOURCE_FIX"
   },
   "rules": {
     "preserveB1B2B3Pass": true,
@@ -57,13 +60,19 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
+    "allowedProductFiles": [
+      "functions/notification-outbox-processor.js",
+      "functions/bootstrap.js",
+      "functions/package.json",
+      "functions/ops-advisor-inbox.js"
+    ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
-    "syntheticQaScope": "B4-001 exact Preview: three synthetic gestiones + duplicate-create discriminant + mandatory cleanup"
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaScope": "B4-002 exact Preview only: isolated previewWorkflowEvents + previewNotificationOutbox + deterministic preview notification projection; mandatory cleanup; no operational collection writes."
   },
-  "nextAction": "B4_001_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_002_CAUSAL_SOURCE_FIX",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "5cbaa41bf542e5a8008cce87abd2ea524e37cf54"
@@ -85,7 +94,10 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
-    "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC"
+    "B4_002_MINIMAL_SOURCE_FIX_BOUND_TO_CANONICAL_COMPOSITION",
+    "B4_002_NOTIFICATION_PROCESSOR_CONTRACT_PASS",
+    "B4_002_EXACT_PREVIEW_POST_COMMIT_RETRY_FAILURE_IDEMPOTENCE_PASS",
+    "B4_002_SYNTHETIC_FINAL_ABSENT"
   ],
   "candidate": {
     "sourceSha": "18799ffbb2623dbfd28623774c41abef22f9f75a",
@@ -98,5 +110,23 @@
     "backendSourceDigest": "3970cb67659f54535e7cdb5f30bd5fdb732a6fbd47890140af63ad82ab054241",
     "bundleDigest": "431445527957a34b434cefba86b9b49cef02a2b7c3241ca3c978fd925e13db10",
     "exactReadback": true
+  },
+  "b4002Diagnostic": {
+    "status": "CAUSE_DEMONSTRATED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
+    "receiptBlobSha": "12183afd6a7a71863e2cd8fd365a847383fc5bee",
+    "workflowEventCount": 110,
+    "notificationOutboxCount": 58,
+    "allObservedOutboxPendingProvider": true,
+    "duplicateEventIdCount": 0,
+    "orphanOutboxCount": 0,
+    "transactionalOutbox": true,
+    "dispatcherOwnerExists": false,
+    "retryOwnerExists": false,
+    "failureAndRetryVisibilityExists": false,
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
