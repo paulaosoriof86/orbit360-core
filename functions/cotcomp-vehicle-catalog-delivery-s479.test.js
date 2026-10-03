@@ -39,8 +39,10 @@ function fixture(){
     catalogDigestSha256:s.EXPECTED_CATALOG_DIGEST,
     allowedSatTypes:[...s.ALLOWED_TYPES],
     entries:expanded,
-    publicSubsetDigestSha256:'a'.repeat(64)
+    sourceRawSha256:'ea15f79900e013bc3c397c23a154802fc2f62f8de3bf056b53003e03b85ec373',
+    publicSubsetDigestSha256:''
   };
+  catalog.publicSubsetDigestSha256=s.computePublicSubsetDigest(catalog);
   return catalog;
 }
 function mockReq(method='GET',query={},headers={}){
