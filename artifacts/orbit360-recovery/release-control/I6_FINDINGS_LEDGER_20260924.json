@@ -2803,7 +2803,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "SOURCE_FIXED_R10_QUOTE_AUTHORITY_RUNTIME_REACHABLE",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2815,7 +2815,7 @@
         "No empty module caused by alternate collection/owner or missing projection.",
         "Role/country scope, persistence/readback and regression are verified."
       ],
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2855,13 +2855,13 @@
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
       "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
-      "humanVisualStatus": "REJECTED_R6_REMEDIATION_ACTIVE",
+      "humanVisualStatus": "PENDING",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_20261003.json",
-      "machineProofReceiptBlobSha": "dc18efbd388479c4d801f5dd16b1cb5244b58874",
+      "machineProofReceiptBlobSha": "b9e0faee20d77d6fe11f5069d849d2e454c4f3a4",
       "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B2_QA_RESIDUE_ADJUDICATION_20261003.json",
-      "qaResidueAdjudicationReceiptBlobSha": "2246ee8256f6b7fc6b2ec5242f768095bd8c2570",
+      "qaResidueAdjudicationReceiptBlobSha": "1379630026d493194f9e0c6a1d19e6f3c70023be",
       "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R5_SOURCE_FIX_20261003.json",
       "visualRejectionReceiptBlobSha": "cc2b950989344acfdade4a38dcc537c088b1819a",
       "cumulativeFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
@@ -2902,7 +2902,7 @@
       "status": "NOT_STARTED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "WAIT_B4_003_R10_PAULA_VISUAL_PASS"
+      "nextAction": "WAIT_B4_003_PAULA_VISUAL"
     },
     {
       "id": "B4-005",

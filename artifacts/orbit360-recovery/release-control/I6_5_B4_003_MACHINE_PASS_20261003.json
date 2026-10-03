@@ -1,23 +1,27 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_MACHINE_PASS_V1",
-  "recordedAt": "2026-10-03T05:16:54.785Z",
+  "recordedAt": "2026-10-03T16:29:41.305Z",
   "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
   "findingId": "B4-003",
-  "sourceSha": "9ad8efe1b68589e57a5f6c8eb449690a75b31e14",
-  "buildId": "gi-i65-b4-9ad8efe1b685-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37099105781-v0dtjffb.web.app",
-  "channelId": "gi-i65-b4-37099105781",
-  "runId": 37099105781,
-  "artifactId": 11265602523,
-  "artifactDigest": "4a3c2b56f3997c641891d0bd9f309873e6e039fb956dcba2eafe983d078d1ff3",
-  "hostedPayloadDigest": "684ea74de61949ba4e9e9f71aea0dee85b8e60f9a721714368481d6149d17b58",
+  "sourceSha": "dccf7ac21cd6d4e914291787b356e3dfe18aa372",
+  "buildId": "gi-i65-b4-dccf7ac21cd6-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37136776942-5498wth2.web.app",
+  "channelId": "gi-i65-b4-37136776942",
+  "runId": 37136776942,
+  "artifactId": 11277749991,
+  "artifactDigest": "dabb1ddb59675f4a6633be49f5b93a5834cfbd8d722e93ea8527af9f0c743a12",
+  "hostedPayloadDigest": "95b4ac4f7956e32e6c1ad6e75bea4a96ba718726ecc54be7421b0bfda9aecd1d",
   "backendSourceDigest": "d1c2d3dc19a9120dd12c21346f99379c17ed016a417ad397aadad6e865db255d",
-  "bundleDigest": "2f91258a5328bad4d21b910675114f05265546417c463a1cf2092a1d53db4cb6",
+  "bundleDigest": "52f8479e89cee66e7125d70f4c1d5d98ff919b067c5e903694f7b35eee51077c",
   "exactHostingReadback": true,
   "assertions": {
     "qaResidueReadOnlyAdjudicated": true,
     "cancellationProjectionConsistent": true,
+    "quoteAuthorityContractHosted": true,
+    "manualFinancialInferenceRemoved": true,
     "authenticatedHydration": true,
+    "insurerKnowledgeVisible": true,
+    "multiProductKnowledgeRoadmapVisible": true,
     "cancelSelectedCountryScope": true,
     "renewalSelectedCountryScope": true,
     "cancelKpiDetails": true,
@@ -104,7 +108,7 @@
   "qaResidueDisposition": "NOT_DELETED_FAIL_CLOSED",
   "qaResidueDeletedCount": 0,
   "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B2_QA_RESIDUE_ADJUDICATION_20261003.json",
-  "qaResidueAdjudicationReceiptBlobSha": "2246ee8256f6b7fc6b2ec5242f768095bd8c2570",
+  "qaResidueAdjudicationReceiptBlobSha": "1379630026d493194f9e0c6a1d19e6f3c70023be",
   "syntheticQaWrites": 4,
   "cleanupWrites": 25,
   "syntheticFinalAbsent": true,
@@ -113,5 +117,29 @@
   "operationalBusinessWrites": 0,
   "reimport": false,
   "livePromoted": false,
+  "knowledgePreview": true,
+  "quoteAuthorityContractV1": true,
+  "insurerKnowledgeVisible": true,
+  "multiProductKnowledgeRoadmapVisible": true,
+  "insurerKnowledge": {
+    "knowledgeProbe": {
+      "aseguateId": "gt-aseguradora-guatemalteca",
+      "columnaId": "gt-seguros-columna",
+      "count": 31
+    },
+    "aseguate": {
+      "sourceBacked": true,
+      "issuance": true,
+      "installment": true,
+      "multiProduct": true,
+      "textSample": "FUENTES REGISTRADAS 0 PROPUESTAS RECIENTES 0 PENDIENTES DE REVISIÓN 0 REFERENCIAS DISPONIBLES 0 🧠 Tarifas y conocimiento Uso controlado: cada fuente se revisa por país, moneda, ramo y producto. Registrar un documento no habilita automáticamente Cotizador ni Comparativo. Mapeado (3) Validado (3) GT · GTQ · Vehículos · Seguro de vehículo · — · — · — · — · — · — · — Pendiente 1 doc(s) GT · GTQ · Vehículos · Seguro de vehículo · — · — · — · — · Automóvil · — · — Pendiente 1 doc(s) GT · GTQ · Vehículos · Seguro de vehículo · — · — · — · — · Microbús hasta 9 pasajeros · — · — Pendiente 1 doc(s) GT · GTQ · Automóviles · Vehículos · — · — · — · — · — · — · — Pendiente 3 doc(s) 🧠 Fuentes relacionadas y disponibles Tasas AseGuate.xlsx Mapeado · GT · GTQ · Vehículos · Seguro de vehículo Mapeado Cotización AseGuate automóvil.pdf Mapeado · GT · GTQ · Vehículos · Seguro de vehículo Mapeado Cotización AseGuate microbús hasta 9 pasajeros.pdf Mapeado · GT · GTQ · Vehículos · Seguro de vehículo Mapeado Tasas AseGuate.xlsx Mapeado · GT · GTQ · Automóviles · Vehículos Validado Cotización AseGuate Auto 2026-09-30 Mapeado · GT · GTQ · Automóviles · Vehículos Validado Póliza AseGuate AUTO-38594 Mapeado · GT · GTQ · Automóviles · Vehículos Validado Conocimiento vigente y observado Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo. Automóviles · Vehículos GT · GTQ · Fuentes 2026; revisar al recibir versión posterior Con evidencia Plan Premium · tasa 3.20% sobre valor asegurado Plan Premium · prima mínima Q1,800 + asistencia Plan Plus · tasa 4.00% sobre valor asegurado Plan Plus · prima mínima Q1,600 + recargo aplicable + asistencia Plan Plus · recargo por antigüedad 15% según condición del tarifario Plan Básico · prima mínima Q800 + asistencia Asistencia Q350 en los tres planes documentados Gastos de emisión 5% de prima neta Fraccionamiento Hasta 6 pagos al precio de contado; 8 pagos 5.37%; 10 pagos 8.42% sobre prima neta IVA 12%; en la póliza muestra grava prima neta + gastos de emisión + asistencia + financiamiento Visa/Cuotas Cotización muestra 3, 6 y 10 pagos; tratar separado del recargo de aseguradora cuando corresponda Fuentes: Tasas AseGuate.xlsx · Cotización AseGuate Auto 2026-09-30 · Póliza AseGuate "
+    },
+    "columna": {
+      "sourceBacked": true,
+      "zeroIssuance": true,
+      "zeroInstallment": true,
+      "textSample": "FUENTES REGISTRADAS 0 PROPUESTAS RECIENTES 0 PENDIENTES DE REVISIÓN 0 REFERENCIAS DISPONIBLES 0 🧠 Tarifas y conocimiento Uso controlado: cada fuente se revisa por país, moneda, ramo y producto. Registrar un documento no habilita automáticamente Cotizador ni Comparativo. Requiere validación (1) Validado (4) GT · GTQ · Vehículos · Seguro de vehículo · — · — · — · — · — · — · — Pendiente 1 doc(s) GT · GTQ · Automóviles · Vehículos · — · — · — · — · — · — · — Pendiente 3 doc(s) GT · GTQ · Automóviles · Motocicleta · — · — · — · — · — · — · — Pendiente 1 doc(s) 🧠 Fuentes relacionadas y disponibles Cotizador VA 2026 V1.4.xlsx Mapeado · GT · GTQ · Vehículos · Seguro de vehículo Requiere validación Cotizador VA 2026 V1.4.xlsx Mapeado · GT · GTQ · Automóviles · Vehículos Validado Cotización Columna CRV 2026-09-28 Mapeado · GT · GTQ · Automóviles · Vehículos Validado Cotización Columna Motocicleta 2026-09-28 Mapeado · GT · GTQ · Automóviles · Motocicleta Validado Póliza Columna VA-41977 Mapeado · GT · GTQ · Automóviles · Vehículos Validado Conocimiento vigente y observado Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo. Automóviles · Vehículos / Motocicleta GT · GTQ · Fuentes 2026; revisar al recibir versión posterior Con evidencia Gastos de emisión 0% en cotizador/pólizas y muestras revisadas de Vehículos Fraccionamiento de aseguradora 0% en póliza muestra de 10 pagos; cotizaciones 2/3/4/5/6/8/10/12 reconstruyen el mismo total IVA 12% sobre la prima neta en las muestras revisadas Pronto pago No es universal: se observó 5% de descuento en una cotización de motocicleta y 0% en otra muestra Visa Cuotas Hasta 12 pagos según cotización; no tratarlo automáticamente como recargo de la aseguradora Fuentes: Cotizador VA 2026 V1.4.xlsx · Cotización Columna CRV 2026-09-28 · Cotización Columna Motocicleta 2026-09-28 · Póliza Columna VA-41977 Las condiciones de pronto pago varían por perfil/producto. No hardcodear 5% global. Cobertura de conocimiento por producto La ficha no se limita a Automóviles. Los demás ramos se incorporan por aseguradora y producto conforme aportemos fuentes; lo no documentado permanece pendiente y no genera cálculos automáticos. Automóviles · Con evidencia actual Vida · Pendiente"
+    }
+  },
   "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
 }
