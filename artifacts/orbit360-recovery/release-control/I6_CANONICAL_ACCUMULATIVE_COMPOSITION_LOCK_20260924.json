@@ -196,7 +196,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "83562417b6be231ab7b8b1f5aa17ea0ae24133b2",
+    "orbit360-platform/index.html": "9152234459797addeb6d53127e12bc759197b9c2",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "7bd0b6bcc93e3ebaac16200279061f87fef28946",
     "orbit360-platform/modules/cancelaciones.js": "22b710bd31d6d42fd68d073946985ec391266dca",
@@ -2082,7 +2082,7 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_READY",
+    "status": "B4_003_SOURCE_FIXED_R10_RUNTIME_REACHABILITY_READY",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "lockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -2412,9 +2412,9 @@
     "livePromotionAuthorized": false
   },
   "b4003R10QuoteAuthority": {
-    "status": "SOURCE_FIXED_R10_QUOTE_AUTHORITY_PENDING_EXACT_PREVIEW",
+    "status": "SOURCE_FIXED_R10_QUOTE_AUTHORITY_RUNTIME_REACHABLE_PENDING_EXACT_PREVIEW",
     "authorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_INTEGRATION_LOCK_20261003.json",
-    "authorizationLockBlobSha": "868a78408791bea719f7d07f5d48a0874df1a8da",
+    "authorizationLockBlobSha": "1133970e390895a008d761f3936ff9901aea0342",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_SOURCE_FIX_20261003.json",
     "sourceFixReceiptBlobSha": "6400bb9447fa145b6fb8d7c42a1c7dfe4477a4d1",
     "contractPath": "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
@@ -2434,6 +2434,18 @@
     "candidateHeadAtRecompute": "e526507a6443ff116678c3b53355ca53af3c87bc",
     "exactProductFileCount": 94,
     "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "b4003R10RuntimeReachabilityRootFix": {
+    "status": "SOURCE_FIXED_R10_RUNTIME_REACHABILITY_PENDING_EXACT_PREVIEW",
+    "rootFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_20261003.json",
+    "rootFixReceiptBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
+    "indexBlobSha": "9152234459797addeb6d53127e12bc759197b9c2",
+    "productFileCount": 94,
+    "providerDeploymentAuthorized": false,
+    "cotcompRealTransportAuthorized": false,
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
