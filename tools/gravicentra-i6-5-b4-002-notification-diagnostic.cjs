@@ -1,13 +1,16 @@
 'use strict';
 const fs=require('node:fs');
 const pathmod=require('node:path');
-const {initializeApp,applicationDefault,getApps}=require('../functions/node_modules/firebase-admin/app');
-const {getFirestore}=require('../functions/node_modules/firebase-admin/firestore');
+const {createRequire}=require('node:module');
+
+const repoRoot=pathmod.resolve(__dirname,'..');
+const requireFunctions=createRequire(pathmod.join(repoRoot,'functions','package.json'));
+const {initializeApp,applicationDefault,getApps}=requireFunctions('firebase-admin/app');
+const {getFirestore}=requireFunctions('firebase-admin/firestore');
 
 const projectId=process.env.PROJECT_ID||'ays-orbit-360-lab';
 const tenantId=process.env.TENANT_HINT||'alianzas-soluciones';
 const outPath=process.env.B4_002_DIAGNOSTIC_OUT||'/tmp/b4-002-notification-diagnostic.json';
-const repoRoot=pathmod.resolve(__dirname,'..');
 
 function files(dir){
   const out=[];
