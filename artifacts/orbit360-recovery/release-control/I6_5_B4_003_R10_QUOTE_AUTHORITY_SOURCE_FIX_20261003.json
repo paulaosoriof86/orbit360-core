@@ -1,0 +1,84 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R10_QUOTE_AUTHORITY_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R10_QUOTE_AUTHORITY_PENDING_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "sourceHead": "719ea0dccb558197d96c4086549351482da772ff",
+  "authorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_INTEGRATION_LOCK_20261003.json",
+  "contractPath": "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
+  "executableContractPath": "orbit360-platform/core/quote-authority-contract-v1.js",
+  "changes": {
+    "singleQuoteDomainAuthority": "GRAVICENTRA",
+    "cotcompRole": "CONSUMER_PRESENTATION_SELECTION_NOT_FINANCIAL_ENGINE",
+    "p06StrictAuthorityPathAdded": true,
+    "p06SilentLegacyFallbackForCotcomp": false,
+    "fullTraceRequired": true,
+    "premiumAmountBasisPreserved": true,
+    "manualNetTaxInferenceRemoved": true,
+    "pdfNetTaxInferenceRemoved": true,
+    "automaticTaxCountryFallbackRemoved": true,
+    "comparisonPublicDefaultRanking": null,
+    "explicitSelectionRequired": true
+  },
+  "productBlobs": {
+    "orbit360-platform/core/quote-authority-contract-v1.js": "7fb49d51476f21456540b0b7a178e82675231562",
+    "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js": "1e3a5d79b4bdcba69f8de0737bf0df96d4cbd3d0",
+    "orbit360-platform/core/quote-comparison-contracts-v1203.js": "c3342d5fc94661a9f23563e4b1c644346dd10fb3",
+    "orbit360-platform/modules/cotizador-v1203-source-gate.js": "87882325e73c6e66e5e82fbef4246208a22b719a",
+    "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md": "ad1abea0181c350a0effd819cbff483673eb24dd",
+    "tools/gravicentra-quote-authority-contract-v1.mjs": "349501614754427f55ec993cce5d82aabcc8ad8d",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "fd7d49ef0b7d5f552ed96f9403ef3c27918882de",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "7744172e20b665fd68b2bad3d683f4262cf0969e"
+  },
+  "classifications": {
+    "alreadyExists": [
+      "P06 multiproduct rule model",
+      "P06C reconciliation and double-add guards",
+      "second enablement gate",
+      "source/version insurer knowledge architecture"
+    ],
+    "adopt": [
+      "single Gravicentra quote-domain authority",
+      "explicit Selection distinct from operational outcome",
+      "vehicle catalog governed by Gravicentra/shared governed service"
+    ],
+    "adjust": [
+      "external Proposal contract",
+      "premium breakdown names and amountBasis",
+      "insurer vs external financing semantics",
+      "full trace/digest/validity",
+      "comparison projection without hidden ranking"
+    ],
+    "reject": [
+      "generic primas.js defaults as CotComp authority",
+      "country-tax rescue of incomplete quote",
+      "silent P06-to-legacy CotComp fallback",
+      "legacy cotTasas as competing CotComp authority",
+      "manual/PDF net-tax derivation from total",
+      "internal weighted recommendation as public truth"
+    ],
+    "dependency": [
+      "provider-side Manifest/Quote/Selection transport",
+      "server correlation/idempotency proof",
+      "Gravicentra-governed vehicle catalog projection",
+      "real CotComp LAB transport"
+    ]
+  },
+  "crossProject": {
+    "aysRepo": "paulaosoriof86/ays-transformacion-digital",
+    "aysHead": "4128feedeb1b957e3dc3d76fe5b8bb085849cfae",
+    "receivedHandoffVersion": "1.0",
+    "currentHandoffVersion": "1.1",
+    "currentCompatibilityStatus": "COMPATIBLE_WITH_ADJUSTMENTS",
+    "rule": "Current Gravicentra recovery authority prevails over old forensic head referenced by CotComp S4.83."
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "providerDeployment": false,
+    "cotcompRealTransport": false
+  },
+  "nextAction": "B4_003_R10_CONTRACT_QA_AND_EXACT_PREVIEW"
+}
