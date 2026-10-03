@@ -59,7 +59,7 @@
     "paulaVisualAcceptanceRequiredBeforeAdvance": true
   },
   "nextRequiredProof": [
-    "B4_003_R13_CONTRACT_PASS",
+    "B4_003_R13P2_CONTRACT_PASS",
     "B4_003_R13_EXACT_PREVIEW_MACHINE_PASS",
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
@@ -74,5 +74,22 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "policyRouteRuntimeRootFix": {
+    "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_ROOTFIX_20261003.json",
+    "blobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
+    "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_CAUSAL_DIAGNOSTIC_20261003.json",
+    "diagnosticBlobSha": "db13f0b8bf0a200bac53033b090db798f684854c",
+    "failedRunId": 37162367038,
+    "productBlobs": {
+      "orbit360-platform/modules/polizas.js": "56a1c67d976a96e047cbc98b38e60920b102614d",
+      "orbit360-platform/index.html": "dc9dc2ee100bd146cf99574e2eb64826a85f0976"
+    },
+    "productSourceChanged": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "visualRedesign": false
   }
 }
