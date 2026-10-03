@@ -1,0 +1,160 @@
+name: CotComp S4.78 first-release vehicle scope
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s478-first-release-vehicle-scope-20261002
+    paths:
+      - '.github/cotcomp-lab-intents/s478-first-release-vehicle-scope-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s478-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.78 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s478-first-release-vehicle-scope-sourceonly.json
+          jq -e '
+            .authorization=="S478_FIRST_RELEASE_VEHICLE_SCOPE_SOURCEONLY" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .catalogDigestSha256=="89a77e66025945d015cc51704441a97437286022cafeef4995962fd750358df8" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .deployment==false and
+            .providerOrRater==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.78 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-first-release-vehicle-scope-s478.js
+          node --check cotcomp-first-release-vehicle-scope-s478.test.js
+          node --test cotcomp-first-release-vehicle-scope-s478.test.js
+
+      - name: Install deterministic PDF text dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Rebuild pinned SAT catalog and verify first-release scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s478"
+          URL='https://portal.sat.gob.gt/portal/descarga/1895/legislacion-aduanera/91646/tabla-de-valores-iva-iprima-2026'
+          PDF="$RUNNER_TEMP/s478/source.pdf"
+          TXT="$RUNNER_TEMP/s478/source.txt"
+          REC="$RUNNER_TEMP/s478/S478_FIRST_RELEASE_VEHICLE_SCOPE_RECEIPT.json"
+
+          curl -fL --retry 3 --retry-delay 2 --connect-timeout 20 --max-time 120 -sS -o "$PDF" "$URL"
+          test "$(sha256sum "$PDF" | awk '{print $1}')" = "ea15f79900e013bc3c397c23a154802fc2f62f8de3bf056b53003e03b85ec373"
+          pdftotext -layout -enc UTF-8 "$PDF" "$TXT"
+
+          cd functions
+          node - "$TXT" "$REC" <<'NODE'
+          const fs=require('fs');
+          const s476=require('./cotcomp-sat2026-normalized-catalog-s476');
+          const s478=require('./cotcomp-first-release-vehicle-scope-s478');
+          const [txtPath,recPath]=process.argv.slice(2);
+          const parsed=s476.parseText(fs.readFileSync(txtPath,'utf8'));
+          const catalog=s476.buildCatalog(parsed.rows);
+          const base=s476.validatePhysicalCatalog(catalog);
+          if(!base.ok)throw new Error('S478_BASE_CATALOG_INVALID:'+base.errors.join(','));
+          if(catalog.catalogDigestSha256!=='89a77e66025945d015cc51704441a97437286022cafeef4995962fd750358df8')throw new Error('S478_CATALOG_DIGEST_MISMATCH');
+
+          const r=s478.readiness(catalog);
+          if(!r.firstReleaseScopeReady)throw new Error('S478_SCOPE_NOT_READY');
+          if(r.catalogDeliverySurfaceReady||r.publicDropdownReleaseReady)throw new Error('S478_FALSE_RELEASE');
+          if(r.aliasDecisionsAreHardBlocker!==false)throw new Error('S478_ALIAS_BLOCKER_CLASSIFICATION_INVALID');
+          if(r.counts.AUTOMOVIL!==824||r.counts.CAMIONETA!==612||r.counts['PICK UP']!==379||r.counts.MOTO!==401)throw new Error('S478_ALLOWED_TYPE_COUNTS_INVALID');
+          if(r.scopedIdentityCount!==2216||r.scopedBrandCount!==119)throw new Error('S478_SCOPE_METRICS_INVALID');
+
+          const receipt={
+            schemaVersion:'ays-cotcomp-s478-first-release-vehicle-scope-receipt-v1.0',
+            sourceRawSha256:s476.SOURCE_RAW_SHA256,
+            catalogVersion:catalog.catalogVersion,
+            catalogDigestSha256:catalog.catalogDigestSha256,
+            firstReleaseScopeReady:true,
+            publicClasses:{
+              AUTO_LIGHT:{label:'Automóvil / SUV / Pickup',satTypes:['AUTOMOVIL','CAMIONETA','PICK UP']},
+              MOTO:{label:'Motocicleta',satTypes:['MOTO']}
+            },
+            allowedSatTypes:r.allowedSatTypes,
+            counts:r.counts,
+            scopedIdentityCount:r.scopedIdentityCount,
+            scopedBrandCount:r.scopedBrandCount,
+            outsideScopeState:r.outsideScopeState,
+            aliasDecisionsAreHardBlocker:false,
+            hardBlockers:r.hardBlockers,
+            nonBlockingEnhancements:r.nonBlockingEnhancements,
+            localIndependentBlockers:r.localIndependentBlockers,
+            catalogDeliverySurfaceReady:false,
+            publicDropdownReleaseReady:false,
+            appDataReads:0,
+            appDataWrites:0,
+            deployment:false,
+            providerOrRaterCalls:0,
+            productionTouched:false
+          };
+          fs.writeFileSync(recPath,JSON.stringify(receipt,null,2));
+          NODE
+
+      - name: Assert S4.78 truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          R="$RUNNER_TEMP/s478/S478_FIRST_RELEASE_VEHICLE_SCOPE_RECEIPT.json"
+          jq -e '
+            .firstReleaseScopeReady==true and
+            (.allowedSatTypes==["AUTOMOVIL","CAMIONETA","PICK UP","MOTO"]) and
+            .counts.AUTOMOVIL==824 and
+            .counts.CAMIONETA==612 and
+            .counts["PICK UP"]==379 and
+            .counts.MOTO==401 and
+            .scopedIdentityCount==2216 and
+            .scopedBrandCount==119 and
+            .outsideScopeState=="OTHER_REQUIRES_REVIEW" and
+            .aliasDecisionsAreHardBlocker==false and
+            (.hardBlockers==["CATALOG_DELIVERY_SURFACE_REQUIRED"]) and
+            .catalogDeliverySurfaceReady==false and
+            .publicDropdownReleaseReady==false and
+            .appDataReads==0 and .appDataWrites==0 and .deployment==false and
+            .providerOrRaterCalls==0 and .productionTouched==false
+          ' "$R" >/dev/null
+
+      - name: Upload S4.78 scope evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s478-first-release-vehicle-scope-${{ github.run_id }}
+          path: ${{ runner.temp }}/s478/S478_FIRST_RELEASE_VEHICLE_SCOPE_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
