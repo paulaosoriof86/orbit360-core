@@ -1,0 +1,70 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-03T01:06:29.220Z",
+  "status": "READONLY_DIAGNOSTIC_COMPLETE",
+  "findingId": "B4-003",
+  "mode": "READ_ONLY_NO_PRODUCT_OR_DATA_WRITES",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "76af40365b5584bbe4596685792e590f937eb7df",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "runtime": {
+    "policies": 1419,
+    "managements": 13,
+    "cancelations": 0,
+    "businesses": 0,
+    "activeRenewalManagements": 3,
+    "duplicateActiveRenewalManagementKeys": [],
+    "activeRecoveryBusinesses": 0,
+    "duplicateActiveRecoveryBusinessKeys": []
+  },
+  "sourceAudit": {
+    "assertions": {
+      "renewalOperationalBridgeLoadedAfterBase": true,
+      "renewalPermissionGuardLoadedAfterBridge": true,
+      "renewalIssuedFilterLoadedAfterBridge": true,
+      "renewalProposalsEffectiveOwnerOverridesLegacy": true,
+      "renewalCampaignEffectiveOwnerOverridesLegacy": true,
+      "renewalCampaignCopyDoesNotClaimAutomaticSend": true,
+      "renewalAcceptedUsesCanonicalManagementModal": true,
+      "renewalProposalUsesCanonicalManagementModal": true,
+      "renewalDuplicateGuardPresent": true,
+      "renewedPoliciesFilteredFromRenewalQueue": true,
+      "cancelationsUsesCanonicalRecordDelete": true,
+      "cancelationsCriticalWritesAwaitServerReadback": false,
+      "cancelationsRecoveryBusinessUsesWorkflowCanonicalStore": true,
+      "cancelationsRecoveryManagementUsesWorkflowCanonicalStore": true,
+      "storeHasDurableApis": true
+    },
+    "optimisticCriticalWriteSites": [
+      "cancelation_state_update",
+      "recovery_business_update",
+      "recovery_business_insert",
+      "recovery_management_update",
+      "renewal_campaign_policy_update",
+      "renewal_campaign_activity_insert"
+    ],
+    "effectiveRenewalOwner": {
+      "base": "orbit360-platform/modules/renovaciones.js",
+      "operationalBridge": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "permissionGuard": "orbit360-platform/modules/renewals-v1200-permission-guard.js",
+      "issuedFilter": "orbit360-platform/modules/renewals-v1201-issued-filter.js"
+    },
+    "cancelationsOwner": "orbit360-platform/modules/cancelaciones.js"
+  },
+  "blockingFindings": [
+    "CANCELATIONS_OPTIMISTIC_CRITICAL_WRITES_WITHOUT_AWAITED_READBACK",
+    "RENEWAL_CAMPAIGN_OPTIMISTIC_WRITES_WITHOUT_AWAITED_READBACK"
+  ],
+  "classification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
+  "causalConclusion": "Renewals are effectively overridden by the operational bridge, but critical renewal/cancelation persistence still contains optimistic store calls whose UI success path does not await server readback. This can report completion before durable persistence and can desynchronize linked recovery records.",
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "configWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CAUSAL_SOURCE_FIX_REQUIRED"
+}
