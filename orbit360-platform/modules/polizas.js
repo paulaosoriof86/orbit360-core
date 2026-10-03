@@ -9,6 +9,13 @@ Orbit.modules.polizas = (function () {
   const PAGE_SIZE = 100;
   const PC = id => (window.Orbit && Orbit.clientProjection && Orbit.clientProjection.get(id)) || S().get('clientes', id);
   let st = { fq: '', framo: '', fasg: '', fase: '', fest: '', sort: 'vence', page: 0 };
+  let indexCache = null, searchTimer = null;
+  function invalidateIndexes() { indexCache = null; }
+  window.addEventListener('orbit:store:emit', event => {
+    const collection = event && event.detail && event.detail.collection;
+    if (!collection || ['*','polizas','clientes','vehiculos','aseguradoras','asesores'].includes(collection)) invalidateIndexes();
+  });
+  document.addEventListener('orbit:session', invalidateIndexes);
 
   const numberOrNull = v => {
     if (v == null || String(v).trim() === '') return null;
@@ -32,12 +39,12 @@ Orbit.modules.polizas = (function () {
     const d = U.daysFromNow(p && (p.vigenciaFin || p.fechaFin || p.fechaVencimiento || p.finVigencia));
     return isActivePolicy(p) && d != null && d >= 0 && d <= 45;
   };
-  const premiumByCurrency = policies => {
+  const premiumByCurrency = (policies, I) => {
     const out = {};
     (policies || []).filter(isActivePolicy).forEach(p => {
       const n = policyPremiumNet(p);
       if (n == null) return;
-      const cli = PC(p.clienteId) || {};
+      const cli = I && I.clientsById ? (I.clientsById.get(p.clienteId) || {}) : (PC(p.clienteId) || {});
       const cur = String(p.moneda || p.divisa || cli.moneda || 'SIN_MONEDA').trim() || 'SIN_MONEDA';
       out[cur] = (out[cur] || 0) + n;
     });
@@ -55,21 +62,41 @@ Orbit.modules.polizas = (function () {
     { id: 'fest', type: 'select', ph: 'Estado', options: ['Vigente', 'Por renovar', 'Vencida', 'Cancelada', 'Anulada', 'Rechazada', 'Requiere validación'].map(v => ({ v, t: v })) }
   ];
 
+  function relationDataReady() {
+    const store=S();
+    if (!store || typeof store._productStatus !== 'function') return true;
+    const ps=store._productStatus() || {}, confirmed=ps.serverConfirmedCollections || [];
+    return confirmed.indexOf('polizas') >= 0 && confirmed.indexOf('clientes') >= 0;
+  }
+
   function buildIndexes() {
+    if (indexCache) return indexCache;
+    const policies = S().all('polizas') || [];
+    const policyClientIds = new Set(policies.map(p => String(p && p.clienteId || '')).filter(Boolean));
     const clientsById = new Map();
-    (S().all('clientes') || []).forEach(c => clientsById.set(c.id, (Orbit.clientProjection && Orbit.clientProjection.project) ? Orbit.clientProjection.project(c) : c));
+    (S().all('clientes') || []).forEach(c => {
+      const projected=(Orbit.clientProjection && Orbit.clientProjection.project)
+        ? Orbit.clientProjection.project(c,{ policyClientIds })
+        : c;
+      clientsById.set(c.id, projected);
+    });
     const vehiclesByPolicy = new Map();
     (S().all('vehiculos') || []).forEach(v => { if (v && v.polizaId && !vehiclesByPolicy.has(v.polizaId)) vehiclesByPolicy.set(v.polizaId, v); });
-    return { clientsById, vehiclesByPolicy };
+    const searchTextByPolicy = new Map();
+    policies.forEach(p => {
+      if (!p || p.id == null) return;
+      const cli=clientsById.get(p.clienteId) || null, veh=vehiclesByPolicy.get(p.id) || null;
+      const placa=(veh && (veh.placa || veh.placaNormalizada || veh.placaFuente)) || p.placa || '';
+      const clienteTxt=cli ? [cli.nombre,cli.identificacion,cli.email,cli.telefono].filter(Boolean).join(' ') : '';
+      searchTextByPolicy.set(p.id,[p.numero,p.producto,p.subramo,clienteTxt,placa,veh&&veh.marca,veh&&veh.linea].filter(Boolean).join(' ').toLowerCase());
+    });
+    indexCache = { clientsById, vehiclesByPolicy, searchTextByPolicy };
+    return indexCache;
   }
 
   function rows(I, source) {
     return (source || S().all('polizas') || []).filter(p => {
-      const cli = I.clientsById.get(p.clienteId) || null;
-      const veh = I.vehiclesByPolicy.get(p.id) || null;
-      const placa = (veh && (veh.placa || veh.placaNormalizada || veh.placaFuente)) || p.placa || '';
-      const clienteTxt = cli ? [cli.nombre, cli.identificacion, cli.email, cli.telefono].filter(Boolean).join(' ') : '';
-      const txt = [p.numero, p.producto, p.subramo, clienteTxt, placa, veh && veh.marca, veh && veh.linea].filter(Boolean).join(' ').toLowerCase();
+      const txt = I.searchTextByPolicy.get(p.id) || '';
       const grouped = !st.fkind || (st.fkind === 'renewals45' ? isRenewalWithin45Days(p) : st.fkind === 'historical' ? isHistoricalNoPortfolio(p) : st.fkind === 'active' ? isActivePolicy(p) : true);
       return grouped && (!st.fq || txt.includes(st.fq.toLowerCase())) &&
         (!st.framo || p.ramo === st.framo) &&
@@ -80,11 +107,15 @@ Orbit.modules.polizas = (function () {
   }
 
   function render(host) {
-    try { if(S()&&typeof S()._ensureCollections==='function') S()._ensureCollections(['polizas','clientes']); } catch (_) {}
+    try { if(S()&&typeof S()._ensureCollections==='function') S()._ensureCollections(['polizas','clientes','vehiculos']); } catch (_) {}
+    if (!relationDataReady()) {
+      host.innerHTML = '<div class="page" data-polizas-relations-loading="1"><div class="card pad"><b>Cargando pólizas…</b><div class="muted" style="margin-top:5px">Estamos preparando clientes y relaciones para mostrar la cartera sin datos incompletos.</div></div></div>';
+      return;
+    }
     const all = q.polizasScoped ? q.polizasScoped() : (S().all('polizas') || []);
     const I = buildIndexes();
     const vig = all.filter(isActivePolicy);
-    const primaVigentePorMoneda = premiumByCurrency(all);
+    const primaVigentePorMoneda = premiumByCurrency(all,I);
     const renovaciones45 = all.filter(isRenewalWithin45Days);
     const historicasSinCartera = all.filter(isHistoricalNoPortfolio);
     const r = rows(I, all);
@@ -125,8 +156,20 @@ Orbit.modules.polizas = (function () {
 
     K.wireFilters(FDEFS(), st, (id, live) => {
       st.page = 0;
-      if (live) { const a = document.activeElement, v = a && a.value || ''; render(host); const i = document.getElementById('fq'); if (i) { i.focus(); i.value = v; i.setSelectionRange(v.length, v.length); } }
-      else render(host);
+      if (live) {
+        const input=document.getElementById('fq'), value=input ? input.value : st.fq;
+        if (searchTimer) clearTimeout(searchTimer);
+        searchTimer=setTimeout(() => {
+          searchTimer=null;
+          if (!host || !host.isConnected) return;
+          render(host);
+          const next=document.getElementById('fq');
+          if (next) { next.focus(); next.value=value; next.setSelectionRange(value.length,value.length); }
+        },180);
+      } else {
+        if (searchTimer) { clearTimeout(searchTimer); searchTimer=null; }
+        render(host);
+      }
     });
   }
   function emptyRow(n) { return `<tr><td colspan="${n}" class="muted" style="text-align:center;padding:30px">Sin resultados.</td></tr>`; }
