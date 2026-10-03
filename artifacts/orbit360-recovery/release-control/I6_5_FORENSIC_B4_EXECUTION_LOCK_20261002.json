@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-02",
-  "status": "B4_003_SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
+  "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_READY",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -37,11 +37,11 @@
   ],
   "activeFinding": {
     "id": "B4-003",
-    "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones, premium/source authority, Information Health and visible insurer knowledge.",
-    "status": "B4_003_SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
+    "title": "Cumulative B4-003 remediation including Gravicentra↔CotComp Quote Authority.",
+    "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_READY",
     "blocking": true,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
-    "humanVisualStatus": "PENDING_R9_PREVIEW",
+    "humanVisualStatus": "PENDING_R10_EXACT_PREVIEW",
     "informationHealthAndInsurerKnowledgeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
     "informationHealthAndInsurerKnowledgeLockBlobSha": "e0edc10070dee174ed0c3527a29a8b632b1cba69",
     "sourceInventoryPass1Path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_SOURCE_INVENTORY_PASS_1_20261003.json",
@@ -69,22 +69,30 @@
       "orbit360-platform/modules/aseguradoras.js",
       "tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-      ".github/workflows/gravicentra-b4-003-executor.yml"
+      ".github/workflows/gravicentra-b4-003-executor.yml",
+      "orbit360-platform/core/quote-authority-contract-v1.js",
+      "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js",
+      "orbit360-platform/core/quote-comparison-contracts-v1203.js",
+      "orbit360-platform/modules/cotizador-v1203-source-gate.js",
+      "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
+      "tools/gravicentra-quote-authority-contract-v1.mjs"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
     "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "B4-003 exact Preview only; mandatory cleanup; no operational record mutation.",
-    "paulaVisualAcceptanceRequiredBeforeAdvance": true
+    "paulaVisualAcceptanceRequiredBeforeAdvance": true,
+    "cotcompRealTransportAuthorized": false,
+    "providerDeploymentAuthorized": false
   },
   "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "f7f5007edd9a1a378ae600e91f1e68ec9e1bfe91"
+    "blobSha": "e35a50baea3f139f9ce3e65193bd81efc7b4158b"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "020a8fa8b6adc118fb5468b524b09757aa72a98b"
+    "blobSha": "cdba7ca717fa13ac69aee459c78f3f6afe7eedfe"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -308,6 +316,26 @@
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
       ".github/workflows/gravicentra-b4-003-executor.yml"
     ],
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW"
+  },
+  "r10QuoteAuthority": {
+    "authorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_INTEGRATION_LOCK_20261003.json",
+    "authorizationLockBlobSha": "868a78408791bea719f7d07f5d48a0874df1a8da",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_SOURCE_FIX_20261003.json",
+    "sourceFixReceiptBlobSha": "6400bb9447fa145b6fb8d7c42a1c7dfe4477a4d1",
+    "contractPath": "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
+    "contractVersion": "gravicentra-quote-authority-v1",
+    "allowedProductFiles": [
+      "orbit360-platform/core/quote-authority-contract-v1.js",
+      "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js",
+      "orbit360-platform/core/quote-comparison-contracts-v1203.js",
+      "orbit360-platform/modules/cotizador-v1203-source-gate.js",
+      "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
+      "tools/gravicentra-quote-authority-contract-v1.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ],
+    "cotcompRealTransportAuthorized": false,
     "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW"
   }
 }
