@@ -15,6 +15,7 @@ const outPath=process.env.B4_002_DIAGNOSTIC_OUT||'/tmp/b4-002-notification-diagn
 function files(dir){
   const out=[];
   for(const ent of fs.readdirSync(dir,{withFileTypes:true})){
+    if(ent.name==='node_modules') continue;
     const p=pathmod.join(dir,ent.name);
     if(ent.isDirectory()) out.push(...files(p));
     else if(ent.isFile()&&/\.js$/.test(ent.name)) out.push(p);
@@ -59,20 +60,25 @@ function iso(v){
   for(const p of functionFiles){
     const c=fs.readFileSync(p,'utf8');
     if(/notificationOutbox|pending_provider|onDocumentCreated|onDocumentWritten|onDocumentUpdated|onSchedule|attemptCount|retryCount|nextAttemptAt|failed_retryable|lastError|processedAt|deliveredAt/.test(c)){
+      const mentionsOutbox=/notificationOutbox/.test(c);
       source.push({
         path:rel(p),
-        writesOutbox:/notificationOutbox[\s\S]{0,2500}pending_provider|pending_provider[\s\S]{0,2500}notificationOutbox/.test(c),
-        readsOutbox:/collection\(['"]notificationOutbox['"]\)/.test(c),
-        firestoreTrigger:/notificationOutbox/.test(c)&&/onDocumentCreated|onDocumentWritten|onDocumentUpdated/.test(c),
-        scheduledProcessor:/notificationOutbox/.test(c)&&/onSchedule/.test(c),
-        retryFields:/attemptCount|retryCount|nextAttemptAt|failed_retryable|failed_provider|lastError/.test(c),
-        deliveryCompletionFields:/processedAt|deliveredAt|sentAt|status\s*[:=]\s*['"](?:delivered|sent|processed)/i.test(c)
+        mentionsOutbox,
+        writesOutbox:mentionsOutbox&&/pending_provider/.test(c)&&/outboxRef|notificationOutbox/.test(c),
+        readsOutbox:mentionsOutbox&&/\.collection\(['"]notificationOutbox['"]\)/.test(c),
+        firestoreTrigger:mentionsOutbox&&/onDocumentCreated|onDocumentWritten|onDocumentUpdated/.test(c),
+        scheduledProcessor:mentionsOutbox&&/onSchedule/.test(c),
+        retryFields:mentionsOutbox&&/attemptCount|retryCount|nextAttemptAt|failed_retryable|failed_provider|lastError/.test(c),
+        deliveryCompletionFields:mentionsOutbox&&/processedAt|deliveredAt|sentAt|status\s*[:=]\s*['"](?:delivered|sent|processed)/i.test(c)
       });
     }
   }
   const productSource=fs.readFileSync(pathmod.join(repoRoot,'functions/product-ops-leads-domain.js'),'utf8');
-  const canonicalWriteAtomic=/db\.runTransaction[\s\S]*notificationOutbox[\s\S]*workflowRequests/.test(productSource)||
-    /db\.runTransaction[\s\S]*workflowRequests[\s\S]*notificationOutbox/.test(productSource);
+  const canonicalWriteAtomic=/db\.runTransaction/.test(productSource)
+    &&/tx\.set\(entity/.test(productSource)
+    &&/tx\.set\(eventRef/.test(productSource)
+    &&/tx\.set\(outboxRef/.test(productSource)
+    &&/tx\.set\(req/.test(productSource);
   const previewSuppresses=/targets\.length&&previewOnly!==true/.test(productSource)&&/notificationSuppressed:previewOnly===true/.test(productSource);
   const processors=source.filter(x=>x.firestoreTrigger||x.scheduledProcessor);
   const retryOwners=source.filter(x=>x.retryFields&&(x.firestoreTrigger||x.scheduledProcessor));
