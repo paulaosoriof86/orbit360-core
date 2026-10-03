@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-02",
-  "status": "B4_003_CAUSES_RECONCILED_SOURCE_FIX_AUTHORIZED",
+  "status": "B4_003_SOURCE_FIXED_R2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,14 +38,18 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Targeted regression closure for Renovaciones and Cancelaciones.",
-    "status": "CAUSES_RECONCILED_SOURCE_FIX_AUTHORIZED",
+    "status": "SOURCE_FIXED_R2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
     "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS",
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
     "diagnosticReceiptBlobSha": "b6aa15478a30a70a839e06cef8037f527480a13c",
-    "nextAction": "B4_003_CAUSAL_SOURCE_FIX",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "adjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DIAGNOSTIC_ADJUDICATION_20261003.json",
-    "adjudicationReceiptBlobSha": "673b47a036eb5f87c5e0e9dbf5d2abd709202b8f"
+    "adjudicationReceiptBlobSha": "673b47a036eb5f87c5e0e9dbf5d2abd709202b8f",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_20261003.json",
+    "sourceFixReceiptBlobSha": "f05e04e6184a3e8ffa49eead631d94cbb68bb1c4",
+    "sourceFixR2ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R2_20261003.json",
+    "sourceFixR2ReceiptBlobSha": "5c2d3ff811e1b40f5d805cc55126696c63b09a96"
   },
   "rules": {
     "preserveB1B2B3Pass": true,
@@ -62,7 +66,7 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "allowedProductFiles": [
       "functions/product-ops-leads-domain.js",
       "orbit360-platform/modules/renovaciones.js",
@@ -77,7 +81,7 @@
     "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "B4-003 exact Preview only: isolated synthetic renewal/cancelation fixtures plus read-only render probe; mandatory cleanup; no operational record mutation."
   },
-  "nextAction": "B4_003_CAUSAL_SOURCE_FIX",
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "6198a6ae8121f6313c8efb193a60fee14f20cce0"
@@ -99,10 +103,10 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
-    "B4_003_MINIMAL_SOURCE_FIX_BOUND_TO_CANONICAL_COMPOSITION",
-    "B4_003_RENEWALS_CANCELATIONS_SINGLE_PASS_DURABLE_CONTRACT_PASS",
-    "B4_003_EXACT_PREVIEW_DURABLE_READBACK_AND_RENDER_STABILITY_PASS",
-    "B4_003_QA_RESIDUE_DISPOSITION",
+    "B4_003_RENEWALS_CANCELATIONS_CONTRACT_PASS",
+    "B4_003_EXACT_PREVIEW_DURABLE_READBACK_PASS",
+    "B4_003_NO_DELAYED_RENEWAL_RENDER_MUTATION",
+    "B4_003_QA_RESIDUE_READONLY_ADJUDICATION",
     "B4_003_SYNTHETIC_FINAL_ABSENT"
   ],
   "candidate": {
@@ -173,5 +177,26 @@
       "orbit360-platform/modules/cancelaciones.js",
       "orbit360-platform/index.html"
     ]
+  },
+  "b4003SourceFix": {
+    "status": "SOURCE_FIXED_R2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_20261003.json",
+    "receiptBlobSha": "f05e04e6184a3e8ffa49eead631d94cbb68bb1c4",
+    "r2ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R2_20261003.json",
+    "r2ReceiptBlobSha": "5c2d3ff811e1b40f5d805cc55126696c63b09a96",
+    "sourceSha": "dc47a0e4307bcacd1ff8f29b0a767b6861521372",
+    "productBlobs": {
+      "functions/product-ops-leads-domain.js": "221b9f10a91c7e0838737efaef1e49a98fed4987",
+      "orbit360-platform/modules/renovaciones.js": "9cedcb2e96ab9c15914f5ed1364a80eb6a6fffac",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "5664e11a6814c9dc1dd77703c83b6d186e86bb41",
+      "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
+      "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
+      "orbit360-platform/modules/cancelaciones.js": "f917ae2f2b72176c1c8ec917d51456b5bc80bbb1",
+      "orbit360-platform/index.html": "4873466b8aa5bd758af05767d7a0367a8b5f53d3"
+    },
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

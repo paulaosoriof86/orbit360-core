@@ -2795,7 +2795,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Targeted regression closure for Renovaciones and Cancelaciones.",
-      "status": "CAUSES_RECONCILED_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2807,7 +2807,7 @@
         "No empty module caused by alternate collection/owner or missing projection.",
         "Role/country scope, persistence/readback and regression are verified."
       ],
-      "nextAction": "B4_003_CAUSAL_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2834,7 +2834,11 @@
         "orbit360-platform/modules/renewals-v1201-issued-filter.js",
         "orbit360-platform/modules/cancelaciones.js",
         "orbit360-platform/index.html"
-      ]
+      ],
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_20261003.json",
+      "sourceFixReceiptBlobSha": "f05e04e6184a3e8ffa49eead631d94cbb68bb1c4",
+      "sourceFixR2ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R2_20261003.json",
+      "sourceFixR2ReceiptBlobSha": "5c2d3ff811e1b40f5d805cc55126696c63b09a96"
     },
     {
       "id": "B4-004",
