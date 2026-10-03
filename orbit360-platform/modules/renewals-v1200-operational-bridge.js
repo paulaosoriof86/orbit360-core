@@ -206,7 +206,7 @@ Orbit.modules = Orbit.modules || {};
           const p=S().get('polizas',id),c=p&&S().get('clientes',p.clienteId);if(!p)return;
           mutations.push({action:'update',collection:'polizas',id:p.id,payload:{renovacionSeguimientoPreparado:date,renovacionCanalEstado:'pendiente_conexion'}});
           const activityId='act_ren_'+String(p.id).replace(/[^A-Za-z0-9._:-]/g,'_')+'_'+date.replace(/-/g,'');
-          const activity={id:activityId,tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,tipo:'renovacion',icon:'📤',fecha:date,titulo:'Seguimiento de renovación preparado',detalle:'Pendiente de canal conectado · '+p.numero+' · '+(c&&c.nombre||'')};
+          const activity={id:activityId,tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,tipo:'renovacion',icon:'📤',fecha:date,titulo:'Seguimiento de renovación preparado',detalle:'Pendiente de canal conectado · '+p.numero+' · '+(c&&c.nombre||''),__syntheticQa:p.__syntheticQa===true};
           mutations.push({action:S().get('actividades',activityId)?'update':'insert',collection:'actividades',id:activityId,payload:activity});
         });
         for(let i=0;i<mutations.length;i+=80)await S().batchDurable(mutations.slice(i,i+80));

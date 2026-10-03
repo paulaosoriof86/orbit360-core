@@ -475,11 +475,12 @@ exports.orbit360ProductAssetRead = onCall({ region: REGION, cors: true, timeoutS
 exports.orbit360ProductAssetReadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>readProductAsset(request,true));
 async function executePreview(request) {
   const input=request.data||{},raw=[].concat(input.mutations||[]);
-  if(!raw.length||raw.some(m=>!/^b3004qa_[A-Za-z0-9._:-]+$/.test(text(m&&(m.id||(m.payload&&m.payload.id)),256)))) {
-    throw new HttpsError('permission-denied','B3-004 Preview operativo solo admite fixtures sintéticos b3004qa_.');
+  const syntheticId=v=>/(?:^|_)(?:b3004qa|b4003qa)_[A-Za-z0-9._:-]+$/i.test(text(v,256));
+  if(!raw.length||raw.some(m=>!syntheticId(m&&(m.id||(m.payload&&m.payload.id))))) {
+    throw new HttpsError('permission-denied','Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.');
   }
   if(raw.some(m=>norm(m&&m.action)!=='remove'&&(!m.payload||m.payload.__syntheticQa!==true))) {
-    throw new HttpsError('permission-denied','B3-004 Preview operativo requiere marca sintética explícita.');
+    throw new HttpsError('permission-denied','Preview operativo requiere marca sintética explícita.');
   }
   return execute(request);
 }

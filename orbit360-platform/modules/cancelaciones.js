@@ -162,7 +162,7 @@ Orbit.modules.cancelaciones = (function () {
         await S().updateDurable('cancelaciones', canId, patch);
         if (c.clienteId) {
           const activityId = 'act_rec_' + String(canId).replace(/[^A-Za-z0-9._:-]/g, '_');
-          const activity = { id: activityId, clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'recuperacion', icon: rec === 'Recuperada' ? '✅' : '♻', fecha, titulo: 'Recuperación: ' + rec, detalle: (p ? p.numero + ' · ' : '') + (nota || motivo || rec) };
+          const activity = { id: activityId, clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'recuperacion', icon: rec === 'Recuperada' ? '✅' : '♻', fecha, titulo: 'Recuperación: ' + rec, detalle: (p ? p.numero + ' · ' : '') + (nota || motivo || rec), __syntheticQa: c.__syntheticQa === true };
           if (S().get('actividades', activityId)) await S().updateDurable('actividades', activityId, activity);
           else await S().insertDurable('actividades', activity);
         }

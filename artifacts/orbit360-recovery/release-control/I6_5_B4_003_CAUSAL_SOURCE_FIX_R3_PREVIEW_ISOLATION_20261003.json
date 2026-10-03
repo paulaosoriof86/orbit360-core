@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_CAUSAL_SOURCE_FIX_R3_PREVIEW_ISOLATION_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R3_PREVIEW_ISOLATION_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "sourceHeadBefore": "dd5af7d17247d377cd8c94e69a0ae7bb21d65028",
+  "scopeAmendment": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_WRITE_ISOLATION_SCOPE_AMENDMENT_20261003.json",
+    "blobSha": "4c4a4dbfc8076ccfe52c70957630919602789750"
+  },
+  "rootCause": "GENERAL_DURABLE_STORE_WRITES_ON_HOSTING_PREVIEW_ROUTE_TO_PRODUCTION_CALLABLE",
+  "changes": [
+    "General durable single/batch writes now route to the dedicated us-east1 Preview callable on recognized isolated Preview hosts.",
+    "Preview operational backend accepts B4-003 synthetic identifiers while retaining explicit __syntheticQa=true and rejecting real records.",
+    "B4-003 synthetic activity rows inherit __syntheticQa from their fixture parent.",
+    "No production callable is required for B4-003 synthetic UI persistence proof."
+  ],
+  "productBlobs": {
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "095765ed4e80b2fd0bdf8ad251673f6e941fa5c9",
+    "functions/product-operational-domain.js": "2af16e3a4e2224f5e094a41e2ee04a5a48187f2e",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "d1d95c6b6b4a7d6bb713d67647e51477eee92030",
+    "orbit360-platform/modules/cancelaciones.js": "be802f437abfaffcf819362da19e5826023dec9f",
+    "orbit360-platform/index.html": "ba8a02fff19725b7c3dfed25668c0e27f1b08fe8"
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

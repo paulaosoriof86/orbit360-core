@@ -7,6 +7,7 @@
   window.Orbit=window.Orbit||{};
   var VERSION='fase-a-i2-product-operational-write-20260930.5-r8-receipt-scope-owner';
   var GENERAL_COMMAND='orbit360ProductOperationalCommand';
+  var GENERAL_PREVIEW_COMMAND='orbit360ProductOperationalCommandPreview';
   var WORKFLOW_COMMAND='orbit360OpsLeadsCommand';
   var WORKFLOW_PREVIEW_COMMAND='orbit360OpsLeadsCommandPreview';
   var SERVER_EMISSION_GUARD='__ORBIT_SERVER_EMISSION_PENDING__';
@@ -196,7 +197,8 @@
         var previewWorkflow=isB2PreviewHost();
         return p.callFunction(previewWorkflow?WORKFLOW_PREVIEW_COMMAND:WORKFLOW_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,operation:operation,entityId:id,payload:clone(payload)||{},reason:workflowReason(operation,prior,payload)},previewWorkflow?'us-east1':'us-central1');
       }
-      return p.callFunction(GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[{action:action,collection:collection,id:id,payload:action==='remove'?null:clone(payload)}]},'us-central1');
+      var previewGeneral=isB2PreviewHost();
+      return p.callFunction(previewGeneral?GENERAL_PREVIEW_COMMAND:GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[{action:action,collection:collection,id:id,payload:action==='remove'?null:clone(payload)}]},previewGeneral?'us-east1':'us-central1');
     }).then(function(result){
       if(!workflow||action==='insert')requireServerReadback(result,[{collection:collection,id:id,action:action}]);
       if(workflow&&payload&&payload.deleted===true){
@@ -258,7 +260,8 @@
       if(!ctx||!ctx.auth||!ctx.auth.currentUser||text(ctx.auth.currentUser.uid)!==text(m.uid))throw new Error('PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH');
       if(provider.browserFirestoreWriteAuthorized!==false||provider.serverWriteTransport!=='firebase-functions'||provider.noFallback!==true||typeof provider.callFunction!=='function')throw new Error('PRODUCT_WRITE_SERVER_TRANSPORT_REQUIRED');
       var requestId=text(options.requestId)||('batch_'+Date.now()+'_'+Math.random().toString(36).slice(2,8));
-      return provider.callFunction(GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,requestId:requestId,mutations:prepared.map(function(x){return{action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(x.row)};})},'us-central1');
+      var previewGeneral=isB2PreviewHost();
+      return provider.callFunction(previewGeneral?GENERAL_PREVIEW_COMMAND:GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,requestId:requestId,mutations:prepared.map(function(x){return{action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(x.row)};})},previewGeneral?'us-east1':'us-central1');
     }).then(function(result){
       serverCommitted=true;
       var targets=prepared.map(function(x){return{collection:x.collection,id:x.id,action:x.action};});
@@ -329,7 +332,7 @@
   }
   function status(){
     var bs=base&&typeof base._productStatus==='function'?base._productStatus():{};
-    return Object.assign({},state,{ready:installed===true&&bs.ready===true&&bs.status==='ready-read-only',readAuthority:'store-firestore-product-readonly-p0',writeAuthority:'product-operational-write-p0',writeTransport:'firebase-functions',generalCommand:GENERAL_COMMAND,workflowCommand:WORKFLOW_COMMAND,browserFirestoreWriteAuthorized:false,workflowSemanticOwner:true,urlTenantAllowed:false,labModeAllowed:false,seedFallback:false,localStorageBusinessPersistence:false,pendingReconcile:'expected-field-match',noFallback:true});
+    return Object.assign({},state,{ready:installed===true&&bs.ready===true&&bs.status==='ready-read-only',readAuthority:'store-firestore-product-readonly-p0',writeAuthority:'product-operational-write-p0',writeTransport:'firebase-functions',generalCommand:GENERAL_COMMAND,generalPreviewCommand:GENERAL_PREVIEW_COMMAND,workflowCommand:WORKFLOW_COMMAND,browserFirestoreWriteAuthorized:false,workflowSemanticOwner:true,urlTenantAllowed:false,labModeAllowed:false,seedFallback:false,localStorageBusinessPersistence:false,pendingReconcile:'expected-field-match',noFallback:true});
   }
   function install(readStore){
     if(installed)return status();
