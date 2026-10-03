@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_001_MACHINE_PASS_V1",
+  "recordedAt": "2026-10-03T00:20:48.162Z",
+  "status": "PASS",
+  "findingId": "B4-001",
+  "sourceSha": "18799ffbb2623dbfd28623774c41abef22f9f75a",
+  "buildId": "gi-i65-b4-18799ffbb262-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37081436268-4ls0jwa6.web.app",
+  "channelId": "gi-i65-b4-37081436268",
+  "runId": 37081436268,
+  "artifactId": 11258972168,
+  "artifactDigest": "11d0239866f5b7a502f678591fc97b4f38980bc5d8677880c2975ae15c27947e",
+  "hostedPayloadDigest": "b44791dddfe3d50c42374d534b0af8b02bdb1b10c51b2154923a8c28e60e7042",
+  "backendSourceDigest": "3970cb67659f54535e7cdb5f30bd5fdb732a6fbd47890140af63ad82ab054241",
+  "bundleDigest": "431445527957a34b434cefba86b9b49cef02a2b7c3241ca3c978fd925e13db10",
+  "exactHostingReadback": true,
+  "assertions": {
+    "serverOwnedWriteFacade": true,
+    "singleCanonicalBrowserRecord": true,
+    "opsProjectionConverges": true,
+    "serverCanonicalReadback": true,
+    "originsPreserved": true,
+    "portalExplicitOperation": true,
+    "eventCardinality": true,
+    "duplicateCreateFailClosed": true
+  },
+  "syntheticQaWrites": 3,
+  "cleanupWrites": 9,
+  "syntheticFinalAbsent": true,
+  "pageErrors": [],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 409 ()"
+  ],
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC"
+}

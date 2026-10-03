@@ -2728,10 +2728,10 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Ops/Leads/Cliente360/Portal gestiones converge to one canonical record with role scopes.",
-      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
-      "blocking": true,
+      "status": "CLOSED_PASS_MACHINE",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "B4_001_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "NONE_CLOSED",
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "rootCause": "LEGACY_OPTIMISTIC_UI_CONTROL_FLOW_AND_PORTAL_OPERATION_MAPPING_GAP",
@@ -2743,16 +2743,19 @@
       "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
-      "livePromotionAuthorized": false
+      "livePromotionAuthorized": false,
+      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_MACHINE_PASS_20261002.json",
+      "machineProofReceiptBlobSha": "72ff0e5571358a6585856f5b453d104387138d7b"
     },
     {
       "id": "B4-002",
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Notifications/automation occur only after committed domain events with retry/failure visibility.",
-      "status": "NOT_STARTED",
+      "status": "ACTIVE_READONLY_DIAGNOSTIC",
       "blocking": true,
-      "mayDisappearWithoutDisposition": false
+      "mayDisappearWithoutDisposition": false,
+      "nextAction": "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC"
     },
     {
       "id": "B4-003",
@@ -6530,17 +6533,17 @@
     }
   },
   "currentB4": {
-    "status": "B4_001_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
-    "activeFindingId": "B4-001",
+    "status": "B4_ACTIVE_B4_002_READONLY_DIAGNOSTIC",
+    "activeFindingId": "B4-002",
     "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "executionLockBlobSha": "f082edc57e939c98a0fe2086a3e444481793bf05",
-    "compositionLockBlobSha": "cb9e8c79d0ee4ab20771879de411f73c256aca87",
+    "compositionLockBlobSha": "5cbaa41bf542e5a8008cce87abd2ea524e37cf54",
     "readinessPercent": 96,
     "targetPercent": 100,
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_001_CONTRACT_AND_EXACT_PREVIEW"
+    "nextAction": "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC"
   }
 }
