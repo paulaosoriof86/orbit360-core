@@ -26,6 +26,13 @@ need('noSilentP06LegacyFallback',C.rules.noSilentP06ToLegacyFallbackForCotComp==
 need('externalFinanceSeparated',C.rules.externalFinancingSeparatedFromInsurerInstallment===true);
 
 const request={tenantId:'alianzas-soluciones',country:'GT',journey:'auto',riskId:'risk-1',correlationId:'corr-1',idempotencyKey:'idem-1',risk:{value:100000}};
+const manifest={
+ authorityContractVersion:'gravicentra-quote-authority-v1',configurationVersion:'cfg-1',catalogVersion:'cat-1',
+ rulesDigest:'sha256:abc',generatedAt:'2026-10-03T15:00:00Z',validityFrom:'2026-01-01',validityTo:'2026-12-31',
+ capabilities:{quote:true,comparison:true,selection:true}
+};
+need('manifestValid',C.validateManifest(manifest,{at:'2026-10-03'}).ok===true);
+need('manifestVersionMismatchFails',C.validateManifest({...manifest,authorityContractVersion:'other'},{at:'2026-10-03'}).ok===false);
 need('quoteRequestAcceptsPureIntent',C.validateQuoteRequest(request).ok===true);
 need('quoteRequestRejectsFinancialOverride',C.validateQuoteRequest({...request,financialOverride:{tax:12}}).ok===false);
 
@@ -48,6 +55,9 @@ const proposal={
 need('validatedProposalPasses',C.validateProposal(proposal,{at:'2026-10-03'}).ok===true);
 need('missingTraceFails',C.validateProposal({...proposal,trace:{...trace,rulesDigest:''}},{at:'2026-10-03'}).ok===false);
 need('requiresValidationBasisFails',C.validateProposal({...proposal,financial:{...financial,amountBasis:'requires_validation'}},{at:'2026-10-03'}).ok===false);
+need('quoteResultValid',C.validateQuoteResult({authorityContractVersion:'gravicentra-quote-authority-v1',tenantId:'alianzas-soluciones',correlationId:'corr-1',idempotencyKey:'idem-1',requestDigest:'sha256:req',proposals:[proposal]},{at:'2026-10-03'}).ok===true);
+need('quoteResultRejectsWebPremium',C.validateQuoteResult({authorityContractVersion:'gravicentra-quote-authority-v1',tenantId:'alianzas-soluciones',correlationId:'corr-1',idempotencyKey:'idem-1',requestDigest:'sha256:req',proposals:[proposal],webCalculatedPremium:1176},{at:'2026-10-03'}).ok===false);
+
 const cmp=C.buildComparisonProjection([proposal,{...proposal,proposalId:'prop-2',insurerId:'asg-2'}],{at:'2026-10-03'});
 need('comparisonProjectionPasses',cmp.ok===true&&cmp.proposals.length===2);
 need('comparisonNoRanking',cmp.defaultRanking===null&&cmp.recommendation===null&&cmp.semantics.missingIsNotNotCovered===true);
