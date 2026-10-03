@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_002_DIAGNOSTIC",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_002_SOURCE_FIX",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4853,24 +4853,24 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_ACTIVE_B4_002_READONLY_DIAGNOSTIC",
+      "status": "B4_002_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "e4a961c03dffd5946ebba9a25cf008f4134f4645",
-      "compositionLockBlobSha": "5cbaa41bf542e5a8008cce87abd2ea524e37cf54",
-      "findingLedgerBlobSha": "feedca40502994b3c2707badd1672b6e5611d0ae",
+      "executionLockBlobSha": "90b71accd2820a30486953dfb6ce448730794dcb",
+      "compositionLockBlobSha": "27d0da1469ec267adf0eca66cd2f9dff9af569db",
+      "findingLedgerBlobSha": "f5891609ceaebb08a91ab5ab33d33d538e03bc76",
       "activeFindingId": "B4-002",
       "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
       "baselinePreviewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
-      "productMutationAuthorized": false,
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC",
+      "nextAction": "B4_002_CAUSAL_SOURCE_FIX",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_MINIMAL_SOURCE_FIX_20261002.json",
       "sourceFixReceiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
@@ -4939,15 +4939,32 @@
         "dataMutation": false,
         "reimport": false,
         "livePromotion": false
+      },
+      "b4002Diagnostic": {
+        "status": "CAUSE_DEMONSTRATED",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
+        "receiptBlobSha": "12183afd6a7a71863e2cd8fd365a847383fc5bee",
+        "classification": "PRODUCT_BACKEND_NOTIFICATION_DELIVERY_GAP",
+        "rootCause": "CANONICAL_OUTBOX_HAS_NO_EXECUTABLE_DISPATCH_RETRY_OWNER",
+        "allowedProductFiles": [
+          "functions/notification-outbox-processor.js",
+          "functions/bootstrap.js",
+          "functions/package.json",
+          "functions/ops-advisor-inbox.js"
+        ],
+        "operationalBusinessWrites": 0,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false
       }
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "5cbaa41bf542e5a8008cce87abd2ea524e37cf54",
+    "compositionLockBlobSha": "27d0da1469ec267adf0eca66cd2f9dff9af569db",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "feedca40502994b3c2707badd1672b6e5611d0ae",
+    "findingLedgerBlobSha": "f5891609ceaebb08a91ab5ab33d33d538e03bc76",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B4",
@@ -4959,7 +4976,8 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC"
+    "nextAction": "B4_002_CAUSAL_SOURCE_FIX",
+    "activeFindingId": "B4-002"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
@@ -5251,15 +5269,15 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_ACTIVE_B4_002_READONLY_DIAGNOSTIC",
+    "status": "B4_002_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "activeFindingId": "B4-002",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "e4a961c03dffd5946ebba9a25cf008f4134f4645",
-    "compositionLockBlobSha": "5cbaa41bf542e5a8008cce87abd2ea524e37cf54",
-    "findingLedgerBlobSha": "feedca40502994b3c2707badd1672b6e5611d0ae",
+    "executionLockBlobSha": "90b71accd2820a30486953dfb6ce448730794dcb",
+    "compositionLockBlobSha": "27d0da1469ec267adf0eca66cd2f9dff9af569db",
+    "findingLedgerBlobSha": "f5891609ceaebb08a91ab5ab33d33d538e03bc76",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC",
+    "nextAction": "B4_002_CAUSAL_SOURCE_FIX",
     "sourceFixReceiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -5313,6 +5331,27 @@
       "reason": "Exclude installed dependencies from owner discovery and bind post-commit assertion to actual canonical transaction writes.",
       "diagnosticToolBlobSha": "fc4c0c64612662793dc7727bc7d60fa2cdb16d09",
       "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
+    },
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b4002Diagnostic": {
+      "status": "CAUSE_DEMONSTRATED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
+      "receiptBlobSha": "12183afd6a7a71863e2cd8fd365a847383fc5bee",
+      "classification": "PRODUCT_BACKEND_NOTIFICATION_DELIVERY_GAP",
+      "rootCause": "CANONICAL_OUTBOX_HAS_NO_EXECUTABLE_DISPATCH_RETRY_OWNER",
+      "allowedProductFiles": [
+        "functions/notification-outbox-processor.js",
+        "functions/bootstrap.js",
+        "functions/package.json",
+        "functions/ops-advisor-inbox.js"
+      ],
+      "operationalBusinessWrites": 0,
       "dataMutation": false,
       "reimport": false,
       "livePromotion": false
