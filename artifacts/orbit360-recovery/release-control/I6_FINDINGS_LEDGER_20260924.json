@@ -2802,8 +2802,8 @@
       "id": "B4-003",
       "block": "B4",
       "source": "FROZEN_PLAN",
-      "finding": "Targeted regression closure for Renovaciones and Cancelaciones.",
-      "status": "R8_PACKET_1_REQUESTED_SOURCE_EXTRACTION_CONTINUES",
+      "finding": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones, premium/source authority, Information Health and visible insurer knowledge.",
+      "status": "SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2815,7 +2815,7 @@
         "No empty module caused by alternate collection/owner or missing projection.",
         "Role/country scope, persistence/readback and regression are verified."
       ],
-      "nextAction": "B4_003_R8_WAIT_PACKET_1_WHILE_CONTINUING_AVAILABLE_SOURCE_EXTRACTION",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2872,9 +2872,15 @@
       "informationHealthAndInsurerKnowledgeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
       "informationHealthAndInsurerKnowledgeLockBlobSha": "e0edc10070dee174ed0c3527a29a8b632b1cba69",
       "paulaFinancialManualActionStatus": "DO_NOT_START_YET",
-      "paulaSourceUploadStatus": "PACKET_1_REQUESTED",
+      "paulaSourceUploadStatus": "PACKET_1_RECEIVED_ANALYZED",
       "sourceInventoryPass1Path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_SOURCE_INVENTORY_PASS_1_20261003.json",
-      "sourceInventoryPass1BlobSha": "fdfc74f663f7ff722f49cc8ddd60120a36eab4e8"
+      "sourceInventoryPass1BlobSha": "fdfc74f663f7ff722f49cc8ddd60120a36eab4e8",
+      "r9KnowledgeAuthorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_PREVIEW_AUTHORIZATION_LOCK_20261003.json",
+      "r9KnowledgeAuthorizationLockBlobSha": "e26ce6ddd4032bf04bda1458513e2564f6e65f9e",
+      "r9KnowledgeSourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_SOURCE_FIX_20261003.json",
+      "r9KnowledgeSourceFixReceiptBlobSha": "988c42f1ab11e8f5957086e4acd22ff4a991d4ff",
+      "r9VisibleInPreview": true,
+      "r9MultiProduct": true
     },
     {
       "id": "B4-004",
@@ -2884,7 +2890,7 @@
       "status": "NOT_STARTED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "WAIT_B4_003_R8_PAULA_VISUAL_PASS"
+      "nextAction": "WAIT_B4_003_R9_PAULA_VISUAL_PASS"
     },
     {
       "id": "B4-005",
@@ -6635,24 +6641,28 @@
     }
   },
   "currentB4": {
-    "status": "B4_003_R8_PACKET_1_REQUESTED_SOURCE_EXTRACTION_CONTINUES",
+    "status": "B4_003_SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
     "activeFindingId": "B4-003",
     "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "executionLockBlobSha": "f082edc57e939c98a0fe2086a3e444481793bf05",
-    "compositionLockBlobSha": "1c02066be59d2fb979fd1fef409f2f8ab2403678",
+    "compositionLockBlobSha": "f7f5007edd9a1a378ae600e91f1e68ec9e1bfe91",
     "readinessPercent": 96,
     "targetPercent": 100,
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R8_WAIT_PACKET_1_WHILE_CONTINUING_AVAILABLE_SOURCE_EXTRACTION",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "cumulativeFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
     "cumulativeFreezeBlobSha": "37f015ea5262df68ac0838b57b1de61c1b0b25a7",
     "informationHealthAndInsurerKnowledgeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
     "informationHealthAndInsurerKnowledgeLockBlobSha": "e0edc10070dee174ed0c3527a29a8b632b1cba69",
     "sourceInventoryPass1Path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_SOURCE_INVENTORY_PASS_1_20261003.json",
-    "sourceInventoryPass1BlobSha": "fdfc74f663f7ff722f49cc8ddd60120a36eab4e8"
+    "sourceInventoryPass1BlobSha": "fdfc74f663f7ff722f49cc8ddd60120a36eab4e8",
+    "r9KnowledgeAuthorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_PREVIEW_AUTHORIZATION_LOCK_20261003.json",
+    "r9KnowledgeAuthorizationLockBlobSha": "e26ce6ddd4032bf04bda1458513e2564f6e65f9e",
+    "r9KnowledgeSourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_SOURCE_FIX_20261003.json",
+    "r9KnowledgeSourceFixReceiptBlobSha": "988c42f1ab11e8f5957086e4acd22ff4a991d4ff"
   },
   "b4003QaResidueCarry": {
     "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
