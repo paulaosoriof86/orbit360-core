@@ -217,6 +217,8 @@ Orbit.quoteContracts = (function () {
       familiaProducto:dims.familiaProducto, subtipoProducto:dims.subtipoProducto, segmento:dims.segmento, tipoRiesgo:dims.tipoRiesgo, tipoVehiculo:dims.tipoVehiculo, usoVehiculo:dims.usoVehiculo,
       clienteId:clean(input.clienteId), prospectoId:clean(input.prospectoId), prospectoNombre:clean(input.prospectoNombre || input.cliente), asesorId:clean(input.asesorId),
       datosRiesgo:clone(input.datosRiesgo || {}), primaNeta:net, gastos:expenses, impuestos:taxes, primaTotal:total, primaMensual:num(input.primaMensual) || total/installments,
+      amountBasis:clean(input.amountBasis || premium.amountBasis || 'requires_validation'),
+      authorityTrace:clone(input.authorityTrace || input.trace || {}),
       formasPago:clone(input.formasPago || []), cuotas:installments,
       coberturas:normalizeCoverage(input.coberturas || input.cob), deducibles:clone(input.deducibles || (input.deducible ? [{ codigo:'principal', nombre:'Deducible', valor:input.deducible }] : [])),
       condiciones:clone(input.condiciones || []), exclusiones:clone(input.exclusiones || []), restricciones:clone(input.restricciones || []), beneficios:clone(input.beneficios || []),
