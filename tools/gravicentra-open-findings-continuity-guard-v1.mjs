@@ -1,0 +1,48 @@
+import fs from 'node:fs';
+const P={
+ ledger:'artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json',
+ registry:'artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json',
+ control:'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
+};
+const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+const need=(v,c)=>{if(!v)throw new Error(c);};
+const led=read(P.ledger),reg=read(P.registry),cp=read(P.control);
+const findings=Array.isArray(led.findings)?led.findings:[];
+const inv=Array.isArray(reg.inventory)?reg.inventory:[];
+const ids=a=>a.map(x=>String(x.id||'')).sort();
+const ledIds=ids(findings),invIds=ids(inv);
+need(ledIds.length===new Set(ledIds).size,'CONTINUITY_LEDGER_DUPLICATE_ID');
+need(invIds.length===new Set(invIds).size,'CONTINUITY_REGISTER_DUPLICATE_ID');
+need(JSON.stringify(ledIds)===JSON.stringify(invIds),'CONTINUITY_REGISTER_LEDGER_SET_MISMATCH');
+need(reg.inventoryCount===inv.length,'CONTINUITY_INVENTORY_COUNT_MISMATCH');
+const byLed=new Map(findings.map(x=>[String(x.id),x]));
+for(const row of inv){
+ const f=byLed.get(String(row.id));
+ need(!!f,'CONTINUITY_REGISTER_UNKNOWN_ID:'+row.id);
+ need(String(row.status||'')===String(f.status||''),'CONTINUITY_STATUS_DRIFT:'+row.id);
+}
+const attention=new Set((reg.attentionIds||[]).map(String));
+for(const id of attention){
+ const row=inv.find(x=>String(x.id)===id);
+ need(!!row,'CONTINUITY_ATTENTION_UNKNOWN:'+id);
+ need(!!row.owner,'CONTINUITY_OWNER_MISSING:'+id);
+ need(!!row.targetGate,'CONTINUITY_TARGET_GATE_MISSING:'+id);
+ need(!!row.closureCondition,'CONTINUITY_CLOSURE_CONDITION_MISSING:'+id);
+}
+const critical=(reg.criticalCurrentReviewIds||[]).map(String);
+for(const id of critical)need(byLed.has(id),'CONTINUITY_CRITICAL_FINDING_MISSING:'+id);
+const currentNext=String(cp.nextAction||cp.currentB4?.nextAction||'').toUpperCase();
+const openBlockingB4003=inv.filter(x=>x.blocking===true&&String(x.targetGate)==='B4-003'&&attention.has(String(x.id)));
+if(/B4[_-]?004/.test(currentNext)){
+ need(openBlockingB4003.length===0,'CONTINUITY_B4_004_BLOCKED_BY:'+openBlockingB4003.map(x=>x.id).join(','));
+ const human=String(cp.currentB4?.humanVisualStatus||cp.b4VisualAcceptanceControl?.currentB4003HumanStatus||'');
+ need(/PASS/.test(human),'CONTINUITY_B4_004_REQUIRES_B4_003_HUMAN_PASS');
+}
+if(/PRODUCTION|LIVE|B4[_-]?007/.test(currentNext)){
+ const prelive=inv.filter(x=>attention.has(String(x.id))&&String(x.targetGate)!=='POST_PRODUCTION_FROZEN');
+ need(prelive.length===0,'CONTINUITY_LIVE_BLOCKED_BY_OPEN_ATTENTION:'+prelive.slice(0,20).map(x=>x.id).join(','));
+}
+for(const required of ['B1-EMAIL-DELIVERY-001','B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5','B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929','B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929','B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6']){
+ need(byLed.has(required),'CONTINUITY_REQUIRED_CROSS_GATE_CARRY_MISSING:'+required);
+}
+console.log(JSON.stringify({status:'PASS',schema:'GRAVICENTRA_FINDING_CONTINUITY_GUARD_V1',ledgerCount:findings.length,inventoryCount:inv.length,attentionCount:attention.size,criticalCount:critical.length,openBlockingB4003:openBlockingB4003.map(x=>x.id),nextAction:cp.nextAction},null,2));

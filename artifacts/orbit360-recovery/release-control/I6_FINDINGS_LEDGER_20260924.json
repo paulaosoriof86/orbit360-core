@@ -2803,7 +2803,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "SOURCE_FIXED_R11_QA_HARNESS_REPAIRED_R11A_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2826,7 +2826,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2915,7 +2915,27 @@
       "renewabilityTriStateStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
       "qualityCountryPerformanceStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
       "cancelationIdentityStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
-      "client360BidirectionalTabsStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW"
+      "client360BidirectionalTabsStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
+      "childFindingIds": [
+        "B4-003-R11-01-CANCELATION-ROW-DETAIL",
+        "B4-003-R11-02-CANCELATION-CLIENT-POLICY-CONTEXT",
+        "B4-003-R11-03-CLIENT360-LEFT-TAB-NAV",
+        "B4-003-R11-04-RENEWABILITY-FAIL-CLOSED",
+        "B4-003-R11-05-POLICY-EDITOR-TAXONOMY-PRESERVATION",
+        "B4-003-R11-06-QUALITY-COUNTRY-SCOPE",
+        "B4-003-R11-07-QUALITY-PERFORMANCE",
+        "B4-003-R11-08-CANCELATION-RATIO-SEMANTICS",
+        "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+        "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
+        "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
+        "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE",
+        "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE",
+        "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+        "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF",
+        "B4-003-R11A-QA-01-VISIBLE-ROW-DISCRIMINANT"
+      ],
+      "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
+      "qaHarnessR11aReceiptBlobSha": "7399b828c3feea6ac52b8625acf9c709c118d419"
     },
     {
       "id": "B4-004",
@@ -6335,6 +6355,279 @@
       "sourceReceiptBlobSha": "be104f0e4a852077ca8b9df477dc79b7900da34c",
       "noLive": true,
       "noReimport": true
+    },
+    {
+      "id": "B4-003-R11-01-CANCELATION-ROW-DETAIL",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261003",
+      "surface": "Cancelaciones",
+      "finding": "Selecting a visible cancellation row outside the client sub-link can show Registro fuera de tu alcance.",
+      "owner": [
+        "orbit360-platform/modules/cancelaciones.js"
+      ],
+      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Exact Preview authenticated visible-row click opens the cancellation detail and Paula visual retest passes.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-02-CANCELATION-CLIENT-POLICY-CONTEXT",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261003",
+      "surface": "Cancelaciones→Cliente360",
+      "finding": "Client selection from Cancelaciones opens Cliente 360 Resumen instead of the policy list/context.",
+      "owner": [
+        "orbit360-platform/modules/cancelaciones.js",
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Client sub-link opens Cliente 360 with t=polizas and Paula confirms expected policy context.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-03-CLIENT360-LEFT-TAB-NAV",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261003",
+      "surface": "Cliente360",
+      "finding": "Cliente 360 tab strip can move right but provides no way to navigate back left.",
+      "owner": [
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Exact Preview proves left control activates after horizontal movement; Paula visual confirms bidirectional navigation.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-04-RENEWABILITY-FAIL-CLOSED",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261003",
+      "surface": "Renovaciones/Pólizas",
+      "finding": "A policy marked Renovabilidad pendiente de validar appears in Renovaciones.",
+      "owner": [
+        "orbit360-platform/modules/renovaciones.js",
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+      ],
+      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Only explicit renovable=true enters Renewals; unknown/no stay out; editor exposes tri-state and Paula visual confirms.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-05-POLICY-EDITOR-TAXONOMY-PRESERVATION",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261003",
+      "surface": "Cliente360/Póliza/Editar",
+      "finding": "Policy detail showed Accidentes y Enfermedades / Accidentes while edit form silently displayed Automóviles / Vehículo Liviano.",
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+      ],
+      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Exact Preview editor preserves existing source ramo/product even when absent from current catalog and no save can silently reclassify.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-06-QUALITY-COUNTRY-SCOPE",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261003",
+      "surface": "Calidad de datos",
+      "finding": "Changing global country does not change Calidad KPIs/list; GT records remain under Colombia.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "status": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW_RETEST",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Authenticated Preview shows only selected-country rows and recalculated KPIs for GT/CO/Todos.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-07-QUALITY-PERFORMANCE",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261003",
+      "surface": "Calidad de datos",
+      "finding": "Opening Calidad and switching country takes about 10–12 seconds.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js"
+      ],
+      "status": "SOURCE_OPTIMIZED_R11_PENDING_EXACT_RUNTIME_PERFORMANCE_PROOF",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Authenticated exact Preview measures module render and route/country-change latency within normal interactive threshold without 10–12 second blocking.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-08-CANCELATION-RATIO-SEMANTICS",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261003_PLUS_SOURCE_AUDIT",
+      "surface": "Cancelaciones",
+      "finding": "Historical canceladas/pólizas ratio was labeled Tasa de fuga without temporal cohort/denominator definition.",
+      "owner": [
+        "orbit360-platform/modules/cancelaciones.js"
+      ],
+      "status": "SOURCE_FIXED_R11_PENDING_VISUAL_RETEST",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "UI uses honest historical accumulated label or a properly defined temporal churn calculation.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261003",
+      "surface": "Póliza/Recibos/Salud de información",
+      "finding": "Observed policy showed contractual prima total Q407.01 while calendario vigente showed Q542.68 / 2 projected receipts.",
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/core/policy-receipts-engine.js",
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "status": "OPEN_BLOCKING_FROZEN_INFORMATION_HEALTH",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Identify authoritative source/lineage and reconcile or explicitly quarantine mismatch; no inferred rewrite; sum of active schedule must reconcile to contractual total within approved tolerance.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_REQUIREMENT_20261003",
+      "surface": "Aseguradoras/Tarifas/Documentos",
+      "finding": "User needs an explicit, reliable place to load tariff Excel, quote/policy examples and documents required by transaction, with durable normalized provenance feeding downstream capabilities.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/core/importa.js",
+        "orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js"
+      ],
+      "status": "OPEN_REQUIRES_RUNTIME_AND_UX_PROOF",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Preview demonstrates each supported document class upload/import path, durable source/provenance, normalized insurer+country+ramo+product+plan+version scope, and fail-closed enablement.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261003_PLUS_SOURCE_AUDIT",
+      "surface": "Aseguradoras/Tarifas y conocimiento",
+      "finding": "Header shows Fuentes registradas/Referencias disponibles = 0 while visible mapped/validated sources are listed below.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/modules/aseguradoras-knowledge-panel-p09f.js"
+      ],
+      "status": "OPEN_REQUIRES_CAUSAL_RECONCILIATION",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Counters and visible source list derive from one explained canonical scope and agree, or labels are changed to reflect their actual distinct semantics.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_REQUIREMENT_20261003",
+      "surface": "IA transversal",
+      "finding": "All section knowledge should feed intelligent assistance according to role; current IA owner is not yet proven as role-authorized source-backed retrieval over insurer/operational knowledge.",
+      "owner": [
+        "orbit360-platform/modules/ia.js",
+        "orbit360-platform/core/ia.js",
+        "orbit360-platform/core/knowledge-binding-gate-p08.js"
+      ],
+      "status": "CARRY_FORWARD_PRELIVE_ROLE_AWARE_RAG_CONTRACT_REQUIRED",
+      "blocking": false,
+      "targetGate": "B4-005_OR_PRELIVE",
+      "closureCondition": "Role-aware retrieval contract proves authorization, provenance/citations, no credential leakage, no cross-scope access, and source-backed answers from canonical knowledge.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_REQUIREMENT_20261003",
+      "surface": "Aseguradoras/Cotizador/Comparativo",
+      "finding": "Knowledge and schema must cover multiple insurer products/lines, not only Auto, and generate structured fields useful to Cotizador and Comparativo.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/core/quote-authority-contract-v1.js",
+        "orbit360-platform/core/cotizacion-esquema-aseguradora-p0.js"
+      ],
+      "status": "CARRY_FORWARD_SOURCE_BACKED_JIT_FAIL_CLOSED",
+      "blocking": false,
+      "targetGate": "B4-005_AND_EVERGREEN",
+      "closureCondition": "Multiproduct schema/roadmap remains visible; supported products have source-backed normalized fields; unsupported products remain explicit Pendiente de fuente with no invented calculations.",
+      "preLiveRequired": true
+    },
+    {
+      "id": "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_QUESTION_20261003",
+      "surface": "Aseguradoras/Tarifas y conocimiento",
+      "finding": "Tariff feedback and knowledge-base feeding for insurers/products not yet worked remains pending.",
+      "owner": [
+        "INSURER_KNOWLEDGE_SOURCE_BACKLOG",
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "status": "OPEN_VISIBLE_BACKLOG_REQUIRED",
+      "blocking": false,
+      "targetGate": "B4-005_AND_EVERGREEN",
+      "closureCondition": "Maintain explicit insurer×product source backlog with source status/last review/version; no pending source may silently become authoritative.",
+      "preLiveRequired": false
+    },
+    {
+      "id": "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_CROSSPROJECT_REQUIREMENT_20261003",
+      "surface": "Gravicentra↔A&S Transformación Digital/CotComp",
+      "finding": "CotComp must consume gravicentra-quote-authority-v1 and stay multiproduct/schema-driven without duplicating tariff authority; real transport remains unauthorized.",
+      "owner": [
+        "CROSS_PROJECT_HANDOFF_GRAVICENTRA_TO_AYS_TRANSFORMACION_DIGITAL"
+      ],
+      "status": "CONTRACT_FROZEN_HANDOFF_REQUIRED_BEFORE_REAL_TRANSPORT",
+      "blocking": false,
+      "targetGate": "CROSS_PROJECT_PRE_TRANSPORT",
+      "closureCondition": "Receiving project records the contract version and constraints; real Manifest/Quote/Proposal/Selection transport remains fail-closed until separately authorized and LAB-proven.",
+      "preLiveRequired": false
+    },
+    {
+      "id": "B4-003-R11A-QA-01-VISIBLE-ROW-DISCRIMINANT",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "RUN_37142027771",
+      "surface": "QA harness",
+      "finding": "R11 exact Preview failed on an artificial stale cancellation-id discriminant rather than the reported visible-row user path.",
+      "owner": [
+        "tools/gravicentra-i6-5-b4-003-preview-proof.mjs"
+      ],
+      "status": "QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW_RETRY",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Exact Preview clicks the visible cancellation row and passes; source static contract continues to enforce policy-id fallback.",
+      "preLiveRequired": true,
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
+      "receiptBlobSha": "7399b828c3feea6ac52b8625acf9c709c118d419"
     }
   ],
   "phaseBBacklog": [
@@ -6681,18 +6974,16 @@
     }
   },
   "currentB4": {
-    "status": "B4_003_SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_003_SOURCE_FIXED_R11_QA_HARNESS_REPAIRED_R11A_PENDING_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-    "executionLockBlobSha": "f082edc57e939c98a0fe2086a3e444481793bf05",
-    "compositionLockBlobSha": "7b6fe473b97f5e7891454178ca948df680f8eeb6",
     "readinessPercent": 96,
     "targetPercent": 100,
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY",
     "cumulativeFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
     "cumulativeFreezeBlobSha": "37f015ea5262df68ac0838b57b1de61c1b0b25a7",
     "informationHealthAndInsurerKnowledgeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
@@ -6714,7 +7005,11 @@
     "r10RuntimeReachabilityRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_20261003.json",
     "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
     "visualRejectionR11ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R11_SOURCE_FIX_20261003.json",
-    "visualRejectionR11ReceiptBlobSha": "1d2e940bad50e2bef141482494097ef5938ba8d4"
+    "visualRejectionR11ReceiptBlobSha": "1d2e940bad50e2bef141482494097ef5938ba8d4",
+    "humanVisualStatus": "REJECTED_R11_PENDING_RETEST",
+    "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
+    "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
+    "qaHarnessR11aReceiptBlobSha": "7399b828c3feea6ac52b8625acf9c709c118d419"
   },
   "b4003QaResidueCarry": {
     "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
@@ -6739,7 +7034,7 @@
     "note": "Names and parent IDs identify prior B2 QA lineage, but no deletion is authorized by this receipt. Exact provenance/dependent-row readback is required before any cleanup."
   },
   "b4VisualAcceptanceControl": {
-    "status": "ENFORCED",
+    "status": "R11A_EXACT_PREVIEW_PENDING",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
     "receiptBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
     "cumulativeReviewThrough": [

@@ -91,6 +91,7 @@ jobs:
           node --check tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs
           node --check tools/gravicentra-quote-authority-contract-v1.mjs
           node --check tools/gravicentra-i6-5-b4-003-preview-proof.mjs
+          node --check tools/gravicentra-open-findings-continuity-guard-v1.mjs
           node --check orbit360-platform/core/quote-authority-contract-v1.js
           node --check orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js
           node --check orbit360-platform/core/quote-comparison-contracts-v1203.js
@@ -109,6 +110,7 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund >/dev/null
           npm run check
           cd ..
+          node tools/gravicentra-open-findings-continuity-guard-v1.mjs | tee "$RUNNER_TEMP/b4-003-continuity-guard.json"
           node tools/gravicentra-i6-5-b4-003-contract.mjs | tee "$RUNNER_TEMP/b4-003-contract.json"
           node tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs | tee "$RUNNER_TEMP/b4-003-knowledge-contract.json"
           node tools/gravicentra-quote-authority-contract-v1.mjs | tee "$RUNNER_TEMP/b4-003-quote-authority-contract.json"

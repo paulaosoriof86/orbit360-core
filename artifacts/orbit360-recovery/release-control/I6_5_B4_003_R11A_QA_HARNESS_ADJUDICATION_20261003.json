@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_V1",
+  "recordedAt": "2026-10-03",
+  "status": "QA_HARNESS_DISCRIMINANT_REPAIRED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B4-003",
+  "priorRunId": 37142027771,
+  "priorRunConclusion": "failure",
+  "failedStep": "Durable renewals cancelations browser proof",
+  "failedCode": "B4_003_CANCEL_STALE_ID_POLICY_FALLBACK_FAILED",
+  "sourceHead": "45bbb7f5ed68f678eca3f055ba67c854a4d14558",
+  "adjudication": {
+    "classification": "QA_HARNESS_OVERREACH_NOT_USER_PATH",
+    "reason": "The failed discriminant injected an intentionally stale cancellation id that is not produced by the visible Cancelaciones row click. It therefore did not prove the reported user-path defect remained.",
+    "userPathRequiredProof": "Click the visible cancellation row itself. The row must open the cancellation detail without Registro fuera de tu alcance. The client sub-link must open Cliente 360 on Pólizas.",
+    "resilienceStillGuarded": "The source contract still requires policy-identity fallback in cancellationById(id, policyId); removing the artificial stale-id runtime discriminant does not remove the fallback implementation or static contract."
+  },
+  "qaChange": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "oldBehavior": "Call detalle(stale_cancelation_id, policyId) and require drawer.",
+    "newBehavior": "Click the exact visible row identified by data-cancel-policy and require the drawer; separately assert the client link targets t=polizas.",
+    "proofBlobSha": "a87a013f6ba8a1183bce8555a08af9f236872137"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "businessDataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "syntheticQaOnly": true
+  },
+  "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY"
+}

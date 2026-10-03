@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-03",
-  "status": "B4_003_SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_003_R11A_QA_HARNESS_REPAIRED_PENDING_EXACT_PREVIEW_RETRY",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones, policy integrity, Information Health and source-backed insurer knowledge.",
-    "status": "SOURCE_FIXED_R11_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "SOURCE_FIXED_R11_QA_HARNESS_REPAIRED_R11A_PENDING_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY",
     "humanVisualStatus": "REJECTED_R11_PENDING_RETEST",
     "knowledgePreview": true
   },
@@ -89,16 +89,17 @@
     "syntheticQaScope": "B4-003 R11 exact Preview only; synthetic rows only; mandatory cleanup/readback; no real operational record mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
-    "providerDeploymentAuthorized": false
+    "providerDeploymentAuthorized": false,
+    "findingContinuityGuardRequired": true
   },
-  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_R11A_EXACT_PREVIEW_RETRY",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "e776af4714b951649b751f05371c0a824a2b66cf"
+    "blobSha": "f2a07f7bb4b11749f286dde5eeb7e87690ad2b34"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "4e29a823a1bb73116e64b16b58bcae750751c9df"
+    "blobSha": "278736c32b336b76077d9b6e30773965c74af873"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -113,8 +114,8 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
-    "B4_003_R11_CONTRACT_PASS",
-    "B4_003_R11_EXACT_PREVIEW_MACHINE_PASS",
+    "CONTINUITY_GUARD_PASS",
+    "B4_003_R11A_EXACT_PREVIEW_MACHINE_PASS",
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
   "candidate": null,
@@ -374,5 +375,24 @@
       "INSURER_DOCUMENT_INGESTION_AND_ROLE_AWARE_AI_CONTRACT",
       "INSURER_MULTI_PRODUCT_KNOWLEDGE_EXPANSION"
     ]
+  },
+  "continuityRegister": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
+    "blobSha": "a2870bd5ccb759745d5e7521eb5ae58d6e4eeccf",
+    "inventoryCount": 181,
+    "attentionCount": 76,
+    "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
+    "guardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
+    "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
+  },
+  "b4003QaHarnessR11a": {
+    "status": "QA_HARNESS_DISCRIMINANT_REPAIRED_PENDING_EXACT_PREVIEW_RETRY",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
+    "receiptBlobSha": "7399b828c3feea6ac52b8625acf9c709c118d419",
+    "failedRunId": 37142027771,
+    "failedCode": "B4_003_CANCEL_STALE_ID_POLICY_FALLBACK_FAILED",
+    "replacementProof": "VISIBLE_ROW_CLICK_TO_DETAIL",
+    "proofBlobSha": "a87a013f6ba8a1183bce8555a08af9f236872137",
+    "productSourceChanged": false
   }
 }
