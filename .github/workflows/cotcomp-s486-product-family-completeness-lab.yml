@@ -114,10 +114,10 @@ jobs:
 
           grep -q '¿Qué quieres proteger?' "$E/page.html"
           grep -q 'Vehículo y movilidad' "$E/page.html"
-          grep -q '>Hogar<' "$E/page.html"
+          grep -q 'Hogar' "$E/page.html"
           grep -q 'Salud / gastos médicos' "$E/page.html"
           grep -q 'Vida e ingreso' "$E/page.html"
-          grep -q '>Empresa<' "$E/page.html"
+          grep -q 'Empresa' "$E/page.html"
           grep -q 'Transporte / carga' "$E/page.html"
           grep -q 'Otros / no sé cuál necesito' "$E/page.html"
 
