@@ -94,6 +94,21 @@ test('S4.87 remains preview-only with no PII capture, persistence or real transp
   ]) assert.equal(src.includes(forbidden),false,forbidden);
 });
 
+test('S4.87 HTML closes style before body so the approved surface actually renders',()=>{
+  const h=S.html();
+  const styleOpen=h.indexOf('<style>');
+  const styleClose=h.indexOf('</style>');
+  const bodyOpen=h.indexOf('<body>');
+  const main=h.indexOf('<main class="vl-screen">');
+  assert.ok(styleOpen>=0);
+  assert.ok(styleClose>styleOpen);
+  assert.ok(bodyOpen>styleClose);
+  assert.ok(main>bodyOpen);
+  assert.equal((h.match(/<style>/g)||[]).length,1);
+  assert.equal((h.match(/<\/style>/g)||[]).length,1);
+  assert.match(h,/<body>[\s\S]*Compara con criterio, no solo por precio\./);
+});
+
 test('S4.87 rejects write-like HTTP methods',()=>{
   const req={method:'POST'};
   const res={statusCode:200,headers:{},body:null,set(k,v){this.headers[k]=v;return this;},status(n){this.statusCode=n;return this;},send(v){this.body=v;return this;}};
