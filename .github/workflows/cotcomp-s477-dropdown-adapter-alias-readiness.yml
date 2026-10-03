@@ -1,0 +1,168 @@
+name: CotComp S4.77 dropdown adapter alias readiness
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s477-dropdown-adapter-alias-readiness-20261002
+    paths:
+      - '.github/cotcomp-lab-intents/s477-dropdown-adapter-alias-sourceonly.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  s477-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.77 source-only intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s477-dropdown-adapter-alias-sourceonly.json
+          jq -e '
+            .authorization=="S477_DROPDOWN_ADAPTER_ALIAS_SOURCEONLY" and
+            .projectId=="ays-orbit-360-lab" and
+            .tenantId=="alianzas-soluciones" and
+            .catalogDigestSha256=="89a77e66025945d015cc51704441a97437286022cafeef4995962fd750358df8" and
+            .appDataReads==false and
+            .appDataWrites==false and
+            .deployment==false and
+            .providerOrRater==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.77 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-dropdown-adapter-alias-s477.js
+          node --check cotcomp-dropdown-adapter-alias-s477.test.js
+          node --test cotcomp-dropdown-adapter-alias-s477.test.js
+
+      - name: Install deterministic PDF text dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Rebuild pinned SAT catalog and evaluate adapter gaps
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s477"
+          URL='https://portal.sat.gob.gt/portal/descarga/1895/legislacion-aduanera/91646/tabla-de-valores-iva-iprima-2026'
+          PDF="$RUNNER_TEMP/s477/source.pdf"
+          TXT="$RUNNER_TEMP/s477/source.txt"
+          REC="$RUNNER_TEMP/s477/S477_DROPDOWN_ADAPTER_ALIAS_RECEIPT.json"
+
+          curl -fL --retry 3 --retry-delay 2 --connect-timeout 20 --max-time 120 -sS -o "$PDF" "$URL"
+          test "$(sha256sum "$PDF" | awk '{print $1}')" = "ea15f79900e013bc3c397c23a154802fc2f62f8de3bf056b53003e03b85ec373"
+          pdftotext -layout -enc UTF-8 "$PDF" "$TXT"
+
+          cd functions
+          node - "$TXT" "$REC" <<'NODE'
+          const fs=require('fs');
+          const s476=require('./cotcomp-sat2026-normalized-catalog-s476');
+          const s477=require('./cotcomp-dropdown-adapter-alias-s477');
+          const [txtPath,recPath]=process.argv.slice(2);
+          const parsed=s476.parseText(fs.readFileSync(txtPath,'utf8'));
+          const catalog=s476.buildCatalog(parsed.rows);
+          const v=s476.validatePhysicalCatalog(catalog);
+          if(!v.ok)throw new Error('S477_BASE_CATALOG_INVALID:'+v.errors.join(','));
+          if(catalog.catalogDigestSha256!=='89a77e66025945d015cc51704441a97437286022cafeef4995962fd750358df8')throw new Error('S477_CATALOG_DIGEST_MISMATCH');
+
+          const gaps=s477.evaluateKnownEvidenceGaps(catalog);
+          const ready=s477.readiness(catalog);
+          if(!ready.adapterContractReady||!ready.searchableBrandSelectReady||!ready.dependentModelSearchReady||!ready.yearSeparateReady)throw new Error('S477_ADAPTER_NOT_READY');
+          if(ready.publicReleaseReady)throw new Error('S477_FALSE_PUBLIC_RELEASE');
+          if(ready.approvedAliasCount!==0||ready.pendingAliasCandidates!==3)throw new Error('S477_ALIAS_STATE_INVALID');
+          if(gaps.probes.cx5Prefix!==8||gaps.probes.crvCompactPrefix!==12||gaps.probes.pulsarPrefix!==0)throw new Error('S477_GAP_PROBES_INVALID');
+
+          const brands=s477.listBrands(catalog);
+          const toyota=brands.find(x=>x.label==='TOYOTA');
+          if(!toyota)throw new Error('S477_TOYOTA_BRAND_MISSING');
+          const corolla=s477.searchModels(catalog,{brandId:toyota.brandId,query:'COROLLA'});
+          if(!corolla.ok||!corolla.options.some(x=>x.label==='COROLLA'))throw new Error('S477_COROLLA_SEARCH_FAILED');
+
+          const receipt={
+            schemaVersion:'ays-cotcomp-s477-dropdown-adapter-alias-receipt-v1.0',
+            sourceRawSha256:s476.SOURCE_RAW_SHA256,
+            catalogVersion:catalog.catalogVersion,
+            catalogDigestSha256:catalog.catalogDigestSha256,
+            brandOptionCount:brands.length,
+            adapterContractReady:true,
+            searchableBrandSelectReady:true,
+            dependentModelSearchReady:true,
+            yearSeparateReady:true,
+            otherReviewFallback:'OTHER_REQUIRES_REVIEW',
+            approvedAliasCount:0,
+            pendingAliasCandidates:ready.pendingAliasCandidates,
+            aliasCandidates:gaps.candidates,
+            probes:gaps.probes,
+            toyotaCorollaSearchPass:true,
+            providerEligibilityEmbedded:false,
+            publicReleaseReady:false,
+            blockers:ready.blockers,
+            appDataReads:0,
+            appDataWrites:0,
+            deployment:false,
+            providerOrRaterCalls:0,
+            productionTouched:false
+          };
+          fs.writeFileSync(recPath,JSON.stringify(receipt,null,2));
+          NODE
+
+      - name: Assert S4.77 truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          R="$RUNNER_TEMP/s477/S477_DROPDOWN_ADAPTER_ALIAS_RECEIPT.json"
+          jq -e '
+            .catalogDigestSha256=="89a77e66025945d015cc51704441a97437286022cafeef4995962fd750358df8" and
+            .brandOptionCount==223 and
+            .adapterContractReady==true and
+            .searchableBrandSelectReady==true and
+            .dependentModelSearchReady==true and
+            .yearSeparateReady==true and
+            .approvedAliasCount==0 and
+            .pendingAliasCandidates==3 and
+            .probes.cx5Prefix==8 and
+            .probes.crvCompactPrefix==12 and
+            .probes.pulsarPrefix==0 and
+            .toyotaCorollaSearchPass==true and
+            .providerEligibilityEmbedded==false and
+            .publicReleaseReady==false and
+            (.blockers|index("GT_AUTO_MOTO_ALLOWED_TYPE_SCOPE_REQUIRED")!=null) and
+            (.blockers|index("REVIEWED_ALIAS_DECISIONS_REQUIRED")!=null) and
+            (.blockers|index("CATALOG_DELIVERY_SURFACE_REQUIRED")!=null) and
+            .appDataReads==0 and .appDataWrites==0 and .deployment==false and
+            .providerOrRaterCalls==0 and .productionTouched==false
+          ' "$R" >/dev/null
+
+      - name: Upload S4.77 readiness evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s477-dropdown-adapter-alias-${{ github.run_id }}
+          path: ${{ runner.temp }}/s477/S477_DROPDOWN_ADAPTER_ALIAS_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
