@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-02",
-  "status": "B4_003_R8_PACKET_1_REQUESTED_SOURCE_EXTRACTION_CONTINUES",
+  "status": "B4_003_SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -37,11 +37,11 @@
   ],
   "activeFinding": {
     "id": "B4-003",
-    "title": "Cumulative remediation plus Information Health and insurer tariff knowledge reuse.",
-    "status": "B4_003_R8_PACKET_1_REQUESTED_SOURCE_EXTRACTION_CONTINUES",
+    "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones, premium/source authority, Information Health and visible insurer knowledge.",
+    "status": "B4_003_SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
     "blocking": true,
-    "nextAction": "B4_003_R8_WAIT_PACKET_1_WHILE_CONTINUING_AVAILABLE_SOURCE_EXTRACTION",
-    "humanVisualStatus": "REJECTED_R6_REMEDIATION_ACTIVE",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "PENDING_R9_PREVIEW",
     "informationHealthAndInsurerKnowledgeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_INFORMATION_HEALTH_AND_INSURER_KNOWLEDGE_LOCK_20261003.json",
     "informationHealthAndInsurerKnowledgeLockBlobSha": "e0edc10070dee174ed0c3527a29a8b632b1cba69",
     "sourceInventoryPass1Path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R8_SOURCE_INVENTORY_PASS_1_20261003.json",
@@ -62,29 +62,29 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "allowedProductFiles": [
-      "orbit360-platform/core/access-scope.js",
-      "orbit360-platform/modules/cancelaciones.js",
-      "orbit360-platform/modules/renovaciones.js",
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
-      "orbit360-platform/modules/cronograma.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js",
+      "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
-    "syntheticQaScope": "B4-003 R5 exact Preview only; mandatory cleanup; no operational record mutation.",
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaScope": "B4-003 exact Preview only; mandatory cleanup; no operational record mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true
   },
-  "nextAction": "B4_003_R8_WAIT_PACKET_1_WHILE_CONTINUING_AVAILABLE_SOURCE_EXTRACTION",
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "1c02066be59d2fb979fd1fef409f2f8ab2403678"
+    "blobSha": "f7f5007edd9a1a378ae600e91f1e68ec9e1bfe91"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "e9c46b3e8014f31a47dc10bd828ba311da6171c8"
+    "blobSha": "020a8fa8b6adc118fb5468b524b09757aa72a98b"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -293,5 +293,21 @@
     "status": "PASS_1_COMPLETE",
     "paulaSourceUploadStatus": "PACKET_1_REQUESTED",
     "paulaFinancialManualActionStatus": "DO_NOT_START_YET"
+  },
+  "r9KnowledgePreview": {
+    "authorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_PREVIEW_AUTHORIZATION_LOCK_20261003.json",
+    "authorizationLockBlobSha": "e26ce6ddd4032bf04bda1458513e2564f6e65f9e",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_SOURCE_FIX_20261003.json",
+    "sourceFixReceiptBlobSha": "988c42f1ab11e8f5957086e4acd22ff4a991d4ff",
+    "libraryManifest": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_ASEGURADORAS_MANIFIESTO_2026-10-03.md",
+    "allowedProductFiles": [
+      "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js",
+      "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ],
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW"
   }
 }
