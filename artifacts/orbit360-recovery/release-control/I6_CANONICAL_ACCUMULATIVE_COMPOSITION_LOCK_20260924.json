@@ -2068,7 +2068,7 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_003_SOURCE_FIXED_R9_KNOWLEDGE_PREVIEW_READY",
+    "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_READY",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "lockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -2090,7 +2090,8 @@
     "r4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
     "visualAcceptanceRequiredBeforeAdvance": true,
     "visualAcceptanceNextAction": "B4_003_TARGETED_PAULA_VISUAL",
-    "productMutationAuthorized": true
+    "productMutationAuthorized": true,
+    "quoteAuthorityContractVersion": "gravicentra-quote-authority-v1"
   },
   "b4001SourceFix": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -2389,6 +2390,21 @@
     "visibleTarget": "Aseguradoras > ficha > Tarifas y conocimiento",
     "libraryManifest": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_ASEGURADORAS_MANIFIESTO_2026-10-03.md",
     "multiProduct": true,
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false
+  },
+  "b4003R10QuoteAuthority": {
+    "status": "SOURCE_FIXED_R10_QUOTE_AUTHORITY_PENDING_EXACT_PREVIEW",
+    "authorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_INTEGRATION_LOCK_20261003.json",
+    "authorizationLockBlobSha": "868a78408791bea719f7d07f5d48a0874df1a8da",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_SOURCE_FIX_20261003.json",
+    "sourceFixReceiptBlobSha": "6400bb9447fa145b6fb8d7c42a1c7dfe4477a4d1",
+    "contractPath": "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
+    "executableContractPath": "orbit360-platform/core/quote-authority-contract-v1.js",
+    "authorityVersion": "gravicentra-quote-authority-v1",
+    "cotcompRealTransportAuthorized": false,
     "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
