@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "ays-cotcomp-s487-approved-visual-convergence-lab-intent-v1.0",
+  "authorization": "S487_DEPLOY_APPROVED_VISUAL_CONVERGENCE_PREVIEW",
+  "authorizedSourceParent": "ffc806aea131bb11dbb7808f904862327d4bea2a",
+  "projectId": "ays-orbit-360-lab",
+  "functionName": "cotcompApprovedVisualPreviewS487",
+  "promotedVisualParentSha": "50aa4190ae22ad13760f893b9bf37415abe35fb7327e034f66dc565b9b2cbf1d",
+  "providerContractVersion": "gravicentra-quote-authority-v1",
+  "productFamilyCount": 7,
+  "fixtureOnly": true,
+  "providerDeploymentAuthorized": false,
+  "cotcompRealTransportAuthorized": false,
+  "appDataReads": false,
+  "appDataWrites": false,
+  "piiFields": false,
+  "quoteCaseWrites": false,
+  "providerOrRater": false,
+  "production": false
+}
