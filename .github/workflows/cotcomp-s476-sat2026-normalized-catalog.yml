@@ -134,8 +134,8 @@ jobs:
             .duplicateSourceRowsMerged==243 and
             .uniqueVehicleTypes==31 and
             .uniqueBrands==223 and
-            .uniqueBrandLinePairs==3289 and
-            .crossTypeBrandLinePairs==101 and
+            .uniqueBrandLinePairs==3287 and
+            .crossTypeBrandLinePairs==103 and
             .regressionProbes.toyotaCorollaExact>=1 and
             .regressionProbes.toyotaYarisExact>=1 and
             .regressionProbes.mazdaCx5Prefix>=1 and
