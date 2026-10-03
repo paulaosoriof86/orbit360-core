@@ -10,7 +10,7 @@ const { __opsLeadsProductDomain } = require('./product-ops-leads-domain');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'gravicentra-drive-document-domain-v5-r10-payment-expedient-binding';
+const VERSION = 'gravicentra-drive-document-domain-v6-r13-insurer-target-authority';
 const PROJECT_ID = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'ays-orbit-360-lab';
 const SERVICE_ACCOUNT = process.env.ORBIT360_SECRETS_SERVICE_ACCOUNT || 'orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com';
 const DRIVE_OAUTH_CLIENT_PREVIEW_SECRET = 'ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW';
@@ -36,7 +36,13 @@ function clean(v,max=500){return String(v==null?'':v).replace(/\u0000/g,'').trim
 function norm(v){return clean(v,160).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');}
 function safeName(v){return clean(v,180).replace(/[\\/:*?"<>|\u0000-\u001f]+/g,' ').replace(/\s+/g,' ').trim()||'Documento';}
 function sha(v){return crypto.createHash('sha256').update(String(v??''),'utf8').digest('hex');}
-function previewSyntheticClient(clientId){return /^(?:b2[-_]|b3004qa_|b3004human_)/i.test(clean(clientId,180));}
+function previewSyntheticClient(clientId){return /^(?:b2[-_]|b3004qa_|b3004human_|b4003qa_)/i.test(clean(clientId,180));}
+function previewSyntheticInsurer(insurerId,row){return /^b4[-_]/i.test(clean(insurerId,180))&&row&&row.__syntheticQa===true;}
+function previewSyntheticTarget(target){
+  if(!target)return false;
+  if(target.entityType==='aseguradora')return target.previewSyntheticQa===true;
+  return target.previewSyntheticQa===true||previewSyntheticClient(target.clientId);
+}
 function driveIdFromUrl(v){
   const s=clean(v,1000);
   const m=s.match(/\/(?:file\/d|folders)\/([A-Za-z0-9_-]{20,})/)||s.match(/[?&]id=([A-Za-z0-9_-]{20,})/);
@@ -219,10 +225,20 @@ async function authorizeTarget(request,tenantId,input,mode,previewOnly){
     const ref=__productOperationalDomain.canonicalRef(tenantId,'clientes',clientId);
     const snap=await ref.get();
     if(!snap.exists)throw new HttpsError('not-found','Cliente vinculado no encontrado.');
-    return{actor:authz.actor,row:Object.assign({},snap.data()||{},{id:clientId,tenantId}),ref,clientId,management};
+    return{actor:authz.actor,row:Object.assign({},snap.data()||{},{id:clientId,tenantId}),ref,clientId,management,entityType:'gestion',entityId:managementId,previewSyntheticQa:false};
   }
-  const clientId=__productOperationalDomain.cleanId(requestedClientId,'clienteId');
   const d=__productOperationalDomain;
+  if(entity==='aseguradora'||entity==='aseguradoras'){
+    const insurerId=d.cleanId(input.aseguradoraId||input.entidadId||input.entityId,'aseguradoraId');
+    const actor=mode==='write'?await d.authorize(request,tenantId,[{collection:'aseguradoras'}]):await d.authorizeRead(request,tenantId,'aseguradoras');
+    const ref=d.canonicalRef(tenantId,'aseguradoras',insurerId),snap=await ref.get();
+    if(!snap.exists)throw new HttpsError('not-found','Aseguradora no encontrada.');
+    const row=Object.assign({},snap.data()||{},{id:insurerId,tenantId});
+    if(!d.withinScope(actor,'aseguradoras','aseguradoras',row))throw new HttpsError('permission-denied','La aseguradora está fuera del alcance activo.');
+    const previewSyntheticQa=previewOnly===true&&previewSyntheticInsurer(insurerId,row);
+    return{actor,row,ref,clientId:'',insurerId,entityType:'aseguradora',entityId:insurerId,previewSyntheticQa};
+  }
+  const clientId=d.cleanId(requestedClientId,'clienteId');
   const actor=mode==='write'?await d.authorize(request,tenantId,[{collection:'clientes'}]):await d.authorizeRead(request,tenantId,'clientes');
   const ref=d.canonicalRef(tenantId,'clientes',clientId);
   const snap=await ref.get();
@@ -230,11 +246,11 @@ async function authorizeTarget(request,tenantId,input,mode,previewOnly){
   const row=Object.assign({},snap.data()||{},{id:clientId,tenantId});
   const exactPreviewQa=exactB3004HumanPreviewClient(previewOnly,clientId,row);
   if(!exactPreviewQa&&!d.withinScope(actor,'clientes','cliente360',row))throw new HttpsError('permission-denied','El alcance activo no autoriza este cliente.');
-  return{actor,row,ref,clientId,exactPreviewQa};
+  return{actor,row,ref,clientId,entityType:'cliente',entityId:clientId,exactPreviewQa,previewSyntheticQa:exactPreviewQa};
 }
 function refsFrom(row){
   const out=[];
-  for(const key of ['documentos','adjuntos','attachments','files']){
+  for(const key of ['documentos','docs','adjuntos','attachments','files']){
     for(const item of (Array.isArray(row&&row[key])?row[key]:[])){
       if(typeof item==='string')out.push(driveIdFromUrl(item)||clean(item,180));
       else if(item&&typeof item==='object')out.push(clean(item.documentRef||item.fileId||item.archivoRef,180)||driveIdFromUrl(item.driveUrl||item.externalUrl||item.url||''));
@@ -247,7 +263,7 @@ async function authorizeDocument(request,previewOnly,mode){
   const input=request.data||{};
   const tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
   const target=await authorizeTarget(request,tenantId,input,mode||'read',previewOnly);
-  if(previewOnly===true&&!previewSyntheticClient(target.clientId))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
+  if(previewOnly===true&&!previewSyntheticTarget(target))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
   const fileId=clean(input.documentRef||input.fileId||input.archivoRef,180)||driveIdFromUrl(input.driveUrl||input.externalUrl||input.url||'');
   if(!/^[A-Za-z0-9_-]{20,}$/.test(fileId))throw new HttpsError('invalid-argument','Referencia documental inválida.');
   const bound=new Set([...refsFrom(target.row),...refsFrom(target.management||{})]);
@@ -255,7 +271,7 @@ async function authorizeDocument(request,previewOnly,mode){
   return{tenantId,target,fileId};
 }
 async function audit(tenantId,actor,action,detail,previewOnly){
-  const payload={schemaVersion:VERSION,tenantId,action,actorUidHash:sha(actor.uid),activeRole:clean(actor.activeRole,80),clientId:clean(detail&&detail.clientId,180),documentRefHash:sha(clean(detail&&detail.documentRef,180)),outcome:clean(detail&&detail.outcome||'ok',60),containsSecrets:false,createdAt:new Date().toISOString()};
+  const payload={schemaVersion:VERSION,tenantId,action,actorUidHash:sha(actor.uid),activeRole:clean(actor.activeRole,80),clientId:clean(detail&&detail.clientId,180),entityType:clean(detail&&detail.entityType,80),entityIdHash:sha(clean(detail&&detail.entityId,180)),documentRefHash:sha(clean(detail&&detail.documentRef,180)),outcome:clean(detail&&detail.outcome||'ok',60),containsSecrets:false,createdAt:new Date().toISOString()};
   if(previewOnly===true){console.info('GRAVICENTRA_PREVIEW_DRIVE_AUDIT '+JSON.stringify(payload));return;}
   await db.collection('tenants').doc(tenantId).collection('auditEvents').add(Object.assign({},payload,{createdAt:FieldValue.serverTimestamp()}));
 }
@@ -305,23 +321,27 @@ async function status(request,previewOnly){
 }
 async function upload(request,previewOnly){
   const input=request.data||{},tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
-  const target=await authorizeTarget(request,tenantId,input,'write',previewOnly),clientId=target.clientId;
-  if(previewOnly===true&&!previewSyntheticClient(clientId))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
+  const target=await authorizeTarget(request,tenantId,input,'write',previewOnly),clientId=target.clientId||'',insurerId=target.insurerId||'',scopeId=target.entityId||clientId;
+  if(previewOnly===true&&!previewSyntheticTarget(target))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
   const auth=await tenantDriveToken(tenantId,previewOnly),accessToken=auth.accessToken,vault=auth.vault,{actor,row}=target;
   const mime=clean(input.mimeType,160).toLowerCase();
   if(!ALLOWED_MIME.has(mime))throw new HttpsError('invalid-argument','Tipo de archivo no permitido.');
   const bytes=base64Bytes(input.base64),contentHash=crypto.createHash('sha256').update(bytes).digest('hex'),rootId=ROOT_BY_TENANT[tenantId];
   if(!rootId)throw new HttpsError('failed-precondition','Repositorio Drive no configurado para el tenant.');
   const rootMeta=await getMeta(rootId,accessToken);
-  if(!rootMeta||!rootMeta.capabilities||rootMeta.capabilities.canAddChildren!==true)throw new HttpsError('permission-denied','La conexión administrativa de Drive no tiene permiso de escritura en Clientes.');
+  if(!rootMeta||!rootMeta.capabilities||rootMeta.capabilities.canAddChildren!==true)throw new HttpsError('permission-denied','La conexión administrativa de Drive no tiene permiso de escritura en el repositorio.');
   let clientFolderId='',clientFolder=null,destination=null;
   if(previewOnly===true){
     const qaRoot=await ensureFolder(rootId,'_GRAVICENTRA_PREVIEW_QA',accessToken);
-    destination=await ensureFolder(qaRoot.id,clientId,accessToken);clientFolder=destination;clientFolderId=destination.id;
+    const entityRoot=target.entityType==='aseguradora'?await ensureFolder(qaRoot.id,'aseguradoras',accessToken):qaRoot;
+    destination=await ensureFolder(entityRoot.id,scopeId,accessToken);clientFolder=destination;clientFolderId=destination.id;
   }else{
     clientFolderId=clean(input.driveFolderId,160)||clean(row.driveFolderId,160)||driveIdFromUrl(row.driveLink||row.driveUrl||'');
-    if(clientFolderId){clientFolder=await getMeta(clientFolderId,accessToken);if(clientFolder.mimeType!=='application/vnd.google-apps.folder')throw new HttpsError('failed-precondition','La referencia Drive del cliente no es una carpeta.');}
-    else{clientFolder=await ensureFolder(rootId,row.nombre||row.razonSocial||clientId,accessToken);clientFolderId=clientFolder.id;}
+    if(clientFolderId){clientFolder=await getMeta(clientFolderId,accessToken);if(clientFolder.mimeType!=='application/vnd.google-apps.folder')throw new HttpsError('failed-precondition','La referencia Drive del expediente no es una carpeta.');}
+    else{
+      const entityRoot=target.entityType==='aseguradora'?await ensureFolder(rootId,'_ASEGURADORAS',accessToken):rootMeta;
+      clientFolder=await ensureFolder(entityRoot.id,row.nombre||row.razonSocial||scopeId,accessToken);clientFolderId=clientFolder.id;
+    }
     destination=clientFolder;
   }
   const provisional=input.provisional===true;
@@ -332,10 +352,10 @@ async function upload(request,previewOnly){
   if(!provisional){
     await target.ref.set({driveFolderId:clientFolderId,driveLink:canonicalFolderUrl,driveUrl:canonicalFolderUrl,driveRepository:'Google Drive',driveLinkedAt:new Date().toISOString()},{merge:true});
     const folderReadback=await target.ref.get(),folderRow=folderReadback.exists?(folderReadback.data()||{}):{};
-    if(clean(folderRow.driveFolderId,160)!==clientFolderId)throw new HttpsError('internal','Drive guardó el archivo, pero no se confirmó el vínculo documental del cliente.');
+    if(clean(folderRow.driveFolderId,160)!==clientFolderId)throw new HttpsError('internal','Drive guardó el archivo, pero no se confirmó el vínculo documental del expediente.');
   }
-  await audit(tenantId,actor,provisional?'drive.document_stage':'drive.document_upload',{clientId,documentRef:uploaded.id,outcome:'ok'},previewOnly);
-  return{ok:true,status:provisional?'staged':'disponible',provisional,documentRef:uploaded.id,fileId:uploaded.id,nombre:uploaded.name||safeName(input.name),mimeType:uploaded.mimeType||mime,size:Number(uploaded.size||bytes.length),driveUrl:uploaded.webViewLink||readback.webViewLink||('https://drive.google.com/file/d/'+uploaded.id+'/view'),externalUrl:uploaded.webViewLink||readback.webViewLink||('https://drive.google.com/file/d/'+uploaded.id+'/view'),folderId:uploadDestination.id,stagingFolderId:provisional?uploadDestination.id:'',clientFolderId,clientFolderUrl:canonicalFolderUrl,contentHash,repository:'Google Drive',actorUid:actor.uid,activeRole:actor.activeRole,driveUserEmail:clean(vault.googleAccountEmail,320),previewIsolated:previewOnly===true,canonicalReadback:true,backendPersistent:true,version:VERSION};
+  await audit(tenantId,actor,provisional?'drive.document_stage':'drive.document_upload',{clientId,entityType:target.entityType,entityId:target.entityId,documentRef:uploaded.id,outcome:'ok'},previewOnly);
+  return{ok:true,status:provisional?'staged':'disponible',provisional,documentRef:uploaded.id,fileId:uploaded.id,nombre:uploaded.name||safeName(input.name),mimeType:uploaded.mimeType||mime,size:Number(uploaded.size||bytes.length),driveUrl:uploaded.webViewLink||readback.webViewLink||('https://drive.google.com/file/d/'+uploaded.id+'/view'),externalUrl:uploaded.webViewLink||readback.webViewLink||('https://drive.google.com/file/d/'+uploaded.id+'/view'),folderId:uploadDestination.id,stagingFolderId:provisional?uploadDestination.id:'',clientFolderId,clientFolderUrl:canonicalFolderUrl,entityFolderId:clientFolderId,entityFolderUrl:canonicalFolderUrl,entityType:target.entityType,entityId:target.entityId,insurerId,contentHash,repository:'Google Drive',actorUid:actor.uid,activeRole:actor.activeRole,driveUserEmail:clean(vault.googleAccountEmail,320),previewIsolated:previewOnly===true,canonicalReadback:true,backendPersistent:true,version:VERSION};
 }
 async function moveDriveFile(fileId,fromParent,toParent,accessToken){
   const query='?addParents='+encodeURIComponent(toParent)+'&removeParents='+encodeURIComponent(fromParent)+'&fields=id,name,mimeType,parents,webViewLink,trashed&supportsAllDrives=true';
@@ -344,7 +364,7 @@ async function moveDriveFile(fileId,fromParent,toParent,accessToken){
 async function finalizeDocument(request,previewOnly){
   const input=request.data||{},tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
   const target=await authorizeTarget(request,tenantId,input,'write',previewOnly),clientId=target.clientId;
-  if(previewOnly===true&&!previewSyntheticClient(clientId))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
+  if(previewOnly===true&&!previewSyntheticTarget(target))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
   const fileId=clean(input.documentRef||input.fileId||input.archivoRef,180)||driveIdFromUrl(input.driveUrl||input.externalUrl||input.url||'');
   const clientFolderId=clean(input.clientFolderId,180),stagingFolderId=clean(input.stagingFolderId||input.folderId,180);
   if(!fileId||!clientFolderId||!stagingFolderId)throw new HttpsError('invalid-argument','Referencia provisional incompleta.');
@@ -380,14 +400,14 @@ async function finalizeDocument(request,previewOnly){
 async function quarantineDocument(request,previewOnly){
   const input=request.data||{},tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
   const target=await authorizeTarget(request,tenantId,input,'write',previewOnly),clientId=target.clientId;
-  if(previewOnly===true&&!previewSyntheticClient(clientId))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
+  if(previewOnly===true&&!previewSyntheticTarget(target))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
   const fileId=clean(input.documentRef||input.fileId||input.archivoRef,180)||driveIdFromUrl(input.driveUrl||input.externalUrl||input.url||'');
   const clientFolderId=clean(input.clientFolderId,180)||clean(target.row&&target.row.driveFolderId,180);
   const stagingFolderId=clean(input.stagingFolderId||input.folderId,180);
   if(!fileId||!clientFolderId)throw new HttpsError('invalid-argument','Referencia documental incompleta.');
   const auth=await tenantDriveToken(tenantId,previewOnly),accessToken=auth.accessToken,meta=await getMeta(fileId,accessToken),parents=Array.isArray(meta&&meta.parents)?meta.parents:[];
   if(!meta||meta.trashed===true)throw new HttpsError('not-found','Documento no disponible.');
-  const exactFinalizedQa=previewOnly===true&&target.exactPreviewQa===true&&parents.includes(clientFolderId);
+  const exactFinalizedQa=previewOnly===true&&target.previewSyntheticQa===true&&parents.includes(clientFolderId);
   if(exactFinalizedQa){
     const quarantine=await ensureFolder(clientFolderId,'_PAGOS_REQUIEREN_RECUPERACION',accessToken);
     const moved=await moveDriveFile(fileId,clientFolderId,quarantine.id,accessToken);
