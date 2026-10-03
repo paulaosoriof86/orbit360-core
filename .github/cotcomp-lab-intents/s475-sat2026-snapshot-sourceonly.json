@@ -1,0 +1,12 @@
+{
+  "schemaVersion":"ays-cotcomp-s475-sat2026-snapshot-sourceonly-intent-v1.0",
+  "authorization":"S475_SAT2026_SNAPSHOT_SOURCEONLY",
+  "authorizedSourceParent":"d9848fe10b3e1d1b7d9d4e2934627512ea9086e7",
+  "projectId":"ays-orbit-360-lab",
+  "tenantId":"alianzas-soluciones",
+  "appDataReads":false,
+  "appDataWrites":false,
+  "deployment":false,
+  "providerOrRater":false,
+  "production":false
+}
