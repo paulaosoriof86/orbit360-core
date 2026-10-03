@@ -746,7 +746,7 @@
     "noReimport": true,
     "noLive": true
   },
-  "activeFindingId": "B4-002",
+  "activeFindingId": "B4-003",
   "b3004R10CausalSourceFix": {
     "status": "FINAL_SOURCE_BOUND_PENDING_EXACT_PREVIEW",
     "findingId": "B3-004",
@@ -2062,22 +2062,22 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_002_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "lockBlobSha": "0b0b6b2b2789f5ab83e1e87a4bfce68da19efddd",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
     "productSourceChanged": true,
     "noLive": true,
     "noReimport": true,
-    "activeFindingId": "B4-002",
-    "nextAction": "B4_002_NOTIFICATION_PROCESSOR_CONTRACT_AND_EXACT_PREVIEW",
+    "activeFindingId": "B4-003",
+    "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
-    "sourceSha": "18799ffbb2623dbfd28623774c41abef22f9f75a",
-    "buildId": "gi-i65-b4-18799ffbb262-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37081436268-4ls0jwa6.web.app",
-    "runId": 37081436268,
-    "artifactId": 11258972168,
-    "artifactDigest": "11d0239866f5b7a502f678591fc97b4f38980bc5d8677880c2975ae15c27947e"
+    "sourceSha": "cb43730733a1c3f68b2bc8a0ec5d7bc4c64159da",
+    "buildId": "gi-i65-b4-cb43730733a1-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37084067150-984oh27l.web.app",
+    "runId": 37084067150,
+    "artifactId": 11260042183,
+    "artifactDigest": "686c12339b1800329b065b4d9717bfbd3c160fe46c78421c58a0729fd38fdfc5"
   },
   "b4001SourceFix": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -2150,5 +2150,20 @@
     "noOperationalDataWrites": true,
     "noReimport": true,
     "noLive": true
+  },
+  "b4002MachinePass": {
+    "status": "PASS",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_MACHINE_PASS_20261003.json",
+    "blobSha": "7d51a1551d73f144a5e80269ee4a811b2bc23c14",
+    "sourceSha": "cb43730733a1c3f68b2bc8a0ec5d7bc4c64159da",
+    "buildId": "gi-i65-b4-cb43730733a1-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37084067150-984oh27l.web.app",
+    "runId": 37084067150,
+    "artifactId": 11260042183,
+    "artifactDigest": "686c12339b1800329b065b4d9717bfbd3c160fe46c78421c58a0729fd38fdfc5",
+    "productSourceChanged": true,
+    "operationalBusinessWrites": 0,
+    "syntheticFinalAbsent": true,
+    "externalProviderSimulation": false
   }
 }

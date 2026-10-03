@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-02",
-  "status": "B4_002_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -36,16 +36,11 @@
     "Paula visual acceptance on exact final Preview before LIVE."
   ],
   "activeFinding": {
-    "id": "B4-002",
-    "title": "Notifications and automations occur only after canonical commit.",
-    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "id": "B4-003",
+    "title": "Targeted regression closure for Renovaciones and Cancelaciones.",
+    "status": "ACTIVE_READONLY_DIAGNOSTIC",
     "blocking": true,
-    "rootCause": "CANONICAL_OUTBOX_HAS_NO_EXECUTABLE_DISPATCH_RETRY_OWNER",
-    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
-    "diagnosticReceiptBlobSha": "12183afd6a7a71863e2cd8fd365a847383fc5bee",
-    "nextAction": "B4_002_NOTIFICATION_PROCESSOR_CONTRACT_AND_EXACT_PREVIEW",
-    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_CAUSAL_SOURCE_FIX_20261003.json",
-    "sourceFixReceiptBlobSha": "b6c06bcd175ec89a1cee8e6f7129adbd25b17029"
+    "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC"
   },
   "rules": {
     "preserveB1B2B3Pass": true,
@@ -66,17 +61,17 @@
     "allowedProductFiles": [],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": true,
+    "syntheticQaWritesAuthorized": false,
     "syntheticQaScope": "B4-002 exact Preview only: isolated previewWorkflowEvents + previewNotificationOutbox + previewNotifs; failure-before-event + retry + idempotent replay; mandatory cleanup; no operational collection writes."
   },
-  "nextAction": "B4_002_NOTIFICATION_PROCESSOR_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "5cbaa41bf542e5a8008cce87abd2ea524e37cf54"
+    "blobSha": "6198a6ae8121f6313c8efb193a60fee14f20cce0"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "feedca40502994b3c2707badd1672b6e5611d0ae"
+    "blobSha": "126cd3443b269c97b482134c515a7759da210af4"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -91,20 +86,18 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
-    "B4_002_NOTIFICATION_PROCESSOR_CONTRACT_PASS",
-    "B4_002_EXACT_PREVIEW_POST_COMMIT_RETRY_FAILURE_IDEMPOTENCE_PASS",
-    "B4_002_SYNTHETIC_FINAL_ABSENT"
+    "B4_003_RENEWALS_CANCELATIONS_READONLY_DIAGNOSTIC"
   ],
   "candidate": {
-    "sourceSha": "18799ffbb2623dbfd28623774c41abef22f9f75a",
-    "buildId": "gi-i65-b4-18799ffbb262-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37081436268-4ls0jwa6.web.app",
-    "runId": 37081436268,
-    "artifactId": 11258972168,
-    "artifactDigest": "11d0239866f5b7a502f678591fc97b4f38980bc5d8677880c2975ae15c27947e",
-    "hostedPayloadDigest": "b44791dddfe3d50c42374d534b0af8b02bdb1b10c51b2154923a8c28e60e7042",
-    "backendSourceDigest": "3970cb67659f54535e7cdb5f30bd5fdb732a6fbd47890140af63ad82ab054241",
-    "bundleDigest": "431445527957a34b434cefba86b9b49cef02a2b7c3241ca3c978fd925e13db10",
+    "sourceSha": "cb43730733a1c3f68b2bc8a0ec5d7bc4c64159da",
+    "buildId": "gi-i65-b4-cb43730733a1-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37084067150-984oh27l.web.app",
+    "runId": 37084067150,
+    "artifactId": 11260042183,
+    "artifactDigest": "686c12339b1800329b065b4d9717bfbd3c160fe46c78421c58a0729fd38fdfc5",
+    "hostedPayloadDigest": "45785709c090597c4eb455ee2a3a2a4cc3c64040a12d14f701bf492aeebdcae2",
+    "backendSourceDigest": "ab62af6a36830fbb528e7e4e7a67c229fcabf1d7708f66a4c77e0f350b156ee5",
+    "bundleDigest": "0b9b037cae0f368be62ebeada6c5f42a763f7bd0a93da7b7d8e549d0b6795a19",
     "exactReadback": true
   },
   "b4002Diagnostic": {

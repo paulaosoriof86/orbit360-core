@@ -2752,10 +2752,10 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Notifications/automation occur only after committed domain events with retry/failure visibility.",
-      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
-      "blocking": true,
+      "status": "CLOSED_PASS_MACHINE",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "B4_002_NOTIFICATION_PROCESSOR_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "NONE_CLOSED",
       "rootCause": "CANONICAL_OUTBOX_HAS_NO_EXECUTABLE_DISPATCH_RETRY_OWNER",
       "causeClassification": "PRODUCT_BACKEND_NOTIFICATION_DELIVERY_GAP",
       "evidence": {
@@ -2785,14 +2785,17 @@
         "functions/bootstrap.js": "b9201c7e917658e6c3c3efebd3e221390ce2417d",
         "functions/package.json": "473f752a48e4850bdf61ccbf025de69bd1c5290d",
         "functions/ops-advisor-inbox.js": "23f2bef28af857fbd3ac2349a934771809d3f228"
-      }
+      },
+      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_MACHINE_PASS_20261003.json",
+      "machineProofReceiptBlobSha": "7d51a1551d73f144a5e80269ee4a811b2bc23c14",
+      "currentCandidateEligibleForPromotion": false
     },
     {
       "id": "B4-003",
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Targeted regression closure for Renovaciones and Cancelaciones.",
-      "status": "NOT_STARTED",
+      "status": "ACTIVE_READONLY_DIAGNOSTIC",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2803,7 +2806,8 @@
         "Real cancellation records/status derived from canonical policy/cancellation events are populated and visible where source evidence exists.",
         "No empty module caused by alternate collection/owner or missing projection.",
         "Role/country scope, persistence/readback and regression are verified."
-      ]
+      ],
+      "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC"
     },
     {
       "id": "B4-004",
@@ -6563,17 +6567,17 @@
     }
   },
   "currentB4": {
-    "status": "B4_ACTIVE_B4_002_READONLY_DIAGNOSTIC",
-    "activeFindingId": "B4-002",
+    "status": "B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC",
+    "activeFindingId": "B4-003",
     "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "executionLockBlobSha": "f082edc57e939c98a0fe2086a3e444481793bf05",
-    "compositionLockBlobSha": "5cbaa41bf542e5a8008cce87abd2ea524e37cf54",
+    "compositionLockBlobSha": "6198a6ae8121f6313c8efb193a60fee14f20cce0",
     "readinessPercent": 96,
     "targetPercent": 100,
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC"
+    "nextAction": "B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC"
   }
 }
