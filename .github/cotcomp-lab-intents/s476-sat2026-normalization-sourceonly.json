@@ -1,13 +1,13 @@
 {
-  "schemaVersion":"ays-cotcomp-s476-sat2026-normalization-sourceonly-intent-v1.0",
-  "authorization":"S476_SAT2026_NORMALIZATION_SOURCEONLY",
-  "authorizedSourceParent":"345035c65b7c1aabd3c993dcf0a2625be0774f9d",
-  "projectId":"ays-orbit-360-lab",
-  "tenantId":"alianzas-soluciones",
-  "sourceRawSha256":"ea15f79900e013bc3c397c23a154802fc2f62f8de3bf056b53003e03b85ec373",
-  "appDataReads":false,
-  "appDataWrites":false,
-  "deployment":false,
-  "providerOrRater":false,
-  "production":false
+  "schemaVersion": "ays-cotcomp-s476-sat2026-normalization-sourceonly-intent-v1.0",
+  "authorization": "S476_SAT2026_NORMALIZATION_SOURCEONLY",
+  "authorizedSourceParent": "7a2715393f0d3e026bd8ca614167b2c304737537",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "sourceRawSha256": "ea15f79900e013bc3c397c23a154802fc2f62f8de3bf056b53003e03b85ec373",
+  "appDataReads": false,
+  "appDataWrites": false,
+  "deployment": false,
+  "providerOrRater": false,
+  "production": false
 }
