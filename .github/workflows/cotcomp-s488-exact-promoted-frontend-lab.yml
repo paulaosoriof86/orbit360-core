@@ -125,7 +125,7 @@ jobs:
           grep -q 'Deducible preferido' "$E/page.html"
           grep -q 'Validar propuestas →' "$E/page.html"
           grep -q 'COMPARACIÓN EN CAPAS · SOLO PROPUESTAS VALIDADAS' "$E/page.html"
-          grep -q 'A&S SUGIERE' "$E/page.html"
+          grep -q 'A&amp;S SUGIERE' "$E/page.html"
           grep -q 'POR QUÉ SUGERIMOS B' "$E/page.html"
           grep -q 'Propuesta C · requiere revisión' "$E/page.html"
           grep -q 'FUERA DE LA COMPARACIÓN' "$E/page.html"
