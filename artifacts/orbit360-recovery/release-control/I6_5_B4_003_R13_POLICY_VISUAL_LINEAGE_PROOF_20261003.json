@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_POLICY_VISUAL_LINEAGE_PROOF_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_LINEAGE_RECONCILED_PENDING_EXACT_PREVIEW_AND_PAULA_VISUAL",
+  "findingId": "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
+  "sourceHead": "cad051e8cde1b18e656890e81923c4ff6cf8d627",
+  "approvedLineage": {
+    "acceptedHead": "1f7b86b60edb8e3c61da55fa5073214f7d52cdbd",
+    "owner": "orbit360-platform/modules/polizas.js",
+    "acceptedOwnerBlobSha": "46b197a77c162c88af498b5a89a759386a36e9e7",
+    "currentOwnerBlobSha": "68eeb3f15bf608f37090d74853704f0ced804565",
+    "acceptedBaseCssBlobSha": "4983f933cc194fe5b876231e5389b6187a071f54",
+    "currentBaseCssBlobSha": "608ef0709144ffcbe748a7bd04e1bd16744def65",
+    "acceptedInfraCssBlobSha": "f98a054a86573672324b539c532b7cb222fb55d5",
+    "currentInfraCssBlobSha": "d9ebaf7fd7e594c98bd0526e544188fc96ce1552"
+  },
+  "adjudication": {
+    "exactApprovedOwnerRecovered": true,
+    "wholesaleCssRollbackAuthorized": false,
+    "redesignFromMemoryAuthorized": false,
+    "laterAcceptedBusinessSemanticsMustBePreserved": true,
+    "currentSourceMutationForVisualFinding": false,
+    "reason": "The approved Pólizas owner is physically identified. The current owner preserves the canonical table/list lineage while later accepted semantics and performance fixes coexist. R13 visual acceptance must therefore be proven on the exact Preview rather than reconstructed from memory or by a broad CSS rollback."
+  },
+  "requiredPreviewProof": [
+    "same list hierarchy and table identity as approved lineage",
+    "bounded density and responsive behavior",
+    "labels/actions remain semantically current",
+    "Paula targeted visual acceptance on exact immutable Preview"
+  ],
+  "productMutation": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_R13_CONTRACT_AND_EXACT_PREVIEW_VISUAL_PROOF"
+}
