@@ -196,16 +196,56 @@ Orbit.modules.aseguradoras = (function () {
     if (/incomplet|conflict|error/.test(key)) return 'Conocimiento incompleto';
     return clean(value) || 'Documento recibido';
   }
-  function tenantKnowledgeSummary() {
+  function tenantKnowledgeSummaries() {
     const id = tenantId();
-    return [].concat(window.OrbitTenantInsurerKnowledgeSummaries || []).find(item => clean(item && item.tenantId) === id) || null;
+    return [].concat(window.OrbitTenantInsurerKnowledgeSummaries || []).filter(item => clean(item && item.tenantId) === id);
+  }
+  function tenantKnowledgeSummary() {
+    const rows = tenantKnowledgeSummaries();
+    if (!rows.length) return null;
+    return {
+      tenantId: tenantId(),
+      evidence: rows.reduce((acc, item) => acc.concat(item && item.evidence || []), []),
+      productDomains: rows.reduce((acc, item) => acc.concat(item && item.productDomains || []), []),
+      insurers: rows.reduce((acc, item) => acc.concat(item && item.insurers || []), [])
+    };
   }
   function insurerNames(row) { return [row && row.nombre, row && row.canonicalName, row && row.displayName].concat(row && row.aliases || []).map(norm).filter(Boolean); }
+  function mergeKnowledgeRows(rows) {
+    if (!rows.length) return null;
+    const out = Object.assign({}, rows[0]), sourceMap = Object.create(null), sources = [], productMap = Object.create(null), knowledgeProducts = [];
+    rows.forEach(item => {
+      [].concat(item && item.sources || []).forEach(source => {
+        const key = sourceIdentity(source) || ('source_' + sources.length);
+        if (!sourceMap[key]) { sourceMap[key] = {}; sources.push(key); }
+        sourceMap[key] = Object.assign({}, sourceMap[key], source);
+      });
+      [].concat(item && item.knowledgeProducts || []).forEach(product => {
+        const key = clean(product && product.id) || [product && product.pais, product && product.ramo, product && product.producto].map(norm).join('|') || ('product_' + knowledgeProducts.length);
+        if (!productMap[key]) { productMap[key] = {}; knowledgeProducts.push(key); }
+        productMap[key] = Object.assign({}, productMap[key], product);
+      });
+      out.aliases = Array.from(new Set([].concat(out.aliases || [], item && item.aliases || []).filter(Boolean)));
+    });
+    out.sources = sources.map(key => sourceMap[key]);
+    out.knowledgeProducts = knowledgeProducts.map(key => productMap[key]);
+    return out;
+  }
   function mappedSummaryFor(row) {
-    const registry = tenantKnowledgeSummary();
-    if (!registry) return null;
     const names = insurerNames(row);
-    return [].concat(registry.insurers || []).find(item => [item && item.insurerName].concat(item && item.aliases || []).map(norm).filter(Boolean).some(name => names.indexOf(name) >= 0)) || null;
+    const matches = tenantKnowledgeSummaries().reduce((acc, registry) => acc.concat(registry && registry.insurers || []), []).filter(item => [item && item.insurerName].concat(item && item.aliases || []).map(norm).filter(Boolean).some(name => names.indexOf(name) >= 0));
+    return mergeKnowledgeRows(matches);
+  }
+  function tenantProductDomains() {
+    const map = Object.create(null), order = [];
+    tenantKnowledgeSummaries().forEach(registry => {
+      [].concat(registry && registry.productDomains || []).forEach(item => {
+        const key = norm(item && item.pais) + '|' + norm(item && item.ramo);
+        if (!map[key]) order.push(key);
+        map[key] = Object.assign({}, map[key], item);
+      });
+    });
+    return order.map(key => map[key]);
   }
   function mappedSummaryRows(row) {
     const summary = mappedSummaryFor(row);
@@ -252,7 +292,7 @@ Orbit.modules.aseguradoras = (function () {
     if (!src || document.querySelector('script[data-orbit-insurer-summary-owner]')) return;
     knowledgeSummaryLoading = true;
     const script = document.createElement('script');
-    script.src = src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260717-owner';
+    script.src = src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20261003-knowledge-r9';
     script.async = false;
     script.setAttribute('data-orbit-insurer-summary-owner', tenantId() || 'tenant');
     script.onload = function () { knowledgeSummaryLoading = false; refreshOwnerView(); };
@@ -268,6 +308,57 @@ Orbit.modules.aseguradoras = (function () {
       return '<div class="asg-row" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><span style="flex:1"><b>' + U.esc(nd.nombre || 'Fuente') + '</b><small class="muted" style="display:block">' + U.esc(item.sourceOrigin || 'Conocimiento') + ' · ' + U.esc(dims) + '</small></span><span class="badge ' + (ev.estado.indexOf('Habilitado') === 0 ? 'ok' : ev.estado === 'Conocimiento incompleto' ? 'danger' : 'neutral') + '">' + U.esc(ev.estado) + '</span></div>';
     }).join('') + '</div>';
   }
+  function knowledgeProductsFor(row) {
+    const summary = mappedSummaryFor(row);
+    return [].concat(summary && summary.knowledgeProducts || []);
+  }
+  function knowledgeStatusLabel(value) {
+    const key = clean(value).toUpperCase();
+    if (/VALIDADO|CONCORDANTE|ACTIVA/.test(key)) return 'Con evidencia';
+    if (/HISTORIC/.test(key)) return 'Fuente histórica';
+    if (/REQUIERE|PENDIENTE|RECIBIDA/.test(key)) return 'Requiere revisión';
+    return clean(value).replace(/_/g, ' ') || 'Pendiente';
+  }
+  function knowledgeFactsHtml(row) {
+    const products = knowledgeProductsFor(row);
+    if (!products.length) return '<div class="cfg-note" style="margin-top:12px"><b>Conocimiento verificable:</b> todavía no hay reglas o hechos del producto con fuente suficiente. El sistema no aplicará valores genéricos en su lugar.</div>';
+    const sources = knowledgeSources(row);
+    const sourceNames = Object.create(null);
+    sources.forEach(item => { const key = clean(item.id || item.documentId || item.sourceDocumentId); if (key) sourceNames[key] = clean(item.nombre || item.fileName || item.archivo || key); });
+    return '<div class="asg-sec-t" style="margin-top:16px">Conocimiento vigente y observado</div>' +
+      '<div class="cfg-note" style="margin-bottom:9px">Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo.</div>' +
+      '<div style="display:grid;gap:10px">' + products.map(product => {
+        const rules = [].concat(product && product.rules || []);
+        const warnings = [].concat(product && product.warnings || []);
+        const sourceLabels = [].concat(product && product.sources || []).map(id => sourceNames[clean(id)] || clean(id)).filter(Boolean);
+        return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--card)">' +
+          '<div style="display:flex;gap:8px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap"><div><b>' + U.esc([product.ramo, product.producto].filter(Boolean).join(' · ') || 'Producto') + '</b><div class="muted" style="font-size:11px">' + U.esc([product.pais, product.moneda, product.vigencia].filter(Boolean).join(' · ')) + '</div></div><span class="badge neutral">' + U.esc(knowledgeStatusLabel(product.estado)) + '</span></div>' +
+          (rules.length ? '<div style="display:grid;gap:5px;margin-top:9px">' + rules.map(rule => '<div style="display:grid;grid-template-columns:minmax(135px,.8fr) minmax(180px,1.4fr);gap:8px;font-size:11.5px;padding:5px 0;border-top:1px dashed var(--line-2)"><b>' + U.esc(rule.label || 'Criterio') + '</b><span>' + U.esc(rule.value || 'Pendiente') + '</span></div>').join('') + '</div>' : '<div class="muted" style="font-size:11.5px;margin-top:8px">Fuente recibida; extracción o validación aún pendiente.</div>') +
+          (sourceLabels.length ? '<div class="muted" style="font-size:10.5px;margin-top:8px"><b>Fuentes:</b> ' + sourceLabels.map(U.esc).join(' · ') + '</div>' : '') +
+          (warnings.length ? '<div class="cfg-note" style="margin-top:8px">' + warnings.map(U.esc).join('<br>') + '</div>' : '') +
+        '</div>';
+      }).join('') + '</div>';
+  }
+  function knowledgeRoadmapHtml(row) {
+    const pais = clean(row && row.pais).toUpperCase();
+    const canonical = Orbit.cat && typeof Orbit.cat.ramosDe === 'function' ? Orbit.cat.ramosDe(pais) : [];
+    const mapped = knowledgeSources(row).map(item => normalizarFuente(item, row));
+    const products = knowledgeProductsFor(row);
+    const statuses = Object.create(null);
+    canonical.forEach(ramo => {
+      const hasValidated = products.some(p => norm(p && p.ramo) === norm(ramo) && /VALIDADO|CONCORDANTE|MUESTRA/.test(clean(p && p.estado).toUpperCase()));
+      const hasMapped = mapped.some(d => norm(d && d.ramo) === norm(ramo));
+      statuses[ramo] = hasValidated ? 'Con evidencia actual' : (hasMapped ? 'Con fuente histórica / por revisar' : 'Pendiente de fuente');
+    });
+    if (!canonical.length) return '';
+    return '<div class="asg-sec-t" style="margin-top:16px">Cobertura de conocimiento por producto</div>' +
+      '<div class="cfg-note" style="margin-bottom:9px">La ficha no se limita a Automóviles. Los demás ramos se incorporan por aseguradora y producto conforme aportemos fuentes; lo no documentado permanece pendiente y no genera cálculos automáticos.</div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">' + canonical.map(ramo => {
+        const st = statuses[ramo], tone = st === 'Con evidencia actual' ? 'ok' : (st.indexOf('histórica') >= 0 ? 'neutral' : 'warn');
+        return '<span class="badge ' + tone + '" title="' + U.esc(st) + '">' + U.esc(ramo) + ' · ' + U.esc(st) + '</span>';
+      }).join('') + '</div>';
+  }
+
   /* Evalúa una fuente y devuelve estado + capacidades de consumo (no solo texto).
      Suficiencia mínima: país + moneda + ramo. Sin eso, "Conocimiento incompleto"
      sin importar el estado que el usuario haya declarado — y NINGUNA capacidad. */
@@ -854,6 +945,8 @@ Orbit.modules.aseguradoras = (function () {
         ${grupos.map(g => `<div class="asg-row" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><span style="flex:1;font-size:12px">${U.esc(g.label)}</span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}" style="font-size:10px">${g.estado}</span><span class="muted" style="font-size:11px">${g.docs.length} doc(s)</span></div>`).join('') || ''}
       </div>
       ${extraKnowledgeHtml(a)}
+      ${knowledgeFactsHtml(a)}
+      ${knowledgeRoadmapHtml(a)}
       ${editing ? '<button class="btn ghost sm" id="af-imp-doc2" style="margin-top:12px">✨ Importar documento tarifario</button>' : ''}
       ${ramos.length ? tablaTasasRamo(a, ramoSel, editing) : '<div class="cfg-note" style="margin-top:12px">Agregá al menos un ramo en la pestaña Productos y planes para configurar su tabla de tasas automáticas.</div>'}
     </div>`;
@@ -1062,6 +1155,6 @@ Orbit.modules.aseguradoras = (function () {
     __tenantOrderV20260717: true,
     __consumerGatesSeparatedV20260717: true,
     __r102LogoAssetResolver: { resolveLogoAsset, hydrateLogoAssets },
-    _fuentes: { SOURCE_TYPES, SOURCE_STATES, DIMENSION_KEYS, normalizarFuente, evaluarFuente, resumenFuentes, resumenGrupos, knowledgeSources, sourceDimensions, sourceCombinationKey, groupLabel, legacyType }
+    _fuentes: { SOURCE_TYPES, SOURCE_STATES, DIMENSION_KEYS, normalizarFuente, evaluarFuente, resumenFuentes, resumenGrupos, knowledgeSources, knowledgeProductsFor, tenantProductDomains, sourceDimensions, sourceCombinationKey, groupLabel, legacyType }
   };
 })();
