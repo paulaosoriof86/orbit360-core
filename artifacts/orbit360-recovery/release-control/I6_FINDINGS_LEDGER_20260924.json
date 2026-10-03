@@ -2803,7 +2803,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "PAULA_VISUAL_REJECTED_R13_DIAGNOSTIC_REQUIRED",
+      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2836,7 +2836,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2976,7 +2976,11 @@
       "visualStateReconciliationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_VISUAL_STATE_RECONCILIATION_20261003.json",
       "visualStateReconciliationBlobSha": "cda0b3cfcd3c89e8312ba13636075ee1f84e2e48",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
-      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f"
+      "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+      "r13RuntimeFailedRunId": 37162367038,
+      "r13RuntimeFailureCode": "B4_003_R13_POLICY_ROUTE_EVENT_LOOP_STALL",
+      "r13PolicyRouteRuntimeRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_ROOTFIX_20261003.json",
+      "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad"
     },
     {
       "id": "B4-004",
@@ -6875,7 +6879,7 @@
         "orbit360-platform/modules/polizas.js",
         "orbit360-platform/core/router.js"
       ],
-      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Authenticated route and first usable render meet performance budget without browser unresponsive dialog.",
@@ -6888,7 +6892,13 @@
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
-      "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d"
+      "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
+      "runtimeDiagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_CAUSAL_DIAGNOSTIC_20261003.json",
+      "runtimeDiagnosticReceiptBlobSha": "db13f0b8bf0a200bac53033b090db798f684854c",
+      "runtimeRootFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_ROOTFIX_20261003.json",
+      "runtimeRootFixReceiptBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
+      "failedRunId": 37162367038,
+      "failedJobId": 111318262858
     },
     {
       "id": "B4-003-R13-06-POLICY-SEARCH-FREEZE",
