@@ -162,11 +162,66 @@ window.Orbit = window.Orbit || {};
         reglaTarifariaId: ruleIdentifier(rule),
         fuenteDocumentoId: clean(rule.documentoFuenteId || rule.documentId),
         versionFuente: clean(rule.versionFuente || rule.sourceVersion),
+        configurationVersion: clean(binding.configurationVersion || binding.version || binding.versionFuente),
+        tariffVersion: clean(rule.tariffVersion || rule.version || rule.versionFuente || rule.sourceVersion),
+        sourceVersion: clean(rule.sourceVersion || rule.versionFuente || rule.version),
+        providerBindingVersion: clean(binding.providerBindingVersion || binding.version || binding.configurationVersion),
+        catalogVersion: clean(binding.catalogVersion || rule.catalogVersion),
+        rulesDigest: clean(binding.rulesDigest || rule.rulesDigest || rule.digest),
+        validityFrom: clean(rule.validityFrom || rule.vigenciaDesde || binding.validityFrom || binding.vigenciaDesde),
+        validityTo: clean(rule.validityTo || rule.vigenciaHasta || binding.validityTo || binding.vigenciaHasta),
         motor: 'P06C',
+        calculatedAt: new Date().toISOString(),
         calculadoAt: new Date().toISOString(),
         requiresSecondGateForEnablement: true
       }
     };
+  }
+
+  function authoritativeAvailability(aseguradoraId, context, risk) {
+    var advanced = p06Availability(aseguradoraId, context || {}, risk || {});
+    if (!advanced.ok) {
+      return {
+        ok: false,
+        errors: Array.from(new Set([].concat(advanced.errors || [], ['QUOTE_AUTHORITY_P06_REQUIRED']))),
+        authority: 'GRAVICENTRA_P06',
+        fallbackUsed: false
+      };
+    }
+    return Object.assign({}, advanced, { authority: 'GRAVICENTRA_P06', fallbackUsed: false });
+  }
+
+  function authoritativeCalculate(aseguradoraId, context, risk, payment) {
+    var advanced = authoritativeAvailability(aseguradoraId, context || {}, risk || {});
+    if (!advanced.ok) return advanced;
+    var calculated = P06C.calculateRule(advanced.rule, calculationContext(context, risk, payment));
+    if (!calculated.ok) return {
+      ok: false,
+      errors: [].concat(calculated.blockers || [], calculated.errors || []),
+      warnings: [].concat(calculated.warnings || []),
+      authority: 'GRAVICENTRA_P06',
+      fallbackUsed: false,
+      calculation: calculated
+    };
+    var result = resultFromP06(advanced, calculated, payment || {});
+    var authority = Orbit.quoteAuthorityContractV1;
+    if (!authority || typeof authority.validateTrace !== 'function') {
+      return { ok:false, errors:['QUOTE_AUTHORITY_CONTRACT_NOT_LOADED'], authority:'GRAVICENTRA_P06', fallbackUsed:false };
+    }
+    var traceCheck = authority.validateTrace(result.trace, { requireCurrent:true });
+    if (!traceCheck.ok) {
+      return {
+        ok:false,
+        errors:Array.from(new Set(['QUOTE_AUTHORITY_TRACE_INCOMPLETE'].concat(traceCheck.errors || []))),
+        authority:'GRAVICENTRA_P06',
+        fallbackUsed:false,
+        trace:result.trace
+      };
+    }
+    result.authority = 'GRAVICENTRA_P06';
+    result.fallbackUsed = false;
+    result.authorityContractVersion = authority.VERSION;
+    return result;
   }
 
   Q.automaticAvailability = function (aseguradoraId, context) {
@@ -192,9 +247,14 @@ window.Orbit = window.Orbit || {};
   };
 
   Q.p06RuntimeAvailability = p06Availability;
+  Q.authorityAvailability = authoritativeAvailability;
+  Q.calculateAuthoritative = authoritativeCalculate;
   Q.__p06RuntimeAdapterV1208 = {
     originalAvailability: originalAvailability,
     originalCalculate: originalCalculate,
+    authoritativeAvailability: authoritativeAvailability,
+    authoritativeCalculate: authoritativeCalculate,
+    publicFallbackAllowed: false,
     bindingEnabled: bindingEnabled,
     ruleValidated: ruleValidated,
     dimensionMatch: dimensionMatch
