@@ -50,8 +50,8 @@ Expected metrics:
 - duplicate source rows merged = 243;
 - vehicle types = 31;
 - unique brands = 223;
-- unique brand/line pairs = 3,289;
-- brand/line pairs appearing under multiple vehicle types = 101.
+- unique brand/line pairs = 3,287;
+- brand/line pairs appearing under multiple vehicle types = 103.
 
 Regression probes:
 - Toyota Corolla exact identity must exist;
@@ -60,7 +60,7 @@ Regression probes:
 - Honda CRV must surface CR-V candidates through punctuation-insensitive alias detection;
 - Bajaj Pulsar is allowed to remain absent and therefore demonstrates the need for the reviewed A&S alias/addition layer.
 
-## Important semantic limit
+## Normalization note\n\nAccent folding and uppercase canonicalization merge two additional brand/line spellings and expose two additional cross-type collisions versus a raw-string count. The frozen physical metrics therefore use the canonicalized values: 3,287 brand/line pairs and 103 cross-type pairs.\n\n## Important semantic limit
 
 SAT identity presence does not prove:
 - insurer acceptance;
