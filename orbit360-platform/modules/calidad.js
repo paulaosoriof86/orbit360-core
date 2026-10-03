@@ -1,5 +1,5 @@
 /* ============================================================
-   Orbit 360 · Calidad de datos v1.217 — país, moneda y alcance
+   Orbit 360 · Calidad de datos v1.218 — país, moneda, alcance e integridad financiera indexada
    - país/moneda pendientes son prioridad de calidad;
    - edición rápida trazable sin asumir Guatemala;
    - evidencia posterior de pólizas/cobros solo propone;
@@ -60,15 +60,9 @@ Orbit.modules.calidad = (function () {
   }
   function financialIntegrityIssues() {
     const rm=Orbit.policyVehicleReadModelV1199c;
-    if(!rm||typeof rm.premiumBreakdown!=='function'||typeof rm.reconciliationTolerance!=='function') return [];
-    const tol=rm.reconciliationTolerance();
-    return (S().all('polizas')||[]).filter(p=>p&&inActiveCountry(p)).map(p=>{
-      const pb=rm.premiumBreakdown(p),total=Number(pb&&pb.total),schedule=Number(pb&&pb.scheduleTotal);
-      if(!Number.isFinite(total)||!Number.isFinite(schedule)) return null;
-      const delta=schedule-total;
-      if(Math.abs(delta)<=tol) return null;
-      return {p,total,schedule,delta,tolerance:tol,receipts:(pb.receipts||[]).length};
-    }).filter(Boolean).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+    if(!rm||typeof rm.financialIntegrityBatch!=='function') return [];
+    const policies=(S().all('polizas')||[]).filter(p=>p&&inActiveCountry(p));
+    return rm.financialIntegrityBatch(policies);
   }
   function financialHealthHtml(issues) {
     if(!issues.length) return '<div class="cfg-note" style="margin:14px 0"><b>Integridad financiera:</b> no se detectaron diferencias materiales entre prima contractual y calendario vigente dentro del alcance seleccionado.</div>';
@@ -214,5 +208,5 @@ Orbit.modules.calidad = (function () {
     const mail = rows.filter(x => !clean(x.c.whatsapp || x.c.telefono) && clean(x.c.email)).length;
     U.toast('Actualización preparada:\n\n• ' + wa + ' por WhatsApp Web/canal pendiente de confirmación\n• ' + mail + ' por correo preparado\n• ' + (rows.length - wa - mail) + ' sin canal — requieren gestión.\n\nNo se ha confirmado ningún envío.');
   }
-  return { render, campana, editarInline, faltantes, financialIntegrityIssues, version: '1.218-information-health-r12' };
+  return { render, campana, editarInline, faltantes, financialIntegrityIssues, version: '1.219-information-health-performance-r12p' };
 })();

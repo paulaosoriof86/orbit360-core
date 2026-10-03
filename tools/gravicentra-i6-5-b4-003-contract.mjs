@@ -94,7 +94,8 @@ need(insurerVisual.includes("box.dataset.knowledgeSource='canonical'")&&insurerV
 need(insurer.includes('aseguradoraId: id')&&insurer.includes('Cargar tarifario / Excel de cotizador')&&insurer.includes('Cargar formulario, póliza o cotización de ejemplo'),'B4_003_R12_INSURER_UPLOAD_ENTRYPOINT_OR_SCOPE_MISSING');
 need(importer.includes("updateDurable('aseguradoras', insurerId")&&importer.includes('preview_protected_operational_insurer')&&importer.includes('Documento recibido')&&importer.includes("requiereValidacion: state.kind === 'docs-aseguradora'"),'B4_003_R12_INSURER_DURABLE_SOURCE_BINDING_MISSING');
 need(importer.includes('Ningún documento habilita Cotizador, Comparativo o IA automáticamente'),'B4_003_R12_INSURER_IMPORT_AUTO_ENABLE_CLAIM_REMAINS');
-need(policyDetail.includes('policyCompleteness, receiptSchedule, premiumBreakdown')&&quality.includes('financialIntegrityIssues')&&quality.includes('data-information-health-policy'),'B4_003_R12_INFORMATION_HEALTH_FINANCIAL_PROJECTION_MISSING');
+need(policyDetail.includes('policyCompleteness, receiptSchedule, financialIntegrityBatch, premiumBreakdown')&&quality.includes('financialIntegrityIssues')&&quality.includes('data-information-health-policy'),'B4_003_R12_INFORMATION_HEALTH_FINANCIAL_PROJECTION_MISSING');
+need(policyDetail.includes("receiptsByPolicy=group(S().all('recibosEsperados')||[],'polizaId')")&&quality.includes('rm.financialIntegrityBatch(policies)')&&!quality.includes('rm.premiumBreakdown(p)'),'B4_003_R12_QUALITY_FINANCIAL_N_SQUARED_PATH_REMAINS');
 need(/selectedCountry/.test(base)&&/data-renewal-country/.test(base),'B4_003_RENEW_SELECTED_COUNTRY_FILTER_MISSING');
 need(/renewalActionsLayout='grid2'/.test(bridge)&&/gridTemplateColumns='repeat\(2,minmax\(0,1fr\)\)'/.test(bridge),'B4_003_RENEW_COMPACT_ACTION_LAYOUT_MISSING');
 need(/eventPriority/.test(cronograma)&&/data-more-date/.test(cronograma)&&/Agenda de renovaciones, recibos, gestiones y tareas/.test(cronograma),'B4_003_CRONOGRAMA_RENEWAL_VISIBILITY_MISSING');
@@ -112,11 +113,11 @@ need(/core\/access-scope\.js\?v=20261003-b4003r5/.test(index),'B4_003_ACCESS_SCO
 need(/modules\/cronograma\.js\?v=20261003-b4003r5/.test(index),'B4_003_CRONOGRAMA_CACHE_BINDING_MISSING');
 need(/store-firestore-product-operational-p0\.js\?v=20261003-b4003r3/.test(index),'B4_003_STORE_CACHE_BINDING_MISSING');
 need(/modules\/cliente360\.js\?v=20261003-b4003r11/.test(index),'B4_003_CLIENT360_R11_CACHE_BINDING_MISSING');
-need(/modules\/calidad\.js\?v=20261003-b4003r12/.test(index),'B4_003_QUALITY_R12_CACHE_BINDING_MISSING');
+need(/modules\/calidad\.js\?v=20261003-b4003r12p/.test(index),'B4_003_QUALITY_R12P_CACHE_BINDING_MISSING');
 need(/modules\/aseguradoras\.js\?v=20261003-b4003r12/.test(index),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
 need(/core\/importa\.js\?v=20261003-b4003r12/.test(index),'B4_003_IMPORTER_R12_CACHE_BINDING_MISSING');
 need(/core\/client-insurer-visual-contract-v20260720\.js\?v=20261003-b4003r12/.test(index),'B4_003_INSURER_VISUAL_R12_CACHE_BINDING_MISSING');
-need(/modules\/policy-receipts-v1199-detail-guard\.js\?v=20261003-b4003r12/.test(index),'B4_003_POLICY_DETAIL_R12_CACHE_BINDING_MISSING');
+need(/modules\/policy-receipts-v1199-detail-guard\.js\?v=20261003-b4003r12p/.test(index),'B4_003_POLICY_DETAIL_R12P_CACHE_BINDING_MISSING');
 need(/modules\/policy-receipts-v1199-bridge\.js\?v=20261003-b4003r11/.test(index),'B4_003_POLICY_BRIDGE_R11_CACHE_BINDING_MISSING');
 need(/styles\/infra\.css\?v=20261003-b4003r11/.test(index),'B4_003_INFRA_R11_CACHE_BINDING_MISSING');
 

@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R12P_QUALITY_PERFORMANCE_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R12P_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "failedRunId": 37151246145,
+  "failedCode": "B4_003_QUALITY_SYNC_RENDER_TOO_SLOW",
+  "parentHead": "cfc2ccf2383bc105a86cd6a631e041cad9909a6b",
+  "classification": "PRODUCT_PERFORMANCE_REGRESSION_CAUSED_BY_N_SQUARED_FINANCIAL_PROJECTION",
+  "rootCause": "Calidad iterated policies and premiumBreakdown() re-filtered the full recibosEsperados collection for each policy, producing policies×receipts work after Information Health was added.",
+  "fix": {
+    "semanticOwner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "strategy": "Preserve receiptCalendarProjection semantics but batch-group recibosEsperados once by polizaId; Calidad calls canonical financialIntegrityBatch instead of per-policy premiumBreakdown.",
+    "productBlobs": {
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "1c223367d8ab39e37b3b52e09cbd4fc5749a43b3",
+      "orbit360-platform/modules/calidad.js": "9ef748908413a20334040e3433ef52c363547aa0",
+      "orbit360-platform/index.html": "8d01cec5c31517dbef0d9cd604afd98136499888"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "1a6fdc8b70284c616d2ff6071ff2bdb23a33f2f9"
+    }
+  },
+  "invariants": [
+    "No premium or receipt value is rewritten.",
+    "Same active-calendar authority and reconciliation tolerance are reused.",
+    "Country filtering remains in Calidad.",
+    "Exact Preview must still prove 407.01 vs 542.68 mismatch unchanged.",
+    "Exact Preview synchronous Calidad render must remain under 2500 ms."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productSourceChanged": true,
+    "syntheticQaWritesOnly": true
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

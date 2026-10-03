@@ -2920,7 +2920,7 @@
       "policyPremiumVsCalendarMismatchStatus": "OPEN_BLOCKING_FROZEN_INFORMATION_HEALTH",
       "policyEditorSourceTaxonomyStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
       "renewabilityTriStateStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
-      "qualityCountryPerformanceStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
+      "qualityCountryPerformanceStatus": "SOURCE_FIXED_R12P_PENDING_EXACT_RUNTIME_PERFORMANCE_PROOF",
       "cancelationIdentityStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
       "client360BidirectionalTabsStatus": "SOURCE_FIXED_R11_PENDING_EXACT_PREVIEW",
       "childFindingIds": [
@@ -2946,7 +2946,9 @@
       "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
       "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
       "r12SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_SOURCE_FIX_20261003.json",
-      "r12SourceFixBlobSha": "663b9846af14ce18097f08f2fc85296ac00f181f"
+      "r12SourceFixBlobSha": "663b9846af14ce18097f08f2fc85296ac00f181f",
+      "r12pPerformanceRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12P_QUALITY_PERFORMANCE_ROOTFIX_20261003.json",
+      "r12pPerformanceRootFixBlobSha": "7c57d94c34ecc4328e718a16716f009f50ff5fdf"
     },
     {
       "id": "B4-004",
@@ -6478,11 +6480,14 @@
         "orbit360-platform/modules/calidad.js",
         "orbit360-platform/data/store-firestore-product-operational-p0.js"
       ],
-      "status": "SOURCE_OPTIMIZED_R11_PENDING_EXACT_RUNTIME_PERFORMANCE_PROOF",
+      "status": "SOURCE_FIXED_R12P_PENDING_EXACT_RUNTIME_PERFORMANCE_PROOF",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Authenticated exact Preview measures module render and route/country-change latency within normal interactive threshold without 10–12 second blocking.",
-      "preLiveRequired": true
+      "preLiveRequired": true,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "r12pPerformanceRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12P_QUALITY_PERFORMANCE_ROOTFIX_20261003.json",
+      "r12pPerformanceRootFixBlobSha": "7c57d94c34ecc4328e718a16716f009f50ff5fdf"
     },
     {
       "id": "B4-003-R11-08-CANCELATION-RATIO-SEMANTICS",

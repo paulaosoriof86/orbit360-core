@@ -224,10 +224,25 @@ Orbit.modules = Orbit.modules || {};
     if(denoms.length<=1)return {current:base,replaced:history,review:[],authority:denoms.length?'SINGLE_PHYSICAL_CALENDAR':'NO_DENOMINATOR',expected:denoms[0]||null};
     return {current:base.filter(r=>receiptPlanDenominator(r)==null),replaced:history,review:base.filter(r=>receiptPlanDenominator(r)!=null),authority:'AMBIGUOUS_FAIL_CLOSED',expected:null};
   }
-  function receiptSchedule(policyId) {
-    const policy=S().get('polizas',policyId)||{},all=(S().all('recibosEsperados') || []).filter(r=>r.polizaId===policyId),projection=activePolicy(policy)?receiptCalendarProjection(policy,all):{current:[],replaced:all,review:[],authority:'POLICY_INACTIVE',expected:0},rows=projection.current;
+  function receiptScheduleFromRows(policy, all) {
+    const rowsAll=[].concat(all||[]),projection=activePolicy(policy)?receiptCalendarProjection(policy,rowsAll):{current:[],replaced:rowsAll,review:[],authority:'POLICY_INACTIVE',expected:0},rows=projection.current;
     const sum=key=>{const vals=rows.map(r=>numberOrNull(r[key])).filter(v=>v!=null);return vals.length?vals.reduce((a,b)=>a+b,0):null;};
     return {rows,historicalRows:projection.replaced,reviewRows:projection.review,calendarAuthority:projection.authority,net:sum('primaNeta'),expedition:sum('gastosExpedicion'),finance:sum('gastosFinanciamiento'),sourceAdjustment:sum('descuento'),iva:sum('impuestosIVA'),total:sum('primaTotal')};
+  }
+  function receiptSchedule(policyId) {
+    const policy=S().get('polizas',policyId)||{},all=(S().all('recibosEsperados') || []).filter(r=>r.polizaId===policyId);
+    return receiptScheduleFromRows(policy,all);
+  }
+  function financialIntegrityBatch(policies) {
+    const selected=[].concat(policies||[]).filter(p=>p&&p.id),receiptsByPolicy=group(S().all('recibosEsperados')||[],'polizaId'),tol=reconciliationTolerance(),issues=[];
+    selected.forEach(p=>{
+      const sch=receiptScheduleFromRows(p,receiptsByPolicy.get(p.id)||[]),total=numberOrNull(first(p.primaTotal,p.prima)),schedule=numberOrNull(sch.total);
+      if(total==null||schedule==null)return;
+      const delta=schedule-total;
+      if(Math.abs(delta)<=tol)return;
+      issues.push({p,total,schedule,delta,tolerance:tol,receipts:sch.rows.length});
+    });
+    return issues.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
   }
   function premiumBreakdown(p) {
     const sch=receiptSchedule(p.id);
@@ -587,7 +602,7 @@ Orbit.modules = Orbit.modules || {};
 
   Orbit.policyVehicleReadModelV1199c = {
     version: '20260731.1', ownerRevision:'20260731.4-human-visual',
-    policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, receiptSchedule, premiumBreakdown, reconciliationTolerance, openVehicleLinker, vehicleCandidates, renewalEligible, startRenewal, deletePolicy, deleteVehicle,
+    policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, receiptSchedule, financialIntegrityBatch, premiumBreakdown, reconciliationTolerance, openVehicleLinker, vehicleCandidates, renewalEligible, startRenewal, deletePolicy, deleteVehicle,
     fullPagePolicy: true, fullPageVehicle: true,
     indexedClientSummary: true,
     writesStore: false,
