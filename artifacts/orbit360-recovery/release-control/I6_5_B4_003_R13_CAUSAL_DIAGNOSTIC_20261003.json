@@ -1,0 +1,14 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-03",
+  "status": "READONLY_CAUSAL_DIAGNOSTIC_COMPLETE",
+  "findingId": "B4-003",
+  "parentHead": "c3e6ada9ccf5de742041e870dd77e0d1f4b2833e",
+  "sourceR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
+  "conclusion": "Seven R13 findings have reproducible product-source causes; Renewals requires real read-only distribution proof, Pólizas visual regression requires exact approved visual-lineage proof, and insurer Drive requires controlled Preview E2E proof.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_AUTHORIZATION"
+}
