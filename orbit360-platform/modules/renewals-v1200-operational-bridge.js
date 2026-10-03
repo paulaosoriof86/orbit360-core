@@ -19,11 +19,14 @@ Orbit.modules = Orbit.modules || {};
   function esc(v) { return U && U.esc ? U.esc(String(v == null ? '' : v)) : String(v || ''); }
   function norm(v) { return A.norm ? A.norm(v) : String(v || '').toLowerCase(); }
   function today() { return U && U.today ? U.today() : new Date().toISOString().slice(0, 10); }
+  function countryCode(v) { return String(v == null ? '' : v).trim().toUpperCase(); }
+  function policyCountry(p) { const c=p&&p.clienteId?S().get('clientes',p.clienteId):null; return countryCode(p&&p.pais || c&&c.pais); }
+  function selectedCountry(p) { const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; }
   function daysUntil(s) { if (!s) return null; const d=new Date(s+'T00:00:00'),n=new Date();n.setHours(0,0,0,0);return Math.ceil((d-n)/86400000); }
   function active(p) { return p && ['vigente','porrenovar'].includes(norm(p.estado)) && !p.renovadaPor && norm(p.renovacionEstado) !== 'renovada'; }
   function policies(limit) {
     return A.filter('polizas', S().all('polizas') || [], 'renovaciones').filter(p => {
-      if (!active(p)) return false;
+      if (!active(p) || !selectedCountry(p)) return false;
       const d=daysUntil(p.vigenciaFin);
       return d != null && d <= (limit == null ? 90 : limit);
     }).sort((a,b)=>String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
@@ -57,11 +60,12 @@ Orbit.modules = Orbit.modules || {};
     host.querySelectorAll('button[onclick*="solicitarPropuestas"]').forEach(btn=>{
       btn.textContent='📋 Propuestas';
       const m=String(btn.getAttribute('onclick')||'').match(/solicitarPropuestas\('([^']+)'\)/);if(!m)return;
-      const policyId=m[1],wrap=btn.parentElement;if(!wrap||wrap.dataset.renewalActionsV2)return;wrap.dataset.renewalActionsV2='1';wrap.style.flexWrap='wrap';
+      const policyId=m[1],wrap=btn.parentElement;if(!wrap||wrap.dataset.renewalActionsV2)return;wrap.dataset.renewalActionsV2='1';wrap.dataset.renewalActionsLayout='grid2';wrap.style.display='grid';wrap.style.gridTemplateColumns='repeat(2,minmax(0,1fr))';wrap.style.gap='6px';wrap.style.marginTop='8px';
       const renew=document.createElement('button');renew.className='btn primary sm';renew.style.flex='1';renew.textContent='✅ Pedir renovar';renew.onclick=e=>{e.stopPropagation();registrarAceptacion(policyId);};wrap.appendChild(renew);
       if(canDirectQuote()){
-        const quote=document.createElement('button');quote.className='btn ghost sm';quote.style.flex='1';quote.textContent='🧮 Cotizar';quote.onclick=e=>{e.stopPropagation();cotizarDirecto(policyId);};wrap.appendChild(quote);
+        const quote=document.createElement('button');quote.className='btn ghost sm';quote.textContent='🧮 Cotizar';quote.onclick=e=>{e.stopPropagation();cotizarDirecto(policyId);};wrap.appendChild(quote);
       }
+      wrap.querySelectorAll('a,button').forEach(el=>{el.style.width='100%';el.style.minWidth='0';el.style.flex='none';el.style.paddingLeft='7px';el.style.paddingRight='7px';el.style.fontSize='11px';el.style.whiteSpace='normal';el.style.lineHeight='1.15';});
     });
     const campaign=Array.from(host.querySelectorAll('button')).find(b=>/Campaña de renovación|Preparar campaña de renovación/i.test(b.textContent||''));if(campaign){if(A.can&&A.can('renovaciones','edit'))campaign.textContent='Preparar campaña de renovación';else campaign.remove();}
   }
