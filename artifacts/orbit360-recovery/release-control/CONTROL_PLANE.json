@@ -5289,6 +5289,16 @@
         "reimport": false,
         "livePromotion": false,
         "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+      },
+      "r13VersionedLockGuardRootFix": {
+        "status": "QA_GOVERNANCE_GUARD_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_VERSIONED_LOCK_GUARD_ROOTFIX_20261003.json",
+        "blobSha": "7ced8ec31e943191c956d08054ffc9fef4d687dc",
+        "failedRunId": 37162057992,
+        "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+        "guardBlobSha": "a1adcf3f82dca2082bbc0ef4bdcbc9ab46cd04cc",
+        "productSourceChanged": false,
+        "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
       }
     }
   },
@@ -6032,6 +6042,16 @@
       "dataMutation": false,
       "reimport": false,
       "livePromotion": false,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+    },
+    "r13VersionedLockGuardRootFix": {
+      "status": "QA_GOVERNANCE_GUARD_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_VERSIONED_LOCK_GUARD_ROOTFIX_20261003.json",
+      "blobSha": "7ced8ec31e943191c956d08054ffc9fef4d687dc",
+      "failedRunId": 37162057992,
+      "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+      "guardBlobSha": "a1adcf3f82dca2082bbc0ef4bdcbc9ab46cd04cc",
+      "productSourceChanged": false,
       "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
     }
   },
