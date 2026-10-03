@@ -39,7 +39,7 @@ test('S4.88 preserves approved comparison truth and explicit choice semantics',(
   const {html}=S.loadExactHtml();
   assert.match(html,/Revisamos las opciones antes de compararlas\./);
   assert.match(html,/Compara diferencias que sí cambian la decisión\./);
-  assert.match(html,/A&S no selecciona automáticamente una alternativa por ti/);
+  assert.match(html,/A&amp;S no selecciona automáticamente una alternativa por ti/);
   assert.match(html,/Elegir una opción inicia la continuidad del proceso\. No equivale a emisión ni confirma cobertura\./);
 });
 
