@@ -4859,7 +4859,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
+      "executionLockBlobSha": "f0d4c4afe7b71689b355f62e7142f30aea47ad1a",
       "compositionLockBlobSha": "8fa16c0c4b16718f674dccf78d19265b90dd2fc8",
       "findingLedgerBlobSha": "1a6dc82a12588e7aa82376374065e8e474c58c70",
       "activeFindingId": "B4-003",
@@ -5077,6 +5077,15 @@
         "operationalBusinessWrite": false,
         "reimport": false,
         "live": false
+      },
+      "governanceBindingRepair": {
+        "status": "PASS",
+        "reason": "B4 lock changed only for conditional synthetic-QA cleanup authority after R3 source fix; control-plane binding updated to the exact current lock blob.",
+        "lockBlobSha": "f0d4c4afe7b71689b355f62e7142f30aea47ad1a",
+        "productSourceChanged": false,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false
       }
     }
   },
@@ -5393,7 +5402,7 @@
     "status": "B4_003_SOURCE_FIXED_R3_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
+    "executionLockBlobSha": "f0d4c4afe7b71689b355f62e7142f30aea47ad1a",
     "compositionLockBlobSha": "8fa16c0c4b16718f674dccf78d19265b90dd2fc8",
     "findingLedgerBlobSha": "1a6dc82a12588e7aa82376374065e8e474c58c70",
     "noLive": true,
@@ -5597,6 +5606,15 @@
       "operationalBusinessWrite": false,
       "reimport": false,
       "live": false
+    },
+    "governanceBindingRepair": {
+      "status": "PASS",
+      "reason": "B4 lock changed only for conditional synthetic-QA cleanup authority after R3 source fix; control-plane binding updated to the exact current lock blob.",
+      "lockBlobSha": "f0d4c4afe7b71689b355f62e7142f30aea47ad1a",
+      "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
     }
   }
 }
