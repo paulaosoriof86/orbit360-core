@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_CAUSAL_SOURCE_FIX_R2_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "sourceHeadBefore": "141bf2c715155244a6266851f413be9507527518",
+  "adjudication": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DIAGNOSTIC_ADJUDICATION_20261003.json",
+    "blobSha": "673b47a036eb5f87c5e0e9dbf5d2abd709202b8f"
+  },
+  "resolves": [
+    "RENEWALS_MULTI_PASS_RENDER_REINTRODUCED",
+    "RENEWALS_LEGACY_OWNER_REMAINS_SHADOWED"
+  ],
+  "changes": [
+    "Legacy renovaciones.js no longer owns campaign/proposal actions; operational bridge is the sole action owner.",
+    "Renewed-policy exclusion is applied in the base renderer and operational owner.",
+    "Permission guard no longer wraps render with setTimeout.",
+    "Issued-renewal bridge no longer wraps render or mutates DOM after delay; it only guards linked renewal navigation.",
+    "Cache bindings bumped for all changed renewal owners."
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/renovaciones.js": "9cedcb2e96ab9c15914f5ed1364a80eb6a6fffac",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "5664e11a6814c9dc1dd77703c83b6d186e86bb41",
+    "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
+    "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
+    "orbit360-platform/index.html": "4873466b8aa5bd758af05767d7a0367a8b5f53d3"
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

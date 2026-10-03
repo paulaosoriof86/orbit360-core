@@ -20,7 +20,7 @@ Orbit.modules = Orbit.modules || {};
   function norm(v) { return A.norm ? A.norm(v) : String(v || '').toLowerCase(); }
   function today() { return U && U.today ? U.today() : new Date().toISOString().slice(0, 10); }
   function daysUntil(s) { if (!s) return null; const d=new Date(s+'T00:00:00'),n=new Date();n.setHours(0,0,0,0);return Math.ceil((d-n)/86400000); }
-  function active(p) { return p && ['vigente','porrenovar'].includes(norm(p.estado)); }
+  function active(p) { return p && ['vigente','porrenovar'].includes(norm(p.estado)) && !p.renovadaPor && norm(p.renovacionEstado) !== 'renovada'; }
   function policies(limit) {
     return A.filter('polizas', S().all('polizas') || [], 'renovaciones').filter(p => {
       if (!active(p)) return false;
@@ -63,7 +63,7 @@ Orbit.modules = Orbit.modules || {};
         const quote=document.createElement('button');quote.className='btn ghost sm';quote.style.flex='1';quote.textContent='🧮 Cotizar';quote.onclick=e=>{e.stopPropagation();cotizarDirecto(policyId);};wrap.appendChild(quote);
       }
     });
-    const campaign=Array.from(host.querySelectorAll('button')).find(b=>/Campaña de renovación/i.test(b.textContent||''));if(campaign)campaign.textContent='Preparar campaña de renovación';
+    const campaign=Array.from(host.querySelectorAll('button')).find(b=>/Campaña de renovación|Preparar campaña de renovación/i.test(b.textContent||''));if(campaign){if(A.can&&A.can('renovaciones','edit'))campaign.textContent='Preparar campaña de renovación';else campaign.remove();}
   }
   function canDirectQuote() {
     try{return !!(A.can&&A.can('renovaciones','edit')&&!(A.esAsesor&&A.esAsesor()));}catch(e){return false;}
