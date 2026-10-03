@@ -1,0 +1,1555 @@
+ Cobertura de gastos de salud bajo red, límites, deducibles, coaseguros, carencias y condiciones de cada alternativa.',
+      'Seguro/Póliza de Salud privado':'Seguro privado de salud sujeto a red, límites, deducibles o copagos según el producto, condiciones de ingreso, carencias y exclusiones. No sustituye la EPS.',
+      'Accidentes personales':'Protección frente a consecuencias de accidentes cubiertos según suma, beneficios y exclusiones contratados.',
+      'Vida':'❤️ Protección económica para beneficiarios ante eventos cubiertos, de acuerdo con suma asegurada, condiciones y designación de beneficiarios.',
+      'Invalidez':'Beneficio aplicable ante situaciones de invalidez cubiertas según definición y condiciones de la póliza.',
+      'Enfermedades graves':'Beneficio asociado a diagnósticos definidos en la póliza y sujeto a condiciones, carencias y exclusiones.'
+    };
+    const dom={
+      movilidad:{t:'Movilidad',icon:'🚗',iso:'#ic-cadena',short:'Auto, moto o bicicleta — y quienes viajan contigo.',
+        desc:'En movilidad conviene revisar daños propios, robo, asistencia y, especialmente, la responsabilidad frente a terceros.',
+        checks:['Cuánto cubre la responsabilidad civil frente a terceros, no solo el valor de tu vehículo.','Deducible real por pérdida parcial y total, y cómo se calcula.','Asistencia vial, grúa y auto sustituto: qué incluye y en qué país aplica.'],
+        ramos:['Auto','Responsabilidad frente a terceros','Asistencia vial'],elig:true},
+      hogar:{t:'Hogar',icon:'🏠',iso:'#ic-empresas',short:'Vivienda, contenido y copropiedad.',
+        desc:'Casa o apartamento concentran patrimonio y contenido. Conviene revisar periódicamente si las sumas aseguradas siguen reflejando el valor real de lo que quieres proteger.',
+        checks:['Suma asegurada de estructura y contenido por separado.','Daños por agua, sismo y responsabilidad civil familiar.','Si vives en copropiedad, qué cubre la póliza del edificio y qué te toca a ti.'],
+        ramos:['Multiriesgo hogar','Contenido','Copropiedades','RC familiar'],elig:true},
+      salud:{t:'Salud',icon:'🩺',iso:'#ic-siniestros',short:isCO?'Seguro/Póliza de Salud privado — no reemplaza la EPS.':'Gastos médicos y atención cuando hace falta.',
+        desc:isCO?'En salud privada importan la red, los límites, los deducibles o copagos según el producto, las condiciones de ingreso y lo que realmente queda cubierto. La póliza no sustituye la EPS.':'En salud importan la red, los límites, los deducibles, los periodos aplicables y lo que realmente queda cubierto según cada alternativa.',
+        checks:isCO?['Red y acceso del seguro privado, y cómo se coordina con tu necesidad de atención.','Límites, deducibles o copagos según la alternativa.','Preexistencias, carencias y exclusiones declaradas desde el inicio.']:['Límite anual, deducible y coaseguro — cómo se combinan en un caso real.','Red de hospitales y médicos, y qué pasa fuera del país.','Preexistencias y periodos de espera declarados desde el inicio.'],
+        ramos:isCO?['Seguro/Póliza de Salud privado','Accidentes personales']:['Gastos médicos','Accidentes personales'],elig:false},
+      vida:{t:'Vida e ingreso',icon:'❤️',iso:'#ic-personas',short:'Continuidad económica para los tuyos.',
+        desc:'La protección de vida e ingreso busca respaldar la continuidad económica de quienes dependen de ti ante eventos cubiertos.',
+        checks:['Suma asegurada comparada con tus obligaciones reales (deudas, educación, gastos fijos).','Coberturas de invalidez y enfermedades graves.','Beneficiarios actualizados y correctamente designados.'],
+        ramos:['Vida','Accidentes personales','Invalidez'],elig:false},
+    };
+    const deep={
+      movilidad:{why:'Dos seguros de vehículo pueden tener primas parecidas y responder de forma distinta en responsabilidad civil, deducibles, pérdida, asistencias o territorio. Comparar solo precio puede ocultar diferencias relevantes.',
+        comp:['Límite de responsabilidad frente a terceros','Deducibles por pérdida parcial y total','Territorio y asistencia','Exclusiones por uso'],
+        no:'No puede asumirse que el uso del vehículo, el conductor habitual o el territorio queden cubiertos por defecto: se declaran y se validan en la propuesta.'},
+      hogar:{why:'Proteger la vivienda no siempre significa asegurar lo mismo: inmueble, contenido, responsabilidad y asistencias pueden tener alcances distintos.',
+        comp:['Bases de valoración de estructura y contenido','Eventos cubiertos (agua, sismo)','Deducibles','Alcance de la responsabilidad civil familiar'],
+        no:'No puede asumirse que lo que cubre la póliza del edificio cubra también tu unidad y tu contenido.'},
+      salud:{why:'En salud conviene revisar red, límites, deducible, coaseguro o copagos según el producto, condiciones de ingreso y exclusiones antes de comparar alternativas.',
+        comp:['Red y acceso','Límite anual','Deducible y coaseguro','Preexistencias y periodos de espera'],
+        no:'No puede asumirse atención inmediata de condiciones previas ni acceso fuera de la red informada por la alternativa.'},
+      vida:{why:'Vida no es solo elegir una suma. Conviene revisar quién depende del ingreso, qué obligaciones existen, por cuánto tiempo y qué eventos adicionales están realmente incluidos.',
+        comp:['Suma asegurada frente a obligaciones','Coberturas de invalidez y enfermedades graves','Carencias','Exclusiones'],
+        no:'No puede asumirse que un beneficio aplique sin la definición, las carencias y la designación de beneficiarios que exige la póliza.'}
+    };
+    const stages={
+      inicio:{label:'Empiezo mi camino',kicker:'PRIMERAS DECISIONES',
+        note:'Primeras decisiones de independencia: movilidad, vivienda, salud, ingreso.',
+        ctx:{movilidad:'Suele ser la primera decisión con presupuesto ajustado; conviene mirar el límite frente a terceros, no solo la prima.',
+          hogar:'En arriendo o primera vivienda, el contenido propio ya tiene valor aunque el inmueble no sea tuyo.',
+          salud:'Aparece la pregunta de qué pasa cuando dejas de estar en la cobertura de tu familia o de un empleo.',
+          vida:'Sin dependientes todavía, la conversación suele girar en torno al ingreso propio y a las deudas iniciales.'}},
+      familia:{label:'Familia en crecimiento',kicker:'DEPENDENCIAS Y CONTINUIDAD',
+        note:'Dependencias, responsabilidades, patrimonio y continuidad aumentan.',
+        ctx:{movilidad:'El vehículo transporta a más personas y los trayectos cotidianos se multiplican.',
+          hogar:'La vivienda concentra patrimonio y contenido familiar que cambia año con año.',
+          salud:'La red y los límites se revisan pensando en varias personas, no solo en ti.',
+          vida:'Con dependientes, la continuidad del ingreso familiar entra de lleno en la conversación.'}},
+      consolidacion:{label:'Patrimonio consolidado',kicker:'SUMAS, LÍMITES Y BENEFICIARIOS',
+        note:'Revisar sumas, límites, duplicaciones, brechas y beneficiarios.',
+        ctx:{movilidad:'Más de un vehículo o coberturas repetidas entre pólizas distintas.',
+          hogar:'Sumas desactualizadas frente a remodelaciones y bienes acumulados.',
+          salud:'Duplicaciones entre planes y límites que quedaron cortos con el tiempo.',
+          vida:'Beneficiarios, designaciones y sumas que conviene revisar y ordenar.'}},
+      independiente:{label:'Trabajo por mi cuenta',kicker:'VIDA PERSONAL E INGRESO',
+        note:'Vida personal e ingreso pueden estar estrechamente conectados.',
+        ctx:{movilidad:'Si el vehículo también es herramienta de trabajo, el uso declarado cambia la conversación.',
+          hogar:'La vivienda es además lugar de trabajo: equipo y contenido se mezclan.',
+          salud:'Una incapacidad afecta la atención y también la continuidad del ingreso.',
+          vida:'Vida personal e ingreso propio se revisan juntos, no por separado.'}}
+    };
+    const order=['movilidad','hogar','salud','vida'];
+    const st=stages[s.pStage]||stages.familia;
+    const curKey=dom[s.pDomain]?s.pDomain:'movilidad';
+    const cur=dom[curKey];
+    const dd=deep[curKey]||{};
+    const OX=500, OY=130, IW=44, IH=22, HZ=27, GW=8, GD=8;
+    const P=(gx,gy,gz)=>[(OX+(gx-gy)*IW).toFixed(1),(OY+(gx+gy)*IH-gz*HZ).toFixed(1)];
+    const poly=(pts)=>'M'+pts.map(p=>p[0]+','+p[1]).join(' L')+' Z';
+    const PAL={ivory:{t:'#F3EAE0',r:'#C9BAAE',l:'#A2938A'},dark:{t:'#3B3546',r:'#241F2D',l:'#15121C'},
+      red:{t:'#F0223F',r:'#C4001F',l:'#8A0015'},gold:{t:'#F0D79B',r:'#C7A25A',l:'#8F7130'},slate:{t:'#4A5566',r:'#2E3746',l:'#1B212B'}};
+    const box=(o)=>{const c=PAL[o.p]||PAL.ivory,h=o.h;
+      return [{d:poly([P(o.x,o.y+o.d,h),P(o.x+o.w,o.y+o.d,h),P(o.x+o.w,o.y+o.d,0),P(o.x,o.y+o.d,0)]),f:c.l},
+        {d:poly([P(o.x+o.w,o.y,h),P(o.x+o.w,o.y+o.d,h),P(o.x+o.w,o.y+o.d,0),P(o.x+o.w,o.y,0)]),f:c.r},
+        {d:poly([P(o.x,o.y,h),P(o.x+o.w,o.y,h),P(o.x+o.w,o.y+o.d,h),P(o.x,o.y+o.d,h)]),f:c.t}];};
+    const blocks=[
+      {x:.8,y:.9,w:2.4,d:2.1,h:1.5,p:'ivory'},
+      {x:1.2,y:1.3,w:1.6,d:1.3,h:2.3,p:'red'},
+      {x:.7,y:4.5,w:2.0,d:.9,h:.5,p:'slate'},
+      {x:1.3,y:4.6,w:.9,d:.7,h:.95,p:'dark'},
+      {x:5.7,y:.7,w:1.5,d:.45,h:1.0,p:'ivory'},
+      {x:6.2,y:.2,w:.45,d:1.5,h:1.0,p:'red'},
+      {x:6.4,y:1.9,w:.7,d:.7,h:.3,p:'gold'},
+      {x:5.1,y:4.2,w:1.9,d:1.0,h:.75,p:'ivory'},
+      {x:6.6,y:4.1,w:.6,d:.6,h:1.9,p:'gold'},
+      {x:5.4,y:4.4,w:.8,d:.5,h:1.25,p:'dark'}
+    ];
+    const grid=[];
+    for(let i=0;i<=GW;i++) grid.push({d:'M'+P(i,0,0).join(',')+' L'+P(i,GD,0).join(',')});
+    for(let j=0;j<=GD;j++) grid.push({d:'M'+P(0,j,0).join(',')+' L'+P(GW,j,0).join(',')});
+    const shapes=[];
+    blocks.slice().sort((m,n)=>(m.x+m.y)-(n.x+n.y)).forEach(o=>box(o).forEach(g=>shapes.push(g)));
+    const gp={movilidad:{gx:1.7,gy:5.2,gz:.95},hogar:{gx:2.0,gy:2.0,gz:2.3},salud:{gx:6.4,gy:1.0,gz:1.0},vida:{gx:6.1,gy:4.7,gz:1.9}};
+    const tabBase='min-height:46px;padding:0 18px;border-radius:999px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:all .16s;';
+    const exitsGT=[
+      {t:'Cotizar o comparar',d:'Cuando el caso ya es elegible, avanzas con el recorrido guiado.',go:()=>this.goCotComp()},
+      {t:'Revisar mis seguros',d:'Renovaciones y revisión de lo que ya tienes, desde la gestión de servicio.',go:()=>this.go('cliente')},
+      {t:'Soy cliente',d:'Pólizas, documentos y solicitudes de servicio.',go:()=>this.go('cliente')},
+      {t:'Siniestros y asistencia',d:'Seguridad primero y luego el canal oficial que corresponde.',go:()=>this.go('siniestros')}
+    ];
+    const exitsCO=[
+      {t:'Cotizar o comparar',d:'Cuando el caso ya es elegible, avanzas con el recorrido guiado.',go:()=>this.goCotComp()},
+      {t:'Siniestros y asistencia',d:'Seguridad primero y luego el canal oficial que corresponde.',go:()=>this.go('siniestros')},
+      {t:'Soy cliente',d:'Gestión disponible según los servicios habilitados para tu cuenta.',go:()=>this.go('cliente')},
+      {t:'Ver la propuesta para empresas',d:'La protección personal se revisa junto a la operación cuando corresponde.',go:()=>this.goEmpresas()}
+    ];
+    return {
+      pEyebrow: isCO?'Personas y familias · Colombia':'Personas y familias · Guatemala',
+      pH1: isCO?'Tu protección también cambia con tu vida.':'Protege lo que cambia contigo.',
+      pBody: isCO
+        ? 'Movilidad, hogar, salud, vida e ingreso se conectan de forma distinta según tu momento. A&S parte de la necesidad para ayudarte a identificar qué revisar, qué comparar y cuándo conviene pasar a asesoría.'
+        : 'Tu movilidad, tu hogar, tu salud y las personas que dependen de ti no necesitan la misma protección en cada etapa. A&S te ayuda a ordenar la necesidad, entender qué conviene revisar y comparar alternativas con mayor claridad.',
+      pTruth: isCO
+        ? 'Una póliza de salud es un seguro privado según sus condiciones; no es una EPS.'
+        : 'La cobertura, elegibilidad y condiciones dependen de la alternativa validada y de la aseguradora.',
+      pSecondaryLabel:'Quiero revisar mis seguros',
+      pSecondaryGo: ()=>{ this._pendingAI={source:'personas',intent:'Revisar mis seguros'}; this._aiIntent='Revisar mis seguros'; this.goRenovar(); },
+      pMapTitle: isCO?'¿Qué proteges hoy y qué conviene revisar?':'¿Qué proteges hoy y qué cambia en tu etapa?',
+      pAmbitos:[
+        {t:'Movilidad',d:'Auto, moto o bicicleta y quienes viajan contigo.'},
+        {t:'Hogar',d:'Vivienda, contenido y copropiedad.'},
+        {t:'Salud',d:isCO?'Seguro/Póliza de Salud privado; no reemplaza la EPS.':'Gastos médicos, red y condiciones cuando hace falta.'},
+        {t:'Vida e ingreso',d:'Continuidad económica para quienes dependen de ti.'}
+      ],
+      pScroll: ()=>{ if(typeof document==='undefined')return; const el=document.getElementById('vl-per-mapa'); if(el&&el.getBoundingClientRect){ const y=el.getBoundingClientRect().top+(window.pageYOffset||0)-70; window.scrollTo({top:y,behavior:'smooth'}); } },
+      pStageTabs: Object.keys(stages).map(k=>({key:k,label:stages[k].label,active:s.pStage===k,pick:()=>set({pStage:k}),
+        style:tabBase+(s.pStage===k?'background:#0E0D10;color:#fff;border:1px solid #0E0D10;':'background:#fff;color:#12110F;border:1px solid #E7E2D6;')})),
+      pStageKicker: st.kicker, pStageNote: st.note,
+      pGround: poly([P(0,0,0),P(GW,0,0),P(GW,GD,0),P(0,GD,0)]),
+      pGrid: grid,
+      pShapes: shapes,
+      pSpots: order.map(k=>({key:k,label:dom[k].t,active:k===curKey,pick:()=>set({pDomain:k}),
+        pos:'left:'+((OX+(gp[k].gx-gp[k].gy)*IW)/10).toFixed(2)+'%;top:'+((OY+(gp[k].gx+gp[k].gy)*IH-gp[k].gz*HZ)/5.0).toFixed(2)+'%;'})),
+      pSpotList: order.map(k=>({key:k,label:dom[k].t,active:k===curKey,pick:()=>set({pDomain:k}),
+        style:'min-height:48px;padding:10px 14px;border-radius:12px;text-align:left;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;'+(k===curKey?'background:#E4002B;color:#fff;border:1px solid #E4002B;':'background:#fff;color:#12110F;border:1px solid #E7E2D6;')})),
+      pDomTitle: cur.t, pDomIcon:cur.icon||'🛡️', pDomShort: cur.short, pDomDesc: cur.desc, pDomChecks: cur.checks, pDomRamos: cur.ramos,
+      pDomWhy: dd.why||'', pDomComp: (dd.comp||[]).map(t=>({t:t})), pDomNoAssume: dd.no||'',
+      pDomStageNote: (st.ctx&&st.ctx[curKey])||'',
+      pProductCards: cur.ramos.map(name=>Object.assign({name,desc:personaProductExplain[name]||'Producto o cobertura a revisar según necesidad, país y condiciones de la alternativa.'},personaProductVisual(name))),
+      pDomElig: cur.elig,
+      pNextTitle: cur.elig?'Puedes continuar en línea con este caso':'Este ámbito conviene revisarlo antes de pedir propuestas',
+      pNextDesc: cur.elig
+        ? 'Avanzas con el recorrido guiado de cotización y comparación; si aparece algo que requiere criterio, un asesor lo revisa contigo sin perder el contexto.'
+        : 'Preferimos ordenar la necesidad antes de pedir propuestas: así la comparación se hace sobre bases equivalentes.',
+      pGoCot: ()=>{ this._pendingAI={source:'personas',intent:st.label+' · '+cur.t}; this._aiIntent=st.label+' · '+cur.t; this.goCotComp(); },
+      pGoAsesor: ()=>{ this.openHandoff({source:'personas',intent:st.label+' · '+cur.t}); },
+      pExitsKicker: isCO?'CONTINÚA POR DONDE NECESITES':'SERVICIO, RENOVACIÓN Y ACOMPAÑAMIENTO',
+      pExitsNote: isCO
+        ? 'Personas y familias acompaña a la propuesta corporativa: puedes cotizar cuando el caso es elegible, atender un siniestro o continuar con la gestión que ya tienes.'
+        : 'Además de explorar tu protección, puedes revisar lo que ya tienes, continuar como cliente o resolver un siniestro por el canal que corresponde.',
+      pExits: isCO?exitsCO:exitsGT
+    };
+  }
+  // F7-T3A · registro interno de acciones para futura instrumentación. Sin proveedor, sin PII, sin red.
+  _ax(name){ if(!name)return; this._axLog=(this._axLog||[]); this._axLog.push({event:name,ts:Date.now()}); if(this._axLog.length>50) this._axLog.shift(); }
+  _empSituations(){ return [
+    {k:'crecio',label:'Mi empresa creció o cambió',desc:'Quiero revisar si los cambios en la operación alteran lo que conviene proteger o comparar.',
+      note:'Empezamos por lo que cambió: qué se agregó, qué creció y qué dejó de ser marginal en la operación. En el mapa puedes ubicar el punto donde ese cambio concentra más exposición y revisar qué conviene comparar antes de decidir.'},
+    {k:'polizas',label:'Ya tengo varias pólizas',desc:'Quiero revisar el programa en conjunto y ordenar posibles vacíos, duplicidades, límites o vigencias.',
+      note:'Revisamos el programa como conjunto y no póliza por póliza. La secuencia siguiente ordena la conversación; lo que se identifique se confirma con la documentación vigente y las condiciones de cada aseguradora.'},
+    {k:'concreta',label:'Tengo una preocupación concreta',desc:'Quiero ir directo al punto de la operación que necesito revisar.',
+      note:'Puedes ir directo al punto que te preocupa. El mapa mantiene disponibles los demás puntos por si la revisión abre algo conectado.'},
+    {k:'integral',label:'Quiero una revisión integral',desc:'Prefiero empezar por la operación completa y ordenar prioridades antes de comparar.',
+      note:'Recorremos la operación completa y ordenamos prioridades antes de pedir propuestas, para que la comparación no se haga sobre bases distintas.'}
+  ]; }
+  _empPath(){ return [
+    {k:'inventario',label:'Inventario',desc:'Se ordena qué pólizas existen hoy, con qué vigencias y a qué parte de la operación responde cada una.'},
+    {k:'exposiciones',label:'Exposiciones',desc:'Se revisa cómo opera la empresa y dónde se concentra la exposición, antes de entrar al clausulado.'},
+    {k:'vacios',label:'Posibles vacíos / solapamientos',desc:'Se identifican posibles vacíos, duplicidades y diferencias de límites o vigencias que conviene confirmar con la documentación vigente.'},
+    {k:'alternativas',label:'Alternativas',desc:'Cuando corresponde, se comparan alternativas sobre bases equivalentes. Un dato no informado se muestra como dato no informado: no equivale a “no cubre”.'},
+    {k:'plan',label:'Plan',desc:'Se ordena qué conviene mantener, ajustar o comparar, y qué requiere criterio de un asesor antes de decidir.'}
+  ]; }
+  _empSitCur(){ const k=this.state&&this.state.empSituation; return k?(this._empSituations().find(x=>x.k===k)||null):null; }
+  _empSitLabel(){ const c=this._empSitCur(); return c?c.label:''; }
+  _empGoMapa(){ if(typeof document==='undefined')return; const el=document.getElementById('vl-emp-mapa'); if(!el||!el.getBoundingClientRect)return;
+    const y=el.getBoundingClientRect().top+(window.pageYOffset||0)-70; window.scrollTo({top:y,behavior:this.reduced()?'auto':'smooth'});
+    setTimeout(()=>{ const b=el.querySelector('[role="group"] button'); if(b&&b.focus) b.focus({preventScroll:true}); },this.reduced()?0:420); }
+  _empCtx(sector,spot,role){ const sit=this._empSitLabel(); const it=sector.label+' · '+spot.label+(role?' · '+role.label:'')+(sit?' · '+sit:''); this._pendingAI={source:'empresas',intent:it}; this._aiIntent=it; }
+  buildSector(){
+    const s=this.state; const set=(p)=>this.setState(p);
+    const OX=500, OY=130, IW=44, IH=22, HZ=27, GW=8, GD=8;
+    const P=(gx,gy,gz)=>[(OX+(gx-gy)*IW).toFixed(1),(OY+(gx+gy)*IH-gz*HZ).toFixed(1)];
+    const poly=(pts)=>'M'+pts.map(p=>p[0]+','+p[1]).join(' L')+' Z';
+    const PAL={
+      ivory:{t:'#F3EAE0',r:'#C9BAAE',l:'#A2938A'},
+      dark:{t:'#3B3546',r:'#241F2D',l:'#15121C'},
+      red:{t:'#F0223F',r:'#C4001F',l:'#8A0015'},
+      gold:{t:'#F0D79B',r:'#C7A25A',l:'#8F7130'},
+      slate:{t:'#4A5566',r:'#2E3746',l:'#1B212B'}
+    };
+    const box=(o)=>{const c=PAL[o.p]||PAL.ivory, h=o.h;
+      const top=poly([P(o.x,o.y,h),P(o.x+o.w,o.y,h),P(o.x+o.w,o.y+o.d,h),P(o.x,o.y+o.d,h)]);
+      const fr=poly([P(o.x+o.w,o.y,h),P(o.x+o.w,o.y+o.d,h),P(o.x+o.w,o.y+o.d,0),P(o.x+o.w,o.y,0)]);
+      const fl=poly([P(o.x,o.y+o.d,h),P(o.x+o.w,o.y+o.d,h),P(o.x+o.w,o.y+o.d,0),P(o.x,o.y+o.d,0)]);
+      return [{d:fl,f:c.l},{d:fr,f:c.r},{d:top,f:c.t}];
+    };
+    const productVisual=(name)=>{const map={'Transporte de carga':{icon:'🚛',tone:'mob'},'Mercancía en tránsito':{icon:'📦',tone:'mob'},'Aduanas':{icon:'🧾',tone:'base'},'Flota de vehículos':{icon:'🚚',tone:'mob'},'RC de flota':{icon:'🤝',tone:'rc'},'Asistencia vial':{icon:'🛠️',tone:'mob'},'Equipo de carga':{icon:'🏗️',tone:'property'},'RC operaciones':{icon:'⚖️',tone:'rc'},'Accidentes':{icon:'🦺',tone:'people'},'Incendio y aliados':{icon:'🔥',tone:'property'},'Inventario':{icon:'🗃️',tone:'property'},'Todo riesgo daños':{icon:'🧱',tone:'property'},'Rotura de maquinaria':{icon:'⚙️',tone:'property'},'Equipo electrónico':{icon:'💻',tone:'property'},'Robo con violencia':{icon:'🔒',tone:'property'},'Lucro cesante':{icon:'📉',tone:'continuity'},'Interrupción de negocio':{icon:'⏸️',tone:'continuity'},'Cadena de suministro':{icon:'🔗',tone:'continuity'},'Gastos médicos':{icon:'🩺',tone:'people'},'Vida colectivo':{icon:'❤️',tone:'people'},'Beneficios flexibles':{icon:'🎁',tone:'people'},'Cristales':{icon:'🪟',tone:'property'},'RC general':{icon:'🤝',tone:'rc'},'RC profesional':{icon:'🧑‍⚖️',tone:'rc'},'D&O directivos':{icon:'👔',tone:'rc'},'Ciber':{icon:'🔐',tone:'cyber'},'Fraude':{icon:'🕵️',tone:'cyber'},'Asesoría especializada':{icon:'🧭',tone:'base'}};return map[name]||{icon:'🛡️',tone:'base'};};
+    const productExplain={
+      'Transporte de carga':'🚛 Protección de mercancías durante el trayecto frente a pérdidas o daños cubiertos, según interés asegurable, ruta, límites y condiciones de la propuesta.',
+      'Mercancía en tránsito':'Revisa el alcance durante traslados y permanencias temporales declaradas; el punto exacto de inicio y fin depende de la alternativa.',
+      'Aduanas':'No es una póliza por sí sola: identifica obligaciones, garantías o responsabilidades aduaneras que pueden requerir una solución específica según la operación.',
+      'Flota de vehículos':'Protección para las unidades de la empresa frente a eventos cubiertos, con deducibles, límites y condiciones que deben compararse.',
+      'RC de flota':'Responsabilidad frente a terceros derivada del uso de vehículos, sujeta a límites, exclusiones y condiciones de la póliza.',
+      'Asistencia vial':'Servicios de apoyo en ruta cuando están incluidos en la alternativa; conviene revisar alcance geográfico y eventos cubiertos.',
+      'Equipo de carga':'Protección de montacargas, equipos de manipulación u otros activos de operación según su naturaleza y condiciones.',
+      'RC operaciones':'Responsabilidad por daños a terceros derivados de actividades operativas cubiertas.',
+      'Accidentes':'Protección frente a accidentes de personas bajo los alcances, sumas y exclusiones contratadas.',
+      'Incendio y aliados':'🔥 Protección de bienes asegurados frente a daños materiales por eventos cubiertos, con sumas, deducibles y exclusiones definidos.',
+      'Inventario':'Protección del valor declarado de existencias según ubicación, acumulación, exposición y condiciones de la propuesta.',
+      'Todo riesgo daños':'Cobertura amplia de daños materiales accidentales salvo exclusiones, siempre sujeta a condiciones, límites y deducibles.',
+      'Rotura de maquinaria':'Protección frente a daños accidentales o fallas cubiertas de maquinaria, según condiciones técnicas y exclusiones.',
+      'Equipo electrónico':'Protección para equipos electrónicos ante daños cubiertos; deben revisarse valores, deducibles y eventos excluidos.',
+      'Robo con violencia':'Cobertura de pérdidas por robo cuando se cumplen los supuestos y evidencias exigidos por la póliza.',
+      'Lucro cesante':'Busca proteger la pérdida de resultado económico derivada de una interrupción cubierta, normalmente vinculada a un daño material asegurado.',
+      'Interrupción de negocio':'Protección de continuidad económica ante una interrupción cubierta; periodo de indemnización y disparador deben validarse.',
+      'Cadena de suministro':'Puede contemplar pérdidas por interrupciones vinculadas a proveedores o clientes cuando la póliza y el evento lo cubren.',
+      'Gastos médicos':'🩺 Cobertura de gastos médicos bajo red, límites, deducibles, coaseguros, carencias y condiciones de la alternativa.',
+      'Vida colectivo':'❤️ Protección de vida para grupos o colaboradores según suma asegurada, elegibilidad y condiciones contratadas.',
+      'Beneficios flexibles':'Diseño de beneficios para colaboradores; la combinación exacta depende de las coberturas y proveedores disponibles.',
+      'Cristales':'Cobertura específica para rotura de cristales asegurados bajo límites y condiciones definidos.',
+      'RC general':'Responsabilidad civil frente a reclamaciones de terceros por daños cubiertos derivados de la actividad asegurada.',
+      'RC profesional':'Responsabilidad por reclamaciones vinculadas a errores u omisiones profesionales cubiertos, según actividad y condiciones.',
+      'D&O directivos':'Responsabilidad de administradores y directivos frente a reclamaciones cubiertas derivadas de actos de gestión.',
+      'Ciber':'🔐 Protección frente a determinados incidentes cibernéticos, costos de respuesta, responsabilidad y/o interrupción según la propuesta.',
+      'Fraude':'Coberturas específicas frente a determinadas pérdidas por fraude o delitos, sujetas a alcance y exclusiones.',
+      'Asesoría especializada':'Revisamos con un asesor la continuidad según la alternativa, la responsabilidad frente a terceros según la exposición y si existe una solución especializada aplicable a este punto.'
+    };
+    const sectors={
+      logistica:{label:'Logística y transporte',kicker:'LOGÍSTICA Y TRANSPORTE',
+        blocks:[
+          {x:.5,y:.6,w:2.8,d:2.4,h:1.4,p:'ivory'},
+          {x:3.3,y:.9,w:.5,d:1.8,h:.7,p:'red'},
+          {x:6.0,y:.8,w:1.4,d:1.4,h:2.4,p:'slate'},
+          {x:.6,y:4.4,w:.7,d:.7,h:.5,p:'red'},
+          {x:1.5,y:4.4,w:.7,d:.7,h:.5,p:'ivory'},
+          {x:.6,y:5.3,w:.7,d:.7,h:.35,p:'gold'},
+          {x:2.6,y:5.0,w:1.7,d:.9,h:.85,p:'ivory'},
+          {x:4.4,y:5.0,w:.7,d:.9,h:1.05,p:'red'},
+          {x:5.6,y:3.6,w:1.5,d:.9,h:.8,p:'slate'},
+          {x:7.2,y:3.6,w:.6,d:.9,h:1.0,p:'red'}
+        ],
+        spots:[
+          {k:'carga',label:'Carga y mercancía',gx:1.1,gy:5.2,gz:.5,title:'Carga y mercancía en movimiento',desc:'La mercancía cambia de manos y de vehículo varias veces antes de llegar. Ahí se concentran robo, daño y faltantes — y la discusión de quién responde.',ramos:['Transporte de carga','Mercancía en tránsito','Aduanas'],elig:true},
+          {k:'flota',label:'Flota y conductores',gx:4.1,gy:5.9,gz:1.0,title:'Flota, conductores y responsabilidad en ruta',desc:'Cada unidad expone daños propios, a terceros y a la operación. Revisamos límites, deducibles y asistencia real en carretera, no solo la prima.',ramos:['Flota de vehículos','RC de flota','Asistencia vial'],elig:true},
+          {k:'patios',label:'Patios y maniobras',gx:6.6,gy:1.5,gz:2.4,title:'Patios, maniobras y equipo de carga',desc:'Cargue, descargue y maniobra concentran golpes, caídas de carga y daños al equipo. Es donde más seguido se rompe la cadena de custodia.',ramos:['Equipo de carga','RC operaciones','Accidentes'],elig:false},
+          {k:'bodega',label:'Bodega de tránsito',gx:1.9,gy:1.8,gz:1.4,title:'Bodega de tránsito e inventario',desc:'Inventario detenido es capital expuesto: incendio, agua, accesos y acumulación por temporada alta.',ramos:['Incendio y aliados','Inventario','Todo riesgo daños'],elig:true}
+        ]},
+      industria:{label:'Bodega, planta e industria',kicker:'BODEGA, PLANTA E INDUSTRIA',
+        blocks:[
+          {x:.6,y:.6,w:2.2,d:2.2,h:3.2,p:'dark'},
+          {x:3.4,y:.5,w:2.6,d:2.0,h:1.5,p:'ivory'},
+          {x:6.4,y:.8,w:1.0,d:1.0,h:1.2,p:'gold'},
+          {x:.8,y:4.0,w:.55,d:2.6,h:1.7,p:'ivory'},
+          {x:1.9,y:4.0,w:.55,d:2.6,h:1.7,p:'ivory'},
+          {x:3.0,y:4.0,w:.55,d:2.6,h:1.7,p:'red'},
+          {x:4.6,y:3.2,w:1.3,d:1.3,h:1.0,p:'slate'},
+          {x:6.2,y:4.8,w:.9,d:.9,h:.55,p:'red'}
+        ],
+        spots:[
+          {k:'planta',label:'Planta y maquinaria',gx:1.7,gy:1.7,gz:3.2,title:'Planta, equipo y maquinaria',desc:'La maquinaria que produce es también la que detiene el negocio si falla. Separamos daño material, rotura de maquinaria y equipo electrónico.',ramos:['Rotura de maquinaria','Equipo electrónico','Todo riesgo daños'],elig:true},
+          {k:'inventario',label:'Inventario y bodega',gx:4.7,gy:1.5,gz:1.5,title:'Inventario, bodega y almacenamiento',desc:'Valor acumulado, altura de estiba y accesos definen tu exposición real — y casi nunca coinciden con la suma asegurada que traías.',ramos:['Incendio y aliados','Inventario','Robo con violencia'],elig:true},
+          {k:'continuidad',label:'Continuidad de la producción',gx:2.0,gy:5.3,gz:1.7,title:'Continuidad de la producción',desc:'Un evento de un día puede costar semanas de ingreso. Se dimensiona con margen bruto, tiempo de reposición y dependencia de proveedores.',ramos:['Lucro cesante','Interrupción de negocio','Cadena de suministro'],elig:false},
+          {k:'personas',label:'Personas en operación',gx:5.25,gy:3.85,gz:1.0,title:'Personas en la operación',desc:'Turnos, riesgo mecánico y traslados piden cobertura de accidentes y salud pensada por puesto, no un plan único para todos.',ramos:['Accidentes','Gastos médicos','Vida colectivo'],elig:false}
+        ]},
+      servicios:{label:'Oficina, comercio y servicios',kicker:'OFICINA, COMERCIO Y SERVICIOS',
+        blocks:[
+          {x:.8,y:3.2,w:1.8,d:1.8,h:4.4,p:'dark'},
+          {x:3.4,y:.6,w:2.0,d:1.8,h:2.2,p:'ivory'},
+          {x:6.0,y:.8,w:1.2,d:1.2,h:1.0,p:'gold'},
+          {x:3.2,y:3.8,w:2.6,d:2.2,h:1.0,p:'ivory'},
+          {x:6.2,y:3.4,w:1.1,d:1.1,h:1.6,p:'slate'},
+          {x:6.0,y:5.2,w:1.0,d:.6,h:.5,p:'red'}
+        ],
+        spots:[
+          {k:'oficina',label:'Oficinas y equipo',gx:4.4,gy:1.5,gz:2.2,title:'Oficinas, sucursales y equipo',desc:'Mobiliario, cómputo y mejoras al local suelen quedar subasegurados justo cuando el negocio creció.',ramos:['Incendio y aliados','Equipo electrónico','Cristales'],elig:true},
+          {k:'rc',label:'Responsabilidad ante clientes',gx:4.5,gy:4.9,gz:1.0,title:'Responsabilidad ante clientes y terceros',desc:'Atender público o dar un servicio profesional te expone a reclamos por daño, error u omisión. Ahí importa el límite, no la prima.',ramos:['RC general','RC profesional','D&O directivos'],elig:true},
+          {k:'beneficios',label:'Beneficios del equipo',gx:6.75,gy:3.95,gz:1.6,title:'Beneficios y retención del equipo',desc:'Salud, vida y accidentes son hoy parte del paquete que retiene talento. Se diseñan por nómina, no por catálogo.',ramos:['Gastos médicos','Vida colectivo','Beneficios flexibles'],elig:false},
+          {k:'ciber',label:'Datos y continuidad digital',gx:1.7,gy:4.1,gz:4.4,title:'Datos, pagos y continuidad digital',desc:'Facturación, datos de clientes y medios de pago dependen de sistemas. Un incidente detiene el ingreso y activa responsabilidad.',ramos:['Ciber','Interrupción de negocio','Fraude'],elig:false}
+        ]}
+    };
+    const SD={
+      'logistica.carga':{esc:"Durante un trayecto o una transferencia entre custodios, la mercancía llega con faltantes o daños y se necesita reconstruir dónde ocurrió el evento.",imp:'Un faltante o una avería puede convertirse en una reclamación del cliente y en una discusión sobre quién tenía la custodia.',
+        why:'La responsabilidad cambia según el rol y el momento del daño; el valor asegurable casi nunca es el valor de la factura.',
+        rev:['Interés asegurable','Rol y custodia','Trayectos declarados','Deducibles','Documentación exigida'],
+        comp:['Bases de valoración','Eventos cubiertos','Sublímites','Exclusiones críticas','Requisitos de reclamación']},
+      'logistica.flota':{esc:"Una unidad sufre un accidente en ruta, involucra daños propios o a terceros y la operación debe continuar mientras se atiende el evento.",imp:'Una unidad detenida o un reclamo de tercero afecta a la vez el servicio, el costo y la relación con el cliente.',
+        why:'Uso, conductores y trayectos pesan más en la respuesta que la diferencia de prima entre alternativas.',
+        rev:['Uso declarado','Conductores','Deducibles por unidad','Límite de responsabilidad','Alcance de asistencia'],
+        comp:['Límites de responsabilidad','Deducibles','Territorio','Asistencias incluidas','Exclusiones por uso']},
+      'logistica.patios':{esc:"Durante una maniobra de cargue o descargue, la carga, el equipo o un tercero resulta afectado y se debe determinar responsabilidad y evidencia.",imp:'Un golpe en maniobra puede dañar equipo propio, carga de terceros y detener el despacho del día.',
+        why:'Es el punto donde más se rompe la cadena de custodia y donde la evidencia define el resultado.',
+        rev:['Equipo y maquinaria de patio','Responsabilidad en maniobra','Cargue y descargue','Protocolos y evidencia'],
+        comp:['Alcance en cargue/descargue','Límites','Deducibles','Exclusiones de manipulación']},
+      'logistica.bodega':{esc:"Un incendio, ingreso de agua o robo afecta inventario acumulado en una ubicación de tránsito y compromete entregas de uno o varios clientes.",imp:'El inventario detenido concentra valor: un solo evento puede afectar varios clientes a la vez.',
+        why:'La acumulación por temporada suele dejar la suma asegurada por debajo del valor real.',
+        rev:['Suma y acumulación','Eventos cubiertos','Protecciones y accesos','Continuidad asociada'],
+        comp:['Bases de valoración','Sublímites por ubicación','Deducibles','Exclusiones']},
+      'industria.planta':{esc:"Una máquina crítica falla de forma súbita y detiene parte o toda la producción mientras se evalúa daño, reparación y tiempo de reposición.",imp:'La falla de una máquina crítica puede detener la línea completa y comprometer entregas comprometidas.',
+        why:'Daño material, rotura de maquinaria y equipo electrónico responden de forma distinta ante el mismo evento.',
+        rev:['Valoración de maquinaria','Rotura vs daño material','Equipo electrónico','Repuestos y reposición'],
+        comp:['Eventos cubiertos','Deducibles','Sublímites técnicos','Exclusiones de mantenimiento']},
+      'industria.inventario':{esc:"Un evento material o un robo afecta una acumulación de inventario superior a la habitual y reduce la capacidad de atender pedidos en curso.",imp:'Una pérdida de inventario afecta el resultado del periodo y la capacidad de cumplir pedidos en curso.',
+        why:'Altura de estiba, accesos y acumulación definen la exposición real, no el promedio anual.',
+        rev:['Suma asegurada','Acumulación máxima','Protecciones','Robo y sus requisitos'],
+        comp:['Bases de valoración','Sublímites','Deducibles','Requisitos de protección']},
+      'industria.continuidad':{esc:"Un daño en la operación obliga a detener producción durante varios días mientras se recupera equipo, capacidad o un proveedor crítico.",imp:'Un evento de un día puede costar semanas de ingreso mientras se repone la capacidad.',
+        why:'Muchas pólizas responden por el daño material y no por el tiempo sin operar.',
+        rev:['Base financiera','Periodo indemnizable','Dependencia de daño material','Proveedores críticos'],
+        comp:['Periodo indemnizable','Espera o deducible','Límites','Alcance de dependencias']},
+      'industria.personas':{esc:"Un colaborador sufre un accidente o una hospitalización y la empresa debe atender la protección de la persona y la continuidad del turno.",imp:'Un accidente o una hospitalización afecta al colaborador, a su familia y a la operación del turno.',
+        why:'La elegibilidad y la red definen si el beneficio sirve cuando se usa, no cuando se contrata.',
+        rev:['Elegibilidad por puesto','Sumas y límites','Red y deducibles','Dependientes'],
+        comp:['Red disponible','Coaseguro y copagos','Carencias','Exclusiones']},
+      'servicios.oficina':{esc:"Un incendio, daño por agua o robo afecta equipos, mejoras o contenido de una oficina o sucursal y obliga a reponer activos para continuar operando.",imp:'La reposición de equipo y mejoras al local suele costar más de lo declarado cuando el negocio ya creció.',
+        why:'El subaseguramiento aparece justo en el momento del siniestro, no antes.',
+        rev:['Sumas actualizadas','Mejoras al local','Equipo electrónico','Cristales y contenido'],
+        comp:['Bases de valoración','Eventos cubiertos','Deducibles','Exclusiones']},
+      'servicios.rc':{esc:"Un cliente o tercero presenta un reclamo por un daño, error u omisión relacionado con la actividad declarada y se debe revisar alcance, límites y defensa.",imp:'Un reclamo de tercero puede consumir tiempo, defensa y recursos incluso antes de definirse.',
+        why:'La actividad declarada y el límite determinan si el reclamo entra o queda fuera.',
+        rev:['Actividad declarada','Límite por evento y agregado','Gastos de defensa','Territorio'],
+        comp:['Límites y sublímites','Retroactividad cuando aplique','Defensa','Exclusiones de actividad']},
+      'servicios.beneficios':{esc:"Un colaborador o dependiente necesita utilizar un beneficio y la elegibilidad, la red y las condiciones determinan el acceso efectivo al servicio.",imp:'Un paquete mal diseñado se paga igual y se percibe menos: afecta costo y retención al mismo tiempo.',
+        why:'El diseño por nómina y elegibilidad importa más que la lista de coberturas.',
+        rev:['Grupo elegible','Sumas por nivel','Red','Dependientes'],
+        comp:['Red y acceso','Deducibles y coaseguro','Carencias','Exclusiones']},
+      'servicios.ciber':{esc:"Un incidente compromete sistemas o datos, interrumpe facturación u operación y puede generar costos de respuesta o responsabilidad frente a terceros.",imp:'Un incidente puede detener la facturación y activar responsabilidad frente a clientes y terceros.',
+        why:'La respuesta depende del tipo de incidente y de los requisitos técnicos exigidos por la alternativa.',
+        rev:['Datos y sistemas críticos','Requisitos de seguridad exigidos','Continuidad de facturación','Responsabilidad frente a terceros'],
+        comp:['Eventos cubiertos','Costos de respuesta','Interrupción y espera','Exclusiones y requisitos']}
+    };
+    const isCO=s.country==='co';
+    const sk=isCO?['logistica','industria','servicios']:['industria','servicios','logistica'];
+    const cur=sectors[s.sectorSel]||sectors.logistica;
+    const spot=cur.spots.find(p=>p.k===s.spotSel)||cur.spots[0];
+    const roleShow=isCO&&s.sectorSel==='logistica';
+    const roleList=this._roles();
+    const role=roleShow?(roleList.find(r=>r.k===s.roleSel)||null):null;
+    const spotLabel=(k)=>{ const hit=cur.spots.find(p=>p.k===k); return hit?hit.label:k; };
+    let spotsOrdered=cur.spots;
+    if(role){ const by={}; cur.spots.forEach(p=>{by[p.k]=p;});
+      spotsOrdered=role.order.map(k=>by[k]).filter(Boolean).concat(cur.spots.filter(p=>role.order.indexOf(p.k)<0)); }
+    const roleChipBase='min-height:78px;padding:12px 14px;border-radius:15px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;transition:transform .16s,border-color .16s,background .16s,box-shadow .16s;text-align:left;';
+    const deep=SD[s.sectorSel+'.'+spot.k]||SD[(sectors[s.sectorSel]?s.sectorSel:'logistica')+'.'+spot.k]||{};
+    const coCmp=(t,side)=>{
+      const a={
+        'Alcance en cargue/descargue':['Incluido con condiciones','Sublímite por maniobra'],
+        'Límites':['COP 2.000 millones','COP 3.000 millones'],
+        'Deducibles':['10% · mín. COP 5 M','15% · mín. COP 3 M'],
+        'Exclusiones de manipulación':['Embalaje deficiente: revisar','Daño gradual: excluido'],
+        'Bases de valoración':['Valor declarado + gastos','Valor factura + flete'],
+        'Eventos cubiertos':['Daño accidental / robo','Daño accidental / volcamiento'],
+        'Sublímites':['COP 500 M por evento','COP 350 M por evento'],
+        'Exclusiones críticas':['Vicio propio: excluido','Merma ordinaria: excluida'],
+        'Requisitos de reclamación':['Aviso + soportes de custodia','Aviso + trazabilidad del evento'],
+        'Límites de responsabilidad':['COP 2.000 millones','COP 3.000 millones'],
+        'Territorio':['Colombia + CAN*','Colombia'],
+        'Asistencias incluidas':['Asistencia 24 h*','Asistencia básica*'],
+        'Exclusiones por uso':['Uso no declarado: revisar','Competencia: excluida'],
+        'Sublímites por ubicación':['COP 700 M','COP 500 M'],
+        'Exclusiones':['Según clausulado','Según clausulado'],
+        'Sublímites técnicos':['COP 250 M','COP 400 M'],
+        'Exclusiones de mantenimiento':['Desgaste: excluido','Falta de mantenimiento: excluida'],
+        'Requisitos de protección':['Protecciones declaradas','Inspección previa*'],
+        'Periodo indemnizable':['12 meses','18 meses'],
+        'Espera o deducible':['72 horas','48 horas'],
+        'Alcance de dependencias':['Proveedores nombrados*','Dependencias directas*'],
+        'Red disponible':['Red nacional*','Red preferente*'],
+        'Coaseguro y copagos':['10% / COP 45 mil*','20% / COP 35 mil*'],
+        'Carencias':['Según condición','Según condición'],
+        'Límites y sublímites':['COP 1.500 M / evento','COP 2.000 M / evento'],
+        'Retroactividad cuando aplique':['12 meses*','24 meses*'],
+        'Defensa':['Dentro del límite*','Adicional al límite*'],
+        'Exclusiones de actividad':['Según actividad declarada','Según actividad declarada'],
+        'Red y acceso':['Nacional*','Nacional + telemedicina*'],
+        'Deducibles y coaseguro':['COP 250 mil + 10%*','COP 180 mil + 20%*'],
+        'Costos de respuesta':['COP 300 M*','COP 500 M*'],
+        'Interrupción y espera':['8 h*','12 h*'],
+        'Exclusiones y requisitos':['MFA / backups*','MFA + EDR*']
+      };
+      const v=a[t]||['Dato ilustrativo A','Dato ilustrativo B'];
+      return side==='a'?v[0]:v[1];
+    };
+    const grid=[];
+    for(let i=0;i<=GW;i++) grid.push({d:'M'+P(i,0,0).join(',')+' L'+P(i,GD,0).join(',')});
+    for(let j=0;j<=GD;j++) grid.push({d:'M'+P(0,j,0).join(',')+' L'+P(GW,j,0).join(',')});
+    const shapes=[];
+    cur.blocks.slice().sort((m,n)=>(m.x+m.y)-(n.x+n.y)).forEach(o=>box(o).forEach(f=>shapes.push(f)));
+    const tabBase='min-height:46px;padding:0 18px;border-radius:999px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:all .16s;';
+    return {
+      sectorTabs: sk.map(k=>({key:k,label:sectors[k].label,active:s.sectorSel===k,
+        pick:()=>set({sectorSel:k,spotSel:sectors[k].spots[0].k,roleSel:k==='logistica'?s.roleSel:null}),
+        style:tabBase+(s.sectorSel===k?'background:#0E0D10;color:#fff;border:1px solid #0E0D10;':'background:#fff;color:#12110F;border:1px solid #E7E2D6;')})),
+      sectorKicker: cur.kicker,
+      sectorGround: poly([P(0,0,0),P(GW,0,0),P(GW,GD,0),P(0,GD,0)]),
+      sectorGrid: grid,
+      sectorShapes: shapes,
+      sectorSpots: spotsOrdered.map(p=>({key:p.k,label:p.label,active:p.k===spot.k,pick:()=>set({spotSel:p.k}),
+        pos:'left:'+((OX+(p.gx-p.gy)*IW)/10).toFixed(2)+'%;top:'+((OY+(p.gx+p.gy)*IH-p.gz*HZ)/5.0).toFixed(2)+'%;'})),
+      sectorSpotList: spotsOrdered.map(p=>({key:p.k,label:p.label,active:p.k===spot.k,pick:()=>set({spotSel:p.k}),
+        style:'min-height:48px;padding:10px 14px;border-radius:12px;text-align:left;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;'+(p.k===spot.k?(isCO?'background:#fff;color:#12110F;border:1.5px solid #E4002B;':'background:#E4002B;color:#fff;border:1px solid #E4002B;'):'background:#fff;color:#12110F;border:1px solid #E7E2D6;')})),
+      spotSpecialtyShow: this._pubRamos(spot.ramos).length!==(spot.ramos||[]).length,
+      spotSpecialtyNote: 'En Guatemala no publicamos una solución especializada para este punto como producto validado. Un asesor revisa contigo si existe una solución especializada aplicable.',
+      spotTitle: spot.title, spotDesc: spot.desc, spotRamos: this._pubRamos(spot.ramos),
+      spotProducts: this._pubRamos(spot.ramos).map(name=>Object.assign({name,desc:productExplain[name]||'Producto o cobertura a revisar según actividad, país, condiciones de la propuesta y criterio del asesor.'},productVisual(name))),
+      spotElig: spot.elig, spotNotElig: !spot.elig,
+      spotEsc: (deep.esc&&deep.esc!==spot.desc)?deep.esc:'',
+      spotEscShow: !!(deep.esc&&deep.esc!==spot.desc),
+      spotImp: deep.imp||'', spotWhy: deep.why||'',
+      spotRev: (deep.rev||[]).map(t=>({t:t})), spotComp: (deep.comp||[]).map(t=>({t:t,a:coCmp(t,'a'),b:coCmp(t,'b')})),
+      spotNextTitle: spot.elig?'Puedes continuar en línea con este caso':'Este punto conviene revisarlo antes de pedir propuestas',
+      spotNextDesc: spot.elig
+        ? 'Avanzas con el recorrido guiado de cotización y comparación; si en el camino aparece algo que requiere criterio, un asesor lo revisa contigo sin perder el contexto.'
+        : 'Preferimos estructurar la necesidad antes de pedir propuestas: así la comparación tiene sentido y no se compara sobre bases distintas.',
+      spotGoOnline: ()=>{ this._ax('diagnostic_exit_to_cotcomp'); this._empCtx(cur,spot,role); this.goCotComp(); },
+      spotGoAsesor: ()=>{ this._ax('diagnostic_exit_to_handoff'); const sitL=this._empSitLabel(); this.openHandoff({source:'empresas',intent:cur.label+' · '+spot.label+(role?' · '+role.label:'')+(sitL?' · '+sitL:'')}); },
+      roleShow: roleShow,
+      roleAny: !!role,
+      roleChips: (roleShow?roleList:[]).map((r,i)=>({key:r.k,n:String(i+1).padStart(2,'0'),label:r.label,active:!!role&&role.k===r.k,
+        pick:()=>set({roleSel:r.k,spotSel:r.order[0]}),
+        style:roleChipBase+(role&&role.k===r.k?'background:#12110F;color:#fff;border:1.5px solid #12110F;box-shadow:0 16px 30px -24px rgba(18,17,15,.65);':'background:#fff;color:#12110F;border:1px solid #DED4C6;')})),
+      roleNote: role?role.note:'',
+      roleOrder: role?role.order.map((k,i)=>({t:(i+1)+' · '+spotLabel(k)})):[],
+      roleClear: ()=>set({roleSel:null}),
+      roleStartCue: role?('Empecemos por: '+spotLabel(role.order[0])):'',
+      roleCtaNote: '',
+      spotRoleFocus: !!role&&role.order[0]===spot.k,
+      empScroll: ()=>{ if(typeof document==='undefined')return; const el=document.getElementById('vl-emp-mapa'); if(el&&el.getBoundingClientRect){ const y=el.getBoundingClientRect().top+(window.pageYOffset||0)-70; window.scrollTo({top:y,behavior:'smooth'}); } },
+      empSitShow: !isCO,
+      empCountryCode: isCO?'co':'gt',
+      empPanelLabel: 'SEIS ÁREAS QUE CONVIENE REVISAR EN CONJUNTO',
+      empPanelNoteShow: isCO,
+      empPanelNote: 'Estas seis áreas se revisan juntas: la exposición aparece en la forma en que opera la empresa, no en la lista de pólizas.',
+      empHumanShow: !isCO,
+      /* T3B · ancla humana propia de Empresas Colombia.
+         Usa un activo A&S aprobado para esta superficie, sin inferir adscripción territorial.
+         No reutiliza EGT_H02 ni el activo de referencia de Home CO. */
+      /* OWNER RW1 · pieza única de biblioteca real A&S; sin collage ni retrato aislado. */
+      empCoHeroShow: isCO,
+      empCoHeroSrc: 'assets/library_real/ECO_H03_REUNION_CORPORATIVA_CO_REAL_v1.png',
+      empCoHeroAlt: 'Reunión corporativa de A&S para revisar alternativas empresariales en Colombia.',
+      empCoPreflightShow: false,
+      empCompChips: !isCO,
+      empCompMock: isCO,
+      empCloseClassic: !isCO,
+      empContShow: isCO,
+      empContSector: (sectors[s.sectorSel]||{}).label||'',
+      empContHumanSrc: 'assets/library_real/ECO_C03_CONTINUIDAD_EQUIPO_REAL_v1.png',
+      empContHumanAlt: 'Equipo de A&S en una reunión de continuidad y asesoría empresarial.',
+      empMapNoteShow: isCO,
+      wsLab2: isCO?'Producto o cobertura a revisar':'SOLUCIONES QUE CONVIENE REVISAR',
+      wsN1: '01', wsN2: '02', wsN3: '03', wsN4: '04',
+      empSituations: (isCO?[]:this._empSituations()).map((x,idx)=>({key:x.k,n:'0'+(idx+1),label:x.label,desc:x.desc,active:s.empSituation===x.k,
+        mark:s.empSituation===x.k?'SITUACIÓN SELECCIONADA':'',
+        pick:()=>{ if(!s.empSituation) this._ax('diagnostic_started'); this._ax('situation_selected'); set({empSituation:x.k,empPath:'inventario'}); },
+        style:'display:block;position:relative;width:100%;min-height:132px;padding:18px 42px 18px 18px;border-radius:18px;text-align:left;font-family:inherit;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;background:#fff;overflow:hidden;'+(s.empSituation===x.k?'border:2px solid #E4002B;box-shadow:0 24px 54px -36px rgba(228,0,43,.58);transform:translateY(-2px);':'border:1px solid #D9D0C3;box-shadow:0 20px 46px -40px rgba(30,10,0,.48);')})),
+      empSitAny: !isCO && !!this._empSitCur(),
+      empSitNote: (!isCO&&this._empSitCur())?this._empSitCur().note:'',
+      empSitClear: ()=>set({empSituation:null,empPath:'inventario'}),
+      empPathShow: !isCO && !!this._empSitCur() && (s.empSituation==='polizas'||s.empSituation==='integral'),
+      empPathSteps: this._empPath().map((p,i)=>({key:p.k,n:'0'+(i+1),label:p.label,active:s.empPath===p.k,
+        pick:()=>{ this._ax('diagnostic_step_completed'); set({empPath:p.k}); },
+        style:'display:block;width:100%;min-height:44px;padding:11px 12px;border-radius:12px;text-align:left;font-family:inherit;cursor:pointer;transition:all .16s;color:#12110F;'+(s.empPath===p.k?'background:#F8F4ED;border:2px solid #E4002B;':'background:#fff;border:1px solid #E2DACF;')})),
+      empPathDesc: (this._empPath().find(p=>p.k===s.empPath)||this._empPath()[0]).desc,
+      empSitPrimaryLabel: (s.empSituation==='polizas'||s.empSituation==='integral')?'Solicitar la revisión con un asesor':'Ir al mapa de la operación',
+      empSitPrimaryAction: (s.empSituation==='polizas'||s.empSituation==='integral')?'diagnostic_exit_to_handoff':'exposure_focus_selected',
+      empSitPrimary: ()=>{ const c=this._empSitCur(); if(s.empSituation==='polizas'||s.empSituation==='integral'){ this._ax('diagnostic_exit_to_handoff'); this.openHandoff({source:'empresas',intent:'Empresas · Guatemala · '+(c?c.label:'Revisión del programa')}); } else { this._ax('exposure_focus_selected'); this._empGoMapa(); } },
+      empSitSecondaryLabel: (s.empSituation==='polizas'||s.empSituation==='integral')?'Ver el mapa de la operación':'Hablar con un asesor',
+      empSitSecondaryAction: (s.empSituation==='polizas'||s.empSituation==='integral')?'exposure_focus_selected':'diagnostic_exit_to_handoff',
+      empSitSecondary: ()=>{ const c=this._empSitCur(); if(s.empSituation==='polizas'||s.empSituation==='integral'){ this._ax('exposure_focus_selected'); this._empGoMapa(); } else { this._ax('diagnostic_exit_to_handoff'); this.openHandoff({source:'empresas',intent:'Empresas · Guatemala · '+(c?c.label:'Orientación inicial')}); } },
+      empEyebrow: isCO?'Empresas · Colombia':'Empresas · Guatemala',
+      empH1a: isCO?'Entiende tu operación: ':'Tu empresa no es un edificio: es un ',
+      empH1b: isCO?'protege mejor':'sistema',
+      empH1c: isCO?' tu empresa.':'.',
+      empBody: isCO
+        ? 'Activos, personas, contratos, movilidad y cadena se conectan. A&S te ayuda a identificar dónde se concentra la exposición, qué conviene revisar y qué comparar antes de decidir.'
+        : 'Activos, personas, responsabilidad, movilidad, contratos y continuidad están conectados. A&S parte de cómo opera tu empresa para ayudarte a identificar exposiciones y revisar qué soluciones conviene comparar.',
+      empCta: isCO?'Evaluar mi operación':'Evaluar mi empresa',
+      empTruth: 'La orientación inicial no confirma cobertura ni sustituye las condiciones de una aseguradora.',
+      empMapTitle: isCO?'¿Dónde está expuesta tu operación?':'¿Dónde está expuesta tu empresa?',
+      empMapNote: isCO
+        ? 'En una operación logística también importan la responsabilidad, los contratos, el patrimonio, la continuidad, la movilidad y las personas. Por eso revisamos el recorrido completo, no una sola etapa.'
+        : '',
+      empChainShow: isCO,
+      empChainNote: 'En cada traspaso pueden cambiar la custodia, la responsabilidad y el riesgo. Explora el recorrido para identificar qué conviene revisar en cada etapa.',
+      empChain:[
+        {n:'01',t:'Origen',k:'Valor, rol y traspaso',d:'Carga, embalaje, cargue y despacho: la exposición empieza antes de rodar.'},
+        {n:'02',t:'Tránsito',k:'Trayectos y custodia',d:'Robo, daño en ruta y responsabilidad frente a terceros.'},
+        {n:'03',t:'Nodos / centros de transferencia',k:'Manipulación y faltantes',d:'Transbordos, manipulación y custodia compartida entre varios actores.'},
+        {n:'04',t:'Almacenamiento',k:'Inventario y continuidad',d:'Bodegas y patios: incendio, inventario acumulado, accesos y continuidad.'},
+        {n:'05',t:'Destino / cumplimiento',k:'Entrega y cumplimiento',d:'Entrega, faltantes reclamados y obligaciones del contrato.'}
+      ],
+      empDominios: isCO?[
+        {n:'01',t:'Patrimonio',d:'Instalaciones, inventarios, maquinaria y equipos.'},
+        {n:'02',t:'Personas y beneficios',d:'Colaboradores y dependientes elegibles.'},
+        {n:'03',t:'Responsabilidad Civil',d:'Reclamaciones de terceros por tu actividad.'},
+        {n:'04',t:'Flotillas, transporte y movilidad',d:'Vehículos, carga en tránsito y responsabilidad.'},
+        {n:'05',t:'Continuidad',d:'El efecto de una interrupción, no solo el daño.'},
+        {n:'06',t:'Contratos y obligaciones',d:'Licitaciones, anticipos, ejecución y garantías.'}
+      ]:[
+        {n:'',t:'Patrimonio',d:'Instalaciones, inventarios, maquinaria y equipos.'},
+        {n:'',t:'Personas y beneficios',d:'Colaboradores y dependientes elegibles.'},
+        {n:'',t:'Responsabilidad Civil',d:'Reclamaciones de terceros por tu actividad.'},
+        {n:'',t:'Flotillas y movilidad',d:'Vehículos, carga en tránsito y responsabilidad.'},
+        {n:'',t:'Continuidad',d:'El efecto de una interrupción, no solo el daño.'},
+        {n:'',t:'Contratos y obligaciones',d:'Licitaciones, anticipos, ejecución y garantías.'}
+      ]
+    };
+  }
+  scrollChain(){ if(typeof document==='undefined')return; const el=document.getElementById('vl-co-chain'); if(el&&el.getBoundingClientRect){ const y=el.getBoundingClientRect().top+(window.pageYOffset||0)-70; window.scrollTo({top:y,behavior:'smooth'}); } }
+  buildChain(){
+    const s=this.state; const set=(p)=>this.setState(p);
+    const ch={
+      origen:{t:'Origen',d:'Carga, embalaje, cargue y despacho: la exposición empieza antes de rodar.',
+        esc:'Un lote se despacha con embalaje insuficiente y llega con avería parcial reclamada por el cliente.',
+        why:'La responsabilidad sobre la mercancía depende del rol y del momento en que ocurre el daño.',
+        tags:['Mercancía','Embalaje','Aduana'],
+        rev:['Valor asegurable y bases','Rol y momento de traspaso','Cargue y despacho','Documentación y requisitos']},
+      transito:{t:'Tránsito',d:'La exposición más visible: robo, daño en ruta y responsabilidad frente a terceros.',
+        esc:'Un vehículo con carga de un tercero sufre un accidente en carretera y hay daño a la mercancía y a un tercero.',
+        why:'Trayectos, custodia, conductores y límites cambian la respuesta más que la prima.',
+        tags:['Robo','Daño en ruta','RC'],
+        rev:['Trayectos y territorio','Custodia y conductores','Deducibles','RC y asistencias']},
+      nodos:{t:'Centros de transferencia',d:'Transbordos, manipulación y custodia compartida entre varios actores.',
+        esc:'En un centro de transferencia se detecta un faltante y no está claro en qué punto ocurrió la pérdida.',
+        why:'Cuando la custodia se comparte, la trazabilidad decide quién responde.',
+        tags:['Manipulación','Custodia','Faltantes'],
+        rev:['Cadena de custodia','Faltantes y mermas','Responsabilidad del operador','Actas y evidencia']},
+      almacen:{t:'Almacenamiento',d:'Bodegas y patios: incendio, inventario acumulado, accesos y continuidad.',
+        esc:'Un incendio en bodega afecta inventario de varios clientes y detiene despachos por semanas.',
+        why:'La concentración de valor y la interrupción suelen pesar más que el daño puntual.',
+        tags:['Incendio','Inventario','Patios'],
+        rev:['Sumas y valoración','Concentración de valor','Continuidad e interrupción','Seguridad y accesos']},
+      destino:{t:'Destino / cumplimiento',d:'Última milla, conformidad de entrega y obligaciones contractuales.',
+        esc:'Un contrato exige garantía de cumplimiento y penaliza el incumplimiento de entrega.',
+        why:'La obligación contractual define el amparo; el nombre de la póliza no lo define.',
+        tags:['Última milla','Conformidad','Cumplimiento'],
+        rev:['Obligación y beneficiario','Amparos y monto','Vigencia','Contragarantías y requisitos']}
+    };
+    const ks=Object.keys(ch);
+    const SP=[[31.7,17.4],[40.1,38.9],[52.5,50],[67,51.5],[76.8,67.1]];
+    const items=ks.map((k,i)=>{const on=s.chainSel===k;return{n:i+1,label:ch[k].t,active:on,pick:()=>set({chainSel:k}),
+      spot:'left:'+SP[i][0]+'%;top:'+SP[i][1]+'%;'+(i===ks.length-1?'transform:translate(-78%,-100%);':''),
+      spotDot:'width:'+(on?'28px':'22px')+';height:'+(on?'28px':'22px')+";border-radius:50%;display:grid;place-items:center;font-family:'IBM Plex Mono';font-size:"+(on?'12px':'10px')+';font-weight:600;transition:all .2s;'+(on?'background:#E4002B;color:#fff;border:2px solid #fff;box-shadow:0 0 0 7px rgba(228,0,43,.22),0 12px 24px -10px rgba(0,0,0,.85);':'background:rgba(12,11,16,.82);color:#F0D79B;border:1px solid rgba(240,215,155,.5);box-shadow:0 8px 18px -10px #000;'),
+      spotLab:"font-family:'IBM Plex Mono';font-size:8.5px;letter-spacing:.06em;padding:3px 7px;border-radius:999px;white-space:nowrap;transition:all .2s;"+(i===3?'transform:translate(60px,-20px);':'')+(on?'background:#fff;color:#12110F;':'background:rgba(12,11,16,.74);color:#D7D1C4;border:1px solid rgba(255,255,255,.14);'),
+      style:'display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:120px;min-height:64px;padding:12px 16px;border-radius:14px;cursor:pointer;font-family:inherit;transition:all .16s;'+(on?'background:#E4002B;color:#fff;border:1px solid #E4002B;':'background:#1C1A21;color:#CFC9BE;border:1px solid #2a2833;')};});
+    // default = cadena/programa completo; ninguna etapa queda preseleccionada de forma arbitraria
+    const isAll=!s.chainSel || !ch[s.chainSel];
+    const ALL={t:'La cadena completa, de origen a cumplimiento',
+      d:'La cadena concentra exposiciones distintas en cada etapa y la responsabilidad cambia de manos varias veces. Un programa se lee sobre el recorrido completo, no sobre una etapa aislada.',
+      esc:'Una misma operación puede sufrir un faltante en un centro de transferencia, un daño en ruta y una demora que incumple una entrega comprometida.',
+      why:'Revisar etapa por etapa deja los traspasos sin dueño: es en los cambios de custodia donde suelen aparecer los vacíos.',
+      rev:['Recorrido completo y traspasos','Coherencia de límites entre etapas','Custodia y responsabilidad por actor','Continuidad ante interrupción']};
+    const c=isAll?ALL:ch[s.chainSel];
+    const KS={origen:'Valor, rol y traspaso',transito:'Trayectos y custodia',nodos:'Manipulación y faltantes',almacen:'Inventario y continuidad',destino:'Entrega y cumplimiento'};
+    return { chainItems:items, chainTitle:c.t, chainDesc:c.d, chainEsc:c.esc, chainWhy:c.why, chainTags:c.tags||[],
+      chainRev:c.rev.map(t=>({t:t})),
+      chainIsAll:true,
+      chainKicker:'RECORRIDO COMPLETO',
+      chainStages:ks.map((k,i)=>({n:'0'+(i+1),t:ch[k].t,k:KS[k]||''})),
+      ...this.buildHomeCO() };
+  }
+  coIntentDefs(){
+    return [
+      {id:'empresa',  scene:'La operación completa'},
+      {id:'cadena',   scene:'La cadena, etapa por etapa'},
+      {id:'personas', scene:'Tu momento y tu necesidad'},
+      {id:'cotizar',  scene:'Comparar por diferencias'},
+      {id:'siniestro',scene:'Primero seguridad'},
+      {id:'cliente',  scene:'Tus gestiones'}
+    ];
+  }
+  // ===== F7 · T4 · Flotillas / Transporte / Logística (Guatemala) — aditivo =====
+  _fltData(){ return {
+    nodes:[
+      {k:'vehiculos',n:'01',t:'Vehículos',meta:'Unidades en operación',link:'Conecta con conductores, terceros y recorrido.',pos:'left:25%;top:60%;'},
+      {k:'personas',n:'02',t:'Conductores y personas',meta:'Quién opera y coordina',link:'Se conecta con vehículos y con la continuidad.',pos:'left:25%;top:86%;'},
+      {k:'carga',n:'03',t:'Carga y mercancía',meta:'Lo que se mueve',link:'Se conecta con el recorrido, terceros y continuidad.',pos:'left:51%;top:60%;'},
+      {k:'terceros',n:'04',t:'Terceros y responsabilidad',meta:'Efecto fuera de la operación',link:'Se conecta con vehículos, carga y continuidad.',pos:'left:69%;top:22%;'},
+      {k:'continuidad',n:'05',t:'Continuidad operativa',meta:'Seguir operando',link:'Recibe el efecto de todos los puntos anteriores.',pos:'left:87%;top:60%;'}
+    ],
+    edges:[
+      {a:'origen',b:'vehiculos',d:'M55,282 H250'},
+      {a:'vehiculos',b:'carga',d:'M250,282 H510'},
+      {a:'carga',b:'continuidad',d:'M510,282 H870'},
+      {a:'vehiculos',b:'personas',d:'M250,282 V404'},
+      {a:'vehiculos',b:'terceros',d:'M250,282 C400,282 520,103 690,103'},
+      {a:'carga',b:'terceros',d:'M510,282 C592,282 612,103 690,103'},
+      {a:'personas',b:'continuidad',d:'M250,404 C500,432 730,424 870,318'},
+      {a:'terceros',b:'continuidad',d:'M690,103 C802,103 842,182 870,268'}
+    ],
+    ins:{
+      overview:{t:'La operación completa',b:[
+        ['QUÉ ESTÁ EN JUEGO','Vehículos, personas, carga, terceros y continuidad forman parte de un mismo sistema operativo y pueden afectarse entre sí.'],
+        ['QUÉ PUEDE CAMBIAR','El uso, las rutas, la custodia, la concentración y las responsabilidades pueden mover más de una exposición al mismo tiempo.'],
+        ['QUÉ CONVIENE REVISAR','Cómo se conectan los componentes de la operación antes de separar soluciones o pedir propuestas.'],
+        ['SIGUIENTE PASO','Elige un punto del mapa o empieza por el escenario que más se parece a tu operación.']]},
+      vehiculos:{t:'Vehículos',b:[
+        ['QUÉ ESTÁ EN JUEGO','Las unidades que movilizan personas, mercancías o servicio dentro de la operación.'],
+        ['QUÉ PUEDE CAMBIAR','El uso, el tipo de unidad, las rutas, la concentración y la necesidad de reemplazo pueden modificar la exposición.'],
+        ['QUÉ CONVIENE REVISAR','Cómo se utiliza la flotilla, qué unidades participan y qué alternativas responden al contexto real de operación.'],
+        ['SIGUIENTE PASO','Evaluar la flotilla como parte de la operación completa.']]},
+      personas:{t:'Conductores y personas',b:[
+        ['QUÉ ESTÁ EN JUEGO','Las personas que conducen, coordinan o dependen de la operación en movimiento.'],
+        ['QUÉ PUEDE CAMBIAR','La frecuencia, los roles, los desplazamientos y la interacción con terceros cambian el contexto que conviene entender.'],
+        ['QUÉ CONVIENE REVISAR','Cómo se conecta la protección de las personas con la movilidad, la operación y las responsabilidades asociadas.'],
+        ['SIGUIENTE PASO','Revisar personas y operación antes de separar soluciones.']]},
+      carga:{t:'Carga y mercancía',b:[
+        ['QUÉ ESTÁ EN JUEGO','Mercancías propias o de terceros mientras se mueven o permanecen dentro del recorrido operativo.'],
+        ['QUÉ PUEDE CAMBIAR','El origen, destino, tipo de carga, custodia, transbordos y concentración pueden cambiar la exposición.'],
+        ['QUÉ CONVIENE REVISAR','Qué se mueve, bajo qué responsabilidad y en qué puntos del recorrido se concentra el riesgo.'],
+        ['SIGUIENTE PASO','Definir el contexto de la carga antes de orientar alternativas.']]},
+      terceros:{t:'Terceros y responsabilidad',b:[
+        ['QUÉ ESTÁ EN JUEGO','Personas, bienes y obligaciones que pueden verse afectados por la operación.'],
+        ['QUÉ PUEDE CAMBIAR','El rol que cumples, los contratos y la forma de operar cambian las responsabilidades que conviene analizar.'],
+        ['QUÉ CONVIENE REVISAR','La exposición frente a terceros y las obligaciones relacionadas, sin asumir una cobertura universal.'],
+        ['SIGUIENTE PASO','Evaluar estas responsabilidades junto con flotilla y carga.']]},
+      continuidad:{t:'Continuidad operativa',b:[
+        ['QUÉ ESTÁ EN JUEGO','La capacidad de seguir operando cuando una unidad, una ruta, una carga o un punto clave deja de funcionar como se esperaba.'],
+        ['QUÉ PUEDE CAMBIAR','La dependencia de pocas unidades, rutas, instalaciones o proveedores puede aumentar el impacto de una interrupción.'],
+        ['QUÉ CONVIENE REVISAR','Qué puede detener la operación, qué depende de qué y qué alternativas podrían ayudar a gestionar esa exposición.'],
+        ['SIGUIENTE PASO','Priorizar los puntos críticos y definir si el caso puede continuar en línea o requiere asesoría.']]}
+    }
+  }; }
+  _fltEmphasis(sit){
+    if(sit==='flotilla') return ['vehiculos','personas','terceros','continuidad'];
+    if(sit==='carga') return ['carga','terceros','continuidad'];
+    return ['vehiculos','personas','carga','terceros','continuidad'];
+  }
+  _fltPickSituation(k){
+    const cur=this.state.fltSituation;
+    const next=cur===k?null:k;
+    this.setState({fltSituation:next,fltNode:next?this._fltDefaultNode(next):'overview'});
+  }
+  _fltPickNode(k){ this.setState({fltNode:this.state.fltNode===k?'overview':k}); }
+  _fltScroll(id){ if(typeof document==='undefined')return; const el=document.getElementById(id); if(!el||typeof window==='undefined')return;
+    const y=el.getBoundingClientRect().top+window.pageYOffset-96;
+    window.scrollTo({top:y<0?0:y,behavior:this.reduced()?'auto':'smooth'});
+    const f=el.querySelector('button'); if(f&&f.focus) setTimeout(()=>{try{f.focus({preventScroll:true});}catch(e){}},this.reduced()?0:420); }
+  // ===== F7 · T5 · Transporte / Logística / Cadena (Colombia) — aditivo =====
+  _t5Data(){ return {
+    stages:[
+      {k:'origen',n:'01',t:'Origen',meta:'Inicio del recorrido',short:'Origen'},
+      {k:'transito',n:'02',t:'Tránsito',meta:'Carga en movimiento',short:'Tránsito'},
+      {k:'nodos',n:'03',t:'Nodos y transferencias',meta:'Traspasos y consolidación',short:'Nodos'},
+      {k:'almacenamiento',n:'04',t:'Almacenamiento',meta:'Permanencia en un punto',short:'Almacén'},
+      {k:'destino',n:'05',t:'Destino y cumplimiento',meta:'Entrega y obligaciones',short:'Destino'}
+    ],
+    ins:{
+      overview:{t:'La cadena completa',b:[
+        ['QUÉ ESTÁ EN JUEGO','La continuidad de una cadena donde carga, vehículos, instalaciones, terceros y obligaciones pueden cambiar de responsable a lo largo del recorrido.'],
+        ['QUÉ PUEDE CAMBIAR','El rol que cumples, los puntos donde recibes o entregas, los lugares de concentración y las obligaciones asociadas pueden cambiar la exposición.'],
+        ['QUÉ CONVIENE REVISAR','Quién responde en cada etapa, qué se mueve, dónde se concentra la operación y qué puede interrumpirla.'],
+        ['SIGUIENTE PASO','Elige un rol o una etapa para profundizar sin asumir todavía una solución.']]},
+      origen:{t:'Origen',b:[
+        ['QUÉ ESTÁ EN JUEGO','La carga y las condiciones con las que inicia el recorrido operativo.'],
+        ['QUÉ PUEDE CAMBIAR','Quién entrega, quién recibe, dónde comienza la responsabilidad y cuánto se concentra en el punto de salida puede cambiar el contexto.'],
+        ['QUÉ CONVIENE REVISAR','La relación entre carga, responsabilidades y continuidad desde el inicio de la cadena.'],
+        ['SIGUIENTE PASO','Definir el rol y el punto de partida antes de orientar alternativas.']]},
+      transito:{t:'Tránsito',b:[
+        ['QUÉ ESTÁ EN JUEGO','La carga en movimiento, los vehículos, las personas y la interacción con terceros.'],
+        ['QUÉ PUEDE CAMBIAR','Rutas, frecuencia, tipo de operación, actores involucrados y responsabilidad frente a terceros pueden modificar la exposición.'],
+        ['QUÉ CONVIENE REVISAR','Cómo se conectan movimiento, responsabilidad, carga y continuidad durante el trayecto.'],
+        ['SIGUIENTE PASO','Revisar quién transporta y bajo qué contexto operativo antes de comparar.']]},
+      nodos:{t:'Nodos y transferencias',b:[
+        ['QUÉ ESTÁ EN JUEGO','Los puntos donde la carga espera, se consolida, se transfiere o cambia de actor dentro de la cadena.'],
+        ['QUÉ PUEDE CAMBIAR','La permanencia, el número de traspasos, la concentración y el cambio de responsable pueden modificar la exposición.'],
+        ['QUÉ CONVIENE REVISAR','Qué ocurre en cada transferencia y cómo se conectan las responsabilidades entre actores.'],
+        ['SIGUIENTE PASO','Identificar los nodos críticos y el rol que cumples en ellos.']]},
+      almacenamiento:{t:'Almacenamiento',b:[
+        ['QUÉ ESTÁ EN JUEGO','Mercancías, instalaciones, equipos, terceros y continuidad mientras la operación permanece en un punto físico.'],
+        ['QUÉ PUEDE CAMBIAR','Tiempo de permanencia, concentración, dependencia de instalaciones o equipos y relación con terceros pueden cambiar el impacto de una interrupción.'],
+        ['QUÉ CONVIENE REVISAR','La relación entre mercancía, propiedad, responsabilidad y continuidad en el nodo de almacenamiento.'],
+        ['SIGUIENTE PASO','Definir qué depende del almacén y qué puede detener la operación.']]},
+      destino:{t:'Destino y cumplimiento',b:[
+        ['QUÉ ESTÁ EN JUEGO','La entrega, el cierre del recorrido y las obligaciones que permanecen después de mover la carga.'],
+        ['QUÉ PUEDE CAMBIAR','Quién recibe, cuándo cambia la responsabilidad y qué obligaciones contractuales aplican pueden modificar lo que conviene revisar.'],
+        ['QUÉ CONVIENE REVISAR','El cierre de responsabilidades, las obligaciones relevantes y la continuidad después de la entrega.'],
+        ['SIGUIENTE PASO','Conectar el destino con el rol y el programa empresarial completo.']]}
+    },
+    roles:[
+      {k:'propietario',n:'01',label:'Soy propietario o generador de carga',emph:'Énfasis en origen, tránsito y destino: carga, obligaciones cuando aplique, responsabilidad civil y continuidad.'},
+      {k:'transportador',n:'02',label:'Soy transportador',emph:'Énfasis en tránsito, nodos y destino: flotillas, personas y conductores, carga según responsabilidad, responsabilidad civil y continuidad.'},
+      {k:'operador',n:'03',label:'Soy operador logístico o de almacenamiento',emph:'Énfasis en nodos, almacenamiento y destino: mercancía en custodia, propiedad e ingeniería, responsabilidad civil, continuidad y personas cuando sea relevante.'}
+    ],
+    layers:[
+      {k:'carga',t:'Carga y mercancías',note:'Lo que se mueve a lo largo del recorrido.',at:['origen','transito','nodos','almacenamiento','destino']},
+      {k:'rc',t:'Responsabilidad Civil',note:'Afectación a terceros y obligaciones asociadas.',at:['origen','transito','nodos','almacenamiento','destino']},
+      {k:'cumplimiento',t:'Cumplimiento y obligaciones',note:'Cuando existen requisitos contractuales.',at:['origen','destino']},
+      {k:'propiedad',t:'Propiedad e ingeniería',note:'Instalaciones y equipos de los que depende la operación.',at:['almacenamiento','nodos']},
+      {k:'flotillas',t:'Flotillas y movilidad',note:'Vehículos y unidades que participan en el recorrido.',at:['transito','nodos']},
+      {k:'personas',t:'Personas y beneficios',note:'Conductores, operarios y colaboradores involucrados.',at:['transito','almacenamiento']},
+      {k:'continuidad',t:'Continuidad',note:'Lo que puede detener la cadena y el tiempo de reanudación.',at:['origen','transito','nodos','almacenamiento','destino']},
+      {k:'siniestros',t:'Siniestros y asistencia',note:'Recorrido disponible si ya ocurrió un evento.',at:['origen','transito','nodos','almacenamiento','destino'],ev:true}
+    ]
+  }; }
+  _t5Emphasis(r){
+    if(r==='propietario') return ['origen','transito','destino'];
+    if(r==='transportador') return ['transito','nodos','destino'];
+    if(r==='operador') return ['nodos','almacenamiento','destino'];
+    return ['origen','transito','nodos','almacenamiento','destino'];
+  }
+  _t5PickRole(k){
+    const cur=this.state.coChainRole;
+    const next=cur===k?null:k;
+    this.setState({coChainRole:next,coChainStage:next?this._t5DefaultStage(next):'overview'});
+  }
+  _t5PickStage(k){ this.setState({coChainStage:this.state.coChainStage===k?'overview':k}); }
+  buildLogisticaCO(){
+    const s=this.state, D=this._t5Data();
+    const on=s.screen==='logisticaco' && s.country==='co';
+    const role=s.coChainRole, stage=s.coChainStage||'overview';
+    const emph=this._t5Emphasis(role);
+    const insDef=D.ins[stage]||D.ins.overview;
+    const stageName=(k)=>{ const f=D.stages.filter(x=>x.k===k)[0]; return f?f.t:'La cadena completa'; };
+    const stageShort=(k)=>{ const f=D.stages.filter(x=>x.k===k)[0]; return f?f.short:'Cadena'; };
+    const roleName=(k)=>{ const f=D.roles.filter(x=>x.k===k)[0]; return f?f.label:null; };
+    const gx=[100,300,500,700,900];
+    const ctxBits=[]; if(roleName(role)) ctxBits.push(roleName(role)); if(stage!=='overview') ctxBits.push(stageName(stage));
+    const ctxLine = ctxBits.length? ctxBits.join(' · ') : 'la vista completa de la cadena.';
+    // Sin señal de elegibilidad confiable para esta cadena: el estado público por defecto es asesoría.
+    const activeState='03';
+    const dotFor=(lay,k)=>{
+      const conn=lay.at.indexOf(k)>=0;
+      if(!conn) return {style:'width:5px;height:5px;background:rgba(255,255,255,.12);',sr:'sin énfasis'};
+      if(lay.ev) return {style:'background:transparent;border:1.5px solid '+((stage===k)?'#FF6B7E':'rgba(255,255,255,.3)')+';',sr:'recorrido si ya ocurrió un evento'};
+      if(stage!=='overview') return stage===k
+        ? {style:'background:#E4002B;box-shadow:0 0 0 4px rgba(228,0,43,.18);',sr:'conecta en esta etapa'}
+        : {style:'background:rgba(255,255,255,.22);',sr:'conecta'};
+      return (emph.indexOf(k)>=0)
+        ? {style:'background:rgba(255,124,140,.9);',sr:'conecta'}
+        : {style:'background:rgba(255,255,255,.22);',sr:'conecta'};
+    };
+    return {
+      isLogisticaCO:on,
+      t5OverviewActive:(stage==='overview' && !role),
+      t5InsTitle:insDef.t,
+      t5InsTag: role? ('ÉNFASIS · '+roleName(role)) : 'CADENA COMPLETA',
+      t5InsBlocks:insDef.b.map(p=>({k:p[0],v:p[1]})),
+      t5ContextLine:ctxLine,
+      t5Roles:D.roles.map(x=>({
+        n:x.n,label:x.label,emph:x.emph,active:role===x.k,pick:()=>this._t5PickRole(x.k),
+        style:(role===x.k?'background:#fff;border-bottom:1px solid #C4001F;box-shadow:inset 3px 0 0 #C4001F;padding-left:14px;':'')
+      })),
+      t5Stages:D.stages.map((x,i)=>{
+        const act=stage===x.k, dim=!act && emph.indexOf(x.k)<0;
+        const base=act?'background:#E4002B;border:1.5px solid #FF6B7E;box-shadow:0 18px 40px -22px rgba(228,0,43,.9);'
+                      :'background:rgba(20,18,26,.94);border:1.5px solid #37333f;';
+        return {
+          n:x.n,t:x.t,meta:x.meta,active:act,pick:()=>this._t5PickStage(x.k),
+          style:'left:'+(10+i*20)+'%;top:26%;'+base+(dim?'opacity:.52;':''),
+          nstyle:base+(dim?'opacity:.62;':''),
+          numStyle:'color:'+(act?'#FFD3D9':'#FF9DA8')+';',
+          labelStyle:'color:'+(act?'#fff':'#F4F1EA')+';',
+          metaStyle:'color:'+(act?'rgba(255,255,255,.9)':'#A9A29A')+';'
+        };
+      }),
+      t5Segments:[0,1,2,3].map(i=>{
+        const a=D.stages[i].k, b=D.stages[i+1].k;
+        const hot = stage!=='overview' && (a===stage||b===stage);
+        const warm = stage==='overview' && emph.indexOf(a)>=0 && emph.indexOf(b)>=0;
+        return {d:'M'+gx[i]+',150 H'+gx[i+1],
+          stroke: hot?'#E4002B':(warm?'rgba(255,124,140,.6)':'rgba(255,255,255,.14)'),
+          w: hot?3:(warm?2:1.2),
+          dash: hot?'0':(warm?'0':'6 8')};
+      }),
+      t5Transfers:[0,1,2,3].map(i=>{
+        const x=(gx[i]+gx[i+1])/2;
+        const hot = stage!=='overview' && (D.stages[i].k===stage||D.stages[i+1].k===stage);
+        return {tick:'M'+x+',98 V202',
+          mark:'M'+x+',142 l8,8 -8,8 -8,-8 z',
+          stroke: hot?'#FF6B7E':'rgba(255,255,255,.22)'};
+      }),
+      t5Bars:D.stages.map((x,i)=>{
+        const h=[22,16,32,40,18][i];
+        const act=stage===x.k, inE=emph.indexOf(x.k)>=0;
+        return {x:gx[i]-7,y:240-h,h:h,
+          fill: act?'#E4002B':(inE?'rgba(255,124,140,.42)':'rgba(255,255,255,.12)')};
+      }),
+      t5Gates:D.stages.map((x,i)=>{
+        const act=stage===x.k, inE=emph.indexOf(x.k)>=0;
+        return {cx:gx[i], r: act?9:6,
+          fill: act?'#E4002B':(inE?'rgba(255,124,140,.3)':'rgba(255,255,255,.08)'),
+          stroke: act?'#FFD3D9':(inE?'rgba(255,124,140,.7)':'rgba(255,255,255,.2)')};
+      }),
+      t5ResetStyle:'min-height:44px;padding:0 16px;border-radius:11px;font-family:inherit;font-size:13px;font-weight:650;cursor:pointer;white-space:nowrap;'+((stage==='overview'&&!role)?'background:#12110F;border:1.5px solid #12110F;color:#fff;':'background:transparent;border:1.5px solid #C9BFB1;color:#4A443C;'),
+      t5MxHead:D.stages.map(x=>({n:x.n,short:x.short,
+        numColor:(stage===x.k?'#FF9DA8':'#6E6870'),
+        color:(stage===x.k?'#fff':(emph.indexOf(x.k)>=0?'#CFC9BE':'#8E8790'))})),
+      t5MxRows:D.layers.map(l=>({
+        t:l.t,note:l.note,
+        cells:D.stages.map(x=>{ const d=dotFor(l,x.k); return {style:d.style,title:l.t+' · '+x.short+': '+d.sr}; }),
+        chips:D.stages.filter(x=>l.at.indexOf(x.k)>=0).map(x=>({label:x.short,
+          style:"font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.07em;padding:5px 9px;border-radius:999px;white-space:nowrap;"+((stage===x.k)?'background:rgba(228,0,43,.16);border:1px solid rgba(255,124,140,.55);color:#FFC2CB;':'background:rgba(255,255,255,.05);border:1px solid #2a2833;color:#A9A29A;')}))
+      })),
+      t5Context:[
+        {n:'01',t:'Quién responde en cada etapa',d:'La responsabilidad puede cambiar de manos varias veces en un mismo recorrido.'},
+        {n:'02',t:'Qué se mueve',d:'El tipo de carga y su valor pueden cambiar lo que conviene revisar.'},
+        {n:'03',t:'Dónde se concentra la operación',d:'Patios, bodegas y nodos concentran carga, equipos y personas en un mismo punto.'},
+        {n:'04',t:'Cuántos actores intervienen',d:'Cada actor adicional agrega traspasos y relaciones que conviene entender.'},
+        {n:'05',t:'Obligaciones cuando corresponda',d:'Cuando existen obligaciones contractuales, conviene entenderlas antes de asumir qué solución aplica.'},
+        {n:'06',t:'Qué puede detener la cadena',d:'Una interrupción en un punto crítico puede afectar el resto del recorrido.'}
+      ],
+      t5States:[
+        {n:'01',label:'Podemos continuar en línea.'},
+        {n:'02',label:'Necesitamos algunos datos más.'},
+        {n:'03',label:'Conviene continuar con asesoría.'}
+      ].map(x=>({n:x.n,label:x.label,
+        numColor:(x.n===activeState?'#FF9DA8':'#6E6870'),
+        textColor:(x.n===activeState?'#fff':'#8E8790'),
+        style:'min-width:0;border-radius:14px;padding:16px 18px;'+(x.n===activeState?'background:linear-gradient(155deg,#1f1219,#0E0D10);border:1.5px solid #C4001F;':'background:rgba(255,255,255,.03);border:1px solid #24222b;')})),
+      t5Method:[
+        {n:'01',t:'Entender',d:'Qué rol cumples y cómo se mueve realmente la cadena.'},
+        {n:'02',t:'Estructurar',d:'Ordenar etapas, responsabilidades y qué conviene revisar primero.'},
+        {n:'03',t:'Comparar',d:'Contrastar alternativas con criterio, no sólo por precio.'},
+        {n:'04',t:'Acompañar',d:'Seguimiento durante la vigencia y cuando ocurre un evento.'}
+      ],
+      t5ToRoles:()=>this._fltScroll('vl-t5-roles'),
+      t5Handoff:()=>this.openHandoff({source:'logisticaco',intent:'Transporte, logística y cadena'+(ctxBits.length?' · '+ctxBits.join(' · '):'')}),
+      t5Reset:()=>this.setState({coChainRole:null,coChainStage:'overview'}),
+      t5Enterprise:()=>this.goEmpresasChain(),
+      goLogisticaCO:()=>this.goLogisticaCO()
+    };
+  }
+  buildFlotillasGT(){
+    const s=this.state, D=this._fltData();
+    const on=s.screen==='flotillasgt' && s.country==='gt';
+    const sit=s.fltSituation, node=s.fltNode||'overview';
+    const emph=this._fltEmphasis(sit);
+    const sitDefs=[
+      {k:'flotilla',n:'01',label:'Tengo una flotilla'},
+      {k:'carga',n:'02',label:'Muevo mercancías o carga'},
+      {k:'ambos',n:'03',label:'Mi operación combina vehículos y carga'},
+      {k:'revision',n:'04',label:'Quiero revisar lo que ya tengo'}
+    ];
+    const insDef=D.ins[node]||D.ins.overview;
+    const nodeName=(k)=>{ const f=D.nodes.filter(x=>x.k===k)[0]; return f?f.t:'La operación completa'; };
+    const sitName=(k)=>{ const f=sitDefs.filter(x=>x.k===k)[0]; return f?f.label:null; };
+    const famDefs=[
+      {t:'Flotillas',d:'Puede ser relevante cuando los vehículos son parte directa de la operación.',rel:['vehiculos','personas']},
+      {t:'Transporte / carga',d:'Puede ser relevante cuando mercancías propias o de terceros se mueven bajo un contexto que debe revisarse.',rel:['carga','terceros']},
+      {t:'Responsabilidad Civil',d:'Puede ser relevante cuando la operación puede afectar a terceros o generar obligaciones asociadas.',rel:['terceros','personas']},
+      {t:'Continuidad y protección patrimonial',d:'Puede ser relevante cuando una interrupción, instalación o activo crítico puede detener la operación.',rel:['continuidad','carga']},
+      {t:'Protección de personas / beneficios',d:'Puede ser relevante cuando conductores, colaboradores u otras personas forman parte de la exposición.',rel:['personas']}
+    ];
+    const tagOn='background:rgba(228,0,43,.16);border:1px solid rgba(255,124,140,.55);color:#FFC2CB;';
+    const tagOff='background:rgba(255,255,255,.05);border:1px solid #2a2833;color:#A9A29A;';
+    const stateDefs=[
+      {n:'01',label:'Podemos continuar en línea.'},
+      {n:'02',label:'Necesitamos algunos datos más.'},
+      {n:'03',label:'Conviene continuar con asesoría.'}
+    ];
+    // Sin señal de elegibilidad confiable para esta operación: el estado público por defecto es asesoría.
+    const activeState='03';
+    const ctxBits=[]; if(sitName(sit)) ctxBits.push(sitName(sit)); if(node!=='overview') ctxBits.push(nodeName(node));
+    return {
+      isFlotillasGT:on,
+      fltOverviewActive:node==='overview',
+      fltInsTitle:insDef.t,
+      fltInsBlocks:insDef.b.map(p=>({k:p[0],v:p[1]})),
+      fltContextLine: ctxBits.length? ctxBits.join(' · ') : 'la vista completa de la operación.',
+      fltSituations:sitDefs.map(x=>({
+        n:x.n,label:x.label,active:sit===x.k,pick:()=>this._fltPickSituation(x.k),
+        style:(sit===x.k?'background:#fff;border:1.5px solid #C4001F;box-shadow:0 12px 26px -18px rgba(196,0,31,.6);':'background:rgba(255,255,255,.55);border:1.5px solid #E2DACF;')
+      })),
+      fltNodes:D.nodes.map(x=>{
+        const act=node===x.k, dim=!act && emph.indexOf(x.k)<0;
+        const base=act?'background:#E4002B;border:1.5px solid #FF6B7E;box-shadow:0 18px 40px -22px rgba(228,0,43,.9);'
+                      :'background:rgba(20,18,26,.94);border:1.5px solid #37333f;';
+        return {
+          n:x.n,t:x.t,meta:x.meta,link:x.link,active:act,pick:()=>this._fltPickNode(x.k),
+          style:x.pos+base+(dim?'opacity:.5;':''),
+          nstyle:base+(dim?'opacity:.62;':''),
+          numStyle:'color:'+(act?'#FFD3D9':'#FF9DA8')+';',
+          labelStyle:'color:'+(act?'#fff':'#F4F1EA')+';',
+          metaStyle:'color:'+(act?'rgba(255,255,255,.9)':'#A9A29A')+';'
+        };
+      }),
+      fltEdges:D.edges.map(e=>{
+        const hot = node!=='overview' && (e.a===node||e.b===node);
+        const all = node==='overview';
+        return {d:e.d,
+          stroke: hot?'#E4002B':(all?'rgba(255,124,140,.5)':'rgba(255,255,255,.13)'),
+          w: hot?2.6:(all?1.8:1.2),
+          dash: hot?'0':(all?'0':'5 7')};
+      }),
+      fltResetStyle:'min-height:44px;padding:0 16px;border-radius:11px;font-family:inherit;font-size:13px;font-weight:650;cursor:pointer;white-space:nowrap;'+(node==='overview'?'background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.34);color:#fff;':'background:transparent;border:1.5px solid #2a2833;color:#CFC9BE;'),
+      fltMatrix:[
+        {n:'01',t:'Uso de los vehículos',d:'El tipo de servicio, la frecuencia y la forma de utilizar las unidades cambian el contexto que conviene revisar.'},
+        {n:'02',t:'Qué se transporta o moviliza',d:'Personas, mercancía propia o carga de terceros pueden implicar exposiciones distintas.'},
+        {n:'03',t:'Rutas y puntos de concentración',d:'Los trayectos, patios, bodegas y puntos donde se concentra la operación pueden cambiar el impacto de un evento.'},
+        {n:'04',t:'Relación con terceros',d:'Clientes, proveedores, bienes ajenos y otras personas pueden formar parte de las responsabilidades de la operación.'},
+        {n:'05',t:'Obligaciones y contratos',d:'Cuando existen obligaciones contractuales, conviene entenderlas antes de asumir qué solución corresponde.'},
+        {n:'06',t:'Dependencias operativas',d:'Pocas unidades, rutas, instalaciones o proveedores críticos pueden concentrar el efecto de una interrupción.'}
+      ],
+      fltFamilies:famDefs.map(f=>({t:f.t,d:f.d,
+        tags:f.rel.map(r=>({label:nodeName(r),style:(node===r?tagOn:tagOff)}))})),
+      fltStates:stateDefs.map(x=>({n:x.n,label:x.label,
+        numColor:(x.n===activeState?'#FF9DA8':'#6E6870'),
+        textColor:(x.n===activeState?'#fff':'#8E8790'),
+        style:'min-width:0;border-radius:14px;padding:16px 18px;'+(x.n===activeState?'background:linear-gradient(155deg,#1f1219,#0E0D10);border:1.5px solid #C4001F;':'background:rgba(255,255,255,.03);border:1px solid #24222b;')})),
+      fltMethod:[
+        {n:'01',t:'Entender',d:'Cómo opera realmente el negocio antes de hablar de productos.'},
+        {n:'02',t:'Estructurar',d:'Ordenar qué conviene revisar y en qué orden.'},
+        {n:'03',t:'Comparar',d:'Contrastar alternativas con criterio, no sólo por precio.'},
+        {n:'04',t:'Acompañar',d:'Seguimiento durante la vigencia y cuando ocurre un evento.'}
+      ],
+      fltToSelector:()=>this._fltScroll('vl-t4-situacion'),
+      fltHandoff:()=>this.openHandoff({source:'flotillasgt',intent:'Operación de flotillas, transporte y logística'+(ctxBits.length?' · '+ctxBits.join(' · '):'')}),
+      fltReset:()=>this.setState({fltSituation:null,fltNode:'overview'}),
+      fltContinue:()=>this.goEmpresas(),
+      goFlotillasGTHome:()=>this.goFlotillasGT()
+    };
+  }
+  buildHomeCO(){
+    const coRouter=[
+        {k:'01',t:'Proteger mi empresa',d:'Activos, responsabilidad, contratos, movilidad, personas y continuidad desde cómo opera tu negocio.',cta:'Evaluar mi operación',go:()=>this.goEmpresas()},
+        {k:'02',t:'Transporte y logística',d:'Carga, flota, almacenamiento, contratos y continuidad según tu rol en la cadena.',cta:'Explorar mi cadena',go:()=>this.scrollChain()},
+        {k:'03',t:'Personas o familia',d:'Movilidad, hogar, salud, vida e ingreso según tu momento.',cta:'Explorar mi protección',go:()=>this.go('personas')},
+        {k:'04',t:'Cotizar o comparar',d:'Puedes continuar en línea si el caso es elegible; asesoría conservando el contexto si requiere análisis.',cta:'Cotizar o comparar',go:()=>this.goCotComp()},
+        {k:'05',t:'Siniestro o asistencia',d:'Seguridad primero y luego el canal oficial correcto.',cta:'Ir a Siniestros y Asistencia',go:()=>this.go('siniestros')},
+      {k:'06',t:'Soy cliente',d:'Gestión disponible según los servicios habilitados para tu cuenta.',cta:'Soy cliente',go:()=>this.go('cliente')}
+    ];
+    const defs=this.coIntentDefs();
+    let ai=defs.map(d=>d.id).indexOf(this.state.coIntent);
+    if(ai<0) ai=0;
+    const cur=coRouter[ai], curDef=defs[ai];
+    return {
+      coRouter:coRouter,
+      coIntents:coRouter.map((r,i)=>({n:r.k,t:r.t,on:i===ai,go:()=>this.setState({coIntent:defs[i].id})})),
+      coIntentDesc:cur.d, coIntentCta:cur.cta, coIntentGo:cur.go, coIntentScene:curDef.scene,
+      coIsEmpresa:ai===0, coIsCadena:ai===1, coIsPersonas:ai===2,
+      coIsCotizar:ai===3, coIsSiniestro:ai===4, coIsCliente:ai===5,
+      coRoles:[
+        {t:'Genero o soy propietario de carga',d:'Valor, rol y momento de traspaso de la responsabilidad.',go:()=>this.goEmpresasRole('generador')},
+        {t:'Transporto mercancías',d:'Flota, trayectos, conductores y RC en ruta.',go:()=>this.goEmpresasRole('transportador')},
+        {t:'Almaceno, distribuyo u opero logística',d:'Custodia, inventario, nodos y continuidad.',go:()=>this.goEmpresasChain()},
+        {t:'Tengo flota o una cadena compleja',d:'Varios actores, varias exposiciones conectadas.',go:()=>this.goEmpresasChain()},
+        {t:'Necesito revisar un programa integral',d:'Revisión del programa completo, no de una póliza suelta.',go:()=>this.goEmpresas()}
+      ],
+      coBreadth:[
+        {t:'Responsabilidad Civil',d:'Reclamaciones de terceros por actividad, predios, productos o servicios.',c:'Actividad, límites, territorio, defensa, sublímites y exclusiones.',go:()=>this.goEmpresas()},
+        {t:'Cumplimiento',d:'Licitaciones, anticipos, ejecución, calidad y garantías contractuales.',c:'Obligación, beneficiario, amparos, monto, vigencia y contragarantías.',go:()=>this.goEmpresas()},
+        {t:'Propiedad, ingeniería y continuidad',d:'Instalaciones, maquinaria, montajes y el efecto de una interrupción.',c:'Valoración, eventos, deducibles, periodo indemnizable y límites.',go:()=>this.goEmpresas()},
+        {t:'Flotillas y utilitarios',d:'Vehículos de trabajo, uso, conductores y responsabilidad asociada.',c:'Uso, conductores, deducibles, RC y asistencias.',go:()=>this.goEmpresas()},
+        {t:'Beneficios y vida grupo',d:'Colaboradores y dependientes elegibles dentro del programa de la empresa.',c:'Elegibilidad, grupo, sumas, red, deducibles y exclusiones.',go:()=>this.goEmpresas()},
+        {t:'PyME formal',d:'Empresas que necesitan ordenar lo esencial antes de crecer en complejidad.',c:'Prioridades, sumas mínimas razonables y qué dejar para una segunda etapa.',go:()=>this.goEmpresas()}
+      ],
+      coNext:[
+        {t:'Cotizar o comparar',go:()=>this.goCotComp()},
+        {t:'Revisar antes de renovar',go:()=>this.goRenovar()},
+        {t:'Siniestro o asistencia',go:()=>this.go('siniestros')},
+        {t:'Soy cliente',go:()=>this.go('cliente')}
+      ],
+      coGroups:[
+        {k:'01',t:'Responsabilidad y cumplimiento',d:'Reclamaciones de terceros y las obligaciones que exige un contrato.'},
+        {k:'02',t:'Propiedad, ingeniería y continuidad',d:'Instalaciones, maquinaria y el efecto de una interrupción en la operación.'},
+        {k:'03',t:'Flotillas y movilidad',d:'Vehículos de trabajo y la responsabilidad asociada cuando la operación se mueve.'},
+        {k:'04',t:'Beneficios y personas de la empresa',d:'Colaboradores y dependientes elegibles dentro del programa corporativo.'}
+      ],
+      coPersonas:[{t:'Movilidad'},{t:'Hogar'},{t:'Salud'},{t:'Vida e ingreso'}],
+      coMetodo:[
+        {n:'01 · ORIENTAR',t:'Orientar',d:'Entender el riesgo y el contexto antes de nombrar un producto.'},
+        {n:'02 · ESTRUCTURAR',t:'Estructurar',d:'Ordenar qué conviene revisar y en qué orden dentro de la operación.'},
+        {n:'03 · COMPARAR',t:'Comparar',d:'Contrastar alternativas válidas por alcance, condiciones y costo.'},
+        {n:'04 · ACOMPAÑAR',t:'Acompañar',d:'Sostener la decisión en servicio, renovación y siniestros.'}
+      ],
+      coModos:[
+        {k:'CUANDO EL CASO ES ELEGIBLE',t:'Disponible solo cuando el caso es elegible',d:'Está disponible solo cuando el producto, el país y las condiciones del caso lo permiten.'},
+        {k:'CUANDO PARTE REQUIERE VALIDACIÓN',t:'Avanzas en línea y un asesor valida o completa',d:'El caso conserva el contexto y los datos que faltan quedan identificados.'},
+        {k:'CUANDO EL RIESGO NECESITA REVISIÓN',t:'El riesgo necesita revisión antes de pedir propuestas',d:'Diagnóstico primero; pedir precio antes no ayuda a decidir.'}
+      ],
+      coFunciones:[
+        {t:'Solicitar asistencia',d:'Servicio inmediato asociado a la póliza cuando aplique.'},
+        {t:'Avisar o reportar',d:'Comunicar que ocurrió un evento.'},
+        {t:'Radicar reclamación',d:'Iniciar o completar formalmente la reclamación.'},
+        {t:'Consultar o dar seguimiento',d:'El caso existe: estado, faltantes y siguiente acción.'}
+      ],
+      coServicio:[
+        {t:'Revisar o renovar',d:'Qué cambió, qué sigue teniendo sentido y qué conviene comparar. La revisión tiene su propio recorrido; no es una cotización automática.',cta:'Quiero revisar',go:()=>this.go('cliente')},
+        {t:'Soy cliente',d:'Pólizas, documentos, gestiones y renovaciones por el canal disponible.',cta:'Soy cliente',go:()=>this.go('cliente')},
+        {t:'Siniestro o asistencia',d:'Seguridad primero y después el canal oficial correcto.',cta:'Ir a Siniestros',go:()=>this.go('siniestros')}
+      ]
+    };
+  }
+  cotRailLegacy(){
+    const steps=[['1','Necesidad y ruta'],['2','Datos mínimos'],['3','Alternativas válidas'],['4','Decisión y continuidad']];
+    const st=this.state.cotStep||0;
+    const cur = this.state.cot!=='auto' ? 4 : (st<=1?1:(st<=2?2:(st<=5?3:4)));
+    return steps.map(function(s,i){ var on=(i+1)===cur, done=(i+1)<cur;
+      return { key:s[0], n:done?'✓':s[0], t:s[1],
+        style:'display:flex;align-items:center;gap:10px;flex-shrink:0;padding:10px 12px;border-radius:12px;font-size:12.5px;font-weight:600;transition:all .16s;'+(on?'background:#fff;color:#12110F;border:1px solid #E4002B;box-shadow:0 10px 22px -14px rgba(196,0,31,.6);':'background:transparent;color:#5E594F;border:1px solid transparent;'),
+        dot:"width:24px;height:24px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-family:'IBM Plex Mono';font-size:11px;"+(on?'background:#E4002B;color:#fff;':done?'background:rgba(44,90,58,.14);color:#2C5A3A;border:1px solid rgba(44,90,58,.35);':'background:#EDE6DC;color:#6E655C;') };
+    });
+  }
+  _asset(p){ var m=(typeof window!=='undefined'&&window.AYS_ASSET_MAP)||null; return (m&&m[p])||p; }
+  teamMembers(){
+    const T=['T01_PAULA.jpg','T02_CARLOS.jpg','T03_SAMUEL.jpg','T04_FERNANDO.jpg'];
+    const N=['Paula','Carlos','Samuel','Fernando'];
+    return T.map((f,i)=>({key:f,src:this._asset('assets/team/'+f),alt:N[i]+', integrante del equipo A&S',
+      name:N[i],tag:'EQUIPO A&S',num:'0'+(i+1),wrapStyle:'aspect-ratio:3/4;'}));
+  }
+  buildSobre(){
+    const s=this.state; const set=(p)=>this.setState(p);
+    const AX={
+      mision:{t:'Asesorar con integridad y criterio',d:'Brindar asesoría e intermediación de seguros con integridad, criterio consultivo y vocación de servicio, ayudando a empresas, personas y familias a identificar sus riesgos, comparar alternativas y tomar decisiones claras de protección para su operación, patrimonio y bienestar. Inspirados en nuestra fe en Dios y apoyados en herramientas digitales, acompañamos cada proceso con responsabilidad, excelencia y calidad humana.'},
+      vision:{t:'Referente binacional y consultivo',d:'Ser reconocida en Guatemala, con proyección binacional, como una empresa intermediaria de seguros confiable, íntegra y consultiva, que transforma la gestión de riesgos en decisiones claras, acompaña a sus clientes durante todo el ciclo del seguro y evoluciona mediante tecnología, excelencia y calidad humana para aportar continuidad, bienestar y protección responsable a empresas, personas y familias.'}
+    };
+    const V={
+      proposito:{k:'PROPÓSITO · CENTRO',t:'Criterio que protege decisiones',d:'Todo gira en torno a una idea: convertir riesgos complejos en decisiones claras. Estructuramos, comparamos de verdad y acompañamos — antes, durante y después de elegir una alternativa.'},
+      fe:{k:'VALOR',t:'Fe en Dios y propósito',d:'Actuar con sentido, responsabilidad y conciencia del impacto de cada decisión de protección.'},
+      integridad:{k:'VALOR',t:'Integridad',d:'Información clara, límites explícitos y cero promesas que no podamos sustentar.'},
+      criterio:{k:'VALOR',t:'Criterio consultivo',d:'Orientar según exposición y necesidad, no solo por producto o precio.'},
+      pasion:{k:'VALOR',t:'Pasión por servir',d:'Acompañar y resolver con disposición humana en cada etapa.'},
+      excelencia:{k:'VALOR',t:'Excelencia con calidad humana',d:'Rigor profesional sin perder cercanía ni continuidad humana.'},
+      tecnologia:{k:'VALOR',t:'Tecnología al servicio de la confianza',d:'Reducir fricción y preservar contexto sin sustituir el juicio humano.'},
+      social:{k:'VALOR',t:'Aporte y protección social',d:'Contribuir a decisiones de protección que cuiden personas, empresas y continuidad.'},
+      mision:{k:'MISIÓN',t:AX.mision.t,d:AX.mision.d},
+      vision:{k:'VISIÓN',t:AX.vision.t,d:AX.vision.d}
+    };
+    const short={fe:'Fe y propósito',integridad:'Integridad',criterio:'Criterio',pasion:'Servicio',excelencia:'Excelencia',tecnologia:'Tecnología',social:'Aporte social'};
+    const order=['fe','integridad','criterio','social','pasion','excelencia','tecnologia'];
+    const pos={fe:[50,4],integridad:[89,26],criterio:[92,60],social:[64,92],pasion:[30,92],excelencia:[7,60],tecnologia:[11,26]};
+    let sel=s.sobreSel||'proposito'; if(!V[sel]) sel='proposito';
+    const nodes=order.map(k=>({key:k,label:short[k],active:sel===k,pick:()=>set({sobreSel:k}),
+      cls:'vl-compass-dot',
+      stylePos:'position:absolute;left:'+pos[k][0]+'%;top:'+pos[k][1]+'%;transform:translate(-50%,-50%);'}));
+    const chipStyle=(on)=>'min-height:38px;padding:8px 14px;border-radius:999px;cursor:pointer;font-family:inherit;font-weight:600;font-size:12.5px;transition:all .15s;'+(on?'background:#fff;color:#12110F;border:1px solid #fff;':'background:rgba(255,255,255,.05);color:#CFC9BE;border:1px solid #2a2833;');
+    const keys=['proposito'].concat(order);
+    const chips=keys.map(k=>({key:k,label:k==='proposito'?'Propósito':short[k],active:sel===k,pick:()=>set({sobreSel:k}),style:chipStyle(sel===k)}));
+    const listBtns=keys.map(k=>({key:k,label:k==='proposito'?'Propósito':short[k],active:sel===k,pick:()=>set({sobreSel:k}),
+      style:'display:flex;align-items:center;gap:8px;text-align:left;min-height:46px;padding:11px 14px;border-radius:12px;cursor:pointer;font-family:inherit;font-weight:600;font-size:13.5px;transition:all .15s;'+(sel===k?'background:#fff;color:#12110F;border:1px solid #fff;':'background:#1C1A21;color:#D7D1C4;border:1px solid #2a2833;')}));
+    const cur=V[sel];
+    return { sobreNodes:nodes, sobreList:listBtns, sobreChips:chips, sobreCoreActive:sel==='proposito',
+      pickProposito:()=>set({sobreSel:'proposito'}),
+      pickMision:()=>set({sobreSel:'mision'}), pickVision:()=>set({sobreSel:'vision'}),
+      sobreMisionActive:sel==='mision', sobreVisionActive:sel==='vision',
+      sobreMisionTitle:AX.mision.t, sobreMisionDesc:AX.mision.d,
+      sobreVisionTitle:AX.vision.t, sobreVisionDesc:AX.vision.d,
+      sobreCurKind:cur.k, sobreCurTitle:cur.t, sobreCurDesc:cur.d };
+  }
+  _flag(c){ if(c==='gt') return 'background:linear-gradient(90deg,#4997D0 0 34%,#fff 34% 66%,#4997D0 66%);';
+    if(c==='co') return 'background:linear-gradient(180deg,#FCD116 0 50%,#003893 50% 75%,#CE1126 75%);';
+    return 'background:linear-gradient(135deg,#4997D0 0 48%,#FCD116 48%);'; }
+  buildMap(){
+    const s=this.state; const set=(p)=>this.setState(p);
+    const M={
+      m2012:{y:'2012',p:'Bogotá, Colombia',c:'co',x:78,yy:74,t:'Nace A&S',d:'Inicio de operación con Liberty Seguros y un foco temprano en cadena de suministro, transporte y logística.'},
+      m1216:{y:'2012–2016',p:'Presencia internacional',c:'co',x:64,yy:62,t:'Convenciones y experiencia',d:'Período de convenciones y experiencias internacionales — Mar Báltico con Liberty (2013), Portugal con RSA, Cuba y México con SURA, Chile con AXA Colpatria.'},
+      m2018:{y:'2018',p:'Guatemala',c:'gt',x:50,yy:50,t:'Llegada a Guatemala',d:'Inicio de operaciones en Guatemala, ampliando a personas, familias, vida y gastos médicos.'},
+      m2024:{y:'2024',p:'Guatemala',c:'gt',x:37,yy:40,t:'Evolución jurídica',d:'Se registra la denominación Alianzas y Soluciones Corredores de Seguros, S.A.'},
+      m2025:{y:'2025',p:'Guatemala',c:'gt',x:27,yy:33,t:'Registro SIB CS-254',d:'Inscripción formal ante la Superintendencia de Bancos de Guatemala como corredora de seguros.'},
+      m2026:{y:'2025–2026',p:'Guatemala + Colombia',c:'both',x:18,yy:26,t:'Transformación digital',d:'Continuidad digital entre web, Cotizador/Comparador, futuro Portal del Cliente y Gravicentra — diferenciando lo diseñado de lo liberado.'}
+    };
+    const order=['m2012','m1216','m2018','m2024','m2025','m2026'];
+    const sel=M[s.mapSel]?s.mapSel:'m2012';
+    const items=order.map((k,i)=>{const on=sel===k; const m=M[k];
+      return {key:k,y:m.y,p:m.p,t:m.t,d:m.d,active:on,n:i+1,aria:m.y+' · '+m.t,
+        flag:this._flag(m.c), pick:()=>set({mapSel:k}),
+        pos:'left:'+m.x+'%;top:'+m.yy+'%;',
+        dot:'width:'+(on?'34px':'26px')+';height:'+(on?'34px':'26px')+";border-radius:50%;display:grid;place-items:center;font-family:'IBM Plex Mono';font-size:"+(on?'13px':'11px')+';font-weight:600;transition:all .2s;'+(on?'background:#E4002B;color:#fff;border:2px solid #fff;box-shadow:0 0 0 8px rgba(228,0,43,.22),0 14px 28px -10px rgba(0,0,0,.8);':'background:rgba(12,11,16,.8);color:#F0D79B;border:1px solid rgba(240,215,155,.55);box-shadow:0 10px 22px -12px #000;'),
+        lab:"font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.08em;padding:3px 8px;border-radius:999px;white-space:nowrap;"+(on?'background:#fff;color:#12110F;':'background:rgba(12,11,16,.72);color:#D7D1C4;border:1px solid rgba(255,255,255,.14);'),
+        chip:'display:inline-flex;align-items:center;gap:8px;flex-shrink:0;min-height:40px;padding:0 14px;border-radius:999px;cursor:pointer;font-family:inherit;font-weight:600;font-size:12.5px;transition:all .16s;'+(on?'background:#E4002B;color:#fff;border:1px solid #E4002B;':'background:#17151C;color:#CFC9BE;border:1px solid #2a2833;')};});
+    const c=M[sel];
+    return { mapItems:items, mapCurYear:c.y, mapCurPlace:c.p, mapCurTitle:c.t, mapCurDesc:c.d,
+      mapCurFlag:this._flag(c.c), mapGtOn:(c.c==='gt'||c.c==='both'), mapCoOn:(c.c==='co'||c.c==='both') };
+  }
+  _alysReply(raw){
+    const t=(raw||'').toLowerCase();
+    const isCO=this.state.country==='co';
+    const chip=(label,fn)=>({label,go:fn});
+    const toCot=()=>chip('Preparar una cotización',()=>{this._pendingAI={source:'ai',intent:'Cotizar'};this.setState({aiOpen:false});this.goCotComp();});
+    const toComp=()=>chip('Comparar alternativas',()=>{this._pendingAI={source:'ai',intent:'Comparar alternativas'};this.setState({aiOpen:false});this.goCotComp();});
+    const toSin=()=>chip('Ir a Siniestros y asistencia',()=>{this._pendingAI={source:'ai',intent:'Siniestro'};this.setState({aiOpen:false});this.go('siniestros');});
+    const toAsesor=()=>chip('Hablar con un asesor',()=>{this.setState({aiOpen:false});this.openHandoff({source:'ai',intent:'Prefiere asesor humano'});});
+    const toEmp=()=>chip('Ver Empresas',()=>{this.setState({aiOpen:false});this.goEmpresas();});
+    const toPer=()=>chip('Ver Personas y familias',()=>{this.setState({aiOpen:false});this.go('personas');});
+    const has=(re)=>re.test(t);
+    if(has(/siniestr|choqu|accidente|robo|reclam|golpe|da[ñn]/)) return {text:'Lamento el inconveniente. Puedo orientarte sobre los pasos y conectarte con nuestro equipo para gestionar tu siniestro. No confirmo cobertura del caso: eso lo valida un asesor.',actions:[toSin(),toAsesor()]};
+    if(has(/deducible/)) return {text:'El deducible es la parte que asumes tú antes de que la póliza pague. Un deducible más bajo suele significar una prima más alta. ¿Quieres que preparemos una cotización con distintas opciones?',actions:[toCot(),toAsesor()]};
+    if(has(/prima|cuota|mensualidad/)) return {text:'La prima es lo que pagas por tu póliza (mensual o anual). El monto exacto depende de coberturas y perfil, y lo confirma un asesor. Puedo ayudarte a preparar una cotización para estimarlo.',actions:[toCot(),toAsesor()]};
+    if(has(/suma asegurad|cobertura|ampar|poliz|póliz|qué cubre|que cubre/)) return {text:'Te explico coberturas en lenguaje simple y armamos una comparación según tu necesidad. La cobertura final queda sujeta a los términos de la póliza y a su emisión.',actions:[toCot(),toComp(),toAsesor()]};
+    if(has(/compar/)) return {text:'Puedo ayudarte a comparar alternativas de verdad —coberturas, deducibles y condiciones—, no solo el precio. ¿Avanzamos?',actions:[toComp(),toAsesor()]};
+    if(has(/cotiz|precio|cu[aá]nto cuesta|cu[aá]nto vale/)) return {text:'Con gusto. Preparo una cotización según tu situación; el precio y la cobertura los confirma un asesor humano. ¿Empezamos?',actions:[toCot(),toAsesor()]};
+    if(has(/auto|carro|veh[ií]culo|moto|flotilla/)) return {text:'Manejamos seguros de auto y flotillas. Puedo ayudarte a identificar la cobertura adecuada y preparar una cotización.',actions:[toCot(),(isCO?toEmp():toPer())]};
+    if(has(/salud|m[eé]dic|vida|gastos m[eé]dicos/)) return {text:'Tenemos opciones de salud y vida para personas y familias. Te oriento según tu perfil y preparamos una cotización.',actions:[toCot(),toPer()]};
+    if(has(/empresa|negocio|pyme|corporativ|transport|cadena|log[ií]stic/)) return {text:'Para empresas estructuramos protección con criterio: patrimonio, flotillas, transporte y cadena, beneficios y más. ¿Quieres verlo?',actions:[toEmp(),toCot()]};
+    if(has(/hogar|casa|familia|persona/)) return {text:'Para personas y familias cubrimos hogar, auto, salud, vida y más. Te ayudo a identificar qué necesitas.',actions:[toPer(),toCot()]};
+    if(has(/asesor|humano|persona real|hablar con|llamar|whatsapp|contact/)) return {text:'Claro, te conecto con nuestro equipo. La validación y la contratación siempre las realiza un asesor humano.',actions:[toAsesor()]};
+    if(has(/hola|buenas|buenos d[ií]as|buenas tardes|qué tal|que tal|hey/)) return {text:'Hola, soy Alys. Cuéntame qué necesitas: identificar un seguro, entender una cobertura, cotizar, comparar o reportar un siniestro.',actions:[toCot(),toComp(),toAsesor()]};
+    if(has(/gracias|listo|ok|vale/)) return {text:'Con gusto. Si necesitas algo más, aquí estoy. ¿Quieres avanzar con una cotización o hablar con un asesor?',actions:[toCot(),toAsesor()]};
+    return {text:'Puedo ayudarte con eso. Para orientarte mejor, dime si buscas identificar qué seguro necesitas, entender una cobertura, cotizar, comparar o reportar un siniestro. También puedo conectarte con un asesor.',actions:[toCot(),toComp(),toAsesor()]};
+  }
+  aiSend(){
+    const txt=(this.state.aiInput||'').trim(); if(!txt) return;
+    const reply=this._alysReply(txt);
+    const msgs=(this.state.aiMsgs||[]).concat([{role:'user',text:txt},{role:'alys',text:reply.text,actions:reply.actions}]);
+    this.setState({aiMsgs:msgs,aiInput:'',aiStep:'chat'},()=>{
+      requestAnimationFrame(()=>{ if(typeof document!=='undefined'){ const b=document.getElementById('vl-ai-thread'); if(b) b.scrollTop=b.scrollHeight; } });
+    });
+  }
+  buildFooterLegal(){
+    const s=this.state; const isCO=s.country==='co'; const resolved=!!s.countryResolved;
+    const L=(typeof window!=='undefined' && window.AYS_PUBLIC_LEGAL_CONFIG) || {gt:{},co:{},docs:{}};
+    const cty=(isCO?L.co:L.gt)||{}; const docs=L.docs||{};
+    const sibReady=!!cty.sibNumber;
+    const sibVigReady=!!(cty.sibNumber && cty.sibVigencia);
+    // canales de footer: solo con país resuelto y canal válido en configuración (D08)
+    const cc=this.countryChannels(s.country);
+    const ch=[];
+    if(resolved){
+      if(this._validWa(cc)) ch.push({key:'whatsapp',label:'WhatsApp',href:'https://wa.me/'+this._digits(cc.whatsapp)});
+      if(this._validTel(cc)) ch.push({key:'phone',label:'Llamar',href:'tel:+'+this._digits(cc.phone)});
+      if(this._validEmail(cc)) ch.push({key:'email',label:'Correo',href:'mailto:'+String(cc.email).trim()});
+    }
+    const openDoc=(k)=>()=>{ if(typeof document!=='undefined') this._legalTrigger=document.activeElement; this.setState({legalDoc:k},()=>this._focusRetry('[data-modal="vl-legal"] button')); };
+    const links=[
+      {key:'privacy',label:isCO?'Tratamiento de datos':'Privacidad',go:openDoc('privacy')},
+      {key:'cookies',label:'Cookies y preferencias',go:openDoc('cookies')},
+      {key:'terms',label:'Términos y aviso legal',go:openDoc('terms')}
+    ];
+    const gaps=[];
+    if(resolved && !isCO){ if(!cty.sibVigencia) gaps.push('GT SIB vigencia'); if(cty.sibNumberSource==='v7-authored') gaps.push('GT SIB CS-254 sin verificación independiente'); if(cty.entityNameSource==='v7-authored') gaps.push('GT razón social sin verificación independiente'); }
+    if(resolved && isCO){ if(!cty.nit) gaps.push('CO NIT'); if(!cty.intermediaryStatusVerified) gaps.push('VERIFY_CO_INTERMEDIARY_STATUS'); }
+    if(!docs.privacyReady) gaps.push('doc privacidad');
+    if(!docs.cookiesReady) gaps.push('doc cookies');
+    if(!docs.termsReady) gaps.push('doc términos');
+    const dm={privacy:{t:isCO?'Política de Tratamiento de la Información':'Aviso de Privacidad',ready:!!docs.privacyReady},
+      cookies:{t:'Cookies y preferencias',ready:!!docs.cookiesReady},
+      terms:{t:'Términos y aviso legal',ready:!!docs.termsReady}};
+    const cur=s.legalDoc?dm[s.legalDoc]:null;
+    return {
+      footBrandSub: resolved ? (isCO?'COLOMBIA':'GUATEMALA') : 'GUATEMALA · COLOMBIA',
+      footBrandDesc: resolved
+        ? (isCO?'Intermediación de seguros en Colombia. Criterio, comparación y acompañamiento.':'Intermediación de seguros en Guatemala. Criterio, comparación y acompañamiento.')
+        : 'Asesoría en seguros para empresas, personas y familias. Criterio, comparación y acompañamiento.',
+      footGlobal: !resolved, footGT: resolved && !isCO, footCO: resolved && isCO,
+      sibReady, sibVigReady, sibNumber: cty.sibNumber||'', sibVigencia: cty.sibVigencia||'',
+      gtEntity: cty.entityName||'', gtRegulator: cty.regulator||'', gtDescriptor: cty.intermediaryDescriptor||'',
+      footChannels: ch, footLegalLinks: links,
+      legalGateVisible: s.technicalReview && gaps.length>0,
+      legalGateList: gaps.join(' · '),
+      legalOpen: !!cur, legalTitle: cur?cur.t:'', legalReady: !!(cur&&cur.ready), legalPending: !!(cur&&!cur.ready),
+      closeLegal:()=>{ const t=this._legalTrigger; this.setState({legalDoc:null}); setTimeout(()=>{ if(t&&t.focus&&document.contains(t))t.focus(); },0); }
+    };
+  }
+  gtExposures(){
+    return [
+      {id:'programa',n:'Programa y revisión integral',zone:'SISTEMA COMPLETO · LECTURA EN CONJUNTO',lead:'Todas las exposiciones leídas juntas.',
+        exp:'Todas las exposiciones de la operación leídas juntas: activos, personas, responsabilidad, movilidad y continuidad.',
+        ej:'Un mismo evento golpea la bodega, detiene los despachos y activa un reclamo de un tercero al mismo tiempo.',
+        why:'Revisarlas en conjunto ayuda a detectar posibles vacíos, solapamientos o incoherencias que pueden pasar desapercibidos al analizar cada póliza por separado.',
+        rev:['Cobertura del conjunto','Vacíos y duplicidades','Coherencia de límites','Orden de prioridades','Vigencias y renovaciones'],
+        objq:'«Ya tenemos pólizas con varias aseguradoras.»',
+        obja:'Tener varias pólizas no asegura por sí solo que el programa esté coordinado; conviene revisarlas en conjunto para identificar posibles vacíos, solapamientos o diferencias de límites y vigencias.'},
+      {id:'flotillas',n:'Flotillas, transporte y logística',zone:'PATIO DE FLOTILLA · RUTA · CARGA',lead:'Vehículos de trabajo, carga y traslado.',
+        exp:'Vehículos de trabajo, mercancía en tránsito y la responsabilidad asociada al traslado.',
+        ej:'Un camión con carga de un cliente sufre un accidente en ruta y hay daño a la mercancía.',
+        why:'El uso, los conductores, los trayectos y la custodia son variables relevantes para entender cómo puede responder la protección, además de la prima.',
+        rev:['Uso y conductores','Mercancía y trayectos','RC y asistencias','Deducibles','Cargue, descargue y custodia'],
+        objq:'«La flotilla ya está asegurada.»',
+        obja:'Conviene comprobar que el uso, los conductores y la carga declarados correspondan a la operación real; el alcance final depende de los términos de cada póliza.'},
+      {id:'personas',n:'Beneficios para colaboradores',zone:'OFICINA · EQUIPO DE TRABAJO',lead:'Equipo de trabajo, elegibilidad y red.',
+        exp:'Colaboradores y dependientes elegibles dentro de los beneficios que ofrece la empresa.',
+        ej:'La hospitalización de un colaborador clave afecta a su familia y a la operación al mismo tiempo.',
+        why:'La elegibilidad, la red, los límites y demás condiciones influyen en la utilidad y en cómo puede responder el beneficio cuando se necesita.',
+        rev:['Elegibilidad y grupo','Sumas y límites','Dependientes','Red, deducibles y coaseguro','Exclusiones'],
+        objq:'«El beneficio ya está contratado.»',
+        obja:'Conviene revisar elegibilidad, red, límites y demás condiciones antes de asumir cómo puede responder el beneficio.'},
+      {id:'patrimonio',n:'Patrimonio',zone:'PLANTA · BODEGA · INVENTARIO',lead:'Planta, bodega, maquinaria e inventario.',
+        exp:'Instalaciones, inventarios, maquinaria y equipos que sostienen la producción y el despacho.',
+        ej:'Un incendio en bodega daña producto terminado y detiene los despachos de la semana.',
+        why:'Una valoración desactualizada puede generar una brecha entre la suma asegurada y el costo real de reposición, según los términos de la póliza.',
+        rev:['Valoración y sumas','Eventos cubiertos','Deducibles y sublímites','Exclusiones','Vínculo con continuidad'],
+        objq:'«La suma se fijó cuando abrimos la planta.»',
+        obja:'Si la valoración está desactualizada, puede existir una brecha entre la suma asegurada y el costo real de reposición; conviene revisarlo contra las condiciones de la póliza.'},
+      {id:'rc',n:'Responsabilidad Civil',zone:'PERÍMETRO · TERCEROS Y VISITANTES',lead:'Daños y reclamos de terceros.',
+        exp:'Daños o reclamaciones de terceros derivados de tu actividad, predios, productos o servicios.',
+        ej:'Un visitante se lesiona en el área de carga y presenta un reclamo contra la empresa.',
+        why:'La actividad declarada, los límites, exclusiones y demás condiciones influyen en el alcance que puede tener la protección ante un reclamo.',
+        rev:['Actividad declarada','Límites y sublímites','Territorio','Gastos de defensa','Retroactividad cuando aplique'],
+        objq:'«Nunca nos han reclamado nada.»',
+        obja:'La actividad declarada, los límites, exclusiones y demás condiciones forman parte de lo que debe revisarse para entender el alcance ante un reclamo.'},
+      {id:'continuidad',n:'Continuidad',zone:'PROCESO · DEPENDENCIA OPERATIVA',lead:'El tiempo sin operar y sus dependencias.',
+        exp:'El efecto económico y operativo de una interrupción, no solamente el daño físico.',
+        ej:'Después de un daño material la planta tarda semanas en volver a facturar con normalidad.',
+        why:'El daño material y la interrupción pueden estar sujetos a coberturas y condiciones distintas; conviene revisar expresamente ambos componentes.',
+        rev:['Base financiera','Periodo indemnizable','Dependencia de daño material','Límites','Espera o deducible'],
+        objq:'«El daño material ya está cubierto.»',
+        obja:'El daño material y la interrupción pueden tener tratamientos distintos; conviene revisar expresamente si y cómo se contempla la pérdida por interrupción.'},
+      {id:'contratos',n:'Otras exposiciones especializadas',zone:'ESPECIALIZADAS · CONTRATOS Y GARANTÍAS',lead:'Exposiciones puntuales según el negocio.',
+        exp:'Exposiciones puntuales que aparecen según el negocio; entre ellas, las garantías y obligaciones exigidas por un contrato.',
+        ej:'Un cliente exige una garantía de cumplimiento antes de firmar la orden de compra.',
+        why:'La obligación exigida por el contrato orienta el tipo de garantía o amparo que conviene revisar; su alcance depende de las condiciones aplicables.',
+        rev:['Obligación y beneficiario','Amparos y tipo','Monto y vigencia','Contragarantías y requisitos'],
+        objq:'«El contrato solo pide una fianza.»',
+        obja:'La obligación exigida por el contrato orienta qué garantía o amparo conviene revisar; la respuesta final depende de las condiciones aplicables.'}
+    ];
+  }
+  buildHomeGT(){
+    const list=this.gtExposures();
+    const cur=list.filter(d=>d.id===this.state.gtExp)[0]||list[0];
+    const intents=[
+      {id:'empresa',n:'01',t:'Proteger mi empresa',scene:'Tu empresa como sistema',
+       d:'Revisa patrimonio, personas, responsabilidad, movilidad y continuidad desde cómo opera tu negocio.',
+       cta:'Evaluar mi empresa',go:()=>this.goEmpresas()},
+      {id:'personas',n:'02',t:'Personas y familias',scene:'Tu momento y tu necesidad',
+       d:'Ordena auto y movilidad, salud y accidentes, y vida y protección familiar según tu momento y tu necesidad.',
+       cta:'Explorar mi protección',go:()=>this.go('personas')},
+      {id:'cotizar',n:'03',t:'Cotizar o comparar',scene:'Comparar por diferencias',
+       d:'Si tu necesidad es elegible, avanzamos por la ruta disponible; si requiere análisis, conservamos el contexto para continuar con asesoría.',
+       cta:'Cotizar o comparar',go:()=>this.goCotComp()},
+      {id:'revisar',n:'04',t:'Revisar mis seguros',scene:'Qué cambió desde la última renovación',
+       d:'Revisa qué cambió, qué sigue teniendo sentido y qué conviene comparar antes de renovar.',
+       cta:'Quiero revisar mis seguros',go:()=>this.go('cliente')},
+      {id:'siniestro',n:'05',t:'Siniestro o asistencia',scene:'Primero seguridad',
+       d:'Primero seguridad. Después identifica la acción y el canal oficial correcto.',
+       cta:'Ir a Siniestros y Asistencia',go:()=>this.go('siniestros')},
+      {id:'cliente',n:'06',t:'Soy cliente',scene:'Tus gestiones',
+       d:'Empieza por la gestión que necesitas y continúa por el canal disponible.',
+       cta:'Soy cliente',go:()=>this.go('cliente')}
+    ];
+    const ci=intents.filter(i=>i.id===this.state.gtIntent)[0]||intents[0];
+    const o={
+      gtName:cur.n, gtZone:cur.zone, gtExpText:cur.exp, gtEj:cur.ej, gtWhy:cur.why,
+      gtObjQ:cur.objq, gtObjA:cur.obja,
+      gtDims:[
+        {t:'Patrimonio y continuidad',d:'Planta, bodega, inventario y el efecto de una interrupción.'},
+        {t:'Personas y beneficios',d:'Colaboradores y dependientes dentro del programa de la empresa.'},
+        {t:'Movilidad y transporte',d:'Flotillas, trayectos y carga cuando la operación se mueve.'},
+        {t:'Responsabilidad y contratos',d:'Terceros, obligaciones contractuales y garantías exigidas.'}
+      ],
+      gtRev:cur.rev.map(t=>({t:t})),
+      gtExpList:list.filter(d=>d.id!=='contratos').map((d,i)=>({n:'0'+(i+1),t:d.n,z:d.zone,lead:d.lead,on:d.id===cur.id,go:()=>this.setState({gtExp:d.id})})),
+      gtIntents:intents.map(it=>({n:it.n,t:it.t,on:it.id===ci.id,go:()=>this.setState({gtIntent:it.id})})),
+      gtIntentTitle:ci.t, gtIntentDesc:ci.d, gtIntentCta:ci.cta, gtIntentScene:ci.scene, gtIntentGo:ci.go,
+      gtIsEmpresa:ci.id==='empresa', gtIsPersonas:ci.id==='personas', gtIsCotizar:ci.id==='cotizar',
+      gtIsRevisar:ci.id==='revisar', gtIsSiniestro:ci.id==='siniestro', gtIsCliente:ci.id==='cliente',
+      gtFocus:cur.id, gtLens:this.state.gtLens, gtLensOn:this.state.gtLens==='programa',
+      gtLensLabel:this.state.gtLens==='programa'?'Ver por exposición':'Ver como programa integral',
+      gtLensToggle:()=>this.setState({gtLens:this.state.gtLens==='programa'?'foco':'programa'}),
+      gtRoute:[
+        {n:'01',t:'Origen y cargue',d:'Quién carga, cómo se estiba y desde qué punto del trayecto conviene revisar el alcance de la protección.'},
+        {n:'02',t:'Tránsito y ruta',d:'Trayectos, horarios, custodia y el daño que ocurre mientras la carga va en camino.'},
+        {n:'03',t:'Entrega y terceros',d:'Descargue, recepción y los reclamos de quien no es parte del contrato.'}
+      ],
+      gtFleet:[
+        {n:'01',t:'Tengo vehículos o una flotilla',d:'Uso, conductores, deducibles y asistencias.',q:'QUÉ REVISAR · uso declarado, conductores autorizados, deducible por unidad.',go:()=>this.goFlotillasGT('flotilla')},
+        {n:'02',t:'Transporto o distribuyo mercancías',d:'Mercancía, trayectos y custodia en tránsito.',q:'QUÉ REVISAR · mercancía declarada, trayectos, custodia y límite por despacho.',go:()=>this.goFlotillasGT('carga')},
+        {n:'03',t:'Tengo bodega o centro de distribución',d:'Almacenamiento, inventario y continuidad.',q:'QUÉ REVISAR · valoración del inventario y el tiempo sin operar después de un daño.',go:()=>this.goFlotillasGT('ambos','continuidad')},
+        {n:'04',t:'Respondo por daños a terceros en ruta',d:'Responsabilidad civil asociada al traslado.',q:'QUÉ REVISAR · actividad declarada, límite de responsabilidad y gastos de defensa.',go:()=>this.goFlotillasGT('ambos','terceros')},
+        {n:'05',t:'Quiero evaluar el programa completo',d:'Programa integral por operación y rol.',q:'QUÉ REVISAR · coherencia de límites y vacíos entre pólizas.',go:()=>this.goEmpresas()}
+      ],
+      gtPersonas:[
+        {t:'Auto y movilidad',d:'Vehículo, responsabilidad y asistencias según la alternativa.',w:'El uso real del vehículo y quién lo conduce son variables que conviene considerar al revisar las alternativas.',c:'RC, suma o valor, deducible, asistencias, territorio, uso y exclusiones.'},
+        {t:'Salud y accidentes',d:'Gastos Médicos: red, límites y condiciones de respuesta.',w:'La red, los límites y demás condiciones influyen en cómo puede responder el beneficio cuando se utiliza.',c:'Red, límites, deducible, coaseguro, hospitalización, carencias y preexistencias.'},
+        {t:'Vida y protección familiar',d:'Dependientes, obligaciones y continuidad económica.',w:'La suma, los beneficiarios, la vigencia y las condiciones ayudan a evaluar si la protección corresponde a las responsabilidades previstas.',c:'Suma, beneficiarios, vigencia, exclusiones y coberturas incluidas.'}
+      ],
+      gtMetodo:[
+        {n:'01 · ORIENTAR',k:'01',t:'Orientar',d:'Entender la necesidad y el contexto antes de nombrar un producto.',
+         a:'Tu situación y lo que te preocupa.',b:'La necesidad ordenada, todavía sin producto.'},
+        {n:'02 · ESTRUCTURAR',k:'02',t:'Estructurar',d:'Ordenar exposiciones y definir qué conviene revisar y en qué orden.',
+         a:'La necesidad ordenada.',b:'Exposiciones priorizadas y qué conviene revisar.'},
+        {n:'03 · COMPARAR',k:'03',t:'Comparar',d:'Contrastar alternativas válidas por alcance, condiciones y costo, no solo por prima.',
+         a:'Alternativas válidas y disponibles para el caso.',b:'Las diferencias explicadas: alcance, condiciones y costo.'},
+        {n:'04 · ACOMPAÑAR',k:'04',t:'Acompañar',d:'Sostener la decisión en servicio, revisión, renovación y siniestros.',
+         a:'La decisión tomada.',b:'Servicio, revisión, renovación y acompañamiento en siniestros.'}
+      ],
+      gtModos:[
+        {k:'CUANDO EL CASO ES ELEGIBLE',t:'Este caso puede continuar en línea',d:'Cuando el producto y el caso son elegibles, la captura avanza en línea.'},
+        {k:'CUANDO PARTE REQUIERE CRITERIO',t:'Puedes avanzar en línea con acompañamiento de un asesor',d:'El caso se conserva con lo que falta identificado; no se pierde el contexto.'},
+        {k:'CUANDO EL RIESGO NECESITA REVISIÓN',t:'Este riesgo necesita revisión antes de pedir propuestas',d:'Diagnóstico y asesoría primero; pedir precio antes no ayuda a decidir.'}
+      ],
+      gtServicio:[
+        {t:'Revisar mis seguros',d:'Qué cambió, qué sigue teniendo sentido y qué conviene comparar antes de renovar.',cta:'Quiero revisar',go:()=>this.go('cliente')},
+        {t:'Siniestro o asistencia',d:'Seguridad primero, después la acción y el canal oficial correcto.',cta:'Ir a Siniestros',go:()=>this.go('siniestros')},
+        {t:'Soy cliente',d:'Pólizas, documentos, gestiones y renovaciones por el canal disponible.',cta:'Soy cliente',go:()=>this.go('cliente')}
+      ]
+    };
+    list.forEach((d,idx)=>{ o['gtOn'+idx]=(d.id===cur.id); o['gtSel'+idx]=()=>this.setState({gtExp:d.id}); });
+    return o;
+  }
+  renderVals(){
+    const s=this.state; const set=(p)=>this.setState(p); const isCO=s.country==='co'; const resolved=!!s.countryResolved;
+    const navBtn=(active)=>'background:none;border:none;cursor:pointer;font-family:inherit;font-weight:600;font-size:15px;padding:8px 2px;border-bottom:2px solid '+(active?'#E4002B':'transparent')+';color:'+(active?'#C4001F':'#3a3630')+';';
+    const homeKey=isCO?'homeco':'home';
+    const mainNav=[
+      {label:'Empresas',go:()=>this.goEmpresas(),style:navBtn(s.screen==='empresas')},
+      {label:'Personas y familias',go:()=>this.go('personas'),style:navBtn(s.screen==='personas')},
+      {label:'Cotizar y comparar',go:()=>this.goCotComp(),style:navBtn(s.screen==='cotcomp')},
+      {label:'Siniestros y asistencia',go:()=>this.go('siniestros'),style:navBtn(s.screen==='siniestros')},
+      {label:'Recursos',go:()=>this.go('recursos'),style:navBtn(s.screen==='recursos')},
+      {label:'Sobre A&S',go:()=>this.go('sobre'),style:navBtn(s.screen==='sobre')},
+    ];
+    const mobileNav=[
+      {label:'Inicio',go:()=>this.go(homeKey)},
+      {label:'Empresas',go:()=>this.goEmpresas()},
+      {label:'Personas y familias',go:()=>this.go('personas')},
+      {label:'Cotizar y comparar',go:()=>this.goCotComp()},
+      {label:'Siniestros y asistencia',go:()=>this.go('siniestros')},
+      {label:'Recursos',go:()=>this.go('recursos')},
+      {label:'Sobre A&S',go:()=>this.go('sobre')},
+      {label:'Soy cliente',go:()=>this.go('cliente')},
+    ];
+    const gate=(scr)=>()=>{ if(this.state.countryResolved){ this.setState({countryPrompt:null}); this.go(scr); } else { this.setState({menuOpen:true,countryPrompt:scr}); this._focus('[data-drawer] button'); } };
+    const gateCot=()=>{ if(this.state.countryResolved){ this.setState({countryPrompt:null}); this.goCotComp(); } else { this.setState({menuOpen:true,countryPrompt:'cotcomp'}); this._focus('[data-drawer] button'); } };
+    const gateEmp=()=>{ if(this.state.countryResolved){ this.setState({countryPrompt:null}); this.goEmpresas(); } else { this.setState({menuOpen:true,countryPrompt:'empresas'}); this._focus('[data-drawer] button'); } };
+    const globalNav=[
+      {label:'Sobre A&S',go:()=>this.go('sobre')},
+      {label:'Recursos',go:gate('recursos')},
+      {label:'Soy cliente',go:gate('cliente')},
+      {label:'Necesito asistencia',go:()=>this.openHandoff({intent:'Necesito asistencia',source:'assist'})},
+      {label:'Hablar con un asesor',go:()=>this.openHandoff()},
+    ];
+    const tab=(on)=>'min-height:44px;padding:0 15px;border:none;background:'+(on?'#E4002B':'#fff')+';color:'+(on?'#fff':'#3a3630')+';font-family:inherit;font-weight:600;font-size:13.5px;cursor:pointer;';
+    const tabM=(on)=>'flex:1;min-height:46px;border-radius:11px;border:1px solid '+(on?'#E4002B':'#2a2833')+';background:'+(on?'#E4002B':'#1A1820')+';color:'+(on?'#fff':'#cfc9bd')+';font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;';
+    const rr=[['Root','root'],['Home GT','home'],['Home CO','homeco'],['Empresas','empresas'],['Personas/Familias','personas'],['Cotizador','cotcomp'],['Cliente','cliente'],['Recursos','recursos'],['Siniestros','siniestros'],['Sobre A&S','sobre'],['Equipo','equipo']];
+    return {
+      reviewMode:s.reviewMode,
+      technicalReview:s.technicalReview,
+      reviewRoutes:rr.map(([label,sc])=>({label,go:()=>this.go(sc)})),
+      mainNav, mobileNav, menuOpen:s.menuOpen, toggleMenu:()=>{ const o=!s.menuOpen; set({menuOpen:o,countryPrompt:null}); if(o)this._focus('[data-drawer] button'); else this._focus('[data-restore="burger"]'); },
+      goRoot:()=>this.go('root'), goCliente:()=>this.go('cliente'),
+      goSobre:()=>this.go('sobre'), goEquipo:()=>this.go('equipo'),
+      equipoReviewVisible:s.reviewMode && s.screen==='equipo',
+      alliesPrev:()=>this.alliesScroll(-1), alliesNext:()=>this.alliesScroll(1),
+      clienteBtn:'display:none;min-height:44px;padding:0 16px;border-radius:11px;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;align-items:center;justify-content:center;'+(s.screen==='cliente'?'background:#12110F;border:1.5px solid #12110F;color:#fff;':'background:#fff;border:1.5px solid #E7E2D6;color:#12110F;'),
+      scrollChain:()=>{ if(typeof document!=='undefined'){ const el=document.getElementById('vl-co-chain'); if(el&&el.getBoundingClientRect){ const y=el.getBoundingClientRect().top+(window.pageYOffset||0)-90; window.scrollTo({top:y,behavior:this.reduced()?'auto':'smooth'}); } } },
+      openHandoff:()=>this.openHandoff(), closeHandoff:()=>this.closeHandoff(), confirmHandoff:()=>this.closeHandoff(),
+      stop:(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); },
+      isGT:!isCO, isCO, countryName:isCO?'Colombia':'Guatemala',
+      insurers:(isCO?[
+        {name:'AXA Colpatria',src:'assets/insurers/co/axa_colpatria.png'},
+        {name:'SBS Seguros',src:'assets/insurers/co/sbs_seguros.png'},
+        {name:'Chubb',src:'assets/insurers/co/chubb_colombia.png'},
+        {name:'MAPFRE',src:'assets/insurers/co/mapfre_colombia.png'},
+        {name:'Aseguradora Solidaria',src:'assets/insurers/co/aseguradora_solidaria.png'},
+        {name:'Zurich Colombia',src:'assets/insurers/co/zurich_colombia.png'},
+        {name:'Seguros Bolívar',src:'assets/insurers/co/seguros_bolivar.png'},
+        {name:'La Previsora',src:'assets/insurers/co/la_previsora.png'},
+        {name:'Quálitas Colombia',src:'assets/insurers/co/qualitas_colombia.png'},
+        {name:'Seguros Médicos Internacionales',src:'assets/insurers/co/smi.png'}
+      ]:[
+        {name:'El Roble',src:'assets/insurers/gt/el_roble.png'},
+        {name:'MAPFRE Guatemala',src:'assets/insurers/gt/mapfre_guatemala.png'},
+        {name:'Aseguradora La Ceiba',src:'assets/insurers/gt/la_ceiba.png'},
+        {name:'G&T Seguros',src:'assets/insurers/gt/gt_seguros.png'},
+        {name:'Aseguradora General',src:'assets/insurers/gt/aseguradora_general.png'},
+        {name:'Aseguradora Guatemalteca',src:'assets/insurers/gt/aseguradora_guatemalteca.png'},
+        {name:'Ficohsa Seguros',src:'assets/insurers/gt/ficohsa.png'},
+        {name:'Seguros Columna · MICOOP',src:'assets/insurers/gt/seguros_columna.png'},
+        {name:'Bantrab Seguros',src:'assets/insurers/gt/bantrab.png'},
+        {name:'Aseguradora Rural',src:'assets/insurers/gt/aseguradora_rural.png'},
+        {name:'Seguros Privanza',src:'assets/insurers/gt/seguros_privanza.png'},
+        {name:'Agromercantil · BAM',src:'assets/insurers/gt/seguros_agromercantil_bam.png'},
+        {name:'Seguros Universales',src:'assets/insurers/gt/seguros_universales.png'},
+        {name:'Pan American Life',src:'assets/insurers/gt/pan_american_life.png'}
+      ]).map(x=>({name:x.name,src:x.src?this._asset(x.src):'',word:x.word||x.name,sub:x.sub||'',hasLogo:!!x.src,noLogo:!x.src})).filter(x=>this._allyVisible(x.name)),
+      alliesShow:this._alliesShow(), alliesInternalMark:this._alliesInternalMark(),
+      setGT:()=>this.switchCountry('gt'), setCO:()=>this.switchCountry('co'),
+      chooseGT:()=>this.chooseCountry('gt'), chooseCO:()=>this.chooseCountry('co'),
+      gtTab:tab(resolved&&!isCO), coTab:tab(resolved&&isCO), gtTabM:tabM(resolved&&!isCO), coTabM:tabM(resolved&&isCO),
+      isGTsel:resolved&&!isCO, isCOsel:resolved&&isCO,
+      drawerNav: resolved?mobileNav:globalNav,
+      countryPromptOpen: !resolved && !!s.countryPrompt,
+      countryPromptGT:()=>{ const t=s.countryPrompt; this.setState({countryPrompt:null}); this.chooseCountry('gt'); if(t&&t!=='home') setTimeout(()=>this.go(t),0); },
+      countryPromptCO:()=>{ const t=s.countryPrompt; this.setState({countryPrompt:null}); this.chooseCountry('co'); if(t&&t!=='homeco') setTimeout(()=>this.go(t),0); },
+      countryPromptCancel:()=>this.setState({countryPrompt:null}),
+      goBack:()=>this.goBack(),
+      aiOpen:s.aiOpen, alysOn:this.alysOn(), alysOff:!this.alysOn(),
+      reviewMode2:s.technicalReview,
+      openAI:()=>{ if(typeof document!=='undefined') this._aiTrigger=document.activeElement; set({aiOpen:true,aiStep:'menu'}); this._focus('[data-modal="vl-ai"] button'); },
+      closeAI:()=>{ this._pendingAI=null; set({aiOpen:false}); const t=this._aiTrigger; requestAnimationFrame(()=>{ if(t&&t.focus&&document.contains(t))t.focus(); }); },
+      aiStep:s.aiStep,
+      aiMenu:[
+        {label:'Quiero saber qué seguro necesito',go:()=>{ this._pendingAI={source:'ai',intent:'Identificar necesidad'}; set({aiStep:'necesito'}); }},
+        {label:'Quiero entender una cobertura',go:()=>{ this._pendingAI={source:'ai',intent:'Entender una cobertura'}; set({aiStep:'entender'}); }},
+        {label:'Quiero cotizar',go:()=>{ this._pendingAI={source:'ai',intent:'Cotizar'}; set({aiOpen:false}); this.goCotComp(); }},
+        {label:'Quiero comparar alternativas',go:()=>{ this._pendingAI={source:'ai',intent:'Comparar alternativas'}; set({aiOpen:false}); this.goCotComp(); }},
+        {label:'Tuve un siniestro',go:()=>{ this._pendingAI={source:'ai',intent:'Siniestro'}; set({aiOpen:false}); this.go('siniestros'); }},
+        {label:'Prefiero hablar con una persona',go:()=>{ set({aiOpen:false}); this.openHandoff({source:'ai',intent:'Prefiere asesor humano'}); }},
+      ],
+      aiIsMenu:s.aiStep==='menu', aiIsNecesito:s.aiStep==='necesito', aiIsEntender:s.aiStep==='entender',
+      aiReset:()=>{ this._pendingAI=null; set({aiStep:'menu'}); },
+      aiToHandoff:()=>{ set({aiOpen:false}); const ctx=this._pendingAI; this._pendingAI=null; this.openHandoff(ctx&&typeof ctx==='object'?ctx:undefined); },
+      aiToCot:()=>{ set({aiOpen:false}); this.goCotComp(); },
+      aiIsChat:s.aiStep==='chat',
+      aiMsgs:(s.aiMsgs||[]).map(m=>({ role:m.role, text:m.text, isAlys:m.role==='alys', bubbleStyle:(m.role==='user'?'align-self:flex-end;background:#E4002B;color:#fff;border-bottom-right-radius:4px;':'align-self:flex-start;background:#1C1A21;color:#F4F1EA;border:1px solid #2a2833;border-bottom-left-radius:4px;')+'max-width:82%;padding:11px 14px;border-radius:14px;font-size:13.5px;line-height:1.5;', actions:(m.actions||[])})),
+      aiInput:s.aiInput,
+      aiOnInput:(e)=>set({aiInput:e.target.value}),
+      aiSend:()=>this.aiSend(),
+      aiInputKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.aiSend(); } },
+      footerSoluciones:[
+        {label:'Empresas',go:gateEmp},
+        {label:'Personas y familias',go:gate('personas')},
+        {label:'Cotizar y comparar',go:gateCot},
+        {label:'Siniestros y asistencia',go:gate('siniestros')},
+      ],
+      footerAys:[
+        {label:'Recursos',go:()=>this.goRecursos()},
+        {label:'Soy cliente',go:gate('cliente')},
+      ],
+      showBack:['empresas','flotillasgt','logisticaco','personas','cotcomp','siniestros','recursos','cliente','sobre','equipo'].indexOf(s.screen)>=0,
+      ...this.buildFlotillasGT(),
+      ...this.buildLogisticaCO(),
+      ...this.buildFooterLegal(),
+      hdrMode: s.countryResolved ? 'vl-hdr-full' : 'vl-hdr-light',
+      menuTitle: s.countryResolved ? ('MENÚ · '+(isCO?'Colombia':'Guatemala')) : 'MENÚ',
+      openHandoffAsist:()=>this.openHandoff({intent:'Necesito asistencia',source:'assist'}),
+      isRoot:s.screen==='root', isHome:s.screen==='home', isHomeCO:s.screen==='homeco',
+      isEmpresas:s.screen==='empresas', isPersonas:s.screen==='personas', isCotComp:s.screen==='cotcomp',
+      isCliente:s.screen==='cliente', isRecursos:s.screen==='recursos' && (this.resourcesOn()||s.reviewMode), isSiniestros:s.screen==='siniestros',
+      sinCapture:s.screen==='siniestros' && s.sinStep===1,
+      sinDone:false,
+      sinReport:()=>set({sinStep:1}), sinSubmit:()=>{ this._ax('siniestros_to_handoff'); this.openHandoff({source:'siniestros',intent:'Orientación de siniestro'}); }, sinReset:()=>set({sinStep:0}),
+      sinSteps:[0,1,2].map(i=>({bg:(s.sinStep||0)>=i?'#E4002B':'#33323a'})),
+      sinFlow:[
+        {n:1,t:'¿Están todos a salvo?',d:'La seguridad de las personas es lo primero.',tag:'SEGURIDAD'},
+        {n:2,t:'Necesito ayuda ahora',d:'Orientación inmediata, sin iniciar sesión.',tag:'AHORA'},
+        {n:3,t:'Reportar el caso',d:'Elige un canal para continuar con un asesor.',tag:'REPORTE'},
+        {n:4,t:'Datos mínimos',d:'Solo lo indispensable, por pasos.',tag:'DATOS'},
+        {n:5,t:'Revisión de un asesor',d:'Validamos póliza y coberturas contigo.',tag:'REVISIÓN'},
+        {n:6,t:'Próximos pasos',d:'Te confirmamos qué sigue, con claridad.',tag:'PASOS'},
+        {n:7,t:'Acompañamiento humano',d:'Seguimiento hasta el cierre del caso.',tag:'HANDOFF'},
+      ].map((x,i)=>({n:x.n,t:x.t,d:x.d,tag:x.tag,tagStyle:"font-family:'IBM Plex Mono';font-size:8.5px;letter-spacing:.08em;color:"+(i>=4?'#e0b45a':'#ADA69B')+";"})),
+      isSobre:s.screen==='sobre', isEquipo:s.screen==='equipo',
+      handoffOpen:s.handoffOpen,
+      goEmpresas:()=>this.goEmpresas(), goEmpresasChain:()=>this.goEmpresasChain(), goCotComp:()=>this.goCotComp(), goPersonas:()=>this.go('personas'),
+      goSiniestros:()=>this.go('siniestros'), goRenovar:()=>this.goRenovar(),
+      modalTags:(()=>{ const tags=[('País: '+(isCO?'Colombia':'Guatemala'))]; if(s.screen==='cotcomp'){ const stageNames=['Punto de partida','Datos del caso','Revisión de opciones','Comparación y decisión']; tags.push('Necesidad: '+((this.buildCot().cotSelectedLabel)||'Seguro')); tags.push('Avance: '+stageNames[Math.max(0,Math.min(3,Number(s.cotStep||0)))]); } else if(this._aiIntent){ tags.push('Motivo: '+this._aiIntent); } return tags; })(),
+      handoffChannels:(()=>{ const ch=this.handoffChannels(); this.__hoCh=ch; return ch; })(),
+      handoffHasChannels:(this.__hoCh||[]).length>0,
+      handoffNoChannels:(this.__hoCh||[]).length===0,
+      routerItems:[
+        {title:'Cotizar y comparar',desc:'Alternativas con criterio, no solo precio.',iso:'#ic-comparar',go:()=>this.goCotComp()},
+        {title:'Proteger mi empresa',desc:'Diagnóstico por exposición y operación.',iso:'#ic-empresas',go:()=>this.goEmpresas()},
+        {title:'Protegerme o a mi familia',desc:'Auto, vida, salud y hogar.',iso:'#ic-personas',go:()=>this.go('personas')},
+        {title:'Tuve un siniestro',desc:'Orientación inmediata, sin iniciar sesión.',iso:'#ic-siniestros',go:()=>this.go('siniestros')},
+        {title:'Soy cliente',desc:'Servicio, documentos y renovaciones.',iso:'#ic-portal',go:()=>this.go('cliente')},
+        {title:'Hablar con un asesor',desc:'Continuidad humana con tu contexto.',iso:'#ic-asesor',go:()=>this.openHandoff()},
+      ],
+      ...this.buildHomeGT(),
+      ...this.buildChain(),
+      ...this.buildCot(),
+      teamMembers:this.teamMembers(), cotRail:this.cotRail(), ...this.buildSobre(),
+      ...this.buildMap(),
+      ...this.buildPersonas(),
+      portalItems:[
+        {t:'Mis pólizas',d:'Vigencias y coberturas en un lugar.',icon:'M12 3l7 4v5c0 4-3 7-7 9-4-2-7-5-7-9V7z'},
+        {t:'Documentos',d:'Certificados y carnés.',icon:'M6 3h9l3 3v15H6zM9 12h6M9 16h4'},
+        {t:'Solicitudes y renovaciones',d:'Endosos y ajustes.',icon:'M20 12a8 8 0 11-2.3-5.6M20 4.5V8h-3.5'},
+        {t:'Siniestros',d:'Casos y seguimiento.',icon:'M12 3l9 16H3zM12 10v4M12 17h.01'},
+        {t:'Pagos y estado',d:'Estado de cuenta (reportado ≠ conciliado).',icon:'M3 7h18v10H3zM3 11h18M7 15h3'}
+      ],
+      clienteItems:[
+        {t:'Siniestros y asistencia',d:'Obtén orientación para reportar un caso o continuar un seguimiento.',icon:'M12 3l9 16H3zM12 10v4M12 17h.01',go:()=>this.go('siniestros')},
+        {t:'Revisar o renovar',d:'Solicita una revisión de lo que cambió antes de decidir si conviene ajustar o comparar.',icon:'M20 12a8 8 0 11-2.3-5.6M20 4.5V8h-3.5',go:()=>this.goRenovar()},
+        {t:'Solicitar una gestión',d:'Pide orientación para endosos, certificados u otros documentos.',icon:'M6 3h9l3 3v15H6zM9 12h6M9 16h4',go:()=>this.openHandoff({source:'cliente',intent:'Solicitar una gestión'})},
+        {t:'Hablar con mi asesor',d:'Continúa por un canal disponible conservando el contexto de esta gestión.',icon:'M4 5h16v10H8l-4 4z',go:()=>this.openHandoff({source:'cliente',intent:'Hablar con mi asesor'})},
+        {t:'Orientación general',d:'Aclara dudas sobre tus pólizas por los canales disponibles.',icon:'M12 3a9 9 0 100 18 9 9 0 000-18M12 11v5M12 8h.01',go:()=>this.goRecursos()},
+        {t:'Documentos y estado',d:'Solicita documentos o consulta con un asesor el estado de una gestión.',icon:'M4 8h16v12H4zM8 13l2 2 4-4M8 5h8',go:()=>this.openHandoff({source:'cliente',intent:'Documentos o estado de una gestión'})},
+      ],
+      recursosItems:[
+        {k:'guia',tag:'GUÍA',t:'Cómo comparar sin mirar solo el precio',iso:'#ic-comparar'},
+        {k:'glo',tag:'GLOSARIO',t:'Deducible, prima y suma asegurada',iso:'#ic-recursos'},
+        {k:'chk',tag:'CHECKLIST',t:'Qué hacer tras un siniestro',iso:'#ic-siniestros'},
+      ],
+      // empresas exposiciones
+      ...this.buildSector(),
+    };
+  }
+}
+</script>
+
+<script id="vl-alys-safe-rail">
+(function(){
+  const GAP=8;
+  const protectedSelector='a,button,input,textarea,select,p,h1,h2,h3,h4,li,td,th,span,em,b,i,small,figcaption,[role="button"],[role="link"]';
+  let raf=0, observer=null;
+  function visible(el){
+    if(!el || el.classList.contains('vl-aifab') || el.closest('.vl-aipanel')) return false;
+    const cs=getComputedStyle(el);
+    if(cs.display==='none'||cs.visibility==='hidden'||Number(cs.opacity)===0) return false;
+    const r=el.getBoundingClientRect();
+    return r.width>1&&r.height>1&&r.bottom>0&&r.right>0&&r.top<innerHeight&&r.left<innerWidth;
+  }
+  function intersects(a,b){return !(a.right<=b.left-GAP||a.left>=b.right+GAP||a.bottom<=b.top-GAP||a.top>=b.bottom+GAP);}
+  function rectAt(x,y,w,h){return {left:x,top:y,right:x+w,bottom:y+h,width:w,height:h};}
+  function currentScreen(){
+    const screens=[...document.querySelectorAll('.vl-screen')].filter(visible);
+    if(!screens.length) return document.body;
+    let best=screens[0],score=-1;
+    for(const s of screens){const r=s.getBoundingClientRect();const inter=Math.max(0,Math.min(r.bottom,innerHeight)-Math.max(r.top,0));if(inter>score){score=inter;best=s;}}
+    return best;
+  }
+  function place(){
+    raf=0;
+    const fab=document.querySelector('.vl-aifab'); if(!fab) return;
+    fab.classList.add('vl-aifab-safe');
+    fab.style.left='auto';fab.style.top='auto';fab.style.right='18px';fab.style.setProperty('bottom','calc(18px + env(safe-area-inset-bottom,0px))','important');
+    const fr=fab.getBoundingClientRect(); const w=Math.ceil(fr.width||52),h=Math.ceil(fr.height||52);
+    const screen=currentScreen();
+    const protectedEls=[...document.querySelectorAll(protectedSelector)]
+      .filter(visible)
+      .filter(el=>!el.contains(fab))
+      // Decorative wrappers such as empty scrims must not block the entire viewport.
+      .filter(el=>!['SPAN','EM','B','I','SMALL','FIGCAPTION'].includes(el.tagName) || (el.textContent||'').trim().length>0);
+    const boxes=protectedEls.map(el=>el.getBoundingClientRect()).filter(r=>r.bottom>0&&r.top<innerHeight);
+    const header=document.querySelector('header'); const hr=header&&visible(header)?header.getBoundingClientRect():null;
+    const minY=Math.max(8,hr?Math.min(innerHeight- h-8,hr.bottom+8):8);
+    const maxY=Math.max(minY,innerHeight-h-8);
+    const xs=[];
+    const rightX=Math.max(8,innerWidth-w-8), leftX=8;
+    xs.push(rightX); if(leftX!==rightX) xs.push(leftX);
+    // If both edge rails are occupied, search interior visual whitespace before collapsing.
+    // Right-biased order preserves the familiar Alys position whenever possible.
+    if(innerWidth<=700){
+      const usable=Math.max(0,innerWidth-w-16);
+      for(const ratio of [0.82,0.66,0.50,0.34,0.18]){
+        const x=Math.max(8,Math.min(rightX,8+Math.round(usable*ratio)));
+        if(!xs.includes(x)) xs.push(x);
+      }
+    } else {
+      xs.push(Math.max(8,innerWidth-w-24));
+    }
+    let candidates=[];
+    for(const x of xs){for(let y=maxY;y>=minY;y-=10)candidates.push([x,y]);}
+    // Prefer the normal bottom-right location, then nearest safe edge slot.
+    candidates.sort((a,b)=>{const da=(rightX-a[0])**2+(maxY-a[1])**2;const db=(rightX-b[0])**2+(maxY-b[1])**2;return da-db;});
+    let chosen=null;
+    outer: for(const [x,y] of candidates){
+      const rr=rectAt(x,y,w,h);
+      for(const b of boxes){if(intersects(rr,b)) continue outer;}
+      chosen=[x,y];break;
+    }
+    if(chosen){fab.style.right='auto';fab.style.setProperty('bottom','auto','important');fab.style.left=chosen[0]+'px';fab.style.top=chosen[1]+'px';fab.style.opacity='1';fab.style.visibility='visible';fab.style.pointerEvents='auto';}
+    else {
+      // Dense viewport fallback: collapse the floating entry rather than cover meaningful content.
+      // It reappears automatically at the next safe scroll position; Alys logic/panel are unchanged.
+      fab.style.opacity='0';fab.style.visibility='hidden';fab.style.pointerEvents='none';
+    }
+  }
+  function schedule(){if(!raf)raf=requestAnimationFrame(place);}
+  function boot(){
+    schedule(); addEventListener('scroll',schedule,{passive:true}); addEventListener('resize',schedule,{passive:true});
+    observer=new MutationObserver(schedule); observer.observe(document.body,{subtree:true,childList:true}); setTimeout(schedule,120); setTimeout(schedule,650); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(schedule).catch(()=>{});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+</script>
+</body>
+</html>
