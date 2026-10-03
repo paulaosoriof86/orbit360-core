@@ -1,0 +1,68 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_NARROW_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "sourceHead": "73f37228ed01d196395dde01ba17515aa1babd8b",
+  "authority": "PAULA_B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
+  "causalEvidence": {
+    "diagnosticBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
+    "driveBackendDiagnosticBlobSha": "9024c81170ac810c35b5ef461ef3700c6b35c226",
+    "driveGuardDiagnosticBlobSha": "e642e4d356c568b18340053f659b103cbe6a5e59",
+    "policyVisualLineageBlobSha": "241a16d434c9d7eb94246a81925e9cbedd183824"
+  },
+  "productBlobs": {
+    "orbit360-platform/modules/cancelaciones.js": "63f6dd1bb3ffad24cf8452404dfc540f1b92e2b7",
+    "orbit360-platform/modules/polizas.js": "68eeb3f15bf608f37090d74853704f0ced804565",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "a351b536ba6d3a34a76f141b86892b63c2a73e24",
+    "orbit360-platform/index.html": "e18173bf7dab5e7f38f9cb8ce5d8d8760c211cce",
+    "orbit360-platform/core/importa.js": "31aee47b3773da7d7f46df7915c29bc7104c0b1d",
+    "functions/document-drive-domain.js": "7b3f9de53bfbedda0879457873676d42d752b925"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "eb27247980cd6d8c3ff49d87e2f9c0161792da73",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "b6e296dff55743f3eba0ce98a338ce195fa21e01",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "d11d28e51432ec18fddbf9f3029044e2493debcf"
+  },
+  "remediatedFindings": [
+    "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
+    "B4-003-R13-02-CANCEL-NONCLIENT-DEEPLINK",
+    "B4-003-R13-03-CANCEL-COUNTRY-IDENTITY-INTEGRITY",
+    "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+    "B4-003-R13-06-POLICY-SEARCH-FREEZE",
+    "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
+    "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
+    "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD"
+  ],
+  "proofOnlyFindings": [
+    "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+    "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION"
+  ],
+  "sourceChanges": {
+    "cancelaciones": "Single indexed relation projection per render; explicit client/policy/cancellation targets; operation country and client identity country are distinct.",
+    "polizas": "Memoized relational/search indexes; coherent relation readiness; 180ms search debounce; bounded render path.",
+    "policyDetail": "Targeted dependency hydration; explicit client/vehicle/receipt loading states; no false blank relation paint.",
+    "importer": "Preview synthetic insurer guard aligned with exact B4003 QA fixture; real operational insurers remain blocked in Preview.",
+    "driveBackend": "Canonical insurer target authority and preview-isolated insurer document handling; preview-only exact file cleanup/readback.",
+    "index": "Exact cache bindings advanced only for changed owners."
+  },
+  "preservedConstraints": {
+    "renewabilityUnknownStillFailClosed": true,
+    "renewalProductOwnerChanged": false,
+    "policyVisualRedesignFromMemory": false,
+    "policyVisualCssRollback": false,
+    "operationalBusinessWrites": 0,
+    "realOperationalDataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productionDriveFunctionsDeployment": false,
+    "realInsurerDriveWrites": false
+  },
+  "syntheticQaAuthorization": {
+    "exactPreviewOnly": true,
+    "allowed": "Existing B4003 synthetic client/policy/renewal/cancel/quality fixtures plus one disposable synthetic insurer/document.",
+    "mandatoryCleanupReadback": true,
+    "realOperationalMutation": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
