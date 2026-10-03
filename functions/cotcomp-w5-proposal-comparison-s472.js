@@ -264,7 +264,7 @@ async function run(){
   if(casePath!==expectedCasePath)throw new Error('S472_QUOTECASE_PATH_INVALID');
   const brand=norm(caseData.capturedFields&&caseData.capturedFields.brand);
   const line=norm(caseData.capturedFields&&caseData.capturedFields.lineModel);
-  if(brand!=='TOYOTA'||!line.includes('YARIS'))throw new Error('S472_W5_RISK_FAMILY_MISMATCH');
+  if(brand!=='TOYOTA'||!line.includes('YARIS'))throw new Error('S472_W5_RISK_FAMILY_MISMATCH:'+brand+'|'+line);
   const caseBeforeDigest=digest(caseData);
 
   const existingProposals=await db.collection(data.pathFor(TENANT_ID,data.ENTITY.PROPOSAL)).where('caseId','==',caseId).limit(8).get();
