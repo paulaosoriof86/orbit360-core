@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_SOURCE_SCOPE_AMENDMENT_V1",
+  "recordedAt": "2026-10-03",
+  "status": "AUTHORIZED_CAUSAL_SCOPE_EXPANSION",
+  "findingId": "B4-003",
+  "rootCauseExtension": "CANCELATION_RECOVERY_LINK_FIELDS_DROPPED_BY_CANONICAL_WORKFLOW_SANITIZER",
+  "evidence": {
+    "frontendOwners": [
+      "orbit360-platform/modules/cancelaciones.js",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+    ],
+    "canonicalServerOwner": "functions/product-ops-leads-domain.js",
+    "demonstratedContractGap": [
+      "Recovery business payload includes polizaId and cancelacionId, but sanitizeBusiness/BUSINESS_MUTABLE_FIELDS do not preserve them.",
+      "Recovery management payload includes cancelacionId, but sanitizeManagement/MANAGEMENT_MUTABLE_FIELDS do not preserve it."
+    ],
+    "risk": "After durable server write/readback, recovery linkage can disappear from the canonical record and allow duplicate follow-up creation after reload."
+  },
+  "addedProductOwner": "functions/product-ops-leads-domain.js",
+  "finalAllowedProductFiles": [
+    "functions/product-ops-leads-domain.js",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+    "orbit360-platform/modules/cancelaciones.js",
+    "orbit360-platform/index.html"
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CAUSAL_SOURCE_FIX"
+}
