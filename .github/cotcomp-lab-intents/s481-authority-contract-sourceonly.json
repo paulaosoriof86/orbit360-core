@@ -1,0 +1,12 @@
+{
+  "schemaVersion":"ays-cotcomp-s481-authority-contract-sourceonly-intent-v1.0",
+  "authorization":"S481_SOURCE_ONLY_GRAVICENTRA_AUTHORITY_CONTRACT",
+  "authorizedSourceParent":"46578b3caf1d2e4ef0d453c6224e38c4463c3dd1",
+  "authority":"GRAVICENTRA",
+  "tenantId":"alianzas-soluciones",
+  "firebaseReads":false,
+  "firebaseWrites":false,
+  "providerOrRater":false,
+  "production":false,
+  "deploy":false
+}
