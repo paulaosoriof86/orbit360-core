@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "ays-cotcomp-s485-schema-intake-preview-lab-intent-v1.0",
+  "authorization": "S485_DEPLOY_SCHEMA_DRIVEN_INTAKE_PREVIEW",
+  "authorizedSourceParent": "caddfce4c6fec5f9f7fb76612b009a805947217c",
+  "providerContractVersion": "gravicentra-quote-authority-v1",
+  "projectId": "ays-orbit-360-lab",
+  "functionName": "cotcompSchemaDrivenIntakePreviewS485",
+  "schemaDriven": true,
+  "multiproduct": true,
+  "fixtureOnly": true,
+  "providerDeploymentAuthorized": false,
+  "cotcompRealTransportAuthorized": false,
+  "appDataReads": false,
+  "appDataWrites": false,
+  "piiFields": false,
+  "quoteCaseWrites": false,
+  "providerOrRater": false,
+  "production": false
+}
