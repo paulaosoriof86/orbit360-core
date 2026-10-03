@@ -1,0 +1,123 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R8_SOURCE_INVENTORY_PASS_1_V1",
+  "recordedAt": "2026-10-03",
+  "sourceHead": "c26516d9a1ab25e29fe22d46e4f523b8645c220a",
+  "status": "SOURCE_INVENTORY_PASS_1_COMPLETE_REQUEST_PACKET_1",
+  "scope": "Read-only inventory of previously available insurer knowledge sources; no operational writes.",
+  "sources": [
+    {
+      "insurer": "Seguros Columna",
+      "country": "GT",
+      "product": "Vehículos/Motocicleta",
+      "source": "Official vehicle quotation dated 2026-09-17 available in Library",
+      "availability": "AVAILABLE",
+      "findings": [
+        "Sample shows prima neta Q1,349.96, IVA Q162.00 and prima total Q1,511.96.",
+        "No numeric issuance expense is charged in the displayed premium breakdown.",
+        "Displayed installment plans from 2 through 12 payments reconcile to the same total within cent rounding; no insurer installment surcharge is demonstrated in this sample."
+      ],
+      "adjudication": "SAMPLE_VALIDATED_EXCEPTION_ANCHOR",
+      "limitation": "Do not generalize to all Columna products/versions without tariff/cotizador authority."
+    },
+    {
+      "insurer": "Aseguradora Rural",
+      "country": "GT",
+      "product": "Gastos Médicos Individual",
+      "source": "Official quotation dated 2026-05-26 available in Library",
+      "availability": "AVAILABLE",
+      "findings": [
+        "Quote states monthly total includes IVA and gastos de emisión."
+      ],
+      "adjudication": "COMPONENT_EXISTENCE_CONFIRMED_RATE_NOT_DERIVABLE",
+      "limitation": "Source does not separately expose the issuance percentage/components required to derive the rate."
+    },
+    {
+      "insurer": "Seguros Universales",
+      "country": "GT",
+      "product": "Gastos Médicos Individual",
+      "source": "Official quotation dated 2026-05-26 available in Library",
+      "availability": "AVAILABLE",
+      "findings": [
+        "Monthly total premiums are available by plan."
+      ],
+      "adjudication": "TOTAL_ONLY_RATE_NOT_DERIVABLE",
+      "limitation": "No decomposed issuance/surcharge rule in this source."
+    },
+    {
+      "insurer": "Ficohsa",
+      "country": "GT",
+      "product": "Auto Prime",
+      "source": "Product material available in Library",
+      "availability": "AVAILABLE",
+      "findings": [
+        "Material states monthly payments up to 10 installments with surcharge and separate Visa Cuotas 3/6/10."
+      ],
+      "adjudication": "PAYMENT_MODE_CONFIRMED_RATE_MISSING",
+      "limitation": "No surcharge percentage table is present in the available material."
+    },
+    {
+      "insurer": "Aseguradora Guatemalteca",
+      "country": "GT",
+      "product": "Vehículos and other historically mapped products",
+      "source": "Historical repository knowledge summary references tariff/cotizador and official quote examples.",
+      "availability": "REFERENCE_PRESENT_PHYSICAL_CURRENT_FILE_NOT_FOUND_IN_PASS_1",
+      "adjudication": "REQUEST_CURRENT_SOURCE_PACKET",
+      "limitation": "Need current official calculator/tariff or a current quotation/policy example before enabling any rate."
+    },
+    {
+      "insurer": "Bantrab/BAM/Banrural/Columna/Universales",
+      "country": "GT",
+      "product": "Multiple",
+      "source": "Historical repo source registry",
+      "availability": "MAPPED_REFERENCE_EXISTS",
+      "adjudication": "REUSE_BEFORE_REUPLOAD",
+      "limitation": "Physical current binaries must be confirmed individually; do not assume historical version remains current."
+    }
+  ],
+  "conclusions": [
+    "Paula's Columna exception is already supported by a current sample for vehicle/motorcycle quotation: no numeric issuance expense and no demonstrated installment surcharge in that sample.",
+    "The 5% GT issuance heuristic remains a review prior, not a universal rule.",
+    "GT installment surcharge cannot be hardcoded universally; available Ficohsa source proves surcharge exists but not its percentage, while Columna sample proves a zero-surcharge exception.",
+    "CO remains no-default-insurer-surcharge pending insurer-specific evidence; issuance is insurer/product specific."
+  ],
+  "packet1Request": {
+    "status": "PAULA_SOURCE_UPLOAD_ALLOWED_PACKET_1",
+    "goal": "Anchor the highest-value general/exception rules with minimal uploads.",
+    "requested": [
+      {
+        "priority": 1,
+        "insurer": "Aseguradora Guatemalteca",
+        "country": "GT",
+        "files": "Current official Excel cotizador/tarifario for vehicles if available + one recent official quote or issued policy showing prima components/payment plan.",
+        "why": "Historical mapping exists but current physical source was not found in pass 1; this can anchor common GT emission/fraccionamiento behavior."
+      },
+      {
+        "priority": 2,
+        "insurer": "Seguros Columna",
+        "country": "GT",
+        "files": "Current official Excel cotizador/tarifario for vehicles if available.",
+        "why": "A current quote already validates the exception sample; Excel can determine whether zero issuance/zero surcharge is rule-level and expose product variants."
+      },
+      {
+        "priority": 3,
+        "insurer": "One Colombian insurer of Paula's choice with active business",
+        "files": "One recent issued policy or official quote showing premium total/components/payment mode; Excel calculator if one exists.",
+        "why": "Anchor CO issuance behavior and verify insurer-as-cash/no-default-surcharge semantics."
+      }
+    ],
+    "optional": "If the Excel itself produces a printable quote, the separate quote/policy example can be omitted for that insurer only if we can reconcile output from the Excel directly.",
+    "doNotSendYet": [
+      "All insurers at once",
+      "31 financial reconciliation cases",
+      "manually transcribed tariff tables"
+    ]
+  },
+  "boundaries": {
+    "operationalWrites": 0,
+    "productMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4004": false
+  },
+  "nextAction": "WAIT_PACKET_1_WHILE_CONTINUING_AVAILABLE_SOURCE_EXTRACTION"
+}
