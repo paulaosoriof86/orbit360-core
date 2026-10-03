@@ -330,7 +330,7 @@ if(activeI65){
       need(FR.currentReadinessPercent===96&&FR.nextTargetPercent===100&&FR.previewAfterEveryBlockRequired===true&&FR.sameArtifactPreviewToLiveRequired===true,'I6_5_FORENSIC_B4_STATE_INVALID');
       need(FR.b4?.executionLockPath===I65_FORENSIC_B4&&git('hash-object',I65_FORENSIC_B4)===FR.b4?.executionLockBlobSha,'I6_5_B4_LOCK_DRIFT');
       need(B4.block==='B4'&&B4.boundaries?.dataMutationAuthorized===false&&B4.boundaries?.reimportAuthorized===false&&B4.boundaries?.livePromotionAuthorized===false,'I6_5_B4_BOUNDARY_INVALID');
-      need(['I6_5_FORENSIC_REMEDIATION_B4_001_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_001_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_002_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_002_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_002_CONTRACT_AND_EXACT_PREVIEW'].includes(C.nextAction),'I6_5_FORENSIC_B4_ACTION_INVALID');
+      need(['I6_5_FORENSIC_REMEDIATION_B4_001_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_001_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_002_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_002_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_002_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_DIAGNOSTIC'].includes(C.nextAction),'I6_5_FORENSIC_B4_ACTION_INVALID');
     }else{
       need(C.nextAction===expectedI65Action,'I6_5_NEXT_ACTION_INVALID');
     }
