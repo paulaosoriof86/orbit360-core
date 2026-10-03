@@ -2803,7 +2803,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "SOURCE_FIXED_R10_QUOTE_AUTHORITY_READY",
+      "status": "SOURCE_FIXED_R10_QUOTE_AUTHORITY_RUNTIME_REACHABLE",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2882,7 +2882,7 @@
       "r9VisibleInPreview": true,
       "r9MultiProduct": true,
       "r10QuoteAuthorityAuthorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_INTEGRATION_LOCK_20261003.json",
-      "r10QuoteAuthorityAuthorizationLockBlobSha": "868a78408791bea719f7d07f5d48a0874df1a8da",
+      "r10QuoteAuthorityAuthorizationLockBlobSha": "1133970e390895a008d761f3936ff9901aea0342",
       "r10QuoteAuthoritySourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_SOURCE_FIX_20261003.json",
       "r10QuoteAuthoritySourceFixReceiptBlobSha": "6400bb9447fa145b6fb8d7c42a1c7dfe4477a4d1",
       "quoteAuthorityContractPath": "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
@@ -2890,7 +2890,9 @@
       "cotcompRealTransportAuthorized": false,
       "r10CompositionRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_COMPOSITION_EXACT_SET_ROOTFIX_20261003.json",
       "r10CompositionRootFixBlobSha": "4cc32b403ad0506f53e473fc620151f0dc8a02c5",
-      "compositionExactSetCount": 94
+      "compositionExactSetCount": 94,
+      "r10RuntimeReachabilityRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_20261003.json",
+      "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea"
     },
     {
       "id": "B4-004",
@@ -6651,13 +6653,13 @@
     }
   },
   "currentB4": {
-    "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_READY",
+    "status": "B4_003_SOURCE_FIXED_R10_QUOTE_AUTHORITY_RUNTIME_REACHABLE",
     "activeFindingId": "B4-003",
     "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "executionLockBlobSha": "f082edc57e939c98a0fe2086a3e444481793bf05",
-    "compositionLockBlobSha": "d9b1a5d73a2cdfd602c59322d4a39e7c29882bcc",
+    "compositionLockBlobSha": "7b6fe473b97f5e7891454178ca948df680f8eeb6",
     "readinessPercent": 96,
     "targetPercent": 100,
     "noLive": true,
@@ -6674,13 +6676,15 @@
     "r9KnowledgeSourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R9_INSURER_KNOWLEDGE_SOURCE_FIX_20261003.json",
     "r9KnowledgeSourceFixReceiptBlobSha": "988c42f1ab11e8f5957086e4acd22ff4a991d4ff",
     "r10QuoteAuthorityAuthorizationLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_INTEGRATION_LOCK_20261003.json",
-    "r10QuoteAuthorityAuthorizationLockBlobSha": "868a78408791bea719f7d07f5d48a0874df1a8da",
+    "r10QuoteAuthorityAuthorizationLockBlobSha": "1133970e390895a008d761f3936ff9901aea0342",
     "r10QuoteAuthoritySourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_SOURCE_FIX_20261003.json",
     "r10QuoteAuthoritySourceFixReceiptBlobSha": "6400bb9447fa145b6fb8d7c42a1c7dfe4477a4d1",
     "quoteAuthorityContractVersion": "gravicentra-quote-authority-v1",
     "r10CompositionRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_COMPOSITION_EXACT_SET_ROOTFIX_20261003.json",
     "r10CompositionRootFixBlobSha": "4cc32b403ad0506f53e473fc620151f0dc8a02c5",
-    "compositionExactSetCount": 94
+    "compositionExactSetCount": 94,
+    "r10RuntimeReachabilityRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_20261003.json",
+    "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea"
   },
   "b4003QaResidueCarry": {
     "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
