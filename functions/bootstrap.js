@@ -8,6 +8,7 @@ module.exports = Object.assign(
   require('./ops-leads-domain'),
   require('./product-ops-leads-domain'),
   require('./ops-advisor-inbox'),
+  require('./notification-outbox-processor'),
   require('./cobros-reconciliation-domain'),
   require('./product-operational-domain'),
   require('./product-insurer-credentials'),

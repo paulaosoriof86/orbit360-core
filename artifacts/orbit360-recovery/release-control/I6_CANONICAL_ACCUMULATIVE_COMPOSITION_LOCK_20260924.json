@@ -36,13 +36,15 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B4",
-  "productFileCount": 82,
+  "productFileCount": 84,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "functions/bootstrap.js",
     "functions/cobros-reconciliation-domain.js",
     "functions/cotcomp-workflow-owner-patch.test.js",
     "functions/document-drive-domain.js",
+    "functions/notification-outbox-processor.js",
+    "functions/ops-advisor-inbox.js",
     "functions/ops-leads-domain.js",
     "functions/package-lock.json",
     "functions/package.json",
@@ -103,6 +105,7 @@
     "orbit360-platform/modules/conciliaciones.js",
     "orbit360-platform/modules/configuracion.js",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+    "orbit360-platform/modules/cronograma.js",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
     "orbit360-platform/modules/equipo.js",
@@ -110,6 +113,7 @@
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "orbit360-platform/modules/polizas.js",
     "orbit360-platform/modules/portal-v1142-copyfix.js",
     "orbit360-platform/modules/portal.js",
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
@@ -117,19 +121,17 @@
     "orbit360-platform/product-runtime-config.js",
     "orbit360-platform/styles/base.css",
     "orbit360-platform/styles/infra.css",
-    "orbit360-platform/sw.js",
-    "orbit360-platform/modules/cronograma.js",
-    "orbit360-platform/modules/polizas.js"
+    "orbit360-platform/sw.js"
   ],
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
-    "functions/bootstrap.js": "ad98eae136e614142cafc858f261ef9c2741f42e",
+    "functions/bootstrap.js": "b9201c7e917658e6c3c3efebd3e221390ce2417d",
     "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
     "functions/document-drive-domain.js": "253b7074c86bb6ce800cc933d10242e9b6096f0a",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
-    "functions/package.json": "05fcda8ff00f6822d11907bd7a6a8d32e264bbc0",
+    "functions/package.json": "473f752a48e4850bdf61ccbf025de69bd1c5290d",
     "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "9800c5140ce415484ccacf086a3657dc66749d0f",
@@ -203,7 +205,9 @@
     "orbit360-platform/styles/infra.css": "53fbdb6ac1fcfae91e64e26d8b600acb910d4588",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
     "orbit360-platform/modules/cronograma.js": "471c84f43de3a86e8b5ad02dcddc24a2a9bc6dcb",
-    "orbit360-platform/modules/polizas.js": "390dd12393d1ac894b844a795093d2c5969f33d5"
+    "orbit360-platform/modules/polizas.js": "390dd12393d1ac894b844a795093d2c5969f33d5",
+    "functions/notification-outbox-processor.js": "47daa1425272f71bbc9ee1bf5968579b0099e75e",
+    "functions/ops-advisor-inbox.js": "23f2bef28af857fbd3ac2349a934771809d3f228"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -2058,15 +2062,15 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_002_CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "status": "B4_002_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-    "lockBlobSha": "90b71accd2820a30486953dfb6ce448730794dcb",
+    "lockBlobSha": "0b0b6b2b2789f5ab83e1e87a4bfce68da19efddd",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
     "productSourceChanged": true,
     "noLive": true,
     "noReimport": true,
     "activeFindingId": "B4-002",
-    "nextAction": "B4_002_CAUSAL_SOURCE_FIX",
+    "nextAction": "B4_002_NOTIFICATION_PROCESSOR_CONTRACT_AND_EXACT_PREVIEW",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
     "sourceSha": "18799ffbb2623dbfd28623774c41abef22f9f75a",
     "buildId": "gi-i65-b4-18799ffbb262-57f234755dc1",
@@ -2115,7 +2119,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "f5891609ceaebb08a91ab5ab33d33d538e03bc76",
+  "findingLedgerBlobSha": "2b827164173b9eabdbb7d0ad8129880944dbed0f",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2128,6 +2132,21 @@
       "functions/package.json",
       "functions/ops-advisor-inbox.js"
     ],
+    "noOperationalDataWrites": true,
+    "noReimport": true,
+    "noLive": true
+  },
+  "b4002SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_CAUSAL_SOURCE_FIX_20261003.json",
+    "blobSha": "b6c06bcd175ec89a1cee8e6f7129adbd25b17029",
+    "exactBlobBindings": {
+      "functions/notification-outbox-processor.js": "47daa1425272f71bbc9ee1bf5968579b0099e75e",
+      "functions/bootstrap.js": "b9201c7e917658e6c3c3efebd3e221390ce2417d",
+      "functions/package.json": "473f752a48e4850bdf61ccbf025de69bd1c5290d",
+      "functions/ops-advisor-inbox.js": "23f2bef28af857fbd3ac2349a934771809d3f228"
+    },
+    "productFileCount": 84,
     "noOperationalDataWrites": true,
     "noReimport": true,
     "noLive": true

@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_002_CAUSAL_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-002",
+  "parentHead": "fe9a1043a6b5d1bd7ffca8c274f5bdbbc98f7ef2",
+  "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
+  "diagnosticReceiptBlobSha": "12183afd6a7a71863e2cd8fd365a847383fc5bee",
+  "rootCause": "CANONICAL_OUTBOX_HAS_NO_EXECUTABLE_DISPATCH_RETRY_OWNER",
+  "fix": {
+    "canonicalOwner": "functions/notification-outbox-processor.js",
+    "semantics": [
+      "Firestore create trigger runs only after notificationOutbox commit.",
+      "Processor refuses delivery until the matching canonical workflowEvent exists.",
+      "Client portal projection uses deterministic event/client identity and merge semantics, so retries are idempotent.",
+      "Advisor/internal visibility remains the canonical notificationOutbox consumed by ops-advisor-inbox.",
+      "Unsupported external channels remain pending_connection; no email/WhatsApp provider delivery is simulated.",
+      "Processing failures persist retry_pending/failed_processing, attemptCount, retryEligible, lastError and nextAttemptAt.",
+      "Authenticated retry callable is explicit and scope-controlled.",
+      "Preview proof uses isolated previewWorkflowEvents/previewNotificationOutbox/previewNotifs only."
+    ],
+    "productBlobs": {
+      "functions/notification-outbox-processor.js": "47daa1425272f71bbc9ee1bf5968579b0099e75e",
+      "functions/bootstrap.js": "b9201c7e917658e6c3c3efebd3e221390ce2417d",
+      "functions/package.json": "473f752a48e4850bdf61ccbf025de69bd1c5290d",
+      "functions/ops-advisor-inbox.js": "23f2bef28af857fbd3ac2349a934771809d3f228"
+    }
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "configWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productSourceChanged": true
+  },
+  "nextAction": "B4_002_NOTIFICATION_PROCESSOR_CONTRACT_AND_EXACT_PREVIEW"
+}

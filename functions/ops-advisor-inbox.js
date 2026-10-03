@@ -5,7 +5,7 @@ const { getFirestore } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
-const VERSION = 'orbit360-ops-advisor-inbox-v1';
+const VERSION = 'orbit360-ops-advisor-inbox-v2-notification-delivery-visibility';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 
@@ -128,8 +128,17 @@ async function inbox(request) {
     status: text(row.status, 80),
     title: text(row.payload && row.payload.title, 240),
     message: text(row.payload && row.payload.message, 1200),
+    attemptCount: Math.max(0, Number(row.attemptCount) || 0),
+    retryEligible: row.retryEligible === true,
+    lastError: text(row.lastError, 800),
+    nextAttemptAt: row.nextAttemptAt || null,
+    processedAt: row.processedAt || null,
+    channelStates: row.channelStates && typeof row.channelStates === 'object' ? row.channelStates : {},
+    externalChannelsPendingConnection: unique(row.externalChannelsPendingConnection || []),
     createdAt: row.createdAt || null
   }));
+  const noticeStatusCounts = {};
+  notices.forEach(row => { const key = row.status || '(blank)'; noticeStatusCounts[key] = (noticeStatusCounts[key] || 0) + 1; });
   return {
     ok: true,
     version: VERSION,
@@ -140,6 +149,7 @@ async function inbox(request) {
     managements,
     businesses,
     notices,
+    noticeStatusCounts,
     counts: { managements: managements.length, businesses: businesses.length, notices: notices.length }
   };
 }

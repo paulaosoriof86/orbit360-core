@@ -2752,10 +2752,10 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Notifications/automation occur only after committed domain events with retry/failure visibility.",
-      "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "B4_002_CAUSAL_SOURCE_FIX",
+      "nextAction": "B4_002_NOTIFICATION_PROCESSOR_CONTRACT_AND_EXACT_PREVIEW",
       "rootCause": "CANONICAL_OUTBOX_HAS_NO_EXECUTABLE_DISPATCH_RETRY_OWNER",
       "causeClassification": "PRODUCT_BACKEND_NOTIFICATION_DELIVERY_GAP",
       "evidence": {
@@ -2777,7 +2777,15 @@
         "functions/bootstrap.js",
         "functions/package.json",
         "functions/ops-advisor-inbox.js"
-      ]
+      ],
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_CAUSAL_SOURCE_FIX_20261003.json",
+      "sourceFixReceiptBlobSha": "b6c06bcd175ec89a1cee8e6f7129adbd25b17029",
+      "productBlobBindings": {
+        "functions/notification-outbox-processor.js": "47daa1425272f71bbc9ee1bf5968579b0099e75e",
+        "functions/bootstrap.js": "b9201c7e917658e6c3c3efebd3e221390ce2417d",
+        "functions/package.json": "473f752a48e4850bdf61ccbf025de69bd1c5290d",
+        "functions/ops-advisor-inbox.js": "23f2bef28af857fbd3ac2349a934771809d3f228"
+      }
     },
     {
       "id": "B4-003",
