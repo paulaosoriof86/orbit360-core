@@ -1,0 +1,15 @@
+{
+  "schemaVersion":"ays-cotcomp-s479-catalog-delivery-lab-intent-v1.0",
+  "authorization":"S479_DEPLOY_LAB_CATALOG_DELIVERY",
+  "authorizedSourceParent":"1e7b9a4c0dc9163a4a823565f11d2306c2e6b083",
+  "projectId":"ays-orbit-360-lab",
+  "tenantId":"alianzas-soluciones",
+  "functionName":"cotcompVehicleCatalogS479",
+  "catalogDigestSha256":"89a77e66025945d015cc51704441a97437286022cafeef4995962fd750358df8",
+  "expectedEntries":2216,
+  "expectedBrands":119,
+  "appDataReads":false,
+  "appDataWrites":false,
+  "providerOrRater":false,
+  "production":false
+}
