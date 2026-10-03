@@ -21,8 +21,8 @@
   },
   "qaBlobs": {
     "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "eb27247980cd6d8c3ff49d87e2f9c0161792da73",
-    "tools/gravicentra-i6-5-b4-003-contract.mjs": "b6e296dff55743f3eba0ce98a338ce195fa21e01",
-    ".github/workflows/gravicentra-b4-003-executor.yml": "333b731f936a3142aed0b315487ad31121a92fb9"
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "ccd4e13cfdafa225b5472007c877d3f528b3f93f",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "49225c8d457990dfabb04698be22933b12a65252"
   },
   "remediatedFindings": [
     "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
@@ -70,5 +70,7 @@
     "exactDriveCleanupCallable": true,
     "workflowDeploysPreviewCleanupOnly": true,
     "productionDriveFunctionsDeployment": false
-  }
+  },
+  "versionedExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
+  "versionedExecutionLockBlobSha": "66a1f431150b772ba0eadaef8c918cfabefd140c"
 }
