@@ -1,0 +1,15 @@
+{
+  "schemaVersion":"ays-cotcomp-s480-dropdown-ux-preview-lab-intent-v1.0",
+  "authorization":"S480_DEPLOY_ZERO_PERSISTENCE_DROPDOWN_PREVIEW",
+  "authorizedSourceParent":"68eb5b55fced8e01bff6d0acd0174af56f602155",
+  "projectId":"ays-orbit-360-lab",
+  "tenantId":"alianzas-soluciones",
+  "functionName":"cotcompVehicleDropdownPreviewS480",
+  "catalogFunctionName":"cotcompVehicleCatalogS479",
+  "appDataReads":false,
+  "appDataWrites":false,
+  "piiFields":false,
+  "quoteCaseWrites":false,
+  "providerOrRater":false,
+  "production":false
+}
