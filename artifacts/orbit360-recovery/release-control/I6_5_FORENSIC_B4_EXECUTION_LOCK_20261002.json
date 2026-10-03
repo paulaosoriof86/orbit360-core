@@ -83,16 +83,17 @@
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
     "syntheticQaWritesAuthorized": true,
-    "syntheticQaScope": "B4-003 exact Preview only: isolated synthetic renewal/cancelation fixtures plus read-only render probe; mandatory cleanup; no operational record mutation."
+    "syntheticQaScope": "B4-003 exact Preview only: isolated synthetic renewal/cancelation fixtures plus read-only render probe; mandatory cleanup; no operational record mutation.",
+    "paulaVisualAcceptanceRequiredBeforeAdvance": true
   },
   "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "4f6805a6c3b7b16074db0457251aab0c2cd557e4"
+    "blobSha": "2930a48f91264e8b39f2dae2712dd9b783fc8fb9"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "e1875d4983db372dbc6ba5888dd3ad295745174d"
+    "blobSha": "ba5a0a38458e40063cd724dd345df106b464a937"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -265,5 +266,18 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "visualAcceptance": {
+    "status": "ENFORCED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
+    "receiptBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
+    "machinePassMayAdvanceFinding": false,
+    "cumulativeReviewThrough": [
+      "B4-001",
+      "B4-002",
+      "B4-003"
+    ],
+    "nextFindingHeld": "B4-004",
+    "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS"
   }
 }
