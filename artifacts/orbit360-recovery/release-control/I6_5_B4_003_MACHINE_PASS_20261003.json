@@ -1,0 +1,113 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_MACHINE_PASS_V1",
+  "recordedAt": "2026-10-03T04:29:04.150Z",
+  "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "findingId": "B4-003",
+  "sourceSha": "cc273dc3d124a9b2ab1d4100c3b6fc18763e7101",
+  "buildId": "gi-i65-b4-cc273dc3d124-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37096401618-undk2u42.web.app",
+  "channelId": "gi-i65-b4-37096401618",
+  "runId": 37096401618,
+  "artifactId": 11264951043,
+  "artifactDigest": "15111cb066fa148147e75feccf4766f4e5f84b68741867c4941460fc9ebde002",
+  "hostedPayloadDigest": "46c9f79ef4d5013a112a6851ab9f6be9c71cca658edf4e88674bce0560cd5c7b",
+  "backendSourceDigest": "d1c2d3dc19a9120dd12c21346f99379c17ed016a417ad397aadad6e865db255d",
+  "bundleDigest": "bdb99375d93da20e57a6697895f6009dda0c0db8de0c3062a9e0cb13860861d9",
+  "exactHostingReadback": true,
+  "assertions": {
+    "qaResidueReadOnlyAdjudicated": true,
+    "cancellationProjectionConsistent": true,
+    "authenticatedHydration": true,
+    "noDelayedRenewalRenderMutation": true,
+    "renewalCampaignDurableReadback": true,
+    "cancelationDurableReadback": true,
+    "recoveryLinkagePreserved": true,
+    "recoveryIdempotentRetry": true,
+    "previewGeneralWriteIsolation": true,
+    "noOperationalRealRowsWritten": true,
+    "cleanupComplete": true
+  },
+  "renewalRenderStability": {
+    "mutationCount": 0,
+    "textStable": true,
+    "route": "renovaciones"
+  },
+  "qaResidue": {
+    "rows": [
+      {
+        "id": "pol_mulsmxsk",
+        "exists": true,
+        "numero": "B2-REN-36489784713",
+        "renuevaDe": "b2-r9195-policy-36489784713",
+        "parentExists": false,
+        "previewWrite": false,
+        "syntheticFlag": false,
+        "createdAt": "",
+        "dependents": {
+          "gestiones": 0,
+          "recibosEsperados": 2,
+          "carteraPrimas": 2,
+          "cobros": 0,
+          "vehiculos": 0,
+          "cancelaciones": 0
+        },
+        "dependentTotal": 4
+      },
+      {
+        "id": "pol_mulssmuz",
+        "exists": true,
+        "numero": "B2-REN-36490245512",
+        "renuevaDe": "b2-r9195-policy-36490245512",
+        "parentExists": false,
+        "previewWrite": false,
+        "syntheticFlag": false,
+        "createdAt": "",
+        "dependents": {
+          "gestiones": 0,
+          "recibosEsperados": 2,
+          "carteraPrimas": 2,
+          "cobros": 0,
+          "vehiculos": 0,
+          "cancelaciones": 0
+        },
+        "dependentTotal": 4
+      },
+      {
+        "id": "pol_mulsxofx",
+        "exists": true,
+        "numero": "B2-REN-36490640789",
+        "renuevaDe": "b2-r9195-policy-36490640789",
+        "parentExists": false,
+        "previewWrite": false,
+        "syntheticFlag": false,
+        "createdAt": "",
+        "dependents": {
+          "gestiones": 0,
+          "recibosEsperados": 2,
+          "carteraPrimas": 2,
+          "cobros": 0,
+          "vehiculos": 0,
+          "cancelaciones": 0
+        },
+        "dependentTotal": 4
+      }
+    ],
+    "patternConsistent": true,
+    "parentsAbsent": true,
+    "noDependents": false,
+    "classification": "AMBIGUOUS_FAIL_CLOSED"
+  },
+  "qaResidueDisposition": "NOT_DELETED_FAIL_CLOSED",
+  "qaResidueDeletedCount": 0,
+  "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B2_QA_RESIDUE_ADJUDICATION_20261003.json",
+  "qaResidueAdjudicationReceiptBlobSha": "4ce53c97521e792641fb9d5b78cf8f54c6e26ce0",
+  "syntheticQaWrites": 4,
+  "cleanupWrites": 25,
+  "syntheticFinalAbsent": true,
+  "pageErrors": [],
+  "consoleErrors": [],
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+}

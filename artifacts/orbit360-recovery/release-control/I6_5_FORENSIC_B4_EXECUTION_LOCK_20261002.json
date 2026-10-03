@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-02",
-  "status": "B4_003_SOURCE_FIXED_R4_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,20 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Targeted regression closure for Renovaciones and Cancelaciones.",
-    "status": "SOURCE_FIXED_R4_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
     "blocking": true,
-    "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
-    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
-    "diagnosticReceiptBlobSha": "b6aa15478a30a70a839e06cef8037f527480a13c",
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
-    "adjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DIAGNOSTIC_ADJUDICATION_20261003.json",
-    "adjudicationReceiptBlobSha": "673b47a036eb5f87c5e0e9dbf5d2abd709202b8f",
-    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_20261003.json",
-    "sourceFixReceiptBlobSha": "f05e04e6184a3e8ffa49eead631d94cbb68bb1c4",
-    "sourceFixR2ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R2_20261003.json",
-    "sourceFixR2ReceiptBlobSha": "5c2d3ff811e1b40f5d805cc55126696c63b09a96",
-    "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
-    "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0"
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "humanVisualStatus": "PENDING"
   },
   "rules": {
     "preserveB1B2B3Pass": true,
@@ -82,18 +72,18 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": true,
+    "syntheticQaWritesAuthorized": false,
     "syntheticQaScope": "B4-003 exact Preview only: isolated synthetic renewal/cancelation fixtures plus read-only render probe; mandatory cleanup; no operational record mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true
   },
-  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "2930a48f91264e8b39f2dae2712dd9b783fc8fb9"
+    "blobSha": "66587062b56fb99046a62dcd1e3ff9b505e13b9e"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "ba5a0a38458e40063cd724dd345df106b464a937"
+    "blobSha": "935b5bf3a2fc67d2002f5bdf35b0b9bc4db3f283"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -108,23 +98,18 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
-    "B4_003_RENEWALS_CANCELATIONS_CONTRACT_PASS",
-    "B4_003_EXACT_PREVIEW_DURABLE_READBACK_PASS",
-    "B4_003_NO_DELAYED_RENEWAL_RENDER_MUTATION",
-    "B4_003_QA_RESIDUE_READONLY_ADJUDICATION",
-    "B4_003_SYNTHETIC_FINAL_ABSENT",
-    "B4_003_PROVEN_B2_QA_RESIDUE_EXACT_CLEANUP_OR_FAIL_CLOSED"
+    "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
   "candidate": {
-    "sourceSha": "cb43730733a1c3f68b2bc8a0ec5d7bc4c64159da",
-    "buildId": "gi-i65-b4-cb43730733a1-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37084067150-984oh27l.web.app",
-    "runId": 37084067150,
-    "artifactId": 11260042183,
-    "artifactDigest": "686c12339b1800329b065b4d9717bfbd3c160fe46c78421c58a0729fd38fdfc5",
-    "hostedPayloadDigest": "45785709c090597c4eb455ee2a3a2a4cc3c64040a12d14f701bf492aeebdcae2",
-    "backendSourceDigest": "ab62af6a36830fbb528e7e4e7a67c229fcabf1d7708f66a4c77e0f350b156ee5",
-    "bundleDigest": "0b9b037cae0f368be62ebeada6c5f42a763f7bd0a93da7b7d8e549d0b6795a19",
+    "sourceSha": "cc273dc3d124a9b2ab1d4100c3b6fc18763e7101",
+    "buildId": "gi-i65-b4-cc273dc3d124-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37096401618-undk2u42.web.app",
+    "runId": 37096401618,
+    "artifactId": 11264951043,
+    "artifactDigest": "15111cb066fa148147e75feccf4766f4e5f84b68741867c4941460fc9ebde002",
+    "hostedPayloadDigest": "46c9f79ef4d5013a112a6851ab9f6be9c71cca658edf4e88674bce0560cd5c7b",
+    "backendSourceDigest": "d1c2d3dc19a9120dd12c21346f99379c17ed016a417ad397aadad6e865db255d",
+    "bundleDigest": "bdb99375d93da20e57a6697895f6009dda0c0db8de0c3062a9e0cb13860861d9",
     "exactReadback": true
   },
   "b4002Diagnostic": {
