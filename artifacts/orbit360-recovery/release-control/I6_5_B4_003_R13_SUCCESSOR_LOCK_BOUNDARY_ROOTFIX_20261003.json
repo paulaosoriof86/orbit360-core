@@ -1,0 +1,24 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_SUCCESSOR_LOCK_BOUNDARY_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "GOVERNANCE_LOCK_BOUNDARY_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B4-003",
+  "failedRunId": 37162185356,
+  "failedJobId": 111317765435,
+  "failureCode": "I6_5_B4_BOUNDARY_INVALID",
+  "classification": "GOVERNANCE_LOCK_SCHEMA_GAP",
+  "rootCause": "The new versioned R13 successor lock carried the correct write/reimport/live boundaries but omitted the explicit top-level block='B4' field required by the canonical I6 guard.",
+  "fix": {
+    "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
+    "lockBlobSha": "e44e234b933b81691a7d5760f0d1b5c60cbcaeb1",
+    "block": "B4",
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false
+  },
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
