@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-03",
-  "status": "B4_003_PAULA_VISUAL_REJECTED_R13_DIAGNOSTIC_REQUIRED",
+  "status": "B4_003_R13_CAUSAL_DIAGNOSTIC_COMPLETE_NARROW_SOURCE_FIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "PAULA_VISUAL_REJECTED_R13_DIAGNOSTIC_REQUIRED",
+    "status": "R13_CAUSAL_DIAGNOSTIC_COMPLETE_NARROW_SOURCE_FIX_AUTHORIZED",
     "blocking": true,
-    "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+    "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
     "humanVisualStatus": "REJECTED_R13",
     "knowledgePreview": true
   },
@@ -59,50 +59,39 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "allowedProductFiles": [
-      "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js",
-      "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js",
-      "orbit360-platform/modules/aseguradoras.js",
-      "tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs",
-      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-      ".github/workflows/gravicentra-b4-003-executor.yml",
-      "orbit360-platform/core/quote-authority-contract-v1.js",
-      "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js",
-      "orbit360-platform/core/quote-comparison-contracts-v1203.js",
-      "orbit360-platform/modules/cotizador-v1203-source-gate.js",
-      "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
-      "tools/gravicentra-quote-authority-contract-v1.mjs",
-      "orbit360-platform/index.html",
       "orbit360-platform/modules/cancelaciones.js",
-      "orbit360-platform/modules/renovaciones.js",
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
-      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/modules/calidad.js",
-      "orbit360-platform/styles/infra.css",
-      "tools/gravicentra-i6-5-b4-003-contract.mjs",
-      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
-      "orbit360-platform/core/importa.js",
-      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      "orbit360-platform/modules/polizas.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/index.html"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
-    "syntheticQaScope": "B4-003 R11 exact Preview only; synthetic rows only; mandatory cleanup/readback; no real operational record mutation.",
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaScope": "R13-10 only: exact Preview, one disposable B4 synthetic insurer/document test, mandatory Drive/linkage/reload readback and cleanup; no real insurer/client mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
     "providerDeploymentAuthorized": false,
-    "findingContinuityGuardRequired": true
+    "findingContinuityGuardRequired": true,
+    "allowedQaFiles": [
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ],
+    "renewalProductMutationAuthorized": false,
+    "policyVisualMutationAuthorized": false,
+    "realInsurerDriveWritesAuthorized": false,
+    "realClientDriveWritesAuthorized": false
   },
-  "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC",
+  "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "fd09f8ec9ac14ac51cc6f89f3707a2e49af0032e"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "88c8f75e24f9371f1af338e3ad51b310e3bdefbd"
+    "blobSha": "12fd1ce7ae09667823268d39a6e753b0b097752a"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -117,6 +106,10 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
+    "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
+    "B4_003_R13_RENEWAL_REAL_DISTRIBUTION_PROOF",
+    "B4_003_R13_POLICY_VISUAL_LINEAGE_PROOF",
+    "B4_003_R13_INSURER_DRIVE_CONTROLLED_E2E",
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
   "candidate": {
@@ -392,9 +385,9 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "77e677bb3b69a6a5fd87270553699747ad242a7a",
-    "inventoryCount": 181,
-    "attentionCount": 76,
+    "blobSha": "22ca21cebb91d40d4faeb506a282a8f2bc3f659d",
+    "inventoryCount": 191,
+    "attentionCount": 86,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "guardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -493,5 +486,33 @@
     "newBlockingFindingCount": 10,
     "productSourceChanged": false,
     "nextAction": "B4_003_R13_READONLY_CAUSAL_DIAGNOSTIC"
+  },
+  "r13CausalDiagnostic": {
+    "status": "READONLY_DIAGNOSTIC_COMPLETE",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
+    "receiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
+    "parentHead": "c3e6ada9ccf5de742041e870dd77e0d1f4b2833e",
+    "demonstratedSourceFixFindingIds": [
+      "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
+      "B4-003-R13-02-CANCEL-NONCLIENT-DEEPLINK",
+      "B4-003-R13-03-CANCEL-COUNTRY-IDENTITY-INTEGRITY",
+      "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+      "B4-003-R13-06-POLICY-SEARCH-FREEZE",
+      "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
+      "B4-003-R13-08-REFRESH-CLIENT-FLICKER"
+    ],
+    "proofBeforeProductMutationFindingIds": [
+      "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+      "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION"
+    ],
+    "e2eProofOnlyFindingIds": [
+      "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD"
+    ],
+    "productSourceChanged": false,
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS"
   }
 }
