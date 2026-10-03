@@ -4859,7 +4859,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
-      "executionLockBlobSha": "7aa601662087d38c49b002164c358e548e38c620",
+      "executionLockBlobSha": "32a8633068ec15c532b94afcf914f1224fed18b5",
       "compositionLockBlobSha": "19bf2c5b66257492326937aabd8c4d17fd806415",
       "findingLedgerBlobSha": "f8e89c8a58d0b11e95a5f6583b640b4450a78c53",
       "activeFindingId": "B4-003",
@@ -5315,6 +5315,16 @@
         "failedRunId": 37162367038,
         "failedJobId": 111318262858,
         "productSourceChanged": true
+      },
+      "policyRouteRuntimeRootFix": {
+        "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_ROOTFIX_20261003.json",
+        "blobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
+        "failedRunId": 37162367038,
+        "productBlobs": {
+          "orbit360-platform/modules/polizas.js": "56a1c67d976a96e047cbc98b38e60920b102614d",
+          "orbit360-platform/index.html": "dc9dc2ee100bd146cf99574e2eb64826a85f0976"
+        }
       }
     }
   },
@@ -5633,7 +5643,7 @@
     "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "7aa601662087d38c49b002164c358e548e38c620",
+    "executionLockBlobSha": "32a8633068ec15c532b94afcf914f1224fed18b5",
     "compositionLockBlobSha": "19bf2c5b66257492326937aabd8c4d17fd806415",
     "findingLedgerBlobSha": "f8e89c8a58d0b11e95a5f6583b640b4450a78c53",
     "noLive": true,
@@ -6085,6 +6095,16 @@
       "failedRunId": 37162367038,
       "failedJobId": 111318262858,
       "productSourceChanged": true
+    },
+    "policyRouteRuntimeRootFix": {
+      "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_ROOTFIX_20261003.json",
+      "blobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
+      "failedRunId": 37162367038,
+      "productBlobs": {
+        "orbit360-platform/modules/polizas.js": "56a1c67d976a96e047cbc98b38e60920b102614d",
+        "orbit360-platform/index.html": "dc9dc2ee100bd146cf99574e2eb64826a85f0976"
+      }
     }
   },
   "b4VisualAcceptanceControl": {
