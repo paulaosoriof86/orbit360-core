@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-02",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_SOURCE_FIXED_R5_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -37,11 +37,13 @@
   ],
   "activeFinding": {
     "id": "B4-003",
-    "title": "Targeted regression closure for Renovaciones and Cancelaciones.",
-    "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "title": "Targeted regression closure for Renovaciones, Cancelaciones and visible calendar scope.",
+    "status": "B4_003_SOURCE_FIXED_R5_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING"
+    "rootCause": "PAULA_VISUAL_REJECTION_COUNTRY_SCOPE_KPI_LAYOUT_AND_CRONOGRAMA_VISIBILITY",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "sourceFixR5ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R5_SOURCE_FIX_20261003.json",
+    "sourceFixR5ReceiptBlobSha": "cc2b950989344acfdade4a38dcc537c088b1819a"
   },
   "rules": {
     "preserveB1B2B3Pass": true,
@@ -60,30 +62,27 @@
     "dataMutationAuthorized": false,
     "productMutationAuthorized": false,
     "allowedProductFiles": [
-      "functions/product-ops-leads-domain.js",
-      "functions/product-operational-domain.js",
-      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/modules/cancelaciones.js",
       "orbit360-platform/modules/renovaciones.js",
       "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
-      "orbit360-platform/modules/renewals-v1200-permission-guard.js",
-      "orbit360-platform/modules/renewals-v1201-issued-filter.js",
-      "orbit360-platform/modules/cancelaciones.js",
+      "orbit360-platform/modules/cronograma.js",
       "orbit360-platform/index.html"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
-    "syntheticQaScope": "B4-003 exact Preview only: isolated synthetic renewal/cancelation fixtures plus read-only render probe; mandatory cleanup; no operational record mutation.",
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaScope": "B4-003 R5 exact Preview only; mandatory cleanup; no operational record mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true
   },
-  "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "66587062b56fb99046a62dcd1e3ff9b505e13b9e"
+    "blobSha": "8aff8fe9384398d0935e97c5a86f1a6f27473d35"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "935b5bf3a2fc67d2002f5bdf35b0b9bc4db3f283"
+    "blobSha": "ae58808a334db4322fe40783f5bf78a74eea5c6b"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -98,6 +97,8 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
+    "B4_003_R5_CONTRACT_PASS",
+    "B4_003_R5_EXACT_PREVIEW_MACHINE_PASS",
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
   "candidate": {
