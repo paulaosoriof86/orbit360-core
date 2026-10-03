@@ -7,7 +7,7 @@ test('real quote corpus includes all 16 uploaded insurer PDFs in 5 risk clusters
   assert.equal(s.clusters,5);
   assert.equal(s.sourceDocuments,16);
   assert.equal(s.uniqueInsurers,10);
-  assert.equal(s.currentW5Clusters,1);
+  assert.equal(s.currentW5Clusters,0);
 });
 
 test('motorcycle corpus preserves four real insurer sources',()=>{
@@ -30,10 +30,11 @@ test('La Ceiba CX-5 two-column labels remain validation-needed',()=>{
   assert.equal(lc.alternatives.every(a=>a.labelNeedsValidation===true),true);
 });
 
-test('only Yaris cluster is eligible as current W5 documentary family',()=>{
+test('no documentary corpus cluster is marked as current W5 after Corolla 2006 correction',()=>{
   const xs=c.CLUSTERS.filter(x=>x.currentW5Case);
-  assert.equal(xs.length,1);
-  assert.equal(xs[0].clusterId,'GT_AUTO_YARIS_2008_37500');
-  assert.equal(xs[0].sources.length,2);
-  assert.equal(xs[0].sources.flatMap(s=>s.alternatives).length,3);
+  assert.equal(xs.length,0);
+  const yaris=c.CLUSTERS.find(x=>x.clusterId==='GT_AUTO_YARIS_2008_37500');
+  assert.equal(yaris.currentW5Case,false);
+  assert.equal(yaris.sources.length,2);
+  assert.equal(yaris.sources.flatMap(s=>s.alternatives).length,3);
 });
