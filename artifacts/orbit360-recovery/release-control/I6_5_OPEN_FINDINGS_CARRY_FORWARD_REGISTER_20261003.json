@@ -2274,16 +2274,17 @@
     {
       "id": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
       "block": "B4",
-      "status": "SOURCE_CONTRACT_PRESENT_CONTROLLED_PREVIEW_E2E_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_NARROW_BACKEND_FIX_AUTHORIZED",
       "blocking": true,
       "owner": "orbit360-platform/modules/aseguradoras.js + orbit360-platform/core/importa.js",
       "targetGate": "B4-003",
       "closureCondition": "Controlled disposable file proves Drive readback, exact insurer/source provenance, reload persistence, fail-closed downstream enablement and cleanup/rollback.",
       "source": "PAULA_R13",
-      "nextAction": "B4_003_R13_INSURER_DRIVE_CONTROLLED_E2E",
-      "classification": "E2E_PROOF_REQUIRED_SOURCE_CONTRACT_PRESENT",
-      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
-      "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d"
+      "nextAction": "B4_003_R13_DRIVE_BACKEND_NARROW_SOURCE_FIX",
+      "classification": "PRODUCT_BACKEND_DOCUMENT_TARGET_AUTHORITY_DEFECT_DEMONSTRATED",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_DRIVE_BACKEND_CAUSAL_DIAGNOSTIC_20261003.json",
+      "diagnosticReceiptBlobSha": "9024c81170ac810c35b5ef461ef3700c6b35c226",
+      "rootCauseCode": "DOCUMENT_DRIVE_BACKEND_CLIENT_ONLY_TARGET_AUTHORITY_DOES_NOT_SUPPORT_INSURER_ENTITY_OR_INSURER_DOC_REFS"
     }
   ],
   "attentionIds": [
