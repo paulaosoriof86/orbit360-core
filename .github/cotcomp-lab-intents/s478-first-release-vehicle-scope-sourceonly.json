@@ -1,0 +1,13 @@
+{
+  "schemaVersion":"ays-cotcomp-s478-first-release-vehicle-scope-sourceonly-intent-v1.0",
+  "authorization":"S478_FIRST_RELEASE_VEHICLE_SCOPE_SOURCEONLY",
+  "authorizedSourceParent":"2fe390bc2ff9054988f0723f1f6459a461c6fb4c",
+  "projectId":"ays-orbit-360-lab",
+  "tenantId":"alianzas-soluciones",
+  "catalogDigestSha256":"89a77e66025945d015cc51704441a97437286022cafeef4995962fd750358df8",
+  "appDataReads":false,
+  "appDataWrites":false,
+  "deployment":false,
+  "providerOrRater":false,
+  "production":false
+}
