@@ -95,7 +95,7 @@
   "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "f2a07f7bb4b11749f286dde5eeb7e87690ad2b34"
+    "blobSha": "1c5272683754e0cde9563a59e23d4dafb1093c4f"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -378,7 +378,7 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "a2870bd5ccb759745d5e7521eb5ae58d6e4eeccf",
+    "blobSha": "e55b362ea481b056ac5949379b68fca88717a579",
     "inventoryCount": 181,
     "attentionCount": 76,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",

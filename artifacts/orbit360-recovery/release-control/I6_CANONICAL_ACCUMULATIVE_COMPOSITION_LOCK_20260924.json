@@ -2486,7 +2486,7 @@
     "proofBlobSha": "a87a013f6ba8a1183bce8555a08af9f236872137",
     "workflowBlobSha": "4a78aa3f9cd51d26455dbadc0a3310beb82f1682",
     "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "continuityRegisterBlobSha": "a2870bd5ccb759745d5e7521eb5ae58d6e4eeccf",
+    "continuityRegisterBlobSha": "e55b362ea481b056ac5949379b68fca88717a579",
     "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "continuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
     "productSourceChanged": false,
