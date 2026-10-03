@@ -620,6 +620,72 @@ try{
  need(dup.size===1,'B4_003_RECOVERY_DUPLICATE_CREATED');
  proof.assertions.recoveryIdempotentRetry=true;
 
+ // R13: controlled insurer Drive E2E on one disposable B4003 QA insurer only.
+ await page.waitForFunction(id=>{
+   const st=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
+   return (st.serverConfirmedCollections||[]).includes('aseguradoras')&&!!Orbit.store.get('aseguradoras',id);
+ },ids.insurer,{timeout:30000});
+ const driveProbe=await page.evaluate(async()=>{
+   const p=Orbit.productDriveDocumentProviderP0;
+   if(!p||typeof p.probe!=='function')return{available:false,status:'provider_missing'};
+   return await p.probe(true);
+ });
+ proof.r13InsurerDrive={probe:driveProbe};
+ need(driveProbe&&driveProbe.available===true,'B4_003_R13_DRIVE_PROVIDER_NOT_AVAILABLE:'+JSON.stringify(driveProbe));
+ await page.evaluate(ids=>{
+   Orbit.importa.open('docs-aseguradora',{
+     multi:false,
+     modo:'documental',
+     scope:{aseguradoraId:ids.insurer,aseguradoraNombre:'B4 R13 Aseguradora QA',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'QA'},
+     documentIntent:'tarifa',
+     docCategory:'Tarifario'
+   });
+ },ids);
+ await page.waitForSelector('#imp-file',{timeout:10000});
+ const driveFileName='b4-r13-drive-'+run+'.csv';
+ await page.setInputFiles('#imp-file',{name:driveFileName,mimeType:'text/csv',buffer:Buffer.from('concepto,valor\nqa_r13,'+run+'\n','utf8')});
+ await page.waitForSelector('#imp-finish',{timeout:10000});
+ await page.click('#imp-finish');
+ await page.waitForFunction(()=>!document.getElementById('imp-back')?.classList.contains('open'),null,{timeout:60000});
+ const insurerAfterUpload=(await ref('aseguradoras',ids.insurer).get()).data()||{};
+ const insurerDocs=Array.isArray(insurerAfterUpload.docs)?insurerAfterUpload.docs:[];
+ const driveDoc=insurerDocs.find(d=>String(d&&d.nombre||'')===driveFileName)||insurerDocs[insurerDocs.length-1]||null;
+ need(!!driveDoc&&clean(driveDoc.documentRef),'B4_003_R13_INSURER_DRIVE_DOCUMENT_LINK_MISSING');
+ need(driveDoc.requiereValidacion===true&&driveDoc.estado==='Documento recibido','B4_003_R13_INSURER_DRIVE_VALIDATION_STATE_INVALID');
+ need(driveDoc.provenance?.repository==='Drive'&&driveDoc.provenance?.confirmed===true&&clean(driveDoc.provenance?.documentRef)===clean(driveDoc.documentRef),'B4_003_R13_INSURER_DRIVE_PROVENANCE_INVALID');
+ need(insurerAfterUpload.cotizadorHabilitado!==true&&insurerAfterUpload.comparativoHabilitado!==true&&insurerAfterUpload.iaHabilitada!==true,'B4_003_R13_INSURER_DRIVE_AUTO_ENABLEMENT_FORBIDDEN');
+ const driveResolve=await page.evaluate(async ({documentRef,insurerId})=>{
+   const p=Orbit.productDriveDocumentProviderP0;
+   return await p.resolve(documentRef,{entidad:'aseguradora',entidadId:insurerId,aseguradoraId:insurerId});
+ },{documentRef:driveDoc.documentRef,insurerId:ids.insurer});
+ need(driveResolve&&driveResolve.ok===true&&driveResolve.status==='disponible','B4_003_R13_INSURER_DRIVE_READBACK_FAILED:'+JSON.stringify(driveResolve));
+ proof.r13InsurerDrive.upload={documentRef:driveDoc.documentRef,nombre:driveDoc.nombre,estado:driveDoc.estado,requiereValidacion:driveDoc.requiereValidacion,provenance:driveDoc.provenance,resolve:{ok:driveResolve.ok,status:driveResolve.status,repository:driveResolve.repository||''}};
+
+ await page.reload({waitUntil:'domcontentloaded'});
+ await bootProduct(page,token);
+ await page.waitForFunction(({insurerId,documentRef})=>{
+   const a=Orbit.store&&Orbit.store.get?Orbit.store.get('aseguradoras',insurerId):null;
+   return !!(a&&Array.isArray(a.docs)&&a.docs.some(d=>String(d&&d.documentRef||'')===documentRef));
+ },{insurerId:ids.insurer,documentRef:driveDoc.documentRef},{timeout:30000});
+ const reloadDoc=await page.evaluate(({insurerId,documentRef})=>{
+   const a=Orbit.store.get('aseguradoras',insurerId)||{};
+   const d=(a.docs||[]).find(x=>String(x&&x.documentRef||'')===documentRef)||null;
+   return{present:!!d,estado:d&&d.estado||'',requiereValidacion:d&&d.requiereValidacion===true,cotizador:a.cotizadorHabilitado===true,comparativo:a.comparativoHabilitado===true,ia:a.iaHabilitada===true};
+ },{insurerId:ids.insurer,documentRef:driveDoc.documentRef});
+ need(reloadDoc.present===true&&reloadDoc.estado==='Documento recibido'&&reloadDoc.requiereValidacion===true,'B4_003_R13_INSURER_DRIVE_RELOAD_PERSISTENCE_FAILED');
+ need(!reloadDoc.cotizador&&!reloadDoc.comparativo&&!reloadDoc.ia,'B4_003_R13_INSURER_DRIVE_RELOAD_AUTO_ENABLEMENT_FORBIDDEN');
+ const quarantined=await page.evaluate(async ({documentRef,insurerId})=>{
+   const p=Orbit.productDriveDocumentProviderP0;
+   return await p.quarantine(documentRef,{entidad:'aseguradora',entidadId:insurerId,aseguradoraId:insurerId});
+ },{documentRef:driveDoc.documentRef,insurerId:ids.insurer});
+ need(quarantined&&quarantined.ok===true&&quarantined.quarantined===true,'B4_003_R13_INSURER_DRIVE_QA_ROLLBACK_FAILED:'+JSON.stringify(quarantined));
+ proof.r13InsurerDrive.reload=reloadDoc;
+ proof.r13InsurerDrive.cleanup={status:quarantined.status,quarantined:quarantined.quarantined===true,quarantineFolderId:quarantined.quarantineFolderId||''};
+ proof.assertions.insurerDriveE2E=true;
+ proof.assertions.insurerDriveReloadPersistence=true;
+ proof.assertions.insurerDriveNoAutoEnablement=true;
+ proof.assertions.insurerDriveSyntheticRollback=true;
+
  proof.assertions.previewGeneralWriteIsolation=true;
  proof.assertions.noOperationalRealRowsWritten=true;
  need(proof.assertions.cancellationProjectionConsistent===true,'B4_003_REAL_CANCELATION_SOURCE_WITHOUT_PROJECTION');
@@ -630,7 +696,7 @@ try{
  if(browser)await browser.close().catch(()=>{});
  await cleanup(startMs).catch(e=>proof.cleanupError=clean(e&&e.message||e));
  const checks=[];
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
  proof.syntheticFinalAbsent=checks.every(x=>x===false);
  proof.assertions.cleanupComplete=proof.syntheticFinalAbsent;
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
