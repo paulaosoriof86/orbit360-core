@@ -1,0 +1,19 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R10_CONTRACT_HARNESS_STATUS_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "failedRunId": 37135666607,
+  "failedJobId": 111239609570,
+  "failedStep": "Validate B4-003 contract and syntax",
+  "failureCode": "B4_003_CONTROL_STATUS_INVALID",
+  "rootCause": "The B4-003 contract harness still accepted only the historical R5 source-fixed control/lock state. Governance had legitimately advanced to R10 Quote Authority source-fixed state, so the harness rejected the current canonical status before executing product/quote-authority assertions.",
+  "remediation": "Extend only the QA harness status predicate from R5-only to the already-authorized R5/R9/R10 source-fixed states. Product source, data, live and reimport remain untouched.",
+  "qaToolPath": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+  "qaToolBlobSha": "9026dbaa3967dfae946b0cc7552d58707d455191",
+  "productSourceChanged": false,
+  "operationalBusinessWrites": 0,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "RETRY_B4_003_R10_EXACT_PREVIEW"
+}
