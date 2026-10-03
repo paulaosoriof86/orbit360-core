@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R12_QA_GATE_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "QA_GATE_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B4-003",
+  "failedRunId": 37150863263,
+  "failedBehavior": "B4_003_PREVIEW_MODE=NOOP",
+  "rootCause": "B4-003 executor sourceFixed predicate accepted R5/R9/R10/R11 but omitted the newly authorized R12 status.",
+  "classification": "QA_GOVERNANCE_GATE_DRIFT_NOT_PRODUCT_DEFECT",
+  "fix": {
+    "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "workflowBlobSha": "7221aec0d27db351c6876266428967d254e9c375",
+    "predicate": "R5|R9|R10|R11|R12"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
