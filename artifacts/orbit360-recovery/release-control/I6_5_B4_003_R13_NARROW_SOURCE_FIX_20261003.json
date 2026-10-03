@@ -72,5 +72,6 @@
     "productionDriveFunctionsDeployment": false
   },
   "versionedExecutionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
-  "versionedExecutionLockBlobSha": "66a1f431150b772ba0eadaef8c918cfabefd140c"
+  "initialVersionedExecutionLockBlobSha": "66a1f431150b772ba0eadaef8c918cfabefd140c",
+  "versionedExecutionLockBindingRule": "Current lock blob is authoritative from CONTROL_PLANE and the versioned lock itself; this source-fix receipt preserves only the initial creation blob to avoid circular hash binding."
 }
