@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s488-exact-owner-baseline-lab-intent-v1.0",
   "authorization": "S488_DEPLOY_EXACT_OWNER_BASELINE_RECOVERY",
-  "authorizedSourceParent": "0614e4bd736395d518fb503da735a9eed1b4ed2b",
+  "authorizedSourceParent": "a572c8909cd319a521b92884a7b8f7cc113cc4b4",
   "projectId": "ays-orbit-360-lab",
   "functionName": "cotcompExactOwnerApprovedPreviewS488",
   "baselineSha256": "a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d",
