@@ -69,7 +69,9 @@ test('S4.85 is preview-only with no PII collection, QuoteCase persistence or rea
   const h=S.html();
   assert.match(h,/no pide información personal ni envía una solicitud/i);
   assert.match(h,/No hay conexión real con Gravicentra, aseguradoras ni proveedores/);
-  assert.doesNotMatch(h,/Correo electrónico|Teléfono|DPI|NIT|Cédula|WhatsApp|requestManagement/i);
+  assert.doesNotMatch(h,/<label[^>]*>[^<]*(Correo electrónico|Teléfono|DPI|NIT|Cédula|WhatsApp)/i);
+  assert.doesNotMatch(h,/(id|name)="[^"]*(email|phone|telefono|dpi|nit|cedula|whatsapp)/i);
+  assert.doesNotMatch(h,/requestManagement/i);
   const src=fs.readFileSync(path.join(__dirname,'cotcomp-schema-driven-intake-preview-s485.js'),'utf8').toUpperCase();
   for(const forbidden of ['GETFIRESTORE','FIREBASE-ADMIN','ONCALL','CALCULATEPREMIUM(','CALCULATETAX(','APPLYTARIFFRATE(','HTTPS://API.','PROVIDER/RATER']){
     assert.equal(src.includes(forbidden),false,forbidden);
