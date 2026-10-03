@@ -24,7 +24,8 @@ const ids={
  healthPolicy:'b4003qa_policy_health_'+run,
  healthReceipt1:'b4003qa_receipt_health_1_'+run,
  healthReceipt2:'b4003qa_receipt_health_2_'+run,
- cancelation:'b4003qa_cancel_'+run
+ cancelation:'b4003qa_cancel_'+run,
+ insurer:'b4_r13_insurer_'+run
 };
 ids.renewActivity='act_ren_'+ids.renewalPolicy+'_'+new Date().toISOString().slice(0,10).replace(/-/g,'');
 ids.cancelActivity='act_rec_'+ids.cancelation;
@@ -59,6 +60,7 @@ async function seed(who){
  await ref('recibosEsperados',ids.healthReceipt1).set({...common,id:ids.healthReceipt1,clienteId:ids.client,polizaId:ids.healthPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',cuota:'1 / 2',serie:'1 / 2',fechaLimite:startS,primaTotal:271.34,montoTotal:271.34,monto:271.34,estado:'Pendiente'},{merge:false});proof.syntheticWrites++;
  await ref('recibosEsperados',ids.healthReceipt2).set({...common,id:ids.healthReceipt2,clienteId:ids.client,polizaId:ids.healthPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',cuota:'2 / 2',serie:'2 / 2',fechaLimite:endS,primaTotal:271.34,montoTotal:271.34,monto:271.34,estado:'Pendiente'},{merge:false});proof.syntheticWrites++;
  await ref('cancelaciones',ids.cancelation).set({...common,id:ids.cancelation,clienteId:ids.client,polizaId:ids.cancelPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',fecha:startS,motivo:'Prueba sintética B4-003',valorPerdido:700,recuperacion:'Pendiente de contacto',recuperada:false},{merge:false});proof.syntheticWrites++;
+ await ref('aseguradoras',ids.insurer).set({...common,id:ids.insurer,nombre:'B4 R13 Aseguradora QA',canonicalName:'B4 R13 Aseguradora QA',displayName:'B4 R13 Aseguradora QA',pais:'GT',moneda:'GTQ',activo:true,estado:'Activa',docs:[],cotizadorHabilitado:false,comparativoHabilitado:false,iaHabilitada:false},{merge:false});proof.syntheticWrites++;
 }
 async function applyLegal(page,who){
  const scope='user:'+clean(who.email||who.uid);
@@ -115,6 +117,34 @@ async function residueReadback(){
  proof.qaResidue={rows:out,patternConsistent:out.every(x=>x.exists&&/^B2-REN-/.test(x.numero)&&/^b2-r9195-policy-/.test(x.renuevaDe)),parentsAbsent:out.every(x=>x.parentExists===false),noDependents:out.every(x=>x.dependentTotal===0),classification:out.every(x=>x.exists&&/^B2-REN-/.test(x.numero)&&/^b2-r9195-policy-/.test(x.renuevaDe)&&!x.parentExists&&x.dependentTotal===0)?'PROVEN_B2_QA_LINEAGE_NO_DEPENDENTS':'AMBIGUOUS_FAIL_CLOSED'};
  proof.assertions.qaResidueReadOnlyAdjudicated=true;
 }
+async function renewalDistributionReadback(){
+ const snap=await tenant.collection('data').doc('polizas').collection('items').get();
+ const now=new Date();now.setHours(0,0,0,0);
+ const rows=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!String(x.id).startsWith('b4003qa_')&&!String(x.id).startsWith('b4_')&&x.__syntheticQa!==true);
+ const state=p=>{
+  if(!Object.prototype.hasOwnProperty.call(p,'renovable')||p.renovable==null||clean(p.renovable)==='')return'UNKNOWN';
+  const v=clean(p.renovable).toLowerCase();
+  if(p.renovable===true||['true','si','sí','renovable'].includes(v))return'YES';
+  if(p.renovable===false||['false','no','no renovable'].includes(v))return'NO';
+  return'UNKNOWN';
+ };
+ const active=p=>['Vigente','Por renovar'].includes(clean(p.estado))&&!p.renovadaPor&&norm(p.renovacionEstado)!=='renovada';
+ const days=p=>{const raw=clean(p.vigenciaFin);if(!raw)return null;const d=new Date(raw+'T00:00:00');return Number.isFinite(d.getTime())?Math.ceil((d-now)/86400000):null;};
+ const byState={YES:0,NO:0,UNKNOWN:0},byCountry={},buckets={vencidas:0,d15:0,d45:0,d90:0},eligible=[];
+ rows.forEach(p=>{
+  const rs=state(p);byState[rs]=(byState[rs]||0)+1;
+  const country=clean(p.pais||p.country||'SIN_PAIS').toUpperCase()||'SIN_PAIS';
+  byCountry[country]=byCountry[country]||{YES:0,NO:0,UNKNOWN:0,eligible90:0};
+  byCountry[country][rs]=(byCountry[country][rs]||0)+1;
+  if(rs!=='YES'||!active(p))return;
+  const d=days(p);if(d==null||d>90)return;
+  eligible.push({id:p.id,numero:p.numero||'',pais:country,dias:d,estado:p.estado||'',vigenciaFin:p.vigenciaFin||''});
+  byCountry[country].eligible90++;
+  if(d<0)buckets.vencidas++;else if(d<=15)buckets.d15++;else if(d<=45)buckets.d45++;else buckets.d90++;
+ });
+ proof.realRenewalDistribution={policyCount:rows.length,byState,byCountry,buckets,eligibleCount:eligible.length,sample:eligible.slice(0,30),readOnly:true};
+ proof.assertions.realRenewalDistributionReadOnly=true;
+}
 async function cancellationEvidence(){
  const snap=await tenant.collection('data').doc('polizas').collection('items').get();
  const rows=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!String(x.id).startsWith('b4003qa_'));
@@ -126,7 +156,7 @@ async function cancellationEvidence(){
  proof.assertions.cancellationProjectionConsistent=(cancelled.length===0);
 }
 async function cleanup(startMs){
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['clientes',ids.client]]){
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]]){
   const r=ref(c,id);if((await r.get()).exists){await r.delete();proof.cleanupWrites++;}
  }
  for(const col of ['workflowEvents','operationalEvents']){
@@ -148,6 +178,7 @@ try{
  const who=await actor();proof.actor=who;
  await residueReadback();
  await cancellationEvidence();
+ await renewalDistributionReadback();
  await seed(who);
  const token=await auth.createCustomToken(who.uid);
  browser=await chromium.launch({headless:true,args:['--no-sandbox']});
