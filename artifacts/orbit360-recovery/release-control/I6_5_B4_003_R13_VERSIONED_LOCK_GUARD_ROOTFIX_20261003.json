@@ -1,0 +1,17 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_VERSIONED_LOCK_GUARD_ROOTFIX_V1",
+  "recordedAt": "2026-10-03",
+  "status": "QA_GOVERNANCE_GUARD_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B4-003",
+  "diagnosticReceiptBlobSha": "4a840f86c8aa7dd86720fd85270b8d00b9355d8c",
+  "failedRunId": 37162057992,
+  "failureCode": "I6_5_B4_LOCK_DRIFT",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "guardBlobSha": "a1adcf3f82dca2082bbc0ef4bdcbc9ab46cd04cc",
+  "fix": "Resolve active B4 execution lock from CONTROL_PLANE.i65ForensicRemediationPlan.b4.executionLockPath and hash that exact versioned lock while preserving the historical B4 lock as required evidence.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
