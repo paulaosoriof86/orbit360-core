@@ -165,6 +165,19 @@ jobs:
           for(const [k,v] of Object.entries({build_id:d.buildId,hosted_payload_digest:d.hostedPayloadDigest,backend_source_digest:d.backendSourceDigest,bundle_digest:d.bundleDigest}))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
           NODE
 
+      - name: Deploy exact B4-001 Preview workflow callable
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          FROOT="$RUNNER_TEMP/b4-001-functions"
+          rm -rf "$FROOT"
+          mkdir -p "$FROOT"
+          cp -a "$RUNNER_TEMP/b4-001-package/bundle/backend" "$FROOT/backend"
+          (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          printf '{"status":"DEPLOYED_EXACT_PREVIEW_ONLY","sourceSha":"%s","backendSourceDigest":"%s","function":"orbit360OpsLeadsCommandPreview","productionFunctionDeployed":false,"realBusinessWritesAuthorized":false,"externalNotificationsSuppressed":true}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-001-package/evidence/b4-001-preview-backend-binding.json"
+
       - name: Deploy exact package to isolated Preview
         if: steps.gate.outputs.run == 'true'
         id: preview

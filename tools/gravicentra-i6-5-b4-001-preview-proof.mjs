@@ -17,7 +17,10 @@ need(target,'B4_001_PREVIEW_URL_MISSING');
 const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId});
 const db=getFirestore(app),auth=getAuth(app),tenant=db.collection('tenants').doc(tenantId);
 const ids=['ops','cliente360','portal'].map(x=>'b4001_'+run+'_'+x);
-const proof={schema:'GRAVICENTRA_I6_5_B4_001_PREVIEW_PROOF_V1',status:'INIT',target,ids,assertions:{},pageErrors:[],consoleErrors:[],syntheticWrites:0,cleanupWrites:0};
+const priorFailedRunIds=['37080168106'];
+const priorCleanupIds=priorFailedRunIds.flatMap(r=>['ops','cliente360','portal'].map(x=>'b4001_'+r+'_'+x));
+const cleanupIds=Array.from(new Set(ids.concat(priorCleanupIds)));
+const proof={schema:'GRAVICENTRA_I6_5_B4_001_PREVIEW_PROOF_V1',status:'INIT',target,ids,priorCleanupIds,assertions:{},pageErrors:[],consoleErrors:[],syntheticWrites:0,cleanupWrites:0};
 
 async function actor(){
   const snap=await tenant.collection('members').get();
@@ -54,11 +57,11 @@ async function boot(page,token){
   await page.waitForFunction(()=>!!window.Orbit?.store?.insertDurable&&!!window.Orbit?.ciclo?.crearGestionDurable);
 }
 async function cleanup(){
-  for(const id of ids){
+  for(const id of cleanupIds){
     const ref=tenant.collection('data').doc('gestiones').collection('items').doc(id);
     const s=await ref.get();if(s.exists){await ref.delete();proof.cleanupWrites++;}
   }
-  const ev=await tenant.collection('workflowEvents').where('entityId','in',ids).get();
+  const ev=await tenant.collection('workflowEvents').where('entityId','in',cleanupIds).get();
   for(const d of ev.docs){
     const x=d.data()||{};
     await d.ref.delete();proof.cleanupWrites++;
@@ -158,8 +161,8 @@ try{
   try{
     await cleanup();
     const remaining=[];
-    for(const id of ids){if((await tenant.collection('data').doc('gestiones').collection('items').doc(id).get()).exists)remaining.push(id);}
-    const evLeft=await tenant.collection('workflowEvents').where('entityId','in',ids).get();
+    for(const id of cleanupIds){if((await tenant.collection('data').doc('gestiones').collection('items').doc(id).get()).exists)remaining.push(id);}
+    const evLeft=await tenant.collection('workflowEvents').where('entityId','in',cleanupIds).get();
     proof.syntheticFinalAbsent=remaining.length===0&&evLeft.empty;
     proof.remainingSyntheticIds=remaining;
     proof.remainingSyntheticEvents=evLeft.size;

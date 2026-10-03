@@ -1,0 +1,43 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_001_PREVIEW_BACKEND_BINDING_ROOTFIX_V1",
+  "recordedAt": "2026-10-02",
+  "status": "QA_PREVIEW_BACKEND_BINDING_REPAIRED_PENDING_EXACT_RETRY",
+  "findingId": "B4-001",
+  "failedRunId": 37080168106,
+  "failedJobId": 111078715919,
+  "failedSourceSha": "e2bb65706d9e66eb43c205ff9aec3040638dc93e",
+  "exactHostingReadbackPassed": true,
+  "failureStep": "Canonical gestion convergence proof",
+  "failureCode": "PRODUCT_SERVER_CANONICAL_READBACK_REQUIRED",
+  "classification": "PREVIEW_RUNTIME_BACKEND_NOT_BOUND_TO_EXACT_CANDIDATE_SOURCE",
+  "evidence": {
+    "browserStoreRequiresCanonicalServerReadback": true,
+    "currentProductOpsLeadsDomainReturnsCanonicalReadback": true,
+    "b4WorkflowPreviouslyDeployedHostingOnly": true,
+    "b2EstablishedPatternDeploysOrbit360OpsLeadsCommandPreviewFromExactPackage": true
+  },
+  "rootCause": "B4-001 built and read back the exact Hosting artifact but did not deploy the Preview-only Ops/Leads callable from the same candidate backend. The browser write facade therefore could reach a stale Preview callable contract and fail closed on canonical readback.",
+  "repair": {
+    "workflowPath": ".github/workflows/gravicentra-b4-001-executor.yml",
+    "deployOnlyFunction": "orbit360OpsLeadsCommandPreview",
+    "source": "exact immutable package backend",
+    "productionFunctionDeployed": false,
+    "proofCleanupHardenedForFailedRun": true,
+    "priorFailedSyntheticIds": [
+      "b4001_37080168106_ops",
+      "b4001_37080168106_cliente360",
+      "b4001_37080168106_portal"
+    ]
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "operationalBusinessWrites": 0,
+    "realBusinessWritesAuthorized": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "previewOnlyFunctionDeployment": true,
+    "syntheticCleanupRequired": true
+  },
+  "nextAction": "B4_001_CONTRACT_AND_EXACT_PREVIEW_RETRY"
+}

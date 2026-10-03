@@ -4876,10 +4876,10 @@
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
       "syntheticQaWritesAuthorized": true,
       "previewDispatchRequest": {
-        "status": "RETRY_AFTER_GOVERNANCE_GUARD_ROOTFIX",
+        "status": "RETRY_AFTER_PREVIEW_BACKEND_BINDING_ROOTFIX",
         "findingId": "B4-001",
         "authority": "USER_CONTINUE",
-        "failedRunId": 37079714389,
+        "failedRunId": 37080168106,
         "target": "B4_001_CONTRACT_AND_EXACT_PREVIEW",
         "productSourceChanged": false,
         "dataMutation": false,
@@ -4893,6 +4893,18 @@
         "guardBlobSha": "2b34d2e739096732d61d2f4b39dcc0c46d56ccde",
         "compositionBlobSha": "d1b3b07af70f690c1e5a06d438c7027816d4f12e",
         "failedRunId": 37079714389
+      },
+      "previewBackendBindingRootFix": {
+        "status": "QA_PREVIEW_BACKEND_BINDING_REPAIRED_PENDING_EXACT_RETRY",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_PREVIEW_BACKEND_BINDING_ROOTFIX_20261002.json",
+        "blobSha": "3ee569995e00870db2146befb83fb89fbb51e64b",
+        "failedRunId": 37080168106,
+        "failedJobId": 111078715919,
+        "workflowBlobSha": "f6f3f5de921c1fc65fbb4d7660a3ece4dfdc19d0",
+        "proofBlobSha": "21afb2e492b34ad95d5290d25d6d7754c51f2906",
+        "productSourceChanged": false,
+        "noLive": true,
+        "noReimport": true
       }
     }
   },
@@ -5217,10 +5229,10 @@
     "sourceFixReceiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
-      "status": "RETRY_AFTER_GOVERNANCE_GUARD_ROOTFIX",
+      "status": "RETRY_AFTER_PREVIEW_BACKEND_BINDING_ROOTFIX",
       "findingId": "B4-001",
       "authority": "USER_CONTINUE",
-      "failedRunId": 37079714389,
+      "failedRunId": 37080168106,
       "target": "B4_001_CONTRACT_AND_EXACT_PREVIEW",
       "productSourceChanged": false,
       "dataMutation": false,
@@ -5234,6 +5246,18 @@
       "guardBlobSha": "2b34d2e739096732d61d2f4b39dcc0c46d56ccde",
       "compositionBlobSha": "d1b3b07af70f690c1e5a06d438c7027816d4f12e",
       "failedRunId": 37079714389
+    },
+    "previewBackendBindingRootFix": {
+      "status": "QA_PREVIEW_BACKEND_BINDING_REPAIRED_PENDING_EXACT_RETRY",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_PREVIEW_BACKEND_BINDING_ROOTFIX_20261002.json",
+      "blobSha": "3ee569995e00870db2146befb83fb89fbb51e64b",
+      "failedRunId": 37080168106,
+      "failedJobId": 111078715919,
+      "workflowBlobSha": "f6f3f5de921c1fc65fbb4d7660a3ece4dfdc19d0",
+      "proofBlobSha": "21afb2e492b34ad95d5290d25d6d7754c51f2906",
+      "productSourceChanged": false,
+      "noLive": true,
+      "noReimport": true
     }
   }
 }
