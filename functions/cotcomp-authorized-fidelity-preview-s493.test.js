@@ -108,7 +108,7 @@ test('S4.93 keeps Gravicentra provider contract and transport gates unchanged',(
 });
 
 test('S4.93 contains no local rating engine, persistence or direct provider runtime',()=>{
-  const src=fs.readFileSync(path.join(__dirname,'cotcomp-owner-authorized-comparative-preview-s492.js'),'utf8').toUpperCase();
+  const src=fs.readFileSync(path.join(__dirname,'cotcomp-authorized-fidelity-preview-s493.js'),'utf8').toUpperCase();
   for(const forbidden of [
     'GETFIRESTORE','FIREBASE-ADMIN','ONCALL',
     'CALCULATEPREMIUM(','CALCULATETAX(','APPLYTARIFFRATE(',
