@@ -1,0 +1,60 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R16_MACHINE_PASS_DISPOSITION_ALIGNMENT_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_GOVERNANCE_MACHINE_PASS_DISPOSITION_ALIGNED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "f93c2cec18ebf5e7356f61fbf3c20fe82b5618e1",
+  "machineProof": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
+    "receiptBlobSha": "3ceb0a77b851351455a0889b24b65ff55f560183",
+    "runId": 37214326078,
+    "sourceSha": "21513b95385e850a12c307fcc2ead8d61e9014b2",
+    "buildId": "gi-i65-b4-21513b95385e-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37214326078-fkajnxki.web.app",
+    "artifactId": 11307867890,
+    "artifactDigest": "f86fa3e3321c4f2072146d4e6dd3830f9bd98c19787adfb542e8f660b27c550c",
+    "hostedPayloadDigest": "c2a9e935db9e87a2b5025f761771b080c26ec76d7442ccec0b993524df95f64e",
+    "backendSourceDigest": "b58ed88379e2656723656ae6deb0500896696bc34a99a9e65c5dfd6e94b02f20",
+    "bundleDigest": "500f997c903ba55a84bf14d40e13eefb189b0daa00b02f2f92b4511a4a08c052"
+  },
+  "rootCause": "Machine-proof freeze updated Ledger parent B4-003, but Carry writer addressed o.findings instead of the canonical inventory array; the same freeze also did not disposition R16-02/R16-03 after their discriminating assertions passed.",
+  "correction": {
+    "ledgerCarryExactSetCount": 210,
+    "parentStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "r1602Status": "CLOSED_PASS",
+    "r1603Status": "CLOSED_PASS",
+    "carryCanonicalArray": "inventory",
+    "noFindingRemoved": true,
+    "baseline208Preserved": true
+  },
+  "evidence": {
+    "r1602": {
+      "qualityRenderPathUnder2500ms": true,
+      "informationHealthFinancialMismatchVisible": true,
+      "thresholdMs": 2500,
+      "thresholdRelaxed": false
+    },
+    "r1603": {
+      "tenantCatalogCanonicalHydration": true,
+      "unexpectedHttpErrors": 0,
+      "unexpectedConsoleErrors": 0,
+      "unexpectedPreauth401": 0,
+      "authenticatedConsumerEnsuresPreserved": 4
+    }
+  },
+  "bindings": {
+    "ledgerBlobSha": "3d65deeee680ee06ce82b862dfbc341c640f2525",
+    "carryBlobSha": "54e5de1592c1a7334c3a87886633e4d7ab09394d",
+    "machineProofReceiptBlobSha": "3ceb0a77b851351455a0889b24b65ff55f560183"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "syntheticQaWritesAuthorized": false,
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+}

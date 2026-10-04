@@ -2887,7 +2887,7 @@
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
       "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
-      "humanVisualStatus": "PENDING",
+      "humanVisualStatus": "PENDING_TARGETED_PAULA_VISUAL",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
@@ -2992,7 +2992,8 @@
       "preserveR15Findings": true,
       "preserveEarlierPasses": true,
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "machineProofRunId": 37214326078
     },
     {
       "id": "B4-004",
@@ -7595,8 +7596,8 @@
       "owner": [
         "orbit360-platform/modules/calidad.js"
       ],
-      "status": "SOURCE_FIXED_R16_02_PENDING_EXACT_PREVIEW",
-      "blocking": true,
+      "status": "CLOSED_PASS",
+      "blocking": false,
       "targetGate": "B4-003",
       "closureCondition": "Same exact authenticated Preview proof renders Calidad GT and CO in <2500 ms without removing required financial mismatch rows, country/provenance semantics, or relaxing threshold.",
       "mayDisappearWithoutDisposition": false,
@@ -7604,9 +7605,19 @@
       "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644",
       "noLive": true,
       "noReimport": true,
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_20261004.json",
-      "sourceFixReceiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9"
+      "sourceFixReceiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9",
+      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
+      "machineProofReceiptBlobSha": "3ceb0a77b851351455a0889b24b65ff55f560183",
+      "machineProofRunId": 37214326078,
+      "closureEvidence": {
+        "qualityRenderPathUnder2500ms": true,
+        "informationHealthFinancialMismatchVisible": true,
+        "thresholdMs": 2500,
+        "thresholdRelaxed": false,
+        "informationRemoved": false
+      }
     },
     {
       "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
@@ -7621,8 +7632,8 @@
         "orbit360-platform/core/config.js",
         "orbit360-platform/core/ciclo.js"
       ],
-      "status": "SOURCE_FIXED_R16_03_PENDING_EXACT_PREVIEW",
-      "blocking": true,
+      "status": "CLOSED_PASS",
+      "blocking": false,
       "targetGate": "B4-003",
       "closureCondition": "Exact authenticated Preview has zero unexpected 401 for tenant catalog config; catalog ensure remains canonical and fail-closed when invoked by authenticated consumers.",
       "mayDisappearWithoutDisposition": false,
@@ -7630,9 +7641,21 @@
       "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c",
       "noLive": true,
       "noReimport": true,
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_SOURCE_FIX_20261004.json",
-      "sourceFixReceiptBlobSha": "46ab8e219ab93e7251036720ce6435cc3d0b50c5"
+      "sourceFixReceiptBlobSha": "46ab8e219ab93e7251036720ce6435cc3d0b50c5",
+      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
+      "machineProofReceiptBlobSha": "3ceb0a77b851351455a0889b24b65ff55f560183",
+      "machineProofRunId": 37214326078,
+      "closureEvidence": {
+        "tenantCatalogCanonicalHydration": true,
+        "unexpectedHttpErrors": 0,
+        "unexpectedConsoleErrors": 0,
+        "unexpectedPreauth401": 0,
+        "authenticatedConsumerEnsuresPreserved": 4,
+        "authRelaxed": false,
+        "localFallbackAuthority": false
+      }
     }
   ],
   "phaseBBacklog": [

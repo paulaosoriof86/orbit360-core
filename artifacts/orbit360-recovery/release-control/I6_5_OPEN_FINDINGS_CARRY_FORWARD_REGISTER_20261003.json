@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76",
-  "expectedLedgerNextBlobSha": "d84746f3a5de1323216e7bc7efd8f8288db81445",
+  "expectedLedgerNextBlobSha": "3d65deeee680ee06ce82b862dfbc341c640f2525",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -669,14 +669,14 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
       "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
       "source": "LEDGER",
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
-      "humanVisualStatus": "PENDING_TARGETED_AFTER_MACHINE_PASS",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "humanVisualStatus": "PENDING_TARGETED_PAULA_VISUAL",
       "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
       "r13QaGateAlignmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
       "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
@@ -685,7 +685,10 @@
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
+      "machineProofReceiptBlobSha": "3ceb0a77b851351455a0889b24b65ff55f560183",
+      "machineProofRunId": 37214326078
     },
     {
       "id": "B4-004",
@@ -3274,8 +3277,8 @@
     {
       "id": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
       "block": "B4",
-      "status": "SOURCE_FIXED_R16_02_PENDING_EXACT_PREVIEW",
-      "blocking": true,
+      "status": "CLOSED_PASS",
+      "blocking": false,
       "owner": [
         "orbit360-platform/modules/calidad.js"
       ],
@@ -3284,17 +3287,27 @@
       "source": "B4_003_EXACT_PREVIEW_MACHINE_PROOF_RUN_37207119191",
       "finding": "Authenticated exact Preview rendered Calidad GT in 10429.2 ms against a <2500 ms gate; CO rendered in 850.9 ms.",
       "rootCause": "R16 expanded per-client linked-country evidence evaluation from country-pending clients to every client in scope.",
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_DIAGNOSTIC_20261004.json",
       "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_20261004.json",
-      "sourceFixReceiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9"
+      "sourceFixReceiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9",
+      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
+      "machineProofReceiptBlobSha": "3ceb0a77b851351455a0889b24b65ff55f560183",
+      "machineProofRunId": 37214326078,
+      "closureEvidence": {
+        "qualityRenderPathUnder2500ms": true,
+        "informationHealthFinancialMismatchVisible": true,
+        "thresholdMs": 2500,
+        "thresholdRelaxed": false,
+        "informationRemoved": false
+      }
     },
     {
       "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
       "block": "B4",
-      "status": "SOURCE_FIXED_R16_03_PENDING_EXACT_PREVIEW",
-      "blocking": true,
+      "status": "CLOSED_PASS",
+      "blocking": false,
       "owner": [
         "orbit360-platform/core/config.js",
         "orbit360-platform/core/ciclo.js"
@@ -3304,11 +3317,23 @@
       "source": "B4_003_EXACT_PREVIEW_MACHINE_PROOF_RUN_37213597161",
       "finding": "Pre-auth eager catalog hydration causes an unexpected 401 before authenticated catalog consumption.",
       "rootCause": "Two eager catalog hydration calls execute before authenticated session: config.js setTimeout(api.ensure) and ciclo.js module-load Promise(Orbit.cat.ensure). Catalog consumers already await canonical ensure after authentication.",
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_DIAGNOSTIC_20261004.json",
       "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_SOURCE_FIX_20261004.json",
-      "sourceFixReceiptBlobSha": "46ab8e219ab93e7251036720ce6435cc3d0b50c5"
+      "sourceFixReceiptBlobSha": "46ab8e219ab93e7251036720ce6435cc3d0b50c5",
+      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
+      "machineProofReceiptBlobSha": "3ceb0a77b851351455a0889b24b65ff55f560183",
+      "machineProofRunId": 37214326078,
+      "closureEvidence": {
+        "tenantCatalogCanonicalHydration": true,
+        "unexpectedHttpErrors": 0,
+        "unexpectedConsoleErrors": 0,
+        "unexpectedPreauth401": 0,
+        "authenticatedConsumerEnsuresPreserved": 4,
+        "authRelaxed": false,
+        "localFallbackAuthority": false
+      }
     }
   ],
   "attentionIds": [
