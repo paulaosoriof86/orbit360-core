@@ -427,6 +427,6 @@ const cotcompPremiumVisualPreviewS494=onRequest({
 },handler);
 
 module.exports=Object.freeze({
-  VERSION,PROJECT_ID,REGION,FUNCTION_NAME,CATALOG_PATH,OWNER_VISUAL_SHA,PRODUCT_SPRITE_SHA,
-  manifest,routes,securityHeaders,html,handler,cotcompAuthorizedFidelityPreviewS493
+  VERSION,PROJECT_ID,REGION,FUNCTION_NAME,CATALOG_PATH,OWNER_VISUAL_SHA,HERO_SHA,PRODUCT_SPRITE_SHA,
+  manifest,routes,securityHeaders,html,handler,cotcompPremiumVisualPreviewS494
 });
