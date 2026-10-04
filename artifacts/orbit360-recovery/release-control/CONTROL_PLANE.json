@@ -6182,7 +6182,8 @@
       "livePromotion": false,
       "targetRenewalPointers": [
         "pol_muj5o5ka"
-      ]
+      ],
+      "retry": "TARGET_POINTER_READBACK_2"
     }
   },
   "b4VisualAcceptanceControl": {
