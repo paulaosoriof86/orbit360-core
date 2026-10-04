@@ -50,7 +50,7 @@ jobs:
           if(r.familyVisualPositionsUnique!==true) throw new Error('family visual positions are not unique');
           const v=G.verify(r);
           console.log(JSON.stringify(v,null,2));
-          if(!v.ok) process.exit(1);
+          if(!v.ok || v.automatedVisualContractPassed!==true || v.ownerReviewUrlAuthorized!==false) process.exit(1);
           NODE
 
       - name: Upload evidence only
