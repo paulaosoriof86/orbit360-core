@@ -2,6 +2,7 @@
 
 const fs=require('fs');
 const path=require('path');
+const DOMAIN=require('./cotcomp-s497-domain-schema');
 
 /*
  * CotComp S4.97 CLEAN VISUAL PARENT — SOURCE ONLY
@@ -67,6 +68,17 @@ function familyCards(){
 
 function html(){
   const mf=manifest();
+  const domainSnapshot={};
+  for(const country of ['gt','co']){
+    for(const product of ['auto','hogar','salud','vida','empresa','transporte','duda','contrato','revision']){
+      domainSnapshot[country+':'+product]={
+        schema:DOMAIN.schema(country,product),
+        comparison:DOMAIN.comparison(country,product),
+        execution:DOMAIN.execution(country,product)
+      };
+    }
+  }
+  const familyToProduct=DOMAIN.FAMILY_TO_PRODUCT;
   return `<!doctype html>
 <html lang="es">
 <head>
@@ -104,7 +116,9 @@ function html(){
 .cc-rail{background:#121015;color:#fff;padding:28px 18px;display:flex;flex-direction:column;gap:18px}.cc-rail__label{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.15em;color:#A99FA6;text-transform:uppercase;margin:0 10px 2px}
 .cc-step{display:flex;gap:12px;align-items:center;min-height:62px;border-radius:14px;padding:10px 12px;color:#8F898F}.cc-step__n{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#201D24;font-family:'IBM Plex Mono';font-size:11px}.cc-step strong{font-size:13px;line-height:1.25}.cc-step.is-active{background:#fff;color:var(--ink)}.cc-step.is-active .cc-step__n{background:var(--red);color:#fff}
 .cc-stage{min-width:0;background:#F8F4ED}.cc-stage__head{background:#151217;color:#fff;padding:26px 28px;display:flex;align-items:center;gap:18px}.cc-stage__number{font-family:'Archivo';font-size:58px;font-weight:900;line-height:.85;color:#E5002D}.cc-stage__head small{display:block;font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.13em;color:#FF8594;text-transform:uppercase;margin-bottom:5px}.cc-stage__head h2{font-family:'Archivo';font-weight:800;font-size:24px;line-height:1.05;margin:0}.cc-stage__body{padding:28px}
-.cc-truth{border:1px solid #E9C98F;background:#FFF7E8;color:#6D5430;border-radius:14px;padding:13px 15px;font-size:12.5px;line-height:1.5;margin-bottom:26px}
+.cc-truth{border:1px solid #E9C98F;background:#FFF7E8;color:#6D5430;border-radius:14px;padding:13px 15px;font-size:12.5px;line-height:1.5;margin-bottom:16px}
+.cc-mode-toggle{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}.cc-mode{min-height:44px;border:1px solid #D8D0C5;background:#fff;border-radius:12px;padding:0 15px;font-size:12.5px;font-weight:700;color:#4F4740}.cc-mode small{display:block;font-size:10px;font-weight:500;color:#83796F;margin-top:2px}.cc-mode.is-active{background:#17141A;border-color:#17141A;color:#fff}.cc-mode.is-active small{color:#D4CBC2}
+.cc-paths{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.cc-path{min-height:42px;border:1px solid #D8D0C5;background:#fff;border-radius:999px;padding:0 14px;font-size:12px;font-weight:700}.cc-path.is-active{background:#17141A;color:#fff;border-color:#17141A}
 .cc-section-kicker{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.13em;color:var(--red2);text-transform:uppercase}.cc-section-title{font-family:'Archivo';font-weight:900;font-size:32px;letter-spacing:-.025em;line-height:1.02;margin:8px 0 8px}.cc-section-lead{font-size:14.5px;line-height:1.55;color:#5F5750;margin:0 0 20px}
 .cc-family-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .cc-family{min-height:108px;padding:16px;border:1.5px solid #DED6CA;background:#fff;border-radius:18px;text-align:left;display:flex;align-items:center;gap:13px;color:var(--ink)}.cc-family strong{display:block;font-family:'Archivo';font-weight:800;font-size:14px;line-height:1.1}.cc-family small{display:block;font-size:11.5px;color:#6E655C;line-height:1.35;margin-top:5px}.cc-family.is-selected{border-color:var(--red);box-shadow:0 10px 26px -20px rgba(228,0,43,.65);background:#FFF7F8}
@@ -117,6 +131,7 @@ function html(){
 .cc-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}.cc-summary{background:#17141A;color:#fff;border-radius:14px;padding:14px}.cc-summary small{font-size:10px;color:#A79EA8}.cc-summary strong{display:block;font-size:14px;margin-top:5px}
 .cc-review-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.cc-review-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}.cc-review-card b{font-family:'Archivo';font-size:17px}.cc-review-card strong{display:block;font-family:'Archivo';font-size:24px;margin:14px 0 6px}
 .cc-compare{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:16px}.cc-compare th{background:#17141A;color:#fff;text-align:left;padding:14px;font-size:13px}.cc-compare td{padding:13px 14px;border-top:1px solid var(--line);font-size:13px;background:#fff}.cc-compare td:first-child{font-weight:700;background:#F5F0E8;width:35%}
+.cc-no-compare{margin-top:16px;background:#17141A;color:#fff;border-radius:16px;padding:20px;border-left:4px solid #C98718}.cc-no-compare small{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.12em;color:#E7C27B;text-transform:uppercase}.cc-no-compare h3{font-family:'Archivo';font-size:21px;line-height:1.15;margin:9px 0 7px}.cc-no-compare p{font-size:13px;line-height:1.55;color:#DED6CC;margin:0}
 .cc-rec{margin-top:16px;background:#111014;color:#fff;border-left:4px solid var(--red);border-radius:15px;padding:20px}.cc-rec small{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.13em;color:#FF8997;text-transform:uppercase}.cc-rec h3{font-family:'Archivo';font-size:21px;line-height:1.15;margin:10px 0 8px}.cc-rec p{font-size:13px;line-height:1.55;color:#E6DED3;margin:0}
 .cc-actions{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);margin-top:22px;padding-top:18px;flex-wrap:wrap}.cc-btn{min-height:46px;border-radius:12px;padding:0 18px;border:1px solid #D9D0C5;background:#fff;font-weight:700}.cc-btn--primary{background:var(--red);border-color:var(--red);color:#fff}
 .cc-replan{margin-top:18px;border:1px dashed #D2C5B5;border-radius:15px;padding:16px;background:#FFFCF8}.cc-replan b{font-family:'Archivo';font-size:16px}.cc-replan__choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.cc-replan__choices button{min-height:58px;border:1px solid var(--line);background:#fff;border-radius:12px;text-align:left;padding:10px 12px;font-weight:700;font-size:12px}
@@ -135,14 +150,14 @@ function html(){
     <nav class="cc-nav" aria-label="Principal">
       <button type="button">Empresas</button><button type="button">Personas y familias</button><button class="is-active" type="button">Cotizar y comparar</button><button type="button">Siniestros y asistencia</button><button type="button">Recursos</button><button type="button">Sobre A&amp;S</button>
     </nav>
-    <div class="cc-country"><button class="is-active" type="button">Guatemala</button><button type="button">Colombia</button></div>
+    <div class="cc-country"><button class="is-active" type="button" data-country="gt">Guatemala</button><button type="button" data-country="co">Colombia</button></div>
     <button class="cc-advisor" type="button">Hablar con un asesor</button>
   </div>
 </header>
 
 <section class="cc-hero">
   <div class="cc-hero__copy">
-    <div class="cc-kicker">COTIZAR Y COMPARAR · GUATEMALA</div>
+    <div class="cc-kicker" id="heroKicker">COTIZAR Y COMPARAR · GUATEMALA</div>
     <h1 class="cc-hero__title">Cotiza y compara <em>con criterio</em></h1>
     <p class="cc-hero__lead">Cuéntanos qué quieres proteger. A&amp;S te ayuda a ordenar la información, revisar alternativas comparables y entender las diferencias que sí cambian tu decisión.</p>
     <div class="cc-hero__benefits"><div class="cc-hero__benefit">Compara opciones<br>sobre bases equivalentes</div><div class="cc-hero__benefit">Entiende coberturas,<br>deducibles y condiciones</div><div class="cc-hero__benefit">Continúa con asesoría<br>cuando haga falta</div></div>
@@ -165,6 +180,10 @@ function html(){
     <div class="cc-stage__head"><div class="cc-stage__number" id="stageNumber">01</div><div><small id="stageKicker">EMPEZAR</small><h2 id="stageHeading">Elige el punto de partida</h2></div></div>
     <div class="cc-stage__body">
       <div class="cc-truth">Tus respuestas se conservan mientras avanzas. Si el caso requiere revisión, un asesor puede continuar desde aquí sin pedirte empezar de cero.</div>
+      <div class="cc-mode-toggle" aria-label="Cómo quieres continuar">
+        <button class="cc-mode is-active" type="button" data-mode="online">Cotización en línea<small>Cuando la fuente permite avanzar digitalmente</small></button>
+        <button class="cc-mode" type="button" data-mode="assisted">Con acompañamiento A&amp;S<small>Un asesor continúa con tu mismo contexto</small></button>
+      </div>
 
       <section data-stage-panel="1" class="is-visible">
         <div class="cc-section-kicker">01 · PUNTO DE PARTIDA</div>
@@ -176,42 +195,33 @@ function html(){
 
       <section data-stage-panel="2">
         <div class="cc-section-kicker">02 · DATOS DEL CASO</div>
-        <h3 class="cc-section-title">Cuéntanos solo lo necesario sobre tu vehículo</h3>
-        <p class="cc-section-lead">Pedimos primero los datos que cambian disponibilidad, condiciones o comparación.</p>
-        <div class="cc-summary-grid"><div class="cc-summary"><small>País</small><strong>Guatemala</strong></div><div class="cc-summary"><small>Necesidad</small><strong id="selectedNeed">Vehículo / Movilidad</strong></div><div class="cc-summary"><small>Cómo seguimos</small><strong>En línea con asesoría disponible</strong></div></div>
+        <h3 class="cc-section-title" id="intakeTitle">Cuéntanos solo lo necesario.</h3>
+        <p class="cc-section-lead" id="intakeLead">Las preguntas cambian según el país y la necesidad seleccionada.</p>
+        <div class="cc-summary-grid"><div class="cc-summary"><small>País</small><strong id="selectedCountry">Guatemala</strong></div><div class="cc-summary"><small>Necesidad</small><strong id="selectedNeed">Vehículo / Movilidad</strong></div><div class="cc-summary"><small>Cómo seguimos</small><strong id="selectedMode">En línea con asesoría disponible</strong></div></div>
         <div class="cc-route-context">
           <div id="routePhoto" class="cc-route-photo" data-visual-asset="route:vehicle" aria-label="Contexto visual de Vehículo / Movilidad"></div>
-          <div class="cc-route-copy"><small id="routeVisualKicker">CONTEXTO DE LA NECESIDAD</small><strong id="routeVisualTitle">Vehículo / Movilidad</strong><p id="routeVisualText">La imagen acompaña la necesidad seleccionada. No sustituye los datos que requiere una cotización real.</p></div>
+          <div class="cc-route-copy"><small>CONTEXTO DE LA NECESIDAD</small><strong id="routeVisualTitle">Vehículo / Movilidad</strong><p id="routeVisualText">La imagen acompaña la necesidad seleccionada. No sustituye los datos que requiere una cotización real.</p></div>
         </div>
-        <div class="cc-stage-panel"><div class="cc-stage-panel__head"><span>01</span><b>Vehículo y uso</b></div><div class="cc-field-grid">
-          <label class="cc-field"><span class="cc-label">Tipo de vehículo</span><select class="cc-control"><option>Automóvil</option></select><span class="cc-help">La disponibilidad puede variar según producto y condiciones del caso.</span></label>
-          <label class="cc-field"><span class="cc-label">Uso</span><select class="cc-control"><option>Particular</option></select><span class="cc-help">El uso declarado puede cambiar las alternativas.</span></label>
-          <label class="cc-field"><span class="cc-label">Marca</span><input class="cc-control" value="Toyota" aria-label="Marca"><span class="cc-help">Búsqueda por catálogo gobernado.</span></label>
-          <label class="cc-field"><span class="cc-label">Línea / modelo</span><input class="cc-control" value="RAV4" aria-label="Línea / modelo"><span class="cc-help">Se filtra a partir de la marca.</span></label>
-          <label class="cc-field"><span class="cc-label">Año</span><select class="cc-control"><option>2024</option></select><span class="cc-help">La antigüedad puede cambiar elegibilidad.</span></label>
-          <label class="cc-field"><span class="cc-label">Valor aproximado</span><input class="cc-control" value="185000" aria-label="Valor aproximado"><span class="cc-help">Referencia inicial; no es una suma confirmada.</span></label>
-        </div></div>
-        <div class="cc-stage-panel"><div class="cc-stage-panel__head"><span>02</span><b>Condiciones que pueden cambiar tus opciones</b></div><div class="cc-field-grid"><label class="cc-field"><span class="cc-label">Conductor joven / condición aplicable</span><select class="cc-control"><option>No</option></select></label><label class="cc-field"><span class="cc-label">Equipo especial</span><select class="cc-control"><option>No</option></select></label><label class="cc-field"><span class="cc-label">Tipo de protección que buscas</span><select class="cc-control"><option>Cobertura amplia</option></select></label><label class="cc-field"><span class="cc-label">Cómo prefieres pagar</span><select class="cc-control"><option>Contado</option></select></label></div></div>
-        <div class="cc-stage-panel"><div class="cc-stage-panel__head"><span>03</span><b>Qué pesa más en tu decisión</b></div><div class="cc-field-grid"><label class="cc-field"><span class="cc-label">¿Qué pesa más en tu decisión?</span><select class="cc-control"><option>Equilibrio entre precio y protección</option></select></label></div></div>
+        <div id="otherPaths" class="cc-paths" hidden></div>
+        <div id="intakeGroups"></div>
         <div class="cc-actions"><button class="cc-btn" type="button" data-prev="1">← Volver</button><button class="cc-btn cc-btn--primary" type="button" data-next="3">Revisar opciones →</button></div>
       </section>
 
       <section data-stage-panel="3">
         <div class="cc-section-kicker">03 · REVISIÓN DE OPCIONES</div>
         <h3 class="cc-section-title">Revisamos las opciones antes de compararlas.</h3>
-        <p class="cc-section-lead">Una opción recibida todavía puede requerir información o validación antes de entrar a la comparación.</p>
-        <div class="cc-review-grid"><article class="cc-review-card"><b>Alternativa A</b><strong>Q 2,180</strong><span>Revisada y lista para comparar</span></article><article class="cc-review-card"><b>Alternativa B</b><strong>Q 2,540</strong><span>Revisada y lista para comparar</span></article><article class="cc-review-card"><b>Alternativa C</b><strong>Dato pendiente</strong><span>Pendiente de revisión</span></article></div>
-        <div class="cc-actions"><button class="cc-btn" type="button" data-prev="2">← Volver</button><button class="cc-btn cc-btn--primary" type="button" data-next="4">Comparar opciones →</button></div>
+        <p class="cc-section-lead">Solo entran al comparador alternativas con información suficiente y bases equivalentes. Si todavía no existen dos propuestas validadas, no inventamos una comparación.</p>
+        <div id="reviewContent"></div>
+        <div class="cc-actions"><button class="cc-btn" type="button" data-prev="2">← Volver</button><button id="compareNext" class="cc-btn cc-btn--primary" type="button" data-next="4">Comparar y continuar →</button></div>
       </section>
 
       <section data-stage-panel="4">
         <div class="cc-section-kicker">04 · COMPARAR Y CONTINUAR</div>
         <h3 class="cc-section-title">Compara diferencias que sí cambian la decisión.</h3>
-        <p class="cc-section-lead">Cuando las alternativas tienen bases comparables, mostramos costo, alcance, condiciones y los puntos que conviene revisar antes de elegir.</p>
-        <table class="cc-compare"><thead><tr><th>CRITERIO</th><th>Alternativa A</th><th>Alternativa B</th></tr></thead><tbody><tr><td>Costo total</td><td>Q 2,180</td><td>Q 2,540</td></tr><tr><td>Deducible</td><td>20%</td><td>10%</td></tr><tr><td>Asistencia / servicio</td><td>Básica</td><td>Ampliada</td></tr><tr><td>Alcance</td><td>Cobertura amplia</td><td>Cobertura amplia</td></tr><tr><td>Estado</td><td>Revisada y comparable</td><td>Revisada y comparable</td></tr></tbody></table>
-        <aside class="cc-rec"><small>Recomendación A&amp;S</small><h3>Orientación según lo que dijiste que más pesa en tu decisión.</h3><p>No elegimos automáticamente por ti. Explicamos qué alternativa se acerca más a tu prioridad y qué diferencias debes revisar antes de continuar.</p></aside>
+        <p class="cc-section-lead">El comparador solo se habilita cuando existen al menos dos alternativas validadas. La prioridad organiza la explicación; no crea un ranking universal.</p>
+        <div id="compareContent"></div>
         <div class="cc-replan"><b>¿Quieres reconsiderar algo sin empezar de cero?</b><div class="cc-replan__choices"><button type="button" data-replan="priority">Cambiar mi prioridad</button><button type="button" data-replan="data">Ajustar datos del caso</button><button type="button" data-replan="need">Revisar otra necesidad</button></div></div>
-        <div class="cc-actions"><button class="cc-btn" type="button" data-prev="3">← Volver</button><div><button class="cc-btn" type="button">Hablar con un asesor</button> <button class="cc-btn cc-btn--primary" type="button">Elegir y continuar →</button></div></div>
+        <div class="cc-actions"><button class="cc-btn" type="button" data-prev="3">← Volver</button><div><button class="cc-btn" type="button">Hablar con un asesor</button> <button id="decisionBtn" class="cc-btn cc-btn--primary" type="button">Continuar →</button></div></div>
       </section>
     </div>
   </main>
@@ -228,20 +238,9 @@ function html(){
 <div class="cc-lab">SOURCE-ONLY LAB · No constituye oferta, emisión ni conexión real con aseguradoras. Gravicentra conserva la autoridad operativa. Este artefacto no está autorizado para URL de Owner Review.</div>
 <script>
 (()=>{
-  const stageMeta={
-    1:['01','EMPEZAR','Elige el punto de partida'],
-    2:['02','TUS DATOS','Responde solo lo necesario'],
-    3:['03','REVISAR','Revisamos las opciones'],
-    4:['04','COMPARAR','Compara y elige cómo continuar']
-  };
-  const go=n=>{
-    document.querySelectorAll('[data-stage-panel]').forEach(x=>x.classList.toggle('is-visible',x.dataset.stagePanel===String(n)));
-    document.querySelectorAll('.cc-step').forEach(x=>x.classList.toggle('is-active',x.dataset.step===String(n)));
-    const m=stageMeta[n];document.getElementById('stageNumber').textContent=m[0];document.getElementById('stageKicker').textContent=m[1];document.getElementById('stageHeading').textContent=m[2];
-    window.scrollTo({top:document.querySelector('.cc-wrap').offsetTop-72,behavior:'smooth'});
-  };
-  document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>go(Number(b.dataset.next))));
-  document.querySelectorAll('[data-prev]').forEach(b=>b.addEventListener('click',()=>go(Number(b.dataset.prev))));
+  const DOMAIN=${JSON.stringify(domainSnapshot)};
+  const FAMILY_TO_PRODUCT=${JSON.stringify(familyToProduct)};
+  const scenePos=${JSON.stringify(SCENES)};
   const sceneMeta={
     vehicle:{label:'Vehículo / Movilidad',text:'Vehículo, uso y condiciones que influyen en tus opciones.'},
     home:{label:'Hogar',text:'Vivienda, contenido y responsabilidad familiar.'},
@@ -251,21 +250,150 @@ function html(){
     cargo:{label:'Transporte / Carga',text:'Rol en la cadena, carga y puntos críticos del trayecto.'},
     other:{label:'Otros / No sé cuál necesito',text:'A&S te ayuda a identificar la necesidad antes de pedir datos de producto.'}
   };
-  const scenePos=${JSON.stringify(SCENES)};
-  let selectedFamily='vehicle';
-  const syncRouteVisual=()=>{
-    const meta=sceneMeta[selectedFamily],pos=scenePos[selectedFamily];
-    const photo=document.getElementById('routePhoto');
-    if(photo){photo.style.backgroundPosition=pos.x+' '+pos.y;photo.dataset.visualAsset='route:'+selectedFamily;photo.setAttribute('aria-label','Contexto visual de '+meta.label);}
-    const need=document.getElementById('selectedNeed');if(need)need.textContent=meta.label;
-    const title=document.getElementById('routeVisualTitle');if(title)title.textContent=meta.label;
-    const copy=document.getElementById('routeVisualText');if(copy)copy.textContent=meta.text;
-  };
+  const state={country:'gt',family:'vehicle',product:'auto',mode:'online',stage:1,form:{}};
+  const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const countryName=()=>state.country==='co'?'Colombia':'Guatemala';
+  const key=()=>state.country+':'+state.product;
+  const current=()=>DOMAIN[key()]||DOMAIN[state.country+':duda];
+
+  function stageMeta(n){
+    return {
+      1:['01','EMPEZAR','Elige el punto de partida'],
+      2:['02','TUS DATOS','Responde solo lo necesario'],
+      3:['03','REVISAR','Revisamos las opciones'],
+      4:['04','COMPARAR','Compara y elige cómo continuar']
+    }[n];
+  }
+
+  function go(n){
+    state.stage=n;
+    document.querySelectorAll('[data-stage-panel]').forEach(x=>x.classList.toggle('is-visible',x.dataset.stagePanel===String(n)));
+    document.querySelectorAll('.cc-step').forEach(x=>x.classList.toggle('is-active',x.dataset.step===String(n)));
+    const m=stageMeta(n);document.getElementById('stageNumber').textContent=m[0];document.getElementById('stageKicker').textContent=m[1];document.getElementById('stageHeading').textContent=m[2];
+    if(n===2)renderIntake();
+    if(n===3)renderReview();
+    if(n===4)renderCompare();
+    window.scrollTo({top:document.querySelector('.cc-wrap').offsetTop-72,behavior:'smooth'});
+  }
+
+  function fieldHtml(f){
+    const id='f_'+f.id;
+    let control='';
+    if(f.type==='select'){
+      control='<select class="cc-control" id="'+id+'" data-field="'+esc(f.id)+'">'+(f.options||[]).map(o=>'<option'+(String(o)===String(f.default)?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
+    }else{
+      control='<input class="cc-control" id="'+id+'" data-field="'+esc(f.id)+'" type="'+esc(f.type||'text')+'" value="'+esc(f.default||'')+'">';
+    }
+    return '<label class="cc-field"><span class="cc-label">'+esc(f.label)+'</span>'+control+(f.help?'<span class="cc-help">'+esc(f.help)+'</span>':'')+'</label>';
+  }
+
+  function bindFields(){
+    document.querySelectorAll('[data-field]').forEach(el=>{
+      el.addEventListener('change',()=>{
+        state.form[el.dataset.field]=el.value;
+        if(state.product==='salud' && el.dataset.field==='hijos') renderIntake();
+      });
+    });
+  }
+
+  function otherPaths(){
+    const box=document.getElementById('otherPaths');
+    if(state.family!=='other'){box.hidden=true;box.innerHTML='';return;}
+    box.hidden=false;
+    const paths=[
+      ['duda','Necesito orientación'],
+      ['contrato','Contrato / obligación / proyecto'],
+      ['revision','Revisar póliza existente']
+    ];
+    box.innerHTML=paths.map(([id,label])=>'<button type="button" class="cc-path'+(state.product===id?' is-active':'')+'" data-path="'+id+'">'+label+'</button>').join('');
+    box.querySelectorAll('[data-path]').forEach(b=>b.addEventListener('click',()=>{state.product=b.dataset.path;state.form={};renderIntake();}));
+  }
+
+  function renderIntake(){
+    const base=DOMAIN[key()]||DOMAIN[state.country+':duda];
+    let sc=base.schema;
+    if(state.product==='salud'){
+      const hijos=state.form.hijos!=null?state.form.hijos:((sc.groups[0].fields.find(x=>x.id==='hijos')||{}).default||0);
+      const n=Math.max(0,Math.min(6,parseInt(hijos,10)||0));
+      sc=JSON.parse(JSON.stringify(sc));
+      const comp=sc.groups[0],idx=comp.fields.findIndex(x=>x.id==='hijos');
+      comp.fields=comp.fields.filter(x=>!/^dependentDob/.test(x.id));
+      const additions=[];for(let i=0;i<n;i++) additions.push({id:'dependentDob'+(i+1),label:'Fecha de nacimiento · hijo '+(i+1),type:'date',options:[],default:i===0?'2018-06-10':'',help:'Solo si aplica a esta composición familiar.'});
+      if(idx>=0)comp.fields.splice(idx+1,0,...additions);
+    }
+    const meta=sceneMeta[state.family];
+    document.getElementById('intakeTitle').textContent='Cuéntanos solo lo necesario sobre '+(state.family==='other'?'tu necesidad':meta.label.toLowerCase())+'.';
+    document.getElementById('intakeLead').textContent='Pedimos datos comunes que cambian disponibilidad, condiciones o comparación. Los requisitos propios de una aseguradora se solicitan solo si la fuente los necesita.';
+    document.getElementById('selectedCountry').textContent=countryName();
+    document.getElementById('selectedNeed').textContent=sc.title;
+    document.getElementById('selectedMode').textContent=state.mode==='assisted'?'Con acompañamiento A&S':'En línea con asesoría disponible';
+    document.getElementById('routeVisualTitle').textContent=meta.label;
+    document.getElementById('routeVisualText').textContent=meta.text;
+    const photo=document.getElementById('routePhoto'),pos=scenePos[state.family];
+    photo.style.backgroundPosition=pos.x+' '+pos.y;photo.dataset.visualAsset='route:'+state.family;photo.setAttribute('aria-label','Contexto visual de '+meta.label);
+    otherPaths();
+    document.getElementById('intakeGroups').innerHTML=sc.groups.map((g,i)=>'<div class="cc-stage-panel"><div class="cc-stage-panel__head"><span>'+String(i+1).padStart(2,'0')+'</span><b>'+esc(g.title)+'</b></div><div class="cc-field-grid">'+g.fields.map(fieldHtml).join('')+'</div></div>').join('');
+    bindFields();
+  }
+
+  function renderReview(){
+    const info=current();
+    const c=info.comparison;
+    let html='';
+    if(c.quotes.length){
+      html='<div class="cc-review-grid">'+c.quotes.map(q=>'<article class="cc-review-card"><b>'+esc(q.name)+'</b><strong>'+esc(q.total)+'</strong><span>'+(q.status==='VALIDATED'?'Revisada y lista para comparar':'Pendiente de validación')+'</span></article>').join('')+'</div>';
+    }
+    if(!c.comparable){
+      html+='<aside class="cc-no-compare"><small>VALIDACIÓN ANTES DE COMPARAR</small><h3>Todavía no hay dos alternativas validadas para comparar.</h3><p>No mostramos precios ni “ganadores” inventados. A&S continúa por la ruta '+(state.mode==='assisted'?'acompañada':'correspondiente')+' hasta contar con propuestas comparables.</p></aside>';
+    }else{
+      html+='<div class="cc-truth" style="margin-top:16px;margin-bottom:0">Hay dos alternativas validadas en este ejemplo LAB. La comparación se habilita sin ranking silencioso.</div>';
+    }
+    document.getElementById('reviewContent').innerHTML=html;
+    document.getElementById('compareNext').textContent=c.comparable?'Comparar opciones →':'Ver cómo continúa →';
+  }
+
+  function renderCompare(){
+    const c=current().comparison;
+    const box=document.getElementById('compareContent');
+    if(c.comparable){
+      const a=c.validated[0],b=c.validated[1];
+      box.innerHTML='<table class="cc-compare"><thead><tr><th>CRITERIO</th><th>'+esc(a.name)+'</th><th>'+esc(b.name)+'</th></tr></thead><tbody>'+
+        '<tr><td>Costo total</td><td>'+esc(a.total)+'</td><td>'+esc(b.total)+'</td></tr>'+
+        '<tr><td>Deducible</td><td>'+esc(a.deductible)+'</td><td>'+esc(b.deductible)+'</td></tr>'+
+        '<tr><td>Asistencia / servicio</td><td>'+esc(a.assistance)+'</td><td>'+esc(b.assistance)+'</td></tr>'+
+        '<tr><td>Alcance</td><td>'+esc(a.coverage)+'</td><td>'+esc(b.coverage)+'</td></tr>'+
+        '</tbody></table>'+
+        '<aside class="cc-rec"><small>Recomendación A&amp;S</small><h3>Orientación según lo que dijiste que más pesa en tu decisión.</h3><p>No elegimos automáticamente por ti. Explicamos los trade-offs entre propuestas validadas y qué diferencia conviene revisar antes de continuar.</p></aside>';
+      document.getElementById('decisionBtn').textContent='Elegir y continuar →';
+    }else{
+      box.innerHTML='<aside class="cc-no-compare"><small>SIN COMPARACIÓN FICTICIA</small><h3>Esta ruta necesita validación o acompañamiento antes de comparar.</h3><p>La experiencia conserva tu contexto y continúa con A&S. No inventamos primas, coberturas ni alternativas cuando la fuente todavía no está validada para web.</p></aside>';
+      document.getElementById('decisionBtn').textContent='Continuar con A&S →';
+    }
+  }
+
+  document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>go(Number(b.dataset.next))));
+  document.querySelectorAll('[data-prev]').forEach(b=>b.addEventListener('click',()=>go(Number(b.dataset.prev))));
+
   document.querySelectorAll('.cc-family').forEach(b=>b.addEventListener('click',()=>{
     document.querySelectorAll('.cc-family').forEach(x=>{x.classList.remove('is-selected');x.setAttribute('aria-pressed','false');});
-    b.classList.add('is-selected');b.setAttribute('aria-pressed','true');selectedFamily=b.dataset.family;syncRouteVisual();
+    b.classList.add('is-selected');b.setAttribute('aria-pressed','true');
+    state.family=b.dataset.family;state.product=FAMILY_TO_PRODUCT[state.family];state.form={};
   }));
-  syncRouteVisual();
+
+  document.querySelectorAll('[data-country]').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('[data-country]').forEach(x=>x.classList.toggle('is-active',x===b));
+    state.country=b.dataset.country;state.form={};
+    document.getElementById('heroKicker').textContent='COTIZAR Y COMPARAR · '+countryName().toUpperCase();
+    if(state.stage>1){renderIntake();if(state.stage>2)renderReview();if(state.stage>3)renderCompare();}
+  }));
+
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{
+    state.mode=b.dataset.mode;
+    document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('is-active',x===b));
+    if(state.stage===2)renderIntake();
+    if(state.stage===3)renderReview();
+    if(state.stage===4)renderCompare();
+  }));
 
   const modal=document.getElementById('replanModal'),rt=document.getElementById('replanTitle'),rx=document.getElementById('replanText');
   const replanCopy={
