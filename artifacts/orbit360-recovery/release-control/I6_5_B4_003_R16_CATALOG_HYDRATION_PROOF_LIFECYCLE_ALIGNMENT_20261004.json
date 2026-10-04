@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R16_CATALOG_HYDRATION_PROOF_LIFECYCLE_ALIGNMENT_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_PROOF_ALIGNED_PENDING_EXACT_PREVIEW",
+  "failedRunId": 37213136634,
+  "failedJobId": 111468172686,
+  "failureCode": "B4_003_R16_CATALOG_CANONICAL_HYDRATION_FAILED",
+  "observed": {
+    "source": "bootstrap-default",
+    "syncPending": true,
+    "hydrated": false
+  },
+  "rootCause": "Proof inspected catalog status from Calidad before a catalog-consuming flow invoked demand-driven canonical ensure(). Passive pre-auth hydration is not a valid startup requirement.",
+  "correction": "Authenticated proof explicitly awaits Orbit.cat.ensure(true) before asserting canonical source. Product consumer flows remain fail-closed and unchanged.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "performanceThresholdRelaxed": false,
+  "priorProofBlobSha": "f87f5ebc9302440a84e97826a37afb6904d343e6",
+  "correctedProofBlobSha": "fd18c4c9da6ab46e8b9fdf8c34ef5d30946adbaf",
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

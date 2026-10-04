@@ -4860,7 +4860,7 @@
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
       "executionLockBlobSha": "349c58044e8fb596ce8b802ebe174594c5e1265e",
-      "compositionLockBlobSha": "96033042ab579849c8560acf51c5305171871896",
+      "compositionLockBlobSha": "fbecdc04e6dbb8e94b6a73bc84afb9421d1c67eb",
       "findingLedgerBlobSha": "e877504ab1395f5f840d87e1d208a0b10c9eb687",
       "activeFindingId": "B4-003",
       "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -5712,6 +5712,13 @@
         "blobSha": "887698030f0a1def0cb2f05f6408745da90d3b37",
         "contractBlobSha": "6e6a256e6509412a1bd8a454473ac076a27a1f8a",
         "productSourceChanged": false
+      },
+      "r16CatalogHydrationProofAlignment": {
+        "status": "QA_PROOF_ALIGNED_PENDING_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_CATALOG_HYDRATION_PROOF_LIFECYCLE_ALIGNMENT_20261004.json",
+        "blobSha": "68cf81b065c19008f430383cb59ff7b4f2af07a8",
+        "proofBlobSha": "fd18c4c9da6ab46e8b9fdf8c34ef5d30946adbaf",
+        "productSourceChanged": false
       }
     }
   },
@@ -6034,7 +6041,7 @@
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "349c58044e8fb596ce8b802ebe174594c5e1265e",
-    "compositionLockBlobSha": "96033042ab579849c8560acf51c5305171871896",
+    "compositionLockBlobSha": "fbecdc04e6dbb8e94b6a73bc84afb9421d1c67eb",
     "findingLedgerBlobSha": "2644cf32b8287a85eec4b12fac4e4ed55bbb596b",
     "noLive": true,
     "noReimport": true,
@@ -6942,6 +6949,13 @@
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9",
       "qualityBlobSha": "85907b0d54e565000f7f10e7ff24c08c46114791"
+    },
+    "r16CatalogHydrationProofAlignment": {
+      "status": "QA_PROOF_ALIGNED_PENDING_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_CATALOG_HYDRATION_PROOF_LIFECYCLE_ALIGNMENT_20261004.json",
+      "blobSha": "68cf81b065c19008f430383cb59ff7b4f2af07a8",
+      "proofBlobSha": "fd18c4c9da6ab46e8b9fdf8c34ef5d30946adbaf",
+      "productSourceChanged": false
     }
   },
   "b4VisualAcceptanceControl": {
