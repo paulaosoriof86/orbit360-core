@@ -7595,7 +7595,7 @@
       "owner": [
         "orbit360-platform/modules/calidad.js"
       ],
-      "status": "DIAGNOSED_R16_02_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R16_02_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Same exact authenticated Preview proof renders Calidad GT and CO in <2500 ms without removing required financial mismatch rows, country/provenance semantics, or relaxing threshold.",
@@ -7604,7 +7604,9 @@
       "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644",
       "noLive": true,
       "noReimport": true,
-      "nextAction": "B4_003_R16_02_NARROW_PERFORMANCE_SOURCE_FIX"
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9"
     }
   ],
   "phaseBBacklog": [
@@ -8005,5 +8007,11 @@
     "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_DIAGNOSTIC_20261004.json",
     "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644",
     "failedRunId": 37207119191
+  },
+  "lastR16PerformanceRegressionSourceFix": {
+    "id": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
+    "status": "SOURCE_FIXED_R16_02_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_20261004.json",
+    "receiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9"
   }
 }

@@ -203,10 +203,10 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "814434e3e4c52fb6ccb5e9e81b17b1169bd193e3",
+    "orbit360-platform/index.html": "b1d1acd38b226ec59ea1c89c40c9a61c63c056f9",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "836fc63ce376e51de1e540ba7bc7ea9a91d2aef2",
-    "orbit360-platform/modules/calidad.js": "eafbba420cd59767945201ec9bdfb20148ff974a",
+    "orbit360-platform/modules/calidad.js": "85907b0d54e565000f7f10e7ff24c08c46114791",
     "orbit360-platform/modules/cancelaciones.js": "63f6dd1bb3ffad24cf8452404dfc540f1b92e2b7",
     "orbit360-platform/modules/cliente360.js": "bf8b4469631ad10f62ea825f46d29bcf3259583c",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
@@ -2166,7 +2166,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "2b0df5e619f499d0d36048d8551659bcf5887869",
+  "findingLedgerBlobSha": "2644cf32b8287a85eec4b12fac4e4ed55bbb596b",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2586,7 +2586,7 @@
     "diagnosticRunId": 37153182332,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "findingContinuityRegisterBlobSha": "2cd3f08db9f30969232d363fa96fec580bb55a0a",
+  "findingContinuityRegisterBlobSha": "6e5680687f26a26d072effb395c9f3ec6f01e107",
   "b4003MachinePassVisualStateReconciliation": {
     "status": "MACHINE_PASS_VISUAL_STATE_RECONCILED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_VISUAL_STATE_RECONCILIATION_20261003.json",
@@ -2814,7 +2814,7 @@
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "continuityRegisterBlobSha": "2cd3f08db9f30969232d363fa96fec580bb55a0a",
+  "continuityRegisterBlobSha": "6e5680687f26a26d072effb395c9f3ec6f01e107",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
   "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "b4003R15VisualReview": {
@@ -2867,7 +2867,7 @@
       "orbit360-platform/index.html": "814434e3e4c52fb6ccb5e9e81b17b1169bd193e3"
     },
     "qaBlobs": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "6e6a256e6509412a1bd8a454473ac076a27a1f8a",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "d6b89c80bc39155dd72b94aa5f70b90db89f658e",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "f87f5ebc9302440a84e97826a37afb6904d343e6",
       ".github/workflows/gravicentra-b4-003-executor.yml": "3f5dc41bcbaa1d0f2b050c2802002c272e2fe81a"
     },
@@ -2903,6 +2903,25 @@
     "priorContractBlobSha": "857a28de36c3e0397040a930b99f38fef6bf7888",
     "correctedContractBlobSha": "6e6a256e6509412a1bd8a454473ac076a27a1f8a",
     "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "b4003R16PerformanceFix": {
+    "status": "SOURCE_FIXED_R16_02_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_20261004.json",
+    "receiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9",
+    "findingId": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
+    "qualityBlobSha": "85907b0d54e565000f7f10e7ff24c08c46114791",
+    "indexBlobSha": "b1d1acd38b226ec59ea1c89c40c9a61c63c056f9",
+    "contractBlobSha": "d6b89c80bc39155dd72b94aa5f70b90db89f658e",
+    "findingLedgerBlobSha": "2644cf32b8287a85eec4b12fac4e4ed55bbb596b",
+    "carryBlobSha": "6e5680687f26a26d072effb395c9f3ec6f01e107",
+    "productFileCount": 100,
+    "thresholdMs": 2500,
+    "thresholdRelaxed": false,
+    "informationRemoved": false,
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false,

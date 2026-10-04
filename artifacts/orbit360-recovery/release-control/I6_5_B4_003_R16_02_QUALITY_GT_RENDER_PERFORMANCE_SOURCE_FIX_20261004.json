@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "SOURCE_FIXED_R16_02_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "8e47aa5e2f6ed18c9a04538bb74f107be0a01838",
+  "findingId": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
+  "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_DIAGNOSTIC_20261004.json",
+  "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644",
+  "failedRunId": 37207119191,
+  "failedObservation": {
+    "GT": {
+      "renderMs": 10429.2,
+      "rows": 50,
+      "financialRows": 72
+    },
+    "CO": {
+      "renderMs": 850.9,
+      "rows": 17,
+      "financialRows": 2
+    },
+    "thresholdMs": 2500
+  },
+  "sourceFix": {
+    "orbit360-platform/modules/calidad.js": "85907b0d54e565000f7f10e7ff24c08c46114791",
+    "orbit360-platform/index.html": "b1d1acd38b226ec59ea1c89c40c9a61c63c056f9"
+  },
+  "qaFix": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "d6b89c80bc39155dd72b94aa5f70b90db89f658e"
+  },
+  "causalCorrection": "Bound linked country-evidence evaluation to clients with missing/invalid country only. Persisted country and provenance remain visible for every row; modal evidence evaluation remains available; financial mismatch rows are unchanged.",
+  "thresholds": {
+    "qualitySyncRenderMsMax": 2500,
+    "relaxed": false
+  },
+  "informationRemoved": false,
+  "financialRowsRemoved": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "b4004Held": true,
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

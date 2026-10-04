@@ -90,8 +90,8 @@ Orbit.modules.calidad = (function () {
       if (state==='vigente' || state==='porrenovar') vigenteClientIds.add(p.clienteId);
     });
     const all = clients.map(c => {
-      const f=faltantes(c);
-      return { c, f, vig: vigenteClientIds.has(c.id), evidence: evidenceFor(c) };
+      const f=faltantes(c), needsCountry=f.some(x=>x.k==='pais');
+      return { c, f, vig: vigenteClientIds.has(c.id), evidence: needsCountry ? evidenceFor(c) : { suggestedCountry:'', conflict:false, sources:[] } };
     }).filter(x => x.f.length > 0);
     const conVig = all.filter(x => x.vig);
     const advisors = advisorOptions(clients);
@@ -216,5 +216,5 @@ Orbit.modules.calidad = (function () {
     const mail = rows.filter(x => !clean(x.c.whatsapp || x.c.telefono) && clean(x.c.email)).length;
     U.toast('Actualización preparada:\n\n• ' + wa + ' por WhatsApp Web/canal pendiente de confirmación\n• ' + mail + ' por correo preparado\n• ' + (rows.length - wa - mail) + ' sin canal — requieren gestión.\n\nNo se ha confirmado ningún envío.');
   }
-  return { render, campana, editarInline, faltantes, financialIntegrityIssues, version: '1.221-r16-durable-information-health' };
+  return { render, campana, editarInline, faltantes, financialIntegrityIssues, version: '1.222-r16p1-performance' };
 })();

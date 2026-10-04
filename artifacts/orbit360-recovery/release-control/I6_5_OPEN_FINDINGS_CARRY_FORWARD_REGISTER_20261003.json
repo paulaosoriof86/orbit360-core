@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76",
-  "expectedLedgerNextBlobSha": "a893fdcccbf3f67d1781277810fa7ddf70496ade",
+  "expectedLedgerNextBlobSha": "2644cf32b8287a85eec4b12fac4e4ed55bbb596b",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -3274,7 +3274,7 @@
     {
       "id": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
       "block": "B4",
-      "status": "DIAGNOSED_R16_02_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R16_02_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/calidad.js"
@@ -3284,9 +3284,11 @@
       "source": "B4_003_EXACT_PREVIEW_MACHINE_PROOF_RUN_37207119191",
       "finding": "Authenticated exact Preview rendered Calidad GT in 10429.2 ms against a <2500 ms gate; CO rendered in 850.9 ms.",
       "rootCause": "R16 expanded per-client linked-country evidence evaluation from country-pending clients to every client in scope.",
-      "nextAction": "B4_003_R16_02_NARROW_PERFORMANCE_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_DIAGNOSTIC_20261004.json",
-      "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644"
+      "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9"
     }
   ],
   "attentionIds": [
@@ -3509,6 +3511,12 @@
     "id": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
     "status": "DIAGNOSED_R16_02_SOURCE_FIX_AUTHORIZED",
     "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644",
+    "exactSetWithLedger": true
+  },
+  "lastR16PerformanceRegressionSourceFix": {
+    "id": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
+    "status": "SOURCE_FIXED_R16_02_PENDING_EXACT_PREVIEW",
+    "receiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9",
     "exactSetWithLedger": true
   }
 }
