@@ -5348,6 +5348,13 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13P3_PREVIEW_GATE_NOOP_ROOTFIX_20261004.json",
         "failedRunId": 37163576092,
         "productSourceChanged": false
+      },
+      "r13P3ContractAlignment": {
+        "status": "QA_CONTRACT_ALIGNED_PENDING_EXACT_PREVIEW",
+        "failedRunId": 37163654710,
+        "failureCode": "B4_003_R13_POLICY_INDEXED_DEBOUNCED_SEARCH_MISSING",
+        "contractBlobSha": "9a4f056a7ee689837ef472ea2eabae6242c2e872",
+        "productSourceChanged": false
       }
     }
   },
@@ -6150,6 +6157,13 @@
       "status": "QA_GOVERNANCE_GATE_MISMATCH_REPAIRED",
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13P3_PREVIEW_GATE_NOOP_ROOTFIX_20261004.json",
       "failedRunId": 37163576092,
+      "productSourceChanged": false
+    },
+    "r13P3ContractAlignment": {
+      "status": "QA_CONTRACT_ALIGNED_PENDING_EXACT_PREVIEW",
+      "failedRunId": 37163654710,
+      "failureCode": "B4_003_R13_POLICY_INDEXED_DEBOUNCED_SEARCH_MISSING",
+      "contractBlobSha": "9a4f056a7ee689837ef472ea2eabae6242c2e872",
       "productSourceChanged": false
     }
   },
