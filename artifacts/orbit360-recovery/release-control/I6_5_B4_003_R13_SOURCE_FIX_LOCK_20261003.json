@@ -29,7 +29,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "fafacabe799aa73fbc8b092741c2c4576a2833c9"
+    "blobSha": "6b2aa8c31c05ae851fcc7c7118f93052cc7baf44"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -331,7 +331,7 @@
     "reimport": false,
     "livePromotion": false
   },
-  "compositionLockBlobSha": "fafacabe799aa73fbc8b092741c2c4576a2833c9",
+  "compositionLockBlobSha": "6b2aa8c31c05ae851fcc7c7118f93052cc7baf44",
   "r14SourceFix": {
     "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
@@ -555,7 +555,7 @@
   "r1604TargetedVisualSourceFix": {
     "status": "SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
-    "blobSha": "cbd2606a8150dd28d728fd16af0fa0d24a8be066",
+    "blobSha": "35d342a313ceef799af0385cadf9f498ec885a91",
     "allowedProductFiles": [
       "orbit360-platform/modules/calidad.js",
       "orbit360-platform/modules/configuracion.js",
@@ -569,6 +569,13 @@
       "tools/gravicentra-i6-5-b4-003-contract.mjs",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs"
     ],
-    "findingCountAfter": 215
+    "findingCountAfter": 215,
+    "qaCompatibilityAlignment": {
+      "failedRunId": 37224611752,
+      "failureCode": "B4_003_R16_INSURER_REGISTRY_UI_OR_METADATA_MISSING",
+      "resolution": "Preserve literal canonical Registry identity while retaining clearer Biblioteca/Drive hierarchy.",
+      "productSourceChanged": true,
+      "noBuildOccurredBeforeFix": true
+    }
   }
 }

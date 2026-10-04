@@ -33,9 +33,9 @@
     "orbit360-platform/modules/configuracion.js": "0ec30235bf676b89c85a5c0dc58b09a5e1a81193",
     "orbit360-platform/modules/renovaciones.js": "7fa3c7a933b246b34c8021dad1e7c34cfa1844ac",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "9c817c3687d724b207227654bc2f361fa98a9148",
-    "orbit360-platform/modules/aseguradoras.js": "34dc9d7834d5204efd496d17368cd208ceac69f0",
+    "orbit360-platform/modules/aseguradoras.js": "f098a07b031f2877cacdd73b04bfaeae4bc7088b",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "5025ee88abaed8be499d2bacf57796cc77a5736f",
-    "orbit360-platform/index.html": "099e17a7ec0cce6502f68f4d8bbbd907e4aed9da"
+    "orbit360-platform/index.html": "9948993770f2ccb55d704ab3db89ee43f77ecb11"
   },
   "qaBlobs": {
     "tools/gravicentra-i6-5-b4-003-contract.mjs": "dc6e23b6df420a3f62edeaa24d612c4ff68e9317",
@@ -52,5 +52,12 @@
     "quoteAuthority": "gravicentra-quote-authority-v1",
     "b4004Held": true
   },
-  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+  "qaCompatibilityAlignment": {
+    "failedRunId": 37224611752,
+    "failureCode": "B4_003_R16_INSURER_REGISTRY_UI_OR_METADATA_MISSING",
+    "resolution": "Preserve literal canonical Registry identity while retaining clearer Biblioteca/Drive hierarchy.",
+    "productSourceChanged": true,
+    "noBuildOccurredBeforeFix": true
+  }
 }
