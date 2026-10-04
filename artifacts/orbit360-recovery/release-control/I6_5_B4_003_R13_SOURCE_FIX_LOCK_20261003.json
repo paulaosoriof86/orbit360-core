@@ -414,5 +414,25 @@
     "reimport": false,
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "r14Client360RuntimeScopeRootFix": {
+    "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_CLIENT360_RUNTIME_SCOPE_ROOTFIX_20261004.json",
+    "blobSha": "4497c0f1b492061e73f3ad38101eb9971e99280d",
+    "failedRunId": 37186271495,
+    "failedJobId": 111389013312,
+    "failure": "CLIENT360_STALE_DIAGNOSTIC_REFERENCE_CLIENTBATCH",
+    "productBlobs": {
+      "orbit360-platform/modules/cliente360.js": "bf8b4469631ad10f62ea825f46d29bcf3259583c",
+      "orbit360-platform/index.html": "a0790a5b52c8c2b6c2c84c4d0f2415cb8a9e2ebf"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "c132fdb8fa2034795ffe77fe34285a49339a80da"
+    },
+    "continuityRegisterBlobSha": "ab18138d0ccc5c5fb79f5ca0d00bcf2b0e906b52",
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   }
 }
