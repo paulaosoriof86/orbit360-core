@@ -692,7 +692,7 @@ try{
    const out={authority:root?.getAttribute('data-c360-base-authority')||'',storeHasSynthetic,authoritativeGtCount:canonical.length,uiUniverseCount,syntheticSearchVisible,pageSize:Number(diag.pageSize||0),renderedRows:Number(diag.renderedRows||0),filteredRows:Number(diag.filteredRows||0),totalRows:Number(diag.totalRows||0)};
    Orbit.pais=previous;return out;
  },ids);
- need(proof.r14Client360Authority.authority==='server-confirmed-store'&&proof.r14Client360Authority.storeHasSynthetic===true&&proof.r14Client360Authority.uiUniverseCount===proof.r14Client360Authority.authoritativeGtCount&&proof.r14Client360Authority.syntheticSearchVisible===true,'B4_003_R14_CLIENT360_AUTHORITATIVE_LIST_FAILED:'+JSON.stringify(proof.r14Client360Authority));
+ need(proof.r14Client360Authority.authority==='server-confirmed-store'&&proof.r14Client360Authority.storeHasSynthetic===true&&proof.r14Client360Authority.uiUniverseCount===proof.r14Client360Authority.authoritativeGtCount&&proof.r14Client360Authority.filteredRows===proof.r14Client360Authority.authoritativeGtCount&&proof.r14Client360Authority.pageSize>0&&proof.r14Client360Authority.renderedRows===Math.min(proof.r14Client360Authority.pageSize,proof.r14Client360Authority.authoritativeGtCount),'B4_003_R14_CLIENT360_AUTHORITATIVE_LIST_FAILED:'+JSON.stringify(proof.r14Client360Authority));
  proof.assertions.client360AuthoritativeList=true;
 
  proof.r14QualityGrammar=await page.evaluate(()=>{
