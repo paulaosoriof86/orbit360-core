@@ -1,12 +1,12 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_V1",
-  "recordedAt": "2026-10-03T01:08:45.242Z",
+  "recordedAt": "2026-10-04T00:25:03.025Z",
   "status": "READONLY_DIAGNOSTIC_COMPLETE",
   "findingId": "B4-003",
   "mode": "READ_ONLY_NO_PRODUCT_OR_DATA_WRITES",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "sourceSha": "16df51c63a5690c6c53285889cfce94d0016d2a3",
+  "sourceSha": "43e615e5abe491926f5a2f46c341706facdf265a",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "runtime": {
@@ -17,7 +17,121 @@
     "activeRenewalManagements": 3,
     "duplicateActiveRenewalManagementKeys": [],
     "activeRecoveryBusinesses": 0,
-    "duplicateActiveRecoveryBusinessKeys": []
+    "duplicateActiveRecoveryBusinessKeys": [],
+    "renewalSourceProbe": [
+      {
+        "id": "pol_9634d32ec97e4dc93fef8f194677",
+        "numero": "1-AP-20890",
+        "estado": "Vigente",
+        "vigenciaInicio": "2026-08-04",
+        "vigenciaFin": "2026-10-04",
+        "renovadaPor": "",
+        "renuevaDe": "",
+        "renovacionEstado": "",
+        "renovable": null,
+        "pais": "GT",
+        "aseguradoraId": "gt-aseguradora-general",
+        "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+      },
+      {
+        "id": "pol_a02fe1584efcde81a752782d0e53",
+        "numero": "68542",
+        "estado": "Renovada",
+        "vigenciaInicio": "2024-10-01",
+        "vigenciaFin": "2025-10-01",
+        "renovadaPor": "",
+        "renuevaDe": "",
+        "renovacionEstado": "",
+        "renovable": null,
+        "pais": "CO",
+        "aseguradoraId": "co-chubb",
+        "sourceRef": ""
+      },
+      {
+        "id": "pol_b9a883095c9fae8f7502ce1cb054",
+        "numero": "68542",
+        "estado": "Vigente",
+        "vigenciaInicio": "2025-10-01",
+        "vigenciaFin": "2026-10-01",
+        "renovadaPor": "",
+        "renuevaDe": "",
+        "renovacionEstado": "",
+        "renovable": null,
+        "pais": "CO",
+        "aseguradoraId": "co-chubb",
+        "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+      },
+      {
+        "id": "pol_df6bf097045762297ec31fd4e5c5",
+        "numero": "AUTO-1000000334",
+        "estado": "Vigente",
+        "vigenciaInicio": "2025-10-07",
+        "vigenciaFin": "2026-10-07",
+        "renovadaPor": "",
+        "renuevaDe": "",
+        "renovacionEstado": "",
+        "renovable": null,
+        "pais": "GT",
+        "aseguradoraId": "gt-seguros-ficohsa",
+        "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+      },
+      {
+        "id": "pol_8231bbb8f9b7272c02891f5a4caf",
+        "numero": "AUTO38446",
+        "estado": "Vigente",
+        "vigenciaInicio": "2025-10-06",
+        "vigenciaFin": "2026-10-06",
+        "renovadaPor": "",
+        "renuevaDe": "",
+        "renovacionEstado": "",
+        "renovable": null,
+        "pais": "GT",
+        "aseguradoraId": "gt-aseguradora-guatemalteca",
+        "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+      },
+      {
+        "id": "pol_04d0eede3860a982971790b5ea4d",
+        "numero": "VA-43685",
+        "estado": "Renovada",
+        "vigenciaInicio": "2023-10-18",
+        "vigenciaFin": "2024-10-18",
+        "renovadaPor": "",
+        "renuevaDe": "",
+        "renovacionEstado": "",
+        "renovable": null,
+        "pais": "GT",
+        "aseguradoraId": "gt-seguros-columna",
+        "sourceRef": ""
+      },
+      {
+        "id": "pol_652260b8dcd7206c34b70a463547",
+        "numero": "VA-43685",
+        "estado": "Renovada",
+        "vigenciaInicio": "2024-10-18",
+        "vigenciaFin": "2025-10-18",
+        "renovadaPor": "",
+        "renuevaDe": "",
+        "renovacionEstado": "",
+        "renovable": null,
+        "pais": "GT",
+        "aseguradoraId": "gt-seguros-columna",
+        "sourceRef": ""
+      },
+      {
+        "id": "pol_965de501d871c56f3964a24b7724",
+        "numero": "VA-43685",
+        "estado": "Vigente",
+        "vigenciaInicio": "2025-10-18",
+        "vigenciaFin": "2026-10-18",
+        "renovadaPor": "pol_muj5o5ka",
+        "renuevaDe": "",
+        "renovacionEstado": "Renovada",
+        "renovable": null,
+        "pais": "GT",
+        "aseguradoraId": "gt-seguros-columna",
+        "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+      }
+    ]
   },
   "sourceAudit": {
     "assertions": {
@@ -30,21 +144,14 @@
       "renewalAcceptedUsesCanonicalManagementModal": true,
       "renewalProposalUsesCanonicalManagementModal": true,
       "renewalDuplicateGuardPresent": true,
-      "renewedPoliciesFilteredFromRenewalQueue": true,
+      "renewedPoliciesFilteredFromRenewalQueue": false,
       "cancelationsUsesCanonicalRecordDelete": true,
-      "cancelationsCriticalWritesAwaitServerReadback": false,
-      "cancelationsRecoveryBusinessUsesWorkflowCanonicalStore": true,
+      "cancelationsCriticalWritesAwaitServerReadback": true,
+      "cancelationsRecoveryBusinessUsesWorkflowCanonicalStore": false,
       "cancelationsRecoveryManagementUsesWorkflowCanonicalStore": true,
       "storeHasDurableApis": true
     },
-    "optimisticCriticalWriteSites": [
-      "cancelation_state_update",
-      "recovery_business_update",
-      "recovery_business_insert",
-      "recovery_management_update",
-      "renewal_campaign_policy_update",
-      "renewal_campaign_activity_insert"
-    ],
+    "optimisticCriticalWriteSites": [],
     "effectiveRenewalOwner": {
       "base": "orbit360-platform/modules/renovaciones.js",
       "operationalBridge": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
@@ -53,12 +160,9 @@
     },
     "cancelationsOwner": "orbit360-platform/modules/cancelaciones.js"
   },
-  "blockingFindings": [
-    "CANCELATIONS_OPTIMISTIC_CRITICAL_WRITES_WITHOUT_AWAITED_READBACK",
-    "RENEWAL_CAMPAIGN_OPTIMISTIC_WRITES_WITHOUT_AWAITED_READBACK"
-  ],
-  "classification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
-  "causalConclusion": "Renewals are effectively overridden by the operational bridge, but critical renewal/cancelation persistence still contains optimistic store calls whose UI success path does not await server readback. This can report completion before durable persistence and can desynchronize linked recovery records.",
+  "blockingFindings": [],
+  "classification": "NO_PRODUCT_DEFECT_DEMONSTRATED",
+  "causalConclusion": "Renewals and cancelations have one effective runtime owner path with awaited canonical persistence and no duplicate active records in the inspected runtime.",
   "boundaries": {
     "operationalBusinessWrites": 0,
     "configWrites": 0,
@@ -66,5 +170,5 @@
     "reimport": false,
     "livePromotion": false
   },
-  "nextAction": "B4_003_CAUSAL_SOURCE_FIX_REQUIRED"
+  "nextAction": "B4_004_SINIESTROS_CRONOGRAMA_DIAGNOSTIC"
 }
