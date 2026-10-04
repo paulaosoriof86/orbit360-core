@@ -1,0 +1,62 @@
+name: CotComp S4.97 Visual Evidence
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/cotcomp-s496b-frontend-recovery-lab-20261004
+    paths:
+      - 'functions/cotcomp-s497-*'
+      - 'functions/cotcomp-clean-parent-s497*'
+      - 'functions/package.json'
+      - '.github/workflows/cotcomp-s497-visual-evidence.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  visual-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run frozen source gates
+        run: |
+          npm run check:cotcomp:s497
+          npm run test:cotcomp:s497
+
+      - name: Install isolated browser test dependency
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Capture deterministic visual evidence
+        run: node cotcomp-s497-capture-evidence.js
+
+      - name: Verify visual receipt
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const G=require('./cotcomp-s497-screenshot-regression-gate');
+          const r=JSON.parse(fs.readFileSync('s497-evidence/receipt.json','utf8'));
+          if(r.familyVisualPositionsUnique!==true) throw new Error('family visual positions are not unique');
+          const v=G.verify(r);
+          console.log(JSON.stringify(v,null,2));
+          if(!v.ok) process.exit(1);
+          NODE
+
+      - name: Upload evidence only
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s497-visual-evidence
+          path: functions/s497-evidence/
+          if-no-files-found: error
+          retention-days: 14
