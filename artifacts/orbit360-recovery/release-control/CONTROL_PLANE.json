@@ -5673,7 +5673,7 @@
     "status": "B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "ab19ea30636e5b701b988da7e9db57b3ed4da33e",
+    "executionLockBlobSha": "18b3998981cb36530dd21b5e8312baa76e29fe86",
     "compositionLockBlobSha": "5ce62d8edaf577f21e4520138653e61d243d1d4e",
     "findingLedgerBlobSha": "bd333e8bc622388afccb5bb307252b4d336b166b",
     "noLive": true,
@@ -6183,7 +6183,7 @@
       "targetRenewalPointers": [
         "pol_muj5o5ka"
       ],
-      "retry": "TARGET_PROVENANCE_AND_DEPENDENTS_3"
+      "retry": "TARGET_PROVENANCE_AND_DEPENDENTS_LOCK_ALIGNED_4"
     }
   },
   "b4VisualAcceptanceControl": {
