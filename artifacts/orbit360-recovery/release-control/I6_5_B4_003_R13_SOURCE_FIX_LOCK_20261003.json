@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-04T04:12:00Z",
-  "status": "B4_003_PAULA_VISUAL_PARTIAL_PASS_R15_DIAGNOSTIC_REQUIRED",
+  "status": "B4_003_PAULA_VISUAL_PARTIAL_PASS_R16_COMPREHENSIVE_REMEDIATION_REQUIRED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
@@ -64,7 +64,7 @@
   "nextRequiredProof": [
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_R15_CAUSAL_DIAGNOSTIC",
+  "nextAction": "B4_003_R16_COMPREHENSIVE_CAUSAL_DIAGNOSTIC_AND_SINGLE_SUCCESSOR_FIX",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -433,7 +433,7 @@
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "humanVisualStatus": "PARTIAL_PASS_R15_REMEDIATION_REQUIRED",
+  "humanVisualStatus": "PARTIAL_PASS_R16_REMEDIATION_REQUIRED",
   "r15VisualReview": {
     "status": "PARTIAL_PASS_REMEDIATION_REQUIRED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -452,7 +452,22 @@
     "broadHumanReviewPaused": true,
     "preservePriorPasses": true
   },
-  "continuityRegisterBlobSha": "f2031cb310196cb99e0ea23ab49afb0992024842",
-  "continuityGuardBlobSha": "52cc57159c4276eba21e1c77cf61089925bc9331",
-  "findingLedgerBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76"
+  "continuityRegisterBlobSha": "5457e732b76b068eeadd30509cd77fb5f368755c",
+  "continuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
+  "findingLedgerBlobSha": "e877504ab1395f5f840d87e1d208a0b10c9eb687",
+  "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+  "masterPendingClosurePlanBlobSha": "74711252c2ac1dae6126857968565d88cc294db7",
+  "r16ComprehensivePlan": {
+    "status": "FROZEN_ACTIVE_NO_LOSS",
+    "parentFinding": "B4-003",
+    "explicitNewFinding": "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
+    "preserveR15": true,
+    "preservePriorPasses": true,
+    "b4004Held": true,
+    "productMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "nextAction": "B4_003_R16_COMPREHENSIVE_CAUSAL_DIAGNOSTIC_AND_SINGLE_SUCCESSOR_FIX"
+  }
 }
