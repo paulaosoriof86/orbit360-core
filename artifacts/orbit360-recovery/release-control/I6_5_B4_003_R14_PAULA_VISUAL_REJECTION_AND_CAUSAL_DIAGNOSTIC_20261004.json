@@ -1,0 +1,123 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-04T03:45:00Z",
+  "status": "PAULA_VISUAL_REJECTED_R14_CAUSES_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headBefore": "e8a5e3d4ab544553b6696a1fe1bc91d525411ac3",
+  "reviewedCandidate": {
+    "sourceSha": "2485b95183584f11648c4c637811c385b60b0e80",
+    "buildId": "gi-i65-b4-2485b9518358-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37171197355-jtcpjb1c.web.app",
+    "runId": 37171197355,
+    "artifactId": 11292050424
+  },
+  "authority": "PAULA_TARGETED_VISUAL_R14_20261003",
+  "decision": "REJECT_B4_003_KEEP_B4_004_HELD",
+  "findings": [
+    {
+      "id": "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
+      "surface": "Renovaciones",
+      "classification": "PRODUCT_HYDRATION_PRESENTATION_DEFECT_DEMONSTRATED",
+      "observed": "Initial route rendered empty/incomplete renewal state, then placeholder dashes, then fully populated cards after hydration.",
+      "rootCause": "renovaciones.js builds buckets immediately from Orbit.store without authoritative readiness for polizas/clientes/aseguradoras; reactive rerenders expose destructive intermediate projections.",
+      "owner": [
+        "orbit360-platform/modules/renovaciones.js",
+        "orbit360-platform/core/router.js"
+      ],
+      "fixContract": "Before authoritative dependencies are ready, render a stable loading state only; never render zero/empty/dash values as business truth. Rerender once authoritative collections settle."
+    },
+    {
+      "id": "B4-003-R14-02-RENEWALS-EXPIRED-OUTCOME-CONTINUITY",
+      "surface": "Renovaciones",
+      "classification": "PRODUCT_RENEWAL_OUTCOME_CONTINUITY_DEFECT_DEMONSTRATED",
+      "observed": "Previously visible renewals disappear from Vencidas when policy state is no longer Vigente/Por renovar even though no renewal outcome has been recorded.",
+      "rootCause": "renewal eligibility in renovaciones.js and renewals-v1200-operational-bridge.js requires state Vigente/Por renovar, so explicit renewable YES policies in Vencida state are dropped before an explicit renewed/non-renewed/closed outcome.",
+      "owner": [
+        "orbit360-platform/modules/renovaciones.js",
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+      ],
+      "fixContract": "Explicit renewable YES with no explicit terminal renewal outcome remains actionable in Vencidas when expired. UNKNOWN remains fail-closed and visible only as pending-validation information, never auto-promoted."
+    },
+    {
+      "id": "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
+      "surface": "Pólizas / Renovaciones",
+      "classification": "PRODUCT_KPI_SEMANTIC_MISMATCH_DEMONSTRATED",
+      "observed": "Pólizas showed 'Por renovar ≤45 d' = 11 while Renovaciones had a much smaller explicit-renewable set.",
+      "rootCause": "polizas.js isRenewalWithin45Days checks active state and date only; it does not check renewability, while the label implies confirmed renewal eligibility.",
+      "owner": [
+        "orbit360-platform/modules/polizas.js",
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "fixContract": "Label date-based metric truthfully as 'Vencen ≤45 d' (or equivalent), preserving the contractual expiry count; do not fabricate renewable status. Surface any policies outside active/historical KPI partitions as other/validate."
+    },
+    {
+      "id": "B4-003-R14-04-CLIENT360-LIST-AUTHORITY",
+      "surface": "Cliente 360",
+      "classification": "PRODUCT_LIST_AUTHORITY_DEFECT_DEMONSTRATED",
+      "observed": "With Colombia selected the Cliente 360 list/KPIs rendered 0, while a Colombia client remained directly accessible and fully populated in the ficha.",
+      "rootCause": "cliente360.js marks clientes ready from product store confirmation, then uses clientProjection.withReadBatch as the base list source; a transient empty/stale projection can override an authoritative non-empty store.",
+      "owner": [
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "fixContract": "Use server-confirmed product store rows as the base client/policy universe for the list. Projection helpers may enrich summaries but may not replace an authoritative base collection with a transient empty snapshot."
+    },
+    {
+      "id": "B4-003-R14-05-QUALITY-VISUAL-GRAMMAR-COMPLETENESS",
+      "surface": "Calidad de datos",
+      "classification": "APPROVED_VISUAL_GRAMMAR_AND_KPI_CLARITY_DEFECT_DEMONSTRATED",
+      "observed": "The upper policy-vs-calendar table and lower client-quality table use visibly different row/cell grammar; completeness displays 0% even though one of 439 records is complete.",
+      "rootCause": "calidad.js builds two independent table templates; completeness uses integer Math.round on complete ratio.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "fixContract": "Preserve existing data semantics and performance, but use one canonical table grammar for spacing/hierarchy/badges/cells. Show complete count plus a non-misleading decimal percentage."
+    },
+    {
+      "id": "B4-003-R14-06-INSURER-IMPORT-STEP-TRUTHFULNESS",
+      "surface": "Aseguradoras / Importación",
+      "classification": "PRODUCT_IMPORT_UX_CONTRACT_MISMATCH_DEMONSTRATED",
+      "observed": "Insurer upload UI shows step 'Extracción inteligente', but docs-aseguradora is forced to documentary mode and jumps from file selection to final Drive confirmation without structured intelligent extraction/diff.",
+      "rootCause": "core/importa.js uses generic three-step labels for all imports while docs-aseguradora sets modo=documental and bypasses parsing/extraction.",
+      "owner": [
+        "orbit360-platform/core/importa.js"
+      ],
+      "fixContract": "Make current insurer-source workflow truthful: classify source, store in Drive, durable-link provenance, pending validation, no automatic tariff enablement. Future structured insurer tariff updates must reuse the same intelligent import/dry-run/diff engine rather than a parallel importer."
+    }
+  ],
+  "allowedProductFiles": [
+    "orbit360-platform/modules/renovaciones.js",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+    "orbit360-platform/modules/polizas.js",
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/modules/calidad.js",
+    "orbit360-platform/core/importa.js",
+    "orbit360-platform/core/router.js",
+    "orbit360-platform/index.html"
+  ],
+  "allowedQaFiles": [
+    "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    ".github/workflows/gravicentra-b4-003-executor.yml"
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "productionFunctionDeploymentAuthorized": false,
+    "realInsurerDriveWritesAuthorized": false,
+    "realClientDriveWritesAuthorized": false,
+    "renewalDeterministicApplyAuthorized": false,
+    "productSourceMutationAuthorized": true,
+    "qaMutationAuthorized": true
+  },
+  "preservedPasses": [
+    "Pólizas route/search/detail performance from R13",
+    "Cancelaciones country switching/detail/navigation",
+    "Cliente 360 ficha and bidirectional tab navigation",
+    "Calidad country scope/performance",
+    "Insurer source-backed knowledge visibility and durable Drive linkage"
+  ],
+  "nextAction": "B4_003_R14_NARROW_SOURCE_FIX"
+}

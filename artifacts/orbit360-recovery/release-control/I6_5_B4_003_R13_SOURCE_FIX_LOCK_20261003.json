@@ -1,16 +1,16 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
-  "recordedAt": "2026-10-03",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "recordedAt": "2026-10-04T03:45:00Z",
+  "status": "B4_003_PAULA_VISUAL_REJECTED_R14_SOURCE_FIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_PAULA_VISUAL_REJECTED_R14_SOURCE_FIX_AUTHORIZED",
     "blocking": true,
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING",
+    "nextAction": "B4_003_SOURCE_FIX",
+    "humanVisualStatus": "REJECTED_R14",
     "knowledgePreview": true
   },
   "supersedes": {
@@ -33,26 +33,26 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "cdd0c050d36c940c5701b61bc735e596e1fc5f80"
+    "blobSha": "5bc7a7ef37afdbe3082e4b74cc49386825aa56aa"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "353a5a9ab29efa02c70eccb97451060db0a68154",
-    "inventoryCount": 191,
-    "attentionCount": 86,
+    "blobSha": "b7133a84d72c5f1b07c431654fb4d0af62e8c993",
+    "inventoryCount": 197,
+    "attentionCount": 92,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
   },
   "boundaries": {
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
     "syntheticQaWritesAuthorized": false,
     "syntheticQaScope": "Exact B4-003 Preview only: disposable B4003 synthetic renewal, cancellation, information-health and insurer-document fixtures with mandatory cleanup/readback; no real operational row mutation.",
-    "renewalProductMutationAuthorized": false,
-    "policyVisualMutationAuthorized": false,
+    "renewalProductMutationAuthorized": true,
+    "policyVisualMutationAuthorized": true,
     "realInsurerDriveWritesAuthorized": false,
     "realClientDriveWritesAuthorized": false,
     "drivePreviewFunctionDeploymentAuthorized": true,
@@ -62,9 +62,11 @@
     "renewalDeterministicApplyAuthorized": false
   },
   "nextRequiredProof": [
+    "B4_003_R14_NARROW_SOURCE_FIX",
+    "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+  "nextAction": "B4_003_SOURCE_FIX",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -305,5 +307,29 @@
     "carryBlobSha": "f343f64b64125cb765229e9b031145d4e91df752",
     "productSourceChanged": false,
     "dataMutation": false
+  },
+  "r14VisualDiagnostic": {
+    "status": "CAUSES_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
+    "blobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
+    "allowedProductFiles": [
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "orbit360-platform/modules/polizas.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/calidad.js",
+      "orbit360-platform/core/importa.js",
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/index.html"
+    ],
+    "allowedQaFiles": [
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ],
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
