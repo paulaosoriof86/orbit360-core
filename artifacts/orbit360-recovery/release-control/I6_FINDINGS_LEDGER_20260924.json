@@ -6879,16 +6879,16 @@
         "orbit360-platform/modules/polizas.js",
         "orbit360-platform/core/router.js"
       ],
-      "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "SOURCE_FIXED_R13P3_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Authenticated route and first usable render meet performance budget without browser unresponsive dialog.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_R13P3_CONTRACT_AND_EXACT_PREVIEW",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
       "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
-      "classification": "PRODUCT_PERFORMANCE_DEFECT_DEMONSTRATED",
-      "rootCauseCode": "POLICY_ROUTE_REBUILDS_FULL_RELATIONAL_SEARCH_STATE_BEFORE_BOUNDED_FIRST_PAINT",
+      "classification": "PRODUCT_PERFORMANCE_DEFECT_SOURCE_FIXED_R13P3",
+      "rootCauseCode": "POLICY_FIRST_PAINT_BUILDS_SEARCH_ONLY_VEHICLE_AND_FULL_SEARCH_INDEX_BEFORE_ANY_QUERY",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
@@ -6898,7 +6898,9 @@
       "runtimeRootFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_ROOTFIX_20261003.json",
       "runtimeRootFixReceiptBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
       "failedRunId": 37162367038,
-      "failedJobId": 111318262858
+      "failedJobId": 111318262858,
+      "runtimeP3DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_CAUSAL_DIAGNOSTIC_20261003.json",
+      "runtimeP3RootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_ROOTFIX_20261003.json"
     },
     {
       "id": "B4-003-R13-06-POLICY-SEARCH-FREEZE",
