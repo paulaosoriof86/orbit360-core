@@ -1,0 +1,201 @@
+name: CotComp S4.93 owner-authorized fidelity frontend LAB
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s493-authorized-fidelity-rework-lab-20261003
+    paths:
+      - '.github/cotcomp-lab-intents/s493-authorized-fidelity-lab-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompAuthorizedFidelityPreviewS493
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompAuthorizedFidelityPreviewS493
+
+jobs:
+  s493-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.93 authorization intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s493-authorized-fidelity-lab-authorized.json
+          jq -e '
+            .authorization=="S493_DEPLOY_OWNER_AUTHORIZED_FIDELITY_FRONTEND" and
+            .projectId=="ays-orbit-360-lab" and
+            .functionName=="cotcompAuthorizedFidelityPreviewS493" and
+            .ownerVisualSha=="3468546cb5d1c0cd7e2191980b306d462ea0b0304da0260167ec06c294aaa10e" and
+            .inCurrentSiteShell==true and
+            .productFamilyCount==7 and
+            .productAwareVisual==true and
+            .fixtureOnly==true and
+            .providerDeploymentAuthorized==false and
+            .cotcompRealTransportAuthorized==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.93 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-authorized-fidelity-preview-s493.js
+          node --check cotcomp-authorized-fidelity-preview-s493.test.js
+          node --test cotcomp-product-family-completeness-preview-s486.test.js
+          node --test cotcomp-authorized-fidelity-preview-s493.test.js
+
+      - name: Prepare LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s493/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s493/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Deploy only S4.93 preview to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physically verify owner-authorized fidelity frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s493/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+
+          grep -q 'class="site-header"' "$E/page.html"
+          grep -q 'Alianzas &amp; Soluciones · Broker de Seguros' "$E/page.html"
+          grep -q 'Cotiza y compara <em>con criterio</em>' "$E/page.html"
+          grep -q 'class="hero-photo"' "$E/page.html"
+          grep -q 'const PRODUCT_SCENES=' "$E/page.html"
+          grep -q 'photo-scene' "$E/page.html"
+          grep -q "home:{x:'33.333%',y:'0%'}" "$E/page.html"
+          grep -q "health:{x:'66.667%',y:'0%'}" "$E/page.html"
+          grep -q "life:{x:'100%',y:'0%'}" "$E/page.html"
+          grep -q "business:{x:'0%',y:'100%'}" "$E/page.html"
+          grep -q "cargo:{x:'33.333%',y:'100%'}" "$E/page.html"
+          grep -q "other:{x:'66.667%',y:'100%'}" "$E/page.html"
+          grep -q "font-family:'Newsreader'" "$E/page.html"
+          grep -q "font-family:'Archivo'" "$E/page.html"
+          grep -q "font-family:'Instrument Sans'" "$E/page.html"
+          grep -q "font-family:'IBM Plex Mono'" "$E/page.html"
+          ! grep -q 'genericIcon(route.id)' "$E/page.html"
+          ! grep -q 'class="generic-art"' "$E/page.html"
+          grep -q 'class="hero-photo"' "$E/page.html"
+          grep -q 'Equipo A&amp;S en asesoría' "$E/page.html"
+          grep -q 'Cotización en línea' "$E/page.html"
+          grep -q 'Con acompañamiento' "$E/page.html"
+          grep -q 'Información' "$E/page.html"
+          grep -q 'Coberturas' "$E/page.html"
+          grep -q 'Comparar' "$E/page.html"
+          grep -q 'Decidir' "$E/page.html"
+
+          grep -q 'Vehículo' "$E/page.html"
+          grep -q 'Hogar' "$E/page.html"
+          grep -q 'Gastos médicos' "$E/page.html"
+          grep -q 'Vida' "$E/page.html"
+          grep -q 'Empresa' "$E/page.html"
+          grep -q 'Transporte' "$E/page.html"
+          grep -q 'No sé cuál necesito' "$E/page.html"
+
+          grep -q 'id="brandInput" role="combobox"' "$E/page.html"
+          grep -q 'id="modelInput" role="combobox"' "$E/page.html"
+          grep -q 'id="yearSel"' "$E/page.html"
+          grep -q "let brand='TOYOTA',model='RAV4 2WD',year='2023'" "$E/page.html"
+          grep -q 'No encuentro mi marca' "$E/page.html"
+          grep -q 'No encuentro mi línea / modelo' "$E/page.html"
+
+          grep -q 'class="product-visual"' "$E/page.html"
+          grep -q 'function renderVisual' "$E/page.html"
+          grep -q '3. Compara alternativas' "$E/page.html"
+          grep -q 'Aseguradora A' "$E/page.html"
+          grep -q 'Aseguradora B' "$E/page.html"
+          grep -q 'Aseguradora C' "$E/page.html"
+          grep -q 'Recomendación A&amp;S' "$E/page.html"
+          grep -q 'Datos de alternativas y precios son ilustrativos; no constituyen oferta' "$E/page.html"
+          grep -q 'Gravicentra sigue siendo la autoridad' "$E/page.html"
+
+          ! grep -q 'class="sidebar"' "$E/page.html"
+          ! grep -q 'calculatePremium(' "$E/page.html"
+          ! grep -q 'getFirestore' "$E/page.html"
+
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+
+          jq -n --arg url "$COTCOMP_URL" '{
+            schemaVersion:"ays-cotcomp-s493-owner-authorized-physical-receipt-v1.0",
+            functionUrl:$url,
+            deployed:true,
+            ownerVisualSha:"3468546cb5d1c0cd7e2191980b306d462ea0b0304da0260167ec06c294aaa10e",
+            inCurrentSiteShell:true,
+            darkHumanHero:true,
+            floatingWorkspace:true,
+            fourStepProgress:true,
+            productFamilyCount:7,
+            productAwareVisual:true,
+            comparativeFrontend:true,
+            recommendationPanel:true,
+            vehiclePatternPreserved:true,
+            fixtureOnly:true,
+            providerDeploymentAuthorized:false,
+            cotcompRealTransportAuthorized:false,
+            productionTouched:false
+          }' > "$E/S493_OWNER_AUTHORIZED_PHYSICAL_RECEIPT.json"
+
+      - name: Upload sanitized S4.93 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s493-owner-authorized-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s493/evidence/S493_OWNER_AUTHORIZED_PHYSICAL_RECEIPT.json
+            ${{ runner.temp }}/s493/evidence/page.html
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s493/firebase-service-account.json"
