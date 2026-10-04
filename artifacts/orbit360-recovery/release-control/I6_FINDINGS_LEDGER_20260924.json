@@ -7607,6 +7607,30 @@
       "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9"
+    },
+    {
+      "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "B4_003_EXACT_PREVIEW_MACHINE_PROOF_RUN_37213597161",
+      "surface": "Startup / tenant catalogs",
+      "finding": "Pre-auth eager catalog hydration causes an unexpected 401 before authenticated catalog consumption.",
+      "classification": "R16_STARTUP_AUTH_ORDER_REGRESSION",
+      "rootCause": "Two eager catalog hydration calls execute before authenticated session: config.js setTimeout(api.ensure) and ciclo.js module-load Promise(Orbit.cat.ensure). Catalog consumers already await canonical ensure after authentication.",
+      "owner": [
+        "orbit360-platform/core/config.js",
+        "orbit360-platform/core/ciclo.js"
+      ],
+      "status": "DIAGNOSED_R16_03_SOURCE_FIX_AUTHORIZED",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Exact authenticated Preview has zero unexpected 401 for tenant catalog config; catalog ensure remains canonical and fail-closed when invoked by authenticated consumers.",
+      "mayDisappearWithoutDisposition": false,
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_DIAGNOSTIC_20261004.json",
+      "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c",
+      "noLive": true,
+      "noReimport": true,
+      "nextAction": "B4_003_R16_03_REMOVE_PREAUTH_CATALOG_HYDRATION"
     }
   ],
   "phaseBBacklog": [
@@ -8013,5 +8037,10 @@
     "status": "SOURCE_FIXED_R16_02_PENDING_EXACT_PREVIEW",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_20261004.json",
     "receiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9"
+  },
+  "lastR16CatalogPreauthRegression": {
+    "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
+    "status": "DIAGNOSED_R16_03_SOURCE_FIX_AUTHORIZED",
+    "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c"
   }
 }

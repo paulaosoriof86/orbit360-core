@@ -1,0 +1,37 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-04",
+  "status": "CAUSE_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "2ac9050201cec256f931f50c0e8c84d6dc6c61b2",
+  "failedRunId": 37213597161,
+  "failedJobId": 111469528793,
+  "failureCode": "UNEXPECTED_HTTP_401_ORBIT360_TENANT_DOMAIN_CONFIG_PREVIEW",
+  "observed": {
+    "url": "orbit360TenantDomainConfigPreview",
+    "domain": "catalogs",
+    "status": 401,
+    "error": "Se requiere sesión activa."
+  },
+  "rootCause": "Two eager catalog hydration calls execute before authenticated session: config.js setTimeout(api.ensure) and ciclo.js module-load Promise(Orbit.cat.ensure). Catalog consumers already await canonical ensure after authentication.",
+  "remedy": "Remove only the two pre-auth eager calls. Preserve fail-closed authenticated ensure() in openNegocio, openGestion, managementCreateModal, nuevoNegocio and Configuración catalog administration.",
+  "allowedProductFiles": [
+    "orbit360-platform/core/config.js",
+    "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/index.html"
+  ],
+  "allowedQaFiles": [
+    "tools/gravicentra-i6-5-b4-003-contract.mjs"
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b4004Authorized": false,
+    "authRelaxationAuthorized": false,
+    "localFallbackAsAuthorityAuthorized": false
+  },
+  "nextAction": "B4_003_R16_03_REMOVE_PREAUTH_CATALOG_HYDRATION"
+}

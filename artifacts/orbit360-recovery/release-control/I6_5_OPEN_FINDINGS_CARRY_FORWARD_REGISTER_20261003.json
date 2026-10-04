@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76",
-  "expectedLedgerNextBlobSha": "2644cf32b8287a85eec4b12fac4e4ed55bbb596b",
+  "expectedLedgerNextBlobSha": "e3a0a2559dda9f87b9252e3c77d4c484d62058d6",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -16,7 +16,7 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 209,
+  "inventoryCount": 210,
   "attentionCount": 103,
   "inventory": [
     {
@@ -3289,6 +3289,24 @@
       "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9"
+    },
+    {
+      "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
+      "block": "B4",
+      "status": "DIAGNOSED_R16_03_SOURCE_FIX_AUTHORIZED",
+      "blocking": true,
+      "owner": [
+        "orbit360-platform/core/config.js",
+        "orbit360-platform/core/ciclo.js"
+      ],
+      "targetGate": "B4-003",
+      "closureCondition": "Exact authenticated Preview has zero unexpected 401 for tenant catalog config; catalog ensure remains canonical and fail-closed when invoked by authenticated consumers.",
+      "source": "B4_003_EXACT_PREVIEW_MACHINE_PROOF_RUN_37213597161",
+      "finding": "Pre-auth eager catalog hydration causes an unexpected 401 before authenticated catalog consumption.",
+      "rootCause": "Two eager catalog hydration calls execute before authenticated session: config.js setTimeout(api.ensure) and ciclo.js module-load Promise(Orbit.cat.ensure). Catalog consumers already await canonical ensure after authentication.",
+      "nextAction": "B4_003_R16_03_REMOVE_PREAUTH_CATALOG_HYDRATION",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_DIAGNOSTIC_20261004.json",
+      "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c"
     }
   ],
   "attentionIds": [
@@ -3517,6 +3535,12 @@
     "id": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
     "status": "SOURCE_FIXED_R16_02_PENDING_EXACT_PREVIEW",
     "receiptBlobSha": "f805e84fdaf99089acc3fc7b80a7e01096d9a3b9",
+    "exactSetWithLedger": true
+  },
+  "lastR16CatalogPreauthRegression": {
+    "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
+    "status": "DIAGNOSED_R16_03_SOURCE_FIX_AUTHORIZED",
+    "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c",
     "exactSetWithLedger": true
   }
 }
