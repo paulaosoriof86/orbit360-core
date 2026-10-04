@@ -6223,6 +6223,15 @@
       "sourceBackedApplyAuthorized": false,
       "deleteRenewalLineageAuthorized": false,
       "dataMutation": false
+    },
+    "r13ContinuityCheckpoint": {
+      "status": "FROZEN",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CONTINUITY_CHECKPOINT_20261004.json",
+      "blobSha": "0d0c82781e760b9d92604f983d3c66e103a2625d",
+      "preservesFindings": true,
+      "preservesPlan": true,
+      "preservesBoundaries": true,
+      "b4004Held": true
     }
   },
   "b4VisualAcceptanceControl": {
