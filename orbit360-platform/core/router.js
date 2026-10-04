@@ -12,6 +12,8 @@ Orbit.router = (function () {
   let host, sidebar, current = null, storeRefreshTimer = null, storeRefreshUnsub = null;
   const REACTIVE_COLLECTIONS = {
     inicio: ['clientes', 'polizas', 'cobros', 'carteraPrimas', 'recibosEsperados', 'aseguradoras', 'asesores', 'metas', 'negocios', 'gestiones', 'comisiones'],
+    ops: ['negocios', 'gestiones', 'clientes', 'polizas', 'aseguradoras', 'asesores'],
+    leads: ['negocios', 'gestiones', 'clientes', 'polizas', 'aseguradoras', 'asesores'],
     cliente360: ['clientes', 'asesores', 'polizas', 'cobros', 'carteraPrimas', 'recibosEsperados', 'comisiones', 'vehiculos'],
     aseguradoras: ['aseguradoras', 'asesores'],
     polizas: ['polizas', 'clientes', 'aseguradoras', 'vehiculos'],

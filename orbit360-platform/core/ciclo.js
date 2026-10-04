@@ -45,6 +45,30 @@ Orbit.ciclo = (function () {
   /* ===================== datos / filtros ===================== */
   function etapaInfo(id) { return E[id] || E.nuevo; }
   function paisOK(pais) { return !Orbit.pais || Orbit.pais === 'TODOS' || pais === Orbit.pais; }
+  function canonicalRosterStore() {
+    let st=S(),hops=0;
+    while(st&&Object.prototype.hasOwnProperty.call(st,'_scopedFor')&&hops<16){const p=Object.getPrototypeOf(st);if(!p||p===st)break;st=p;hops++;}
+    return st||S();
+  }
+  function advisorRoles(a){return [...new Set((Array.isArray(a&&a.roles)&&a.roles.length?a.roles:[a&&(a.rolDefault||a.rol)]).map(x=>String(x||'').trim()).filter(Boolean))];}
+  function advisorCountries(a){return [...new Set((Array.isArray(a&&a.paises)&&a.paises.length?a.paises:[a&&(a.paisDefault||a.pais)]).map(x=>String(x||'').trim().toUpperCase()).filter(Boolean))];}
+  function advisorAssignable(a,country){
+    if(!a||a.deleted===true||a.eliminado===true||a.inactivo===true||a.activo===false||['inactivo','eliminado'].includes(String(a.estado||'').toLowerCase())||a.projectionOnly===true)return false;
+    if(!advisorRoles(a).includes('Asesor'))return false;
+    const ps=advisorCountries(a),c=String(country||'').trim().toUpperCase();
+    return !c||c==='TODOS'||!ps.length||ps.includes(c);
+  }
+  function advisorIdentityKeys(a){
+    const email=String(a&&a.email||'').trim().toLowerCase(),canonical=String(a&&(a.canonicalDocumentId||a.id)||'').trim(),name=String(a&&a.nombre||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,' ');
+    return [email?'email:'+email:'',canonical?'id:'+canonical:'',name?'name:'+name:''].filter(Boolean);
+  }
+  function assignableAdvisors(country){
+    const st=canonicalRosterStore(),rows=((st&&st.all&&st.all('asesores'))||[]).filter(a=>advisorAssignable(a,country));
+    rows.sort((a,b)=>String(a.nombre||'').localeCompare(String(b.nombre||''),'es',{sensitivity:'base'}));
+    const seen=new Set(),out=[];
+    rows.forEach(a=>{const keys=advisorIdentityKeys(a);if(!keys.length||keys.some(k=>seen.has(k)))return;keys.forEach(k=>seen.add(k));out.push(a);});
+    return out;
+  }
   function rolFiltro(asesorId) {
     if (Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor()) return asesorId === Orbit.session.asesorId();
     return true;
@@ -244,7 +268,7 @@ Orbit.ciclo = (function () {
   function openNegocio(id) {
     const n = S().get('negocios', id); if (!n) return;
     const ase = q.asesor(n.asesorId), asg = q.aseguradora(n.aseguradoraId), ei = etapaInfo(n.etapa), prob = U.finiteNumber(n.prob);
-    const asesores = S().all('asesores'), asgs = S().all('aseguradoras');
+    const asesores = assignableAdvisors(n.pais), asgs = S().all('aseguradoras');
     const enOps = !!ei.ops;
     // stepper
     const stepper = FLUJO.map((sid, i) => {
@@ -913,7 +937,8 @@ Orbit.ciclo = (function () {
 
   /* ===================== nuevo negocio / nueva gestión ===================== */
   function nuevoNegocio() {
-    const asesores = S().all('asesores');
+    const initialCountry = Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : 'GT';
+    const asesores = assignableAdvisors(initialCountry);
     const html = `
       <div class="ciclo-h" style="background:linear-gradient(120deg,#C5162E,#8f1020)">
         <div><div class="ciclo-eyebrow">Nuevo ingreso · ciclo comercial</div><h2>🌱 Nuevo prospecto</h2>
@@ -926,7 +951,7 @@ Orbit.ciclo = (function () {
           ${fSelect('Tipo', 'nn-tipo', ['Persona', 'Empresa'], 'Persona')}
           ${fInput('Teléfono (WhatsApp)', 'nn-tel', '')}
           ${fInput('Correo', 'nn-email', '')}
-          ${fSelect('País', 'nn-pais', ['GT', 'CO'], Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : 'GT')}
+          ${fSelect('País', 'nn-pais', ['GT', 'CO'], initialCountry)}
           ${fInput('Canal', 'nn-canal', 'Referido')}
           ${fInput('Producto', 'nn-prod', '')}
           ${fInput('Ramo', 'nn-ramo', 'Auto')}
@@ -938,6 +963,15 @@ Orbit.ciclo = (function () {
       </div>
       <div class="ciclo-foot"><div></div><div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="nn-ok">Crear</button></div></div>`;
     const back = modal(html, 640);
+    const advisorSelect=back.querySelector('#nn-ase'),countrySelect=back.querySelector('#nn-pais');
+    const refreshAssignableAdvisors=()=>{
+      const current=advisorSelect.value||(Orbit.session&&Orbit.session.asesorId?(Orbit.session.asesorId()||''):'');
+      const rows=assignableAdvisors(countrySelect.value);
+      advisorSelect.innerHTML=rows.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');
+      if(rows.some(a=>a.id===current))advisorSelect.value=current;else if(rows.length)advisorSelect.value=rows[0].id;
+      advisorSelect.dataset.assignableAdvisorRoster='canonical';advisorSelect.dataset.assignableCount=String(rows.length);
+    };
+    countrySelect.addEventListener('change',refreshAssignableAdvisors);refreshAssignableAdvisors();
     back.querySelector('#nn-ok').addEventListener('click', async () => {
       const save = back.querySelector('#nn-ok');
       if (save.disabled) return;
@@ -1069,7 +1103,7 @@ Orbit.ciclo = (function () {
     negocios, gestiones, opsBoard, leadsBoard, metricasLeads,
     cardNegocio, cardGestion, wireCards, notify, gestionarListas,
     setEtapa, decidirCierre, perder, archivar, emitir, crearGestion, crearGestionDurable,
-    openNegocio, openGestion, managementCreateModal, solicitarGestion, nuevoNegocio, nuevaGestion
+    openNegocio, openGestion, managementCreateModal, solicitarGestion, nuevoNegocio, nuevaGestion, assignableAdvisors
   };
 })();
 

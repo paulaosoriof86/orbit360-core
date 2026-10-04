@@ -689,6 +689,21 @@ try{
  proof.assertions.qualityCanonicalGrammar=true;
  proof.assertions.qualityCompletenessExplicit=true;
 
+ // R14A: assignment roster must ignore viewer record scope and remain unique.
+ proof.r14AssignableAdvisorRoster=await page.evaluate(()=>{
+   const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,' ');
+   let base=Orbit.store,hops=0;while(base&&Object.prototype.hasOwnProperty.call(base,'_scopedFor')&&hops++<16)base=Object.getPrototypeOf(base);
+   const canonical=((base&&base.all&&base.all('asesores'))||[]);
+   const eligible=a=>{const roles=(Array.isArray(a.roles)&&a.roles.length?a.roles:[a.rolDefault||a.rol]).map(x=>String(x||'').trim()),ps=(Array.isArray(a.paises)&&a.paises.length?a.paises:[a.paisDefault||a.pais]).map(x=>String(x||'').trim().toUpperCase()).filter(Boolean);return a&&a.deleted!==true&&a.eliminado!==true&&a.inactivo!==true&&a.activo!==false&&!['inactivo','eliminado'].includes(String(a.estado||'').toLowerCase())&&a.projectionOnly!==true&&roles.includes('Asesor')&&(!ps.length||ps.includes('GT'));};
+   const expected=[],seen=new Set();canonical.filter(eligible).sort((a,b)=>String(a.nombre||'').localeCompare(String(b.nombre||''),'es',{sensitivity:'base'})).forEach(a=>{const keys=[String(a.email||'').trim().toLowerCase(),norm(a.nombre)].filter(Boolean);if(keys.some(k=>seen.has(k)))return;keys.forEach(k=>seen.add(k));expected.push(String(a.id||''));});
+   const original=Orbit.store,scoped=Orbit.access&&Orbit.access.scopedStore?Orbit.access.scopedStore('ops'):original;Orbit.store=scoped;let actual=[];try{actual=(Orbit.ciclo.assignableAdvisors('GT')||[]).map(a=>String(a.id||''));}finally{Orbit.store=original;}
+   const rows=Orbit.ciclo.assignableAdvisors('GT')||[],identities=rows.map(a=>String(a.email||'').trim().toLowerCase()||norm(a.nombre));
+   return{expected,actual,canonicalCount:canonical.length,assignableCount:actual.length,uniqueIdentityCount:new Set(identities).size,names:rows.map(a=>String(a.nombre||''))};
+ });
+ need(JSON.stringify(proof.r14AssignableAdvisorRoster.actual)===JSON.stringify(proof.r14AssignableAdvisorRoster.expected),'B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_SCOPE_DRIFT:'+JSON.stringify(proof.r14AssignableAdvisorRoster));
+ need(proof.r14AssignableAdvisorRoster.uniqueIdentityCount===proof.r14AssignableAdvisorRoster.assignableCount,'B4_003_R14A_ASSIGNABLE_ADVISOR_DUPLICATE_IDENTITY:'+JSON.stringify(proof.r14AssignableAdvisorRoster));
+ proof.assertions.assignableAdvisorRosterCanonical=true;proof.assertions.assignableAdvisorRosterDeduplicated=true;
+
  // R13: reconcile the real, non-synthetic renewal universe against the canonical YES-only pipeline.
  proof.r13RenewalReality=await page.evaluate(ids=>{
    const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';
