@@ -1,0 +1,699 @@
+        doc.documentElement.setAttribute("data-dc-canvas", "");
+        canvasStyleEl = doc.createElement("style");
+        canvasStyleEl.setAttribute("data-dc-canvas", "");
+        applyCanvasBg();
+        doc.head.appendChild(canvasStyleEl);
+      } else {
+        doc.documentElement.removeAttribute("data-dc-canvas");
+        canvasStyleEl?.remove();
+        canvasStyleEl = null;
+      }
+    }
+    window.addEventListener("message", (e) => {
+      const type = e.data && e.data.type;
+      if (type === "__dc_theme") {
+        const t = e.data.theme;
+        if (t === "light" || t === "dark") {
+          appTheme = t;
+          applyCanvasBg();
+        }
+        return;
+      }
+      if (!designDocMode || type !== "__dc_probe") return;
+      postDesignMode(designDocMode);
+    });
+    function compile(node) {
+      const raw = [...node.children];
+      const helmetClosed = node.nextSibling != null || node.parentNode?.nextSibling != null;
+      if (node.hasAttribute("data-dc-atomics") && !mounted.has("__dc-atomics")) {
+        mounted.add("__dc-atomics");
+        const el = doc.createElement("style");
+        el.id = "__dc-atomics";
+        el.textContent = ATOMIC_CSS;
+        doc.head.appendChild(el);
+      }
+      return (_vals, ctx) => {
+        const name = ctx && ctx.__name || "";
+        const streaming = !!(name && isStreaming(name));
+        for (let i = 0; i < raw.length; i++) {
+          const child = raw[i];
+          const tag = child.tagName;
+          const mayBePartial = streaming && !helmetClosed && i === raw.length - 1;
+          if (tag === "SCRIPT") {
+            if (mayBePartial) continue;
+            const key = "SCRIPT|" + (child.getAttribute("src") || child.textContent || "");
+            if (mounted.has(key)) continue;
+            mounted.add(key);
+            const el = doc.createElement("script");
+            for (const { name: an, value } of [...child.attributes])
+              el.setAttribute(an, value);
+            if (child.textContent) el.textContent = child.textContent;
+            doc.head.appendChild(el);
+          } else if (tag === "LINK" || tag === "META") {
+            if (mayBePartial) continue;
+            const key = tag + "|" + (child.getAttribute("href") || child.getAttribute("src") || child.outerHTML);
+            if (mounted.has(key)) continue;
+            mounted.add(key);
+            if (tag === "LINK") {
+              const rel = (child.getAttribute("rel") || "").toLowerCase().split(/\s+/);
+              const href = (child.getAttribute("href") || "").trim();
+              const res = window.__resources;
+              const pre = res && rel.includes("stylesheet") && !rel.includes("alternate") ? res[href] : void 0;
+              const blob = typeof pre === "string" && pre ? bundledBlob(pre) : null;
+              if (blob) {
+                const el = doc.createElement("style");
+                if (child.hasAttribute("disabled")) {
+                  el.setAttribute("media", "not all");
+                } else if (child.getAttribute("media")) {
+                  el.setAttribute("media", child.getAttribute("media"));
+                }
+                if (child.getAttribute("title"))
+                  el.setAttribute("title", child.getAttribute("title"));
+                void blob.text().then((css) => {
+                  el.textContent = css;
+                });
+                doc.head.appendChild(el);
+                continue;
+              }
+            }
+            doc.head.appendChild(child.cloneNode(true));
+          } else {
+            const key = name + "|" + i;
+            let el = live.get(key);
+            if (!el || el.tagName !== tag) {
+              if (el) el.remove();
+              el = doc.createElement(tag.toLowerCase());
+              live.set(key, el);
+              doc.head.appendChild(el);
+            }
+            for (const { name: an, value } of [...child.attributes]) {
+              if (el.getAttribute(an) !== value) el.setAttribute(an, value);
+            }
+            if (el.textContent !== child.textContent)
+              el.textContent = child.textContent;
+          }
+        }
+        return null;
+      };
+    }
+    return { compile, setDesignDocMode };
+  }
+
+  // src/pseudo.ts
+  function scanUnquotedUrl(css, i) {
+    if (css[i] !== "u" && css[i] !== "U" || css.slice(i, i + 4).toLowerCase() !== "url(" || /[a-z0-9_-]/i.test(css[i - 1] ?? "")) {
+      return -1;
+    }
+    let j = i + 4;
+    while (j < css.length && /\s/.test(css[j])) j++;
+    if (css[j] === '"' || css[j] === "'") return -1;
+    while (j < css.length && css[j] !== ")") {
+      if (css[j] === "\\") j++;
+      j++;
+    }
+    return j < css.length ? j + 1 : css.length;
+  }
+  function stripComments(css) {
+    let out = "";
+    let quote = "";
+    for (let i = 0; i < css.length; i++) {
+      const c = css[i];
+      if (quote) {
+        if (c === "\\") {
+          out += c + (css[i + 1] ?? "");
+          i++;
+          continue;
+        }
+        if (c === quote) quote = "";
+        out += c;
+      } else if (c === "'" || c === '"') {
+        quote = c;
+        out += c;
+      } else if (c === "/" && css[i + 1] === "*") {
+        const end = css.indexOf("*/", i + 2);
+        i = end === -1 ? css.length : end + 1;
+        out += " ";
+      } else {
+        const end = scanUnquotedUrl(css, i);
+        if (end === -1) out += c;
+        else {
+          out += css.slice(i, end);
+          i = end - 1;
+        }
+      }
+    }
+    return out;
+  }
+  function importantify(css) {
+    css = stripComments(css);
+    const decls = [];
+    let start = 0;
+    let depth = 0;
+    let quote = "";
+    for (let i = 0; i < css.length; i++) {
+      const c = css[i];
+      if (quote) {
+        if (c === "\\") i++;
+        else if (c === quote) quote = "";
+      } else if (c === "'" || c === '"') quote = c;
+      else if (c === "(") depth++;
+      else if (c === ")") depth = Math.max(0, depth - 1);
+      else if (c === ";" && depth === 0) {
+        decls.push(css.slice(start, i));
+        start = i + 1;
+      } else {
+        const end = scanUnquotedUrl(css, i);
+        if (end !== -1) i = end - 1;
+      }
+    }
+    decls.push(css.slice(start));
+    return decls.map((d) => d.trim()).filter(Boolean).map((d) => /!\s*important$/i.test(d) ? d : d + " !important").join(";");
+  }
+  function createPseudoSheet(doc) {
+    let el = null;
+    const cache = /* @__PURE__ */ new Map();
+    let n = 0;
+    return (pseudo, css) => {
+      const k = pseudo + "|" + css;
+      const hit = cache.get(k);
+      if (hit) return hit;
+      if (!el) {
+        el = doc.createElement("style");
+        doc.head.appendChild(el);
+      }
+      const cls = "scp" + (n++).toString(36);
+      const isPseudoElement = pseudo === "before" || pseudo === "after";
+      const sel = isPseudoElement ? "." + cls + "::" + pseudo : "." + cls + ":" + pseudo;
+      el.sheet.insertRule(
+        sel + "{" + (isPseudoElement ? css : importantify(css)) + "}",
+        el.sheet.cssRules.length
+      );
+      cache.set(k, cls);
+      return cls;
+    };
+  }
+
+  // src/registry.ts
+  function createRegistry() {
+    const entries = /* @__PURE__ */ Object.create(null);
+    function get(name) {
+      return entries[name] || (entries[name] = {
+        html: "",
+        tpl: null,
+        Logic: null,
+        jsStreaming: false,
+        htmlStreaming: false,
+        ver: 0,
+        subs: /* @__PURE__ */ new Set(),
+        fetched: false
+      });
+    }
+    function bump(name) {
+      const r = get(name);
+      r.ver++;
+      for (const fn of r.subs) fn();
+    }
+    return {
+      entries,
+      get,
+      bump,
+      bumpAll() {
+        for (const n in entries) bump(n);
+      }
+    };
+  }
+
+  // src/runtime.ts
+  var COMPONENT_DIR = ".";
+  function createRuntime(doc = document) {
+    const registry = createRegistry();
+    const pseudoClass = createPseudoSheet(doc);
+    const helmet = createHelmetManager(
+      doc,
+      (name) => registry.get(name).htmlStreaming
+    );
+    const external = createExternalModules(() => registry.bumpAll());
+    const factory = createComponentFactory(registry, ensureFetched);
+    const host = {
+      component: (name) => factory.getDC(name),
+      placeholder: (props) => h(Placeholder, props),
+      helmet: (node) => helmet.compile(node),
+      loadExternal: (kind, url, after) => external.load(kind, url, after),
+      resolveExternal: (url, name) => external.resolve(url, name),
+      resolveExternalGlobal: (url, name) => external.resolveGlobal(url, name),
+      resolveExternalError: (url, name) => external.getError(url, name),
+      pseudoClass
+    };
+    function ensureFetched(name) {
+      const r = registry.get(name);
+      if (r.fetched) return;
+      r.fetched = true;
+      const url = COMPONENT_DIR + "/" + encodeURIComponent(name) + ".dc.html";
+      const res = window.__resources;
+      const pre = res ? res[url] : void 0;
+      const target = typeof pre === "string" && pre ? pre : url;
+      const blob = bundledBlob(target);
+      (blob ? blob.text() : fetch(target).then((res2) => {
+        if (!res2.ok) {
+          console.error(
+            '[dc-runtime] sibling fetch for "' + name + '" failed:',
+            url,
+            "returned",
+            res2.status,
+            "\u2014 the reference renders as an empty placeholder."
+          );
+          return "";
+        }
+        return res2.text();
+      })).then((t) => {
+        if (!t) return;
+        const parsed = parseDcText(t);
+        if (!parsed) {
+          console.error(
+            '[dc-runtime] sibling fetch for "' + name + '":',
+            url,
+            "has no <x-dc> block \u2014 not a Design Component."
+          );
+          return;
+        }
+        if (parsed.props) r.propsMeta = parsed.props;
+        if (parsed.preview) r.preview = parsed.preview;
+        if (parsed.template && !r.html) updateHtml(name, parsed.template);
+        if (parsed.js && !r.Logic) updateJs(name, parsed.js);
+      }).catch(
+        (e) => console.error(
+          '[dc-runtime] sibling fetch for "' + name + '" threw:',
+          url,
+          e
+        )
+      );
+    }
+    let rootName = null;
+    function updateHtml(name, html) {
+      const r = registry.get(name);
+      r.html = html;
+      if (name === rootName) {
+        const mode = DESIGN_DOC_MODE_RE.exec(html)?.[1] ?? null;
+        if (mode || !r.htmlStreaming) helmet.setDesignDocMode(mode);
+      }
+      try {
+        r.tpl = compileTemplate(html, host);
+      } catch (e) {
+        console.error("[dc-runtime] template compile FAILED for", name, e);
+      }
+      registry.bump(name);
+    }
+    function updateJs(name, src) {
+      const r = registry.get(name);
+      const seq = r.jsSeq = (r.jsSeq || 0) + 1;
+      try {
+        const Cls = evalDcLogic(src);
+        if (r.jsSeq !== seq) return;
+        if (typeof Cls !== "function") {
+          r.logicError = name + ".dc.html: <script data-dc-script> must define `class Component extends DCLogic`";
+        } else {
+          r.logicError = null;
+          r.Logic = Cls;
+        }
+      } catch (e) {
+        if (r.jsSeq !== seq) return;
+        console.error(
+          "[dc-runtime] logic class eval FAILED for",
+          name,
+          "\u2014 the template renders with props only.",
+          e
+        );
+        r.logicError = name + ": " + (e instanceof Error && e.message ? e.message : String(e));
+      }
+      registry.bump(name);
+    }
+    function setStreaming(name, kind, on) {
+      const r = registry.get(name);
+      if (kind === "html") r.htmlStreaming = !!on;
+      else r.jsStreaming = !!on;
+      let any = false;
+      for (const n in registry.entries) {
+        const e = registry.entries[n];
+        if (e && (e.htmlStreaming || e.jsStreaming)) {
+          any = true;
+          break;
+        }
+      }
+      doc.documentElement.classList.toggle("sc-dc-streaming", any);
+      registry.bump(name);
+    }
+    function dcUpdate(name, kind, content, streaming) {
+      if (streaming) registry.get(name).fetched = true;
+      if (kind === "html") {
+        setStreaming(name, "html", !!streaming);
+        updateHtml(name, content);
+      } else if (kind === "js") {
+        setStreaming(name, "js", !!streaming);
+        if (!streaming) updateJs(name, content);
+      } else if (kind === "props") {
+        const { props, preview } = parseDataProps(content);
+        const r = registry.get(name);
+        r.propsMeta = props ?? void 0;
+        r.preview = preview;
+        registry.bump(name);
+      }
+    }
+    function setProps(name, overrides) {
+      registry.get(name).propOverrides = overrides && typeof overrides === "object" ? { ...overrides } : null;
+      registry.bump(name);
+    }
+    function adoptParsed(name, parsed) {
+      if (!parsed) return;
+      const r = registry.get(name);
+      if (parsed.props) r.propsMeta = parsed.props;
+      if (parsed.preview) r.preview = parsed.preview;
+      if (parsed.template) updateHtml(name, parsed.template);
+      if (parsed.js) updateJs(name, parsed.js);
+    }
+    return {
+      registry,
+      getDC: factory.getDC,
+      updateHtml,
+      updateJs,
+      dcUpdate,
+      setProps,
+      adoptParsed,
+      setRootName: (name) => {
+        rootName = name;
+      },
+      markFetched: (name) => {
+        registry.get(name).fetched = true;
+      },
+      annotatedTemplate: (name) => {
+        const r = registry.get(name);
+        return r.tpl && r.tpl.__annotated || null;
+      },
+      templateSource: (name) => registry.get(name).html || null,
+      StreamableLogic
+    };
+  }
+
+  // src/stream-state.ts
+  function createStreamTracker(staleMs = 6e4, now = Date.now) {
+    const since = /* @__PURE__ */ new Map();
+    const liveOne = (n) => {
+      const t = since.get(n);
+      if (t === void 0) return false;
+      if (now() - t > staleMs) {
+        since.delete(n);
+        return false;
+      }
+      return true;
+    };
+    return {
+      push(name, streaming, viewportKey) {
+        if (viewportKey === "dc-model") return;
+        if (streaming) since.set(name, now());
+        else since.delete(name);
+      },
+      live(name) {
+        if (name !== void 0) return liveOne(name);
+        for (const n of [...since.keys()]) if (liveOne(n)) return true;
+        return false;
+      }
+    };
+  }
+
+  // src/index.ts
+  function hideRawTemplate() {
+    const s = document.createElement("style");
+    s.textContent = "x-dc{display:none!important}";
+    document.head.appendChild(s);
+  }
+  function loadScript(src, integrity) {
+    return new Promise((resolve2, reject) => {
+      //! nosemgrep: create-script-element
+      const s = document.createElement("script");
+      s.src = src;
+      if (integrity) {
+        s.integrity = integrity;
+        s.crossOrigin = "anonymous";
+      }
+      s.async = false;
+      s.onload = () => resolve2();
+      s.onerror = () => reject(new Error(`failed to load ${src}`));
+      document.head.appendChild(s);
+    });
+  }
+  function loadReactUmd() {
+    const w = window;
+    if (w.React && w.ReactDOM) return Promise.resolve();
+    const react = cdnScriptFor(REACT_URL, REACT_SRI);
+    const reactDom = cdnScriptFor(REACT_DOM_URL, REACT_DOM_SRI);
+    return Promise.all([
+      loadScript(react.src, react.integrity),
+      loadScript(reactDom.src, reactDom.integrity)
+    ]).then(() => void 0);
+  }
+  function init() {
+    const runtime = createRuntime(document);
+    let rootName = "Root";
+    const baseCss = document.createElement("style");
+    baseCss.textContent = BASE_CSS;
+    document.head.prepend(baseCss);
+    const notifyHost = () => {
+      if (window.parent === window) return;
+      const r = runtime.registry.entries[rootName];
+      try {
+        window.parent.postMessage(
+          {
+            type: "__dc_booted",
+            rootName,
+            propsMeta: r && r.propsMeta || null,
+            preview: r && r.preview || null
+          },
+          "*"
+        );
+      } catch {
+      }
+    };
+    const streams = createStreamTracker();
+    const api = {
+      __dcUpdate: (name, kind, content, streaming, viewportKey) => {
+        streams.push(name, streaming, viewportKey);
+        runtime.dcUpdate(name, kind, content, streaming);
+        if (name === rootName && !streaming && kind === "props") notifyHost();
+      },
+      __dcStreaming: (name) => streams.live(name),
+      __dcSetProps: (name, overrides) => runtime.setProps(name, overrides),
+      /** Name of the component currently mounted as the page root — DC tools
+       *  push their template-stream here when targeting "the open page". */
+      __dcRootName: () => rootName,
+      /** Editor bridge — the encoded, `data-dc-tpl`-annotated template source.
+       *  The host editor parses this into its own template DOM so it can map a
+       *  rendered node (carrying the same `data-dc-tpl`) back to the source
+       *  node that emitted it. Returns the encoded form (`sc-camel-*` attrs,
+       *  `<sc-raw-*>`/`<sc-helmet>` tags); the editor decodes on serialize. */
+      __dcAnnotatedTemplate: (name) => runtime.annotatedTemplate(name),
+      /** Editor bridge — the *original* (decoded) template source. */
+      __dcTemplateSource: (name) => runtime.templateSource(name),
+      __dcBoot: () => {
+        rootName = boot(runtime, document) ?? rootName;
+        notifyHost();
+      },
+      __dcRegistry: runtime.registry.entries,
+      getDC: (name) => runtime.getDC(name),
+      // `DCLogic` is the documented base class name; `StreamableLogic` is the
+      // implementation alias kept for any project that already references it.
+      DCLogic: runtime.StreamableLogic,
+      StreamableLogic: runtime.StreamableLogic
+    };
+    Object.assign(window, api);
+    window.__dcContentKeyed = true;
+    if (document.readyState !== "loading") api.__dcBoot();
+    else document.addEventListener("DOMContentLoaded", () => api.__dcBoot());
+  }
+  hideRawTemplate();
+  loadReactUmd().then(init).catch((err) => {
+    console.error("[dc] failed to load React or boot:", err);
+    throw err;
+  });
+})();
+</script>
+<script>/* ============================================================
+   A&S · Cotizador/Comparador · Safe Adapter LAB v0.4
+   Fecha: 2026-09-26
+
+   OBJETIVO
+   - Probar el contrato público de integración con el backend ya existente.
+   - NO conecta Orbit.store ni escribe en Gravicentra.
+   - Expone schema/catalog/eligibility/comparison en modo LAB sanitizado.
+   - La futura implementación productiva debe sustituir este transporte LAB
+     por un endpoint/adaptador autenticado, manteniendo esta interfaz pública.
+
+   FUENTES TÉCNICAS VIVAS (orbit360-core / ays/backend-tenant-lab-v99-20260703)
+   - cotizador-comparativo-contrato-p0.js @ 61f46696c41e277789a525450f4544dbfbb454a9
+   - quote-comparison-contracts-v1203.js @ cb7761e267f6ea114b5a99877313e9dee864b9c3
+   - cotizador-v1203-source-gate.js @ 21f016b81388b052ca01ee784c3cca0dc566091d
+   - quote-comparison-p06-runtime-adapter-v1208.js @ 93454e0ce1c7478bbbe6570f2e68bf4d0d6a7431
+   - comparativo-v1203-operational-bridge.js @ cf3dce3d88f31de23b00dbfe0066831637f2766a
+   ============================================================ */
+(function(root){
+  'use strict';
+  const BACKEND={
+    branch:'ays/backend-tenant-lab-v99-20260703',
+    contracts:{
+      p0:{file:'core/cotizador-comparativo-contrato-p0.js',sha:'61f46696c41e277789a525450f4544dbfbb454a9'},
+      quoteContracts:{file:'core/quote-comparison-contracts-v1203.js',sha:'cb7761e267f6ea114b5a99877313e9dee864b9c3'},
+      sourceGate:{file:'modules/cotizador-v1203-source-gate.js',sha:'21f016b81388b052ca01ee784c3cca0dc566091d'},
+      tariffAdapter:{file:'core/quote-comparison-p06-runtime-adapter-v1208.js',sha:'93454e0ce1c7478bbbe6570f2e68bf4d0d6a7431'},
+      comparisonBridge:{file:'modules/comparativo-v1203-operational-bridge.js',sha:'cf3dce3d88f31de23b00dbfe0066831637f2766a'}
+    },
+    requiredDimensions:['pais','moneda','ramo','producto'],
+    optionalDimensions:['familiaProducto','subtipoProducto','segmento','tipoRiesgo','tipoVehiculo','usoVehiculo','plan'],
+    eligibilityStates:['AUTO_ELIGIBLE','HYBRID_REQUIRED','CONSULTATIVE_REQUIRED','MORE_DATA_REQUIRED','NOT_AVAILABLE','OUT_OF_SCOPE']
+  };
+
+  const YEARS=Array.from({length:32},(_,i)=>String(2026-i));
+  const PRIORITIES={
+    auto:['Balance costo/protección','Menor deducible','Mayor alcance de cobertura','Mejor asistencia','Responsabilidad civil'],
+    salud:['Red / acceso','Deducible o copago','Cobertura internacional','Maternidad / carencias','Exclusiones / preexistencias'],
+    hogar:['Estructura y contenido','Responsabilidad civil familiar','Eventos naturales','Robo / hurto','Alojamiento temporal'],
+    vida:['Continuidad económica','Protección de dependientes','Invalidez / enfermedades graves','Plazo / suma asegurada'],
+    empresa:['Patrimonio','Personas / beneficios','Responsabilidad civil','Flotillas / movilidad','Continuidad','Contratos / obligaciones'],
+    transporte:['Carga y mercancía','Responsabilidad civil','Flota','Patios / maniobras','Almacenamiento','Continuidad'],
+    contrato:['Amparos / alcance','Requisitos / contragarantías','Vigencia','Costo total'],
+    revision:['Cobertura','Costo','Deducible','Servicio','Renovación / cambios']
+  };
+  const f=(id,label,type,options,def,group,help,when)=>({id,label,type,options:options||[],default:def==null?'':def,group:group||'',help:help||'',when:when||null});
+
+  function commonAuto(country){
+    const gt=country==='gt';
+    return {
+      schemaId:`${country}_auto_audit_union_v0.2`,
+      title:gt?'Auto / movilidad · captura basada en cotizadores GT auditados':'Auto / movilidad · captura base Colombia',
+      evidence:gt?'Auditoría multiproducto GT: BAM, Bantrab, Columna, AseGuate, Banrural.':'Sin rater CO operativo certificado para web en este corte; captura base para ruta híbrida/consultiva.',
+      eligibility:gt?'HYBRID_REQUIRED':'CONSULTATIVE_REQUIRED',
+      sourceMode:gt?'audit-derived / backend-binding pending':'public-intake / source-binding not certified',
+      groups:[
+        {title:'Vehículo y uso',kicker:'RIESGO',fields:[
+          f('tipoVehiculo','Tipo de vehículo','select',gt?['Automóvil','Motocicleta','Camioneta agrícola','Microbús hasta 9 pasajeros','Panel / camión liviano','Bus','Camión pesado','Cabezal','Transporte por plataforma']:['Automóvil','Camioneta / SUV','Motocicleta','Vehículo comercial','Otro / requiere revisión'],'Automóvil','Vehículo y uso','La disponibilidad se resuelve contra producto/fuente habilitada.'),
+          f('usoVehiculo','Uso','select',gt?['Particular','Comercial','Transporte por plataforma']:['Particular','Comercial','Plataforma / aplicación','Otro / requiere revisión'],'Particular','Vehículo y uso','La fuente puede restringir usos.'),
+          f('anioModelo','Año','select',YEARS,'2024','Vehículo y uso','La antigüedad puede cambiar las opciones disponibles.'),
+          f('marca','Marca','text',[],gt?'Toyota':'Renault','Vehículo y uso','Nos ayuda a identificar correctamente el vehículo.'),
+          f('lineaModelo','Línea / modelo','text',[],gt?'Corolla':'Duster','Vehículo y uso','Completa la referencia del vehículo para continuar.'),
+          f('valorAsegurado','Valor aproximado','number',[],gt?'185000':'95000000','Vehículo y uso','Se utiliza como referencia del riesgo; la propuesta final depende de la alternativa validada.')
+        ]},
+        {title:'Condiciones que cambian la tarifa o la ruta',kicker:'APLICABILIDAD',fields:[
+          f('conductorJoven','Conductor joven / recargo potencial','select',['No','Sí','No aplica'],'No','Aplicabilidad','Algunas fuentes auditadas manejan recargo o condición por conductor joven.'),
+          f('equipoEspecial','Equipo especial','select',['No','Sí / requiere declarar'],'No','Aplicabilidad','Puede requerir suma o validación adicional según producto.'),
+          f('coberturaObjetivo','Enfoque de cobertura','select',['Cobertura amplia','Daños a terceros / RC','Robo','Revisar opciones disponibles'],'Cobertura amplia','Aplicabilidad','La ruta final depende de los productos habilitados.'),
+          f('formaPago','Preferencia de pago','select',['Contado','Cuotas / fraccionamiento','Revisar opciones'],'Contado','Aplicabilidad','La fuente define recargos, cuotas y mecanismos permitidos.')
+        ]},
+        {title:'Qué pesa más en tu decisión',kicker:'PRIORIDAD',fields:[
+          f('prioridad','Prioridad principal','select',PRIORITIES.auto,'Balance costo/protección','Prioridad','Alimenta la explicación del comparador, no un ranking universal.')
+        ]}
+      ]
+    };
+  }
+
+  function commonHealth(country){
+    const gt=country==='gt';
+    return {
+      schemaId:`${country}_salud_audit_union_v0.2`,
+      title:gt?'Gastos Médicos · composición y opciones':'Seguro / Póliza de Salud privado · contexto inicial',
+      evidence:gt?'Auditoría GT: BAM Salud y Aseguradora Rural/Banrural Gastos Médicos.':'No existe rater CO público certificado en este corte; no reemplaza EPS.',
+      eligibility:gt?'HYBRID_REQUIRED':'CONSULTATIVE_REQUIRED',
+      sourceMode:gt?'audit-derived / backend-binding pending':'public-intake / source-binding not certified',
+      groups:[
+        {title:'Composición',kicker:'ASEGURADOS',fields:[
+          f('modalidad','Modalidad','select',['Individual','Familiar'],'Familiar','Composición','Las fuentes GT auditadas distinguen composición individual/familiar.'),
+          f('titularDob','Fecha de nacimiento del titular','date',[],'1988-05-12','Composición','La fecha exacta evita aproximaciones al validar la solicitud.'),
+          f('generoTitular','Género tarifario titular','select',['Femenino','Masculino'],'Femenino','Composición','Se conserva porque aparece en matrices tarifarias auditadas; la fuente final gobierna su uso.'),
+          f('conyuge','¿Incluye cónyuge?','select',['No','Sí'],'Sí','Composición','Activa datos adicionales en el backend cuando corresponda.'),
+          f('spouseDob','Fecha de nacimiento del cónyuge','date',[],'1986-09-21','Composición','Completar solo si incluyes cónyuge.'),
+          f('hijos','Cantidad de hijos','number',[],'1','Composición','La composición modifica plan/tarifa en fuentes auditadas.')
+        ]},
+        {title:'Opciones del plan',kicker:'COBERTURAS',fields:[
+          f('maternidad','Maternidad','select',['No','Sí / revisar aplicabilidad'],'No','Opciones','En fuentes GT puede ser matriz alternativa por plan, no un recargo genérico.'),
+          f('dental','Dental','select',['No','Sí'],'No','Opciones','Puede ser cargo individual o familiar según fuente.'),
+          f('territorio','Territorio','select',gt?['Guatemala','Guatemala + internacional','Revisar territorio']:['Colombia','Colombia + internacional','Revisar territorio'],gt?'Guatemala':'Colombia','Opciones','El producto/fuente final define red y territorio.'),
+          f('prioridad','Prioridad principal','select',PRIORITIES.salud,gt?'Red / acceso':'Red / acceso','Opciones','En Colombia se trata de seguro privado y no sustituye EPS.')
+        ]}
+      ]
+    };
+  }
+
+  const SIMPLE={
+    hogar:(country)=>({schemaId:`${country}_hogar_public_v0.2`,title:'Hogar · datos que cambian la revisión',evidence:'Arquitectura pública A&S; binding operacional por producto pendiente.',eligibility:'HYBRID_REQUIRED',sourceMode:'public-schema / operational-binding pending',groups:[
+      {title:'Vivienda',kicker:'RIESGO',fields:[f('tipoInmueble','Tipo de inmueble','select',['Casa','Apartamento','Otro / revisar'],'Casa'),f('usoInmueble','Uso','select',['Vivienda propia','Arrendada','Segunda vivienda','Otro / revisar'],'Vivienda propia'),f('valorEstructura','Valor aproximado de estructura','number',[],country==='gt'?'850000':'420000000'),f('valorContenido','Valor aproximado de contenido','number',[],country==='gt'?'150000':'65000000')]},
+      {title:'Prioridad',kicker:'DECISIÓN',fields:[f('prioridad','Prioridad principal','select',PRIORITIES.hogar,'Estructura y contenido')]}
+    ]}),
+    vida:(country)=>({schemaId:`${country}_vida_public_v0.2`,title:'Vida e ingreso · continuidad económica',evidence:'Arquitectura Personas/Familias; binding actuarial/producto pendiente.',eligibility:'CONSULTATIVE_REQUIRED',sourceMode:'public-schema / operational-binding pending',groups:[
+      {title:'Contexto',kicker:'NECESIDAD',fields:[f('momentoVida','Momento de vida','select',['Empiezo mi camino','Familia en crecimiento','Patrimonio consolidado','Trabajo por mi cuenta'],'Familia en crecimiento'),f('dependientes','Personas que dependen de ti','number',[],'2'),f('ingreso','Ingreso mensual a proteger','number',[],country==='gt'?'18000':'8000000'),f('horizonte','Horizonte que quieres revisar','select',['1–5 años','6–10 años','Más de 10 años','No estoy seguro'],'6–10 años')]},
+      {title:'Prioridad',kicker:'DECISIÓN',fields:[f('prioridad','Prioridad principal','select',PRIORITIES.vida,'Continuidad económica')]}
+    ]}),
+    empresa:(country)=>({schemaId:`${country}_empresa_public_v0.2`,title:'Empresa · exposición antes que póliza',evidence:'Arquitectura Empresas A&S; catálogo operacional completo pendiente por ramo/fuente.',eligibility:'CONSULTATIVE_REQUIRED',sourceMode:'public-schema / operational-binding pending',groups:[
+      {title:'Operación',kicker:'EMPRESA',fields:[f('sector','Sector / actividad','select',['Servicios','Comercio','Industria / manufactura','Logística / transporte','Construcción / proyectos','Profesional / oficina','Otro / revisar'],'Servicios'),f('tamano','Tamaño','select',['Microempresa','Pequeña empresa','Mediana empresa','Corporativo'],'Pequeña empresa'),f('empleados','Personas / colaboradores','number',[],'12')]},
+      {title:'Exposición',kicker:'PRIORIDAD',fields:[f('exposicion','Exposición principal','select',PRIORITIES.empresa,'Continuidad'),f('valorActivos','Valor aproximado de activos','number',[],country==='gt'?'1200000':'650000000')]}
+    ]}),
+    transporte:(country)=>({schemaId:`${country}_transporte_public_v0.2`,title:'Flotilla / transporte / carga · operación y cadena',evidence:'Arquitectura T4/T5 A&S; fuentes operativas se habilitan por país/producto.',eligibility:country==='gt'?'HYBRID_REQUIRED':'CONSULTATIVE_REQUIRED',sourceMode:'public-schema / source-binding per country',groups:[
+      {title:'Rol y operación',kicker:'CADENA',fields:[f('rolCadena','Rol en la cadena','select',['Transportador','Generador / propietario de carga','Operador logístico','Almacenamiento','Importador / exportador'],'Transportador'),f('unidades','Unidades / vehículos','number',[],'12'),f('carga','Tipo de carga','select',['Mercancía general','Alimentos / perecederos','Maquinaria / equipo','Carga de alto valor','Otra / revisar'],'Mercancía general'),f('trayecto','Alcance del trayecto','select',country==='gt'?['Guatemala','Centroamérica','Mixto / revisar']:['Colombia','Regional / internacional','Mixto / revisar'],country==='gt'?'Guatemala':'Colombia')]},
+      ...(country==='co'?[{title:'Cómo quieres proteger la operación',kicker:'MODALIDAD',fields:[f('coverageModeNeed','Tipo de necesidad','select',['SPECIFIC_SHIPMENT','ANNUAL_PROGRAM','NEED_GUIDANCE'],'SPECIFIC_SHIPMENT','Modalidad','Define si revisamos un despacho puntual o un programa continuo.'),f('transportModePrimary','Medio principal de transporte','select',['ROAD','AIR','MARITIME','MULTIMODAL','OTHER','NEED_GUIDANCE'],'ROAD','Modalidad','Puedes ampliar los medios cuando el caso requiera más de uno.')]},{title:'Datos de la modalidad',kicker:'DETALLE',fields:[f('origin','Origen','text',[],'Bogotá','Detalle','Punto de inicio del despacho.'),f('destination','Destino','text',[],'Medellín','Detalle','Punto de destino del despacho.'),f('valueToProtect','Valor a proteger','number',[],'180000000','Detalle','Valor estimado del despacho específico.'),f('maxValuePerShipment','Valor máximo por despacho','number',[],'180000000','Detalle','Para un programa anual, indica el máximo estimado por despacho.'),f('annualMovementBudget','Movimiento anual estimado','number',[],'1500000000','Detalle','Para un programa anual, indica el movimiento total aproximado.')]}]:[]),
+      {title:'Punto crítico',kicker:'EXPOSICIÓN',fields:[f('punto','Dónde se concentra la exposición','select',['Origen / cargue','Tránsito','Nodos / transferencias','Almacenamiento','Destino / entrega'],'Tránsito'),f('valorCarga','Valor aproximado por despacho','number',[],country==='gt'?'250000':'180000000'),f('prioridad','Prioridad principal','select',PRIORITIES.transporte,'Carga y mercancía')]}
+    ]}),
+    contrato:(country)=>({schemaId:`${country}_contrato_public_v0.2`,title:'Contrato / obligación / proyecto',evidence:'Ruta consultiva A&S; no se presume emisión automática de cumplimiento.',eligibility:'CONSULTATIVE_REQUIRED',sourceMode:'public-schema / operational-binding pending',groups:[
+      {title:'Obligación',kicker:'CONTRATO',fields:[f('tipoContrato','Tipo de obligación','select',['Cumplimiento contractual','Obra / construcción','Suministro','Servicios','Otra / revisar'],'Cumplimiento contractual'),f('monto','Monto de la obligación','number',[],country==='gt'?'500000':'150000000'),f('vigencia','Vigencia estimada','select',['Hasta 6 meses','7–12 meses','13–24 meses','Más de 24 meses'],'7–12 meses')]},
+      {title:'Qué revisar',kicker:'DECISIÓN',fields:[f('prioridad','Prioridad principal','select',PRIORITIES.contrato,'Amparos / alcance')]}
+    ]}),
+    revision:(country)=>({schemaId:`${country}_revision_public_v0.2`,title:'Revisión de póliza existente',evidence:'Ruta pública de revisión/renovación; backend de pólizas/renovaciones se conserva separado.',eligibility:'HYBRID_REQUIRED',sourceMode:'public-schema / policy-binding pending',groups:[
+      {title:'Póliza actual',kicker:'CONTEXTO',fields:[f('ramoActual','Qué quieres revisar','select',country==='gt'?['Auto / movilidad','Gastos Médicos','Vida','Hogar','Empresa / corporativo']:['Autos / automotores','Seguro / póliza de salud','Vida','Hogar / multirriesgo','Empresa / corporativo'],'Auto / movilidad'),f('renovacion','Fecha de renovación','date',[],'2026-12-31'),f('primaActual','Prima aproximada actual','number',[],country==='gt'?'2500':'1350000')]},
+      {title:'Motivo',kicker:'CAMBIO',fields:[f('motivo','Qué cambió','select',['Precio / prima','Cobertura','Deducible','Servicio','Datos del riesgo','Quiero comparar alternativas'],'Quiero comparar alternativas'),f('prioridad','Prioridad principal','select',PRIORITIES.revision,'Cobertura')]}
+    ]}),
+    duda:(country)=>({schemaId:`${country}_duda_public_v0.2`,title:'No estoy seguro · orientación inicial',evidence:'Router need-first A&S.',eligibility:'MORE_DATA_REQUIRED',sourceMode:'public-router',groups:[
+      {title:'Empecemos por el cambio',kicker:'ORIENTACIÓN',fields:[f('queProtege','Qué quieres proteger','select',['Una persona / familia','Un vehículo / movilidad','Una vivienda','Una empresa / operación','Carga / transporte','Un contrato / proyecto','No sé todavía'],'No sé todavía'),f('queCambio','Qué cambió','select',['Compré / adquirí algo','Mi familia cambió','Mi empresa creció o cambió','Tengo varias pólizas y quiero ordenar','Tengo una obligación o contrato','Solo quiero entender mis opciones'],'Solo quiero entender mis opciones')]}
+    ]})
+  };
+
+  function schema(country,product,form){
+    country=(country||'gt').toLowerCase(); product=product||'auto'; form=form||{};
+    let out=product==='auto'?commonAuto(country):product==='salud'?commonHealth(country):(SIMPLE[product]?SIMPLE[product](country):SIMPLE.duda(country));
+    out=JSON.parse(JSON.stringify(out));
+    if(product==='salud' && out.groups && out.groups[0]){
+      const comp=out.groups[0];
+      const childCount=Math.max(0,Math.min(6,parseInt((form&&form.hijos)!=null?form.hijos:((comp.fields.find(x=>x.id==='hijos')||{}).default||0),10)||0));
+      const idx=comp.fields.findIndex(x=>x.id==='hijos');
+      const childFields=[];
+      for(let i=0;i<childCount;i++) childFields.push(f('dependentDob'+(i+1),'Fecha de nacimiento · hijo '+(i+1),'date',[],i===0?'2018-06-10':'','Composición','Solo si aplica a esta composición familiar.'));
+      if(idx>=0) comp.fields.splice(idx+1,0,...childFields);
+    }
+    out.country=country; out.product=product; out.currency=country==='co'?'COP':'GTQ';
+    out.backendDimensions={pais:country.toUpperCase(),moneda:out.currency,ramo:product==='auto'?'Auto':product==='salud'?'Salud':product,producto:product};
+    return out;
+  }
+
+  function flatten(schemaObj){ return (schemaObj.groups||[]).flatMap(g=>(g.fields||[])); }
+  function requiredMissing(schemaObj,form){
+    const missing=[];
+    flatten(schemaObj).forEach(x=>{
+      if(x.when && !x.when(form||{})) return;
+      const v=(form||{})[x.id];
+      if(v==null || String(v).trim()==='') missing.push(x.id);
+    });
+    return missing;
+  }
+
+  function eligibility(country,product,form){
+    const sc=schema(country,product,form); const missing=requiredMissing(sc,form||{});
+    let state=sc.eligibility;
+    if(missing.length>3 && product!=='duda') state='MORE_DATA_REQUIRED';
+    const mode=state==='AUTO_ELIGIBLE'?'DIGITAL':state==='HYBRID_REQUIRED'?'HYBRID':state==='MORE_DATA_REQUIRED'?'MORE_DATA':'CONSULTATIVE';
+    return {state,mode,missing,schemaId:sc.schemaId,sourceMode:sc.sourceMode,dimensions:sc.backendDimensions};
+  }
+
+  const DEMO_QUOTES={
+    gt:{auto:[
+      {id:'lab_auto_a',status:'VALIDATED',name:'Alternativa A',total:2180,deductible:'20%',assistance:'Básica',coverage:'Cobertura amplia',rc:'Según propuesta',source:'tarifa_validada_lab',version:'LAB-v0.2'},
+      {id:'lab_auto_b',status:'VALIDATED',name:'Alternativa B',total:2540,deductible:'10%',assistance:'Ampliada',coverage:'Cobertura amplia',rc:'Según propuesta',source:'documento_validado_lab',version:'LAB-v0.2'},
+      {id:'lab_auto_c',status:'REQUIRES_VALIDATION',name:'Alternativa C',total:null,deductible:'Dato pendiente',assistance:'Dato pendiente',coverage:'No interpretable todavía',rc:'Dato pendiente',source:'pdf_lab',version:'LAB-v0.2'}
+    ],salud:[
+      {id:'lab_salud_a',status:'VALIDATED',name:'Alternativa A',total:0,deductible:'Según plan',assistance:'Red / servicio según propuesta',coverage:'Plan privado',rc:'No aplica',source:'documento_validado_lab',version:'LAB-v0.2'},
+      {id:'lab_salud_b',status:'REQUIRES_VALIDATION',name:'Alternativa B',total:null,deductible:'Dato pendiente',assistance:'Dato pendiente',coverage:'En revisión',rc:'No aplica',source:'pdf_lab',version:'LAB-v0.2'}
+    ]},
+    co:{auto:[],salud:[]}
+  };
