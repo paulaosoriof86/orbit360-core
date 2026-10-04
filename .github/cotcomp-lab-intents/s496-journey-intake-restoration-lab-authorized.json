@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "ays-cotcomp-s496-journey-intake-restoration-lab-intent-v1.0",
+  "authorization": "S496_DEPLOY_JOURNEY_INTAKE_RESTORATION",
+  "authorizedSourceParent": "28a15754a315e3264ae3af09fa49c5614efc8705",
+  "projectId": "ays-orbit-360-lab",
+  "functionName": "cotcompPremiumJourneyPreviewS496",
+  "parentFunction": "cotcompPremiumVisualPreviewS495",
+  "parentVersion": "ays-cotcomp-s495-premium-refinement-v1.0",
+  "governanceContext": "A&S/COTCOMP_CANONICAL_CONTEXT_v1.0_2026-10-04",
+  "governanceRebase": true,
+  "heroTypographyRestored": true,
+  "journeyStateMachineRestored": true,
+  "countryProductIntakeRestored": true,
+  "deterministicProductVisual": true,
+  "comparisonHierarchyRefined": true,
+  "productFamilyCount": 7,
+  "fixtureOnly": true,
+  "providerDeploymentAuthorized": false,
+  "cotcompRealTransportAuthorized": false,
+  "production": false,
+  "scope": "LAB governed journey/intake restoration and premium refinement only; no real provider transport, no production, no real data writes"
+}
