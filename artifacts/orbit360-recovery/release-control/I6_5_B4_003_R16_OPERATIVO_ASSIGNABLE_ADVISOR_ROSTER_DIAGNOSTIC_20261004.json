@@ -1,0 +1,54 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R16_OPERATIVO_ASSIGNABLE_ADVISOR_ROSTER_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-04",
+  "status": "CAUSE_DEMONSTRATED_FIX_REQUIRED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentFindingId": "B4-003",
+  "predecessorFindingId": "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
+  "authority": "PAULA_AUTHENTICATED_OPERATIVO_VISUAL_20261004",
+  "humanEvidence": {
+    "session": "Carlos Castro · active role Operativo",
+    "route": "#/ops",
+    "surface": "Nuevo prospecto",
+    "country": "GT",
+    "observation": "Asesor selector renders empty for Carlos after the R14A roster correction; the same selector had populated advisors for Paula/Dirección."
+  },
+  "causalEvidence": {
+    "r14aAttempt": "core/ciclo.js now unwraps route-scoped store before reading asesores, filters active Asesor role, country and deduplicates identities.",
+    "accessPolicy": "tenant-access-policy-effective-p0 restricts the asesores/team-directory read to Dirección, SuperAdmin, AdminTenant and Admin through canUseTeamDirectory(). Operativo is not in TEAM_DIRECTORY_ROLES.",
+    "readonlyStore": "store-firestore-product-readonly-p0 converts the effective query plan __deny__ constraint into a denied collection and an empty asesores cache.",
+    "demonstratedFailure": "Because the canonical asesores collection is never hydrated for Operativo, unwrapping the scoped store cannot recover rows that were denied upstream. R14A fixed route-scope shadowing but not role-authorized assignment-roster hydration."
+  },
+  "rootCause": "ASSIGNMENT_ROSTER_INCORRECTLY_REUSES_FULL_TEAM_DIRECTORY_READ_AUTHORITY",
+  "classification": "PRODUCT_ROLE_ASSIGNMENT_DIRECTORY_AUTHORITY_DEFECT",
+  "securityDecision": {
+    "rule": "Do not grant Operativo unrestricted Equipo/team-directory access merely to populate an assignment selector.",
+    "requiredAuthority": "Create/reuse a minimal canonical assignable-advisor projection/contract containing only fields required for assignment (canonical id, display name, active/assignable state, advisor role eligibility and country compatibility), readable by roles that are allowed to assign work in Ops/Leads.",
+    "managementBoundary": "Full user/team administration and sensitive account/credential fields remain restricted to authorized administration roles.",
+    "noUiSecurityShortcut": true
+  },
+  "requiredFix": [
+    "Introduce one canonical minimal assignment-roster read owner, not a parallel user master.",
+    "Ops/Leads assignment-capable roles, including Operativo when module permissions allow creation/assignment, can hydrate the minimal roster independently of Equipo visibility.",
+    "Dirección/Admin continue to receive the same canonical eligible advisor set.",
+    "Selected-country filter remains reactive.",
+    "No hardcoded advisors; no duplicate identities; inactive/deleted/projection-only/non-Asesor users excluded.",
+    "Exact authenticated Preview must prove Paula/Dirección and Carlos/Operativo parity for the same country and prove Carlos still cannot access restricted full team administration unless separately authorized."
+  ],
+  "likelyOwners": [
+    "orbit360-platform/core/tenant-access-policy-effective-p0.js",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/core/router.js"
+  ],
+  "boundaries": {
+    "productMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "productionFunctionDeploymentAuthorized": false
+  },
+  "nextAction": "B4_003_R16_INCLUDE_IN_SINGLE_CAUSAL_SUCCESSOR_FIX"
+}
