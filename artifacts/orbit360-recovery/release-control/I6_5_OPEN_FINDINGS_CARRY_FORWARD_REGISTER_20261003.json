@@ -571,7 +571,9 @@
       "source": "LEDGER",
       "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "humanVisualStatus": "REJECTED_R13",
-      "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad"
+      "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
+      "r13QaGateAlignmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
+      "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e"
     },
     {
       "id": "B4-004",

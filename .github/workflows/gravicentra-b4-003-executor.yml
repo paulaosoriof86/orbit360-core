@@ -39,6 +39,7 @@ jobs:
       B4_LOCK: artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json
       FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
       COMPOSITION: artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json
+      CARRY: artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -273,7 +274,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b4-003-preview-proof.mjs
-          node -e "const x=require(process.env.B4_003_PROOF_OUT),a=x.assertions||{};if(x.status!=='PASS'||a.quoteAuthorityContractHosted!==true||a.manualFinancialInferenceRemoved!==true||a.insurerKnowledgeVisible!==true||a.multiProductKnowledgeRoadmapVisible!==true||a.noDelayedRenewalRenderMutation!==true||a.renewalCampaignDurableReadback!==true||a.cancelationDurableReadback!==true||a.recoveryLinkagePreserved!==true||a.recoveryIdempotentRetry!==true||a.previewGeneralWriteIsolation!==true||a.cancellationProjectionConsistent!==true||a.qaResidueReadOnlyAdjudicated!==true||a.cancelCountrySwitchUnder2500ms!==true||a.cancelExplicitCanonicalTargets!==true||a.cancelCrossCountryIdentityExplicit!==true||a.policyRouteUnder2500ms!==true||a.policySearchUnder2500ms!==true||a.policyDetailUnder2500ms!==true||a.policyRefreshCoherentHydration!==true||a.realRenewalPipelineRepopulated!==true||a.realRenewalPipelineMatchesCanonicalEligibility!==true||a.insurerDriveE2E!==true||a.insurerDriveReloadPersistence!==true||a.insurerDriveNoAutoEnablement!==true||a.insurerDriveSyntheticRollback!==true||a.insurerDriveFileCleanup!==true||a.cleanupComplete!==true||x.syntheticFinalAbsent!==true)process.exit(1);console.log('B4_003_PREVIEW_PROOF=PASS')"
+          node -e "const x=require(process.env.B4_003_PROOF_OUT),a=x.assertions||{},b=x.r13RenewalDataBlocker||{},blocked=x.status==='PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER'&&b.blocking===true&&['REAL_RENEWABILITY_SOURCE_CONFLICT_OR_APPLY_REQUIRED','REAL_RENEWABILITY_FIELDS_UNCLASSIFIED_SOURCE_BACKED_APPLY_REQUIRED'].includes(b.code),full=x.status==='PASS',renewalOk=blocked||(a.realRenewalPipelineRepopulated===true&&a.realRenewalPipelineMatchesCanonicalEligibility===true),browserOk=(x.pageErrors||[]).length===0&&(x.consoleErrors||[]).length===0&&(x.httpErrors||[]).length===0;if((!full&&!blocked)||!browserOk||a.quoteAuthorityContractHosted!==true||a.manualFinancialInferenceRemoved!==true||a.insurerKnowledgeVisible!==true||a.multiProductKnowledgeRoadmapVisible!==true||a.noDelayedRenewalRenderMutation!==true||a.renewalCampaignDurableReadback!==true||a.cancelationDurableReadback!==true||a.recoveryLinkagePreserved!==true||a.recoveryIdempotentRetry!==true||a.previewGeneralWriteIsolation!==true||a.cancellationProjectionConsistent!==true||a.qaResidueReadOnlyAdjudicated!==true||a.cancelCountrySwitchUnder2500ms!==true||a.cancelExplicitCanonicalTargets!==true||a.cancelCrossCountryIdentityExplicit!==true||a.policyRouteUnder2500ms!==true||a.policySearchUnder2500ms!==true||a.policyDetailUnder2500ms!==true||a.policyRefreshCoherentHydration!==true||!renewalOk||a.insurerDriveE2E!==true||a.insurerDriveReloadPersistence!==true||a.insurerDriveNoAutoEnablement!==true||a.insurerDriveSyntheticRollback!==true||a.insurerDriveFileCleanup!==true||a.cleanupComplete!==true||x.syntheticFinalAbsent!==true)process.exit(1);console.log(blocked?'B4_003_PREVIEW_PROOF=PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'B4_003_PREVIEW_PROOF=PASS')"
 
       - name: Adjudicate and clean exact historical B2 QA residue
         if: steps.gate.outputs.run == 'true'
@@ -344,8 +345,8 @@ jobs:
           B4_QA_CLEANUP: ${{ runner.temp }}/b4-003-qa-residue-cleanup.json
         run: |
           set -euo pipefail
-          RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_20261003.json"
-          QA_RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B4_003_B2_QA_RESIDUE_ADJUDICATION_20261003.json"
+          RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json"
+          QA_RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_B2_QA_RESIDUE_ADJUDICATION_20261004.json"
           export RECEIPT QA_RECEIPT
           REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
           test "$REMOTE" = "$CANDIDATE_SOURCE_SHA"
@@ -355,50 +356,66 @@ jobs:
           const fs=require('node:fs'),p=JSON.parse(fs.readFileSync(process.env.B4_PROOF,'utf8')),q=JSON.parse(fs.readFileSync(process.env.B4_QA_CLEANUP,'utf8'));
           const safe=p.qaResidue?.classification==='PROVEN_B2_QA_LINEAGE_NO_DEPENDENTS';
           const adjudicated=(safe&&q.status==='PASS'&&q.deletedCount===3)||(!safe&&q.status==='NOT_DELETED_FAIL_CLOSED'&&q.deletedCount===0);
-          if(p.status!=='PASS'||p.syntheticFinalAbsent!==true||!adjudicated)throw Error('B4_003_PROOF_NOT_PASS');
-          const rr={schema:'GRAVICENTRA_I6_5_B4_003_MACHINE_PASS_V1',recordedAt:new Date().toISOString(),status:'MACHINE_PASS_PENDING_PAULA_VISUAL',findingId:'B4-003',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,channelId:process.env.B4_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactHostingReadback:true,assertions:p.assertions,renewalRenderStability:p.renewalRenderStability,qaResidue:p.qaResidue,qaResidueDisposition:q.status,qaResidueDeletedCount:q.deletedCount,qaResidueAdjudicationReceiptPath:process.env.QA_RECEIPT,qaResidueAdjudicationReceiptBlobSha:process.env.QA_BLOB,syntheticQaWrites:p.syntheticWrites||0,cleanupWrites:p.cleanupWrites||0,syntheticFinalAbsent:p.syntheticFinalAbsent===true,pageErrors:p.pageErrors||[],consoleErrors:p.consoleErrors||[],operationalBusinessWrites:0,reimport:false,livePromoted:false,knowledgePreview:true,quoteAuthorityContractV1:true,insurerKnowledgeVisible:p.assertions?.insurerKnowledgeVisible===true,multiProductKnowledgeRoadmapVisible:p.assertions?.multiProductKnowledgeRoadmapVisible===true,insurerKnowledge:p.insurerKnowledge||null,nextAction:'B4_003_TARGETED_PAULA_VISUAL'};
+          const blocked=p.status==='PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER'&&p.r13RenewalDataBlocker?.blocking===true;
+          if(!['PASS','PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER'].includes(p.status)||p.syntheticFinalAbsent!==true||!adjudicated||p.pageErrors?.length||p.consoleErrors?.length||p.httpErrors?.length)throw Error('B4_003_PROOF_NOT_ACCEPTABLE');
+          const status=blocked?'MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'MACHINE_PASS_PENDING_PAULA_VISUAL';
+          const nextAction=blocked?'B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION':'B4_003_TARGETED_PAULA_VISUAL';
+          const rr={schema:'GRAVICENTRA_I6_5_B4_003_MACHINE_PROOF_V2',recordedAt:new Date().toISOString(),status,findingId:'B4-003',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,channelId:process.env.B4_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactHostingReadback:true,assertions:p.assertions,renewalRenderStability:p.renewalRenderStability,qaResidue:p.qaResidue,qaResidueDisposition:q.status,qaResidueDeletedCount:q.deletedCount,qaResidueAdjudicationReceiptPath:process.env.QA_RECEIPT,qaResidueAdjudicationReceiptBlobSha:process.env.QA_BLOB,syntheticQaWrites:p.syntheticWrites||0,cleanupWrites:p.cleanupWrites||0,syntheticFinalAbsent:p.syntheticFinalAbsent===true,pageErrors:p.pageErrors||[],consoleErrors:p.consoleErrors||[],httpErrors:p.httpErrors||[],operationalBusinessWrites:0,reimport:false,livePromoted:false,knowledgePreview:true,quoteAuthorityContractV1:true,insurerKnowledgeVisible:p.assertions?.insurerKnowledgeVisible===true,multiProductKnowledgeRoadmapVisible:p.assertions?.multiProductKnowledgeRoadmapVisible===true,insurerKnowledge:p.insurerKnowledge||null,r13RenewalDataBlocker:p.r13RenewalDataBlocker||null,nextAction};
           fs.writeFileSync(process.env.RECEIPT,JSON.stringify(rr,null,2)+'\n');
           NODE
           RECEIPT_BLOB=$(git hash-object "$RECEIPT"); export RECEIPT_BLOB
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.COMPOSITION,o=JSON.parse(fs.readFileSync(p,'utf8'));
           o.activeFindingId='B4-003';o.activeBlock='B4';o.currentBlock='B4';
-          o.b4003MachinePass={status:'MACHINE_PASS_PENDING_PAULA_VISUAL',path:process.env.RECEIPT,blobSha:process.env.RECEIPT_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',operationalBusinessWrites:0,syntheticFinalAbsent:true,qaResidueAdjudicationBlobSha:process.env.QA_BLOB};
-          o.b4Execution={...(o.b4Execution||{}),status:'B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL',activeFindingId:'B4-003',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',noLive:true,noReimport:true,nextAction:'B4_003_TARGETED_PAULA_VISUAL'};
+          const rr=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8')),blocked=rr.status==='MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',status=blocked?'B4_003_MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL',nextAction=rr.nextAction;
+          o.b4003MachinePass={status:rr.status,path:process.env.RECEIPT,blobSha:process.env.RECEIPT_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',operationalBusinessWrites:0,syntheticFinalAbsent:true,qaResidueAdjudicationBlobSha:process.env.QA_BLOB,r13RenewalDataBlocker:rr.r13RenewalDataBlocker||null};
+          o.b4Execution={...(o.b4Execution||{}),status,activeFindingId:'B4-003',sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',noLive:true,noReimport:true,nextAction};
           fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
           NODE
           COMPOSITION_BLOB=$(git hash-object "$COMPOSITION"); export COMPOSITION_BLOB
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.FINDINGS,o=JSON.parse(fs.readFileSync(p,'utf8'));
           const f=(o.findings||[]).find(x=>x.id==='B4-003'),n=(o.findings||[]).find(x=>x.id==='B4-004');if(!f||!n)throw Error('B4_FINDING_MISSING');
-          Object.assign(f,{status:'MACHINE_PASS_PENDING_PAULA_VISUAL',blocking:true,nextAction:'B4_003_TARGETED_PAULA_VISUAL',humanVisualStatus:'PENDING',machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB,qaResidueAdjudicationReceiptPath:process.env.QA_RECEIPT,qaResidueAdjudicationReceiptBlobSha:process.env.QA_BLOB});
-          Object.assign(n,{status:'NOT_STARTED',blocking:true,nextAction:'WAIT_B4_003_PAULA_VISUAL'});
+          const rr=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8')),blocked=rr.status==='MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',status=blocked?'MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'MACHINE_PASS_PENDING_PAULA_VISUAL',nextAction=rr.nextAction;
+          Object.assign(f,{status,blocking:true,nextAction,humanVisualStatus:blocked?'REJECTED_R13':'PENDING',machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB,qaResidueAdjudicationReceiptPath:process.env.QA_RECEIPT,qaResidueAdjudicationReceiptBlobSha:process.env.QA_BLOB});
+          const r13=(o.findings||[]).find(x=>x.id==='B4-003-R13-04-RENEWALS-ZERO-REGRESSION');if(r13&&blocked)Object.assign(r13,{status:'MACHINE_PROOF_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',blocking:true,nextAction:'B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION'});
+          Object.assign(n,{status:'NOT_STARTED',blocking:true,nextAction:blocked?'WAIT_B4_003_RENEWAL_DATA_RESOLUTION':'WAIT_B4_003_PAULA_VISUAL'});
           fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
           NODE
           FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
           node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CARRY,o=JSON.parse(fs.readFileSync(p,'utf8')),rr=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8')),blocked=rr.status==='MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',status=blocked?'MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'MACHINE_PASS_PENDING_PAULA_VISUAL';
+          const f=(o.findings||[]).find(x=>x.id==='B4-003'),r13=(o.findings||[]).find(x=>x.id==='B4-003-R13-04-RENEWALS-ZERO-REGRESSION');
+          if(f)Object.assign(f,{status,blocking:true,nextAction:rr.nextAction});
+          if(r13&&blocked)Object.assign(r13,{status:'MACHINE_PROOF_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',blocking:true,nextAction:'B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION'});
+          o.machineProofReceiptPath=process.env.RECEIPT;o.machineProofReceiptBlobSha=process.env.RECEIPT_BLOB;
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          CARRY_BLOB=$(git hash-object "$CARRY"); export CARRY_BLOB
+          node - <<'NODE'
           const fs=require('node:fs'),p=process.env.B4_LOCK,o=JSON.parse(fs.readFileSync(p,'utf8'));
-          o.status='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL';
-          o.activeFinding={id:'B4-003',title:'Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.',status:'MACHINE_PASS_PENDING_PAULA_VISUAL',blocking:true,nextAction:'B4_003_TARGETED_PAULA_VISUAL',humanVisualStatus:'PENDING',knowledgePreview:true};
-          o.nextAction='B4_003_TARGETED_PAULA_VISUAL';o.nextRequiredProof=['B4_003_TARGETED_PAULA_VISUAL_PASS'];
+          const rr=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8')),blocked=rr.status==='MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',status=blocked?'B4_003_MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL',nextAction=rr.nextAction;
+          o.status=status;
+          o.activeFinding={id:'B4-003',title:'Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.',status,blocking:true,nextAction,humanVisualStatus:blocked?'REJECTED_R13':'PENDING',knowledgePreview:true};
+          o.nextAction=nextAction;o.nextRequiredProof=blocked?['B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION','B4_003_TARGETED_PAULA_VISUAL_PASS']:['B4_003_TARGETED_PAULA_VISUAL_PASS'];
           o.candidate={sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactReadback:true};
-          o.compositionLock={...(o.compositionLock||{}),blobSha:process.env.COMPOSITION_BLOB};o.findingLedger={...(o.findingLedger||{}),blobSha:process.env.FINDINGS_BLOB};
+          o.compositionLock={...(o.compositionLock||{}),blobSha:process.env.COMPOSITION_BLOB};o.findingLedger={...(o.findingLedger||{}),blobSha:process.env.FINDINGS_BLOB};o.continuityRegister={...(o.continuityRegister||{}),blobSha:process.env.CARRY_BLOB};
           o.boundaries={...(o.boundaries||{}),businessWritesAuthorized:false,syntheticQaWritesAuthorized:false,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false};
           fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
           NODE
           LOCK_BLOB=$(git hash-object "$B4_LOCK"); export LOCK_BLOB
           node - <<'NODE'
-          const fs=require('node:fs'),p=process.env.CONTROL,o=JSON.parse(fs.readFileSync(p,'utf8')),b=o.i65ForensicRemediationPlan.b4;
-          Object.assign(b,{status:'B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL',activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactReadback:true,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false,syntheticQaWritesAuthorized:false,nextAction:'B4_003_TARGETED_PAULA_VISUAL'});
-          o.currentB4={...(o.currentB4||{}),status:'B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL',activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,noLive:true,noReimport:true,nextAction:'B4_003_TARGETED_PAULA_VISUAL'};
-          o.nextAction='I6_5_FORENSIC_REMEDIATION_B4_003_TARGETED_PAULA_VISUAL';
-          o.canonicalAccumulationControl={...(o.canonicalAccumulationControl||{}),activeBlock:'B4',activeFindingId:'B4-003',compositionLockBlobSha:process.env.COMPOSITION_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,nextAction:'B4_003_TARGETED_PAULA_VISUAL'};
+          const fs=require('node:fs'),p=process.env.CONTROL,o=JSON.parse(fs.readFileSync(p,'utf8')),b=o.i65ForensicRemediationPlan.b4,rr=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8')),blocked=rr.status==='MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',status=blocked?'B4_003_MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL',nextAction=rr.nextAction,controlNext=blocked?'I6_5_FORENSIC_REMEDIATION_B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION':'I6_5_FORENSIC_REMEDIATION_B4_003_TARGETED_PAULA_VISUAL';
+          Object.assign(b,{status,activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,continuityRegisterBlobSha:process.env.CARRY_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactReadback:true,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false,syntheticQaWritesAuthorized:false,nextAction});
+          o.currentB4={...(o.currentB4||{}),status,activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,continuityRegisterBlobSha:process.env.CARRY_BLOB,noLive:true,noReimport:true,nextAction};
+          o.nextAction=controlNext;
+          o.canonicalAccumulationControl={...(o.canonicalAccumulationControl||{}),activeBlock:'B4',activeFindingId:'B4-003',compositionLockBlobSha:process.env.COMPOSITION_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,continuityRegisterBlobSha:process.env.CARRY_BLOB,nextAction};
           fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
           NODE
-          git add "$RECEIPT" "$QA_RECEIPT" "$COMPOSITION" "$FINDINGS" "$B4_LOCK" "$CONTROL"
+          git add "$RECEIPT" "$QA_RECEIPT" "$COMPOSITION" "$FINDINGS" "$CARRY" "$B4_LOCK" "$CONTROL"
           git config user.name gravicentra-recovery-bot
           git config user.email gravicentra-recovery-bot@users.noreply.github.com
-          git commit -m "hold(i6.5 B4-003): machine pass pending Paula visual"
+          git commit -m "hold(i6.5 B4-003): freeze R13 machine proof"
           git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Fail closed

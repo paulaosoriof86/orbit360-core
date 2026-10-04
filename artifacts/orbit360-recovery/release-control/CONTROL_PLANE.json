@@ -4859,9 +4859,9 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
-      "executionLockBlobSha": "4ff78e51c394ff003b970bd5f39aa8786c1d08d8",
+      "executionLockBlobSha": "ce42ab952434fb90553bfe8031402a0a43b98c36",
       "compositionLockBlobSha": "fbfb631d72b45adff5ed0a3703376c123ca893f6",
-      "findingLedgerBlobSha": "b5e96a63c871f67a1beb6e1f74ce481791842ae9",
+      "findingLedgerBlobSha": "8891b006beba42842a1304f2a03ad79795d0186f",
       "activeFindingId": "B4-003",
       "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
@@ -5172,7 +5172,7 @@
       "priorMachinePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37136776942-5498wth2.web.app",
       "humanVisualStatus": "REJECTED_R13",
       "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-      "continuityRegisterBlobSha": "097916b5e49c06fa8b666133a7622f699f2ec9c1",
+      "continuityRegisterBlobSha": "aa4afbd8269262b80e670ae509b327d694260c41",
       "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
       "continuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
       "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -5410,6 +5410,13 @@
         "dataMutation": false,
         "reimport": false,
         "livePromotion": false
+      },
+      "r13QaGateAlignment": {
+        "status": "QA_GATE_ALIGNED_PENDING_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
+        "blobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
+        "failedRunId": 37167797028,
+        "productSourceChanged": false
       }
     }
   },
@@ -5728,9 +5735,9 @@
     "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "4ff78e51c394ff003b970bd5f39aa8786c1d08d8",
+    "executionLockBlobSha": "ce42ab952434fb90553bfe8031402a0a43b98c36",
     "compositionLockBlobSha": "fbfb631d72b45adff5ed0a3703376c123ca893f6",
-    "findingLedgerBlobSha": "b5e96a63c871f67a1beb6e1f74ce481791842ae9",
+    "findingLedgerBlobSha": "8891b006beba42842a1304f2a03ad79795d0186f",
     "noLive": true,
     "noReimport": true,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
@@ -6013,7 +6020,7 @@
     "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
     "humanVisualStatus": "REJECTED_R13",
     "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "continuityRegisterBlobSha": "097916b5e49c06fa8b666133a7622f699f2ec9c1",
+    "continuityRegisterBlobSha": "aa4afbd8269262b80e670ae509b327d694260c41",
     "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "continuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
     "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -6294,6 +6301,13 @@
       "dataMutation": false,
       "reimport": false,
       "livePromotion": false
+    },
+    "r13QaGateAlignment": {
+      "status": "QA_GATE_ALIGNED_PENDING_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
+      "blobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
+      "failedRunId": 37167797028,
+      "productSourceChanged": false
     }
   },
   "b4VisualAcceptanceControl": {
