@@ -719,16 +719,30 @@ try{
  });
  proof.r13InsurerDrive={probe:driveProbe};
  need(driveProbe&&driveProbe.available===true,'B4_003_R13_DRIVE_PROVIDER_NOT_AVAILABLE:'+JSON.stringify(driveProbe));
- await page.evaluate(ids=>{
-   Orbit.importa.open('docs-aseguradora',{
-     multi:false,
-     modo:'documental',
-     scope:{aseguradoraId:ids.insurer,aseguradoraNombre:'B4 R13 Aseguradora QA',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'QA'},
-     documentIntent:'tarifa',
-     docCategory:'Tarifario'
-   });
+ const importerProbe=await page.evaluate(ids=>{
+   const out={error:'',fileExists:false,drawerExists:false,drawerOpen:false,backOpen:false,drawerText:'',openSource:'',scriptSrcs:[]};
+   try{
+     out.openSource=String(Orbit.importa&&Orbit.importa.open||'').slice(0,1000);
+     out.scriptSrcs=Array.from(document.scripts||[]).map(x=>String(x.src||'')).filter(x=>/importa/i.test(x));
+     Orbit.importa.open('docs-aseguradora',{
+       multi:false,
+       modo:'documental',
+       scope:{aseguradoraId:ids.insurer,aseguradoraNombre:'B4 R13 Aseguradora QA',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'QA'},
+       documentIntent:'tarifa',
+       docCategory:'Tarifario'
+     });
+   }catch(error){out.error=String(error&&error.stack||error&&error.message||error).slice(0,1800);}
+   const dr=document.getElementById('imp-drawer'),back=document.getElementById('imp-back');
+   out.fileExists=!!document.getElementById('imp-file');
+   out.drawerExists=!!dr;
+   out.drawerOpen=!!(dr&&dr.classList.contains('open'));
+   out.backOpen=!!(back&&back.classList.contains('open'));
+   out.drawerText=String(dr&&dr.innerText||'').replace(/\s+/g,' ').trim().slice(0,1800);
+   return out;
  },ids);
- await page.waitForSelector('#imp-file',{state:'attached',timeout:10000});
+ proof.r13InsurerDrive.importerProbe=importerProbe;
+ console.log('B4_003_R13_IMPORTER_OPEN_PROBE='+JSON.stringify(importerProbe));
+ need(!importerProbe.error&&importerProbe.fileExists===true,'B4_003_R13_IMPORTER_FILE_INPUT_NOT_RENDERED:'+JSON.stringify(importerProbe));
  const driveFileName='b4-r13-drive-'+run+'.csv';
  await page.setInputFiles('#imp-file',{name:driveFileName,mimeType:'text/csv',buffer:Buffer.from('concepto,valor\nqa_r13,'+run+'\n','utf8')});
  await page.waitForSelector('#imp-finish',{timeout:10000});
