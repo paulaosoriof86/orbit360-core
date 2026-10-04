@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s493-authorized-fidelity-lab-intent-v1.0",
   "authorization": "S493_DEPLOY_OWNER_AUTHORIZED_FIDELITY_FRONTEND",
-  "authorizedSourceParent": "b10ee432b80e23d6d56f81a7fd8003e603f63a2f",
+  "authorizedSourceParent": "a2d168fac2db2f9648575369e8c9bb0f26b28fbf",
   "projectId": "ays-orbit-360-lab",
   "functionName": "cotcompAuthorizedFidelityPreviewS493",
   "ownerVisualSha": "3468546cb5d1c0cd7e2191980b306d462ea0b0304da0260167ec06c294aaa10e",
@@ -12,5 +12,6 @@
   "providerDeploymentAuthorized": false,
   "cotcompRealTransportAuthorized": false,
   "production": false,
-  "reason": "Restore the Owner-authorized in-site CotComp composition with visibly preserved hero, product-specific photographic scenes for all seven families, and A&S typography/readability; no business-authority or transport expansion."
+  "reason": "Restore the Owner-authorized in-site CotComp composition with visibly preserved hero, product-specific photographic scenes for all seven families, and A&S typography/readability; no business-authority or transport expansion.",
+  "retryReason": "Fix inherited visual-scene test and export product sprite evidence hash; no scope expansion."
 }
