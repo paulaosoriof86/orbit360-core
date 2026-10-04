@@ -634,12 +634,16 @@ try{
    proof.assertions.realRenewalPipelineRepopulated=true;
    proof.assertions.realRenewalPipelineMatchesCanonicalEligibility=true;
  }else{
-   need(proof.r13RenewalSourceDryRun&&proof.r13RenewalSourceDryRun.ready===true,'B4_003_R13_RENEWAL_SOURCE_DRYRUN_NOT_READY:'+JSON.stringify(proof.r13RenewalSourceDryRun||{}));
+   const dry=proof.r13RenewalSourceDryRun||{};
    proof.r13RenewalDataBlocker={
      blocking:true,
-     code:'REAL_RENEWABILITY_FIELDS_UNCLASSIFIED_SOURCE_BACKED_APPLY_REQUIRED',
+     code:dry.ready===true?'REAL_RENEWABILITY_FIELDS_UNCLASSIFIED_SOURCE_BACKED_APPLY_REQUIRED':'REAL_RENEWABILITY_SOURCE_CONFLICT_OR_APPLY_REQUIRED',
      byState:proof.realRenewalDistribution.byState,
-     sourceDryRunCount:proof.r13RenewalSourceDryRun.proposedWriteCount,
+     sourceDryRunCount:Number(dry.proposedWriteCount||0),
+     sourceDryRunReady:dry.ready===true,
+     sourceMissing:dry.missing||[],
+     sourceDuplicates:dry.duplicates||[],
+     sourceHistoricalSameNumber:dry.historicalSameNumber||[],
      writeExecuted:false,
      authorizationRequired:true
    };
