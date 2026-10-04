@@ -184,7 +184,7 @@ const q=(s,r=document)=>r.querySelector(s);
 const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
-const state={country:'GT',route:'vehicle',stage:1,maxStage:1,mode:'online',drafts:{},brands:[],models:[],brandId:null,toastTimer:null};
+const state={country:'GT',route:'vehicle',stage:0,maxStage:0,mode:'online',drafts:{},brands:[],models:[],brandId:null,toastTimer:null};
 const key=()=>state.country+':'+state.route;
 const draft=()=>state.drafts[key()]||(state.drafts[key()]={});
 function setv(id,v){draft()[id]=v}
@@ -403,7 +403,7 @@ function schema(){
 function defaultFor(f){if(getv(f.id,'')===''&&f.def!=='')setv(f.id,f.def);return getv(f.id,'')}
 function visibleField(f){return !f.show||f.show()}
 function missingRequired(sc){
- const m=[];(sc.groups||[]).forEach(g=>(g.fields||[]).filter(visibleField).forEach(f=>{defaultFor(f);if(f.required&&String(getv(f.id,'')).trim()==='')m.push(f.label)}));
+ const m=[];(sc.groups||[]).forEach(g=>(g.fields||[]).filter(visibleField).forEach(f=>{defaultFor(f);const v=String(getv(f.id,'')).trim();const consentMissing=f.id==='consent'&&v!=='Acepto continuar con la gestión';if(f.required&&(v===''||consentMissing))m.push(f.label)}));
  return m;
 }
 function toast(msg){
@@ -458,7 +458,8 @@ function inputHtml(f){
  }
  if(f.type==='brand'||f.type==='model'){
   const list=f.type==='brand'?'s496BrandList':'s496ModelList';
-  return '<div class="'+cls+'"><label for="s496_'+f.id+'">'+esc(f.label)+req+'</label><div class="combo-wrap"><input id="s496_'+f.id+'" data-field="'+esc(f.id)+'" data-combo="'+f.type+'" role="combobox" aria-expanded="false" aria-controls="'+list+'" autocomplete="off" value="'+esc(val)+'"><div id="'+list+'" class="combo-list" role="listbox"></div></div><button class="fallback-link" type="button" data-fallback="'+f.type+'">No encuentro mi '+(f.type==='brand'?'marca':'línea / modelo')+'</button>'+(f.help?'<div class="s496-help">'+esc(f.help)+'</div>':'')+'</div>';
+  const fallbackLabel=f.type==='brand'?'No encuentro mi marca':'No encuentro mi línea / modelo';
+  return '<div class="'+cls+'"><label for="s496_'+f.id+'">'+esc(f.label)+req+'</label><div class="combo-wrap"><input id="s496_'+f.id+'" data-field="'+esc(f.id)+'" data-combo="'+f.type+'" role="combobox" aria-expanded="false" aria-controls="'+list+'" autocomplete="off" value="'+esc(val)+'"><div id="'+list+'" class="combo-list" role="listbox"></div></div><button class="fallback-link" type="button" data-fallback="'+f.type+'">'+fallbackLabel+'</button>'+(f.help?'<div class="s496-help">'+esc(f.help)+'</div>':'')+'</div>';
  }
  return '<div class="'+cls+'"><label for="s496_'+f.id+'">'+esc(f.label)+req+'</label><input id="s496_'+f.id+'" data-field="'+esc(f.id)+'" type="'+esc(f.type)+'" value="'+esc(val)+'">'+(f.help?'<div class="s496-help">'+esc(f.help)+'</div>':'')+'</div>';
 }
