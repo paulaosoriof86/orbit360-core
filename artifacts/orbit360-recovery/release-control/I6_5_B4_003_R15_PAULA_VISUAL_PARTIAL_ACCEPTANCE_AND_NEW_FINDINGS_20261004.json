@@ -1,0 +1,194 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_V1",
+  "recordedAt": "2026-10-04",
+  "status": "PAULA_VISUAL_PARTIAL_PASS_REMEDIATION_REQUIRED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "reviewedCandidate": {
+    "sourceSha": "7aa67243cd0bb26c79cb2e0540f8fbd176321379",
+    "buildId": "gi-i65-b4-7aa67243cd0b-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37187722951-exxphdvs.web.app",
+    "runId": 37187722951,
+    "artifactId": 11297951932,
+    "artifactDigest": "f7d4d8c526ee9c897703f48dbbb33964e2b67f65a4cc8c770b87703e3b95a45c"
+  },
+  "authority": "PAULA_VISUAL_REVIEW_20261004_CAPTURE_BATCH_0231_0253",
+  "preservedHumanPasses": [
+    {
+      "id": "B4-003-R11-02-CANCELATION-CLIENT-POLICY-CONTEXT",
+      "status": "PAULA_VISUAL_PASS_R13_PRESERVE"
+    },
+    {
+      "id": "B4-003-R11-03-CLIENT360-LEFT-TAB-NAV",
+      "status": "PAULA_VISUAL_PASS_R13_PRESERVE"
+    },
+    {
+      "id": "B4-003-R11-06-QUALITY-COUNTRY-SCOPE",
+      "status": "PAULA_VISUAL_PASS_R13_PRESERVE"
+    }
+  ],
+  "newHumanPassEvidence": [
+    {
+      "id": "B4-003-R11-07-QUALITY-PERFORMANCE",
+      "status": "PAULA_VISUAL_PASS_R15",
+      "evidence": "Paula explicitly reports tested modules load correctly; current machine proof also has qualityRenderPathUnder2500ms=true."
+    },
+    {
+      "id": "B4-003-R14-05-QUALITY-VISUAL-GRAMMAR-COMPLETENESS",
+      "status": "PAULA_VISUAL_PASS_R15",
+      "evidence": "Paula explicitly states Calidad de la información está bien; captures show 1/439=0.2%, 1/416=0.2%, CO 0/17=0.0% and canonical table grammar."
+    },
+    {
+      "id": "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
+      "status": "VISUAL_EVIDENCE_PASS_R15",
+      "evidence": "Captures show VENCEN ≤45 D in Pólizas for GT/CO/Todos; no renewable claim in that KPI."
+    },
+    {
+      "id": "B4-003-R11-08-CANCELATION-RATIO-SEMANTICS",
+      "status": "VISUAL_EVIDENCE_PASS_R15",
+      "evidence": "Captures show Canceladas / cartera with copy histórico acumulado · no es churn temporal and detail modal repeats the limitation."
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "B4-003-R15-01-OPS-LEADS-NEW-PROSPECT-CATALOGS",
+      "surface": "Ops/Leads/Nuevo prospecto",
+      "classification": "PRODUCT_CANONICAL_CATALOG_ENTRYPOINT_DIVERGENCE",
+      "observed": "Nuevo prospecto renders Canal, Producto and Ramo as free-text inputs with hardcoded/default text while the existing management editor already uses catalog-backed selects.",
+      "rootCause": "core/ciclo.js nuevoNegocio() uses fInput for nn-canal/nn-prod/nn-ramo; edit flow uses fSelectCat. Current Orbit.cat persists only in browser localStorage and Configuración has no durable shared catalog administration surface.",
+      "requiredFix": "Use one tenant-durable catalog owner for new/edit flows; Dirección/Admin administer catalogs in Configuración; country-aware ramo/product where applicable; no hardcoded defaults as business truth.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/core/config.js",
+        "orbit360-platform/modules/configuracion.js",
+        "orbit360-platform/core/tenant-domain-config-client.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R15-02-QUALITY-CLIENT-COMPLETION-DURABILITY",
+      "surface": "Calidad de datos/Completar expediente",
+      "classification": "PRODUCT_DURABLE_WRITE_READBACK_DEFECT",
+      "observed": "Paula completed missing email, but the row/missing reason did not reliably clear and the change appeared not to persist as expected.",
+      "rootCause": "calidad.js completion modal uses synchronous store.update plus immediate local readback instead of updateDurable/server-confirmed readback.",
+      "requiredFix": "Use durable awaited update with server readback, audit/motivo, rerender only from confirmed state, and prove reload persistence.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R15-03-QUALITY-GEO-CATALOG-COMPLETENESS",
+      "surface": "Calidad de datos/Completar expediente",
+      "classification": "PRODUCT_REFERENCE_CATALOG_INCOMPLETE",
+      "observed": "Ciudad/municipio selector does not expose the complete locality list; capture shows only placeholder/Otro when department data is unavailable in the reduced catalog.",
+      "rootCause": "Orbit.GEO is a reduced embedded subset, not a complete authoritative GT/CO geographic catalog.",
+      "requiredFix": "Bind country→department/province→city/municipality to a complete governed catalog or authoritative tenant reference; preserve Otro/requires-validation fail-closed path.",
+      "owner": [
+        "orbit360-platform/core/config.js",
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R15-04-QUALITY-COUNTRY-EVIDENCE-SEMANTICS",
+      "surface": "Calidad de datos",
+      "classification": "PRODUCT_QUALITY_SEMANTIC_MISMATCH",
+      "observed": "Rows can say Sin evidencia vinculada although client ficha/edit already contains country; user cannot distinguish current value from provenance evidence.",
+      "rootCause": "Quality table labels external linked-evidence absence as if country itself were absent/unsubstantiated, while current client country and evidence lineage are separate concepts.",
+      "requiredFix": "Show current country and provenance separately; user-confirmed durable update becomes auditable evidence; never imply country is missing when value exists.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R15-05-QUALITY-CHANNEL-ACTION",
+      "surface": "Calidad de datos",
+      "classification": "PRODUCT_ACTION_AFFORDANCE_DEFECT",
+      "observed": "Sin canal is rendered as a disabled button and does nothing.",
+      "rootCause": "calidad.js intentionally renders disabled Sin canal when no usable phone/email exists.",
+      "requiredFix": "Render as non-action badge or actionable Agregar canal that opens completion focused on contact fields; no dead button.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R15-06-QUALITY-POLICY-MISMATCH-ACTIONABILITY",
+      "surface": "Calidad de datos/Salud póliza vs calendario",
+      "classification": "PRODUCT_DIAGNOSTIC_ACTIONABILITY_GAP",
+      "observed": "Mismatch rows expose contractual premium/calendar/delta but no action, no drill-down, and clicking policy does not open context or explain what must be validated.",
+      "rootCause": "financialHealthHtml renders informational rows only and does not bind policy/receipt lineage/action surface.",
+      "requiredFix": "Provide policy/receipt drill-down with contractual source, active calendar rows, delta/tolerance, exact validation reason and safe actions; no inferred rewrite. Rows within tolerance must not be false-positive review items.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+      "surface": "Renovaciones",
+      "classification": "SOURCE_BACKED_BUSINESS_COMPLETENESS_BLOCKER",
+      "observed": "Fail-closed pipeline works but still shows 39 policies pending renewability review/conciliation (GT≈33, CO=6) and some actionable cards lack premium, so the module is not operationally complete.",
+      "rootCause": "Most policies still lack authoritative renovable YES/NO and some renewal financial fields remain source-incomplete; current product correctly refuses to infer them.",
+      "requiredFix": "Resolve renewability/financial completeness from source-backed policy/insurer evidence and visible validation workflow; do not auto-promote UNKNOWN.",
+      "owner": [
+        "orbit360-platform/modules/renovaciones.js",
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+        "INSURER_KNOWLEDGE_SOURCE_BACKLOG"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
+      "surface": "Aseguradoras/Documentos y Drive/Tarifas y conocimiento",
+      "classification": "PRODUCT_SOURCE_TAXONOMY_AND_LINEAGE_GAP",
+      "observed": "Tarifas y conocimiento shows related validated sources while Documentos y Drive can show Sin documentos cargados; current classifier is too coarse for tariff/commercial/subscription/claims/etc. document families.",
+      "rootCause": "Reusable Library/knowledge references and insurer Drive-upload registry have distinct semantics that UI does not explain; docs-aseguradora metadata taxonomy is not rich enough.",
+      "requiredFix": "One source registry with storage location/provenance and multi-tag business classification; clearly distinguish referenced Library source from insurer Drive copy; no duplicate source authority.",
+      "owner": [
+        "orbit360-platform/core/importa.js",
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE",
+      "surface": "Ops/Pólizas/Cliente360",
+      "classification": "CAPABILITY_CLOSURE_AND_LINEAGE_REQUIRED",
+      "observed": "Endoso workflow exists, but current B4 proof has not demonstrated exhaustive endoso E2E and no equivalent proven first-class creation workflow was found for certificates/annexes.",
+      "rootCause": "Historical v1.201 implemented endoso application flows and versioned tests, but its own audit left full-repo execution/smoke and several endoso types/backend durability pending; certificate remains an Ops management type rather than a proven document-generation lifecycle.",
+      "requiredFix": "Reconcile latest approved scope for Endosos/Certificados/Anexos, reuse existing v1.201 owners, and include exact E2E coverage in B4-005; do not rebuild parallel workflows.",
+      "owner": [
+        "orbit360-platform/core/endorsement-workflow-v1201.js",
+        "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+        "B4-005_E2E_MATRIX"
+      ],
+      "blocking": false,
+      "targetGate": "B4-005"
+    }
+  ],
+  "nonDefectsClarified": [
+    {
+      "surface": "Cobros y cartera",
+      "observation": "Vista previa segura",
+      "disposition": "EXPECTED_PREVIEW_ISOLATION_NOT_ROLE_DENIAL",
+      "reason": "The current URL is a Firebase Preview channel; real operational writes are intentionally read-only there and only isolated synthetic QA writes are allowed. Direction role is not being denied."
+    }
+  ],
+  "reviewDecision": "DO_NOT_CONTINUE_BROAD_HUMAN_REVIEW_ON_THIS_CANDIDATE",
+  "reason": "The current candidate is now visually rejected for specific new findings. Preserve passed evidence and issue a successor Preview; do not make Paula re-review already accepted surfaces unless impacted by the narrow fix.",
+  "boundaries": {
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productionFunctionDeployment": false
+  },
+  "nextAction": "B4_003_R15_NARROW_SOURCE_FIX_AND_GOVERNANCE_RECONCILIATION"
+}
