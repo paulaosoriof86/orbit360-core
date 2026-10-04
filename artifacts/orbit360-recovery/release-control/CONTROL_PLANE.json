@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_DIAGNOSTIC",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -5670,7 +5670,7 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "ab19ea30636e5b701b988da7e9db57b3ed4da33e",
@@ -5678,7 +5678,7 @@
     "findingLedgerBlobSha": "bd333e8bc622388afccb5bb307252b4d336b166b",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "B4_003_READONLY_RENEWAL_SOURCE_LINEAGE_DIAGNOSTIC",
     "sourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -6165,6 +6165,21 @@
       "failureCode": "B4_003_R13_POLICY_INDEXED_DEBOUNCED_SEARCH_MISSING",
       "contractBlobSha": "9a4f056a7ee689837ef472ea2eabae6242c2e872",
       "productSourceChanged": false
+    },
+    "r13RenewalSourceLineageDiagnostic": {
+      "status": "READ_ONLY_DIAGNOSTIC_ARMED",
+      "targetPolicyNumbers": [
+        "68542",
+        "1-AP-20890",
+        "AUTO 38446",
+        "AUTO-1000000334",
+        "VA-43685"
+      ],
+      "purpose": "Resolve VA-43685 canonical renewal-lineage conflict before any source-backed apply.",
+      "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
     }
   },
   "b4VisualAcceptanceControl": {
