@@ -103,7 +103,7 @@ need(cancel.includes('no es churn temporal')&&cancel.includes('Relación cancela
 need(policyBridge.includes('!rs.includes(initialRamo)')&&policyBridge.includes('!initialSubs.includes(initialProduct)'),'B4_003_POLICY_EDITOR_SOURCE_TAXONOMY_PRESERVATION_MISSING');
 need(policyBridge.includes('data-renewable')&&policyBridge.includes("renovable: $('[data-renewable]').value==='yes'"),'B4_003_POLICY_EDITOR_RENEWABILITY_TRISTATE_MISSING');
 need(/function\s+relationDataReady\s*\(/.test(policy)&&/data-polizas-relations-loading="1"/.test(policy),'B4_003_R13_POLICY_RELATION_READINESS_MISSING');
-need(/searchTextByPolicy/.test(policy)&&/searchTimer=setTimeout/.test(policy)&&/},180\)/.test(policy),'B4_003_R13_POLICY_INDEXED_DEBOUNCED_SEARCH_MISSING');
+need(/ensureBasicSearchIndex/.test(policy)&&/ensureVehicleSearchIndex/.test(policy)&&/searchTimer=setTimeout/.test(policy)&&/},180\)/.test(policy),'B4_003_R13_POLICY_INDEXED_DEBOUNCED_SEARCH_MISSING');
 need(/const policies = S\(\)\.all\('polizas'\)/.test(policy)&&/const clients = S\(\)\.all\('clientes'\)/.test(policy)&&/insurersById/.test(policy)&&/advisorsById/.test(policy),'B4_003_R13_POLICY_SINGLE_READ_RELATION_INDEX_MISSING');
 const policyFirstPaintBlock=(policy.match(/function buildIndexes\(\) \{[\s\S]*?\n  \}\n\n  function ensureBasicSearchIndex/)||[''])[0];
 need(policyFirstPaintBlock&&!/all\('vehiculos'\)/.test(policyFirstPaintBlock)&&!/searchTextByPolicy/.test(policyFirstPaintBlock),'B4_003_R13P3_POLICY_FIRST_PAINT_SEARCH_WORK_REMAINS');
