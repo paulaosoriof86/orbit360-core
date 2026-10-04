@@ -27,7 +27,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "a1e7e5a79681f3c3c05696c4de429dcdfbb00a29"
+    "blobSha": "c38e296b9472b70a08c7a9ef91ed677e6e014bed"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -162,10 +162,11 @@
     "bridgeBlobSha": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "indexBlobSha": "2f58429833edea2bebf0813e6bbd007aa9f7ae31",
     "contractBlobSha": "df74d759fb8515f693d578302e363bd94b145e24",
-    "compositionBlobSha": "a1e7e5a79681f3c3c05696c4de429dcdfbb00a29",
+    "compositionBlobSha": "c38e296b9472b70a08c7a9ef91ed677e6e014bed",
     "productSourceChanged": true,
     "dataMutation": false,
     "reimport": false,
-    "livePromotion": false
+    "livePromotion": false,
+    "exactSetProductFileCount": 97
   }
 }
