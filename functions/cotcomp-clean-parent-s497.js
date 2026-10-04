@@ -180,7 +180,7 @@ function html(){
         <p class="cc-section-lead">Pedimos primero los datos que cambian disponibilidad, condiciones o comparación.</p>
         <div class="cc-summary-grid"><div class="cc-summary"><small>País</small><strong>Guatemala</strong></div><div class="cc-summary"><small>Necesidad</small><strong id="selectedNeed">Vehículo / Movilidad</strong></div><div class="cc-summary"><small>Cómo seguimos</small><strong>En línea con asesoría disponible</strong></div></div>
         <div class="cc-route-context">
-          <div id="routePhoto" class="cc-route-photo" data-visual-asset="family:vehicle" aria-label="Contexto visual de Vehículo / Movilidad"></div>
+          <div id="routePhoto" class="cc-route-photo" data-visual-asset="route:vehicle" aria-label="Contexto visual de Vehículo / Movilidad"></div>
           <div class="cc-route-copy"><small id="routeVisualKicker">CONTEXTO DE LA NECESIDAD</small><strong id="routeVisualTitle">Vehículo / Movilidad</strong><p id="routeVisualText">La imagen acompaña la necesidad seleccionada. No sustituye los datos que requiere una cotización real.</p></div>
         </div>
         <div class="cc-stage-panel"><div class="cc-stage-panel__head"><span>01</span><b>Vehículo y uso</b></div><div class="cc-field-grid">
@@ -256,7 +256,7 @@ function html(){
   const syncRouteVisual=()=>{
     const meta=sceneMeta[selectedFamily],pos=scenePos[selectedFamily];
     const photo=document.getElementById('routePhoto');
-    if(photo){photo.style.backgroundPosition=pos.x+' '+pos.y;photo.dataset.visualAsset='family:'+selectedFamily;photo.setAttribute('aria-label','Contexto visual de '+meta.label);}
+    if(photo){photo.style.backgroundPosition=pos.x+' '+pos.y;photo.dataset.visualAsset='route:'+selectedFamily;photo.setAttribute('aria-label','Contexto visual de '+meta.label);}
     const need=document.getElementById('selectedNeed');if(need)need.textContent=meta.label;
     const title=document.getElementById('routeVisualTitle');if(title)title.textContent=meta.label;
     const copy=document.getElementById('routeVisualText');if(copy)copy.textContent=meta.text;
