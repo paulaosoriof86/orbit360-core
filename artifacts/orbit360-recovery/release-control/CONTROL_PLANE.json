@@ -742,7 +742,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_SOURCE_FIX",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4853,24 +4853,24 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_FIX_AUTHORIZED",
+      "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
-      "executionLockBlobSha": "3ff854dee06d8fdb3e1937030ccf71bd94ca4037",
-      "compositionLockBlobSha": "5ce62d8edaf577f21e4520138653e61d243d1d4e",
-      "findingLedgerBlobSha": "bd333e8bc622388afccb5bb307252b4d336b166b",
+      "executionLockBlobSha": "6f856a663344753bb657461aab5a4d1ef47ef7bb",
+      "compositionLockBlobSha": "a1e7e5a79681f3c3c05696c4de429dcdfbb00a29",
+      "findingLedgerBlobSha": "1659c0fd34208277eb691a14a5563571edd2b8d9",
       "activeFindingId": "B4-003",
       "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
       "baselinePreviewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
-      "productMutationAuthorized": true,
+      "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
       "sourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
@@ -5172,7 +5172,7 @@
       "priorMachinePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37136776942-5498wth2.web.app",
       "humanVisualStatus": "REJECTED_R13",
       "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-      "continuityRegisterBlobSha": "38a9b17aae04fb2743e17d3f797ddcc4acdbf256",
+      "continuityRegisterBlobSha": "0581ef2ad4cdd23f02f69b290a3bd2219112683a",
       "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
       "continuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
       "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -5389,6 +5389,13 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_DIAGNOSTIC_20261004.json",
         "exactPreviewRunId": 37166534897,
         "rootCause": "LATE_LEGACY_INSURER_IMPORT_BRIDGE_SHADOWS_R13_DURABLE_DRIVE_IMPORT_OWNER"
+      },
+      "r13InsurerDriveShadowOwnerSourceFix": {
+        "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_SOURCE_FIX_20261004.json",
+        "bridgeBlobSha": "db5f012abe505c2dd27d77a47d0694868bee5348",
+        "indexBlobSha": "2f58429833edea2bebf0813e6bbd007aa9f7ae31",
+        "contractBlobSha": "df74d759fb8515f693d578302e363bd94b145e24"
       }
     }
   },
@@ -5704,15 +5711,15 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_FIX_AUTHORIZED",
+    "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "3ff854dee06d8fdb3e1937030ccf71bd94ca4037",
-    "compositionLockBlobSha": "5ce62d8edaf577f21e4520138653e61d243d1d4e",
-    "findingLedgerBlobSha": "bd333e8bc622388afccb5bb307252b4d336b166b",
+    "executionLockBlobSha": "6f856a663344753bb657461aab5a4d1ef47ef7bb",
+    "compositionLockBlobSha": "a1e7e5a79681f3c3c05696c4de429dcdfbb00a29",
+    "findingLedgerBlobSha": "1659c0fd34208277eb691a14a5563571edd2b8d9",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_SOURCE_FIX",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "sourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -5772,7 +5779,7 @@
       "reimport": false,
       "livePromotion": false
     },
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -5992,7 +5999,7 @@
     "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
     "humanVisualStatus": "REJECTED_R13",
     "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "continuityRegisterBlobSha": "38a9b17aae04fb2743e17d3f797ddcc4acdbf256",
+    "continuityRegisterBlobSha": "0581ef2ad4cdd23f02f69b290a3bd2219112683a",
     "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "continuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
     "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -6252,6 +6259,13 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_DIAGNOSTIC_20261004.json",
       "exactPreviewRunId": 37166534897,
       "rootCause": "LATE_LEGACY_INSURER_IMPORT_BRIDGE_SHADOWS_R13_DURABLE_DRIVE_IMPORT_OWNER"
+    },
+    "r13InsurerDriveShadowOwnerSourceFix": {
+      "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_SOURCE_FIX_20261004.json",
+      "bridgeBlobSha": "db5f012abe505c2dd27d77a47d0694868bee5348",
+      "indexBlobSha": "2f58429833edea2bebf0813e6bbd007aa9f7ae31",
+      "contractBlobSha": "df74d759fb8515f693d578302e363bd94b145e24"
     }
   },
   "b4VisualAcceptanceControl": {
