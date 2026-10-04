@@ -10,7 +10,8 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - '.github/workflows/gravicentra-b4-003-executor.yml'
-      - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'\n      - 'tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs'
+      - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
+      - 'tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs'
       - 'tools/gravicentra-quote-authority-contract-v1.mjs'
       - 'orbit360-platform/core/quote-authority-contract-v1.js'
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'

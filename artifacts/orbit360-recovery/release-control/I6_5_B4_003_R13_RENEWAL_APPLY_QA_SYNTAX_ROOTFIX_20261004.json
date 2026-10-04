@@ -1,0 +1,28 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_RENEWAL_APPLY_QA_SYNTAX_ROOTFIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_COMPOSITION_FIXED_PENDING_DETERMINISTIC_APPLY",
+  "findingId": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+  "failedExecutorRunId": 37170625216,
+  "failedGuardRunId": 37170625915,
+  "rootCause": "Two generated source insertions persisted literal backslash-n sequences instead of physical newlines: one in workflow paths and one in the I6 guard, causing invalid workflow YAML and JavaScript syntax.",
+  "proof": {
+    "executorHadJobs": 0,
+    "dataWriteExecuted": false,
+    "firestoreMutationFromFailedRun": false,
+    "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "workflowPriorBlobSha": "654951395c5a82b44be2ffa13a9ded481d61f23c",
+    "workflowFixedBlobSha": "a8c9b36be46807c27d5e8ce3a0356970e12f4497",
+    "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+    "guardPriorBlobSha": "cae0f8663e036a1a021adef40d5f23ebf3eed299",
+    "guardFixedBlobSha": "904791e42a0a8dc004b332936d89a5a3e3e45b3c"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "authorizationUnchanged": true
+  },
+  "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY"
+}
