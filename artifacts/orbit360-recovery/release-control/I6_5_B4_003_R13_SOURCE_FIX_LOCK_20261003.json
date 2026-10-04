@@ -1,15 +1,15 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-03",
-  "status": "B4_003_RENEWAL_DATA_APPLY_AUTHORIZED",
+  "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_RENEWAL_DATA_APPLY_AUTHORIZED",
+    "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_R13",
     "knowledgePreview": true
   },
@@ -29,15 +29,15 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "aae05332f3e46dddf3eae33c4458c475684a8a37"
+    "blobSha": "4140057db511ea5a194c45c7bc9748ee12b765e7"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "a920c901a1d5d4b81c82404d21a4e9302c70a652"
+    "blobSha": "de3a4c2002f50e5176047b8e1eb13eb7ae553140"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "ade0ea4177077f0d722db25edd4f26f3f4047564",
+    "blobSha": "535b08b08e67c95ae512bd16f0e3f23cbca7c060",
     "inventoryCount": 191,
     "attentionCount": 86,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -46,10 +46,10 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "productMutationAuthorized": false,
-    "dataMutationAuthorized": true,
+    "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "Exact B4-003 Preview only: disposable B4003 synthetic renewal, cancellation, information-health and insurer-document fixtures with mandatory cleanup/readback; no real operational row mutation.",
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": false,
@@ -59,14 +59,13 @@
     "productionDriveFunctionDeploymentAuthorized": false,
     "cotcompRealTransportAuthorized": false,
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
-    "renewalDeterministicApplyAuthorized": true
+    "renewalDeterministicApplyAuthorized": false
   },
   "nextRequiredProof": [
-    "B4_003_RENEWAL_DETERMINISTIC_APPLY_PASS_WITH_READBACK_AND_ROLLBACK_RECEIPT",
     "B4_003_R13_EXACT_PREVIEW_MACHINE_PASS",
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -234,7 +233,7 @@
     "exactReadback": true
   },
   "renewalDeterministicApplyAuthorization": {
-    "status": "AUTHORIZED_PENDING_APPLY",
+    "status": "APPLIED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_AUTH_20261004.json",
     "blobSha": "b7b47af69634a093a1bf79be3adb46d4ebeb701b",
     "sourceSha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3",
@@ -261,7 +260,10 @@
       "globalBatchBlocking": false
     },
     "conversationDependent": false,
-    "repeatedConversationalAuthorizationRequired": false
+    "repeatedConversationalAuthorizationRequired": false,
+    "resultPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
+    "resultBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e",
+    "writes": 4
   },
   "r13RenewalApplyQaSyntaxRootFix": {
     "status": "QA_COMPOSITION_FIXED_PENDING_DETERMINISTIC_APPLY",
@@ -271,5 +273,29 @@
     "guardBlobSha": "904791e42a0a8dc004b332936d89a5a3e3e45b3c",
     "productSourceChanged": false,
     "dataMutation": false
+  },
+  "r13RenewalDeterministicApply": {
+    "status": "APPLIED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
+    "blobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e",
+    "writes": 4,
+    "conflictHold": {
+      "policyNumber": "VA-43685",
+      "parentId": "pol_965de501d871c56f3964a24b7724",
+      "childId": "pol_muj5o5ka",
+      "writeAuthorized": false,
+      "deleteAuthorized": false
+    },
+    "integrity": {
+      "exactWrites": 4,
+      "onlyAllowedFieldsChanged": true,
+      "unrelatedPoliciesUnchanged": true,
+      "conflictParentUnchanged": true,
+      "conflictChildUnchanged": true,
+      "conflictDependentsUnchanged": true,
+      "eligibleSetExact": true,
+      "noDeletes": true,
+      "noInserts": true
+    }
   }
 }

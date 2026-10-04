@@ -1,0 +1,246 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_V1",
+  "recordedAt": "2026-10-04T02:21:21.838Z",
+  "status": "PASS",
+  "mode": "apply",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "sourceSha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3",
+  "writes": 4,
+  "rollbackExecuted": false,
+  "rollbackStatus": "NOT_NEEDED",
+  "targetIds": [
+    "pol_b9a883095c9fae8f7502ce1cb054",
+    "pol_9634d32ec97e4dc93fef8f194677",
+    "pol_8231bbb8f9b7272c02891f5a4caf",
+    "pol_df6bf097045762297ec31fd4e5c5"
+  ],
+  "conflictHold": {
+    "policyNumber": "VA-43685",
+    "parentId": "pol_965de501d871c56f3964a24b7724",
+    "childId": "pol_muj5o5ka",
+    "writeAuthorized": false,
+    "deleteAuthorized": false
+  },
+  "before": {
+    "policyCount": 1419,
+    "distribution": {
+      "by": {
+        "YES": 0,
+        "NO": 0,
+        "UNKNOWN": 1419
+      },
+      "eligible": []
+    },
+    "targets": [
+      {
+        "id": "pol_b9a883095c9fae8f7502ce1cb054",
+        "numero": "68542",
+        "estado": "Vigente",
+        "pais": "CO",
+        "vigenciaFin": "2026-10-01",
+        "aseguradoraId": "co-chubb",
+        "renewabilityState": "UNKNOWN",
+        "fields": {
+          "renovable": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          },
+          "renewabilityProvenance": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          },
+          "renewabilitySourceSha256": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          }
+        },
+        "strippedHash": "d22ad49d9acc7071222169ab936499b520cd898848445b435b4142c419b137eb"
+      },
+      {
+        "id": "pol_9634d32ec97e4dc93fef8f194677",
+        "numero": "1-AP-20890",
+        "estado": "Vigente",
+        "pais": "GT",
+        "vigenciaFin": "2026-10-04",
+        "aseguradoraId": "gt-aseguradora-general",
+        "renewabilityState": "UNKNOWN",
+        "fields": {
+          "renovable": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          },
+          "renewabilityProvenance": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          },
+          "renewabilitySourceSha256": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          }
+        },
+        "strippedHash": "20eb3c726bccb43013efcb50b55a57018677e3ea5b28bd0f746fb5339dcda289"
+      },
+      {
+        "id": "pol_8231bbb8f9b7272c02891f5a4caf",
+        "numero": "AUTO38446",
+        "estado": "Vigente",
+        "pais": "GT",
+        "vigenciaFin": "2026-10-06",
+        "aseguradoraId": "gt-aseguradora-guatemalteca",
+        "renewabilityState": "UNKNOWN",
+        "fields": {
+          "renovable": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          },
+          "renewabilityProvenance": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          },
+          "renewabilitySourceSha256": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          }
+        },
+        "strippedHash": "c1784f5aed981761a3934ca15ba888fa6b1a40e38523be0b46c87a59b4dea2f6"
+      },
+      {
+        "id": "pol_df6bf097045762297ec31fd4e5c5",
+        "numero": "AUTO-1000000334",
+        "estado": "Vigente",
+        "pais": "GT",
+        "vigenciaFin": "2026-10-07",
+        "aseguradoraId": "gt-seguros-ficohsa",
+        "renewabilityState": "UNKNOWN",
+        "fields": {
+          "renovable": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          },
+          "renewabilityProvenance": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          },
+          "renewabilitySourceSha256": {
+            "exists": false,
+            "value": {
+              "__undefined": true
+            }
+          }
+        },
+        "strippedHash": "a23ee1fcc830d020b96be4212597ae096a57463624fefe22bf8d8d881faf4d09"
+      }
+    ],
+    "unrelatedDigest": "2271003506ccc76c2001e4c11226e48a235df8f8fe9057fafdf0434723938581",
+    "conflict": {
+      "parentHash": "71133512ed4e4de7197e704311aae9db2758f1ca9429d92b82ad8cb8ccbb13ce",
+      "childHash": "f0358149605dfd20b760e6795b66271d5b6e74a2181e4960976285109679ad57",
+      "dependents": {
+        "gestiones": 0,
+        "recibosEsperados": 1,
+        "carteraPrimas": 1,
+        "cobros": 0,
+        "vehiculos": 1,
+        "cancelaciones": 0
+      }
+    }
+  },
+  "after": {
+    "policyCount": 1419,
+    "distribution": {
+      "by": {
+        "YES": 4,
+        "NO": 0,
+        "UNKNOWN": 1415
+      },
+      "eligible": [
+        "pol_8231bbb8f9b7272c02891f5a4caf",
+        "pol_9634d32ec97e4dc93fef8f194677",
+        "pol_b9a883095c9fae8f7502ce1cb054",
+        "pol_df6bf097045762297ec31fd4e5c5"
+      ]
+    },
+    "targets": [
+      {
+        "id": "pol_b9a883095c9fae8f7502ce1cb054",
+        "numero": "68542",
+        "renewabilityState": "YES",
+        "renovable": true,
+        "renewabilityProvenance": "source_report",
+        "renewabilitySourceSha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3"
+      },
+      {
+        "id": "pol_9634d32ec97e4dc93fef8f194677",
+        "numero": "1-AP-20890",
+        "renewabilityState": "YES",
+        "renovable": true,
+        "renewabilityProvenance": "source_report",
+        "renewabilitySourceSha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3"
+      },
+      {
+        "id": "pol_8231bbb8f9b7272c02891f5a4caf",
+        "numero": "AUTO38446",
+        "renewabilityState": "YES",
+        "renovable": true,
+        "renewabilityProvenance": "source_report",
+        "renewabilitySourceSha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3"
+      },
+      {
+        "id": "pol_df6bf097045762297ec31fd4e5c5",
+        "numero": "AUTO-1000000334",
+        "renewabilityState": "YES",
+        "renovable": true,
+        "renewabilityProvenance": "source_report",
+        "renewabilitySourceSha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3"
+      }
+    ],
+    "unrelatedDigest": "2271003506ccc76c2001e4c11226e48a235df8f8fe9057fafdf0434723938581",
+    "conflict": {
+      "parentHash": "71133512ed4e4de7197e704311aae9db2758f1ca9429d92b82ad8cb8ccbb13ce",
+      "childHash": "f0358149605dfd20b760e6795b66271d5b6e74a2181e4960976285109679ad57",
+      "dependents": {
+        "gestiones": 0,
+        "recibosEsperados": 1,
+        "carteraPrimas": 1,
+        "cobros": 0,
+        "vehiculos": 1,
+        "cancelaciones": 0
+      }
+    }
+  },
+  "integrity": {
+    "exactWrites": 4,
+    "onlyAllowedFieldsChanged": true,
+    "unrelatedPoliciesUnchanged": true,
+    "conflictParentUnchanged": true,
+    "conflictChildUnchanged": true,
+    "conflictDependentsUnchanged": true,
+    "eligibleSetExact": true,
+    "noDeletes": true,
+    "noInserts": true
+  },
+  "errors": []
+}

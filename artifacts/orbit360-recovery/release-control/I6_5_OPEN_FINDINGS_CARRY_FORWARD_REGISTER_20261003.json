@@ -2475,5 +2475,7 @@
   "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
   "machineProofReceiptBlobSha": "b164548aadac1783ebc04b9f2777cfbdb19439da",
   "renewalDeterministicApplyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_AUTH_20261004.json",
-  "renewalDeterministicApplyAuthBlobSha": "b7b47af69634a093a1bf79be3adb46d4ebeb701b"
+  "renewalDeterministicApplyAuthBlobSha": "b7b47af69634a093a1bf79be3adb46d4ebeb701b",
+  "renewalDeterministicApplyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
+  "renewalDeterministicApplyReceiptBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e"
 }

@@ -2803,7 +2803,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "RENEWAL_DATA_APPLY_AUTHORIZED",
+      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2836,7 +2836,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2994,7 +2994,7 @@
       "status": "NOT_STARTED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "WAIT_B4_003_RENEWAL_APPLY_AND_VISUAL"
+      "nextAction": "WAIT_B4_003_PAULA_VISUAL"
     },
     {
       "id": "B4-005",
@@ -6856,12 +6856,12 @@
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
         "orbit360-platform/modules/renewals-v1201-issued-filter.js"
       ],
-      "status": "DETERMINISTIC_APPLY_AUTHORIZED",
+      "status": "DATA_APPLIED_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Real source-backed renewal pipeline repopulates by canonical eligibility/country/horizon and is proven on exact Preview.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
       "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
       "classification": "RUNTIME_DATA_SEMANTIC_DISTRIBUTION_PROOF_REQUIRED",
@@ -6875,14 +6875,13 @@
       "renewalDeterministicApplyAuthBlobSha": "b7b47af69634a093a1bf79be3adb46d4ebeb701b",
       "localizedConflictHold": {
         "policyNumber": "VA-43685",
-        "parentId": "pol_965de501d871c56f3964a24b7724",
-        "childId": "pol_muj5o5ka",
-        "dependentTotal": 3,
         "status": "CONFLICT_REVIEW_REQUIRED",
+        "blockingGlobal": false,
         "writeAuthorized": false,
-        "deleteAuthorized": false,
-        "globalBatchBlocking": false
-      }
+        "deleteAuthorized": false
+      },
+      "renewalDeterministicApplyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
+      "renewalDeterministicApplyReceiptBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e"
     },
     {
       "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",

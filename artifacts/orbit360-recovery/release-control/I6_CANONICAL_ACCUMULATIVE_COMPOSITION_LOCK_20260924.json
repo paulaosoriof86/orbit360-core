@@ -2088,7 +2088,7 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_003_RENEWAL_DATA_APPLY_AUTHORIZED",
+    "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "lockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -2096,7 +2096,7 @@
     "noLive": true,
     "noReimport": true,
     "activeFindingId": "B4-003",
-    "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
     "sourceSha": "1354c3db5d490a9a91c4ee6ff27ae2049aae6b2e",
     "buildId": "gi-i65-b4-1354c3db5d49-57f234755dc1",
@@ -2733,6 +2733,34 @@
     "guardBlobSha": "cae0f8663e036a1a021adef40d5f23ebf3eed299",
     "productSourceChanged": false,
     "dataMutationPending": true,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "b4003R13RenewalDeterministicApply": {
+    "status": "APPLIED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
+    "blobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e",
+    "writes": 4,
+    "sourceSha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3",
+    "conflictHold": {
+      "policyNumber": "VA-43685",
+      "parentId": "pol_965de501d871c56f3964a24b7724",
+      "childId": "pol_muj5o5ka",
+      "writeAuthorized": false,
+      "deleteAuthorized": false
+    },
+    "integrity": {
+      "exactWrites": 4,
+      "onlyAllowedFieldsChanged": true,
+      "unrelatedPoliciesUnchanged": true,
+      "conflictParentUnchanged": true,
+      "conflictChildUnchanged": true,
+      "conflictDependentsUnchanged": true,
+      "eligibleSetExact": true,
+      "noDeletes": true,
+      "noInserts": true
+    },
+    "productSourceChanged": false,
     "reimport": false,
     "livePromotion": false
   }
