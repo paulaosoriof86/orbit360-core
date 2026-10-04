@@ -121,3 +121,16 @@ La precedencia es:
 Owner decision vigente > documento rector > baseline aprobado > candidato posterior.
 
 Las candidatas no aprobadas son deltas, no nuevas fuentes de verdad.
+
+
+## 8. Visual evidence gate
+
+Visual quality cannot be certified only from DOM presence, source assertions or browser-agent descriptions.
+
+Required separation:
+- SOURCE/RUNTIME PASS: exact deployed bytes, CSS, markers and release gates.
+- INTERACTION PASS: controls, states, route changes, back/forward and progressive journey.
+- VISUAL PASS: compare-to-approved evidence for composition, crop, proportions, type scale, hierarchy, repeated imagery and lower-page design.
+- OWNER PASS: explicit Owner acceptance.
+
+TinyFish/browser automation may support INTERACTION PASS and capture evidence, but cannot by itself grant VISUAL PASS. A conflict between automation narrative and Owner screenshot triggers manual/forensic compare-to-approved review, never automatic promotion.
