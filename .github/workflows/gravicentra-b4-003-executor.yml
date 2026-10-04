@@ -1,6 +1,7 @@
 name: Gravicentra B4-003 Renewals Cancelations Preview
 # R13 scheduling-only retrigger after shared B4-003 concurrency collision; product source unchanged.
 # R13P2 scheduling-only retrigger after Pólizas runtime rootfix; product source unchanged by this line.
+# R13P3 scheduling-only retrigger after lazy-search contract alignment; product source unchanged.
 
 on:
   workflow_dispatch:
