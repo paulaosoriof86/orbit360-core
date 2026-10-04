@@ -25,6 +25,7 @@ const paths={
   insurer:'orbit360-platform/modules/aseguradoras.js',
   insurerVisual:'orbit360-platform/core/client-insurer-visual-contract-v20260720.js',
   importer:'orbit360-platform/core/importa.js',
+  insurerImportBridge:'orbit360-platform/modules/aseguradoras-v1202-import-bridge.js',
   driveBackend:'functions/document-drive-domain.js',
   infra:'orbit360-platform/styles/infra.css',
   index:'orbit360-platform/index.html',
@@ -48,7 +49,7 @@ const paths={
 };
 for(const p of Object.values(paths))need(fs.existsSync(p),'B4_003_REQUIRED_FILE_MISSING:'+p);
 
-const workflow=read(paths.workflow),opBackend=read(paths.operationalBackend),store=read(paths.store),accessScope=read(paths.accessScope),cronograma=read(paths.cronograma),base=read(paths.base),bridge=read(paths.bridge),permission=read(paths.permission),issued=read(paths.issued),cancel=read(paths.cancel),policy=read(paths.policy),policyBridge=read(paths.policyBridge),policyDetail=read(paths.policyDetail),client360=read(paths.client360),quality=read(paths.quality),insurer=read(paths.insurer),insurerVisual=read(paths.insurerVisual),importer=read(paths.importer),driveBackend=read(paths.driveBackend),infra=read(paths.infra),index=read(paths.index);
+const workflow=read(paths.workflow),opBackend=read(paths.operationalBackend),store=read(paths.store),accessScope=read(paths.accessScope),cronograma=read(paths.cronograma),base=read(paths.base),bridge=read(paths.bridge),permission=read(paths.permission),issued=read(paths.issued),cancel=read(paths.cancel),policy=read(paths.policy),policyBridge=read(paths.policyBridge),policyDetail=read(paths.policyDetail),client360=read(paths.client360),quality=read(paths.quality),insurer=read(paths.insurer),insurerVisual=read(paths.insurerVisual),importer=read(paths.importer),insurerImportBridge=read(paths.insurerImportBridge),driveBackend=read(paths.driveBackend),infra=read(paths.infra),index=read(paths.index);
 const comp=json(paths.composition),lock=json(paths.lock),control=json(paths.control),r1=json(paths.r1),r2=json(paths.r2),r3=json(paths.r3),r4=json(paths.r4),r5=json(paths.r5),r11=json(paths.r11),r12diag=json(paths.r12diag),r12fix=json(paths.r12fix),adj=json(paths.adjudication),r13diag=json(paths.r13diag),r13drive=json(paths.r13drive),r13guard=json(paths.r13guard),r13visual=json(paths.r13visual),r13fix=json(paths.r13fix);
 
 need(control.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW','B4_003_CONTROL_NEXT_ACTION_INVALID');
@@ -122,6 +123,7 @@ need(insurer.includes('aseguradoraId: id')&&insurer.includes('Cargar tarifario /
 need(importer.includes("updateDurable('aseguradoras', insurerId")&&importer.includes('preview_protected_operational_insurer')&&importer.includes('Documento recibido')&&importer.includes("requiereValidacion: state.kind === 'docs-aseguradora'"),'B4_003_R12_INSURER_DURABLE_SOURCE_BINDING_MISSING');
 need(importer.includes('Ningún documento habilita Cotizador, Comparativo o IA automáticamente'),'B4_003_R12_INSURER_IMPORT_AUTO_ENABLE_CLAIM_REMAINS');
 need(/\^\(\?:b4\[-_\]\|b4003qa_\)/.test(importer)||/b4003qa_/.test(importer),'B4_003_R13_INSURER_PREVIEW_GUARD_ALIGNMENT_MISSING');
+need(/if \(kind === 'docs-aseguradora'\) return originalImportOpen\(kind, options \|\| \{\}\)/.test(insurerImportBridge)&&/canonicalDocumentOwner: 'core\/importa\.js'/.test(insurerImportBridge)&&/legacyDocumentModalShadowed: false/.test(insurerImportBridge),'B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_REMAINS');
 need(/entity==='aseguradora'\|\|entity==='aseguradoras'/.test(driveBackend)&&/canonicalRef\(tenantId,'aseguradoras',insurerId\)/.test(driveBackend),'B4_003_R13_DRIVE_INSURER_TARGET_AUTHORITY_MISSING');
 need(/\['documentos','docs','adjuntos','attachments','files'\]/.test(driveBackend),'B4_003_R13_DRIVE_INSURER_DOC_REFS_MISSING');
 need(/previewSyntheticInsurer/.test(driveBackend)&&/b4003qa_/.test(driveBackend)&&/previewSyntheticTarget/.test(driveBackend),'B4_003_R13_DRIVE_PREVIEW_SYNTHETIC_GUARD_MISSING');
@@ -150,6 +152,7 @@ need(/modules\/cliente360\.js\?v=20261003-b4003r11/.test(index),'B4_003_CLIENT36
 need(/modules\/calidad\.js\?v=20261003-b4003r12q/.test(index),'B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING');
 need(/modules\/aseguradoras\.js\?v=20261003-b4003r12/.test(index),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
 need(/core\/importa\.js\?v=20261003-b4003r13/.test(index),'B4_003_IMPORTER_R13_CACHE_BINDING_MISSING');
+need(/modules\/aseguradoras-v1202-import-bridge\.js\?v=20261004-b4003r13d/.test(index),'B4_003_R13_INSURER_IMPORT_BRIDGE_CACHE_BINDING_MISSING');
 need(/core\/client-insurer-visual-contract-v20260720\.js\?v=20261003-b4003r12/.test(index),'B4_003_INSURER_VISUAL_R12_CACHE_BINDING_MISSING');
 need(/modules\/policy-receipts-v1199-detail-guard\.js\?v=20261003-b4003r13/.test(index),'B4_003_POLICY_DETAIL_R13_CACHE_BINDING_MISSING');
 need(/modules\/policy-receipts-v1199-bridge\.js\?v=20261003-b4003r11/.test(index),'B4_003_POLICY_BRIDGE_R11_CACHE_BINDING_MISSING');
