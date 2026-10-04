@@ -572,22 +572,25 @@ try{
    const row=h.querySelector('[data-information-health-policy="'+ids.healthPolicy+'"]');
    const text=String(row&&row.innerText||'').replace(/\s+/g,' ').trim();
    Orbit.pais=previous;
-   return{issue:issue?{total:issue.total,schedule:issue.schedule,delta:issue.delta,receipts:issue.receipts,shadowRows:issue.shadowRows,calendarAuthority:issue.calendarAuthority}:null,rowVisible:!!row,rowText:text,technicalToken:/SINGLE_PHYSICAL_CALENDAR|POLICY_CUOTAS|AMBIGUOUS_FAIL_CLOSED/.test(text),exactAction:!!row?.querySelector('[data-health-open-policy]'),mobileContract:!!h.querySelector('.quality-fin-mobile')};
+   return{issue:issue?{total:issue.total,schedule:issue.schedule,delta:issue.delta,receipts:issue.receipts,shadowRows:issue.shadowRows,calendarAuthority:issue.calendarAuthority,reason:issue.reason}:null,rowVisible:!!row,rowText:text,technicalToken:/SINGLE_PHYSICAL_CALENDAR|POLICY_CUOTAS|AMBIGUOUS_FAIL_CLOSED|PRIMARY_POLICY_UNIVERSE|REQUIERE_VALIDACION/.test(text),exactAction:!!row?.querySelector('[data-health-open-review]'),mobileContract:!!h.querySelector('.quality-fin-mobile')};
  },ids);
  need(proof.r12InformationHealth.rowVisible===true,'B4_003_R12_INFORMATION_HEALTH_ROW_MISSING');
  need(Math.abs(proof.r12InformationHealth.issue?.total-407.01)<0.001&&Math.abs(proof.r12InformationHealth.issue?.schedule-542.68)<0.001,'B4_003_R12_INFORMATION_HEALTH_VALUES_CHANGED');
  need(Math.abs(proof.r12InformationHealth.issue?.delta-135.67)<0.001,'B4_003_R12_INFORMATION_HEALTH_DELTA_INVALID');
  need(proof.r12InformationHealth.issue?.shadowRows===1&&proof.r12InformationHealth.issue?.receipts===2,'B4_003_R16_05_RECEIPT_SHADOW_DUPLICATE_NOT_EXCLUDED:'+JSON.stringify(proof.r12InformationHealth));
- need(proof.r12InformationHealth.technicalToken===false&&proof.r12InformationHealth.exactAction===true&&proof.r12InformationHealth.mobileContract===true,'B4_003_R16_04_QUALITY_HUMAN_SEMANTICS_MISSING:'+JSON.stringify(proof.r12InformationHealth));
+ need(proof.r12InformationHealth.technicalToken===false&&proof.r12InformationHealth.exactAction===true&&proof.r12InformationHealth.mobileContract===true&&!!proof.r12InformationHealth.issue?.reason,'B4_003_R17_QUALITY_HUMAN_SEMANTICS_MISSING:'+JSON.stringify(proof.r12InformationHealth));
  proof.assertions.receiptShadowDuplicateProjection=true;proof.assertions.qualityResolutionHumanSemantics=true;
- proof.assertions.informationHealthFinancialMismatchVisible=true;
- proof.assertions.informationHealthNoInference=true;
- await page.evaluate(ids=>{const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);h.querySelector('[data-information-health-policy="'+ids.healthPolicy+'"] [data-health-open-policy]')?.click();},ids);
- await page.waitForFunction(id=>Orbit.route&&Orbit.route.key==='cliente360'&&Orbit.route.params&&Orbit.route.params.p===id,ids.healthPolicy,{timeout:10000});
- await page.waitForSelector('[data-policy-fullpage="1"]',{timeout:10000});
- proof.r1604QualityDeepLink=await page.evaluate(id=>({route:Orbit.route?.key,policyId:Orbit.route?.params?.p||'',fullpage:!!document.querySelector('[data-policy-fullpage="1"]'),editButton:/Editar póliza/.test(document.getElementById('host')?.innerText||'')}),ids.healthPolicy);
- need(proof.r1604QualityDeepLink.route==='cliente360'&&proof.r1604QualityDeepLink.policyId===ids.healthPolicy&&proof.r1604QualityDeepLink.fullpage&&proof.r1604QualityDeepLink.editButton,'B4_003_R16_04_QUALITY_DEEPLINK_NOT_ACTIONABLE:'+JSON.stringify(proof.r1604QualityDeepLink));
- proof.assertions.qualityExactPolicyResolutionPath=true;
+ proof.assertions.informationHealthFinancialMismatchVisible=true;proof.assertions.informationHealthNoInference=true;
+
+ await page.evaluate(ids=>{const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);h.querySelector('[data-information-health-policy="'+ids.healthPolicy+'"] [data-health-open-review]')?.click();},ids);
+ await page.waitForSelector('#quality-fin-review',{timeout:10000});
+ proof.r17QualityReviewModal=await page.evaluate(()=>{const m=document.getElementById('quality-fin-review'),text=String(m?.innerText||'').replace(/\s+/g,' ').trim();return{modal:!!m,hasCause:/Motivo detectado/.test(text),hasReceipts:!!m?.querySelector('[data-receipts]'),hasPolicy:!!m?.querySelector('[data-policy]'),technical:/I6_|PRIMARY_POLICY_UNIVERSE|SINGLE_PHYSICAL_CALENDAR|REQUIERE_VALIDACION/.test(text)};});
+ need(proof.r17QualityReviewModal.modal&&proof.r17QualityReviewModal.hasCause&&proof.r17QualityReviewModal.hasReceipts&&proof.r17QualityReviewModal.hasPolicy&&!proof.r17QualityReviewModal.technical,'B4_003_R17_QUALITY_REVIEW_MODAL_NOT_ACTIONABLE:'+JSON.stringify(proof.r17QualityReviewModal));
+ await page.evaluate(()=>document.querySelector('#quality-fin-review [data-receipts]')?.click());
+ await page.waitForFunction(id=>location.hash.includes('p='+encodeURIComponent(id))&&location.hash.includes('t=recibos'),ids.healthPolicy,{timeout:10000});
+ proof.r17QualityReceiptsDeepLink=await page.evaluate(id=>({hash:location.hash,policyId:id,receiptsTarget:location.hash.includes('t=recibos')}));
+ need(proof.r17QualityReceiptsDeepLink.receiptsTarget===true,'B4_003_R17_QUALITY_RECEIPTS_DEEPLINK_MISSING:'+JSON.stringify(proof.r17QualityReceiptsDeepLink));
+ proof.assertions.qualityExactPolicyResolutionPath=true;proof.assertions.qualityReceiptsExactContext=true;
 
  await page.evaluate(id=>Orbit.modules.cliente360.editarPoliza(id),ids.unknownRenewPolicy);
  await page.waitForSelector('#policy-v1199 [data-ramo]',{timeout:10000});
@@ -603,7 +606,7 @@ try{
  proof.assertions.policyEditorExposesRenewabilityTriState=true;
  await page.evaluate(()=>document.getElementById('policy-v1199')?.remove());
  await page.setViewportSize({width:390,height:844});
- proof.r1604MobileQuality=await page.evaluate(()=>{const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);const mobile=h.querySelector('.quality-fin-mobile'),desktop=h.querySelector('.quality-fin-desktop'),card=mobile&&mobile.querySelector('[data-information-health-card-policy]');return{mobileDisplay:mobile?getComputedStyle(mobile).display:'missing',desktopDisplay:desktop?getComputedStyle(desktop).display:'missing',cardVisible:!!card,hasResolutionAction:!!mobile?.querySelector('[data-health-open-policy]')};});
+ proof.r1604MobileQuality=await page.evaluate(()=>{const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);const mobile=h.querySelector('.quality-fin-mobile'),desktop=h.querySelector('.quality-fin-desktop'),card=mobile&&mobile.querySelector('[data-information-health-card-policy]');return{mobileDisplay:mobile?getComputedStyle(mobile).display:'missing',desktopDisplay:desktop?getComputedStyle(desktop).display:'missing',cardVisible:!!card,hasResolutionAction:!!mobile?.querySelector('[data-health-open-review]')};});
  need(proof.r1604MobileQuality.mobileDisplay!=='none'&&proof.r1604MobileQuality.desktopDisplay==='none'&&proof.r1604MobileQuality.cardVisible&&proof.r1604MobileQuality.hasResolutionAction,'B4_003_R16_04_QUALITY_MOBILE_USABILITY_FAILED:'+JSON.stringify(proof.r1604MobileQuality));
  proof.assertions.qualityMobileResolutionCard=true;
  await page.setViewportSize({width:1280,height:720});
@@ -611,9 +614,15 @@ try{
  await page.evaluate(()=>{location.hash='#/renovaciones';});
  await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='renovaciones',null,{timeout:10000});
  await page.waitForSelector('[data-renewability-review-workflow="1"]',{timeout:10000});
- proof.r1604RenewabilityWorkflow=await page.evaluate(ids=>{const note=document.querySelector('[data-renewability-review-workflow="1"]'),button=document.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');return{instruction:/Editar póliza/.test(note?.innerText||'')&&/Pendiente de validar/.test(note?.innerText||''),buttonLabel:String(button?.innerText||''),buttonPresent:!!button};},ids);
- need(proof.r1604RenewabilityWorkflow.instruction&&proof.r1604RenewabilityWorkflow.buttonPresent&&/Revisar y clasificar/.test(proof.r1604RenewabilityWorkflow.buttonLabel),'B4_003_R16_07_RENEWABILITY_WORKFLOW_NOT_ACTIONABLE:'+JSON.stringify(proof.r1604RenewabilityWorkflow));
- proof.assertions.renewabilityReviewWorkflowActionable=true;
+ proof.r1604RenewabilityWorkflow=await page.evaluate(ids=>{const note=document.querySelector('[data-renewability-review-workflow="1"]'),button=document.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');return{instruction:/directamente Renovabilidad/.test(note?.innerText||'')&&/Pendiente de validar/.test(note?.innerText||''),buttonLabel:String(button?.innerText||''),buttonPresent:!!button};},ids);
+ need(proof.r1604RenewabilityWorkflow.instruction&&proof.r1604RenewabilityWorkflow.buttonPresent&&/Revisar y clasificar/.test(proof.r1604RenewabilityWorkflow.buttonLabel),'B4_003_R17_RENEWABILITY_WORKFLOW_NOT_ACTIONABLE:'+JSON.stringify(proof.r1604RenewabilityWorkflow));
+ await page.evaluate(id=>document.querySelector('[data-renewability-review="'+id+'"]')?.click(),ids.unknownRenewPolicy);
+ await page.waitForSelector('#policy-v1199 [data-renewable]',{timeout:10000});
+ proof.r17RenewabilityFocusedEditor=await page.evaluate(()=>{const el=document.querySelector('#policy-v1199 [data-renewable]');return{value:String(el?.value||''),focused:document.activeElement===el,options:Array.from(el?.options||[]).map(o=>o.textContent.trim())};});
+ need(proof.r17RenewabilityFocusedEditor.value===''&&proof.r17RenewabilityFocusedEditor.focused===true&&['Pendiente de validar','Renovable','No renovable'].every(x=>proof.r17RenewabilityFocusedEditor.options.includes(x)),'B4_003_R17_RENEWABILITY_EDITOR_NOT_FOCUSED_TRI_STATE:'+JSON.stringify(proof.r17RenewabilityFocusedEditor));
+ proof.assertions.renewabilityReviewWorkflowActionable=true;proof.assertions.renewabilityReviewOpensFocusedTriState=true;
+ await page.evaluate(()=>document.getElementById('policy-v1199')?.remove());
+
 
 
  await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id)+'&t=polizas';},ids.client);
