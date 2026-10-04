@@ -1,16 +1,16 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-04T04:12:00Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R17_VISUAL_REMEDIATION_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R17_VISUAL_REMEDIATION_AUTHORIZED",
     "blocking": true,
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING",
+    "nextAction": "B4_003_R17_SOURCE_FIX",
+    "humanVisualStatus": "REJECTED_R17",
     "knowledgePreview": true
   },
   "supersedes": {
@@ -33,11 +33,11 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "fb36b6b2aed4895009c58eb8f20684a7344241b5"
+    "blobSha": "20b28e0832ac8bf5679450ea613abd595add4f20"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "be484e603e749f2960ad84f1350b011cd6768a35",
+    "blobSha": "4bc36c5d3391d63405b4200a369a9cdeeac54187",
     "inventoryCount": 215,
     "attentionCount": 92,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -45,7 +45,7 @@
   "boundaries": {
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -62,9 +62,11 @@
     "renewalDeterministicApplyAuthorized": false
   },
   "nextRequiredProof": [
-    "B4_003_TARGETED_PAULA_VISUAL_PASS"
+    "B4_003_R17_CONTRACT_PASS",
+    "B4_003_R17_EXACT_PREVIEW_MACHINE_PASS",
+    "B4_003_R17_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+  "nextAction": "B4_003_R17_SOURCE_FIX",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -627,5 +629,27 @@
     "productSourceChanged": true,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "compositionBlobSha": "a1e052403a3765f284ef2e8b515ba287fffd78f5"
+  },
+  "r17RemediationPlan": {
+    "status": "AUTHORIZED_SOURCE_ONLY",
+    "preservePriorPasses": true,
+    "b4004Held": true,
+    "allowedProductFiles": [
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/calidad.js",
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/aseguradoras.js"
+    ],
+    "allowedQaFiles": [
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ],
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "nextAction": "B4_003_R17_SOURCE_FIX"
   }
 }
