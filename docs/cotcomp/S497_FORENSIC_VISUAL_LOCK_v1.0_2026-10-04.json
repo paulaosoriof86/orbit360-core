@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "ays-cotcomp-s497-forensic-visual-lock-v1.0",
-  "status": "FORENSIC_RECOVERY_ANCHOR_IDENTIFIED_IMPLEMENTATION_HOLD",
+  "schemaVersion": "ays-cotcomp-s497-forensic-visual-lock-v1.1",
+  "status": "FORENSIC_RECOVERY_ANCHOR_IDENTIFIED_OWNER_DELTAS_RECONCILED_IMPLEMENTATION_HOLD",
   "anchor": {
     "artifact": "OWNER_REVIEW_COTCOMP_S4_10_STANDALONE.html",
     "sha256": "a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d",
@@ -24,31 +24,89 @@
       "f7-s4-cotcomp-workspace": "28ab271b5e13e5bb58f73e1e5f24f3d3d8575283d17c054377d4ea196c31d5c4"
     }
   },
-  "visualContract": {
-    "openingH1": "Empecemos por lo que quieres proteger.",
-    "h1Font": "Archivo",
-    "architecture": "PRODUCT_WORKSPACE_NOT_MARKETING_PHOTO_HERO",
-    "desktopNeedGridColumns": 3,
-    "desktopNeedGridGapPx": 12,
-    "desktopNeedCardMinHeightPx": 108,
-    "desktopShellJourneyRailPx": 220,
+  "recoveredVisualRoles": {
+    "displayFont": "Archivo",
+    "bodyUiFont": "Instrument Sans",
+    "microLabelFont": "IBM Plex Mono",
+    "editorialSupportFont": "Newsreader_optional_only",
+    "productArchitecture": "four_stage_product_workspace",
     "stages": [
       "Lo que necesitas",
       "Tus datos",
       "Revisar opciones",
       "Comparar y continuar"
     ],
-    "breakpoints": [
+    "comparison": "criterion_first_explainable",
+    "replanning": "context_preserving",
+    "desktopNeedGridReference": {
+      "columns": 3,
+      "gapPx": 12,
+      "minCardHeightPx": 108
+    },
+    "desktopShellJourneyRailPx": 220,
+    "historicalBreakpoints": [
       980,
       650,
       360
     ]
   },
-  "excludedVisualParents": [
-    "S4.95",
-    "S4.96",
-    "S4.96B"
-  ],
+  "ownerAuthorizedLaterDeltas": {
+    "headline": [
+      "Cotiza y compara",
+      "con criterio"
+    ],
+    "humanContextualOpeningPhoto": true,
+    "currentPublicShell": true,
+    "firstLevelFamilies": [
+      "Vehículo / Movilidad",
+      "Hogar",
+      "Salud / Gastos médicos",
+      "Vida / Ingreso",
+      "Empresa",
+      "Transporte / Carga",
+      "Otros / No sé cuál necesito"
+    ],
+    "deeperRoutesUnderSurface": [
+      "Contrato / obligación / proyecto",
+      "Revisar póliza existente"
+    ],
+    "richDimensionalIcons": true,
+    "recommendationAS": true,
+    "multiProductJourney": true,
+    "vehiclePattern": "Marca → Línea/modelo → Año",
+    "journeyInsidePublicASPage": true
+  },
+  "reconciledOpeningContract": {
+    "h1Font": "Archivo",
+    "h1Weight": 900,
+    "photoClass": "bounded_contextual_figure",
+    "photoRules": {
+      "objectFit": "cover",
+      "fixedAspectRatioByBreakpoint": true,
+      "assetSpecificObjectPosition": true,
+      "independentFromWorkspaceHeight": true,
+      "sameImageCannotBeGenericFallbackAcrossRoutes": true
+    },
+    "forbidden": [
+      "stretched_full_height_photo",
+      "Newsreader_H1",
+      "workspace_displaced_by_oversized_decorative_hero"
+    ]
+  },
+  "familySelectionContract": {
+    "sevenVisibleFamilies": true,
+    "forbiddenLayout": "seven_equal_compressed_cards_in_single_row",
+    "desktopPreferred": "compact_multirow_4_plus_3_or_auto_fit",
+    "gapPxRange": [
+      12,
+      16
+    ],
+    "mobileColumns": [
+      2,
+      1
+    ],
+    "minTargetPx": 44
+  },
   "allowedPortableFunctionalDeltas": [
     "country_product_deep_intake",
     "correct_back_forward_state",
@@ -59,13 +117,19 @@
     "comparison_gating",
     "context_preserving_assisted_handoff"
   ],
+  "excludedVisualParents": [
+    "S4.95",
+    "S4.96",
+    "S4.96B"
+  ],
   "denylist": [
-    "large_marketing_photo_hero_without_new_owner_gate",
-    "non_anchor_H1_typography",
-    "seven_equal_horizontal_need_cards_without_new_owner_gate",
-    "visual_override_stack_from_S4.94_to_S4.96B",
+    "inherit_visual_css_from_S4.94_S4.95_S4.96_S4.96B",
+    "Newsreader_as_CotComp_H1",
+    "stretched_or_height_coupled_hero_photo",
+    "seven_equal_compressed_family_cards_single_row",
     "cards_as_dominant_page_composition",
     "single_fallback_photo_reused_across_routes",
+    "decorative_lower_cards_without_action_or_explanatory_role",
     "internal_technical_language"
   ],
   "gates": {
@@ -74,9 +138,10 @@
     "production": false,
     "newOwnerReviewCandidateAllowed": false,
     "requiredBeforeCandidate": [
-      "deterministic_golden_screenshots",
-      "screenshot_regression_gate",
-      "clean_parent_from_exact_anchor"
+      "asset_map_frozen",
+      "golden_reference_pack_registered",
+      "screenshot_regression_gate_ready",
+      "clean_parent_without_legacy_override_stack"
     ]
   }
 }
