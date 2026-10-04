@@ -5,8 +5,9 @@
 **URL LAB:** https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompFrontendRecoveryPreviewS496B  
 **Visual parent:** S4.95 integrated surface  
 **Logic source:** governed S4.96 journey/intake only  
-**Deployed source commit:** `a230a472c36d6aa01a406cd7383fd125c4a31f02`  
-**Workflow:** `37214847237` — SUCCESS  
+**Deployed branch head:** `8ebe05207593347c14bad59042a6056f6138c5d0`  
+**Frontend source change:** `7a8bc994a851128d3b392f309a7c5ff7299a5d0c`  
+**Workflow:** `37229051575` — SUCCESS  
 **Estado:** READY FOR OWNER REVIEW / NOT OWNER PASS
 
 ## Recovery decisions
@@ -70,3 +71,25 @@ Final browser regression on build `a230a472c36d6aa01a406cd7383fd125c4a31f02`:
 ## Next decision
 
 Owner reviews S4.96B visually and functionally. Any further change is a delta over this recovery candidate and must not reintroduce S4.96 visual regression or alter the locked journey/domain rules.
+
+
+## Visual QA policy correction — 2026-10-04
+
+The latest Owner review exposed that element-presence/browser-agent checks can produce false confidence about composition quality.
+
+From this candidate onward:
+- TinyFish/browser automation is an interaction/state regression tool, not the visual Owner gate.
+- Exact deployed HTML/CSS/runtime identity is verified by physical readback artifact.
+- Visual acceptance requires compare-to-approved screenshots and Owner review.
+- No automated PASS may promote hero proportion, typography hierarchy, image crop, image repetition, lower-page hierarchy or overall composition without visual evidence.
+- A runtime/source PASS and an interaction PASS remain separate from VISUAL PASS and OWNER PASS.
+
+For the current build, the deployed artifact physically contains:
+- S4.96B recovery identity and Surface Lock marker;
+- a bounded hero media rule at desktop: `width:min(580px,38vw)`, `aspect-ratio:4/3`, `border-radius:24px`;
+- S4.95 editorial headline family in the recovery override;
+- progressive intake shell;
+- route-specific visual resolver;
+- final-stage lower action hierarchy and explicit comparison actions.
+
+TinyFish produced a conflicting semantic description of the hero after deployment. That conflict is recorded as a QA-tool limitation and is not treated as visual evidence overriding the exact runtime artifact or Owner review.
