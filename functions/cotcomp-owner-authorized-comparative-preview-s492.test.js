@@ -65,6 +65,13 @@ test('S4.92 makes the quote-area visual product-aware',()=>{
   assert.match(h,/data:image\/webp;base64/);
 });
 
+test('S4.92 initializes the visual example to the catalog-backed Toyota RAV4 reference',()=>{
+  const h=S.html();
+  assert.match(h,/let brand='TOYOTA',model='RAV4 2WD',year='2023'/);
+  assert.match(h,/norm\(x\.label\)===norm\(brand\)/);
+  assert.match(h,/startsWith\(norm\('RAV4'\)\)/);
+});
+
 test('S4.92 preserves searchable Marca -> dependent Línea/modelo -> separate Año plus assisted fallback',()=>{
   const h=S.html();
   assert.match(h,/Marca/);
