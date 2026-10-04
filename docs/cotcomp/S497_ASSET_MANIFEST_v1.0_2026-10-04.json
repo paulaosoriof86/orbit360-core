@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "ays-cotcomp-s497-asset-manifest-v1.0",
+  "status": "SOURCE_ONLY_OWNER_REVIEW_ASSET_CANDIDATES",
+  "officialIdentity": {
+    "fullLogo": {
+      "source": "project-upload:Logo V. 2026.jpeg",
+      "sha256": "71e571a6367064a9a7372fd3e156d79508f00f0f8ffe6276d422341008a88a8c",
+      "dimensions": "1092x345",
+      "bytes": 71397,
+      "status": "OFFICIAL_SOURCE",
+      "eligibleForOwnerReview": true,
+      "productionApproved": true
+    },
+    "symbol": {
+      "source": "project-upload:Logo Bolita V. 2025.png",
+      "sha256": "1936bad462956e1cd92569f8e564e4d8d2729df2bd41b14271796470e09853e3",
+      "dimensions": "560x577",
+      "bytes": 194473,
+      "status": "OFFICIAL_SOURCE",
+      "eligibleForOwnerReview": true,
+      "productionApproved": true
+    }
+  },
+  "hero": {
+    "slot": "cotcomp_opening_human_anchor",
+    "path": "03_REALES/reunión_profesional_en_oficina_luminosa.png",
+    "sha256": "2548b0edf42d4fcd2662c751b05e74f3b80bdd23efdb81c54d80665146b3c3b5",
+    "dimensions": "1672x941",
+    "status": "candidate_real",
+    "visualRole": "human_consultation_decision_support",
+    "eligibleForOwnerReview": true,
+    "productionApproved": false,
+    "nativeAspectRatio": "16:9",
+    "objectFit": "cover",
+    "objectPosition": "center 42%"
+  },
+  "familyVisuals": [
+    {
+      "family": "vehicle",
+      "path": "03_REALES/reunión_amistosa_en_oficina_automotriz.png",
+      "sha256": "4c3e2e7ced02fdc01d56124805ec162ac49b99fc6f5e3da5a8ecff6c1176623e",
+      "dimensions": "1672x941",
+      "status": "candidate_real",
+      "visualRole": "automotive_consultation",
+      "eligibleForOwnerReview": true,
+      "productionApproved": false
+    },
+    {
+      "family": "home",
+      "path": "04_CTX/familia_feliz_en_hogar_moderno.png",
+      "sha256": "ab3cbe3c2c7e91c8244ad7f8bd1bf84c1f5f58331e6b75de651b1f6756297464",
+      "dimensions": "1672x941",
+      "status": "context",
+      "visualRole": "home_family_context",
+      "eligibleForOwnerReview": true,
+      "productionApproved": false
+    },
+    {
+      "family": "health",
+      "path": "03_REALES/consulta_familiar_en_un_ambiente_acogedor.png",
+      "sha256": "e62a5d9525941674067cc1e12a2a685bdff3cf2cbf8d9dd3a2bd745e57b81e70",
+      "dimensions": "1672x941",
+      "status": "candidate_real",
+      "visualRole": "family_protection_consultation",
+      "eligibleForOwnerReview": true,
+      "productionApproved": false
+    },
+    {
+      "family": "life",
+      "path": "03_REALES/consulta_de_seguros_en_familia.png",
+      "sha256": "c01dc364069480b54b3d1c3db26905e7590ef619dc5e1e5adf434ffa7980165c",
+      "dimensions": "1672x941",
+      "status": "candidate_real",
+      "visualRole": "family_continuity_planning",
+      "eligibleForOwnerReview": true,
+      "productionApproved": false
+    },
+    {
+      "family": "business",
+      "path": "03_REALES/reunión_profesional_con_presentación_digital.png",
+      "sha256": "0a4dea893a12af5bc3d44fb63ffbb8c36e723467de0956bcaf61693fb1227488",
+      "dimensions": "1672x941",
+      "status": "candidate_real",
+      "visualRole": "business_proposal_review",
+      "eligibleForOwnerReview": true,
+      "productionApproved": false
+    },
+    {
+      "family": "cargo",
+      "path": "03_REALES/equipo_logístico_revisando_planos_en_el_almacén.png",
+      "sha256": "055528673cf433988a9d476430d946883a6e242ac3e8fb63a0277546267e88e5",
+      "dimensions": "1672x941",
+      "status": "candidate_real",
+      "visualRole": "logistics_operation_advisory",
+      "eligibleForOwnerReview": true,
+      "productionApproved": false
+    },
+    {
+      "family": "other",
+      "path": "03_REALES/colaboración_en_alianzas_soluciones.png",
+      "sha256": "9a2b5dc14c7b5f495c72ef53edf3ccd053ac31bef8ad7ddcde8d416b333335a2",
+      "dimensions": "1448x1086",
+      "status": "candidate_real",
+      "visualRole": "orientation_discovery",
+      "eligibleForOwnerReview": true,
+      "productionApproved": false
+    }
+  ],
+  "priscila": {
+    "path": "10_OWNER_APPROVED_20260921/PRISCILA_CUTOUT_APPROVED.png",
+    "sha256": "d091beb90594abc3a7c4fac01e6028fda188301589b0c712b3b8fb1a997f2a60",
+    "dimensions": "1086x1448",
+    "status": "owner_approved_library_asset",
+    "placementStatus": "PENDING_SURFACE_COMPOSITION",
+    "rule": "do_not_mechanically_overlay; new composite requires new filename/hash and placement gate"
+  },
+  "gates": {
+    "ownerReviewAssetEligibility": true,
+    "productionVisualApproval": false,
+    "packagingComplete": false,
+    "runtimeBytesVerified": false
+  }
+}
