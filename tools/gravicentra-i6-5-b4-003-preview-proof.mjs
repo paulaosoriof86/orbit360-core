@@ -632,6 +632,7 @@ try{
    return{before,after:h.innerText,mutations:records.length,records,events,route:String(Orbit.route&&Orbit.route.key||'')};
  });
  proof.renewalRenderStability={mutationCount:stable.mutations,textStable:stable.before===stable.after,route:stable.route,records:stable.records,events:stable.events};
+ console.log('B4_003_RENEWAL_RENDER_STABILITY='+JSON.stringify(proof.renewalRenderStability));
  need(stable.route==='renovaciones','B4_003_RENEWAL_ROUTE_NOT_ACTIVE');
  proof.assertions.noDelayedRenewalRenderMutation=stable.before===stable.after&&stable.mutations===0;
  if(!proof.assertions.noDelayedRenewalRenderMutation){
@@ -727,7 +728,7 @@ try{
      docCategory:'Tarifario'
    });
  },ids);
- await page.waitForSelector('#imp-file',{timeout:10000});
+ await page.waitForSelector('#imp-file',{state:'attached',timeout:10000});
  const driveFileName='b4-r13-drive-'+run+'.csv';
  await page.setInputFiles('#imp-file',{name:driveFileName,mimeType:'text/csv',buffer:Buffer.from('concepto,valor\nqa_r13,'+run+'\n','utf8')});
  await page.waitForSelector('#imp-finish',{timeout:10000});
