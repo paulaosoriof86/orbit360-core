@@ -386,5 +386,12 @@
     "blobSha": "7accfae28df10af522e4536366bf770efcd76b20",
     "contractBlobSha": "2c7a80594ede46810821e110937bde46090b8e65",
     "productChanged": false
+  },
+  "r14OperationalRenewabilityContractRootFix": {
+    "status": "QA_CONTRACT_ALIGNED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_OPERATIONAL_RENEWABILITY_CONTRACT_ROOTFIX_20261004.json",
+    "blobSha": "c7efe22784e3af7d3b88395073f216a0f46d8cdd",
+    "contractBlobSha": "2499e565c4d8e7b8bd4bb726be533bf7dc506ced",
+    "productChanged": false
   }
 }

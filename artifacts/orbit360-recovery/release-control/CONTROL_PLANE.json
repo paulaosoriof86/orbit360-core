@@ -4859,7 +4859,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
-      "executionLockBlobSha": "bcddf2119c13f21bfdede9062bc8481015ed52a9",
+      "executionLockBlobSha": "9b636009bc62fe3efd50a70eeacea53410bcc102",
       "compositionLockBlobSha": "7936196a7e1f16a8fb88d46432c80293d2ab4b42",
       "findingLedgerBlobSha": "4311d807aa0afa88fb7d07d0464f6db45cbd3b37",
       "activeFindingId": "B4-003",
@@ -5587,6 +5587,13 @@
         "blobSha": "7accfae28df10af522e4536366bf770efcd76b20",
         "contractBlobSha": "2c7a80594ede46810821e110937bde46090b8e65",
         "productChanged": false
+      },
+      "r14OperationalRenewabilityContractRootFix": {
+        "status": "QA_CONTRACT_ALIGNED_PENDING_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_OPERATIONAL_RENEWABILITY_CONTRACT_ROOTFIX_20261004.json",
+        "blobSha": "c7efe22784e3af7d3b88395073f216a0f46d8cdd",
+        "contractBlobSha": "2499e565c4d8e7b8bd4bb726be533bf7dc506ced",
+        "productChanged": false
       }
     }
   },
@@ -5906,7 +5913,7 @@
     "status": "B4_003_SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "bcddf2119c13f21bfdede9062bc8481015ed52a9",
+    "executionLockBlobSha": "9b636009bc62fe3efd50a70eeacea53410bcc102",
     "compositionLockBlobSha": "7936196a7e1f16a8fb88d46432c80293d2ab4b42",
     "findingLedgerBlobSha": "4311d807aa0afa88fb7d07d0464f6db45cbd3b37",
     "noLive": true,
@@ -6627,6 +6634,13 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_CONTRACT_RENEWABILITY_ASSERTION_ROOTFIX_20261004.json",
       "blobSha": "7accfae28df10af522e4536366bf770efcd76b20",
       "contractBlobSha": "2c7a80594ede46810821e110937bde46090b8e65",
+      "productChanged": false
+    },
+    "r14OperationalRenewabilityContractRootFix": {
+      "status": "QA_CONTRACT_ALIGNED_PENDING_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_OPERATIONAL_RENEWABILITY_CONTRACT_ROOTFIX_20261004.json",
+      "blobSha": "c7efe22784e3af7d3b88395073f216a0f46d8cdd",
+      "contractBlobSha": "2499e565c4d8e7b8bd4bb726be533bf7dc506ced",
       "productChanged": false
     }
   },

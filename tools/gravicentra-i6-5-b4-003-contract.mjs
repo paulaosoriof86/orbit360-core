@@ -92,7 +92,7 @@ need(/mod\.campana\s*=\s*campana/.test(bridge)&&/mod\.solicitarPropuestas\s*=\s*
 need(/batchDurable/.test(bridge)&&/await\s+S\(\)\.batchDurable/.test(bridge),'B4_003_RENEWAL_CAMPAIGN_DURABLE_READBACK_MISSING');
 need(/No fue posible confirmar la preparación\. No se registró un falso éxito\./.test(bridge),'B4_003_RENEWAL_FALSE_SUCCESS_GUARD_MISSING');
 need(/p\.renovadaPor/.test(bridge)&&/terminalRenewalOutcome/.test(bridge)&&/renovacionEstado/.test(bridge),'B4_003_OPERATIONAL_RENEWED_FILTER_MISSING');
-need(bridge.includes("renewabilityState(p)==='YES'"),'B4_003_OPERATIONAL_RENEWABILITY_FAIL_CLOSED_MISSING');
+need(bridge.includes("renewabilityState(p)!=='YES'"),'B4_003_OPERATIONAL_RENEWABILITY_FAIL_CLOSED_MISSING');
 need(/\['vigente','porrenovar','vencida'\]/.test(bridge),'B4_003_R14_OPERATIONAL_EXPIRED_RENEWAL_CONTINUITY_MISSING');
 need(!/mod\.render\s*=/.test(permission)&&!/setTimeout\s*\(/.test(permission),'B4_003_PERMISSION_SECOND_RENDER_FORBIDDEN');
 need(!/mod\.render\s*=/.test(issued)&&!/setTimeout\s*\(/.test(issued),'B4_003_ISSUED_SECOND_RENDER_FORBIDDEN');

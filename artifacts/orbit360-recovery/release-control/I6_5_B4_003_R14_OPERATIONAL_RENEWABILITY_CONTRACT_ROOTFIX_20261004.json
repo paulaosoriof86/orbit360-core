@@ -1,0 +1,25 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R14_OPERATIONAL_RENEWABILITY_CONTRACT_ROOTFIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_CONTRACT_ALIGNED_PENDING_EXACT_PREVIEW",
+  "failedRunId": 37178455929,
+  "failedJobId": 111365922484,
+  "failureCode": "B4_003_OPERATIONAL_RENEWABILITY_FAIL_CLOSED_MISSING",
+  "adjudication": "STALE_ASSERTION_ONLY",
+  "evidence": {
+    "bridgeBlobSha": "c66a13bf292edb6d235b487778a36d71e69f9ecc",
+    "semantic": "Operational bridge active(p) rejects any renewability state other than YES and preserves expired Vencida only when explicit YES with no terminal outcome.",
+    "productChanged": false
+  },
+  "contract": {
+    "priorBlobSha": "2c7a80594ede46810821e110937bde46090b8e65",
+    "newBlobSha": "2499e565c4d8e7b8bd4bb726be533bf7dc506ced"
+  },
+  "boundaries": {
+    "businessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
