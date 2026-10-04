@@ -191,18 +191,40 @@ const FAMILY_TO_PRODUCT=Object.freeze({
   vehicle:'auto',home:'hogar',health:'salud',life:'vida',business:'empresa',cargo:'transporte',other:'duda'
 });
 
-function schema(country,product){
+function schema(country,product,form){
   country=String(country||'gt').toLowerCase();
   product=String(product||'auto').toLowerCase();
-  if(product==='auto') return auto(country);
-  if(product==='salud') return salud(country);
-  if(product==='hogar') return hogar(country);
-  if(product==='vida') return vida(country);
-  if(product==='empresa') return empresa(country);
-  if(product==='transporte') return transporte(country);
-  if(product==='contrato') return contrato(country);
-  if(product==='revision') return revision(country);
-  return duda(country);
+  let out;
+  if(product==='auto') out=auto(country);
+  else if(product==='salud') out=salud(country);
+  else if(product==='hogar') out=hogar(country);
+  else if(product==='vida') out=vida(country);
+  else if(product==='empresa') out=empresa(country);
+  else if(product==='transporte') out=transporte(country);
+  else if(product==='contrato') out=contrato(country);
+  else if(product==='revision') out=revision(country);
+  else out=duda(country);
+
+  out=JSON.parse(JSON.stringify(out));
+  if(product==='salud' && out.groups && out.groups[0]){
+    const comp=out.groups[0];
+    const source=(form&&form.hijos)!=null?form.hijos:(comp.fields.find(x=>x.id==='hijos')||{}).default;
+    const childCount=Math.max(0,Math.min(6,parseInt(source,10)||0));
+    const idx=comp.fields.findIndex(x=>x.id==='hijos');
+    const additions=[];
+    for(let i=0;i<childCount;i++){
+      additions.push({
+        id:'dependentDob'+(i+1),
+        label:'Fecha de nacimiento · hijo '+(i+1),
+        type:'date',
+        options:[],
+        default:i===0?'2018-06-10':'',
+        help:'Solo si aplica a esta composición familiar.'
+      });
+    }
+    if(idx>=0) comp.fields.splice(idx+1,0,...additions);
+  }
+  return out;
 }
 
 const DEMO_QUOTES=Object.freeze({
