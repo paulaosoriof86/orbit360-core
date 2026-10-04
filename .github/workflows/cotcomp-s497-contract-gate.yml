@@ -1,0 +1,66 @@
+name: CotComp S4.97 Contract Gate
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s496b-frontend-recovery-lab-20261004
+    paths:
+      - 'functions/cotcomp-s497-*'
+      - 'functions/cotcomp-clean-parent-s497*'
+      - 'functions/package.json'
+      - 'docs/cotcomp/S497_*'
+      - '.github/workflows/cotcomp-s497-contract-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract-gate:
+    name: Source-only visual contract gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prove clean parent is source-only
+        run: |
+          if grep -q "require('./cotcomp-clean-parent-s497')" bootstrap.js; then
+            echo "FAIL: S4.97 clean parent is exported by bootstrap"
+            exit 1
+          fi
+          if grep -q "firebase-functions" cotcomp-clean-parent-s497.js; then
+            echo "FAIL: S4.97 clean parent has deployment dependency"
+            exit 1
+          fi
+
+      - name: Syntax gate
+        run: npm run check:cotcomp:s497
+
+      - name: Contract tests
+        run: npm run test:cotcomp:s497
+
+      - name: Deployment deny assertion
+        run: |
+          node - <<'NODE'
+          const S=require('./cotcomp-clean-parent-s497');
+          const m=S.manifest();
+          const bad=[
+            S.DEPLOYMENT_EXPORT!==false,
+            m.providerDeploymentAuthorized!==false,
+            m.cotcompRealTransportAuthorized!==false,
+            m.production!==false,
+            m.ownerReviewUrlAuthorized!==false
+          ].some(Boolean);
+          if(bad) process.exit(1);
+          console.log('PASS: S4.97 remains source-only and fail-closed.');
+          NODE
