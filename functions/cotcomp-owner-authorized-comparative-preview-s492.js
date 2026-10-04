@@ -191,7 +191,7 @@ function html(){
   const assistTab=document.getElementById('assistTab');
 
   let route=ROUTES.find(r=>r.id==='vehicle')||ROUTES[0];
-  let brand='Toyota',model='RAV4',year='2023',brands=[],models=[];
+  let brand='TOYOTA',model='RAV4 2WD',year='2023',brands=[],models=[];
 
   const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const norm=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
@@ -229,9 +229,10 @@ function html(){
     formTitle.textContent='2. Ingresa los datos de tu vehículo';
     const years=await loadYears();
     await loadBrands();
-    let matched=brands.find(x=>x.label===brand)||brands[0]||null;
+    let matched=brands.find(x=>norm(x.label)===norm(brand))||brands[0]||null;
     if(matched){brand=matched.label;await loadModels(matched.brandId)}
-    if(models.length && !models.some(x=>x.label===model)) model=models[0].label;
+    const wantedModel=models.find(x=>norm(x.label)===norm(model))||models.find(x=>norm(x.label).startsWith(norm('RAV4')))||models[0]||null;
+    if(wantedModel) model=wantedModel.label;
     formRow.innerHTML=
       '<div class="field"><label>Marca</label><div class="combo-wrap"><input id="brandInput" role="combobox" aria-expanded="false" aria-controls="brandList" autocomplete="off" value="'+esc(brand)+'" placeholder="Escribe para buscar"><div id="brandList" class="combo-list" role="listbox"></div></div><button id="brandFallback" class="fallback-link" type="button">No encuentro mi marca</button></div>'+
       '<div class="field"><label>Línea / modelo</label><div class="combo-wrap"><input id="modelInput" role="combobox" aria-expanded="false" aria-controls="modelList" autocomplete="off" value="'+esc(model)+'" placeholder="Escribe para buscar"><div id="modelList" class="combo-list" role="listbox"></div></div><button id="modelFallback" class="fallback-link" type="button">No encuentro mi línea / modelo</button></div>'+
