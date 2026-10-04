@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R14P3_CLIENT360_AUTHORITY_HARNESS_ADJUDICATION_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_HARNESS_FALSE_NEGATIVE_ADJUDICATED_PENDING_EXACT_PREVIEW",
+  "findingId": "B4-003-R14-04-CLIENT360-LIST-AUTHORITY",
+  "failedRunId": 37186756670,
+  "failedJobId": 111390196172,
+  "failureCode": "B4_003_R14_CLIENT360_AUTHORITATIVE_LIST_FAILED",
+  "failedObservation": {
+    "authority": "server-confirmed-store",
+    "syntheticClientVisible": false
+  },
+  "historicalStableContract": {
+    "evidenceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R5P3_CLIENT360_CLIENT_CENTRIC_SCOPE_FIX_20261002.json",
+    "progressiveFirstPaintReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_R2P9_CLIENT360_PROGRESSIVE_FIRST_PAINT_SOURCE_FIX_20261002.json",
+    "rule": "Cliente360 is client-centric. Country defines the visible client universe first; KPIs use that full universe. The list is paginated and first paint is bounded. Policy-derived data is progressive and must not block the client list.",
+    "provenHarnessPattern": "Compare independent scoped client universe to data-c360-kpi-client-count for CO/GT/TODOS; do not equate first-page text with full-universe membership."
+  },
+  "currentSourceConfirmation": {
+    "listPageSize": 40,
+    "authorityMarker": "data-c360-base-authority=server-confirmed-store",
+    "fullUniverseMarker": "data-c360-kpi-client-count",
+    "paginationMarker": "c360-pagination",
+    "crmBridgeMode": "permission-only",
+    "doubleScopeGuard": "alreadyScoped before A.withScope"
+  },
+  "rootCause": "The R14 B4-003 assertion required the synthetic QA client name to occur in host.innerText immediately after rendering GT. Cliente360 renders only the current 40-row page, so a valid client outside page 1 produces syntheticClientVisible=false even when the authoritative store and KPI universe are correct.",
+  "fixContract": [
+    "Reuse the previously proven B3-008 universe assertion pattern.",
+    "Assert server-confirmed-store authority marker.",
+    "Assert synthetic client exists in authoritative store.",
+    "Assert UI full-universe count equals the canonical GT client universe after merged-client exclusion.",
+    "Use Cliente360 search to prove the synthetic client is reachable without assuming page-1 placement.",
+    "Do not change product source, page size, data, scope rules, reimport, or LIVE."
+  ],
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_EXACT_PREVIEW_RETRY"
+}
