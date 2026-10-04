@@ -1,0 +1,25 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R14_CONTRACT_RENEWABILITY_ASSERTION_ROOTFIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_CONTRACT_ALIGNED_PENDING_EXACT_PREVIEW",
+  "failedRunId": 37178375746,
+  "failedJobId": 111365687632,
+  "failureCode": "B4_003_BASE_RENEWABILITY_FAIL_CLOSED_MISSING",
+  "adjudication": "STALE_ASSERTION_ONLY",
+  "evidence": {
+    "productBlobSha": "962ff81e28fb94f1eaa89a96b4a2f765dd2b630d",
+    "semantic": "renewalActionable rejects every state other than YES; renewalPendingValidation separately admits only UNKNOWN as non-actionable validation debt.",
+    "productChanged": false
+  },
+  "contract": {
+    "priorBlobSha": "48046852710b0ca759a409dc9b9c049494817635",
+    "newBlobSha": "2c7a80594ede46810821e110937bde46090b8e65"
+  },
+  "boundaries": {
+    "businessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
