@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s492-owner-authorized-comparative-lab-intent-v1.0",
   "authorization": "S492_DEPLOY_OWNER_AUTHORIZED_COMPARATIVE_FRONTEND",
-  "authorizedSourceParent": "bbfbaae8a2660b204ab89a374f7640aba15c7268",
+  "authorizedSourceParent": "c4c97ae208ef1046367ccb43044a0e19e629e39b",
   "projectId": "ays-orbit-360-lab",
   "functionName": "cotcompOwnerAuthorizedComparativePreviewS492",
   "ownerVisualSha": "3468546cb5d1c0cd7e2191980b306d462ea0b0304da0260167ec06c294aaa10e",
@@ -12,5 +12,5 @@
   "providerDeploymentAuthorized": false,
   "cotcompRealTransportAuthorized": false,
   "production": false,
-  "retryReason": "Fix false-negative QA assertions only; no scope expansion"
+  "retryReason": "Deploy explicit human advisory hero plus catalog-backed Toyota RAV4 initial example; no scope expansion"
 }
