@@ -5512,6 +5512,21 @@
         "failedRunId": 37170865514,
         "carryBlobSha": "f343f64b64125cb765229e9b031145d4e91df752",
         "productSourceChanged": false
+      },
+      "r13PostApplyPreviewBackendRetry": {
+        "status": "REQUESTED",
+        "reason": "FIREBASE_CLI_TRANSIENT_UNEXPECTED_ERROR_AFTER_FUNCTIONS_PACKAGE_BEFORE_UPDATE",
+        "priorRunId": 37170998783,
+        "priorJobId": 111343761007,
+        "failedStep": "Deploy exact B4-003 Preview write backends",
+        "priorHead": "37a513c5a45f7307976c4a04e630727312d53483",
+        "renewalApplyReceiptBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e",
+        "sameProductSource": true,
+        "sameDataState": true,
+        "productSourceChanged": false,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false
       }
     }
   },
@@ -6499,6 +6514,21 @@
       "failedRunId": 37170865514,
       "carryBlobSha": "f343f64b64125cb765229e9b031145d4e91df752",
       "productSourceChanged": false
+    },
+    "r13PostApplyPreviewBackendRetry": {
+      "status": "REQUESTED",
+      "reason": "FIREBASE_CLI_TRANSIENT_UNEXPECTED_ERROR_AFTER_FUNCTIONS_PACKAGE_BEFORE_UPDATE",
+      "priorRunId": 37170998783,
+      "priorJobId": 111343761007,
+      "failedStep": "Deploy exact B4-003 Preview write backends",
+      "priorHead": "37a513c5a45f7307976c4a04e630727312d53483",
+      "renewalApplyReceiptBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e",
+      "sameProductSource": true,
+      "sameDataState": true,
+      "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
     }
   },
   "b4VisualAcceptanceControl": {
