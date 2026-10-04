@@ -45,8 +45,10 @@ test('visual evidence gate rejects typography, distortion, repetition and overfl
   for(const code of ['H1_FONT','HERO_NOT_DISTORTED','NO_REPEATED_FAMILY_VISUAL','NO_HORIZONTAL_OVERFLOW']) assert.ok(v.failed.some(x=>x.code===code),code);
 });
 
-test('visual evidence gate authorizes Owner URL only after every contract check passes',()=>{
+test('automated visual evidence can pass but cannot alone authorize an Owner URL',()=>{
   const v=G.verify(good());
   assert.equal(v.ok,true,JSON.stringify(v.failed,null,2));
-  assert.equal(v.ownerReviewUrlAuthorized,true);
+  assert.equal(v.automatedVisualContractPassed,true);
+  assert.equal(v.ownerReviewUrlAuthorized,false);
+  assert.equal(v.ownerReviewBlockReason,'INTERNAL_MANUAL_VISUAL_AUDIT_REQUIRED');
 });
