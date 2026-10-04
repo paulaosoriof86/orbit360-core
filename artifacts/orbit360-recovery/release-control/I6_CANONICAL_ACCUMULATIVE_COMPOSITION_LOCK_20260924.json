@@ -2972,7 +2972,7 @@
   "b4003R1604TargetedVisualSourceFix": {
     "status": "SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
-    "blobSha": "e961897432e218a164046520a9901d6f3661d4b8",
+    "blobSha": "6c35c17aa919de6c82392d296fd45fbe459ed8f6",
     "productBlobs": {
       "orbit360-platform/modules/calidad.js": "368b1f578a7500f7d8a2037962328770550ed8c3",
       "orbit360-platform/modules/configuracion.js": "0ec30235bf676b89c85a5c0dc58b09a5e1a81193",
@@ -2983,7 +2983,7 @@
       "orbit360-platform/index.html": "9948993770f2ccb55d704ab3db89ee43f77ecb11"
     },
     "qaBlobs": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "9ae4358e41496f43bf6593021369ff9c2fbfbb7a",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "7233bdb1df31b22a773c0955d5978edd4dcc965a",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "5568d97cdd17b44ec4faf23ee98ce8b3182c5e20"
     },
     "findingCountAfter": 215,
@@ -3009,6 +3009,13 @@
       "failureCode": "B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING",
       "classification": "QA_CACHE_BINDING_DRIFT",
       "resolution": "Update all R16.4 modified-owner cache assertions together: calidad r16p4, aseguradoras r16p4a, insurer visual r16p4, policy detail r16p4.",
+      "productSourceChanged": false
+    },
+    "qaCompatibilityAlignment4": {
+      "failedRunId": 37224914217,
+      "failureCode": "CONTRACT_SYNTAX_INVALID_REGEXP_FLAGS",
+      "classification": "QA_SYNTAX_DEFECT",
+      "resolution": "Replace four modified-owner cache regex literals with exact index.includes assertions; no product semantic relaxation.",
       "productSourceChanged": false
     }
   }

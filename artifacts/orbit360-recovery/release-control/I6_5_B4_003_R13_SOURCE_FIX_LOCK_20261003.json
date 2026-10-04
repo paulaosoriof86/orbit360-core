@@ -29,7 +29,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "d8927869083ae932346281bfc42058401621a0b6"
+    "blobSha": "9bb3afbb39d280f351dd8077243c30017b88e759"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -331,7 +331,7 @@
     "reimport": false,
     "livePromotion": false
   },
-  "compositionLockBlobSha": "d8927869083ae932346281bfc42058401621a0b6",
+  "compositionLockBlobSha": "9bb3afbb39d280f351dd8077243c30017b88e759",
   "r14SourceFix": {
     "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
@@ -555,7 +555,7 @@
   "r1604TargetedVisualSourceFix": {
     "status": "SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
-    "blobSha": "e961897432e218a164046520a9901d6f3661d4b8",
+    "blobSha": "6c35c17aa919de6c82392d296fd45fbe459ed8f6",
     "allowedProductFiles": [
       "orbit360-platform/modules/calidad.js",
       "orbit360-platform/modules/configuracion.js",
@@ -589,6 +589,13 @@
       "failureCode": "B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING",
       "classification": "QA_CACHE_BINDING_DRIFT",
       "resolution": "Update all R16.4 modified-owner cache assertions together: calidad r16p4, aseguradoras r16p4a, insurer visual r16p4, policy detail r16p4.",
+      "productSourceChanged": false
+    },
+    "qaCompatibilityAlignment4": {
+      "failedRunId": 37224914217,
+      "failureCode": "CONTRACT_SYNTAX_INVALID_REGEXP_FLAGS",
+      "classification": "QA_SYNTAX_DEFECT",
+      "resolution": "Replace four modified-owner cache regex literals with exact index.includes assertions; no product semantic relaxation.",
       "productSourceChanged": false
     }
   }
