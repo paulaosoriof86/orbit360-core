@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R14_CLIENT360_RUNTIME_SCOPE_ROOTFIX_V1",
+  "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "failedRunId": 37186271495,
+  "failedJobId": 111389013312,
+  "failedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37186271495-5mlkjphv.web.app",
+  "failure": "ReferenceError: clientBatch is not defined",
+  "stackOwner": "orbit360-platform/modules/cliente360.js:lista",
+  "findingId": "B4-003-R14-04-CLIENT360-LIST-AUTHORITY",
+  "rootCause": "R14 intentionally removed projection batchRunner/clientBatch so the server-confirmed product store remained the authoritative base. The runtime diagnostics footer still referenced !!clientBatch, producing a ReferenceError after the list rendered.",
+  "fix": "Keep server-confirmed store authority; do not restore clientBatch. Replace the stale diagnostic with batchRead:false and baseAuthority:'server-confirmed-store'; advance the Client 360 cache binding and assert no clientBatch identifier remains.",
+  "productBlobs": {
+    "orbit360-platform/modules/cliente360.js": "bf8b4469631ad10f62ea825f46d29bcf3259583c",
+    "orbit360-platform/index.html": "a0790a5b52c8c2b6c2c84c4d0f2415cb8a9e2ebf"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "c132fdb8fa2034795ffe77fe34285a49339a80da"
+  },
+  "invariants": {
+    "serverConfirmedStoreAuthorityPreserved": true,
+    "projectionBatchRestored": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
