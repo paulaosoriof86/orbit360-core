@@ -29,7 +29,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "6b2aa8c31c05ae851fcc7c7118f93052cc7baf44"
+    "blobSha": "cdf2993229d5cc610fb83e6f1eb44004bc9c9991"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -331,7 +331,7 @@
     "reimport": false,
     "livePromotion": false
   },
-  "compositionLockBlobSha": "6b2aa8c31c05ae851fcc7c7118f93052cc7baf44",
+  "compositionLockBlobSha": "cdf2993229d5cc610fb83e6f1eb44004bc9c9991",
   "r14SourceFix": {
     "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
@@ -555,7 +555,7 @@
   "r1604TargetedVisualSourceFix": {
     "status": "SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
-    "blobSha": "35d342a313ceef799af0385cadf9f498ec885a91",
+    "blobSha": "c52101525be8a5ebd9680d5fa58ddf10d00f108b",
     "allowedProductFiles": [
       "orbit360-platform/modules/calidad.js",
       "orbit360-platform/modules/configuracion.js",
@@ -576,6 +576,13 @@
       "resolution": "Preserve literal canonical Registry identity while retaining clearer Biblioteca/Drive hierarchy.",
       "productSourceChanged": true,
       "noBuildOccurredBeforeFix": true
+    },
+    "qaCompatibilityAlignment2": {
+      "failedRunId": 37224727762,
+      "failureCode": "B4_003_R14_QUALITY_FINANCIAL_CLIENT_PROJECTION_HOTPATH_REMAINS",
+      "classification": "QA_LITERAL_DRIFT",
+      "resolution": "Accept indexed clientsById projection through v.c while preserving prohibition on per-row store lookup/N-squared financial projection.",
+      "productSourceChanged": false
     }
   }
 }

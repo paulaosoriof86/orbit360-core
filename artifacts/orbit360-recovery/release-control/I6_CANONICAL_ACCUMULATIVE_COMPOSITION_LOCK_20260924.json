@@ -2972,7 +2972,7 @@
   "b4003R1604TargetedVisualSourceFix": {
     "status": "SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
-    "blobSha": "35d342a313ceef799af0385cadf9f498ec885a91",
+    "blobSha": "c52101525be8a5ebd9680d5fa58ddf10d00f108b",
     "productBlobs": {
       "orbit360-platform/modules/calidad.js": "368b1f578a7500f7d8a2037962328770550ed8c3",
       "orbit360-platform/modules/configuracion.js": "0ec30235bf676b89c85a5c0dc58b09a5e1a81193",
@@ -2983,7 +2983,7 @@
       "orbit360-platform/index.html": "9948993770f2ccb55d704ab3db89ee43f77ecb11"
     },
     "qaBlobs": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "dc6e23b6df420a3f62edeaa24d612c4ff68e9317",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "d42e87982a7355ef28b8deb0414b27c80cdeefcc",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "5568d97cdd17b44ec4faf23ee98ce8b3182c5e20"
     },
     "findingCountAfter": 215,
@@ -2996,6 +2996,13 @@
       "resolution": "Preserve literal canonical Registry identity while retaining clearer Biblioteca/Drive hierarchy.",
       "productSourceChanged": true,
       "noBuildOccurredBeforeFix": true
+    },
+    "qaCompatibilityAlignment2": {
+      "failedRunId": 37224727762,
+      "failureCode": "B4_003_R14_QUALITY_FINANCIAL_CLIENT_PROJECTION_HOTPATH_REMAINS",
+      "classification": "QA_LITERAL_DRIFT",
+      "resolution": "Accept indexed clientsById projection through v.c while preserving prohibition on per-row store lookup/N-squared financial projection.",
+      "productSourceChanged": false
     }
   }
 }
