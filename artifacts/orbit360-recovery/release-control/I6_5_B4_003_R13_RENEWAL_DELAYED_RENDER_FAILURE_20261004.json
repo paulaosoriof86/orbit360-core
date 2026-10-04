@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_RENEWAL_DELAYED_RENDER_FAILURE_V1",
+  "recordedAt": "2026-10-04",
+  "status": "EXACT_PREVIEW_FAILED_DIAGNOSTIC_INSTRUMENTATION_REQUIRED",
+  "findingId": "B4-003",
+  "failedRunId": 37165441232,
+  "failedJobId": 111327318478,
+  "failedStep": "Durable renewals cancelations browser proof",
+  "failureCode": "B4_003_RENEWAL_DELAYED_RENDER_MUTATION",
+  "exactCandidateHead": "0ca360b707fe84be40acc34f4bbb8682b46a4338",
+  "prerequisitesPassed": [
+    "Control Plane Guard",
+    "Gate exact B4-003 Preview",
+    "LIVE unchanged",
+    "B4-003 contract and syntax",
+    "Immutable package",
+    "Preview backends",
+    "Hosting package",
+    "Exact Hosting readback"
+  ],
+  "boundaries": {
+    "productMutationAuthorized": false,
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_R13_RENEWAL_DELAYED_RENDER_READONLY_INSTRUMENTATION"
+}
