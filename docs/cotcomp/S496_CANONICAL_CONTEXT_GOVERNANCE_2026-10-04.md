@@ -5,7 +5,10 @@
 **Base técnica actual:** `ays/cotcomp-s495-premium-refinement-lab-20261004`  
 **Candidata visual actual:** `cotcompPremiumVisualPreviewS495`  
 **Owner status:** S4.95 = REWORK / NO OWNER PASS  
-**Próximo bloque autorizado:** S4.96 — Journey & Intake Restoration + Premium Refinement
+**S4.96 runtime status:** DEPLOYED LAB / TECHNICAL PASS / OWNER REVIEW PENDING  
+**S4.96 function:** `cotcompPremiumJourneyPreviewS496`  
+**S4.96 deployed source commit:** `5329dcf49f9b4dbbd04ac05718a3825b9bfd00a1`  
+**Next action:** Owner visual/functional review of S4.96, then targeted refinement only
 
 ## 1. Propósito
 
@@ -124,3 +127,21 @@ S4.96 deberá usar el frontend S4.95 como piel visual refinada, pero restaurar p
 - tipografía canónica A&S.
 
 No activar transporte real ni producción.
+
+
+## 8. S4.96 runtime closure update — 2026-10-04
+
+- Workflow run `37192953945`: SUCCESS.
+- Governance preflight: PASS.
+- Accumulated source QA: PASS.
+- LAB deploy: PASS.
+- Physical verification: PASS.
+- Focused browser regression after parent-render race fix:
+  - vehicle intake group headings persist after page settlement: PASS;
+  - headings reappear after Health → Vehicle navigation: PASS;
+  - right-side image never blank in tested navigation: PASS;
+  - Elegir esta alternativa visible: PASS;
+  - Ver detalles visible: PASS;
+  - Ver recomendación completa visible: PASS.
+- The parent-render race that could overwrite S4.96 intake with S4.94/S4.95 form content was corrected with ownership/reconciliation guards.
+- S4.96 is not Owner-approved yet. Technical PASS does not promote it.
