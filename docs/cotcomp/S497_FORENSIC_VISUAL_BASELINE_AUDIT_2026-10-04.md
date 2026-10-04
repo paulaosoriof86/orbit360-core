@@ -278,7 +278,28 @@ The next candidate may **not**:
 - reuse one fallback photo across multiple families/states;
 - expose internal technical language.
 
-## 10. Remaining forensic task before new implementation
+## 10. Cross-version physical stability proof
+
+Additional physical artifacts were recovered and hashed:
+
+| Artifact | File SHA-256 | CotComp section SHA | Combined CotComp visual CSS SHA |
+|---|---|---|---|
+| S4.7 | `60d6cd67618da09b3a892cd87738ae304266b29d907662e2145f311e33929fd9` | `758dcf6871fb3e3e03844f736ee0a99c5d0d76d1ed4a124b65e90abbe9a07928` | `94a23c292fb6f271aaccf1ab6fe47b0506082de1d724c9688510a3be663fafbb` |
+| S4.9 | `60d6cd67618da09b3a892cd87738ae304266b29d907662e2145f311e33929fd9` | same | same |
+| S4.10 | `a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d` | same | same |
+| S4.13 | `a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d` | same | same |
+| S4.18 | `a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d` | same | same |
+
+Conclusions:
+- S4.7 and S4.9 are byte-identical full artifacts.
+- S4.10, S4.13 and S4.18 are byte-identical full artifacts.
+- The CotComp HTML section is physically identical across all five artifacts.
+- The complete CotComp visual CSS lock is physically identical across all five artifacts.
+- S4.10 changed data/schema scripts, not CotComp visual markup or styling.
+
+This creates a much stronger recovery chain than semantic memory: the visual structure that S4.6 recorded as satisfactory remained physically stable through S4.18.
+
+## 11. Remaining forensic task before new implementation
 
 Still required before a new candidate:
 1. Produce deterministic golden screenshots from the exact S4.10/S4.13 artifact at required breakpoints.
