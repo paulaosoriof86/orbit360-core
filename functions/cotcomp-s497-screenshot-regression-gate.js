@@ -55,7 +55,9 @@ function verify(receipt){
   const failed=checks.filter(x=>!x.ok);
   return Object.freeze({
     ok:failed.length===0,
-    ownerReviewUrlAuthorized:failed.length===0,
+    automatedVisualContractPassed:failed.length===0,
+    ownerReviewUrlAuthorized:false,
+    ownerReviewBlockReason:failed.length===0?'INTERNAL_MANUAL_VISUAL_AUDIT_REQUIRED':'AUTOMATED_VISUAL_CONTRACT_FAILED',
     failedCount:failed.length,
     failed,
     checks
