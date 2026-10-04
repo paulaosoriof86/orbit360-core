@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76",
-  "expectedLedgerNextBlobSha": "3d65deeee680ee06ce82b862dfbc341c640f2525",
+  "expectedLedgerNextBlobSha": "f42a1e03355f18e8f5ae0a34d59e9664bf846b88",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -16,7 +16,7 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 210,
+  "inventoryCount": 215,
   "attentionCount": 103,
   "inventory": [
     {
@@ -669,14 +669,14 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
       "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
       "source": "LEDGER",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
-      "humanVisualStatus": "PENDING_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "humanVisualStatus": "REJECTED_R16_04_PENDING_RETEST",
       "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
       "r13QaGateAlignmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
       "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
@@ -3334,6 +3334,102 @@
         "authRelaxed": false,
         "localFallbackAuthority": false
       }
+    },
+    {
+      "id": "B4-003-R16-04-QUALITY-RESOLUTION-DEEPLINK-MOBILE",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_TARGETED_VISUAL_20261004",
+      "surface": "Calidad de la información",
+      "finding": "La acción Ver póliza apuntaba a #/polizas?p=<id>, ruta que no consume p, y la tabla financiera móvil obligaba desplazamiento horizontal con términos internos de calendario.",
+      "classification": "PRODUCT_UX_NAVIGATION_AND_RESPONSIVE_DEFECT",
+      "rootCause": "QUALITY_ACTION_BYPASSED_CANONICAL_CLIENT360_POLICY_OWNER_AND_EXPOSED_INTERNAL_CALENDAR_TOKENS",
+      "owner": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "status": "SOURCE_FIXED_R16_04_PENDING_EXACT_PREVIEW",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Exact Preview must navigate from a financial mismatch to the exact policy full page with edit action, expose human calendar labels, and render actionable mobile cards.",
+      "mayDisappearWithoutDisposition": false,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+    },
+    {
+      "id": "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_TARGETED_VISUAL_20261004",
+      "surface": "Póliza / Recibos / Calidad financiera",
+      "finding": "Rows such as 3 and 3/12, 4 and 4/12 coexist as active because undenominated legacy rows are accepted alongside confirmed N/N calendar rows.",
+      "classification": "READ_MODEL_DUPLICATE_CALENDAR_PROJECTION_DEFECT",
+      "rootCause": "EXPLICIT_POLICY_CUOTAS_BRANCH_TREATED_UNDENOMINATED_ORDINAL_ROWS_AS_CURRENT_EVEN_WHEN_SAME_ORDINAL_CONFIRMED_N_DENOMINATOR_EXISTS",
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "status": "SOURCE_FIXED_R16_04_PENDING_EXACT_PREVIEW",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Synthetic duplicate ordinal plus N/N fixture must keep only canonical N/N row active, preserve legacy row as history, and not mutate/delete operational data.",
+      "mayDisappearWithoutDisposition": false,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+    },
+    {
+      "id": "B4-003-R16-06-CONFIG-CATALOG-FIRST-PAINT",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_TARGETED_VISUAL_20261004",
+      "surface": "Configuración / Catálogos",
+      "finding": "Al entrar a Catálogos la vista queda visualmente vacía mientras await Orbit.cat.ensure resolves.",
+      "classification": "AUTHENTICATED_SURFACE_FIRST_PAINT_UX_DEFECT",
+      "rootCause": "CATALOG_TAB_CLICK_DEFERRED_RENDER_UNTIL_CANONICAL_ENSURE_COMPLETED_WITHOUT_VISIBLE_LOADING_OR_FAIL_CLOSED_ERROR_STATE",
+      "owner": [
+        "orbit360-platform/modules/configuracion.js"
+      ],
+      "status": "SOURCE_FIXED_R16_04_PENDING_EXACT_PREVIEW",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Authenticated Catalogs entry paints loading state immediately, uses canonical ensure only on demand, and exposes fail-closed retry without local authority fallback.",
+      "mayDisappearWithoutDisposition": false,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+    },
+    {
+      "id": "B4-003-R16-07-RENEWABILITY-REVIEW-WORKFLOW-UX",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_TARGETED_VISUAL_20261004",
+      "surface": "Renovaciones",
+      "finding": "Renovabilidad pendiente is correctly fail-closed but the UI does not tell the operator what to validate or where to classify it.",
+      "classification": "WORKFLOW_ACTIONABILITY_UX_DEFECT",
+      "rootCause": "PENDING_RENEWABILITY_DEBT_EXPOSED_WITH_GENERIC_REVIEW_BUTTON_WITHOUT_CANONICAL_EDITOR_INSTRUCTION",
+      "owner": [
+        "orbit360-platform/modules/renovaciones.js"
+      ],
+      "status": "SOURCE_FIXED_R16_04_PENDING_EXACT_PREVIEW",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Pending-renewability panel must explain source verification and tri-state classification, and each action must open the exact policy for classification.",
+      "mayDisappearWithoutDisposition": false,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+    },
+    {
+      "id": "B4-003-R16-08-INSURER-KNOWLEDGE-HIERARCHY",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_TARGETED_VISUAL_20261004",
+      "surface": "Aseguradoras / Tarifas y conocimiento / Documentos",
+      "finding": "Knowledge/source data are present but hierarchy conflates mapped and validated states, raw empty dimensions are shown, Drive-empty copy conflicts with Library sources, and no-logo fallback displays literal logo text.",
+      "classification": "INFORMATION_ARCHITECTURE_AND_VISUAL_SEMANTICS_DEFECT",
+      "rootCause": "MULTIPLE_CANONICAL_SOURCE_STATES_RENDERED_WITH_AMBIGUOUS_AGGREGATE_LABELS_AND_UNFILTERED_EMPTY_DIMENSIONS",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+      ],
+      "status": "SOURCE_FIXED_R16_04_PENDING_EXACT_PREVIEW",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Exact Preview must distinguish validated/review/physical-Drive counts, separate Library from physical Drive semantics, filter empty dimensions, and preserve Quote Authority/no-auto-enable rules.",
+      "mayDisappearWithoutDisposition": false,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
     }
   ],
   "attentionIds": [
@@ -3439,7 +3535,12 @@
     "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
     "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
     "B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE",
-    "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION"
+    "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
+    "B4-003-R16-04-QUALITY-RESOLUTION-DEEPLINK-MOBILE",
+    "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION",
+    "B4-003-R16-06-CONFIG-CATALOG-FIRST-PAINT",
+    "B4-003-R16-07-RENEWABILITY-REVIEW-WORKFLOW-UX",
+    "B4-003-R16-08-INSURER-KNOWLEDGE-HIERARCHY"
   ],
   "criticalCurrentReviewIds": [
     "B4-003",

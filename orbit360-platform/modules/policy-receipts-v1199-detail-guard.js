@@ -219,6 +219,11 @@ Orbit.modules = Orbit.modules || {};
     const m=raw.match(/(?:^|\s)(\d+)\s*\/\s*(\d+)(?:\s|$)/);
     return m?Number(m[2]):null;
   }
+  function receiptPlanOrdinal(r) {
+    const values=[r&&r.cuota,r&&r.serie,r&&r.numeroReciboFuente].map(x=>safe(x)).filter(Boolean);
+    for(const raw of values){const m=raw.match(/^\s*(\d+)(?:\s*\/\s*\d+)?\s*$/);if(m)return Number(m[1]);}
+    return null;
+  }
   function receiptBaseInactive(r) {
     const s=String(r&&r.estado||'').trim().toLowerCase();
     return !!(r&&(r.superseded===true||r.calendarActive===false||s==='anulado'||s==='superseded'||s==='reemplazado'));
@@ -227,8 +232,8 @@ Orbit.modules = Orbit.modules || {};
     const all=[].concat(rows||[]),base=all.filter(r=>!receiptBaseInactive(r)),history=all.filter(receiptBaseInactive);
     const explicit=Number(policy&&policy.cuotas);
     if(Number.isFinite(explicit)&&explicit>0){
-      const current=[],replaced=history.slice();
-      base.forEach(r=>{const d=receiptPlanDenominator(r);(d&&d!==explicit?replaced:current).push(r);});
+      const current=[],replaced=history.slice(),confirmedOrdinals=new Set(base.map(r=>receiptPlanDenominator(r)===explicit?receiptPlanOrdinal(r):null).filter(n=>Number.isFinite(n)&&n>0));
+      base.forEach(r=>{const d=receiptPlanDenominator(r),ordinal=receiptPlanOrdinal(r);if(d&&d!==explicit){replaced.push(r);return;}if(!d&&ordinal&&confirmedOrdinals.has(ordinal)){replaced.push(Object.assign({},r,{__calendarShadowReason:'LEGACY_UNDENOMINATED_DUPLICATE'}));return;}current.push(r);});
       return {current,replaced,review:[],authority:'POLICY_CUOTAS',expected:explicit};
     }
     const denoms=[...new Set(base.map(receiptPlanDenominator).filter(n=>Number.isFinite(n)&&n>0))];
@@ -238,7 +243,8 @@ Orbit.modules = Orbit.modules || {};
   function receiptScheduleFromRows(policy, all) {
     const rowsAll=[].concat(all||[]),projection=activePolicy(policy)?receiptCalendarProjection(policy,rowsAll):{current:[],replaced:rowsAll,review:[],authority:'POLICY_INACTIVE',expected:0},rows=projection.current;
     const sum=key=>{const vals=rows.map(r=>numberOrNull(r[key])).filter(v=>v!=null);return vals.length?vals.reduce((a,b)=>a+b,0):null;};
-    return {rows,historicalRows:projection.replaced,reviewRows:projection.review,calendarAuthority:projection.authority,net:sum('primaNeta'),expedition:sum('gastosExpedicion'),finance:sum('gastosFinanciamiento'),sourceAdjustment:sum('descuento'),iva:sum('impuestosIVA'),total:sum('primaTotal')};
+    const shadowRows=projection.replaced.filter(r=>r&&r.__calendarShadowReason==='LEGACY_UNDENOMINATED_DUPLICATE');
+    return {rows,historicalRows:projection.replaced,reviewRows:projection.review,shadowRows,calendarAuthority:projection.authority,net:sum('primaNeta'),expedition:sum('gastosExpedicion'),finance:sum('gastosFinanciamiento'),sourceAdjustment:sum('descuento'),iva:sum('impuestosIVA'),total:sum('primaTotal')};
   }
   function receiptSchedule(policyId) {
     const policy=S().get('polizas',policyId)||{},all=(S().all('recibosEsperados') || []).filter(r=>r.polizaId===policyId);
@@ -253,7 +259,7 @@ Orbit.modules = Orbit.modules || {};
       if(Math.abs(delta)<=tol)return;
       const explicitSource=first(p.primaFuente,p.primaSource,p.primaSourceRef,p.sourceDocumentId,p.sourceRef,p.importSource,p.fuente);
       const contractualSource=explicitSource?String(explicitSource):(p.primaTotal!=null&&p.primaTotal!==''?'Póliza · prima total':p.prima!=null&&p.prima!==''?'Póliza · prima':'Fuente contractual no identificada');
-      issues.push({p,total,schedule,delta:Math.abs(delta)<0.0000001?0:delta,tolerance:tol,receipts:sch.rows.length,rows:sch.rows,reviewRows:sch.reviewRows.length,calendarAuthority:sch.calendarAuthority,contractualSource,reason:'La suma del calendario activo difiere de la prima contractual por encima de la tolerancia configurada.'});
+      issues.push({p,total,schedule,delta:Math.abs(delta)<0.0000001?0:delta,tolerance:tol,receipts:sch.rows.length,rows:sch.rows,reviewRows:sch.reviewRows.length,shadowRows:sch.shadowRows.length,calendarAuthority:sch.calendarAuthority,contractualSource,reason:'La suma del calendario activo difiere de la prima contractual por encima de la tolerancia configurada.'});
     });
     return issues.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
   }
@@ -269,7 +275,9 @@ Orbit.modules = Orbit.modules || {};
       iva:numberOrNull(first(p.ivaMonto,p.iva,p.impuestos,p.impuestosIVA)) ?? sch.iva,
       total:numberOrNull(first(p.primaTotal,p.prima)),
       scheduleTotal:sch.total,
-      receipts:sch.rows
+      receipts:sch.rows,
+      shadowRows:sch.shadowRows,
+      shadowCount:sch.shadowRows.length
     };
   }
   function receiptRows(policyId, cur) {
@@ -433,7 +441,7 @@ Orbit.modules = Orbit.modules || {};
             field('Frecuencia', first(p.frecuencia, p.forma)), field('Forma de pago', p.formaPago), field('Conducto', p.conducto)
           ],3)}</div>`)}
           ${section('🚘 Riesgo asegurado / vehículo', vehiclesReady ? vehicleCard(vehicle, cur, p.id, p.clienteId) : '<div class="muted" data-policy-vehicle-loading="1">Actualizando vehículo y relaciones…</div>')}
-          ${section('🧾 Recibos y cartera', receiptsReady ? receiptRows(p.id, cur) : '<div class="muted" data-policy-receipts-loading="1">Actualizando calendario y cartera…</div>')}
+          ${section('🧾 Recibos y cartera', receiptsReady ? ((pb.shadowCount?'<div class="cfg-note" data-receipt-shadow-exclusion="1" style="margin-bottom:10px"><b>'+pb.shadowCount+' registro(s) legado(s) duplicado(s) excluido(s) del calendario activo.</b> Se conservan en histórico; no se borraron ni se usaron para recalcular la prima.</div>':'')+receiptRows(p.id, cur)) : '<div class="muted" data-policy-receipts-loading="1">Actualizando calendario y cartera…</div>')}
         </div>
         <div style="display:grid;gap:16px;min-width:0">
           ${section('📌 Resumen', `<div style="display:grid;gap:10px">${field('Prima total', moneyDetail(pb.total,cur))}${field('Vigencia', `${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`)}${field('Forma de pago', p.formaPago)}${field('Estado', p.estado)}</div>`)}

@@ -25,6 +25,7 @@ const ids={
  healthPolicy:'b4003qa_policy_health_'+run,
  healthReceipt1:'b4003qa_receipt_health_1_'+run,
  healthReceipt2:'b4003qa_receipt_health_2_'+run,
+ healthReceiptShadow:'b4003qa_receipt_health_shadow_'+run,
  cancelation:'b4003qa_cancel_'+run,
  insurer:'b4003qa_insurer_'+run
 };
@@ -83,6 +84,7 @@ async function seed(who){
  await ref('polizas',ids.healthPolicy).set({...common,id:ids.healthPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-HEALTH-'+run,estado:'Vigente',renovable:false,pais:'GT',moneda:'GTQ',ramo:'Accidentes',producto:'Accidentes',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:407.01,primaTotal:407.01,primaNeta:346.09,cuotas:2},{merge:false});proof.syntheticWrites++;
  await ref('recibosEsperados',ids.healthReceipt1).set({...common,id:ids.healthReceipt1,clienteId:ids.client,polizaId:ids.healthPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',cuota:'1 / 2',serie:'1 / 2',fechaLimite:startS,primaTotal:271.34,montoTotal:271.34,monto:271.34,estado:'Pendiente'},{merge:false});proof.syntheticWrites++;
  await ref('recibosEsperados',ids.healthReceipt2).set({...common,id:ids.healthReceipt2,clienteId:ids.client,polizaId:ids.healthPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',cuota:'2 / 2',serie:'2 / 2',fechaLimite:endS,primaTotal:271.34,montoTotal:271.34,monto:271.34,estado:'Pendiente'},{merge:false});proof.syntheticWrites++;
+ await ref('recibosEsperados',ids.healthReceiptShadow).set({...common,id:ids.healthReceiptShadow,clienteId:ids.client,polizaId:ids.healthPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',cuota:'1',serie:'1',fechaLimite:startS,primaTotal:271.34,montoTotal:271.34,monto:271.34,estado:'Pendiente'},{merge:false});proof.syntheticWrites++;
  await ref('cancelaciones',ids.cancelation).set({...common,id:ids.cancelation,clienteId:ids.client,polizaId:ids.cancelPolicy,asesorId:who.advisorId||'qa',pais:'GT',moneda:'GTQ',fecha:startS,motivo:'Prueba sintética B4-003',valorPerdido:700,recuperacion:'Pendiente de contacto',recuperada:false},{merge:false});proof.syntheticWrites++;
  await ref('aseguradoras',ids.insurer).set({...common,id:ids.insurer,nombre:'B4 R13 Aseguradora QA',canonicalName:'B4 R13 Aseguradora QA',displayName:'B4 R13 Aseguradora QA',pais:'GT',moneda:'GTQ',activo:true,estado:'Activa',docs:[],cotizadorHabilitado:false,comparativoHabilitado:false,iaHabilitada:false},{merge:false});proof.syntheticWrites++;
 }
@@ -235,7 +237,7 @@ async function cancellationEvidence(){
  proof.assertions.cancellationProjectionConsistent=(cancelled.length===0);
 }
 async function cleanup(startMs){
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]]){
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['recibosEsperados',ids.healthReceiptShadow],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]]){
   const r=ref(c,id);if((await r.get()).exists){await r.delete();proof.cleanupWrites++;}
  }
  for(const col of ['workflowEvents','operationalEvents']){
@@ -543,13 +545,22 @@ try{
    const row=h.querySelector('[data-information-health-policy="'+ids.healthPolicy+'"]');
    const text=String(row&&row.innerText||'').replace(/\s+/g,' ').trim();
    Orbit.pais=previous;
-   return{issue:issue?{total:issue.total,schedule:issue.schedule,delta:issue.delta,receipts:issue.receipts}:null,rowVisible:!!row,rowText:text};
+   return{issue:issue?{total:issue.total,schedule:issue.schedule,delta:issue.delta,receipts:issue.receipts,shadowRows:issue.shadowRows,calendarAuthority:issue.calendarAuthority}:null,rowVisible:!!row,rowText:text,technicalToken:/SINGLE_PHYSICAL_CALENDAR|POLICY_CUOTAS|AMBIGUOUS_FAIL_CLOSED/.test(text),exactAction:!!row?.querySelector('[data-health-open-policy]'),mobileContract:!!h.querySelector('.quality-fin-mobile')};
  },ids);
  need(proof.r12InformationHealth.rowVisible===true,'B4_003_R12_INFORMATION_HEALTH_ROW_MISSING');
  need(Math.abs(proof.r12InformationHealth.issue?.total-407.01)<0.001&&Math.abs(proof.r12InformationHealth.issue?.schedule-542.68)<0.001,'B4_003_R12_INFORMATION_HEALTH_VALUES_CHANGED');
  need(Math.abs(proof.r12InformationHealth.issue?.delta-135.67)<0.001,'B4_003_R12_INFORMATION_HEALTH_DELTA_INVALID');
+ need(proof.r12InformationHealth.issue?.shadowRows===1&&proof.r12InformationHealth.issue?.receipts===2,'B4_003_R16_05_RECEIPT_SHADOW_DUPLICATE_NOT_EXCLUDED:'+JSON.stringify(proof.r12InformationHealth));
+ need(proof.r12InformationHealth.technicalToken===false&&proof.r12InformationHealth.exactAction===true&&proof.r12InformationHealth.mobileContract===true,'B4_003_R16_04_QUALITY_HUMAN_SEMANTICS_MISSING:'+JSON.stringify(proof.r12InformationHealth));
+ proof.assertions.receiptShadowDuplicateProjection=true;proof.assertions.qualityResolutionHumanSemantics=true;
  proof.assertions.informationHealthFinancialMismatchVisible=true;
  proof.assertions.informationHealthNoInference=true;
+ await page.evaluate(ids=>{const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);h.querySelector('[data-information-health-policy="'+ids.healthPolicy+'"] [data-health-open-policy]')?.click();},ids);
+ await page.waitForFunction(id=>Orbit.route&&Orbit.route.key==='cliente360'&&Orbit.route.params&&Orbit.route.params.p===id,ids.healthPolicy,{timeout:10000});
+ await page.waitForSelector('[data-policy-fullpage="1"]',{timeout:10000});
+ proof.r1604QualityDeepLink=await page.evaluate(id=>({route:Orbit.route?.key,policyId:Orbit.route?.params?.p||'',fullpage:!!document.querySelector('[data-policy-fullpage="1"]'),editButton:/Editar póliza/.test(document.getElementById('host')?.innerText||'')}),ids.healthPolicy);
+ need(proof.r1604QualityDeepLink.route==='cliente360'&&proof.r1604QualityDeepLink.policyId===ids.healthPolicy&&proof.r1604QualityDeepLink.fullpage&&proof.r1604QualityDeepLink.editButton,'B4_003_R16_04_QUALITY_DEEPLINK_NOT_ACTIONABLE:'+JSON.stringify(proof.r1604QualityDeepLink));
+ proof.assertions.qualityExactPolicyResolutionPath=true;
 
  await page.evaluate(id=>Orbit.modules.cliente360.editarPoliza(id),ids.unknownRenewPolicy);
  await page.waitForSelector('#policy-v1199 [data-ramo]',{timeout:10000});
@@ -564,6 +575,19 @@ try{
  proof.assertions.policyEditorPreservesSourceTaxonomy=true;
  proof.assertions.policyEditorExposesRenewabilityTriState=true;
  await page.evaluate(()=>document.getElementById('policy-v1199')?.remove());
+ await page.setViewportSize({width:390,height:844});
+ proof.r1604MobileQuality=await page.evaluate(()=>{const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);const mobile=h.querySelector('.quality-fin-mobile'),desktop=h.querySelector('.quality-fin-desktop'),card=mobile&&mobile.querySelector('[data-information-health-card-policy]');return{mobileDisplay:mobile?getComputedStyle(mobile).display:'missing',desktopDisplay:desktop?getComputedStyle(desktop).display:'missing',cardVisible:!!card,hasResolutionAction:!!mobile?.querySelector('[data-health-open-policy]')};});
+ need(proof.r1604MobileQuality.mobileDisplay!=='none'&&proof.r1604MobileQuality.desktopDisplay==='none'&&proof.r1604MobileQuality.cardVisible&&proof.r1604MobileQuality.hasResolutionAction,'B4_003_R16_04_QUALITY_MOBILE_USABILITY_FAILED:'+JSON.stringify(proof.r1604MobileQuality));
+ proof.assertions.qualityMobileResolutionCard=true;
+ await page.setViewportSize({width:1280,height:720});
+
+ await page.evaluate(()=>{location.hash='#/renovaciones';});
+ await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='renovaciones',null,{timeout:10000});
+ await page.waitForSelector('[data-renewability-review-workflow="1"]',{timeout:10000});
+ proof.r1604RenewabilityWorkflow=await page.evaluate(ids=>{const note=document.querySelector('[data-renewability-review-workflow="1"]'),button=document.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');return{instruction:/Editar póliza/.test(note?.innerText||'')&&/Pendiente de validar/.test(note?.innerText||''),buttonLabel:String(button?.innerText||''),buttonPresent:!!button};},ids);
+ need(proof.r1604RenewabilityWorkflow.instruction&&proof.r1604RenewabilityWorkflow.buttonPresent&&/Revisar y clasificar/.test(proof.r1604RenewabilityWorkflow.buttonLabel),'B4_003_R16_07_RENEWABILITY_WORKFLOW_NOT_ACTIONABLE:'+JSON.stringify(proof.r1604RenewabilityWorkflow));
+ proof.assertions.renewabilityReviewWorkflowActionable=true;
+
 
  await page.evaluate(id=>{location.hash='#/cliente360?c='+encodeURIComponent(id)+'&t=polizas';},ids.client);
  await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='cliente360',null,{timeout:10000});
@@ -951,7 +975,7 @@ try{
  if(browser)await browser.close().catch(()=>{});
  await cleanup(startMs).catch(e=>proof.cleanupError=clean(e&&e.message||e));
  const checks=[];
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['recibosEsperados',ids.healthReceiptShadow],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
  proof.syntheticFinalAbsent=checks.every(x=>x===false);
  proof.assertions.cleanupComplete=proof.syntheticFinalAbsent;
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');

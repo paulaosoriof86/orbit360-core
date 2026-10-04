@@ -174,7 +174,7 @@ Orbit.modules.aseguradoras = (function () {
   function normalizarFuente(d,a){if(Orbit.insurerSourceRegistry&&typeof Orbit.insurerSourceRegistry.normalize==='function'){const n=Orbit.insurerSourceRegistry.normalize(d,a);return Object.assign({},d,n,{familiaProducto:d.familiaProducto||'',subtipoProducto:d.subtipoProducto||'',segmento:d.segmento||'',tipoRiesgo:d.tipoRiesgo||'',tipoVehiculo:d.tipoVehiculo||'',usoVehiculo:d.usoVehiculo||''});}return Object.assign({id:d.id,nombre:d.nombre||'Documento',cat:d.cat||'Otro/requiere clasificación',tipo:d.tipo||legacyType(d.cat),pais:d.pais||a.pais,moneda:d.moneda||(a.pais==='GT'?'GTQ':'COP'),ramo:d.ramo||'',producto:d.producto||'',plan:d.plan||'',estado:d.estado||'Documento recibido',version:d.version||1,vigencia:d.vigencia||''},d);}
   function sourceDimensions(d) { const o = {}; DIMENSION_KEYS.forEach(k => { if (d[k]) o[k] = d[k]; }); return o; }
   function sourceCombinationKey(d) { return DIMENSION_KEYS.map(k => d[k] || '—').join(' · '); }
-  function groupLabel(key) { return key; }
+  function groupLabel(key) { const parts=clean(key).split(' · ').filter(x=>x&&x!=='—'); return parts.join(' · ')||'Dimensiones pendientes'; }
   function sourceIdentity(item) { return clean(item && (item.documentId || item.sourceDocumentId || item.id || item.nombre || item.fileName || item.archivo)).toLowerCase(); }
   function visibleState(value) {
     const key = norm(value).replace(/ /g, '_');
@@ -307,7 +307,7 @@ Orbit.modules.aseguradoras = (function () {
     const sources = knowledgeSources(row);
     const sourceNames = Object.create(null);
     sources.forEach(item => { const key = clean(item.id || item.documentId || item.sourceDocumentId); if (key) sourceNames[key] = clean(item.nombre || item.fileName || item.archivo || key); });
-    return '<div class="asg-sec-t" style="margin-top:16px">Conocimiento vigente y observado</div>' +
+    return '<div class="asg-sec-t" style="margin-top:16px">🧠 Conocimiento con evidencia vigente</div>' +
       '<div class="cfg-note" style="margin-bottom:9px">Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo.</div>' +
       '<div style="display:grid;gap:10px">' + products.map(product => {
         const rules = [].concat(product && product.rules || []);
@@ -549,7 +549,7 @@ Orbit.modules.aseguradoras = (function () {
       <div class="card" style="overflow:hidden;padding:0;display:flex;flex-direction:column">
         <div style="padding:20px 24px;background:linear-gradient(120deg,${a.color},#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
           <div style="display:flex;gap:13px;align-items:center">
-            <span class="asg-logo">${(a.logo || a.logoAssetRef) ? logoImg(a, 'Logo de ' + U.text(a.nombre, 'aseguradora'), 'max-width:100%;max-height:100%;object-fit:contain') : '<span>🏢<br><small>logo</small></span>'}</span>
+            <span class="asg-logo">${(a.logo || a.logoAssetRef) ? logoImg(a, 'Logo de ' + U.text(a.nombre, 'aseguradora'), 'max-width:100%;max-height:100%;object-fit:contain') : '<span aria-label="Sin logo cargado" style="font-size:28px">🏢</span>'}</span>
             <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Aseguradora · ${a.pais}</div>
               <div style="font-family:var(--f-display);font-weight:800;font-size:20px;color:#fff">${U.esc(a.nombre)}</div>
               <div style="font-size:12px;margin-top:5px;color:rgba(255,255,255,.85)">${a.vinculada !== false ? '✓ Vinculada' : 'Sin vincular'}${st.editing ? ' · <b>Editando</b>' : ''}</div></div>
@@ -887,7 +887,7 @@ Orbit.modules.aseguradoras = (function () {
   function sourceRegistryHtml(a){
     const rows=knowledgeSources(a);if(!rows.length)return '<div class="cfg-note" style="margin-top:12px">Sin fuentes registradas.</div>';
     const label=k=>k==='BOTH'?'Biblioteca + Drive':k==='DRIVE_FILE'?'Drive':'Biblioteca / conocimiento';
-    return '<div class="asg-sec-t" style="margin-top:14px">📚 Registry canónica de fuentes</div><div style="display:grid;gap:7px">'+rows.map(r=>'<div class="asg-row" data-source-registry-row="'+U.esc(r.id||'')+'" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>'+U.esc(r.nombre||'Fuente')+'</b><small class="muted" style="display:block">'+U.esc((r.taxonomyLabel||r.cat||'Otro/requiere clasificación')+' · '+label(r.storageKind)+' · '+([r.pais,r.moneda,r.ramo,r.producto,r.plan].filter(Boolean).join(' · ')||'Dimensiones pendientes'))+'</small></span><span class="badge '+(/validado/i.test(r.validationStatus||r.estado)?'ok':'neutral')+'">'+U.esc(r.validationStatus||r.estado||'Documento recibido')+'</span></div>').join('')+'</div>';
+    return '<div class="asg-sec-t" style="margin-top:14px">📚 Fuentes canónicas · Biblioteca y Drive</div><div style="display:grid;gap:7px">'+rows.map(r=>'<div class="asg-row" data-source-registry-row="'+U.esc(r.id||'')+'" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>'+U.esc(r.nombre||'Fuente')+'</b><small class="muted" style="display:block">'+U.esc((r.taxonomyLabel||r.cat||'Otro/requiere clasificación')+' · '+label(r.storageKind)+' · '+([r.pais,r.moneda,r.ramo,r.producto,r.plan].filter(Boolean).join(' · ')||'Dimensiones pendientes'))+'</small></span><span class="badge '+(/validado/i.test(r.validationStatus||r.estado)?'ok':'neutral')+'">'+U.esc(r.validationStatus||r.estado||'Documento recibido')+'</span></div>').join('')+'</div>';
   }
 
   /* ---- Documentos y Drive ---- */
@@ -897,7 +897,7 @@ Orbit.modules.aseguradoras = (function () {
     return `<div class="asg-sec">
       <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Documentos y Drive ${editing ? '<button class="btn ghost sm" id="af-add-doc">+ Documento</button>' : ''}</div>
       <div class="cfg-note" style="margin-bottom:9px"><b>Registro canónico de fuentes:</b> distingue conocimiento de Biblioteca, archivo físico Drive o ambos; conserva metadata, ubicación, hash, provenance y validación. Registrar una fuente no habilita cálculos automáticamente.</div>
-      <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="muted" style="font-size:12px">Sin documentos cargados.</div>'}</div>
+      <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="cfg-note" data-drive-empty="1"><b>Sin archivos físicos cargados en Drive desde esta ficha.</b> Las fuentes de Biblioteca/conocimiento relacionadas se muestran abajo por separado.</div>'}</div>
       ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc" style="margin-top:9px">📁 Cargar fuente</button>' : ''}
       ${sourceRegistryHtml(a)}
     </div>`;
@@ -928,11 +928,12 @@ Orbit.modules.aseguradoras = (function () {
     tarifaRamoSel[id] = tarifaRamoSel[id] || ramos[0] || '';
     const ramoSel = tarifaRamoSel[id];
     return `<div class="asg-sec">
-      <div class="asg-sec-t">🧮 Tarifas y conocimiento — sección administrativa avanzada</div>
+      <div class="asg-sec-t">🧠 Tarifas y conocimiento</div>
       <div class="cfg-note" style="margin-bottom:9px">Cada documento se organiza por país/moneda/ramo/producto (+segmento/plan/tipo de riesgo cuando aplica) y define qué puede hacerse con él (tarifas, reglas, presentación, comparativo, condiciones, casos de prueba). <b>Procesar un documento nunca habilita automáticamente</b> Cotizador/Comparativo.</div>
       <div class="asg-tarifas-est">${Object.keys(resumen).filter(k => resumen[k] > 0).map(k => `<span class="badge ${k.indexOf('incompleto') >= 0 ? 'danger' : k.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10.5px">${k} (${resumen[k]})</span>`).join('') || '<span class="muted" style="font-size:12px">Sin fuentes cargadas todavía.</span>'}</div>
-      <div style="margin-top:12px;display:grid;gap:8px">
-        ${grupos.map(g => `<div class="asg-row" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><span style="flex:1;font-size:12px">${U.esc(g.label)}</span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}" style="font-size:10px">${g.estado}</span><span class="muted" style="font-size:11px">${g.docs.length} doc(s)</span></div>`).join('') || ''}
+      <div class="asg-sec-t" style="margin-top:14px">Cobertura y estado por producto</div>
+      <div style="margin-top:8px;display:grid;gap:8px" data-knowledge-product-groups="1">
+        ${grupos.map(g => `<div class="asg-row" style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px"><span style="flex:1;font-size:12px"><b>${U.esc(g.label)}</b><small class="muted" style="display:block;margin-top:3px">${g.docs.length} fuente(s) relacionadas</small></span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}" style="font-size:10px">${g.estado}</span></div>`).join('') || '<div class="muted">Sin combinaciones de producto con fuente relacionada.</div>'}
       </div>
       ${extraKnowledgeHtml(a)}
       ${knowledgeFactsHtml(a)}

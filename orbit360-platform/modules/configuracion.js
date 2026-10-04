@@ -12,6 +12,13 @@ Orbit.modules.configuracion = (function () {
   const U = Orbit.ui, K = Orbit.kit, T = () => Orbit.tenant;
   let tab = 'marca';
   let glosPais = null;
+  let catalogLoadState = 'idle', catalogLoadError = '';
+  function hydrateCatalogs(host, force){
+    const status=Orbit.cat&&Orbit.cat.status?Orbit.cat.status():{};
+    if(!force&&status.hydrated===true&&status.syncPending===false){catalogLoadState='ready';catalogLoadError='';render(host);return;}
+    catalogLoadState='loading';catalogLoadError='';render(host);
+    Promise.resolve(Orbit.cat&&Orbit.cat.ensure?Orbit.cat.ensure(force===true):Promise.reject(new Error('CATALOG_CLIENT_MISSING'))).then(()=>{catalogLoadState='ready';catalogLoadError='';if(tab==='catalogos')render(host);}).catch(error=>{catalogLoadState='error';catalogLoadError=String(error&&error.message||error||'No disponible');if(tab==='catalogos')render(host);});
+  }
 
   const TABS = [
     ['marca', '🎨 Marca', 'cli'],
@@ -34,7 +41,7 @@ Orbit.modules.configuracion = (function () {
         <div class="cfg-body" id="cfg-body"></div>
       </div>
     </div>`;
-    host.querySelectorAll('.cfg-navi').forEach(el => el.addEventListener('click', () => { tab = el.dataset.t; if(tab==='catalogos'&&Orbit.cat&&Orbit.cat.ensure)Orbit.cat.ensure().finally(()=>render(host)); else render(host); }));
+    host.querySelectorAll('.cfg-navi').forEach(el => el.addEventListener('click', () => { tab = el.dataset.t; if(tab==='catalogos'){hydrateCatalogs(host,false);return;} render(host); }));
     paint(host);
   }
 
@@ -52,8 +59,10 @@ Orbit.modules.configuracion = (function () {
   function toggle(id, on) { return `<button class="cfg-tog ${on ? 'on' : ''}" data-tog="${id}"><span></span></button>`; }
 
   function catalogos(){
+    if(catalogLoadState==='loading')return sectionHead('Catálogos operativos','Una sola autoridad durable para Ops, Leads, edición y cotización')+'<div class="card pad" data-catalog-state="loading"><b>Confirmando catálogos canónicos…</b><div class="muted" style="margin-top:6px">La plataforma está leyendo la configuración protegida del tenant. No se usan valores locales como autoridad.</div></div>';
+    if(catalogLoadState==='error')return sectionHead('Catálogos operativos','Una sola autoridad durable para Ops, Leads, edición y cotización')+'<div class="card pad" data-catalog-state="error"><b>No fue posible confirmar los catálogos.</b><div class="muted" style="margin-top:6px">La edición permanece bloqueada hasta obtener readback canónico.</div><button class="btn primary" id="cf-cat-retry" style="margin-top:10px">Reintentar</button></div>';
     const c=Orbit.cat.all(),lines=a=>[].concat(a||[]).join('\n'),ramoNames=p=>Object.keys((c.ramosPais||{})[p]||{}).join('\n'),points=[].concat(c.puntosIngreso||[]);
-    return sectionHead('Catálogos operativos','Una sola autoridad durable para Ops, Leads, edición y cotización')+
+    return '<div data-catalog-state="ready">'+sectionHead('Catálogos operativos','Una sola autoridad durable para Ops, Leads, edición y cotización')+
       '<div class="cfg-note" style="margin-bottom:14px"><b>Catálogos del tenant:</b> los asesores se administran en Usuarios y permisos; nunca forman parte de un catálogo libre.</div>'+
       row('Canales','<textarea class="o-sel" id="cf-cat-canales" style="min-height:110px;width:min(540px,100%)">'+U.esc(lines(c.canales))+'</textarea>','Un valor por línea')+
       row('Productos / planes','<textarea class="o-sel" id="cf-cat-productos" style="min-height:110px;width:min(540px,100%)">'+U.esc(lines(c.productos))+'</textarea>','Un valor por línea')+
@@ -63,7 +72,7 @@ Orbit.modules.configuracion = (function () {
       row('Ramos Colombia','<textarea class="o-sel" id="cf-cat-ramos-co" style="min-height:130px;width:min(540px,100%)">'+U.esc(ramoNames('CO'))+'</textarea>','Conserva subramos de nombres existentes')+
       '<div class="cfg-h"><b>Puntos de ingreso</b><span>La lógica del ciclo permanece controlada; aquí se administra su etiqueta visible.</span></div><div style="display:grid;gap:10px;margin:12px 0">'+points.map((p,i)=>'<label class="ce-l">'+U.esc(p.id==='LEADS_INTERES'?'Ingreso a Leads':'Ingreso directo a cotización')+'<input class="o-sel" data-cat-point="'+i+'" value="'+U.esc(p.label||'')+'"></label>').join('')+'</div>'+
       row('Motivo del cambio','<textarea class="o-sel" id="cf-cat-motivo" style="min-height:70px;width:min(540px,100%)"></textarea>','Obligatorio para auditoría')+
-      row('Guardar catálogos','<button class="btn primary" id="cf-cat-save">Guardar catálogos</button>','El éxito se muestra solo después del readback canónico');
+      row('Guardar catálogos','<button class="btn primary" id="cf-cat-save">Guardar catálogos</button>','El éxito se muestra solo después del readback canónico')+'</div>';
   }
   async function guardarCatalogos(){
     const val=id=>(document.getElementById(id)||{}).value||'',list=id=>val(id).split(/\r?\n/).map(x=>x.trim()).filter(Boolean),reason=val('cf-cat-motivo').trim();
@@ -329,6 +338,7 @@ Orbit.modules.configuracion = (function () {
   /* ---------- wiring ---------- */
   function wire(host) {
     const catSave=document.getElementById('cf-cat-save');if(catSave)catSave.addEventListener('click',guardarCatalogos);
+    const catRetry=document.getElementById('cf-cat-retry');if(catRetry)catRetry.addEventListener('click',()=>hydrateCatalogs(host,true));
     // toggles genéricos
     host.querySelectorAll('[data-tog]').forEach(b => b.addEventListener('click', () => {
       const key = b.dataset.tog, t = T().get();

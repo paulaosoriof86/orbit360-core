@@ -1,0 +1,56 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "eaad80242e7312c8a6c3fb2d0c41820d57c0590a",
+  "visualEvidence": {
+    "status": "PAULA_TARGETED_VISUAL_REJECTED",
+    "loginObservation": {
+      "classification": "USER_INPUT_TYPO_NOT_PRODUCT_FINDING",
+      "observedEmail": "carlos.castro@aysseguros.con",
+      "canonicalExpectedSuffix": ".com",
+      "authFindingCreated": false
+    },
+    "findings": [
+      "B4-003-R16-04-QUALITY-RESOLUTION-DEEPLINK-MOBILE",
+      "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION",
+      "B4-003-R16-06-CONFIG-CATALOG-FIRST-PAINT",
+      "B4-003-R16-07-RENEWABILITY-REVIEW-WORKFLOW-UX",
+      "B4-003-R16-08-INSURER-KNOWLEDGE-HIERARCHY"
+    ]
+  },
+  "causalDiagnosis": {
+    "quality": "Quality action used #/polizas?p=<id>; polizas route does not consume p. Internal calendarAuthority token was rendered directly and mobile reused desktop table.",
+    "receipts": "With explicit policy.cuotas, receiptCalendarProjection accepted undenominated ordinal rows as current even when an N/N row for the same ordinal existed.",
+    "configuration": "Catalog tab awaited Orbit.cat.ensure before repaint, causing an empty body during authenticated canonical read.",
+    "renewability": "UNKNOWN remained correctly fail-closed but Review lacked source/classification instructions.",
+    "insurerKnowledge": "Canonical source states were present but summary merged mapped+validated, empty dimensions rendered as em-dash chains, physical Drive emptiness was not distinguished from Library knowledge."
+  },
+  "productBlobs": {
+    "orbit360-platform/modules/calidad.js": "368b1f578a7500f7d8a2037962328770550ed8c3",
+    "orbit360-platform/modules/configuracion.js": "0ec30235bf676b89c85a5c0dc58b09a5e1a81193",
+    "orbit360-platform/modules/renovaciones.js": "7fa3c7a933b246b34c8021dad1e7c34cfa1844ac",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "9c817c3687d724b207227654bc2f361fa98a9148",
+    "orbit360-platform/modules/aseguradoras.js": "34dc9d7834d5204efd496d17368cd208ceac69f0",
+    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "5025ee88abaed8be499d2bacf57796cc77a5736f",
+    "orbit360-platform/index.html": "099e17a7ec0cce6502f68f4d8bbbd907e4aed9da"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "dc6e23b6df420a3f62edeaa24d612c4ff68e9317",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "5568d97cdd17b44ec4faf23ee98ce8b3182c5e20"
+  },
+  "invariants": {
+    "noLive": true,
+    "noReimport": true,
+    "dataMutation": false,
+    "operationalBusinessWrites": 0,
+    "authRelaxed": false,
+    "localCatalogAuthorityFallback": false,
+    "performanceThresholdMs": 2500,
+    "quoteAuthority": "gravicentra-quote-authority-v1",
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
