@@ -405,7 +405,8 @@ try{
    document.querySelector('#asg-ficha [data-tab="documentos"]')?.click();
    document.querySelector('#asg-ficha #af-imp-doc')?.click();
    Orbit.importa.open=originalOpen;
-   return{canonicalCount:canonical.length,metrics,captures,text:String(box.innerText||''),hierarchy};
+   const registry=document.querySelector('#asg-ficha details[data-source-registry-row]');if(registry)registry.open=true;const registryDetail=registry?.querySelector('[data-source-registry-detail]');
+   return{canonicalCount:canonical.length,metrics,captures,text:String(box.innerText||''),hierarchy,registry:{present:!!registry,open:!!registry?.open,detailPresent:!!registryDetail,detailText:String(registryDetail?.innerText||'').replace(/\s+/g,' ').trim()}};
  },knowledgeProbe.aseguateId);
  const related=proof.r12InsurerKnowledge.metrics.find(x=>x.label==='Fuentes relacionadas');
  need(!!related&&related.value===proof.r12InsurerKnowledge.canonicalCount&&related.value>0,'B4_003_R12_INSURER_KPI_CANONICAL_COUNT_MISMATCH');
@@ -414,6 +415,8 @@ try{
  need(['Fuentes relacionadas','Validadas','Requieren revisión','Archivo físico en Drive'].every(x=>metricLabels.includes(x))&&!metricLabels.includes('Mapeadas / validadas')&&!metricLabels.includes('Con archivo confirmado'),'B4_003_R16_08_INSURER_HIERARCHY_METRICS_AMBIGUOUS:'+JSON.stringify(metricLabels));
  need(proof.r12InsurerKnowledge.hierarchy?.productGroupsPresent===true&&proof.r12InsurerKnowledge.hierarchy?.hasHumanProductHeading===true&&!/—\s*·\s*—/.test(proof.r12InsurerKnowledge.hierarchy?.productGroupsText||''),'B4_003_R16_08_INSURER_PRODUCT_HIERARCHY_NOT_HUMAN:'+JSON.stringify(proof.r12InsurerKnowledge.hierarchy));
  proof.assertions.insurerKnowledgeHierarchyHuman=true;
+ need(proof.r12InsurerKnowledge.registry?.present===true&&proof.r12InsurerKnowledge.registry?.open===true&&proof.r12InsurerKnowledge.registry?.detailPresent===true&&/Clasificación/.test(proof.r12InsurerKnowledge.registry?.detailText||'')&&/Ubicación/.test(proof.r12InsurerKnowledge.registry?.detailText||''),'B4_003_R17_INSURER_REGISTRY_NOT_INSPECTABLE:'+JSON.stringify(proof.r12InsurerKnowledge.registry));
+ proof.assertions.insurerSourceRegistryInspectable=true;
  const tariffCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='tarifa');
  const docCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='documento');
  need(tariffCapture?.kind==='docs-aseguradora'&&tariffCapture?.scope?.aseguradoraId===knowledgeProbe.aseguateId&&tariffCapture?.docCategory==='Tarifario','B4_003_R12_TARIFF_IMPORT_INSURER_SCOPE_MISSING');
