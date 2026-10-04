@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-04",
+  "status": "CAUSE_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
+  "findingId": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+  "evidence": {
+    "exactPreviewRunId": 37166534897,
+    "exactPreviewCandidateHead": "7552d712aa8da962e9989dd1016f957c0ac30fa7",
+    "runtimeProbe": {
+      "fileExists": false,
+      "drawerExists": false,
+      "openOwner": "Orbit.importa.open wrapper from modules/aseguradoras-v1202-import-bridge.js"
+    },
+    "coreImporterBlob": "31aee47b3773da7d7f46df7915c29bc7104c0b1d",
+    "shadowBridgeBlob": "fd23b68763ad6787d03d24e6251a6ee7f8344903",
+    "indexBlob": "398ff1c8b8f0f0da83d67e4297c26e85e00d50d3",
+    "facts": [
+      "core/importa.js contains the R13 durable Drive upload/readback path for docs-aseguradora.",
+      "index.html loads core/importa.js first and modules/aseguradoras-v1202-import-bridge.js later.",
+      "The later bridge replaces Orbit.importa.open for docs-aseguradora and routes to openInsurerDocumentImport.",
+      "That legacy bridge path only records a proposal/external HTTPS reference and explicitly does not store the selected file.",
+      "Therefore the approved R13 Drive path is unreachable from the current Aseguradoras upload entrypoint."
+    ]
+  },
+  "rootCause": "LATE_LEGACY_INSURER_IMPORT_BRIDGE_SHADOWS_R13_DURABLE_DRIVE_IMPORT_OWNER",
+  "allowedProductFiles": [
+    "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+    "orbit360-platform/index.html"
+  ],
+  "allowedQaFiles": [
+    "tools/gravicentra-i6-5-b4-003-contract.mjs"
+  ],
+  "requiredFix": [
+    "Keep v1202 bridge ownership for insurer directory import and safe new-insurer creation.",
+    "For docs-aseguradora, delegate to the captured canonical originalImportOpen from core/importa.js.",
+    "Make mod.importarDocumentoSeguro delegate to the same canonical docs-aseguradora owner.",
+    "Cache-bust the bridge and add a contract assertion preventing the legacy document owner from shadowing the canonical Drive path."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "visualRedesign": false
+  },
+  "nextAction": "B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_SOURCE_FIX"
+}
