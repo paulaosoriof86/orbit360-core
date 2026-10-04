@@ -30,7 +30,7 @@ test('S4.96 restores canonical typography and a contained editorial hero',()=>{
 test('S4.96 restores the four-stage state machine and back semantics',()=>{
   const h=S.html();
   for(const label of ['Lo que necesitas','Tus datos','Revisar opciones','Comparar y continuar']) assert.ok(h.includes(label),label);
-  for(const token of ['stage:1','maxStage:1','function setStage(n)','function advance()','function back()','state.stage--','if(n>state.maxStage)return']) assert.ok(h.includes(token),token);
+  for(const token of ['stage:0','maxStage:0','function setStage(n)','function advance()','function back()','state.stage--','if(n>state.maxStage)return']) assert.ok(h.includes(token),token);
   assert.match(h,/if\(state\.stage<3\)\{state\.stage\+\+/);
   assert.match(h,/if\(state\.stage>0\)\{state\.stage--/);
 });
@@ -82,6 +82,7 @@ test('S4.96 preserves Brand -> Model -> Year and explicit assisted fallback',()=
   assert.match(h,/No encuentro mi línea \/ modelo/);
   assert.match(h,/modelYear/);
   assert.match(h,/No forzamos una selección incorrecta/);
+  assert.match(h,/consentMissing=f\.id==='consent'/);
 });
 
 test('S4.96 keeps a deterministic product visual and does not replace every assisted route with Priscila',()=>{
