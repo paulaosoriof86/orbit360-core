@@ -213,12 +213,12 @@ need(/core\/ciclo\.js\?v=20261004-r16p2/.test(index),'B4_003_R14A_CYCLE_CACHE_BI
 need(/modules\/cronograma\.js\?v=20261003-b4003r5/.test(index),'B4_003_CRONOGRAMA_CACHE_BINDING_MISSING');
 need(/store-firestore-product-operational-p0\.js\?v=20261003-b4003r3/.test(index),'B4_003_STORE_CACHE_BINDING_MISSING');
 need(/modules\/cliente360\.js\?v=20261004-b4003r14p2/.test(index),'B4_003_CLIENT360_R11_CACHE_BINDING_MISSING');
-need(/modules\/calidad\.js\?v=20261004-r16p1/.test(index),'B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING');
-need(/modules\/aseguradoras\.js\?v=20261004-r16/.test(index),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
+need(/modules\\/calidad\\.js\\?v=20261004-r16p4/.test(index),'B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING');
+need(/modules\\/aseguradoras\\.js\\?v=20261004-r16p4a/.test(index),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
 need(/core\/importa\.js\?v=20261004-r16/.test(index),'B4_003_IMPORTER_R13_CACHE_BINDING_MISSING');
 need(/modules\/aseguradoras-v1202-import-bridge\.js\?v=20261004-b4003r13d/.test(index),'B4_003_R13_INSURER_IMPORT_BRIDGE_CACHE_BINDING_MISSING');
-need(/core\/client-insurer-visual-contract-v20260720\.js\?v=20261003-b4003r12/.test(index),'B4_003_INSURER_VISUAL_R12_CACHE_BINDING_MISSING');
-need(/modules\/policy-receipts-v1199-detail-guard\.js\?v=20261004-r16/.test(index),'B4_003_POLICY_DETAIL_R13_CACHE_BINDING_MISSING');
+need(/core\\/client-insurer-visual-contract-v20260720\\.js\\?v=20261004-r16p4/.test(index),'B4_003_INSURER_VISUAL_R12_CACHE_BINDING_MISSING');
+need(/modules\\/policy-receipts-v1199-detail-guard\\.js\\?v=20261004-r16p4/.test(index),'B4_003_POLICY_DETAIL_R13_CACHE_BINDING_MISSING');
 need(/modules\/policy-receipts-v1199-bridge\.js\?v=20261003-b4003r11/.test(index),'B4_003_POLICY_BRIDGE_R11_CACHE_BINDING_MISSING');
 need(/styles\/infra\.css\?v=20261003-b4003r11/.test(index),'B4_003_INFRA_R11_CACHE_BINDING_MISSING');
 
