@@ -2210,20 +2210,22 @@
     {
       "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
       "block": "B4",
-      "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "SOURCE_FIXED_R13P3_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "orbit360-platform/modules/polizas.js + orbit360-platform/core/router.js",
       "targetGate": "B4-003",
       "closureCondition": "Authenticated route and first usable render meet performance budget without browser unresponsive dialog.",
       "source": "PAULA_R13",
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
-      "classification": "PRODUCT_PERFORMANCE_DEFECT_DEMONSTRATED",
+      "nextAction": "B4_003_R13P3_CONTRACT_AND_EXACT_PREVIEW",
+      "classification": "PRODUCT_PERFORMANCE_DEFECT_SOURCE_FIXED_R13P3",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
       "runtimeDiagnosticReceiptBlobSha": "db13f0b8bf0a200bac53033b090db798f684854c",
       "runtimeRootFixReceiptBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
-      "failedRunId": 37162367038
+      "failedRunId": 37162367038,
+      "runtimeP3DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_CAUSAL_DIAGNOSTIC_20261003.json",
+      "runtimeP3RootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_ROOTFIX_20261003.json"
     },
     {
       "id": "B4-003-R13-06-POLICY-SEARCH-FREEZE",
@@ -2430,7 +2432,7 @@
     "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
     "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
   ],
-  "b4AdvanceRule": "B4-004 remains held until exact Preview closes all R13 machine proofs and Paula gives targeted visual PASS.",
+  "b4AdvanceRule": "B4-004 remains held until all R13 blocking B4-003 findings have exact Preview evidence-backed closure and Paula targeted visual PASS.",
   "liveRule": {
     "required": "Every attention item marked/derived as pre-live debt must have explicit final disposition; no silent omission.",
     "noLiveUntilB4_007": true
@@ -2449,5 +2451,6 @@
   "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
   "r13PolicyVisualLineageReceiptBlobSha": "241a16d434c9d7eb94246a81925e9cbedd183824",
   "r13PolicyRouteRuntimeDiagnosticBlobSha": "db13f0b8bf0a200bac53033b090db798f684854c",
-  "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad"
+  "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
+  "r13PolicyRuntimeP3RootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_ROOTFIX_20261003.json"
 }
