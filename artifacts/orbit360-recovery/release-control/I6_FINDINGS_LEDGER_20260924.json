@@ -7149,7 +7149,12 @@
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
       "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
-      "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9"
+      "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9",
+      "runtimeScopeRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_CLIENT360_RUNTIME_SCOPE_ROOTFIX_20261004.json",
+      "runtimeScopeRootFixBlobSha": "4497c0f1b492061e73f3ad38101eb9971e99280d",
+      "lastFailedRunId": 37186271495,
+      "lastFailedJobId": 111389013312,
+      "lastFailure": "CLIENT360_STALE_DIAGNOSTIC_REFERENCE_CLIENTBATCH"
     },
     {
       "id": "B4-003-R14-05-QUALITY-VISUAL-GRAMMAR-COMPLETENESS",
