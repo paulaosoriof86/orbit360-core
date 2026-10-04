@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "ays-cotcomp-s495-premium-refinement-lab-intent-v1.0",
+  "authorization": "S495_DEPLOY_PREMIUM_REFINEMENT",
+  "authorizedSourceParent": "03913f7ccee4ea92b5825d0d0d2a7e71e8520b0b",
+  "projectId": "ays-orbit-360-lab",
+  "functionName": "cotcompPremiumVisualPreviewS495",
+  "parentFunction": "cotcompPremiumVisualPreviewS494",
+  "parentVersion": "ays-cotcomp-s494-premium-visual-polish-v1.0",
+  "priscilaSourceSha": "5a5ea22a1da84f97e123b5a1142951867bcd65729babfef9425dccdf4a14b717",
+  "priscilaDerivativeSha": "7fa88afd9031c66cca3e532bba2d9142eac8d3d4c22a445857156915dcc7afc9",
+  "heroRefinement": true,
+  "otherConsultativePhoto": true,
+  "priscilaSelectiveIntegration": true,
+  "antiTruncation": true,
+  "interactionRefinement": true,
+  "productFamilyCount": 7,
+  "fixtureOnly": true,
+  "providerDeploymentAuthorized": false,
+  "cotcompRealTransportAuthorized": false,
+  "production": false,
+  "scope": "LAB visual and interaction refinement only; no real provider transport, no production, no real data writes"
+}
