@@ -66,7 +66,7 @@ function html(){
 .product-scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}.product-scene img{width:88%;max-height:250px;object-fit:contain;display:block}
 .product-scene.generic{padding:28px;text-align:center}.generic-art{width:220px;height:160px;border-radius:30px;background:linear-gradient(135deg,var(--sceneA),var(--sceneB));display:grid;place-items:center;box-shadow:0 26px 50px -28px rgba(0,0,0,.4);position:relative;overflow:hidden}.generic-art:before{content:"";position:absolute;width:160px;height:160px;border-radius:50%;border:26px solid rgba(255,255,255,.26);top:-30px;right:-35px}.generic-art svg{width:78px;height:78px;color:#fff;position:relative;z-index:1}.visual-note{position:absolute;top:16px;right:18px;background:rgba(255,255,255,.92);border:1px solid #E7E2D6;border-radius:13px;padding:10px 12px;box-shadow:0 14px 34px -24px rgba(0,0,0,.38);font-size:10px;line-height:1.25}.visual-note strong{display:block;font-size:11px}.handnote{position:absolute;right:18px;bottom:20px;max-width:150px;font-family:'Newsreader',serif;font-style:italic;font-size:14px;line-height:1.25;color:#413b35}
 .section-title{font-family:'Archivo';font-weight:800;font-size:15px;margin:0 0 10px}.family-row{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.family{min-height:74px;border:1px solid #E6E0D8;background:#fff;border-radius:10px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#3f3a34;font-size:10px;line-height:1.15}.family svg{width:22px;height:22px;margin-bottom:6px}.family.active{border-color:var(--red);box-shadow:0 0 0 1px var(--red);background:#fffafa;color:#111}.family.active svg{color:var(--red)}
-.form-title{font-family:'Archivo';font-size:14px;font-weight:800;margin:14px 0 8px}.form-row{display:grid;grid-template-columns:1fr 1.4fr .72fr .95fr;gap:8px}.field{position:relative}.field label{position:absolute;left:12px;top:6px;font-size:9px;color:#8b857d;z-index:2}.field input,.field select{width:100%;min-height:50px;border:1px solid #DDD6CE;border-radius:9px;background:#fff;padding:18px 34px 7px 12px;font-size:13px;color:#241f1b}.field input:focus,.field select:focus{border-color:var(--red);outline:3px solid rgba(228,0,43,.08)}.cta{border:0;border-radius:10px;background:var(--red);color:#fff;font-weight:800;font-size:13px}.privacy{font-size:10px;color:#8C867E;margin-top:8px}
+.form-title{font-family:'Archivo';font-size:14px;font-weight:800;margin:14px 0 8px}.form-row{display:grid;grid-template-columns:1fr 1.4fr .72fr .95fr;gap:8px}.field{position:relative}.field label{position:absolute;left:12px;top:6px;font-size:9px;color:#8b857d;z-index:2}.field input,.field select{width:100%;min-height:50px;border:1px solid #DDD6CE;border-radius:9px;background:#fff;padding:18px 34px 7px 12px;font-size:13px;color:#241f1b}.field input:focus,.field select:focus{border-color:var(--red);outline:3px solid rgba(228,0,43,.08)}.combo-wrap{position:relative}.combo-list{position:absolute;z-index:40;left:0;right:0;top:calc(100% + 4px);display:none;max-height:220px;overflow:auto;background:#fff;border:1px solid #D8D0C6;border-radius:9px;padding:5px;box-shadow:0 18px 40px -22px rgba(0,0,0,.34)}.combo-list.open{display:block}.combo-opt{padding:8px 9px;border-radius:7px;font-size:11px}.combo-opt:hover,.combo-opt.active{background:#F4F1EA}.fallback-link{display:block;margin-top:5px;padding:0;border:0;background:none;color:var(--red2);font-size:9.5px;font-weight:700;text-align:left}.cta{border:0;border-radius:10px;background:var(--red);color:#fff;font-weight:800;font-size:13px}.privacy{font-size:10px;color:#8C867E;margin-top:8px}
 .compare{padding:12px 18px 14px;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:12px}
 .compare-main{min-width:0}.compare-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:9px}.compare-head h3{font-family:'Archivo';font-size:14px;margin:0}.compare-link{font-size:10px;color:var(--red2);font-weight:700}
 .alternatives{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.alt{border:1px solid #E4DED6;border-radius:10px;background:#fff;padding:10px 11px;min-width:0}.alt-top{display:flex;align-items:center;gap:8px}.insurer-mark{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:11px;background:var(--mark)}.alt h4{font-size:12px;margin:0}.alt-price{margin-left:auto;font-family:'Archivo';font-size:17px;font-weight:800}.alt-price small{display:block;font-family:'Instrument Sans';font-size:8px;font-weight:500;text-align:right;color:#888}.alt-body{display:grid;grid-template-columns:1.05fr .95fr;gap:8px;margin-top:9px}.checks{font-size:9px;line-height:1.55}.checks span{display:block}.bars{display:flex;flex-direction:column;gap:7px}.barrow{display:grid;grid-template-columns:66px 1fr;gap:6px;align-items:center;font-size:8px;color:#7b756e}.bar{height:5px;background:#E9E5E0;border-radius:999px;overflow:hidden}.bar b{display:block;height:100%;width:var(--w);background:var(--red);border-radius:999px}.details{margin-top:8px;width:100%;min-height:27px;border:1px solid var(--red);border-radius:7px;background:#fff;color:var(--red2);font-size:9px;font-weight:700}
@@ -228,15 +228,54 @@ function html(){
   async function renderVehicleForm(){
     formTitle.textContent='2. Ingresa los datos de tu vehículo';
     const years=await loadYears();
-    formRow.innerHTML='<div class="field"><label>Marca</label><select id="brandSel"><option>'+esc(brand)+'</option></select></div><div class="field"><label>Línea / modelo</label><select id="modelSel"><option>'+esc(model)+'</option></select></div><div class="field"><label>Año</label><select id="yearSel">'+([year,...years.filter(y=>String(y)!==year)].slice(0,25).map(y=>'<option>'+esc(y)+'</option>').join(''))+'</select></div><button class="cta" type="button">Cotizar y comparar →</button>';
-    const bsel=document.getElementById('brandSel'),msel=document.getElementById('modelSel'),ysel=document.getElementById('yearSel');
     await loadBrands();
-    const matched=brands.find(x=>x.label===brand)||brands[0];
-    bsel.innerHTML=brands.slice(0,120).map(x=>'<option value="'+esc(x.brandId)+'"'+(x.label===brand?' selected':'')+'>'+esc(x.label)+'</option>').join('');
-    if(matched){await loadModels(matched.brandId);msel.innerHTML=models.slice(0,160).map(x=>'<option value="'+esc(x.modelId)+'"'+(x.label===model?' selected':'')+'>'+esc(x.label)+'</option>').join('')}
-    bsel.addEventListener('change',async()=>{brand=bsel.options[bsel.selectedIndex].text;await loadModels(bsel.value);msel.innerHTML=models.slice(0,160).map(x=>'<option value="'+esc(x.modelId)+'">'+esc(x.label)+'</option>').join('');model=msel.options[0]?msel.options[0].text:'';renderVisual()});
-    msel.addEventListener('change',()=>{model=msel.options[msel.selectedIndex].text;renderVisual()});
+    let matched=brands.find(x=>x.label===brand)||brands[0]||null;
+    if(matched){brand=matched.label;await loadModels(matched.brandId)}
+    if(models.length && !models.some(x=>x.label===model)) model=models[0].label;
+    formRow.innerHTML=
+      '<div class="field"><label>Marca</label><div class="combo-wrap"><input id="brandInput" role="combobox" aria-expanded="false" aria-controls="brandList" autocomplete="off" value="'+esc(brand)+'" placeholder="Escribe para buscar"><div id="brandList" class="combo-list" role="listbox"></div></div><button id="brandFallback" class="fallback-link" type="button">No encuentro mi marca</button></div>'+
+      '<div class="field"><label>Línea / modelo</label><div class="combo-wrap"><input id="modelInput" role="combobox" aria-expanded="false" aria-controls="modelList" autocomplete="off" value="'+esc(model)+'" placeholder="Escribe para buscar"><div id="modelList" class="combo-list" role="listbox"></div></div><button id="modelFallback" class="fallback-link" type="button">No encuentro mi línea / modelo</button></div>'+
+      '<div class="field"><label>Año</label><select id="yearSel">'+([year,...years.filter(y=>String(y)!==year)].slice(0,35).map(y=>'<option>'+esc(y)+'</option>').join(''))+'</select></div>'+
+      '<button class="cta" type="button">Cotizar y comparar →</button>';
+
+    const bi=document.getElementById('brandInput'),bl=document.getElementById('brandList');
+    const mi=document.getElementById('modelInput'),ml=document.getElementById('modelList');
+    const ysel=document.getElementById('yearSel');
+    const bf=document.getElementById('brandFallback'),mf=document.getElementById('modelFallback');
+
+    const open=(list,input)=>{list.classList.add('open');input.setAttribute('aria-expanded','true')};
+    const close=(list,input)=>{list.classList.remove('open');input.setAttribute('aria-expanded','false')};
+    const renderBrandList=()=>{
+      const q=norm(bi.value);
+      const rows=brands.filter(x=>!q||norm(x.label).includes(q)).slice(0,70);
+      bl.innerHTML=rows.map(x=>'<div class="combo-opt" role="option" data-id="'+esc(x.brandId)+'" data-label="'+esc(x.label)+'">'+esc(x.label)+'</div>').join('');
+      open(bl,bi);
+    };
+    const renderModelList=()=>{
+      const q=norm(mi.value);
+      const rows=models.filter(x=>!q||norm(x.label).includes(q)).slice(0,90);
+      ml.innerHTML=rows.map(x=>'<div class="combo-opt" role="option" data-id="'+esc(x.modelId)+'" data-label="'+esc(x.label)+'">'+esc(x.label)+'</div>').join('');
+      open(ml,mi);
+    };
+    bi.addEventListener('focus',renderBrandList);
+    bi.addEventListener('input',renderBrandList);
+    bl.addEventListener('mousedown',async e=>{
+      e.preventDefault();const x=e.target.closest('[data-id]');if(!x)return;
+      brand=x.dataset.label;bi.value=brand;close(bl,bi);model='';mi.value='';models=[];
+      await loadModels(x.dataset.id);renderModelList();mi.focus();renderVisual();
+    });
+    mi.addEventListener('focus',()=>{if(models.length)renderModelList()});
+    mi.addEventListener('input',renderModelList);
+    ml.addEventListener('mousedown',e=>{
+      e.preventDefault();const x=e.target.closest('[data-id]');if(!x)return;
+      model=x.dataset.label;mi.value=model;close(ml,mi);renderVisual();
+    });
     ysel.addEventListener('change',()=>{year=ysel.value;renderVisual()});
+    const assisted=()=>{
+      onlineTab.classList.remove('active');assistTab.classList.add('active');
+      productVisual.insertAdjacentHTML('beforeend','<div class="visual-note" style="top:auto;bottom:15px;left:15px;right:auto"><strong>Revisión asistida</strong>No forzaremos una opción incorrecta.</div>');
+    };
+    bf.addEventListener('click',assisted);mf.addEventListener('click',assisted);
   }
 
   function renderGenericForm(){
