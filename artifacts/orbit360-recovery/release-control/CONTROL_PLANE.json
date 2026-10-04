@@ -5487,6 +5487,23 @@
           "noDeletes": true,
           "noInserts": true
         }
+      },
+      "r13PostRenewalApplyPreviewDispatch": {
+        "status": "REQUESTED",
+        "reason": "POST_RENEWAL_DETERMINISTIC_APPLY_EXACT_PREVIEW",
+        "renewalApplyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
+        "renewalApplyReceiptBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e",
+        "priorHead": "c7bbe7f79589b5f9e49b68f9f228c842f0dca057",
+        "expectedRenewabilityDistribution": {
+          "YES": 4,
+          "NO": 0,
+          "UNKNOWN": 1415
+        },
+        "conflictHold": "VA-43685",
+        "productSourceChanged": false,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false
       }
     }
   },
@@ -6449,6 +6466,23 @@
         "noDeletes": true,
         "noInserts": true
       }
+    },
+    "r13PostRenewalApplyPreviewDispatch": {
+      "status": "REQUESTED",
+      "reason": "POST_RENEWAL_DETERMINISTIC_APPLY_EXACT_PREVIEW",
+      "renewalApplyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
+      "renewalApplyReceiptBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e",
+      "priorHead": "c7bbe7f79589b5f9e49b68f9f228c842f0dca057",
+      "expectedRenewabilityDistribution": {
+        "YES": 4,
+        "NO": 0,
+        "UNKNOWN": 1415
+      },
+      "conflictHold": "VA-43685",
+      "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
     }
   },
   "b4VisualAcceptanceControl": {
