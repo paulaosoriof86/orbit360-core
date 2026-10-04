@@ -1,0 +1,14 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13P3_PREVIEW_GATE_NOOP_ROOTFIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_GOVERNANCE_GATE_MISMATCH_DEMONSTRATED_FIX_AUTHORIZED",
+  "failedRunId": 37163576092,
+  "failureCode": "B4_003_PREVIEW_MODE_NOOP",
+  "cause": "P3-specific source-fixed status fell outside the executor's frozen accepted status regex R(5|9|10|11|12|13), while the canonical R13 contract also requires the generic R13 source-fixed status.",
+  "fix": "Keep generic B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW as the gate status and retain P3 lineage in policyRouteRuntimeP3RootFix.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
