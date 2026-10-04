@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_QA_HIDDEN_FILE_INPUT_ROOTFIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "findingId": "B4-003",
+  "failedRunId": 37165820718,
+  "failedJobId": 111328370701,
+  "failureCode": "PLAYWRIGHT_VISIBLE_SELECTOR_TIMEOUT_IMP_FILE",
+  "rootCause": "The importer intentionally renders #imp-file with display:none behind a visible label. The QA harness required the hidden input to be visible even though setInputFiles supports attached hidden file inputs.",
+  "fix": {
+    "proofPath": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "proofBlobSha": "af5e082c37f583f8dd3cd075ef65c0572eff065b",
+    "selectorContract": "wait for #imp-file state=attached, then use setInputFiles",
+    "additionalTelemetry": "Print B4_003_RENEWAL_RENDER_STABILITY immediately after the renewal stability window."
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": 0,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
