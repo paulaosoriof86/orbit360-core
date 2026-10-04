@@ -23,5 +23,6 @@ module.exports = Object.assign(
   require('./cotcomp-owner-authorized-comparative-preview-s492'),
   require('./cotcomp-authorized-fidelity-preview-s493'),
   require('./cotcomp-premium-visual-preview-s494'),
-  require('./cotcomp-premium-visual-preview-s495')
+  require('./cotcomp-premium-visual-preview-s495'),
+  require('./cotcomp-premium-journey-preview-s496')
 );
