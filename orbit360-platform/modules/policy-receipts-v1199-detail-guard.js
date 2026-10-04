@@ -189,13 +189,14 @@ Orbit.modules = Orbit.modules || {};
   function grid(items, cols) {
     return `<div class="orbit-detail-grid" style="display:grid;grid-template-columns:repeat(${cols || 3},minmax(0,1fr));gap:13px 18px">${items.join('')}</div>`;
   }
+  const isVehiclePolicy = p => /vehicul|autom[oó]vil|auto individual|motocicleta|flotilla|gr[uú]a/i.test(`${safe(p&&p.ramo)} ${safe(p&&p.subramo)} ${safe(p&&p.producto)}`);
   function policyCompleteness(p, vehicle) {
     const gaps=[];
     if (numberOrNull(p.primaNeta) == null) gaps.push('prima neta');
     if (numberOrNull(p.primaTotal) == null) gaps.push('prima total');
     if (!safe(p.concepto)) gaps.push('riesgo / concepto');
     if (numberOrNull(p.sumaAsegurada) == null) gaps.push('suma asegurada');
-    if (/vehicul|auto/i.test(`${safe(p.ramo)} ${safe(p.subramo)} ${safe(p.producto)}`)) {
+    if (isVehiclePolicy(p)) {
       if (!vehicle) gaps.push('vehículo vinculado');
       else {
         const V=vehicleVisual(vehicle);
@@ -259,7 +260,13 @@ Orbit.modules = Orbit.modules || {};
       if(Math.abs(delta)<=tol)return;
       const explicitSource=first(p.primaFuente,p.primaSource,p.primaSourceRef,p.sourceDocumentId,p.sourceRef,p.importSource,p.fuente);
       const contractualSource=explicitSource?String(explicitSource):(p.primaTotal!=null&&p.primaTotal!==''?'Póliza · prima total':p.prima!=null&&p.prima!==''?'Póliza · prima':'Fuente contractual no identificada');
-      issues.push({p,total,schedule,delta:Math.abs(delta)<0.0000001?0:delta,tolerance:tol,receipts:sch.rows.length,rows:sch.rows,reviewRows:sch.reviewRows.length,shadowRows:sch.shadowRows.length,calendarAuthority:sch.calendarAuthority,contractualSource,reason:'La suma del calendario activo difiere de la prima contractual por encima de la tolerancia configurada.'});
+      let reason='';
+      if(sch.reviewRows.length) reason='Hay '+sch.reviewRows.length+' recibo(s) con numeración o plan incompatible pendientes de validar; no forman parte del calendario activo hasta confirmar la fuente.';
+      else if(sch.calendarAuthority==='NO_DENOMINATOR') reason='Los recibos activos no confirman una secuencia N/N; valida periodicidad, cantidad de cuotas y montos antes de corregir.';
+      else if(sch.calendarAuthority==='AMBIGUOUS_FAIL_CLOSED') reason='Existen calendarios incompatibles y la plataforma no puede elegir uno por inferencia; valida la fuente que gobierna esta vigencia.';
+      else if(sch.shadowRows.length) reason='Se excluyeron '+sch.shadowRows.length+' registro(s) histórico(s) duplicado(s); el calendario activo aún '+(delta>0?'supera':'queda por debajo de')+' la prima contractual.';
+      else reason='El calendario activo '+(delta>0?'suma más':'suma menos')+' que la prima contractual; valida cuotas y montos contra la fuente antes de modificar.';
+      issues.push({p,total,schedule,delta:Math.abs(delta)<0.0000001?0:delta,tolerance:tol,receipts:sch.rows.length,rows:sch.rows,reviewRows:sch.reviewRows.length,shadowRows:sch.shadowRows.length,calendarAuthority:sch.calendarAuthority,contractualSource,reason});
     });
     return issues.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
   }
@@ -440,7 +447,7 @@ Orbit.modules = Orbit.modules || {};
           <div class="gi-payment-conditions">${grid([
             field('Frecuencia', first(p.frecuencia, p.forma)), field('Forma de pago', p.formaPago), field('Conducto', p.conducto)
           ],3)}</div>`)}
-          ${section('🚘 Riesgo asegurado / vehículo', vehiclesReady ? vehicleCard(vehicle, cur, p.id, p.clienteId) : '<div class="muted" data-policy-vehicle-loading="1">Actualizando vehículo y relaciones…</div>')}
+          ${isVehiclePolicy(p) ? section('🚘 Riesgo asegurado / vehículo', vehiclesReady ? vehicleCard(vehicle, cur, p.id, p.clienteId) : '<div class="muted" data-policy-vehicle-loading="1">Actualizando vehículo y relaciones…</div>') : ''}
           ${section('🧾 Recibos y cartera', receiptsReady ? ((pb.shadowCount?'<div class="cfg-note" data-receipt-shadow-exclusion="1" style="margin-bottom:10px"><b>'+pb.shadowCount+' registro(s) legado(s) duplicado(s) excluido(s) del calendario activo.</b> Se conservan en histórico; no se borraron ni se usaron para recalcular la prima.</div>':'')+receiptRows(p.id, cur)) : '<div class="muted" data-policy-receipts-loading="1">Actualizando calendario y cartera…</div>')}
         </div>
         <div style="display:grid;gap:16px;min-width:0">
@@ -632,7 +639,7 @@ Orbit.modules = Orbit.modules || {};
 
   Orbit.policyVehicleReadModelV1199c = {
     version: '20260731.1', ownerRevision:'20260731.4-human-visual',
-    policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, receiptSchedule, financialIntegrityBatch, premiumBreakdown, reconciliationTolerance, openVehicleLinker, vehicleCandidates, renewalEligible, startRenewal, deletePolicy, deleteVehicle,
+    policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, isVehiclePolicy, receiptSchedule, financialIntegrityBatch, premiumBreakdown, reconciliationTolerance, openVehicleLinker, vehicleCandidates, renewalEligible, startRenewal, deletePolicy, deleteVehicle,
     fullPagePolicy: true, fullPageVehicle: true,
     indexedClientSummary: true,
     writesStore: false,
