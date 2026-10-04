@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_POST_MACHINE_GOVERNANCE_ALIGNMENT_V1",
+  "recordedAt": "2026-10-04T22:27:00Z",
+  "status": "GOVERNANCE_DRIFT_CORRECTED_NO_PRODUCT_CHANGE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "originHead": "2c3de01fd55c14de2dc7ec3854c1eb59f840e08a",
+  "cause": "Post-machine hold advanced B4-003 parent status but left currentB4 exact-preview identity, Carry parent/binding, and blocking child lifecycle states on pre-machine values.",
+  "preservedExactArtifact": {
+    "sourceSha": "7dc809340f95d3d559912ca6427859a380a879e3",
+    "buildId": "gi-i65-b4-7dc809340f95-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37228202621-s43jo3pb.web.app",
+    "runId": 37228202621,
+    "artifactId": 11313241549,
+    "artifactDigest": "0b05b2d8c4ed5dc3cb01ace386cdb20c3fdc755873f2388c0d206b721017b2e7",
+    "hostedPayloadDigest": "5085e24332853b9a15314b15ca453c0c30a9e9a390b9c065e5ac281c6e7f8c28",
+    "backendSourceDigest": "b58ed88379e2656723656ae6deb0500896696bc34a99a9e65c5dfd6e94b02f20",
+    "bundleDigest": "4638675fffaf15cfe59bec223219bdd2c01df4a2c46bd92ff88896a6b12d71d5",
+    "machineProofBlob": "8138c08b5d951bc3119f470daa98c1cd2d432dfe"
+  },
+  "transitions": {
+    "ledgerChildTransitions": 22,
+    "carryChildTransitions": 22
+  },
+  "newBlobs": {
+    "ledger": "fb36b6b2aed4895009c58eb8f20684a7344241b5",
+    "carry": "be484e603e749f2960ad84f1350b011cd6768a35",
+    "executionLock": "dac90dc42691f1bcefeeb41e5c8deb954817cffe",
+    "controlPlane": "073f04bbbc83b3ca29b9d4a9c8f954521757bde0"
+  },
+  "invariants": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "rebuild": false,
+    "previewRedeploy": false,
+    "b4004Held": true
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_TARGETED_PAULA_VISUAL"
+}
