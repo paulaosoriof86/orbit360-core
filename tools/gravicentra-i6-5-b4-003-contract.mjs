@@ -248,6 +248,7 @@ need(/function\s+calendarAuthorityLabel\s*\(/.test(quality)&&quality.includes('d
 need(!quality.includes("location.hash='#/polizas?p=")&&quality.includes('quality-fin-mobile'),'B4_003_R16_04_QUALITY_STALE_DEEPLINK_OR_MOBILE_CONTRACT_MISSING');
 need(policyDetail.includes('function receiptPlanOrdinal')&&policyDetail.includes('LEGACY_UNDENOMINATED_DUPLICATE')&&policyDetail.includes('data-receipt-shadow-exclusion'),'B4_003_R16_05_RECEIPT_SHADOW_PROJECTION_MISSING');
 need(configuracion.includes("catalogLoadState = 'idle'")&&configuracion.includes('data-catalog-state="loading"')&&configuracion.includes('hydrateCatalogs(host,false)'),'B4_003_R16_06_CATALOG_FIRST_PAINT_MISSING');
+need(configuracion.includes('plans = Orbit.PLANES || {}')&&!configuracion.includes('plan = Orbit.PLANES[t.plan]'),'B4_003_R16_06_CONFIG_PLAN_BOOTSTRAP_GUARD_MISSING');
 need(base.includes('data-renewability-review-workflow="1"')&&base.includes('Revisar y clasificar')&&base.includes('Editar póliza → Renovabilidad'),'B4_003_R16_07_RENEWABILITY_REVIEW_INSTRUCTION_MISSING');
 need(insurer.includes('Sin archivos físicos cargados en Drive desde esta ficha')&&insurer.includes('Cobertura y estado por producto')&&insurer.includes('Conocimiento vigente y observado · con evidencia'),'B4_003_R16_08_INSURER_KNOWLEDGE_HIERARCHY_MISSING');
 need(insurerVisual.includes('<span>Validadas</span>')&&insurerVisual.includes('Archivo físico en Drive')&&!insurerVisual.includes('Mapeadas / validadas'),'B4_003_R16_08_INSURER_KPI_SEMANTICS_MISSING');

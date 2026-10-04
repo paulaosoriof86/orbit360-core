@@ -2166,7 +2166,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "0c9a760035cc646603f8379f1bbfb26f8c71a951",
+  "findingLedgerBlobSha": "c4d9c60d560a991e132833e3d25a5348dc16dff7",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2586,7 +2586,7 @@
     "diagnosticRunId": 37153182332,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "findingContinuityRegisterBlobSha": "4848eb69a0f509422739712feb8bafb7061e498c",
+  "findingContinuityRegisterBlobSha": "01dfebdaf4d8a18e8e7b48e285c7241f16322cd6",
   "b4003MachinePassVisualStateReconciliation": {
     "status": "MACHINE_PASS_VISUAL_STATE_RECONCILED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_VISUAL_STATE_RECONCILIATION_20261003.json",
@@ -2814,7 +2814,7 @@
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "continuityRegisterBlobSha": "4848eb69a0f509422739712feb8bafb7061e498c",
+  "continuityRegisterBlobSha": "01dfebdaf4d8a18e8e7b48e285c7241f16322cd6",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
   "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "b4003R15VisualReview": {
@@ -3039,5 +3039,17 @@
       "reimport": false,
       "livePromotion": false
     }
+  },
+  "b4003R1604ConfigPlanBootstrapFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "failedRunId": 37225795493,
+    "productBlobs": {
+      "orbit360-platform/modules/configuracion.js": "156c97a74649177f693d3dbe5910fc419f77924f",
+      "orbit360-platform/index.html": "7f5f5b7e6322543e6833820b04b6fbb1f1366a41"
+    },
+    "contractBlobSha": "b3e32c77ac7baf9e3e01dbae873a1bf1ee3e0acd",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
+    "receiptBlobSha": "890b7c8d02d1979ea1e3706bbdb9989b718cfb1f",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   }
 }

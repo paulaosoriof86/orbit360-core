@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76",
-  "expectedLedgerNextBlobSha": "0c9a760035cc646603f8379f1bbfb26f8c71a951",
+  "expectedLedgerNextBlobSha": "c4d9c60d560a991e132833e3d25a5348dc16dff7",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -3381,16 +3381,19 @@
       "surface": "Configuración / Catálogos",
       "finding": "Al entrar a Catálogos la vista queda visualmente vacía mientras await Orbit.cat.ensure resolves.",
       "classification": "AUTHENTICATED_SURFACE_FIRST_PAINT_UX_DEFECT",
-      "rootCause": "CATALOG_TAB_CLICK_DEFERRED_RENDER_UNTIL_CANONICAL_ENSURE_COMPLETED_WITHOUT_VISIBLE_LOADING_OR_FAIL_CLOSED_ERROR_STATE",
+      "rootCause": "CATALOG_TAB_LOADING_STATE_FIXED_AND_CONFIG_PLAN_BOOTSTRAP_GUARD_REQUIRED_AFTER_EXACT_PREVIEW_PAGE_ERROR",
       "owner": [
         "orbit360-platform/modules/configuracion.js"
       ],
       "status": "SOURCE_FIXED_R16_04_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "targetGate": "B4-003",
-      "closureCondition": "Authenticated Catalogs entry paints loading state immediately, uses canonical ensure only on demand, and exposes fail-closed retry without local authority fallback.",
+      "closureCondition": "Authenticated Configuración paints without page errors even if plan registry is not initialized yet; Catalogs loading state appears immediately and canonical ready completes without local fallback.",
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "failedRunId": 37225795493,
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "890b7c8d02d1979ea1e3706bbdb9989b718cfb1f"
     },
     {
       "id": "B4-003-R16-07-RENEWABILITY-REVIEW-WORKFLOW-UX",

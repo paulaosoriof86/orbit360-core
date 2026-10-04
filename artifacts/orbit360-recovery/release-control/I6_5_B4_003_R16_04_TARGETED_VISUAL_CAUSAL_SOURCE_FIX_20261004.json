@@ -30,15 +30,15 @@
   },
   "productBlobs": {
     "orbit360-platform/modules/calidad.js": "368b1f578a7500f7d8a2037962328770550ed8c3",
-    "orbit360-platform/modules/configuracion.js": "0ec30235bf676b89c85a5c0dc58b09a5e1a81193",
+    "orbit360-platform/modules/configuracion.js": "156c97a74649177f693d3dbe5910fc419f77924f",
     "orbit360-platform/modules/renovaciones.js": "7fa3c7a933b246b34c8021dad1e7c34cfa1844ac",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "9c817c3687d724b207227654bc2f361fa98a9148",
     "orbit360-platform/modules/aseguradoras.js": "bf253d9c04db5a45acdf172993902bb266fa26ce",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "5025ee88abaed8be499d2bacf57796cc77a5736f",
-    "orbit360-platform/index.html": "5d567bb8a7f1492374f99ad79ca39a969f172d2f"
+    "orbit360-platform/index.html": "7f5f5b7e6322543e6833820b04b6fbb1f1366a41"
   },
   "qaBlobs": {
-    "tools/gravicentra-i6-5-b4-003-contract.mjs": "b8989c96a1ab9da558a4a8e506bbd767ec5c25d9",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "b3e32c77ac7baf9e3e01dbae873a1bf1ee3e0acd",
     "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "55e80951d51fbff8f2d44b66a7a3d46c6ac8d5cb"
   },
   "invariants": {
@@ -101,5 +101,19 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "qaCoverageExtension2": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "failedRunId": 37225795493,
+    "failedJobId": 111505054805,
+    "failureCode": "CONFIGURATION_PLAN_BOOTSTRAP_PAGE_ERROR",
+    "pageError": "Cannot read properties of undefined (reading 'personalizado')",
+    "rootCause": "Configuración first paint entered Marca before Orbit.PLANES was guaranteed initialized; direct Orbit.PLANES[t.plan] access threw before Catalogos could paint its loading state.",
+    "resolution": "Guard all Configuración plan reads against missing Orbit.PLANES; Marca gets truthful local display fallback, Integraciones/APIs remain fail-closed until plan authority is present.",
+    "productSourceChanged": true,
+    "noLive": true,
+    "noReimport": true,
+    "dataMutation": false,
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   }
 }

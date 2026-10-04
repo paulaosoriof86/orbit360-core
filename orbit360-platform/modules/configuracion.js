@@ -89,7 +89,7 @@ Orbit.modules.configuracion = (function () {
 
   /* ---------- MARCA ---------- */
   function marca() {
-    const t = T().get(), plan = Orbit.PLANES[t.plan] || { nombre: t.plan || 'Actual', personalizacion: true };
+    const t = T().get(), plans = Orbit.PLANES || {}, plan = plans[t.plan] || { nombre: t.plan || 'Actual', personalizacion: true };
     const lock = !plan.personalizacion;
     const b = (Orbit.publicTenantBranding && Orbit.publicTenantBranding.current && Orbit.publicTenantBranding.current()) || {};
     return `${sectionHead('Marca y apariencia', 'Identidad pública de la empresa, logo y favicon — configuración viva')}
@@ -176,7 +176,7 @@ Orbit.modules.configuracion = (function () {
 
   /* ---------- INTEGRACIONES / ADD-ONS ---------- */
   function addons() {
-    const t = T().get(), plan = Orbit.PLANES[t.plan];
+    const t = T().get(), plan = (Orbit.PLANES || {})[t.plan] || { addons: false };
     const lock = !plan.addons;
     // Catálogo amplio por categorías (ecosistema completo). on = estado guardado en tenant.addons[id]
     const CATS = [
@@ -255,7 +255,7 @@ Orbit.modules.configuracion = (function () {
 
   /* ---------- APIs ---------- */
   function apis() {
-    const t = T().get(), plan = Orbit.PLANES[t.plan];
+    const t = T().get(), plan = (Orbit.PLANES || {})[t.plan] || { apis: false };
     const lock = !plan.apis;
     return `${sectionHead('APIs y referencias de conexión', 'Conexiones seguras con el nivel de seguridad correcto')}
       ${lock ? `<div class="cfg-lock">🔒 Gestión de APIs disponible en el plan Personalizado.</div>` : ''}
@@ -278,7 +278,7 @@ Orbit.modules.configuracion = (function () {
     const t = T().get();
     return `${sectionHead('Plan contratado', 'Define qué puede personalizar el cliente')}
       <div class="cfg-grid3">
-        ${Object.values(Orbit.PLANES).map(p => `<div class="cfg-plan ${t.plan === p.id ? 'on' : ''}">
+        ${Object.values(Orbit.PLANES || {}).map(p => `<div class="cfg-plan ${t.plan === p.id ? 'on' : ''}">
           <div class="cfg-plan-h">${p.nombre}${t.plan === p.id ? '<span class="badge ok">Actual</span>' : ''}</div>
           <p>${p.desc}</p>
           <ul>
@@ -295,7 +295,7 @@ Orbit.modules.configuracion = (function () {
   function interna() {
     const t = T().get();
     const nav = Orbit.NAV.flatMap(b => b.type === 'home' ? [{ route: b.route, label: b.label, icon: b.icon }] : b.items);
-    const planes = Object.values(Orbit.PLANES).concat(loadCustomPlans());
+    const planes = Object.values(Orbit.PLANES || {}).concat(loadCustomPlans());
     return `${sectionHead('Configuración interna · Orbit', 'Solo nuestro equipo — provisioning del cliente')}
       <div class="cfg-int-banner">🔒 Esta sección NO es visible para el cliente. Aquí definimos plan, white-label y los <b>módulos activos</b> de cada cuenta.</div>
 
@@ -407,7 +407,7 @@ Orbit.modules.configuracion = (function () {
   Orbit.applyBrand = applyBrandToTopbar;
 
   function editarPlan(id) {
-    const base = Object.values(Orbit.PLANES).concat(loadCustomPlans());
+    const base = Object.values(Orbit.PLANES || {}).concat(loadCustomPlans());
     const p = base.find(x => x.id === id); if (!p) return;
     let back = document.getElementById('cf-plan-ed'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'cf-plan-ed'; back.className = 'drawer-back open';
