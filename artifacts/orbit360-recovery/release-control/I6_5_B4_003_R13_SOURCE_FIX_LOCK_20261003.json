@@ -1,15 +1,15 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-03",
-  "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
     "id": "B4-003",
-    "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC",
     "blocking": true,
     "humanVisualStatus": "REJECTED_R13",
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+    "nextAction": "B4_003_READONLY_RENEWAL_SOURCE_LINEAGE_DIAGNOSTIC"
   },
   "supersedes": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
@@ -63,7 +63,7 @@
     "B4_003_R13_EXACT_PREVIEW_MACHINE_PASS",
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_READONLY_RENEWAL_SOURCE_LINEAGE_DIAGNOSTIC",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -118,5 +118,24 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13P3_PREVIEW_GATE_NOOP_ROOTFIX_20261004.json",
     "failedRunId": 37163576092,
     "productSourceChanged": false
+  },
+  "r13RenewalSourceLineageDiagnostic": {
+    "status": "READ_ONLY_TARGET_PROVENANCE_DIAGNOSTIC_ARMED",
+    "targetPolicyNumbers": [
+      "68542",
+      "1-AP-20890",
+      "AUTO 38446",
+      "AUTO-1000000334",
+      "VA-43685"
+    ],
+    "targetRenewalPointers": [
+      "pol_muj5o5ka"
+    ],
+    "sourceAuthority": "Renovaciones (13).xlsx sha256 1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3",
+    "productSourceChanged": false,
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
