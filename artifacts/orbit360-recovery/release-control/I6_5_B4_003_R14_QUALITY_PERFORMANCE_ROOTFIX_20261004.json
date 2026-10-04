@@ -1,0 +1,61 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R14_QUALITY_PERFORMANCE_ROOTFIX_V1",
+  "recordedAt": "2026-10-04T07:20:00Z",
+  "status": "SOURCE_FIXED_R14_PERFORMANCE_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "561a29ca0b52091e38546149d61c2260c84ed4f3",
+  "sourceHead": "aef96336742f5372ce8e8b5208a2c98d09d1fd10",
+  "failedExactPreview": {
+    "runId": 37183696547,
+    "jobId": 111381171762,
+    "failureCode": "B4_003_QUALITY_SYNC_RENDER_TOO_SLOW",
+    "observed": {
+      "gtMs": 3056.2,
+      "coMs": 534.5,
+      "gtRows": 50,
+      "coRows": 17,
+      "financialGtRows": 72,
+      "financialCoRows": 2,
+      "financialGtCount": 72,
+      "financialCoCount": 2
+    },
+    "limitMs": 2500,
+    "reproducedAfterPriorRetry": true,
+    "priorRetryRunId": 37178549427
+  },
+  "rootCause": {
+    "owner": "orbit360-platform/modules/calidad.js",
+    "finding": "B4-003-R11-07-QUALITY-PERFORMANCE",
+    "classification": "REPRODUCIBLE_R14_RENDER_REGRESSION",
+    "detail": "The financial health table rendered every mismatch row synchronously and, per row, resolved the client once with store.get and again through K.clienteCell, which re-entered clientProjection/store. GT has 72 financial rows versus 2 in CO. financialIntegrityBatch is already grouped by policy and is not the N-squared path.",
+    "discriminant": "Same authenticated harness: GT 72 financial rows / 3056.2 ms versus CO 2 financial rows / 534.5 ms."
+  },
+  "fix": {
+    "type": "NARROW_PRODUCT_SOURCE_FIX",
+    "changes": [
+      "Build one country-scoped clientsById map per quality render.",
+      "Render financial client identity from the already-resolved client record instead of re-entering clientProjection for every financial row.",
+      "Keep every financial mismatch row and all values, KPIs, country scope, table semantics and client-table pageSize=50 unchanged.",
+      "Bind calidad.js with a new cache key and assert the optimized path in the B4-003 contract."
+    ],
+    "productBlobs": {
+      "orbit360-platform/modules/calidad.js": "b30767e58cd3dc60c5af5f165238c16f472632d3",
+      "orbit360-platform/index.html": "9e0f7744e1952973da998d06468959c5a11e354d"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "8a20cd46add3dd02e9c7a61ae6e732ffff59e10f"
+    }
+  },
+  "invariants": {
+    "thresholdRelaxed": false,
+    "rowsRemoved": false,
+    "financialSemanticsChanged": false,
+    "countryScopeChanged": false,
+    "clientPageSizeChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
