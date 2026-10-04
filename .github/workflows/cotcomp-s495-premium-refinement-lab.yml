@@ -1,0 +1,179 @@
+name: CotComp S4.95 premium refinement LAB
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s495-premium-refinement-lab-20261004
+    paths:
+      - '.github/cotcomp-lab-intents/s495-premium-refinement-lab-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompPremiumVisualPreviewS495
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompPremiumVisualPreviewS495
+
+jobs:
+  s495-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.95 authorization intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s495-premium-refinement-lab-authorized.json
+          jq -e '
+            .authorization=="S495_DEPLOY_PREMIUM_REFINEMENT" and
+            .projectId=="ays-orbit-360-lab" and
+            .functionName=="cotcompPremiumVisualPreviewS495" and
+            .parentFunction=="cotcompPremiumVisualPreviewS494" and
+            .priscilaSourceSha=="5a5ea22a1da84f97e123b5a1142951867bcd65729babfef9425dccdf4a14b717" and
+            .priscilaDerivativeSha=="7fa88afd9031c66cca3e532bba2d9142eac8d3d4c22a445857156915dcc7afc9" and
+            .heroRefinement==true and
+            .otherConsultativePhoto==true and
+            .priscilaSelectiveIntegration==true and
+            .antiTruncation==true and
+            .interactionRefinement==true and
+            .productFamilyCount==7 and
+            .fixtureOnly==true and
+            .providerDeploymentAuthorized==false and
+            .cotcompRealTransportAuthorized==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.95 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-premium-visual-preview-s494.js
+          node --check cotcomp-premium-visual-preview-s495.js
+          node --check cotcomp-premium-visual-preview-s495.test.js
+          node --test cotcomp-premium-visual-preview-s494.test.js
+          node --test cotcomp-premium-visual-preview-s495.test.js
+
+      - name: Prepare LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s495/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s495/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Deploy only S4.95 preview to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physically verify S4.95 premium refinement
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s495/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+
+          grep -q 'meta name="ays-candidate" content="cotcompPremiumVisualPreviewS495"' "$E/page.html"
+          grep -q 'data-s495-refinement="true"' "$E/page.html"
+          grep -q 'Cotiza y compara <em>con criterio</em>' "$E/page.html"
+          grep -q 'body\[data-s495-refinement="true"\] .hero{min-height:392px}' "$E/page.html"
+          grep -q '.hero-media{left:50%;right:0}' "$E/page.html"
+          grep -q 'object-position:center 40%' "$E/page.html"
+          grep -q 's495-consultative-photo' "$E/page.html"
+          grep -q 'Ruta con acompañamiento' "$E/page.html"
+          grep -q 'text-overflow:clip' "$E/page.html"
+          grep -q 'toggleAltDetail' "$E/page.html"
+          grep -q 'toggleComparison' "$E/page.html"
+          grep -q 'toggleRecommendation' "$E/page.html"
+          grep -q 'openAdvisorModal' "$E/page.html"
+          grep -q 'primaryAction' "$E/page.html"
+          grep -q 'id="brandInput"' "$E/page.html"
+          grep -q 'id="modelInput"' "$E/page.html"
+          grep -q 'id="yearSel"' "$E/page.html"
+          grep -q 'Aseguradora A' "$E/page.html"
+          grep -q 'Aseguradora B' "$E/page.html"
+          grep -q 'Aseguradora C' "$E/page.html"
+          grep -q 'Recomendación A&amp;S' "$E/page.html"
+          grep -q 'Datos de alternativas y precios son ilustrativos; no constituyen oferta' "$E/page.html"
+          grep -q 'Gravicentra sigue siendo la autoridad' "$E/page.html"
+          ! grep -q 'class="sidebar"' "$E/page.html"
+          ! grep -q 'getFirestore' "$E/page.html"
+          ! grep -q 'calculatePremium(' "$E/page.html"
+
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+
+          jq -n --arg url "$COTCOMP_URL" '{
+            schemaVersion:"ays-cotcomp-s495-premium-refinement-physical-receipt-v1.0",
+            functionUrl:$url,
+            deployed:true,
+            parentFunction:"cotcompPremiumVisualPreviewS494",
+            priscilaSourceSha:"5a5ea22a1da84f97e123b5a1142951867bcd65729babfef9425dccdf4a14b717",
+            priscilaDerivativeSha:"7fa88afd9031c66cca3e532bba2d9142eac8d3d4c22a445857156915dcc7afc9",
+            heroRefinement:true,
+            otherConsultativePhoto:true,
+            priscilaSelectiveIntegration:true,
+            antiTruncation:true,
+            interactionRefinement:true,
+            productFamilyCount:7,
+            comparativeFrontend:true,
+            recommendationPanel:true,
+            fixtureOnly:true,
+            providerDeploymentAuthorized:false,
+            cotcompRealTransportAuthorized:false,
+            productionTouched:false
+          }' > "$E/S495_PREMIUM_REFINEMENT_PHYSICAL_RECEIPT.json"
+
+      - name: Upload sanitized S4.95 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s495-premium-refinement-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s495/evidence/S495_PREMIUM_REFINEMENT_PHYSICAL_RECEIPT.json
+            ${{ runner.temp }}/s495/evidence/page.html
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s495/firebase-service-account.json"
