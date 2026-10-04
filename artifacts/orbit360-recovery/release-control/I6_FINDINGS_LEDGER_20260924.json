@@ -7188,6 +7188,29 @@
       "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9"
+    },
+    {
+      "id": "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_R14A_20261003",
+      "surface": "Ops / Leads / Equipo",
+      "finding": "Active Asesor can be absent from commercial assignment selector and duplicate advisor identities can appear.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/core/router.js"
+      ],
+      "status": "SOURCE_FIXED_R14A_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Exact Preview roster equals unique active canonical Asesor roster for selected country even under scoped Operativo session.",
+      "preLiveRequired": true,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "classification": "PRODUCT_ROLE_ASSIGNMENT_ROSTER_SCOPE_DEFECT_DEMONSTRATED",
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_ROOTFIX_20261004.json",
+      "diagnosticReceiptBlobSha": "801c25e1b0f63f7c59ea4502b9f24144f2efdde6",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_ROOTFIX_20261004.json",
+      "sourceFixReceiptBlobSha": "801c25e1b0f63f7c59ea4502b9f24144f2efdde6"
     }
   ],
   "phaseBBacklog": [

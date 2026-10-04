@@ -165,7 +165,7 @@
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "f98777a40f791612dd88c606a7172ba669a66312",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
-    "orbit360-platform/core/ciclo.js": "b78f93b1640f444db90da0f4d73ccf098ac0ea8d",
+    "orbit360-platform/core/ciclo.js": "833d81892aea559e5645857779c99be7f8332ba7",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "bc614613875bef19f4f9a0b3129b4f9dd978837f",
     "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
@@ -188,7 +188,7 @@
     "orbit360-platform/core/quote-comparison-contracts-v1203.js": "c3342d5fc94661a9f23563e4b1c644346dd10fb3",
     "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js": "1e3a5d79b4bdcba69f8de0737bf0df96d4cbd3d0",
     "orbit360-platform/core/record-delete.js": "749722f8482db5a72b72ac9b64dbcac08af86b82",
-    "orbit360-platform/core/router.js": "ee300051b692ef52d8808514ad0572e00b3830c5",
+    "orbit360-platform/core/router.js": "9bccd345a0d7291cbffc720b83eb76e0cb3ce535",
     "orbit360-platform/core/tenant-access-policy-contract-p0.js": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
     "orbit360-platform/core/tenant-access-policy-effective-p0.js": "56e515206ff18e3baabcfd66b217b4985f1288ad",
     "orbit360-platform/core/tenant-access-policy-product-p0.js": "045322231523ec624c6f19efea1a66c204b962bc",
@@ -200,7 +200,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "bc355c381daf328b8158d8703e8c6802f7fbf71a",
+    "orbit360-platform/index.html": "fc16a9b53796a4c1407e5e3d821b3cd44c630893",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "1e6b93422833f450d02616807479159ddf8a099b",
     "orbit360-platform/modules/calidad.js": "e0b3e9f2f4b71da151af076cb934b104ae51ee6a",
@@ -269,8 +269,8 @@
       "orbit360-platform/modules/cliente360.js": "129fae4063fbf3d603d3575fc71369a764a27a7a",
       "orbit360-platform/modules/calidad.js": "e0b3e9f2f4b71da151af076cb934b104ae51ee6a",
       "orbit360-platform/core/importa.js": "902f5fee87a71933ede31afe005582c6f00f817b",
-      "orbit360-platform/core/router.js": "ee300051b692ef52d8808514ad0572e00b3830c5",
-      "orbit360-platform/index.html": "bc355c381daf328b8158d8703e8c6802f7fbf71a"
+      "orbit360-platform/core/router.js": "9bccd345a0d7291cbffc720b83eb76e0cb3ce535",
+      "orbit360-platform/index.html": "fc16a9b53796a4c1407e5e3d821b3cd44c630893"
     }
   },
   "lastMechanismRootFix": {
@@ -2124,7 +2124,7 @@
     "blobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
     "productBlobs": {
-      "ciclo": "b78f93b1640f444db90da0f4d73ccf098ac0ea8d",
+      "ciclo": "833d81892aea559e5645857779c99be7f8332ba7",
       "portal": "957cefe0647bff2b350e5b3f0f78ef7a9e97703f",
       "operationalStore": "f24b1ad6a083273929b032fe4b84d15cd7a2a74e",
       "index": "030e5c7c35b4624d2ced050b6cb3c6d9cc8515b8"
@@ -2739,8 +2739,8 @@
       "orbit360-platform/modules/cliente360.js": "129fae4063fbf3d603d3575fc71369a764a27a7a",
       "orbit360-platform/modules/calidad.js": "e0b3e9f2f4b71da151af076cb934b104ae51ee6a",
       "orbit360-platform/core/importa.js": "902f5fee87a71933ede31afe005582c6f00f817b",
-      "orbit360-platform/core/router.js": "ee300051b692ef52d8808514ad0572e00b3830c5",
-      "orbit360-platform/index.html": "bc355c381daf328b8158d8703e8c6802f7fbf71a"
+      "orbit360-platform/core/router.js": "9bccd345a0d7291cbffc720b83eb76e0cb3ce535",
+      "orbit360-platform/index.html": "fc16a9b53796a4c1407e5e3d821b3cd44c630893"
     },
     "qaBlobs": {
       "tools/gravicentra-i6-5-b4-003-contract.mjs": "b651547bcc3bbf51d88d0685db5ae911f5d762ad",
@@ -2751,5 +2751,20 @@
     "reimport": false,
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "b4003SourceFixR14A": {
+    "status": "SOURCE_FIXED_R14A_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_ROOTFIX_20261004.json",
+    "blobSha": "801c25e1b0f63f7c59ea4502b9f24144f2efdde6",
+    "productBlobs": {
+      "orbit360-platform/core/ciclo.js": "833d81892aea559e5645857779c99be7f8332ba7",
+      "orbit360-platform/core/router.js": "9bccd345a0d7291cbffc720b83eb76e0cb3ce535",
+      "orbit360-platform/index.html": "fc16a9b53796a4c1407e5e3d821b3cd44c630893"
+    },
+    "qaBlobs": {
+      ".github/workflows/gravicentra-b4-003-executor.yml": "a98dfc1502e3ea15a85f5081cc8f55bac91ec5d8",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "48046852710b0ca759a409dc9b9c049494817635",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "adb040743d75b8433bf19f65288fa3f3a745e7d3"
+    }
   }
 }

@@ -29,15 +29,15 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "3a56896ad4ceaea87d06c57a3630123027edadcb"
+    "blobSha": "7936196a7e1f16a8fb88d46432c80293d2ab4b42"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "9a80933d2298a6ff27670dbd6deaa59b96255001"
+    "blobSha": "14e9db2c07257c853b4d4df90a6ede2d81211018"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "649b740d539028d46a5814ff8ddee822a1c31efc",
+    "blobSha": "edfef134aaf1a4dc93fea9bcb3bef0f04041f2f5",
     "inventoryCount": 197,
     "attentionCount": 92,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -350,6 +350,21 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b4-003-contract.mjs": "b651547bcc3bbf51d88d0685db5ae911f5d762ad",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "581309ff094082beda4c65427994a0b228374203"
+    }
+  },
+  "r14AssignableAdvisorRosterRootFix": {
+    "status": "SOURCE_FIXED_R14A_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_ROOTFIX_20261004.json",
+    "blobSha": "801c25e1b0f63f7c59ea4502b9f24144f2efdde6",
+    "productBlobs": {
+      "orbit360-platform/core/ciclo.js": "833d81892aea559e5645857779c99be7f8332ba7",
+      "orbit360-platform/core/router.js": "9bccd345a0d7291cbffc720b83eb76e0cb3ce535",
+      "orbit360-platform/index.html": "fc16a9b53796a4c1407e5e3d821b3cd44c630893"
+    },
+    "qaBlobs": {
+      ".github/workflows/gravicentra-b4-003-executor.yml": "a98dfc1502e3ea15a85f5081cc8f55bac91ec5d8",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "48046852710b0ca759a409dc9b9c049494817635",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "adb040743d75b8433bf19f65288fa3f3a745e7d3"
     }
   }
 }

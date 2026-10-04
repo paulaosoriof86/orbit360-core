@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_ROOTFIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "SOURCE_FIXED_R14A_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
+  "parentFindingId": "B4-003",
+  "sourceEvidence": {
+    "equipo": "Samuel Daza is active with Asesor + Operativo in Equipo.",
+    "ops": "Samuel Daza is absent from Nuevo prospecto advisor selector while Paula Osorio appears twice.",
+    "staticRootCause": "core/ciclo.js consumed S().all('asesores') inside router withScope('ops'/'leads'), so an assignment directory inherited viewer record scope; no canonical assignable-role filter or identity deduplication existed.",
+    "canonicalPolicy": "tenant-access-policy-effective-p0 defines asesores as tenant directory, scoped=false and countryFiltered=false."
+  },
+  "remediation": {
+    "rosterAuthority": "unwrapped canonical tenant asesores store",
+    "eligibility": "active + nondeleted + non-projectionOnly + Asesor role + selected-country compatibility",
+    "dedupe": "email/canonical-id/normalized-name identity keys",
+    "countryReactive": true,
+    "viewerScopeIndependent": true,
+    "hardcodedUsers": false,
+    "opsLeadsReactiveToAsesores": true,
+    "workflowR14GateFixed": true
+  },
+  "productBlobs": {
+    "orbit360-platform/core/ciclo.js": "833d81892aea559e5645857779c99be7f8332ba7",
+    "orbit360-platform/core/router.js": "9bccd345a0d7291cbffc720b83eb76e0cb3ce535",
+    "orbit360-platform/index.html": "fc16a9b53796a4c1407e5e3d821b3cd44c630893"
+  },
+  "qaBlobs": {
+    ".github/workflows/gravicentra-b4-003-executor.yml": "a98dfc1502e3ea15a85f5081cc8f55bac91ec5d8",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "48046852710b0ca759a409dc9b9c049494817635",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "adb040743d75b8433bf19f65288fa3f3a745e7d3"
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productionFunctionDeployment": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
