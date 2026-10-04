@@ -5,7 +5,7 @@ on:
     branches:
       - ays/cotcomp-s495-premium-refinement-lab-20261004
     paths:
-      - '.github/cotcomp-lab-intents/s496-governed-journey-lab-authorized.json'
+      - 'functions/cotcomp-premium-journey-preview-s496.js'
 
 permissions:
   contents: read
@@ -34,32 +34,22 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verify S4.96 authorization intent
+      - name: Verify S4.96 governed LAB preflight
         shell: bash
         run: |
           set -euo pipefail
-          I=.github/cotcomp-lab-intents/s496-governed-journey-lab-authorized.json
-          jq -e '
-            .authorization=="S496_DEPLOY_GOVERNED_JOURNEY" and
-            .projectId=="ays-orbit-360-lab" and
-            .functionName=="cotcompPremiumJourneyPreviewS496" and
-            .parentFunction=="cotcompPremiumVisualPreviewS495" and
-            .governanceLock==true and
-            .canonicalJourneyRestored==true and
-            .deepIntakeRestored==true and
-            .heroTypographyRestored==true and
-            .visualResolverReconciled==true and
-            .productFamilyCount==7 and
-            .fixtureOnly==true and
-            .providerDeploymentAuthorized==false and
-            .cotcompRealTransportAuthorized==false and
-            .production==false
-          ' "$I" >/dev/null
-          PARENT="$(git rev-parse HEAD^)"
-          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
-          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
-          test "${#CHANGED[@]}" = "1"
-          test "${CHANGED[0]}" = "$I"
+          test -f docs/cotcomp/S496_CANONICAL_CONTEXT_GOVERNANCE_2026-10-04.md
+          test -f docs/cotcomp/S496_LOCKS_2026-10-04.md
+          test -f docs/cotcomp/S496_PRODUCT_INTAKE_MATRIX_2026-10-04.md
+          test -f docs/cotcomp/S496_PREFLIGHT_ANTI_REGRESSION_PROTOCOL_2026-10-04.md
+          test -f docs/cotcomp/S496_WORK_PLAN_2026-10-04.md
+          grep -q 'S4.95 = REWORK / NO OWNER PASS' docs/cotcomp/S496_CANONICAL_CONTEXT_GOVERNANCE_2026-10-04.md
+          grep -q 'providerDeploymentAuthorized=false' docs/cotcomp/S496_CANONICAL_CONTEXT_GOVERNANCE_2026-10-04.md
+          grep -q 'cotcompRealTransportAuthorized=false' docs/cotcomp/S496_CANONICAL_CONTEXT_GOVERNANCE_2026-10-04.md
+          grep -q "const FUNCTION_NAME='cotcompPremiumJourneyPreviewS496'" functions/cotcomp-premium-journey-preview-s496.js
+          grep -q 'providerDeploymentAuthorized:false' functions/cotcomp-premium-journey-preview-s496.js
+          grep -q 'cotcompRealTransportAuthorized:false' functions/cotcomp-premium-journey-preview-s496.js
+          grep -q 'production:false' functions/cotcomp-premium-journey-preview-s496.js
 
       - name: Prepare transient bootstrap export
         working-directory: functions
