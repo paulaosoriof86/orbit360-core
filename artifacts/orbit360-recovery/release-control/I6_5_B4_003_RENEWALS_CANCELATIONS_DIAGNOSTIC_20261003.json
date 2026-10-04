@@ -1,12 +1,12 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_V1",
-  "recordedAt": "2026-10-04T00:25:03.025Z",
+  "recordedAt": "2026-10-04T00:28:21.154Z",
   "status": "READONLY_DIAGNOSTIC_COMPLETE",
   "findingId": "B4-003",
   "mode": "READ_ONLY_NO_PRODUCT_OR_DATA_WRITES",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "sourceSha": "43e615e5abe491926f5a2f46c341706facdf265a",
+  "sourceSha": "8d5d9a55c06ed011855414a16f40a851058ad5f6",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "runtime": {
@@ -130,6 +130,22 @@
         "pais": "GT",
         "aseguradoraId": "gt-seguros-columna",
         "sourceRef": "I6_4_PRIMARY_POLICY_UNIVERSE"
+      }
+    ],
+    "renewalLineageTargets": [
+      {
+        "id": "pol_muj5o5ka",
+        "numero": "prueba",
+        "estado": "Vigente",
+        "vigenciaInicio": "2026-10-18",
+        "vigenciaFin": "2027-10-18",
+        "renovadaPor": "",
+        "renuevaDe": "pol_965de501d871c56f3964a24b7724",
+        "renovacionEstado": "",
+        "renovable": null,
+        "pais": "GT",
+        "aseguradoraId": "gt-seguros-columna",
+        "sourceRef": ""
       }
     ]
   },
