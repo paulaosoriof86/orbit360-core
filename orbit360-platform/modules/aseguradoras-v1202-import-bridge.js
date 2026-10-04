@@ -166,7 +166,10 @@ Orbit.modules = Orbit.modules || {};
   if (Orbit.importa && originalImportOpen) {
     Orbit.importa.open = function (kind, options) {
       if (kind === 'directorio-aseguradoras' || kind === 'directorio_aseguradoras') return D.open(options || {});
-      if (kind === 'docs-aseguradora') return openInsurerDocumentImport(options || {});
+      // R13: the canonical docs-aseguradora owner is core/importa.js because it performs
+      // confirmed Drive upload/readback before durable insurer linkage. Do not shadow it
+      // with the older proposal/reference-only modal kept below for compatibility history.
+      if (kind === 'docs-aseguradora') return originalImportOpen(kind, options || {});
       return originalImportOpen(kind, options);
     };
   }
@@ -174,7 +177,9 @@ Orbit.modules = Orbit.modules || {};
   const originalNew = mod.nuevaAseguradora && mod.nuevaAseguradora.bind(mod);
   mod.nuevaAseguradora = openNewInsurer;
   mod.importarDirectorio = function () { return D.open({ onDone: () => mod.render(document.getElementById('host')) }); };
-  mod.importarDocumentoSeguro = openInsurerDocumentImport;
+  mod.importarDocumentoSeguro = function (options) {
+    return originalImportOpen ? originalImportOpen('docs-aseguradora', options || {}) : toast('La carga documental no está disponible.');
+  };
 
   const originalRender = mod.render.bind(mod);
   mod.render = function (host) {
@@ -190,5 +195,5 @@ Orbit.modules = Orbit.modules || {};
   };
 
   mod.__directoryImportV1203 = { originalNew, originalImportOpen, originalRender, safeCreateBeforeInsert: true, cancelWritesStore: false,
-    documentaryImportRequiresVerifiedPersistence: true, selectedFileDoesNotEqualStored: true, supportsExternalHttpsReference: true, selectors: ['#asg-new', '#asg-imp'] };
+    documentaryImportRequiresVerifiedPersistence: true, canonicalDocumentOwner: 'core/importa.js', legacyDocumentModalShadowed: false, selectedFileDoesNotEqualStored: false, supportsExternalHttpsReference: true, selectors: ['#asg-new', '#asg-imp'] };
 })();
