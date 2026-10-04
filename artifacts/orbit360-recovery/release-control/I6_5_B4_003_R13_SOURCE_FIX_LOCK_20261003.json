@@ -33,11 +33,11 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "4b35658b6ae85cb0d9f7348fa139ac6ce4c4c4e7"
+    "blobSha": "fb36b6b2aed4895009c58eb8f20684a7344241b5"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "4b25fbac71588cc070fc470c3842a33683c5635b",
+    "blobSha": "be484e603e749f2960ad84f1350b011cd6768a35",
     "inventoryCount": 215,
     "attentionCount": 92,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
