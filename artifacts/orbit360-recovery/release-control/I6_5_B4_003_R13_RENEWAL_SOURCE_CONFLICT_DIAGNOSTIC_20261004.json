@@ -1,0 +1,87 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_RENEWAL_SOURCE_CONFLICT_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-04",
+  "status": "RENEWAL_SOURCE_CONFLICT_ISOLATED_NO_DATA_WRITE",
+  "findingId": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+  "sourceAuthority": {
+    "file": "Renovaciones (13).xlsx",
+    "sha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3",
+    "sourceRows": 23,
+    "sourceStatusCounts": {
+      "Vencida": 14,
+      "No Renovada": 4,
+      "Vigente": 5
+    },
+    "activePolicyNumbers": [
+      "68542",
+      "1-AP-20890",
+      "AUTO 38446",
+      "AUTO-1000000334",
+      "VA-43685"
+    ],
+    "directWorkbookVerification": true
+  },
+  "runtimeEvidence": {
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_20261003.json",
+    "diagnosticReceiptBlobSha": "cdbab1abcfb865d534d405f61571c917399f7dfb",
+    "policies": 1419,
+    "cleanSourceBackedUnknownPolicyIds": [
+      "pol_b9a883095c9fae8f7502ce1cb054",
+      "pol_9634d32ec97e4dc93fef8f194677",
+      "pol_8231bbb8f9b7272c02891f5a4caf",
+      "pol_df6bf097045762297ec31fd4e5c5"
+    ],
+    "conflictingPolicy": {
+      "id": "pol_965de501d871c56f3964a24b7724",
+      "numero": "VA-43685",
+      "estado": "Vigente",
+      "vigenciaFin": "2026-10-18",
+      "renovadaPor": "pol_muj5o5ka",
+      "renovacionEstado": "Renovada",
+      "renovable": null
+    },
+    "renewalLineageTarget": {
+      "id": "pol_muj5o5ka",
+      "numero": "prueba",
+      "estado": "Vigente",
+      "vigenciaInicio": "2026-10-18",
+      "vigenciaFin": "2027-10-18",
+      "renuevaDe": "pol_965de501d871c56f3964a24b7724",
+      "sourceRef": "",
+      "previewWrite": false,
+      "syntheticFlag": false,
+      "importado": false,
+      "createdAt": "2026-09-27T01:44:22.901Z",
+      "dependents": {
+        "gestiones": 0,
+        "recibosEsperados": 1,
+        "carteraPrimas": 1,
+        "cobros": 0,
+        "vehiculos": 1,
+        "cancelaciones": 0
+      },
+      "dependentTotal": 3
+    }
+  },
+  "causalConclusion": "Four source-listed current policies are clean candidates for source-backed renewability classification. VA-43685 is not safe to classify from the older report because the runtime contains a later renewal lineage to policy 'prueba' with three dependent records. That lineage is not proven disposable QA residue and cannot be silently deleted or ignored.",
+  "safeDryRun": {
+    "proposedWriteCount": 4,
+    "writeExecuted": false,
+    "fields": {
+      "renovable": true,
+      "renewabilityProvenance": "source_report",
+      "renewabilitySourceSha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3"
+    },
+    "conflictedPolicyExcluded": "VA-43685",
+    "authorizationRequiredBeforeApply": true
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "deleteRenewalLineageAuthorized": false,
+    "sourceBackedApplyAuthorized": false
+  },
+  "nextAction": "B4_003_COMPLETE_MACHINE_PROOF_WITH_RENEWAL_DATA_BLOCKER_EXPLICIT"
+}
