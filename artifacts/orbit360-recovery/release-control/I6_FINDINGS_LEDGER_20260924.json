@@ -7270,20 +7270,23 @@
         "orbit360-platform/core/ciclo.js",
         "orbit360-platform/core/router.js"
       ],
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "REOPENED_R16_OPERATIVO_CAUSAL_DEFECT",
       "blocking": true,
       "targetGate": "B4-003",
-      "closureCondition": "Exact Preview roster equals unique active canonical Asesor roster for selected country even under scoped Operativo session.",
+      "closureCondition": "Exact authenticated Preview: same eligible assignment roster for Paula/Dirección and Carlos/Operativo for selected country, while full Equipo administration remains permission-restricted.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL_AFTER_R15_SUCCESSOR",
+      "nextAction": "B4_003_R16_INCLUDE_IN_SINGLE_CAUSAL_SUCCESSOR_FIX",
       "classification": "PRODUCT_ROLE_ASSIGNMENT_ROSTER_SCOPE_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_ROOTFIX_20261004.json",
       "diagnosticReceiptBlobSha": "801c25e1b0f63f7c59ea4502b9f24144f2efdde6",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_ROOTFIX_20261004.json",
       "sourceFixReceiptBlobSha": "801c25e1b0f63f7c59ea4502b9f24144f2efdde6",
-      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "humanVisualStatus": "FAIL_R16_OPERATIVO_EMPTY",
       "machinePassRunId": 37187722951,
-      "machinePassSourceSha": "7aa67243cd0bb26c79cb2e0540f8fbd176321379"
+      "machinePassSourceSha": "7aa67243cd0bb26c79cb2e0540f8fbd176321379",
+      "r16DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_OPERATIVO_ASSIGNABLE_ADVISOR_ROSTER_DIAGNOSTIC_20261004.json",
+      "r16DiagnosticBlobSha": "0e4747b80add3b4d749b5833f2891544a3cba0f4",
+      "rootCause": "ASSIGNMENT_ROSTER_INCORRECTLY_REUSES_FULL_TEAM_DIRECTORY_READ_AUTHORITY"
     },
     {
       "id": "B4-003-R15-01-OPS-LEADS-NEW-PROSPECT-CATALOGS",
@@ -7494,6 +7497,32 @@
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
       "receiptBlobSha": "afe6193dc1ff4151e94777a276296f9df0ed17a3",
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_AUTHENTICATED_OPERATIVO_VISUAL_20261004",
+      "surface": "Ops / Leads / Nuevo prospecto",
+      "finding": "Carlos Castro with active Operativo role sees an empty Asesor selector while Paula/Dirección sees the canonical advisor roster.",
+      "classification": "PRODUCT_ROLE_ASSIGNMENT_DIRECTORY_AUTHORITY_DEFECT",
+      "rootCause": "ASSIGNMENT_ROSTER_INCORRECTLY_REUSES_FULL_TEAM_DIRECTORY_READ_AUTHORITY",
+      "owner": [
+        "orbit360-platform/core/tenant-access-policy-effective-p0.js",
+        "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+        "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/core/router.js"
+      ],
+      "status": "OPEN_PAULA_VISUAL_REJECTED_R16",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Minimal canonical assignable-advisor projection hydrates for assignment-capable Operativo without granting full team-directory administration; exact authenticated parity proof Paula vs Carlos; selected-country reactive; no duplicates/hardcodes.",
+      "mayDisappearWithoutDisposition": false,
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_OPERATIVO_ASSIGNABLE_ADVISOR_ROSTER_DIAGNOSTIC_20261004.json",
+      "diagnosticReceiptBlobSha": "0e4747b80add3b4d749b5833f2891544a3cba0f4",
       "noLive": true,
       "noReimport": true
     }
