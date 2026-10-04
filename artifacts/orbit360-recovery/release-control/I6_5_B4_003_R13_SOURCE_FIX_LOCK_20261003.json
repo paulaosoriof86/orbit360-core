@@ -1,12 +1,12 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-03",
-  "status": "B4_003_SOURCE_FIXED_R13P3_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
     "id": "B4-003",
-    "status": "SOURCE_FIXED_R13P3_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
     "humanVisualStatus": "REJECTED_R13",
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
@@ -112,5 +112,11 @@
     "reimport": false,
     "livePromotion": false,
     "visualRedesign": false
+  },
+  "previewGateNoopRootFix": {
+    "status": "QA_GOVERNANCE_GATE_MISMATCH_REPAIRED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13P3_PREVIEW_GATE_NOOP_ROOTFIX_20261004.json",
+    "failedRunId": 37163576092,
+    "productSourceChanged": false
   }
 }
