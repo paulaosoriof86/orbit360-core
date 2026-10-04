@@ -4859,7 +4859,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
-      "executionLockBlobSha": "ce42ab952434fb90553bfe8031402a0a43b98c36",
+      "executionLockBlobSha": "a451fdbad044dbb1dfba729a75225b38e709c4a3",
       "compositionLockBlobSha": "fbfb631d72b45adff5ed0a3703376c123ca893f6",
       "findingLedgerBlobSha": "8891b006beba42842a1304f2a03ad79795d0186f",
       "activeFindingId": "B4-003",
@@ -5417,6 +5417,14 @@
         "blobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
         "failedRunId": 37167797028,
         "productSourceChanged": false
+      },
+      "r13PreviewConcurrencyRootFix": {
+        "status": "QA_CONCURRENCY_FIXED_PENDING_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_PREVIEW_CONCURRENCY_ROOTFIX_20261004.json",
+        "blobSha": "ea94cf1fbadc48253378016b2879dddcd27604f5",
+        "staleRunId": 37168684782,
+        "workflowBlobSha": "0bf015a9cb160734157be1fa251d0019e07b743e",
+        "productSourceChanged": false
       }
     }
   },
@@ -5735,7 +5743,7 @@
     "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "ce42ab952434fb90553bfe8031402a0a43b98c36",
+    "executionLockBlobSha": "a451fdbad044dbb1dfba729a75225b38e709c4a3",
     "compositionLockBlobSha": "fbfb631d72b45adff5ed0a3703376c123ca893f6",
     "findingLedgerBlobSha": "8891b006beba42842a1304f2a03ad79795d0186f",
     "noLive": true,
@@ -6307,6 +6315,14 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
       "blobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
       "failedRunId": 37167797028,
+      "productSourceChanged": false
+    },
+    "r13PreviewConcurrencyRootFix": {
+      "status": "QA_CONCURRENCY_FIXED_PENDING_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_PREVIEW_CONCURRENCY_ROOTFIX_20261004.json",
+      "blobSha": "ea94cf1fbadc48253378016b2879dddcd27604f5",
+      "staleRunId": 37168684782,
+      "workflowBlobSha": "0bf015a9cb160734157be1fa251d0019e07b743e",
       "productSourceChanged": false
     }
   },

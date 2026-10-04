@@ -1,27 +1,17 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_PREVIEW_CONCURRENCY_ROOTFIX_V1",
   "recordedAt": "2026-10-04",
-  "status": "QA_WORKFLOW_SCHEDULER_FIXED",
+  "status": "QA_CONCURRENCY_FIXED_PENDING_EXACT_PREVIEW",
   "findingId": "B4-003",
-  "evidence": {
-    "sharedGroup": "gravicentra-b4-003-${{ github.ref }}",
-    "competingWorkflows": [
-      ".github/workflows/gravicentra-b4-003-executor.yml",
-      ".github/workflows/gravicentra-b4-003-readonly-diagnostic.yml",
-      ".github/workflows/gravicentra-b4-003-renewals-cancelations-diagnostic.yml"
-    ],
-    "observedCancelledPreviewRunId": 37166086187,
-    "observedCancelledPreviewHadJobs": 0
-  },
-  "rootCause": "The exact Preview shared one concurrency group with two read-only diagnostic workflows. Control Plane pushes scheduled all three; GitHub concurrency allowed only one running and one pending member, so pending Preview runs were repeatedly replaced/cancelled before jobs started.",
-  "fix": {
-    "workflow": ".github/workflows/gravicentra-b4-003-executor.yml",
-    "workflowBlobSha": "3bbb6e092ee8c115ee106d4dd9e35ecbdb59f69f",
-    "previewGroup": "gravicentra-b4-003-preview-${{ github.ref }}",
-    "diagnosticGroupsUnchanged": true
-  },
+  "parentHead": "0ea899271361c42f651bf718372a534aad9902bb",
+  "staleRunId": 37168684782,
+  "staleJobId": 111336964564,
+  "staleStep": "Durable renewals cancelations browser proof",
+  "rootCause": "Exact Preview concurrency kept cancel-in-progress=false, allowing a dead older candidate to block a successor on the same branch.",
+  "fix": "Set cancel-in-progress=true so a newer exact candidate supersedes the stale Preview in the same concurrency group.",
+  "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+  "workflowBlobSha": "0bf015a9cb160734157be1fa251d0019e07b743e",
   "productSourceChanged": false,
-  "operationalBusinessWrites": 0,
   "dataMutation": false,
   "reimport": false,
   "livePromotion": false,

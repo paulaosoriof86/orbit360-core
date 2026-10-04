@@ -198,5 +198,13 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "r13PreviewConcurrencyRootFix": {
+    "status": "QA_CONCURRENCY_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_PREVIEW_CONCURRENCY_ROOTFIX_20261004.json",
+    "blobSha": "ea94cf1fbadc48253378016b2879dddcd27604f5",
+    "staleRunId": 37168684782,
+    "workflowBlobSha": "0bf015a9cb160734157be1fa251d0019e07b743e",
+    "productSourceChanged": false
   }
 }

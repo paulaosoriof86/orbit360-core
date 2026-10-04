@@ -22,7 +22,7 @@ concurrency:
   # Preview must not compete with the two read-only B4-003 diagnostics for the single pending slot.
   # Diagnostics keep their own serialization; the exact Preview has an independent queue.
   group: gravicentra-b4-003-preview-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   b4-003-renewals-cancelations-preview:
