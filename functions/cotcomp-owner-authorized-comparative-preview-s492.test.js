@@ -27,7 +27,8 @@ test('S4.92 stays inside the current A&S public-site shell',()=>{
 test('S4.92 restores the authorized dark human advisory hero and headline',()=>{
   const h=S.html();
   assert.match(h,/class="hero"/);
-  assert.match(h,/background-image:url\('data:image\/webp;base64,/);
+  assert.match(h,/class="hero-photo" src="data:image\/webp;base64,/);
+  assert.match(h,/alt="Equipo A&amp;S en asesoría"/);
   assert.match(h,/Cotiza y compara <em>con criterio<\/em>/);
   assert.match(h,/Compara coberturas, beneficios y condiciones/);
   assert.match(h,/Compara<br>opciones reales/);
