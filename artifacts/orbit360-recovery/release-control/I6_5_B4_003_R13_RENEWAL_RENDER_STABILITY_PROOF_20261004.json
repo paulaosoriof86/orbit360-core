@@ -1,0 +1,25 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_RENEWAL_RENDER_STABILITY_PROOF_V1",
+  "recordedAt": "2026-10-04",
+  "status": "PASS",
+  "findingId": "B4-003",
+  "sourceRunId": 37166205718,
+  "sourceJobId": 111329494154,
+  "exactCandidateHead": "8bfd1a673280a0663d5fcf0243f7992be80dadf5",
+  "proof": {
+    "mutationCount": 0,
+    "textStable": true,
+    "route": "renovaciones",
+    "records": [],
+    "events": []
+  },
+  "conclusion": "The instrumented 1-second post-settle renewal stability window showed no DOM mutation and no store/domain/session event. The prior B4_003_RENEWAL_DELAYED_RENDER_MUTATION is not reproducible on the current exact candidate and is not an active product blocker.",
+  "boundaries": {
+    "productSourceChanged": false,
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "Continue exact Preview at the next blocker: insurer Drive importer E2E."
+}
