@@ -1,0 +1,142 @@
+name: CotComp S4.96B frontend recovery LAB
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s496b-frontend-recovery-lab-20261004
+    paths:
+      - 'functions/cotcomp-frontend-recovery-preview-s496b.js'
+      - 'functions/cotcomp-frontend-recovery-preview-s496b.test.js'
+      - '.github/workflows/cotcomp-s496b-frontend-recovery-lab.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompFrontendRecoveryPreviewS496B
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompFrontendRecoveryPreviewS496B
+
+jobs:
+  s496b-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify governed recovery preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f docs/cotcomp/S496_CANONICAL_CONTEXT_GOVERNANCE_2026-10-04.md
+          test -f docs/cotcomp/S496_LOCKS_2026-10-04.md
+          test -f docs/cotcomp/S496_PRODUCT_INTAKE_MATRIX_2026-10-04.md
+          grep -q 'VISUAL REGRESSION OWNER-CONFIRMED' docs/cotcomp/S496_CANONICAL_CONTEXT_GOVERNANCE_2026-10-04.md
+          grep -q "PARENT_FUNCTION='cotcompPremiumVisualPreviewS495'" functions/cotcomp-frontend-recovery-preview-s496b.js
+          grep -q "const FUNCTION_NAME='cotcompFrontendRecoveryPreviewS496B'" functions/cotcomp-frontend-recovery-preview-s496b.js
+          grep -q 'providerDeploymentAuthorized:false' functions/cotcomp-frontend-recovery-preview-s496b.js
+          grep -q 'cotcompRealTransportAuthorized:false' functions/cotcomp-frontend-recovery-preview-s496b.js
+          grep -q 'production:false' functions/cotcomp-frontend-recovery-preview-s496b.js
+
+      - name: Run S4.96B source and regression QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-frontend-recovery-preview-s496b.js
+          node --check cotcomp-frontend-recovery-preview-s496b.test.js
+          node --test cotcomp-premium-visual-preview-s495.test.js
+          node --test cotcomp-premium-journey-preview-s496.test.js
+          node --test cotcomp-frontend-recovery-preview-s496b.test.js
+
+      - name: Prepare LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s496b/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s496b/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Deploy only S4.96B recovery preview to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physical readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s496b/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+          grep -q 'S496B_FRONTEND_RECOVERY_LOCKED' "$E/page.html"
+          grep -q 'data-s496b="true"' "$E/page.html"
+          grep -q "font-family:'Newsreader',serif" "$E/page.html"
+          grep -q 'aspect-ratio:16/10' "$E/page.html"
+          grep -q 'aspect-ratio:4/3' "$E/page.html"
+          grep -q 's496b-intake-shell' "$E/page.html"
+          grep -q 'Ver las diferencias clave' "$E/page.html"
+          grep -q 'Entender la recomendación' "$E/page.html"
+          grep -q 'Continuar con un asesor' "$E/page.html"
+          grep -q "const consult=state.route==='other'" "$E/page.html"
+          grep -q 'providerDeploymentAuthorized:false' "$E/page.html"
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+          jq -n --arg url "$COTCOMP_URL" '{
+            schemaVersion:"ays-cotcomp-s496b-frontend-recovery-physical-receipt-v1.0",
+            functionUrl:$url,
+            deployed:true,
+            visualParent:"S4.95",
+            progressiveIntake:true,
+            boundedHero:true,
+            boundedProductVisual:true,
+            routeSpecificVisualResolver:true,
+            lowerActionHierarchy:true,
+            providerDeploymentAuthorized:false,
+            cotcompRealTransportAuthorized:false,
+            productionTouched:false
+          }' > "$E/S496B_FRONTEND_RECOVERY_RECEIPT.json"
+
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s496b-frontend-recovery-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s496b/evidence/S496B_FRONTEND_RECOVERY_RECEIPT.json
+            ${{ runner.temp }}/s496b/evidence/page.html
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s496b/firebase-service-account.json"
