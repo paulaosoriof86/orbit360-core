@@ -64,11 +64,16 @@ test('S4.92 makes the quote-area visual product-aware',()=>{
   assert.match(h,/data:image\/webp;base64/);
 });
 
-test('S4.92 preserves vehicle Marca, Linea/modelo and Año while consuming read-only catalog projection',()=>{
+test('S4.92 preserves searchable Marca -> dependent Línea/modelo -> separate Año plus assisted fallback',()=>{
   const h=S.html();
   assert.match(h,/Marca/);
   assert.match(h,/Línea \/ modelo/);
   assert.match(h,/Año/);
+  assert.match(h,/id="brandInput" role="combobox"/);
+  assert.match(h,/id="modelInput" role="combobox"/);
+  assert.match(h,/id="yearSel"/);
+  assert.match(h,/No encuentro mi marca/);
+  assert.match(h,/No encuentro mi línea \/ modelo/);
   assert.match(h,/cotcompVehicleCatalogS479/);
   assert.match(h,/op:'brands'/);
   assert.match(h,/op:'models'/);
