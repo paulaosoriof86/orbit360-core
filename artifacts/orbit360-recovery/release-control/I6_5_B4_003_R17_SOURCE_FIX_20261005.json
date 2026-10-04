@@ -1,0 +1,59 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R17_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-05T00:11:00Z",
+  "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceTreeHeadBeforeControlPlaneSeal": "8112911d2c6c8cbea8b5af1998c8a0f628d06818",
+  "findingId": "B4-003",
+  "humanVisualOrigin": "PAULA_R17_REJECTION_20261004",
+  "findingCountAfter": 217,
+  "fixes": [
+    "Ops/Leads business insurer interest is country-scoped and multi-select; primary aseguradoraId remains backward-compatible.",
+    "Quality financial review is responsive and opens a discriminating review modal; receipt action targets exact policy receipts context; internal lineage/status tokens are not user-facing.",
+    "Financial mismatch causes are discriminated from calendar authority/review/shadow/source facts without inferred data mutation.",
+    "Renewability review opens the exact canonical policy editor focused on tri-state Renovabilidad; UNKNOWN remains fail-closed.",
+    "Renewal KPI bridge derives counts from the same visible canonical bucket membership as the base renewal board.",
+    "Insurer source Registry entries are inspectable and expose stored metadata/provenance/dimensions/status without inventing missing data.",
+    "Vehicle-risk section is guarded to vehicle policies only; non-vehicle policies do not require a vehicle.",
+    "Canonical index cache bindings were advanced for every modified browser asset."
+  ],
+  "productBlobs": {
+    "orbit360-platform/core/ciclo.js": "03eb4862d5b2a91359918d0511922e512502a182",
+    "orbit360-platform/modules/calidad.js": "0851a73f29445cac6ddf9099fa2ef7c9c0b71ba5",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "8033ff7cf1858824e6c6b2d9a568b4c2988ec15e",
+    "orbit360-platform/modules/cliente360.js": "58f9c1469e50b0e27fb0fcea7c8a6d613ce8f320",
+    "orbit360-platform/modules/renovaciones.js": "c7285e6e1dfdad5e91b9c30c48939da2853b7c87",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "b44695f05170b4406740ed7158b47e6464916d8f",
+    "orbit360-platform/modules/aseguradoras.js": "b12b65b0468bb2942ecb8e9a50eb089533387291",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "d3ee9ce359570b6f6940374aefe74c617cc71d20",
+    "orbit360-platform/index.html": "f96358fbef0cef9e49c4e750f58160132eea1672"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "2955f739f1a57fc3f90cf85f0cddee2805b3f7f0",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "2f73abe643f4dc2b447e252453b307c92b449ceb",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "bb77f9992587bd7e28ccef74bc4871cb7da69a4b"
+  },
+  "governanceBlobs": {
+    "findingLedger": "6f6dc7f1f94ba39e451eb1281cc95f92585b372c",
+    "continuityRegister": "3e7590d971c50c1043b1f1f6fba62f489936e19d",
+    "canonicalComposition": "de96020b887df5124404e2e2080446723d73ff82",
+    "executionLock": "b8669595e65d147714338b2edb951e92f0476bc6"
+  },
+  "preservedPasses": [
+    "Assignable advisor roster for Carlos/Operativo in reviewed flow",
+    "Configuración→Catálogos fast useful paint",
+    "Sampled active receipt shadow-duplicate exclusion",
+    "Renewal pipeline repopulation"
+  ],
+  "boundaries": {
+    "productMutationClosedAfterThisReceipt": true,
+    "businessWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "syntheticQaWritesAuthorizedForExactPreview": true,
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
