@@ -641,7 +641,8 @@
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "orbit360-platform/modules/aseguradoras.js",
-      "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
     ],
     "allowedQaFiles": [
       "tools/gravicentra-i6-5-b4-003-contract.mjs",
@@ -653,6 +654,8 @@
     "livePromotionAuthorized": false,
     "nextAction": "B4_003_R17_SOURCE_FIX",
     "scopeExtensionReason": "R17 renewal KPI/column divergence is caused by renewals-v1200-operational-bridge.js rewriting base KPIs from a second independently derived policy set after renovaciones.js renders the visible buckets.",
-    "scopeExtendedAt": "2026-10-04T23:48:00Z"
+    "scopeExtendedAt": "2026-10-04T23:48:00Z",
+    "scopeExtensionReason2": "Runtime policy editor is owned by policy-receipts-v1199-bridge.js, which replaces cliente360.editarPoliza and otherwise discards the R17 renewability focus argument. The owner must be patched to preserve the direct classification workflow.",
+    "scopeExtendedAt2": "2026-10-04T23:56:00Z"
   }
 }
