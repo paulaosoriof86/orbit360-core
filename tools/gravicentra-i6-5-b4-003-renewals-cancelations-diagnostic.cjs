@@ -41,12 +41,24 @@ const doneStates=new Set(['resuelta','completada','cerrada','cancelada','anulada
    }))
    .sort((a,b)=>policyNumberKey(a.numero).localeCompare(policyNumberKey(b.numero))||String(a.vigenciaFin).localeCompare(String(b.vigenciaFin)));
  const renewalTargetIds=new Set(renewalSourceProbe.map(x=>x.renovadaPor).filter(Boolean));
- const renewalLineageTargets=pol.filter(p=>renewalTargetIds.has(p.id)).map(p=>({
-   id:p.id,numero:p.numero||'',estado:p.estado||'',vigenciaInicio:p.vigenciaInicio||'',vigenciaFin:p.vigenciaFin||'',
-   renovadaPor:p.renovadaPor||'',renuevaDe:p.renuevaDe||'',renovacionEstado:p.renovacionEstado||'',
-   renovable:Object.prototype.hasOwnProperty.call(p,'renovable')?p.renovable:null,
-   pais:p.pais||'',aseguradoraId:p.aseguradoraId||'',sourceRef:p.sourceRef||p._origenHoja||''
- }));
+ const iso=v=>v&&typeof v.toDate==='function'?v.toDate().toISOString():(v||'');
+ const renewalLineageTargets=[];
+ for(const p of pol.filter(p=>renewalTargetIds.has(p.id))){
+   const deps={};
+   for(const c of ['gestiones','recibosEsperados','carteraPrimas','cobros','vehiculos','cancelaciones']){
+     const q=await tenant.collection('data').doc(c).collection('items').where('polizaId','==',p.id).get();
+     deps[c]=q.size;
+   }
+   renewalLineageTargets.push({
+     id:p.id,numero:p.numero||'',estado:p.estado||'',vigenciaInicio:p.vigenciaInicio||'',vigenciaFin:p.vigenciaFin||'',
+     renovadaPor:p.renovadaPor||'',renuevaDe:p.renuevaDe||'',renovacionEstado:p.renovacionEstado||'',
+     renovable:Object.prototype.hasOwnProperty.call(p,'renovable')?p.renovable:null,
+     pais:p.pais||'',aseguradoraId:p.aseguradoraId||'',sourceRef:p.sourceRef||p._origenHoja||'',
+     clienteId:p.clienteId||'',asesorId:p.asesorId||'',previewWrite:p.previewWrite===true,syntheticFlag:p.__syntheticQa===true,
+     importado:p.importado===true,createdAt:iso(p.createdAt),updatedAt:iso(p.updatedAt),createdBy:p.createdBy||p.actorUid||p.usuarioId||'',
+     dependents:deps,dependentTotal:Object.values(deps).reduce((a,b)=>a+b,0)
+   });
+ }
  const activeRen=ges.filter(g=>['renewal_proposals','renewal_accepted'].includes(String(g.workflowType||''))&&!doneStates.has(norm(g.estado))&&g.archivado!==true);
  const dupRen={};
  for(const g of activeRen){const k=[g.polizaId||g.sourcePolicyId||'',g.workflowType||''].join('|');if(!k.startsWith('|'))dupRen[k]=(dupRen[k]||0)+1;}
