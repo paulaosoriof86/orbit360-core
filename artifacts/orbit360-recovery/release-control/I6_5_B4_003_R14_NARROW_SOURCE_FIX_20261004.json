@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R14_NARROW_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-04T04:10:00Z",
+  "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "6313f029d8488f31d236a95ee8caae77b29e9f9d",
+  "authority": {
+    "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
+    "diagnosticBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b"
+  },
+  "findings": [
+    "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
+    "B4-003-R14-02-RENEWALS-EXPIRED-OUTCOME-CONTINUITY",
+    "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
+    "B4-003-R14-04-CLIENT360-LIST-AUTHORITY",
+    "B4-003-R14-05-QUALITY-VISUAL-GRAMMAR-COMPLETENESS",
+    "B4-003-R14-06-INSURER-IMPORT-STEP-TRUTHFULNESS"
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/renovaciones.js": "962ff81e28fb94f1eaa89a96b4a2f765dd2b630d",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c66a13bf292edb6d235b487778a36d71e69f9ecc",
+    "orbit360-platform/modules/polizas.js": "c5dcc45c02de91964338de22125f24bbdb3a3176",
+    "orbit360-platform/modules/cliente360.js": "129fae4063fbf3d603d3575fc71369a764a27a7a",
+    "orbit360-platform/modules/calidad.js": "e0b3e9f2f4b71da151af076cb934b104ae51ee6a",
+    "orbit360-platform/core/importa.js": "902f5fee87a71933ede31afe005582c6f00f817b",
+    "orbit360-platform/core/router.js": "ee300051b692ef52d8808514ad0572e00b3830c5",
+    "orbit360-platform/index.html": "bc355c381daf328b8158d8703e8c6802f7fbf71a"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "b651547bcc3bbf51d88d0685db5ae911f5d762ad",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "581309ff094082beda4c65427994a0b228374203"
+  },
+  "changes": {
+    "renewalFirstPaint": "Stable loading until polizas/clientes/aseguradoras are server-confirmed; no false zero/dash business projection.",
+    "renewalOutcomeContinuity": "Explicit renewable YES + expired Vencida + no terminal renewal outcome remains actionable in Vencidas.",
+    "unknownRenewability": "UNKNOWN remains fail-closed; surfaced only as visible validation debt.",
+    "policyKpi": "Date-based ≤45-day KPI relabeled Vencen ≤45 d; unpartitioned states surfaced as otros/validar.",
+    "client360Authority": "Server-confirmed product store is the base list/policy universe; projection no longer replaces it.",
+    "quality": "Canonical table grammar markers and explicit complete-count/decimal percentage.",
+    "insurerImport": "Documentary source flow truthfully shows Cargar archivo → Clasificar fuente → Guardar y vincular; no tariff auto-application claim.",
+    "router": "Renovaciones now depends on aseguradoras hydration."
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productionFunctionDeployment": false,
+    "realDriveWrites": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

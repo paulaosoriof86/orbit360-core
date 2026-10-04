@@ -6,6 +6,17 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.renovaciones = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
+  const REQUIRED_DATA = ['polizas', 'clientes', 'aseguradoras'];
+  function ensureDataCollections() {
+    try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(REQUIRED_DATA); } catch (_) {}
+  }
+  function renewalDataReadiness() {
+    const store=S();
+    if(!store || store.__productReadOnlyP0!==true || typeof store._productStatus!=='function') return 'ready';
+    const ps=store._productStatus()||{},confirmed=[].concat(ps.serverConfirmedCollections||[]),denied=[].concat(ps.deniedCollections||[]);
+    if(REQUIRED_DATA.some(name=>denied.includes(name))) return 'unavailable';
+    return REQUIRED_DATA.every(name=>confirmed.includes(name)) ? 'ready' : 'pending';
+  }
   const countryCode = v => String(v == null ? '' : v).trim().toUpperCase();
   const policyCountry = p => { const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null; return countryCode(p&&p.pais || cli&&cli.pais); };
   const selectedCountry = p => { const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; };
@@ -16,7 +27,24 @@ Orbit.modules.renovaciones = (function () {
     if(p.renovable===false || ['false','no','no renovable'].includes(v)) return 'NO';
     return 'UNKNOWN';
   };
-  const esRenovable = p => p && renewabilityState(p)==='YES' && selectedCountry(p) && (p.estado === 'Vigente' || p.estado === 'Por renovar') && !p.renovadaPor && String(p.renovacionEstado || '').toLowerCase() !== 'renovada';
+  const policyState = p => String(p&&p.estado||'').trim().toLowerCase().replace(/\s+/g,'');
+  const terminalRenewalOutcome = p => {
+    if(!p) return true;
+    if(p.renovadaPor) return true;
+    const state=String(p.renovacionEstado||'').trim().toLowerCase().replace(/[\s_-]+/g,'');
+    return ['renovada','norenovada','rechazada','cerrada','cancelada'].includes(state);
+  };
+  const renewalActionable = p => {
+    if(!p || renewabilityState(p)!=='YES' || !selectedCountry(p) || terminalRenewalOutcome(p)) return false;
+    const d=U.daysFromNow(p.vigenciaFin),state=policyState(p);
+    if(d==null) return false;
+    return d<0 ? ['vigente','porrenovar','vencida'].includes(state) : ['vigente','porrenovar'].includes(state);
+  };
+  const renewalPendingValidation = p => {
+    if(!p || renewabilityState(p)!=='UNKNOWN' || !selectedCountry(p) || terminalRenewalOutcome(p)) return false;
+    const state=policyState(p),d=U.daysFromNow(p.vigenciaFin);
+    return d!=null && d<=90 && ['vigente','porrenovar'].includes(state);
+  };
 
   function buckets() {
     const cols = [
@@ -25,7 +53,7 @@ Orbit.modules.renovaciones = (function () {
       { key: 'd45', label: 'Próximas (16–45 d)', tone: 'warn', test: d => d > 15 && d <= 45 },
       { key: 'd90', label: 'En el horizonte (46–90 d)', tone: 'info', test: d => d > 45 && d <= 90 }
     ];
-    const pols = S().where('polizas', esRenovable);
+    const pols = S().where('polizas', renewalActionable);
     cols.forEach(c => c.items = []);
     pols.forEach(p => {
       const d = U.daysFromNow(p.vigenciaFin);
@@ -37,7 +65,14 @@ Orbit.modules.renovaciones = (function () {
   }
 
   function render(host) {
+    ensureDataCollections();
+    const readiness=renewalDataReadiness();
+    if(readiness!=='ready'){
+      host.innerHTML=`<div class="page" data-renewals-loading="${readiness}">${K.bannerFor('renovaciones','')}<div class="card pad"><b>${readiness==='unavailable'?'No fue posible cargar la cartera de renovaciones.':'Cargando cartera de renovaciones…'}</b><div class="muted" style="margin-top:5px">${readiness==='unavailable'?'La fuente operativa requerida no está disponible para este rol.':'Estamos preparando pólizas, clientes y aseguradoras antes de mostrar resultados.'}</div></div></div>`;
+      return;
+    }
     const cols = buckets();
+    const pendingValidation=S().where('polizas', renewalPendingValidation);
     const totalPrima = cols.reduce((s, c) => s + c.items.reduce((ss, it) => ss + q.norm(it.p.prima, it.p.moneda), 0), 0);
     const toneBg = { danger: 'var(--danger)', warn: 'var(--warn)', info: 'var(--info)' };
 
@@ -49,6 +84,7 @@ Orbit.modules.renovaciones = (function () {
         { label: '16–45 días', val: cols[2].items.length, color: 'var(--warn)', foot: 'planificar', onclick: "location.hash='#/renovaciones'" },
         { label: 'Prima en juego', val: U.moneyShort(totalPrima, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
+      <div class="cfg-note" data-renewability-pending-count="${pendingValidation.length}" style="margin:0 0 14px"><b>Renovabilidad pendiente de validar: ${pendingValidation.length}</b><span class="muted"> · Estas pólizas no se incorporan al pipeline accionable hasta contar con una fuente que confirme que son renovables.</span></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:start">
         ${cols.map(c => `<div class="card" style="overflow:hidden">
           <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;border-top:3px solid ${toneBg[c.tone]}">

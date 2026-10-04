@@ -30,7 +30,18 @@ Orbit.modules = Orbit.modules || {};
     return 'UNKNOWN';
   }
   function daysUntil(s) { if (!s) return null; const d=new Date(s+'T00:00:00'),n=new Date();n.setHours(0,0,0,0);return Math.ceil((d-n)/86400000); }
-  function active(p) { return p && renewabilityState(p)==='YES' && ['vigente','porrenovar'].includes(norm(p.estado)) && !p.renovadaPor && norm(p.renovacionEstado) !== 'renovada'; }
+  function terminalRenewalOutcome(p) {
+    if(!p) return true;
+    if(p.renovadaPor) return true;
+    const state=String(p.renovacionEstado||'').trim().toLowerCase().replace(/[\s_-]+/g,'');
+    return ['renovada','norenovada','rechazada','cerrada','cancelada'].includes(state);
+  }
+  function active(p) {
+    if(!p || renewabilityState(p)!=='YES' || terminalRenewalOutcome(p)) return false;
+    const d=daysUntil(p.vigenciaFin),state=norm(p.estado).replace(/\s+/g,'');
+    if(d==null) return false;
+    return d<0 ? ['vigente','porrenovar','vencida'].includes(state) : ['vigente','porrenovar'].includes(state);
+  }
   function policies(limit) {
     return A.filter('polizas', S().all('polizas') || [], 'renovaciones').filter(p => {
       if (!active(p) || !selectedCountry(p)) return false;

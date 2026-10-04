@@ -18,7 +18,7 @@ Orbit.router = (function () {
     cobros: ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas'],
     cronograma: ['clientes', 'polizas', 'recibosEsperados', 'carteraPrimas', 'cobros', 'gestiones', 'tareas'],
     conciliaciones: ['cobros', 'polizas', 'clientes', 'finmovs'],
-    renovaciones: ['polizas', 'clientes', 'gestiones'],
+    renovaciones: ['polizas', 'clientes', 'aseguradoras', 'gestiones'],
     comisiones: ['comisiones', 'polizas', 'clientes'],
     calidad: ['clientes', 'polizas', 'asesores']
   };

@@ -1,10 +1,10 @@
 {
   "schema": "GRAVICENTRA_I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_V1",
-  "recordedAt": "2026-10-04T03:45:00Z",
+  "recordedAt": "2026-10-04T04:10:00Z",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "cdd0c050d36c940c5701b61bc735e596e1fc5f80",
-  "expectedLedgerNextBlobSha": "5bc7a7ef37afdbe3082e4b74cc49386825aa56aa",
+  "sourceLedgerPreviousBlobSha": "5bc7a7ef37afdbe3082e4b74cc49386825aa56aa",
+  "expectedLedgerNextBlobSha": "9a80933d2298a6ff27670dbd6deaa59b96255001",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -2325,86 +2325,98 @@
     {
       "id": "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
       "block": "B4",
-      "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "orbit360-platform/modules/renovaciones.js + orbit360-platform/core/router.js",
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview first paint shows stable loading until authoritative renewal dependencies are ready, then one coherent populated render.",
       "source": "PAULA_R14",
-      "nextAction": "B4_003_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "PRODUCT_HYDRATION_PRESENTATION_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
-      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b"
+      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9"
     },
     {
       "id": "B4-003-R14-02-RENEWALS-EXPIRED-OUTCOME-CONTINUITY",
       "block": "B4",
-      "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "orbit360-platform/modules/renovaciones.js + orbit360-platform/modules/renewals-v1200-operational-bridge.js",
       "targetGate": "B4-003",
       "closureCondition": "Explicit YES expired unresolved policies remain in Vencidas; UNKNOWN stays fail-closed and visible as validation debt only.",
       "source": "PAULA_R14",
-      "nextAction": "B4_003_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "PRODUCT_RENEWAL_OUTCOME_CONTINUITY_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
-      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b"
+      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9"
     },
     {
       "id": "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
       "block": "B4",
-      "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "orbit360-platform/modules/polizas.js + orbit360-platform/modules/cliente360.js",
       "targetGate": "B4-003",
       "closureCondition": "KPI is truthfully labeled as expiry horizon and remaining unpartitioned policy states are explicit.",
       "source": "PAULA_R14",
-      "nextAction": "B4_003_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "PRODUCT_KPI_SEMANTIC_MISMATCH_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
-      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b"
+      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9"
     },
     {
       "id": "B4-003-R14-04-CLIENT360-LIST-AUTHORITY",
       "block": "B4",
-      "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "orbit360-platform/modules/cliente360.js",
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview GT/CO/Todos list uses authoritative server-confirmed store and cannot collapse to zero from a stale projection.",
       "source": "PAULA_R14",
-      "nextAction": "B4_003_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "PRODUCT_LIST_AUTHORITY_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
-      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b"
+      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9"
     },
     {
       "id": "B4-003-R14-05-QUALITY-VISUAL-GRAMMAR-COMPLETENESS",
       "block": "B4",
-      "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "orbit360-platform/modules/calidad.js",
       "targetGate": "B4-003",
       "closureCondition": "Both quality tables share canonical table grammar and completeness shows count plus decimal percent without changing data semantics.",
       "source": "PAULA_R14",
-      "nextAction": "B4_003_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "APPROVED_VISUAL_GRAMMAR_AND_KPI_CLARITY_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
-      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b"
+      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9"
     },
     {
       "id": "B4-003-R14-06-INSURER-IMPORT-STEP-TRUTHFULNESS",
       "block": "B4",
-      "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "orbit360-platform/core/importa.js",
       "targetGate": "B4-003",
       "closureCondition": "Current source-upload steps truthfully represent classify → Drive/link → pending validation; no automatic tariff activation is implied.",
       "source": "PAULA_R14",
-      "nextAction": "B4_003_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "PRODUCT_IMPORT_UX_CONTRACT_MISMATCH_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
-      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b"
+      "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9"
     }
   ],
   "attentionIds": [
@@ -2546,7 +2558,7 @@
     "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
     "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
   ],
-  "b4AdvanceRule": "B4-004 remains held until all R14 blocking B4-003 findings have exact Preview evidence-backed closure and Paula targeted visual PASS.",
+  "b4AdvanceRule": "B4-004 remains held until R14 exact Preview machine PASS and Paula targeted visual PASS.",
   "liveRule": {
     "required": "Every attention item marked/derived as pre-live debt must have explicit final disposition; no silent omission.",
     "noLiveUntilB4_007": true
@@ -2574,5 +2586,7 @@
   "renewalDeterministicApplyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
   "renewalDeterministicApplyReceiptBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e",
   "r14VisualRejectionAndDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
-  "r14VisualRejectionAndDiagnosticBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b"
+  "r14VisualRejectionAndDiagnosticBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
+  "r14SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
+  "r14SourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9"
 }

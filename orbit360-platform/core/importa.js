@@ -891,7 +891,7 @@ Orbit.importa = (function () {
   function paint() {
     const dr = document.getElementById('imp-drawer');
     const m = state.meta;
-    const steps = ['Cargar archivo', 'Extracción inteligente', 'Confirmar'];
+    const steps = state.kind === 'docs-aseguradora' ? ['Cargar archivo', 'Clasificar fuente', 'Guardar y vincular'] : ['Cargar archivo', 'Extracción inteligente', 'Confirmar'];
     dr.innerHTML = `<div class="imp-head">
         <div><div class="imp-eyebrow">Importación inteligente</div>
         <div class="imp-title">${m.icon} ${U.esc(m.title)}</div></div>
@@ -920,6 +920,22 @@ Orbit.importa = (function () {
       <div class="imp-note">${state.modo === 'documental' ? '📁 Modo documental: el archivo se guardará en <b>Drive únicamente después de confirmar</b> y de recibir readback del proveedor documental. Si Drive no está conectado, la operación se bloquea sin falso éxito.' : '🧠 Modo inteligente: reconoce el formato, <b>extrae los datos y los mapea</b> a Orbit 360 (cruza y complementa sin duplicar). Para documentos de expediente, el archivo original también debe quedar confirmado en Drive.'}</div>`;
   }
   function step2(m) {
+    if (state.kind === 'docs-aseguradora') {
+      const insurerName=clean(state.scope&&state.scope.aseguradoraNombre)||'Aseguradora';
+      const files=(state.files||[]).map(n=>'<span class="mail-chip">📎 '+U.esc(n)+'</span>').join('');
+      return `${scopeBanner(state.kind)}
+        <div class="card" data-insurer-source-classification="1" style="padding:14px">
+          <div style="font-family:var(--f-display);font-weight:800;font-size:14px">Fuente clasificada para ${U.esc(insurerName)}</div>
+          <div class="imp-files" style="margin-top:10px">${files}</div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px">
+            <div><span class="muted">Tipo de fuente</span><b style="display:block">${U.esc(state.insurerDocCategory||'Documento')}</b></div>
+            <div><span class="muted">Ramo / línea</span><b style="display:block">${U.esc(state.insurerDocRamo||'Pendiente de clasificar')}</b></div>
+            <div><span class="muted">Producto / plan</span><b style="display:block">${U.esc(state.insurerDocProducto||'Pendiente de clasificar')}</b></div>
+            <div><span class="muted">Versión / vigencia</span><b style="display:block">${U.esc(state.insurerDocVersion||'Pendiente de clasificar')}</b></div>
+          </div>
+          <div class="cfg-note" style="margin-top:12px"><b>Qué ocurrirá al confirmar:</b> el archivo se guardará en Drive y quedará vinculado a esta aseguradora con procedencia y estado <b>Documento recibido · requiere validación</b>. <b>No se extraerán ni aplicarán tarifas automáticamente en este flujo</b> y no se habilitarán Cotizador, Comparativo ni IA.</div>
+        </div>`;
+    }
     // Base de datos inicial: si aún no se resolvió a una entidad real, hacerlo aquí (nunca mostrar la tabla de ejemplo)
     if (state.kind === 'base-inicial' && state.parsed && state.parsed.headers && state.parsed.headers.length) {
       let best = 'clientes', score = -1;['clientes', 'polizas', 'vehiculos', 'movimientos-finanzas', 'estados-cuenta'].forEach(k => { const n = Object.keys(mapHeaders(k, state.parsed.headers)).length; if (n > score) { score = n; best = k; } });
@@ -1230,7 +1246,7 @@ Orbit.importa = (function () {
         state.step = 2; paint();
       };
       const fail = (why) => { state.parsed = null; state.processing = null; state.step = 2; paint(); if (why && Orbit.ui && Orbit.ui.toast) Orbit.ui.toast('⚠ ' + why); };
-      if (state.modo === 'documental') { setTimeout(() => { state.step = 3; paint(); }, 300); return; }
+      if (state.modo === 'documental') { setTimeout(() => { state.step = 2; paint(); }, 300); return; }
       // CSV / TSV / TXT
       if (ext === 'csv' || ext === 'tsv' || ext === 'txt') {
         const rd = new FileReader();
@@ -1335,7 +1351,7 @@ Orbit.importa = (function () {
         state.filesReal = files;
         state.parsed = null;
         if (!files.length) return;
-        if (state.modo === 'documental') { state.step = 3; paint(); return; }
+        if (state.modo === 'documental') { state.step = 2; paint(); return; }
         const synthetic = document.createElement('input');
         synthetic.type = 'file';
         const fl = dr.querySelector('#imp-files');
@@ -1354,7 +1370,7 @@ Orbit.importa = (function () {
       // botón continuar al pie
       const body = dr.querySelector('.imp-body');
       const bar = document.createElement('div'); bar.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin-top:16px';
-      bar.innerHTML = `<button class="btn ghost" id="imp-back2">Atrás</button><button class="btn primary" id="imp-next2">Confirmar mapeo →</button>`;
+      bar.innerHTML = `<button class="btn ghost" id="imp-back2">Atrás</button><button class="btn primary" id="imp-next2">${state.kind === 'docs-aseguradora' ? 'Revisar y guardar →' : 'Confirmar mapeo →'}</button>`;
       body.appendChild(bar);
       bar.querySelector('#imp-back2').addEventListener('click', () => { state.step = 1; paint(); });
       bar.querySelector('#imp-next2').addEventListener('click', () => { state.step = 3; paint(); });

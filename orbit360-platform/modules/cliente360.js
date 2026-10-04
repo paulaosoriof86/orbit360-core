@@ -174,17 +174,15 @@ Orbit.modules.cliente360 = (function () {
     listWaitingForReady = false;
     const renderStartedAt = perfNow();
     const summaryStartedAt = perfNow();
-    const batchRunner = Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function' ? Orbit.clientProjection.withReadBatch : null;
-    const clientBatch = batchRunner ? batchRunner(['clientes'], source => ({ clientes: source.clientes || [] })) : null;
-    const clientesRaw = clientBatch ? clientBatch.clientes : S().all('clientes');
+    // R14: server-confirmed product store is the authoritative base universe.
+    // Projection helpers may enrich summaries but may not replace it with an empty/stale snapshot.
+    const clientesRaw = S().all('clientes');
     const clientesAll = (clientesRaw || []).filter(c => !(c && (c.fusionado === true || String(c.mergedIntoClientId || '').trim())));
     const globalCountry = String(Orbit.pais || 'TODOS').toUpperCase();
     const clientes = clientesAll.filter(c => globalCountry === 'TODOS' || String(c && c.pais || '').toUpperCase() === globalCountry);
     const policyReadiness = dataReadiness(['polizas']);
     if (policyReadiness === 'pending') ensureDataCollections(['polizas']);
-    const policiesRaw = policyReadiness === 'ready'
-      ? (batchRunner ? batchRunner(['polizas'], source => source.polizas || []) : S().all('polizas'))
-      : [];
+    const policiesRaw = policyReadiness === 'ready' ? S().all('polizas') : [];
     // Cliente 360 is client-centric: once the visible client universe is scoped,
     // include every policy linked to those clients. Policy-country discrepancies
     // remain visible for validation instead of silently dropping client history.
@@ -278,14 +276,14 @@ Orbit.modules.cliente360 = (function () {
     const rowsBuildMs = perfNow() - rowsBuildStartedAt;
     const innerHtmlStartedAt = perfNow();
 
-    host.innerHTML = `<div class="page" data-c360-list-ready="1">
+    host.innerHTML = `<div class="page" data-c360-list-ready="1" data-c360-base-authority="server-confirmed-store">
       ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevoCliente()">+ Nuevo cliente</button>`)}
 
       <div class="kpi-row" data-c360-kpi-scope="${globalCountry}" data-c360-filter-country="${f.pais || ''}" data-c360-kpi-client-count="${rows.length}" data-c360-kpi-active-count="${activePolicyCount==null?'':activePolicyCount}" data-c360-kpi-policy-count="${totalPolicyCount==null?'':totalPolicyCount}" data-c360-kpi-renew-count="${renewals45Count==null?'':renewals45Count}" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
         <button class="kpi kpi-click" data-c360-kpi="clients" title="Ver clientes del universo actual"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${rows.length}</div><div class="k-foot muted">${rows.filter(c => c.tipo === 'Empresa').length} empresas · ${rows.filter(c => c.tipo === 'Persona').length} personas ›</div></button>
         <button class="kpi kpi-click" data-c360-kpi="active" title="Ver pólizas activas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${policyReadiness === 'ready' ? activePolicyCount : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'de ' + totalPolicyCount + ' históricas ›' : 'Actualizando pólizas'}</div></button>
         <button class="kpi kpi-click" data-c360-kpi="premium" title="Ver detalle de prima vigente"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima neta vigente</div><div class="k-val">${primaNetaVigenteHtml}</div><div class="k-foot muted">Separada por moneda; no se suman GTQ y COP ›</div></button>
-        <button class="kpi kpi-click" data-c360-kpi="renewals" title="Ver renovaciones próximas"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Por renovar ≤45 d</div><div class="k-val">${policyReadiness === 'ready' ? renewals45Count : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'requieren gestión ›' : 'Actualizando pólizas'}</div></button>
+        <button class="kpi kpi-click" data-c360-kpi="renewals" title="Ver renovaciones próximas"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Vencen ≤45 d</div><div class="k-val">${policyReadiness === 'ready' ? renewals45Count : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'requieren gestión ›' : 'Actualizando pólizas'}</div></button>
       </div>
 
       <div class="card" style="overflow:hidden">

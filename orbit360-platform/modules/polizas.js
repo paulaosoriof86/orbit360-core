@@ -181,6 +181,7 @@ Orbit.modules.polizas = (function () {
     const primaVigentePorMoneda = premiumByCurrency(all,I);
     const renovaciones45 = all.filter(isRenewalWithin45Days);
     const historicasSinCartera = all.filter(isHistoricalNoPortfolio);
+    const otherPolicyCount = Math.max(0, all.length - vig.length - historicasSinCartera.length);
     const r = rows(I, all);
     const pages = Math.max(1, Math.ceil(r.length / PAGE_SIZE));
     if (st.page >= pages) st.page = 0;
@@ -191,9 +192,9 @@ Orbit.modules.polizas = (function () {
     host.innerHTML = `<div class="page" data-polizas-kpi-ready="1" data-polizas-total="${all.length}" data-polizas-active="${vig.length}" data-polizas-renew45="${renovaciones45.length}" data-polizas-historical="${historicasSinCartera.length}">
       ${K.bannerFor('polizas', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevaPoliza()">+ Nueva póliza</button>`)}
       ${K.kpis([
-        { label: 'Pólizas activas', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'Vigente + Por renovar', onclick: "Orbit.modules.polizas.filtrarGrupo('active')" },
+        { label: 'Pólizas activas', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'Vigente + Por renovar' + (otherPolicyCount ? ' · ' + otherPolicyCount + ' otros/validar' : ''), onclick: "Orbit.modules.polizas.filtrarGrupo('active')" },
         { label: 'Prima neta vigente', val: premiumByCurrencyHtml(primaVigentePorMoneda), color: 'var(--ok)', foot: 'separada por moneda · no se suman GTQ y COP', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
-        { label: 'Por renovar ≤45 d', val: renovaciones45.length, color: 'var(--warn)', foot: 'vigentes con vencimiento en 0–45 días', onclick: "Orbit.modules.polizas.filtrarGrupo('renewals45')" },
+        { label: 'Vencen ≤45 d', val: renovaciones45.length, color: 'var(--warn)', foot: 'activas con vencimiento en 0–45 días', onclick: "Orbit.modules.polizas.filtrarGrupo('renewals45')" },
         { label: 'Histórico / sin cartera', onclick: "Orbit.modules.polizas.filtrarGrupo('historical')", val: historicasSinCartera.length, color: 'var(--danger)', foot: 'ediciones no vigentes sin cartera activa' }
       ])}
       <div class="card" style="overflow:hidden">

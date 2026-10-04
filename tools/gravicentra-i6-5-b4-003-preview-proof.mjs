@@ -19,6 +19,7 @@ const db=getFirestore(app),auth=getAuth(app),tenant=db.collection('tenants').doc
 const ids={
  client:'b4003qa_client_'+run,
  renewalPolicy:'b4003qa_policy_renew_'+run,
+ expiredRenewPolicy:'b4003qa_policy_expired_renew_'+run,
  unknownRenewPolicy:'b4003qa_policy_unknown_'+run,
  cancelPolicy:'b4003qa_policy_cancel_'+run,
  healthPolicy:'b4003qa_policy_health_'+run,
@@ -61,10 +62,11 @@ async function actor(){
  return candidates.sort((a,b)=>order.indexOf(a.activeRole)-order.indexOf(b.activeRole))[0];
 }
 async function seed(who){
- const today=new Date(),end=new Date(today.getTime()+10*86400000),endS=end.toISOString().slice(0,10),startS=today.toISOString().slice(0,10);
+ const today=new Date(),end=new Date(today.getTime()+10*86400000),expiredEnd=new Date(today.getTime()-3*86400000),expiredStart=new Date(today.getTime()-368*86400000),endS=end.toISOString().slice(0,10),startS=today.toISOString().slice(0,10),expiredEndS=expiredEnd.toISOString().slice(0,10),expiredStartS=expiredStart.toISOString().slice(0,10);
  const common={tenantId,__syntheticQa:true,ownerUid:who.uid,ownerEmail:who.email,createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()};
  await ref('clientes',ids.client).set({...common,id:ids.client,nombre:'B4-003 QA Cliente',tipo:'Persona',pais:'GT',moneda:'GTQ',asesorId:who.advisorId||'qa',email:'b4003qa@example.invalid',telefono:''},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.renewalPolicy).set({...common,id:ids.renewalPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-REN-'+run,estado:'Vigente',renovable:true,pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:1000,primaNeta:900},{merge:false});proof.syntheticWrites++;
+ await ref('polizas',ids.expiredRenewPolicy).set({...common,id:ids.expiredRenewPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-EXP-'+run,estado:'Vencida',renovable:true,pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:expiredStartS,vigenciaFin:expiredEndS,prima:750,primaNeta:680},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.unknownRenewPolicy).set({...common,id:ids.unknownRenewPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-UNKNOWN-'+run,estado:'Vigente',pais:'GT',moneda:'GTQ',ramo:'ACCIDENTES QA FUENTE',producto:'PRODUCTO QA FUENTE',subramo:'PRODUCTO QA FUENTE',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:650,primaNeta:600},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.cancelPolicy).set({...common,id:ids.cancelPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-CAN-'+run,estado:'Cancelada',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:800,primaNeta:700},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.healthPolicy).set({...common,id:ids.healthPolicy,clienteId:ids.client,asesorId:who.advisorId||'qa',numero:'B4-003-HEALTH-'+run,estado:'Vigente',renovable:false,pais:'GT',moneda:'GTQ',ramo:'Accidentes',producto:'Accidentes',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:407.01,primaTotal:407.01,primaNeta:346.09,cuotas:2},{merge:false});proof.syntheticWrites++;
@@ -209,7 +211,7 @@ async function cancellationEvidence(){
  proof.assertions.cancellationProjectionConsistent=(cancelled.length===0);
 }
 async function cleanup(startMs){
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]]){
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]]){
   const r=ref(c,id);if((await r.get()).exists){await r.delete();proof.cleanupWrites++;}
  }
  for(const col of ['workflowEvents','operationalEvents']){
@@ -642,6 +644,51 @@ try{
    proof.r13RenewalDelayedRenderBlocker={blocking:true,code:'RENEWAL_DELAYED_RENDER_MUTATION',mutationCount:stable.mutations,textStable:stable.before===stable.after,records:stable.records,events:stable.events};
  }
 
+ // R14: first paint must never expose false zero/placeholder business state.
+ proof.r14RenewalReadiness=await page.evaluate(ids=>{
+   const h=document.getElementById('host'),store=Orbit.store,previous=Orbit.pais||'TODOS',original=store._productStatus;
+   Orbit.pais='GT';
+   let loading=false,leakedRows=-1,readyExpired=false,unknownActionable=true,pendingCount=-1,placeholderClient=false;
+   try{
+     store._productStatus=function(){const q=original.call(store)||{},confirmed=[].concat(q.serverConfirmedCollections||[]).filter(x=>x!=='aseguradoras');return Object.assign({},q,{serverConfirmedCollections:confirmed});};
+     Orbit.modules.renovaciones.render(h);
+     loading=!!h.querySelector('[data-renewals-loading]');
+     leakedRows=h.querySelectorAll('[data-renewal-policy]').length;
+   }finally{store._productStatus=original;}
+   Orbit.modules.renovaciones.render(h);
+   readyExpired=!!h.querySelector('[data-renewal-policy="'+ids.expiredRenewPolicy+'"]');
+   unknownActionable=!!h.querySelector('[data-renewal-policy="'+ids.unknownRenewPolicy+'"]');
+   pendingCount=Number(h.querySelector('[data-renewability-pending-count]')?.getAttribute('data-renewability-pending-count')||0);
+   placeholderClient=Array.from(h.querySelectorAll('[data-renewal-policy] b')).some(x=>String(x.textContent||'').trim()==='—');
+   Orbit.pais=previous;
+   return{loading,leakedRows,readyExpired,unknownActionable,pendingCount,placeholderClient};
+ },ids);
+ need(proof.r14RenewalReadiness.loading===true&&proof.r14RenewalReadiness.leakedRows===0,'B4_003_R14_RENEWAL_LOADING_GATE_FAILED:'+JSON.stringify(proof.r14RenewalReadiness));
+ need(proof.r14RenewalReadiness.readyExpired===true,'B4_003_R14_EXPIRED_RENEWAL_DROPPED');
+ need(proof.r14RenewalReadiness.unknownActionable===false&&proof.r14RenewalReadiness.pendingCount>=1,'B4_003_R14_UNKNOWN_RENEWABILITY_VISIBILITY_CONTRACT_FAILED');
+ need(proof.r14RenewalReadiness.placeholderClient===false,'B4_003_R14_RENEWAL_PLACEHOLDER_LEAK');
+ proof.assertions.renewalFirstPaintReadiness=true;
+ proof.assertions.expiredRenewalOutcomeContinuity=true;
+ proof.assertions.unknownRenewabilityDebtVisibleFailClosed=true;
+
+ proof.r14Client360Authority=await page.evaluate(ids=>{
+   const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';Orbit.pais='GT';Orbit.modules.cliente360.render(h);
+   const root=h.querySelector('[data-c360-list-ready="1"]'),text=String(h.innerText||'');
+   const out={authority:root?.getAttribute('data-c360-base-authority')||'',syntheticClientVisible:text.includes('B4-003 QA Cliente')};
+   Orbit.pais=previous;return out;
+ },ids);
+ need(proof.r14Client360Authority.authority==='server-confirmed-store'&&proof.r14Client360Authority.syntheticClientVisible===true,'B4_003_R14_CLIENT360_AUTHORITATIVE_LIST_FAILED:'+JSON.stringify(proof.r14Client360Authority));
+ proof.assertions.client360AuthoritativeList=true;
+
+ proof.r14QualityGrammar=await page.evaluate(()=>{
+   const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';Orbit.pais='GT';Orbit.modules.calidad.render(h);
+   const grammar=h.querySelectorAll('[data-quality-table-grammar="canonical"]').length,text=String(h.innerText||'').toLowerCase();Orbit.pais=previous;
+   return{grammar,hasCompleteLabel:text.includes('expedientes completos'),hasDecimal:/\d+[.,]\d% de completitud/i.test(text)};
+ });
+ need(proof.r14QualityGrammar.grammar>=2&&proof.r14QualityGrammar.hasCompleteLabel===true&&proof.r14QualityGrammar.hasDecimal===true,'B4_003_R14_QUALITY_GRAMMAR_OR_COMPLETENESS_FAILED:'+JSON.stringify(proof.r14QualityGrammar));
+ proof.assertions.qualityCanonicalGrammar=true;
+ proof.assertions.qualityCompletenessExplicit=true;
+
  // R13: reconcile the real, non-synthetic renewal universe against the canonical YES-only pipeline.
  proof.r13RenewalReality=await page.evaluate(ids=>{
    const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';
@@ -748,7 +795,12 @@ try{
  need(!importerProbe.error&&importerProbe.fileExists===true,'B4_003_R13_IMPORTER_FILE_INPUT_NOT_RENDERED:'+JSON.stringify(importerProbe));
  const driveFileName='b4-r13-drive-'+run+'.csv';
  await page.setInputFiles('#imp-file',{name:driveFileName,mimeType:'text/csv',buffer:Buffer.from('concepto,valor\nqa_r13,'+run+'\n','utf8')});
+ await page.waitForSelector('[data-insurer-source-classification="1"]',{timeout:10000});
+ const importerClassifyText=await page.locator('#imp-drawer').innerText();
+ need(importerClassifyText.includes('Clasificar fuente')&&importerClassifyText.includes('No se extraerán ni aplicarán tarifas automáticamente'),'B4_003_R14_INSURER_IMPORT_STEP_NOT_TRUTHFUL');
+ await page.click('#imp-next2');
  await page.waitForSelector('#imp-finish',{timeout:10000});
+ proof.assertions.insurerImportTruthfulClassificationStep=true;
  await page.click('#imp-finish');
  await page.waitForFunction(()=>!document.getElementById('imp-back')?.classList.contains('open'),null,{timeout:60000});
  const insurerAfterUpload=(await ref('aseguradoras',ids.insurer).get()).data()||{};
@@ -829,7 +881,7 @@ try{
  if(browser)await browser.close().catch(()=>{});
  await cleanup(startMs).catch(e=>proof.cleanupError=clean(e&&e.message||e));
  const checks=[];
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
  proof.syntheticFinalAbsent=checks.every(x=>x===false);
  proof.assertions.cleanupComplete=proof.syntheticFinalAbsent;
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
