@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R14_PARENT_STATE_RECONCILIATION_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_PARENT_STATE_RECONCILED_PENDING_EXACT_PREVIEW",
+  "failedRunId": 37178282685,
+  "failedJobId": 111365407240,
+  "failureCode": "CONTINUITY_STATUS_DRIFT:B4-003",
+  "before": {
+    "ledger": {
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+    },
+    "carry": {
+      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+    }
+  },
+  "after": {
+    "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "REJECTED_R14_PENDING_RETEST"
+  },
+  "reason": "R13 machine-pass parent status was not invalidated in ledger when Paula rejected the candidate and R14 source remediation opened. R14 is the current authoritative state.",
+  "boundaries": {
+    "productSourceChanged": false,
+    "businessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

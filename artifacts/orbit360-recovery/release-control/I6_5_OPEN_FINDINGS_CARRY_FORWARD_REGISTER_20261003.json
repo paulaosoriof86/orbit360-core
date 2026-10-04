@@ -563,14 +563,14 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
       "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
       "source": "LEDGER",
       "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
-      "humanVisualStatus": "REJECTED_R13",
+      "humanVisualStatus": "REJECTED_R14_PENDING_RETEST",
       "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
       "r13QaGateAlignmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
       "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
@@ -585,7 +585,8 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-004",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER"
+      "source": "LEDGER",
+      "nextAction": "WAIT_B4_003_PAULA_VISUAL"
     },
     {
       "id": "B4-005",

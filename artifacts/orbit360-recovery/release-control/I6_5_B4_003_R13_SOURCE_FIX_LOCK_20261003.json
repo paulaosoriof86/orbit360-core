@@ -7,7 +7,7 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_R14_PENDING_RETEST",
@@ -33,11 +33,11 @@
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "14e9db2c07257c853b4d4df90a6ede2d81211018"
+    "blobSha": "4311d807aa0afa88fb7d07d0464f6db45cbd3b37"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "ac36f0f146387ce3a74b1d4c84a9e9b313bce0a2",
+    "blobSha": "cabbfc3bbb3b6b4e56fcbba0ffeb3061efc72d94",
     "inventoryCount": 197,
     "attentionCount": 92,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -371,6 +371,13 @@
     "status": "QA_CONTINUITY_METADATA_FIXED_PENDING_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14A_CONTINUITY_METADATA_ROOTFIX_20261004.json",
     "blobSha": "1321826bedf1b80b1ae7f569585d4748e0af3f7b",
-    "carryBlobSha": "ac36f0f146387ce3a74b1d4c84a9e9b313bce0a2"
+    "carryBlobSha": "cabbfc3bbb3b6b4e56fcbba0ffeb3061efc72d94"
+  },
+  "r14ParentStateReconciliation": {
+    "status": "QA_PARENT_STATE_RECONCILED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PARENT_STATE_RECONCILIATION_20261004.json",
+    "blobSha": "632f942405eec8083bd2addb04090f4c7203a741",
+    "ledgerBlobSha": "4311d807aa0afa88fb7d07d0464f6db45cbd3b37",
+    "carryBlobSha": "cabbfc3bbb3b6b4e56fcbba0ffeb3061efc72d94"
   }
 }
