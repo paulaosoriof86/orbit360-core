@@ -1,10 +1,12 @@
 import fs from 'node:fs';
+import {createHash} from 'node:crypto';
 const P={
  ledger:'artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json',
  registry:'artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json',
  control:'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
 };
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+const gitBlobSha=p=>{const b=fs.readFileSync(p);return createHash('sha1').update(`blob ${b.length}\0`).update(b).digest('hex');};
 const need=(v,c)=>{if(!v)throw new Error(c);};
 const led=read(P.ledger),reg=read(P.registry),cp=read(P.control);
 const findings=Array.isArray(led.findings)?led.findings:[];
@@ -20,6 +22,22 @@ for(const row of inv){
  const f=byLed.get(String(row.id));
  need(!!f,'CONTINUITY_REGISTER_UNKNOWN_ID:'+row.id);
  need(String(row.status||'')===String(f.status||''),'CONTINUITY_STATUS_DRIFT:'+row.id);
+}
+need(String(reg.expectedLedgerNextBlobSha||'')===gitBlobSha(P.ledger),'CONTINUITY_REGISTER_LEDGER_BLOB_BINDING_DRIFT');
+const b4003Parent=byLed.get('B4-003');
+need(!!b4003Parent,'CONTINUITY_B4_003_PARENT_MISSING');
+if(cp.currentB4?.findingStatus!=null) need(String(cp.currentB4.findingStatus)===String(b4003Parent.status||''),'CONTINUITY_B4_003_PARENT_STATUS_DRIFT');
+if(cp.i65ForensicRemediationPlan?.b4?.findingStatus!=null) need(String(cp.i65ForensicRemediationPlan.b4.findingStatus)===String(b4003Parent.status||''),'CONTINUITY_B4_003_PLAN_PARENT_STATUS_DRIFT');
+for(const row of inv.filter(x=>String(x.id||'').startsWith('B4-003-'))){
+ if(/PASS.*PRESERVE|CLOSED_PASS|VISUAL_EVIDENCE_PASS/.test(String(row.status||''))) need(row.blocking!==true,'CONTINUITY_PASS_FINDING_STILL_BLOCKING:'+row.id);
+}
+if(/MACHINE_PASS_PENDING_PAULA_VISUAL/.test(String(b4003Parent.status||''))){
+ const stale=inv.filter(x=>String(x.id||'').startsWith('B4-003-')&&x.blocking===true&&/(SOURCE_FIXED|DATA_APPLIED).*PENDING_(CONTRACT|EXACT_PREVIEW)/.test(String(x.status||'')));
+ need(stale.length===0,'CONTINUITY_MACHINE_PASS_WITH_STALE_CHILD_STATE:'+stale.map(x=>x.id).join(','));
+}
+if(/PARTIAL_PASS|REJECTED|REMEDIATION_REQUIRED/.test(String(b4003Parent.status||''))){
+ const openCurrent=inv.filter(x=>String(x.targetGate||'')==='B4-003'&&x.blocking===true&&/OPEN_|REJECTED|REMEDIATION_REQUIRED/.test(String(x.status||'')));
+ need(openCurrent.length>0,'CONTINUITY_HUMAN_REJECTION_WITHOUT_OPEN_CHILD_FINDING');
 }
 const attention=new Set((reg.attentionIds||[]).map(String));
 for(const id of attention){
