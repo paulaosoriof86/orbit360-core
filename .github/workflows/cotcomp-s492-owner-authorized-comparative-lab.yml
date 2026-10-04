@@ -128,6 +128,7 @@ jobs:
           grep -q 'id="brandInput" role="combobox"' "$E/page.html"
           grep -q 'id="modelInput" role="combobox"' "$E/page.html"
           grep -q 'id="yearSel"' "$E/page.html"
+          grep -q "let brand='TOYOTA',model='RAV4 2WD',year='2023'" "$E/page.html"
           grep -q 'No encuentro mi marca' "$E/page.html"
           grep -q 'No encuentro mi línea / modelo' "$E/page.html"
 
