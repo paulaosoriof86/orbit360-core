@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-04T04:12:00Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_PAULA_VISUAL_PARTIAL_PASS_R15_DIAGNOSTIC_REQUIRED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
@@ -64,7 +64,7 @@
   "nextRequiredProof": [
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+  "nextAction": "B4_003_R15_CAUSAL_DIAGNOSTIC",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -432,5 +432,27 @@
     "reimport": false,
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
-  }
+  },
+  "humanVisualStatus": "PARTIAL_PASS_R15_REMEDIATION_REQUIRED",
+  "r15VisualReview": {
+    "status": "PARTIAL_PASS_REMEDIATION_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
+    "receiptBlobSha": "afe6193dc1ff4151e94777a276296f9df0ed17a3",
+    "newBlockingFindingIds": [
+      "B4-003-R15-01-OPS-LEADS-NEW-PROSPECT-CATALOGS",
+      "B4-003-R15-02-QUALITY-CLIENT-COMPLETION-DURABILITY",
+      "B4-003-R15-03-QUALITY-GEO-CATALOG-COMPLETENESS",
+      "B4-003-R15-04-QUALITY-COUNTRY-EVIDENCE-SEMANTICS",
+      "B4-003-R15-05-QUALITY-CHANNEL-ACTION",
+      "B4-003-R15-06-QUALITY-POLICY-MISMATCH-ACTIONABILITY",
+      "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+      "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE"
+    ],
+    "b4004Held": true,
+    "broadHumanReviewPaused": true,
+    "preservePriorPasses": true
+  },
+  "continuityRegisterBlobSha": "f2031cb310196cb99e0ea23ab49afb0992024842",
+  "continuityGuardBlobSha": "52cc57159c4276eba21e1c77cf61089925bc9331",
+  "findingLedgerBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76"
 }
