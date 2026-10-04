@@ -5,10 +5,10 @@
 **Base técnica actual:** `ays/cotcomp-s495-premium-refinement-lab-20261004`  
 **Candidata visual actual:** `cotcompPremiumVisualPreviewS495`  
 **Owner status:** S4.95 = REWORK / NO OWNER PASS  
-**S4.96 runtime status:** DEPLOYED LAB / TECHNICAL PASS / OWNER REVIEW PENDING  
+**S4.96 runtime status:** TECHNICAL LOGIC SALVAGEABLE / VISUAL REGRESSION OWNER-CONFIRMED / NO VISUAL PARENT AUTHORITY  
 **S4.96 function:** `cotcompPremiumJourneyPreviewS496`  
 **S4.96 deployed source commit:** `5329dcf49f9b4dbbd04ac05718a3825b9bfd00a1`  
-**Next action:** Owner visual/functional review of S4.96, then targeted refinement only
+**Next action:** S4.96B Frontend Recovery — use S4.95 integrated surface as visual parent and cherry-pick only governed S4.96 journey/intake logic
 
 ## 1. Propósito
 
@@ -145,3 +145,23 @@ No activar transporte real ni producción.
   - Ver recomendación completa visible: PASS.
 - The parent-render race that could overwrite S4.96 intake with S4.94/S4.95 form content was corrected with ownership/reconciliation guards.
 - S4.96 is not Owner-approved yet. Technical PASS does not promote it.
+
+
+## 9. Owner visual rejection / S4.96B recovery gate — 2026-10-04
+
+Owner review of the exact S4.96 LAB runtime confirmed material visual regression:
+- hero image stretched / disproportionate;
+- approved frontend hierarchy degraded;
+- lower comparison/action area visually weak;
+- repeated imagery across the journey;
+- typography and labels too small in several modules;
+- intake presentation became form-dense;
+- the candidate no longer felt equivalent to the approved integrated frontend.
+
+Binding consequence:
+- S4.96 may supply journey/intake/state logic only.
+- S4.96 MUST NOT be used as visual parent.
+- S4.95 is reinstated as the integrated surface parent for S4.96B.
+- S4.88/promoted hashes remain provenance references for pre-backend authority.
+- S4.96B may change only the expressly authorized recovery deltas: hero geometry, readable type scale, progressive intake presentation, route-specific visual resolver, comparison/recommendation hierarchy, lower actions.
+- No other visual composition drift is authorized.
