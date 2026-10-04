@@ -61,7 +61,7 @@ test('S4.93 makes the quote-area visual product-aware',()=>{
   for(const id of ['vehicle','home','health','life','business','cargo','other']){
     assert.match(h,new RegExp(id+":\\{"));
   }
-  assert.match(h,/product-scene generic/);
+  assert.match(h,/product-scene photo-scene/);
   assert.match(h,/data:image\/webp;base64/);
 });
 
