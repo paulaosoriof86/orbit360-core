@@ -1,0 +1,164 @@
+name: CotComp S4.90 dashboard-workspace recovery LAB
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s490-dashboard-workspace-recovery-lab-20261003
+    paths:
+      - '.github/cotcomp-lab-intents/s490-dashboard-workspace-recovery-lab-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompDashboardWorkspacePreviewS490
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompDashboardWorkspacePreviewS490
+
+jobs:
+  s490-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.90 intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s490-dashboard-workspace-recovery-lab-authorized.json
+          jq -e '
+            .authorization=="S490_DEPLOY_DASHBOARD_WORKSPACE_RECOVERY" and
+            .projectId=="ays-orbit-360-lab" and
+            .functionName=="cotcompDashboardWorkspacePreviewS490" and
+            .reference1Sha=="b854a5a8c2bc6fd9f50339a31b98914bfa25a3dcdbb9c95a76905442f1cf36b0" and
+            .reference2Sha=="bad94a30d5c2f209c3efa9cedfccfa5e57c52deb270d5150cfac5e7f9cbcb735" and
+            .dashboardWorkspace==true and
+            .fixtureOnly==true and
+            .providerDeploymentAuthorized==false and
+            .cotcompRealTransportAuthorized==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Run accumulated QA plus S4.90 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-dashboard-workspace-preview-s490.js
+          node --check cotcomp-dashboard-workspace-preview-s490.test.js
+          node --test cotcomp-product-family-completeness-preview-s486.test.js
+          node --test cotcomp-dashboard-workspace-preview-s490.test.js
+
+      - name: Prepare LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s490/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s490/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Deploy only S4.90 preview to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physically verify dashboard-workspace recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s490/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+
+          grep -q 'class="app"' "$E/page.html"
+          grep -q 'class="sidebar"' "$E/page.html"
+          grep -q 'class="topbar"' "$E/page.html"
+          grep -q 'class="metrics"' "$E/page.html"
+          grep -q 'class="workspace"' "$E/page.html"
+          grep -q 'Cotizador &amp; Comparador' "$E/page.html"
+          grep -q 'Nueva cotización' "$E/page.html"
+          grep -q 'Alternativas y comparación' "$E/page.html"
+          grep -q 'Vehículo y movilidad' "$E/page.html"
+          grep -q 'Salud / gastos médicos' "$E/page.html"
+          grep -q 'Vida e ingreso' "$E/page.html"
+          grep -q 'Transporte / carga' "$E/page.html"
+          grep -q 'Otros / no sé cuál necesito' "$E/page.html"
+          grep -q 'No encuentro mi marca' "$E/page.html"
+          grep -q 'No encuentro mi línea / modelo' "$E/page.html"
+          grep -q 'MISSING' "$E/page.html"
+          grep -q 'No equivale a no cubierto' "$E/page.html"
+
+          ! grep -q 'Compara con criterio, no solo por precio' "$E/page.html"
+          ! grep -q 'class="page-title"' "$E/page.html"
+
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+
+          jq -n --arg url "$COTCOMP_URL" '{
+            schemaVersion:"ays-cotcomp-s490-dashboard-workspace-physical-receipt-v1.0",
+            functionUrl:$url,
+            deployed:true,
+            reference1Sha:"b854a5a8c2bc6fd9f50339a31b98914bfa25a3dcdbb9c95a76905442f1cf36b0",
+            reference2Sha:"bad94a30d5c2f209c3efa9cedfccfa5e57c52deb270d5150cfac5e7f9cbcb735",
+            dashboardWorkspace:true,
+            strongSidebar:true,
+            compactTopbar:true,
+            modularGrid:true,
+            mediumHighDensity:true,
+            productFamilyCount:7,
+            vehiclePatternPreserved:true,
+            fixtureOnly:true,
+            providerDeploymentAuthorized:false,
+            cotcompRealTransportAuthorized:false,
+            productionTouched:false
+          }' > "$E/S490_DASHBOARD_WORKSPACE_PHYSICAL_RECEIPT.json"
+
+      - name: Upload sanitized S4.90 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s490-dashboard-workspace-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s490/evidence/S490_DASHBOARD_WORKSPACE_PHYSICAL_RECEIPT.json
+            ${{ runner.temp }}/s490/evidence/page.html
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s490/firebase-service-account.json"
