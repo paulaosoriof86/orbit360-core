@@ -1,0 +1,14 @@
+/* Gravicentra Insurance · assignable advisor roster client v1 */
+(function(){'use strict';window.Orbit=window.Orbit||{};
+const VERSION='gravicentra-assignable-advisor-roster-client-v1',PROD='orbit360AssignableAdvisorRoster',PREVIEW='orbit360AssignableAdvisorRosterPreview',cache=new Map(),meta=new Map(),inflight=new Map();
+const text=v=>String(v==null?'':v).trim(),tenant=()=>text((window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{}).tenantHint||(window.OrbitBackend&&(OrbitBackend.tenantId||OrbitBackend.tenant))||(Orbit.tenant&&Orbit.tenant.get&&Orbit.tenant.get().id)),role=()=>text(Orbit.session&&Orbit.session.rol?Orbit.session.rol():'');
+const preview=()=>/--/.test(String(location.hostname||'')),fn=()=>preview()?PREVIEW:PROD,region=()=>preview()?'us-east1':text((window.OrbitBackend||{}).functionsRegion||'us-central1');
+const provider=()=>Orbit.productRuntimeBrowserProvidersP0&&typeof Orbit.productRuntimeBrowserProvidersP0.callFunction==='function'?Orbit.productRuntimeBrowserProvidersP0:null;
+const compat=()=>{try{return window.firebase&&typeof firebase.functions==='function'?firebase.app().functions(region()).httpsCallable(fn()):null;}catch(e){return null;}};
+async function call(payload){const p=provider();if(p)return p.callFunction(fn(),payload,region());const f=compat();if(!f)throw Error('ASSIGNABLE_ADVISOR_ROSTER_BACKEND_REQUIRED');const r=await f(payload);return r&&r.data?r.data:r;}
+const key=c=>role().toLowerCase()+'|'+text(c).toUpperCase(),peek=c=>(cache.get(key(c))||[]).map(x=>Object.assign({},x,{paises:[].concat(x.paises||[])}));
+async function list(country,opts){const k=key(country);if(!(opts&&opts.force)&&meta.get(k)?.confirmed)return peek(country);if(inflight.has(k))return inflight.get(k);const p=(async()=>{const data=await call({tenantId:tenant(),activeRole:role(),country:text(country).toUpperCase()});if(!data||data.ok!==true||!Array.isArray(data.rows))throw Error('ASSIGNABLE_ADVISOR_ROSTER_READBACK_REQUIRED');const seen=new Set(),rows=[];data.rows.forEach(x=>{const id=text(x?.id),nombre=text(x?.nombre);if(!id||!nombre||x.assignable!==true||seen.has(id))return;seen.add(id);rows.push({id,nombre,activo:x.activo!==false,assignable:true,roleEligible:x.roleEligible===true,paises:[...new Set([].concat(x.paises||[]).map(v=>text(v).toUpperCase()).filter(Boolean))]});});cache.set(k,rows);meta.set(k,{confirmed:true,scope:data.scope||'',country:data.country||'',at:new Date().toISOString()});return peek(country);})().finally(()=>inflight.delete(k));inflight.set(k,p);return p;}
+function invalidate(){cache.clear();meta.clear();inflight.clear();}
+window.addEventListener('orbit:domain-config',e=>{if(e?.detail?.domain==='access')invalidate();});
+Orbit.assignableAdvisorRoster=Object.freeze({VERSION,list,peek,invalidate,status:()=>({version:VERSION,functionName:fn(),region:region(),tenantId:tenant(),role:role(),entries:[...meta.entries()].map(([key,value])=>({key,...value}))})});
+})();

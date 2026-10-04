@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76",
-  "expectedLedgerNextBlobSha": "e877504ab1395f5f840d87e1d208a0b10c9eb687",
+  "expectedLedgerNextBlobSha": "2b0df5e619f499d0d36048d8551659bcf5887869",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -669,21 +669,23 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "PAULA_VISUAL_PARTIAL_PASS_R16_COMPREHENSIVE_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
       "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
       "source": "LEDGER",
-      "nextAction": "B4_003_R16_COMPREHENSIVE_CAUSAL_DIAGNOSTIC_AND_SINGLE_SUCCESSOR_FIX",
-      "humanVisualStatus": "REJECTED_R14_PENDING_RETEST",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "humanVisualStatus": "PENDING_TARGETED_AFTER_MACHINE_PASS",
       "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
       "r13QaGateAlignmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
       "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
       "renewalDeterministicApplyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_AUTH_20261004.json",
       "renewalDeterministicApplyAuthBlobSha": "b7b47af69634a093a1bf79be3adb46d4ebeb701b",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP"
+      "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-004",
@@ -2306,7 +2308,7 @@
     {
       "id": "B3-CARRY-OPS-CATALOG-ADMIN-20260929",
       "block": "B3",
-      "status": "OPEN_B3_CARRY_FORWARD",
+      "status": "R16_SOURCE_CONVERGED_PENDING_MACHINE_PROOF_AND_LATER_GATE_DISPOSITION",
       "blocking": false,
       "owner": [
         "functions/tenant-domain-config.js",
@@ -2318,7 +2320,9 @@
       "surface": "Configuración/Ops",
       "classification": "FROZEN_B3_TENANT_ADMIN_UI",
       "finding": "Backend supports stages/priorities/managementTypes/SLA but Configuración does not expose complete tenant administration.",
-      "rootCause": "UI administration gap."
+      "rootCause": "UI administration gap.",
+      "nextAction": "B4_003_MACHINE_PROOF_THEN_CARRY_DISPOSITION",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
@@ -2339,7 +2343,7 @@
     {
       "id": "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
       "block": "B3",
-      "status": "OPEN_B3_CARRY_FORWARD",
+      "status": "R16_SOURCE_CONVERGED_PENDING_MACHINE_PROOF_AND_LATER_GATE_DISPOSITION",
       "blocking": false,
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
@@ -2351,7 +2355,9 @@
       "surface": "Aseguradoras/Tarifas/Conocimiento/Planes",
       "classification": "FROZEN_B3_FAIL_CLOSED_CONTENT",
       "finding": "Tariff/knowledge/plan content is deferred; no importer is final without proof.",
-      "rootCause": "Official source integration pending."
+      "rootCause": "Official source integration pending.",
+      "nextAction": "B4_003_MACHINE_PROOF_THEN_CARRY_DISPOSITION",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B3-CARRY-OPS-HYDRATION-EMPTY-FLASH-20260929",
@@ -2462,7 +2468,7 @@
     {
       "id": "B4-003-R11-04-RENEWABILITY-FAIL-CLOSED",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/renovaciones.js",
@@ -2472,9 +2478,11 @@
       "targetGate": "B4-003",
       "closureCondition": "Only explicit renovable=true enters Renewals; unknown/no stay out; editor exposes tri-state and Paula visual confirms.",
       "source": "PAULA_R11_OR_QA_R11A",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "surface": "Renovaciones/Pólizas",
-      "finding": "A policy marked Renovabilidad pendiente de validar appears in Renovaciones."
+      "finding": "A policy marked Renovabilidad pendiente de validar appears in Renovaciones.",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R11-05-POLICY-EDITOR-TAXONOMY-PRESERVATION",
@@ -2545,7 +2553,7 @@
     {
       "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -2555,14 +2563,16 @@
       "targetGate": "B4-003",
       "closureCondition": "Identify authoritative source/lineage and reconcile or explicitly quarantine mismatch; no inferred rewrite; sum of active schedule must reconcile to contractual total within approved tolerance.",
       "source": "PAULA_R11_OR_QA_R11A",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "surface": "Póliza/Recibos/Salud de información",
-      "finding": "Observed policy showed contractual prima total Q407.01 while calendario vigente showed Q542.68 / 2 projected receipts."
+      "finding": "Observed policy showed contractual prima total Q407.01 while calendario vigente showed Q542.68 / 2 projected receipts.",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
@@ -2572,14 +2582,16 @@
       "targetGate": "B4-003",
       "closureCondition": "Preview demonstrates each supported document class upload/import path, durable source/provenance, normalized insurer+country+ramo+product+plan+version scope, and fail-closed enablement.",
       "source": "PAULA_R11_OR_QA_R11A",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "surface": "Aseguradoras/Tarifas/Documentos",
-      "finding": "User needs an explicit, reliable place to load tariff Excel, quote/policy examples and documents required by transaction, with durable normalized provenance feeding downstream capabilities."
+      "finding": "User needs an explicit, reliable place to load tariff Excel, quote/policy examples and documents required by transaction, with durable normalized provenance feeding downstream capabilities.",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
@@ -2588,9 +2600,11 @@
       "targetGate": "B4-003",
       "closureCondition": "Counters and visible source list derive from one explained canonical scope and agree, or labels are changed to reflect their actual distinct semantics.",
       "source": "PAULA_R11_OR_QA_R11A",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "surface": "Aseguradoras/Tarifas y conocimiento",
-      "finding": "Header shows Fuentes registradas/Referencias disponibles = 0 while visible mapped/validated sources are listed below."
+      "finding": "Header shows Fuentes registradas/Referencias disponibles = 0 while visible mapped/validated sources are listed below.",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE",
@@ -2611,7 +2625,7 @@
     {
       "id": "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE",
       "block": "B4",
-      "status": "CARRY_FORWARD_SOURCE_BACKED_JIT_FAIL_CLOSED",
+      "status": "R16_SOURCE_CONVERGED_PENDING_MACHINE_PROOF_AND_LATER_GATE_DISPOSITION",
       "blocking": false,
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
@@ -2622,12 +2636,14 @@
       "closureCondition": "Multiproduct schema/roadmap remains visible; supported products have source-backed normalized fields; unsupported products remain explicit Pendiente de fuente with no invented calculations.",
       "source": "PAULA_R11_OR_QA_R11A",
       "surface": "Aseguradoras/Cotizador/Comparativo",
-      "finding": "Knowledge and schema must cover multiple insurer products/lines, not only Auto, and generate structured fields useful to Cotizador and Comparativo."
+      "finding": "Knowledge and schema must cover multiple insurer products/lines, not only Auto, and generate structured fields useful to Cotizador and Comparativo.",
+      "nextAction": "B4_005_EXPLICIT_DISPOSITION_AFTER_B4_003_CLOSE",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
       "block": "B4",
-      "status": "OPEN_VISIBLE_BACKLOG_REQUIRED",
+      "status": "R16_SOURCE_CONVERGED_PENDING_MACHINE_PROOF_AND_LATER_GATE_DISPOSITION",
       "blocking": false,
       "owner": [
         "INSURER_KNOWLEDGE_SOURCE_BACKLOG",
@@ -2637,7 +2653,9 @@
       "closureCondition": "Maintain explicit insurer×product source backlog with source status/last review/version; no pending source may silently become authoritative.",
       "source": "PAULA_R11_OR_QA_R11A",
       "surface": "Aseguradoras/Tarifas y conocimiento",
-      "finding": "Tariff feedback and knowledge-base feeding for insurers/products not yet worked remains pending."
+      "finding": "Tariff feedback and knowledge-base feeding for insurers/products not yet worked remains pending.",
+      "nextAction": "B4_005_EXPLICIT_DISPOSITION_AFTER_B4_003_CLOSE",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF",
@@ -2867,7 +2885,7 @@
     {
       "id": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
@@ -2876,7 +2894,7 @@
       "targetGate": "B4-003",
       "closureCondition": "Controlled disposable file proves Drive readback, exact insurer/source provenance, reload persistence, fail-closed downstream enablement and cleanup/rollback.",
       "source": "PAULA_R13",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL_AFTER_R15_SUCCESSOR",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "PRODUCT_RUNTIME_REFERENCE_DEFECT_SOURCE_FIXED_PENDING_E2E",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_DRIVE_BACKEND_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "9024c81170ac810c35b5ef461ef3700c6b35c226",
@@ -2888,12 +2906,14 @@
       "importerCleanRootFixBlobSha": "39c1eff27c415f8ac7688596ec9edde3bbd86992",
       "failedExactPreviewRunId": 37167226337,
       "surface": "Aseguradoras/Drive",
-      "finding": "Drive upload path is visible but end-to-end upload→Drive readback→insurer linkage→reload persistence is not yet proven."
+      "finding": "Drive upload path is visible but end-to-end upload→Drive readback→insurer linkage→reload persistence is not yet proven.",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/renovaciones.js",
@@ -2902,19 +2922,21 @@
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview first paint shows stable loading until authoritative renewal dependencies are ready, then one coherent populated render.",
       "source": "PAULA_R14",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL_AFTER_R15_SUCCESSOR",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "PRODUCT_HYDRATION_PRESENTATION_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
       "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9",
       "surface": "Renovaciones",
-      "finding": "Initial first paint exposes empty/partial/dash renewal state before authoritative hydration."
+      "finding": "Initial first paint exposes empty/partial/dash renewal state before authoritative hydration.",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R14-02-RENEWALS-EXPIRED-OUTCOME-CONTINUITY",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/renovaciones.js",
@@ -2923,14 +2945,16 @@
       "targetGate": "B4-003",
       "closureCondition": "Explicit YES expired unresolved policies remain in Vencidas; UNKNOWN stays fail-closed and visible as validation debt only.",
       "source": "PAULA_R14",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL_AFTER_R15_SUCCESSOR",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "PRODUCT_RENEWAL_OUTCOME_CONTINUITY_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
       "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9",
       "surface": "Renovaciones",
-      "finding": "Expired explicit-renewable policies can disappear before a renewal outcome is recorded."
+      "finding": "Expired explicit-renewable policies can disappear before a renewal outcome is recorded.",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
@@ -3023,7 +3047,7 @@
     {
       "id": "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
       "block": "B4",
-      "status": "REOPENED_R16_OPERATIVO_CAUSAL_DEFECT",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/core/ciclo.js",
@@ -3032,7 +3056,7 @@
       "targetGate": "B4-003",
       "closureCondition": "Exact authenticated Preview: same eligible assignment roster for Paula/Dirección and Carlos/Operativo for selected country, while full Equipo administration remains permission-restricted.",
       "source": "PAULA_R14A",
-      "nextAction": "B4_003_R16_INCLUDE_IN_SINGLE_CAUSAL_SUCCESSOR_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "PRODUCT_ROLE_ASSIGNMENT_ROSTER_SCOPE_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_ROOTFIX_20261004.json",
       "diagnosticReceiptBlobSha": "801c25e1b0f63f7c59ea4502b9f24144f2efdde6",
@@ -3040,12 +3064,14 @@
       "sourceFixReceiptBlobSha": "801c25e1b0f63f7c59ea4502b9f24144f2efdde6",
       "surface": "Ops / Leads / Equipo",
       "finding": "Active Asesor can be absent from commercial assignment selector and duplicate advisor identities can appear.",
-      "rootCause": "ASSIGNMENT_ROSTER_INCORRECTLY_REUSES_FULL_TEAM_DIRECTORY_READ_AUTHORITY"
+      "rootCause": "ASSIGNMENT_ROSTER_INCORRECTLY_REUSES_FULL_TEAM_DIRECTORY_READ_AUTHORITY",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R15-01-OPS-LEADS-NEW-PROSPECT-CATALOGS",
       "block": "B4",
-      "status": "OPEN_PAULA_VISUAL_REJECTED_R15",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/core/ciclo.js",
@@ -3059,12 +3085,15 @@
       "surface": "Ops/Leads/Nuevo prospecto",
       "classification": "PRODUCT_CANONICAL_CATALOG_ENTRYPOINT_DIVERGENCE",
       "finding": "Nuevo prospecto renders Canal, Producto and Ramo as free-text inputs with hardcoded/default text while the existing management editor already uses catalog-backed selects.",
-      "rootCause": "core/ciclo.js nuevoNegocio() uses fInput for nn-canal/nn-prod/nn-ramo; edit flow uses fSelectCat. Current Orbit.cat persists only in browser localStorage and Configuración has no durable shared catalog administration surface."
+      "rootCause": "core/ciclo.js nuevoNegocio() uses fInput for nn-canal/nn-prod/nn-ramo; edit flow uses fSelectCat. Current Orbit.cat persists only in browser localStorage and Configuración has no durable shared catalog administration surface.",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R15-02-QUALITY-CLIENT-COMPLETION-DURABILITY",
       "block": "B4",
-      "status": "OPEN_PAULA_VISUAL_REJECTED_R15",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/calidad.js",
@@ -3076,12 +3105,15 @@
       "surface": "Calidad de datos/Completar expediente",
       "classification": "PRODUCT_DURABLE_WRITE_READBACK_DEFECT",
       "finding": "Paula completed missing email, but the row/missing reason did not reliably clear and the change appeared not to persist as expected.",
-      "rootCause": "calidad.js completion modal uses synchronous store.update plus immediate local readback instead of updateDurable/server-confirmed readback."
+      "rootCause": "calidad.js completion modal uses synchronous store.update plus immediate local readback instead of updateDurable/server-confirmed readback.",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R15-03-QUALITY-GEO-CATALOG-COMPLETENESS",
       "block": "B4",
-      "status": "OPEN_PAULA_VISUAL_REJECTED_R15",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/core/config.js",
@@ -3094,12 +3126,15 @@
       "surface": "Calidad de datos/Completar expediente",
       "classification": "PRODUCT_REFERENCE_CATALOG_INCOMPLETE",
       "finding": "Ciudad/municipio selector does not expose the complete locality list; capture shows only placeholder/Otro when department data is unavailable in the reduced catalog.",
-      "rootCause": "Orbit.GEO is a reduced embedded subset, not a complete authoritative GT/CO geographic catalog."
+      "rootCause": "Orbit.GEO is a reduced embedded subset, not a complete authoritative GT/CO geographic catalog.",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R15-04-QUALITY-COUNTRY-EVIDENCE-SEMANTICS",
       "block": "B4",
-      "status": "OPEN_PAULA_VISUAL_REJECTED_R15",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/calidad.js",
@@ -3111,12 +3146,15 @@
       "surface": "Calidad de datos",
       "classification": "PRODUCT_QUALITY_SEMANTIC_MISMATCH",
       "finding": "Rows can say Sin evidencia vinculada although client ficha/edit already contains country; user cannot distinguish current value from provenance evidence.",
-      "rootCause": "Quality table labels external linked-evidence absence as if country itself were absent/unsubstantiated, while current client country and evidence lineage are separate concepts."
+      "rootCause": "Quality table labels external linked-evidence absence as if country itself were absent/unsubstantiated, while current client country and evidence lineage are separate concepts.",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R15-05-QUALITY-CHANNEL-ACTION",
       "block": "B4",
-      "status": "OPEN_PAULA_VISUAL_REJECTED_R15",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/calidad.js"
@@ -3127,12 +3165,15 @@
       "surface": "Calidad de datos",
       "classification": "PRODUCT_ACTION_AFFORDANCE_DEFECT",
       "finding": "Sin canal is rendered as a disabled button and does nothing.",
-      "rootCause": "calidad.js intentionally renders disabled Sin canal when no usable phone/email exists."
+      "rootCause": "calidad.js intentionally renders disabled Sin canal when no usable phone/email exists.",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R15-06-QUALITY-POLICY-MISMATCH-ACTIONABILITY",
       "block": "B4",
-      "status": "OPEN_PAULA_VISUAL_REJECTED_R15",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/calidad.js",
@@ -3144,12 +3185,15 @@
       "surface": "Calidad de datos/Salud póliza vs calendario",
       "classification": "PRODUCT_DIAGNOSTIC_ACTIONABILITY_GAP",
       "finding": "Mismatch rows expose contractual premium/calendar/delta but no action, no drill-down, and clicking policy does not open context or explain what must be validated.",
-      "rootCause": "financialHealthHtml renders informational rows only and does not bind policy/receipt lineage/action surface."
+      "rootCause": "financialHealthHtml renders informational rows only and does not bind policy/receipt lineage/action surface.",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
       "block": "B4",
-      "status": "OPEN_PAULA_VISUAL_REJECTED_R15",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/renovaciones.js",
@@ -3162,12 +3206,15 @@
       "surface": "Renovaciones",
       "classification": "SOURCE_BACKED_BUSINESS_COMPLETENESS_BLOCKER",
       "finding": "Fail-closed pipeline works but still shows 39 policies pending renewability review/conciliation (GT≈33, CO=6) and some actionable cards lack premium, so the module is not operationally complete.",
-      "rootCause": "Most policies still lack authoritative renovable YES/NO and some renewal financial fields remain source-incomplete; current product correctly refuses to infer them."
+      "rootCause": "Most policies still lack authoritative renovable YES/NO and some renewal financial fields remain source-incomplete; current product correctly refuses to infer them.",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
       "block": "B4",
-      "status": "OPEN_PAULA_VISUAL_REJECTED_R15",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/core/importa.js",
@@ -3180,7 +3227,10 @@
       "surface": "Aseguradoras/Documentos y Drive/Tarifas y conocimiento",
       "classification": "PRODUCT_SOURCE_TAXONOMY_AND_LINEAGE_GAP",
       "finding": "Tarifas y conocimiento shows related validated sources while Documentos y Drive can show Sin documentos cargados; current classifier is too coarse for tariff/commercial/subscription/claims/etc. document families.",
-      "rootCause": "Reusable Library/knowledge references and insurer Drive-upload registry have distinct semantics that UI does not explain; docs-aseguradora metadata taxonomy is not rich enough."
+      "rootCause": "Reusable Library/knowledge references and insurer Drive-upload registry have distinct semantics that UI does not explain; docs-aseguradora metadata taxonomy is not rich enough.",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     },
     {
       "id": "B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE",
@@ -3203,7 +3253,7 @@
     {
       "id": "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
       "block": "B4",
-      "status": "OPEN_PAULA_VISUAL_REJECTED_R16",
+      "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/core/tenant-access-policy-effective-p0.js",
@@ -3216,7 +3266,10 @@
       "closureCondition": "Minimal canonical assignable-advisor projection hydrates for assignment-capable Operativo without granting full team-directory administration; exact authenticated parity proof Paula vs Carlos; selected-country reactive; no duplicates/hardcodes.",
       "source": "PAULA_AUTHENTICATED_OPERATIVO_VISUAL_20261004",
       "finding": "Carlos Castro with active Operativo role sees an empty Asesor selector while Paula/Dirección sees the canonical advisor roster.",
-      "rootCause": "ASSIGNMENT_ROSTER_INCORRECTLY_REUSES_FULL_TEAM_DIRECTORY_READ_AUTHORITY"
+      "rootCause": "ASSIGNMENT_ROSTER_INCORRECTLY_REUSES_FULL_TEAM_DIRECTORY_READ_AUTHORITY",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
     }
   ],
   "attentionIds": [
@@ -3427,5 +3480,12 @@
   ],
   "r16FindingId": "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
   "r16DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_OPERATIVO_ASSIGNABLE_ADVISOR_ROSTER_DIAGNOSTIC_20261004.json",
-  "r16NoLossRule": "ALL_LEDGER_IDS_MUST_REMAIN_IN_REGISTER; CLOSED/PASS MAY CHANGE STATUS BUT MAY NOT DISAPPEAR; NEW FINDINGS MUST BE ADDED BEFORE NEXT BUILD."
+  "r16NoLossRule": "ALL_LEDGER_IDS_MUST_REMAIN_IN_REGISTER; CLOSED/PASS MAY CHANGE STATUS BUT MAY NOT DISAPPEAR; NEW FINDINGS MUST BE ADDED BEFORE NEXT BUILD.",
+  "lastR16SourceFix": {
+    "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+    "findingCount": 208,
+    "exactSetWithLedger": true,
+    "noIdsRemoved": true
+  }
 }

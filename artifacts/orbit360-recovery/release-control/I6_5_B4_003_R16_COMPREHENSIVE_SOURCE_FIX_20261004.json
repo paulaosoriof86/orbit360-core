@@ -1,0 +1,114 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "13ed6031dc99b66903fb0643472a918339ba9e81",
+  "findingId": "B4-003",
+  "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_CAUSAL_DIAGNOSTIC_20261004.json",
+  "diagnosticBlobSha": "ac4575ea1b2e0233723a46dc91884d8672ace573",
+  "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+  "masterPendingClosurePlanBlobSha": "74711252c2ac1dae6126857968565d88cc294db7",
+  "productBlobs": {
+    "functions/assignable-advisor-roster.js": "88a7cc53f044ae6d86338e451cb56abfed4d4b6a",
+    "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
+    "functions/package.json": "2b7183aac731ee4f3e0626baa8448000d94115a1",
+    "functions/tenant-domain-config.js": "b112a4771100007ee3bd949cba632b907287168b",
+    "orbit360-platform/core/assignable-advisor-roster-client.js": "02bda0f10b94849cef6f4222be6e53e9c7de9606",
+    "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js": "734b6518bc968a8c4e278602aa7161a38351cb02",
+    "orbit360-platform/core/config.js": "bfb2612273be2d5d9a022ffa3aedf87c4604d4a5",
+    "orbit360-platform/core/ciclo.js": "7a98e82009418d2ec0f50f4a4e1c1a386c31195b",
+    "orbit360-platform/core/tenant-domain-config-client.js": "0ce2acdd0022fae441e39992444c46ab99cc3585",
+    "orbit360-platform/modules/configuracion.js": "f2e294eb24660cf7253d80e7ef94c0c9dcdb2fc2",
+    "orbit360-platform/modules/calidad.js": "eafbba420cd59767945201ec9bdfb20148ff974a",
+    "orbit360-platform/modules/renovaciones.js": "f7536da81f9eff72617b169b585bfde9dd67250a",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "b235e3facfd83060c442a0ab070254d1e9f06b01",
+    "orbit360-platform/modules/aseguradoras.js": "836fc63ce376e51de1e540ba7bc7ea9a91d2aef2",
+    "orbit360-platform/core/importa.js": "47e9d695e25bc51a8745e016d5d6ab19e1c9ce0d",
+    "orbit360-platform/index.html": "814434e3e4c52fb6ccb5e9e81b17b1169bd193e3"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "857a28de36c3e0397040a930b99f38fef6bf7888",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "f87f5ebc9302440a84e97826a37afb6904d343e6",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "3f5dc41bcbaa1d0f2b050c2802002c272e2fe81a"
+  },
+  "workstreams": {
+    "assignableAdvisors": {
+      "status": "SOURCE_FIXED_PENDING_AUTHENTICATED_ROLE_PARITY",
+      "authority": "server-owned-minimal-projection",
+      "fullTeamDirectoryExpanded": false
+    },
+    "tenantCatalogs": {
+      "status": "SOURCE_FIXED_PENDING_DURABLE_PREVIEW_PROOF",
+      "authority": "tenant-domain-config/catalogs",
+      "freeTextBusinessCatalogsRemovedFromNewProspect": true,
+      "advisorCatalogForbidden": true
+    },
+    "clientQuality": {
+      "status": "SOURCE_FIXED_PENDING_DURABLE_PREVIEW_PROOF",
+      "updateDurableAwaited": true,
+      "readbackRequired": true,
+      "countryProvenanceSeparated": true,
+      "deadChannelActionRemoved": true
+    },
+    "geography": {
+      "status": "SOURCE_FIXED_PINNED_DATASET_PENDING_RUNTIME_PROOF",
+      "GT": {
+        "departments": 22,
+        "municipalities": 340,
+        "sourceBlobSha": "f190e0088186238147cc523cab38851e54056b52"
+      },
+      "CO": {
+        "municipalities": 1122,
+        "sourceBlobSha": "ff8c7edbe5449cc8aa49aad6ffc04792214e8b66"
+      }
+    },
+    "financialQuality": {
+      "status": "SOURCE_FIXED_PENDING_RUNTIME_PROOF",
+      "noInference": true,
+      "exactDelta": true,
+      "toleranceVisible": true,
+      "calendarAuthorityVisible": true,
+      "drilldown": true
+    },
+    "renewals": {
+      "status": "SOURCE_FIXED_PENDING_RUNTIME_AND_HUMAN_VALIDATION",
+      "unknownFailClosed": true,
+      "singleOwnerPreserved": true,
+      "baseRenderOnly": true,
+      "reviewPath": "canonical policy editor with mandatory change reason",
+      "missingPremiumInvented": false
+    },
+    "insurerRegistry": {
+      "status": "SOURCE_FIXED_PENDING_RUNTIME_PROOF",
+      "registry": "gravicentra-insurer-source-registry-v1",
+      "quoteAuthority": "gravicentra-quote-authority-v1",
+      "automaticCalculationOnUpload": false
+    },
+    "emailTraceability": {
+      "status": "REMAINS_OPEN_REQUIRES_PROVIDER_DELIVERY_OR_FAILURE_EVIDENCE",
+      "closedByR16": false
+    }
+  },
+  "noLoss": {
+    "baselineFindingCount": 208,
+    "ledgerCarryExactSetRequired": true,
+    "masterPlanStatusRequired": "FROZEN_ACTIVE",
+    "preservedHumanPasses": true,
+    "b4004Held": true
+  },
+  "boundaries": {
+    "productSourceChanged": true,
+    "operationalBusinessWrites": 0,
+    "realDataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "fullTeamDirectoryPermissionExpansion": false,
+    "hardcodedPersons": false,
+    "cotcompRealTransport": false,
+    "syntheticQaWritesAuthorizedAfterCommit": true,
+    "syntheticQaScope": "Exact isolated B4-003 Preview only with mandatory cleanup/readback."
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

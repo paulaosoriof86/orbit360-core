@@ -43,32 +43,10 @@ Orbit.ciclo = (function () {
   function tiposGestion() { return Orbit.cat.get('tiposGestion'); }
 
   /* ===================== datos / filtros ===================== */
+  Promise.resolve().then(()=>Orbit.cat&&Orbit.cat.ensure?Orbit.cat.ensure():null).then(()=>document.dispatchEvent(new CustomEvent('orbit:ciclo'))).catch(()=>{});
   function etapaInfo(id) { return E[id] || E.nuevo; }
   function paisOK(pais) { return !Orbit.pais || Orbit.pais === 'TODOS' || pais === Orbit.pais; }
-  function canonicalRosterStore() {
-    let st=S(),hops=0;
-    while(st&&Object.prototype.hasOwnProperty.call(st,'_scopedFor')&&hops<16){const p=Object.getPrototypeOf(st);if(!p||p===st)break;st=p;hops++;}
-    return st||S();
-  }
-  function advisorRoles(a){return [...new Set((Array.isArray(a&&a.roles)&&a.roles.length?a.roles:[a&&(a.rolDefault||a.rol)]).map(x=>String(x||'').trim()).filter(Boolean))];}
-  function advisorCountries(a){return [...new Set((Array.isArray(a&&a.paises)&&a.paises.length?a.paises:[a&&(a.paisDefault||a.pais)]).map(x=>String(x||'').trim().toUpperCase()).filter(Boolean))];}
-  function advisorAssignable(a,country){
-    if(!a||a.deleted===true||a.eliminado===true||a.inactivo===true||a.activo===false||['inactivo','eliminado'].includes(String(a.estado||'').toLowerCase())||a.projectionOnly===true)return false;
-    if(!advisorRoles(a).includes('Asesor'))return false;
-    const ps=advisorCountries(a),c=String(country||'').trim().toUpperCase();
-    return !c||c==='TODOS'||!ps.length||ps.includes(c);
-  }
-  function advisorIdentityKeys(a){
-    const email=String(a&&a.email||'').trim().toLowerCase(),canonical=String(a&&(a.canonicalDocumentId||a.id)||'').trim(),name=String(a&&a.nombre||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,' ');
-    return [email?'email:'+email:'',canonical?'id:'+canonical:'',name?'name:'+name:''].filter(Boolean);
-  }
-  function assignableAdvisors(country){
-    const st=canonicalRosterStore(),rows=((st&&st.all&&st.all('asesores'))||[]).filter(a=>advisorAssignable(a,country));
-    rows.sort((a,b)=>String(a.nombre||'').localeCompare(String(b.nombre||''),'es',{sensitivity:'base'}));
-    const seen=new Set(),out=[];
-    rows.forEach(a=>{const keys=advisorIdentityKeys(a);if(!keys.length||keys.some(k=>seen.has(k)))return;keys.forEach(k=>seen.add(k));out.push(a);});
-    return out;
-  }
+  async function assignableAdvisors(country){if(!Orbit.assignableAdvisorRoster?.list)return[];try{return await Orbit.assignableAdvisorRoster.list(country);}catch(e){return[];}}
   function rolFiltro(asesorId) {
     if (Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor()) return asesorId === Orbit.session.asesorId();
     return true;
@@ -265,10 +243,11 @@ Orbit.ciclo = (function () {
   function refresh() { document.dispatchEvent(new CustomEvent('orbit:ciclo')); }
 
   /* ===================== ficha de NEGOCIO (rediseñada) ===================== */
-  function openNegocio(id) {
+  async function openNegocio(id) {
+    try{await Orbit.cat.ensure();}catch(error){U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;}
     const n = S().get('negocios', id); if (!n) return;
     const ase = q.asesor(n.asesorId), asg = q.aseguradora(n.aseguradoraId), ei = etapaInfo(n.etapa), prob = U.finiteNumber(n.prob);
-    const asesores = assignableAdvisors(n.pais), asgs = S().all('aseguradoras');
+    const asesores = await assignableAdvisors(n.pais), asgs = S().all('aseguradoras');
     const enOps = !!ei.ops;
     // stepper
     const stepper = FLUJO.map((sid, i) => {
@@ -308,8 +287,9 @@ Orbit.ciclo = (function () {
           <div class="ciclo-sec">
             <div class="ciclo-sec-t">Riesgo y comercial</div>
             <div class="cgrid">
-              ${fSelectCat('Producto', 'ng-prod', 'productos', n.producto)}
-              ${fSelectCat('Ramo', 'ng-ramo', 'ramos', n.ramo)}
+              ${fSelectCat('Producto / plan', 'ng-prod', 'productos', n.producto)}
+              ${fSelect('Ramo', 'ng-ramo', Orbit.cat.ramosDe(n.pais), n.ramo)}
+              ${fSelectCat('Segmento', 'ng-segmento', 'segmentos', n.segmento || '')}
               ${fSelectOpt('Aseguradora de interés', 'ng-asg', asgs.map(a => [a.id, a.nombre]), n.aseguradoraId)}
               ${fSelectOpt('Asesor responsable', 'ng-ase', asesores.map(a => [a.id, a.nombre]), n.asesorId)}
               ${fInput('Prima estimada', 'ng-prima', n.primaEst, 'number')}
@@ -425,7 +405,7 @@ Orbit.ciclo = (function () {
         await S().updateDurable('negocios', id, {
           nombre: g('ng-nombre') || n.nombre, tipo: g('ng-tipo'), telefono: g('ng-tel'), email: g('ng-email'),
           pais: g('ng-pais'), moneda: g('ng-pais') === 'CO' ? 'COP' : 'GTQ', canal: g('ng-canal'),
-          producto: g('ng-prod'), ramo: g('ng-ramo'), aseguradoraId: g('ng-asg'), asesorId: g('ng-ase'),
+          producto: g('ng-prod'), ramo: g('ng-ramo'), segmento: g('ng-segmento'), aseguradoraId: g('ng-asg'), asesorId: g('ng-ase'),
           primaEst: +g('ng-prima') || n.primaEst, prioridad: g('ng-prio'), nroCotizacion: g('ng-cot'),
           proximoToque: g('ng-toque') || n.proximoToque, descripcion: g('ng-desc'), colLeads: (back.querySelector('#ng-col') || {}).value || '', actualizado: today()
         });
@@ -457,10 +437,11 @@ Orbit.ciclo = (function () {
   }
 
   /* ===================== ficha de GESTIÓN (Ops) ===================== */
-  function openGestion(id) {
+  async function openGestion(id) {
+    try{await Orbit.cat.ensure();}catch(error){U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;}
     const g = S().get('gestiones', id); if (!g) return;
     const cli = S().get('clientes', g.clienteId), ase = q.asesor(g.asesorId), asg = q.aseguradora(g.aseguradoraId);
-    const asesores = S().all('asesores'), asgs = S().all('aseguradoras');
+    const asesores = await assignableAdvisors((cli&&cli.pais)||Orbit.pais), asgs = S().all('aseguradoras');
     const Lcol = (opsListas().find(l => l.nombre === g.lista) || opsListas()[0]);
     const done = (g.checklist || []).filter(c => c.done).length, tot = (g.checklist || []).length;
     const pols = g.clienteId ? S().where('polizas', p => p.clienteId === g.clienteId) : [];
@@ -625,7 +606,8 @@ Orbit.ciclo = (function () {
     if (/^https:\/\/[^\s]+$/i.test(url)) window.open(url, '_blank', 'noopener,noreferrer');
   }
 
-  function managementCreateModal(opts) {
+  async function managementCreateModal(opts) {
+    try{await Orbit.cat.ensure();}catch(error){U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;}
     opts = Object.assign({
       clienteId: '', polizaId: '', tipo: '', titulo: '', lista: '', prioridad: 'Media', estado: 'Pendiente',
       asesorId: '', aseguradoraId: '', vence: inDays(7), proximaAccion: 'Pendiente de definir',
@@ -635,10 +617,10 @@ Orbit.ciclo = (function () {
     }, opts || {});
 
     const clientes = S().all('clientes').filter(c => c && c.id);
-    const asesores = S().all('asesores').filter(a => a && a.id);
     const asgs = S().all('aseguradoras').filter(a => a && a.id);
     const tipos = tiposGestion().slice();
     const initialClient = opts.clienteId ? S().get('clientes', opts.clienteId) : null;
+    const asesores = await assignableAdvisors((initialClient&&initialClient.pais)||Orbit.pais);
     const typeDef = tipos.find(t => t.t === opts.tipo) || null;
     const initialList = opts.lista || (typeDef && typeDef.lista) || 'Gestiones Admin';
     const initialAdvisor = opts.asesorId || (initialClient && initialClient.asesorId) || (Orbit.session && Orbit.session.asesorId ? Orbit.session.asesorId() : '');
@@ -936,9 +918,10 @@ Orbit.ciclo = (function () {
   }
 
   /* ===================== nuevo negocio / nueva gestión ===================== */
-  function nuevoNegocio() {
+  async function nuevoNegocio() {
+    try{await Orbit.cat.ensure();}catch(error){U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;}
     const initialCountry = Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : 'GT';
-    const asesores = assignableAdvisors(initialCountry);
+    let asesores = await assignableAdvisors(initialCountry);
     const html = `
       <div class="ciclo-h" style="background:linear-gradient(120deg,#C5162E,#8f1020)">
         <div><div class="ciclo-eyebrow">Nuevo ingreso · ciclo comercial</div><h2>🌱 Nuevo prospecto</h2>
@@ -952,42 +935,39 @@ Orbit.ciclo = (function () {
           ${fInput('Teléfono (WhatsApp)', 'nn-tel', '')}
           ${fInput('Correo', 'nn-email', '')}
           ${fSelect('País', 'nn-pais', ['GT', 'CO'], initialCountry)}
-          ${fInput('Canal', 'nn-canal', 'Referido')}
-          ${fInput('Producto', 'nn-prod', '')}
-          ${fInput('Ramo', 'nn-ramo', 'Auto')}
+          ${fSelectCat('Canal', 'nn-canal', 'canales', Orbit.cat.get('canales')[0] || '')}
+          ${fSelectCat('Producto / plan', 'nn-prod', 'productos', '')}
+          ${fSelect('Ramo', 'nn-ramo', Orbit.cat.ramosDe(initialCountry), Orbit.cat.ramosDe(initialCountry)[0] || '')}
+          ${fSelectCat('Segmento', 'nn-segmento', 'segmentos', Orbit.cat.get('segmentos')[0] || '')}
+          ${fSelectCat('Prioridad', 'nn-prioridad', 'prioridades', Orbit.cat.get('prioridades')[0] || '')}
           ${fInput('Prima estimada', 'nn-prima', 0, 'number')}
           ${fSelectOpt('Asesor', 'nn-ase', asesores.map(a => [a.id, a.nombre]), (Orbit.session && Orbit.session.asesorId ? (Orbit.session.asesorId() || '') : ''))}
         </div>
-        ${fSelect('Punto de ingreso', 'nn-ingreso', ['Leads (interés, sin cotizar)', 'Ops (pide cotización)'], 'Ops (pide cotización)')}
+        ${fSelectOpt('Punto de ingreso', 'nn-ingreso', Orbit.cat.get('puntosIngreso').map(p=>[p.id,p.label]), (Orbit.cat.get('puntosIngreso')[1]||Orbit.cat.get('puntosIngreso')[0]||{}).id || '')}
         <label class="ce-l">Descripción / detalle del riesgo<textarea id="nn-desc" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px"></textarea></label>
       </div>
       <div class="ciclo-foot"><div></div><div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="nn-ok">Crear</button></div></div>`;
     const back = modal(html, 640);
     const advisorSelect=back.querySelector('#nn-ase'),countrySelect=back.querySelector('#nn-pais');
-    const refreshAssignableAdvisors=()=>{
-      const current=advisorSelect.value||(Orbit.session&&Orbit.session.asesorId?(Orbit.session.asesorId()||''):'');
-      const rows=assignableAdvisors(countrySelect.value);
-      advisorSelect.innerHTML=rows.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');
-      if(rows.some(a=>a.id===current))advisorSelect.value=current;else if(rows.length)advisorSelect.value=rows[0].id;
-      advisorSelect.dataset.assignableAdvisorRoster='canonical';advisorSelect.dataset.assignableCount=String(rows.length);
-    };
-    countrySelect.addEventListener('change',refreshAssignableAdvisors);refreshAssignableAdvisors();
+    const refreshAssignableAdvisors=async()=>{const current=advisorSelect.value||(Orbit.session?.asesorId?Orbit.session.asesorId():'');asesores=await assignableAdvisors(countrySelect.value);advisorSelect.innerHTML=asesores.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');if(asesores.some(a=>a.id===current))advisorSelect.value=current;else if(asesores.length)advisorSelect.value=asesores[0].id;advisorSelect.dataset.assignableAdvisorRoster='server-owned-minimal';advisorSelect.dataset.assignableCount=String(asesores.length);const ramo=back.querySelector('#nn-ramo'),prior=ramo&&ramo.value,rows=Orbit.cat.ramosDe(countrySelect.value);if(ramo){ramo.innerHTML=rows.map(v=>'<option>'+U.esc(v)+'</option>').join('');if(rows.includes(prior))ramo.value=prior;}};
+    countrySelect.addEventListener('change',()=>{refreshAssignableAdvisors().catch(()=>{});});
     back.querySelector('#nn-ok').addEventListener('click', async () => {
       const save = back.querySelector('#nn-ok');
       if (save.disabled) return;
       const v = sid => (back.querySelector('#' + sid) || {}).value;
-      const ingresoOps = v('nn-ingreso').indexOf('Ops') === 0;
+      const ingreso=Orbit.cat.puntoIngreso(v('nn-ingreso'));if(!ingreso)return U.toast('Selecciona un punto de ingreso válido.');
+      const ingresoOps = ingreso.origen === 'Ops';
       const pais = v('nn-pais'), asesorId = v('nn-ase');
       if (!asesorId) return U.toast('Selecciona un asesor responsable.');
       const n = {
         id: 'neg' + Date.now().toString().slice(-7), nombre: v('nn-nombre') || 'Prospecto', tipo: v('nn-tipo'),
-        etapa: ingresoOps ? 'cotizando' : 'nuevo', prob: ingresoOps ? 45 : 10,
+        etapa: ingreso.etapa, prob: Number(ingreso.probability ?? ingreso.prob ?? 0), puntoIngreso: ingreso.id,
         asesorId, canal: v('nn-canal'), pais, moneda: pais === 'CO' ? 'COP' : 'GTQ',
-        producto: v('nn-prod') || 'Por definir', ramo: v('nn-ramo') || 'Auto', aseguradoraId: '',
+        producto: v('nn-prod') || '', ramo: v('nn-ramo') || '', segmento: v('nn-segmento') || '', aseguradoraId: '',
         telefono: v('nn-tel'), email: v('nn-email'), primaEst: +v('nn-prima') || 0,
         descripcion: v('nn-desc'), notas: '', cadencia: '', cadenciaActiva: false,
-        proximoToque: inDays(2), vence: inDays(7), prioridad: 'Media',
-        decision: '', nroCotizacion: ingresoOps ? 'COT-' + Math.floor(1000 + Math.random() * 9000) : '', nroPoliza: '',
+        proximoToque: inDays(2), vence: inDays(7), prioridad: v('nn-prioridad') || '',
+        decision: '', nroCotizacion: '', nroPoliza: '',
         checklist: [{ t: 'Datos completos para cotizar', done: ingresoOps }, { t: 'Cotización enviada al cliente', done: false }, { t: 'Documentos del riesgo recibidos', done: false }, { t: 'Inspección / avalúo realizado', done: false }],
         clienteIdCreado: '', archivado: false, etiquetas: [],
         bitacora: [{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Ingreso (' + (ingresoOps ? 'Ops' : 'Leads') + ')', origen: 'manual' }],
@@ -1048,20 +1028,25 @@ Orbit.ciclo = (function () {
         </div>
         <div class="ciclo-foot"><div class="muted" style="font-size:12px">Los cambios se guardan al instante.</div><button class="btn primary" data-close>Listo</button></div>`;
       const back = modal(html, 600);
-      const save = (newArr) => { Orbit.cat.setList(boardKey, newArr); refresh(); render(); };
-      back.querySelectorAll('[data-name]').forEach(el => el.addEventListener('change', () => { const a = Orbit.cat.get(boardKey).slice(); const old = a[+el.dataset.name].nombre; a[+el.dataset.name] = Object.assign({}, a[+el.dataset.name], { nombre: el.value }); if (a[+el.dataset.name].kind === 'gestion') S().all('gestiones').forEach(g => { if (g.lista === old) S().update('gestiones', g.id, { lista: el.value }); }); save(a); }));
-      back.querySelectorAll('[data-emoji]').forEach(el => el.addEventListener('change', () => { const a = Orbit.cat.get(boardKey).slice(); a[+el.dataset.emoji] = Object.assign({}, a[+el.dataset.emoji], { emoji: el.value || '🗂' }); save(a); }));
-      back.querySelectorAll('[data-color]').forEach(el => el.addEventListener('change', () => { const a = Orbit.cat.get(boardKey).slice(); a[+el.dataset.color] = Object.assign({}, a[+el.dataset.color], { color: el.value }); save(a); }));
-      back.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { const a = Orbit.cat.get(boardKey).slice(); const i = +b.dataset.up; [a[i - 1], a[i]] = [a[i], a[i - 1]]; save(a); }));
-      back.querySelectorAll('[data-down]').forEach(b => b.addEventListener('click', () => { const a = Orbit.cat.get(boardKey).slice(); const i = +b.dataset.down; [a[i + 1], a[i]] = [a[i], a[i + 1]]; save(a); }));
-      back.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { const a = Orbit.cat.get(boardKey).slice(); if (a[+b.dataset.del].fixed) return; a.splice(+b.dataset.del, 1); save(a); }));
+      const save = async (newArr) => {
+        const reason='Actualización de listas '+titulo;
+        const current=Orbit.cat.all(),next=Object.assign({},current,{[boardKey]:newArr});
+        try{await Orbit.cat.saveDurable(next,reason);refresh();render();}
+        catch(error){U.toast('No fue posible confirmar la configuración de listas. No se registró un falso éxito.');}
+      };
+      back.querySelectorAll('[data-name]').forEach(el => el.addEventListener('change', async () => { const a = Orbit.cat.get(boardKey).slice(); a[+el.dataset.name] = Object.assign({}, a[+el.dataset.name], { nombre: el.value }); await await save(a); }));
+      back.querySelectorAll('[data-emoji]').forEach(el => el.addEventListener('change', async () => { const a = Orbit.cat.get(boardKey).slice(); a[+el.dataset.emoji] = Object.assign({}, a[+el.dataset.emoji], { emoji: el.value || '🗂' }); await save(a); }));
+      back.querySelectorAll('[data-color]').forEach(el => el.addEventListener('change', async () => { const a = Orbit.cat.get(boardKey).slice(); a[+el.dataset.color] = Object.assign({}, a[+el.dataset.color], { color: el.value }); await save(a); }));
+      back.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', async () => { const a = Orbit.cat.get(boardKey).slice(); const i = +b.dataset.up; [a[i - 1], a[i]] = [a[i], a[i - 1]]; await save(a); }));
+      back.querySelectorAll('[data-down]').forEach(b => b.addEventListener('click', async () => { const a = Orbit.cat.get(boardKey).slice(); const i = +b.dataset.down; [a[i + 1], a[i]] = [a[i], a[i + 1]]; await save(a); }));
+      back.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => { const a = Orbit.cat.get(boardKey).slice(); if (a[+b.dataset.del].fixed) return; a.splice(+b.dataset.del, 1); await save(a); }));
       back.querySelector('#lm-add').addEventListener('click', async () => {
         const a = Orbit.cat.get(boardKey).slice();
         const palette = ['#1f3a5f', '#c9821b', '#0f766e', '#6b4ea0', '#2563a8', '#b91c1c', '#15803d', '#7c3aed'];
         const nombre = ((await Orbit.ui.prompt('Nombre de la nueva lista:', { title: 'Nueva lista' })) || '').trim(); if (!nombre) return;
         const base = { id: boardKey.slice(0, 2) + Date.now().toString().slice(-5), nombre, emoji: '🗂', color: palette[a.length % palette.length] };
         a.push(boardKey === 'opsListas' ? Object.assign(base, { kind: 'gestion' }) : Object.assign(base, { custom: true }));
-        save(a);
+        await save(a);
       });
     }
     render();
@@ -1089,7 +1074,7 @@ Orbit.ciclo = (function () {
     return `<label class="ce-l">${label}<select id="${id}" class="o-sel cat-sel" data-cat="${catKey}">
       ${opts.map(o => `<option ${o === val ? 'selected' : ''}>${U.esc(o)}</option>`).join('')}
       ${(!has && val) ? `<option selected>${U.esc(val)}</option>` : ''}
-      <option value="__otro__">➕ Otro…</option></select></label>`;
+</select></label>`;
   }
   function fSelectOpt(label, id, pairs, val) {
     return `<label class="ce-l">${label}<select id="${id}" class="o-sel">${pairs.map(p => `<option value="${p[0]}" ${p[0] === val ? 'selected' : ''}>${U.esc(p[1])}</option>`).join('')}</select></label>`;

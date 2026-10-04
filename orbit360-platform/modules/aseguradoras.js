@@ -164,23 +164,14 @@ Orbit.modules.aseguradoras = (function () {
   }
 
   /* ===================== MOTOR DE FUENTES/CONOCIMIENTO (Tarifas) ===================== */
-  const SOURCE_TYPES = ['tarifario', 'cotizacion_ejemplo', 'poliza_ejemplo', 'formulario', 'manual', 'circular'];
+  const SOURCE_TYPES=(Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.TAXONOMY?Orbit.insurerSourceRegistry.TAXONOMY.map(x=>x[0]):['otro_requiere_clasificacion']);
   const SOURCE_STATES = ['Documento recibido', 'Mapeado', 'Persistido', 'Requiere validación', 'Validado', 'Conocimiento incompleto', 'Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'];
   // dimensiones extendidas — no todas se capturan en la UI de docs aún (país/moneda/ramo sí);
   // el resto queda disponible en el contrato para consumidores/importadores futuros.
   const DIMENSION_KEYS = ['pais', 'moneda', 'ramo', 'producto', 'familiaProducto', 'subtipoProducto', 'segmento', 'tipoRiesgo', 'tipoVehiculo', 'usoVehiculo', 'plan'];
-  const CAT_TO_TYPE = { 'Cotización ejemplo': 'cotizacion_ejemplo', 'Póliza ejemplo': 'poliza_ejemplo', 'Formulario': 'formulario', 'Clausulado': 'formulario', 'Condiciones': 'formulario', 'Manual': 'manual', 'Circular': 'circular' };
-  function legacyType(cat) { return CAT_TO_TYPE[cat] || 'tarifario'; }
-  function normalizarFuente(d, a) {
-    return Object.assign({
-      id: d.id, // estable: se asigna en alta, NUNCA en render (ver addDoc)
-      nombre: d.nombre || 'Documento', cat: d.cat || 'Formulario', tipo: d.tipo || legacyType(d.cat),
-      pais: d.pais || a.pais, moneda: d.moneda || (a.pais === 'GT' ? 'GTQ' : 'COP'),
-      ramo: d.ramo || '', producto: d.producto || '', familiaProducto: d.familiaProducto || '', subtipoProducto: d.subtipoProducto || '',
-      segmento: d.segmento || '', tipoRiesgo: d.tipoRiesgo || '', tipoVehiculo: d.tipoVehiculo || '', usoVehiculo: d.usoVehiculo || '', plan: d.plan || '',
-      estado: d.estado || 'Documento recibido', version: d.version || 1, vigencia: d.vigencia || ''
-    }, {});
-  }
+  const CAT_TO_TYPE=Object.fromEntries((Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.TAXONOMY||[]).map(x=>[x[1],x[0]]));
+  function legacyType(cat){return Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.taxonomyId?Orbit.insurerSourceRegistry.taxonomyId(cat):(CAT_TO_TYPE[cat]||'otro_requiere_clasificacion');}
+  function normalizarFuente(d,a){if(Orbit.insurerSourceRegistry&&typeof Orbit.insurerSourceRegistry.normalize==='function'){const n=Orbit.insurerSourceRegistry.normalize(d,a);return Object.assign({},d,n,{familiaProducto:d.familiaProducto||'',subtipoProducto:d.subtipoProducto||'',segmento:d.segmento||'',tipoRiesgo:d.tipoRiesgo||'',tipoVehiculo:d.tipoVehiculo||'',usoVehiculo:d.usoVehiculo||''});}return Object.assign({id:d.id,nombre:d.nombre||'Documento',cat:d.cat||'Otro/requiere clasificación',tipo:d.tipo||legacyType(d.cat),pais:d.pais||a.pais,moneda:d.moneda||(a.pais==='GT'?'GTQ':'COP'),ramo:d.ramo||'',producto:d.producto||'',plan:d.plan||'',estado:d.estado||'Documento recibido',version:d.version||1,vigencia:d.vigencia||''},d);}
   function sourceDimensions(d) { const o = {}; DIMENSION_KEYS.forEach(k => { if (d[k]) o[k] = d[k]; }); return o; }
   function sourceCombinationKey(d) { return DIMENSION_KEYS.map(k => d[k] || '—').join(' · '); }
   function groupLabel(key) { return key; }
@@ -264,17 +255,8 @@ Orbit.modules.aseguradoras = (function () {
       return [].concat(result.sources || []).map(item => Object.assign({}, item, { estado: visibleState(item.estado || item.status || 'Persistido'), sourceOrigin: 'Persistido' }));
     } catch (e) { return []; }
   }
-  function knowledgeSources(row) {
-    const map = Object.create(null), order = [];
-    [mappedSummaryRows(row), persistedKnowledgeRows(row), [].concat(row.docs || []).map(item => Object.assign({}, item, { sourceOrigin: 'Ficha' }))].forEach(group => {
-      group.forEach(item => {
-        const key = sourceIdentity(item) || ('source_' + order.length);
-        if (!map[key]) { map[key] = {}; order.push(key); }
-        map[key] = Object.assign({}, map[key], item, { estado: visibleState(item.estado || item.status) });
-      });
-    });
-    return order.map(key => map[key]);
-  }
+  function rawKnowledgeSources(row){const map=Object.create(null),order=[];[mappedSummaryRows(row),persistedKnowledgeRows(row),[].concat(row.docs||[]).map(item=>Object.assign({},item,{sourceOrigin:'Ficha'}))].forEach(group=>group.forEach(item=>{const key=sourceIdentity(item)||('source_'+order.length);if(!map[key]){map[key]={};order.push(key);}map[key]=Object.assign({},map[key],item,{estado:visibleState(item.estado||item.status)});}));return order.map(key=>map[key]);}
+  function knowledgeSources(row){const raw=rawKnowledgeSources(row);return Orbit.insurerSourceRegistry&&typeof Orbit.insurerSourceRegistry.buildForInsurer==='function'?Orbit.insurerSourceRegistry.buildForInsurer(row,raw):raw;}
   function configuredKnowledgeSummarySrc() { return clean(tenantInsurerConfig().knowledgeSummarySrc); }
   function refreshOwnerView() {
     const open = document.getElementById('asg-ficha');
@@ -902,15 +884,22 @@ Orbit.modules.aseguradoras = (function () {
     </div>`;
   }
 
+  function sourceRegistryHtml(a){
+    const rows=knowledgeSources(a);if(!rows.length)return '<div class="cfg-note" style="margin-top:12px">Sin fuentes registradas.</div>';
+    const label=k=>k==='BOTH'?'Biblioteca + Drive':k==='DRIVE_FILE'?'Drive':'Biblioteca / conocimiento';
+    return '<div class="asg-sec-t" style="margin-top:14px">📚 Registry canónica de fuentes</div><div style="display:grid;gap:7px">'+rows.map(r=>'<div class="asg-row" data-source-registry-row="'+U.esc(r.id||'')+'" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>'+U.esc(r.nombre||'Fuente')+'</b><small class="muted" style="display:block">'+U.esc((r.taxonomyLabel||r.cat||'Otro/requiere clasificación')+' · '+label(r.storageKind)+' · '+([r.pais,r.moneda,r.ramo,r.producto,r.plan].filter(Boolean).join(' · ')||'Dimensiones pendientes'))+'</small></span><span class="badge '+(/validado/i.test(r.validationStatus||r.estado)?'ok':'neutral')+'">'+U.esc(r.validationStatus||r.estado||'Documento recibido')+'</span></div>').join('')+'</div>';
+  }
+
   /* ---- Documentos y Drive ---- */
-  const CATS_DOC = ['Formulario', 'Clausulado', 'Condiciones', 'Póliza ejemplo', 'Cotización ejemplo', 'Anexo', 'Manual', 'Circular'];
+  const CATS_DOC=Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels():['Otro/requiere clasificación'];
   function tabDocumentos(a, editing) {
     const docs = a.docs || [];
     return `<div class="asg-sec">
       <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Documentos y Drive ${editing ? '<button class="btn ghost sm" id="af-add-doc">+ Documento</button>' : ''}</div>
-      <div class="cfg-note" style="margin-bottom:9px"><b>Fuentes de la aseguradora:</b> aquí puedes cargar formularios, clausulados, condiciones, pólizas o cotizaciones de ejemplo, manuales y circulares. El archivo se registra con la aseguradora y queda pendiente de validación; no habilita cálculos automáticamente.</div>
+      <div class="cfg-note" style="margin-bottom:9px"><b>Registro canónico de fuentes:</b> distingue conocimiento de Biblioteca, archivo físico Drive o ambos; conserva metadata, ubicación, hash, provenance y validación. Registrar una fuente no habilita cálculos automáticamente.</div>
       <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="muted" style="font-size:12px">Sin documentos cargados.</div>'}</div>
-      ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc" style="margin-top:9px">📁 Cargar formulario, póliza o cotización de ejemplo</button>' : ''}
+      ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc" style="margin-top:9px">📁 Cargar fuente</button>' : ''}
+      ${sourceRegistryHtml(a)}
     </div>`;
   }
   function docRow(d, i, editing, a) {

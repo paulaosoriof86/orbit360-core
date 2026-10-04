@@ -11,9 +11,10 @@ const VERSION = 'orbit360-tenant-domain-config-v1';
 const PREVIEW_VERSION = 'orbit360-tenant-domain-config-preview-b2-r96-v1';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
-const DOMAINS = new Set(['workflow', 'reconciliation', 'access']);
+const DOMAINS = new Set(['workflow', 'reconciliation', 'access', 'catalogs']);
 const ADMIN_ROLES = new Set(['superadmin', 'admintenant', 'direccion', 'admin']);
-const PERMISSIONS = new Set(['config_manage', 'workflow_config_manage', 'reconciliation_config_manage', 'access_config_manage']);
+const PERMISSIONS = new Set(['config_manage', 'workflow_config_manage', 'reconciliation_config_manage', 'access_config_manage', 'catalog_config_manage']);
+const CATALOG_DEFAULT = Object.freeze({"canales":["Referido","Conocido","Cliente actual","Cliente antiguo","Web / sitio","WhatsApp","Facebook","Instagram","TikTok","LinkedIn","YouTube","Campaña","Telemarketing","Evento / feria"],"ramos":["Auto","Vida","Gastos Médicos","Hogar","Daños","Fianzas","Transporte","RC","Accidentes"],"ramosPais":{"GT":{"Automóviles":["Vehículo Liviano","Vehículo Pesado","Motocicleta","Grúa / Equipo Especial","Pérdidas Totales","Pérdidas Parciales","Responsabilidad Civil Vehículos","Seguro por Kilómetros","Flotilla"],"Vida":["Vida Individual","Vida Colectivo","Vida Deudores","Vida Temporal","Dotal","Renta / Retiro"],"Gastos Médicos":["GM Individual","GM Familiar","GM Colectivo","GM Internacional","Enfermedades Graves"],"Incendio y Líneas Aliadas":["Hogar","Edificio / Comercio","Todo Riesgo Construcción","Lucro Cesante"],"Daños":["Multirriesgo PYME","Multirriesgo Hogar","Robo y Hurto","Rotura de Maquinaria","Equipo Electrónico","Dinero y Valores"],"Fianzas":["Fianza de Cumplimiento","Fianza de Anticipo","Fianza de Sostenimiento de Oferta","Fianza de Calidad / Conservación de Obra","Fianza Judicial","Fianza Aduanera"],"Transporte":["Carga Terrestre","Carga Marítima","Carga Aérea","Casco","Importación / Exportación"],"Responsabilidad Civil":["RC General","RC Profesional","RC Productos","RC Patronal","RC Directores y Funcionarios (D&O)"],"Accidentes Personales":["AP Individual","AP Colectivo","AP Escolar","Viajero / Asistencia"]},"CO":{"Automóviles":["Todo Riesgo Liviano","Todo Riesgo Pesado","Pérdidas Totales","Pérdidas Parciales","Responsabilidad Civil","Motos","Grúa / Maquinaria","Seguro por Kilómetros","SOAT","Flotas"],"Vida":["Vida Individual","Vida Grupo","Vida Deudores","Temporal","Exequias","Renta Voluntaria"],"Salud":["Salud Individual","Salud Familiar","Medicina Prepagada","Plan Complementario","Hospitalización y Cirugía","Salud Internacional"],"Incendio y Terremoto":["Hogar","PYME","Copropiedades","Todo Riesgo Daño Material","Lucro Cesante"],"Daños":["Multirriesgo Empresarial","Multirriesgo Hogar","Sustracción","Rotura de Maquinaria","Equipo y Maquinaria","Manejo"],"Cumplimiento":["Cumplimiento Particular","Cumplimiento Estatal","Seriedad de la Oferta","Buen Manejo de Anticipo","Estabilidad de Obra","Calidad del Servicio"],"Transporte":["Mercancías","Automotor de Carga","Casco Marítimo","Importación / Exportación"],"Responsabilidad Civil":["RC Extracontractual","RC Profesional","RC Directores y Administradores (D&O)","RC Clínicas y Hospitales","RC Contractual"],"ARL / Riesgos Laborales":["ARL","Accidentes Personales","AP Estudiantil","Viajero"]}},"productos":["Auto Total","Auto Plus","Auto Básico","Vida Entera","Vida Temporal","Salud Integral","Salud Familiar","Salud Premium","Hogar Protegido","Hogar Plus","Multirriesgo PYME","Responsabilidad Civil","Transporte de Carga","Fianza Cumplimiento","Accidentes Personales"],"prioridades":["Alta","Media","Baja"],"tiposGestion":[{"t":"Solicitar condiciones de renovación","lista":"Renovaciones / Modif."},{"t":"Renovación de póliza","lista":"Renovaciones / Modif."},{"t":"Modificar suma asegurada","lista":"Renovaciones / Modif."},{"t":"Sustitución de vehículo","lista":"Renovaciones / Modif."},{"t":"Cambio de propietario","lista":"Renovaciones / Modif."},{"t":"Actualizar datos de cliente","lista":"Gestiones Admin"},{"t":"Endoso de beneficiario","lista":"Gestiones Admin"},{"t":"Solicitud de cancelación","lista":"Gestiones Admin"},{"t":"Carta de no adeudo","lista":"Gestiones Admin"},{"t":"Emisión de certificado","lista":"Gestiones Admin"},{"t":"Reclamo / Siniestro","lista":"Gestiones Admin"}],"opsListas":[{"id":"l-admin","nombre":"Gestiones Admin","emoji":"🗂","color":"#1f3a5f","kind":"gestion"},{"id":"l-cotiz","nombre":"Cotizaciones","emoji":"🧮","color":"#c9821b","kind":"negocio","etapa":"cotizando","fixed":true},{"id":"l-insp","nombre":"Inspecciones","emoji":"🔍","color":"#0f766e","kind":"negocio","etapa":"inspeccion","fixed":true},{"id":"l-emis","nombre":"Emisiones","emoji":"📝","color":"#1f8a4c","kind":"negocio","etapa":"emision","fixed":true},{"id":"l-renov","nombre":"Renovaciones / Modif.","emoji":"🔄","color":"#6b4ea0","kind":"gestion"}],"leadsListas":[{"id":"q-nuevo","nombre":"Nuevo","emoji":"🌱","color":"#6b7280","etapa":"nuevo","fixed":true},{"id":"q-cont","nombre":"Contactado","emoji":"📞","color":"#1f3a5f","etapa":"contactado","fixed":true},{"id":"q-cotiz","nombre":"Cotizando","emoji":"🧮","color":"#c9821b","etapa":"cotizando","espejo":true,"fixed":true},{"id":"q-prop","nombre":"Propuesta","emoji":"📨","color":"#6b4ea0","etapa":"propuesta","fixed":true},{"id":"q-nego","nombre":"Negociación","emoji":"🤝","color":"#2563a8","etapa":"negociacion","fixed":true},{"id":"q-insp","nombre":"Inspección","emoji":"🔍","color":"#0f766e","etapa":"inspeccion","espejo":true,"fixed":true},{"id":"q-emis","nombre":"Emisión","emoji":"📝","color":"#1f8a4c","etapa":"emision","espejo":true,"fixed":true},{"id":"q-cierre","nombre":"Cierre","emoji":"🏆","color":"#15803d","etapa":"emitido","fixed":true}],"segmentos":["Premium","Recurrente","Estándar","Nuevo","Activo","Inactivo","Prospecto"],"puntosIngreso":[{"id":"LEADS_INTERES","label":"Leads (interés, sin cotizar)","etapa":"nuevo","origen":"Leads","probability":10},{"id":"OPS_COTIZACION","label":"Ops (pide cotización)","etapa":"cotizando","origen":"Ops","probability":45}]});
 
 const text = (value, max = 1000) => String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
 const norm = value => text(value, 160).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
@@ -58,7 +59,7 @@ function active(member) {
   return !!member && member.active !== false && member.activo !== false && !['inactive', 'inactivo', 'blocked', 'bloqueado'].includes(state);
 }
 function canManage(member, domain) {
-  const needed = domain === 'workflow' ? 'workflow_config_manage' : domain === 'access' ? 'access_config_manage' : 'reconciliation_config_manage';
+  const needed = domain === 'workflow' ? 'workflow_config_manage' : domain === 'access' ? 'access_config_manage' : domain === 'catalogs' ? 'catalog_config_manage' : 'reconciliation_config_manage';
   return roles(member).some(role => ADMIN_ROLES.has(role)) || permissions(member).some(permission => PERMISSIONS.has(permission) || permission === needed);
 }
 async function authorize(request, domain, write) {
@@ -164,7 +165,19 @@ function validateAccess(input){
   Object.entries(input.roleScopes&&typeof input.roleScopes==='object'?input.roleScopes:{}).slice(0,30).forEach(([role,value])=>{const rk=text(role,100),sc=norm(value);if(rk&&valid.has(sc))roleScopes[rk]=sc;});
   return{schemaVersion:'gravicentra-access-policy-v1',rolePermissions,roleScopes};
 }
-function validate(domain,input){return domain==='workflow'?validateWorkflow(input):domain==='access'?validateAccess(input):validateReconciliation(input);}
+function cloneCatalogDefault(){return JSON.parse(JSON.stringify(CATALOG_DEFAULT));}
+function validateCatalogs(input){
+ input=input&&typeof input==='object'?input:{};const base=cloneCatalogDefault(),out={schemaVersion:'gravicentra-tenant-catalogs-v1'};
+ const strList=(key,max=300)=>unique(input[key]==null?base[key]:input[key]).slice(0,max);
+ out.canales=strList('canales');out.productos=strList('productos');out.segmentos=strList('segmentos');out.prioridades=strList('prioridades');out.ramos=strList('ramos');
+ const rp=input.ramosPais&&typeof input.ramosPais==='object'?input.ramosPais:base.ramosPais;out.ramosPais={};
+ ['GT','CO'].forEach(country=>{const source=rp?.[country]&&typeof rp[country]==='object'?rp[country]:{};out.ramosPais[country]={};Object.entries(source).slice(0,100).forEach(([ramo,subs])=>{const k=text(ramo,160);if(k)out.ramosPais[country][k]=unique(subs).slice(0,200);});});
+ const points=Array.isArray(input.puntosIngreso)?input.puntosIngreso:base.puntosIngreso;out.puntosIngreso=points.slice(0,20).map(row=>({id:norm(row?.id),label:text(row?.label,180),etapa:norm(row?.etapa),origen:text(row?.origen,80),probability:Math.max(0,Math.min(100,Number(row?.probability??row?.prob??0)))})).filter(row=>row.id&&row.label&&row.etapa);
+ const mg=Array.isArray(input.tiposGestion)?input.tiposGestion:base.tiposGestion;out.tiposGestion=mg.slice(0,200).map(row=>({t:text(row?.t||row?.label,180),lista:text(row?.lista||row?.opsList,120)})).filter(row=>row.t);
+ const board=rows=>[].concat(rows||[]).slice(0,100).map(row=>({id:text(row?.id,100),nombre:text(row?.nombre,160),emoji:text(row?.emoji,16),color:text(row?.color,32),kind:text(row?.kind,40),etapa:norm(row?.etapa),espejo:row?.espejo===true,fixed:row?.fixed===true,custom:row?.custom===true})).filter(row=>row.id&&row.nombre);
+ out.opsListas=board(input.opsListas==null?base.opsListas:input.opsListas);out.leadsListas=board(input.leadsListas==null?base.leadsListas:input.leadsListas);return out;
+}
+function validate(domain,input){return domain==='workflow'?validateWorkflow(input):domain==='access'?validateAccess(input):domain==='catalogs'?validateCatalogs(input):validateReconciliation(input);}
 
 async function execute(request) {
   const data = request.data || {};
@@ -176,7 +189,7 @@ async function execute(request) {
   const ref = configRef(authz.tenantId, domain);
   if (action === 'get') {
     const snap = await ref.get();
-    return { ok: true, domain, exists: snap.exists, config: snap.exists ? snap.data() : null };
+    return { ok: true, domain, exists: snap.exists, config: snap.exists ? snap.data() : (domain==='catalogs'?validateCatalogs(CATALOG_DEFAULT):null), source: snap.exists?'canonical':(domain==='catalogs'?'canonical_default':'empty') };
   }
   const reason = text(data.reason || data.motivo, 1000);
   if (!reason) throw new HttpsError('invalid-argument', 'El motivo es obligatorio.');
@@ -220,9 +233,9 @@ async function executePreview(request) {
       ok: true,
       domain,
       exists: canonicalSnap.exists,
-      config: canonicalSnap.exists ? canonicalSnap.data() : null,
+      config: canonicalSnap.exists ? canonicalSnap.data() : (domain==='catalogs'?validateCatalogs(CATALOG_DEFAULT):null),
       previewIsolated: true,
-      source: canonicalSnap.exists ? 'canonical_readonly_baseline' : 'empty_baseline'
+      source: canonicalSnap.exists ? 'canonical_readonly_baseline' : (domain==='catalogs'?'canonical_default_readonly_baseline':'empty_baseline')
     };
   }
   const reason = text(data.reason || data.motivo, 1000);
@@ -258,5 +271,5 @@ async function executePreview(request) {
 
 exports.orbit360TenantDomainConfig = onCall({ region: REGION, cors: true }, execute);
 exports.orbit360TenantDomainConfigPreview = onCall({ region: PREVIEW_REGION, cors: true }, executePreview);
-exports.__tenantDomainConfig = Object.freeze({ VERSION, PREVIEW_VERSION, DOMAINS, validateReconciliation, normalizeInsurerPaymentPlans });
+exports.__tenantDomainConfig = Object.freeze({ VERSION, PREVIEW_VERSION, DOMAINS, validateReconciliation, validateCatalogs, normalizeInsurerPaymentPlans });
 

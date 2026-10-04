@@ -251,7 +251,9 @@ Orbit.modules = Orbit.modules || {};
       if(total==null||schedule==null)return;
       const delta=schedule-total;
       if(Math.abs(delta)<=tol)return;
-      issues.push({p,total,schedule,delta,tolerance:tol,receipts:sch.rows.length});
+      const explicitSource=first(p.primaFuente,p.primaSource,p.primaSourceRef,p.sourceDocumentId,p.sourceRef,p.importSource,p.fuente);
+      const contractualSource=explicitSource?String(explicitSource):(p.primaTotal!=null&&p.primaTotal!==''?'Póliza · prima total':p.prima!=null&&p.prima!==''?'Póliza · prima':'Fuente contractual no identificada');
+      issues.push({p,total,schedule,delta:Math.abs(delta)<0.0000001?0:delta,tolerance:tol,receipts:sch.rows.length,rows:sch.rows,reviewRows:sch.reviewRows.length,calendarAuthority:sch.calendarAuthority,contractualSource,reason:'La suma del calendario activo difiere de la prima contractual por encima de la tolerancia configurada.'});
     });
     return issues.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
   }

@@ -73,9 +73,10 @@ Orbit.modules.calidad = (function () {
       <span style="min-width:0"><span style="font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${U.esc(nombre)}</span>
       <span class="muted" style="font-size:11px">${meta}</span></span></a>`;
   }
+  function moneyValue(n,cur){const v=Math.abs(Number(n)||0)<0.005?0:Number(n||0);return U.money?U.money(v,cur):U.esc((cur?cur+' ':'')+v.toFixed(2));}
   function financialHealthHtml(issues, clientsById) {
-    if(!issues.length) return '<div class="cfg-note" style="margin:14px 0"><b>Integridad financiera:</b> no se detectaron diferencias materiales entre prima contractual y calendario vigente dentro del alcance seleccionado.</div>';
-    return `<div class="card" data-information-health-financial="1" data-quality-table-grammar="canonical" style="overflow:hidden;margin-bottom:14px"><div style="padding:13px 14px;border-bottom:1px solid var(--line)"><b>Salud de la información · póliza vs calendario</b><div class="muted" style="font-size:12px;margin-top:3px">Estas diferencias se señalan para revisión. La plataforma no sustituye ni corrige importes sin fuente autorizada.</div></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Póliza</th><th>Cliente</th><th class="num">Prima contractual</th><th class="num">Calendario vigente</th><th class="num">Diferencia</th><th>Estado</th></tr></thead><tbody>${issues.map(x=>{const c=(clientsById&&clientsById.get(x.p.clienteId))||S().get('clientes',x.p.clienteId)||{id:x.p.clienteId},cur=x.p.moneda||c.moneda||'';return `<tr class="clickable" data-information-health-policy="${U.esc(x.p.id)}" onclick="location.hash='#/cliente360?c=${encodeURIComponent(x.p.clienteId||'')}&p=${encodeURIComponent(x.p.id)}"><td><b>${U.esc(x.p.numero||x.p.id)}</b><div class="muted" style="font-size:11px">${x.receipts} recibo(s) vigente(s)</div></td><td>${financialClientCell(c,x.p.clienteId)}</td><td class="num">${U.money?U.money(x.total,cur):U.esc(cur+' '+x.total.toFixed(2))}</td><td class="num">${U.money?U.money(x.schedule,cur):U.esc(cur+' '+x.schedule.toFixed(2))}</td><td class="num"><b>${U.money?U.money(x.delta,cur):U.esc(cur+' '+x.delta.toFixed(2))}</b></td><td><span class="badge danger">Revisión requerida</span></td></tr>`;}).join('')}</tbody></table></div></div>`;
+    if(!issues.length)return '<div class="cfg-note" style="margin:14px 0"><b>Integridad financiera:</b> no se detectaron diferencias materiales entre prima contractual y calendario vigente dentro del alcance seleccionado.</div>';
+    return `<div class="card" data-information-health-financial="1" data-quality-table-grammar="canonical" style="overflow:hidden;margin-bottom:14px"><div style="padding:13px 14px;border-bottom:1px solid var(--line)"><b>Salud de la información · póliza vs calendario</b><div class="muted" style="font-size:12px;margin-top:3px">Cada descuadre muestra fuente contractual, calendario activo, suma, diferencia y tolerancia. No se cambian primas ni recibos por inferencia.</div></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Póliza</th><th>Cliente</th><th>Prima / fuente</th><th>Calendario activo</th><th class="num">Suma</th><th class="num">Diferencia</th><th>Tolerancia / causa</th><th></th></tr></thead><tbody>${issues.map(x=>{const c=(clientsById&&clientsById.get(x.p.clienteId))||S().get('clientes',x.p.clienteId)||{id:x.p.clienteId},cur=x.p.moneda||c.moneda||'',delta=Math.abs(Number(x.delta)||0)<0.005?0:Number(x.delta||0);return `<tr data-information-health-policy="${U.esc(x.p.id)}"><td><b>${U.esc(x.p.numero||x.p.id)}</b><div class="muted" style="font-size:11px">${x.receipts} recibo(s) vigente(s)</div></td><td>${financialClientCell(c,x.p.clienteId)}</td><td><b>${moneyValue(x.total,cur)}</b><div class="muted" style="font-size:11px">${U.esc(x.contractualSource||'Fuente contractual no identificada')}</div></td><td><b>${U.esc(x.calendarAuthority||'Sin autoridad de calendario')}</b><div class="muted" style="font-size:11px">${x.reviewRows||0} fila(s) en revisión</div></td><td class="num">${moneyValue(x.schedule,cur)}</td><td class="num"><b>${moneyValue(delta,cur)}</b></td><td><b>${moneyValue(x.tolerance||0,cur)}</b><div class="muted" style="font-size:11px">${U.esc(x.reason||'Requiere validación de fuente.')}</div></td><td style="white-space:nowrap"><button class="btn ghost sm" onclick="event.stopPropagation();location.hash='#/polizas?p=${encodeURIComponent(x.p.id)}'">Ver póliza</button><button class="btn ghost sm" onclick="event.stopPropagation();location.hash='#/cliente360?c=${encodeURIComponent(x.p.clienteId||'')}&p=${encodeURIComponent(x.p.id)}&t=recibos'">Ver recibos</button></td></tr>`;}).join('')}</tbody></table></div></div>`;
   }
 
   function render(host) {
@@ -89,8 +90,8 @@ Orbit.modules.calidad = (function () {
       if (state==='vigente' || state==='porrenovar') vigenteClientIds.add(p.clienteId);
     });
     const all = clients.map(c => {
-      const f=faltantes(c), needsCountry=f.some(x=>x.k==='pais');
-      return { c, f, vig: vigenteClientIds.has(c.id), evidence: needsCountry ? evidenceFor(c) : { suggestedCountry:'', conflict:false, sources:[] } };
+      const f=faltantes(c);
+      return { c, f, vig: vigenteClientIds.has(c.id), evidence: evidenceFor(c) };
     }).filter(x => x.f.length > 0);
     const conVig = all.filter(x => x.vig);
     const advisors = advisorOptions(clients);
@@ -130,17 +131,17 @@ Orbit.modules.calidad = (function () {
           ${advisors.length > 1 && !ownScope ? `<select id="q-asesor" class="o-sel"><option value="">Todos los asesores</option>${advisors.map(a => `<option value="${U.esc(a.id)}" ${st.asesor === a.id ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select>` : ''}
           <span class="muted" style="margin-left:auto;font-size:12.5px">${rows.length} clientes${rows.length ? ' · mostrando ' + (pageStart + 1) + '–' + pageEnd : ''}</span>
         </div>
-        <div style="overflow-x:auto" data-quality-paged="true"><table class="tbl"><thead><tr><th>Cliente</th><th>Asesor</th><th>Faltan</th><th>Evidencia de país</th><th>Vigente</th><th>Canal</th><th></th></tr></thead>
+        <div style="overflow-x:auto" data-quality-paged="true"><table class="tbl"><thead><tr><th>Cliente</th><th>Asesor</th><th>Faltan</th><th>País actual</th><th>Provenance / evidencia</th><th>Vigente</th><th>Canal</th><th></th></tr></thead>
           <tbody>${visibleRows.map(({ c, f, vig, evidence }) => {
             const phone = clean(c.whatsapp || c.telefono), wa = phone.replace(/[^0-9]/g, '');
             const canal = phone ? '<span class="badge ok">💬 WhatsApp</span>' : c.email ? '<span class="badge info">✉ Correo</span>' : '<span class="badge danger">Sin contacto</span>';
             const faltaTxt = f.sort((a,b) => a.pri - b.pri).map(x => `<span class="badge ${x.pri <= 2 ? 'danger' : x.pri <= 6 ? 'warn' : 'neutral'}">${x.label}</span>`).join(' ');
-            const evidenceTxt = evidence && evidence.conflict ? '<span class="badge danger">Conflicto · revisar</span>' : evidence && evidence.suggestedCountry ? `<span class="badge info">Sugiere ${countryLabel(evidence.suggestedCountry)} · ${evidence.sources.length} fuente(s)</span>` : '<span class="muted">Sin evidencia vinculada</span>';
+            const countryTxt=validCountry(c.pais)?'<span class="badge ok">'+U.esc(countryLabel(countryCode(c.pais)))+'</span>':'<span class="badge danger">Por validar</span>'; const provenance=c.calidad&&c.calidad.paisProvenance; const evidenceTxt=provenance&&provenance.mode?'<span class="badge ok">'+U.esc(provenance.mode==='USER_CONFIRMED'?'Confirmado por usuario':provenance.mode)+'</span>':evidence&&evidence.conflict?'<span class="badge danger">Conflicto · revisar</span>':evidence&&evidence.suggestedCountry?`<span class="badge info">Evidencia sugiere ${countryLabel(evidence.suggestedCountry)} · ${evidence.sources.length} fuente(s)</span>`:'<span class="muted">Sin provenance registrada</span>';
             const accion = phone ? `<a class="btn ghost sm" style="color:#1f8a4c" href="https://wa.me/${wa}?text=${encodeURIComponent('Hola ' + clean(c.nombre).split(' ')[0] + ', para mantener tu información al día necesitamos actualizar algunos datos. ¿Nos ayudás?')}" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 Preparar WA</a>`
               : c.email ? `<button class="btn ghost sm" onclick="event.stopPropagation();window.__orbitCompose={para:'${U.esc(c.email)}',asunto:'Actualización de datos · ${U.esc(c.nombre)}',cuerpo:'',clienteId:'${c.id}',vinculo:{tipo:'cliente',id:'${c.id}',label:'${U.esc(c.nombre)}'}};location.hash='#/correo'">✉ Preparar correo</button>`
-              : `<button class="btn ghost sm" disabled>Sin canal</button>`;
-            return `<tr class="clickable" data-quality-country="${U.esc(countryCode(c.pais))}" onclick="location.hash='#/cliente360?c=${c.id}&t=resumen'"><td>${K.clienteCell(c.id)}</td><td>${K.asesorCell(c.asesorId)}</td><td>${faltaTxt}</td><td>${evidenceTxt}</td><td>${vig ? '<span class="badge ok">Sí</span>' : '<span class="muted">Pendiente de pólizas / sin vigente</span>'}</td><td>${canal}</td><td style="text-align:right;white-space:nowrap"><button class="btn primary sm" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}',{focus:'${f[0] && f[0].k || ''}'})">✏ Completar</button> ${accion}</td></tr>`;
-          }).join('') || `<tr><td colspan="7" class="muted" style="text-align:center;padding:30px">No hay expedientes incompletos con los filtros actuales.</td></tr>`}</tbody></table></div>
+              : `<button class="btn ghost sm" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}',{focus:'telefono'})">Agregar/corregir canal</button>`;
+            return `<tr class="clickable" data-quality-country="${U.esc(countryCode(c.pais))}" onclick="location.hash='#/cliente360?c=${c.id}&t=resumen'"><td>${K.clienteCell(c.id)}</td><td>${K.asesorCell(c.asesorId)}</td><td>${faltaTxt}</td><td>${countryTxt}</td><td>${evidenceTxt}</td><td>${vig ? '<span class="badge ok">Sí</span>' : '<span class="muted">Pendiente de pólizas / sin vigente</span>'}</td><td>${canal}</td><td style="text-align:right;white-space:nowrap"><button class="btn primary sm" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}',{focus:'${f[0] && f[0].k || ''}'})">✏ Completar</button> ${accion}</td></tr>`;
+          }).join('') || `<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">No hay expedientes incompletos con los filtros actuales.</td></tr>`}</tbody></table></div>
         ${rows.length > pageSize ? `<div data-quality-pagination="true" style="display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid var(--line)"><button class="btn ghost sm" id="q-page-prev" ${st.page<=1?'disabled':''}>← Anterior</button><span class="muted" style="font-size:12px">Página ${st.page} de ${pageCount}</span><button class="btn ghost sm" id="q-page-next" ${st.page>=pageCount?'disabled':''}>Siguiente →</button></div>` : ''}
       </div>
       <div class="cfg-note" style="margin-top:14px">Prioridad: país/moneda › contacto › correo/documento › ubicación › datos complementarios. Completar vacíos no permite reasignar, fusionar, borrar ni modificar pólizas o cobros.</div>
@@ -179,7 +180,7 @@ Orbit.modules.calidad = (function () {
     };
     let back = document.getElementById('q-inline'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'q-inline'; back.className = 'drawer-back open'; back.style.cssText = 'display:grid;place-items:center;z-index:215';
-    const evidenceNote = evidence.conflict ? '<div class="cfg-note" style="border-left-color:var(--danger)"><b>Conflicto:</b> las fuentes vinculadas apuntan a más de un país. Debe revisarse manualmente.</div>' : evidence.suggestedCountry ? `<div class="cfg-note"><b>Sugerencia:</b> ${countryLabel(evidence.suggestedCountry)} por ${evidence.sources.length} fuente(s) vinculada(s). La decisión sigue requiriendo confirmación.</div>` : '<div class="cfg-note">Aún no existen pólizas o cobros vinculados con evidencia suficiente de país.</div>';
+    const evidenceNote='<div class="cfg-note"><b>País actual:</b> '+U.esc(currentCountry?countryLabel(currentCountry):'Por validar')+'.</div>'+(evidence.conflict?'<div class="cfg-note" style="border-left-color:var(--danger)"><b>Provenance:</b> las fuentes vinculadas apuntan a más de un país. Debe revisarse manualmente.</div>':evidence.suggestedCountry?`<div class="cfg-note"><b>Evidencia vinculada:</b> sugiere ${countryLabel(evidence.suggestedCountry)} por ${evidence.sources.length} fuente(s). La decisión sigue requiriendo confirmación.</div>`:'<div class="cfg-note"><b>Provenance:</b> no existe evidencia vinculada suficiente; el país actual no se borra ni se infiere por esta ausencia.</div>');
     back.innerHTML = `<div class="card" style="width:min(600px,94vw);max-height:92vh;overflow:auto;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><div><div class="crumb" style="margin-bottom:2px">Completar expediente · ${U.esc(countryLabel(c.pais))}</div><b style="font-family:var(--f-display);font-size:16px">${U.esc(c.nombre)}</b></div><button class="imp-x" id="qi-x">✕</button></div><div style="padding:18px 20px;display:grid;gap:12px">${evidenceNote}${ordered.map(field).join('')}<label class="ce-l">Motivo / fuente de actualización *<textarea id="qi-motivo" class="o-sel" style="min-height:62px"></textarea></label><div class="cfg-note">Solo se completan datos pendientes. País y moneda quedan con trazabilidad y revisión de calidad.</div></div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="qi-cancel">Cancelar</button><button class="btn primary" id="qi-ok">Guardar datos</button></div></div>`;
     document.body.appendChild(back);
     const close = () => back.remove();
@@ -194,28 +195,18 @@ Orbit.modules.calidad = (function () {
     const dep = back.querySelector('#qi-departamento'), city = back.querySelector('#qi-ciudad');
     const fillCities = () => { if (!city) return; const selectedCountry = (pais && pais.value) || currentCountry; const rows = dep && dep.value && dep.value !== 'REQUIERE_VALIDACION' ? geoOptions(selectedCountry, dep.value).cities : []; city.innerHTML = '<option value="">— Seleccionar —</option>' + rows.map(v => `<option>${U.esc(v)}</option>`).join('') + '<option value="REQUIERE_VALIDACION">Otro / requiere validación</option>'; };
     if (dep) dep.addEventListener('change', fillCities);
-    back.querySelector('#qi-ok').addEventListener('click', () => {
-      const motivo = clean(back.querySelector('#qi-motivo').value);
-      if (!motivo) return U.toast('Indica el motivo o fuente de la actualización.');
-      const before = JSON.parse(JSON.stringify(c)), patch = {};
-      ordered.forEach(x => {
-        const el = back.querySelector('#qi-' + x.k), value = el && clean(el.value);
-        const current = clean(c[x.k]);
-        const pending = !current || current === 'REQUIERE_VALIDACION' || (x.k === 'moneda' && current !== expectedCurrency(currentCountry));
-        if (value && pending) patch[x.k] = value;
-      });
-      if (patch.pais && validCountry(patch.pais)) patch.moneda = expectedCurrency(patch.pais);
-      if (!Object.keys(patch).length) return U.toast('No hay datos nuevos para guardar.');
-      const projectedAfter = Object.assign({}, c, patch);
-      const remaining = faltantes(projectedAfter);
-      patch.requiereValidacion = remaining.length > 0;
-      patch.calidad = Object.assign({}, c.calidad || {}, { estado: remaining.length ? 'REQUIERE_VALIDACION' : 'COMPLETO_PENDIENTE_REVISION', alertas: remaining.map(x => 'falta_' + x.k), actualizado: new Date().toISOString(), fuenteActualizacion: motivo, paisEvidence: evidence.suggestedCountry || '', paisEvidenceConflict: !!evidence.conflict });
-      S().update('clientes', cid, patch);
-      const after = S().get('clientes', cid);
-      if (A.audit) A.audit('completar_faltantes', 'clientes', cid, before, after, motivo, { modulo: 'calidad', soloCamposPendientes: true, countryEvidence: evidence });
-      close(); U.toast(remaining.length ? 'Datos guardados · faltan ' + remaining.length : 'Expediente completo, pendiente de revisión');
-      const h = document.getElementById('host'); if (h && location.hash.indexOf('#/calidad') === 0) render(h);
-      if (location.hash.indexOf('#/cliente360') === 0) window.dispatchEvent(new HashChangeEvent('hashchange'));
+    back.querySelector('#qi-ok').addEventListener('click', async () => {
+      const save=back.querySelector('#qi-ok'),motivo=clean(back.querySelector('#qi-motivo').value);if(!motivo)return U.toast('Indica el motivo o fuente de la actualización.');
+      const before=JSON.parse(JSON.stringify(c)),patch={};
+      ordered.forEach(x=>{const el=back.querySelector('#qi-'+x.k),value=el&&clean(el.value),current=clean(c[x.k]),pending=!current||current==='REQUIERE_VALIDACION'||(x.k==='moneda'&&current!==expectedCurrency(currentCountry));if(value&&pending)patch[x.k]=value;});
+      if(patch.pais&&validCountry(patch.pais))patch.moneda=expectedCurrency(patch.pais);if(!Object.keys(patch).length)return U.toast('No hay datos nuevos para guardar.');
+      const projected=Object.assign({},c,patch),projectedRemaining=faltantes(projected),now=new Date().toISOString();patch.requiereValidacion=projectedRemaining.length>0;
+      patch.calidad=Object.assign({},c.calidad||{},{estado:projectedRemaining.length?'REQUIERE_VALIDACION':'COMPLETO_PENDIENTE_REVISION',alertas:projectedRemaining.map(x=>'falta_'+x.k),actualizado:now,fuenteActualizacion:motivo,paisEvidence:evidence.suggestedCountry||'',paisEvidenceConflict:!!evidence.conflict});
+      if(patch.pais&&validCountry(patch.pais))patch.calidad.paisProvenance={mode:'USER_CONFIRMED',reason:motivo,confirmedAt:now,evidenceSuggestedCountry:evidence.suggestedCountry||'',evidenceConflict:!!evidence.conflict};
+      if(!S().updateDurable)return U.toast('Persistencia canónica no disponible.');save.disabled=true;save.textContent='Guardando…';
+      try{await S().updateDurable('clientes',cid,patch);const after=S().get('clientes',cid);if(!after)throw Error('QUALITY_CLIENT_READBACK_MISSING');for(const [k,v] of Object.entries(patch)){if(k==='calidad'||k==='requiereValidacion')continue;if(clean(after[k])!==clean(v))throw Error('QUALITY_CLIENT_READBACK_MISMATCH_'+k);}const remaining=faltantes(after);if(A.audit)A.audit('completar_faltantes','clientes',cid,before,JSON.parse(JSON.stringify(after)),motivo,{modulo:'calidad',soloCamposPendientes:true,countryEvidence:evidence,remainingAfterReadback:remaining.map(x=>x.k)});close();U.toast(remaining.length?'Datos confirmados · faltan '+remaining.length:'Expediente confirmado, pendiente de revisión');const h=document.getElementById('host');if(h&&location.hash.indexOf('#/calidad')===0)render(h);if(location.hash.indexOf('#/cliente360')===0)window.dispatchEvent(new HashChangeEvent('hashchange'));}
+      catch(error){save.disabled=false;save.textContent='Guardar datos';U.toast('No fue posible confirmar el guardado. No se registró un falso éxito.');}
+
     });
   }
 
@@ -225,5 +216,5 @@ Orbit.modules.calidad = (function () {
     const mail = rows.filter(x => !clean(x.c.whatsapp || x.c.telefono) && clean(x.c.email)).length;
     U.toast('Actualización preparada:\n\n• ' + wa + ' por WhatsApp Web/canal pendiente de confirmación\n• ' + mail + ' por correo preparado\n• ' + (rows.length - wa - mail) + ' sin canal — requieren gestión.\n\nNo se ha confirmado ningún envío.');
   }
-  return { render, campana, editarInline, faltantes, financialIntegrityIssues, version: '1.220-information-health-pagination-r12q' };
+  return { render, campana, editarInline, faltantes, financialIntegrityIssues, version: '1.221-r16-durable-information-health' };
 })();

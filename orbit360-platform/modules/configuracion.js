@@ -17,6 +17,7 @@ Orbit.modules.configuracion = (function () {
     ['marca', '🎨 Marca', 'cli'],
     ['usuarios', '👥 Usuarios y permisos', 'cli'],
     ['paises', '🌎 Países y monedas', 'cli'],
+    ['catalogos', '🗂 Catálogos', 'cli'],
     ['addons', '🧩 Integraciones', 'cli'],
     ['apis', '🔌 APIs', 'cli'],
     ['planes', '⭐ Plan', 'cli'],
@@ -33,13 +34,13 @@ Orbit.modules.configuracion = (function () {
         <div class="cfg-body" id="cfg-body"></div>
       </div>
     </div>`;
-    host.querySelectorAll('.cfg-navi').forEach(el => el.addEventListener('click', () => { tab = el.dataset.t; render(host); }));
+    host.querySelectorAll('.cfg-navi').forEach(el => el.addEventListener('click', () => { tab = el.dataset.t; if(tab==='catalogos'&&Orbit.cat&&Orbit.cat.ensure)Orbit.cat.ensure().finally(()=>render(host)); else render(host); }));
     paint(host);
   }
 
   function paint(host) {
     const body = document.getElementById('cfg-body');
-    const fns = { marca, usuarios, paises, addons, apis, planes, interna };
+    const fns = { marca, usuarios, paises, catalogos, addons, apis, planes, interna };
     body.innerHTML = (fns[tab] || marca)();
     wire(host);
   }
@@ -49,6 +50,33 @@ Orbit.modules.configuracion = (function () {
     return `<div class="cfg-row"><div class="cfg-lab">${label}${hint ? `<small>${hint}</small>` : ''}</div><div class="cfg-ctrl">${ctrl}</div></div>`;
   }
   function toggle(id, on) { return `<button class="cfg-tog ${on ? 'on' : ''}" data-tog="${id}"><span></span></button>`; }
+
+  function catalogos(){
+    const c=Orbit.cat.all(),lines=a=>[].concat(a||[]).join('\n'),ramoNames=p=>Object.keys((c.ramosPais||{})[p]||{}).join('\n'),points=[].concat(c.puntosIngreso||[]);
+    return sectionHead('Catálogos operativos','Una sola autoridad durable para Ops, Leads, edición y cotización')+
+      '<div class="cfg-note" style="margin-bottom:14px"><b>Catálogos del tenant:</b> los asesores se administran en Usuarios y permisos; nunca forman parte de un catálogo libre.</div>'+
+      row('Canales','<textarea class="o-sel" id="cf-cat-canales" style="min-height:110px;width:min(540px,100%)">'+U.esc(lines(c.canales))+'</textarea>','Un valor por línea')+
+      row('Productos / planes','<textarea class="o-sel" id="cf-cat-productos" style="min-height:110px;width:min(540px,100%)">'+U.esc(lines(c.productos))+'</textarea>','Un valor por línea')+
+      row('Segmentos','<textarea class="o-sel" id="cf-cat-segmentos" style="min-height:100px;width:min(540px,100%)">'+U.esc(lines(c.segmentos))+'</textarea>','Un valor por línea')+
+      row('Prioridades','<textarea class="o-sel" id="cf-cat-prioridades" style="min-height:80px;width:min(540px,100%)">'+U.esc(lines(c.prioridades))+'</textarea>','Un valor por línea')+
+      row('Ramos Guatemala','<textarea class="o-sel" id="cf-cat-ramos-gt" style="min-height:130px;width:min(540px,100%)">'+U.esc(ramoNames('GT'))+'</textarea>','Conserva subramos de nombres existentes')+
+      row('Ramos Colombia','<textarea class="o-sel" id="cf-cat-ramos-co" style="min-height:130px;width:min(540px,100%)">'+U.esc(ramoNames('CO'))+'</textarea>','Conserva subramos de nombres existentes')+
+      '<div class="cfg-h"><b>Puntos de ingreso</b><span>La lógica del ciclo permanece controlada; aquí se administra su etiqueta visible.</span></div><div style="display:grid;gap:10px;margin:12px 0">'+points.map((p,i)=>'<label class="ce-l">'+U.esc(p.id==='LEADS_INTERES'?'Ingreso a Leads':'Ingreso directo a cotización')+'<input class="o-sel" data-cat-point="'+i+'" value="'+U.esc(p.label||'')+'"></label>').join('')+'</div>'+
+      row('Motivo del cambio','<textarea class="o-sel" id="cf-cat-motivo" style="min-height:70px;width:min(540px,100%)"></textarea>','Obligatorio para auditoría')+
+      row('Guardar catálogos','<button class="btn primary" id="cf-cat-save">Guardar catálogos</button>','El éxito se muestra solo después del readback canónico');
+  }
+  async function guardarCatalogos(){
+    const val=id=>(document.getElementById(id)||{}).value||'',list=id=>val(id).split(/\r?\n/).map(x=>x.trim()).filter(Boolean),reason=val('cf-cat-motivo').trim();
+    if(reason.length<5)return U.toast('Indica un motivo claro para el cambio.');
+    const cur=Orbit.cat.all(),next=JSON.parse(JSON.stringify(cur)),rebuild=(country,names)=>{const old=(cur.ramosPais||{})[country]||{},out={};names.forEach(n=>{out[n]=Array.isArray(old[n])?old[n].slice():[];});return out;};
+    next.canales=list('cf-cat-canales');next.productos=list('cf-cat-productos');next.segmentos=list('cf-cat-segmentos');next.prioridades=list('cf-cat-prioridades');
+    next.ramosPais=Object.assign({},cur.ramosPais||{},{GT:rebuild('GT',list('cf-cat-ramos-gt')),CO:rebuild('CO',list('cf-cat-ramos-co'))});
+    next.ramos=[...new Set(Object.keys(next.ramosPais.GT||{}).concat(Object.keys(next.ramosPais.CO||{})))];
+    next.puntosIngreso=[].concat(cur.puntosIngreso||[]).map((p,i)=>Object.assign({},p,{label:((document.querySelector('[data-cat-point="'+i+'"]')||{}).value||p.label||'').trim()}));
+    const b=document.getElementById('cf-cat-save');if(b){b.disabled=true;b.textContent='Guardando…';}
+    try{await Orbit.cat.saveDurable(next,reason);U.toast('Catálogos guardados y confirmados.');paint(document.getElementById('host'));}
+    catch(error){if(b){b.disabled=false;b.textContent='Guardar catálogos';}U.toast('No fue posible confirmar los catálogos. No se registró un falso éxito.');}
+  }
 
   /* ---------- MARCA ---------- */
   function marca() {
@@ -300,6 +328,7 @@ Orbit.modules.configuracion = (function () {
 
   /* ---------- wiring ---------- */
   function wire(host) {
+    const catSave=document.getElementById('cf-cat-save');if(catSave)catSave.addEventListener('click',guardarCatalogos);
     // toggles genéricos
     host.querySelectorAll('[data-tog]').forEach(b => b.addEventListener('click', () => {
       const key = b.dataset.tog, t = T().get();
@@ -549,7 +578,7 @@ Orbit.modules.configuracion = (function () {
     const el = document.createElement('div'); el.className = 'ciclo-toast'; el.textContent = '↺ ' + pais + ' restablecido a defaults'; document.body.appendChild(el); setTimeout(() => el.remove(), 2400);
   }
 
-  return { render, editarPlan, subirManualMarca, agregarPais, configIntegracion, setGlosPais, guardarGlosario, limpiarGlosario };
+  return { render, editarPlan, subirManualMarca, agregarPais, configIntegracion, setGlosPais, guardarGlosario, limpiarGlosario, guardarCatalogos };
 })();
 
 // ORBIT360 V1330 CONFIGURACION GATES PATCH START

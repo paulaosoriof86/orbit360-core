@@ -64,6 +64,8 @@ Orbit.modules.renovaciones = (function () {
     return cols;
   }
 
+  function premiumValue(p){const a=Number(p&&p.primaTotal);if(Number.isFinite(a)&&a>0)return a;const b=Number(p&&p.prima);return Number.isFinite(b)&&b>0?b:null;}
+
   function render(host) {
     ensureDataCollections();
     const readiness=renewalDataReadiness();
@@ -84,7 +86,7 @@ Orbit.modules.renovaciones = (function () {
         { label: '16–45 días', val: cols[2].items.length, color: 'var(--warn)', foot: 'planificar', onclick: "location.hash='#/renovaciones'" },
         { label: 'Prima en juego', val: U.moneyShort(totalPrima, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
-      <div class="cfg-note" data-renewability-pending-count="${pendingValidation.length}" style="margin:0 0 14px"><b>Renovabilidad pendiente de validar: ${pendingValidation.length}</b><span class="muted"> · Estas pólizas no se incorporan al pipeline accionable hasta contar con una fuente que confirme que son renovables.</span></div>
+      <div class="cfg-note" data-renewability-pending-count="${pendingValidation.length}" style="margin:0 0 14px"><b>Renovabilidad pendiente de validar: ${pendingValidation.length}</b><span class="muted"> · Permanecen fail-closed hasta contar con fuente autorizada o confirmación humana auditable.</span>${pendingValidation.slice(0,12).map(p=>`<button class="btn ghost sm" style="margin:4px 4px 0 0" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')">Revisar ${U.esc(p.numero||p.id)}</button>`).join('')}</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:start">
         ${cols.map(c => `<div class="card" style="overflow:hidden">
           <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;border-top:3px solid ${toneBg[c.tone]}">
@@ -105,7 +107,7 @@ Orbit.modules.renovaciones = (function () {
                   <div class="muted" style="font-size:11.5px;margin-top:4px">${p.ramo} · ${p.producto}</div>
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">
                     <span style="display:flex;align-items:center;gap:5px;font-size:11px"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${U.esc(asg ? asg.nombre : '')}</span>
-                    <span class="mono" style="font-size:11px;font-weight:600">${U.moneyShort(p.prima, p.moneda)}</span>
+                    <span class="mono" style="font-size:11px;font-weight:600">${premiumValue(p)==null?'<span class="badge warn">Prima pendiente de fuente</span>':U.moneyShort(premiumValue(p),p.moneda)}</span>
                   </div>
                 </div>
                 <div style="display:flex;gap:6px;margin-top:2px">

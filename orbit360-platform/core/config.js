@@ -59,131 +59,42 @@ Orbit.GLOSARIO = [
 ];
 
 /* Catálogo geográfico (departamentos → ciudades) por país. Configurable por cliente. */
-Orbit.GEO = {
-  GT: { 'Guatemala': ['Guatemala', 'Mixco', 'Villa Nueva', 'San Miguel Petapa', 'Amatitlán', 'Chinautla'], 'Quetzaltenango': ['Quetzaltenango', 'Coatepeque', 'Salcajá'], 'Escuintla': ['Escuintla', 'Santa Lucía Cotzumalguapa', 'Tiquisate', 'Puerto San José'], 'Sacatepéquez': ['Antigua Guatemala', 'Jocotenango', 'Ciudad Vieja'], 'Sololá': ['Sololá', 'Panajachel'], 'Chimaltenango': ['Chimaltenango', 'Tecpán'], 'Huehuetenango': ['Huehuetenango'], 'Petén': ['Flores', 'San Benito'], 'Izabal': ['Puerto Barrios', 'Morales'], 'Alta Verapaz': ['Cobán'] },
-  CO: { 'Cundinamarca': ['Bogotá', 'Soacha', 'Chía', 'Zipaquirá', 'Facatativá', 'Fusagasugá'], 'Antioquia': ['Medellín', 'Envigado', 'Itagüí', 'Bello', 'Rionegro', 'Sabaneta'], 'Valle del Cauca': ['Cali', 'Palmira', 'Buenaventura', 'Tuluá', 'Cartago'], 'Atlántico': ['Barranquilla', 'Soledad', 'Malambo'], 'Santander': ['Bucaramanga', 'Floridablanca', 'Girón'], 'Bolívar': ['Cartagena', 'Magangué'], 'Risaralda': ['Pereira', 'Dosquebradas'], 'Caldas': ['Manizales'], 'Norte de Santander': ['Cúcuta'], 'Magdalena': ['Santa Marta'] }
-};
-
-/* =========================================================
-   TENANT — configuración del cliente (white-label / plan).
-   Dos niveles: el cliente administra parte (según plan) y
-   nosotros administramos lo interno (módulos activos, plan).
-   Persistente. Una sola fuente de verdad para sidebar/router.
-   ========================================================= */
-Orbit.PLANES = {
-  estandar:      { id: 'estandar', nombre: 'Estándar', personalizacion: false, addons: false, apis: false, desc: 'Plantillas predefinidas, sin auto-branding.' },
-  profesional:   { id: 'profesional', nombre: 'Profesional', personalizacion: true, addons: true, apis: false, desc: 'Marca configurable + add-ons.' },
-  personalizado: { id: 'personalizado', nombre: 'Personalizado', personalizacion: true, addons: true, apis: true, desc: 'White-label completo, auto-branding por manual de marca, APIs.' }
-};
-Orbit.ROLES = {
-  'Dirección':   { nivel: 5, desc: 'Acceso total + configuración + comisión empresa + análitica completa.', color: '#C5162E',
-    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','conciliaciones','renovaciones','cancelaciones','siniestros','historial','comisiones','importar','calidad','plantillas','finanzas','insights','reportes','automatizaciones','correo','marketing','academia','portal','equipo','configuracion'] },
-  'Admin':       { nivel: 4, desc: 'Operación completa + configuración. Sin módulo Finanzas completo.', color: '#1f3a5f',
-    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','conciliaciones','renovaciones','cancelaciones','siniestros','historial','comisiones','importar','calidad','plantillas','insights','reportes','automatizaciones','correo','academia','equipo','configuracion'] },
-  'Comercial':   { nivel: 3, desc: 'CRM + Ops/Leads + Cotizador. Sin Finanzas ni Config.', color: '#1f8a4c',
-    modulos: ['inicio','cronograma','ops','leads','aseguradoras','cotizador','comparativo','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo','marketing','academia'] },
-  'Finanzas':    { nivel: 3, desc: 'Cobros, comisiones, finanzas, conciliación. Sin Ops/Leads.', color: '#c9821b',
-    modulos: ['inicio','cronograma','cliente360','polizas','cobros','conciliaciones','renovaciones','cancelaciones','comisiones','historial','finanzas','reportes','correo','academia'] },
-  'Marketing':   { nivel: 2, desc: 'Marketing, Academia, Reportes, CRM básico.', color: '#6b4ea0',
-    modulos: ['inicio','cronograma','marketing','academia','cliente360','correo','reportes'] },
-  'Operativo':   { nivel: 2, desc: 'Ops + CRM operativo. Sin Finanzas ni Config.', color: '#0f766e',
-    modulos: ['inicio','cronograma','ops','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','importar','calidad','correo','academia'] },
-  'Asesor':      { nivel: 2, desc: 'Su cartera; ve solo su comisión. Sin Ops ni Config.', color: '#2563a8',
-    modulos: ['inicio','cronograma','leads','cliente360','polizas','cobros','renovaciones','siniestros','historial','cotizador','comparativo','correo','academia'] },
-  'Asistente':   { nivel: 1, desc: 'Captura y gestión básica. Sin comisiones ni finanzas.', color: '#7a818e',
-    modulos: ['inicio','cronograma','cliente360','polizas','cobros','renovaciones','historial','importar','correo','academia'] }
-};
+Orbit.GEO = (window.OrbitGeoCatalogGTCO && window.OrbitGeoCatalogGTCO.countries) || {};
+Orbit.GEO_META = (window.OrbitGeoCatalogGTCO && window.OrbitGeoCatalogGTCO.sources) || {};
 /* =========================================================
    CATÁLOGOS configurables (para que TODO sea desplegable →
    analítica). Persistentes; editables desde Configuración.
    Cualquier desplegable ofrece "➕ Otro…" que agrega aquí.
    ========================================================= */
 Orbit.cat = (function () {
-  const KEY = 'orbit360_cat';
-  const DEF = {
-    canales: ['Referido', 'Conocido', 'Cliente actual', 'Cliente antiguo', 'Web / sitio', 'WhatsApp', 'Facebook', 'Instagram', 'TikTok', 'LinkedIn', 'YouTube', 'Campaña', 'Telemarketing', 'Evento / feria'],
-    ramos: ['Auto', 'Vida', 'Gastos Médicos', 'Hogar', 'Daños', 'Fianzas', 'Transporte', 'RC', 'Accidentes'],
-    // Ramos y subramos con LENGUAJE POR PAÍS (GT/CO) — fuente única para
-    // desplegables, analítica, trazabilidad y estandarización.
-    ramosPais: {
-      GT: {
-        'Automóviles': ['Vehículo Liviano', 'Vehículo Pesado', 'Motocicleta', 'Grúa / Equipo Especial', 'Pérdidas Totales', 'Pérdidas Parciales', 'Responsabilidad Civil Vehículos', 'Seguro por Kilómetros', 'Flotilla'],
-        'Vida': ['Vida Individual', 'Vida Colectivo', 'Vida Deudores', 'Vida Temporal', 'Dotal', 'Renta / Retiro'],
-        'Gastos Médicos': ['GM Individual', 'GM Familiar', 'GM Colectivo', 'GM Internacional', 'Enfermedades Graves'],
-        'Incendio y Líneas Aliadas': ['Hogar', 'Edificio / Comercio', 'Todo Riesgo Construcción', 'Lucro Cesante'],
-        'Daños': ['Multirriesgo PYME', 'Multirriesgo Hogar', 'Robo y Hurto', 'Rotura de Maquinaria', 'Equipo Electrónico', 'Dinero y Valores'],
-        'Fianzas': ['Fianza de Cumplimiento', 'Fianza de Anticipo', 'Fianza de Sostenimiento de Oferta', 'Fianza de Calidad / Conservación de Obra', 'Fianza Judicial', 'Fianza Aduanera'],
-        'Transporte': ['Carga Terrestre', 'Carga Marítima', 'Carga Aérea', 'Casco', 'Importación / Exportación'],
-        'Responsabilidad Civil': ['RC General', 'RC Profesional', 'RC Productos', 'RC Patronal', 'RC Directores y Funcionarios (D&O)'],
-        'Accidentes Personales': ['AP Individual', 'AP Colectivo', 'AP Escolar', 'Viajero / Asistencia']
-      },
-      CO: {
-        'Automóviles': ['Todo Riesgo Liviano', 'Todo Riesgo Pesado', 'Pérdidas Totales', 'Pérdidas Parciales', 'Responsabilidad Civil', 'Motos', 'Grúa / Maquinaria', 'Seguro por Kilómetros', 'SOAT', 'Flotas'],
-        'Vida': ['Vida Individual', 'Vida Grupo', 'Vida Deudores', 'Temporal', 'Exequias', 'Renta Voluntaria'],
-        'Salud': ['Salud Individual', 'Salud Familiar', 'Medicina Prepagada', 'Plan Complementario', 'Hospitalización y Cirugía', 'Salud Internacional'],
-        'Incendio y Terremoto': ['Hogar', 'PYME', 'Copropiedades', 'Todo Riesgo Daño Material', 'Lucro Cesante'],
-        'Daños': ['Multirriesgo Empresarial', 'Multirriesgo Hogar', 'Sustracción', 'Rotura de Maquinaria', 'Equipo y Maquinaria', 'Manejo'],
-        'Cumplimiento': ['Cumplimiento Particular', 'Cumplimiento Estatal', 'Seriedad de la Oferta', 'Buen Manejo de Anticipo', 'Estabilidad de Obra', 'Calidad del Servicio'],
-        'Transporte': ['Mercancías', 'Automotor de Carga', 'Casco Marítimo', 'Importación / Exportación'],
-        'Responsabilidad Civil': ['RC Extracontractual', 'RC Profesional', 'RC Directores y Administradores (D&O)', 'RC Clínicas y Hospitales', 'RC Contractual'],
-        'ARL / Riesgos Laborales': ['ARL', 'Accidentes Personales', 'AP Estudiantil', 'Viajero']
-      }
-    },
-    productos: ['Auto Total', 'Auto Plus', 'Auto Básico', 'Vida Entera', 'Vida Temporal', 'Salud Integral', 'Salud Familiar', 'Salud Premium', 'Hogar Protegido', 'Hogar Plus', 'Multirriesgo PYME', 'Responsabilidad Civil', 'Transporte de Carga', 'Fianza Cumplimiento', 'Accidentes Personales'],
-    prioridades: ['Alta', 'Media', 'Baja'],
-    tiposGestion: [
-      { t: 'Solicitar condiciones de renovación', lista: 'Renovaciones / Modif.' },
-      { t: 'Renovación de póliza', lista: 'Renovaciones / Modif.' },
-      { t: 'Modificar suma asegurada', lista: 'Renovaciones / Modif.' },
-      { t: 'Sustitución de vehículo', lista: 'Renovaciones / Modif.' },
-      { t: 'Cambio de propietario', lista: 'Renovaciones / Modif.' },
-      { t: 'Actualizar datos de cliente', lista: 'Gestiones Admin' },
-      { t: 'Endoso de beneficiario', lista: 'Gestiones Admin' },
-      { t: 'Solicitud de cancelación', lista: 'Gestiones Admin' },
-      { t: 'Carta de no adeudo', lista: 'Gestiones Admin' },
-      { t: 'Emisión de certificado', lista: 'Gestiones Admin' },
-      { t: 'Reclamo / Siniestro', lista: 'Gestiones Admin' }
-    ],
-    // Listas de los tableros — EDITABLES (crear/renombrar/recolor/reordenar/eliminar).
-    // Las marcadas fixed están atadas a una etapa del ciclo (no se eliminan, sí se renombran/recolor/reordenan).
-    opsListas: [
-      { id: 'l-admin', nombre: 'Gestiones Admin', emoji: '🗂', color: '#1f3a5f', kind: 'gestion' },
-      { id: 'l-cotiz', nombre: 'Cotizaciones', emoji: '🧮', color: '#c9821b', kind: 'negocio', etapa: 'cotizando', fixed: true },
-      { id: 'l-insp', nombre: 'Inspecciones', emoji: '🔍', color: '#0f766e', kind: 'negocio', etapa: 'inspeccion', fixed: true },
-      { id: 'l-emis', nombre: 'Emisiones', emoji: '📝', color: '#1f8a4c', kind: 'negocio', etapa: 'emision', fixed: true },
-      { id: 'l-renov', nombre: 'Renovaciones / Modif.', emoji: '🔄', color: '#6b4ea0', kind: 'gestion' }
-    ],
-    leadsListas: [
-      { id: 'q-nuevo', nombre: 'Nuevo', emoji: '🌱', color: '#6b7280', etapa: 'nuevo', fixed: true },
-      { id: 'q-cont', nombre: 'Contactado', emoji: '📞', color: '#1f3a5f', etapa: 'contactado', fixed: true },
-      { id: 'q-cotiz', nombre: 'Cotizando', emoji: '🧮', color: '#c9821b', etapa: 'cotizando', espejo: true, fixed: true },
-      { id: 'q-prop', nombre: 'Propuesta', emoji: '📨', color: '#6b4ea0', etapa: 'propuesta', fixed: true },
-      { id: 'q-nego', nombre: 'Negociación', emoji: '🤝', color: '#2563a8', etapa: 'negociacion', fixed: true },
-      { id: 'q-insp', nombre: 'Inspección', emoji: '🔍', color: '#0f766e', etapa: 'inspeccion', espejo: true, fixed: true },
-      { id: 'q-emis', nombre: 'Emisión', emoji: '📝', color: '#1f8a4c', etapa: 'emision', espejo: true, fixed: true },
-      { id: 'q-cierre', nombre: 'Cierre', emoji: '🏆', color: '#15803d', etapa: 'emitido', fixed: true }
-    ]
-  };
-  let d = null;
-  try { const r = localStorage.getItem(KEY); if (r) d = JSON.parse(r); } catch (e) {}
-  if (!d) d = JSON.parse(JSON.stringify(DEF));
-  // merge claves nuevas si la versión cambió en el código
-  Object.keys(DEF).forEach(k => { if (d[k] == null) d[k] = JSON.parse(JSON.stringify(DEF[k])); });
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} document.dispatchEvent(new CustomEvent('orbit:cat')); }
-  return {
-    get: (k) => d[k] || [],
-    all: () => d,
-    // Ramos/subramos por país (lenguaje local GT/CO) para listas desplegables y analítica
-    ramosDe: (pais) => { const m = (d.ramosPais || {})[pais]; return m ? Object.keys(m) : (d.ramos || []); },
-    subramosDe: (pais, ramo) => { const m = (d.ramosPais || {})[pais]; return (m && m[ramo]) ? m[ramo].slice() : []; },
-    addRamo: (pais, ramo) => { d.ramosPais = d.ramosPais || {}; d.ramosPais[pais] = d.ramosPais[pais] || {}; if (!d.ramosPais[pais][ramo]) { d.ramosPais[pais][ramo] = []; save(); } },
-    addSubramo: (pais, ramo, sub) => { d.ramosPais = d.ramosPais || {}; d.ramosPais[pais] = d.ramosPais[pais] || {}; d.ramosPais[pais][ramo] = d.ramosPais[pais][ramo] || []; if (d.ramosPais[pais][ramo].indexOf(sub) < 0) { d.ramosPais[pais][ramo].push(sub); save(); } },
-    add: (k, v) => { if (!v) return; d[k] = d[k] || []; if (d[k].indexOf(v) < 0) { d[k].push(v); save(); } },
-    setList: (k, arr) => { d[k] = arr; save(); },
-    save,
-    reset: () => { d = JSON.parse(JSON.stringify(DEF)); save(); },
-    DEF
-  };
+ const DEF={"canales":["Referido","Conocido","Cliente actual","Cliente antiguo","Web / sitio","WhatsApp","Facebook","Instagram","TikTok","LinkedIn","YouTube","Campaña","Telemarketing","Evento / feria"],"ramos":["Auto","Vida","Gastos Médicos","Hogar","Daños","Fianzas","Transporte","RC","Accidentes"],"ramosPais":{"GT":{"Automóviles":["Vehículo Liviano","Vehículo Pesado","Motocicleta","Grúa / Equipo Especial","Pérdidas Totales","Pérdidas Parciales","Responsabilidad Civil Vehículos","Seguro por Kilómetros","Flotilla"],"Vida":["Vida Individual","Vida Colectivo","Vida Deudores","Vida Temporal","Dotal","Renta / Retiro"],"Gastos Médicos":["GM Individual","GM Familiar","GM Colectivo","GM Internacional","Enfermedades Graves"],"Incendio y Líneas Aliadas":["Hogar","Edificio / Comercio","Todo Riesgo Construcción","Lucro Cesante"],"Daños":["Multirriesgo PYME","Multirriesgo Hogar","Robo y Hurto","Rotura de Maquinaria","Equipo Electrónico","Dinero y Valores"],"Fianzas":["Fianza de Cumplimiento","Fianza de Anticipo","Fianza de Sostenimiento de Oferta","Fianza de Calidad / Conservación de Obra","Fianza Judicial","Fianza Aduanera"],"Transporte":["Carga Terrestre","Carga Marítima","Carga Aérea","Casco","Importación / Exportación"],"Responsabilidad Civil":["RC General","RC Profesional","RC Productos","RC Patronal","RC Directores y Funcionarios (D&O)"],"Accidentes Personales":["AP Individual","AP Colectivo","AP Escolar","Viajero / Asistencia"]},"CO":{"Automóviles":["Todo Riesgo Liviano","Todo Riesgo Pesado","Pérdidas Totales","Pérdidas Parciales","Responsabilidad Civil","Motos","Grúa / Maquinaria","Seguro por Kilómetros","SOAT","Flotas"],"Vida":["Vida Individual","Vida Grupo","Vida Deudores","Temporal","Exequias","Renta Voluntaria"],"Salud":["Salud Individual","Salud Familiar","Medicina Prepagada","Plan Complementario","Hospitalización y Cirugía","Salud Internacional"],"Incendio y Terremoto":["Hogar","PYME","Copropiedades","Todo Riesgo Daño Material","Lucro Cesante"],"Daños":["Multirriesgo Empresarial","Multirriesgo Hogar","Sustracción","Rotura de Maquinaria","Equipo y Maquinaria","Manejo"],"Cumplimiento":["Cumplimiento Particular","Cumplimiento Estatal","Seriedad de la Oferta","Buen Manejo de Anticipo","Estabilidad de Obra","Calidad del Servicio"],"Transporte":["Mercancías","Automotor de Carga","Casco Marítimo","Importación / Exportación"],"Responsabilidad Civil":["RC Extracontractual","RC Profesional","RC Directores y Administradores (D&O)","RC Clínicas y Hospitales","RC Contractual"],"ARL / Riesgos Laborales":["ARL","Accidentes Personales","AP Estudiantil","Viajero"]}},"productos":["Auto Total","Auto Plus","Auto Básico","Vida Entera","Vida Temporal","Salud Integral","Salud Familiar","Salud Premium","Hogar Protegido","Hogar Plus","Multirriesgo PYME","Responsabilidad Civil","Transporte de Carga","Fianza Cumplimiento","Accidentes Personales"],"prioridades":["Alta","Media","Baja"],"tiposGestion":[{"t":"Solicitar condiciones de renovación","lista":"Renovaciones / Modif."},{"t":"Renovación de póliza","lista":"Renovaciones / Modif."},{"t":"Modificar suma asegurada","lista":"Renovaciones / Modif."},{"t":"Sustitución de vehículo","lista":"Renovaciones / Modif."},{"t":"Cambio de propietario","lista":"Renovaciones / Modif."},{"t":"Actualizar datos de cliente","lista":"Gestiones Admin"},{"t":"Endoso de beneficiario","lista":"Gestiones Admin"},{"t":"Solicitud de cancelación","lista":"Gestiones Admin"},{"t":"Carta de no adeudo","lista":"Gestiones Admin"},{"t":"Emisión de certificado","lista":"Gestiones Admin"},{"t":"Reclamo / Siniestro","lista":"Gestiones Admin"}],"opsListas":[{"id":"l-admin","nombre":"Gestiones Admin","emoji":"🗂","color":"#1f3a5f","kind":"gestion"},{"id":"l-cotiz","nombre":"Cotizaciones","emoji":"🧮","color":"#c9821b","kind":"negocio","etapa":"cotizando","fixed":true},{"id":"l-insp","nombre":"Inspecciones","emoji":"🔍","color":"#0f766e","kind":"negocio","etapa":"inspeccion","fixed":true},{"id":"l-emis","nombre":"Emisiones","emoji":"📝","color":"#1f8a4c","kind":"negocio","etapa":"emision","fixed":true},{"id":"l-renov","nombre":"Renovaciones / Modif.","emoji":"🔄","color":"#6b4ea0","kind":"gestion"}],"leadsListas":[{"id":"q-nuevo","nombre":"Nuevo","emoji":"🌱","color":"#6b7280","etapa":"nuevo","fixed":true},{"id":"q-cont","nombre":"Contactado","emoji":"📞","color":"#1f3a5f","etapa":"contactado","fixed":true},{"id":"q-cotiz","nombre":"Cotizando","emoji":"🧮","color":"#c9821b","etapa":"cotizando","espejo":true,"fixed":true},{"id":"q-prop","nombre":"Propuesta","emoji":"📨","color":"#6b4ea0","etapa":"propuesta","fixed":true},{"id":"q-nego","nombre":"Negociación","emoji":"🤝","color":"#2563a8","etapa":"negociacion","fixed":true},{"id":"q-insp","nombre":"Inspección","emoji":"🔍","color":"#0f766e","etapa":"inspeccion","espejo":true,"fixed":true},{"id":"q-emis","nombre":"Emisión","emoji":"📝","color":"#1f8a4c","etapa":"emision","espejo":true,"fixed":true},{"id":"q-cierre","nombre":"Cierre","emoji":"🏆","color":"#15803d","etapa":"emitido","fixed":true}],"segmentos":["Premium","Recurrente","Estándar","Nuevo","Activo","Inactivo","Prospecto"],"puntosIngreso":[{"id":"LEADS_INTERES","label":"Leads (interés, sin cotizar)","etapa":"nuevo","origen":"Leads","probability":10},{"id":"OPS_COTIZACION","label":"Ops (pide cotización)","etapa":"cotizando","origen":"Ops","probability":45}]},clone=v=>JSON.parse(JSON.stringify(v)),merge=v=>{const out=clone(DEF),src=v&&typeof v==='object'?v:{};Object.keys(DEF).forEach(k=>{if(src[k]!=null)out[k]=clone(src[k]);});return out;};
+ let d=merge(null),source='bootstrap-default',syncPending=true,hydrated=false,inflight=null;
+ function publish(next,src,pending){d=merge(next);source=src||'unknown';syncPending=pending===true;hydrated=!syncPending;document.dispatchEvent(new CustomEvent('orbit:cat',{detail:{source,syncPending}}));return d;}
+ async function ensure(force){if(hydrated&&!force)return clone(d);if(inflight)return inflight;inflight=(async()=>{if(!Orbit.domainConfig?.ensure)throw Error('CATALOG_CONFIG_CLIENT_REQUIRED');const r=await Orbit.domainConfig.ensure('catalogs');if(!r?.config||r.syncPending===true||!/^protected$|^canonical|^preview_uat/.test(String(r.source||'')))throw Error('CATALOG_CONFIG_CANONICAL_READBACK_REQUIRED');return clone(publish(r.config,r.source||'protected',false));})().finally(()=>{inflight=null;});return inflight;}
+ async function saveDurable(next,reason){if(!Orbit.domainConfig?.save)throw Error('CATALOG_CONFIG_SERVER_REQUIRED');const r=await Orbit.domainConfig.save('catalogs',merge(next),reason);if(!r||r.ok!==true||!r.config)throw Error('CATALOG_CONFIG_SAVE_NOT_CONFIRMED');return clone(publish(r.config,r.source||'protected',false));}
+ function localChange(fn){fn();source='unsaved-local';syncPending=true;document.dispatchEvent(new CustomEvent('orbit:cat',{detail:{source,syncPending}}));}
+ const api={get:k=>clone(d[k]||[]),all:()=>clone(d),ramosDe:p=>{const m=(d.ramosPais||{})[p];return m?Object.keys(m):(d.ramos||[]).slice();},subramosDe:(p,r)=>{const m=(d.ramosPais||{})[p];return m&&m[r]?m[r].slice():[];},puntoIngreso:id=>(d.puntosIngreso||[]).find(x=>x.id===id)||null,
+ addRamo:(p,r)=>localChange(()=>{d.ramosPais=d.ramosPais||{};d.ramosPais[p]=d.ramosPais[p]||{};if(!d.ramosPais[p][r])d.ramosPais[p][r]=[];}),addSubramo:(p,r,v)=>localChange(()=>{d.ramosPais=d.ramosPais||{};d.ramosPais[p]=d.ramosPais[p]||{};d.ramosPais[p][r]=d.ramosPais[p][r]||[];if(!d.ramosPais[p][r].includes(v))d.ramosPais[p][r].push(v);}),add:(k,v)=>{if(v)localChange(()=>{d[k]=d[k]||[];if(!d[k].includes(v))d[k].push(v);});},setList:(k,a)=>localChange(()=>{d[k]=clone(a||[]);}),
+ ensure,saveDurable,resetDurable:reason=>saveDurable(DEF,reason||'Restablecer catálogos del tenant'),save:()=>{throw Error('CATALOG_CONFIG_DURABLE_SAVE_REQUIRED');},status:()=>({source,syncPending,hydrated}),DEF:Object.freeze(clone(DEF))};
+ setTimeout(()=>{api.ensure().catch(()=>{});},0);return Object.freeze(api);
+})();
+
+/* Canonical insurer source registry · R16 */
+Orbit.insurerSourceRegistry=(function(){
+  const VERSION='gravicentra-insurer-source-registry-v1';
+  const TAXONOMY=[
+    ['tarifario_excel','Tarifario / Excel cotizador'],['cotizacion_oficial_ejemplo','Cotización oficial/ejemplo'],['poliza_emitida_ejemplo','Póliza emitida/ejemplo'],
+    ['formulario_suscripcion','Formulario de suscripción'],['requisitos_suscripcion','Requisitos/documentos suscripción'],['clausulado_condiciones_generales','Clausulado / condiciones generales'],
+    ['condiciones_particulares_modelos','Condiciones particulares/modelos'],['anexo_endoso_modelo','Anexo/endoso modelo'],['manual_procedimiento','Manual/procedimiento'],
+    ['comercial_ficha_presentacion','Comercial/ficha/presentación'],['circular_oficial','Circular oficial'],['beneficios_asistencias','Beneficios/asistencias'],
+    ['cobranza_pagos','Cobranza/pagos'],['siniestros','Siniestros'],['comisiones_liquidaciones','Comisiones/liquidaciones'],['legal_regulatorio','Legal/regulatorio'],
+    ['otro_requiere_clasificacion','Otro/requiere clasificación']
+  ];
+  const label=Object.fromEntries(TAXONOMY),clean=v=>String(v==null?'':v).trim(),key=v=>clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+  function taxonomyId(v){const n=key(v);for(const [re,id] of [[/tarif|cotizador.*excel/,'tarifario_excel'],[/cotiz/,'cotizacion_oficial_ejemplo'],[/poliza/,'poliza_emitida_ejemplo'],[/requisit/,'requisitos_suscripcion'],[/formulario|suscrip/,'formulario_suscripcion'],[/claus|condiciones.*generales/,'clausulado_condiciones_generales'],[/condiciones.*particulares/,'condiciones_particulares_modelos'],[/anexo|endoso/,'anexo_endoso_modelo'],[/manual|procedimiento/,'manual_procedimiento'],[/comercial|ficha|presentacion/,'comercial_ficha_presentacion'],[/circular/,'circular_oficial'],[/beneficio|asistencia/,'beneficios_asistencias'],[/cobranza|pago/,'cobranza_pagos'],[/siniestro|reclamo/,'siniestros'],[/comision|liquidacion/,'comisiones_liquidaciones'],[/legal|regulator/,'legal_regulatorio']])if(re.test(n))return id;return'otro_requiere_clasificacion';}
+  function normalize(s,a){s=s||{};a=a||{};const family=taxonomyId(s.taxonomyId||s.tipo||s.tipoFuente||s.cat||s.categoria),state=clean(s.estado||s.status||'Documento recibido'),libraryRef=clean(s.libraryRef||s.sourceDocumentId||s.documentId),documentRef=clean(s.documentRef||s.fileId),driveUrl=clean(s.driveUrl||s.externalUrl||s.url),hasDrive=!!(documentRef||driveUrl),hasKnowledge=!!libraryRef||/mapeado|persistido|biblioteca|knowledge/i.test(clean(s.sourceOrigin)),storageKind=hasDrive&&hasKnowledge?'BOTH':hasDrive?'DRIVE_FILE':'KNOWLEDGE_REFERENCE',hash=clean(s.contentHash||s.hash);return{id:clean(s.id||documentRef||libraryRef||s.nombre||s.fileName),nombre:clean(s.nombre||s.fileName||s.archivo||s.documentId||'Fuente'),taxonomyId:family,taxonomyLabel:label[family],cat:label[family],tipo:family,aseguradoraId:clean(a.id||s.aseguradoraId),aseguradora:clean(a.nombre||a.canonicalName||s.aseguradora),pais:clean(s.pais||a.pais).toUpperCase(),moneda:clean(s.moneda||a.moneda).toUpperCase(),ramo:clean(s.ramo),producto:clean(s.producto),plan:clean(s.plan),familiaDocumento:clean(s.familiaDocumento||label[family]),version:clean(s.version||s.versionFuente),vigencia:clean(s.vigencia||s.vigenciaFuente),hash,contentHash:hash,storageKind,ubicacion:{tipo:storageKind,libraryRef,documentRef,driveUrl},libraryRef,documentRef,driveUrl,provenance:s.provenance||{source:clean(s.sourceOrigin||s.origen||'knowledge')},validationStatus:state,estado:state,requiereValidacion:s.requiereValidacion!==false&&!/^validado$/i.test(state),downstream:{quoteAuthority:'gravicentra-quote-authority-v1',automaticCalculationAllowed:false,requiresExplicitEnablement:true}};}
+  function buildForInsurer(a,rows){const map=new Map();[].concat(rows||[],a&&a.docs||[]).forEach(raw=>{const n=normalize(raw,a),id=clean(n.contentHash||n.documentRef||n.libraryRef||n.id||n.nombre).toLowerCase();if(!map.has(id))map.set(id,n);else{const m=Object.assign({},map.get(id),n),d=!!(m.documentRef||m.driveUrl),k=!!m.libraryRef||m.storageKind==='KNOWLEDGE_REFERENCE';m.storageKind=d&&k?'BOTH':d?'DRIVE_FILE':'KNOWLEDGE_REFERENCE';m.ubicacion={tipo:m.storageKind,libraryRef:m.libraryRef||'',documentRef:m.documentRef||'',driveUrl:m.driveUrl||''};map.set(id,m);}});return [...map.values()];}
+  return Object.freeze({VERSION,TAXONOMY:Object.freeze(TAXONOMY),labels:()=>TAXONOMY.map(x=>x[1]),taxonomyId,normalize,buildForInsurer});
 })();
 
 /* =========================================================

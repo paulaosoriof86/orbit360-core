@@ -71,7 +71,7 @@ jobs:
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const l=JSON.parse(fs.readFileSync(process.env.B4_LOCK,'utf8'));
-          const sourceFixed=v=>/^B4_003_SOURCE_FIXED_R(?:5|9|10|11|12|13|14)_/.test(String(v||''));
+          const sourceFixed=v=>/^B4_003_SOURCE_FIXED_R(?:5|9|10|11|12|13|14|16)_/.test(String(v||''));
           const previewOk=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW'
             && sourceFixed(c.currentB4?.status)
             && sourceFixed(c.i65ForensicRemediationPlan?.b4?.status)
@@ -336,8 +336,8 @@ jobs:
           cp -a "$RUNNER_TEMP/b4-003-package/bundle/backend" "$FROOT/backend"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360DocumentDriveStatusPreview,functions:orbit360DocumentDriveUploadPreview,functions:orbit360DocumentDriveReadPreview,functions:orbit360DocumentDriveCleanupPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          printf '{"status":"DEPLOYED_EXACT_PREVIEW_ONLY","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360ProductOperationalCommandPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview","orbit360DocumentDriveReadPreview","orbit360DocumentDriveCleanupPreview"],"productionFunctionsDeployed":false,"realBusinessWritesAuthorized":false}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360DocumentDriveStatusPreview,functions:orbit360DocumentDriveUploadPreview,functions:orbit360DocumentDriveReadPreview,functions:orbit360DocumentDriveCleanupPreview,functions:orbit360TenantDomainConfigPreview,functions:orbit360AssignableAdvisorRosterPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          printf '{"status":"DEPLOYED_EXACT_PREVIEW_ONLY","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360ProductOperationalCommandPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview","orbit360DocumentDriveReadPreview","orbit360DocumentDriveCleanupPreview","orbit360TenantDomainConfigPreview","orbit360AssignableAdvisorRosterPreview"],"productionFunctionsDeployed":false,"realBusinessWritesAuthorized":false}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
 
       - name: Deploy exact package to isolated Preview
         if: steps.gate.outputs.run == 'true'

@@ -878,7 +878,7 @@ Orbit.importa = (function () {
     const meta = KINDS[kind] || KINDS['clientes'];
     // docs-aseguradora es documental (guarda archivos; no escribe registros estructurados a ciegas) — P0-06.
     const modoIni = (kind === 'docs-aseguradora') ? 'documental' : ((opts && opts.modo) || 'inteligente');
-    state = { kind, meta, step: 1, opts: opts || {}, multi: opts && opts.multi, scope: opts && opts.scope, modo: modoIni, files: [], insurerDocCategory: clean(opts && opts.docCategory) || 'Formulario', insurerDocRamo: clean(opts && opts.scope && opts.scope.ramo), insurerDocProducto: clean(opts && opts.scope && opts.scope.producto), insurerDocVersion: '' };
+    state = { kind, meta, step: 1, opts: opts || {}, multi: opts && opts.multi, scope: opts && opts.scope, modo: modoIni, files: [], insurerDocCategory: clean(opts && opts.docCategory) || 'Otro/requiere clasificación', insurerDocRamo: clean(opts && opts.scope && opts.scope.ramo), insurerDocProducto: clean(opts && opts.scope && opts.scope.producto), insurerDocPlan: clean(opts && opts.scope && opts.scope.plan), insurerDocFamily: '', insurerDocVersion: '', insurerDocVigencia: '' };
     document.getElementById('imp-back').classList.add('open');
     document.getElementById('imp-drawer').classList.add('open');
     paint();
@@ -906,7 +906,7 @@ Orbit.importa = (function () {
   function step1(m) {
     if (state.processing) return `<div style="text-align:center;padding:48px 16px"><div class="imp-spinner"></div><div style="font-family:var(--f-display);font-weight:700;font-size:16px;margin-top:16px">${U.esc(state.processing)}</div><p class="muted" style="font-size:13px;margin-top:6px">Procesando <b>${U.esc(state.files[0] || '')}</b> en tu navegador…</p></div>`;
     const insurerSource = state.kind === 'docs-aseguradora';
-    const sourceFields = insurerSource ? `<div class="card" style="padding:12px;margin-bottom:12px"><div style="font-weight:800;margin-bottom:8px">Clasificar fuente</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px"><label class="ce-l">Tipo de fuente<select class="o-sel" id="imp-insurer-cat">${['Tarifario','Cotizador Excel','Formulario','Clausulado','Condiciones','Cotización ejemplo','Póliza ejemplo','Manual','Circular','Otro'].map(x=>`<option ${x===state.insurerDocCategory?'selected':''}>${U.esc(x)}</option>`).join('')}</select></label><label class="ce-l">Ramo / línea<input class="o-sel" id="imp-insurer-ramo" value="${U.esc(state.insurerDocRamo||'')}" placeholder="Ej. Automóviles"></label><label class="ce-l">Producto / plan<input class="o-sel" id="imp-insurer-producto" value="${U.esc(state.insurerDocProducto||'')}" placeholder="Ej. Vehículos / Premium"></label><label class="ce-l">Versión / vigencia de fuente<input class="o-sel" id="imp-insurer-version" value="${U.esc(state.insurerDocVersion||'')}" placeholder="Ej. 2026 / v1.4"></label></div><div class="cfg-note" style="margin-top:9px"><b>${U.esc(state.scope&&state.scope.aseguradoraNombre||'Aseguradora')}:</b> el archivo quedará vinculado a esta aseguradora como <b>Documento recibido · requiere validación</b>. Registrar la fuente no activa cálculos automáticos.</div></div>` : '';
+    const sourceFields = insurerSource ? `<div class="card" style="padding:12px;margin-bottom:12px"><div style="font-weight:800;margin-bottom:8px">Clasificar fuente</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px"><label class="ce-l">Tipo de fuente<select class="o-sel" id="imp-insurer-cat">${(Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels():['Otro/requiere clasificación']).map(x=>`<option ${x===state.insurerDocCategory?'selected':''}>${U.esc(x)}</option>`).join('')}</select></label><label class="ce-l">Ramo / línea<input class="o-sel" id="imp-insurer-ramo" value="${U.esc(state.insurerDocRamo||'')}"></label><label class="ce-l">Producto<input class="o-sel" id="imp-insurer-producto" value="${U.esc(state.insurerDocProducto||'')}"></label><label class="ce-l">Plan<input class="o-sel" id="imp-insurer-plan" value="${U.esc(state.insurerDocPlan||'')}"></label><label class="ce-l">Familia documental<input class="o-sel" id="imp-insurer-family" value="${U.esc(state.insurerDocFamily||state.insurerDocCategory||'')}"></label><label class="ce-l">Versión<input class="o-sel" id="imp-insurer-version" value="${U.esc(state.insurerDocVersion||'')}"></label><label class="ce-l">Vigencia<input class="o-sel" id="imp-insurer-vigencia" value="${U.esc(state.insurerDocVigencia||'')}" placeholder="AAAA-MM-DD o periodo"></label></div><div class="cfg-note" style="margin-top:9px"><b>${U.esc(state.scope&&state.scope.aseguradoraNombre||'Aseguradora')}:</b> se registrarán metadata, ubicación y provenance. Registrar la fuente no activa cálculos; Quote Authority conserva el control.</div></div>` : '';
     return `${scopeBanner(state.kind)}<p class="imp-desc">${U.esc(m.desc)}</p>
       ${insurerSource ? '' : `<div class="imp-mode" id="imp-mode"><button class="imp-mode-b ${state.modo !== 'documental' ? 'on' : ''}" data-modo="inteligente">✨ Inteligente<small>extrae y mapea a los módulos</small></button><button class="imp-mode-b ${state.modo === 'documental' ? 'on' : ''}" data-modo="documental">📁 Documental<small>solo almacena para consulta</small></button></div>`}
       ${sourceFields}
@@ -1128,7 +1128,10 @@ Orbit.importa = (function () {
         tipoFuente: state.kind === 'docs-aseguradora' ? state.insurerDocCategory : '',
         ramo: state.kind === 'docs-aseguradora' ? state.insurerDocRamo : '',
         producto: state.kind === 'docs-aseguradora' ? state.insurerDocProducto : '',
+        plan: state.kind === 'docs-aseguradora' ? state.insurerDocPlan : '',
+        familiaDocumento: state.kind === 'docs-aseguradora' ? state.insurerDocFamily : '',
         versionFuente: state.kind === 'docs-aseguradora' ? state.insurerDocVersion : '',
+        vigenciaFuente: state.kind === 'docs-aseguradora' ? state.insurerDocVigencia : '',
         nombre: file.name
       });
       if (!uploaded || uploaded.ok !== true || !(uploaded.documentRef || uploaded.driveUrl || uploaded.externalUrl || uploaded.url)) {
@@ -1151,7 +1154,10 @@ Orbit.importa = (function () {
         moneda: state.kind === 'docs-aseguradora' ? clean(state.scope && state.scope.moneda) : '',
         ramo: state.kind === 'docs-aseguradora' ? state.insurerDocRamo : '',
         producto: state.kind === 'docs-aseguradora' ? state.insurerDocProducto : '',
+        plan: state.kind === 'docs-aseguradora' ? state.insurerDocPlan : '',
+        familiaDocumento: state.kind === 'docs-aseguradora' ? state.insurerDocFamily : '',
         version: state.kind === 'docs-aseguradora' ? state.insurerDocVersion : '',
+        vigencia: state.kind === 'docs-aseguradora' ? state.insurerDocVigencia : '',
         estado: state.kind === 'docs-aseguradora' ? 'Documento recibido' : '',
         requiereValidacion: state.kind === 'docs-aseguradora',
         archivoDisponible: true,
@@ -1220,11 +1226,14 @@ Orbit.importa = (function () {
     const dr = document.getElementById('imp-drawer');
     const drop = dr.querySelector('#imp-drop');
     dr.querySelectorAll('.imp-mode-b').forEach(b => b.addEventListener('click', () => { state.modo = b.dataset.modo; paint(); }));
-    const insurerCat=dr.querySelector('#imp-insurer-cat'),insurerRamo=dr.querySelector('#imp-insurer-ramo'),insurerProducto=dr.querySelector('#imp-insurer-producto'),insurerVersion=dr.querySelector('#imp-insurer-version');
+    const insurerCat=dr.querySelector('#imp-insurer-cat'),insurerRamo=dr.querySelector('#imp-insurer-ramo'),insurerProducto=dr.querySelector('#imp-insurer-producto'),insurerPlan=dr.querySelector('#imp-insurer-plan'),insurerFamily=dr.querySelector('#imp-insurer-family'),insurerVersion=dr.querySelector('#imp-insurer-version'),insurerVigencia=dr.querySelector('#imp-insurer-vigencia');
     if(insurerCat) insurerCat.addEventListener('change',e=>state.insurerDocCategory=e.target.value);
     if(insurerRamo) insurerRamo.addEventListener('input',e=>state.insurerDocRamo=e.target.value);
     if(insurerProducto) insurerProducto.addEventListener('input',e=>state.insurerDocProducto=e.target.value);
+    if(insurerPlan) insurerPlan.addEventListener('input',e=>state.insurerDocPlan=e.target.value);
+    if(insurerFamily) insurerFamily.addEventListener('input',e=>state.insurerDocFamily=e.target.value);
     if(insurerVersion) insurerVersion.addEventListener('input',e=>state.insurerDocVersion=e.target.value);
+    if(insurerVigencia) insurerVigencia.addEventListener('input',e=>state.insurerDocVigencia=e.target.value);
     const fileInput = dr.querySelector('#imp-file');
     if (fileInput) fileInput.addEventListener('change', e => {
       const files = [...e.target.files];

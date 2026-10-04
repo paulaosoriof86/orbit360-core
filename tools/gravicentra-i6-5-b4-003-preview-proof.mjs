@@ -32,7 +32,7 @@ ids.renewActivity='act_ren_'+ids.renewalPolicy+'_'+new Date().toISOString().slic
 ids.cancelActivity='act_rec_'+ids.cancelation;
 ids.recoveryBusiness='neg_rec_'+ids.cancelation;
 const residueIds=['pol_mulsmxsk','pol_mulssmuz','pol_mulsxofx'];
-const proof={schema:'GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_V3',status:'INIT',target,ids,assertions:{},syntheticWrites:0,cleanupWrites:0,pageErrors:[],consoleErrors:[],httpErrors:[],expectedIsolationDenials:[],unexpectedHttpErrors:[],unexpectedConsoleErrors:[],syntheticFinalAbsent:false,qaResidue:{},runtimeCancellationEvidence:{}};
+const proof={schema:'GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R16_V1',status:'INIT',target,ids,assertions:{},syntheticWrites:0,cleanupWrites:0,pageErrors:[],consoleErrors:[],httpErrors:[],expectedIsolationDenials:[],unexpectedHttpErrors:[],unexpectedConsoleErrors:[],syntheticFinalAbsent:false,qaResidue:{},runtimeCancellationEvidence:{}};
 
 const renewalSourceAuthority={
   sourceFile:'Renovaciones (13).xlsx',
@@ -60,6 +60,17 @@ async function actor(){
  }
  need(candidates.length,'B4_003_PRIVILEGED_ACTOR_NOT_FOUND');
  return candidates.sort((a,b)=>order.indexOf(a.activeRole)-order.indexOf(b.activeRole))[0];
+}
+async function actorForRole(roleWanted){
+ const wanted=norm(roleWanted),snap=await tenant.collection('members').get(),candidates=[];
+ for(const d of snap.docs){
+  const m=d.data()||{},state=norm(m.status||m.estado||'active');
+  const roles=[m.activeRole,m.rolActivo,m.defaultRole,m.rolDefault,m.rol].concat(m.roles||[],m.assignedRoles||[],m.rolesAsignados||[]).map(norm).filter(Boolean);
+  if(m.active===false||m.activo===false||['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(state)||!roles.includes(wanted))continue;
+  try{const u=await auth.getUser(d.id);if(!u.disabled)candidates.push({uid:u.uid,email:clean(u.email),activeRole:wanted,advisorId:clean(m.advisorId||m.asesorId)});}catch{}
+ }
+ need(candidates.length,'B4_003_R16_ACTOR_FOR_ROLE_NOT_FOUND:'+wanted);
+ return candidates.sort((a,b)=>clean(a.email).localeCompare(clean(b.email)))[0];
 }
 async function seed(who){
  const today=new Date(),end=new Date(today.getTime()+10*86400000),expiredEnd=new Date(today.getTime()-3*86400000),expiredStart=new Date(today.getTime()-368*86400000),endS=end.toISOString().slice(0,10),startS=today.toISOString().slice(0,10),expiredEndS=expiredEnd.toISOString().slice(0,10),expiredStartS=expiredStart.toISOString().slice(0,10);
@@ -112,6 +123,19 @@ async function bootProduct(page,token){
  need(state.uid&&state.started,'B4_003_PRODUCT_SESSION_NOT_STARTED');
  need(state.forced&&state.forced.called===true,'B4_003_READONLY_COLLECTION_FORCE_NOT_REACHED');
  return state;
+}
+async function rosterProjectionFor(browser,who,country){
+ const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
+ try{
+  await applyLegal(p,who);
+  await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
+  await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});
+  return await p.evaluate(async ({token,tenantId,activeRole,country})=>{
+    const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();
+    if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);
+    return await provider.callFunction('orbit360AssignableAdvisorRosterPreview',{tenantId,activeRole,country},'us-east1');
+  },{token,tenantId,activeRole:who.activeRole,country});
+ }finally{await ctx.close();}
 }
 async function residueReadback(){
  const out=[];
@@ -232,6 +256,8 @@ let browser,context,page,startMs=Date.now();
 const httpCapturePromises=[];
 try{
  const who=await actor();proof.actor=who;
+ const directionActor=await actorForRole('direccion'),operativeActor=await actorForRole('operativo');
+ proof.r16RosterActors={direction:{uid:directionActor.uid,activeRole:directionActor.activeRole},operative:{uid:operativeActor.uid,activeRole:operativeActor.activeRole}};
  await residueReadback();
  await cancellationEvidence();
  await renewalDistributionReadback();
@@ -495,6 +521,18 @@ try{
  proof.assertions.cancelRowNoMisleadingSingleTarget=true;
  proof.assertions.qualitySelectedCountryScope=true;
  proof.assertions.qualityRenderPathUnder2500ms=true;
+ proof.r16CatalogAndQuality=await page.evaluate(async()=>{
+  const catalogStatus=Orbit.cat&&Orbit.cat.status?Orbit.cat.status():null,geo=Orbit.GEO||{},gt=geo.GT||{},co=geo.CO||{};
+  const gtMunicipalities=Object.values(gt).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0),coMunicipalities=Object.values(co).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0);
+  const h=document.getElementById('host');Orbit.modules.calidad.render(h);
+  return{catalogStatus,gtDepartments:Object.keys(gt).length,gtMunicipalities,coDepartments:Object.keys(co).length,coMunicipalities,
+   qualityHasCountryHeader:/País actual/.test(h.textContent||''),qualityHasProvenanceHeader:/Provenance \/ evidencia/.test(h.textContent||''),
+   qualityDeadChannelButtons:Array.from(h.querySelectorAll('button[disabled]')).filter(b=>/Sin canal/.test(b.textContent||'')).length};
+ });
+ need(proof.r16CatalogAndQuality.catalogStatus&&proof.r16CatalogAndQuality.catalogStatus.hydrated===true&&proof.r16CatalogAndQuality.catalogStatus.syncPending===false,'B4_003_R16_CATALOG_CANONICAL_HYDRATION_FAILED:'+JSON.stringify(proof.r16CatalogAndQuality.catalogStatus));
+ need(proof.r16CatalogAndQuality.gtDepartments===22&&proof.r16CatalogAndQuality.gtMunicipalities===340&&proof.r16CatalogAndQuality.coMunicipalities===1122,'B4_003_R16_GEO_RUNTIME_COMPLETENESS_FAILED:'+JSON.stringify(proof.r16CatalogAndQuality));
+ need(proof.r16CatalogAndQuality.qualityHasCountryHeader&&proof.r16CatalogAndQuality.qualityHasProvenanceHeader&&proof.r16CatalogAndQuality.qualityDeadChannelButtons===0,'B4_003_R16_QUALITY_RUNTIME_SEMANTICS_FAILED');
+ proof.assertions.tenantCatalogCanonicalHydration=true;proof.assertions.geoGtCoComplete=true;proof.assertions.qualityCountryProvenanceSeparated=true;proof.assertions.qualityNoDeadChannelAction=true;
 
  // R12: information health surfaces policy/calendar mismatch without rewriting either source value.
  proof.r12InformationHealth=await page.evaluate(ids=>{
@@ -704,20 +742,20 @@ try{
  proof.assertions.qualityCanonicalGrammar=true;
  proof.assertions.qualityCompletenessExplicit=true;
 
- // R14A: assignment roster must ignore viewer record scope and remain unique.
- proof.r14AssignableAdvisorRoster=await page.evaluate(()=>{
-   const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,' ');
-   let base=Orbit.store,hops=0;while(base&&Object.prototype.hasOwnProperty.call(base,'_scopedFor')&&hops++<16)base=Object.getPrototypeOf(base);
-   const canonical=((base&&base.all&&base.all('asesores'))||[]);
-   const eligible=a=>{const roles=(Array.isArray(a.roles)&&a.roles.length?a.roles:[a.rolDefault||a.rol]).map(x=>String(x||'').trim()),ps=(Array.isArray(a.paises)&&a.paises.length?a.paises:[a.paisDefault||a.pais]).map(x=>String(x||'').trim().toUpperCase()).filter(Boolean);return a&&a.deleted!==true&&a.eliminado!==true&&a.inactivo!==true&&a.activo!==false&&!['inactivo','eliminado'].includes(String(a.estado||'').toLowerCase())&&a.projectionOnly!==true&&roles.includes('Asesor')&&(!ps.length||ps.includes('GT'));};
-   const expected=[],seen=new Set();canonical.filter(eligible).sort((a,b)=>String(a.nombre||'').localeCompare(String(b.nombre||''),'es',{sensitivity:'base'})).forEach(a=>{const keys=[String(a.email||'').trim().toLowerCase(),norm(a.nombre)].filter(Boolean);if(keys.some(k=>seen.has(k)))return;keys.forEach(k=>seen.add(k));expected.push(String(a.id||''));});
-   const original=Orbit.store,scoped=Orbit.access&&Orbit.access.scopedStore?Orbit.access.scopedStore('ops'):original;Orbit.store=scoped;let actual=[];try{actual=(Orbit.ciclo.assignableAdvisors('GT')||[]).map(a=>String(a.id||''));}finally{Orbit.store=original;}
-   const rows=Orbit.ciclo.assignableAdvisors('GT')||[],identities=rows.map(a=>String(a.email||'').trim().toLowerCase()||norm(a.nombre));
-   return{expected,actual,canonicalCount:canonical.length,assignableCount:actual.length,uniqueIdentityCount:new Set(identities).size,names:rows.map(a=>String(a.nombre||''))};
- });
- need(JSON.stringify(proof.r14AssignableAdvisorRoster.actual)===JSON.stringify(proof.r14AssignableAdvisorRoster.expected),'B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_SCOPE_DRIFT:'+JSON.stringify(proof.r14AssignableAdvisorRoster));
- need(proof.r14AssignableAdvisorRoster.uniqueIdentityCount===proof.r14AssignableAdvisorRoster.assignableCount,'B4_003_R14A_ASSIGNABLE_ADVISOR_DUPLICATE_IDENTITY:'+JSON.stringify(proof.r14AssignableAdvisorRoster));
- proof.assertions.assignableAdvisorRosterCanonical=true;proof.assertions.assignableAdvisorRosterDeduplicated=true;
+ // R16: server-owned minimal roster parity for Dirección and Operativo.
+ const [directionRoster,operativeRoster]=await Promise.all([rosterProjectionFor(browser,directionActor,'GT'),rosterProjectionFor(browser,operativeActor,'GT')]);
+ const normalizedRows=data=>[].concat(data&&data.rows||[]).map(r=>({id:clean(r.id),nombre:clean(r.nombre),activo:r.activo===true,assignable:r.assignable===true,roleEligible:r.roleEligible===true,paises:[].concat(r.paises||[]).map(x=>clean(x)).sort()}));
+ const dirRows=normalizedRows(directionRoster),opRows=normalizedRows(operativeRoster),allowedKeys=['activo','assignable','id','nombre','paises','roleEligible'].sort();
+ const fieldSets=[...dirRows,...opRows].map(r=>Object.keys(r).sort());
+ proof.r16AssignableAdvisorRoster={direction:{scope:directionRoster&&directionRoster.scope,count:dirRows.length,rows:dirRows},operative:{scope:operativeRoster&&operativeRoster.scope,count:opRows.length,rows:opRows},sameCountry:'GT',minimalFields:fieldSets.every(keys=>JSON.stringify(keys)===JSON.stringify(allowedKeys))};
+ need(directionRoster&&directionRoster.ok===true&&operativeRoster&&operativeRoster.ok===true,'B4_003_R16_ASSIGNABLE_ROSTER_CALL_FAILED');
+ need(JSON.stringify(dirRows)===JSON.stringify(opRows),'B4_003_R16_ASSIGNABLE_ROSTER_ROLE_PARITY_FAILED:'+JSON.stringify(proof.r16AssignableAdvisorRoster));
+ need(dirRows.length>0&&new Set(dirRows.map(r=>r.id)).size===dirRows.length,'B4_003_R16_ASSIGNABLE_ROSTER_EMPTY_OR_DUPLICATED');
+ need(proof.r16AssignableAdvisorRoster.minimalFields===true,'B4_003_R16_ASSIGNABLE_ROSTER_NON_MINIMAL_FIELDS_EXPOSED');
+ need(dirRows.every(r=>r.assignable&&r.roleEligible&&r.activo&&(!r.paises.length||r.paises.includes('GT'))),'B4_003_R16_ASSIGNABLE_ROSTER_COUNTRY_OR_ELIGIBILITY_FAILED');
+ proof.assertions.assignableAdvisorRosterRoleParity=true;
+ proof.assertions.assignableAdvisorRosterMinimalProjection=true;
+ proof.assertions.assignableAdvisorRosterDeduplicated=true;
 
  // R13: reconcile the real, non-synthetic renewal universe against the canonical YES-only pipeline.
  proof.r13RenewalReality=await page.evaluate(ids=>{
