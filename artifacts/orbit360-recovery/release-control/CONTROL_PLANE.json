@@ -6183,7 +6183,7 @@
       "targetRenewalPointers": [
         "pol_muj5o5ka"
       ],
-      "retry": "TARGET_POINTER_READBACK_2"
+      "retry": "TARGET_PROVENANCE_AND_DEPENDENTS_3"
     }
   },
   "b4VisualAcceptanceControl": {
