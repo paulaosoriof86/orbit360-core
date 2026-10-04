@@ -1,0 +1,28 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R14A_CONTINUITY_METADATA_ROOTFIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_CONTINUITY_METADATA_FIXED_PENDING_EXACT_PREVIEW",
+  "failedRunId": 37178176874,
+  "failedJobId": 111365092563,
+  "failureCode": "CONTINUITY_INVENTORY_COUNT_MISMATCH",
+  "cause": {
+    "inventoryLength": 198,
+    "staleInventoryCount": 197,
+    "staleAttentionCount": 92,
+    "newBlockingFindingId": "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY"
+  },
+  "fixed": {
+    "inventoryCount": 198,
+    "attentionCount": 93,
+    "attentionIdAdded": "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
+    "carryBlobSha": "ac36f0f146387ce3a74b1d4c84a9e9b313bce0a2"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "businessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

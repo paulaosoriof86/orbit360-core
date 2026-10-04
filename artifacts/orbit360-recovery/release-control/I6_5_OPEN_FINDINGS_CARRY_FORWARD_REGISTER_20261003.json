@@ -16,8 +16,8 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 197,
-  "attentionCount": 92,
+  "inventoryCount": 198,
+  "attentionCount": 93,
   "inventory": [
     {
       "id": "MECH-HARNESS-005",
@@ -2527,7 +2527,8 @@
     "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
     "B4-003-R14-04-CLIENT360-LIST-AUTHORITY",
     "B4-003-R14-05-QUALITY-VISUAL-GRAMMAR-COMPLETENESS",
-    "B4-003-R14-06-INSURER-IMPORT-STEP-TRUTHFULNESS"
+    "B4-003-R14-06-INSURER-IMPORT-STEP-TRUTHFULNESS",
+    "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY"
   ],
   "criticalCurrentReviewIds": [
     "B4-003",
