@@ -127,7 +127,7 @@ need(!/K\.clienteCell\(p\.clienteId\)/.test(policy)&&!/K\.aseguradoraCell\(p\.as
 need(/function\s+collectionConfirmed\s*\(/.test(policyDetail)&&/data-policy-detail-loading="client"/.test(policyDetail),'B4_003_R13_POLICY_DETAIL_READINESS_MISSING');
 need(/data-policy-vehicle-loading="1"/.test(policyDetail)&&/data-policy-receipts-loading="1"/.test(policyDetail),'B4_003_R13_POLICY_DETAIL_OPTIONAL_LOADING_MISSING');
 need(client360.includes('id="ftab-prev"')&&client360.includes('left: -strip.clientWidth')&&infra.includes('.ftab-prev'),'B4_003_CLIENT360_LEFT_TAB_CONTROL_MISSING');
-need(client360.includes("const clientesRaw = S().all('clientes')")&&client360.includes("const policiesRaw = policyReadiness === 'ready' ? S().all('polizas') : []")&&!client360.includes("batchRunner(['clientes']"),'B4_003_R14_CLIENT360_BASE_AUTHORITY_MISSING');
+need(client360.includes("const clientesRaw = S().all('clientes')")&&client360.includes("const policiesRaw = policyReadiness === 'ready' ? S().all('polizas') : []")&&!client360.includes("batchRunner(['clientes']")&&!client360.includes('clientBatch')&&client360.includes("baseAuthority: 'server-confirmed-store'"),'B4_003_R14_CLIENT360_BASE_AUTHORITY_MISSING');
 need(client360.includes('data-c360-base-authority="server-confirmed-store"')&&client360.includes('Vencen ≤45 d'),'B4_003_R14_CLIENT360_AUTHORITY_OR_KPI_LABEL_MISSING');
 need(quality.includes('.filter(inActiveCountry)')&&quality.includes('vigenteClientIds')&&quality.includes('data-quality-country'),'B4_003_QUALITY_COUNTRY_OR_LINEAR_INDEX_MISSING');
 need(!quality.includes("vig: tieneVigente(c.id)"),'B4_003_QUALITY_PER_CLIENT_POLICY_SCAN_REMAINS');
@@ -170,7 +170,7 @@ need(/core\/router\.js\?v=20261004-b4003r14a/.test(index),'B4_003_R14_ROUTER_CAC
 need(/core\/ciclo\.js\?v=20261004-b4003r14a/.test(index),'B4_003_R14A_CYCLE_CACHE_BINDING_MISSING');
 need(/modules\/cronograma\.js\?v=20261003-b4003r5/.test(index),'B4_003_CRONOGRAMA_CACHE_BINDING_MISSING');
 need(/store-firestore-product-operational-p0\.js\?v=20261003-b4003r3/.test(index),'B4_003_STORE_CACHE_BINDING_MISSING');
-need(/modules\/cliente360\.js\?v=20261004-b4003r14/.test(index),'B4_003_CLIENT360_R11_CACHE_BINDING_MISSING');
+need(/modules\/cliente360\.js\?v=20261004-b4003r14p2/.test(index),'B4_003_CLIENT360_R11_CACHE_BINDING_MISSING');
 need(/modules\/calidad\.js\?v=20261004-b4003r14p1/.test(index),'B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING');
 need(/modules\/aseguradoras\.js\?v=20261003-b4003r12/.test(index),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
 need(/core\/importa\.js\?v=20261004-b4003r14/.test(index),'B4_003_IMPORTER_R13_CACHE_BINDING_MISSING');
