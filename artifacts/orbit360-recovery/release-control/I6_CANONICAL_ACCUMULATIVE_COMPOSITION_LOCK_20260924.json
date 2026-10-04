@@ -2879,5 +2879,19 @@
     "reimport": false,
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "b4003R16ContinuityParentStatusAlignment": {
+    "status": "QA_GOVERNANCE_PARENT_STATUS_ALIGNED_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_CONTINUITY_PARENT_STATUS_ALIGNMENT_20261004.json",
+    "receiptBlobSha": "a48f4bedf8bb12bde64018abf6d7f50065e22790",
+    "failedRunId": 37206726477,
+    "failedJobId": 111449340469,
+    "failureCode": "CONTINUITY_B4_003_PARENT_STATUS_DRIFT",
+    "productSourceChanged": false,
+    "productBlobsChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   }
 }
