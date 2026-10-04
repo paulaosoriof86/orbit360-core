@@ -1,16 +1,16 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-04T04:12:00Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "REJECTED_R16_04_PENDING_RETEST",
     "knowledgePreview": true
   },
   "supersedes": {
@@ -29,15 +29,15 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "1c90de0feda6cf149a5aa86bacb49a3e219cf7ad"
+    "blobSha": "dee3ce9ca166932f73e0928a9bc72a92ba51e587"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "0433a77944300d1c5b0ee12af8a52177da00983d"
+    "blobSha": "0c9a760035cc646603f8379f1bbfb26f8c71a951"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "576ad989065ad5139ee2cfcaeb358f1d11b985e2",
+    "blobSha": "4848eb69a0f509422739712feb8bafb7061e498c",
     "inventoryCount": 215,
     "attentionCount": 92,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -49,7 +49,7 @@
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "Exact B4-003 Preview only: disposable B4003 synthetic renewal, cancellation, information-health and insurer-document fixtures with mandatory cleanup/readback; no real operational row mutation.",
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": false,
@@ -62,9 +62,10 @@
     "renewalDeterministicApplyAuthorized": false
   },
   "nextRequiredProof": [
+    "B4_003_EXACT_PREVIEW_MACHINE_PASS",
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -330,7 +331,7 @@
     "reimport": false,
     "livePromotion": false
   },
-  "compositionLockBlobSha": "cd0ca4a68647e9f80262442226fd7a2b865bffb1",
+  "compositionLockBlobSha": "dee3ce9ca166932f73e0928a9bc72a92ba51e587",
   "r14SourceFix": {
     "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
@@ -452,9 +453,9 @@
     "broadHumanReviewPaused": true,
     "preservePriorPasses": true
   },
-  "continuityRegisterBlobSha": "b56efd11bf9ab235d1c21dec5b6f193b72b70498",
+  "continuityRegisterBlobSha": "4848eb69a0f509422739712feb8bafb7061e498c",
   "continuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-  "findingLedgerBlobSha": "f42a1e03355f18e8f5ae0a34d59e9664bf846b88",
+  "findingLedgerBlobSha": "0c9a760035cc646603f8379f1bbfb26f8c71a951",
   "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
   "masterPendingClosurePlanBlobSha": "74711252c2ac1dae6126857968565d88cc294db7",
   "r16ComprehensivePlan": {
@@ -554,7 +555,7 @@
   "r1604TargetedVisualSourceFix": {
     "status": "SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
-    "blobSha": "eec4b28f8ee236c0e4aaca4a6e01e49336694f5b",
+    "blobSha": "040efbffd98c2423e29760f5c9b5ef2f8751f1f7",
     "allowedProductFiles": [
       "orbit360-platform/modules/calidad.js",
       "orbit360-platform/modules/configuracion.js",
@@ -604,6 +605,19 @@
       "resolution": "Preserve canonical phrase 'Conocimiento vigente y observado' while retaining R16.4 evidence hierarchy.",
       "productSourceChanged": true,
       "noBuildOccurredBeforeFix": true
+    },
+    "qaCoverageExtension": {
+      "status": "QA_COVERAGE_EXTENDED_PENDING_EXACT_PREVIEW",
+      "reason": "Paula visual rejection showed that presence/data assertions were insufficient for Configuración first paint and insurer knowledge hierarchy.",
+      "addedDiscriminators": [
+        "Authenticated Configuración→Catálogos paints loading/ready synchronously (<250 ms) and reaches canonical ready <5000 ms.",
+        "Aseguradora knowledge runtime exposes unambiguous metric labels, product hierarchy, and no raw empty-dimension chains."
+      ],
+      "priorMachineRunId": 37225119597,
+      "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
     }
   }
 }

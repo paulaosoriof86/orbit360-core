@@ -2094,15 +2094,15 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "lockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
-    "productSourceChanged": true,
+    "productSourceChanged": false,
     "noLive": true,
     "noReimport": true,
     "activeFindingId": "B4-003",
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
     "sourceSha": "3472fadc6b0cc2bee75a1155a87a9eea17511652",
     "buildId": "gi-i65-b4-3472fadc6b0c-57f234755dc1",
@@ -2166,7 +2166,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "f42a1e03355f18e8f5ae0a34d59e9664bf846b88",
+  "findingLedgerBlobSha": "0c9a760035cc646603f8379f1bbfb26f8c71a951",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2586,7 +2586,7 @@
     "diagnosticRunId": 37153182332,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "findingContinuityRegisterBlobSha": "b56efd11bf9ab235d1c21dec5b6f193b72b70498",
+  "findingContinuityRegisterBlobSha": "4848eb69a0f509422739712feb8bafb7061e498c",
   "b4003MachinePassVisualStateReconciliation": {
     "status": "MACHINE_PASS_VISUAL_STATE_RECONCILED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_VISUAL_STATE_RECONCILIATION_20261003.json",
@@ -2814,7 +2814,7 @@
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "continuityRegisterBlobSha": "b56efd11bf9ab235d1c21dec5b6f193b72b70498",
+  "continuityRegisterBlobSha": "4848eb69a0f509422739712feb8bafb7061e498c",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
   "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "b4003R15VisualReview": {
@@ -2972,7 +2972,7 @@
   "b4003R1604TargetedVisualSourceFix": {
     "status": "SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
-    "blobSha": "eec4b28f8ee236c0e4aaca4a6e01e49336694f5b",
+    "blobSha": "040efbffd98c2423e29760f5c9b5ef2f8751f1f7",
     "productBlobs": {
       "orbit360-platform/modules/calidad.js": "368b1f578a7500f7d8a2037962328770550ed8c3",
       "orbit360-platform/modules/configuracion.js": "0ec30235bf676b89c85a5c0dc58b09a5e1a81193",
@@ -2984,7 +2984,7 @@
     },
     "qaBlobs": {
       "tools/gravicentra-i6-5-b4-003-contract.mjs": "b8989c96a1ab9da558a4a8e506bbd767ec5c25d9",
-      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "5568d97cdd17b44ec4faf23ee98ce8b3182c5e20"
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "55e80951d51fbff8f2d44b66a7a3d46c6ac8d5cb"
     },
     "findingCountAfter": 215,
     "noLive": true,
@@ -3025,6 +3025,19 @@
       "resolution": "Preserve canonical phrase 'Conocimiento vigente y observado' while retaining R16.4 evidence hierarchy.",
       "productSourceChanged": true,
       "noBuildOccurredBeforeFix": true
+    },
+    "qaCoverageExtension": {
+      "status": "QA_COVERAGE_EXTENDED_PENDING_EXACT_PREVIEW",
+      "reason": "Paula visual rejection showed that presence/data assertions were insufficient for Configuración first paint and insurer knowledge hierarchy.",
+      "addedDiscriminators": [
+        "Authenticated Configuración→Catálogos paints loading/ready synchronously (<250 ms) and reaches canonical ready <5000 ms.",
+        "Aseguradora knowledge runtime exposes unambiguous metric labels, product hierarchy, and no raw empty-dimension chains."
+      ],
+      "priorMachineRunId": 37225119597,
+      "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
     }
   }
 }

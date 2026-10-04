@@ -397,17 +397,23 @@ try{
    const canonical=api.knowledgeSources(insurer)||[];
    const box=document.querySelector('#asg-ficha .m1-knowledge-summary[data-knowledge-source="canonical"]');
    const metrics=Array.from(box.querySelectorAll(':scope > div')).map(x=>({label:String(x.querySelector('span')?.textContent||'').trim(),value:Number(x.querySelector('b')?.textContent||0)}));
+   const productGroups=document.querySelector('#asg-ficha [data-knowledge-product-groups="1"]');
+   const hierarchy={metricLabels:metrics.map(x=>x.label),productGroupsPresent:!!productGroups,productGroupsText:String(productGroups?.innerText||'').replace(/\s+/g,' ').trim(),hasHumanProductHeading:/Cobertura y estado por producto/.test(document.querySelector('#asg-ficha #af-body')?.innerText||'')};
    const originalOpen=Orbit.importa.open,captures=[];
    Orbit.importa.open=(kind,opts)=>{captures.push({kind,scope:opts&&opts.scope||{},documentIntent:opts&&opts.documentIntent||'',docCategory:opts&&opts.docCategory||''});};
    document.querySelector('#asg-ficha #af-imp-doc2')?.click();
    document.querySelector('#asg-ficha [data-tab="documentos"]')?.click();
    document.querySelector('#asg-ficha #af-imp-doc')?.click();
    Orbit.importa.open=originalOpen;
-   return{canonicalCount:canonical.length,metrics,captures,text:String(box.innerText||'')};
+   return{canonicalCount:canonical.length,metrics,captures,text:String(box.innerText||''),hierarchy};
  },knowledgeProbe.aseguateId);
  const related=proof.r12InsurerKnowledge.metrics.find(x=>x.label==='Fuentes relacionadas');
  need(!!related&&related.value===proof.r12InsurerKnowledge.canonicalCount&&related.value>0,'B4_003_R12_INSURER_KPI_CANONICAL_COUNT_MISMATCH');
  need(!/Fuentes registradas\s*0/i.test(proof.r12InsurerKnowledge.text),'B4_003_R12_SHADOW_ZERO_KPI_REMAINS');
+ const metricLabels=proof.r12InsurerKnowledge.hierarchy?.metricLabels||[];
+ need(['Fuentes relacionadas','Validadas','Requieren revisión','Archivo físico en Drive'].every(x=>metricLabels.includes(x))&&!metricLabels.includes('Mapeadas / validadas')&&!metricLabels.includes('Con archivo confirmado'),'B4_003_R16_08_INSURER_HIERARCHY_METRICS_AMBIGUOUS:'+JSON.stringify(metricLabels));
+ need(proof.r12InsurerKnowledge.hierarchy?.productGroupsPresent===true&&proof.r12InsurerKnowledge.hierarchy?.hasHumanProductHeading===true&&!/—\s*·\s*—/.test(proof.r12InsurerKnowledge.hierarchy?.productGroupsText||''),'B4_003_R16_08_INSURER_PRODUCT_HIERARCHY_NOT_HUMAN:'+JSON.stringify(proof.r12InsurerKnowledge.hierarchy));
+ proof.assertions.insurerKnowledgeHierarchyHuman=true;
  const tariffCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='tarifa');
  const docCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='documento');
  need(tariffCapture?.kind==='docs-aseguradora'&&tariffCapture?.scope?.aseguradoraId===knowledgeProbe.aseguateId&&tariffCapture?.docCategory==='Tarifario','B4_003_R12_TARIFF_IMPORT_INSURER_SCOPE_MISSING');
@@ -523,6 +529,27 @@ try{
  proof.assertions.cancelRowNoMisleadingSingleTarget=true;
  proof.assertions.qualitySelectedCountryScope=true;
  proof.assertions.qualityRenderPathUnder2500ms=true;
+
+ // R16.4: Configuración must paint immediately while canonical catalogs hydrate on demand.
+ await page.evaluate(()=>{location.hash='#/configuracion';});
+ await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='configuracion',null,{timeout:10000});
+ await page.waitForSelector('.cfg-navi[data-t="catalogos"]',{timeout:10000});
+ const cfgStart=Date.now();
+ proof.r1604ConfigFirstPaint=await page.evaluate(()=>{
+   const button=document.querySelector('.cfg-navi[data-t="catalogos"]'),t=performance.now();
+   if(!button) return {state:'missing',syncPaintMs:999999,hasVisibleState:false};
+   button.click();
+   const node=document.querySelector('[data-catalog-state]');
+   return {state:String(node?.getAttribute('data-catalog-state')||''),syncPaintMs:performance.now()-t,hasVisibleState:!!node,text:String(node?.innerText||'').replace(/\s+/g,' ').trim().slice(0,500)};
+ });
+ need(proof.r1604ConfigFirstPaint.hasVisibleState===true&&['loading','ready'].includes(proof.r1604ConfigFirstPaint.state)&&proof.r1604ConfigFirstPaint.syncPaintMs<250,'B4_003_R16_06_CONFIG_IMMEDIATE_PAINT_FAILED:'+JSON.stringify(proof.r1604ConfigFirstPaint));
+ await page.waitForSelector('[data-catalog-state="ready"]',{timeout:5000});
+ proof.r1604ConfigFirstPaint.canonicalReadyMs=Date.now()-cfgStart;
+ proof.r1604ConfigFirstPaint.finalState=await page.evaluate(()=>document.querySelector('[data-catalog-state]')?.getAttribute('data-catalog-state')||'');
+ need(proof.r1604ConfigFirstPaint.finalState==='ready'&&proof.r1604ConfigFirstPaint.canonicalReadyMs<5000,'B4_003_R16_06_CONFIG_CANONICAL_READY_TOO_SLOW:'+JSON.stringify(proof.r1604ConfigFirstPaint));
+ proof.assertions.configCatalogImmediatePaint=true;
+ proof.assertions.configCatalogCanonicalReady=true;
+
  proof.r16CatalogAndQuality=await page.evaluate(async()=>{
   let catalogEnsureError='';
   try{if(!Orbit.cat||typeof Orbit.cat.ensure!=='function')throw new Error('CATALOG_CLIENT_MISSING');await Orbit.cat.ensure(true);}catch(error){catalogEnsureError=String(error&&error.message||error);}

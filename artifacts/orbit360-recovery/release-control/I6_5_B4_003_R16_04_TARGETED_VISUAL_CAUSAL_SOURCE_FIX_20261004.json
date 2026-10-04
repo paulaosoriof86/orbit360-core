@@ -39,7 +39,7 @@
   },
   "qaBlobs": {
     "tools/gravicentra-i6-5-b4-003-contract.mjs": "b8989c96a1ab9da558a4a8e506bbd767ec5c25d9",
-    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "5568d97cdd17b44ec4faf23ee98ce8b3182c5e20"
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "55e80951d51fbff8f2d44b66a7a3d46c6ac8d5cb"
   },
   "invariants": {
     "noLive": true,
@@ -88,5 +88,18 @@
     "resolution": "Preserve canonical phrase 'Conocimiento vigente y observado' while retaining R16.4 evidence hierarchy.",
     "productSourceChanged": true,
     "noBuildOccurredBeforeFix": true
+  },
+  "qaCoverageExtension": {
+    "status": "QA_COVERAGE_EXTENDED_PENDING_EXACT_PREVIEW",
+    "reason": "Paula visual rejection showed that presence/data assertions were insufficient for Configuración first paint and insurer knowledge hierarchy.",
+    "addedDiscriminators": [
+      "Authenticated Configuración→Catálogos paints loading/ready synchronously (<250 ms) and reaches canonical ready <5000 ms.",
+      "Aseguradora knowledge runtime exposes unambiguous metric labels, product hierarchy, and no raw empty-dimension chains."
+    ],
+    "priorMachineRunId": 37225119597,
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
