@@ -108,6 +108,8 @@ jobs:
           grep -q 'class="site-header"' "$E/page.html"
           grep -q 'Alianzas &amp; Soluciones · Broker de Seguros' "$E/page.html"
           grep -q 'Cotiza y compara <em>con criterio</em>' "$E/page.html"
+          grep -q 'class="hero-photo"' "$E/page.html"
+          grep -q 'Equipo A&amp;S en asesoría' "$E/page.html"
           grep -q 'Cotización en línea' "$E/page.html"
           grep -q 'Con acompañamiento' "$E/page.html"
           grep -q 'Información' "$E/page.html"
