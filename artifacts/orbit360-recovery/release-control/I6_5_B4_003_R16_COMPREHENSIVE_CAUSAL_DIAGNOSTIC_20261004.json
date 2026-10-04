@@ -1,0 +1,139 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R16_COMPREHENSIVE_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-04",
+  "status": "CAUSES_DEMONSTRATED_SINGLE_SUCCESSOR_SOURCE_FIX_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "1bc95e25a08a0655f91d977abbae59878155accb",
+  "parentFinding": "B4-003",
+  "authorityBindings": {
+    "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+    "masterPendingClosurePlanBlobSha": "74711252c2ac1dae6126857968565d88cc294db7",
+    "findingLedgerBlobSha": "e877504ab1395f5f840d87e1d208a0b10c9eb687",
+    "continuityRegisterBlobSha": "5457e732b76b068eeadd30509cd77fb5f368755c",
+    "findingCount": 208,
+    "ledgerCarryExactSet": true,
+    "currentCompositionBlobSha": "e5292db4d12252e6e255dc7555b89517ebb261ff"
+  },
+  "workstreams": {
+    "assignableAdvisors": {
+      "findingIds": [
+        "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
+        "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION"
+      ],
+      "rootCause": "ASSIGNMENT_ROSTER_INCORRECTLY_REUSES_FULL_TEAM_DIRECTORY_READ_AUTHORITY",
+      "evidence": [
+        "tenant-access-policy-effective-p0 maps asesores to Equipo and denies full team directory to Operativo.",
+        "store-firestore-product-readonly-p0 returns full documents for allowed collections, so widening asesores read access would violate least privilege.",
+        "core/ciclo.js assignableAdvisors() currently reads store.all('asesores'), therefore Carlos/Operativo receives an empty roster upstream."
+      ],
+      "remedy": "Add a server-owned minimal assignable-advisor projection and client facade. Keep full Equipo restricted. Project only canonical id, display name, active/assignable state, Asesor-role eligibility and compatible countries; dedupe canonically and react to country."
+    },
+    "tenantCatalogs": {
+      "findingIds": [
+        "B4-003-R15-01-OPS-LEADS-NEW-PROSPECT-CATALOGS",
+        "B3-CARRY-OPS-CATALOG-ADMIN-20260929"
+      ],
+      "rootCause": "NEW_PROSPECT_FREE_TEXT_PLUS_BROWSER_LOCAL_ONLY_CATALOG_AUTHORITY",
+      "evidence": [
+        "core/ciclo.js nuevoNegocio() uses free-text inputs/defaults for Canal, Producto and Ramo.",
+        "core/config.js Orbit.cat persists only to localStorage.",
+        "functions/tenant-domain-config.js has durable tenant configuration but does not yet expose a catalogs domain.",
+        "Configuracion lacks complete durable tenant catalog administration."
+      ],
+      "remedy": "Extend the existing tenant-domain config owner with a catalogs domain; hydrate Orbit.cat from server-owned tenant config; expose Configuracion administration; make new/edit flows consume the same authority without hardcoded business truth."
+    },
+    "clientQuality": {
+      "findingIds": [
+        "B4-003-R15-02-QUALITY-CLIENT-COMPLETION-DURABILITY",
+        "B4-003-R15-03-QUALITY-GEO-CATALOG-COMPLETENESS",
+        "B4-003-R15-04-QUALITY-COUNTRY-EVIDENCE-SEMANTICS",
+        "B4-003-R15-05-QUALITY-CHANNEL-ACTION"
+      ],
+      "rootCauses": [
+        "calidad.js uses synchronous store.update followed by immediate local readback instead of awaited updateDurable/server commit.",
+        "Orbit.GEO is an explicitly reduced embedded subset rather than a complete governed GT/CO locality catalog.",
+        "Quality UI conflates current country value with linked provenance evidence.",
+        "No-contact rows render a disabled Sin canal button."
+      ],
+      "remedy": "Await durable server write/readback before rerender/audit; separate current country from provenance; use a complete governed GT/CO geography dataset shared by Calidad and Cliente360; make contact completion actionable."
+    },
+    "financialQuality": {
+      "findingIds": [
+        "B4-003-R15-06-QUALITY-POLICY-MISMATCH-ACTIONABILITY",
+        "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH"
+      ],
+      "rootCause": "FINANCIAL_MISMATCH_READMODEL_IS_VISIBLE_BUT_NOT_OPERATIONALLY_EXPLAINED_OR_DRILLABLE",
+      "remedy": "Expose contractual source, active schedule/receipt lineage, exact normalized delta, tolerance and safe drill-down/actions; never rewrite premium or receipts by inference; normalize negative zero and precision-only deltas."
+    },
+    "renewals": {
+      "findingIds": [
+        "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+        "B4-003-R11-04-RENEWABILITY-FAIL-CLOSED",
+        "B4-003-R14-01-RENEWALS-FIRST-PAINT-AUTHORITY",
+        "B4-003-R14-02-EXPIRED-RENEWAL-OUTCOME-CONTINUITY",
+        "B4-003-R13-04-RENEWALS-ZERO-REGRESSION"
+      ],
+      "adjudication": "Existing fail-closed YES/NO/UNKNOWN semantics are correct and must be preserved. The remaining blocker is source-backed/human-auditable completion, not permission to infer.",
+      "remedy": "Add an auditable validation surface for UNKNOWN renewability and missing financial fields. No operational row is changed by this source-fix commit; later human/source confirmation remains explicit and server-owned."
+    },
+    "insurerSources": {
+      "findingIds": [
+        "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
+        "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
+        "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
+        "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+        "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929"
+      ],
+      "rootCause": "LIBRARY_KNOWLEDGE_REFERENCES_AND_DRIVE_DOCUMENTS_HAVE_DISTINCT_STORAGE_SEMANTICS_WITHOUT_ONE_CANONICAL_REGISTRY_PROJECTION_AND_TAXONOMY",
+      "remedy": "Create one canonical source-registry projection that labels Library reference, Drive file or both; expand document taxonomy and normalized metadata; keep all downstream tariff/calc enablement fail-closed and preserve gravicentra-quote-authority-v1."
+    },
+    "emailTraceability": {
+      "findingIds": [
+        "B1-EMAIL-DELIVERY-001",
+        "B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5",
+        "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
+      ],
+      "adjudication": "Existing B4-002 outbox/retry source remediation does not prove mailbox delivery. These findings remain open until provider acceptance/delivery or bounce/failure evidence is obtained; they are not silently closed by R16."
+    }
+  },
+  "allowedProductFiles": [
+    "functions/assignable-advisor-roster.js",
+    "functions/bootstrap.js",
+    "functions/package.json",
+    "functions/tenant-domain-config.js",
+    "orbit360-platform/core/assignable-advisor-roster-client.js",
+    "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js",
+    "orbit360-platform/core/config.js",
+    "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/core/tenant-domain-config-client.js",
+    "orbit360-platform/modules/configuracion.js",
+    "orbit360-platform/modules/calidad.js",
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/modules/renovaciones.js",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "orbit360-platform/core/insurer-source-registry-v1.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/core/importa.js",
+    "orbit360-platform/index.html"
+  ],
+  "allowedQaFiles": [
+    "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    ".github/workflows/gravicentra-b4-003-executor.yml"
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "realOperationalBusinessWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b4004Authorized": false,
+    "fullTeamDirectoryPermissionExpansionAuthorized": false,
+    "hardcodedPersonsAuthorized": false,
+    "quoteAuthorityReplacementAuthorized": false,
+    "cotcompRealTransportAuthorized": false
+  },
+  "preservedHumanPasses": true,
+  "nextAction": "B4_003_R16_COMPREHENSIVE_SINGLE_SUCCESSOR_FIX"
+}

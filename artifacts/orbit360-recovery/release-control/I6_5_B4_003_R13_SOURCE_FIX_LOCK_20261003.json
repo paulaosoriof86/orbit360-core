@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-04T04:12:00Z",
-  "status": "B4_003_PAULA_VISUAL_PARTIAL_PASS_R16_COMPREHENSIVE_REMEDIATION_REQUIRED",
+  "status": "B4_003_R16_CAUSAL_DIAGNOSTIC_COMPLETE_SINGLE_SUCCESSOR_FIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
@@ -45,7 +45,7 @@
   "boundaries": {
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -64,7 +64,7 @@
   "nextRequiredProof": [
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_R16_COMPREHENSIVE_CAUSAL_DIAGNOSTIC_AND_SINGLE_SUCCESSOR_FIX",
+  "nextAction": "B4_003_R16_COMPREHENSIVE_SINGLE_SUCCESSOR_FIX",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -458,16 +458,43 @@
   "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
   "masterPendingClosurePlanBlobSha": "74711252c2ac1dae6126857968565d88cc294db7",
   "r16ComprehensivePlan": {
-    "status": "FROZEN_ACTIVE_NO_LOSS",
+    "status": "CAUSES_DEMONSTRATED_SINGLE_SUCCESSOR_SOURCE_FIX_AUTHORIZED",
     "parentFinding": "B4-003",
     "explicitNewFinding": "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
     "preserveR15": true,
     "preservePriorPasses": true,
     "b4004Held": true,
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "nextAction": "B4_003_R16_COMPREHENSIVE_CAUSAL_DIAGNOSTIC_AND_SINGLE_SUCCESSOR_FIX"
+    "nextAction": "B4_003_R16_COMPREHENSIVE_SINGLE_SUCCESSOR_FIX",
+    "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_CAUSAL_DIAGNOSTIC_20261004.json",
+    "diagnosticBlobSha": "ac4575ea1b2e0233723a46dc91884d8672ace573",
+    "allowedProductFiles": [
+      "functions/assignable-advisor-roster.js",
+      "functions/bootstrap.js",
+      "functions/package.json",
+      "functions/tenant-domain-config.js",
+      "orbit360-platform/core/assignable-advisor-roster-client.js",
+      "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js",
+      "orbit360-platform/core/config.js",
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/core/tenant-domain-config-client.js",
+      "orbit360-platform/modules/configuracion.js",
+      "orbit360-platform/modules/calidad.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/core/insurer-source-registry-v1.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/core/importa.js",
+      "orbit360-platform/index.html"
+    ],
+    "allowedQaFiles": [
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ]
   }
 }
