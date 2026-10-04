@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "ays-cotcomp-s497-forensic-visual-lock-v1.0",
+  "status": "FORENSIC_RECOVERY_ANCHOR_IDENTIFIED_IMPLEMENTATION_HOLD",
+  "anchor": {
+    "artifact": "OWNER_REVIEW_COTCOMP_S4_10_STANDALONE.html",
+    "sha256": "a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d",
+    "equivalentArtifacts": [
+      "OWNER_REVIEW_COTCOMP_S4_13_STANDALONE.html",
+      "OWNER_REVIEW_COTCOMP_S4_18_STANDALONE.html"
+    ],
+    "formalOwnerPass": false,
+    "classification": "FORENSIC_RECOVERY_ANCHOR_OWNER_SATISFACTORY_VISUAL_LINEAGE"
+  },
+  "physicalLocks": {
+    "cotcompSectionSha256": "758dcf6871fb3e3e03844f736ee0a99c5d0d76d1ed4a124b65e90abbe9a07928",
+    "combinedVisualCssSha256": "94a23c292fb6f271aaccf1ab6fe47b0506082de1d724c9688510a3be663fafbb",
+    "styleBlocks": {
+      "f7-s4-1-cotcomp-catalog-rework": "b07da11b9535b6610e6faca813d625bea059a0ed6c8ba1749010fa67c6872e44",
+      "f7-s4-2-cotcomp-hierarchy-adapter": "d23da6fd91b2ed71cf7b4ba419087319701f15374be9379cab7f23544329bd36",
+      "f7-s4-2-1-copy-nav-truth-fix": "aed070c1993690ae28fabb322adc0cf4084b116b8b0366d37cf221fa1604b28c",
+      "f7-s4-3-mobile-visual-language-rework": "170d90293356c45d0443a36cd32900cdd776a8b6bd8431202192fecd1984573d",
+      "f7-s4-4-desktop-polish-contextual-replan": "9b04a0e0838166c162a7a133754c09fd06e8f5db25cf6fa3dbd4697d44b3fdf9",
+      "f7-s4-5-visual-elevation": "73fbc75175fee6dea279591e36a6d81120c7a41df6f495853c6670f47f6691c8",
+      "f7-s4-cotcomp-workspace": "28ab271b5e13e5bb58f73e1e5f24f3d3d8575283d17c054377d4ea196c31d5c4"
+    }
+  },
+  "visualContract": {
+    "openingH1": "Empecemos por lo que quieres proteger.",
+    "h1Font": "Archivo",
+    "architecture": "PRODUCT_WORKSPACE_NOT_MARKETING_PHOTO_HERO",
+    "desktopNeedGridColumns": 3,
+    "desktopNeedGridGapPx": 12,
+    "desktopNeedCardMinHeightPx": 108,
+    "desktopShellJourneyRailPx": 220,
+    "stages": [
+      "Lo que necesitas",
+      "Tus datos",
+      "Revisar opciones",
+      "Comparar y continuar"
+    ],
+    "breakpoints": [
+      980,
+      650,
+      360
+    ]
+  },
+  "excludedVisualParents": [
+    "S4.95",
+    "S4.96",
+    "S4.96B"
+  ],
+  "allowedPortableFunctionalDeltas": [
+    "country_product_deep_intake",
+    "correct_back_forward_state",
+    "progressive_disclosure_compatible_with_anchor",
+    "vehicle_search_brand_line_model_year",
+    "schema_driven_field_completion",
+    "explicit_choice_semantics",
+    "comparison_gating",
+    "context_preserving_assisted_handoff"
+  ],
+  "denylist": [
+    "large_marketing_photo_hero_without_new_owner_gate",
+    "non_anchor_H1_typography",
+    "seven_equal_horizontal_need_cards_without_new_owner_gate",
+    "visual_override_stack_from_S4.94_to_S4.96B",
+    "cards_as_dominant_page_composition",
+    "single_fallback_photo_reused_across_routes",
+    "internal_technical_language"
+  ],
+  "gates": {
+    "providerDeploymentAuthorized": false,
+    "cotcompRealTransportAuthorized": false,
+    "production": false,
+    "newOwnerReviewCandidateAllowed": false,
+    "requiredBeforeCandidate": [
+      "deterministic_golden_screenshots",
+      "screenshot_regression_gate",
+      "clean_parent_from_exact_anchor"
+    ]
+  }
+}
