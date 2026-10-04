@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_PREVIEW_CONCURRENCY_ROOTFIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_WORKFLOW_SCHEDULER_FIXED",
+  "findingId": "B4-003",
+  "evidence": {
+    "sharedGroup": "gravicentra-b4-003-${{ github.ref }}",
+    "competingWorkflows": [
+      ".github/workflows/gravicentra-b4-003-executor.yml",
+      ".github/workflows/gravicentra-b4-003-readonly-diagnostic.yml",
+      ".github/workflows/gravicentra-b4-003-renewals-cancelations-diagnostic.yml"
+    ],
+    "observedCancelledPreviewRunId": 37166086187,
+    "observedCancelledPreviewHadJobs": 0
+  },
+  "rootCause": "The exact Preview shared one concurrency group with two read-only diagnostic workflows. Control Plane pushes scheduled all three; GitHub concurrency allowed only one running and one pending member, so pending Preview runs were repeatedly replaced/cancelled before jobs started.",
+  "fix": {
+    "workflow": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "workflowBlobSha": "3bbb6e092ee8c115ee106d4dd9e35ecbdb59f69f",
+    "previewGroup": "gravicentra-b4-003-preview-${{ github.ref }}",
+    "diagnosticGroupsUnchanged": true
+  },
+  "productSourceChanged": false,
+  "operationalBusinessWrites": 0,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
