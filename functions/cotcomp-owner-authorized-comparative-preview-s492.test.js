@@ -1,0 +1,121 @@
+'use strict';
+
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const S=require('./cotcomp-owner-authorized-comparative-preview-s492');
+const C=require('./cotcomp-gravicentra-provider-contract-s484');
+
+test('S4.92 pins the exact Owner-authorized visual reference',()=>{
+  assert.equal(S.OWNER_VISUAL_SHA,'3468546cb5d1c0cd7e2191980b306d462ea0b0304da0260167ec06c294aaa10e');
+});
+
+test('S4.92 stays inside the current A&S public-site shell',()=>{
+  const h=S.html();
+  assert.match(h,/class="site-header"/);
+  assert.match(h,/Alianzas &amp; Soluciones · Broker de Seguros/);
+  for(const item of ['Empresas','Personas y familias','Cotizar y comparar','Siniestros y asistencia','Recursos','Sobre A&amp;S']){
+    assert.ok(h.includes(item),item);
+  }
+  assert.match(h,/Guatemala/);
+  assert.match(h,/Colombia/);
+  assert.match(h,/Hablar con un asesor/);
+  assert.doesNotMatch(h,/class="sidebar"/);
+});
+
+test('S4.92 restores the authorized dark human advisory hero and headline',()=>{
+  const h=S.html();
+  assert.match(h,/class="hero"/);
+  assert.match(h,/background-image:url\('data:image\/webp;base64,/);
+  assert.match(h,/Cotiza y compara <em>con criterio<\/em>/);
+  assert.match(h,/Compara coberturas, beneficios y condiciones/);
+  assert.match(h,/Compara<br>opciones reales/);
+  assert.match(h,/Evalúa beneficios<br>con claridad/);
+  assert.match(h,/Decide con<br>asesoría experta/);
+});
+
+test('S4.92 reproduces the authorized floating CotComp workspace composition',()=>{
+  const h=S.html();
+  assert.match(h,/class="workspace"/);
+  assert.match(h,/Cotización en línea/);
+  assert.match(h,/Con acompañamiento/);
+  for(const stage of ['Información','Coberturas','Comparar','Decidir']) assert.ok(h.includes(stage),stage);
+  assert.match(h,/1\. Selecciona el tipo de seguro/);
+  assert.match(h,/3\. Compara alternativas/);
+  assert.match(h,/Recomendación A&amp;S/);
+});
+
+test('S4.92 contains the seven frozen public product families',()=>{
+  const h=S.html();
+  for(const label of ['Vehículo','Hogar','Salud','Gastos médicos','Vida','Ingreso','Empresa','Transporte','Carga','Otros','No sé cuál necesito']){
+    assert.ok(h.includes(label),label);
+  }
+  assert.equal(S.routes().length,7);
+});
+
+test('S4.92 makes the quote-area visual product-aware',()=>{
+  const h=S.html();
+  assert.match(h,/function renderVisual\(\)/);
+  for(const id of ['vehicle','home','health','life','business','cargo','other']){
+    assert.match(h,new RegExp(id+":\\{"));
+  }
+  assert.match(h,/product-scene generic/);
+  assert.match(h,/data:image\/webp;base64/);
+});
+
+test('S4.92 preserves vehicle Marca, Linea/modelo and Año while consuming read-only catalog projection',()=>{
+  const h=S.html();
+  assert.match(h,/Marca/);
+  assert.match(h,/Línea \/ modelo/);
+  assert.match(h,/Año/);
+  assert.match(h,/cotcompVehicleCatalogS479/);
+  assert.match(h,/op:'brands'/);
+  assert.match(h,/op:'models'/);
+  assert.match(h,/op:'years'/);
+});
+
+test('S4.92 comparison and recommendation are visibly present but truthfully illustrative',()=>{
+  const h=S.html();
+  assert.match(h,/Aseguradora A/);
+  assert.match(h,/Aseguradora B/);
+  assert.match(h,/Aseguradora C/);
+  assert.match(h,/Alternativa B/);
+  assert.match(h,/ilustrativo/);
+  assert.match(h,/no constituyen oferta/);
+  assert.match(h,/Gravicentra sigue siendo la autoridad/);
+});
+
+test('S4.92 keeps Gravicentra provider contract and transport gates unchanged',()=>{
+  const m=S.manifest();
+  assert.equal(C.validateProviderManifest(m).ok,true);
+  assert.equal(m.providerContractVersion,'gravicentra-quote-authority-v1');
+  assert.equal(m.providerDeploymentAuthorized,false);
+  assert.equal(m.cotcompRealTransportAuthorized,false);
+});
+
+test('S4.92 contains no local rating engine, persistence or direct provider runtime',()=>{
+  const src=fs.readFileSync(path.join(__dirname,'cotcomp-owner-authorized-comparative-preview-s492.js'),'utf8').toUpperCase();
+  for(const forbidden of [
+    'GETFIRESTORE','FIREBASE-ADMIN','ONCALL',
+    'CALCULATEPREMIUM(','CALCULATETAX(','APPLYTARIFFRATE(',
+    'REQUESTMANAGEMENT','PROVIDER/RATER'
+  ]) assert.equal(src.includes(forbidden),false,forbidden);
+});
+
+test('S4.92 HTML is structurally renderable and responsive',()=>{
+  const h=S.html();
+  assert.ok(h.indexOf('</style>')<h.indexOf('<body>'));
+  assert.ok(h.indexOf('<body>')<h.indexOf('Cotiza y compara'));
+  assert.equal((h.match(/<style>/g)||[]).length,1);
+  assert.equal((h.match(/<\/style>/g)||[]).length,1);
+  assert.match(h,/@media\(max-width:1180px\)/);
+  assert.match(h,/@media\(max-width:560px\)/);
+});
+
+test('S4.92 rejects write-like HTTP methods',()=>{
+  const req={method:'POST'};
+  const res={statusCode:200,headers:{},body:null,set(k,v){this.headers[k]=v;return this;},status(n){this.statusCode=n;return this;},send(v){this.body=v;return this;}};
+  S.handler(req,res);
+  assert.equal(res.statusCode,405);
+});
