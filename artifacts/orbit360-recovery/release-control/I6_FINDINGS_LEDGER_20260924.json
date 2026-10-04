@@ -7621,7 +7621,7 @@
         "orbit360-platform/core/config.js",
         "orbit360-platform/core/ciclo.js"
       ],
-      "status": "DIAGNOSED_R16_03_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R16_03_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Exact authenticated Preview has zero unexpected 401 for tenant catalog config; catalog ensure remains canonical and fail-closed when invoked by authenticated consumers.",
@@ -7630,7 +7630,9 @@
       "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c",
       "noLive": true,
       "noReimport": true,
-      "nextAction": "B4_003_R16_03_REMOVE_PREAUTH_CATALOG_HYDRATION"
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "46ab8e219ab93e7251036720ce6435cc3d0b50c5"
     }
   ],
   "phaseBBacklog": [
@@ -8042,5 +8044,11 @@
     "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
     "status": "DIAGNOSED_R16_03_SOURCE_FIX_AUTHORIZED",
     "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c"
+  },
+  "lastR16CatalogPreauthSourceFix": {
+    "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
+    "status": "SOURCE_FIXED_R16_03_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_SOURCE_FIX_20261004.json",
+    "receiptBlobSha": "46ab8e219ab93e7251036720ce6435cc3d0b50c5"
   }
 }

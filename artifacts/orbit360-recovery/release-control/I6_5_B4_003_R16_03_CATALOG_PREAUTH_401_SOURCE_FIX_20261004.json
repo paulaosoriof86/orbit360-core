@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "SOURCE_FIXED_R16_03_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "96d4ef1b32a012679b75e48641e42e6bc433f2ed",
+  "findingId": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
+  "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_DIAGNOSTIC_20261004.json",
+  "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c",
+  "failedRunId": 37213597161,
+  "sourceFix": {
+    "orbit360-platform/core/config.js": "63104aa8b715a42c757763b8e4275291bd7248a6",
+    "orbit360-platform/core/ciclo.js": "e8423c8916b67401c96a49fcd955c6077f486c74",
+    "orbit360-platform/index.html": "3ceac195349f158a33a6d5bd5f87e808202ae254"
+  },
+  "qaFix": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "cb50ef487427af20d4c8c107b7a0edafecb834ee"
+  },
+  "correction": "Removed only the two eager pre-auth catalog ensure calls. Four authenticated catalog-consuming paths retain awaited canonical fail-closed ensure.",
+  "authenticatedConsumerEnsureCount": 4,
+  "authRelaxed": false,
+  "localFallbackAuthority": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "b4004Held": true,
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

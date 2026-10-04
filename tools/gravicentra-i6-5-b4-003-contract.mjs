@@ -94,6 +94,7 @@ const ledgerIds=(ledger.findings||[]).map(x=>String(x.id)).sort(),carryIds=(carr
 need(ledgerIds.length>=208&&carryIds.length===ledgerIds.length&&JSON.stringify(ledgerIds)===JSON.stringify(carryIds),'B4_003_LEDGER_CARRY_NO_LOSS_VIOLATION');
 for(const id of ['B1-EMAIL-DELIVERY-001','B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5','B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6'])need(ledgerIds.includes(id)&&carryIds.includes(id),'B4_003_EMAIL_FINDING_LOST:'+id);
 need(ledgerIds.includes('B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION'),'B4_003_R16_02_PERFORMANCE_FINDING_LOST');
+need(ledgerIds.includes('B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401'),'B4_003_R16_03_PREAUTH_FINDING_LOST');
 
 need(/BUSINESS_MUTABLE_FIELDS[\s\S]*'polizaId','cancelacionId'/.test(workflow),'B4_003_RECOVERY_BUSINESS_LINK_FIELDS_MISSING');
 need(/MANAGEMENT_MUTABLE_FIELDS[\s\S]*'negocioId','cancelacionId'/.test(workflow),'B4_003_RECOVERY_MANAGEMENT_LINK_FIELD_MISSING');
@@ -166,6 +167,7 @@ need(!/password|contrasena|credential|telefono|email/.test((rosterBackend.match(
 need(/orbit360AssignableAdvisorRosterPreview/.test(rosterBackend)&&/Orbit\.assignableAdvisorRoster=Object\.freeze/.test(rosterClient),'B4_003_R16_ASSIGNABLE_ROSTER_CLIENT_BACKEND_BINDING_MISSING');
 need(/DOMAINS = new Set\(\[[\s\S]*'catalogs'/.test(tenantBackend)&&/validateCatalogs/.test(tenantBackend)&&/CATALOG_CONFIG_SERVER_REQUIRED/.test(tenantClient),'B4_003_R16_DURABLE_TENANT_CATALOG_AUTHORITY_MISSING');
 need(/CATALOG_CONFIG_CANONICAL_READBACK_REQUIRED/.test(read(paths.index.replace('index.html','core/config.js')))||/CATALOG_CONFIG_CANONICAL_READBACK_REQUIRED/.test(read('orbit360-platform/core/config.js')),'B4_003_R16_CATALOG_FAIL_CLOSED_MISSING');
+need(!/setTimeout\(\(\)=>\{api\.ensure\(\)\.catch/.test(read('orbit360-platform/core/config.js'))&&!/Promise\.resolve\(\)\.then\(\(\)=>Orbit\.cat&&Orbit\.cat\.ensure/.test(cycle),'B4_003_R16_03_PREAUTH_CATALOG_HYDRATION_REMAINS');
 need(/cf-cat-canales/.test(configuracion)&&/cf-cat-productos/.test(configuracion)&&/cf-cat-segmentos/.test(configuracion)&&/cf-cat-prioridades/.test(configuracion)&&/Orbit\.cat\.saveDurable/.test(configuracion),'B4_003_R16_CATALOG_ADMIN_SURFACE_MISSING');
 need(/nn-canal/.test(cycle)&&/fSelectCat\('Canal'/.test(cycle)&&/nn-segmento/.test(cycle)&&/nn-prioridad/.test(cycle)&&/puntoIngreso/.test(cycle)&&!/Math\.floor\(1000 \+ Math\.random\(\) \* 9000\)/.test(cycle),'B4_003_R16_NEW_PROSPECT_CATALOG_AUTHORITY_MISSING');
 need(/departments:22,municipalities:340/.test(geo)&&/municipalities:1122/.test(geo),'B4_003_R16_GEO_GT_CO_COMPLETENESS_BINDING_MISSING');
@@ -204,7 +206,7 @@ need(/cancelaciones\.js\?v=20261003-b4003r13/.test(index),'B4_003_CANCEL_R13_CAC
 need(/modules\/polizas\.js\?v=20261004-b4003r14/.test(index),'B4_003_POLICY_R13_CACHE_BINDING_MISSING');
 need(/core\/access-scope\.js\?v=20261003-b4003r5/.test(index),'B4_003_ACCESS_SCOPE_CACHE_BINDING_MISSING');
 need(/core\/router\.js\?v=20261004-b4003r14a/.test(index),'B4_003_R14_ROUTER_CACHE_BINDING_MISSING');
-need(/core\/ciclo\.js\?v=20261004-r16/.test(index),'B4_003_R14A_CYCLE_CACHE_BINDING_MISSING');
+need(/core\/ciclo\.js\?v=20261004-r16p2/.test(index),'B4_003_R14A_CYCLE_CACHE_BINDING_MISSING');
 need(/modules\/cronograma\.js\?v=20261003-b4003r5/.test(index),'B4_003_CRONOGRAMA_CACHE_BINDING_MISSING');
 need(/store-firestore-product-operational-p0\.js\?v=20261003-b4003r3/.test(index),'B4_003_STORE_CACHE_BINDING_MISSING');
 need(/modules\/cliente360\.js\?v=20261004-b4003r14p2/.test(index),'B4_003_CLIENT360_R11_CACHE_BINDING_MISSING');

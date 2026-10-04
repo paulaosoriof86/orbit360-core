@@ -76,7 +76,7 @@ Orbit.cat = (function () {
  const api={get:k=>clone(d[k]||[]),all:()=>clone(d),ramosDe:p=>{const m=(d.ramosPais||{})[p];return m?Object.keys(m):(d.ramos||[]).slice();},subramosDe:(p,r)=>{const m=(d.ramosPais||{})[p];return m&&m[r]?m[r].slice():[];},puntoIngreso:id=>(d.puntosIngreso||[]).find(x=>x.id===id)||null,
  addRamo:(p,r)=>localChange(()=>{d.ramosPais=d.ramosPais||{};d.ramosPais[p]=d.ramosPais[p]||{};if(!d.ramosPais[p][r])d.ramosPais[p][r]=[];}),addSubramo:(p,r,v)=>localChange(()=>{d.ramosPais=d.ramosPais||{};d.ramosPais[p]=d.ramosPais[p]||{};d.ramosPais[p][r]=d.ramosPais[p][r]||[];if(!d.ramosPais[p][r].includes(v))d.ramosPais[p][r].push(v);}),add:(k,v)=>{if(v)localChange(()=>{d[k]=d[k]||[];if(!d[k].includes(v))d[k].push(v);});},setList:(k,a)=>localChange(()=>{d[k]=clone(a||[]);}),
  ensure,saveDurable,resetDurable:reason=>saveDurable(DEF,reason||'Restablecer catálogos del tenant'),save:()=>{throw Error('CATALOG_CONFIG_DURABLE_SAVE_REQUIRED');},status:()=>({source,syncPending,hydrated}),DEF:Object.freeze(clone(DEF))};
- setTimeout(()=>{api.ensure().catch(()=>{});},0);return Object.freeze(api);
+ return Object.freeze(api);
 })();
 
 /* Canonical insurer source registry · R16 */

@@ -43,7 +43,7 @@ Orbit.ciclo = (function () {
   function tiposGestion() { return Orbit.cat.get('tiposGestion'); }
 
   /* ===================== datos / filtros ===================== */
-  Promise.resolve().then(()=>Orbit.cat&&Orbit.cat.ensure?Orbit.cat.ensure():null).then(()=>document.dispatchEvent(new CustomEvent('orbit:ciclo'))).catch(()=>{});
+
   function etapaInfo(id) { return E[id] || E.nuevo; }
   function paisOK(pais) { return !Orbit.pais || Orbit.pais === 'TODOS' || pais === Orbit.pais; }
   async function assignableAdvisors(country){if(!Orbit.assignableAdvisorRoster?.list)return[];try{return await Orbit.assignableAdvisorRoster.list(country);}catch(e){return[];}}

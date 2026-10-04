@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76",
-  "expectedLedgerNextBlobSha": "e3a0a2559dda9f87b9252e3c77d4c484d62058d6",
+  "expectedLedgerNextBlobSha": "d84746f3a5de1323216e7bc7efd8f8288db81445",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -3293,7 +3293,7 @@
     {
       "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
       "block": "B4",
-      "status": "DIAGNOSED_R16_03_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R16_03_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/core/config.js",
@@ -3304,9 +3304,11 @@
       "source": "B4_003_EXACT_PREVIEW_MACHINE_PROOF_RUN_37213597161",
       "finding": "Pre-auth eager catalog hydration causes an unexpected 401 before authenticated catalog consumption.",
       "rootCause": "Two eager catalog hydration calls execute before authenticated session: config.js setTimeout(api.ensure) and ciclo.js module-load Promise(Orbit.cat.ensure). Catalog consumers already await canonical ensure after authentication.",
-      "nextAction": "B4_003_R16_03_REMOVE_PREAUTH_CATALOG_HYDRATION",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_DIAGNOSTIC_20261004.json",
-      "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c"
+      "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c",
+      "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_SOURCE_FIX_20261004.json",
+      "sourceFixReceiptBlobSha": "46ab8e219ab93e7251036720ce6435cc3d0b50c5"
     }
   ],
   "attentionIds": [
@@ -3541,6 +3543,12 @@
     "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
     "status": "DIAGNOSED_R16_03_SOURCE_FIX_AUTHORIZED",
     "diagnosticReceiptBlobSha": "12064b490e023d1487c5a29f23f088dc7ce0848c",
+    "exactSetWithLedger": true
+  },
+  "lastR16CatalogPreauthSourceFix": {
+    "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
+    "status": "SOURCE_FIXED_R16_03_PENDING_EXACT_PREVIEW",
+    "receiptBlobSha": "46ab8e219ab93e7251036720ce6435cc3d0b50c5",
     "exactSetWithLedger": true
   }
 }
