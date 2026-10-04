@@ -1,0 +1,700 @@
+                  <button onClick="{{ empSitPrimary }}" data-analytics-action="{{ empSitPrimaryAction }}" style="min-height:48px;padding:0 20px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">{{ empSitPrimaryLabel }}</button>
+                  <button onClick="{{ empSitSecondary }}" data-analytics-action="{{ empSitSecondaryAction }}" style="min-height:48px;padding:0 18px;border-radius:12px;background:#fff;border:1px solid #E2DACF;color:#12110F;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;">{{ empSitSecondaryLabel }}</button>
+                </div>
+                <p class="vl-emp-rail vl-functional-copy" style="font-size:11px;line-height:1.5;color:#6E655C;margin:12px 0 0;max-width:92ch;">Elegir una situación ordena el recorrido y el énfasis de la explicación. No confirma cobertura, no determina elegibilidad, no selecciona producto ni sustituye la revisión de un asesor; todos los puntos del mapa siguen disponibles.</p>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- T3B · CO · la cadena como programa conectado (Origen → cumplimiento). No sustituye la propuesta corporativa amplia. -->
+      <sc-if value="{{ empChainShow }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#141216;color:#F4F1EA;border-top:1px solid #2a2833;">
+          <div style="max-width:1600px;margin:0 auto;padding:clamp(30px,4vh,52px) clamp(20px,3vw,44px);">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+              <div style="min-width:0;max-width:60ch;">
+                <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">TRANSPORTE, LOGÍSTICA Y CADENA</div>
+                <h2 style="font-family:'Archivo';font-weight:800;font-size:clamp(22px,2.4vw,34px);letter-spacing:-.024em;line-height:1.05;margin:10px 0 0;">Un despacho pasa por varias manos: conviene revisar el recorrido completo.</h2>
+              </div>
+              <p style="font-size:12.5px;line-height:1.6;color:#A9A29A;margin:0;max-width:44ch;">{{ empChainNote }}</p>
+            </div>
+            <div class="vl-co-chainrail" style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:22px;">
+              <sc-for list="{{ empChain }}" as="c" hint-placeholder-count="5">
+                <div style="min-width:0;background:#1C1A21;border:1px solid #2a2833;border-radius:16px;padding:14px 15px;display:flex;flex-direction:column;gap:6px;">
+                  <span style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#FF9DA8;">{{ c.n }}</span>
+                  <span style="font-family:'Archivo';font-weight:750;font-size:15px;line-height:1.15;color:#fff;">{{ c.t }}</span>
+                  <span style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.08em;color:#FF7C8C;">{{ c.k }}</span>
+                  <span style="font-size:12.5px;line-height:1.5;color:#CFC9BE;">{{ c.d }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- MAPA DE LA OPERACIÓN · engine sectorial preservado, ahora protagonista -->
+      <div id="vl-emp-mapa" style="background:#F4F1EA;color:#12110F;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(42px,6vh,84px) clamp(20px,3vw,44px);">
+          <div class="vl-mapa-head" style="display:flex;align-items:flex-end;justify-content:space-between;gap:22px;flex-wrap:wrap;margin:0 0 22px;">
+            <div style="max-width:62ch;">
+              <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#C4001F;">MAPA DE LA OPERACIÓN</div>
+              <h2 style="font-family:'Archivo';font-weight:800;font-size:clamp(26px,3.2vw,44px);letter-spacing:-.027em;line-height:1.03;margin:10px 0 8px;">{{ empMapTitle }}</h2>
+              <p style="font-size:15.5px;line-height:1.6;color:#454039;margin:0;">Elige el tipo de operación más parecido al tuyo, recorre los puntos donde el riesgo se concentra y revisa qué conviene comparar antes de decidir.</p>
+            </div>
+            <div class="vl-mapa-tabs" role="group" aria-label="Tipo de operación" style="display:flex;gap:8px;flex-wrap:wrap;">
+              <sc-for list="{{ sectorTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.pick }}" aria-pressed="{{ t.active }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+            </div>
+          </div>
+          <sc-if value="{{ empMapNoteShow }}" hint-placeholder-val="{{ false }}">
+            <p class="vl-mapa-note" style="font-size:12.5px;line-height:1.55;color:#6E655C;margin:0 0 18px;max-width:84ch;">{{ empMapNote }}</p>
+          </sc-if>
+
+          <sc-if value="{{ roleShow }}" hint-placeholder-val="{{ false }}">
+            <div class="vl-mapa-role" style="border-bottom:1px solid #E7E2D6;padding:0 0 16px;margin:0 0 18px;">
+              <div class="vl-role-head">
+                <div class="vl-role-step" aria-hidden="true"><span>01</span></div>
+                <div class="vl-role-copy">
+                  <div class="vl-role-kicker">DEFINE TU PUNTO DE ENTRADA</div>
+                  <h3>¿Dónde participas en la cadena?</h3>
+                  <p>Selecciona el rol que más se parece a tu operación. Organizamos el recorrido desde ese punto, sin ocultar los demás.</p>
+                </div>
+                <sc-if value="{{ roleAny }}" hint-placeholder-val="{{ false }}">
+                  <button class="vl-role-clear" onClick="{{ roleClear }}">Ver recorrido completo</button>
+                </sc-if>
+              </div>
+              <div class="vl-mapa-rolechips" role="group" aria-label="Participación en la cadena">
+                <sc-for list="{{ roleChips }}" as="r" hint-placeholder-count="5"><button class="vl-role-chip" onClick="{{ r.pick }}" aria-pressed="{{ r.active }}" style="{{ r.style }}"><span class="vl-role-chip-n">{{ r.n }}</span><span class="vl-role-chip-label">{{ r.label }}</span><span class="vl-role-chip-arrow" aria-hidden="true">→</span></button></sc-for>
+              </div>
+              <sc-if value="{{ roleAny }}" hint-placeholder-val="{{ false }}">
+                <div class="vl-role-cue" aria-live="polite"><span>RECORRIDO PRIORIZADO</span><strong>{{ roleStartCue }}</strong></div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <div class="vl-mapa-work" style="min-width:0;">
+          <div class="vl-sec-stage vl-emp-m03" style="min-height:0;">
+            <span class="vl-m03-kick" style="position:absolute;left:20px;top:16px;z-index:6;font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.13em;color:#FF9DA8;">{{ sectorKicker }}</span>
+            <span class="vl-m03-instr" style="position:absolute;right:20px;top:16px;z-index:6;font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.1em;color:#ADA69B;">TOCA UN PUNTO DE LA OPERACIÓN</span>
+            <span class="vl-m03-instr-short" style="position:absolute;right:20px;top:16px;z-index:6;font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.1em;color:#ADA69B;">ELIGE UN PUNTO</span>
+            <div class="vl-sec-scene">
+              <svg viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" style="position:absolute;inset:0;width:100%;height:100%;" aria-label="Escena isométrica de la operación seleccionada" role="img">
+                <ellipse cx="500" cy="392" rx="336" ry="54" fill="#12000A" opacity=".5"></ellipse>
+                <path d="{{ sectorGround }}" fill="#171420" stroke="rgba(216,169,78,.34)" stroke-width="1.4"></path>
+                <sc-for list="{{ sectorGrid }}" as="g" hint-placeholder-count="10"><path d="{{ g.d }}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="1"></path></sc-for>
+                <sc-for list="{{ sectorShapes }}" as="sh" hint-placeholder-count="12"><path d="{{ sh.d }}" fill="{{ sh.f }}"></path></sc-for>
+              </svg>
+              <sc-for list="{{ sectorSpots }}" as="p" hint-placeholder-count="4">
+                <button onClick="{{ p.pick }}" aria-pressed="{{ p.active }}" aria-label="{{ p.label }}" class="vl-sec-spot" style="{{ p.pos }}"><span class="vl-sec-lab">{{ p.label }}</span><span aria-hidden="true" class="vl-sec-dot"></span></button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div class="vl-sec-mob" style="margin-top:12px;"><sc-for list="{{ sectorSpotList }}" as="l" hint-placeholder-count="4"><button onClick="{{ l.pick }}" aria-pressed="{{ l.active }}" style="{{ l.style }}">{{ l.label }}</button></sc-for></div>
+
+          <div aria-live="polite" class="vl-split" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;align-items:start;">
+            <div style="background:#fff;border:1px solid #E7E2D6;border-radius:20px;padding:clamp(20px,2.3vw,30px);min-width:0;box-shadow:0 26px 60px -46px rgba(30,10,0,.5);">
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                <div class="vl-emp-spotkick" style="font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.12em;color:#C4001F;">PUNTO DE EXPOSICIÓN</div>
+              </div>
+              <h3 class="vl-emp-spottitle" style="font-family:'Archivo';font-weight:800;font-size:clamp(21px,2.1vw,29px);letter-spacing:-.02em;margin:8px 0 0;">{{ spotTitle }}</h3>
+              <div class="vl-insp-blk vl-insp-blk--first" style="margin-top:18px;border-top:2px solid #E4002B;padding-top:12px;">
+                <div class="vl-insp-lab" style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">EXPOSICIÓN</div>
+                <p class="vl-insp-body" style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:15.5px;line-height:1.62;color:#3C382F;margin:6px 0 0;">{{ spotDesc }}</p>
+              </div>
+              <sc-if value="{{ spotEscShow }}" hint-placeholder-val="{{ true }}">
+              <div class="vl-insp-blk" style="margin-top:14px;border-top:1px solid #E7E2D6;padding-top:12px;">
+                <div class="vl-insp-lab" style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">ESCENARIO</div>
+                <p class="vl-insp-body" style="font-size:14px;line-height:1.6;color:#454039;margin:6px 0 0;">{{ spotEsc }}</p>
+              </div>
+              </sc-if>
+              <div class="vl-insp-blk" style="margin-top:14px;border-top:1px solid #E7E2D6;padding-top:12px;">
+                <div class="vl-insp-lab" style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">IMPACTO</div>
+                <p class="vl-insp-body" style="font-size:14px;line-height:1.6;color:#454039;margin:6px 0 0;">{{ spotImp }}</p>
+              </div>
+              <div class="vl-insp-blk" style="margin-top:14px;border-top:1px solid #E7E2D6;padding-top:12px;">
+                <div class="vl-insp-lab" style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">POR QUÉ IMPORTA</div>
+                <p class="vl-insp-body" style="font-size:14px;line-height:1.6;color:#454039;margin:6px 0 0;">{{ spotWhy }}</p>
+              </div>
+            </div>
+            <div class="vl-egt-ws" style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+              <div class="vl-egt-paper" style="background:#fff;border:1px solid #E7E2D6;border-radius:20px;padding:clamp(20px,2.3vw,30px);">
+                <div class="vl-egt-step vl-egt-step--01">
+                  <div class="vl-egt-h" style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;"><span class="vl-egt-n vl-step-n">{{ wsN1 }}</span><span class="vl-step-label">Qué revisar</span></div>
+                  <div class="vl-egt-revwrap" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;"><sc-for list="{{ spotRev }}" as="v" hint-placeholder-count="4"><span style="font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:9px;background:#F8F4ED;border:1px solid #E7E2D6;color:#12110F;">{{ v.t }}</span></sc-for></div>
+                </div>
+                <div class="vl-egt-b vl-egt-step vl-egt-step--02" style="margin-top:18px;padding-top:16px;border-top:1px solid #E7E2D6;">
+                  <div class="vl-egt-h" style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;"><span class="vl-egt-n vl-step-n">{{ wsN2 }}</span><span class="vl-step-label">{{ wsLab2 }}</span></div>
+                  <sc-if value="{{ spotSpecialtyShow }}" hint-placeholder-val="{{ false }}"><p style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:12.5px;line-height:1.55;color:#5B544B;background:#F8F4ED;border:1px solid #E7E2D6;border-radius:12px;padding:11px 12px;margin:10px 0 0;">{{ spotSpecialtyNote }}</p></sc-if><div class="vl-egt-prodwrap s45-product-grid"><sc-for list="{{ spotProducts }}" as="r" hint-placeholder-count="3"><div class="vl-egt-prod s45-product-card {{ r.tone }}"><span class="s45-product-icon" aria-hidden="true">{{ r.icon }}</span><div><div class="s45-product-name">{{ r.name }}</div><div class="s45-product-desc">{{ r.desc }}</div></div></div></sc-for></div>
+                  <p class="vl-functional-copy" style="font-size:11px;line-height:1.5;color:#6E655C;margin:10px 0 0;">Orientación general: mencionar un producto no confirma cobertura, elegibilidad ni disponibilidad. La propuesta validada y las condiciones de la aseguradora prevalecen.</p>
+                </div>
+                <div class="vl-egt-b vl-egt-step vl-egt-step--03" style="margin-top:18px;padding-top:16px;border-top:1px solid #E7E2D6;">
+                  <div class="vl-egt-h" style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;"><span class="vl-egt-n vl-step-n">{{ wsN3 }}</span><span class="vl-step-label">Qué comparar</span></div>
+                  <sc-if value="{{ empCompChips }}" hint-placeholder-val="{{ true }}">
+                  <div class="vl-egt-comp" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;"><sc-for list="{{ spotComp }}" as="c" hint-placeholder-count="4"><span style="font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:9px;background:#fff;border:1px solid #E2DACF;color:#454039;">{{ c.t }}</span></sc-for></div>
+                  <p class="vl-egt-compnote vl-functional-copy" style="font-size:11px;line-height:1.5;color:#6E655C;margin:10px 0 0;">Cuando una alternativa no informa un dato, se muestra como dato no informado: no equivale a “no cubre”.</p>
+                  </sc-if>
+                  <sc-if value="{{ empCompMock }}" hint-placeholder-val="{{ false }}">
+                    <div class="vl-co-compmock" style="margin-top:12px;border:1px solid #CFC4B6;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 28px 58px -38px rgba(30,10,0,.52);">
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 14px;background:#171318;border-bottom:1px solid #2E2730;">
+                        <span style="display:flex;align-items:center;gap:9px;"><span aria-hidden="true" style="display:flex;gap:5px;"><i style="display:block;width:8px;height:8px;border-radius:50%;background:#E4002B;"></i><i style="display:block;width:8px;height:8px;border-radius:50%;background:#6F6671;"></i><i style="display:block;width:8px;height:8px;border-radius:50%;background:#6F6671;"></i></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.11em;color:#F4F1EA;">VISTA DE COMPARACIÓN</span></span>
+                        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#FF9DA8;">EJEMPLO SIMULADO · COLOMBIA</span>
+                      </div>
+                      <div class="vl-comp-row vl-comp-head" style="display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr);gap:0;padding:10px 14px;background:#EDE6DB;border-bottom:1px solid #CFC4B6;">
+                        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#514A43;">CRITERIO</span>
+                        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#514A43;">ALTERNATIVA A</span>
+                        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#514A43;">ALTERNATIVA B</span>
+                      </div>
+                      <sc-for list="{{ spotComp }}" as="c" hint-placeholder-count="4">
+                        <div class="vl-comp-row vl-comp-data" style="display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr);gap:0;padding:12px 14px;border-bottom:1px solid #E5DDD2;align-items:center;">
+                          <span style="font-size:12.5px;font-weight:700;line-height:1.35;color:#12110F;padding-right:12px;">{{ c.t }}</span>
+                          <span class="vl-comp-val vl-comp-val-a">{{ c.a }}</span>
+                          <span class="vl-comp-val vl-comp-val-b">{{ c.b }}</span>
+                        </div>
+                      </sc-for>
+                      <p class="vl-functional-copy" style="font-size:10.5px;line-height:1.55;color:#5B544B;margin:0;padding:12px 14px 14px;background:#FBF8F2;">Datos únicamente ilustrativos para mostrar cómo se leería una comparación en Colombia. La comparación real se completa solo con propuestas válidas; un dato ausente se muestra como dato no informado y nunca equivale a “no cubre”.</p>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+              <div class="vl-egt-act" style="background:#0E0D10;color:#F4F1EA;border-radius:20px;padding:clamp(20px,2.3vw,28px);">
+                <div class="vl-egt-h" style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#FF9DA8;"><span class="vl-egt-n vl-step-n">{{ wsN4 }}</span><span class="vl-step-label">Siguiente acción</span></div>
+                <div style="font-family:'Archivo';font-weight:800;font-size:19px;letter-spacing:-.015em;margin:8px 0 6px;">{{ spotNextTitle }}</div>
+                <p style="font-size:13.5px;line-height:1.6;color:#CFC9BE;margin:0 0 16px;">{{ spotNextDesc }}</p>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                  <sc-if value="{{ spotElig }}" hint-placeholder-val="{{ true }}"><button onClick="{{ spotGoOnline }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Continuar en línea</button></sc-if>
+                  <button onClick="{{ spotGoAsesor }}" style="min-height:48px;padding:0 20px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.26);color:#fff;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;">Continuar con acompañamiento</button>
+                </div>
+                <p class="vl-functional-copy" style="font-size:11px;line-height:1.5;color:#A9A29A;margin:14px 0 0;">Continuamos con el país, la operación y el punto que ya elegiste; no necesitas repetir el contexto.</p>
+                
+              </div>
+            </div>
+          </div>
+          </div>
+
+          <sc-if value="{{ empContShow }}" hint-placeholder-val="{{ false }}">
+            <div class="vl-emp-cont" style="margin-top:22px;background:#0E0D10;color:#F4F1EA;border-radius:26px;padding:clamp(22px,2.6vw,40px);display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:clamp(22px,2.8vw,44px);align-items:center;box-shadow:0 44px 96px -62px rgba(0,0,0,.9);">
+              <div style="min-width:0;">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:#FF9DA8;">CONTINUIDAD DEL RECORRIDO</div>
+                <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(21px,2.2vw,31px);letter-spacing:-.022em;line-height:1.07;margin:10px 0 8px;">Continúa con el contexto que ya elegiste.</h3>
+                <p style="font-size:13.5px;line-height:1.6;color:#CFC9BE;margin:0 0 18px;max-width:60ch;">Conservamos el país, el tipo de operación y el punto de exposición para seguir en línea o con un asesor.</p>
+                <div style="background:#141216;border:1px solid #2a2833;border-radius:16px;overflow:hidden;">
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#1C1A21;border-bottom:1px solid #2a2833;">
+                    <span aria-hidden="true" style="display:flex;gap:5px;"><i style="display:block;width:8px;height:8px;border-radius:50%;background:#3a3542;"></i><i style="display:block;width:8px;height:8px;border-radius:50%;background:#3a3542;"></i><i style="display:block;width:8px;height:8px;border-radius:50%;background:#3a3542;"></i></span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.11em;color:#A9A29A;white-space:nowrap;">TU RECORRIDO</span>
+                  </div>
+                  <div style="padding:14px 14px 16px;">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#8B8279;">LO QUE YA ELEGISTE</div>
+                    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;">
+                      <span style="font-size:12px;font-weight:650;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid #34313d;color:#EDE9E0;">{{ countryName }}</span>
+                      <span style="font-size:12px;font-weight:650;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid #34313d;color:#EDE9E0;">{{ empContSector }}</span>
+                      <span style="font-size:12px;font-weight:650;padding:6px 11px;border-radius:999px;background:rgba(228,0,43,.16);border:1px solid rgba(228,0,43,.5);color:#fff;">{{ spotTitle }}</span>
+                    </div>
+                    <div style="display:grid;gap:12px;margin-top:14px;border-top:1px solid #2a2833;padding-top:14px;">
+                      <sc-if value="{{ spotElig }}" hint-placeholder-val="{{ true }}">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                          <span style="min-width:0;max-width:44ch;"><span style="display:block;font-family:'Archivo';font-weight:750;font-size:14px;color:#fff;">Continuar en línea</span><span class="vl-functional-mobile" style="display:block;font-size:12px;line-height:1.5;color:#A9A29A;margin-top:2px;">Cuando el caso es elegible, entra al recorrido guiado de cotización y comparación.</span></span>
+                          <button onClick="{{ goCotComp }}" style="min-height:46px;padding:0 18px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:13.5px;cursor:pointer;">Cotizar y comparar →</button>
+                        </div>
+                      </sc-if>
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                        <span style="min-width:0;max-width:44ch;"><span style="display:block;font-family:'Archivo';font-weight:750;font-size:14px;color:#fff;">Continuar con un asesor</span><span class="vl-functional-mobile" style="display:block;font-size:12px;line-height:1.5;color:#A9A29A;margin-top:2px;">Lo que requiere criterio se revisa antes de pedir propuestas.</span></span>
+                        <button onClick="{{ openHandoff }}" style="min-height:46px;padding:0 18px;border-radius:12px;background:transparent;border:1.5px solid rgba(255,255,255,.34);color:#fff;font-family:inherit;font-weight:650;font-size:13.5px;cursor:pointer;">Hablar con un asesor →</button>
+                      </div>
+                    </div>
+                    <p class="vl-functional-copy" style="font-size:10.5px;line-height:1.5;color:#8B8279;margin:14px 0 0;">Vista ilustrativa del recorrido. La emisión, el pago y la gestión en portal no forman parte de esta etapa.</p>
+                  </div>
+                </div>
+              </div>
+              <figure style="margin:0;min-width:0;border-radius:22px;overflow:hidden;border:1px solid #2a2833;">
+                <img src="assets/library_real/ECO_C03_CONTINUIDAD_EQUIPO_REAL_v1.png" alt="{{ empContHumanAlt }}" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:52% 50%;">
+              </figure>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ empCloseClassic }}" hint-placeholder-val="{{ true }}">
+          <div class="vl-2 vl-emp-close" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
+            <div class="vl-emp-close-a" style="background:#fff;border:1px solid #E7E2D6;border-radius:18px;padding:24px;"><div style="font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.1em;color:#2C5A3A;">CUANDO SE PUEDE EN LÍNEA</div><div style="font-family:'Archivo';font-weight:700;font-size:19px;margin:8px 0 6px;">Cotiza y compara ahora</div><p style="font-size:13px;line-height:1.55;color:#454039;margin:0 0 14px;">Cuando el caso es elegible, la necesidad entra al recorrido guiado de cotización y comparación.</p><button onClick="{{ goCotComp }}" style="min-height:46px;padding:0 20px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Ir a cotizar y comparar →</button></div>
+            <div class="vl-emp-close-b" style="background:#0E0D10;color:#F4F1EA;border-radius:18px;padding:24px;"><div style="font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.1em;color:#c3aee6;">CUANDO REQUIERE CRITERIO</div><div style="font-family:'Archivo';font-weight:700;font-size:19px;margin:8px 0 6px;">Con acompañamiento de un asesor</div><p style="font-size:13px;line-height:1.55;color:#CFC9BE;margin:0 0 14px;">Los riesgos que necesitan análisis se revisan antes de pedir propuestas; tu contexto se conserva.</p><button onClick="{{ openHandoff }}" style="min-height:46px;padding:0 20px;border-radius:12px;background:#fff;border:none;color:#12110F;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Hablar con un asesor →</button></div>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+
+    </section>
+  </sc-if>
+
+  <!-- ============================ PERSONAS ============================ -->
+  <sc-if value="{{ isPersonas }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen" data-screen-label="Personas y familias">
+
+      <!-- HERO · composición tipográfica, sin fotografía -->
+      <div style="position:relative;background:#0E0D10;color:#F4F1EA;overflow:hidden;">
+        <div aria-hidden="true" style="position:absolute;inset:0;z-index:0;background:radial-gradient(920px 560px at 86% 4%,rgba(228,0,43,.15),transparent 62%);"></div>
+        <div class="vl-hero-grid" style="position:relative;z-index:1;max-width:1600px;margin:0 auto;padding:clamp(44px,7vh,98px) clamp(20px,3vw,44px);display:grid;grid-template-columns:1.06fr 1fr;gap:clamp(24px,3.2vw,52px);align-items:center;">
+          <div style="min-width:0;">
+            <div style="font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.14em;color:#FF7C8C;display:flex;align-items:center;gap:10px;"><span style="width:30px;height:2px;background:#E4002B;"></span>{{ pEyebrow }}</div>
+            <h1 style="font-family:'Archivo';font-weight:900;font-size:clamp(34px,4.4vw,68px);line-height:.95;letter-spacing:-.035em;margin:18px 0 0;max-width:18ch;">{{ pH1 }}</h1>
+            <p style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:clamp(17px,1.55vw,22px);line-height:1.45;color:#D7D1C4;margin:18px 0 0;max-width:56ch;">{{ pBody }}</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;">
+              <button onClick="{{ pScroll }}" style="min-height:52px;padding:0 24px;border-radius:13px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;">Explorar mi protección</button>
+              <button onClick="{{ pSecondaryGo }}" style="min-height:52px;padding:0 24px;border-radius:13px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.24);color:#fff;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;">{{ pSecondaryLabel }}</button>
+            </div>
+            <p class="vl-personas-readable" style="font-size:12px;line-height:1.55;color:#A9A29A;margin:24px 0 0;max-width:62ch;border-top:1px solid #2a2833;padding-top:14px;">{{ pTruth }}</p>
+          </div>
+          <div class="vl-personas-journey" aria-label="Equipo A&amp;S acompañando decisiones de protección personal y familiar">
+            <img class="vl-personas-team-hero" src="assets/owner_approved/PERSONAS_FAMILIAS_TEAM_PPS_COMPOSITE_APPROVED_20260926.png" alt="Composición visual aprobada de Paula, Priscila y Samuel para Personas y Familias" loading="eager" decoding="async">
+          </div>
+        </div>
+      </div>
+
+      <!-- MAPA DE EXPOSICIÓN PERSONAL Y FAMILIAR -->
+      <div id="vl-per-mapa" style="background:#F4F1EA;color:#12110F;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(42px,6vh,84px) clamp(20px,3vw,44px);">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:22px;flex-wrap:wrap;margin:0 0 20px;">
+            <div style="max-width:62ch;">
+              <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#C4001F;">MAPA DE EXPOSICIÓN PERSONAL Y FAMILIAR</div>
+              <h2 style="font-family:'Archivo';font-weight:800;font-size:clamp(26px,3.2vw,44px);letter-spacing:-.027em;line-height:1.03;margin:10px 0 8px;">{{ pMapTitle }}</h2>
+              <p style="font-size:15.5px;line-height:1.6;color:#454039;margin:0;">Elige el momento de vida más parecido al tuyo y recorre los cuatro puntos del mapa. El momento cambia el contexto de la lectura; los cuatro ámbitos siguen disponibles y ninguno se presenta como recomendación universal.</p>
+            </div>
+            <div role="group" aria-label="Momento de vida" style="display:flex;gap:8px;flex-wrap:wrap;">
+              <sc-for list="{{ pStageTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.pick }}" aria-pressed="{{ t.active }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+            </div>
+          </div>
+
+          <div aria-live="polite" style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid #E7E2D6;border-radius:16px;padding:16px 20px;margin:0 0 18px;">
+            <span style="font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.12em;color:#C4001F;padding-top:3px;">{{ pStageKicker }}</span>
+            <span style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:15.5px;line-height:1.6;color:#12110F;max-width:80ch;">{{ pStageNote }}</span>
+          </div>
+
+          <div class="vl-sec-stage" style="min-height:0;">
+            <span style="position:absolute;left:20px;top:16px;z-index:6;font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.13em;color:#FF9DA8;">MOVILIDAD · HOGAR · SALUD · VIDA E INGRESO</span>
+            <span style="position:absolute;right:20px;top:16px;z-index:6;font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.1em;color:#ADA69B;">TOCA UN PUNTO DEL MAPA</span>
+            <div class="vl-sec-scene">
+              <svg viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" style="position:absolute;inset:0;width:100%;height:100%;" aria-label="Escena isométrica con vehículo, vivienda, símbolo de salud y espacio de trabajo" role="img">
+                <ellipse cx="500" cy="392" rx="336" ry="54" fill="#12000A" opacity=".5"></ellipse>
+                <path d="{{ pGround }}" fill="#171420" stroke="rgba(216,169,78,.34)" stroke-width="1.4"></path>
+                <sc-for list="{{ pGrid }}" as="g" hint-placeholder-count="10"><path d="{{ g.d }}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="1"></path></sc-for>
+                <sc-for list="{{ pShapes }}" as="sh" hint-placeholder-count="14"><path d="{{ sh.d }}" fill="{{ sh.f }}"></path></sc-for>
+              </svg>
+              <sc-for list="{{ pSpots }}" as="p" hint-placeholder-count="4">
+                <button onClick="{{ p.pick }}" aria-pressed="{{ p.active }}" aria-label="{{ p.label }}" class="vl-sec-spot" style="{{ p.pos }}"><span class="vl-sec-lab">{{ p.label }}</span><span aria-hidden="true" class="vl-sec-dot"></span></button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div class="vl-sec-mob" style="margin-top:12px;"><sc-for list="{{ pSpotList }}" as="l" hint-placeholder-count="4"><button onClick="{{ l.pick }}" aria-pressed="{{ l.active }}" style="{{ l.style }}">{{ l.label }}</button></sc-for></div>
+
+          <div aria-live="polite" class="vl-split" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;align-items:start;">
+            <div class="s45-persona-card s45-persona-card--insight" style="background:#fff;border:1px solid #E7E2D6;border-radius:20px;padding:clamp(20px,2.3vw,30px);min-width:0;box-shadow:0 26px 60px -46px rgba(30,10,0,.5);">
+              <div class="s45-domain-head"><span class="s45-domain-orb" aria-hidden="true">{{ pDomIcon }}</span><div><div style="font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.12em;color:#C4001F;">QUÉ PROTEGES</div><h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(21px,2.1vw,29px);letter-spacing:-.02em;margin:6px 0 0;">{{ pDomTitle }}</h3></div></div>
+              <p style="font-size:14.5px;line-height:1.55;color:#454039;margin:8px 0 0;">{{ pDomShort }}</p>
+              <div style="margin-top:18px;border-top:2px solid #E4002B;padding-top:12px;">
+                <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">QUÉ PUEDE AFECTARLO</div>
+                <p style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:15.5px;line-height:1.62;color:#3C382F;margin:6px 0 0;">{{ pDomDesc }}</p>
+              </div>
+              <div style="margin-top:14px;border-top:1px solid #E7E2D6;padding-top:12px;">
+                <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">QUÉ CONVIENE REVISAR</div>
+                <div style="display:flex;flex-direction:column;gap:9px;margin-top:8px;">
+                  <sc-for list="{{ pDomChecks }}" as="c" hint-placeholder-count="3"><div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55;color:#454039;"><span aria-hidden="true" style="width:7px;height:7px;border-radius:50%;background:#E4002B;flex:none;margin-top:7px;"></span>{{ c }}</div></sc-for>
+                </div>
+              </div>
+              <div style="margin-top:14px;border-top:1px solid #E7E2D6;padding-top:12px;">
+                <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">POR QUÉ IMPORTA</div>
+                <p style="font-size:14px;line-height:1.6;color:#454039;margin:6px 0 0;">{{ pDomWhy }}</p>
+              </div>
+              <div style="margin-top:14px;border-top:1px solid #E7E2D6;padding-top:12px;">
+                <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">EN TU MOMENTO ACTUAL</div>
+                <p style="font-size:14px;line-height:1.6;color:#454039;margin:6px 0 0;">{{ pDomStageNote }}</p>
+                <p style="font-size:11px;line-height:1.5;color:#6E655C;margin:8px 0 0;">Contexto del momento que elegiste; no es un orden de prioridad ni una recomendación igual para todas las personas.</p>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+              <div class="s45-persona-card s45-persona-card--products" style="background:#fff;border:1px solid #E7E2D6;border-radius:20px;padding:clamp(20px,2.3vw,30px);">
+                <div class="s45-products-title"><span aria-hidden="true">✨</span><div><div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">PRODUCTO O COBERTURA A REVISAR</div><b>Entiende para qué sirve cada opción</b></div></div>
+                <div class="s45-product-grid"><sc-for list="{{ pProductCards }}" as="r" hint-placeholder-count="3"><div class="s45-product-card {{ r.tone }}"><span class="s45-product-icon" aria-hidden="true">{{ r.icon }}</span><div><div class="s45-product-name">{{ r.name }}</div><div class="s45-product-desc">{{ r.desc }}</div></div></div></sc-for></div>
+                <div style="margin-top:18px;padding-top:16px;border-top:1px solid #E7E2D6;">
+                  <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">QUÉ COMPARAR</div>
+                  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;"><sc-for list="{{ pDomComp }}" as="c" hint-placeholder-count="4"><span style="font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:9px;background:#fff;border:1px solid #E2DACF;color:#454039;">{{ c.t }}</span></sc-for></div>
+                </div>
+                <div style="margin-top:18px;padding-top:16px;border-top:1px solid #E7E2D6;">
+                  <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">QUÉ NO PUEDE ASUMIRSE</div>
+                  <p style="font-size:13.5px;line-height:1.55;color:#454039;margin:8px 0 0;">{{ pDomNoAssume }}</p>
+                  <p style="font-size:11px;line-height:1.5;color:#6E655C;margin:8px 0 0;">La cobertura, la elegibilidad y las condiciones dependen de la alternativa validada y de la aseguradora.</p>
+                </div>
+              </div>
+              <div style="background:#0E0D10;color:#F4F1EA;border-radius:20px;padding:clamp(20px,2.3vw,28px);">
+                <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#FF9DA8;">SIGUIENTE ACCIÓN</div>
+                <div style="font-family:'Archivo';font-weight:800;font-size:19px;letter-spacing:-.015em;margin:8px 0 6px;">{{ pNextTitle }}</div>
+                <p style="font-size:13.5px;line-height:1.6;color:#CFC9BE;margin:0 0 16px;">{{ pNextDesc }}</p>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                  <sc-if value="{{ pDomElig }}" hint-placeholder-val="{{ true }}"><button onClick="{{ pGoCot }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Cotizar o comparar</button></sc-if>
+                  <button onClick="{{ pGoAsesor }}" style="min-height:48px;padding:0 20px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.26);color:#fff;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;">Hablar con un asesor</button>
+                </div>
+                <p style="font-size:11px;line-height:1.5;color:#A9A29A;margin:14px 0 0;">Continuamos con el país, el momento y el ámbito que ya elegiste; no necesitas repetir el contexto.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- SALIDAS DE SERVICIO Y ACOMPAÑAMIENTO -->
+          <div class="vl-split" style="display:grid;grid-template-columns:1.4fr .6fr;gap:16px;margin-top:20px;align-items:stretch;">
+            <div style="background:#fff;border:1px solid #E7E2D6;border-radius:18px;padding:clamp(20px,2.2vw,26px);">
+              <div style="font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.12em;color:#C4001F;">{{ pExitsKicker }}</div>
+              <p style="font-size:13.5px;line-height:1.55;color:#454039;margin:8px 0 0;max-width:80ch;">{{ pExitsNote }}</p>
+              <div class="vl-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
+                <sc-for list="{{ pExits }}" as="e" hint-placeholder-count="4">
+                  <button onClick="{{ e.go }}" style="text-align:left;cursor:pointer;font-family:inherit;min-height:64px;background:#F8F4ED;border:1px solid #E7E2D6;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;">
+                    <span style="font-family:'Archivo';font-weight:750;font-size:14.5px;color:#12110F;">{{ e.t }}</span>
+                    <span style="font-size:12.5px;line-height:1.45;color:#454039;">{{ e.d }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#0E0D10;color:#F4F1EA;border-radius:18px;padding:clamp(18px,2vw,24px);display:flex;flex-direction:column;justify-content:center;gap:14px;">
+              <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#FF9DA8;">ACOMPAÑAMIENTO HUMANO</div>
+              <div style="font-family:'Archivo';font-weight:800;font-size:clamp(20px,2vw,27px);line-height:1.08;letter-spacing:-.02em;">Tu contexto no se reinicia al pasar a un asesor.</div>
+              <p style="font-size:13.5px;line-height:1.6;color:#CFC9BE;margin:0;">Cuando el caso necesita criterio, el equipo A&amp;S continúa desde el país, momento y ámbito que ya elegiste antes de pedir propuestas.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+  </sc-if>
+
+  <!-- ============================ COTCOMP · F7-S4.4 ============================ -->
+  <sc-if value="{{ isCotComp }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen s42-screen" data-screen-label="Cotizar y comparar" style="background:#F4F1EA;min-height:80vh;">
+      <div class="s42-wrap">
+        <div class="s42-kicker"><span class="s42-kicker-line"></span><span class="s42-kicker-label">COTIZAR Y COMPARAR</span><span class="s42-kicker-dot">·</span><span class="s42-kicker-country">{{ countryName }}</span></div>
+        <div class="s42-hero">
+          <div>
+            <h1>Empecemos por lo que quieres proteger.</h1>
+            <p>Te hacemos solo las preguntas que realmente cambian tus opciones. No necesitas saber el nombre técnico de una póliza para empezar.</p>
+          </div>
+          <div class="s42-engine-card">
+            <div class="s42-engine-top"><span class="s42-live-dot"></span><span>CÓMO PUEDE CONTINUAR</span></div>
+            <strong>{{ cotEligibilityLabel }}</strong>
+            <p>{{ cotEligibilityDesc }}</p>
+            <div class="s42-engine-meta"><span>{{ cotCountryContext }}</span><span>{{ cotSelectedLabel }}</span></div>
+          </div>
+        </div>
+
+        <div class="s42-shell" style="{{ cotStageStyle }}">
+          <aside class="s42-rail">
+            <div class="s42-rail-title">TU RECORRIDO</div>
+            <sc-for list="{{ cotRail }}" as="r" hint-placeholder-count="4">
+              <button type="button" onClick="{{ r.go }}" class="{{ r.cls }}" disabled="{{ r.disabled }}"><span>{{ r.n }}</span><b>{{ r.t }}</b></button>
+            </sc-for>
+            <div class="s42-rail-truth"><b>ANTES DE COMPARAR</b><span>Primero revisamos que las alternativas tengan información suficiente y bases equivalentes.</span></div>
+          </aside>
+
+          <div class="s42-stage">
+            <div class="s42-stage-banner">
+              <div class="s42-stage-number">0{{ cotStageNum }}</div>
+              <div class="s42-stage-copy"><span>{{ cotStageKicker }}</span><h2>{{ cotStageTitle }}</h2><p>{{ cotStageDesc }}</p></div>
+              <div class="s42-stage-context"><span>{{ cotSelectedLabel }}</span><span>{{ cotEligibilityLabel }}</span></div>
+            </div>
+
+            <div class="s42-stage-body">
+              <div class="s42-country-note">{{ cotReviewNotice }}</div>
+
+              <sc-if value="{{ cotShowNeed }}" hint-placeholder-val="{{ true }}">
+                <div class="s42-section-head"><span>01 · PUNTO DE PARTIDA</span><h3>¿Qué quieres proteger o revisar?</h3><p>Tu elección cambia las preguntas que haremos y nos ayuda a mostrarte la forma más clara de continuar.</p></div>
+                <div class="s42-route-grid">
+                  <sc-for list="{{ cotProducts }}" as="p" hint-placeholder-count="9">
+                    <button onClick="{{ p.pick }}" aria-pressed="{{ p.on }}" class="{{ p.style }}">
+                      <span class="s42-route-icon vl-icon3d"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{ p.icon }}"></path></svg></span>
+                      <span><b>{{ p.label }}</b><small>{{ p.desc }}</small></span>
+                    </button>
+                  </sc-for>
+                </div>
+                <div class="s42-resolution-grid s421-public-summary">
+                  <div><span>Elegiste</span><strong>{{ cotSelectedLabel }}</strong></div>
+                  <div><span>Cómo puede continuar</span><strong>{{ cotEligibilityLabel }}</strong></div>
+                  <div><span>Siguiente paso</span><strong>Responder solo lo necesario</strong></div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ cotShowData }}" hint-placeholder-val="{{ false }}">
+                <sc-if value="{{ cotShowReplanNotice }}" hint-placeholder-val="{{ false }}"><div class="s44-replan-notice">{{ cotReplanNotice }}</div></sc-if>
+                <div class="s42-section-head"><span>02 · DATOS DEL CASO</span><h3>{{ cotPublicFormTitle }}</h3><p>{{ cotPublicFormLead }}</p></div>
+                <div class="s42-contract-strip s421-public-summary">
+                  <div><span>País</span><b>{{ countryName }}</b></div>
+                  <div><span>Necesidad</span><b>{{ cotSelectedLabel }}</b></div>
+                  <div><span>Cómo seguimos</span><b>{{ cotEligibilityLabel }}</b></div>
+                </div>
+                <div class="s42-form-groups">
+                  <sc-for list="{{ cotFieldGroups }}" as="g" hint-placeholder-count="3">
+                    <section class="s42-form-group {{ g.cls }}">
+                      <div class="s42-group-head"><span class="s45-group-icon" aria-hidden="true">{{ g.icon }}</span><span class="s45-group-num">{{ g.n }}</span><div><small>{{ g.kicker }}</small><h4>{{ g.title }}</h4><sc-if value="{{ g.priority }}" hint-placeholder-val="false"><p class="s45-group-note">{{ g.note }}</p></sc-if></div></div>
+                      <div class="s42-form-grid">
+                        <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="5"><div class="s42-field">
+                          <label>{{ f.label }}</label>
+                          <sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ true }}"><select value="{{ f.value }}" onChange="{{ f.change }}" aria-label="{{ f.label }}"><sc-for list="{{ f.options }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-if>
+                          <sc-if value="{{ f.isNumber }}" hint-placeholder-val="{{ false }}"><input type="number" value="{{ f.value }}" onInput="{{ f.change }}" inputmode="decimal" aria-label="{{ f.label }}"></sc-if>
+                          <sc-if value="{{ f.isDate }}" hint-placeholder-val="{{ false }}"><input type="date" value="{{ f.value }}" onInput="{{ f.change }}" aria-label="{{ f.label }}"></sc-if>
+                          <sc-if value="{{ f.isText }}" hint-placeholder-val="{{ false }}"><input type="text" value="{{ f.value }}" onInput="{{ f.change }}" aria-label="{{ f.label }}"></sc-if>
+                          <small>{{ f.help }}</small>
+                        </div></sc-for>
+                      </div>
+                    </section>
+                  </sc-for>
+                </div>
+                
+              </sc-if>
+
+              <sc-if value="{{ cotShowValidation }}" hint-placeholder-val="{{ false }}">
+                <div class="s42-section-head"><span>03 · REVISIÓN DE OPCIONES</span><h3>Revisamos las opciones antes de compararlas.</h3><p>Una opción recibida todavía puede requerir información o validación antes de entrar a la comparación.</p></div><sc-if value="{{ cotProofShow }}" hint-placeholder-val="{{ true }}"><div class="s421-review-tag">Vista de revisión: las alternativas y valores de esta candidata son ejemplos controlados para validar la experiencia; no son cotizaciones ni ofertas.</div></sc-if>
+                <div class="s42-pipeline">
+                  <div class="is-done"><span>1</span><b>Datos recibidos</b><small>Lo necesario para este caso</small></div>
+                  <div class="is-done"><span>2</span><b>Forma de continuar</b><small>{{ cotEligibilityLabel }}</small></div>
+                  <div class="is-current"><span>3</span><b>Opciones revisadas</b><small>{{ cotValidatedCount }} listas para comparar · {{ cotPendingCount }} en revisión</small></div>
+                  <div><span>4</span><b>Comparación</b><small>Disponible con 2 opciones comparables</small></div>
+                </div>
+                <sc-if value="{{ cotHasQuotes }}" hint-placeholder-val="{{ true }}">
+                  <div class="s42-quote-grid"><sc-for list="{{ cotQuoteCards }}" as="q" hint-placeholder-count="3"><article class="s42-quote-card"><div class="s45-quote-top"><span class="s45-quote-orb" aria-hidden="true">{{ q.icon }}</span><div class="s42-quote-head"><b>{{ q.name }}</b><span class="{{ q.statusClass }}">{{ q.status }}</span></div></div><div class="s45-quote-label">COSTO / ESTADO DE LA OPCIÓN</div><strong>{{ q.total }}</strong><small>{{ q.sourcePublic }}</small></article></sc-for></div>
+                </sc-if>
+                <sc-if value="{{ cotNoQuotes }}" hint-placeholder-val="{{ false }}"><div class="s42-empty-state"><b>Aún no hay alternativas listas para revisar.</b><p>Conservamos lo que ya elegiste y continuamos con un asesor cuando el caso necesita revisión adicional.</p></div></sc-if>
+                <div class="s42-truth-grid"><div><i aria-hidden="true">🔎</i><span>En revisión</span><b>Estamos verificando la información antes de compararla.</b></div><div><i aria-hidden="true">🧩</i><span>Falta un dato</span><b>La opción sigue en revisión; no significa que esté descartada.</b></div><div><i aria-hidden="true">✅</i><span>Opción elegida</span><b>La elección inicia el siguiente paso; todavía no es una póliza emitida.</b></div></div>
+              </sc-if>
+
+              <sc-if value="{{ cotShowCompare }}" hint-placeholder-val="{{ false }}">
+                <div class="s42-section-head"><span>04 · COMPARAR Y CONTINUAR</span><h3>Compara diferencias que sí cambian la decisión.</h3><p>Cuando las alternativas tienen bases comparables, mostramos costo, alcance, condiciones y los puntos que conviene revisar antes de elegir.</p></div><sc-if value="{{ cotProofShow }}" hint-placeholder-val="{{ true }}"><div class="s421-review-tag">Vista de revisión: esta comparación usa datos de ejemplo para revisar jerarquía, comprensión y acciones; no representa propuestas reales.</div></sc-if>
+                <sc-if value="{{ cotHasCompare }}" hint-placeholder-val="{{ false }}">
+                  <div class="s42-compare-wrap">
+                    <div class="s42-compare-head"><span>CRITERIO</span><b>{{ cotCompareA }}</b><b>{{ cotCompareB }}</b></div>
+                    <sc-for list="{{ cotCompareRows }}" as="r" hint-placeholder-count="6"><div class="s42-compare-row" data-different="{{ r.different }}"><span><i class="s45-criterion-icon" aria-hidden="true">{{ r.icon }}</i><b>{{ r.label }}</b></span><div data-option="{{ cotCompareA }}">{{ r.a }}</div><div data-option="{{ cotCompareB }}">{{ r.b }}</div></div></sc-for>
+                  </div>
+                  <div class="s42-orientation"><span>ORIENTACIÓN SEGÚN TU PRIORIDAD</span><p>{{ cotOrientation }}</p><ul><sc-for list="{{ cotOrientationPoints }}" as="pt" hint-placeholder-count="4"><li><span class="s45-orient-icon" aria-hidden="true">{{ pt.icon }}</span><span>{{ pt.t }}</span></li></sc-for></ul><small>La orientación explica diferencias relevantes; no declara una opción como universalmente mejor. La cobertura y la vigencia dependen de la propuesta y de la emisión.</small></div>
+                  <div class="s42-decision-actions"><button onClick="{{ cotChoose }}" class="primary">Elegir una opción y continuar</button><button onClick="{{ cotRestart }}">Replantear</button><button onClick="{{ cotTalk }}" class="dark">Hablar con un asesor</button></div>
+                </sc-if>
+                <sc-if value="{{ cotNoCompare }}" hint-placeholder-val="{{ false }}">
+                  <div class="s42-no-compare"><span>ANTES DE COMPARAR</span><h4>Aún necesitamos alternativas suficientemente revisadas.</h4><p>{{ cotOrientation }}</p><button onClick="{{ cotTalk }}">Continuar con un asesor</button></div>
+                </sc-if>
+              </sc-if>
+
+              <div class="s42-actions"><div><button onClick="{{ cotBackOrExit }}" class="secondary">{{ cotBackLabel }}</button><sc-if value="{{ cotCanChangeNeed }}" hint-placeholder-val="{{ false }}"><button onClick="{{ cotGoNeed }}" class="secondary">Cambiar necesidad</button></sc-if></div><div><sc-if value="{{ cotFooterAdvisor }}" hint-placeholder-val="{{ true }}"><button onClick="{{ cotTalk }}" class="ghost">Hablar con un asesor</button></sc-if><sc-if value="{{ cotShowAdvance }}" hint-placeholder-val="{{ true }}"><button onClick="{{ cotAdvance }}" class="primary">{{ cotNextLabel }}</button></sc-if></div></div>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{ cotNeedModalOpen }}" hint-placeholder-val="{{ false }}">
+          <div class="s44-modal-backdrop" role="presentation">
+            <div class="s44-modal" role="dialog" aria-modal="true" aria-label="Cambiar necesidad">
+              <button class="s44-modal-close" onClick="{{ cotCloseNeed }}" aria-label="Cerrar">×</button>
+              <div class="s44-modal-kicker">CAMBIAR NECESIDAD</div>
+              <h3>¿Qué quieres proteger o revisar ahora?</h3>
+              <p class="s44-modal-lead">Elige una nueva necesidad aquí, sin volver al inicio. Conservamos el país y el contexto del recorrido; solo reiniciamos los datos que dependan de esta selección.</p>
+              <div class="s44-need-grid">
+                <sc-for list="{{ cotNeedChoices }}" as="p" hint-placeholder-count="9">
+                  <button onClick="{{ p.pick }}" class="{{ p.routeClass }}">
+                    <span class="s42-route-icon vl-icon3d"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{ p.icon }}"></path></svg></span>
+                    <span><b>{{ p.label }}</b><small>{{ p.desc }}</small></span>
+                  </button>
+                </sc-for>
+              </div>
+              <div class="s44-modal-note">Cambiar de necesidad puede modificar las preguntas y las opciones disponibles. No cambia tu país ni te obliga a empezar todo el recorrido de cero.</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ cotReplanModalOpen }}" hint-placeholder-val="{{ false }}">
+          <div class="s44-modal-backdrop" role="presentation">
+            <div class="s44-modal s44-modal-sm" role="dialog" aria-modal="true" aria-label="Replantear comparación">
+              <button class="s44-modal-close" onClick="{{ cotCloseReplan }}" aria-label="Cerrar">×</button>
+              <div class="s44-modal-kicker">REPLANTEAR</div>
+              <h3>¿Qué quieres reconsiderar?</h3>
+              <p class="s44-modal-lead">No necesitas volver al inicio. Elige qué quieres ajustar y retomamos la comparación desde ese punto.</p>
+              <div class="s44-replan-grid">
+                <button class="s44-replan-option" onClick="{{ cotReplanPriority }}"><span>01</span><span><b>Cambiar mi prioridad</b><small>Por ejemplo, dar más peso al precio, al deducible, a la asistencia o al nivel de protección.</small></span><span>→</span></button>
+                <button class="s44-replan-option" onClick="{{ cotReplanData }}"><span>02</span><span><b>Ajustar datos del caso</b><small>Volver a los datos que pueden cambiar las opciones y revisar únicamente lo necesario.</small></span><span>→</span></button>
+                <button class="s44-replan-option" onClick="{{ cotReplanNeed }}"><span>03</span><span><b>Revisar otra necesidad</b><small>Abrir el selector de necesidades sin salir de este recorrido.</small></span><span>→</span></button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ cotChoiceModalOpen }}" hint-placeholder-val="{{ false }}">
+          <div class="s44-modal-backdrop" role="presentation">
+            <div class="s44-modal s44-modal-sm" role="dialog" aria-modal="true" aria-label="Elegir alternativa">
+              <button class="s44-modal-close" onClick="{{ cotCloseChoice }}" aria-label="Cerrar">×</button>
+              <div class="s44-modal-kicker">TU ELECCIÓN</div>
+              <h3>¿Con cuál opción quieres continuar?</h3>
+              <p class="s44-modal-lead">Las diferencias están organizadas para ayudarte a decidir, pero A&amp;S no selecciona automáticamente una alternativa por ti.</p>
+              <div class="s44-replan-grid">
+                <sc-for list="{{ cotChoiceOptions }}" as="o" hint-placeholder-count="2">
+                  <button class="s44-replan-option" onClick="{{ o.pick }}"><span>✓</span><span><b>{{ o.name }}</b><small>{{ o.total }} · Deducible {{ o.deductible }} · Asistencia {{ o.assistance }}</small></span><span>→</span></button>
+                </sc-for>
+              </div>
+              <div class="s44-modal-note">Elegir una opción inicia la continuidad del proceso. No equivale a emisión ni confirma cobertura.</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ cotProofShow }}" hint-placeholder-val="{{ true }}">
+          <details class="s42-proof">
+            <summary><span>VERIFICACIÓN TÉCNICA · LAB</span><b>Comprobar integración técnica de esta candidata</b></summary>
+            <div class="s42-proof-body">
+              <div class="s42-proof-grid"><div><span>Adaptador ejecutándose</span><b>{{ cotProofVersion }}</b></div><div><span>Modo</span><b>{{ cotProofMode }}</b></div><div><span>Llamadas en esta sesión</span><b>{{ cotProofCalls }}</b></div><div><span>Última operación</span><b>{{ cotProofLast }}</b></div><div><span>Schema resuelto</span><b>{{ cotProofSchema }}</b></div><div><span>Eligibility</span><b>{{ cotProofEligibility }}</b></div><div><span>Contrato ejecutable</span><b>{{ cotExecutionJourney }}</b></div><div><span>Estado de mapeo</span><b>{{ cotExecutionStatus }}</b></div><div><span>QA backend</span><b>{{ cotExecutionQa }}</b></div></div><div class="s42-catalog-note"><strong>Campos todavía requeridos antes de submit:</strong> {{ cotExecutionMissing }}</div>
+              <div class="s42-proof-contracts"><sc-for list="{{ cotProofContracts }}" as="c" hint-placeholder-count="5"><div><span>{{ c.k }}</span><b>{{ c.file }}</b><code>{{ c.sha }}</code></div></sc-for></div>
+              <p><strong>Qué prueba:</strong> esta candidata ya separa comparación visual de decisión del usuario y alinea la semántica con los contratos ejecutables source-only verificados en Orbit360. No hay ranking silencioso ni ganador automático. <strong>Qué todavía no prueba:</strong> el mapeo público→backend es parcial en los journeys indicados, no existe transporte runtime autenticado desde esta web, no escribe en Orbit.store ni ejecuta raters/productos productivos; esa conexión permanece cerrada hasta completar contrato, endpoint seguro y release gates.</p>
+            </div>
+          </details>
+        </sc-if>
+      </div>
+    </section>
+  </sc-if>
+
+  <!-- ============================ CLIENTE / RECURSOS / SINIESTROS (hubs) ============================ -->
+  <sc-if value="{{ isCliente }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen" data-screen-label="Soy cliente" style="background:#F4F1EA;min-height:70vh;">
+      <div style="max-width:1600px;margin:0 auto;padding:clamp(40px,6vh,80px) clamp(20px,3vw,44px);">
+        <div style="font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.14em;color:#C4001F;">SOY CLIENTE · {{ countryName }}</div>
+        <h1 style="font-family:'Archivo';font-weight:900;font-size:clamp(30px,4vw,56px);line-height:.95;letter-spacing:-.03em;margin:14px 0 0;max-width:20ch;">¿En qué te ayudamos hoy?</h1>
+        <p style="font-size:15px;color:#454039;margin:14px 0 26px;max-width:56ch;">Resuelve tu gestión con tu asesor: pólizas, renovaciones, consultas de pagos y siniestros, siempre con acompañamiento humano.</p>
+        <div class="vl-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <sc-for list="{{ clienteItems }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.go }}" style="text-align:left;cursor:pointer;font-family:inherit;background:#fff;border:1px solid #E7E2D6;border-radius:18px;padding:24px;min-height:130px;display:flex;flex-direction:column;transition:all .16s;" style-hover="border-color:#E4002B;transform:translateY(-3px);"><span class="vl-icon3d" style="width:52px;height:52px;border-radius:16px;margin-bottom:15px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{ c.icon }}"></path></svg></span><div style="font-family:'Archivo';font-weight:700;font-size:18px;">{{ c.t }}</div><p style="font-size:13px;line-height:1.5;color:#454039;margin:8px 0 0;">{{ c.d }}</p></button></sc-for>
+        </div>
+        <div style="margin-top:26px;border-radius:22px;background:#0E0D10;color:#F4F1EA;padding:clamp(22px,3vw,34px);position:relative;overflow:hidden;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.12em;color:#c3aee6;background:rgba(122,92,168,.18);border:1px solid rgba(122,92,168,.45);border-radius:999px;padding:6px 12px;">TU PRÓXIMO ESPACIO DE AUTOSERVICIO</div>
+            
+          </div>
+          <h2 style="font-family:'Archivo';font-weight:900;font-size:clamp(24px,3vw,40px);letter-spacing:-.028em;margin:16px 0 0;max-width:22ch;">Tu Portal del Cliente, cuando esté listo.</h2>
+          <p style="font-size:14px;color:#CFC9BE;line-height:1.55;margin:10px 0 0;max-width:64ch;">Estamos construyendo el espacio donde podrás consultar tus pólizas, coberturas y documentos, dar seguimiento a un siniestro y hablar con tu asesor. Mientras lo liberamos, tu asesor lo gestiona por ti — con la misma información y sin trámites de más.</p>
+          <div style="display:grid;grid-template-columns:1.35fr .65fr;gap:20px;margin-top:24px;align-items:end;" class="vl-split">
+            <div style="position:relative;">
+              
+              <div style="border-radius:16px;overflow:hidden;border:1px solid #33323a;background:#0B0A0D;box-shadow:0 40px 90px -44px #000;">
+                <div style="display:flex;align-items:center;gap:6px;padding:10px 14px;background:#151318;border-bottom:1px solid #2a2833;"><span style="width:9px;height:9px;border-radius:50%;background:#E4002B;"></span><span style="width:9px;height:9px;border-radius:50%;background:#3a3630;"></span><span style="width:9px;height:9px;border-radius:50%;background:#3a3630;"></span><span style="margin-left:12px;font-family:'IBM Plex Mono';font-size:9.5px;color:#ADA69B;">portal.aysseguros.com</span></div>
+                <div style="display:grid;grid-template-columns:150px 1fr;min-height:230px;">
+                  <div style="background:#111015;border-right:1px solid #2a2833;padding:16px 12px;">
+                    <div style="display:flex;align-items:center;gap:7px;"><span style="width:22px;height:22px;border-radius:6px;background:#E4002B;display:grid;place-items:center;font-family:'Archivo';font-weight:900;font-size:10px;color:#fff;">A&amp;S</span><span style="font-family:'Archivo';font-weight:800;font-size:11px;">Portal</span></div>
+                    <div style="display:flex;flex-direction:column;gap:3px;margin-top:16px;">
+                      <div style="padding:8px 10px;border-radius:8px;background:rgba(228,0,43,.16);border:1px solid rgba(228,0,43,.4);font-size:11px;color:#fff;">Resumen</div>
+                      <div style="padding:8px 10px;font-size:11px;color:#B7B1A6;">Mis pólizas</div>
+                      <div style="padding:8px 10px;font-size:11px;color:#B7B1A6;">Documentos</div>
+                      <div style="padding:8px 10px;font-size:11px;color:#B7B1A6;">Renovaciones</div>
+                      <div style="padding:8px 10px;font-size:11px;color:#B7B1A6;">Siniestros</div>
+                      <div style="padding:8px 10px;font-size:11px;color:#B7B1A6;">Pagos y estado</div>
+                    </div>
+                  </div>
+                  <div style="padding:18px;">
+                    <div style="font-family:'Archivo';font-weight:800;font-size:15px;">Hola de nuevo 👋</div>
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;">
+                      <div style="background:#17151A;border:1px solid #2a2833;border-radius:11px;padding:11px;"><div style="font-family:'Archivo';font-weight:900;font-size:20px;">6</div><div style="font-size:8.5px;color:#ADA69B;letter-spacing:.04em;">PÓLIZAS ACTIVAS</div></div>
+                      <div style="background:#17151A;border:1px solid #2a2833;border-radius:11px;padding:11px;"><div style="font-family:'Archivo';font-weight:900;font-size:20px;">1</div><div style="font-size:8.5px;color:#ADA69B;letter-spacing:.04em;">SINIESTRO EN CURSO</div></div>
+                      <div style="background:#17151A;border:1px solid #2a2833;border-radius:11px;padding:11px;"><div style="font-family:'Archivo';font-weight:900;font-size:20px;color:#7fce9b;">Sí</div><div style="font-size:8.5px;color:#ADA69B;letter-spacing:.04em;">PAGOS AL DÍA</div></div>
+                      <div style="background:#17151A;border:1px solid #2a2833;border-radius:11px;padding:11px;"><div style="font-family:'Archivo';font-weight:900;font-size:20px;">15 Jun</div><div style="font-size:8.5px;color:#ADA69B;letter-spacing:.04em;">PRÓX. VENCIMIENTO</div></div>
+                    </div>
+                    <div style="margin-top:12px;background:#17151A;border:1px solid #2a2833;border-radius:11px;padding:12px;"><div style="font-size:9px;color:#ADA69B;letter-spacing:.06em;font-family:'IBM Plex Mono';">ACCESOS RÁPIDOS</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;"><span style="font-size:10px;padding:6px 11px;border-radius:8px;background:#0E0D10;border:1px solid #2a2833;">Ver pólizas</span><span style="font-size:10px;padding:6px 11px;border-radius:8px;background:#0E0D10;border:1px solid #2a2833;">Reportar siniestro</span><span style="font-size:10px;padding:6px 11px;border-radius:8px;background:#0E0D10;border:1px solid #2a2833;">Ver estado de pagos</span></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="vl-phonestage">
+              <div class="vl-phone vl-phone--back" aria-hidden="true">
+                <div class="vl-phone-screen">
+                  <div class="vl-phone-status"><span>9:41</span><span class="vl-phone-sig"></span></div>
+                  <div style="padding:0 14px;">
+                    <div style="font-family:'IBM Plex Mono';font-size:7.5px;letter-spacing:.12em;color:#ADA69B;">SINIESTROS</div>
+                    <div style="font-family:'Archivo';font-weight:800;font-size:11px;color:#fff;margin-top:5px;">Caso 2026-0148</div>
+                    <div style="margin-top:9px;display:flex;flex-direction:column;gap:6px;">
+                      <div class="vl-phone-row"><span style="color:#7fce9b;">●</span> Reporte recibido</div>
+                      <div class="vl-phone-row"><span style="color:#7fce9b;">●</span> Asesor asignado</div>
+                      <div class="vl-phone-row vl-phone-row--on"><span style="color:#E0BC6A;">◐</span> Validación de cobertura</div>
+                      <div class="vl-phone-row" style="opacity:.5;"><span>○</span> Resolución</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="vl-phone vl-phone--front" role="img" aria-label="Vista conceptual del Portal del Cliente A&amp;S en teléfono">
+                <span class="vl-phone-island"></span>
+                <div class="vl-phone-screen">
+                  <div class="vl-phone-status"><span>9:41</span><span class="vl-phone-sig"></span></div>
+                  <div style="padding:0 15px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                      <div style="display:flex;align-items:center;gap:7px;">
+                        <span style="width:22px;height:22px;border-radius:7px;background:#E4002B;display:grid;place-items:center;font-family:'Archivo';font-weight:900;font-size:9px;color:#fff;">A&amp;S</span>
+                        <span style="font-family:'Archivo';font-weight:800;font-size:10.5px;color:#fff;">Portal</span>
+                      </div>
+                      
+                    </div>
+                    <div class="vl-phone-card">
+                      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+                        <div>
+                          <div style="font-family:'IBM Plex Mono';font-size:7.5px;letter-spacing:.12em;color:#FF9DA8;">PÓLIZA · AUTO</div>
+                          <div style="font-family:'Archivo';font-weight:800;font-size:13px;color:#fff;margin-top:4px;letter-spacing:-.01em;">Toyota Hilux 2021</div>
+                          <div style="font-family:'IBM Plex Mono';font-size:7.5px;color:#D7D1C4;margin-top:3px;">GT · VIGENTE HASTA 15 JUN</div>
+                        </div>
+                        <span class="vl-isotile vl-isotile--dark" style="width:40px;height:40px;border-radius:12px;padding:2px;"><svg class="vl-ico" viewBox="0 0 120 120"><use href="#ic-portal"></use></svg></span>
+                      </div>
+                      <div style="display:flex;gap:5px;margin-top:11px;">
+                        <span class="vl-phone-pill">Cobertura</span>
+                        <span class="vl-phone-pill">Asistencia</span>
+                        <span class="vl-phone-pill">Deducible</span>
+                      </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px;">
+                      <div class="vl-phone-stat"><div style="font-family:'Archivo';font-weight:900;font-size:15px;color:#fff;">6</div><div class="vl-phone-lab">PÓLIZAS ACTIVAS</div></div>
+                      <div class="vl-phone-stat"><div style="font-family:'Archivo';font-weight:900;font-size:15px;color:#7fce9b;">Al día</div><div class="vl-phone-lab">ESTADO DE PAGOS</div></div>
+                    </div>
+                    <div style="margin-top:9px;display:flex;flex-direction:column;gap:5px;">
+                      <div class="vl-phone-row"><span style="color:#E0BC6A;">◈</span> Descargar carné digital</div>
+                      <div class="vl-phone-row"><span style="color:#E0BC6A;">◈</span> Reportar un siniestro</div>
+                    </div>
+                    <div class="vl-phone-cta">Ver detalle de mi póliza</div>
+                    
+                  </div>
+                </div>
+                <span class="vl-phone-bar" aria-hidden="true"></span>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px;" class="vl-4">
+            <sc-for list="{{ portalItems }}" as="p" hint-placeholder-count="5"><div style="background:#17151A;border:1px solid #2a2833;border-radius:14px;padding:14px;opacity:.94;"><div style="font-family:'Archivo';font-weight:700;font-size:13.5px;color:#fff;">{{ p.t }}</div><p style="font-size:11.5px;color:#ADA69B;line-height:1.45;margin:5px 0 0;">{{ p.d }}</p></div></sc-for>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;align-items:center;">
+            
+            <button onClick="{{ openHandoff }}" style="min-height:46px;padding:0 20px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Mientras tanto, habla con tu asesor</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+  <!-- ============================ T4 · FLOTILLAS / TRANSPORTE / LOGÍSTICA · GUATEMALA ============================ -->
+  <sc-if value="{{ isFlotillasGT }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen" data-screen-label="Flotillas y logística GT" data-country="gt" data-analytics-action="fleetlogistics_open">
+
+      <!-- 01 · HERO editorial -->
+      <div id="vl-t4-hero" style="position:relative;background:#0E0D10;color:#F4F1EA;overflow:hidden;">
+        <div aria-hidden="true" style="position:absolute;inset:0;z-index:0;background:radial-gradient(900px 560px at 92% 0%,rgba(228,0,43,.16),transparent 60%);"></div>
+        <div class="vl-t4-hero" style="position:relative;z-index:1;max-width:1600px;margin:0 auto;padding:clamp(40px,6.4vh,92px) clamp(20px,3vw,44px);">
+          <div style="min-width:0;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;display:flex;align-items:center;gap:10px;"><span style="width:30px;height:2px;background:#E4002B;flex:none;"></span>A&amp;S Guatemala · Flotillas, transporte y logística</div>
+            <h1 style="font-family:'Archivo';font-weight:900;font-size:clamp(33px,4.3vw,70px);line-height:.96;letter-spacing:-.035em;margin:18px 0 0;max-width:17ch;">Tu operación no termina en <span style="color:#FF3B54;">los vehículos.</span></h1>
+            <p style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:clamp(17px,1.5vw,22px);line-height:1.45;color:#D7D1C4;margin:18px 0 0;max-width:52ch;">Flotillas, carga, personas, terceros y continuidad se conectan. Entender cómo funciona tu operación ayuda a decidir qué conviene revisar.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;">
+              <button onClick="{{ fltToSelector }}" data-analytics-action="fleetlogistics_open" style="min-height:52px;padding:0 24px;border-radius:13px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap;">Evaluar mi operación</button>
+              <button onClick="{{ fltHandoff }}" data-analytics-action="fleetlogistics_exit_to_handoff" style="min-height:52px;padding:0 24px;border-radius:13px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.24);color:#fff;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;white-space:nowrap;">Hablar con un asesor</button>
+            </div>
+            <p class="vl-t4-copy" style="font-size:12.5px;line-height:1.6;color:#A9A29A;margin:26px 0 0;max-width:62ch;border-top:1px solid #2a2833;padding-top:14px;">Te orientamos según tu operación. Coberturas, requisitos y alternativas dependen de cada caso y de la información validada.</p>
+          </div>
+          <figure style="margin:0;position:relative;border-radius:24px;overflow:hidden;border:1px solid #2a2833;box-shadow:0 54px 112px -60px rgba(0,0,0,.95);">
+            <img src="assets/photos/T4_GT_FLOTILLAS_HERO_REAL_20260925.png" alt="Equipo real de A&amp;S en una conversación de asesoría vinculada a movilidad y operación." decoding="async" style="display:block;width:100%;height:auto;aspect-ratio:16/11;object-fit:cover;object-position:50% 50%;">
+            <span aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,16,0) 62%,rgba(14,13,16,.6) 100%);"></span>
+          </figure>
+        </div>
+      </div>
+
+      <!-- 02 · SELECTOR DE SITUACIÓN -->
+      <div id="vl-t4-situacion" style="background:#EFE9DD;color:#12110F;border-top:1px solid #E2DACF;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(26px,3.4vh,44px) clamp(20px,3vw,44px);">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+            <div style="max-width:72ch;min-width:0;">
+              <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#C4001F;">EMPIEZA POR TU OPERACIÓN</div>
+              <h2 style="font-family:'Archivo';font-weight:850;font-size:clamp(22px,2.5vw,34px);line-height:1.08;letter-spacing:-.025em;margin:10px 0 0;">¿Qué se parece más a lo que necesitas revisar?</h2>
+              <p class="vl-t4-copy" style="font-size:14px;line-height:1.6;color:#4A443C;margin:10px 0 0;max-width:64ch;">No necesitas saber el nombre del seguro. Elige el escenario que más se aproxima a tu operación.</p>
+            </div>
