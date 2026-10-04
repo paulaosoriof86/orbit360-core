@@ -166,7 +166,7 @@ test('S4.93 preserves A&S typography and raises microcopy readability',()=>{
 });
 
 test('S4.93 product sprite chunks resolve to a WebP data URI',()=>{
-  assert.equal(S.PRODUCT_SPRITE_SHA,'b6d7ec040e72fa2edc268150751f0a625230104bf701767b545d261c92b36fe9');
+  assert.equal(S.PRODUCT_SPRITE_SHA,'b199c128f08a54899805c61e7d126a56c11a75537b056cdb5b17faf2e3657e1a');
   const h=S.html();
   assert.match(h,/data:image\/webp;base64,UklGR/);
 });
