@@ -40,6 +40,13 @@ const doneStates=new Set(['resuelta','completada','cerrada','cancelada','anulada
      pais:p.pais||'',aseguradoraId:p.aseguradoraId||'',sourceRef:p.sourceRef||p._origenHoja||''
    }))
    .sort((a,b)=>policyNumberKey(a.numero).localeCompare(policyNumberKey(b.numero))||String(a.vigenciaFin).localeCompare(String(b.vigenciaFin)));
+ const renewalTargetIds=new Set(renewalSourceProbe.map(x=>x.renovadaPor).filter(Boolean));
+ const renewalLineageTargets=pol.filter(p=>renewalTargetIds.has(p.id)).map(p=>({
+   id:p.id,numero:p.numero||'',estado:p.estado||'',vigenciaInicio:p.vigenciaInicio||'',vigenciaFin:p.vigenciaFin||'',
+   renovadaPor:p.renovadaPor||'',renuevaDe:p.renuevaDe||'',renovacionEstado:p.renovacionEstado||'',
+   renovable:Object.prototype.hasOwnProperty.call(p,'renovable')?p.renovable:null,
+   pais:p.pais||'',aseguradoraId:p.aseguradoraId||'',sourceRef:p.sourceRef||p._origenHoja||''
+ }));
  const activeRen=ges.filter(g=>['renewal_proposals','renewal_accepted'].includes(String(g.workflowType||''))&&!doneStates.has(norm(g.estado))&&g.archivado!==true);
  const dupRen={};
  for(const g of activeRen){const k=[g.polizaId||g.sourcePolicyId||'',g.workflowType||''].join('|');if(!k.startsWith('|'))dupRen[k]=(dupRen[k]||0)+1;}
@@ -115,7 +122,8 @@ const doneStates=new Set(['resuelta','completada','cerrada','cancelada','anulada
      duplicateActiveRenewalManagementKeys:dupRenRows,
      activeRecoveryBusinesses:activeRecoveryNeg.length,
      duplicateActiveRecoveryBusinessKeys:dupRecoveryRows,
-     renewalSourceProbe
+     renewalSourceProbe,
+     renewalLineageTargets
    },
    sourceAudit:{
      assertions,
