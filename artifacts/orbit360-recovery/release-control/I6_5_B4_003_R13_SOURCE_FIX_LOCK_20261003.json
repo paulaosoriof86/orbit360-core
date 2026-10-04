@@ -29,7 +29,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "e86b60e6bd71e6fd3b3493ee329b8ff18a6eb675"
+    "blobSha": "a1e052403a3765f284ef2e8b515ba287fffd78f5"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -331,7 +331,7 @@
     "reimport": false,
     "livePromotion": false
   },
-  "compositionLockBlobSha": "e86b60e6bd71e6fd3b3493ee329b8ff18a6eb675",
+  "compositionLockBlobSha": "a1e052403a3765f284ef2e8b515ba287fffd78f5",
   "r14SourceFix": {
     "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
@@ -621,11 +621,12 @@
     }
   },
   "r1604ConfigPlanBootstrapFix": {
-    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "status": "COMPOSITION_BOUND_PENDING_EXACT_PREVIEW",
     "failedRunId": 37225795493,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
-    "receiptBlobSha": "890b7c8d02d1979ea1e3706bbdb9989b718cfb1f",
+    "receiptBlobSha": "f55161601105e7e759f5aca99a0ee97c21ea1b0a",
     "productSourceChanged": true,
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "compositionBlobSha": "a1e052403a3765f284ef2e8b515ba287fffd78f5"
   }
 }

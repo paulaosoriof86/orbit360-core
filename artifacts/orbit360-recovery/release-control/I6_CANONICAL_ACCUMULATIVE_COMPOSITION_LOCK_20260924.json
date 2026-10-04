@@ -203,7 +203,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "5d567bb8a7f1492374f99ad79ca39a969f172d2f",
+    "orbit360-platform/index.html": "7f5f5b7e6322543e6833820b04b6fbb1f1366a41",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "bf253d9c04db5a45acdf172993902bb266fa26ce",
     "orbit360-platform/modules/calidad.js": "368b1f578a7500f7d8a2037962328770550ed8c3",
@@ -213,7 +213,7 @@
     "orbit360-platform/modules/cobros.js": "866570f35d87f8d4d7709736058831a218cb461e",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/conciliaciones.js": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25",
-    "orbit360-platform/modules/configuracion.js": "0ec30235bf676b89c85a5c0dc58b09a5e1a81193",
+    "orbit360-platform/modules/configuracion.js": "156c97a74649177f693d3dbe5910fc419f77924f",
     "orbit360-platform/modules/cotizador-v1203-source-gate.js": "87882325e73c6e66e5e82fbef4246208a22b719a",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "0ec76280098c2f47982779fbd8d3a220745ea912",
     "orbit360-platform/modules/cronograma.js": "c2c5e2cccae88e5c3492aef0e7f109a0a896e5fa",
@@ -3041,8 +3041,8 @@
     }
   },
   "b4003R1604ConfigPlanBootstrapFix": {
-    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
-    "failedRunId": 37225795493,
+    "status": "COMPOSITION_BOUND_PENDING_EXACT_PREVIEW",
+    "failedRunId": 37228114447,
     "productBlobs": {
       "orbit360-platform/modules/configuracion.js": "156c97a74649177f693d3dbe5910fc419f77924f",
       "orbit360-platform/index.html": "7f5f5b7e6322543e6833820b04b6fbb1f1366a41"
@@ -3050,6 +3050,8 @@
     "contractBlobSha": "b3e32c77ac7baf9e3e01dbae873a1bf1ee3e0acd",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
     "receiptBlobSha": "890b7c8d02d1979ea1e3706bbdb9989b718cfb1f",
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "failureCode": "I6_CANONICAL_COMPOSITION_BLOB_DRIFT",
+    "compositionExactSetUpdated": true
   }
 }

@@ -115,5 +115,15 @@
     "noReimport": true,
     "dataMutation": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "qaCompatibilityAlignment6": {
+    "failedRunId": 37228114447,
+    "failedJobId": 111511891538,
+    "failureCode": "I6_CANONICAL_COMPOSITION_BLOB_DRIFT",
+    "classification": "GOVERNANCE_COMPOSITION_BINDING_OMISSION",
+    "resolution": "Bind R16.4b configuracion/index product blobs into the canonical exact-set composition before rebuilding.",
+    "productSourceChanged": false,
+    "noBuildOccurredBeforeFailure": true,
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   }
 }
