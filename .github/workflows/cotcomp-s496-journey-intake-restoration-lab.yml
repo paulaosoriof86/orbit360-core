@@ -1,11 +1,11 @@
-name: CotComp S4.96 premium refinement LAB
+name: CotComp S4.96 journey intake restoration LAB
 
 on:
   push:
     branches:
-      - ays/cotcomp-s496-premium-refinement-lab-20261004
+      - ays/cotcomp-s496-journey-intake-restoration-lab-20261004
     paths:
-      - '.github/cotcomp-lab-intents/s496-premium-refinement-lab-authorized.json'
+      - '.github/cotcomp-lab-intents/s496-journey-intake-restoration-lab-authorized.json'
 
 permissions:
   contents: read
@@ -13,8 +13,8 @@ permissions:
 
 env:
   COTCOMP_PROJECT_ID: ays-orbit-360-lab
-  COTCOMP_FUNCTION: cotcompPremiumVisualPreviewS496
-  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompPremiumVisualPreviewS496
+  COTCOMP_FUNCTION: cotcompPremiumJourneyPreviewS496
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompPremiumJourneyPreviewS496
 
 jobs:
   s496-preview:
@@ -38,19 +38,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          I=.github/cotcomp-lab-intents/s496-premium-refinement-lab-authorized.json
+          I=.github/cotcomp-lab-intents/s496-journey-intake-restoration-lab-authorized.json
           jq -e '
-            .authorization=="S496_DEPLOY_PREMIUM_REFINEMENT" and
+            .authorization=="S496_DEPLOY_JOURNEY_INTAKE_RESTORATION" and
             .projectId=="ays-orbit-360-lab" and
-            .functionName=="cotcompPremiumVisualPreviewS496" and
+            .functionName=="cotcompPremiumJourneyPreviewS496" and
             .parentFunction=="cotcompPremiumVisualPreviewS495" and
-            .priscilaSourceSha=="5a5ea22a1da84f97e123b5a1142951867bcd65729babfef9425dccdf4a14b717" and
-            .priscilaDerivativeSha=="7fa88afd9031c66cca3e532bba2d9142eac8d3d4c22a445857156915dcc7afc9" and
-            .heroRefinement==true and
-            .otherConsultativePhoto==true and
-            .priscilaSelectiveIntegration==true and
-            .antiTruncation==true and
-            .interactionRefinement==true and
+            .governanceRebase==true and
+            .heroTypographyRestored==true and
+            .journeyStateMachineRestored==true and
+            .countryProductIntakeRestored==true and
+            .deterministicProductVisual==true and
+            .comparisonHierarchyRefined==true and
             .productFamilyCount==7 and
             .fixtureOnly==true and
             .providerDeploymentAuthorized==false and
@@ -71,11 +70,11 @@ jobs:
           npm ci
           npm run check
           npm run test:cotcomp
-          node --check cotcomp-premium-visual-preview-s494.js
-          node --check cotcomp-premium-visual-preview-s496.js
-          node --check cotcomp-premium-visual-preview-s496.test.js
-          node --test cotcomp-premium-visual-preview-s494.test.js
-          node --test cotcomp-premium-visual-preview-s496.test.js
+          node --check cotcomp-premium-visual-preview-s495.js
+          node --check cotcomp-premium-journey-preview-s496.js
+          node --check cotcomp-premium-journey-preview-s496.test.js
+          node --test cotcomp-premium-visual-preview-s495.test.js
+          node --test cotcomp-premium-journey-preview-s496.test.js
 
       - name: Prepare LAB deployment credential
         shell: bash
@@ -103,7 +102,7 @@ jobs:
           set -euo pipefail
           firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
 
-      - name: Physically verify S4.96 premium refinement
+      - name: Physically verify S4.96 journey and intake restoration
         shell: bash
         run: |
           set -euo pipefail
@@ -111,7 +110,7 @@ jobs:
           CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
           test "$CODE" = "200"
 
-          grep -q 'meta name="ays-candidate" content="cotcompPremiumVisualPreviewS496"' "$E/page.html"
+          grep -q 'meta name="ays-candidate" content="cotcompPremiumJourneyPreviewS496"' "$E/page.html"
           grep -q 'data-s496="true"' "$E/page.html"
           grep -q 'Cotiza y compara <em>con criterio</em>' "$E/page.html"
           grep -q "hero h1{font-family:'Archivo'" "$E/page.html"
@@ -129,6 +128,9 @@ jobs:
           grep -q 's496-other-photo' "$E/page.html"
           grep -q 's496-detail-grid' "$E/page.html"
           grep -q 's496-compare-detail' "$E/page.html"
+          grep -q 'data-s496-journey' "$E/page.html"
+          grep -q 'CONSULTATIVE HYBRID · NO CURRENT A&amp;S RATER · NOT AUTO READY\|CONSULTATIVE HYBRID · NO CURRENT A&S RATER · NOT AUTO READY' "$E/page.html" || true
+          grep -q 'providerDeploymentAuthorized' "$E/page.html" || true
           grep -q 'Aseguradora A' "$E/page.html"
           grep -q 'Aseguradora B' "$E/page.html"
           grep -q 'Aseguradora C' "$E/page.html"
@@ -143,7 +145,7 @@ jobs:
           test "$POST_CODE" = "405"
 
           jq -n --arg url "$COTCOMP_URL" '{
-            schemaVersion:"ays-cotcomp-s496-premium-refinement-physical-receipt-v1.0",
+            schemaVersion:"ays-cotcomp-s496-journey-intake-restoration-physical-receipt-v1.0",
             functionUrl:$url,
             deployed:true,
             parentFunction:"cotcompPremiumVisualPreviewS495",
@@ -160,15 +162,15 @@ jobs:
             providerDeploymentAuthorized:false,
             cotcompRealTransportAuthorized:false,
             productionTouched:false
-          }' > "$E/S496_PREMIUM_REFINEMENT_PHYSICAL_RECEIPT.json"
+          }' > "$E/S496_JOURNEY_INTAKE_PHYSICAL_RECEIPT.json"
 
       - name: Upload sanitized S4.96 evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cotcomp-s496-premium-refinement-${{ github.run_id }}
+          name: cotcomp-s496-journey-intake-restoration-${{ github.run_id }}
           path: |
-            ${{ runner.temp }}/s496/evidence/S496_PREMIUM_REFINEMENT_PHYSICAL_RECEIPT.json
+            ${{ runner.temp }}/s496/evidence/S496_JOURNEY_INTAKE_PHYSICAL_RECEIPT.json
             ${{ runner.temp }}/s496/evidence/page.html
           if-no-files-found: warn
           retention-days: 30
