@@ -3064,7 +3064,7 @@
       "orbit360-platform/index.html": "f96358fbef0cef9e49c4e750f58160132eea1672"
     },
     "qaBlobs": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "2955f739f1a57fc3f90cf85f0cddee2805b3f7f0",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "c2925a82cb1427927ce5180a87c22605aab1a9c7",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "2f73abe643f4dc2b447e252453b307c92b449ceb",
       ".github/workflows/gravicentra-b4-003-executor.yml": "bb77f9992587bd7e28ccef74bc4871cb7da69a4b"
     },
@@ -3081,6 +3081,14 @@
     "noLive": true,
     "noReimport": true,
     "dataMutation": false,
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "qaCompatibilityAlignment": {
+      "status": "QA_LITERAL_DRIFT_CORRECTED_BEFORE_BUILD",
+      "failedRunId": 37245596240,
+      "failureCode": "B4_003_CONTROL_STATUS_INVALID",
+      "resolution": "R17 gate/control/lock lifecycle was correct; contract still asserted R16_04 control/lock status names. Updated only QA literals; product source unchanged and no build occurred.",
+      "productSourceChanged": false,
+      "noBuildOccurredBeforeFix": true
+    }
   }
 }
