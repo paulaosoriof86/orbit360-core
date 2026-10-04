@@ -673,11 +673,26 @@ try{
 
  proof.r14Client360Authority=await page.evaluate(ids=>{
    const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';Orbit.pais='GT';Orbit.modules.cliente360.render(h);
-   const root=h.querySelector('[data-c360-list-ready="1"]'),text=String(h.innerText||'');
-   const out={authority:root?.getAttribute('data-c360-base-authority')||'',syntheticClientVisible:text.includes('B4-003 QA Cliente')};
+   const root=h.querySelector('[data-c360-list-ready="1"]');
+   const kpi=h.querySelector('[data-c360-kpi-client-count]');
+   const all=Orbit.store?.all?.('clientes')||[];
+   const canonical=all.filter(c=>c&&!(c.fusionado===true||String(c.mergedIntoClientId||'').trim())&&String(c.pais||'').toUpperCase()==='GT');
+   const storeHasSynthetic=!!Orbit.store?.get?.('clientes',ids.client);
+   const uiUniverseCount=Number(kpi?.getAttribute('data-c360-kpi-client-count')||-1);
+   const search=document.getElementById('f-q');
+   let syntheticSearchVisible=false;
+   if(search){
+     search.value='B4-003 QA Cliente';
+     search.dispatchEvent(new Event('input',{bubbles:true}));
+     syntheticSearchVisible=String(h.innerText||'').includes('B4-003 QA Cliente');
+     const reset=document.getElementById('f-q');
+     if(reset){reset.value='';reset.dispatchEvent(new Event('input',{bubbles:true}));}
+   }
+   const diag=window.OrbitRuntimeDiagnostics?.cliente360?.list||{};
+   const out={authority:root?.getAttribute('data-c360-base-authority')||'',storeHasSynthetic,authoritativeGtCount:canonical.length,uiUniverseCount,syntheticSearchVisible,pageSize:Number(diag.pageSize||0),renderedRows:Number(diag.renderedRows||0),filteredRows:Number(diag.filteredRows||0),totalRows:Number(diag.totalRows||0)};
    Orbit.pais=previous;return out;
  },ids);
- need(proof.r14Client360Authority.authority==='server-confirmed-store'&&proof.r14Client360Authority.syntheticClientVisible===true,'B4_003_R14_CLIENT360_AUTHORITATIVE_LIST_FAILED:'+JSON.stringify(proof.r14Client360Authority));
+ need(proof.r14Client360Authority.authority==='server-confirmed-store'&&proof.r14Client360Authority.storeHasSynthetic===true&&proof.r14Client360Authority.uiUniverseCount===proof.r14Client360Authority.authoritativeGtCount&&proof.r14Client360Authority.syntheticSearchVisible===true,'B4_003_R14_CLIENT360_AUTHORITATIVE_LIST_FAILED:'+JSON.stringify(proof.r14Client360Authority));
  proof.assertions.client360AuthoritativeList=true;
 
  proof.r14QualityGrammar=await page.evaluate(()=>{
