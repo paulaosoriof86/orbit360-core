@@ -1,12 +1,12 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_CANCELATIONS_DIAGNOSTIC_V1",
-  "recordedAt": "2026-10-04T00:28:21.154Z",
+  "recordedAt": "2026-10-04T00:32:45.508Z",
   "status": "READONLY_DIAGNOSTIC_COMPLETE",
   "findingId": "B4-003",
   "mode": "READ_ONLY_NO_PRODUCT_OR_DATA_WRITES",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "sourceSha": "8d5d9a55c06ed011855414a16f40a851058ad5f6",
+  "sourceSha": "54961e7f8a399e3f63a0181ebb1dc0cebc70b243",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "runtime": {
@@ -145,7 +145,24 @@
         "renovable": null,
         "pais": "GT",
         "aseguradoraId": "gt-seguros-columna",
-        "sourceRef": ""
+        "sourceRef": "",
+        "clienteId": "cli_siga_48999e7ea238b1a0e5",
+        "asesorId": "ase-paula-osorio",
+        "previewWrite": false,
+        "syntheticFlag": false,
+        "importado": false,
+        "createdAt": "2026-09-27T01:44:22.901Z",
+        "updatedAt": "2026-09-27T01:44:21.277Z",
+        "createdBy": "",
+        "dependents": {
+          "gestiones": 0,
+          "recibosEsperados": 1,
+          "carteraPrimas": 1,
+          "cobros": 0,
+          "vehiculos": 1,
+          "cancelaciones": 0
+        },
+        "dependentTotal": 3
       }
     ]
   },
