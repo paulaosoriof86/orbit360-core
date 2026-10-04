@@ -33,6 +33,17 @@ ids.recoveryBusiness='neg_rec_'+ids.cancelation;
 const residueIds=['pol_mulsmxsk','pol_mulssmuz','pol_mulsxofx'];
 const proof={schema:'GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_V1',status:'INIT',target,ids,assertions:{},syntheticWrites:0,cleanupWrites:0,pageErrors:[],consoleErrors:[],syntheticFinalAbsent:false,qaResidue:{},runtimeCancellationEvidence:{}};
 
+const renewalSourceAuthority={
+  sourceFile:'Renovaciones (13).xlsx',
+  sourceSha256:'1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3',
+  companionPolicyFile:'Polizas (16).xlsx',
+  companionPolicySha256:'e68bfd576b28b01d2839d8c3a22e547d8905f1eaeb84d1d7ffc3a0082960c2a7',
+  sourceRows:23,
+  sourceStatusCounts:{Vencida:14,'No Renovada':4,Vigente:5},
+  activePolicyNumbers:['68542','1-AP-20890','AUTO 38446','AUTO-1000000334','VA-43685'],
+  interpretation:'Positive source authority only for listed active policies; absence does not imply NO.'
+};
+const policyNumberKey=v=>clean(v).toUpperCase().replace(/[^A-Z0-9]+/g,'');
 const ref=(c,id)=>tenant.collection('data').doc(c).collection('items').doc(id);
 async function actor(){
  const snap=await tenant.collection('members').get();
@@ -147,8 +158,40 @@ async function renewalDistributionReadback(){
   byCountry[country].eligible90++;
   if(d<0)buckets.vencidas++;else if(d<=15)buckets.d15++;else if(d<=45)buckets.d45++;else buckets.d90++;
  });
+ const wantedKeys=new Set(renewalSourceAuthority.activePolicyNumbers.map(policyNumberKey));
+ const grouped={};
+ rows.forEach(p=>{
+   const k=policyNumberKey(p.numero);
+   if(!wantedKeys.has(k))return;
+   grouped[k]=grouped[k]||[];
+   grouped[k].push(p);
+ });
+ const sourceMatches=[],missing=[],duplicates=[];
+ renewalSourceAuthority.activePolicyNumbers.forEach(numero=>{
+   const k=policyNumberKey(numero),matches=grouped[k]||[];
+   if(matches.length===0)missing.push(numero);
+   if(matches.length>1)duplicates.push({numero,ids:matches.map(x=>x.id)});
+   matches.forEach(p=>sourceMatches.push({
+     id:p.id,numero:p.numero||'',estado:p.estado||'',pais:p.pais||'',vigenciaFin:p.vigenciaFin||'',
+     aseguradoraId:p.aseguradoraId||'',renewabilityState:state(p),
+     currentRenovable:Object.prototype.hasOwnProperty.call(p,'renovable')?p.renovable:null,
+     proposedPatch:{renovable:true,renewabilityProvenance:'source_report',renewabilitySourceSha256:renewalSourceAuthority.sourceSha256}
+   }));
+ });
  proof.realRenewalDistribution={policyCount:rows.length,byState,byCountry,buckets,eligibleCount:eligible.length,eligibleIds:eligible.map(x=>x.id),sample:eligible.slice(0,30),readOnly:true};
+ proof.r13RenewalSourceDryRun={
+   source:renewalSourceAuthority,
+   matches:sourceMatches,
+   missing,
+   duplicates,
+   proposedWriteCount:sourceMatches.length,
+   conflictCount:missing.length+duplicates.length,
+   ready:sourceMatches.length===renewalSourceAuthority.activePolicyNumbers.length&&missing.length===0&&duplicates.length===0,
+   writeExecuted:false,
+   authorizationRequiredBeforeApply:true
+ };
  proof.assertions.realRenewalDistributionReadOnly=true;
+ proof.assertions.realRenewalSourceDryRunReady=proof.r13RenewalSourceDryRun.ready===true;
 }
 async function cancellationEvidence(){
  const snap=await tenant.collection('data').doc('polizas').collection('items').get();
@@ -579,12 +622,25 @@ try{
    Orbit.pais=previous;
    return{allIds,realIds,kpis};
  },ids);
- need(proof.realRenewalDistribution.eligibleCount>0,'B4_003_R13_REAL_RENEWAL_PIPELINE_EMPTY:'+JSON.stringify(proof.realRenewalDistribution.byState));
  const expectedRenewals=[...(proof.realRenewalDistribution.eligibleIds||[])].sort();
  const visibleRenewals=[...proof.r13RenewalReality.realIds].sort();
- need(JSON.stringify(visibleRenewals)===JSON.stringify(expectedRenewals),'B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH:'+JSON.stringify({expected:expectedRenewals.length,visible:visibleRenewals.length,expectedSample:expectedRenewals.slice(0,20),visibleSample:visibleRenewals.slice(0,20)}));
- proof.assertions.realRenewalPipelineRepopulated=true;
- proof.assertions.realRenewalPipelineMatchesCanonicalEligibility=true;
+ if(proof.realRenewalDistribution.eligibleCount>0){
+   need(JSON.stringify(visibleRenewals)===JSON.stringify(expectedRenewals),'B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH:'+JSON.stringify({expected:expectedRenewals.length,visible:visibleRenewals.length,expectedSample:expectedRenewals.slice(0,20),visibleSample:visibleRenewals.slice(0,20)}));
+   proof.assertions.realRenewalPipelineRepopulated=true;
+   proof.assertions.realRenewalPipelineMatchesCanonicalEligibility=true;
+ }else{
+   need(proof.r13RenewalSourceDryRun&&proof.r13RenewalSourceDryRun.ready===true,'B4_003_R13_RENEWAL_SOURCE_DRYRUN_NOT_READY:'+JSON.stringify(proof.r13RenewalSourceDryRun||{}));
+   proof.r13RenewalDataBlocker={
+     blocking:true,
+     code:'REAL_RENEWABILITY_FIELDS_UNCLASSIFIED_SOURCE_BACKED_APPLY_REQUIRED',
+     byState:proof.realRenewalDistribution.byState,
+     sourceDryRunCount:proof.r13RenewalSourceDryRun.proposedWriteCount,
+     writeExecuted:false,
+     authorizationRequired:true
+   };
+   proof.assertions.realRenewalPipelineRepopulated=false;
+   proof.assertions.realRenewalPipelineMatchesCanonicalEligibility=false;
+ }
 
  await page.evaluate(()=>Orbit.modules.renovaciones.campana());
  await page.waitForSelector('#renewal-campaign-v1200 [data-prepare]',{timeout:10000});
@@ -691,7 +747,7 @@ try{
  proof.assertions.previewGeneralWriteIsolation=true;
  proof.assertions.noOperationalRealRowsWritten=true;
  need(proof.assertions.cancellationProjectionConsistent===true,'B4_003_REAL_CANCELATION_SOURCE_WITHOUT_PROJECTION');
- proof.status='PASS';
+ proof.status=proof.r13RenewalDataBlocker&&proof.r13RenewalDataBlocker.blocking===true?'BLOCKED_RENEWABILITY_DATA_APPLY_REQUIRED':'PASS';
 } finally {
  if(page)await page.close().catch(()=>{});
  if(context)await context.close().catch(()=>{});
@@ -704,5 +760,5 @@ try{
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
 }
 if(proof.status!=='PASS'||proof.syntheticFinalAbsent!==true||proof.assertions.insurerDriveFileCleanup!==true)process.exitCode=1;
-console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors},null,2));
+console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,r13PolicyPerformance:proof.r13PolicyPerformance,r13RenewalSourceDryRun:proof.r13RenewalSourceDryRun,r13RenewalDataBlocker:proof.r13RenewalDataBlocker,r13InsurerDrive:proof.r13InsurerDrive,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors},null,2));
 // R12 remaining B4-003 blocker proof: 2026-10-03
