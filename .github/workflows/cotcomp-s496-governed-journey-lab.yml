@@ -1,0 +1,177 @@
+name: CotComp S4.96 governed journey LAB
+
+on:
+  push:
+    branches:
+      - ays/cotcomp-s495-premium-refinement-lab-20261004
+    paths:
+      - '.github/cotcomp-lab-intents/s496-governed-journey-lab-authorized.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompPremiumJourneyPreviewS496
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompPremiumJourneyPreviewS496
+
+jobs:
+  s496-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.96 authorization intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          I=.github/cotcomp-lab-intents/s496-governed-journey-lab-authorized.json
+          jq -e '
+            .authorization=="S496_DEPLOY_GOVERNED_JOURNEY" and
+            .projectId=="ays-orbit-360-lab" and
+            .functionName=="cotcompPremiumJourneyPreviewS496" and
+            .parentFunction=="cotcompPremiumVisualPreviewS495" and
+            .governanceLock==true and
+            .canonicalJourneyRestored==true and
+            .deepIntakeRestored==true and
+            .heroTypographyRestored==true and
+            .visualResolverReconciled==true and
+            .productFamilyCount==7 and
+            .fixtureOnly==true and
+            .providerDeploymentAuthorized==false and
+            .cotcompRealTransportAuthorized==false and
+            .production==false
+          ' "$I" >/dev/null
+          PARENT="$(git rev-parse HEAD^)"
+          test "$(jq -r '.authorizedSourceParent' "$I")" = "$PARENT"
+          mapfile -t CHANGED < <(git diff --name-only "$PARENT" HEAD)
+          test "${#CHANGED[@]}" = "1"
+          test "${CHANGED[0]}" = "$I"
+
+      - name: Prepare transient bootstrap export
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('bootstrap.js')
+          s=p.read_text()
+          old="  require('./cotcomp-premium-visual-preview-s495')\n);"
+          new="  require('./cotcomp-premium-visual-preview-s495'),\n  require('./cotcomp-premium-journey-preview-s496')\n);"
+          if old not in s:
+              raise SystemExit('bootstrap insertion anchor missing')
+          p.write_text(s.replace(old,new))
+          PY
+
+      - name: Run accumulated QA plus S4.96 safeguards
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check
+          npm run test:cotcomp
+          node --check cotcomp-premium-visual-preview-s495.js
+          node --check cotcomp-premium-journey-preview-s496.js
+          node --check cotcomp-premium-journey-preview-s496.test.js
+          node --test cotcomp-premium-visual-preview-s495.test.js
+          node --test cotcomp-premium-journey-preview-s496.test.js
+
+      - name: Prepare LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s496/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s496/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Deploy only S4.96 preview to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physically verify S4.96
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s496/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+          grep -q 'ays-candidate-s496' "$E/page.html"
+          grep -q 'S496_LOCKED' "$E/page.html"
+          grep -q 'data-s496="true"' "$E/page.html"
+          grep -q "hero h1{font-family:'Archivo'" "$E/page.html"
+          grep -q 'Lo que necesitas' "$E/page.html"
+          grep -q 'Tus datos' "$E/page.html"
+          grep -q 'Revisar opciones' "$E/page.html"
+          grep -q 'Comparar y continuar' "$E/page.html"
+          grep -q 'Tipo de vehículo' "$E/page.html"
+          grep -q 'Conductor joven / condición aplicable' "$E/page.html"
+          grep -q 'Fecha de nacimiento del titular' "$E/page.html"
+          grep -q 'Movimiento anual estimado' "$E/page.html"
+          grep -q 'Un contrato / proyecto' "$E/page.html"
+          grep -q 'Revisar una póliza existente' "$E/page.html"
+          grep -q 'id="s496Brand"' "$E/page.html"
+          grep -q 'id="s496Model"' "$E/page.html"
+          grep -q "pv.dataset.s495Photo='false'" "$E/page.html"
+          grep -q 'Vista previa visual LAB' "$E/page.html"
+          grep -q 'Gravicentra sigue siendo la autoridad' "$E/page.html"
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+          jq -n --arg url "$COTCOMP_URL" '{
+            schemaVersion:"ays-cotcomp-s496-governed-journey-physical-receipt-v1.0",
+            functionUrl:$url,
+            deployed:true,
+            governanceLock:true,
+            canonicalJourneyRestored:true,
+            deepIntakeRestored:true,
+            heroTypographyRestored:true,
+            visualResolverReconciled:true,
+            fixtureOnly:true,
+            providerDeploymentAuthorized:false,
+            cotcompRealTransportAuthorized:false,
+            productionTouched:false
+          }' > "$E/S496_GOVERNED_JOURNEY_PHYSICAL_RECEIPT.json"
+
+      - name: Upload sanitized S4.96 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s496-governed-journey-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s496/evidence/S496_GOVERNED_JOURNEY_PHYSICAL_RECEIPT.json
+            ${{ runner.temp }}/s496/evidence/page.html
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s496/firebase-service-account.json"
