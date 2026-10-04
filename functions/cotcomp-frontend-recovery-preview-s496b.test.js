@@ -16,8 +16,8 @@ test('S4.96B restores S4.95 as visual parent',()=>{
 test('hero is bounded and preserves S4.95 editorial headline family',()=>{
   const h=S.html();
   assert.match(h,/hero-media\{[\s\S]*position:relative/);
-  assert.match(h,/aspect-ratio:16\/10/);
-  assert.match(h,/max-height:410px/);
+  assert.match(h,/aspect-ratio:4\/3/);
+  assert.match(h,/width:min\(580px,38vw\)/);
   assert.match(h,/hero h1\{[\s\S]*font-family:'Newsreader'/);
   assert.doesNotMatch(h,/body\[data-s496b="true"\] \.hero-media\{[^}]*bottom:22px/);
 });
