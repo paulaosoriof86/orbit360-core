@@ -239,7 +239,7 @@ try{
  page=await context.newPage();
  page.on('pageerror',e=>proof.pageErrors.push(clean(e?.message||e)));
  page.on('console',m=>{if(m.type()==='error')proof.consoleErrors.push(clean(m.text()));});
- page.on('response',r=>{if(r.status()>=400)proof.httpErrors.push({status:r.status(),url:clean(r.url()),resourceType:clean(r.request().resourceType())});});
+ page.on('response',async r=>{if(r.status()>=400){const req=r.request();let body='';try{body=clean(await r.text()).slice(0,2000);}catch{}proof.httpErrors.push({status:r.status(),url:clean(r.url()),resourceType:clean(req.resourceType()),method:clean(req.method()),postData:clean(req.postData()).slice(0,4000),responseBody:body});}});
  await applyLegal(page,who);
  await page.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
  await bootProduct(page,token);
