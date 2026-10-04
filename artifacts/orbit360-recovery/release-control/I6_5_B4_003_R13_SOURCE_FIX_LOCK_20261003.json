@@ -393,5 +393,26 @@
     "blobSha": "c7efe22784e3af7d3b88395073f216a0f46d8cdd",
     "contractBlobSha": "2499e565c4d8e7b8bd4bb726be533bf7dc506ced",
     "productChanged": false
+  },
+  "r14QualityPerformanceRootFix": {
+    "status": "SOURCE_FIXED_R14_PERFORMANCE_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_QUALITY_PERFORMANCE_ROOTFIX_20261004.json",
+    "blobSha": "099219db3a28bdb5bd32afd475b356c842a62781",
+    "failedRunId": 37183696547,
+    "failedJobId": 111381171762,
+    "failureCode": "B4_003_QUALITY_SYNC_RENDER_TOO_SLOW",
+    "productBlobs": {
+      "orbit360-platform/modules/calidad.js": "b30767e58cd3dc60c5af5f165238c16f472632d3",
+      "orbit360-platform/index.html": "9e0f7744e1952973da998d06468959c5a11e354d"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "8a20cd46add3dd02e9c7a61ae6e732ffff59e10f"
+    },
+    "continuityRegisterBlobSha": "efcdd67d09196aa849525050a85aa5122a6cbd3a",
+    "productSourceChanged": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   }
 }
