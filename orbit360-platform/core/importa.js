@@ -10,6 +10,7 @@
 window.Orbit = window.Orbit || {};
 Orbit.importa = (function () {
   const U = Orbit.ui;
+  function clean(v) { return String(v == null ? '' : v).trim(); }
 
   /* ---- Motor de extracción REAL (CSV/TSV/TXT) ----------------------
      Lee el archivo del cliente, detecta delimitador, mapea encabezados

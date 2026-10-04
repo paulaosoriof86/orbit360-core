@@ -27,15 +27,15 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "c38e296b9472b70a08c7a9ef91ed677e6e014bed"
+    "blobSha": "fbfb631d72b45adff5ed0a3703376c123ca893f6"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "1659c0fd34208277eb691a14a5563571edd2b8d9"
+    "blobSha": "b5e96a63c871f67a1beb6e1f74ce481791842ae9"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "0581ef2ad4cdd23f02f69b290a3bd2219112683a",
+    "blobSha": "097916b5e49c06fa8b666133a7622f699f2ec9c1",
     "inventoryCount": 191,
     "attentionCount": 86,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -168,5 +168,21 @@
     "reimport": false,
     "livePromotion": false,
     "exactSetProductFileCount": 97
+  },
+  "r13ImporterCleanRootFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_IMPORTER_CLEAN_ROOTFIX_20261004.json",
+    "blobSha": "39c1eff27c415f8ac7688596ec9edde3bbd86992",
+    "failedRunId": 37167226337,
+    "failedJobId": 111332573729,
+    "failureCode": "B4_003_R13_IMPORTER_FILE_INPUT_NOT_RENDERED",
+    "productBlobs": {
+      "orbit360-platform/core/importa.js": "6d07ea4649b0d83dd66795c9329209993a5f9180"
+    },
+    "compositionBlobSha": "fbfb631d72b45adff5ed0a3703376c123ca893f6",
+    "productSourceChanged": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

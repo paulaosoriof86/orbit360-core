@@ -171,7 +171,7 @@
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "774c6cbe32be08f23e45f37b8e12e56f9be08bf3",
     "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
-    "orbit360-platform/core/importa.js": "31aee47b3773da7d7f46df7915c29bc7104c0b1d",
+    "orbit360-platform/core/importa.js": "6d07ea4649b0d83dd66795c9329209993a5f9180",
     "orbit360-platform/core/issuance-workflow-v1201-refinements.js": "47a9d68bef8cb60a00a057375efdf443c2ff2de2",
     "orbit360-platform/core/issuance-workflow-v1201.js": "ab138f218e041b41ac737ff250c7e808edc8c030",
     "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
@@ -2649,5 +2649,20 @@
     "livePromotion": false,
     "exactSetAddedPath": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
     "exactSetReason": "R13 product source fix changed an already-runtime-loaded bridge; canonical exact diff set must bind every product delta from the certified baseline."
+  },
+  "b4003R13ImporterCleanRootFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "findingId": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+    "failedRunId": 37167226337,
+    "failedJobId": 111332573729,
+    "failureCode": "B4_003_R13_IMPORTER_FILE_INPUT_NOT_RENDERED",
+    "rootCause": "UNDEFINED_LOCAL_CLEAN_HELPER_IN_CANONICAL_IMPORTER",
+    "productBlobs": {
+      "orbit360-platform/core/importa.js": "6d07ea4649b0d83dd66795c9329209993a5f9180"
+    },
+    "productFileCountUnchanged": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

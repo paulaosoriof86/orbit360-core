@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_IMPORTER_CLEAN_ROOTFIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+  "authority": "B4_003_FAIL_CLOSED_CAUSAL_ROOTFIX_WITHIN_ACTIVE_GATE",
+  "parentHead": "75a4cba84705e29d743705dca58d6d3ac36a2248",
+  "failedExactPreviewRunId": 37167226337,
+  "failedJobId": 111332573729,
+  "failedStep": "Durable renewals cancelations browser proof",
+  "failureCode": "B4_003_R13_IMPORTER_FILE_INPUT_NOT_RENDERED",
+  "rootCause": "The canonical docs-aseguradora owner orbit360-platform/core/importa.js calls clean() when opening the insurer-document drawer, but no local clean function exists in the file, causing ReferenceError before the file input renders.",
+  "discriminant": {
+    "importerBlobBefore": "31aee47b3773da7d7f46df7915c29bc7104c0b1d",
+    "cleanDefinitionCountBefore": 0,
+    "cleanCallSites": [
+      880,
+      1133,
+      1134
+    ],
+    "observedBrowserError": "ReferenceError: clean is not defined"
+  },
+  "allowedProductFiles": [
+    "orbit360-platform/core/importa.js"
+  ],
+  "fix": "Add one local non-destructive clean(v) helper that converts null/undefined to empty string and trims surrounding whitespace without lowercasing or altering insurer document semantics.",
+  "productBlobs": {
+    "orbit360-platform/core/importa.js": "6d07ea4649b0d83dd66795c9329209993a5f9180"
+  },
+  "compositionLockBlobSha": "fbfb631d72b45adff5ed0a3703376c123ca893f6",
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "realOperationalDataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productionFunctionsDeployment": false,
+    "realInsurerDriveWrites": false,
+    "syntheticQaOnly": true
+  },
+  "requiredProof": [
+    "B4_003_R13_CONTRACT_PASS",
+    "B4_003_R13_EXACT_PREVIEW_MACHINE_PROOF_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER",
+    "B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION",
+    "B4_003_TARGETED_PAULA_VISUAL_PASS"
+  ],
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
