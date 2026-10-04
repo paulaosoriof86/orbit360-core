@@ -3,12 +3,13 @@ import {createHash} from 'node:crypto';
 const P={
  ledger:'artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json',
  registry:'artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json',
- control:'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
+ control:'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json',
+ masterPlan:'artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json'
 };
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const gitBlobSha=p=>{const b=fs.readFileSync(p);return createHash('sha1').update(`blob ${b.length}\0`).update(b).digest('hex');};
 const need=(v,c)=>{if(!v)throw new Error(c);};
-const led=read(P.ledger),reg=read(P.registry),cp=read(P.control);
+const led=read(P.ledger),reg=read(P.registry),cp=read(P.control),plan=read(P.masterPlan);
 const findings=Array.isArray(led.findings)?led.findings:[];
 const inv=Array.isArray(reg.inventory)?reg.inventory:[];
 const ids=a=>a.map(x=>String(x.id||'')).sort();
@@ -17,6 +18,17 @@ need(ledIds.length===new Set(ledIds).size,'CONTINUITY_LEDGER_DUPLICATE_ID');
 need(invIds.length===new Set(invIds).size,'CONTINUITY_REGISTER_DUPLICATE_ID');
 need(JSON.stringify(ledIds)===JSON.stringify(invIds),'CONTINUITY_REGISTER_LEDGER_SET_MISMATCH');
 need(reg.inventoryCount===inv.length,'CONTINUITY_INVENTORY_COUNT_MISMATCH');
+need(plan.schema==='GRAVICENTRA_I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_V1'&&String(plan.status||'').startsWith('FROZEN_ACTIVE'),'CONTINUITY_MASTER_PLAN_INVALID');
+const baselinePlanIds=(plan.noLossContract?.baselineRequiredFindingIds||[]).map(String);
+need(baselinePlanIds.length===Number(plan.noLossContract?.baselineFindingCount||0),'CONTINUITY_MASTER_PLAN_BASELINE_COUNT_MISMATCH');
+for(const id of baselinePlanIds)need(ledIds.includes(id),'CONTINUITY_MASTER_PLAN_BASELINE_FINDING_LOST:'+id);
+for(const id of (plan.noLossContract?.criticalMustNeverDisappearIds||[]).map(String)){
+ need(ledIds.includes(id),'CONTINUITY_MASTER_PLAN_CRITICAL_FINDING_LOST:'+id);
+ need(invIds.includes(id),'CONTINUITY_MASTER_PLAN_CRITICAL_REGISTER_LOST:'+id);
+}
+for(const required of ['B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE','B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION','B4-004','B4-005','B4-006','B4-007']){
+ need(baselinePlanIds.includes(required),'CONTINUITY_MASTER_PLAN_REQUIRED_SCOPE_MISSING:'+required);
+}
 const byLed=new Map(findings.map(x=>[String(x.id),x]));
 for(const row of inv){
  const f=byLed.get(String(row.id));
