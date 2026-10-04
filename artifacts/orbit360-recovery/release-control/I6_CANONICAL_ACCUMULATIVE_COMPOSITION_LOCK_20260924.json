@@ -199,7 +199,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "398ff1c8b8f0f0da83d67e4297c26e85e00d50d3",
+    "orbit360-platform/index.html": "2f58429833edea2bebf0813e6bbd007aa9f7ae31",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "1e6b93422833f450d02616807479159ddf8a099b",
     "orbit360-platform/modules/calidad.js": "0d9b9337a1aff1ce9f351663db60ff83c44a99f4",
@@ -2633,5 +2633,17 @@
     "livePromotion": false,
     "visualRedesign": false,
     "nextAction": "B4_003_R13P3_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "b4003R13InsurerDriveShadowOwner": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "bridgePath": "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js",
+    "bridgeBlobSha": "db5f012abe505c2dd27d77a47d0694868bee5348",
+    "indexBlobSha": "2f58429833edea2bebf0813e6bbd007aa9f7ae31",
+    "canonicalDocumentOwner": "orbit360-platform/core/importa.js",
+    "legacyShadowOwnerDisabled": true,
+    "productSourceChanged": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
