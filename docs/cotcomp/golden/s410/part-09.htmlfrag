@@ -1,0 +1,700 @@
+          </div>
+          <div role="group" aria-label="Escenario de tu operación" class="vl-t4-rail" style="margin-top:18px;">
+            <sc-for list="{{ fltSituations }}" as="q" hint-placeholder-count="4">
+              <button class="vl-t4-sit" onClick="{{ q.pick }}" aria-pressed="{{ q.active }}" data-analytics-action="fleetlogistics_situation_selected" style="{{ q.style }}">
+                <span style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#C4001F;">{{ q.n }}</span>
+                <span style="font-family:'Archivo';font-weight:750;font-size:14.5px;line-height:1.2;letter-spacing:-.012em;color:#12110F;">{{ q.label }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <p class="vl-t4-copy" style="font-size:12.5px;line-height:1.55;color:#6E655C;margin:14px 0 0;max-width:92ch;">Elegir un escenario ordena el énfasis del recorrido. Todos los puntos de la operación siguen disponibles.</p>
+        </div>
+      </div>
+
+      <!-- 03 · TORRE DE CONTROL + INSPECTOR -->
+      <div id="vl-t4-mapa" style="background:#0E0D10;color:#F4F1EA;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(36px,5.4vh,76px) clamp(20px,3vw,44px);">
+          <div style="max-width:76ch;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">UNA OPERACIÓN CONECTADA</div>
+            <h2 style="font-family:'Archivo';font-weight:850;font-size:clamp(24px,2.9vw,42px);line-height:1.05;letter-spacing:-.03em;margin:12px 0 0;">Lo que se mueve también conecta responsabilidades y continuidad.</h2>
+            <p class="vl-t4-copy" style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:clamp(15px,1.25vw,19px);line-height:1.5;color:#CFC9BE;margin:12px 0 0;max-width:62ch;">Selecciona un punto para entender qué puede cambiar y qué conviene revisar antes de comparar alternativas.</p>
+          </div>
+
+          <div class="vl-t4-map" style="margin-top:26px;">
+            <div style="min-width:0;">
+              <div class="vl-t4-canvas vl-t4-wide">
+                <svg viewBox="0 0 1000 470" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                  <g stroke="rgba(255,255,255,.05)" strokeWidth="1" vectorEffect="non-scaling-stroke">
+                    <path d="M0,94 H1000"></path><path d="M0,188 H1000"></path><path d="M0,282 H1000"></path><path d="M0,376 H1000"></path>
+                    <path d="M200,0 V470"></path><path d="M400,0 V470"></path><path d="M600,0 V470"></path><path d="M800,0 V470"></path>
+                  </g>
+                  <sc-for list="{{ fltEdges }}" as="e" hint-placeholder-count="8">
+                    <path d="{{ e.d }}" fill="none" stroke="{{ e.stroke }}" strokeWidth="{{ e.w }}" strokeLinecap="round" strokeDasharray="{{ e.dash }}" vectorEffect="non-scaling-stroke"></path>
+                  </sc-for>
+                  <circle cx="55" cy="282" r="7" fill="#E4002B"></circle>
+                </svg>
+                <span aria-hidden="true" style="position:absolute;left:2.6%;top:66%;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8E8790;">ORIGEN</span>
+                <span aria-hidden="true" style="position:absolute;right:2.4%;top:4.5%;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8E8790;">RECORRIDO OPERATIVO</span>
+                <sc-for list="{{ fltNodes }}" as="n" hint-placeholder-count="5">
+                  <button class="vl-t4-node" onClick="{{ n.pick }}" aria-pressed="{{ n.active }}" data-analytics-action="fleetlogistics_node_selected" style="{{ n.style }}">
+                    <span class="vl-t4-nodenum" style="{{ n.numStyle }}">{{ n.n }}</span>
+                    <span class="vl-t4-nodelabel" style="{{ n.labelStyle }}">{{ n.t }}</span>
+                    <span class="vl-t4-nodemeta" style="{{ n.metaStyle }}">{{ n.meta }}</span>
+                  </button>
+                </sc-for>
+              </div>
+
+              <div class="vl-t4-narrow" role="group" aria-label="Puntos de la operación">
+                <sc-for list="{{ fltNodes }}" as="n" hint-placeholder-count="5">
+                  <button class="vl-t4-nnode" onClick="{{ n.pick }}" aria-pressed="{{ n.active }}" data-analytics-action="fleetlogistics_node_selected" style="{{ n.nstyle }}">
+                    <span class="vl-t4-nodenum" style="{{ n.numStyle }}">{{ n.n }}</span>
+                    <span class="vl-t4-nodelabel" style="{{ n.labelStyle }}">{{ n.t }}</span>
+                    <span class="vl-t4-nodemeta vl-t4-copy" style="{{ n.metaStyle }}">{{ n.link }}</span>
+                  </button>
+                </sc-for>
+              </div>
+
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;">
+                <button onClick="{{ fltReset }}" aria-pressed="{{ fltOverviewActive }}" data-analytics-action="fleetlogistics_node_selected" style="{{ fltResetStyle }}">Ver la operación completa</button>
+                <span class="vl-t4-copy" style="font-size:12px;line-height:1.5;color:#A9A29A;max-width:56ch;">Todos los puntos siguen disponibles, elijas el escenario que elijas.</span>
+              </div>
+            </div>
+
+            <aside aria-live="polite" style="min-width:0;border:1px solid #2a2833;border-radius:20px;background:linear-gradient(155deg,#1a1119 0%,#0E0D10 60%);padding:clamp(18px,2vw,26px);box-shadow:0 46px 96px -58px rgba(0,0,0,.9);">
+              <div style="font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.13em;color:#FF9DA8;">PUNTO DE LA OPERACIÓN</div>
+              <h3 style="font-family:'Archivo';font-weight:850;font-size:clamp(20px,1.85vw,27px);line-height:1.1;letter-spacing:-.022em;margin:9px 0 0;color:#fff;">{{ fltInsTitle }}</h3>
+              <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px;">
+                <sc-for list="{{ fltInsBlocks }}" as="b" hint-placeholder-count="4">
+                  <div style="border-top:1px solid #2a2833;padding-top:12px;">
+                    <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#FF9DA8;">{{ b.k }}</div>
+                    <p class="vl-t4-copy" style="font-size:13.5px;line-height:1.6;color:#D7D1C4;margin:7px 0 0;">{{ b.v }}</p>
+                  </div>
+                </sc-for>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+
+      <!-- 04 · MATRIZ DE CONTEXTO -->
+      <div id="vl-t4-contexto" style="background:#F4F1EA;color:#12110F;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(36px,5.4vh,76px) clamp(20px,3vw,44px);">
+          <div style="max-width:70ch;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#C4001F;">EL CONTEXTO CAMBIA LA DECISIÓN</div>
+            <h2 style="font-family:'Archivo';font-weight:850;font-size:clamp(24px,2.7vw,40px);line-height:1.06;letter-spacing:-.03em;margin:12px 0 0;">No todas las operaciones necesitan revisar lo mismo.</h2>
+          </div>
+          <div style="margin-top:22px;border-bottom:1px solid #E2DACF;">
+            <sc-for list="{{ fltMatrix }}" as="m" hint-placeholder-count="6">
+              <div class="vl-t4-ledger">
+                <div style="min-width:0;display:flex;gap:12px;align-items:baseline;">
+                  <span style="font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.1em;color:#C4001F;flex:none;">{{ m.n }}</span>
+                  <span style="font-family:'Archivo';font-weight:800;font-size:clamp(16px,1.35vw,20px);line-height:1.2;letter-spacing:-.018em;">{{ m.t }}</span>
+                </div>
+                <p class="vl-t4-copy" style="font-size:14px;line-height:1.6;color:#4A443C;margin:0;max-width:76ch;">{{ m.d }}</p>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <!-- 05 · CAPA DE RELACIÓN CON SOLUCIONES -->
+      <div id="vl-t4-soluciones" style="background:#12100F;color:#F4F1EA;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(36px,5.4vh,76px) clamp(20px,3vw,44px);">
+          <div style="max-width:70ch;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">DE LA OPERACIÓN A LAS SOLUCIONES</div>
+            <h2 style="font-family:'Archivo';font-weight:850;font-size:clamp(24px,2.7vw,40px);line-height:1.06;letter-spacing:-.03em;margin:12px 0 0;">La operación orienta qué soluciones vale la pena revisar.</h2>
+          </div>
+          <div style="margin-top:22px;border-bottom:1px solid #2a2833;">
+            <sc-for list="{{ fltFamilies }}" as="f" hint-placeholder-count="5">
+              <div class="vl-t4-rel">
+                <div style="min-width:0;">
+                  <span style="font-family:'Archivo';font-weight:800;font-size:clamp(16px,1.35vw,20px);line-height:1.2;letter-spacing:-.018em;color:#fff;">{{ f.t }}</span>
+                  <div class="vl-t4-tags">
+                    <sc-for list="{{ f.tags }}" as="g" hint-placeholder-count="2">
+                      <span class="vl-t4-tag" style="{{ g.style }}">{{ g.label }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+                <p class="vl-t4-copy" style="font-size:14px;line-height:1.6;color:#CFC9BE;margin:0;max-width:76ch;">{{ f.d }}</p>
+              </div>
+            </sc-for>
+          </div>
+          <p class="vl-t4-copy" style="font-size:12.5px;line-height:1.6;color:#A9A29A;margin:18px 0 0;max-width:88ch;">No todas las soluciones aplican a todos los casos. La alternativa final depende del contexto y de la información validada.</p>
+        </div>
+      </div>
+
+      <!-- 06 · CONTINUIDAD -->
+      <div id="vl-t4-continuidad" style="background:#0B0A0E;color:#F4F1EA;border-top:1px solid #2a2833;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(34px,5vh,70px) clamp(20px,3vw,44px);">
+          <div style="max-width:70ch;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">SIGUIENTE PASO</div>
+            <h2 style="font-family:'Archivo';font-weight:850;font-size:clamp(23px,2.5vw,36px);line-height:1.06;letter-spacing:-.03em;margin:12px 0 0;">Tu contexto define cómo podemos continuar.</h2>
+          </div>
+          <div class="vl-t4-states" style="margin-top:22px;">
+            <sc-for list="{{ fltStates }}" as="c" hint-placeholder-count="3">
+              <div style="{{ c.style }}">
+                <span style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:{{ c.numColor }};">{{ c.n }}</span>
+                <p style="font-family:'Archivo';font-weight:750;font-size:15px;line-height:1.3;letter-spacing:-.014em;margin:8px 0 0;color:{{ c.textColor }};">{{ c.label }}</p>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;">
+            <button onClick="{{ fltHandoff }}" data-analytics-action="fleetlogistics_exit_to_handoff" style="min-height:52px;padding:0 24px;border-radius:13px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap;">Hablar con un asesor</button>
+            <button onClick="{{ fltContinue }}" data-analytics-action="fleetlogistics_continue_evaluation" style="min-height:52px;padding:0 24px;border-radius:13px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.24);color:#fff;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;white-space:nowrap;">Revisar mi empresa</button>
+          </div>
+          <p class="vl-t4-copy" style="font-size:12.5px;line-height:1.6;color:#A9A29A;margin:16px 0 0;max-width:88ch;">Hablar con un asesor traslada lo que ya elegiste: {{ fltContextLine }} — Revisar mi empresa abre la evaluación general de Empresas y no conserva esa selección.</p>
+        </div>
+      </div>
+
+      <!-- 07 · MÉTODO A&S -->
+      <div id="vl-t4-metodo" style="background:#EFE9DD;color:#12110F;border-top:1px solid #E2DACF;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(30px,4.4vh,60px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#C4001F;">MÉTODO A&amp;S</div>
+          <h2 style="font-family:'Archivo';font-weight:800;font-size:clamp(20px,2.1vw,29px);line-height:1.12;letter-spacing:-.025em;margin:10px 0 20px;max-width:34ch;">Una decisión de operación empieza por ordenar el contexto.</h2>
+          <div class="vl-t4-method">
+            <sc-for list="{{ fltMethod }}" as="s" hint-placeholder-count="4">
+              <div style="border-top:2px solid #C4001F;padding-top:12px;min-width:0;">
+                <span style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#C4001F;">{{ s.n }}</span>
+                <div style="font-family:'Archivo';font-weight:800;font-size:17px;letter-spacing:-.018em;margin-top:5px;">{{ s.t }}</div>
+                <p class="vl-t4-copy" style="font-size:13px;line-height:1.55;color:#4A443C;margin:6px 0 0;">{{ s.d }}</p>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </sc-if>
+
+  <!-- ============================ T5 · TRANSPORTE / LOGÍSTICA / CADENA · COLOMBIA ============================ -->
+  <sc-if value="{{ isLogisticaCO }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen" data-screen-label="Transporte y cadena CO" data-country="co">
+
+      <!-- 01 · HERO humano / editorial asimétrico -->
+      <div id="vl-t5-hero" style="position:relative;background:#0E0D10;color:#F4F1EA;overflow:hidden;">
+        <div aria-hidden="true" style="position:absolute;inset:0;z-index:0;background:radial-gradient(980px 560px at 6% 0%,rgba(228,0,43,.15),transparent 62%);"></div>
+        <div aria-hidden="true" style="position:absolute;left:0;right:0;bottom:0;height:1px;background:#2a2833;z-index:2;"></div>
+        <div class="vl-t5-hero" style="position:relative;z-index:1;max-width:1600px;margin:0 auto;padding:clamp(44px,6.2vh,88px) clamp(20px,3vw,44px) clamp(40px,5.4vh,72px);">
+          <div style="min-width:0;padding-bottom:0;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;display:flex;align-items:center;gap:10px;"><span style="width:30px;height:2px;background:#E4002B;flex:none;"></span>A&amp;S Colombia · Transporte, logística y cadena</div>
+            <h1 style="font-family:'Archivo';font-weight:900;font-size:clamp(32px,4.1vw,66px);line-height:.97;letter-spacing:-.035em;margin:18px 0 0;max-width:19ch;">Protege la cadena desde el rol que <span style="color:#FF3B54;">realmente cumples.</span></h1>
+            <p style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:clamp(17px,1.45vw,21px);line-height:1.46;color:#D7D1C4;margin:18px 0 0;max-width:54ch;">Transporte y logística se entienden desde la operación: quién es responsable, qué se mueve, dónde se concentra el riesgo y qué puede detener la cadena.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;">
+              <button onClick="{{ t5ToRoles }}" style="min-height:52px;padding:0 24px;border-radius:13px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap;">Evaluar mi cadena</button>
+              <button onClick="{{ t5Handoff }}" data-analytics-action="chain_exit_to_handoff" style="min-height:52px;padding:0 24px;border-radius:13px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.24);color:#fff;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;white-space:nowrap;">Hablar con un asesor</button>
+            </div>
+            <p class="vl-t5-copy" style="font-size:12.5px;line-height:1.6;color:#A9A29A;margin:26px 0 0;max-width:64ch;border-top:1px solid #2a2833;padding-top:14px;">Te orientamos según tu rol y tu operación. Coberturas, requisitos, responsabilidades y alternativas dependen de cada caso y de la información validada.</p>
+          </div>
+          <figure style="margin:0;position:relative;align-self:center;justify-self:end;width:100%;max-width:720px;">
+            <img src="assets/photos/T5_CO_CADENA_REAL_TEAM_ADVISORY_v1.png" alt="Integrantes reales del equipo A&amp;S en una sesión de asesoría." decoding="async" style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:center 48%;border-radius:24px;border:1px solid #2a2833;box-shadow:0 34px 72px -42px rgba(0,0,0,.88);">
+            <span aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,16,.08) 0%,rgba(14,13,16,0) 54%,rgba(14,13,16,.34) 100%);border-radius:24px;pointer-events:none;"></span>
+          </figure>
+        </div>
+      </div>
+
+      <!-- 02 · ROLE SELECTOR compacto (registro tipográfico, no rail de cards) -->
+      <div id="vl-t5-roles" style="background:#EFE9DD;color:#12110F;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(28px,3.6vh,48px) clamp(20px,3vw,44px);">
+          <div style="max-width:74ch;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#C4001F;">EMPIEZA POR TU ROL</div>
+            <h2 style="font-family:'Archivo';font-weight:850;font-size:clamp(22px,2.5vw,34px);line-height:1.08;letter-spacing:-.025em;margin:10px 0 0;">La misma cadena cambia según quién responde en cada etapa.</h2>
+            <p class="vl-t5-copy" style="font-size:14px;line-height:1.6;color:#4A443C;margin:10px 0 0;max-width:66ch;">Elige el rol que más se aproxima a tu operación. Si todavía no quieres definirlo, puedes explorar la cadena completa.</p>
+          </div>
+          <div class="vl-t5-roles" role="group" aria-label="Rol en la cadena" style="margin-top:20px;">
+            <sc-for list="{{ t5Roles }}" as="r" hint-placeholder-count="3">
+              <button class="vl-t5-role" onClick="{{ r.pick }}" aria-pressed="{{ r.active }}" data-analytics-action="chain_role_selected" style="{{ r.style }}">
+                <span style="font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.1em;color:#C4001F;flex:none;">{{ r.n }}</span>
+                <span style="font-family:'Archivo';font-weight:800;font-size:clamp(16px,1.4vw,21px);line-height:1.18;letter-spacing:-.02em;color:#12110F;">{{ r.label }}</span>
+                <span class="vl-t5-copy" style="font-size:13.5px;line-height:1.55;color:#4A443C;max-width:56ch;">{{ r.emph }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px;">
+            <button onClick="{{ t5Reset }}" aria-pressed="{{ t5OverviewActive }}" data-analytics-action="chain_reset_overview" style="{{ t5ResetStyle }}">Ver la cadena completa</button>
+            <span class="vl-t5-copy" style="font-size:12.5px;line-height:1.55;color:#6E655C;max-width:64ch;">Elegir un rol ordena el énfasis del recorrido. Todas las etapas siguen disponibles.</span>
+          </div>
+          <p class="vl-t5-copy" style="font-size:12.5px;line-height:1.55;color:#6E655C;margin:12px 0 0;max-width:92ch;">Son énfasis de orientación: no son paquetes obligatorios ni una evaluación de aseguramiento.</p>
+        </div>
+      </div>
+
+      <!-- 03 · CHAIN TWIN profundo (una sola visual DOM/SVG) -->
+      <div id="vl-t5-cadena" style="background:#0E0D10;color:#F4F1EA;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(36px,5.4vh,76px) clamp(20px,3vw,44px) clamp(22px,3vh,38px);">
+          <div style="max-width:78ch;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">UNA CADENA, VARIAS RESPONSABILIDADES</div>
+            <h2 style="font-family:'Archivo';font-weight:850;font-size:clamp(24px,2.9vw,42px);line-height:1.05;letter-spacing:-.03em;margin:12px 0 0;">El riesgo cambia cuando la carga cambia de etapa, lugar o responsable.</h2>
+            <p class="vl-t5-copy" style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:clamp(15px,1.25vw,19px);line-height:1.5;color:#CFC9BE;margin:12px 0 0;max-width:64ch;">Selecciona una etapa para entender qué puede cambiar y qué conviene revisar según tu rol.</p>
+          </div>
+
+          <div style="margin-top:26px;">
+            <div class="vl-t5-canvas vl-t5-wide">
+              <svg viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <g stroke="rgba(255,255,255,.05)" strokeWidth="1" vectorEffect="non-scaling-stroke">
+                  <path d="M0,60 H1000"></path><path d="M0,150 H1000"></path><path d="M0,240 H1000"></path>
+                </g>
+                <rect x="0" y="132" width="1000" height="36" fill="rgba(255,255,255,.022)"></rect>
+                <sc-for list="{{ t5Segments }}" as="g" hint-placeholder-count="4">
+                  <path d="{{ g.d }}" fill="none" stroke="{{ g.stroke }}" strokeWidth="{{ g.w }}" strokeLinecap="round" strokeDasharray="{{ g.dash }}" vectorEffect="non-scaling-stroke"></path>
+                </sc-for>
+                <sc-for list="{{ t5Transfers }}" as="x" hint-placeholder-count="4">
+                  <g>
+                    <path d="{{ x.tick }}" stroke="{{ x.stroke }}" strokeWidth="1" strokeDasharray="3 5" vectorEffect="non-scaling-stroke"></path>
+                    <path d="{{ x.mark }}" fill="{{ x.stroke }}"></path>
+                  </g>
+                </sc-for>
+                <sc-for list="{{ t5Bars }}" as="b" hint-placeholder-count="5">
+                  <rect x="{{ b.x }}" y="{{ b.y }}" width="14" height="{{ b.h }}" rx="3" fill="{{ b.fill }}"></rect>
+                </sc-for>
+                <sc-for list="{{ t5Gates }}" as="c" hint-placeholder-count="5">
+                  <circle cx="{{ c.cx }}" cy="150" r="{{ c.r }}" fill="{{ c.fill }}" stroke="{{ c.stroke }}" strokeWidth="1.5" vectorEffect="non-scaling-stroke"></circle>
+                </sc-for>
+              </svg>
+              <span aria-hidden="true" style="position:absolute;left:1.8%;top:7%;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8E8790;">RECORRIDO DE LA CARGA</span>
+              <span aria-hidden="true" style="position:absolute;right:1.8%;bottom:6%;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8E8790;">CONCENTRACIÓN OPERATIVA</span>
+              <span aria-hidden="true" style="position:absolute;left:1.8%;bottom:6%;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#6E6870;">◆ CAMBIO DE RESPONSABLE</span>
+              <sc-for list="{{ t5Stages }}" as="e" hint-placeholder-count="5">
+                <button class="vl-t5-stage" onClick="{{ e.pick }}" aria-pressed="{{ e.active }}" data-analytics-action="chain_stage_selected" style="{{ e.style }}">
+                  <span class="vl-t5-stagenum" style="{{ e.numStyle }}">{{ e.n }}</span>
+                  <span class="vl-t5-stagelabel" style="{{ e.labelStyle }}">{{ e.t }}</span>
+                  <span class="vl-t5-stagemeta" style="{{ e.metaStyle }}">{{ e.meta }}</span>
+                </button>
+              </sc-for>
+            </div>
+
+            <div class="vl-t5-narrow" role="group" aria-label="Etapas de la cadena">
+              <sc-for list="{{ t5Stages }}" as="e" hint-placeholder-count="5">
+                <button class="vl-t5-nstage" onClick="{{ e.pick }}" aria-pressed="{{ e.active }}" data-analytics-action="chain_stage_selected" style="{{ e.nstyle }}">
+                  <span class="vl-t5-stagenum" style="{{ e.numStyle }}">{{ e.n }}</span>
+                  <span class="vl-t5-stagelabel" style="{{ e.labelStyle }}">{{ e.t }}</span>
+                  <span class="vl-t5-stagemeta vl-t5-copy" style="{{ e.metaStyle }}">{{ e.meta }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04 · INSPECTOR dinámico único (banda de ancho completo, 2x2) -->
+        <div id="vl-t5-inspector" aria-live="polite" style="background:linear-gradient(168deg,#1a1119 0%,#0B0A0E 64%);border-top:1px solid #2a2833;">
+          <div style="max-width:1600px;margin:0 auto;padding:clamp(28px,4vh,54px) clamp(20px,3vw,44px) clamp(32px,4.6vh,62px);">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;padding-bottom:18px;">
+              <div style="min-width:0;">
+                <div style="font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.13em;color:#FF9DA8;">ETAPA DE LA CADENA</div>
+                <h3 style="font-family:'Archivo';font-weight:850;font-size:clamp(22px,2.3vw,34px);line-height:1.08;letter-spacing:-.026em;margin:9px 0 0;color:#fff;">{{ t5InsTitle }}</h3>
+              </div>
+              <span class="vl-t5-copy" style="font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.1em;color:#8E8790;">{{ t5InsTag }}</span>
+            </div>
+            <div class="vl-t5-ins">
+              <sc-for list="{{ t5InsBlocks }}" as="b" hint-placeholder-count="4">
+                <div class="vl-t5-insblock">
+                  <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#FF9DA8;">{{ b.k }}</div>
+                  <p class="vl-t5-copy" style="font-size:14px;line-height:1.62;color:#D7D1C4;margin:8px 0 0;max-width:64ch;">{{ b.v }}</p>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 05 · EXPOSURE OVERLAYS relacionales (matriz etapa × exposición) -->
+      <div id="vl-t5-exposiciones" style="background:#12100F;color:#F4F1EA;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(36px,5.4vh,76px) clamp(20px,3vw,44px);">
+          <div style="max-width:70ch;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">EXPOSICIONES CONECTADAS</div>
+            <h2 style="font-family:'Archivo';font-weight:850;font-size:clamp(24px,2.7vw,40px);line-height:1.06;letter-spacing:-.03em;margin:12px 0 0;">Una etapa puede conectar varias exposiciones al mismo tiempo.</h2>
+          </div>
+
+          <div class="vl-t5-mx" style="margin-top:24px;">
+            <div style="min-width:0;"></div>
+            <sc-for list="{{ t5MxHead }}" as="h" hint-placeholder-count="5">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 4px 10px;text-align:center;">
+                <span style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.1em;color:{{ h.numColor }};">{{ h.n }}</span>
+                <span style="font-family:'Archivo';font-weight:750;font-size:11.5px;line-height:1.15;letter-spacing:-.008em;color:{{ h.color }};">{{ h.short }}</span>
+              </div>
+            </sc-for>
+            <sc-for list="{{ t5MxRows }}" as="r" hint-placeholder-count="8">
+              <div style="display:contents;">
+                <div class="vl-t5-mxname">
+                  <span style="font-family:'Archivo';font-weight:750;font-size:14px;line-height:1.2;letter-spacing:-.014em;color:#fff;">{{ r.t }}</span>
+                  <span class="vl-t5-copy" style="font-size:11px;line-height:1.4;color:#8E8790;">{{ r.note }}</span>
+                </div>
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5">
+                  <div class="vl-t5-mxcell"><span class="vl-t5-dot" style="{{ c.style }}" title="{{ c.title }}"></span><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">{{ c.title }}</span></div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+
+          <div class="vl-t5-mxnarrow" style="margin-top:20px;border-bottom:1px solid #2a2833;">
+            <sc-for list="{{ t5MxRows }}" as="r" hint-placeholder-count="8">
+              <div style="border-top:1px solid #2a2833;padding:14px 0;">
+                <span style="font-family:'Archivo';font-weight:750;font-size:15px;line-height:1.2;letter-spacing:-.014em;color:#fff;">{{ r.t }}</span>
+                <p class="vl-t5-copy" style="font-size:12.5px;line-height:1.5;color:#8E8790;margin:5px 0 0;">{{ r.note }}</p>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+                  <sc-for list="{{ r.chips }}" as="c" hint-placeholder-count="3">
+                    <span style="{{ c.style }}">{{ c.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <p class="vl-t5-copy" style="font-size:12.5px;line-height:1.6;color:#A9A29A;margin:18px 0 0;max-width:92ch;">La relación entre etapa y exposición orienta qué conviene revisar. No todas las exposiciones aplican a todos los casos y la alternativa final depende del contexto y de la información validada.</p>
+        </div>
+      </div>
+
+      <!-- 06 · CONTEXT MATRIX -->
+      <div id="vl-t5-contexto" style="background:#F4F1EA;color:#12110F;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(36px,5.4vh,76px) clamp(20px,3vw,44px);">
+          <div style="max-width:70ch;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#C4001F;">EL CONTEXTO CAMBIA LA LECTURA</div>
+            <h2 style="font-family:'Archivo';font-weight:850;font-size:clamp(24px,2.7vw,40px);line-height:1.06;letter-spacing:-.03em;margin:12px 0 24px;">La cadena no se evalúa igual para todos los actores.</h2>
+          </div>
+          <div class="vl-t5-ctx">
+            <sc-for list="{{ t5Context }}" as="c" hint-placeholder-count="6">
+              <div class="vl-t5-ctxitem">
+                <span style="font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.1em;color:#C4001F;">{{ c.n }}</span>
+                <div style="font-family:'Archivo';font-weight:800;font-size:clamp(16px,1.3vw,19px);line-height:1.2;letter-spacing:-.018em;margin-top:6px;">{{ c.t }}</div>
+                <p class="vl-t5-copy" style="font-size:13.5px;line-height:1.6;color:#4A443C;margin:8px 0 0;">{{ c.d }}</p>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <!-- 07 · CONTINUIDAD / HANDOFF -->
+      <div id="vl-t5-continuidad" style="background:#0B0A0E;color:#F4F1EA;border-top:1px solid #2a2833;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(34px,5vh,70px) clamp(20px,3vw,44px);">
+          <div style="max-width:70ch;">
+            <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">SIGUIENTE PASO</div>
+            <h2 style="font-family:'Archivo';font-weight:850;font-size:clamp(23px,2.5vw,36px);line-height:1.06;letter-spacing:-.03em;margin:12px 0 0;">Tu rol y tu cadena definen cómo conviene continuar.</h2>
+          </div>
+          <div class="vl-t5-states" style="margin-top:22px;">
+            <sc-for list="{{ t5States }}" as="c" hint-placeholder-count="3">
+              <div style="{{ c.style }}">
+                <span style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:{{ c.numColor }};">{{ c.n }}</span>
+                <p style="font-family:'Archivo';font-weight:750;font-size:15px;line-height:1.3;letter-spacing:-.014em;margin:8px 0 0;color:{{ c.textColor }};">{{ c.label }}</p>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;">
+            <button onClick="{{ t5Handoff }}" data-analytics-action="chain_exit_to_handoff" style="min-height:52px;padding:0 24px;border-radius:13px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap;">Hablar con un asesor</button>
+            <button onClick="{{ t5Enterprise }}" data-analytics-action="chain_exit_to_enterprise_review" style="min-height:52px;padding:0 24px;border-radius:13px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.24);color:#fff;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;white-space:nowrap;">Revisar mi programa empresarial</button>
+          </div>
+          <p class="vl-t5-copy" style="font-size:12.5px;line-height:1.6;color:#A9A29A;margin:16px 0 0;max-width:92ch;">Hablar con un asesor traslada lo que ya elegiste: {{ t5ContextLine }} — Revisar mi programa empresarial abre la revisión empresarial general y no conserva esa selección.</p>
+        </div>
+      </div>
+
+      <!-- 08 · MÉTODO A&S compacto -->
+      <div id="vl-t5-metodo" style="background:#EFE9DD;color:#12110F;border-top:1px solid #E2DACF;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(30px,4.4vh,60px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#C4001F;">MÉTODO A&amp;S</div>
+          <h2 style="font-family:'Archivo';font-weight:800;font-size:clamp(20px,2.1vw,29px);line-height:1.12;letter-spacing:-.025em;margin:10px 0 20px;max-width:36ch;">Una decisión de cadena empieza por ordenar el rol y el recorrido.</h2>
+          <div class="vl-t5-method">
+            <sc-for list="{{ t5Method }}" as="m" hint-placeholder-count="4">
+              <div style="border-top:2px solid #C4001F;padding-top:12px;min-width:0;">
+                <span style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#C4001F;">{{ m.n }}</span>
+                <div style="font-family:'Archivo';font-weight:800;font-size:17px;letter-spacing:-.018em;margin-top:5px;">{{ m.t }}</div>
+                <p class="vl-t5-copy" style="font-size:13px;line-height:1.55;color:#4A443C;margin:6px 0 0;">{{ m.d }}</p>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </sc-if>
+
+  <!-- ============================ SOBRE A&S · DIRECT TRUST DELTA ============================ -->
+  <sc-if value="{{ isSobre }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen" data-screen-label="Sobre A&amp;S" style="background:#F4F1EA;color:#12110F;">
+      <!-- HERO -->
+      <div style="max-width:1600px;margin:0 auto;padding:clamp(40px,6vh,80px) clamp(20px,3vw,44px) clamp(18px,3vh,30px);">
+        <div style="font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.14em;color:#C4001F;">SOBRE A&amp;S · {{ countryName }}</div>
+        <div class="vl-split" style="display:grid;grid-template-columns:1.06fr .94fr;gap:clamp(28px,4vw,52px);align-items:center;margin-top:16px;">
+          <div>
+            <h1 style="font-family:'Archivo';font-weight:900;font-size:clamp(36px,5vw,72px);line-height:.93;letter-spacing:-.038em;margin:0;max-width:15ch;">Convertimos riesgos complejos en <span style="color:#E4002B;">decisiones claras.</span></h1>
+            <p style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:clamp(18px,1.8vw,24px);line-height:1.45;color:#3C382F;margin:20px 0 0;max-width:56ch;">Somos un equipo de seguros que combina criterio consultivo, comparación y acompañamiento para proteger empresa, patrimonio y personas — sin perder la continuidad humana.</p>
+            <div style="display:flex;gap:26px;flex-wrap:wrap;margin-top:26px;">
+              <div><div style="font-family:'Archivo';font-weight:900;font-size:30px;color:#12110F;">2012</div><div style="font-size:12px;color:#5E594F;">Origen en Bogotá</div></div>
+              <div style="width:1px;background:#E7E2D6;"></div>
+              <div><div style="font-family:'Archivo';font-weight:900;font-size:30px;color:#12110F;">2018</div><div style="font-size:12px;color:#5E594F;">Operación en Guatemala</div></div>
+              <div style="width:1px;background:#E7E2D6;"></div>
+              <div><div style="font-family:'Archivo';font-weight:900;font-size:30px;color:#12110F;">SIB</div><div style="font-size:12px;color:#5E594F;">Registro CS-254</div></div>
+            </div>
+          </div>
+          <div style="display:grid;gap:12px;">
+            <div style="background:#fff;border:1px solid #E7E2D6;border-radius:18px;padding:20px 22px;box-shadow:0 20px 44px -36px rgba(14,13,16,.45);">
+              <div style="display:flex;align-items:center;gap:10px;"><span class="vl-flagpin" style="width:30px;height:20px;background:linear-gradient(90deg,#4997D0 0 34%,#fff 34% 66%,#4997D0 66%);"></span><div style="font-family:'Archivo';font-weight:800;font-size:18px;">Guatemala</div></div>
+              <div style="font-size:13.5px;color:#3C382F;line-height:1.55;margin-top:10px;">Alianzas y Soluciones Corredores de Seguros, S.A. — corredora de seguros.</div>
+              <div style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:6px 12px;border-radius:999px;background:#F4F1EA;border:1px solid #E7E2D6;font-family:'IBM Plex Mono';font-size:11.5px;color:#12110F;">Registro SIB CS-254</div>
+            </div>
+            <div style="background:#0E0D10;color:#F4F1EA;border-radius:18px;padding:20px 22px;">
+              <div style="display:flex;align-items:center;gap:10px;"><span class="vl-flagpin" style="width:30px;height:20px;background:linear-gradient(180deg,#FCD116 0 50%,#003893 50% 75%,#CE1126 75%);"></span><div style="font-family:'Archivo';font-weight:800;font-size:18px;color:#fff;">Colombia</div></div>
+              <div style="font-size:13.5px;color:#CFC9BE;line-height:1.55;margin-top:10px;">A&amp;S Consultores de Seguros — Transporte, Logística y Cadena es una especialización visible dentro de una propuesta corporativa más amplia.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M07 · STRATEGY COCKPIT · MISIÓN / VISIÓN / VALORES -->
+      <div style="background:#0B0A0E;color:#F4F1EA;position:relative;overflow:hidden;">
+        <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(900px 520px at 78% 6%,rgba(228,0,43,.16),transparent 62%),radial-gradient(700px 500px at 4% 92%,rgba(216,169,78,.10),transparent 60%);"></div>
+        <div style="position:relative;max-width:1600px;margin:0 auto;padding:clamp(44px,6vh,84px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">BRÚJULA ESTRATÉGICA · SISTEMA DE DECISIÓN A&amp;S</div>
+          <h2 style="font-family:'Archivo';font-weight:900;font-size:clamp(28px,3.5vw,48px);letter-spacing:-.03em;margin:10px 0 12px;max-width:22ch;">Propósito, misión y visión dentro de un mismo sistema.</h2>
+          <p style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:clamp(16px,1.45vw,19px);line-height:1.55;color:#CFC9BE;margin:0 0 24px;max-width:74ch;">No son declaraciones aisladas: orientan cómo entendemos el riesgo, cómo acompañamos una decisión y cómo evoluciona nuestra forma de servir.</p>
+
+          <div class="vl-strategy-shell">
+            <div class="vl-strategy-top">
+              <div class="vl-strategy-brand"><span class="vl-strategy-lights"><span></span><span></span><span></span></span>A&amp;S · TABLERO ESTRATÉGICO · GT / CO</div>
+              <div style="font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.12em;color:#B9B2A3;">INTERACTIVO · PROPÓSITO + 7 VALORES</div>
+            </div>
+
+            <div class="vl-strategy-grid">
+              <article class="vl-strategy-panel vl-strategy-panel--mission">
+                <div class="vl-strategy-kicker">01 · MISIÓN</div>
+                <h3>{{ sobreMisionTitle }}</h3>
+                <p>{{ sobreMisionDesc }}</p>
+                <div class="vl-strategy-chipline"><button onClick="{{ pickMision }}" aria-pressed="{{ sobreMisionActive }}" aria-label="Explorar misión de A&amp;S" style="background:#17130F;color:#fff;border:1px solid #17130F;">Explorar misión</button></div>
+              </article>
+
+              <div class="vl-strategy-panel vl-strategy-panel--center">
+                <div class="vl-compass-desktop" style="width:100%;">
+                  <div class="vl-compass">
+                    <div class="vl-compass-ring"></div><div class="vl-compass-ring r2"></div><div class="vl-compass-ring r3"></div>
+                    <div aria-hidden="true" class="vl-compass-cross"></div>
+                    <button class="vl-compass-core" aria-pressed="{{ sobreCoreActive }}" onClick="{{ pickProposito }}"><span style="font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,.8);">PROPÓSITO</span><span style="font-family:'Archivo';font-weight:900;font-size:17px;line-height:1;margin-top:5px;">Criterio</span></button>
+                    <sc-for list="{{ sobreNodes }}" as="n" hint-placeholder-count="7"><button class="{{ n.cls }}" aria-pressed="{{ n.active }}" onClick="{{ n.pick }}" style="{{ n.stylePos }}">{{ n.label }}</button></sc-for>
+                  </div>
+                </div>
+                <div class="vl-compass-mobile" style="width:100%;">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><sc-for list="{{ sobreList }}" as="n" hint-placeholder-count="8"><button aria-pressed="{{ n.active }}" onClick="{{ n.pick }}" style="{{ n.style }}">{{ n.label }}</button></sc-for></div>
+                </div>
+              </div>
+
+              <article class="vl-strategy-panel vl-strategy-panel--vision">
+                <div class="vl-strategy-kicker">02 · VISIÓN</div>
+                <h3>{{ sobreVisionTitle }}</h3>
+                <p>{{ sobreVisionDesc }}</p>
+                <div class="vl-strategy-chipline"><button onClick="{{ pickVision }}" aria-pressed="{{ sobreVisionActive }}" aria-label="Explorar visión de A&amp;S" style="background:#fff;color:#17130F;border:1px solid #fff;">Explorar visión</button></div>
+              </article>
+            </div>
+
+            <div class="vl-strategy-detail" aria-live="polite">
+              <div class="vl-strategy-detail-badge">{{ sobreCurKind }}</div>
+              <div>
+                <div style="font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.13em;color:#E0BC6A;">VALOR / PRINCIPIO ACTIVO</div>
+                <h4>{{ sobreCurTitle }}</h4>
+                <p>{{ sobreCurDesc }}</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;"><sc-for list="{{ sobreChips }}" as="c" hint-placeholder-count="8"><button onClick="{{ c.pick }}" aria-pressed="{{ c.active }}" style="{{ c.style }}">{{ c.label }}</button></sc-for></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M08 · ATLAS BINACIONAL DE EVOLUCIÓN -->
+      <div style="background:#F4F1EA;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(44px,6vh,84px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#C4001F;">ATLAS BINACIONAL · RECORRIDO 2012 → 2026</div>
+          <h2 style="font-family:'Archivo';font-weight:900;font-size:clamp(26px,3.4vw,46px);letter-spacing:-.025em;margin:10px 0 22px;max-width:22ch;">De Bogotá a Guatemala, una sola trayectoria.</h2>
+          <div style="position:relative;border-radius:26px;overflow:hidden;background:#0B0A0E;border:1px solid #23202a;box-shadow:0 44px 90px -54px rgba(0,0,0,.85);">
+            <div class="vl-atlas">
+              <img src="assets/photos/09_GT_LANDSCAPE_NO_PEOPLE.png" alt="" loading="lazy" class="vl-atlas-photo">
+              <div aria-hidden="true" class="vl-atlas-grid"></div>
+              <div aria-hidden="true" class="vl-atlas-veil"></div>
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="vl-atlas-route" aria-hidden="true">
+                <defs><linearGradient id="atlasGrad" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#E4002B"></stop><stop offset="1" stop-color="#F0D79B"></stop></linearGradient></defs>
+                <path d="M78,74 C69,69 58,63 50,50 C42,37 29,32 18,26" fill="none" stroke="#5A0012" stroke-width="1.1" vector-effect="non-scaling-stroke"></path>
+                <path d="M78,74 C69,69 58,63 50,50 C42,37 29,32 18,26" fill="none" stroke="url(#atlasGrad)" stroke-width="1.6" stroke-dasharray="3 5" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
+              </svg>
+              <div class="vl-atlas-terr" style="left:11%;top:12%;">
+                <span class="vl-flagpin" style="width:26px;height:17px;background:linear-gradient(90deg,#4997D0 0 34%,#fff 34% 66%,#4997D0 66%);"></span>
+                <div><div style="font-family:'Archivo';font-weight:800;font-size:14px;color:#fff;">Guatemala</div><div style="font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.1em;color:#CFC9BE;">14.6°N · 90.5°W · SIB CS-254</div></div>
+              </div>
+              <div class="vl-atlas-terr" style="right:7%;bottom:11%;">
+                <span class="vl-flagpin" style="width:26px;height:17px;background:linear-gradient(180deg,#FCD116 0 50%,#003893 50% 75%,#CE1126 75%);"></span>
+                <div><div style="font-family:'Archivo';font-weight:800;font-size:14px;color:#fff;">Colombia</div><div style="font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.1em;color:#CFC9BE;">4.7°N · 74.1°W · Bogotá</div></div>
+              </div>
+              <sc-for list="{{ mapItems }}" as="m" hint-placeholder-count="6">
+                <button onClick="{{ m.pick }}" aria-pressed="{{ m.active }}" aria-label="{{ m.aria }}" class="vl-atlas-pin" style="{{ m.pos }}"><span style="{{ m.dot }}">{{ m.n }}</span><span style="{{ m.lab }}">{{ m.y }}</span></button>
+              </sc-for>
+              <div aria-live="polite" class="vl-atlas-card">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <span class="vl-flagpin" style="width:32px;height:21px;{{ mapCurFlag }}"></span>
+                  <span style="font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.12em;color:#FF9DA8;">{{ mapCurPlace }}</span>
+                </div>
+                <div style="font-family:'Archivo';font-weight:900;font-size:clamp(34px,4.4vw,58px);line-height:.9;letter-spacing:-.03em;margin:12px 0 0;color:#fff;">{{ mapCurYear }}</div>
+                <h3 style="font-family:'Archivo';font-weight:800;font-size:20px;letter-spacing:-.02em;margin:10px 0 0;color:#fff;">{{ mapCurTitle }}</h3>
+                <p style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:15.5px;line-height:1.5;color:#D7D1C4;margin:8px 0 0;text-wrap:pretty;">{{ mapCurDesc }}</p>
+              </div>
+            </div>
+            <div class="vl-atlas-scale">
+              <sc-for list="{{ mapItems }}" as="m" hint-placeholder-count="6"><button onClick="{{ m.pick }}" aria-pressed="{{ m.active }}" style="{{ m.chip }}"><span class="vl-flagpin" style="width:18px;height:12px;{{ m.flag }}"></span>{{ m.y }} · {{ m.t }}</button></sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M09 · EQUIPO · RETRATOS EDITORIALES + DISCIPLINAS -->
+      <div style="background:#0B0A0E;color:#F4F1EA;position:relative;overflow:hidden;">
+        <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(760px 460px at 88% 100%,rgba(216,169,78,.10),transparent 62%);"></div>
+        <div style="position:relative;max-width:1600px;margin:0 auto;padding:clamp(44px,6vh,84px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">NUESTRO EQUIPO · CAPACIDAD COLECTIVA</div>
+          <div style="display:flex;align-items:end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:10px 0 0;">
+            <h2 style="font-family:'Archivo';font-weight:900;font-size:clamp(26px,3.4vw,46px);letter-spacing:-.025em;margin:0;max-width:20ch;">Distintas disciplinas. Un solo criterio de protección.</h2>
+            <span style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;color:#B6AFA0;">GUATEMALA · COLOMBIA</span>
+          </div>
+          <p style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:clamp(16px,1.5vw,19px);line-height:1.55;color:#D7D1C4;margin:16px 0 0;max-width:74ch;text-wrap:pretty;">Un equipo multidisciplinario que combina experiencia aseguradora con capacidades en derecho, administración, mercadeo, comercio internacional y tecnología, para analizar riesgos desde una perspectiva integral.</p>
+          <div class="vl-disc"><span>Seguros</span><span>Derecho</span><span>Administración</span><span>Mercadeo</span><span>Comercio internacional</span><span>Tecnología</span></div>
+          <div class="vl-conste" style="margin-top:28px;">
+            <sc-for list="{{ teamMembers }}" as="t" hint-placeholder-count="4">
+              <figure class="vl-memb" style="{{ t.wrapStyle }}">
+                <img src="{{ t.src }}" alt="{{ t.alt }}" loading="lazy">
+                <span aria-hidden="true" class="vl-memb-veil"></span>
+                <span class="vl-memb-num">{{ t.num }}</span>
+                <figcaption>
+                  <div style="font-family:'Archivo';font-weight:800;font-size:clamp(16px,1.5vw,20px);letter-spacing:-.015em;">{{ t.name }}</div>
+                  <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.09em;color:#E0BC6A;margin-top:5px;">{{ t.tag }}</div>
+                </figcaption>
+              </figure>
+            </sc-for>
+          </div>
+          <p style="font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.06em;color:#A39D92;margin:14px 0 0;">RETRATOS REALES DEL EQUIPO A&amp;S · SIN MONTAJES NI COMPOSICIONES FABRICADAS</p>
+        </div>
+      </div>
+
+      <!-- M10 · ALIADOS ASEGURADORES (trust shelf, superficie clara) · CONFIG-GATED -->
+      <sc-if value="{{ alliesShow }}" hint-placeholder-val="{{ false }}"><div style="background:#F8F3EB;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(44px,6vh,80px) clamp(20px,3vw,44px);">
+          <div style="display:flex;align-items:end;justify-content:space-between;gap:20px;flex-wrap:wrap;"><div><div style="font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.12em;color:#C4001F;">NUESTROS ALIADOS ASEGURADORES · {{ countryName }}</div><h2 style="font-family:'Archivo';font-weight:900;font-size:clamp(24px,3vw,40px);letter-spacing:-.025em;margin:8px 0 0;">Una red para comparar de verdad.</h2><p style="font-size:14px;color:#454039;line-height:1.55;margin:9px 0 0;max-width:66ch;">Estructuramos y comparamos alternativas entre aseguradoras reconocidas, según la necesidad y el país.</p></div><span style="font-family:'IBM Plex Mono';font-size:10px;color:#6E5B5F;letter-spacing:.08em;">DESLIZA · EXPLORA</span></div>
+          <div class="vl-shelf"><button class="vl-shelf-arrow prev" onClick="{{ alliesPrev }}" aria-label="Ver aliados anteriores">‹</button><div id="vl-allies-rail" class="vl-shelf-rail" role="list" aria-label="Aliados aseguradores"><sc-for list="{{ insurers }}" as="ins" hint-placeholder-count="12"><div class="vl-shelf-card" role="listitem" title="{{ ins.name }}"><sc-if value="{{ ins.hasLogo }}" hint-placeholder-val="{{ true }}"><img src="{{ ins.src }}" alt="{{ ins.name }}" loading="lazy"></sc-if><sc-if value="{{ ins.noLogo }}" hint-placeholder-val="{{ false }}"><div class="vl-shelf-word">{{ ins.word }}<small>{{ ins.sub }}</small></div></sc-if></div></sc-for></div><button class="vl-shelf-arrow next" onClick="{{ alliesNext }}" aria-label="Ver más aliados">›</button></div>
+          <p style="font-size:11px;color:#6E5B5F;line-height:1.5;margin:12px 0 0;">Los logotipos pertenecen a sus respectivos titulares. Algunas marcas se muestran de forma tipográfica homogénea.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:30px;"><button onClick="{{ openHandoff }}" style="min-height:50px;padding:0 24px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;">Hablar con un asesor</button><button onClick="{{ goCotComp }}" style="min-height:50px;padding:0 24px;border-radius:12px;background:#fff;border:1.5px solid #E7E2D6;color:#12110F;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;">Cotizar y comparar</button></div>
+        </div>
+      </div></sc-if>
+    </section>
+  </sc-if>
+
+  <!-- ACCESO EQUIPO A&S · solo visible en REVIEW hasta existir destino autenticado real -->
+  <sc-if value="{{ equipoReviewVisible }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen" data-screen-label="Acceso equipo A&amp;S" style="background:#0E0D10;color:#F4F1EA;min-height:60vh;display:flex;align-items:center;"><div style="max-width:760px;margin:0 auto;padding:64px 24px;width:100%;"><div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">REVIEW · ACCESO INTERNO</div><h1 style="font-family:'Archivo';font-weight:900;font-size:clamp(30px,4vw,54px);margin:14px 0 0;">Acceso reservado al equipo.</h1><p style="font-size:14px;line-height:1.6;color:#CFC9BE;max-width:56ch;">Esta ruta no forma parte de la navegación pública. El acceso externo se publicará únicamente cuando exista un destino autenticado verificado.</p><button onClick="{{ goRoot }}" style="margin-top:24px;min-height:48px;padding:0 22px;border-radius:12px;background:#fff;border:none;color:#12110F;font-family:inherit;font-weight:700;cursor:pointer;">Volver al inicio</button></div></section>
+  </sc-if>
+
+  <sc-if value="{{ isRecursos }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen" data-screen-label="Recursos" style="background:#0E0D10;color:#F4F1EA;min-height:70vh;">
+      <div style="max-width:1600px;margin:0 auto;padding:clamp(40px,6vh,80px) clamp(20px,3vw,44px);">
+        <div style="font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.14em;color:#FF7C8C;">RECURSOS</div>
+        <h1 style="font-family:'Archivo';font-weight:900;font-size:clamp(30px,4vw,56px);line-height:.95;letter-spacing:-.03em;margin:14px 0 26px;max-width:22ch;">Entender el riesgo, decidir mejor.</h1>
+        <div style="display:grid;grid-template-columns:1.25fr .75fr;gap:20px;margin-bottom:16px;" class="vl-split">
+          <div class="vl-vidwrap">
+            <div class="vl-vidscene">
+              <span aria-hidden="true" class="vl-vid-grid"></span>
+              <span aria-hidden="true" class="vl-vid-glow"></span>
+              <div aria-hidden="true" class="vl-vid-chrome">
+                <span class="vl-vid-dot" style="background:#E4002B;"></span>
+                <span class="vl-vid-dot"></span><span class="vl-vid-dot"></span>
+                <span style="margin-left:10px;font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.08em;color:#ADA69B;">recursos.aysseguros.com · reproductor</span>
+              </div>
+              <div aria-hidden="true" class="vl-vid-frames">
+                <span class="vl-vid-frame"><span style="font-family:'IBM Plex Mono';font-size:7.5px;color:#ADA69B;">01 · COBERTURA</span></span>
+                <span class="vl-vid-frame vl-vid-frame--on"><span style="font-family:'IBM Plex Mono';font-size:7.5px;color:#F0D79B;">02 · DEDUCIBLE</span></span>
+                <span class="vl-vid-frame"><span style="font-family:'IBM Plex Mono';font-size:7.5px;color:#ADA69B;">03 · EXCLUSIÓN</span></span>
+                <span class="vl-vid-frame"><span style="font-family:'IBM Plex Mono';font-size:7.5px;color:#ADA69B;">04 · SUMA</span></span>
+              </div>
+              <div aria-hidden="true" class="vl-vid-scrub"><span class="vl-vid-scrub-fill"></span><span class="vl-vid-scrub-head"></span></div>
+            </div>
+            <div style="position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(20px,3vw,30px);padding-top:clamp(46px,5vw,58px);padding-bottom:104px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.1em;color:#F4F1EA;background:rgba(14,13,16,.55);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:6px 12px;backdrop-filter:blur(6px);">VIDEO · GUÍA DESTACADA</span>
+                <span style="font-family:'IBM Plex Mono';font-size:11px;color:#F4F1EA;background:rgba(14,13,16,.55);border:1px solid rgba(255,255,255,.16);border-radius:8px;padding:5px 9px;">04:20</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;">
+                <span class="vl-play" role="img" aria-label="Vista previa de video"><svg width="26" height="26" viewBox="0 0 24 24" fill="#12110F"><path d="M8 5v14l11-7z"></path></svg></span>
+                <div>
+                  <div style="font-family:'Archivo';font-weight:800;font-size:clamp(20px,2.4vw,30px);letter-spacing:-.02em;line-height:1.05;max-width:16ch;">Cómo entender una cobertura antes de decidir.</div>
+                  <div style="display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:5px 11px;border-radius:999px;background:rgba(176,131,20,.16);border:1px solid rgba(176,131,20,.42);font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.06em;color:#e0b45a;"><span style="width:6px;height:6px;border-radius:50%;background:#e0b45a;"></span>SERIE EDITORIAL A&amp;S</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="background:#1C1A21;border:1px solid #2a2833;border-radius:18px;padding:20px;flex:1;display:flex;flex-direction:column;">
+              <span class="vl-isotile vl-isotile--dark"><svg class="vl-ico" viewBox="0 0 120 120"><use href="#ic-recursos"></use></svg></span>
+              <div style="font-family:'Archivo';font-weight:800;font-size:17px;margin-top:14px;">Biblioteca editorial A&amp;S</div>
+              <p style="font-size:13px;color:#B7B1A6;line-height:1.5;margin:8px 0 0;">Guías, glosarios y checklists para decidir con criterio. Publicaremos por bloques a medida que estén listos.</p>
+              <div style="display:flex;gap:14px;margin-top:auto;padding-top:16px;"><div><div style="font-family:'Archivo';font-weight:900;font-size:22px;">3</div><div style="font-size:10px;color:#ADA69B;">temas iniciales</div></div><div><div style="font-family:'Archivo';font-weight:900;font-size:22px;color:#e0b45a;">2026</div><div style="font-size:10px;color:#ADA69B;">lanzamiento</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="vl-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <sc-for list="{{ recursosItems }}" as="r" hint-placeholder-count="3"><div style="background:#1C1A21;border:1px solid #2a2833;border-radius:18px;padding:26px 24px;display:flex;flex-direction:column;gap:16px;"><div style="display:flex;align-items:center;justify-content:space-between;"><span class="vl-isotile vl-isotile--dark"><svg class="vl-ico" viewBox="0 0 120 120"><use href="{{ r.iso }}"></use></svg></span><span style="font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.1em;color:#ADA69B;">{{ r.tag }}</span></div><div style="font-family:'Archivo';font-weight:700;font-size:18px;line-height:1.25;">{{ r.t }}</div></div></sc-for>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+  <sc-if value="{{ isSiniestros }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen" data-screen-label="Siniestros" style="background:#0E0D10;color:#F4F1EA;min-height:70vh;">
+      <div class="vl-split" style="position:relative;max-width:1600px;margin:0 auto;padding:clamp(38px,7vh,84px) clamp(20px,3vw,44px);display:grid;grid-template-columns:1.12fr .88fr;gap:clamp(26px,4vw,50px);align-items:center;">
+        <div>
+          <div style="font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.14em;color:#FF7C8C;display:flex;align-items:center;gap:10px;"><span class="vl-isotile vl-isotile--dark vl-isotile--sm" style="width:44px;height:44px;"><svg class="vl-ico" viewBox="0 0 120 120"><use href="#ic-siniestros"></use></svg></span>SINIESTROS Y ASISTENCIA · SIN INICIAR SESIÓN</div>
+          <h1 style="font-family:'Instrument Sans',system-ui,sans-serif;font-style:italic;font-size:clamp(30px,4.4vw,60px);line-height:1.08;margin:18px 0 0;">Estamos contigo. Primero, ¿están todos a salvo?</h1>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:26px;"><button onClick="{{ openHandoff }}" style="min-height:52px;padding:0 26px;border-radius:13px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;">Necesito ayuda ahora</button><button onClick="{{ sinReport }}" style="min-height:52px;padding:0 26px;border-radius:13px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.22);color:#fff;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;">Reportar un caso</button></div>
+          <p style="font-size:13px;color:#CFC9BE;margin:22px 0 0;max-width:52ch;line-height:1.6;">Un caso creado no es una cobertura confirmada. Un asesor valida tu póliza y te confirma los próximos pasos. No te ofreceremos nada más durante este momento.</p>
+        </div>
+        <figure style="margin:0;position:relative;border-radius:22px;overflow:hidden;aspect-ratio:4/5;max-height:520px;background:#0E0D10;border:1px solid rgba(255,255,255,.12);box-shadow:0 40px 90px -44px rgba(0,0,0,.85);">
+          <img src="assets/photos/05_SINIESTROS_FERNANDO.jpg" alt="Fernando, asesor A&amp;S, en llamada de asistencia" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 22%;display:block;">
+          <div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(14,13,16,.55),transparent 46%);"></div>
+          <figcaption style="position:absolute;left:14px;bottom:14px;display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;background:rgba(14,13,16,.66);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.1em;color:#F4F1EA;"><span style="width:7px;height:7px;border-radius:50%;background:#7fce9b;"></span>ASESOR EN LÍNEA · ACOMPAÑAMIENTO HUMANO</figcaption>
+        </figure>
+      </div>
+      <!-- M11 · flujo de servicio end-to-end -->
+      <div style="border-top:1px solid #2a2833;background:#0B0A0D;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(34px,5vh,60px) clamp(20px,3vw,44px);">
+          <div style="display:flex;align-items:end;justify-content:space-between;gap:18px;flex-wrap:wrap;">
+            <div><div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#FF7C8C;">FLUJO DE SERVICIO · DE PRINCIPIO A FIN</div><h2 style="font-family:'Archivo';font-weight:800;font-size:clamp(22px,2.8vw,36px);letter-spacing:-.02em;margin:8px 0 0;">Cómo te acompañamos, paso a paso.</h2></div>
+            <span style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(176,131,20,.14);border:1px solid rgba(176,131,20,.4);font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.06em;color:#e0b45a;"><span style="width:7px;height:7px;border-radius:50%;background:#e0b45a;"></span>CASO CREADO ≠ COBERTURA CONFIRMADA</span>
+          </div>
+          <div style="display:flex;gap:0;overflow-x:auto;margin-top:24px;padding-bottom:8px;scrollbar-width:none;">
+            <sc-for list="{{ sinFlow }}" as="f" hint-placeholder-count="7">
+              <div style="display:flex;align-items:stretch;flex-shrink:0;">
+                <div style="width:clamp(158px,17vw,196px);background:#151318;border:1px solid #2a2833;border-radius:16px;padding:18px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;"><span style="width:30px;height:30px;border-radius:50%;background:rgba(228,0,43,.16);border:1px solid rgba(228,0,43,.5);color:#FF7C8C;display:grid;place-items:center;font-family:'IBM Plex Mono';font-size:12px;">{{ f.n }}</span><span style="{{ f.tagStyle }}">{{ f.tag }}</span></div>
+                  <div style="font-family:'Archivo';font-weight:700;font-size:15px;color:#fff;margin-top:14px;line-height:1.15;">{{ f.t }}</div>
+                  <p style="font-size:12px;color:#B7B1A6;line-height:1.5;margin:6px 0 0;">{{ f.d }}</p>
+                </div>
+                <span aria-hidden="true" style="width:26px;align-self:center;height:2px;background:repeating-linear-gradient(90deg,#E4002B 0 5px,transparent 5px 10px);flex-shrink:0;"></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{ sinCapture }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:900px;margin:0 auto;padding:0 clamp(20px,3vw,44px) clamp(48px,8vh,90px);">
+          <div style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.1em;color:#e0b45a;background:rgba(176,131,20,.14);border:1px solid rgba(176,131,20,.4);border-radius:999px;padding:6px 12px;">REPORTE INICIAL · DATOS MÍNIMOS</div>
+          <div style="background:#1C1A21;border:1px solid #2a2833;border-radius:20px;padding:clamp(22px,3vw,32px);margin-top:16px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;"><sc-for list="{{ sinSteps }}" as="st" hint-placeholder-count="3"><div style="flex:1;height:5px;border-radius:3px;background:{{ st.bg }};"></div></sc-for></div>
+            <div style="font-family:'Archivo';font-weight:800;font-size:22px;">Captura mínima del caso</div>
+            <p style="font-size:13.5px;color:#CFC9BE;margin:8px 0 20px;line-height:1.55;">Solo lo indispensable para que un asesor tome tu caso. Nada de esto confirma cobertura.</p>
+            <div class="vl-2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div><label style="display:block;font-size:12px;color:#ADA69B;margin-bottom:6px;">¿Qué pasó?</label><input type="text" value="Colisión leve, sin heridos" style="width:100%;min-height:46px;padding:0 14px;border-radius:11px;background:#0E0D10;border:1px solid #33323a;color:#F4F1EA;font-family:inherit;font-size:14px;"></div>
+              <div><label style="display:block;font-size:12px;color:#ADA69B;margin-bottom:6px;">¿Cuándo?</label><input type="text" value="Hoy, hace ~30 min" style="width:100%;min-height:46px;padding:0 14px;border-radius:11px;background:#0E0D10;border:1px solid #33323a;color:#F4F1EA;font-family:inherit;font-size:14px;"></div>
+              <div><label style="display:block;font-size:12px;color:#ADA69B;margin-bottom:6px;">Ramo</label><input type="text" value="Auto" style="width:100%;min-height:46px;padding:0 14px;border-radius:11px;background:#0E0D10;border:1px solid #33323a;color:#F4F1EA;font-family:inherit;font-size:14px;"></div>
+              <div><label style="display:block;font-size:12px;color:#ADA69B;margin-bottom:6px;">¿Cómo te contactamos?</label><input type="text" value="" placeholder="WhatsApp o teléfono" style="width:100%;min-height:46px;padding:0 14px;border-radius:11px;background:#0E0D10;border:1px solid #33323a;color:#F4F1EA;font-family:inherit;font-size:14px;"></div>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;"><button onClick="{{ sinSubmit }}" style="min-height:50px;padding:0 24px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;">Enviar caso a un asesor →</button><button onClick="{{ sinReset }}" style="min-height:50px;padding:0 22px;border-radius:12px;background:none;border:1.5px solid rgba(255,255,255,.22);color:#F4F1EA;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;">Cancelar</button></div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ sinDone }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:900px;margin:0 auto;padding:0 clamp(20px,3vw,44px) clamp(48px,8vh,90px);">
+          <div style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.1em;color:#e0b45a;background:rgba(176,131,20,.14);border:1px solid rgba(176,131,20,.4);border-radius:999px;padding:6px 12px;">RECEPCIÓN DEL CASO</div>
+          <div style="background:#12130F;border:1px solid rgba(44,90,58,.5);border-radius:20px;padding:clamp(22px,3vw,32px);margin-top:16px;">
+            <span style="width:56px;height:56px;border-radius:50%;background:rgba(44,90,58,.2);border:1px solid rgba(44,90,58,.5);display:grid;place-items:center;color:#7fce9b;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>
+            <div style="font-family:'Archivo';font-weight:800;font-size:24px;margin:16px 0 0;">Recibimos tu caso. Un asesor te contactará.</div>
+            <p style="font-size:14px;color:#CFC9BE;margin:10px 0 0;line-height:1.6;max-width:56ch;">Al completar un reporte real, asignamos una referencia para seguimiento. Un asesor valida tu póliza y confirma los próximos pasos. <b style="color:#F4F1EA;">Esto no confirma cobertura</b> — es una recepción inicial del caso.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;"><button onClick="{{ openHandoff }}" style="min-height:50px;padding:0 24px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;">Hablar ahora con un asesor</button><button onClick="{{ sinReset }}" style="min-height:50px;padding:0 22px;border-radius:12px;background:none;border:1.5px solid rgba(255,255,255,.22);color:#F4F1EA;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;">Volver</button></div>
+          </div>
+        </div>
+      </sc-if>
+    </section>
