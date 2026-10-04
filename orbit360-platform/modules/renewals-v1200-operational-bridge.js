@@ -66,7 +66,10 @@ Orbit.modules = Orbit.modules || {};
   }
   function enhance(host) {
     if(!host)return;
-    const all=policies(90),venc=all.filter(p=>daysUntil(p.vigenciaFin)<0),d15=all.filter(p=>{const d=daysUntil(p.vigenciaFin);return d>=0&&d<=15;}),d45=all.filter(p=>{const d=daysUntil(p.vigenciaFin);return d>15&&d<=45;}),premium=moneyMap(all);
+    const bucket=key=>Array.from(host.querySelectorAll('[data-renewal-bucket="'+key+'"] [data-renewal-policy]')).map(el=>S().get('polizas',el.getAttribute('data-renewal-policy'))).filter(Boolean);
+    const venc=bucket('vencidas'),d15=bucket('d15'),d45=bucket('d45'),d90=bucket('d90');
+    const seen=new Set(),all=[...venc,...d15,...d45,...d90].filter(p=>p&&p.id&&!seen.has(p.id)&&seen.add(p.id));
+    const premium=moneyMap(all);
     const defs=[
       ['Vencidas',String(venc.length),'Recuperar o cerrar gestión',()=>detail('Pólizas vencidas',venc)],
       ['≤15 días',String(d15.length),'Atención prioritaria',()=>detail('Renovaciones ≤15 días',d15)],
