@@ -349,7 +349,7 @@ Orbit.modules.cliente360 = (function () {
     OrbitRuntimeDiagnostics.cliente360 = Object.assign({}, OrbitRuntimeDiagnostics.cliente360 || {}, {
       version: '20260817.2-bounded-first-paint',
       renderMs: totalMs,
-      list: { bounded: true, batchRead: !!clientBatch, firstPaintSummaryRows: visibleRows.length, firstPaintCommissionRows: 0, firstPaintPolicyRows: policiesForList.length, firstPaintCollectionRows: portfolioReadiness === 'ready' ? (S().all('carteraPrimas') || []).length : 0, policyReadiness, portfolioReadiness, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
+      list: { bounded: true, batchRead: false, baseAuthority: 'server-confirmed-store', firstPaintSummaryRows: visibleRows.length, firstPaintCommissionRows: 0, firstPaintPolicyRows: policiesForList.length, firstPaintCollectionRows: portfolioReadiness === 'ready' ? (S().all('carteraPrimas') || []).length : 0, policyReadiness, portfolioReadiness, pageSize: LIST_PAGE_SIZE, page: listPage, pageCount, totalRows: clientes.length, filteredRows: rows.length, renderedRows: visibleRows.length, summaryCacheMs, summaryAggregateMs, rowsBuildMs, innerHtmlMs, bindingsMs, totalMs, renderSeq: listRenderSeq, writes: 0 }
     });
   }
 
