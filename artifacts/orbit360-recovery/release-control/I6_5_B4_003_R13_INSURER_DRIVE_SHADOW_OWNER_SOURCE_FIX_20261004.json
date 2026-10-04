@@ -1,0 +1,30 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-04",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+  "sourceHead": "76c6753c874f093f153ca62632aadb740f69d745",
+  "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_INSURER_DRIVE_SHADOW_OWNER_DIAGNOSTIC_20261004.json",
+  "productBlobs": {
+    "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
+    "orbit360-platform/index.html": "2f58429833edea2bebf0813e6bbd007aa9f7ae31"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "df74d759fb8515f693d578302e363bd94b145e24"
+  },
+  "compositionBlobSha": "a1e7e5a79681f3c3c05696c4de429dcdfbb00a29",
+  "changes": [
+    "docs-aseguradora now delegates from the v1202 bridge to the captured canonical core/importa.js owner.",
+    "mod.importarDocumentoSeguro delegates to the same canonical Drive importer.",
+    "Directory import and safe new-insurer creation remain owned by the v1202 bridge.",
+    "Bridge cache binding was advanced and the contract now rejects any return of the legacy document shadow owner."
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "visualRedesign": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}
