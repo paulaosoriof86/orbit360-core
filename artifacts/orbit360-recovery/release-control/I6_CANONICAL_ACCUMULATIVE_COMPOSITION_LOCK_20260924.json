@@ -203,9 +203,9 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "9948993770f2ccb55d704ab3db89ee43f77ecb11",
+    "orbit360-platform/index.html": "5d567bb8a7f1492374f99ad79ca39a969f172d2f",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
-    "orbit360-platform/modules/aseguradoras.js": "f098a07b031f2877cacdd73b04bfaeae4bc7088b",
+    "orbit360-platform/modules/aseguradoras.js": "bf253d9c04db5a45acdf172993902bb266fa26ce",
     "orbit360-platform/modules/calidad.js": "368b1f578a7500f7d8a2037962328770550ed8c3",
     "orbit360-platform/modules/cancelaciones.js": "63f6dd1bb3ffad24cf8452404dfc540f1b92e2b7",
     "orbit360-platform/modules/cliente360.js": "bf8b4469631ad10f62ea825f46d29bcf3259583c",
@@ -2972,18 +2972,18 @@
   "b4003R1604TargetedVisualSourceFix": {
     "status": "SOURCE_FIXED_R16_04_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_04_TARGETED_VISUAL_CAUSAL_SOURCE_FIX_20261004.json",
-    "blobSha": "6c35c17aa919de6c82392d296fd45fbe459ed8f6",
+    "blobSha": "eec4b28f8ee236c0e4aaca4a6e01e49336694f5b",
     "productBlobs": {
       "orbit360-platform/modules/calidad.js": "368b1f578a7500f7d8a2037962328770550ed8c3",
       "orbit360-platform/modules/configuracion.js": "0ec30235bf676b89c85a5c0dc58b09a5e1a81193",
       "orbit360-platform/modules/renovaciones.js": "7fa3c7a933b246b34c8021dad1e7c34cfa1844ac",
       "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "9c817c3687d724b207227654bc2f361fa98a9148",
-      "orbit360-platform/modules/aseguradoras.js": "f098a07b031f2877cacdd73b04bfaeae4bc7088b",
+      "orbit360-platform/modules/aseguradoras.js": "bf253d9c04db5a45acdf172993902bb266fa26ce",
       "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "5025ee88abaed8be499d2bacf57796cc77a5736f",
-      "orbit360-platform/index.html": "9948993770f2ccb55d704ab3db89ee43f77ecb11"
+      "orbit360-platform/index.html": "5d567bb8a7f1492374f99ad79ca39a969f172d2f"
     },
     "qaBlobs": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "7233bdb1df31b22a773c0955d5978edd4dcc965a",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "b8989c96a1ab9da558a4a8e506bbd767ec5c25d9",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "5568d97cdd17b44ec4faf23ee98ce8b3182c5e20"
     },
     "findingCountAfter": 215,
@@ -3017,6 +3017,14 @@
       "classification": "QA_SYNTAX_DEFECT",
       "resolution": "Replace four modified-owner cache regex literals with exact index.includes assertions; no product semantic relaxation.",
       "productSourceChanged": false
+    },
+    "qaCompatibilityAlignment5": {
+      "failedRunId": 37225008128,
+      "failureCode": "B4_003_R9_KNOWLEDGE_CONTRACT:moduleShowsKnowledgeFacts",
+      "classification": "CANONICAL_UI_LABEL_COMPATIBILITY",
+      "resolution": "Preserve canonical phrase 'Conocimiento vigente y observado' while retaining R16.4 evidence hierarchy.",
+      "productSourceChanged": true,
+      "noBuildOccurredBeforeFix": true
     }
   }
 }

@@ -307,7 +307,7 @@ Orbit.modules.aseguradoras = (function () {
     const sources = knowledgeSources(row);
     const sourceNames = Object.create(null);
     sources.forEach(item => { const key = clean(item.id || item.documentId || item.sourceDocumentId); if (key) sourceNames[key] = clean(item.nombre || item.fileName || item.archivo || key); });
-    return '<div class="asg-sec-t" style="margin-top:16px">🧠 Conocimiento con evidencia vigente</div>' +
+    return '<div class="asg-sec-t" style="margin-top:16px">🧠 Conocimiento vigente y observado · con evidencia</div>' +
       '<div class="cfg-note" style="margin-bottom:9px">Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo.</div>' +
       '<div style="display:grid;gap:10px">' + products.map(product => {
         const rules = [].concat(product && product.rules || []);

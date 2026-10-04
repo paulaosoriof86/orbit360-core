@@ -214,7 +214,7 @@ need(/modules\/cronograma\.js\?v=20261003-b4003r5/.test(index),'B4_003_CRONOGRAM
 need(/store-firestore-product-operational-p0\.js\?v=20261003-b4003r3/.test(index),'B4_003_STORE_CACHE_BINDING_MISSING');
 need(/modules\/cliente360\.js\?v=20261004-b4003r14p2/.test(index),'B4_003_CLIENT360_R11_CACHE_BINDING_MISSING');
 need(index.includes('modules/calidad.js?v=20261004-r16p4'),'B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING');
-need(index.includes('modules/aseguradoras.js?v=20261004-r16p4a'),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
+need(index.includes('modules/aseguradoras.js?v=20261004-r16p4b'),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
 need(/core\/importa\.js\?v=20261004-r16/.test(index),'B4_003_IMPORTER_R13_CACHE_BINDING_MISSING');
 need(/modules\/aseguradoras-v1202-import-bridge\.js\?v=20261004-b4003r13d/.test(index),'B4_003_R13_INSURER_IMPORT_BRIDGE_CACHE_BINDING_MISSING');
 need(index.includes('core/client-insurer-visual-contract-v20260720.js?v=20261004-r16p4'),'B4_003_INSURER_VISUAL_R12_CACHE_BINDING_MISSING');
@@ -249,5 +249,5 @@ need(!quality.includes("location.hash='#/polizas?p=")&&quality.includes('quality
 need(policyDetail.includes('function receiptPlanOrdinal')&&policyDetail.includes('LEGACY_UNDENOMINATED_DUPLICATE')&&policyDetail.includes('data-receipt-shadow-exclusion'),'B4_003_R16_05_RECEIPT_SHADOW_PROJECTION_MISSING');
 need(configuracion.includes("catalogLoadState = 'idle'")&&configuracion.includes('data-catalog-state="loading"')&&configuracion.includes('hydrateCatalogs(host,false)'),'B4_003_R16_06_CATALOG_FIRST_PAINT_MISSING');
 need(base.includes('data-renewability-review-workflow="1"')&&base.includes('Revisar y clasificar')&&base.includes('Editar póliza → Renovabilidad'),'B4_003_R16_07_RENEWABILITY_REVIEW_INSTRUCTION_MISSING');
-need(insurer.includes('Sin archivos físicos cargados en Drive desde esta ficha')&&insurer.includes('Cobertura y estado por producto')&&insurer.includes('Conocimiento con evidencia vigente'),'B4_003_R16_08_INSURER_KNOWLEDGE_HIERARCHY_MISSING');
+need(insurer.includes('Sin archivos físicos cargados en Drive desde esta ficha')&&insurer.includes('Cobertura y estado por producto')&&insurer.includes('Conocimiento vigente y observado · con evidencia'),'B4_003_R16_08_INSURER_KNOWLEDGE_HIERARCHY_MISSING');
 need(insurerVisual.includes('<span>Validadas</span>')&&insurerVisual.includes('Archivo físico en Drive')&&!insurerVisual.includes('Mapeadas / validadas'),'B4_003_R16_08_INSURER_KPI_SEMANTICS_MISSING');
