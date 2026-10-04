@@ -1,0 +1,118 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_AUTH_V1",
+  "recordedAt": "2026-10-04",
+  "status": "AUTHORIZED_PENDING_APPLY",
+  "gate": "I6.5/B4-003",
+  "findingId": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authorizedFromHead": "f73b02139e77614a32b9747467a9d2f2004f210f",
+  "authorizationBasis": [
+    "EVERGREEN_DELTA_V5_FORMALLY_OPEN_GATE_DETERMINISTIC_APPLY",
+    "CONTROL_PLANE_B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION",
+    "OWNER_CONTINUE_CURRENT_SESSION"
+  ],
+  "conversationDependent": false,
+  "repeatedConversationalAuthorizationRequired": false,
+  "source": {
+    "file": "Renovaciones (13).xlsx",
+    "sha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3",
+    "pinned": true,
+    "interpretation": "Positive authority for listed active policies only; absence does not imply NO."
+  },
+  "exactPolicyIds": [
+    "pol_b9a883095c9fae8f7502ce1cb054",
+    "pol_9634d32ec97e4dc93fef8f194677",
+    "pol_8231bbb8f9b7272c02891f5a4caf",
+    "pol_df6bf097045762297ec31fd4e5c5"
+  ],
+  "exactRows": [
+    {
+      "id": "pol_b9a883095c9fae8f7502ce1cb054",
+      "numero": "68542",
+      "estado": "Vigente",
+      "pais": "CO",
+      "vigenciaFin": "2026-10-01",
+      "aseguradoraId": "co-chubb"
+    },
+    {
+      "id": "pol_9634d32ec97e4dc93fef8f194677",
+      "numero": "1-AP-20890",
+      "estado": "Vigente",
+      "pais": "GT",
+      "vigenciaFin": "2026-10-04",
+      "aseguradoraId": "gt-aseguradora-general"
+    },
+    {
+      "id": "pol_8231bbb8f9b7272c02891f5a4caf",
+      "numero": "AUTO38446",
+      "estado": "Vigente",
+      "pais": "GT",
+      "vigenciaFin": "2026-10-06",
+      "aseguradoraId": "gt-aseguradora-guatemalteca"
+    },
+    {
+      "id": "pol_df6bf097045762297ec31fd4e5c5",
+      "numero": "AUTO-1000000334",
+      "estado": "Vigente",
+      "pais": "GT",
+      "vigenciaFin": "2026-10-07",
+      "aseguradoraId": "gt-seguros-ficohsa"
+    }
+  ],
+  "exactFields": [
+    "renovable",
+    "renewabilityProvenance",
+    "renewabilitySourceSha256"
+  ],
+  "exactPatch": {
+    "renovable": true,
+    "renewabilityProvenance": "source_report",
+    "renewabilitySourceSha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3"
+  },
+  "maxWrites": 4,
+  "conflictHold": {
+    "policyNumber": "VA-43685",
+    "parentId": "pol_965de501d871c56f3964a24b7724",
+    "childId": "pol_muj5o5ka",
+    "dependentTotal": 3,
+    "status": "CONFLICT_REVIEW_REQUIRED",
+    "writeAuthorized": false,
+    "deleteAuthorized": false,
+    "globalBatchBlocking": false
+  },
+  "invariants": {
+    "inserts": 0,
+    "deletes": 0,
+    "unrelatedPolicyWrites": 0,
+    "conflictParentWrites": 0,
+    "conflictChildWrites": 0,
+    "conflictDependentWrites": 0,
+    "exactBeforeAfterRequired": true,
+    "exactRollbackRequired": true,
+    "postWriteReadbackRequired": true,
+    "eligibleSetAfterApply": [
+      "pol_8231bbb8f9b7272c02891f5a4caf",
+      "pol_9634d32ec97e4dc93fef8f194677",
+      "pol_b9a883095c9fae8f7502ce1cb054",
+      "pol_df6bf097045762297ec31fd4e5c5"
+    ],
+    "expectedDistributionAfter": {
+      "YES": 4,
+      "NO": 0,
+      "UNKNOWN": 1415
+    },
+    "noReimport": true,
+    "noLivePromotion": true,
+    "productSourceMutation": false
+  },
+  "executor": {
+    "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "workflowBlobSha": "654951395c5a82b44be2ffa13a9ded481d61f23c",
+    "toolPath": "tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs",
+    "toolBlobSha": "a101465b935d212ddc9cb73baa722fbd30761a04",
+    "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+    "guardBlobSha": "cae0f8663e036a1a021adef40d5f23ebf3eed299"
+  },
+  "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY"
+}

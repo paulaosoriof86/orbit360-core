@@ -2803,7 +2803,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER",
+      "status": "RENEWAL_DATA_APPLY_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2836,7 +2836,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION",
+      "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2982,7 +2982,9 @@
       "r13PolicyRouteRuntimeRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_ROOTFIX_20261003.json",
       "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
       "r13QaGateAlignmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
-      "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e"
+      "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
+      "renewalDeterministicApplyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_AUTH_20261004.json",
+      "renewalDeterministicApplyAuthBlobSha": "b7b47af69634a093a1bf79be3adb46d4ebeb701b"
     },
     {
       "id": "B4-004",
@@ -2992,7 +2994,7 @@
       "status": "NOT_STARTED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "WAIT_B4_003_RENEWAL_DATA_RESOLUTION"
+      "nextAction": "WAIT_B4_003_RENEWAL_APPLY_AND_VISUAL"
     },
     {
       "id": "B4-005",
@@ -6854,12 +6856,12 @@
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
         "orbit360-platform/modules/renewals-v1201-issued-filter.js"
       ],
-      "status": "MACHINE_PROOF_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER",
+      "status": "DETERMINISTIC_APPLY_AUTHORIZED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Real source-backed renewal pipeline repopulates by canonical eligibility/country/horizon and is proven on exact Preview.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION",
+      "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
       "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
       "classification": "RUNTIME_DATA_SEMANTIC_DISTRIBUTION_PROOF_REQUIRED",
@@ -6868,7 +6870,19 @@
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_NARROW_SOURCE_FIX_20261003.json",
       "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
-      "disposition": "NO_RENEWAL_PRODUCT_MUTATION; exact Preview must prove real YES/NO/UNKNOWN distribution and visible eligible set equality."
+      "disposition": "NO_RENEWAL_PRODUCT_MUTATION; exact Preview must prove real YES/NO/UNKNOWN distribution and visible eligible set equality.",
+      "renewalDeterministicApplyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_AUTH_20261004.json",
+      "renewalDeterministicApplyAuthBlobSha": "b7b47af69634a093a1bf79be3adb46d4ebeb701b",
+      "localizedConflictHold": {
+        "policyNumber": "VA-43685",
+        "parentId": "pol_965de501d871c56f3964a24b7724",
+        "childId": "pol_muj5o5ka",
+        "dependentTotal": 3,
+        "status": "CONFLICT_REVIEW_REQUIRED",
+        "writeAuthorized": false,
+        "deleteAuthorized": false,
+        "globalBatchBlocking": false
+      }
     },
     {
       "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",

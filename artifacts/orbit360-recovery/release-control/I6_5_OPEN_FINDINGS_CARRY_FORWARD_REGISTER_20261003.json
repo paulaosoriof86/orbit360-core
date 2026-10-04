@@ -563,17 +563,19 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "RENEWAL_DATA_APPLY_AUTHORIZED",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
       "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
       "source": "LEDGER",
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
       "humanVisualStatus": "REJECTED_R13",
       "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
       "r13QaGateAlignmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
-      "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e"
+      "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
+      "renewalDeterministicApplyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_AUTH_20261004.json",
+      "renewalDeterministicApplyAuthBlobSha": "b7b47af69634a093a1bf79be3adb46d4ebeb701b"
     },
     {
       "id": "B4-004",
@@ -2197,17 +2199,27 @@
     {
       "id": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
       "block": "B4",
-      "status": "READONLY_PROOF_ARMED_PENDING_EXACT_PREVIEW",
+      "status": "DETERMINISTIC_APPLY_AUTHORIZED",
       "blocking": true,
       "owner": "orbit360-platform/modules/renovaciones.js + orbit360-platform/modules/renewals-v1200-operational-bridge.js + orbit360-platform/modules/renewals-v1201-issued-filter.js",
       "targetGate": "B4-003",
       "closureCondition": "Real source-backed renewal pipeline repopulates by canonical eligibility/country/horizon and is proven on exact Preview.",
       "source": "PAULA_R13",
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
       "classification": "RUNTIME_DATA_SEMANTIC_DISTRIBUTION_PROOF_REQUIRED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
-      "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d"
+      "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
+      "localizedConflictHold": {
+        "policyNumber": "VA-43685",
+        "parentId": "pol_965de501d871c56f3964a24b7724",
+        "childId": "pol_muj5o5ka",
+        "dependentTotal": 3,
+        "status": "CONFLICT_REVIEW_REQUIRED",
+        "writeAuthorized": false,
+        "deleteAuthorized": false,
+        "globalBatchBlocking": false
+      }
     },
     {
       "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
@@ -2461,5 +2473,7 @@
   "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
   "r13PolicyRuntimeP3RootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_ROOTFIX_20261003.json",
   "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
-  "machineProofReceiptBlobSha": "b164548aadac1783ebc04b9f2777cfbdb19439da"
+  "machineProofReceiptBlobSha": "b164548aadac1783ebc04b9f2777cfbdb19439da",
+  "renewalDeterministicApplyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_AUTH_20261004.json",
+  "renewalDeterministicApplyAuthBlobSha": "b7b47af69634a093a1bf79be3adb46d4ebeb701b"
 }

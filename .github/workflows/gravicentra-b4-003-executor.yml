@@ -10,7 +10,7 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - '.github/workflows/gravicentra-b4-003-executor.yml'
-      - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
+      - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'\n      - 'tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs'
       - 'tools/gravicentra-quote-authority-contract-v1.mjs'
       - 'orbit360-platform/core/quote-authority-contract-v1.js'
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
@@ -71,7 +71,7 @@ jobs:
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const l=JSON.parse(fs.readFileSync(process.env.B4_LOCK,'utf8'));
           const sourceFixed=v=>/^B4_003_SOURCE_FIXED_R(?:5|9|10|11|12|13)_/.test(String(v||''));
-          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW'
+          const previewOk=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW'
             && sourceFixed(c.currentB4?.status)
             && sourceFixed(c.i65ForensicRemediationPlan?.b4?.status)
             && sourceFixed(l.status)
@@ -81,9 +81,138 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===false
             && l.boundaries?.reimportAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
-          console.log('B4_003_PREVIEW_MODE='+(ok?'RUN':'NOOP'));
+          const a=l.renewalDeterministicApplyAuthorization||{};
+          const applyOk=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_RENEWAL_DETERMINISTIC_APPLY'
+            && c.currentB4?.status==='B4_003_RENEWAL_DATA_APPLY_AUTHORIZED'
+            && c.i65ForensicRemediationPlan?.b4?.status==='B4_003_RENEWAL_DATA_APPLY_AUTHORIZED'
+            && l.status==='B4_003_RENEWAL_DATA_APPLY_AUTHORIZED'
+            && l.activeFinding?.id==='B4-003'
+            && a.status==='AUTHORIZED_PENDING_APPLY'
+            && a.sourceSha256==='1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3'
+            && a.maxWrites===4
+            && Array.isArray(a.exactPolicyIds)&&a.exactPolicyIds.length===4
+            && l.boundaries?.dataMutationAuthorized===true
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(previewOk?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'apply='+(applyOk?'true':'false')+'\n');
+          console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP'));
           NODE
+
+
+      - name: Assert LIVE unchanged before renewal data apply
+        if: steps.gate.outputs.apply == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+
+      - name: Prepare exact renewal data apply
+        if: steps.gate.outputs.apply == 'true'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b4-003-renewal-apply-auth"
+          mkdir -p "$ROOT"
+          export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json'
+                  p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('B4_003_RENEWAL_APPLY_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          SEL=$(head -n1 "$ROOT/files")
+          cp "$SEL" "$RUNNER_TEMP/b4-003-renewal-apply-sa.json"
+          chmod 600 "$RUNNER_TEMP/b4-003-renewal-apply-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4-003-renewal-apply-sa.json" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+          node --check tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs
+
+      - name: Apply exact deterministic renewal classification
+        if: steps.gate.outputs.apply == 'true'
+        env:
+          B4_003_RENEWAL_APPLY_RESULT: ${{ runner.temp }}/b4-003-renewal-apply-result.json
+          B4_003_RENEWAL_ROLLBACK: ${{ runner.temp }}/b4-003-renewal-rollback.private.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs --mode=apply
+
+      - name: Roll back exact renewal classification on failure
+        if: failure() && steps.gate.outputs.apply == 'true'
+        env:
+          B4_003_RENEWAL_APPLY_RESULT: ${{ runner.temp }}/b4-003-renewal-rollback-result.json
+          B4_003_RENEWAL_ROLLBACK: ${{ runner.temp }}/b4-003-renewal-rollback.private.json
+        run: |
+          if [ -f "$B4_003_RENEWAL_ROLLBACK" ]; then
+            node tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs --mode=rollback || true
+          fi
+          echo "B4_003_RENEWAL_APPLY_FAILED_FAIL_CLOSED"
+
+      - name: Freeze renewal data apply and reopen exact Preview
+        if: success() && steps.gate.outputs.apply == 'true'
+        env:
+          B4_003_RENEWAL_APPLY_RESULT: ${{ runner.temp }}/b4-003-renewal-apply-result.json
+        run: |
+          set -euo pipefail
+          RESULT_RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json"
+          REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
+          test "$REMOTE" = "$CANDIDATE_SOURCE_SHA"
+          cp "$B4_003_RENEWAL_APPLY_RESULT" "$RESULT_RECEIPT"
+          export RESULT_RECEIPT
+          node -e "const fs=require('node:fs'),r=JSON.parse(fs.readFileSync(process.env.B4_003_RENEWAL_APPLY_RESULT,'utf8'));if(r.status!=='PASS'||r.writes!==4||r.rollbackExecuted!==false||r.integrity?.onlyAllowedFieldsChanged!==true||r.integrity?.unrelatedPoliciesUnchanged!==true||r.integrity?.conflictParentUnchanged!==true||r.integrity?.conflictChildUnchanged!==true||r.integrity?.conflictDependentsUnchanged!==true||r.integrity?.eligibleSetExact!==true)process.exit(1)"
+          RESULT_BLOB=$(git hash-object "$RESULT_RECEIPT"); export RESULT_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.COMPOSITION,o=JSON.parse(fs.readFileSync(p,'utf8')),r=JSON.parse(fs.readFileSync(process.env.RESULT_RECEIPT,'utf8'));
+          o.b4003R13RenewalDeterministicApply={status:'APPLIED_PENDING_EXACT_PREVIEW',path:process.env.RESULT_RECEIPT,blobSha:process.env.RESULT_BLOB,writes:r.writes,sourceSha256:r.sourceSha256,conflictHold:r.conflictHold,integrity:r.integrity,productSourceChanged:false,reimport:false,livePromotion:false};
+          o.b4Execution={...(o.b4Execution||{}),status:'B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW',activeFindingId:'B4-003',noLive:true,noReimport:true,nextAction:'B4_003_CONTRACT_AND_EXACT_PREVIEW'};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          COMPOSITION_BLOB=$(git hash-object "$COMPOSITION"); export COMPOSITION_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.FINDINGS,o=JSON.parse(fs.readFileSync(p,'utf8'));
+          const f=(o.findings||[]).find(x=>x.id==='B4-003'),r13=(o.findings||[]).find(x=>x.id==='B4-003-R13-04-RENEWALS-ZERO-REGRESSION'),n=(o.findings||[]).find(x=>x.id==='B4-004');if(!f||!r13||!n)throw Error('B4_FINDING_MISSING');
+          Object.assign(f,{status:'SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW',blocking:true,nextAction:'B4_003_CONTRACT_AND_EXACT_PREVIEW'});
+          Object.assign(r13,{status:'DATA_APPLIED_PENDING_EXACT_PREVIEW',blocking:true,nextAction:'B4_003_CONTRACT_AND_EXACT_PREVIEW',renewalDeterministicApplyReceiptPath:process.env.RESULT_RECEIPT,renewalDeterministicApplyReceiptBlobSha:process.env.RESULT_BLOB,localizedConflictHold:{policyNumber:'VA-43685',status:'CONFLICT_REVIEW_REQUIRED',blockingGlobal:false,writeAuthorized:false,deleteAuthorized:false}});
+          Object.assign(n,{status:'NOT_STARTED',blocking:true,nextAction:'WAIT_B4_003_PAULA_VISUAL'});
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CARRY,o=JSON.parse(fs.readFileSync(p,'utf8'));
+          const f=(o.findings||[]).find(x=>x.id==='B4-003'),r13=(o.findings||[]).find(x=>x.id==='B4-003-R13-04-RENEWALS-ZERO-REGRESSION');
+          if(f)Object.assign(f,{status:'SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW',blocking:true,nextAction:'B4_003_CONTRACT_AND_EXACT_PREVIEW'});
+          if(r13)Object.assign(r13,{status:'DATA_APPLIED_PENDING_EXACT_PREVIEW',blocking:true,nextAction:'B4_003_CONTRACT_AND_EXACT_PREVIEW',localizedConflictHold:{policyNumber:'VA-43685',status:'CONFLICT_REVIEW_REQUIRED',blockingGlobal:false,writeAuthorized:false,deleteAuthorized:false}});
+          o.renewalDeterministicApplyReceiptPath=process.env.RESULT_RECEIPT;o.renewalDeterministicApplyReceiptBlobSha=process.env.RESULT_BLOB;
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          CARRY_BLOB=$(git hash-object "$CARRY"); export CARRY_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.B4_LOCK,o=JSON.parse(fs.readFileSync(p,'utf8')),r=JSON.parse(fs.readFileSync(process.env.RESULT_RECEIPT,'utf8'));
+          o.status='B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW';
+          o.activeFinding={...(o.activeFinding||{}),id:'B4-003',status:'SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW',blocking:true,nextAction:'B4_003_CONTRACT_AND_EXACT_PREVIEW',humanVisualStatus:'REJECTED_R13'};
+          o.renewalDeterministicApplyAuthorization={...(o.renewalDeterministicApplyAuthorization||{}),status:'APPLIED',resultPath:process.env.RESULT_RECEIPT,resultBlobSha:process.env.RESULT_BLOB,writes:r.writes};
+          o.r13RenewalDeterministicApply={status:'APPLIED_PENDING_EXACT_PREVIEW',path:process.env.RESULT_RECEIPT,blobSha:process.env.RESULT_BLOB,writes:r.writes,conflictHold:r.conflictHold,integrity:r.integrity};
+          o.nextAction='B4_003_CONTRACT_AND_EXACT_PREVIEW';o.nextRequiredProof=['B4_003_R13_EXACT_PREVIEW_MACHINE_PASS','B4_003_TARGETED_PAULA_VISUAL_PASS'];
+          o.compositionLock={...(o.compositionLock||{}),blobSha:process.env.COMPOSITION_BLOB};o.findingLedger={...(o.findingLedger||{}),blobSha:process.env.FINDINGS_BLOB};o.continuityRegister={...(o.continuityRegister||{}),blobSha:process.env.CARRY_BLOB};
+          o.boundaries={...(o.boundaries||{}),businessWritesAuthorized:false,syntheticQaWritesAuthorized:true,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false,renewalProductMutationAuthorized:false,renewalDeterministicApplyAuthorized:false};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          LOCK_BLOB=$(git hash-object "$B4_LOCK"); export LOCK_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,o=JSON.parse(fs.readFileSync(p,'utf8')),b=o.i65ForensicRemediationPlan.b4,r=JSON.parse(fs.readFileSync(process.env.RESULT_RECEIPT,'utf8'));
+          const patch={status:'B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW',activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,compositionLockBlobSha:process.env.COMPOSITION_BLOB,continuityRegisterBlobSha:process.env.CARRY_BLOB,productMutationAuthorized:false,dataMutationAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false,syntheticQaWritesAuthorized:true,nextAction:'B4_003_CONTRACT_AND_EXACT_PREVIEW',r13RenewalDeterministicApply:{status:'APPLIED_PENDING_EXACT_PREVIEW',path:process.env.RESULT_RECEIPT,blobSha:process.env.RESULT_BLOB,writes:r.writes,conflictHold:r.conflictHold,integrity:r.integrity}};
+          Object.assign(b,patch);o.currentB4={...(o.currentB4||{}),...patch,noLive:true,noReimport:true};
+          o.nextAction='I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW';
+          o.canonicalAccumulationControl={...(o.canonicalAccumulationControl||{}),activeBlock:'B4',activeFindingId:'B4-003',compositionLockBlobSha:process.env.COMPOSITION_BLOB,findingLedgerBlobSha:process.env.FINDINGS_BLOB,continuityRegisterBlobSha:process.env.CARRY_BLOB,nextAction:'B4_003_CONTRACT_AND_EXACT_PREVIEW'};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          git add "$RESULT_RECEIPT" "$COMPOSITION" "$FINDINGS" "$CARRY" "$B4_LOCK" "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "hold(i6.5 B4-003): apply deterministic renewal classification"
+          git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Assert LIVE unchanged
         if: steps.gate.outputs.run == 'true'
