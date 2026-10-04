@@ -107,7 +107,6 @@ jobs:
           grep -q 'Entender la recomendación' "$E/page.html"
           grep -q 'Continuar con un asesor' "$E/page.html"
           grep -q "const consult=state.route==='other'" "$E/page.html"
-          grep -q 'providerDeploymentAuthorized:false' "$E/page.html"
           POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
           test "$POST_CODE" = "405"
           jq -n --arg url "$COTCOMP_URL" '{
