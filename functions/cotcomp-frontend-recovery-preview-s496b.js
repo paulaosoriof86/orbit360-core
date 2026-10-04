@@ -20,24 +20,26 @@ const CSS=`
 body[data-s496b="true"] .hero{
   min-height:0;
   display:grid;
-  grid-template-columns:minmax(520px,1.02fr) minmax(520px,.98fr);
+  grid-template-columns:minmax(0,1fr) minmax(460px,580px);
   grid-template-areas:"copy media";
-  gap:34px;
+  gap:clamp(30px,4vw,64px);
   align-items:center;
-  padding:28px clamp(28px,4vw,58px) 72px;
+  padding:34px clamp(34px,5vw,76px) 76px;
   background:#0E0D10;
 }
 body[data-s496b="true"] .hero-media{
   position:relative;
   inset:auto;
   grid-area:media;
-  width:100%;
-  aspect-ratio:16/10;
-  max-height:410px;
+  width:min(580px,38vw);
+  max-width:100%;
+  aspect-ratio:4/3;
+  justify-self:end;
   align-self:center;
-  border-radius:22px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:24px;
   overflow:hidden;
-  box-shadow:0 28px 70px -42px rgba(0,0,0,.9);
+  box-shadow:0 30px 72px -38px rgba(0,0,0,.88);
   background:#17151a;
 }
 body[data-s496b="true"] .hero-media img{
@@ -52,7 +54,9 @@ body[data-s496b="true"] .hero-media img{
 body[data-s496b="true"] .hero-overlay{display:none}
 body[data-s496b="true"] .hero-inner{
   grid-area:copy;
-  max-width:none;
+  width:min(650px,100%);
+  max-width:650px;
+  justify-self:start;
   margin:0;
   padding:34px 0 44px;
   display:block;
@@ -60,9 +64,9 @@ body[data-s496b="true"] .hero-inner{
 body[data-s496b="true"] .hero h1{
   font-family:'Newsreader',serif;
   font-weight:600;
-  font-size:clamp(48px,4.5vw,68px);
-  line-height:.92;
-  letter-spacing:-.035em;
+  font-size:clamp(48px,4.15vw,64px);
+  line-height:.94;
+  letter-spacing:-.032em;
   max-width:10.5ch;
   margin:12px 0 18px;
 }
@@ -223,7 +227,8 @@ body[data-s496b="true"] .s496b-util.primary b{color:#FF6074}
 body[data-s496b="true"] .labnote{font-size:11.5px;line-height:1.45;padding-bottom:18px}
 
 @media(max-width:1180px){
-  body[data-s496b="true"] .hero{grid-template-columns:minmax(440px,1fr) minmax(420px,.9fr);gap:24px;padding-left:28px;padding-right:28px}
+  body[data-s496b="true"] .hero{grid-template-columns:minmax(420px,1fr) minmax(390px,470px);gap:28px;padding-left:28px;padding-right:28px}
+  body[data-s496b="true"] .hero-media{width:min(470px,39vw);aspect-ratio:4/3}
   body[data-s496b="true"] .hero h1{font-size:clamp(46px,5vw,60px)}
   body[data-s496b="true"] .product-visual{position:relative;top:auto;aspect-ratio:16/8.5;max-height:430px;border-left:0;border-top:1px solid var(--line)}
   body[data-s496b="true"] .compare{grid-template-columns:1fr}
@@ -232,7 +237,7 @@ body[data-s496b="true"] .labnote{font-size:11.5px;line-height:1.45;padding-botto
 @media(max-width:900px){
   body[data-s496b="true"] .hero{grid-template-columns:1fr;grid-template-areas:"copy" "media";padding:28px 24px 66px;gap:10px}
   body[data-s496b="true"] .hero-inner{padding:24px 0 16px}
-  body[data-s496b="true"] .hero-media{max-height:none;aspect-ratio:16/9}
+  body[data-s496b="true"] .hero-media{width:100%;max-width:680px;justify-self:start;aspect-ratio:16/9}
   body[data-s496b="true"] .hero h1{max-width:9ch}
   body[data-s496b="true"] .s496-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
   body[data-s496b="true"] .utility{grid-template-columns:1fr}
