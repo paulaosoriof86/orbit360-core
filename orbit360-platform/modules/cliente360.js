@@ -1560,12 +1560,12 @@ Orbit.modules.cliente360 = (function () {
   }
 
   /* ---- Editar póliza (administrable) con auto-cálculo de prima ---- */
-  function editarPoliza(polId) {
+  function editarPoliza(polId, focusField) {
     const p = S().get('polizas', polId); if (!p) return;
     const cli = S().get('clientes', p.clienteId), pais = cli ? cli.pais : 'GT';
-    const asgs = S().all('aseguradoras');
-    const ramos = Orbit.cat.ramosDe(pais);
-    const curRamo = ramos.indexOf(p.ramo) >= 0 ? p.ramo : ramos[0];
+    const asgs = S().all('aseguradoras').filter(a => a && a.vinculada !== false && (!a.pais || String(a.pais).toUpperCase() === String(pais).toUpperCase()));
+    const ramos = Orbit.cat.ramosDe(pais); if (p.ramo && ramos.indexOf(p.ramo) < 0) ramos.push(p.ramo);
+    const curRamo = p.ramo || ramos[0];
     const frecs = Object.keys(Orbit.primas.FRECUENCIAS);
     const formas = Orbit.primas.FORMAS_PAGO;
     const subOpts = (ramo) => { const s = Orbit.cat.subramosDe(pais, ramo); if (p.subramo && s.indexOf(p.subramo) < 0) s.push(p.subramo); return s; };
@@ -1590,7 +1590,7 @@ Orbit.modules.cliente360 = (function () {
           <label class="ce-l">Frecuencia<select id="ep-frec" class="o-sel">${frecs.map(f => `<option ${f === p.frecuencia ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
           <label class="ce-l">Forma de pago<select id="ep-forma" class="o-sel">${formas.map(f => `<option ${f === p.formaPago ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
           <label class="ce-l" id="ep-cuotas-wrap" style="display:none">Cantidad de cuotas<input id="ep-cuotas" class="o-sel" type="number" min="1" max="36" value="${p.cuotas || Orbit.primas.cuotasDe(p.frecuencia)}"></label>
-          <label class="ce-l ck"><input type="checkbox" id="ep-renov" ${p.renovable ? 'checked' : ''}> Renovable anualmente</label>
+          <label class="ce-l" id="ep-renov-wrap">Renovabilidad<select id="ep-renov" class="o-sel"><option value="UNKNOWN" ${renovabilidad(p)==='UNKNOWN'?'selected':''}>Pendiente de validar</option><option value="YES" ${renovabilidad(p)==='YES'?'selected':''}>Renovable</option><option value="NO" ${renovabilidad(p)==='NO'?'selected':''}>No renovable</option></select><small class="muted" style="display:block;margin-top:4px">Selecciona solo según evidencia de la póliza/fuente; si no es suficiente, conserva Pendiente de validar.</small></label>
           <label class="ce-l">Suma asegurada<input id="ep-suma" class="o-sel" type="number" value="${p.sumaAsegurada}"></label>
         </div>
         <div class="vp-desglose">
@@ -1610,6 +1610,7 @@ Orbit.modules.cliente360 = (function () {
         <button class="btn ghost" id="ep-cancel">Cancelar</button><button class="btn primary" id="ep-ok">Guardar cambios</button></div>
     </div>`;
     document.body.appendChild(back);
+    if (focusField === 'renovabilidad') setTimeout(()=>{const wrap=back.querySelector('#ep-renov-wrap'),el=back.querySelector('#ep-renov');if(wrap&&wrap.scrollIntoView)wrap.scrollIntoView({block:'center'});if(el)el.focus();},0);
     const close = () => back.remove();
     const $ = s => back.querySelector(s);
     back.addEventListener('click', e => { if (e.target === back) close(); });
@@ -1672,7 +1673,7 @@ Orbit.modules.cliente360 = (function () {
         vigenciaInicio: $('#ep-vini').value, vigenciaFin: $('#ep-vfin').value,
         frecuencia, forma: frecuencia, formaPago,
         cuotas: (Orbit.primas.cuotasDe(frecuencia) > 1 && $('#ep-cuotas')) ? (Math.max(1, +$('#ep-cuotas').value || Orbit.primas.cuotasDe(frecuencia))) : Orbit.primas.cuotasDe(frecuencia),
-        renovable: $('#ep-renov').checked, sumaAsegurada: +$('#ep-suma').value || p.sumaAsegurada,
+        renovable: $('#ep-renov').value === 'YES' ? true : $('#ep-renov').value === 'NO' ? false : null, sumaAsegurada: +$('#ep-suma').value || p.sumaAsegurada,
         recargoFinModo: $('#ep-recmodo').value,
         primaNeta: dd.neta, gastosEmision: dd.gastosEmision, gastosFinan: dd.gastosFinan, otros: dd.otros,
         ivaPct: dd.ivaPct, ivaMonto: dd.iva, recargoFinPct: dd.recargoPct, baseGravable: dd.baseGravable, prima: dd.total, primaTotal: dd.total,
