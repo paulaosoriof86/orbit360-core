@@ -1,0 +1,74 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_CONTINUITY_CHECKPOINT_V1",
+  "recordedAt": "2026-10-04",
+  "purpose": "Prevent loss of plan, findings, fixes and boundaries across UI/tool interruptions. This is a checkpoint only; it does not create a new methodology or gate.",
+  "activeGate": "B4-003",
+  "activeState": "SOURCE_FIXED_R13_PENDING_EXACT_PREVIEW_WITH_TWO_BLOCKERS",
+  "authoritativeBranch": "recovery/fase-a-clean-20260831",
+  "lastExactCandidateHead": "0ca360b707fe84be40acc34f4bbb8682b46a4338",
+  "latestInstrumentationHead": "fdafe7a8b5ea6f9892b1513b2eddfb473189d81a",
+  "currentBranchHeadBeforeCheckpoint": "173f82e190d876142c1d5e2202b404d4ac4bd099",
+  "exactPreview": {
+    "failedRunId": 37165441232,
+    "failedJobId": 111327318478,
+    "failureCode": "B4_003_RENEWAL_DELAYED_RENDER_MUTATION",
+    "prerequisitePasses": [
+      "CONTROL_PLANE_GUARD",
+      "EXACT_GATE",
+      "LIVE_UNCHANGED",
+      "CONTRACT_SYNTAX",
+      "IMMUTABLE_PACKAGE",
+      "PREVIEW_BACKENDS",
+      "HOSTING_DEPLOY",
+      "HOSTING_READBACK"
+    ]
+  },
+  "blockers": [
+    {
+      "id": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+      "status": "REAL_RENEWABILITY_SOURCE_CONFLICT_OR_APPLY_REQUIRED",
+      "safeDryRunWriteCount": 4,
+      "conflictedPolicyNumber": "VA-43685",
+      "conflictedRenewalTargetId": "pol_muj5o5ka",
+      "conflictDependentTotal": 3,
+      "dataWriteAuthorized": false,
+      "deleteAuthorized": false
+    },
+    {
+      "id": "B4-003-R13-RENEWAL-DELAYED-RENDER",
+      "status": "READONLY_CAUSAL_INSTRUMENTATION_IN_PROGRESS",
+      "instrumentedRunId": 37165820718,
+      "productMutationAuthorized": false
+    }
+  ],
+  "preservedR13Findings": [
+    "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
+    "B4-003-R13-02-CANCEL-NONCLIENT-DEEPLINK",
+    "B4-003-R13-03-CANCEL-COUNTRY-IDENTITY-INTEGRITY",
+    "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+    "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+    "B4-003-R13-06-POLICY-SEARCH-FREEZE",
+    "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
+    "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
+    "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
+    "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD"
+  ],
+  "preservedHumanPasses": [
+    "R13-PASS-01",
+    "R13-PASS-02",
+    "R13-PASS-03",
+    "R13-PASS-04",
+    "R13-PASS-05"
+  ],
+  "immutableRules": {
+    "b4004Held": true,
+    "productionUntouched": true,
+    "reimportAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "unknownRenewabilityPromotionAuthorized": false,
+    "deleteConflictedRenewalAuthorized": false,
+    "visualRedesignFromMemoryAuthorized": false,
+    "paulaTargetedVisualPassRequired": true
+  },
+  "nextAction": "Finish instrumented exact Preview, prove delayed-render cause, authorize only the demonstrated narrow fix if needed, rerun exact Preview, then resolve the explicit renewal data blocker without reimport or unsafe promotion."
+}
