@@ -28,6 +28,7 @@ This matrix is binding for the next CotComp candidate.
 | No accidental Firebase deployment of clean parent | no `onRequest`, not required/exported by `bootstrap.js` | ENFORCED |
 | No Owner URL before visual evidence | clean parent manifest says `ownerReviewUrlAuthorized:false`; screenshot gate only returns true after all evidence passes | ENFORCED |
 | Required visual evidence | 1440 / 1024 / 390 / 320 + stage1/2/3/4/replan/changeNeed screenshot SHA | GATE READY · EVIDENCE PENDING |
+| CI enforcement on every S4.97 change | `.github/workflows/cotcomp-s497-contract-gate.yml` runs syntax + contract + no-deploy assertions | REGISTERED · EXECUTION RECEIPT NOT YET OBSERVED |
 | Official A&S logo exact asset | source parent currently uses a text slot, not final logo bytes | BLOCKING BEFORE OWNER URL |
 | Governed hero/family asset bytes packaged and verified | asset map frozen; source paths declared; runtime bytes not yet packaged | BLOCKING BEFORE OWNER URL |
 | Pixel/visual compare against golden evidence | evidence registry exists; actual new screenshots not generated yet | BLOCKING BEFORE OWNER URL |
@@ -65,6 +66,12 @@ Registered commands:
 `npm run check:cotcomp:s497`
 
 `npm run test:cotcomp:s497`
+
+Registered CI workflow:
+
+`.github/workflows/cotcomp-s497-contract-gate.yml`
+
+The workflow has read-only repository permission and contains no deployment step, no Firebase command and no secret usage. Its execution receipt has not yet been independently read back, so CI is not being claimed as PASS yet.
 
 ## Fail-closed rule
 
