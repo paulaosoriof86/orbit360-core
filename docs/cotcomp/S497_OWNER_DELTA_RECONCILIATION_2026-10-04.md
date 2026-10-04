@@ -29,16 +29,16 @@ Keep a human/contextual photograph in the CotComp opening.
 This is an authorized later delta, but it must not recreate the rejected stretched marketing hero.
 
 Required composition:
-- photograph is a bounded contextual figure;
-- explicit fixed aspect ratio at each breakpoint;
+- photograph lives in a **bounded media slot integrated into the right side of the dark hero**;
+- it is not an independent 4:3 rounded card;
+- desktop hero height is explicitly controlled and cannot grow with the workspace/intake below;
+- media slot fills only its governed hero region;
 - `object-fit:cover`;
 - asset-specific `object-position`;
-- independent from form/workspace height;
-- no width/height coupling to the intake below;
-- no full-height stretch caused by parent grid;
+- no CSS stretch of intrinsic image ratio;
 - no repeated use of the same image as route/assistance fallback.
 
-The approved A&S surface pattern is text + contextual figure, not uncontrolled background stretching.
+The later Owner feedback on S4.94 indicates that the integrated human-photo direction was closer to the intended identity; the defect was proportion/crop, not the existence of the integrated right-side photo.
 
 ### OD-03 — Current A&S public shell
 Keep the current A&S navigation/shell and country context.
@@ -114,12 +114,14 @@ The next opening must combine:
 
 ### Proposed structural contract
 Desktop:
-- content width aligned to A&S site container;
-- two-column opening;
-- copy column ~52–58%;
-- image figure ~42–48%;
-- figure bounded and no taller than the copy block;
-- workspace begins immediately after opening with controlled overlap/continuity only if the approved shell supports it.
+- dark hero remains a single integrated editorial surface;
+- copy occupies roughly the left 48–54%;
+- media slot begins around the center/right 48–52%;
+- hero target height: approximately 350–390px at normal desktop widths;
+- image fills the media slot with `object-fit:cover`, never by width/height distortion;
+- a left-to-right dark gradient may integrate the copy and photo without covering faces;
+- no rounded 4:3 photo card floating inside the hero;
+- workspace begins immediately after the hero with controlled continuity/overlap only if the shell supports it.
 
 This is a **contract**, not yet an implementation.
 
