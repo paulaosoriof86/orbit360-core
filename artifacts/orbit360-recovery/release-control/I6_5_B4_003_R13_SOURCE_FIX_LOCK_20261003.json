@@ -1,16 +1,16 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-04T04:12:00Z",
-  "status": "B4_003_SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "blocking": true,
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
-    "humanVisualStatus": "REJECTED_R14_PENDING_RETEST",
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "humanVisualStatus": "PENDING",
     "knowledgePreview": true
   },
   "supersedes": {
@@ -29,15 +29,15 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "7936196a7e1f16a8fb88d46432c80293d2ab4b42"
+    "blobSha": "31e52f7378611c4557a7d4bf143fceaeab1f7a8b"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "4311d807aa0afa88fb7d07d0464f6db45cbd3b37"
+    "blobSha": "9187f5661dfba7c3ef2ee4163c62fed2b537bebf"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "cabbfc3bbb3b6b4e56fcbba0ffeb3061efc72d94",
+    "blobSha": "89193eaa90eecbc10f03bdecb0d8538427503c3d",
     "inventoryCount": 197,
     "attentionCount": 92,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -49,7 +49,7 @@
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": true,
+    "syntheticQaWritesAuthorized": false,
     "syntheticQaScope": "Exact B4-003 Preview only: disposable B4003 synthetic renewal, cancellation, information-health and insurer-document fixtures with mandatory cleanup/readback; no real operational row mutation.",
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": false,
@@ -62,11 +62,9 @@
     "renewalDeterministicApplyAuthorized": false
   },
   "nextRequiredProof": [
-    "B4_003_R14_CONTRACT_PASS",
-    "B4_003_R14_EXACT_PREVIEW_MACHINE_PASS",
     "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -222,15 +220,15 @@
     "livePromotion": false
   },
   "candidate": {
-    "sourceSha": "2485b95183584f11648c4c637811c385b60b0e80",
-    "buildId": "gi-i65-b4-2485b9518358-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37171197355-jtcpjb1c.web.app",
-    "runId": 37171197355,
-    "artifactId": 11292050424,
-    "artifactDigest": "b4639c3e9722afa1ad2fd46ea1f8c7373006b5d3556fd5ae495fdea90de9096b",
-    "hostedPayloadDigest": "5e77d293774cc885bd9fb85710ee9b34fa74bef7612a04e36d8dc8924ecf138d",
+    "sourceSha": "7aa67243cd0bb26c79cb2e0540f8fbd176321379",
+    "buildId": "gi-i65-b4-7aa67243cd0b-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37187722951-exxphdvs.web.app",
+    "runId": 37187722951,
+    "artifactId": 11297951932,
+    "artifactDigest": "f7d4d8c526ee9c897703f48dbbb33964e2b67f65a4cc8c770b87703e3b95a45c",
+    "hostedPayloadDigest": "849bb5c740e3a79819067d0d739f0813ae0f8f09ae103c34ab9da2e2e808d59d",
     "backendSourceDigest": "4c9981ee4ae5c13210d9c1c722195ad571880b48ae169776544a2e649add3f13",
-    "bundleDigest": "9b47b690b95ec43d779435509478a2d77c211636d5cb5b02e9e1355ab8c306ac",
+    "bundleDigest": "c777861247060e72cd744a4d12a795ecdcb2e88315a8f296f2ce590c690f1ac1",
     "exactReadback": true
   },
   "renewalDeterministicApplyAuthorization": {
