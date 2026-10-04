@@ -1,5 +1,8 @@
 'use strict';
 
+const fs=require('fs');
+const path=require('path');
+
 /*
  * CotComp S4.97 CLEAN VISUAL PARENT — SOURCE ONLY
  * No deployment export. No legacy visual parent. No real provider transport.
@@ -9,15 +12,20 @@
 const VERSION='ays-cotcomp-s497-clean-parent-v0.1-source-only';
 const DEPLOYMENT_EXPORT=false;
 
-const ASSETS=Object.freeze({
-  hero:'assets/cotcomp/03_REALES/reunion_profesional_en_oficina_luminosa.png',
-  vehicle:'assets/cotcomp/03_REALES/reunion_amistosa_en_oficina_automotriz.png',
-  home:'assets/cotcomp/04_CTX/familia_feliz_en_hogar_moderno.png',
-  health:'assets/cotcomp/03_REALES/consulta_familiar_en_un_ambiente_acogedor.png',
-  life:'assets/cotcomp/03_REALES/consulta_de_seguros_en_familia.png',
-  business:'assets/cotcomp/03_REALES/reunion_profesional_con_presentacion_digital.png',
-  cargo:'assets/cotcomp/03_REALES/equipo_logistico_revisando_planos_en_el_almacen.png',
-  other:'assets/cotcomp/03_REALES/colaboracion_en_alianzas_soluciones.png'
+const PACKAGED=Object.freeze({
+  logo:'data:image/webp;base64,'+fs.readFileSync(path.join(__dirname,'cotcomp-s497-logo-derived-official.b64'),'utf8').trim(),
+  hero:'data:image/webp;base64,'+fs.readFileSync(path.join(__dirname,'cotcomp-s497-hero-governed.b64'),'utf8').trim(),
+  scenes:'data:image/webp;base64,'+fs.readFileSync(path.join(__dirname,'cotcomp-s497-family-scenes-governed.b64'),'utf8').trim()
+});
+
+const SCENES=Object.freeze({
+  vehicle:{x:'0%',y:'0%'},
+  home:{x:'33.333%',y:'0%'},
+  health:{x:'66.667%',y:'0%'},
+  life:{x:'100%',y:'0%'},
+  business:{x:'0%',y:'100%'},
+  cargo:{x:'33.333%',y:'100%'},
+  other:{x:'66.667%',y:'100%'}
 });
 
 const FAMILIES=Object.freeze([
@@ -40,7 +48,12 @@ function manifest(){
     providerDeploymentAuthorized:false,
     cotcompRealTransportAuthorized:false,
     production:false,
-    ownerReviewUrlAuthorized:false
+    ownerReviewUrlAuthorized:false,
+    packagedAssets:{
+      logoSha256:'dfac6f73cf0a6ca54956bcb1f00a0385980ace685ef5366515317f7e5220d0f8',
+      heroSha256:'a80c5458137e2914a6e8d43f8212ea1997ea5d8ba8d4a44136c36ef28cb927bd',
+      familySpriteSha256:'4209a06de9b030c0f81d5b004fbf995018f8b050418c22913daaf1f73ead4800'
+    }
   });
 }
 
@@ -71,7 +84,7 @@ function html(){
 :focus-visible{outline:3px solid rgba(228,0,43,.28);outline-offset:3px}
 .cc-header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line)}
 .cc-header__inner{max-width:1600px;height:82px;margin:auto;padding:0 clamp(20px,3vw,44px);display:flex;align-items:center;gap:28px}
-.cc-brand{font-family:'Archivo';font-weight:900;letter-spacing:-.035em;font-size:18px;line-height:1}.cc-brand span{display:block;color:var(--red);font-size:10px;letter-spacing:.08em;margin-top:4px}
+.cc-brand{display:flex;align-items:center;flex:0 0 auto}.cc-brand img{display:block;width:190px;height:auto;max-height:58px;object-fit:contain}
 .cc-nav{display:flex;gap:22px;align-items:center;margin-right:auto}.cc-nav button{border:0;background:none;color:#3D3832;font-size:14px;font-weight:600;padding:10px 0}.cc-nav .is-active{color:var(--red2);border-bottom:2px solid var(--red)}
 .cc-country{display:flex;border:1px solid var(--line);border-radius:11px;overflow:hidden}.cc-country button{min-height:42px;border:0;background:#fff;padding:0 12px;font-size:12px;font-weight:700}.cc-country .is-active{background:var(--graph);color:#fff}
 .cc-advisor{min-height:44px;border:0;border-radius:11px;background:var(--red);color:#fff;padding:0 17px;font-weight:700}
@@ -98,7 +111,8 @@ function html(){
 .cc-icon{flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;color:#fff;font-family:'Archivo';font-weight:900;font-size:20px;box-shadow:inset 0 1px 1px rgba(255,255,255,.6),0 10px 20px -13px rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.45)}
 .cc-icon--vehicle{background:linear-gradient(145deg,#FF7085,#B0002A)}.cc-icon--home{background:linear-gradient(145deg,#FF8D82,#A83830)}.cc-icon--health{background:linear-gradient(145deg,#F68CC3,#8F225E)}.cc-icon--life{background:linear-gradient(145deg,#BB86E8,#65339A)}.cc-icon--business{background:linear-gradient(145deg,#FF985F,#AF4B14)}.cc-icon--cargo{background:linear-gradient(145deg,#89AEE8,#325EAA)}.cc-icon--other{background:linear-gradient(145deg,#B8B1C2,#5A5260)}
 
-.cc-stage-panel{margin-top:26px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}.cc-stage-panel__head{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:15px}.cc-stage-panel__head b{font-family:'Archivo';font-size:18px}.cc-stage-panel__head span{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#17131D;color:#fff;font-family:'IBM Plex Mono';font-size:10px}
+.cc-route-context{display:grid;grid-template-columns:minmax(240px,.72fr) minmax(0,1.28fr);gap:16px;align-items:stretch;margin:20px 0 4px}.cc-route-photo{min-height:178px;border-radius:16px;background-image:url("${PACKAGED.scenes}");background-repeat:no-repeat;background-size:400% 200%;background-position:0% 0%;box-shadow:0 18px 36px -30px rgba(0,0,0,.55)}.cc-route-copy{background:#17141A;color:#fff;border-radius:16px;padding:18px;display:flex;flex-direction:column;justify-content:center}.cc-route-copy small{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.12em;color:#FF8997;text-transform:uppercase}.cc-route-copy strong{font-family:'Archivo';font-size:20px;line-height:1.1;margin:7px 0}.cc-route-copy p{font-size:12.5px;line-height:1.5;color:#DCD3C8;margin:0}
+.cc-stage-panel{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}.cc-stage-panel__head{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:15px}.cc-stage-panel__head b{font-family:'Archivo';font-size:18px}.cc-stage-panel__head span{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#17131D;color:#fff;font-family:'IBM Plex Mono';font-size:10px}
 .cc-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.cc-field{display:flex;flex-direction:column;gap:7px}.cc-label{font-size:12px;font-weight:700}.cc-control{min-height:48px;border:1px solid #D9CFC2;border-radius:12px;background:#fff;padding:0 14px;font-size:15px;color:var(--ink)}.cc-help{font-size:10.5px;line-height:1.4;color:#8A7F74}
 .cc-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}.cc-summary{background:#17141A;color:#fff;border-radius:14px;padding:14px}.cc-summary small{font-size:10px;color:#A79EA8}.cc-summary strong{display:block;font-size:14px;margin-top:5px}
 .cc-review-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.cc-review-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}.cc-review-card b{font-family:'Archivo';font-size:17px}.cc-review-card strong{display:block;font-family:'Archivo';font-size:24px;margin:14px 0 6px}
@@ -110,14 +124,14 @@ function html(){
 
 [data-stage-panel]{display:none}[data-stage-panel].is-visible{display:block}
 @media(max-width:980px){.cc-nav{display:none}.cc-workspace{grid-template-columns:1fr}.cc-rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px}.cc-rail__label{display:none}.cc-step{min-height:56px;padding:8px;justify-content:center}.cc-step strong{font-size:11px}.cc-family-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:820px){.cc-hero{grid-template-columns:1fr;grid-template-areas:"copy" "media";min-height:0}.cc-hero__copy{padding:42px 24px 34px}.cc-hero__media{min-height:260px}.cc-hero__media:after{background:linear-gradient(180deg,var(--graph),rgba(14,13,16,.12) 32%,rgba(14,13,16,0))}.cc-family-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cc-summary-grid,.cc-review-grid{grid-template-columns:1fr}.cc-field-grid{grid-template-columns:1fr}}
+@media(max-width:820px){.cc-hero{grid-template-columns:1fr;grid-template-areas:"copy" "media";min-height:0}.cc-route-context{grid-template-columns:1fr}.cc-route-photo{min-height:210px}.cc-hero__copy{padding:42px 24px 34px}.cc-hero__media{min-height:260px}.cc-hero__media:after{background:linear-gradient(180deg,var(--graph),rgba(14,13,16,.12) 32%,rgba(14,13,16,0))}.cc-family-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cc-summary-grid,.cc-review-grid{grid-template-columns:1fr}.cc-field-grid{grid-template-columns:1fr}}
 @media(max-width:560px){.cc-header__inner{height:68px;padding:0 16px}.cc-country,.cc-advisor{display:none}.cc-brand{margin-right:auto}.cc-wrap{padding:0 12px;margin-top:-14px}.cc-hero__title{font-size:44px}.cc-hero__lead{font-size:15px}.cc-hero__benefits{gap:14px}.cc-hero__media{min-height:220px}.cc-rail{grid-template-columns:1fr 1fr}.cc-step{justify-content:flex-start}.cc-stage__head{padding:20px}.cc-stage__number{font-size:44px}.cc-stage__body{padding:18px 15px}.cc-section-title{font-size:26px}.cc-family-grid{grid-template-columns:1fr}.cc-family{min-height:96px}.cc-replan__choices{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header class="cc-header">
   <div class="cc-header__inner">
-    <div class="cc-brand" aria-label="Alianzas y Soluciones">ALIANZAS &amp; SOLUCIONES<span>BROKER DE SEGUROS</span></div>
+    <a class="cc-brand" href="#" aria-label="Alianzas y Soluciones"><img src="${PACKAGED.logo}" alt="Alianzas y Soluciones · Broker de Seguros"></a>
     <nav class="cc-nav" aria-label="Principal">
       <button type="button">Empresas</button><button type="button">Personas y familias</button><button class="is-active" type="button">Cotizar y comparar</button><button type="button">Siniestros y asistencia</button><button type="button">Recursos</button><button type="button">Sobre A&amp;S</button>
     </nav>
@@ -134,7 +148,7 @@ function html(){
     <div class="cc-hero__benefits"><div class="cc-hero__benefit">Compara opciones<br>sobre bases equivalentes</div><div class="cc-hero__benefit">Entiende coberturas,<br>deducibles y condiciones</div><div class="cc-hero__benefit">Continúa con asesoría<br>cuando haga falta</div></div>
   </div>
   <figure class="cc-hero__media" data-visual-asset="hero:consultation">
-    <img src="${ASSETS.hero}" alt="Escena de asesoría para revisar opciones de seguro con A&amp;S">
+    <img src="${PACKAGED.hero}" alt="Equipo A&amp;S en una conversación de asesoría">
   </figure>
 </section>
 
@@ -164,7 +178,11 @@ function html(){
         <div class="cc-section-kicker">02 · DATOS DEL CASO</div>
         <h3 class="cc-section-title">Cuéntanos solo lo necesario sobre tu vehículo</h3>
         <p class="cc-section-lead">Pedimos primero los datos que cambian disponibilidad, condiciones o comparación.</p>
-        <div class="cc-summary-grid"><div class="cc-summary"><small>País</small><strong>Guatemala</strong></div><div class="cc-summary"><small>Necesidad</small><strong>Vehículo / Movilidad</strong></div><div class="cc-summary"><small>Cómo seguimos</small><strong>En línea con asesoría disponible</strong></div></div>
+        <div class="cc-summary-grid"><div class="cc-summary"><small>País</small><strong>Guatemala</strong></div><div class="cc-summary"><small>Necesidad</small><strong id="selectedNeed">Vehículo / Movilidad</strong></div><div class="cc-summary"><small>Cómo seguimos</small><strong>En línea con asesoría disponible</strong></div></div>
+        <div class="cc-route-context">
+          <div id="routePhoto" class="cc-route-photo" data-visual-asset="family:vehicle" aria-label="Contexto visual de Vehículo / Movilidad"></div>
+          <div class="cc-route-copy"><small id="routeVisualKicker">CONTEXTO DE LA NECESIDAD</small><strong id="routeVisualTitle">Vehículo / Movilidad</strong><p id="routeVisualText">La imagen acompaña la necesidad seleccionada. No sustituye los datos que requiere una cotización real.</p></div>
+        </div>
         <div class="cc-stage-panel"><div class="cc-stage-panel__head"><span>01</span><b>Vehículo y uso</b></div><div class="cc-field-grid">
           <label class="cc-field"><span class="cc-label">Tipo de vehículo</span><select class="cc-control"><option>Automóvil</option></select><span class="cc-help">La disponibilidad puede variar según producto y condiciones del caso.</span></label>
           <label class="cc-field"><span class="cc-label">Uso</span><select class="cc-control"><option>Particular</option></select><span class="cc-help">El uso declarado puede cambiar las alternativas.</span></label>
@@ -192,12 +210,20 @@ function html(){
         <p class="cc-section-lead">Cuando las alternativas tienen bases comparables, mostramos costo, alcance, condiciones y los puntos que conviene revisar antes de elegir.</p>
         <table class="cc-compare"><thead><tr><th>CRITERIO</th><th>Alternativa A</th><th>Alternativa B</th></tr></thead><tbody><tr><td>Costo total</td><td>Q 2,180</td><td>Q 2,540</td></tr><tr><td>Deducible</td><td>20%</td><td>10%</td></tr><tr><td>Asistencia / servicio</td><td>Básica</td><td>Ampliada</td></tr><tr><td>Alcance</td><td>Cobertura amplia</td><td>Cobertura amplia</td></tr><tr><td>Estado</td><td>Revisada y comparable</td><td>Revisada y comparable</td></tr></tbody></table>
         <aside class="cc-rec"><small>Recomendación A&amp;S</small><h3>Orientación según lo que dijiste que más pesa en tu decisión.</h3><p>No elegimos automáticamente por ti. Explicamos qué alternativa se acerca más a tu prioridad y qué diferencias debes revisar antes de continuar.</p></aside>
-        <div class="cc-replan"><b>¿Quieres reconsiderar algo sin empezar de cero?</b><div class="cc-replan__choices"><button type="button">Cambiar mi prioridad</button><button type="button">Ajustar datos del caso</button><button type="button">Revisar otra necesidad</button></div></div>
+        <div class="cc-replan"><b>¿Quieres reconsiderar algo sin empezar de cero?</b><div class="cc-replan__choices"><button type="button" data-replan="priority">Cambiar mi prioridad</button><button type="button" data-replan="data">Ajustar datos del caso</button><button type="button" data-replan="need">Revisar otra necesidad</button></div></div>
         <div class="cc-actions"><button class="cc-btn" type="button" data-prev="3">← Volver</button><div><button class="cc-btn" type="button">Hablar con un asesor</button> <button class="cc-btn cc-btn--primary" type="button">Elegir y continuar →</button></div></div>
       </section>
     </div>
   </main>
 </section>
+</div>
+<div id="replanModal" hidden style="position:fixed;inset:0;z-index:80;background:rgba(14,13,16,.72);display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="width:min(560px,100%);background:#fff;border-radius:20px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.35)">
+    <div class="cc-section-kicker">REPLANTEAR SIN PERDER EL CONTEXTO</div>
+    <h3 id="replanTitle" style="font-family:'Archivo';font-size:26px;line-height:1.05;margin:8px 0">Ajusta lo necesario</h3>
+    <p id="replanText" style="font-size:14px;line-height:1.55;color:#5F5750;margin:0 0 18px">Conservamos la información ya ingresada.</p>
+    <div class="cc-actions" style="margin-top:0"><button id="replanClose" class="cc-btn" type="button">Cerrar</button><button id="replanConfirm" class="cc-btn cc-btn--primary" type="button">Continuar con el ajuste →</button></div>
+  </div>
 </div>
 <div class="cc-lab">SOURCE-ONLY LAB · No constituye oferta, emisión ni conexión real con aseguradoras. Gravicentra conserva la autoridad operativa. Este artefacto no está autorizado para URL de Owner Review.</div>
 <script>
@@ -216,10 +242,44 @@ function html(){
   };
   document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>go(Number(b.dataset.next))));
   document.querySelectorAll('[data-prev]').forEach(b=>b.addEventListener('click',()=>go(Number(b.dataset.prev))));
+  const sceneMeta={
+    vehicle:{label:'Vehículo / Movilidad',text:'Vehículo, uso y condiciones que influyen en tus opciones.'},
+    home:{label:'Hogar',text:'Vivienda, contenido y responsabilidad familiar.'},
+    health:{label:'Salud / Gastos médicos',text:'Red, plan y condiciones relevantes para tu protección de salud.'},
+    life:{label:'Vida / Ingreso',text:'Dependientes y continuidad económica.'},
+    business:{label:'Empresa',text:'Operación, exposición y prioridades de tu empresa.'},
+    cargo:{label:'Transporte / Carga',text:'Rol en la cadena, carga y puntos críticos del trayecto.'},
+    other:{label:'Otros / No sé cuál necesito',text:'A&S te ayuda a identificar la necesidad antes de pedir datos de producto.'}
+  };
+  const scenePos=${JSON.stringify(SCENES)};
+  let selectedFamily='vehicle';
+  const syncRouteVisual=()=>{
+    const meta=sceneMeta[selectedFamily],pos=scenePos[selectedFamily];
+    const photo=document.getElementById('routePhoto');
+    if(photo){photo.style.backgroundPosition=pos.x+' '+pos.y;photo.dataset.visualAsset='family:'+selectedFamily;photo.setAttribute('aria-label','Contexto visual de '+meta.label);}
+    const need=document.getElementById('selectedNeed');if(need)need.textContent=meta.label;
+    const title=document.getElementById('routeVisualTitle');if(title)title.textContent=meta.label;
+    const copy=document.getElementById('routeVisualText');if(copy)copy.textContent=meta.text;
+  };
   document.querySelectorAll('.cc-family').forEach(b=>b.addEventListener('click',()=>{
     document.querySelectorAll('.cc-family').forEach(x=>{x.classList.remove('is-selected');x.setAttribute('aria-pressed','false');});
-    b.classList.add('is-selected');b.setAttribute('aria-pressed','true');
+    b.classList.add('is-selected');b.setAttribute('aria-pressed','true');selectedFamily=b.dataset.family;syncRouteVisual();
   }));
+  syncRouteVisual();
+
+  const modal=document.getElementById('replanModal'),rt=document.getElementById('replanTitle'),rx=document.getElementById('replanText');
+  const replanCopy={
+    priority:['Cambiar mi prioridad','Conservamos la necesidad y los datos del caso; solo revisamos qué pesa más en tu decisión.'],
+    data:['Ajustar datos del caso','Vuelves a tus datos sin perder la necesidad seleccionada ni el contexto del recorrido.'],
+    need:['Revisar otra necesidad','Puedes cambiar la necesidad y conservar el resto del contexto mientras A&S recalcula qué preguntas corresponden.']
+  };
+  document.querySelectorAll('[data-replan]').forEach(b=>b.addEventListener('click',()=>{const c=replanCopy[b.dataset.replan];rt.textContent=c[0];rx.textContent=c[1];modal.hidden=false;modal.style.display='flex';modal.dataset.mode=b.dataset.replan;}));
+  document.getElementById('replanClose').addEventListener('click',()=>{modal.style.display='none';modal.hidden=true;});
+  document.getElementById('replanConfirm').addEventListener('click',()=>{
+    const mode=modal.dataset.mode;modal.style.display='none';modal.hidden=true;
+    if(mode==='priority'||mode==='data')go(2);
+    if(mode==='need')go(1);
+  });
 })();
 </script>
 <script type="application/json" id="cc-manifest">${JSON.stringify(mf).replace(/</g,'\\u003c')}</script>
@@ -227,4 +287,4 @@ function html(){
 </html>`;
 }
 
-module.exports=Object.freeze({VERSION,DEPLOYMENT_EXPORT,ASSETS,FAMILIES,manifest,html});
+module.exports=Object.freeze({VERSION,DEPLOYMENT_EXPORT,PACKAGED,SCENES,FAMILIES,manifest,html});
