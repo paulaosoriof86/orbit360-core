@@ -12,7 +12,7 @@ const REGION='us-central1';
 const FUNCTION_NAME='cotcompAuthorizedFidelityPreviewS493';
 const CATALOG_PATH=S486.CATALOG_PATH;
 const OWNER_VISUAL_SHA='3468546cb5d1c0cd7e2191980b306d462ea0b0304da0260167ec06c294aaa10e';
-const PRODUCT_SPRITE_SHA='b6d7ec040e72fa2edc268150751f0a625230104bf701767b545d261c92b36fe9';
+const PRODUCT_SPRITE_SHA='b199c128f08a54899805c61e7d126a56c11a75537b056cdb5b17faf2e3657e1a';
 const PRODUCT_SPRITE='data:image/webp;base64,'+
   fs.readFileSync(path.join(__dirname,'cotcomp-s493-product-sprite-1.b64'),'utf8').trim()+
   fs.readFileSync(path.join(__dirname,'cotcomp-s493-product-sprite-2.b64'),'utf8').trim();
