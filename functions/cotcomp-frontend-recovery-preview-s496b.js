@@ -560,7 +560,7 @@ function renderIntake(){
   state.intakePage=Math.max(0,Math.min(state.intakePage,pages.length-1));
   const page=pages[state.intakePage];
   row.className='form-row s496-form';
-  row.innerHTML='<span data-s496-intake-root hidden></span><section class="s496b-intake-shell">'+
+  row.innerHTML='<span data-s496-intake-root hidden></span><span data-s496b-stage-owner="1" hidden></span><section class="s496b-intake-shell">'+
     '<div class="s496b-intake-head"><div><strong>'+esc(page.title)+'</strong><p>'+esc(page.subtitle)+'</p></div><span class="s496b-step-chip">Datos '+(state.intakePage+1)+' de '+pages.length+'</span></div>'+
     '<div class="s496b-intake-page">'+page.nodes.join('')+'</div>'+
     '<div id="s496bValidation" class="s496b-validation" hidden></div>'+
@@ -651,17 +651,17 @@ function renderStage(){
   const review=q('#s496Review');
   if(state.stage===0){
     if(formTitle)formTitle.textContent='2. Elige una familia para continuar';
-    if(row){row.className='form-row s496-form';row.innerHTML='<div class="s496-journey-note" style="grid-column:1/-1">Selecciona una familia. Las preguntas cambian según país, producto y tipo de riesgo.</div>';}
+    if(row){row.className='form-row s496-form';row.innerHTML='<span data-s496b-stage-owner="0" hidden></span><div class="s496-journey-note" style="grid-column:1/-1">Selecciona una familia. Las preguntas cambian según país, producto y tipo de riesgo.</div>';}
     q('#s496Status')?.remove(); if(review)review.hidden=true;if(compare)compare.classList.add('s496-locked');
   }else if(state.stage===1){
     renderIntake();if(review)review.hidden=true;if(compare)compare.classList.add('s496-locked');
   }else if(state.stage===2){
     if(formTitle)formTitle.textContent='2. Datos del caso preservados';
-    if(row){row.className='form-row s496-form';row.innerHTML='<div class="s496-journey-note" style="grid-column:1/-1">Puedes volver y editar tus datos sin perder la necesidad seleccionada.</div>';}
+    if(row){row.className='form-row s496-form';row.innerHTML='<span data-s496b-stage-owner="2" hidden></span><div class="s496-journey-note" style="grid-column:1/-1">Puedes volver y editar tus datos sin perder la necesidad seleccionada.</div>';}
     renderStatus();renderReview();if(compare)compare.classList.add('s496-locked');
   }else{
     if(formTitle)formTitle.textContent='2. Contexto listo para comparar';
-    if(row){row.className='form-row s496-form';row.innerHTML='<div class="s496-actions"><button type="button" class="s496-back">← Volver a revisar</button><span class="s496-journey-note" style="margin:0">Las alternativas de esta candidata siguen siendo ilustrativas.</span></div>';}
+    if(row){row.className='form-row s496-form';row.innerHTML='<span data-s496b-stage-owner="3" hidden></span><div class="s496-actions"><button type="button" class="s496-back">← Volver a revisar</button><span class="s496-journey-note" style="margin:0">Las alternativas de esta candidata siguen siendo ilustrativas.</span></div>';}
     if(review)review.hidden=true;if(compare){compare.classList.remove('s496-locked');ensureComparisonHierarchy();}
   }
   if(privacy)privacy.style.display=state.stage===0?'none':'block';
@@ -705,11 +705,12 @@ function installOwnershipGuards(){
   if(row&&!row.dataset.s496Observer){
     row.dataset.s496Observer='true';
     const observer=new MutationObserver(()=>{
-      if(state.stage!==1||state.formRepairing)return;
-      if(q('[data-s496-intake-root]',row))return;
+      if(state.formRepairing)return;
+      const owner=q('[data-s496b-stage-owner="'+state.stage+'"]',row);
+      if(owner)return;
       state.formRepairing=true;
       queueMicrotask(()=>{
-        try{renderIntake();syncVisual();}finally{state.formRepairing=false}
+        try{renderStage();}finally{state.formRepairing=false}
       });
     });
     observer.observe(row,{childList:true});
@@ -799,8 +800,9 @@ document.body.dataset.s496bStage=String(state.stage);
 enhanceUtility();
 syncProgress();
 setTimeout(render,30);
-setTimeout(()=>{installOwnershipGuards();if(state.stage===1&&!q('[data-s496-intake-root]',q('#formRow')))renderIntake();syncVisual();},180);
-setTimeout(()=>{if(state.stage===1&&!q('[data-s496-intake-root]',q('#formRow')))renderIntake();syncVisual();},650);
+setTimeout(()=>{installOwnershipGuards();const row=q('#formRow');if(row&&!q('[data-s496b-stage-owner="'+state.stage+'"]',row))renderStage();syncVisual();},180);
+setTimeout(()=>{const row=q('#formRow');if(row&&!q('[data-s496b-stage-owner="'+state.stage+'"]',row))renderStage();syncVisual();},650);
+setTimeout(()=>{const row=q('#formRow');if(row&&!q('[data-s496b-stage-owner="'+state.stage+'"]',row))renderStage();syncVisual();},1400);
 })();
 `;
 
