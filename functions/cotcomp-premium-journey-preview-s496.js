@@ -1,5 +1,7 @@
 'use strict';
 
+// S4.96 governed LAB candidate: canonical preflight required before deployment.
+
 const {onRequest}=require('firebase-functions/v2/https');
 const S495=require('./cotcomp-premium-visual-preview-s495');
 const S494=require('./cotcomp-premium-visual-preview-s494');
