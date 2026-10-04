@@ -46,6 +46,8 @@ Orbit.ciclo = (function () {
 
   function etapaInfo(id) { return E[id] || E.nuevo; }
   function paisOK(pais) { return !Orbit.pais || Orbit.pais === 'TODOS' || pais === Orbit.pais; }
+  function insurerCountry(a){return String(a&&((a.pais||a.country||a.paisCodigo||a.countryCode)||'')).trim().toUpperCase();}
+  function insurersForCountry(country){const wanted=String(country||'').trim().toUpperCase();return S().all('aseguradoras').filter(a=>a&&a.id&&a.vinculada!==false&&(!wanted||insurerCountry(a)===wanted));}
   async function assignableAdvisors(country){if(!Orbit.assignableAdvisorRoster?.list)return[];try{return await Orbit.assignableAdvisorRoster.list(country);}catch(e){return[];}}
   function rolFiltro(asesorId) {
     if (Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor()) return asesorId === Orbit.session.asesorId();
@@ -247,7 +249,8 @@ Orbit.ciclo = (function () {
     try{await Orbit.cat.ensure();}catch(error){U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;}
     const n = S().get('negocios', id); if (!n) return;
     const ase = q.asesor(n.asesorId), asg = q.aseguradora(n.aseguradoraId), ei = etapaInfo(n.etapa), prob = U.finiteNumber(n.prob);
-    const asesores = await assignableAdvisors(n.pais), asgs = S().all('aseguradoras');
+    let asesores = await assignableAdvisors(n.pais), asgs = insurersForCountry(n.pais);
+    let selectedInsurerIds=[...new Set([].concat(n.aseguradoraIds||[],n.aseguradoraId||[]).filter(Boolean))].filter(id=>asgs.some(a=>a.id===id));
     const enOps = !!ei.ops;
     // stepper
     const stepper = FLUJO.map((sid, i) => {
@@ -290,7 +293,7 @@ Orbit.ciclo = (function () {
               ${fSelectCat('Producto / plan', 'ng-prod', 'productos', n.producto)}
               ${fSelect('Ramo', 'ng-ramo', Orbit.cat.ramosDe(n.pais), n.ramo)}
               ${fSelectCat('Segmento', 'ng-segmento', 'segmentos', n.segmento || '')}
-              ${fSelectOpt('Aseguradora de interés', 'ng-asg', asgs.map(a => [a.id, a.nombre]), n.aseguradoraId)}
+              <label class="ce-l">Aseguradoras de interés<select id="ng-asg" class="o-sel" multiple size="${Math.min(6,Math.max(3,asgs.length||3))}">${asgs.map(a=>`<option value="${U.esc(a.id)}" ${selectedInsurerIds.includes(a.id)?'selected':''}>${U.esc(a.nombre)}</option>`).join('')}</select><small class="muted" style="display:block;margin-top:4px">Puedes seleccionar varias; solo se muestran aseguradoras del país del negocio.</small></label>
               ${fSelectOpt('Asesor responsable', 'ng-ase', asesores.map(a => [a.id, a.nombre]), n.asesorId)}
               ${fInput('Prima estimada', 'ng-prima', n.primaEst, 'number')}
               ${fSelectCat('Prioridad', 'ng-prio', 'prioridades', n.prioridad)}
@@ -343,6 +346,16 @@ Orbit.ciclo = (function () {
         </div>
       </div>`;
     const back = modal(html, 980);
+    const countrySelect=back.querySelector('#ng-pais'),insurerSelect=back.querySelector('#ng-asg'),advisorSelect=back.querySelector('#ng-ase');
+    const refreshCountryScopedCommercial=async()=>{
+      const country=countrySelect.value;
+      const priorInsurers=insurerSelect?[...insurerSelect.selectedOptions].map(o=>o.value):[];
+      asgs=insurersForCountry(country);
+      if(insurerSelect){insurerSelect.innerHTML=asgs.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');priorInsurers.filter(id=>asgs.some(a=>a.id===id)).forEach(id=>{const o=[...insurerSelect.options].find(x=>x.value===id);if(o)o.selected=true;});insurerSelect.dataset.countryScope=country;}
+      const currentAdvisor=advisorSelect&&advisorSelect.value;asesores=await assignableAdvisors(country);if(advisorSelect){advisorSelect.innerHTML=asesores.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');if(asesores.some(a=>a.id===currentAdvisor))advisorSelect.value=currentAdvisor;else if(asesores.length)advisorSelect.value=asesores[0].id;}
+      const ramo=back.querySelector('#ng-ramo'),priorRamo=ramo&&ramo.value,rows=Orbit.cat.ramosDe(country);if(ramo){ramo.innerHTML=rows.map(v=>'<option>'+U.esc(v)+'</option>').join('');if(rows.includes(priorRamo))ramo.value=priorRamo;}
+    };
+    countrySelect.addEventListener('change',()=>{refreshCountryScopedCommercial().catch(()=>U.toast('No fue posible actualizar opciones por país.'));});
 
     // stepper jump: no UI success before canonical commit/readback.
     back.querySelectorAll('.cstep').forEach(b => b.addEventListener('click', async () => {
@@ -400,12 +413,13 @@ Orbit.ciclo = (function () {
     // save
     back.querySelector('#ng-save').addEventListener('click', async () => {
       const save = back.querySelector('#ng-save'), g = sid => (back.querySelector('#' + sid) || {}).value;
+      const insurerIds=[...((back.querySelector('#ng-asg')||{}).selectedOptions||[])].map(o=>o.value).filter(Boolean);
       if (save.disabled) return; save.disabled = true;
       try {
         await S().updateDurable('negocios', id, {
           nombre: g('ng-nombre') || n.nombre, tipo: g('ng-tipo'), telefono: g('ng-tel'), email: g('ng-email'),
           pais: g('ng-pais'), moneda: g('ng-pais') === 'CO' ? 'COP' : 'GTQ', canal: g('ng-canal'),
-          producto: g('ng-prod'), ramo: g('ng-ramo'), segmento: g('ng-segmento'), aseguradoraId: g('ng-asg'), asesorId: g('ng-ase'),
+          producto: g('ng-prod'), ramo: g('ng-ramo'), segmento: g('ng-segmento'), aseguradoraIds: insurerIds, aseguradoraId: insurerIds[0] || '', asesorId: g('ng-ase'),
           primaEst: +g('ng-prima') || n.primaEst, prioridad: g('ng-prio'), nroCotizacion: g('ng-cot'),
           proximoToque: g('ng-toque') || n.proximoToque, descripcion: g('ng-desc'), colLeads: (back.querySelector('#ng-col') || {}).value || '', actualizado: today()
         });
