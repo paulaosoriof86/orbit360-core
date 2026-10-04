@@ -607,15 +607,36 @@ try{
  await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='renovaciones',null,{timeout:10000});
  await page.waitForTimeout(500);
  const stable=await page.evaluate(async()=>{
-   const h=document.getElementById('host'),before=h.innerText,count={n:0};
-   const obs=new MutationObserver(m=>count.n+=m.length);obs.observe(h,{subtree:true,childList:true,characterData:true});
-   await new Promise(r=>setTimeout(r,350));
-   obs.disconnect();return{before,after:h.innerText,mutations:count.n,route:String(Orbit.route&&Orbit.route.key||'')};
+   const h=document.getElementById('host'),before=h.innerText,start=performance.now(),events=[],records=[];
+   const stamp=(kind,detail)=>events.push({ms:Math.round(performance.now()-start),kind,detail:String(detail||'').slice(0,240)});
+   const onStore=e=>stamp('store',e&&e.detail&&e.detail.collection);
+   const onDomain=e=>stamp('domain',e&&e.detail&&e.detail.domain);
+   const onSession=()=>stamp('session','orbit:session');
+   window.addEventListener('orbit:store:emit',onStore);
+   window.addEventListener('orbit:domain-config',onDomain);
+   document.addEventListener('orbit:session',onSession);
+   const obs=new MutationObserver(list=>{
+     list.forEach(m=>{
+       if(records.length>=80)return;
+       const added=Array.from(m.addedNodes||[]).map(n=>String(n.textContent||n.nodeName||'').replace(/\s+/g,' ').trim().slice(0,180)).filter(Boolean);
+       const removed=Array.from(m.removedNodes||[]).map(n=>String(n.textContent||n.nodeName||'').replace(/\s+/g,' ').trim().slice(0,180)).filter(Boolean);
+       records.push({ms:Math.round(performance.now()-start),type:m.type,target:String(m.target&&m.target.nodeName||''),added,removed});
+     });
+   });
+   obs.observe(h,{subtree:true,childList:true,characterData:true});
+   await new Promise(r=>setTimeout(r,1000));
+   obs.disconnect();
+   window.removeEventListener('orbit:store:emit',onStore);
+   window.removeEventListener('orbit:domain-config',onDomain);
+   document.removeEventListener('orbit:session',onSession);
+   return{before,after:h.innerText,mutations:records.length,records,events,route:String(Orbit.route&&Orbit.route.key||'')};
  });
- proof.renewalRenderStability={mutationCount:stable.mutations,textStable:stable.before===stable.after,route:stable.route};
+ proof.renewalRenderStability={mutationCount:stable.mutations,textStable:stable.before===stable.after,route:stable.route,records:stable.records,events:stable.events};
  need(stable.route==='renovaciones','B4_003_RENEWAL_ROUTE_NOT_ACTIVE');
- need(stable.before===stable.after&&stable.mutations===0,'B4_003_RENEWAL_DELAYED_RENDER_MUTATION');
- proof.assertions.noDelayedRenewalRenderMutation=true;
+ proof.assertions.noDelayedRenewalRenderMutation=stable.before===stable.after&&stable.mutations===0;
+ if(!proof.assertions.noDelayedRenewalRenderMutation){
+   proof.r13RenewalDelayedRenderBlocker={blocking:true,code:'RENEWAL_DELAYED_RENDER_MUTATION',mutationCount:stable.mutations,textStable:stable.before===stable.after,records:stable.records,events:stable.events};
+ }
 
  // R13: reconcile the real, non-synthetic renewal universe against the canonical YES-only pipeline.
  proof.r13RenewalReality=await page.evaluate(ids=>{
