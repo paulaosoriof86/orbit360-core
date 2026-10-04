@@ -171,6 +171,7 @@ Orbit.modules = Orbit.modules || {};
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card)">${existing ? '<button class="btn ghost" data-delete style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>' : ''}<button class="btn ghost" data-close>Cancelar</button><button class="btn primary" data-save>${existing ? 'Guardar y sincronizar recibos' : 'Crear póliza y recibos'}</button></div>`;
     const b = modal('policy-v1199', inner, 800), $ = s => b.querySelector(s);
+    if(opts.focusField==='renovabilidad')setTimeout(()=>{const el=$('[data-renewable]');if(el&&el.scrollIntoView)el.scrollIntoView({block:'center'});if(el)el.focus();},0);
     const clientEl = $('[data-client]'), advisorEl = $('[data-advisor]'), insurerEl = $('[data-insurer]'), ramoEl = $('[data-ramo]'), productEl = $('[data-product]');
     const clientSearch = $('[data-client-search]');
     function paintClientOptions(query) {
@@ -417,7 +418,7 @@ Orbit.modules = Orbit.modules || {};
   if(clientMod){
     clientMod.__policyReceiptsV1199={nuevaPoliza:clientMod.nuevaPoliza,editarPoliza:clientMod.editarPoliza,renovar:clientMod.renovar,endoso:clientMod.endoso};
     clientMod.nuevaPoliza=function(clientId){const c=S().get('clientes',clientId)||scopedClients()[0];if(!c)return toast('No hay clientes disponibles');return openPolicyForm({clientId:c.id});};
-    clientMod.editarPoliza=function(policyId){return openPolicyForm({policyId});};
+    clientMod.editarPoliza=function(policyId,focusField){return openPolicyForm({policyId,focusField});};
     clientMod.editarVehiculo=function(vehicleId){return openVehicleForm(vehicleId);};
     clientMod.renovar=function(policyId){const p=S().get('polizas',policyId),c=p&&S().get('clientes',p.clienteId);if(c)requestCorrection(c,policyId,'renovación; definir número y vigencia de la nueva póliza');};
     clientMod.endoso=function(policyId){const p=S().get('polizas',policyId),c=p&&S().get('clientes',p.clienteId);if(c)requestCorrection(c,policyId,'endoso; requiere tipo, fecha efectiva y documento');};
