@@ -53,7 +53,7 @@ function html(){
 .logo{height:58px;width:auto;display:block;flex:none}.nav{display:flex;align-items:center;gap:clamp(14px,1.55vw,26px);margin-right:auto}.nav button{background:none;border:none;padding:8px 2px;font-weight:600;font-size:14px;color:#39352f}.nav button.active{color:var(--red2);border-bottom:2px solid var(--red)}
 .hdr-actions{display:flex;align-items:center;gap:9px}.country{display:flex;border:1.5px solid var(--line);border-radius:11px;overflow:hidden}.country button{min-height:42px;padding:0 12px;border:0;background:#fff;color:#454039;font-size:12px;font-weight:700}.country button.active{background:var(--graph);color:#fff}.advisor{min-height:44px;padding:0 17px;border:0;border-radius:11px;background:var(--red);color:#fff;font-weight:700}.burger{display:none}
 .hero{position:relative;min-height:355px;background:var(--graph);color:#fff;overflow:hidden}
-.hero-media{position:absolute;inset:0 0 0 45%;background-image:url('${HERO}');background-size:cover;background-position:center center}.hero-overlay{position:absolute;inset:0;background:linear-gradient(90deg,#0E0D10 2%,rgba(14,13,16,.98) 34%,rgba(14,13,16,.82) 49%,rgba(14,13,16,.22) 78%,rgba(14,13,16,.08) 100%)}
+.hero-media{position:absolute;inset:0 0 0 45%;overflow:hidden}.hero-media img{width:100%;height:100%;object-fit:cover;object-position:center 38%;display:block}.hero-overlay{position:absolute;inset:0;background:linear-gradient(90deg,#0E0D10 2%,rgba(14,13,16,.98) 34%,rgba(14,13,16,.82) 49%,rgba(14,13,16,.22) 78%,rgba(14,13,16,.08) 100%)}
 .hero-inner{position:relative;z-index:2;max-width:1600px;margin:0 auto;padding:48px clamp(20px,3vw,44px) 86px;display:grid;grid-template-columns:minmax(0,650px) 1fr}
 .eyebrow{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#fff;text-transform:uppercase}.hero h1{font-family:'Newsreader',serif;font-weight:600;font-size:clamp(44px,4.8vw,72px);line-height:.91;letter-spacing:-.03em;margin:11px 0 14px}.hero h1 em{font-style:normal;color:#FF2B46}.hero p{font-size:16px;line-height:1.45;color:#F4EFE8;max-width:47ch;margin:0}.hero-benefits{display:flex;gap:28px;margin-top:22px;flex-wrap:wrap}.hero-benefit{display:flex;align-items:center;gap:10px;font-size:12px;line-height:1.35}.hero-benefit svg{width:24px;height:24px;color:#FF4057}
 .wrap{max-width:1540px;margin:-40px auto 0;padding:0 clamp(18px,2.4vw,34px) 42px;position:relative;z-index:5}
@@ -99,7 +99,7 @@ function html(){
 </header>
 
 <section class="hero">
-  <div class="hero-media"></div><div class="hero-overlay"></div>
+  <div class="hero-media"><img class="hero-photo" src="${HERO}" alt="Equipo A&amp;S en asesoría"></div><div class="hero-overlay"></div>
   <div class="hero-inner">
     <div>
       <div class="eyebrow">SEGUROS PARA PERSONAS</div>
