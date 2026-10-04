@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76",
-  "expectedLedgerNextBlobSha": "fb36b6b2aed4895009c58eb8f20684a7344241b5",
+  "expectedLedgerNextBlobSha": "20b28e0832ac8bf5679450ea613abd595add4f20",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -16,7 +16,7 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 215,
+  "inventoryCount": 217,
   "attentionCount": 103,
   "inventory": [
     {
@@ -31,7 +31,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Run 36162989052 completed authenticated B2 PASS; workflow now aggregates independent access/IAM/package prerequisites before future long browser proof.",
-      "source": "LEDGER",
+      "source": "RUN_SEQUENCE_20260924_20260925",
       "finding": "AUTHENTICATED_B2_VALIDATION_DISCOVERED_INDEPENDENT_HARNESS_AND_PREVIEW_INFRASTRUCTURE_PREREQUISITES_SERIALIZED_ONE_PER_RUN",
       "rootCause": "The long authenticated proof was fail-fast and external prerequisites were not aggregated before browser execution. Each run therefore stopped at the first independent missing precondition (route host, edit-state transition, prompt binding, isolated credential vault, Secret Manager IAM/package), making already-preserved product fixes appear as repeated interruption."
     },
@@ -47,7 +47,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "IAM proof PASS + exact Preview credential import mapping + insurer metadata readback + password reveal hash-match + preview cleanup + LIVE untouched.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36161855364",
       "finding": "PREVIEW_CREDENTIAL_CALLABLE_CANNOT_READ_ITS_ISOLATED_SECRET_MANAGER_VAULT",
       "rootCause": "After removing the production-vault cross-read, the exact Preview callable still returns functions/unavailable from readVaultScope(preview). This proves the isolated preview vault itself is not usable by the runtime identity; the remaining causal surface is preview-secret existence/IAM, not Aseguradoras UI, active role, prompt binding or operational Firestore."
     },
@@ -62,7 +62,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "New immutable B2 Preview: credential import PASS, insurer durable update PASS, logo reload PASS, reveal hash-match PASS, preview cleanup PASS, LIVE untouched.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36160736564",
       "finding": "PREVIEW_CREDENTIAL_CALLABLE_DEPENDED_ON_PRODUCTION_SECRET_VAULT",
       "rootCause": "readEffectiveVault(preview) merged production+preview, and preview import used production as fallback base. The isolated Preview callable therefore required production Secret Manager read access, contradicting isolation and causing functions/unavailable before any insurer metadata write."
     },
@@ -76,7 +76,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Exact fe140 Preview reaches secure provider/batch writer or yields a product-specific save failure after the correctly-bound prompt; no ambiguous global dialog interaction.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36158157603",
       "finding": "INSURER_SAVE_PROOF_USED_GLOBAL_PROMPT_CONFIRM_SELECTOR_AND_DID_NOT_PROVE_THE_GUARDAR_CHANGES_PROMPT_WAS_THE_DIALOG_CONFIRMED",
       "rootCause": "The harness waited for global [data-in].last() and clicked global [data-yes].last(). The product uses overlay-scoped prompts; unrelated/stale overlays can make the proof close a different dialog while guardarDraft remains awaiting its own U.prompt."
     },
@@ -90,7 +90,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "New exact Preview stays in edit mode through full module rerender, saves logo and password, and completes canonical + secure readback.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36156246656",
       "finding": "ASEGURADORAS_MODULE_RERENDER_WITH_FICHA_DEEPLINK_REOPENS_SAME_FICHA_WITHOUT_PRESERVING_EDIT_STATE",
       "rootCause": "render(host) always processed route.params.ficha by calling ficha(deepId) with default view semantics. Any module rerender while editing therefore replaced the active draft with read-only state even after the async knowledge refresh path was fixed."
     },
@@ -104,7 +104,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "New exact Preview remains in edit mode after deferred knowledge load; logo + password can be entered and saved; canonical insurer readback and secure credential reveal/cleanup PASS.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36155142701",
       "finding": "ASEGURADORAS_ENTERS_EDIT_MODE_THEN_ASYNC_KNOWLEDGE_SUMMARY_LOAD_REFRESH_REOPENS_FICHA_IN_VIEW_MODE",
       "rootCause": "ensureKnowledgeSummaryLoaded() invokes refreshOwnerView() on script.onload; refreshOwnerView() called ficha(id) without edit-state preservation. ficha() interpreted missing startEdit as false, discarding editing/draft/credentialDrafts."
     },
@@ -118,7 +118,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Exact same Preview completes insurer logo/credential proof and all later renewal/cleanup assertions.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36073128460",
       "finding": "HARNESS_GENERIC_PAGE_WAIT_CAN_PASS_BEFORE_ASEGURADORAS_RENDER_BINDS_MODULE_HOST",
       "rootCause": "Router transition is asynchronous. Waiting for generic #host .page can match the stale Cliente360 page; Aseguradoras ficha() then runs before Aseguradoras.render(host) has assigned its module-scoped host."
     },
@@ -134,7 +134,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Direct protected-document readback contains all frozen roleScopes plus Operativo Cotizador/Comparativo; exact Preview runtime consumes them; no business-data writes.",
-      "source": "LEDGER",
+      "source": "CONTROLLED_ACCESS_RECOVERY_RUN_36072858956",
       "finding": "PROTECTED_ACCESS_CALLABLE_EXPOSED_EFFECTIVE_SCOPE_DEFAULTS_BUT_PHYSICAL_ACCESS_DOCUMENT_DID_NOT_CONTAIN_FULL_FROZEN_ROLE_SCOPES",
       "rootCause": "tenant-domain-config-client publish() shallow-merges defaultAccess() with protected server config, so missing physical roleScopes can look valid in browser. B1 tests asserted effective runtime values rather than physical config completeness."
     },
@@ -151,7 +151,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Protected config readback contains Operativo cotizador/comparativo; exact Preview sidebar and runtime expose both; Asesor scope remains own; no business data writes.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_RUNTIME_RUN_36071653541_PLUS_B1_R8_PROOF_AUDIT",
       "finding": "B1_SERVER_OWNED_ACCESS_MIGRATION_PRESERVED_SCOPES_BUT_DID_NOT_MATERIALIZE_APPROVED_ROLE_PERMISSION_MATRIX",
       "rootCause": "B1 R8 verified matrix semantics with window.__accessCfg synthetic data and source-contract assertions, while the real protected access document was not asserted to contain the approved rolePermissions. The transition removed reliance on origin-local storage without migrating that state. The first controlled recovery then proved a second facet: the browser's protected config exposed effective scope defaults, while the physical protected document did not contain the full frozen roleScopes set."
     },
@@ -166,7 +166,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Exact authenticated renewal creates one new linked vehicle with new ID and preserves the source relationship.",
-      "source": "LEDGER",
+      "source": "FORENSIC_SOURCE_REVIEW_20260924_R2",
       "finding": "RENEWAL_CAN_CREATE_NEW_VEHICLE_POLICY_WITHOUT_CARRYING_UNAMBIGUOUS_SOURCE_VEHICLE_RISK",
       "rootCause": "issueRequest used only policyInput.vehiculo. If the renewal caller omitted it, the new policy could be emitted without snapshotting the single source-policy vehicle."
     },
@@ -181,7 +181,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Human Preview shows the canonical edit action and generated schedule.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924_R2",
       "finding": "RECEIPT_DETAIL_HAS_NO_CLEAR_EDIT_PATH_AND_POLICY_EDITOR_DID_NOT_SHOW_RECEIPT_SCHEDULE",
       "rootCause": "Expected receipts are derived from policy payment terms, but receipt detail had no canonical edit path and policy preview exposed only a receipt count."
     },
@@ -195,7 +195,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "No repeated generic Ver vehículo completo buttons in Cliente360.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924_R2",
       "finding": "CLIENTE360_SHOWS_MULTIPLE_GENERIC_VER_VEHICULO_COMPLETO_BUTTONS",
       "rootCause": "patchLegacyCards injected one generic vehicle button after every policy card with a vehicle, duplicating Cliente360's dedicated vehicle actions."
     },
@@ -211,7 +211,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Exact Preview proves configured Operativo Cotizador+Comparativo in both access engine and sidebar.",
-      "source": "LEDGER",
+      "source": "PAULA_SCREENSHOT_REVIEW_20260924_R2",
       "finding": "OPERATIVO_LOSES_APPROVED_COTIZADOR_COMPARATIVO_BECAUSE_PROTECTED_ACCESS_CONFIG_HAS_EMPTY_ROLE_PERMISSIONS",
       "rootCause": "Hydration is working and returns source=protected, syncPending=false. The protected access document preserves roleScopes but contains rolePermissions={}. B1 migrated access authority to the server without materializing the already-approved module matrix; its R8 proof used a synthetic in-memory matrix and therefore did not prove the protected document. A fresh Preview origin has no legacy localStorage matrix, so access-scope correctly falls back to the base Operativo role, where Cotizador and Comparativo are absent."
     },
@@ -225,7 +225,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "GitHub accepts workflow syntax, central guard passes and B2 deploy job starts.",
-      "source": "LEDGER",
+      "source": "WORKFLOW_RUN_36004467901",
       "finding": "The first scoped channel-cleanup patch made the workflow YAML invalid because an embedded heredoc body escaped the run-block indentation.",
       "rootCause": "The initial quota-cleanup patch accidentally duplicated the remainder of the B2 workflow, including Exact B2 Preview readback and the authenticated-preview job; later edits only repaired the first visible malformed segment and left duplicate YAML keys."
     },
@@ -240,7 +240,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "B2 Hosting Preview deploy succeeds after scoped cleanup; exact readback follows; live/data remain untouched.",
-      "source": "LEDGER",
+      "source": "WORKFLOW_RUN_36003922764",
       "finding": "Firebase Hosting Preview channel quota reached after repeated recovery previews.",
       "rootCause": "Preview channels were created repeatedly during recovery but the active B2 executor had no safe garbage collection for obsolete unreferenced B2 channels."
     },
@@ -254,7 +254,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Next B2 Preview run either deploys successfully or surfaces the exact Firebase failure; no hidden deploy error.",
-      "source": "LEDGER",
+      "source": "WORKFLOW_RUN_36003423424",
       "finding": "B2 Hosting Preview deploy failed but the workflow hid Firebase's diagnostic because set -e exited before the redirected deploy output was printed.",
       "rootCause": "Executor observability defect: failing command redirected stdout/stderr to b2-preview.json and shell exited before cat."
     },
@@ -269,7 +269,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Central guard PASS and B2 Preview executor reaches build/proof on the same HEAD without product-source drift.",
-      "source": "LEDGER",
+      "source": "FORENSIC_MECHANISM_AUDIT_20260924",
       "finding": "Single-candidate rule existed semantically but not as one machine-authoritative physical composition; guard/workflow/locks duplicated composition/state knowledge.",
       "rootCause": "The project required one accumulative candidate, but physical product composition authorization was distributed across Control Plane, B1/B2 locks, historical successor scopes and hardcoded status lists in the guard/workflow. A legitimate new remediation state could therefore make the guard ignore already-authorized product owners and report false source drift. This also made preservation of prior improvements dependent on multiple consumers staying manually synchronized."
     },
@@ -283,7 +283,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "PAULA_REVIEW_20260920",
       "finding": "Access/synchronization email reported sent but Fernando did not receive it in any mailbox.",
       "rootCause": "Not yet proven end-to-end; provider/request acceptance is not delivery proof."
     },
@@ -303,7 +303,7 @@
         "visualReceiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
         "exactCandidateSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3"
       },
-      "source": "LEDGER",
+      "source": "B1_SCOPE_REVIEW",
       "finding": "Inicio/Dashboard must reconcile KPI/advisor/monthly reality with active-role scoped canonical data.",
       "rootCause": "Mixed-scope aggregation was previously demonstrated; active-role scope fix passed but final dashboard reality closure remains open."
     },
@@ -321,7 +321,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Polizas",
       "finding": "BODY_TYPOGRAPHY_TOO_HEAVY",
       "rootCause": "Inline field values used font-weight 650 almost universally and premium rows used generalized <b>, flattening hierarchy."
@@ -334,7 +334,7 @@
       "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js + core/policy-receipts-engine.js",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Policy with base and policy without base; no invented value and no empty summary noise.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Polizas",
       "finding": "BASE_GRAVABLE_SEMANTICS_AND_SUMMARY_NOISE",
       "rootCause": "Canonical model supports taxable base, but summary rendered the missing value as a completion warning and used ambiguous label."
@@ -347,7 +347,7 @@
       "owner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Runtime records with distinct values and legacy missing values; write/readback stays distinct.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Polizas",
       "finding": "FORMA_PAGO_CONDUCTO_CROSS_FALLBACK_DUPLICATION",
       "rootCause": "Read normalizer cross-fell back formaPago<-conductoPago and conducto<-formaPago; I6.4 source contract imports them separately."
@@ -360,7 +360,7 @@
       "owner": "policy-receipts-v1199-bridge.js + policy-receipts-engine.js + authenticated harness",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Synthetic existing policy same ID: empty motive block -> valid save -> Firestore readback -> reload.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Polizas",
       "finding": "EDIT_EXISTING_POLICY_DOES_NOT_PERSIST_IN_HUMAN_FLOW",
       "rootCause": "Prior authenticated PASS never edited a policy field; it edited only vehicle color. Engine also required motivo only for a subset of critical fields, while UI declared motive mandatory. Exact human-field failure remains runtime-discriminant pending."
@@ -379,7 +379,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Vehiculos/Polizas",
       "finding": "POLICY_VEHICLE_RELATIONSHIP_AMBIGUOUS_FOR_OBSERVED_CLIENT",
       "rootCause": "Policy detail resolves a vehicle by exact vehicle.polizaId while Cliente360 lists vehicles by clienteId. A client can therefore have vehicle records while one specific policy has no physical vehicle link."
@@ -392,7 +392,7 @@
       "owner": "policy-receipts-v1199-detail-guard.js + policy-receipts-v1199-bridge.js + cliente360.js",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Authenticated edit -> exact vehicle doc readback -> one vehicle for policy -> reload -> policy/client link preserved.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Vehiculos",
       "finding": "NO_CLEAR_EDIT_VEHICLE_ACTION",
       "rootCause": "Buttons labeled 'Editar vehículo' called editarPoliza(polizaId); no dedicated vehicle editor owner existed."
@@ -411,7 +411,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Vehiculos",
       "finding": "VISIBLE_UNDEFINED_TEXT",
       "rootCause": "Legacy row/identity renderers allowed literal string 'undefined'/'null' to pass through."
@@ -430,7 +430,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Recibos",
       "finding": "PARTIAL_FIRST_RENDER_THEN_FULL_12_RECEIPTS",
       "rootCause": "Cliente360 rendered legacy receipts first; canonical bridge replaced it in setTimeout(0), creating a visible partial-state race."
@@ -449,7 +449,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "DetalleRecibo",
       "finding": "TECHNICAL_TERMS_AND_HARSH_VISUAL_HIERARCHY",
       "rootCause": "UI printed raw provenance fields/codes and separate state/reconciliation badges even when semantically identical; hero used unrelated dark treatment."
@@ -468,7 +468,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Aseguradoras",
       "finding": "LOGO_NOT_ADMINISTRABLE",
       "rootCause": "Logo URL editing existed in source but was buried inside the Resumen edit form and was not discoverable in the human flow."
@@ -481,7 +481,7 @@
       "owner": "functions/product-insurer-credentials.js + product-insurer-credential-provider-p0.js + aseguradoras.js",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Authenticated Operativo synthetic insurer password update -> credentialRef readback -> refresh/reveal hash match -> Preview secret cleanup; no plaintext/log/artifact.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Aseguradoras",
       "finding": "SECURE_CREDENTIAL_PASSWORD_UPDATE_FAILS",
       "rootCause": "The human flow now reaches the isolated Preview callable correctly, but the Preview callable itself read the production Secret Manager vault before importing into the preview vault. That cross-environment dependency returned functions/unavailable ('No fue posible consultar la bóveda segura') and aborted Aseguradoras save before logo/credential readback. This violated Preview isolation."
@@ -494,7 +494,7 @@
       "owner": "modules/academia.js",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Authenticated privileged role and Operativo/Asesor counts/routes; CRM/Cliente360 and Aseguradoras courses present; no technical/LAB visible to normal roles.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "Academia",
       "finding": "VISIBLE_CATALOG_COUNT_DISCREPANCY_25_VS_RUNTIME_LARGER",
       "rootCause": "Session owner returns canonical role SuperAdmin while visual label is Dirección; Academia privileged filter recognized Dirección/Admin only. SuperAdmin therefore received exactly the Operativo subset."
@@ -507,7 +507,7 @@
       "owner": "detail guard + receipt projection + Cliente360 + Aseguradoras",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Own visual audit desktop/mobile across Cliente360, Aseguradoras, Policy, Vehicle, Receipt, Academia; new Paula review afterward.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260924",
       "surface": "TransversalVisual",
       "finding": "MATURE_VISUAL_FAMILY_NOT_YET_CONSISTENT",
       "rootCause": "Policy/receipt/vehicle surfaces used independent inline weights and receipt-specific dark hero instead of mature family hierarchy."
@@ -524,9 +524,11 @@
       ],
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "exact B3 Preview readback + static owner contract + targeted visual shell confirmation",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Restore approved Cobros y cartera shell; bridge is projection adapter, not renderer replacement.",
-      "rootCause": "cobros-cartera-i65-closure-bridge.js replaced Orbit.modules.cobros.render with a second full renderer."
+      "rootCause": "cobros-cartera-i65-closure-bridge.js replaced Orbit.modules.cobros.render with a second full renderer.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-002",
@@ -536,7 +538,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "Cold/warm Cobros entry timing with phase markers; no ~10s blank/unusable wait; no page freeze; data complete after load.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Search/performance: indexing, debounce and pagination/virtualization; no page freeze.",
       "rootCause": "COBROS_UNCOALESCED_HYDRATION_RENDER_STORM_PLUS_FULL_DOM_AND_PER_ROW_VEHICLE_SCAN",
       "nextAction": "B3-003"
@@ -549,7 +551,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "KPI and aging invariant audit by country/currency; no contradiction such as Vencido=0 with positive overdue aging unless semantics explicitly exclude those rows and UI explains it.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "KPIs and aging live by currency/country; no invalid cross-currency totals.",
       "rootCause": "SPLIT_UI_READ_MODEL_AUTHORITY_PLUS_RENDERED_ROWS_COUNTRY_SCOPE_OMISSION",
       "nextAction": "B3-004"
@@ -576,7 +578,7 @@
         "Cobros entry and filter changes show no material redundant hydration/double render.",
         "No relevant 404, console or page errors; responsive behavior applicable."
       ],
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "One canonical Apply/Confirm Payment command from Cliente360 and Cobros with date/method/evidence.",
       "rootCause": "CANONICAL_SERVER_DOMAIN_EXISTS_BUT_PAYMENT_APPLICATION_IS_BLOCKED_WHILE_CLIENTE360_COBROS_PORTAL_USE_SPLIT_DIRECT_WRITES",
       "nextAction": "B3-005"
@@ -596,7 +598,7 @@
         "Bantrab may use 12 only when the exception is explicitly documented; without that evidence it fails closed with zero writes; more than 12 remains blocked.",
         "Later direct evidence enriches prior inferred payment instead of duplicating it."
       ],
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Evidence reconciliation and approved inference through one server-owned engine with provenance/idempotency.",
       "rootCause": "CANONICAL_SINGLE_RECEIPT_WRITE_PRIMITIVE_EXISTS_BUT_HIGH_CONFIDENCE_MULTI_EVIDENCE_INFERENCE_ORCHESTRATOR_AND_CURRENT_TENANT_CONFIG_CONTRACT_ARE_NOT_COMPOSED",
       "nextAction": "B3-006"
@@ -609,7 +611,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Controlled policy import creates policy + expected receipts + portfolio, never confirmed cobro without evidence.",
       "rootCause": "POLICY_IMPORT_BYPASSES_CANONICAL_POLICY_RECEIPTS_OWNER_AND_PERFORMS_FIRE_AND_FORGET_NON_ATOMIC_POLICY_PLUS_LEGACY_COBROS_WRITES",
       "nextAction": "B3-007"
@@ -622,10 +624,11 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Cronograma consumes real pending obligations from receipts/portfolio.",
       "rootCause": "CRONOGRAMA_PENDING_OBLIGATION_READ_OWNER_IS_LEGACY_COBROS_AND_CRONOGRAMA_SOURCE_WAS_NOT_TRACKED_IN_THE_ACCUMULATIVE_PRODUCT_SET",
-      "nextAction": "B3-008"
+      "nextAction": "B3-008",
+      "humanVisualStatus": "PASS_PAULA_TARGETED_VISUAL_20261002"
     },
     {
       "id": "B3-008",
@@ -635,7 +638,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Dashboard Inicio reality reconciliation closed before B4.",
       "rootCause": "READINESS_OWNER_MISMATCH_AND_CAUSAL_SECOND_WRITERS_CONFIRMED",
       "nextAction": "B4_ENTRY_GUARD"
@@ -648,10 +651,11 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-001",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Ops/Leads/Cliente360/Portal gestiones converge to one canonical record with role scopes.",
       "rootCause": "LEGACY_OPTIMISTIC_UI_CONTROL_FLOW_AND_PORTAL_OPERATION_MAPPING_GAP",
-      "nextAction": "NONE_CLOSED"
+      "nextAction": "NONE_CLOSED",
+      "humanVisualStatus": "PENDING_CUMULATIVE_REVIEW"
     },
     {
       "id": "B4-002",
@@ -661,22 +665,23 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-002",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Notifications/automation occur only after committed domain events with retry/failure visibility.",
       "rootCause": "CANONICAL_OUTBOX_HAS_NO_EXECUTABLE_DISPATCH_RETRY_OWNER",
-      "nextAction": "NONE_CLOSED"
+      "nextAction": "NONE_CLOSED",
+      "humanVisualStatus": "PENDING_CUMULATIVE_REVIEW"
     },
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
       "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
-      "source": "LEDGER",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
-      "humanVisualStatus": "PENDING",
+      "source": "FROZEN_PLAN",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "humanVisualStatus": "REJECTED_R17",
       "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
       "r13QaGateAlignmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
       "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
@@ -698,7 +703,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-004",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "nextAction": "WAIT_B4_003_PAULA_VISUAL",
       "finding": "Targeted regression closure for Siniestros and Cronograma."
     },
@@ -710,7 +715,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-005",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Authenticated module × role × viewport E2E matrix; zero relevant page/console/request errors."
     },
     {
@@ -721,7 +726,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-006",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Paula visual acceptance on exact final Preview."
     },
     {
@@ -732,7 +737,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-007",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "FROZEN_PLAN",
       "finding": "Promote same immutable accepted artifact to LIVE; exact readback or rollback."
     },
     {
@@ -743,7 +748,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "POST_PRODUCTION_FROZEN",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
       "finding": "Advanced renewal comparator / richer real quotation-comparison workflow."
     },
     {
@@ -754,7 +759,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "POST_PRODUCTION_FROZEN",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
       "finding": "Vehicle catalog reuse from Cotizador for make/line/model dropdowns."
     },
     {
@@ -765,7 +770,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "POST_PRODUCTION_FROZEN",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
       "finding": "Insurer-specific assistance intelligence/configuration."
     },
     {
@@ -776,7 +781,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "POST_PRODUCTION_FROZEN",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
       "finding": "Guatemala insurer-specific issuance expense intelligence/defaults."
     },
     {
@@ -787,7 +792,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "POST_PRODUCTION_FROZEN",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
       "finding": "Fine-grained insurer/payment-method fractionation rules."
     },
     {
@@ -798,7 +803,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "POST_PRODUCTION_FROZEN",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
       "finding": "Safe delete/archive UX with referential integrity."
     },
     {
@@ -809,7 +814,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "POST_PRODUCTION_FROZEN",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "I6_5_B2_VISUAL_CORRECTION_AND_POSTPROD_FREEZE_20260923",
       "finding": "Importer intelligence beyond B3 minimum controlled proof."
     },
     {
@@ -822,7 +827,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Exact Preview: labels/body/dividers/weights in Datos de póliza and Prima/condiciones share canonical hierarchy; automated DOM discriminant + Paula visual pass.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "surface": "Polizas",
       "rootCause": "Independent inline premium grid/value weights were outside the mature detail hierarchy; fixed by the existing detail owner plus base.css contract."
     },
@@ -837,7 +842,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Source/contract evidence for tolerance + deterministic fixture around threshold + exact Preview rendering.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "surface": "Polizas/Recibos",
       "rootCause": "Renderer hardcoded 0.005; protected reconciliation config defines amountTolerance with canonical default 0.02, so Q0.06 remains a real warning."
     },
@@ -852,7 +857,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "P853FFX: detail values == editor initial values; edit one innocuous field; server commit/readback/reload preserves every other value and same vehicle.id.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "surface": "Vehiculos",
       "rootCause": "Detail normalized legacy aliases while editor read raw canonical keys and rebuilt a full subset; fixed by shared normalizeVehicle plus sparse changed-fields write."
     },
@@ -868,7 +873,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Oscar/91-0169567 read-only physical genealogy; explicit vehicleId→policyId linking contract; historical relation preserved; readback/reload idempotent.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "surface": "Polizas/Vehiculos/Renovaciones",
       "rootCause": "Physical audit proved multiple policy versions and historical same-plate vehicle IDs; existing issuance owner already snapshots risk on renewal and links genealogy by physical IDs. Manual reconciliation now preserves the historical source and creates an idempotent versioned relation."
     },
@@ -883,7 +888,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Oscar's five physical vehicle IDs classified; zero repeated candidate for same vehicle.id; distinct same-plate IDs remain distinguishable; no delete/merge writes.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "surface": "Cliente360/Polizas/Vehiculos",
       "rootCause": "Candidate projection did not distinguish physical identity/history strongly enough; fixed by dedupe on vehicle.id and policy-context labels."
     },
@@ -898,7 +903,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Automatic scan + visual proof across all five Oscar vehicles: zero literal undefined/null/[object Object].",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "surface": "Vehiculos",
       "rootCause": "Raw candidate/editor projections could surface alias gaps; fixed by the canonical vehicle normalizer and shown-value guard."
     },
@@ -912,7 +917,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Cold load, hard refresh, Cliente360→Recibos and role change: first paint/state transitions show loading until ready; no false empty; final count stable.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "surface": "Recibos",
       "rootCause": "Cliente360 legacy receipt tab could paint its cobros-based empty state before receiptsPortfolioProjection became owner; fixed by readiness gate on serverConfirmedCollections."
     },
@@ -927,7 +932,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Exact Preview main operational view has no filename#row/raw provenance labels; audit detail retains provenance; business information preserved.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "surface": "DetalleRecibo/Poliza",
       "rootCause": "Technical source/match metadata was rendered as a primary card; moved to collapsed audit details while operational as-of remains primary."
     },
@@ -942,7 +947,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "File upload→preview→server commit→persisted URL/asset ref→reload same logo→replace; no Data URL/localStorage authority; password/reveal regression PASS.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "surface": "Aseguradoras",
       "rootCause": "No real upload owner existed; Storage was read-only client-side. Extended the existing product operational server owner with authenticated insurer-logo upload and canonical Firestore readback. Preview isolation completed with orbit360ProductAssetUploadPreview@us-east1 restricted to synthetic B2 insurer IDs; production callable remains undeployed."
     },
@@ -963,7 +968,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "POLICY_PREMIUM_PAYMENT_SECTION_REMAINS_VISUALLY_OUTSIDE_MATURE_CLIENTE360_ASEGURADORAS_FAMILY",
       "rootCause": "Independent inline premium grid/value weights were outside the mature detail hierarchy; fixed by the existing detail owner plus base.css contract."
     },
@@ -984,7 +989,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "POLICY_SCHEDULE_DELTA_Q0_06_IS_FLAGGED_BY_HARDCODED_THRESHOLD_WITHOUT_PROVEN_APPROVED_ROUNDING_TOLERANCE",
       "rootCause": "Renderer hardcoded 0.005; protected reconciliation config defines amountTolerance with canonical default 0.02, so Q0.06 remains a real warning."
     },
@@ -1006,7 +1011,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "VEHICLE_DETAIL_VALUES_DO_NOT_ALL_PREFILL_EDITOR_AND_PARTIAL_SAVE_CAN_DESTRUCTIVELY_CLEAR_UNHYDRATED_FIELDS",
       "rootCause": "Detail normalized legacy aliases while editor read raw canonical keys and rebuilt a full subset; fixed by shared normalizeVehicle plus sparse changed-fields write."
     },
@@ -1028,7 +1033,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "COMMERCIAL_POLICY_91_0169567_HAS_MULTIPLE_PHYSICAL_VERSIONS_AND_CURRENT_2026_2027_VERSION_HAS_NO_DIRECT_VEHICLE_LINK",
       "rootCause": "Read-only audit proved versioned physical policy and vehicle records; existing renewal implementation snapshots vehicle risk rather than moving the historical vehicle. Explicit manual linking now creates a versioned relation when source already belongs to a historical policy."
     },
@@ -1049,7 +1054,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "VEHICLE_LINK_CANDIDATES_MUST_NOT_DUPLICATE_THE_SAME_ID_AND_SAME_PLATE_DIFFERENT_IDS_MUST_REMAIN_DISTINGUISHABLE",
       "rootCause": "Five physical vehicle IDs include four same-plate historical KIA records; candidates now dedupe only identical vehicle.id and show physical/history context."
     },
@@ -1071,7 +1076,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "RECIPTS_FIRST_PAINT_CAN_SHOW_FALSE_FINAL_ZERO_EMPTY_STATE_BEFORE_CANONICAL_HYDRATION_FINISHES",
       "rootCause": "Legacy Cliente360 empty-state raced ahead of canonical receipt hydration; readiness gate now shows loading until recibosEsperados and carteraPrimas are server-confirmed."
     },
@@ -1091,7 +1096,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "RECEIPT_OPERATIONAL_VIEW_STILL_EXPOSES_TECHNICAL_PROVENANCE_AS_PRIMARY_CONTENT",
       "rootCause": "Technical sourceRef/matchQuality was primary UI; moved behind collapsed audit details."
     },
@@ -1112,7 +1117,7 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "INSURER_LOGO_ADMINISTRATION_IS_URL_ONLY_AND_DOES_NOT_SUPPORT_FILE_SELECTION_PREVIEW_PERSIST_RELOAD",
       "rootCause": "No existing file upload owner was wired. The existing product operational server owner now accepts validated image upload, persists Storage asset and insurer URL/ref, then performs canonical readback. Preview isolation completed with orbit360ProductAssetUploadPreview@us-east1 restricted to synthetic B2 insurer IDs; production callable remains undeployed."
     },
@@ -1127,7 +1132,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Canonical runtime/readback remains 28 courses / 102 lessons for the reviewed privileged route.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "ACADEMIA_VISIBLE_COUNTS_28_COURSES_102_LESSONS_HUMANLY_CONFIRMED",
       "rootCause": "No new defect demonstrated in R3; human evidence is favorable and matches the authenticated catalog/runtime direction."
     },
@@ -1142,7 +1147,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Action opens canonical editor; open-only path performs zero writes.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "RECEIPT_DETAIL_EDITAR_PLAN_DE_RECIBOS_IS_VISIBLE_AND_ACCEPTED",
       "rootCause": "No new defect demonstrated; prior discoverability finding is visually resolved."
     },
@@ -1156,7 +1161,7 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "DOM/visual exact Preview has no repeated generic Ver vehículo completo injection.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R3",
       "finding": "PREVIOUS_GENERIC_DUPLICATED_VER_VEHICULO_COMPLETO_INJECTION_REMAINS_ABSENT",
       "rootCause": "No regression demonstrated; prior generic injection removal remains effective."
     },
@@ -1168,7 +1173,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Asesor muestra Comparativo y scope own sin leaks.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "surface": "Roles/Navegación",
       "rootCause": "Asesor base omitía Comparativo aunque el acceso aprobado lo exige."
     },
@@ -1180,7 +1185,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Synthetic authenticated management create from Cliente360/Renovaciones -> server commit -> canonical readback -> visible exactly once in Ops -> reload -> cleanup; real Preview action must explicitly report no write.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "surface": "Cliente360/Ops",
       "rootCause": "Effective current owners still used optimistic Orbit.store insert: core/ciclo.js returned before server commit, and renewal bridge immediately redirected/toasted. Backend rejection in protected Preview rolled back the pending row after UI had implied success."
     },
@@ -1192,7 +1197,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Oscar sin undefined/null/object; historia física accesible por vigencia/ID.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "surface": "Cliente360/Vehículos",
       "rootCause": "Versiones históricas físicas se mostraban como tarjetas equivalentes y escapaba undefined."
     },
@@ -1204,7 +1209,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Asesor solo consulta; rol autorizado conserva vínculo versionado.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "surface": "Póliza/Vehículo",
       "rootCause": "Asesor veía acción mutante que no podía ejecutar y faltaba contexto de vigencia física."
     },
@@ -1216,7 +1221,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Real: no write explicado. Sintética: upload→reload→replace.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "surface": "Aseguradoras",
       "rootCause": "Preview protegía aseguradoras reales pero UI parecía fallo de guardado."
     },
@@ -1228,7 +1233,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Loading→final sin 0 falso; conteo estable.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "surface": "Recibos",
       "rootCause": "Capturas estáticas no prueban desaparición de falso 0 durante hidratación."
     },
@@ -1240,7 +1245,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "Cliente with reported payment evidence shows it in Cobros as non-confirmed evidence; confirmed cobro count remains unchanged unless authoritative payment confirmation exists.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R4",
       "surface": "Cobros/Recibos",
       "rootCause": "Pago reportado pendiente de conciliación no equivale a cobro aplicado, pero Cobros no expone bien esa evidencia.",
       "nextAction": "NONE_CLOSED"
@@ -1266,7 +1271,8 @@
       "surface": "Aseguradoras",
       "classification": "INFRASTRUCTURE_PREREQUISITE_MISSING",
       "finding": "INSURER_LOGO_FILE_UPLOAD_CONTRACT_CANNOT_COMPLETE_BECAUSE_FIREBASE_PROJECT_HAS_NO_USABLE_ASSET_BUCKET",
-      "rootCause": "Firebase SDK config advertises the default Storage bucket name, but that bucket is not provisioned. The only physical buckets belong to Cloud Functions internals and must not be repurposed."
+      "rootCause": "Firebase SDK config advertises the default Storage bucket name, but that bucket is not provisioned. The only physical buckets belong to Cloud Functions internals and must not be repurposed.",
+      "noLive": true
     },
     {
       "id": "B2-R39-ISSUANCE-MANAGEMENT-DURABLE-CONTRACT",
@@ -1287,7 +1293,8 @@
       "surface": "Renovaciones/Emisión/Ops",
       "classification": "SERVER_SANITIZER_CONTRACT_LOSS",
       "finding": "ISSUANCE_REQUEST_FIELDS_WERE_NOT_PRESERVED_BY_CANONICAL_OPS_MANAGEMENT_SANITIZER_AND_PREVIEW_SYNTHETIC_SCOPE_REJECTED_CANONICAL_GES_EMI_IDS",
-      "rootCause": "The issuance owner writes workflowType/requestKey/operationId/issuanceMode/sourcePolicyId/acceptedOffer/emissionStage and closure fields into gestiones, while the Ops/Leads server sanitizer previously retained only generic management fields. Preview also recognized only b2-ges/b2-neg entity IDs even though the canonical issuance owner generates ges_emi_* IDs."
+      "rootCause": "The issuance owner writes workflowType/requestKey/operationId/issuanceMode/sourcePolicyId/acceptedOffer/emissionStage and closure fields into gestiones, while the Ops/Leads server sanitizer previously retained only generic management fields. Preview also recognized only b2-ges/b2-neg entity IDs even though the canonical issuance owner generates ges_emi_* IDs.",
+      "noLive": true
     },
     {
       "id": "B2-R40-PREVIEW-ASSET-CLEANUP-PROOF",
@@ -1300,7 +1307,8 @@
       "source": "LEDGER",
       "surface": "Aseguradoras/QA",
       "classification": "HARNESS_CLEANUP_PROOF_GAP",
-      "finding": "AUTHENTICATED_B2_CLEANUP_CONFIRMED_FIRESTORE_AND_PREVIEW_CREDENTIAL_REMOVAL_BUT_DID_NOT_EXPLICITLY_VERIFY_DEDICATED_STORAGE_OBJECT_ABSENCE"
+      "finding": "AUTHENTICATED_B2_CLEANUP_CONFIRMED_FIRESTORE_AND_PREVIEW_CREDENTIAL_REMOVAL_BUT_DID_NOT_EXPLICITLY_VERIFY_DEDICATED_STORAGE_OBJECT_ABSENCE",
+      "noLive": true
     },
     {
       "id": "B2-R41-VEHICLE-HISTORY-PROJECTION-INCOMPLETE-R5",
@@ -1310,7 +1318,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Oscar vehicle view shows resolved current identity once; versioned records under history; ambiguous incomplete rows clearly separated; zero merge/delete writes.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R5",
       "surface": "Cliente360/Vehículos/Póliza",
       "classification": "VISUAL_PROJECTION_DEFECT",
       "finding": "Same apparent vehicle remains rendered as multiple equivalent top-level cards/candidates when historical rows have incomplete plate identity; explicit physical history is not presented as one resolved identity plus subordinate history.",
@@ -1324,7 +1332,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Open from exact vehicle preserves vehicleId context and same physical policy ID; receipt section corresponds to that exact version; sibling versions are distinguishable.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R5",
       "surface": "Vehículo→Póliza/Recibos",
       "classification": "CONTEXT_LOSS",
       "finding": "Opening policy from vehicle resolves the physical policy ID but drops originating vehicle context and can show a same-number policy version without receipts, making it appear to be a different policy.",
@@ -1338,7 +1346,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Authorized role can edit one eligible receipt and reload same receipt; sibling receipts unchanged; paid evidence protected; portfolio row stays synchronized.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R5",
       "surface": "Recibos",
       "classification": "CAPABILITY_GAP",
       "finding": "Receipt detail exposes only Editar plan de recibos; there is no controlled edit for one specific receipt.",
@@ -1352,7 +1360,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Same client shows reported-payment evidence in Cobros; zero fabricated confirmed cobros; validation/apply actions remain explicit.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R5",
       "surface": "Cobros/Cliente360",
       "classification": "READ_MODEL_GAP",
       "finding": "Recibos y pagos shows Pago reportado · por conciliar while Cobros can still appear empty, so existing payment evidence disappears when switching modules.",
@@ -1366,7 +1374,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Synthetic insurer logo save/readback PASS remains bound to exact Preview; real insurer edit continues blocked in Preview; LIVE not touched.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R5",
       "surface": "Aseguradoras",
       "classification": "EXPECTED_PREVIEW_BOUNDARY",
       "finding": "Paula cannot persist a logo edit on a real insurer in Preview; UI correctly displays that real insurer persistence is protected.",
@@ -1380,7 +1388,7 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Controlled non-production mailbox receives invitation/reset link and completes flow, or transactional email owner/configuration provides explicit delivery receipt.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_20260925_R5",
       "surface": "Equipo/Acceso",
       "classification": "CARRY_FORWARD_VISIBLE_DEBT",
       "finding": "Password reset/invitation controls exist in source, but end-to-end mailbox delivery remains unconfirmed; Fernando previously did not receive the email.",
@@ -1636,11 +1644,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Exact new immutable Preview: select logo on synthetic insurer -> wait across knowledge hydration window -> save -> Storage/Firestore HTTPS asset readback -> reload same logo -> credential regression -> cleanup.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_EXACT_PREVIEW_RUN_36259661784",
       "surface": "Aseguradoras / editar logo",
       "classification": "PRODUCT_DEFECT",
       "finding": "ASYNC_KNOWLEDGE_OWNER_CAN_RERENDER_ACTIVE_EDIT_AND_DROP_PENDING_LOGO_FILE",
-      "rootCause": "ensureKnowledgeSummaryLoaded completion calls refreshOwnerView, which rebuilds the active ficha; preserveState omitted logoFile and DOM replacement clears FileList."
+      "rootCause": "ensureKnowledgeSummaryLoaded completion calls refreshOwnerView, which rebuilds the active ficha; preserveState omitted logoFile and DOM replacement clears FileList.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R62-RENEWAL-OPS-MANAGEMENT-DURABILITY-R8",
@@ -1650,11 +1660,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Synthetic renewal_proposals + renewal_accepted management commit/readback; each appears once in Ops after reload; accepted panel exposes issuance/direct-registration branches; cleanup.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_R8",
       "surface": "Cliente360/Renovaciones/Ops",
       "classification": "PRODUCT_DEFECT_FALSE_SUCCESS_DURABILITY",
       "finding": "Renewal/management action can navigate or imply success before canonical Ops management is committed; protected Preview then shows Ops with zero managements.",
-      "rootCause": "renewals-v1200-operational-bridge invokes optimistic Orbit.ciclo.crearGestion; core/ciclo crearGestion uses non-awaited S().insert."
+      "rootCause": "renewals-v1200-operational-bridge invokes optimistic Orbit.ciclo.crearGestion; core/ciclo crearGestion uses non-awaited S().insert.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-CARRY-OSCAR-RECEIPT-PAYMENT-LINEAGE-R8",
@@ -1664,10 +1676,12 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_REVIEW_R8",
       "surface": "Cliente360/Recibos/Cobros",
       "classification": "CARRY_FORWARD_CONDITIONAL_ON_PRESERVATION_PROOF",
-      "finding": "AUTO39012 current 10-receipt calendar is visible but financial breakdown is incomplete and previously reported payment evidence is not visible on the current client projection."
+      "finding": "AUTO39012 current 10-receipt calendar is visible but financial breakdown is incomplete and previously reported payment evidence is not visible on the current client projection.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R63-RENEWAL-WORKFLOW-SEMANTIC-CONTRACT-R9",
@@ -1677,11 +1691,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Exact immutable Preview functional proof + authenticated general proof + Paula visual: three renewal actions by role; Propuestas/Renovar do not auto-open Cotizador; Ops accepted panel exposes issuance/direct registration; no optimistic persistence claim in protected Preview.",
-      "source": "LEDGER",
+      "source": "PAULA_EXPLICIT_BUSINESS_RULE_R9",
       "surface": "Renovaciones/Cliente360/Ops/Cotizador",
       "classification": "PRODUCT_SEMANTIC_CONTRACT_CORRECTION",
       "finding": "Propuestas and Renovar were incorrectly coupled to Cotizador. Propuestas must create Ops work; Renovar means client-approved renewal and creates Ops work; Cotizar must be a separate role-gated action; Ops must support request issuance or direct firm-renewal registration.",
-      "rootCause": "Legacy renewal bridge encoded 'create/reuse management and open Cotizador' as one action, and Cliente360 Renovar delegated to solicitarPropuestas."
+      "rootCause": "Legacy renewal bridge encoded 'create/reuse management and open Cotizador' as one action, and Cliente360 Renovar delegated to solicitarPropuestas.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R63-RENEWAL-ACTION-SEMANTICS-R9",
@@ -1697,10 +1713,12 @@
         "terminalHumanRetestBlobSha": "5e973de2580177d2fa2b8b070fe5622d63b41190",
         "terminalCleanupBlobSha": "b5df10b6c5e8b20cddc8cd2c5a68a8c1500822b8"
       },
-      "source": "LEDGER",
+      "source": "PAULA_EXPLICIT_BUSINESS_RULE_20260926",
       "surface": "Renovaciones/Cliente360/Ops",
       "classification": "BUSINESS_RULE_PREVALENT",
-      "finding": "Renewal actions must be semantically separated: Propuestas creates Ops proposal management; Pedir renovar creates accepted-renewal management after client approval; Cotizar is separate and advisor-forbidden; Ops handles issuance request or direct firm-renewal registration."
+      "finding": "Renewal actions must be semantically separated: Propuestas creates Ops proposal management; Pedir renovar creates accepted-renewal management after client approval; Cotizar is separate and advisor-forbidden; Ops handles issuance request or direct firm-renewal registration.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R64-RENEWALS-DUAL-PASS-VISUAL-AUTHORITY-R10",
@@ -1710,11 +1728,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Fresh Preview entry to Renovaciones remains visually stable and role-specific actions do not swap after first paint.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_20260926",
       "surface": "Renovaciones",
       "classification": "PRODUCT_UI_COMPOSITION",
       "finding": "Renewals rendered base content then asynchronously enhanced it, exposing two sequential visual states and allowing metrics/actions to visibly change immediately after entry.",
-      "rootCause": "mod.render called originalRender(host) and then setTimeout(()=>enhance(host),0)."
+      "rootCause": "mod.render called originalRender(host) and then setTimeout(()=>enhance(host),0).",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R65-OPS-LEADS-AUTH-E2E-COVERAGE-GAP-R11",
@@ -1724,11 +1744,12 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "New exact immutable Preview authenticated run passes OPS_LEADS_SYNTHETIC_E2E_PASS and cleanup leaves zero synthetic data/workflow residue.",
-      "source": "LEDGER",
+      "source": "FORENSIC_QA_AUDIT_R11",
       "surface": "Ops/Leads/Cliente360/Renovaciones",
       "classification": "QA_COVERAGE_GAP",
       "finding": "Authenticated B2 pass did not exercise successful synthetic management persistence/projection for generic gestion, renewal proposals, accepted renewal, or Leads↔Ops same-business synchronization.",
-      "rootCause": "The harness validated source contracts and advisor Ops visibility but had no server-owned synthetic management E2E discriminant."
+      "rootCause": "The harness validated source contracts and advisor Ops visibility but had no server-owned synthetic management E2E discriminant.",
+      "noLive": true
     },
     {
       "id": "B2-R66-PREVIEW-UAT-WRITE-CAPABILITY-R12",
@@ -1738,11 +1759,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Propuestas, Pedir renovar y Gestión desde Cliente360 persisten y aparecen una sola vez en Ops; negocio de prueba se sincroniza Leads↔Ops; reload conserva; cero outbox externo.",
-      "source": "LEDGER",
+      "source": "PAULA_EXPLICIT_UAT_REQUIREMENT_20260926",
       "surface": "Preview/Ops/Leads/Cliente360/Renovaciones",
       "classification": "UAT_CAPABILITY_REQUIREMENT",
       "finding": "La regla synthetic-only impedía validar desde la UI la persistencia real de los flujos de Ops/Leads.",
-      "rootCause": "El endurecimiento de seguridad B2 convirtió el Preview de workflow en read-only para registros no sintéticos."
+      "rootCause": "El endurecimiento de seguridad B2 convirtió el Preview de workflow en read-only para registros no sintéticos.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R67-OPS-MANAGEMENT-COUNTRY-RELOAD-R13",
@@ -1752,10 +1775,12 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Create management -> canonical readback -> hard reload -> visible exactly once in Ops.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_UAT_20260927",
       "surface": "Ops/Cliente360/Renovaciones",
       "classification": "PRODUCT_DEFECT",
-      "finding": "Canonical gestiones persisted but disappeared after reload because product Ops query requires pais and created managements lacked pais. Fixed by enriching from linked policy/client and persisting pais/moneda/producto."
+      "finding": "Canonical gestiones persisted but disappeared after reload because product Ops query requires pais and created managements lacked pais. Fixed by enriching from linked policy/client and persisting pais/moneda/producto.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R68-RENEWAL-PROPOSALS-PREMATURE-CREATE-R13",
@@ -1765,10 +1790,12 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Open Propuestas and cancel -> zero management; confirm -> exactly one management.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_UAT_20260927",
       "surface": "Renovaciones/Ops",
       "classification": "PRODUCT_DEFECT",
-      "finding": "Propuestas created Ops work before the user completed/confirmed its management form. Fixed with explicit pre-create modal and no persistence until confirmation."
+      "finding": "Propuestas created Ops work before the user completed/confirmed its management form. Fixed with explicit pre-create modal and no persistence until confirmation.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R69-DIRECT-RENEWAL-RECEIPTS-PREMIUM-R13",
@@ -1778,10 +1805,12 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Source Mensual + inconsistent cuotas does not prefill one receipt; user can set a monthly custom count and exact receipts are generated; fixed frequencies keep canonical frequency counts; premium component edits recalc/persist.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_UAT_20260927",
       "surface": "Ops/Renovaciones/Pólizas/Recibos",
       "classification": "PRODUCT_DEFECT",
-      "finding": "Direct renewal could prefill Mensual + 1 receipt from inconsistent source cuotas. Fixed with a coherent frequency-derived default in the renewal UI; monthly custom receipt count remains editable under the approved engine contract, while fixed frequencies continue deriving their canonical count from frequency; premium components/IVA and live total preview are editable/visible."
+      "finding": "Direct renewal could prefill Mensual + 1 receipt from inconsistent source cuotas. Fixed with a coherent frequency-derived default in the renewal UI; monthly custom receipt count remains editable under the approved engine contract, while fixed frequencies continue deriving their canonical count from frequency; premium components/IVA and live total preview are editable/visible.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R70-FIRM-RENEWAL-SUPPORT-R13",
@@ -1791,10 +1820,12 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Placeholder support rejected; traceable reference accepted and persisted.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_UAT_20260927",
       "surface": "Ops/Renovaciones",
       "classification": "PRODUCT_DEFECT",
-      "finding": "Firm-renewal document was an unconstrained text field that accepted placeholder text. Clarified as traceable insurer support and reject placeholder/too-short values."
+      "finding": "Firm-renewal document was an unconstrained text field that accepted placeholder text. Clarified as traceable insurer support and reject placeholder/too-short values.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R71-OPS-CHECKLIST-FEEDBACK-MODAL-R13",
@@ -1804,10 +1835,12 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Backdrop click does not close; checklist persists/reloads with bitacora/notification; compare/send and feedback path available.",
-      "source": "LEDGER",
+      "source": "PAULA_VISUAL_UAT_20260927",
       "surface": "Ops/Renovaciones/Comparativo",
       "classification": "PRODUCT_DEFECT",
-      "finding": "Ops modal closed on backdrop click, checklist changes lacked durable feedback, and renewal proposal management lacked compare/send/feedback path. Backdrop close disabled; checklist uses durable write + bitacora/notification; compare/send and feedback actions added."
+      "finding": "Ops modal closed on backdrop click, checklist changes lacked durable feedback, and renewal proposal management lacked compare/send/feedback path. Backdrop close disabled; checklist uses durable write + bitacora/notification; compare/send and feedback actions added.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R72-ADVISOR-WRITE-ACTIVE-ROLE-DESYNC-R14",
@@ -1817,11 +1850,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Asesor dentro de own-scope puede crear Propuestas/Pedir renovar/Gestión, aparece una vez en Ops y persiste tras reload.",
-      "source": "LEDGER",
+      "source": "PAULA_MANUAL_UAT_20260927",
       "surface": "Cliente360/Renovaciones/Ops",
       "classification": "PRODUCT_DEFECT_ROLE_AUTHORITY_DESYNC",
       "finding": "El rol activo visible Asesor y el rol usado por la capa de escritura divergían; create_management self-service se bloqueaba antes del backend.",
-      "rootCause": "store-firestore-product-operational-p0 member() usaba Orbit.auth.productUser.activeRole en lugar de Orbit.session.rol()."
+      "rootCause": "store-firestore-product-operational-p0 member() usaba Orbit.auth.productUser.activeRole en lugar de Orbit.session.rol().",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R73-MOBILE-TENANT-BRANDING-HIDDEN-R15",
@@ -1831,11 +1866,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "On mobile and desktop, tenant brand/logo is visible according to approved shell hierarchy without losing Gravicentra product identity where applicable.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Shell/Branding/Mobile",
       "classification": "PRODUCT_DEFECT_RESPONSIVE_BRANDING_OWNER",
       "finding": "Mobile header shows Gravicentra Insurance instead of configured tenant brand/logo.",
-      "rootCause": "base.css hides .tb-logo at max-width:880px while public-tenant-branding renders tenant logo into .tb-logo; product brand remains visible."
+      "rootCause": "base.css hides .tb-logo at max-width:880px while public-tenant-branding renders tenant logo into .tb-logo; product brand remains visible.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R74-CLIENT360-MOBILE-SEARCH-HIDDEN-R15",
@@ -1845,11 +1882,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Cliente360 free-text search remains visible and usable on mobile and desktop, without changing topbar mobile-search behavior.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Cliente360/Listado/Mobile",
       "classification": "PRODUCT_DEFECT_CSS_SELECTOR_COLLISION",
       "finding": "Cliente 360 mobile list exposes filters but no free-text search.",
-      "rootCause": "Cliente360 list search reuses .tb-search; global mobile CSS hides .tb-search at max-width:980px."
+      "rootCause": "Cliente360 list search reuses .tb-search; global mobile CSS hides .tb-search at max-width:980px.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R75-CLIENT360-RENEWALS-MOBILE-OVERFLOW-R15",
@@ -1859,11 +1898,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Renewal row and actions fit mobile viewport with no clipped business information or action.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Cliente360/Renovaciones/Mobile",
       "classification": "PRODUCT_DEFECT_RESPONSIVE_LAYOUT",
       "finding": "Cliente360 Renewals tab overflows horizontally and content/actions are clipped on mobile.",
-      "rootCause": "tabRenov renders fixed-width flex children (120px + flexible bar + 150px + badge + button) without a mobile wrap/grid contract."
+      "rootCause": "tabRenov renders fixed-width flex children (120px + flexible bar + 150px + badge + button) without a mobile wrap/grid contract.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R76-MANAGEMENT-CREATE-SURFACE-DIVERGENCE-R15",
@@ -1873,11 +1914,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Cliente360, Policy, Renewals, Portal and Ops all open one canonical management creation/editor surface with contextual prefill and create one canonical gestion record.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Cliente360/Póliza/Renovaciones/Ops/Portal",
       "classification": "PRODUCT_DEFECT_CANONICAL_UI_OWNER_SPLIT",
       "finding": "Management requested from Cliente360/Renewals does not use the same complete Ops management editor.",
-      "rootCause": "Orbit.ciclo.solicitarGestion uses a separate request modal while Ops +Gestión creates a generic record and then opens openGestion; creation semantics/UI are split."
+      "rootCause": "Orbit.ciclo.solicitarGestion uses a separate request modal while Ops +Gestión creates a generic record and then opens openGestion; creation semantics/UI are split.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R77-MANAGEMENT-ATTACHMENT-METADATA-ONLY-R15",
@@ -1887,11 +1930,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Attached support is durably stored in the approved documentary repository, linked by metadata/provenance to the gestion, opens after reload, and does not expose a false upload success.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Ops/Gestiones/Documentos",
       "classification": "PRODUCT_DEFECT_FALSE_DOCUMENT_PERSISTENCE",
       "finding": "Management request UI offers file attachment.",
-      "rootCause": "Canonical Ops/Leads backend omitted adjuntos, documentoCargaPendiente and documentoCargaFallida from management create/update allowlists; the browser workflow writer kept optimistic attachment state without a discriminating server document readback."
+      "rootCause": "Canonical Ops/Leads backend omitted adjuntos, documentoCargaPendiente and documentoCargaFallida from management create/update allowlists; the browser workflow writer kept optimistic attachment state without a discriminating server document readback.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R78-MANAGEMENT-DELETE-ACTION-MISSING-R15",
@@ -1901,11 +1946,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Authorized user can remove an erroneous management from active Ops with confirmation, audit/tombstone semantics and canonical readback; no silent orphaned relations.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Ops/Gestiones",
       "classification": "PRODUCT_DEFECT_SELF_ADMINISTRATION_GAP",
       "finding": "User requires ability to remove an erroneously created management; current management detail exposes archive but no delete/remove action.",
-      "rootCause": "openGestion actions include resolve/reopen/client/archive, with no authorized remove path."
+      "rootCause": "openGestion actions include resolve/reopen/client/archive, with no authorized remove path.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R79-POLICY-RENEW-ENTRYPOINT-MISSING-45D-R15",
@@ -1915,11 +1962,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Renewable policies at 0–45 days show the canonical renewal action on policy detail; outside-window/non-renewable behavior is explicit and consistent.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Póliza/Renovaciones",
       "classification": "PRODUCT_DEFECT_CROSS_SURFACE_ACTION_PARITY",
       "finding": "A renewable policy expiring within the already-used renewal window lacks an active Renew action on policy detail.",
-      "rootCause": "Canonical 0–45 day renewal criterion exists in CRM/policies list, but policy full-detail owner does not expose equivalent renewal entrypoint."
+      "rootCause": "Canonical 0–45 day renewal criterion exists in CRM/policies list, but policy full-detail owner does not expose equivalent renewal entrypoint.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R80-POLICY-VEHICLE-CANDIDATE-RAW-DUPLICATES-R15",
@@ -1929,11 +1978,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Linker shows one canonical current vehicle per normalized identity/lineage with prior vigencies preserved as history; no reimport.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Póliza/Vehículos",
       "classification": "PRODUCT_DEFECT_LINEAGE_PROJECTION_DEDUP",
       "finding": "Policy detail offers three vehicle candidates that visually represent the same vehicle/history.",
-      "rootCause": "policy-receipts-v1199-detail-guard vehicleCandidates deduplicates only by raw record id; historical/lineage-equivalent records with normalized same plate remain separate candidates."
+      "rootCause": "policy-receipts-v1199-detail-guard vehicleCandidates deduplicates only by raw record id; historical/lineage-equivalent records with normalized same plate remain separate candidates.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R81-CLIENT-DOCUMENTARY-IMPORT-FALSE-PERSISTENCE-R15",
@@ -1943,11 +1994,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Client document upload stores the raw file in the approved documentary repository (Drive), records durable link/provenance in the client expediente, survives reload, and remains distinct from data extraction proposals.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Cliente360/Importación/Drive",
       "classification": "PRODUCT_DEFECT_DOCUMENT_REPOSITORY_CONTRACT",
       "finding": "Cliente360 offers Importar a este expediente and documentary mode claims files are stored/visible.",
-      "rootCause": "importa.js documentary path advances directly to completion and performs no durable raw-file storage write; intelligent mode extracts data but does not retain the raw document."
+      "rootCause": "importa.js documentary path advances directly to completion and performs no durable raw-file storage write; intelligent mode extracts data but does not retain the raw document.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R82-CROSS-MODULE-DELETE-ACTION-R15A",
@@ -1957,11 +2010,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Eliminar visible/operable según permiso en todos los módulos administrables; persistencia tras reload; registros dependientes fail-closed o soft-delete sin huérfanos; actor/motivo/fecha conservados.",
-      "source": "LEDGER",
+      "source": "PAULA_EXPLICIT_PRODUCT_RULE_20260927",
       "surface": "Cross-module CRUD",
       "classification": "PRODUCT_DEFECT_CROSS_MODULE_CRUD_PARITY",
       "finding": "La acción Eliminar no está disponible de forma consistente en todos los módulos que administran registros persistentes.",
-      "rootCause": "R82 cumulative root cause now includes direct-read projection: after durable soft-delete and reload, all()/where()/find() hid deleted rows but get() returned the durable deleted row, allowing a direct detail/deep-link read to resurrect it."
+      "rootCause": "R82 cumulative root cause now includes direct-read projection: after durable soft-delete and reload, all()/where()/find() hid deleted rows but get() returned the durable deleted row, allowing a direct detail/deep-link read to resurrect it.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R83-DRIVE-DOWNLOAD-NOOP-R15B",
@@ -1971,11 +2026,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "En nueva Preview exacta, mismo documento sintético: Conectar Drive, abrir visor, Descargar produce archivo local verificable; Abrir en Drive continúa funcionando; sin persistir token; aislamiento Preview preservado.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260927",
       "surface": "Cliente360/DocumentViewer/GoogleDrive",
       "classification": "PRODUCT_DEFECT_DRIVE_DOWNLOAD_PROVIDER_CAPABILITY_MISSING",
       "finding": "Documento subido y abierto correctamente en Google Drive, pero la acción Descargar del visor no produce descarga.",
-      "rootCause": "document-viewer habilita descarga solo cuando el proveedor expone downloadAvailable y secureResources puede invocar provider.download(); product-drive-document-provider-p0.js no implementaba download() ni exponía esa capacidad."
+      "rootCause": "document-viewer habilita descarga solo cuando el proveedor expone downloadAvailable y secureResources puede invocar provider.download(); product-drive-document-provider-p0.js no implementaba download() ni exponía esa capacidad.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R84-DRIVE-PER-USER-OAUTH-NOT-PRODUCTIVE-R16",
@@ -1985,11 +2042,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "one-time tenant bootstrap succeeds and readback persists; fresh user browser has zero Google consent/account selection; authorized client document read/download/upload works by active role/scope; cross-scope access denied; no Drive token in browser storage; Preview synthetic isolation preserved; audit receipt present; cleanup synthetic fixture",
-      "source": "LEDGER",
+      "source": "PAULA_EXPLICIT_PRODUCT_RULE_20260927",
       "surface": "Cliente360/Ops/Documentos/GoogleDrive/Auth",
       "classification": "PRODUCT_ARCHITECTURE_DEFECT_PER_USER_EPHEMERAL_OAUTH",
       "finding": "Routine document access requires repeated Google account selection/consent because Drive authority is held in a browser access token for only the active session.",
-      "rootCause": "product-drive-document-provider-p0.js forces Google prompt=consent and memory_only token persistence; document-drive-domain.js requires googleAccessToken from the browser for status/upload. The same model would repeat in LIVE."
+      "rootCause": "product-drive-document-provider-p0.js forces Google prompt=consent and memory_only token persistence; document-drive-domain.js requires googleAccessToken from the browser for status/upload. The same model would repeat in LIVE.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R85-DRIVE-BOOTSTRAP-FIREBASE-AUTH-NO-OFFLINE-REFRESH-R17",
@@ -1999,11 +2058,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "On one new exact Preview, Dirección performs one administrative authorization; backend returns configured=true and Secret Manager readback survives reload; fresh routine-user sessions receive zero Google account/consent prompts; authorized view/download/upload pass; cross-scope denial passes; no Google access or refresh token exists in browser storage.",
-      "source": "LEDGER",
+      "source": "PAULA_MOBILE_UAT_20260928",
       "surface": "Cliente360/Documentos/GoogleDrive/TenantBootstrap",
       "classification": "PRODUCT_ARCHITECTURE_DEFECT_WRONG_OAUTH_FLOW_FOR_OFFLINE_DRIVE_AUTHORITY",
       "finding": "The one-time tenant bootstrap completed Google account selection/consent but Firebase Auth signInWithPopup did not return a Google Drive refresh token, so the persistent tenant connection could not be stored.",
-      "rootCause": "The browser bootstrap used Firebase Authentication GoogleAuthProvider and inspected Firebase _tokenResponse for oauthRefreshToken. Durable Google Drive authority requires an OAuth authorization-code flow with backend code exchange; refresh tokens are not a browser authentication credential."
+      "rootCause": "The browser bootstrap used Firebase Authentication GoogleAuthProvider and inspected Firebase _tokenResponse for oauthRefreshToken. Durable Google Drive authority requires an OAuth authorization-code flow with backend code exchange; refresh tokens are not a browser authentication credential.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R86-DRIVE-OAUTH-CLIENT-RUNTIME-CONFIG-UNAVAILABLE-R18",
@@ -2013,11 +2074,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Central guard PASS; workflow creates/updates ORBIT360_DRIVE_OAUTH_CLIENT_PREVIEW without touching production; Preview Drive functions deploy with explicit secret binding; authenticated status returns non-empty bootstrapClientId while tenant remains unconfigured; then one admin authorization-code bootstrap succeeds and persists.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_PREVIEW_36417141888",
       "surface": "GoogleDrive/TenantBootstrap/OAuthClientConfig",
       "classification": "PREVIEW_RUNTIME_CONFIG_DEFECT_SECRET_NOT_BOUND",
       "finding": "Exact authenticated Preview returned tenant_setup_required with bootstrapClientId empty, so the authorization-code bootstrap could not start.",
-      "rootCause": "Drive Preview functions attempted to obtain the Google provider OAuth client configuration at runtime. The function service account did not expose the client-secret-bearing Identity Platform config required by providerConfig, and the status path intentionally collapsed that failure to an empty bootstrapClientId."
+      "rootCause": "Drive Preview functions attempted to obtain the Google provider OAuth client configuration at runtime. The function service account did not expose the client-secret-bearing Identity Platform config required by providerConfig, and the status path intentionally collapsed that failure to an empty bootstrapClientId.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R87-DRIVE-OAUTH-PREVIEW-ORIGIN-MISMATCH-R19",
@@ -2036,7 +2099,9 @@
       "source": "LEDGER",
       "surface": "Cliente360/Documentos/GoogleDrive/TenantBootstrap",
       "classification": "PREVIEW_OAUTH_CLIENT_AUTHORIZED_JAVASCRIPT_ORIGIN_MISMATCH",
-      "rootCause": "The one-time Google Identity Services authorization-code popup originates from the exact Firebase Hosting Preview origin. Google rejects the request before account selection because that exact scheme+host is not registered as an Authorized JavaScript origin for the OAuth web client."
+      "rootCause": "The one-time Google Identity Services authorization-code popup originates from the exact Firebase Hosting Preview origin. Google rejects the request before account selection because that exact scheme+host is not registered as an Authorized JavaScript origin for the OAuth web client.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R88-AUTH-RESTORE-BLOCKS-ON-FULL-HYDRATION-R19",
@@ -2049,7 +2114,9 @@
       "source": "LEDGER",
       "surface": "Login/SessionRestore/ProductBootstrap",
       "classification": "PRODUCT_STARTUP_PERFORMANCE_AND_STATE_SEMANTICS_DEFECT",
-      "rootCause": "The UI state labeled Restaurando sesión spans more than session restoration. It also waits membership, tenant/read authority and full authoritative hydration of eight required business collections before revealing the product shell. This conflates identity readiness with data readiness and makes startup latency visible as an authentication delay."
+      "rootCause": "The UI state labeled Restaurando sesión spans more than session restoration. It also waits membership, tenant/read authority and full authoritative hydration of eight required business collections before revealing the product shell. This conflates identity readiness with data readiness and makes startup latency visible as an authentication delay.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R89-OPS-LEADS-PENDING-OVERLAY-PREMATURE-RECONCILIATION-R20",
@@ -2062,9 +2129,11 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "R20 dynamic contract plus exact authenticated Preview must keep cotizando visible through stale base snapshot and show accepted business exactly once in Ops and Leads.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_PREVIEW_RERUN_36418353246_ATTEMPT2",
       "finding": "OPS_LEADS_ACCEPTED_BUSINESS_DISAPPEARED_FROM_OPS_BECAUSE_PENDING_STAGE_UPDATE_WAS_RECONCILED_BY_ID_EXISTENCE_BEFORE_AUTHORITATIVE_FIELDS_MATCHED",
-      "rootCause": "The operational facade reconciled every pending update away as soon as the authoritative base snapshot contained the same record ID, even when that base row still held pre-write values. A stale negocios snapshot therefore removed the optimistic cotizando overlay and exposed nuevo until the later server snapshot."
+      "rootCause": "The operational facade reconciled every pending update away as soon as the authoritative base snapshot contained the same record ID, even when that base row still held pre-write values. A stale negocios snapshot therefore removed the optimistic cotizando overlay and exposed nuevo until the later server snapshot.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R90-ROUTE-DEFERRED-WORKFLOW-DEPENDENCY-R20B",
@@ -2074,11 +2143,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "New exact Preview must preserve route-primary startup, pass startup timing, and complete renewal/issuance after an unrelated-route reload without null dependency or full-startup hydration regression.",
-      "source": "LEDGER",
+      "source": "AUTHENTICATED_PREVIEW_36449511487",
       "surface": "R88/Issuance/Renewal/CrossModuleHydration",
       "classification": "PRODUCT_RUNTIME_RACE_DEFERRED_COLLECTION_READ_BEFORE_AUTHORITATIVE_SNAPSHOT",
       "finding": "After route-primary startup, issuance/renewal may synchronously read a deferred policy/client/insurer/management/vehicle before its authoritative snapshot is available, producing a null cross-module dependency.",
-      "rootCause": "R88 correctly made startup route-primary and deferred unrelated collections, but issuance/renewal APIs synchronously read clientes/polizas/aseguradoras/gestiones/vehiculos. A cross-module workflow invoked after an Aseguradoras reload can therefore read a still-deferred policy as null before its authoritative snapshot arrives."
+      "rootCause": "R88 correctly made startup route-primary and deferred unrelated collections, but issuance/renewal APIs synchronously read clientes/polizas/aseguradoras/gestiones/vehiculos. A cross-module workflow invoked after an Aseguradoras reload can therefore read a still-deferred policy as null before its authoritative snapshot arrives.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R91-RENEWAL-FIRM-SUPPORT-NO-CANONICAL-DRIVE-UPLOAD-R21",
@@ -2088,11 +2159,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "New exact Preview: synthetic B2 firm-support upload/readback, management attachment linkage, direct renewal idempotence and reload.",
-      "source": "LEDGER",
+      "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "surface": "Ops/Renovación aceptada/Registrar renovación",
       "classification": "PRODUCT_DEFECT_DOCUMENTARY_CONTRACT",
       "finding": "Firm-renewal registration requires documentary proof but exposed only a free-text documentRef field, with no canonical Drive file upload or selection of existing confirmed client documents.",
-      "rootCause": "Two-layer defect: the original UI lacked canonical support upload, and the exact Preview runtime then proved that resolve_management dropped renewal-specific closure fields after policy creation. The policy and Drive attachment persisted, but Firestore management did not persist directRenewalPolicyId/nuevaPolizaId."
+      "rootCause": "Two-layer defect: the original UI lacked canonical support upload, and the exact Preview runtime then proved that resolve_management dropped renewal-specific closure fields after policy creation. The policy and Drive attachment persisted, but Firestore management did not persist directRenewalPolicyId/nuevaPolizaId.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R92-RENEWAL-TARIFF-COSTS-NOT-AUTO-DERIVED-R21",
@@ -2102,11 +2175,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "New exact Preview: validated tariff fixture calculates configured costs; missing/unvalidated tariff remains fail-closed without invented charge.",
-      "source": "LEDGER",
+      "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "surface": "Ops/Renovación aceptada/Registrar renovación",
       "classification": "PRODUCT_DEFECT_TARIFF_CALCULATION_INTEGRATION",
       "finding": "Renewal modal copied issue/financing expenses from the source policy and did not derive them from the selected insurer's validated tariff configuration.",
-      "rootCause": "The direct-renewal modal did not consult aseguradora.cotTasas/cotTasasValidadas for issuance expense and installment surcharge."
+      "rootCause": "The direct-renewal modal did not consult aseguradora.cotTasas/cotTasasValidadas for issuance expense and installment surcharge.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R93-RENEWAL-ISSUANCE-MODAL-CRASH-SEMANTIC-VISUAL-R21",
@@ -2116,11 +2191,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "New exact Preview: modal opens without page/console errors, button creates one internal canonical issuance management, no false email behavior, canonical visual family.",
-      "source": "LEDGER",
+      "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "surface": "Ops/Renovación aceptada/Solicitud de emisión",
       "classification": "PRODUCT_DEFECT_RUNTIME_AND_UX_SEMANTICS",
       "finding": "The renewal issuance modal displayed but its wiring referenced non-existent rend-* controls; its label implied contacting the insurer although the action only creates an internal Ops request, and its custom modal visual diverged from canonical Ops.",
-      "rootCause": "Copy/pasted direct-renewal listeners remained inside openRenewalIssuance, while a separate generic modal helper bypassed canonical Ops visual semantics."
+      "rootCause": "Copy/pasted direct-renewal listeners remained inside openRenewalIssuance, while a separate generic modal helper bypassed canonical Ops visual semantics.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R94-PREVIEW-DOCUMENT-UPLOAD-GUARD-MISLEADING-UX-R21",
@@ -2130,11 +2207,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "New exact Preview: real client shows explicit protected message without false failure; synthetic B2 upload appears and succeeds after tenant provider probe.",
-      "source": "LEDGER",
+      "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "surface": "Cliente360/Importación + Ops/Gestión/Documentos",
       "classification": "PREVIEW_SAFETY_UX_DEFECT",
       "finding": "Preview allowed a user to attempt binary uploads for real operational clients, then surfaced generic Drive failure/unavailable copy even though the backend was intentionally denying non-synthetic Preview writes.",
-      "rootCause": "Frontend did not project the backend's synthetic-only Preview write boundary and Ops also rendered synchronous provider status before async probe completion."
+      "rootCause": "Frontend did not project the backend's synthetic-only Preview write boundary and Ops also rendered synchronous provider status before async probe completion.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R95-CLIENT-DRIVE-LEGACY-VS-CANONICAL-SEMANTICS-R21",
@@ -2144,11 +2223,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "New exact Preview: clients with and without legacy driveLink show unambiguous copy; provider-managed documents do not require manual folder URL.",
-      "source": "LEDGER",
+      "source": "PAULA_UAT_PLUS_SOURCE_FORENSIC_20260928",
       "surface": "Cliente360/Drive",
       "classification": "PRODUCT_DEFECT_DOCUMENTARY_SEMANTIC_AMBIGUITY",
       "finding": "Cliente360 treated existing historical driveLink and absence of driveLink as if users had to manually add a folder link, creating ambiguity with the new tenant-managed canonical Drive provider.",
-      "rootCause": "Legacy preserved client.driveLink UI predates the canonical tenant Drive provider and was not relabeled after R84."
+      "rootCause": "Legacy preserved client.driveLink UI predates the canonical tenant Drive provider and was not relabeled after R84.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R96-ACCESS-MATRIX-PREVIEW-SERVER-READBACK-R22",
@@ -2163,11 +2244,13 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "reversible save -> server readback -> reload",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Configuración/Equipo/Matriz",
       "classification": "PRODUCT_DEFECT_PREVIEW_UAT_SERVER_BOUNDARY",
       "finding": "Access matrix save could not be server-confirmed on reviewed Preview.",
-      "rootCause": "Preview browser used production tenant-domain-config callable; no Preview-isolated server write/readback path existed."
+      "rootCause": "Preview browser used production tenant-domain-config callable; no Preview-isolated server write/readback path existed.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R97-DIRECTION-DOCUMENT-AUTHORIZATION-R22",
@@ -2181,11 +2264,13 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "Dirección synthetic status/read/upload authorization",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Documentos/Drive",
       "classification": "PRODUCT_DEFECT_ACTIVE_ROLE_DOCUMENT_AUTHORIZATION",
       "finding": "Dirección was denied documentary access.",
-      "rootCause": "Canonical role owner emitted orbit:session on product role switch while Drive authorization provider listened for orbit:active-role-changed; stale previous-role document status could persist."
+      "rootCause": "Canonical role owner emitted orbit:session on product role switch while Drive authorization provider listened for orbit:active-role-changed; stale previous-role document status could persist.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R98-OPS-SYNTHETIC-HUMAN-UPLOAD-SURFACE-R22",
@@ -2199,11 +2284,13 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "upload -> visible -> reload -> open/download -> cleanup",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Ops/Gestión/Documentos",
       "classification": "PREVIEW_UAT_SURFACE_GAP",
       "finding": "Synthetic-only Preview upload is machine-proven but no clear human management fixture is surfaced.",
-      "rootCause": "Exact Preview product surface is valid; fixture job NOOP was caused by stale workflow state gating after r22 had advanced to CANDIDATE_ARMED_PENDING_SINGLE_EXACT_PREVIEW."
+      "rootCause": "Exact Preview product surface is valid; fixture job NOOP was caused by stale workflow state gating after r22 had advanced to CANDIDATE_ARMED_PENDING_SINGLE_EXACT_PREVIEW.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R99-OPS-MOBILE-CREATE-OVERFLOW-R22",
@@ -2217,11 +2304,13 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "no mobile horizontal clipping",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Ops/Crear gestión/Mobile",
       "classification": "PRODUCT_DEFECT_RESPONSIVE_OVERFLOW",
       "finding": "Ops create/detail clips to right on mobile.",
-      "rootCause": "Mobile ciclo modal descendants/footer could exceed available width despite viewport-bounded outer card."
+      "rootCause": "Mobile ciclo modal descendants/footer could exceed available width despite viewport-bounded outer card.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R100-TEAM-DELETE-MOBILE-FOOTER-COMPOSITION-R22",
@@ -2235,11 +2324,13 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "delete/sync/cancel/save all visible",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Equipo/Editar usuario/Mobile",
       "classification": "PRODUCT_DEFECT_RESPONSIVE_ACTION_COMPOSITION",
       "finding": "Eliminar usuario is displaced/hidden by Sync/Cancel/Save.",
-      "rootCause": "Delete used margin-right:auto in single-row footer while onboarding bridge injected the fourth action."
+      "rootCause": "Delete used margin-right:auto in single-row footer while onboarding bridge injected the fourth action.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R101-USER-EDIT-HUMAN-PERSISTENCE-FIXTURE-R22",
@@ -2252,11 +2343,13 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "edit -> save confirmed -> reload -> cleanup",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Equipo/Editar usuario",
       "classification": "HUMAN_PERSISTENCE_PROOF_GAP",
       "finding": "Current Preview lacks human edit-user server-readback/reload proof.",
-      "rootCause": "Safe reversible human fixture not prepared."
+      "rootCause": "Safe reversible human fixture not prepared.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B2-R102-INSURER-LOGO-HUMAN-PERSISTENCE-FIXTURE-R22",
@@ -2269,11 +2362,13 @@
       ],
       "targetGate": "PRELIVE_DISPOSITION_RECONCILIATION",
       "closureCondition": "new exact Preview machine render PASS -> Paula retests only insurer logo refresh",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Aseguradoras/Logo",
       "classification": "HUMAN_PERSISTENCE_PROOF_GAP",
       "finding": "Insurer logo machine persistence passed but final human save/reload proof is absent.",
-      "rootCause": "Firestore reference, Storage object, token metadata and image bytes persist correctly, but both persisted and metadata-token Firebase download URLs return HTTP 412."
+      "rootCause": "Firestore reference, Storage object, token metadata and image bytes persist correctly, but both persisted and metadata-token Firebase download URLs return HTTP 412.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929",
@@ -2286,11 +2381,13 @@
       ],
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "schedule count/total/provenance invariants",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Pólizas/Recibos",
       "classification": "FROZEN_B3_DATA_READ_MODEL_LINEAGE",
       "finding": "Current calendar may coexist x/n plus no-denominator overlapping rows; count/total can contradict contractual cuotas/premium.",
-      "rootCause": "receiptCalendarProjection keeps no-denominator rows in current calendar even when policy.cuotas is known."
+      "rootCause": "receiptCalendarProjection keeps no-denominator rows in current calendar even when policy.cuotas is known.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-CARRY-VEHICLE-CANONICAL-IDENTITY-20260929",
@@ -2302,11 +2399,13 @@
       ],
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "deterministic identity without unsafe merge",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Cliente360/Vehículos",
       "classification": "FROZEN_B3_CANONICAL_IDENTITY",
       "finding": "Exact plateKey/version lineage does not safely resolve aliases such as prefixed plate variants.",
-      "rootCause": "Current identity grouping is insufficient for alias variants."
+      "rootCause": "Current identity grouping is insufficient for alias variants.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-CARRY-OPS-CATALOG-ADMIN-20260929",
@@ -2319,13 +2418,15 @@
       ],
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "CRUD/readback/reload",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Configuración/Ops",
       "classification": "FROZEN_B3_TENANT_ADMIN_UI",
       "finding": "Backend supports stages/priorities/managementTypes/SLA but Configuración does not expose complete tenant administration.",
       "rootCause": "UI administration gap.",
       "nextAction": "B4_003_MACHINE_PROOF_THEN_CARRY_DISPOSITION",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
@@ -2337,11 +2438,13 @@
       ],
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "official-source lineage + canonical engine runtime",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Renovaciones/Comparativo",
       "classification": "FROZEN_B3_ENGINE_INTEGRATION",
       "finding": "Current renewal comparison is not the final comparative engine.",
-      "rootCause": "Cotizador/Comparativo and official tariff-source integration pending."
+      "rootCause": "Cotizador/Comparativo and official tariff-source integration pending.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
@@ -2354,13 +2457,15 @@
       ],
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "source lineage + runtime/import proof",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_HUMAN_UAT_20260929",
       "surface": "Aseguradoras/Tarifas/Conocimiento/Planes",
       "classification": "FROZEN_B3_FAIL_CLOSED_CONTENT",
       "finding": "Tariff/knowledge/plan content is deferred; no importer is final without proof.",
       "rootCause": "Official source integration pending.",
       "nextAction": "B4_003_MACHINE_PROOF_THEN_CARRY_DISPOSITION",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-CARRY-OPS-HYDRATION-EMPTY-FLASH-20260929",
@@ -2373,11 +2478,13 @@
       ],
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "Refresh Ops with existing records; distinguish loading vs true empty; records appear without retry/data mutation.",
-      "source": "LEDGER",
+      "source": "PAULA_FINAL_TARGETED_UAT_20260929",
       "surface": "Ops/refresh hydration",
       "classification": "NONBLOCKING_HYDRATION_UX_CARRY_FORWARD",
       "finding": "After refreshing Ops, management rows were temporarily absent for a few seconds and then appeared. Document and management persisted; no data loss observed.",
-      "rootCause": "PENDING_B3_PERFORMANCE_HYDRATION_DIAGNOSTIC"
+      "rootCause": "PENDING_B3_PERFORMANCE_HYDRATION_DIAGNOSTIC",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-CARRY-PAYMENT-STATUS-LABEL-CONSISTENCY-20260929",
@@ -2387,11 +2494,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "Same record state renders consistently in list/detail/KPI and maps to one server-owned state transition contract.",
-      "source": "LEDGER",
+      "source": "PAULA_TARGETED_B3_001_VISUAL_20260929",
       "surface": "Cobros/Recibo detalle/KPIs",
       "classification": "SEMANTIC_STATE_DRIFT",
       "finding": "Table labels reported evidence as 'Pago reportado · por validar' while receipt detail labels it 'Pago reportado · por conciliar'; KPI Por conciliar shows 0.",
-      "rootCause": "PENDING_CANONICAL_PAYMENT_STATE_MODEL_RECONCILIATION"
+      "rootCause": "PENDING_CANONICAL_PAYMENT_STATE_MODEL_RECONCILIATION",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-CARRY-RECEIPT-EDIT-GATE-AFFORDANCE-20260929",
@@ -2401,11 +2510,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "Action availability exactly matches backend write gate when payment evidence exists.",
-      "source": "LEDGER",
+      "source": "PAULA_TARGETED_B3_001_VISUAL_20260929",
       "surface": "Cobros/Recibo esperado detalle",
       "classification": "UI_CONTRACT_AMBIGUITY",
       "finding": "Detail states 'Edición bloqueada · existe evidencia de pago' while 'Editar plan de recibos' remains available.",
-      "rootCause": "PENDING_WRITE_GATE_VS_UI_ACTION_RECONCILIATION"
+      "rootCause": "PENDING_WRITE_GATE_VS_UI_ACTION_RECONCILIATION",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B3-CARRY-COBROS-HEADER-MICROCOPY-20260929",
@@ -2415,11 +2526,13 @@
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "PRELIVE_RECONCILIATION",
       "closureCondition": "Desktop/mobile visual spotcheck with no text collision or hierarchy regression.",
-      "source": "LEDGER",
+      "source": "PAULA_TARGETED_B3_001_VISUAL_20260929",
       "surface": "Cobros/header",
       "classification": "NON_BLOCKING_VISUAL_POLISH",
       "finding": "Right-side Cobros header microcopy is cramped and low-legibility on desktop.",
-      "rootCause": "PENDING_VISUAL_SPACING_REVIEW"
+      "rootCause": "PENDING_VISUAL_SPACING_REVIEW",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R11-01-CANCELATION-ROW-DETAIL",
@@ -2431,10 +2544,12 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview authenticated visible-row click opens the cancellation detail and Paula visual retest passes.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_VISUAL_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "surface": "Cancelaciones",
-      "finding": "Selecting a visible cancellation row outside the client sub-link can show Registro fuera de tu alcance."
+      "finding": "Selecting a visible cancellation row outside the client sub-link can show Registro fuera de tu alcance.",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-02-CANCELATION-CLIENT-POLICY-CONTEXT",
@@ -2447,10 +2562,12 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Client sub-link opens Cliente 360 with t=polizas and Paula confirms expected policy context.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_VISUAL_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "surface": "Cancelaciones→Cliente360",
-      "finding": "Client selection from Cancelaciones opens Cliente 360 Resumen instead of the policy list/context."
+      "finding": "Client selection from Cancelaciones opens Cliente 360 Resumen instead of the policy list/context.",
+      "humanVisualStatus": "PASS_R13",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-03-CLIENT360-LEFT-TAB-NAV",
@@ -2463,10 +2580,12 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview proves left control activates after horizontal movement; Paula visual confirms bidirectional navigation.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_VISUAL_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "surface": "Cliente360",
-      "finding": "Cliente 360 tab strip can move right but provides no way to navigate back left."
+      "finding": "Cliente 360 tab strip can move right but provides no way to navigate back left.",
+      "humanVisualStatus": "PASS_R13",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-04-RENEWABILITY-FAIL-CLOSED",
@@ -2480,12 +2599,14 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Only explicit renovable=true enters Renewals; unknown/no stay out; editor exposes tri-state and Paula visual confirms.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_VISUAL_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "surface": "Renovaciones/Pólizas",
       "finding": "A policy marked Renovabilidad pendiente de validar appears in Renovaciones.",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-05-POLICY-EDITOR-TAXONOMY-PRESERVATION",
@@ -2497,10 +2618,12 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview editor preserves existing source ramo/product even when absent from current catalog and no save can silently reclassify.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_VISUAL_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "surface": "Cliente360/Póliza/Editar",
-      "finding": "Policy detail showed Accidentes y Enfermedades / Accidentes while edit form silently displayed Automóviles / Vehículo Liviano."
+      "finding": "Policy detail showed Accidentes y Enfermedades / Accidentes while edit form silently displayed Automóviles / Vehículo Liviano.",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-06-QUALITY-COUNTRY-SCOPE",
@@ -2512,10 +2635,12 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Authenticated Preview shows only selected-country rows and recalculated KPIs for GT/CO/Todos.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_VISUAL_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "surface": "Calidad de datos",
-      "finding": "Changing global country does not change Calidad KPIs/list; GT records remain under Colombia."
+      "finding": "Changing global country does not change Calidad KPIs/list; GT records remain under Colombia.",
+      "humanVisualStatus": "PASS_R13",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-07-QUALITY-PERFORMANCE",
@@ -2528,7 +2653,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Authenticated exact Preview measures module render and route/country-change latency within normal interactive threshold without 10–12 second blocking.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_VISUAL_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "causalInvalidation": "Exact Preview R14 reproduced B4_003_QUALITY_SYNC_RENDER_TOO_SLOW at 3056.2 ms GT after the single no-threshold-relaxation retry; prior visual PASS is invalidated only for this performance contract.",
       "failedRunId": 37183696547,
@@ -2536,7 +2661,9 @@
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_QUALITY_PERFORMANCE_ROOTFIX_20261004.json",
       "sourceFixReceiptBlobSha": "099219db3a28bdb5bd32afd475b356c842a62781",
       "surface": "Calidad de datos",
-      "finding": "Opening Calidad and switching country takes about 10–12 seconds."
+      "finding": "Opening Calidad and switching country takes about 10–12 seconds.",
+      "humanVisualStatus": "PASS_R15",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-08-CANCELATION-RATIO-SEMANTICS",
@@ -2548,15 +2675,17 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "UI uses honest historical accumulated label or a properly defined temporal churn calculation.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_VISUAL_20261003_PLUS_SOURCE_AUDIT",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "surface": "Cancelaciones",
-      "finding": "Historical canceladas/pólizas ratio was labeled Tasa de fuga without temporal cohort/denominator definition."
+      "finding": "Historical canceladas/pólizas ratio was labeled Tasa de fuga without temporal cohort/denominator definition.",
+      "humanVisualStatus": "VISUAL_EVIDENCE_PASS_R15",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -2565,12 +2694,15 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Identify authoritative source/lineage and reconcile or explicitly quarantine mismatch; no inferred rewrite; sum of active schedule must reconcile to contractual total within approved tolerance.",
-      "source": "PAULA_R11_OR_QA_R11A",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "source": "PAULA_VISUAL_20261003",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
       "surface": "Póliza/Recibos/Salud de información",
       "finding": "Observed policy showed contractual prima total Q407.01 while calendario vigente showed Q542.68 / 2 projected receipts.",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "REJECTED_R17",
+      "requiredFix": "Emit discriminating human-readable cause based on calendar authority/review/shadow/source facts; internal tokens never rendered; monetary delta/tolerance displayed consistently.",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
@@ -2584,12 +2716,14 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Preview demonstrates each supported document class upload/import path, durable source/provenance, normalized insurer+country+ramo+product+plan+version scope, and fail-closed enablement.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_REQUIREMENT_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "surface": "Aseguradoras/Tarifas/Documentos",
       "finding": "User needs an explicit, reliable place to load tariff Excel, quote/policy examples and documents required by transaction, with durable normalized provenance feeding downstream capabilities.",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
@@ -2602,12 +2736,14 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Counters and visible source list derive from one explained canonical scope and agree, or labels are changed to reflect their actual distinct semantics.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_VISUAL_20261003_PLUS_SOURCE_AUDIT",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "surface": "Aseguradoras/Tarifas y conocimiento",
       "finding": "Header shows Fuentes registradas/Referencias disponibles = 0 while visible mapped/validated sources are listed below.",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE",
@@ -2621,9 +2757,10 @@
       ],
       "targetGate": "B4-005_OR_PRELIVE",
       "closureCondition": "Role-aware retrieval contract proves authorization, provenance/citations, no credential leakage, no cross-scope access, and source-backed answers from canonical knowledge.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_REQUIREMENT_20261003",
       "surface": "IA transversal",
-      "finding": "All section knowledge should feed intelligent assistance according to role; current IA owner is not yet proven as role-authorized source-backed retrieval over insurer/operational knowledge."
+      "finding": "All section knowledge should feed intelligent assistance according to role; current IA owner is not yet proven as role-authorized source-backed retrieval over insurer/operational knowledge.",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE",
@@ -2637,11 +2774,12 @@
       ],
       "targetGate": "B4-005_AND_EVERGREEN",
       "closureCondition": "Multiproduct schema/roadmap remains visible; supported products have source-backed normalized fields; unsupported products remain explicit Pendiente de fuente with no invented calculations.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_REQUIREMENT_20261003",
       "surface": "Aseguradoras/Cotizador/Comparativo",
       "finding": "Knowledge and schema must cover multiple insurer products/lines, not only Auto, and generate structured fields useful to Cotizador and Comparativo.",
       "nextAction": "B4_005_EXPLICIT_DISPOSITION_AFTER_B4_003_CLOSE",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
@@ -2654,11 +2792,12 @@
       ],
       "targetGate": "B4-005_AND_EVERGREEN",
       "closureCondition": "Maintain explicit insurer×product source backlog with source status/last review/version; no pending source may silently become authoritative.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_QUESTION_20261003",
       "surface": "Aseguradoras/Tarifas y conocimiento",
       "finding": "Tariff feedback and knowledge-base feeding for insurers/products not yet worked remains pending.",
       "nextAction": "B4_005_EXPLICIT_DISPOSITION_AFTER_B4_003_CLOSE",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF",
@@ -2670,9 +2809,10 @@
       ],
       "targetGate": "CROSS_PROJECT_PRE_TRANSPORT",
       "closureCondition": "Receiving project records the contract version and constraints; real Manifest/Quote/Proposal/Selection transport remains fail-closed until separately authorized and LAB-proven.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "PAULA_CROSSPROJECT_REQUIREMENT_20261003",
       "surface": "Gravicentra↔A&S Transformación Digital/CotComp",
-      "finding": "CotComp must consume gravicentra-quote-authority-v1 and stay multiproduct/schema-driven without duplicating tariff authority; real transport remains unauthorized."
+      "finding": "CotComp must consume gravicentra-quote-authority-v1 and stay multiproduct/schema-driven without duplicating tariff authority; real transport remains unauthorized.",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R11A-QA-01-VISIBLE-ROW-DISCRIMINANT",
@@ -2684,10 +2824,12 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview clicks the visible cancellation row and passes; source static contract continues to enforce policy-id fallback.",
-      "source": "PAULA_R11_OR_QA_R11A",
+      "source": "RUN_37142027771",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "surface": "QA harness",
-      "finding": "R11 exact Preview failed on an artificial stale cancellation-id discriminant rather than the reported visible-row user path."
+      "finding": "R11 exact Preview failed on an artificial stale cancellation-id discriminant rather than the reported visible-row user path.",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
@@ -2700,14 +2842,16 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Authenticated exact Preview country switch settles <=2500 ms with no delayed mutation/stale rows.",
-      "source": "PAULA_R13",
+      "source": "PAULA_VISUAL_R13_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "classification": "PRODUCT_PERFORMANCE_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
       "surface": "Cancelaciones",
-      "finding": "Country filter transition remains ~10 seconds."
+      "finding": "Country filter transition remains ~10 seconds.",
+      "humanVisualStatus": "PASS_R15",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R13-02-CANCEL-NONCLIENT-DEEPLINK",
@@ -2720,14 +2864,16 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Every intentionally interactive datum opens its canonical target; non-interactive cells do not imply clickability.",
-      "source": "PAULA_R13",
+      "source": "PAULA_VISUAL_R13_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL_AFTER_R15_SUCCESSOR",
       "classification": "PRODUCT_INTERACTION_IDENTITY_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
       "surface": "Cancelaciones",
-      "finding": "Non-client row datum still lacks reliable canonical navigation and can show Registro fuera de tu alcance."
+      "finding": "Non-client row datum still lacks reliable canonical navigation and can show Registro fuera de tu alcance.",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R13-03-CANCEL-COUNTRY-IDENTITY-INTEGRITY",
@@ -2740,14 +2886,16 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "KPI/list/row identity use one documented country authority or explicitly model cross-country relation without leakage.",
-      "source": "PAULA_R13",
+      "source": "PAULA_VISUAL_R13_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "classification": "PRODUCT_SCOPE_PRESENTATION_MISMATCH_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
       "surface": "Cancelaciones",
-      "finding": "Colombia-selected list visibly includes client identity labels marked GT; canonical country authority is unresolved."
+      "finding": "Colombia-selected list visibly includes client identity labels marked GT; canonical country authority is unresolved.",
+      "humanVisualStatus": "VISUAL_EVIDENCE_PASS_R15",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
@@ -2761,7 +2909,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Real source-backed renewal pipeline repopulates by canonical eligibility/country/horizon and is proven on exact Preview.",
-      "source": "PAULA_R13",
+      "source": "PAULA_VISUAL_R13_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "classification": "RUNTIME_DATA_SEMANTIC_DISTRIBUTION_PROOF_REQUIRED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
@@ -2777,7 +2925,9 @@
       "renewalDeterministicApplyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
       "renewalDeterministicApplyReceiptBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e",
       "surface": "Renovaciones",
-      "finding": "Real renewal pipeline visually disappeared: all buckets and premium rendered 0 in Todos los países."
+      "finding": "Real renewal pipeline visually disappeared: all buckets and premium rendered 0 in Todos los países.",
+      "humanVisualStatus": "VISUAL_EVIDENCE_PASS_R15",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
@@ -2790,7 +2940,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Authenticated route and first usable render meet performance budget without browser unresponsive dialog.",
-      "source": "PAULA_R13",
+      "source": "PAULA_VISUAL_R13_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL_AFTER_R15_SUCCESSOR",
       "classification": "PRODUCT_PERFORMANCE_DEFECT_SOURCE_FIXED_R13P3",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
@@ -2802,7 +2952,9 @@
       "runtimeP3DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_CAUSAL_DIAGNOSTIC_20261003.json",
       "runtimeP3RootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_ROOTFIX_20261003.json",
       "surface": "Pólizas",
-      "finding": "Opening Pólizas blocked the page and took >10 seconds."
+      "finding": "Opening Pólizas blocked the page and took >10 seconds.",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R13-06-POLICY-SEARCH-FREEZE",
@@ -2814,14 +2966,16 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Search is bounded/indexed/debounced and remains interactive over full corpus; no full render/scan per keystroke.",
-      "source": "PAULA_R13",
+      "source": "PAULA_VISUAL_R13_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL_AFTER_R15_SUCCESSOR",
       "classification": "PRODUCT_PERFORMANCE_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
       "surface": "Pólizas",
-      "finding": "Policy search froze the browser for approximately five minutes."
+      "finding": "Policy search froze the browser for approximately five minutes.",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
@@ -2835,14 +2989,16 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Direct policy detail navigation is deterministic, preserves context and has no full-page stall.",
-      "source": "PAULA_R13",
+      "source": "PAULA_VISUAL_R13_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL_AFTER_R15_SUCCESSOR",
       "classification": "PRODUCT_DETAIL_HYDRATION_PERFORMANCE_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
       "surface": "Pólizas→Cliente360",
-      "finding": "Selecting a policy remained slow and required refresh before detail became usable."
+      "finding": "Selecting a policy remained slow and required refresh before detail became usable.",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
@@ -2855,14 +3011,16 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "No destructive intermediate projection; loading state preserves stable relations until hydration is coherent.",
-      "source": "PAULA_R13",
+      "source": "PAULA_VISUAL_R13_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL_AFTER_R15_SUCCESSOR",
       "classification": "PRODUCT_HYDRATION_PRESENTATION_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
       "surface": "Hydration/relations",
-      "finding": "After refresh client names disappeared temporarily and later reappeared."
+      "finding": "After refresh client names disappeared temporarily and later reappeared.",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
@@ -2875,7 +3033,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Recover latest approved visual lineage and prove structure/density/hierarchy/labels/responsive match; no redesign from memory.",
-      "source": "PAULA_R13",
+      "source": "PAULA_VISUAL_R13_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL_AFTER_R15_SUCCESSOR",
       "classification": "APPROVED_VISUAL_LINEAGE_PARTIALLY_RECOVERED_SOURCE_FIX_HELD",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
@@ -2883,7 +3041,9 @@
       "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
       "visualLineageReceiptBlobSha": "241a16d434c9d7eb94246a81925e9cbedd183824",
       "surface": "Pólizas list",
-      "finding": "List visual identity differs from latest approved/expected presentation."
+      "finding": "List visual identity differs from latest approved/expected presentation.",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
@@ -2896,7 +3056,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Controlled disposable file proves Drive readback, exact insurer/source provenance, reload persistence, fail-closed downstream enablement and cleanup/rollback.",
-      "source": "PAULA_R13",
+      "source": "PAULA_VISUAL_R13_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "classification": "PRODUCT_RUNTIME_REFERENCE_DEFECT_SOURCE_FIXED_PENDING_E2E",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_DRIVE_BACKEND_CAUSAL_DIAGNOSTIC_20261003.json",
@@ -2911,7 +3071,9 @@
       "surface": "Aseguradoras/Drive",
       "finding": "Drive upload path is visible but end-to-end upload→Drive readback→insurer linkage→reload persistence is not yet proven.",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
@@ -2924,7 +3086,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview first paint shows stable loading until authoritative renewal dependencies are ready, then one coherent populated render.",
-      "source": "PAULA_R14",
+      "source": "PAULA_VISUAL_R14_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "classification": "PRODUCT_HYDRATION_PRESENTATION_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
@@ -2934,7 +3096,9 @@
       "surface": "Renovaciones",
       "finding": "Initial first paint exposes empty/partial/dash renewal state before authoritative hydration.",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R14-02-RENEWALS-EXPIRED-OUTCOME-CONTINUITY",
@@ -2947,7 +3111,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Explicit YES expired unresolved policies remain in Vencidas; UNKNOWN stays fail-closed and visible as validation debt only.",
-      "source": "PAULA_R14",
+      "source": "PAULA_VISUAL_R14_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "classification": "PRODUCT_RENEWAL_OUTCOME_CONTINUITY_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
@@ -2957,7 +3121,9 @@
       "surface": "Renovaciones",
       "finding": "Expired explicit-renewable policies can disappear before a renewal outcome is recorded.",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
@@ -2970,7 +3136,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "KPI is truthfully labeled as expiry horizon and remaining unpartitioned policy states are explicit.",
-      "source": "PAULA_R14",
+      "source": "PAULA_VISUAL_R14_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "classification": "PRODUCT_KPI_SEMANTIC_MISMATCH_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
@@ -2978,7 +3144,9 @@
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9",
       "surface": "Pólizas / Renovaciones",
-      "finding": "Date-based ≤45-day policy KPI is labeled as renewal eligibility although it does not check renovable."
+      "finding": "Date-based ≤45-day policy KPI is labeled as renewal eligibility although it does not check renovable.",
+      "humanVisualStatus": "VISUAL_EVIDENCE_PASS_R15",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R14-04-CLIENT360-LIST-AUTHORITY",
@@ -2990,7 +3158,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview GT/CO/Todos list uses authoritative server-confirmed store and cannot collapse to zero from a stale projection.",
-      "source": "PAULA_R14",
+      "source": "PAULA_VISUAL_R14_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "classification": "PRODUCT_LIST_AUTHORITY_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
@@ -3003,7 +3171,9 @@
       "lastFailedJobId": 111389013312,
       "lastFailure": "CLIENT360_STALE_DIAGNOSTIC_REFERENCE_CLIENTBATCH",
       "surface": "Cliente 360",
-      "finding": "List/KPIs can show zero while authoritative client ficha remains present and usable."
+      "finding": "List/KPIs can show zero while authoritative client ficha remains present and usable.",
+      "humanVisualStatus": "VISUAL_EVIDENCE_PASS_R15",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R14-05-QUALITY-VISUAL-GRAMMAR-COMPLETENESS",
@@ -3015,7 +3185,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Both quality tables share canonical table grammar and completeness shows count plus decimal percent without changing data semantics.",
-      "source": "PAULA_R14",
+      "source": "PAULA_VISUAL_R14_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "classification": "APPROVED_VISUAL_GRAMMAR_AND_KPI_CLARITY_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
@@ -3025,7 +3195,9 @@
       "performanceRootFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_QUALITY_PERFORMANCE_ROOTFIX_20261004.json",
       "performanceRootFixReceiptBlobSha": "099219db3a28bdb5bd32afd475b356c842a62781",
       "surface": "Calidad de datos",
-      "finding": "Financial-health and client-quality tables have divergent visual grammar; integer completeness rounds a nonzero complete set to 0%."
+      "finding": "Financial-health and client-quality tables have divergent visual grammar; integer completeness rounds a nonzero complete set to 0%.",
+      "humanVisualStatus": "PASS_R15",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R14-06-INSURER-IMPORT-STEP-TRUTHFULNESS",
@@ -3037,7 +3209,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Current source-upload steps truthfully represent classify → Drive/link → pending validation; no automatic tariff activation is implied.",
-      "source": "PAULA_R14",
+      "source": "PAULA_VISUAL_R14_20261003",
       "nextAction": "PRESERVE_NO_REOPEN_WITHOUT_REPRODUCIBLE_REGRESSION",
       "classification": "PRODUCT_IMPORT_UX_CONTRACT_MISMATCH_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
@@ -3045,7 +3217,9 @@
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9",
       "surface": "Aseguradoras / Importación",
-      "finding": "docs-aseguradora UI promises intelligent extraction while current canonical path is documentary Drive storage/linkage only."
+      "finding": "docs-aseguradora UI promises intelligent extraction while current canonical path is documentary Drive storage/linkage only.",
+      "humanVisualStatus": "VISUAL_EVIDENCE_PASS_R15",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
@@ -3058,7 +3232,7 @@
       ],
       "targetGate": "B4-003",
       "closureCondition": "Exact authenticated Preview: same eligible assignment roster for Paula/Dirección and Carlos/Operativo for selected country, while full Equipo administration remains permission-restricted.",
-      "source": "PAULA_R14A",
+      "source": "PAULA_VISUAL_R14A_20261003",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "classification": "PRODUCT_ROLE_ASSIGNMENT_ROSTER_SCOPE_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14A_ASSIGNABLE_ADVISOR_ROSTER_ROOTFIX_20261004.json",
@@ -3069,7 +3243,9 @@
       "finding": "Active Asesor can be absent from commercial assignment selector and duplicate advisor identities can appear.",
       "rootCause": "ASSIGNMENT_ROSTER_INCORRECTLY_REUSES_FULL_TEAM_DIRECTORY_READ_AUTHORITY",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "FAIL_R16_OPERATIVO_EMPTY",
+      "parent": "B4-003"
     },
     {
       "id": "B4-003-R15-01-OPS-LEADS-NEW-PROSPECT-CATALOGS",
@@ -3091,7 +3267,10 @@
       "rootCause": "core/ciclo.js nuevoNegocio() uses fInput for nn-canal/nn-prod/nn-ramo; edit flow uses fSelectCat. Current Orbit.cat persists only in browser localStorage and Configuración has no durable shared catalog administration surface.",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "requiredFix": "Use one tenant-durable catalog owner for new/edit flows; Dirección/Admin administer catalogs in Configuración; country-aware ramo/product where applicable; no hardcoded defaults as business truth.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R15-02-QUALITY-CLIENT-COMPLETION-DURABILITY",
@@ -3111,7 +3290,10 @@
       "rootCause": "calidad.js completion modal uses synchronous store.update plus immediate local readback instead of updateDurable/server-confirmed readback.",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "requiredFix": "Use durable awaited update with server readback, audit/motivo, rerender only from confirmed state, and prove reload persistence.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R15-03-QUALITY-GEO-CATALOG-COMPLETENESS",
@@ -3132,7 +3314,10 @@
       "rootCause": "Orbit.GEO is a reduced embedded subset, not a complete authoritative GT/CO geographic catalog.",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "requiredFix": "Bind country→department/province→city/municipality to a complete governed catalog or authoritative tenant reference; preserve Otro/requires-validation fail-closed path.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R15-04-QUALITY-COUNTRY-EVIDENCE-SEMANTICS",
@@ -3152,7 +3337,10 @@
       "rootCause": "Quality table labels external linked-evidence absence as if country itself were absent/unsubstantiated, while current client country and evidence lineage are separate concepts.",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "requiredFix": "Show current country and provenance separately; user-confirmed durable update becomes auditable evidence; never imply country is missing when value exists.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R15-05-QUALITY-CHANNEL-ACTION",
@@ -3171,12 +3359,15 @@
       "rootCause": "calidad.js intentionally renders disabled Sin canal when no usable phone/email exists.",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "requiredFix": "Render as non-action badge or actionable Agregar canal that opens completion focused on contact fields; no dead button.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R15-06-QUALITY-POLICY-MISMATCH-ACTIONABILITY",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/calidad.js",
@@ -3189,14 +3380,18 @@
       "classification": "PRODUCT_DIAGNOSTIC_ACTIONABILITY_GAP",
       "finding": "Mismatch rows expose contractual premium/calendar/delta but no action, no drill-down, and clicking policy does not open context or explain what must be validated.",
       "rootCause": "financialHealthHtml renders informational rows only and does not bind policy/receipt lineage/action surface.",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "REJECTED_R17",
+      "requiredFix": "Responsive usable on laptop/tablet; correction review modal with precise cause/source/delta; receipts deep-link to Recibos tab; hide internal lineage/status tokens; no zero-rounded false-positive semantics.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/renovaciones.js",
@@ -3210,14 +3405,18 @@
       "classification": "SOURCE_BACKED_BUSINESS_COMPLETENESS_BLOCKER",
       "finding": "Fail-closed pipeline works but still shows 39 policies pending renewability review/conciliation (GT≈33, CO=6) and some actionable cards lack premium, so the module is not operationally complete.",
       "rootCause": "Most policies still lack authoritative renovable YES/NO and some renewal financial fields remain source-incomplete; current product correctly refuses to infer them.",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "REJECTED_R17",
+      "requiredFix": "Open exact policy editor focused on tri-state Renovabilidad with source-safe options; keep UNKNOWN fail-closed; derive KPI and columns from the same immutable bucket snapshot and prove equality.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
       "block": "B4",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
       "blocking": true,
       "owner": [
         "orbit360-platform/core/importa.js",
@@ -3231,9 +3430,13 @@
       "classification": "PRODUCT_SOURCE_TAXONOMY_AND_LINEAGE_GAP",
       "finding": "Tarifas y conocimiento shows related validated sources while Documentos y Drive can show Sin documentos cargados; current classifier is too coarse for tariff/commercial/subscription/claims/etc. document families.",
       "rootCause": "Reusable Library/knowledge references and insurer Drive-upload registry have distinct semantics that UI does not explain; docs-aseguradora metadata taxonomy is not rich enough.",
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "REJECTED_R17",
+      "requiredFix": "Registry rows must be inspectable/expandable with real stored metadata/provenance/dimensions/status and storage distinction; no duplicate authority.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE",
@@ -3251,7 +3454,10 @@
       "surface": "Ops/Pólizas/Cliente360",
       "classification": "CAPABILITY_CLOSURE_AND_LINEAGE_REQUIRED",
       "finding": "Endoso workflow exists, but current B4 proof has not demonstrated exhaustive endoso E2E and no equivalent proven first-class creation workflow was found for certificates/annexes.",
-      "rootCause": "Historical v1.201 implemented endoso application flows and versioned tests, but its own audit left full-repo execution/smoke and several endoso types/backend durability pending; certificate remains an Ops management type rather than a proven document-generation lifecycle."
+      "rootCause": "Historical v1.201 implemented endoso application flows and versioned tests, but its own audit left full-repo execution/smoke and several endoso types/backend durability pending; certificate remains an Ops management type rather than a proven document-generation lifecycle.",
+      "requiredFix": "Reconcile latest approved scope for Endosos/Certificados/Anexos, reuse existing v1.201 owners, and include exact E2E coverage in B4-005; do not rebuild parallel workflows.",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
@@ -3272,7 +3478,12 @@
       "rootCause": "ASSIGNMENT_ROSTER_INCORRECTLY_REUSES_FULL_TEAM_DIRECTORY_READ_AUTHORITY",
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "surface": "Ops / Leads / Nuevo prospecto",
+      "classification": "PRODUCT_ROLE_ASSIGNMENT_DIRECTORY_AUTHORITY_DEFECT",
+      "parent": "B4-003",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
@@ -3301,7 +3512,12 @@
         "thresholdMs": 2500,
         "thresholdRelaxed": false,
         "informationRemoved": false
-      }
+      },
+      "surface": "Calidad / Guatemala",
+      "classification": "R16_CAUSAL_PERFORMANCE_REGRESSION",
+      "parent": "B4-003",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R16-03-CATALOG-PREAUTH-HYDRATION-HTTP-401",
@@ -3333,7 +3549,12 @@
         "authenticatedConsumerEnsuresPreserved": 4,
         "authRelaxed": false,
         "localFallbackAuthority": false
-      }
+      },
+      "surface": "Startup / tenant catalogs",
+      "classification": "R16_STARTUP_AUTH_ORDER_REGRESSION",
+      "parent": "B4-003",
+      "noLive": true,
+      "noReimport": true
     },
     {
       "id": "B4-003-R16-04-QUALITY-RESOLUTION-DEEPLINK-MOBILE",
@@ -3433,6 +3654,46 @@
       "closureCondition": "Exact Preview must distinguish validated/review/physical-Drive counts, separate Library from physical Drive semantics, filter empty dimensions, and preserve Quote Authority/no-auto-enable rules.",
       "mayDisappearWithoutDisposition": false,
       "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+    },
+    {
+      "id": "B4-003-R17-01-LEAD-INSURER-COUNTRY-MULTISELECT",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261004_R17",
+      "surface": "Ops/Leads/Negocio",
+      "finding": "Aseguradora de interés uses one unfiltered tenant-wide select; GT business can show/select CO insurer and cannot represent several insurers of interest.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js"
+      ],
+      "classification": "PRODUCT_COUNTRY_SCOPE_AND_CARDINALITY_DEFECT",
+      "status": "OPEN_R17_SOURCE_FIX_AUTHORIZED",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Filter insurers by business country; allow multiple insurers of interest; preserve backward-compatible primary insurer id; country change cannot retain out-of-country selections.",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "mayDisappearWithoutDisposition": false,
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B4-003-R17-02-NONVEHICLE-RISK-SECTION-GUARD",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261004_R17",
+      "surface": "Cliente360/Póliza",
+      "finding": "Non-vehicle policy DAÑOS/Casa Habitación renders vehicle-risk section and missing-vehicle warning.",
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "classification": "PRODUCT_DOMAIN_SECTION_GUARD_DEFECT",
+      "status": "OPEN_R17_SOURCE_FIX_AUTHORIZED",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Vehicle section/warnings/actions render only for vehicle/auto policies; non-vehicle policies retain generic insured-risk data without vehicle requirement.",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "mayDisappearWithoutDisposition": false,
+      "noLive": true,
+      "noReimport": true
     }
   ],
   "attentionIds": [
@@ -3543,7 +3804,9 @@
     "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION",
     "B4-003-R16-06-CONFIG-CATALOG-FIRST-PAINT",
     "B4-003-R16-07-RENEWABILITY-REVIEW-WORKFLOW-UX",
-    "B4-003-R16-08-INSURER-KNOWLEDGE-HIERARCHY"
+    "B4-003-R16-08-INSURER-KNOWLEDGE-HIERARCHY",
+    "B4-003-R17-01-LEAD-INSURER-COUNTRY-MULTISELECT",
+    "B4-003-R17-02-NONVEHICLE-RISK-SECTION-GUARD"
   ],
   "criticalCurrentReviewIds": [
     "B4-003",
