@@ -1,0 +1,17 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R17_SCOPE_EXTENSION_POLICY_EDITOR_V1",
+  "recordedAt": "2026-10-04T23:56:00Z",
+  "status": "R17_SCOPE_EXTENDED_SOURCE_ONLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "addedProductOwner": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+  "cause": "Canonical runtime bridge replaces cliente360.editarPoliza, so the base-module focus fix alone cannot make Revisar y clasificar open the renewability field.",
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false
+  },
+  "executionLockBlobSha": "6d41a250272b6961789a06ba0e7cb05a8f0d638f",
+  "nextAction": "B4_003_R17_SOURCE_FIX"
+}
