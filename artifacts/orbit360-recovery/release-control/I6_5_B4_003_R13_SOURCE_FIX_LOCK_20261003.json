@@ -206,5 +206,17 @@
     "staleRunId": 37168684782,
     "workflowBlobSha": "0bf015a9cb160734157be1fa251d0019e07b743e",
     "productSourceChanged": false
+  },
+  "r13SecureResourcePreviewIsolationAdjudication": {
+    "status": "QA_FALSE_POSITIVE_ADJUDICATED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SECRES_PREVIEW_ISOLATION_ADJUDICATION_20261004.json",
+    "blobSha": "cc153baa9281a1540691756432c6f3d34a29e5fe",
+    "failedRunId": 37169249578,
+    "proofBlobSha": "ea95bdbfe103e4a51472f1e6ef5b5acaf95100d4",
+    "workflowBlobSha": "b16ed26939b6d81e01a7c1f72bc9f0326694e93b",
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

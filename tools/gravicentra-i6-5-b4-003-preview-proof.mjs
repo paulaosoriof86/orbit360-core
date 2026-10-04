@@ -31,7 +31,7 @@ ids.renewActivity='act_ren_'+ids.renewalPolicy+'_'+new Date().toISOString().slic
 ids.cancelActivity='act_rec_'+ids.cancelation;
 ids.recoveryBusiness='neg_rec_'+ids.cancelation;
 const residueIds=['pol_mulsmxsk','pol_mulssmuz','pol_mulsxofx'];
-const proof={schema:'GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_V2',status:'INIT',target,ids,assertions:{},syntheticWrites:0,cleanupWrites:0,pageErrors:[],consoleErrors:[],httpErrors:[],syntheticFinalAbsent:false,qaResidue:{},runtimeCancellationEvidence:{}};
+const proof={schema:'GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_V3',status:'INIT',target,ids,assertions:{},syntheticWrites:0,cleanupWrites:0,pageErrors:[],consoleErrors:[],httpErrors:[],expectedIsolationDenials:[],unexpectedHttpErrors:[],unexpectedConsoleErrors:[],syntheticFinalAbsent:false,qaResidue:{},runtimeCancellationEvidence:{}};
 
 const renewalSourceAuthority={
   sourceFile:'Renovaciones (13).xlsx',
@@ -227,6 +227,7 @@ async function cleanup(startMs){
  }
 }
 let browser,context,page,startMs=Date.now();
+const httpCapturePromises=[];
 try{
  const who=await actor();proof.actor=who;
  await residueReadback();
@@ -239,7 +240,7 @@ try{
  page=await context.newPage();
  page.on('pageerror',e=>proof.pageErrors.push(clean(e?.message||e)));
  page.on('console',m=>{if(m.type()==='error')proof.consoleErrors.push(clean(m.text()));});
- page.on('response',async r=>{if(r.status()>=400){const req=r.request();let body='';try{body=clean(await r.text()).slice(0,2000);}catch{}proof.httpErrors.push({status:r.status(),url:clean(r.url()),resourceType:clean(req.resourceType()),method:clean(req.method()),postData:clean(req.postData()).slice(0,4000),responseBody:body});}});
+ page.on('response',r=>{if(r.status()>=400){httpCapturePromises.push((async()=>{const req=r.request();let body='';try{body=clean(await r.text()).slice(0,2000);}catch{}proof.httpErrors.push({status:r.status(),url:clean(r.url()),resourceType:clean(req.resourceType()),method:clean(req.method()),postData:clean(req.postData()).slice(0,4000),responseBody:body});})());}});
  await applyLegal(page,who);
  await page.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
  await bootProduct(page,token);
@@ -791,8 +792,35 @@ try{
  proof.assertions.insurerDriveSyntheticRollback=true;
  proof.assertions.insurerDriveFileCleanup=true;
 
- proof.assertions.previewGeneralWriteIsolation=true;
- proof.assertions.noOperationalRealRowsWritten=true;
+ await Promise.all(httpCapturePromises);
+ const expectedIsolationDenials=[],unexpectedHttpErrors=[];
+ for(const e of proof.httpErrors){
+   let d=null;try{d=JSON.parse(e.postData||'{}').data||null;}catch{}
+   const muts=d&&Array.isArray(d.mutations)?d.mutations:[];
+   const exact=e.status===403
+     && /orbit360ProductOperationalCommandPreview$/.test(e.url||'')
+     && /Preview operativo solo admite fixtures sintéticos autorizados B3-004\/B4-003/.test(e.responseBody||'')
+     && muts.length===1
+     && muts[0]&&muts[0].action==='insert'&&muts[0].collection==='actividades'
+     && /^secres_[A-Za-z0-9._:-]+$/.test(String(muts[0].id||''))
+     && muts[0].payload&&muts[0].payload.tipo==='admin'
+     && muts[0].payload.titulo==='Acceso a recurso seguro'
+     && /^document\.upload · ok$/.test(String(muts[0].payload.detalle||''));
+   if(exact)expectedIsolationDenials.push({status:e.status,url:e.url,id:muts[0].id,collection:'actividades',reason:'SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW',persisted:null});
+   else unexpectedHttpErrors.push(e);
+ }
+ for(const x of expectedIsolationDenials)x.persisted=(await ref('actividades',x.id).get()).exists;
+ const generic403=(proof.consoleErrors||[]).filter(x=>/Failed to load resource: the server responded with a status of 403/.test(x)).length;
+ const non403=(proof.consoleErrors||[]).filter(x=>!/Failed to load resource: the server responded with a status of 403/.test(x));
+ const extra403=Math.max(0,generic403-expectedIsolationDenials.length);
+ proof.expectedIsolationDenials=expectedIsolationDenials;
+ proof.unexpectedHttpErrors=unexpectedHttpErrors;
+ proof.unexpectedConsoleErrors=non403.concat(Array.from({length:extra403},()=> 'UNATTRIBUTED_CONSOLE_403'));
+ proof.assertions.previewGeneralWriteIsolation=expectedIsolationDenials.length>=1
+   && expectedIsolationDenials.every(x=>x.persisted===false)
+   && unexpectedHttpErrors.length===0
+   && proof.unexpectedConsoleErrors.length===0;
+ proof.assertions.noOperationalRealRowsWritten=proof.assertions.previewGeneralWriteIsolation===true;
  need(proof.assertions.cancellationProjectionConsistent===true,'B4_003_REAL_CANCELATION_SOURCE_WITHOUT_PROJECTION');
  proof.status=proof.r13RenewalDataBlocker&&proof.r13RenewalDataBlocker.blocking===true?'PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'PASS';
 } finally {
@@ -807,5 +835,5 @@ try{
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
 }
 if(!['PASS','PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER'].includes(proof.status)||proof.syntheticFinalAbsent!==true||proof.assertions.insurerDriveFileCleanup!==true)process.exitCode=1;
-console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,r13PolicyPerformance:proof.r13PolicyPerformance,r13RenewalSourceDryRun:proof.r13RenewalSourceDryRun,r13RenewalDataBlocker:proof.r13RenewalDataBlocker,r13InsurerDrive:proof.r13InsurerDrive,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors,httpErrors:proof.httpErrors},null,2));
+console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,r13PolicyPerformance:proof.r13PolicyPerformance,r13RenewalSourceDryRun:proof.r13RenewalSourceDryRun,r13RenewalDataBlocker:proof.r13RenewalDataBlocker,r13InsurerDrive:proof.r13InsurerDrive,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors,httpErrors:proof.httpErrors,expectedIsolationDenials:proof.expectedIsolationDenials,unexpectedHttpErrors:proof.unexpectedHttpErrors,unexpectedConsoleErrors:proof.unexpectedConsoleErrors},null,2));
 // R12 remaining B4-003 blocker proof: 2026-10-03
