@@ -6167,7 +6167,7 @@
       "productSourceChanged": false
     },
     "r13RenewalSourceLineageDiagnostic": {
-      "status": "READ_ONLY_DIAGNOSTIC_ARMED",
+      "status": "READ_ONLY_LINEAGE_TARGET_DIAGNOSTIC_ARMED",
       "targetPolicyNumbers": [
         "68542",
         "1-AP-20890",
@@ -6179,7 +6179,10 @@
       "productSourceChanged": false,
       "dataMutation": false,
       "reimport": false,
-      "livePromotion": false
+      "livePromotion": false,
+      "targetRenewalPointers": [
+        "pol_muj5o5ka"
+      ]
     }
   },
   "b4VisualAcceptanceControl": {
