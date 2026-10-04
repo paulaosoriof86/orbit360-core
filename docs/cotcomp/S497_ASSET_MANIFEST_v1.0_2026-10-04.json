@@ -117,7 +117,29 @@
   "gates": {
     "ownerReviewAssetEligibility": true,
     "productionVisualApproval": false,
-    "packagingComplete": false,
-    "runtimeBytesVerified": false
+    "packagingComplete": true,
+    "runtimeBytesVerified": false,
+    "sourceBytesVerified": true,
+    "ownerReviewVisualEvidenceComplete": false
+  },
+  "packagedRuntime": {
+    "logo": {
+      "file": "cotcomp-s497-logo-derived-official.b64",
+      "sha256": "dfac6f73cf0a6ca54956bcb1f00a0385980ace685ef5366515317f7e5220d0f8",
+      "format": "webp",
+      "source": "S4.94 packaged official A&S logo conversion"
+    },
+    "hero": {
+      "file": "cotcomp-s497-hero-governed.b64",
+      "sha256": "a80c5458137e2914a6e8d43f8212ea1997ea5d8ba8d4a44136c36ef28cb927bd",
+      "format": "webp",
+      "source": "S4.94 authorized hero asset bytes"
+    },
+    "familySprite": {
+      "file": "cotcomp-s497-family-scenes-governed.b64",
+      "sha256": "4209a06de9b030c0f81d5b004fbf995018f8b050418c22913daaf1f73ead4800",
+      "format": "webp",
+      "source": "S4.94 seven-scene product sprite bytes"
+    }
   }
 }
