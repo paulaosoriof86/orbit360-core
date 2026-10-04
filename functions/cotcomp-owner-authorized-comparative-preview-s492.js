@@ -81,7 +81,7 @@ function html(){
 <body>
 <header class="site-header">
   <div class="hdr">
-    <img class="logo" src="${LOGO}" alt="Alianzas & Soluciones · Broker de Seguros">
+    <img class="logo" src="${LOGO}" alt="Alianzas &amp; Soluciones · Broker de Seguros">
     <nav class="nav" aria-label="Principal">
       <button type="button">Empresas</button>
       <button type="button">Personas y familias</button>
@@ -287,7 +287,8 @@ function html(){
   function renderAlternatives(){
     const prices=['Q 2,180','Q 2,540','Q 2,860'];
     const marks=['#2F6AA3','#E4002B','#2C8DB5'];
-    alternatives.innerHTML=[0,1,2].map((i)=>'<article class="alt"><div class="alt-top"><span class="insurer-mark" style="--mark:'+marks[i]+'">'+String.fromCharCode(65+i)+'</span><div><h4>Aseguradora '+String.fromCharCode(65+i)+'</h4><div style="font-size:8px;color:#888">Plan '+(i===1?'Balance':'Protección')+'</div></div><div class="alt-price">'+prices[i]+'<small>anual · ilustrativo</small></div></div><div class="alt-body"><div class="checks"><span>✓ Cobertura amplia</span><span>✓ Asistencia incluida</span><span>✓ Beneficios según propuesta</span></div><div class="bars"><div class="barrow"><span>Daños propios</span><div class="bar"><b style="--w:'+(45+i*16)+'%"></b></div></div><div class="barrow"><span>Asistencia</span><div class="bar"><b style="--w:'+(38+i*18)+'%"></b></div></div><div class="barrow"><span>Cobertura total</span><div class="bar"><b style="--w:'+(58+i*11)+'%"></b></div></div></div></div><button class="details" type="button">Ver detalles</button></article>').join('');
+    const insurerNames=['Aseguradora A','Aseguradora B','Aseguradora C'];
+    alternatives.innerHTML=[0,1,2].map((i)=>'<article class="alt"><div class="alt-top"><span class="insurer-mark" style="--mark:'+marks[i]+'">'+String.fromCharCode(65+i)+'</span><div><h4>'+insurerNames[i]+'</h4><div style="font-size:8px;color:#888">Plan '+(i===1?'Balance':'Protección')+'</div></div><div class="alt-price">'+prices[i]+'<small>anual · ilustrativo</small></div></div><div class="alt-body"><div class="checks"><span>✓ Cobertura amplia</span><span>✓ Asistencia incluida</span><span>✓ Beneficios según propuesta</span></div><div class="bars"><div class="barrow"><span>Daños propios</span><div class="bar"><b style="--w:'+(45+i*16)+'%"></b></div></div><div class="barrow"><span>Asistencia</span><div class="bar"><b style="--w:'+(38+i*18)+'%"></b></div></div><div class="barrow"><span>Cobertura total</span><div class="bar"><b style="--w:'+(58+i*11)+'%"></b></div></div></div></div><button class="details" type="button">Ver detalles</button></article>').join('');
     recommendation.innerHTML='<div class="rec-ribbon">★ Recomendación A&amp;S</div><p>Para este ejemplo visual, la <strong>Alternativa B</strong> ofrece un mejor equilibrio entre cobertura, beneficios y costo.</p><div class="rec-list"><div class="rec-item"><span>●</span><span>Mayor protección relativa en daños propios</span></div><div class="rec-item"><span>●</span><span>Asistencia incluida según la propuesta</span></div><div class="rec-item"><span>●</span><span>Diferencias explicadas, sin ranking silencioso</span></div></div><button class="rec-btn" type="button">Ver recomendación completa →</button>';
   }
 
