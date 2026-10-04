@@ -887,7 +887,25 @@ Orbit.modules.aseguradoras = (function () {
   function sourceRegistryHtml(a){
     const rows=knowledgeSources(a);if(!rows.length)return '<div class="cfg-note" style="margin-top:12px">Sin fuentes registradas.</div>';
     const label=k=>k==='BOTH'?'Biblioteca + Drive':k==='DRIVE_FILE'?'Drive':'Biblioteca / conocimiento';
-    return '<div class="asg-sec-t" style="margin-top:14px">📚 Registry canónica de fuentes · Biblioteca y Drive</div><div style="display:grid;gap:7px">'+rows.map(r=>'<div class="asg-row" data-source-registry-row="'+U.esc(r.id||'')+'" style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>'+U.esc(r.nombre||'Fuente')+'</b><small class="muted" style="display:block">'+U.esc((r.taxonomyLabel||r.cat||'Otro/requiere clasificación')+' · '+label(r.storageKind)+' · '+([r.pais,r.moneda,r.ramo,r.producto,r.plan].filter(Boolean).join(' · ')||'Dimensiones pendientes'))+'</small></span><span class="badge '+(/validado/i.test(r.validationStatus||r.estado)?'ok':'neutral')+'">'+U.esc(r.validationStatus||r.estado||'Documento recibido')+'</span></div>').join('')+'</div>';
+    const human=v=>clean(v).replace(/_/g,' ');
+    return '<div class="asg-sec-t" style="margin-top:14px">📚 Registro de fuentes · Biblioteca y Drive</div><div style="display:grid;gap:7px">'+rows.map(r=>{
+      const status=r.validationStatus||r.estado||'Documento recibido',dims=[r.pais,r.moneda,r.ramo,r.producto,r.plan].filter(Boolean);
+      const provenance=clean(r.provenance||r.sourceOrigin||r.origen||r.fuenteOrigen);
+      const version=clean(r.version||r.sourceVersion||r.versión),validity=clean(r.vigencia||r.validFrom||r.fechaVigencia);
+      const hash=clean(r.hash||r.sha256||r.contentHash),docId=clean(r.documentId||r.sourceDocumentId);
+      const url=clean(r.driveUrl||r.externalUrl||r.url);
+      const extra=[
+        ['Clasificación',r.taxonomyLabel||r.cat||'Otro/requiere clasificación'],
+        ['Ubicación',label(r.storageKind)],
+        ['Dimensiones',dims.join(' · ')||'Pendientes de completar'],
+        ['Provenance',provenance||'No registrada'],
+        ['Versión',version||'No registrada'],
+        ['Vigencia',validity||'No registrada'],
+        ['Documento / referencia',docId||r.id||'No registrada'],
+        ['Huella',hash||'No registrada']
+      ];
+      return '<details class="asg-row" data-source-registry-row="'+U.esc(r.id||'')+'" style="display:block;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0;overflow:hidden"><summary style="cursor:pointer;list-style:none;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>'+U.esc(r.nombre||'Fuente')+'</b><small class="muted" style="display:block">'+U.esc((r.taxonomyLabel||r.cat||'Otro/requiere clasificación')+' · '+label(r.storageKind)+' · '+(dims.join(' · ')||'Dimensiones pendientes'))+'</small></span><span class="badge '+(/validado/i.test(status)?'ok':'neutral')+'">'+U.esc(status)+'</span><span class="muted" style="font-size:11px">Ver detalles ▾</span></summary><div data-source-registry-detail="'+U.esc(r.id||'')+'" style="border-top:1px solid var(--line);padding:10px 12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">'+extra.map(([k,v])=>'<div><small class="muted">'+U.esc(k)+'</small><div style="font-size:12px;overflow-wrap:anywhere">'+U.esc(human(v))+'</div></div>').join('')+( /^https:\/\/[^\s]+$/i.test(url)?'<div style="grid-column:1/-1"><a class="btn ghost sm" href="'+U.esc(url)+'" target="_blank" rel="noopener">Abrir fuente</a></div>':'')+'</div></details>';
+    }).join('')+'</div>';
   }
 
   /* ---- Documentos y Drive ---- */
