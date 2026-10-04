@@ -1,0 +1,17 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R17_SCOPE_EXTENSION_INDEX_CACHE_V1",
+  "recordedAt": "2026-10-05T00:04:00Z",
+  "status": "R17_SCOPE_EXTENDED_SOURCE_ONLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "addedProductOwner": "orbit360-platform/index.html",
+  "cause": "R17 changes modify browser-loaded modules; the canonical index asset query versions must advance so the same certified artifact cannot serve stale pre-R17 module bytes after production promotion.",
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false
+  },
+  "executionLockBlobSha": "a67ad0703e8882e74e65f6860479e98c9b5d218c",
+  "nextAction": "B4_003_R17_SOURCE_FIX"
+}
