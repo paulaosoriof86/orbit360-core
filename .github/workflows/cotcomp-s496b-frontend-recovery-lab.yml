@@ -100,7 +100,7 @@ jobs:
           grep -q 'S496B_FRONTEND_RECOVERY_LOCKED' "$E/page.html"
           grep -q 'data-s496b="true"' "$E/page.html"
           grep -q "font-family:'Newsreader',serif" "$E/page.html"
-          grep -q 'aspect-ratio:16/10' "$E/page.html"
+          grep -q 'width:min(580px,38vw)' "$E/page.html"\n          grep -q 'aspect-ratio:4/3' "$E/page.html"
           grep -q 'aspect-ratio:4/3' "$E/page.html"
           grep -q 's496b-intake-shell' "$E/page.html"
           grep -q 'Ver las diferencias clave' "$E/page.html"
