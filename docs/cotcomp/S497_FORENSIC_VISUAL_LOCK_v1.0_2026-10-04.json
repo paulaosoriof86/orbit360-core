@@ -79,18 +79,33 @@
   "reconciledOpeningContract": {
     "h1Font": "Archivo",
     "h1Weight": 900,
-    "photoClass": "bounded_contextual_figure",
+    "structure": "single_dark_editorial_hero_with_integrated_right_media_slot",
+    "desktopTargetHeightPx": [
+      350,
+      390
+    ],
+    "approximateCopySharePct": [
+      48,
+      54
+    ],
+    "approximateMediaSharePct": [
+      46,
+      52
+    ],
     "photoRules": {
+      "preferredNativeRatio": "16:9",
       "objectFit": "cover",
-      "fixedAspectRatioByBreakpoint": true,
       "assetSpecificObjectPosition": true,
       "independentFromWorkspaceHeight": true,
-      "sameImageCannotBeGenericFallbackAcrossRoutes": true
+      "noIntrinsicRatioDistortion": true,
+      "noUniversalRouteFallback": true
     },
     "forbidden": [
-      "stretched_full_height_photo",
       "Newsreader_H1",
-      "workspace_displaced_by_oversized_decorative_hero"
+      "floating_4_3_rounded_photo_card",
+      "height_coupled_to_workspace_or_intake",
+      "stretched_image",
+      "oversized_decorative_hero_that_pushes_product_workspace_down"
     ]
   },
   "familySelectionContract": {
