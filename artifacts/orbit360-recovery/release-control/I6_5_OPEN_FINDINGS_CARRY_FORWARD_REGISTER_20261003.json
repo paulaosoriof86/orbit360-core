@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76",
-  "expectedLedgerNextBlobSha": "20b28e0832ac8bf5679450ea613abd595add4f20",
+  "expectedLedgerNextBlobSha": "6f6dc7f1f94ba39e451eb1281cc95f92585b372c",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -674,14 +674,14 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
       "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
       "source": "FROZEN_PLAN",
-      "nextAction": "B4_003_R17_SOURCE_FIX",
-      "humanVisualStatus": "REJECTED_R17",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "humanVisualStatus": "REJECTED_R17_PENDING_RETEST",
       "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
       "r13QaGateAlignmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
       "r13QaGateAlignmentBlobSha": "be7e311badc6ef5adf9c0d3801adebc53ccd6f6e",
@@ -2685,7 +2685,7 @@
     {
       "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
       "block": "B4",
-      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -2695,7 +2695,7 @@
       "targetGate": "B4-003",
       "closureCondition": "Identify authoritative source/lineage and reconcile or explicitly quarantine mismatch; no inferred rewrite; sum of active schedule must reconcile to contractual total within approved tolerance.",
       "source": "PAULA_VISUAL_20261003",
-      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "surface": "Póliza/Recibos/Salud de información",
       "finding": "Observed policy showed contractual prima total Q407.01 while calendario vigente showed Q542.68 / 2 projected receipts.",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
@@ -3367,7 +3367,7 @@
     {
       "id": "B4-003-R15-06-QUALITY-POLICY-MISMATCH-ACTIONABILITY",
       "block": "B4",
-      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/calidad.js",
@@ -3380,7 +3380,7 @@
       "classification": "PRODUCT_DIAGNOSTIC_ACTIONABILITY_GAP",
       "finding": "Mismatch rows expose contractual premium/calendar/delta but no action, no drill-down, and clicking policy does not open context or explain what must be validated.",
       "rootCause": "financialHealthHtml renders informational rows only and does not bind policy/receipt lineage/action surface.",
-      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
       "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
       "humanVisualStatus": "REJECTED_R17",
@@ -3391,12 +3391,14 @@
     {
       "id": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
       "block": "B4",
-      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/modules/renovaciones.js",
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
-        "INSURER_KNOWLEDGE_SOURCE_BACKLOG"
+        "INSURER_KNOWLEDGE_SOURCE_BACKLOG",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/modules/cliente360.js"
       ],
       "targetGate": "B4-003",
       "closureCondition": "Resolve renewability/financial completeness from source-backed policy/insurer evidence and visible validation workflow; do not auto-promote UNKNOWN.",
@@ -3405,7 +3407,7 @@
       "classification": "SOURCE_BACKED_BUSINESS_COMPLETENESS_BLOCKER",
       "finding": "Fail-closed pipeline works but still shows 39 policies pending renewability review/conciliation (GT≈33, CO=6) and some actionable cards lack premium, so the module is not operationally complete.",
       "rootCause": "Most policies still lack authoritative renovable YES/NO and some renewal financial fields remain source-incomplete; current product correctly refuses to infer them.",
-      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
       "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
       "humanVisualStatus": "REJECTED_R17",
@@ -3416,7 +3418,7 @@
     {
       "id": "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
       "block": "B4",
-      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
+      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": [
         "orbit360-platform/core/importa.js",
@@ -3430,7 +3432,7 @@
       "classification": "PRODUCT_SOURCE_TAXONOMY_AND_LINEAGE_GAP",
       "finding": "Tarifas y conocimiento shows related validated sources while Documentos y Drive can show Sin documentos cargados; current classifier is too coarse for tariff/commercial/subscription/claims/etc. document families.",
       "rootCause": "Reusable Library/knowledge references and insurer Drive-upload registry have distinct semantics that UI does not explain; docs-aseguradora metadata taxonomy is not rich enough.",
-      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
       "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
       "humanVisualStatus": "REJECTED_R17",
@@ -3666,11 +3668,11 @@
         "orbit360-platform/core/ciclo.js"
       ],
       "classification": "PRODUCT_COUNTRY_SCOPE_AND_CARDINALITY_DEFECT",
-      "status": "OPEN_R17_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Filter insurers by business country; allow multiple insurers of interest; preserve backward-compatible primary insurer id; country change cannot retain out-of-country selections.",
-      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "mayDisappearWithoutDisposition": false,
       "noLive": true,
       "noReimport": true
@@ -3686,11 +3688,11 @@
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
       ],
       "classification": "PRODUCT_DOMAIN_SECTION_GUARD_DEFECT",
-      "status": "OPEN_R17_SOURCE_FIX_AUTHORIZED",
+      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Vehicle section/warnings/actions render only for vehicle/auto policies; non-vehicle policies retain generic insured-risk data without vehicle requirement.",
-      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "mayDisappearWithoutDisposition": false,
       "noLive": true,
       "noReimport": true
