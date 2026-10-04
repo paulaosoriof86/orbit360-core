@@ -2088,7 +2088,7 @@
     "readinessPercent": 96
   },
   "b4Execution": {
-    "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "lockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
     "lockBlobSha": "d91829fd7ee876d4814fddd888983d793e07fc2e",
     "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -2096,14 +2096,14 @@
     "noLive": true,
     "noReimport": true,
     "activeFindingId": "B4-003",
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
     "sourceHead": "67d8695680556bec1f559a8c4ee650176d400f98",
-    "sourceSha": "1354c3db5d490a9a91c4ee6ff27ae2049aae6b2e",
-    "buildId": "gi-i65-b4-1354c3db5d49-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37169604232-axy5q3g2.web.app",
-    "runId": 37169604232,
-    "artifactId": 11290158810,
-    "artifactDigest": "94ec4cfa7ca76c53476ebd5e7952a48fe34ff01aebbbfc1e73f38efc8f75babf",
+    "sourceSha": "2485b95183584f11648c4c637811c385b60b0e80",
+    "buildId": "gi-i65-b4-2485b9518358-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37171197355-jtcpjb1c.web.app",
+    "runId": 37171197355,
+    "artifactId": 11292050424,
+    "artifactDigest": "b4639c3e9722afa1ad2fd46ea1f8c7373006b5d3556fd5ae495fdea90de9096b",
     "sourceHeadBefore": "dd5af7d17247d377cd8c94e69a0ae7bb21d65028",
     "r4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
     "r4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
@@ -2342,59 +2342,19 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS"
   },
   "b4003MachinePass": {
-    "status": "MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER",
+    "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
-    "blobSha": "b164548aadac1783ebc04b9f2777cfbdb19439da",
-    "sourceSha": "1354c3db5d490a9a91c4ee6ff27ae2049aae6b2e",
-    "buildId": "gi-i65-b4-1354c3db5d49-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37169604232-axy5q3g2.web.app",
-    "runId": 37169604232,
-    "artifactId": 11290158810,
-    "artifactDigest": "94ec4cfa7ca76c53476ebd5e7952a48fe34ff01aebbbfc1e73f38efc8f75babf",
+    "blobSha": "6db5cd52b2d08c859ec243e5e14c1997688ce0a6",
+    "sourceSha": "2485b95183584f11648c4c637811c385b60b0e80",
+    "buildId": "gi-i65-b4-2485b9518358-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37171197355-jtcpjb1c.web.app",
+    "runId": 37171197355,
+    "artifactId": 11292050424,
+    "artifactDigest": "b4639c3e9722afa1ad2fd46ea1f8c7373006b5d3556fd5ae495fdea90de9096b",
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true,
-    "qaResidueAdjudicationBlobSha": "e42eccd1d1d41e1a29626ef6234c9baf632e7194",
-    "r13RenewalDataBlocker": {
-      "blocking": true,
-      "code": "REAL_RENEWABILITY_SOURCE_CONFLICT_OR_APPLY_REQUIRED",
-      "byState": {
-        "YES": 0,
-        "NO": 0,
-        "UNKNOWN": 1419
-      },
-      "sourceDryRunCount": 4,
-      "sourceDryRunReady": false,
-      "sourceMissing": [
-        "VA-43685"
-      ],
-      "sourceDuplicates": [],
-      "sourceHistoricalSameNumber": [
-        {
-          "numero": "68542",
-          "ids": [
-            "pol_a02fe1584efcde81a752782d0e53"
-          ],
-          "states": [
-            "Renovada"
-          ]
-        },
-        {
-          "numero": "VA-43685",
-          "ids": [
-            "pol_04d0eede3860a982971790b5ea4d",
-            "pol_652260b8dcd7206c34b70a463547",
-            "pol_965de501d871c56f3964a24b7724"
-          ],
-          "states": [
-            "Renovada",
-            "Renovada",
-            "Vigente"
-          ]
-        }
-      ],
-      "writeExecuted": false,
-      "authorizationRequired": true
-    }
+    "qaResidueAdjudicationBlobSha": "bae44a4c229783e0c6082559f4a8aceb1d7f475e",
+    "r13RenewalDataBlocker": null
   },
   "b4003SourceFixR5": {
     "status": "SOURCE_FIXED_R5_PENDING_CONTRACT_AND_EXACT_PREVIEW",

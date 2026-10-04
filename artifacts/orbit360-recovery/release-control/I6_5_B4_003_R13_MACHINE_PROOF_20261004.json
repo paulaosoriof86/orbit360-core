@@ -1,18 +1,18 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_MACHINE_PROOF_V2",
-  "recordedAt": "2026-10-04T02:02:25.243Z",
-  "status": "MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER",
+  "recordedAt": "2026-10-04T02:33:52.794Z",
+  "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
   "findingId": "B4-003",
-  "sourceSha": "1354c3db5d490a9a91c4ee6ff27ae2049aae6b2e",
-  "buildId": "gi-i65-b4-1354c3db5d49-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37169604232-axy5q3g2.web.app",
-  "channelId": "gi-i65-b4-37169604232",
-  "runId": 37169604232,
-  "artifactId": 11290158810,
-  "artifactDigest": "94ec4cfa7ca76c53476ebd5e7952a48fe34ff01aebbbfc1e73f38efc8f75babf",
-  "hostedPayloadDigest": "6d6658757be5028fb0eda0e6b1a944d0996cfbef3a0ffaa94b7761b4fb09ce3a",
+  "sourceSha": "2485b95183584f11648c4c637811c385b60b0e80",
+  "buildId": "gi-i65-b4-2485b9518358-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37171197355-jtcpjb1c.web.app",
+  "channelId": "gi-i65-b4-37171197355",
+  "runId": 37171197355,
+  "artifactId": 11292050424,
+  "artifactDigest": "b4639c3e9722afa1ad2fd46ea1f8c7373006b5d3556fd5ae495fdea90de9096b",
+  "hostedPayloadDigest": "5e77d293774cc885bd9fb85710ee9b34fa74bef7612a04e36d8dc8924ecf138d",
   "backendSourceDigest": "4c9981ee4ae5c13210d9c1c722195ad571880b48ae169776544a2e649add3f13",
-  "bundleDigest": "bfcd6e4127424427226c4a7ef830c78346c32f67188277d4536c38b42585018c",
+  "bundleDigest": "9b47b690b95ec43d779435509478a2d77c211636d5cb5b02e9e1355ab8c306ac",
   "exactHostingReadback": true,
   "assertions": {
     "qaResidueReadOnlyAdjudicated": true,
@@ -50,8 +50,8 @@
     "policyDetailUnder2500ms": true,
     "policyRefreshCoherentHydration": true,
     "noDelayedRenewalRenderMutation": true,
-    "realRenewalPipelineRepopulated": false,
-    "realRenewalPipelineMatchesCanonicalEligibility": false,
+    "realRenewalPipelineRepopulated": true,
+    "realRenewalPipelineMatchesCanonicalEligibility": true,
     "renewalCampaignDurableReadback": true,
     "cancelationDurableReadback": true,
     "recoveryLinkagePreserved": true,
@@ -70,28 +70,7 @@
     "textStable": true,
     "route": "renovaciones",
     "records": [],
-    "events": [
-      {
-        "ms": 35,
-        "kind": "store",
-        "detail": "metas"
-      },
-      {
-        "ms": 42,
-        "kind": "store",
-        "detail": "reclamos"
-      },
-      {
-        "ms": 47,
-        "kind": "store",
-        "detail": "comisiones"
-      },
-      {
-        "ms": 53,
-        "kind": "store",
-        "detail": "auditoria"
-      }
-    ],
+    "events": [],
     "canonicalRerenderObserved": false
   },
   "qaResidue": {
@@ -162,7 +141,7 @@
   "qaResidueDisposition": "NOT_DELETED_FAIL_CLOSED",
   "qaResidueDeletedCount": 0,
   "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_B2_QA_RESIDUE_ADJUDICATION_20261004.json",
-  "qaResidueAdjudicationReceiptBlobSha": "e42eccd1d1d41e1a29626ef6234c9baf632e7194",
+  "qaResidueAdjudicationReceiptBlobSha": "bae44a4c229783e0c6082559f4a8aceb1d7f475e",
   "syntheticQaWrites": 9,
   "cleanupWrites": 32,
   "syntheticFinalAbsent": true,
@@ -176,7 +155,7 @@
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
       "resourceType": "fetch",
       "method": "POST",
-      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mut6dyqg9emgh\",\"payload\":{\"id\":\"secres_mut6dyqg9emgh\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-04\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-04T02:02:08.536Z\",\"updatedAt\":\"2026-10-04T02:02:08.536Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
+      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mut7icp8g7icc\",\"payload\":{\"id\":\"secres_mut7icp8g7icc\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-04\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-04T02:33:32.877Z\",\"updatedAt\":\"2026-10-04T02:33:32.877Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
       "responseBody": "{\"error\":{\"message\":\"Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.\",\"status\":\"PERMISSION_DENIED\"}}"
     }
   ],
@@ -184,7 +163,7 @@
     {
       "status": 403,
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
-      "id": "secres_mut6dyqg9emgh",
+      "id": "secres_mut7icp8g7icc",
       "collection": "actividades",
       "reason": "SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW",
       "persisted": false
@@ -219,46 +198,6 @@
       "textSample": "FUENTES RELACIONADAS 5 MAPEADAS / VALIDADAS 4 REQUIEREN REVISIÓN 1 CON ARCHIVO CONFIRMADO 0 🧠 Tarifas y conocimiento Uso controlado: cada fuente se revisa por país, moneda, ramo y producto. Registrar un documento no habilita automáticamente Cotizador ni Comparativo. Requiere validación (1) Validado (4) GT · GTQ · Vehículos · Seguro de vehículo · — · — · — · — · — · — · — Pendiente 1 doc(s) GT · GTQ · Automóviles · Vehículos · — · — · — · — · — · — · — Pendiente 3 doc(s) GT · GTQ · Automóviles · Motocicleta · — · — · — · — · — · — · — Pendiente 1 doc(s) 🧠 Fuentes relacionadas y disponibles Cotizador VA 2026 V1.4.xlsx Mapeado · GT · GTQ · Vehículos · Seguro de vehículo Requiere validación Cotizador VA 2026 V1.4.xlsx Mapeado · GT · GTQ · Automóviles · Vehículos Validado Cotización Columna CRV 2026-09-28 Mapeado · GT · GTQ · Automóviles · Vehículos Validado Cotización Columna Motocicleta 2026-09-28 Mapeado · GT · GTQ · Automóviles · Motocicleta Validado Póliza Columna VA-41977 Mapeado · GT · GTQ · Automóviles · Vehículos Validado Conocimiento vigente y observado Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo. Automóviles · Vehículos / Motocicleta GT · GTQ · Fuentes 2026; revisar al recibir versión posterior Con evidencia Gastos de emisión 0% en cotizador/pólizas y muestras revisadas de Vehículos Fraccionamiento de aseguradora 0% en póliza muestra de 10 pagos; cotizaciones 2/3/4/5/6/8/10/12 reconstruyen el mismo total IVA 12% sobre la prima neta en las muestras revisadas Pronto pago No es universal: se observó 5% de descuento en una cotización de motocicleta y 0% en otra muestra Visa Cuotas Hasta 12 pagos según cotización; no tratarlo automáticamente como recargo de la aseguradora Fuentes: Cotizador VA 2026 V1.4.xlsx · Cotización Columna CRV 2026-09-28 · Cotización Columna Motocicleta 2026-09-28 · Póliza Columna VA-41977 Las condiciones de pronto pago varían por perfil/producto. No hardcodear 5% global. Cobertura de conocimiento por producto La ficha no se limita a Automóviles. Los demás ramos se incorporan por aseguradora y producto conforme aportemos fuentes; lo no documentado permanece pendiente y no genera cálculos automáticos. Automóviles · Con evidencia actual Vida · Pendiente de "
     }
   },
-  "r13RenewalDataBlocker": {
-    "blocking": true,
-    "code": "REAL_RENEWABILITY_SOURCE_CONFLICT_OR_APPLY_REQUIRED",
-    "byState": {
-      "YES": 0,
-      "NO": 0,
-      "UNKNOWN": 1419
-    },
-    "sourceDryRunCount": 4,
-    "sourceDryRunReady": false,
-    "sourceMissing": [
-      "VA-43685"
-    ],
-    "sourceDuplicates": [],
-    "sourceHistoricalSameNumber": [
-      {
-        "numero": "68542",
-        "ids": [
-          "pol_a02fe1584efcde81a752782d0e53"
-        ],
-        "states": [
-          "Renovada"
-        ]
-      },
-      {
-        "numero": "VA-43685",
-        "ids": [
-          "pol_04d0eede3860a982971790b5ea4d",
-          "pol_652260b8dcd7206c34b70a463547",
-          "pol_965de501d871c56f3964a24b7724"
-        ],
-        "states": [
-          "Renovada",
-          "Renovada",
-          "Vigente"
-        ]
-      }
-    ],
-    "writeExecuted": false,
-    "authorizationRequired": true
-  },
-  "nextAction": "B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION"
+  "r13RenewalDataBlocker": null,
+  "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
 }
