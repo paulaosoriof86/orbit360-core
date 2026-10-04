@@ -18,26 +18,48 @@ The next runtime must have a deterministic visual map and a no-repeat rule.
 
 ## 2. Hero candidate pool
 
-### Preferred candidate A — insurance consultation / team
+### Preferred candidate A — wide professional consultation
+Path:
+`03_REALES/reunión_profesional_en_oficina_luminosa.png`
+
+- status: `candidate_real`
+- SHA-256: `2548b0edf42d4fcd2662c751b05e74f3b80bdd23efdb81c54d80665146b3c3b5`
+- dimensions: 1672×941
+- native ratio: ~16:9
+- role: human consultation / decision support
+- suitability: strongest current candidate for the opening because it is naturally wide and does not require forcing a 4:3 source into a landscape hero.
+- placement status: CANDIDATE, not automatically approved.
+
+### Candidate B — digital proposal review
+Path:
+`03_REALES/reunión_profesional_con_presentación_digital.png`
+
+- status: `candidate_real`
+- SHA-256: `0a4dea893a12af5bc3d44fb63ffbb8c36e723467de0956bcaf61693fb1227488`
+- dimensions: 1672×941
+- native ratio: ~16:9
+- role: comparison / proposal review
+- placement status: CANDIDATE.
+
+### Candidate C — insurance consultation / team
 Path:
 `03_REALES/consulta_de_seguros_en_equipo.png`
 
 - status: `candidate_real`
 - SHA-256: `2e319b2c2b41b8d843fe31135a37099715e3563098c12056d2b027f59635be32`
 - dimensions: 1448×1086
-- role: contextual human insurance consultation
-- suitability: strong for CotComp opening because it communicates human guidance + product review
-- placement status: CANDIDATE, not automatically approved
-
-### Candidate B — modern insurance consultation
-Path:
-`03_REALES/consulta_de_seguros_en_oficina_moderna.png`
-
-- status: `candidate_real`
-- SHA-256: `f3b0a056bd173632908006d44d8f129cd9efa484acf41d7e5cd8bf0042be23e0`
-- dimensions: 1448×1086
+- native ratio: 4:3
 - role: consultation / assisted journey
-- placement status: CANDIDATE
+- caveat: useful elsewhere, but not preferred for the hero because a landscape crop would discard more of the original composition.
+
+### Hero geometry rule
+The current library contains many 1672×941 assets. For the next CotComp opening, the visual audit therefore favors a native **16:9 landscape figure** rather than the rejected 4:3 S4.96B box.
+
+No hero asset will be stretched to fit. Use:
+- native/controlled 16:9 at desktop;
+- `object-fit:cover`;
+- asset-specific crop;
+- fixed visual height independent from workspace/intake height.
 
 ### Do not use as hero source
 `02_WEB/cotiza_con_criterio_alianzas_y_soluciones.png`
