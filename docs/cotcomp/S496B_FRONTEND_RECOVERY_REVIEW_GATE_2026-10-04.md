@@ -8,7 +8,7 @@
 **Deployed branch head:** `8ebe05207593347c14bad59042a6056f6138c5d0`  
 **Frontend source change:** `7a8bc994a851128d3b392f309a7c5ff7299a5d0c`  
 **Workflow:** `37229051575` — SUCCESS  
-**Estado:** READY FOR OWNER REVIEW / NOT OWNER PASS
+**Estado:** HOLD / INVALID VISUAL PARENT / NOT OWNER REVIEW CANDIDATE
 
 ## Recovery decisions
 
@@ -93,3 +93,30 @@ For the current build, the deployed artifact physically contains:
 - final-stage lower action hierarchy and explicit comparison actions.
 
 TinyFish produced a conflicting semantic description of the hero after deployment. That conflict is recorded as a QA-tool limitation and is not treated as visual evidence overriding the exact runtime artifact or Owner review.
+
+
+## Owner rejection and forensic stop — 2026-10-04
+
+Owner rejected S4.96B as a visual candidate because:
+- hero typography is not the approved typography;
+- hero image/composition is not the approved hero treatment;
+- multi-select/family-card spacing is degraded;
+- visual hierarchy and approved frontend language remain altered;
+- repeated visual drift has created unacceptable review cost.
+
+### Governance finding
+
+S4.95 was used as a visual parent for S4.96B, but the rector documentation states CotComp was still OWNER REVIEW PENDING and that PASS FOR OWNER REVIEW / WORKBENCH candidates cannot become canonical parents automatically.
+
+Therefore S4.96B has INVALID VISUAL PARENTAGE for restoration purposes.
+
+### Mandatory stop
+
+- No further UI implementation on S4.96B.
+- S4.96B cannot become parent for another visual iteration.
+- Preserve only separately verified functional logic as portable delta.
+- LAB URL remains evidence only.
+- Production untouched.
+- Real CotComp↔Gravicentra transport remains unauthorized.
+
+Next required activity: forensic CotComp visual baseline recovery audit before any new visual code.
