@@ -75,9 +75,9 @@ test('S4.92 preserves searchable Marca -> dependent Línea/modelo -> separate A�
   assert.match(h,/No encuentro mi marca/);
   assert.match(h,/No encuentro mi línea \/ modelo/);
   assert.match(h,/cotcompVehicleCatalogS479/);
-  assert.match(h,/op:'brands'/);
-  assert.match(h,/op:'models'/);
-  assert.match(h,/op:'years'/);
+  assert.match(h,/getCatalog\('brands'/);
+  assert.match(h,/getCatalog\('models'/);
+  assert.match(h,/getCatalog\('years'/);
 });
 
 test('S4.92 comparison and recommendation are visibly present but truthfully illustrative',()=>{
@@ -111,7 +111,7 @@ test('S4.92 contains no local rating engine, persistence or direct provider runt
 test('S4.92 HTML is structurally renderable and responsive',()=>{
   const h=S.html();
   assert.ok(h.indexOf('</style>')<h.indexOf('<body>'));
-  assert.ok(h.indexOf('<body>')<h.indexOf('Cotiza y compara'));
+  assert.ok(h.indexOf('<body>')<h.indexOf('<section class="hero">'));
   assert.equal((h.match(/<style>/g)||[]).length,1);
   assert.equal((h.match(/<\/style>/g)||[]).length,1);
   assert.match(h,/@media\(max-width:1180px\)/);
