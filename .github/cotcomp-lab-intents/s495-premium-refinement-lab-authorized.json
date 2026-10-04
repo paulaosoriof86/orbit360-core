@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ays-cotcomp-s495-premium-refinement-lab-intent-v1.0",
   "authorization": "S495_DEPLOY_PREMIUM_REFINEMENT",
-  "authorizedSourceParent": "03913f7ccee4ea92b5825d0d0d2a7e71e8520b0b",
+  "authorizedSourceParent": "4cff9ff870052bef271262981293d356a47550d6",
   "projectId": "ays-orbit-360-lab",
   "functionName": "cotcompPremiumVisualPreviewS495",
   "parentFunction": "cotcompPremiumVisualPreviewS494",
@@ -18,5 +18,6 @@
   "providerDeploymentAuthorized": false,
   "cotcompRealTransportAuthorized": false,
   "production": false,
-  "scope": "LAB visual and interaction refinement only; no real provider transport, no production, no real data writes"
+  "scope": "LAB visual and interaction refinement only; no real provider transport, no production, no real data writes",
+  "retryReason": "Final S4.95 LAB redeploy after removing two unused working assets; no change to approved refinement composition or gates"
 }
