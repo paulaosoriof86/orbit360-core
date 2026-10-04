@@ -166,17 +166,21 @@ async function renewalDistributionReadback(){
    grouped[k]=grouped[k]||[];
    grouped[k].push(p);
  });
- const sourceMatches=[],missing=[],duplicates=[];
+ const sourceMatches=[],missing=[],duplicates=[],historicalSameNumber=[];
  renewalSourceAuthority.activePolicyNumbers.forEach(numero=>{
    const k=policyNumberKey(numero),matches=grouped[k]||[];
-   if(matches.length===0)missing.push(numero);
-   if(matches.length>1)duplicates.push({numero,ids:matches.map(x=>x.id)});
-   matches.forEach(p=>sourceMatches.push({
+   const activeMatches=matches.filter(active).sort((a,b)=>String(b.vigenciaFin||'').localeCompare(String(a.vigenciaFin||'')));
+   const historicalMatches=matches.filter(p=>!active(p));
+   if(historicalMatches.length)historicalSameNumber.push({numero,ids:historicalMatches.map(x=>x.id),states:historicalMatches.map(x=>x.estado||'')});
+   if(activeMatches.length===0)missing.push(numero);
+   if(activeMatches.length>1)duplicates.push({numero,ids:activeMatches.map(x=>x.id),states:activeMatches.map(x=>x.estado||'')});
+   const p=activeMatches[0]||null;
+   if(p)sourceMatches.push({
      id:p.id,numero:p.numero||'',estado:p.estado||'',pais:p.pais||'',vigenciaFin:p.vigenciaFin||'',
      aseguradoraId:p.aseguradoraId||'',renewabilityState:state(p),
      currentRenovable:Object.prototype.hasOwnProperty.call(p,'renovable')?p.renovable:null,
      proposedPatch:{renovable:true,renewabilityProvenance:'source_report',renewabilitySourceSha256:renewalSourceAuthority.sourceSha256}
-   }));
+   });
  });
  proof.realRenewalDistribution={policyCount:rows.length,byState,byCountry,buckets,eligibleCount:eligible.length,eligibleIds:eligible.map(x=>x.id),sample:eligible.slice(0,30),readOnly:true};
  proof.r13RenewalSourceDryRun={
@@ -184,6 +188,7 @@ async function renewalDistributionReadback(){
    matches:sourceMatches,
    missing,
    duplicates,
+   historicalSameNumber,
    proposedWriteCount:sourceMatches.length,
    conflictCount:missing.length+duplicates.length,
    ready:sourceMatches.length===renewalSourceAuthority.activePolicyNumbers.length&&missing.length===0&&duplicates.length===0,
