@@ -2803,7 +2803,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2823,7 +2823,11 @@
         "2026-10-03 Paula R13: Calidad opens and switches country quickly; Information Health visible.",
         "2026-10-03 Paula R13: Pólizas list visual identity differs from expected/approved.",
         "2026-10-03 Paula R13: insurer document upload entry point visible but Drive end-to-end upload/readback/persistence still unproven.",
-        "2026-10-03 Paula R13 capture: Colombia-selected Cancelaciones includes rows whose client identity label is GT; country authority must be adjudicated."
+        "2026-10-03 Paula R13 capture: Colombia-selected Cancelaciones includes rows whose client identity label is GT; country authority must be adjudicated.",
+        "2026-10-04 R17: assignable advisor roster visually passes for Carlos after correcting user identity.",
+        "2026-10-04 R17: Configuración→Catálogos opens quickly.",
+        "2026-10-04 R17: sampled active receipt calendars no longer show prior duplicate shadow pairs.",
+        "2026-10-04 R17: failures remain in insurer country/cardinality, quality actionability/responsive semantics, renewal review flow/count consistency, insurer source drill-down, and non-vehicle risk guard."
       ],
       "requiredProof": [
         "Cancelaciones route remains visible to authorized roles.",
@@ -2836,7 +2840,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2887,7 +2891,7 @@
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
       "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
-      "humanVisualStatus": "PENDING",
+      "humanVisualStatus": "REJECTED_R17",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
@@ -6627,23 +6631,27 @@
         "orbit360-platform/core/policy-receipts-engine.js",
         "orbit360-platform/modules/calidad.js"
       ],
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Identify authoritative source/lineage and reconcile or explicitly quarantine mismatch; no inferred rewrite; sum of active schedule must reconcile to contractual total within approved tolerance.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
       "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
       "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
       "r12SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_SOURCE_FIX_20261003.json",
       "r12SourceFixBlobSha": "663b9846af14ce18097f08f2fc85296ac00f181f",
-      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "humanVisualStatus": "REJECTED_R17",
       "machinePassReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_20261003.json",
       "machinePassReceiptBlobSha": "ddced2eb79c916c80fd9acd80eeca6b5c9196f09",
       "visualStateReconciliationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_VISUAL_STATE_RECONCILIATION_20261003.json",
       "visualStateReconciliationBlobSha": "cda0b3cfcd3c89e8312ba13636075ee1f84e2e48",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanEvidence": [
+        "2026-10-04 Paula R17: mismatch list repeats a generic reason for every row and exposes internal source token; rounded zero/tolerance semantics are confusing."
+      ],
+      "requiredFix": "Emit discriminating human-readable cause based on calendar authority/review/shadow/source facts; internal tokens never rendered; monetary delta/tolerance displayed consistently."
     },
     {
       "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
@@ -7463,8 +7471,8 @@
         "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
       ],
       "rootCause": "financialHealthHtml renders informational rows only and does not bind policy/receipt lineage/action surface.",
-      "requiredFix": "Provide policy/receipt drill-down with contractual source, active calendar rows, delta/tolerance, exact validation reason and safe actions; no inferred rewrite. Rows within tolerance must not be false-positive review items.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "requiredFix": "Responsive usable on laptop/tablet; correction review modal with precise cause/source/delta; receipts deep-link to Recibos tab; hide internal lineage/status tokens; no zero-rounded false-positive semantics.",
+      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Provide policy/receipt drill-down with contractual source, active calendar rows, delta/tolerance, exact validation reason and safe actions; no inferred rewrite. Rows within tolerance must not be false-positive review items.",
@@ -7473,9 +7481,13 @@
       "receiptBlobSha": "afe6193dc1ff4151e94777a276296f9df0ed17a3",
       "noLive": true,
       "noReimport": true,
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "REJECTED_R17",
+      "humanEvidence": [
+        "2026-10-04 Paula R17: Calidad no es responsive; Revisar y corregir y Ver recibos terminan en la póliza sin contexto de corrección/recibos; motivos repetidos y términos técnicos visibles."
+      ]
     },
     {
       "id": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
@@ -7490,8 +7502,8 @@
         "INSURER_KNOWLEDGE_SOURCE_BACKLOG"
       ],
       "rootCause": "Most policies still lack authoritative renovable YES/NO and some renewal financial fields remain source-incomplete; current product correctly refuses to infer them.",
-      "requiredFix": "Resolve renewability/financial completeness from source-backed policy/insurer evidence and visible validation workflow; do not auto-promote UNKNOWN.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "requiredFix": "Open exact policy editor focused on tri-state Renovabilidad with source-safe options; keep UNKNOWN fail-closed; derive KPI and columns from the same immutable bucket snapshot and prove equality.",
+      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Resolve renewability/financial completeness from source-backed policy/insurer evidence and visible validation workflow; do not auto-promote UNKNOWN.",
@@ -7500,9 +7512,13 @@
       "receiptBlobSha": "afe6193dc1ff4151e94777a276296f9df0ed17a3",
       "noLive": true,
       "noReimport": true,
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "REJECTED_R17",
+      "humanEvidence": [
+        "2026-10-04 Paula R17: Revisar y clasificar only opens policy; user is left to find the field manually; KPI bucket counts and visible column counts diverged in same review."
+      ]
     },
     {
       "id": "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
@@ -7517,8 +7533,8 @@
         "orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js"
       ],
       "rootCause": "Reusable Library/knowledge references and insurer Drive-upload registry have distinct semantics that UI does not explain; docs-aseguradora metadata taxonomy is not rich enough.",
-      "requiredFix": "One source registry with storage location/provenance and multi-tag business classification; clearly distinguish referenced Library source from insurer Drive copy; no duplicate source authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "requiredFix": "Registry rows must be inspectable/expandable with real stored metadata/provenance/dimensions/status and storage distinction; no duplicate authority.",
+      "status": "VISUAL_REJECTED_R17_REMEDIATION_REQUIRED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "One source registry with storage location/provenance and multi-tag business classification; clearly distinguish referenced Library source from insurer Drive copy; no duplicate source authority.",
@@ -7527,9 +7543,13 @@
       "receiptBlobSha": "afe6193dc1ff4151e94777a276296f9df0ed17a3",
       "noLive": true,
       "noReimport": true,
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+      "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+      "humanVisualStatus": "REJECTED_R17",
+      "humanEvidence": [
+        "2026-10-04 Paula R17: source Registry rows show status but cannot be selected/expanded to inspect details."
+      ]
     },
     {
       "id": "B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE",
@@ -7751,6 +7771,46 @@
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview must distinguish validated/review/physical-Drive counts, separate Library from physical Drive semantics, filter empty dimensions, and preserve Quote Authority/no-auto-enable rules.",
       "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003-R17-01-LEAD-INSURER-COUNTRY-MULTISELECT",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261004_R17",
+      "surface": "Ops/Leads/Negocio",
+      "finding": "Aseguradora de interés uses one unfiltered tenant-wide select; GT business can show/select CO insurer and cannot represent several insurers of interest.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js"
+      ],
+      "classification": "PRODUCT_COUNTRY_SCOPE_AND_CARDINALITY_DEFECT",
+      "status": "OPEN_R17_SOURCE_FIX_AUTHORIZED",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Filter insurers by business country; allow multiple insurers of interest; preserve backward-compatible primary insurer id; country change cannot retain out-of-country selections.",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "mayDisappearWithoutDisposition": false,
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B4-003-R17-02-NONVEHICLE-RISK-SECTION-GUARD",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261004_R17",
+      "surface": "Cliente360/Póliza",
+      "finding": "Non-vehicle policy DAÑOS/Casa Habitación renders vehicle-risk section and missing-vehicle warning.",
+      "owner": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "classification": "PRODUCT_DOMAIN_SECTION_GUARD_DEFECT",
+      "status": "OPEN_R17_SOURCE_FIX_AUTHORIZED",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Vehicle section/warnings/actions render only for vehicle/auto policies; non-vehicle policies retain generic insured-risk data without vehicle requirement.",
+      "nextAction": "B4_003_R17_SOURCE_FIX",
+      "mayDisappearWithoutDisposition": false,
+      "noLive": true,
+      "noReimport": true
     }
   ],
   "phaseBBacklog": [
