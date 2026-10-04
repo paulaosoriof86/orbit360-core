@@ -1,0 +1,17 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R17_SCOPE_EXTENSION_V1",
+  "recordedAt": "2026-10-04T23:48:00Z",
+  "status": "R17_SCOPE_EXTENDED_SOURCE_ONLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "addedProductOwner": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+  "cause": "Post-render bridge independently recomputes and rewrites KPI counts, while visible renewal columns come from the base module buckets; this reproduces the human-observed 1/3 vs 2/2 inconsistency.",
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false
+  },
+  "executionLockBlobSha": "e222372c29534ab5dcb21280e1a2cc974c0c7ea1",
+  "nextAction": "B4_003_R17_SOURCE_FIX"
+}
