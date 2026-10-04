@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "ays-cotcomp-s490-dashboard-workspace-lab-intent-v1.0",
+  "authorization": "S490_DEPLOY_DASHBOARD_WORKSPACE_RECOVERY",
+  "authorizedSourceParent": "889061caf32ac6255a74f853904d931bc2e6d04d",
+  "projectId": "ays-orbit-360-lab",
+  "functionName": "cotcompDashboardWorkspacePreviewS490",
+  "reference1Sha": "b854a5a8c2bc6fd9f50339a31b98914bfa25a3dcdbb9c95a76905442f1cf36b0",
+  "reference2Sha": "bad94a30d5c2f209c3efa9cedfccfa5e57c52deb270d5150cfac5e7f9cbcb735",
+  "dashboardWorkspace": true,
+  "fixtureOnly": true,
+  "providerDeploymentAuthorized": false,
+  "cotcompRealTransportAuthorized": false,
+  "production": false
+}
