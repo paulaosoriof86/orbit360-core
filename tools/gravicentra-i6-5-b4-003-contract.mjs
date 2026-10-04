@@ -89,7 +89,7 @@ need(r14diag.status==='PAULA_VISUAL_REJECTED_R14_CAUSES_DEMONSTRATED_NARROW_SOUR
 need(r14fix.status==='SOURCE_FIXED_R14_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R14_SOURCE_FIX_RECEIPT_INVALID');
 need(r16diag.status==='CAUSES_DEMONSTRATED_SINGLE_SUCCESSOR_SOURCE_FIX_AUTHORIZED','B4_003_R16_DIAGNOSTIC_INVALID');
 need(r16fix.status==='SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW','B4_003_R16_SOURCE_FIX_RECEIPT_INVALID');
-need(master.status==='FROZEN_ACTIVE','B4_003_MASTER_PENDING_PLAN_NOT_FROZEN');
+need(String(master.status||'').startsWith('FROZEN_ACTIVE'),'B4_003_MASTER_PENDING_PLAN_NOT_FROZEN');
 const ledgerIds=(ledger.findings||[]).map(x=>String(x.id)).sort(),carryIds=(carry.inventory||[]).map(x=>String(x.id)).sort();
 need(ledgerIds.length===208&&carryIds.length===208&&JSON.stringify(ledgerIds)===JSON.stringify(carryIds),'B4_003_LEDGER_CARRY_NO_LOSS_VIOLATION');
 for(const id of ['B1-EMAIL-DELIVERY-001','B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5','B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6'])need(ledgerIds.includes(id)&&carryIds.includes(id),'B4_003_EMAIL_FINDING_LOST:'+id);

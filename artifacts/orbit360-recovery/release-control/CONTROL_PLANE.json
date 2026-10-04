@@ -4860,7 +4860,7 @@
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
       "executionLockBlobSha": "d0b264f4c093f6496c644f220ba3e8abc4210621",
-      "compositionLockBlobSha": "a754246cdfff01d1397a8bea93944683080931f2",
+      "compositionLockBlobSha": "580ec38d8468ae5991ee0a6930cfc723d4ac4dbe",
       "findingLedgerBlobSha": "e877504ab1395f5f840d87e1d208a0b10c9eb687",
       "activeFindingId": "B4-003",
       "productSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -5705,6 +5705,13 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_CONTINUITY_PARENT_STATUS_ALIGNMENT_20261004.json",
         "blobSha": "a48f4bedf8bb12bde64018abf6d7f50065e22790",
         "productSourceChanged": false
+      },
+      "r16MasterPlanStatusContractAlignment": {
+        "status": "QA_CONTRACT_MASTER_PLAN_STATUS_ALIGNED_PENDING_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_MASTER_PLAN_STATUS_CONTRACT_ALIGNMENT_20261004.json",
+        "blobSha": "887698030f0a1def0cb2f05f6408745da90d3b37",
+        "contractBlobSha": "6e6a256e6509412a1bd8a454473ac076a27a1f8a",
+        "productSourceChanged": false
       }
     }
   },
@@ -6027,7 +6034,7 @@
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "d0b264f4c093f6496c644f220ba3e8abc4210621",
-    "compositionLockBlobSha": "a754246cdfff01d1397a8bea93944683080931f2",
+    "compositionLockBlobSha": "580ec38d8468ae5991ee0a6930cfc723d4ac4dbe",
     "findingLedgerBlobSha": "2b0df5e619f499d0d36048d8551659bcf5887869",
     "noLive": true,
     "noReimport": true,
@@ -6909,6 +6916,13 @@
       "blobSha": "a48f4bedf8bb12bde64018abf6d7f50065e22790",
       "failedRunId": 37206726477,
       "failedJobId": 111449340469,
+      "productSourceChanged": false
+    },
+    "r16MasterPlanStatusContractAlignment": {
+      "status": "QA_CONTRACT_MASTER_PLAN_STATUS_ALIGNED_PENDING_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_MASTER_PLAN_STATUS_CONTRACT_ALIGNMENT_20261004.json",
+      "blobSha": "887698030f0a1def0cb2f05f6408745da90d3b37",
+      "contractBlobSha": "6e6a256e6509412a1bd8a454473ac076a27a1f8a",
       "productSourceChanged": false
     }
   },
