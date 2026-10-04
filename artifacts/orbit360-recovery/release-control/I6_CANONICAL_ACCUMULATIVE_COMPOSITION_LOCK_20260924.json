@@ -200,10 +200,10 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "fc16a9b53796a4c1407e5e3d821b3cd44c630893",
+    "orbit360-platform/index.html": "9e0f7744e1952973da998d06468959c5a11e354d",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "1e6b93422833f450d02616807479159ddf8a099b",
-    "orbit360-platform/modules/calidad.js": "e0b3e9f2f4b71da151af076cb934b104ae51ee6a",
+    "orbit360-platform/modules/calidad.js": "b30767e58cd3dc60c5af5f165238c16f472632d3",
     "orbit360-platform/modules/cancelaciones.js": "63f6dd1bb3ffad24cf8452404dfc540f1b92e2b7",
     "orbit360-platform/modules/cliente360.js": "129fae4063fbf3d603d3575fc71369a764a27a7a",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
@@ -2766,5 +2766,26 @@
       "tools/gravicentra-i6-5-b4-003-contract.mjs": "48046852710b0ca759a409dc9b9c049494817635",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "adb040743d75b8433bf19f65288fa3f3a745e7d3"
     }
+  },
+  "b4003SourceFixR14Performance": {
+    "status": "SOURCE_FIXED_R14_PERFORMANCE_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_QUALITY_PERFORMANCE_ROOTFIX_20261004.json",
+    "receiptBlobSha": "099219db3a28bdb5bd32afd475b356c842a62781",
+    "parentHead": "561a29ca0b52091e38546149d61c2260c84ed4f3",
+    "sourceHead": "aef96336742f5372ce8e8b5208a2c98d09d1fd10",
+    "productBlobs": {
+      "orbit360-platform/modules/calidad.js": "b30767e58cd3dc60c5af5f165238c16f472632d3",
+      "orbit360-platform/index.html": "9e0f7744e1952973da998d06468959c5a11e354d"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "8a20cd46add3dd02e9c7a61ae6e732ffff59e10f"
+    },
+    "continuityRegisterBlobSha": "efcdd67d09196aa849525050a85aa5122a6cbd3a",
+    "executionLockBlobSha": "0f48f3f6159da0820b50f78e008a02a3c1a98dd0",
+    "productSourceChanged": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   }
 }
