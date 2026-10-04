@@ -30,12 +30,27 @@
     "Assert server-confirmed-store authority marker.",
     "Assert synthetic client exists in authoritative store.",
     "Assert UI full-universe count equals the canonical GT client universe after merged-client exclusion.",
-    "Use Cliente360 search to prove the synthetic client is reachable without assuming page-1 placement.",
+    "Assert filteredRows equals the authoritative universe and renderedRows equals the bounded first page (min(pageSize, universe)).",
+    "Do not require a specific record to occur in page-1 text and do not add a separate search requirement to the authority finding.",
     "Do not change product source, page size, data, scope rules, reimport, or LIVE."
   ],
   "productSourceChanged": false,
   "dataMutation": false,
   "reimport": false,
   "livePromotion": false,
-  "nextAction": "B4_003_EXACT_PREVIEW_RETRY"
+  "nextAction": "B4_003_EXACT_PREVIEW_RETRY",
+  "validationRunId": 37187434809,
+  "validationJobId": 111392272145,
+  "validationObservation": {
+    "authority": "server-confirmed-store",
+    "storeHasSynthetic": true,
+    "authoritativeGtCount": 417,
+    "uiUniverseCount": 417,
+    "pageSize": 40,
+    "renderedRows": 40,
+    "filteredRows": 417,
+    "totalRows": 417,
+    "syntheticSearchVisible": false
+  },
+  "adjudication": "CLIENT360_AUTHORITY_AND_BOUNDED_LIST_ARE_PROVEN_CORRECT; SYNTHETIC_SEARCH_SUBCHECK_WAS EXTRA_QA_AND_NOT_PART_OF_THE_PREVIOUSLY_PROVEN_B3_008_AUTHORITY_CONTRACT"
 }
