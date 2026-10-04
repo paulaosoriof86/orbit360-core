@@ -118,7 +118,9 @@ const state={
   brands:[],
   models:[],
   brandId:'',
-  visualTimer:null
+  visualTimer:null,
+  formRepairing:false,
+  visualRepairing:false
 };
 const q=(s,r=document)=>r.querySelector(s);
 const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
@@ -368,7 +370,7 @@ function renderStatus(){
 function renderIntake(){
   const row=q('#formRow');if(!row)return;
   row.className='form-row s496-form';
-  row.innerHTML=intakeHtml()+
+  row.innerHTML='<span data-s496-intake-root hidden></span>'+intakeHtml()+
     '<div class="s496-actions"><button type="button" class="s496-back">← Volver</button><button type="button" class="s496-next">Revisar opciones →</button></div>';
   const title=q('#formTitle');if(title)title.textContent='2. '+(INTAKE[state.route]?.title||INTAKE.other.title);
   bindFields();renderStatus();
@@ -484,11 +486,39 @@ function syncVisual(){
     }
   },0);
 }
+function installOwnershipGuards(){
+  const row=q('#formRow');
+  if(row&&!row.dataset.s496Observer){
+    row.dataset.s496Observer='true';
+    const observer=new MutationObserver(()=>{
+      if(state.stage!==1||state.formRepairing)return;
+      if(q('[data-s496-intake-root]',row))return;
+      state.formRepairing=true;
+      queueMicrotask(()=>{
+        try{renderIntake();syncVisual();}finally{state.formRepairing=false}
+      });
+    });
+    observer.observe(row,{childList:true});
+  }
+  const pv=q('#productVisual');
+  if(pv&&!pv.dataset.s496Observer){
+    pv.dataset.s496Observer='true';
+    const observer=new MutationObserver(()=>{
+      if(state.visualRepairing)return;
+      state.visualRepairing=true;
+      queueMicrotask(()=>{
+        try{syncVisual();}finally{state.visualRepairing=false}
+      });
+    });
+    observer.observe(pv,{childList:true});
+  }
+}
 function render(){
   state.route=routeId();
   renderStage();
 }
 document.body.dataset.s496='true';
+installOwnershipGuards();
 
 document.addEventListener('click',e=>{
   const back=e.target.closest('.s496-back');
@@ -528,6 +558,8 @@ qa('.country button').forEach(b=>{if(b.classList.contains('active'))state.countr
 state.route=routeId();
 syncProgress();
 setTimeout(render,30);
+setTimeout(()=>{installOwnershipGuards();if(state.stage===1&&!q('[data-s496-intake-root]',q('#formRow')))renderIntake();syncVisual();},180);
+setTimeout(()=>{if(state.stage===1&&!q('[data-s496-intake-root]',q('#formRow')))renderIntake();syncVisual();},650);
 })();
 `;
 
