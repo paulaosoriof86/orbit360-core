@@ -6232,6 +6232,14 @@
       "preservesPlan": true,
       "preservesBoundaries": true,
       "b4004Held": true
+    },
+    "r13HiddenFileInputQaRootFix": {
+      "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_HIDDEN_FILE_INPUT_ROOTFIX_20261004.json",
+      "blobSha": "0a83390c65c43269cac4ff8661469890ce48a2aa",
+      "failedRunId": 37165820718,
+      "proofBlobSha": "af5e082c37f583f8dd3cd075ef65c0572eff065b",
+      "productSourceChanged": false
     }
   },
   "b4VisualAcceptanceControl": {
