@@ -2803,7 +2803,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2836,7 +2836,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -2890,10 +2890,10 @@
       "humanVisualStatus": "REJECTED_R13",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
-      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_20261003.json",
-      "machineProofReceiptBlobSha": "ddced2eb79c916c80fd9acd80eeca6b5c9196f09",
-      "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B2_QA_RESIDUE_ADJUDICATION_20261003.json",
-      "qaResidueAdjudicationReceiptBlobSha": "153d0d425897e0e97f2b4b162bacfb58cc2fa0be",
+      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
+      "machineProofReceiptBlobSha": "b164548aadac1783ebc04b9f2777cfbdb19439da",
+      "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_B2_QA_RESIDUE_ADJUDICATION_20261004.json",
+      "qaResidueAdjudicationReceiptBlobSha": "e42eccd1d1d41e1a29626ef6234c9baf632e7194",
       "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R5_SOURCE_FIX_20261003.json",
       "visualRejectionReceiptBlobSha": "cc2b950989344acfdade4a38dcc537c088b1819a",
       "cumulativeFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
@@ -2992,7 +2992,7 @@
       "status": "NOT_STARTED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "WAIT_B4_003_PAULA_VISUAL"
+      "nextAction": "WAIT_B4_003_RENEWAL_DATA_RESOLUTION"
     },
     {
       "id": "B4-005",
@@ -6854,12 +6854,12 @@
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
         "orbit360-platform/modules/renewals-v1201-issued-filter.js"
       ],
-      "status": "READONLY_PROOF_ARMED_PENDING_EXACT_PREVIEW",
+      "status": "MACHINE_PROOF_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Real source-backed renewal pipeline repopulates by canonical eligibility/country/horizon and is proven on exact Preview.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION",
       "visualRejectionR13ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R13_20261003.json",
       "visualRejectionR13ReceiptBlobSha": "0d5ede1167f4986bdab0b1393e371725d341709f",
       "classification": "RUNTIME_DATA_SEMANTIC_DISTRIBUTION_PROOF_REQUIRED",

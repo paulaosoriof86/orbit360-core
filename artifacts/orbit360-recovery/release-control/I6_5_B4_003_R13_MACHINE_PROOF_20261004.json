@@ -1,0 +1,264 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_MACHINE_PROOF_V2",
+  "recordedAt": "2026-10-04T02:02:25.243Z",
+  "status": "MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER",
+  "findingId": "B4-003",
+  "sourceSha": "1354c3db5d490a9a91c4ee6ff27ae2049aae6b2e",
+  "buildId": "gi-i65-b4-1354c3db5d49-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37169604232-axy5q3g2.web.app",
+  "channelId": "gi-i65-b4-37169604232",
+  "runId": 37169604232,
+  "artifactId": 11290158810,
+  "artifactDigest": "94ec4cfa7ca76c53476ebd5e7952a48fe34ff01aebbbfc1e73f38efc8f75babf",
+  "hostedPayloadDigest": "6d6658757be5028fb0eda0e6b1a944d0996cfbef3a0ffaa94b7761b4fb09ce3a",
+  "backendSourceDigest": "4c9981ee4ae5c13210d9c1c722195ad571880b48ae169776544a2e649add3f13",
+  "bundleDigest": "bfcd6e4127424427226c4a7ef830c78346c32f67188277d4536c38b42585018c",
+  "exactHostingReadback": true,
+  "assertions": {
+    "qaResidueReadOnlyAdjudicated": true,
+    "cancellationProjectionConsistent": true,
+    "realRenewalDistributionReadOnly": true,
+    "realRenewalSourceDryRunReady": false,
+    "quoteAuthorityContractHosted": true,
+    "manualFinancialInferenceRemoved": true,
+    "authenticatedHydration": true,
+    "insurerKnowledgeVisible": true,
+    "multiProductKnowledgeRoadmapVisible": true,
+    "insurerKnowledgeCountersCanonical": true,
+    "insurerImportScopeBound": true,
+    "renewabilityTriStateFailClosed": true,
+    "cancelSelectedCountryScope": true,
+    "cancelCountrySwitchUnder2500ms": true,
+    "cancelExplicitCanonicalTargets": true,
+    "cancelCrossCountryIdentityExplicit": true,
+    "renewalSelectedCountryScope": true,
+    "cancelKpiDetails": true,
+    "renewalCompactActions": true,
+    "cancelVisibleRowDetail": true,
+    "cancelDeepLinkIdentity": true,
+    "cancelClientOpensPolicies": true,
+    "cancelRowNoMisleadingSingleTarget": true,
+    "qualitySelectedCountryScope": true,
+    "qualityRenderPathUnder2500ms": true,
+    "informationHealthFinancialMismatchVisible": true,
+    "informationHealthNoInference": true,
+    "policyEditorPreservesSourceTaxonomy": true,
+    "policyEditorExposesRenewabilityTriState": true,
+    "client360BidirectionalTabs": true,
+    "policyRouteUnder2500ms": true,
+    "policySearchUnder2500ms": true,
+    "policyDetailUnder2500ms": true,
+    "policyRefreshCoherentHydration": true,
+    "noDelayedRenewalRenderMutation": true,
+    "realRenewalPipelineRepopulated": false,
+    "realRenewalPipelineMatchesCanonicalEligibility": false,
+    "renewalCampaignDurableReadback": true,
+    "cancelationDurableReadback": true,
+    "recoveryLinkagePreserved": true,
+    "recoveryIdempotentRetry": true,
+    "insurerDriveE2E": true,
+    "insurerDriveReloadPersistence": true,
+    "insurerDriveNoAutoEnablement": true,
+    "insurerDriveSyntheticRollback": true,
+    "insurerDriveFileCleanup": true,
+    "previewGeneralWriteIsolation": true,
+    "noOperationalRealRowsWritten": true,
+    "cleanupComplete": true
+  },
+  "renewalRenderStability": {
+    "mutationCount": 0,
+    "textStable": true,
+    "route": "renovaciones",
+    "records": [],
+    "events": [
+      {
+        "ms": 35,
+        "kind": "store",
+        "detail": "metas"
+      },
+      {
+        "ms": 42,
+        "kind": "store",
+        "detail": "reclamos"
+      },
+      {
+        "ms": 47,
+        "kind": "store",
+        "detail": "comisiones"
+      },
+      {
+        "ms": 53,
+        "kind": "store",
+        "detail": "auditoria"
+      }
+    ],
+    "canonicalRerenderObserved": false
+  },
+  "qaResidue": {
+    "rows": [
+      {
+        "id": "pol_mulsmxsk",
+        "exists": true,
+        "numero": "B2-REN-36489784713",
+        "renuevaDe": "b2-r9195-policy-36489784713",
+        "parentExists": false,
+        "previewWrite": false,
+        "syntheticFlag": false,
+        "createdAt": "",
+        "dependents": {
+          "gestiones": 0,
+          "recibosEsperados": 2,
+          "carteraPrimas": 2,
+          "cobros": 0,
+          "vehiculos": 0,
+          "cancelaciones": 0
+        },
+        "dependentTotal": 4
+      },
+      {
+        "id": "pol_mulssmuz",
+        "exists": true,
+        "numero": "B2-REN-36490245512",
+        "renuevaDe": "b2-r9195-policy-36490245512",
+        "parentExists": false,
+        "previewWrite": false,
+        "syntheticFlag": false,
+        "createdAt": "",
+        "dependents": {
+          "gestiones": 0,
+          "recibosEsperados": 2,
+          "carteraPrimas": 2,
+          "cobros": 0,
+          "vehiculos": 0,
+          "cancelaciones": 0
+        },
+        "dependentTotal": 4
+      },
+      {
+        "id": "pol_mulsxofx",
+        "exists": true,
+        "numero": "B2-REN-36490640789",
+        "renuevaDe": "b2-r9195-policy-36490640789",
+        "parentExists": false,
+        "previewWrite": false,
+        "syntheticFlag": false,
+        "createdAt": "",
+        "dependents": {
+          "gestiones": 0,
+          "recibosEsperados": 2,
+          "carteraPrimas": 2,
+          "cobros": 0,
+          "vehiculos": 0,
+          "cancelaciones": 0
+        },
+        "dependentTotal": 4
+      }
+    ],
+    "patternConsistent": true,
+    "parentsAbsent": true,
+    "noDependents": false,
+    "classification": "AMBIGUOUS_FAIL_CLOSED"
+  },
+  "qaResidueDisposition": "NOT_DELETED_FAIL_CLOSED",
+  "qaResidueDeletedCount": 0,
+  "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_B2_QA_RESIDUE_ADJUDICATION_20261004.json",
+  "qaResidueAdjudicationReceiptBlobSha": "e42eccd1d1d41e1a29626ef6234c9baf632e7194",
+  "syntheticQaWrites": 9,
+  "cleanupWrites": 32,
+  "syntheticFinalAbsent": true,
+  "pageErrors": [],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 ()"
+  ],
+  "httpErrors": [
+    {
+      "status": 403,
+      "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
+      "resourceType": "fetch",
+      "method": "POST",
+      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mut6dyqg9emgh\",\"payload\":{\"id\":\"secres_mut6dyqg9emgh\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-04\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-04T02:02:08.536Z\",\"updatedAt\":\"2026-10-04T02:02:08.536Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
+      "responseBody": "{\"error\":{\"message\":\"Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.\",\"status\":\"PERMISSION_DENIED\"}}"
+    }
+  ],
+  "expectedIsolationDenials": [
+    {
+      "status": 403,
+      "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
+      "id": "secres_mut6dyqg9emgh",
+      "collection": "actividades",
+      "reason": "SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW",
+      "persisted": false
+    }
+  ],
+  "unexpectedHttpErrors": [],
+  "unexpectedConsoleErrors": [],
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "livePromoted": false,
+  "knowledgePreview": true,
+  "quoteAuthorityContractV1": true,
+  "insurerKnowledgeVisible": true,
+  "multiProductKnowledgeRoadmapVisible": true,
+  "insurerKnowledge": {
+    "knowledgeProbe": {
+      "aseguateId": "gt-aseguradora-guatemalteca",
+      "columnaId": "gt-seguros-columna",
+      "count": 32
+    },
+    "aseguate": {
+      "sourceBacked": true,
+      "issuance": true,
+      "installment": true,
+      "multiProduct": true,
+      "textSample": "FUENTES RELACIONADAS 6 MAPEADAS / VALIDADAS 6 REQUIEREN REVISIÓN 0 CON ARCHIVO CONFIRMADO 0 🧠 Tarifas y conocimiento Uso controlado: cada fuente se revisa por país, moneda, ramo y producto. Registrar un documento no habilita automáticamente Cotizador ni Comparativo. Mapeado (3) Validado (3) GT · GTQ · Vehículos · Seguro de vehículo · — · — · — · — · — · — · — Pendiente 1 doc(s) GT · GTQ · Vehículos · Seguro de vehículo · — · — · — · — · Automóvil · — · — Pendiente 1 doc(s) GT · GTQ · Vehículos · Seguro de vehículo · — · — · — · — · Microbús hasta 9 pasajeros · — · — Pendiente 1 doc(s) GT · GTQ · Automóviles · Vehículos · — · — · — · — · — · — · — Pendiente 3 doc(s) 🧠 Fuentes relacionadas y disponibles Tasas AseGuate.xlsx Mapeado · GT · GTQ · Vehículos · Seguro de vehículo Mapeado Cotización AseGuate automóvil.pdf Mapeado · GT · GTQ · Vehículos · Seguro de vehículo Mapeado Cotización AseGuate microbús hasta 9 pasajeros.pdf Mapeado · GT · GTQ · Vehículos · Seguro de vehículo Mapeado Tasas AseGuate.xlsx Mapeado · GT · GTQ · Automóviles · Vehículos Validado Cotización AseGuate Auto 2026-09-30 Mapeado · GT · GTQ · Automóviles · Vehículos Validado Póliza AseGuate AUTO-38594 Mapeado · GT · GTQ · Automóviles · Vehículos Validado Conocimiento vigente y observado Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo. Automóviles · Vehículos GT · GTQ · Fuentes 2026; revisar al recibir versión posterior Con evidencia Plan Premium · tasa 3.20% sobre valor asegurado Plan Premium · prima mínima Q1,800 + asistencia Plan Plus · tasa 4.00% sobre valor asegurado Plan Plus · prima mínima Q1,600 + recargo aplicable + asistencia Plan Plus · recargo por antigüedad 15% según condición del tarifario Plan Básico · prima mínima Q800 + asistencia Asistencia Q350 en los tres planes documentados Gastos de emisión 5% de prima neta Fraccionamiento Hasta 6 pagos al precio de contado; 8 pagos 5.37%; 10 pagos 8.42% sobre prima neta IVA 12%; en la póliza muestra grava prima neta + gastos de emisión + asistencia + financiamiento Visa/Cuotas Cotización muestra 3, 6 y 10 pagos; tratar separado del recargo de aseguradora cuando corresponda Fuentes: Tasas AseGuate.xlsx · Cotización AseGuate Auto 2026-09-30 · Póliza AseGuate AUTO"
+    },
+    "columna": {
+      "sourceBacked": true,
+      "zeroIssuance": true,
+      "zeroInstallment": true,
+      "textSample": "FUENTES RELACIONADAS 5 MAPEADAS / VALIDADAS 4 REQUIEREN REVISIÓN 1 CON ARCHIVO CONFIRMADO 0 🧠 Tarifas y conocimiento Uso controlado: cada fuente se revisa por país, moneda, ramo y producto. Registrar un documento no habilita automáticamente Cotizador ni Comparativo. Requiere validación (1) Validado (4) GT · GTQ · Vehículos · Seguro de vehículo · — · — · — · — · — · — · — Pendiente 1 doc(s) GT · GTQ · Automóviles · Vehículos · — · — · — · — · — · — · — Pendiente 3 doc(s) GT · GTQ · Automóviles · Motocicleta · — · — · — · — · — · — · — Pendiente 1 doc(s) 🧠 Fuentes relacionadas y disponibles Cotizador VA 2026 V1.4.xlsx Mapeado · GT · GTQ · Vehículos · Seguro de vehículo Requiere validación Cotizador VA 2026 V1.4.xlsx Mapeado · GT · GTQ · Automóviles · Vehículos Validado Cotización Columna CRV 2026-09-28 Mapeado · GT · GTQ · Automóviles · Vehículos Validado Cotización Columna Motocicleta 2026-09-28 Mapeado · GT · GTQ · Automóviles · Motocicleta Validado Póliza Columna VA-41977 Mapeado · GT · GTQ · Automóviles · Vehículos Validado Conocimiento vigente y observado Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo. Automóviles · Vehículos / Motocicleta GT · GTQ · Fuentes 2026; revisar al recibir versión posterior Con evidencia Gastos de emisión 0% en cotizador/pólizas y muestras revisadas de Vehículos Fraccionamiento de aseguradora 0% en póliza muestra de 10 pagos; cotizaciones 2/3/4/5/6/8/10/12 reconstruyen el mismo total IVA 12% sobre la prima neta en las muestras revisadas Pronto pago No es universal: se observó 5% de descuento en una cotización de motocicleta y 0% en otra muestra Visa Cuotas Hasta 12 pagos según cotización; no tratarlo automáticamente como recargo de la aseguradora Fuentes: Cotizador VA 2026 V1.4.xlsx · Cotización Columna CRV 2026-09-28 · Cotización Columna Motocicleta 2026-09-28 · Póliza Columna VA-41977 Las condiciones de pronto pago varían por perfil/producto. No hardcodear 5% global. Cobertura de conocimiento por producto La ficha no se limita a Automóviles. Los demás ramos se incorporan por aseguradora y producto conforme aportemos fuentes; lo no documentado permanece pendiente y no genera cálculos automáticos. Automóviles · Con evidencia actual Vida · Pendiente de "
+    }
+  },
+  "r13RenewalDataBlocker": {
+    "blocking": true,
+    "code": "REAL_RENEWABILITY_SOURCE_CONFLICT_OR_APPLY_REQUIRED",
+    "byState": {
+      "YES": 0,
+      "NO": 0,
+      "UNKNOWN": 1419
+    },
+    "sourceDryRunCount": 4,
+    "sourceDryRunReady": false,
+    "sourceMissing": [
+      "VA-43685"
+    ],
+    "sourceDuplicates": [],
+    "sourceHistoricalSameNumber": [
+      {
+        "numero": "68542",
+        "ids": [
+          "pol_a02fe1584efcde81a752782d0e53"
+        ],
+        "states": [
+          "Renovada"
+        ]
+      },
+      {
+        "numero": "VA-43685",
+        "ids": [
+          "pol_04d0eede3860a982971790b5ea4d",
+          "pol_652260b8dcd7206c34b70a463547",
+          "pol_965de501d871c56f3964a24b7724"
+        ],
+        "states": [
+          "Renovada",
+          "Renovada",
+          "Vigente"
+        ]
+      }
+    ],
+    "writeExecuted": false,
+    "authorizationRequired": true
+  },
+  "nextAction": "B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION"
+}

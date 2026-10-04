@@ -2459,5 +2459,7 @@
   "r13PolicyVisualLineageReceiptBlobSha": "241a16d434c9d7eb94246a81925e9cbedd183824",
   "r13PolicyRouteRuntimeDiagnosticBlobSha": "db13f0b8bf0a200bac53033b090db798f684854c",
   "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
-  "r13PolicyRuntimeP3RootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_ROOTFIX_20261003.json"
+  "r13PolicyRuntimeP3RootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_ROOTFIX_20261003.json",
+  "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
+  "machineProofReceiptBlobSha": "b164548aadac1783ebc04b9f2777cfbdb19439da"
 }
