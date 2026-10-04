@@ -1,0 +1,700 @@
+                <div class="vl-gt-scene">
+                  <div class="vl-s5" role="img" aria-label="Escena de objetos: un vehículo en la vía, un centro de salud con su cruz y tres vínculos enlazados que representan a las personas que dependen de ti.">
+                    <span class="vl-s5-key" aria-hidden="true"></span>
+                    <span class="vl-s5-floor" aria-hidden="true"></span>
+                    <div class="vl-s5-3d">
+                      <span class="vl-s5-sh" aria-hidden="true" style="left:4%;top:60%;width:32%;height:13%;"></span>
+                      <span class="vl-s5-sh" aria-hidden="true" style="left:38%;top:40%;width:22%;height:12%;"></span>
+                      <div class="vl-s5-b s5-car"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <div class="vl-s5-b s5-carcab"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <span class="s5-wl" style="left:8%;top:62%;"></span>
+                      <span class="s5-wl" style="left:27%;top:62%;"></span>
+                      <div class="vl-s5-b s5-cli"><span class="top"><span aria-hidden="true" style="position:absolute;left:45%;top:20%;width:10%;height:60%;background:rgba(228,0,43,.9);"></span><span aria-hidden="true" style="position:absolute;left:30%;top:40%;width:40%;height:20%;background:rgba(228,0,43,.9);"></span></span><span class="sa"></span><span class="sb"></span></div>
+                      <span class="s5-ring s5-ring1" aria-hidden="true"></span>
+                      <span class="s5-ring s5-ring2" aria-hidden="true"></span>
+                      <span class="s5-ring s5-ring3" aria-hidden="true"></span>
+                      <span class="vl-s5-tag" style="left:3%;top:78%;">AUTO Y MOVILIDAD</span>
+                      <span class="vl-s5-tag" style="left:33%;top:12%;">SALUD Y ACCIDENTES</span>
+                      <span class="vl-s5-tag" style="left:62%;top:66%;">VIDA Y PROTECCIÓN FAMILIAR</span>
+                    </div>
+                  </div>
+                  <div class="vl-s5-legend">
+                    <div><span class="kn">01</span><span><b>Auto y movilidad</b><i>Vehículo, responsabilidad y asistencias al conducir.</i></span></div>
+                    <div><span class="kn">02</span><span><b>Salud y accidentes</b><i>Red, límites y condiciones de respuesta.</i></span></div>
+                    <div><span class="kn">03</span><span><b>Vida y protección familiar</b><i>Personas y obligaciones que dependen de ti.</i></span></div>
+                  </div>
+                  <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">La necesidad cambia con el momento: primero se ordena, después se compara.</p>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ gtIsCotizar }}" hint-placeholder-val="{{ false }}">
+                <div class="vl-gt-scene">
+                  <div class="vl-s5" role="img" aria-label="Escena de objetos: una balanza con dos platos cargados de bloques distintos y una regla graduada debajo, para contrastar diferencia por diferencia.">
+                    <span class="vl-s5-key" aria-hidden="true"></span>
+                    <span class="vl-s5-floor" aria-hidden="true"></span>
+                    <div class="vl-s5-3d">
+                      <span class="vl-s5-sh" aria-hidden="true" style="left:40%;top:64%;width:22%;height:12%;"></span>
+                      <div class="vl-s5-b s5-col"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <span class="s5-beam" aria-hidden="true"></span>
+                      <span class="s5-hang a" aria-hidden="true"></span>
+                      <span class="s5-hang b" aria-hidden="true"></span>
+                      <span class="s5-tray a" aria-hidden="true"></span>
+                      <span class="s5-tray b" aria-hidden="true"></span>
+                      <span class="s5-blk a1" aria-hidden="true"></span>
+                      <span class="s5-blk a2" aria-hidden="true"></span>
+                      <span class="s5-blk a3" aria-hidden="true"></span>
+                      <span class="s5-blk b1" aria-hidden="true"></span>
+                      <span class="s5-blk b2" aria-hidden="true"></span>
+                      <span class="s5-rule" aria-hidden="true"></span>
+                      <span class="vl-s5-tag" style="left:4%;top:20%;">ALTERNATIVA</span>
+                      <span class="vl-s5-tag" style="right:4%;top:28%;">ALTERNATIVA</span>
+                      <span class="vl-s5-tag" style="left:50%;transform:translateX(-50%);bottom:2%;">DIFERENCIA POR DIFERENCIA</span>
+                    </div>
+                  </div>
+                  <div class="vl-s5-legend">
+                    <div><span class="kn">01</span><span><b>Alcance, límites y deducibles</b><i>Qué responde, hasta cuánto y con qué participación.</i></span></div>
+                    <div><span class="kn">02</span><span><b>Condiciones, exclusiones y asistencias</b><i>Lo que cambia el resultado cuando se usa.</i></span></div>
+                    <div><span class="kn">03</span><span><b>Costo</b><i>Se contrasta cuando las propuestas ya son comparables.</i></span></div>
+                  </div>
+                  <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">La comparación se hace con propuestas válidas y con información disponible. Un dato faltante se identifica como faltante; no se interpreta como ausencia de cobertura.</p>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ gtIsRevisar }}" hint-placeholder-val="{{ false }}">
+                <div class="vl-gt-scene">
+                  <div class="vl-s5" role="img" aria-label="Escena de objetos: un expediente abierto bajo una lupa y, al lado, un reloj de renovación con la parte del año ya transcurrida marcada.">
+                    <span class="vl-s5-key" aria-hidden="true"></span>
+                    <span class="vl-s5-floor" aria-hidden="true"></span>
+                    <div class="vl-s5-3d">
+                      <span class="vl-s5-sh" aria-hidden="true" style="left:8%;top:62%;width:44%;height:14%;"></span>
+                      <div class="vl-s5-b s5-fold2"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <div class="vl-s5-b s5-fold"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <span class="s5-lines" aria-hidden="true"></span>
+                      <span class="s5-maghd" aria-hidden="true"></span>
+                      <span class="s5-mag" aria-hidden="true"></span>
+                      <span class="s5-dial" aria-hidden="true"></span>
+                      <span class="vl-s5-tag" style="left:4%;top:80%;">QUÉ CAMBIÓ</span>
+                      <span class="vl-s5-tag" style="left:26%;top:16%;">QUÉ CONVIENE REVISAR</span>
+                      <span class="vl-s5-tag" style="right:4%;top:6%;">ANTES DE RENOVAR</span>
+                    </div>
+                  </div>
+                  <div class="vl-s5-legend">
+                    <div><span class="kn">01</span><span><b>Qué cambió</b><i>Vehículos, personas, operación o patrimonio desde la última renovación.</i></span></div>
+                    <div><span class="kn">02</span><span><b>Qué conviene revisar</b><i>Sumas, deducibles, exclusiones y asistencias.</i></span></div>
+                    <div><span class="kn">03</span><span><b>Siguiente acción</b><i>Comparar, ajustar o continuar con asesoría.</i></span></div>
+                  </div>
+                  <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">Revisar no obliga a cambiar ni promete un precio menor: ordena la decisión antes de renovar.</p>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ gtIsSiniestro }}" hint-placeholder-val="{{ false }}">
+                <div class="vl-gt-scene">
+                  <div class="vl-s5" role="img" aria-label="Escena de objetos: un cono de seguridad iluminado al frente, detrás un poste con diadema de atención y una barrera de canal oficial.">
+                    <span class="vl-s5-key" aria-hidden="true"></span>
+                    <span class="vl-s5-floor" aria-hidden="true"></span>
+                    <div class="vl-s5-3d">
+                      <span class="s5-bring" aria-hidden="true"></span>
+                      <span class="vl-s5-sh" aria-hidden="true" style="left:12%;top:60%;width:22%;height:12%;"></span>
+                      <div class="vl-s5-b s5-conebase"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <span class="s5-cone" aria-hidden="true"></span>
+                      <div class="vl-s5-b s5-post"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <span class="s5-hset" aria-hidden="true"></span>
+                      <div class="vl-s5-b s5-bar"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <span class="vl-s5-tag" style="left:4%;top:76%;">PRIMERO, SEGURIDAD</span>
+                      <span class="vl-s5-tag" style="left:44%;top:16%;">IDENTIFICA LA ACCIÓN</span>
+                      <span class="vl-s5-tag" style="right:4%;top:70%;">CANAL OFICIAL</span>
+                    </div>
+                  </div>
+                  <div class="vl-s5-legend">
+                    <div><span class="kn">01</span><span><b>Primero, seguridad</b><i>Atiende a las personas y resguarda el lugar.</i></span></div>
+                    <div><span class="kn">02</span><span><b>Identifica la acción</b><i>Qué corresponde reportar y con qué información.</i></span></div>
+                    <div><span class="kn">03</span><span><b>Canal oficial</b><i>Te indicamos el canal correcto y acompañamos el caso.</i></span></div>
+                  </div>
+                  <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">A&amp;S orienta y acompaña. La aseguradora o el proveedor determina asistencia, cobertura y resolución.</p>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ gtIsCliente }}" hint-placeholder-val="{{ false }}">
+                <div class="vl-gt-scene">
+                  <div class="vl-s5" role="img" aria-label="Escena de objetos: un mostrador de atención con bandejas de documentos y, al fondo, un archivador de expedientes por gestión.">
+                    <span class="vl-s5-key" aria-hidden="true"></span>
+                    <span class="vl-s5-floor" aria-hidden="true"></span>
+                    <div class="vl-s5-3d">
+                      <span class="vl-s5-sh" aria-hidden="true" style="left:6%;top:64%;width:52%;height:14%;"></span>
+                      <span class="vl-s5-sh" aria-hidden="true" style="right:6%;top:42%;width:28%;height:14%;"></span>
+                      <div class="vl-s5-b s5-cab"><span class="top"><span aria-hidden="true" style="position:absolute;left:10%;top:14%;right:10%;height:14%;border:1px solid rgba(255,240,243,.45);"></span><span aria-hidden="true" style="position:absolute;left:10%;top:36%;right:10%;height:14%;border:1px solid rgba(255,240,243,.38);"></span><span aria-hidden="true" style="position:absolute;left:10%;top:58%;right:10%;height:14%;border:1px solid rgba(255,240,243,.3);"></span></span><span class="sa"></span><span class="sb"></span></div>
+                      <div class="vl-s5-b s5-cnt"><span class="top"><span aria-hidden="true" style="position:absolute;left:62%;top:22%;width:14%;height:52%;background:rgba(255,240,243,.82);box-shadow:2px 3px 0 rgba(255,240,243,.42);"></span><span aria-hidden="true" style="position:absolute;left:82%;top:30%;width:11%;height:40%;background:rgba(228,0,43,.7);"></span></span><span class="sa"></span><span class="sb"></span></div>
+                      <div class="vl-s5-b s5-tray2"><span class="top"><span aria-hidden="true" style="position:absolute;left:10%;top:18%;right:10%;height:26%;background:rgba(255,240,243,.72);"></span><span aria-hidden="true" style="position:absolute;left:16%;top:54%;right:16%;height:22%;background:rgba(255,240,243,.5);"></span></span><span class="sa"></span><span class="sb"></span></div>
+                      <div class="vl-s5-b s5-tray3"><span class="top"><span aria-hidden="true" style="position:absolute;left:12%;top:24%;right:12%;height:24%;background:rgba(255,240,243,.6);"></span><span aria-hidden="true" style="position:absolute;left:18%;top:58%;right:18%;height:20%;background:rgba(255,240,243,.42);"></span></span><span class="sa"></span><span class="sb"></span></div>
+                      <span class="vl-s5-tag" style="left:4%;top:80%;">PÓLIZAS Y DOCUMENTOS</span>
+                      <span class="vl-s5-tag" style="right:4%;top:8%;">GESTIONES POR CANAL</span>
+                    </div>
+                  </div>
+                  <div class="vl-s5-legend">
+                    <div><span class="kn">01</span><span><b>Pólizas y documentos</b><i>Consultar o solicitar lo que ya tienes.</i></span></div>
+                    <div><span class="kn">02</span><span><b>Siniestro o asistencia</b><i>Ir a la ruta de orientación.</i></span></div>
+                    <div><span class="kn">03</span><span><b>Renovación y cambios</b><i>Con acompañamiento de tu asesor.</i></span></div>
+                  </div>
+                  <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">La ruta continúa por las gestiones y canales realmente disponibles para tu caso.</p>
+                </div>
+              </sc-if>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 · EMPRESAS · twin empresarial · NIVEL B · único preview estratégico grande (F7-CIG-05-R1B) -->
+      <div style="background:#0E0D10;color:#F4F1EA;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(32px,4.2vh,56px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#FF7C8C;">EMPRESAS · CÓMO OPERA TU NEGOCIO</div>
+          <h2 style="font-family:'Archivo';font-weight:800;font-size:clamp(23px,2.4vw,33px);letter-spacing:-.024em;line-height:1.06;margin:12px 0 0;max-width:34ch;">Protege tu empresa desde cómo opera, no revisando pólizas por separado.</h2>
+          <div class="vl-split" style="display:grid;grid-template-columns:1.08fr .92fr;gap:clamp(18px,2.2vw,30px);margin-top:22px;align-items:start;">
+            <div style="min-width:0;">
+              <div class="vl-t5 vl-r1b-twin" data-focus="{{ gtFocus }}">
+                <span class="vl-t5-sky" aria-hidden="true"></span>
+                <span class="vl-t5-lab">OPERACIÓN · ESCENA DEL SISTEMA</span>
+                <div class="vl-t5-cam">
+                  <div class="vl-t5-plate">
+                    <span class="vl-t5-sh" aria-hidden="true" style="left:2%;top:58%;width:44%;height:22%;"></span>
+                    <span class="vl-t5-sh" aria-hidden="true" style="left:46%;top:12%;width:24%;height:16%;"></span>
+                    <span class="vl-t5-sh" aria-hidden="true" style="left:68%;top:50%;width:30%;height:20%;"></span>
+                    <div class="vl-t5-o t5-rc" data-o="rc"><span class="top"><span class="gate"></span></span><span class="sa"></span><span class="sb"></span></div>
+                    <span class="t5-walk" aria-hidden="true"></span>
+                    <div class="vl-t5-o t5-xcar" data-o="rc"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-wh" data-o="patrimonio"><span class="top"><span class="ridge"></span></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-pal t5-pal1" data-o="patrimonio"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-pal t5-pal2" data-o="patrimonio"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-of" data-o="personas"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-cnpy" data-o="personas"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-dk t5-dk1" data-o="personas"><span class="top"><span class="chair"></span></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-dk t5-dk2" data-o="personas"><span class="top"><span class="chair"></span></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-dk t5-dk3" data-o="personas"><span class="top"><span class="chair"></span></span><span class="sa"></span><span class="sb"></span></div>
+                    <span class="t5-road" aria-hidden="true"></span>
+                    <span class="t5-bay" aria-hidden="true"></span>
+                    <div class="t5-tr t5-tr1">
+                      <div class="vl-t5-o bx" data-o="flotillas"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <div class="vl-t5-o cab" data-o="flotillas"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <span class="wl" style="left:32%;top:74%;"></span><span class="wl" style="left:66%;top:74%;"></span>
+                    </div>
+                    <div class="t5-tr t5-tr2">
+                      <div class="vl-t5-o bx" data-o="flotillas"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <div class="vl-t5-o cab" data-o="flotillas"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                      <span class="wl" style="left:34%;top:74%;"></span><span class="wl" style="left:68%;top:74%;"></span>
+                    </div>
+                    <div class="vl-t5-o t5-tk t5-tk1" data-o="continuidad"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-tk t5-tk2" data-o="continuidad"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-tk t5-tk3" data-o="continuidad"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-pipe t5-pipe1" data-o="continuidad"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-pipe t5-pipe2" data-o="continuidad"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-o t5-pipe t5-pipe3" data-o="continuidad"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <span class="t5-flow" aria-hidden="true" style="left:64%;top:40%;transform:translateZ(58px) rotateZ(45deg);"></span>
+                    <span class="t5-flow" aria-hidden="true" style="left:76%;top:52%;transform:translateZ(58px) rotateZ(135deg);"></span>
+                    <div class="vl-t5-o t5-sp" data-o="contratos"><span class="top"></span><span class="sa"></span><span class="sb"></span></div>
+                    <div class="vl-t5-prog" aria-hidden="true"></div>
+                  </div>
+                </div>
+                <span class="vl-t5-vig" aria-hidden="true"></span>
+                <div class="vl-t5-tags" aria-hidden="true">
+                  <div class="vl-t5-tag lt" style="left:31%;top:58%;"><span class="chip">PATRIMONIO</span></div>
+                  <div class="vl-t5-tag lt" style="left:44%;top:36%;"><span class="chip">COLABORADORES</span></div>
+                  <div class="vl-t5-tag rt" style="left:56.5%;top:55%;"><span class="chip">FLOTILLAS Y TRANSPORTE</span></div>
+                  <div class="vl-t5-tag rt" style="left:65%;top:42%;"><span class="chip">CONTINUIDAD</span></div>
+                  <div class="vl-t5-tag rt" style="left:62.5%;top:74%;"><span class="chip">RESPONSABILIDAD CIVIL</span></div>
+                </div>
+              </div>
+              <p style="font-size:12px;color:#A9A29A;line-height:1.55;margin:10px 0 0;max-width:74ch;">Una vista de conjunto de la operación. El análisis por exposición, sector y escenario vive en Empresas.</p>
+            </div>
+            <div class="vl-gt-amplitude" style="min-width:0;background:rgba(255,255,255,.04);border:1px solid #2a2833;border-radius:20px;padding:clamp(16px,1.8vw,24px);display:flex;flex-direction:column;" aria-live="polite">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#FF9DA8;">AMPLITUD EMPRESARIAL</div>
+              <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(18px,1.7vw,23px);letter-spacing:-.02em;line-height:1.08;margin:8px 0 0;">Cuatro dimensiones que se revisan juntas.</h3>
+              <div class="vl-v2-dims">
+                <sc-for list="{{ gtDims }}" as="d" hint-placeholder-count="4">
+                  <div class="vl-v2-dim"><b>{{ d.t }}</b><i>{{ d.d }}</i></div>
+                </sc-for>
+              </div>
+              <p style="font-size:12.5px;line-height:1.55;color:#CFC9BE;margin:14px 0 0;">Cada dimensión tiene sus propias exposiciones, escenarios y criterios. Esa lectura se hace en Empresas, sobre tu sector y tu operación.</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+                <button onClick="{{ goEmpresas }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Ir a Empresas</button>
+                <button onClick="{{ openHandoff }}" style="min-height:48px;padding:0 20px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.46);color:#fff;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;">Hablar con un asesor</button>
+              </div>
+              <p class="vl-functional-mobile" style="font-size:11.5px;line-height:1.55;color:#A9A29A;margin:12px 0 0;">Esta vista orienta: no confirma cobertura, elegibilidad ni condiciones.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 · FLOTILLAS / TRANSPORTE / LOGÍSTICA · NIVEL C teaser compacto (F7-CIG-05-R1B) -->
+      <div style="background:#F4F1EA;color:#12110F;">
+        <div class="vl-r1b-teaser" style="max-width:1600px;margin:0 auto;padding:clamp(24px,3vh,38px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#C4001F;">FLOTILLAS · TRANSPORTE · LOGÍSTICA</div>
+          <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(19px,1.95vw,26px);letter-spacing:-.022em;line-height:1.08;margin:10px 0 0;max-width:40ch;">Una flotilla o una operación de transporte puede exponer más que los vehículos.</h3>
+          <p style="font-size:14px;line-height:1.6;color:#454039;margin:10px 0 0;max-width:76ch;">La exposición se mueve con la operación: cambia de manos en el cargue, en la ruta y en la entrega. Por eso se revisa por trayecto y por rol, no solo por vehículo.</p>
+          <div class="vl-v2-strip" role="list" aria-label="Momentos del traslado">
+            <sc-for list="{{ gtRoute }}" as="r" hint-placeholder-count="3">
+              <div class="vl-v2-striti" role="listitem"><span>{{ r.n }}</span><b>{{ r.t }}</b></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
+            <button onClick="{{ goFlotillasGTHome }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Explorar Flotillas, Transporte y Logística</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 · PERSONAS Y FAMILIAS · NIVEL C teaser (F7-CIG-05-R1B) -->
+      <div style="background:#EFE9DD;color:#12110F;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(24px,3vh,38px) clamp(20px,3vw,44px);">
+          <div class="vl-split" style="display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(18px,2.4vw,34px);align-items:center;">
+            <div style="min-width:0;">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#C4001F;">PERSONAS Y FAMILIAS</div>
+              <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(19px,1.95vw,26px);letter-spacing:-.022em;line-height:1.08;margin:10px 0 0;max-width:22ch;">Protege lo que cambia contigo.</h3>
+              <p style="font-size:14px;line-height:1.6;color:#454039;margin:10px 0 0;max-width:50ch;">Tu movilidad, tu salud y las personas que dependen de ti no necesitan la misma protección en cada etapa.</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+                <button onClick="{{ goPersonas }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Explorar mi protección</button>
+              </div>
+            </div>
+            <div class="vl-3" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;min-width:0;">
+              <sc-for list="{{ gtPersonas }}" as="p" hint-placeholder-count="3">
+                <div style="border-top:2px solid #C4001F;padding-top:11px;display:grid;gap:4px;min-width:0;">
+                  <span style="font-family:'Archivo';font-weight:700;font-size:15px;color:#12110F;line-height:1.14;">{{ p.t }}</span>
+                  <span style="font-size:12.5px;line-height:1.5;color:#454039;">{{ p.d }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 · MÉTODO A&S · compactado a la secuencia + verdad de comparación (F7-CIG-05-R1B) -->
+      <div style="background:#171419;color:#F4F1EA;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(26px,3.2vh,42px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#FF7C8C;">MÉTODO A&amp;S</div>
+          <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(19px,1.95vw,26px);letter-spacing:-.022em;line-height:1.08;margin:10px 0 0;max-width:34ch;">Una decisión de seguro empieza antes de pedir un precio.</h3>
+          <div class="vl-v2-seq vl-r1b-seq">
+            <sc-for list="{{ gtMetodo }}" as="m" hint-placeholder-count="4">
+              <div class="vl-v2-step">
+                <span class="nn" aria-hidden="true">{{ m.k }}</span>
+                <h4>{{ m.t }}</h4>
+              </div>
+            </sc-for>
+          </div>
+          <div class="vl-split" style="display:grid;grid-template-columns:1fr .8fr;gap:clamp(18px,2.4vw,32px);align-items:center;margin-top:22px;border-top:1px solid #2a2833;padding-top:18px;">
+            <div style="min-width:0;">
+              <p style="font-size:14px;line-height:1.6;color:#CFC9BE;margin:0;max-width:70ch;"><b style="color:#fff;">Comparar bien no es mirar solo la prima.</b> Coberturas, límites, deducibles, exclusiones, asistencias y requisitos cambian el resultado. Cuando una propuesta no informa un dato, se muestra como dato no informado: no como “no cubre”.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button onClick="{{ goCotComp }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Cotizar o comparar</button>
+              <button onClick="{{ goRenovar }}" style="min-height:48px;padding:0 20px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.24);color:#fff;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;">Revisar antes de renovar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 · CONTINUIDAD + SERVICIO · NIVEL D banda utilitaria (fusión R4 bandas 6+7, sin repetir Need Router) -->
+      <div style="background:#F4F1EA;color:#12110F;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(26px,3.2vh,42px) clamp(20px,3vw,44px);">
+          <div class="vl-split" style="display:grid;grid-template-columns:.86fr 1.14fr;gap:clamp(18px,2.4vw,34px);align-items:start;">
+            <div style="min-width:0;">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#C4001F;">CONTINUIDAD Y SERVICIO</div>
+              <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(19px,1.95vw,26px);letter-spacing:-.022em;line-height:1.08;margin:10px 0 0;max-width:22ch;">La ruta se adapta al caso, no al revés.</h3>
+              <p style="font-size:14px;line-height:1.6;color:#454039;margin:10px 0 0;max-width:52ch;">Algunos casos avanzan en línea; otros necesitan revisión antes de pedir propuestas. El contexto se conserva cuando la conversación pasa a asesoría o a servicio: no empiezas de cero.</p>
+              <p style="font-size:11.5px;color:#6E655C;line-height:1.55;margin:14px 0 0;max-width:60ch;" class="vl-functional-mobile">Pagos, emisión y Mi Portal se muestran únicamente cuando ya están disponibles para tu país y tu cuenta. Elegir una alternativa no equivale a emisión.</p>
+            </div>
+            <div style="min-width:0;">
+              <div class="vl-3" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;">
+                <sc-for list="{{ gtServicio }}" as="sv" hint-placeholder-count="3">
+                  <button onClick="{{ sv.go }}" style="text-align:left;font-family:inherit;cursor:pointer;background:#fff;border:1px solid #E2DACF;border-radius:14px;padding:16px;min-height:104px;display:flex;flex-direction:column;gap:5px;transition:border-color .16s,transform .16s;" style-hover="border-color:#E4002B;transform:translateY(-2px);">
+                    <span style="font-family:'Archivo';font-weight:700;font-size:15.5px;color:#12110F;line-height:1.14;">{{ sv.t }}</span>
+                    <span style="font-size:12.5px;line-height:1.5;color:#454039;">{{ sv.d }}</span>
+                    <span style="margin-top:auto;padding-top:8px;font-family:'Archivo';font-weight:700;font-size:13px;color:#C4001F;">{{ sv.cta }} →</span>
+                  </button>
+                </sc-for>
+              </div>
+              <p style="font-size:11.5px;color:#6E655C;line-height:1.55;margin:12px 0 0;max-width:82ch;" class="vl-functional-mobile">A&amp;S orienta y acompaña. La aseguradora o el proveedor determina asistencia, cobertura y resolución de un caso. Revisar no obliga a cambiar.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </section>
+  </sc-if>
+
+  <!-- ============================ HOME CO ============================ -->
+  <sc-if value="{{ isHomeCO }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen" data-screen-label="Home Colombia">
+
+      <!-- 1 · PRIMER VIEWPORT CO · superficie de decisión con las seis intenciones -->
+      <div style="position:relative;background:#0E0D10;color:#F4F1EA;overflow:hidden;">
+        <div aria-hidden="true" style="position:absolute;inset:0;z-index:0;background:radial-gradient(980px 620px at 86% 4%,rgba(228,0,43,.15),transparent 62%),radial-gradient(620px 480px at 2% 98%,rgba(216,169,78,.09),transparent 66%);"></div>
+        <div class="vl-co-hero" style="position:relative;z-index:1;max-width:1600px;margin:0 auto;padding:clamp(28px,4.6vh,58px) clamp(20px,3vw,44px) clamp(32px,4.6vh,60px);display:grid;grid-template-columns:1fr 1.02fr;gap:clamp(22px,3vw,48px);align-items:stretch;">
+
+          <figure class="vl-co-hum">
+            <img src="assets/photos/06_HOME_CO_LOGISTICA.jpg" alt="Personas trabajando en un contexto logístico durante una revisión de operación con A&amp;S.">
+            <figcaption>
+              <span class="kk">A&amp;S COLOMBIA · OPERACIÓN Y CADENA</span>
+              <b>La operación se revisa completa, no una póliza a la vez.</b>
+              <i>Transporte y logística es donde A&amp;S Colombia tiene más profundidad, dentro de una revisión empresarial más amplia.</i>
+            </figcaption>
+          </figure>
+
+          <div class="vl-co-copy" style="min-width:0;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#FF7C8C;display:flex;align-items:center;gap:10px;"><span style="width:30px;height:2px;background:#E4002B;"></span>A&amp;S Colombia · Intermediación de seguros</div>
+            <h1 style="font-family:'Archivo';font-weight:900;font-size:clamp(32px,3.7vw,58px);line-height:.98;letter-spacing:-.032em;margin:16px 0 0;max-width:17ch;">Protege tu operación. Decide con <span style="color:#FF3B54;">más claridad</span>.</h1>
+            <p class="vl-co-lead" style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:clamp(15px,1.15vw,18px);line-height:1.48;color:#D7D1C4;margin:14px 0 0;max-width:58ch;">A&amp;S Consultores de Seguros te ayuda a entender riesgos, estructurar qué conviene revisar, comparar alternativas disponibles cuando son válidas y continuar acompañado. Transporte y Logística es una especialización visible dentro de una propuesta corporativa más amplia.</p>
+
+            <div role="group" aria-label="Empieza por lo que necesitas resolver" class="vl-co-intents" style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:20px;">
+              <sc-for list="{{ coIntents }}" as="i" hint-placeholder-count="6">
+                <button class="vl-co-intent" onClick="{{ i.go }}" aria-pressed="{{ i.on }}">
+                  <span class="vl-co-n" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8C8378;">{{ i.n }}</span>
+                  <span style="font-family:'Archivo';font-weight:700;font-size:14.5px;letter-spacing:-.012em;line-height:1.15;">{{ i.t }}</span>
+                </button>
+              </sc-for>
+            </div>
+
+            <div class="vl-co-active" aria-live="polite" style="margin-top:18px;border-top:2px solid #E4002B;padding-top:13px;">
+              <p style="font-size:14.5px;line-height:1.6;color:#EFE9DD;margin:0;max-width:60ch;">{{ coIntentDesc }}</p>
+              <div class="vl-co-ctarow" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+                <button onClick="{{ coIntentGo }}" style="min-height:50px;padding:0 22px;border-radius:13px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;">{{ coIntentCta }}</button>
+                <button onClick="{{ openHandoff }}" style="min-height:50px;padding:0 20px;border-radius:13px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.46);color:#fff;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;">Hablar con un asesor</button>
+              </div>
+            </div>
+            <p class="vl-co-note" style="font-size:12px;line-height:1.55;color:#A9A29A;margin:18px 0 0;max-width:62ch;border-top:1px solid #2a2833;padding-top:12px;">La disponibilidad, elegibilidad, condiciones y automatización dependen del producto, la aseguradora y la validación del caso.</p>
+          </div>
+
+          <div class="vl-co-canvas">
+            <div style="position:relative;display:flex;align-items:center;gap:10px;">
+              <span aria-hidden="true" style="width:22px;height:2px;background:#E4002B;flex:none;"></span>
+              <span style="font-family:'Archivo';font-weight:700;font-size:13px;letter-spacing:.01em;color:#EFE9DD;">{{ coIntentScene }}</span>
+            </div>
+
+            <sc-if value="{{ coIsEmpresa }}" hint-placeholder-val="{{ true }}">
+              <div class="vl-co-scene">
+                <div class="vl-co-spine vl-co-spine--empresa" role="img" aria-label="La operación completa: responsabilidad civil, cumplimiento, propiedad e ingeniería, flotillas, beneficios y vida grupo, PyME formal, con transporte y logística como especialización conectada.">
+                  <div class="vl-co-branch"><span><b>Responsabilidad Civil</b><i>Reclamaciones de terceros por actividad, predios, productos o servicios.</i></span><em>TERCEROS</em></div>
+                  <div class="vl-co-branch"><span><b>Cumplimiento</b><i>Licitaciones, anticipos, ejecución, calidad y garantías contractuales.</i></span><em>CONTRATOS</em></div>
+                  <div class="vl-co-branch"><span><b>Propiedad, ingeniería y continuidad</b><i>Instalaciones, maquinaria, montajes y el efecto de una interrupción.</i></span><em>ACTIVOS</em></div>
+                  <div class="vl-co-branch vl-co-branch--spec"><span><b>Transporte y logística</b><i>Especialización conectada dentro del mismo programa, no la propuesta completa.</i></span><em>CADENA</em></div>
+                  <div class="vl-co-branch"><span><b>Flotillas y utilitarios</b><i>Vehículos de trabajo, uso, conductores y responsabilidad asociada.</i></span><em>MOVILIDAD</em></div>
+                  <div class="vl-co-branch"><span><b>Beneficios y vida grupo</b><i>Colaboradores y dependientes elegibles dentro del programa de la empresa.</i></span><em>PERSONAS</em></div>
+                  <div class="vl-co-branch"><span><b>PyME formal</b><i>Ordenar lo esencial antes de crecer en complejidad.</i></span><em>ESCALA</em></div>
+                </div>
+                <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">Una propuesta corporativa se lee completa: la cadena es una rama del mismo programa, no toda la marca.</p>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ coIsCadena }}" hint-placeholder-val="{{ false }}">
+              <div class="vl-co-scene">
+                <div class="vl-co-route" role="img" aria-label="Recorrido de la cadena: origen, tránsito, centros de transferencia, almacenamiento y destino o cumplimiento.">
+                  <div class="vl-co-stop"><span class="vl-co-dot">1</span><span><b style="font-family:'Archivo';font-size:13px;color:#F4F1EA;">Origen</b><i style="display:block;font-style:normal;font-size:11.5px;line-height:1.4;color:#B5AEA4;">Valor, rol y momento en que se traspasa la responsabilidad.</i></span></div>
+                  <div class="vl-co-stop"><span class="vl-co-dot vl-co-dot--on">2</span><span><b style="font-family:'Archivo';font-size:13px;color:#F4F1EA;">Tránsito</b><i style="display:block;font-style:normal;font-size:11.5px;line-height:1.4;color:#B5AEA4;">Trayectos, custodia, conductores y responsabilidad frente a terceros.</i></span></div>
+                  <div class="vl-co-stop"><span class="vl-co-dot">3</span><span><b style="font-family:'Archivo';font-size:13px;color:#F4F1EA;">Centros de transferencia</b><i style="display:block;font-style:normal;font-size:11.5px;line-height:1.4;color:#B5AEA4;">Manipulación, tiempos de espera y traspasos entre actores.</i></span></div>
+                  <div class="vl-co-stop"><span class="vl-co-dot">4</span><span><b style="font-family:'Archivo';font-size:13px;color:#F4F1EA;">Almacenamiento</b><i style="display:block;font-style:normal;font-size:11.5px;line-height:1.4;color:#B5AEA4;">Inventario, custodia y continuidad de la operación.</i></span></div>
+                  <div class="vl-co-stop"><span class="vl-co-dot">5</span><span><b style="font-family:'Archivo';font-size:13px;color:#F4F1EA;">Destino / cumplimiento</b><i style="display:block;font-style:normal;font-size:11.5px;line-height:1.4;color:#B5AEA4;">Entrega, obligaciones contractuales y garantías.</i></span></div>
+                </div>
+                <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">Cada etapa concentra una exposición distinta. Aquí ves la lectura de conjunto; la revisión por rol, operación y etapa continúa en Empresas.</p>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ coIsPersonas }}" hint-placeholder-val="{{ false }}">
+              <div class="vl-co-scene">
+                <div class="vl-co-spine" role="img" aria-label="Protección de personas y familias: movilidad, hogar, salud, vida e ingreso.">
+                  <div class="vl-co-branch"><span><b>Movilidad</b><i>Vehículo y responsabilidad al conducir.</i></span><em>DÍA A DÍA</em></div>
+                  <div class="vl-co-branch"><span><b>Hogar</b><i>Inmueble, contenido y responsabilidad familiar.</i></span><em>PATRIMONIO</em></div>
+                  <div class="vl-co-branch"><span><b>Salud</b><i>Seguro privado según sus condiciones; no reemplaza el sistema obligatorio.</i></span><em>RED Y LÍMITES</em></div>
+                  <div class="vl-co-branch"><span><b>Vida e ingreso</b><i>Personas y obligaciones que dependen de ti.</i></span><em>CONTINUIDAD</em></div>
+                </div>
+                <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">Personas y familias acompaña a la propuesta corporativa y cambia con el momento de cada quien.</p>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ coIsCotizar }}" hint-placeholder-val="{{ false }}">
+              <div class="vl-co-scene">
+                <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
+                  <div class="vl-co-row"><span>Una propuesta recibida</span><span>No equivale a una propuesta validada</span></div>
+                  <div class="vl-co-row"><span>Un dato que falta</span><span>No equivale a una exclusión de cobertura</span></div>
+                  <div class="vl-co-row"><span>Elegir una alternativa</span><span>No equivale a la emisión de la póliza</span></div>
+                  <div class="vl-co-row"><span>La comparación</span><span>Se lee por alcance y condiciones, no solo por precio</span></div>
+                  <div class="vl-co-row"><span>El avance en línea</span><span>Existe solo cuando el caso es elegible</span></div>
+                </div>
+                <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">Comparar empieza antes del precio: primero qué responde cada alternativa y bajo qué condiciones.</p>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ coIsSiniestro }}" hint-placeholder-val="{{ false }}">
+              <div class="vl-co-scene">
+                <div class="vl-co-spine" role="img" aria-label="Rutas de siniestro y asistencia: solicitar asistencia, avisar o reportar, radicar reclamación, consultar o dar seguimiento.">
+                  <div class="vl-co-branch vl-co-branch--spec"><span><b>Primero, seguridad</b><i>Atiende a las personas y resguarda el lugar antes de cualquier trámite.</i></span><em>PRIORIDAD</em></div>
+                  <div class="vl-co-branch"><span><b>Solicitar asistencia</b><i>Servicio inmediato asociado a la póliza cuando aplique.</i></span><em>AHORA</em></div>
+                  <div class="vl-co-branch"><span><b>Avisar o reportar</b><i>Comunicar que ocurrió un evento.</i></span><em>AVISO</em></div>
+                  <div class="vl-co-branch"><span><b>Radicar reclamación</b><i>Iniciar o completar formalmente la reclamación.</i></span><em>FORMAL</em></div>
+                  <div class="vl-co-branch"><span><b>Consultar o dar seguimiento</b><i>El caso existe: estado, faltantes y siguiente acción.</i></span><em>EN CURSO</em></div>
+                </div>
+                <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">A&amp;S orienta y acompaña. La aseguradora o el proveedor determina asistencia, cobertura y resolución.</p>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ coIsCliente }}" hint-placeholder-val="{{ false }}">
+              <div class="vl-co-scene">
+                <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
+                  <div class="vl-co-row"><span>Pólizas y documentos</span><span>Consultar o solicitar</span></div>
+                  <div class="vl-co-row"><span>Revisar o renovar</span><span>Recorrido propio; no es una cotización automática</span></div>
+                  <div class="vl-co-row"><span>Siniestro o asistencia</span><span>Por el canal oficial que corresponde</span></div>
+                  <div class="vl-co-row"><span>Pagos, recibos y cambios</span><span>Según la gestión habilitada para tu cuenta</span></div>
+                </div>
+                <p style="font-size:12.5px;line-height:1.6;color:#B5AEA4;margin:0;">Continúa por la gestión y el canal que ya están disponibles para tu cuenta.</p>
+              </div>
+            </sc-if>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 · TRANSPORTE, LOGÍSTICA Y CADENA · NIVEL B · único preview estratégico grande (F7-CIG-05-R1B) -->
+      <div id="vl-co-chain" style="background:#141216;color:#F4F1EA;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(32px,4.2vh,56px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#FF7C8C;">TRANSPORTE, LOGÍSTICA Y CADENA</div>
+          <h2 style="font-family:'Archivo';font-weight:800;font-size:clamp(23px,2.4vw,33px);letter-spacing:-.024em;line-height:1.06;margin:12px 0 0;max-width:34ch;">Una cadena de suministro puede concentrar varios riesgos a la vez.</h2>
+          <div class="vl-split" style="display:grid;grid-template-columns:.92fr 1.08fr;gap:clamp(18px,2.2vw,30px);margin-top:22px;align-items:start;">
+            <div style="background:#1C1A21;border:1px solid #2a2833;border-radius:20px;padding:clamp(16px,1.8vw,24px);min-width:0;">
+              <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.12em;color:#FF7C8C;">{{ chainKicker }}</div>
+              <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(18px,1.7vw,23px);letter-spacing:-.02em;line-height:1.08;margin:8px 0 0;">{{ chainTitle }}</h3>
+              <p style="font-size:14px;line-height:1.62;color:#EFE9DD;margin:14px 0 0;border-top:2px solid #E4002B;padding-top:13px;">La responsabilidad cambia de manos varias veces en un mismo despacho. A&amp;S Colombia lee la cadena por ese recorrido —quién responde en cada traspaso— y no por una póliza a la vez.</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+                <button onClick="{{ goLogisticaCO }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Explorar Transporte, Logística y Cadena</button>
+                <button onClick="{{ openHandoff }}" style="min-height:48px;padding:0 20px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.46);color:#fff;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;">Hablar con un asesor</button>
+              </div>
+              <p style="font-size:11.5px;line-height:1.55;color:#A9A29A;margin:12px 0 0;" class="vl-functional-mobile">Qué cambia según tu rol, tu operación y cada etapa se revisa en Empresas. Esta lectura orienta: no confirma cobertura, elegibilidad ni condiciones.</p>
+            </div>
+            <div class="vl-chainstage" aria-label="Mapa visual de la cadena de suministro">
+              <div style="position:relative;z-index:6;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 20px 0;">
+                <span class="vl-isotile vl-isotile--dark vl-isotile--sm"><svg class="vl-ico" viewBox="0 0 120 120"><use href="#ic-cadena"></use></svg></span>
+                <span style="font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.12em;color:#FF9DA8;text-align:right;line-height:1.5;">MAPA VISUAL<br>DE LA CADENA</span>
+              </div>
+              <div class="vl-chainscene">
+                <svg viewBox="0 0 920 300" preserveAspectRatio="xMidYMid meet" style="position:absolute;inset:0;width:100%;height:100%;" aria-hidden="true">
+                  <defs>
+                    <filter id="chBlur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="13"/></filter>
+                    <linearGradient id="chGround" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#26222E"/><stop offset="55%" stop-color="#1A1721"/><stop offset="100%" stop-color="#131019"/></linearGradient>
+                  </defs>
+                  <g><ellipse cx="452" cy="214" rx="340" ry="34" fill="#12000A" opacity=".55" filter="url(#chBlur)"/><polygon points="272,64 778,229.6 668,265.6 162,100" fill="url(#chGround)"/><polygon points="778,229.6 668,265.6 668,273.6 778,237.6" fill="#0D0B12"/><polygon points="162,100 668,265.6 668,273.6 162,108" fill="#100E16"/><polygon points="272,64 778,229.6 668,265.6 162,100" fill="none" stroke="rgba(216,169,78,.4)" stroke-width="1.1"/><path d="M294,71.2 L184,107.2" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M316,78.4 L206,114.4" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M338,85.6 L228,121.6" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M360,92.8 L250,128.8" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M382,100 L272,136" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M404,107.2 L294,143.2" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M426,114.4 L316,150.4" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M448,121.6 L338,157.6" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M470,128.8 L360,164.8" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M492,136 L382,172" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M514,143.2 L404,179.2" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M536,150.4 L426,186.4" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M558,157.6 L448,193.6" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M580,164.8 L470,200.8" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M602,172 L492,208" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M624,179.2 L514,215.2" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M646,186.4 L536,222.4" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M668,193.6 L558,229.6" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M690,200.8 L580,236.8" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M712,208 L602,244" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M734,215.2 L624,251.2" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M756,222.4 L646,258.4" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M250,71.2 L756,236.8" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M228,78.4 L734,244" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M206,85.6 L712,251.2" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M184,92.8 L690,258.4" stroke="rgba(255,255,255,.04)" stroke-width="1"/><polygon points="225.8,78.7 731.8,244.3 714.2,250.1 208.2,84.5" fill="#191720"/><path d="M223.6,83.7 L235.7,87.6" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M247.8,91.6 L259.9,95.5" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M272,99.5 L284.1,103.5" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M296.2,107.4 L308.3,111.4" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M320.4,115.3 L332.5,119.3" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M344.6,123.3 L356.7,127.2" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M368.8,131.2 L380.9,135.1" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M393,139.1 L405.1,143.1" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M417.2,147 L429.3,151" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M441.4,154.9 L453.5,158.9" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M465.6,162.9 L477.7,166.8" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M489.8,170.8 L501.9,174.7" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M514,178.7 L526.1,182.7" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M538.2,186.6 L550.3,190.6" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M562.4,194.5 L574.5,198.5" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M586.6,202.5 L598.7,206.4" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M610.8,210.4 L622.9,214.3" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M635,218.3 L647.1,222.3" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M659.2,226.2 L671.3,230.2" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M683.4,234.1 L695.5,238.1" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><path d="M707.6,242.1 L719.7,246" stroke="rgba(240,215,155,.45)" stroke-width="1.4"/><polygon points="333.6,56.5 305,65.8 305,97.8 333.6,88.5" fill="#1D222A"/><polygon points="250,47.8 305,65.8 305,97.8 250,79.8" fill="#333A46"/><polygon points="278.6,38.5 333.6,56.5 305,65.8 250,47.8" fill="#5B6472"/><path d="M278.6,38.5 L333.6,56.5 L305,65.8" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><path d="M333.6,77.8 L305,87.2 L250,69.2" fill="none" stroke="rgba(180,215,255,.4)" stroke-width="1.4" stroke-dasharray="4 4"/><path d="M333.6,67.1 L305,76.5 L250,58.5" fill="none" stroke="rgba(180,215,255,.4)" stroke-width="1.4" stroke-dasharray="4 4"/><polygon points="305,90.8 297.3,93.4 297.3,100.4 305,97.8" fill="#100E14"/><polygon points="242.3,75.4 297.3,93.4 297.3,100.4 242.3,82.4" fill="#221C2A"/><polygon points="250,72.8 305,90.8 297.3,93.4 242.3,75.4" fill="#3E3746"/><path d="M250,72.8 L305,90.8 L297.3,93.4" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="236.8,91.9 221.4,96.9 221.4,107.9 236.8,102.9" fill="#780015"/><polygon points="201.6,90.4 221.4,96.9 221.4,107.9 201.6,101.4" fill="#B8001F"/><polygon points="217,85.4 236.8,91.9 221.4,96.9 201.6,90.4" fill="#F0284C"/><path d="M217,85.4 L236.8,91.9 L221.4,96.9" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="261,99.8 245.6,104.8 245.6,115.8 261,110.8" fill="#A99C95"/><polygon points="225.8,98.4 245.6,104.8 245.6,115.8 225.8,109.4" fill="#D3C7BE"/><polygon points="241.2,93.3 261,99.8 245.6,104.8 225.8,98.4" fill="#F3EDE6"/><path d="M241.2,93.3 L261,99.8 L245.6,104.8" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="380.9,119.6 364.4,125 364.4,136 380.9,130.6" fill="#A99C95"/><polygon points="329.2,113.5 364.4,125 364.4,136 329.2,124.5" fill="#D3C7BE"/><polygon points="345.7,108.1 380.9,119.6 364.4,125 329.2,113.5" fill="#F3EDE6"/><path d="M345.7,108.1 L380.9,119.6 L364.4,125" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="395.2,120.3 378.7,125.7 378.7,140.7 395.2,135.3" fill="#780015"/><polygon points="364.4,121 378.7,125.7 378.7,140.7 364.4,136" fill="#B8001F"/><polygon points="380.9,115.6 395.2,120.3 378.7,125.7 364.4,121" fill="#F0284C"/><path d="M380.9,115.6 L395.2,120.3 L378.7,125.7" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><ellipse cx="338" cy="127.4" rx="4" ry="2" fill="#0A0910"/><ellipse cx="366.6" cy="136.7" rx="4" ry="2" fill="#0A0910"/><polygon points="442.5,139.8 426,145.2 426,156.2 442.5,150.8" fill="#A99C95"/><polygon points="390.8,133.6 426,145.2 426,156.2 390.8,144.6" fill="#D3C7BE"/><polygon points="407.3,128.2 442.5,139.8 426,145.2 390.8,133.6" fill="#F3EDE6"/><path d="M407.3,128.2 L442.5,139.8 L426,145.2" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="456.8,140.4 440.3,145.8 440.3,160.8 456.8,155.4" fill="#780015"/><polygon points="426,141.2 440.3,145.8 440.3,160.8 426,156.2" fill="#B8001F"/><polygon points="442.5,135.8 456.8,140.4 440.3,145.8 426,141.2" fill="#F0284C"/><path d="M442.5,135.8 L456.8,140.4 L440.3,145.8" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><ellipse cx="399.6" cy="147.5" rx="4" ry="2" fill="#0A0910"/><ellipse cx="428.2" cy="156.9" rx="4" ry="2" fill="#0A0910"/><polygon points="394.1,84.3 382,88.2 382,112.2 394.1,108.3" fill="#96691B"/><polygon points="369.9,84.3 382,88.2 382,112.2 369.9,108.3" fill="#D8A94E"/><polygon points="382,80.3 394.1,84.3 382,88.2 369.9,84.3" fill="#F7E3AE"/><path d="M382,80.3 L394.1,84.3 L382,88.2" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="558,144.4 529.4,153.7 529.4,172.7 558,163.4" fill="#A99C95"/><polygon points="472.2,135 529.4,153.7 529.4,172.7 472.2,154" fill="#D3C7BE"/><polygon points="500.8,125.6 558,144.4 529.4,153.7 472.2,135" fill="#F3EDE6"/><path d="M500.8,125.6 L558,144.4 L529.4,153.7" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><path d="M558,153.9 L529.4,163.2 L472.2,144.5" fill="none" stroke="rgba(180,215,255,.4)" stroke-width="1.4" stroke-dasharray="4 4"/><polygon points="494.2,165.2 465.6,174.6 465.6,193.6 494.2,184.2" fill="#A99C95"/><polygon points="408.4,155.9 465.6,174.6 465.6,193.6 408.4,174.9" fill="#D3C7BE"/><polygon points="437,146.5 494.2,165.2 465.6,174.6 408.4,155.9" fill="#F3EDE6"/><path d="M437,146.5 L494.2,165.2 L465.6,174.6" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><path d="M494.2,174.7 L465.6,184.1 L408.4,165.4" fill="none" stroke="rgba(180,215,255,.4)" stroke-width="1.4" stroke-dasharray="4 4"/><polygon points="505.9,160.5 489.4,165.9 489.4,176.9 505.9,171.5" fill="#A99C95"/><polygon points="461.2,156.7 489.4,165.9 489.4,176.9 461.2,167.7" fill="#D3C7BE"/><polygon points="477.7,151.3 505.9,160.5 489.4,165.9 461.2,156.7" fill="#F3EDE6"/><path d="M477.7,151.3 L505.9,160.5 L489.4,165.9" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="520.2,161.2 503.7,166.6 503.7,181.6 520.2,176.2" fill="#780015"/><polygon points="489.4,161.9 503.7,166.6 503.7,181.6 489.4,176.9" fill="#B8001F"/><polygon points="505.9,156.5 520.2,161.2 503.7,166.6 489.4,161.9" fill="#F0284C"/><path d="M505.9,156.5 L520.2,161.2 L503.7,166.6" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><ellipse cx="470" cy="170.6" rx="4" ry="2" fill="#0A0910"/><ellipse cx="491.1" cy="177.5" rx="4" ry="2" fill="#0A0910"/><polygon points="669.1,169.6 631.7,181.8 631.7,209.8 669.1,197.6" fill="#171B22"/><polygon points="563.5,159.5 631.7,181.8 631.7,209.8 563.5,187.5" fill="#2B323E"/><polygon points="600.9,147.2 669.1,169.6 631.7,181.8 563.5,159.5" fill="#4B5566"/><path d="M600.9,147.2 L669.1,169.6 L631.7,181.8" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><path d="M600.9,147.2 L653.7,142.3 L669.1,169.6" fill="#3A4351" stroke="rgba(255,255,255,.24)"/><path d="M653.7,142.3 L669.1,169.6 L631.7,181.8 L616.3,154.5" fill="#242B36"/><polygon points="559.1,193.5 541.5,199.2 541.5,211.2 559.1,205.5" fill="#780015"/><polygon points="520.6,192.4 541.5,199.2 541.5,211.2 520.6,204.4" fill="#B8001F"/><polygon points="538.2,186.6 559.1,193.5 541.5,199.2 520.6,192.4" fill="#F0284C"/><path d="M538.2,186.6 L559.1,193.5 L541.5,199.2" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="585.5,202.1 567.9,207.9 567.9,219.9 585.5,214.1" fill="#A99C95"/><polygon points="547,201 567.9,207.9 567.9,219.9 547,213" fill="#D3C7BE"/><polygon points="564.6,195.3 585.5,202.1 567.9,207.9 547,201" fill="#F3EDE6"/><path d="M564.6,195.3 L585.5,202.1 L567.9,207.9" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="537.1,200.7 519.5,206.4 519.5,218.4 537.1,212.7" fill="#A99C95"/><polygon points="498.6,199.6 519.5,206.4 519.5,218.4 498.6,211.6" fill="#D3C7BE"/><polygon points="516.2,193.8 537.1,200.7 519.5,206.4 498.6,199.6" fill="#F3EDE6"/><path d="M516.2,193.8 L537.1,200.7 L519.5,206.4" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="739.5,202.6 710.9,212 710.9,235 739.5,225.6" fill="#A99C95"/><polygon points="674.6,200.1 710.9,212 710.9,235 674.6,223.1" fill="#D3C7BE"/><polygon points="703.2,190.8 739.5,202.6 710.9,212 674.6,200.1" fill="#F3EDE6"/><path d="M703.2,190.8 L739.5,202.6 L710.9,212" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><path d="M739.5,218 L710.9,227.3 L674.6,215.5" fill="none" stroke="rgba(180,215,255,.4)" stroke-width="1.4" stroke-dasharray="4 4"/><path d="M739.5,210.3 L710.9,219.7 L674.6,207.8" fill="none" stroke="rgba(180,215,255,.4)" stroke-width="1.4" stroke-dasharray="4 4"/><polygon points="673.5,234.4 653.7,240.8 653.7,250.8 673.5,244.4" fill="#100E14"/><polygon points="626.2,231.8 653.7,240.8 653.7,250.8 626.2,241.8" fill="#221C2A"/><polygon points="646,225.4 673.5,234.4 653.7,240.8 626.2,231.8" fill="#3E3746"/><path d="M646,225.4 L673.5,234.4 L653.7,240.8" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="651.5,219.6 647.1,221.1 647.1,245.1 651.5,243.6" fill="#96691B"/><polygon points="642.7,219.6 647.1,221.1 647.1,245.1 642.7,243.6" fill="#D8A94E"/><polygon points="647.1,218.2 651.5,219.6 647.1,221.1 642.7,219.6" fill="#F7E3AE"/><path d="M647.1,218.2 L651.5,219.6 L647.1,221.1" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="665.1,212.6 648.6,218 648.6,229 665.1,223.6" fill="#A99C95"/><polygon points="624,210 648.6,218 648.6,229 624,221" fill="#D3C7BE"/><polygon points="640.5,204.6 665.1,212.6 648.6,218 624,210" fill="#F3EDE6"/><path d="M640.5,204.6 L665.1,212.6 L648.6,218" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><polygon points="679.4,213.3 662.9,218.7 662.9,233.7 679.4,228.3" fill="#780015"/><polygon points="648.6,214 662.9,218.7 662.9,233.7 648.6,229" fill="#B8001F"/><polygon points="665.1,208.6 679.4,213.3 662.9,218.7 648.6,214" fill="#F0284C"/><path d="M665.1,208.6 L679.4,213.3 L662.9,218.7" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".9"/><ellipse cx="632.8" cy="223.8" rx="4" ry="2" fill="#0A0910"/><ellipse cx="650.2" cy="229.5" rx="4" ry="2" fill="#0A0910"/></g>
+                </svg>
+                <sc-for list="{{ chainItems }}" as="c" hint-placeholder-count="5">
+                  <span aria-hidden="true" class="vl-chainpin" style="{{ c.spot }}"><span style="{{ c.spotDot }}">{{ c.n }}</span><span style="{{ c.spotLab }}">{{ c.label }}</span></span>
+                </sc-for>
+              </div>
+              <div style="position:relative;z-index:6;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 20px 18px;">
+                <div><div style="font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.1em;color:#ADA69B;">LECTURA DE CONJUNTO</div><div style="font-family:'Archivo';font-weight:800;font-size:clamp(17px,1.9vw,22px);color:#fff;margin-top:3px;letter-spacing:-.015em;">{{ chainTitle }}</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 · AMPLITUD EMPRESARIAL · NIVEL C teaser (absorbe la banda R4 “Protección empresarial”) -->
+      <div style="background:#F4F1EA;color:#12110F;">
+        <div class="vl-r1b-teaser" style="max-width:1600px;margin:0 auto;padding:clamp(24px,3vh,38px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#C4001F;">PROTECCIÓN EMPRESARIAL</div>
+          <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(19px,1.95vw,26px);letter-spacing:-.022em;line-height:1.08;margin:10px 0 0;max-width:36ch;">Protege la operación completa, no una póliza aislada.</h3>
+          <p style="font-size:14px;line-height:1.6;color:#454039;margin:10px 0 0;max-width:78ch;">La cadena casi nunca viaja sola: responsabilidad, contratos, propiedad, continuidad, movilidad y beneficios se activan alrededor de la misma operación.</p>
+          <div class="vl-co-groups">
+            <sc-for list="{{ coGroups }}" as="g" hint-placeholder-count="4">
+              <div class="vl-co-group"><span>{{ g.k }}</span><b>{{ g.t }}</b><i>{{ g.d }}</i></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
+            <button onClick="{{ goEmpresas }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Ir a Empresas</button>
+          </div>
+          <p style="font-size:11.5px;color:#6E655C;line-height:1.55;margin:14px 0 0;max-width:80ch;" class="vl-functional-mobile">Cada grupo tiene sus propios criterios y condiciones; esa revisión se hace en Empresas. Que una solución exista en el mercado no significa que sea adecuada o esté disponible para todos los casos.</p>
+        </div>
+      </div>
+
+      <!-- 4 · PERSONAS Y FAMILIAS · NIVEL C teaser secundario -->
+      <div style="background:#EFE9DD;color:#12110F;">
+        <div class="vl-split" style="max-width:1600px;margin:0 auto;padding:clamp(24px,3vh,38px) clamp(20px,3vw,44px);display:grid;grid-template-columns:1fr .9fr;gap:clamp(18px,2.4vw,34px);align-items:center;">
+          <div style="min-width:0;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#C4001F;">PERSONAS Y FAMILIAS</div>
+            <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(19px,1.95vw,26px);letter-spacing:-.022em;line-height:1.08;margin:10px 0 0;max-width:24ch;">Tu protección también cambia con tu vida.</h3>
+            <p style="font-size:14px;line-height:1.6;color:#454039;margin:10px 0 0;max-width:58ch;">Movilidad, hogar, salud, vida e ingreso se conectan de forma distinta según tu momento. Una póliza de salud es un seguro privado según sus condiciones; no es una EPS.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;min-width:0;">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <sc-for list="{{ coPersonas }}" as="p" hint-placeholder-count="4"><span style="font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;background:#fff;border:1px solid #E2DACF;color:#12110F;">{{ p.t }}</span></sc-for>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+              <button onClick="{{ goPersonas }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Explorar mi protección</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 · MÉTODO + CONTINUIDAD · compactado (F7-CIG-05-R1B) -->
+      <div style="background:#171419;color:#F4F1EA;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(26px,3.2vh,42px) clamp(20px,3vw,44px);">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#FF7C8C;">MÉTODO A&amp;S</div>
+          <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(19px,1.95vw,26px);letter-spacing:-.022em;line-height:1.08;margin:10px 0 0;max-width:30ch;">Comparar empieza antes del precio.</h3>
+          <div class="vl-3" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px;">
+            <sc-for list="{{ coMetodo }}" as="m" hint-placeholder-count="4">
+              <div style="border-top:2px solid #E4002B;padding-top:12px;display:flex;flex-direction:column;gap:5px;min-width:0;">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#FF9DA8;">{{ m.n }}</span>
+                <span style="font-family:'Archivo';font-weight:800;font-size:18px;letter-spacing:-.02em;color:#fff;line-height:1.1;">{{ m.t }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div class="vl-split" style="display:grid;grid-template-columns:1fr .9fr;gap:clamp(18px,2.4vw,32px);margin-top:22px;border-top:1px solid #2a2833;padding-top:18px;align-items:start;">
+            <div style="min-width:0;">
+              <p style="font-size:14px;line-height:1.6;color:#CFC9BE;margin:0;max-width:70ch;"><b style="color:#fff;">Recibida no significa validada.</b> Solo una propuesta validada y vigente entra a la comparación. Cuando una alternativa no informa un dato, se muestra como dato no informado: no como “no cubre”. Elegir no equivale a emisión.</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+                <button onClick="{{ goCotComp }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Cotizar o comparar</button>
+                <button onClick="{{ goRenovar }}" style="min-height:48px;padding:0 20px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.24);color:#fff;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;">Revisar antes de renovar</button>
+              </div>
+            </div>
+            <div style="display:grid;gap:10px;min-width:0;align-content:start;">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:#A9A29A;">CONTINÚA POR DONDE NECESITES</div>
+              <div style="display:flex;gap:9px;flex-wrap:wrap;">
+                <sc-for list="{{ coNext }}" as="nx" hint-placeholder-count="4">
+                  <button onClick="{{ nx.go }}" class="vl-co-allbtn">{{ nx.t }}</button>
+                </sc-for>
+              </div>
+              <p style="font-size:11.5px;line-height:1.55;color:#A9A29A;margin:4px 0 0;" class="vl-functional-mobile">Puedes continuar en línea solo cuando el caso es elegible. Pagos, emisión y Mi Portal solo se muestran cuando están disponibles.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 · SINIESTROS, SERVICIO Y CONTINUIDAD · NIVEL D banda utilitaria (fusión R4 bandas 7+8) -->
+      <div style="background:#F4F1EA;color:#12110F;">
+        <div style="max-width:1600px;margin:0 auto;padding:clamp(26px,3.2vh,42px) clamp(20px,3vw,44px);">
+          <div class="vl-split" style="display:grid;grid-template-columns:.86fr 1.14fr;gap:clamp(18px,2.4vw,34px);align-items:start;">
+            <div style="min-width:0;">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#C4001F;">SINIESTROS, SERVICIO Y CONTINUIDAD</div>
+              <h3 style="font-family:'Archivo';font-weight:800;font-size:clamp(19px,1.95vw,26px);letter-spacing:-.022em;line-height:1.08;margin:10px 0 0;max-width:26ch;">Si algo ocurrió, te ayudamos a ordenar el siguiente paso.</h3>
+              <p style="font-size:14px;line-height:1.6;color:#454039;margin:10px 0 0;max-width:56ch;">Seguridad primero. Luego identificamos si necesitas asistencia, aviso, radicación o seguimiento y te dirigimos al canal oficial que corresponde.</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+                <button onClick="{{ goSiniestros }}" style="min-height:48px;padding:0 22px;border-radius:12px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;">Necesito orientación ahora</button>
+                <button onClick="{{ openHandoff }}" style="min-height:48px;padding:0 20px;border-radius:12px;background:#fff;border:1.5px solid #CFC5B4;color:#12110F;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;">Cuéntanos qué necesitas proteger</button>
+              </div>
+              <p style="font-size:11.5px;color:#6E655C;line-height:1.55;margin:14px 0 0;max-width:64ch;" class="vl-functional-mobile">A&amp;S acompaña; la aseguradora o el proveedor conserva la decisión sobre asistencia, cobertura, ajuste e indemnización.</p>
+            </div>
+            <div style="min-width:0;">
+              <div class="vl-3" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;">
+                <sc-for list="{{ coServicio }}" as="sv" hint-placeholder-count="3">
+                  <button onClick="{{ sv.go }}" style="text-align:left;font-family:inherit;cursor:pointer;background:#fff;border:1px solid #E2DACF;border-radius:14px;padding:16px;min-height:104px;display:flex;flex-direction:column;gap:5px;transition:border-color .16s,transform .16s;" style-hover="border-color:#E4002B;transform:translateY(-2px);">
+                    <span style="font-family:'Archivo';font-weight:700;font-size:15.5px;color:#12110F;line-height:1.14;">{{ sv.t }}</span>
+                    <span style="font-size:12.5px;line-height:1.5;color:#454039;">{{ sv.d }}</span>
+                    <span style="margin-top:auto;padding-top:8px;font-family:'Archivo';font-weight:700;font-size:13px;color:#C4001F;">{{ sv.cta }} →</span>
+                  </button>
+                </sc-for>
+              </div>
+              <p style="font-size:11.5px;color:#6E655C;line-height:1.55;margin:12px 0 0;max-width:80ch;" class="vl-functional-mobile">A&amp;S Consultores de Seguros — intermediación de seguros en Colombia. No trabajamos con todas las aseguradoras del mercado ni prometemos el mejor precio.</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+                <button onClick="{{ goSobre }}" style="min-height:48px;padding:0 20px;border-radius:12px;background:#fff;border:1.5px solid #E7E2D6;color:#12110F;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;">Conocer cómo trabajamos</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </section>
+  </sc-if>
+
+  <!-- ============================ EMPRESAS GT ============================ -->
+  <sc-if value="{{ isEmpresas }}" hint-placeholder-val="{{ false }}">
+    <section class="vl-screen" data-screen-label="Empresas" data-country="{{ empCountryCode }}">
+
+      <!-- HERO · composición tipográfica + seis dominios condensados (sin fotografía) -->
+      <div style="position:relative;background:#0E0D10;color:#F4F1EA;overflow:hidden;">
+        <div aria-hidden="true" style="position:absolute;inset:0;z-index:0;background:radial-gradient(980px 600px at 88% 2%,rgba(228,0,43,.15),transparent 62%);"></div>
+        <div class="vl-hero-grid vl-emp-hero" style="position:relative;z-index:1;max-width:1600px;margin:0 auto;padding:clamp(44px,7vh,98px) clamp(20px,3vw,44px);display:grid;grid-template-columns:1.06fr 1fr;gap:clamp(24px,3.2vw,52px);align-items:center;">
+          <div style="min-width:0;">
+            <div style="font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.14em;color:#FF7C8C;display:flex;align-items:center;gap:10px;"><span style="width:30px;height:2px;background:#E4002B;"></span>{{ empEyebrow }}</div>
+            <h1 style="font-family:'Archivo';font-weight:900;font-size:clamp(34px,4.4vw,72px);line-height:.95;letter-spacing:-.035em;margin:18px 0 0;max-width:20ch;">{{ empH1a }}<span style="color:#FF3B54;">{{ empH1b }}</span>{{ empH1c }}</h1>
+            <p style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:clamp(17px,1.55vw,22px);line-height:1.45;color:#D7D1C4;margin:18px 0 0;max-width:54ch;">{{ empBody }}</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;">
+              <button onClick="{{ empScroll }}" style="min-height:52px;padding:0 24px;border-radius:13px;background:#E4002B;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;">{{ empCta }}</button>
+              <button onClick="{{ openHandoff }}" style="min-height:52px;padding:0 24px;border-radius:13px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.24);color:#fff;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;">Hablar con un asesor</button>
+            </div>
+            <p style="font-size:12px;line-height:1.55;color:#A9A29A;margin:24px 0 0;max-width:60ch;border-top:1px solid #2a2833;padding-top:14px;">{{ empTruth }}</p>
+          </div>
+          <sc-if value="{{ empCoHeroShow }}" hint-placeholder-val="{{ false }}">
+            <figure class="vl-emp-heromedia" style="margin:0;position:relative;border-radius:24px;overflow:hidden;border:1px solid #2a2833;box-shadow:0 54px 112px -62px rgba(0,0,0,.95);">
+              <img src="assets/library_real/ECO_H03_REUNION_CORPORATIVA_CO_REAL_v1.png" alt="{{ empCoHeroAlt }}" decoding="async" style="display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:52% 48%;">
+              <span aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,16,0) 56%,rgba(14,13,16,.66) 100%);"></span>
+              
+            </figure>
+          </sc-if>
+          <div class="vl-emp-heropanel" style="min-width:0;border:1px solid #2a2833;border-radius:22px;background:linear-gradient(155deg,#1a1119 0%,#0E0D10 62%);padding:clamp(18px,2vw,26px);box-shadow:0 46px 96px -58px rgba(0,0,0,.9);">
+            <div style="font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.12em;color:#FF9DA8;">{{ empPanelLabel }}</div>
+            <div class="vl-2 vl-egt-areas" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
+              <sc-for list="{{ empDominios }}" as="d" hint-placeholder-count="6">
+                <div style="border-top:2px solid rgba(228,0,43,.7);padding:10px 0 0;display:flex;flex-direction:column;gap:3px;">
+                  <span class="vl-co-num" style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#FF9DA8;">{{ d.n }}</span>
+                  <span style="font-family:'Archivo';font-weight:700;font-size:14.5px;color:#fff;">{{ d.t }}</span>
+                  <span style="font-size:12px;line-height:1.45;color:#CFC9BE;">{{ d.d }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ empPanelNoteShow }}" hint-placeholder-val="{{ false }}">
+              <p class="vl-functional-mobile" style="font-size:11.5px;line-height:1.55;color:#A9A29A;margin:16px 0 0;">{{ empPanelNote }}</p>
+            </sc-if>
+            <sc-if value="{{ empCoPreflightShow }}" hint-placeholder-val="{{ false }}">
+              <div class="vl-co-anchor" style="margin:18px 0 0;border-top:1px solid #2a2833;padding-top:16px;">
+                <div aria-hidden="true" style="height:118px;border-radius:12px;border:1px dashed #4a4550;background:repeating-linear-gradient(135deg,#1A1820 0 12px,#141216 12px 24px);display:grid;place-items:center;text-align:center;padding:0 16px;">
+                  <span style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;line-height:1.7;color:#A9A29A;">NON_PUBLIC_PREFLIGHT<br>SLOT DE EQUIPO A&amp;S COLOMBIA · SIN ACTIVO APROBADO</span>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ empHumanShow }}" hint-placeholder-val="{{ false }}">
+              <div class="vl-egt-anchor">
+                <img src="assets/library_real/EGT_C01_REUNION_EMPRESARIAL_REAL_v1.png" alt="Reunión empresarial de A&amp;S para revisar alternativas y riesgos de una operación." loading="lazy" decoding="async" style="display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%;">
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+
+      <!-- F7-T3A · SITUACIÓN · punto de partida compacto entre hero y mapa (solo Guatemala) -->
+      <sc-if value="{{ empSitShow }}" hint-placeholder-val="{{ false }}">
+        <div id="vl-emp-situacion" style="background:#EFE9DD;color:#12110F;border-top:1px solid #E2DACF;">
+          <div style="max-width:1600px;margin:0 auto;padding:clamp(24px,3.2vh,42px) clamp(20px,3vw,44px);">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;">
+              <div style="max-width:70ch;min-width:0;">
+                <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.13em;color:#C4001F;">PUNTO DE PARTIDA</div>
+                <h2 style="font-family:'Archivo';font-weight:800;font-size:clamp(22px,2.5vw,33px);letter-spacing:-.024em;line-height:1.06;margin:10px 0 8px;">Empieza por lo que puede afectar tu empresa.</h2>
+                <p style="font-size:14.5px;line-height:1.6;color:#454039;margin:0;">No necesitas saber el nombre de una póliza. Cuéntanos qué quieres proteger o qué cambió en tu operación y te orientamos hacia el siguiente paso.</p>
+              </div>
+              <sc-if value="{{ empSitAny }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ empSitClear }}" style="min-height:44px;padding:0 16px;border-radius:12px;background:#fff;border:1px solid #E2DACF;color:#454039;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer;">Quitar la situación</button>
+              </sc-if>
+            </div>
+            <div role="group" aria-label="Situación de tu empresa" class="vl-emp-sit" style="margin-top:16px;">
+              <sc-for list="{{ empSituations }}" as="q" hint-placeholder-count="4">
+                <button class="vl-emp-sit-card" onClick="{{ q.pick }}" aria-pressed="{{ q.active }}" data-analytics-action="situation_selected" style="{{ q.style }}">
+                  <span class="vl-emp-sit-meta"><span class="vl-emp-sit-n">{{ q.n }}</span><span class="vl-emp-sit-line" aria-hidden="true"></span><span class="vl-emp-sit-status">{{ q.mark }}</span></span>
+                  <span class="vl-emp-sit-title">{{ q.label }}</span>
+                  <span class="vl-emp-sit-desc">{{ q.desc }}</span>
+                  <span class="vl-emp-sit-arrow" aria-hidden="true">→</span>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ empSitAny }}" hint-placeholder-val="{{ false }}">
+              <div aria-live="polite" style="margin-top:14px;background:#fff;border:1px solid #E7E2D6;border-radius:18px;padding:clamp(16px,1.9vw,24px);box-shadow:0 22px 52px -46px rgba(30,10,0,.45);">
+                <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#6E655C;">CÓMO SEGUIMOS DESDE AQUÍ</div>
+                <p class="vl-emp-rail" style="font-family:'Instrument Sans',system-ui,sans-serif;font-size:15.5px;line-height:1.5;color:#3C382F;margin:6px 0 0;max-width:92ch;">{{ empSitNote }}</p>
+                <sc-if value="{{ empPathShow }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:16px;border-top:1px solid #E7E2D6;padding-top:14px;">
+                    <div style="font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.12em;color:#C4001F;">REVISIÓN DEL PROGRAMA · SECUENCIA</div>
+                    <div role="group" aria-label="Secuencia de revisión del programa" class="vl-emp-path vl-emp-rail" style="margin-top:10px;">
+                      <sc-for list="{{ empPathSteps }}" as="p" hint-placeholder-count="5">
+                        <button onClick="{{ p.pick }}" aria-pressed="{{ p.active }}" data-analytics-action="diagnostic_step_completed" style="{{ p.style }}">
+                          <span style="display:block;font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.1em;color:#C4001F;">{{ p.n }}</span>
+                          <span style="display:block;font-family:'Archivo';font-weight:750;font-size:13px;letter-spacing:-.01em;margin-top:4px;">{{ p.label }}</span>
+                        </button>
+                      </sc-for>
+                    </div>
+                    <p class="vl-emp-rail" style="font-size:13.5px;line-height:1.6;color:#454039;margin:12px 0 0;max-width:92ch;">{{ empPathDesc }}</p>
+                    <p class="vl-emp-rail vl-functional-copy" style="font-size:11.5px;line-height:1.55;color:#6E655C;margin:10px 0 0;max-width:92ch;">Tener varias pólizas no asegura por sí solo que el programa esté coordinado. La revisión conjunta ayuda a identificar posibles vacíos, solapamientos, diferencias de límites y vigencias antes de decidir qué conviene mantener, ajustar o comparar.</p>
+                  </div>
+                </sc-if>
+                <div class="vl-emp-rail" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
