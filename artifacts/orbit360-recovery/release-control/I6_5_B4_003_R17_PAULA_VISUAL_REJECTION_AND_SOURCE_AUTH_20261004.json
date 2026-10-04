@@ -1,0 +1,51 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R17_PAULA_VISUAL_REJECTION_AND_SOURCE_AUTH_V1",
+  "recordedAt": "2026-10-04T23:36:00Z",
+  "status": "R17_VISUAL_REJECTION_SOURCE_FIX_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "passesPreserved": [
+    "assignable advisor roster for Carlos",
+    "Configuración Catálogos fast paint",
+    "sampled receipt shadow-duplicate exclusion",
+    "renewals populated"
+  ],
+  "blockers": [
+    "lead insurer country/cardinality",
+    "quality responsive/actionability/cause semantics",
+    "renewability review UX/count consistency",
+    "insurer source detail drill-down",
+    "non-vehicle vehicle-section leak"
+  ],
+  "scope": {
+    "status": "AUTHORIZED_SOURCE_ONLY",
+    "preservePriorPasses": true,
+    "b4004Held": true,
+    "allowedProductFiles": [
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/calidad.js",
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/aseguradoras.js"
+    ],
+    "allowedQaFiles": [
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ],
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "nextAction": "B4_003_R17_SOURCE_FIX"
+  },
+  "noLive": true,
+  "noReimport": true,
+  "b4004Held": true,
+  "newBlobs": {
+    "ledger": "20b28e0832ac8bf5679450ea613abd595add4f20",
+    "carry": "4bc36c5d3391d63405b4200a369a9cdeeac54187",
+    "lock": "8d453074d19bf44d411513f275c70ac1adfac924",
+    "controlPlane": "9ad169a60a8055dbbac565dc6394a6ee5f2f57ba"
+  }
+}
