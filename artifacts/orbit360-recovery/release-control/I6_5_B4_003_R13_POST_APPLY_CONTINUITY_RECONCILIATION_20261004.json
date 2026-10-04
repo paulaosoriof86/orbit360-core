@@ -1,0 +1,52 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R13_POST_APPLY_CONTINUITY_RECONCILIATION_V1",
+  "recordedAt": "2026-10-04",
+  "status": "QA_CONTINUITY_RECONCILED_PENDING_EXACT_PREVIEW",
+  "failedRunId": 37170865514,
+  "failedJobId": 111343376621,
+  "failureCode": "CONTINUITY_STATUS_DRIFT:B4-003",
+  "rootCause": "Post-apply freeze updated ledger findings but targeted carry-forward property 'findings'; the canonical carry-forward rows live under 'inventory', leaving B4-003 and B4-003-R13-04 statuses stale.",
+  "changes": {
+    "carryPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
+    "priorCarryBlobSha": "535b08b08e67c95ae512bd16f0e3f23cbca7c060",
+    "newCarryBlobSha": "f343f64b64125cb765229e9b031145d4e91df752",
+    "rows": [
+      {
+        "id": "B4-003",
+        "before": {
+          "status": "RENEWAL_DATA_APPLY_AUTHORIZED",
+          "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY"
+        },
+        "after": {
+          "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+          "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+        }
+      },
+      {
+        "id": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
+        "before": {
+          "status": "DETERMINISTIC_APPLY_AUTHORIZED",
+          "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY"
+        },
+        "after": {
+          "status": "DATA_APPLIED_PENDING_EXACT_PREVIEW",
+          "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+        }
+      }
+    ]
+  },
+  "evidence": {
+    "renewalApplyReceiptBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e",
+    "exactWritesAlreadyApplied": 4,
+    "thisFixBusinessWrites": 0,
+    "previewRunReached": "CONTRACT_VALIDATION_PRE_DEPLOY",
+    "liveUnchangedPass": true
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
+}

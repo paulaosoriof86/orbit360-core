@@ -563,13 +563,13 @@
     {
       "id": "B4-003",
       "block": "B4",
-      "status": "RENEWAL_DATA_APPLY_AUTHORIZED",
+      "status": "SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
       "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
       "source": "LEDGER",
-      "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "humanVisualStatus": "REJECTED_R13",
       "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
       "r13QaGateAlignmentPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_QA_GATE_ALIGNMENT_20261004.json",
@@ -2199,27 +2199,26 @@
     {
       "id": "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
       "block": "B4",
-      "status": "DETERMINISTIC_APPLY_AUTHORIZED",
+      "status": "DATA_APPLIED_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "owner": "orbit360-platform/modules/renovaciones.js + orbit360-platform/modules/renewals-v1200-operational-bridge.js + orbit360-platform/modules/renewals-v1201-issued-filter.js",
       "targetGate": "B4-003",
       "closureCondition": "Real source-backed renewal pipeline repopulates by canonical eligibility/country/horizon and is proven on exact Preview.",
       "source": "PAULA_R13",
-      "nextAction": "B4_003_RENEWAL_DETERMINISTIC_APPLY",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "classification": "RUNTIME_DATA_SEMANTIC_DISTRIBUTION_PROOF_REQUIRED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_CAUSAL_DIAGNOSTIC_20261003.json",
       "diagnosticReceiptBlobSha": "e67f03d0f2da8fc53fc198941caf95f696e4186d",
       "r13SourceFixReceiptBlobSha": "3b1aead3b385657149d29c5034dd55d4aaf56e9d",
       "localizedConflictHold": {
         "policyNumber": "VA-43685",
-        "parentId": "pol_965de501d871c56f3964a24b7724",
-        "childId": "pol_muj5o5ka",
-        "dependentTotal": 3,
         "status": "CONFLICT_REVIEW_REQUIRED",
+        "blockingGlobal": false,
         "writeAuthorized": false,
-        "deleteAuthorized": false,
-        "globalBatchBlocking": false
-      }
+        "deleteAuthorized": false
+      },
+      "renewalDeterministicApplyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
+      "renewalDeterministicApplyReceiptBlobSha": "79b27b5b1b748e4d04aefa5d2be63f85033e570e"
     },
     {
       "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",

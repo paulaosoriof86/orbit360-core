@@ -4859,7 +4859,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
-      "executionLockBlobSha": "e6e7b75ed4f3af5a7838a151df7d2ad7b43c152b",
+      "executionLockBlobSha": "cbc9121ce73e932637e84dba7ab2cdbf0ca43c98",
       "compositionLockBlobSha": "4140057db511ea5a194c45c7bc9748ee12b765e7",
       "findingLedgerBlobSha": "de3a4c2002f50e5176047b8e1eb13eb7ae553140",
       "activeFindingId": "B4-003",
@@ -5172,7 +5172,7 @@
       "priorMachinePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37136776942-5498wth2.web.app",
       "humanVisualStatus": "REJECTED_R13",
       "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-      "continuityRegisterBlobSha": "535b08b08e67c95ae512bd16f0e3f23cbca7c060",
+      "continuityRegisterBlobSha": "f343f64b64125cb765229e9b031145d4e91df752",
       "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
       "continuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
       "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -5504,6 +5504,14 @@
         "dataMutation": false,
         "reimport": false,
         "livePromotion": false
+      },
+      "r13PostApplyContinuityReconciliation": {
+        "status": "QA_CONTINUITY_RECONCILED_PENDING_EXACT_PREVIEW",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POST_APPLY_CONTINUITY_RECONCILIATION_20261004.json",
+        "blobSha": "df55966e0dbb2feac88c417a5fff717bdf7671a1",
+        "failedRunId": 37170865514,
+        "carryBlobSha": "f343f64b64125cb765229e9b031145d4e91df752",
+        "productSourceChanged": false
       }
     }
   },
@@ -5528,7 +5536,7 @@
     "activeFindingId": "B4-003",
     "findingContinuityRegisterBlobSha": "f87e8ce46443170b9e0f902ff8648a8b50e0d377",
     "findingContinuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
-    "continuityRegisterBlobSha": "535b08b08e67c95ae512bd16f0e3f23cbca7c060"
+    "continuityRegisterBlobSha": "f343f64b64125cb765229e9b031145d4e91df752"
   },
   "antiInterruptionControl": {
     "status": "FROZEN_ACTIVE",
@@ -5823,7 +5831,7 @@
     "status": "B4_003_SOURCE_FIXED_R13_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "e6e7b75ed4f3af5a7838a151df7d2ad7b43c152b",
+    "executionLockBlobSha": "cbc9121ce73e932637e84dba7ab2cdbf0ca43c98",
     "compositionLockBlobSha": "4140057db511ea5a194c45c7bc9748ee12b765e7",
     "findingLedgerBlobSha": "de3a4c2002f50e5176047b8e1eb13eb7ae553140",
     "noLive": true,
@@ -6108,7 +6116,7 @@
     "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
     "humanVisualStatus": "REJECTED_R13",
     "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "continuityRegisterBlobSha": "535b08b08e67c95ae512bd16f0e3f23cbca7c060",
+    "continuityRegisterBlobSha": "f343f64b64125cb765229e9b031145d4e91df752",
     "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "continuityGuardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
     "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -6483,6 +6491,14 @@
       "dataMutation": false,
       "reimport": false,
       "livePromotion": false
+    },
+    "r13PostApplyContinuityReconciliation": {
+      "status": "QA_CONTINUITY_RECONCILED_PENDING_EXACT_PREVIEW",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POST_APPLY_CONTINUITY_RECONCILIATION_20261004.json",
+      "blobSha": "df55966e0dbb2feac88c417a5fff717bdf7671a1",
+      "failedRunId": 37170865514,
+      "carryBlobSha": "f343f64b64125cb765229e9b031145d4e91df752",
+      "productSourceChanged": false
     }
   },
   "b4VisualAcceptanceControl": {
