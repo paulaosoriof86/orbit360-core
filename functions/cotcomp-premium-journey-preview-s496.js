@@ -47,6 +47,19 @@ body[data-s496="true"] .s496-status.hybrid{background:#fff1e5;color:#7f4a12}
 body[data-s496="true"] .s496-status.consultative{background:#f0ecf8;color:#5b467b}
 body[data-s496="true"] .s496-status.more{background:#eef4f8;color:#355d72}
 body[data-s496="true"] .s496-actions{grid-column:1/-1;display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:5px}
+body[data-s496="true"] .s496-form-group{grid-column:1/-1;margin:4px 0 -1px;padding-top:9px;border-top:1px solid #eee6df}
+body[data-s496="true"] .s496-form-group:first-child{border-top:0;padding-top:0}
+body[data-s496="true"] .s496-form-group strong{display:block;font:800 13px/1.2 'Archivo';color:#241f1b}
+body[data-s496="true"] .s496-form-group span{display:block;margin-top:2px;font:11px/1.35 'Instrument Sans';color:#7c746d}
+body[data-s496="true"] .s496-select-alt{width:100%;min-height:38px;margin-top:9px;border:1px solid #ded5cc;border-radius:9px;background:#fff;color:#2c2622;font:750 11.5px/1.2 'Instrument Sans'}
+body[data-s496="true"] .s496-select-alt:hover{border-color:#E4002B;color:#C40024}
+body[data-s496="true"] .alt.s496-selected{border-color:#E4002B;box-shadow:0 0 0 2px rgba(228,0,43,.08),0 18px 36px -30px rgba(0,0,0,.5)}
+body[data-s496="true"] .alt.s496-selected .s496-select-alt{background:#E4002B;color:#fff;border-color:#E4002B}
+body[data-s496="true"] .s496-selection-note{grid-column:1/-1;margin:10px 0 0;padding:10px 12px;border-radius:10px;background:#f7f3ef;border:1px solid #e7ddd4;font:11.5px/1.45 'Instrument Sans';color:#544a43}
+body[data-s496="true"] .details,body[data-s496="true"] .rec-btn{display:block!important}
+body[data-s496="true"] .s496-compare-guidance{grid-column:1/-1;margin:0 0 10px;padding:11px 12px;border:1px solid #e7ddd4;border-radius:10px;background:#fbf8f4}
+body[data-s496="true"] .s496-compare-guidance strong{display:block;font:800 13px/1.2 'Archivo';margin-bottom:3px}
+body[data-s496="true"] .s496-compare-guidance span{font:11.5px/1.45 'Instrument Sans';color:#665d55}
 body[data-s496="true"] .s496-back{min-height:46px;border:1px solid #ddd4cc;background:#fff;color:#3c342e;border-radius:9px;padding:0 14px;font-weight:750}
 body[data-s496="true"] .s496-next{min-height:46px;border:0;background:#E4002B;color:#fff;border-radius:9px;padding:0 20px;font-weight:800}
 body[data-s496="true"] .s496-next:hover{background:#bd001f}
@@ -177,12 +190,15 @@ function vehicleFields(){
   const gt=state.country==='GT';
   const years=[]; for(let y=2027;y>=1990;y--)years.push(String(y));
   return [
+    '<div class="s496-form-group"><strong>Vehículo y uso</strong><span>Primero ubicamos el tipo de riesgo; después completamos identificación y condiciones.</span></div>',
     field('tipoVehiculo','Tipo de vehículo','select',gt?['Automóvil','Camioneta / SUV','Pickup','Motocicleta','Panel / camión liviano','Microbús hasta 9 pasajeros','Camión pesado','Cabezal','Transporte por plataforma']:['Automóvil','Camioneta / SUV','Pickup','Motocicleta','Vehículo comercial','Plataforma / aplicación','Otro / requiere revisión'],'w6'),
     field('usoVehiculo','Uso','select',gt?['Particular','Comercial','Transporte por plataforma']:['Particular','Comercial','Plataforma / aplicación','Otro / requiere revisión'],'w6'),
+    '<div class="s496-form-group"><strong>Identificación del vehículo</strong><span>Marca → Línea/modelo → Año se conserva como patrón principal, acompañado del valor del riesgo.</span></div>',
     '<div class="field w6"><label>Marca</label><div class="combo-wrap"><input id="s496Brand" role="combobox" aria-expanded="false" aria-controls="s496BrandList" autocomplete="off" value="'+esc(state.form.marca||'')+'" placeholder="Escribe para buscar"><div id="s496BrandList" class="combo-list" role="listbox"></div></div><button id="s496BrandFallback" class="fallback-link" type="button">No encuentro mi marca</button></div>',
     '<div class="field w6"><label>Línea / modelo</label><div class="combo-wrap"><input id="s496Model" role="combobox" aria-expanded="false" aria-controls="s496ModelList" autocomplete="off" value="'+esc(state.form.lineaModelo||'')+'" placeholder="Selecciona primero la marca"><div id="s496ModelList" class="combo-list" role="listbox"></div></div><button id="s496ModelFallback" class="fallback-link" type="button">No encuentro mi línea / modelo</button></div>',
     field('anioModelo','Año','select',years,''),
     field('valorAsegurado','Valor aproximado','number',[],'','Referencia del riesgo; no calcula una prima en esta vista LAB.'),
+    '<div class="s496-form-group"><strong>Condiciones y preferencias</strong><span>Estas respuestas permiten preparar una cotización o decidir cuándo corresponde acompañamiento.</span></div>',
     field('conductorJoven','Conductor joven / condición aplicable','select',['No','Sí','No aplica'],''),
     field('equipoEspecial','Equipo especial','select',['No','Sí / requiere declarar'],''),
     field('coberturaObjetivo','Tipo de protección que buscas','select',['Cobertura amplia','Daños a terceros / RC','Robo','Quiero revisar opciones'],'w6'),
@@ -380,6 +396,40 @@ function renderReview(){
     p.innerHTML='<h4>Revisa lo que nos contaste</h4><p>Esta revisión conserva tu contexto antes de pasar a alternativas. En LAB no ejecuta una cotización real.</p><div class="s496-summary">'+summaryItems()+'</div><div class="s496-actions"><button type="button" class="s496-back">← Volver a tus datos</button><button type="button" class="s496-next">Comparar opciones →</button></div>';
   }
 }
+function ensureComparisonHierarchy(){
+  const compare=q('.compare');if(!compare)return;
+  const alternatives=q('#alternatives',compare)||q('.alternatives',compare);
+  if(alternatives&&!q('#s496CompareGuidance',compare)){
+    const guide=document.createElement('div');guide.id='s496CompareGuidance';guide.className='s496-compare-guidance';
+    guide.innerHTML='<strong>Compara primero lo que realmente cambia</strong><span>Abre el detalle de una alternativa a la vez. La selección aquí es solo visual en LAB y no crea una Selection real.</span>';
+    alternatives.insertAdjacentElement('beforebegin',guide);
+  }
+  qa('.alt',compare).forEach((alt,i)=>{
+    let detail=q('.details',alt);
+    if(!detail){
+      detail=document.createElement('button');detail.type='button';detail.className='details';detail.textContent='Ver detalles';detail.setAttribute('aria-expanded','false');alt.appendChild(detail);
+    }
+    let choose=q('.s496-select-alt',alt);
+    if(!choose){
+      choose=document.createElement('button');choose.type='button';choose.className='s496-select-alt';choose.dataset.s496Select=String(i);choose.textContent='Elegir esta alternativa';alt.appendChild(choose);
+    }
+  });
+  const rec=q('.rec',compare);
+  if(rec&&!q('.rec-btn',rec)){
+    const b=document.createElement('button');b.type='button';b.className='rec-btn';b.textContent='Ver recomendación completa →';b.setAttribute('aria-expanded','false');rec.appendChild(b);
+  }
+}
+function selectAlternative(button){
+  const compare=q('.compare');if(!compare)return;
+  const alt=button.closest('.alt');if(!alt)return;
+  qa('.alt',compare).forEach(x=>{
+    const on=x===alt;x.classList.toggle('s496-selected',on);
+    const b=q('.s496-select-alt',x);if(b)b.textContent=on?'Alternativa elegida ✓':'Elegir esta alternativa';
+  });
+  let note=q('#s496SelectionNote',compare);
+  if(!note){note=document.createElement('div');note.id='s496SelectionNote';note.className='s496-selection-note';(q('#alternatives',compare)||q('.alternatives',compare))?.insertAdjacentElement('afterend',note);}
+  if(note)note.textContent='Selección visual LAB registrada en esta pantalla. No se envían datos ni se crea Selection hasta que el transporte real sea autorizado.';
+}
 function renderStage(){
   const formTitle=q('#formTitle'),row=q('#formRow'),privacy=q('.privacy'),compare=q('.compare');
   const review=q('#s496Review');
@@ -396,7 +446,7 @@ function renderStage(){
   }else{
     if(formTitle)formTitle.textContent='2. Contexto listo para comparar';
     if(row){row.className='form-row s496-form';row.innerHTML='<div class="s496-actions"><button type="button" class="s496-back">← Volver a revisar</button><span class="s496-journey-note" style="margin:0">Las alternativas de esta candidata siguen siendo ilustrativas.</span></div>';}
-    if(review)review.hidden=true;if(compare)compare.classList.remove('s496-locked');
+    if(review)review.hidden=true;if(compare){compare.classList.remove('s496-locked');ensureComparisonHierarchy();}
   }
   if(privacy)privacy.style.display=state.stage===0?'none':'block';
   syncProgress();syncVisual();
@@ -461,6 +511,8 @@ document.addEventListener('click',e=>{
   const cb=e.target.closest('.country button');
   if(cb){const txt=cb.textContent.trim().toLowerCase();setTimeout(()=>setCountry(txt.startsWith('col')?'CO':'GT'),0);return}
   if(e.target.closest('.scene-edit')){state.stage=1;setTimeout(render,0);return}
+  const choose=e.target.closest('.s496-select-alt');
+  if(choose){e.preventDefault();selectAlternative(choose);return}
   if(e.target.closest('.details')){
     setTimeout(()=>{
       qa('.alt').forEach(alt=>{
