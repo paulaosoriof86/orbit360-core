@@ -64,13 +64,23 @@ Orbit.modules.calidad = (function () {
     const policies=(S().all('polizas')||[]).filter(p=>p&&inActiveCountry(p));
     return rm.financialIntegrityBatch(policies);
   }
-  function financialHealthHtml(issues) {
+  function financialClientCell(c, fallbackId) {
+    c = c || {};
+    const id = clean(c.id || fallbackId), nombre = clean(c.nombre) || 'Cliente', tipo = clean(c.tipo) || 'Pendiente de completar', pais = clean(c.pais);
+    const meta = pais ? `${U.esc(tipo)} · ${U.esc(pais)}` : U.esc(tipo);
+    return `<a style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="event.stopPropagation();location.hash='#/cliente360?c=${encodeURIComponent(id)}'">
+      ${U.avatar(nombre, tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'sm')}
+      <span style="min-width:0"><span style="font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${U.esc(nombre)}</span>
+      <span class="muted" style="font-size:11px">${meta}</span></span></a>`;
+  }
+  function financialHealthHtml(issues, clientsById) {
     if(!issues.length) return '<div class="cfg-note" style="margin:14px 0"><b>Integridad financiera:</b> no se detectaron diferencias materiales entre prima contractual y calendario vigente dentro del alcance seleccionado.</div>';
-    return `<div class="card" data-information-health-financial="1" data-quality-table-grammar="canonical" style="overflow:hidden;margin-bottom:14px"><div style="padding:13px 14px;border-bottom:1px solid var(--line)"><b>Salud de la información · póliza vs calendario</b><div class="muted" style="font-size:12px;margin-top:3px">Estas diferencias se señalan para revisión. La plataforma no sustituye ni corrige importes sin fuente autorizada.</div></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Póliza</th><th>Cliente</th><th class="num">Prima contractual</th><th class="num">Calendario vigente</th><th class="num">Diferencia</th><th>Estado</th></tr></thead><tbody>${issues.map(x=>{const c=S().get('clientes',x.p.clienteId)||{},cur=x.p.moneda||c.moneda||'';return `<tr class="clickable" data-information-health-policy="${U.esc(x.p.id)}" onclick="location.hash='#/cliente360?c=${encodeURIComponent(x.p.clienteId||'')}&p=${encodeURIComponent(x.p.id)}"><td><b>${U.esc(x.p.numero||x.p.id)}</b><div class="muted" style="font-size:11px">${x.receipts} recibo(s) vigente(s)</div></td><td>${K.clienteCell(c.id)}</td><td class="num">${U.money?U.money(x.total,cur):U.esc(cur+' '+x.total.toFixed(2))}</td><td class="num">${U.money?U.money(x.schedule,cur):U.esc(cur+' '+x.schedule.toFixed(2))}</td><td class="num"><b>${U.money?U.money(x.delta,cur):U.esc(cur+' '+x.delta.toFixed(2))}</b></td><td><span class="badge danger">Revisión requerida</span></td></tr>`;}).join('')}</tbody></table></div></div>`;
+    return `<div class="card" data-information-health-financial="1" data-quality-table-grammar="canonical" style="overflow:hidden;margin-bottom:14px"><div style="padding:13px 14px;border-bottom:1px solid var(--line)"><b>Salud de la información · póliza vs calendario</b><div class="muted" style="font-size:12px;margin-top:3px">Estas diferencias se señalan para revisión. La plataforma no sustituye ni corrige importes sin fuente autorizada.</div></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Póliza</th><th>Cliente</th><th class="num">Prima contractual</th><th class="num">Calendario vigente</th><th class="num">Diferencia</th><th>Estado</th></tr></thead><tbody>${issues.map(x=>{const c=(clientsById&&clientsById.get(x.p.clienteId))||S().get('clientes',x.p.clienteId)||{id:x.p.clienteId},cur=x.p.moneda||c.moneda||'';return `<tr class="clickable" data-information-health-policy="${U.esc(x.p.id)}" onclick="location.hash='#/cliente360?c=${encodeURIComponent(x.p.clienteId||'')}&p=${encodeURIComponent(x.p.id)}"><td><b>${U.esc(x.p.numero||x.p.id)}</b><div class="muted" style="font-size:11px">${x.receipts} recibo(s) vigente(s)</div></td><td>${financialClientCell(c,x.p.clienteId)}</td><td class="num">${U.money?U.money(x.total,cur):U.esc(cur+' '+x.total.toFixed(2))}</td><td class="num">${U.money?U.money(x.schedule,cur):U.esc(cur+' '+x.schedule.toFixed(2))}</td><td class="num"><b>${U.money?U.money(x.delta,cur):U.esc(cur+' '+x.delta.toFixed(2))}</b></td><td><span class="badge danger">Revisión requerida</span></td></tr>`;}).join('')}</tbody></table></div></div>`;
   }
 
   function render(host) {
     const clients = (S().all('clientes') || []).filter(inActiveCountry);
+    const clientsById = new Map(clients.map(c => [c.id, c]));
     const clientIds = new Set(clients.map(c => c.id).filter(Boolean));
     const vigenteClientIds = new Set();
     (S().all('polizas') || []).forEach(p => {
@@ -109,7 +119,7 @@ Orbit.modules.calidad = (function () {
         { label: 'Expedientes completos', val: completeCount + ' / ' + clients.length, color: 'var(--ok)', foot: completePct.toFixed(1) + '% de completitud', footTone: 'up' },
         { label: 'Descuadres póliza/calendario', val: financialIssues.length, color: 'var(--danger)', foot: 'requieren fuente / conciliación', footTone: financialIssues.length ? 'down' : 'up' }
       ])}
-      ${financialHealthHtml(financialIssues)}
+      ${financialHealthHtml(financialIssues, clientsById)}
       <div class="card" data-quality-table-grammar="canonical" style="overflow:hidden">
         <div style="display:flex;gap:10px;flex-wrap:wrap;padding:13px 14px;border-bottom:1px solid var(--line);align-items:center">
           <label style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="q-vig" ${st.soloVig ? 'checked' : ''} style="accent-color:var(--red)"> Solo con póliza vigente</label>
