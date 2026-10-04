@@ -5594,6 +5594,24 @@
         "blobSha": "c7efe22784e3af7d3b88395073f216a0f46d8cdd",
         "contractBlobSha": "2499e565c4d8e7b8bd4bb726be533bf7dc506ced",
         "productChanged": false
+      },
+      "r14QualityPerformanceExactRetry": {
+        "status": "REQUESTED",
+        "reason": "R14_EXACT_RETRY_SINGLE_PERFORMANCE_VARIANCE_ADJUDICATION",
+        "priorRunId": 37178549427,
+        "priorJobId": 111366203835,
+        "failureCode": "B4_003_QUALITY_SYNC_RENDER_TOO_SLOW",
+        "observed": {
+          "gtMs": 2905.2,
+          "coMs": 507.3,
+          "limitMs": 2500
+        },
+        "policy": "ONE_EXACT_RETRY_NO_THRESHOLD_RELAXATION_THEN_CAUSAL_FIX_IF_REPRODUCED",
+        "sourceHead": "5b9272e1b78aa3da22c304d53490afe0756a5abc",
+        "productSourceChanged": false,
+        "dataMutation": false,
+        "reimport": false,
+        "livePromotion": false
       }
     }
   },
@@ -6642,6 +6660,24 @@
       "blobSha": "c7efe22784e3af7d3b88395073f216a0f46d8cdd",
       "contractBlobSha": "2499e565c4d8e7b8bd4bb726be533bf7dc506ced",
       "productChanged": false
+    },
+    "r14QualityPerformanceExactRetry": {
+      "status": "REQUESTED",
+      "reason": "R14_EXACT_RETRY_SINGLE_PERFORMANCE_VARIANCE_ADJUDICATION",
+      "priorRunId": 37178549427,
+      "priorJobId": 111366203835,
+      "failureCode": "B4_003_QUALITY_SYNC_RENDER_TOO_SLOW",
+      "observed": {
+        "gtMs": 2905.2,
+        "coMs": 507.3,
+        "limitMs": 2500
+      },
+      "policy": "ONE_EXACT_RETRY_NO_THRESHOLD_RELAXATION_THEN_CAUSAL_FIX_IF_REPRODUCED",
+      "sourceHead": "5b9272e1b78aa3da22c304d53490afe0756a5abc",
+      "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
     }
   },
   "b4VisualAcceptanceControl": {
