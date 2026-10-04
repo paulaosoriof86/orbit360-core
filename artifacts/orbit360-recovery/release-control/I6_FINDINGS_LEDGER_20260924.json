@@ -7582,6 +7582,29 @@
       "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
       "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+    },
+    {
+      "id": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "B4_003_EXACT_PREVIEW_MACHINE_PROOF_RUN_37207119191",
+      "surface": "Calidad / Guatemala",
+      "finding": "Authenticated exact Preview rendered Calidad GT in 10429.2 ms against a <2500 ms gate; CO rendered in 850.9 ms.",
+      "classification": "R16_CAUSAL_PERFORMANCE_REGRESSION",
+      "rootCause": "R16 expanded per-client linked-country evidence evaluation from country-pending clients to every client in scope.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "status": "DIAGNOSED_R16_02_SOURCE_FIX_AUTHORIZED",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "Same exact authenticated Preview proof renders Calidad GT and CO in <2500 ms without removing required financial mismatch rows, country/provenance semantics, or relaxing threshold.",
+      "mayDisappearWithoutDisposition": false,
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_DIAGNOSTIC_20261004.json",
+      "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644",
+      "noLive": true,
+      "noReimport": true,
+      "nextAction": "B4_003_R16_02_NARROW_PERFORMANCE_SOURCE_FIX"
     }
   ],
   "phaseBBacklog": [
@@ -7975,5 +7998,12 @@
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
     "findingCount": 208,
     "noIdsRemoved": true
+  },
+  "lastR16PerformanceRegression": {
+    "id": "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
+    "status": "DIAGNOSED_R16_02_SOURCE_FIX_AUTHORIZED",
+    "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_DIAGNOSTIC_20261004.json",
+    "diagnosticReceiptBlobSha": "1152324be263fef6384bfbb61d56758e58512644",
+    "failedRunId": 37207119191
   }
 }

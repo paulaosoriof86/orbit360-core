@@ -1,0 +1,51 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R16_02_QUALITY_GT_RENDER_PERFORMANCE_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-04",
+  "status": "CAUSE_DEMONSTRATED_NARROW_SOURCE_FIX_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "31c748b46ce194042ef4df46c73fb02cf6d56d5d",
+  "failedRunId": 37207119191,
+  "failedJobId": 111450516051,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37207119191-wp5a9ooa.web.app",
+  "failureCode": "B4_003_QUALITY_SYNC_RENDER_TOO_SLOW",
+  "observed": {
+    "GT": {
+      "renderMs": 10429.2,
+      "qualityRows": 50,
+      "financialRows": 72,
+      "financialIssueCount": 72
+    },
+    "CO": {
+      "renderMs": 850.9,
+      "qualityRows": 17,
+      "financialRows": 2,
+      "financialIssueCount": 2
+    },
+    "thresholdMs": 2500
+  },
+  "causalDelta": {
+    "beforeR16": "calidad render evaluated linked-country evidence only when country was missing.",
+    "r16Regression": "R16 changed clients.map to call evidenceFor(c) for every client in scope.",
+    "effect": "clientCountryEvidence.evaluate executes once per client instead of only for country-pending records; cost scales with the materially larger GT universe.",
+    "discriminant": "CO remains <2.5s while GT expands to 10.4s under the same renderer; financial mismatch rows remain required and are not removed."
+  },
+  "remedy": "Restore conditional linked-evidence evaluation to country-pending records only. Keep current country and persisted provenance visible for every row; modal-level evidence evaluation remains available when a record is edited. Do not paginate/hide financial mismatches unless this narrow fix fails the unchanged <2500ms gate.",
+  "allowedProductFiles": [
+    "orbit360-platform/modules/calidad.js",
+    "orbit360-platform/index.html"
+  ],
+  "allowedQaFiles": [
+    "tools/gravicentra-i6-5-b4-003-contract.mjs"
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "b4004Authorized": false,
+    "performanceThresholdRelaxationAuthorized": false,
+    "informationRemovalAuthorized": false
+  },
+  "nextAction": "B4_003_R16_02_NARROW_PERFORMANCE_SOURCE_FIX"
+}
