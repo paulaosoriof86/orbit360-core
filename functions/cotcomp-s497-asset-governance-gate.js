@@ -29,9 +29,13 @@ function verify(m){
   add(new Set(primary).size===primary.length,'NO_PRIMARY_ASSET_REUSE','hero + seven families must be distinct');
   add(m?.priscila?.sha256==='d091beb90594abc3a7c4fac01e6028fda188301589b0c712b3b8fb1a997f2a60','PRISCILA_GOVERNED_ASSET','owner-approved cutout exact hash');
   add(m?.priscila?.placementStatus==='PENDING_SURFACE_COMPOSITION','PRISCILA_NOT_MECHANICALLY_WIRED','placement remains gated');
+  add(m?.packagedRuntime?.logo?.sha256==='dfac6f73cf0a6ca54956bcb1f00a0385980ace685ef5366515317f7e5220d0f8','PACKAGED_LOGO_SHA','derived official webp');
+  add(m?.packagedRuntime?.hero?.sha256==='a80c5458137e2914a6e8d43f8212ea1997ea5d8ba8d4a44136c36ef28cb927bd','PACKAGED_HERO_SHA','governed hero bytes');
+  add(m?.packagedRuntime?.familySprite?.sha256==='4209a06de9b030c0f81d5b004fbf995018f8b050418c22913daaf1f73ead4800','PACKAGED_SCENE_SHA','seven-scene sprite bytes');
   add(m?.gates?.productionVisualApproval===false,'NO_PRODUCTION_VISUAL_APPROVAL','false');
-  add(m?.gates?.packagingComplete===false,'PACKAGING_STILL_BLOCKED','must remain false until bytes are packaged and verified');
-  add(m?.gates?.runtimeBytesVerified===false,'RUNTIME_BYTES_STILL_BLOCKED','must remain false until render package readback');
+  add(m?.gates?.packagingComplete===true,'PACKAGING_COMPLETE','source asset package is complete');
+  add(m?.gates?.sourceBytesVerified===true,'SOURCE_BYTES_VERIFIED','packaged source hashes verified');
+  add(m?.gates?.runtimeBytesVerified===false,'RUNTIME_BYTES_STILL_BLOCKED','remains false until browser render/readback');
 
   const failed=c.filter(x=>!x.ok);
   return Object.freeze({ok:failed.length===0,failedCount:failed.length,failed,checks:c});
