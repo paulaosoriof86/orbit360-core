@@ -1,16 +1,16 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-04T04:12:00Z",
-  "status": "B4_003_R17_VISUAL_REMEDIATION_AUTHORIZED",
+  "status": "B4_003_SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_R17_VISUAL_REMEDIATION_AUTHORIZED",
+    "status": "B4_003_SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R17_SOURCE_FIX",
-    "humanVisualStatus": "REJECTED_R17",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "REJECTED_R17_PENDING_RETEST",
     "knowledgePreview": true
   },
   "supersedes": {
@@ -29,27 +29,27 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "96afeaab9e3674d60038d1f1b8aa2863e75b7d0e"
+    "blobSha": "de96020b887df5124404e2e2080446723d73ff82"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "20b28e0832ac8bf5679450ea613abd595add4f20"
+    "blobSha": "6f6dc7f1f94ba39e451eb1281cc95f92585b372c"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "4bc36c5d3391d63405b4200a369a9cdeeac54187",
-    "inventoryCount": 215,
-    "attentionCount": 92,
+    "blobSha": "3e7590d971c50c1043b1f1f6fba62f489936e19d",
+    "inventoryCount": 217,
+    "attentionCount": 110,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
   },
   "boundaries": {
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "Exact B4-003 Preview only: disposable B4003 synthetic renewal, cancellation, information-health and insurer-document fixtures with mandatory cleanup/readback; no real operational row mutation.",
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": false,
@@ -66,7 +66,7 @@
     "B4_003_R17_EXACT_PREVIEW_MACHINE_PASS",
     "B4_003_R17_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_R17_SOURCE_FIX",
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -631,7 +631,7 @@
     "compositionBlobSha": "a1e052403a3765f284ef2e8b515ba287fffd78f5"
   },
   "r17RemediationPlan": {
-    "status": "AUTHORIZED_SOURCE_ONLY",
+    "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "preservePriorPasses": true,
     "b4004Held": true,
     "allowedProductFiles": [
@@ -653,12 +653,16 @@
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "nextAction": "B4_003_R17_SOURCE_FIX",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "scopeExtensionReason": "R17 renewal KPI/column divergence is caused by renewals-v1200-operational-bridge.js rewriting base KPIs from a second independently derived policy set after renovaciones.js renders the visible buckets.",
     "scopeExtendedAt": "2026-10-04T23:48:00Z",
     "scopeExtensionReason2": "Runtime policy editor is owned by policy-receipts-v1199-bridge.js, which replaces cliente360.editarPoliza and otherwise discards the R17 renewability focus argument. The owner must be patched to preserve the direct classification workflow.",
     "scopeExtendedAt2": "2026-10-04T23:56:00Z",
     "scopeExtensionReason3": "R17 changes modify browser-loaded modules; the canonical index asset query versions must advance so the same certified artifact cannot serve stale pre-R17 module bytes after production promotion.",
-    "scopeExtendedAt3": "2026-10-05T00:04:00Z"
+    "scopeExtendedAt3": "2026-10-05T00:04:00Z",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
+    "compositionBlobSha": "de96020b887df5124404e2e2080446723d73ff82",
+    "productMutationAuthorized": false,
+    "syntheticQaWritesAuthorized": true
   }
 }
