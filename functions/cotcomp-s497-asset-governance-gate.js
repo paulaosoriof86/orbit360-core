@@ -35,7 +35,8 @@ function verify(m){
   add(m?.gates?.productionVisualApproval===false,'NO_PRODUCTION_VISUAL_APPROVAL','false');
   add(m?.gates?.packagingComplete===true,'PACKAGING_COMPLETE','source asset package is complete');
   add(m?.gates?.sourceBytesVerified===true,'SOURCE_BYTES_VERIFIED','packaged source hashes verified');
-  add(m?.gates?.runtimeBytesVerified===false,'RUNTIME_BYTES_STILL_BLOCKED','remains false until browser render/readback');
+  add(m?.gates?.runtimeBytesVerified===true,'RUNTIME_BYTES_VERIFIED','browser render/readback evidence completed');
+  add(m?.gates?.ownerReviewVisualEvidenceComplete===true,'OWNER_REVIEW_VISUAL_EVIDENCE_COMPLETE','required visual evidence completed');
 
   const failed=c.filter(x=>!x.ok);
   return Object.freeze({ok:failed.length===0,failedCount:failed.length,failed,checks:c});
