@@ -626,7 +626,27 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 .ciclo-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;border-top:1px solid var(--line);background:var(--surface)}
 .ciclo-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:300;background:var(--graph);color:#fff;font-family:var(--f-display);font-weight:700;font-size:13px;padding:12px 20px;border-radius:99px;box-shadow:0 14px 40px rgba(15,17,20,.35);animation:toastIn .22s ease}
 @keyframes toastIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
-@media(max-width:760px){.ciclo-body{grid-template-columns:1fr}.ciclo-main{border-right:none;border-bottom:1px solid var(--line)}.cgrid{grid-template-columns:1fr}}
+@media(max-width:760px){
+  #ciclo-modal{place-items:start stretch!important;padding:8px;overflow:auto}
+  #ciclo-modal .ciclo-card{width:100%!important;max-width:100%;max-height:calc(100dvh - 16px);border-radius:14px}
+  .ciclo-h{padding:16px;gap:10px;min-width:0}
+  .ciclo-h>div:first-child{min-width:0;flex:1}
+  .ciclo-h h2{font-size:20px;line-height:1.08;overflow-wrap:anywhere}
+  .ciclo-sub{font-size:12px;overflow-wrap:anywhere}
+  .ciclo-h-act{align-items:flex-start;gap:7px}
+  .ciclo-syncbadge{white-space:normal;max-width:180px;text-align:center;line-height:1.25}
+  .ciclo-stepper{padding:11px 12px}
+  .cstep{min-width:58px}.cstep-l{font-size:9.5px}
+  .ciclo-body{grid-template-columns:1fr;overflow:auto}
+  .ciclo-main{border-right:none;border-bottom:1px solid var(--line);padding:14px}
+  .ciclo-aside{padding:14px}
+  .cgrid{grid-template-columns:1fr}
+  .ciclo-foot{align-items:stretch;flex-direction:column;padding:12px 14px}
+  .ciclo-foot>div:last-child{width:100%;display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important}
+  .ciclo-foot .btn{width:100%;justify-content:center;min-width:0;white-space:normal}
+  .ciclo-collab-add{display:grid;grid-template-columns:1fr}
+  .ciclo-collab-add .btn{width:100%;justify-content:center}
+}
 
 /* ---------- CICLO: extras (flags, adjuntos, listas, notif) ---------- */
 .kflag{font-size:12px;line-height:1}
@@ -896,4 +916,23 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
   .fh-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
   .fh-kpis>.fh-kpi:last-child:nth-child(odd){grid-column:1 / -1}
   [data-rp-receipts-table="1"] .rp-action-cell{position:static!important;right:auto!important}
+}
+
+
+/* B4-003 R18 · mobile search + insurer knowledge hierarchy */
+@media(max-width:760px){
+  .tb-search{display:flex!important;flex:1 1 100%!important;order:-10!important;min-width:0!important;width:100%!important;max-width:none!important}
+  .tb-search input{display:block!important;min-width:0!important;width:100%!important;flex:1 1 auto!important}
+  .insurer-source-card summary{align-items:flex-start!important;padding:12px!important}
+  .insurer-source-card summary>span:first-child{min-width:0!important;width:100%!important;flex-basis:100%!important;overflow-wrap:anywhere}
+  .insurer-source-detail{grid-template-columns:1fr!important}
+  .insurer-source-detail>div{min-width:0;overflow-wrap:anywhere}
+  .insurer-knowledge-card{align-items:flex-start!important;flex-direction:column!important;gap:8px!important}
+  .insurer-knowledge-card>span{min-width:0!important;max-width:100%!important;overflow-wrap:anywhere}
+  .insurer-knowledge-title{font-size:17px!important;line-height:1.2}
+  .insurer-knowledge-intro{font-size:12px;line-height:1.45}
+  .insurer-activity-row{overflow-wrap:anywhere}
+  [data-knowledge-product-groups]{grid-template-columns:1fr!important}
+  [data-source-registry-row]{max-width:100%;min-width:0}
+  .asg-sec{min-width:0;max-width:100%;overflow-wrap:anywhere}
 }
