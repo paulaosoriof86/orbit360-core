@@ -29,6 +29,13 @@ const viewports=[
     states:[]
   };
 
+  async function newEvidencePage(viewport){
+    const page=await browser.newPage({viewport});
+    page.on('pageerror',err=>console.error('[S497 PAGEERROR]',err&&err.stack?err.stack:String(err)));
+    page.on('console',msg=>{if(msg.type()==='error')console.error('[S497 CONSOLE ERROR]',msg.text());});
+    return page;
+  }
+
   async function settled(page){
     await page.waitForLoadState('domcontentloaded');
     await page.evaluate(async()=>{if(document.fonts&&document.fonts.ready)await document.fonts.ready;});
@@ -73,7 +80,7 @@ const viewports=[
   }
 
   for(const vp of viewports){
-    const page=await browser.newPage({viewport:{width:vp.width,height:vp.height}});
+    const page=await newEvidencePage({width:vp.width,height:vp.height});
     await page.setContent(S.html(),{waitUntil:'domcontentloaded'});
     await settled(page);
     const heroH1=await page.locator('.cc-hero').boundingBox();
@@ -89,7 +96,7 @@ const viewports=[
     await page.close();
   }
 
-  const page=await browser.newPage({viewport:{width:1440,height:1000}});
+  const page=await newEvidencePage({width:1440,height:1000});
   await page.setContent(S.html(),{waitUntil:'domcontentloaded'});
   await settled(page);
 
