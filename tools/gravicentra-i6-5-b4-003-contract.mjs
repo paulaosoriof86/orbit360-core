@@ -298,7 +298,7 @@ need(base.includes('function date45DispositionRows')&&base.includes('data-renewa
 need(inicio.includes('data-inicio-advisor-readiness="unavailable"')&&inicio.includes("state==='unavailable'?'No disponible'"),'B4_003_R19_INICIO_TERMINAL_READINESS_MISSING');
 need(insurer.includes('data-technical-registry="1"')&&insurer.includes('data-knowledge-order="2-products"')&&insurer.includes('data-knowledge-order="4-tariffs"')&&insurer.includes('data-knowledge-order="7-activity"'),'B4_003_R19_INSURER_HIERARCHY_MISSING');
 need(workflow.includes("collabDirection==='advisor'")&&workflow.includes("collabDirection==='operations'"),'B4_003_R19_HANDOFF_OUTBOX_DIRECTION_MISSING');
-need(opsInbox.includes('orbit360GetAdvisorOpsInboxPreview')&&opsInbox.includes('collaborationNotices')&&opsInbox.includes("direction==='operations'"),'B4_003_R19_HANDOFF_INBOX_PROJECTION_MISSING');
+need(opsInbox.includes('orbit360GetAdvisorOpsInboxPreview')&&opsInbox.includes('collaborationNotices')&&opsInbox.includes("['advisor','operations'].includes(direction)")&&opsInbox.includes('isOpsRole'),'B4_003_R19_HANDOFF_INBOX_PROJECTION_MISSING');
 need(infra.includes('.quality-main-scroll')&&infra.includes('.insurer-multicheck-list')&&infra.includes('.quality-main-table td:before'),'B4_003_R19_RESPONSIVE_STYLES_MISSING');
 need(/function\s+calendarAuthorityLabel\s*\(/.test(quality)&&quality.includes('data-health-open-review')&&quality.includes('revisarDescuadre')&&quality.includes('&t=recibos'),'B4_003_R17_QUALITY_EXACT_RESOLUTION_ACTION_MISSING');
 need(!quality.includes("location.hash='#/polizas?p=")&&quality.includes('quality-fin-mobile'),'B4_003_R16_04_QUALITY_STALE_DEEPLINK_OR_MOBILE_CONTRACT_MISSING');
