@@ -1,0 +1,197 @@
+{
+  "schema": "gravicentra-i6-5-b4-003-r19-causal-diagnostic-source-fix-authorization-v1",
+  "recordedAt": "2026-10-05T21:15:00Z",
+  "status": "CAUSES_DEMONSTRATED_SINGLE_CUMULATIVE_SOURCE_FIX_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "observedHead": "e7816e38e9e65a6e46e348bdb90cc72c7ba0f44d",
+  "gate": "I6.5/B4-003",
+  "humanState": "R18_REJECTED_R19_REMEDIATION_ACTIVE",
+  "findingLedgerCount": 243,
+  "noLoss": {
+    "preserveAllFindings": true,
+    "oneCumulativeSuccessor": true,
+    "noLive": true,
+    "noReimport": true,
+    "noOperationalBusinessWrites": true,
+    "b4004Held": true
+  },
+  "diagnoses": [
+    {
+      "id": "B4-003-R18-02-OPS-LEADS-RAMO-PRODUCT-PLAN-DEPENDENCY",
+      "cause": "refreshCommercialDependencies passes the previous product/plan to paintSelect; paintSelect explicitly re-inserts a preferred value that is absent from the new upstream option set. A Ramo change can therefore retain an incompatible Producto/Plan.",
+      "owners": [
+        "orbit360-platform/core/ciclo.js"
+      ],
+      "fix": "On upstream change, clear incompatible downstream values instead of re-inserting them; preserve only values present in the newly scoped set.",
+      "proof": "Change Ramo across incompatible product sets; Producto becomes placeholder immediately, Plan clears, save+reload stays coherent."
+    },
+    {
+      "id": "B4-003-R19-01-INSURER-MULTISELECT-NATIVE-CTRL-DEPENDENCY",
+      "cause": "Aseguradoras de interés is rendered as native <select multiple>; desktop multi-select depends on Ctrl/Command and mobile affordance is not explicit.",
+      "owners": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "fix": "Replace native multiple interaction with explicit checkbox/chip/token selector while preserving country scope and stored insurer IDs.",
+      "proof": "Desktop+390px: select/deselect multiple insurers without modifier keys; save+reload persists exact set."
+    },
+    {
+      "id": "B4-003-R19-02-QUALITY-SEARCH-FILTER-REGRESSION",
+      "cause": "calidad.js state/header contains ffalta, soloVig and asesor but no text query; the prior search control is absent from the current render contract.",
+      "owners": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "fix": "Restore indexed/debounced text search and explicit country/advisor/missing-type/active filters without N-squared lookups.",
+      "proof": "Search and each filter change result set; persistence within render lifecycle; render threshold remains unchanged."
+    },
+    {
+      "id": "B4-003-R19-03-QUALITY-HORIZONTAL-REACHABILITY",
+      "cause": "Quality uses a wide table inside overflow-x:auto while the right action cell is white-space:nowrap; narrow viewports can place actions offscreen without a persistent affordance.",
+      "owners": [
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "fix": "Use visible desktop horizontal scroll/sticky action affordance and mobile card layout so actions remain reachable.",
+      "proof": "Desktop overflow scroll is usable; 390px exposes every row action with no inaccessible horizontal content."
+    },
+    {
+      "id": "B4-003-R19-04-QUALITY-CONTACT-CHANNEL-ACTION-GAP",
+      "cause": "The visible Canal value is derived from phone/email availability and editarInline has no dedicated preferred contact-channel field; the action edits phone/WhatsApp, not a channel attribute.",
+      "owners": [
+        "orbit360-platform/modules/calidad.js",
+        "client contact schema"
+      ],
+      "fix": "Separate contactability from acquisition channel and preferred contact channel. Never label a phone editor as Canal.",
+      "proof": "Each action label matches the field changed; durable readback+reload clears the correct quality reason."
+    },
+    {
+      "id": "B4-003-R19-05-POLICY-TECHNICAL-MARKUP-LABEL-VISIBLE",
+      "cause": "Policy qualityBlock renders raw motivosPendientes/motivosCalidad strings after only underscore replacement/lowercasing; policy bridge errorText also falls back to raw internal error codes. Internal/HTML-like source tokens can therefore become user-facing text.",
+      "owners": [
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+      ],
+      "fix": "Map known technical validation/error tokens to human labels and safely strip/normalize residual markup-like text without hiding the underlying condition.",
+      "proof": "DOM/text scan of policy detail+edit contains no raw internal token, raw tag text, source identifier or unmapped error code."
+    },
+    {
+      "id": "B4-003-R19-06-RENEWABILITY-DURABLE-ATOMIC-SAVE-FAILURE",
+      "cause": "On B4 Preview hosts batchDurable routes to orbit360ProductOperationalCommandPreview; executePreview rejects every non-synthetic document ID and requires __syntheticQa=true. Editing a real policy in Preview is therefore correctly denied, but policy-receipts-engine collapses the backend reason into operacion_atomica_no_confirmada and the bridge displays that unmapped technical code.",
+      "owners": [
+        "orbit360-platform/core/policy-receipts-engine.js",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "functions/product-operational-domain.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+      ],
+      "fix": "Do not weaken Preview isolation. Detect/translate Preview real-record write denial, and prove the exact write contract with an equivalent b4003qa_* synthetic policy+receipts+portfolio fixture and cleanup.",
+      "proof": "Carlos/Operativo: exact real policy remains protected in Preview with human message; synthetic equivalent proves before→renewability change→server commit→canonical readback→reload→receipt consistency→cleanup. LIVE write remains reserved for LIVE gate."
+    },
+    {
+      "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+      "cause": "Inicio gates advisor board on productionReadiness==='ready' && metaReadiness==='ready', but the fallback always says 'Actualizando producción y metas...' and does not distinguish denied/unavailable/missing configuration. A terminal non-ready state therefore looks like endless hydration.",
+      "owners": [
+        "orbit360-platform/modules/inicio.js",
+        "product read-store hydration"
+      ],
+      "fix": "Render bounded readiness states (loading/unavailable/meta-not-configured/ready), rerender on relevant collection readiness, and never leave a terminal unavailable state as 'Actualizando'.",
+      "proof": "Login→Inicio reaches a deterministic terminal state without refresh; metas/advisor board either renders data or a truthful terminal explanation within the startup threshold."
+    },
+    {
+      "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+      "cause": "Typed collaboration is stored as negocios.comentarios/bitacora through update_business. The existing outbox is generic and advisor-targeted; it has no typed handoff recipient/direction contract, Preview suppresses notificationOutbox creation, and the inbox therefore cannot prove request→intended recipient notification→case navigation for both advisor and operations directions.",
+      "owners": [
+        "orbit360-platform/core/ciclo.js",
+        "functions/product-ops-leads-domain.js",
+        "functions/ops-advisor-inbox.js"
+      ],
+      "fix": "Reuse the existing canonical workflow/outbox/inbox. Add an explicit typed collaboration event/direction contract and internal recipient semantics after canonical commit; keep external email delivery as separate debt.",
+      "proof": "Synthetic Preview path proves commit then durable internal notice for request→advisor, response→operations, recipient inbox/badge, case navigation and reload; no external-delivery claim."
+    },
+    {
+      "id": "B4-003-R18-09-POLICY-MOBILE-SEARCH-VISIBILITY",
+      "cause": "Search logic/index exists in polizas.js; failure is responsive composition/discoverability rather than missing search semantics.",
+      "owners": [
+        "orbit360-platform/modules/polizas.js",
+        "orbit360-platform/core/crmkit.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "fix": "Keep existing search engine and make the search control visibly reachable at ~390px above fold or via a clearly discoverable mobile filter affordance.",
+      "proof": "390px screenshot plus typed query returns canonical policy result."
+    },
+    {
+      "id": "B4-003-R18-10-RENEWAL-UNIVERSE-11-VS-2-DISPOSITION-GAP",
+      "cause": "Renewal date buckets still filter actionable renovable=YES records, while pending renewability rows are counted separately; this creates a summary/bucket universe gap.",
+      "owners": [
+        "orbit360-platform/modules/renovaciones.js",
+        "orbit360-platform/modules/polizas.js"
+      ],
+      "fix": "Every in-window policy receives one explicit disposition: actionable, pending classification, confirmed non-renewable, renewed or closed.",
+      "proof": "Source universe→policy→date→state→renewability→disposition reconciles 100%, with stable counts across role/country/timestamp."
+    },
+    {
+      "id": "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
+      "cause": "Functional knowledge/registry content is split across repeated nested cards/grids without an editorial hierarchy; technical detail competes with operational knowledge on mobile.",
+      "owners": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "fix": "Apply frozen hierarchy: summary→products/ramos→validated active sources→derived tariffs/conditions→Drive documents→collapsible technical Registry→activity/audit; preserve provenance/metadata.",
+      "proof": "Desktop+390px screenshots show distinct mapped/validated/enabled states, collapsible technical detail and no clipping/loss."
+    },
+    {
+      "id": "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINATOR-COVERAGE",
+      "cause": "R18 harness asserted element existence/display/routes and did not discriminate stale dependent values, mobile reachability, real Preview write isolation, full renewal disposition or recipient-visible handoff.",
+      "owners": [
+        "tools/gravicentra-i6-5-b4-003-contract.mjs",
+        "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+        ".github/workflows/gravicentra-b4-003-executor.yml"
+      ],
+      "fix": "Upgrade assertions to user outcomes with authenticated screenshots, typed interactions, canonical readback/reload and exact mobile geometry.",
+      "proof": "No candidate reaches Paula unless all impacted R18/R19 discriminants pass on the exact served artifact."
+    }
+  ],
+  "sourceFixAuthorization": {
+    "mode": "ONE_CUMULATIVE_R19_SUCCESSOR",
+    "allowedProductFiles": [
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/calidad.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/modules/polizas.js",
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/core/crmkit.js",
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "functions/product-ops-leads-domain.js",
+      "functions/ops-advisor-inbox.js",
+      "orbit360-platform/index.html"
+    ],
+    "allowedQaFiles": [
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ],
+    "forbidden": [
+      "LIVE promotion",
+      "real operational data writes in Preview",
+      "weakening Preview synthetic isolation",
+      "reimporting data",
+      "reopening PASS capabilities without causal regression",
+      "creating parallel repo/branch/Firebase/importer"
+    ],
+    "requiredAfterSourceChange": [
+      "new sourceSha",
+      "composition binding",
+      "contract PASS",
+      "immutable build once",
+      "exact isolated Preview readback",
+      "authenticated desktop+390px pre-UAT",
+      "synthetic write/readback/reload/cleanup where writes are required",
+      "targeted Paula visual only after pre-UAT PASS"
+    ]
+  },
+  "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX"
+}

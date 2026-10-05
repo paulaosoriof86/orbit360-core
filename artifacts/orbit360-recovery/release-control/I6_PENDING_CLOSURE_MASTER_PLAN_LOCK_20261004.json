@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "R18_HUMAN_REJECTED_R19_DIAGNOSTIC_ACTIVE",
-    "nextAction": "R19_CAUSAL_DIAGNOSTIC_AND_SINGLE_CUMULATIVE_FIX",
-    "why": "R18 exact Preview machine-pass was human-rejected on stale dependent product, native multiselect UX, notification gap, quality controls, mobile policy search, renewal atomic save, renewal bucket completeness, Inicio readiness and insurer hierarchy.",
+    "status": "R19_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
+    "why": "R18 human rejection and all R19 blocking causes are physically diagnosed; one cumulative successor source fix is authorized without LIVE or data reimport.",
     "currentCandidateReview": "R17_REJECTED_NO_MORE_HUMAN_RETEST_UNTIL_R18_MACHINE_PLUS_TINYFISH_PREUAT_PASS",
     "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
     "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
@@ -6348,5 +6348,33 @@
     "carryBlobSha": "17e652128da7af382b6a79f4ac171ed0624a84ea",
     "exactFindingCount": 243,
     "preservePasses": true
+  },
+  "r19CausalAuthorization": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
+    "status": "CAUSES_DEMONSTRATED_SINGLE_CUMULATIVE_SOURCE_FIX_AUTHORIZED",
+    "allowedProductFiles": [
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/calidad.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/modules/polizas.js",
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/core/crmkit.js",
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "functions/product-ops-leads-domain.js",
+      "functions/ops-advisor-inbox.js",
+      "orbit360-platform/index.html"
+    ],
+    "allowedQaFiles": [
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ],
+    "noLive": true,
+    "noReimport": true,
+    "noOperationalBusinessWrites": true
   }
 }

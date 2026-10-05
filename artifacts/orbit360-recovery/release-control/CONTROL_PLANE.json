@@ -6051,7 +6051,7 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_R19_CAUSAL_DIAGNOSTIC_ACTIVE",
+    "status": "B4_003_R19_SOURCE_FIX_AUTHORIZED",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "92e20553146e8cc43e56b8b67312ba893ea36825",
@@ -6059,7 +6059,7 @@
     "findingLedgerBlobSha": "3fdd0a9c515250a5055f1a994456941cca6b4557",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "R19_CAUSAL_DIAGNOSTIC_AND_SINGLE_CUMULATIVE_FIX",
+    "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
     "sourceFixReceiptBlobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -7011,7 +7011,36 @@
     },
     "hostedPayloadDigest": "7cd4ff5c6315b51f9c3425ff59f59f4b2cfdd0d3d941a80e9d2e14864710c97c",
     "backendSourceDigest": "b58ed88379e2656723656ae6deb0500896696bc34a99a9e65c5dfd6e94b02f20",
-    "bundleDigest": "609ab4f2e1d3d72fd9b15bfde91353e5d30ce82df5cfef2db507c6de9b6d74b2"
+    "bundleDigest": "609ab4f2e1d3d72fd9b15bfde91353e5d30ce82df5cfef2db507c6de9b6d74b2",
+    "r18HumanStatus": "R18_HUMAN_REJECTED_R19_CAUSAL_REMEDIATION_REQUIRED",
+    "r19CausalAuthorization": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
+      "status": "CAUSES_DEMONSTRATED_SINGLE_CUMULATIVE_SOURCE_FIX_AUTHORIZED",
+      "allowedProductFiles": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "orbit360-platform/modules/inicio.js",
+        "orbit360-platform/modules/polizas.js",
+        "orbit360-platform/modules/renovaciones.js",
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/core/crmkit.js",
+        "orbit360-platform/styles/infra.css",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "functions/product-ops-leads-domain.js",
+        "functions/ops-advisor-inbox.js",
+        "orbit360-platform/index.html"
+      ],
+      "allowedQaFiles": [
+        "tools/gravicentra-i6-5-b4-003-contract.mjs",
+        "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+        ".github/workflows/gravicentra-b4-003-executor.yml"
+      ],
+      "noLive": true,
+      "noReimport": true,
+      "noOperationalBusinessWrites": true
+    }
   },
   "b4VisualAcceptanceControl": {
     "status": "R18_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",

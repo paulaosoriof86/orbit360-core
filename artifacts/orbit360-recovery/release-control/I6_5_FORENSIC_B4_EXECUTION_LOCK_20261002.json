@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-05T11:24:00-06:00",
-  "status": "B4_003_R19_CAUSAL_DIAGNOSTIC_ACTIVE",
+  "status": "B4_003_R19_SOURCE_FIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "R19_CAUSAL_DIAGNOSTIC_ACTIVE",
+    "status": "R19_SOURCE_FIX_AUTHORIZED",
     "blocking": true,
-    "nextAction": "R19_CAUSAL_DIAGNOSTIC_AND_SINGLE_CUMULATIVE_FIX",
+    "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
     "humanVisualStatus": "REJECTED_R18",
     "knowledgePreview": true
   },
@@ -91,7 +91,7 @@
     "drivePreviewFunctionDeploymentAuthorized": true,
     "drivePreviewProductionFunctionsAuthorized": false
   },
-  "nextAction": "R19_CAUSAL_DIAGNOSTIC_AND_SINGLE_CUMULATIVE_FIX",
+  "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "7560cfba0fee9f9fc0888e7eff8839066ed9c710"
@@ -592,5 +592,33 @@
   "r19NoLossFreeze": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_R19_NOLOSS_FREEZE_20261005.json",
     "blobSha": "5277c2a052ea8dcea3bb9e15eb7eb3f6b55e0c5d"
+  },
+  "r19CausalAuthorization": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
+    "status": "CAUSES_DEMONSTRATED_SINGLE_CUMULATIVE_SOURCE_FIX_AUTHORIZED",
+    "allowedProductFiles": [
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/calidad.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/modules/polizas.js",
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/core/crmkit.js",
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "functions/product-ops-leads-domain.js",
+      "functions/ops-advisor-inbox.js",
+      "orbit360-platform/index.html"
+    ],
+    "allowedQaFiles": [
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ],
+    "noLive": true,
+    "noReimport": true,
+    "noOperationalBusinessWrites": true
   }
 }
