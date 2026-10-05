@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-05T11:24:00-06:00",
-  "status": "B4_003_R18_AUTHENTICATED_READONLY_DIAGNOSTIC",
+  "status": "B4_003_R18_CAUSAL_SOURCE_FIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "R18_AUTHENTICATED_READONLY_DIAGNOSTIC",
+    "status": "R18_CAUSAL_SOURCE_FIX_AUTHORIZED",
     "blocking": true,
-    "nextAction": "R18_AUTHENTICATED_HARNESS_READBACK",
+    "nextAction": "R18_SINGLE_CUMULATIVE_SOURCE_FIX",
     "humanVisualStatus": "REJECTED_R17",
     "knowledgePreview": true
   },
@@ -59,29 +59,29 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "allowedProductFiles": [
-      "orbit360-platform/modules/cancelaciones.js",
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/calidad.js",
       "orbit360-platform/modules/polizas.js",
-      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
-      "orbit360-platform/index.html",
-      "functions/document-drive-domain.js",
-      "orbit360-platform/core/importa.js"
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/index.html"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "R13-10 only: exact Preview, one disposable B4 synthetic insurer/document test, mandatory Drive/linkage/reload readback and cleanup; no real insurer/client mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
     "providerDeploymentAuthorized": false,
     "findingContinuityGuardRequired": true,
     "allowedQaFiles": [
-      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
       "tools/gravicentra-i6-5-b4-003-contract.mjs",
-      ".github/workflows/gravicentra-b4-003-executor.yml",
-      "tools/gravicentra-i6-5-b4-003-r18-readonly-forensic.mjs",
-      ".github/workflows/gravicentra-b4-003-readonly-diagnostic.yml"
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": false,
@@ -90,7 +90,7 @@
     "drivePreviewFunctionDeploymentAuthorized": true,
     "drivePreviewProductionFunctionsAuthorized": false
   },
-  "nextAction": "R18_AUTHENTICATED_HARNESS_READBACK",
+  "nextAction": "R18_SINGLE_CUMULATIVE_SOURCE_FIX",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "fd09f8ec9ac14ac51cc6f89f3707a2e49af0032e"
@@ -544,5 +544,14 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "r18CausalAuthorization": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_CAUSAL_SOURCE_FIX_AUTHORIZATION_20261005.json",
+    "blobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8",
+    "forensicPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_AUTHENTICATED_READONLY_FORENSIC_RESULT_20261005.json",
+    "forensicBlobSha": "e4b1b418fc7b2b1f15d28a0560529a7603f32203",
+    "ledgerBlobSha": "3caffb0d57fcfbefb911f4d3ff5af022574e7dda",
+    "carryBlobSha": "38ecbdf3d69008c21192e2cbb5c5375fb54fd321",
+    "masterPlanBlobSha": "e079abbbd13d021ecedaf35357fbdfee5d25a9bc"
   }
 }
