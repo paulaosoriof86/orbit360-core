@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-05T11:24:00-06:00",
-  "status": "B4_003_R18_CAUSAL_SOURCE_FIX_AUTHORIZED",
+  "status": "B4_003_SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "R18_CAUSAL_SOURCE_FIX_AUTHORIZED",
+    "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "R18_SINGLE_CUMULATIVE_SOURCE_FIX",
+    "nextAction": "R18_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_R17",
     "knowledgePreview": true
   },
@@ -59,7 +59,7 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "allowedProductFiles": [
       "orbit360-platform/core/ciclo.js",
       "orbit360-platform/modules/calidad.js",
@@ -91,7 +91,7 @@
     "drivePreviewFunctionDeploymentAuthorized": true,
     "drivePreviewProductionFunctionsAuthorized": false
   },
-  "nextAction": "R18_SINGLE_CUMULATIVE_SOURCE_FIX",
+  "nextAction": "R18_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "fd09f8ec9ac14ac51cc6f89f3707a2e49af0032e"
@@ -561,5 +561,12 @@
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
   "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
-  "continuityRegisterBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6"
+  "continuityRegisterBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
+  "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
+  "r18SourceFix": {
+    "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
+    "blobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
+    "compositionBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843"
+  }
 }
