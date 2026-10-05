@@ -203,7 +203,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "c39e1340da01bed174bbe3e6b4bc8028ca04aabf",
+    "orbit360-platform/index.html": "a735993a1a2e672ba09d78898bc29589969dc4f7",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "ef8a7bd900c16b83d3f83bc271b38b8a4d24dc0c",
     "orbit360-platform/modules/calidad.js": "83c8e041217f4d15cfd42ff30b792a8cd672d079",
@@ -220,7 +220,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "e7b6fcf58fe7a90db82db788e75e28b3ea0bd5ea",
+    "orbit360-platform/modules/inicio.js": "e73f91c1d81985a3baa4fde1575a453260c5125d",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "d3ee9ce359570b6f6940374aefe74c617cc71d20",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "8033ff7cf1858824e6c6b2d9a568b4c2988ec15e",
@@ -3144,6 +3144,8 @@
     "exactSetChanged": false,
     "noDataMutation": true,
     "noReimport": true,
-    "noLive": true
+    "noLive": true,
+    "renewalKpiParityAddendum": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
+    "sameCandidate": true
   }
 }
