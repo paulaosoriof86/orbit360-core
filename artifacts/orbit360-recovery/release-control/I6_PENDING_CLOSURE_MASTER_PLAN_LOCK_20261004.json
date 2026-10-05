@@ -6246,8 +6246,8 @@
     "status": "FROZEN",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_DECISION_AND_NOLOSS_FREEZE_20261005.json",
     "receiptBlobSha": "3a3ef9c695ad8f714be95f743bbf1b78870d2d90",
-    "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
-    "carryBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
+    "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
+    "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7",
     "exactFindingSetCount": 235,
     "newFindingIds": [
       "B4-003-R18-01-OPS-LEADS-DEFAULT-ENTRY-STAGE",
@@ -6314,9 +6314,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
     "blobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
     "compositionBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
-    "executionLockBlobSha": "85e1c24b7171a8c80836ec000df05a81f19b368a",
-    "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
-    "carryBlobSha": "12d6e394c10bc40d0b219eed7bab2a9266853797",
+    "executionLockBlobSha": "5577996dda4803c9572ad9a6dfd433f446f05085",
+    "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
+    "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7",
     "exactFindingSetCount": 235
   },
   "r18ContinuityBindingRepair": {
@@ -6333,5 +6333,11 @@
     "previewProofBlobSha": "b60ff527a2723002923cbbd7499d222a3da1c470",
     "failedRunId": 37355564631,
     "productSourceChanged": false
+  },
+  "r18MachineProofContinuitySeal": {
+    "status": "SEALED",
+    "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
+    "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7",
+    "executionLockBlobSha": "5577996dda4803c9572ad9a6dfd433f446f05085"
   }
 }
