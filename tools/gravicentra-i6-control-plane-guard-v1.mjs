@@ -9,6 +9,8 @@ const I6_PLAN_LOCK='artifacts/orbit360-recovery/release-control/I6_POSTSALIDA_PL
 const V5_MANIFEST='artifacts/orbit360-recovery/project-sources-v2/v5/08_MANIFIESTO_FUENTES_EVERGREEN_V5.json';
 const V6_MANIFEST='artifacts/orbit360-recovery/project-sources-v2/v6/10_MANIFIESTO_FUENTES_EVERGREEN_V6.json';
 const V6_ADDENDUM='artifacts/orbit360-recovery/project-sources-v2/v6/09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md';
+const V7_MANIFEST='artifacts/orbit360-recovery/project-sources-v2/v7/12_MANIFIESTO_FUENTES_EVERGREEN_V7.json';
+const V7_ADDENDUM='artifacts/orbit360-recovery/project-sources-v2/v7/11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md';
 const DATA_UPDATE_PLAN='artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json';
 const DATA_UPDATE_DISCIPLINE='artifacts/orbit360-recovery/release-control/I6_DATA_UPDATE_EXECUTION_DISCIPLINE_LOCK_20260917.json';
 const DATA_UPDATE_REGISTRY='artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json';
@@ -49,11 +51,11 @@ const stable=v=>{if(v===null||typeof v!=='object')return v;if(Array.isArray(v))r
 const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
-for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,V6_MANIFEST,V6_ADDENDUM,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2,I65_FORENSIC_B3,I65_FORENSIC_B4,I6_CANONICAL_COMPOSITION,I6_FINDINGS_LEDGER,I65_FORENSIC_PLAN_V2,I65_B2_REJECTION,I65_B2_ROOT_CAUSE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
+for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,V6_MANIFEST,V6_ADDENDUM,V7_MANIFEST,V7_ADDENDUM,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2,I65_FORENSIC_B3,I65_FORENSIC_B4,I6_CANONICAL_COMPOSITION,I6_FINDINGS_LEDGER,I65_FORENSIC_PLAN_V2,I65_B2_REJECTION,I65_B2_ROOT_CAUSE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
 const C=readJson(CONTROL);
 const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionLockPath||I65_FORENSIC_B4);
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
-const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M=readJson(V6_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
+const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);
 need(C.schemaVersion==='gravicentra-control-plane-v2','I6_CONTROL_SCHEMA_INVALID');
@@ -150,15 +152,16 @@ need(A.schemaVersion==='gravicentra-i6-explicit-authorization-receipt-v1','I6_AU
 need(A.authorization?.decision==='AUTHORIZED_BY_OWNER','I6_AUTH_RECEIPT_DECISION_INVALID');
 need(A.authorization?.dataMutationAuthorized===false&&A.authorization?.augustRefreshApplyAuthorized===false,'I6_AUTH_RECEIPT_OVERREACH');
 
-need(C.projectSources?.activePackage==='GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V6','I6_PROJECT_SOURCES_NOT_V6');
-need(C.projectSources?.activeVersion===6,'I6_PROJECT_SOURCES_VERSION_INVALID');
-need(C.projectSources?.manifestPath===V6_MANIFEST,'I6_PROJECT_SOURCES_MANIFEST_INVALID');
+need(C.projectSources?.activePackage==='GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7','I6_PROJECT_SOURCES_NOT_V7');
+need(C.projectSources?.activeVersion===7,'I6_PROJECT_SOURCES_VERSION_INVALID');
+need(C.projectSources?.manifestPath===V7_MANIFEST,'I6_PROJECT_SOURCES_MANIFEST_INVALID');
 need(C.projectSources?.staticSourceUpdateRequired===true,'I6_PROJECT_SOURCE_UPDATE_FLAG_EXPECTED_UNTIL_USER_SYNC');
-need(String(C.projectSources?.reason||'').includes('canonical accumulative composition'),'I6_PROJECT_SOURCE_UPDATE_REASON_MISSING');
-need(M.packageId===C.projectSources.activePackage&&M.version===6,'I6_V6_MANIFEST_BINDING_INVALID');
+need(String(C.projectSources?.reason||'').includes('Evergreen V7 package'),'I6_PROJECT_SOURCE_UPDATE_REASON_MISSING');
+need(M.packageId===C.projectSources.activePackage&&M.version===7,'I6_V7_MANIFEST_BINDING_INVALID');
+need(M6.version===6,'I6_V6_RETAINED_MANIFEST_INVALID');
 need(M5.version===5,'I6_V5_RETAINED_MANIFEST_INVALID');
-need(git('hash-object',V6_MANIFEST)===C.projectSources.manifestBlobSha,'I6_V6_MANIFEST_BLOB_DRIFT');
-need(git('hash-object',V6_ADDENDUM)===C.projectSources.normativeAddendumBlobSha,'I6_V6_ADDENDUM_BLOB_DRIFT');
+need(git('hash-object',V7_MANIFEST)===C.projectSources.manifestBlobSha,'I6_V7_MANIFEST_BLOB_DRIFT');
+need(git('hash-object',V7_ADDENDUM)===C.projectSources.normativeAddendumBlobSha,'I6_V7_ADDENDUM_BLOB_DRIFT');
 
 if(activeI62V5){
   need(C.i6Execution?.requiresDryRun===false,'I6_V5_DRYRUN_MUST_NOT_BE_MANDATORY');
