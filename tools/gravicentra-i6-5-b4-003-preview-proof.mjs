@@ -613,6 +613,19 @@ try{
  need(proof.r1604MobileQuality.mobileDisplay!=='none'&&proof.r1604MobileQuality.desktopDisplay==='none'&&proof.r1604MobileQuality.cardVisible&&proof.r1604MobileQuality.hasResolutionAction,'B4_003_R16_04_QUALITY_MOBILE_USABILITY_FAILED:'+JSON.stringify(proof.r1604MobileQuality));
  proof.assertions.qualityMobileResolutionCard=true;
  await page.setViewportSize({width:1280,height:720});
+ proof.r17KanbanCardContainment=await page.evaluate(()=>{
+   const probe=document.createElement('div');
+   probe.id='b4003-r17-kanban-card-probe';
+   probe.style.cssText='position:fixed;left:-2400px;top:0;width:560px;height:360px;display:block';
+   probe.innerHTML='<div class="kanban" style="width:520px"><div class="kcol"><div class="kcol-h2" style="--lc:#999"><span class="kcol-emoji">🧪</span><b>Cotizaciones</b><span class="kcount">1</span></div><div class="kcol-body"><div class="kcard"><div class="kcard-top"><span class="badge neutral">Automóviles</span></div><div class="kcard-t">PILOTV6_S1_CTO2_CTO3_20261003_01_NOMBRE_EXTREMADAMENTE_LARGO_SIN_ESPACIOS</div><div class="kcard-cli">Auto Total · Q0</div><div class="kcard-meta">Cotizando · 45%</div><div class="kcard-foot"><span>SD</span><span class="kchk">✓ 1/4</span><span class="kvence">en 1d</span></div></div></div></div></div>';
+   document.body.appendChild(probe);
+   const col=probe.querySelector('.kcol'),body=probe.querySelector('.kcol-body'),card=probe.querySelector('.kcard'),title=probe.querySelector('.kcard-t');
+   const cr=col.getBoundingClientRect(),br=body.getBoundingClientRect(),kr=card.getBoundingClientRect(),ts=getComputedStyle(title);
+   const out={colWidth:cr.width,bodyWidth:br.width,cardWidth:kr.width,cardWithinColumn:kr.left>=cr.left-1&&kr.right<=cr.right+1,cardWithinBody:kr.left>=br.left-1&&kr.right<=br.right+1,cardScrollWidth:card.scrollWidth,cardClientWidth:card.clientWidth,titleOverflowWrap:ts.overflowWrap,titleWordBreak:ts.wordBreak};
+   probe.remove();return out;
+ });
+ need(proof.r17KanbanCardContainment.cardWithinColumn===true&&proof.r17KanbanCardContainment.cardWithinBody===true&&proof.r17KanbanCardContainment.cardScrollWidth<=proof.r17KanbanCardContainment.cardClientWidth+1&&['anywhere','break-word'].includes(proof.r17KanbanCardContainment.titleOverflowWrap),'B4_003_R17_OPS_LEADS_CARD_OVERFLOW:'+JSON.stringify(proof.r17KanbanCardContainment));
+ proof.assertions.opsLeadsKanbanCardContained=true;
 
  await page.evaluate(()=>{location.hash='#/renovaciones';});
  await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='renovaciones',null,{timeout:10000});

@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "f169d3799294ff1ba6740c6ef4840122fcf5ca76",
-  "expectedLedgerNextBlobSha": "6f6dc7f1f94ba39e451eb1281cc95f92585b372c",
+  "expectedLedgerNextBlobSha": "79b47a8f2bd76f39b12fe5216ce91c38f638d8e0",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -16,7 +16,7 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 217,
+  "inventoryCount": 218,
   "attentionCount": 103,
   "inventory": [
     {
@@ -3696,6 +3696,27 @@
       "mayDisappearWithoutDisposition": false,
       "noLive": true,
       "noReimport": true
+    },
+    {
+      "id": "B4-003-R17-03-OPS-LEADS-KANBAN-CARD-OVERFLOW",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261004_R17",
+      "surface": "Ops/Leads shared Kanban",
+      "finding": "A long unbroken opportunity name expands the shared kcard beyond its kcol; Paula reproduced it in Ops Cotizaciones from a case created under Carlos and observed the card visually displaced/clipped.",
+      "owner": [
+        "orbit360-platform/styles/infra.css",
+        "orbit360-platform/core/ciclo.js"
+      ],
+      "classification": "PRODUCT_RESPONSIVE_INTRINSIC_WIDTH_DEFECT",
+      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "At desktop and responsive widths every shared Leads/Ops kcard remains inside kcol/kcol-body; long unbroken names wrap without horizontal overflow; browser proof asserts geometric containment.",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "mayDisappearWithoutDisposition": false,
+      "noLive": true,
+      "noReimport": true
     }
   ],
   "attentionIds": [
@@ -3808,7 +3829,8 @@
     "B4-003-R16-07-RENEWABILITY-REVIEW-WORKFLOW-UX",
     "B4-003-R16-08-INSURER-KNOWLEDGE-HIERARCHY",
     "B4-003-R17-01-LEAD-INSURER-COUNTRY-MULTISELECT",
-    "B4-003-R17-02-NONVEHICLE-RISK-SECTION-GUARD"
+    "B4-003-R17-02-NONVEHICLE-RISK-SECTION-GUARD",
+    "B4-003-R17-03-OPS-LEADS-KANBAN-CARD-OVERFLOW"
   ],
   "criticalCurrentReviewIds": [
     "B4-003",

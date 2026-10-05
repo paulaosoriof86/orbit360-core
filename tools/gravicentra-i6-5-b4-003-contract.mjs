@@ -220,7 +220,7 @@ need(/modules\/aseguradoras-v1202-import-bridge\.js\?v=20261004-b4003r13d/.test(
 need(index.includes('core/client-insurer-visual-contract-v20260720.js?v=20261004-r16p4'),'B4_003_INSURER_VISUAL_R12_CACHE_BINDING_MISSING');
 need(index.includes('modules/policy-receipts-v1199-detail-guard.js?v=20261005-r17'),'B4_003_POLICY_DETAIL_R13_CACHE_BINDING_MISSING');
 need(/modules\/policy-receipts-v1199-bridge\.js\?v=20261005-r17/.test(index),'B4_003_POLICY_BRIDGE_R11_CACHE_BINDING_MISSING');
-need(/styles\/infra\.css\?v=20261003-b4003r11/.test(index),'B4_003_INFRA_R11_CACHE_BINDING_MISSING');
+need(/styles\/infra\.css\?v=20261005-r17-cardfit/.test(index),'B4_003_INFRA_R17_CARD_FIT_CACHE_BINDING_MISSING');
 
 const productPaths=[paths.workflow,paths.operationalBackend,paths.store,paths.accessScope,paths.cronograma,paths.base,paths.bridge,paths.permission,paths.issued,paths.cancel,paths.policy,paths.policyBridge,paths.policyDetail,paths.client360,paths.quality,paths.insurer,paths.insurerVisual,paths.importer,paths.driveBackend,paths.infra,paths.index,paths.rosterBackend,paths.rosterClient,paths.tenantBackend,paths.tenantClient,paths.configuracion,paths.geo,'orbit360-platform/core/config.js'];
 const bindings=Object.fromEntries(productPaths.map(p=>[p,hash(p)]));
@@ -254,6 +254,7 @@ need(base.includes('data-renewability-review-workflow="1"')&&base.includes('Revi
 need(insurer.includes('Sin archivos físicos cargados en Drive desde esta ficha')&&insurer.includes('Cobertura y estado por producto')&&insurer.includes('Conocimiento vigente y observado · con evidencia'),'B4_003_R16_08_INSURER_KNOWLEDGE_HIERARCHY_MISSING');
 need(insurerVisual.includes('<span>Validadas</span>')&&insurerVisual.includes('Archivo físico en Drive')&&!insurerVisual.includes('Mapeadas / validadas'),'B4_003_R16_08_INSURER_KPI_SEMANTICS_MISSING');
 need(cycle.includes('function insurersForCountry')&&cycle.includes('multiple size=')&&cycle.includes('aseguradoraIds: insurerIds')&&cycle.includes('solo se muestran aseguradoras del país del negocio'),'B4_003_R17_LEAD_INSURER_COUNTRY_MULTISELECT_MISSING');
+need(infra.includes('.kcol-body{padding:10px;display:grid;gap:9px;flex:1;min-width:0;overflow:hidden}')&&infra.includes('min-width:0;max-width:100%;width:100%;box-sizing:border-box;overflow:hidden')&&infra.includes('.kcard-t{')&&infra.includes('overflow-wrap:anywhere;word-break:break-word'),'B4_003_R17_OPS_LEADS_CARD_CONTAINMENT_MISSING');
 need(base.includes('data-renewal-bucket=')&&bridge.includes("bucket=key=>Array.from(host.querySelectorAll('[data-renewal-bucket=\"'+key+'\"] [data-renewal-policy]'))")&&!bridge.includes('const all=policies(90),venc='),'B4_003_R17_RENEWAL_KPI_CANONICAL_BUCKET_BINDING_MISSING');
 need(policyBridge.includes("clientMod.editarPoliza=function(policyId,focusField)")&&policyBridge.includes("opts.focusField==='renovabilidad'")&&policyBridge.includes('[data-renewable]'),'B4_003_R17_RENEWABILITY_FOCUS_RUNTIME_OWNER_MISSING');
 need(quality.includes('max-width:1700px')&&quality.includes('sourceLabel(x.contractualSource)')&&quality.includes('Motivo detectado:')&&quality.includes('Origen / evidencia')&&!quality.includes('<th>Provenance / evidencia</th>'),'B4_003_R17_QUALITY_RESPONSIVE_HUMAN_SEMANTICS_MISSING');

@@ -2827,7 +2827,8 @@
         "2026-10-04 R17: assignable advisor roster visually passes for Carlos after correcting user identity.",
         "2026-10-04 R17: Configuración→Catálogos opens quickly.",
         "2026-10-04 R17: sampled active receipt calendars no longer show prior duplicate shadow pairs.",
-        "2026-10-04 R17: failures remain in insurer country/cardinality, quality actionability/responsive semantics, renewal review flow/count consistency, insurer source drill-down, and non-vehicle risk guard."
+        "2026-10-04 R17: failures remain in insurer country/cardinality, quality actionability/responsive semantics, renewal review flow/count consistency, insurer source drill-down, and non-vehicle risk guard.",
+        "2026-10-04 R17: Paula reproduced a shared Leads/Ops Kanban card overflow with a long unbroken opportunity name; root cause is intrinsic card width escaping its column."
       ],
       "requiredProof": [
         "Cancelaciones route remains visible to authorized roles.",
@@ -7809,6 +7810,27 @@
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Vehicle section/warnings/actions render only for vehicle/auto policies; non-vehicle policies retain generic insured-risk data without vehicle requirement.",
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "mayDisappearWithoutDisposition": false,
+      "noLive": true,
+      "noReimport": true
+    },
+    {
+      "id": "B4-003-R17-03-OPS-LEADS-KANBAN-CARD-OVERFLOW",
+      "block": "B4",
+      "parent": "B4-003",
+      "source": "PAULA_VISUAL_20261004_R17",
+      "surface": "Ops/Leads shared Kanban",
+      "finding": "A long unbroken opportunity name expands the shared kcard beyond its kcol; Paula reproduced it in Ops Cotizaciones from a case created under Carlos and observed the card visually displaced/clipped.",
+      "owner": [
+        "orbit360-platform/styles/infra.css",
+        "orbit360-platform/core/ciclo.js"
+      ],
+      "classification": "PRODUCT_RESPONSIVE_INTRINSIC_WIDTH_DEFECT",
+      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "blocking": true,
+      "targetGate": "B4-003",
+      "closureCondition": "At desktop and responsive widths every shared Leads/Ops kcard remains inside kcol/kcol-body; long unbroken names wrap without horizontal overflow; browser proof asserts geometric containment.",
       "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "mayDisappearWithoutDisposition": false,
       "noLive": true,

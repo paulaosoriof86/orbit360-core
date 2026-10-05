@@ -7,7 +7,7 @@
   "sourceTreeHeadBeforeControlPlaneSeal": "8112911d2c6c8cbea8b5af1998c8a0f628d06818",
   "findingId": "B4-003",
   "humanVisualOrigin": "PAULA_R17_REJECTION_20261004",
-  "findingCountAfter": 217,
+  "findingCountAfter": 218,
   "fixes": [
     "Ops/Leads business insurer interest is country-scoped and multi-select; primary aseguradoraId remains backward-compatible.",
     "Quality financial review is responsive and opens a discriminating review modal; receipt action targets exact policy receipts context; internal lineage/status tokens are not user-facing.",
@@ -27,18 +27,19 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "b44695f05170b4406740ed7158b47e6464916d8f",
     "orbit360-platform/modules/aseguradoras.js": "2e651c12fe78aac38bc1f655bfb3a3f2ac6f182e",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "d3ee9ce359570b6f6940374aefe74c617cc71d20",
-    "orbit360-platform/index.html": "f96358fbef0cef9e49c4e750f58160132eea1672"
+    "orbit360-platform/index.html": "c931300edf0f32392bb38be44fea2c1524f37909",
+    "orbit360-platform/styles/infra.css": "f7e0dd4442e36592ed3507c5455b3ff7cec23a08"
   },
   "qaBlobs": {
-    "tools/gravicentra-i6-5-b4-003-contract.mjs": "66dcac1ee462023e7a27ada26df160f63531a9ee",
-    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "2f73abe643f4dc2b447e252453b307c92b449ceb",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "4142ea0d0e27bcd76d8a4ff6362fd39e271a4abc",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "5d2b6c86b2edcde586c379becd88c0b87797c8a5",
     ".github/workflows/gravicentra-b4-003-executor.yml": "bb77f9992587bd7e28ccef74bc4871cb7da69a4b"
   },
   "governanceBlobs": {
-    "findingLedger": "6f6dc7f1f94ba39e451eb1281cc95f92585b372c",
-    "continuityRegister": "3e7590d971c50c1043b1f1f6fba62f489936e19d",
-    "canonicalComposition": "cce6f6bd6d56006257eb63d15c2c98b8487f98fe",
-    "executionLock": "d060fa4c2e6b195da4537fae773339cbf659b3dd"
+    "findingLedger": "79b47a8f2bd76f39b12fe5216ce91c38f638d8e0",
+    "continuityRegister": "76f3cc0a91bbccd00fa8a24113154bf8142cd312",
+    "canonicalComposition": "125d91b3ee73c63b1322322811d48aca5cb623ed",
+    "executionLock": "4123349e1de51b1b72bca28a9d1b2543fd27c421"
   },
   "preservedPasses": [
     "Assignable advisor roster for Carlos/Operativo in reviewed flow",
@@ -91,5 +92,15 @@
     "previewDeployed": false,
     "dataMutation": false,
     "liveTouched": false
+  },
+  "opsLeadsCardContainment": {
+    "findingId": "B4-003-R17-03-OPS-LEADS-KANBAN-CARD-OVERFLOW",
+    "status": "SOURCE_FIXED_PENDING_EXACT_BROWSER_PROOF",
+    "humanEvidence": "Paula visual review 2026-10-04: a long-named card from a Carlos-owned case overflowed the Ops Cotizaciones column; Leads uses the same shared kcard.",
+    "rootCause": "Intrinsic minimum width from the unbroken opportunity name escaped the Kanban column.",
+    "fix": "Shared CSS containment/wrapping guards plus exact browser geometry regression proof.",
+    "noDataMutation": true,
+    "noReimport": true,
+    "noLive": true
   }
 }

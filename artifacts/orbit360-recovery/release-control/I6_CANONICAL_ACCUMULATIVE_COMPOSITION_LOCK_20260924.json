@@ -203,7 +203,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "f96358fbef0cef9e49c4e750f58160132eea1672",
+    "orbit360-platform/index.html": "c931300edf0f32392bb38be44fea2c1524f37909",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras.js": "2e651c12fe78aac38bc1f655bfb3a3f2ac6f182e",
     "orbit360-platform/modules/calidad.js": "0851a73f29445cac6ddf9099fa2ef7c9c0b71ba5",
@@ -234,7 +234,7 @@
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
-    "orbit360-platform/styles/infra.css": "d9ebaf7fd7e594c98bd0526e544188fc96ce1552",
+    "orbit360-platform/styles/infra.css": "f7e0dd4442e36592ed3507c5455b3ff7cec23a08",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "functions/assignable-advisor-roster.js": "88a7cc53f044ae6d86338e451cb56abfed4d4b6a",
@@ -2161,7 +2161,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "6f6dc7f1f94ba39e451eb1281cc95f92585b372c",
+  "findingLedgerBlobSha": "79b47a8f2bd76f39b12fe5216ce91c38f638d8e0",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2581,7 +2581,7 @@
     "diagnosticRunId": 37153182332,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "findingContinuityRegisterBlobSha": "3e7590d971c50c1043b1f1f6fba62f489936e19d",
+  "findingContinuityRegisterBlobSha": "76f3cc0a91bbccd00fa8a24113154bf8142cd312",
   "b4003MachinePassVisualStateReconciliation": {
     "status": "MACHINE_PASS_VISUAL_STATE_RECONCILED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_VISUAL_STATE_RECONCILIATION_20261003.json",
@@ -2809,7 +2809,7 @@
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "continuityRegisterBlobSha": "3e7590d971c50c1043b1f1f6fba62f489936e19d",
+  "continuityRegisterBlobSha": "76f3cc0a91bbccd00fa8a24113154bf8142cd312",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
   "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "b4003R15VisualReview": {
@@ -3061,14 +3061,15 @@
       "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "b44695f05170b4406740ed7158b47e6464916d8f",
       "orbit360-platform/modules/aseguradoras.js": "2e651c12fe78aac38bc1f655bfb3a3f2ac6f182e",
       "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "d3ee9ce359570b6f6940374aefe74c617cc71d20",
-      "orbit360-platform/index.html": "f96358fbef0cef9e49c4e750f58160132eea1672"
+      "orbit360-platform/index.html": "c931300edf0f32392bb38be44fea2c1524f37909",
+      "orbit360-platform/styles/infra.css": "f7e0dd4442e36592ed3507c5455b3ff7cec23a08"
     },
     "qaBlobs": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "66dcac1ee462023e7a27ada26df160f63531a9ee",
-      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "2f73abe643f4dc2b447e252453b307c92b449ceb",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "4142ea0d0e27bcd76d8a4ff6362fd39e271a4abc",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "5d2b6c86b2edcde586c379becd88c0b87797c8a5",
       ".github/workflows/gravicentra-b4-003-executor.yml": "bb77f9992587bd7e28ccef74bc4871cb7da69a4b"
     },
-    "findingCountAfter": 217,
+    "findingCountAfter": 218,
     "humanVisualOrigin": "R17_REJECTED_20261004",
     "fixes": [
       "country-scoped multi-select insurer interest",
@@ -3105,6 +3106,15 @@
       "resolution": "Contract required contiguous pre-R17 export text and obsolete K.clienteCell literal. Updated assertions to prove the same projection functions plus the new financialClientCell owner.",
       "productSourceChanged": false,
       "noBuildOccurredBeforeFix": true
+    },
+    "opsLeadsCardContainment": {
+      "status": "SOURCE_FIXED_PENDING_EXACT_BROWSER_PROOF",
+      "findingId": "B4-003-R17-03-OPS-LEADS-KANBAN-CARD-OVERFLOW",
+      "rootCause": "Long unbroken business names created an intrinsic minimum width larger than the shared Kanban column because kcol-body/kcard lacked containment guards.",
+      "fix": "min-width:0/max-width/box-sizing/overflow guards plus wrapping and exact browser geometry proof.",
+      "productSourceChanged": true,
+      "noReimport": true,
+      "noLive": true
     }
   }
 }
