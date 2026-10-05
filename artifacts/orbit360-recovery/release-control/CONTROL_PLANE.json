@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R18_SOURCE_FIX",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R18_CONTRACT_AND_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4863,24 +4863,24 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_R18_CAUSAL_SOURCE_FIX_AUTHORIZED",
+      "status": "B4_003_SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "bfe152c1a758ec7b221a9be66569b21cf71c98cc",
-      "compositionLockBlobSha": "baf0fe4551ff2be6ded68504b73506b28dacc17f",
+      "executionLockBlobSha": "8e0d598b27173350ada8a6aa7f0555e86ef41307",
+      "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
       "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
       "baselinePreviewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
-      "productMutationAuthorized": true,
+      "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "R18_SINGLE_CUMULATIVE_SOURCE_FIX",
+      "nextAction": "R18_CONTRACT_AND_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
       "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
@@ -6051,16 +6051,16 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_R18_CAUSAL_SOURCE_FIX_AUTHORIZED",
+    "status": "B4_003_SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "bfe152c1a758ec7b221a9be66569b21cf71c98cc",
-    "compositionLockBlobSha": "baf0fe4551ff2be6ded68504b73506b28dacc17f",
+    "executionLockBlobSha": "8e0d598b27173350ada8a6aa7f0555e86ef41307",
+    "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
     "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "R18_SINGLE_CUMULATIVE_SOURCE_FIX",
-    "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
+    "nextAction": "R18_CONTRACT_AND_EXACT_PREVIEW",
+    "sourceFixReceiptBlobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
       "status": "RETRY_AFTER_R10_RUNTIME_REACHABILITY_ROOTFIX",
@@ -6119,7 +6119,7 @@
       "reimport": false,
       "livePromotion": false
     },
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -6271,7 +6271,7 @@
       "reimport": false,
       "livePromotion": false
     },
-    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
     "b4003SourceFixR4": {
       "status": "SOURCE_FIXED_R4_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
@@ -7078,7 +7078,7 @@
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "guardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
     "masterPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "masterPlanBlobSha": "eb911d895030f6070c536e6e1a2adf6bb0c77bcc",
+    "masterPlanBlobSha": "e8685e410e8f26d2e5cd99e1ded083b31ce75faf",
     "inventoryCount": 235,
     "attentionCount": 126,
     "rule": "Ledger/register sets are exact and deletion-forbidden. R18 findings are appended before any next build; prior PASS remains preserved unless a causal source change invalidates it.",
@@ -7096,7 +7096,7 @@
   "pendingClosureMasterPlan": {
     "status": "FROZEN_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "blobSha": "eb911d895030f6070c536e6e1a2adf6bb0c77bcc",
+    "blobSha": "e8685e410e8f26d2e5cd99e1ded083b31ce75faf",
     "baselineFindingCount": 208,
     "currentGate": "B4-003",
     "currentRevision": "R17",
@@ -7104,7 +7104,7 @@
     "extendsPlanV2": true,
     "conversationDependent": false
   },
-  "compositionLockBlobSha": "a1e052403a3765f284ef2e8b515ba287fffd78f5",
+  "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
   "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
   "continuityRegisterBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
   "r16PerformanceRegression": {
@@ -7359,5 +7359,13 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139",
     "findingId": "B4-003-R18-16-INICIO-POLIZAS-RENEWAL-KPI-PARITY"
+  },
+  "r18SourceFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
+    "receiptBlobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
+    "compositionBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
+    "executionLockBlobSha": "8e0d598b27173350ada8a6aa7f0555e86ef41307",
+    "productMutationClosed": true
   }
 }
