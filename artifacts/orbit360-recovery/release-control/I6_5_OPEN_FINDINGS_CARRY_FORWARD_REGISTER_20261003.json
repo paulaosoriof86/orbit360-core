@@ -1,10 +1,10 @@
 {
   "schema": "GRAVICENTRA_I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_V1",
-  "recordedAt": "2026-10-05T09:08:00-06:00",
+  "recordedAt": "2026-10-05T12:12:00-06:00",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "ffa1f7b937ffcc616b0af02e44513adcc445c9aa",
-  "expectedLedgerNextBlobSha": "efb76ccc69c6ce1e33f71a81494565694b03857f",
+  "sourceLedgerPreviousBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+  "expectedLedgerNextBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -9216,6 +9216,16 @@
       "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
       "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
       "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINANT-COVERAGE"
-    ]
+    ],
+    "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2"
+  },
+  "r18ContinuityBindingRepair": {
+    "status": "REPAIRED_EXACT_LEDGER_BINDING",
+    "cause": "R18 finding 235 appended after prior carry binding; guard correctly failed before build.",
+    "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
