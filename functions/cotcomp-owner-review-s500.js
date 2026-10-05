@@ -346,6 +346,7 @@ const S500_SCRIPT=`
 function humanizeVisibleCopy(h){
   return h
     .replace(/Owner Delta LAB S4\.99/g,'Owner Review S5.00')
+    .replace(/SOURCE-ONLY LAB ·/g,'Vista de revisión ·')
     .replace(/CONTINUIDAD A&S · LAB/g,'CONTINUIDAD A&S')
     .replace(/En S4\.99 LAB no existen escrituras, envío al asesor, emisión ni binding\./g,'En esta vista de revisión no se envían datos ni se crea una solicitud real.')
     .replace(/Continuidad asistida preparada en LAB\. El contexto se conserva localmente; no se enviaron datos\./g,'Acompañamiento A&S seleccionado. El contexto se conserva mientras continúas.')
