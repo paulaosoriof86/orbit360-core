@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_PROJECT_SOURCES_V7_REPO_SYNC_V1",
+  "recordedAt": "2026-10-05",
+  "status": "REPO_GOVERNANCE_SYNCHRONIZED_PROJECT_SOURCE_UI_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headAtReceipt": "7ff5434f733bcf73fc1a9a23c3696ee2a7d86f64",
+  "controlPlaneBlobSha": "cc2460890c8e86ae91daf945cafed77881592bf9",
+  "v7AddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v7/11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md",
+  "v7AddendumBlobSha": "b51eb0f37f48a4fcab0336b8b300c559b0f76714",
+  "v7ManifestPath": "artifacts/orbit360-recovery/project-sources-v2/v7/12_MANIFIESTO_FUENTES_EVERGREEN_V7.json",
+  "v7ManifestBlobSha": "6c20649fa2fdff12324d334d3a049fd2c05923d8",
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "certifiedB4003ArtifactChanged": false
+  },
+  "projectSourceCatchUp": {
+    "requiredAdds": [
+      "V6 canonical composition/findings addendum",
+      "V7 payment/cobro/date semantics addendum"
+    ],
+    "exactDuplicateCleanupObserved": [
+      "04_LEEME_REANUDACION_Y_AUTORIDAD_V3",
+      "07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16"
+    ],
+    "removeOnlyAfterExactDuplicateVerification": true,
+    "flagRemainsTrueUntilProjectReadback": true
+  }
+}
