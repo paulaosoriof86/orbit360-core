@@ -1,0 +1,44 @@
+name: CotComp S5.03 Public Inbound Adapter Source-only
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/cotcomp-s503-public-inbound-adapter-sourceonly-20261005
+    paths:
+      - 'functions/cotcomp-public-inbound-adapter-s503.js'
+      - 'functions/cotcomp-public-inbound-adapter-s503.test.js'
+      - '.github/workflows/cotcomp-s503-public-inbound-adapter-sourceonly.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  source-only-adapter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify hard deny boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "RUNTIME_EXPORT_ALLOWED=false" functions/cotcomp-public-inbound-adapter-s503.js
+          grep -q "EXECUTION_ENABLED=false" functions/cotcomp-public-inbound-adapter-s503.js
+          grep -q "WRITES_ENABLED=false" functions/cotcomp-public-inbound-adapter-s503.js
+          grep -q "PRODUCTION=false" functions/cotcomp-public-inbound-adapter-s503.js
+          grep -q "enforceAppCheck:true" functions/cotcomp-public-inbound-adapter-s503.js
+          grep -q "consumeAppCheckToken:true" functions/cotcomp-public-inbound-adapter-s503.js
+      - name: Syntax and tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check cotcomp-gravicentra-handoff-contract-s502.js
+          node --test cotcomp-gravicentra-handoff-contract-s502.test.js
+          node --check cotcomp-public-inbound-adapter-s503.js
+          node --check cotcomp-public-inbound-adapter-s503.test.js
+          node --test cotcomp-public-inbound-adapter-s503.test.js
