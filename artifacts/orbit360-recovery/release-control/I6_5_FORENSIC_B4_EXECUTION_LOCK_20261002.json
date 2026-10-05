@@ -560,8 +560,8 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
-  "continuityRegisterBlobSha": "12d6e394c10bc40d0b219eed7bab2a9266853797",
+  "findingLedgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
+  "continuityRegisterBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7",
   "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -582,5 +582,10 @@
     "failedRunId": 37355564631,
     "previewProofBlobSha": "b60ff527a2723002923cbbd7499d222a3da1c470",
     "productSourceChanged": false
+  },
+  "r18MachineProofContinuitySeal": {
+    "status": "SEALED",
+    "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
+    "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7"
   }
 }
