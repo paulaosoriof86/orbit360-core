@@ -368,7 +368,11 @@ function humanizeVisibleCopy(h){
 function html(){
   let h=humanizeVisibleCopy(S499.html());
   h=h.replace('await loadModels();renderModels();modelInput.focus();','await loadModels();close(brandList,brandInput);close(modelList,modelInput);');
-  h=h.replace(/<div class="cc-lab">[\\s\\S]*?<\\/div>/,'');
+  const footerStart=h.indexOf('<div class="cc-lab">');
+  if(footerStart>=0){
+    const footerEnd=h.indexOf('</div>',footerStart);
+    if(footerEnd>=0)h=h.slice(0,footerStart)+h.slice(footerEnd+6);
+  }
   h=h.replace(
     '<meta name="ays-owner-delta" content="S4.99_VISUAL_CTA">',
     '<meta name="ays-owner-delta" content="S5.00_CONSOLIDATED_OWNER_UX">'
