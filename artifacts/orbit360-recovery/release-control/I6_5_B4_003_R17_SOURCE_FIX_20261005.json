@@ -30,15 +30,15 @@
     "orbit360-platform/index.html": "f96358fbef0cef9e49c4e750f58160132eea1672"
   },
   "qaBlobs": {
-    "tools/gravicentra-i6-5-b4-003-contract.mjs": "c2925a82cb1427927ce5180a87c22605aab1a9c7",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "66dcac1ee462023e7a27ada26df160f63531a9ee",
     "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "2f73abe643f4dc2b447e252453b307c92b449ceb",
     ".github/workflows/gravicentra-b4-003-executor.yml": "bb77f9992587bd7e28ccef74bc4871cb7da69a4b"
   },
   "governanceBlobs": {
     "findingLedger": "6f6dc7f1f94ba39e451eb1281cc95f92585b372c",
     "continuityRegister": "3e7590d971c50c1043b1f1f6fba62f489936e19d",
-    "canonicalComposition": "f15d7b45884b0c236b2bea50c5a49e59dde01664",
-    "executionLock": "9cc0f69874d163d6deed13326cce2339d91bd1d0"
+    "canonicalComposition": "cce6f6bd6d56006257eb63d15c2c98b8487f98fe",
+    "executionLock": "d060fa4c2e6b195da4537fae773339cbf659b3dd"
   },
   "preservedPasses": [
     "Assignable advisor roster for Carlos/Operativo in reviewed flow",
@@ -76,6 +76,18 @@
     "cause": "R17 drill-down renamed the frozen canonical Registry heading.",
     "resolution": "Restored the exact canonical heading while preserving expandable R17 detail rows.",
     "productSourceChanged": true,
+    "previewDeployed": false,
+    "dataMutation": false,
+    "liveTouched": false
+  },
+  "qaCompatibilityAlignment3": {
+    "status": "QA_LITERAL_DRIFT_CORRECTED_BEFORE_BUILD",
+    "failedRunId": 37245876914,
+    "failedStep": "Validate B4-003 contract and syntax",
+    "failureCode": "B4_003_R12_INFORMATION_HEALTH_FINANCIAL_PROJECTION_MISSING",
+    "cause": "Static contract asserted a contiguous pre-R17 export string and the old client-cell renderer although the same projection path remains present.",
+    "resolution": "Assert the individual canonical projection functions and the new indexed financialClientCell renderer.",
+    "productSourceChanged": false,
     "previewDeployed": false,
     "dataMutation": false,
     "liveTouched": false
