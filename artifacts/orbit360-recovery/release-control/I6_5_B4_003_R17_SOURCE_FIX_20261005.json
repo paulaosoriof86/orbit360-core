@@ -25,7 +25,7 @@
     "orbit360-platform/modules/cliente360.js": "58f9c1469e50b0e27fb0fcea7c8a6d613ce8f320",
     "orbit360-platform/modules/renovaciones.js": "c7285e6e1dfdad5e91b9c30c48939da2853b7c87",
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "b44695f05170b4406740ed7158b47e6464916d8f",
-    "orbit360-platform/modules/aseguradoras.js": "b12b65b0468bb2942ecb8e9a50eb089533387291",
+    "orbit360-platform/modules/aseguradoras.js": "2e651c12fe78aac38bc1f655bfb3a3f2ac6f182e",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "d3ee9ce359570b6f6940374aefe74c617cc71d20",
     "orbit360-platform/index.html": "f96358fbef0cef9e49c4e750f58160132eea1672"
   },
@@ -37,8 +37,8 @@
   "governanceBlobs": {
     "findingLedger": "6f6dc7f1f94ba39e451eb1281cc95f92585b372c",
     "continuityRegister": "3e7590d971c50c1043b1f1f6fba62f489936e19d",
-    "canonicalComposition": "c4e16f12e9a13c2366a11e5ccb2bb5bc164c1112",
-    "executionLock": "058c37b4dfc2d766351a6abf4f8d920110d7dd43"
+    "canonicalComposition": "f15d7b45884b0c236b2bea50c5a49e59dde01664",
+    "executionLock": "9cc0f69874d163d6deed13326cce2339d91bd1d0"
   },
   "preservedPasses": [
     "Assignable advisor roster for Carlos/Operativo in reviewed flow",
@@ -64,6 +64,18 @@
     "cause": "Static contract still expected the prior R16_04 Control Plane and execution-lock status literals after the lifecycle advanced to R17.",
     "resolution": "Updated only the two stale status assertions and rebound QA/composition/lock evidence. No product byte changed and the failed run never built or deployed a Preview.",
     "productSourceChanged": false,
+    "previewDeployed": false,
+    "dataMutation": false,
+    "liveTouched": false
+  },
+  "qaCompatibilityAlignment2": {
+    "status": "CANONICAL_UI_LITERAL_RESTORED_BEFORE_BUILD",
+    "failedRunId": 37245721821,
+    "failedStep": "Validate B4-003 contract and syntax",
+    "failureCode": "B4_003_R16_INSURER_REGISTRY_UI_OR_METADATA_MISSING",
+    "cause": "R17 drill-down renamed the frozen canonical Registry heading.",
+    "resolution": "Restored the exact canonical heading while preserving expandable R17 detail rows.",
+    "productSourceChanged": true,
     "previewDeployed": false,
     "dataMutation": false,
     "liveTouched": false
