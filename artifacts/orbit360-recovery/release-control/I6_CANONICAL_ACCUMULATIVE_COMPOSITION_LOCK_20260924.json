@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_V1",
   "status": "FROZEN_ACTIVE",
-  "date": "2026-10-01",
+  "date": "2026-10-05",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "purpose": "Make the single accumulative incremental candidate a physical machine-enforced authority rather than a rule distributed across block locks and guard status enums.",
@@ -168,7 +168,7 @@
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "f98777a40f791612dd88c606a7172ba669a66312",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "43540bfd1a059d6a67c097d7b8d1cddc7da2d2c1",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
-    "orbit360-platform/core/ciclo.js": "03eb4862d5b2a91359918d0511922e512502a182",
+    "orbit360-platform/core/ciclo.js": "d4bdad7272294eb8d63308c569705432ec67f222",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "5025ee88abaed8be499d2bacf57796cc77a5736f",
     "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
@@ -177,7 +177,7 @@
     "orbit360-platform/core/importa.js": "47e9d695e25bc51a8745e016d5d6ab19e1c9ce0d",
     "orbit360-platform/core/issuance-workflow-v1201-refinements.js": "47a9d68bef8cb60a00a057375efdf443c2ff2de2",
     "orbit360-platform/core/issuance-workflow-v1201.js": "ab138f218e041b41ac737ff250c7e808edc8c030",
-    "orbit360-platform/core/policy-receipts-engine.js": "aa24273e0b1c84fea3c285b9f7fa6d2dc5a714c2",
+    "orbit360-platform/core/policy-receipts-engine.js": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
     "orbit360-platform/core/product-app-p0.js": "b58593eda9bb395f1a523558efe085e3333d9ac2",
     "orbit360-platform/core/product-drive-document-provider-p0.js": "cc0224a1e550fb1eb0b9f2e50a8373ec6b952ab9",
@@ -203,10 +203,10 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "c931300edf0f32392bb38be44fea2c1524f37909",
+    "orbit360-platform/index.html": "c39e1340da01bed174bbe3e6b4bc8028ca04aabf",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
-    "orbit360-platform/modules/aseguradoras.js": "2e651c12fe78aac38bc1f655bfb3a3f2ac6f182e",
-    "orbit360-platform/modules/calidad.js": "0851a73f29445cac6ddf9099fa2ef7c9c0b71ba5",
+    "orbit360-platform/modules/aseguradoras.js": "ef8a7bd900c16b83d3f83bc271b38b8a4d24dc0c",
+    "orbit360-platform/modules/calidad.js": "83c8e041217f4d15cfd42ff30b792a8cd672d079",
     "orbit360-platform/modules/cancelaciones.js": "63f6dd1bb3ffad24cf8452404dfc540f1b92e2b7",
     "orbit360-platform/modules/cliente360.js": "58f9c1469e50b0e27fb0fcea7c8a6d613ce8f320",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
@@ -230,11 +230,11 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "b44695f05170b4406740ed7158b47e6464916d8f",
     "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
     "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
-    "orbit360-platform/modules/renovaciones.js": "c7285e6e1dfdad5e91b9c30c48939da2853b7c87",
+    "orbit360-platform/modules/renovaciones.js": "a6bbe2c3b0232a8e71f904fa55a62633f3b4efef",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
-    "orbit360-platform/styles/infra.css": "f7e0dd4442e36592ed3507c5455b3ff7cec23a08",
+    "orbit360-platform/styles/infra.css": "09e9974dbf72ddd21da58545a51aa5415277e929",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "functions/assignable-advisor-roster.js": "88a7cc53f044ae6d86338e451cb56abfed4d4b6a",
@@ -3127,5 +3127,23 @@
       "noLive": true,
       "noReimport": true
     }
+  },
+  "r18CumulativeSourceFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "authorityPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_CAUSAL_SOURCE_FIX_AUTHORIZATION_20261005.json",
+    "productBlobs": {
+      "orbit360-platform/core/ciclo.js": "d4bdad7272294eb8d63308c569705432ec67f222",
+      "orbit360-platform/modules/calidad.js": "83c8e041217f4d15cfd42ff30b792a8cd672d079",
+      "orbit360-platform/core/policy-receipts-engine.js": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
+      "orbit360-platform/modules/renovaciones.js": "a6bbe2c3b0232a8e71f904fa55a62633f3b4efef",
+      "orbit360-platform/modules/aseguradoras.js": "ef8a7bd900c16b83d3f83bc271b38b8a4d24dc0c",
+      "orbit360-platform/styles/infra.css": "09e9974dbf72ddd21da58545a51aa5415277e929",
+      "orbit360-platform/index.html": "c39e1340da01bed174bbe3e6b4bc8028ca04aabf"
+    },
+    "preservedProductFileCount": 100,
+    "exactSetChanged": false,
+    "noDataMutation": true,
+    "noReimport": true,
+    "noLive": true
   }
 }
