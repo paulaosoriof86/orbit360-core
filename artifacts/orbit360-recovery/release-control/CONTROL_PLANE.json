@@ -4859,8 +4859,8 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
-      "executionLockBlobSha": "4123349e1de51b1b72bca28a9d1b2543fd27c421",
-      "compositionLockBlobSha": "125d91b3ee73c63b1322322811d48aca5cb623ed",
+      "executionLockBlobSha": "704c3d7487cc9b9413c1e3f0b824301a76f54855",
+      "compositionLockBlobSha": "de82446f4924f6b688ac3029ededd25d798221f3",
       "findingLedgerBlobSha": "79b47a8f2bd76f39b12fe5216ce91c38f638d8e0",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -4872,7 +4872,7 @@
       "livePromotionAuthorized": false,
       "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
-      "sourceFixReceiptBlobSha": "24c8ed46dd50db3fd151a2464470614aa228b530",
+      "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
       "syntheticQaWritesAuthorized": true,
       "previewDispatchRequest": {
@@ -5722,7 +5722,8 @@
         "productSourceChanged": false
       },
       "noLive": true,
-      "noReimport": true
+      "noReimport": true,
+      "compositionBlobSha": "de82446f4924f6b688ac3029ededd25d798221f3"
     }
   },
   "canonicalAccumulationControl": {
@@ -6043,13 +6044,13 @@
     "status": "B4_003_SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "4123349e1de51b1b72bca28a9d1b2543fd27c421",
-    "compositionLockBlobSha": "125d91b3ee73c63b1322322811d48aca5cb623ed",
+    "executionLockBlobSha": "704c3d7487cc9b9413c1e3f0b824301a76f54855",
+    "compositionLockBlobSha": "de82446f4924f6b688ac3029ededd25d798221f3",
     "findingLedgerBlobSha": "79b47a8f2bd76f39b12fe5216ce91c38f638d8e0",
     "noLive": true,
     "noReimport": true,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
-    "sourceFixReceiptBlobSha": "24c8ed46dd50db3fd151a2464470614aa228b530",
+    "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
       "status": "RETRY_AFTER_R10_RUNTIME_REACHABILITY_ROOTFIX",
@@ -6984,9 +6985,9 @@
     "artifactId": 11313241549,
     "artifactDigest": "0b05b2d8c4ed5dc3cb01ace386cdb20c3fdc755873f2388c0d206b721017b2e7",
     "exactReadback": true,
-    "compositionBlobSha": "125d91b3ee73c63b1322322811d48aca5cb623ed",
+    "compositionBlobSha": "de82446f4924f6b688ac3029ededd25d798221f3",
     "r17SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
-    "r17SourceFixReceiptBlobSha": "24c8ed46dd50db3fd151a2464470614aa228b530",
+    "r17SourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
     "findingCount": 218,
     "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f"
   },
@@ -7186,11 +7187,11 @@
   "r17VisualRemediation": {
     "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
-    "sourceFixReceiptBlobSha": "24c8ed46dd50db3fd151a2464470614aa228b530",
-    "compositionBlobSha": "125d91b3ee73c63b1322322811d48aca5cb623ed",
+    "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
+    "compositionBlobSha": "de82446f4924f6b688ac3029ededd25d798221f3",
     "findingLedgerBlobSha": "79b47a8f2bd76f39b12fe5216ce91c38f638d8e0",
     "continuityRegisterBlobSha": "76f3cc0a91bbccd00fa8a24113154bf8142cd312",
-    "executionLockBlobSha": "4123349e1de51b1b72bca28a9d1b2543fd27c421",
+    "executionLockBlobSha": "704c3d7487cc9b9413c1e3f0b824301a76f54855",
     "findingCount": 218,
     "noLive": true,
     "noReimport": true,
@@ -7217,6 +7218,12 @@
       "findingId": "B4-003-R17-03-OPS-LEADS-KANBAN-CARD-OVERFLOW",
       "status": "SOURCE_FIXED_PENDING_EXACT_BROWSER_PROOF",
       "humanVisualStatus": "REJECTED_PENDING_RETEST"
+    },
+    "compositionLockBlobSha": "de82446f4924f6b688ac3029ededd25d798221f3",
+    "qaCompatibilityAlignment4": {
+      "status": "QA_VISIBLE_TERMINOLOGY_PROOF_ALIGNED_AFTER_EXACT_PREVIEW_FAILURE",
+      "failedRunId": 37247742108,
+      "productSourceChanged": false
     }
   }
 }

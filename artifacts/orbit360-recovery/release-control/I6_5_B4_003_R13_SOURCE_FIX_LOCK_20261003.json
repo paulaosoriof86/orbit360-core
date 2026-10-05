@@ -29,7 +29,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "125d91b3ee73c63b1322322811d48aca5cb623ed"
+    "blobSha": "de82446f4924f6b688ac3029ededd25d798221f3"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -662,7 +662,7 @@
     "scopeExtensionReason3": "R17 changes modify browser-loaded modules; the canonical index asset query versions must advance so the same certified artifact cannot serve stale pre-R17 module bytes after production promotion.",
     "scopeExtendedAt3": "2026-10-05T00:04:00Z",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
-    "compositionBlobSha": "125d91b3ee73c63b1322322811d48aca5cb623ed",
+    "compositionBlobSha": "de82446f4924f6b688ac3029ededd25d798221f3",
     "productMutationAuthorized": false,
     "syntheticQaWritesAuthorized": true,
     "qaCompatibilityAlignment": {
@@ -694,6 +694,13 @@
       "findingId": "B4-003-R17-03-OPS-LEADS-KANBAN-CARD-OVERFLOW",
       "status": "SOURCE_FIXED_PENDING_EXACT_BROWSER_PROOF",
       "productMutationAuthorized": false
+    },
+    "qaCompatibilityAlignment4": {
+      "status": "QA_VISIBLE_TERMINOLOGY_PROOF_ALIGNED_AFTER_EXACT_PREVIEW_FAILURE",
+      "failedRunId": 37247742108,
+      "failureCode": "B4_003_R16_QUALITY_RUNTIME_SEMANTICS_FAILED",
+      "productSourceChanged": false,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
     }
   }
 }

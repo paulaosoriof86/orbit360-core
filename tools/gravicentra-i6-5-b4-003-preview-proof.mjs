@@ -560,12 +560,12 @@ try{
   const gtMunicipalities=Object.values(gt).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0),coMunicipalities=Object.values(co).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0);
   const h=document.getElementById('host');Orbit.modules.calidad.render(h);
   return{catalogStatus,gtDepartments:Object.keys(gt).length,gtMunicipalities,coDepartments:Object.keys(co).length,coMunicipalities,
-   qualityHasCountryHeader:/País actual/.test(h.textContent||''),qualityHasProvenanceHeader:/Provenance \/ evidencia/.test(h.textContent||''),
+   qualityHasCountryHeader:/País actual/.test(h.textContent||''),qualityHasOriginEvidenceHeader:/Origen \/ evidencia/.test(h.textContent||''),
    qualityDeadChannelButtons:Array.from(h.querySelectorAll('button[disabled]')).filter(b=>/Sin canal/.test(b.textContent||'')).length,catalogEnsureError};
  });
  need(proof.r16CatalogAndQuality.catalogStatus&&proof.r16CatalogAndQuality.catalogStatus.hydrated===true&&proof.r16CatalogAndQuality.catalogStatus.syncPending===false,'B4_003_R16_CATALOG_CANONICAL_HYDRATION_FAILED:'+JSON.stringify(proof.r16CatalogAndQuality));
  need(proof.r16CatalogAndQuality.gtDepartments===22&&proof.r16CatalogAndQuality.gtMunicipalities===340&&proof.r16CatalogAndQuality.coMunicipalities===1122,'B4_003_R16_GEO_RUNTIME_COMPLETENESS_FAILED:'+JSON.stringify(proof.r16CatalogAndQuality));
- need(proof.r16CatalogAndQuality.qualityHasCountryHeader&&proof.r16CatalogAndQuality.qualityHasProvenanceHeader&&proof.r16CatalogAndQuality.qualityDeadChannelButtons===0,'B4_003_R16_QUALITY_RUNTIME_SEMANTICS_FAILED');
+ need(proof.r16CatalogAndQuality.qualityHasCountryHeader&&proof.r16CatalogAndQuality.qualityHasOriginEvidenceHeader&&proof.r16CatalogAndQuality.qualityDeadChannelButtons===0,'B4_003_R16_QUALITY_RUNTIME_SEMANTICS_FAILED:'+JSON.stringify(proof.r16CatalogAndQuality));
  proof.assertions.tenantCatalogCanonicalHydration=true;proof.assertions.geoGtCoComplete=true;proof.assertions.qualityCountryProvenanceSeparated=true;proof.assertions.qualityNoDeadChannelAction=true;
 
  // R12: information health surfaces policy/calendar mismatch without rewriting either source value.

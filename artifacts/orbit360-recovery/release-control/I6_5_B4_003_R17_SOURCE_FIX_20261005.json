@@ -32,14 +32,14 @@
   },
   "qaBlobs": {
     "tools/gravicentra-i6-5-b4-003-contract.mjs": "4142ea0d0e27bcd76d8a4ff6362fd39e271a4abc",
-    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "5d2b6c86b2edcde586c379becd88c0b87797c8a5",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "778157293837ca574bd8aa8a34806165acdd46ea",
     ".github/workflows/gravicentra-b4-003-executor.yml": "bb77f9992587bd7e28ccef74bc4871cb7da69a4b"
   },
   "governanceBlobs": {
     "findingLedger": "79b47a8f2bd76f39b12fe5216ce91c38f638d8e0",
     "continuityRegister": "76f3cc0a91bbccd00fa8a24113154bf8142cd312",
-    "canonicalComposition": "125d91b3ee73c63b1322322811d48aca5cb623ed",
-    "executionLock": "4123349e1de51b1b72bca28a9d1b2543fd27c421"
+    "canonicalComposition": "de82446f4924f6b688ac3029ededd25d798221f3",
+    "executionLock": "704c3d7487cc9b9413c1e3f0b824301a76f54855"
   },
   "preservedPasses": [
     "Assignable advisor roster for Carlos/Operativo in reviewed flow",
@@ -102,5 +102,17 @@
     "noDataMutation": true,
     "noReimport": true,
     "noLive": true
+  },
+  "qaCompatibilityAlignment4": {
+    "status": "QA_VISIBLE_TERMINOLOGY_PROOF_ALIGNED_AFTER_EXACT_PREVIEW_FAILURE",
+    "failedRunId": 37247742108,
+    "failedStep": "Durable renewals cancelations browser proof",
+    "failureCode": "B4_003_R16_QUALITY_RUNTIME_SEMANTICS_FAILED",
+    "cause": "Browser proof still expected the superseded technical header while R17 product correctly shows human-facing 'Origen / evidencia'.",
+    "resolution": "Updated only browser proof terminology assertion. Product bytes unchanged.",
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "liveTouched": false
   }
 }
