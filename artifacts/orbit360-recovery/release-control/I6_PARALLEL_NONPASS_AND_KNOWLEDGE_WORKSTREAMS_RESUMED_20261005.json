@@ -1,0 +1,153 @@
+{
+  "schema": "GRAVICENTRA_I6_PARALLEL_NONPASS_AND_KNOWLEDGE_WORKSTREAMS_V1",
+  "recordedAt": "2026-10-05T00:45:00Z",
+  "status": "ACTIVE_PARALLEL_NO_PRODUCT_MUTATION",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "purpose": "Prevent unfinished Phase A findings and the insurer knowledge/source workstream from being forgotten while B4-003 awaits targeted Paula visual acceptance.",
+  "activeGate": {
+    "id": "B4-003",
+    "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "machineProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
+    "machineProofBlobSha": "89d4dbc5370055fa47b7defc0886c6d892e9208d",
+    "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
+    "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37248154086-11dxqgq2.web.app",
+    "artifactDigest": "21607653bcabbf8c6994c28d46569055cf0b0a4f4972f0eb5774b228d958915b",
+    "exactHostingReadback": true
+  },
+  "noLoss": {
+    "ledgerFindingCount": 218,
+    "masterPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+    "rule": "No unresolved finding is dropped. PASS findings remain preserved unless a causal regression is reproduced. B4-004 stays held until B4-003 Paula visual PASS."
+  },
+  "parallelWorkstreams": [
+    {
+      "id": "KNOWLEDGE-SOURCES-PASS2",
+      "status": "RESUMED_PERSISTED_LIBRARY_FAIL_CLOSED",
+      "targetFindings": [
+        "B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929",
+        "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE",
+        "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+        "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE"
+      ],
+      "libraryInventoryPath": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_ASEGURADORAS_INVENTARIO_PASS2_2026-10-04.md",
+      "libraryInventoryId": "libfile_17ca244570808191a58ec6ff7e4ef950",
+      "libraryNormalizedCandidatePath": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_NORMALIZADO_CANDIDATO_PASS2_2026-10-04.json",
+      "libraryNormalizedCandidateId": "libfile_6eed5de6ccc481919b8fa5dea1a5f3a2",
+      "sourceCoverage": [
+        {
+          "insurer": "Aseguradora Guatemalteca",
+          "scope": "Auto",
+          "state": "SOURCE_BACKED_CURRENT_MATERIAL"
+        },
+        {
+          "insurer": "Seguros Columna",
+          "scope": "Auto/Moto",
+          "state": "SOURCE_BACKED_CURRENT_MATERIAL"
+        },
+        {
+          "insurer": "Ficohsa",
+          "scope": "Auto Prime",
+          "state": "SOURCE_BACKED_DESCRIPTIVE_FACTS_NUMERIC_SURCHARGE_UNRESOLVED"
+        },
+        {
+          "insurer": "El Roble",
+          "scope": "Asistencia 2026",
+          "state": "SOURCE_BACKED_ASSISTANCE_NOT_TARIFF"
+        },
+        {
+          "insurer": "Aseguradora Rural",
+          "scope": "Gastos Médicos",
+          "state": "SOURCE_BACKED_PRODUCT_AND_QUOTE_SAMPLE_NO_UNIVERSAL_RATE"
+        },
+        {
+          "insurer": "Seguros Universales",
+          "scope": "Riesgo Plus",
+          "state": "SOURCE_BACKED_QUOTE_SAMPLE_AND_CONDITIONS_NO_UNIVERSAL_TARIFF"
+        },
+        {
+          "insurer": "MAPFRE/Aseguradora General/La Ceiba",
+          "scope": "Auto samples",
+          "state": "SAMPLE_ONLY"
+        },
+        {
+          "insurer": "Bantrab/BAM",
+          "scope": "Auto",
+          "state": "HISTORICAL_OR_MAPPED_REFERENCE_CURRENT_VERSION_REQUIRED"
+        },
+        {
+          "insurer": "AXA Colombia",
+          "scope": "Auto",
+          "state": "CURRENT_SAMPLE_FACTS_ONLY"
+        },
+        {
+          "insurer": "Previsora",
+          "scope": "Auto",
+          "state": "HISTORICAL_SAMPLE_NEWER_SOURCE_REQUIRED"
+        },
+        {
+          "insurer": "SBS",
+          "scope": "Auto",
+          "state": "PROTECTED_CURRENT_PLUS_HISTORICAL_REFERENCES_FAIL_CLOSED"
+        },
+        {
+          "insurer": "Equidad",
+          "scope": "Auto",
+          "state": "HISTORICAL_2021"
+        },
+        {
+          "insurer": "Conduce Tranquilo 4.1.1",
+          "scope": "Auto",
+          "state": "INSURER_VALIDITY_RESOLUTION_REQUIRED"
+        }
+      ],
+      "enablementPolicy": "Storing/parsing/proposing facts never enables Cotizador or Comparativo. Numeric calculation remains disabled until authoritative versioned evidence and the separate human/administrative gate pass.",
+      "productMutation": false
+    },
+    {
+      "id": "B4-004-PREFLIGHT",
+      "status": "READONLY_PREFLIGHT_COMPLETE_GATE_HELD",
+      "modules": [
+        "Siniestros",
+        "Cronograma"
+      ],
+      "risks": [
+        "Siniestros has canonical client/policy/insurer relations and country scope, but controlled status/note persistence and reload still require exact B4-004 proof.",
+        "Cronograma consumes canonical receipt/portfolio and renewal relations; task persistence/reload still requires exact B4-004 proof."
+      ],
+      "productMutation": false
+    },
+    {
+      "id": "B4-005-PREFLIGHT",
+      "status": "READONLY_PREFLIGHT_COMPLETE_GATE_HELD",
+      "items": [
+        "Reuse endorsement-workflow-v1201 and issuance-endosos-v1201; do not rebuild Endosos.",
+        "Certificados/Anexos still require latest-approved-scope reconciliation and exact E2E closure.",
+        "Role-aware AI knowledge is still open: existing IA is not yet proven as authorized source-backed RAG with provenance/citations.",
+        "Multiproduct knowledge/source backlog remains explicit and fail-closed."
+      ],
+      "productMutation": false
+    },
+    {
+      "id": "EMAIL-DELIVERY-TRACEABILITY",
+      "status": "CAUSE_CONFIRMED_NOT_CLOSED",
+      "findingIds": [
+        "B1-EMAIL-DELIVERY-001",
+        "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
+      ],
+      "diagnosis": "user-onboarding can mark invitationState=sent and audit an invitation as sent without provider delivery telemetry. The notification outbox separately leaves external channels pending_connection. Therefore current 'sent' semantics do not prove recipient delivery.",
+      "requiredClosure": "Provider acceptance/delivery/bounce telemetry or truthful UI semantics that distinguish request/link generation from actual delivery, plus retry/audit proof.",
+      "productMutation": false
+    }
+  ],
+  "boundaries": {
+    "productMutation": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "certifiedB4003ArtifactUnchanged": true
+  },
+  "nextAction": "B4_003_TARGETED_PAULA_VISUAL_WHILE_PARALLEL_KNOWLEDGE_AND_PREFLIGHT_CONTINUE"
+}
