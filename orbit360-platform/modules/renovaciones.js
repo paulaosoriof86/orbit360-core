@@ -43,8 +43,26 @@ Orbit.modules.renovaciones = (function () {
   const renewalPendingValidation = p => {
     if(!p || renewabilityState(p)!=='UNKNOWN' || !selectedCountry(p) || terminalRenewalOutcome(p)) return false;
     const state=policyState(p),d=U.daysFromNow(p.vigenciaFin);
-    return d!=null && d<=90 && ['vigente','porrenovar'].includes(state);
+    return d!=null && d<=90 && ['vigente','porrenovar','vencida'].includes(state);
   };
+  const renewalDate45Universe = p => {
+    if(!p || !selectedCountry(p)) return false;
+    const state=policyState(p),d=U.daysFromNow(p.vigenciaFin);
+    return d!=null && d>=0 && d<=45 && ['vigente','porrenovar'].includes(state);
+  };
+  function date45Disposition(){
+    const rows=S().where('polizas',renewalDate45Universe),out={total:rows.length,actionable:0,pending:0,nonrenewable:0,terminal:0,conflict:0};
+    rows.forEach(p=>{
+      if(terminalRenewalOutcome(p)){out.terminal++;return;}
+      const r=renewabilityState(p);
+      if(r==='NO'){out.nonrenewable++;return;}
+      if(r==='UNKNOWN'){out.pending++;return;}
+      if(renewalActionable(p)){out.actionable++;return;}
+      out.conflict++;
+    });
+    out.reconciled=out.total===out.actionable+out.pending+out.nonrenewable+out.terminal+out.conflict;
+    return out;
+  }
 
   function buckets() {
     const cols = [
@@ -75,6 +93,7 @@ Orbit.modules.renovaciones = (function () {
     }
     const cols = buckets();
     const pendingValidation=S().where('polizas', renewalPendingValidation);
+    const disposition45=date45Disposition();
     const totalPrima = cols.reduce((s, c) => s + c.items.reduce((ss, it) => ss + q.norm(it.p.prima, it.p.moneda), 0), 0);
     const toneBg = { danger: 'var(--danger)', warn: 'var(--warn)', info: 'var(--info)' };
 
@@ -86,7 +105,8 @@ Orbit.modules.renovaciones = (function () {
         { label: '16–45 días', val: cols[2].items.length, color: 'var(--warn)', foot: 'planificar', onclick: "location.hash='#/renovaciones'" },
         { label: 'Prima en juego', val: U.moneyShort(totalPrima, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
-      <div class="cfg-note" data-renewability-pending-count="${pendingValidation.length}" data-renewability-review-workflow="1" style="margin:0 0 14px"><b>Renovabilidad pendiente de revisión/conciliación: ${pendingValidation.length}</b><div class="muted" style="margin-top:5px">Estas pólizas no entran al pipeline hasta confirmar su condición. <b>Revisar y clasificar</b> abre directamente Renovabilidad en la póliza exacta. Marca <b>Renovable</b> o <b>No renovable</b> solo cuando la fuente lo respalde; si no hay evidencia suficiente, conserva <b>Pendiente de validar</b>.</div>${pendingValidation.slice(0,12).map(p=>`<button class="btn ghost sm" data-renewability-review="${U.esc(p.id)}" style="margin:7px 4px 0 0" onclick="Orbit.modules.cliente360.editarPoliza('${p.id}','renovabilidad')">Revisar y clasificar ${U.esc(p.numero||p.id)}</button>`).join('')}</div>
+      <div class="cfg-note renewal-disposition-summary" data-renewal-date45-total="${disposition45.total}" data-renewal-date45-actionable="${disposition45.actionable}" data-renewal-date45-pending="${disposition45.pending}" data-renewal-date45-terminal="${disposition45.terminal}" data-renewal-date45-nonrenewable="${disposition45.nonrenewable}" data-renewal-date45-conflict="${disposition45.conflict}" data-renewal-date45-reconciled="${disposition45.reconciled?'true':'false'}" style="margin:0 0 14px"><b>Disposición de las pólizas que vencen en ≤45 días: ${disposition45.total}</b><div class="muted" style="margin-top:5px">${disposition45.actionable} en gestión · ${disposition45.pending} pendientes de clasificar · ${disposition45.terminal} con resultado de renovación · ${disposition45.nonrenewable} no renovables${disposition45.conflict?' · '+disposition45.conflict+' con conflicto explícito':''}. <b>${disposition45.reconciled?'Universo reconciliado.':'Requiere conciliación: hay pólizas sin disposición.'}</b></div></div>
+      <div class="cfg-note" data-renewability-pending-count="${pendingValidation.length}" data-renewability-review-workflow="1" style="margin:0 0 14px"><b>Renovabilidad pendiente de revisión/conciliación: ${pendingValidation.length}</b><div class="muted" style="margin-top:5px">Ninguna póliza pendiente desaparece del control: las vigentes, por renovar o vencidas sin evidencia concluyente permanecen aquí hasta clasificarse. <b>Revisar y clasificar</b> abre directamente Renovabilidad en la póliza exacta. Marca <b>Renovable</b> o <b>No renovable</b> solo cuando la fuente lo respalde; si no hay evidencia suficiente, conserva <b>Pendiente de validar</b>.</div>${pendingValidation.slice(0,12).map(p=>`<button class="btn ghost sm" data-renewability-review="${U.esc(p.id)}" style="margin:7px 4px 0 0" onclick="Orbit.modules.cliente360.editarPoliza('${p.id}','renovabilidad')">Revisar y clasificar ${U.esc(p.numero||p.id)}</button>`).join('')}</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:start">
         ${cols.map(c => `<div class="card" data-renewal-bucket="${c.key}" data-renewal-bucket-count="${c.items.length}" style="overflow:hidden">
           <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;border-top:3px solid ${toneBg[c.tone]}">
