@@ -1,0 +1,64 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R18_CAUSAL_SOURCE_FIX_AUTHORIZATION_V1",
+  "recordedAt": "2026-10-05T11:36:00-06:00",
+  "status": "R18_SINGLE_CUMULATIVE_SOURCE_FIX_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "authority": {
+    "paulaVisualRejectionFreeze": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_DECISION_AND_NOLOSS_FREEZE_20261005.json",
+    "authenticatedForensicReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_AUTHENTICATED_READONLY_FORENSIC_RESULT_20261005.json",
+    "authenticatedForensicBlobSha": "e4b1b418fc7b2b1f15d28a0560529a7603f32203",
+    "authenticatedForensicRunId": 37349040379,
+    "controlPlaneGuardRunId": 37349040383
+  },
+  "demonstratedCauses": [
+    "Nuevo prospecto defaults to OPS_COTIZACION because puntoIngreso index 1 is selected by default.",
+    "Ramo and Producto/plan are independent despite canonical country->ramo->subramo taxonomy.",
+    "Generic comments lack typed advisor<->Ops handoff semantics.",
+    "Crear gestión exposes queue/list as primary although tiposGestion already carries business types.",
+    "Quality channel action labels do not match edited field; financial action promises correction but is diagnostic/navigation only.",
+    "Policy search exists but mobile composition can hide it.",
+    "Renewal date universe has 11 policies: 2 actionable, 8 pending classification, 1 terminal outcome; current screen does not reconcile the complete universe.",
+    "Policy 1003687 has three legitimate non-overlapping yearly editions; duplicate validation must be edition-aware, not primary-key-only.",
+    "Insurer Registry renders structured provenance as [object Object]; knowledge/activity hierarchy remains fragmented on mobile."
+  ],
+  "allowedProductFiles": [
+    "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/modules/calidad.js",
+    "orbit360-platform/modules/polizas.js",
+    "orbit360-platform/modules/renovaciones.js",
+    "orbit360-platform/core/policy-receipts-engine.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/styles/infra.css",
+    "orbit360-platform/index.html"
+  ],
+  "allowedQaFiles": [
+    "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    ".github/workflows/gravicentra-b4-003-executor.yml"
+  ],
+  "frozenDecisions": {
+    "oneCumulativeCandidate": "R18",
+    "doNotReopenPreservedPasses": true,
+    "noDataMutation": true,
+    "noReimport": true,
+    "noLive": true,
+    "sourceChangeRequiresNewImmutableArtifact": true,
+    "tinyFishDisposition": "AUTH_STATE_NOT_REUSED; nonblocking. Authenticated GitHub Playwright harness is the required pre-UAT equivalent for R18.",
+    "renewalDispositionInvariant": "Every date-window policy resolves visibly to actionable, pending classification, confirmed nonrenewable, terminal outcome or explicit conflict; sums must reconcile.",
+    "policyEditionInvariant": "Same country+insurer+policy number+client may have multiple legitimate editions when vigenciaInicio differs; exact-edition duplicates remain forbidden.",
+    "commissionAuthorityCarry": "I6.7; no silent fallback represented as contractual truth."
+  },
+  "noLoss": {
+    "ledgerAndCarryMustRemainExact": true,
+    "findingDeletionForbidden": true,
+    "priorPassPreservedUnlessCausallyTouched": true
+  },
+  "boundaries": {
+    "businessWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false
+  }
+}
