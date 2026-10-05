@@ -888,7 +888,7 @@ Orbit.modules.aseguradoras = (function () {
     const rows=knowledgeSources(a);if(!rows.length)return '<div class="cfg-note" style="margin-top:12px">Sin fuentes registradas.</div>';
     const label=k=>k==='BOTH'?'Biblioteca + Drive':k==='DRIVE_FILE'?'Drive':'Biblioteca / conocimiento';
     const human=v=>clean(v).replace(/_/g,' ');
-    return '<div class="asg-sec-t" style="margin-top:14px">📚 Registro de fuentes · Biblioteca y Drive</div><div style="display:grid;gap:7px">'+rows.map(r=>{
+    return '<div class="asg-sec-t" style="margin-top:14px">📚 Registry canónica de fuentes · Biblioteca y Drive</div><div style="display:grid;gap:7px">'+rows.map(r=>{
       const status=r.validationStatus||r.estado||'Documento recibido',dims=[r.pais,r.moneda,r.ramo,r.producto,r.plan].filter(Boolean);
       const provenance=clean(r.provenance||r.sourceOrigin||r.origen||r.fuenteOrigen);
       const version=clean(r.version||r.sourceVersion||r.versión),validity=clean(r.vigencia||r.validFrom||r.fechaVigencia);
