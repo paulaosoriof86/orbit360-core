@@ -27,5 +27,6 @@ module.exports = Object.assign(
   require('./cotcomp-frontend-recovery-preview-s496b'),
   require('./cotcomp-owner-review-s498'),
   require('./cotcomp-owner-review-s499'),
-  require('./cotcomp-owner-review-s500')
+  require('./cotcomp-owner-review-s500'),
+  require('./cotcomp-owner-review-s501')
 );
