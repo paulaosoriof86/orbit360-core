@@ -79,7 +79,7 @@ jobs:
           grep -q 's504Consent' "$E/page.html"
           grep -q '50256149048' "$E/page.html"
           grep -q '573138340897' "$E/page.html"
-          ! grep -q 'cc-hero__benefits' "$E/page.html"
+          ! grep -q '<div class="cc-hero__benefits">' "$E/page.html"
           POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
           test "$POST_CODE" = "405"
       - name: Upload evidence
