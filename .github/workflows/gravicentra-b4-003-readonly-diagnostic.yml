@@ -1,4 +1,4 @@
-name: Gravicentra B4-003 Renewals Cancellations Diagnostic
+name: Gravicentra B4-003 R18 Readonly Forensic
 
 on:
   workflow_dispatch:
@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/gravicentra-b4-003-readonly-diagnostic.yml'
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
+      - 'tools/gravicentra-i6-5-b4-003-r18-readonly-forensic.mjs'
 
 permissions:
   contents: write
@@ -25,7 +26,7 @@ jobs:
       TENANT_HINT: alianzas-soluciones
       CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       B4_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json
-      RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_CANCELATIONS_READONLY_DIAGNOSTIC_20261003.json
+      RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_AUTHENTICATED_READONLY_FORENSIC_RESULT_20261005.json
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -53,10 +54,10 @@ jobs:
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const l=JSON.parse(fs.readFileSync(process.env.B4_LOCK,'utf8'));
-          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_DIAGNOSTIC'
-            && c.currentB4?.status==='B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC'
+          const ok=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R18_AUTHENTICATED_HARNESS_READBACK'
+            && c.currentB4?.status==='B4_003_R18_AUTHENTICATED_READONLY_DIAGNOSTIC'
             && c.currentB4?.activeFindingId==='B4-003'
-            && l.status==='B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC'
+            && l.status==='B4_003_R18_AUTHENTICATED_READONLY_DIAGNOSTIC'
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
             && l.boundaries?.productMutationAuthorized===false
@@ -102,15 +103,18 @@ jobs:
           npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
 
-      - name: Execute B4-003 read-only diagnostic
+      - name: Execute B4-003 R18 read-only forensic
         if: steps.gate.outputs.run == 'true'
         env:
           B4_PREVIEW_URL: ${{ steps.gate.outputs.preview_url }}
           B4_003_DIAGNOSTIC_OUT: ${{ runner.temp }}/b4-003-diagnostic.json
+          B4_003_R18_FORENSIC_OUT: ${{ runner.temp }}/b4-003-diagnostic.json
+          FORENSIC_REFERENCE_DATE: 2026-10-05
+          R18_TARGET_POLICY_NUMBER: "1003687"
         run: |
           set -euo pipefail
-          node --check tools/gravicentra-i6-5-b4-003-renewals-cancellations-diagnostic.mjs
-          node tools/gravicentra-i6-5-b4-003-renewals-cancellations-diagnostic.mjs
+          node --check tools/gravicentra-i6-5-b4-003-r18-readonly-forensic.mjs
+          node tools/gravicentra-i6-5-b4-003-r18-readonly-forensic.mjs
           test -s "$B4_003_DIAGNOSTIC_OUT"
 
       - name: Upload B4-003 diagnostic evidence
@@ -136,5 +140,5 @@ jobs:
             echo "B4_003_RECEIPT_UNCHANGED"
             exit 0
           fi
-          git commit -m "diag(i6.5 B4-003): freeze renewals cancellations evidence"
+          git commit -m "diag(i6.5 B4-003): freeze R18 authenticated forensic evidence"
           git push origin "HEAD:$GITHUB_REF_NAME"
