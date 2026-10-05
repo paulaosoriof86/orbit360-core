@@ -102,7 +102,7 @@ function html(){
 .cc-advisor{min-height:44px;border:0;border-radius:11px;background:var(--red);color:#fff;padding:0 17px;font-weight:700}
 
 .cc-hero{min-height:370px;background:var(--graph);color:#fff;display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);grid-template-areas:"copy media";overflow:hidden}
-.cc-hero__copy{grid-area:copy;z-index:2;align-self:center;padding:30px 32px 40px max(34px,calc((100vw - 1500px)/2 + 34px));max-width:780px}
+.cc-hero__copy{grid-area:copy;z-index:2;align-self:center;padding:28px 32px 28px max(34px,calc((100vw - 1500px)/2 + 34px));max-width:780px}
 .cc-kicker{font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#FF7C8C;display:flex;align-items:center;gap:10px}.cc-kicker:before{content:"";width:30px;height:2px;background:var(--red)}
 .cc-hero__title{font-family:'Archivo';font-weight:900;font-size:clamp(42px,3.9vw,56px);line-height:.94;letter-spacing:-.045em;max-width:10ch;margin:14px 0 14px}.cc-hero__title em{font-style:normal;color:#FF3B54}
 .cc-hero__lead{font-size:15.5px;line-height:1.48;color:#D7D1C4;max-width:52ch;margin:0}
@@ -128,6 +128,7 @@ function html(){
 .cc-route-context{display:grid;grid-template-columns:minmax(240px,.72fr) minmax(0,1.28fr);gap:16px;align-items:stretch;margin:20px 0 4px}.cc-route-photo{min-height:178px;border-radius:16px;background-image:url("${PACKAGED.scenes}");background-repeat:no-repeat;background-size:400% 200%;background-position:0% 0%;box-shadow:0 18px 36px -30px rgba(0,0,0,.55)}.cc-route-copy{background:#17141A;color:#fff;border-radius:16px;padding:18px;display:flex;flex-direction:column;justify-content:center}.cc-route-copy small{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.12em;color:#FF8997;text-transform:uppercase}.cc-route-copy strong{font-family:'Archivo';font-size:20px;line-height:1.1;margin:7px 0}.cc-route-copy p{font-size:12.5px;line-height:1.5;color:#DCD3C8;margin:0}
 .cc-stage-panel{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}.cc-stage-panel__head{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:15px}.cc-stage-panel__head b{font-family:'Archivo';font-size:18px}.cc-stage-panel__head span{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#17131D;color:#fff;font-family:'IBM Plex Mono';font-size:10px}
 .cc-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.cc-field{display:flex;flex-direction:column;gap:7px}.cc-label{font-size:12px;font-weight:700}.cc-control{min-height:48px;border:1px solid #D9CFC2;border-radius:12px;background:#fff;padding:0 14px;font-size:15px;color:var(--ink)}.cc-help{font-size:10.5px;line-height:1.4;color:#8A7F74}
+.cc-combo{position:relative}.cc-combo-list{display:none;position:absolute;z-index:30;left:0;right:0;top:calc(100% + 5px);max-height:250px;overflow:auto;background:#fff;border:1px solid #CFC4B7;border-radius:12px;padding:5px;box-shadow:0 20px 44px -24px rgba(0,0,0,.42)}.cc-combo-list.is-open{display:block}.cc-combo-option{display:block;width:100%;min-height:42px;border:0;background:#fff;border-radius:8px;padding:9px 10px;text-align:left;font-size:13px;color:var(--ink)}.cc-combo-option:hover,.cc-combo-option.is-active{background:#F4EFE7}.cc-combo-fallback{border-top:1px solid var(--line);margin-top:4px;color:var(--red2);font-weight:800}.cc-combo-fallback-link{align-self:flex-start;border:0;background:none;color:var(--red2);font-size:11px;font-weight:800;padding:0;min-height:28px}.cc-combo-status{font-size:11px;line-height:1.4;color:#6F655B;margin-top:4px}
 .cc-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}.cc-summary{background:#17141A;color:#fff;border-radius:14px;padding:14px}.cc-summary small{font-size:10px;color:#A79EA8}.cc-summary strong{display:block;font-size:14px;margin-top:5px}
 .cc-review-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.cc-review-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}.cc-review-card b{font-family:'Archivo';font-size:17px}.cc-review-card strong{display:block;font-family:'Archivo';font-size:24px;margin:14px 0 6px}
 .cc-compare{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:16px}.cc-compare th{background:#17141A;color:#fff;text-align:left;padding:14px;font-size:13px}.cc-compare td{padding:13px 14px;border-top:1px solid var(--line);font-size:13px;background:#fff}.cc-compare td:first-child{font-weight:700;background:#F5F0E8;width:35%}
@@ -242,6 +243,8 @@ function html(){
   const DOMAIN=${JSON.stringify(domainSnapshot)};
   const FAMILY_TO_PRODUCT=${JSON.stringify(familyToProduct)};
   const scenePos=${JSON.stringify(SCENES)};
+  const CATALOG_API='/cotcompVehicleCatalogS479';
+  const vehicleCatalog={brands:[],models:[],brandId:null,modelId:null,brandLabel:'',modelLabel:'',loadedBrands:false};
   const sceneMeta={
     vehicle:{label:'Vehículo / Movilidad',text:'Vehículo, uso y condiciones que influyen en tus opciones.'},
     home:{label:'Hogar',text:'Vivienda, contenido y responsabilidad familiar.'},
@@ -279,22 +282,134 @@ function html(){
 
   function fieldHtml(f){
     const id='f_'+f.id;
+    const currentValue=state.form[f.id]!=null?state.form[f.id]:(f.default==null?'':f.default);
+    const help=f.help?'<span class="cc-help">'+esc(f.help)+'</span>':'';
+    if(state.product==='auto' && (f.id==='marca'||f.id==='lineaModelo')){
+      const kind=f.id==='marca'?'brand':'model';
+      const listId=kind==='brand'?'vehicleBrandList':'vehicleModelList';
+      const disabled=(kind==='model'&&!vehicleCatalog.brandId)?' disabled':'';
+      const placeholder=kind==='brand'?'Escribe para buscar la marca':'Selecciona primero una marca';
+      return '<label class="cc-field"><span class="cc-label">'+esc(f.label)+'</span><div class="cc-combo">'+
+        '<input class="cc-control" id="'+id+'" data-field="'+esc(f.id)+'" data-vehicle-combo="'+kind+'" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="'+listId+'" placeholder="'+placeholder+'" value="'+esc(currentValue)+'"'+disabled+'>'+
+        '<div id="'+listId+'" class="cc-combo-list" role="listbox" aria-label="'+(kind==='brand'?'Marcas':'Líneas y modelos')+'"></div></div>'+
+        '<button class="cc-combo-fallback-link" type="button" data-vehicle-fallback="'+kind+'">'+(kind==='brand'?'No encuentro mi marca':'No encuentro mi línea / modelo')+'</button>'+help+'</label>';
+    }
     let control='';
     if(f.type==='select'){
-      control='<select class="cc-control" id="'+id+'" data-field="'+esc(f.id)+'">'+(f.options||[]).map(o=>'<option'+(String(o)===String(f.default)?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
+      const selected=String(currentValue);
+      control='<select class="cc-control" id="'+id+'" data-field="'+esc(f.id)+'">'+(f.options||[]).map(o=>'<option'+(String(o)===selected?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
     }else{
-      control='<input class="cc-control" id="'+id+'" data-field="'+esc(f.id)+'" type="'+esc(f.type||'text')+'" value="'+esc(f.default||'')+'">';
+      control='<input class="cc-control" id="'+id+'" data-field="'+esc(f.id)+'" type="'+esc(f.type||'text')+'" value="'+esc(currentValue)+'">';
     }
-    return '<label class="cc-field"><span class="cc-label">'+esc(f.label)+'</span>'+control+(f.help?'<span class="cc-help">'+esc(f.help)+'</span>':'')+'</label>';
+    return '<label class="cc-field"><span class="cc-label">'+esc(f.label)+'</span>'+control+help+'</label>';
   }
 
+  function norm(v){return String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();}
+  const qp=o=>new URLSearchParams(Object.fromEntries(Object.entries(o).filter(([,v])=>v!==''&&v!=null))).toString();
+  async function catalogGet(op,args={}){
+    if(state.country!=='gt') throw new Error('CATALOG_COUNTRY_NOT_AVAILABLE');
+    const r=await fetch(CATALOG_API+'?'+qp({op,...args}),{headers:{accept:'application/json'}});
+    const j=await r.json();
+    if(!r.ok||!j.ok) throw new Error(j.code||'CATALOG_UNAVAILABLE');
+    return j;
+  }
+  function forceAssistedCatalog(message){
+    state.mode='assisted';
+    document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('is-active',x.dataset.mode==='assisted'));
+    const target=document.getElementById('vehicleCatalogStatus');
+    if(target)target.textContent=message||'A&S continuará la identificación del vehículo sin forzar una opción incorrecta.';
+  }
   function bindFields(){
     document.querySelectorAll('[data-field]').forEach(el=>{
+      if(el.dataset.vehicleCombo){
+        el.addEventListener('input',()=>{state.form[el.dataset.field]=el.value;});
+        return;
+      }
       el.addEventListener('change',()=>{
         state.form[el.dataset.field]=el.value;
         if(state.product==='salud' && el.dataset.field==='hijos') renderIntake();
       });
     });
+    if(state.product==='auto') bindVehicleComboboxes();
+  }
+
+  function bindVehicleComboboxes(){
+    const brandInput=document.querySelector('[data-vehicle-combo="brand"]');
+    const modelInput=document.querySelector('[data-vehicle-combo="model"]');
+    const brandList=document.getElementById('vehicleBrandList');
+    const modelList=document.getElementById('vehicleModelList');
+    if(!brandInput||!modelInput||!brandList||!modelList)return;
+
+    const open=(list,input)=>{list.classList.add('is-open');input.setAttribute('aria-expanded','true');};
+    const close=(list,input)=>{list.classList.remove('is-open');input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');};
+    const fallback=(kind)=>{
+      if(kind==='brand'){
+        vehicleCatalog.brandId=null;vehicleCatalog.modelId=null;vehicleCatalog.brandLabel='';vehicleCatalog.modelLabel='';
+        state.form.marca=brandInput.value;state.form.lineaModelo='';modelInput.value='';modelInput.disabled=true;
+      }else{
+        vehicleCatalog.modelId=null;vehicleCatalog.modelLabel='';state.form.lineaModelo=modelInput.value;
+      }
+      close(kind==='brand'?brandList:modelList,kind==='brand'?brandInput:modelInput);
+      forceAssistedCatalog('No forzaremos una opción aproximada. Este caso continuará con revisión A&S.');
+    };
+    const optionHtml=(rows,kind)=>rows.map((x,i)=>{
+      const id=(kind==='brand'?'brandOpt':'modelOpt')+i;
+      const value=kind==='brand'?x.brandId:x.modelId;
+      const label=x.label;
+      return '<button type="button" id="'+id+'" class="cc-combo-option" role="option" data-kind="'+kind+'" data-id="'+esc(value)+'" data-label="'+esc(label)+'">'+esc(label)+'</button>';
+    }).join('')+'<button type="button" class="cc-combo-option cc-combo-fallback" data-fallback="'+kind+'">'+(kind==='brand'?'No encuentro mi marca':'No encuentro mi línea / modelo')+'</button>';
+
+    async function ensureBrands(){
+      if(vehicleCatalog.loadedBrands)return;
+      if(state.country!=='gt'){forceAssistedCatalog('Para Colombia, la identificación vehicular continúa de forma consultiva hasta contar con la proyección de catálogo autorizada por Gravicentra.');return;}
+      try{
+        const j=await catalogGet('brands',{vehicleClass:'AUTO_LIGHT',limit:200});
+        vehicleCatalog.brands=j.items||[];vehicleCatalog.loadedBrands=true;
+      }catch(e){
+        forceAssistedCatalog('El catálogo vehicular no está disponible en esta vista. Puedes continuar con A&S sin escoger un dato incorrecto.');
+      }
+    }
+    async function renderBrands(){
+      await ensureBrands();
+      const q=norm(brandInput.value);
+      const rows=vehicleCatalog.brands.filter(x=>!q||norm(x.label).includes(q)).slice(0,70);
+      brandList.innerHTML=optionHtml(rows,'brand');open(brandList,brandInput);
+    }
+    async function loadModels(){
+      if(!vehicleCatalog.brandId)return;
+      try{
+        const j=await catalogGet('models',{vehicleClass:'AUTO_LIGHT',brandId:vehicleCatalog.brandId,limit:200});
+        vehicleCatalog.models=j.items||[];
+      }catch(e){
+        vehicleCatalog.models=[];forceAssistedCatalog('No fue posible cargar las líneas/modelos. A&S continuará la revisión sin forzar una opción.');
+      }
+    }
+    function renderModels(){
+      const q=norm(modelInput.value);
+      const rows=vehicleCatalog.models.filter(x=>!q||norm(x.label).includes(q)).slice(0,90);
+      modelList.innerHTML=optionHtml(rows,'model');open(modelList,modelInput);
+    }
+    async function chooseBrand(btn){
+      vehicleCatalog.brandId=btn.dataset.id;vehicleCatalog.brandLabel=btn.dataset.label;vehicleCatalog.modelId=null;vehicleCatalog.modelLabel='';
+      state.form.marca=btn.dataset.label;state.form.lineaModelo='';
+      brandInput.value=btn.dataset.label;modelInput.value='';modelInput.disabled=false;close(brandList,brandInput);
+      await loadModels();renderModels();modelInput.focus();
+    }
+    function chooseModel(btn){
+      vehicleCatalog.modelId=btn.dataset.id;vehicleCatalog.modelLabel=btn.dataset.label;state.form.lineaModelo=btn.dataset.label;
+      modelInput.value=btn.dataset.label;close(modelList,modelInput);
+      const status=document.getElementById('vehicleCatalogStatus');
+      if(status)status.textContent='Identidad vehicular seleccionada desde el catálogo LAB. La elegibilidad y tarifa siguen bajo autoridad de Gravicentra.';
+    }
+
+    brandInput.addEventListener('focus',renderBrands);
+    brandInput.addEventListener('input',()=>{vehicleCatalog.brandId=null;vehicleCatalog.modelId=null;state.form.marca=brandInput.value;state.form.lineaModelo='';modelInput.value='';modelInput.disabled=true;renderBrands();});
+    modelInput.addEventListener('focus',()=>{if(vehicleCatalog.brandId)renderModels();});
+    modelInput.addEventListener('input',()=>{vehicleCatalog.modelId=null;state.form.lineaModelo=modelInput.value;renderModels();});
+    brandList.addEventListener('mousedown',async e=>{e.preventDefault();const fb=e.target.closest('[data-fallback]');if(fb)return fallback('brand');const b=e.target.closest('[data-kind="brand"]');if(b)await chooseBrand(b);});
+    modelList.addEventListener('mousedown',e=>{e.preventDefault();const fb=e.target.closest('[data-fallback]');if(fb)return fallback('model');const b=e.target.closest('[data-kind="model"]');if(b)chooseModel(b);});
+    document.querySelectorAll('[data-vehicle-fallback]').forEach(b=>b.addEventListener('click',()=>fallback(b.dataset.vehicleFallback)));
+    document.addEventListener('mousedown',e=>{if(!brandInput.closest('.cc-combo').contains(e.target))close(brandList,brandInput);if(!modelInput.closest('.cc-combo').contains(e.target))close(modelList,modelInput);},{once:true});
   }
 
   function otherPaths(){
@@ -333,7 +448,7 @@ function html(){
     const photo=document.getElementById('routePhoto'),pos=scenePos[state.family];
     photo.style.backgroundPosition=pos.x+' '+pos.y;photo.dataset.visualAsset='route:'+state.family;photo.setAttribute('aria-label','Contexto visual de '+meta.label);
     otherPaths();
-    document.getElementById('intakeGroups').innerHTML=sc.groups.map((g,i)=>'<div class="cc-stage-panel"><div class="cc-stage-panel__head"><span>'+String(i+1).padStart(2,'0')+'</span><b>'+esc(g.title)+'</b></div><div class="cc-field-grid">'+g.fields.map(fieldHtml).join('')+'</div></div>').join('');
+    document.getElementById('intakeGroups').innerHTML=sc.groups.map((g,i)=>'<div class="cc-stage-panel"><div class="cc-stage-panel__head"><span>'+String(i+1).padStart(2,'0')+'</span><b>'+esc(g.title)+'</b></div><div class="cc-field-grid">'+g.fields.map(fieldHtml).join('')+'</div></div>').join('')+(state.product==='auto'?'<div id="vehicleCatalogStatus" class="cc-combo-status">Marca y línea/modelo se validan contra el catálogo vehicular LAB cuando está disponible. La tarifa y elegibilidad no se calculan aquí.</div>':'');
     bindFields();
   }
 
@@ -342,12 +457,12 @@ function html(){
     const c=info.comparison;
     let html='';
     if(c.quotes.length){
-      html='<div class="cc-review-grid">'+c.quotes.map(q=>'<article class="cc-review-card"><b>'+esc(q.name)+'</b><strong>'+esc(q.total)+'</strong><span>'+(q.status==='VALIDATED'?'Revisada y lista para comparar':'Pendiente de validación')+'</span></article>').join('')+'</div>';
+      html='<div class="cc-review-grid">'+c.quotes.map(q=>'<article class="cc-review-card"><b>'+esc(q.name)+'</b><strong>'+esc(q.total)+'</strong><span>'+(c.visualFixture?'Ejemplo visual · sin propuesta real':(q.status==='VALIDATED'?'Revisada y lista para comparar':'Pendiente de validación'))+'</span></article>').join('')+'</div>';
     }
     if(!c.comparable){
       html+='<aside class="cc-no-compare"><small>VALIDACIÓN ANTES DE COMPARAR</small><h3>Todavía no hay dos alternativas validadas para comparar.</h3><p>No mostramos precios ni “ganadores” inventados. A&S continúa por la ruta '+(state.mode==='assisted'?'acompañada':'correspondiente')+' hasta contar con propuestas comparables.</p></aside>';
     }else{
-      html+='<div class="cc-truth" style="margin-top:16px;margin-bottom:0">Hay dos alternativas validadas en este ejemplo LAB. La comparación se habilita sin ranking silencioso.</div>';
+      html+='<div class="cc-truth" style="margin-top:16px;margin-bottom:0">'+(c.visualFixture?'Esta es una plantilla visual source-only para revisar la experiencia. No representa cotizaciones reales ni propuestas validadas.':'Hay dos alternativas validadas y comparables. La comparación se habilita sin ranking silencioso.')+'</div>';
     }
     document.getElementById('reviewContent').innerHTML=html;
     document.getElementById('compareNext').textContent=c.comparable?'Comparar opciones →':'Ver cómo continúa →';
@@ -364,8 +479,8 @@ function html(){
         '<tr><td>Asistencia / servicio</td><td>'+esc(a.assistance)+'</td><td>'+esc(b.assistance)+'</td></tr>'+
         '<tr><td>Alcance</td><td>'+esc(a.coverage)+'</td><td>'+esc(b.coverage)+'</td></tr>'+
         '</tbody></table>'+
-        '<aside class="cc-rec"><small>Recomendación A&amp;S</small><h3>Orientación según lo que dijiste que más pesa en tu decisión.</h3><p>No elegimos automáticamente por ti. Explicamos los trade-offs entre propuestas validadas y qué diferencia conviene revisar antes de continuar.</p></aside>';
-      document.getElementById('decisionBtn').textContent='Elegir y continuar →';
+        '<aside class="cc-rec"><small>Recomendación A&amp;S</small><h3>'+ (c.visualFixture?'Así se verá la orientación cuando existan propuestas reales comparables.':'Orientación según lo que dijiste que más pesa en tu decisión.') +'</h3><p>'+ (c.visualFixture?'La estructura se muestra sin inventar primas, deducibles ni coberturas. La recomendación real se construirá únicamente con propuestas validadas.':'No elegimos automáticamente por ti. Explicamos los trade-offs entre propuestas validadas y qué diferencia conviene revisar antes de continuar.') +'</p></aside>';
+      document.getElementById('decisionBtn').textContent=c.visualFixture?'Continuar con A&S →':'Elegir y continuar →';
     }else{
       box.innerHTML='<aside class="cc-no-compare"><small>SIN COMPARACIÓN FICTICIA</small><h3>Esta ruta necesita validación o acompañamiento antes de comparar.</h3><p>La experiencia conserva tu contexto y continúa con A&S. No inventamos primas, coberturas ni alternativas cuando la fuente todavía no está validada para web.</p></aside>';
       document.getElementById('decisionBtn').textContent='Continuar con A&S →';
