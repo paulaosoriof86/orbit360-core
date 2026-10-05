@@ -1,0 +1,200 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R18_READONLY_FORENSIC_RENEWAL_11_OF_11_V1",
+  "recordedAt": "2026-10-05T09:08:00-06:00",
+  "status": "SOURCE_RECONCILIATION_PASS_RUNTIME_COLLISION_READBACK_PENDING",
+  "mode": "READ_ONLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sources": {
+    "primaryPolicyUniverse": {
+      "filename": "Polizas (16)(2).xlsx",
+      "sha256": "e68bfd576b28b01d2839d8c3a22e547d8905f1eaeb84d1d7ffc3a0082960c2a7",
+      "authority": "I6_4_PRIMARY_POLICY_UNIVERSE",
+      "pinnedReceipt": "artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json"
+    },
+    "renewalSupplement": {
+      "filename": "Renovaciones (13)(2).xlsx",
+      "sha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3",
+      "reportRange": "2025-01-01/2026-10-31",
+      "authority": "I6_4_RENEWAL_SUPPLEMENT"
+    },
+    "priorDeterministicApply": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",
+      "sourceSha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3",
+      "writes": 4
+    }
+  },
+  "referenceDate": "2026-10-05",
+  "dateWindow": "2026-10-05..2026-11-19 inclusive",
+  "dateKpiCount": 11,
+  "runtimeRuleObserved": "Renovaciones requires renovable=YES for actionable cards; UNKNOWN is fail-closed. Future actionable state also requires Vigente/Por renovar.",
+  "policies": [
+    {
+      "numero": "AUTO 38446",
+      "cliente": "WILFREDO MISAEL PINEDA CRUZ",
+      "fin": "2026-10-06",
+      "estadoFuente": "Vigente",
+      "aseguradora": "AseGuate",
+      "ramo": "VEHICULOS",
+      "subramo": "Automoviles",
+      "renewalSupplement": true,
+      "priorDeterministicRenewableYes": true,
+      "disposition": "ACTIONABLE_VISIBLE_EXPECTED"
+    },
+    {
+      "numero": "AUTO-1000000334",
+      "cliente": "NILDA PATRICIA POROJ CARABALLO",
+      "fin": "2026-10-07",
+      "estadoFuente": "Vigente",
+      "aseguradora": "Ficohsa",
+      "ramo": "VEHICULOS",
+      "subramo": "Automoviles",
+      "renewalSupplement": true,
+      "priorDeterministicRenewableYes": true,
+      "disposition": "ACTIONABLE_VISIBLE_EXPECTED"
+    },
+    {
+      "numero": "VA-43685",
+      "cliente": "CASSIDY ISABEL RIOS MELÉNDEZ",
+      "fin": "2026-10-18",
+      "estadoFuente": "Vigente",
+      "aseguradora": "Columna",
+      "ramo": "VEHICULOS",
+      "subramo": "Automoviles",
+      "renewalSupplement": true,
+      "priorDeterministicRenewableYes": false,
+      "disposition": "TERMINAL_OUTCOME_PRESENT_BUT_LINEAGE_ADJUDICATION_REQUIRED",
+      "runtimeEvidence": {
+        "parentId": "pol_965de501d871c56f3964a24b7724",
+        "renovadaPor": "pol_muj5o5ka",
+        "renovacionEstado": "Renovada",
+        "childNumero": "prueba",
+        "childDependents": 3
+      }
+    },
+    {
+      "numero": "91-8357452",
+      "cliente": "JORGE DANIEL MORALES ROUANET",
+      "fin": "2026-10-27",
+      "estadoFuente": "Vencida",
+      "aseguradora": "El Roble",
+      "ramo": "VEHICULOS",
+      "subramo": "Automoviles",
+      "renewalSupplement": true,
+      "priorDeterministicRenewableYes": false,
+      "disposition": "SOURCE_SAYS_RENEWAL_BUT_STATE_CONTRADICTS_FUTURE_TERM"
+    },
+    {
+      "numero": "VA125-00006571",
+      "cliente": "JOSÉ PABLO GARCÍA VASQUEZ",
+      "fin": "2026-11-03",
+      "estadoFuente": "Vigente",
+      "aseguradora": "Banrural",
+      "ramo": "VEHICULOS",
+      "subramo": "Automoviles",
+      "renewalSupplement": false,
+      "supplementCoverage": "OUTSIDE_2026-10-31_HORIZON",
+      "disposition": "PENDING_SOURCE_CLASSIFICATION_MUST_NOT_DISAPPEAR"
+    },
+    {
+      "numero": "91-8342189",
+      "cliente": "EDSON KENED MORATAYA PINEDA",
+      "fin": "2026-11-12",
+      "estadoFuente": "Vigente",
+      "aseguradora": "El Roble",
+      "ramo": "VEHICULOS",
+      "subramo": "Automoviles",
+      "renewalSupplement": false,
+      "supplementCoverage": "OUTSIDE_2026-10-31_HORIZON",
+      "disposition": "PENDING_SOURCE_CLASSIFICATION_MUST_NOT_DISAPPEAR"
+    },
+    {
+      "numero": "91-8324489",
+      "cliente": "KEVIN MARIO FERNANDO STEWART FLORES",
+      "fin": "2026-11-16",
+      "estadoFuente": "Vigente",
+      "aseguradora": "El Roble",
+      "ramo": "VEHICULOS",
+      "subramo": "Automoviles",
+      "renewalSupplement": false,
+      "supplementCoverage": "OUTSIDE_2026-10-31_HORIZON",
+      "disposition": "PENDING_SOURCE_CLASSIFICATION_MUST_NOT_DISAPPEAR"
+    },
+    {
+      "numero": "VA-48941",
+      "cliente": "ABNER BENJAMIN DUARTE CIFUENTES",
+      "fin": "2026-11-19",
+      "estadoFuente": "Vencida",
+      "aseguradora": "Columna",
+      "ramo": "VEHICULOS",
+      "subramo": "Automoviles",
+      "renewalSupplement": false,
+      "supplementCoverage": "OUTSIDE_2026-10-31_HORIZON",
+      "disposition": "STATE_CONTRADICTS_FUTURE_TERM_AND_SOURCE_CLASSIFICATION_PENDING"
+    },
+    {
+      "numero": "WC-351F8L",
+      "cliente": "MARÍA DE JESÚS LÓPEZ GARZÓN",
+      "fin": "2026-10-27",
+      "estadoFuente": "Vigente",
+      "aseguradora": "SMI",
+      "ramo": "ACCIDENTES Y ENFERMEDADES",
+      "subramo": "Viajes",
+      "renewalSupplement": false,
+      "supplementCoverage": "INSIDE_REPORT_RANGE_BUT_ABSENT",
+      "disposition": "ABSENCE_IS_NOT_NO_RENEWABLE_PENDING_AUTHORITY"
+    },
+    {
+      "numero": "TLG$-7491",
+      "cliente": "IMPAGUA, SOCIEDAD ANONIMA",
+      "fin": "2026-10-11",
+      "estadoFuente": "Vigente",
+      "aseguradora": "G&T",
+      "ramo": "DAÑOS",
+      "subramo": "Transportes",
+      "renewalSupplement": false,
+      "supplementCoverage": "INSIDE_REPORT_RANGE_BUT_ABSENT",
+      "disposition": "LIKELY_BUSINESS_NONRENEWABLE_CLASS_REQUIRES_CANONICAL_AUTHORITY_NOT_INFERENCE"
+    },
+    {
+      "numero": "TLG$-7492",
+      "cliente": "IMPAGUA, SOCIEDAD ANONIMA",
+      "fin": "2026-10-11",
+      "estadoFuente": "Vigente",
+      "aseguradora": "G&T",
+      "ramo": "DAÑOS",
+      "subramo": "Transportes",
+      "renewalSupplement": false,
+      "supplementCoverage": "INSIDE_REPORT_RANGE_BUT_ABSENT",
+      "disposition": "LIKELY_BUSINESS_NONRENEWABLE_CLASS_REQUIRES_CANONICAL_AUTHORITY_NOT_INFERENCE"
+    }
+  ],
+  "reconciliation": {
+    "exact11AccountedFor": true,
+    "currentlyActionableFromPriorSource": 2,
+    "terminalOutcomeNeedsLineageAdjudication": 1,
+    "renewalSupplementPresentButLifecycleStateConflict": 1,
+    "outsideRenewalSupplementHorizon": 4,
+    "insideSupplementRangeButAbsent": 3,
+    "hiddenOrUnexplainedAllowed": 0
+  },
+  "rootCauseConclusion": [
+    "The Pólizas <=45 KPI and Renovaciones pipeline intentionally use different predicates, but the product lacks a complete visible disposition layer.",
+    "The Sep-18 renewal supplement cannot classify November policies because its frozen horizon ends 2026-10-31.",
+    "At least two source rows have estado=Vencida while vigenciaFin is still future relative to 2026-10-05, so the current actionable-state predicate can hide them.",
+    "Absence from the renewal supplement is not proof of NO renovable.",
+    "VA-43685 already has a terminal renewal linkage, but its child 'prueba' requires fail-closed adjudication before relying on that outcome."
+  ],
+  "requiredProductContract": "For the exact date-based <=45 universe, every row must resolve visibly to ACTIONABLE, PENDING_CLASSIFICATION, CONFIRMED_NONRENEWABLE, RENEWED/CLOSED_OUTCOME, or explicit source conflict. Sum of dispositions must equal the date universe.",
+  "remainingRuntimeBlocker": {
+    "id": "B4-003-R18-11-POLICY-DUPLICATE-COLLISION-ON-RENEWABILITY-EDIT",
+    "reason": "The exact policy pair behind Paula's poliza_duplicada runtime error is not present in committed forensic receipts; authenticated exact Preview readback is required before changing duplicate/version validation.",
+    "tinyFishAuthenticatedSessionRequired": true
+  },
+  "mutations": {
+    "product": 0,
+    "businessData": 0,
+    "reimport": 0,
+    "live": 0
+  }
+}
