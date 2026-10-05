@@ -68,7 +68,8 @@
       "orbit360-platform/core/policy-receipts-engine.js",
       "orbit360-platform/modules/aseguradoras.js",
       "orbit360-platform/styles/infra.css",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "orbit360-platform/modules/inicio.js"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -553,5 +554,12 @@
     "ledgerBlobSha": "3caffb0d57fcfbefb911f4d3ff5af022574e7dda",
     "carryBlobSha": "38ecbdf3d69008c21192e2cbb5c5375fb54fd321",
     "masterPlanBlobSha": "e079abbbd13d021ecedaf35357fbdfee5d25a9bc"
-  }
+  },
+  "r18RenewalKpiParity": {
+    "status": "AUTHORIZED_SAME_CANDIDATE",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
+    "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
+  },
+  "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+  "continuityRegisterBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6"
 }
