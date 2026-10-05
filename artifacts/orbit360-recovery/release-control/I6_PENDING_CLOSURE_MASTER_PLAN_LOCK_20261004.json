@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "R18_CAUSAL_SOURCE_FIX_AUTHORIZED",
-    "nextAction": "R18_SINGLE_CUMULATIVE_SOURCE_FIX",
-    "why": "Authenticated read-only forensic reconciled 11/11 renewal date universe and proved policy 1003687 collision is legitimate non-overlapping editions with incomplete lineage; visual findings remain frozen.",
+    "status": "R18_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "R18_CONTRACT_AND_EXACT_PREVIEW",
+    "why": "Single cumulative R18 source fix is frozen. No product mutation remains authorized before contract and exact Preview.",
     "currentCandidateReview": "R17_REJECTED_NO_MORE_HUMAN_RETEST_UNTIL_R18_MACHINE_PLUS_TINYFISH_PREUAT_PASS",
     "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
     "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
@@ -6308,5 +6308,15 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139",
     "findingId": "B4-003-R18-16-INICIO-POLIZAS-RENEWAL-KPI-PARITY"
+  },
+  "r18SourceFix": {
+    "status": "FROZEN_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
+    "blobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
+    "compositionBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
+    "executionLockBlobSha": "8e0d598b27173350ada8a6aa7f0555e86ef41307",
+    "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+    "carryBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
+    "exactFindingSetCount": 235
   }
 }
