@@ -29,7 +29,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "f15d7b45884b0c236b2bea50c5a49e59dde01664"
+    "blobSha": "cce6f6bd6d56006257eb63d15c2c98b8487f98fe"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -661,7 +661,7 @@
     "scopeExtensionReason3": "R17 changes modify browser-loaded modules; the canonical index asset query versions must advance so the same certified artifact cannot serve stale pre-R17 module bytes after production promotion.",
     "scopeExtendedAt3": "2026-10-05T00:04:00Z",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
-    "compositionBlobSha": "f15d7b45884b0c236b2bea50c5a49e59dde01664",
+    "compositionBlobSha": "cce6f6bd6d56006257eb63d15c2c98b8487f98fe",
     "productMutationAuthorized": false,
     "syntheticQaWritesAuthorized": true,
     "qaCompatibilityAlignment": {
@@ -682,6 +682,12 @@
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false
+    },
+    "qaCompatibilityAlignment3": {
+      "status": "QA_LITERAL_DRIFT_CORRECTED_BEFORE_BUILD",
+      "failedRunId": 37245876914,
+      "productSourceChanged": false,
+      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
     }
   }
 }
