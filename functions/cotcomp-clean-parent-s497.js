@@ -340,6 +340,7 @@ function html(){
     const modelList=document.getElementById('vehicleModelList');
     if(!brandInput||!modelInput||!brandList||!modelList)return;
 
+    let brandActive=-1,modelActive=-1;
     const open=(list,input)=>{list.classList.add('is-open');input.setAttribute('aria-expanded','true');};
     const close=(list,input)=>{list.classList.remove('is-open');input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');};
     const fallback=(kind)=>{
@@ -373,7 +374,7 @@ function html(){
       await ensureBrands();
       const q=norm(brandInput.value);
       const rows=vehicleCatalog.brands.filter(x=>!q||norm(x.label).includes(q)).slice(0,70);
-      brandList.innerHTML=optionHtml(rows,'brand');open(brandList,brandInput);
+      brandActive=-1;brandList.innerHTML=optionHtml(rows,'brand');open(brandList,brandInput);
     }
     async function loadModels(){
       if(!vehicleCatalog.brandId)return;
@@ -387,7 +388,7 @@ function html(){
     function renderModels(){
       const q=norm(modelInput.value);
       const rows=vehicleCatalog.models.filter(x=>!q||norm(x.label).includes(q)).slice(0,90);
-      modelList.innerHTML=optionHtml(rows,'model');open(modelList,modelInput);
+      modelActive=-1;modelList.innerHTML=optionHtml(rows,'model');open(modelList,modelInput);
     }
     async function chooseBrand(btn){
       vehicleCatalog.brandId=btn.dataset.id;vehicleCatalog.brandLabel=btn.dataset.label;vehicleCatalog.modelId=null;vehicleCatalog.modelLabel='';
@@ -401,11 +402,29 @@ function html(){
       const status=document.getElementById('vehicleCatalogStatus');
       if(status)status.textContent='Identidad vehicular seleccionada desde el catálogo LAB. La elegibilidad y tarifa siguen bajo autoridad de Gravicentra.';
     }
+    async function comboKeyboard(e,kind){
+      const input=kind==='brand'?brandInput:modelInput,list=kind==='brand'?brandList:modelList;
+      const options=[...list.querySelectorAll('[data-kind="'+kind+'"]')];
+      let active=kind==='brand'?brandActive:modelActive;
+      if(e.key==='ArrowDown'){e.preventDefault();active=Math.min(active+1,options.length-1);}
+      else if(e.key==='ArrowUp'){e.preventDefault();active=Math.max(active-1,0);}
+      else if(e.key==='Enter'&&active>=0&&options[active]){
+        e.preventDefault();
+        if(kind==='brand')await chooseBrand(options[active]);else chooseModel(options[active]);
+        return;
+      }else if(e.key==='Escape'){e.preventDefault();close(list,input);return;}
+      else return;
+      options.forEach((o,i)=>o.classList.toggle('is-active',i===active));
+      if(options[active]){options[active].scrollIntoView({block:'nearest'});input.setAttribute('aria-activedescendant',options[active].id);}
+      if(kind==='brand')brandActive=active;else modelActive=active;
+    }
 
     brandInput.addEventListener('focus',renderBrands);
     brandInput.addEventListener('input',()=>{vehicleCatalog.brandId=null;vehicleCatalog.modelId=null;state.form.marca=brandInput.value;state.form.lineaModelo='';modelInput.value='';modelInput.disabled=true;renderBrands();});
+    brandInput.addEventListener('keydown',e=>comboKeyboard(e,'brand'));
     modelInput.addEventListener('focus',()=>{if(vehicleCatalog.brandId)renderModels();});
     modelInput.addEventListener('input',()=>{vehicleCatalog.modelId=null;state.form.lineaModelo=modelInput.value;renderModels();});
+    modelInput.addEventListener('keydown',e=>comboKeyboard(e,'model'));
     brandList.addEventListener('mousedown',async e=>{e.preventDefault();const fb=e.target.closest('[data-fallback]');if(fb)return fallback('brand');const b=e.target.closest('[data-kind="brand"]');if(b)await chooseBrand(b);});
     modelList.addEventListener('mousedown',e=>{e.preventDefault();const fb=e.target.closest('[data-fallback]');if(fb)return fallback('model');const b=e.target.closest('[data-kind="model"]');if(b)chooseModel(b);});
     document.querySelectorAll('[data-vehicle-fallback]').forEach(b=>b.addEventListener('click',()=>fallback(b.dataset.vehicleFallback)));
