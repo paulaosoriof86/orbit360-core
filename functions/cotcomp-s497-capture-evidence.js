@@ -126,6 +126,7 @@ const viewports=[
 
   async function stateShot(id){
     const p=path.join(OUT,'state-'+id+'.png');
+    if(id.startsWith('stage')){await page.evaluate(()=>window.scrollTo(0,0));await page.waitForTimeout(80);}
     await page.screenshot({path:p,fullPage:true});
     receipt.states.push({id,screenshotSha256:sha(p),unexpectedVisualDrift:false});
   }
