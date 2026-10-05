@@ -19,7 +19,7 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 235,
+    "total": 243,
     "b2HumanFindings": 61,
     "currentBlocking": 24,
     "countingNote": "Reconciled to exact union of physical ledger + carry-forward register, then appended R18 Paula visual rejection findings. No IDs removed.",
@@ -8488,8 +8488,8 @@
       "id": "B4-003-R18-01-OPS-LEADS-DEFAULT-ENTRY-STAGE",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_R18_PRESERVE",
+      "blocking": false,
       "surface": "Ops/Leads/Nuevo prospecto",
       "finding": "Nuevo prospecto can enter Cotizando by default instead of Nuevo/Contactado, bypassing the real commercial journey.",
       "rootCause": "nuevoNegocio derives etapa from Punto de ingreso and currently defaults to the second catalog entry; the default can therefore be a downstream stage.",
@@ -8508,17 +8508,20 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "closureProof": "Paula R18 visual review proved new lead starts in Nuevo and persisted transition Nuevo→Contactado.",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
     },
     {
       "id": "B4-003-R18-02-OPS-LEADS-RAMO-PRODUCT-PLAN-DEPENDENCY",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R18_STALE_PRODUCT_AFTER_RAMO_CHANGE",
       "blocking": true,
       "surface": "Ops/Leads/Nuevo prospecto",
       "finding": "Ramo, Producto and Plan are not modeled as dependent selections, allowing incoherent combinations.",
-      "rootCause": "The form exposes Producto/plan from a generic catalog and Ramo independently; no country→ramo→producto→plan dependency contract governs the capture.",
+      "rootCause": "paintSelect reinjects preferred stale product when it is not in the new ramo product set; visible example Vida retained Vehículo Liviano.",
       "owner": [
         "orbit360-platform/core/ciclo.js",
         "tenant catalog authority",
@@ -8535,7 +8538,9 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
     },
     {
       "id": "B4-003-R18-03-COMMERCIAL-IDENTITY-MULTIOPPORTUNITY-MODEL",
@@ -8569,7 +8574,7 @@
       "id": "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PARTIAL_PASS_R18_TYPED_ACTIVITY_NOTIFICATION_OPEN",
       "blocking": true,
       "surface": "Ops/Leads collaboration",
       "finding": "Generic comments do not provide a clear advisor↔operational request/return/re-submit workflow.",
@@ -8590,7 +8595,10 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "closureProof": "Typed operational observation persists in activity/bitácora; user notification/attention mechanism not proven.",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
     },
     {
       "id": "B4-003-R18-05-OPS-MANAGEMENT-TYPE-QUEUE-SEMANTICS",
@@ -8622,8 +8630,8 @@
       "id": "B4-003-R18-06-QUALITY-PROVENANCE-CONFIRMATION-ACTION",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_R18_PRESERVE",
+      "blocking": false,
       "surface": "Calidad de datos/País y provenance",
       "finding": "A client can display País=Colombia and simultaneously Sin origen/evidencia registrada without a clear action to document/confirm the source.",
       "rootCause": "Current value and provenance are technically separate, but the UI exposes the absence of provenance without an operational confirmation path.",
@@ -8642,7 +8650,10 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "closureProof": "R18 visual shows current country/evidence separated and completion form exposes evidence plus governed confirmation path.",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
     },
     {
       "id": "B4-003-R18-07-QUALITY-CHANNEL-ACTION-SEMANTIC-MISMATCH",
@@ -8673,8 +8684,8 @@
       "id": "B4-003-R18-08-QUALITY-REVIEW-AND-CORRECT-NOT-ACTIONABLE",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_R18_PRESERVE",
+      "blocking": false,
       "surface": "Calidad/Salud póliza vs calendario",
       "finding": "Revisar y corregir opens a diagnostic modal but only offers Cerrar, Ver recibos and Abrir póliza; it does not provide a governed correction path.",
       "rootCause": "R17 proved exact drill-down but the visible action label overstates the outcome.",
@@ -8693,13 +8704,16 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "closureProof": "R18 visual shows human financial comparison and distinct Revisar recibos / Corregir en póliza actions.",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
     },
     {
       "id": "B4-003-R18-09-POLICY-MOBILE-SEARCH-VISIBILITY",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R18_MOBILE_SEARCH_NOT_DISCOVERABLE",
       "blocking": true,
       "surface": "Pólizas/mobile",
       "finding": "The existing policy search engine is not visible in Paula's mobile Preview while select filters remain visible.",
@@ -8720,17 +8734,19 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
     },
     {
       "id": "B4-003-R18-10-RENEWAL-UNIVERSE-11-VS-2-DISPOSITION-GAP",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R18_BUCKETS_STILL_HIDE_PENDING",
       "blocking": true,
       "surface": "Pólizas/Renovaciones",
       "finding": "Same context shows Pólizas Vencen ≤45 d = 11 while Renovaciones shows only 2 in ≤15 d and 0 in 16–45 d; nine dated policies are not visibly dispositioned in the renewal pipeline.",
-      "rootCause": "Pólizas date KPI does not require renovable=YES; Renovaciones requires YES. UNKNOWN expired policies are also excluded from renewalPendingValidation because that predicate accepts only Vigente/Por renovar.",
+      "rootCause": "buckets() still filters only renewalActionable (renovable=YES), so pending renewability rows are counted in summary but absent from date buckets.",
       "owner": [
         "orbit360-platform/modules/polizas.js",
         "orbit360-platform/modules/renovaciones.js",
@@ -8747,17 +8763,19 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
     },
     {
       "id": "B4-003-R18-11-POLICY-DUPLICATE-COLLISION-ON-RENEWABILITY-EDIT",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PARTIAL_CAUSE_FIXED_R18_DURABLE_SAVE_FAILS_ATOMIC_CONFIRMATION",
       "blocking": true,
       "surface": "Póliza/Renovabilidad",
       "finding": "Changing Renovabilidad can fail with poliza_duplicada pointing to another physical policy id, blocking classification.",
-      "rootCause": "validatePolicy excludes current id but rejects another same-commercial-key record unless renuevaDe is present. It is not yet proven whether the second row is an invalid duplicate or a legitimate policy version with incomplete lineage.",
+      "rootCause": "Edition-aware validation no longer raises duplicate, but the actual durable policy save path still ends with 'operación atómica no confirmada'.",
       "owner": [
         "orbit360-platform/core/policy-receipts-engine.js",
         "policy lineage/read model"
@@ -8773,7 +8791,9 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
     },
     {
       "id": "B4-003-R18-12-INSURER-REGISTRY-PROVENANCE-OBJECT-RENDER",
@@ -8805,7 +8825,7 @@
       "id": "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R18_NO_MATERIAL_HIERARCHY_IMPROVEMENT",
       "blocking": true,
       "surface": "Aseguradoras/Documentos/Registry/Tarifas y conocimiento",
       "finding": "Knowledge/Registry pages remain visually dense and insufficiently responsive on mobile; long titles/rules compress or clip and state hierarchy is unclear.",
@@ -8825,7 +8845,9 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
     },
     {
       "id": "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
@@ -8857,7 +8879,7 @@
       "id": "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINANT-COVERAGE",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "OPEN_R18_MACHINE_FALSE_CONFIDENCE_REQUIRES_STRONGER_PREUAT",
       "blocking": true,
       "surface": "QA/TinyFish/Authenticated Preview",
       "finding": "R17 machine proof passed several route/action existence assertions while Paula still found business-semantic and mobile defects that automation should have detected before human UAT.",
@@ -8877,7 +8899,9 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
     },
     {
       "id": "I6-7-R18-CARRY-INSURER-COMMISSION-SOURCE-AUTHORITY",
@@ -8901,8 +8925,8 @@
       "id": "B4-003-R18-16-INICIO-POLIZAS-RENEWAL-KPI-PARITY",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_R18_PARITY_ONLY",
+      "blocking": false,
       "surface": "Inicio/Pólizas/Renovaciones",
       "finding": "Inicio displayed Renovaciones ≤45 d = 14 while Pólizas displayed Vencen ≤45 d = 11 and authenticated raw forensic reconciled the exact date-window universe to 11.",
       "rootCause": "RENEWAL_KPI_DUPLICATED_SOURCE_AUTHORITY_ACROSS_INICIO_AND_POLIZAS",
@@ -8919,7 +8943,138 @@
       "mayDisappearWithoutDisposition": false,
       "nextAction": "B4_003_R18_TARGETED_PAULA_VISUAL",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2"
+      "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
+      "closureProof": "Inicio and Renovaciones show 14 for same <=45 universe in R18 visual. Renewal completeness remains separately open.",
+      "lastReviewedAt": "2026-10-05T14:50:00-06:00",
+      "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
+    },
+    {
+      "id": "B4-003-R19-01-INSURER-MULTISELECT-NATIVE-CTRL-DEPENDENCY",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_CAUSE_CONFIRMED",
+      "blocking": true,
+      "surface": "Ops/Leads/Aseguradoras de interés",
+      "finding": "Selecting multiple insurers requires Ctrl/Command because native <select multiple> is used.",
+      "rootCause": "Native HTML multiple select has desktop modifier-key semantics and poor mobile discoverability.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "remediation": "Replace with accessible checkbox/toggle multiselect that works by ordinary click/tap and preserves country scope.",
+      "closureCondition": "Desktop and mobile select/deselect multiple insurers by normal click/tap with durable readback."
+    },
+    {
+      "id": "B4-003-R19-02-QUALITY-SEARCH-FILTER-REGRESSION",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_CAUSE_CONFIRMED",
+      "blocking": true,
+      "surface": "Calidad de datos",
+      "finding": "Approved search/filter experience is missing; R18 shows only reduced checkbox/missing-data/advisor controls and no client search.",
+      "rootCause": "Quality table header was rebuilt without a text query state/control; prior controls were not protected by a regression assertion.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "remediation": "Restore explicit client/document/contact search plus approved filters without removing current country/evidence filters.",
+      "closureCondition": "Search and all required filters visible, combinable, persistent during pagination/rerender on desktop/mobile."
+    },
+    {
+      "id": "B4-003-R19-03-QUALITY-HORIZONTAL-REACHABILITY",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_VISUAL",
+      "blocking": true,
+      "surface": "Calidad/contact data table",
+      "finding": "Right-side actions are clipped/off-screen and horizontal scrolling is not discoverable/reachable in the observed layout.",
+      "rootCause": "Wide table relies on nested overflow-x auto without a persistent or discoverable horizontal navigation affordance.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "remediation": "Make action column reachable with sticky actions and/or explicit horizontal scroller; no hidden controls.",
+      "closureCondition": "All columns/actions reachable at desktop narrow width and mobile without browser zoom."
+    },
+    {
+      "id": "B4-003-R19-04-QUALITY-CONTACT-CHANNEL-ACTION-GAP",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_CAUSE_CONFIRMED",
+      "blocking": true,
+      "surface": "Calidad/Canal",
+      "finding": "Channel/contact action opens generic incomplete-data editor and does not expose a channel/preference field.",
+      "rootCause": "Quality derives Canal from phone/email availability; there is no dedicated contact-channel editor although UI labels the concept as Canal.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "clientes contact schema"
+      ],
+      "remediation": "Provide dedicated Contacto y canal action for phone/WhatsApp/email/preferred contact channel, preserving acquisition channel separately.",
+      "closureCondition": "User can correct contact details and preferred contact channel directly; readback/reload updates Canal column."
+    },
+    {
+      "id": "B4-003-R19-05-POLICY-TECHNICAL-MARKUP-LABEL-VISIBLE",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Pólizas/Calidad policy editor",
+      "finding": "A policy surface still exposes a technical/HTML-like label to the user.",
+      "rootCause": "Exact rendering owner not yet pinned from source; must be located before mutation.",
+      "owner": [
+        "orbit360-platform/modules/cliente360.js",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      ],
+      "remediation": "Locate exact visible token and render human label only; do not hide an underlying semantic field.",
+      "closureCondition": "No HTML/internal technical labels visible in the exact policy edit/detail flow."
+    },
+    {
+      "id": "B4-003-R19-06-RENEWABILITY-DURABLE-ATOMIC-SAVE-FAILURE",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_REPRODUCED_BY_PAULA",
+      "blocking": true,
+      "surface": "Renovaciones→Editar póliza",
+      "finding": "Changing Renovabilidad reaches saving state then displays 'operación atómica no confirmada'.",
+      "rootCause": "Runtime write/readback path fails after validation; exact backend/client stage not yet demonstrated.",
+      "owner": [
+        "orbit360-platform/modules/cliente360.js",
+        "policy durable writer/backend owner"
+      ],
+      "remediation": "Reproduce with authorized synthetic policy, identify write/readback stage, fix only causal owner and prove durable reload.",
+      "closureCondition": "Synthetic and targeted Preview edit Renovabilidad persists/reloads with exact before/after and no duplicate weakening."
+    },
+    {
+      "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_REPRODUCED_BY_PAULA",
+      "blocking": true,
+      "surface": "Inicio",
+      "finding": "Monthly target dials and advisor progress remain in 'Actualizando...' / empty state in R18 visual review.",
+      "rootCause": "Inicio gates monthly/advisor metrics on server-confirmed asesores+metas readiness and can remain pending indefinitely; exact collection readiness cause must be diagnosed.",
+      "owner": [
+        "orbit360-platform/modules/inicio.js",
+        "product store hydration/config collections"
+      ],
+      "remediation": "Prove readiness source and restore bounded canonical render; no invented targets.",
+      "closureCondition": "Exact Preview settles monthly targets/advisor progress for authorized role or explicitly shows source-backed 'not configured/unavailable', never indefinite updating."
+    },
+    {
+      "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Ops/Leads collaboration",
+      "finding": "Typed handoff events persist, but it is not proven how the receiving advisor/operational user is notified or sees required action.",
+      "rootCause": "ciclo.js currently persists comentarios/bitacora only; notificationOutbox/inbox exists separately but no demonstrated bridge from these typed events.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "functions/ops-advisor-inbox.js",
+        "functions/notification-outbox-processor.js"
+      ],
+      "remediation": "Use existing canonical notification/outbox/inbox path for actionable handoff types, with target user/advisor and read/unread visibility; do not invent delivery claims.",
+      "closureCondition": "Synthetic handoff creates canonical in-app notification/task for recipient, appears in recipient inbox, persists/reloads, and acknowledgement/return is auditable."
     }
   ],
   "phaseBBacklog": [
@@ -8958,24 +9113,8 @@
     "rule": "Only these human-visible items require Paula confirmation before B2 acceptance; technical findings already closed may not be reopened without reproducible causal regression."
   },
   "currentHumanReview": {
-    "date": "2026-10-03",
-    "origin": "PAULA_B4_003_TARGETED_VISUAL_R14",
-    "decision": "B4_003_REJECTED_SOURCE_REMEDIATION_REQUIRED",
-    "exactPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37171197355-jtcpjb1c.web.app",
-    "exactSourceSha": "2485b95183584f11648c4c637811c385b60b0e80",
-    "blockingFindingId": "B4-003",
-    "findings": [
-      "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
-      "B4-003-R14-02-RENEWALS-EXPIRED-OUTCOME-CONTINUITY",
-      "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
-      "B4-003-R14-04-CLIENT360-LIST-AUTHORITY",
-      "B4-003-R14-05-QUALITY-VISUAL-GRAMMAR-COMPLETENESS",
-      "B4-003-R14-06-INSURER-IMPORT-STEP-TRUTHFULNESS"
-    ],
-    "noLive": true,
-    "noReimport": true,
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
-    "receiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b"
+    "status": "R18_REJECTED_R19_REQUIRED",
+    "recordedAt": "2026-10-05T14:50:00-06:00"
   },
   "lastReview": {
     "date": "2026-09-26",
@@ -9393,5 +9532,10 @@
       "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
       "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINANT-COVERAGE"
     ]
+  },
+  "r19NoLossFreeze": {
+    "status": "FROZEN",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_R19_NOLOSS_FREEZE_20261005.json",
+    "blobSha": "5277c2a052ea8dcea3bb9e15eb7eb3f6b55e0c5d"
   }
 }
