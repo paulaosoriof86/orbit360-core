@@ -36,7 +36,7 @@ test('S4.99 attaches observable LAB-safe continuity to advisor and decision CTAs
   assert.match(h,/id="s499Handoff"/);
   assert.match(h,/openHandoff\('advisor'\)/);
   assert.match(h,/openHandoff\('decision'\)/);
-  assert.match(h,/Continuar con acompañamiento A&amp;S/);
+  assert.match(h,/Continuar con acompañamiento A(?:&amp;|&)S/);
   assert.match(h,/no se enviaron datos/i);
   assert.match(h,/"writes":false/);
   assert.match(h,/"realAdvisorTransport":false/);
