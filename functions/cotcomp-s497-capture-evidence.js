@@ -45,7 +45,8 @@ const viewports=[
     production:false,
     viewports:[],
     states:[],
-    vehicleCombobox:null
+    vehicleCombobox:null,
+    domainJourneys:null
   };
 
   async function newEvidencePage(viewport){
@@ -199,6 +200,49 @@ const viewports=[
     screenshotSha256:sha(comboShot)
   };
   await comboPage.close();
+
+  // Cross-country/product proof: dynamic forms must reflect the selected country and need.
+  const domainProof={realTransport:false};
+
+  const coPage=await newEvidencePage({width:1440,height:1000});
+  await coPage.setContent(generatedHtml,{waitUntil:'domcontentloaded'});await settled(coPage);
+  await coPage.click('[data-country="co"]');
+  await coPage.click('.cc-family[data-family="cargo"]');
+  await coPage.click('[data-next="2"]');await coPage.waitForTimeout(80);
+  domainProof.coTransportSpecializedFields=await coPage.locator('#f_coverageModeNeed,#f_transportModePrimary,#f_origin,#f_destination,#f_valueToProtect,#f_maxValuePerShipment,#f_annualMovementBudget').count()===7;
+  domainProof.coCountryVisible=(await coPage.locator('#selectedCountry').textContent())==='Colombia';
+  const coShot=path.join(OUT,'state-co-transport.png');await coPage.screenshot({path:coShot,fullPage:true});domainProof.coTransportScreenshotSha256=sha(coShot);
+  await coPage.close();
+
+  const healthPage=await newEvidencePage({width:1440,height:1000});
+  await healthPage.setContent(generatedHtml,{waitUntil:'domcontentloaded'});await settled(healthPage);
+  await healthPage.click('.cc-family[data-family="health"]');
+  await healthPage.click('[data-next="2"]');await healthPage.waitForTimeout(80);
+  await healthPage.locator('#f_hijos').fill('2');await healthPage.locator('#f_hijos').dispatchEvent('change');await healthPage.waitForTimeout(80);
+  domainProof.gtHealthDependentDobDynamic=await healthPage.locator('#f_dependentDob1,#f_dependentDob2').count()===2;
+  const healthShot=path.join(OUT,'state-gt-health-dependents.png');await healthPage.screenshot({path:healthShot,fullPage:true});domainProof.gtHealthScreenshotSha256=sha(healthShot);
+  await healthPage.close();
+
+  const otherPage=await newEvidencePage({width:1440,height:1000});
+  await otherPage.setContent(generatedHtml,{waitUntil:'domcontentloaded'});await settled(otherPage);
+  await otherPage.click('.cc-family[data-family="other"]');
+  await otherPage.click('[data-next="2"]');await otherPage.waitForTimeout(80);
+  await otherPage.click('[data-path="contrato"]');await otherPage.waitForTimeout(60);
+  domainProof.otherDeepContractRoute=await otherPage.locator('#f_tipoContrato,#f_monto,#f_vigencia,#f_prioridad').count()===4;
+  const otherShot=path.join(OUT,'state-other-contract.png');await otherPage.screenshot({path:otherShot,fullPage:true});domainProof.otherContractScreenshotSha256=sha(otherShot);
+  await otherPage.close();
+
+  const statePage=await newEvidencePage({width:1440,height:1000});
+  await statePage.setContent(generatedHtml,{waitUntil:'domcontentloaded'});await settled(statePage);
+  await statePage.click('[data-next="2"]');await statePage.waitForTimeout(60);
+  await statePage.locator('#f_valorAsegurado').fill('37500');await statePage.locator('#f_valorAsegurado').dispatchEvent('change');
+  await statePage.click('[data-next="3"]');await statePage.waitForTimeout(50);
+  await statePage.click('[data-prev="2"]');await statePage.waitForTimeout(60);
+  domainProof.backPreservesCompatibleValue=(await statePage.locator('#f_valorAsegurado').inputValue())==='37500';
+  domainProof.stepperMatchesStage2=await statePage.locator('.cc-step.is-active[data-step="2"]').count()===1;
+  await statePage.close();
+
+  receipt.domainJourneys=domainProof;
 
   fs.writeFileSync(path.join(OUT,'receipt.json'),JSON.stringify(receipt,null,2));
   console.log(JSON.stringify(receipt,null,2));
