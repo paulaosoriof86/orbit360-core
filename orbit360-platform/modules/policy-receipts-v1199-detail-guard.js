@@ -208,11 +208,18 @@ Orbit.modules = Orbit.modules || {};
     }
     return gaps;
   }
+  function humanIssueLabel(value){
+    const raw=safe(value),key=raw.trim().toLowerCase();
+    const labels={requiere_validacion:'Requiere validación',lineage_ediciones_sin_vinculo:'Histórico de vigencias pendiente de vincular',policy_cuotas:'Calendario definido por cuotas de la póliza',ambiguous_fail_closed:'Requiere revisión de fuente'};
+    if(labels[key])return labels[key];
+    const cleaned=raw.replace(/<[^>]*>/g,' ').replace(/&lt;[^&]*?&gt;/g,' ').replace(/[<>]/g,' ').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
+    return cleaned||'Dato pendiente de validar';
+  }
   function qualityBlock(p, vehicle) {
     const pending = [].concat(p.motivosPendientes || p.motivosCalidad || []).filter(Boolean);
     const gaps = policyCompleteness(p, vehicle);
     if (!p.requiereValidacion && !pending.length && !gaps.length) return '<span class="badge ok">Datos principales validados</span>';
-    const labels = pending.concat(gaps).slice(0,8).map(x => esc(String(x).replace(/_/g,' ').toLowerCase()));
+    const labels = pending.concat(gaps).slice(0,8).map(x => esc(humanIssueLabel(x)));
     return `<span class="badge warn">Información pendiente de completar</span>${labels.length ? `<div class="muted" style="font-size:12px;margin-top:7px">${labels.join(' · ')}</div>` : ''}`;
   }
   function receiptPlanDenominator(r) {

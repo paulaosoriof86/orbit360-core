@@ -43,9 +43,11 @@ Orbit.modules = Orbit.modules || {};
     permiso_poliza_denegado: 'Tu rol activo no puede modificar pólizas.', permiso_cobro_denegado: 'Tu rol activo no puede aplicar cobros.',
     reporte_cliente_requiere_validacion: 'Valida primero el pago reportado por el cliente.', poliza_sin_cartera_activa: 'La póliza no tiene cartera activa.',
     pagos_existentes_requieren_endoso: 'La póliza tiene pagos aplicados. Los cambios financieros o de asignación requieren un endoso/gestión controlada.',
-    operacion_incompleta: 'La operación quedó marcada para revisión; no la repitas sin verificar.'
+    operacion_incompleta: 'La operación quedó marcada para revisión; no la repitas sin verificar.',
+    operacion_atomica_no_confirmada: 'No fue posible confirmar el guardado en el servidor. Ningún cambio debe darse por aplicado hasta obtener readback.'
   };
-  function errorText(errors) { return (errors || []).map(x => ERROR_LABELS[String(x).split(':')[0]] || String(x).replace(/_/g, ' ')).join(' · '); }
+  function errorText(errors) { return (errors || []).map(x => ERROR_LABELS[String(x).split(':')[0]] || 'No fue posible confirmar esta operación.').join(' · '); }
+  function protectedPreviewRealPolicy(id){const host=String(location&&location.hostname||'');return /^ays-orbit-360-lab--gi-i65-b4-/i.test(host)&&!/^(?:b3004qa_|b4003qa_)/i.test(String(id||''));}
   async function requestCorrection(client, policyId, action) {
     if (!client) return toast('Cliente no disponible');
     try {
@@ -193,9 +195,9 @@ Orbit.modules = Orbit.modules || {};
     function refreshProducts(preferred) {
       const current = preferred != null ? String(preferred) : String(productEl.value || '');
       const options = subramos(client().pais, ramoEl.value).slice();
-      if (current && !options.includes(current)) options.unshift(current);
-      productEl.innerHTML = options.map(x => `<option>${esc(x)}</option>`).join('');
-      if (current && options.includes(current)) productEl.value = current;
+      const validCurrent=current&&options.includes(current)?current:'';
+      productEl.innerHTML = '<option value="">— Seleccionar producto —</option>'+options.map(x => `<option>${esc(x)}</option>`).join('');
+      productEl.value=validCurrent;
       $('[data-vehicle]').style.display = /auto|veh/i.test(ramoEl.value) ? '' : 'none'; preview();
     }
     function syncInstallments() {
@@ -259,6 +261,7 @@ Orbit.modules = Orbit.modules || {};
       const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
       const err = $('[data-error]'), originalText = save.textContent;
       if (existing && !reason) { err.style.display=''; err.textContent=ERROR_LABELS.motivo_requerido; $('[data-reason]').focus(); return; }
+      if(existing&&protectedPreviewRealPolicy(existing.id)){err.style.display='';err.textContent='Esta Preview protege los registros reales. La persistencia se valida aquí con una póliza sintética equivalente; el cambio real se prueba únicamente en el gate LIVE autorizado.';return;}
       save.disabled = true; save.textContent = 'Guardando…';
       try {
         const result = existing ? await E.updatePolicy(existing.id, payload, { motivo: reason }) : await E.createPolicy(payload, { motivo: reason });

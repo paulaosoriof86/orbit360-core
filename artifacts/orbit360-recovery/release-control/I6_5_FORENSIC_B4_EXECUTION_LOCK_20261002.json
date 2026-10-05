@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-05T11:24:00-06:00",
-  "status": "B4_003_R19_SOURCE_FIX_AUTHORIZED",
+  "status": "B4_003_SOURCE_FIXED_R19_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "R19_SOURCE_FIX_AUTHORIZED",
+    "status": "B4_003_SOURCE_FIXED_R19_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
+    "nextAction": "B4_003_R19_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_R18",
     "knowledgePreview": true
   },
@@ -91,14 +91,14 @@
     "drivePreviewFunctionDeploymentAuthorized": true,
     "drivePreviewProductionFunctionsAuthorized": false
   },
-  "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "7560cfba0fee9f9fc0888e7eff8839066ed9c710"
+    "blobSha": "b053c0b0b54926bc1ada3c5b2789edd280aa8e23"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "6e1c8b292f366e0521b9fcf305053334c5d32fe2"
+    "blobSha": "dd438896cbccc299e203fe3fcd64eb5ef1dbcefe"
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -388,7 +388,7 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "cd60ffe80a9aec8eefb0b102b25c25b5f018b048",
+    "blobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
     "inventoryCount": 191,
     "attentionCount": 86,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
@@ -560,8 +560,8 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "6e1c8b292f366e0521b9fcf305053334c5d32fe2",
-  "continuityRegisterBlobSha": "cd60ffe80a9aec8eefb0b102b25c25b5f018b048",
+  "findingLedgerBlobSha": "dd438896cbccc299e203fe3fcd64eb5ef1dbcefe",
+  "continuityRegisterBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
   "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -588,7 +588,7 @@
     "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
     "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7"
   },
-  "masterPlanBlobSha": "081e4ab25a6ab908c31eb7a9eee8ca7dddf28a3c",
+  "masterPlanBlobSha": "f2c8d4ed75eaa81527cc1923317d0af6741b36a6",
   "r19NoLossFreeze": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_R19_NOLOSS_FREEZE_20261005.json",
     "blobSha": "5277c2a052ea8dcea3bb9e15eb7eb3f6b55e0c5d"
@@ -624,5 +624,14 @@
     "ledgerBlobSha": "6e1c8b292f366e0521b9fcf305053334c5d32fe2",
     "carryBlobSha": "cd60ffe80a9aec8eefb0b102b25c25b5f018b048",
     "masterPlanBlobSha": "081e4ab25a6ab908c31eb7a9eee8ca7dddf28a3c"
+  },
+  "r19SourceFix": {
+    "status": "SOURCE_FIXED_R19_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
+    "receiptBlobSha": "3b3ff4f0792d8e5eb91d8c33fb9106c1ce54fec9",
+    "compositionBlobSha": "b053c0b0b54926bc1ada3c5b2789edd280aa8e23",
+    "ledgerBlobSha": "dd438896cbccc299e203fe3fcd64eb5ef1dbcefe",
+    "carryBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
+    "masterPlanBlobSha": "f2c8d4ed75eaa81527cc1923317d0af6741b36a6"
   }
 }

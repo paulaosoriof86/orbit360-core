@@ -10,9 +10,9 @@
     "activeForensicPlanV2": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activeForensicPlanV2BlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "findingLedger": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "6e1c8b292f366e0521b9fcf305053334c5d32fe2",
+    "findingLedgerBlobSha": "dd438896cbccc299e203fe3fcd64eb5ef1dbcefe",
     "carryRegister": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "carryRegisterBlobSha": "cd60ffe80a9aec8eefb0b102b25c25b5f018b048",
+    "carryRegisterBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
     "compositionLock": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "normativeEvergreen": [
       "Documento Maestro Evergreen V3",
@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "R19_SOURCE_FIX_AUTHORIZED",
-    "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
-    "why": "R18 human rejection and all R19 blocking causes are physically diagnosed; one cumulative successor source fix is authorized without LIVE or data reimport.",
+    "status": "R19_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW",
+    "why": "One cumulative R19 product+QA source fix is sealed; exact Preview machine proof is next.",
     "currentCandidateReview": "R17_REJECTED_NO_MORE_HUMAN_RETEST_UNTIL_R18_MACHINE_PLUS_TINYFISH_PREUAT_PASS",
     "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
     "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
@@ -6379,5 +6379,13 @@
     "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1",
     "ledgerBlobSha": "6e1c8b292f366e0521b9fcf305053334c5d32fe2",
     "carryBlobSha": "cd60ffe80a9aec8eefb0b102b25c25b5f018b048"
+  },
+  "r19SourceFix": {
+    "status": "SOURCE_FIXED_R19_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
+    "receiptBlobSha": "3b3ff4f0792d8e5eb91d8c33fb9106c1ce54fec9",
+    "compositionBlobSha": "b053c0b0b54926bc1ada3c5b2789edd280aa8e23",
+    "ledgerBlobSha": "dd438896cbccc299e203fe3fcd64eb5ef1dbcefe",
+    "carryBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec"
   }
 }

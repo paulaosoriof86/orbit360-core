@@ -58,10 +58,22 @@ Orbit.ciclo = (function () {
     return [...out].sort((a,b)=>a.localeCompare(b));
   }
   function paintSelect(select,values,preferred,blankLabel){
-    if(!select)return;const rows=[...new Set([].concat(values||[]).filter(Boolean))];
-    if(preferred&&!rows.includes(preferred))rows.unshift(preferred);
+    if(!select)return;const rows=[...new Set([].concat(values||[]).map(v=>String(v||'').trim()).filter(Boolean))];
+    const validPreferred=preferred&&rows.includes(String(preferred))?String(preferred):'';
     select.innerHTML=(blankLabel!=null?'<option value="">'+U.esc(blankLabel)+'</option>':'')+rows.map(v=>'<option value="'+U.esc(v)+'">'+U.esc(v)+'</option>').join('');
-    if(preferred&&rows.includes(preferred))select.value=preferred;
+    if(validPreferred)select.value=validPreferred;else if(blankLabel!=null)select.value='';
+  }
+  function checkedInsurerIds(root){
+    return Array.from((root&&root.querySelectorAll?root.querySelectorAll('input[type="checkbox"][data-insurer-id]:checked'):[])||[]).map(x=>String(x.value||'')).filter(Boolean);
+  }
+  function insurerChecklistHtml(rows,selected){
+    const chosen=new Set([].concat(selected||[]).map(String));
+    return '<div class="insurer-multicheck-list">'+[].concat(rows||[]).map(a=>'<label class="insurer-multicheck-option"><input type="checkbox" data-insurer-id value="'+U.esc(a.id)+'" '+(chosen.has(String(a.id))?'checked':'')+'><span>'+U.esc(a.nombre)+'</span></label>').join('')+'</div>';
+  }
+  function collaborationDirection(tipo){
+    if(['Solicitar información al asesor','Devuelto a asesor'].includes(tipo))return 'advisor';
+    if(['Respuesta del asesor','Reenviado a Operaciones'].includes(tipo))return 'operations';
+    return '';
   }
   const COLLAB_TYPES=['Comentario comercial','Observación operativa','Solicitar información al asesor','Respuesta del asesor','Devuelto a asesor','Reenviado a Operaciones','Nota interna'];
   async function assignableAdvisors(country){if(!Orbit.assignableAdvisorRoster?.list)return[];try{return await Orbit.assignableAdvisorRoster.list(country);}catch(e){return[];}}
@@ -310,7 +322,7 @@ Orbit.ciclo = (function () {
               ${fSelect('Producto', 'ng-prod', commercialProducts(n.pais,n.ramo), n.producto || '')}
               ${fSelect('Plan', 'ng-plan', commercialPlans(n.pais,n.ramo,selectedInsurerIds), n.plan || '')}
               ${fSelectCat('Segmento', 'ng-segmento', 'segmentos', n.segmento || '')}
-              <label class="ce-l">Aseguradoras de interés<select id="ng-asg" class="o-sel" multiple size="${Math.min(6,Math.max(3,asgs.length||3))}">${asgs.map(a=>`<option value="${U.esc(a.id)}" ${selectedInsurerIds.includes(a.id)?'selected':''}>${U.esc(a.nombre)}</option>`).join('')}</select><small class="muted" style="display:block;margin-top:4px">Puedes seleccionar varias; solo se muestran aseguradoras del país del negocio.</small></label>
+              <div class="ce-l"><span>Aseguradoras de interés</span><div id="ng-asg" class="insurer-multicheck" data-country-scope="${U.esc(n.pais||'')}">${insurerChecklistHtml(asgs,selectedInsurerIds)}</div><small class="muted" style="display:block;margin-top:4px">Marca una o varias aseguradoras. Solo se muestran las habilitadas para el país del negocio.</small></div>
               ${fSelectOpt('Asesor responsable', 'ng-ase', asesores.map(a => [a.id, a.nombre]), n.asesorId)}
               ${fInput('Prima estimada', 'ng-prima', n.primaEst, 'number')}
               ${fSelectCat('Prioridad', 'ng-prio', 'prioridades', n.prioridad)}
@@ -368,16 +380,16 @@ Orbit.ciclo = (function () {
     const refreshCommercialDependencies=()=>{
       const country=countrySelect.value,ramo=ramoSelect&&ramoSelect.value,priorProduct=productSelect&&productSelect.value,priorPlan=planSelect&&planSelect.value;
       paintSelect(productSelect,commercialProducts(country,ramo),priorProduct,'— Seleccionar producto —');
-      const insurerIds=insurerSelect?[...insurerSelect.selectedOptions].map(o=>o.value):[];
+      const insurerIds=insurerSelect?checkedInsurerIds(insurerSelect):[];
       paintSelect(planSelect,commercialPlans(country,ramo,insurerIds),priorPlan,'— Sin plan específico —');
       if(productSelect)productSelect.dataset.ramoScope=ramo||'';
       if(planSelect)planSelect.dataset.ramoScope=ramo||'';
     };
     const refreshCountryScopedCommercial=async()=>{
       const country=countrySelect.value;
-      const priorInsurers=insurerSelect?[...insurerSelect.selectedOptions].map(o=>o.value):[];
+      const priorInsurers=insurerSelect?checkedInsurerIds(insurerSelect):[];
       asgs=insurersForCountry(country);
-      if(insurerSelect){insurerSelect.innerHTML=asgs.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');priorInsurers.filter(id=>asgs.some(a=>a.id===id)).forEach(id=>{const o=[...insurerSelect.options].find(x=>x.value===id);if(o)o.selected=true;});insurerSelect.dataset.countryScope=country;}
+      if(insurerSelect){const kept=priorInsurers.filter(id=>asgs.some(a=>a.id===id));insurerSelect.innerHTML=insurerChecklistHtml(asgs,kept);insurerSelect.dataset.countryScope=country;}
       const currentAdvisor=advisorSelect&&advisorSelect.value;asesores=await assignableAdvisors(country);if(advisorSelect){advisorSelect.innerHTML=asesores.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');if(asesores.some(a=>a.id===currentAdvisor))advisorSelect.value=currentAdvisor;else if(asesores.length)advisorSelect.value=asesores[0].id;}
       const priorRamo=ramoSelect&&ramoSelect.value,rows=Orbit.cat.ramosDe(country);if(ramoSelect){paintSelect(ramoSelect,rows,rows.includes(priorRamo)?priorRamo:(rows[0]||''),null);}
       refreshCommercialDependencies();
@@ -424,8 +436,9 @@ Orbit.ciclo = (function () {
       const v = back.querySelector('#ng-com-new').value.trim(); if (!v) return;
       const tipo=(back.querySelector('#ng-com-type')||{}).value||'Comentario comercial',actor=(Orbit.session ? Orbit.session.rol() : 'Equipo');
       const prior = (n.comentarios || []).slice(),priorBit=(n.bitacora||[]).slice();
-      n.comentarios = prior.concat([{ ts: stamp(), user: actor, tipo, texto: v }]);
-      n.bitacora=priorBit.concat([{ts:stamp(),user:actor,campo:'Colaboración',de:'',a:tipo,origen:'manual'}]);
+      const direction=collaborationDirection(tipo),eventId='collab_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7),ts=stamp();
+      n.comentarios = prior.concat([{ ts, user: actor, tipo, texto: v, direction, eventId }]);
+      n.bitacora=priorBit.concat([{ts,user:actor,campo:'Colaboración',de:'',a:tipo,origen:'manual',direction,eventId}]);
       comadd.disabled = true;
       try { await S().updateDurable('negocios', id, { comentarios: n.comentarios,bitacora:n.bitacora,actualizado:today() }); openNegocio(id); }
       catch (error) { n.comentarios = prior;n.bitacora=priorBit;comadd.disabled = false; U.toast('No fue posible guardar la colaboración.'); }
@@ -452,7 +465,7 @@ Orbit.ciclo = (function () {
     // save
     back.querySelector('#ng-save').addEventListener('click', async () => {
       const save = back.querySelector('#ng-save'), g = sid => (back.querySelector('#' + sid) || {}).value;
-      const insurerIds=[...((back.querySelector('#ng-asg')||{}).selectedOptions||[])].map(o=>o.value).filter(Boolean);
+      const insurerIds=checkedInsurerIds(back.querySelector('#ng-asg'));
       if (save.disabled) return; save.disabled = true;
       try {
         await S().updateDurable('negocios', id, {
@@ -1004,7 +1017,7 @@ Orbit.ciclo = (function () {
           ${fInput('Prima estimada', 'nn-prima', 0, 'number')}
           ${fSelectOpt('Asesor', 'nn-ase', asesores.map(a => [a.id, a.nombre]), prefill.asesorId||(Orbit.session&&Orbit.session.asesorId?Orbit.session.asesorId()||'':''))}
         </div>
-        <label class="ce-l">Aseguradoras de interés<select id="nn-asg" class="o-sel" multiple size="${Math.min(6,Math.max(3,asgs.length||3))}">${asgs.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('')}</select><small class="muted" style="display:block;margin-top:4px">Solo se muestran aseguradoras del país seleccionado. Puedes elegir varias.</small></label>
+        <div class="ce-l"><span>Aseguradoras de interés</span><div id="nn-asg" class="insurer-multicheck" data-country-scope="${U.esc(initialCountry)}">${insurerChecklistHtml(asgs,[])}</div><small class="muted" style="display:block;margin-top:4px">Marca una o varias aseguradoras. Solo se muestran las habilitadas para el país seleccionado.</small></div>
         ${fSelectOpt('Punto de ingreso', 'nn-ingreso', entryOptions.map(p=>[p.id,p.label]), defaultEntry)}
         <label class="ce-l">Descripción / detalle del riesgo<textarea id="nn-desc" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px"></textarea></label>
       </div>
@@ -1014,14 +1027,14 @@ Orbit.ciclo = (function () {
     const refreshDependencies=()=>{
       const priorProduct=productSelect.value,priorPlan=planSelect.value;
       paintSelect(productSelect,commercialProducts(countrySelect.value,ramoSelect.value),priorProduct,'— Seleccionar producto —');
-      paintSelect(planSelect,commercialPlans(countrySelect.value,ramoSelect.value,[...insurerSelect.selectedOptions].map(o=>o.value)),priorPlan,'— Sin plan específico —');
+      paintSelect(planSelect,commercialPlans(countrySelect.value,ramoSelect.value,checkedInsurerIds(insurerSelect)),priorPlan,'— Sin plan específico —');
     };
     const refreshCountry=async()=>{
       const current=advisorSelect.value||(prefill.asesorId||'');asesores=await assignableAdvisors(countrySelect.value);
       advisorSelect.innerHTML=asesores.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');if(asesores.some(a=>a.id===current))advisorSelect.value=current;else if(asesores.length)advisorSelect.value=asesores[0].id;
       advisorSelect.dataset.assignableAdvisorRoster='server-owned-minimal';advisorSelect.dataset.assignableCount=String(asesores.length);
       const priorRamo=ramoSelect.value,rows=Orbit.cat.ramosDe(countrySelect.value);paintSelect(ramoSelect,rows,rows.includes(priorRamo)?priorRamo:(rows[0]||''),null);
-      asgs=insurersForCountry(countrySelect.value);insurerSelect.innerHTML=asgs.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');insurerSelect.dataset.countryScope=countrySelect.value;
+      asgs=insurersForCountry(countrySelect.value);insurerSelect.innerHTML=insurerChecklistHtml(asgs,[]);insurerSelect.dataset.countryScope=countrySelect.value;
       refreshDependencies();
     };
     countrySelect.addEventListener('change',()=>refreshCountry().catch(()=>U.toast('No fue posible actualizar opciones por país.')));
@@ -1031,7 +1044,7 @@ Orbit.ciclo = (function () {
       const save = back.querySelector('#nn-ok');if(save.disabled)return;
       const v=sid=>(back.querySelector('#'+sid)||{}).value;
       const ingreso=Orbit.cat.puntoIngreso(v('nn-ingreso'));if(!ingreso)return U.toast('Selecciona un punto de ingreso válido.');
-      const ingresoOps=ingreso.origen==='Ops',pais=v('nn-pais'),asesorId=v('nn-ase'),insurerIds=[...insurerSelect.selectedOptions].map(o=>o.value).filter(Boolean);
+      const ingresoOps=ingreso.origen==='Ops',pais=v('nn-pais'),asesorId=v('nn-ase'),insurerIds=checkedInsurerIds(insurerSelect);
       if(!asesorId)return U.toast('Selecciona un asesor responsable.');
       const id='neg'+Date.now().toString().slice(-7),identityId=prefill.commercialIdentityId||id;
       const n={id,commercialIdentityId:identityId,sourceOpportunityId:prefill.sourceOpportunityId||'',nombre:v('nn-nombre')||'Prospecto',tipo:v('nn-tipo'),

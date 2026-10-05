@@ -1,0 +1,74 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-05T22:05:00Z",
+  "status": "SOURCE_FIXED_R19_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceTreeHeadBeforeSeal": "08ef504cac972908c58541f8ba8efde867f3f134",
+  "findingId": "B4-003",
+  "findingCountAfter": 243,
+  "authority": {
+    "causalAuthorizationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
+    "causalAuthorizationBlobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
+  },
+  "fixes": [
+    "Ramo change clears incompatible Producto and Plan instead of silently re-inserting stale values.",
+    "Insurer interest uses explicit checkbox multi-selection without Ctrl/Command and preserves country scope.",
+    "Quality restores search, country/advisor/missing/active filters and mobile-accessible actions; contact medium is not mislabeled as Canal.",
+    "Policy UI humanizes technical validation/error tokens; real records remain protected from Preview writes.",
+    "Renewability persistence is proven only through equivalent synthetic Preview fixtures with server readback/reload; real Preview records stay protected.",
+    "Renewal <=45 universe exposes one explicit disposition per policy.",
+    "Inicio distinguishes terminal unavailable readiness from loading.",
+    "Typed advisor↔operations collaboration carries direction/event identity and is projected to a durable internal recipient inbox.",
+    "Insurer knowledge follows approved hierarchy and technical Registry is secondary/collapsible.",
+    "R19 Playwright/contract harness checks user outcomes rather than element presence."
+  ],
+  "productBlobs": {
+    "orbit360-platform/core/ciclo.js": "ae97f663cfae5155f14456be9610e3d040054772",
+    "orbit360-platform/modules/calidad.js": "9a31c9119f79c535cf2e28b76412bd1643b65c71",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "1b8dceb208b93220ce232037b4d0d394bb022f62",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "20de0a6a4beeb83e8bf696986f5d8482a3972674",
+    "orbit360-platform/modules/renovaciones.js": "3442fbcb9354f81118fc0ae7169d60068c40212a",
+    "orbit360-platform/modules/inicio.js": "273242ecca413906088ed734a185281ee71a1c0e",
+    "functions/product-ops-leads-domain.js": "a939d7e3bebb39eccfdc0ab6085bd909d435bbf7",
+    "functions/ops-advisor-inbox.js": "b6b99ed18afb8cdbcfb5dabac6f58be69795d070",
+    "orbit360-platform/modules/aseguradoras.js": "ba35416a47629eac5b852d867a90a19cb415364b",
+    "orbit360-platform/styles/infra.css": "a7f72e59548cc64aaccbba1db37d8858b7a9db30",
+    "orbit360-platform/index.html": "8cab189db61cfc630da868de7bf34d2e9c34888b"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "3d6af30c790f828a816b7d121b6cce3a04e2c3e9",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "f531033d8aba969646144b9389cbc27b7ad229fc",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "0218c0381ddee972ae78c1ed123517c2828c03f4"
+  },
+  "composition": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "blobSha": "b053c0b0b54926bc1ada3c5b2789edd280aa8e23",
+    "exactSetChanged": false,
+    "productFileCount": 100
+  },
+  "noLoss": {
+    "ledgerBlobSha": "dd438896cbccc299e203fe3fcd64eb5ef1dbcefe",
+    "carryBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
+    "exactFindingCount": 243,
+    "findingsDeleted": 0
+  },
+  "boundaries": {
+    "productMutationClosedAfterThisReceipt": true,
+    "businessWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "syntheticQaWritesAuthorizedForExactPreview": true,
+    "b4004Held": true
+  },
+  "qa": {
+    "status": "PENDING_R19_CONTRACT_AND_EXACT_PREVIEW",
+    "tinyFish": "AUTH_STATE_NOT_REUSED_NONBLOCKING",
+    "authenticatedPreUatOwner": "GitHub Playwright B4-003 R19 harness"
+  },
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "B4_003_R19_CONTRACT_AND_EXACT_PREVIEW"
+}

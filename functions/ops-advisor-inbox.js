@@ -5,7 +5,7 @@ const { getFirestore } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
-const VERSION = 'orbit360-ops-advisor-inbox-v2-notification-delivery-visibility';
+const VERSION = 'orbit360-ops-advisor-inbox-v3-typed-collaboration-notices';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 
@@ -62,7 +62,7 @@ async function authorize(request) {
   const scope = scopeOf(member);
   if (scope === 'none') throw new HttpsError('permission-denied', 'El alcance de Ops está deshabilitado.');
   if (scope === 'own' && !advisorId) throw new HttpsError('failed-precondition', 'La membresía no está vinculada a un asesor.');
-  return { tenantId, member, advisorId, scope };
+  return { tenantId, member, advisorId, scope, roles: rolesOf(member) };
 }
 async function storageMode(tenantId) {
   const snap = await configRef(tenantId).get();
@@ -117,7 +117,7 @@ async function inbox(request) {
   const managements = managementRows.filter(row => visible(row, authz)).map(row => project(row, 'management'));
   const businesses = businessRows.filter(row => visible(row, authz)).map(row => project(row, 'business'));
   const allowed = new Set(allowedAdvisorIds(authz));
-  const notices = noticesSnap.docs.map(doc => Object.assign({ id: doc.id }, doc.data())).filter(row => {
+  const outboxNotices = noticesSnap.docs.map(doc => Object.assign({ id: doc.id }, doc.data())).filter(row => {
     if (authz.scope === 'all') return true;
     return [].concat(row.targets || []).some(target => target && target.type === 'advisor' && allowed.has(text(target.id, 180)));
   }).map(row => ({
@@ -136,7 +136,18 @@ async function inbox(request) {
     channelStates: row.channelStates && typeof row.channelStates === 'object' ? row.channelStates : {},
     externalChannelsPendingConnection: unique(row.externalChannelsPendingConnection || []),
     createdAt: row.createdAt || null
-  }));
+  });
+  const isOpsRole=authz.roles.some(role=>/operativo|admin|direccion|superadmin|super admin/.test(role));
+  const collaborationNotices=[];
+  businessRows.forEach(row=>{
+    [].concat(row&&row.comentarios||[]).forEach((comment,index)=>{
+      const direction=text(comment&&comment.direction,40);if(!['advisor','operations'].includes(direction))return;
+      const advisorTarget=text(row.asesorId,180),visibleToRecipient=direction==='advisor'?(authz.scope==='all'||allowed.has(advisorTarget)):(authz.scope==='all'||isOpsRole);
+      if(!visibleToRecipient)return;
+      collaborationNotices.push({id:text(comment.eventId||('collab_'+row.id+'_'+index),180),entityType:'negocios',entityId:text(row.id,180),operation:'typed_collaboration',status:'internal_committed',title:text(comment.tipo||'Colaboración comercial-operativa',240),message:text(comment.texto||comment.txt,1200),attemptCount:0,retryEligible:false,lastError:'',nextAttemptAt:null,processedAt:null,channelStates:{internal:'committed'},externalChannelsPendingConnection:[],createdAt:comment.ts||row.updatedAt||row.actualizado||null,direction});
+    });
+  });
+  const notices=outboxNotices.concat(collaborationNotices).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||''))).slice(0,limit);
   const noticeStatusCounts = {};
   notices.forEach(row => { const key = row.status || '(blank)'; noticeStatusCounts[key] = (noticeStatusCounts[key] || 0) + 1; });
   return {
@@ -156,4 +167,5 @@ async function inbox(request) {
 
 exports.orbit360GetAdvisorOpsInbox = onCall({ region: REGION, cors: true }, inbox);
 exports.orbit360GetAdvisorOpsInboxLabV20260804 = onCall({ region: REGION, cors: true }, inbox);
+exports.orbit360GetAdvisorOpsInboxPreview = onCall({ region: 'us-east1', cors: true }, inbox);
 exports.__opsAdvisorInbox = Object.freeze({ VERSION });

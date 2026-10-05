@@ -936,3 +936,26 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
   [data-source-registry-row]{max-width:100%;min-width:0}
   .asg-sec{min-width:0;max-width:100%;overflow-wrap:anywhere}
 }
+
+
+/* B4-003 R19 human-outcome responsive remediation */
+.insurer-multicheck{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:8px;max-height:190px;overflow:auto}
+.insurer-multicheck-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px}
+.insurer-multicheck-option{display:flex;align-items:center;gap:8px;padding:8px 9px;border:1px solid var(--line-2);border-radius:8px;cursor:pointer;min-width:0}
+.insurer-multicheck-option input{accent-color:var(--red);flex:0 0 auto}.insurer-multicheck-option span{overflow-wrap:anywhere}
+.quality-main-scroll{overflow-x:auto;scrollbar-gutter:stable;scrollbar-width:auto}.quality-main-scroll::-webkit-scrollbar{height:12px}.quality-main-scroll::-webkit-scrollbar-thumb{background:var(--ink-3);border-radius:20px}
+.quality-actions{text-align:right;white-space:normal;min-width:220px}.quality-search{min-width:min(360px,100%);flex:1}
+.crm-filter-search{display:flex!important;min-height:44px!important;border:1px solid var(--line)!important;background:var(--card)!important;position:relative;z-index:2}
+.insurer-technical-registry{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:10px 12px}.insurer-technical-registry>summary{cursor:pointer;font-weight:700}
+.insurer-knowledge-section{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.insurer-activity-row{position:relative;padding-left:18px!important}.insurer-activity-row:before{content:'';position:absolute;left:2px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--red)}
+@media(max-width:760px){
+ .insurer-multicheck-list{grid-template-columns:1fr}.quality-toolbar>*{width:100%;max-width:none!important}.quality-search{min-width:100%}
+ .quality-main-scroll{overflow:visible}.quality-main-table,.quality-main-table tbody{display:block;width:100%}.quality-main-table thead{display:none}
+ .quality-main-table tr{display:grid!important;gap:8px;margin:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+ .quality-main-table td{display:grid!important;grid-template-columns:minmax(105px,.75fr) minmax(0,1.25fr);gap:9px;align-items:start;padding:4px 0!important;border:0!important;white-space:normal!important;min-width:0!important}
+ .quality-main-table td:before{content:attr(data-label);font-weight:700;color:var(--ink-3);font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+ .quality-main-table .quality-actions{display:flex!important;grid-template-columns:1fr!important;flex-wrap:wrap;min-width:0}.quality-main-table .quality-actions:before{width:100%}
+ .crm-filter-search{width:100%!important;max-width:none!important;margin:0 0 8px!important;position:sticky;top:0}
+ .renewal-disposition-detail [data-renewal-disposition-policy]{grid-template-columns:1fr!important}
+}

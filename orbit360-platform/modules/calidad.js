@@ -10,9 +10,11 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.calidad = (function () {
   'use strict';
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store, A = Orbit.access || {};
-  let st = { ffalta: '', soloVig: false, asesor: '', page: 1, pageSize: 50 };
+  let st = { q: '', pais: '', ffalta: '', soloVig: false, asesor: '', page: 1, pageSize: 50 };
+  let searchTimer = null;
 
   function clean(v) { return String(v == null ? '' : v).trim(); }
+  function fold(v){return clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
   function countryCode(v) { return clean(v).toUpperCase(); }
   function activeCountry() { const p=countryCode(Orbit.pais); return p && p!=='TODOS' ? p : ''; }
   function validCountry(v) { return ['GT', 'CO'].includes(clean(v).toUpperCase()); }
@@ -118,8 +120,15 @@ Orbit.modules.calidad = (function () {
     const conVig = all.filter(x => x.vig);
     const advisors = advisorOptions(clients);
     if (st.asesor && !advisors.some(a => a.id === st.asesor)) st.asesor = '';
-    const rows = all.filter(x => (!st.soloVig || x.vig) && (!st.ffalta || x.f.some(f => f.k === st.ffalta)) && (!st.asesor || x.c.asesorId === st.asesor))
-      .sort((a,b) => (b.vig - a.vig) || (Math.min(...a.f.map(f => f.pri)) - Math.min(...b.f.map(f => f.pri))));
+    const query=fold(st.q);
+    const rows = all.filter(x => {
+      if(st.soloVig&&!x.vig)return false;
+      if(st.ffalta&&!x.f.some(f=>f.k===st.ffalta))return false;
+      if(st.asesor&&x.c.asesorId!==st.asesor)return false;
+      if(st.pais&&countryCode(x.c.pais)!==st.pais)return false;
+      if(query){const hay=fold([x.c.nombre,x.c.identificacion,x.c.documento,x.c.nit,x.c.dpi,x.c.email,x.c.telefono,x.c.whatsapp,x.c.ciudad,x.c.departamento,x.f.map(f=>f.label).join(' ')].join(' '));if(!hay.includes(query))return false;}
+      return true;
+    }).sort((a,b) => (b.vig - a.vig) || (Math.min(...a.f.map(f => f.pri)) - Math.min(...b.f.map(f => f.pri))));
     const pendingCountry = all.filter(x => x.f.some(f => f.k === 'pais')).length;
     const suggestedCountry = all.filter(x => x.f.some(f => f.k === 'pais') && x.evidence && x.evidence.suggestedCountry && !x.evidence.conflict).length;
     const sinContacto = all.filter(x => x.f.some(f => f.k === 'telefono')).length;
@@ -144,7 +153,9 @@ Orbit.modules.calidad = (function () {
       ])}
       ${financialHealthHtml(financialIssues, clientsById)}
       <div class="card" data-quality-table-grammar="canonical" style="overflow:hidden">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;padding:13px 14px;border-bottom:1px solid var(--line);align-items:center">
+        <div class="quality-toolbar" style="display:flex;gap:10px;flex-wrap:wrap;padding:13px 14px;border-bottom:1px solid var(--line);align-items:center">
+          <div class="tb-search quality-search" data-quality-search="1"><span>⌕</span><input id="q-search" value="${U.esc(st.q)}" placeholder="Buscar cliente, documento, correo o teléfono" autocomplete="off"></div>
+          <select id="q-pais" class="o-sel"><option value="">Todos los países</option><option value="GT" ${st.pais==='GT'?'selected':''}>Guatemala</option><option value="CO" ${st.pais==='CO'?'selected':''}>Colombia</option></select>
           <label style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="q-vig" ${st.soloVig ? 'checked' : ''} style="accent-color:var(--red)"> Solo con póliza vigente</label>
           <select id="q-falta" class="o-sel"><option value="">Falta cualquier dato</option>${[
             ['pais','País por validar'],['moneda','Moneda por validar'],['telefono','Sin teléfono / WhatsApp'],['email','Sin correo'],['identificacion','Sin documento'],
@@ -153,22 +164,24 @@ Orbit.modules.calidad = (function () {
           ${advisors.length > 1 && !ownScope ? `<select id="q-asesor" class="o-sel"><option value="">Todos los asesores</option>${advisors.map(a => `<option value="${U.esc(a.id)}" ${st.asesor === a.id ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select>` : ''}
           <span class="muted" style="margin-left:auto;font-size:12.5px">${rows.length} clientes${rows.length ? ' · mostrando ' + (pageStart + 1) + '–' + pageEnd : ''}</span>
         </div>
-        <div style="overflow-x:auto" data-quality-paged="true"><table class="tbl"><thead><tr><th>Cliente</th><th>Asesor</th><th>Faltan</th><th>País actual</th><th>Origen / evidencia</th><th>Vigente</th><th>Canal</th><th></th></tr></thead>
+        <div class="quality-main-scroll" data-quality-scroll="1" data-quality-paged="true"><table class="tbl quality-main-table"><thead><tr><th>Cliente</th><th>Asesor</th><th>Faltan</th><th>País actual</th><th>Origen / evidencia</th><th>Vigente</th><th>Medio de contacto</th><th>Acciones</th></tr></thead>
           <tbody>${visibleRows.map(({ c, f, vig, evidence }) => {
             const phone = clean(c.whatsapp || c.telefono), wa = phone.replace(/[^0-9]/g, '');
-            const canal = phone ? '<span class="badge ok">💬 WhatsApp</span>' : c.email ? '<span class="badge info">✉ Correo</span>' : '<span class="badge danger">Sin contacto</span>';
+            const contacto = phone ? '<span class="badge ok">💬 WhatsApp disponible</span>' : c.email ? '<span class="badge info">✉ Correo disponible</span>' : '<span class="badge danger">Sin medio de contacto</span>';
             const faltaTxt = f.sort((a,b) => a.pri - b.pri).map(x => `<span class="badge ${x.pri <= 2 ? 'danger' : x.pri <= 6 ? 'warn' : 'neutral'}">${x.label}</span>`).join(' ');
             const countryTxt=validCountry(c.pais)?'<span class="badge ok">'+U.esc(countryLabel(countryCode(c.pais)))+'</span>':'<span class="badge danger">Por validar</span>'; const provenance=c.calidad&&c.calidad.paisProvenance; const evidenceTxt=provenance&&provenance.mode?'<span class="badge ok">'+U.esc(provenance.mode==='USER_CONFIRMED'?'Confirmado por usuario':provenance.mode)+'</span>':evidence&&evidence.conflict?'<span class="badge danger">Conflicto · revisar</span>':evidence&&evidence.suggestedCountry?`<span class="badge info">Evidencia sugiere ${countryLabel(evidence.suggestedCountry)} · ${evidence.sources.length} fuente(s)</span>`:'<span class="muted">Sin origen/evidencia registrada</span>'; const provenanceAction=!provenance?.mode&&validCountry(c.pais)?`<button class="btn ghost sm" style="margin-top:5px" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}',{focus:'pais',forceProvenance:true})">Documentar origen</button>`:'';
             const accion = phone ? `<a class="btn ghost sm" style="color:#1f8a4c" href="https://wa.me/${wa}?text=${encodeURIComponent('Hola ' + clean(c.nombre).split(' ')[0] + ', para mantener tu información al día necesitamos actualizar algunos datos. ¿Nos ayudás?')}" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 Preparar WA</a>`
               : c.email ? `<button class="btn ghost sm" onclick="event.stopPropagation();window.__orbitCompose={para:'${U.esc(c.email)}',asunto:'Actualización de datos · ${U.esc(c.nombre)}',cuerpo:'',clienteId:'${c.id}',vinculo:{tipo:'cliente',id:'${c.id}',label:'${U.esc(c.nombre)}'}};location.hash='#/correo'">✉ Preparar correo</button>`
               : `<button class="btn ghost sm" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}',{focus:'telefono'})">Agregar/corregir teléfono / WhatsApp</button>`;
-            return `<tr class="clickable" data-quality-country="${U.esc(countryCode(c.pais))}" onclick="location.hash='#/cliente360?c=${c.id}&t=resumen'"><td>${financialClientCell(c,c.id)}</td><td>${K.asesorCell(c.asesorId)}</td><td>${faltaTxt}</td><td>${countryTxt}</td><td>${evidenceTxt}${provenanceAction}</td><td>${vig ? '<span class="badge ok">Sí</span>' : '<span class="muted">Pendiente de pólizas / sin vigente</span>'}</td><td>${canal}</td><td style="text-align:right;white-space:nowrap"><button class="btn primary sm" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}',{focus:'${f[0] && f[0].k || ''}'})">✏ Completar</button> ${accion}</td></tr>`;
+            return `<tr class="clickable" data-quality-country="${U.esc(countryCode(c.pais))}" onclick="location.hash='#/cliente360?c=${c.id}&t=resumen'"><td data-label="Cliente">${financialClientCell(c,c.id)}</td><td data-label="Asesor">${K.asesorCell(c.asesorId)}</td><td data-label="Faltan">${faltaTxt}</td><td data-label="País">${countryTxt}</td><td data-label="Origen / evidencia">${evidenceTxt}${provenanceAction}</td><td data-label="Vigente">${vig ? '<span class="badge ok">Sí</span>' : '<span class="muted">Pendiente de pólizas / sin vigente</span>'}</td><td data-label="Medio de contacto">${contacto}</td><td data-label="Acciones" class="quality-actions"><button class="btn primary sm" onclick="event.stopPropagation();Orbit.modules.calidad.editarInline('${c.id}',{focus:'${f[0] && f[0].k || ''}'})">✏ Completar</button> ${accion}</td></tr>`;
           }).join('') || `<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">No hay expedientes incompletos con los filtros actuales.</td></tr>`}</tbody></table></div>
         ${rows.length > pageSize ? `<div data-quality-pagination="true" style="display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid var(--line)"><button class="btn ghost sm" id="q-page-prev" ${st.page<=1?'disabled':''}>← Anterior</button><span class="muted" style="font-size:12px">Página ${st.page} de ${pageCount}</span><button class="btn ghost sm" id="q-page-next" ${st.page>=pageCount?'disabled':''}>Siguiente →</button></div>` : ''}
       </div>
       <div class="cfg-note" style="margin-top:14px">Prioridad: país/moneda › contacto › correo/documento › ubicación › datos complementarios. Completar vacíos no permite reasignar, fusionar, borrar ni modificar pólizas o cobros.</div>
     </div>`;
 
+    const search=document.getElementById('q-search'); if(search)search.addEventListener('input',e=>{st.q=e.target.value;st.page=1;clearTimeout(searchTimer);searchTimer=setTimeout(()=>render(host),160);});
+    const pais=document.getElementById('q-pais'); if(pais)pais.addEventListener('change',e=>{st.pais=e.target.value;st.page=1;render(host);});
     const vig = document.getElementById('q-vig'); if (vig) vig.addEventListener('change', e => { st.soloVig = e.target.checked; st.page=1; render(host); });
     const falta = document.getElementById('q-falta'); if (falta) falta.addEventListener('change', e => { st.ffalta = e.target.value; st.page=1; render(host); });
     const advisor = document.getElementById('q-asesor'); if (advisor) advisor.addEventListener('change', e => { st.asesor = e.target.value; st.page=1; render(host); });

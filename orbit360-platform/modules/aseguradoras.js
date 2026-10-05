@@ -899,7 +899,7 @@ Orbit.modules.aseguradoras = (function () {
       }
       return clean(v).replace(/_/g,' ');
     };
-    return '<div class="asg-sec-t" style="margin-top:14px">📚 Registry canónica de fuentes · Biblioteca y Drive</div><div style="display:grid;gap:7px">'+rows.map(r=>{
+    return '<details class="insurer-technical-registry" data-technical-registry="1" style="margin-top:14px"><summary>🧾 Registry técnico y provenance · '+rows.length+' fuente(s)</summary><div class="muted" style="font-size:11.5px;margin:6px 0 10px">Detalle técnico secundario: clasificación, ubicación, provenance, versión, vigencia y huella.</div><div style="display:grid;gap:7px">'+rows.map(r=>{
       const status=r.validationStatus||r.estado||'Documento recibido',dims=[r.pais,r.moneda,r.ramo,r.producto,r.plan].filter(Boolean);
       const provenance=human(r.provenance||r.sourceOrigin||r.origen||r.fuenteOrigen);
       const version=clean(r.version||r.sourceVersion||r.versión),validity=clean(r.vigencia||r.validFrom||r.fechaVigencia);
@@ -916,14 +916,14 @@ Orbit.modules.aseguradoras = (function () {
         ['Huella',hash||'No registrada']
       ];
       return '<details class="asg-row insurer-source-card" data-source-registry-row="'+U.esc(r.id||'')+'" style="display:block;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0;overflow:hidden"><summary style="cursor:pointer;list-style:none;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>'+U.esc(r.nombre||'Fuente')+'</b><small class="muted" style="display:block">'+U.esc((r.taxonomyLabel||r.cat||'Otro/requiere clasificación')+' · '+label(r.storageKind)+' · '+(dims.join(' · ')||'Dimensiones pendientes'))+'</small></span><span class="badge '+(/validado/i.test(status)?'ok':'neutral')+'">'+U.esc(status)+'</span><span class="muted" style="font-size:11px">Ver detalles ▾</span></summary><div class="insurer-source-detail" data-source-registry-detail="'+U.esc(r.id||'')+'" style="border-top:1px solid var(--line);padding:10px 12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">'+extra.map(([k,v])=>'<div><small class="muted">'+U.esc(k)+'</small><div style="font-size:12px;overflow-wrap:anywhere">'+U.esc(human(v))+'</div></div>').join('')+( /^https:\/\/[^\s]+$/i.test(url)?'<div style="grid-column:1/-1"><a class="btn ghost sm" href="'+U.esc(url)+'" target="_blank" rel="noopener">Abrir fuente</a></div>':'')+'</div></details>';
-    }).join('')+'</div>';
+    }).join('')+'</div></details>';
   }
 
   /* ---- Documentos y Drive ---- */
   const CATS_DOC=Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels():['Otro/requiere clasificación'];
   function tabDocumentos(a, editing) {
     const docs = a.docs || [];
-    return `<div class="asg-sec">
+    return `<div class="asg-sec insurer-knowledge-section" data-knowledge-order="5-documents">
       <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Documentos y Drive ${editing ? '<button class="btn ghost sm" id="af-add-doc">+ Documento</button>' : ''}</div>
       <div class="cfg-note" style="margin-bottom:9px"><b>Registro canónico de fuentes:</b> distingue conocimiento de Biblioteca, archivo físico Drive o ambos; conserva metadata, ubicación, hash, provenance y validación. Registrar una fuente no habilita cálculos automáticamente.</div>
       <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="cfg-note" data-drive-empty="1"><b>Sin archivos físicos cargados en Drive desde esta ficha.</b> Las fuentes de Biblioteca/conocimiento relacionadas se muestran abajo por separado.</div>'}</div>
@@ -956,17 +956,18 @@ Orbit.modules.aseguradoras = (function () {
     const id = a.id;
     tarifaRamoSel[id] = tarifaRamoSel[id] || ramos[0] || '';
     const ramoSel = tarifaRamoSel[id];
-    return `<div class="asg-sec">
-      <div class="asg-sec-t insurer-knowledge-title">🧠 Tarifas y conocimiento</div>
+    return `<div class="asg-sec insurer-knowledge-section" data-knowledge-order="1-summary">
+      <div class="asg-sec-t insurer-knowledge-title">🧠 Resumen del conocimiento de la aseguradora</div>
       <div class="cfg-note insurer-knowledge-intro" style="margin-bottom:9px"><b>Jerarquía:</b> una fuente puede estar <b>Mapeada</b> (clasificada), <b>Validada</b> (evidencia revisada) y, por separado, <b>Habilitada</b> para un cálculo concreto. <b>Registrar o validar un documento nunca habilita automáticamente</b> Cotizador/Comparativo.</div>
-      <div class="asg-tarifas-est">${Object.keys(resumen).filter(k => resumen[k] > 0).map(k => `<span class="badge ${k.indexOf('incompleto') >= 0 ? 'danger' : k.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10.5px">${k} (${resumen[k]})</span>`).join('') || '<span class="muted" style="font-size:12px">Sin fuentes cargadas todavía.</span>'}</div>
-      <div class="asg-sec-t" style="margin-top:14px">Cobertura y estado por producto</div>
+      <div class="asg-tarifas-est" data-knowledge-order="3-sources">${Object.keys(resumen).filter(k => resumen[k] > 0).map(k => `<span class="badge ${k.indexOf('incompleto') >= 0 ? 'danger' : k.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10.5px">${k} (${resumen[k]})</span>`).join('') || '<span class="muted" style="font-size:12px">Sin fuentes cargadas todavía.</span>'}</div>
+      <div class="asg-sec-t" style="margin-top:14px" data-knowledge-order="2-products">Productos y ramos cubiertos</div>
       <div style="margin-top:8px;display:grid;gap:8px" data-knowledge-product-groups="1">
         ${grupos.map(g => `<div class="asg-row insurer-knowledge-card" style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px"><span style="flex:1;font-size:12px"><b>${U.esc(g.label)}</b><small class="muted" style="display:block;margin-top:3px">${g.docs.length} fuente(s) relacionadas</small></span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}" style="font-size:10px">${g.estado}</span></div>`).join('') || '<div class="muted">Sin combinaciones de producto con fuente relacionada.</div>'}
       </div>
       ${extraKnowledgeHtml(a)}
       ${knowledgeFactsHtml(a)}
       ${knowledgeRoadmapHtml(a)}
+      <div class="asg-sec-t" style="margin-top:16px" data-knowledge-order="4-tariffs">Tarifas y condiciones derivadas</div>
       ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc2" style="margin-top:12px">📊 Cargar tarifario / Excel de cotizador</button>' : ''}
       ${ramos.length ? tablaTasasRamo(a, ramoSel, editing) : '<div class="cfg-note" style="margin-top:12px">Agregá al menos un ramo en la pestaña Productos y planes para configurar su tabla de tasas automáticas.</div>'}
     </div>`;
@@ -1017,8 +1018,8 @@ Orbit.modules.aseguradoras = (function () {
       return {kind:'fuente',cambio:'Fuente · '+status,responsable:r.actor||r.responsable||'Registry',fecha,motivo:r.nombre||r.documentId||r.id||'Fuente documental',camposCambiados:[r.taxonomyLabel||r.cat||'clasificación',r.storageKind||'ubicación'].filter(Boolean)};
     });
     const rows=hist.concat(sourceEvents).sort((x,y)=>String(y.fecha||'').localeCompare(String(x.fecha||'')));
-    return `<div class="asg-sec">
-      <div class="asg-sec-t">🕒 Actividad</div>
+    return `<div class="asg-sec insurer-knowledge-section" data-knowledge-order="7-activity">
+      <div class="asg-sec-t">🕒 Actividad y auditoría</div>
       <div class="cfg-note" style="margin-bottom:9px"><b>Historia unificada:</b> combina cambios guardados en la ficha y el ciclo documental visible del Registry. Consultar una fuente no genera actividad; cargar, mapear o validar sí debe quedar trazable.</div>
       ${rows.length ? rows.map(h => `<div class="insurer-activity-row ${h.kind==='fuente'?'documental':''}" style="font-size:12px;padding:9px 0;border-bottom:1px dashed var(--line-2)"><b>${U.esc(h.cambio || 'Actualización')}</b> · ${U.esc(h.responsable || 'equipo')} · <span class="muted">${h.fecha ? new Date(h.fecha).toLocaleString() : 'fecha no registrada'}</span>${h.motivo ? '<div class="muted">Referencia: ' + U.esc(h.motivo) + '</div>' : ''}${h.camposCambiados ? '<div class="muted">Ámbito: ' + h.camposCambiados.map(U.esc).join(' · ') + '</div>' : ''}</div>`).join('') : '<div class="muted" style="font-size:12px">Sin actividad registrada.</div>'}
     </div>`;
