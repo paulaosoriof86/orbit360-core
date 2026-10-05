@@ -7059,7 +7059,7 @@
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "guardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
     "masterPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "masterPlanBlobSha": "74711252c2ac1dae6126857968565d88cc294db7",
+    "masterPlanBlobSha": "7b1d5f7f8a6e145f0d36dbc89f637c103e06cde9",
     "inventoryCount": 210,
     "attentionCount": 103,
     "rule": "Ledger/register sets must remain equal. The 208 finding IDs frozen by the R16 master plan are a permanent no-loss baseline; new findings must be appended before the next build. PASS items remain preserved unless causally invalidated.",
@@ -7077,10 +7077,10 @@
   "pendingClosureMasterPlan": {
     "status": "FROZEN_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "blobSha": "74711252c2ac1dae6126857968565d88cc294db7",
+    "blobSha": "7b1d5f7f8a6e145f0d36dbc89f637c103e06cde9",
     "baselineFindingCount": 208,
     "currentGate": "B4-003",
-    "currentRevision": "R16",
+    "currentRevision": "R17",
     "b4004Held": true,
     "extendsPlanV2": true,
     "conversationDependent": false
@@ -7238,6 +7238,8 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false,
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "receiptBlobSha": "039524619c230bfa7ac84af31332db26282675db",
+    "masterPlanBlobSha": "7b1d5f7f8a6e145f0d36dbc89f637c103e06cde9"
   }
 }
