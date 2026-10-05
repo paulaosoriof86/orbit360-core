@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ays-cotcomp-s497-forensic-visual-lock-v1.1",
-  "status": "FORENSIC_RECOVERY_ANCHOR_IDENTIFIED_OWNER_DELTAS_RECONCILED_IMPLEMENTATION_HOLD",
+  "status": "FORENSIC_RECOVERY_ANCHOR_IDENTIFIED_OWNER_DELTAS_RECONCILED_OWNER_REVIEW_CANDIDATE_ALLOWED",
   "anchor": {
     "artifact": "OWNER_REVIEW_COTCOMP_S4_10_STANDALONE.html",
     "sha256": "a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d",
@@ -151,12 +151,15 @@
     "providerDeploymentAuthorized": false,
     "cotcompRealTransportAuthorized": false,
     "production": false,
-    "newOwnerReviewCandidateAllowed": false,
+    "newOwnerReviewCandidateAllowed": true,
     "requiredBeforeCandidate": [
       "asset_map_frozen",
       "golden_reference_pack_registered",
       "screenshot_regression_gate_ready",
       "clean_parent_without_legacy_override_stack"
-    ]
+    ],
+    "internalManualVisualAuditPassed": true,
+    "visualEvidenceRunId": 37251478643,
+    "contractGateRunId": 37251478642
   }
 }
