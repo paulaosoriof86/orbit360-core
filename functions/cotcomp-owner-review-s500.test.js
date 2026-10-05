@@ -25,6 +25,7 @@ test('S5.00 removes owner-visible technical LAB/source-only copy called out by O
   assert.ok(!h.includes('catálogo vehicular LAB'));
   assert.ok(!h.includes('plantilla visual source-only'));
   assert.ok(!h.includes('SOURCE-ONLY LAB · No constituye'));
+  assert.ok(!h.includes('class="cc-lab"'));
   assert.ok(h.includes('En uso real, aquí aparecerán únicamente las alternativas validadas para tu caso.'));
 });
 
@@ -41,6 +42,8 @@ test('S5.00 fixes vehicle combobox close behavior',()=>{
   assert.match(h,/Robust close after a vehicle brand\/model option is selected/);
   assert.match(h,/querySelectorAll\('\.cc-combo-list'\)/);
   assert.match(h,/aria-expanded','false'/);
+  assert.ok(!h.includes('await loadModels();renderModels();modelInput.focus();'));
+  assert.ok(h.includes('await loadModels();close(brandList,brandInput);close(modelList,modelInput);'));
 });
 
 test('S5.00 final continuity produces a terminal state instead of looping to same CTA',()=>{
