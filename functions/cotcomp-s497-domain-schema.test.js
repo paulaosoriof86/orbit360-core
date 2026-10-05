@@ -42,7 +42,8 @@ test('Other preserves orientation plus contract/project and policy-review deeper
 });
 
 test('comparison stays fail-closed when two validated alternatives do not exist',()=>{
-  assert.equal(D.comparison('gt','auto').comparable,true);
+  assert.equal(D.comparison('gt','auto').comparable,false);
+  assert.equal(D.comparison('gt','auto').visualComparable,true);
   assert.equal(D.comparison('gt','salud').comparable,false);
   for(const [country,product] of [['co','auto'],['gt','hogar'],['gt','vida'],['gt','empresa'],['gt','transporte'],['co','transporte'],['gt','contrato'],['gt','revision'],['gt','duda']]){
     const c=D.comparison(country,product);
@@ -68,6 +69,9 @@ test('Home stays consultative until operational provider binding exists',()=>{
 test('Source-only visual comparison fixture carries no invented monetary values',()=>{
   const c=D.comparison('gt','auto');
   assert.equal(c.visualFixture,true);
+  assert.equal(c.visualComparable,true);
+  assert.equal(c.comparable,false);
+  assert.equal(c.validated.length,0);
   assert.equal(c.reason,'SOURCE_ONLY_VISUAL_FIXTURE_NOT_REAL_PROPOSALS');
   assert.equal(c.quotes.length,2);
   for(const q of c.quotes){
