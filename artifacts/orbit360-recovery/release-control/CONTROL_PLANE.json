@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R18_TINYFISH_AUTHENTICATED_READBACK_REQUIRED",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R18_AUTHENTICATED_HARNESS_READBACK",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4863,13 +4863,13 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "B4_003_R18_AUTHENTICATED_READONLY_DIAGNOSTIC",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
-      "executionLockBlobSha": "3fa797d74d4397e38a7e97cdad2faa798f9c78aa",
+      "executionLockBlobSha": "1e36f2f51e0f6ecb4ff3af9e5dc4df313083755c",
       "compositionLockBlobSha": "baf0fe4551ff2be6ded68504b73506b28dacc17f",
       "findingLedgerBlobSha": "ffa1f7b937ffcc616b0af02e44513adcc445c9aa",
       "activeFindingId": "B4-003",
@@ -4880,7 +4880,7 @@
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "R18_AUTHENTICATED_HARNESS_READBACK",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
       "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
@@ -6051,15 +6051,15 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_PAULA_VISUAL_REJECTED_R17_R18_FORENSIC_ACTIVE",
+    "status": "B4_003_R18_AUTHENTICATED_READONLY_DIAGNOSTIC",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "3fa797d74d4397e38a7e97cdad2faa798f9c78aa",
+    "executionLockBlobSha": "1e36f2f51e0f6ecb4ff3af9e5dc4df313083755c",
     "compositionLockBlobSha": "baf0fe4551ff2be6ded68504b73506b28dacc17f",
     "findingLedgerBlobSha": "ffa1f7b937ffcc616b0af02e44513adcc445c9aa",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "R18_TINYFISH_AUTHENTICATED_READBACK_THEN_SINGLE_CUMULATIVE_SOURCE_FIX",
+    "nextAction": "R18_AUTHENTICATED_HARNESS_READBACK",
     "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -6988,12 +6988,12 @@
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "46ab8e219ab93e7251036720ce6435cc3d0b50c5"
     },
-    "sourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
-    "buildId": "gi-i65-b4-7dc809340f95-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37228202621-s43jo3pb.web.app",
-    "runId": 37228202621,
-    "artifactId": 11313241549,
-    "artifactDigest": "0b05b2d8c4ed5dc3cb01ace386cdb20c3fdc755873f2388c0d206b721017b2e7",
+    "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
+    "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37248154086-11dxqgq2.web.app",
+    "runId": 37248154086,
+    "artifactId": 11319524354,
+    "artifactDigest": "21607653bcabbf8c6994c28d46569055cf0b0a4f4972f0eb5774b228d958915b",
     "exactReadback": true,
     "compositionBlobSha": "de82446f4924f6b688ac3029ededd25d798221f3",
     "r17SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
@@ -7307,12 +7307,19 @@
     "noDataMutation": true
   },
   "r18ReadOnlyForensic": {
-    "status": "SOURCE_RECONCILIATION_PASS_RUNTIME_COLLISION_READBACK_PENDING",
+    "status": "AUTHENTICATED_HARNESS_DISPATCH_AUTHORIZED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_READONLY_FORENSIC_RENEWAL_11_OF_11_20261005.json",
     "receiptBlobSha": "fe79c58a26715c846064aba16162db6345693c25",
     "exact11AccountedFor": true,
     "productWrites": 0,
     "businessDataWrites": 0,
-    "nextAction": "TINYFISH_AUTHENTICATED_EXACT_PREVIEW_READBACK_FOR_DUPLICATE_COLLISION_AND_IMPACTED_PREUAT"
+    "nextAction": "WAIT_AUTHENTICATED_HARNESS_RECEIPT",
+    "workflowPath": ".github/workflows/gravicentra-b4-003-readonly-diagnostic.yml",
+    "toolPath": "tools/gravicentra-i6-5-b4-003-r18-readonly-forensic.mjs",
+    "executionLockBlobSha": "1e36f2f51e0f6ecb4ff3af9e5dc4df313083755c",
+    "targetPolicyNumber": "1003687",
+    "referenceDate": "2026-10-05",
+    "expectedWrites": 0,
+    "tinyFishStatus": "AUTH_STATE_NOT_REUSED_NONBLOCKING"
   }
 }
