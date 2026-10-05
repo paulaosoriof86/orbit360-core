@@ -48,6 +48,22 @@ Orbit.ciclo = (function () {
   function paisOK(pais) { return !Orbit.pais || Orbit.pais === 'TODOS' || pais === Orbit.pais; }
   function insurerCountry(a){return String(a&&((a.pais||a.country||a.paisCodigo||a.countryCode)||'')).trim().toUpperCase();}
   function insurersForCountry(country){const wanted=String(country||'').trim().toUpperCase();return S().all('aseguradoras').filter(a=>a&&a.id&&a.vinculada!==false&&(!wanted||insurerCountry(a)===wanted));}
+  function commercialProducts(country,ramo){return Orbit.cat.subramosDe(country,ramo)||[];}
+  function commercialPlans(country,ramo,insurerIds){
+    const ids=new Set([].concat(insurerIds||[]).filter(Boolean)),out=new Set();
+    insurersForCountry(country).filter(a=>!ids.size||ids.has(a.id)).forEach(a=>{
+      const det=(a.ramosDetalle&&a.ramosDetalle[ramo])||{},raw=det.plan||det.planes||'';
+      [].concat(raw||[]).flatMap(v=>String(v||'').split(/[;,|]/)).map(v=>v.trim()).filter(Boolean).forEach(v=>out.add(v));
+    });
+    return [...out].sort((a,b)=>a.localeCompare(b));
+  }
+  function paintSelect(select,values,preferred,blankLabel){
+    if(!select)return;const rows=[...new Set([].concat(values||[]).filter(Boolean))];
+    if(preferred&&!rows.includes(preferred))rows.unshift(preferred);
+    select.innerHTML=(blankLabel!=null?'<option value="">'+U.esc(blankLabel)+'</option>':'')+rows.map(v=>'<option value="'+U.esc(v)+'">'+U.esc(v)+'</option>').join('');
+    if(preferred&&rows.includes(preferred))select.value=preferred;
+  }
+  const COLLAB_TYPES=['Comentario comercial','Observación operativa','Solicitar información al asesor','Respuesta del asesor','Devuelto a asesor','Reenviado a Operaciones','Nota interna'];
   async function assignableAdvisors(country){if(!Orbit.assignableAdvisorRoster?.list)return[];try{return await Orbit.assignableAdvisorRoster.list(country);}catch(e){return[];}}
   function rolFiltro(asesorId) {
     if (Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor()) return asesorId === Orbit.session.asesorId();
@@ -290,8 +306,9 @@ Orbit.ciclo = (function () {
           <div class="ciclo-sec">
             <div class="ciclo-sec-t">Riesgo y comercial</div>
             <div class="cgrid">
-              ${fSelectCat('Producto / plan', 'ng-prod', 'productos', n.producto)}
               ${fSelect('Ramo', 'ng-ramo', Orbit.cat.ramosDe(n.pais), n.ramo)}
+              ${fSelect('Producto', 'ng-prod', commercialProducts(n.pais,n.ramo), n.producto || '')}
+              ${fSelect('Plan', 'ng-plan', commercialPlans(n.pais,n.ramo,selectedInsurerIds), n.plan || '')}
               ${fSelectCat('Segmento', 'ng-segmento', 'segmentos', n.segmento || '')}
               <label class="ce-l">Aseguradoras de interés<select id="ng-asg" class="o-sel" multiple size="${Math.min(6,Math.max(3,asgs.length||3))}">${asgs.map(a=>`<option value="${U.esc(a.id)}" ${selectedInsurerIds.includes(a.id)?'selected':''}>${U.esc(a.nombre)}</option>`).join('')}</select><small class="muted" style="display:block;margin-top:4px">Puedes seleccionar varias; solo se muestran aseguradoras del país del negocio.</small></label>
               ${fSelectOpt('Asesor responsable', 'ng-ase', asesores.map(a => [a.id, a.nombre]), n.asesorId)}
@@ -309,9 +326,9 @@ Orbit.ciclo = (function () {
             <div class="cadd"><input id="ng-chk-new" class="o-sel" placeholder="Nuevo ítem de checklist"><button class="btn ghost sm" id="ng-chk-add">+ Agregar</button></div>
           </div>
           <div class="ciclo-sec">
-            <div class="ciclo-sec-t">Comentarios del equipo</div>
-            <div id="ng-coms">${(n.comentarios || []).map(comRow).join('') || '<div class="muted" style="font-size:12.5px">Sin comentarios.</div>'}</div>
-            <div class="cadd"><input id="ng-com-new" class="o-sel" placeholder="Escribe un comentario…"><button class="btn ghost sm" id="ng-com-add">Enviar</button></div>
+            <div class="ciclo-sec-t">Colaboración comercial ↔ operativa</div>
+            <div id="ng-coms">${(n.comentarios || []).map(comRow).join('') || '<div class="muted" style="font-size:12.5px">Sin observaciones ni solicitudes.</div>'}</div>
+            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Detalle para el equipo…"><button class="btn ghost sm" id="ng-com-add">Registrar</button></div>
           </div>
         </div>
         <aside class="ciclo-aside">
@@ -340,22 +357,34 @@ Orbit.ciclo = (function () {
       <div class="ciclo-foot">
         <div class="muted" style="font-size:12px">${n.clienteIdCreado ? '🏆 Cliente creado · <a style="color:var(--red);cursor:pointer" onclick="document.getElementById(\'ciclo-modal\').remove();location.hash=\'#/cliente360?c=' + n.clienteIdCreado + '\'">ver expediente</a>' : 'Creado ' + U.fmtDate(n.creado)}</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn ghost" id="ng-new-opportunity">＋ Otra oportunidad</button>
           <button class="btn ghost" id="ng-delete" style="color:var(--danger,var(--red))">Eliminar</button>
           <button class="btn ghost" data-close>Cerrar</button>
           <button class="btn primary" id="ng-save">Guardar cambios</button>
         </div>
       </div>`;
     const back = modal(html, 980);
-    const countrySelect=back.querySelector('#ng-pais'),insurerSelect=back.querySelector('#ng-asg'),advisorSelect=back.querySelector('#ng-ase');
+    const countrySelect=back.querySelector('#ng-pais'),insurerSelect=back.querySelector('#ng-asg'),advisorSelect=back.querySelector('#ng-ase'),ramoSelect=back.querySelector('#ng-ramo'),productSelect=back.querySelector('#ng-prod'),planSelect=back.querySelector('#ng-plan');
+    const refreshCommercialDependencies=()=>{
+      const country=countrySelect.value,ramo=ramoSelect&&ramoSelect.value,priorProduct=productSelect&&productSelect.value,priorPlan=planSelect&&planSelect.value;
+      paintSelect(productSelect,commercialProducts(country,ramo),priorProduct,'— Seleccionar producto —');
+      const insurerIds=insurerSelect?[...insurerSelect.selectedOptions].map(o=>o.value):[];
+      paintSelect(planSelect,commercialPlans(country,ramo,insurerIds),priorPlan,'— Sin plan específico —');
+      if(productSelect)productSelect.dataset.ramoScope=ramo||'';
+      if(planSelect)planSelect.dataset.ramoScope=ramo||'';
+    };
     const refreshCountryScopedCommercial=async()=>{
       const country=countrySelect.value;
       const priorInsurers=insurerSelect?[...insurerSelect.selectedOptions].map(o=>o.value):[];
       asgs=insurersForCountry(country);
       if(insurerSelect){insurerSelect.innerHTML=asgs.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');priorInsurers.filter(id=>asgs.some(a=>a.id===id)).forEach(id=>{const o=[...insurerSelect.options].find(x=>x.value===id);if(o)o.selected=true;});insurerSelect.dataset.countryScope=country;}
       const currentAdvisor=advisorSelect&&advisorSelect.value;asesores=await assignableAdvisors(country);if(advisorSelect){advisorSelect.innerHTML=asesores.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');if(asesores.some(a=>a.id===currentAdvisor))advisorSelect.value=currentAdvisor;else if(asesores.length)advisorSelect.value=asesores[0].id;}
-      const ramo=back.querySelector('#ng-ramo'),priorRamo=ramo&&ramo.value,rows=Orbit.cat.ramosDe(country);if(ramo){ramo.innerHTML=rows.map(v=>'<option>'+U.esc(v)+'</option>').join('');if(rows.includes(priorRamo))ramo.value=priorRamo;}
+      const priorRamo=ramoSelect&&ramoSelect.value,rows=Orbit.cat.ramosDe(country);if(ramoSelect){paintSelect(ramoSelect,rows,rows.includes(priorRamo)?priorRamo:(rows[0]||''),null);}
+      refreshCommercialDependencies();
     };
     countrySelect.addEventListener('change',()=>{refreshCountryScopedCommercial().catch(()=>U.toast('No fue posible actualizar opciones por país.'));});
+    if(ramoSelect)ramoSelect.addEventListener('change',refreshCommercialDependencies);
+    if(insurerSelect)insurerSelect.addEventListener('change',refreshCommercialDependencies);
 
     // stepper jump: no UI success before canonical commit/readback.
     back.querySelectorAll('.cstep').forEach(b => b.addEventListener('click', async () => {
@@ -393,9 +422,19 @@ Orbit.ciclo = (function () {
     const comadd = back.querySelector('#ng-com-add');
     if (comadd) comadd.addEventListener('click', async () => {
       const v = back.querySelector('#ng-com-new').value.trim(); if (!v) return;
-      const prior = (n.comentarios || []).slice(); n.comentarios = prior.concat([{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), texto: v }]); comadd.disabled = true;
-      try { await S().updateDurable('negocios', id, { comentarios: n.comentarios }); openNegocio(id); }
-      catch (error) { n.comentarios = prior; comadd.disabled = false; U.toast('No fue posible guardar el comentario.'); }
+      const tipo=(back.querySelector('#ng-com-type')||{}).value||'Comentario comercial',actor=(Orbit.session ? Orbit.session.rol() : 'Equipo');
+      const prior = (n.comentarios || []).slice(),priorBit=(n.bitacora||[]).slice();
+      n.comentarios = prior.concat([{ ts: stamp(), user: actor, tipo, texto: v }]);
+      n.bitacora=priorBit.concat([{ts:stamp(),user:actor,campo:'Colaboración',de:'',a:tipo,origen:'manual'}]);
+      comadd.disabled = true;
+      try { await S().updateDurable('negocios', id, { comentarios: n.comentarios,bitacora:n.bitacora,actualizado:today() }); openNegocio(id); }
+      catch (error) { n.comentarios = prior;n.bitacora=priorBit;comadd.disabled = false; U.toast('No fue posible guardar la colaboración.'); }
+    });
+    const anotherOpportunity=back.querySelector('#ng-new-opportunity');
+    if(anotherOpportunity)anotherOpportunity.addEventListener('click',()=>{
+      const identityId=n.commercialIdentityId||n.id;
+      back.remove();
+      nuevoNegocio({commercialIdentityId:identityId,sourceOpportunityId:n.id,nombre:n.nombre,tipo:n.tipo,telefono:n.telefono,email:n.email,pais:n.pais,canal:n.canal,asesorId:n.asesorId,segmento:n.segmento,prioridad:n.prioridad});
     });
     // delete
     const ngDelete = back.querySelector('#ng-delete');
@@ -419,7 +458,7 @@ Orbit.ciclo = (function () {
         await S().updateDurable('negocios', id, {
           nombre: g('ng-nombre') || n.nombre, tipo: g('ng-tipo'), telefono: g('ng-tel'), email: g('ng-email'),
           pais: g('ng-pais'), moneda: g('ng-pais') === 'CO' ? 'COP' : 'GTQ', canal: g('ng-canal'),
-          producto: g('ng-prod'), ramo: g('ng-ramo'), segmento: g('ng-segmento'), aseguradoraIds: insurerIds, aseguradoraId: insurerIds[0] || '', asesorId: g('ng-ase'),
+          producto: g('ng-prod'), plan: g('ng-plan'), ramo: g('ng-ramo'), segmento: g('ng-segmento'), aseguradoraIds: insurerIds, aseguradoraId: insurerIds[0] || '', asesorId: g('ng-ase'),
           primaEst: +g('ng-prima') || n.primaEst, prioridad: g('ng-prio'), nroCotizacion: g('ng-cot'),
           proximoToque: g('ng-toque') || n.proximoToque, descripcion: g('ng-desc'), colLeads: (back.querySelector('#ng-col') || {}).value || '', actualizado: today()
         });
@@ -671,8 +710,8 @@ Orbit.ciclo = (function () {
           <div class="ciclo-sec-t">Datos de la gestión</div>
           <div class="cgrid">
             ${fSelectOpt('Cliente', 'mg-cli', clientOptions, opts.clienteId || '')}
-            ${fSelectOpt('Lista (Ops)', 'mg-lista', listOptions, initialList)}
             ${fSelectFree('Tipo de gestión', 'mg-tipo', typeOptions, opts.tipo || (typeOptions[0] || 'Actualizar datos de cliente'))}
+            <label class="ce-l">Cola operativa asignada<input id="mg-lista" class="o-sel" value="${U.esc(initialList)}" readonly><small class="muted" style="display:block;margin-top:4px">Se determina por el tipo de gestión; no tienes que escoger una lista manualmente.</small></label>
             ${fSelectFree('Estado', 'mg-estado', ['Pendiente', 'En proceso'], opts.estado || 'Pendiente')}
             ${fSelectCat('Prioridad', 'mg-prio', 'prioridades', opts.prioridad || 'Media')}
             ${fSelectOpt('Responsable', 'mg-ase', asesores.map(a => [a.id, a.nombre]), initialAdvisor)}
@@ -747,6 +786,10 @@ Orbit.ciclo = (function () {
       const pol = policySelect.value ? S().get('polizas', policySelect.value) : null;
       if (pol && insurerSelect && pol.aseguradoraId) insurerSelect.value = pol.aseguradoraId;
     });
+    const managementTypeSelect=el('mg-tipo'),managementListInput=el('mg-lista');
+    const syncManagementQueue=()=>{const def=tipos.find(t=>t.t===managementTypeSelect.value);if(def&&managementListInput)managementListInput.value=def.lista||'Gestiones Admin';};
+    if(managementTypeSelect)managementTypeSelect.addEventListener('change',syncManagementQueue);
+    syncManagementQueue();
 
     const drop = el('mg-drop'), input = el('mg-file'), chips = el('mg-files');
     const driveArea = el('mg-drive-upload-area'), driveNote = el('mg-drive-connect-note'), driveBootstrap = el('mg-drive-bootstrap');
@@ -932,72 +975,76 @@ Orbit.ciclo = (function () {
   }
 
   /* ===================== nuevo negocio / nueva gestión ===================== */
-  async function nuevoNegocio() {
+  async function nuevoNegocio(prefill) {
     try{await Orbit.cat.ensure();}catch(error){U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;}
-    const initialCountry = Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : 'GT';
-    let asesores = await assignableAdvisors(initialCountry);
+    prefill=prefill&&typeof prefill==='object'?prefill:{};
+    const initialCountry = prefill.pais || (Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : 'GT');
+    const initialRamo=(Orbit.cat.ramosDe(initialCountry)||[])[0]||'';
+    let asesores = await assignableAdvisors(initialCountry),asgs=insurersForCountry(initialCountry);
+    const entryOptions=Orbit.cat.get('puntosIngreso'),defaultEntry=(entryOptions.find(p=>p&&p.etapa==='nuevo')||entryOptions[0]||{}).id||'';
     const html = `
       <div class="ciclo-h" style="background:linear-gradient(120deg,#C5162E,#8f1020)">
-        <div><div class="ciclo-eyebrow">Nuevo ingreso · ciclo comercial</div><h2>🌱 Nuevo prospecto</h2>
-        <div class="ciclo-sub">Entra a <b>Leads</b> (interés) o directo a <b>Cotización</b> en Ops.</div></div>
+        <div><div class="ciclo-eyebrow">${prefill.commercialIdentityId?'Nueva oportunidad · misma identidad comercial':'Nuevo ingreso · ciclo comercial'}</div><h2>🌱 ${prefill.commercialIdentityId?'Nueva oportunidad':'Nuevo prospecto'}</h2>
+        <div class="ciclo-sub">${prefill.commercialIdentityId?'Conserva la misma persona/empresa y crea un negocio independiente.':'Por defecto inicia en <b>Nuevo</b>. Solo usa ingreso directo a Cotización cuando el caso ya esté listo para cotizar.'}</div></div>
         <div class="ciclo-h-act"><button class="imp-x" data-close>✕</button></div>
       </div>
       <div class="ciclo-create-body" style="padding:20px 22px;display:grid;gap:13px">
         <div class="cgrid">
-          ${fInput('Nombre / razón social', 'nn-nombre', '')}
-          ${fSelect('Tipo', 'nn-tipo', ['Persona', 'Empresa'], 'Persona')}
-          ${fInput('Teléfono (WhatsApp)', 'nn-tel', '')}
-          ${fInput('Correo', 'nn-email', '')}
+          ${fInput('Nombre / razón social', 'nn-nombre', prefill.nombre||'')}
+          ${fSelect('Tipo', 'nn-tipo', ['Persona', 'Empresa'], prefill.tipo||'Persona')}
+          ${fInput('Teléfono (WhatsApp)', 'nn-tel', prefill.telefono||'')}
+          ${fInput('Correo', 'nn-email', prefill.email||'')}
           ${fSelect('País', 'nn-pais', ['GT', 'CO'], initialCountry)}
-          ${fSelectCat('Canal', 'nn-canal', 'canales', Orbit.cat.get('canales')[0] || '')}
-          ${fSelectCat('Producto / plan', 'nn-prod', 'productos', '')}
-          ${fSelect('Ramo', 'nn-ramo', Orbit.cat.ramosDe(initialCountry), Orbit.cat.ramosDe(initialCountry)[0] || '')}
-          ${fSelectCat('Segmento', 'nn-segmento', 'segmentos', Orbit.cat.get('segmentos')[0] || '')}
-          ${fSelectCat('Prioridad', 'nn-prioridad', 'prioridades', Orbit.cat.get('prioridades')[0] || '')}
+          ${fSelectCat('Canal de ingreso', 'nn-canal', 'canales', prefill.canal||Orbit.cat.get('canales')[0]||'')}
+          ${fSelect('Ramo', 'nn-ramo', Orbit.cat.ramosDe(initialCountry), initialRamo)}
+          ${fSelect('Producto', 'nn-prod', commercialProducts(initialCountry,initialRamo), '')}
+          ${fSelect('Plan', 'nn-plan', [], '')}
+          ${fSelectCat('Segmento', 'nn-segmento', 'segmentos', prefill.segmento||Orbit.cat.get('segmentos')[0]||'')}
+          ${fSelectCat('Prioridad', 'nn-prioridad', 'prioridades', prefill.prioridad||Orbit.cat.get('prioridades')[0]||'')}
           ${fInput('Prima estimada', 'nn-prima', 0, 'number')}
-          ${fSelectOpt('Asesor', 'nn-ase', asesores.map(a => [a.id, a.nombre]), (Orbit.session && Orbit.session.asesorId ? (Orbit.session.asesorId() || '') : ''))}
+          ${fSelectOpt('Asesor', 'nn-ase', asesores.map(a => [a.id, a.nombre]), prefill.asesorId||(Orbit.session&&Orbit.session.asesorId?Orbit.session.asesorId()||'':''))}
         </div>
-        ${fSelectOpt('Punto de ingreso', 'nn-ingreso', Orbit.cat.get('puntosIngreso').map(p=>[p.id,p.label]), (Orbit.cat.get('puntosIngreso')[1]||Orbit.cat.get('puntosIngreso')[0]||{}).id || '')}
+        <label class="ce-l">Aseguradoras de interés<select id="nn-asg" class="o-sel" multiple size="${Math.min(6,Math.max(3,asgs.length||3))}">${asgs.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('')}</select><small class="muted" style="display:block;margin-top:4px">Solo se muestran aseguradoras del país seleccionado. Puedes elegir varias.</small></label>
+        ${fSelectOpt('Punto de ingreso', 'nn-ingreso', entryOptions.map(p=>[p.id,p.label]), defaultEntry)}
         <label class="ce-l">Descripción / detalle del riesgo<textarea id="nn-desc" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px"></textarea></label>
       </div>
-      <div class="ciclo-foot"><div></div><div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="nn-ok">Crear</button></div></div>`;
-    const back = modal(html, 640);
-    const advisorSelect=back.querySelector('#nn-ase'),countrySelect=back.querySelector('#nn-pais');
-    const refreshAssignableAdvisors=async()=>{const current=advisorSelect.value||(Orbit.session?.asesorId?Orbit.session.asesorId():'');asesores=await assignableAdvisors(countrySelect.value);advisorSelect.innerHTML=asesores.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');if(asesores.some(a=>a.id===current))advisorSelect.value=current;else if(asesores.length)advisorSelect.value=asesores[0].id;advisorSelect.dataset.assignableAdvisorRoster='server-owned-minimal';advisorSelect.dataset.assignableCount=String(asesores.length);const ramo=back.querySelector('#nn-ramo'),prior=ramo&&ramo.value,rows=Orbit.cat.ramosDe(countrySelect.value);if(ramo){ramo.innerHTML=rows.map(v=>'<option>'+U.esc(v)+'</option>').join('');if(rows.includes(prior))ramo.value=prior;}};
-    countrySelect.addEventListener('change',()=>{refreshAssignableAdvisors().catch(()=>{});});
+      <div class="ciclo-foot"><div class="muted" style="font-size:12px">${prefill.commercialIdentityId?'Identidad comercial vinculada · oportunidades independientes':'Nuevo es el estado inicial normal'}</div><div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="nn-ok">Crear</button></div></div>`;
+    const back = modal(html, 700);
+    const advisorSelect=back.querySelector('#nn-ase'),countrySelect=back.querySelector('#nn-pais'),ramoSelect=back.querySelector('#nn-ramo'),productSelect=back.querySelector('#nn-prod'),planSelect=back.querySelector('#nn-plan'),insurerSelect=back.querySelector('#nn-asg');
+    const refreshDependencies=()=>{
+      const priorProduct=productSelect.value,priorPlan=planSelect.value;
+      paintSelect(productSelect,commercialProducts(countrySelect.value,ramoSelect.value),priorProduct,'— Seleccionar producto —');
+      paintSelect(planSelect,commercialPlans(countrySelect.value,ramoSelect.value,[...insurerSelect.selectedOptions].map(o=>o.value)),priorPlan,'— Sin plan específico —');
+    };
+    const refreshCountry=async()=>{
+      const current=advisorSelect.value||(prefill.asesorId||'');asesores=await assignableAdvisors(countrySelect.value);
+      advisorSelect.innerHTML=asesores.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');if(asesores.some(a=>a.id===current))advisorSelect.value=current;else if(asesores.length)advisorSelect.value=asesores[0].id;
+      advisorSelect.dataset.assignableAdvisorRoster='server-owned-minimal';advisorSelect.dataset.assignableCount=String(asesores.length);
+      const priorRamo=ramoSelect.value,rows=Orbit.cat.ramosDe(countrySelect.value);paintSelect(ramoSelect,rows,rows.includes(priorRamo)?priorRamo:(rows[0]||''),null);
+      asgs=insurersForCountry(countrySelect.value);insurerSelect.innerHTML=asgs.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');insurerSelect.dataset.countryScope=countrySelect.value;
+      refreshDependencies();
+    };
+    countrySelect.addEventListener('change',()=>refreshCountry().catch(()=>U.toast('No fue posible actualizar opciones por país.')));
+    ramoSelect.addEventListener('change',refreshDependencies);insurerSelect.addEventListener('change',refreshDependencies);
+    refreshDependencies();
     back.querySelector('#nn-ok').addEventListener('click', async () => {
-      const save = back.querySelector('#nn-ok');
-      if (save.disabled) return;
-      const v = sid => (back.querySelector('#' + sid) || {}).value;
+      const save = back.querySelector('#nn-ok');if(save.disabled)return;
+      const v=sid=>(back.querySelector('#'+sid)||{}).value;
       const ingreso=Orbit.cat.puntoIngreso(v('nn-ingreso'));if(!ingreso)return U.toast('Selecciona un punto de ingreso válido.');
-      const ingresoOps = ingreso.origen === 'Ops';
-      const pais = v('nn-pais'), asesorId = v('nn-ase');
-      if (!asesorId) return U.toast('Selecciona un asesor responsable.');
-      const n = {
-        id: 'neg' + Date.now().toString().slice(-7), nombre: v('nn-nombre') || 'Prospecto', tipo: v('nn-tipo'),
-        etapa: ingreso.etapa, prob: Number(ingreso.probability ?? ingreso.prob ?? 0), puntoIngreso: ingreso.id,
-        asesorId, canal: v('nn-canal'), pais, moneda: pais === 'CO' ? 'COP' : 'GTQ',
-        producto: v('nn-prod') || '', ramo: v('nn-ramo') || '', segmento: v('nn-segmento') || '', aseguradoraId: '',
-        telefono: v('nn-tel'), email: v('nn-email'), primaEst: +v('nn-prima') || 0,
-        descripcion: v('nn-desc'), notas: '', cadencia: '', cadenciaActiva: false,
-        proximoToque: inDays(2), vence: inDays(7), prioridad: v('nn-prioridad') || '',
-        decision: '', nroCotizacion: '', nroPoliza: '',
-        checklist: [{ t: 'Datos completos para cotizar', done: ingresoOps }, { t: 'Cotización enviada al cliente', done: false }, { t: 'Documentos del riesgo recibidos', done: false }, { t: 'Inspección / avalúo realizado', done: false }],
-        clienteIdCreado: '', archivado: false, etiquetas: [],
-        bitacora: [{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Ingreso (' + (ingresoOps ? 'Ops' : 'Leads') + ')', origen: 'manual' }],
-        comentarios: [], origen: ingresoOps ? 'Ops' : 'Leads', creado: today(), actualizado: today()
-      };
-      save.disabled = true; const original = save.textContent; save.textContent = 'Guardando…';
-      try {
-        if (!S().insertDurable) throw new Error('OPS_BUSINESS_DURABLE_WRITE_REQUIRED');
-        await S().insertDurable('negocios', n);
-        const confirmed = S().get('negocios', n.id);
-        if (!confirmed) throw new Error('OPS_BUSINESS_DURABLE_READBACK_MISSING');
-        back.remove(); refresh(); openNegocio(n.id);
-      } catch (error) {
-        save.disabled = false; save.textContent = original;
-        U.toast('No fue posible confirmar el nuevo ingreso. No se registró un falso éxito.');
-      }
+      const ingresoOps=ingreso.origen==='Ops',pais=v('nn-pais'),asesorId=v('nn-ase'),insurerIds=[...insurerSelect.selectedOptions].map(o=>o.value).filter(Boolean);
+      if(!asesorId)return U.toast('Selecciona un asesor responsable.');
+      const id='neg'+Date.now().toString().slice(-7),identityId=prefill.commercialIdentityId||id;
+      const n={id,commercialIdentityId:identityId,sourceOpportunityId:prefill.sourceOpportunityId||'',nombre:v('nn-nombre')||'Prospecto',tipo:v('nn-tipo'),
+        etapa:ingreso.etapa,prob:Number(ingreso.probability??ingreso.prob??0),puntoIngreso:ingreso.id,asesorId,canal:v('nn-canal'),pais,moneda:pais==='CO'?'COP':'GTQ',
+        producto:v('nn-prod')||'',plan:v('nn-plan')||'',ramo:v('nn-ramo')||'',segmento:v('nn-segmento')||'',aseguradoraIds:insurerIds,aseguradoraId:insurerIds[0]||'',
+        telefono:v('nn-tel'),email:v('nn-email'),primaEst:+v('nn-prima')||0,descripcion:v('nn-desc'),notas:'',cadencia:'',cadenciaActiva:false,
+        proximoToque:inDays(2),vence:inDays(7),prioridad:v('nn-prioridad')||'',decision:'',nroCotizacion:'',nroPoliza:'',
+        checklist:[{t:'Datos completos para cotizar',done:ingresoOps},{t:'Cotización enviada al cliente',done:false},{t:'Documentos del riesgo recibidos',done:false},{t:'Inspección / avalúo realizado',done:false}],
+        clienteIdCreado:'',archivado:false,etiquetas:[],bitacora:[{ts:stamp(),user:(Orbit.session?Orbit.session.rol():'Equipo'),campo:'Creación',de:'',a:'Ingreso ('+(ingresoOps?'Ops':'Leads')+')',origen:'manual'}],
+        comentarios:[],origen:ingresoOps?'Ops':'Leads',creado:today(),actualizado:today()};
+      save.disabled=true;const original=save.textContent;save.textContent='Guardando…';
+      try{if(!S().insertDurable)throw new Error('OPS_BUSINESS_DURABLE_WRITE_REQUIRED');await S().insertDurable('negocios',n);const confirmed=S().get('negocios',n.id);if(!confirmed)throw new Error('OPS_BUSINESS_DURABLE_READBACK_MISSING');back.remove();refresh();openNegocio(n.id);}
+      catch(error){save.disabled=false;save.textContent=original;U.toast('No fue posible confirmar el nuevo ingreso. No se registró un falso éxito.');}
     });
   }
   function nuevaGestion() {
@@ -1094,7 +1141,7 @@ Orbit.ciclo = (function () {
     return `<label class="ce-l">${label}<select id="${id}" class="o-sel">${pairs.map(p => `<option value="${p[0]}" ${p[0] === val ? 'selected' : ''}>${U.esc(p[1])}</option>`).join('')}</select></label>`;
   }
   function chkRow(ns, i, c) { return `<label class="chk-row"><input type="checkbox" data-chk="${i}" ${c.done ? 'checked' : ''}><span class="${c.done ? 'done' : ''}">${U.esc(c.t)}</span></label>`; }
-  function comRow(c) { return `<div class="com-row"><div class="com-h"><b>${U.esc(c.user)}</b><span class="muted mono">${U.esc(c.ts)}</span></div><div>${U.esc(c.texto)}</div></div>`; }
+  function comRow(c) { return `<div class="com-row"><div class="com-h"><b>${U.esc(c.user)}</b><span class="muted mono">${U.esc(c.ts)}</span></div>${c.tipo?'<span class="badge info" style="font-size:10px;margin-bottom:5px">'+U.esc(c.tipo)+'</span>':''}<div>${U.esc(c.texto)}</div></div>`; }
   function bitRow(b) { return `<div class="bit-row"><span class="bit-dot ${b.origen === 'auto' ? 'auto' : ''}"></span><div><div class="bit-t"><b>${U.esc(b.campo)}</b> ${b.de ? '· ' + U.esc(b.de) + ' → ' : ''}${U.esc(b.a)}</div><div class="muted mono" style="font-size:10.5px">${U.esc(b.ts)} · ${U.esc(b.user)}${b.origen === 'auto' ? ' · auto' : ''}</div></div></div>`; }
 
   return {
