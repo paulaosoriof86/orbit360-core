@@ -610,7 +610,7 @@ try{
    const documentButton=Array.from(row?.querySelectorAll('button')||[]).find(b=>/Documentar origen/.test(b.innerText||''))||null;
    if(documentButton)documentButton.click();
    await new Promise(r=>setTimeout(r,60));
-   const modal=document.getElementById('quality-inline'),country=modal?.querySelector('#qi-pais');
+   const modal=document.getElementById('q-inline'),country=modal?.querySelector('#qi-pais');
    const out={buttonPresent:!!documentButton,modalPresent:!!modal,country:String(country?.value||''),hasReason:!!modal?.querySelector('#qi-motivo'),phoneLabel:/teléfono \/ WhatsApp/i.test(String(h.innerText||''))};
    modal?.remove();return out;
  },ids);
