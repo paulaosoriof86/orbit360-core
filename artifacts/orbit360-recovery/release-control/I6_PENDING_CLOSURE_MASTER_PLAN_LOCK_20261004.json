@@ -10,9 +10,9 @@
     "activeForensicPlanV2": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activeForensicPlanV2BlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "findingLedger": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "e877504ab1395f5f840d87e1d208a0b10c9eb687",
+    "findingLedgerBlobSha": "6e1c8b292f366e0521b9fcf305053334c5d32fe2",
     "carryRegister": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "carryRegisterBlobSha": "5457e732b76b068eeadd30509cd77fb5f368755c",
+    "carryRegisterBlobSha": "cd60ffe80a9aec8eefb0b102b25c25b5f018b048",
     "compositionLock": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "normativeEvergreen": [
       "Documento Maestro Evergreen V3",
@@ -283,7 +283,7 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "R19_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "status": "R19_SOURCE_FIX_AUTHORIZED",
     "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
     "why": "R18 human rejection and all R19 blocking causes are physically diagnosed; one cumulative successor source fix is authorized without LIVE or data reimport.",
     "currentCandidateReview": "R17_REJECTED_NO_MORE_HUMAN_RETEST_UNTIL_R18_MACHINE_PLUS_TINYFISH_PREUAT_PASS",
@@ -6375,6 +6375,9 @@
     ],
     "noLive": true,
     "noReimport": true,
-    "noOperationalBusinessWrites": true
+    "noOperationalBusinessWrites": true,
+    "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1",
+    "ledgerBlobSha": "6e1c8b292f366e0521b9fcf305053334c5d32fe2",
+    "carryBlobSha": "cd60ffe80a9aec8eefb0b102b25c25b5f018b048"
   }
 }

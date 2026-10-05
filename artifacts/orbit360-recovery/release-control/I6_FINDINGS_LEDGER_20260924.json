@@ -2959,7 +2959,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "R19_SOURCE_FIX_AUTHORIZED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2997,7 +2997,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R18_TARGETED_PAULA_VISUAL",
+      "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -8531,7 +8531,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
       "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
@@ -8725,7 +8725,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
       "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
@@ -8751,7 +8751,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
       "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
@@ -8831,7 +8831,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
       "machineProofReceiptBlobSha": "cc76946b8f72082983c5a63a334e5d0c95b444d2",
@@ -8955,7 +8955,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "mayDisappearWithoutDisposition": false
     },
@@ -8976,7 +8976,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "mayDisappearWithoutDisposition": false
     },
@@ -8998,7 +8998,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "mayDisappearWithoutDisposition": false
     },
@@ -9020,7 +9020,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "mayDisappearWithoutDisposition": false
     },
@@ -9042,7 +9042,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "mayDisappearWithoutDisposition": false
     },
@@ -9066,7 +9066,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "mayDisappearWithoutDisposition": false
     },
@@ -9088,7 +9088,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "mayDisappearWithoutDisposition": false
     },
@@ -9111,7 +9111,7 @@
       "nextAction": "R19_SINGLE_CUMULATIVE_SOURCE_FIX",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
-        "status": "PENDING_BLOB_BINDING_AT_COMMIT"
+        "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "mayDisappearWithoutDisposition": false
     }
