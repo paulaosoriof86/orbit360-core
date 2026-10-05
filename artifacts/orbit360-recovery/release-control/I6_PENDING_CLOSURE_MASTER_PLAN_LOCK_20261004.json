@@ -6246,9 +6246,9 @@
     "status": "FROZEN",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_DECISION_AND_NOLOSS_FREEZE_20261005.json",
     "receiptBlobSha": "3a3ef9c695ad8f714be95f743bbf1b78870d2d90",
-    "ledgerBlobSha": "efb76ccc69c6ce1e33f71a81494565694b03857f",
-    "carryBlobSha": "0de76f2429712c5f555ab05c8bf75685361ad501",
-    "exactFindingSetCount": 234,
+    "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+    "carryBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
+    "exactFindingSetCount": 235,
     "newFindingIds": [
       "B4-003-R18-01-OPS-LEADS-DEFAULT-ENTRY-STAGE",
       "B4-003-R18-02-OPS-LEADS-RAMO-PRODUCT-PLAN-DEPENDENCY",
@@ -6302,5 +6302,11 @@
     "carryBlobSha": "38ecbdf3d69008c21192e2cbb5c5375fb54fd321",
     "tinyFish": "AUTH_STATE_NOT_REUSED_NONBLOCKING",
     "preUatEquivalent": "AUTHENTICATED_GITHUB_PLAYWRIGHT_REQUIRED"
+  },
+  "r18RenewalKpiParity": {
+    "status": "CAUSE_CONFIRMED_SAME_R18",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
+    "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139",
+    "findingId": "B4-003-R18-16-INICIO-POLIZAS-RENEWAL-KPI-PARITY"
   }
 }
