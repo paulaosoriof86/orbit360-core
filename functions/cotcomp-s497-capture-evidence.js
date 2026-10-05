@@ -44,7 +44,8 @@ const viewports=[
     cotcompRealTransportAuthorized:false,
     production:false,
     viewports:[],
-    states:[]
+    states:[],
+    vehicleCombobox:null
   };
 
   async function newEvidencePage(viewport){
@@ -155,6 +156,48 @@ const viewports=[
   }
   receipt.familyVisualPositions=positions;
   receipt.familyVisualPositionsUnique=new Set(positions.map(x=>x.pos)).size===7;
+
+  // Controlled UI-only proof of the frozen searchable Marca → Línea/modelo pattern.
+  // The mock represents the S4.79 read-only response shape; it does not prove provider/rater transport.
+  const comboPage=await newEvidencePage({width:1440,height:1000});
+  await comboPage.route('**/cotcompVehicleCatalogS479**',async route=>{
+    const u=new URL(route.request().url()),op=u.searchParams.get('op');
+    let body={ok:true,items:[]};
+    if(op==='brands') body={ok:true,items:[{brandId:'vbrand_toyota',label:'TOYOTA'},{brandId:'vbrand_mazda',label:'MAZDA'}]};
+    if(op==='models') body={ok:true,items:[{modelId:'vmodel_rav4',label:'RAV4 2WD'},{modelId:'vmodel_corolla',label:'COROLLA'}]};
+    if(op==='years') body={ok:true,items:[2026,2025,2024,2023]};
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(body)});
+  });
+  const comboHtml=generatedHtml.replace('<head>','<head><base href="https://ays-orbit-360-lab.web.app/">');
+  await comboPage.setContent(comboHtml,{waitUntil:'domcontentloaded'});await settled(comboPage);
+  await comboPage.click('[data-next="2"]');await comboPage.waitForTimeout(80);
+  const brandInput=comboPage.locator('[data-vehicle-combo="brand"]');
+  const modelInput=comboPage.locator('[data-vehicle-combo="model"]');
+  await brandInput.focus();await brandInput.fill('TOY');await comboPage.waitForTimeout(80);
+  const brandOption=comboPage.locator('[data-kind="brand"][data-label="TOYOTA"]');
+  const brandSearchWorks=await brandOption.count()===1;
+  if(brandSearchWorks) await brandOption.dispatchEvent('mousedown');
+  await comboPage.waitForTimeout(100);
+  const dependentModelEnabled=!(await modelInput.isDisabled());
+  await modelInput.fill('RAV');await comboPage.waitForTimeout(50);
+  const modelOption=comboPage.locator('[data-kind="model"][data-label="RAV4 2WD"]');
+  const modelSearchWorks=await modelOption.count()===1;
+  if(modelSearchWorks) await modelOption.dispatchEvent('mousedown');
+  await comboPage.waitForTimeout(50);
+  const selectedBrand=(await brandInput.inputValue())==='TOYOTA';
+  const selectedModel=(await modelInput.inputValue())==='RAV4 2WD';
+  await comboPage.click('[data-vehicle-fallback="model"]');await comboPage.waitForTimeout(40);
+  const assistedFallback=await comboPage.locator('[data-mode="assisted"].is-active').count()===1;
+  const noForcedSelection=(await comboPage.locator('#vehicleCatalogStatus').textContent()||'').includes('No forzaremos');
+  const comboShot=path.join(OUT,'state-vehicle-combobox.png');
+  await comboPage.screenshot({path:comboShot,fullPage:true});
+  receipt.vehicleCombobox={
+    mockContract:'S479_READ_ONLY_SHAPE_UI_PROOF_ONLY',
+    realTransport:false,
+    brandSearchWorks,dependentModelEnabled,modelSearchWorks,selectedBrand,selectedModel,assistedFallback,noForcedSelection,
+    screenshotSha256:sha(comboShot)
+  };
+  await comboPage.close();
 
   fs.writeFileSync(path.join(OUT,'receipt.json'),JSON.stringify(receipt,null,2));
   console.log(JSON.stringify(receipt,null,2));
