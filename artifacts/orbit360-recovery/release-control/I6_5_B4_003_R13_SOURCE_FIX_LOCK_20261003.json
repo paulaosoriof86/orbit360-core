@@ -1,15 +1,15 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-04T04:12:00Z",
-  "status": "B4_003_R17_INSURER_REGISTRY_LITERAL_COMPATIBILITY_AUTHORIZED",
+  "status": "B4_003_SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_R17_INSURER_REGISTRY_LITERAL_COMPATIBILITY_AUTHORIZED",
+    "status": "B4_003_SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R17_INSURER_REGISTRY_LITERAL_COMPATIBILITY_FIX",
+    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_R17_PENDING_RETEST",
     "knowledgePreview": true
   },
@@ -29,7 +29,7 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "c4e16f12e9a13c2366a11e5ccb2bb5bc164c1112"
+    "blobSha": "f15d7b45884b0c236b2bea50c5a49e59dde01664"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -45,11 +45,11 @@
   "boundaries": {
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "Exact B4-003 Preview only: disposable B4003 synthetic renewal, cancellation, information-health and insurer-document fixtures with mandatory cleanup/readback; no real operational row mutation.",
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": false,
@@ -66,7 +66,7 @@
     "B4_003_R17_EXACT_PREVIEW_MACHINE_PASS",
     "B4_003_R17_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_R17_INSURER_REGISTRY_LITERAL_COMPATIBILITY_FIX",
+  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -661,7 +661,7 @@
     "scopeExtensionReason3": "R17 changes modify browser-loaded modules; the canonical index asset query versions must advance so the same certified artifact cannot serve stale pre-R17 module bytes after production promotion.",
     "scopeExtendedAt3": "2026-10-05T00:04:00Z",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
-    "compositionBlobSha": "c4e16f12e9a13c2366a11e5ccb2bb5bc164c1112",
+    "compositionBlobSha": "f15d7b45884b0c236b2bea50c5a49e59dde01664",
     "productMutationAuthorized": false,
     "syntheticQaWritesAuthorized": true,
     "qaCompatibilityAlignment": {
@@ -671,14 +671,14 @@
       "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
     },
     "qaCompatibilityAlignment2": {
-      "status": "AUTHORIZED_NARROW_PRODUCT_LITERAL_FIX",
+      "status": "FIXED_BEFORE_BUILD",
       "failedRunId": 37245721821,
       "failureCode": "B4_003_R16_INSURER_REGISTRY_UI_OR_METADATA_MISSING",
       "cause": "R17 source Registry drill-down retained the canonical data but renamed the frozen visible heading from 'Registry canónica de fuentes' to 'Registro de fuentes'.",
       "allowedProductFiles": [
         "orbit360-platform/modules/aseguradoras.js"
       ],
-      "productMutationAuthorized": true,
+      "productMutationAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false
