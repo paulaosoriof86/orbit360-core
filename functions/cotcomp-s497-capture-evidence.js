@@ -213,7 +213,7 @@ const viewports=[
   await coPage.click('[data-next="2"]');await coPage.waitForTimeout(80);
   domainProof.coTransportSpecializedFields=await coPage.locator('#f_coverageModeNeed,#f_transportModePrimary,#f_origin,#f_destination,#f_valueToProtect,#f_maxValuePerShipment,#f_annualMovementBudget').count()===7;
   domainProof.coCountryVisible=(await coPage.locator('#selectedCountry').textContent())==='Colombia';
-  const coShot=path.join(OUT,'state-co-transport.png');await coPage.screenshot({path:coShot,fullPage:true});domainProof.coTransportScreenshotSha256=sha(coShot);
+  await coPage.evaluate(()=>window.scrollTo(0,0));await coPage.waitForTimeout(50);const coShot=path.join(OUT,'state-co-transport.png');await coPage.screenshot({path:coShot,fullPage:true});domainProof.coTransportScreenshotSha256=sha(coShot);
   await coPage.close();
 
   const healthPage=await newEvidencePage({width:1440,height:1000});
@@ -226,7 +226,7 @@ const viewports=[
   await healthPage.locator('#f_hijos').fill('2');await healthPage.locator('#f_hijos').dispatchEvent('change');await healthPage.waitForTimeout(80);
   domainProof.gtHealthDependentDobDynamic=await healthPage.locator('#f_dependentDob1,#f_dependentDob2').count()===2;
   domainProof.gtHealthDependentDobStartsBlank=(await healthPage.locator('#f_dependentDob1').inputValue())==='' && (await healthPage.locator('#f_dependentDob2').inputValue())==='';
-  const healthShot=path.join(OUT,'state-gt-health-dependents.png');await healthPage.screenshot({path:healthShot,fullPage:true});domainProof.gtHealthScreenshotSha256=sha(healthShot);
+  await healthPage.evaluate(()=>window.scrollTo(0,0));await healthPage.waitForTimeout(50);const healthShot=path.join(OUT,'state-gt-health-dependents.png');await healthPage.screenshot({path:healthShot,fullPage:true});domainProof.gtHealthScreenshotSha256=sha(healthShot);
   await healthPage.close();
 
   const otherPage=await newEvidencePage({width:1440,height:1000});
@@ -235,7 +235,7 @@ const viewports=[
   await otherPage.click('[data-next="2"]');await otherPage.waitForTimeout(80);
   await otherPage.click('[data-path="contrato"]');await otherPage.waitForTimeout(60);
   domainProof.otherDeepContractRoute=await otherPage.locator('#f_tipoContrato,#f_monto,#f_vigencia,#f_prioridad').count()===4;
-  const otherShot=path.join(OUT,'state-other-contract.png');await otherPage.screenshot({path:otherShot,fullPage:true});domainProof.otherContractScreenshotSha256=sha(otherShot);
+  await otherPage.evaluate(()=>window.scrollTo(0,0));await otherPage.waitForTimeout(50);const otherShot=path.join(OUT,'state-other-contract.png');await otherPage.screenshot({path:otherShot,fullPage:true});domainProof.otherContractScreenshotSha256=sha(otherShot);
   await otherPage.close();
 
   const statePage=await newEvidencePage({width:1440,height:1000});
