@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "7eefb9f6f57864ee23a121786d9a971241458709",
+      "executionLockBlobSha": "85e1c24b7171a8c80836ec000df05a81f19b368a",
       "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
       "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
       "activeFindingId": "B4-003",
@@ -6054,7 +6054,7 @@
     "status": "B4_003_SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "7eefb9f6f57864ee23a121786d9a971241458709",
+    "executionLockBlobSha": "85e1c24b7171a8c80836ec000df05a81f19b368a",
     "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
     "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
     "noLive": true,
@@ -7078,7 +7078,7 @@
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "guardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
     "masterPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "masterPlanBlobSha": "76fa843efaa65f21365e7d54decbe32177507eef",
+    "masterPlanBlobSha": "0405d18116649f29ca5cae54bedbbdef6a2a9e7c",
     "inventoryCount": 235,
     "attentionCount": 126,
     "rule": "Ledger/register sets are exact and deletion-forbidden. R18 findings are appended before any next build; prior PASS remains preserved unless a causal source change invalidates it.",
@@ -7096,7 +7096,7 @@
   "pendingClosureMasterPlan": {
     "status": "FROZEN_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "blobSha": "76fa843efaa65f21365e7d54decbe32177507eef",
+    "blobSha": "0405d18116649f29ca5cae54bedbbdef6a2a9e7c",
     "baselineFindingCount": 208,
     "currentGate": "B4-003",
     "currentRevision": "R17",
@@ -7365,7 +7365,7 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
     "receiptBlobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
     "compositionBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
-    "executionLockBlobSha": "7eefb9f6f57864ee23a121786d9a971241458709",
+    "executionLockBlobSha": "85e1c24b7171a8c80836ec000df05a81f19b368a",
     "productMutationClosed": true
   },
   "r18ContinuityBindingRepair": {
@@ -7380,5 +7380,12 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "r18QualityProvenanceQaSelectorRootFix": {
+    "status": "QA_FIXED_PENDING_EXACT_RETRY",
+    "failedRunId": 37355564631,
+    "executionLockBlobSha": "85e1c24b7171a8c80836ec000df05a81f19b368a",
+    "masterPlanBlobSha": "0405d18116649f29ca5cae54bedbbdef6a2a9e7c",
+    "nextAction": "RETRY_R18_EXACT_PREVIEW"
   }
 }
