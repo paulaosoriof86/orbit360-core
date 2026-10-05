@@ -42,6 +42,19 @@ function verify(receipt){
     add(v.replanVisible===true,'REPLAN_VISIBLE',req.id);
   }
 
+  const combo=receipt&&receipt.vehicleCombobox;
+  add(!!combo,'VEHICLE_COMBOBOX_EVIDENCE','searchable vehicle identity interaction receipt');
+  if(combo){
+    add(combo.mockContract==='S479_READ_ONLY_SHAPE_UI_PROOF_ONLY','VEHICLE_COMBOBOX_MOCK_BOUNDARY','UI proof only');
+    add(combo.realTransport===false,'VEHICLE_COMBOBOX_NO_REAL_TRANSPORT','real transport remains false');
+    add(combo.brandSearchWorks===true,'VEHICLE_BRAND_SEARCH','brand searchable');
+    add(combo.dependentModelEnabled===true,'VEHICLE_MODEL_DEPENDENCY','model enabled after brand');
+    add(combo.modelSearchWorks===true,'VEHICLE_MODEL_SEARCH','model searchable');
+    add(combo.selectedBrand===true && combo.selectedModel===true,'VEHICLE_COMBOBOX_SELECTION','brand/model selected');
+    add(combo.assistedFallback===true && combo.noForcedSelection===true,'VEHICLE_COMBOBOX_FALLBACK','missing option routes to assisted review');
+    add(SHA.test(String(combo.screenshotSha256||'')),'VEHICLE_COMBOBOX_SCREENSHOT_SHA','interaction evidence');
+  }
+
   const requiredStates=['stage1','stage2','stage3','stage4','replan','changeNeed'];
   const states=(receipt&&Array.isArray(receipt.states))?receipt.states:[];
   for(const id of requiredStates){
