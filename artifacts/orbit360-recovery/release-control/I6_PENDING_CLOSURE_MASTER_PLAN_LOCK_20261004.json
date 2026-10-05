@@ -283,10 +283,10 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
-    "why": "Exact cumulative R17 candidate passed contract, immutable build, isolated Preview deployment, exact Hosting readback, authenticated browser proof and cleanup. B4-004 remains held until targeted Paula visual acceptance. Parallel knowledge/source, email-traceability and future-gate preflight continue without changing the certified artifact.",
-    "currentCandidateReview": "TARGETED_PAULA_VISUAL_ONLY_ON_IMPACTED_PENDING_SURFACES",
+    "status": "PAULA_VISUAL_REJECTED_R17_R18_FORENSIC_ACTIVE",
+    "nextAction": "R18_READONLY_FORENSIC_RENEWALS_AND_POLICY_VERSION_COLLISION",
+    "why": "Paula targeted R17 review preserved several fixes but found blocking commercial-flow, quality-action, mobile, renewals-universe, policy-version and insurer-knowledge defects. R17 machine PASS is retained only for assertions actually demonstrated. B4-004 remains held.",
+    "currentCandidateReview": "R17_REJECTED_NO_MORE_HUMAN_RETEST_UNTIL_R18_MACHINE_PLUS_TINYFISH_PREUAT_PASS",
     "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
     "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
     "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37248154086-11dxqgq2.web.app",
@@ -6241,5 +6241,55 @@
     ],
     "b4004Held": true,
     "rule": "Work all independent non-PASS causes in parallel where safe, but do not advance a later blocking gate or mutate the certified B4-003 product artifact before its required visual acceptance."
+  },
+  "r18VisualRejectionFreeze": {
+    "status": "FROZEN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_DECISION_AND_NOLOSS_FREEZE_20261005.json",
+    "receiptBlobSha": "3a3ef9c695ad8f714be95f743bbf1b78870d2d90",
+    "ledgerBlobSha": "efb76ccc69c6ce1e33f71a81494565694b03857f",
+    "carryBlobSha": "0de76f2429712c5f555ab05c8bf75685361ad501",
+    "exactFindingSetCount": 234,
+    "newFindingIds": [
+      "B4-003-R18-01-OPS-LEADS-DEFAULT-ENTRY-STAGE",
+      "B4-003-R18-02-OPS-LEADS-RAMO-PRODUCT-PLAN-DEPENDENCY",
+      "B4-003-R18-03-COMMERCIAL-IDENTITY-MULTIOPPORTUNITY-MODEL",
+      "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
+      "B4-003-R18-05-OPS-MANAGEMENT-TYPE-QUEUE-SEMANTICS",
+      "B4-003-R18-06-QUALITY-PROVENANCE-CONFIRMATION-ACTION",
+      "B4-003-R18-07-QUALITY-CHANNEL-ACTION-SEMANTIC-MISMATCH",
+      "B4-003-R18-08-QUALITY-REVIEW-AND-CORRECT-NOT-ACTIONABLE",
+      "B4-003-R18-09-POLICY-MOBILE-SEARCH-VISIBILITY",
+      "B4-003-R18-10-RENEWAL-UNIVERSE-11-VS-2-DISPOSITION-GAP",
+      "B4-003-R18-11-POLICY-DUPLICATE-COLLISION-ON-RENEWABILITY-EDIT",
+      "B4-003-R18-12-INSURER-REGISTRY-PROVENANCE-OBJECT-RENDER",
+      "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
+      "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
+      "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINANT-COVERAGE",
+      "I6-7-R18-CARRY-INSURER-COMMISSION-SOURCE-AUTHORITY"
+    ],
+    "preservedR17PassIds": [
+      "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
+      "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
+      "B4-003-R17-01-LEAD-INSURER-COUNTRY-MULTISELECT",
+      "B4-003-R17-02-NONVEHICLE-RISK-SECTION-GUARD",
+      "B4-003-R17-03-OPS-LEADS-KANBAN-CARD-OVERFLOW",
+      "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
+      "B4-003-R15-03-QUALITY-GEO-CATALOG-COMPLETENESS"
+    ],
+    "rule": "One cumulative R18 only. Read-only forensic first; then one causal source-fix set; extend discriminants and TinyFish pre-UAT before presenting another Preview to Paula.",
+    "tinyFishPreUat": {
+      "required": true,
+      "scope": [
+        "Ops/Leads commercial creation and responsive drawer",
+        "dependent Ramo→Producto→Plan",
+        "advisor↔operational handoff",
+        "Quality provenance/channel/mismatch actions",
+        "Pólizas mobile search",
+        "Renewals 11/11 disposition",
+        "renewability edit duplicate/version collision",
+        "Aseguradoras Registry provenance/activity/mobile hierarchy"
+      ],
+      "cannotReplaceHumanVisualAcceptance": true
+    }
   }
 }
