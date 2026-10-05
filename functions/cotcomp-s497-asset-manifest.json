@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ays-cotcomp-s497-asset-manifest-v1.0",
-  "status": "SOURCE_ONLY_OWNER_REVIEW_ASSET_CANDIDATES",
+  "status": "SOURCE_ONLY_OWNER_REVIEW_READY_ASSET_PACKAGE",
   "officialIdentity": {
     "fullLogo": {
       "source": "project-upload:Logo V. 2026.jpeg",
@@ -118,9 +118,9 @@
     "ownerReviewAssetEligibility": true,
     "productionVisualApproval": false,
     "packagingComplete": true,
-    "runtimeBytesVerified": false,
+    "runtimeBytesVerified": true,
     "sourceBytesVerified": true,
-    "ownerReviewVisualEvidenceComplete": false
+    "ownerReviewVisualEvidenceComplete": true
   },
   "packagedRuntime": {
     "logo": {
