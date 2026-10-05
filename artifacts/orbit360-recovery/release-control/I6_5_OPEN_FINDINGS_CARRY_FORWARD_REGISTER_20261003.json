@@ -16,8 +16,8 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 234,
-  "attentionCount": 126,
+  "inventoryCount": 235,
+  "attentionCount": 127,
   "inventory": [
     {
       "id": "MECH-HARNESS-005",
@@ -8858,6 +8858,27 @@
       "remediation": "Document/endoso→extraction proposal→human validation→effective-version activation; policy/commission relation must bind the applicable version. Missing source remains pending, not invented 12%.",
       "closureCondition": "I6.7 proves source-backed effective commission rule, policy linkage, readback/reload, historical non-retroactivity and role controls.",
       "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003-R18-16-INICIO-POLIZAS-RENEWAL-KPI-PARITY",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "CAUSE_CONFIRMED_R18_SOURCE_FIX_AUTHORIZED",
+      "blocking": true,
+      "surface": "Inicio/Pólizas/Renovaciones",
+      "finding": "Inicio displayed Renovaciones ≤45 d = 14 while Pólizas displayed Vencen ≤45 d = 11 and authenticated raw forensic reconciled the exact date-window universe to 11.",
+      "rootCause": "RENEWAL_KPI_DUPLICATED_SOURCE_AUTHORITY_ACROSS_INICIO_AND_POLIZAS",
+      "owner": [
+        "orbit360-platform/modules/inicio.js",
+        "orbit360-platform/modules/polizas.js"
+      ],
+      "remediation": "Inicio consumes the exact Pólizas policyMetrics.isRenewalWithin45Days predicate over the same scoped policy collection; no parallel KPI predicate.",
+      "closureCondition": "Exact Preview must show Inicio and Pólizas equal renewal <=45 counts for same role/country context and no hidden date-window row.",
+      "causalAuthority": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
+        "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
+      },
+      "mayDisappearWithoutDisposition": false
     }
   ],
   "attentionIds": [
@@ -8986,7 +9007,8 @@
     "B4-003-R18-12-INSURER-REGISTRY-PROVENANCE-OBJECT-RENDER",
     "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
     "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
-    "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINANT-COVERAGE"
+    "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINANT-COVERAGE",
+    "B4-003-R18-16-INICIO-POLIZAS-RENEWAL-KPI-PARITY"
   ],
   "criticalCurrentReviewIds": [
     "B4-003",
@@ -9046,7 +9068,8 @@
     "B4-003-R18-12-INSURER-REGISTRY-PROVENANCE-OBJECT-RENDER",
     "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
     "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
-    "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINANT-COVERAGE"
+    "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINANT-COVERAGE",
+    "B4-003-R18-16-INICIO-POLIZAS-RENEWAL-KPI-PARITY"
   ],
   "explicitCrossGateCarries": [
     "B1-EMAIL-DELIVERY-001",
