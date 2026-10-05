@@ -1,7 +1,7 @@
 # CotComp S4.97 — Pact Compliance Matrix
 
 **Date:** 2026-10-04  
-**Status:** CLEAN PARENT SOURCE BUILT · FAIL-CLOSED GATES ACTIVE · NO OWNER URL · NO DEPLOYMENT
+**Status:** CLEAN PARENT SOURCE BUILT · AUTOMATED + INTERNAL VISUAL AUDIT PASS · OWNER REVIEW CANDIDATE ALLOWED · NO PRODUCTION
 
 ## Purpose
 
@@ -27,11 +27,11 @@ This matrix is binding for the next CotComp candidate.
 | No production / no real provider transport | manifest false + no-deploy test | ENFORCED |
 | No accidental Firebase deployment of clean parent | no `onRequest`, not required/exported by `bootstrap.js` | ENFORCED |
 | No Owner URL before visual evidence | clean parent manifest says `ownerReviewUrlAuthorized:false`; screenshot gate only returns true after all evidence passes | ENFORCED |
-| Required visual evidence | 1440 / 1024 / 390 / 320 + stage1/2/3/4/replan/changeNeed screenshot SHA | GATE READY · EVIDENCE PENDING |
-| CI enforcement on every S4.97 change | `.github/workflows/cotcomp-s497-contract-gate.yml` runs syntax + contract + no-deploy assertions | REGISTERED · EXECUTION RECEIPT NOT YET OBSERVED |
-| Official A&S logo exact asset | source parent currently uses a text slot, not final logo bytes | BLOCKING BEFORE OWNER URL |
-| Governed hero/family asset bytes packaged and verified | asset map frozen; source paths declared; runtime bytes not yet packaged | BLOCKING BEFORE OWNER URL |
-| Pixel/visual compare against golden evidence | evidence registry exists; actual new screenshots not generated yet | BLOCKING BEFORE OWNER URL |
+| Required visual evidence | 1440 / 1024 / 390 / 320 + stage1/2/3/4/replan/changeNeed screenshot SHA | **PASS · run 37251478643** |
+| CI enforcement on every S4.97 change | `.github/workflows/cotcomp-s497-contract-gate.yml` runs syntax + contract + no-deploy assertions | **PASS · run 37251478642** |
+| Official A&S logo exact asset | governed official source + packaged derived runtime bytes verified in browser | **PASS FOR OWNER REVIEW** |
+| Governed hero/family asset bytes packaged and verified | packaged logo, hero and family-scene bytes are hash-governed and browser-render verified | **PASS FOR OWNER REVIEW** |
+| Pixel/visual compare against golden evidence | exact anchor/style lock + deterministic screenshots + internal manual visual audit | **PASS FOR OWNER REVIEW** |
 
 ## Current implementation state
 
@@ -71,7 +71,7 @@ Registered CI workflow:
 
 `.github/workflows/cotcomp-s497-contract-gate.yml`
 
-The workflow has read-only repository permission and contains no deployment step, no Firebase command and no secret usage. Its execution receipt has not yet been independently read back, so CI is not being claimed as PASS yet.
+The workflow has read-only repository permission and contains no deployment step, no Firebase command and no secret usage. Contract Gate run `37251478642` and Visual Evidence run `37251478643` are independently read back as SUCCESS for the audited candidate.
 
 ## Fail-closed rule
 
@@ -92,10 +92,4 @@ A new Owner-review URL is forbidden if **any** of the following remains true:
 
 No process can guarantee that software will never contain a defect. What is guaranteed by this recovery design is the **gate behavior**: a candidate that violates the frozen checks must remain blocked and must not be presented as Owner-ready.
 
-The next action is therefore not deployment. It is:
-1. package governed visual assets;
-2. wire exact official logo;
-3. render locally/LAB-isolated without promotion;
-4. generate the required visual evidence receipt;
-5. run S4.97 gates;
-6. only if all PASS, open Owner review.
+The pre-Owner-review blockers above are closed for the audited source. The next action is a **LAB-only Owner Review wrapper/deployment** around S4.97, with physical readback and no production/provider promotion. Owner review remains a visual/UX approval gate, not production approval.
