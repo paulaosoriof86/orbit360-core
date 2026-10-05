@@ -4868,7 +4868,7 @@
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-      "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_SOURCE_FIX_LOCK_20261003.json",
+      "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
       "executionLockBlobSha": "1e36f2f51e0f6ecb4ff3af9e5dc4df313083755c",
       "compositionLockBlobSha": "baf0fe4551ff2be6ded68504b73506b28dacc17f",
       "findingLedgerBlobSha": "ffa1f7b937ffcc616b0af02e44513adcc445c9aa",
