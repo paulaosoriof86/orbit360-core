@@ -63,8 +63,8 @@ function salud(country){
         field('modalidad','Modalidad','select',['Individual','Familiar'],'Familiar','La composición puede cambiar plan y tarifa.'),
         field('titularDob','Fecha de nacimiento del titular','date',[],'','La fecha exacta evita aproximaciones al validar la solicitud.'),
         field('generoTitular','Género tarifario titular','select',['Femenino','Masculino'],'Femenino','Se conserva cuando la fuente final lo requiere.'),
-        field('conyuge','¿Incluye cónyuge?','select',['No','Sí'],'Sí','Activa datos adicionales cuando corresponda.'),
-        field('spouseDob','Fecha de nacimiento del cónyuge','date',[],'','Completar solo si incluyes cónyuge.'),
+        field('conyuge','¿Incluye cónyuge?','select',['No','Sí'],'No','Activa datos adicionales cuando corresponda.'),
+        field('spouseDob','Fecha de nacimiento del cónyuge','date',[],'','Completar solo si incluyes cónyuge.',{field:'conyuge',equals:'Sí'}),
         field('hijos','Cantidad de hijos','number',[],'0','La composición modifica plan/tarifa en fuentes auditadas.')
       ]},
       {title:'Opciones del plan',kicker:'COBERTURAS',fields:[
@@ -131,8 +131,8 @@ function transporte(country){
   if(country==='co'){
     groups.push(
       {title:'Cómo quieres proteger la operación',kicker:'MODALIDAD',fields:[
-        field('coverageModeNeed','Tipo de necesidad','select',['SPECIFIC_SHIPMENT','ANNUAL_PROGRAM','NEED_GUIDANCE'],'SPECIFIC_SHIPMENT','Define si revisamos un despacho puntual o un programa continuo.'),
-        field('transportModePrimary','Medio principal de transporte','select',['ROAD','AIR','MARITIME','MULTIMODAL','OTHER','NEED_GUIDANCE'],'ROAD','Puedes ampliar los medios cuando el caso requiera más de uno.')
+        field('coverageModeNeed','Tipo de necesidad','select',['Despacho específico','Programa anual','Necesito orientación'],'Despacho específico','Define si revisamos un despacho puntual o un programa continuo.'),
+        field('transportModePrimary','Medio principal de transporte','select',['Terrestre','Aéreo','Marítimo','Multimodal','Otro / revisar','Necesito orientación'],'Terrestre','Puedes ampliar los medios cuando el caso requiera más de uno.')
       ]},
       {title:'Datos de la modalidad',kicker:'DETALLE',fields:[
         field('origin','Origen','text',[],'','Punto de inicio del despacho.'),
