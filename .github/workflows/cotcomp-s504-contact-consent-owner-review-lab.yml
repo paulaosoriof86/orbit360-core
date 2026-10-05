@@ -1,0 +1,95 @@
+name: CotComp S5.04 Contact + Consent Owner Review LAB
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/cotcomp-s504-contact-consent-owner-review-lab-20261005
+    paths:
+      - 'functions/cotcomp-owner-review-s504.js'
+      - 'functions/cotcomp-owner-review-s504.test.js'
+      - 'functions/bootstrap.js'
+      - '.github/workflows/cotcomp-s504-contact-consent-owner-review-lab.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompOwnerReviewS504
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompOwnerReviewS504
+
+jobs:
+  s504-contact-consent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:{ fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with:{ node-version: '22' }
+      - name: QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          node --check cotcomp-owner-review-s504.js
+          node --check cotcomp-owner-review-s504.test.js
+          node --test cotcomp-owner-review-s504.test.js
+      - name: Prepare LAB credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s504/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s504/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+      - name: Deploy only S5.04
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+      - name: Physical readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s504/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+          grep -q 'Owner Review S5.04' "$E/page.html"
+          grep -q 's504Name' "$E/page.html"
+          grep -q 's504Consent' "$E/page.html"
+          grep -q '50256149048' "$E/page.html"
+          grep -q '573138340897' "$E/page.html"
+          ! grep -q 'cc-hero__benefits' "$E/page.html"
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s504-contact-consent-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s504/evidence/page.html
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Cleanup credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s504/firebase-service-account.json"
