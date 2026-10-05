@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-05T11:24:00-06:00",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R19_CAUSAL_DIAGNOSTIC_ACTIVE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "R19_CAUSAL_DIAGNOSTIC_ACTIVE",
     "blocking": true,
-    "nextAction": "B4_003_R18_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING_R18_TARGETED_VISUAL",
+    "nextAction": "R19_CAUSAL_DIAGNOSTIC_AND_SINGLE_CUMULATIVE_FIX",
+    "humanVisualStatus": "REJECTED_R18",
     "knowledgePreview": true
   },
   "rules": {
@@ -73,7 +73,7 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "R13-10 only: exact Preview, one disposable B4 synthetic insurer/document test, mandatory Drive/linkage/reload readback and cleanup; no real insurer/client mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
@@ -91,7 +91,7 @@
     "drivePreviewFunctionDeploymentAuthorized": true,
     "drivePreviewProductionFunctionsAuthorized": false
   },
-  "nextAction": "B4_003_R18_TARGETED_PAULA_VISUAL",
+  "nextAction": "R19_CAUSAL_DIAGNOSTIC_AND_SINGLE_CUMULATIVE_FIX",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "7560cfba0fee9f9fc0888e7eff8839066ed9c710"
@@ -560,8 +560,8 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
-  "continuityRegisterBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7",
+  "findingLedgerBlobSha": "3fdd0a9c515250a5055f1a994456941cca6b4557",
+  "continuityRegisterBlobSha": "17e652128da7af382b6a79f4ac171ed0624a84ea",
   "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -587,5 +587,10 @@
     "status": "SEALED",
     "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
     "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7"
+  },
+  "masterPlanBlobSha": "4413b71c6b31b863d9363aa2a923e71efc106269",
+  "r19NoLossFreeze": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_R19_NOLOSS_FREEZE_20261005.json",
+    "blobSha": "5277c2a052ea8dcea3bb9e15eb7eb3f6b55e0c5d"
   }
 }
