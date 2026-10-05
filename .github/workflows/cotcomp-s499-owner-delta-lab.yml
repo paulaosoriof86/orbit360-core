@@ -1,0 +1,147 @@
+name: CotComp S4.99 Owner Delta LAB
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/cotcomp-s499-owner-delta-visual-cta-lab-20261005
+    paths:
+      - 'functions/cotcomp-owner-review-s499.js'
+      - 'functions/cotcomp-owner-review-s499.test.js'
+      - 'functions/bootstrap.js'
+      - '.github/workflows/cotcomp-s499-owner-delta-lab.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COTCOMP_PROJECT_ID: ays-orbit-360-lab
+  COTCOMP_FUNCTION: cotcompOwnerReviewS499
+  COTCOMP_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompOwnerReviewS499
+  CATALOG_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/cotcompVehicleCatalogS479
+
+jobs:
+  owner-delta-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify S4.99 boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "providerDeploymentAuthorized:false" functions/cotcomp-owner-review-s499.js
+          grep -q "cotcompRealTransportAuthorized:false" functions/cotcomp-owner-review-s499.js
+          grep -q "production:false" functions/cotcomp-owner-review-s499.js
+          grep -q "writes:false" functions/cotcomp-owner-review-s499.js
+          grep -q "realAdvisorTransport:false" functions/cotcomp-owner-review-s499.js
+
+      - name: Run S4.97 baseline + S4.99 QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run check:cotcomp:s497
+          npm run test:cotcomp:s497
+          node --check cotcomp-owner-review-s499.js
+          node --check cotcomp-owner-review-s499.test.js
+          node --test cotcomp-owner-review-s499.test.js
+
+      - name: Prepare LAB deployment credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s499/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s499/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "$COTCOMP_PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Install Firebase CLI
+        shell: bash
+        run: npm install --global firebase-tools@15.32.0
+
+      - name: Deploy only S4.99 Owner Delta to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$COTCOMP_FUNCTION" --project "$COTCOMP_PROJECT_ID" --non-interactive --force
+
+      - name: Physical readback and boundary proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          E="$RUNNER_TEMP/s499/evidence"
+          CODE="$(curl -sS -o "$E/page.html" -w '%{http_code}' "$COTCOMP_URL")"
+          test "$CODE" = "200"
+          grep -q 'OWNER_DELTA_REVIEW_LAB_ONLY' "$E/page.html"
+          grep -q 'data-s499-visual="data"' "$E/page.html"
+          grep -q 'data-s499-visual="review"' "$E/page.html"
+          grep -q 'data-s499-visual="compare"' "$E/page.html"
+          grep -q 'id="s499Handoff"' "$E/page.html"
+          grep -q '"writes":false' "$E/page.html"
+          grep -q '"realAdvisorTransport":false' "$E/page.html"
+          POST_CODE="$(curl -sS -o "$E/post.txt" -w '%{http_code}' -X POST "$COTCOMP_URL")"
+          test "$POST_CODE" = "405"
+
+          CAT_CODE="$(curl -sS -o "$E/catalog-meta.json" -w '%{http_code}' "$CATALOG_URL?op=meta")"
+          test "$CAT_CODE" = "200"
+          node - "$E/catalog-meta.json" <<'NODE'
+          const fs=require('fs');
+          const j=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          if(j.ok!==true || j.labOnly!==true || j.appDataSource!==false || j.providerEligibilityEmbedded!==false) process.exit(1);
+          NODE
+
+          node - "$E/S499_OWNER_DELTA_LAB_RECEIPT.json" <<'NODE'
+          const fs=require('fs');
+          fs.writeFileSync(process.argv[2],JSON.stringify({
+            schemaVersion:'ays-cotcomp-s499-owner-delta-lab-receipt-v1.0',
+            functionUrl:process.env.COTCOMP_URL,
+            projectId:process.env.COTCOMP_PROJECT_ID,
+            visualStages234:true,
+            advisorCtaObservable:true,
+            decisionCtaObservable:true,
+            providerDeploymentAuthorized:false,
+            cotcompRealTransportAuthorized:false,
+            productionTouched:false,
+            writes:false,
+            realAdvisorTransport:false
+          },null,2));
+          NODE
+
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s499-owner-delta-lab-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/s499/evidence/S499_OWNER_DELTA_LAB_RECEIPT.json
+            ${{ runner.temp }}/s499/evidence/page.html
+            ${{ runner.temp }}/s499/evidence/catalog-meta.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s499/firebase-service-account.json"
