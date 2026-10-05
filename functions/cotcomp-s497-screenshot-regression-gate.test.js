@@ -11,7 +11,7 @@ function good(){
     anchorSha256:'a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d',
     providerDeploymentAuthorized:false,cotcompRealTransportAuthorized:false,production:false,
     viewports:G.REQUIRED_VIEWPORTS.map(v=>({
-      id:v.id,width:v.width,screenshotSha256:H,h1FontFamily:'Archivo',h1FontWeight:900,
+      id:v.id,width:v.width,screenshotSha256:H,h1FontFamily:'Archivo',h1FontWeight:900,heroHeight:Math.round((v.heroMin+v.heroMax)/2),
       heroImageObjectFit:'cover',heroImageDistorted:false,heroHeightCoupledToWorkspace:false,
       horizontalOverflow:false,repeatedFamilyVisual:false,minPrimaryBodyPx:14,minControlPx:15,minLabelPx:12,
       familyColumns:v.familyColumns,stagesVisible:true,recommendationVisible:true,replanVisible:true
@@ -38,11 +38,12 @@ test('visual evidence gate rejects typography, distortion, repetition and overfl
   const r=good();
   r.viewports[0].h1FontFamily='Newsreader';
   r.viewports[0].heroImageDistorted=true;
+  r.viewports[0].heroHeight=900;
   r.viewports[0].repeatedFamilyVisual=true;
   r.viewports[0].horizontalOverflow=true;
   const v=G.verify(r);
   assert.equal(v.ok,false);
-  for(const code of ['H1_FONT','HERO_NOT_DISTORTED','NO_REPEATED_FAMILY_VISUAL','NO_HORIZONTAL_OVERFLOW']) assert.ok(v.failed.some(x=>x.code===code),code);
+  for(const code of ['H1_FONT','HERO_HEIGHT_RANGE','HERO_NOT_DISTORTED','NO_REPEATED_FAMILY_VISUAL','NO_HORIZONTAL_OVERFLOW']) assert.ok(v.failed.some(x=>x.code===code),code);
 });
 
 test('automated visual evidence can pass but cannot alone authorize an Owner URL',()=>{
