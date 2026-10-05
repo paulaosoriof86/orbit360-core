@@ -6,7 +6,7 @@ const S497=require('./cotcomp-clean-parent-s497');
 const S498=require('./cotcomp-owner-review-s498');
 
 test('S4.98 is an Owner-review wrapper around the clean source-only parent',()=>{
-  assert.equal(S497.DEPLOYMENT_EXPORT,null);
+  assert.equal(S497.DEPLOYMENT_EXPORT,false);
   assert.equal(S498.AUTH.sourceParent,S497.VERSION);
   assert.equal(S498.AUTH.ownerReviewUrlAuthorized,true);
   assert.equal(S498.AUTH.internalManualVisualAuditPassed,true);
