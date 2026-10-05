@@ -51,6 +51,7 @@ function verify(receipt){
     add(combo.dependentModelEnabled===true,'VEHICLE_MODEL_DEPENDENCY','model enabled after brand');
     add(combo.modelSearchWorks===true,'VEHICLE_MODEL_SEARCH','model searchable');
     add(combo.selectedBrand===true && combo.selectedModel===true,'VEHICLE_COMBOBOX_SELECTION','brand/model selected');
+    add(combo.keyboardSelectionWorks===true,'VEHICLE_COMBOBOX_KEYBOARD','Arrow/Enter keyboard selection works');
     add(combo.assistedFallback===true && combo.noForcedSelection===true,'VEHICLE_COMBOBOX_FALLBACK','missing option routes to assisted review');
     add(SHA.test(String(combo.screenshotSha256||'')),'VEHICLE_COMBOBOX_SCREENSHOT_SHA','interaction evidence');
   }
