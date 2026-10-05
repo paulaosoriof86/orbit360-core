@@ -1,8 +1,8 @@
 'use strict';
 
 const REQUIRED_VIEWPORTS=Object.freeze([
-  {id:'desktop-1440',width:1440,height:1000,familyColumns:4,heroMin:350,heroMax:410},
-  {id:'desktop-1024',width:1024,height:900,familyColumns:4,heroMin:350,heroMax:420},
+  {id:'desktop-1440',width:1440,height:1000,familyColumns:4,heroMin:350,heroMax:390},
+  {id:'desktop-1024',width:1024,height:900,familyColumns:4,heroMin:350,heroMax:390},
   {id:'mobile-390',width:390,height:844,familyColumns:1,heroMin:500,heroMax:680},
   {id:'mobile-320',width:320,height:700,familyColumns:1,heroMin:500,heroMax:700}
 ]);
