@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "R18_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
-    "nextAction": "R18_CONTRACT_AND_EXACT_PREVIEW",
-    "why": "Single cumulative R18 source fix is frozen. No product mutation remains authorized before contract and exact Preview.",
+    "status": "R18_HUMAN_REJECTED_R19_DIAGNOSTIC_ACTIVE",
+    "nextAction": "R19_CAUSAL_DIAGNOSTIC_AND_SINGLE_CUMULATIVE_FIX",
+    "why": "R18 exact Preview machine-pass was human-rejected on stale dependent product, native multiselect UX, notification gap, quality controls, mobile policy search, renewal atomic save, renewal bucket completeness, Inicio readiness and insurer hierarchy.",
     "currentCandidateReview": "R17_REJECTED_NO_MORE_HUMAN_RETEST_UNTIL_R18_MACHINE_PLUS_TINYFISH_PREUAT_PASS",
     "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
     "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
@@ -6339,5 +6339,14 @@
     "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
     "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7",
     "executionLockBlobSha": "5577996dda4803c9572ad9a6dfd433f446f05085"
+  },
+  "r19NoLossFreeze": {
+    "status": "FROZEN",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_R19_NOLOSS_FREEZE_20261005.json",
+    "blobSha": "5277c2a052ea8dcea3bb9e15eb7eb3f6b55e0c5d",
+    "ledgerBlobSha": "3fdd0a9c515250a5055f1a994456941cca6b4557",
+    "carryBlobSha": "17e652128da7af382b6a79f4ac171ed0624a84ea",
+    "exactFindingCount": 243,
+    "preservePasses": true
   }
 }
