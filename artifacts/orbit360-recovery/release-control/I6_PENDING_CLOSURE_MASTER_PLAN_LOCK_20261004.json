@@ -283,10 +283,16 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "PAULA_VISUAL_PARTIAL_PASS_R16_COMPREHENSIVE_REMEDIATION_REQUIRED",
-    "nextAction": "B4_003_R16_COMPREHENSIVE_CAUSAL_DIAGNOSTIC_AND_SINGLE_SUCCESSOR_FIX",
-    "why": "R15 functional findings remain open and Carlos/Operativo exposed a role-dependent empty assignable-advisor roster. B4-004 remains held.",
-    "currentCandidateReview": "STOP_BROAD_HUMAN_REVIEW_UNTIL_R16_SUCCESSOR"
+    "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "why": "Exact cumulative R17 candidate passed contract, immutable build, isolated Preview deployment, exact Hosting readback, authenticated browser proof and cleanup. B4-004 remains held until targeted Paula visual acceptance. Parallel knowledge/source, email-traceability and future-gate preflight continue without changing the certified artifact.",
+    "currentCandidateReview": "TARGETED_PAULA_VISUAL_ONLY_ON_IMPACTED_PENDING_SURFACES",
+    "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
+    "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37248154086-11dxqgq2.web.app",
+    "machineProofRunId": 37248154086,
+    "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
+    "machineProofReceiptBlobSha": "89d4dbc5370055fa47b7defc0886c6d892e9208d"
   },
   "frozenExecutionSequence": [
     {
@@ -6225,5 +6231,15 @@
     "rule": "No reimport/rewrite to fix UI, routing, permissions, hydration, validators, composition or semantic display defects."
   },
   "renewalWhyStillOpen": "The R13/R14 technical fixes repaired zero-regression/first-paint/fail-closed mechanics, but the business universe still contains many policies without authoritative renovable YES/NO and some with incomplete premium/source lineage. The product is correctly refusing to infer them; closure requires source-backed enrichment/validation, not another rendering patch.",
-  "completionDefinition": "No Fase A closure declaration until B4-003 through B4-007 and I6.6-I6.9 satisfy their evidence contracts, every pre-live finding has explicit evidence-backed disposition, and LIVE readback proves the accepted release."
+  "completionDefinition": "No Fase A closure declaration until B4-003 through B4-007 and I6.6-I6.9 satisfy their evidence contracts, every pre-live finding has explicit evidence-backed disposition, and LIVE readback proves the accepted release.",
+  "parallelWorkstreamResume": {
+    "status": "ACTIVE_NO_PRODUCT_MUTATION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_PARALLEL_NONPASS_AND_KNOWLEDGE_WORKSTREAMS_RESUMED_20261005.json",
+    "knowledgeLibraryPaths": [
+      "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_ASEGURADORAS_INVENTARIO_PASS2_2026-10-04.md",
+      "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_NORMALIZADO_CANDIDATO_PASS2_2026-10-04.json"
+    ],
+    "b4004Held": true,
+    "rule": "Work all independent non-PASS causes in parallel where safe, but do not advance a later blocking gate or mutate the certified B4-003 product artifact before its required visual acceptance."
+  }
 }
