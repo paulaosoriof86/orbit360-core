@@ -1,0 +1,27 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_V1",
+  "recordedAt": "2026-10-05T11:42:00-06:00",
+  "status": "CAUSE_CONFIRMED_ADD_TO_SAME_R18_CANDIDATE",
+  "findingId": "B4-003-R18-16-INICIO-POLIZAS-RENEWAL-KPI-PARITY",
+  "evidence": {
+    "paulaMobilePolicyKpi": "Pólizas · Todos los países · Operativo: Vencen ≤45 d = 11",
+    "paulaTinyFishCaptureInicio": "Inicio · Todos los países · Dirección: Renovaciones ≤45 d = 14",
+    "authenticatedForensic": "Exact raw date-window universe = 11 as of 2026-10-05",
+    "sourceSplit": [
+      "orbit360-platform/modules/inicio.js -> Orbit.q.renovacionesProximas(45)",
+      "orbit360-platform/modules/polizas.js -> policyMetrics.isRenewalWithin45Days"
+    ]
+  },
+  "rootCause": "RENEWAL_KPI_DUPLICATED_SOURCE_AUTHORITY_ACROSS_INICIO_AND_POLIZAS",
+  "decision": "Pólizas policyMetrics.isRenewalWithin45Days is the visible canonical predicate for the <=45 policy universe. Inicio must consume that exact predicate over the same scoped policy set, not maintain an independent KPI owner.",
+  "allowedAdditionalProductFiles": [
+    "orbit360-platform/modules/inicio.js"
+  ],
+  "requiredProof": "Exact Preview must show Inicio and Pólizas equal renewal <=45 counts for same role/country context and no hidden date-window row.",
+  "boundaries": {
+    "sameR18Candidate": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  }
+}
