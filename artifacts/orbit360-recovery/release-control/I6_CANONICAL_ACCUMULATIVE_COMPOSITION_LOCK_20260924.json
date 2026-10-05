@@ -205,7 +205,7 @@
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
     "orbit360-platform/index.html": "f96358fbef0cef9e49c4e750f58160132eea1672",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
-    "orbit360-platform/modules/aseguradoras.js": "b12b65b0468bb2942ecb8e9a50eb089533387291",
+    "orbit360-platform/modules/aseguradoras.js": "2e651c12fe78aac38bc1f655bfb3a3f2ac6f182e",
     "orbit360-platform/modules/calidad.js": "0851a73f29445cac6ddf9099fa2ef7c9c0b71ba5",
     "orbit360-platform/modules/cancelaciones.js": "63f6dd1bb3ffad24cf8452404dfc540f1b92e2b7",
     "orbit360-platform/modules/cliente360.js": "58f9c1469e50b0e27fb0fcea7c8a6d613ce8f320",
@@ -3059,7 +3059,7 @@
       "orbit360-platform/modules/cliente360.js": "58f9c1469e50b0e27fb0fcea7c8a6d613ce8f320",
       "orbit360-platform/modules/renovaciones.js": "c7285e6e1dfdad5e91b9c30c48939da2853b7c87",
       "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "b44695f05170b4406740ed7158b47e6464916d8f",
-      "orbit360-platform/modules/aseguradoras.js": "b12b65b0468bb2942ecb8e9a50eb089533387291",
+      "orbit360-platform/modules/aseguradoras.js": "2e651c12fe78aac38bc1f655bfb3a3f2ac6f182e",
       "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "d3ee9ce359570b6f6940374aefe74c617cc71d20",
       "orbit360-platform/index.html": "f96358fbef0cef9e49c4e750f58160132eea1672"
     },
@@ -3088,6 +3088,14 @@
       "failureCode": "B4_003_CONTROL_STATUS_INVALID",
       "resolution": "R17 gate/control/lock lifecycle was correct; contract still asserted R16_04 control/lock status names. Updated only QA literals; product source unchanged and no build occurred.",
       "productSourceChanged": false,
+      "noBuildOccurredBeforeFix": true
+    },
+    "qaCompatibilityAlignment2": {
+      "status": "CANONICAL_UI_LITERAL_RESTORED_BEFORE_BUILD",
+      "failedRunId": 37245721821,
+      "failureCode": "B4_003_R16_INSURER_REGISTRY_UI_OR_METADATA_MISSING",
+      "resolution": "Restored frozen visible heading 'Registry canónica de fuentes · Biblioteca y Drive' while preserving R17 expandable detail functionality.",
+      "productSourceChanged": true,
       "noBuildOccurredBeforeFix": true
     }
   }
