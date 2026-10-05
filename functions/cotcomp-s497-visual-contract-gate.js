@@ -55,6 +55,10 @@ function validateHtml(html,manifest){
   push(out,/\.cc-family\{[^}]*padding:16px/.test(html),'FAMILY_CARD_PADDING','16px');
 
   push(out,hasAll(html,LOCK.requiredVehicleFields),'VEHICLE_PATTERN','Marca → Línea/modelo → Año');
+  push(out,html.includes('data-vehicle-combo="brand"') && html.includes('data-vehicle-combo="model"') && html.includes('role="combobox"'),'VEHICLE_SEARCHABLE_COMBOBOX','searchable dependent Marca → Línea/modelo');
+  push(out,html.includes('No encuentro mi marca') && html.includes('No encuentro mi línea / modelo'),'VEHICLE_ASSISTED_FALLBACK','explicit assisted fallback');
+  push(out,html.includes("CATALOG_API='/cotcompVehicleCatalogS479'"),'VEHICLE_CATALOG_BOUNDARY','LAB read-only catalog boundary');
+  push(out,html.includes('SOURCE_ONLY_VISUAL_FIXTURE_NOT_REAL_PROPOSALS') && html.includes('Según propuesta') && !html.includes('Q 2,180') && !html.includes('Q 2,540'),'VISUAL_FIXTURE_TRUTH','visual comparison fixture has no invented monetary values');
   push(out,/\.cc-control\{[^}]*font-size:15px/.test(html),'FORM_CONTROL_SIZE','15px');
   push(out,/\.cc-label\{[^}]*font-size:12px/.test(html),'FORM_LABEL_SIZE','12px');
 
