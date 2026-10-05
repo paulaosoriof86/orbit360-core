@@ -240,10 +240,12 @@ function comparison(country,product){
   const visualFixture=quotes.length>=2;
   const validated=[];
   return Object.freeze({
-    comparable:visualFixture,
+    comparable:false,
+    visualComparable:visualFixture,
     visualFixture,
     quotes:Object.freeze(quotes),
-    validated:Object.freeze(visualFixture?quotes:validated),
+    displayOptions:Object.freeze(quotes),
+    validated:Object.freeze(validated),
     reason:visualFixture?'SOURCE_ONLY_VISUAL_FIXTURE_NOT_REAL_PROPOSALS':'comparativo_requiere_dos_cotizaciones_validadas',
     rankingPolicy:'NONE_BY_DEFAULT',
     noSilentWeighting:true
