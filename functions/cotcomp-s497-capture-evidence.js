@@ -108,6 +108,12 @@ const viewports=[
     await page.click('[data-next="2"]');
     await page.waitForTimeout(120);
     const heroH2=await page.locator('.cc-hero').boundingBox();
+    await page.click('[data-next="3"]');
+    await page.waitForTimeout(80);
+    await page.click('[data-next="4"]');
+    await page.waitForTimeout(80);
+    m.recommendationVisible=await page.locator('.cc-rec').count()>0;
+    m.replanVisible=await page.locator('.cc-replan').count()>0;
     m.screenshotSha256=sha(shot);
     m.heroHeightCoupledToWorkspace=Math.abs((heroH1?.height||0)-(heroH2?.height||0))>1;
     receipt.viewports.push(m);
