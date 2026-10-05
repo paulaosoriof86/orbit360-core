@@ -1,0 +1,94 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R18_PAULA_VISUAL_REJECTION_DECISION_FREEZE_V1",
+  "recordedAt": "2026-10-05T09:08:00-06:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authority": "PAULA_TARGETED_VISUAL_REVIEW_R17_PLUS_PHYSICAL_SOURCE_CAUSAL_ANALYSIS",
+  "status": "FROZEN_NOLOSS_R18_FORENSIC_NEXT",
+  "gate": "I6.5 / B4-003",
+  "reviewedCandidate": {
+    "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
+    "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37248154086-11dxqgq2.web.app",
+    "priorMachineStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "humanDisposition": "REJECTED_R17"
+  },
+  "governingDecisions": {
+    "singleCumulativeSuccessor": "R18",
+    "serialRediscoveryLoopsForbidden": true,
+    "b4004Held": true,
+    "livePromotionForbidden": true,
+    "reimportForbidden": true,
+    "productMutationBeforeReadOnlyForensic": false,
+    "machinePassAloneNeverEqualsHumanAcceptance": true,
+    "preservePriorHumanPassUnlessCausallyTouched": true,
+    "findingDeletionForbidden": true,
+    "everyNewFindingMustRemainInLedgerAndCarryAcrossIterations": true,
+    "noHiddenRenewalDisposition": true,
+    "oneCommercialIdentityManyOpportunities": true,
+    "commercialDefaultStage": "Nuevo",
+    "commercialStageSequence": [
+      "Nuevo",
+      "Contactado",
+      "Cotizando",
+      "Propuesta",
+      "Negociación",
+      "Inspección",
+      "Emisión",
+      "Emitido"
+    ],
+    "dependentCommercialDimensions": [
+      "País",
+      "Ramo",
+      "Producto",
+      "Plan",
+      "Aseguradoras compatibles"
+    ],
+    "provenanceRule": "Current value and provenance are separate; missing provenance never authorizes inference or deletion of current value.",
+    "financialCorrectionRule": "No premium/receipt correction by inference; correction must follow authoritative source.",
+    "commissionRule": "Missing commission authority stays pending; no silent fallback may be represented as contractual truth.",
+    "tinyFishPreUatMandatory": true
+  },
+  "preservedR17PassIds": [
+    "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
+    "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
+    "B4-003-R17-01-LEAD-INSURER-COUNTRY-MULTISELECT",
+    "B4-003-R17-02-NONVEHICLE-RISK-SECTION-GUARD",
+    "B4-003-R17-03-OPS-LEADS-KANBAN-CARD-OVERFLOW",
+    "B4-003-R16-02-QUALITY-GT-RENDER-PERFORMANCE-REGRESSION",
+    "B4-003-R15-03-QUALITY-GEO-CATALOG-COMPLETENESS"
+  ],
+  "newFindingIds": [
+    "B4-003-R18-01-OPS-LEADS-DEFAULT-ENTRY-STAGE",
+    "B4-003-R18-02-OPS-LEADS-RAMO-PRODUCT-PLAN-DEPENDENCY",
+    "B4-003-R18-03-COMMERCIAL-IDENTITY-MULTIOPPORTUNITY-MODEL",
+    "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
+    "B4-003-R18-05-OPS-MANAGEMENT-TYPE-QUEUE-SEMANTICS",
+    "B4-003-R18-06-QUALITY-PROVENANCE-CONFIRMATION-ACTION",
+    "B4-003-R18-07-QUALITY-CHANNEL-ACTION-SEMANTIC-MISMATCH",
+    "B4-003-R18-08-QUALITY-REVIEW-AND-CORRECT-NOT-ACTIONABLE",
+    "B4-003-R18-09-POLICY-MOBILE-SEARCH-VISIBILITY",
+    "B4-003-R18-10-RENEWAL-UNIVERSE-11-VS-2-DISPOSITION-GAP",
+    "B4-003-R18-11-POLICY-DUPLICATE-COLLISION-ON-RENEWABILITY-EDIT",
+    "B4-003-R18-12-INSURER-REGISTRY-PROVENANCE-OBJECT-RENDER",
+    "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
+    "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
+    "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINANT-COVERAGE",
+    "I6-7-R18-CARRY-INSURER-COMMISSION-SOURCE-AUTHORITY"
+  ],
+  "exactNextSequence": [
+    "R18_READONLY_FORENSIC_RENEWALS_11_OF_11_AND_DUPLICATE_COLLISION",
+    "R18_SINGLE_CUMULATIVE_CAUSAL_SOURCE_FIX",
+    "R18_EXTEND_HARNESS_AND_TINYFISH_PREUAT",
+    "R18_ONE_IMMUTABLE_BUILD_ONE_ISOLATED_PREVIEW_EXACT_READBACK",
+    "R18_MACHINE_PLUS_TINYFISH_PASS",
+    "PAULA_TARGETED_VISUAL_ONLY_ON_R18_IMPACTED_SURFACES",
+    "IF_PASS_SEAL_B4_003_THEN_ENTER_B4_004"
+  ],
+  "noLossInvariant": "Ledger and carry-forward register must contain the same complete finding ID set after this freeze. No finding is deleted; statuses may change only with evidence-backed disposition.",
+  "notes": [
+    "R17 automated proof remains evidence for assertions it actually demonstrated, but is insufficient for B4-003 acceptance.",
+    "Read-only forensic must classify the exact 11 <=45d policies and the duplicate-policy collision before product mutation.",
+    "TinyFish must be used before Paula's next visual review, not as a substitute for her final human visual acceptance."
+  ]
+}
