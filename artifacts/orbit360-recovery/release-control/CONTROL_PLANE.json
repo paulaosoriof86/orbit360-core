@@ -29,7 +29,7 @@
     "activeVersion": 7,
     "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v7",
     "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v7/12_MANIFIESTO_FUENTES_EVERGREEN_V7.json",
-    "manifestBlobSha": "6c20649fa2fdff12324d334d3a049fd2c05923d8",
+    "manifestBlobSha": "b598fdd65a88a6fc20d0b9ea34caccfdf21dc9f5",
     "deltaAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
     "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
     "staticSourceUpdateRequired": true,
