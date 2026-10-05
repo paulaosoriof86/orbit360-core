@@ -56,6 +56,19 @@ function verify(receipt){
     add(SHA.test(String(combo.screenshotSha256||'')),'VEHICLE_COMBOBOX_SCREENSHOT_SHA','interaction evidence');
   }
 
+  const dj=receipt&&receipt.domainJourneys;
+  add(!!dj,'DOMAIN_JOURNEY_EVIDENCE','dynamic country-product interaction receipt');
+  if(dj){
+    add(dj.realTransport===false,'DOMAIN_JOURNEY_NO_REAL_TRANSPORT','real transport remains false');
+    add(dj.coCountryVisible===true && dj.coTransportSpecializedFields===true,'CO_TRANSPORT_DYNAMIC_FIELDS','Colombia transport specialized intake');
+    add(dj.gtHealthDependentDobDynamic===true,'GT_HEALTH_DYNAMIC_DEPENDENTS','dependent DOB fields respond to household composition');
+    add(dj.otherDeepContractRoute===true,'OTHER_DEEP_CONTRACT_ROUTE','deep contract route preserved');
+    add(dj.backPreservesCompatibleValue===true && dj.stepperMatchesStage2===true,'JOURNEY_BACK_STATE','back navigation preserves compatible data and stage truth');
+    for(const k of ['coTransportScreenshotSha256','gtHealthScreenshotSha256','otherContractScreenshotSha256']){
+      add(SHA.test(String(dj[k]||'')),'DOMAIN_JOURNEY_SCREENSHOT_SHA',k);
+    }
+  }
+
   const requiredStates=['stage1','stage2','stage3','stage4','replan','changeNeed'];
   const states=(receipt&&Array.isArray(receipt.states))?receipt.states:[];
   for(const id of requiredStates){
