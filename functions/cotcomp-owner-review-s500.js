@@ -316,6 +316,8 @@ const S500_SCRIPT=`
     if(first)first.click();
     const to2=document.querySelector('[data-prev="2"]');
     if(to2)to2.click();
+    const to1=document.querySelector('[data-prev="1"]');
+    if(to1)to1.click();
   });
 
   // Robust close after a vehicle brand/model option is selected.
@@ -364,6 +366,7 @@ function humanizeVisibleCopy(h){
 
 function html(){
   let h=humanizeVisibleCopy(S499.html());
+  h=h.replace('await loadModels();renderModels();modelInput.focus();','await loadModels();close(brandList,brandInput);close(modelList,modelInput);');
   h=h.replace(
     '<meta name="ays-owner-delta" content="S4.99_VISUAL_CTA">',
     '<meta name="ays-owner-delta" content="S5.00_CONSOLIDATED_OWNER_UX">'
