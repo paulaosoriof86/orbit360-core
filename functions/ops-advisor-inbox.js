@@ -136,7 +136,7 @@ async function inbox(request) {
     channelStates: row.channelStates && typeof row.channelStates === 'object' ? row.channelStates : {},
     externalChannelsPendingConnection: unique(row.externalChannelsPendingConnection || []),
     createdAt: row.createdAt || null
-  });
+  }));
   const isOpsRole=authz.roles.some(role=>/operativo|admin|direccion|superadmin|super admin/.test(role));
   const collaborationNotices=[];
   businessRows.forEach(row=>{

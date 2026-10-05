@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R19_SYNTAX_CONTRACT_ROOTFIX_V1",
+  "recordedAt": "2026-10-05T23:35:00Z",
+  "status": "R19_ROOTFIX_APPLIED_PENDING_EXACT_PREVIEW_RETRY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "d622296391ed553dbf69b7f239f95bc9c029be58",
+  "gate": "I6.5/B4-003/R19",
+  "failedRunId": 37377472032,
+  "failedJobId": 111990296746,
+  "failedStep": "Validate B4-003 contract and syntax",
+  "causes": [
+    {
+      "type": "PRODUCT_SOURCE_SYNTAX",
+      "path": "functions/ops-advisor-inbox.js",
+      "priorBlobSha": "b6b99ed18afb8cdbcfb5dabac6f58be69795d070",
+      "newBlobSha": "bf726f39946b27d96f2439a4beee32baa1ce14cf",
+      "cause": "outboxNotices Array.map was closed with }); instead of }));",
+      "fix": "Close callback and map invocation with }));"
+    },
+    {
+      "type": "QA_CONTRACT_NAME_DRIFT",
+      "path": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "priorBlobSha": "3d6af30c790f828a816b7d121b6cce3a04e2c3e9",
+      "newBlobSha": "d593d89c0f86d324eb60762c6d5a3fc4fa7cb0bd",
+      "cause": "Contract expected orbit360OpsAdvisorInboxPreview, while backend/workflow/proof use orbit360GetAdvisorOpsInboxPreview.",
+      "fix": "Bind the contract to orbit360GetAdvisorOpsInboxPreview."
+    }
+  ],
+  "composition": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "priorBlobSha": "b053c0b0b54926bc1ada3c5b2789edd280aa8e23",
+    "newBlobSha": "e1ccb9245cd64462693a662b2e4ad5467bdce88d"
+  },
+  "boundaries": {
+    "businessWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
+    "b4004Held": true
+  },
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "livePromoted": false,
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW"
+}

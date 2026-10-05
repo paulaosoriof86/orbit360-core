@@ -147,7 +147,7 @@
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
     "functions/document-drive-domain.js": "7b3f9de53bfbedda0879457873676d42d752b925",
     "functions/notification-outbox-processor.js": "47daa1425272f71bbc9ee1bf5968579b0099e75e",
-    "functions/ops-advisor-inbox.js": "b6b99ed18afb8cdbcfb5dabac6f58be69795d070",
+    "functions/ops-advisor-inbox.js": "bf726f39946b27d96f2439a4beee32baa1ce14cf",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
     "functions/package.json": "2b7183aac731ee4f3e0626baa8448000d94115a1",
@@ -3271,6 +3271,13 @@
     ],
     "noLive": true,
     "noReimport": true,
-    "operationalBusinessWrites": 0
+    "operationalBusinessWrites": 0,
+    "syntaxContractRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SYNTAX_CONTRACT_ROOTFIX_20261005.json",
+    "productSyntaxRootFixBlobSha": "bf726f39946b27d96f2439a4beee32baa1ce14cf",
+    "qaContractRootFixBlobSha": "d593d89c0f86d324eb60762c6d5a3fc4fa7cb0bd",
+    "failedRunId": 37377472032,
+    "failedJobId": 111990296746,
+    "failedCode": "OPS_ADVISOR_INBOX_SYNTAX_ERROR_AND_PREVIEW_CALLABLE_CONTRACT_NAME_DRIFT",
+    "productSourceChanged": true
   }
 }
