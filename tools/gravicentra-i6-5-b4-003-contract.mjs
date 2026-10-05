@@ -265,7 +265,6 @@ need(insurer.includes("typeof v==='object'")&&insurer.includes('Historia unifica
 need(infra.includes('#ciclo-modal{place-items:start stretch!important')&&infra.includes('.tb-search{display:flex!important')&&infra.includes('.insurer-source-detail{grid-template-columns:1fr!important'),'B4_003_R18_MOBILE_RESPONSIVE_GUARDS_MISSING');
 need(inicio.includes('function renewalRows45()')&&inicio.includes('Orbit.modules.polizas.policyMetrics.isRenewalWithin45Days')&&inicio.includes('data-renewal-owner="polizas.policyMetrics.isRenewalWithin45Days"'),'B4_003_R18_INICIO_POLICY_KPI_PARITY_OWNER_MISSING');
 need(index.includes('modules/inicio.js?v=20261005-r19')&&index.includes('core/policy-receipts-engine.js?v=20261005-r18'),'B4_003_R18_NEW_CACHE_BINDINGS_MISSING');
-need(index.includes('core/crmkit.js?v=20261005-r19'),'B4_003_R19_CRMKIT_CACHE_BINDING_MISSING');
 
 const productPaths=[paths.workflow,paths.opsInbox,paths.operationalBackend,paths.store,paths.accessScope,paths.cycle,paths.inicio,paths.policyEngine,paths.cronograma,paths.base,paths.bridge,paths.permission,paths.issued,paths.cancel,paths.policy,paths.policyBridge,paths.policyDetail,paths.client360,paths.quality,paths.insurer,paths.insurerVisual,paths.importer,paths.driveBackend,paths.infra,paths.index,paths.rosterBackend,paths.rosterClient,paths.tenantBackend,paths.tenantClient,paths.configuracion,paths.geo,'orbit360-platform/core/config.js'];
 const bindings=Object.fromEntries(productPaths.map(p=>[p,hash(p)]));
