@@ -220,7 +220,7 @@ function html(){
       <section data-stage-panel="4">
         <div class="cc-section-kicker">04 · COMPARAR Y CONTINUAR</div>
         <h3 class="cc-section-title">Compara diferencias que sí cambian la decisión.</h3>
-        <p class="cc-section-lead">El comparador solo se habilita cuando existen al menos dos alternativas validadas. La prioridad organiza la explicación; no crea un ranking universal.</p>
+        <p class="cc-section-lead" id="compareLead">El comparador solo se habilita cuando existen al menos dos alternativas validadas. La prioridad organiza la explicación; no crea un ranking universal.</p>
         <div id="compareContent"></div>
         <div class="cc-replan"><b>¿Quieres reconsiderar algo sin empezar de cero?</b><div class="cc-replan__choices"><button type="button" data-replan="priority">Cambiar mi prioridad</button><button type="button" data-replan="data">Ajustar datos del caso</button><button type="button" data-replan="need">Revisar otra necesidad</button></div></div>
         <div class="cc-actions"><button class="cc-btn" type="button" data-prev="3">← Volver</button><div><button class="cc-btn" type="button">Hablar con un asesor</button> <button id="decisionBtn" class="cc-btn cc-btn--primary" type="button">Continuar →</button></div></div>
@@ -492,6 +492,10 @@ function html(){
   function renderCompare(){
     const c=current().comparison;
     const box=document.getElementById('compareContent');
+    const lead=document.getElementById('compareLead');
+    if(lead)lead.textContent=c.visualFixture
+      ?'Esta vista muestra la estructura del comparador. En uso real solo se habilita con al menos dos alternativas validadas y comparables.'
+      :'El comparador solo se habilita cuando existen al menos dos alternativas validadas. La prioridad organiza la explicación; no crea un ranking universal.';
     if(c.comparable||c.visualFixture){
       const options=c.visualFixture?c.displayOptions:c.validated;
       const a=options[0],b=options[1];
