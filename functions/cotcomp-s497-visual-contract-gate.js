@@ -41,7 +41,7 @@ function validateHtml(html,manifest){
   push(out,hasAll(html,LOCK.requiredHeadline),'HEADLINE','Cotiza y compara con criterio');
   push(out,/\.cc-hero__title\{[^}]*font-family:'Archivo'[^}]*font-weight:900/.test(html),'H1_TYPOGRAPHY','Archivo 900');
   push(out,!/\.cc-hero__title\{[^}]*Newsreader/.test(html),'NO_NEWSREADER_H1','Newsreader cannot own CotComp H1');
-  push(out,/\.cc-hero\{[^}]*min-height:370px/.test(html),'HERO_HEIGHT_LOCK','desktop target 370px');
+  push(out,/\.cc-hero\{[^}]*height:390px;min-height:390px/.test(html),'HERO_HEIGHT_LOCK','desktop target locked within frozen 350–390px range');
   push(out,/\.cc-hero__media img\{[^}]*object-fit:cover/.test(html),'HERO_OBJECT_FIT','cover');
   push(out,/\.cc-hero__media\{[^}]*grid-area:media/.test(html),'HERO_INTEGRATED_MEDIA','right-side integrated media region');
   push(out,!/\.cc-hero__media\{[^}]*aspect-ratio:4\/3/.test(html),'NO_FLOATING_4_3_HERO','4:3 hero card forbidden');
