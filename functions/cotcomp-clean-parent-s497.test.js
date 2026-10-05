@@ -49,7 +49,7 @@ test('S4.97 never uses Newsreader as H1 and never uses 4:3 hero card',()=>{
 
 test('S4.97 generated inline JavaScript is syntactically valid',()=>{
   const h=S.html();
-  const scripts=[...h.matchAll(/<script(?![^>]*type=["']application\\/json["'])[^>]*>([\\s\\S]*?)<\\/script>/gi)].map(m=>m[1]);
+  const scripts=[...h.matchAll(/<script(?![^>]*type=["']application\/json["'])[^>]*>([\s\S]*?)<\/script>/gi)].map(m=>m[1]);
   assert.ok(scripts.length>0);
   scripts.forEach((src,i)=>assert.doesNotThrow(()=>new vm.Script(src,{filename:'s497-inline-'+(i+1)+'.js'})));
 });
