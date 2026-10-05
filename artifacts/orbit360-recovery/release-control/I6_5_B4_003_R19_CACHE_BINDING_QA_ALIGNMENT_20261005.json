@@ -1,0 +1,30 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R19_CACHE_BINDING_QA_ALIGNMENT_V1",
+  "recordedAt": "2026-10-05T23:50:00Z",
+  "status": "QA_CACHE_BINDINGS_ALIGNED_PENDING_EXACT_PREVIEW_RETRY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "5f18ffa125ca0b1d55820586cb2c45a2311edcb7",
+  "failedRunId": 37388859395,
+  "failedCode": "B4_003_BASE_CACHE_BINDING_MISSING",
+  "classification": "STALE_QA_CACHE_ASSERTIONS_AFTER_R19_CACHE_BUMP",
+  "contractPath": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+  "priorContractBlobSha": "2a07d305a5e7709c83436813e18143f884a15b60",
+  "newContractBlobSha": "b6368d2d65259ea4dce33ec66a604a9db5642274",
+  "alignedBindings": [
+    "modules/renovaciones.js?v=20261005-r19",
+    "core/ciclo.js?v=20261005-r19",
+    "modules/calidad.js?v=20261005-r19",
+    "modules/aseguradoras.js?v=20261005-r19",
+    "modules/policy-receipts-v1199-detail-guard.js?v=20261005-r19",
+    "modules/policy-receipts-v1199-bridge.js?v=20261005-r19",
+    "styles/infra.css?v=20261005-r19",
+    "modules/inicio.js?v=20261005-r19",
+    "core/crmkit.js?v=20261005-r19"
+  ],
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW"
+}
