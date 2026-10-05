@@ -30,9 +30,11 @@ jobs:
       FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
     steps:
       - uses: actions/checkout@v4
-        with:{ fetch-depth: 0 }
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
-        with:{ node-version: '22' }
+        with:
+          node-version: '22'
       - name: QA
         working-directory: functions
         shell: bash
