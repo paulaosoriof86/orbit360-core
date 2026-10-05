@@ -1,0 +1,76 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R18_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-05T11:47:00-06:00",
+  "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceTreeHeadBeforeSeal": "78ba5da402655da80e5ab319ce76a0dd84258299",
+  "findingId": "B4-003",
+  "findingCountAfter": 235,
+  "authority": {
+    "causalAuthorizationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_CAUSAL_SOURCE_FIX_AUTHORIZATION_20261005.json",
+    "causalAuthorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8",
+    "authenticatedForensicPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_AUTHENTICATED_READONLY_FORENSIC_RESULT_20261005.json",
+    "authenticatedForensicBlobSha": "e4b1b418fc7b2b1f15d28a0560529a7603f32203",
+    "renewalKpiParityAddendumPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
+    "renewalKpiParityAddendumBlobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
+  },
+  "fixes": [
+    "Commercial creation defaults to Nuevo; direct-to-Cotización remains explicit.",
+    "Commercial capture is País→Ramo→Producto→Plan with downstream dependency and country-scoped multi-insurer interest.",
+    "One commercial identity can create multiple independent opportunities without duplicating the person/company identity.",
+    "Advisor↔Ops collaboration is typed and auditable; management queue is derived from management type.",
+    "Quality actions are truthful: provenance can be documented, contact action edits phone/WhatsApp, financial review states exactly what is compared and opens governed owners.",
+    "Policy duplicate validation is edition-aware: same commercial key with distinct vigenciaInicio is allowed; exact duplicate edition remains blocked.",
+    "Renewals keeps expired UNKNOWN debt visible and reconciles every <=45 policy into actionable/pending/nonrenewable/terminal/conflict.",
+    "Inicio <=45 KPI consumes the exact Pólizas canonical metric owner.",
+    "Insurer Registry renders structured provenance humanly, knowledge lifecycle converges into visible activity, and mobile knowledge hierarchy is hardened.",
+    "Mobile Ciclo drawers and existing topbar search are forced usable; no new search engine was invented."
+  ],
+  "productBlobs": {
+    "orbit360-platform/core/ciclo.js": "d4bdad7272294eb8d63308c569705432ec67f222",
+    "orbit360-platform/modules/calidad.js": "83c8e041217f4d15cfd42ff30b792a8cd672d079",
+    "orbit360-platform/core/policy-receipts-engine.js": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
+    "orbit360-platform/modules/renovaciones.js": "a6bbe2c3b0232a8e71f904fa55a62633f3b4efef",
+    "orbit360-platform/modules/aseguradoras.js": "ef8a7bd900c16b83d3f83bc271b38b8a4d24dc0c",
+    "orbit360-platform/styles/infra.css": "09e9974dbf72ddd21da58545a51aa5415277e929",
+    "orbit360-platform/modules/inicio.js": "e73f91c1d81985a3baa4fde1575a453260c5125d",
+    "orbit360-platform/index.html": "a735993a1a2e672ba09d78898bc29589969dc4f7"
+  },
+  "composition": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "blobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
+    "exactSetChanged": false,
+    "productFileCount": 100
+  },
+  "noLoss": {
+    "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+    "carryBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
+    "exactFindingCount": 235,
+    "findingsDeleted": 0
+  },
+  "preservedPasses": [
+    "Carlos/Operativo assignable advisor roster",
+    "Country-scoped multi-select insurers",
+    "Ops/Leads long-card containment",
+    "Quality fast render and GT/CO geo catalogs",
+    "Exact Quality→policy/receipts context",
+    "Non-vehicle policies do not fabricate vehicle risk",
+    "R17 renewal first-paint stability"
+  ],
+  "boundaries": {
+    "productMutationClosedAfterThisReceipt": true,
+    "businessWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "syntheticQaWritesAuthorizedForExactPreview": true,
+    "b4004Held": true
+  },
+  "qa": {
+    "status": "PENDING_R18_CONTRACT_AND_EXACT_PREVIEW",
+    "tinyFish": "AUTH_STATE_NOT_REUSED_NONBLOCKING",
+    "authenticatedPreUatOwner": "GitHub Playwright B4-003 harness"
+  },
+  "nextAction": "B4_003_R18_CONTRACT_AND_EXACT_PREVIEW"
+}
