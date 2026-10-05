@@ -551,8 +551,8 @@
     "blobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8",
     "forensicPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_AUTHENTICATED_READONLY_FORENSIC_RESULT_20261005.json",
     "forensicBlobSha": "e4b1b418fc7b2b1f15d28a0560529a7603f32203",
-    "ledgerBlobSha": "3caffb0d57fcfbefb911f4d3ff5af022574e7dda",
-    "carryBlobSha": "38ecbdf3d69008c21192e2cbb5c5375fb54fd321",
+    "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+    "carryBlobSha": "12d6e394c10bc40d0b219eed7bab2a9266853797",
     "masterPlanBlobSha": "e079abbbd13d021ecedaf35357fbdfee5d25a9bc"
   },
   "r18RenewalKpiParity": {
@@ -561,12 +561,18 @@
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
   "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
-  "continuityRegisterBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
+  "continuityRegisterBlobSha": "12d6e394c10bc40d0b219eed7bab2a9266853797",
   "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
     "blobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
     "compositionBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843"
+  },
+  "r18ContinuityBindingRepair": {
+    "status": "PASS",
+    "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+    "carryBlobSha": "12d6e394c10bc40d0b219eed7bab2a9266853797",
+    "productSourceChanged": false
   }
 }
