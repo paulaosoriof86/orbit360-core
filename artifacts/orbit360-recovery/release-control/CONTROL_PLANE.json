@@ -7225,5 +7225,19 @@
       "failedRunId": 37247742108,
       "productSourceChanged": false
     }
+  },
+  "parallelNonPassWorkstreams": {
+    "status": "ACTIVE_PARALLEL_NO_PRODUCT_MUTATION",
+    "path": "artifacts/orbit360-recovery/release-control/I6_PARALLEL_NONPASS_AND_KNOWLEDGE_WORKSTREAMS_RESUMED_20261005.json",
+    "knowledgeInventoryLibraryPath": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_ASEGURADORAS_INVENTARIO_PASS2_2026-10-04.md",
+    "knowledgeNormalizedCandidateLibraryPath": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_NORMALIZADO_CANDIDATO_PASS2_2026-10-04.json",
+    "insurerKnowledgeParallel": true,
+    "b4004StillHeld": true,
+    "certifiedB4003ArtifactSourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
+    "productMutation": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL"
   }
 }
