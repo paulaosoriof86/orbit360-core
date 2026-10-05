@@ -1,16 +1,16 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R13_SOURCE_FIX_LOCK_V1",
   "recordedAt": "2026-10-04T04:12:00Z",
-  "status": "B4_003_SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "blocking": true,
-    "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
-    "humanVisualStatus": "REJECTED_R17_PENDING_RETEST",
+    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "humanVisualStatus": "PENDING",
     "knowledgePreview": true
   },
   "supersedes": {
@@ -29,15 +29,15 @@
   },
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "de82446f4924f6b688ac3029ededd25d798221f3"
+    "blobSha": "baf0fe4551ff2be6ded68504b73506b28dacc17f"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "79b47a8f2bd76f39b12fe5216ce91c38f638d8e0"
+    "blobSha": "ffa1f7b937ffcc616b0af02e44513adcc445c9aa"
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "76f3cc0a91bbccd00fa8a24113154bf8142cd312",
+    "blobSha": "7e8cfc4ca99cc89310e5b674e998864c52bb8f16",
     "inventoryCount": 218,
     "attentionCount": 111,
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -49,7 +49,7 @@
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": true,
+    "syntheticQaWritesAuthorized": false,
     "syntheticQaScope": "Exact B4-003 Preview only: disposable B4003 synthetic renewal, cancellation, information-health and insurer-document fixtures with mandatory cleanup/readback; no real operational row mutation.",
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": false,
@@ -62,11 +62,9 @@
     "renewalDeterministicApplyAuthorized": false
   },
   "nextRequiredProof": [
-    "B4_003_R17_CONTRACT_PASS",
-    "B4_003_R17_EXACT_PREVIEW_MACHINE_PASS",
-    "B4_003_R17_TARGETED_PAULA_VISUAL_PASS"
+    "B4_003_TARGETED_PAULA_VISUAL_PASS"
   ],
-  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
   "block": "B4",
   "r13PolicyRouteRuntimeRootFix": {
     "status": "SOURCE_FIXED_R13P2_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -222,15 +220,15 @@
     "livePromotion": false
   },
   "candidate": {
-    "sourceSha": "7dc809340f95d3d559912ca6427859a380a879e3",
-    "buildId": "gi-i65-b4-7dc809340f95-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37228202621-s43jo3pb.web.app",
-    "runId": 37228202621,
-    "artifactId": 11313241549,
-    "artifactDigest": "0b05b2d8c4ed5dc3cb01ace386cdb20c3fdc755873f2388c0d206b721017b2e7",
-    "hostedPayloadDigest": "5085e24332853b9a15314b15ca453c0c30a9e9a390b9c065e5ac281c6e7f8c28",
+    "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
+    "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37248154086-11dxqgq2.web.app",
+    "runId": 37248154086,
+    "artifactId": 11319524354,
+    "artifactDigest": "21607653bcabbf8c6994c28d46569055cf0b0a4f4972f0eb5774b228d958915b",
+    "hostedPayloadDigest": "a5890792def1bf0946341598f56b1ebbc170e92a777c871536965de576cb810b",
     "backendSourceDigest": "b58ed88379e2656723656ae6deb0500896696bc34a99a9e65c5dfd6e94b02f20",
-    "bundleDigest": "4638675fffaf15cfe59bec223219bdd2c01df4a2c46bd92ff88896a6b12d71d5",
+    "bundleDigest": "a3d30fb9e50a8e92d056214c220cbaa298a4ef2888d0a564daf7effd307a0960",
     "exactReadback": true
   },
   "renewalDeterministicApplyAuthorization": {
