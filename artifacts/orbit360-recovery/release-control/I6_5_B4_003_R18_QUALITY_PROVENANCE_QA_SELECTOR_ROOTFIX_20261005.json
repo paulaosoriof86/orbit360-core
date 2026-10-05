@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R18_QUALITY_PROVENANCE_QA_SELECTOR_ROOTFIX_V1",
+  "recordedAt": "2026-10-05T12:33:00-06:00",
+  "status": "QA_HARNESS_CAUSE_DEMONSTRATED_FIX_AUTHORIZED",
+  "gate": "I6.5/B4-003",
+  "failedRunId": 37355564631,
+  "failedJobId": 111916974267,
+  "failedCode": "B4_003_R18_QUALITY_PROVENANCE_ACTION_MISSING",
+  "observed": {
+    "buttonPresent": true,
+    "modalPresent": false,
+    "country": "",
+    "hasReason": false,
+    "phoneLabel": true
+  },
+  "rootCause": "QA_SELECTOR_DRIFT: product editarInline creates #q-inline; R18 proof searched #quality-inline after clicking the correct Documentar origen button.",
+  "adjudication": "QA_HARNESS_DEFECT_NOT_PRODUCT_DEFECT",
+  "allowedQaFile": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+  "exactFix": "Resolve provenance modal by #q-inline; retain all existing behavioral assertions country=GT and #qi-motivo.",
+  "productSourceChanged": false,
+  "productArtifactFromFailedRun": {
+    "sourceSha": "9604489572c86e96d5dada437016a5209fb9edd0",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37355564631-f0y1gpy0.web.app",
+    "hostingReadback": "PASS"
+  },
+  "boundaries": {
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productMutation": false
+  },
+  "nextAction": "RETRY_R18_EXACT_PREVIEW_WITH_VERSIONED_QA_SELECTOR_FIX"
+}
