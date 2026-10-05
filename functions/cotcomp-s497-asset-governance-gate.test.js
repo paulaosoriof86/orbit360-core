@@ -21,5 +21,6 @@ test('S4.97 production visual approval remains false until Owner promotion',()=>
   assert.equal(M.gates.productionVisualApproval,false);
   assert.equal(M.gates.packagingComplete,true);
   assert.equal(M.gates.sourceBytesVerified,true);
-  assert.equal(M.gates.runtimeBytesVerified,false);
+  assert.equal(M.gates.runtimeBytesVerified,true);
+  assert.equal(M.gates.ownerReviewVisualEvidenceComplete,true);
 });
