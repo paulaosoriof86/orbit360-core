@@ -51,6 +51,17 @@ test('S4.97 generated inline JavaScript is syntactically valid',()=>{
   const h=S.html();
   const scripts=[...h.matchAll(/<script(?![^>]*type=["']application\/json["'])[^>]*>([\s\S]*?)<\/script>/gi)].map(m=>m[1]);
   assert.ok(scripts.length>0);
-  scripts.forEach((src,i)=>assert.doesNotThrow(()=>new vm.Script(src,{filename:'s497-inline-'+(i+1)+'.js'})));
+  scripts.forEach((src,i)=>{
+    try{
+      new vm.Script(src,{filename:'s497-inline-'+(i+1)+'.js'});
+    }catch(err){
+      const stack=String(err&&err.stack||err);
+      const m=stack.match(/s497-inline-\d+\.js:(\d+)/);
+      const line=m?Number(m[1]):null;
+      const lines=src.split(/\r?\n/);
+      const context=line?lines.slice(Math.max(0,line-4),Math.min(lines.length,line+3)).map((x,j)=>String(Math.max(1,line-3)+j).padStart(4,' ')+' | '+x).join('\n'):'';
+      assert.fail(stack+(context?'\n'+context:''));
+    }
+  });
 });
 
