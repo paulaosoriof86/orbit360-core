@@ -49,5 +49,5 @@ test('S5.00 final continuity produces a terminal state instead of looping to sam
   assert.match(h,/Tu continuidad con A&S está preparada/);
   assert.match(h,/¿Qué sigue en la versión conectada\?/);
   assert.match(h,/showCompletion\(\)/);
-  assert.match(h,/Continuar con A&S sin perder el contexto/);
+  assert.match(h,/Continúa con A&S sin perder el contexto/);
 });
