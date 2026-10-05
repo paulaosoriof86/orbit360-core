@@ -25,34 +25,41 @@
     "latestBlobSha": "7b7a14d834c31f5e6f1d5142dc92532119b9f437"
   },
   "projectSources": {
-    "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V6",
-    "activeVersion": 6,
-    "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v6",
-    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v6/10_MANIFIESTO_FUENTES_EVERGREEN_V6.json",
-    "manifestBlobSha": "b27b31a6a552df6a50a3dd981f2d6e18b156e0db",
+    "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
+    "activeVersion": 7,
+    "canonicalRoot": "artifacts/orbit360-recovery/project-sources-v2/v7",
+    "manifestPath": "artifacts/orbit360-recovery/project-sources-v2/v7/12_MANIFIESTO_FUENTES_EVERGREEN_V7.json",
+    "manifestBlobSha": "6c20649fa2fdff12324d334d3a049fd2c05923d8",
     "deltaAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
     "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
     "staticSourceUpdateRequired": true,
-    "reason": "Permanent normative architecture change: canonical accumulative composition and findings ledger are machine-authoritative to prevent regression/lost improvements; pending Project-source synchronization also includes the 2026-09-26 permanent payment/date semantics addendum required before B3.",
+    "reason": "Repository-side Evergreen V7 package is materialized. ChatGPT Project sources still require catch-up synchronization: retain canonical V3-V5/V4 sources, add V6 canonical-composition/findings addendum and V7 payment/cobro/date semantics addendum; only then may this flag be cleared after readback.",
     "operationalStateChangesDoNotRequireReplacement": true,
     "notificationRequiredWhenFlagTrue": true,
-    "compositionModel": "IMMUTABLE_RETAINED_V5_PLUS_V6_ADDENDUM",
-    "retainedPreviousSources": 7,
+    "compositionModel": "IMMUTABLE_RETAINED_V6_PLUS_V7_PAYMENT_DATE_ADDENDUM",
+    "retainedPreviousSources": 8,
     "addedSources": 1,
     "lastTransition": {
-      "fromPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V5",
-      "toPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V6",
-      "cause": "Freeze single machine-authoritative cumulative composition + mandatory findings ledger after demonstrated composition-authority split.",
-      "userAction": "KEEP_7_EXISTING_SOURCES_AND_ADD_ONLY_V6_CANONICAL_COMPOSITION_FINDINGS_ADDENDUM"
+      "fromPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V6",
+      "toPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
+      "cause": "Materialize the permanent 2026-09-26 payment/cobro/date semantics while preserving the still-required V6 canonical composition/findings source.",
+      "userAction": "KEEP_EXISTING_CANONICAL_SOURCES; ADD_V6_IF_MISSING; ADD_V7; REMOVE_ONLY_VERIFIED_EXACT_DUPLICATES"
     },
-    "normativeAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v6/09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
-    "normativeAddendumBlobSha": "40b57682f89fc134bc95c5806b71a34bc4119882",
-    "pendingNormativeChange": {
-      "requestedVersion": 7,
-      "reason": "Permanent payment/cobro/date semantics changed on 2026-09-26; V2 payment addendum supersedes only conflicting inferred-date interpretation while V6 source-sync obligation is still pending.",
-      "addendumPath": "artifacts/orbit360-recovery/release-control/GRAVICENTRA_REGLAS_CANONICAS_PAGOS_CONCILIACION_INFERENCIA_V2_20260926.md",
-      "addendumBlobSha": "c0c1ba8e58940d0796f94129ac7a6c7ce660e540",
-      "requiredBefore": "B3_OPEN"
+    "normativeAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v7/11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md",
+    "normativeAddendumBlobSha": "b51eb0f37f48a4fcab0336b8b300c559b0f76714",
+    "pendingNormativeChange": null,
+    "projectSynchronization": {
+      "status": "REPO_V7_READY_PROJECT_SOURCE_SYNC_PENDING",
+      "requiredAdds": [
+        "09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
+        "11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md"
+      ],
+      "duplicateCleanupAfterReadback": true,
+      "staticSourceUpdateRequiredMayClearOnlyAfterProjectReadback": true,
+      "productSourceChanged": false,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false
     }
   },
   "deprecatedMutableAuthorities": {
