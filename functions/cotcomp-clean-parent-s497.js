@@ -459,20 +459,23 @@ function html(){
     if(c.quotes.length){
       html='<div class="cc-review-grid">'+c.quotes.map(q=>'<article class="cc-review-card"><b>'+esc(q.name)+'</b><strong>'+esc(q.total)+'</strong><span>'+(c.visualFixture?'Ejemplo visual · sin propuesta real':(q.status==='VALIDATED'?'Revisada y lista para comparar':'Pendiente de validación'))+'</span></article>').join('')+'</div>';
     }
-    if(!c.comparable){
+    if(c.visualFixture){
+      html+='<div class="cc-truth" style="margin-top:16px;margin-bottom:0">Esta es una plantilla visual source-only para revisar la experiencia. No representa cotizaciones reales ni propuestas validadas.</div>';
+    }else if(!c.comparable){
       html+='<aside class="cc-no-compare"><small>VALIDACIÓN ANTES DE COMPARAR</small><h3>Todavía no hay dos alternativas validadas para comparar.</h3><p>No mostramos precios ni “ganadores” inventados. A&S continúa por la ruta '+(state.mode==='assisted'?'acompañada':'correspondiente')+' hasta contar con propuestas comparables.</p></aside>';
     }else{
-      html+='<div class="cc-truth" style="margin-top:16px;margin-bottom:0">'+(c.visualFixture?'Esta es una plantilla visual source-only para revisar la experiencia. No representa cotizaciones reales ni propuestas validadas.':'Hay dos alternativas validadas y comparables. La comparación se habilita sin ranking silencioso.')+'</div>';
+      html+='<div class="cc-truth" style="margin-top:16px;margin-bottom:0">Hay dos alternativas validadas y comparables. La comparación se habilita sin ranking silencioso.</div>';
     }
     document.getElementById('reviewContent').innerHTML=html;
-    document.getElementById('compareNext').textContent=c.comparable?'Comparar opciones →':'Ver cómo continúa →';
+    document.getElementById('compareNext').textContent=c.visualFixture?'Ver estructura comparativa →':(c.comparable?'Comparar opciones →':'Ver cómo continúa →');
   }
 
   function renderCompare(){
     const c=current().comparison;
     const box=document.getElementById('compareContent');
-    if(c.comparable){
-      const a=c.validated[0],b=c.validated[1];
+    if(c.comparable||c.visualFixture){
+      const options=c.visualFixture?c.displayOptions:c.validated;
+      const a=options[0],b=options[1];
       box.innerHTML='<table class="cc-compare"><thead><tr><th>CRITERIO</th><th>'+esc(a.name)+'</th><th>'+esc(b.name)+'</th></tr></thead><tbody>'+
         '<tr><td>Costo total</td><td>'+esc(a.total)+'</td><td>'+esc(b.total)+'</td></tr>'+
         '<tr><td>Deducible</td><td>'+esc(a.deductible)+'</td><td>'+esc(b.deductible)+'</td></tr>'+
