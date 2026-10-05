@@ -1,10 +1,10 @@
 'use strict';
 
 const REQUIRED_VIEWPORTS=Object.freeze([
-  {id:'desktop-1440',width:1440,height:1000,familyColumns:4},
-  {id:'desktop-1024',width:1024,height:900,familyColumns:4},
-  {id:'mobile-390',width:390,height:844,familyColumns:1},
-  {id:'mobile-320',width:320,height:700,familyColumns:1}
+  {id:'desktop-1440',width:1440,height:1000,familyColumns:4,heroMin:350,heroMax:410},
+  {id:'desktop-1024',width:1024,height:900,familyColumns:4,heroMin:350,heroMax:420},
+  {id:'mobile-390',width:390,height:844,familyColumns:1,heroMin:500,heroMax:680},
+  {id:'mobile-320',width:320,height:700,familyColumns:1,heroMin:500,heroMax:700}
 ]);
 
 const SHA=/^[a-f0-9]{64}$/;
@@ -27,6 +27,7 @@ function verify(receipt){
     add(SHA.test(String(v.screenshotSha256||'')),'SCREENSHOT_SHA',req.id);
     add(v.h1FontFamily==='Archivo','H1_FONT',req.id);
     add(Number(v.h1FontWeight)>=800,'H1_WEIGHT',req.id);
+    add(Number(v.heroHeight)>=req.heroMin && Number(v.heroHeight)<=req.heroMax,'HERO_HEIGHT_RANGE',req.id);
     add(v.heroImageObjectFit==='cover','HERO_OBJECT_FIT',req.id);
     add(v.heroImageDistorted===false,'HERO_NOT_DISTORTED',req.id);
     add(v.heroHeightCoupledToWorkspace===false,'HERO_INDEPENDENT_HEIGHT',req.id);
