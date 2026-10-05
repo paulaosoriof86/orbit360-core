@@ -10,6 +10,7 @@ function good(){
     schemaVersion:'ays-cotcomp-s497-visual-evidence-v1.0',
     anchorSha256:'a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d',
     providerDeploymentAuthorized:false,cotcompRealTransportAuthorized:false,production:false,
+    vehicleCombobox:{mockContract:'S479_READ_ONLY_SHAPE_UI_PROOF_ONLY',realTransport:false,brandSearchWorks:true,dependentModelEnabled:true,modelSearchWorks:true,selectedBrand:true,selectedModel:true,assistedFallback:true,noForcedSelection:true,screenshotSha256:H},
     viewports:G.REQUIRED_VIEWPORTS.map(v=>({
       id:v.id,width:v.width,screenshotSha256:H,h1FontFamily:'Archivo',h1FontWeight:900,heroHeight:Math.round((v.heroMin+v.heroMax)/2),
       heroImageObjectFit:'cover',heroImageDistorted:false,heroHeightCoupledToWorkspace:false,
@@ -53,3 +54,11 @@ test('automated visual evidence can pass but cannot alone authorize an Owner URL
   assert.equal(v.ownerReviewUrlAuthorized,false);
   assert.equal(v.ownerReviewBlockReason,'INTERNAL_MANUAL_VISUAL_AUDIT_REQUIRED');
 });
+
+test('visual evidence gate rejects missing vehicle combobox interaction proof',()=>{
+  const r=good();r.vehicleCombobox=null;
+  const v=G.verify(r);
+  assert.equal(v.ok,false);
+  assert.ok(v.failed.some(x=>x.code==='VEHICLE_COMBOBOX_EVIDENCE'));
+});
+
