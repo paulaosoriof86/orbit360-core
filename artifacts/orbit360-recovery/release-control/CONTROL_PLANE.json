@@ -4869,9 +4869,9 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "5773905799c1f78fc40e4aa470c1a3b2dbcf6683",
+      "executionLockBlobSha": "bfe152c1a758ec7b221a9be66569b21cf71c98cc",
       "compositionLockBlobSha": "baf0fe4551ff2be6ded68504b73506b28dacc17f",
-      "findingLedgerBlobSha": "3caffb0d57fcfbefb911f4d3ff5af022574e7dda",
+      "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
@@ -5183,7 +5183,7 @@
       "priorMachinePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37136776942-5498wth2.web.app",
       "humanVisualStatus": "REJECTED_R17_PENDING_RETEST",
       "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-      "continuityRegisterBlobSha": "38ecbdf3d69008c21192e2cbb5c5375fb54fd321",
+      "continuityRegisterBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
       "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
       "continuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
       "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -6054,9 +6054,9 @@
     "status": "B4_003_R18_CAUSAL_SOURCE_FIX_AUTHORIZED",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "5773905799c1f78fc40e4aa470c1a3b2dbcf6683",
+    "executionLockBlobSha": "bfe152c1a758ec7b221a9be66569b21cf71c98cc",
     "compositionLockBlobSha": "baf0fe4551ff2be6ded68504b73506b28dacc17f",
-    "findingLedgerBlobSha": "3caffb0d57fcfbefb911f4d3ff5af022574e7dda",
+    "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
     "noLive": true,
     "noReimport": true,
     "nextAction": "R18_SINGLE_CUMULATIVE_SOURCE_FIX",
@@ -6339,7 +6339,7 @@
     "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
     "humanVisualStatus": "REJECTED_R17_PENDING_RETEST",
     "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "continuityRegisterBlobSha": "38ecbdf3d69008c21192e2cbb5c5375fb54fd321",
+    "continuityRegisterBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
     "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "continuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
     "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -7074,15 +7074,15 @@
   "findingContinuityControl": {
     "status": "ENFORCED_FAIL_CLOSED_R18",
     "registerPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "registerBlobSha": "38ecbdf3d69008c21192e2cbb5c5375fb54fd321",
+    "registerBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "guardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
     "masterPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "masterPlanBlobSha": "e079abbbd13d021ecedaf35357fbdfee5d25a9bc",
-    "inventoryCount": 234,
+    "masterPlanBlobSha": "eb911d895030f6070c536e6e1a2adf6bb0c77bcc",
+    "inventoryCount": 235,
     "attentionCount": 126,
     "rule": "Ledger/register sets are exact and deletion-forbidden. R18 findings are appended before any next build; prior PASS remains preserved unless a causal source change invalidates it.",
-    "lastLedgerBlobSha": "3caffb0d57fcfbefb911f4d3ff5af022574e7dda",
+    "lastLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
     "exactLedgerCarrySet": true
   },
   "r12ExactPreviewRetrigger": {
@@ -7096,7 +7096,7 @@
   "pendingClosureMasterPlan": {
     "status": "FROZEN_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "blobSha": "e079abbbd13d021ecedaf35357fbdfee5d25a9bc",
+    "blobSha": "eb911d895030f6070c536e6e1a2adf6bb0c77bcc",
     "baselineFindingCount": 208,
     "currentGate": "B4-003",
     "currentRevision": "R17",
@@ -7105,8 +7105,8 @@
     "conversationDependent": false
   },
   "compositionLockBlobSha": "a1e052403a3765f284ef2e8b515ba287fffd78f5",
-  "findingLedgerBlobSha": "3caffb0d57fcfbefb911f4d3ff5af022574e7dda",
-  "continuityRegisterBlobSha": "38ecbdf3d69008c21192e2cbb5c5375fb54fd321",
+  "findingLedgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+  "continuityRegisterBlobSha": "6fa81023a5a0c550dc21e0c7a6fdab10009288c6",
   "r16PerformanceRegression": {
     "status": "CLOSED_PASS",
     "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
@@ -7343,7 +7343,8 @@
       "orbit360-platform/core/policy-receipts-engine.js",
       "orbit360-platform/modules/aseguradoras.js",
       "orbit360-platform/styles/infra.css",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "orbit360-platform/modules/inicio.js"
     ],
     "allowedQaFiles": [
       "tools/gravicentra-i6-5-b4-003-contract.mjs",
@@ -7352,5 +7353,11 @@
     ],
     "tinyFishStatus": "AUTH_STATE_NOT_REUSED_NONBLOCKING",
     "authenticatedPreUatEquivalent": "GITHUB_PLAYWRIGHT"
+  },
+  "r18RenewalKpiParity": {
+    "status": "AUTHORIZED_SAME_CANDIDATE",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
+    "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139",
+    "findingId": "B4-003-R18-16-INICIO-POLIZAS-RENEWAL-KPI-PARITY"
   }
 }
