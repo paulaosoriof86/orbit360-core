@@ -368,6 +368,7 @@ function humanizeVisibleCopy(h){
 function html(){
   let h=humanizeVisibleCopy(S499.html());
   h=h.replace('await loadModels();renderModels();modelInput.focus();','await loadModels();close(brandList,brandInput);close(modelList,modelInput);');
+  h=h.replace(/<div class="cc-lab">[\\s\\S]*?<\\/div>/,'');
   h=h.replace(
     '<meta name="ays-owner-delta" content="S4.99_VISUAL_CTA">',
     '<meta name="ays-owner-delta" content="S5.00_CONSOLIDATED_OWNER_UX">'
