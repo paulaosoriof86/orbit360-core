@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R18_READONLY_FORENSIC",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R18_TINYFISH_AUTHENTICATED_READBACK_REQUIRED",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -6059,7 +6059,7 @@
     "findingLedgerBlobSha": "ffa1f7b937ffcc616b0af02e44513adcc445c9aa",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "R18_READONLY_FORENSIC_RENEWALS_AND_POLICY_VERSION_COLLISION",
+    "nextAction": "R18_TINYFISH_AUTHENTICATED_READBACK_THEN_SINGLE_CUMULATIVE_SOURCE_FIX",
     "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -7305,5 +7305,14 @@
     "noLive": true,
     "noReimport": true,
     "noDataMutation": true
+  },
+  "r18ReadOnlyForensic": {
+    "status": "SOURCE_RECONCILIATION_PASS_RUNTIME_COLLISION_READBACK_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_READONLY_FORENSIC_RENEWAL_11_OF_11_20261005.json",
+    "receiptBlobSha": "fe79c58a26715c846064aba16162db6345693c25",
+    "exact11AccountedFor": true,
+    "productWrites": 0,
+    "businessDataWrites": 0,
+    "nextAction": "TINYFISH_AUTHENTICATED_EXACT_PREVIEW_READBACK_FOR_DUPLICATE_COLLISION_AND_IMPACTED_PREUAT"
   }
 }
