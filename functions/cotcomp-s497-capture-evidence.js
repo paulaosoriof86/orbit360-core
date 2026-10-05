@@ -176,16 +176,17 @@ const viewports=[
   await brandInput.focus();await brandInput.fill('TOY');await comboPage.waitForTimeout(80);
   const brandOption=comboPage.locator('[data-kind="brand"][data-label="TOYOTA"]');
   const brandSearchWorks=await brandOption.count()===1;
-  if(brandSearchWorks) await brandOption.dispatchEvent('mousedown');
+  if(brandSearchWorks){await brandInput.press('ArrowDown');await brandInput.press('Enter');}
   await comboPage.waitForTimeout(100);
   const dependentModelEnabled=!(await modelInput.isDisabled());
   await modelInput.fill('RAV');await comboPage.waitForTimeout(50);
   const modelOption=comboPage.locator('[data-kind="model"][data-label="RAV4 2WD"]');
   const modelSearchWorks=await modelOption.count()===1;
-  if(modelSearchWorks) await modelOption.dispatchEvent('mousedown');
+  if(modelSearchWorks){await modelInput.press('ArrowDown');await modelInput.press('Enter');}
   await comboPage.waitForTimeout(50);
   const selectedBrand=(await brandInput.inputValue())==='TOYOTA';
   const selectedModel=(await modelInput.inputValue())==='RAV4 2WD';
+  const keyboardSelectionWorks=selectedBrand&&selectedModel;
   await comboPage.click('[data-vehicle-fallback="model"]');await comboPage.waitForTimeout(40);
   const assistedFallback=await comboPage.locator('[data-mode="assisted"].is-active').count()===1;
   const noForcedSelection=(await comboPage.locator('#vehicleCatalogStatus').textContent()||'').includes('No forzaremos');
@@ -194,7 +195,7 @@ const viewports=[
   receipt.vehicleCombobox={
     mockContract:'S479_READ_ONLY_SHAPE_UI_PROOF_ONLY',
     realTransport:false,
-    brandSearchWorks,dependentModelEnabled,modelSearchWorks,selectedBrand,selectedModel,assistedFallback,noForcedSelection,
+    brandSearchWorks,dependentModelEnabled,modelSearchWorks,selectedBrand,selectedModel,keyboardSelectionWorks,assistedFallback,noForcedSelection,
     screenshotSha256:sha(comboShot)
   };
   await comboPage.close();
