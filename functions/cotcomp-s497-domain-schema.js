@@ -37,7 +37,7 @@ function auto(country){
         field('usoVehiculo','Uso','select',gt?['Particular','Comercial','Transporte por plataforma']:['Particular','Comercial','Plataforma / aplicación','Otro / requiere revisión'],'Particular','La fuente puede restringir usos.'),
         field('marca','Marca','text',[],'','Nos ayuda a identificar correctamente el vehículo.'),
         field('lineaModelo','Línea / modelo','text',[],'','Completa la referencia del vehículo para continuar.'),
-        field('anioModelo','Año','select',YEARS,'2024','La antigüedad puede cambiar las opciones disponibles.'),
+        field('anioModelo','Año','select',YEARS,'','La antigüedad puede cambiar las opciones disponibles.'),
         field('valorAsegurado','Valor aproximado','number',[],'','Referencia del riesgo; la propuesta final depende de la alternativa validada.')
       ]},
       {title:'Condiciones que cambian la tarifa o la ruta',kicker:'APLICABILIDAD',fields:[
