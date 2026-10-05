@@ -310,7 +310,7 @@ function html(){
   }
 
   function renderIntake(){
-    const base=DOMAIN[key()]||DOMAIN[state.country+':duda];
+    const base=DOMAIN[key()]||DOMAIN[state.country+':duda'];
     let sc=base.schema;
     if(state.product==='salud'){
       const hijos=state.form.hijos!=null?state.form.hijos:((sc.groups[0].fields.find(x=>x.id==='hijos')||{}).default||0);
