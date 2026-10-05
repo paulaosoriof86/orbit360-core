@@ -174,6 +174,8 @@ const viewports=[
   await comboPage.click('[data-next="2"]');await comboPage.waitForTimeout(80);
   const brandInput=comboPage.locator('[data-vehicle-combo="brand"]');
   const modelInput=comboPage.locator('[data-vehicle-combo="model"]');
+  const vehicleYear=comboPage.locator('#f_anioModelo');
+  const yearStartsUnselected=(await vehicleYear.inputValue())==='';
   await brandInput.focus();await brandInput.fill('TOY');await comboPage.waitForTimeout(80);
   const brandOption=comboPage.locator('[data-kind="brand"][data-label="TOYOTA"]');
   const brandSearchWorks=await brandOption.count()===1;
@@ -196,7 +198,7 @@ const viewports=[
   receipt.vehicleCombobox={
     mockContract:'S479_READ_ONLY_SHAPE_UI_PROOF_ONLY',
     realTransport:false,
-    brandSearchWorks,dependentModelEnabled,modelSearchWorks,selectedBrand,selectedModel,keyboardSelectionWorks,assistedFallback,noForcedSelection,
+    brandSearchWorks,dependentModelEnabled,modelSearchWorks,selectedBrand,selectedModel,keyboardSelectionWorks,yearStartsUnselected,assistedFallback,noForcedSelection,
     screenshotSha256:sha(comboShot)
   };
   await comboPage.close();
@@ -218,8 +220,12 @@ const viewports=[
   await healthPage.setContent(generatedHtml,{waitUntil:'domcontentloaded'});await settled(healthPage);
   await healthPage.click('.cc-family[data-family="health"]');
   await healthPage.click('[data-next="2"]');await healthPage.waitForTimeout(80);
+  domainProof.gtHealthSpouseDobHiddenByDefault=await healthPage.locator('#f_spouseDob').count()===0;
+  await healthPage.locator('#f_conyuge').selectOption({label:'Sí'});await healthPage.locator('#f_conyuge').dispatchEvent('change');await healthPage.waitForTimeout(80);
+  domainProof.gtHealthSpouseDobAppearsAfterExplicitYes=await healthPage.locator('#f_spouseDob').count()===1 && (await healthPage.locator('#f_spouseDob').inputValue())==='';
   await healthPage.locator('#f_hijos').fill('2');await healthPage.locator('#f_hijos').dispatchEvent('change');await healthPage.waitForTimeout(80);
   domainProof.gtHealthDependentDobDynamic=await healthPage.locator('#f_dependentDob1,#f_dependentDob2').count()===2;
+  domainProof.gtHealthDependentDobStartsBlank=(await healthPage.locator('#f_dependentDob1').inputValue())==='' && (await healthPage.locator('#f_dependentDob2').inputValue())==='';
   const healthShot=path.join(OUT,'state-gt-health-dependents.png');await healthPage.screenshot({path:healthShot,fullPage:true});domainProof.gtHealthScreenshotSha256=sha(healthShot);
   await healthPage.close();
 
