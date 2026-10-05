@@ -4,6 +4,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
+const vm=require('node:vm');
 const S=require('./cotcomp-clean-parent-s497');
 const G=require('./cotcomp-s497-visual-contract-gate');
 
@@ -45,3 +46,11 @@ test('S4.97 never uses Newsreader as H1 and never uses 4:3 hero card',()=>{
   assert.doesNotMatch(h,/\.cc-hero__title\{[^}]*Newsreader/);
   assert.doesNotMatch(h,/\.cc-hero__media\{[^}]*aspect-ratio:4\/3/);
 });
+
+test('S4.97 generated inline JavaScript is syntactically valid',()=>{
+  const h=S.html();
+  const scripts=[...h.matchAll(/<script(?![^>]*type=["']application\\/json["'])[^>]*>([\\s\\S]*?)<\\/script>/gi)].map(m=>m[1]);
+  assert.ok(scripts.length>0);
+  scripts.forEach((src,i)=>assert.doesNotThrow(()=>new vm.Script(src,{filename:'s497-inline-'+(i+1)+'.js'})));
+});
+
