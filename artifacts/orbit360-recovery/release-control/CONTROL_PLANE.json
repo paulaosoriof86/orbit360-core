@@ -49,7 +49,7 @@
     "normativeAddendumBlobSha": "b51eb0f37f48a4fcab0336b8b300c559b0f76714",
     "pendingNormativeChange": null,
     "projectSynchronization": {
-      "status": "REPO_V7_READY_PROJECT_SOURCE_SYNC_PENDING",
+      "status": "REPO_V7_GUARD_PASS_PROJECT_SOURCE_SYNC_PENDING",
       "requiredAdds": [
         "09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
         "11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md"
@@ -59,7 +59,10 @@
       "productSourceChanged": false,
       "dataMutation": false,
       "reimport": false,
-      "livePromotion": false
+      "livePromotion": false,
+      "repositoryGuardRunId": 37302206269,
+      "repositoryGuardConclusion": "success",
+      "repositoryGuardHead": "11145eb2ee63dde90d4e8808169e5c31c49ad482"
     }
   },
   "deprecatedMutableAuthorities": {
