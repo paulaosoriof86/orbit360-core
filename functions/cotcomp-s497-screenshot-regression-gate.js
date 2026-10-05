@@ -52,6 +52,7 @@ function verify(receipt){
     add(combo.modelSearchWorks===true,'VEHICLE_MODEL_SEARCH','model searchable');
     add(combo.selectedBrand===true && combo.selectedModel===true,'VEHICLE_COMBOBOX_SELECTION','brand/model selected');
     add(combo.keyboardSelectionWorks===true,'VEHICLE_COMBOBOX_KEYBOARD','Arrow/Enter keyboard selection works');
+    add(combo.yearStartsUnselected===true,'VEHICLE_YEAR_EXPLICIT','model year must be explicitly selected');
     add(combo.assistedFallback===true && combo.noForcedSelection===true,'VEHICLE_COMBOBOX_FALLBACK','missing option routes to assisted review');
     add(SHA.test(String(combo.screenshotSha256||'')),'VEHICLE_COMBOBOX_SCREENSHOT_SHA','interaction evidence');
   }
@@ -61,7 +62,8 @@ function verify(receipt){
   if(dj){
     add(dj.realTransport===false,'DOMAIN_JOURNEY_NO_REAL_TRANSPORT','real transport remains false');
     add(dj.coCountryVisible===true && dj.coTransportSpecializedFields===true,'CO_TRANSPORT_DYNAMIC_FIELDS','Colombia transport specialized intake');
-    add(dj.gtHealthDependentDobDynamic===true,'GT_HEALTH_DYNAMIC_DEPENDENTS','dependent DOB fields respond to household composition');
+    add(dj.gtHealthSpouseDobHiddenByDefault===true && dj.gtHealthSpouseDobAppearsAfterExplicitYes===true,'GT_HEALTH_SPOUSE_PROGRESSIVE','spouse DOB appears only after explicit inclusion');
+    add(dj.gtHealthDependentDobDynamic===true && dj.gtHealthDependentDobStartsBlank===true,'GT_HEALTH_DYNAMIC_DEPENDENTS','dependent DOB fields respond to household composition and start blank');
     add(dj.otherDeepContractRoute===true,'OTHER_DEEP_CONTRACT_ROUTE','deep contract route preserved');
     add(dj.backPreservesCompatibleValue===true && dj.stepperMatchesStage2===true,'JOURNEY_BACK_STATE','back navigation preserves compatible data and stage truth');
     for(const k of ['coTransportScreenshotSha256','gtHealthScreenshotSha256','otherContractScreenshotSha256']){
