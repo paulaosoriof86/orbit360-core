@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "PAULA_VISUAL_REJECTED_R17_R18_FORENSIC_ACTIVE",
-    "nextAction": "R18_READONLY_FORENSIC_RENEWALS_AND_POLICY_VERSION_COLLISION",
-    "why": "Paula targeted R17 review preserved several fixes but found blocking commercial-flow, quality-action, mobile, renewals-universe, policy-version and insurer-knowledge defects. R17 machine PASS is retained only for assertions actually demonstrated. B4-004 remains held.",
+    "status": "R18_CAUSAL_SOURCE_FIX_AUTHORIZED",
+    "nextAction": "R18_SINGLE_CUMULATIVE_SOURCE_FIX",
+    "why": "Authenticated read-only forensic reconciled 11/11 renewal date universe and proved policy 1003687 collision is legitimate non-overlapping editions with incomplete lineage; visual findings remain frozen.",
     "currentCandidateReview": "R17_REJECTED_NO_MORE_HUMAN_RETEST_UNTIL_R18_MACHINE_PLUS_TINYFISH_PREUAT_PASS",
     "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
     "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
@@ -6291,5 +6291,16 @@
       ],
       "cannotReplaceHumanVisualAcceptance": true
     }
+  },
+  "r18CausalAuthorization": {
+    "status": "AUTHORIZED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_CAUSAL_SOURCE_FIX_AUTHORIZATION_20261005.json",
+    "blobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8",
+    "forensicPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_AUTHENTICATED_READONLY_FORENSIC_RESULT_20261005.json",
+    "forensicBlobSha": "e4b1b418fc7b2b1f15d28a0560529a7603f32203",
+    "ledgerBlobSha": "3caffb0d57fcfbefb911f4d3ff5af022574e7dda",
+    "carryBlobSha": "38ecbdf3d69008c21192e2cbb5c5375fb54fd321",
+    "tinyFish": "AUTH_STATE_NOT_REUSED_NONBLOCKING",
+    "preUatEquivalent": "AUTHENTICATED_GITHUB_PLAYWRIGHT_REQUIRED"
   }
 }
