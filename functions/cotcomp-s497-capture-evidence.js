@@ -3,6 +3,7 @@
 const fs=require('fs');
 const path=require('path');
 const crypto=require('crypto');
+const vm=require('vm');
 const {chromium}=require('playwright');
 const S=require('./cotcomp-clean-parent-s497');
 
@@ -17,6 +18,23 @@ const viewports=[
 ];
 
 (async()=>{
+  const generatedHtml=S.html();
+  const scriptBlocks=[...generatedHtml.matchAll(/<script(?![^>]*type=["']application\/json["'])[^>]*>([\s\S]*?)<\/script>/gi)].map(m=>m[1]);
+  for(let i=0;i<scriptBlocks.length;i++){
+    try{
+      new vm.Script(scriptBlocks[i],{filename:'s497-inline-script-'+(i+1)+'.js'});
+    }catch(err){
+      const lines=scriptBlocks[i].split(/\r?\n/);
+      const match=String(err.stack||'').match(/s497-inline-script-\d+\.js:(\d+)/);
+      const line=match?Number(match[1]):null;
+      if(line){
+        const from=Math.max(1,line-3),to=Math.min(lines.length,line+3);
+        for(let n=from;n<=to;n++) console.error('[S497 INLINE '+n+'] '+lines[n-1]);
+      }
+      console.error('[S497 INLINE SCRIPT SYNTAX]',err&&err.stack?err.stack:String(err));
+      throw err;
+    }
+  }
   const browser=await chromium.launch({headless:true});
   const receipt={
     schemaVersion:'ays-cotcomp-s497-visual-evidence-v1.0',
@@ -81,7 +99,7 @@ const viewports=[
 
   for(const vp of viewports){
     const page=await newEvidencePage({width:vp.width,height:vp.height});
-    await page.setContent(S.html(),{waitUntil:'domcontentloaded'});
+    await page.setContent(generatedHtml,{waitUntil:'domcontentloaded'});
     await settled(page);
     const heroH1=await page.locator('.cc-hero').boundingBox();
     const shot=path.join(OUT,vp.id+'.png');
@@ -97,7 +115,7 @@ const viewports=[
   }
 
   const page=await newEvidencePage({width:1440,height:1000});
-  await page.setContent(S.html(),{waitUntil:'domcontentloaded'});
+  await page.setContent(generatedHtml,{waitUntil:'domcontentloaded'});
   await settled(page);
 
   async function stateShot(id){
