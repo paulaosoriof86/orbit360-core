@@ -1,0 +1,21 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R19_R16_CONTRACT_HIERARCHY_ALIGNMENT_V1",
+  "recordedAt": "2026-10-05T23:44:00Z",
+  "status": "QA_CONTRACT_ALIGNED_PENDING_EXACT_PREVIEW_RETRY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "744a90feede79be168a0c1ed4993686a7f5c79de",
+  "gate": "I6.5/B4-003/R19",
+  "failedRunId": 37388686568,
+  "failedCode": "B4_003_R16_INSURER_REGISTRY_UI_OR_METADATA_MISSING",
+  "classification": "STALE_QA_ASSERTION_AFTER_APPROVED_R19_HIERARCHY_CHANGE",
+  "contractPath": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+  "priorContractBlobSha": "d593d89c0f86d324eb60762c6d5a3fc4fa7cb0bd",
+  "newContractBlobSha": "2a07d305a5e7709c83436813e18143f884a15b60",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "rationale": "R19 intentionally demoted the Registry to a secondary collapsible technical section; metadata/provenance requirements remain enforced.",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW"
+}
