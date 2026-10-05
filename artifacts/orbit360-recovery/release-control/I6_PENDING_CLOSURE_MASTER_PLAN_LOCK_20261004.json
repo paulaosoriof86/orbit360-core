@@ -6314,7 +6314,7 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
     "blobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
     "compositionBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
-    "executionLockBlobSha": "7eefb9f6f57864ee23a121786d9a971241458709",
+    "executionLockBlobSha": "85e1c24b7171a8c80836ec000df05a81f19b368a",
     "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
     "carryBlobSha": "12d6e394c10bc40d0b219eed7bab2a9266853797",
     "exactFindingSetCount": 235
@@ -6324,6 +6324,14 @@
     "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
     "carryBlobSha": "12d6e394c10bc40d0b219eed7bab2a9266853797",
     "executionLockBlobSha": "7eefb9f6f57864ee23a121786d9a971241458709",
+    "productSourceChanged": false
+  },
+  "r18QualityProvenanceQaSelectorRootFix": {
+    "status": "QA_FIXED_PENDING_EXACT_RETRY",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_QUALITY_PROVENANCE_QA_SELECTOR_ROOTFIX_20261005.json",
+    "receiptBlobSha": "5b577da70cde56ad757af9ff294aabbccf926e4d",
+    "previewProofBlobSha": "b60ff527a2723002923cbbd7499d222a3da1c470",
+    "failedRunId": 37355564631,
     "productSourceChanged": false
   }
 }
