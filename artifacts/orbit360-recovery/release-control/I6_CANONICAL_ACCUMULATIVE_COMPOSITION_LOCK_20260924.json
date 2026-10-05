@@ -3064,7 +3064,7 @@
       "orbit360-platform/index.html": "f96358fbef0cef9e49c4e750f58160132eea1672"
     },
     "qaBlobs": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "c2925a82cb1427927ce5180a87c22605aab1a9c7",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "66dcac1ee462023e7a27ada26df160f63531a9ee",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "2f73abe643f4dc2b447e252453b307c92b449ceb",
       ".github/workflows/gravicentra-b4-003-executor.yml": "bb77f9992587bd7e28ccef74bc4871cb7da69a4b"
     },
@@ -3096,6 +3096,14 @@
       "failureCode": "B4_003_R16_INSURER_REGISTRY_UI_OR_METADATA_MISSING",
       "resolution": "Restored frozen visible heading 'Registry canónica de fuentes · Biblioteca y Drive' while preserving R17 expandable detail functionality.",
       "productSourceChanged": true,
+      "noBuildOccurredBeforeFix": true
+    },
+    "qaCompatibilityAlignment3": {
+      "status": "QA_LITERAL_DRIFT_CORRECTED_BEFORE_BUILD",
+      "failedRunId": 37245876914,
+      "failureCode": "B4_003_R12_INFORMATION_HEALTH_FINANCIAL_PROJECTION_MISSING",
+      "resolution": "Contract required contiguous pre-R17 export text and obsolete K.clienteCell literal. Updated assertions to prove the same projection functions plus the new financialClientCell owner.",
+      "productSourceChanged": false,
       "noBuildOccurredBeforeFix": true
     }
   }
