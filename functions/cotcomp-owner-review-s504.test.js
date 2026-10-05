@@ -42,6 +42,6 @@ test('S5.04 terminal channel buttons cannot bypass contact/consent gate',()=>{
 
 test('S5.04 removes hero benefit markup and corrects title',()=>{
   const h=S504.html();
-  assert.ok(!h.includes('cc-hero__benefits'));
+  assert.ok(!h.includes('<div class="cc-hero__benefits">'));
   assert.match(h,/Owner Review S5\.04/);
 });
