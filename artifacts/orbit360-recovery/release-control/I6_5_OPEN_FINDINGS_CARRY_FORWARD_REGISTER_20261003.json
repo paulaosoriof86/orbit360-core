@@ -1,10 +1,10 @@
 {
   "schema": "GRAVICENTRA_I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_V1",
-  "recordedAt": "2026-10-05T12:12:00-06:00",
+  "recordedAt": "2026-10-05T13:27:00-06:00",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
-  "expectedLedgerNextBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+  "sourceLedgerPreviousBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
+  "expectedLedgerNextBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -9256,6 +9256,16 @@
     "status": "REPAIRED_EXACT_LEDGER_BINDING",
     "cause": "R18 finding 235 appended after prior carry binding; guard correctly failed before build.",
     "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "r18MachineProofContinuitySeal": {
+    "status": "SEALED_TO_CURRENT_LEDGER_AFTER_MACHINE_PROOF",
+    "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
+    "machineProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_MACHINE_PROOF_20261005.json",
+    "reason": "Machine-proof freeze updated finding dispositions after exact Preview PASS; carry blob binding is advanced to that exact ledger without changing product or evidence.",
     "productSourceChanged": false,
     "dataMutation": false,
     "reimport": false,
