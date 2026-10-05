@@ -1,0 +1,39 @@
+name: CotComp S5.02 Gravicentra Handoff Contract Source-only
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/cotcomp-s502-gravicentra-handoff-contract-sourceonly-20261005
+    paths:
+      - 'functions/cotcomp-gravicentra-handoff-contract-s502.js'
+      - 'functions/cotcomp-gravicentra-handoff-contract-s502.test.js'
+      - '.github/workflows/cotcomp-s502-gravicentra-handoff-contract-sourceonly.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  source-only-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify source-only boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "AUTO_READY=false" functions/cotcomp-gravicentra-handoff-contract-s502.js
+          grep -q "RUNTIME_WRITES_ALLOWED=false" functions/cotcomp-gravicentra-handoff-contract-s502.js
+          grep -q "PRODUCTION=false" functions/cotcomp-gravicentra-handoff-contract-s502.js
+      - name: Syntax and contract tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check cotcomp-gravicentra-handoff-contract-s502.js
+          node --check cotcomp-gravicentra-handoff-contract-s502.test.js
+          node --test cotcomp-gravicentra-handoff-contract-s502.test.js
