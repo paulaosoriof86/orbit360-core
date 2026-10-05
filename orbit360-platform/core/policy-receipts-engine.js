@@ -125,10 +125,11 @@ Orbit.policyReceipts = (function () {
     const key = canonicalPolicyKey(normalizedPolicy);
     const versionKey = policyVersionKey(normalizedPolicy);
     const rows = (S().all('polizas') || []).filter(x => x && x.id !== currentId);
-    const duplicateVersion = rows.find(x => policyVersionKey(x) === versionKey);
-    if (duplicateVersion) errors.push('poliza_version_duplicada:' + duplicateVersion.id);
-    const sameCommercial = rows.find(x => canonicalPolicyKey(x) === key);
-    if (sameCommercial && !clean(p.renuevaDe)) errors.push('poliza_duplicada:' + sameCommercial.id);
+    const sameCommercialRows = rows.filter(x => canonicalPolicyKey(x) === key);
+    const editionStart = clean(normalizedPolicy.vigenciaInicio || normalizedPolicy.vigenciaIni);
+    const duplicateEdition = sameCommercialRows.find(x => clean(x.vigenciaInicio || x.vigenciaIni) === editionStart);
+    if (duplicateEdition) errors.push('poliza_version_duplicada:' + duplicateEdition.id);
+    if (sameCommercialRows.length && !clean(p.renuevaDe)) warnings.push('lineage_ediciones_sin_vinculo');
     if (clean(p.renuevaDe)) {
       const source = S().get('polizas', clean(p.renuevaDe));
       if (!source) errors.push('poliza_origen_renovacion_no_encontrada');
