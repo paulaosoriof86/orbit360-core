@@ -56,3 +56,24 @@ test('first-level family routing remains exactly seven families',()=>{
   assert.deepEqual(Object.keys(D.FAMILY_TO_PRODUCT),['vehicle','home','health','life','business','cargo','other']);
   assert.equal(D.FAMILY_TO_PRODUCT.other,'duda');
 });
+
+test('Home stays consultative until operational provider binding exists',()=>{
+  for(const country of ['gt','co']){
+    const sc=D.schema(country,'hogar');
+    assert.equal(sc.eligibility,'CONSULTATIVE_REQUIRED');
+    assert.equal(sc.bindingStatus,'OPERATIONAL_BINDING_PENDING');
+  }
+});
+
+test('Source-only visual comparison fixture carries no invented monetary values',()=>{
+  const c=D.comparison('gt','auto');
+  assert.equal(c.visualFixture,true);
+  assert.equal(c.reason,'SOURCE_ONLY_VISUAL_FIXTURE_NOT_REAL_PROPOSALS');
+  assert.equal(c.quotes.length,2);
+  for(const q of c.quotes){
+    assert.equal(q.status,'VISUAL_FIXTURE');
+    assert.equal(q.total,'Según propuesta');
+    assert.doesNotMatch(q.total,/Q\s*\d|\$\s*\d|COP|GTQ/i);
+  }
+});
+
