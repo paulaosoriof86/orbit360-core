@@ -770,8 +770,8 @@ try{
  await page.setViewportSize({width:390,height:844});
  await page.evaluate(()=>{location.hash='#/polizas';});
  await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='polizas',null,{timeout:10000});
- await page.waitForSelector('#f-q',{timeout:10000});
- proof.r18MobilePolicySearch=await page.evaluate(()=>{const q=document.getElementById('f-q'),p=q?.closest('.tb-search');const qs=q?getComputedStyle(q):null,ps=p?getComputedStyle(p):null;return{present:!!q,inputDisplay:qs?.display||'',parentDisplay:ps?.display||'',width:q?.getBoundingClientRect().width||0,viewport:innerWidth};});
+ await page.waitForSelector('#fq',{timeout:10000});
+ proof.r18MobilePolicySearch=await page.evaluate(()=>{const q=document.getElementById('fq'),p=q?.closest('.tb-search');const qs=q?getComputedStyle(q):null,ps=p?getComputedStyle(p):null;return{present:!!q,inputDisplay:qs?.display||'',parentDisplay:ps?.display||'',width:q?.getBoundingClientRect().width||0,viewport:innerWidth,selector:'#fq'};});
  need(proof.r18MobilePolicySearch.present&&proof.r18MobilePolicySearch.inputDisplay!=='none'&&proof.r18MobilePolicySearch.parentDisplay!=='none'&&proof.r18MobilePolicySearch.width>120,'B4_003_R18_MOBILE_POLICY_SEARCH_HIDDEN:'+JSON.stringify(proof.r18MobilePolicySearch));
  proof.assertions.policyMobileSearchVisible=true;
  await page.setViewportSize({width:1280,height:720});
