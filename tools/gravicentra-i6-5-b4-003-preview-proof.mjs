@@ -33,7 +33,7 @@ ids.renewActivity='act_ren_'+ids.renewalPolicy+'_'+new Date().toISOString().slic
 ids.cancelActivity='act_rec_'+ids.cancelation;
 ids.recoveryBusiness='neg_rec_'+ids.cancelation;
 const residueIds=['pol_mulsmxsk','pol_mulssmuz','pol_mulsxofx'];
-const proof={schema:'GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R16_V1',status:'INIT',target,ids,assertions:{},syntheticWrites:0,cleanupWrites:0,pageErrors:[],consoleErrors:[],httpErrors:[],expectedIsolationDenials:[],unexpectedHttpErrors:[],unexpectedConsoleErrors:[],syntheticFinalAbsent:false,qaResidue:{},runtimeCancellationEvidence:{}};
+const proof={schema:'GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R18_V1',status:'INIT',target,ids,assertions:{},syntheticWrites:0,cleanupWrites:0,pageErrors:[],consoleErrors:[],httpErrors:[],expectedIsolationDenials:[],unexpectedHttpErrors:[],unexpectedConsoleErrors:[],syntheticFinalAbsent:false,qaResidue:{},runtimeCancellationEvidence:{}};
 
 const renewalSourceAuthority={
   sourceFile:'Renovaciones (13).xlsx',
@@ -417,6 +417,25 @@ try{
  proof.assertions.insurerKnowledgeHierarchyHuman=true;
  need(proof.r12InsurerKnowledge.registry?.present===true&&proof.r12InsurerKnowledge.registry?.open===true&&proof.r12InsurerKnowledge.registry?.detailPresent===true&&/Clasificación/.test(proof.r12InsurerKnowledge.registry?.detailText||'')&&/Ubicación/.test(proof.r12InsurerKnowledge.registry?.detailText||''),'B4_003_R17_INSURER_REGISTRY_NOT_INSPECTABLE:'+JSON.stringify(proof.r12InsurerKnowledge.registry));
  proof.assertions.insurerSourceRegistryInspectable=true;
+ need(!/\[object Object\]/.test(proof.r12InsurerKnowledge.registry?.detailText||''),'B4_003_R18_INSURER_PROVENANCE_OBJECT_RENDERED:'+JSON.stringify(proof.r12InsurerKnowledge.registry));
+ proof.assertions.insurerRegistryProvenanceHuman=true;
+ await page.click('#asg-ficha [data-tab="actividad"]');
+ await page.waitForFunction(()=>/Historia unificada/.test(String(document.querySelector('#asg-ficha #af-body')?.innerText||'')),null,{timeout:10000});
+ proof.r18InsurerActivity=await page.evaluate(()=>{
+   const body=document.querySelector('#asg-ficha #af-body'),rows=Array.from(body?.querySelectorAll('.insurer-activity-row')||[]),documental=Array.from(body?.querySelectorAll('.insurer-activity-row.documental')||[]);
+   return{text:String(body?.innerText||'').replace(/\s+/g,' ').trim().slice(0,2400),rows:rows.length,documental:documental.length,hasUnified:/Historia unificada/.test(body?.innerText||'')};
+ });
+ need(proof.r18InsurerActivity.hasUnified===true&&proof.r18InsurerActivity.documental>0,'B4_003_R18_INSURER_ACTIVITY_NOT_CONVERGED:'+JSON.stringify(proof.r18InsurerActivity));
+ proof.assertions.insurerKnowledgeActivityConverged=true;
+ await page.setViewportSize({width:390,height:844});
+ proof.r18InsurerMobile=await page.evaluate(()=>{
+   const body=document.querySelector('#asg-ficha #af-body'),details=body?.querySelector('.insurer-source-detail'),cards=Array.from(body?.querySelectorAll('.insurer-source-card,.insurer-knowledge-card')||[]);
+   const viewport=window.innerWidth;
+   return{viewport,bodyOverflow:body?body.scrollWidth>body.clientWidth+2:false,detailOverflow:details?details.scrollWidth>details.clientWidth+2:false,cardOverflow:cards.some(x=>x.scrollWidth>x.clientWidth+2)};
+ });
+ need(!proof.r18InsurerMobile.bodyOverflow&&!proof.r18InsurerMobile.detailOverflow&&!proof.r18InsurerMobile.cardOverflow,'B4_003_R18_INSURER_MOBILE_OVERFLOW:'+JSON.stringify(proof.r18InsurerMobile));
+ proof.assertions.insurerKnowledgeMobileResponsive=true;
+ await page.setViewportSize({width:1280,height:720});
  const tariffCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='tarifa');
  const docCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='documento');
  need(tariffCapture?.kind==='docs-aseguradora'&&tariffCapture?.scope?.aseguradoraId===knowledgeProbe.aseguateId&&tariffCapture?.docCategory==='Tarifario','B4_003_R12_TARIFF_IMPORT_INSURER_SCOPE_MISSING');
@@ -585,10 +604,24 @@ try{
  proof.assertions.receiptShadowDuplicateProjection=true;proof.assertions.qualityResolutionHumanSemantics=true;
  proof.assertions.informationHealthFinancialMismatchVisible=true;proof.assertions.informationHealthNoInference=true;
 
+ proof.r18QualityProvenance=await page.evaluate(async ids=>{
+   const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);
+   const row=Array.from(h.querySelectorAll('[data-quality-country="GT"]')).find(x=>String(x.innerText||'').includes('B4-003 QA Cliente'))||null;
+   const documentButton=Array.from(row?.querySelectorAll('button')||[]).find(b=>/Documentar origen/.test(b.innerText||''))||null;
+   if(documentButton)documentButton.click();
+   await new Promise(r=>setTimeout(r,60));
+   const modal=document.getElementById('quality-inline'),country=modal?.querySelector('#qi-pais');
+   const out={buttonPresent:!!documentButton,modalPresent:!!modal,country:String(country?.value||''),hasReason:!!modal?.querySelector('#qi-motivo'),phoneLabel:/teléfono \/ WhatsApp/i.test(String(h.innerText||''))};
+   modal?.remove();return out;
+ },ids);
+ need(proof.r18QualityProvenance.buttonPresent&&proof.r18QualityProvenance.modalPresent&&proof.r18QualityProvenance.country==='GT'&&proof.r18QualityProvenance.hasReason,'B4_003_R18_QUALITY_PROVENANCE_ACTION_MISSING:'+JSON.stringify(proof.r18QualityProvenance));
+ proof.assertions.qualityProvenanceActionable=true;
+
  await page.evaluate(ids=>{const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);h.querySelector('[data-information-health-policy="'+ids.healthPolicy+'"] [data-health-open-review]')?.click();},ids);
  await page.waitForSelector('#quality-fin-review',{timeout:10000});
- proof.r17QualityReviewModal=await page.evaluate(()=>{const m=document.getElementById('quality-fin-review'),text=String(m?.innerText||'').replace(/\s+/g,' ').trim();return{modal:!!m,hasCause:/Motivo detectado/.test(text),hasReceipts:!!m?.querySelector('[data-receipts]'),hasPolicy:!!m?.querySelector('[data-policy]'),technical:/I6_|PRIMARY_POLICY_UNIVERSE|SINGLE_PHYSICAL_CALENDAR|REQUIERE_VALIDACION/.test(text)};});
- need(proof.r17QualityReviewModal.modal&&proof.r17QualityReviewModal.hasCause&&proof.r17QualityReviewModal.hasReceipts&&proof.r17QualityReviewModal.hasPolicy&&!proof.r17QualityReviewModal.technical,'B4_003_R17_QUALITY_REVIEW_MODAL_NOT_ACTIONABLE:'+JSON.stringify(proof.r17QualityReviewModal));
+ proof.r18QualityReviewModal=await page.evaluate(()=>{const m=document.getElementById('quality-fin-review'),text=String(m?.innerText||'').replace(/\s+/g,' ').trim();return{modal:!!m,hasComparison:/Qué estamos comparando/.test(text),hasWhy:/Por qué requiere revisión/.test(text),hasReceipts:!!m?.querySelector('[data-receipts]'),hasPolicy:!!m?.querySelector('[data-policy]'),receiptLabel:String(m?.querySelector('[data-receipts]')?.innerText||''),policyLabel:String(m?.querySelector('[data-policy]')?.innerText||''),technical:/I6_|PRIMARY_POLICY_UNIVERSE|SINGLE_PHYSICAL_CALENDAR|REQUIERE_VALIDACION/.test(text)};});
+ need(proof.r18QualityReviewModal.modal&&proof.r18QualityReviewModal.hasComparison&&proof.r18QualityReviewModal.hasWhy&&/Revisar recibos/.test(proof.r18QualityReviewModal.receiptLabel)&&/Corregir en póliza/.test(proof.r18QualityReviewModal.policyLabel)&&!proof.r18QualityReviewModal.technical,'B4_003_R18_QUALITY_REVIEW_MODAL_NOT_ACTIONABLE:'+JSON.stringify(proof.r18QualityReviewModal));
+ proof.assertions.qualityReviewTruthfulAndActionable=true;
  await page.evaluate(()=>document.querySelector('#quality-fin-review [data-receipts]')?.click());
  await page.waitForFunction(id=>location.hash.includes('p='+encodeURIComponent(id))&&location.hash.includes('t=recibos'),ids.healthPolicy,{timeout:10000});
  proof.r17QualityReceiptsDeepLink=await page.evaluate(id=>({hash:location.hash,policyId:id,receiptsTarget:location.hash.includes('t=recibos')}));
@@ -627,9 +660,44 @@ try{
  need(proof.r17KanbanCardContainment.cardWithinColumn===true&&proof.r17KanbanCardContainment.cardWithinBody===true&&proof.r17KanbanCardContainment.cardScrollWidth<=proof.r17KanbanCardContainment.cardClientWidth+1&&['anywhere','break-word'].includes(proof.r17KanbanCardContainment.titleOverflowWrap),'B4_003_R17_OPS_LEADS_CARD_OVERFLOW:'+JSON.stringify(proof.r17KanbanCardContainment));
  proof.assertions.opsLeadsKanbanCardContained=true;
 
- await page.evaluate(()=>{location.hash='#/renovaciones';});
+ await page.evaluate(async()=>{Orbit.pais='GT';await Orbit.ciclo.nuevoNegocio();});
+ await page.waitForSelector('#ciclo-modal #nn-ingreso',{timeout:10000});
+ proof.r18CommercialCreate=await page.evaluate(()=>{
+   const modal=document.getElementById('ciclo-modal'),entry=modal?.querySelector('#nn-ingreso'),ramo=modal?.querySelector('#nn-ramo'),product=modal?.querySelector('#nn-prod'),plan=modal?.querySelector('#nn-plan'),insurers=modal?.querySelector('#nn-asg');
+   const entryDef=Orbit.cat.puntoIngreso(entry?.value||''),ids=Array.from(modal?.querySelectorAll('select')||[]).map(x=>x.id).filter(Boolean);
+   const productValues=Array.from(product?.options||[]).map(o=>o.value).filter(Boolean).sort(),canonical=(Orbit.cat.subramosDe('GT',ramo?.value)||[]).slice().sort();
+   return{entryId:String(entry?.value||''),entryStage:String(entryDef?.etapa||''),ids,ramoBeforeProduct:ids.indexOf('nn-ramo')>=0&&ids.indexOf('nn-ramo')<ids.indexOf('nn-prod'),productBeforePlan:ids.indexOf('nn-prod')>=0&&ids.indexOf('nn-prod')<ids.indexOf('nn-plan'),productValues,canonical,multiInsurer:!!insurers?.multiple,insurerCount:insurers?.options?.length||0};
+ });
+ need(proof.r18CommercialCreate.entryStage==='nuevo'&&proof.r18CommercialCreate.ramoBeforeProduct&&proof.r18CommercialCreate.productBeforePlan&&JSON.stringify(proof.r18CommercialCreate.productValues)===JSON.stringify(proof.r18CommercialCreate.canonical)&&proof.r18CommercialCreate.multiInsurer&&proof.r18CommercialCreate.insurerCount>0,'B4_003_R18_COMMERCIAL_CREATE_CONTRACT_FAILED:'+JSON.stringify(proof.r18CommercialCreate));
+ await page.setViewportSize({width:390,height:844});
+ proof.r18CommercialMobile=await page.evaluate(()=>{const modal=document.getElementById('ciclo-modal'),card=modal?.querySelector('.ciclo-card');return{viewport:innerWidth,cardWidth:card?.getBoundingClientRect().width||0,cardScrollWidth:card?.scrollWidth||0,cardClientWidth:card?.clientWidth||0,footerButtons:Array.from(modal?.querySelectorAll('.ciclo-foot .btn')||[]).length};});
+ need(proof.r18CommercialMobile.cardWidth<=390&&proof.r18CommercialMobile.cardScrollWidth<=proof.r18CommercialMobile.cardClientWidth+2,'B4_003_R18_COMMERCIAL_MOBILE_OVERFLOW:'+JSON.stringify(proof.r18CommercialMobile));
+ proof.assertions.commercialDefaultNew=true;proof.assertions.commercialRamoProductPlanDependent=true;proof.assertions.commercialMobileResponsive=true;
+ await page.setViewportSize({width:1280,height:720});
+ await page.evaluate(()=>document.getElementById('ciclo-modal')?.remove());
+
+ await page.evaluate(async()=>{await Orbit.ciclo.managementCreateModal({origen:'Ops',openAfterCreate:false});});
+ await page.waitForSelector('#ciclo-modal #mg-tipo',{timeout:10000});
+ proof.r18ManagementModal=await page.evaluate(()=>{
+   const modal=document.getElementById('ciclo-modal'),type=modal?.querySelector('#mg-tipo'),queue=modal?.querySelector('#mg-lista');
+   const typeValues=Array.from(type?.options||[]).map(o=>String(o.value||o.textContent||'').trim()).filter(Boolean);
+   return{typeCount:typeValues.length,typeValues:typeValues.slice(0,20),queueReadonly:!!queue?.readOnly,queue:String(queue?.value||''),help:/determina por el tipo de gestión/i.test(String(modal?.innerText||''))};
+ });
+ need(proof.r18ManagementModal.typeCount>2&&proof.r18ManagementModal.queueReadonly&&proof.r18ManagementModal.help,'B4_003_R18_MANAGEMENT_TYPE_QUEUE_FAILED:'+JSON.stringify(proof.r18ManagementModal));
+ proof.assertions.managementTypeDrivesQueue=true;
+ await page.evaluate(()=>document.getElementById('ciclo-modal')?.remove());
+
+ await page.evaluate(()=>{Orbit.pais='TODOS';location.hash='#/renovaciones';});
  await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='renovaciones',null,{timeout:10000});
  await page.waitForSelector('[data-renewability-review-workflow="1"]',{timeout:10000});
+ await page.waitForSelector('[data-renewal-date45-reconciled]',{timeout:10000});
+ proof.r18RenewalDisposition=await page.evaluate(()=>{
+   const el=document.querySelector('[data-renewal-date45-reconciled]');
+   const n=k=>Number(el?.getAttribute(k)||0);
+   return{reconciled:el?.getAttribute('data-renewal-date45-reconciled')==='true',total:n('data-renewal-date45-total'),actionable:n('data-renewal-date45-actionable'),pending:n('data-renewal-date45-pending'),terminal:n('data-renewal-date45-terminal'),nonrenewable:n('data-renewal-date45-nonrenewable'),conflict:n('data-renewal-date45-conflict'),text:String(el?.innerText||'').replace(/\s+/g,' ').trim()};
+ });
+ need(proof.r18RenewalDisposition.reconciled===true&&proof.r18RenewalDisposition.total===proof.r18RenewalDisposition.actionable+proof.r18RenewalDisposition.pending+proof.r18RenewalDisposition.terminal+proof.r18RenewalDisposition.nonrenewable+proof.r18RenewalDisposition.conflict&&proof.r18RenewalDisposition.total>=11,'B4_003_R18_RENEWAL_DATE45_NOT_RECONCILED:'+JSON.stringify(proof.r18RenewalDisposition));
+ proof.assertions.renewalDate45UniverseReconciled=true;
  proof.r1604RenewabilityWorkflow=await page.evaluate(ids=>{const note=document.querySelector('[data-renewability-review-workflow="1"]'),button=document.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');return{instruction:/directamente Renovabilidad/.test(note?.innerText||'')&&/Pendiente de validar/.test(note?.innerText||''),buttonLabel:String(button?.innerText||''),buttonPresent:!!button};},ids);
  need(proof.r1604RenewabilityWorkflow.instruction&&proof.r1604RenewabilityWorkflow.buttonPresent&&/Revisar y clasificar/.test(proof.r1604RenewabilityWorkflow.buttonLabel),'B4_003_R17_RENEWABILITY_WORKFLOW_NOT_ACTIONABLE:'+JSON.stringify(proof.r1604RenewabilityWorkflow));
  await page.evaluate(id=>document.querySelector('[data-renewability-review="'+id+'"]')?.click(),ids.unknownRenewPolicy);
@@ -688,6 +756,34 @@ try{
  proof.assertions.policyRouteUnder2500ms=true;
  proof.assertions.policySearchUnder2500ms=true;
  proof.assertions.policyDetailUnder2500ms=true;
+
+ proof.r18PolicyEditionValidation=await page.evaluate(()=>{
+   const key=v=>String(v||'').toUpperCase().replace(/[^A-Z0-9]+/g,''),rows=(Orbit.store.all('polizas')||[]).filter(p=>key(p.numero)==='1003687').sort((a,b)=>String(a.vigenciaInicio||'').localeCompare(String(b.vigenciaInicio||'')));
+   const current=rows.find(p=>String(p.estado||'')==='Vigente')||rows[rows.length-1]||null;
+   if(!current)return{rows:[],errors:['target_missing'],warnings:[]};
+   const result=Orbit.policyReceipts.validatePolicy({...current,renovable:true},current.id);
+   return{rows:rows.map(p=>({id:p.id,inicio:p.vigenciaInicio||'',fin:p.vigenciaFin||'',estado:p.estado||''})),currentId:current.id,errors:result.errors||[],warnings:result.warnings||[]};
+ });
+ need(proof.r18PolicyEditionValidation.rows.length===3&&!proof.r18PolicyEditionValidation.errors.some(x=>String(x).startsWith('poliza_duplicada:'))&&!proof.r18PolicyEditionValidation.errors.some(x=>String(x).startsWith('poliza_version_duplicada:')),'B4_003_R18_LEGITIMATE_POLICY_EDITION_BLOCKED:'+JSON.stringify(proof.r18PolicyEditionValidation));
+ proof.assertions.policyEditionAwareValidation=true;
+
+ await page.setViewportSize({width:390,height:844});
+ await page.evaluate(()=>{location.hash='#/polizas';});
+ await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='polizas',null,{timeout:10000});
+ await page.waitForSelector('#f-q',{timeout:10000});
+ proof.r18MobilePolicySearch=await page.evaluate(()=>{const q=document.getElementById('f-q'),p=q?.closest('.tb-search');const qs=q?getComputedStyle(q):null,ps=p?getComputedStyle(p):null;return{present:!!q,inputDisplay:qs?.display||'',parentDisplay:ps?.display||'',width:q?.getBoundingClientRect().width||0,viewport:innerWidth};});
+ need(proof.r18MobilePolicySearch.present&&proof.r18MobilePolicySearch.inputDisplay!=='none'&&proof.r18MobilePolicySearch.parentDisplay!=='none'&&proof.r18MobilePolicySearch.width>120,'B4_003_R18_MOBILE_POLICY_SEARCH_HIDDEN:'+JSON.stringify(proof.r18MobilePolicySearch));
+ proof.assertions.policyMobileSearchVisible=true;
+ await page.setViewportSize({width:1280,height:720});
+
+ proof.r18RenewalKpiParity=await page.evaluate(()=>{
+   const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';Orbit.pais='TODOS';
+   Orbit.modules.inicio.render(h);const inicio=Number(h.querySelector('[data-inicio-renew45]')?.getAttribute('data-inicio-renew45')||-1),owner=String(h.querySelector('[data-inicio-renew45]')?.getAttribute('data-renewal-owner')||'');
+   Orbit.modules.polizas.render(h);const polizas=Number(h.querySelector('[data-polizas-renew45]')?.getAttribute('data-polizas-renew45')||-2);
+   Orbit.pais=previous;return{inicio,polizas,owner};
+ });
+ need(proof.r18RenewalKpiParity.inicio>=0&&proof.r18RenewalKpiParity.inicio===proof.r18RenewalKpiParity.polizas&&proof.r18RenewalKpiParity.owner==='polizas.policyMetrics.isRenewalWithin45Days','B4_003_R18_RENEWAL_KPI_PARITY_FAILED:'+JSON.stringify(proof.r18RenewalKpiParity));
+ proof.assertions.inicioPolizasRenewalKpiParity=true;
 
  await page.addInitScript(({policyNumber,clientName})=>{
    window.__R13_POLICY_FLICKER__={states:[],destructive:false};
@@ -1033,5 +1129,5 @@ try{
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
 }
 if(!['PASS','PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER'].includes(proof.status)||proof.syntheticFinalAbsent!==true||proof.assertions.insurerDriveFileCleanup!==true)process.exitCode=1;
-console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,r13PolicyPerformance:proof.r13PolicyPerformance,r13RenewalSourceDryRun:proof.r13RenewalSourceDryRun,r13RenewalDataBlocker:proof.r13RenewalDataBlocker,r13InsurerDrive:proof.r13InsurerDrive,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors,httpErrors:proof.httpErrors,expectedIsolationDenials:proof.expectedIsolationDenials,unexpectedHttpErrors:proof.unexpectedHttpErrors,unexpectedConsoleErrors:proof.unexpectedConsoleErrors},null,2));
+console.log(JSON.stringify({status:proof.status,assertions:proof.assertions,visualScope:proof.visualScope,r13PolicyPerformance:proof.r13PolicyPerformance,r13RenewalSourceDryRun:proof.r13RenewalSourceDryRun,r13RenewalDataBlocker:proof.r13RenewalDataBlocker,r13InsurerDrive:proof.r13InsurerDrive,renewalRenderStability:proof.renewalRenderStability,qaResidue:proof.qaResidue,runtimeCancellationEvidence:proof.runtimeCancellationEvidence,r18CommercialCreate:proof.r18CommercialCreate,r18ManagementModal:proof.r18ManagementModal,r18RenewalDisposition:proof.r18RenewalDisposition,r18PolicyEditionValidation:proof.r18PolicyEditionValidation,r18MobilePolicySearch:proof.r18MobilePolicySearch,r18RenewalKpiParity:proof.r18RenewalKpiParity,r18InsurerActivity:proof.r18InsurerActivity,syntheticWrites:proof.syntheticWrites,cleanupWrites:proof.cleanupWrites,syntheticFinalAbsent:proof.syntheticFinalAbsent,pageErrors:proof.pageErrors,consoleErrors:proof.consoleErrors,httpErrors:proof.httpErrors,expectedIsolationDenials:proof.expectedIsolationDenials,unexpectedHttpErrors:proof.unexpectedHttpErrors,unexpectedConsoleErrors:proof.unexpectedConsoleErrors},null,2));
 // R12 remaining B4-003 blocker proof: 2026-10-03
