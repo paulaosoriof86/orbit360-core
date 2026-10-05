@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
-  "recordedAt": "2026-10-03",
-  "status": "B4_003_R13_CAUSAL_DIAGNOSTIC_EXPANDED_NARROW_SOURCE_FIX_AUTHORIZED",
+  "recordedAt": "2026-10-05T11:24:00-06:00",
+  "status": "B4_003_R18_AUTHENTICATED_READONLY_DIAGNOSTIC",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "R13_CAUSAL_DIAGNOSTIC_EXPANDED_NARROW_SOURCE_FIX_AUTHORIZED",
+    "status": "R18_AUTHENTICATED_READONLY_DIAGNOSTIC",
     "blocking": true,
-    "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
-    "humanVisualStatus": "REJECTED_R13",
+    "nextAction": "R18_AUTHENTICATED_HARNESS_READBACK",
+    "humanVisualStatus": "REJECTED_R17",
     "knowledgePreview": true
   },
   "rules": {
@@ -59,7 +59,7 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "allowedProductFiles": [
       "orbit360-platform/modules/cancelaciones.js",
       "orbit360-platform/modules/polizas.js",
@@ -70,7 +70,7 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": true,
+    "syntheticQaWritesAuthorized": false,
     "syntheticQaScope": "R13-10 only: exact Preview, one disposable B4 synthetic insurer/document test, mandatory Drive/linkage/reload readback and cleanup; no real insurer/client mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
@@ -79,7 +79,9 @@
     "allowedQaFiles": [
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
       "tools/gravicentra-i6-5-b4-003-contract.mjs",
-      ".github/workflows/gravicentra-b4-003-executor.yml"
+      ".github/workflows/gravicentra-b4-003-executor.yml",
+      "tools/gravicentra-i6-5-b4-003-r18-readonly-forensic.mjs",
+      ".github/workflows/gravicentra-b4-003-readonly-diagnostic.yml"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": false,
@@ -88,7 +90,7 @@
     "drivePreviewFunctionDeploymentAuthorized": true,
     "drivePreviewProductionFunctionsAuthorized": false
   },
-  "nextAction": "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
+  "nextAction": "R18_AUTHENTICATED_HARNESS_READBACK",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "fd09f8ec9ac14ac51cc6f89f3707a2e49af0032e"
@@ -110,23 +112,19 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
-    "B4_003_R13_NARROW_SOURCE_FIX_DEMONSTRATED_OWNERS",
-    "B4_003_R13_RENEWAL_REAL_DISTRIBUTION_PROOF",
-    "B4_003_R13_POLICY_VISUAL_LINEAGE_PROOF",
-    "B4_003_R13_INSURER_DRIVE_CONTROLLED_E2E",
-    "B4_003_TARGETED_PAULA_VISUAL_PASS"
+    "R18_READONLY_RENEWAL_45_DISPOSITION",
+    "R18_POLICY_1003687_COLLISION_READBACK",
+    "R18_CAUSAL_FIX_AUTHORIZATION"
   ],
   "candidate": {
-    "sourceSha": "e7071dcd492d2a55d7feb5b5c1938861bc00114b",
-    "buildId": "gi-i65-b4-e7071dcd492d-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37153635447-6wnebg4z.web.app",
-    "runId": 37153635447,
-    "artifactId": 11284254512,
-    "artifactDigest": "40cbdb9343f5b1633a89b5a78a003db72104ca765139549d2c9a73cdf7303fb3",
-    "hostedPayloadDigest": "7a76d4d8972eea1f14f97993ccbc093c7f3dbd06c6b4a3d397c2b1cd6323d4ac",
-    "backendSourceDigest": "d1c2d3dc19a9120dd12c21346f99379c17ed016a417ad397aadad6e865db255d",
-    "bundleDigest": "fca2537159bd2e2841c4c7cd65f3b390ce1c71629198cc456ba68141b190b546",
-    "exactReadback": true
+    "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
+    "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37248154086-11dxqgq2.web.app",
+    "runId": 37248154086,
+    "artifactId": 11319524354,
+    "artifactDigest": "21607653bcabbf8c6994c28d46569055cf0b0a4f4972f0eb5774b228d958915b",
+    "exactReadback": true,
+    "status": "R17_REJECTED_HUMAN_RETAINED_FOR_READONLY_FORENSIC"
   },
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED",
@@ -537,5 +535,14 @@
     "allowedProductFiles": [
       "orbit360-platform/core/importa.js"
     ]
+  },
+  "r18ReadOnlyForensic": {
+    "status": "AUTHORIZED",
+    "toolPath": "tools/gravicentra-i6-5-b4-003-r18-readonly-forensic.mjs",
+    "workflowPath": ".github/workflows/gravicentra-b4-003-readonly-diagnostic.yml",
+    "businessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
