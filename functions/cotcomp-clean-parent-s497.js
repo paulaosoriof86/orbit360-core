@@ -254,7 +254,7 @@ function html(){
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const countryName=()=>state.country==='co'?'Colombia':'Guatemala';
   const key=()=>state.country+':'+state.product;
-  const current=()=>DOMAIN[key()]||DOMAIN[state.country+':duda];
+  const current=()=>DOMAIN[key()]||DOMAIN[state.country+':duda'];
 
   function stageMeta(n){
     return {
