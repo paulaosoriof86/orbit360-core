@@ -81,3 +81,17 @@ test('Source-only visual comparison fixture carries no invented monetary values'
   }
 });
 
+test('identity-sensitive defaults remain explicit rather than fabricated',()=>{
+  const auto=D.schema('gt','auto');
+  const autoFields=auto.groups.flatMap(g=>g.fields);
+  assert.equal(autoFields.find(x=>x.id==='anioModelo').default,'');
+  assert.equal(autoFields.find(x=>x.id==='marca').default,'');
+  assert.equal(autoFields.find(x=>x.id==='lineaModelo').default,'');
+  const health=D.schema('gt','salud',{hijos:2});
+  const healthFields=health.groups.flatMap(g=>g.fields);
+  assert.equal(healthFields.find(x=>x.id==='conyuge').default,'No');
+  assert.equal(healthFields.find(x=>x.id==='spouseDob').default,'');
+  assert.equal(healthFields.find(x=>x.id==='dependentDob1').default,'');
+  assert.equal(healthFields.find(x=>x.id==='dependentDob2').default,'');
+});
+
