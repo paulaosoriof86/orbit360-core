@@ -10,8 +10,8 @@ function good(){
     schemaVersion:'ays-cotcomp-s497-visual-evidence-v1.0',
     anchorSha256:'a7f1be79cdb6d8144f608dc559d69ebc38bb6347a03ad2733eac2bb914a4673d',
     providerDeploymentAuthorized:false,cotcompRealTransportAuthorized:false,production:false,
-    vehicleCombobox:{mockContract:'S479_READ_ONLY_SHAPE_UI_PROOF_ONLY',realTransport:false,brandSearchWorks:true,dependentModelEnabled:true,modelSearchWorks:true,selectedBrand:true,selectedModel:true,keyboardSelectionWorks:true,assistedFallback:true,noForcedSelection:true,screenshotSha256:H},
-    domainJourneys:{realTransport:false,coCountryVisible:true,coTransportSpecializedFields:true,gtHealthDependentDobDynamic:true,otherDeepContractRoute:true,backPreservesCompatibleValue:true,stepperMatchesStage2:true,coTransportScreenshotSha256:H,gtHealthScreenshotSha256:H,otherContractScreenshotSha256:H},
+    vehicleCombobox:{mockContract:'S479_READ_ONLY_SHAPE_UI_PROOF_ONLY',realTransport:false,brandSearchWorks:true,dependentModelEnabled:true,modelSearchWorks:true,selectedBrand:true,selectedModel:true,keyboardSelectionWorks:true,yearStartsUnselected:true,assistedFallback:true,noForcedSelection:true,screenshotSha256:H},
+    domainJourneys:{realTransport:false,coCountryVisible:true,coTransportSpecializedFields:true,gtHealthSpouseDobHiddenByDefault:true,gtHealthSpouseDobAppearsAfterExplicitYes:true,gtHealthDependentDobDynamic:true,gtHealthDependentDobStartsBlank:true,otherDeepContractRoute:true,backPreservesCompatibleValue:true,stepperMatchesStage2:true,coTransportScreenshotSha256:H,gtHealthScreenshotSha256:H,otherContractScreenshotSha256:H},
     viewports:G.REQUIRED_VIEWPORTS.map(v=>({
       id:v.id,width:v.width,screenshotSha256:H,h1FontFamily:'Archivo',h1FontWeight:900,heroHeight:Math.round((v.heroMin+v.heroMax)/2),
       heroImageObjectFit:'cover',heroImageDistorted:false,heroHeightCoupledToWorkspace:false,
