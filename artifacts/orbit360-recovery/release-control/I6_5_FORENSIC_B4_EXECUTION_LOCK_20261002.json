@@ -574,5 +574,13 @@
     "ledgerBlobSha": "4b062a1234326d123386035c1fd1416f6950c5f2",
     "carryBlobSha": "12d6e394c10bc40d0b219eed7bab2a9266853797",
     "productSourceChanged": false
+  },
+  "r18QualityProvenanceQaSelectorRootFix": {
+    "status": "QA_FIXED_PENDING_EXACT_RETRY",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_QUALITY_PROVENANCE_QA_SELECTOR_ROOTFIX_20261005.json",
+    "receiptBlobSha": "5b577da70cde56ad757af9ff294aabbccf926e4d",
+    "failedRunId": 37355564631,
+    "previewProofBlobSha": "b60ff527a2723002923cbbd7499d222a3da1c470",
+    "productSourceChanged": false
   }
 }
