@@ -4,12 +4,12 @@
   "status": "REPO_GOVERNANCE_SYNCHRONIZED_PROJECT_SOURCE_UI_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "headAtReceipt": "7ff5434f733bcf73fc1a9a23c3696ee2a7d86f64",
-  "controlPlaneBlobSha": "cc2460890c8e86ae91daf945cafed77881592bf9",
+  "headAtReceipt": "ca8510bd51e0f56f67865eeca684099ab23c7415",
+  "controlPlaneBlobSha": "17d2f3aef6d2b52aef9b98905744e80bc41e7011",
   "v7AddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v7/11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md",
   "v7AddendumBlobSha": "b51eb0f37f48a4fcab0336b8b300c559b0f76714",
   "v7ManifestPath": "artifacts/orbit360-recovery/project-sources-v2/v7/12_MANIFIESTO_FUENTES_EVERGREEN_V7.json",
-  "v7ManifestBlobSha": "6c20649fa2fdff12324d334d3a049fd2c05923d8",
+  "v7ManifestBlobSha": "b598fdd65a88a6fc20d0b9ea34caccfdf21dc9f5",
   "boundaries": {
     "productSourceChanged": false,
     "dataMutation": false,
@@ -28,5 +28,9 @@
     ],
     "removeOnlyAfterExactDuplicateVerification": true,
     "flagRemainsTrueUntilProjectReadback": true
+  },
+  "governanceGuardAlignment": {
+    "status": "CENTRAL_GUARD_UPDATED_FOR_V7_PENDING_TERMINAL_PASS",
+    "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs"
   }
 }
