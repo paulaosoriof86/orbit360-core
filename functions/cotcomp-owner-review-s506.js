@@ -186,6 +186,20 @@ function registrationCard(id){
   </div>`;
 }
 
+function s506ModalHtml(){
+  return '<div id="s506Contact" class="s506-contact-backdrop" role="dialog" aria-modal="true" aria-labelledby="s506ContactTitle" aria-hidden="true">'
+    +'<div class="s506-contact">'
+    +'<div class="s506-contact__mark" aria-hidden="true">🤝</div>'
+    +'<div class="cc-section-kicker" style="margin-top:12px">CONTINUAR CON A&S</div>'
+    +'<h3 id="s506ContactTitle">Hablar con A&S sin empezar de cero</h3>'
+    +'<p>Confirma el registro interno de prueba o continúa por un canal directo.</p>'
+    +'<div class="s506-context"><div><small>País</small><strong id="s506Country">—</strong></div><div><small>Necesidad</small><strong id="s506Need">—</strong></div><div><small>Modalidad</small><strong id="s506Mode">—</strong></div></div>'
+    +registrationCard('advisor')
+    +'<div class="s506-channel-grid"><button id="s506WhatsApp" class="s506-channel s506-channel--primary" type="button">💬 Continuar por WhatsApp<small id="s506WaLabel">Canal A&S</small></button><button id="s506Email" class="s506-channel" type="button">✉️ Continuar por correo<small>info@aysseguros.com</small></button></div>'
+    +'<div class="s506-contact__footer"><button id="s506Close" class="cc-btn" type="button">Seguir revisando</button></div>'
+    +'</div></div>';
+}
+
 const SCRIPT=`
 <script>
 (()=>{
