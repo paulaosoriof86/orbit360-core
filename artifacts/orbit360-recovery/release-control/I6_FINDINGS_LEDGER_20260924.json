@@ -2959,7 +2959,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "PAULA_VISUAL_REJECTED_R20_REMEDIATION_REQUIRED",
+      "status": "R20_CAUSES_DEMONSTRATED_SOURCE_FIX_AND_RENEWABILITY_DRY_RUN",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2997,7 +2997,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX",
+      "nextAction": "B4_003_R20_RENEWABILITY_DRY_RUN_AND_SOURCE_FIX",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3224,7 +3224,9 @@
         "B4-003-R20-B12",
         "B4-003-R20-B13",
         "B4-003-R20-B14"
-      ]
+      ],
+      "r20DiagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "r20DiagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-004",
@@ -9389,11 +9391,11 @@
       "id": "B4-003-R20-B01",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX",
       "blocking": true,
       "surface": "Renovaciones/Kanban",
       "finding": "Eliminar la tabla paralela como solución principal. Mantener columnas aprobadas Vencidas, Esta quincena 0-15, Próximas 16-45, Horizonte 46-90; vencida sin sucesora/terminal permanece Vencidas sin límite; renovabilidad pendiente no desaparece; renovada sale solo con cierre causal.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "renewalActionable exige renewabilityState===YES y buckets() usa solo renewalActionable. Las UNKNOWN salen del Kanban y se renderizan en un flujo separado de disposición/revisión.",
       "owner": [
         "orbit360-platform/modules/renovaciones.js",
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
@@ -9406,17 +9408,23 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "diagnosedOwners": [
+        "renewalsUi"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B02",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_FULL_UNIVERSE_DRY_RUN",
       "blocking": true,
       "surface": "Renovabilidad",
       "finding": "Regla autorizada: todo RENOVABLE salvo Transporte actualmente cargado y AP corto plazo de Valdemar Barrios. Dry-run exact IDs/diff antes de write; apply con before/after,audit,readback,reload,rollback; conflictos fuera de regla fail-closed.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "Executor R13 está hardcodeado a 4 IDs y valida explícitamente distribución final YES=4/NO=0/UNKNOWN=1415. No implementa la regla R20.",
       "owner": [
         "orbit360-platform/core/policy-receipts-engine.js",
         "orbit360-platform/data/store-firestore-product-operational-p0.js",
@@ -9429,17 +9437,24 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_FULL_UNIVERSE_RENEWABILITY_DRY_RUN",
+      "causeStatus": "CAUSE_DEMONSTRATED_NEW_BUSINESS_AUTHORITY_REQUIRES_NEW_DRY_RUN",
+      "diagnosedOwners": [
+        "previousRenewabilityExecutor",
+        "productOperationalBackend"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B03",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX",
       "blocking": true,
       "surface": "Aseguradoras/Requisitos",
       "finding": "País, ramo, producto/plan, tipo, descripción, adjunto opcional, estado, provenance, fecha; filtros ramo/producto; requisito sin archivo permitido.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "reqRow solo captura producto+items; snapshot persiste solo {producto,items}; addReq crea solo esos campos.",
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
         "insurer knowledge/document registry owner"
@@ -9451,17 +9466,23 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "diagnosedOwners": [
+        "insurerUi"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B04",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX",
       "blocking": true,
       "surface": "Aseguradoras/Fuentes",
       "finding": "Adjuntar/subir fuente a entidad existente, asociar país/ramo/producto/moneda, dedupe, mostrar vínculo y abrir/descargar vía Drive; no crear segundo documento al adjuntar evidencia.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "Modelo DIMENSION_KEYS incluye producto/plan pero docRow no los captura; openInsurerSource pasa scope sin producto/plan; Registry ofrece inspección/abrir URL pero no acción explícita de asociación/enriquecimiento de fuente existente.",
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
         "Drive/documentRef backend owner"
@@ -9473,17 +9494,23 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "diagnosedOwners": [
+        "insurerUi"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B05",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX",
       "blocking": true,
       "surface": "Aseguradoras/Registry UI",
       "finding": "Registry técnico secundario/colapsable pero premium: iconos,badges,color,tarjetas,contraste,estados distinguibles.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "La estructura colapsable ya existe, pero composición depende de filas genéricas + inline styles y badges limitados; la aceptación humana R20 rechaza la jerarquía visual.",
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
         "orbit360-platform/styles/infra.css"
@@ -9495,17 +9522,24 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "HUMAN_VISUAL_REJECTION_OWNER_DEMONSTRATED",
+      "diagnosedOwners": [
+        "insurerUi",
+        "infraCss"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B06",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX",
       "blocking": true,
       "surface": "Aseguradoras/Tarifas-conocimiento",
       "finding": "Cards premium, jerarquía, catálogos administrables, filtros ramo/producto, provenance secundaria; no inputs libres si existe catálogo.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "Plan/segmento de ramo son inputs libres; documento fuente de tarifas es input libre; knowledge groups no exponen filtro combinado ramo/producto.",
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
         "Config/Catalog owners"
@@ -9517,17 +9551,23 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "diagnosedOwners": [
+        "insurerUi"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B07",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "PARTIAL_CAUSE_DEMONSTRATED_TIMESTAMP_CONTRACT_FIX_REQUIRED",
       "blocking": true,
       "surface": "Aseguradoras/Actividad",
       "finding": "Más reciente arriba; timestamps canónicos; tipo/color/icono; no inventar fechas desde commits.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "tabActividad ordena correctamente y consume timestamps canónicos cuando existen; la prueba R19 demostró seis fuentes antiguas sin timestamp canónico. Falta garantizar timestamps en eventos nuevos, no inventar históricos.",
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
         "insurer audit/activity persistence owner"
@@ -9539,17 +9579,23 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "PARTIAL_CAUSE_DEMONSTRATED_NO_DATE_FABRICATION",
+      "diagnosedOwners": [
+        "insurerUi"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B08",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_UAT_FIXTURE_COVERAGE",
       "blocking": true,
       "surface": "Aseguradoras/UAT writes",
       "finding": "Probar logo, producto, plan, requisito y documento con UAT Preview sintético, real server write, readback, reload y cleanup; LIVE intacto.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "Preview isolation protege correctamente registros reales, pero R19 UAT cubrió principalmente Drive/documento y no el conjunto completo de escrituras de ficha requerido por R20.",
       "owner": [
         "orbit360-platform/modules/aseguradoras.js",
         "functions/product-operational-domain.js",
@@ -9562,17 +9608,25 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "CAUSE_DEMONSTRATED_UAT_COVERAGE_GAP",
+      "diagnosedOwners": [
+        "insurerUi",
+        "previewStore",
+        "productOperationalBackend"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B09",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX",
       "blocking": true,
       "surface": "Ops/Leads handoff",
       "finding": "Loading inmediato/disabled/Registrando; commit-readback-confirmación; estado exterior de tarjeta; campana+badge+deep-link+acción rápida; adjuntos Drive/documentRef.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "UI deshabilita el botón pero no cambia a Registrando; comentarios se renderizan en orden de array; tarjeta no proyecta estado de colaboración. Backend genera target advisor/operations, pero processor solo materializa clientTargets; advisor/role targets no producen proyección visible de topbar. Preview suprime outbox y R19 prueba inbox reconstruido, no la señal visible equivalente a LIVE.",
       "owner": [
         "orbit360-platform/core/ciclo.js",
         "functions/product-ops-leads-domain.js",
@@ -9585,17 +9639,26 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "diagnosedOwners": [
+        "cycleUi",
+        "opsLeadsBackend",
+        "advisorInbox",
+        "notificationProcessor"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B10",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX",
       "blocking": true,
       "surface": "Ops/Leads scopes",
       "finding": "Asesor solo sus casos y sin editar base; Leads propios por identidad incluso con rol activo Operativo; Operativo no obtiene leads ajenos.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "Frontend rolFiltro aplica own-only solo si esAsesor() según rol activo. Backend combina dataScopes.workflow/leads/gestiones/default y ADMIN_ROLES incluye Operativo; inbox también comparte scope Ops/workflow. Se confunden dos dominios de scope.",
       "owner": [
         "orbit360-platform/core/ciclo.js",
         "functions/product-ops-leads-domain.js",
@@ -9608,17 +9671,25 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "diagnosedOwners": [
+        "cycleUi",
+        "opsLeadsBackend",
+        "advisorInbox"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B11",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_EXECUTION_OWNER_ABSENT_PENDING_SOURCE_FIX",
       "blocking": true,
       "surface": "Ops/Leads cadencias",
       "finding": "Auditar trigger→scheduler owner→fecha próxima→acción→persistencia→notificación con timestamp real.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "UI y backend persisten cadenciaActiva/configuración, pero no se encontró owner de ejecución/scheduler en el dominio actual; prueba R19 de Inicio incluso reporta 'sin cadencia automática · gestiona por WhatsApp'. B4 lock exige automation post-commit.",
       "owner": [
         "Ops/Leads cadence scheduler owner",
         "functions/product-ops-leads-domain.js"
@@ -9630,17 +9701,24 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "CAUSE_DEMONSTRATED_EXECUTION_OWNER_ABSENT",
+      "diagnosedOwners": [
+        "cycleUi",
+        "opsLeadsBackend"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B12",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "PARTIAL_CAUSE_DEMONSTRATED_LOGOUT_FIX_PLUS_RUNTIME_DISCRIMINATION",
       "blocking": true,
       "surface": "Sesión/router/startup",
       "finding": "Logout lento, refresh puede expulsar, back no restaura ruta, Preview puede tardar minutos, Leads/comentarios ~5s; diagnosticar transversalmente y cerrar si impide UAT.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "Logout hace signOut y location.reload(), forzando bootstrap completo: causa demostrada. Auth restoring oculta login+shell hasta initialUser/activate: puede prolongar percepción si activación falla/lenta. Router usa hashchange nativo y Firebase local persistence existe; refresh/back no deben modificarse sin prueba runtime que discrimine auth loss vs activation/render.",
       "owner": [
         "orbit360-platform/core/auth-product-runtime-p0.js",
         "orbit360-platform/core/product-app-p0.js",
@@ -9653,17 +9731,26 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "PARTIAL_CAUSE_DEMONSTRATED_RUNTIME_DISCRIMINATION_REQUIRED",
+      "diagnosedOwners": [
+        "authRuntime",
+        "router",
+        "hydration",
+        "infraCss"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B13",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_SELECT_OWNER_AUDIT_AND_TOUCHED_FIX",
       "blocking": true,
       "surface": "Catálogos/selects Fase A",
       "finding": "Auditar todos los selects incluyendo Ops/Leads: campo→módulo→owner→fuente→administrable S/N→dependencias→persistencia/readback→rol; no hardcodear personas/estados/tipos configurables.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "Aseguradoras contiene inputs libres para plan/segmento/documento fuente y Ciclo define listas colaborativas/estados en source. Falta inventario transversal owner→fuente→administrabilidad.",
       "owner": [
         "Config/Catalog owners",
         "orbit360-platform/core/ciclo.js",
@@ -9676,17 +9763,25 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "CAUSE_DEMONSTRATED_MIXED_CONFIG_OWNERS_AUDIT_REQUIRED",
+      "diagnosedOwners": [
+        "insurerUi",
+        "cycleUi",
+        "catalog owner"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     },
     {
       "id": "B4-003-R20-B14",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "status": "CAUSE_DEMONSTRATED_PENDING_UAT_FIXTURE_COVERAGE",
       "blocking": true,
       "surface": "Preview write contract",
       "finding": "Paula necesita E2E writes sin tocar registros reales: fixtures UAT aislados/deshechables equivalentes, misma UI que LIVE, commit/readback/reload/cleanup.",
-      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "rootCause": "El 403 a registros reales es el control correcto. La brecha es que el harness/UAT no provee fixture equivalente para cada flujo humano que Paula debe probar.",
       "owner": [
         "orbit360-platform/data/store-firestore-product-operational-p0.js",
         "functions/product-operational-domain.js",
@@ -9699,7 +9794,15 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
+      "causeStatus": "CAUSE_DEMONSTRATED_UAT_FIXTURE_GAP_NOT_ISOLATION_DEFECT",
+      "diagnosedOwners": [
+        "previewStore",
+        "productOperationalBackend",
+        "B4 harness"
+      ],
+      "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
     }
   ],
   "phaseBBacklog": [
@@ -10076,8 +10179,8 @@
     }
   },
   "currentB4": {
-    "status": "B4_003_PAULA_VISUAL_REJECTED_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
-    "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX",
+    "status": "B4_003_R20_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "nextAction": "B4_003_R20_RENEWABILITY_DRY_RUN_AND_SOURCE_FIX",
     "humanVisualStatus": "REJECTED_R20_BLOCKERS_REMAIN"
   },
   "b4003QaResidueCarry": {
@@ -10115,7 +10218,7 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
   },
-  "lastUpdatedAt": "2026-10-06T13:44:00-06:00",
+  "lastUpdatedAt": "2026-10-06T14:12:00-06:00",
   "lastR16SourceFix": {
     "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
@@ -10211,5 +10314,72 @@
     "status": "FROZEN",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
     "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+  },
+  "r20Diagnostic": {
+    "status": "FROZEN",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+    "blobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0",
+    "diagnosticHead": "28d6994de8f350296dab446b30cf7091927ead6a",
+    "findings": [
+      {
+        "id": "B4-003-R20-B01",
+        "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX"
+      },
+      {
+        "id": "B4-003-R20-B02",
+        "status": "CAUSE_DEMONSTRATED_PENDING_FULL_UNIVERSE_DRY_RUN"
+      },
+      {
+        "id": "B4-003-R20-B03",
+        "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX"
+      },
+      {
+        "id": "B4-003-R20-B04",
+        "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX"
+      },
+      {
+        "id": "B4-003-R20-B05",
+        "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX"
+      },
+      {
+        "id": "B4-003-R20-B06",
+        "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX"
+      },
+      {
+        "id": "B4-003-R20-B07",
+        "status": "PARTIAL_CAUSE_DEMONSTRATED_TIMESTAMP_CONTRACT_FIX_REQUIRED"
+      },
+      {
+        "id": "B4-003-R20-B08",
+        "status": "CAUSE_DEMONSTRATED_PENDING_UAT_FIXTURE_COVERAGE"
+      },
+      {
+        "id": "B4-003-R20-B09",
+        "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX"
+      },
+      {
+        "id": "B4-003-R20-B10",
+        "status": "CAUSE_DEMONSTRATED_PENDING_SOURCE_FIX"
+      },
+      {
+        "id": "B4-003-R20-B11",
+        "status": "CAUSE_DEMONSTRATED_EXECUTION_OWNER_ABSENT_PENDING_SOURCE_FIX"
+      },
+      {
+        "id": "B4-003-R20-B12",
+        "status": "PARTIAL_CAUSE_DEMONSTRATED_LOGOUT_FIX_PLUS_RUNTIME_DISCRIMINATION"
+      },
+      {
+        "id": "B4-003-R20-B13",
+        "status": "CAUSE_DEMONSTRATED_PENDING_SELECT_OWNER_AUDIT_AND_TOUCHED_FIX"
+      },
+      {
+        "id": "B4-003-R20-B14",
+        "status": "CAUSE_DEMONSTRATED_PENDING_UAT_FIXTURE_COVERAGE"
+      }
+    ],
+    "dataMutationAuthorized": false,
+    "noLive": true,
+    "noReimport": true
   }
 }

@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "R20_PAULA_VISUAL_REJECTED_CAUSAL_DIAGNOSTIC_REQUIRED",
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX",
-    "why": "R19 machine proof succeeded, but Paula R20 human review rejected remaining blocking business/UX/runtime findings while explicitly authorizing Quality as non-blocking carry-forward.",
+    "status": "R20_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED_DATA_READONLY",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWABILITY_DRY_RUN_AND_SOURCE_FIX",
+    "why": "R20 causal owner matrix frozen; only diagnosed source owners may mutate; renewability data remains read-only pending full-universe deterministic dry-run.",
     "currentCandidateReview": "R20_REJECTED_BLOCKERS_PLUS_AUTHORIZED_QUALITY_CARRY",
     "sourceSha": "41c38ff22f026f2a503d1814817e4a5d671904a4",
     "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
@@ -6435,5 +6435,17 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "r20Diagnostic": {
+    "status": "FROZEN",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+    "blobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0",
+    "findingLedgerBlobSha": "38aa90722663e95658575ea32a3b260f7e91be53",
+    "carryRegisterBlobSha": "e81389d3ae009e98afe4725b0c2572998bb895f3",
+    "productMutationAuthorizedForDiagnosedOwners": true,
+    "dataMutationAuthorized": false,
+    "noBuildUntilCumulativeSuccessor": true,
+    "noLive": true,
+    "noReimport": true
   }
 }
