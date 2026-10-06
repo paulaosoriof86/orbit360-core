@@ -1,0 +1,176 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_V1",
+  "recordedAt": "2026-10-06T13:44:00-06:00",
+  "status": "FROZEN_PAULA_VISUAL_REJECTED_BLOCKERS_PLUS_AUTHORIZED_CARRY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authority": "PAULA_R19_TARGETED_VISUAL_REVIEW_20261006",
+  "reviewedCandidate": {
+    "head": "d0e31018909ece246b12bcbf62e9244b49101726",
+    "sourceSha": "41c38ff22f026f2a503d1814817e4a5d671904a4",
+    "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
+    "runId": 37486500112,
+    "artifactId": 11423532705,
+    "artifactDigest": "8dd67ddb8f8bbce00687fc2ebf8d8ab681a74b3f3668d7ba86fa879abf4b5ffb",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37486500112-bx1qyk0h.web.app",
+    "machine": "SUCCESS",
+    "human": "REJECTED_R20"
+  },
+  "hardBoundaries": [
+    "NO_PRODUCT_MUTATION_BEFORE_FREEZE",
+    "NO_LIVE",
+    "NO_REIMPORT",
+    "PRESERVE_APPROVED_FRONTEND",
+    "NO_BASELINE_OVERLAY",
+    "PREVIEW_WRITES_ONLY_ON_ISOLATED_DISPOSABLE_UAT_FIXTURES"
+  ],
+  "priorPassPreserved": [
+    [
+      "R20-PASS-01",
+      "Inicio",
+      "Carga bien; preservar y no modificar sin regresión causal."
+    ],
+    [
+      "R20-PASS-02",
+      "Ops/Leads base",
+      "Base visual/sincronización mejoró; preservar."
+    ],
+    [
+      "R20-PASS-03",
+      "Cliente360/Póliza",
+      "Datos, prima y recibos con estructura útil; preservar."
+    ],
+    [
+      "R20-PASS-04",
+      "Aseguradoras/Registry",
+      "Estructura mejoró; preservar, aunque el pulido visual sigue pendiente."
+    ]
+  ],
+  "carryForwardNonBlockingByPaula": [
+    [
+      "B4-003-R20-Q01",
+      "Calidad/Póliza vs calendario",
+      "Faltan buscador, filtros, jerarquía premium, estados humanizados, acciones y limpieza de etiquetas técnicas."
+    ],
+    [
+      "B4-003-R20-Q02",
+      "Calidad/Datos personales",
+      "Tabla no ajusta al ancho; acciones se cortan; resolver responsive/scroll alcanzable."
+    ],
+    [
+      "B4-003-R20-Q03",
+      "Calidad/Acciones",
+      "Completar, Agregar/corregir y Documentar origen son ambiguos; separar edición canónica de provenance o consolidar."
+    ],
+    [
+      "B4-003-R20-Q04",
+      "Calidad/País",
+      "Separar valor canónico de evidencia; auto-resolver si póliza+aseguradora canónicas determinan país único; conflicto GT/CO humano."
+    ],
+    [
+      "B4-003-R20-Q05",
+      "Calidad/País persistencia",
+      "Tras guardar país, País por validar no desapareció; probar before→save→commit→readback→reload→motivo desaparece."
+    ],
+    [
+      "B4-003-R20-Q06",
+      "Calidad/WhatsApp",
+      "No se pudo confirmar guardado; probar save→canonical readback→reload→motivo Teléfono/WhatsApp desaparece."
+    ],
+    [
+      "B4-003-R20-Q07",
+      "Calidad/Automatización",
+      "No convertir país/moneda determinísticos en trabajo manual masivo; humano solo para conflicto real."
+    ]
+  ],
+  "blockingCurrentGate": [
+    [
+      "B4-003-R20-B01",
+      "Renovaciones/Kanban",
+      "Eliminar la tabla paralela como solución principal. Mantener columnas aprobadas Vencidas, Esta quincena 0-15, Próximas 16-45, Horizonte 46-90; vencida sin sucesora/terminal permanece Vencidas sin límite; renovabilidad pendiente no desaparece; renovada sale solo con cierre causal."
+    ],
+    [
+      "B4-003-R20-B02",
+      "Renovabilidad",
+      "Regla autorizada: todo RENOVABLE salvo Transporte actualmente cargado y AP corto plazo de Valdemar Barrios. Dry-run exact IDs/diff antes de write; apply con before/after,audit,readback,reload,rollback; conflictos fuera de regla fail-closed."
+    ],
+    [
+      "B4-003-R20-B03",
+      "Aseguradoras/Requisitos",
+      "País, ramo, producto/plan, tipo, descripción, adjunto opcional, estado, provenance, fecha; filtros ramo/producto; requisito sin archivo permitido."
+    ],
+    [
+      "B4-003-R20-B04",
+      "Aseguradoras/Fuentes",
+      "Adjuntar/subir fuente a entidad existente, asociar país/ramo/producto/moneda, dedupe, mostrar vínculo y abrir/descargar vía Drive; no crear segundo documento al adjuntar evidencia."
+    ],
+    [
+      "B4-003-R20-B05",
+      "Aseguradoras/Registry UI",
+      "Registry técnico secundario/colapsable pero premium: iconos,badges,color,tarjetas,contraste,estados distinguibles."
+    ],
+    [
+      "B4-003-R20-B06",
+      "Aseguradoras/Tarifas-conocimiento",
+      "Cards premium, jerarquía, catálogos administrables, filtros ramo/producto, provenance secundaria; no inputs libres si existe catálogo."
+    ],
+    [
+      "B4-003-R20-B07",
+      "Aseguradoras/Actividad",
+      "Más reciente arriba; timestamps canónicos; tipo/color/icono; no inventar fechas desde commits."
+    ],
+    [
+      "B4-003-R20-B08",
+      "Aseguradoras/UAT writes",
+      "Probar logo, producto, plan, requisito y documento con UAT Preview sintético, real server write, readback, reload y cleanup; LIVE intacto."
+    ],
+    [
+      "B4-003-R20-B09",
+      "Ops/Leads handoff",
+      "Loading inmediato/disabled/Registrando; commit-readback-confirmación; estado exterior de tarjeta; campana+badge+deep-link+acción rápida; adjuntos Drive/documentRef."
+    ],
+    [
+      "B4-003-R20-B10",
+      "Ops/Leads scopes",
+      "Asesor solo sus casos y sin editar base; Leads propios por identidad incluso con rol activo Operativo; Operativo no obtiene leads ajenos."
+    ],
+    [
+      "B4-003-R20-B11",
+      "Ops/Leads cadencias",
+      "Auditar trigger→scheduler owner→fecha próxima→acción→persistencia→notificación con timestamp real."
+    ],
+    [
+      "B4-003-R20-B12",
+      "Sesión/router/startup",
+      "Logout lento, refresh puede expulsar, back no restaura ruta, Preview puede tardar minutos, Leads/comentarios ~5s; diagnosticar transversalmente y cerrar si impide UAT."
+    ],
+    [
+      "B4-003-R20-B13",
+      "Catálogos/selects Fase A",
+      "Auditar todos los selects incluyendo Ops/Leads: campo→módulo→owner→fuente→administrable S/N→dependencias→persistencia/readback→rol; no hardcodear personas/estados/tipos configurables."
+    ],
+    [
+      "B4-003-R20-B14",
+      "Preview write contract",
+      "Paula necesita E2E writes sin tocar registros reales: fixtures UAT aislados/deshechables equivalentes, misma UI que LIVE, commit/readback/reload/cleanup."
+    ]
+  ],
+  "conditionalScope": {
+    "opsLeads": "Bloquea si pertenece al contrato B4-003 o es regresión causal del candidato; si es capacidad nueva fuera del bloque PASS, carry-forward sin reabrir.",
+    "session": "Bloquea si impide la validación humana reproducible.",
+    "catalogs": "Corregir dentro de B4-003 solo lo que afecte owners tocados; resto queda deuda explícita sin pérdida."
+  },
+  "frontendAntiRegression": "Identificar owner; preservar composición aprobada; añadir capacidad dentro de ella; BEFORE/AFTER desktop+390px; no perder colores,jerarquía,iconos,acciones,información. Renovaciones se corrige dentro del Kanban aprobado.",
+  "nextExecutionOrder": [
+    "REGISTER_LEDGER_AND_CARRY",
+    "OWNER_CAUSE_MATRIX",
+    "RENEWALS_RENEWABILITY_FIRST",
+    "INSURER_B4_FUNCTIONALITY",
+    "CAUSAL_OPS_LEADS_SESSION",
+    "ONE_CUMULATIVE_SUCCESSOR",
+    "EXACT_PREVIEW_MACHINE_PREUAT_DESKTOP_MOBILE",
+    "SHORT_DIRECTED_PAULA_VISUAL"
+  ],
+  "exitCondition": "Blocking findings PASS on exact artifact; Renewals approved columns; deterministic renewability applied/readback; insurer B4 functional; no open causal regression; exact artifact proof; Paula targeted acceptance. Quality carry may remain open by explicit authorization.",
+  "liveUntouched": true
+}
