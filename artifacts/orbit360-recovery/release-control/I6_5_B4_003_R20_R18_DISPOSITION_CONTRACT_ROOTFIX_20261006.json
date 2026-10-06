@@ -1,0 +1,15 @@
+{
+  "schema":"GRAVICENTRA_I6_5_B4_003_R20_R18_DISPOSITION_CONTRACT_ROOTFIX_V1",
+  "recordedAt":"2026-10-06T15:24:00-06:00",
+  "status":"QA_CONTRACT_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "failedRunId":37533399670,
+  "failedJobId":112508162786,
+  "failureCode":"B4_003_R18_RENEWAL_DISPOSITION_CONTRACT_MISSING",
+  "priorContractBlobSha":"b2b3184788d31a99ce2074255cee7d8d5c532d81",
+  "nextContractBlobSha":"4ada51586550872baf4eb79dc26bc9ce5f791fdc",
+  "productSourceChanged":false,
+  "dataMutation":false,
+  "reimport":false,
+  "livePromotion":false,
+  "nextAction":"RETRY_SAME_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
