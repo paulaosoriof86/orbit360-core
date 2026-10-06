@@ -48,8 +48,8 @@ const renewState=p=>{
  return'UNKNOWN';
 };
 const taxonomyValues=p=>['ramo','producto','subramo','linea','tipoRiesgo','tipoSeguro','familiaProducto'].map(k=>words(p&&p[k])).filter(Boolean);
-const isTransport=p=>taxonomyValues(p).some(v=>v.split(/\s+/).includes('transporte'));
-const isPersonalAccident=p=>taxonomyValues(p).some(v=>v==='ap'||v==='accidentes personales'||v.startsWith('accidentes personales '));
+const isTransport=p=>taxonomyValues(p).some(v=>{const parts=v.split(/\s+/);return parts.includes('transporte')||parts.includes('transportes');});
+const isPersonalAccident=p=>{const numero=clean(p&&p.numero).toUpperCase(),ramo=words(p&&p.ramo),producto=words(p&&(p.producto||p.subramo));return /^1-AP-/.test(numero)&&ramo==='accidentes y enfermedades'&&producto.startsWith('accidentes');};
 const clientName=c=>clean(c&&(c.nombre||c.name||c.displayName||c.razonSocial));
 const isExplicitSynthetic=(id,p)=>KNOWN_NONBUSINESS_HOLDS.has(id)||p?.__syntheticQa===true||p?.previewWrite===true||/^b4003qa[_:-]/i.test(id)||/^b3004qa[_:-]/i.test(id);
 const patchFor=proposed=>({renovable:proposed,renewabilityProvenance:'paula_authorized_business_rule',renewabilityRuleId:RULE_ID,renewabilityRuleVersion:1});
@@ -70,10 +70,10 @@ async function readUniverse(){
 }
 function classify(universe){
  const {policies,clients}=universe;
- const exactValdemar=[...clients].filter(([,c])=>words(clientName(c))==='valdemar barrios').map(([id,c])=>({id,name:clientName(c)}));
+ const exactValdemar=[...clients].filter(([,c])=>words(clientName(c))==='edvin waldemar barrios sales').map(([id,c])=>({id,name:clientName(c)}));
  const discovery=[...clients].filter(([,c])=>{const n=words(clientName(c));return n.includes('valdemar')||n.includes('barrios');}).map(([id,c])=>({id,name:clientName(c)})).slice(0,30);
  const conflicts=[];
- if(exactValdemar.length!==1)conflicts.push({code:'VALDEMAR_CANONICAL_ID_CARDINALITY',count:exactValdemar.length,exactMatches:exactValdemar,discoveryCandidates:discovery});
+ if(exactValdemar.length!==1)conflicts.push({code:'VALDEMAR_CANONICAL_ID_CARDINALITY',expectedCanonicalName:'EDVIN WALDEMAR BARRIOS SALES',count:exactValdemar.length,exactMatches:exactValdemar,discoveryCandidates:discovery});
  const valdemarId=exactValdemar.length===1?exactValdemar[0].id:'';
  const rows=[],targets=[],holds=[],transportIds=[],valdemarApIds=[],valdemarShortApIds=[],valdemarAnnualApIds=[];
  for(const [id,p] of [...policies].sort((a,b)=>a[0].localeCompare(b[0]))){
