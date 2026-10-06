@@ -181,8 +181,8 @@ function registrationCard(id){
       <div><small>Nombre</small><strong>Persona de prueba A&S</strong></div>
       <div><small>Contacto</small><strong>synthetic@example.invalid</strong></div>
     </div>
-    <label class="s506-consent"><input type="checkbox" data-s506-consent="${id}"><span>Autorizo a A&S a gestionar esta solicitud de prueba.</span></label>
-    <div class="s506-register-actions"><button class="cc-btn cc-btn--primary" type="button" data-s506-register="${id}" disabled="disabled" aria-disabled="true">Registrar solicitud de prueba →</button></div>
+    <label class="s506-consent" for="s506Consent-${id}"><input id="s506Consent-${id}" type="checkbox" data-s506-consent="${id}"><span>Autorizo a A&S a gestionar esta solicitud de prueba.</span></label>
+    <div class="s506-register-actions"><button id="s506Register-${id}" class="cc-btn cc-btn--primary" type="button" data-s506-register="${id}" disabled="disabled" aria-disabled="true">Registrar solicitud de prueba →</button></div>
     <div class="s506-register-status" data-s506-status="${id}" role="status" aria-live="polite"></div>
   </div>`;
 }
