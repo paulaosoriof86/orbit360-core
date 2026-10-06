@@ -280,6 +280,7 @@ async function executeCommand(request) {
   if (prepared) entityId = prepared.id;
   entityId = cleanId(entityId, isBusiness ? 'businessId' : 'managementId');
   const requestId = requestIdentity(authz.tenantId, operation, entityId, payload, data.requestId);
+  const requestDigest = digest({ operation, entityType, entityId, payload });
   const entity = domainRef(config, authz.tenantId, entityType, entityId);
   const reqRef = requestRef(authz.tenantId, requestId);
   const eventId = `evt_${sha(`${authz.tenantId}|${requestId}`).slice(0, 28)}`;
@@ -287,7 +288,11 @@ async function executeCommand(request) {
   return db.runTransaction(async tx => {
     const previousRequest = await tx.get(reqRef);
     if (previousRequest.exists && previousRequest.data().status === 'committed') {
-      return Object.assign({ reused: true }, previousRequest.data().result || {});
+      const previous = previousRequest.data();
+      if (previous.requestDigest && previous.requestDigest !== requestDigest) {
+        throw new HttpsError('failed-precondition', 'El requestId ya fue usado con un payload diferente.');
+      }
+      return Object.assign({ reused: true }, previous.result || {});
     }
     const snap = await tx.get(entity);
     const before = snap.exists ? snap.data() : null;
@@ -399,11 +404,11 @@ async function executeCommand(request) {
         advisorVisible: !!after.asesorId
       }
     };
-    tx.set(reqRef, { status: 'committed', operation, entityType, entityId, eventId, result, committedAt: serverNow() }, { merge: true });
+    tx.set(reqRef, { status: 'committed', operation, entityType, entityId, eventId, requestDigest, result, committedAt: serverNow() }, { merge: true });
     return result;
   });
 }
 
 exports.orbit360OpsLeadsCommand = onCall({ region: REGION, cors: true }, executeCommand);
 exports.orbit360OpsLeadsCommandLabV20260804 = onCall({ region: REGION, cors: true }, executeCommand);
-exports.__opsLeadsDomain = Object.freeze({ VERSION, DEFAULT_STAGES, OPERATIONS });
+exports.__opsLeadsDomain = Object.freeze({ VERSION, DEFAULT_STAGES, OPERATIONS, executeCommand, requestIdentity, sanitizeCotcompRef });
