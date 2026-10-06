@@ -238,10 +238,20 @@
   function batchDurable(mutations,options){
     options=options||{};
     if(!Array.isArray(mutations)||!mutations.length||mutations.length>80)return Promise.reject(new Error('PRODUCT_BATCH_INVALID'));
-    var m=member(),seen={},prepared=[],backups=[],serverCommitted=false;
+    var m=member(),seen={},prepared=[],backups=[],serverCommitted=false,previewBatch=isB2PreviewHost();
+    var syntheticId=function(v){return /(?:^|_)(?:b3004qa|b4003qa)_[A-Za-z0-9._:-]+$/i.test(text(v));};
+    var rootSynthetic=previewBatch?mutations.find(function(x){return text(x&&x.collection)==='polizas'&&syntheticId(x&&(x.id||(x.payload&&x.payload.id)))&&x.payload&&x.payload.__syntheticQa===true;}):null;
+    var linkedSynthetic=function(payload){return !!payload&&['id','polizaId','clienteId','reciboId'].some(function(k){return syntheticId(payload[k]);});};
     try{
       mutations.forEach(function(input){
         var action=text(input&&input.action),collection=text(input&&input.collection),id=text(input&&input.id),payload=clone(input&&input.payload)||null;
+        if(rootSynthetic&&action!=='remove'&&payload&&(syntheticId(id)||linkedSynthetic(payload))){
+          payload.__syntheticQa=true;
+          if(action==='insert'&&!syntheticId(id)&&['actividades','vehiculos'].includes(collection)&&linkedSynthetic(payload)){
+            id='b4003qa_'+collection+'_'+text(id).replace(/[^A-Za-z0-9._:-]+/g,'_').slice(-140);
+            payload.id=id;
+          }
+        }
         if(!['insert','update','remove'].includes(action)||!collection||!id)error('PRODUCT_BATCH_MUTATION_INVALID');
         var key=collection+'|'+id;if(seen[key])error('PRODUCT_BATCH_DUPLICATE_TARGET');seen[key]=true;
         var prior=get(collection,id),row=null;

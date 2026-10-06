@@ -198,7 +198,7 @@
     "orbit360-platform/core/tenant-domain-config-client.js": "0ce2acdd0022fae441e39992444c46ab99cc3585",
     "orbit360-platform/core/user-onboarding.js": "bf645951a23491ce53d2034ba4281d965cbb326d",
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
-    "orbit360-platform/data/store-firestore-product-operational-p0.js": "095765ed4e80b2fd0bdf8ad251673f6e941fa5c9",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "112891368bcf4f9c2dc7c94abdb7e7c1bebff32a",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "e4f523d18dec8594a53c15132cd29ce1c26b2d48",
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
@@ -3267,7 +3267,8 @@
       "functions/ops-advisor-inbox.js",
       "orbit360-platform/modules/aseguradoras.js",
       "orbit360-platform/styles/infra.css",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js"
     ],
     "noLive": true,
     "noReimport": true,
@@ -3281,7 +3282,9 @@
     "productSourceChanged": true,
     "policyTaxonomyPreservationRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_POLICY_TAXONOMY_PRESERVATION_ROOTFIX_20261006.json",
     "policyBridgeBlobSha": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
-    "priorFailedRunId": 37409990322,
-    "priorFailedCode": "B4_003_POLICY_EDITOR_PRODUCT_SOURCE_VALUE_REPLACED"
+    "priorFailedRunId": 37410543153,
+    "priorFailedCode": "R19_RENEWABILITY_SYNTHETIC_BATCH_CHILDREN_NOT_PREVIEW_MARKED",
+    "syntheticChildPreviewWriteRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SYNTHETIC_CHILD_PREVIEW_WRITE_ROOTFIX_20261006.json",
+    "storeOperationalBlobSha": "112891368bcf4f9c2dc7c94abdb7e7c1bebff32a"
   }
 }
