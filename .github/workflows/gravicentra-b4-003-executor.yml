@@ -16,6 +16,7 @@ on:
       - '.github/workflows/gravicentra-b4-003-executor.yml'
       - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
       - 'tools/gravicentra-i6-5-b4-003-contract.mjs'
+      - 'tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs'
       - 'tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs'
       - 'tools/gravicentra-i6-5-b4-003-r20-renewability-rule.mjs'
       - 'tools/gravicentra-quote-authority-contract-v1.mjs'
