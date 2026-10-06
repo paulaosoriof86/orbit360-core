@@ -100,7 +100,7 @@
   "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "9416399662b3c66eacf43f078b62804889ed1a88"
+    "blobSha": "2de4d8c58ff5c4bc65bff1e9f8c9819614229582"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -763,7 +763,7 @@
     "selectAuditBlobSha": "ed06932efbb9efe74bd90693952cb94776cab3e1",
     "findingLedgerBlobSha": "08711b0fc4d399dd98c2147c958277d71283080a",
     "continuityRegisterBlobSha": "6f7b0eb5f79744e1e03ccbea552b7d7ec3a795cf",
-    "compositionLockBlobSha": "9416399662b3c66eacf43f078b62804889ed1a88",
+    "compositionLockBlobSha": "2de4d8c58ff5c4bc65bff1e9f8c9819614229582",
     "masterPlanBlobSha": "9ee1c1098b4e619223e49ebdd15db8969febe0df",
     "renewabilityApplyWrites": 1415,
     "additionalOperationalWrites": 0,
@@ -771,5 +771,17 @@
     "dataMutationAuthorized": false,
     "noLive": true,
     "noReimport": true
+  },
+  "r20HandoffScopeRootFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_HANDOFF_SCOPE_ROOTFIX_20261006.json",
+    "receiptBlobSha": "ec59d3f0040c1ff2f60c86be4fa0c34a0152f4ee",
+    "compositionLockBlobSha": "2de4d8c58ff5c4bc65bff1e9f8c9819614229582",
+    "sourceHead": "a79f3e9b4b9b8a8c73ec3afa223fd337c71ad0b2",
+    "productMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
   }
 }

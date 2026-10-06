@@ -154,7 +154,7 @@
     "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "2af16e3a4e2224f5e094a41e2ee04a5a48187f2e",
-    "functions/product-ops-leads-domain.js": "a480769d50675508d323dceef34f2f57799b435a",
+    "functions/product-ops-leads-domain.js": "8abf872b85e2d38cf0821d5699b823da2a3cb1b7",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "b112a4771100007ee3bd949cba632b907287168b",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -3471,5 +3471,22 @@
     "additionalOperationalWrites": 0,
     "noLive": true,
     "noReimport": true
+  },
+  "r20HandoffScopeRootFix": {
+    "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_HANDOFF_SCOPE_ROOTFIX_20261006.json",
+    "receiptBlobSha": "ec59d3f0040c1ff2f60c86be4fa0c34a0152f4ee",
+    "sourcePath": "functions/product-ops-leads-domain.js",
+    "sourceBlobSha": "8abf872b85e2d38cf0821d5699b823da2a3cb1b7",
+    "qaContractPath": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "qaContractBlobSha": "7aa7b8dc194c0e9e62a5d31f6ead9b6fbf03f35f",
+    "sourceHead": "a79f3e9b4b9b8a8c73ec3afa223fd337c71ad0b2",
+    "failedRunId": 37537789024,
+    "failureCode": "B4_003_R19_HANDOFF_DURABLE_BROWSER_COMMIT_NOT_CONFIRMED",
+    "productMutationClosedAfterFix": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
   }
 }
