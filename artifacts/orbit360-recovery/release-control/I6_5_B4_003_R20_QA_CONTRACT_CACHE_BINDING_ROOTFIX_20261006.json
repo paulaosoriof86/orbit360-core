@@ -1,0 +1,21 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_QA_CONTRACT_CACHE_BINDING_ROOTFIX_V1",
+  "recordedAt": "2026-10-06T15:23:00-06:00",
+  "status": "QA_CONTRACT_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "failedRunId": 37533091855,
+  "failedJobId": 112507121335,
+  "failureCode": "B4_003_BASE_CACHE_BINDING_MISSING",
+  "oldContractBlobSha": "cf3591797da8dd550b9bb8ffe1324078bd826467",
+  "newContractBlobSha": "b2b3184788d31a99ce2074255cee7d8d5c532d81",
+  "alignedBindings": [
+    "modules/renovaciones.js?v=20261006-r20",
+    "core/ciclo.js?v=20261006-r20",
+    "modules/aseguradoras.js?v=20261006-r20",
+    "styles/infra.css?v=20261006-r20"
+  ],
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

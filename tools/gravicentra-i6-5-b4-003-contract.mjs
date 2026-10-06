@@ -234,7 +234,7 @@ need(/GENERAL_PREVIEW_COMMAND='orbit360ProductOperationalCommandPreview'/.test(s
 need(/previewGeneral\?GENERAL_PREVIEW_COMMAND:GENERAL_COMMAND/.test(store),'B4_003_GENERAL_PREVIEW_ROUTING_MISSING');
 need(/previewGeneral\?'us-east1':'us-central1'/.test(store),'B4_003_GENERAL_PREVIEW_REGION_MISSING');
 need(/b4003qa/.test(opBackend)&&/__syntheticQa/.test(opBackend),'B4_003_PREVIEW_SYNTHETIC_GUARD_MISSING');
-need(/modules\/renovaciones\.js\?v=20261005-r19/.test(index),'B4_003_BASE_CACHE_BINDING_MISSING');
+need(/modules\/renovaciones\.js\?v=20261006-r20/.test(index),'B4_003_BASE_CACHE_BINDING_MISSING');
 need(/renewals-v1200-operational-bridge\.js\?v=20261005-r17/.test(index),'B4_003_BRIDGE_CACHE_BINDING_MISSING');
 need(/renewals-v1200-permission-guard\.js\?v=20261003-b4003r2/.test(index),'B4_003_PERMISSION_CACHE_BINDING_MISSING');
 need(/renewals-v1201-issued-filter\.js\?v=20261003-b4003r2/.test(index),'B4_003_ISSUED_CACHE_BINDING_MISSING');
@@ -242,18 +242,18 @@ need(/cancelaciones\.js\?v=20261003-b4003r13/.test(index),'B4_003_CANCEL_R13_CAC
 need(/modules\/polizas\.js\?v=20261004-b4003r14/.test(index),'B4_003_POLICY_R13_CACHE_BINDING_MISSING');
 need(/core\/access-scope\.js\?v=20261003-b4003r5/.test(index),'B4_003_ACCESS_SCOPE_CACHE_BINDING_MISSING');
 need(/core\/router\.js\?v=20261004-b4003r14a/.test(index),'B4_003_R14_ROUTER_CACHE_BINDING_MISSING');
-need(/core\/ciclo\.js\?v=20261005-r19/.test(index),'B4_003_R14A_CYCLE_CACHE_BINDING_MISSING');
+need(/core\/ciclo\.js\?v=20261006-r20/.test(index),'B4_003_R14A_CYCLE_CACHE_BINDING_MISSING');
 need(/modules\/cronograma\.js\?v=20261003-b4003r5/.test(index),'B4_003_CRONOGRAMA_CACHE_BINDING_MISSING');
 need(/store-firestore-product-operational-p0\.js\?v=20261003-b4003r3/.test(index),'B4_003_STORE_CACHE_BINDING_MISSING');
 need(/modules\/cliente360\.js\?v=20261005-r17/.test(index),'B4_003_CLIENT360_R11_CACHE_BINDING_MISSING');
 need(index.includes('modules/calidad.js?v=20261005-r19'),'B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING');
-need(index.includes('modules/aseguradoras.js?v=20261005-r19'),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
+need(index.includes('modules/aseguradoras.js?v=20261006-r20'),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
 need(/core\/importa\.js\?v=20261004-r16/.test(index),'B4_003_IMPORTER_R13_CACHE_BINDING_MISSING');
 need(/modules\/aseguradoras-v1202-import-bridge\.js\?v=20261004-b4003r13d/.test(index),'B4_003_R13_INSURER_IMPORT_BRIDGE_CACHE_BINDING_MISSING');
 need(index.includes('core/client-insurer-visual-contract-v20260720.js?v=20261004-r16p4'),'B4_003_INSURER_VISUAL_R12_CACHE_BINDING_MISSING');
 need(index.includes('modules/policy-receipts-v1199-detail-guard.js?v=20261005-r19'),'B4_003_POLICY_DETAIL_R13_CACHE_BINDING_MISSING');
 need(/modules\/policy-receipts-v1199-bridge\.js\?v=20261005-r19/.test(index),'B4_003_POLICY_BRIDGE_R11_CACHE_BINDING_MISSING');
-need(/styles\/infra\.css\?v=20261005-r19/.test(index),'B4_003_INFRA_R17_CARD_FIT_CACHE_BINDING_MISSING');
+need(/styles\/infra\.css\?v=20261006-r20/.test(index),'B4_003_INFRA_R17_CARD_FIT_CACHE_BINDING_MISSING');
 
 
 need(cycle.includes("find(p=>p&&p.etapa==='nuevo')")&&!cycle.includes("(Orbit.cat.get('puntosIngreso')[1]||Orbit.cat.get('puntosIngreso')[0]"),'B4_003_R18_DEFAULT_NEW_STAGE_NOT_CANONICAL');
