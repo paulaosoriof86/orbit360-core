@@ -171,6 +171,12 @@ function registrationCard(id){
 const SCRIPT=`
 <script>
 (()=>{
+  const terminalTemplate=document.getElementById('s506TerminalTemplate');
+  const terminalCompletion=document.getElementById('s500Completion');
+  if(terminalTemplate&&terminalCompletion&&!terminalCompletion.querySelector('[data-s506-card="terminal"]')){
+    const terminalChannels=terminalCompletion.querySelector('.s501-terminal-channels');
+    terminalCompletion.insertBefore(terminalTemplate.content.cloneNode(true),terminalChannels||terminalCompletion.firstChild);
+  }
   function countryCode(){
     const t=(document.getElementById('selectedCountry')?.textContent||'Guatemala').toLowerCase();
     return t.includes('colombia')?'CO':'GT';
@@ -234,11 +240,7 @@ function html(){
     '<div class="s501-channel-grid">',
     registrationCard('advisor')+'<div class="s501-channel-grid">'
   );
-  h=h.replace(
-    '<div class="s501-terminal-channels">',
-    registrationCard('terminal')+'<div class="s501-terminal-channels">'
-  );
-  h=h.replace('</body>',SCRIPT+'</body>');
+  h=h.replace('</body>','<template id="s506TerminalTemplate">'+registrationCard('terminal')+'</template>'+SCRIPT+'</body>');
   h=h.replace('Owner Review S5.00','Owner Review S5.06');
   return h;
 }
