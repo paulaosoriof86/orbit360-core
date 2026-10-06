@@ -2811,7 +2811,7 @@
   },
   "continuityRegisterBlobSha": "76f3cc0a91bbccd00fa8a24113154bf8142cd312",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-  "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX",
   "b4003R15VisualReview": {
     "status": "PAULA_VISUAL_PARTIAL_PASS_REMEDIATION_REQUIRED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -3403,5 +3403,18 @@
     },
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
+  },
+  "r20NoLossFreeze": {
+    "status": "FROZEN",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+    "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+  },
+  "r20HumanReview": {
+    "status": "PAULA_VISUAL_REJECTED_R20_REMEDIATION_REQUIRED",
+    "findingLedgerBlobSha": "c746cf8270590c3e24de4c70922ba47c348cdb03",
+    "continuityRegisterBlobSha": "7fc84be1b8f0233b14cf4869c4a98438f8accb6e",
+    "masterPlanBlobSha": "c2b59b9e48a288e767123c8d8982d3815317dfc1",
+    "productSourceChanged": false,
+    "compositionProductFileSetChanged": false
   }
 }

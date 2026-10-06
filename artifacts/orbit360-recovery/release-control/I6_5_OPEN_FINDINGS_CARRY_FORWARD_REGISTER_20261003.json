@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
-  "expectedLedgerNextBlobSha": "dd438896cbccc299e203fe3fcd64eb5ef1dbcefe",
+  "expectedLedgerNextBlobSha": "c746cf8270590c3e24de4c70922ba47c348cdb03",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -16,8 +16,8 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 243,
-  "attentionCount": 135,
+  "inventoryCount": 264,
+  "attentionCount": 155,
   "inventory": [
     {
       "id": "MECH-HARNESS-005",
@@ -2951,7 +2951,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "SOURCE_FIXED_R19_PENDING_MACHINE_PROOF",
+      "status": "PAULA_VISUAL_REJECTED_R20_REMEDIATION_REQUIRED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2989,7 +2989,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R19_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3040,13 +3040,13 @@
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
       "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
-      "humanVisualStatus": "REJECTED_R17_PENDING_RETEST",
+      "humanVisualStatus": "REJECTED_R20_BLOCKERS_REMAIN",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
-      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
-      "machineProofReceiptBlobSha": "8138c08b5d951bc3119f470daa98c1cd2d432dfe",
-      "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_B2_QA_RESIDUE_ADJUDICATION_20261004.json",
-      "qaResidueAdjudicationReceiptBlobSha": "85a97809be701934cf59c4f059d1009f80853f14",
+      "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_MACHINE_PROOF_20261005.json",
+      "machineProofReceiptBlobSha": "41619ea152169dea4e3c44c75386abaa8b92dfe4",
+      "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_B2_QA_RESIDUE_ADJUDICATION_20261005.json",
+      "qaResidueAdjudicationReceiptBlobSha": "6da820dbdf82d2564533b9d7b1c4a4bf14c73237",
       "visualRejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_REJECTION_R5_SOURCE_FIX_20261003.json",
       "visualRejectionReceiptBlobSha": "cc2b950989344acfdade4a38dcc537c088b1819a",
       "cumulativeFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
@@ -3112,7 +3112,28 @@
         "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
         "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
         "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
-        "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD"
+        "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+        "B4-003-R20-Q01",
+        "B4-003-R20-Q02",
+        "B4-003-R20-Q03",
+        "B4-003-R20-Q04",
+        "B4-003-R20-Q05",
+        "B4-003-R20-Q06",
+        "B4-003-R20-Q07",
+        "B4-003-R20-B01",
+        "B4-003-R20-B02",
+        "B4-003-R20-B03",
+        "B4-003-R20-B04",
+        "B4-003-R20-B05",
+        "B4-003-R20-B06",
+        "B4-003-R20-B07",
+        "B4-003-R20-B08",
+        "B4-003-R20-B09",
+        "B4-003-R20-B10",
+        "B4-003-R20-B11",
+        "B4-003-R20-B12",
+        "B4-003-R20-B13",
+        "B4-003-R20-B14"
       ],
       "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
       "qaHarnessR11aReceiptBlobSha": "7399b828c3feea6ac52b8625acf9c709c118d419",
@@ -3149,7 +3170,53 @@
       "machineProofRunId": 37228202621,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-003",
-      "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included."
+      "closureCondition": "R13 blocking findings diagnosed/fixed + exact Preview machine PASS + targeted Paula visual PASS; Drive E2E proof included.",
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "r20ReviewedCandidate": {
+        "head": "d0e31018909ece246b12bcbf62e9244b49101726",
+        "sourceSha": "41c38ff22f026f2a503d1814817e4a5d671904a4",
+        "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
+        "runId": 37486500112,
+        "artifactId": 11423532705,
+        "artifactDigest": "8dd67ddb8f8bbce00687fc2ebf8d8ab681a74b3f3668d7ba86fa879abf4b5ffb",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37486500112-bx1qyk0h.web.app",
+        "machine": "SUCCESS",
+        "human": "REJECTED_R20"
+      },
+      "r20PreservedPassIds": [
+        "R20-PASS-01",
+        "R20-PASS-02",
+        "R20-PASS-03",
+        "R20-PASS-04"
+      ],
+      "r20CarryIds": [
+        "B4-003-R20-Q01",
+        "B4-003-R20-Q02",
+        "B4-003-R20-Q03",
+        "B4-003-R20-Q04",
+        "B4-003-R20-Q05",
+        "B4-003-R20-Q06",
+        "B4-003-R20-Q07"
+      ],
+      "r20BlockingIds": [
+        "B4-003-R20-B01",
+        "B4-003-R20-B02",
+        "B4-003-R20-B03",
+        "B4-003-R20-B04",
+        "B4-003-R20-B05",
+        "B4-003-R20-B06",
+        "B4-003-R20-B07",
+        "B4-003-R20-B08",
+        "B4-003-R20-B09",
+        "B4-003-R20-B10",
+        "B4-003-R20-B11",
+        "B4-003-R20-B12",
+        "B4-003-R20-B13",
+        "B4-003-R20-B14"
+      ]
     },
     {
       "id": "B4-004",
@@ -3159,7 +3226,7 @@
       "status": "NOT_STARTED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
-      "nextAction": "WAIT_B4_003_PAULA_VISUAL",
+      "nextAction": "WAIT_B4_003_R19_PAULA_VISUAL",
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-004",
       "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking."
@@ -7245,8 +7312,8 @@
         "orbit360-platform/core/policy-receipts-engine.js",
         "orbit360-platform/modules/calidad.js"
       ],
-      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
-      "blocking": true,
+      "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+      "blocking": false,
       "targetGate": "B4-003",
       "closureCondition": "Identify authoritative source/lineage and reconcile or explicitly quarantine mismatch; no inferred rewrite; sum of active schedule must reconcile to contractual total within approved tolerance.",
       "preLiveRequired": true,
@@ -7265,7 +7332,13 @@
       "humanEvidence": [
         "2026-10-04 Paula R17: mismatch list repeats a generic reason for every row and exposes internal source token; rounded zero/tolerance semantics are confusing."
       ],
-      "requiredFix": "Emit discriminating human-readable cause based on calendar authority/review/shadow/source facts; internal tokens never rendered; monetary delta/tolerance displayed consistently."
+      "requiredFix": "Emit discriminating human-readable cause based on calendar authority/review/shadow/source facts; internal tokens never rendered; monetary delta/tolerance displayed consistently.",
+      "r20PriorStatus": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "r20Disposition": "PAULA_AUTHORIZED_NON_BLOCKING_CARRY",
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      }
     },
     {
       "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
@@ -8094,8 +8167,8 @@
       ],
       "rootCause": "financialHealthHtml renders informational rows only and does not bind policy/receipt lineage/action surface.",
       "requiredFix": "Responsive usable on laptop/tablet; correction review modal with precise cause/source/delta; receipts deep-link to Recibos tab; hide internal lineage/status tokens; no zero-rounded false-positive semantics.",
-      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
-      "blocking": true,
+      "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+      "blocking": false,
       "targetGate": "B4-003",
       "closureCondition": "Provide policy/receipt drill-down with contractual source, active calendar rows, delta/tolerance, exact validation reason and safe actions; no inferred rewrite. Rows within tolerance must not be false-positive review items.",
       "mayDisappearWithoutDisposition": false,
@@ -8109,7 +8182,13 @@
       "humanVisualStatus": "REJECTED_R17",
       "humanEvidence": [
         "2026-10-04 Paula R17: Calidad no es responsive; Revisar y corregir y Ver recibos terminan en la póliza sin contexto de corrección/recibos; motivos repetidos y términos técnicos visibles."
-      ]
+      ],
+      "r20PriorStatus": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "r20Disposition": "PAULA_AUTHORIZED_NON_BLOCKING_CARRY",
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      }
     },
     {
       "id": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
@@ -9093,8 +9172,8 @@
       "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
-      "blocking": true,
+      "status": "PAULA_VISUAL_PASS_R20_PRESERVE",
+      "blocking": false,
       "surface": "Inicio",
       "finding": "Monthly target dials and advisor progress remain in 'Actualizando...' / empty state in R18 visual review.",
       "rootCause": "Inicio gates advisor board on productionReadiness==='ready' && metaReadiness==='ready', but the fallback always says 'Actualizando producción y metas...' and does not distinguish denied/unavailable/missing configuration. A terminal non-ready state therefore looks like endless hydration.",
@@ -9112,7 +9191,13 @@
       "mayDisappearWithoutDisposition": false,
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_MACHINE_PROOF_20261005.json",
-      "machineProofReceiptBlobSha": "41619ea152169dea4e3c44c75386abaa8b92dfe4"
+      "machineProofReceiptBlobSha": "41619ea152169dea4e3c44c75386abaa8b92dfe4",
+      "r20PriorStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "r20Disposition": "PRIOR_PASS_PRESERVED",
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      }
     },
     {
       "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
@@ -9139,6 +9224,474 @@
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_MACHINE_PROOF_20261005.json",
       "machineProofReceiptBlobSha": "41619ea152169dea4e3c44c75386abaa8b92dfe4"
+    },
+    {
+      "id": "B4-003-R20-Q01",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+      "blocking": false,
+      "surface": "Calidad/Póliza vs calendario",
+      "finding": "Faltan buscador, filtros, jerarquía premium, estados humanizados, acciones y limpieza de etiquetas técnicas.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "remediation": "Resolve in next authorized carry step; do not retain B4-003 solely for this item.",
+      "closureCondition": "Restore search/filters/humanized hierarchy without technical labels.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "CARRY_FORWARD_AFTER_B4_003"
+    },
+    {
+      "id": "B4-003-R20-Q02",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+      "blocking": false,
+      "surface": "Calidad/Datos personales",
+      "finding": "Tabla no ajusta al ancho; acciones se cortan; resolver responsive/scroll alcanzable.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "remediation": "Resolve in next authorized carry step; do not retain B4-003 solely for this item.",
+      "closureCondition": "Desktop and 390px expose all actions; scrolling discoverable if needed.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "CARRY_FORWARD_AFTER_B4_003"
+    },
+    {
+      "id": "B4-003-R20-Q03",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+      "blocking": false,
+      "surface": "Calidad/Acciones",
+      "finding": "Completar, Agregar/corregir y Documentar origen son ambiguos; separar edición canónica de provenance o consolidar.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "remediation": "Resolve in next authorized carry step; do not retain B4-003 solely for this item.",
+      "closureCondition": "Canonical edit and provenance actions are distinct or consolidated truthfully.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "CARRY_FORWARD_AFTER_B4_003"
+    },
+    {
+      "id": "B4-003-R20-Q04",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+      "blocking": false,
+      "surface": "Calidad/País",
+      "finding": "Separar valor canónico de evidencia; auto-resolver si póliza+aseguradora canónicas determinan país único; conflicto GT/CO humano.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "canonical client/policy/insurer relation owners"
+      ],
+      "remediation": "Resolve in next authorized carry step; do not retain B4-003 solely for this item.",
+      "closureCondition": "Deterministic country canonical; provenance separate; conflicts human.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "CARRY_FORWARD_AFTER_B4_003"
+    },
+    {
+      "id": "B4-003-R20-Q05",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+      "blocking": false,
+      "surface": "Calidad/País persistencia",
+      "finding": "Tras guardar país, País por validar no desapareció; probar before→save→commit→readback→reload→motivo desaparece.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js"
+      ],
+      "remediation": "Resolve in next authorized carry step; do not retain B4-003 solely for this item.",
+      "closureCondition": "before→save→server commit→readback→reload clears País por validar.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "CARRY_FORWARD_AFTER_B4_003"
+    },
+    {
+      "id": "B4-003-R20-Q06",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+      "blocking": false,
+      "surface": "Calidad/WhatsApp",
+      "finding": "No se pudo confirmar guardado; probar save→canonical readback→reload→motivo Teléfono/WhatsApp desaparece.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js"
+      ],
+      "remediation": "Resolve in next authorized carry step; do not retain B4-003 solely for this item.",
+      "closureCondition": "save→canonical readback→reload clears Teléfono/WhatsApp reason.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "CARRY_FORWARD_AFTER_B4_003"
+    },
+    {
+      "id": "B4-003-R20-Q07",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+      "blocking": false,
+      "surface": "Calidad/Automatización",
+      "finding": "No convertir país/moneda determinísticos en trabajo manual masivo; humano solo para conflicto real.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/calidad.js",
+        "canonical evidence/inference owner"
+      ],
+      "remediation": "Resolve in next authorized carry step; do not retain B4-003 solely for this item.",
+      "closureCondition": "Deterministic evidence auto-resolves; only conflicts remain human.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "CARRY_FORWARD_AFTER_B4_003"
+    },
+    {
+      "id": "B4-003-R20-B01",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Renovaciones/Kanban",
+      "finding": "Eliminar la tabla paralela como solución principal. Mantener columnas aprobadas Vencidas, Esta quincena 0-15, Próximas 16-45, Horizonte 46-90; vencida sin sucesora/terminal permanece Vencidas sin límite; renovabilidad pendiente no desaparece; renovada sale solo con cierre causal.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/renovaciones.js",
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+        "orbit360-platform/modules/renewals-v1201-issued-filter.js"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Exact Preview Kanban places policies in approved date buckets with lineage closure and no parallel-table substitute.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B02",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Renovabilidad",
+      "finding": "Regla autorizada: todo RENOVABLE salvo Transporte actualmente cargado y AP corto plazo de Valdemar Barrios. Dry-run exact IDs/diff antes de write; apply con before/after,audit,readback,reload,rollback; conflictos fuera de regla fail-closed.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/core/policy-receipts-engine.js",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "functions/product-operational-domain.js"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Authorized classification dry-run/apply/readback/reload/audit/rollback PASS with exact IDs.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B03",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Aseguradoras/Requisitos",
+      "finding": "País, ramo, producto/plan, tipo, descripción, adjunto opcional, estado, provenance, fecha; filtros ramo/producto; requisito sin archivo permitido.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "insurer knowledge/document registry owner"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Synthetic requirement create/edit/filter/readback/reload/cleanup PASS.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B04",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Aseguradoras/Fuentes",
+      "finding": "Adjuntar/subir fuente a entidad existente, asociar país/ramo/producto/moneda, dedupe, mostrar vínculo y abrir/descargar vía Drive; no crear segundo documento al adjuntar evidencia.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "Drive/documentRef backend owner"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Attach source to existing entity with canonical associations/dedupe/open-download/readback.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B05",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Aseguradoras/Registry UI",
+      "finding": "Registry técnico secundario/colapsable pero premium: iconos,badges,color,tarjetas,contraste,estados distinguibles.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Registry premium secondary technical surface PASS desktop+390px.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B06",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Aseguradoras/Tarifas-conocimiento",
+      "finding": "Cards premium, jerarquía, catálogos administrables, filtros ramo/producto, provenance secundaria; no inputs libres si existe catálogo.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "Config/Catalog owners"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Tariff/knowledge managed catalogs and filters PASS.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B07",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Aseguradoras/Actividad",
+      "finding": "Más reciente arriba; timestamps canónicos; tipo/color/icono; no inventar fechas desde commits.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "insurer audit/activity persistence owner"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Activity newest-first with canonical timestamps/types.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B08",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Aseguradoras/UAT writes",
+      "finding": "Probar logo, producto, plan, requisito y documento con UAT Preview sintético, real server write, readback, reload y cleanup; LIVE intacto.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "functions/product-operational-domain.js",
+        "Drive/documentRef backend owner"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Synthetic insurer writes commit/readback/reload/cleanup; LIVE unchanged.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B09",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Ops/Leads handoff",
+      "finding": "Loading inmediato/disabled/Registrando; commit-readback-confirmación; estado exterior de tarjeta; campana+badge+deep-link+acción rápida; adjuntos Drive/documentRef.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "functions/product-ops-leads-domain.js",
+        "functions/ops-advisor-inbox.js"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Synthetic handoff proves loading→commit→notice/badge/card/deep-link/attachment→reload.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B10",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Ops/Leads scopes",
+      "finding": "Asesor solo sus casos y sin editar base; Leads propios por identidad incluso con rol activo Operativo; Operativo no obtiene leads ajenos.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "functions/product-ops-leads-domain.js",
+        "role/scope backend owner"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Role×identity proof: advisor own-only; Operativo active role does not leak other advisors' Leads.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B11",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Ops/Leads cadencias",
+      "finding": "Auditar trigger→scheduler owner→fecha próxima→acción→persistencia→notificación con timestamp real.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "Ops/Leads cadence scheduler owner",
+        "functions/product-ops-leads-domain.js"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Timestamped scheduler/cadence proof trigger→action→persist→notify.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B12",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Sesión/router/startup",
+      "finding": "Logout lento, refresh puede expulsar, back no restaura ruta, Preview puede tardar minutos, Leads/comentarios ~5s; diagnosticar transversalmente y cerrar si impide UAT.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/core/auth-product-runtime-p0.js",
+        "orbit360-platform/core/product-app-p0.js",
+        "shell/router/history owners"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Logout/login/refresh/back/deep-link stable and first render within contract.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B13",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Catálogos/selects Fase A",
+      "finding": "Auditar todos los selects incluyendo Ops/Leads: campo→módulo→owner→fuente→administrable S/N→dependencias→persistencia/readback→rol; no hardcodear personas/estados/tipos configurables.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "Config/Catalog owners",
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Full select matrix; B4-affected hardcodes removed/bound to managed owner; rest carried explicitly.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
+    },
+    {
+      "id": "B4-003-R20-B14",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "OPEN_R20_CAUSAL_DIAGNOSTIC_REQUIRED",
+      "blocking": true,
+      "surface": "Preview write contract",
+      "finding": "Paula necesita E2E writes sin tocar registros reales: fixtures UAT aislados/deshechables equivalentes, misma UI que LIVE, commit/readback/reload/cleanup.",
+      "rootCause": "PENDING_R20_CAUSAL_DIAGNOSTIC",
+      "owner": [
+        "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "functions/product-operational-domain.js",
+        "B4 authenticated QA harness"
+      ],
+      "remediation": "No product fix until runtime owner and causal root cause are physically demonstrated.",
+      "closureCondition": "Disposable UAT fixtures prove same server write contract with readback/reload/cleanup.",
+      "mayDisappearWithoutDisposition": false,
+      "r20Freeze": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+        "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+      },
+      "nextAction": "B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX"
     }
   ],
   "attentionIds": [
@@ -9275,77 +9828,47 @@
     "B4-003-R19-04-QUALITY-CONTACT-CHANNEL-ACTION-GAP",
     "B4-003-R19-05-POLICY-TECHNICAL-MARKUP-LABEL-VISIBLE",
     "B4-003-R19-06-RENEWABILITY-DURABLE-ATOMIC-SAVE-FAILURE",
-    "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
-    "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
+    "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+    "B4-003-R20-Q01",
+    "B4-003-R20-Q02",
+    "B4-003-R20-Q03",
+    "B4-003-R20-Q04",
+    "B4-003-R20-Q05",
+    "B4-003-R20-Q06",
+    "B4-003-R20-Q07",
+    "B4-003-R20-B01",
+    "B4-003-R20-B02",
+    "B4-003-R20-B03",
+    "B4-003-R20-B04",
+    "B4-003-R20-B05",
+    "B4-003-R20-B06",
+    "B4-003-R20-B07",
+    "B4-003-R20-B08",
+    "B4-003-R20-B09",
+    "B4-003-R20-B10",
+    "B4-003-R20-B11",
+    "B4-003-R20-B12",
+    "B4-003-R20-B13",
+    "B4-003-R20-B14"
   ],
   "criticalCurrentReviewIds": [
     "B4-003",
-    "B4-003-R13-01-CANCEL-COUNTRY-FILTER-PERFORMANCE",
-    "B4-003-R13-02-CANCEL-NONCLIENT-DEEPLINK",
-    "B4-003-R13-03-CANCEL-COUNTRY-IDENTITY-INTEGRITY",
-    "B4-003-R13-04-RENEWALS-ZERO-REGRESSION",
-    "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
-    "B4-003-R13-06-POLICY-SEARCH-FREEZE",
-    "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
-    "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
-    "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
-    "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
-    "B4-003-R11-01-CANCELATION-ROW-DETAIL",
-    "B4-003-R11-02-CANCELATION-CLIENT-POLICY-CONTEXT",
-    "B4-003-R11-03-CLIENT360-LEFT-TAB-NAV",
-    "B4-003-R11-04-RENEWABILITY-FAIL-CLOSED",
-    "B4-003-R11-05-POLICY-EDITOR-TAXONOMY-PRESERVATION",
-    "B4-003-R11-06-QUALITY-COUNTRY-SCOPE",
-    "B4-003-R11-07-QUALITY-PERFORMANCE",
-    "B4-003-R11-08-CANCELATION-RATIO-SEMANTICS",
-    "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
-    "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
-    "B4-003-R11-11-INSURER-KNOWLEDGE-KPI-COUNTERS",
-    "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE",
-    "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE",
-    "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
-    "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF",
-    "B4-003-R11A-QA-01-VISIBLE-ROW-DISCRIMINANT",
-    "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
-    "B4-003-R14-02-RENEWALS-EXPIRED-OUTCOME-CONTINUITY",
-    "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
-    "B4-003-R14-04-CLIENT360-LIST-AUTHORITY",
-    "B4-003-R14-05-QUALITY-VISUAL-GRAMMAR-COMPLETENESS",
-    "B4-003-R14-06-INSURER-IMPORT-STEP-TRUTHFULNESS",
-    "B4-003-R15-01-OPS-LEADS-NEW-PROSPECT-CATALOGS",
-    "B4-003-R15-02-QUALITY-CLIENT-COMPLETION-DURABILITY",
-    "B4-003-R15-03-QUALITY-GEO-CATALOG-COMPLETENESS",
-    "B4-003-R15-04-QUALITY-COUNTRY-EVIDENCE-SEMANTICS",
-    "B4-003-R15-05-QUALITY-CHANNEL-ACTION",
-    "B4-003-R15-06-QUALITY-POLICY-MISMATCH-ACTIONABILITY",
     "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
     "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
-    "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
-    "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
-    "B4-003-R18-01-OPS-LEADS-DEFAULT-ENTRY-STAGE",
-    "B4-003-R18-02-OPS-LEADS-RAMO-PRODUCT-PLAN-DEPENDENCY",
-    "B4-003-R18-03-COMMERCIAL-IDENTITY-MULTIOPPORTUNITY-MODEL",
-    "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
-    "B4-003-R18-05-OPS-MANAGEMENT-TYPE-QUEUE-SEMANTICS",
-    "B4-003-R18-06-QUALITY-PROVENANCE-CONFIRMATION-ACTION",
-    "B4-003-R18-07-QUALITY-CHANNEL-ACTION-SEMANTIC-MISMATCH",
-    "B4-003-R18-08-QUALITY-REVIEW-AND-CORRECT-NOT-ACTIONABLE",
-    "B4-003-R18-09-POLICY-MOBILE-SEARCH-VISIBILITY",
-    "B4-003-R18-10-RENEWAL-UNIVERSE-11-VS-2-DISPOSITION-GAP",
-    "B4-003-R18-11-POLICY-DUPLICATE-COLLISION-ON-RENEWABILITY-EDIT",
-    "B4-003-R18-12-INSURER-REGISTRY-PROVENANCE-OBJECT-RENDER",
-    "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
-    "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
-    "B4-003-R18-15-PREUAT-AUTOMATION-DISCRIMINANT-COVERAGE",
-    "B4-003-R18-16-INICIO-POLIZAS-RENEWAL-KPI-PARITY",
-    "B4-003-R19-01-INSURER-MULTISELECT-NATIVE-CTRL-DEPENDENCY",
-    "B4-003-R19-02-QUALITY-SEARCH-FILTER-REGRESSION",
-    "B4-003-R19-03-QUALITY-HORIZONTAL-REACHABILITY",
-    "B4-003-R19-04-QUALITY-CONTACT-CHANNEL-ACTION-GAP",
-    "B4-003-R19-05-POLICY-TECHNICAL-MARKUP-LABEL-VISIBLE",
-    "B4-003-R19-06-RENEWABILITY-DURABLE-ATOMIC-SAVE-FAILURE",
-    "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
-    "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
+    "B4-003-R20-B01",
+    "B4-003-R20-B02",
+    "B4-003-R20-B03",
+    "B4-003-R20-B04",
+    "B4-003-R20-B05",
+    "B4-003-R20-B06",
+    "B4-003-R20-B07",
+    "B4-003-R20-B08",
+    "B4-003-R20-B09",
+    "B4-003-R20-B10",
+    "B4-003-R20-B11",
+    "B4-003-R20-B12",
+    "B4-003-R20-B13",
+    "B4-003-R20-B14"
   ],
   "explicitCrossGateCarries": [
     "B1-EMAIL-DELIVERY-001",
@@ -9357,11 +9880,8 @@
     "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
     "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
   ],
-  "b4AdvanceRule": "B4-004 remains forbidden until R18 exact cumulative Preview has machine + TinyFish pre-UAT PASS and Paula targeted visual PASS; prior PASS is preserved unless causally touched.",
-  "liveRule": {
-    "required": "Every attention item marked/derived as pre-live debt must have explicit final disposition; no silent omission.",
-    "noLiveUntilB4_007": true
-  },
+  "b4AdvanceRule": "B4-004 forbidden until R20 blocking items are causally adjudicated and PASS on one exact cumulative Preview plus Paula targeted visual PASS. R20 Quality carry alone may not retain B4-003.",
+  "liveRule": "LIVE remains forbidden until later promotion gate; R20 Quality carry stays visible and must be resolved in next authorized step but is non-blocking for B4-003.",
   "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
   "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
   "r12SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_SOURCE_FIX_20261003.json",
@@ -9530,5 +10050,45 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
     "compositionBlobSha": "b053c0b0b54926bc1ada3c5b2789edd280aa8e23",
     "ledgerBlobSha": "dd438896cbccc299e203fe3fcd64eb5ef1dbcefe"
+  },
+  "r20NoLossFreeze": {
+    "status": "FROZEN",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+    "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+  },
+  "r20Classification": {
+    "status": "PAULA_VISUAL_REJECTED_BLOCKERS_PLUS_AUTHORIZED_CARRY",
+    "blockingIds": [
+      "B4-003-R20-B01",
+      "B4-003-R20-B02",
+      "B4-003-R20-B03",
+      "B4-003-R20-B04",
+      "B4-003-R20-B05",
+      "B4-003-R20-B06",
+      "B4-003-R20-B07",
+      "B4-003-R20-B08",
+      "B4-003-R20-B09",
+      "B4-003-R20-B10",
+      "B4-003-R20-B11",
+      "B4-003-R20-B12",
+      "B4-003-R20-B13",
+      "B4-003-R20-B14"
+    ],
+    "carryIds": [
+      "B4-003-R20-Q01",
+      "B4-003-R20-Q02",
+      "B4-003-R20-Q03",
+      "B4-003-R20-Q04",
+      "B4-003-R20-Q05",
+      "B4-003-R20-Q06",
+      "B4-003-R20-Q07"
+    ],
+    "priorPassIds": [
+      "R20-PASS-01",
+      "R20-PASS-02",
+      "R20-PASS-03",
+      "R20-PASS-04"
+    ],
+    "qualityMayNotRetainB4003ByItself": true
   }
 }

@@ -283,16 +283,16 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "R19_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW",
-    "why": "One cumulative R19 product+QA source fix is sealed; exact Preview machine proof is next.",
-    "currentCandidateReview": "R17_REJECTED_NO_MORE_HUMAN_RETEST_UNTIL_R18_MACHINE_PLUS_TINYFISH_PREUAT_PASS",
-    "sourceSha": "6bc5430d23a286db6b1bd0a94d2594c583449772",
-    "buildId": "gi-i65-b4-6bc5430d23a2-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37248154086-11dxqgq2.web.app",
-    "machineProofRunId": 37248154086,
-    "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_MACHINE_PROOF_20261004.json",
-    "machineProofReceiptBlobSha": "89d4dbc5370055fa47b7defc0886c6d892e9208d"
+    "status": "R20_PAULA_VISUAL_REJECTED_CAUSAL_DIAGNOSTIC_REQUIRED",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX",
+    "why": "R19 machine proof succeeded, but Paula R20 human review rejected remaining blocking business/UX/runtime findings while explicitly authorizing Quality as non-blocking carry-forward.",
+    "currentCandidateReview": "R20_REJECTED_BLOCKERS_PLUS_AUTHORIZED_QUALITY_CARRY",
+    "sourceSha": "41c38ff22f026f2a503d1814817e4a5d671904a4",
+    "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37486500112-bx1qyk0h.web.app",
+    "machineProofRunId": 37486500112,
+    "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_MACHINE_PROOF_20261005.json",
+    "machineProofReceiptBlobSha": "41619ea152169dea4e3c44c75386abaa8b92dfe4"
   },
   "frozenExecutionSequence": [
     {
@@ -6387,5 +6387,53 @@
     "compositionBlobSha": "b053c0b0b54926bc1ada3c5b2789edd280aa8e23",
     "ledgerBlobSha": "dd438896cbccc299e203fe3fcd64eb5ef1dbcefe",
     "carryBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec"
+  },
+  "r20NoLossFreeze": {
+    "status": "FROZEN",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+    "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+  },
+  "r20HumanReview": {
+    "status": "REJECTED_BLOCKERS_PLUS_AUTHORIZED_CARRY",
+    "findingLedgerBlobSha": "c746cf8270590c3e24de4c70922ba47c348cdb03",
+    "carryRegisterBlobSha": "7fc84be1b8f0233b14cf4869c4a98438f8accb6e",
+    "findingCount": 264,
+    "newR20FindingCount": 21,
+    "blockingIds": [
+      "B4-003-R20-B01",
+      "B4-003-R20-B02",
+      "B4-003-R20-B03",
+      "B4-003-R20-B04",
+      "B4-003-R20-B05",
+      "B4-003-R20-B06",
+      "B4-003-R20-B07",
+      "B4-003-R20-B08",
+      "B4-003-R20-B09",
+      "B4-003-R20-B10",
+      "B4-003-R20-B11",
+      "B4-003-R20-B12",
+      "B4-003-R20-B13",
+      "B4-003-R20-B14"
+    ],
+    "carryIds": [
+      "B4-003-R20-Q01",
+      "B4-003-R20-Q02",
+      "B4-003-R20-Q03",
+      "B4-003-R20-Q04",
+      "B4-003-R20-Q05",
+      "B4-003-R20-Q06",
+      "B4-003-R20-Q07"
+    ],
+    "priorPassPreserved": [
+      "R20-PASS-01",
+      "R20-PASS-02",
+      "R20-PASS-03",
+      "R20-PASS-04"
+    ],
+    "qualityCarryMayNotRetainB4003ByItself": true,
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
