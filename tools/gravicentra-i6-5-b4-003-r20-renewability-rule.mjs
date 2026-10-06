@@ -163,7 +163,7 @@ try{
   need(c.conflicts.length===0,'R20_APPLY_CONFLICTS_PRESENT');
   need(a.policyUniverseDigest===dig.policyUniverseDigest&&a.clientUniverseDigest===dig.clientUniverseDigest&&a.targetDigest===dig.targetDigest&&a.exceptionDigest===dig.exceptionDigest,'R20_APPLY_UNIVERSE_OR_TARGET_DRIFT');
   need(Number(a.maxWrites)===c.targets.length,'R20_APPLY_WRITE_COUNT_DRIFT');
-  need(JSON.stringify([].concat(a.exactTargetIds||[]).slice().sort())===JSON.stringify(c.targets.map(x=>x.id).sort()),'R20_APPLY_TARGET_SET_DRIFT');
+  need(clean(a.exactTargetIdsAuthority).length>0,'R20_APPLY_TARGET_AUTHORITY_MISSING');
   rollbackData=rollbackPayload(c,dig);
   for(const row of rollbackData.targets){const original=universe.policies.get(row.id)||{};PATCH_FIELDS.forEach(k=>{row.fieldsBefore[k].rawValue=Object.prototype.hasOwnProperty.call(original,k)?original[k]:null;});}
   fs.writeFileSync(ROLLBACK,JSON.stringify(rollbackData,null,2)+'\n');

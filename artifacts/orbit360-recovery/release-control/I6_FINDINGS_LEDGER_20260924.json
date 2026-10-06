@@ -2959,7 +2959,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "R20_CAUSES_DEMONSTRATED_SOURCE_FIX_AND_RENEWABILITY_DRY_RUN",
+      "status": "R20_RENEWABILITY_APPLY_AUTHORIZED_SOURCE_FIX_PENDING",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2997,7 +2997,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_RENEWABILITY_DRY_RUN_AND_SOURCE_FIX",
+      "nextAction": "B4_003_R20_RENEWABILITY_APPLY",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3226,7 +3226,14 @@
         "B4-003-R20-B14"
       ],
       "r20DiagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
-      "r20DiagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
+      "r20DiagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0",
+      "r20RenewabilityDryRun": {
+        "status": "PASS_DRY_RUN",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_DRY_RUN_20261006.json",
+        "receiptBlobSha": "132597e805ce888c374664182f24d9dddaf27a0a",
+        "applyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_AUTH_20261006.json",
+        "applyAuthBlobSha": "5268e7941754609d30688ff1b5e7a7d4b5224e09"
+      }
     },
     {
       "id": "B4-004",
@@ -9420,7 +9427,7 @@
       "id": "B4-003-R20-B02",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "CAUSE_DEMONSTRATED_PENDING_FULL_UNIVERSE_DRY_RUN",
+      "status": "R20_DRY_RUN_PASS_APPLY_AUTHORIZED",
       "blocking": true,
       "surface": "Renovabilidad",
       "finding": "Regla autorizada: todo RENOVABLE salvo Transporte actualmente cargado y AP corto plazo de Valdemar Barrios. Dry-run exact IDs/diff antes de write; apply con before/after,audit,readback,reload,rollback; conflictos fuera de regla fail-closed.",
@@ -9437,14 +9444,29 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "R20_FULL_UNIVERSE_RENEWABILITY_DRY_RUN",
+      "nextAction": "R20_RENEWABILITY_APPLY",
       "causeStatus": "CAUSE_DEMONSTRATED_NEW_BUSINESS_AUTHORITY_REQUIRES_NEW_DRY_RUN",
       "diagnosedOwners": [
         "previousRenewabilityExecutor",
         "productOperationalBackend"
       ],
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
-      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
+      "diagnosticReceiptBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0",
+      "dryRunReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_DRY_RUN_20261006.json",
+      "dryRunReceiptBlobSha": "132597e805ce888c374664182f24d9dddaf27a0a",
+      "applyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_AUTH_20261006.json",
+      "applyAuthBlobSha": "5268e7941754609d30688ff1b5e7a7d4b5224e09",
+      "dryRunSummary": {
+        "policyCount": 1419,
+        "targetWriteCount": 1415,
+        "proposedYes": 1309,
+        "proposedNo": 106,
+        "transportExceptions": 98,
+        "valdemarShortApExceptions": 8,
+        "valdemarAnnualApRenewable": 3,
+        "qaHolds": 4,
+        "conflicts": 0
+      }
     },
     {
       "id": "B4-003-R20-B03",
@@ -10179,8 +10201,8 @@
     }
   },
   "currentB4": {
-    "status": "B4_003_R20_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
-    "nextAction": "B4_003_R20_RENEWABILITY_DRY_RUN_AND_SOURCE_FIX",
+    "status": "B4_003_R20_RENEWABILITY_APPLY_AUTHORIZED",
+    "nextAction": "B4_003_R20_RENEWABILITY_APPLY",
     "humanVisualStatus": "REJECTED_R20_BLOCKERS_REMAIN"
   },
   "b4003QaResidueCarry": {
@@ -10218,7 +10240,7 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
   },
-  "lastUpdatedAt": "2026-10-06T14:12:00-06:00",
+  "lastUpdatedAt": "2026-10-06T20:38:00Z",
   "lastR16SourceFix": {
     "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
@@ -10379,6 +10401,16 @@
       }
     ],
     "dataMutationAuthorized": false,
+    "noLive": true,
+    "noReimport": true
+  },
+  "r20Renewability": {
+    "status": "DRY_RUN_PASS_APPLY_AUTHORIZED",
+    "dryRunReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_DRY_RUN_20261006.json",
+    "dryRunReceiptBlobSha": "132597e805ce888c374664182f24d9dddaf27a0a",
+    "applyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_AUTH_20261006.json",
+    "applyAuthBlobSha": "5268e7941754609d30688ff1b5e7a7d4b5224e09",
+    "writesAuthorized": 1415,
     "noLive": true,
     "noReimport": true
   }

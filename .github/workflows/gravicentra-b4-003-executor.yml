@@ -110,10 +110,23 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===true
             && l.boundaries?.reimportAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
+          const r20a=l.r20RenewabilityApplyAuthorization||{};
+          const r20Apply=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWABILITY_APPLY'
+            && c.currentB4?.status==='B4_003_R20_RENEWABILITY_APPLY_AUTHORIZED'
+            && c.i65ForensicRemediationPlan?.b4?.status==='B4_003_R20_RENEWABILITY_APPLY_AUTHORIZED'
+            && l.status==='B4_003_R20_RENEWABILITY_APPLY_AUTHORIZED'
+            && l.activeFinding?.id==='B4-003'
+            && r20a.status==='AUTHORIZED_PENDING_APPLY'
+            && r20a.ruleId==='PAULA_R20_RENEWABILITY_RULE_20261006'
+            && Number(r20a.maxWrites)===1415
+            && l.boundaries?.dataMutationAuthorized===true
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(previewOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'apply='+(applyOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_dryrun='+(r20DryRun?'true':'false')+'\n');
-          console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP'));
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_apply='+(r20Apply?'true':'false')+'\n');
+          console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP')+' R20_APPLY_MODE='+(r20Apply?'RUN':'NOOP'));
           NODE
 
 
@@ -161,6 +174,66 @@ jobs:
         with:
           name: b4-003-r20-renewability-dryrun-${{ github.run_id }}
           path: ${{ runner.temp }}/b4-003-r20-renewability-dryrun.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Assert LIVE unchanged before R20 renewability apply
+        if: steps.gate.outputs.r20_apply == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+
+      - name: Prepare authorized R20 renewability apply
+        if: steps.gate.outputs.r20_apply == 'true'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b4-003-r20-apply-auth"
+          mkdir -p "$ROOT"
+          export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json'
+                  p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('B4_003_R20_APPLY_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          SEL=$(head -n1 "$ROOT/files")
+          cp "$SEL" "$RUNNER_TEMP/b4-003-r20-apply-sa.json"
+          chmod 600 "$RUNNER_TEMP/b4-003-r20-apply-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4-003-r20-apply-sa.json" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+          node --check tools/gravicentra-i6-5-b4-003-r20-renewability-rule.mjs
+
+      - name: Apply exact R20 renewability classification
+        if: steps.gate.outputs.r20_apply == 'true'
+        env:
+          R20_RENEWABILITY_RESULT: ${{ runner.temp }}/b4-003-r20-renewability-apply.json
+          R20_RENEWABILITY_ROLLBACK: ${{ runner.temp }}/b4-003-r20-renewability-rollback.private.json
+          R20_RENEWABILITY_AUTH: artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_AUTH_20261006.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-003-r20-renewability-rule.mjs --mode=apply
+
+      - name: Roll back R20 renewability on failure
+        if: failure() && steps.gate.outputs.r20_apply == 'true'
+        env:
+          R20_RENEWABILITY_RESULT: ${{ runner.temp }}/b4-003-r20-renewability-rollback-result.json
+          R20_RENEWABILITY_ROLLBACK: ${{ runner.temp }}/b4-003-r20-renewability-rollback.private.json
+        run: |
+          if [ -f "$R20_RENEWABILITY_ROLLBACK" ]; then
+            node tools/gravicentra-i6-5-b4-003-r20-renewability-rule.mjs --mode=rollback || true
+          fi
+          echo "B4_003_R20_RENEWABILITY_APPLY_FAIL_CLOSED"
+
+      - name: Upload R20 renewability apply evidence
+        if: always() && steps.gate.outputs.r20_apply == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: b4-003-r20-renewability-apply-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-r20-renewability-apply.json
           if-no-files-found: error
           retention-days: 14
 

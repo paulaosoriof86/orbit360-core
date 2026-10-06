@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_RENEWABILITY_APPLY_AUTH_V1",
+  "recordedAt": "2026-10-06T20:38:00Z",
+  "status": "AUTHORIZED_PENDING_APPLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "ruleId": "PAULA_R20_RENEWABILITY_RULE_20261006",
+  "authority": "PAULA_EXPLICIT_R20_RULE_AND_APPLY_AFTER_DETERMINISTIC_DRY_RUN",
+  "dryRun": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_DRY_RUN_20261006.json",
+    "workflowRunId": 37527814893,
+    "artifactId": 11442568727,
+    "artifactDigest": "sha256:7ec0bc390eb1a45ac536aac6ed83ffc844c14069aede6b0096d116431606de86",
+    "sourceHead": "57fa6792f1969f80d5ed02ab677abab720a2f34e"
+  },
+  "policyUniverseDigest": "424d922ef052da7f2f82b61647dcb67f779cf62677497410c41281b43ad72810",
+  "clientUniverseDigest": "1426258a61412331895a61dd5e5710ccecd8ce73d7ae96c93e4d0dbe16ea7540",
+  "targetDigest": "39c5176188062691cc03c6deee908d383cb1f49bf5933a21f5116896f45c4111",
+  "exceptionDigest": "2793668c46585516c791cc6102cfa34792930b10974a5a8e02209556c2468e79",
+  "holdDigest": "b0d7b3d368d715b3ded376fc21770d19d0bfab8195f6c6c3efedc414549083ab",
+  "maxWrites": 1415,
+  "exactTargetIdsAuthority": "Bound dry-run artifact target array; apply must recompute and match all universe/target/exception digests before first write.",
+  "proposedDistribution": {
+    "YES": 1309,
+    "NO": 106,
+    "HOLD": 4,
+    "CONFLICT": 0
+  },
+  "invariants": {
+    "onlyFields": [
+      "renovable",
+      "renewabilityProvenance",
+      "renewabilityRuleId",
+      "renewabilityRuleVersion"
+    ],
+    "inserts": 0,
+    "deletes": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "knownQaHoldsUntouched": true,
+    "beforeAfterRequired": true,
+    "postWriteReadbackRequired": true,
+    "rollbackExactRequired": true
+  },
+  "nextAction": "B4_003_R20_RENEWABILITY_APPLY"
+}
