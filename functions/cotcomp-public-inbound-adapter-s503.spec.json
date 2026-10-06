@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "ays-cotcomp-s503-public-inbound-adapter-spec-v1.0",
+  "status": "SOURCE_ONLY",
+  "runtimeExport": false,
+  "runtimeWritesAllowed": false,
+  "production": false,
+  "tenantId": "alianzas-soluciones",
+  "source": "Web CotComp",
+  "input": {
+    "required": [
+      "country",
+      "needFamily",
+      "contact.name",
+      "contact.channel",
+      "consent.requestManagement"
+    ],
+    "contactChannelAnyOf": ["whatsapp", "email"],
+    "cotcompRefWhenPresent": [
+      "caseId",
+      "journeyId",
+      "correlationId"
+    ]
+  },
+  "serverOnly": {
+    "tenantResolution": "FIXED",
+    "advisorRouting": "COUNTRY_SCOPED_ACTIVE_ROSTER",
+    "requestId": "IDEMPOTENT",
+    "originAllowlist": true,
+    "requestProofRequired": true
+  },
+  "targetDomain": {
+    "operation": "create_business",
+    "channel": "Web CotComp",
+    "origin": "Web CotComp",
+    "stage": "nuevo"
+  },
+  "requiredReadback": [
+    "businessEntity",
+    "workflowRequestCommitted",
+    "workflowEvent",
+    "advisorId",
+    "notificationOutboxAdvisorTarget"
+  ],
+  "successCopyAllowedOnlyAfterReadback": [
+    "Tu solicitud fue registrada",
+    "A&S ya puede continuar tu caso"
+  ],
+  "fallback": [
+    "WhatsApp",
+    "Email"
+  ],
+  "nextGate": "LAB_SYNTHETIC_WRITE_ROLLBACK_WITH_ZERO_DUPLICATES"
+}
