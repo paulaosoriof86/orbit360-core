@@ -1,0 +1,16 @@
+{
+  "schema":"GRAVICENTRA_I6_5_B4_003_R20_RENEWAL_PIPELINE_CONTRACT_SIGNATURE_ROOTFIX_V1",
+  "recordedAt":"2026-10-06T15:27:00-06:00",
+  "status":"QA_CONTRACT_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "failedRunId":37533572695,
+  "failedJobId":112508747512,
+  "failureCode":"B4_003_R18_RENEWAL_DISPOSITION_CONTRACT_MISSING",
+  "priorContractBlobSha":"4ada51586550872baf4eb79dc26bc9ce5f791fdc",
+  "nextContractBlobSha":"37ff2b83db38dd07b49fcadec90f64723f821615",
+  "rootCause":"R20 owner uses const renewalPipelineCandidate arrow-function syntax; validator expected function declaration syntax.",
+  "productSourceChanged":false,
+  "dataMutation":false,
+  "reimport":false,
+  "livePromotion":false,
+  "nextAction":"RETRY_SAME_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
