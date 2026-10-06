@@ -275,6 +275,8 @@ const S506_OVERRIDE_SCRIPT=`
   function txt(id,fallback){const e=document.getElementById(id);return e&&e.textContent.trim()?e.textContent.trim():fallback;}
   function cc(){return /colombia/i.test(txt('selectedCountry','Guatemala'))?'CO':'GT';}
   function ctx(){return {country:txt('selectedCountry',cc()==='CO'?'Colombia':'Guatemala'),need:txt('selectedNeed','Cotización y comparación'),mode:txt('selectedMode','Con acompañamiento A&S')};}
+  function nf(){const t=ctx().need.toLowerCase();if(t.includes('vehículo')||t.includes('movilidad'))return 'vehicle';if(t.includes('hogar'))return 'home';if(t.includes('salud')||t.includes('médic'))return 'health';if(t.includes('vida')||t.includes('ingreso'))return 'life';if(t.includes('empresa'))return 'business';if(t.includes('transporte')||t.includes('carga'))return 'cargo';return 'other';}
+  function setRegisterStatus(id,state,msg){const el=document.querySelector('[data-s506-status="'+id+'"]');if(el){el.className='s506-register-status '+state;el.textContent=msg;}}
   function msg(){const x=ctx();return ['Hola, escribo desde Cotizar y comparar de A&S.','País: '+x.country,'Necesidad: '+x.need,'Modalidad: '+x.mode,'Quiero continuar con asesoría sin empezar de cero.'].join('\\n');}
   function open(kind){
     handoffKind=kind||'advisor';
@@ -305,6 +307,29 @@ const S506_OVERRIDE_SCRIPT=`
   window.addEventListener('click',e=>{
     const b=e.target.closest&&e.target.closest('button');if(!b)return;
     const label=b.textContent.trim();
+    if(b.hasAttribute('data-s506-register')){
+      const id=b.getAttribute('data-s506-register');
+      const consent=document.querySelector('[data-s506-consent="'+id+'"]');
+      if(!consent||!consent.checked||b.disabled)return;
+      e.preventDefault();e.stopImmediatePropagation();
+      b.disabled=true;b.setAttribute('aria-disabled','true');
+      setRegisterStatus(id,'is-wait','Registrando la solicitud de prueba y confirmando la recepción interna…');
+      fetch(window.location.href,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({synthetic:true,consent:true,country:cc(),needFamily:nf()})
+      }).then(async r=>{
+        const j=await r.json().catch(()=>({}));
+        if(!r.ok||j.integrationConfirmed!==true)throw new Error('REGISTER_FAILED');
+        setRegisterStatus(id,'is-ok','Integración confirmada: A&S recibió internamente la solicitud sintética y la evidencia de prueba fue limpiada automáticamente.');
+        if(id==='advisor'&&handoffKind==='decision'){close();showTerminal();}
+      }).catch(()=>{
+        setRegisterStatus(id,'is-error','No se pudo confirmar el registro interno. WhatsApp y correo continúan disponibles como alternativa.');
+      }).finally(()=>{
+        b.disabled=!consent.checked;b.setAttribute('aria-disabled',consent.checked?'false':'true');
+      });
+      return;
+    }
     if(b.classList.contains('cc-advisor')||label==='Hablar con un asesor'){e.preventDefault();e.stopImmediatePropagation();open('advisor');return;}
     if(b.id==='decisionBtn'||label.startsWith('Continuar con A&S')){e.preventDefault();e.stopImmediatePropagation();open('decision');return;}
   },true);
