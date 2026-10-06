@@ -1,0 +1,16 @@
+{
+  "schema":"GRAVICENTRA_I6_5_B4_003_R20_INLINE_RENEWABILITY_CONTRACT_ROOTFIX_V1",
+  "recordedAt":"2026-10-06T15:29:00-06:00",
+  "status":"QA_CONTRACT_FIXED_PENDING_EXACT_PREVIEW_RETRY",
+  "failedRunId":37533848273,
+  "failedJobId":112509676575,
+  "failureCode":"B4_003_R20_RENEWABILITY_INLINE_ACTION_MISSING",
+  "priorContractBlobSha":"37ff2b83db38dd07b49fcadec90f64723f821615",
+  "nextContractBlobSha":"1c9864a2b030099c262af60faa6c729d2bb94ebe",
+  "rootCause":"The product action is semantically correct but assembled by string concatenation, so the validator literal did not match the source text.",
+  "productSourceChanged":false,
+  "dataMutation":false,
+  "reimport":false,
+  "livePromotion":false,
+  "nextAction":"RETRY_SAME_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
