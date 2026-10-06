@@ -149,7 +149,25 @@ const CSS=`
 .s506-register-status.is-ok{display:block;background:#EEF8F1;border:1px solid #B8DEC2;color:#225D31}
 .s506-register-status.is-error{display:block;background:#FFF3F3;border:1px solid #E8BEBE;color:#842D2D}
 .s506-register-status.is-wait{display:block;background:#FFF8ED;border:1px solid #EAD8C5;color:#6A5639}
-@media(max-width:720px){.s506-demo-grid{grid-template-columns:1fr}}
+#s499Handoff,#s501Contact{display:none!important}
+.s506-contact-backdrop{position:fixed;inset:0;z-index:240;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(18,15,18,.76)}
+.s506-contact-backdrop.is-open{display:flex}
+.s506-contact{width:min(680px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:24px;padding:26px;box-shadow:0 34px 100px rgba(0,0,0,.34)}
+.s506-contact__mark{width:50px;height:50px;display:grid;place-items:center;border-radius:16px;background:#F6ECE6;font-size:24px}
+.s506-contact h3{font-family:'Archivo';font-size:27px;line-height:1.08;margin:13px 0 8px}
+.s506-contact>p{color:#61574F;line-height:1.5;margin:0 0 14px}
+.s506-context{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0}
+.s506-context div{border:1px solid #E8DED5;border-radius:12px;padding:10px;background:#FFFCF9}
+.s506-context small{display:block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#877B71}
+.s506-context strong{display:block;font-size:12px;margin-top:3px}
+.s506-channel-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.s506-channel{min-height:58px;border:1px solid #DDD3C8;border-radius:14px;background:#fff;padding:11px 13px;font-weight:800;text-align:left}
+.s506-channel small{display:block;font-weight:500;color:#74695F;font-size:10.5px;margin-top:2px}
+.s506-channel--primary{border-color:#E5002D;background:#FFF7F8}
+.s506-contact__footer{margin-top:14px;padding-top:14px;border-top:1px solid #EEE5DC}
+.s506-terminal-ack{display:none;margin:0 0 14px;border-radius:12px;padding:11px 13px;background:#EEF8F1;border:1px solid #B8DEC2;color:#225D31;font-size:12px;line-height:1.45}
+.s506-terminal-ack.is-visible{display:block}
+@media(max-width:720px){.s506-demo-grid,.s506-context,.s506-channel-grid{grid-template-columns:1fr}}
 `;
 
 function registrationCard(id){
