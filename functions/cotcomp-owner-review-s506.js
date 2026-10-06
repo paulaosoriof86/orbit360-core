@@ -265,6 +265,59 @@ const SCRIPT=`
 </script>
 `;
 
+const S506_OVERRIDE_SCRIPT=`
+<script>
+(()=>{
+  const modal=document.getElementById('s506Contact');
+  const CHANNELS={GT:{whatsapp:'50256149048',email:'info@aysseguros.com',label:'+502 5614 9048'},CO:{whatsapp:'573138340897',email:'info@aysseguros.com',label:'+57 313 834 0897'}};
+  let handoffKind='advisor';
+  function txt(id,fallback){const e=document.getElementById(id);return e&&e.textContent.trim()?e.textContent.trim():fallback;}
+  function cc(){return /colombia/i.test(txt('selectedCountry','Guatemala'))?'CO':'GT';}
+  function ctx(){return {country:txt('selectedCountry',cc()==='CO'?'Colombia':'Guatemala'),need:txt('selectedNeed','Cotización y comparación'),mode:txt('selectedMode','Con acompañamiento A&S')};}
+  function msg(){const x=ctx();return ['Hola, escribo desde Cotizar y comparar de A&S.','País: '+x.country,'Necesidad: '+x.need,'Modalidad: '+x.mode,'Quiero continuar con asesoría sin empezar de cero.'].join('\\n');}
+  function open(kind){
+    handoffKind=kind||'advisor';
+    const x=ctx(),ch=CHANNELS[cc()];
+    document.getElementById('s506Country').textContent=x.country;
+    document.getElementById('s506Need').textContent=x.need;
+    document.getElementById('s506Mode').textContent=x.mode;
+    document.getElementById('s506WaLabel').textContent=ch.label;
+    document.getElementById('s506ContactTitle').textContent=handoffKind==='decision'?'Continuar con A&S, conservando lo que ya revisaste':'Hablar con A&S sin empezar de cero';
+    modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');
+  }
+  function close(){modal.classList.remove('is-open');modal.setAttribute('aria-hidden','true');}
+  function showTerminal(){
+    const completion=document.getElementById('s500Completion');
+    if(!completion)return;
+    const stage4=document.querySelector('[data-stage-panel="4"]');
+    const replan=stage4&&stage4.querySelector('.cc-replan');
+    const actions=stage4&&stage4.querySelector('.cc-actions');
+    if(replan)replan.style.display='none';if(actions)actions.style.display='none';
+    completion.classList.add('is-visible');
+    const consent=document.querySelector('[data-s506-consent="terminal"]');if(consent)consent.checked=true;
+    const button=document.querySelector('[data-s506-register="terminal"]');if(button)button.disabled=false;
+    const status=document.querySelector('[data-s506-status="terminal"]');if(status){status.className='s506-register-status is-ok';status.textContent='Integración confirmada: A&S recibió internamente la solicitud sintética y la evidencia de prueba fue limpiada automáticamente.';}
+    const kicker=document.getElementById('stageKicker');if(kicker)kicker.textContent='SIGUIENTE PASO';
+    const heading=document.getElementById('stageHeading');if(heading)heading.textContent='Continúa con A&S sin perder el contexto';
+    completion.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  window.addEventListener('click',e=>{
+    const b=e.target.closest&&e.target.closest('button');if(!b)return;
+    const label=b.textContent.trim();
+    if(b.classList.contains('cc-advisor')||label==='Hablar con un asesor'){e.preventDefault();e.stopImmediatePropagation();open('advisor');return;}
+    if(b.id==='decisionBtn'||label.startsWith('Continuar con A&S')){e.preventDefault();e.stopImmediatePropagation();open('decision');return;}
+  },true);
+  document.getElementById('s506Close').addEventListener('click',close);
+  document.getElementById('s506WhatsApp').addEventListener('click',()=>{const ch=CHANNELS[cc()];window.open('https://wa.me/'+ch.whatsapp+'?text='+encodeURIComponent(msg()),'_blank','noopener');});
+  document.getElementById('s506Email').addEventListener('click',()=>{const ch=CHANNELS[cc()],x=ctx();window.location.href='mailto:'+ch.email+'?subject='+encodeURIComponent('Continuidad Cotizar y comparar A&S · '+x.country)+'&body='+encodeURIComponent(msg());});
+  modal.addEventListener('click',e=>{if(e.target===modal)close();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('is-open'))close();});
+  const advisorStatus=document.querySelector('[data-s506-status="advisor"]');
+  if(advisorStatus){new MutationObserver(()=>{if(handoffKind==='decision'&&advisorStatus.classList.contains('is-ok')){close();showTerminal();}}).observe(advisorStatus,{attributes:true,childList:true,subtree:true});}
+})();
+</script>
+`;
+
 function html(){
   let h=S501.html();
   h=h.replace('</style>',CSS+'</style>');
@@ -272,7 +325,7 @@ function html(){
     '<div class="s501-channel-grid">',
     registrationCard('advisor')+'<div class="s501-channel-grid">'
   );
-  h=h.replace('</body>','<template id="s506TerminalTemplate">'+registrationCard('terminal')+'</template>'+SCRIPT+'</body>');
+  h=h.replace('</body>',s506ModalHtml()+'<template id="s506TerminalTemplate">'+registrationCard('terminal')+'</template>'+SCRIPT+S506_OVERRIDE_SCRIPT+'</body>');
   h=h.replace('Owner Review S5.00','Owner Review S5.06');
   return h;
 }
