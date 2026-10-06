@@ -5,7 +5,7 @@ const { getFirestore } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
-const VERSION = 'orbit360-ops-advisor-inbox-v3-typed-collaboration-notices';
+const VERSION = 'orbit360-ops-advisor-inbox-v4-product-canonical-data-merge';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 
@@ -29,6 +29,9 @@ function legacyCollection(tenantId, collection) {
 }
 function canonicalCollection(tenantId, collection) {
   return db.collection('tenants').doc(tenantId).collection('workflow').doc(collection).collection('items');
+}
+function productCanonicalCollection(tenantId, collection) {
+  return db.collection('tenants').doc(tenantId).collection('data').doc(collection).collection('items');
 }
 function activeMember(member) {
   const status = norm(member && (member.status || member.estado));
@@ -105,15 +108,25 @@ async function getCollectionRows(ref, limit) {
   const snap = await ref.limit(limit).get();
   return snap.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
 }
+function mergeRows(productRows, compatibilityRows) {
+  const byId = new Map();
+  [].concat(compatibilityRows || []).forEach(row => { const id = text(row && row.id, 180); if (id) byId.set(id, row); });
+  [].concat(productRows || []).forEach(row => { const id = text(row && row.id, 180); if (id) byId.set(id, row); });
+  return Array.from(byId.values());
+}
 async function inbox(request) {
   const authz = await authorize(request);
   const mode = await storageMode(authz.tenantId);
   const limit = Math.min(500, Math.max(20, Number(request.data && request.data.limit) || 250));
-  const [managementRows, businessRows, noticesSnap] = await Promise.all([
+  const [productManagementRows, productBusinessRows, compatibilityManagementRows, compatibilityBusinessRows, noticesSnap] = await Promise.all([
+    getCollectionRows(productCanonicalCollection(authz.tenantId, 'gestiones'), limit),
+    getCollectionRows(productCanonicalCollection(authz.tenantId, 'negocios'), limit),
     getCollectionRows(refFor(mode, authz.tenantId, 'gestiones'), limit),
     getCollectionRows(refFor(mode, authz.tenantId, 'negocios'), limit),
     db.collection('tenants').doc(authz.tenantId).collection('notificationOutbox').orderBy('createdAt', 'desc').limit(limit).get()
   ]);
+  const managementRows = mergeRows(productManagementRows, compatibilityManagementRows);
+  const businessRows = mergeRows(productBusinessRows, compatibilityBusinessRows);
   const managements = managementRows.filter(row => visible(row, authz)).map(row => project(row, 'management'));
   const businesses = businessRows.filter(row => visible(row, authz)).map(row => project(row, 'business'));
   const allowed = new Set(allowedAdvisorIds(authz));
@@ -157,6 +170,8 @@ async function inbox(request) {
     scope: authz.scope,
     advisorId: authz.advisorId,
     storageMode: mode,
+    productCanonicalDataOwner: true,
+    compatibilityOwnerMerged: true,
     managements,
     businesses,
     notices,

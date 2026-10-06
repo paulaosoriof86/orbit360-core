@@ -1,4 +1,5 @@
 name: Gravicentra B4-003 R19 Exact Preview
+# R19 inbox product-canonical read-owner rootfix retrigger.
 # R19 mobile policy-search visibility rootfix retrigger.
 # R19 synthetic-child Preview-write retrigger after fail-closed lineage rootfix.
 # R19 taxonomy-preservation source-rootfix retrigger; product bridge bound in canonical composition.

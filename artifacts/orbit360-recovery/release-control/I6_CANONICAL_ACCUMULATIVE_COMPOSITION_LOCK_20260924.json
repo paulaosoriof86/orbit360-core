@@ -147,7 +147,7 @@
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
     "functions/document-drive-domain.js": "7b3f9de53bfbedda0879457873676d42d752b925",
     "functions/notification-outbox-processor.js": "47daa1425272f71bbc9ee1bf5968579b0099e75e",
-    "functions/ops-advisor-inbox.js": "bf726f39946b27d96f2439a4beee32baa1ce14cf",
+    "functions/ops-advisor-inbox.js": "0689aa1fd8957d121b9c019726b886028bd501bc",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
     "functions/package.json": "2b7183aac731ee4f3e0626baa8448000d94115a1",
@@ -3282,11 +3282,13 @@
     "productSourceChanged": true,
     "policyTaxonomyPreservationRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_POLICY_TAXONOMY_PRESERVATION_ROOTFIX_20261006.json",
     "policyBridgeBlobSha": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
-    "priorFailedRunId": 37434369280,
-    "priorFailedCode": "B4_003_R19_MOBILE_POLICY_SEARCH_NOT_REACHABLE",
+    "priorFailedRunId": 37481992830,
+    "priorFailedCode": "B4_003_R19_ADVISOR_NOTICE_MISSING",
     "syntheticChildPreviewWriteRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SYNTHETIC_CHILD_PREVIEW_WRITE_ROOTFIX_20261006.json",
     "storeOperationalBlobSha": "112891368bcf4f9c2dc7c94abdb7e7c1bebff32a",
     "policyMobileSearchVisibilityRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_POLICY_MOBILE_SEARCH_VISIBILITY_ROOTFIX_20261006.json",
-    "infraBlobSha": "a4bf022739db4786a5a1436c11760672ff3f87db"
+    "infraBlobSha": "a4bf022739db4786a5a1436c11760672ff3f87db",
+    "inboxProductCanonicalOwnerRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_INBOX_PRODUCT_CANONICAL_OWNER_ROOTFIX_20261006.json",
+    "opsAdvisorInboxBlobSha": "0689aa1fd8957d121b9c019726b886028bd501bc"
   }
 }
