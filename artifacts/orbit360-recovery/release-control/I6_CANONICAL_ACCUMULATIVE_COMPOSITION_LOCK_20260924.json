@@ -234,7 +234,7 @@
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
-    "orbit360-platform/styles/infra.css": "a7f72e59548cc64aaccbba1db37d8858b7a9db30",
+    "orbit360-platform/styles/infra.css": "a4bf022739db4786a5a1436c11760672ff3f87db",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "functions/assignable-advisor-roster.js": "88a7cc53f044ae6d86338e451cb56abfed4d4b6a",
@@ -3282,9 +3282,11 @@
     "productSourceChanged": true,
     "policyTaxonomyPreservationRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_POLICY_TAXONOMY_PRESERVATION_ROOTFIX_20261006.json",
     "policyBridgeBlobSha": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
-    "priorFailedRunId": 37410543153,
-    "priorFailedCode": "R19_RENEWABILITY_SYNTHETIC_BATCH_CHILDREN_NOT_PREVIEW_MARKED",
+    "priorFailedRunId": 37434369280,
+    "priorFailedCode": "B4_003_R19_MOBILE_POLICY_SEARCH_NOT_REACHABLE",
     "syntheticChildPreviewWriteRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SYNTHETIC_CHILD_PREVIEW_WRITE_ROOTFIX_20261006.json",
-    "storeOperationalBlobSha": "112891368bcf4f9c2dc7c94abdb7e7c1bebff32a"
+    "storeOperationalBlobSha": "112891368bcf4f9c2dc7c94abdb7e7c1bebff32a",
+    "policyMobileSearchVisibilityRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_POLICY_MOBILE_SEARCH_VISIBILITY_ROOTFIX_20261006.json",
+    "infraBlobSha": "a4bf022739db4786a5a1436c11760672ff3f87db"
   }
 }

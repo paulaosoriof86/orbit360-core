@@ -958,4 +958,7 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
  .quality-main-table .quality-actions{display:flex!important;grid-template-columns:1fr!important;flex-wrap:wrap;min-width:0}.quality-main-table .quality-actions:before{width:100%}
  .crm-filter-search{width:100%!important;max-width:none!important;margin:0 0 8px!important;position:sticky;top:0}
  .renewal-disposition-detail [data-renewal-disposition-policy]{grid-template-columns:1fr!important}
+ .page[data-polizas-kpi-ready="1"]{padding-top:58px}
+ .page[data-polizas-kpi-ready="1"] .tb-search{position:fixed!important;top:72px;left:14px;right:14px;width:auto!important;min-width:0!important;z-index:110;background:var(--card)!important;border:1px solid var(--line)!important;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+ .page[data-polizas-kpi-ready="1"] .tb-search input{width:100%!important;min-width:0!important}
 }
