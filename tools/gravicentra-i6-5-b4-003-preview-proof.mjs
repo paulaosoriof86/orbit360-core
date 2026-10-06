@@ -414,7 +414,9 @@ try{
    Orbit.importa.open=(kind,opts)=>{captures.push({kind,scope:opts&&opts.scope||{},documentIntent:opts&&opts.documentIntent||'',docCategory:opts&&opts.docCategory||''});};
    document.querySelector('#asg-ficha #af-imp-doc2')?.click();
    document.querySelector('#asg-ficha [data-tab="documentos"]')?.click();
-   hierarchy.technicalRegistrySecondary=!!document.querySelector('#asg-ficha [data-technical-registry="1"]');
+   const technicalRegistry=document.querySelector('#asg-ficha [data-technical-registry="1"]');
+   hierarchy.technicalRegistrySecondary=!!technicalRegistry&&!technicalRegistry.open;
+   if(technicalRegistry)technicalRegistry.open=true;
    document.querySelector('#asg-ficha #af-imp-doc')?.click();
    Orbit.importa.open=originalOpen;
    const registry=document.querySelector('#asg-ficha details[data-source-registry-row]');if(registry)registry.open=true;const registryDetail=registry?.querySelector('[data-source-registry-detail]');
@@ -439,6 +441,8 @@ try{
  });
  need(proof.r18InsurerActivity.hasUnified===true&&proof.r18InsurerActivity.documental>0,'B4_003_R18_INSURER_ACTIVITY_NOT_CONVERGED:'+JSON.stringify(proof.r18InsurerActivity));
  proof.assertions.insurerKnowledgeActivityConverged=true;
+ await page.click('#asg-ficha [data-tab="documentos"]');
+ await page.waitForSelector('#asg-ficha [data-technical-registry="1"]',{timeout:10000});
  await page.setViewportSize({width:390,height:844});
  proof.r18InsurerMobile=await page.evaluate(()=>{
    const body=document.querySelector('#asg-ficha #af-body'),details=body?.querySelector('.insurer-source-detail'),cards=Array.from(body?.querySelectorAll('.insurer-source-card,.insurer-knowledge-card')||[]);
