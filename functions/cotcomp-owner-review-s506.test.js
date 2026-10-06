@@ -42,3 +42,21 @@ test('S5.06 user success copy is conditional on integration confirmation',()=>{
   assert.match(h,/Integración confirmada: A&S recibió internamente la solicitud sintética/);
   assert.match(h,/No se pudo confirmar el registro interno/);
 });
+
+
+test('S5.06 visible advisor/decision modal contains synthetic registration and direct channels',()=>{
+  const h=s.html();
+  assert.match(h,/id="s506Contact"/);
+  assert.match(h,/id="s506ContactTitle"/);
+  assert.match(h,/data-s506-card="advisor"/);
+  assert.match(h,/data-s506-register="advisor"/);
+  assert.match(h,/id="s506WhatsApp"/);
+  assert.match(h,/id="s506Email"/);
+  assert.match(h,/window\.addEventListener\('click'/);
+  assert.match(h,/label\.startsWith\('Continuar con A&S'\)/);
+});
+
+test('S5.06 suppresses inherited hidden continuity modals from the Owner surface',()=>{
+  const h=s.html();
+  assert.match(h,/#s499Handoff,#s501Contact\{display:none!important\}/);
+});
