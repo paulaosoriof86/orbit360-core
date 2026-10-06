@@ -21,6 +21,7 @@ const ids={
  renewalPolicy:'b4003qa_policy_renew_'+run,
  expiredRenewPolicy:'b4003qa_policy_expired_renew_'+run,
  unknownRenewPolicy:'b4003qa_policy_unknown_'+run,
+ renewabilityWritePolicy:'b4003qa_policy_renewwrite_'+run,
  cancelPolicy:'b4003qa_policy_cancel_'+run,
  healthPolicy:'b4003qa_policy_health_'+run,
  healthReceipt1:'b4003qa_receipt_health_1_'+run,
@@ -81,6 +82,7 @@ async function seed(who,advisorIdOverride){
  await ref('polizas',ids.renewalPolicy).set({...common,id:ids.renewalPolicy,clienteId:ids.client,asesorId:advisorIdOverride||who.advisorId||'qa',numero:'B4-003-REN-'+run,estado:'Vigente',renovable:true,pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:1000,primaNeta:900},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.expiredRenewPolicy).set({...common,id:ids.expiredRenewPolicy,clienteId:ids.client,asesorId:advisorIdOverride||who.advisorId||'qa',numero:'B4-003-EXP-'+run,estado:'Vencida',renovable:true,pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:expiredStartS,vigenciaFin:expiredEndS,prima:750,primaNeta:680},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.unknownRenewPolicy).set({...common,id:ids.unknownRenewPolicy,clienteId:ids.client,asesorId:advisorIdOverride||who.advisorId||'qa',numero:'B4-003-UNKNOWN-'+run,estado:'Vigente',pais:'GT',moneda:'GTQ',ramo:'ACCIDENTES QA FUENTE',producto:'PRODUCTO QA FUENTE',subramo:'PRODUCTO QA FUENTE',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:650,primaNeta:600},{merge:false});proof.syntheticWrites++;
+ await ref('polizas',ids.renewabilityWritePolicy).set({...common,id:ids.renewabilityWritePolicy,clienteId:ids.client,asesorId:advisorIdOverride||who.advisorId||'qa',numero:'B4-003-RENEWWRITE-'+run,estado:'Vigente',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',subramo:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:660,primaNeta:610},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.cancelPolicy).set({...common,id:ids.cancelPolicy,clienteId:ids.client,asesorId:advisorIdOverride||who.advisorId||'qa',numero:'B4-003-CAN-'+run,estado:'Cancelada',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'Auto',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:800,primaNeta:700},{merge:false});proof.syntheticWrites++;
  await ref('polizas',ids.healthPolicy).set({...common,id:ids.healthPolicy,clienteId:ids.client,asesorId:advisorIdOverride||who.advisorId||'qa',numero:'B4-003-HEALTH-'+run,estado:'Vigente',renovable:false,pais:'GT',moneda:'GTQ',ramo:'Accidentes',producto:'Accidentes',aseguradoraId:'',vigenciaInicio:startS,vigenciaFin:endS,prima:407.01,primaTotal:407.01,primaNeta:346.09,cuotas:2},{merge:false});proof.syntheticWrites++;
  await ref('recibosEsperados',ids.healthReceipt1).set({...common,id:ids.healthReceipt1,clienteId:ids.client,polizaId:ids.healthPolicy,asesorId:advisorIdOverride||who.advisorId||'qa',pais:'GT',moneda:'GTQ',cuota:'1 / 2',serie:'1 / 2',fechaLimite:startS,primaTotal:271.34,montoTotal:271.34,monto:271.34,estado:'Pendiente'},{merge:false});proof.syntheticWrites++;
@@ -247,7 +249,7 @@ async function cancellationEvidence(){
  proof.assertions.cancellationProjectionConsistent=(cancelled.length===0);
 }
 async function cleanup(startMs){
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['negocios',ids.collabBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['recibosEsperados',ids.healthReceiptShadow],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]]){
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['negocios',ids.collabBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['recibosEsperados',ids.healthReceiptShadow],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.renewabilityWritePolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]]){
   const r=ref(c,id);if((await r.get()).exists){await r.delete();proof.cleanupWrites++;}
  }
  for(const col of ['workflowEvents','operationalEvents']){
@@ -735,15 +737,18 @@ try{
  proof.r17RenewabilityFocusedEditor=await page.evaluate(()=>{const el=document.querySelector('#policy-v1199 [data-renewable]');return{value:String(el?.value||''),focused:document.activeElement===el,options:Array.from(el?.options||[]).map(o=>o.textContent.trim())};});
  need(proof.r17RenewabilityFocusedEditor.value===''&&proof.r17RenewabilityFocusedEditor.focused===true&&['Pendiente de validar','Renovable','No renovable'].every(x=>proof.r17RenewabilityFocusedEditor.options.includes(x)),'B4_003_R17_RENEWABILITY_EDITOR_NOT_FOCUSED_TRI_STATE:'+JSON.stringify(proof.r17RenewabilityFocusedEditor));
  proof.assertions.renewabilityReviewWorkflowActionable=true;proof.assertions.renewabilityReviewOpensFocusedTriState=true;
+ await page.evaluate(()=>document.getElementById('policy-v1199')?.remove());
+ await page.evaluate(id=>Orbit.modules.cliente360.editarPoliza(id,'renovabilidad'),ids.renewabilityWritePolicy);
+ await page.waitForSelector('#policy-v1199 [data-renewable]',{timeout:10000});
  await page.selectOption('#policy-v1199 [data-renewable]',{label:'Renovable'});
  await page.fill('#policy-v1199 [data-reason]','B4-003 R19 persistencia sintética de renovabilidad');
  await page.click('#policy-v1199 [data-save]');
  await page.waitForFunction(()=>!document.getElementById('policy-v1199'),null,{timeout:30000});
- const renewabilityBackend=(await ref('polizas',ids.unknownRenewPolicy).get()).data()||{};
+ const renewabilityBackend=(await ref('polizas',ids.renewabilityWritePolicy).get()).data()||{};
  need(renewabilityBackend.renovable===true,'B4_003_R19_RENEWABILITY_SERVER_COMMIT_MISSING');
  await page.reload({waitUntil:'domcontentloaded',timeout:60000});await bootProduct(page,token);
- await page.waitForFunction(id=>Orbit.store?.get('polizas',id)?.renovable===true,ids.unknownRenewPolicy,{timeout:30000});
- proof.r19RenewabilityDurable={serverValue:renewabilityBackend.renovable,reloadValue:await page.evaluate(id=>Orbit.store.get('polizas',id)?.renovable,ids.unknownRenewPolicy)};
+ await page.waitForFunction(id=>Orbit.store?.get('polizas',id)?.renovable===true,ids.renewabilityWritePolicy,{timeout:30000});
+ proof.r19RenewabilityDurable={policyId:ids.renewabilityWritePolicy,serverValue:renewabilityBackend.renovable,reloadValue:await page.evaluate(id=>Orbit.store.get('polizas',id)?.renovable,ids.renewabilityWritePolicy)};
  proof.assertions.renewabilitySyntheticServerCommitReload=true;
 
 
@@ -1195,7 +1200,7 @@ try{
  if(browser)await browser.close().catch(()=>{});
  await cleanup(startMs).catch(e=>proof.cleanupError=clean(e&&e.message||e));
  const checks=[];
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['negocios',ids.collabBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['recibosEsperados',ids.healthReceiptShadow],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['negocios',ids.collabBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['recibosEsperados',ids.healthReceiptShadow],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.renewabilityWritePolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
  proof.syntheticFinalAbsent=checks.every(x=>x===false);
  proof.assertions.cleanupComplete=proof.syntheticFinalAbsent;
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
