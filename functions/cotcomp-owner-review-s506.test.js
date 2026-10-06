@@ -60,3 +60,23 @@ test('S5.06 suppresses inherited hidden continuity modals from the Owner surface
   const h=s.html();
   assert.match(h,/#s499Handoff,#s501Contact\{display:none!important\}/);
 });
+
+
+test('S5.06 consent gate is explicit in rendered HTML',()=>{
+  const h=s.html();
+  assert.match(h,/data-s506-register="advisor" disabled="disabled" aria-disabled="true"/);
+  assert.match(h,/data-s506-consent="advisor"/);
+  assert.match(h,/data-s506-register="terminal" disabled="disabled" aria-disabled="true"/);
+});
+
+test('S5.06 visible modal and terminal expose success/error states and direct channels',()=>{
+  const h=s.html();
+  assert.match(h,/id="s506Contact"/);
+  assert.match(h,/Persona de prueba A&S/);
+  assert.match(h,/synthetic@example\.invalid/);
+  assert.match(h,/Integración confirmada: A&S recibió internamente la solicitud sintética/);
+  assert.match(h,/No se pudo confirmar el registro interno/);
+  assert.match(h,/Continuar por WhatsApp/);
+  assert.match(h,/Continuar por correo/);
+  assert.match(h,/showTerminal/);
+});
