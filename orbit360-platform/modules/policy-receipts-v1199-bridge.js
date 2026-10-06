@@ -192,12 +192,16 @@ Orbit.modules = Orbit.modules || {};
       insurerEl.innerHTML = linkedInsurers(country2).map(a => `<option value="${esc(a.id)}">${esc(a.nombre)}</option>`).join('');
       ramoEl.innerHTML = ramos(country2).map(x => `<option>${esc(x)}</option>`).join(''); refreshProducts('');
     }
-    function refreshProducts(preferred) {
+    function refreshProducts(preferred, preserveSourceValue) {
       const current = preferred != null ? String(preferred) : String(productEl.value || '');
       const options = subramos(client().pais, ramoEl.value).slice();
-      const validCurrent=current&&options.includes(current)?current:'';
       productEl.innerHTML = '<option value="">— Seleccionar producto —</option>'+options.map(x => `<option>${esc(x)}</option>`).join('');
-      productEl.value=validCurrent;
+      if (preserveSourceValue === true && current && !options.includes(current)) {
+        productEl.insertAdjacentHTML('beforeend','<option data-source-taxonomy="preserved" value="'+esc(current)+'">'+esc(current)+'</option>');
+        productEl.value=current;
+      } else {
+        productEl.value=current&&options.includes(current)?current:'';
+      }
       $('[data-vehicle]').style.display = /auto|veh/i.test(ramoEl.value) ? '' : 'none'; preview();
     }
     function syncInstallments() {
@@ -236,7 +240,7 @@ Orbit.modules = Orbit.modules || {};
       preview.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><small class="muted">Resultado antes de guardar</small><b style="display:block">${active ? recs.length + ' recibo(s) en cartera' : 'Histórico · sin cartera nueva'}</b></div><b>${money(prepared.moneda, prepared.primaTotal)}</b></div><div class="asg197-info-grid" style="margin-top:10px"><div><small>Prima neta</small><b>${money(prepared.moneda, prepared.primaNeta)}</b></div><div><small>Gastos financieros</small><b>${money(prepared.moneda, prepared.gastosFinan)}</b></div><div><small>IVA</small><b>${money(prepared.moneda, prepared.ivaMonto)}</b></div><div><small>Total</small><b>${money(prepared.moneda, prepared.primaTotal)}</b></div></div>`;
       if(active&&recs.length)preview.insertAdjacentHTML('beforeend','<div style="margin-top:12px"><div style="font-weight:800;font-size:14px;margin-bottom:7px">🧾 Calendario que quedará guardado</div><div style="max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:10px"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Monto</th></tr></thead><tbody>'+recs.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.fechaLimite||r.vence||r.fechaVencimiento||'—')+'</td><td class="num">'+esc(money(prepared.moneda,r.montoTotal!=null?r.montoTotal:r.monto))+'</td></tr>').join('')+'</tbody></table></div></div>');
     }
-    clientEl.addEventListener('change', () => { if (!existing && advisorEl) { const own = client().asesorId; if (own && advisors.some(a => a.id === own)) advisorEl.value = own; } refreshCountry(); }); ramoEl.addEventListener('change', refreshProducts);
+    clientEl.addEventListener('change', () => { if (!existing && advisorEl) { const own = client().asesorId; if (own && advisors.some(a => a.id === own)) advisorEl.value = own; } refreshCountry(); }); ramoEl.addEventListener('change', () => refreshProducts('', false));
     $('[data-start]').addEventListener('change', () => { if (!$('[data-end]').value) $('[data-end]').value = plusYear($('[data-start]').value); preview(); });
     $('[data-frequency]').addEventListener('change', syncInstallments);
     b.querySelectorAll('input,select').forEach(el => el.addEventListener('input', preview));
@@ -273,7 +277,7 @@ Orbit.modules = Orbit.modules || {};
         save.disabled = false; save.textContent = originalText;
       }
     });
-    refreshProducts(initialProduct); syncInstallments(); preview();
+    refreshProducts(initialProduct, true); syncInstallments(); preview();
   }
 
   function openVehicleForm(vehicleId) {

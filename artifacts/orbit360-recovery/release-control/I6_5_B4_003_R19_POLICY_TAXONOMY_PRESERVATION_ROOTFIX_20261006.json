@@ -1,0 +1,28 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R19_POLICY_TAXONOMY_PRESERVATION_ROOTFIX_V1",
+  "recordedAt": "2026-10-06T03:44:00Z",
+  "status": "SOURCE_ROOTFIX_APPLIED_PENDING_EXACT_PREVIEW_RETRY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "2096212c7dfac61218d8f3dfa3da4aa78601079f",
+  "failedRunId": 37409990322,
+  "failedCode": "B4_003_POLICY_EDITOR_PRODUCT_SOURCE_VALUE_REPLACED",
+  "classification": "R19_DEPENDENCY_FIX_OVERREACHED_INITIAL_SOURCE_TAXONOMY",
+  "rootCause": "The R19 downstream-clearing logic treated initial editor hydration the same as a user Ramo change, clearing a valid source product that is absent from the current catalog.",
+  "fix": "Preserve unknown source Producto only during initial edit hydration; clear incompatible Producto on subsequent Ramo changes.",
+  "productPath": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+  "priorBlobSha": "20de0a6a4beeb83e8bf696986f5d8482a3972674",
+  "newBlobSha": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
+  "compositionPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+  "priorCompositionBlobSha": "e1ccb9245cd64462693a662b2e4ad5467bdce88d",
+  "newCompositionBlobSha": "36b4af5fd77f9e96395b376fc4f172bc1a14a3c8",
+  "boundaries": {
+    "businessWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
+    "b4004Held": true
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW"
+}
