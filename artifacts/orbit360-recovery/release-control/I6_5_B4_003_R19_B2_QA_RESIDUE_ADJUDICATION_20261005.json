@@ -1,0 +1,85 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_B2_QA_RESIDUE_ADJUDICATION_V1",
+  "recordedAt": "2026-10-06T15:26:18.123Z",
+  "status": "NOT_DELETED_FAIL_CLOSED",
+  "authority": {
+    "status": "CONDITIONAL_FAIL_CLOSED_NO_DELETE",
+    "exactPolicyIds": [
+      "pol_mulsmxsk",
+      "pol_mulssmuz",
+      "pol_mulsxofx"
+    ],
+    "proofClassification": "AMBIGUOUS_FAIL_CLOSED",
+    "prerequisiteSatisfied": false,
+    "operationalBusinessWrite": false
+  },
+  "before": [
+    {
+      "id": "pol_mulsmxsk",
+      "exists": true,
+      "numero": "B2-REN-36489784713",
+      "renuevaDe": "b2-r9195-policy-36489784713",
+      "dependentTotal": 4,
+      "dependents": {
+        "gestiones": 0,
+        "recibosEsperados": 2,
+        "carteraPrimas": 2,
+        "cobros": 0,
+        "vehiculos": 0,
+        "cancelaciones": 0
+      }
+    },
+    {
+      "id": "pol_mulssmuz",
+      "exists": true,
+      "numero": "B2-REN-36490245512",
+      "renuevaDe": "b2-r9195-policy-36490245512",
+      "dependentTotal": 4,
+      "dependents": {
+        "gestiones": 0,
+        "recibosEsperados": 2,
+        "carteraPrimas": 2,
+        "cobros": 0,
+        "vehiculos": 0,
+        "cancelaciones": 0
+      }
+    },
+    {
+      "id": "pol_mulsxofx",
+      "exists": true,
+      "numero": "B2-REN-36490640789",
+      "renuevaDe": "b2-r9195-policy-36490640789",
+      "dependentTotal": 4,
+      "dependents": {
+        "gestiones": 0,
+        "recibosEsperados": 2,
+        "carteraPrimas": 2,
+        "cobros": 0,
+        "vehiculos": 0,
+        "cancelaciones": 0
+      }
+    }
+  ],
+  "after": [
+    {
+      "id": "pol_mulsmxsk",
+      "exists": true,
+      "deleted": false
+    },
+    {
+      "id": "pol_mulssmuz",
+      "exists": true,
+      "deleted": false
+    },
+    {
+      "id": "pol_mulsxofx",
+      "exists": true,
+      "deleted": false
+    }
+  ],
+  "deletedCount": 0,
+  "dependentTotal": 12,
+  "realOperationalRowsDeleted": 0,
+  "reimport": false,
+  "live": false
+}
