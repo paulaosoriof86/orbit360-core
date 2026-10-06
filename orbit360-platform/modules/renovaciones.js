@@ -45,6 +45,15 @@ Orbit.modules.renovaciones = (function () {
     const state=policyState(p),d=U.daysFromNow(p.vigenciaFin);
     return d!=null && d<=90 && ['vigente','porrenovar','vencida'].includes(state);
   };
+  /* R20: el Kanban aprobado es la superficie primaria. Una renovabilidad
+     pendiente no puede sacar la póliza del bucket de fecha; NO explícito y
+     outcomes terminales sí quedan fuera. */
+  const renewalPipelineCandidate = p => {
+    if(!p || renewabilityState(p)==='NO' || !selectedCountry(p) || terminalRenewalOutcome(p)) return false;
+    const state=policyState(p),d=U.daysFromNow(p.vigenciaFin);
+    if(d==null) return false;
+    return d<0 ? ['vigente','porrenovar','vencida'].includes(state) : ['vigente','porrenovar'].includes(state);
+  };
   const renewalDate45Universe = p => {
     if(!p || !selectedCountry(p)) return false;
     const state=policyState(p),d=U.daysFromNow(p.vigenciaFin);
@@ -68,7 +77,7 @@ Orbit.modules.renovaciones = (function () {
       { key: 'd45', label: 'Próximas (16–45 d)', tone: 'warn', test: d => d > 15 && d <= 45 },
       { key: 'd90', label: 'En el horizonte (46–90 d)', tone: 'info', test: d => d > 45 && d <= 90 }
     ];
-    const pols = S().where('polizas', renewalActionable);
+    const pols = S().where('polizas', renewalPipelineCandidate);
     cols.forEach(c => c.items = []);
     pols.forEach(p => {
       const d = U.daysFromNow(p.vigenciaFin);
@@ -102,9 +111,7 @@ Orbit.modules.renovaciones = (function () {
         { label: '16–45 días', val: cols[2].items.length, color: 'var(--warn)', foot: 'planificar', onclick: "location.hash='#/renovaciones'" },
         { label: 'Prima en juego', val: U.moneyShort(totalPrima, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
-      <div class="cfg-note renewal-disposition-summary" data-renewal-date45-total="${disposition45.total}" data-renewal-date45-actionable="${disposition45.actionable}" data-renewal-date45-pending="${disposition45.pending}" data-renewal-date45-terminal="${disposition45.terminal}" data-renewal-date45-nonrenewable="${disposition45.nonrenewable}" data-renewal-date45-conflict="${disposition45.conflict}" data-renewal-date45-reconciled="${disposition45.reconciled?'true':'false'}" style="margin:0 0 14px"><b>Disposición de las pólizas que vencen en ≤45 días: ${disposition45.total}</b><div class="muted" style="margin-top:5px">${disposition45.actionable} en gestión · ${disposition45.pending} pendientes de clasificar · ${disposition45.terminal} con resultado de renovación · ${disposition45.nonrenewable} no renovables${disposition45.conflict?' · '+disposition45.conflict+' con conflicto explícito':''}. <b>${disposition45.reconciled?'Universo reconciliado.':'Requiere conciliación: hay pólizas sin disposición.'}</b></div></div>
-      <details class="card pad renewal-disposition-detail" data-renewal-disposition-detail="1" style="margin:0 0 14px"><summary style="cursor:pointer;font-weight:700">Trazabilidad individual del universo ≤45 días · ${dispositionRows45.length}</summary><div style="display:grid;gap:7px;margin-top:10px">${dispositionRows45.map(({p,disposition,days})=>`<div data-renewal-disposition-policy="${U.esc(p.id)}" data-renewal-disposition="${U.esc(disposition)}" style="display:grid;grid-template-columns:minmax(120px,1fr) minmax(100px,.7fr) minmax(170px,1fr);gap:8px;align-items:center;border-bottom:1px solid var(--line-2);padding:7px 0"><button class="btn ghost sm" style="justify-self:start" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')">${U.esc(p.numero||p.id)}</button><span class="muted">${days==null?'Sin fecha':days+' d'}</span><span class="badge ${disposition==='En gestión'?'ok':disposition==='Pendiente de clasificar'?'warn':'neutral'}">${U.esc(disposition)}</span></div>`).join('')||'<div class="muted">Sin pólizas en este universo.</div>'}</div></details>
-      <div class="cfg-note" data-renewability-pending-count="${pendingValidation.length}" data-renewability-review-workflow="1" style="margin:0 0 14px"><b>Renovabilidad pendiente de revisión/conciliación: ${pendingValidation.length}</b><div class="muted" style="margin-top:5px">Ninguna póliza pendiente desaparece del control: las vigentes, por renovar o vencidas sin evidencia concluyente permanecen aquí hasta clasificarse. <b>Revisar y clasificar</b> abre directamente Renovabilidad en la póliza exacta. Marca <b>Renovable</b> o <b>No renovable</b> solo cuando la fuente lo respalde; si no hay evidencia suficiente, conserva <b>Pendiente de validar</b>.</div>${pendingValidation.slice(0,12).map(p=>`<button class="btn ghost sm" data-renewability-review="${U.esc(p.id)}" style="margin:7px 4px 0 0" onclick="Orbit.modules.cliente360.editarPoliza('${p.id}','renovabilidad')">Revisar y clasificar ${U.esc(p.numero||p.id)}</button>`).join('')}</div>
+      <div class="cfg-note renewal-pipeline-note" data-renewability-pending-count="${pendingValidation.length}" style="margin:0 0 14px"><b>Pipeline de renovación por fecha</b><div class="muted" style="margin-top:5px">Cada póliza permanece en su columna por vigencia. Las que todavía requieren validar renovabilidad se identifican en su propia tarjeta y se corrigen desde allí.</div></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:start">
         ${cols.map(c => `<div class="card" data-renewal-bucket="${c.key}" data-renewal-bucket-count="${c.items.length}" style="overflow:hidden">
           <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;border-top:3px solid ${toneBg[c.tone]}">
@@ -122,13 +129,19 @@ Orbit.modules.renovaciones = (function () {
                     <b style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(cli ? cli.nombre : '—')}</b>
                     <span class="mono" style="font-size:10.5px;color:${d < 0 ? 'var(--danger)' : 'var(--ink-3)'};white-space:nowrap">${d < 0 ? (-d) + 'd vencida' : d + 'd'}</span>
                   </div>
-                  <div class="muted" style="font-size:11.5px;margin-top:4px">${p.ramo} · ${p.producto}</div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">
-                    <span style="display:flex;align-items:center;gap:5px;font-size:11px"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${U.esc(asg ? asg.nombre : '')}</span>
-                    <span class="mono" style="font-size:11px;font-weight:600">${premiumValue(p)==null?'<span class="badge warn">Prima pendiente de fuente</span>':U.moneyShort(premiumValue(p),p.moneda)}</span>
+                  <div class="mono" style="font-size:10.5px;margin-top:4px;color:var(--ink-3)">Póliza ${U.esc(p.numero||'—')}</div>
+                  <div class="muted" style="font-size:11.5px;margin-top:4px">${U.esc(p.ramo||'—')} · ${U.esc(p.producto||'—')}</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px;gap:8px">
+                    <span style="display:flex;align-items:center;gap:5px;font-size:11px;min-width:0"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${U.esc(asg ? asg.nombre : '—')}</span></span>
+                    <span class="mono" style="font-size:11px;font-weight:600;white-space:nowrap">${premiumValue(p)==null?'<span class="badge warn">Prima pendiente de fuente</span>':U.moneyShort(premiumValue(p),p.moneda)}</span>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
+                    <span class="badge neutral">${U.esc(p.estado||'Estado pendiente')}</span>
+                    ${renewabilityState(p)==='UNKNOWN'?'<span class="badge warn">Renovabilidad pendiente</span>':'<span class="badge ok">Renovable</span>'}
                   </div>
                 </div>
-                <div style="display:flex;gap:6px;margin-top:2px">
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+                  ${renewabilityState(p)==='UNKNOWN'?'<button class="btn ghost sm" data-renewability-review="'+U.esc(p.id)+'" style="flex:1" onclick="event.stopPropagation();Orbit.modules.cliente360.editarPoliza(\''+p.id+'\',\'renovabilidad\')">Revisar renovabilidad</button>':''}
                   <a href="https://wa.me/${wa}?text=${waTxt}" target="_blank" rel="noopener" class="reno-wa" style="flex:1" onclick="event.stopPropagation()">💬 WhatsApp</a>
                   <button class="btn ghost sm" style="flex:1" onclick="event.stopPropagation();Orbit.modules.renovaciones.solicitarPropuestas('${p.id}')">📋 Propuestas</button>
                 </div>

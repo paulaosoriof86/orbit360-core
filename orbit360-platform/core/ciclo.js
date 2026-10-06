@@ -77,21 +77,36 @@ Orbit.ciclo = (function () {
   }
   const COLLAB_TYPES=['Comentario comercial','Observación operativa','Solicitar información al asesor','Respuesta del asesor','Devuelto a asesor','Reenviado a Operaciones','Nota interna'];
   async function assignableAdvisors(country){if(!Orbit.assignableAdvisorRoster?.list)return[];try{return await Orbit.assignableAdvisorRoster.list(country);}catch(e){return[];}}
-  function rolFiltro(asesorId) {
-    if (Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor()) return asesorId === Orbit.session.asesorId();
+  function membershipProjection(){try{return Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.productReadOnly===true?Orbit.auth.productUser:null;}catch(e){return null;}}
+  function advisorIdentity(){try{return Orbit.session&&Orbit.session.asesorId?String(Orbit.session.asesorId()||'').trim():'';}catch(e){return'';}}
+  function normalizedScope(value){value=String(value==null?'':value).trim().toLowerCase();if(['own','propios','propio'].includes(value))return'own';if(['team','equipo'].includes(value))return'team';if(['none','ninguno'].includes(value))return'none';if(['all','todos'].includes(value))return'all';return'';}
+  function surfaceScope(surface){
+    const p=membershipProjection(),scopes=p&&p.dataScopes||{},own=advisorIdentity();
+    if(surface==='leads')return own?'own':(normalizedScope(scopes.leads||scopes.commercial||scopes.default)||'all');
+    return normalizedScope(scopes.ops||scopes.workflow||scopes.gestiones||scopes.default)||(own?'own':'all');
+  }
+  function scopeAllows(asesorId,surface){
+    const scope=surfaceScope(surface),own=advisorIdentity(),target=String(asesorId||'').trim();
+    if(scope==='none')return false;
+    if(scope==='own')return!!own&&target===own;
+    if(scope==='team'){
+      const p=membershipProjection(),ids=[own].concat(p&&p.teamAdvisorIds||[],p&&p.asesoresEquipo||[]).filter(Boolean).map(String);
+      return ids.includes(target);
+    }
     return true;
   }
   function negocios(opts) {
-    opts = opts || {};
+    opts = opts || {};const surface=opts.surface||'ops';
     return S().all('negocios').filter(n =>
       (opts.incArchivado ? true : !n.archivado) &&
       paisOK(n.pais) &&
-      (opts.ignoreRol ? true : rolFiltro(n.asesorId)));
+      (opts.ignoreRol ? true : scopeAllows(n.asesorId,surface)));
   }
-  function gestiones() {
+  function gestiones(opts) {
+    opts=opts||{};const surface=opts.surface||'ops';
     return S().all('gestiones').filter(g => !g.archivado &&
       (() => { const c = S().get('clientes', g.clienteId); return !c || paisOK(c.pais); })() &&
-      rolFiltro(g.asesorId));
+      scopeAllows(g.asesorId,surface));
   }
   function primaShort(n) { return U.moneyShort(n.primaEst, n.moneda); }
   function flag(pais) { return pais === 'GT' ? '🇬🇹' : pais === 'CO' ? '🇨🇴' : '🌎'; }
@@ -180,17 +195,17 @@ Orbit.ciclo = (function () {
 
   /* ===================== tableros ===================== */
   function opsBoard() {
-    const ng = negocios();
+    const ng = negocios({surface:'ops'});
     return opsListas().map(L => {
       let items;
       if (L.kind === 'negocio') items = ng.filter(n => n.etapa === L.etapa).map(n => ({ kind: 'negocio', rec: n }));
-      else items = gestiones().filter(g => g.lista === L.nombre).map(g => ({ kind: 'gestion', rec: g }));
+      else items = gestiones({surface:'ops'}).filter(g => g.lista === L.nombre).map(g => ({ kind: 'gestion', rec: g }));
       return { def: L, items };
     });
   }
   function leadsBoard() {
-    const ng = negocios();
-    const lists = leadsListas();
+    const ng = negocios({surface:'leads'});
+    const lists = leadsListas()
     const customIds = lists.filter(l => l.custom).map(l => l.id);
     return lists.map(L => {
       let items;
@@ -200,10 +215,10 @@ Orbit.ciclo = (function () {
     });
   }
   function metricasLeads() {
-    const ng = negocios().filter(n => n.etapa !== 'perdido');
+    const ng = negocios({surface:'leads'}).filter(n => n.etapa !== 'perdido');
     const tot = ng.reduce((s, n) => s + q.norm(n.primaEst, n.moneda), 0);
     const pond = ng.reduce((s, n) => { const prob = U.finiteNumber(n.prob); return s + q.norm(n.primaEst, n.moneda) * (prob == null ? 0 : prob) / 100; }, 0);
-    const ganados = negocios({ incArchivado: true }).filter(n => n.etapa === 'emitido').length;
+    const ganados = negocios({ incArchivado: true, surface:'leads' }).filter(n => n.etapa === 'emitido').length;
     return { activos: ng.length, tot, pond, ganados };
   }
 
@@ -214,7 +229,8 @@ Orbit.ciclo = (function () {
     const d = U.daysFromNow(n.proximoToque), prob = U.finiteNumber(n.prob);
     const done = (n.checklist || []).filter(c => c.done).length, tot = (n.checklist || []).length;
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[n.prioridad] || 'neutral';
-    const espejo = opts.espejo;
+    const espejo = opts.espejo,comments=[].concat(n.comentarios||[]),lastCollab=comments.length?comments[comments.length-1]:null;
+    const collabDirection=lastCollab&&lastCollab.direction||'',collabLabel=collabDirection==='advisor'?'Esperando asesor':collabDirection==='operations'?'Esperando Operaciones':'';
     return `<div class="kcard ${espejo ? 'kcard-espejo' : ''}" data-neg="${n.id}">
       <div class="kcard-top">
         <span class="badge ${pr}">${U.esc(U.text(n.prioridad, 'Sin prioridad'))}</span>
@@ -223,6 +239,7 @@ Orbit.ciclo = (function () {
         ${opts.board === 'ops' && n.origen ? `<span class="badge info" title="Ingreso por ${n.origen}">${n.origen === 'Leads' ? '🎯' : n.origen === 'Solicitud del cliente' ? '🙋' : '🗂'} ${U.esc(U.text(n.origen, 'Sin origen'))}</span>` : ''}
         ${espejo ? `<span class="kmirror" title="Gestión operativa en curso por el equipo">🔗 en Ops</span>` : ''}
         ${n.cadenciaActiva ? `<span class="badge ok" title="Cadencia automática activa">🔁</span>` : ''}
+        ${collabLabel ? `<span class="badge info" data-collab-state="${U.esc(collabDirection)}">↔ ${U.esc(collabLabel)}</span>` : ''}
       </div>
       <div class="kcard-t">${U.esc(n.nombre)}</div>
       <div class="kcard-cli">${U.esc(n.producto)} · <span class="mono">${primaShort(n)}</span></div>
@@ -311,7 +328,7 @@ Orbit.ciclo = (function () {
               ${fSelect('Tipo', 'ng-tipo', ['Persona', 'Empresa'], n.tipo)}
               ${fInput('Teléfono (WhatsApp)', 'ng-tel', n.telefono)}
               ${fInput('Correo', 'ng-email', n.email)}
-              ${fSelect('País', 'ng-pais', ['GT', 'CO'], n.pais)}
+              ${fSelect('País', 'ng-pais', (Orbit.PAISES||[]).filter(p=>p&&p.id&&p.id!=='TODOS').map(p=>p.id), n.pais)}
               ${fSelectCat('Canal de ingreso', 'ng-canal', 'canales', n.canal)}
             </div>
           </div>
@@ -339,7 +356,7 @@ Orbit.ciclo = (function () {
           </div>
           <div class="ciclo-sec">
             <div class="ciclo-sec-t">Colaboración comercial ↔ operativa</div>
-            <div id="ng-coms">${(n.comentarios || []).map(comRow).join('') || '<div class="muted" style="font-size:12.5px">Sin observaciones ni solicitudes.</div>'}</div>
+            <div id="ng-coms">${(n.comentarios || []).slice().reverse().map(comRow).join('') || '<div class="muted" style="font-size:12.5px">Sin observaciones ni solicitudes.</div>'}</div>
             <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Detalle para el equipo…"><button class="btn ghost sm" id="ng-com-add">Registrar</button></div>
           </div>
         </div>
@@ -439,9 +456,9 @@ Orbit.ciclo = (function () {
       const direction=collaborationDirection(tipo),eventId='collab_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7),ts=stamp();
       n.comentarios = prior.concat([{ ts, user: actor, tipo, texto: v, direction, eventId }]);
       n.bitacora=priorBit.concat([{ts,user:actor,campo:'Colaboración',de:'',a:tipo,origen:'manual',direction,eventId}]);
-      comadd.disabled = true;
-      try { await S().updateDurable('negocios', id, { comentarios: n.comentarios,bitacora:n.bitacora,actualizado:today() }); openNegocio(id); }
-      catch (error) { n.comentarios = prior;n.bitacora=priorBit;comadd.disabled = false; U.toast('No fue posible guardar la colaboración.'); }
+      comadd.disabled = true;comadd.dataset.originalLabel=comadd.textContent;comadd.textContent='Registrando…';comadd.setAttribute('aria-busy','true');
+      try { await S().updateDurable('negocios', id, { comentarios: n.comentarios,bitacora:n.bitacora,actualizado:today() }); U.toast('Colaboración registrada y confirmada.');openNegocio(id); }
+      catch (error) { n.comentarios = prior;n.bitacora=priorBit;comadd.disabled = false;comadd.textContent=comadd.dataset.originalLabel||'Registrar';comadd.removeAttribute('aria-busy'); U.toast('No fue posible guardar la colaboración.'); }
     });
     const anotherOpportunity=back.querySelector('#ng-new-opportunity');
     if(anotherOpportunity)anotherOpportunity.addEventListener('click',()=>{
@@ -1007,7 +1024,7 @@ Orbit.ciclo = (function () {
           ${fSelect('Tipo', 'nn-tipo', ['Persona', 'Empresa'], prefill.tipo||'Persona')}
           ${fInput('Teléfono (WhatsApp)', 'nn-tel', prefill.telefono||'')}
           ${fInput('Correo', 'nn-email', prefill.email||'')}
-          ${fSelect('País', 'nn-pais', ['GT', 'CO'], initialCountry)}
+          ${fSelect('País', 'nn-pais', (Orbit.PAISES||[]).filter(p=>p&&p.id&&p.id!=='TODOS').map(p=>p.id), initialCountry)}
           ${fSelectCat('Canal de ingreso', 'nn-canal', 'canales', prefill.canal||Orbit.cat.get('canales')[0]||'')}
           ${fSelect('Ramo', 'nn-ramo', Orbit.cat.ramosDe(initialCountry), initialRamo)}
           ${fSelect('Producto', 'nn-prod', commercialProducts(initialCountry,initialRamo), '')}

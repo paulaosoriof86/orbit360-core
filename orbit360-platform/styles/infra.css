@@ -962,3 +962,33 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
  .page[data-polizas-kpi-ready="1"] .tb-search{position:fixed!important;top:72px;left:14px;right:14px;width:auto!important;min-width:0!important;z-index:110;background:var(--card)!important;border:1px solid var(--line)!important;box-shadow:0 8px 24px rgba(0,0,0,.14)}
  .page[data-polizas-kpi-ready="1"] .tb-search input{width:100%!important;min-width:0!important}
 }
+
+/* R20 · Aseguradoras premium hierarchy + responsive requirement/source surfaces */
+.insurer-filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:10px 0 14px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card-2)}
+.insurer-filter-bar label{display:grid;gap:5px;min-width:180px;flex:1;font-size:11px;font-weight:700;color:var(--ink-2)}
+.insurer-requirement-card{display:grid;gap:10px;padding:12px;margin-bottom:10px;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--sh-1)}
+.insurer-requirement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px}
+.insurer-requirement-grid label{display:grid;gap:4px;font-size:10.5px;font-weight:700;color:var(--ink-2)}
+.insurer-requirement-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.insurer-technical-registry{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--card),var(--card-2));padding:10px 12px}
+.insurer-technical-registry>summary{cursor:pointer;font-family:var(--f-display);font-weight:800;color:var(--ink)}
+.insurer-source-card{box-shadow:var(--sh-1);transition:box-shadow .15s ease,border-color .15s ease}
+.insurer-source-card[open]{border-color:var(--red-line)!important;box-shadow:var(--sh-2)}
+.insurer-source-card summary b{font-family:var(--f-display);font-size:13px}
+.insurer-source-detail>div{padding:7px 8px;border-radius:8px;background:var(--card-2)}
+.insurer-knowledge-grid{margin-top:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.insurer-knowledge-card{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--card);box-shadow:var(--sh-1)}
+.insurer-activity-row{font-size:12px;padding:11px 0;border-bottom:1px dashed var(--line-2)}
+.insurer-activity-head{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px}
+.insurer-activity-icon{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--card-2);border:1px solid var(--line)}
+.insurer-activity-time{margin-left:auto;font-family:var(--f-mono);font-size:10.5px}
+@media(max-width:640px){
+  .insurer-filter-bar{display:grid;grid-template-columns:1fr}
+  .insurer-filter-bar label{min-width:0}
+  .insurer-requirement-grid{grid-template-columns:1fr}
+  .insurer-source-card summary{align-items:flex-start!important}
+  .insurer-source-card summary>span:first-child{min-width:0!important;width:100%}
+  .insurer-source-detail{grid-template-columns:1fr!important}
+  .insurer-knowledge-grid{grid-template-columns:1fr}
+  .insurer-activity-time{margin-left:0;width:100%}
+}

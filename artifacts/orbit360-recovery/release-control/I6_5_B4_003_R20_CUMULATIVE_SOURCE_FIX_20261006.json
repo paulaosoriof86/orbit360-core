@@ -1,0 +1,61 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_CUMULATIVE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-06T15:20:00-06:00",
+  "status": "SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "ad38342471f103cc79c681b863b6652327c93b95",
+  "authority": {
+    "r20FreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+    "r20FreezeBlobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856",
+    "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+    "diagnosticBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0",
+    "renewabilityApplyPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_RESULT_20261006.json",
+    "renewabilityApplyBlobSha": "67d8d480bd85314a01611f5154919c587854af55"
+  },
+  "productBlobs": {
+    "orbit360-platform/modules/renovaciones.js": "a4c88b97eaf2ecef010fa4afbaa7de813fef77f0",
+    "orbit360-platform/modules/aseguradoras.js": "4e5e1cf85fdec9b887fbe51fcbd0bb3a5ad656bd",
+    "orbit360-platform/styles/infra.css": "db5139dd1bd726d7da8da94e1b065d96b5cbce75",
+    "orbit360-platform/core/ciclo.js": "f54f5531a99c38dc6d629da9a2d197bfc1b9c33f",
+    "functions/product-ops-leads-domain.js": "a480769d50675508d323dceef34f2f57799b435a",
+    "functions/ops-advisor-inbox.js": "dd47674a790639337f9d1ff5d25be1d38c3147a9",
+    "functions/notification-outbox-processor.js": "7746017e771cc6b3656c214d92bf9e4f1a11e4f2",
+    "orbit360-platform/core/auth-product-runtime-p0.js": "6d9341f843f481e61656e528186270dd230d6cfd",
+    "orbit360-platform/index.html": "076289fcbd36c562247fed4ca54caa3e2d5c1fb4"
+  },
+  "qaBlobs": {
+    ".github/workflows/gravicentra-b4-003-executor.yml": "5b0238202cb2415c2374dd50edfcfaa0ae810016",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "cf3591797da8dd550b9bb8ffe1324078bd826467"
+  },
+  "evidence": {
+    "selectOwnerAuditPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SELECT_OWNER_AUDIT_20261006.json",
+    "selectOwnerAuditBlobSha": "ed06932efbb9efe74bd90693952cb94776cab3e1"
+  },
+  "findingDisposition": {
+    "B4-003-R20-B01": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "B4-003-R20-B02": "DATA_APPLIED_PASS_PENDING_EXACT_PREVIEW",
+    "B4-003-R20-B03": "SOURCE_FIXED_PENDING_SYNTHETIC_UAT",
+    "B4-003-R20-B04": "SOURCE_FIXED_PENDING_SYNTHETIC_UAT",
+    "B4-003-R20-B05": "SOURCE_FIXED_PENDING_DESKTOP_MOBILE_VISUAL",
+    "B4-003-R20-B06": "SOURCE_FIXED_PENDING_DESKTOP_MOBILE_VISUAL",
+    "B4-003-R20-B07": "SOURCE_FIXED_PENDING_CANONICAL_TIMESTAMP_RUNTIME_PROOF",
+    "B4-003-R20-B08": "PENDING_SYNTHETIC_UAT_PROOF",
+    "B4-003-R20-B09": "SOURCE_FIXED_PENDING_RECIPIENT_RUNTIME_PROOF",
+    "B4-003-R20-B10": "SOURCE_FIXED_PENDING_ROLE_IDENTITY_MATRIX",
+    "B4-003-R20-B11": "SOURCE_FIXED_PENDING_CADENCE_RUNTIME_PROOF",
+    "B4-003-R20-B12": "SOURCE_FIXED_PENDING_AUTH_ROUTER_RUNTIME_PROOF",
+    "B4-003-R20-B13": "TOUCHED_OWNERS_PASS_UNRELATED_CARRY_EXPLICIT",
+    "B4-003-R20-B14": "PENDING_SYNTHETIC_UAT_PROOF"
+  },
+  "renewabilityApplyWrites": 1415,
+  "findingCountAfter": 264,
+  "operationalBusinessWrites": 0,
+  "productSourceChanged": true,
+  "dataMutationAfterSourceFix": false,
+  "reimport": false,
+  "livePromoted": false,
+  "buildExecuted": false,
+  "previewExecuted": false,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

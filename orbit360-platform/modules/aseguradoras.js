@@ -18,7 +18,7 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.aseguradoras = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store;
   let host, q = '', fPais = 'TODOS', fRamo = '', fEstado = 'TODAS', orderMode = 'country', knowledgeSummaryLoading = false;
-  const logoAssetCache = new Map();
+  const logoAssetCache = new Map(), reqFilterState = Object.create(null), knowledgeFilterState = Object.create(null);
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function norm(value) { return clean(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); }
   function tenantId() {
@@ -176,6 +176,19 @@ Orbit.modules.aseguradoras = (function () {
   function sourceCombinationKey(d) { return DIMENSION_KEYS.map(k => d[k] || '—').join(' · '); }
   function groupLabel(key) { const parts=clean(key).split(' · ').filter(x=>x&&x!=='—'); return parts.join(' · ')||'Dimensiones pendientes'; }
   function sourceIdentity(item) { return clean(item && (item.documentId || item.sourceDocumentId || item.id || item.nombre || item.fileName || item.archivo)).toLowerCase(); }
+  function uniqueText(values){return [...new Set([].concat(values||[]).map(clean).filter(Boolean))];}
+  function productOptionsFor(a,ramo){
+    let rows=[];try{rows=Orbit.cat&&typeof Orbit.cat.subramosDe==='function'?Orbit.cat.subramosDe(a.pais,ramo)||[]:[];}catch(e){}
+    [].concat(a.docsRequeridos||[],a.docs||[],knowledgeSources(a)||[]).forEach(x=>{if(!ramo||norm(x&&x.ramo)===norm(ramo)){if(x&&x.producto)rows.push(x.producto);}});
+    return uniqueText(rows).sort((x,y)=>x.localeCompare(y,'es'));
+  }
+  function planOptionsFor(a,ramo,producto){
+    const out=[];const det=a&&a.ramosDetalle&&a.ramosDetalle[ramo]||{},raw=det.planes||det.plan||[];
+    [].concat(raw||[]).flatMap(v=>String(v||'').split(/[;,|]/)).map(clean).filter(Boolean).forEach(v=>out.push(v));
+    [].concat(a.docsRequeridos||[],a.docs||[],knowledgeSources(a)||[]).forEach(x=>{if((!ramo||norm(x&&x.ramo)===norm(ramo))&&(!producto||norm(x&&x.producto)===norm(producto))&&x&&x.plan)out.push(x.plan);});
+    return uniqueText(out).sort((x,y)=>x.localeCompare(y,'es'));
+  }
+  function selectOptions(values,current,blank){return (blank!=null?'<option value="">'+U.esc(blank)+'</option>':'')+uniqueText(values).map(v=>'<option value="'+U.esc(v)+'" '+(clean(v)===clean(current)?'selected':'')+'>'+U.esc(v)+'</option>').join('');}
   function visibleState(value) {
     const key = norm(value).replace(/ /g, '_');
     if (/habilitado.*cotizador/.test(key)) return 'Habilitado para Cotizador';
@@ -281,8 +294,9 @@ Orbit.modules.aseguradoras = (function () {
     script.onerror = function () { knowledgeSummaryLoading = false; };
     document.head.appendChild(script);
   }
-  function extraKnowledgeHtml(row) {
-    const rows = knowledgeSources(row).filter(item => item.sourceOrigin !== 'Ficha');
+  function extraKnowledgeHtml(row,filter) {
+    filter=filter||{};
+    const rows = knowledgeSources(row).filter(item => item.sourceOrigin !== 'Ficha').filter(item=>(!filter.ramo||norm(item.ramo)===norm(filter.ramo))&&(!filter.producto||norm(item.producto)===norm(filter.producto)));
     if (!rows.length) return '<div class="cfg-note" style="margin-top:10px">Sin conocimiento adicional mapeado o persistido para esta aseguradora.</div>';
     return '<div class="asg-sec-t" style="margin-top:14px">🧠 Fuentes mapeadas y persistidas</div><div style="display:grid;gap:7px">' + rows.map(item => {
       const nd = normalizarFuente(item, row), ev = evaluarFuente(nd);
@@ -301,8 +315,9 @@ Orbit.modules.aseguradoras = (function () {
     if (/REQUIERE|PENDIENTE|RECIBIDA/.test(key)) return 'Requiere revisión';
     return clean(value).replace(/_/g, ' ') || 'Pendiente';
   }
-  function knowledgeFactsHtml(row) {
-    const products = knowledgeProductsFor(row);
+  function knowledgeFactsHtml(row,filter) {
+    filter=filter||{};
+    const products = knowledgeProductsFor(row).filter(p=>(!filter.ramo||norm(p&&p.ramo)===norm(filter.ramo))&&(!filter.producto||norm(p&&p.producto)===norm(filter.producto)));
     if (!products.length) return '<div class="cfg-note" style="margin-top:12px"><b>Conocimiento verificable:</b> todavía no hay reglas o hechos del producto con fuente suficiente. El sistema no aplicará valores genéricos en su lugar.</div>';
     const sources = knowledgeSources(row);
     const sourceNames = Object.create(null);
@@ -857,13 +872,15 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ---- Productos y planes ---- */
   function tabProductos(a, editing) {
-    const ramos = a.ramos || [];
+    const ramos = a.ramos || [],state=reqFilterState[a.id]||(reqFilterState[a.id]={ramo:'',producto:''});
+    const products=productOptionsFor(a,state.ramo),reqs=(a.docsRequeridos||[]).map((r,i)=>({r,i})).filter(x=>(!state.ramo||norm(x.r.ramo)===norm(state.ramo))&&(!state.producto||norm(x.r.producto)===norm(state.producto)));
     return `<div class="asg-sec">
       <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Productos, ramos y planes ${editing ? '<button class="btn ghost sm" id="af-add-ramo">+ Ramo</button>' : ''}</div>
       <div class="ct-grid">${ramos.map((r, i) => ramoRow(a, r, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin ramos habilitados.</div>'}</div>
       <div class="cfg-note" style="margin-top:9px">Un ramo NO se ofrece en Cotizador hasta que lo marqués explícitamente "Habilitado p/ Cotizador" aquí. La ausencia de configuración significa <b>no disponible</b>, no lo contrario.</div>
-      <div class="asg-sec-t" style="margin-top:16px">Documentos requeridos para emisión ${editing ? '<button class="btn ghost sm" id="af-add-req">+ Requisito</button>' : ''}</div>
-      <div id="af-reqs">${(a.docsRequeridos || []).map((r, i) => reqRow(r, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin requisitos registrados.</div>'}</div>
+      <div class="asg-sec-t" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span>Documentos requeridos para emisión</span>${editing ? '<button class="btn ghost sm" id="af-add-req">+ Requisito</button>' : ''}</div>
+      <div class="insurer-filter-bar"><label>Ramo<select id="af-req-filter-ramo" class="o-sel">${selectOptions(ramos,state.ramo,'Todos')}</select></label><label>Producto<select id="af-req-filter-producto" class="o-sel">${selectOptions(products,state.producto,'Todos')}</select></label></div>
+      <div id="af-reqs">${reqs.map(x => reqRow(x.r, x.i, editing, a)).join('') || '<div class="muted" style="font-size:12px">Sin requisitos para los filtros seleccionados.</div>'}</div>
     </div>`;
   }
   function ramoRow(a, r, i, editing) {
@@ -871,20 +888,31 @@ Orbit.modules.aseguradoras = (function () {
     const hab = !!(a.ramosHabilitados && a.ramosHabilitados[r] && a.ramosHabilitados[r].cotizador === true);
     const det = (a.ramosDetalle && a.ramosDetalle[r]) || {};
     return `<div class="ct-cell"><span>${U.esc(r)}</span><div class="ct-inp"><input type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}" ${editing ? '' : 'disabled'}><span>%</span></div>
-      <input class="o-sel" data-ramoseg="${U.esc(r)}" placeholder="Segmento (Individual/Flota/Colectivo)" value="${U.esc(det.segmento || '')}" style="font-size:11px;margin-top:4px" ${editing ? '' : 'disabled'}>
-      <input class="o-sel" data-ramoplan="${U.esc(r)}" placeholder="Plan (Básico/Amplio/Premium)" value="${U.esc(det.plan || '')}" style="font-size:11px;margin-top:4px" ${editing ? '' : 'disabled'}>
+      <select class="o-sel" data-ramoseg="${U.esc(r)}" style="font-size:11px;margin-top:4px" ${editing ? '' : 'disabled'}>${selectOptions((Orbit.cat&&Orbit.cat.get?Orbit.cat.get('segmentos'):[]).filter(x=>typeof x==='string'),det.segmento||'','Segmento…')}</select>
+      <select class="o-sel" data-ramoplan="${U.esc(r)}" style="font-size:11px;margin-top:4px" ${editing ? '' : 'disabled'}>${selectOptions(planOptionsFor(a,r,''),det.plan||'','Plan…')}</select>
       <label style="display:flex;align-items:center;gap:4px;font-size:10.5px;margin-top:4px"><input type="checkbox" data-ramohab="${U.esc(r)}" ${hab ? 'checked' : ''} ${editing ? '' : 'disabled'}><b>${hab ? 'Habilitado' : 'NO habilitado'}</b> p/ Cotizador</label></div>`;
   }
-  function reqRow(r, i, editing) {
-    const ro = editing ? '' : 'disabled';
-    return `<div class="asg-row" data-req="${i}">
-      <input class="o-sel" data-rp placeholder="Producto" value="${U.esc(r.producto || '')}" style="flex:1" ${ro}>
-      <input class="o-sel" data-ri placeholder="Requisitos" value="${U.esc(r.items || '')}" style="flex:2.2" ${ro}>
-      ${editing ? `<button class="asg-del" data-del="docsRequeridos:${i}">✕</button>` : ''}
+  function reqRow(r, i, editing, a) {
+    const ro = editing ? '' : 'disabled',ramos=a.ramos||[],ramo=r.ramo||'',products=productOptionsFor(a,ramo),plans=planOptionsFor(a,ramo,r.producto||''),status=r.estado||'Vigente',type=r.tipo||'Documento';
+    const attachment=clean(r.documentRef||r.adjuntoRef||r.driveUrl||r.externalUrl||r.url);
+    return `<div class="insurer-requirement-card" data-req="${i}">
+      <div class="insurer-requirement-grid">
+        <label>País<select class="o-sel" data-rcountry ${ro}>${selectOptions(preferredCountries(),r.pais||a.pais,null)}</select></label>
+        <label>Ramo<select class="o-sel" data-rramo ${ro}>${selectOptions(ramos,ramo,'—')}</select></label>
+        <label>Producto<select class="o-sel" data-rp ${ro}>${selectOptions(products,r.producto||'','—')}</select></label>
+        <label>Plan<select class="o-sel" data-rplan ${ro}>${selectOptions(plans,r.plan||'','Sin plan específico')}</select></label>
+        <label>Tipo<select class="o-sel" data-rtype ${ro}>${selectOptions(['Documento','Formulario','Identificación','Declaración','Inspección','Pago','Otro'],type,null)}</select></label>
+        <label>Estado<select class="o-sel" data-rstatus ${ro}>${selectOptions(['Vigente','Pendiente','Requiere validación','Inactivo'],status,null)}</select></label>
+        <label>Fecha<input class="o-sel" type="date" data-rdate value="${U.esc(r.fecha||r.updatedAt||r.createdAt||'')}" ${ro}></label>
+        <label>Provenance<input class="o-sel" data-rprov value="${U.esc(r.provenance||r.origen||'')}" placeholder="Fuente / responsable" ${ro}></label>
+      </div>
+      <label class="ce-l">Descripción del requisito<textarea class="o-sel" data-ri style="min-height:58px;resize:vertical" ${ro}>${U.esc(r.descripcion||r.items||'')}</textarea></label>
+      <label class="ce-l">Adjunto / referencia Drive (opcional)<input class="o-sel" data-rattach value="${U.esc(attachment)}" placeholder="documentRef o https://…" ${ro}></label>
+      <div class="insurer-requirement-actions">${attachment&&/^https:\/\//i.test(attachment)?'<a class="btn ghost sm" href="'+U.esc(attachment)+'" target="_blank" rel="noopener">Abrir adjunto</a>':''}${editing ? `<button class="asg-del" data-del="docsRequeridos:${i}">Eliminar</button>` : ''}</div>
     </div>`;
   }
 
-  function sourceRegistryHtml(a){
+  function sourceRegistryHtml(a,editing){
     const rows=knowledgeSources(a);if(!rows.length)return '<div class="cfg-note" style="margin-top:12px">Sin fuentes registradas.</div>';
     const label=k=>k==='BOTH'?'Biblioteca + Drive':k==='DRIVE_FILE'?'Drive':'Biblioteca / conocimiento';
     const human=v=>{
@@ -915,7 +943,8 @@ Orbit.modules.aseguradoras = (function () {
         ['Documento / referencia',docId||r.id||'No registrada'],
         ['Huella',hash||'No registrada']
       ];
-      return '<details class="asg-row insurer-source-card" data-source-registry-row="'+U.esc(r.id||'')+'" style="display:block;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0;overflow:hidden"><summary style="cursor:pointer;list-style:none;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>'+U.esc(r.nombre||'Fuente')+'</b><small class="muted" style="display:block">'+U.esc((r.taxonomyLabel||r.cat||'Otro/requiere clasificación')+' · '+label(r.storageKind)+' · '+(dims.join(' · ')||'Dimensiones pendientes'))+'</small></span><span class="badge '+(/validado/i.test(status)?'ok':'neutral')+'">'+U.esc(status)+'</span><span class="muted" style="font-size:11px">Ver detalles ▾</span></summary><div class="insurer-source-detail" data-source-registry-detail="'+U.esc(r.id||'')+'" style="border-top:1px solid var(--line);padding:10px 12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">'+extra.map(([k,v])=>'<div><small class="muted">'+U.esc(k)+'</small><div style="font-size:12px;overflow-wrap:anywhere">'+U.esc(human(v))+'</div></div>').join('')+( /^https:\/\/[^\s]+$/i.test(url)?'<div style="grid-column:1/-1"><a class="btn ghost sm" href="'+U.esc(url)+'" target="_blank" rel="noopener">Abrir fuente</a></div>':'')+'</div></details>';
+      const linkAction=editing&&r.sourceOrigin!=='Ficha'?'<button type="button" class="btn ghost sm" data-source-link="'+U.esc(r.id||r.documentId||r.sourceDocumentId||'')+'">Asociar a ficha</button>':'';
+      return '<details class="asg-row insurer-source-card" data-source-registry-row="'+U.esc(r.id||'')+'" style="display:block;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0;overflow:hidden"><summary style="cursor:pointer;list-style:none;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>'+U.esc(r.nombre||'Fuente')+'</b><small class="muted" style="display:block">'+U.esc((r.taxonomyLabel||r.cat||'Otro/requiere clasificación')+' · '+label(r.storageKind)+' · '+(dims.join(' · ')||'Dimensiones pendientes'))+'</small></span><span class="badge '+(/validado/i.test(status)?'ok':'neutral')+'">'+U.esc(status)+'</span><span class="muted" style="font-size:11px">Ver detalles ▾</span></summary><div class="insurer-source-detail" data-source-registry-detail="'+U.esc(r.id||'')+'" style="border-top:1px solid var(--line);padding:10px 12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">'+extra.map(([k,v])=>'<div><small class="muted">'+U.esc(k)+'</small><div style="font-size:12px;overflow-wrap:anywhere">'+U.esc(human(v))+'</div></div>').join('')+( /^https:\/\/[^\s]+$/i.test(url)?'<div style="grid-column:1/-1"><a class="btn ghost sm" href="'+U.esc(url)+'" target="_blank" rel="noopener">Abrir / descargar fuente</a>'+linkAction+'</div>':(linkAction?'<div style="grid-column:1/-1">'+linkAction+'</div>':''))+'</div></details>';
     }).join('')+'</div></details>';
   }
 
@@ -928,7 +957,7 @@ Orbit.modules.aseguradoras = (function () {
       <div class="cfg-note" style="margin-bottom:9px"><b>Registro canónico de fuentes:</b> distingue conocimiento de Biblioteca, archivo físico Drive o ambos; conserva metadata, ubicación, hash, provenance y validación. Registrar una fuente no habilita cálculos automáticamente.</div>
       <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="cfg-note" data-drive-empty="1"><b>Sin archivos físicos cargados en Drive desde esta ficha.</b> Las fuentes de Biblioteca/conocimiento relacionadas se muestran abajo por separado.</div>'}</div>
       ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc" style="margin-top:9px">📁 Cargar fuente</button>' : ''}
-      ${sourceRegistryHtml(a)}
+      ${sourceRegistryHtml(a,editing)}
     </div>`;
   }
   function docRow(d, i, editing, a) {
@@ -940,8 +969,10 @@ Orbit.modules.aseguradoras = (function () {
       <input class="o-sel" data-dn value="${U.esc(d.nombre || '')}" style="flex:1.1" ${ro}>
       <select class="o-sel" data-dc style="flex:1" ${ro}>${CATS_DOC.map(c => `<option ${c === d.cat ? 'selected' : ''}>${c}</option>`).join('')}</select>
       <select class="o-sel" data-dr style="width:100px" ${ro}><option value="">Ramo…</option>${(a.ramos || []).map(r => `<option ${r === d.ramo ? 'selected' : ''}>${r}</option>`).join('')}</select>
-      <select class="o-sel" data-dpais style="width:65px" ${ro}><option ${(d.pais || a.pais) === 'GT' ? 'selected' : ''}>GT</option><option ${(d.pais || a.pais) === 'CO' ? 'selected' : ''}>CO</option></select>
+      <select class="o-sel" data-dpais style="width:90px" ${ro}>${selectOptions(preferredCountries(),d.pais||a.pais,null)}</select>
       <select class="o-sel" data-dmon style="width:75px" ${ro}><option ${(d.moneda || nd.moneda) === 'GTQ' ? 'selected' : ''}>GTQ</option><option ${(d.moneda || nd.moneda) === 'COP' ? 'selected' : ''}>COP</option><option ${(d.moneda || nd.moneda) === 'USD' ? 'selected' : ''}>USD</option></select>
+      <select class="o-sel" data-dprod style="min-width:150px" ${ro}>${selectOptions(productOptionsFor(a,d.ramo||''),d.producto||'','Producto…')}</select>
+      <select class="o-sel" data-dplan style="min-width:140px" ${ro}>${selectOptions(planOptionsFor(a,d.ramo||'',d.producto||''),d.plan||'','Plan…')}</select>
       <input class="o-sel" data-dseg placeholder="Segmento" value="${U.esc(d.segmento || '')}" style="width:110px" ${ro}>
       <span class="badge ${ev.estado.indexOf('incompleto') >= 0 ? 'danger' : ev.estado.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10px">${ev.estado}</span>
       ${editing ? `<button class="asg-del" data-del="docs:${i}">✕</button>` : ''}
@@ -950,22 +981,22 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ---- Tarifas y conocimiento (secundaria, motor real) ---- */
   function tabTarifas(a, editing) {
-    const resumen = resumenFuentes(a);
-    const grupos = resumenGrupos(a);
-    const ramos = a.ramos || [];
-    const id = a.id;
+    const resumen = resumenFuentes(a),grupos = resumenGrupos(a),ramos = a.ramos || [],id = a.id,state=knowledgeFilterState[id]||(knowledgeFilterState[id]={ramo:'',producto:''});
+    const sourceRows=knowledgeSources(a),filterRamos=uniqueText(ramos.concat(sourceRows.map(x=>x.ramo))),filterProducts=uniqueText(sourceRows.filter(x=>!state.ramo||norm(x.ramo)===norm(state.ramo)).map(x=>x.producto)).sort((x,y)=>x.localeCompare(y,'es'));
+    const filteredGroups=grupos.filter(g=>g.docs.some(x=>(!state.ramo||norm(x.ramo)===norm(state.ramo))&&(!state.producto||norm(x.producto)===norm(state.producto))));
     tarifaRamoSel[id] = tarifaRamoSel[id] || ramos[0] || '';
-    const ramoSel = tarifaRamoSel[id];
+    const ramoSel = tarifaRamoSel[id],filter={ramo:state.ramo,producto:state.producto};
     return `<div class="asg-sec insurer-knowledge-section" data-knowledge-order="1-summary">
       <div class="asg-sec-t insurer-knowledge-title">🧠 Resumen del conocimiento de la aseguradora</div>
       <div class="cfg-note insurer-knowledge-intro" style="margin-bottom:9px"><b>Jerarquía:</b> una fuente puede estar <b>Mapeada</b> (clasificada), <b>Validada</b> (evidencia revisada) y, por separado, <b>Habilitada</b> para un cálculo concreto. <b>Registrar o validar un documento nunca habilita automáticamente</b> Cotizador/Comparativo.</div>
+      <div class="insurer-filter-bar"><label>Ramo<select id="kf-ramo" class="o-sel">${selectOptions(filterRamos,state.ramo,'Todos')}</select></label><label>Producto<select id="kf-producto" class="o-sel">${selectOptions(filterProducts,state.producto,'Todos')}</select></label></div>
       <div class="asg-tarifas-est" data-knowledge-order="3-sources">${Object.keys(resumen).filter(k => resumen[k] > 0).map(k => `<span class="badge ${k.indexOf('incompleto') >= 0 ? 'danger' : k.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10.5px">${k} (${resumen[k]})</span>`).join('') || '<span class="muted" style="font-size:12px">Sin fuentes cargadas todavía.</span>'}</div>
       <div class="asg-sec-t" style="margin-top:14px" data-knowledge-order="2-products">Productos y ramos cubiertos</div>
-      <div style="margin-top:8px;display:grid;gap:8px" data-knowledge-product-groups="1">
-        ${grupos.map(g => `<div class="asg-row insurer-knowledge-card" style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px"><span style="flex:1;font-size:12px"><b>${U.esc(g.label)}</b><small class="muted" style="display:block;margin-top:3px">${g.docs.length} fuente(s) relacionadas</small></span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}" style="font-size:10px">${g.estado}</span></div>`).join('') || '<div class="muted">Sin combinaciones de producto con fuente relacionada.</div>'}
+      <div class="insurer-knowledge-grid" data-knowledge-product-groups="1">
+        ${filteredGroups.map(g => `<div class="insurer-knowledge-card"><span style="flex:1;font-size:12px"><b>${U.esc(g.label)}</b><small class="muted" style="display:block;margin-top:3px">${g.docs.length} fuente(s) relacionadas</small></span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}">${g.estado}</span></div>`).join('') || '<div class="muted">Sin combinaciones para los filtros seleccionados.</div>'}
       </div>
-      ${extraKnowledgeHtml(a)}
-      ${knowledgeFactsHtml(a)}
+      ${extraKnowledgeHtml(a,filter)}
+      ${knowledgeFactsHtml(a,filter)}
       ${knowledgeRoadmapHtml(a)}
       <div class="asg-sec-t" style="margin-top:16px" data-knowledge-order="4-tariffs">Tarifas y condiciones derivadas</div>
       ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc2" style="margin-top:12px">📊 Cargar tarifario / Excel de cotizador</button>' : ''}
@@ -1002,7 +1033,7 @@ Orbit.modules.aseguradoras = (function () {
         ${ramo === 'Auto' ? `<label class="ce-l">Recargo por antigüedad — año límite<input class="o-sel" type="number" id="tf-ra-anio" value="${(cfg.recargoAntiguedad && cfg.recargoAntiguedad.anioLimite) || ''}" placeholder="Ej. 2015" ${editing ? '' : 'disabled'}></label><label class="ce-l">% recargo si es anterior<input class="o-sel" type="number" step="0.1" id="tf-ra-pct" value="${(cfg.recargoAntiguedad && cfg.recargoAntiguedad.pct) || ''}" ${editing ? '' : 'disabled'}></label>` : ''}
         <label class="ce-l">Gastos de emisión GT %<input class="o-sel" type="number" step="0.1" id="tf-ge-gt" value="${(cfg.gastosEmisionPct && cfg.gastosEmisionPct.GT) || 0}" ${editing ? '' : 'disabled'}></label>
         <label class="ce-l">Gastos de emisión CO %<input class="o-sel" type="number" step="0.1" id="tf-ge-co" value="${(cfg.gastosEmisionPct && cfg.gastosEmisionPct.CO) || 0}" ${editing ? '' : 'disabled'}></label>
-        <label class="ce-l">Documento fuente (referencia)<input class="o-sel" id="tf-fuente" value="${U.esc(cfg.fuenteDocumentoId || '')}" placeholder="Ej. Tarifario Auto 2026" ${editing ? '' : 'disabled'}></label>
+        <label class="ce-l">Documento fuente<select class="o-sel" id="tf-fuente" ${editing ? '' : 'disabled'}>${selectOptions(knowledgeSources(a).filter(x=>!ramo||norm(x.ramo)===norm(ramo)).map(x=>x.id||x.documentId||x.sourceDocumentId),cfg.fuenteDocumentoId||'','Seleccionar fuente registrada')}</select></label>
         <label class="ce-l">Versión<input class="o-sel" id="tf-version" value="${U.esc(cfg.version || '')}" placeholder="v2026-1" ${editing ? '' : 'disabled'}></label>
         <label class="ce-l">Vigencia<input class="o-sel" id="tf-vigencia" value="${U.esc(cfg.vigencia || '')}" placeholder="2026-01 a 2026-12" ${editing ? '' : 'disabled'}></label>
       </div>
@@ -1021,7 +1052,7 @@ Orbit.modules.aseguradoras = (function () {
     return `<div class="asg-sec insurer-knowledge-section" data-knowledge-order="7-activity">
       <div class="asg-sec-t">🕒 Actividad y auditoría</div>
       <div class="cfg-note" style="margin-bottom:9px"><b>Historia unificada:</b> combina cambios guardados en la ficha y el ciclo documental visible del Registry. Consultar una fuente no genera actividad; cargar, mapear o validar sí debe quedar trazable.</div>
-      ${rows.length ? rows.map(h => `<div class="insurer-activity-row ${h.kind==='fuente'?'documental':''}" style="font-size:12px;padding:9px 0;border-bottom:1px dashed var(--line-2)"><b>${U.esc(h.cambio || 'Actualización')}</b> · ${U.esc(h.responsable || 'equipo')} · <span class="muted">${h.fecha ? new Date(h.fecha).toLocaleString() : 'fecha no registrada'}</span>${h.motivo ? '<div class="muted">Referencia: ' + U.esc(h.motivo) + '</div>' : ''}${h.camposCambiados ? '<div class="muted">Ámbito: ' + h.camposCambiados.map(U.esc).join(' · ') + '</div>' : ''}</div>`).join('') : '<div class="muted" style="font-size:12px">Sin actividad registrada.</div>'}
+      ${rows.length ? rows.map(h => {const type=h.kind==='fuente'?'Documento':'Ficha',icon=h.kind==='fuente'?'📄':'✏️',tone=h.kind==='fuente'?'info':'neutral';return `<div class="insurer-activity-row ${h.kind==='fuente'?'documental':''}"><div class="insurer-activity-head"><span class="insurer-activity-icon">${icon}</span><b>${U.esc(h.cambio || 'Actualización')}</b><span class="badge ${tone}">${type}</span><span class="muted insurer-activity-time">${h.fecha ? new Date(h.fecha).toLocaleString() : 'fecha no registrada'}</span></div><div class="muted">Responsable: ${U.esc(h.responsable || 'equipo')}</div>${h.motivo ? '<div class="muted">Referencia: ' + U.esc(h.motivo) + '</div>' : ''}${h.camposCambiados ? '<div class="muted">Ámbito: ' + h.camposCambiados.map(U.esc).join(' · ') + '</div>' : ''}</div>`;}).join('') : '<div class="muted" style="font-size:12px">Sin actividad registrada.</div>'}
     </div>`;
   }
 
@@ -1057,12 +1088,25 @@ Orbit.modules.aseguradoras = (function () {
     };
     const uploadDoc = body.querySelector('#af-imp-doc'); if (uploadDoc) uploadDoc.addEventListener('click', () => openInsurerSource('documento', 'Formulario'));
     const uploadTariff = body.querySelector('#af-imp-doc2'); if (uploadTariff) uploadTariff.addEventListener('click', () => openInsurerSource('tarifa', 'Tarifario'));
+    const reqRamoFilter=body.querySelector('#af-req-filter-ramo'),reqProductFilter=body.querySelector('#af-req-filter-producto');
+    if(reqRamoFilter)reqRamoFilter.addEventListener('change',()=>{reqFilterState[id]={ramo:reqRamoFilter.value,producto:''};selectTab('productos');});
+    if(reqProductFilter)reqProductFilter.addEventListener('change',()=>{const stf=reqFilterState[id]||(reqFilterState[id]={ramo:'',producto:''});stf.producto=reqProductFilter.value;selectTab('productos');});
+    const knowledgeRamoFilter=body.querySelector('#kf-ramo'),knowledgeProductFilter=body.querySelector('#kf-producto');
+    if(knowledgeRamoFilter)knowledgeRamoFilter.addEventListener('change',()=>{knowledgeFilterState[id]={ramo:knowledgeRamoFilter.value,producto:''};selectTab('tarifas');});
+    if(knowledgeProductFilter)knowledgeProductFilter.addEventListener('change',()=>{const stf=knowledgeFilterState[id]||(knowledgeFilterState[id]={ramo:'',producto:''});stf.producto=knowledgeProductFilter.value;selectTab('tarifas');});
     if (!editing) return; // las cargas documentales son acciones separadas; los campos de ficha siguen solo en edición
 
     body.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
       const [key, idx] = b.dataset.del.split(':');
       draft[key] = (draft[key] || []).slice(); draft[key].splice(+idx, 1);
       selectTab(t);
+    }));
+    body.querySelectorAll('[data-source-link]').forEach(b=>b.addEventListener('click',()=>{
+      const liveRow=S().get('aseguradoras',id)||data||{},key=clean(b.dataset.sourceLink),src=knowledgeSources(liveRow).find(x=>clean(x.id||x.documentId||x.sourceDocumentId)===key);
+      if(!src)return U.toast('No fue posible identificar la fuente seleccionada.');
+      draft.docs=[].concat(draft.docs||[]);
+      if(!draft.docs.some(x=>sourceIdentity(x)===sourceIdentity(src)))draft.docs.push(Object.assign({},src,{id:src.id||src.documentId||src.sourceDocumentId,sourceOrigin:'Ficha'}));
+      selectTab('documentos');
     }));
     const syncField = () => { /* no-op: se lee directamente del DOM al guardar la pestaña vía snapshot() abajo */ };
 
@@ -1103,11 +1147,11 @@ Orbit.modules.aseguradoras = (function () {
           if (segEl) draft.ramosDetalle[r].segmento = segEl.value; if (planEl) draft.ramosDetalle[r].plan = planEl.value;
           draft.ramosHabilitados = draft.ramosHabilitados || {}; draft.ramosHabilitados[r] = Object.assign({}, draft.ramosHabilitados[r], { cotizador: habEl ? habEl.checked : false });
         });
-        draft.docsRequeridos = [...body.querySelectorAll('[data-req]')].map(r => ({ producto: r.querySelector('[data-rp]').value, items: r.querySelector('[data-ri]').value }));
+        draft.docsRequeridos = [...body.querySelectorAll('[data-req]')].map(r => ({ pais:(r.querySelector('[data-rcountry]')||{}).value||draft.pais, ramo:(r.querySelector('[data-rramo]')||{}).value||'', producto:(r.querySelector('[data-rp]')||{}).value||'', plan:(r.querySelector('[data-rplan]')||{}).value||'', tipo:(r.querySelector('[data-rtype]')||{}).value||'Documento', descripcion:(r.querySelector('[data-ri]')||{}).value||'', items:(r.querySelector('[data-ri]')||{}).value||'', estado:(r.querySelector('[data-rstatus]')||{}).value||'Vigente', provenance:(r.querySelector('[data-rprov]')||{}).value||'', fecha:(r.querySelector('[data-rdate]')||{}).value||'', documentRef:(r.querySelector('[data-rattach]')||{}).value||'' }));
       }
       if (t === 'documentos') {
         const prevDocs = draft.docs || [];
-        draft.docs = [...body.querySelectorAll('[data-doc]')].map((r, idx) => Object.assign({}, prevDocs[idx] || {}, { nombre: r.querySelector('[data-dn]').value, cat: r.querySelector('[data-dc]').value, ramo: r.querySelector('[data-dr]').value, pais: r.querySelector('[data-dpais]').value, moneda: r.querySelector('[data-dmon]').value, segmento: r.querySelector('[data-dseg]').value }));
+        draft.docs = [...body.querySelectorAll('[data-doc]')].map((r, idx) => Object.assign({}, prevDocs[idx] || {}, { nombre: r.querySelector('[data-dn]').value, cat: r.querySelector('[data-dc]').value, ramo: r.querySelector('[data-dr]').value, pais: r.querySelector('[data-dpais]').value, moneda: r.querySelector('[data-dmon]').value, producto:(r.querySelector('[data-dprod]')||{}).value||'', plan:(r.querySelector('[data-dplan]')||{}).value||'', segmento: r.querySelector('[data-dseg]').value }));
       }
       if (t === 'tarifas') {
         const ramo = tarifaRamoSel[draft.id] || (draft.ramos || [])[0];
@@ -1139,7 +1183,7 @@ Orbit.modules.aseguradoras = (function () {
     if (t === 'bancos') { const add = body.querySelector('#af-add-cta'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.cuentas = (draft.cuentas || []).concat([{ id: 'account_' + Date.now().toString(36), banco: '', tipo: 'Monetaria', numero: '', moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', titular: '', linkPago: '', ultimaVerificacion: '' }]); selectTab('bancos'); }); }
     if (t === 'productos') {
       const addRamo = body.querySelector('#af-add-ramo'); if (addRamo) addRamo.addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; snapshotTab(); const rr = (draft.ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); draft.ramos = rr; draft.comisiones = Object.assign({}, draft.comisiones); draft.comisiones[r] = draft.comisionDefault || 12; selectTab('productos'); });
-      const addReq = body.querySelector('#af-add-req'); if (addReq) addReq.addEventListener('click', () => { snapshotTab(); draft.docsRequeridos = (draft.docsRequeridos || []).concat([{ producto: '', items: '' }]); selectTab('productos'); });
+      const addReq = body.querySelector('#af-add-req'); if (addReq) addReq.addEventListener('click', () => { snapshotTab(); draft.docsRequeridos = (draft.docsRequeridos || []).concat([{ pais:draft.pais, ramo:'', producto:'', plan:'', tipo:'Documento', descripcion:'', items:'', estado:'Vigente', provenance:'captura_plataforma', fecha:new Date().toISOString().slice(0,10), documentRef:'' }]); selectTab('productos'); });
       const impCom = body.querySelector('#af-imp-com'); if (impCom) impCom.addEventListener('click', () => { if (!canEdit()) return; document.getElementById('asg-ficha').remove(); Orbit.importa.open('planillas-comision', { onDone: reload }); });
     }
     if (t === 'documentos') {

@@ -78,10 +78,12 @@ jobs:
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const l=JSON.parse(fs.readFileSync(process.env.B4_LOCK,'utf8'));
           const sourceFixed=v=>String(v||'')==='B4_003_SOURCE_FIXED_R19_PENDING_CONTRACT_AND_EXACT_PREVIEW';
-          const previewOk=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW'
-            && sourceFixed(c.currentB4?.status)
-            && sourceFixed(c.i65ForensicRemediationPlan?.b4?.status)
-            && sourceFixed(l.status)
+          const sourceFixedR20=v=>String(v||'')==='B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW';
+          const r19Preview=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW'
+            && sourceFixed(c.currentB4?.status)&&sourceFixed(c.i65ForensicRemediationPlan?.b4?.status)&&sourceFixed(l.status);
+          const r20Preview=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW'
+            && sourceFixedR20(c.currentB4?.status)&&sourceFixedR20(c.i65ForensicRemediationPlan?.b4?.status)&&sourceFixedR20(l.status);
+          const previewOk=(r19Preview||r20Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
             && l.boundaries?.syntheticQaWritesAuthorized===true

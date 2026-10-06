@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "R20_RENEWABILITY_APPLIED_SOURCE_FIX_REQUIRED",
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_SOURCE_FIX",
-    "why": "R20 deterministic renewability apply PASS: 1415 exact writes, post-write readback clean, 1309 renewable, 106 nonrenewable, 4 known QA holds, 0 conflicts; data mutation closed again. Continue only cumulative source remediation.",
+    "status": "R20_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+    "why": "R20 cumulative source fix prepared on diagnosed canonical owners after deterministic renewability apply PASS. No additional data writes, no build, no Preview, no LIVE promotion yet.",
     "currentCandidateReview": "R20_REJECTED_BLOCKERS_PLUS_AUTHORIZED_QUALITY_CARRY",
     "sourceSha": "41c38ff22f026f2a503d1814817e4a5d671904a4",
     "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
@@ -6468,5 +6468,22 @@
     "dataMutationAuthorized": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "r20SourceFix": {
+    "status": "SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CUMULATIVE_SOURCE_FIX_20261006.json",
+    "blobSha": "8fb48cb0b69ce985db90e3e9a22e6461b2189b98",
+    "selectAuditPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SELECT_OWNER_AUDIT_20261006.json",
+    "selectAuditBlobSha": "ed06932efbb9efe74bd90693952cb94776cab3e1",
+    "findingLedgerBlobSha": "08711b0fc4d399dd98c2147c958277d71283080a",
+    "carryRegisterBlobSha": "6f7b0eb5f79744e1e03ccbea552b7d7ec3a795cf",
+    "findingCount": 264,
+    "renewabilityApplyWrites": 1415,
+    "additionalOperationalWrites": 0,
+    "productMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "noBuildYet": true,
+    "noLive": true,
+    "noReimport": true
   }
 }

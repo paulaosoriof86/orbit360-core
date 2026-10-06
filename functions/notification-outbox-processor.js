@@ -7,7 +7,7 @@ const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'orbit360-notification-outbox-processor-v1';
+const VERSION = 'orbit360-notification-outbox-processor-v2-r20-internal-targets';
 const MAX_ATTEMPTS = 3;
 const INTERNAL_CHANNELS = new Set(['portal','in_app','interna','topbar','tarea','actividad']);
 const ADMIN_ROLES = new Set(['superadmin','admintenant','direccion','admin','operativo']);
@@ -30,6 +30,7 @@ const outboxRef = (tenantId, eventId, preview) => db.collection('tenants').doc(t
 const eventRef = (tenantId, eventId, preview) => db.collection('tenants').doc(tenantId).collection(preview ? 'previewWorkflowEvents' : 'workflowEvents').doc(eventId);
 const previewProjectionRef = (tenantId, notificationId) => db.collection('tenants').doc(tenantId).collection('previewNotifs').doc(notificationId);
 const portalProjectionRef = (tenantId, notificationId) => db.collection('tenantId').doc(tenantId).collection('notifs').doc(notificationId);
+const internalProjectionRef = (tenantId, notificationId, preview) => db.collection('tenants').doc(tenantId).collection(preview ? 'previewInternalNotifs' : 'internalNotifs').doc(notificationId);
 
 function rolesOf(member) {
   return unique([...(member && member.roles || []), member && member.activeRole, member && member.rolActivo, member && member.defaultRole, member && member.rol]).map(norm);
@@ -58,6 +59,7 @@ async function authorizeRetry(request, preview) {
 function notificationId(tenantId, eventId, clientId) {
   return `ntf_${sha(`${tenantId}|${eventId}|${clientId}`).slice(0, 24)}`;
 }
+function internalNotificationId(tenantId,eventId,type,id){return `int_${sha(`${tenantId}|${eventId}|${type}|${id}`).slice(0,24)}`;}
 function channelPlan(row) {
   const requested = unique(row.channels || []).map(norm).filter(Boolean);
   const channels = requested.length ? requested : ['portal','in_app'];
@@ -98,9 +100,7 @@ async function recordFailure(tenantId, eventId, preview, error) {
 async function processOutbox(tenantIdInput, eventIdInput, preview, actorUid) {
   const tenantId = cleanId(tenantIdInput, 'tenantId');
   const eventId = cleanId(eventIdInput, 'eventId');
-  if (preview && (tenantId !== 'alianzas-soluciones' || !/^b4002qa_[A-Za-z0-9._:-]+$/.test(eventId))) {
-    throw new Error('PREVIEW_QA_EVENT_ONLY');
-  }
+  if (preview && tenantId !== 'alianzas-soluciones') throw new Error('PREVIEW_QA_TENANT_ONLY');
   const outRef = outboxRef(tenantId, eventId, preview);
   const evtRef = eventRef(tenantId, eventId, preview);
   try {
@@ -109,6 +109,7 @@ async function processOutbox(tenantIdInput, eventIdInput, preview, actorUid) {
       if (!outSnap.exists) throw new Error('OUTBOX_NOT_FOUND');
       const row = outSnap.data() || {};
       if (!evtSnap.exists) throw new Error('CANONICAL_EVENT_NOT_COMMITTED');
+      if (preview) { const entityId=text(row.entityId,180); if(row.previewWrite!==true||!/^b400[23]qa[_:-]/i.test(entityId))throw new Error('PREVIEW_QA_EVENT_ONLY'); }
       if (row.processorVersion === VERSION && ['delivered_internal','pending_connection'].includes(text(row.status, 80))) {
         return { ok: true, reused: true, status: text(row.status, 80), attemptCount: Number(row.attemptCount) || 0 };
       }
@@ -118,7 +119,9 @@ async function processOutbox(tenantIdInput, eventIdInput, preview, actorUid) {
       const targets = [].concat(row.targets || []).filter(Boolean);
       const attemptCount = Math.max(0, Number(row.attemptCount) || 0) + 1;
       const clientTargets = targets.filter(t => norm(t && t.type) === 'client' && text(t && t.id, 180));
+      const internalTargets = targets.filter(t => ['advisor','role'].includes(norm(t&&t.type)) && text(t&&t.id,180));
       const shouldProjectClient = plan.internal.some(c => ['portal','in_app','interna'].includes(c));
+      const shouldProjectInternal = plan.internal.some(c => ['in_app','interna','topbar','tarea','actividad'].includes(c));
 
       if (shouldProjectClient) {
         for (const target of clientTargets) {
@@ -148,6 +151,18 @@ async function processOutbox(tenantIdInput, eventIdInput, preview, actorUid) {
         }
       }
 
+      if (shouldProjectInternal) {
+        for (const target of internalTargets) {
+          const type=norm(target.type),targetId=cleanId(target.id,'targetId'),id=internalNotificationId(tenantId,eventId,type,targetId);
+          tx.set(internalProjectionRef(tenantId,id,preview),{
+            id,tenantId,eventId,entityType:text(row.entityType,100),entityId:text(row.entityId,180),operation:text(row.operation,100),
+            targetType:type,targetId,titulo:text(row.payload&&row.payload.title,240)||'Actualización interna',
+            cuerpo:text(row.payload&&row.payload.message,1200),leida:false,previewWrite:preview===true,source:'canonical_notification_outbox',
+            processorVersion:VERSION,createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()
+          },{merge:true});
+        }
+      }
+
       const status = plan.external.length ? 'pending_connection' : 'delivered_internal';
       tx.set(outRef, {
         processorVersion: VERSION,
@@ -174,6 +189,7 @@ async function processOutbox(tenantIdInput, eventIdInput, preview, actorUid) {
         status,
         attemptCount,
         clientProjectionCount: shouldProjectClient ? clientTargets.length : 0,
+        internalProjectionCount: shouldProjectInternal ? internalTargets.length : 0,
         externalChannelsPendingConnection: plan.external
       };
     });

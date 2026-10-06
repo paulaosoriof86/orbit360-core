@@ -1,0 +1,135 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SELECT_OWNER_AUDIT_V1",
+  "recordedAt": "2026-10-06T15:18:00-06:00",
+  "status": "PASS_TOUCHED_OWNERS_WITH_EXPLICIT_UNRELATED_CARRY",
+  "scopeRule": "R20 B13: correct hardcoded/configurable selects in B4-touched owners; unrelated Phase A owners remain explicit carry and do not reopen prior PASS gates.",
+  "touchedOwners": [
+    {
+      "module": "Ops/Leads",
+      "field": "País",
+      "source": "Orbit.PAISES single owner",
+      "administrable": "tenant/platform country owner",
+      "status": "PASS_NO_LOCAL_DUPLICATE"
+    },
+    {
+      "module": "Ops/Leads",
+      "field": "Canal",
+      "source": "Orbit.cat.canales protected tenant catalog",
+      "administrable": true,
+      "status": "PASS"
+    },
+    {
+      "module": "Ops/Leads",
+      "field": "Prioridad",
+      "source": "Orbit.cat.prioridades protected tenant catalog",
+      "administrable": true,
+      "status": "PASS"
+    },
+    {
+      "module": "Ops/Leads",
+      "field": "Tipo de gestión",
+      "source": "Orbit.cat.tiposGestion protected tenant catalog",
+      "administrable": true,
+      "status": "PASS"
+    },
+    {
+      "module": "Ops/Leads",
+      "field": "Ramo/Producto",
+      "source": "Orbit.cat.ramosDe/subramosDe",
+      "administrable": true,
+      "status": "PASS"
+    },
+    {
+      "module": "Ops/Leads",
+      "field": "Plan",
+      "source": "Aseguradora canónica/ramosDetalle",
+      "administrable": true,
+      "status": "PASS"
+    },
+    {
+      "module": "Ops/Leads",
+      "field": "Asesor",
+      "source": "assignable advisor roster backend",
+      "administrable": "Equipo",
+      "status": "PASS_NO_HARDCODED_PERSON"
+    },
+    {
+      "module": "Ops/Leads",
+      "field": "Aseguradora",
+      "source": "Firestore aseguradoras por país",
+      "administrable": "Aseguradoras",
+      "status": "PASS"
+    },
+    {
+      "module": "Ops/Leads",
+      "field": "Etapa/estado workflow",
+      "source": "contractual workflow enum",
+      "administrable": false,
+      "status": "CONTRACT_ENUM_NOT_TENANT_CATALOG"
+    },
+    {
+      "module": "Ops/Leads",
+      "field": "Tipo colaboración/dirección",
+      "source": "contractual handoff enum",
+      "administrable": false,
+      "status": "CONTRACT_ENUM_NOT_PERSON_OR_TENANT_TYPE"
+    },
+    {
+      "module": "Aseguradoras",
+      "field": "País",
+      "source": "preferredCountries/Orbit.PAISES single owner",
+      "administrable": "tenant/platform country owner",
+      "status": "PASS_NO_LOCAL_DUPLICATE"
+    },
+    {
+      "module": "Aseguradoras",
+      "field": "Ramo",
+      "source": "aseguradora.ramos + tenant catalog",
+      "administrable": true,
+      "status": "PASS"
+    },
+    {
+      "module": "Aseguradoras",
+      "field": "Producto",
+      "source": "Orbit.cat.subramosDe + source registry",
+      "administrable": true,
+      "status": "PASS"
+    },
+    {
+      "module": "Aseguradoras",
+      "field": "Plan",
+      "source": "aseguradora.ramosDetalle + source registry",
+      "administrable": true,
+      "status": "PASS"
+    },
+    {
+      "module": "Aseguradoras",
+      "field": "Segmento",
+      "source": "Orbit.cat.segmentos protected tenant catalog",
+      "administrable": true,
+      "status": "PASS"
+    },
+    {
+      "module": "Aseguradoras",
+      "field": "Fuente tarifaria",
+      "source": "knowledgeSources existing source IDs",
+      "administrable": "source registry",
+      "status": "PASS_NO_FREE_TEXT"
+    },
+    {
+      "module": "Aseguradoras",
+      "field": "Tipo/estado de requisito",
+      "source": "contractual insurer-requirement enum",
+      "administrable": false,
+      "status": "CONTRACT_ENUM"
+    }
+  ],
+  "unrelatedCarry": {
+    "status": "EXPLICIT_CARRY_FORWARD_NON_BLOCKING_FOR_B4_003",
+    "rule": "Complete Phase A select inventory outside touched B4 owners remains visible in the findings ledger and must be resolved in the next authorized step; it does not justify reopening prior PASS modules without causal regression."
+  },
+  "noHardcodedPeople": true,
+  "noParallelCatalogOwner": true,
+  "noLive": true,
+  "noDataWrites": true
+}
