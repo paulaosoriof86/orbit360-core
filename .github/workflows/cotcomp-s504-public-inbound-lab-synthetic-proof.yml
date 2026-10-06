@@ -1,0 +1,114 @@
+name: CotComp S5.04 Public Inbound LAB Synthetic Proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/cotcomp-s504-public-inbound-lab-synthetic-proof-20261006
+    paths:
+      - 'functions/ops-leads-domain.js'
+      - 'functions/ops-advisor-inbox.js'
+      - 'functions/cotcomp-public-inbound-lab-proof-s504.js'
+      - 'functions/cotcomp-public-inbound-lab-proof-s504.test.js'
+      - '.github/workflows/cotcomp-s504-public-inbound-lab-synthetic-proof.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  GCLOUD_PROJECT: ays-orbit-360-lab
+
+jobs:
+  lab-synthetic-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Static boundary checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "PROJECT_ID='ays-orbit-360-lab'" functions/cotcomp-public-inbound-lab-proof-s504.js
+          grep -q "TENANT_ID='alianzas-soluciones'" functions/cotcomp-public-inbound-lab-proof-s504.js
+          grep -q "realCustomerDataUsed:false" functions/cotcomp-public-inbound-lab-proof-s504.js
+          grep -q "productionTouched:false" functions/cotcomp-public-inbound-lab-proof-s504.js
+          grep -q "publicEndpointDeployed:false" functions/cotcomp-public-inbound-lab-proof-s504.js
+
+      - name: Install functions dependencies
+        working-directory: functions
+        shell: bash
+        run: npm ci
+
+      - name: Syntax and unit tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check ops-leads-domain.js
+          node --check ops-advisor-inbox.js
+          node --check cotcomp-public-inbound-lab-proof-s504.js
+          node --test cotcomp-public-inbound-lab-proof-s504.test.js
+
+      - name: Prepare LAB credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s504"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s504/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "ays-orbit-360-lab"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+
+      - name: Execute controlled synthetic LAB proof
+        working-directory: functions
+        shell: bash
+        env:
+          S504_PROOF_RUN_ID: s504-${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s504/evidence"
+          node cotcomp-public-inbound-lab-proof-s504.js | tee "$RUNNER_TEMP/s504/evidence/S504_PUBLIC_INBOUND_LAB_RECEIPT.json"
+          node - "$RUNNER_TEMP/s504/evidence/S504_PUBLIC_INBOUND_LAB_RECEIPT.json" <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          if(r.syntheticOnly!==true)process.exit(1);
+          if(r.readback.business!==true||r.readback.requestCommitted!==true||r.readback.workflowEvent!==true)process.exit(1);
+          if(r.readback.advisorTargetedOutbox!==true||r.readback.advisorInboxBusiness!==true||r.readback.advisorInboxNotice!==true)process.exit(1);
+          if(r.retry.reused!==true||r.retry.duplicateRequests!==0||r.retry.duplicateEvents!==0||r.retry.duplicateOutbox!==0)process.exit(1);
+          if(r.conflict.sameRequestIdDifferentPayloadDenied!==true)process.exit(1);
+          if(r.cleanup.finalAbsence!==true||r.boundaries.netPersistentSyntheticDocuments!==0)process.exit(1);
+          if(r.boundaries.realCustomerDataUsed!==false||r.boundaries.productionTouched!==false)process.exit(1);
+          NODE
+
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s504-public-inbound-lab-${{ github.run_id }}
+          path: ${{ runner.temp }}/s504/evidence/S504_PUBLIC_INBOUND_LAB_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s504/firebase-service-account.json"
