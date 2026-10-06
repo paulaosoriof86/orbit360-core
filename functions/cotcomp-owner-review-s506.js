@@ -145,6 +145,7 @@ const CSS=`
 .s506-consent{display:flex;align-items:flex-start;gap:8px;margin:11px 0;font-size:11.5px;line-height:1.4;color:#544A44}
 .s506-consent input{margin-top:2px;width:16px;height:16px}
 .s506-register-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.s506-register-actions button:disabled{opacity:.48;cursor:not-allowed;pointer-events:none}
 .s506-register-status{display:none;margin-top:11px;border-radius:11px;padding:10px 11px;font-size:11.5px;line-height:1.45}
 .s506-register-status.is-ok{display:block;background:#EEF8F1;border:1px solid #B8DEC2;color:#225D31}
 .s506-register-status.is-error{display:block;background:#FFF3F3;border:1px solid #E8BEBE;color:#842D2D}
@@ -181,7 +182,7 @@ function registrationCard(id){
       <div><small>Contacto</small><strong>synthetic@example.invalid</strong></div>
     </div>
     <label class="s506-consent"><input type="checkbox" data-s506-consent="${id}"><span>Autorizo a A&S a gestionar esta solicitud de prueba.</span></label>
-    <div class="s506-register-actions"><button class="cc-btn cc-btn--primary" type="button" data-s506-register="${id}" disabled>Registrar solicitud de prueba →</button></div>
+    <div class="s506-register-actions"><button class="cc-btn cc-btn--primary" type="button" data-s506-register="${id}" disabled="disabled" aria-disabled="true">Registrar solicitud de prueba →</button></div>
     <div class="s506-register-status" data-s506-status="${id}" role="status" aria-live="polite"></div>
   </div>`;
 }
@@ -235,7 +236,7 @@ const SCRIPT=`
     cb.addEventListener('change',()=>{
       const id=cb.getAttribute('data-s506-consent');
       const b=document.querySelector('[data-s506-register="'+id+'"]');
-      if(b)b.disabled=!cb.checked;
+      if(b){b.disabled=!cb.checked;b.setAttribute('aria-disabled',cb.checked?'false':'true');}
     });
   });
   document.querySelectorAll('[data-s506-register]').forEach(btn=>{
@@ -295,7 +296,7 @@ const S506_OVERRIDE_SCRIPT=`
     if(replan)replan.style.display='none';if(actions)actions.style.display='none';
     completion.classList.add('is-visible');
     const consent=document.querySelector('[data-s506-consent="terminal"]');if(consent)consent.checked=true;
-    const button=document.querySelector('[data-s506-register="terminal"]');if(button)button.disabled=false;
+    const button=document.querySelector('[data-s506-register="terminal"]');if(button){button.disabled=false;button.setAttribute('aria-disabled','false');}
     const status=document.querySelector('[data-s506-status="terminal"]');if(status){status.className='s506-register-status is-ok';status.textContent='Integración confirmada: A&S recibió internamente la solicitud sintética y la evidencia de prueba fue limpiada automáticamente.';}
     const kicker=document.getElementById('stageKicker');if(kicker)kicker.textContent='SIGUIENTE PASO';
     const heading=document.getElementById('stageHeading');if(heading)heading.textContent='Continúa con A&S sin perder el contexto';
