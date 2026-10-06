@@ -152,11 +152,11 @@ async function collaborationFor(browser,who,businessId,type,message){
  try{
   await applyLegal(p,who);await p.goto(target+'/#/ops',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
   await p.waitForFunction(id=>!!Orbit.store?.get('negocios',id),businessId,{timeout:30000});
-  const before=await p.evaluate(()=>{const s=Orbit.store?._productStatus?.()||{};return{pending:Number(s.pending||0),failed:Number(s.failed||0),committed:Number(s.committed||0)};});
+  const before=await p.evaluate(()=>{const s=Orbit.productOperationalWriteP0?.status?.()||{};return{pending:Number(s.pending||0),failed:Number(s.failed||0),committed:Number(s.committed||0),lastError:String(s.lastError||'')};});
   await p.evaluate(id=>Orbit.ciclo.openNegocio(id),businessId);await p.waitForSelector('#ciclo-modal #ng-com-type',{timeout:10000});await p.selectOption('#ciclo-modal #ng-com-type',{label:type});await p.fill('#ciclo-modal #ng-com-new',message);await p.click('#ciclo-modal #ng-com-add');
   await p.waitForFunction(({businessId,type})=>{const n=Orbit.store?.get('negocios',businessId),rows=[].concat(n?.comentarios||[]);return rows.some(x=>String(x.tipo||'')===type&&String(x.direction||''));},{businessId,type},{timeout:30000});
-  await p.waitForFunction(({failedBefore})=>{const s=Orbit.store?._productStatus?.()||{};return Number(s.pending||0)===0&&Number(s.failed||0)===Number(failedBefore);},{failedBefore:before.failed},{timeout:30000});
-  const after=await p.evaluate(({businessId,type})=>{const s=Orbit.store?._productStatus?.()||{},n=Orbit.store?.get('negocios',businessId),rows=[].concat(n?.comentarios||[]);const c=rows.find(x=>String(x.tipo||'')===type&&String(x.direction||''));return{pending:Number(s.pending||0),failed:Number(s.failed||0),committed:Number(s.committed||0),comment:c||null};},{businessId,type});
+  await p.waitForFunction(()=>{const s=Orbit.productOperationalWriteP0?.status?.()||{};return Number(s.pending||0)===0;},null,{timeout:30000});
+  const after=await p.evaluate(({businessId,type})=>{const s=Orbit.productOperationalWriteP0?.status?.()||{},n=Orbit.store?.get('negocios',businessId),rows=[].concat(n?.comentarios||[]);const c=rows.find(x=>String(x.tipo||'')===type&&String(x.direction||''));return{pending:Number(s.pending||0),failed:Number(s.failed||0),committed:Number(s.committed||0),lastError:String(s.lastError||''),comment:c||null};},{businessId,type});
   need(after.pending===0&&after.failed===before.failed&&!!after.comment,'B4_003_R19_HANDOFF_DURABLE_BROWSER_COMMIT_NOT_CONFIRMED:'+JSON.stringify({before,after}));
   return after;
  }finally{await ctx.close();}
