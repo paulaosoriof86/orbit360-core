@@ -55,7 +55,7 @@ function fixture(raw){
         ramo:'Automóviles',
         prioridad:'Media',
         origen:'Web CotComp',
-        asesorId,
+        asesorId:advisorId,
         cotcompRef:{
           role:'public_handoff',
           caseId,
