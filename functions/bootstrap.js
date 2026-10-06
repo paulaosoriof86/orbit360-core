@@ -29,5 +29,6 @@ module.exports = Object.assign(
   require('./cotcomp-owner-review-s499'),
   require('./cotcomp-owner-review-s500'),
   require('./cotcomp-owner-review-s501'),
-  require('./cotcomp-public-inbound-lab-s505'),\n  require('./cotcomp-owner-review-s506')
+  require('./cotcomp-public-inbound-lab-s505'),
+  require('./cotcomp-owner-review-s506')
 );
