@@ -1,0 +1,25 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_PREVIEW_PROOF_SCOPE_FIX_V1",
+  "recordedAt": "2026-10-06T15:58:00-06:00",
+  "status": "QA_HARNESS_SCOPE_ALIGNED_PENDING_EXACT_PREVIEW_RETRY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "failedRunId": 37536582397,
+  "failedJobId": 112519014954,
+  "failureCode": "B4_003_CANCEL_LINK_READBACK_FAILED",
+  "diagnosis": "The cancellation recovery fixture was seeded with advisorActor.advisorId but executed by a different authenticated privileged identity. R20 commercial scope correctly keeps Leads own-only for an advisor-bound identity regardless of active privileged/Operativo role, so create_business for another advisor was denied. The generic downstream link assertion hid the scope denial.",
+  "authority": {
+    "findingId": "B4-003-R20-B10",
+    "rule": "Leads remain own-scope by advisor identity even when active role is Operativo/privileged; operational scope is separate."
+  },
+  "qaChange": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "blobSha": "4b3921d80047109f7ad251c0bc48d09730645a8b",
+    "fixtureRule": "Cancellation/recovery fixtures use the authenticated execution actor advisorId. The collaboration fixture remains explicitly assigned to advisorActor so handoff recipient proof is preserved."
+  },
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
