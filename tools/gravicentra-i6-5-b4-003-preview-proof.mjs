@@ -117,14 +117,23 @@ async function bootProduct(page,token){
    };
    window.addEventListener('orbit:product-readonly-bootstrap',forceCollections);
    const s=Orbit.productAppP0.status?.();
-   let activated;
+   let activated=s?.started?s:null,lastActivationError='';
    try{
-     activated=await Promise.resolve(s?.started?s:Orbit.productAppP0.activate());
+     for(let attempt=1;attempt<=3&&!activated?.started;attempt++){
+       try{
+         activated=await Promise.resolve(Orbit.productAppP0.activate());
+         lastActivationError='';
+       }catch(error){
+         lastActivationError=String(error&&error.message||error||'');
+         if(!/PRODUCT_(?:READONLY_BOOTSTRAP_NOT_READY|STORE_NOT_READY)/.test(lastActivationError)||attempt===3)throw error;
+         await new Promise(resolve=>setTimeout(resolve,250*attempt));
+       }
+     }
      forceCollections({detail:{phase:'post-activate'}});
    }finally{
      window.removeEventListener('orbit:product-readonly-bootstrap',forceCollections);
    }
-   return{uid:String(c.auth.currentUser?.uid||''),started:activated?.started===true,forced};
+   return{uid:String(c.auth.currentUser?.uid||''),started:activated?.started===true,forced,lastActivationError};
  },token);
  need(state.uid&&state.started,'B4_003_PRODUCT_SESSION_NOT_STARTED');
  need(state.forced&&state.forced.called===true,'B4_003_READONLY_COLLECTION_FORCE_NOT_REACHED');
