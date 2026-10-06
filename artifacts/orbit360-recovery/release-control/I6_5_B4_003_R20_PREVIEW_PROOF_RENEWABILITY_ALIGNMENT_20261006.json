@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_PREVIEW_PROOF_RENEWABILITY_ALIGNMENT_V1",
+  "recordedAt": "2026-10-06T15:46:00-06:00",
+  "status": "QA_HARNESS_ALIGNED_PENDING_EXACT_PREVIEW_RETRY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "failedRunId": 37535510570,
+  "failedJobId": 112515276675,
+  "failureCode": "B4_003_UNKNOWN_RENEWABILITY_MUST_FAIL_CLOSED",
+  "diagnosis": "The browser proof still enforced pre-R20 semantics: UNKNOWN renewability hidden from Kanban plus parallel disposition/review surfaces. R20 authority requires unresolved UNKNOWN to remain in the approved date bucket with a visible pending badge and direct review action, while explicit NO and terminal outcomes stay out.",
+  "authority": {
+    "r20FreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+    "r20FindingId": "B4-003-R20-B01",
+    "r20SourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CUMULATIVE_SOURCE_FIX_20261006.json",
+    "r20RenewabilityApplyPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_RESULT_20261006.json"
+  },
+  "qaChange": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "blobSha": "e54a36a5442cf6dbea6b89510296ee2c5375ef65",
+    "expectedSemantics": [
+      "UNKNOWN visible inside Vencidas/Esta quincena/Proximas/Horizonte according to date",
+      "Renovabilidad pendiente badge visible",
+      "Revisar renovabilidad direct action visible",
+      "parallel disposition table absent",
+      "date45 visible IDs equal date45 canonical pipeline candidates",
+      "known four R20 QA holds excluded from operational-universe distribution proof only"
+    ]
+  },
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "buildMutation": false,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

@@ -35,6 +35,7 @@ ids.renewActivity='act_ren_'+ids.renewalPolicy+'_'+new Date().toISOString().slic
 ids.cancelActivity='act_rec_'+ids.cancelation;
 ids.recoveryBusiness='neg_rec_'+ids.cancelation;
 const residueIds=['pol_mulsmxsk','pol_mulssmuz','pol_mulsxofx'];
+const r20QaHoldIds=new Set([...residueIds,'pol_muj5o5ka']); // authority: R20 renewability apply receipt, 4 known QA holds
 const proof={schema:'GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R19_V1',status:'INIT',target,ids,assertions:{},syntheticWrites:0,cleanupWrites:0,pageErrors:[],consoleErrors:[],httpErrors:[],expectedIsolationDenials:[],unexpectedHttpErrors:[],unexpectedConsoleErrors:[],syntheticFinalAbsent:false,qaResidue:{},runtimeCancellationEvidence:{}};
 
 const renewalSourceAuthority={
@@ -212,7 +213,7 @@ async function renewalDistributionReadback(){
  ]);
  const now=new Date();now.setHours(0,0,0,0);
  const clientById=new Map(clientSnap.docs.map(d=>[d.id,{id:d.id,...d.data()}]));
- const rows=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!String(x.id).startsWith('b4003qa_')&&!String(x.id).startsWith('b4_')&&x.__syntheticQa!==true);
+ const rows=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!String(x.id).startsWith('b4003qa_')&&!String(x.id).startsWith('b4_')&&x.__syntheticQa!==true&&!r20QaHoldIds.has(String(x.id)));
  const state=p=>{
   if(!Object.prototype.hasOwnProperty.call(p,'renovable')||p.renovable==null||clean(p.renovable)==='')return'UNKNOWN';
   const v=clean(p.renovable).toLowerCase();
@@ -229,7 +230,7 @@ async function renewalDistributionReadback(){
   const country=clean(p.pais||p.country||cli.pais||cli.country||'SIN_PAIS').toUpperCase()||'SIN_PAIS';
   byCountry[country]=byCountry[country]||{YES:0,NO:0,UNKNOWN:0,eligible90:0};
   byCountry[country][rs]=(byCountry[country][rs]||0)+1;
-  if(rs!=='YES'||!active(p))return;
+  if(rs==='NO'||!active(p))return;
   const d=days(p);if(d==null||d>90)return;
   eligible.push({id:p.id,numero:p.numero||'',pais:country,dias:d,estado:p.estado||'',vigenciaFin:p.vigenciaFin||''});
   byCountry[country].eligible90++;
@@ -528,8 +529,12 @@ try{
    Orbit.pais='GT';Orbit.modules.renovaciones.render(h);
    const renewGT=countries('[data-renewal-country]','data-renewal-country');
    const syntheticRenewVisibleGT=!!h.querySelector('[data-renewal-policy="'+ids.renewalPolicy+'"]');
-   const unknownRenewVisibleGT=!!h.querySelector('[data-renewal-policy="'+ids.unknownRenewPolicy+'"]');
-   const actionLayout=h.querySelector('[data-renewal-policy="'+ids.renewalPolicy+'"] [data-renewal-actions-layout]')?.getAttribute('data-renewal-actions-layout')||'';
+   const unknownCard=h.querySelector('[data-renewal-policy="'+ids.unknownRenewPolicy+'"]');
+   const unknownRenewVisibleGT=!!unknownCard;
+   const unknownRenewPendingBadge=Array.from(unknownCard?.querySelectorAll('.badge')||[]).some(x=>String(x.textContent||'').trim()==='Renovabilidad pendiente');
+   const unknownRenewReviewAction=!!unknownCard?.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');
+   const regularCard=h.querySelector('[data-renewal-policy="'+ids.renewalPolicy+'"]');
+   const regularActionCount=regularCard?regularCard.querySelectorAll('a.reno-wa,button').length:0;
    Orbit.pais='CO';Orbit.modules.renovaciones.render(h);
    const renewCO=countries('[data-renewal-country]','data-renewal-country');
    Orbit.pais=previous;
@@ -538,7 +543,7 @@ try{
      cancelExplicitTargetsGT:gt.explicitTargets,cancelExplicitTargetsCO:co.explicitTargets,
      cancelCrossCountryExplicitGT:gt.crossCountryExplicit,cancelCrossCountryExplicitCO:co.crossCountryExplicit,
      cancelIdentitySampleGT:gt.identitySample,cancelIdentitySampleCO:co.identitySample,
-     renewGT,renewCO,syntheticCancelVisibleGT,syntheticRenewVisibleGT,unknownRenewVisibleGT,cancelKpiDetailOpen,actionLayout
+     renewGT,renewCO,syntheticCancelVisibleGT,syntheticRenewVisibleGT,unknownRenewVisibleGT,unknownRenewPendingBadge,unknownRenewReviewAction,regularActionCount,cancelKpiDetailOpen
    };
  },ids);
  need(proof.visualScope.cancelGT.every(x=>x==='GT')&&proof.visualScope.cancelCO.every(x=>x==='CO'),'B4_003_CANCEL_SELECTED_COUNTRY_SCOPE_LEAK');
@@ -547,10 +552,11 @@ try{
  need(proof.visualScope.cancelCrossCountryExplicitGT===true&&proof.visualScope.cancelCrossCountryExplicitCO===true,'B4_003_R13_CANCEL_CROSS_COUNTRY_IDENTITY_AMBIGUOUS');
  need(proof.visualScope.renewGT.every(x=>x==='GT')&&proof.visualScope.renewCO.every(x=>x==='CO'),'B4_003_RENEW_SELECTED_COUNTRY_SCOPE_LEAK');
  need(proof.visualScope.syntheticCancelVisibleGT===true&&proof.visualScope.syntheticRenewVisibleGT===true,'B4_003_GT_SYNTHETIC_SCOPE_MISSING');
- need(proof.visualScope.unknownRenewVisibleGT===false,'B4_003_UNKNOWN_RENEWABILITY_MUST_FAIL_CLOSED');
+ need(proof.visualScope.unknownRenewVisibleGT===true&&proof.visualScope.unknownRenewPendingBadge===true&&proof.visualScope.unknownRenewReviewAction===true,'B4_003_R20_UNKNOWN_RENEWABILITY_MUST_STAY_IN_KANBAN:'+JSON.stringify(proof.visualScope));
  proof.assertions.renewabilityTriStateFailClosed=true;
+ proof.assertions.renewabilityPendingStaysInKanban=true;
  need(proof.visualScope.cancelKpiDetailOpen===true,'B4_003_CANCEL_KPI_DETAIL_MISSING');
- need(proof.visualScope.actionLayout==='grid2','B4_003_RENEW_ACTION_LAYOUT_NOT_COMPACT');
+ need(proof.visualScope.regularActionCount>=2,'B4_003_R20_RENEW_ACTIONS_NOT_ACCESSIBLE:'+JSON.stringify(proof.visualScope));
  proof.assertions.cancelSelectedCountryScope=true;
  proof.assertions.cancelCountrySwitchUnder2500ms=true;
  proof.assertions.cancelExplicitCanonicalTargets=true;
@@ -757,18 +763,26 @@ try{
 
  await page.evaluate(()=>{Orbit.pais='TODOS';location.hash='#/renovaciones';});
  await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='renovaciones',null,{timeout:10000});
- await page.waitForSelector('[data-renewability-review-workflow="1"]',{timeout:10000});
- await page.waitForSelector('[data-renewal-date45-reconciled]',{timeout:10000});
- proof.r18RenewalDisposition=await page.evaluate(()=>{
-   const el=document.querySelector('[data-renewal-date45-reconciled]');
-   const n=k=>Number(el?.getAttribute(k)||0);
-   const rows=Array.from(document.querySelectorAll('[data-renewal-disposition-policy]')).map(x=>({id:x.getAttribute('data-renewal-disposition-policy')||'',disposition:x.getAttribute('data-renewal-disposition')||''}));
-   return{reconciled:el?.getAttribute('data-renewal-date45-reconciled')==='true',total:n('data-renewal-date45-total'),actionable:n('data-renewal-date45-actionable'),pending:n('data-renewal-date45-pending'),terminal:n('data-renewal-date45-terminal'),nonrenewable:n('data-renewal-date45-nonrenewable'),conflict:n('data-renewal-date45-conflict'),rows,text:String(el?.innerText||'').replace(/\s+/g,' ').trim()};
- });
- need(proof.r18RenewalDisposition.reconciled===true&&proof.r18RenewalDisposition.total===proof.r18RenewalDisposition.actionable+proof.r18RenewalDisposition.pending+proof.r18RenewalDisposition.terminal+proof.r18RenewalDisposition.nonrenewable+proof.r18RenewalDisposition.conflict&&proof.r18RenewalDisposition.total>=11&&proof.r18RenewalDisposition.rows.length===proof.r18RenewalDisposition.total&&proof.r18RenewalDisposition.rows.every(x=>x.id&&x.disposition),'B4_003_R19_RENEWAL_DATE45_NOT_INDIVIDUALLY_RECONCILED:'+JSON.stringify(proof.r18RenewalDisposition));
+ await page.waitForSelector('[data-renewability-pending-count]',{timeout:10000});
+ await page.waitForSelector('[data-renewal-bucket="vencidas"]',{timeout:10000});
+ proof.r18RenewalDisposition=await page.evaluate(ids=>{
+   const bucketKeys=['vencidas','d15','d45','d90'];
+   const buckets=bucketKeys.map(key=>{const el=document.querySelector('[data-renewal-bucket="'+key+'"]');return{key,count:Number(el?.getAttribute('data-renewal-bucket-count')||0),ids:Array.from(el?.querySelectorAll('[data-renewal-policy]')||[]).map(x=>String(x.getAttribute('data-renewal-policy')||''))};});
+   const pending=Number(document.querySelector('[data-renewability-pending-count]')?.getAttribute('data-renewability-pending-count')||0);
+   const unknown=document.querySelector('[data-renewal-policy="'+ids.unknownRenewPolicy+'"]');
+   const unknownBadge=Array.from(unknown?.querySelectorAll('.badge')||[]).some(x=>String(x.textContent||'').trim()==='Renovabilidad pendiente');
+   const unknownReview=!!unknown?.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');
+   const parallelDispositionAbsent=!document.querySelector('[data-renewal-disposition-detail],[data-renewal-date45-reconciled]');
+   const terminal=p=>!!p.renovadaPor||['renovada','norenovada','rechazada','cerrada','cancelada'].includes(String(p.renovacionEstado||'').trim().toLowerCase().replace(/[\s_-]+/g,''));
+   const renewState=p=>{if(!Object.prototype.hasOwnProperty.call(p,'renovable')||p.renovable==null||String(p.renovable).trim()==='')return'UNKNOWN';const v=String(p.renovable).trim().toLowerCase();if(p.renovable===true||['true','si','sí','renovable'].includes(v))return'YES';if(p.renovable===false||['false','no','no renovable'].includes(v))return'NO';return'UNKNOWN';};
+   const expected=(Orbit.store?.all?.('polizas')||[]).filter(p=>{const state=String(p.estado||'').trim().toLowerCase().replace(/\s+/g,''),d=Orbit.ui.daysFromNow(p.vigenciaFin);return renewState(p)!=='NO'&&!terminal(p)&&d!=null&&d>=0&&d<=45&&['vigente','porrenovar'].includes(state);}).map(p=>String(p.id)).sort();
+   const visible=buckets.filter(x=>x.key==='d15'||x.key==='d45').flatMap(x=>x.ids).sort();
+   return{approvedBuckets:buckets.map(x=>x.key),buckets,pending,unknownInKanban:!!unknown,unknownBadge,unknownReview,parallelDispositionAbsent,date45ExpectedIds:expected,date45VisibleIds:visible};
+ },ids);
+ need(JSON.stringify(proof.r18RenewalDisposition.approvedBuckets)===JSON.stringify(['vencidas','d15','d45','d90'])&&proof.r18RenewalDisposition.parallelDispositionAbsent===true&&proof.r18RenewalDisposition.pending>=1&&proof.r18RenewalDisposition.unknownInKanban===true&&proof.r18RenewalDisposition.unknownBadge===true&&proof.r18RenewalDisposition.unknownReview===true&&JSON.stringify(proof.r18RenewalDisposition.date45VisibleIds)===JSON.stringify(proof.r18RenewalDisposition.date45ExpectedIds),'B4_003_R20_RENEWAL_KANBAN_RECONCILIATION_FAILED:'+JSON.stringify(proof.r18RenewalDisposition));
  proof.assertions.renewalDate45UniverseReconciled=true;
- proof.r1604RenewabilityWorkflow=await page.evaluate(ids=>{const note=document.querySelector('[data-renewability-review-workflow="1"]'),button=document.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');return{instruction:/directamente Renovabilidad/.test(note?.innerText||'')&&/Pendiente de validar/.test(note?.innerText||''),buttonLabel:String(button?.innerText||''),buttonPresent:!!button};},ids);
- need(proof.r1604RenewabilityWorkflow.instruction&&proof.r1604RenewabilityWorkflow.buttonPresent&&/Revisar y clasificar/.test(proof.r1604RenewabilityWorkflow.buttonLabel),'B4_003_R17_RENEWABILITY_WORKFLOW_NOT_ACTIONABLE:'+JSON.stringify(proof.r1604RenewabilityWorkflow));
+ proof.r1604RenewabilityWorkflow=await page.evaluate(ids=>{const note=document.querySelector('[data-renewability-pending-count]'),button=document.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');return{instruction:/permanece en su columna/i.test(note?.innerText||'')&&/desde allí/i.test(note?.innerText||''),buttonLabel:String(button?.innerText||''),buttonPresent:!!button};},ids);
+ need(proof.r1604RenewabilityWorkflow.instruction&&proof.r1604RenewabilityWorkflow.buttonPresent&&/Revisar renovabilidad/i.test(proof.r1604RenewabilityWorkflow.buttonLabel),'B4_003_R20_RENEWABILITY_WORKFLOW_NOT_ACTIONABLE:'+JSON.stringify(proof.r1604RenewabilityWorkflow));
  await page.evaluate(id=>document.querySelector('[data-renewability-review="'+id+'"]')?.click(),ids.unknownRenewPolicy);
  await page.waitForSelector('#policy-v1199 [data-renewable]',{timeout:10000});
  proof.r17RenewabilityFocusedEditor=await page.evaluate(()=>{const el=document.querySelector('#policy-v1199 [data-renewable]');return{value:String(el?.value||''),focused:document.activeElement===el,options:Array.from(el?.options||[]).map(o=>o.textContent.trim())};});
@@ -957,7 +971,7 @@ try{
  proof.r14RenewalReadiness=await page.evaluate(ids=>{
    const h=document.getElementById('host'),store=Orbit.store,previous=Orbit.pais||'TODOS',original=store._productStatus;
    Orbit.pais='GT';
-   let loading=false,leakedRows=-1,readyExpired=false,unknownActionable=true,pendingCount=-1,placeholderClient=false;
+   let loading=false,leakedRows=-1,readyExpired=false,unknownVisible=false,unknownReview=false,pendingCount=-1,placeholderClient=false;
    try{
      store._productStatus=function(){const q=original.call(store)||{},confirmed=[].concat(q.serverConfirmedCollections||[]).filter(x=>x!=='aseguradoras');return Object.assign({},q,{serverConfirmedCollections:confirmed});};
      Orbit.modules.renovaciones.render(h);
@@ -966,15 +980,16 @@ try{
    }finally{store._productStatus=original;}
    Orbit.modules.renovaciones.render(h);
    readyExpired=!!h.querySelector('[data-renewal-policy="'+ids.expiredRenewPolicy+'"]');
-   unknownActionable=!!h.querySelector('[data-renewal-policy="'+ids.unknownRenewPolicy+'"]');
+   unknownVisible=!!h.querySelector('[data-renewal-policy="'+ids.unknownRenewPolicy+'"]');
+   unknownReview=!!h.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');
    pendingCount=Number(h.querySelector('[data-renewability-pending-count]')?.getAttribute('data-renewability-pending-count')||0);
    placeholderClient=Array.from(h.querySelectorAll('[data-renewal-policy] b')).some(x=>String(x.textContent||'').trim()==='—');
    Orbit.pais=previous;
-   return{loading,leakedRows,readyExpired,unknownActionable,pendingCount,placeholderClient};
+   return{loading,leakedRows,readyExpired,unknownVisible,unknownReview,pendingCount,placeholderClient};
  },ids);
  need(proof.r14RenewalReadiness.loading===true&&proof.r14RenewalReadiness.leakedRows===0,'B4_003_R14_RENEWAL_LOADING_GATE_FAILED:'+JSON.stringify(proof.r14RenewalReadiness));
  need(proof.r14RenewalReadiness.readyExpired===true,'B4_003_R14_EXPIRED_RENEWAL_DROPPED');
- need(proof.r14RenewalReadiness.unknownActionable===false&&proof.r14RenewalReadiness.pendingCount>=1,'B4_003_R14_UNKNOWN_RENEWABILITY_VISIBILITY_CONTRACT_FAILED');
+ need(proof.r14RenewalReadiness.unknownVisible===true&&proof.r14RenewalReadiness.unknownReview===true&&proof.r14RenewalReadiness.pendingCount>=1,'B4_003_R20_UNKNOWN_RENEWABILITY_KANBAN_VISIBILITY_FAILED:'+JSON.stringify(proof.r14RenewalReadiness));
  need(proof.r14RenewalReadiness.placeholderClient===false,'B4_003_R14_RENEWAL_PLACEHOLDER_LEAK');
  proof.assertions.renewalFirstPaintReadiness=true;
  proof.assertions.expiredRenewalOutcomeContinuity=true;
@@ -1028,7 +1043,7 @@ try{
  proof.assertions.assignableAdvisorRosterMinimalProjection=true;
  proof.assertions.assignableAdvisorRosterDeduplicated=true;
 
- // R13: reconcile the real, non-synthetic renewal universe against the canonical YES-only pipeline.
+ // R20: reconcile the real, non-QA renewal universe against the canonical date-bucket pipeline (YES plus unresolved UNKNOWN debt, never explicit NO).
  proof.r13RenewalReality=await page.evaluate(ids=>{
    const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';
    Orbit.pais='TODOS';Orbit.modules.renovaciones.render(h);
