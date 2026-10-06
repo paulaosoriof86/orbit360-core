@@ -170,6 +170,24 @@ async function collaborationFor(browser,who,businessId,type,message){
   return after;
  }finally{await ctx.close();}
 }
+async function collaborationCommandFor(browser,who,businessId,type,message,direction){
+ const snap=await ref('negocios',businessId).get();need(snap.exists,'B4_003_R19_HANDOFF_COMMAND_BUSINESS_MISSING');
+ const row=snap.data()||{},ts=new Date().toISOString(),eventId='collab_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+ const comments=[].concat(row.comentarios||[]).concat([{ts,user:who.activeRole,tipo:type,texto:message,direction,eventId}]);
+ const bitacora=[].concat(row.bitacora||[]).concat([{ts,user:who.activeRole,campo:'Colaboración',de:'',a:type,origen:'manual',direction,eventId}]);
+ const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
+ try{
+  await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
+  await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});
+  const result=await p.evaluate(async({token,tenantId,activeRole,businessId,comments,bitacora,type})=>{
+    const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();
+    if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);
+    return await provider.callFunction('orbit360OpsLeadsCommandPreview',{tenantId,activeRole,operation:'update_business',entityId:businessId,payload:{comentarios:comments,bitacora,actualizado:new Date().toISOString()},reason:'B4-003 R19 '+type},'us-east1');
+  },{token,tenantId,activeRole:who.activeRole,businessId,comments,bitacora,type});
+  need(result?.canonicalReadback===true&&result?.entityId===businessId,'B4_003_R19_HANDOFF_COMMAND_CANONICAL_READBACK_MISSING:'+JSON.stringify(result));
+  return{eventId,result};
+ }finally{await ctx.close();}
+}
 async function residueReadback(){
  const out=[];
  for(const id of residueIds){
@@ -1082,8 +1100,9 @@ try{
  need(requestComment.direction==='advisor'&&requestComment.eventId,'B4_003_R19_HANDOFF_REQUEST_COMMIT_MISSING');
  const advisorInbox=await inboxProjectionFor(browser,advisorActor),advisorNotice=[].concat(advisorInbox?.notices||[]).find(x=>x.entityId===ids.collabBusiness&&x.direction==='advisor');
  need(!!advisorNotice&&advisorNotice.status==='internal_committed','B4_003_R19_ADVISOR_NOTICE_MISSING:'+JSON.stringify(advisorInbox));
- await collaborationFor(browser,advisorActor,ids.collabBusiness,'Respuesta del asesor','B4-003 R19 respuesta sintética del asesor');
+ const advisorResponse=await collaborationCommandFor(browser,advisorActor,ids.collabBusiness,'Respuesta del asesor','B4-003 R19 respuesta sintética del asesor','operations');
  const responseRow=(await ref('negocios',ids.collabBusiness).get()).data()||{},responseComment=[].concat(responseRow.comentarios||[]).slice(-1)[0]||{};
+ need(responseComment.eventId===advisorResponse.eventId,'B4_003_R19_HANDOFF_RESPONSE_EVENT_ID_MISMATCH');
  need(responseComment.direction==='operations'&&responseComment.eventId,'B4_003_R19_HANDOFF_RESPONSE_COMMIT_MISSING');
  const opsInbox=await inboxProjectionFor(browser,operativeActor),opsNotice=[].concat(opsInbox?.notices||[]).find(x=>x.entityId===ids.collabBusiness&&x.direction==='operations');
  need(!!opsNotice&&opsNotice.status==='internal_committed','B4_003_R19_OPERATIONS_NOTICE_MISSING:'+JSON.stringify(opsInbox));
