@@ -29,7 +29,7 @@ need('sbsFailClosed', text.summary.includes('fuente_recibida_requiere_copia_legi
 need('multiProductGt', ['Vida','Gastos Médicos','Fianzas','Transporte','Responsabilidad Civil'].every(x => text.summary.includes('"ramo": "'+x+'"')));
 need('multiProductCo', ['Vida','Salud','Cumplimiento','Transporte','Responsabilidad Civil'].every(x => text.summary.includes('"ramo": "'+x+'"')));
 need('moduleMergesSummaryVersions', text.module.includes('function tenantKnowledgeSummaries()') && text.module.includes('function mergeKnowledgeRows(rows)'));
-need('moduleShowsKnowledgeFacts', text.module.includes('function knowledgeFactsHtml(row)') && text.module.includes('Conocimiento vigente y observado'));
+need('moduleShowsKnowledgeFacts', /function\s+knowledgeFactsHtml\s*\(row(?:\s*,\s*filter)?\)/.test(text.module) && text.module.includes('Conocimiento vigente y observado'));
 need('moduleShowsProductRoadmap', text.module.includes('function knowledgeRoadmapHtml(row)') && text.module.includes('Cobertura de conocimiento por producto'));
 need('moduleKeepsFailClosedCopy', text.module.includes('El sistema no aplicará valores genéricos en su lugar.'));
 need('moduleKeepsManualTariffValidationGate', text.module.includes('Tabla validada y habilitada para cálculo automático'));
