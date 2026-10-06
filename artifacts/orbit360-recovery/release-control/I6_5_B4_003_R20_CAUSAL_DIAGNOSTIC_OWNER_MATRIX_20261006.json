@@ -1,0 +1,335 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_V1",
+  "recordedAt": "2026-10-06T14:02:00-06:00",
+  "status": "CAUSE_MATRIX_FROZEN_SOURCE_FIX_AUTHORIZATION_PENDING_BINDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "diagnosticHead": "28d6994de8f350296dab446b30cf7091927ead6a",
+  "r20Freeze": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
+    "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
+  },
+  "reviewedR19": {
+    "sourceSha": "41c38ff22f026f2a503d1814817e4a5d671904a4",
+    "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
+    "runId": 37486500112,
+    "machineProofBlobSha": "41619ea152169dea4e3c44c75386abaa8b92dfe4",
+    "humanStatus": "REJECTED_R20"
+  },
+  "sourceOwners": {
+    "renewalsUi": {
+      "path": "orbit360-platform/modules/renovaciones.js",
+      "blobSha": "3442fbcb9354f81118fc0ae7169d60068c40212a"
+    },
+    "insurerUi": {
+      "path": "orbit360-platform/modules/aseguradoras.js",
+      "blobSha": "ba35416a47629eac5b852d867a90a19cb415364b"
+    },
+    "cycleUi": {
+      "path": "orbit360-platform/core/ciclo.js",
+      "blobSha": "ae97f663cfa5155f14456be9610e3d040054772"
+    },
+    "opsLeadsBackend": {
+      "path": "functions/product-ops-leads-domain.js",
+      "blobSha": "a939d7e3bebb39eccfdc0ab6085bd909d435bbf7"
+    },
+    "advisorInbox": {
+      "path": "functions/ops-advisor-inbox.js",
+      "blobSha": "0689aa1fd8957d121b9c019726b886028bd501bc"
+    },
+    "notificationProcessor": {
+      "path": "functions/notification-outbox-processor.js",
+      "blobSha": "47daa1425272f71bbc9ee1bf5968579b0099e75e"
+    },
+    "authRuntime": {
+      "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+      "blobSha": "cb991621489263eaf60040ef3ddf221a69b25c6e"
+    },
+    "router": {
+      "path": "orbit360-platform/core/router.js",
+      "blobSha": "9bccd345a0d7291cbffc720b83eb76e0cb3ce535"
+    },
+    "hydration": {
+      "path": "orbit360-platform/core/product-hydration-required-optional-p0.js",
+      "blobSha": "21f870d3e0e165487843d1d6efa454474fd73563"
+    },
+    "infraCss": {
+      "path": "orbit360-platform/styles/infra.css",
+      "blobSha": "a4bf022739db4786a5a1436c11760672ff3f87db"
+    },
+    "previewStore": {
+      "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "blobSha": "112891368bcf4f9c2dc7c94abdb7e7c1bebff32a"
+    },
+    "productOperationalBackend": {
+      "path": "functions/product-operational-domain.js",
+      "blobSha": "2af16e3a4e2224f5e094a41e2ee04a5a48187f2"
+    },
+    "previousRenewabilityExecutor": {
+      "path": "tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs",
+      "blobSha": "a101465b935d212ddc9cb73baa722fbd30761a04"
+    }
+  },
+  "findings": [
+    {
+      "id": "B4-003-R20-B01",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "owner": [
+        "renewalsUi"
+      ],
+      "symptom": "Kanban no contiene todas las pólizas que deben verse por fecha; una tabla paralela intenta explicar el universo.",
+      "invariant": "Kanban aprobado es la superficie primaria; UNKNOWN renovabilidad permanece por fecha con badge/acción; NO explícito y terminales se excluyen; vencidas no tienen límite inferior.",
+      "rootCause": "renewalActionable exige renewabilityState===YES y buckets() usa solo renewalActionable. Las UNKNOWN salen del Kanban y se renderizan en un flujo separado de disposición/revisión.",
+      "discriminant": "Cambiar candidato de pipeline a YES+UNKNOWN no terminal, mantener buckets por fecha y probar que UNKNOWN aparece en su columna sin tabla sustituta.",
+      "mutationScope": [
+        "orbit360-platform/modules/renovaciones.js"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B02",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "CAUSE_DEMONSTRATED_NEW_BUSINESS_AUTHORITY_REQUIRES_NEW_DRY_RUN",
+      "owner": [
+        "previousRenewabilityExecutor",
+        "productOperationalBackend"
+      ],
+      "symptom": "1415/1419 pólizas siguen UNKNOWN después del apply previo.",
+      "invariant": "Regla R20: todo RENOVABLE salvo Transporte cargado y AP no anual de la persona canónica Valdemar Barrios.",
+      "rootCause": "Executor R13 está hardcodeado a 4 IDs y valida explícitamente distribución final YES=4/NO=0/UNKNOWN=1415. No implementa la regla R20.",
+      "discriminant": "Dry-run sobre universo completo con current/proposed/reason/exact IDs; Transporte por taxonomía canónica; Valdemar por clienteId canónico y AP cuya vigenciaFin no es el aniversario de +1 año; ambigüedades fail-closed; cero writes en dry-run.",
+      "dataWriteRule": "Paula ya autorizó el apply determinístico después de dry-run; dataMutation permanece false hasta congelar ese dry-run."
+    },
+    {
+      "id": "B4-003-R20-B03",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "owner": [
+        "insurerUi"
+      ],
+      "symptom": "Requisitos de emisión no soportan metadatos/adjunto/filtros exigidos.",
+      "invariant": "Cada requisito: país, ramo, producto/plan, tipo, descripción, adjunto opcional, estado, provenance, fecha; filtro ramo/producto.",
+      "rootCause": "reqRow solo captura producto+items; snapshot persiste solo {producto,items}; addReq crea solo esos campos.",
+      "discriminant": "Fixture requisito persiste todos los campos, se filtra por ramo/producto y sobrevive reload.",
+      "mutationScope": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B04",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "owner": [
+        "insurerUi"
+      ],
+      "symptom": "Fuente existente no puede enriquecerse/asociarse completamente ni adjuntarse sin crear una entidad paralela.",
+      "invariant": "Adjuntar evidencia a fuente existente, asociar país/ramo/producto/plan/moneda, dedupe, abrir/descargar, Drive canónico.",
+      "rootCause": "Modelo DIMENSION_KEYS incluye producto/plan pero docRow no los captura; openInsurerSource pasa scope sin producto/plan; Registry ofrece inspección/abrir URL pero no acción explícita de asociación/enriquecimiento de fuente existente.",
+      "discriminant": "UAT sobre una fuente sintética existente: attach/associate → mismo source id → readback/reload → enlace abre → no duplicado.",
+      "mutationScope": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "document/import owner already approved"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B05",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "HUMAN_VISUAL_REJECTION_OWNER_DEMONSTRATED",
+      "owner": [
+        "insurerUi",
+        "infraCss"
+      ],
+      "symptom": "Registry técnico sigue visualmente plano.",
+      "invariant": "Secundario/colapsable, premium, cards/badges/iconos/contraste sin perder datos.",
+      "rootCause": "La estructura colapsable ya existe, pero composición depende de filas genéricas + inline styles y badges limitados; la aceptación humana R20 rechaza la jerarquía visual.",
+      "discriminant": "BEFORE/AFTER exacto desktop+390px preserva contenido y mejora jerarquía sin nueva superficie paralela.",
+      "mutationScope": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/styles/infra.css"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B06",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "owner": [
+        "insurerUi"
+      ],
+      "symptom": "Tarifas/conocimiento usa inputs libres y carece de filtros suficientes.",
+      "invariant": "Catálogos administrables, filtros ramo/producto, cards premium, provenance secundaria.",
+      "rootCause": "Plan/segmento de ramo son inputs libres; documento fuente de tarifas es input libre; knowledge groups no exponen filtro combinado ramo/producto.",
+      "discriminant": "Selects administrables + filtros cambian conjunto visible y persisten; fuente de tarifa elige source id existente.",
+      "mutationScope": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "catalog owner"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B07",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "PARTIAL_CAUSE_DEMONSTRATED_NO_DATE_FABRICATION",
+      "owner": [
+        "insurerUi"
+      ],
+      "symptom": "Actividad muestra fuentes sin fecha pese a que los eventos nuevos deben tener timestamp real.",
+      "invariant": "Más reciente arriba; createdAt/updatedAt/import/audit reales; si realmente no existe fecha, decirlo sin inventar.",
+      "rootCause": "tabActividad ordena correctamente y consume timestamps canónicos cuando existen; la prueba R19 demostró seis fuentes antiguas sin timestamp canónico. Falta garantizar timestamps en eventos nuevos, no inventar históricos.",
+      "discriminant": "Nuevo evento sintético recibe timestamp de servidor/import receipt y queda arriba tras reload; históricos sin fecha continúan honestos.",
+      "mutationScope": [
+        "insurer source persistence/import owner",
+        "orbit360-platform/modules/aseguradoras.js"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B08",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "CAUSE_DEMONSTRATED_UAT_COVERAGE_GAP",
+      "owner": [
+        "insurerUi",
+        "previewStore",
+        "productOperationalBackend"
+      ],
+      "symptom": "Paula no pudo comprobar logo/producto/plan/requisito/documento E2E sin tocar LIVE.",
+      "invariant": "Misma UI; fixtures sintéticos aislados; write real Preview→readback→reload→cleanup.",
+      "rootCause": "Preview isolation protege correctamente registros reales, pero R19 UAT cubrió principalmente Drive/documento y no el conjunto completo de escrituras de ficha requerido por R20.",
+      "discriminant": "Una aseguradora sintética equivalente prueba las cinco operaciones y cleanup, sin filas reales escritas.",
+      "mutationScope": [
+        "B4 preview harness",
+        "synthetic fixture support only"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B09",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "owner": [
+        "cycleUi",
+        "opsLeadsBackend",
+        "advisorInbox",
+        "notificationProcessor"
+      ],
+      "symptom": "Comentario tarda sin feedback y receptor no ve señal clara en tarjeta/campana/deep-link.",
+      "invariant": "Loading inmediato; commit/readback; comentario visible; tarjeta destinatario; aviso interno post-commit; badge/deep-link/acción; adjuntos.",
+      "rootCause": "UI deshabilita el botón pero no cambia a Registrando; comentarios se renderizan en orden de array; tarjeta no proyecta estado de colaboración. Backend genera target advisor/operations, pero processor solo materializa clientTargets; advisor/role targets no producen proyección visible de topbar. Preview suprime outbox y R19 prueba inbox reconstruido, no la señal visible equivalente a LIVE.",
+      "discriminant": "Fixture colaboración request/response muestra loading, latest-first, card state y aviso visible al destinatario con deep-link exacto después del commit.",
+      "mutationScope": [
+        "orbit360-platform/core/ciclo.js",
+        "functions/product-ops-leads-domain.js",
+        "functions/ops-advisor-inbox.js",
+        "functions/notification-outbox-processor.js",
+        "notification UI consumer"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B10",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "CAUSE_DEMONSTRATED",
+      "owner": [
+        "cycleUi",
+        "opsLeadsBackend",
+        "advisorInbox"
+      ],
+      "symptom": "Usuario con identidad de asesor y rol activo Operativo puede ver Leads ajenos.",
+      "invariant": "Leads se limita por ownership comercial de identidad; Ops usa scope operativo separado; activeRole Operativo no amplía Leads.",
+      "rootCause": "Frontend rolFiltro aplica own-only solo si esAsesor() según rol activo. Backend combina dataScopes.workflow/leads/gestiones/default y ADMIN_ROLES incluye Operativo; inbox también comparte scope Ops/workflow. Se confunden dos dominios de scope.",
+      "discriminant": "Matriz identidad asesor con roles múltiples: Leads own-only con activeRole Asesor y Operativo; Ops respeta scope configurado; backend niega leakage.",
+      "mutationScope": [
+        "orbit360-platform/core/ciclo.js",
+        "functions/product-ops-leads-domain.js",
+        "functions/ops-advisor-inbox.js",
+        "access policy/config owner"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B11",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "CAUSE_DEMONSTRATED_EXECUTION_OWNER_ABSENT",
+      "owner": [
+        "cycleUi",
+        "opsLeadsBackend"
+      ],
+      "symptom": "Lead con cadencia activa no avanza ni notifica automáticamente.",
+      "invariant": "trigger→scheduler owner→next date→action→persist→notification, timestamp real.",
+      "rootCause": "UI y backend persisten cadenciaActiva/configuración, pero no se encontró owner de ejecución/scheduler en el dominio actual; prueba R19 de Inicio incluso reporta 'sin cadencia automática · gestiona por WhatsApp'. B4 lock exige automation post-commit.",
+      "discriminant": "Owner server-side versionado ejecuta fixture vencido una vez, persiste acción/next date/event, notifica sin duplicado en retry.",
+      "mutationScope": [
+        "canonical Ops/Leads backend; no parallel persistence"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B12",
+      "classification": "BLOCKING_IF_UAT_IMPAIRED",
+      "causeStatus": "PARTIAL_CAUSE_DEMONSTRATED_RUNTIME_DISCRIMINATION_REQUIRED",
+      "owner": [
+        "authRuntime",
+        "router",
+        "hydration",
+        "infraCss"
+      ],
+      "symptom": "Logout lento; reportes de refresh/session/back; restoring prolongado.",
+      "invariant": "Logout muestra login rápido; refresh mantiene auth/rol/ruta; Back usa historial; first render no espera SW/no esenciales.",
+      "rootCause": "Logout hace signOut y location.reload(), forzando bootstrap completo: causa demostrada. Auth restoring oculta login+shell hasta initialUser/activate: puede prolongar percepción si activación falla/lenta. Router usa hashchange nativo y Firebase local persistence existe; refresh/back no deben modificarse sin prueba runtime que discrimine auth loss vs activation/render.",
+      "discriminant": "Corregir logout sin reload. Harness mide logout/login/refresh/back y registra raw auth user, hash y route antes/después; solo ampliar fix si falla discriminante.",
+      "mutationScope": [
+        "orbit360-platform/core/auth-product-runtime-p0.js",
+        "runtime harness; router only if proof fails"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B13",
+      "classification": "BLOCKING_FOR_TOUCHED_B4_OWNERS_PLUS_CARRY_FOR_UNRELATED",
+      "causeStatus": "CAUSE_DEMONSTRATED_MIXED_CONFIG_OWNERS_AUDIT_REQUIRED",
+      "owner": [
+        "insurerUi",
+        "cycleUi",
+        "catalog owner"
+      ],
+      "symptom": "Persisten selects/listas definidos en source fuera de catálogo central.",
+      "invariant": "Matriz de todos los selects Fase A; configurables desde plataforma; no personas/estados/tipos de negocio hardcodeados cuando son configurables.",
+      "rootCause": "Aseguradoras contiene inputs libres para plan/segmento/documento fuente y Ciclo define listas colaborativas/estados en source. Falta inventario transversal owner→fuente→administrabilidad.",
+      "discriminant": "Matriz completa; todos los selects tocados por B4 apuntan a owner administrable o quedan clasificados como enum contractual no configurable; resto explicit carry.",
+      "mutationScope": [
+        "touched B4 owners + catalog audit"
+      ]
+    },
+    {
+      "id": "B4-003-R20-B14",
+      "classification": "BLOCKING_CURRENT_GATE",
+      "causeStatus": "CAUSE_DEMONSTRATED_UAT_FIXTURE_GAP_NOT_ISOLATION_DEFECT",
+      "owner": [
+        "previewStore",
+        "productOperationalBackend",
+        "B4 harness"
+      ],
+      "symptom": "Botones no permiten validar escrituras reales en Preview sobre registros operativos.",
+      "invariant": "Nunca escribir real operational row en Preview; sí ejecutar misma UI/contrato contra fixtures sintéticos equivalentes.",
+      "rootCause": "El 403 a registros reales es el control correcto. La brecha es que el harness/UAT no provee fixture equivalente para cada flujo humano que Paula debe probar.",
+      "discriminant": "R20 Preview permite por UI editar fixtures identificables solo por backend, sin exigir conocimiento técnico a Paula; readback/reload/cleanup y 0 real writes.",
+      "mutationScope": [
+        "B4 synthetic harness/fixture wiring; do not weaken backend isolation"
+      ]
+    }
+  ],
+  "adjudication": {
+    "allR20FindingsPreserved": true,
+    "qualityCarryRemainsNonBlocking": true,
+    "productMutationCanBeginAfterThisReceiptBound": true,
+    "productMutationAllowedFiles": [
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/core/ciclo.js",
+      "functions/product-ops-leads-domain.js",
+      "functions/ops-advisor-inbox.js",
+      "functions/notification-outbox-processor.js",
+      "orbit360-platform/core/auth-product-runtime-p0.js",
+      "catalog/access/notification consumers only if exact dependency proof requires",
+      "B4 QA harness/workflow files"
+    ],
+    "dataMutationAuthorized": false,
+    "nextDataStep": "R20_FULL_UNIVERSE_RENEWABILITY_DRY_RUN",
+    "noReimport": true,
+    "noLive": true,
+    "noBuildUntilOneCumulativeSuccessorReady": true
+  }
+}
