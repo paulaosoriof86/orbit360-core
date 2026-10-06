@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "R20_RENEWABILITY_APPLY_AUTHORIZED",
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWABILITY_APPLY",
-    "why": "R20 full-universe dry-run PASS: 1419 policies, 1415 exact target writes, 1309 renewable, 106 nonrenewable, 4 QA holds, 0 conflicts. Apply bound to exact universe/target/exception digests; no build or LIVE promotion.",
+    "status": "R20_RENEWABILITY_APPLIED_SOURCE_FIX_REQUIRED",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_SOURCE_FIX",
+    "why": "R20 deterministic renewability apply PASS: 1415 exact writes, post-write readback clean, 1309 renewable, 106 nonrenewable, 4 known QA holds, 0 conflicts; data mutation closed again. Continue only cumulative source remediation.",
     "currentCandidateReview": "R20_REJECTED_BLOCKERS_PLUS_AUTHORIZED_QUALITY_CARRY",
     "sourceSha": "41c38ff22f026f2a503d1814817e4a5d671904a4",
     "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
@@ -6449,16 +6449,23 @@
     "noReimport": true
   },
   "r20Renewability": {
-    "status": "DRY_RUN_PASS_APPLY_AUTHORIZED",
+    "status": "DATA_APPLIED_PASS",
     "dryRunReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_DRY_RUN_20261006.json",
     "dryRunReceiptBlobSha": "132597e805ce888c374664182f24d9dddaf27a0a",
     "applyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_AUTH_20261006.json",
     "applyAuthBlobSha": "5268e7941754609d30688ff1b5e7a7d4b5224e09",
-    "findingLedgerBlobSha": "f48d95ccf67618aed25979addc7a253a813df4ad",
-    "carryRegisterBlobSha": "ed3d20a4105d7dfc0969c9106ce2324283fe803f",
-    "writesAuthorized": 1415,
-    "productMutationAuthorized": false,
-    "dataMutationAuthorized": true,
+    "applyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_RESULT_20261006.json",
+    "applyReceiptBlobSha": "67d8d480bd85314a01611f5154919c587854af55",
+    "findingLedgerBlobSha": "fded630aa3c677ade76e016be833753ffe14c6ec",
+    "carryRegisterBlobSha": "9886666395dee795242143904e4c6366a7c195f8",
+    "writes": 1415,
+    "after": {
+      "YES": 1309,
+      "NO": 106,
+      "UNKNOWN_QA_HOLD": 4
+    },
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
     "reimport": false,
     "livePromotion": false
   }

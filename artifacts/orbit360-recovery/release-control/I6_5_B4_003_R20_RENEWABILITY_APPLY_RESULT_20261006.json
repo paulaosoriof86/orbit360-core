@@ -1,0 +1,66 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_RENEWABILITY_APPLY_RESULT_V1",
+  "recordedAt": "2026-10-06T20:44:55Z",
+  "status": "PASS_APPLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "0229196bad1bb4850f25d30fd7c39dbd21463215",
+  "ruleId": "PAULA_R20_RENEWABILITY_RULE_20261006",
+  "workflowRunId": 37528456040,
+  "artifactId": 11442484713,
+  "artifactDigest": "sha256:53ce186bd4a40a9f8c80d427d42141e5a09efebffdead2af691b95cba98dd2f5",
+  "artifactName": "b4-003-r20-renewability-apply-37528456040",
+  "dryRunReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_DRY_RUN_20261006.json",
+  "applyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_AUTH_20261006.json",
+  "writes": 1415,
+  "rollbackExecuted": false,
+  "rollbackStatus": "NOT_NEEDED",
+  "before": {
+    "policyCount": 1419,
+    "YES": 4,
+    "NO": 0,
+    "UNKNOWN": 1415,
+    "targetWriteCount": 1415
+  },
+  "after": {
+    "policyCount": 1419,
+    "YES": 1309,
+    "NO": 106,
+    "UNKNOWN": 4,
+    "targetWriteCount": 0,
+    "holds": 4,
+    "conflicts": 0,
+    "transportExceptions": 98,
+    "valdemarAp": 11,
+    "valdemarShortApExceptions": 8,
+    "valdemarAnnualApRenewable": 3
+  },
+  "integrity": {
+    "exactTargetCount": 1415,
+    "exactWrites": 1415,
+    "allTargetsReadBack": true,
+    "allTargetsClean": true,
+    "onlyRenewabilityFieldsChanged": true,
+    "noInserts": true,
+    "noDeletes": true,
+    "noReimport": true
+  },
+  "digests": {
+    "beforePolicyUniverse": "424d922ef052da7f2f82b61647dcb67f779cf62677497410c41281b43ad72810",
+    "afterPolicyUniverse": "8944171d2596057dce31c81dcd08ea6df60063614e4159ca17e2a532bfe80f96",
+    "clientUniverse": "1426258a61412331895a61dd5e5710ccecd8ce73d7ae96c93e4d0dbe16ea7540",
+    "targetBefore": "39c5176188062691cc03c6deee908d383cb1f49bf5933a21f5116896f45c4111",
+    "targetAfter": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "exception": "2793668c46585516c791cc6102cfa34792930b10974a5a8e02209556c2468e79",
+    "hold": "b0d7b3d368d715b3ded376fc21770d19d0bfab8195f6c6c3efedc414549083ab"
+  },
+  "knownQaHoldsUntouched": [
+    "pol_muj5o5ka",
+    "pol_mulsmxsk",
+    "pol_mulssmuz",
+    "pol_mulsxofx"
+  ],
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_R20_SOURCE_FIX"
+}

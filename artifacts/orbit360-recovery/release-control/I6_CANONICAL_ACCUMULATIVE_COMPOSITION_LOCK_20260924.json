@@ -2811,7 +2811,7 @@
   },
   "continuityRegisterBlobSha": "76f3cc0a91bbccd00fa8a24113154bf8142cd312",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-  "nextAction": "B4_003_R20_RENEWABILITY_APPLY",
+  "nextAction": "B4_003_R20_SOURCE_FIX",
   "b4003R15VisualReview": {
     "status": "PAULA_VISUAL_PARTIAL_PASS_REMEDIATION_REQUIRED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -3411,9 +3411,9 @@
   },
   "r20HumanReview": {
     "status": "PAULA_VISUAL_REJECTED_R20_REMEDIATION_REQUIRED",
-    "findingLedgerBlobSha": "f48d95ccf67618aed25979addc7a253a813df4ad",
-    "continuityRegisterBlobSha": "ed3d20a4105d7dfc0969c9106ce2324283fe803f",
-    "masterPlanBlobSha": "9c3ed9eb28f9b8801ece3a8a8fea45d18488aa94",
+    "findingLedgerBlobSha": "fded630aa3c677ade76e016be833753ffe14c6ec",
+    "continuityRegisterBlobSha": "9886666395dee795242143904e4c6366a7c195f8",
+    "masterPlanBlobSha": "64f9b11ade950b4c2734265d2c6b3ecfed3a6976",
     "productSourceChanged": false,
     "compositionProductFileSetChanged": false
   },
@@ -3421,25 +3421,28 @@
     "status": "FROZEN",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
     "blobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0",
-    "findingLedgerBlobSha": "f48d95ccf67618aed25979addc7a253a813df4ad",
-    "continuityRegisterBlobSha": "ed3d20a4105d7dfc0969c9106ce2324283fe803f",
-    "masterPlanBlobSha": "9c3ed9eb28f9b8801ece3a8a8fea45d18488aa94",
+    "findingLedgerBlobSha": "fded630aa3c677ade76e016be833753ffe14c6ec",
+    "continuityRegisterBlobSha": "9886666395dee795242143904e4c6366a7c195f8",
+    "masterPlanBlobSha": "64f9b11ade950b4c2734265d2c6b3ecfed3a6976",
     "productSourceChanged": false,
     "productFileSetChanged": false
   },
   "r20Renewability": {
-    "status": "DRY_RUN_PASS_APPLY_AUTHORIZED",
-    "dryRunReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_DRY_RUN_20261006.json",
-    "dryRunReceiptBlobSha": "132597e805ce888c374664182f24d9dddaf27a0a",
-    "applyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_AUTH_20261006.json",
-    "applyAuthBlobSha": "5268e7941754609d30688ff1b5e7a7d4b5224e09",
-    "findingLedgerBlobSha": "f48d95ccf67618aed25979addc7a253a813df4ad",
-    "continuityRegisterBlobSha": "ed3d20a4105d7dfc0969c9106ce2324283fe803f",
-    "masterPlanBlobSha": "9c3ed9eb28f9b8801ece3a8a8fea45d18488aa94",
+    "status": "DATA_APPLIED_PASS",
+    "applyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_RESULT_20261006.json",
+    "applyReceiptBlobSha": "67d8d480bd85314a01611f5154919c587854af55",
+    "findingLedgerBlobSha": "fded630aa3c677ade76e016be833753ffe14c6ec",
+    "continuityRegisterBlobSha": "9886666395dee795242143904e4c6366a7c195f8",
+    "masterPlanBlobSha": "64f9b11ade950b4c2734265d2c6b3ecfed3a6976",
+    "writes": 1415,
+    "after": {
+      "YES": 1309,
+      "NO": 106,
+      "UNKNOWN_QA_HOLD": 4
+    },
     "productSourceChanged": false,
     "productFileSetChanged": false,
-    "dataMutationAuthorized": true,
-    "writesAuthorized": 1415,
+    "dataMutationAuthorized": false,
     "noLive": true,
     "noReimport": true
   }

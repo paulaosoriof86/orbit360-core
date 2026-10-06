@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
-  "expectedLedgerNextBlobSha": "f48d95ccf67618aed25979addc7a253a813df4ad",
+  "expectedLedgerNextBlobSha": "fded630aa3c677ade76e016be833753ffe14c6ec",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -2951,7 +2951,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "R20_RENEWABILITY_APPLY_AUTHORIZED_SOURCE_FIX_PENDING",
+      "status": "R20_RENEWABILITY_APPLIED_SOURCE_FIX_REQUIRED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2989,7 +2989,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_RENEWABILITY_APPLY",
+      "nextAction": "B4_003_R20_SOURCE_FIX",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3225,6 +3225,12 @@
         "receiptBlobSha": "132597e805ce888c374664182f24d9dddaf27a0a",
         "applyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_AUTH_20261006.json",
         "applyAuthBlobSha": "5268e7941754609d30688ff1b5e7a7d4b5224e09"
+      },
+      "r20RenewabilityApply": {
+        "status": "PASS_APPLY",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_RESULT_20261006.json",
+        "receiptBlobSha": "67d8d480bd85314a01611f5154919c587854af55",
+        "writes": 1415
       }
     },
     {
@@ -9419,7 +9425,7 @@
       "id": "B4-003-R20-B02",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "R20_DRY_RUN_PASS_APPLY_AUTHORIZED",
+      "status": "R20_RENEWABILITY_DATA_APPLIED_PASS_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Renovabilidad",
       "finding": "Regla autorizada: todo RENOVABLE salvo Transporte actualmente cargado y AP corto plazo de Valdemar Barrios. Dry-run exact IDs/diff antes de write; apply con before/after,audit,readback,reload,rollback; conflictos fuera de regla fail-closed.",
@@ -9436,7 +9442,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "R20_RENEWABILITY_APPLY",
+      "nextAction": "R20_CUMULATIVE_SOURCE_FIX_AND_PROOF",
       "causeStatus": "CAUSE_DEMONSTRATED_NEW_BUSINESS_AUTHORITY_REQUIRES_NEW_DRY_RUN",
       "diagnosedOwners": [
         "previousRenewabilityExecutor",
@@ -9458,6 +9464,17 @@
         "valdemarAnnualApRenewable": 3,
         "qaHolds": 4,
         "conflicts": 0
+      },
+      "applyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_RESULT_20261006.json",
+      "applyReceiptBlobSha": "67d8d480bd85314a01611f5154919c587854af55",
+      "applySummary": {
+        "writes": 1415,
+        "afterYes": 1309,
+        "afterNo": 106,
+        "afterUnknownQaHolds": 4,
+        "remainingTargetWrites": 0,
+        "conflicts": 0,
+        "rollbackExecuted": false
       }
     },
     {
@@ -10005,7 +10022,7 @@
     "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
     "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
   ],
-  "b4AdvanceRule": "B4-004 forbidden. Execute exact R20 renewability apply bound to dry-run digests, then return dataMutationAuthorized=false and continue the cumulative source fix.",
+  "b4AdvanceRule": "B4-004 forbidden. R20 renewability data apply PASS; data writes are closed again. Continue one cumulative source fix, then exact Preview machine proof and targeted Paula visual.",
   "liveRule": "LIVE remains forbidden until later promotion gate; R20 Quality carry stays visible and must be resolved in next authorized step but is non-blocking for B4-003.",
   "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
   "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
@@ -10224,12 +10241,17 @@
     "dataMutationAuthorized": false
   },
   "r20Renewability": {
-    "status": "DRY_RUN_PASS_APPLY_AUTHORIZED",
-    "dryRunReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_DRY_RUN_20261006.json",
-    "dryRunReceiptBlobSha": "132597e805ce888c374664182f24d9dddaf27a0a",
-    "applyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_AUTH_20261006.json",
-    "applyAuthBlobSha": "5268e7941754609d30688ff1b5e7a7d4b5224e09",
-    "writesAuthorized": 1415,
+    "status": "DATA_APPLIED_PASS",
+    "applyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_RESULT_20261006.json",
+    "applyReceiptBlobSha": "67d8d480bd85314a01611f5154919c587854af55",
+    "writes": 1415,
+    "after": {
+      "YES": 1309,
+      "NO": 106,
+      "UNKNOWN_QA_HOLD": 4
+    },
+    "dataMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "noLive": true,
     "noReimport": true
   }
