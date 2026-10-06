@@ -1,0 +1,52 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_HANDOFF_SCOPE_ROOTFIX_V1",
+  "recordedAt": "2026-10-06T17:19:00-06:00",
+  "status": "SOURCE_FIXED_R20_HANDOFF_SCOPE_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "ff09493a2b5d3f6ffbb2644f6ebb53b19f68aadf",
+  "failedRunId": 37537789024,
+  "failedJobId": 112523080514,
+  "failureCode": "B4_003_R19_HANDOFF_DURABLE_BROWSER_COMMIT_NOT_CONFIRMED",
+  "failureMessage": "El asesor está fuera de su alcance activo.",
+  "classification": "SOURCE_DEFECT",
+  "findings": [
+    "B4-003-R20-B09",
+    "B4-003-R20-B10"
+  ],
+  "rootCause": "The canonical Ops/Leads workflow backend applied Leads scope to every negocios mutation and then applied a second generic scope check. That blocks a legitimate Ops-to-advisor typed handoff for a business assigned to another advisor even when the authenticated active role has an authorized operational scope. R20 requires Leads OWN by commercial identity while Ops uses an independent configured scope.",
+  "authority": {
+    "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+    "diagnosticBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0",
+    "mutationScope": [
+      "functions/product-ops-leads-domain.js"
+    ],
+    "invariant": "Leads remains OWN by commercial identity even with privileged active role; Ops scope is independent. Cross-domain collaboration is allowed only as a typed handoff, not as general Leads access."
+  },
+  "sourceFix": {
+    "path": "functions/product-ops-leads-domain.js",
+    "beforeBlobSha": "a480769d50675508d323dceef34f2f57799b435a",
+    "afterBlobSha": "8abf872b85e2d38cf0821d5699b823da2a3cb1b7",
+    "behavior": [
+      "Normal negocios writes continue to authorize against Leads scope.",
+      "A new typed direction=advisor collaboration may use Ops scope only for update_business, only for an operational-context business, and only when the authenticated active role is an authorized Ops/Admin role.",
+      "Advisor direction=operations responses continue to authorize against Leads OWN.",
+      "The second scope check uses the same adjudicated domain instead of intersecting Leads and Ops implicitly."
+    ]
+  },
+  "qaDiscriminant": {
+    "path": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "beforeBlobSha": "1c9864a2b030099c262af60faa6c729d2bb94ebe",
+    "afterBlobSha": "7aa7b8dc194c0e9e62a5d31f6ead9b6fbf03f35f",
+    "code": "B4_003_R20_HANDOFF_BACKEND_SCOPE_DOMAIN_MISSING"
+  },
+  "productSourceChanged": true,
+  "frontendSourceChanged": false,
+  "backendSourceChanged": true,
+  "dataMutation": false,
+  "operationalBusinessWrites": 0,
+  "renewabilityApplyRepeated": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
