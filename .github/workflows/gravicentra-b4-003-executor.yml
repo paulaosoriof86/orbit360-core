@@ -506,19 +506,6 @@ jobs:
           if not rows:raise SystemExit('B4_003_NO_SERVICE_ACCOUNT')
           pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
           PY
-          CROOT="$RUNNER_TEMP/b4-003-firebase-cli"
-          npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
-          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CROOT"
-          CLI="$CROOT/node_modules/firebase-tools/lib/bin/firebase.js"
-          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
-          SEL=''
-          while read -r F; do
-            if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then SEL="$F"; break; fi
-          done < "$ROOT/files"
-          test -n "$SEL"
-          cp "$SEL" "$RUNNER_TEMP/b4-003-sa.json"
-          chmod 600 "$RUNNER_TEMP/b4-003-sa.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4-003-sa.json" >> "$GITHUB_ENV"
           retry_bounded() {
             local limit="$1"
             shift
@@ -530,6 +517,19 @@ jobs:
             done
             return 1
           }
+          CROOT="$RUNNER_TEMP/b4-003-firebase-cli"
+          retry_bounded 420 npm install --prefix "$CROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CROOT"
+          CLI="$CROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          SEL=''
+          while read -r F; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then SEL="$F"; break; fi
+          done < "$ROOT/files"
+          test -n "$SEL"
+          cp "$SEL" "$RUNNER_TEMP/b4-003-sa.json"
+          chmod 600 "$RUNNER_TEMP/b4-003-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4-003-sa.json" >> "$GITHUB_ENV"
           retry_bounded 420 npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0
           retry_bounded 600 npx playwright install --with-deps chromium
 

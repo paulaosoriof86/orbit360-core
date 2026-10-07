@@ -1,0 +1,24 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_QA_FIREBASE_CLI_PROVISIONING_BOUNDARY_ROOTFIX_V1",
+  "recordedAt": "2026-10-07T19:44:00Z",
+  "status": "QA_INFRASTRUCTURE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B4-003-R20-QA-FIREBASE-CLI-PROVISIONING-04",
+  "affectedRunId": 37675612317,
+  "affectedSourceSha": "67651290e7731429915d0aab18f58d154632f72f",
+  "affectedJobId": 112978207234,
+  "affectedStep": "Prepare Firebase and browser dependencies",
+  "rootCause": "THE_FIRST_INFRASTRUCTURE_ROOTFIX_BOUNDED_APPLICATION_DEPENDENCIES_AND_CHROMIUM_BUT_LEFT_THE_EARLIER_FIREBASE_TOOLS_INSTALL_OUTSIDE_RETRY_BOUNDED, SO_THE_STEP_COULD_STILL_STALL_BEFORE_REACHING_EITHER_PROTECTED_COMMAND",
+  "fix": "Define retry_bounded before every dependency command and apply the 420-second two-attempt boundary to firebase-tools 14.10.1 as well as the existing app and browser boundaries.",
+  "qaBlobs": {
+    ".github/workflows/gravicentra-b4-003-executor.yml": "51387dc6c640a3b59f85dd8cda39b51f68b318ea",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "8226c1c59a1d7e07882864d4b034099f0ca78587",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "83a5d0295fa88eb275fad0953bc2de6590a05220"
+  },
+  "productFilesChanged": 0,
+  "identityMutation": false,
+  "dataMutation": false,
+  "reimport": false,
+  "live": false,
+  "b4004Held": true,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

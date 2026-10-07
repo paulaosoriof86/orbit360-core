@@ -3816,5 +3816,17 @@
     },
     "identityMutation": false,
     "b4004Held": true
+  },
+  "r20QaFirebaseCliProvisioningBoundaryRootFix": {
+    "status": "QA_INFRASTRUCTURE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_QA_FIREBASE_CLI_PROVISIONING_BOUNDARY_ROOTFIX_20261007.json",
+    "blobSha": "b72ee163b35d46fc305426501b94a17b4594cc21",
+    "qaBlobs": {
+      ".github/workflows/gravicentra-b4-003-executor.yml": "51387dc6c640a3b59f85dd8cda39b51f68b318ea",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "8226c1c59a1d7e07882864d4b034099f0ca78587",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "83a5d0295fa88eb275fad0953bc2de6590a05220"
+    },
+    "productFilesChanged": 0,
+    "b4004Held": true
   }
 }
