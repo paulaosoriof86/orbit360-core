@@ -15,6 +15,41 @@ const PUBLIC_STATE=Object.freeze({
   'Rechazado':Object.freeze({code:'REJECTED',label:'Rechazado',final:true})
 });
 
+const VALIDATED_GT_CHANNELS=Object.freeze({
+  'aseguradora_general':Object.freeze({
+    insurer:'ASEGURADORA GENERAL',channel:'1757',type:'emergency',scope:'general',
+    reviewedAt:'2026-10-07',sourceUrl:'https://www.aseguradorageneral.com/telefonos-de-emergencia'
+  }),
+  'aseguradora_guatemalteca':Object.freeze({
+    insurer:'ASEGURADORA GUATEMALTECA',channel:'2388-6868 Ext. 1',type:'emergency',scope:'general_24_7',
+    reviewedAt:'2026-10-07',sourceUrl:'https://aseguate.com/blog/'
+  }),
+  'aseguradora_la_ceiba':Object.freeze({
+    insurer:'ASEGURADORA LA CEIBA',channel:'2379-1818 / 2311-1223',type:'emergency',scope:'general',
+    reviewedAt:'2026-10-07',sourceUrl:'https://www.aceiba.com.gt/'
+  }),
+  'aseguradora_rural':Object.freeze({
+    insurer:'ASEGURADORA RURAL',channel:'2294-8811',type:'emergency',scope:'auto_danos',
+    reviewedAt:'2026-10-07',sourceUrl:'https://www.aseguradorarural.com.gt/aseguradoradnn/ServiciosyAtenci%C3%B3n/Tel%C3%A9fonosdeEmergencia.aspx'
+  }),
+  'g_t_seguros':Object.freeze({
+    insurer:'G&T SEGUROS',channel:'1778',type:'emergency',scope:'general_24_7',
+    reviewedAt:'2026-10-07',sourceUrl:'https://landing.segurosgyt.com.gt/cotizar-seguro-de-auto'
+  }),
+  'mapfre_seguros':Object.freeze({
+    insurer:'MAPFRE SEGUROS',channel:'2328-5060 / 2375-5060',type:'assistance',scope:'assistance_24_7',
+    reviewedAt:'2026-10-07',sourceUrl:'https://www.mapfre.com.gt/sobre-mapfre-guatemala/contacto/'
+  }),
+  'seguros_el_roble':Object.freeze({
+    insurer:'SEGUROS EL ROBLE',channel:'1797',type:'emergency',scope:'general',
+    reviewedAt:'2026-10-07',sourceUrl:'https://www.elroble.com/'
+  }),
+  'seguros_bantrab':Object.freeze({
+    insurer:'SEGUROS BANTRAB',channel:'2410-2696',type:'emergency',scope:'auto_incendios_vida',
+    reviewedAt:'2026-10-07',sourceUrl:'https://www.bantrab.com.gt/tips/que-hacer-en-caso-de-emergencia/'
+  })
+});
+
 const POLICY=Object.freeze({
   sourceOnly:true,
   publicWriteAllowed:false,
@@ -72,6 +107,38 @@ function documentRequestAllowed({claimExists,customerScopeResolved,requestReason
   return {ok:errors.length===0,errors};
 }
 
+function insurerKey(name){
+  return norm(name).replace(/^seguros_de_?/,'').replace(/^seguros_?/,m=>m);
+}
+
+function validatedGtChannel(insurerName){
+  const key=norm(insurerName);
+  if(VALIDATED_GT_CHANNELS[key])return VALIDATED_GT_CHANNELS[key];
+  const aliases={
+    'mapfre':'mapfre_seguros',
+    'mapfre_seguros_guatemala':'mapfre_seguros',
+    'seguros_g_t':'g_t_seguros',
+    'g_t':'g_t_seguros',
+    'el_roble':'seguros_el_roble',
+    'bantrab':'seguros_bantrab',
+    'la_ceiba':'aseguradora_la_ceiba',
+    'rural':'aseguradora_rural',
+    'aseguate':'aseguradora_guatemalteca'
+  };
+  const canonical=aliases[key]||'';
+  return canonical&&VALIDATED_GT_CHANNELS[canonical]||null;
+}
+
+function validatedChannelRegistrySummary(){
+  const rows=Object.values(VALIDATED_GT_CHANNELS);
+  return Object.freeze({
+    country:'GT',
+    reviewedAt:'2026-10-07',
+    count:rows.length,
+    insurerNames:Object.freeze(rows.map(r=>r.insurer))
+  });
+}
+
 function channelFreshnessStatus({emergencyContact,lastReviewedAt,officialEvidenceVerified}={}){
   const contact=clean(emergencyContact,220);
   const reviewed=clean(lastReviewedAt,40);
@@ -124,6 +191,6 @@ function assistanceChannelProjection({insurer,aysWhatsapp,aysEmail}={}){
 }
 
 module.exports=Object.freeze({
-  VERSION,INTERNAL_STATES,PUBLIC_STATE,POLICY,
-  clean,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,channelFreshnessStatus,resolvePublicAssistanceChannels,assistanceChannelProjection
+  VERSION,INTERNAL_STATES,PUBLIC_STATE,VALIDATED_GT_CHANNELS,POLICY,
+  clean,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,insurerKey,validatedGtChannel,validatedChannelRegistrySummary,channelFreshnessStatus,resolvePublicAssistanceChannels,assistanceChannelProjection
 });
