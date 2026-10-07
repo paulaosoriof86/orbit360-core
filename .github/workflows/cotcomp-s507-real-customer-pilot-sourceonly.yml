@@ -1,0 +1,44 @@
+name: CotComp S5.07 Real Customer Pilot Source-only Contract
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/cotcomp-s507-real-customer-pilot-sourceonly-20261007
+    paths:
+      - 'functions/cotcomp-real-customer-pilot-s507-contract.js'
+      - 'functions/cotcomp-real-customer-pilot-s507-contract.test.js'
+      - '.github/workflows/cotcomp-s507-real-customer-pilot-sourceonly.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  source-only-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and deterministic contract tests
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check cotcomp-real-customer-pilot-s507-contract.js
+          node --check cotcomp-real-customer-pilot-s507-contract.test.js
+          node --test cotcomp-real-customer-pilot-s507-contract.test.js
+      - name: Source-only hard locks
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "runtimeRealDataEnabled: false" cotcomp-real-customer-pilot-s507-contract.js
+          grep -q "production: false" cotcomp-real-customer-pilot-s507-contract.js
+          grep -q "providerRater: false" cotcomp-real-customer-pilot-s507-contract.js
+          grep -q "formalLegalValidationComplete: false" cotcomp-real-customer-pilot-s507-contract.js
+          grep -q "legalComplianceVerified: false" cotcomp-real-customer-pilot-s507-contract.js
+          ! grep -q "firebase-admin" cotcomp-real-customer-pilot-s507-contract.js
+          ! grep -q "onRequest\|onCall" cotcomp-real-customer-pilot-s507-contract.js
