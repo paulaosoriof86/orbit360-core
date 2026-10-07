@@ -188,7 +188,10 @@ Orbit.modules.aseguradoras = (function () {
     [].concat(a.docsRequeridos||[],a.docs||[],knowledgeSources(a)||[]).forEach(x=>{if((!ramo||norm(x&&x.ramo)===norm(ramo))&&(!producto||norm(x&&x.producto)===norm(producto))&&x&&x.plan)out.push(x.plan);});
     return uniqueText(out).sort((x,y)=>x.localeCompare(y,'es'));
   }
-  function commercialPlanCatalog(a,ramo){let out=[];try{out=out.concat(Orbit.cat&&Orbit.cat.get?Orbit.cat.get('planes')||[]:[]);}catch(e){}out=out.concat(planOptionsFor(a,ramo,''));return uniqueText(out).sort((x,y)=>x.localeCompare(y,'es'));}\n  function selectOptions(values,current,blank){return (blank!=null?'<option value="">'+U.esc(blank)+'</option>':'')+uniqueText(values).map(v=>'<option value="'+U.esc(v)+'" '+(clean(v)===clean(current)?'selected':'')+'>'+U.esc(v)+'</option>').join('');}
+  function commercialPlanCatalog(a,ramo){let out=[];try{out=out.concat(Orbit.cat&&Orbit.cat.get?Orbit.cat.get('planes')||[]:[]);}catch(e){}out=out.concat(planOptionsFor(a,ramo,''));return uniqueText(out).sort((x,y)=>x.localeCompare(y,'es'));}\n  function commercialProductCatalog(a,ramo){let out=[];try{out=Orbit.cat&&typeof Orbit.cat.subramosDe==='function'?Orbit.cat.subramosDe(a.pais,ramo)||[]:[];}catch(e){}try{out=out.concat(Orbit.cat&&Orbit.cat.get?Orbit.cat.get('productos')||[]:[]);}catch(e){}return uniqueText(out).sort((x,y)=>x.localeCompare(y,'es'));}
+  function selectedCommercialList(a,ramo,key,legacyKey){const det=a&&a.ramosDetalle&&a.ramosDetalle[ramo]||{},raw=det[key]!=null?det[key]:det[legacyKey];return uniqueText([].concat(raw||[]).flatMap(v=>String(v||'').split(/[;,|]/))).sort((x,y)=>x.localeCompare(y,'es'));}
+  function multiCheckOptions(values,selected,attr,ramo){const chosen=new Set([].concat(selected||[]).map(clean));return '<div class="insurer-offering-checks">'+uniqueText(values).map(v=>'<label><input type="checkbox" '+attr+'="'+U.esc(ramo)+'" value="'+U.esc(v)+'" '+(chosen.has(clean(v))?'checked':'')+'><span>'+U.esc(v)+'</span></label>').join('')+'</div>';}
+  function selectOptions(values,current,blank){return (blank!=null?'<option value="">'+U.esc(blank)+'</option>':'')+uniqueText(values).map(v=>'<option value="'+U.esc(v)+'" '+(clean(v)===clean(current)?'selected':'')+'>'+U.esc(v)+'</option>').join('');}
   function visibleState(value) {
     const key = norm(value).replace(/ /g, '_');
     if (/habilitado.*cotizador/.test(key)) return 'Habilitado para Cotizador';
@@ -916,12 +919,15 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ---- Productos y planes ---- */
   function tabProductos(a, editing) {
-    const ramos = a.ramos || [],state=reqFilterState[a.id]||(reqFilterState[a.id]={ramo:'',producto:''});
+    const ramos = a.ramos || [],catalogRamos=uniqueText((Orbit.cat&&Orbit.cat.ramosDe?Orbit.cat.ramosDe(a.pais):[]).concat(ramos)),state=reqFilterState[a.id]||(reqFilterState[a.id]={ramo:'',producto:''});
     const products=productOptionsFor(a,state.ramo),reqs=(a.docsRequeridos||[]).map((r,i)=>({r,i})).filter(x=>(!state.ramo||norm(x.r.ramo)===norm(state.ramo))&&(!state.producto||norm(x.r.producto)===norm(state.producto)));
-    return `<div class="asg-sec insurer-premium-section"><div class="insurer-premium-head"><div style="display:flex;gap:12px"><span class="insurer-premium-icon">🧩</span><div><h3>Productos, ramos y planes</h3><p>Configura qué ofrece la aseguradora y qué exige para emitir. Los documentos de respaldo se guardan en Drive.</p></div></div></div><div class="insurer-premium-body">
-      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Configuración comercial ${editing ? '<button class="btn ghost sm" id="af-add-ramo">+ Ramo</button>' : ''}</div>
-      <div class="ct-grid">${ramos.map((r, i) => ramoRow(a, r, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin ramos habilitados.</div>'}</div>
-      <div class="cfg-note" style="margin-top:9px">Un ramo NO se ofrece en Cotizador hasta que lo marqués explícitamente "Habilitado p/ Cotizador" aquí. La ausencia de configuración significa <b>no disponible</b>, no lo contrario.</div>
+    return `<div class="asg-sec insurer-premium-section"><div class="insurer-premium-head"><div style="display:flex;gap:12px"><span class="insurer-premium-icon">🧩</span><div><h3>Productos, ramos y planes</h3><p><b>Aquí defines qué comercializa la aseguradora.</b> Selecciona ramos, productos y planes aprobados. Los archivos que los respaldan se cargan en Documentos y fuentes.</p></div></div></div><div class="insurer-premium-body">
+      <div class="insurer-role-guide"><div><b>1 · Oferta comercial</b><span>Ramos, productos y planes que sí ofrecemos.</span></div><div><b>2 · Evidencia</b><span>Los documentos se administran en Documentos y fuentes.</span></div><div><b>3 · Cálculo</b><span>Solo conocimiento validado pasa a Tarifas y conocimiento.</span></div></div>
+      <div class="asg-sec-t">Ramos que ofrece esta aseguradora</div>
+      ${editing?'<div class="insurer-ramo-multiselect">'+catalogRamos.map(r=>'<label><input type="checkbox" data-offer-ramo value="'+U.esc(r)+'" '+(ramos.includes(r)?'checked':'')+'><span>'+U.esc(r)+'</span></label>').join('')+'</div>':'<div class="insurer-selected-ramos">'+(ramos.map(r=>'<span class="badge info">'+U.esc(r)+'</span>').join('')||'<span class="muted">Sin ramos seleccionados.</span>')+'</div>'}
+      <div class="asg-sec-t" style="margin-top:16px">Matriz comercial por ramo</div>
+      <div class="insurer-offering-matrix">${ramos.map((r, i) => ramoRow(a, r, i, editing)).join('') || '<div class="muted" style="font-size:12px">Selecciona al menos un ramo para configurar productos y planes.</div>'}</div>
+      <div class="cfg-note" style="margin-top:9px">Seleccionar un producto o plan <b>no habilita cálculos</b>. El Cotizador solo usa un ramo cuando también tenga conocimiento validado y la habilitación correspondiente.</div>
       <div class="asg-sec-t" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span>Documentos requeridos para emisión</span>${editing ? '<button class="btn ghost sm" id="af-add-req">+ Requisito</button>' : ''}</div>
       <div class="insurer-filter-bar"><label>Ramo<select id="af-req-filter-ramo" class="o-sel">${selectOptions(ramos,state.ramo,'Todos')}</select></label><label>Producto<select id="af-req-filter-producto" class="o-sel">${selectOptions(products,state.producto,'Todos')}</select></label></div>
       <div id="af-reqs">${reqs.map(x => reqRow(x.r, x.i, editing, a)).join('') || '<div class="muted" style="font-size:12px">Sin requisitos para los filtros seleccionados.</div>'}</div></div>
@@ -930,11 +936,12 @@ Orbit.modules.aseguradoras = (function () {
   function ramoRow(a, r, i, editing) {
     const pct = (a.comisiones && a.comisiones[r] != null) ? a.comisiones[r] : (a.comisionDefault != null ? a.comisionDefault : '');
     const hab = !!(a.ramosHabilitados && a.ramosHabilitados[r] && a.ramosHabilitados[r].cotizador === true);
-    const det = (a.ramosDetalle && a.ramosDetalle[r]) || {};
-    return `<div class="ct-cell"><span>${U.esc(r)}</span><div class="ct-inp"><input type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}" ${editing ? '' : 'disabled'}><span>%</span></div>
-      <select class="o-sel" data-ramoseg="${U.esc(r)}" style="font-size:11px;margin-top:4px" ${editing ? '' : 'disabled'}>${selectOptions((Orbit.cat&&Orbit.cat.get?Orbit.cat.get('segmentos'):[]).filter(x=>typeof x==='string'),det.segmento||'','Segmento…')}</select>
-      <select class="o-sel" data-ramoplan="${U.esc(r)}" style="font-size:11px;margin-top:4px" ${editing ? '' : 'disabled'}>${selectOptions(planOptionsFor(a,r,''),det.plan||'','Plan…')}</select>
-      <label style="display:flex;align-items:center;gap:4px;font-size:10.5px;margin-top:4px"><input type="checkbox" data-ramohab="${U.esc(r)}" ${hab ? 'checked' : ''} ${editing ? '' : 'disabled'}><b>${hab ? 'Habilitado' : 'NO habilitado'}</b> p/ Cotizador</label></div>`;
+    const det = (a.ramosDetalle && a.ramosDetalle[r]) || {},selectedProducts=selectedCommercialList(a,r,'productos','producto'),selectedPlans=selectedCommercialList(a,r,'planes','plan');
+    const products=commercialProductCatalog(a,r),plans=commercialPlanCatalog(a,r);
+    return `<section class="insurer-offering-card" data-offering-ramo="${U.esc(r)}"><div class="insurer-offering-head"><div><b>${U.esc(r)}</b><span>${selectedProducts.length} producto(s) · ${selectedPlans.length} plan(es)</span></div><label class="insurer-cotizador-toggle"><input type="checkbox" data-ramohab="${U.esc(r)}" ${hab ? 'checked' : ''} ${editing ? '' : 'disabled'}><span>${hab?'Disponible para Cotizador':'No habilitado para Cotizador'}</span></label></div>
+      <div class="insurer-offering-meta"><label>Comisión %<input class="o-sel" type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}" ${editing ? '' : 'disabled'}></label><label>Segmento<select class="o-sel" data-ramoseg="${U.esc(r)}" ${editing ? '' : 'disabled'}>${selectOptions((Orbit.cat&&Orbit.cat.get?Orbit.cat.get('segmentos'):[]).filter(x=>typeof x==='string'),det.segmento||'','Seleccionar…')}</select></label></div>
+      <div class="insurer-offering-cols"><div><b>Productos</b><small>Catálogo del país y ramo</small>${editing?multiCheckOptions(products,selectedProducts,'data-ramoprod',r):(selectedProducts.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin productos seleccionados.</span>')}</div><div><b>Planes</b><small>Planes comerciales definidos para el tenant o documentados</small>${editing?multiCheckOptions(plans,selectedPlans,'data-ramoplancheck',r):(selectedPlans.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin planes específicos.</span>')}</div></div>
+    </section>`;
   }
   function reqRow(r, i, editing, a) {
     const ro = editing ? '' : 'disabled',ramos=a.ramos||[],ramo=r.ramo||'',products=productOptionsFor(a,ramo),plans=planOptionsFor(a,ramo,r.producto||''),status=r.estado||'Vigente',type=r.tipo||'Documento';
