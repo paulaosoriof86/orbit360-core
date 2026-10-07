@@ -183,7 +183,12 @@ async function inboxUiFor(browser,who,eventId,expectedSurface,markAttended){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{
   await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
-  await p.evaluate(()=>document.dispatchEvent(new CustomEvent('orbit:session',{detail:{source:'b4003qa'}})));
+  const expectedRole=norm(who.activeRole);
+  const sessionReady=await p.waitForFunction(role=>{
+    const raw=String(Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+    return raw===role;
+  },expectedRole,{timeout:10000}).then(()=>true).catch(()=>false);
+  need(sessionReady,'B4_003_INBOX_SESSION_ROLE_NOT_READY:'+expectedRole);
   if(expectedSurface)await p.waitForFunction(surface=>location.hash==='#/'+surface,expectedSurface,{timeout:10000});
   const landingHash=await p.evaluate(()=>location.hash);
   await p.click('#ops-inbox-bell');
@@ -1384,7 +1389,7 @@ try{
  for(const e of proof.httpErrors){
    let d=null;try{d=JSON.parse(e.postData||'{}').data||null;}catch{}
    const muts=d&&Array.isArray(d.mutations)?d.mutations:[];
-   const exact=e.status===403
+   const exactSecureAudit=e.status===403
      && /orbit360ProductOperationalCommandPreview$/.test(e.url||'')
      && /Preview operativo solo admite fixtures sintéticos autorizados B3-004\/B4-003/.test(e.responseBody||'')
      && muts.length===1
@@ -1393,21 +1398,59 @@ try{
      && muts[0].payload&&muts[0].payload.tipo==='admin'
      && muts[0].payload.titulo==='Acceso a recurso seguro'
      && /^document\.upload · ok$/.test(String(muts[0].payload.detalle||''));
-   if(exact)expectedIsolationDenials.push({status:e.status,url:e.url,id:muts[0].id,collection:'actividades',reason:'SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW',persisted:null});
-   else unexpectedHttpErrors.push(e);
+   const entityId=clean(d&&d.entidadId),entity=norm(d&&d.entidad),sourceModule=norm(d&&d.sourceModule);
+   const exactDriveIsolation=e.status===403
+     && /orbit360DocumentDriveListFolderPreview$/.test(e.url||'')
+     && /Preview documental solo admite expedientes sintéticos autorizados\./.test(e.responseBody||'')
+     && /PERMISSION_DENIED/.test(e.responseBody||'')
+     && clean(d&&d.tenantId)===tenantId
+     && entity==='aseguradora'
+     && entityId===clean(knowledgeProbe.aseguateId)
+     && entityId==='gt-aseguradora-guatemalteca'
+     && !/^b4003qa_/i.test(entityId)
+     && sourceModule==='aseguradoras'
+     && !clean(d&&d.folderId);
+   if(exactSecureAudit){
+     expectedIsolationDenials.push({status:e.status,url:e.url,id:muts[0].id,collection:'actividades',reason:'SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW',persisted:null});
+   }else if(exactDriveIsolation){
+     expectedIsolationDenials.push({status:e.status,url:e.url,operation:'listFolder',entity:'aseguradora',entityId,sourceModule:'aseguradoras',reason:'DRIVE_REAL_DOSSIER_EXPECTED_ISOLATION_DENIAL',persisted:false,persistenceCheck:'NOT_APPLICABLE_READ_ONLY_DENIAL'});
+   }else unexpectedHttpErrors.push(e);
  }
- for(const x of expectedIsolationDenials)x.persisted=(await ref('actividades',x.id).get()).exists;
+ for(const x of expectedIsolationDenials){
+   if(x.collection==='actividades')x.persisted=(await ref('actividades',x.id).get()).exists;
+ }
+ const secureAuditDenials=expectedIsolationDenials.filter(x=>x.reason==='SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW');
+ const driveIsolationDenials=expectedIsolationDenials.filter(x=>x.reason==='DRIVE_REAL_DOSSIER_EXPECTED_ISOLATION_DENIAL');
+ proof.driveIsolation={positiveSynthetic:{
+   insurerId:ids.insurer,
+   e2e:proof.assertions.insurerDriveE2E===true,
+   browserVisible:proof.assertions.insurerDriveBrowserVisible===true,
+   fileOpen:proof.assertions.insurerDriveBrowserFileOpen===true,
+   reloadPersistence:proof.assertions.insurerDriveReloadPersistence===true,
+   cleanup:proof.assertions.insurerDriveFileCleanup===true
+ },negativeReal:{entityId:clean(knowledgeProbe.aseguateId),denials:driveIsolationDenials}};
+ proof.assertions.insurerDriveSyntheticPositivePath=proof.assertions.insurerDriveE2E===true
+   && proof.assertions.insurerDriveBrowserVisible===true
+   && proof.assertions.insurerDriveBrowserFileOpen===true
+   && proof.assertions.insurerDriveReloadPersistence===true
+   && proof.assertions.insurerDriveSyntheticRollback===true
+   && proof.assertions.insurerDriveFileCleanup===true;
+ proof.assertions.insurerDriveRealIsolationDenied=driveIsolationDenials.length>=1
+   && driveIsolationDenials.every(x=>x.entityId==='gt-aseguradora-guatemalteca'&&x.operation==='listFolder'&&x.reason==='DRIVE_REAL_DOSSIER_EXPECTED_ISOLATION_DENIAL');
  const generic403=(proof.consoleErrors||[]).filter(x=>/Failed to load resource: the server responded with a status of 403/.test(x)).length;
  const non403=(proof.consoleErrors||[]).filter(x=>!/Failed to load resource: the server responded with a status of 403/.test(x));
  const extra403=Math.max(0,generic403-expectedIsolationDenials.length);
  proof.expectedIsolationDenials=expectedIsolationDenials;
  proof.unexpectedHttpErrors=unexpectedHttpErrors;
  proof.unexpectedConsoleErrors=non403.concat(Array.from({length:extra403},()=> 'UNATTRIBUTED_CONSOLE_403'));
- proof.assertions.previewGeneralWriteIsolation=expectedIsolationDenials.length>=1
-   && expectedIsolationDenials.every(x=>x.persisted===false)
+ proof.assertions.previewGeneralWriteIsolation=secureAuditDenials.length>=1
+   && secureAuditDenials.every(x=>x.persisted===false)
+   && proof.assertions.insurerDriveRealIsolationDenied===true
    && unexpectedHttpErrors.length===0
    && proof.unexpectedConsoleErrors.length===0;
  proof.assertions.noOperationalRealRowsWritten=proof.assertions.previewGeneralWriteIsolation===true;
+ need(proof.assertions.insurerDriveSyntheticPositivePath===true,'B4_003_DRIVE_SYNTHETIC_POSITIVE_PATH_NOT_PROVEN');
+ need(proof.assertions.insurerDriveRealIsolationDenied===true,'B4_003_DRIVE_REAL_ISOLATION_NEGATIVE_PATH_NOT_PROVEN');
  need(proof.assertions.cancellationProjectionConsistent===true,'B4_003_REAL_CANCELATION_SOURCE_WITHOUT_PROJECTION');
  proof.assertions.r19CommercialDependencyClearsStale=true;
  proof.assertions.r19QualitySearchFiltersReachable=true;
