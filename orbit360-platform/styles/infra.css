@@ -1002,8 +1002,8 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 .inbox-open{display:block;width:100%;border:0;background:transparent;text-align:left;padding:14px 15px;cursor:pointer;color:inherit}
 .inbox-card-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.inbox-message{margin-top:6px;color:var(--ink-2);font-size:13px;line-height:1.45}
 .inbox-card-actions{display:flex;gap:7px;justify-content:flex-end;padding:10px 14px;border-top:1px solid var(--line-2);background:var(--card-2)}
-.badge.collab-action{background:var(--red-soft);color:var(--red);border-color:var(--red-line);font-weight:800}
-.badge.collab-wait{background:color-mix(in srgb,var(--ok) 11%,var(--card));color:var(--ok);border-color:color-mix(in srgb,var(--ok) 30%,var(--line));font-weight:800}
+.badge.collab-action{background:var(--red);color:#fff;border-color:var(--red);font-weight:800;box-shadow:0 4px 12px color-mix(in srgb,var(--red) 24%,transparent)}
+.badge.collab-wait{background:var(--ok);color:#fff;border-color:var(--ok);font-weight:800}
 .collab-file-btn{position:relative}.collab-doc{max-width:100%;white-space:normal;text-align:left}
 
 /* Aseguradoras · premium information hierarchy */
@@ -1031,4 +1031,31 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
  .inbox-card-actions{justify-content:stretch}.inbox-card-actions .btn{flex:1}
  .insurer-premium-head{padding:15px;gap:10px}.insurer-premium-body{padding:12px}.insurer-preview-uat{align-items:flex-start;flex-direction:column}
  .quality-section-head{padding:14px}.quality-section-head h3{font-size:17px}
+}
+
+
+/* B4-003 R20 second human review · daily-use hierarchy */
+.ciclo-h-brand{background:linear-gradient(120deg,var(--red) 0%,#65101d 42%,#17191d 100%)!important}
+.ciclo-stage-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;box-shadow:0 0 0 2px rgba(255,255,255,.35)}
+.ciclo-card{max-height:min(92vh,900px)}
+.ciclo-stepper{scrollbar-width:none}.ciclo-stepper::-webkit-scrollbar{display:none}
+.ciclo-collab-panel{border:1px solid var(--red-line);border-radius:14px;background:var(--card);padding:14px;box-shadow:var(--sh-1)}
+.ciclo-collab-title{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:15px}
+.ciclo-collab-help{font-size:12px;line-height:1.45;color:var(--ink-2);background:var(--card-2);border-radius:10px;padding:9px 11px;margin:-2px 0 12px}
+.ciclo-collab-thread{display:grid;gap:8px;max-height:300px;overflow:auto;padding-right:3px}
+.ciclo-collab-empty{padding:14px;border:1px dashed var(--line);border-radius:10px;text-align:center}
+.com-row{padding:12px 13px;border-radius:12px;margin:0;background:var(--card);box-shadow:none}
+.com-row.collab-advisor{border-left:4px solid var(--red)}
+.com-row.collab-operations{border-left:4px solid var(--ok)}
+.com-h b{font-family:var(--f-display);font-size:12.5px}.collab-message{font-size:13px;line-height:1.45}
+.ciclo-collab-add{display:grid;grid-template-columns:minmax(170px,.8fr) minmax(220px,1.4fr) auto auto;align-items:center}
+.inbox-toolbar{padding:10px 16px 12px;border-bottom:1px solid var(--line);background:var(--card-2)}
+.inbox-active-count{display:inline-flex;align-items:center;gap:7px;font-size:12px}.inbox-active-count b{display:grid;place-items:center;min-width:28px;height:28px;padding:0 7px;border-radius:99px;background:var(--red);color:#fff;font-family:var(--f-display);font-size:13px}
+.inbox-card-actions .btn[aria-busy="true"]{opacity:.72;cursor:wait}
+.quality-scroll-top{overflow-x:auto;height:14px;margin:0 14px 4px;scrollbar-width:auto}.quality-scroll-top>div{height:1px}
+.quality-scroll-top::-webkit-scrollbar{height:12px}.quality-scroll-top::-webkit-scrollbar-thumb{background:var(--ink-3);border-radius:20px}
+@media(max-width:760px){
+ .ciclo-collab-add{grid-template-columns:1fr}
+ .inbox-toolbar{align-items:center;padding:10px 12px}
+ .quality-scroll-top{display:none}
 }
