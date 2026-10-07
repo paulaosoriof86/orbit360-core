@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-clean-20261007.r20f2-role-landing';
+  var VERSION='fase-a-i2-clean-20261007.r20f3-pending-landing';
   var state={initialized:false,activating:false,started:false,routerStarted:false,tenantContextReady:false,operationalWriteReady:false,lastError:''};
   var activationPromise=null;
 
@@ -28,12 +28,8 @@
   }
   function progress(message){try{var el=document.querySelector('#auth-restoring small');if(el)el.textContent=message||'';}catch(e){}}
   function preferredLanding(){
-    var p=Orbit.auth&&Orbit.auth.productUser||{},role=clean(p.activeRole).toLowerCase(),advisor=clean(p.advisorId);
-    // Active role governs the operational surface. A multi-role user may have an
-    // advisor binding without currently acting as Asesor; advisorId must never
-    // override Dirección/Operativo/Admin.
-    if(/operativo|admin|direccion|superadmin/.test(role))return'ops';
-    if(/asesor|comercial/.test(role)&&advisor)return'leads';
+    // Fast neutral first paint. The inbox owner performs a non-blocking,
+    // recipient-aware redirect only when an actionable request exists.
     return'inicio';
   }
   function prewarmCriticalRoutes(){
