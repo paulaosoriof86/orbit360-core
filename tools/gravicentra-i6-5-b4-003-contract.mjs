@@ -350,6 +350,7 @@ need(index.includes('Marcar atendida')&&index.includes('Archivar atendidas')&&in
 need(authRuntime.includes("setRestoring('Acceso confirmado · preparando tus datos…')")&&!authRuntime.includes("if(!validRequestedRoute())location.hash='#/inicio'"),'B4_003_R20_AUTH_PROGRESS_OR_FORCED_INICIO_REMAINS');
 need(productApp.includes('hydration.required.slice()')&&productApp.includes("function preferredLanding()")&&productApp.includes("return'inicio'")&&!productApp.includes("if(advisor)return'leads'")&&index.includes('maybePendingLanding')&&index.includes("surface=/operativo|admin|direcci[oó]n|superadmin/.test(role)?'ops':/asesor|comercial/.test(role)?'leads':''"),'B4_003_R20_SECOND_REVIEW_STARTUP_PENDING_ROUTING_MISSING');
 need(previewProof.includes("'|BOOTSTRAP_TRACE='")&&previewProof.includes('bootstrapTrace.length>16'),'B4_003_R20_ADVISOR_BOOTSTRAP_SANITIZED_TRACE_MISSING');
+need(previewProof.includes('u.emailVerified===true')&&previewProof.includes('B4_003_R20_VERIFIED_ACTOR_FOR_ROLE_NOT_FOUND'),'B4_003_R20_VERIFIED_CROSS_ROLE_ACTOR_SELECTION_MISSING');
 need(router.includes("orbit:route-ready"),'B4_003_R20_ROUTE_READY_SIGNAL_MISSING');
 need(base.includes('Vencidas renovables')&&base.includes('data-expired-historical-count')&&base.includes('expiredContext()'),'B4_003_R20_RENEWAL_EXPIRED_KPI_SEMANTICS_MISSING');
 need(insurer.includes('data-insurer-preview-uat="1"')&&insurer.includes('data-rupload')&&insurer.includes('insurer-premium-section')&&!insurer.includes('Registry técnico y provenance'),'B4_003_R20_INSURER_HUMAN_UAT_OR_VISUAL_REDESIGN_MISSING');

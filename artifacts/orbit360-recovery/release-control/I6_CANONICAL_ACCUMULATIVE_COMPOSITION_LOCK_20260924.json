@@ -3805,5 +3805,16 @@
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "80a28b8f8957ea9840aeb3c32c7df32b017c57e5"
     },
     "b4004Held": true
+  },
+  "r20VerifiedCrossRoleActorSelectionRootFix": {
+    "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_VERIFIED_CROSS_ROLE_ACTOR_SELECTION_ROOTFIX_20261007.json",
+    "blobSha": "4838e333ff1db62d56ce0344d2dd1f4f1c83fb38",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "51e011b3d264351699b4c0a705b0594e8beb7287",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "83a5d0295fa88eb275fad0953bc2de6590a05220"
+    },
+    "identityMutation": false,
+    "b4004Held": true
   }
 }

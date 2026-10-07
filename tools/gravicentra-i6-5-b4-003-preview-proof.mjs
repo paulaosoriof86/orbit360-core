@@ -72,9 +72,9 @@ async function actorForRole(roleWanted){
   const m=d.data()||{},state=norm(m.status||m.estado||'active');
   const roles=[m.activeRole,m.rolActivo,m.defaultRole,m.rolDefault,m.rol].concat(m.roles||[],m.assignedRoles||[],m.rolesAsignados||[]).map(norm).filter(Boolean);
   if(m.active===false||m.activo===false||['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(state)||!roles.includes(wanted))continue;
-  try{const u=await auth.getUser(d.id);if(!u.disabled)candidates.push({uid:u.uid,email:clean(u.email),activeRole:wanted,advisorId:clean(m.advisorId||m.asesorId)});}catch{}
+  try{const u=await auth.getUser(d.id);if(!u.disabled&&u.emailVerified===true)candidates.push({uid:u.uid,email:clean(u.email),emailVerified:true,activeRole:wanted,advisorId:clean(m.advisorId||m.asesorId)});}catch{}
  }
- need(candidates.length,'B4_003_R16_ACTOR_FOR_ROLE_NOT_FOUND:'+wanted);
+ need(candidates.length,'B4_003_R20_VERIFIED_ACTOR_FOR_ROLE_NOT_FOUND:'+wanted);
  return candidates.sort((a,b)=>clean(a.email).localeCompare(clean(b.email)))[0];
 }
 async function seed(who,fixtureAdvisorId,collabAdvisorId){
