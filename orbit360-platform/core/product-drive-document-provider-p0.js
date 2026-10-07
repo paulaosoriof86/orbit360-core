@@ -205,7 +205,7 @@
       const out=await call(names.readDossier,Object.assign(requestBase(extra),{documentRef:id}),names.region);
       if(!out||out.ok!==true||!out.base64)return Object.assign({ok:false,status:'sin_readback'},out||{});
       const blob=bytesFromBase64(out.base64,out.mimeType),blobUrl=URL.createObjectURL(blob);
-      return Object.assign({},out,{ok:true,status:'disponible',previewUrl:out.previewAvailable===true?blobUrl:'',downloadAvailable:true,backendPersistent:true});
+      return Object.assign({},out,{ok:true,status:'disponible',previewUrl:out.previewAvailable===true?blobUrl:'',downloadUrl:blobUrl,downloadAvailable:true,backendPersistent:true});
     }catch(error){return{ok:false,status:'no_disponible',message:'No fue posible abrir el documento del expediente.',code:String(error&&(error.code||error.message)||'')};}
   }
   async function resolve(ref, extra) {
