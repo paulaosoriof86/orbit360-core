@@ -46,3 +46,18 @@ test('public contract remains source-only and forbids public writes/uploads',()=
   assert.equal(s.POLICY.coverageConfirmationFromReportAllowed,false);
   assert.equal(s.POLICY.rawInternalBitacoraAllowed,false);
 });
+
+
+test('assistance channel keeps insurer directory data separate from coverage truth',()=>{
+  const r=s.assistanceChannelProjection({
+    insurer:{emergencia:'+502 5555 1111',ultimaRevision:'2026-09-01'},
+    aysWhatsapp:'+502 5614 9048',
+    aysEmail:'info@aysseguros.com'
+  });
+  assert.equal(r.ays.whatsapp,'+502 5614 9048');
+  assert.equal(r.ays.email,'info@aysseguros.com');
+  assert.equal(r.insurer.emergencyContactRegistered,true);
+  assert.equal(r.insurer.verifiedCurrent,false);
+  assert.equal(r.truth.insurerContactIsDirectoryDataNotCoverageConfirmation,true);
+  assert.equal(r.truth.insurerContactFreshnessMustBeValidated,true);
+});
