@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>A&S · Portal de Clientes · LAB</title>
+  <meta name="description" content="Portal de Clientes A&S — candidato read-only en LAB.">
+  <style>
+    :root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#171717;background:#f4f2ef;--red:#c9152b;--ink:#171717;--muted:#6d6b68;--line:#ded9d4;--card:#fff;--soft:#f8f6f3}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fbfaf9 0,#f1efec 100%);min-height:100vh}
+    button,input,select{font:inherit}.hidden{display:none!important}.shell{max-width:1120px;margin:auto;padding:24px}
+    .topbar{display:flex;align-items:center;gap:14px;padding:8px 0 22px}.brand{font-weight:800;font-size:20px}.brand b{color:var(--red)}.lab{margin-left:auto;font-size:12px;background:#171717;color:#fff;padding:7px 10px;border-radius:999px}.subtle{color:var(--muted)}
+    .hero{background:#171717;color:#fff;border-radius:22px;padding:28px;display:flex;gap:24px;justify-content:space-between;align-items:flex-end}.hero h1{margin:0 0 8px;font-size:34px;line-height:1.1}.hero p{margin:0;max-width:690px;color:#ddd;line-height:1.55}
+    .notice{margin-top:14px;padding:12px 14px;border:1px solid #f1c2ca;background:#fff6f7;border-radius:12px;color:#7e1423;font-size:13px;line-height:1.45}
+    .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.05)}
+    .login{max-width:520px;margin:28px auto}.login h2{margin:0 0 8px}.field{margin-top:14px}.field label{display:block;font-weight:700;font-size:13px;margin-bottom:6px}.field input,.field select{width:100%;padding:12px 13px;border:1px solid #bbb5af;border-radius:10px;background:#fff}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:10px;padding:11px 14px;font-weight:800;cursor:pointer}.btn.primary{background:var(--red);color:#fff}.btn.secondary{background:#ece8e3;color:#222}.btn.ghost{background:transparent;border:1px solid var(--line)}.btn:disabled{opacity:.5;cursor:not-allowed}
+    .status{margin-top:14px;min-height:22px;font-size:13px;color:var(--muted)}.error{color:#a10f22}.ok{color:#17663a}
+    .portal-head{display:flex;gap:18px;justify-content:space-between;align-items:flex-start}.portal-head h2{margin:0 0 6px}.account-switch{min-width:230px}.account-switch label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:18px}.section h3{margin:0 0 12px}.list{display:grid;gap:10px}
+    .item{border:1px solid var(--line);border-radius:13px;padding:14px;background:#fff}.item-top{display:flex;gap:10px;justify-content:space-between}.item-title{font-weight:800}.meta{color:var(--muted);font-size:12px;line-height:1.45;margin-top:5px}.badge{font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:#eeeae5;color:#333;white-space:nowrap}.badge.good{background:#e8f5ed;color:#17663a}.empty{padding:18px;border:1px dashed #cfc8c1;border-radius:12px;color:var(--muted);background:var(--soft)}
+    .service{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;line-height:1.5}.service a{color:#8f1020;font-weight:700}
+    @media(max-width:760px){.shell{padding:14px}.hero{padding:22px;align-items:flex-start}.hero h1{font-size:28px}.grid{grid-template-columns:1fr}.portal-head{flex-direction:column}.account-switch{width:100%}.lab{font-size:10px}.actions .btn{flex:1 1 auto}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><b>A&S</b> · Alianzas y Soluciones</div>
+      <div class="lab">Portal P-01 · LAB · READ-ONLY</div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <h1>Tu información de seguros, con contexto.</h1>
+        <p>Este candidato de Portal muestra únicamente información autorizada y en modo lectura. Pagos, cambios de póliza, cargas de documentos, siniestros transaccionales, mensajería e IA todavía no están liberados.</p>
+      </div>
+    </section>
+
+    <div class="notice">Entorno de validación LAB. No está habilitado para clientes reales ni para uso productivo.</div>
+
+    <section id="state-loading" class="panel" aria-live="polite">
+      <strong>Validando sesión…</strong>
+      <div class="subtle">Estamos comprobando tu acceso al Portal.</div>
+    </section>
+
+    <section id="state-login" class="panel login hidden">
+      <h2>Ingresar al Portal</h2>
+      <p class="subtle">Usa el correo de cliente autorizado. El acceso del equipo interno de A&S no puede utilizarse aquí.</p>
+      <form id="portal-login-form">
+        <div class="field"><label for="portal-email">Correo</label><input id="portal-email" type="email" autocomplete="username" required></div>
+        <div class="field"><label for="portal-password">Contraseña</label><input id="portal-password" type="password" autocomplete="current-password" required></div>
+        <div class="actions">
+          <button class="btn primary" id="portal-login-btn" type="submit">Ingresar</button>
+          <button class="btn ghost" id="portal-reset-btn" type="button">Restablecer contraseña</button>
+        </div>
+        <div id="login-status" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section id="state-unverified" class="panel hidden">
+      <h2>Verifica tu correo</h2>
+      <p>Tu identidad está autenticada, pero el Portal requiere un correo verificado antes de consultar información.</p>
+      <div class="actions">
+        <button class="btn primary" id="verify-send-btn" type="button">Enviar verificación</button>
+        <button class="btn secondary" id="verify-refresh-btn" type="button">Ya verifiqué mi correo</button>
+        <button class="btn ghost" data-logout type="button">Salir</button>
+      </div>
+      <div id="verify-status" class="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="state-noaccess" class="panel hidden">
+      <h2>Tu acceso a esta cuenta no está disponible</h2>
+      <p class="subtle">No mostramos información cuando el acceso no está vigente, no corresponde a una cuenta autorizada o pertenece a una sesión interna de A&S.</p>
+      <div class="service">Puedes continuar por los canales validados de A&S: <a href="mailto:info@aysseguros.com">info@aysseguros.com</a> · Guatemala +502 5614 9048.</div>
+      <div class="actions"><button class="btn ghost" data-logout type="button">Salir</button></div>
+    </section>
+
+    <section id="state-error" class="panel hidden">
+      <h2>No pudimos consultar la información</h2>
+      <p class="subtle">Tu sesión puede seguir activa, pero la consulta no terminó correctamente. Esto es distinto de una cuenta sin pólizas.</p>
+      <div class="actions"><button class="btn primary" id="retry-btn" type="button">Intentar de nuevo</button><button class="btn ghost" data-logout type="button">Salir</button></div>
+      <div id="error-detail" class="status error" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="state-portal" class="panel hidden">
+      <div class="portal-head">
+        <div>
+          <h2 id="account-name">Tu cuenta</h2>
+          <div id="account-meta" class="subtle"></div>
+        </div>
+        <div class="account-switch hidden" id="account-switch-wrap">
+          <label for="account-switch">Cuenta autorizada</label>
+          <select id="account-switch"></select>
+        </div>
+        <button class="btn ghost" data-logout type="button">Salir</button>
+      </div>
+
+      <div class="grid">
+        <section class="section">
+          <h3>Tus seguros</h3>
+          <div id="policy-list" class="list"></div>
+        </section>
+        <section class="section">
+          <h3>Tus documentos</h3>
+          <div id="document-list" class="list"></div>
+        </section>
+      </div>
+
+      <div class="service">¿Necesitas una gestión? Este primer slice es solo lectura. Usa <a href="mailto:info@aysseguros.com">info@aysseguros.com</a> o el canal A&S de tu país para continuar.</div>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
+  <script src="/__/firebase/init.js"></script>
+  <script src="core/portal-p01-s511f.js?v=20261007-1"></script>
+</body>
+</html>
