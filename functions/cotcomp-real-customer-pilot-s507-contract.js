@@ -16,13 +16,16 @@ const POLICY = Object.freeze({
   payment: false,
   tenantId: TENANT_ID,
   pilot: Object.freeze({
-    status: 'RECOMMENDED_NOT_AUTHORIZED',
+    status: 'OWNER_APPROVED_SCOPE_SOURCE_ONLY',
     country: 'GT',
     needFamily: 'vehicle',
     journeyId: 'GT_AUTO_MOTO_HYBRID',
     maxParticipants: 1,
     maxAcceptedRealRecords: 1,
-    maxExecutions: 1
+    maxExecutions: 1,
+    designatedRouting: 'DESIGNATED_TRIAGE_ADVISOR',
+    designatedAdvisorNameKey: 'paula_osorio',
+    designatedAdvisorWhatsappDigits: '50256149048'
   }),
   rateLimit: Object.freeze({
     maxAttemptsPerCapability: 5,
@@ -37,10 +40,15 @@ const POLICY = Object.freeze({
     ownerEvidenceBasedGtRiskAcceptanceHistorical: true
   }),
   privacy: Object.freeze({
-    noticeVersion: '',
-    noticeStatus: 'OPEN',
-    retentionDisposition: '',
-    retentionStatus: 'OPEN'
+    noticeVersion: 'GT_REAL_CUSTOMER_LAB_PILOT_PRIVACY_v1',
+    noticeStatus: 'SOURCE_READY_OWNER_CHANNEL_CONFIRMED',
+    consentVersion: 'GT_REAL_CUSTOMER_LAB_PILOT_REQUEST_MANAGEMENT_v1',
+    privacyContactEmail: 'info@aysseguros.com',
+    retentionDisposition: 'RETAIN_IF_VALID_BUSINESS_RECORD',
+    retentionStatus: 'OWNER_APPROVED_INTERNAL_POLICY',
+    unconvertedRetentionMonths: 12,
+    retentionLegalMandatoryClaim: false,
+    convertedHandoff: 'GRAVICENTRA_OPERATIONAL_GOVERNANCE'
   }),
   truth: Object.freeze({
     initialBusinessStage: 'nuevo',
@@ -162,10 +170,11 @@ function idempotencyDecision(existingDigest, incomingPayload) {
 
 function readiness(input = {}) {
   const blockers = [];
-  if (!clean(input.privacyNoticeVersion, 80)) blockers.push('PRIVACY_NOTICE_VERSION_REQUIRED');
-  if (!['RETAIN_IF_VALID_BUSINESS_RECORD', 'ROLLBACK_TO_BEFORE_STATE'].includes(clean(input.retentionDisposition, 80))) blockers.push('RETENTION_DISPOSITION_REQUIRED');
-  if (input.advisorRosterReadback !== true) blockers.push('ADVISOR_ROSTER_READBACK_REQUIRED');
+  if (!clean(POLICY.privacy.noticeVersion, 80)) blockers.push('PRIVACY_NOTICE_VERSION_REQUIRED');
+  if (!['RETAIN_IF_VALID_BUSINESS_RECORD', 'ROLLBACK_TO_BEFORE_STATE'].includes(clean(POLICY.privacy.retentionDisposition, 80))) blockers.push('RETENTION_DISPOSITION_REQUIRED');
+  if (input.designatedAdvisorReadback !== true) blockers.push('DESIGNATED_ADVISOR_READBACK_REQUIRED');
   if (input.routingContractPass !== true) blockers.push('ADVISOR_ROUTING_CONTRACT_REQUIRED');
+  if (POLICY.pilot.designatedRouting !== 'DESIGNATED_TRIAGE_ADVISOR') blockers.push('DESIGNATED_ROUTING_NOT_FROZEN');
   if (input.antiAbuseContractPass !== true) blockers.push('ANTI_ABUSE_CONTRACT_REQUIRED');
   if (input.rateLimitContractPass !== true) blockers.push('RATE_LIMIT_CONTRACT_REQUIRED');
   if (input.syntheticRehearsalPass !== true) blockers.push('SYNTHETIC_REHEARSAL_REQUIRED');
@@ -197,6 +206,8 @@ function proposedBusinessCommand(sanitized, advisorId, requestId) {
       asesorId: aid,
       consentVersion: safe.consentVersion,
       marketingConsent: false,
+      privacyContactEmail: POLICY.privacy.privacyContactEmail,
+      retentionDisposition: POLICY.privacy.retentionDisposition,
       cotcompRef: { journeyId: safe.journeyId, correlationId: safe.correlationId }
     },
     truth: {
