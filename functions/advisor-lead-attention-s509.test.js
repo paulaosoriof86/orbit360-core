@@ -24,11 +24,16 @@ test('attention receipt id is deterministic and scoped by uid + event',()=>{
   assert.match(a,/^att_[a-f0-9]{40}$/);
 });
 
-test('LAB client auto-opens Leads only on initial unseen-lead poll and polls every 30s',()=>{
+test('LAB client auto-opens unseen leads on authenticated entry, clears on Leads and polls every 30s',()=>{
   const p=path.join(__dirname,'..','orbit360-platform','core','advisor-lead-attention-s509.js');
   const src=fs.readFileSync(p,'utf8');
   assert.match(src,/if\(initial\)\{\s*await openLeads\(ids,true\)/);
+  assert.match(src,/poll\(true\)/);
+  assert.doesNotMatch(src,/sessionStorage/);
   assert.match(src,/location\.hash='#\/leads'/);
+  assert.match(src,/hashchange/);
+  assert.match(src,/acknowledgeVisibleLeadAttention/);
+  assert.match(src,/lead-attention-s509-close/);
   assert.match(src,/setInterval\(\(\)=>poll\(false\),30000\)/);
   assert.match(src,/Tienes un nuevo lead asignado/);
   assert.doesNotMatch(src,/wa\.me|mailto:|sendgrid|twilio/i);
