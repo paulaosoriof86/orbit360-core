@@ -575,9 +575,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "c7d35adb3f980cae310a5f7051c77715e8f485a2",
+  "findingLedgerBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
   "continuityRegisterBlobSha": "233364d5ca31265677fd3cd204f1d235f2866ca5",
-  "compositionLockBlobSha": "1de25e0265ddb3f5cec594328a8a7f2386ab9d20",
+  "compositionLockBlobSha": "7d6ca56297d920ebd3f66171413546bfdcafb467",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -903,5 +903,13 @@
     "blobSha": "5ba6a95204fdc86e9fe5083ecabe61ca99a057ae",
     "productMutationAuthorized": true,
     "dataMutationAuthorized": false
+  },
+  "r20SecondReviewCumulativeSourceFix": {
+    "status": "IN_PROGRESS_EXACT_COMPOSITION_REBOUND",
+    "compositionLockBlobSha": "7d6ca56297d920ebd3f66171413546bfdcafb467",
+    "findingLedgerBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
+    "productFileCount": 102,
+    "dataMutationAuthorized": false,
+    "b4004Held": true
   }
 }
