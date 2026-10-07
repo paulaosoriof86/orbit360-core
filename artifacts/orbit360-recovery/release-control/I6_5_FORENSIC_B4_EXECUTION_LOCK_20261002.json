@@ -577,7 +577,7 @@
   },
   "findingLedgerBlobSha": "e03a5b251973a0234668a4f2cd2c6e9e17658587",
   "continuityRegisterBlobSha": "31c6646999730ea0c77021818cfa4dddaf8908a7",
-  "compositionLockBlobSha": "50dc750cb3d6c4f2168f13fbb3526e441c8f0360",
+  "compositionLockBlobSha": "68babc6722cac2dee533f4e8dab55cedc465b742",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -940,6 +940,16 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_QUALITY_PHONE_ACTION_ROOTFIX_20261007.json",
     "blobSha": "738c3da1217876a9a27f13863ffafeaffc576d32",
     "compositionLockBlobSha": "50dc750cb3d6c4f2168f13fbb3526e441c8f0360",
+    "dataMutation": false,
+    "noLive": true,
+    "noReimport": true
+  },
+  "r20SecondReviewCollabAttachmentAuthRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_COLLAB_ATTACHMENT_AUTH_ROOTFIX_20261007.json",
+    "blobSha": "b95f70f8f4f2c663b237e6cba06792620e9ff289",
+    "compositionLockBlobSha": "68babc6722cac2dee533f4e8dab55cedc465b742",
+    "authorizationBoundary": "SAME_AUTHORIZED_BUSINESS_ONLY",
     "dataMutation": false,
     "noLive": true,
     "noReimport": true

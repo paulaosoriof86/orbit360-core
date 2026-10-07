@@ -1,0 +1,24 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_COLLAB_ATTACHMENT_AUTH_ROOTFIX_V1",
+  "recordedAt": "2026-10-07T18:20:00Z",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003-R20-B12",
+  "failedRunId": 37656401571,
+  "failedSourceSha": "d82f16f26d3b6f87a522881f3e86690321676b31",
+  "failedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37656401571-xcqywesh.web.app",
+  "failedBuildId": "gi-i65-b4-d82f16f26d3b-57f234755dc1",
+  "failureCode": "B4_003_R20_SECOND_REVIEW_COLLAB_UI_ATTACHMENT_READBACK_FAILED",
+  "rootCause": "DOCUMENT_AUTHORIZATION_DID_NOT_PROJECT_DRIVE_REFERENCES_NESTED_IN_CANONICAL_BUSINESS_COMMENTS_OR_LOG",
+  "fix": "Authorize document readback only when the Drive reference is bound to the same authorized business, including its canonical comentarios and bitacora history.",
+  "sourceSha": "36ec6d3d84b2b9862d71b72cc4d54bedf4260c29",
+  "productBlobs": {
+    "functions/document-drive-domain.js": "f58fc244988424ceb0af3361e8f60e6f16f243de"
+  },
+  "authorizationBoundary": "SAME_AUTHORIZED_BUSINESS_ONLY",
+  "dataMutation": false,
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "live": false,
+  "b4004Held": true,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

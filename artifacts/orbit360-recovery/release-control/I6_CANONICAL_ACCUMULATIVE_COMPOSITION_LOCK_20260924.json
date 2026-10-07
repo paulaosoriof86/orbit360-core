@@ -148,7 +148,7 @@
     "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
     "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
-    "functions/document-drive-domain.js": "4157e9a7c22fdc77609af88cc1c2f829757238d2",
+    "functions/document-drive-domain.js": "f58fc244988424ceb0af3361e8f60e6f16f243de",
     "functions/notification-outbox-processor.js": "ce31ae776beb5945741ef0f9f9dbf53075d03910",
     "functions/ops-advisor-inbox.js": "622126d36c6ea5c9d98920f1c5ed9c61b5774aa8",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
@@ -3728,6 +3728,17 @@
     "productBlobs": {
       "orbit360-platform/modules/calidad.js": "f90813a3ba7c249f1b7e3c34ad6e3b5c1279a7bd"
     },
+    "b4004Held": true
+  },
+  "r20SecondReviewCollabAttachmentAuthRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_COLLAB_ATTACHMENT_AUTH_ROOTFIX_20261007.json",
+    "blobSha": "b95f70f8f4f2c663b237e6cba06792620e9ff289",
+    "sourceSha": "36ec6d3d84b2b9862d71b72cc4d54bedf4260c29",
+    "productBlobs": {
+      "functions/document-drive-domain.js": "f58fc244988424ceb0af3361e8f60e6f16f243de"
+    },
+    "authorizationBoundary": "SAME_AUTHORIZED_BUSINESS_ONLY",
     "b4004Held": true
   }
 }
