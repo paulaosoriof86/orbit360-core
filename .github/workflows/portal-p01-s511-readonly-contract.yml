@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - ays/portal-p01-readonly-contract-s511-20261007
+      - ays/portal-p01-s511a-grant-lifecycle-20261007
     paths:
       - 'functions/portal-p01-readonly-contract-s511.js'
       - 'functions/portal-p01-readonly-contract-s511.test.js'
