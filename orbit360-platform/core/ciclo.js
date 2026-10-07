@@ -67,8 +67,9 @@ Orbit.ciclo = (function () {
   function leadRiskSummary(n) {
     const d = U.text(n && n.descripcion, '').trim();
     if (!d) return '';
-    const first = d.split(' · ')[0].trim();
-    return first.length > 92 ? first.slice(0, 89) + '…' : first;
+    let first = d.split(' · ')[0].trim();
+    first = first.replace(/^(veh[ií]culo|auto|moto)\s*:\s*/i, '').trim();
+    return first.length > 72 ? first.slice(0, 69) + '…' : first;
   }
   function leadContactSummary(n) {
     const out = [];
@@ -192,26 +193,28 @@ Orbit.ciclo = (function () {
     const risk = leadRiskSummary(n);
     const origin = leadOrigin(n);
     const contact = leadContactSummary(n);
+    const country = U.text(n.pais, 'País pendiente');
+    const product = U.text(n.producto || n.ramo, 'Producto pendiente');
+    const stage = U.text(ei.label, 'Sin etapa');
+    const touch = d == null ? 'Sin próximo toque' : d < 0 ? (-d) + 'd vencido' : 'Próximo toque en ' + d + 'd';
     return `<div class="kcard ${espejo ? 'kcard-espejo' : ''}" data-neg="${n.id}">
-      <div class="kcard-top">
+      <div class="kcard-top" style="align-items:center">
         <span class="badge ${pr}">${U.esc(U.text(n.prioridad, 'Sin prioridad'))}</span>
-        <span class="badge neutral" title="Producto / familia">${U.esc(U.text(n.producto || n.ramo, 'Producto pendiente'))}</span>
-        <span class="badge info" title="Canal de ingreso">🌐 ${U.esc(origin)}</span>
-        <span class="kflag" title="${U.esc(U.text(n.pais, 'Sin país'))}">${flag(n.pais)}</span>
+        <span style="margin-left:auto;font-size:10.5px;color:var(--ink-3);white-space:nowrap" title="Origen y país">${flag(n.pais)} ${U.esc(country)} · ${U.esc(origin)}</span>
         ${espejo ? `<span class="kmirror" title="Gestión operativa en curso por el equipo">🔗 en Ops</span>` : ''}
         ${n.cadenciaActiva ? `<span class="badge ok" title="Cadencia automática activa">🔁</span>` : ''}
       </div>
-      <div class="kcard-t">${U.esc(U.text(n.nombre, 'Prospecto sin nombre'))}</div>
-      <div class="kcard-cli"><b>${U.esc(U.text(n.producto, 'Producto pendiente'))}</b>${n.ramo && n.ramo !== n.producto ? ' · ' + U.esc(n.ramo) : ''}</div>
-      ${risk ? `<div class="kcard-meta" title="Resumen del riesgo">🚗 ${U.esc(risk)}</div>` : ''}
-      <div class="kcard-meta" title="Datos de contacto disponibles">${U.esc(contact)} · ${flag(n.pais)} ${U.esc(U.text(n.pais, 'País pendiente'))}</div>
-      <div class="kcard-meta"><span class="dot-s" style="background:${ei.color}"></span>${ei.emoji} ${U.esc(U.text(ei.label, 'Sin etapa'))} · ${prob == null ? 'Prob. por definir' : prob + '%'} · ${U.esc(primaLabel(n))}</div>
+      <div class="kcard-t" style="font-size:14px;line-height:1.22;margin-top:7px">${U.esc(U.text(n.nombre, 'Prospecto sin nombre'))}</div>
+      <div class="kcard-cli" style="font-size:12px;margin-top:3px;color:var(--ink-2)"><b>${U.esc(product)}</b>${n.ramo && n.ramo !== n.producto ? ' · ' + U.esc(n.ramo) : ''}</div>
+      ${risk ? `<div style="margin-top:9px;padding:7px 8px;border-radius:8px;background:var(--surface-2,#f6f4f0);font-size:11.5px;line-height:1.35;color:var(--ink-1)" title="Resumen del riesgo"><span style="opacity:.72">🚗</span> <b>${U.esc(risk)}</b></div>` : ''}
+      <div style="margin-top:8px;font-size:10.5px;line-height:1.35;color:var(--ink-3)" title="Datos de contacto disponibles">${U.esc(contact)}</div>
+      <div style="margin-top:5px;font-size:10.5px;line-height:1.35;color:var(--ink-3)" title="Estado comercial"><span class="dot-s" style="background:${ei.color}"></span> ${U.esc(stage)} · ${prob == null ? 'Prob. por definir' : prob + '%'} · ${U.esc(primaLabel(n))}</div>
       ${n.cadenciaActiva && !espejo ? `<div class="kcad">🔁 ${U.esc(n.cadencia || 'Cadencia activa')}</div>` : ''}
-      <div class="kcard-foot">
+      <div class="kcard-foot" style="margin-top:9px;padding-top:8px;border-top:1px solid var(--line)">
         <span title="${U.esc(ase ? ase.nombre : '')}">${U.avatar(ase ? ase.nombre : '?', ase ? ase.color : '#999', 'sm')}</span>
-        <span style="font-size:11px;color:var(--ink-3);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Asesor responsable">${U.esc(ase ? ase.nombre : 'Asesor pendiente')}</span>
+        <span style="font-size:10.5px;color:var(--ink-3);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Asesor responsable">${U.esc(ase ? ase.nombre : 'Asesor pendiente')}</span>
         ${tot ? `<span class="kchk">✓ ${done}/${tot}</span>` : ''}
-        <span class="kvence ${d < 0 ? 'over' : ''}" title="Próximo toque">${d == null ? 'Sin toque' : d < 0 ? (-d) + 'd vencido' : 'en ' + d + 'd'}</span>
+        <span class="kvence ${d < 0 ? 'over' : ''}" title="Próximo toque" style="font-size:10.5px">${U.esc(touch)}</span>
       </div>
     </div>`;
   }
