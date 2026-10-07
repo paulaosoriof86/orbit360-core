@@ -680,7 +680,7 @@ try{
  proof.r18QualityProvenance=await page.evaluate(async ids=>{
    const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);
    const row=Array.from(h.querySelectorAll('[data-quality-country="GT"]')).find(x=>String(x.innerText||'').includes('B4-003 QA Cliente'))||null;
-   const documentButton=Array.from(row?.querySelectorAll('button')||[]).find(b=>/Documentar origen/.test(b.innerText||''))||null;
+   const documentButton=Array.from(row?.querySelectorAll('button')||[]).find(b=>/Registrar evidencia del origen/.test(b.innerText||''))||null;
    if(documentButton)documentButton.click();
    await new Promise(r=>setTimeout(r,60));
    const modal=document.getElementById('q-inline'),country=modal?.querySelector('#qi-pais');
