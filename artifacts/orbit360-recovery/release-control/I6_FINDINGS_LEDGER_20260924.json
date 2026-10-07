@@ -19,10 +19,10 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 281,
+    "total": 282,
     "b2HumanFindings": 61,
-    "currentBlocking": 42,
-    "countingNote": "Second R20 visual review remains open. Transversal visual hierarchy finding V2-16 added and must receive explicit Paula Preview pass.",
+    "currentBlocking": 41,
+    "countingNote": "Second R20 source remediation ready for exact Preview. Data dry-runs passed but writes remain unauthorized. Preexisting LIVE binding drift blocks production promotion, not isolated Preview.",
     "currentBlockingB2B3": 0,
     "lastReconciledAt": "2026-10-07"
   },
@@ -10346,7 +10346,7 @@
       ],
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "status": "DRY_RUN_PASS_PENDING_DATA_WRITE_AUTHORIZATION",
       "blocking": true,
       "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
       "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
@@ -10355,7 +10355,15 @@
       "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
       "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
       "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
-      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+      "nextAction": "AUTHORIZE_EXACT_5_COUNTRY_WRITES_OR_HOLD",
+      "dataDryRunReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_20261007.json",
+      "dataDryRunReceiptBlobSha": "65f48ab5decb113f6551d5b0f68f994ff00fe7a4",
+      "dryRun": {
+        "candidateCount": 5,
+        "conflicts": 0,
+        "heldNoEvidence": 1,
+        "targetDigest": "676c157a246cc1b03acaeed4888b6dd96bed8fbc3cba0367cabe27ff393a6c43"
+      }
     },
     {
       "id": "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION",
@@ -10367,7 +10375,7 @@
       ],
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "status": "DRY_RUN_PASS_PENDING_DATA_WRITE_AUTHORIZATION",
       "blocking": true,
       "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
       "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
@@ -10376,7 +10384,19 @@
       "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
       "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
       "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
-      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+      "nextAction": "AUTHORIZE_EXACT_583_RENEWAL_DISPOSITION_WRITES_OR_HOLD",
+      "dataDryRunReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_20261007.json",
+      "dataDryRunReceiptBlobSha": "65f48ab5decb113f6551d5b0f68f994ff00fe7a4",
+      "dryRun": {
+        "oldCandidateCount": 583,
+        "recentPipelineCount": 24,
+        "recentByMonth": {
+          "2026-08": 9,
+          "2026-09": 11,
+          "2026-10": 4
+        },
+        "targetDigest": "744f6f26139f272fa3a26ab35e889a9d011833e802d1495286147734ec7b4d1d"
+      }
     },
     {
       "id": "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY",
@@ -10421,6 +10441,32 @@
       "addendumPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_VISUAL_SYSTEM_AND_WHATSAPP_ARCHITECTURE_ADDENDUM_20261007.json",
       "addendumBlobSha": "e3816c831e273a975461a0961de20c4a180ca6cd",
       "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX"
+    },
+    {
+      "id": "B4-003-R20-V2-17-LIVE-RELEASE-BINDING-DRIFT",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "surface": "Release lineage / production Hosting",
+      "finding": "Current public LIVE no longer matches the certifiedCandidate binding recorded by recovery control. Historical run 35416730679 promoted/read back the certified I6.5 artifact, but current live fingerprint is a legacy Orbit 360 release.",
+      "owner": [
+        "RELEASE_CONTROL",
+        "Firebase Hosting live channel"
+      ],
+      "rootCause": "PENDING_FORENSIC_RELEASE_LINEAGE_RECONCILIATION",
+      "remediation": "Identify the later live overwrite/release and reconcile authority. Do not promote any new artifact until current LIVE lineage is physically understood and rollback path is exact.",
+      "closureCondition": "Current live release/version is identified, certified authority is reconciled, and promotion plan proves same-artifact promotion + exact rehash.",
+      "status": "PREEXISTING_LIVE_RELEASE_DRIFT_BLOCKS_PROMOTION",
+      "blocking": true,
+      "blocksPreview": false,
+      "blocksProduction": true,
+      "evidence": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_20261007.json",
+        "receiptBlobSha": "65f48ab5decb113f6551d5b0f68f994ff00fe7a4",
+        "liveFingerprint": "b1d3909e9013d4b166171cedbbdbf44261dc10e5c77af1a4675fa51bf8124082",
+        "historicalPromotionRunId": 35416730679
+      },
+      "nextAction": "RECONCILE_LIVE_RELEASE_LINEAGE_BEFORE_ANY_PROMOTION",
+      "mayDisappearWithoutDisposition": false
     }
   ],
   "phaseBBacklog": [
@@ -10755,8 +10801,8 @@
     }
   },
   "currentB4": {
-    "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
-    "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
+    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW"
   },
   "b4003QaResidueCarry": {
@@ -10794,7 +10840,7 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
   },
-  "lastUpdatedAt": "2026-10-07T08:58:00-06:00",
+  "lastUpdatedAt": "2026-10-07T10:25:00-06:00",
   "lastR16SourceFix": {
     "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
