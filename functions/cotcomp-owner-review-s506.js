@@ -272,14 +272,51 @@ const S506_OVERRIDE_SCRIPT=`
   const modal=document.getElementById('s506Contact');
   const CHANNELS={GT:{whatsapp:'50256149048',email:'info@aysseguros.com',label:'+502 5614 9048'},CO:{whatsapp:'573138340897',email:'info@aysseguros.com',label:'+57 313 834 0897'}};
   let handoffKind='advisor';
+  let registrationConfirmed=false;
   function txt(id,fallback){const e=document.getElementById(id);return e&&e.textContent.trim()?e.textContent.trim():fallback;}
   function cc(){return /colombia/i.test(txt('selectedCountry','Guatemala'))?'CO':'GT';}
   function ctx(){return {country:txt('selectedCountry',cc()==='CO'?'Colombia':'Guatemala'),need:txt('selectedNeed','Cotización y comparación'),mode:txt('selectedMode','Con acompañamiento A&S')};}
   function nf(){const t=ctx().need.toLowerCase();if(t.includes('vehículo')||t.includes('movilidad'))return 'vehicle';if(t.includes('hogar'))return 'home';if(t.includes('salud')||t.includes('médic'))return 'health';if(t.includes('vida')||t.includes('ingreso'))return 'life';if(t.includes('empresa'))return 'business';if(t.includes('transporte')||t.includes('carga'))return 'cargo';return 'other';}
   function setRegisterStatus(id,state,msg){const el=document.querySelector('[data-s506-status="'+id+'"]');if(el){el.className='s506-register-status '+state;el.textContent=msg;}}
   function msg(){const x=ctx();return ['Hola, escribo desde Cotizar y comparar de A&S.','País: '+x.country,'Necesidad: '+x.need,'Modalidad: '+x.mode,'Quiero continuar con asesoría sin empezar de cero.'].join('\\n');}
+  function resetAdvisorRegistration(){
+    const card=document.querySelector('[data-s506-card="advisor"]');
+    const consent=document.querySelector('[data-s506-consent="advisor"]');
+    const button=document.querySelector('[data-s506-register="advisor"]');
+    const status=document.querySelector('[data-s506-status="advisor"]');
+    if(card)card.style.display='';
+    if(consent){consent.checked=false;const label=consent.closest('.s506-consent');if(label)label.style.display='';}
+    if(button){button.disabled=true;button.setAttribute('aria-disabled','true');const actions=button.closest('.s506-register-actions');if(actions)actions.style.display='';}
+    if(status){status.className='s506-register-status';status.textContent='';}
+  }
+  function showAdvisorRegistered(){
+    const consent=document.querySelector('[data-s506-consent="advisor"]');
+    const button=document.querySelector('[data-s506-register="advisor"]');
+    const status=document.querySelector('[data-s506-status="advisor"]');
+    if(consent){const label=consent.closest('.s506-consent');if(label)label.style.display='none';}
+    if(button){const actions=button.closest('.s506-register-actions');if(actions)actions.style.display='none';}
+    if(status){status.className='s506-register-status is-ok';status.textContent='Solicitud de prueba ya registrada internamente en A&S durante esta sesión.';}
+  }
+  function ensureTerminalAck(){
+    const completion=document.getElementById('s500Completion');
+    if(!completion)return null;
+    let ack=document.getElementById('s506TerminalAck');
+    if(!ack){
+      ack=document.createElement('div');
+      ack.id='s506TerminalAck';
+      ack.className='s506-terminal-ack';
+      const context=completion.querySelector('.s500-completion__context');
+      if(context)context.insertAdjacentElement('beforebegin',ack);
+      else completion.insertAdjacentElement('afterbegin',ack);
+    }
+    ack.classList.add('is-visible');
+    ack.textContent='Integración confirmada: A&S recibió internamente la solicitud sintética durante esta sesión.';
+    return ack;
+  }
   function open(kind){
     handoffKind=kind||'advisor';
+    if(handoffKind==='decision'&&registrationConfirmed){showTerminal();return;}
+    if(registrationConfirmed)showAdvisorRegistered(); else resetAdvisorRegistration();
     const x=ctx(),ch=CHANNELS[cc()];
     document.getElementById('s506Country').textContent=x.country;
     document.getElementById('s506Need').textContent=x.need;
@@ -306,9 +343,8 @@ const S506_OVERRIDE_SCRIPT=`
     if(needEl)needEl.textContent=x.need;
     if(modeEl)modeEl.textContent='Con acompañamiento A&S';
     completion.classList.add('is-visible');
-    const consent=document.querySelector('[data-s506-consent="terminal"]');if(consent)consent.checked=true;
-    const button=document.querySelector('[data-s506-register="terminal"]');if(button){button.disabled=false;button.setAttribute('aria-disabled','false');}
-    const status=document.querySelector('[data-s506-status="terminal"]');if(status){status.className='s506-register-status is-ok';status.textContent='Integración confirmada: A&S recibió internamente la solicitud sintética y la evidencia de prueba fue limpiada automáticamente.';}
+    ensureTerminalAck();
+    const terminalCard=document.querySelector('[data-s506-card="terminal"]');if(terminalCard)terminalCard.remove();
     const kicker=document.getElementById('stageKicker');if(kicker)kicker.textContent='SIGUIENTE PASO';
     const heading=document.getElementById('stageHeading');if(heading)heading.textContent='Continúa con A&S sin perder el contexto';
     completion.scrollIntoView({behavior:'smooth',block:'center'});
@@ -330,8 +366,10 @@ const S506_OVERRIDE_SCRIPT=`
       }).then(async r=>{
         const j=await r.json().catch(()=>({}));
         if(!r.ok||j.integrationConfirmed!==true)throw new Error('REGISTER_FAILED');
+        registrationConfirmed=true;
         setRegisterStatus(id,'is-ok','Integración confirmada: A&S recibió internamente la solicitud sintética y la evidencia de prueba fue limpiada automáticamente.');
         if(id==='advisor'&&handoffKind==='decision'){close();showTerminal();}
+        else if(id==='advisor'){showAdvisorRegistered();}
       }).catch(()=>{
         setRegisterStatus(id,'is-error','No se pudo confirmar el registro interno. WhatsApp y correo continúan disponibles como alternativa.');
       }).finally(()=>{
@@ -356,7 +394,7 @@ const S506_OVERRIDE_SCRIPT=`
 function html(){
   let h=S501.html();
   h=h.replace('</style>',CSS+'</style>');
-  h=h.replace('</body>',s506ModalHtml()+'<template id="s506TerminalTemplate">'+registrationCard('terminal')+'</template>'+SCRIPT+S506_OVERRIDE_SCRIPT+'</body>');
+  h=h.replace('</body>',s506ModalHtml()+SCRIPT+S506_OVERRIDE_SCRIPT+'</body>');
   h=h.replace('Owner Review S5.00','Owner Review S5.06');
   return h;
 }
