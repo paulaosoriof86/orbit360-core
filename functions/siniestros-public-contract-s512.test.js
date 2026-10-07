@@ -109,3 +109,31 @@ test('S5.12a public resolver exposes insurer channel only after full freshness g
   assert.equal(r.insurerChannel.validated,true);
   assert.equal(r.insurerChannelStatus,'CURRENT_CHANNEL_VALIDATED');
 });
+
+
+test('S5.12B validated registry includes only evidence-backed channels',()=>{
+  const sry=s.validatedChannelRegistrySummary();
+  assert.equal(sry.country,'GT');
+  assert.equal(sry.reviewedAt,'2026-10-07');
+  assert.equal(sry.count,8);
+  assert.equal(s.validatedGtChannel('ASEGURADORA GENERAL').channel,'1757');
+  assert.equal(s.validatedGtChannel('MAPFRE').channel,'2328-5060 / 2375-5060');
+  assert.equal(s.validatedGtChannel('SEGUROS EL ROBLE').channel,'1797');
+  assert.equal(s.validatedGtChannel('SEGUROS BANTRAB').channel,'2410-2696');
+});
+
+test('S5.12B stale or semantically unverified directory values are excluded from validated registry',()=>{
+  assert.equal(s.validatedGtChannel('SEGUROS BAM'),null);
+  assert.equal(s.validatedGtChannel('SEGUROS COLUMNA'),null);
+  assert.equal(s.validatedGtChannel('SEGUROS UNIVERSALES'),null);
+});
+
+test('S5.12B registry stores evidence source, review date and scope',()=>{
+  for(const row of Object.values(s.VALIDATED_GT_CHANNELS)){
+    assert.match(row.sourceUrl,/^https:\/\//);
+    assert.equal(row.reviewedAt,'2026-10-07');
+    assert.ok(row.scope);
+    assert.ok(row.type);
+    assert.ok(row.channel);
+  }
+});
