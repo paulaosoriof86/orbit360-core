@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - ays/siniestros-public-contract-s512-20261007
+      - ays/siniestros-s512a-channel-freshness-20261007
     paths:
       - 'functions/siniestros-public-contract-s512.js'
       - 'functions/siniestros-public-contract-s512.test.js'
@@ -84,12 +85,16 @@ jobs:
               if(Number(row.montoAprobado||0)>0)approved++;
             }
             let insurersWithEmergency=0,insurersWithEmergencyAndReview=0;
+            const emergencyDirectory=[];
             for(const doc of insurerSnap.docs){
               const row=doc.data()||{},em=String(row.emergencia||'').trim(),rev=String(row.ultimaRevision||'').trim();
-              if(em)insurersWithEmergency++;
+              if(em){
+                insurersWithEmergency++;
+                emergencyDirectory.push({name:String(row.nombre||'').trim().slice(0,180),emergency:em.slice(0,220),lastReviewedAt:rev.slice(0,40)});
+              }
               if(em&&rev)insurersWithEmergencyAndReview++;
             }
-            console.log(JSON.stringify({schemaVersion:'ays-siniestros-s512-runtime-readonly-v1',projectId:PROJECT_ID,tenantId:TENANT_ID,sourcePath:'tenantId/{tenant}/reclamos',readOnly:true,containsCustomerPii:false,recordCount:snap.size,noRecords:snap.empty,internalStateCounts:internal,publicStateCounts:publicCounts,unknownStateCount:unknown,recordsWithRawDocsCount:docs,recordsWithBitacoraCount:bitacora,recordsWithApprovedAmountCount:approved,insurerDirectoryCount:insurerSnap.size,insurersWithEmergencyContactCount:insurersWithEmergency,insurersWithEmergencyAndReviewDateCount:insurersWithEmergencyAndReview,publicProjectionCanRemainMetadataOnly:true,productionTouched:false},null,2));
+            console.log(JSON.stringify({schemaVersion:'ays-siniestros-s512-runtime-readonly-v1',projectId:PROJECT_ID,tenantId:TENANT_ID,sourcePath:'tenantId/{tenant}/reclamos',readOnly:true,containsCustomerPii:false,recordCount:snap.size,noRecords:snap.empty,internalStateCounts:internal,publicStateCounts:publicCounts,unknownStateCount:unknown,recordsWithRawDocsCount:docs,recordsWithBitacoraCount:bitacora,recordsWithApprovedAmountCount:approved,insurerDirectoryCount:insurerSnap.size,insurersWithEmergencyContactCount:insurersWithEmergency,insurersWithEmergencyAndReviewDateCount:insurersWithEmergencyAndReview,emergencyDirectory,publicProjectionCanRemainMetadataOnly:true,productionTouched:false},null,2));
           })().catch(e=>{console.error(JSON.stringify({readOnly:true,containsCustomerPii:false,error:String(e&&e.message||e).slice(0,160)}));process.exit(1);});
           NODE
           node - "$RUNNER_TEMP/s512/evidence/SINIESTROS_RUNTIME_READONLY.json" <<'NODE'
