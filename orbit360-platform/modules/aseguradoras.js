@@ -165,7 +165,7 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ===================== MOTOR DE FUENTES/CONOCIMIENTO (Tarifas) ===================== */
   const SOURCE_TYPES=(Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.TAXONOMY?Orbit.insurerSourceRegistry.TAXONOMY.map(x=>x[0]):['otro_requiere_clasificacion']);
-  const SOURCE_STATES = ['Documento recibido', 'Mapeado', 'Persistido', 'Requiere validación', 'Validado', 'Conocimiento incompleto', 'Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'];
+  const SOURCE_STATES = ['Documento recibido', 'Clasificado', 'Persistido', 'Requiere validación', 'Validado', 'Conocimiento incompleto', 'Listo para habilitar', 'Habilitado para Cotizador', 'Habilitado para Comparativo'];
   // dimensiones extendidas — no todas se capturan en la UI de docs aún (país/moneda/ramo sí);
   // el resto queda disponible en el contrato para consumidores/importadores futuros.
   const DIMENSION_KEYS = ['pais', 'moneda', 'ramo', 'producto', 'familiaProducto', 'subtipoProducto', 'segmento', 'tipoRiesgo', 'tipoVehiculo', 'usoVehiculo', 'plan'];
@@ -196,7 +196,7 @@ Orbit.modules.aseguradoras = (function () {
     if (/requiere.*valid|requires.*valid/.test(key)) return 'Requiere validación';
     if (/validado|validated/.test(key)) return 'Validado';
     if (/persist|metadata_persisted/.test(key)) return 'Persistido';
-    if (/mapeado|mapped|lectura_preparada|propuesta_lista/.test(key)) return 'Mapeado';
+    if (/mapeado|mapped|lectura_preparada|propuesta_lista/.test(key)) return 'Clasificado';
     if (/incomplet|conflict|error/.test(key)) return 'Conocimiento incompleto';
     return clean(value) || 'Documento recibido';
   }
@@ -256,8 +256,8 @@ Orbit.modules.aseguradoras = (function () {
     return [].concat(summary && summary.sources || []).map(item => Object.assign({}, item, {
       id: clean(item.id || item.documentId || item.sourceDocumentId),
       nombre: clean(item.nombre || item.fileName || item.archivo || item.documentId) || 'Fuente mapeada',
-      estado: visibleState(item.estado || item.status || 'Mapeado'),
-      sourceOrigin: 'Mapeado'
+      estado: visibleState(item.estado || item.status || 'Clasificado'),
+      sourceOrigin: 'Clasificado'
     }));
   }
   function persistedKnowledgeRows(row) {
@@ -396,6 +396,20 @@ Orbit.modules.aseguradoras = (function () {
   }
 
   /* ===================== DIRECTORIO ===================== */
+  function humanPreviewFixtureId(){return'b4003qa_human_insurer_r20';}
+  function humanPreviewFixture(){
+    const id=humanPreviewFixtureId(),existing=S().get('aseguradoras',id);if(existing)return existing;
+    return {id,__syntheticQa:true,previewWrite:true,previewSource:'r20-human-uat',tenantId:tenantId(),nombre:'PRUEBA PREVIEW · Aseguradora',canonicalName:'PRUEBA PREVIEW · Aseguradora',displayName:'PRUEBA PREVIEW · Aseguradora',pais:'GT',moneda:'GTQ',activo:true,vinculada:true,estado:'Activa',contactos:[],portales:[],cuentas:[],ramos:['Auto'],ramosDetalle:{Auto:{segmento:'Individual',plan:''}},ramosHabilitados:{Auto:{cotizador:false}},docsRequeridos:[],docs:[],actividad:[],cotTasas:{},cotTasasValidadas:{},observaciones:'Fixture temporal aislado para validar UI y persistencia en Preview.'};
+  }
+  async function openHumanPreviewFixture(){
+    const id=humanPreviewFixtureId(),existing=S().get('aseguradoras',id);
+    if(!existing){
+      if(!S().insertDurable)throw new Error('INSURER_PREVIEW_UAT_DURABLE_INSERT_REQUIRED');
+      await S().insertDurable('aseguradoras',humanPreviewFixture());
+      const readback=S().get('aseguradoras',id);if(!readback)throw new Error('INSURER_PREVIEW_UAT_READBACK_MISSING');
+    }
+    ficha(id);
+  }
   function render(h) {
     host = h;
     ensureKnowledgeSummaryLoaded();
@@ -423,6 +437,7 @@ Orbit.modules.aseguradoras = (function () {
 
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '🏢', title: 'Aseguradoras', sub: 'Directorio de aseguradoras vinculadas', features: [], actions: `${puedeEditar ? `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button>` : ''}${puedeEditar ? '<button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>' : ''}` })}
+      ${isB2PreviewHost()&&puedeEditar?'<div class="insurer-preview-uat" data-insurer-preview-uat="1"><div><b>🧪 Ficha de prueba Preview</b><p>Úsala para probar logo, productos/planes, requisitos y documentos. Está aislada y no modifica una aseguradora real.</p></div><button class="btn primary" id="asg-preview-uat">Abrir ficha de prueba</button></div>':''}
       ${K.kpis([
         { label: 'Activas', val: vinc.length, color: 'var(--ok)', foot: 'de ' + base.length + ' en directorio', footTone: 'up', onclick: "Orbit.modules.aseguradoras.kpi('activas')" },
         { label: 'Con contacto principal', val: conContactoPpal.length, color: 'var(--red)', foot: 'marcado como principal', onclick: "Orbit.modules.aseguradoras.kpi('contacto')" },
@@ -441,6 +456,7 @@ Orbit.modules.aseguradoras = (function () {
       <div class="asg-grid">${all.map(a => card(a)).join('') || '<div class="muted" style="padding:16px">Sin resultados para este filtro.</div>'}</div>
     </div>`;
     hydrateLogoAssets(host);
+    const previewUat=host.querySelector('#asg-preview-uat');if(previewUat)previewUat.addEventListener('click',async()=>{previewUat.disabled=true;try{await openHumanPreviewFixture();}catch(error){previewUat.disabled=false;U.toast('No fue posible preparar la ficha de prueba Preview.');}});
     if (host.querySelector('#asg-new')) host.querySelector('#asg-new').addEventListener('click', nueva);
     if (host.querySelector('#asg-imp')) host.querySelector('#asg-imp').addEventListener('click', () => { if (!canEdit()) { U.toast('Solo Dirección, Superadmin, Admin u Operativo puede importar.'); return; } Orbit.importa.open('directorio-aseguradoras', { onDone: reload }); });
     host.querySelector('#asg-q').addEventListener('input', e => { q = e.target.value; render(host); });
@@ -560,6 +576,7 @@ Orbit.modules.aseguradoras = (function () {
     const st = fichaState[id];
     const data = st.editing ? st.draft : a;
     host.innerHTML = `<div class="page" id="asg-ficha" data-id="${id}">
+      ${isB2PreviewHost()?'<div class="insurer-preview-uat" data-insurer-preview-uat="1"><div><b>🧪 Prueba segura en Preview</b><p>Las aseguradoras reales están protegidas. Para probar logo y documentos, vuelve al directorio y abre la ficha de prueba Preview.</p></div><button class="btn ghost" onclick="location.hash=\'#/aseguradoras\'">Ir al directorio</button></div>':''}
       <div class="crumb" style="margin-bottom:14px"><a style="cursor:pointer;color:var(--red)" onclick="location.hash='#/aseguradoras'">‹ Aseguradoras</a> / ${U.esc(a.nombre)}</div>
       <div class="card" style="overflow:hidden;padding:0;display:flex;flex-direction:column">
         <div style="padding:20px 24px;background:linear-gradient(120deg,${a.color},#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
@@ -663,7 +680,7 @@ Orbit.modules.aseguradoras = (function () {
       const bytes = new Uint8Array(await pendingLogo.arrayBuffer());
       let binary = ''; for (let i=0;i<bytes.length;i+=0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i,Math.min(i+0x8000,bytes.length)));
       const previewHost = /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location && location.hostname || ''));
-      if (previewHost && !/^b2-asg-[a-z0-9-]+$/i.test(id)) { U.toast('Preview protege las aseguradoras reales: puedes previsualizar el archivo, pero no se guardará hasta la promoción. La persistencia se valida con una aseguradora sintética B2.'); return; }
+      if (previewHost && !/^(?:b2-asg-[a-z0-9-]+|b4003qa_[A-Za-z0-9._:-]+)$/i.test(id)) { U.toast('Preview protege las aseguradoras reales. Usa la ficha de prueba Preview para validar logo y documentos sin tocar datos reales.'); return; }
       const assetCallable = previewHost ? 'orbit360ProductAssetUploadPreview' : 'orbit360ProductAssetUpload';
       const assetRegion = previewHost ? 'us-east1' : 'us-central1';
       const uploaded = await provider.callFunction(assetCallable,{tenantId:tenantId(),activeRole:(Orbit.session&&Orbit.session.rol&&Orbit.session.rol())||'',insurerId:id,fileName:pendingLogo.name,mimeType:pendingLogo.type,base64:btoa(binary)},assetRegion);
@@ -682,6 +699,12 @@ Orbit.modules.aseguradoras = (function () {
         delete patch.id;
         if (!S().batchDurable) throw new Error('PRODUCT_INSURER_DURABLE_BATCH_MISSING');
         await S().batchDurable([{ action: 'update', collection: 'aseguradoras', id, payload: patch }], { requestId: 'asg_edit_' + id + '_' + Date.now().toString(36), timeoutMs: 20000 });
+        const driveProvider=Orbit.productDriveDocumentProviderP0;
+        if(driveProvider&&typeof driveProvider.pendingDocument==='function'&&typeof driveProvider.finalize==='function'){
+          for(const req of [].concat(st.draft.docsRequeridos||[])){
+            const ref=clean(req&&req.documentRef);if(ref&&driveProvider.pendingDocument(ref))await driveProvider.finalize(ref,{entidad:'aseguradora',entidadId:id,insurerId:id,sourceModule:'aseguradoras'});
+          }
+        }
         if (cambios.indexOf('cotTasas') >= 0 || cambios.indexOf('cotTasasValidadas') >= 0) tarifaValidacionAudit(id, before, st.draft, motivo);
       }
       st.editing = false; st.draft = null; st.credentialDrafts = {}; st.snapshotCurrent = null; st.saving = false;
@@ -874,13 +897,13 @@ Orbit.modules.aseguradoras = (function () {
   function tabProductos(a, editing) {
     const ramos = a.ramos || [],state=reqFilterState[a.id]||(reqFilterState[a.id]={ramo:'',producto:''});
     const products=productOptionsFor(a,state.ramo),reqs=(a.docsRequeridos||[]).map((r,i)=>({r,i})).filter(x=>(!state.ramo||norm(x.r.ramo)===norm(state.ramo))&&(!state.producto||norm(x.r.producto)===norm(state.producto)));
-    return `<div class="asg-sec">
-      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Productos, ramos y planes ${editing ? '<button class="btn ghost sm" id="af-add-ramo">+ Ramo</button>' : ''}</div>
+    return `<div class="asg-sec insurer-premium-section"><div class="insurer-premium-head"><div style="display:flex;gap:12px"><span class="insurer-premium-icon">🧩</span><div><h3>Productos, ramos y planes</h3><p>Configura qué ofrece la aseguradora y qué exige para emitir. Los documentos de respaldo se guardan en Drive.</p></div></div></div><div class="insurer-premium-body">
+      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Configuración comercial ${editing ? '<button class="btn ghost sm" id="af-add-ramo">+ Ramo</button>' : ''}</div>
       <div class="ct-grid">${ramos.map((r, i) => ramoRow(a, r, i, editing)).join('') || '<div class="muted" style="font-size:12px">Sin ramos habilitados.</div>'}</div>
       <div class="cfg-note" style="margin-top:9px">Un ramo NO se ofrece en Cotizador hasta que lo marqués explícitamente "Habilitado p/ Cotizador" aquí. La ausencia de configuración significa <b>no disponible</b>, no lo contrario.</div>
       <div class="asg-sec-t" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span>Documentos requeridos para emisión</span>${editing ? '<button class="btn ghost sm" id="af-add-req">+ Requisito</button>' : ''}</div>
       <div class="insurer-filter-bar"><label>Ramo<select id="af-req-filter-ramo" class="o-sel">${selectOptions(ramos,state.ramo,'Todos')}</select></label><label>Producto<select id="af-req-filter-producto" class="o-sel">${selectOptions(products,state.producto,'Todos')}</select></label></div>
-      <div id="af-reqs">${reqs.map(x => reqRow(x.r, x.i, editing, a)).join('') || '<div class="muted" style="font-size:12px">Sin requisitos para los filtros seleccionados.</div>'}</div>
+      <div id="af-reqs">${reqs.map(x => reqRow(x.r, x.i, editing, a)).join('') || '<div class="muted" style="font-size:12px">Sin requisitos para los filtros seleccionados.</div>'}</div></div>
     </div>`;
   }
   function ramoRow(a, r, i, editing) {
@@ -907,8 +930,8 @@ Orbit.modules.aseguradoras = (function () {
         <label>Provenance<input class="o-sel" data-rprov value="${U.esc(r.provenance||r.origen||'')}" placeholder="Fuente / responsable" ${ro}></label>
       </div>
       <label class="ce-l">Descripción del requisito<textarea class="o-sel" data-ri style="min-height:58px;resize:vertical" ${ro}>${U.esc(r.descripcion||r.items||'')}</textarea></label>
-      <label class="ce-l">Adjunto / referencia Drive (opcional)<input class="o-sel" data-rattach value="${U.esc(attachment)}" placeholder="documentRef o https://…" ${ro}></label>
-      <div class="insurer-requirement-actions">${attachment&&/^https:\/\//i.test(attachment)?'<a class="btn ghost sm" href="'+U.esc(attachment)+'" target="_blank" rel="noopener">Abrir adjunto</a>':''}${editing ? `<button class="asg-del" data-del="docsRequeridos:${i}">Eliminar</button>` : ''}</div>
+      <div class="insurer-uploader"><input type="hidden" data-rattach value="${U.esc(attachment)}"><div style="flex:1;min-width:180px"><b style="font-size:12px">Documento de respaldo</b><div class="muted" data-rfile-label style="font-size:11px;margin-top:2px">${attachment?'Adjunto registrado':'Sin adjunto'}</div></div>${editing?'<label class="btn ghost sm">📎 Cargar archivo<input type="file" data-rupload hidden accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,.csv,.txt"></label>':''}${attachment?'<button type="button" class="btn ghost sm" data-ropen="'+U.esc(attachment)+'">Abrir adjunto</button>':''}</div>
+      <div class="insurer-requirement-actions">${editing ? `<button class="asg-del" data-del="docsRequeridos:${i}">Eliminar</button>` : ''}</div>
     </div>`;
   }
 
@@ -927,7 +950,7 @@ Orbit.modules.aseguradoras = (function () {
       }
       return clean(v).replace(/_/g,' ');
     };
-    return '<details class="insurer-technical-registry" data-technical-registry="1" style="margin-top:14px"><summary>🧾 Registry técnico y provenance · '+rows.length+' fuente(s)</summary><div class="muted" style="font-size:11.5px;margin:6px 0 10px">Detalle técnico secundario: clasificación, ubicación, provenance, versión, vigencia y huella.</div><div style="display:grid;gap:7px">'+rows.map(r=>{
+    return '<details class="insurer-technical-registry" data-technical-registry="1" style="margin-top:14px"><summary>🧾 Detalle de fuentes y trazabilidad · '+rows.length+' fuente(s)</summary><div class="muted" style="font-size:11.5px;margin:6px 0 10px">Información secundaria de la fuente: clasificación, ubicación, origen, versión, vigencia e identificación del archivo.</div><div style="display:grid;gap:7px">'+rows.map(r=>{
       const status=r.validationStatus||r.estado||'Documento recibido',dims=[r.pais,r.moneda,r.ramo,r.producto,r.plan].filter(Boolean);
       const provenance=human(r.provenance||r.sourceOrigin||r.origen||r.fuenteOrigen);
       const version=clean(r.version||r.sourceVersion||r.versión),validity=clean(r.vigencia||r.validFrom||r.fechaVigencia);
@@ -937,7 +960,7 @@ Orbit.modules.aseguradoras = (function () {
         ['Clasificación',r.taxonomyLabel||r.cat||'Otro/requiere clasificación'],
         ['Ubicación',label(r.storageKind)],
         ['Dimensiones',dims.join(' · ')||'Pendientes de completar'],
-        ['Provenance',provenance||'No registrada'],
+        ['Origen / trazabilidad',provenance||'No registrada'],
         ['Versión',version||'No registrada'],
         ['Vigencia',validity||'No registrada'],
         ['Documento / referencia',docId||r.id||'No registrada'],
@@ -986,9 +1009,9 @@ Orbit.modules.aseguradoras = (function () {
     const filteredGroups=grupos.filter(g=>g.docs.some(x=>(!state.ramo||norm(x.ramo)===norm(state.ramo))&&(!state.producto||norm(x.producto)===norm(state.producto))));
     tarifaRamoSel[id] = tarifaRamoSel[id] || ramos[0] || '';
     const ramoSel = tarifaRamoSel[id],filter={ramo:state.ramo,producto:state.producto};
-    return `<div class="asg-sec insurer-knowledge-section" data-knowledge-order="1-summary">
-      <div class="asg-sec-t insurer-knowledge-title">🧠 Resumen del conocimiento de la aseguradora</div>
-      <div class="cfg-note insurer-knowledge-intro" style="margin-bottom:9px"><b>Jerarquía:</b> una fuente puede estar <b>Mapeada</b> (clasificada), <b>Validada</b> (evidencia revisada) y, por separado, <b>Habilitada</b> para un cálculo concreto. <b>Registrar o validar un documento nunca habilita automáticamente</b> Cotizador/Comparativo.</div>
+    return `<div class="asg-sec insurer-knowledge-section insurer-premium-section" data-knowledge-order="1-summary"><div class="insurer-premium-head"><div style="display:flex;gap:12px"><span class="insurer-premium-icon">🧠</span><div><h3>Tarifas y conocimiento</h3><p>Fuentes, condiciones y reglas comerciales organizadas por producto. La evidencia queda separada de la habilitación del cotizador.</p></div></div></div><div class="insurer-premium-body">
+      <div class="asg-sec-t insurer-knowledge-title">Resumen de conocimiento</div>
+      <div class="cfg-note insurer-knowledge-intro" style="margin-bottom:9px"><b>Cómo leer esta sección:</b> una fuente puede estar <b>Clasificada</b>, <b>Validada</b> y, por separado, <b>Habilitada</b> para un cálculo. Cargar o validar un documento nunca activa automáticamente Cotizador ni Comparativo.</div>
       <div class="insurer-filter-bar"><label>Ramo<select id="kf-ramo" class="o-sel">${selectOptions(filterRamos,state.ramo,'Todos')}</select></label><label>Producto<select id="kf-producto" class="o-sel">${selectOptions(filterProducts,state.producto,'Todos')}</select></label></div>
       <div class="asg-tarifas-est" data-knowledge-order="3-sources">${Object.keys(resumen).filter(k => resumen[k] > 0).map(k => `<span class="badge ${k.indexOf('incompleto') >= 0 ? 'danger' : k.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10.5px">${k} (${resumen[k]})</span>`).join('') || '<span class="muted" style="font-size:12px">Sin fuentes cargadas todavía.</span>'}</div>
       <div class="asg-sec-t" style="margin-top:14px" data-knowledge-order="2-products">Productos y ramos cubiertos</div>
@@ -1000,7 +1023,7 @@ Orbit.modules.aseguradoras = (function () {
       ${knowledgeRoadmapHtml(a)}
       <div class="asg-sec-t" style="margin-top:16px" data-knowledge-order="4-tariffs">Tarifas y condiciones derivadas</div>
       ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc2" style="margin-top:12px">📊 Cargar tarifario / Excel de cotizador</button>' : ''}
-      ${ramos.length ? tablaTasasRamo(a, ramoSel, editing) : '<div class="cfg-note" style="margin-top:12px">Agregá al menos un ramo en la pestaña Productos y planes para configurar su tabla de tasas automáticas.</div>'}
+      ${ramos.length ? tablaTasasRamo(a, ramoSel, editing) : '<div class="cfg-note" style="margin-top:12px">Agregá al menos un ramo en la pestaña Productos y planes para configurar su tabla de tasas automáticas.</div>'}</div>
     </div>`;
   }
   /* ---- Tabla de tasas automáticas del Cotizador, POR RAMO — sin esto, calcTasas() del Cotizador siempre queda bloqueado (nunca se usa un valor genérico) ---- */
@@ -1184,6 +1207,21 @@ Orbit.modules.aseguradoras = (function () {
     if (t === 'productos') {
       const addRamo = body.querySelector('#af-add-ramo'); if (addRamo) addRamo.addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; snapshotTab(); const rr = (draft.ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); draft.ramos = rr; draft.comisiones = Object.assign({}, draft.comisiones); draft.comisiones[r] = draft.comisionDefault || 12; selectTab('productos'); });
       const addReq = body.querySelector('#af-add-req'); if (addReq) addReq.addEventListener('click', () => { snapshotTab(); draft.docsRequeridos = (draft.docsRequeridos || []).concat([{ pais:draft.pais, ramo:'', producto:'', plan:'', tipo:'Documento', descripcion:'', items:'', estado:'Vigente', provenance:'captura_plataforma', fecha:new Date().toISOString().slice(0,10), documentRef:'' }]); selectTab('productos'); });
+      body.querySelectorAll('[data-rupload]').forEach(input=>input.addEventListener('change',async()=>{
+        const file=input.files&&input.files[0],card=input.closest('[data-req]');if(!file||!card)return;
+        const label=card.querySelector('[data-rfile-label]'),refInput=card.querySelector('[data-rattach]'),provider=Orbit.productDriveDocumentProviderP0;
+        if(!provider||typeof provider.upload!=='function'){input.value='';return U.toast('La carga documental no está disponible.');}
+        if(label)label.textContent='Subiendo '+file.name+'…';input.disabled=true;
+        try{
+          const out=await provider.upload(file,{entidad:'aseguradora',entidadId:draft.id,insurerId:draft.id,sourceModule:'aseguradoras',documentType:'requisito_emision',categoria:'Requisito de emisión',nombre:file.name,provisional:true});
+          if(!out||out.ok!==true||!(out.documentRef||out.driveUrl||out.externalUrl))throw new Error('INSURER_REQUIREMENT_UPLOAD_NOT_CONFIRMED');
+          if(refInput)refInput.value=out.documentRef||out.fileId||out.driveUrl||out.externalUrl||'';
+          if(label)label.textContent='Adjunto: '+file.name;
+          snapshotTab();U.toast('Documento cargado y vinculado al requisito.');
+        }catch(error){if(label)label.textContent='No fue posible cargar el archivo.';U.toast('No fue posible guardar el documento en Drive.');}
+        finally{input.disabled=false;input.value='';}
+      }));
+      body.querySelectorAll('[data-ropen]').forEach(btn=>btn.addEventListener('click',async()=>{const provider=Orbit.productDriveDocumentProviderP0;if(!provider||typeof provider.download!=='function')return;btn.disabled=true;try{await provider.download(btn.dataset.ropen,{entidad:'aseguradora',entidadId:draft.id,insurerId:draft.id,sourceModule:'aseguradoras'});}finally{btn.disabled=false;}}));
       const impCom = body.querySelector('#af-imp-com'); if (impCom) impCom.addEventListener('click', () => { if (!canEdit()) return; document.getElementById('asg-ficha').remove(); Orbit.importa.open('planillas-comision', { onDone: reload }); });
     }
     if (t === 'documentos') {

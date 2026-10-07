@@ -149,6 +149,8 @@
     return {
       uid: text(authUser && authUser.uid),
       email: text(authUser && authUser.email).toLowerCase(),
+      nombre: text(membership.nombre || membership.displayName || membership.name || (authUser && authUser.displayName) || (authUser && authUser.email) || ''),
+      displayName: text(membership.displayName || membership.nombre || membership.name || (authUser && authUser.displayName) || (authUser && authUser.email) || ''),
       emailVerified: authUser && authUser.emailVerified === true,
       tenantId: text(membership.tenantId),
       roles: (membership.roles || []).slice(),

@@ -1,11 +1,11 @@
 'use strict';
 
 const { getApps, initializeApp } = require('firebase-admin/app');
-const { getFirestore } = require('firebase-admin/firestore');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
-const VERSION = 'orbit360-ops-advisor-inbox-v5-r20-scope-notices';
+const VERSION = 'orbit360-ops-advisor-inbox-v6-r20-recipient-dedupe-state';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 
@@ -32,6 +32,26 @@ function canonicalCollection(tenantId, collection) {
 }
 function productCanonicalCollection(tenantId, collection) {
   return db.collection('tenants').doc(tenantId).collection('data').doc(collection).collection('items');
+}
+function inboxStateCollection(tenantId,uid,preview){
+  return membershipRef(tenantId,uid).collection(preview?'previewInboxState':'inboxState');
+}
+function opsRole(activeRole){return /operativo|admin|direccion|superadmin|super admin/.test(norm(activeRole));}
+function advisorRole(activeRole){return /asesor|comercial|asistente/.test(norm(activeRole));}
+function timestampMs(value){
+  if(!value)return 0;
+  if(typeof value.toMillis==='function')return value.toMillis();
+  if(typeof value.toDate==='function')return value.toDate().getTime();
+  if(typeof value._seconds==='number')return value._seconds*1000+Number(value._nanoseconds||0)/1e6;
+  if(typeof value.seconds==='number')return value.seconds*1000+Number(value.nanoseconds||0)/1e6;
+  const n=Date.parse(String(value));return Number.isFinite(n)?n:0;
+}
+function recipientMatch(target,authz,actorUid){
+  if(actorUid&&text(actorUid,180)===text(authz.uid,180))return false;
+  const type=norm(target&&target.type),targetId=text(target&&target.id,180);
+  if(type==='advisor')return !!authz.advisorId&&targetId===authz.advisorId;
+  if(type==='role'&&norm(targetId)==='operations')return authz.opsScope!=='none'&&opsRole(authz.activeRole);
+  return false;
 }
 function activeMember(member) {
   const status = norm(member && (member.status || member.estado));
@@ -61,10 +81,12 @@ async function authorize(request) {
   const snap = await membershipRef(tenantId, request.auth.uid).get();
   const member = snap.exists ? snap.data() : null;
   if (!activeMember(member)) throw new HttpsError('permission-denied', 'La membresía no está activa.');
+  const roles=rolesOf(member),requestedRole=norm(request.data&&request.data.activeRole),activeRole=requestedRole||norm(member.activeRole||member.rolActivo||member.defaultRole||member.rol)||roles[0]||'';
+  if(requestedRole&&!roles.includes(requestedRole))throw new HttpsError('permission-denied','El rol activo no está asignado.');
   const advisorId=advisorIdOf(member),opsScope=scopeOf(member,'ops'),leadsScope=scopeOf(member,'leads');
   if (opsScope==='none'&&leadsScope==='none') throw new HttpsError('permission-denied','Los alcances de Ops y Leads están deshabilitados.');
   if ((opsScope==='own'||leadsScope==='own')&&!advisorId) throw new HttpsError('failed-precondition','La membresía no está vinculada a un asesor.');
-  return { tenantId, member, advisorId, opsScope, leadsScope, roles: rolesOf(member) };
+  return { tenantId, member, advisorId, opsScope, leadsScope, roles, activeRole, uid:request.auth.uid };
 }
 async function storageMode(tenantId) {
   const snap = await configRef(tenantId).get();
@@ -109,56 +131,62 @@ async function inbox(request,preview) {
   const authz = await authorize(request);
   const mode = await storageMode(authz.tenantId);
   const limit = Math.min(500, Math.max(20, Number(request.data && request.data.limit) || 250));
-  const [productManagementRows, productBusinessRows, compatibilityManagementRows, compatibilityBusinessRows, noticesSnap, internalSnap] = await Promise.all([
+  const [productManagementRows, productBusinessRows, compatibilityManagementRows, compatibilityBusinessRows, noticesSnap, internalSnap, stateSnap] = await Promise.all([
     getCollectionRows(productCanonicalCollection(authz.tenantId, 'gestiones'), limit),
     getCollectionRows(productCanonicalCollection(authz.tenantId, 'negocios'), limit),
     getCollectionRows(refFor(mode, authz.tenantId, 'gestiones'), limit),
     getCollectionRows(refFor(mode, authz.tenantId, 'negocios'), limit),
     db.collection('tenants').doc(authz.tenantId).collection(preview?'previewNotificationOutbox':'notificationOutbox').orderBy('createdAt','desc').limit(limit).get(),
-    db.collection('tenants').doc(authz.tenantId).collection(preview?'previewInternalNotifs':'internalNotifs').orderBy('createdAt','desc').limit(limit).get()
+    db.collection('tenants').doc(authz.tenantId).collection(preview?'previewInternalNotifs':'internalNotifs').orderBy('createdAt','desc').limit(limit).get(),
+    inboxStateCollection(authz.tenantId,authz.uid,preview).limit(Math.min(500,limit*3)).get()
   ]);
   const managementRows = mergeRows(productManagementRows, compatibilityManagementRows);
   const businessRows = mergeRows(productBusinessRows, compatibilityBusinessRows);
   const managements=managementRows.filter(row=>visible(row,authz,'ops')).map(row=>project(row,'management'));
   const businesses=businessRows.filter(row=>visible(row,authz,'leads')).map(row=>project(row,'business'));
   const allowedLeads=new Set(allowedAdvisorIds(authz,'leads')),allowedOps=new Set(allowedAdvisorIds(authz,'ops'));
-  const outboxNotices = noticesSnap.docs.map(doc => Object.assign({ id: doc.id }, doc.data())).filter(row => {
-    const domain=text(row.entityType,100)==='negocios'?'leads':'ops',scope=domain==='leads'?authz.leadsScope:authz.opsScope,allowed=domain==='leads'?allowedLeads:allowedOps;
-    return [].concat(row.targets||[]).some(target=>{const type=norm(target&&target.type),id=text(target&&target.id,180);if(type==='advisor')return id===authz.advisorId||scope==='all'||allowed.has(id);if(type==='role'&&norm(id)==='operations')return authz.opsScope!=='none'&&authz.roles.some(role=>/operativo|admin|direccion|superadmin|super admin/.test(role));return false;});
-  }).map(row => ({
-    id: text(row.id, 180),
-    entityType: text(row.entityType, 100),
-    entityId: text(row.entityId, 180),
-    operation: text(row.operation, 100),
-    status: text(row.status, 80),
-    title: text(row.payload && row.payload.title, 240),
-    message: text(row.payload && row.payload.message, 1200),
-    attemptCount: Math.max(0, Number(row.attemptCount) || 0),
-    retryEligible: row.retryEligible === true,
-    lastError: text(row.lastError, 800),
-    nextAttemptAt: row.nextAttemptAt || null,
-    processedAt: row.processedAt || null,
-    channelStates: row.channelStates && typeof row.channelStates === 'object' ? row.channelStates : {},
-    externalChannelsPendingConnection: unique(row.externalChannelsPendingConnection || []),
-    createdAt: row.createdAt || null
-  }));
-  const isOpsRole=authz.roles.some(role=>/operativo|admin|direccion|superadmin|super admin/.test(role));
+  const stateByEvent=new Map(stateSnap.docs.map(doc=>{const row=doc.data()||{};return[text(row.noticeId||doc.id,180),row];}));
+  const outboxNotices = noticesSnap.docs.map(doc => Object.assign({ id: doc.id }, doc.data())).filter(row =>
+    [].concat(row.targets||[]).some(target=>recipientMatch(target,authz,row.actorUid))
+  ).map(row => {
+    const targets=[].concat(row.targets||[]).filter(t=>recipientMatch(t,authz,row.actorUid)),target=targets[0]||{},eventId=text(row.eventId||row.id,180);
+    return {
+      id:eventId,eventId,entityType:text(row.entityType,100),entityId:text(row.entityId,180),operation:text(row.operation,100),
+      status:text(row.status,80),title:text(row.payload&&row.payload.title,240),message:text(row.payload&&row.payload.message,1200),
+      attemptCount:Math.max(0,Number(row.attemptCount)||0),retryEligible:row.retryEligible===true,lastError:text(row.lastError,800),
+      nextAttemptAt:row.nextAttemptAt||null,processedAt:row.processedAt||null,channelStates:row.channelStates&&typeof row.channelStates==='object'?row.channelStates:{},
+      externalChannelsPendingConnection:unique(row.externalChannelsPendingConnection||[]),createdAt:row.createdAt||null,direction:text(row.direction,40),
+      targetType:norm(target.type),targetId:text(target.id,180),targetSurface:norm(target.type)==='advisor'?'leads':'ops',actorUid:text(row.actorUid,180),sourceRank:2
+    };
+  });
   const collaborationNotices=[];
   businessRows.forEach(row=>{
     [].concat(row&&row.comentarios||[]).forEach((comment,index)=>{
       const direction=text(comment&&comment.direction,40);if(!['advisor','operations'].includes(direction))return;
-      const advisorTarget=text(row.asesorId,180),visibleToRecipient=direction==='advisor'?(advisorTarget===authz.advisorId||authz.leadsScope==='all'||allowedLeads.has(advisorTarget)):(authz.opsScope!=='none'&&isOpsRole);
-      if(!visibleToRecipient)return;
-      collaborationNotices.push({id:text(comment.eventId||('collab_'+row.id+'_'+index),180),entityType:'negocios',entityId:text(row.id,180),operation:'typed_collaboration',status:'internal_committed',title:text(comment.tipo||'Colaboración comercial-operativa',240),message:text(comment.texto||comment.txt,1200),attemptCount:0,retryEligible:false,lastError:'',nextAttemptAt:null,processedAt:null,channelStates:{internal:'committed'},externalChannelsPendingConnection:[],createdAt:comment.ts||row.updatedAt||row.actualizado||null,direction});
+      const target=direction==='advisor'?{type:'advisor',id:text(row.asesorId,180)}:{type:'role',id:'operations'};
+      const actorUid=text(comment&&comment.actorUid,180);
+      if(!recipientMatch(target,authz,actorUid))return;
+      const eventId=text(comment.eventId||('collab_'+row.id+'_'+index),180);
+      collaborationNotices.push({id:eventId,eventId,entityType:'negocios',entityId:text(row.id,180),operation:'typed_collaboration',status:'internal_committed',
+        title:text(comment.tipo||'Colaboración comercial-operativa',240),message:text(comment.texto||comment.txt,1200),attemptCount:0,retryEligible:false,lastError:'',
+        nextAttemptAt:null,processedAt:null,channelStates:{internal:'committed'},externalChannelsPendingConnection:[],createdAt:comment.ts||row.updatedAt||row.actualizado||null,
+        direction,targetType:norm(target.type),targetId:text(target.id,180),targetSurface:direction==='advisor'?'leads':'ops',actorUid,sourceRank:1});
     });
   });
   const internalNotices=internalSnap.docs.map(doc=>Object.assign({id:doc.id},doc.data())).filter(row=>{
-    const type=norm(row.targetType),targetId=text(row.targetId,180);
-    if(type==='advisor')return targetId===authz.advisorId||authz.leadsScope==='all'||allowedLeads.has(targetId);
-    if(type==='role'&&norm(targetId)==='operations')return authz.opsScope!=='none'&&isOpsRole;
-    return false;
-  }).map(row=>({id:text(row.id,180),entityType:text(row.entityType,100),entityId:text(row.entityId,180),operation:text(row.operation,100),status:'internal_delivered',title:text(row.titulo,240),message:text(row.cuerpo,1200),attemptCount:1,retryEligible:false,lastError:'',nextAttemptAt:null,processedAt:row.updatedAt||null,channelStates:{internal:'delivered'},externalChannelsPendingConnection:[],createdAt:row.createdAt||null}));
-  const notices=internalNotices.concat(outboxNotices,collaborationNotices).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||''))).slice(0,limit);
+    const target={type:row.targetType,id:row.targetId};return recipientMatch(target,authz,row.actorUid);
+  }).map(row=>{const eventId=text(row.eventId||row.id,180),type=norm(row.targetType);return{id:eventId,eventId,entityType:text(row.entityType,100),entityId:text(row.entityId,180),
+    operation:text(row.operation,100),status:'internal_delivered',title:text(row.titulo,240),message:text(row.cuerpo,1200),attemptCount:1,retryEligible:false,lastError:'',
+    nextAttemptAt:null,processedAt:row.updatedAt||null,channelStates:{internal:'delivered'},externalChannelsPendingConnection:[],createdAt:row.createdAt||null,
+    direction:text(row.direction,40),targetType:type,targetId:text(row.targetId,180),targetSurface:type==='advisor'?'leads':'ops',actorUid:text(row.actorUid,180),sourceRank:3};});
+  const deduped=new Map();
+  internalNotices.concat(outboxNotices,collaborationNotices).forEach(row=>{const key=text(row.eventId||row.id,180);const prior=deduped.get(key);if(!prior||Number(row.sourceRank||0)>Number(prior.sourceRank||0))deduped.set(key,row);});
+  const includeArchived=request.data&&request.data.includeArchived===true;
+  const notices=Array.from(deduped.values()).map(row=>{
+    const state=stateByEvent.get(text(row.eventId||row.id,180))||{},readAt=state.readAt||null,attendedAt=state.attendedAt||null,archivedAt=state.archivedAt||null;
+    return Object.assign({},row,{readAt,attendedAt,archivedAt,read:!!readAt,attended:!!attendedAt,archived:!!archivedAt,
+      statusLabel:attendedAt?'Atendida':readAt?'Vista':'Nueva'});
+  }).filter(row=>includeArchived||!row.archived).sort((a,b)=>timestampMs(b.createdAt)-timestampMs(a.createdAt)).slice(0,limit);
   const noticeStatusCounts = {};
   notices.forEach(row => { const key = row.status || '(blank)'; noticeStatusCounts[key] = (noticeStatusCounts[key] || 0) + 1; });
   return {
@@ -169,6 +197,7 @@ async function inbox(request,preview) {
     opsScope: authz.opsScope,
     leadsScope: authz.leadsScope,
     advisorId: authz.advisorId,
+    activeRole: authz.activeRole,
     preview: preview===true,
     storageMode: mode,
     productCanonicalDataOwner: true,
@@ -177,11 +206,26 @@ async function inbox(request,preview) {
     businesses,
     notices,
     noticeStatusCounts,
-    counts: { managements: managements.length, businesses: businesses.length, notices: notices.length }
+    counts: { managements: managements.length, businesses: businesses.length, notices: notices.length, unread: notices.filter(row=>!row.read).length, attended:notices.filter(row=>row.attended).length }
   };
+}
+
+async function updateInboxState(request,preview){
+  const authz=await authorize(request),noticeId=cleanId(request.data&&request.data.noticeId,'noticeId'),action=norm(request.data&&request.data.action);
+  if(!['read','attended','archive','restore'].includes(action))throw new HttpsError('invalid-argument','Acción de bandeja no soportada.');
+  const ref=inboxStateCollection(authz.tenantId,authz.uid,preview),doc=ref.doc(noticeId),patch={noticeId,updatedAt:FieldValue.serverTimestamp()};
+  if(action==='read')patch.readAt=FieldValue.serverTimestamp();
+  if(action==='attended'){patch.readAt=FieldValue.serverTimestamp();patch.attendedAt=FieldValue.serverTimestamp();}
+  if(action==='archive'){patch.readAt=FieldValue.serverTimestamp();patch.archivedAt=FieldValue.serverTimestamp();}
+  if(action==='restore')patch.archivedAt=FieldValue.delete();
+  await doc.set(patch,{merge:true});
+  const after=await doc.get(),row=after.data()||{};
+  return{ok:true,version:VERSION,noticeId,action,read:!!row.readAt,attended:!!row.attendedAt,archived:!!row.archivedAt,preview:preview===true};
 }
 
 exports.orbit360GetAdvisorOpsInbox = onCall({ region: REGION, cors: true }, request=>inbox(request,false));
 exports.orbit360GetAdvisorOpsInboxLabV20260804 = onCall({ region: REGION, cors: true }, request=>inbox(request,false));
 exports.orbit360GetAdvisorOpsInboxPreview = onCall({ region: 'us-east1', cors: true }, request=>inbox(request,true));
+exports.orbit360UpdateAdvisorOpsInboxState = onCall({region:REGION,cors:true},request=>updateInboxState(request,false));
+exports.orbit360UpdateAdvisorOpsInboxStatePreview = onCall({region:'us-east1',cors:true},request=>updateInboxState(request,true));
 exports.__opsAdvisorInbox = Object.freeze({ VERSION });

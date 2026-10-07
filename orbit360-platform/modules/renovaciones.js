@@ -72,7 +72,7 @@ Orbit.modules.renovaciones = (function () {
 
   function buckets() {
     const cols = [
-      { key: 'vencidas', label: 'Vencidas', tone: 'danger', test: d => d < 0 },
+      { key: 'vencidas', label: 'Vencidas renovables', tone: 'danger', test: d => d < 0 },
       { key: 'd15', label: 'Esta quincena (≤15 d)', tone: 'danger', test: d => d >= 0 && d <= 15 },
       { key: 'd45', label: 'Próximas (16–45 d)', tone: 'warn', test: d => d > 15 && d <= 45 },
       { key: 'd90', label: 'En el horizonte (46–90 d)', tone: 'info', test: d => d > 45 && d <= 90 }
@@ -89,6 +89,11 @@ Orbit.modules.renovaciones = (function () {
   }
 
   function premiumValue(p){const a=Number(p&&p.primaTotal);if(Number.isFinite(a)&&a>0)return a;const b=Number(p&&p.prima);return Number.isFinite(b)&&b>0?b:null;}
+  function expiredContext(){
+    const rows=(S().all('polizas')||[]).filter(p=>p&&selectedCountry(p)&&U.daysFromNow(p.vigenciaFin)!=null&&U.daysFromNow(p.vigenciaFin)<0);
+    const pipeline=rows.filter(renewalPipelineCandidate),nonrenewable=rows.filter(p=>renewabilityState(p)==='NO').length,terminal=rows.filter(terminalRenewalOutcome).length,other=Math.max(0,rows.length-pipeline.length-nonrenewable-terminal);
+    return{historicalExpired:rows.length,pipeline:pipeline.length,nonrenewable,terminal,other};
+  }
 
   function render(host) {
     ensureDataCollections();
@@ -100,18 +105,18 @@ Orbit.modules.renovaciones = (function () {
     const cols = buckets();
     const pendingValidation=S().where('polizas', renewalPendingValidation);
     const dispositionRows45=date45DispositionRows(),disposition45=date45Disposition();
-    const totalPrima = cols.reduce((s, c) => s + c.items.reduce((ss, it) => ss + q.norm(it.p.prima, it.p.moneda), 0), 0);
+    const totalPrima = cols.reduce((s, c) => s + c.items.reduce((ss, it) => ss + q.norm(it.p.prima, it.p.moneda), 0), 0),expired=expiredContext();
     const toneBg = { danger: 'var(--danger)', warn: 'var(--warn)', info: 'var(--info)' };
 
     host.innerHTML = `<div class="page">
       ${K.bannerFor('renovaciones', `<button class="btn primary" onclick="Orbit.modules.renovaciones.campana()">📤 Campaña de renovación</button>`)}
       ${K.kpis([
-        { label: 'Vencidas', val: cols[0].items.length, color: 'var(--danger)', foot: 'recuperar ya', footTone: 'down', onclick: "location.hash='#/renovaciones'" },
+        { label: 'Vencidas renovables', val: cols[0].items.length, color: 'var(--danger)', foot: 'en gestión de renovación', footTone: 'down', onclick: "location.hash='#/renovaciones'" },
         { label: '≤15 días', val: cols[1].items.length, color: 'var(--danger)', foot: 'urgente', onclick: "location.hash='#/renovaciones'" },
         { label: '16–45 días', val: cols[2].items.length, color: 'var(--warn)', foot: 'planificar', onclick: "location.hash='#/renovaciones'" },
         { label: 'Prima en juego', val: U.moneyShort(totalPrima, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
-      <div class="cfg-note renewal-pipeline-note" data-renewability-pending-count="${pendingValidation.length}" style="margin:0 0 14px"><b>Pipeline de renovación por fecha</b><div class="muted" style="margin-top:5px">Cada póliza permanece en su columna por vigencia. Las que todavía requieren validar renovabilidad se identifican en su propia tarjeta y se corrigen desde allí.</div></div>
+      <div class="cfg-note renewal-pipeline-note" data-renewability-pending-count="${pendingValidation.length}" data-expired-pipeline-count="${expired.pipeline}" data-expired-historical-count="${expired.historicalExpired}" style="margin:0 0 14px"><b>Pipeline de renovación por fecha</b><div class="muted" style="margin-top:5px">Aquí se muestran pólizas que todavía forman parte del proceso de renovación. <b>${expired.pipeline}</b> están vencidas y renovables dentro del pipeline; existen <b>${expired.historicalExpired}</b> pólizas con vigencia pasada en el alcance histórico, de las cuales ${expired.nonrenewable} están marcadas como no renovables y ${expired.terminal} ya tienen resultado terminal. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela.</div></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:start">
         ${cols.map(c => `<div class="card" data-renewal-bucket="${c.key}" data-renewal-bucket-count="${c.items.length}" style="overflow:hidden">
           <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;border-top:3px solid ${toneBg[c.tone]}">

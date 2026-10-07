@@ -2959,7 +2959,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "B4_003_R20_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED_DATA_READONLY",
+      "status": "SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2997,7 +2997,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3048,7 +3048,7 @@
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
       "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
-      "humanVisualStatus": "REJECTED_R20_FOLLOWUP_BLOCKERS_REMAIN",
+      "humanVisualStatus": "REJECTED_R20_FOLLOWUP_PENDING_RETEST",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_MACHINE_PROOF_20261005.json",
@@ -3245,7 +3245,9 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-004",
@@ -9258,7 +9260,7 @@
       "id": "B4-003-R20-Q01",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "REOPENED_BLOCKING_BY_PAULA_R20_FOLLOWUP",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Calidad/Póliza vs calendario",
       "finding": "Faltan buscador, filtros, jerarquía premium, estados humanizados, acciones y limpieza de etiquetas técnicas.",
@@ -9273,17 +9275,19 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-Q02",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "REOPENED_BLOCKING_BY_PAULA_R20_FOLLOWUP",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Calidad/Datos personales",
       "finding": "Tabla no ajusta al ancho; acciones se cortan; resolver responsive/scroll alcanzable.",
@@ -9299,17 +9303,19 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-Q03",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "REOPENED_BLOCKING_BY_PAULA_R20_FOLLOWUP",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Calidad/Acciones",
       "finding": "Completar, Agregar/corregir y Documentar origen son ambiguos; separar edición canónica de provenance o consolidar.",
@@ -9324,17 +9330,19 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-Q04",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "REOPENED_BLOCKING_BY_PAULA_R20_FOLLOWUP",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Calidad/País",
       "finding": "Separar valor canónico de evidencia; auto-resolver si póliza+aseguradora canónicas determinan país único; conflicto GT/CO humano.",
@@ -9350,17 +9358,19 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-Q05",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "REOPENED_BLOCKING_BY_PAULA_R20_FOLLOWUP",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Calidad/País persistencia",
       "finding": "Tras guardar país, País por validar no desapareció; probar before→save→commit→readback→reload→motivo desaparece.",
@@ -9376,17 +9386,19 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-Q06",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "REOPENED_BLOCKING_BY_PAULA_R20_FOLLOWUP",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Calidad/WhatsApp",
       "finding": "No se pudo confirmar guardado; probar save→canonical readback→reload→motivo Teléfono/WhatsApp desaparece.",
@@ -9402,17 +9414,19 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-Q07",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "REOPENED_BLOCKING_BY_PAULA_R20_FOLLOWUP",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Calidad/Automatización",
       "finding": "No convertir país/moneda determinísticos en trabajo manual masivo; humano solo para conflicto real.",
@@ -9428,17 +9442,19 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B01",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "HUMAN_REJECTED_R20_KPI_SEMANTIC_REVALIDATION_REQUIRED",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Renovaciones/Kanban",
       "finding": "Eliminar la tabla paralela como solución principal. Mantener columnas aprobadas Vencidas, Esta quincena 0-15, Próximas 16-45, Horizonte 46-90; vencida sin sucesora/terminal permanece Vencidas sin límite; renovabilidad pendiente no desaparece; renovada sale solo con cierre causal.",
@@ -9455,7 +9471,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED",
       "diagnosedOwners": [
         "renewalsUi"
@@ -9467,7 +9483,9 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B02",
@@ -9535,7 +9553,7 @@
       "id": "B4-003-R20-B03",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "HUMAN_REJECTED_R20_PREVIEW_UAT_NOT_HUMAN_ACCESSIBLE",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Aseguradoras/Requisitos",
       "finding": "País, ramo, producto/plan, tipo, descripción, adjunto opcional, estado, provenance, fecha; filtros ramo/producto; requisito sin archivo permitido.",
@@ -9551,7 +9569,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED",
       "diagnosedOwners": [
         "insurerUi"
@@ -9563,13 +9581,15 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B04",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "HUMAN_REJECTED_R20_PREVIEW_UAT_NOT_HUMAN_ACCESSIBLE",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Aseguradoras/Fuentes",
       "finding": "Adjuntar/subir fuente a entidad existente, asociar país/ramo/producto/moneda, dedupe, mostrar vínculo y abrir/descargar vía Drive; no crear segundo documento al adjuntar evidencia.",
@@ -9585,7 +9605,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED",
       "diagnosedOwners": [
         "insurerUi"
@@ -9597,13 +9617,15 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B05",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "HUMAN_REJECTED_R20_VISUAL_UNCHANGED",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Aseguradoras/Registry UI",
       "finding": "Registry técnico secundario/colapsable pero premium: iconos,badges,color,tarjetas,contraste,estados distinguibles.",
@@ -9619,7 +9641,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "HUMAN_VISUAL_REJECTION_OWNER_DEMONSTRATED",
       "diagnosedOwners": [
         "insurerUi",
@@ -9632,13 +9654,15 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B06",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "HUMAN_REJECTED_R20_VISUAL_UNCHANGED",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Aseguradoras/Tarifas-conocimiento",
       "finding": "Cards premium, jerarquía, catálogos administrables, filtros ramo/producto, provenance secundaria; no inputs libres si existe catálogo.",
@@ -9654,7 +9678,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED",
       "diagnosedOwners": [
         "insurerUi"
@@ -9666,13 +9690,15 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B07",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "R20_FOLLOWUP_PENDING_CANONICAL_TIMESTAMP_PROOF",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Aseguradoras/Actividad",
       "finding": "Más reciente arriba; timestamps canónicos; tipo/color/icono; no inventar fechas desde commits.",
@@ -9688,7 +9714,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "PARTIAL_CAUSE_DEMONSTRATED_NO_DATE_FABRICATION",
       "diagnosedOwners": [
         "insurerUi"
@@ -9700,13 +9726,15 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B08",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "HUMAN_REJECTED_R20_PREVIEW_UAT_NOT_HUMAN_ACCESSIBLE",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Aseguradoras/UAT writes",
       "finding": "Probar logo, producto, plan, requisito y documento con UAT Preview sintético, real server write, readback, reload y cleanup; LIVE intacto.",
@@ -9723,7 +9751,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED_UAT_COVERAGE_GAP",
       "diagnosedOwners": [
         "insurerUi",
@@ -9737,13 +9765,15 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B09",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "HUMAN_REJECTED_R20_NOTIFICATION_HANDOFF_DEFECTS",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Ops/Leads handoff",
       "finding": "Loading inmediato/disabled/Registrando; commit-readback-confirmación; estado exterior de tarjeta; campana+badge+deep-link+acción rápida; adjuntos Drive/documentRef.",
@@ -9760,7 +9790,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED",
       "diagnosedOwners": [
         "cycleUi",
@@ -9775,7 +9805,9 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B10",
@@ -9818,7 +9850,7 @@
       "id": "B4-003-R20-B11",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "R20_FOLLOWUP_PENDING_CADENCE_RUNTIME_PROOF",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Ops/Leads cadencias",
       "finding": "Auditar trigger→scheduler owner→fecha próxima→acción→persistencia→notificación con timestamp real.",
@@ -9834,7 +9866,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED_EXECUTION_OWNER_ABSENT",
       "diagnosedOwners": [
         "cycleUi",
@@ -9847,13 +9879,15 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B12",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "HUMAN_REJECTED_R20_STARTUP_ROUTING_PERFORMANCE",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Sesión/router/startup",
       "finding": "Logout lento, refresh puede expulsar, back no restaura ruta, Preview puede tardar minutos, Leads/comentarios ~5s; diagnosticar transversalmente y cerrar si impide UAT.",
@@ -9870,7 +9904,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "PARTIAL_CAUSE_DEMONSTRATED_RUNTIME_DISCRIMINATION_REQUIRED",
       "diagnosedOwners": [
         "authRuntime",
@@ -9885,13 +9919,15 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B13",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "R20_FOLLOWUP_PENDING_TOUCHED_OWNER_CATALOG_PROOF",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Catálogos/selects Fase A",
       "finding": "Auditar todos los selects incluyendo Ops/Leads: campo→módulo→owner→fuente→administrable S/N→dependencias→persistencia/readback→rol; no hardcodear personas/estados/tipos configurables.",
@@ -9908,7 +9944,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED_MIXED_CONFIG_OWNERS_AUDIT_REQUIRED",
       "diagnosedOwners": [
         "insurerUi",
@@ -9922,13 +9958,15 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     },
     {
       "id": "B4-003-R20-B14",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "HUMAN_REJECTED_R20_PREVIEW_UAT_NOT_HUMAN_ACCESSIBLE",
+      "status": "SOURCE_FIX_CANDIDATE_R20_FOLLOWUP_PENDING_EXACT_PREVIEW",
       "blocking": true,
       "surface": "Preview write contract",
       "finding": "Paula necesita E2E writes sin tocar registros reales: fixtures UAT aislados/deshechables equivalentes, misma UI que LIVE, commit/readback/reload/cleanup.",
@@ -9945,7 +9983,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED_UAT_FIXTURE_GAP_NOT_ISOLATION_DEFECT",
       "diagnosedOwners": [
         "previewStore",
@@ -9959,7 +9997,9 @@
       "r20FollowupHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
-      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+      "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
+      "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
     }
   ],
   "phaseBBacklog": [
@@ -10331,9 +10371,9 @@
     }
   },
   "currentB4": {
-    "status": "B4_003_R20_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED_DATA_READONLY",
-    "nextAction": "B4_003_R20_SOURCE_FIX",
-    "humanVisualStatus": "REJECTED_R20_FOLLOWUP_BLOCKERS_REMAIN"
+    "status": "SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "REJECTED_R20_FOLLOWUP_PENDING_RETEST"
   },
   "b4003QaResidueCarry": {
     "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
@@ -10370,7 +10410,7 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
   },
-  "lastUpdatedAt": "2026-10-06T18:36:00-06:00",
+  "lastUpdatedAt": "2026-10-06T19:55:00-06:00",
   "lastR16SourceFix": {
     "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
@@ -10567,5 +10607,14 @@
     "status": "CAUSES_DEMONSTRATED_SINGLE_CUMULATIVE_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
     "blobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+  },
+  "r20FollowupSourceFix": {
+    "status": "SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
+    "blobSha": "360542cca021b187cda638c3742dff8353137416",
+    "productMutationComplete": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

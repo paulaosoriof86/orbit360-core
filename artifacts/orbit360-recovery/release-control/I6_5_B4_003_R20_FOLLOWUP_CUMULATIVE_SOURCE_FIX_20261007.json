@@ -1,0 +1,60 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-06T19:52:00-06:00",
+  "status": "SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentSha": "bb01bfc7ba22b9582bb012c376eb8c3158d4a62b",
+  "authority": {
+    "humanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
+    "humanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
+    "diagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
+    "diagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+  },
+  "productBlobs": {
+    "orbit360-platform/index.html": "9961f8f190e90dec978c8cd153eb976113548e0d",
+    "orbit360-platform/styles/infra.css": "a9bb379e2db0a6ebab7c40424cc57cc9bcb346a3",
+    "orbit360-platform/core/ciclo.js": "5bf8b8f904b1dfadb009e9f8f281274fc70cdb91",
+    "orbit360-platform/core/auth-product-runtime-p0.js": "5299e3397fc4f37488e65e609eb446d27d724128",
+    "orbit360-platform/core/product-app-p0.js": "313bc1e82df3e5ac6b8a3922ee8ad658649da2e6",
+    "orbit360-platform/core/router.js": "d612a86a11952457f2b1acf40b00de0d6ad37ee9",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "1f1da3d54b32d94fe7d7111f318437a48bbf95cd",
+    "orbit360-platform/modules/renovaciones.js": "77ce45bbdeb2452c51d8e88c1fa0d13969c549d6",
+    "orbit360-platform/modules/aseguradoras.js": "64e64de7b3c14a93e335e633d3ae320e5fab1c76",
+    "orbit360-platform/modules/calidad.js": "eb737732a8e96880093b031629f61394a66cce8e",
+    "functions/product-ops-leads-domain.js": "4ee966743b8aa67ddbd02cbb7d66f0ab97a3f28e",
+    "functions/ops-advisor-inbox.js": "622126d36c6ea5c9d98920f1c5ed9c61b5774aa8",
+    "functions/notification-outbox-processor.js": "ce31ae776beb5945741ef0f9f9dbf53075d03910",
+    "functions/document-drive-domain.js": "6467886aa9b5fe8d21521f2651f20911ed34a35c",
+    "functions/product-operational-domain.js": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "b61fc2840203061b2e73eb637759b29e456e8f59",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "9753de662adf4543e6751c88e601027d5b88e3ed",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "32b0d1bf776358a279c3b3db3f223df36861b6b1"
+  },
+  "implemented": [
+    "Inbox: exact recipient semantics, sender exclusion, event-level dedupe, targetSurface, human labels, read/attended/archive persistence.",
+    "Collaboration: authenticated display name, canonical server ISO timestamp/readback, attachment upload through existing Drive owner, numbered/action-state card badges.",
+    "Startup: continuous restoring/progress state, no forced Inicio after credential acceptance, Leads-first for users with advisor identity, route preservation on refresh, required-first readiness.",
+    "Renewals: KPI renamed Vencidas renovables and historical-expired context exposed without changing canonical candidate eligibility.",
+    "Aseguradoras: actual file upload for emission requirement evidence, disposable human Preview UAT fixture, Preview logo support for B4003 synthetic insurer, premium hierarchy and humanized source registry.",
+    "Calidad: raw contractual source humanized on mobile, human headings/actions and premium workbench hierarchy.",
+    "Governance/QA: R20 workflow/proof successor; Preview deploy includes exact new inbox state, logo asset and document lifecycle callables."
+  ],
+  "preservedPasses": [
+    "B4-003-R20-B02 renewability apply",
+    "B4-003-R20-B10 Roles/scopes",
+    "four-column renewal Kanban",
+    "deep-link auto-open mechanism"
+  ],
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "syntheticQaWritesAuthorized": true,
+    "renewabilityApplyRepeat": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

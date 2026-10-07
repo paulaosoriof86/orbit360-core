@@ -7,7 +7,7 @@ const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'orbit360-notification-outbox-processor-v2-r20-internal-targets';
+const VERSION = 'orbit360-notification-outbox-processor-v3-r20-recipient-projection';
 const MAX_ATTEMPTS = 3;
 const INTERNAL_CHANNELS = new Set(['portal','in_app','interna','topbar','tarea','actividad']);
 const ADMIN_ROLES = new Set(['superadmin','admintenant','direccion','admin','operativo']);
@@ -154,9 +154,11 @@ async function processOutbox(tenantIdInput, eventIdInput, preview, actorUid) {
       if (shouldProjectInternal) {
         for (const target of internalTargets) {
           const type=norm(target.type),targetId=cleanId(target.id,'targetId'),id=internalNotificationId(tenantId,eventId,type,targetId);
+          const eventActor=event&&event.actor||{},actorUid=text(row.actorUid||eventActor.uid,180),actorName=text(row.actorName||eventActor.name||eventActor.displayName||eventActor.email,220);
+          const direction=text(row.direction,40),targetSurface=type==='advisor'?'leads':'ops';
           tx.set(internalProjectionRef(tenantId,id,preview),{
             id,tenantId,eventId,entityType:text(row.entityType,100),entityId:text(row.entityId,180),operation:text(row.operation,100),
-            targetType:type,targetId,titulo:text(row.payload&&row.payload.title,240)||'Actualización interna',
+            targetType:type,targetId,targetSurface,direction,actorUid,actorName,titulo:text(row.payload&&row.payload.title,240)||'Actualización interna',
             cuerpo:text(row.payload&&row.payload.message,1200),leida:false,previewWrite:preview===true,source:'canonical_notification_outbox',
             processorVersion:VERSION,createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()
           },{merge:true});

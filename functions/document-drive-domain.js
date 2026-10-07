@@ -227,6 +227,19 @@ async function authorizeTarget(request,tenantId,input,mode,previewOnly){
     if(!snap.exists)throw new HttpsError('not-found','Cliente vinculado no encontrado.');
     return{actor:authz.actor,row:Object.assign({},snap.data()||{},{id:clientId,tenantId}),ref,clientId,management,entityType:'gestion',entityId:managementId,previewSyntheticQa:false};
   }
+  if(entity==='negocio'||entity==='negocios'){
+    const ops=__opsLeadsProductDomain,authz=await ops.authorize(request,'update_business');
+    if(authz.tenantId!==tenantId)throw new HttpsError('permission-denied','Tenant fuera de alcance.');
+    const businessId=clean(input.entidadId||input.entityId,180);if(!businessId)throw new HttpsError('invalid-argument','Negocio requerido para acceder a documentos.');
+    const businessRef=ops.dataRef(tenantId,'negocios',businessId),bs=await businessRef.get();if(!bs.exists)throw new HttpsError('not-found','Negocio no encontrado.');
+    const business=Object.assign({},bs.data()||{},{id:businessId}),activeRole=norm(authz.actor&&authz.actor.activeRole),domain=/operativo|admin|direccion|superadmin/.test(activeRole)?'ops':'leads';
+    if(!ops.advisorAllowed(authz.member,business.asesorId,domain))throw new HttpsError('permission-denied','El negocio está fuera del alcance activo.');
+    const clientId=clean(business.clienteId||requestedClientId,180);if(!clientId)throw new HttpsError('failed-precondition','El negocio no tiene cliente vinculado para su carpeta documental.');
+    if(requestedClientId&&requestedClientId!==clientId)throw new HttpsError('failed-precondition','El cliente del documento no coincide con el negocio.');
+    const clientRef=__productOperationalDomain.canonicalRef(tenantId,'clientes',clientId),cs=await clientRef.get();if(!cs.exists)throw new HttpsError('not-found','Cliente vinculado no encontrado.');
+    const client=Object.assign({},cs.data()||{},{id:clientId,tenantId}),previewSyntheticQa=previewOnly===true&&business.previewWrite===true&&/^b4003qa[_:-]/i.test(businessId)&&previewSyntheticClient(clientId);
+    return{actor:authz.actor,row:client,ref:businessRef,clientId,business,entityType:'negocio',entityId:businessId,previewSyntheticQa};
+  }
   const d=__productOperationalDomain;
   if(entity==='aseguradora'||entity==='aseguradoras'){
     const insurerId=d.cleanId(input.aseguradoraId||input.entidadId||input.entityId,'aseguradoraId');
@@ -266,7 +279,7 @@ async function authorizeDocument(request,previewOnly,mode){
   if(previewOnly===true&&!previewSyntheticTarget(target))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
   const fileId=clean(input.documentRef||input.fileId||input.archivoRef,180)||driveIdFromUrl(input.driveUrl||input.externalUrl||input.url||'');
   if(!/^[A-Za-z0-9_-]{20,}$/.test(fileId))throw new HttpsError('invalid-argument','Referencia documental inválida.');
-  const bound=new Set([...refsFrom(target.row),...refsFrom(target.management||{})]);
+  const bound=new Set([...refsFrom(target.row),...refsFrom(target.management||{}),...refsFrom(target.business||{})]);
   if(!bound.has(fileId))throw new HttpsError('permission-denied','El documento no pertenece al expediente autorizado.');
   return{tenantId,target,fileId};
 }

@@ -9,7 +9,7 @@ const { resolveProductActiveRole } = require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
-const VERSION = 'gravicentra-product-operational-domain-v6-r8-receipt-scope-owner';
+const VERSION = 'gravicentra-product-operational-domain-v7-r20-human-preview-uat';
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -377,7 +377,7 @@ async function execute(request) {
 
 async function uploadProductAsset(request, previewOnly) {
   const input=request.data||{},tenantId=cleanId(input.tenantId,'tenantId'),insurerId=cleanId(input.insurerId,'insurerId');
-  if(previewOnly===true && !/^b2-asg-[a-z0-9-]+$/i.test(insurerId)) throw new HttpsError('permission-denied','El upload aislado de Preview solo admite fixtures sintéticos B2.');
+  if(previewOnly===true && !/^(?:b2-asg-[a-z0-9-]+|b4003qa_[A-Za-z0-9._:-]+)$/i.test(insurerId)) throw new HttpsError('permission-denied','El upload aislado de Preview solo admite fixtures sintéticos B2.');
   const actor=await authorize(request,tenantId,[{collection:'aseguradoras'}]);
   const insurerRef=canonicalRef(tenantId,'aseguradoras',insurerId),insurerSnap=await insurerRef.get();
   if(!insurerSnap.exists)throw new HttpsError('not-found','Aseguradora no encontrada.');
@@ -421,7 +421,7 @@ async function uploadProductAsset(request, previewOnly) {
 
 async function readProductAsset(request, previewOnly) {
   const input=request.data||{},tenantId=cleanId(input.tenantId,'tenantId'),insurerId=cleanId(input.insurerId,'insurerId');
-  if(previewOnly===true && !/^b2-asg-[a-z0-9-]+$/i.test(insurerId)) throw new HttpsError('permission-denied','La lectura aislada de Preview solo admite fixtures sintéticos B2.');
+  if(previewOnly===true && !/^(?:b2-asg-[a-z0-9-]+|b4003qa_[A-Za-z0-9._:-]+)$/i.test(insurerId)) throw new HttpsError('permission-denied','La lectura aislada de Preview solo admite fixtures sintéticos B2.');
   const actor=await authorizeRead(request,tenantId,'aseguradoras');
   const insurerRef=canonicalRef(tenantId,'aseguradoras',insurerId),snap=await insurerRef.get();
   if(!snap.exists)throw new HttpsError('not-found','Aseguradora no encontrada.');

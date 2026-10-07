@@ -155,7 +155,11 @@ async function rosterProjectionFor(browser,who,country){
 } 
 async function inboxProjectionFor(browser,who){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
- try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});return await p.evaluate(async({token,tenantId})=>{const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);return await provider.callFunction('orbit360GetAdvisorOpsInboxPreview',{tenantId,limit:100},'us-east1');},{token,tenantId});}finally{await ctx.close();}
+ try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});return await p.evaluate(async({token,tenantId,activeRole})=>{const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);return await provider.callFunction('orbit360GetAdvisorOpsInboxPreview',{tenantId,activeRole,limit:100},'us-east1');},{token,tenantId,activeRole:who.activeRole});}finally{await ctx.close();}
+}
+async function inboxStateFor(browser,who,noticeId,action){
+ const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
+ try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});return await p.evaluate(async({token,tenantId,activeRole,noticeId,action})=>{const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);return await provider.callFunction('orbit360UpdateAdvisorOpsInboxStatePreview',{tenantId,activeRole,noticeId,action},'us-east1');},{token,tenantId,activeRole:who.activeRole,noticeId,action});}finally{await ctx.close();}
 }
 async function collaborationFor(browser,who,businessId,type,message){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
@@ -492,6 +496,10 @@ try{
  });
  need(!proof.r18InsurerMobile.bodyOverflow&&!proof.r18InsurerMobile.detailOverflow&&!proof.r18InsurerMobile.cardOverflow&&proof.r18InsurerMobile.registryPresent&&proof.r18InsurerMobile.registryCollapsed,'B4_003_R19_INSURER_MOBILE_HIERARCHY_FAILED:'+JSON.stringify(proof.r18InsurerMobile));
  proof.assertions.insurerKnowledgeMobileResponsive=true;
+ const humanUat=await page.evaluate(()=>({banner:!!document.querySelector('[data-insurer-preview-uat="1"]'),premiumSections:document.querySelectorAll('.insurer-premium-section').length,technicalText:String(document.querySelector('#asg-ficha #af-body')?.innerText||'')}));
+ need(humanUat.banner===true,'B4_003_R20_HUMAN_PREVIEW_UAT_ENTRY_MISSING:'+JSON.stringify(humanUat));
+  need(!/Registry técnico|provenance/i.test(humanUat.technicalText),'B4_003_R20_INSURER_TECHNICAL_TERMS_VISIBLE:'+JSON.stringify(humanUat));
+ proof.assertions.insurerHumanPreviewUatVisible=true;proof.assertions.insurerTechnicalTermsHumanized=true;
  await page.setViewportSize({width:1280,height:720});
  const tariffCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='tarifa');
  const docCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='documento');
@@ -708,6 +716,10 @@ try{
  proof.r1604MobileQuality=await page.evaluate(()=>{const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);const mobile=h.querySelector('.quality-fin-mobile'),desktop=h.querySelector('.quality-fin-desktop'),card=mobile&&mobile.querySelector('[data-information-health-card-policy]');return{mobileDisplay:mobile?getComputedStyle(mobile).display:'missing',desktopDisplay:desktop?getComputedStyle(desktop).display:'missing',cardVisible:!!card,hasResolutionAction:!!mobile?.querySelector('[data-health-open-review]')};});
  need(proof.r1604MobileQuality.mobileDisplay!=='none'&&proof.r1604MobileQuality.desktopDisplay==='none'&&proof.r1604MobileQuality.cardVisible&&proof.r1604MobileQuality.hasResolutionAction,'B4_003_R16_04_QUALITY_MOBILE_USABILITY_FAILED:'+JSON.stringify(proof.r1604MobileQuality));
  proof.assertions.qualityMobileResolutionCard=true;
+ const qualityHuman=await page.evaluate(()=>{const h=document.getElementById('host');return{text:String(h?.innerText||''),workbench:!!h?.querySelector('.quality-workbench'),humanHeading:/Revisión de primas y calendario de cobro|Expedientes que requieren atención/.test(String(h?.innerText||''))};});
+ need(!/I6_4_PRIMARY_POLICY_UNIVERSE|contractualSource|provenance/i.test(qualityHuman.text),'B4_003_R20_QUALITY_TECHNICAL_TERMS_VISIBLE:'+JSON.stringify(qualityHuman));
+ need(qualityHuman.workbench===true&&qualityHuman.humanHeading===true,'B4_003_R20_QUALITY_VISUAL_HIERARCHY_MISSING:'+JSON.stringify(qualityHuman));
+ proof.assertions.qualityTechnicalTermsHumanized=true;proof.assertions.qualityPremiumHierarchyVisible=true;
  await page.setViewportSize({width:1280,height:720});
  proof.r17KanbanCardContainment=await page.evaluate(()=>{
    const probe=document.createElement('div');
@@ -778,9 +790,11 @@ try{
    const renewState=p=>{if(!Object.prototype.hasOwnProperty.call(p,'renovable')||p.renovable==null||String(p.renovable).trim()==='')return'UNKNOWN';const v=String(p.renovable).trim().toLowerCase();if(p.renovable===true||['true','si','sí','renovable'].includes(v))return'YES';if(p.renovable===false||['false','no','no renovable'].includes(v))return'NO';return'UNKNOWN';};
    const expected=(Orbit.store?.all?.('polizas')||[]).filter(p=>{const state=String(p.estado||'').trim().toLowerCase().replace(/\s+/g,''),d=Orbit.ui.daysFromNow(p.vigenciaFin);return renewState(p)!=='NO'&&!terminal(p)&&d!=null&&d>=0&&d<=45&&['vigente','porrenovar'].includes(state);}).map(p=>String(p.id)).sort();
    const visible=buckets.filter(x=>x.key==='d15'||x.key==='d45').flatMap(x=>x.ids).sort();
-   return{approvedBuckets:buckets.map(x=>x.key),buckets,pending,unknownInKanban:!!unknown,unknownBadge,unknownReview,parallelDispositionAbsent,date45ExpectedIds:expected,date45VisibleIds:visible};
+   const note=document.querySelector('[data-expired-pipeline-count]');return{approvedBuckets:buckets.map(x=>x.key),buckets,pending,unknownInKanban:!!unknown,unknownBadge,unknownReview,parallelDispositionAbsent,date45ExpectedIds:expected,date45VisibleIds:visible,expiredPipelineCount:Number(note?.getAttribute('data-expired-pipeline-count')||-1),expiredHistoricalCount:Number(note?.getAttribute('data-expired-historical-count')||-1),noteText:String(note?.innerText||'')};
  },ids);
  need(JSON.stringify(proof.r18RenewalDisposition.approvedBuckets)===JSON.stringify(['vencidas','d15','d45','d90'])&&proof.r18RenewalDisposition.parallelDispositionAbsent===true&&proof.r18RenewalDisposition.pending>=1&&proof.r18RenewalDisposition.unknownInKanban===true&&proof.r18RenewalDisposition.unknownBadge===true&&proof.r18RenewalDisposition.unknownReview===true&&JSON.stringify(proof.r18RenewalDisposition.date45VisibleIds)===JSON.stringify(proof.r18RenewalDisposition.date45ExpectedIds),'B4_003_R20_RENEWAL_KANBAN_RECONCILIATION_FAILED:'+JSON.stringify(proof.r18RenewalDisposition));
+ need(proof.r18RenewalDisposition.expiredPipelineCount===proof.r18RenewalDisposition.buckets.find(x=>x.key==='vencidas').count&&proof.r18RenewalDisposition.expiredHistoricalCount>=proof.r18RenewalDisposition.expiredPipelineCount&&/Vencidas renovables|vencidas y renovables/i.test(proof.r18RenewalDisposition.noteText),'B4_003_R20_RENEWAL_EXPIRED_KPI_SEMANTICS_FAILED:'+JSON.stringify(proof.r18RenewalDisposition));
+ proof.assertions.renewalExpiredKpiSemanticsHuman=true;
  proof.assertions.renewalDate45UniverseReconciled=true;
  proof.r1604RenewabilityWorkflow=await page.evaluate(ids=>{const note=document.querySelector('[data-renewability-pending-count]'),button=document.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');return{instruction:/permanece en su columna/i.test(note?.innerText||'')&&/desde allí/i.test(note?.innerText||''),buttonLabel:String(button?.innerText||''),buttonPresent:!!button};},ids);
  need(proof.r1604RenewabilityWorkflow.instruction&&proof.r1604RenewabilityWorkflow.buttonPresent&&/Revisar renovabilidad/i.test(proof.r1604RenewabilityWorkflow.buttonLabel),'B4_003_R20_RENEWABILITY_WORKFLOW_NOT_ACTIONABLE:'+JSON.stringify(proof.r1604RenewabilityWorkflow));
@@ -1111,19 +1125,37 @@ try{
  const dup=await tenant.collection('data').doc('negocios').collection('items').where('cancelacionId','==',ids.cancelation).get();
  need(dup.size===1,'B4_003_RECOVERY_DUPLICATE_CREATED');
  proof.assertions.recoveryIdempotentRetry=true;
- await collaborationFor(browser,directionActor,ids.collabBusiness,'Solicitar información al asesor','B4-003 R19 solicitud sintética al asesor');
+ await collaborationFor(browser,directionActor,ids.collabBusiness,'Solicitar información al asesor','B4-003 R20 solicitud sintética al asesor');
  const requestRow=(await ref('negocios',ids.collabBusiness).get()).data()||{},requestComment=[].concat(requestRow.comentarios||[]).slice(-1)[0]||{};
- need(requestComment.direction==='advisor'&&requestComment.eventId,'B4_003_R19_HANDOFF_REQUEST_COMMIT_MISSING');
- const advisorInbox=await inboxProjectionFor(browser,advisorActor),advisorNotice=[].concat(advisorInbox?.notices||[]).find(x=>x.entityId===ids.collabBusiness&&x.direction==='advisor');
- need(!!advisorNotice&&advisorNotice.status==='internal_committed','B4_003_R19_ADVISOR_NOTICE_MISSING:'+JSON.stringify(advisorInbox));
- const advisorResponse=await collaborationCommandFor(browser,advisorActor,ids.collabBusiness,'Respuesta del asesor','B4-003 R19 respuesta sintética del asesor','operations');
+ need(requestComment.direction==='advisor'&&requestComment.eventId&&requestComment.actorUid&&requestComment.actorName&&requestComment.user===requestComment.actorName,'B4_003_R20_HANDOFF_REQUEST_COMMIT_MISSING');
+ need(/^\d{4}-\d{2}-\d{2}T/.test(String(requestComment.ts||'')),'B4_003_R20_HANDOFF_CANONICAL_TIMESTAMP_MISSING');
+ const advisorInbox=await inboxProjectionFor(browser,advisorActor),advisorNotices=[].concat(advisorInbox?.notices||[]).filter(x=>x.eventId===requestComment.eventId);
+ need(advisorNotices.length===1,'B4_003_R20_ADVISOR_NOTICE_NOT_DEDUPED:'+JSON.stringify(advisorInbox));
+ const advisorNotice=advisorNotices[0];
+ need(advisorNotice.targetSurface==='leads'&&advisorNotice.targetId===advisorActor.advisorId&&advisorNotice.statusLabel==='Nueva','B4_003_R20_ADVISOR_NOTICE_TARGET_INVALID:'+JSON.stringify(advisorNotice));
+ const senderInbox=await inboxProjectionFor(browser,directionActor);
+ need(![].concat(senderInbox?.notices||[]).some(x=>x.eventId===requestComment.eventId),'B4_003_R20_SENDER_RECEIVED_OWN_REQUEST:'+JSON.stringify(senderInbox));
+ const marked=await inboxStateFor(browser,advisorActor,requestComment.eventId,'attended');
+ need(marked?.ok===true&&marked.attended===true,'B4_003_R20_ADVISOR_NOTICE_STATE_NOT_PERSISTED:'+JSON.stringify(marked));
+ const advisorInboxAfter=await inboxProjectionFor(browser,advisorActor),advisorAfter=[].concat(advisorInboxAfter?.notices||[]).find(x=>x.eventId===requestComment.eventId);
+ need(advisorAfter?.attended===true&&advisorAfter?.statusLabel==='Atendida','B4_003_R20_ADVISOR_NOTICE_ATTENDED_READBACK_FAILED:'+JSON.stringify(advisorInboxAfter));
+ const advisorResponse=await collaborationCommandFor(browser,advisorActor,ids.collabBusiness,'Reenviado a Operaciones','B4-003 R20 respuesta sintética del asesor','operations');
  const responseRow=(await ref('negocios',ids.collabBusiness).get()).data()||{},responseComment=[].concat(responseRow.comentarios||[]).slice(-1)[0]||{};
- need(responseComment.eventId===advisorResponse.eventId,'B4_003_R19_HANDOFF_RESPONSE_EVENT_ID_MISMATCH');
- need(responseComment.direction==='operations'&&responseComment.eventId,'B4_003_R19_HANDOFF_RESPONSE_COMMIT_MISSING');
- const opsInbox=await inboxProjectionFor(browser,operativeActor),opsNotice=[].concat(opsInbox?.notices||[]).find(x=>x.entityId===ids.collabBusiness&&x.direction==='operations');
- need(!!opsNotice&&opsNotice.status==='internal_committed','B4_003_R19_OPERATIONS_NOTICE_MISSING:'+JSON.stringify(opsInbox));
- proof.r19TypedHandoff={requestEventId:requestComment.eventId,advisorNoticeId:advisorNotice.id,responseEventId:responseComment.eventId,operationsNoticeId:opsNotice.id,caseEntityId:ids.collabBusiness};
+ need(responseComment.eventId===advisorResponse.eventId,'B4_003_R20_HANDOFF_RESPONSE_EVENT_ID_MISMATCH');
+ need(responseComment.direction==='operations'&&responseComment.eventId&&responseComment.actorName,'B4_003_R20_HANDOFF_RESPONSE_COMMIT_MISSING');
+ const opsInbox=await inboxProjectionFor(browser,operativeActor),opsNotices=[].concat(opsInbox?.notices||[]).filter(x=>x.eventId===responseComment.eventId);
+ need(opsNotices.length===1,'B4_003_R20_OPERATIONS_NOTICE_NOT_DEDUPED:'+JSON.stringify(opsInbox));
+ const opsNotice=opsNotices[0];
+ need(opsNotice.targetSurface==='ops'&&opsNotice.statusLabel==='Nueva','B4_003_R20_OPERATIONS_NOTICE_TARGET_INVALID:'+JSON.stringify(opsNotice));
+ const advisorOwnResponseInbox=await inboxProjectionFor(browser,advisorActor);
+ need(![].concat(advisorOwnResponseInbox?.notices||[]).some(x=>x.eventId===responseComment.eventId),'B4_003_R20_ADVISOR_RECEIVED_OWN_RESPONSE:'+JSON.stringify(advisorOwnResponseInbox));
+ proof.r20TypedHandoff={requestEventId:requestComment.eventId,advisorNoticeId:advisorNotice.id,responseEventId:responseComment.eventId,operationsNoticeId:opsNotice.id,caseEntityId:ids.collabBusiness,requestTargetSurface:advisorNotice.targetSurface,responseTargetSurface:opsNotice.targetSurface,advisorAttendedPersisted:advisorAfter.attended===true};
  proof.assertions.typedHandoffRecipientNoticeDurable=true;
+ proof.assertions.typedHandoffDeduplicated=true;
+ proof.assertions.typedHandoffSenderExcluded=true;
+ proof.assertions.typedHandoffTargetSurfaceCorrect=true;
+ proof.assertions.inboxStatePersistent=true;
+ proof.assertions.collaborationCanonicalIdentityAndTimestamp=true;
 
  // R13: controlled insurer Drive E2E on one disposable B4003 QA insurer only.
  await page.waitForFunction(id=>{

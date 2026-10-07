@@ -15,7 +15,21 @@ Orbit.ciclo = (function () {
   const U = Orbit.ui, q = Orbit.q, S = () => Orbit.store;
   // Fechas VIVAS (regla Orbit): nada de literales quemados en flujos que crean datos.
   const today = () => (U.today ? U.today() : new Date().toISOString().slice(0, 10));
-  const stamp = () => today() + ' ' + new Date().toTimeString().slice(0, 5);
+  const stamp = () => new Date().toISOString();
+  function currentUserName(){
+    try{
+      const p=Orbit.auth&&Orbit.auth.productUser||{},u=Orbit.auth&&typeof Orbit.auth.user==='function'?Orbit.auth.user()||{}:{};
+      const name=String(p.nombre||p.displayName||p.name||u.displayName||u.nombre||u.name||'').trim();
+      if(name)return name;
+      const top=document.querySelector('#tb-user .who b');if(top&&String(top.textContent||'').trim()&&String(top.textContent||'').trim()!=='Usuario')return String(top.textContent||'').trim();
+      return String(p.email||u.email||'Usuario').trim();
+    }catch(e){return'Usuario';}
+  }
+  function displayStamp(value){
+    const raw=String(value||'').trim();if(!raw)return'';
+    const d=new Date(raw);if(Number.isNaN(d.getTime()))return raw;
+    try{return new Intl.DateTimeFormat('es-GT',{dateStyle:'medium',timeStyle:'short'}).format(d);}catch(e){return raw;}
+  }
   const inDays = (d) => { const base = (U.now ? U.now() : new Date()); return new Date(base.getTime() + d * 86400000).toISOString().slice(0, 10); };
 
   /* ---- Etapas canónicas del ciclo ---- */
@@ -114,7 +128,7 @@ Orbit.ciclo = (function () {
   /* ===================== transiciones ===================== */
   function log(rec, campo, de, a, origen) {
     rec.bitacora = rec.bitacora || [];
-    rec.bitacora.push({ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo, de: de || '', a: a || '', origen: origen || 'manual' });
+    rec.bitacora.push({ ts: stamp(), user: currentUserName(), campo, de: de || '', a: a || '', origen: origen || 'manual' });
   }
   const PROB = { nuevo: 10, contactado: 25, cotizando: 45, propuesta: 65, negociacion: 78, inspeccion: 85, emision: 92, emitido: 100, perdido: 0 };
 
@@ -167,7 +181,7 @@ Orbit.ciclo = (function () {
       clienteId: '', polizaId: '', asesorId: activeAdvisor, aseguradoraId: '', ramo: '',
       estado: 'Pendiente', prioridad: 'Media', vence: '', proximaAccion: 'Pendiente de definir',
       checklist: [], nota: '', notas: '', origen: 'manual',
-      bitacora: [{ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Creación', de: '', a: 'Gestión creada', origen: 'manual' }],
+      bitacora: [{ ts: stamp(), user: currentUserName(), campo: 'Creación', de: '', a: 'Gestión creada', origen: 'manual' }],
       comentarios: [], creado: today(), actualizado: today(), archivado: false
     };
     const out = Object.assign(base, g || {});
@@ -230,7 +244,10 @@ Orbit.ciclo = (function () {
     const done = (n.checklist || []).filter(c => c.done).length, tot = (n.checklist || []).length;
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[n.prioridad] || 'neutral';
     const espejo = opts.espejo,comments=[].concat(n.comentarios||[]),lastCollab=comments.length?comments[comments.length-1]:null;
-    const collabDirection=lastCollab&&lastCollab.direction||'',collabLabel=collabDirection==='advisor'?'Esperando asesor':collabDirection==='operations'?'Esperando Operaciones':'';
+    const collabDirection=lastCollab&&lastCollab.direction||'',collabSeq=Number(lastCollab&&lastCollab.sequence)||comments.length;
+    const collabNeedsAction=(opts.board==='ops'&&collabDirection==='operations')||(opts.board==='leads'&&collabDirection==='advisor');
+    const collabLabel=!collabDirection?'':collabNeedsAction?('Acción requerida · #'+collabSeq):((collabDirection==='advisor'?'Esperando asesor':'Esperando Operaciones')+' · #'+collabSeq);
+    const collabClass=collabNeedsAction?'collab-action':'collab-wait';
     return `<div class="kcard ${espejo ? 'kcard-espejo' : ''}" data-neg="${n.id}">
       <div class="kcard-top">
         <span class="badge ${pr}">${U.esc(U.text(n.prioridad, 'Sin prioridad'))}</span>
@@ -239,7 +256,7 @@ Orbit.ciclo = (function () {
         ${opts.board === 'ops' && n.origen ? `<span class="badge info" title="Ingreso por ${n.origen}">${n.origen === 'Leads' ? '🎯' : n.origen === 'Solicitud del cliente' ? '🙋' : '🗂'} ${U.esc(U.text(n.origen, 'Sin origen'))}</span>` : ''}
         ${espejo ? `<span class="kmirror" title="Gestión operativa en curso por el equipo">🔗 en Ops</span>` : ''}
         ${n.cadenciaActiva ? `<span class="badge ok" title="Cadencia automática activa">🔁</span>` : ''}
-        ${collabLabel ? `<span class="badge info" data-collab-state="${U.esc(collabDirection)}">↔ ${U.esc(collabLabel)}</span>` : ''}
+        ${collabLabel ? `<span class="badge ${collabClass}" data-collab-state="${U.esc(collabDirection)}" data-collab-seq="${collabSeq}">↔ ${U.esc(collabLabel)}</span>` : ''}
       </div>
       <div class="kcard-t">${U.esc(n.nombre)}</div>
       <div class="kcard-cli">${U.esc(n.producto)} · <span class="mono">${primaShort(n)}</span></div>
@@ -357,7 +374,7 @@ Orbit.ciclo = (function () {
           <div class="ciclo-sec">
             <div class="ciclo-sec-t">Colaboración comercial ↔ operativa</div>
             <div id="ng-coms">${(n.comentarios || []).slice().reverse().map(comRow).join('') || '<div class="muted" style="font-size:12.5px">Sin observaciones ni solicitudes.</div>'}</div>
-            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Detalle para el equipo…"><button class="btn ghost sm" id="ng-com-add">Registrar</button></div>
+            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Detalle para el equipo…"><label class="btn ghost sm collab-file-btn">📎 Adjuntar<input id="ng-com-file" type="file" hidden></label><button class="btn ghost sm" id="ng-com-add">Registrar</button></div><div class="muted" id="ng-com-file-name" style="font-size:11.5px;margin-top:6px">Puedes adjuntar un documento de respaldo a la solicitud o respuesta.</div>
           </div>
         </div>
         <aside class="ciclo-aside">
@@ -448,17 +465,33 @@ Orbit.ciclo = (function () {
       try { await S().updateDurable('negocios', id, { checklist: n.checklist }); openNegocio(id); }
       catch (error) { n.checklist = prior; cadd.disabled = false; U.toast('No fue posible guardar el checklist.'); }
     });
+    const comFile=back.querySelector('#ng-com-file'),comFileName=back.querySelector('#ng-com-file-name');
+    if(comFile)comFile.addEventListener('change',()=>{const file=comFile.files&&comFile.files[0];if(comFileName)comFileName.textContent=file?('Adjunto seleccionado: '+file.name):'Puedes adjuntar un documento de respaldo a la solicitud o respuesta.';});
+    back.querySelectorAll('[data-collab-doc]').forEach(btn=>btn.addEventListener('click',async(e)=>{e.preventDefault();e.stopPropagation();const ref=btn.dataset.collabDoc;if(!ref)return;const provider=Orbit.productDriveDocumentProviderP0;if(!provider||typeof provider.download!=='function')return U.toast('El documento no está disponible en este momento.');btn.disabled=true;try{const out=await provider.download(ref,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});if(!out||out.ok!==true)U.toast('No fue posible abrir el documento.');}finally{btn.disabled=false;}}));
     const comadd = back.querySelector('#ng-com-add');
     if (comadd) comadd.addEventListener('click', async () => {
       const v = back.querySelector('#ng-com-new').value.trim(); if (!v) return;
-      const tipo=(back.querySelector('#ng-com-type')||{}).value||'Comentario comercial',actor=(Orbit.session ? Orbit.session.rol() : 'Equipo');
+      const tipo=(back.querySelector('#ng-com-type')||{}).value||'Comentario comercial',actor=currentUserName();
       const prior = (n.comentarios || []).slice(),priorBit=(n.bitacora||[]).slice();
-      const direction=collaborationDirection(tipo),eventId='collab_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7),ts=stamp();
-      n.comentarios = prior.concat([{ ts, user: actor, tipo, texto: v, direction, eventId }]);
-      n.bitacora=priorBit.concat([{ts,user:actor,campo:'Colaboración',de:'',a:tipo,origen:'manual',direction,eventId}]);
-      comadd.disabled = true;comadd.dataset.originalLabel=comadd.textContent;comadd.textContent='Registrando…';comadd.setAttribute('aria-busy','true');
-      try { await S().updateDurable('negocios', id, { comentarios: n.comentarios,bitacora:n.bitacora,actualizado:today() }); U.toast('Colaboración registrada y confirmada.');openNegocio(id); }
-      catch (error) { n.comentarios = prior;n.bitacora=priorBit;comadd.disabled = false;comadd.textContent=comadd.dataset.originalLabel||'Registrar';comadd.removeAttribute('aria-busy'); U.toast('No fue posible guardar la colaboración.'); }
+      const direction=collaborationDirection(tipo),eventId='collab_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7),ts=stamp(),file=comFile&&comFile.files&&comFile.files[0]||null;
+      let uploaded=null,attachment=null;
+      comadd.disabled = true;comadd.dataset.originalLabel=comadd.textContent;comadd.textContent=file?'Subiendo y registrando…':'Registrando…';comadd.setAttribute('aria-busy','true');
+      try {
+        if(file){
+          const provider=Orbit.productDriveDocumentProviderP0;if(!provider||typeof provider.upload!=='function')throw new Error('COLLAB_DOCUMENT_PROVIDER_REQUIRED');
+          uploaded=await provider.upload(file,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads',documentType:'colaboracion',categoria:'Colaboración',nombre:file.name,provisional:true});
+          if(!uploaded||uploaded.ok!==true||!(uploaded.documentRef||uploaded.driveUrl||uploaded.externalUrl))throw new Error('COLLAB_DOCUMENT_UPLOAD_NOT_CONFIRMED');
+          attachment={documentRef:uploaded.documentRef||uploaded.fileId||'',driveUrl:uploaded.driveUrl||uploaded.externalUrl||'',nombre:file.name,mimeType:file.type||'',size:Number(file.size)||0};
+        }
+        n.comentarios = prior.concat([{ ts, user: actor, tipo, texto: v, direction, eventId, attachment }]);
+        n.bitacora=priorBit.concat([{ts,user:actor,campo:'Colaboración',de:'',a:tipo,origen:'manual',direction,eventId}]);
+        await S().updateDurable('negocios', id, { comentarios: n.comentarios,bitacora:n.bitacora,actualizado:today() });
+        if(uploaded&&Orbit.productDriveDocumentProviderP0&&typeof Orbit.productDriveDocumentProviderP0.finalize==='function')await Orbit.productDriveDocumentProviderP0.finalize(uploaded.documentRef||uploaded.fileId||uploaded.driveUrl,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});
+        U.toast('Colaboración registrada y confirmada.');openNegocio(id);
+      } catch (error) {
+        if(uploaded&&Orbit.productDriveDocumentProviderP0&&typeof Orbit.productDriveDocumentProviderP0.quarantine==='function')try{await Orbit.productDriveDocumentProviderP0.quarantine(uploaded.documentRef||uploaded.fileId||uploaded.driveUrl,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});}catch(_e){}
+        n.comentarios = prior;n.bitacora=priorBit;comadd.disabled = false;comadd.textContent=comadd.dataset.originalLabel||'Registrar';comadd.removeAttribute('aria-busy'); U.toast('No fue posible guardar la colaboración.');
+      }
     });
     const anotherOpportunity=back.querySelector('#ng-new-opportunity');
     if(anotherOpportunity)anotherOpportunity.addEventListener('click',()=>{
@@ -1171,8 +1204,8 @@ Orbit.ciclo = (function () {
     return `<label class="ce-l">${label}<select id="${id}" class="o-sel">${pairs.map(p => `<option value="${p[0]}" ${p[0] === val ? 'selected' : ''}>${U.esc(p[1])}</option>`).join('')}</select></label>`;
   }
   function chkRow(ns, i, c) { return `<label class="chk-row"><input type="checkbox" data-chk="${i}" ${c.done ? 'checked' : ''}><span class="${c.done ? 'done' : ''}">${U.esc(c.t)}</span></label>`; }
-  function comRow(c) { return `<div class="com-row"><div class="com-h"><b>${U.esc(c.user)}</b><span class="muted mono">${U.esc(c.ts)}</span></div>${c.tipo?'<span class="badge info" style="font-size:10px;margin-bottom:5px">'+U.esc(c.tipo)+'</span>':''}<div>${U.esc(c.texto)}</div></div>`; }
-  function bitRow(b) { return `<div class="bit-row"><span class="bit-dot ${b.origen === 'auto' ? 'auto' : ''}"></span><div><div class="bit-t"><b>${U.esc(b.campo)}</b> ${b.de ? '· ' + U.esc(b.de) + ' → ' : ''}${U.esc(b.a)}</div><div class="muted mono" style="font-size:10.5px">${U.esc(b.ts)} · ${U.esc(b.user)}${b.origen === 'auto' ? ' · auto' : ''}</div></div></div>`; }
+  function comRow(c) { const a=c&&c.attachment||{},ref=a.documentRef||a.driveUrl||'';return `<div class="com-row"><div class="com-h"><b>${U.esc(c.actorName||c.user||'Usuario')}</b><span class="muted">${U.esc(displayStamp(c.ts))}</span></div>${c.tipo?'<span class="badge info" style="font-size:10px;margin-bottom:5px">'+U.esc(c.tipo)+'</span>':''}<div>${U.esc(c.texto)}</div>${ref?'<button type="button" class="btn ghost sm collab-doc" data-collab-doc="'+U.esc(ref)+'" style="margin-top:7px">📎 '+U.esc(a.nombre||'Abrir adjunto')+'</button>':''}</div>`; }
+  function bitRow(b) { return `<div class="bit-row"><span class="bit-dot ${b.origen === 'auto' ? 'auto' : ''}"></span><div><div class="bit-t"><b>${U.esc(b.campo)}</b> ${b.de ? '· ' + U.esc(b.de) + ' → ' : ''}${U.esc(b.a)}</div><div class="muted" style="font-size:10.5px">${U.esc(displayStamp(b.ts))} · ${U.esc(b.actorName||b.user||'Usuario')}${b.origen === 'auto' ? ' · automático' : ''}</div></div></div>`; }
 
   return {
     ETAPAS, E, FLUJO, opsListas, leadsListas, etapaInfo, flag,

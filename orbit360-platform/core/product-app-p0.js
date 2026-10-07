@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-clean-20261001.b3004r12p14';
+  var VERSION='fase-a-i2-clean-20261007.r20f1-startup';
   var state={initialized:false,activating:false,started:false,routerStarted:false,tenantContextReady:false,operationalWriteReady:false,lastError:''};
   var activationPromise=null;
 
@@ -25,6 +25,13 @@
   }
   function signal(){
     try{document.dispatchEvent(new CustomEvent('orbit:product-app',{detail:status()}));}catch(e){}
+  }
+  function progress(message){try{var el=document.querySelector('#auth-restoring small');if(el)el.textContent=message||'';}catch(e){}}
+  function preferredLanding(){
+    var p=Orbit.auth&&Orbit.auth.productUser||{},role=clean(p.activeRole).toLowerCase(),advisor=clean(p.advisorId);
+    if(advisor)return'leads';
+    if(/operativo|admin|direccion|superadmin/.test(role))return'ops';
+    return'inicio';
   }
   function prewarmCriticalRoutes(){
     var store=Orbit.store;
@@ -51,7 +58,7 @@
   function activate(){
     if(state.started)return Promise.resolve(status());
     if(activationPromise)return activationPromise;
-    state.activating=true;state.lastError='';signal();
+    state.activating=true;state.lastError='';progress('Validando tu acceso y permisos…');signal();
 
     activationPromise=Promise.resolve().then(function(){
       var cfg=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};
@@ -63,14 +70,22 @@
       if(!owner||typeof owner.start!=='function')throw new Error('PRODUCT_READONLY_BOOTSTRAP_MISSING');
       if(!hydrationOwner||typeof hydrationOwner.contract!=='function')throw new Error('PRODUCT_HYDRATION_CONTRACT_MISSING');
       var hydration=hydrationOwner.contract();
-      var bootstrapCollections=hydration.required.concat(hydration.optional);
+      var bootstrapCollections=hydration.required.slice();
       if(!hydration.required.length||!bootstrapCollections.length)throw new Error('PRODUCT_HYDRATION_CONTRACT_EMPTY');
+      progress('Preparando acceso seguro a tu información…');
       return owner.start(providers.dependencies(),{
         mode:'product',
         authorizedProductReadOnly:true,
         runtimeAuthorized:true,
         collections:bootstrapCollections,
-        snapshotTimeoutMs:20000
+        snapshotTimeoutMs:8000
+      }).then(function(result){
+        if(result&&result.ready===true&&Orbit.store&&typeof Orbit.store._ensureCollections==='function'){
+          var lazy=[].concat(hydration.optional||[]);
+          var defer=window.requestIdleCallback||function(fn){return setTimeout(fn,0);};
+          defer(function(){try{Orbit.store._ensureCollections(lazy);}catch(e){}},{timeout:600});
+        }
+        return result;
       });
     }).then(function(result){
       if(!result||result.ok!==true||result.ready!==true||result.writeAuthorized!==false)throw new Error('PRODUCT_READONLY_BOOTSTRAP_NOT_READY');
@@ -99,7 +114,8 @@
       if(!academyStatus||academyStatus.ready!==true||academyStatus.requiredCoursesPresent!==true||academyStatus.automaticWrites!==false||academyStatus.seed!==false||academyStatus.lab!==false)throw new Error('ACADEMIA_PRODUCT_CATALOG_NOT_READY');
 
       if(!state.routerStarted){
-        if(!location.hash)location.hash='#/inicio';
+        if(!location.hash)location.hash='#/'+preferredLanding();
+        progress('Abriendo '+(location.hash==='#/leads'?'Leads':location.hash==='#/ops'?'Ops':'tu panel')+'…');
         if(!Orbit.router||typeof Orbit.router.init!=='function')throw new Error('PRODUCT_ROUTER_MISSING');
         Orbit.router.init();
         state.routerStarted=true;
