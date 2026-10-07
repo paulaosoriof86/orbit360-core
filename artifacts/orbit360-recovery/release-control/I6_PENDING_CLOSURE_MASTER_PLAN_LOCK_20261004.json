@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
-    "why": "Second R20 targeted human review identified unresolved Ops/Leads/inbox/collaboration, insurer IA/Drive/catalog, Quality usability/language and renewal data-disposition gaps. Prior machine proof is evidence only; B4-004 remains held.",
+    "status": "B4_003_R20_SECOND_REVIEW_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX",
+    "why": "Second R20 human rejection remains blocking. Cumulative product remediation is authorized; data mutation remains closed. Source, visual hierarchy and TinyFish pre-handoff QA must pass before a new Paula review.",
     "currentCandidateReview": "R20_REJECTED_BLOCKERS_PLUS_AUTHORIZED_QUALITY_CARRY",
     "sourceSha": "86a54019ce2500b65ea2745517bde4dd5a5eecef",
     "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
@@ -6216,11 +6216,11 @@
     ]
   },
   "carryForwardIntegrity": {
-    "inventoryCount": 208,
+    "inventoryCount": 281,
     "attentionCount": 103,
     "registerSetMustEqualLedgerSet": true,
-    "latestLedgerBlobSha": "c7d35adb3f980cae310a5f7051c77715e8f485a2",
-    "latestCarryBlobSha": "233364d5ca31265677fd3cd204f1d235f2866ca5"
+    "latestLedgerBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
+    "latestCarryBlobSha": "4bc063d9ec181774b0fedcfa31d06f665d0db8e0"
   },
   "dataProtection": {
     "alreadyAppliedDoNotRepeat": [
@@ -6574,8 +6574,17 @@
     "status": "FROZEN_REJECTED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
     "blobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
-    "findingLedgerBlobSha": "c7d35adb3f980cae310a5f7051c77715e8f485a2",
-    "continuityRegisterBlobSha": "233364d5ca31265677fd3cd204f1d235f2866ca5",
+    "findingLedgerBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
+    "continuityRegisterBlobSha": "4bc063d9ec181774b0fedcfa31d06f665d0db8e0",
     "b4004Held": true
+  },
+  "r20SecondReviewExecution": {
+    "status": "SOURCE_FIX_AND_READONLY_DRYRUNS_ACTIVE",
+    "findingLedgerBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
+    "continuityRegisterBlobSha": "4bc063d9ec181774b0fedcfa31d06f665d0db8e0",
+    "tinyFishRequiredBeforePaulaHandoff": true,
+    "dataMutationAuthorized": false,
+    "noLive": true,
+    "noReimport": true
   }
 }
