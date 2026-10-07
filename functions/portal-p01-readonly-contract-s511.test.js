@@ -132,3 +132,75 @@ test('P-01 executable contract denies unverified external identity',async()=>{
   assert.equal(r.ok,false);
   assert.equal(r.code,'IDENTITY_DENY');
 });
+
+
+test('S5.11a identity provider remains gated until project enablement is proven',()=>{
+  assert.equal(p.IDENTITY_PROVIDER_GATE.externalProviderRequired,true);
+  assert.equal(p.IDENTITY_PROVIDER_GATE.projectProviderEnablementVerified,false);
+  assert.equal(p.IDENTITY_PROVIDER_GATE.passwordStorageByAys,false);
+  assert.equal(p.IDENTITY_PROVIDER_GATE.recreatedUidRequiresGrantReissue,true);
+});
+
+test('S5.11a grant issuance is explicit, expiring and account-scoped',()=>{
+  const r=p.buildGrantRecord({
+    identitySubject:'customerUid_123',
+    clientIds:['cli-1','cli-2','cli-1'],
+    issuedAt:'2026-10-07T17:00:00Z',
+    expiresAt:'2026-12-31T23:59:59Z',
+    issuedByRef:'actor_commitment_1',
+    issueReason:'Portal P-01 pilot access',
+    version:1
+  });
+  assert.equal(r.ok,true);
+  assert.equal(r.record.status,'active');
+  assert.deepEqual(r.record.clientIds,['cli-1','cli-2']);
+  assert.equal(r.record.version,1);
+  assert.equal(r.record.tenantId,'alianzas-soluciones');
+  assert.equal(p.GRANT_LIFECYCLE.directSelfGrantAllowed,false);
+  assert.equal(p.GRANT_LIFECYCLE.staffMembershipMutationAllowed,false);
+});
+
+test('S5.11a grant issue fails closed without expiry, issuer or scope',()=>{
+  const r=p.buildGrantRecord({
+    identitySubject:'customerUid_123',
+    clientIds:[],
+    issuedAt:'2026-10-07T17:00:00Z',
+    expiresAt:'',
+    issuedByRef:'',
+    issueReason:''
+  });
+  assert.equal(r.ok,false);
+  assert.ok(r.errors.includes('GRANT_CLIENT_SCOPE_REQUIRED'));
+  assert.ok(r.errors.includes('GRANT_EXPIRY_REQUIRED'));
+  assert.ok(r.errors.includes('GRANT_ISSUER_REF_REQUIRED'));
+});
+
+test('S5.11a revoke is explicit and reissue increments version',()=>{
+  const issued=p.buildGrantRecord({
+    identitySubject:'customerUid_123',
+    clientIds:['cli-1'],
+    issuedAt:'2026-10-07T17:00:00Z',
+    expiresAt:'2026-12-31T23:59:59Z',
+    issuedByRef:'actor1',
+    issueReason:'Issue',
+    version:1
+  }).record;
+  const revoked=p.revokeGrantRecord(issued,{
+    revokedAt:'2026-10-08T10:00:00Z',
+    revokedByRef:'actor2',
+    revocationReason:'Customer access revoked'
+  });
+  assert.equal(revoked.ok,true);
+  assert.equal(revoked.record.status,'revoked');
+  const reissued=p.reissueGrantRecord(revoked.record,{
+    clientIds:['cli-1','cli-3'],
+    issuedAt:'2026-10-09T10:00:00Z',
+    expiresAt:'2027-01-09T10:00:00Z',
+    issuedByRef:'actor3',
+    issueReason:'Reissued after identity review'
+  });
+  assert.equal(reissued.ok,true);
+  assert.equal(reissued.record.status,'active');
+  assert.equal(reissued.record.version,2);
+  assert.deepEqual(reissued.record.clientIds,['cli-1','cli-3']);
+});
