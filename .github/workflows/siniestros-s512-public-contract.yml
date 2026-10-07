@@ -13,15 +13,25 @@ on:
 permissions:
   contents: read
 
+env:
+  GCLOUD_PROJECT: ays-orbit-360-lab
+
 jobs:
   siniestros-contract:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install functions dependencies
+        working-directory: functions
+        run: npm ci
       - name: Source and deterministic contract QA
         working-directory: functions
         shell: bash
@@ -34,3 +44,59 @@ jobs:
           grep -q "coverageConfirmationFromReportAllowed:false" siniestros-public-contract-s512.js
           ! grep -q "firebase-admin" siniestros-public-contract-s512.js
           ! grep -q "onCall\|onRequest" siniestros-public-contract-s512.js
+      - name: Prepare LAB credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s512/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s512/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "ays-orbit-360-lab"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+      - name: Sanitized runtime readback
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE' | tee "$RUNNER_TEMP/s512/evidence/SINIESTROS_RUNTIME_READONLY.json"
+          const {getApps,initializeApp}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const c=require('./siniestros-public-contract-s512');
+          const PROJECT_ID='ays-orbit-360-lab',TENANT_ID='alianzas-soluciones';
+          (async()=>{
+            const app=getApps()[0]||initializeApp({projectId:PROJECT_ID});
+            const db=getFirestore(app);
+            const snap=await db.collection('tenantId').doc(TENANT_ID).collection('reclamos').get();
+            const internal={},publicCounts={}; let unknown=0,docs=0,bitacora=0,approved=0;
+            for(const doc of snap.docs){
+              const row=doc.data()||{},state=String(row.estado||'').trim()||'(empty)';
+              internal[state]=(internal[state]||0)+1;
+              const m=c.publicState(state); if(m.ok)publicCounts[m.state.code]=(publicCounts[m.state.code]||0)+1; else unknown++;
+              if(Array.isArray(row.docs)&&row.docs.length)docs++;
+              if(Array.isArray(row.bitacora)&&row.bitacora.length)bitacora++;
+              if(Number(row.montoAprobado||0)>0)approved++;
+            }
+            console.log(JSON.stringify({schemaVersion:'ays-siniestros-s512-runtime-readonly-v1',projectId:PROJECT_ID,tenantId:TENANT_ID,sourcePath:'tenantId/{tenant}/reclamos',readOnly:true,containsCustomerPii:false,recordCount:snap.size,noRecords:snap.empty,internalStateCounts:internal,publicStateCounts:publicCounts,unknownStateCount:unknown,recordsWithRawDocsCount:docs,recordsWithBitacoraCount:bitacora,recordsWithApprovedAmountCount:approved,publicProjectionCanRemainMetadataOnly:true,productionTouched:false},null,2));
+          })().catch(e=>{console.error(JSON.stringify({readOnly:true,containsCustomerPii:false,error:String(e&&e.message||e).slice(0,160)}));process.exit(1);});
+          NODE
+          node - "$RUNNER_TEMP/s512/evidence/SINIESTROS_RUNTIME_READONLY.json" <<'NODE'
+          const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          if(r.readOnly!==true||r.containsCustomerPii!==false||r.productionTouched!==false)process.exit(1);
+          if(!Number.isInteger(r.recordCount)||!Number.isInteger(r.unknownStateCount))process.exit(1);
+          NODE
+      - name: Upload sanitized evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: siniestros-s512-runtime-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/s512/evidence/SINIESTROS_RUNTIME_READONLY.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Remove transient credential
+        if: always()
+        run: rm -f "$RUNNER_TEMP/s512/firebase-service-account.json"
