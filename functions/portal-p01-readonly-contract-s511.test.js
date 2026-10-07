@@ -60,3 +60,14 @@ test('document projection never exposes raw storage url/path',()=>{
   assert.equal(Object.prototype.hasOwnProperty.call(d,'storagePath'),false);
   assert.equal(Object.prototype.hasOwnProperty.call(d,'url'),false);
 });
+
+
+test('current Firestore rules must not be reused as external customer authorization',()=>{
+  const fs=require('node:fs');
+  const path=require('node:path');
+  const rules=fs.readFileSync(path.join(__dirname,'..','firestore.rules'),'utf8');
+  assert.match(rules,/isTenantMember\(tenantId\)/);
+  assert.doesNotMatch(rules,/CustomerAccessGrant|portalCustomerAccessGrant|PortalIdentity/);
+  assert.equal(p.POLICY.staffSessionReuseAllowed,false);
+  assert.equal(p.POLICY.directBrowserClientIdAllowed,false);
+});
