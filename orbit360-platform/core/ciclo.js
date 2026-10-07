@@ -62,7 +62,21 @@ Orbit.ciclo = (function () {
       rolFiltro(g.asesorId));
   }
   function primaShort(n) { return U.moneyShort(n.primaEst, n.moneda); }
+  function primaLabel(n) { return Number(n && n.primaEst || 0) > 0 ? primaShort(n) : 'Prima por definir'; }
   function flag(pais) { return pais === 'GT' ? '🇬🇹' : pais === 'CO' ? '🇨🇴' : '🌎'; }
+  function leadRiskSummary(n) {
+    const d = U.text(n && n.descripcion, '').trim();
+    if (!d) return '';
+    const first = d.split(' · ')[0].trim();
+    return first.length > 92 ? first.slice(0, 89) + '…' : first;
+  }
+  function leadContactSummary(n) {
+    const out = [];
+    if (U.text(n && n.telefono, '').trim()) out.push('💬 WhatsApp');
+    if (U.text(n && n.email, '').trim()) out.push('✉ Correo');
+    return out.length ? out.join(' · ') : 'Sin canal de contacto';
+  }
+  function leadOrigin(n) { return U.text((n && (n.canal || n.origen)) || '', 'Origen pendiente'); }
 
   /* ===================== transiciones ===================== */
   function log(rec, campo, de, a, origen) {
@@ -175,23 +189,29 @@ Orbit.ciclo = (function () {
     const done = (n.checklist || []).filter(c => c.done).length, tot = (n.checklist || []).length;
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[n.prioridad] || 'neutral';
     const espejo = opts.espejo;
+    const risk = leadRiskSummary(n);
+    const origin = leadOrigin(n);
+    const contact = leadContactSummary(n);
     return `<div class="kcard ${espejo ? 'kcard-espejo' : ''}" data-neg="${n.id}">
       <div class="kcard-top">
         <span class="badge ${pr}">${U.esc(U.text(n.prioridad, 'Sin prioridad'))}</span>
-        <span class="badge neutral">${U.esc(U.text(n.ramo, 'Sin ramo'))}</span>
+        <span class="badge neutral" title="Producto / familia">${U.esc(U.text(n.producto || n.ramo, 'Producto pendiente'))}</span>
+        <span class="badge info" title="Canal de ingreso">🌐 ${U.esc(origin)}</span>
         <span class="kflag" title="${U.esc(U.text(n.pais, 'Sin país'))}">${flag(n.pais)}</span>
-        ${opts.board === 'ops' && n.origen ? `<span class="badge info" title="Ingreso por ${n.origen}">${n.origen === 'Leads' ? '🎯' : n.origen === 'Solicitud del cliente' ? '🙋' : '🗂'} ${U.esc(U.text(n.origen, 'Sin origen'))}</span>` : ''}
         ${espejo ? `<span class="kmirror" title="Gestión operativa en curso por el equipo">🔗 en Ops</span>` : ''}
         ${n.cadenciaActiva ? `<span class="badge ok" title="Cadencia automática activa">🔁</span>` : ''}
       </div>
-      <div class="kcard-t">${U.esc(n.nombre)}</div>
-      <div class="kcard-cli">${U.esc(n.producto)} · <span class="mono">${primaShort(n)}</span></div>
-      <div class="kcard-meta"><span class="dot-s" style="background:${ei.color}"></span>${ei.emoji} ${U.esc(U.text(ei.label, 'Sin etapa'))} · ${prob == null ? '—' : prob + '%'}</div>
+      <div class="kcard-t">${U.esc(U.text(n.nombre, 'Prospecto sin nombre'))}</div>
+      <div class="kcard-cli"><b>${U.esc(U.text(n.producto, 'Producto pendiente'))}</b>${n.ramo && n.ramo !== n.producto ? ' · ' + U.esc(n.ramo) : ''}</div>
+      ${risk ? `<div class="kcard-meta" title="Resumen del riesgo">🚗 ${U.esc(risk)}</div>` : ''}
+      <div class="kcard-meta" title="Datos de contacto disponibles">${U.esc(contact)} · ${flag(n.pais)} ${U.esc(U.text(n.pais, 'País pendiente'))}</div>
+      <div class="kcard-meta"><span class="dot-s" style="background:${ei.color}"></span>${ei.emoji} ${U.esc(U.text(ei.label, 'Sin etapa'))} · ${prob == null ? 'Prob. por definir' : prob + '%'} · ${U.esc(primaLabel(n))}</div>
       ${n.cadenciaActiva && !espejo ? `<div class="kcad">🔁 ${U.esc(n.cadencia || 'Cadencia activa')}</div>` : ''}
       <div class="kcard-foot">
         <span title="${U.esc(ase ? ase.nombre : '')}">${U.avatar(ase ? ase.nombre : '?', ase ? ase.color : '#999', 'sm')}</span>
+        <span style="font-size:11px;color:var(--ink-3);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Asesor responsable">${U.esc(ase ? ase.nombre : 'Asesor pendiente')}</span>
         ${tot ? `<span class="kchk">✓ ${done}/${tot}</span>` : ''}
-        <span class="kvence ${d < 0 ? 'over' : ''}" title="Próximo toque">${d == null ? '—' : d < 0 ? (-d) + 'd' : 'en ' + d + 'd'}</span>
+        <span class="kvence ${d < 0 ? 'over' : ''}" title="Próximo toque">${d == null ? 'Sin toque' : d < 0 ? (-d) + 'd vencido' : 'en ' + d + 'd'}</span>
       </div>
     </div>`;
   }
@@ -252,7 +272,7 @@ Orbit.ciclo = (function () {
         <div>
           <div class="ciclo-eyebrow">Negocio · ciclo comercial</div>
           <h2>${ei.emoji} ${U.esc(n.nombre)}</h2>
-          <div class="ciclo-sub">${U.esc(U.text(n.producto, 'Producto pendiente'))} · ${U.esc(U.text(n.ramo, 'Ramo pendiente'))} · ${primaShort(n)} · ${prob == null ? '—' : prob + '%'} prob.</div>
+          <div class="ciclo-sub">${U.esc(U.text(n.producto, 'Producto pendiente'))} · ${U.esc(U.text(n.ramo, 'Ramo pendiente'))} · ${U.esc(primaLabel(n))} · ${prob == null ? '—' : prob + '%'} prob.</div>
         </div>
         <div class="ciclo-h-act">
           <span class="ciclo-syncbadge">${enOps ? '🗂 Visible en Ops · ' + ei.ops : '🎯 Solo en Leads'}</span>
@@ -278,7 +298,7 @@ Orbit.ciclo = (function () {
             <div class="cgrid">
               ${fSelectCat('Producto', 'ng-prod', 'productos', n.producto)}
               ${fSelectCat('Ramo', 'ng-ramo', 'ramos', n.ramo)}
-              ${fSelectOpt('Aseguradora de interés', 'ng-asg', asgs.map(a => [a.id, a.nombre]), n.aseguradoraId)}
+              ${fSelectOpt('Aseguradora de interés', 'ng-asg', [['', '— Sin aseguradora seleccionada —']].concat(asgs.map(a => [a.id, a.nombre])), n.aseguradoraId)}
               ${fSelectOpt('Asesor responsable', 'ng-ase', asesores.map(a => [a.id, a.nombre]), n.asesorId)}
               ${fInput('Prima estimada', 'ng-prima', n.primaEst, 'number')}
               ${fSelectCat('Prioridad', 'ng-prio', 'prioridades', n.prioridad)}
