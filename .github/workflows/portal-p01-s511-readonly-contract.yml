@@ -6,9 +6,12 @@ on:
     branches:
       - ays/portal-p01-readonly-contract-s511-20261007
       - ays/portal-p01-s511a-grant-lifecycle-20261007
+      - ays/portal-p01-s511b-grant-admin-contract-20261007
     paths:
       - 'functions/portal-p01-readonly-contract-s511.js'
       - 'functions/portal-p01-readonly-contract-s511.test.js'
+      - 'functions/portal-p01-grant-admin-s511b.js'
+      - 'functions/portal-p01-grant-admin-s511b.test.js'
       - '.github/workflows/portal-p01-s511-readonly-contract.yml'
 
 permissions:
@@ -31,6 +34,12 @@ jobs:
           node --check portal-p01-readonly-contract-s511.js
           node --check portal-p01-readonly-contract-s511.test.js
           node --test portal-p01-readonly-contract-s511.test.js
+          if [ -f portal-p01-grant-admin-s511b.test.js ]; then
+            node --check portal-p01-grant-admin-s511b.js
+            node --check portal-p01-grant-admin-s511b.test.js
+            node --test portal-p01-grant-admin-s511b.test.js
+            grep -q "executionAllowed:false" portal-p01-grant-admin-s511b.js
+          fi
           grep -q "staffSessionReuseAllowed:false" portal-p01-readonly-contract-s511.js
           grep -q "directBrowserClientIdAllowed:false" portal-p01-readonly-contract-s511.js
           grep -q "writeOperationsAllowed:false" portal-p01-readonly-contract-s511.js
