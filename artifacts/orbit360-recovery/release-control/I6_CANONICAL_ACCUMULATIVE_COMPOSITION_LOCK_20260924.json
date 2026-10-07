@@ -3760,5 +3760,16 @@
     },
     "authorizationBoundary": "SAME_AUTHORIZED_TARGET_EXPLICIT_BOUND_REFERENCES_ONLY",
     "b4004Held": true
+  },
+  "r20SecondReviewCrossContextBootstrapRetryRootFix": {
+    "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_CROSS_CONTEXT_BOOTSTRAP_RETRY_ROOTFIX_20261007.json",
+    "blobSha": "aea85ddbbdb57e98d875999ed1d7c31a6dfd074f",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "a885f33b7c642cdf7d4a2be0eef8662cab43b5e4",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "d0d0e49ec4228448eb826f3f7f29e0808e247fc4"
+    },
+    "productFilesChanged": 0,
+    "b4004Held": true
   }
 }

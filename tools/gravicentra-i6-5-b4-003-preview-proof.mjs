@@ -122,14 +122,14 @@ async function bootProduct(page,token){
    const s=Orbit.productAppP0.status?.();
    let activated=s?.started?s:null,lastActivationError='';
    try{
-     for(let attempt=1;attempt<=3&&!activated?.started;attempt++){
+     for(let attempt=1;attempt<=6&&!activated?.started;attempt++){
        try{
          activated=await Promise.resolve(Orbit.productAppP0.activate());
          lastActivationError='';
        }catch(error){
          lastActivationError=String(error&&error.message||error||'');
-         if(!/PRODUCT_(?:READONLY_BOOTSTRAP_NOT_READY|STORE_NOT_READY)/.test(lastActivationError)||attempt===3)throw error;
-         await new Promise(resolve=>setTimeout(resolve,250*attempt));
+         if(!/PRODUCT_(?:READONLY_BOOTSTRAP_NOT_READY|STORE_NOT_READY)/.test(lastActivationError)||attempt===6)throw error;
+         await new Promise(resolve=>setTimeout(resolve,Math.min(2500,500*attempt)));
        }
      }
      forceCollections({detail:{phase:'post-activate'}});

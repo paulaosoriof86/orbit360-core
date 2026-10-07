@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_CROSS_CONTEXT_BOOTSTRAP_RETRY_ROOTFIX_V1",
+  "recordedAt": "2026-10-07T18:34:00Z",
+  "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B4-003-R20-B13",
+  "failedRunId": 37666118407,
+  "failedSourceSha": "637aedead3bf2fd96d6de8420bf0e11fb50d703c",
+  "failedProofCommitSha": "8d0f7825ba32361e9bf4c141d4b79a6432b6a4bd",
+  "failedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37666118407-prusgxbx.web.app",
+  "failedProofBlobSha": "3fcab4a696b0f02d0270d1340afa0c73429fe749",
+  "preservedPassEvidence": {
+    "collaborationCommitted": 1,
+    "attachmentReadOk": true,
+    "attachmentContentRetrieved": true,
+    "attachmentCleanupOk": true,
+    "attachmentDeleted": true,
+    "syntheticFinalAbsent": true,
+    "unexpectedHttpErrors": 0,
+    "unexpectedConsoleErrors": 0,
+    "pageErrors": 0
+  },
+  "failureMessage": "PRODUCT_READONLY_BOOTSTRAP_NOT_READY",
+  "failureLocation": "advisor cross-context action-card UI proof after the primary authenticated browser flow had completed",
+  "rootCause": "THE_SECOND_AUTHENTICATED_BROWSER_CONTEXT_CAN_REACH_PRODUCT_ACTIVATION_BEFORE_ALL_REQUIRED_READONLY_SNAPSHOTS_ARE_READY; THE_QA_HARNESS_ALLOWED_ONLY_THREE_SHORT_RETRIES_AND_EXHAUSTED_ITS_SYNCHRONIZATION_BUDGET",
+  "fix": "Retry only the two explicit transient bootstrap states for up to six attempts with bounded progressive delay; preserve immediate failure for every non-transient error.",
+  "productFilesChanged": 0,
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "a885f33b7c642cdf7d4a2be0eef8662cab43b5e4",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "d0d0e49ec4228448eb826f3f7f29e0808e247fc4"
+  },
+  "retryBoundary": {
+    "transientCodes": [
+      "PRODUCT_READONLY_BOOTSTRAP_NOT_READY",
+      "PRODUCT_STORE_NOT_READY"
+    ],
+    "maxAttempts": 6,
+    "maxDelayMs": 2500,
+    "otherErrorsFailImmediately": true
+  },
+  "dataMutation": false,
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "live": false,
+  "b4004Held": true,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
