@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-05T13:27:00-06:00",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "ecb742858375500171dd6c8e2525b161e244f417",
-  "expectedLedgerNextBlobSha": "35105b099e4a33be237149071c2d1e95b3396ff0",
+  "sourceLedgerPreviousBlobSha": "35105b099e4a33be237149071c2d1e95b3396ff0",
+  "expectedLedgerNextBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -10398,5 +10398,18 @@
     "canonicalStatus": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "productSourceChanged": false,
     "dataMutation": false
+  },
+  "r20FollowupInsurerVisualRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX_20261007.json",
+    "blobSha": "2fbd7532a778013df05d1b8107769a563ea3a30a",
+    "sourceCommit": "86a54019ce2500b65ea2745517bde4dd5a5eecef",
+    "sourceBlob": "32d35bfcb0045632346af96984b03c7dccdc9dee",
+    "blockingIds": [
+      "B4-003-R20-B05",
+      "B4-003-R20-B06",
+      "B4-003-R20-B08"
+    ],
+    "humanStatus": "REJECTED_PENDING_RETEST"
   }
 }
