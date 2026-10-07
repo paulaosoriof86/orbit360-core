@@ -688,6 +688,20 @@ try{
  need(proof.r18QualityProvenance.buttonPresent&&proof.r18QualityProvenance.modalPresent&&proof.r18QualityProvenance.country==='GT'&&proof.r18QualityProvenance.hasReason,'B4_003_R18_QUALITY_PROVENANCE_ACTION_MISSING:'+JSON.stringify(proof.r18QualityProvenance));
  proof.assertions.qualityProvenanceActionable=true;
 
+ proof.r20SecondQualityPhone=await page.evaluate(ids=>{
+   const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);
+   const row=Array.from(h.querySelectorAll('[data-quality-country="GT"]')).find(x=>String(x.innerText||'').includes('B4-003 QA Cliente'))||null;
+   const phoneButton=Array.from(row?.querySelectorAll('button')||[]).find(b=>/Agregar teléfono \/ WhatsApp/.test(String(b.innerText||'')))||null;
+   if(phoneButton)phoneButton.click();
+   const modal=document.getElementById('q-inline'),code=modal?.querySelector('#qi-phone-code'),phone=modal?.querySelector('#qi-telefono');
+   const fields=Array.from(modal?.querySelectorAll('input,select,textarea')||[]).map(x=>x.id).filter(Boolean);
+   const topScroll=h.querySelector('[data-quality-scroll-top="1"]'),mainScroll=h.querySelector('[data-quality-scroll="1"]');
+   const out={buttonPresent:!!phoneButton,modalPresent:!!modal,code:String(code?.value||''),phonePresent:!!phone,fields,onlyPhoneBusinessFields:!!phone&&!modal?.querySelector('#qi-pais')&&!modal?.querySelector('#qi-email')&&!modal?.querySelector('#qi-departamento'),topScroll:!!topScroll,mainScroll:!!mainScroll,topScrollWidth:topScroll?.scrollWidth||0,mainScrollWidth:mainScroll?.scrollWidth||0};
+   modal?.remove();return out;
+ },ids);
+ need(proof.r20SecondQualityPhone.buttonPresent&&proof.r20SecondQualityPhone.modalPresent&&proof.r20SecondQualityPhone.code==='+502'&&proof.r20SecondQualityPhone.phonePresent&&proof.r20SecondQualityPhone.onlyPhoneBusinessFields&&proof.r20SecondQualityPhone.topScroll&&proof.r20SecondQualityPhone.mainScroll,'B4_003_R20_SECOND_REVIEW_QUALITY_PHONE_OR_SCROLL_FAILED:'+JSON.stringify(proof.r20SecondQualityPhone));
+ proof.assertions.qualityPhoneFocusedModal=true;proof.assertions.qualityPhoneDefaultCountryCode=true;proof.assertions.qualityTopHorizontalScroll=true;
+
  await page.evaluate(ids=>{const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);h.querySelector('[data-information-health-policy="'+ids.healthPolicy+'"] [data-health-open-review]')?.click();},ids);
  await page.waitForSelector('#quality-fin-review',{timeout:10000});
  proof.r18QualityReviewModal=await page.evaluate(()=>{const m=document.getElementById('quality-fin-review'),text=String(m?.innerText||'').replace(/\s+/g,' ').trim();return{modal:!!m,hasComparison:/Qué estamos comparando/.test(text),hasWhy:/Por qué requiere revisión/.test(text),hasReceipts:!!m?.querySelector('[data-receipts]'),hasPolicy:!!m?.querySelector('[data-policy]'),receiptLabel:String(m?.querySelector('[data-receipts]')?.innerText||''),policyLabel:String(m?.querySelector('[data-policy]')?.innerText||''),technical:/I6_|PRIMARY_POLICY_UNIVERSE|SINGLE_PHYSICAL_CALENDAR|REQUIERE_VALIDACION/.test(text)};});
