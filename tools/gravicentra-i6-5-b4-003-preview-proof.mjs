@@ -1332,6 +1332,17 @@ try{
  },{insurerId:ids.insurer,documentRef:driveDoc.documentRef});
  need(reloadDoc.present===true&&reloadDoc.estado==='Documento recibido'&&reloadDoc.requiereValidacion===true,'B4_003_R13_INSURER_DRIVE_RELOAD_PERSISTENCE_FAILED');
  need(!reloadDoc.cotizador&&!reloadDoc.comparativo&&!reloadDoc.ia,'B4_003_R13_INSURER_DRIVE_RELOAD_AUTO_ENABLEMENT_FORBIDDEN');
+ await page.evaluate(id=>{document.getElementById('asg-ficha')?.remove();Orbit.modules.aseguradoras.ficha(id);},ids.insurer);
+ await page.waitForSelector('#asg-ficha [data-tab="documentos"]',{timeout:10000});
+ await page.click('#asg-ficha [data-tab="documentos"]');
+ await page.waitForFunction(name=>Array.from(document.querySelectorAll('#asg-ficha [data-drive-file]')).some(x=>String(x.innerText||'').includes(name)),driveFileName,{timeout:15000});
+ proof.r20SecondDriveBrowser=await page.evaluate(name=>{const panel=document.querySelector('#asg-ficha [data-drive-browser="1"]'),file=Array.from(panel?.querySelectorAll('[data-drive-file]')||[]).find(x=>String(x.innerText||'').includes(name)),path=String(panel?.querySelector('[data-drive-path]')?.innerText||'');return{panel:!!panel,filePresent:!!file,path,rootButton:!!panel?.querySelector('[data-drive-root]')};},driveFileName);
+ need(proof.r20SecondDriveBrowser.panel&&proof.r20SecondDriveBrowser.filePresent&&proof.r20SecondDriveBrowser.rootButton,'B4_003_R20_SECOND_REVIEW_INSURER_DRIVE_BROWSER_UI_MISSING:'+JSON.stringify(proof.r20SecondDriveBrowser));
+ await page.evaluate(name=>Array.from(document.querySelectorAll('#asg-ficha [data-drive-file]')).find(x=>String(x.innerText||'').includes(name))?.click(),driveFileName);
+ await page.waitForFunction(()=>{const p=document.querySelector('#asg-ficha [data-drive-preview]');return !!p&&!p.hidden&&String(p.innerText||'').length>0;},null,{timeout:15000});
+ proof.r20SecondDrivePreview=await page.evaluate(()=>{const p=document.querySelector('#asg-ficha [data-drive-preview]');return{visible:!!p&&!p.hidden,text:String(p?.innerText||'').replace(/\s+/g,' ').trim().slice(0,800),iframe:!!p?.querySelector('iframe'),image:!!p?.querySelector('img'),download:!!p?.querySelector('[data-dossier-download]')};});
+ need(proof.r20SecondDrivePreview.visible&&(proof.r20SecondDrivePreview.iframe||proof.r20SecondDrivePreview.image||proof.r20SecondDrivePreview.download),'B4_003_R20_SECOND_REVIEW_INSURER_DRIVE_PREVIEW_FAILED:'+JSON.stringify(proof.r20SecondDrivePreview));
+ proof.assertions.insurerDriveBrowserVisible=true;proof.assertions.insurerDriveBrowserFileOpen=true;
  const deleted=await page.evaluate(async ({tenantId,documentRef,insurerId})=>{
    const r=Orbit.productRuntimeBrowserProvidersP0;
    const role=Orbit.session&&Orbit.session.rol?Orbit.session.rol():'';
