@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "R20_SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
-    "why": "R20 cumulative source fix prepared on diagnosed canonical owners after deterministic renewability apply PASS. No additional data writes, no build, no Preview, no LIVE promotion yet.",
+    "status": "R20_FOLLOWUP_REJECTED_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_SOURCE_FIX",
+    "why": "Paula follow-up visual review rejected unresolved notification/startup/insurer/quality acceptance. Quality Q01-Q07 are promoted to current blocking acceptance; role/scope and renewability apply are preserved PASS.",
     "currentCandidateReview": "R20_REJECTED_BLOCKERS_PLUS_AUTHORIZED_QUALITY_CARRY",
     "sourceSha": "41c38ff22f026f2a503d1814817e4a5d671904a4",
     "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
@@ -6231,7 +6231,9 @@
     "rule": "No reimport/rewrite to fix UI, routing, permissions, hydration, validators, composition or semantic display defects."
   },
   "renewalWhyStillOpen": "The R13/R14 technical fixes repaired zero-regression/first-paint/fail-closed mechanics, but the business universe still contains many policies without authoritative renovable YES/NO and some with incomplete premium/source lineage. The product is correctly refusing to infer them; closure requires source-backed enrichment/validation, not another rendering patch.",
-  "completionDefinition": "No Fase A closure declaration until B4-003 through B4-007 and I6.6-I6.9 satisfy their evidence contracts, every pre-live finding has explicit evidence-backed disposition, and LIVE readback proves the accepted release.",
+  "completionDefinition": {
+    "r20Followup": "All 19 current blocking IDs including Quality Q01-Q07 must PASS on the same exact Preview artifact; B4-004 remains held until Paula targeted acceptance."
+  },
   "parallelWorkstreamResume": {
     "status": "ACTIVE_NO_PRODUCT_MUTATION",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_PARALLEL_NONPASS_AND_KNOWLEDGE_WORKSTREAMS_RESUMED_20261005.json",
@@ -6485,5 +6487,40 @@
     "noBuildYet": true,
     "noLive": true,
     "noReimport": true
+  },
+  "r20FollowupHumanReview": {
+    "status": "FROZEN",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
+    "blobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
+    "blockingIds": [
+      "B4-003-R20-Q01",
+      "B4-003-R20-Q02",
+      "B4-003-R20-Q03",
+      "B4-003-R20-Q04",
+      "B4-003-R20-Q05",
+      "B4-003-R20-Q06",
+      "B4-003-R20-Q07",
+      "B4-003-R20-B01",
+      "B4-003-R20-B03",
+      "B4-003-R20-B04",
+      "B4-003-R20-B05",
+      "B4-003-R20-B06",
+      "B4-003-R20-B07",
+      "B4-003-R20-B08",
+      "B4-003-R20-B09",
+      "B4-003-R20-B11",
+      "B4-003-R20-B12",
+      "B4-003-R20-B13",
+      "B4-003-R20-B14"
+    ],
+    "preservedPassIds": [
+      "B4-003-R20-B02",
+      "B4-003-R20-B10"
+    ]
+  },
+  "r20FollowupDiagnostic": {
+    "status": "FROZEN",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
+    "blobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
   }
 }

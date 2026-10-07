@@ -1,0 +1,164 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-06T18:36:00-06:00",
+  "status": "CAUSES_DEMONSTRATED_SINGLE_CUMULATIVE_SOURCE_FIX_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authority": {
+    "noLossPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_20261006.json",
+    "noLossBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
+    "priorR20DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX_20261006.json",
+    "priorR20DiagnosticBlobSha": "a01f118b0b388ae9a68d7038be9f2e17d65b5dc0"
+  },
+  "findings": [
+    {
+      "owner": "notification UI + inbox projection",
+      "ids": [
+        "B4-003-R20-B09"
+      ],
+      "cause": "index.html renders raw backend status and hardcodes every negocio inbox click to #/leads. ops-advisor-inbox concatenates internalNotices, outboxNotices and collaborationNotices without event-level dedupe and broad data scope is incorrectly treated as notification-recipient scope.",
+      "sourceEvidence": [
+        "orbit360-platform/index.html",
+        "functions/ops-advisor-inbox.js"
+      ],
+      "fix": "Human status labels; dedupe by canonical eventId/entity/direction; exact-recipient targeting; targetSurface advisor→leads operations→ops; per-user read/attended/archive state; preserve exact auto-open."
+    },
+    {
+      "owner": "cycle UI + Ops/Leads backend",
+      "ids": [
+        "B4-003-R20-B09"
+      ],
+      "cause": "ciclo.js persists collaboration author from Orbit.session.rol() and timestamp from browser-local stamp(); collaboration payload has no document attachment field.",
+      "sourceEvidence": [
+        "orbit360-platform/core/ciclo.js",
+        "functions/product-ops-leads-domain.js"
+      ],
+      "fix": "Use authenticated display name and server-canonical event timestamp/readback; add attachment/documentRef support through existing Drive provider and canonical business mutable fields."
+    },
+    {
+      "owner": "session/startup",
+      "ids": [
+        "B4-003-R20-B12"
+      ],
+      "cause": "Startup is route-primary but the UI has no durable phase indicator between authentication and usable route render; login routing defaults to/retains Inicio instead of prioritizing actionable collaboration. Exact runtime timing still requires instrumentation, but the silent-state UX defect is demonstrated.",
+      "sourceEvidence": [
+        "orbit360-platform/core/auth-product-runtime-p0.js",
+        "orbit360-platform/core/product-app-p0.js",
+        "orbit360-platform/core/product-hydration-required-optional-p0.js",
+        "orbit360-platform/data/store-firestore-product-readonly-p0.js"
+      ],
+      "fix": "Keep one visible progress state through product-app started + route first render; instrument phase timings; route to pending target surface when actionable notice exists, otherwise role-appropriate default; do not reintroduce full-hydration blocking."
+    },
+    {
+      "owner": "renewals UI",
+      "ids": [
+        "B4-003-R20-B01"
+      ],
+      "cause": "KPI 'Vencidas' is the renewal-pipeline candidate count, not all historical expired policies. Machine proof contains 4 including one synthetic and therefore 3 real after cleanup; label does not make that semantic boundary explicit.",
+      "sourceEvidence": [
+        "orbit360-platform/modules/renovaciones.js",
+        "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_MACHINE_PROOF_20261005.json"
+      ],
+      "fix": "Preserve exact candidate logic and four-column Kanban; rename/explain KPI as expired renewable pipeline and show excluded nonrenewable/terminal context. Re-prove exact real IDs after cleanup."
+    },
+    {
+      "owner": "insurer UI + Preview UAT",
+      "ids": [
+        "B4-003-R20-B03",
+        "B4-003-R20-B04",
+        "B4-003-R20-B08",
+        "B4-003-R20-B14"
+      ],
+      "cause": "Requirement attachment is still a text documentRef input. Preview has synthetic write support but no discoverable human UAT fixture; real insurer edit is correctly blocked, leaving Paula unable to validate logo/document/product/plan flows.",
+      "sourceEvidence": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "functions/document-drive-domain.js",
+        "orbit360-platform/core/product-drive-document-provider-p0.js"
+      ],
+      "fix": "Use real file input/upload via existing Drive provider; expose a clearly labeled disposable Preview test insurer using same UI/server contract and cleanup; keep real-row protection unchanged."
+    },
+    {
+      "owner": "insurer visual hierarchy",
+      "ids": [
+        "B4-003-R20-B05",
+        "B4-003-R20-B06"
+      ],
+      "cause": "Prior machine contract asserted class/token presence but did not prove visual hierarchy. Current source still relies on generic rows/inline styling and screenshots confirm Registry and Tarifas/Conocimiento remain visually flat.",
+      "sourceEvidence": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/styles/infra.css",
+        "tools/gravicentra-i6-5-b4-003-contract.mjs"
+      ],
+      "fix": "Actual visual composition change with platform cards, icons, status hierarchy, compact secondary provenance; desktop+390px screenshot/DOM proof, not token-only static assertion."
+    },
+    {
+      "owner": "quality UI",
+      "ids": [
+        "B4-003-R20-Q01",
+        "B4-003-R20-Q02",
+        "B4-003-R20-Q03",
+        "B4-003-R20-Q04",
+        "B4-003-R20-Q05",
+        "B4-003-R20-Q06",
+        "B4-003-R20-Q07"
+      ],
+      "cause": "These findings were intentionally carried as non-blocking in the prior R20 freeze, so the cumulative source fix did not close them. Additionally, mobile financial health renders raw x.contractualSource instead of sourceLabel(), directly exposing I6_4_PRIMARY_POLICY_UNIVERSE.",
+      "sourceEvidence": [
+        "orbit360-platform/modules/calidad.js",
+        "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json"
+      ],
+      "fix": "Promote Q01-Q07 to current acceptance; humanize all technical labels consistently desktop/mobile; premium visual hierarchy; precise action semantics; persist/readback/reload for country/contact; deterministic country/currency automation remains fail-closed."
+    },
+    {
+      "owner": "B4 executor governance",
+      "ids": [
+        "R20-GOVERNANCE-PARENT-ADVANCE-REGRESSION"
+      ],
+      "cause": "Freeze step is still R19-specific and writes R19 targeted visual / R18-R19 finding statuses even when the gate was R20. It can advance the parent despite unresolved R20 findings.",
+      "sourceEvidence": [
+        ".github/workflows/gravicentra-b4-003-executor.yml"
+      ],
+      "fix": "Revision-aware machine freeze: R20 exact preview produces R20 machine proof pending R20 human acceptance; never rewrites R20 human rejection or closes human/UAT-only findings."
+    }
+  ],
+  "preservedPasses": [
+    "Ops/Leads role-scope matrix",
+    "base deep-link auto-open mechanism",
+    "R20 renewability data apply 1415 writes",
+    "four-column renewal Kanban"
+  ],
+  "allowedProductFiles": [
+    "orbit360-platform/index.html",
+    "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/core/auth-product-runtime-p0.js",
+    "orbit360-platform/core/product-app-p0.js",
+    "orbit360-platform/core/product-hydration-required-optional-p0.js",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "orbit360-platform/modules/renovaciones.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/modules/calidad.js",
+    "orbit360-platform/styles/infra.css",
+    "orbit360-platform/core/product-drive-document-provider-p0.js",
+    "functions/product-ops-leads-domain.js",
+    "functions/ops-advisor-inbox.js",
+    "functions/notification-outbox-processor.js",
+    "functions/product-operational-domain.js",
+    "functions/document-drive-domain.js"
+  ],
+  "allowedQaFiles": [
+    "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    ".github/workflows/gravicentra-b4-003-executor.yml",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "operationalBusinessWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
+    "renewabilityApplyRepeatAuthorized": false,
+    "reimportAuthorized": false,
+    "livePromotionAuthorized": false
+  },
+  "nextAction": "B4_003_R20_SINGLE_CUMULATIVE_SOURCE_FIX"
+}

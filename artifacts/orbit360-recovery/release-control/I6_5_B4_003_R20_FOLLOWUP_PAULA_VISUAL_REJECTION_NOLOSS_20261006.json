@@ -1,0 +1,155 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_FOLLOWUP_PAULA_VISUAL_REJECTION_NOLOSS_V1",
+  "recordedAt": "2026-10-06T18:34:00-06:00",
+  "status": "FROZEN_PAULA_VISUAL_REJECTED_R20_FOLLOWUP",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "reviewedCandidate": {
+    "machineFreezeHead": "d11dd0b1f68f21b2985c7fdf1546695a134bdb45",
+    "sourceSha": "dd0763944b261088d39503dc4667e9ab598cd00d",
+    "buildId": "gi-i65-b4-dd0763944b26-57f234755dc1",
+    "runId": 37546965774,
+    "artifactId": 11451520629,
+    "artifactDigest": "fa7cebc1643ffab7da1a18becb21931e2a192fa195b05f0cf1d0bf9c9966b161",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37546965774-dwh4lbaa.web.app",
+    "machine": "SUCCESS",
+    "human": "REJECTED_R20_FOLLOWUP"
+  },
+  "preservedHumanPasses": [
+    {
+      "id": "R20-FOLLOWUP-PASS-01",
+      "scope": "Ops/Leads role and identity scopes",
+      "decision": "PASS_PRESERVE",
+      "note": "Paula explicitly confirms Roles/scopes works. Do not regress Leads own-by-identity or Ops independent scope."
+    },
+    {
+      "id": "R20-FOLLOWUP-PASS-02",
+      "scope": "Notification deep-link basic behavior",
+      "decision": "PARTIAL_PASS_PRESERVE",
+      "note": "Selecting a correctly targeted notification can open the exact business automatically. Preserve auto-open behavior while fixing target surface."
+    },
+    {
+      "id": "R20-FOLLOWUP-PASS-03",
+      "scope": "Renewals Kanban primary surface",
+      "decision": "PARTIAL_PASS_PRESERVE",
+      "note": "The full approved four-column Kanban is now visible. Preserve the Kanban; revalidate KPI semantics/cardinality."
+    }
+  ],
+  "currentBlockingAcceptance": [
+    {
+      "findingId": "B4-003-R20-B09",
+      "requirements": [
+        "No technical status labels in human UI",
+        "One event must render as one inbox item",
+        "Sender does not receive its own actionable request",
+        "Exact recipient only",
+        "Advisor-target request opens Leads; operations-target response opens Ops",
+        "Unread/read/attended/archive controls",
+        "Latest-first card state with clear action-needed vs waiting-on-other-party color and order",
+        "Response may attach/upload document",
+        "Comments and bitacora show real user display name, not role",
+        "Canonical timestamp formatted for user"
+      ]
+    },
+    {
+      "findingId": "B4-003-R20-B12",
+      "requirements": [
+        "Login/refresh must not clear the visible progress state before usable app render",
+        "No long silent gap after Validando acceso",
+        "Refresh restores usable session and route",
+        "Post-login landing strategy must prioritize actionable work: advisor-targeted pending work in Leads, operations-targeted pending work in Ops; otherwise role-appropriate default"
+      ]
+    },
+    {
+      "findingId": "B4-003-R20-B01",
+      "requirements": [
+        "Keep complete four-column Kanban",
+        "Validate Vencidas KPI against exact real renewal-pipeline universe after synthetic cleanup",
+        "Humanize KPI label so it is not confused with all historical expired policies",
+        "Expose excluded non-renewable/terminal counts or explanation if material"
+      ]
+    },
+    {
+      "findingId": "B4-003-R20-B03",
+      "requirements": [
+        "Requirement attachment must be a real upload/Drive action, not text-only documentRef",
+        "Visible human Preview UAT fixture must allow Paula to test safely"
+      ]
+    },
+    {
+      "findingId": "B4-003-R20-B04",
+      "requirements": [
+        "Existing source can receive actual uploaded/attached evidence",
+        "No duplicate source entity when enriching existing source"
+      ]
+    },
+    {
+      "findingId": "B4-003-R20-B05",
+      "requirements": [
+        "Registry technical data remains secondary/collapsible but visibly redesigned to Gravicentra premium hierarchy; static class presence is not acceptance"
+      ]
+    },
+    {
+      "findingId": "B4-003-R20-B06",
+      "requirements": [
+        "Tarifas y conocimiento visibly redesigned with cards/hierarchy/filters consistent with platform; static class presence is not acceptance"
+      ]
+    },
+    {
+      "findingId": "B4-003-R20-B08",
+      "requirements": [
+        "Human-visible Preview UAT for logo, product, plan, requirement and document write/reload/cleanup; no knowledge of synthetic IDs required"
+      ]
+    },
+    {
+      "findingId": "B4-003-R20-B14",
+      "requirements": [
+        "Safe disposable Preview fixtures must be discoverable by Paula in UI and use same production UI/server contract"
+      ]
+    },
+    {
+      "findingId": "B4-003-R20-Q01",
+      "promoteToBlocking": true
+    },
+    {
+      "findingId": "B4-003-R20-Q02",
+      "promoteToBlocking": true
+    },
+    {
+      "findingId": "B4-003-R20-Q03",
+      "promoteToBlocking": true
+    },
+    {
+      "findingId": "B4-003-R20-Q04",
+      "promoteToBlocking": true
+    },
+    {
+      "findingId": "B4-003-R20-Q05",
+      "promoteToBlocking": true
+    },
+    {
+      "findingId": "B4-003-R20-Q06",
+      "promoteToBlocking": true
+    },
+    {
+      "findingId": "B4-003-R20-Q07",
+      "promoteToBlocking": true
+    }
+  ],
+  "governanceFinding": {
+    "id": "R20-GOVERNANCE-PARENT-ADVANCE-REGRESSION",
+    "classification": "QA_GOVERNANCE_DEFECT",
+    "observed": "The R19-named machine-freeze step advanced the parent to MACHINE_PASS_PENDING_PAULA_VISUAL and R19 targeted visual even though R20 blockers remained pending and R20 was the governing review.",
+    "required": "Future machine proof must preserve current revision and may not overwrite R20 human state or promote unresolved human/Preview-UAT findings."
+  },
+  "hardBoundaries": {
+    "noLive": true,
+    "noReimport": true,
+    "noOperationalBusinessWrites": true,
+    "renewabilityApplyMayNotRepeat": true,
+    "preservePriorApprovedFrontend": true,
+    "oneCumulativeSuccessor": true,
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_AND_SINGLE_CUMULATIVE_SOURCE_FIX"
+}
