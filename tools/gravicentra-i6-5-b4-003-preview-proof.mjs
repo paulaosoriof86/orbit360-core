@@ -163,6 +163,18 @@ async function inboxStateFor(browser,who,noticeId,action){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});return await p.evaluate(async({token,tenantId,activeRole,noticeId,action})=>{const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);return await provider.callFunction('orbit360UpdateAdvisorOpsInboxStatePreview',{tenantId,activeRole,noticeId,action},'us-east1');},{token,tenantId,activeRole:who.activeRole,noticeId,action});}finally{await ctx.close();}
 }
+async function actionCardUiFor(browser,who,businessId,surface){
+ const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
+ try{
+  await applyLegal(p,who);await p.goto(target+'/#/'+surface,{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
+  await p.waitForFunction(({businessId,surface})=>{const h=document.getElementById('host');if(!h)return false;const card=h.querySelector('[data-neg="'+businessId+'"]');return !!card&&location.hash==='#/'+surface;},{businessId,surface},{timeout:15000});
+  return await p.evaluate(({businessId,surface})=>{
+    const card=document.querySelector('[data-neg="'+businessId+'"]'),badge=card?.querySelector('.collab-action'),ranks=Orbit.ciclo?.actionQueueRanks?.(surface)||{},expected=Number(ranks[businessId]||0),actual=Number(badge?.dataset.collabRank||0),css=badge?getComputedStyle(badge):null;
+    return{present:!!card,badge:!!badge,label:String(badge?.innerText||''),expectedRank:expected,actualRank:actual,background:css?.backgroundColor||'',color:css?.color||'',priorityText:String(card?.querySelector('.badge.danger,.badge.warn,.badge.neutral')?.innerText||'')};
+  },{businessId,surface});
+ }finally{await ctx.close();}
+}
+
 async function inboxUiFor(browser,who,eventId,expectedSurface,markAttended){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{
@@ -1180,6 +1192,9 @@ try{
  const collabUi=await collaborationFor(browser,directionActor,ids.collabBusiness,'Solicitar información al asesor','B4-003 R20 solicitud sintética al asesor',true);proof.r20SecondCollaborationUi=collabUi;proof.assertions.collaborationUiAttachmentDurable=true;proof.assertions.businessCardOpenUnder2500ms=true;proof.assertions.collaborationVisualHierarchy=true;
  const requestRow=(await ref('negocios',ids.collabBusiness).get()).data()||{},requestComment=[].concat(requestRow.comentarios||[]).slice(-1)[0]||{};
  need(requestComment.direction==='advisor'&&requestComment.eventId&&requestComment.actorUid&&requestComment.actorName&&requestComment.user===requestComment.actorName,'B4_003_R20_HANDOFF_REQUEST_COMMIT_MISSING');
+ const advisorActionCard=await actionCardUiFor(browser,advisorActor,ids.collabBusiness,'leads');
+ need(advisorActionCard.present&&advisorActionCard.badge&&advisorActionCard.expectedRank>0&&advisorActionCard.actualRank===advisorActionCard.expectedRank&&advisorActionCard.label.includes('#'+advisorActionCard.expectedRank)&&advisorActionCard.background&&!/rgba\(0,\s*0,\s*0,\s*0\)/.test(advisorActionCard.background),'B4_003_R20_SECOND_REVIEW_ACTION_QUEUE_RANK_OR_VISUAL_FAILED:'+JSON.stringify(advisorActionCard));
+ proof.r20SecondAdvisorActionCard=advisorActionCard;proof.assertions.currentActionQueueRank=true;proof.assertions.actionRequiredSolidVisual=true;
  need(/^\d{4}-\d{2}-\d{2}T/.test(String(requestComment.ts||'')),'B4_003_R20_HANDOFF_CANONICAL_TIMESTAMP_MISSING');
  const advisorInbox=await inboxProjectionFor(browser,advisorActor),advisorNotices=[].concat(advisorInbox?.notices||[]).filter(x=>x.eventId===requestComment.eventId);
  need(advisorNotices.length===1,'B4_003_R20_ADVISOR_NOTICE_NOT_DEDUPED:'+JSON.stringify(advisorInbox));
