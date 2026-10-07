@@ -65,7 +65,8 @@ Orbit.modules.configuracion = (function () {
     return '<div data-catalog-state="ready">'+sectionHead('Catálogos operativos','Una sola autoridad durable para Ops, Leads, edición y cotización')+
       '<div class="cfg-note" style="margin-bottom:14px"><b>Catálogos del tenant:</b> los asesores se administran en Usuarios y permisos; nunca forman parte de un catálogo libre.</div>'+
       row('Canales','<textarea class="o-sel" id="cf-cat-canales" style="min-height:110px;width:min(540px,100%)">'+U.esc(lines(c.canales))+'</textarea>','Un valor por línea')+
-      row('Productos / planes','<textarea class="o-sel" id="cf-cat-productos" style="min-height:110px;width:min(540px,100%)">'+U.esc(lines(c.productos))+'</textarea>','Un valor por línea')+
+      row('Productos generales','<textarea class="o-sel" id="cf-cat-productos" style="min-height:110px;width:min(540px,100%)">'+U.esc(lines(c.productos))+'</textarea>','Complementan los productos dependientes de cada ramo')+
+      row('Planes comerciales','<textarea class="o-sel" id="cf-cat-planes" style="min-height:100px;width:min(540px,100%)">'+U.esc(lines(c.planes))+'</textarea>','Un plan por línea; no se mezclan con productos')+
       row('Segmentos','<textarea class="o-sel" id="cf-cat-segmentos" style="min-height:100px;width:min(540px,100%)">'+U.esc(lines(c.segmentos))+'</textarea>','Un valor por línea')+
       row('Prioridades','<textarea class="o-sel" id="cf-cat-prioridades" style="min-height:80px;width:min(540px,100%)">'+U.esc(lines(c.prioridades))+'</textarea>','Un valor por línea')+
       row('Ramos Guatemala','<textarea class="o-sel" id="cf-cat-ramos-gt" style="min-height:130px;width:min(540px,100%)">'+U.esc(ramoNames('GT'))+'</textarea>','Conserva subramos de nombres existentes')+
