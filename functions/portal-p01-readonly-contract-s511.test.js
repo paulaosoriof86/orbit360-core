@@ -71,3 +71,17 @@ test('current Firestore rules must not be reused as external customer authorizat
   assert.equal(p.POLICY.staffSessionReuseAllowed,false);
   assert.equal(p.POLICY.directBrowserClientIdAllowed,false);
 });
+
+
+test('P-01 external customer access must go through a backend projection',()=>{
+  assert.equal(p.BACKEND_CONTRACT.transport,'firebase_callable');
+  assert.equal(p.BACKEND_CONTRACT.auth,'firebase_auth_external_customer');
+  assert.equal(p.BACKEND_CONTRACT.grantCollection,'portalCustomerAccessGrants');
+  assert.equal(p.BACKEND_CONTRACT.grantLookup,'server_side');
+  assert.equal(p.BACKEND_CONTRACT.dataAccess,'admin_sdk_server_side');
+  assert.equal(p.BACKEND_CONTRACT.browserFirestoreRead,false);
+  assert.equal(p.BACKEND_CONTRACT.browserFirestoreWrite,false);
+  assert.equal(p.BACKEND_CONTRACT.customerAsTenantMember,false);
+  assert.equal(p.BACKEND_CONTRACT.projection,'allowlisted_read_only_dto');
+  assert.equal(p.BACKEND_CONTRACT.failClosed,true);
+});
