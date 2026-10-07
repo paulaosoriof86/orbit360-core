@@ -1,0 +1,57 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_VISUAL_SYSTEM_AND_WHATSAPP_ARCHITECTURE_ADDENDUM_V1",
+  "recordedAt": "2026-10-07T08:52:00-06:00",
+  "status": "FROZEN_IN_CURRENT_B4_003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHumanReview": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+  "visualSystem": {
+    "scope": [
+      "cards",
+      "panels",
+      "informational_blocks",
+      "content_boxes",
+      "secondary_containers",
+      "section_backgrounds",
+      "borders"
+    ],
+    "goals": [
+      "Increase perceptible contrast between page background and card/panel surfaces.",
+      "Improve visual separation and grouping between adjacent blocks.",
+      "Strengthen information hierarchy without making the interface aggressive.",
+      "Preserve the approved typography family and weight grammar; do not introduce mixed typefaces or monospace except intentionally technical internal-only data.",
+      "Use brand colors semantically: red for primary/action/attention, green for success/complete/forward, amber only for warning/pending, navy/blue/gray for neutral/info/supporting hierarchy."
+    ],
+    "rule": "Every touched surface in the R20 cumulative source fix must be reviewed for background/surface contrast, border/shadow hierarchy, spacing, heading hierarchy and typography consistency. A local fix cannot regress this grammar elsewhere.",
+    "humanGate": "Paula must visually validate the updated grammar on Ops/Leads business card, inbox, insurer Products/Documents/Knowledge, Activity, Quality and Renewals before B4-003 can close."
+  },
+  "whatsappArchitecture": {
+    "intent": "Centralize WhatsApp-related customer communication in Gravicentra and link each conversation/event to canonical client, lead/business and management records.",
+    "verifiedPlatformContext": [
+      "WhatsApp Business Platform/Cloud API is intended for programmatic messaging and CRM/backend integrations.",
+      "WhatsApp Business App can participate in Communities it is already part of, but official Help Center states that creating a Community in the Business app is not currently supported.",
+      "Current official Business Platform materials reviewed do not establish a supported Communities API endpoint; therefore Communities must not be treated as an automatable canonical integration until official Meta support is demonstrated for the tenant/account."
+    ],
+    "phaseAArchitecture": [
+      "Create a canonical WhatsApp conversation/thread binding keyed by phone/WABA conversation identity and linked to clienteId plus optional negocioId/gestionId/polizaId.",
+      "Inbound/outbound messages and approved-template sends should create human-readable timeline events on the linked record.",
+      "From Cliente/Lead/Ops, users should be able to open the linked WhatsApp conversation context instead of creating disconnected notes.",
+      "Do not scrape WhatsApp Web or use browser automation as a production integration.",
+      "If Groups API eligibility is later confirmed for the actual WABA, model a group as another conversation context; do not equate a Group with a Community.",
+      "Treat WhatsApp Communities as external/manual context unless and until an official API with account eligibility and permissions is demonstrated."
+    ],
+    "privacyAndScope": [
+      "Respect role/data-scope visibility; linking a WhatsApp thread never widens access to a client/lead/management record.",
+      "Store only the business-required message metadata/content under approved retention and consent rules; do not expose phone/contact data beyond scope."
+    ],
+    "currentGateTreatment": "Architecture frozen so it is not forgotten. Do not expand B4-003 into an unproven Communities implementation. Existing WhatsApp buttons/links must remain compatible with the future canonical conversation binding."
+  },
+  "boundaries": {
+    "b4004Held": true,
+    "noLive": true,
+    "noReimport": true,
+    "dataMutation": false,
+    "productMutationRemainsAuthorized": true
+  },
+  "nextAction": "CONTINUE_B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX"
+}
