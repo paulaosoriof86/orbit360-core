@@ -2959,7 +2959,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -10371,7 +10371,7 @@
     }
   },
   "currentB4": {
-    "status": "SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_R20_FOLLOWUP_PENDING_RETEST"
   },

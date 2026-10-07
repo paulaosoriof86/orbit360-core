@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_FOLLOWUP_COMPOSITION_BINDING_ROOTFIX_V1",
+  "recordedAt": "2026-10-06T19:58:00-06:00",
+  "status": "QA_GOVERNANCE_BINDING_ROOTFIX_PENDING_RECHECK",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "failedGuardRunId": 37558991445,
+  "failedPreviewRunId": 37558991503,
+  "failureCode": "I6_CANONICAL_COMPOSITION_BLOB_DRIFT",
+  "rootCause": "The cumulative R20 product blobs were committed but productFileBlobs in the canonical composition lock still pointed to the pre-fix hashes. Parent status was also normalized to the existing R20 exact-preview state recognized by the executor.",
+  "compositionBlobSha": "ead65695effe488cc436ed44470fbbdf3161f0e8",
+  "executionLockBlobSha": "f36f4589d95c0fe16929be9e99152876f03e03a1",
+  "controlPlaneBlobSha": "97584f5fddf0b83244de47fd84c2a0cc118814f4",
+  "findingLedgerBlobSha": "35105b099e4a33be237149071c2d1e95b3396ff0",
+  "continuityRegisterBlobSha": "b60bd116916026fe056e87fa7f25d10cb63513c1",
+  "canonicalStatus": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
