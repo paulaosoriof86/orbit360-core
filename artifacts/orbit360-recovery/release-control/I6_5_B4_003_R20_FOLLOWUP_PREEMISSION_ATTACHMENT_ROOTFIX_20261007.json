@@ -1,0 +1,21 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_FOLLOWUP_PREEMISSION_ATTACHMENT_ROOTFIX_V1",
+  "recordedAt": "2026-10-06T20:14:00-06:00",
+  "status": "SOURCE_ROOTFIX_PENDING_EXACT_PREVIEW",
+  "cause": "Collaboration attachment authority required a linked client. Commercial businesses can be in cotizando/propuesta before emission creates a canonical client, so a real handoff could fail even though the synthetic fixture had clienteId.",
+  "correction": "Negocio document authority now supports a pre-emission business with no clientId, binds documents to the business, and uses a dedicated _NEGOCIOS Drive folder (and Preview negocios folder). Existing linked-client behavior remains supported.",
+  "productBlob": {
+    "functions/document-drive-domain.js": "59922a28e4cfef140a84154095214fd4457607f8"
+  },
+  "qaBlob": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "ba82e3971614133a2994c5851063f8feb0f188d6"
+  },
+  "compositionBlobSha": "3d8736677d3faa7f59c282fbfe3b46205305ded5",
+  "executionLockBlobSha": "21051ebebabe391cdb192b3c706cb810ae7d8607",
+  "operationalBusinessWrites": 0,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "renewabilityApplyRepeat": false,
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

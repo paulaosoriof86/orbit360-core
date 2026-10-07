@@ -234,11 +234,16 @@ async function authorizeTarget(request,tenantId,input,mode,previewOnly){
     const businessRef=ops.dataRef(tenantId,'negocios',businessId),bs=await businessRef.get();if(!bs.exists)throw new HttpsError('not-found','Negocio no encontrado.');
     const business=Object.assign({},bs.data()||{},{id:businessId}),activeRole=norm(authz.actor&&authz.actor.activeRole),domain=/operativo|admin|direccion|superadmin/.test(activeRole)?'ops':'leads';
     if(!ops.advisorAllowed(authz.member,business.asesorId,domain))throw new HttpsError('permission-denied','El negocio está fuera del alcance activo.');
-    const clientId=clean(business.clienteId||requestedClientId,180);if(!clientId)throw new HttpsError('failed-precondition','El negocio no tiene cliente vinculado para su carpeta documental.');
-    if(requestedClientId&&requestedClientId!==clientId)throw new HttpsError('failed-precondition','El cliente del documento no coincide con el negocio.');
-    const clientRef=__productOperationalDomain.canonicalRef(tenantId,'clientes',clientId),cs=await clientRef.get();if(!cs.exists)throw new HttpsError('not-found','Cliente vinculado no encontrado.');
-    const client=Object.assign({},cs.data()||{},{id:clientId,tenantId}),previewSyntheticQa=previewOnly===true&&business.previewWrite===true&&/^b4003qa[_:-]/i.test(businessId)&&previewSyntheticClient(clientId);
-    return{actor:authz.actor,row:client,ref:businessRef,clientId,business,entityType:'negocio',entityId:businessId,previewSyntheticQa};
+    const clientId=clean(business.clienteId||requestedClientId,180);
+    if(requestedClientId&&clientId&&requestedClientId!==clientId)throw new HttpsError('failed-precondition','El cliente del documento no coincide con el negocio.');
+    let folderRow=business,client=null;
+    if(clientId){
+      const clientRef=__productOperationalDomain.canonicalRef(tenantId,'clientes',clientId),cs=await clientRef.get();
+      if(!cs.exists)throw new HttpsError('not-found','Cliente vinculado no encontrado.');
+      client=Object.assign({},cs.data()||{},{id:clientId,tenantId});folderRow=client;
+    }
+    const previewSyntheticQa=previewOnly===true&&business.previewWrite===true&&/^b4003qa[_:-]/i.test(businessId)&&(!clientId||previewSyntheticClient(clientId));
+    return{actor:authz.actor,row:folderRow,ref:businessRef,clientId,business,client,entityType:'negocio',entityId:businessId,previewSyntheticQa};
   }
   const d=__productOperationalDomain;
   if(entity==='aseguradora'||entity==='aseguradoras'){
@@ -346,13 +351,13 @@ async function upload(request,previewOnly){
   let clientFolderId='',clientFolder=null,destination=null;
   if(previewOnly===true){
     const qaRoot=await ensureFolder(rootId,'_GRAVICENTRA_PREVIEW_QA',accessToken);
-    const entityRoot=target.entityType==='aseguradora'?await ensureFolder(qaRoot.id,'aseguradoras',accessToken):qaRoot;
+    const entityRoot=target.entityType==='aseguradora'?await ensureFolder(qaRoot.id,'aseguradoras',accessToken):target.entityType==='negocio'?await ensureFolder(qaRoot.id,'negocios',accessToken):qaRoot;
     destination=await ensureFolder(entityRoot.id,scopeId,accessToken);clientFolder=destination;clientFolderId=destination.id;
   }else{
     clientFolderId=clean(input.driveFolderId,160)||clean(row.driveFolderId,160)||driveIdFromUrl(row.driveLink||row.driveUrl||'');
     if(clientFolderId){clientFolder=await getMeta(clientFolderId,accessToken);if(clientFolder.mimeType!=='application/vnd.google-apps.folder')throw new HttpsError('failed-precondition','La referencia Drive del expediente no es una carpeta.');}
     else{
-      const entityRoot=target.entityType==='aseguradora'?await ensureFolder(rootId,'_ASEGURADORAS',accessToken):rootMeta;
+      const entityRoot=target.entityType==='aseguradora'?await ensureFolder(rootId,'_ASEGURADORAS',accessToken):target.entityType==='negocio'?await ensureFolder(rootId,'_NEGOCIOS',accessToken):rootMeta;
       clientFolder=await ensureFolder(entityRoot.id,row.nombre||row.razonSocial||scopeId,accessToken);clientFolderId=clientFolder.id;
     }
     destination=clientFolder;

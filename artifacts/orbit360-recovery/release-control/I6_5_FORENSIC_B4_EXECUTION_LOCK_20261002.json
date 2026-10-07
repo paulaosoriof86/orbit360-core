@@ -109,7 +109,7 @@
   "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "ecf13a031d6d499cca76021640a9d83ca141deae"
+    "blobSha": "3d8736677d3faa7f59c282fbfe3b46205305ded5"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -850,5 +850,13 @@
     "compositionBlobSha": "ecf13a031d6d499cca76021640a9d83ca141deae",
     "productSourceChanged": false,
     "dataMutation": false
+  },
+  "r20FollowupPreEmissionCollabAttachmentRootFix": {
+    "status": "SOURCE_ROOTFIX_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_PREEMISSION_ATTACHMENT_ROOTFIX_20261007.json",
+    "productSourceChanged": true,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }

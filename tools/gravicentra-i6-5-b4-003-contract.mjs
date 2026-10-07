@@ -336,7 +336,7 @@ need(router.includes("orbit:route-ready"),'B4_003_R20_ROUTE_READY_SIGNAL_MISSING
 need(base.includes('Vencidas renovables')&&base.includes('data-expired-historical-count')&&base.includes('expiredContext()'),'B4_003_R20_RENEWAL_EXPIRED_KPI_SEMANTICS_MISSING');
 need(insurer.includes('data-insurer-preview-uat="1"')&&insurer.includes('data-rupload')&&insurer.includes('insurer-premium-section')&&!insurer.includes('Registry técnico y provenance'),'B4_003_R20_INSURER_HUMAN_UAT_OR_VISUAL_REDESIGN_MISSING');
 need(quality.includes('sourceLabel(x.contractualSource)')&&quality.includes('Revisión de primas y calendario de cobro')&&quality.includes('quality-workbench'),'B4_003_R20_QUALITY_HUMANIZATION_OR_VISUAL_REDESIGN_MISSING');
-need(driveBackend.includes("entity==='negocio'")&&driveBackend.includes('refsFrom(target.business||{})'),'B4_003_R20_COLLAB_DRIVE_TARGET_MISSING');
+need(driveBackend.includes("entity==='negocio'")&&driveBackend.includes('refsFrom(target.business||{})')&&driveBackend.includes("target.entityType==='negocio'?await ensureFolder(rootId,'_NEGOCIOS'")&&!driveBackend.includes("if(!clientId)throw new HttpsError('failed-precondition','El negocio no tiene cliente vinculado"),'B4_003_R20_COLLAB_DRIVE_TARGET_MISSING');
 need(opBackend.includes('b4003qa_'),'B4_003_R20_INSURER_ASSET_PREVIEW_UAT_MISSING');
 
 need(workflow.includes("onSchedule")&&workflow.includes('orbit360OpsLeadsCadenceScheduler')&&workflow.includes('previewNotificationOutbox')&&workflow.includes("advisorAllowed(authz.member")&&workflow.includes("'leads'"),'B4_003_R20_CADENCE_SCOPE_PREVIEW_BACKEND_MISSING');
