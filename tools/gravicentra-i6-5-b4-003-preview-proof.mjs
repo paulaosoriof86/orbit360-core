@@ -1194,10 +1194,10 @@ try{
      out.scriptSrcs=Array.from(document.scripts||[]).map(x=>String(x.src||'')).filter(x=>/importa/i.test(x));
      Orbit.importa.open('docs-aseguradora',{
        multi:false,
-       modo:'documental',
-       scope:{aseguradoraId:ids.insurer,aseguradoraNombre:'B4 R13 Aseguradora QA',pais:'GT',moneda:'GTQ',ramo:'Auto',producto:'QA'},
-       documentIntent:'tarifa',
-       docCategory:'Tarifario'
+       modo:'inteligente',
+       scope:{aseguradoraId:ids.insurer,aseguradoraNombre:'B4 R20 Aseguradora QA',pais:'GT',moneda:'GTQ',ramo:'Automóviles',producto:''},
+       documentIntent:'documento',
+       docCategory:'Cotización oficial/ejemplo'
      });
    }catch(error){out.error=String(error&&error.stack||error&&error.message||error).slice(0,1800);}
    const dr=document.getElementById('imp-drawer'),back=document.getElementById('imp-back');
@@ -1211,14 +1211,14 @@ try{
  proof.r13InsurerDrive.importerProbe=importerProbe;
  console.log('B4_003_R13_IMPORTER_OPEN_PROBE='+JSON.stringify(importerProbe));
  need(!importerProbe.error&&importerProbe.fileExists===true,'B4_003_R13_IMPORTER_FILE_INPUT_NOT_RENDERED:'+JSON.stringify(importerProbe));
- const driveFileName='b4-r13-drive-'+run+'.csv';
- await page.setInputFiles('#imp-file',{name:driveFileName,mimeType:'text/csv',buffer:Buffer.from('concepto,valor\nqa_r13,'+run+'\n','utf8')});
+ const driveFileName='cotizacion-vehiculo-liviano-'+run+'.csv';
+ await page.setInputFiles('#imp-file',{name:'cotizacion-vehiculo-liviano-'+run+'.csv',mimeType:'text/csv',buffer:Buffer.from('tipo,ramo,producto\nCotización oficial/ejemplo,Automóviles,Vehículo Liviano\n','utf8')});
  await page.waitForSelector('[data-insurer-source-classification="1"]',{timeout:10000});
  const importerClassifyText=await page.locator('#imp-drawer').innerText();
- need(importerClassifyText.includes('Clasificar fuente')&&importerClassifyText.includes('No se extraerán ni aplicarán tarifas automáticamente'),'B4_003_R14_INSURER_IMPORT_STEP_NOT_TRUTHFUL');
+ need(/Análisis completado/.test(importerClassifyText)&&/Automóviles/.test(importerClassifyText)&&/Vehículo Liviano/.test(importerClassifyText)&&/Cómo se analizó/.test(importerClassifyText)&&!/No se extraerán ni aplicarán tarifas automáticamente/.test(importerClassifyText),'B4_003_R20_SECOND_REVIEW_INSURER_IMPORT_NOT_ANALYZED:'+JSON.stringify({text:importerClassifyText.slice(0,1800)}));
  await page.click('#imp-next2');
  await page.waitForSelector('#imp-finish',{timeout:10000});
- proof.assertions.insurerImportTruthfulClassificationStep=true;
+ proof.assertions.insurerImportTruthfulClassificationStep=true;proof.assertions.insurerImportAnalyzesContent=true;proof.assertions.insurerImportUsesDependentCatalogs=true;
  await page.click('#imp-finish');
  await page.waitForFunction(()=>!document.getElementById('imp-back')?.classList.contains('open'),null,{timeout:60000});
  const insurerAfterUpload=(await ref('aseguradoras',ids.insurer).get()).data()||{};
