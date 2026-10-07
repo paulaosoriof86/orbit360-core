@@ -7,7 +7,7 @@ const OUT=process.env.LIVE_DRIFT_OUT||'/tmp/gravicentra-live-drift.json';
 const BEFORE=process.env.LIVE_DRIFT_BEFORE||'';
 const MODE=(process.argv.find(x=>x.startsWith('--mode='))||'--mode=snapshot').split('=')[1];
 const paths=['/index.html','/core/pwa.js','/sw.js','/product-runtime-config.js','/__recovery__/build.json'];
-const sha=t=>crypto.createHash('sha256').update(t).digest('hex');
+const sha=t=>crypto.createHash('sha256').update(typeof t==='string'||Buffer.isBuffer(t)?t:JSON.stringify(t)).digest('hex');
 const c=JSON.parse(fs.readFileSync(CONTROL,'utf8')),expected=c.certifiedCandidate||{};
 const result={schema:'GRAVICENTRA_PREEXISTING_LIVE_DRIFT_SNAPSHOT_V1',recordedAt:new Date().toISOString(),mode:MODE,base:BASE,readOnly:true,hostingMutation:false,dataMutation:false,expected:{sourceSha:expected.sourceSha||'',buildId:expected.buildId||''},files:{},status:'INIT'};
 for(const p of paths){
