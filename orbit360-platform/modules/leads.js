@@ -27,6 +27,7 @@ Orbit.modules.leads = (function () {
 
   function draw() {
     const board = C().leadsBoard();
+    const actionRanks=C().actionQueueRanks?C().actionQueueRanks('leads'):{};
     const m = C().metricasLeads();
     const esAse = Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor();
     host.innerHTML = `<div class="page">
@@ -42,7 +43,7 @@ Orbit.modules.leads = (function () {
         <span class="ops-sync">🔁 Sincronizado con Orbit Ops</span>
       </div>
       <div class="kanban">
-        ${board.map(col => kcol(col)).join('')}
+        ${board.map(col => kcol(col, actionRanks)).join('')}
       </div>
     </div>`;
     C().wireCards(host);
@@ -51,10 +52,10 @@ Orbit.modules.leads = (function () {
     host.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => C().nuevoNegocio()));
   }
 
-  function kcol(col) {
+  function kcol(col, actionRanks) {
     const L = col.def, q = Orbit.q;
     const subt = col.items.reduce((s, it) => s + q.norm(it.rec.primaEst, it.rec.moneda), 0);
-    const cards = col.items.map(it => C().cardNegocio(it.rec, { espejo: L.espejo, board: 'leads' })).join('');
+    const cards = col.items.map(it => C().cardNegocio(it.rec, { espejo: L.espejo, board: 'leads', actionRank:(actionRanks||{})[it.rec.id]||0 })).join('');
     return `<div class="kcol ${L.espejo ? 'kcol-espejo' : ''}">
       <div class="kcol-h2" style="--lc:${L.color}">
         <span class="kcol-emoji">${L.emoji}</span><b>${L.nombre}</b><span class="kcount">${col.items.length}</span>
