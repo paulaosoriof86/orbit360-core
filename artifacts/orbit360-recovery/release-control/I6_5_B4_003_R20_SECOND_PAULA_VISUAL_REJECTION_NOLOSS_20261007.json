@@ -1,0 +1,270 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_V1",
+  "recordedAt": "2026-10-07T08:18:00-06:00",
+  "status": "FROZEN_PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "reviewedCandidate": {
+    "sourceSha": "9bc3df4c7701e5aae06df3889bd5cdbc794c560b",
+    "buildId": "gi-i65-b4-9bc3df4c7701-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37569139879-u2qsc5zp.web.app",
+    "runId": 37569139879,
+    "machineProofStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL"
+  },
+  "decision": "Machine proof remains valid only as technical evidence. Human acceptance is REJECTED; no B4-003 close and no B4-004 entry.",
+  "preservedPassIds": [
+    "B4-003-R20-B02",
+    "B4-003-R20-B10"
+  ],
+  "preservedExistingBlockingIds": [
+    "B4-003-R20-Q01",
+    "B4-003-R20-Q02",
+    "B4-003-R20-Q03",
+    "B4-003-R20-Q04",
+    "B4-003-R20-Q05",
+    "B4-003-R20-Q06",
+    "B4-003-R20-Q07",
+    "B4-003-R20-B01",
+    "B4-003-R20-B03",
+    "B4-003-R20-B04",
+    "B4-003-R20-B05",
+    "B4-003-R20-B06",
+    "B4-003-R20-B07",
+    "B4-003-R20-B08",
+    "B4-003-R20-B09",
+    "B4-003-R20-B11",
+    "B4-003-R20-B12",
+    "B4-003-R20-B13",
+    "B4-003-R20-B14"
+  ],
+  "extensions": [
+    {
+      "id": "B4-003-R20-B12",
+      "evidence": "Dirección with advisorId landed in Leads. Source preferredLanding() checks advisorId before operational/admin role; landing is not actually chosen from pending-target surface.",
+      "required": "Dirección/Operativo/Admin/SuperAdmin open Ops when an actionable operations-target request exists; Asesor/Comercial open Leads when advisor-target request exists; otherwise role-appropriate default/Inicio."
+    },
+    {
+      "id": "B4-003-R20-B09",
+      "evidence": "Inbox state actions take ~3-4s without visible pending confirmation; historical collaboration entries show roles instead of human names; technical notification labels remain.",
+      "required": "Immediate busy/success/error feedback, human actor name/time, recipient-specific route and human wording."
+    },
+    {
+      "id": "B4-003-R20-B14",
+      "evidence": "Paula could attach in the business UI but Preview rejected the real operational record, preventing human validation of the complete attachment/comment write path.",
+      "required": "Discoverable disposable UAT business/policy/quality fixtures using the same canonical server write/readback/reload/cleanup contract while real records remain protected."
+    },
+    {
+      "id": "B4-003-R20-B05",
+      "evidence": "Tarifas y conocimiento still has mixed typography, weak hierarchy, flat/gray visual language and is materially less resolved than Documentos y fuentes.",
+      "required": "Premium brand-consistent hierarchy and table/card grammar; no visual regression."
+    },
+    {
+      "id": "B4-003-R20-B06",
+      "evidence": "Roles of Productos/Ramos/Planes, Documentos/Drive and Tarifas/Conocimiento are not clear and appear redundant.",
+      "required": "Distinct information architecture with one owner per responsibility and explicit cross-links."
+    },
+    {
+      "id": "B4-003-R20-B08",
+      "evidence": "Uploaded insurer source remains largely unclassified; source detail exposes technical provenance/hash language; activity contains Registry/KNOWLEDGE_REFERENCE vocabulary.",
+      "required": "Human source detail/activity and truthful classification/extraction semantics."
+    },
+    {
+      "id": "B4-003-R20-B13",
+      "evidence": "Products/Ramos/Plans behaves mainly as Ramos; products/plans are not first-class managed selections; ramo catalog is not presented as the approved multi-select matrix; importer ramo/product/plan fields are free text.",
+      "required": "Managed country→ramo→producto→plan catalogs, multi-select offering matrix, dependent dropdowns in importer and persistent readback."
+    },
+    {
+      "id": "B4-003-R20-Q01",
+      "evidence": "Quality is improved but amber/yellow is overused beyond pending/warning semantics.",
+      "required": "Brand color grammar: red primary/action, green success, amber only warning/pending, blue/navy/gray neutral/info."
+    },
+    {
+      "id": "B4-003-R20-Q02",
+      "evidence": "Prima contractual, fuente contractual and calendario activo are not natural insurance language.",
+      "required": "Human insurance wording aligned to actual semantics, e.g. prima total registrada en póliza vs total de recibos/programación de pagos."
+    },
+    {
+      "id": "B4-003-R20-Q04",
+      "evidence": "Wide Quality table has horizontal scrollbar only at the bottom.",
+      "required": "Synchronized top horizontal scroll or explicit left/right controls."
+    },
+    {
+      "id": "B4-003-R20-Q05",
+      "evidence": "Agregar teléfono/WhatsApp opens the same full correction modal; country prefix is not safely defaulted/selected.",
+      "required": "Focused phone modal with country-code selector, GT +502 / CO +57 default, normalized stored number."
+    },
+    {
+      "id": "B4-003-R20-Q06",
+      "evidence": "Many clients remain País por validar; UI speaks of suggestion/evidence instead of a clear default/confirmation model.",
+      "required": "Show human source basis; preselect unique deterministic country, require confirmation before write, and plan a separate deterministic data backfill for unresolved records."
+    },
+    {
+      "id": "B4-003-R20-B01",
+      "evidence": "Only 3 expired renewables appear although historical expired population is much larger. Paula defines new cutoff disposition rule.",
+      "required": "Policies expired through 2026-07-31 and neither renewed nor cancelled default to No renovada; Aug/Sep/current Oct 2026 expired and neither renewed nor cancelled remain in Vencidas pipeline for validation. Apply as deterministic data rule, not UI-only hiding."
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "B4-003-R20-V2-01-ACTION-QUEUE-RANK",
+      "surface": "Ops/Leads Kanban",
+      "finding": "Acción requerida #N uses historical comment sequence rather than current actionable queue rank.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/modules/ops.js",
+        "orbit360-platform/modules/leads.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-02-ACTION-STATE-VISUAL",
+      "surface": "Ops/Leads Kanban",
+      "finding": "Action-required and completed/returned states do not have sufficiently strong, distinct visual priority.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-03-CARD-OPEN-LATENCY",
+      "surface": "Ops/Leads business card",
+      "finding": "Opening a card waits on Orbit.cat.ensure() before first paint and takes ~4s in human use.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+      "surface": "Business collaboration",
+      "finding": "Comments/requests area is visually flat and does not clearly state that Registrar commits immediately while Guardar cambios belongs to business fields.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
+      "surface": "Tareas y solicitudes",
+      "finding": "Marcar atendida/Archivar waits for server+refresh without visible pending/success state, encouraging repeated clicks.",
+      "owner": [
+        "orbit360-platform/index.html",
+        "functions/ops-advisor-inbox.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-06-INBOX-HEADER-ALIGNMENT",
+      "surface": "Tareas y solicitudes",
+      "finding": "Active-count placement/hierarchy is visually weak and detached from header.",
+      "owner": [
+        "orbit360-platform/index.html",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-07-BUSINESS-MODAL-VISUAL",
+      "surface": "Ops/Leads business detail",
+      "finding": "Header/stepper/comments spacing, yellow band, internal scrolling and menu density are not acceptable for a high-frequency daily surface.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-08-INSURER-DRIVE-EMBED-RBAC",
+      "surface": "Aseguradoras · Documentos y fuentes",
+      "finding": "Existing insurer Drive folder is not embedded/browsable in the ficha with role-aware access; current drive field is only a reference string.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "functions/document-drive-domain.js",
+        "orbit360-platform/core/product-drive-document-provider-p0.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-09-INSURER-IMPORTER-TRUTHFULNESS",
+      "surface": "Aseguradoras · Cargar fuente",
+      "finding": "Flow is titled Importación inteligente but docs-aseguradora is forced to documentary mode and performs no content extraction/mapping.",
+      "owner": [
+        "orbit360-platform/core/importa.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-10-INSURER-AUDIT-HUMAN-LANGUAGE",
+      "surface": "Aseguradoras · Actividad",
+      "finding": "Activity/source details expose Registry, KNOWLEDGE_REFERENCE, hashes and structural labels rather than user/action/result language.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-11-INSURER-SEMANTIC-DIFF",
+      "surface": "Aseguradoras · Guardar cambios",
+      "finding": "Changing only logo can report many unrelated changed fields because draft normalization changes undefined/empty structures and diff uses raw top-level JSON.stringify.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-12-INSURER-SAVE-PROGRESS",
+      "surface": "Aseguradoras · Guardar cambios",
+      "finding": "Logo/upload/save can take seconds before the visible Guardando state begins.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-13-QUALITY-PHONE-PREFIX",
+      "surface": "Calidad · contacto",
+      "finding": "Phone entry does not enforce/select international country code and can persist ambiguous numbers.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-14-QUALITY-COUNTRY-DATA-DEBT",
+      "surface": "Calidad · país",
+      "finding": "Large unresolved country population requires deterministic source-backed backfill/readback, not only per-row UI suggestions.",
+      "owner": [
+        "DATA_UPDATE",
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION",
+      "surface": "Renovaciones",
+      "finding": "Historical expired policies are not dispositioned by the approved business cutoff; old expireds pollute historical state while recent expireds need actionable pipeline treatment.",
+      "owner": [
+        "DATA_UPDATE",
+        "orbit360-platform/modules/renovaciones.js"
+      ],
+      "blocking": true
+    }
+  ],
+  "scheduleFinding": {
+    "status": "TIMEZONE_CONFIRMED_BUSINESS_HOURS_NOT_CONFIGURED",
+    "evidence": "Cadence scheduler runs every 60 minutes with timeZone America/Guatemala; localDate also uses America/Guatemala.",
+    "consequence": "Timezone is correct. It currently runs hourly 24/7; no business-hours window is configured."
+  },
+  "hardBoundaries": {
+    "b4004Held": true,
+    "noLive": true,
+    "noReimport": true,
+    "dataMutation": false,
+    "productMutation": false,
+    "preservePriorPasses": true,
+    "noHumanPassInference": true
+  },
+  "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+}
