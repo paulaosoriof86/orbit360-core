@@ -19,10 +19,10 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 279,
+    "total": 280,
     "b2HumanFindings": 61,
-    "currentBlocking": 40,
-    "countingNote": "R20 second visual review frozen. Existing blockers preserved; 15 additional blocking findings added. Machine proof does not close human findings.",
+    "currentBlocking": 41,
+    "countingNote": "Second R20 visual review remains open. Transversal visual hierarchy finding V2-16 added and must receive explicit Paula Preview pass.",
     "currentBlockingB2B3": 0,
     "lastReconciledAt": "2026-10-07"
   },
@@ -10377,6 +10377,30 @@
       "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
       "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
       "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "surface": "All changed B4-003 surfaces",
+      "finding": "Cards, panels, information blocks, content boxes, secondary containers and section backgrounds require stronger but restrained contrast, clearer separation and consistent hierarchy without typography regression.",
+      "owner": [
+        "orbit360-platform/styles/infra.css",
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/index.html",
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "rootCause": "Cross-surface visual grammar is inconsistent: some redesigned surfaces remain flat/gray while others overuse amber or rely on weak border/background separation.",
+      "remediation": "Apply one restrained visual grammar using contrast, spacing, border, elevation and brand accents. Preserve approved typography; reserve amber for warning/pending.",
+      "closureCondition": "Targeted Paula Preview review explicitly passes hierarchy, contrast, separation and typography consistency across each changed surface.",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20VisualWhatsappRequirementsPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_VISUAL_AND_WHATSAPP_REQUIREMENTS_20261007.json",
+      "r20VisualWhatsappRequirementsBlobSha": "d47601187d98dbdf56c749f4b3e5ad4676778ce6",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX",
+      "mayDisappearWithoutDisposition": false
     }
   ],
   "phaseBBacklog": [
@@ -10750,7 +10774,7 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
   },
-  "lastUpdatedAt": "2026-10-07T08:20:00-06:00",
+  "lastUpdatedAt": "2026-10-07T09:32:00-06:00",
   "lastR16SourceFix": {
     "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
