@@ -1,0 +1,37 @@
+name: Portal P-01 S5.11 Read-only Contract
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/portal-p01-readonly-contract-s511-20261007
+    paths:
+      - 'functions/portal-p01-readonly-contract-s511.js'
+      - 'functions/portal-p01-readonly-contract-s511.test.js'
+      - '.github/workflows/portal-p01-s511-readonly-contract.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  portal-p01-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source and deterministic contract QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check portal-p01-readonly-contract-s511.js
+          node --check portal-p01-readonly-contract-s511.test.js
+          node --test portal-p01-readonly-contract-s511.test.js
+          grep -q "staffSessionReuseAllowed:false" portal-p01-readonly-contract-s511.js
+          grep -q "directBrowserClientIdAllowed:false" portal-p01-readonly-contract-s511.js
+          grep -q "writeOperationsAllowed:false" portal-p01-readonly-contract-s511.js
+          ! grep -q "firebase-admin" portal-p01-readonly-contract-s511.js
+          ! grep -q "onCall\|onRequest" portal-p01-readonly-contract-s511.js
