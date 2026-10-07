@@ -577,7 +577,7 @@
   },
   "findingLedgerBlobSha": "e03a5b251973a0234668a4f2cd2c6e9e17658587",
   "continuityRegisterBlobSha": "31c6646999730ea0c77021818cfa4dddaf8908a7",
-  "compositionLockBlobSha": "5e483f5100497cbc37dcee20b81879529782c49b",
+  "compositionLockBlobSha": "b271c89a6b4a75c9985f8a091bd87984669950fd",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -925,5 +925,14 @@
     "tinyFishRequiredBeforePaulaHandoff": true,
     "dataMutationAuthorized": false,
     "livePromotionAuthorized": false
+  },
+  "r20SecondReviewCatalogUiRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_CATALOG_UI_ROOTFIX_20261007.json",
+    "blobSha": "df6e7fefcf2e6b17625f9301a058eb2c605b2199",
+    "compositionLockBlobSha": "b271c89a6b4a75c9985f8a091bd87984669950fd",
+    "dataMutation": false,
+    "noLive": true,
+    "noReimport": true
   }
 }
