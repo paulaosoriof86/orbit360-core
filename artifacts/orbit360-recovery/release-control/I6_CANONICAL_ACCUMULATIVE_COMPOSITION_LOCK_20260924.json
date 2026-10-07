@@ -178,7 +178,7 @@
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "5245748330e410a1acf5749955f908aff30fcdcd",
     "orbit360-platform/core/document-viewer.js": "fd4b391ae84dc128fc47f3c1040a3d64a942b58c",
-    "orbit360-platform/core/importa.js": "abcd821c7c7235a5ac7e380ca78c14c226c69f81",
+    "orbit360-platform/core/importa.js": "dbd4a0583bb2f9745c3f951d312b26c4dba53750",
     "orbit360-platform/core/issuance-workflow-v1201-refinements.js": "47a9d68bef8cb60a00a057375efdf443c2ff2de2",
     "orbit360-platform/core/issuance-workflow-v1201.js": "ab138f218e041b41ac737ff250c7e808edc8c030",
     "orbit360-platform/core/policy-receipts-engine.js": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
@@ -2117,7 +2117,7 @@
     "visualAcceptanceNextAction": "B4_003_TARGETED_PAULA_VISUAL",
     "productMutationAuthorized": true,
     "quoteAuthorityContractVersion": "gravicentra-quote-authority-v1",
-    "compositionExactSetCount": 100,
+    "compositionExactSetCount": 102,
     "compositionRootFixBlobSha": "4cc32b403ad0506f53e473fc620151f0dc8a02c5",
     "syntheticQaWritesAuthorized": true,
     "r14SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
@@ -3686,5 +3686,13 @@
     ],
     "dataMutationAuthorized": false,
     "b4004Held": true
+  },
+  "r20SecondReviewExecution": {
+    "status": "SOURCE_FIX_AND_READONLY_DRYRUNS_ACTIVE",
+    "findingLedgerBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
+    "continuityRegisterBlobSha": "4bc063d9ec181774b0fedcfa31d06f665d0db8e0",
+    "masterPlanBlobSha": "249145294df8f9d8e0241a9059cd48f4ee5222f4",
+    "productFileCount": 102,
+    "tinyFishRequiredBeforePaulaHandoff": true
   }
 }
