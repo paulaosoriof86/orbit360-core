@@ -1,0 +1,15 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_QUALITY_QA_LITERAL_ALIGNMENT_V1",
+  "status": "QA_LITERAL_DRIFT_DEMONSTRATED_ALIGNMENT_AUTHORIZED",
+  "failedRunId": 37568710768,
+  "failureCode": "B4_003_R18_QUALITY_PROVENANCE_ACTION_MISSING",
+  "findingId": "B4-003-R20-Q03",
+  "cause": "Calidad renders 'Registrar evidencia del origen' but the browser proof still searched for the older label 'Documentar origen'.",
+  "allowedQaFile": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "assertionSemanticsPreserved": "The proof must still click the real action and verify modal q-inline, country GT and reason field qi-motivo.",
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
