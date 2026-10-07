@@ -292,10 +292,19 @@ const S506_OVERRIDE_SCRIPT=`
   function showTerminal(){
     const completion=document.getElementById('s500Completion');
     if(!completion)return;
+    const x=ctx();
     const stage4=document.querySelector('[data-stage-panel="4"]');
     const replan=stage4&&stage4.querySelector('.cc-replan');
-    const actions=stage4&&stage4.querySelector('.cc-actions');
-    if(replan)replan.style.display='none';if(actions)actions.style.display='none';
+    const decision=document.getElementById('decisionBtn');
+    const originalActions=decision&&decision.closest('.cc-actions');
+    if(replan)replan.style.display='none';
+    if(originalActions)originalActions.style.display='none';
+    const countryEl=document.getElementById('s500Country');
+    const needEl=document.getElementById('s500Need');
+    const modeEl=document.getElementById('s500Mode');
+    if(countryEl)countryEl.textContent=x.country;
+    if(needEl)needEl.textContent=x.need;
+    if(modeEl)modeEl.textContent='Con acompañamiento A&S';
     completion.classList.add('is-visible');
     const consent=document.querySelector('[data-s506-consent="terminal"]');if(consent)consent.checked=true;
     const button=document.querySelector('[data-s506-register="terminal"]');if(button){button.disabled=false;button.setAttribute('aria-disabled','false');}
