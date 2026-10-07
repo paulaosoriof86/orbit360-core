@@ -7,7 +7,10 @@ const P={
  masterPlan:'artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json'
 };
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
-const gitBlobSha=p=>{const b=fs.readFileSync(p);return createHash('sha1').update(`blob ${b.length}\0`).update(b).digest('hex');};
+const gitBlobSha=p=>{
+ const b=Buffer.from(fs.readFileSync(p,'utf8').replace(/\r\n/g,'\n'));
+ return createHash('sha1').update(`blob ${b.length}\0`).update(b).digest('hex');
+};
 const need=(v,c)=>{if(!v)throw new Error(c);};
 const led=read(P.ledger),reg=read(P.registry),cp=read(P.control),plan=read(P.masterPlan);
 const findings=Array.isArray(led.findings)?led.findings:[];
