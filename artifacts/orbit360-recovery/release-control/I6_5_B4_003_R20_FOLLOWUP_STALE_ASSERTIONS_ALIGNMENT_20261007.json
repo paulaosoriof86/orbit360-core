@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_FOLLOWUP_STALE_ASSERTIONS_ALIGNMENT_V1",
+  "recordedAt": "2026-10-06T20:10:00-06:00",
+  "status": "QA_ASSERTIONS_ALIGNED_PENDING_EXACT_PREVIEW",
+  "failedPreviewRunId": 37559955248,
+  "priorFailureCode": "B4_003_R18_QUALITY_DURABILITY_OR_PROVENANCE_MISSING",
+  "adjudication": {
+    "productRegression": false,
+    "evidence": [
+      "calidad.js retains await S().updateDurable('clientes',...), canonical readback checks, remainingAfterReadback, paisProvenance and forceProvenance.",
+      "R20 intentionally humanized Documentar origen -> Registrar evidencia del origen and Agregar/corregir teléfono / WhatsApp -> Agregar teléfono / WhatsApp.",
+      "R20 changed exact cache bindings for touched assets to 20261007-r20f1.",
+      "Inbox routing is now targetSurface-driven rather than two hardcoded assignments.",
+      "Ops inbox uses opsRole(activeRole) / recipientMatch instead of the prior isOpsRole local."
+    ]
+  },
+  "contractBlobSha": "415790b073f6bd77e874cfc6ae320d646545ee7b",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

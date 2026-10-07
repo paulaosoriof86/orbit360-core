@@ -213,7 +213,7 @@ need(!/setTimeout\(\(\)=>\{api\.ensure\(\)\.catch/.test(read('orbit360-platform/
 need(/cf-cat-canales/.test(configuracion)&&/cf-cat-productos/.test(configuracion)&&/cf-cat-segmentos/.test(configuracion)&&/cf-cat-prioridades/.test(configuracion)&&/Orbit\.cat\.saveDurable/.test(configuracion),'B4_003_R16_CATALOG_ADMIN_SURFACE_MISSING');
 need(/nn-canal/.test(cycle)&&/fSelectCat\('Canal de ingreso'/.test(cycle)&&/nn-segmento/.test(cycle)&&/nn-prioridad/.test(cycle)&&/puntoIngreso/.test(cycle)&&!/Math\.floor\(1000 \+ Math\.random\(\) \* 9000\)/.test(cycle),'B4_003_R18_NEW_PROSPECT_CATALOG_AUTHORITY_MISSING');
 need(/departments:22,municipalities:340/.test(geo)&&/municipalities:1122/.test(geo),'B4_003_R16_GEO_GT_CO_COMPLETENESS_BINDING_MISSING');
-need(/await S\(\)\.updateDurable\('clientes'/.test(quality)&&/remainingAfterReadback/.test(quality)&&/paisProvenance/.test(quality)&&/Documentar origen/.test(quality)&&/forceProvenance/.test(quality),'B4_003_R18_QUALITY_DURABILITY_OR_PROVENANCE_MISSING');
+need(/await S\(\)\.updateDurable\('clientes'/.test(quality)&&/remainingAfterReadback/.test(quality)&&/paisProvenance/.test(quality)&&/Registrar evidencia del origen/.test(quality)&&/forceProvenance/.test(quality),'B4_003_R18_QUALITY_DURABILITY_OR_PROVENANCE_MISSING');
 need(/needsCountry=f\.some\(x=>x\.k==='pais'\)/.test(quality)&&/needsCountry \? evidenceFor\(c\)/.test(quality),'B4_003_R16_02_QUALITY_EVIDENCE_EVALUATION_NOT_BOUNDED');
 need(/Tolerancia \/ causa/.test(quality)&&/calendarAuthority/.test(quality)&&/contractualSource/.test(policyDetail)&&/Math\.abs\(delta\)<0\.0000001\?0:delta/.test(policyDetail),'B4_003_R16_FINANCIAL_QUALITY_ACTIONABILITY_MISSING');
 need(/Prima pendiente de fuente/.test(base)&&/Orbit\.modules\.cliente360\.verPoliza/.test(base)&&/return\s*\{\s*render\s*\}/.test(base),'B4_003_R16_RENEWAL_FAIL_CLOSED_REVIEW_PATH_MISSING');
@@ -240,26 +240,26 @@ need(/GENERAL_PREVIEW_COMMAND='orbit360ProductOperationalCommandPreview'/.test(s
 need(/previewGeneral\?GENERAL_PREVIEW_COMMAND:GENERAL_COMMAND/.test(store),'B4_003_GENERAL_PREVIEW_ROUTING_MISSING');
 need(/previewGeneral\?'us-east1':'us-central1'/.test(store),'B4_003_GENERAL_PREVIEW_REGION_MISSING');
 need(/b4003qa/.test(opBackend)&&/__syntheticQa/.test(opBackend),'B4_003_PREVIEW_SYNTHETIC_GUARD_MISSING');
-need(/modules\/renovaciones\.js\?v=20261006-r20/.test(index),'B4_003_BASE_CACHE_BINDING_MISSING');
+need(/modules\/renovaciones\.js\?v=20261007-r20f1/.test(index),'B4_003_BASE_CACHE_BINDING_MISSING');
 need(/renewals-v1200-operational-bridge\.js\?v=20261005-r17/.test(index),'B4_003_BRIDGE_CACHE_BINDING_MISSING');
 need(/renewals-v1200-permission-guard\.js\?v=20261003-b4003r2/.test(index),'B4_003_PERMISSION_CACHE_BINDING_MISSING');
 need(/renewals-v1201-issued-filter\.js\?v=20261003-b4003r2/.test(index),'B4_003_ISSUED_CACHE_BINDING_MISSING');
 need(/cancelaciones\.js\?v=20261003-b4003r13/.test(index),'B4_003_CANCEL_R13_CACHE_BINDING_MISSING');
 need(/modules\/polizas\.js\?v=20261004-b4003r14/.test(index),'B4_003_POLICY_R13_CACHE_BINDING_MISSING');
 need(/core\/access-scope\.js\?v=20261003-b4003r5/.test(index),'B4_003_ACCESS_SCOPE_CACHE_BINDING_MISSING');
-need(/core\/router\.js\?v=20261004-b4003r14a/.test(index),'B4_003_R14_ROUTER_CACHE_BINDING_MISSING');
-need(/core\/ciclo\.js\?v=20261006-r20/.test(index),'B4_003_R14A_CYCLE_CACHE_BINDING_MISSING');
+need(/core\/router\.js\?v=20261007-r20f1/.test(index),'B4_003_R14_ROUTER_CACHE_BINDING_MISSING');
+need(/core\/ciclo\.js\?v=20261007-r20f1/.test(index),'B4_003_R14A_CYCLE_CACHE_BINDING_MISSING');
 need(/modules\/cronograma\.js\?v=20261003-b4003r5/.test(index),'B4_003_CRONOGRAMA_CACHE_BINDING_MISSING');
 need(/store-firestore-product-operational-p0\.js\?v=20261003-b4003r3/.test(index),'B4_003_STORE_CACHE_BINDING_MISSING');
 need(/modules\/cliente360\.js\?v=20261005-r17/.test(index),'B4_003_CLIENT360_R11_CACHE_BINDING_MISSING');
-need(index.includes('modules/calidad.js?v=20261005-r19'),'B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING');
-need(index.includes('modules/aseguradoras.js?v=20261006-r20'),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
+need(index.includes('modules/calidad.js?v=20261007-r20f1'),'B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING');
+need(index.includes('modules/aseguradoras.js?v=20261007-r20f1'),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
 need(/core\/importa\.js\?v=20261004-r16/.test(index),'B4_003_IMPORTER_R13_CACHE_BINDING_MISSING');
 need(/modules\/aseguradoras-v1202-import-bridge\.js\?v=20261004-b4003r13d/.test(index),'B4_003_R13_INSURER_IMPORT_BRIDGE_CACHE_BINDING_MISSING');
 need(index.includes('core/client-insurer-visual-contract-v20260720.js?v=20261004-r16p4'),'B4_003_INSURER_VISUAL_R12_CACHE_BINDING_MISSING');
 need(index.includes('modules/policy-receipts-v1199-detail-guard.js?v=20261005-r19'),'B4_003_POLICY_DETAIL_R13_CACHE_BINDING_MISSING');
 need(/modules\/policy-receipts-v1199-bridge\.js\?v=20261005-r19/.test(index),'B4_003_POLICY_BRIDGE_R11_CACHE_BINDING_MISSING');
-need(/styles\/infra\.css\?v=20261006-r20/.test(index),'B4_003_INFRA_R17_CARD_FIT_CACHE_BINDING_MISSING');
+need(/styles\/infra\.css\?v=20261007-r20f1/.test(index),'B4_003_INFRA_R17_CARD_FIT_CACHE_BINDING_MISSING');
 
 
 need(cycle.includes("find(p=>p&&p.etapa==='nuevo')")&&!cycle.includes("(Orbit.cat.get('puntosIngreso')[1]||Orbit.cat.get('puntosIngreso')[0]"),'B4_003_R18_DEFAULT_NEW_STAGE_NOT_CANONICAL');
@@ -268,7 +268,7 @@ need(cycle.includes('commercialIdentityId')&&cycle.includes('sourceOpportunityId
 for(const token of ['Comentario comercial','Observación operativa','Solicitar información al asesor','Devuelto a asesor','Reenviado a Operaciones'])need(cycle.includes(token),'B4_003_R18_TYPED_HANDOFF_MISSING:'+token);
 need(cycle.includes('syncManagementQueue')&&cycle.includes('Cola operativa asignada')&&cycle.includes('id="mg-lista"')&&cycle.includes('readonly'),'B4_003_R18_MANAGEMENT_QUEUE_DERIVATION_MISSING');
 need(quality.includes('Revisar diferencia')&&quality.includes('Corregir en póliza')&&quality.includes('Revisar recibos')&&!quality.includes('Revisar y corregir</button>'),'B4_003_R18_QUALITY_ACTION_TRUTHFULNESS_MISSING');
-need(quality.includes('Documentar origen')&&quality.includes('forceProvenance')&&quality.includes('Agregar/corregir teléfono / WhatsApp'),'B4_003_R18_QUALITY_PROVENANCE_OR_CHANNEL_ACTION_MISSING');
+need(quality.includes('Registrar evidencia del origen')&&quality.includes('forceProvenance')&&quality.includes('Agregar teléfono / WhatsApp'),'B4_003_R18_QUALITY_PROVENANCE_OR_CHANNEL_ACTION_MISSING');
 need((base.includes('function date45Disposition')&&base.includes('data-renewal-date45-reconciled='))||(base.includes('const renewalPipelineCandidate')&&base.includes('data-renewal-bucket=')&&!base.includes('renewal-disposition-detail')),'B4_003_R18_RENEWAL_DISPOSITION_CONTRACT_MISSING');
 need(policyEngine.includes('const duplicateEdition')&&policyEngine.includes('lineage_ediciones_sin_vinculo')&&!policyEngine.includes("errors.push('poliza_duplicada:'"),'B4_003_R18_POLICY_EDITION_VALIDATOR_NOT_FIXED');
 need(insurer.includes("typeof v==='object'")&&insurer.includes('Historia unificada:')&&insurer.includes('insurer-source-detail')&&!insurer.includes('a.comisionDefault || 12'),'B4_003_R18_INSURER_PROVENANCE_ACTIVITY_OR_COMMISSION_FALLBACK_INVALID');
@@ -309,7 +309,7 @@ need(base.includes('const renewalPipelineCandidate')&&base.includes("renewabilit
 need(inicio.includes('data-inicio-advisor-readiness="unavailable"')&&inicio.includes("state==='unavailable'?'No disponible'"),'B4_003_R19_INICIO_TERMINAL_READINESS_MISSING');
 need(insurer.includes('data-technical-registry="1"')&&insurer.includes('data-knowledge-order="2-products"')&&insurer.includes('data-knowledge-order="4-tariffs"')&&insurer.includes('data-knowledge-order="7-activity"'),'B4_003_R19_INSURER_HIERARCHY_MISSING');
 need(workflow.includes("collabDirection==='advisor'")&&workflow.includes("collabDirection==='operations'"),'B4_003_R19_HANDOFF_OUTBOX_DIRECTION_MISSING');
-need(opsInbox.includes('orbit360GetAdvisorOpsInboxPreview')&&opsInbox.includes('collaborationNotices')&&opsInbox.includes("['advisor','operations'].includes(direction)")&&opsInbox.includes('isOpsRole'),'B4_003_R19_HANDOFF_INBOX_PROJECTION_MISSING');
+need(opsInbox.includes('orbit360GetAdvisorOpsInboxPreview')&&opsInbox.includes('collaborationNotices')&&opsInbox.includes("['advisor','operations'].includes(direction)")&&opsInbox.includes('opsRole(authz.activeRole)'),'B4_003_R19_HANDOFF_INBOX_PROJECTION_MISSING');
 need(infra.includes('.quality-main-scroll')&&infra.includes('.insurer-multicheck-list')&&infra.includes('.quality-main-table td:before'),'B4_003_R19_RESPONSIVE_STYLES_MISSING');
 need(/function\s+calendarAuthorityLabel\s*\(/.test(quality)&&quality.includes('data-health-open-review')&&quality.includes('revisarDescuadre')&&quality.includes('&t=recibos'),'B4_003_R17_QUALITY_EXACT_RESOLUTION_ACTION_MISSING');
 need(!quality.includes("location.hash='#/polizas?p=")&&quality.includes('quality-fin-mobile'),'B4_003_R16_04_QUALITY_STALE_DEEPLINK_OR_MOBILE_CONTRACT_MISSING');
@@ -343,7 +343,7 @@ need(workflow.includes("onSchedule")&&workflow.includes('orbit360OpsLeadsCadence
 need(opsInbox.includes('opsScope')&&opsInbox.includes('leadsScope')&&opsInbox.includes('previewInternalNotifs')&&opsInbox.includes('internalNotices'),'B4_003_R20_INBOX_SCOPE_OR_INTERNAL_PROJECTION_MISSING');
 need(notificationProcessor.includes('internalProjectionRef')&&notificationProcessor.includes('internalProjectionCount')&&notificationProcessor.includes('PREVIEW_QA_EVENT_ONLY'),'B4_003_R20_INTERNAL_NOTIFICATION_PROJECTION_MISSING');
 need(authRuntime.includes('restorePromise=null')&&authRuntime.includes("showLogin();paintError('')")&&!authRuntime.includes('rawUser=null;location.reload()'),'B4_003_R20_LOGOUT_RELOAD_REGRESSION_REMAINS');
-need(index.includes('id="ops-inbox-bell"')&&index.includes('orbit360GetAdvisorOpsInboxPreview')&&index.includes("location.hash='#/leads'")&&index.includes("location.hash='#/ops'"),'B4_003_R20_INTERNAL_INBOX_SHELL_MISSING');
+need(index.includes('id="ops-inbox-bell"')&&index.includes('orbit360GetAdvisorOpsInboxPreview')&&index.includes("surface==='ops'?'#/ops':'#/leads'")&&index.includes("location.hash='#/ops'"),'B4_003_R20_INTERNAL_INBOX_SHELL_MISSING');
 need(insurer.includes('insurer-requirement-card')&&insurer.includes('data-rcountry')&&insurer.includes('data-rramo')&&insurer.includes('data-rplan')&&insurer.includes('data-rattach'),'B4_003_R20_INSURER_REQUIREMENT_SCHEMA_UI_MISSING');
 need(insurer.includes('data-dprod')&&insurer.includes('data-dplan')&&insurer.includes('data-source-link')&&insurer.includes('Asociar a ficha'),'B4_003_R20_INSURER_SOURCE_ASSOCIATION_MISSING');
 need(insurer.includes('id="kf-ramo"')&&insurer.includes('id="kf-producto"')&&insurer.includes('Seleccionar fuente registrada'),'B4_003_R20_INSURER_KNOWLEDGE_FILTER_OR_SOURCE_CATALOG_MISSING');
