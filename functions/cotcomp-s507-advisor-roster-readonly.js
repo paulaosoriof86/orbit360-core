@@ -34,8 +34,12 @@ function triage(row) {
   return row.pilotTriage === true || row.publicHandoffTriage === true;
 }
 function digits(value) { return clean(value, 80).replace(/\D+/g, ''); }
-function designated(row) {
-  return norm(row.nombre || row.name) === 'paula_osorio' && digits(row.telefono || row.phone || row.whatsapp) === '50256149048';
+function designatedName(row) {
+  const parts = norm(row.nombre || row.name).split('_').filter(Boolean);
+  return parts.includes('paula') && parts.includes('osorio');
+}
+function designatedPhone(row) {
+  return digits(row.telefono || row.phone || row.whatsapp) === '50256149048';
 }
 
 async function main() {
@@ -51,8 +55,10 @@ async function main() {
   const co = rows.filter(row => eligible(row, 'CO'));
   const gtTriage = gt.filter(triage);
   const coTriage = co.filter(triage);
-  const designatedRows = rows.filter(designated);
-  const designatedGtEligible = designatedRows.filter(row => eligible(row, 'GT'));
+  const designatedNameRows = rows.filter(designatedName);
+  const designatedPhoneRows = rows.filter(designatedPhone);
+  const designatedGtEligible = designatedNameRows.filter(row => eligible(row, 'GT'));
+  const designatedNameAndPhoneRows = rows.filter(row => designatedName(row) && designatedPhone(row));
   const designatedCommitment = designatedGtEligible.length === 1
     ? require('node:crypto').createHash('sha256').update(String(designatedGtEligible[0].id || ''), 'utf8').digest('hex')
     : '';
@@ -71,7 +77,9 @@ async function main() {
     coEligibleAdvisorCount: co.length,
     gtExplicitTriageCount: gtTriage.length,
     coExplicitTriageCount: coTriage.length,
-    designatedAdvisorMatchCount: designatedRows.length,
+    designatedAdvisorNameMatchCount: designatedNameRows.length,
+    designatedAdvisorPhoneMatchCount: designatedPhoneRows.length,
+    designatedAdvisorNameAndPhoneMatchCount: designatedNameAndPhoneRows.length,
     designatedAdvisorGtEligibleCount: designatedGtEligible.length,
     designatedAdvisorIdCommitment: designatedCommitment,
     gtRoutingState: gtTriage.length === 1 ? 'EXPLICIT_TRIAGE_READY' : gt.length === 1 ? 'SOLE_ELIGIBLE_READY' : gt.length === 0 ? 'NO_ELIGIBLE_ADVISOR' : 'AMBIGUOUS_REQUIRES_RULE',
