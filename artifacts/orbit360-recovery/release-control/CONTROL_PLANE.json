@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4863,7 +4863,7 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "B4_003_R20_INSURER_VISUAL_ROOTFIX_AUTHORIZED",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
@@ -4876,11 +4876,11 @@
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
       "baselinePreviewUrl": "https://ays-orbit-360-lab--gi-b3008-37061984102-1rgwzj6k.web.app",
-      "productMutationAuthorized": false,
+      "productMutationAuthorized": true,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
       "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
@@ -6150,7 +6150,7 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_003_R20_INSURER_VISUAL_ROOTFIX_AUTHORIZED",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "21051ebebabe391cdb192b3c706cb810ae7d8607",
@@ -6158,7 +6158,7 @@
     "findingLedgerBlobSha": "35105b099e4a33be237149071c2d1e95b3396ff0",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX",
     "sourceFixReceiptBlobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -6218,7 +6218,7 @@
       "reimport": false,
       "livePromotion": false
     },
-    "productMutationAuthorized": false,
+    "productMutationAuthorized": true,
     "dataMutationAuthorized": false,
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -7278,6 +7278,19 @@
       "status": "SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
       "blobSha": "360542cca021b187cda638c3742dff8353137416"
+    },
+    "r20FollowupInsurerVisualAuthorization": {
+      "status": "AUTHORIZED",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_CAUSAL_AUTH_20261007.json",
+      "blobSha": "f0931b6b2728ac087942cec84186fee06ec4ed3d",
+      "failedRunId": 37561015481,
+      "failureCode": "B4_003_R20_INSURER_TECHNICAL_TERMS_VISIBLE",
+      "allowedProductFiles": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "noLive": true,
+      "noReimport": true,
+      "dataMutation": false
     }
   },
   "b4VisualAcceptanceControl": {
