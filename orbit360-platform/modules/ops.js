@@ -33,6 +33,7 @@ Orbit.modules.ops = (function () {
   function draw() {
     const advisor = isAdvisor();
     let board = C().opsBoard();
+    const actionRanks=C().actionQueueRanks?C().actionQueueRanks('ops'):{};
     if (Orbit.access && Orbit.access.canView) {
       board = board.map(col => Object.assign({}, col, {
         items: (col.items || []).filter(it => Orbit.access.canView(it.kind === 'negocio' ? 'negocios' : 'gestiones', it.rec, 'ops'))
@@ -72,7 +73,7 @@ Orbit.modules.ops = (function () {
         <span class="muted">${advisor ? 'Tu operación' : 'Tablero operativo en vivo'} · <b>${totNeg}</b> negocios en flujo · <b>${totGes}</b> gestiones</span>
         <span class="ops-sync">🔁 Sincronizado con Orbit Leads</span>
       </div>
-      <div class="kanban">${board.map(col => kcol(col, advisor)).join('')}</div>
+      <div class="kanban">${board.map(col => kcol(col, advisor, actionRanks)).join('')}</div>
     </div>`;
     C().wireCards(host);
     const lists = host.querySelector('#op-lists'); if (lists) lists.addEventListener('click', () => C().gestionarListas('opsListas'));
@@ -85,9 +86,9 @@ Orbit.modules.ops = (function () {
     if (!advisor) host.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => { b.dataset.add === 'gestion' ? C().nuevaGestion() : C().nuevoNegocio(); }));
   }
 
-  function kcol(col, advisor) {
+  function kcol(col, advisor, actionRanks) {
     const L = col.def;
-    const cards = col.items.map(it => it.kind === 'negocio' ? C().cardNegocio(it.rec, { board: 'ops' }) : C().cardGestion(it.rec)).join('');
+    const cards = col.items.map(it => it.kind === 'negocio' ? C().cardNegocio(it.rec, { board: 'ops', actionRank:(actionRanks||{})[it.rec.id]||0 }) : C().cardGestion(it.rec)).join('');
     return `<div class="kcol">
       <div class="kcol-h2" style="--lc:${L.color}"><span class="kcol-emoji">${L.emoji}</span><b>${L.nombre}</b><span class="kcount">${col.items.length}</span></div>
       <div class="kcol-body">${cards || '<div class="kempty">Sin tarjetas</div>'}${advisor ? '' : `<button class="kadd" data-add="${L.kind}">+ ${L.kind === 'gestion' ? 'Gestión' : 'Ingreso'}</button>`}</div>
