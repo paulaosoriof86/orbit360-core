@@ -65,7 +65,7 @@ jobs:
           const r=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
           if(r.readOnly!==true||r.containsCustomerData!==false||r.containsAdvisorPII!==false)process.exit(1);
           if(!Number.isInteger(r.recordsScanned)||!Number.isInteger(r.gtEligibleAdvisorCount))process.exit(1);
-          if(r.designatedAdvisorMatchCount!==1||r.designatedAdvisorGtEligibleCount!==1)process.exit(1);
+          if(r.designatedAdvisorNameMatchCount!==1||r.designatedAdvisorGtEligibleCount!==1)process.exit(1);
           if(!/^[a-f0-9]{64}$/.test(r.designatedAdvisorIdCommitment||''))process.exit(1);
           NODE
       - name: Upload sanitized evidence
