@@ -1,0 +1,15 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_FOLLOWUP_PREEMISSION_ATTACHMENT_RUNTIME_PROOF_BINDING_V1",
+  "recordedAt": "2026-10-06T20:17:00-06:00",
+  "status": "QA_RUNTIME_PROOF_BOUND_PENDING_EXACT_PREVIEW",
+  "productRootFixHead": "9aa59285d3fea843303961bd33baa7044f641d69",
+  "proofBlobSha": "6dd1b95e801f0554ddcb8dbf082b70e49c7d28d0",
+  "assertion": "preEmissionCollaborationAttachmentDurable",
+  "runtimeScenario": "Synthetic cotizando business with previewWrite=true and no clienteId -> Drive stage -> finalize -> canonical business document binding -> read -> file cleanup.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

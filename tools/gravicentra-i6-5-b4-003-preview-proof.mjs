@@ -29,7 +29,8 @@ const ids={
  healthReceiptShadow:'b4003qa_receipt_health_shadow_'+run,
  cancelation:'b4003qa_cancel_'+run,
  insurer:'b4003qa_insurer_'+run,
- collabBusiness:'b4003qa_business_collab_'+run
+ collabBusiness:'b4003qa_business_collab_'+run,
+ collabNoClientBusiness:'b4003qa_business_collab_noclient_'+run
 };
 ids.renewActivity='act_ren_'+ids.renewalPolicy+'_'+new Date().toISOString().slice(0,10).replace(/-/g,'');
 ids.cancelActivity='act_rec_'+ids.cancelation;
@@ -92,6 +93,7 @@ async function seed(who,fixtureAdvisorId,collabAdvisorId){
  await ref('cancelaciones',ids.cancelation).set({...common,id:ids.cancelation,clienteId:ids.client,polizaId:ids.cancelPolicy,asesorId:fixtureAdvisorId||who.advisorId||'qa',pais:'GT',moneda:'GTQ',fecha:startS,motivo:'Prueba sintética B4-003',valorPerdido:700,recuperacion:'Pendiente de contacto',recuperada:false},{merge:false});proof.syntheticWrites++;
  await ref('aseguradoras',ids.insurer).set({...common,id:ids.insurer,nombre:'B4 R13 Aseguradora QA',canonicalName:'B4 R13 Aseguradora QA',displayName:'B4 R13 Aseguradora QA',pais:'GT',moneda:'GTQ',activo:true,estado:'Activa',docs:[],cotizadorHabilitado:false,comparativoHabilitado:false,iaHabilitada:false},{merge:false});proof.syntheticWrites++;
  await ref('negocios',ids.collabBusiness).set({...common,id:ids.collabBusiness,clienteId:ids.client,asesorId:collabAdvisorId||fixtureAdvisorId||who.advisorId||'qa',pais:'GT',moneda:'GTQ',titulo:'B4-003 QA colaboración',nombre:'B4-003 QA colaboración',etapa:'nuevo',estado:'Nuevo',origen:'Ops',comentarios:[],bitacora:[],archivado:false,previewWrite:true,previewSource:'b4003qa-harness'},{merge:false});proof.syntheticWrites++;
+ await ref('negocios',ids.collabNoClientBusiness).set({...common,id:ids.collabNoClientBusiness,asesorId:collabAdvisorId||fixtureAdvisorId||who.advisorId||'qa',pais:'GT',moneda:'GTQ',titulo:'B4-003 QA colaboración pre-emisión',nombre:'B4-003 QA colaboración pre-emisión',etapa:'cotizando',estado:'Cotizando',origen:'Leads',comentarios:[],bitacora:[],archivado:false,previewWrite:true,previewSource:'b4003qa-harness'},{merge:false});proof.syntheticWrites++;
 }
 async function applyLegal(page,who){
  const scope='user:'+clean(who.email||who.uid);
@@ -291,7 +293,7 @@ async function cancellationEvidence(){
  proof.assertions.cancellationProjectionConsistent=(cancelled.length===0);
 }
 async function cleanup(startMs){
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['negocios',ids.collabBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['recibosEsperados',ids.healthReceiptShadow],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.renewabilityWritePolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]]){
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['negocios',ids.collabBusiness],['negocios',ids.collabNoClientBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['recibosEsperados',ids.healthReceiptShadow],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.renewabilityWritePolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]]){
   const r=ref(c,id);if((await r.get()).exists){await r.delete();proof.cleanupWrites++;}
  }
  for(const col of ['workflowEvents','operationalEvents']){
@@ -1169,6 +1171,24 @@ try{
  });
  proof.r13InsurerDrive={probe:driveProbe};
  need(driveProbe&&driveProbe.available===true,'B4_003_R13_DRIVE_PROVIDER_NOT_AVAILABLE:'+JSON.stringify(driveProbe));
+ const preEmissionAttachment=await page.evaluate(async({tenantId,activeRole,businessId,run})=>{
+   const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();
+   const raw='tipo,valor\ncolaboracion,'+run+'\n',base64=btoa(unescape(encodeURIComponent(raw)));
+   const uploaded=await provider.callFunction('orbit360DocumentDriveUploadPreview',{tenantId,activeRole,entidad:'negocio',entidadId:businessId,sourceModule:'ops-leads',documentType:'colaboracion',categoria:'Colaboración',name:'b4-r20-preemision-'+run+'.csv',mimeType:'text/csv',size:raw.length,base64,provisional:true},'us-east1');
+   if(!uploaded||uploaded.ok!==true)return{stage:uploaded||null};
+   const finalized=await provider.callFunction('orbit360DocumentDriveFinalizePreview',{tenantId,activeRole,entidad:'negocio',entidadId:businessId,sourceModule:'ops-leads',documentType:'colaboracion',categoria:'Colaboración',documentRef:uploaded.documentRef,clientFolderId:uploaded.clientFolderId,stagingFolderId:uploaded.stagingFolderId||uploaded.folderId},'us-east1');
+   if(!finalized||finalized.ok!==true)return{stage:uploaded,finalized:finalized||null};
+   const read=await provider.callFunction('orbit360DocumentDriveReadPreview',{tenantId,activeRole,entidad:'negocio',entidadId:businessId,sourceModule:'ops-leads',documentRef:uploaded.documentRef},'us-east1');
+   return{stage:uploaded,finalized,read};
+ },{tenantId,activeRole:who.activeRole,businessId:ids.collabNoClientBusiness,run});
+ const preEmissionRow=(await ref('negocios',ids.collabNoClientBusiness).get()).data()||{},preEmissionDocs=[].concat(preEmissionRow.documentos||[]);
+ const preEmissionRef=clean(preEmissionAttachment?.stage?.documentRef);
+ need(preEmissionAttachment?.stage?.ok===true&&preEmissionAttachment?.stage?.provisional===true&&preEmissionAttachment?.stage?.entityType==='negocio','B4_003_R20_PREEMISSION_ATTACHMENT_STAGE_FAILED:'+JSON.stringify(preEmissionAttachment));
+ need(preEmissionAttachment?.finalized?.ok===true&&preEmissionAttachment?.read?.ok===true&&preEmissionDocs.some(x=>clean(x&&x.documentRef)===preEmissionRef),'B4_003_R20_PREEMISSION_ATTACHMENT_BINDING_FAILED:'+JSON.stringify({preEmissionAttachment,preEmissionDocs}));
+ const preEmissionCleanup=await page.evaluate(async({tenantId,activeRole,businessId,documentRef})=>Orbit.productRuntimeBrowserProvidersP0.callFunction('orbit360DocumentDriveCleanupPreview',{tenantId,activeRole,entidad:'negocio',entidadId:businessId,sourceModule:'ops-leads',documentRef},'us-east1'),{tenantId,activeRole:who.activeRole,businessId:ids.collabNoClientBusiness,documentRef:preEmissionRef});
+ need(preEmissionCleanup?.ok===true&&preEmissionCleanup?.deleted===true,'B4_003_R20_PREEMISSION_ATTACHMENT_CLEANUP_FAILED:'+JSON.stringify(preEmissionCleanup));
+ proof.r20PreEmissionCollabAttachment={businessId:ids.collabNoClientBusiness,clientId:clean(preEmissionRow.clienteId),documentRef:preEmissionRef,staged:true,finalized:true,readback:true,cleanup:true};
+ proof.assertions.preEmissionCollaborationAttachmentDurable=true;
  const importerProbe=await page.evaluate(ids=>{
    const out={error:'',fileExists:false,drawerExists:false,drawerOpen:false,backOpen:false,drawerText:'',openSource:'',scriptSrcs:[]};
    try{
@@ -1286,7 +1306,7 @@ try{
  if(browser)await browser.close().catch(()=>{});
  await cleanup(startMs).catch(e=>proof.cleanupError=clean(e&&e.message||e));
  const checks=[];
- for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['negocios',ids.collabBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['recibosEsperados',ids.healthReceiptShadow],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.renewabilityWritePolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
+ for(const [c,id] of [['actividades',ids.renewActivity],['actividades',ids.cancelActivity],['negocios',ids.recoveryBusiness],['negocios',ids.collabBusiness],['negocios',ids.collabNoClientBusiness],['cancelaciones',ids.cancelation],['recibosEsperados',ids.healthReceipt1],['recibosEsperados',ids.healthReceipt2],['recibosEsperados',ids.healthReceiptShadow],['polizas',ids.renewalPolicy],['polizas',ids.expiredRenewPolicy],['polizas',ids.unknownRenewPolicy],['polizas',ids.renewabilityWritePolicy],['polizas',ids.cancelPolicy],['polizas',ids.healthPolicy],['aseguradoras',ids.insurer],['clientes',ids.client]])checks.push((await ref(c,id).get()).exists);
  proof.syntheticFinalAbsent=checks.every(x=>x===false);
  proof.assertions.cleanupComplete=proof.syntheticFinalAbsent;
  fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
