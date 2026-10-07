@@ -137,3 +137,27 @@ test('S5.12B registry stores evidence source, review date and scope',()=>{
     assert.ok(row.channel);
   }
 });
+
+
+test('S5.12B GT public assistance resolver only exposes validated insurer registry rows',()=>{
+  const ok=s.resolveValidatedGtAssistance({
+    insurerName:'SEGUROS EL ROBLE',
+    aysWhatsapp:'+502 5614 9048',
+    aysEmail:'info@aysseguros.com'
+  });
+  assert.equal(ok.insurerChannelStatus,'CURRENT_CHANNEL_VALIDATED');
+  assert.equal(ok.insurerChannel.value,'1797');
+  assert.equal(ok.insurerChannel.validated,true);
+  assert.equal(ok.fallbackChannels.length,2);
+  assert.equal(ok.truth.coverageConfirmed,false);
+  assert.equal(ok.truth.eligibilityConfirmed,false);
+
+  const stale=s.resolveValidatedGtAssistance({
+    insurerName:'SEGUROS UNIVERSALES',
+    aysWhatsapp:'+502 5614 9048',
+    aysEmail:'info@aysseguros.com'
+  });
+  assert.equal(stale.insurerChannel,null);
+  assert.equal(stale.insurerChannelStatus,'NO_VALIDATED_INSURER_CHANNEL');
+  assert.equal(stale.fallbackChannels.length,2);
+});
