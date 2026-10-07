@@ -283,9 +283,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW",
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
-    "why": "Authenticated R20 exact Preview readback passed but Aseguradoras human UI exposed technical vocabulary and lacked perceptible premium hierarchy. Narrow source rootfix is now frozen; exact immutable Preview proof is required before Paula retest; B4-004 remains held.",
+    "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
+    "why": "Second R20 targeted human review identified unresolved Ops/Leads/inbox/collaboration, insurer IA/Drive/catalog, Quality usability/language and renewal data-disposition gaps. Prior machine proof is evidence only; B4-004 remains held.",
     "currentCandidateReview": "R20_REJECTED_BLOCKERS_PLUS_AUTHORIZED_QUALITY_CARRY",
     "sourceSha": "86a54019ce2500b65ea2745517bde4dd5a5eecef",
     "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
@@ -6219,8 +6219,8 @@
     "inventoryCount": 208,
     "attentionCount": 103,
     "registerSetMustEqualLedgerSet": true,
-    "latestLedgerBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
-    "latestCarryBlobSha": "bae26681cf60e42459ab8c379373ac76bb9f1919"
+    "latestLedgerBlobSha": "c7d35adb3f980cae310a5f7051c77715e8f485a2",
+    "latestCarryBlobSha": "233364d5ca31265677fd3cd204f1d235f2866ca5"
   },
   "dataProtection": {
     "alreadyAppliedDoNotRepeat": [
@@ -6568,6 +6568,14 @@
     ],
     "ledgerBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
     "carryBlobSha": "bae26681cf60e42459ab8c379373ac76bb9f1919",
+    "b4004Held": true
+  },
+  "r20SecondHumanReview": {
+    "status": "FROZEN_REJECTED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+    "blobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+    "findingLedgerBlobSha": "c7d35adb3f980cae310a5f7051c77715e8f485a2",
+    "continuityRegisterBlobSha": "233364d5ca31265677fd3cd204f1d235f2866ca5",
     "b4004Held": true
   }
 }
