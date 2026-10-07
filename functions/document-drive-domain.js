@@ -300,7 +300,16 @@ async function authorizeDocument(request,previewOnly,mode){
   if(previewOnly===true&&!previewSyntheticTarget(target))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
   const fileId=clean(input.documentRef||input.fileId||input.archivoRef,180)||driveIdFromUrl(input.driveUrl||input.externalUrl||input.url||'');
   if(!/^[A-Za-z0-9_-]{20,}$/.test(fileId))throw new HttpsError('invalid-argument','Referencia documental inválida.');
-  const bound=new Set([...refsFrom(target.row),...refsFrom(target.management||{}),...refsFrom(target.business||{})]);
+  const businessHistory=[
+    ...(Array.isArray(target.business&&target.business.comentarios)?target.business.comentarios:[]),
+    ...(Array.isArray(target.business&&target.business.bitacora)?target.business.bitacora:[])
+  ];
+  const bound=new Set([
+    ...refsFrom(target.row),
+    ...refsFrom(target.management||{}),
+    ...refsFrom(target.business||{}),
+    ...businessHistory.flatMap(refsFrom)
+  ]);
   if(!bound.has(fileId))throw new HttpsError('permission-denied','El documento no pertenece al expediente autorizado.');
   return{tenantId,target,fileId};
 }
