@@ -979,7 +979,7 @@ Orbit.modules.aseguradoras = (function () {
       }
       return clean(v).replace(/_/g,' ');
     };
-    return '<details class="insurer-technical-registry" data-technical-registry="1" style="margin-top:14px"><summary>🧾 Detalle de fuentes y trazabilidad · '+rows.length+' fuente(s)</summary><div class="muted" style="font-size:11.5px;margin:6px 0 10px">Información secundaria de la fuente: clasificación, ubicación, origen, versión, vigencia e identificación del archivo.</div><div style="display:grid;gap:7px">'+rows.map(r=>{
+    return '<details class="insurer-technical-registry" data-technical-registry="1" style="margin-top:14px"><summary>📚 Fuentes y respaldo · '+rows.length+' fuente(s)</summary><div class="muted" style="font-size:11.5px;margin:6px 0 10px">Consulta cómo se clasificó cada archivo, dónde está guardado, su vigencia y su respaldo.</div><div style="display:grid;gap:7px">'+rows.map(r=>{
       const status=r.validationStatus||r.estado||'Documento recibido',dims=[r.pais,r.moneda,r.ramo,r.producto,r.plan].filter(Boolean);
       const provenance=human(r.provenance||r.sourceOrigin||r.origen||r.fuenteOrigen);
       const version=clean(r.version||r.sourceVersion||r.versión),validity=clean(r.vigencia||r.validFrom||r.fechaVigencia);
@@ -992,8 +992,8 @@ Orbit.modules.aseguradoras = (function () {
         ['Origen / trazabilidad',provenance||'No registrada'],
         ['Versión',version||'No registrada'],
         ['Vigencia',validity||'No registrada'],
-        ['Documento / referencia',docId||r.id||'No registrada'],
-        ['Huella',hash||'No registrada']
+        ['Archivo / referencia',r.nombre||docId||'No registrada'],
+        ['Integridad del archivo',hash?'Verificada':'Sin verificación registrada']
       ];
       const linkAction=editing&&r.sourceOrigin!=='Ficha'?'<button type="button" class="btn ghost sm" data-source-link="'+U.esc(r.id||r.documentId||r.sourceDocumentId||'')+'">Asociar a ficha</button>':'';
       return '<details class="asg-row insurer-source-card" data-source-registry-row="'+U.esc(r.id||'')+'" style="display:block;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0;overflow:hidden"><summary style="cursor:pointer;list-style:none;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>'+U.esc(r.nombre||'Fuente')+'</b><small class="muted" style="display:block">'+U.esc((r.taxonomyLabel||r.cat||'Otro/requiere clasificación')+' · '+label(r.storageKind)+' · '+(dims.join(' · ')||'Dimensiones pendientes'))+'</small></span><span class="badge '+(/validado/i.test(status)?'ok':'neutral')+'">'+U.esc(status)+'</span><span class="muted" style="font-size:11px">Ver detalles ▾</span></summary><div class="insurer-source-detail" data-source-registry-detail="'+U.esc(r.id||'')+'" style="border-top:1px solid var(--line);padding:10px 12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">'+extra.map(([k,v])=>'<div><small class="muted">'+U.esc(k)+'</small><div style="font-size:12px;overflow-wrap:anywhere">'+U.esc(human(v))+'</div></div>').join('')+( /^https:\/\/[^\s]+$/i.test(url)?'<div style="grid-column:1/-1"><a class="btn ghost sm" href="'+U.esc(url)+'" target="_blank" rel="noopener">Abrir / descargar fuente</a>'+linkAction+'</div>':(linkAction?'<div style="grid-column:1/-1">'+linkAction+'</div>':''))+'</div></details>';
@@ -1002,21 +1002,25 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ---- Documentos y Drive ---- */
   const CATS_DOC=Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels():['Otro/requiere clasificación'];
+  function canBrowseInsurerDossier(){
+    let role='';try{role=norm(Orbit.session&&Orbit.session.rol?Orbit.session.rol():'');}catch(e){}
+    return ['direccion','superadmin','super_admin','admin','admintenant','admin_tenant','operativo'].includes(role);
+  }
   function tabDocumentos(a, editing) {
-    const docs = a.docs || [], sources = knowledgeSources(a);
+    const docs = a.docs || [], sources = knowledgeSources(a), dossier=canBrowseInsurerDossier();
     return `<div class="asg-sec insurer-knowledge-section insurer-premium-section" data-knowledge-order="5-documents">
       <div class="insurer-premium-head">
-        <div style="display:flex;gap:12px;align-items:flex-start"><span class="insurer-premium-icon">📚</span><div><h3>Documentos y fuentes</h3><p>Archivos, formularios y conocimiento vinculados a esta aseguradora, organizados para revisión y uso operativo.</p></div></div>
-        ${editing ? '<button class="btn ghost sm" id="af-add-doc">+ Documento</button>' : ''}
+        <div style="display:flex;gap:12px;align-items:flex-start"><span class="insurer-premium-icon">📚</span><div><h3>Documentos y fuentes</h3><p><b>Aquí vive el expediente documental.</b> Dirección, Operaciones y Administración pueden navegar la carpeta Drive de la aseguradora; los asesores consumen únicamente fuentes ya clasificadas para productos y planes.</p></div></div>
       </div>
       <div class="insurer-premium-body">
-        <div class="insurer-knowledge-grid" style="margin:0 0 12px">
-          <div class="insurer-knowledge-card"><span style="flex:1;min-width:0"><b>Archivos en la ficha</b><small class="muted" style="display:block;margin-top:3px">Documentos físicos asociados directamente a esta aseguradora.</small></span><span class="badge ${docs.length?'ok':'neutral'}">${docs.length}</span></div>
-          <div class="insurer-knowledge-card"><span style="flex:1;min-width:0"><b>Fuentes relacionadas</b><small class="muted" style="display:block;margin-top:3px">Conocimiento disponible en Biblioteca, Drive o ambos.</small></span><span class="badge ${sources.length?'ok':'neutral'}">${sources.length}</span></div>
+        <div class="insurer-role-guide"><div><b>Expediente Drive</b><span>Archivo completo de la aseguradora según rol.</span></div><div><b>Clasificación</b><span>Cada fuente se vincula a ramo, producto y plan.</span></div><div><b>Uso posterior</b><span>Lo validado puede alimentar conocimiento; nunca activa cálculos por sí solo.</span></div></div>
+        ${dossier?'<section class="insurer-drive-panel" data-drive-browser="1"><div class="insurer-drive-head"><div><b>📁 Expediente Drive</b><span>Navega la carpeta vinculada sin salir de Gravicentra.</span></div><button type="button" class="btn ghost sm" data-drive-root disabled>Volver a raíz</button></div><div class="insurer-drive-path" data-drive-path>Cargando carpeta…</div><div class="insurer-drive-items" data-drive-items><div class="muted">Consultando Drive…</div></div><div class="insurer-drive-preview" data-drive-preview hidden></div></section>':'<div class="cfg-note"><b>Vista por rol:</b> el expediente Drive completo está reservado a Dirección, Operaciones y Administración. Tu vista conserva las fuentes comerciales ya clasificadas.</div>'}
+        <div class="insurer-knowledge-grid" style="margin:14px 0 12px">
+          <div class="insurer-knowledge-card"><span style="flex:1;min-width:0"><b>Fuentes clasificadas</b><small class="muted" style="display:block;margin-top:3px">Archivos ya relacionados con esta aseguradora y su uso.</small></span><span class="badge ${docs.length?'ok':'neutral'}">${docs.length}</span></div>
+          <div class="insurer-knowledge-card"><span style="flex:1;min-width:0"><b>Conocimiento relacionado</b><small class="muted" style="display:block;margin-top:3px">Fuentes disponibles para revisión y validación.</small></span><span class="badge ${sources.length?'ok':'neutral'}">${sources.length}</span></div>
         </div>
-        <div class="cfg-note" style="margin-bottom:12px"><b>Biblioteca de respaldo:</b> cada fuente conserva su origen, ubicación, huella de integridad y estado de validación. Cargar o validar un documento no habilita cálculos automáticamente.</div>
-        <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="cfg-note" data-drive-empty="1"><b>Sin archivos físicos cargados en Drive desde esta ficha.</b> Las fuentes de Biblioteca/conocimiento relacionadas se muestran abajo por separado.</div>'}</div>
-        ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc" style="margin-top:12px">📁 Cargar fuente</button>' : ''}
+        <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="cfg-note" data-drive-empty="1"><b>Aún no hay fuentes clasificadas en la ficha.</b> Puedes cargar una fuente o navegar el expediente Drive si tu rol lo permite.</div>'}</div>
+        ${canEdit() ? '<button class="btn primary sm" id="af-imp-doc" style="margin-top:12px">＋ Cargar y clasificar fuente</button>' : ''}
         ${sourceRegistryHtml(a,editing)}
       </div>
     </div>`;
@@ -1045,24 +1049,18 @@ Orbit.modules.aseguradoras = (function () {
     const resumen = resumenFuentes(a),grupos = resumenGrupos(a),ramos = a.ramos || [],id = a.id,state=knowledgeFilterState[id]||(knowledgeFilterState[id]={ramo:'',producto:''});
     const sourceRows=knowledgeSources(a),filterRamos=uniqueText(ramos.concat(sourceRows.map(x=>x.ramo))),filterProducts=uniqueText(sourceRows.filter(x=>!state.ramo||norm(x.ramo)===norm(state.ramo)).map(x=>x.producto)).sort((x,y)=>x.localeCompare(y,'es'));
     const filteredGroups=grupos.filter(g=>g.docs.some(x=>(!state.ramo||norm(x.ramo)===norm(state.ramo))&&(!state.producto||norm(x.producto)===norm(state.producto))));
+    const validatedSources=sourceRows.filter(x=>/validado/i.test(String(x.validationStatus||x.estado||''))).length,readyRamos=Object.keys(a.cotTasasValidadas||{}).filter(k=>a.cotTasasValidadas[k]===true).length;
     tarifaRamoSel[id] = tarifaRamoSel[id] || ramos[0] || '';
     const ramoSel = tarifaRamoSel[id],filter={ramo:state.ramo,producto:state.producto};
-    return `<div class="asg-sec insurer-knowledge-section insurer-premium-section" data-knowledge-order="1-summary"><div class="insurer-premium-head"><div style="display:flex;gap:12px"><span class="insurer-premium-icon">🧠</span><div><h3>Tarifas y conocimiento</h3><p>Fuentes, condiciones y reglas comerciales organizadas por producto. La evidencia queda separada de la habilitación del cotizador.</p></div></div></div><div class="insurer-premium-body">
-      <div class="asg-sec-t insurer-knowledge-title">Resumen de conocimiento</div>
-      <div class="cfg-note insurer-knowledge-intro" style="margin-bottom:9px"><b>Cómo leer esta sección:</b> una fuente puede estar <b>Clasificada</b>, <b>Validada</b> y, por separado, <b>Habilitada</b> para un cálculo. Cargar o validar un documento nunca activa automáticamente Cotizador ni Comparativo.</div>
+    return `<div class="asg-sec insurer-knowledge-section insurer-premium-section insurer-knowledge-workbench" data-knowledge-order="1-summary"><div class="insurer-premium-head"><div style="display:flex;gap:12px"><span class="insurer-premium-icon">🧠</span><div><h3>Tarifas y conocimiento</h3><p><b>Aquí no se cargan archivos.</b> Esta sección convierte fuentes ya clasificadas en condiciones, reglas y tarifas revisables. Solo lo validado explícitamente puede alimentar Cotizador o Comparativo.</p></div></div></div><div class="insurer-premium-body">
+      <div class="insurer-role-guide"><div><b>1 · Fuente</b><span>Se carga y clasifica en Documentos y fuentes.</span></div><div><b>2 · Conocimiento</b><span>Aquí se revisan condiciones y hechos extraídos.</span></div><div><b>3 · Habilitación</b><span>Una tarifa solo calcula después de validación expresa.</span></div></div>
+      <div class="insurer-knowledge-status-grid"><div><span>Fuentes disponibles</span><b>${sourceRows.length}</b><small>evidencia vinculada</small></div><div><span>Fuentes validadas</span><b>${validatedSources}</b><small>revisión confirmada</small></div><div class="ready"><span>Ramos listos para cálculo</span><b>${readyRamos}</b><small>habilitación explícita</small></div></div>
       <div class="insurer-filter-bar"><label>Ramo<select id="kf-ramo" class="o-sel">${selectOptions(filterRamos,state.ramo,'Todos')}</select></label><label>Producto<select id="kf-producto" class="o-sel">${selectOptions(filterProducts,state.producto,'Todos')}</select></label></div>
-      <div class="asg-tarifas-est" data-knowledge-order="3-sources">${Object.keys(resumen).filter(k => resumen[k] > 0).map(k => `<span class="badge ${k.indexOf('incompleto') >= 0 ? 'danger' : k.indexOf('Habilitado') === 0 ? 'ok' : 'neutral'}" style="font-size:10.5px">${k} (${resumen[k]})</span>`).join('') || '<span class="muted" style="font-size:12px">Sin fuentes cargadas todavía.</span>'}</div>
-      <div class="asg-sec-t" style="margin-top:14px" data-knowledge-order="2-products">Productos y ramos cubiertos</div>
-      <div class="insurer-knowledge-grid" data-knowledge-product-groups="1">
-        ${filteredGroups.map(g => `<div class="insurer-knowledge-card"><span style="flex:1;font-size:12px"><b>${U.esc(g.label)}</b><small class="muted" style="display:block;margin-top:3px">${g.docs.length} fuente(s) relacionadas</small></span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}">${g.estado}</span></div>`).join('') || '<div class="muted">Sin combinaciones para los filtros seleccionados.</div>'}
-      </div>
-      ${extraKnowledgeHtml(a,filter)}
-      ${knowledgeFactsHtml(a,filter)}
-      ${knowledgeRoadmapHtml(a)}
-      <div class="asg-sec-t" style="margin-top:16px" data-knowledge-order="4-tariffs">Tarifas y condiciones derivadas</div>
-      ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc2" style="margin-top:12px">📊 Cargar tarifario / Excel de cotizador</button>' : ''}
-      ${ramos.length ? tablaTasasRamo(a, ramoSel, editing) : '<div class="cfg-note" style="margin-top:12px">Agregá al menos un ramo en la pestaña Productos y planes para configurar su tabla de tasas automáticas.</div>'}</div>
-    </div>`;
+      <section class="insurer-knowledge-block"><div class="insurer-block-head"><div><span class="quality-eyebrow">Cobertura documental</span><h4>Productos con conocimiento disponible</h4><p>Resume qué productos tienen respaldo y cuáles todavía necesitan fuente o validación.</p></div></div><div class="insurer-knowledge-grid" data-knowledge-product-groups="1">${filteredGroups.map(g => `<div class="insurer-knowledge-card"><span style="flex:1;font-size:12px"><b>${U.esc(g.label)}</b><small class="muted" style="display:block;margin-top:3px">${g.docs.length} fuente(s) relacionadas</small></span><span class="badge ${g.estado === 'Conocimiento incompleto' ? 'danger' : g.estado === 'Habilitado' ? 'ok' : 'neutral'}">${g.estado}</span></div>`).join('') || '<div class="muted">Sin combinaciones para los filtros seleccionados.</div>'}</div></section>
+      <section class="insurer-knowledge-block"><div class="insurer-block-head"><div><span class="quality-eyebrow">Condiciones conocidas</span><h4>Reglas, hechos y vigencias</h4><p>Información derivada de fuentes; los vacíos permanecen pendientes en lugar de usar valores genéricos.</p></div></div>${extraKnowledgeHtml(a,filter)}${knowledgeFactsHtml(a,filter)}${knowledgeRoadmapHtml(a)}</section>
+      <section class="insurer-knowledge-block tariff-block"><div class="insurer-block-head"><div><span class="quality-eyebrow">Cotizador</span><h4>Tarifas y condiciones para cálculo</h4><p>Configura únicamente valores respaldados por una fuente y valida antes de habilitar el cálculo automático.</p></div></div>
+      ${ramos.length ? tablaTasasRamo(a, ramoSel, editing) : '<div class="cfg-note">Primero selecciona los ramos que comercializa la aseguradora en Productos, ramos y planes.</div>'}</section>
+    </div></div>`;
   }
   /* ---- Tabla de tasas automáticas del Cotizador, POR RAMO — sin esto, calcTasas() del Cotizador siempre queda bloqueado (nunca se usa un valor genérico) ---- */
   const tarifaRamoSel = {};
@@ -1105,15 +1103,18 @@ Orbit.modules.aseguradoras = (function () {
   /* ---- Actividad ---- */
   function tabActividad(a) {
     const hist=[].concat(a.actividad||[]).map(h=>Object.assign({kind:'ficha'},h));
+    const humanStatus=v=>/validado/i.test(v)?'Documento validado':/clasif/i.test(v)?'Documento clasificado':/recib/i.test(v)?'Documento recibido':'Documento actualizado';
+    const humanScope=v=>String(v||'').replace(/KNOWLEDGE_REFERENCE/gi,'Conocimiento de la aseguradora').replace(/_/g,' ').replace(/\s+/g,' ').trim();
     const sourceEvents=knowledgeSources(a).map(r=>{
-      const status=r.validationStatus||r.estado||'Fuente registrada',fecha=r.validatedAt||r.updatedAt||r.createdAt||r.fecha||'';
-      return {kind:'fuente',cambio:'Fuente · '+status,responsable:r.actor||r.responsable||'Registry',fecha,motivo:r.nombre||r.documentId||r.id||'Fuente documental',camposCambiados:[r.taxonomyLabel||r.cat||'clasificación',r.storageKind||'ubicación'].filter(Boolean)};
+      const status=String(r.validationStatus||r.estado||'Documento registrado'),fecha=r.validatedAt||r.updatedAt||r.createdAt||r.fecha||'';
+      const responsible=String(r.actor||r.responsable||'Sistema documental').replace(/^Registry$/i,'Sistema documental');
+      return {kind:'fuente',cambio:humanStatus(status),responsable:responsible,fecha,motivo:r.nombre||'Documento de la aseguradora',camposCambiados:[r.taxonomyLabel||r.cat||'Clasificación pendiente',[r.pais,r.ramo,r.producto,r.plan].filter(Boolean).join(' · ')].filter(Boolean).map(humanScope)};
     });
     const rows=hist.concat(sourceEvents).sort((x,y)=>String(y.fecha||'').localeCompare(String(x.fecha||'')));
     return `<div class="asg-sec insurer-knowledge-section" data-knowledge-order="7-activity">
       <div class="asg-sec-t">🕒 Actividad y auditoría</div>
-      <div class="cfg-note" style="margin-bottom:9px"><b>Historia unificada:</b> combina cambios guardados en la ficha y el ciclo documental visible del Registry. Consultar una fuente no genera actividad; cargar, mapear o validar sí debe quedar trazable.</div>
-      ${rows.length ? rows.map(h => {const type=h.kind==='fuente'?'Documento':'Ficha',icon=h.kind==='fuente'?'📄':'✏️',tone=h.kind==='fuente'?'info':'neutral';return `<div class="insurer-activity-row ${h.kind==='fuente'?'documental':''}"><div class="insurer-activity-head"><span class="insurer-activity-icon">${icon}</span><b>${U.esc(h.cambio || 'Actualización')}</b><span class="badge ${tone}">${type}</span><span class="muted insurer-activity-time">${h.fecha ? new Date(h.fecha).toLocaleString() : 'fecha no registrada'}</span></div><div class="muted">Responsable: ${U.esc(h.responsable || 'equipo')}</div>${h.motivo ? '<div class="muted">Referencia: ' + U.esc(h.motivo) + '</div>' : ''}${h.camposCambiados ? '<div class="muted">Ámbito: ' + h.camposCambiados.map(U.esc).join(' · ') + '</div>' : ''}</div>`;}).join('') : '<div class="muted" style="font-size:12px">Sin actividad registrada.</div>'}
+      <div class="cfg-note" style="margin-bottom:9px"><b>Qué ocurrió y quién lo hizo:</b> aquí se registran cambios de la ficha y acciones documentales que modifican información. Consultar un archivo no crea una actividad nueva.</div>
+      ${rows.length ? rows.map(h => {const type=h.kind==='fuente'?'Documento':'Ficha',icon=h.kind==='fuente'?'📄':'✏️',tone=h.kind==='fuente'?'info':'neutral';const changed=[].concat(h.camposCambiados||[]).map(humanScope).filter(Boolean);return `<div class="insurer-activity-row ${h.kind==='fuente'?'documental':''}"><div class="insurer-activity-head"><span class="insurer-activity-icon">${icon}</span><b>${U.esc(humanScope(h.cambio||'Actualización'))}</b><span class="badge ${tone}">${type}</span><span class="muted insurer-activity-time">${h.fecha ? new Date(h.fecha).toLocaleString('es-GT') : 'Fecha no registrada'}</span></div><div class="muted">Hecho por: ${U.esc(humanScope(h.responsable||'Equipo'))}</div>${h.motivo ? '<div class="muted">Documento / motivo: ' + U.esc(humanScope(h.motivo)) + '</div>' : ''}${changed.length ? '<div class="muted">Se actualizó: ' + changed.map(U.esc).join(' · ') + '</div>' : ''}</div>`;}).join('') : '<div class="muted" style="font-size:12px">Sin actividad registrada.</div>'}
     </div>`;
   }
 
@@ -1136,6 +1137,25 @@ Orbit.modules.aseguradoras = (function () {
         const url = URL.createObjectURL(file); preview.innerHTML = '<img src="'+url+'" alt="Vista previa del logo" style="max-width:180px;max-height:70px;object-fit:contain">'; const img=preview.querySelector('img'); if(img)img.addEventListener('load',()=>URL.revokeObjectURL(url),{once:true});
       });
     }
+    const driveBrowser=body.querySelector('[data-drive-browser]');
+    if(driveBrowser){
+      const provider=Orbit.productDriveDocumentProviderP0,itemsHost=driveBrowser.querySelector('[data-drive-items]'),pathHost=driveBrowser.querySelector('[data-drive-path]'),previewHost=driveBrowser.querySelector('[data-drive-preview]'),rootBtn=driveBrowser.querySelector('[data-drive-root]');
+      let rootFolder='';
+      const esc=U.esc;
+      const renderFolder=async(folderId)=>{
+        if(!provider||typeof provider.listFolder!=='function'){itemsHost.innerHTML='<div class="cfg-note">Drive no está disponible en este momento.</div>';return;}
+        itemsHost.innerHTML='<div class="muted">Consultando carpeta…</div>';previewHost.hidden=true;previewHost.innerHTML='';
+        const out=await provider.listFolder({entidad:'aseguradora',entidadId:id,insurerId:id,folderId:folderId||'',sourceModule:'aseguradoras'});
+        if(!out||out.ok!==true){itemsHost.innerHTML='<div class="cfg-note"><b>No fue posible abrir el expediente Drive.</b> '+esc(out&&out.message||'Revisa la conexión o los permisos del rol.')+'</div>';return;}
+        if(out.folderLinked===false){pathHost.textContent='Sin carpeta Drive vinculada todavía.';itemsHost.innerHTML='<div class="cfg-note">Al cargar la primera fuente se creará o vinculará la carpeta documental de esta aseguradora.</div>';return;}
+        rootFolder=out.rootFolderId||rootFolder;pathHost.textContent='Carpeta: '+(out.folderName||'Expediente');if(rootBtn){rootBtn.disabled=!rootFolder||out.currentFolderId===rootFolder;rootBtn.onclick=()=>renderFolder(rootFolder);}
+        const rows=[].concat(out.items||[]);itemsHost.innerHTML=rows.length?rows.map(x=>'<button type="button" class="insurer-drive-item '+(x.kind==='folder'?'folder':'file')+'" '+(x.kind==='folder'?'data-drive-folder="'+esc(x.folderId||x.id)+'"':'data-drive-file="'+esc(x.documentRef||x.id)+'"')+'><span class="insurer-drive-item-icon">'+(x.kind==='folder'?'📁':'📄')+'</span><span><b>'+esc(x.name||'Documento')+'</b><small>'+esc(x.kind==='folder'?'Carpeta':x.mimeType||'Archivo')+'</small></span><span>›</span></button>').join(''):'<div class="muted">La carpeta está vacía.</div>';
+        itemsHost.querySelectorAll('[data-drive-folder]').forEach(btn=>btn.onclick=()=>renderFolder(btn.dataset.driveFolder));
+        itemsHost.querySelectorAll('[data-drive-file]').forEach(btn=>btn.onclick=async()=>{btn.disabled=true;const outFile=await provider.resolveDossier(btn.dataset.driveFile,{entidad:'aseguradora',entidadId:id,insurerId:id,sourceModule:'aseguradoras'});btn.disabled=false;if(!outFile||outFile.ok!==true)return U.toast('No fue posible abrir el documento.');previewHost.hidden=false;const name=esc(outFile.nombre||'Documento');if(outFile.previewUrl){previewHost.innerHTML='<div class="insurer-drive-preview-head"><b>'+name+'</b><button type="button" class="btn ghost sm" data-close-preview>Cerrar vista</button></div>'+(String(outFile.mimeType||'').startsWith('image/')?'<img src="'+outFile.previewUrl+'" alt="'+name+'">':'<iframe src="'+outFile.previewUrl+'" title="'+name+'"></iframe>');}else{previewHost.innerHTML='<div class="insurer-drive-preview-head"><b>'+name+'</b></div><div class="cfg-note">Este formato no tiene vista previa integrada.<br><a class="btn ghost sm" data-dossier-download href="'+esc(outFile.downloadUrl||'')+'" download="'+name+'">Descargar archivo</a></div>';}const close=previewHost.querySelector('[data-close-preview]');if(close)close.onclick=()=>{previewHost.hidden=true;previewHost.innerHTML='';};previewHost.scrollIntoView({behavior:'smooth',block:'nearest'});});
+      };
+      renderFolder('').catch(()=>{itemsHost.innerHTML='<div class="cfg-note">No fue posible consultar Drive.</div>';});
+    }
+
     const openInsurerSource = (intent, category) => {
       if (!canEdit()) return;
       const liveRow = S().get('aseguradoras', id) || data || {};
