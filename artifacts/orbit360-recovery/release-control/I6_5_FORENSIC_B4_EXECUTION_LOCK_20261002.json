@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-05T11:24:00-06:00",
-  "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+  "status": "B4_003_R20_SECOND_REVIEW_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+    "status": "B4_003_R20_SECOND_REVIEW_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "blocking": true,
-    "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
+    "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX",
     "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
     "knowledgePreview": true
   },
@@ -106,7 +106,7 @@
     "authorizedDataMutation": "Only exact R20 renewability target set bound to dry-run digests; fields renewable/provenance/rule only; max 1415 writes; automatic rollback on failure.",
     "renewabilityApplyRepeatAuthorized": false
   },
-  "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
+  "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "edce8dfcaed778bfd2c8e191683f611167d15ae5"
@@ -649,7 +649,7 @@
     "carryBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
     "masterPlanBlobSha": "64f9b11ade950b4c2734265d2c6b3ecfed3a6976"
   },
-  "productMutationAuthorized": false,
+  "productMutationAuthorized": true,
   "dataMutationAuthorized": false,
   "reimportAuthorized": false,
   "livePromotionAuthorized": false,
@@ -896,5 +896,12 @@
     "masterPlanBlobSha": "dfd562bd4afa72200bd9cbad8ce86056f30bcfed",
     "compositionBlobSha": "1de25e0265ddb3f5cec594328a8a7f2386ab9d20",
     "b4004Held": true
+  },
+  "r20SecondReviewDiagnostic": {
+    "status": "AUTHORIZED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_CAUSAL_DIAGNOSTIC_20261007.json",
+    "blobSha": "5ba6a95204fdc86e9fe5083ecabe61ca99a057ae",
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false
   }
 }
