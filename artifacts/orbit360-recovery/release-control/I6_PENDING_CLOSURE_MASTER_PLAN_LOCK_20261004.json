@@ -6220,7 +6220,7 @@
     "attentionCount": 103,
     "registerSetMustEqualLedgerSet": true,
     "latestLedgerBlobSha": "0dfaa45d2ed9524044bed523386926039dfbd653",
-    "latestCarryBlobSha": "1bba67d5e4047d76fc1b6f8eca5bbf0681ad9328"
+    "latestCarryBlobSha": "ad92f13d76d4ce422b4fd5c5d46ed6251bfcb595"
   },
   "dataProtection": {
     "alreadyAppliedDoNotRepeat": [
@@ -6590,7 +6590,8 @@
   "r20SecondReviewDataDryRuns": {
     "status": "PASS_PENDING_WRITE_AUTHORIZATION",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_20261007.json",
-    "blobSha": "65f48ab5decb113f6551d5b0f68f994ff00fe7a4"
+    "blobSha": "65f48ab5decb113f6551d5b0f68f994ff00fe7a4",
+    "continuityRegisterBlobSha": "ad92f13d76d4ce422b4fd5c5d46ed6251bfcb595"
   },
   "liveReleaseBindingDrift": {
     "status": "BLOCKS_PRODUCTION_PROMOTION",
