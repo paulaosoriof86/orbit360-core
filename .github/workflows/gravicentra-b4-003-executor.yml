@@ -19,6 +19,8 @@ on:
       - 'tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs'
       - 'tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs'
       - 'tools/gravicentra-i6-5-b4-003-r20-renewability-rule.mjs'
+      - 'tools/gravicentra-i6-5-b4-003-r20-country-backfill-dryrun.mjs'
+      - 'tools/gravicentra-i6-5-b4-003-r20-renewal-cutoff-dryrun.mjs'
       - 'tools/gravicentra-quote-authority-contract-v1.mjs'
       - 'orbit360-platform/core/quote-authority-contract-v1.js'
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
@@ -91,6 +93,14 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===false
             && l.boundaries?.reimportAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
+          const secondReviewDryRun=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX'
+            && c.currentB4?.status==='B4_003_R20_SECOND_REVIEW_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED'
+            && c.i65ForensicRemediationPlan?.b4?.status==='B4_003_R20_SECOND_REVIEW_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED'
+            && l.status==='B4_003_R20_SECOND_REVIEW_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
           const r20DryRun=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWABILITY_DRY_RUN_AND_SOURCE_FIX'
             && c.currentB4?.status==='B4_003_R20_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED_DATA_READONLY'
             && c.i65ForensicRemediationPlan?.b4?.status==='B4_003_R20_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED_DATA_READONLY'
@@ -129,9 +139,72 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'apply='+(applyOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_dryrun='+(r20DryRun?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_apply='+(r20Apply?'true':'false')+'\n');
-          console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP')+' R20_APPLY_MODE='+(r20Apply?'RUN':'NOOP'));
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_second_dryrun='+(secondReviewDryRun?'true':'false')+'\n');
+          console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP')+' R20_APPLY_MODE='+(r20Apply?'RUN':'NOOP')+' R20_SECOND_DRYRUN='+(secondReviewDryRun?'RUN':'NOOP'));
           NODE
 
+
+      - name: Assert LIVE unchanged before second R20 review dry-runs
+        if: steps.gate.outputs.r20_second_dryrun == 'true'
+        run: node tools/gravicentra-certified-live-binding-check.mjs
+
+      - name: Prepare second R20 review read-only dry-runs and source syntax checks
+        if: steps.gate.outputs.r20_second_dryrun == 'true'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b4-003-r20-second-dryrun-auth"
+          mkdir -p "$ROOT"
+          export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json'
+                  p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('B4_003_R20_SECOND_DRYRUN_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          SEL=$(head -n1 "$ROOT/files")
+          cp "$SEL" "$RUNNER_TEMP/b4-003-r20-second-dryrun-sa.json"
+          chmod 600 "$RUNNER_TEMP/b4-003-r20-second-dryrun-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4-003-r20-second-dryrun-sa.json" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+          node --check tools/gravicentra-i6-5-b4-003-r20-country-backfill-dryrun.mjs
+          node --check tools/gravicentra-i6-5-b4-003-r20-renewal-cutoff-dryrun.mjs
+          node --check orbit360-platform/core/product-app-p0.js
+          node --check orbit360-platform/core/ciclo.js
+          node --check orbit360-platform/modules/ops.js
+          node --check orbit360-platform/modules/leads.js
+          node --check orbit360-platform/core/importa.js
+          node --check orbit360-platform/core/product-drive-document-provider-p0.js
+          node --check orbit360-platform/modules/aseguradoras.js
+          node --check orbit360-platform/modules/calidad.js
+          node --check orbit360-platform/modules/configuracion.js
+          node --check orbit360-platform/core/config.js
+
+      - name: Execute second R20 review read-only data dry-runs
+        if: steps.gate.outputs.r20_second_dryrun == 'true'
+        env:
+          R20_COUNTRY_BACKFILL_RESULT: ${{ runner.temp }}/b4-003-r20-country-backfill-dryrun.json
+          R20_RENEWAL_CUTOFF_RESULT: ${{ runner.temp }}/b4-003-r20-renewal-cutoff-dryrun.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-003-r20-country-backfill-dryrun.mjs
+          node tools/gravicentra-i6-5-b4-003-r20-renewal-cutoff-dryrun.mjs
+
+      - name: Upload second R20 review dry-run evidence
+        if: always() && steps.gate.outputs.r20_second_dryrun == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: b4-003-r20-second-review-dryruns-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b4-003-r20-country-backfill-dryrun.json
+            ${{ runner.temp }}/b4-003-r20-renewal-cutoff-dryrun.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Assert LIVE unchanged before R20 renewability dry-run
         if: steps.gate.outputs.r20_dryrun == 'true'
