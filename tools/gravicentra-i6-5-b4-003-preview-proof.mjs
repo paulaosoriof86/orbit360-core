@@ -163,6 +163,30 @@ async function inboxStateFor(browser,who,noticeId,action){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});return await p.evaluate(async({token,tenantId,activeRole,noticeId,action})=>{const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);return await provider.callFunction('orbit360UpdateAdvisorOpsInboxStatePreview',{tenantId,activeRole,noticeId,action},'us-east1');},{token,tenantId,activeRole:who.activeRole,noticeId,action});}finally{await ctx.close();}
 }
+async function inboxUiFor(browser,who,eventId,expectedSurface,markAttended){
+ const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
+ try{
+  await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
+  await p.evaluate(()=>document.dispatchEvent(new CustomEvent('orbit:session',{detail:{source:'b4003qa'}})));
+  if(expectedSurface)await p.waitForFunction(surface=>location.hash==='#/'+surface,expectedSurface,{timeout:10000});
+  const landingHash=await p.evaluate(()=>location.hash);
+  await p.click('#ops-inbox-bell');
+  await p.waitForSelector('#ops-inbox-drawer.open',{timeout:10000});
+  const selector='[data-notice-event="'+eventId.replace(/"/g,'')+'"]';
+  await p.waitForSelector(selector,{timeout:10000});
+  const header=await p.evaluate(sel=>{const d=document.getElementById('ops-inbox-drawer'),count=d?.querySelector('.inbox-active-count'),r=count?.getBoundingClientRect();return{countText:String(count?.innerText||'').replace(/\s+/g,' ').trim(),countLeft:r?.left||0,drawerLeft:d?.getBoundingClientRect().left||0,drawerWidth:d?.getBoundingClientRect().width||0};},selector);
+  let pendingSeen=false;
+  if(markAttended){
+    const btnSel=selector+' [data-inbox-attend]';
+    await p.click(btnSel);
+    pendingSeen=await p.waitForFunction(sel=>/Marcando/.test(String(document.querySelector(sel)?.textContent||'')),btnSel,{timeout:2000}).then(()=>true).catch(()=>false);
+    await p.waitForFunction(id=>{const row=document.querySelector('[data-notice-event="'+id+'"]');return !!row&&/Atendida/.test(String(row.innerText||''));},eventId,{timeout:15000});
+  }
+  const final=await p.evaluate(id=>{const row=document.querySelector('[data-notice-event="'+id+'"]');return{present:!!row,text:String(row?.innerText||'').replace(/\s+/g,' ').trim()};},eventId);
+  return{landingHash,expectedSurface,header,pendingSeen,final};
+ }finally{await ctx.close();}
+}
+
 async function collaborationFor(browser,who,businessId,type,message,withAttachment=false){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{
