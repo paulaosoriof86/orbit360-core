@@ -1,0 +1,37 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_CAUSAL_AUTH_V1",
+  "recordedAt": "2026-10-06T21:42:00-06:00",
+  "status": "CAUSE_DEMONSTRATED_NARROW_INSURER_VISUAL_ROOTFIX_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "failedRunId": 37561015481,
+  "failedJobId": 112598380538,
+  "failedHead": "df482cb7f3f47145f20e90afe6177bd7c275a39b",
+  "failureCode": "B4_003_R20_INSURER_TECHNICAL_TERMS_VISIBLE",
+  "hostingReadback": "PASS",
+  "rootCause": "Aseguradoras > Documentos y Drive still renders backend-oriented vocabulary (metadata/hash/provenance) in the human surface and the Documentos tab is not composed as a perceptible premium section, despite existing premium primitives. The authenticated browser proof correctly rejected the rendered UI.",
+  "findings": [
+    "B4-003-R20-B05",
+    "B4-003-R20-B06",
+    "B4-003-R20-B08"
+  ],
+  "allowedProductFiles": [
+    "orbit360-platform/modules/aseguradoras.js"
+  ],
+  "allowedQaFiles": [],
+  "proofPolicy": {
+    "weakenAssertionForbidden": true,
+    "preserveAuthenticatedBrowserProof": true,
+    "requireHumanLanguage": true,
+    "requirePerceptiblePremiumHierarchy": true
+  },
+  "boundaries": {
+    "dataMutation": false,
+    "operationalBusinessWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "repeatRenewabilityApply": false,
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX"
+}
