@@ -2809,7 +2809,7 @@
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "continuityRegisterBlobSha": "b60bd116916026fe056e87fa7f25d10cb63513c1",
+  "continuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
   "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "b4003R15VisualReview": {
@@ -3509,6 +3509,13 @@
   "r20FollowupCompositionBinding": {
     "status": "ROOTFIXED",
     "productBlobBindingsUpdated": 15,
+    "productSourceChanged": false,
+    "dataMutation": false
+  },
+  "r20FollowupContinuityAlignment": {
+    "status": "PASS_PENDING_RECHECK",
+    "continuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
+    "findingLedgerBlobSha": "35105b099e4a33be237149071c2d1e95b3396ff0",
     "productSourceChanged": false,
     "dataMutation": false
   }
