@@ -347,10 +347,6 @@ const S506_OVERRIDE_SCRIPT=`
 function html(){
   let h=S501.html();
   h=h.replace('</style>',CSS+'</style>');
-  h=h.replace(
-    '<div class="s501-channel-grid">',
-    registrationCard('advisor')+'<div class="s501-channel-grid">'
-  );
   h=h.replace('</body>',s506ModalHtml()+'<template id="s506TerminalTemplate">'+registrationCard('terminal')+'</template>'+SCRIPT+S506_OVERRIDE_SCRIPT+'</body>');
   h=h.replace('Owner Review S5.00','Owner Review S5.06');
   return h;
