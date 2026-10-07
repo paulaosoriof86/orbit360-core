@@ -1,0 +1,61 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_V1",
+  "recordedAt": "2026-10-07T10:20:40-06:00",
+  "status": "PASS_DRY_RUN_DATA_WRITES_NOT_AUTHORIZED",
+  "runId": 37651200860,
+  "headSha": "0810f673060c15392bd33309d0261128aa0de822",
+  "boundaries": {
+    "readOnly": true,
+    "writes": 0,
+    "dataMutationAuthorized": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4004Held": true
+  },
+  "countryBackfill": {
+    "status": "PASS_DRY_RUN",
+    "clients": 442,
+    "validCountry": 436,
+    "pendingCountry": 6,
+    "candidates": 5,
+    "conflicts": 0,
+    "noEvidence": 1,
+    "proposedGT": 1,
+    "proposedCO": 4,
+    "evidenceBasis": {
+      "policy": 5,
+      "insurer": 5,
+      "financial": 0
+    },
+    "targetDigest": "676c157a246cc1b03acaeed4888b6dd96bed8fbc3cba0367cabe27ff393a6c43",
+    "conflictDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "decision": "Five records are deterministically resolvable from consistent linked policy+insurer country. One remains held because no sufficient evidence exists. No phone-prefix inference was used."
+  },
+  "renewalCutoff": {
+    "status": "PASS_DRY_RUN",
+    "policyCount": 1419,
+    "expired": 1157,
+    "oldExpiredOpenCandidates": 583,
+    "recentExpiredOpenCandidates": 24,
+    "cancelled": 460,
+    "explicitNonRenewable": 90,
+    "invalidDate": 0,
+    "recentByMonth": {
+      "2026-08": 9,
+      "2026-09": 11,
+      "2026-10": 4
+    },
+    "oldTargetDigest": "744f6f26139f272fa3a26ab35e889a9d011833e802d1495286147734ec7b4d1d",
+    "recentDigest": "3512b167cdde30b51f67acc3c77135f2a94df5f133fd2d3b45cde8540938e67a",
+    "proposedRule": "vigenciaFin <= 2026-07-31 and no renewal/cancellation/terminal outcome => No renovada. Expired 2026-08-01 through 2026-10-06 with no terminal outcome => remain in Vencidas pipeline."
+  },
+  "liveDrift": {
+    "status": "PREEXISTING_CERTIFIED_BINDING_DRIFT_UNCHANGED_DURING_DRYRUNS",
+    "fingerprintBefore": "b1d3909e9013d4b166171cedbbdbf44261dc10e5c77af1a4675fa51bf8124082",
+    "fingerprintAfter": "b1d3909e9013d4b166171cedbbdbf44261dc10e5c77af1a4675fa51bf8124082",
+    "certifiedBindingMismatch": true,
+    "historicalEvidence": "Run 35416730679 cloned the I6.5 preview channel to live and read back 209 files on 2026-09-19. Current public live content no longer matches that certified binding.",
+    "consequence": "Blocks any production promotion until release lineage is reconciled. Does not authorize or require a live mutation during B4-003 Preview remediation."
+  },
+  "nextAction": "SOURCE_PREVIEW_AND_TINYFISH_QA_BEFORE_DATA_WRITE_AUTHORIZATION"
+}
