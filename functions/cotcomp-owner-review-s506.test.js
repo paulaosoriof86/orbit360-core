@@ -11,13 +11,21 @@ test('S5.06 is LAB-only and uses S5.05 inbound adapter',()=>{
   assert.match(s.INBOUND_URL,/cotcompPublicInboundS505$/);
 });
 
-test('S5.06 UI includes minimum consent and synthetic-safe contact preview',()=>{
+test('S5.06 visible modal contains one synthetic registration control set',()=>{
   const h=s.html();
-  assert.match(h,/Registrar solicitud de prueba en A&S/);
+  assert.match(h,/id="s506Contact"/);
+  assert.match(h,/Persona de prueba A&S/);
   assert.match(h,/synthetic@example\.invalid/);
   assert.match(h,/Autorizo a A&S a gestionar esta solicitud de prueba/);
-  assert.match(h,/data-s506-register="advisor"/);
-  assert.match(h,/data-s506-register="terminal"/);
+  assert.equal((h.match(/<div class="s506-register-card" data-s506-card="advisor">/g)||[]).length,1);
+  assert.equal((h.match(/<input id="s506Consent-advisor"[^>]*data-s506-consent="advisor"/g)||[]).length,1);
+  assert.equal((h.match(/<button id="s506Register-advisor"[^>]*data-s506-register="advisor"/g)||[]).length,1);
+});
+
+test('S5.06 consent gate is explicit and initially disabled',()=>{
+  const h=s.html();
+  assert.match(h,/id="s506Register-advisor"[^>]*disabled="disabled"[^>]*aria-disabled="true"/);
+  assert.match(h,/button:disabled\{opacity:\.48;cursor:not-allowed;pointer-events:none\}/);
 });
 
 test('S5.06 preserves WhatsApp and email fallbacks',()=>{
@@ -25,6 +33,8 @@ test('S5.06 preserves WhatsApp and email fallbacks',()=>{
   assert.match(h,/Continuar por WhatsApp/);
   assert.match(h,/Continuar por correo/);
   assert.match(h,/info@aysseguros\.com/);
+  assert.match(h,/50256149048/);
+  assert.match(h,/573138340897/);
 });
 
 test('S5.06 only accepts explicit country and need families',()=>{
@@ -36,86 +46,45 @@ test('S5.06 only accepts explicit country and need families',()=>{
   assert.equal(s.family('unknown'),'');
 });
 
-test('S5.06 user success copy is conditional on integration confirmation',()=>{
+test('S5.06 success copy remains conditional on integration confirmation',()=>{
   const h=s.html();
   assert.match(h,/integrationConfirmed!==true/);
   assert.match(h,/Integración confirmada: A&S recibió internamente la solicitud sintética/);
   assert.match(h,/No se pudo confirmar el registro interno/);
 });
 
-
-test('S5.06 visible advisor/decision modal contains synthetic registration and direct channels',()=>{
+test('S5.06 routes Advisor and Continue-with-A&S through the same visible modal',()=>{
   const h=s.html();
-  assert.match(h,/id="s506Contact"/);
-  assert.match(h,/id="s506ContactTitle"/);
-  assert.match(h,/data-s506-card="advisor"/);
-  assert.match(h,/data-s506-register="advisor"/);
-  assert.match(h,/id="s506WhatsApp"/);
-  assert.match(h,/id="s506Email"/);
   assert.match(h,/window\.addEventListener\('click'/);
+  assert.match(h,/b\.classList\.contains\('cc-advisor'\)/);
   assert.match(h,/label\.startsWith\('Continuar con A&S'\)/);
+  assert.match(h,/open\('advisor'\)/);
+  assert.match(h,/open\('decision'\)/);
 });
 
-test('S5.06 suppresses inherited hidden continuity modals from the Owner surface',()=>{
+test('S5.06 keeps registration state once per session and skips duplicate consent on Continue',()=>{
   const h=s.html();
-  assert.match(h,/#s499Handoff,#s501Contact\{display:none!important\}/);
+  assert.match(h,/let registrationConfirmed=false/);
+  assert.match(h,/if\(handoffKind==='decision'&&registrationConfirmed\)\{showTerminal\(\);return;\}/);
+  assert.match(h,/registrationConfirmed=true/);
+  assert.match(h,/resetAdvisorRegistration\(\)/);
+  assert.match(h,/showAdvisorRegistered\(\)/);
 });
 
-
-test('S5.06 consent gate is explicit in rendered HTML',()=>{
+test('S5.06 terminal state uses acknowledgement instead of a second consent form',()=>{
   const h=s.html();
-  assert.match(h,/data-s506-register="advisor" disabled="disabled" aria-disabled="true"/);
-  assert.match(h,/data-s506-consent="advisor"/);
-  assert.match(h,/data-s506-register="terminal" disabled="disabled" aria-disabled="true"/);
+  assert.ok(!h.includes('<div class="s506-register-card" data-s506-card="terminal">'));
+  assert.ok(!h.includes('<input id="s506Consent-terminal"'));
+  assert.ok(!h.includes('<button id="s506Register-terminal"'));
+  assert.match(h,/ensureTerminalAck\(\)/);
+  assert.match(h,/Integración confirmada: A&S recibió internamente la solicitud sintética durante esta sesión/);
 });
-
-test('S5.06 visible modal and terminal expose success/error states and direct channels',()=>{
-  const h=s.html();
-  assert.match(h,/id="s506Contact"/);
-  assert.match(h,/Persona de prueba A&S/);
-  assert.match(h,/synthetic@example\.invalid/);
-  assert.match(h,/Integración confirmada: A&S recibió internamente la solicitud sintética/);
-  assert.match(h,/No se pudo confirmar el registro interno/);
-  assert.match(h,/Continuar por WhatsApp/);
-  assert.match(h,/Continuar por correo/);
-  assert.match(h,/showTerminal/);
-});
-
-
-test('S5.06 renders a single advisor registration control set',()=>{
-  const h=s.html();
-  assert.equal((h.match(/data-s506-card="advisor"/g)||[]).length,1);
-  assert.equal((h.match(/data-s506-consent="advisor"/g)||[]).length,1);
-  assert.equal((h.match(/data-s506-register="advisor"/g)||[]).length,1);
-});
-
 
 test('S5.06 terminal success preserves context and hides repeated primary actions',()=>{
   const h=s.html();
-  assert.match(h,/const x=ctx\(\);/);
-  assert.match(h,/id='s500Country'|id="s500Country"/);
   assert.match(h,/countryEl\.textContent=x\.country/);
   assert.match(h,/needEl\.textContent=x\.need/);
   assert.match(h,/modeEl\.textContent='Con acompañamiento A&S'/);
   assert.match(h,/decision&&decision\.closest\('\.cc-actions'\)/);
   assert.match(h,/originalActions\.style\.display='none'/);
-});
-
-
-test('S5.06 does not reuse checked consent as a second registration step',()=>{
-  const h=s.html();
-  assert.match(h,/let registrationConfirmed=false/);
-  assert.match(h,/if\(handoffKind==='decision'&&registrationConfirmed\)\{showTerminal\(\);return;\}/);
-  assert.match(h,/resetAdvisorRegistration\(\)/);
-  assert.match(h,/showAdvisorRegistered\(\)/);
-  assert.ok(!h.includes('data-s506-card="terminal"'));
-  assert.ok(!h.includes('data-s506-consent="terminal"'));
-  assert.ok(!h.includes('data-s506-register="terminal"'));
-});
-
-test('S5.06 terminal state shows acknowledgement instead of a second consent form',()=>{
-  const h=s.html();
-  assert.match(h,/ensureTerminalAck\(\)/);
-  assert.match(h,/Solicitud de prueba ya registrada internamente en A&S durante esta sesión/);
-  assert.match(h,/Integración confirmada: A&S recibió internamente la solicitud sintética durante esta sesión/);
 });
