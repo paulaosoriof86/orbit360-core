@@ -1,0 +1,186 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_CAUSAL_DIAGNOSTIC_V1",
+  "recordedAt": "2026-10-07T08:28:00-06:00",
+  "status": "CAUSES_DEMONSTRATED_CUMULATIVE_SOURCE_FIX_AUTHORIZED_DATA_LANES_SEPARATE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authority": {
+    "humanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+    "humanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31"
+  },
+  "demonstrated": [
+    {
+      "area": "Startup landing",
+      "cause": "product-app preferredLanding() returns Leads whenever advisorId exists before checking Dirección/Operativo/Admin roles; it does not inspect the pending notification target.",
+      "owners": [
+        "orbit360-platform/core/product-app-p0.js",
+        "orbit360-platform/index.html"
+      ]
+    },
+    {
+      "area": "Ops/Leads action rank",
+      "cause": "cardNegocio uses the last collaboration comment's historical sequence number, so #4 can display when only one action is currently actionable.",
+      "owners": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/modules/ops.js",
+        "orbit360-platform/modules/leads.js"
+      ]
+    },
+    {
+      "area": "Ops/Leads card latency",
+      "cause": "openNegocio awaits Orbit.cat.ensure() before constructing the modal, blocking first paint on catalog/network readiness.",
+      "owners": [
+        "orbit360-platform/core/ciclo.js"
+      ]
+    },
+    {
+      "area": "Inbox state UX",
+      "cause": "UI disables buttons but gives no pending label/toast until backend update + full refresh + drawer repaint completes.",
+      "owners": [
+        "orbit360-platform/index.html",
+        "functions/ops-advisor-inbox.js"
+      ]
+    },
+    {
+      "area": "Collaboration identity",
+      "cause": "New backend writes are canonicalized to member display name, but historical comments retain role strings; UI has no human fallback/migration label and comments visually mix with business-save semantics.",
+      "owners": [
+        "functions/product-ops-leads-domain.js",
+        "orbit360-platform/core/ciclo.js"
+      ]
+    },
+    {
+      "area": "Preview collaboration UAT",
+      "cause": "Real operational businesses are intentionally immutable in Preview; a discoverable disposable human fixture is missing.",
+      "owners": [
+        "functions/product-ops-leads-domain.js",
+        "orbit360-platform/core/ciclo.js",
+        "tools/gravicentra-i6-5-b4-003-preview-proof.mjs"
+      ]
+    },
+    {
+      "area": "Aseguradoras diff/save",
+      "cause": "diffResumen compares raw top-level JSON and draft snapshot normalizes absent nested values to empty strings, creating false-positive changed fields; busy state starts after motive prompt/logo processing.",
+      "owners": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ]
+    },
+    {
+      "area": "Aseguradoras catalog model",
+      "cause": "Productos y planes stores insurer ramos plus one plan field per ramo; products are inferred from catalog/doc sources instead of being a first-class managed offering matrix; add ramo is free-text.",
+      "owners": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/core/config.js"
+      ]
+    },
+    {
+      "area": "Aseguradoras source importer",
+      "cause": "docs-aseguradora is forced to documentary mode while UI is titled Importación inteligente; ramo/producto/plan are free text and file content is not extracted in this path.",
+      "owners": [
+        "orbit360-platform/core/importa.js"
+      ]
+    },
+    {
+      "area": "Aseguradoras Drive",
+      "cause": "Backend persists canonical insurer driveFolderId/driveLink and can read bound files, but exposes no role-authorized folder-list surface for embedding/browsing the dossier in the ficha.",
+      "owners": [
+        "functions/document-drive-domain.js",
+        "orbit360-platform/core/product-drive-document-provider-p0.js",
+        "orbit360-platform/modules/aseguradoras.js"
+      ]
+    },
+    {
+      "area": "Aseguradoras activity language",
+      "cause": "Registry/source-origin identifiers are rendered directly in human UI.",
+      "owners": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ]
+    },
+    {
+      "area": "Quality language",
+      "cause": "UI exposes internal semantic labels 'prima contractual', 'fuente contractual' and 'calendario activo' rather than policy/receipt vocabulary.",
+      "owners": [
+        "orbit360-platform/modules/calidad.js"
+      ]
+    },
+    {
+      "area": "Quality phone modal",
+      "cause": "editarInline focus only reorders fields; it does not narrow the form, so Agregar teléfono/WhatsApp opens the same full correction form.",
+      "owners": [
+        "orbit360-platform/modules/calidad.js"
+      ]
+    },
+    {
+      "area": "Quality horizontal table",
+      "cause": "Only the native bottom scrollbar exists on the wide table container.",
+      "owners": [
+        "orbit360-platform/modules/calidad.js",
+        "orbit360-platform/styles/infra.css"
+      ]
+    },
+    {
+      "area": "Country debt",
+      "cause": "Evidence suggestions are intentionally not auto-persisted; unresolved country rows remain until human confirmation or separate deterministic data apply.",
+      "lane": "DATA_UPDATE"
+    },
+    {
+      "area": "Renewal cutoff",
+      "cause": "Current pipeline is governed by renewability tri-state + terminal outcome, not the newly approved July-31 cutoff disposition. Old rows therefore require canonical data disposition, not UI hiding.",
+      "lane": "DATA_UPDATE"
+    },
+    {
+      "area": "Cadence schedule",
+      "cause": "Scheduler is configured every 60 minutes with America/Guatemala timezone and localDate uses the same timezone; no business-hours window exists.",
+      "owners": [
+        "functions/product-ops-leads-domain.js"
+      ],
+      "classification": "CONFIG_CONFIRMED_NOT_BUSINESS_HOURS"
+    }
+  ],
+  "informationArchitecture": {
+    "Productos, ramos y planes": "Curated commercial offering matrix: what the insurer sells by country → ramo → product → plan, advisor-visible, source-backed but not a raw document store.",
+    "Documentos y fuentes": "Evidence/source repository and insurer dossier: Drive browsing for authorized operational/admin roles, upload/classify/map each source to country/ramo/product/plan.",
+    "Tarifas y conocimiento": "Derived/validated operational knowledge from classified sources: conditions, rates, rules and examples; no duplicate raw-file repository; only explicitly validated knowledge can feed Cotizador/Comparativo."
+  },
+  "allowedProductFiles": [
+    "orbit360-platform/core/product-app-p0.js",
+    "orbit360-platform/index.html",
+    "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/modules/ops.js",
+    "orbit360-platform/modules/leads.js",
+    "orbit360-platform/styles/infra.css",
+    "functions/ops-advisor-inbox.js",
+    "functions/product-ops-leads-domain.js",
+    "functions/document-drive-domain.js",
+    "orbit360-platform/core/product-drive-document-provider-p0.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/core/importa.js",
+    "orbit360-platform/modules/calidad.js"
+  ],
+  "allowedQaFiles": [
+    "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    ".github/workflows/gravicentra-b4-003-executor.yml"
+  ],
+  "dataLanes": [
+    {
+      "id": "COUNTRY_BACKFILL",
+      "status": "DRY_RUN_REQUIRED_NO_APPLY_AUTH_YET"
+    },
+    {
+      "id": "RENEWAL_CUTOFF_DISPOSITION",
+      "status": "DRY_RUN_REQUIRED_NO_APPLY_AUTH_YET",
+      "rule": "vigenciaFin <= 2026-07-31 and not renewed/cancelled => candidate No renovada; Aug/Sep/current Oct 2026 unresolved expired => remain Vencidas"
+    }
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4004Held": true,
+    "preserveMachineEvidence": true,
+    "noHistoricalPassLoss": true
+  },
+  "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX_PLUS_DATA_DRY_RUNS"
+}
