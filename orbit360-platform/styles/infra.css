@@ -1059,3 +1059,89 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
  .inbox-toolbar{align-items:center;padding:10px 12px}
  .quality-scroll-top{display:none}
 }
+
+
+/* B4-003 R20 · canonical surface hierarchy (Paula visual review) */
+.page{background:var(--surface)}
+.page>.card,.quality-workbench,.insurer-premium-section,.insurer-knowledge-section{
+  background:var(--card);
+  border:1px solid color-mix(in srgb,var(--ink) 14%,var(--line));
+  box-shadow:0 10px 28px -24px rgba(15,17,20,.48);
+}
+.insurer-premium-body,.quality-section-head{
+  background:var(--card);
+}
+.insurer-role-guide{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 16px;
+}
+.insurer-role-guide>div{
+  background:var(--card-2);border:1px solid color-mix(in srgb,var(--ink) 12%,var(--line));
+  border-radius:12px;padding:12px 13px;min-width:0;
+}
+.insurer-role-guide b{display:block;font-family:var(--f-display);font-size:12.5px;color:var(--ink);margin-bottom:3px}
+.insurer-role-guide span{display:block;font-family:var(--f-text);font-size:11.5px;line-height:1.4;color:var(--ink-2)}
+.insurer-ramo-multiselect,.insurer-offering-checks{
+  display:flex;flex-wrap:wrap;gap:7px;
+}
+.insurer-ramo-multiselect{padding:12px;background:var(--card-2);border:1px solid var(--line);border-radius:12px}
+.insurer-ramo-multiselect label,.insurer-offering-checks label{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid var(--line);
+  border-radius:9px;background:var(--card);font-size:12px;cursor:pointer;
+}
+.insurer-ramo-multiselect label:has(input:checked),.insurer-offering-checks label:has(input:checked){
+  border-color:color-mix(in srgb,var(--red) 52%,var(--line));background:var(--red-soft);
+}
+.insurer-offering-matrix{display:grid;gap:12px}
+.insurer-offering-card{
+  background:var(--card);border:1px solid color-mix(in srgb,var(--ink) 16%,var(--line));
+  border-radius:14px;box-shadow:0 8px 24px -22px rgba(15,17,20,.5);overflow:hidden;
+}
+.insurer-offering-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;background:var(--card-2);border-bottom:1px solid var(--line)}
+.insurer-offering-head b{display:block;font-family:var(--f-display);font-size:14px}.insurer-offering-head span{font-size:11.5px;color:var(--ink-2)}
+.insurer-cotizador-toggle{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700}
+.insurer-offering-meta{display:grid;grid-template-columns:minmax(120px,.55fr) minmax(180px,1fr);gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.insurer-offering-meta label,.insurer-offering-cols>div>b,.insurer-offering-cols>div>small{display:block}
+.insurer-offering-meta label{font-size:11.5px;color:var(--ink-2)}
+.insurer-offering-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px}
+.insurer-offering-cols>div{min-width:0;padding:12px;background:var(--card-2);border:1px solid var(--line);border-radius:12px}
+.insurer-offering-cols>div>b{font-family:var(--f-display);font-size:12.5px;color:var(--ink)}
+.insurer-offering-cols>div>small{font-size:11px;color:var(--ink-3);margin:2px 0 9px}
+.insurer-selected-ramos{display:flex;gap:7px;flex-wrap:wrap;padding:10px 0}
+.insurer-drive-panel{
+  margin-bottom:14px;background:var(--card-2);border:1px solid color-mix(in srgb,var(--ink) 15%,var(--line));
+  border-radius:14px;overflow:hidden;
+}
+.insurer-drive-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;background:var(--card);border-bottom:1px solid var(--line)}
+.insurer-drive-head b{display:block;font-family:var(--f-display);font-size:14px}.insurer-drive-head span{display:block;font-size:11.5px;color:var(--ink-2);margin-top:2px}
+.insurer-drive-path{padding:9px 14px;border-bottom:1px solid var(--line);font-size:11.5px;color:var(--ink-2)}
+.insurer-drive-items{display:grid;gap:7px;padding:12px}
+.insurer-drive-item{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 11px;cursor:pointer;color:var(--ink)}
+.insurer-drive-item:hover{border-color:color-mix(in srgb,var(--red) 38%,var(--line));box-shadow:var(--sh-1)}
+.insurer-drive-item b{display:block;font-family:var(--f-display);font-size:12.5px}.insurer-drive-item small{display:block;font-size:10.5px;color:var(--ink-3);margin-top:2px}
+.insurer-drive-item-icon{font-size:17px}
+.insurer-drive-preview{margin:0 12px 12px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.insurer-drive-preview-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.insurer-drive-preview iframe{display:block;width:100%;height:min(560px,60vh);border:0;background:#fff}
+.insurer-drive-preview img{display:block;max-width:100%;max-height:60vh;margin:auto;padding:12px}
+.insurer-knowledge-workbench .insurer-premium-body{display:grid;gap:14px}
+.insurer-knowledge-status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.insurer-knowledge-status-grid>div{background:var(--card-2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.insurer-knowledge-status-grid>div.ready{border-left:4px solid var(--ok)}
+.insurer-knowledge-status-grid span,.insurer-knowledge-status-grid small{display:block;color:var(--ink-2);font-size:11px}
+.insurer-knowledge-status-grid b{display:block;font-family:var(--f-display);font-size:22px;color:var(--ink);margin:4px 0 2px}
+.insurer-knowledge-block{background:var(--card-2);border:1px solid color-mix(in srgb,var(--ink) 13%,var(--line));border-radius:14px;padding:14px}
+.insurer-knowledge-block.tariff-block{background:var(--card);border-left:4px solid var(--red)}
+.insurer-block-head{padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.insurer-block-head h4{font-family:var(--f-display);font-size:15px;margin:2px 0 3px;color:var(--ink)}
+.insurer-block-head p{font-family:var(--f-text);font-size:11.5px;line-height:1.45;color:var(--ink-2);margin:0}
+.quality-workbench{box-shadow:0 12px 32px -26px rgba(15,17,20,.55)}
+.quality-main-table tbody tr:nth-child(even){background:color-mix(in srgb,var(--card-2) 70%,transparent)}
+.quality-main-table tbody tr:hover{background:color-mix(in srgb,var(--red-soft) 44%,var(--card))}
+.inbox-card{background:var(--card);border-color:color-mix(in srgb,var(--ink) 15%,var(--line));box-shadow:0 8px 20px -22px rgba(15,17,20,.6)}
+.ciclo-card{border:1px solid color-mix(in srgb,var(--ink) 18%,var(--line))}
+.ciclo-main>.ciclo-sec,.ciclo-aside>.ciclo-sec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px}
+.ciclo-aside{background:color-mix(in srgb,var(--surface) 65%,var(--card))}
+@media(max-width:900px){
+  .insurer-role-guide,.insurer-knowledge-status-grid,.insurer-offering-cols{grid-template-columns:1fr}
+  .insurer-offering-meta{grid-template-columns:1fr}
+}
