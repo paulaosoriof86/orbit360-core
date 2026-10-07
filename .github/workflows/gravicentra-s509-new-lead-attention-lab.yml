@@ -1,0 +1,106 @@
+name: Gravicentra S5.09 New Lead Attention LAB
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/gravicentra-s509-new-lead-attention-20261007
+    paths:
+      - 'functions/advisor-lead-attention-s509.js'
+      - 'functions/advisor-lead-attention-s509.test.js'
+      - 'functions/advisor-lead-attention-s509-fixture.js'
+      - 'functions/bootstrap.js'
+      - 'orbit360-platform/core/advisor-lead-attention-s509.js'
+      - 'orbit360-platform/core/backend-lab-init.js'
+      - '.github/workflows/gravicentra-s509-new-lead-attention-lab.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  GCLOUD_PROJECT: ays-orbit-360-lab
+  S509_FUNCTION: orbit360AdvisorLeadAttentionS509
+  LAB_HOST: https://ays-orbit-360-lab.web.app
+
+jobs:
+  lead-attention-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install functions dependencies
+        working-directory: functions
+        run: npm ci
+      - name: Source and deterministic QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check advisor-lead-attention-s509.js
+          node --check advisor-lead-attention-s509-fixture.js
+          node --check ../orbit360-platform/core/advisor-lead-attention-s509.js
+          node --test advisor-lead-attention-s509.test.js
+          grep -q "leadAttention: 'orbit360AdvisorLeadAttentionS509'" ../orbit360-platform/core/backend-lab-init.js
+          grep -q "advisor-lead-attention-s509.js" ../orbit360-platform/core/backend-lab-init.js
+          grep -q "require('./advisor-lead-attention-s509')" bootstrap.js
+      - name: Prepare LAB credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s509/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s509/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "ays-orbit-360-lab"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools@15.32.0
+      - name: Deploy attention function and LAB hosting
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:$S509_FUNCTION,hosting" --project "$GCLOUD_PROJECT" --non-interactive --force
+      - name: Synthetic backend attention proof
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node advisor-lead-attention-s509-fixture.js | tee "$RUNNER_TEMP/s509/evidence/attention-receipt.json"
+          node - "$RUNNER_TEMP/s509/evidence/attention-receipt.json" <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          if(r.syntheticOnly!==true||r.firstPollNewLeadCount!==1||r.acked!==1||r.secondPollNewLeadCount!==0)process.exit(1);
+          if(r.productionTouched!==false||r.customerDataUsed!==false)process.exit(1);
+          NODE
+      - name: Hosted client readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL "$LAB_HOST/core/advisor-lead-attention-s509.js" -o "$RUNNER_TEMP/s509/evidence/client.js"
+          curl -fsSL "$LAB_HOST/core/backend-lab-init.js" -o "$RUNNER_TEMP/s509/evidence/backend-lab-init.js"
+          grep -q "location.hash='#/leads'" "$RUNNER_TEMP/s509/evidence/client.js"
+          grep -q "setInterval(()=>poll(false),30000)" "$RUNNER_TEMP/s509/evidence/client.js"
+          grep -q "orbit360AdvisorLeadAttentionS509" "$RUNNER_TEMP/s509/evidence/backend-lab-init.js"
+      - name: Upload sanitized evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-s509-new-lead-attention-${{ github.run_id }}
+          path: ${{ runner.temp }}/s509/evidence/attention-receipt.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Remove transient credential
+        if: always()
+        run: rm -f "$RUNNER_TEMP/s509/firebase-service-account.json"
