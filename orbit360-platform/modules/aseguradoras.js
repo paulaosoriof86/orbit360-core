@@ -651,29 +651,52 @@ Orbit.modules.aseguradoras = (function () {
     return mappings.length;
   }
 
-  /* ---- diff simple (top-level) para trazabilidad antes/después ---- */
+  /* ---- diff semántico para trazabilidad antes/después ---- */
+  const CHANGE_LABELS={nombre:'Nombre comercial',logo:'Logo',logoAssetRef:'Logo',nit:'NIT / identificación fiscal',codigoIntermediario:'Código de intermediario',web:'Sitio web / app',responsable:'Responsable interno',telGeneral:'Teléfono general',emergencia:'Emergencia / asistencia',ultimaRevision:'Última revisión',observaciones:'Observaciones',drive:'Carpeta Drive',facturacion:'Datos de facturación',contactos:'Contactos',portales:'Plataformas y accesos',cuentas:'Bancos y pagos',ramos:'Ramos ofrecidos',comisiones:'Comisiones',ramosHabilitados:'Habilitación comercial',ramosDetalle:'Productos, planes y segmentación',docsRequeridos:'Requisitos de emisión',docs:'Documentos y fuentes',vinculada:'Estado de la aseguradora',cotTasas:'Tarifas y condiciones',cotTasasValidadas:'Validación de tarifas'};
+  function semanticValue(value,depth){
+    depth=depth||0;
+    if(value==null||value==='')return undefined;
+    if(Array.isArray(value))return value.map(v=>semanticValue(v,depth+1)).filter(v=>v!==undefined);
+    if(typeof value==='object'){
+      const out={};
+      Object.keys(value).sort().forEach(k=>{
+        if(depth>0&&['id','createdAt','updatedAt','credencialActualizadaAt'].includes(k))return;
+        if(/^__/.test(k))return;
+        const v=semanticValue(value[k],depth+1);if(v!==undefined)out[k]=v;
+      });
+      return Object.keys(out).length?out:undefined;
+    }
+    if(typeof value==='string')return value.trim();
+    return value;
+  }
+  function semanticEqual(a,b){return JSON.stringify(semanticValue(a,0))===JSON.stringify(semanticValue(b,0));}
   function diffResumen(before, after) {
     const claves = ['nombre', 'logo', 'logoAssetRef', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada', 'cotTasas', 'cotTasasValidadas'];
-    const cambios = [];
-    claves.forEach(k => { const b = JSON.stringify(before[k]), a2 = JSON.stringify(after[k]); if (b !== a2) cambios.push(k); });
-    return cambios;
+    const cambios=[];claves.forEach(k=>{if(!semanticEqual(before&&before[k],after&&after[k]))cambios.push(k);});return cambios;
+  }
+  function humanChangeSummary(keys){
+    const labels=[];[].concat(keys||[]).forEach(k=>{const label=CHANGE_LABELS[k]||k;if(!labels.includes(label))labels.push(label);});return labels;
   }
 
   async function guardarDraft(id, back) {
     const st = fichaState[id]; if (!st || !st.draft || st.saving) return;
+    const saveButton=back&&back.querySelector('#af-guardar'),originalSaveLabel=saveButton&&saveButton.textContent||'💾 Guardar cambios';
+    st.saving=true;if(saveButton){saveButton.disabled=true;saveButton.textContent='Revisando cambios…';saveButton.setAttribute('aria-busy','true');}
     if (typeof st.snapshotCurrent === 'function') st.snapshotCurrent();
-    const before = S().get('aseguradoras', id); if (!before) return;
+    const before = S().get('aseguradoras', id); if (!before) {st.saving=false;if(saveButton){saveButton.disabled=false;saveButton.textContent=originalSaveLabel;saveButton.removeAttribute('aria-busy');}return;}
     let logoUrl = clean(st.draft.logo);
     const pendingLogo = st.logoFile || null;
     let cambios = diffResumen(before, st.draft);
     const secureCount = credentialChanges(st, st.draft).length;
     const pendingLogoCount = pendingLogo ? 1 : 0;
-    if (!cambios.length && !secureCount && !pendingLogoCount) { st.editing = false; st.draft = null; st.credentialDrafts = {}; ficha(id); return; }
-    const summary = cambios.concat(pendingLogoCount ? ['logo'] : [], secureCount ? ['credenciales_seguras'] : []);
-    const motivo = await U.prompt('Se detectaron cambios en: ' + summary.join(', ') + '.\n\nMotivo del cambio:', { title: 'Guardar cambios' });
-    if (motivo == null) return;
+    if (!cambios.length && !secureCount && !pendingLogoCount) { st.saving=false;st.editing = false; st.draft = null; st.credentialDrafts = {}; ficha(id); return; }
+    const summary = humanChangeSummary(cambios.concat(pendingLogoCount ? ['logo'] : [], secureCount ? ['Credenciales seguras'] : []));
+    if(saveButton)saveButton.textContent='Esperando motivo…';
+    const motivo = await U.prompt('Cambios detectados: ' + summary.join(', ') + '.\n\nMotivo del cambio:', { title: 'Guardar cambios' });
+    if (motivo == null) {st.saving=false;if(saveButton){saveButton.disabled=false;saveButton.textContent=originalSaveLabel;saveButton.removeAttribute('aria-busy');}return;}
     // Confirm intent before any server-side asset or credential side effect.
     if (pendingLogo) {
+      if(saveButton)saveButton.textContent='Procesando logo…';
       const provider = Orbit.productRuntimeBrowserProvidersP0;
       if (!provider || typeof provider.callFunction !== 'function') { U.toast('No está disponible el guardado seguro del logo.'); return; }
       if (pendingLogo.size > 2 * 1024 * 1024) { U.toast('El logo no puede superar 2 MB.'); return; }
@@ -688,9 +711,7 @@ Orbit.modules.aseguradoras = (function () {
       st.draft.logo = uploaded.url; st.draft.logoAssetRef = uploaded.assetRef; st.logoFile = null; logoUrl = uploaded.url;
     }
     if (logoUrl && !/^https:\/\//i.test(logoUrl)) { U.toast('El logo debe usar una referencia HTTPS segura.'); return; }
-    const saveButton = back && back.querySelector('#af-guardar');
-    st.saving = true;
-    if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'Guardando…'; }
+    if (saveButton) saveButton.textContent = secureCount ? 'Guardando accesos…' : 'Guardando…';
     try {
       if (secureCount) await persistSecureCredentialChanges(id, st);
       cambios = diffResumen(before, st.draft);
@@ -712,7 +733,7 @@ Orbit.modules.aseguradoras = (function () {
       ficha(id); reload();
     } catch (error) {
       st.saving = false;
-      if (saveButton) { saveButton.disabled = false; saveButton.textContent = '💾 Guardar cambios'; }
+      if (saveButton) { saveButton.disabled = false; saveButton.textContent = originalSaveLabel; saveButton.removeAttribute('aria-busy'); }
       const code = String(error && (error.code || error.message) || '');
       U.toast(/CREDENTIAL|SECURE_/i.test(code) ? 'No fue posible guardar la contraseña de forma segura. La edición continúa abierta para reintentar.' : 'No fue posible guardar. La edición continúa abierta para corregir o reintentar.');
       try { console.warn('[Orbit Aseguradoras] SAVE_FAILED', error && (error.code || error.message) || error); } catch (e) {}
