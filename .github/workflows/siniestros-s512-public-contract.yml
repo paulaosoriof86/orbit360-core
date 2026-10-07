@@ -1,0 +1,36 @@
+name: Siniestros S5.12 Public Contract
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/siniestros-public-contract-s512-20261007
+    paths:
+      - 'functions/siniestros-public-contract-s512.js'
+      - 'functions/siniestros-public-contract-s512.test.js'
+      - '.github/workflows/siniestros-s512-public-contract.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  siniestros-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source and deterministic contract QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check siniestros-public-contract-s512.js
+          node --check siniestros-public-contract-s512.test.js
+          node --test siniestros-public-contract-s512.test.js
+          grep -q "publicWriteAllowed:false" siniestros-public-contract-s512.js
+          grep -q "coverageConfirmationFromReportAllowed:false" siniestros-public-contract-s512.js
+          ! grep -q "firebase-admin" siniestros-public-contract-s512.js
+          ! grep -q "onCall\|onRequest" siniestros-public-contract-s512.js
