@@ -1198,14 +1198,15 @@ Orbit.modules.aseguradoras = (function () {
         draft.cuentas = [...body.querySelectorAll('[data-cta]')].map((r, idx) => Object.assign({}, previous[idx] || {}, { banco: r.querySelector('[data-cb]').value, tipo: r.querySelector('[data-ctt]').value, numero: r.querySelector('[data-ccn]').value, moneda: r.querySelector('[data-cm]').value, titular: r.querySelector('[data-ctit]').value, linkPago: r.querySelector('[data-clink]').value, ultimaVerificacion: r.querySelector('[data-cver]').value }));
       }
       if (t === 'productos') {
+        const ramoBoxes=[...body.querySelectorAll('[data-offer-ramo]')];
+        if(ramoBoxes.length)draft.ramos=ramoBoxes.filter(x=>x.checked).map(x=>x.value);
         body.querySelectorAll('[data-ramopct]').forEach(inp => { draft.comisiones = draft.comisiones || {}; draft.comisiones[inp.dataset.ramopct] = +inp.value || 0; });
-        body.querySelectorAll('[data-ramoseg],[data-ramoplan]').forEach(inp => {
-          const r = inp.dataset.ramoseg || inp.dataset.ramoplan; draft.ramosDetalle = draft.ramosDetalle || {}; draft.ramosDetalle[r] = draft.ramosDetalle[r] || {};
-        });
         (draft.ramos || []).forEach(r => {
-          const segEl = body.querySelector(`[data-ramoseg="${CSS.escape(r)}"]`), planEl = body.querySelector(`[data-ramoplan="${CSS.escape(r)}"]`), habEl = body.querySelector(`[data-ramohab="${CSS.escape(r)}"]`);
-          draft.ramosDetalle = draft.ramosDetalle || {}; draft.ramosDetalle[r] = draft.ramosDetalle[r] || {};
-          if (segEl) draft.ramosDetalle[r].segmento = segEl.value; if (planEl) draft.ramosDetalle[r].plan = planEl.value;
+          const segEl = body.querySelector(`[data-ramoseg="${CSS.escape(r)}"]`),habEl = body.querySelector(`[data-ramohab="${CSS.escape(r)}"]`);
+          const prod=[...body.querySelectorAll(`[data-ramoprod="${CSS.escape(r)}"]:checked`)].map(x=>x.value);
+          const plans=[...body.querySelectorAll(`[data-ramoplancheck="${CSS.escape(r)}"]:checked`)].map(x=>x.value);
+          draft.ramosDetalle = draft.ramosDetalle || {}; draft.ramosDetalle[r] = Object.assign({},draft.ramosDetalle[r]||{},{segmento:segEl?segEl.value:'',productos:prod,planes:plans});
+          delete draft.ramosDetalle[r].producto; delete draft.ramosDetalle[r].plan;
           draft.ramosHabilitados = draft.ramosHabilitados || {}; draft.ramosHabilitados[r] = Object.assign({}, draft.ramosHabilitados[r], { cotizador: habEl ? habEl.checked : false });
         });
         draft.docsRequeridos = [...body.querySelectorAll('[data-req]')].map(r => ({ pais:(r.querySelector('[data-rcountry]')||{}).value||draft.pais, ramo:(r.querySelector('[data-rramo]')||{}).value||'', producto:(r.querySelector('[data-rp]')||{}).value||'', plan:(r.querySelector('[data-rplan]')||{}).value||'', tipo:(r.querySelector('[data-rtype]')||{}).value||'Documento', descripcion:(r.querySelector('[data-ri]')||{}).value||'', items:(r.querySelector('[data-ri]')||{}).value||'', estado:(r.querySelector('[data-rstatus]')||{}).value||'Vigente', provenance:(r.querySelector('[data-rprov]')||{}).value||'', fecha:(r.querySelector('[data-rdate]')||{}).value||'', documentRef:(r.querySelector('[data-rattach]')||{}).value||'' }));
@@ -1243,7 +1244,7 @@ Orbit.modules.aseguradoras = (function () {
     if (t === 'plataformas') { const add = body.querySelector('#af-add-portal'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.portales = (draft.portales || []).concat([{ id: 'portal_' + Date.now().toString(36), nombre: '', url: '', usuario: '', estadoAcceso: 'Sin verificar', credentialRef: 'backend_required' }]); selectTab('plataformas'); }); }
     if (t === 'bancos') { const add = body.querySelector('#af-add-cta'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.cuentas = (draft.cuentas || []).concat([{ id: 'account_' + Date.now().toString(36), banco: '', tipo: 'Monetaria', numero: '', moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', titular: '', linkPago: '', ultimaVerificacion: '' }]); selectTab('bancos'); }); }
     if (t === 'productos') {
-      const addRamo = body.querySelector('#af-add-ramo'); if (addRamo) addRamo.addEventListener('click', async () => { const r = await Orbit.ui.prompt('Nombre del ramo:', { title: 'Agregar ramo' }); if (!r) return; snapshotTab(); const rr = (draft.ramos || []).slice(); if (rr.indexOf(r) < 0) rr.push(r); draft.ramos = rr; draft.comisiones = Object.assign({}, draft.comisiones); draft.comisiones[r] = draft.comisionDefault || 12; selectTab('productos'); });
+      body.querySelectorAll('[data-offer-ramo]').forEach(chk=>chk.addEventListener('change',()=>{snapshotTab();selectTab('productos');}));
       const addReq = body.querySelector('#af-add-req'); if (addReq) addReq.addEventListener('click', () => { snapshotTab(); draft.docsRequeridos = (draft.docsRequeridos || []).concat([{ pais:draft.pais, ramo:'', producto:'', plan:'', tipo:'Documento', descripcion:'', items:'', estado:'Vigente', provenance:'captura_plataforma', fecha:new Date().toISOString().slice(0,10), documentRef:'' }]); selectTab('productos'); });
       body.querySelectorAll('[data-rupload]').forEach(input=>input.addEventListener('change',async()=>{
         const file=input.files&&input.files[0],card=input.closest('[data-req]');if(!file||!card)return;
