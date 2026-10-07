@@ -28,6 +28,7 @@ const ALLOWED_MIME = new Set([
   'text/plain','text/csv'
 ]);
 const BOOTSTRAP_ROLES = new Set(['direccion','superadmin','super_admin','admin','admintenant','admin_tenant']);
+const INSURER_DOSSIER_ROLES = new Set(['direccion','superadmin','super_admin','admin','admintenant','admin_tenant','operativo']);
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 const secrets = new SecretManagerServiceClient();
@@ -183,6 +184,21 @@ async function listChildFolder(parentId,name,accessToken){
 async function createFolder(parentId,name,accessToken){
   return driveFetch('https://www.googleapis.com/drive/v3/files?fields=id,name,mimeType,parents,webViewLink&supportsAllDrives=true',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:safeName(name),mimeType:'application/vnd.google-apps.folder',parents:[parentId]})},accessToken);
 }
+async function listFolderItems(folderId,accessToken){
+  const q="'"+clean(folderId,180).replace(/'/g,"\\'")+"' in parents and trashed=false";
+  const url='https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id,name,mimeType,size,parents,webViewLink,modifiedTime,capabilities(canDownload))&orderBy=folder,name&supportsAllDrives=true&includeItemsFromAllDrives=true&pageSize=200';
+  const body=await driveFetch(url,{},accessToken);
+  return Array.isArray(body.files)?body.files:[];
+}
+async function isFolderWithinRoot(folderId,rootId,accessToken){
+  let current=clean(folderId,180);const root=clean(rootId,180),seen=new Set();
+  for(let depth=0;depth<10&&current&&!seen.has(current);depth++){
+    if(current===root)return true;seen.add(current);
+    const meta=await getMeta(current,accessToken),parents=Array.isArray(meta&&meta.parents)?meta.parents:[];
+    current=clean(parents[0],180);
+  }
+  return false;
+}
 async function ensureFolder(parentId,name,accessToken){
   const found=await listChildFolder(parentId,name,accessToken);
   return found||createFolder(parentId,name,accessToken);
@@ -337,6 +353,37 @@ async function status(request,previewOnly){
     return{ok:false,available:false,configured:true,backendPersistent:true,status:'tenant_connection_invalid',message:'La conexión administrativa con Drive necesita revisión.',code:raw};
   }
 }
+async function listEntityFolder(request,previewOnly){
+  const input=request.data||{},tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
+  const target=await authorizeTarget(request,tenantId,input,'read',previewOnly);
+  if(previewOnly===true&&!previewSyntheticTarget(target))throw new HttpsError('permission-denied','Preview documental solo admite expedientes sintéticos autorizados.');
+  if(target.entityType==='aseguradora'&&!INSURER_DOSSIER_ROLES.has(norm(target.actor&&target.actor.activeRole)))throw new HttpsError('permission-denied','El rol activo no puede navegar el expediente documental completo de la aseguradora.');
+  const auth=await tenantDriveToken(tenantId,previewOnly),accessToken=auth.accessToken,row=target.row||{};
+  const rootFolderId=clean(row.driveFolderId,180)||driveIdFromUrl(row.driveLink||row.driveUrl||row.drive||'');
+  if(!rootFolderId)return{ok:true,status:'sin_carpeta_vinculada',folderLinked:false,items:[],entityType:target.entityType,entityId:target.entityId,previewIsolated:previewOnly===true};
+  const requested=clean(input.folderId,180)||rootFolderId;
+  if(!await isFolderWithinRoot(requested,rootFolderId,accessToken))throw new HttpsError('permission-denied','La carpeta solicitada no pertenece al expediente autorizado.');
+  const meta=await getMeta(requested,accessToken);if(!meta||meta.mimeType!=='application/vnd.google-apps.folder'||meta.trashed===true)throw new HttpsError('not-found','Carpeta documental no disponible.');
+  const items=(await listFolderItems(requested,accessToken)).filter(x=>x&&x.trashed!==true).map(x=>({id:x.id,documentRef:x.id,name:safeName(x.name||'Documento'),mimeType:clean(x.mimeType,160),size:Number(x.size||0),modifiedTime:clean(x.modifiedTime,80),kind:x.mimeType==='application/vnd.google-apps.folder'?'folder':'file',folderId:x.mimeType==='application/vnd.google-apps.folder'?x.id:'',externalUrl:clean(x.webViewLink,1200),downloadAvailable:!!(x.capabilities&&x.capabilities.canDownload!==false)}));
+  await audit(tenantId,target.actor,'drive.folder_list',{clientId:target.clientId,entityType:target.entityType,entityId:target.entityId,documentRef:requested,outcome:'ok'},previewOnly);
+  return{ok:true,status:'disponible',folderLinked:true,rootFolderId,currentFolderId:requested,folderName:safeName(meta.name||'Expediente'),items,entityType:target.entityType,entityId:target.entityId,previewIsolated:previewOnly===true};
+}
+async function readDossierFile(request,previewOnly){
+  const input=request.data||{},tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
+  const target=await authorizeTarget(request,tenantId,input,'read',previewOnly);
+  if(previewOnly===true&&!previewSyntheticTarget(target))throw new HttpsError('permission-denied','Preview documental solo admite expedientes sintéticos autorizados.');
+  if(target.entityType==='aseguradora'&&!INSURER_DOSSIER_ROLES.has(norm(target.actor&&target.actor.activeRole)))throw new HttpsError('permission-denied','El rol activo no puede abrir el expediente documental completo de la aseguradora.');
+  const row=target.row||{},rootFolderId=clean(row.driveFolderId,180)||driveIdFromUrl(row.driveLink||row.driveUrl||row.drive||'');
+  const fileId=clean(input.documentRef||input.fileId,180);if(!rootFolderId||!/^[A-Za-z0-9_-]{20,}$/.test(fileId))throw new HttpsError('invalid-argument','Referencia documental inválida.');
+  const auth=await tenantDriveToken(tenantId,previewOnly),accessToken=auth.accessToken,meta=await getMeta(fileId,accessToken),parents=Array.isArray(meta&&meta.parents)?meta.parents:[];
+  let allowed=false;for(const p of parents){if(await isFolderWithinRoot(p,rootFolderId,accessToken)){allowed=true;break;}}
+  if(!allowed)throw new HttpsError('permission-denied','El documento no pertenece al expediente autorizado.');
+  if(meta.mimeType==='application/vnd.google-apps.folder')throw new HttpsError('invalid-argument','Selecciona un archivo, no una carpeta.');
+  const bytes=await driveBinary(fileId,accessToken),mime=clean(meta.mimeType,160)||'application/octet-stream',previewAvailable=/^(application\/pdf|image\/|text\/)/i.test(mime);
+  await audit(tenantId,target.actor,'drive.dossier_file_read',{clientId:target.clientId,entityType:target.entityType,entityId:target.entityId,documentRef:fileId,outcome:'ok'},previewOnly);
+  return{ok:true,status:'disponible',documentRef:fileId,fileId,nombre:safeName(meta.name||'Documento'),mimeType:mime,size:bytes.length,base64:bytes.toString('base64'),previewAvailable,downloadAvailable:true,externalUrl:meta.webViewLink||('https://drive.google.com/file/d/'+fileId+'/view'),backendPersistent:true,previewIsolated:previewOnly===true};
+}
+
 async function upload(request,previewOnly){
   const input=request.data||{},tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
   const target=await authorizeTarget(request,tenantId,input,'write',previewOnly),clientId=target.clientId||'',insurerId=target.insurerId||'',scopeId=target.entityId||clientId;
@@ -354,7 +401,7 @@ async function upload(request,previewOnly){
     const entityRoot=target.entityType==='aseguradora'?await ensureFolder(qaRoot.id,'aseguradoras',accessToken):target.entityType==='negocio'?await ensureFolder(qaRoot.id,'negocios',accessToken):qaRoot;
     destination=await ensureFolder(entityRoot.id,scopeId,accessToken);clientFolder=destination;clientFolderId=destination.id;
   }else{
-    clientFolderId=clean(input.driveFolderId,160)||clean(row.driveFolderId,160)||driveIdFromUrl(row.driveLink||row.driveUrl||'');
+    clientFolderId=clean(input.driveFolderId,160)||clean(row.driveFolderId,160)||driveIdFromUrl(row.driveLink||row.driveUrl||row.drive||'');
     if(clientFolderId){clientFolder=await getMeta(clientFolderId,accessToken);if(clientFolder.mimeType!=='application/vnd.google-apps.folder')throw new HttpsError('failed-precondition','La referencia Drive del expediente no es una carpeta.');}
     else{
       const entityRoot=target.entityType==='aseguradora'?await ensureFolder(rootId,'_ASEGURADORAS',accessToken):target.entityType==='negocio'?await ensureFolder(rootId,'_NEGOCIOS',accessToken):rootMeta;
@@ -478,6 +525,8 @@ const PROD={region:REGION,cors:true,serviceAccount:SERVICE_ACCOUNT,secrets:[DRIV
 const PREVIEW={region:PREVIEW_REGION,cors:true,serviceAccount:SERVICE_ACCOUNT,secrets:[DRIVE_OAUTH_CLIENT_PREVIEW_SECRET]};
 exports.orbit360DocumentDriveStatus = onCall(Object.assign({},PROD,{timeoutSeconds:30,memory:'256MiB'}),r=>status(r,false));
 exports.orbit360DocumentDriveUpload = onCall(Object.assign({},PROD,{timeoutSeconds:90,memory:'512MiB'}),r=>upload(r,false));
+exports.orbit360DocumentDriveListFolder = onCall(Object.assign({},PROD,{timeoutSeconds:60,memory:'256MiB'}),r=>listEntityFolder(r,false));
+exports.orbit360DocumentDriveReadDossier = onCall(Object.assign({},PROD,{timeoutSeconds:60,memory:'512MiB'}),r=>readDossierFile(r,false));
 exports.orbit360DocumentDriveRead = onCall(Object.assign({},PROD,{timeoutSeconds:60,memory:'512MiB'}),r=>readDocument(r,false,false));
 exports.orbit360DocumentDriveDownload = onCall(Object.assign({},PROD,{timeoutSeconds:60,memory:'512MiB'}),r=>readDocument(r,false,true));
 exports.orbit360DocumentDriveFinalize = onCall(Object.assign({},PROD,{timeoutSeconds:60,memory:'256MiB'}),r=>finalizeDocument(r,false));
@@ -485,10 +534,12 @@ exports.orbit360DocumentDriveQuarantine = onCall(Object.assign({},PROD,{timeoutS
 exports.orbit360DocumentDriveBootstrap = onCall(Object.assign({},PROD,{timeoutSeconds:60,memory:'256MiB'}),r=>bootstrap(r,false));
 exports.orbit360DocumentDriveStatusPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:30,memory:'256MiB'}),r=>status(r,true));
 exports.orbit360DocumentDriveUploadPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:90,memory:'512MiB'}),r=>upload(r,true));
+exports.orbit360DocumentDriveListFolderPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'256MiB'}),r=>listEntityFolder(r,true));
+exports.orbit360DocumentDriveReadDossierPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'512MiB'}),r=>readDossierFile(r,true));
 exports.orbit360DocumentDriveReadPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'512MiB'}),r=>readDocument(r,true,false));
 exports.orbit360DocumentDriveDownloadPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'512MiB'}),r=>readDocument(r,true,true));
 exports.orbit360DocumentDriveFinalizePreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'256MiB'}),r=>finalizeDocument(r,true));
 exports.orbit360DocumentDriveQuarantinePreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'256MiB'}),r=>quarantineDocument(r,true));
 exports.orbit360DocumentDriveCleanupPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'256MiB'}),r=>cleanupPreviewDocument(r));
 exports.orbit360DocumentDriveBootstrapPreview = onCall(Object.assign({},PREVIEW,{timeoutSeconds:60,memory:'256MiB'}),r=>bootstrap(r,true));
-exports.__documentDriveDomain=Object.freeze({VERSION,ROOT_BY_TENANT,MAX_BYTES,ALLOWED_MIME,oauthDelegated:false,tenantPersistentBackend:true,credentialStore:'SecretManager',serviceAccount:SERVICE_ACCOUNT});
+exports.__documentDriveDomain=Object.freeze({VERSION,ROOT_BY_TENANT,MAX_BYTES,ALLOWED_MIME,INSURER_DOSSIER_ROLES,oauthDelegated:false,tenantPersistentBackend:true,credentialStore:'SecretManager',serviceAccount:SERVICE_ACCOUNT});
