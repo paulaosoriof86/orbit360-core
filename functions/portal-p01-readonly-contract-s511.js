@@ -16,6 +16,24 @@ const BACKEND_CONTRACT=Object.freeze({
   failClosed:true
 });
 
+const IDENTITY_PROVIDER_GATE=Object.freeze({
+  externalProviderRequired:true,
+  projectProviderEnablementVerified:false,
+  preferredCandidate:'email_link_or_verified_email_flow',
+  passwordStorageByAys:false,
+  uidContinuityRequiredForEmailChange:true,
+  recreatedUidRequiresGrantReissue:true
+});
+
+const GRANT_LIFECYCLE=Object.freeze({
+  statuses:Object.freeze(['active','revoked']),
+  operations:Object.freeze(['issue','reissue','revoke']),
+  expiryRequired:true,
+  clientScopeRequired:true,
+  directSelfGrantAllowed:false,
+  staffMembershipMutationAllowed:false
+});
+
 const POLICY=Object.freeze({
   version:VERSION,
   sourceOnly:true,
@@ -38,7 +56,8 @@ const CUSTOMER_IDENTITY_FIELDS=Object.freeze([
 ]);
 
 const ACCESS_GRANT_FIELDS=Object.freeze([
-  'grantId','tenantId','identitySubject','clientIds','status','expiresAt'
+  'grantId','tenantId','identitySubject','clientIds','status','expiresAt',
+  'issuedAt','issuedByRef','issueReason','version','revokedAt','revokedByRef','revocationReason'
 ]);
 
 function clean(v,m=300){return String(v==null?'':v).trim().slice(0,m);}
@@ -132,6 +151,70 @@ function buildReadOnlyProjection({client,policies,insurersById,documents}={}){
   });
 }
 
+function grantDocumentId(identitySubject){
+  const id=clean(identitySubject,180);
+  if(!/^[A-Za-z0-9._:-]{6,180}$/.test(id))return '';
+  return id;
+}
+
+function buildGrantRecord({identitySubject,clientIds,expiresAt,issuedAt,issuedByRef,issueReason,version}={}){
+  const errors=[];
+  const subject=grantDocumentId(identitySubject);
+  const clients=Array.from(new Set([].concat(clientIds||[]).map(v=>clean(v,180)).filter(Boolean)));
+  const exp=clean(expiresAt,40),issued=clean(issuedAt,40);
+  const ver=Number(version||1);
+  if(!subject)errors.push('GRANT_SUBJECT_INVALID');
+  if(!clients.length)errors.push('GRANT_CLIENT_SCOPE_REQUIRED');
+  if(!exp||!Number.isFinite(Date.parse(exp)))errors.push('GRANT_EXPIRY_REQUIRED');
+  if(!issued||!Number.isFinite(Date.parse(issued)))errors.push('GRANT_ISSUED_AT_REQUIRED');
+  if(exp&&issued&&Date.parse(exp)<=Date.parse(issued))errors.push('GRANT_EXPIRY_MUST_FOLLOW_ISSUE');
+  if(!clean(issuedByRef,180))errors.push('GRANT_ISSUER_REF_REQUIRED');
+  if(!clean(issueReason,240))errors.push('GRANT_ISSUE_REASON_REQUIRED');
+  if(!Number.isInteger(ver)||ver<1)errors.push('GRANT_VERSION_INVALID');
+  if(errors.length)return {ok:false,errors:Array.from(new Set(errors))};
+  return {
+    ok:true,
+    record:Object.freeze({
+      grantId:subject,
+      tenantId:TENANT_ID,
+      identitySubject:subject,
+      clientIds:Object.freeze(clients),
+      status:'active',
+      expiresAt:exp,
+      issuedAt:issued,
+      issuedByRef:clean(issuedByRef,180),
+      issueReason:clean(issueReason,240),
+      version:ver,
+      revokedAt:'',
+      revokedByRef:'',
+      revocationReason:''
+    })
+  };
+}
+
+function revokeGrantRecord(grant,{revokedAt,revokedByRef,revocationReason}={}){
+  if(!grant||norm(grant.status)!=='active')return {ok:false,code:'GRANT_NOT_ACTIVE'};
+  const at=clean(revokedAt,40),by=clean(revokedByRef,180),reason=clean(revocationReason,240);
+  if(!at||!Number.isFinite(Date.parse(at)))return {ok:false,code:'REVOCATION_TIME_REQUIRED'};
+  if(!by)return {ok:false,code:'REVOCATION_ACTOR_REQUIRED'};
+  if(!reason)return {ok:false,code:'REVOCATION_REASON_REQUIRED'};
+  return {
+    ok:true,
+    record:Object.freeze(Object.assign({},grant,{
+      status:'revoked',
+      revokedAt:at,
+      revokedByRef:by,
+      revocationReason:reason
+    }))
+  };
+}
+
+function reissueGrantRecord(grant,{clientIds,expiresAt,issuedAt,issuedByRef,issueReason}={}){
+  const subject=clean(grant&&grant.identitySubject,180);
+  const version=Number(grant&&grant.version||0)+1;
+  return buildGrantRecord({identitySubject:subject,clientIds,expiresAt,issuedAt,issuedByRef,issueReason,version});
+}
+
 async function makeReadOnlyHandler(deps,input={}){
   const d=deps||{};
   const authUid=clean(input.authUid,180);
@@ -182,7 +265,7 @@ async function makeReadOnlyHandler(deps,input={}){
 }
 
 module.exports=Object.freeze({
-  VERSION,TENANT_ID,BACKEND_CONTRACT,POLICY,CUSTOMER_IDENTITY_FIELDS,ACCESS_GRANT_FIELDS,
+  VERSION,TENANT_ID,BACKEND_CONTRACT,IDENTITY_PROVIDER_GATE,GRANT_LIFECYCLE,POLICY,CUSTOMER_IDENTITY_FIELDS,ACCESS_GRANT_FIELDS,
   clean,norm,validatePortalIdentity,validateAccessGrant,resolveClientScope,
-  accountProjection,policyProjection,documentProjection,buildReadOnlyProjection,makeReadOnlyHandler
+  accountProjection,policyProjection,documentProjection,buildReadOnlyProjection,grantDocumentId,buildGrantRecord,revokeGrantRecord,reissueGrantRecord,makeReadOnlyHandler
 });
