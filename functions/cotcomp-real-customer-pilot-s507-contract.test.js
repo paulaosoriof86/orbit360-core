@@ -31,6 +31,19 @@ test('S5.07 remains source-only and blocks production/provider/issuance/payment'
   assert.equal(s.POLICY.payment, false);
 });
 
+
+test('Owner decisions are frozen without enabling real data', () => {
+  assert.equal(s.POLICY.pilot.status, 'OWNER_APPROVED_SCOPE_SOURCE_ONLY');
+  assert.equal(s.POLICY.pilot.designatedRouting, 'DESIGNATED_TRIAGE_ADVISOR');
+  assert.equal(s.POLICY.pilot.designatedAdvisorNameKey, 'paula_osorio');
+  assert.equal(s.POLICY.pilot.designatedAdvisorWhatsappDigits, '50256149048');
+  assert.equal(s.POLICY.privacy.privacyContactEmail, 'info@aysseguros.com');
+  assert.equal(s.POLICY.privacy.retentionDisposition, 'RETAIN_IF_VALID_BUSINESS_RECORD');
+  assert.equal(s.POLICY.privacy.unconvertedRetentionMonths, 12);
+  assert.equal(s.POLICY.privacy.retentionLegalMandatoryClaim, false);
+  assert.equal(s.POLICY.runtimeRealDataEnabled, false);
+});
+
 test('intake accepts only minimized GT vehicle handoff data', () => {
   const r = s.validateIntake(validIntake());
   assert.equal(r.ok, true);
@@ -111,9 +124,7 @@ test('idempotency reuses exact payload and denies changed payload', () => {
 
 test('readiness remains non-executable even when decision inputs are hypothetically complete', () => {
   const r = s.readiness({
-    privacyNoticeVersion: 'pilot-v1',
-    retentionDisposition: 'ROLLBACK_TO_BEFORE_STATE',
-    advisorRosterReadback: true,
+    designatedAdvisorReadback: true,
     routingContractPass: true,
     antiAbuseContractPass: true,
     rateLimitContractPass: true,
