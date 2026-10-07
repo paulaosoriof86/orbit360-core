@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
-  "expectedLedgerNextBlobSha": "c7d35adb3f980cae310a5f7051c77715e8f485a2",
+  "expectedLedgerNextBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -16,7 +16,7 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 279,
+  "inventoryCount": 281,
   "attentionCount": 155,
   "inventory": [
     {
@@ -9948,6 +9948,361 @@
       "r20FollowupHumanReviewBlobSha": "6bf81606c016cb7cb75307ab776951a739ad0772",
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
       "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79"
+    },
+    {
+      "id": "B4-003-R20-V2-01-ACTION-QUEUE-RANK",
+      "surface": "Ops/Leads Kanban",
+      "finding": "Acción requerida #N uses historical collaboration sequence instead of current actionable queue rank.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/modules/ops.js",
+        "orbit360-platform/modules/leads.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-02-ACTION-STATE-VISUAL",
+      "surface": "Ops/Leads Kanban",
+      "finding": "Action-required and completed/returned states lack sufficiently strong distinct visual priority.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-03-CARD-OPEN-LATENCY",
+      "surface": "Ops/Leads business card",
+      "finding": "Card opening blocks first paint on Orbit.cat.ensure(), producing multi-second human latency.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+      "surface": "Business collaboration",
+      "finding": "Comments/requests area is flat and does not explain that Registrar commits immediately while Guardar cambios belongs to business fields.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
+      "surface": "Tareas y solicitudes",
+      "finding": "Marcar atendida/Archivar waits on server and refresh without visible pending/success state.",
+      "owner": [
+        "orbit360-platform/index.html",
+        "functions/ops-advisor-inbox.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-06-INBOX-HEADER-ALIGNMENT",
+      "surface": "Tareas y solicitudes",
+      "finding": "Active-count placement/hierarchy is visually weak and detached from the drawer header.",
+      "owner": [
+        "orbit360-platform/index.html",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-07-BUSINESS-MODAL-VISUAL",
+      "surface": "Ops/Leads business detail",
+      "finding": "Header/stepper/comments spacing, accent strip, internal scrolling and density are not acceptable for a high-frequency daily surface.",
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/styles/infra.css"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-08-INSURER-DRIVE-EMBED-RBAC",
+      "surface": "Aseguradoras · Documentos y fuentes",
+      "finding": "Existing insurer Drive folder is not embedded/browsable in the insurer ficha with role-aware access.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js",
+        "functions/document-drive-domain.js",
+        "orbit360-platform/core/product-drive-document-provider-p0.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-09-INSURER-IMPORTER-TRUTHFULNESS",
+      "surface": "Aseguradoras · Cargar fuente",
+      "finding": "Flow says Importación inteligente although docs-aseguradora is forced to documentary mode and performs no content extraction/mapping.",
+      "owner": [
+        "orbit360-platform/core/importa.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-10-INSURER-AUDIT-HUMAN-LANGUAGE",
+      "surface": "Aseguradoras · Actividad",
+      "finding": "Activity/source detail exposes Registry, KNOWLEDGE_REFERENCE, hashes and structural labels instead of user/action/result language.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-11-INSURER-SEMANTIC-DIFF",
+      "surface": "Aseguradoras · Guardar cambios",
+      "finding": "A logo-only edit can report unrelated fields because draft normalization plus raw JSON.stringify diff creates semantic false positives.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-12-INSURER-SAVE-PROGRESS",
+      "surface": "Aseguradoras · Guardar cambios",
+      "finding": "Logo/upload/save may take seconds before visible Guardando state appears.",
+      "owner": [
+        "orbit360-platform/modules/aseguradoras.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-13-QUALITY-PHONE-PREFIX",
+      "surface": "Calidad · contacto",
+      "finding": "Phone entry does not require/select international country code and can persist ambiguous numbers.",
+      "owner": [
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-14-QUALITY-COUNTRY-DATA-DEBT",
+      "surface": "Calidad · país",
+      "finding": "Large unresolved country population needs source-backed deterministic backfill/readback rather than only per-row UI suggestions.",
+      "owner": [
+        "DATA_UPDATE",
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION",
+      "surface": "Renovaciones",
+      "finding": "Historical expired policies are not dispositioned by the approved cutoff: through 2026-07-31 should default No renovada when not renewed/cancelled; Aug/Sep/current Oct remain actionable if still unresolved.",
+      "owner": [
+        "DATA_UPDATE",
+        "orbit360-platform/modules/renovaciones.js"
+      ],
+      "block": "B4",
+      "targetGate": "B4-003",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
+      "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
+      "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
+      "mayDisappearWithoutDisposition": false,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+      "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION"
+    },
+    {
+      "id": "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "surface": "All changed B4-003 surfaces",
+      "finding": "Cards, panels, information blocks, content boxes, secondary containers and section backgrounds require stronger but restrained contrast, clearer separation and consistent hierarchy without typography regression.",
+      "owner": [
+        "orbit360-platform/styles/infra.css",
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/index.html",
+        "orbit360-platform/modules/aseguradoras.js",
+        "orbit360-platform/modules/calidad.js"
+      ],
+      "rootCause": "Cross-surface visual grammar is inconsistent: some redesigned surfaces remain flat/gray while others overuse amber or rely on weak border/background separation.",
+      "remediation": "Apply one restrained visual grammar using contrast, spacing, border, elevation and brand accents. Preserve approved typography; reserve amber for warning/pending.",
+      "closureCondition": "Targeted Paula Preview review explicitly passes hierarchy, contrast, separation and typography consistency across each changed surface.",
+      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "blocking": true,
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "r20VisualWhatsappRequirementsPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_VISUAL_AND_WHATSAPP_REQUIREMENTS_20261007.json",
+      "r20VisualWhatsappRequirementsBlobSha": "d47601187d98dbdf56c749f4b3e5ad4676778ce6",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003-R20-V2-16-SURFACE-HIERARCHY",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "surface": "Transversal UI",
+      "finding": "Cards, panels, informational blocks, content boxes, secondary containers, section backgrounds and borders need stronger perceptible surface separation and hierarchy without altering the approved typography.",
+      "owner": [
+        "orbit360-platform/styles/infra.css",
+        "all R20 touched surfaces"
+      ],
+      "status": "SOURCE_FIX_IN_PROGRESS_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
+      "blocking": true,
+      "rootCause": "Newly corrected surfaces inherited low-contrast flat card grammar inconsistently; typography is approved and must remain unchanged.",
+      "remediation": "Apply one canonical surface grammar with more background/card contrast, border/shadow separation, spacing and heading hierarchy; preserve approved font families and semantic brand-color grammar.",
+      "closureCondition": "Exact Preview + Paula visual pass across Ops/Leads card, inbox, insurer Products/Documents/Knowledge/Activity, Quality and Renewals.",
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "addendumPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_VISUAL_SYSTEM_AND_WHATSAPP_ARCHITECTURE_ADDENDUM_20261007.json",
+      "addendumBlobSha": "e3816c831e273a975461a0961de20c4a180ca6cd",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX"
     }
   ],
   "attentionIds": [
@@ -10138,7 +10493,7 @@
     "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
     "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
   ],
-  "b4AdvanceRule": "B4-004 remains held until the second R20 human-review findings are causally remediated, exact Preview passes, and Paula explicitly accepts the complete targeted UAT checklist.",
+  "b4AdvanceRule": "B4-004 remains held until second-review source, read-only data dry-runs, exact Preview, TinyFish functional/visual QA and Paula targeted human acceptance all pass.",
   "liveRule": "LIVE remains forbidden until later promotion gate; R20 Quality carry stays visible and must be resolved in next authorized step but is non-blocking for B4-003.",
   "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
   "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
@@ -10418,5 +10773,31 @@
     "blobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
     "preservedExistingBlockers": true,
     "newBlockingFindingCount": 15
+  },
+  "r20SecondReviewNoLossSync": {
+    "status": "PASS",
+    "syncedAt": "2026-10-07T10:00:00-06:00",
+    "ledgerBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
+    "inventoryCount": 281,
+    "addedIds": [
+      "B4-003-R20-V2-01-ACTION-QUEUE-RANK",
+      "B4-003-R20-V2-02-ACTION-STATE-VISUAL",
+      "B4-003-R20-V2-03-CARD-OPEN-LATENCY",
+      "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+      "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
+      "B4-003-R20-V2-06-INBOX-HEADER-ALIGNMENT",
+      "B4-003-R20-V2-07-BUSINESS-MODAL-VISUAL",
+      "B4-003-R20-V2-08-INSURER-DRIVE-EMBED-RBAC",
+      "B4-003-R20-V2-09-INSURER-IMPORTER-TRUTHFULNESS",
+      "B4-003-R20-V2-10-INSURER-AUDIT-HUMAN-LANGUAGE",
+      "B4-003-R20-V2-11-INSURER-SEMANTIC-DIFF",
+      "B4-003-R20-V2-12-INSURER-SAVE-PROGRESS",
+      "B4-003-R20-V2-13-QUALITY-PHONE-PREFIX",
+      "B4-003-R20-V2-14-QUALITY-COUNTRY-DATA-DEBT",
+      "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION",
+      "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY",
+      "B4-003-R20-V2-16-SURFACE-HIERARCHY"
+    ],
+    "noFindingsDropped": true
   }
 }
