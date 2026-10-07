@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_QUALITY_PHONE_ACTION_ROOTFIX_V1",
+  "recordedAt": "2026-10-07T17:00:00Z",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003-R20-Q04",
+  "failedRunId": 37654917049,
+  "failedSourceSha": "4e819cc39bc20e8002cbc5d0298be1b472c0c799",
+  "failedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37654917049-ioksb4y1.web.app",
+  "failureCode": "B4_003_R20_SECOND_REVIEW_QUALITY_PHONE_OR_SCROLL_FAILED",
+  "rootCause": "QUALITY_PHONE_COMPLETION_ACTION_WAS_HIDDEN_WHEN_EMAIL_ALREADY_EXISTED",
+  "fix": "Keep Agregar teléfono / WhatsApp visible whenever phone is missing and preserve Preparar correo as an additional action when email exists.",
+  "sourceSha": "9c1ffe574ef29f8891e55f94481b9322eb27ba6c",
+  "productBlobs": {
+    "orbit360-platform/modules/calidad.js": "f90813a3ba7c249f1b7e3c34ad6e3b5c1279a7bd"
+  },
+  "dataMutation": false,
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "live": false,
+  "b4004Held": true,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

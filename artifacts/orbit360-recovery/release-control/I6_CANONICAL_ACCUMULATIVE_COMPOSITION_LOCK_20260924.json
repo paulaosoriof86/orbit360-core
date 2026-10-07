@@ -212,7 +212,7 @@
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "31f0baa6823d3d051651a4950224f69406a3805b",
-    "orbit360-platform/modules/calidad.js": "6dd10f6e79bc1d265f48673f04766a2ca8c92399",
+    "orbit360-platform/modules/calidad.js": "f90813a3ba7c249f1b7e3c34ad6e3b5c1279a7bd",
     "orbit360-platform/modules/cancelaciones.js": "63f6dd1bb3ffad24cf8452404dfc540f1b92e2b7",
     "orbit360-platform/modules/cliente360.js": "58f9c1469e50b0e27fb0fcea7c8a6d613ce8f320",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
@@ -3717,6 +3717,16 @@
     "productBlobs": {
       "orbit360-platform/modules/configuracion.js": "bc30918ac226d0f510fa180141a30af8ff8a7933",
       "orbit360-platform/index.html": "b0fdfc0ef4f107ddd176db00218741b94739ae2f"
+    },
+    "b4004Held": true
+  },
+  "r20SecondReviewQualityPhoneActionRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_QUALITY_PHONE_ACTION_ROOTFIX_20261007.json",
+    "blobSha": "738c3da1217876a9a27f13863ffafeaffc576d32",
+    "sourceSha": "9c1ffe574ef29f8891e55f94481b9322eb27ba6c",
+    "productBlobs": {
+      "orbit360-platform/modules/calidad.js": "f90813a3ba7c249f1b7e3c34ad6e3b5c1279a7bd"
     },
     "b4004Held": true
   }
