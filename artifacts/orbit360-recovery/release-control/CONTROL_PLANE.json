@@ -8115,6 +8115,15 @@
       "productFile": "orbit360-platform/modules/polizas.js",
       "productBlobSha": "ff6c77a3beb935edf2aa2bb66f2c7ae415848cfb",
       "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+    },
+    "r20SecondReviewContinuityGuardStabilization": {
+      "status": "GOVERNANCE_GUARD_STABILIZED_PENDING_EXACT_PREVIEW",
+      "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
+      "guardBlobSha": "e3a73b899afddc3e86d428bbf293a1bf74fb1b6b",
+      "carryRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
+      "carryRegisterBlobSha": "a78d2efec6146f3dbd3a9d97c58069590dedbc73",
+      "reason": "Normalize ledger blob binding across Windows CRLF and GitHub Linux LF runners.",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
     }
   }
 }
