@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-05T11:24:00-06:00",
-  "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_003_R20_INSURER_VISUAL_ROOTFIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_003_R20_INSURER_VISUAL_ROOTFIX_AUTHORIZED",
     "blocking": true,
-    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX",
     "humanVisualStatus": "REJECTED_R20_FOLLOWUP_PENDING_RETEST",
     "knowledgePreview": true
   },
@@ -106,7 +106,7 @@
     "authorizedDataMutation": "Only exact R20 renewability target set bound to dry-run digests; fields renewable/provenance/rule only; max 1415 writes; automatic rollback on failure.",
     "renewabilityApplyRepeatAuthorized": false
   },
-  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "3d8736677d3faa7f59c282fbfe3b46205305ded5"
@@ -858,5 +858,18 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "r20FollowupInsurerVisualAuthorization": {
+    "status": "AUTHORIZED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_CAUSAL_AUTH_20261007.json",
+    "blobSha": "f0931b6b2728ac087942cec84186fee06ec4ed3d",
+    "failedRunId": 37561015481,
+    "allowedProductFiles": [
+      "orbit360-platform/modules/aseguradoras.js"
+    ],
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "noLive": true,
+    "noReimport": true
   }
 }
