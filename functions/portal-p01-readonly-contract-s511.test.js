@@ -85,3 +85,50 @@ test('P-01 external customer access must go through a backend projection',()=>{
   assert.equal(p.BACKEND_CONTRACT.projection,'allowlisted_read_only_dto');
   assert.equal(p.BACKEND_CONTRACT.failClosed,true);
 });
+
+
+test('P-01 executable read-only backend contract returns only granted account',async()=>{
+  const deps={
+    loadGrant:async uid=>grant({identitySubject:uid,clientIds:['cli-1','cli-2']}),
+    loadClient:async id=>({id,nombre:id==='cli-1'?'Cliente Uno':'Cliente Dos',pais:'GT',tipo:'Persona'}),
+    loadPolicies:async id=>[{id:'p-'+id,numero:'POL-'+id,ramo:'Vehículos',estado:'Vigente',aseguradoraId:'a1'}],
+    loadInsurers:async()=>[{id:'a1',nombre:'Aseguradora Uno'}],
+    loadDocuments:async id=>[{id:'d-'+id,clienteId:id,nombre:'Carátula',tipo:'Póliza',storagePath:'secure/path'}]
+  };
+  const r=await p.makeReadOnlyHandler(deps,{authUid:'cust-auth-1',emailVerified:true,accountRef:'cli-2',nowIso:'2026-10-07T00:00:00Z'});
+  assert.equal(r.ok,true);
+  assert.equal(r.accountRef,'cli-2');
+  assert.deepEqual(r.allowedAccountRefs,['cli-1','cli-2']);
+  assert.equal(r.projection.account.clientRef,'cli-2');
+  assert.equal(r.projection.policies.length,1);
+  assert.equal(r.projection.documents.length,1);
+});
+
+test('P-01 executable contract denies account outside grant and browser clientId injection',async()=>{
+  const deps={
+    loadGrant:async uid=>grant({identitySubject:uid,clientIds:['cli-1']}),
+    loadClient:async id=>({id,nombre:'Cliente',pais:'GT',tipo:'Persona'}),
+    loadPolicies:async()=>[],
+    loadInsurers:async()=>[],
+    loadDocuments:async()=>[]
+  };
+  const outside=await p.makeReadOnlyHandler(deps,{authUid:'cust-auth-1',emailVerified:true,accountRef:'cli-9',nowIso:'2026-10-07T00:00:00Z'});
+  assert.equal(outside.ok,false);
+  assert.equal(outside.code,'ACCOUNT_SCOPE_DENY');
+  const injected=await p.makeReadOnlyHandler(deps,{authUid:'cust-auth-1',emailVerified:true,requestedClientId:'cli-1',nowIso:'2026-10-07T00:00:00Z'});
+  assert.equal(injected.ok,false);
+  assert.equal(injected.code,'BROWSER_CLIENT_ID_DENY');
+});
+
+test('P-01 executable contract denies unverified external identity',async()=>{
+  const deps={
+    loadGrant:async()=>grant(),
+    loadClient:async()=>({id:'cli-1'}),
+    loadPolicies:async()=>[],
+    loadInsurers:async()=>[],
+    loadDocuments:async()=>[]
+  };
+  const r=await p.makeReadOnlyHandler(deps,{authUid:'cust-auth-1',emailVerified:false,nowIso:'2026-10-07T00:00:00Z'});
+  assert.equal(r.ok,false);
+  assert.equal(r.code,'IDENTITY_DENY');
+});
