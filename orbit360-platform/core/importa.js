@@ -221,7 +221,7 @@ Orbit.importa = (function () {
     let ramos=[],productos=[],planes=[];
     try{ramos=Orbit.cat&&Orbit.cat.ramosDe?Orbit.cat.ramosDe(country)||[]:[];}catch(e){}
     try{productos=ramo&&Orbit.cat&&Orbit.cat.subramosDe?Orbit.cat.subramosDe(country,ramo)||[]:[];}catch(e){}
-    try{productos=productos.concat(Orbit.cat&&Orbit.cat.get?Orbit.cat.get('productos')||[]:[]);}catch(e){}
+    if(!productos.length){try{productos=Orbit.cat&&Orbit.cat.get?Orbit.cat.get('productos')||[]:[];}catch(e){}}
     try{planes=Orbit.cat&&Orbit.cat.get?Orbit.cat.get('planes')||[]:[];}catch(e){}
     return{country,ramos:[...new Set(ramos)],productos:[...new Set(productos)],planes:[...new Set(planes)]};
   }
@@ -237,7 +237,8 @@ Orbit.importa = (function () {
   async function analyzeInsurerSourceText(text,fileName){
     const raw=String(fileName||'')+'\n'+String(text||''),cat=insurerCatalogState();
     let ramo=exactCatalogMatch(raw,cat.ramos),productos=ramo&&Orbit.cat&&Orbit.cat.subramosDe?Orbit.cat.subramosDe(cat.country,ramo)||[]:cat.productos;
-    productos=[...new Set([].concat(productos||[],cat.productos||[]))];
+    if(!productos.length)productos=cat.productos||[];
+    productos=[...new Set([].concat(productos||[]))];
     let producto=exactCatalogMatch(raw,productos),plan=exactCatalogMatch(raw,cat.planes),category=sourceCategoryFromText(raw);
     let version='',vigencia='';const vm=raw.match(/\b(?:versi[oó]n|version|v)\s*[:#-]?\s*([A-Za-z0-9._-]{1,24})\b/i);if(vm)version=clean(vm[1]);
     const ym=raw.match(/\b(20\d{2})(?:\s*[-–]\s*(20\d{2}))?\b/);if(ym)vigencia=ym[2]?ym[1]+'–'+ym[2]:ym[1];
@@ -248,7 +249,7 @@ Orbit.importa = (function () {
           +'No inventes. category debe ser una de: '+(Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels().join(' | '):'Otro/requiere clasificación')+'. '
           +'ramo debe ser uno de: '+cat.ramos.join(' | ')+'. producto debe ser uno de: '+productos.join(' | ')+'. plan debe ser uno de: '+cat.planes.join(' | ')+'. '
           +'Si no aparece evidencia suficiente usa cadena vacía. Documento: """'+raw.slice(0,7000)+'"""';
-        const out=await Orbit.ia.complete(prompt),m=String(out).match(/\{[\s\S]*\}/);if(m){const ai=JSON.parse(m[0]),pick=(v,allowed)=>allowed.find(x=>norm(x)===norm(v))||'';category=pick(ai.category,Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels():[])||category;ramo=pick(ai.ramo,cat.ramos)||ramo;const pRows=ramo&&Orbit.cat&&Orbit.cat.subramosDe?[...new Set([].concat(Orbit.cat.subramosDe(cat.country,ramo)||[],cat.productos||[]))]:productos;producto=pick(ai.producto,pRows)||producto;plan=pick(ai.plan,cat.planes)||plan;version=clean(ai.version)||version;vigencia=clean(ai.vigencia)||vigencia;aiUsed=true;method='análisis del contenido + IA asistida';}
+        const out=await Orbit.ia.complete(prompt),m=String(out).match(/\{[\s\S]*\}/);if(m){const ai=JSON.parse(m[0]),pick=(v,allowed)=>allowed.find(x=>norm(x)===norm(v))||'';category=pick(ai.category,Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels():[])||category;ramo=pick(ai.ramo,cat.ramos)||ramo;let pRows=ramo&&Orbit.cat&&Orbit.cat.subramosDe?[...new Set([].concat(Orbit.cat.subramosDe(cat.country,ramo)||[]))]:productos;if(!pRows.length)pRows=cat.productos||[];producto=pick(ai.producto,pRows)||producto;plan=pick(ai.plan,cat.planes)||plan;version=clean(ai.version)||version;vigencia=clean(ai.vigencia)||vigencia;aiUsed=true;method='análisis del contenido + IA asistida';}
       }catch(e){}
     }
     state.insurerDocCategory=category||state.insurerDocCategory||'Otro/requiere clasificación';
@@ -979,8 +980,11 @@ Orbit.importa = (function () {
           <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px">
             <div><span class="muted">Tipo de fuente</span><b style="display:block">${U.esc(state.insurerDocCategory||'Documento')}</b></div>
             <div><span class="muted">Ramo / línea</span><b style="display:block">${U.esc(state.insurerDocRamo||'Pendiente de clasificar')}</b></div>
-            <div><span class="muted">Producto / plan</span><b style="display:block">${U.esc(state.insurerDocProducto||'Pendiente de clasificar')}</b></div>
-            <div><span class="muted">Versión / vigencia</span><b style="display:block">${U.esc(state.insurerDocVersion||'Pendiente de clasificar')}</b></div>
+            <div><span class="muted">Producto</span><b style="display:block">${U.esc(state.insurerDocProducto||'Pendiente de clasificar')}</b></div>
+            <div><span class="muted">Plan</span><b style="display:block">${U.esc(state.insurerDocPlan||'Sin plan específico / pendiente')}</b></div>
+            <div><span class="muted">Versión</span><b style="display:block">${U.esc(state.insurerDocVersion||'Pendiente de clasificar')}</b></div>
+            <div><span class="muted">Vigencia</span><b style="display:block">${U.esc(state.insurerDocVigencia||'Pendiente de clasificar')}</b></div>
+            <div><span class="muted">Cómo se analizó</span><b style="display:block">${U.esc(state.insurerAnalysis&&state.insurerAnalysis.method|| (state.modo==='documental'?'Sin análisis':'Análisis del contenido'))}</b></div>
           </div>
           <div class="cfg-note" style="margin-top:12px"><b>${state.modo==='documental'?'Archivo listo para guardar':'Análisis completado'}:</b> ${state.modo==='documental'?'se conservará en Drive sin interpretar su contenido.':'se leyó el contenido y se propuso la clasificación mostrada arriba. '+(state.insurerAnalysis&&state.insurerAnalysis.needsReview?'Ramo o producto todavía necesitan confirmación.':'La propuesta tiene dimensiones reconocidas para revisión.')} Al confirmar, el archivo quedará en Drive como <b>Documento recibido · requiere validación</b>. Ninguna tarifa se aplicará ni se habilitará automáticamente.</div>
         </div>`;
