@@ -33,6 +33,10 @@ function eligible(row, country) {
 function triage(row) {
   return row.pilotTriage === true || row.publicHandoffTriage === true;
 }
+function digits(value) { return clean(value, 80).replace(/\D+/g, ''); }
+function designated(row) {
+  return norm(row.nombre || row.name) === 'paula_osorio' && digits(row.telefono || row.phone || row.whatsapp) === '50256149048';
+}
 
 async function main() {
   if (PROJECT_ID !== EXPECTED_PROJECT_ID) throw new Error('WRONG_PROJECT');
@@ -47,6 +51,11 @@ async function main() {
   const co = rows.filter(row => eligible(row, 'CO'));
   const gtTriage = gt.filter(triage);
   const coTriage = co.filter(triage);
+  const designatedRows = rows.filter(designated);
+  const designatedGtEligible = designatedRows.filter(row => eligible(row, 'GT'));
+  const designatedCommitment = designatedGtEligible.length === 1
+    ? require('node:crypto').createHash('sha256').update(String(designatedGtEligible[0].id || ''), 'utf8').digest('hex')
+    : '';
 
   const result = {
     schemaVersion: 'ays-cotcomp-s507-advisor-roster-readonly-v1',
@@ -62,6 +71,9 @@ async function main() {
     coEligibleAdvisorCount: co.length,
     gtExplicitTriageCount: gtTriage.length,
     coExplicitTriageCount: coTriage.length,
+    designatedAdvisorMatchCount: designatedRows.length,
+    designatedAdvisorGtEligibleCount: designatedGtEligible.length,
+    designatedAdvisorIdCommitment: designatedCommitment,
     gtRoutingState: gtTriage.length === 1 ? 'EXPLICIT_TRIAGE_READY' : gt.length === 1 ? 'SOLE_ELIGIBLE_READY' : gt.length === 0 ? 'NO_ELIGIBLE_ADVISOR' : 'AMBIGUOUS_REQUIRES_RULE',
     coRoutingState: coTriage.length === 1 ? 'EXPLICIT_TRIAGE_READY' : co.length === 1 ? 'SOLE_ELIGIBLE_READY' : co.length === 0 ? 'NO_ELIGIBLE_ADVISOR' : 'AMBIGUOUS_REQUIRES_RULE'
   };
