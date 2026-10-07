@@ -308,10 +308,11 @@ Orbit.ciclo = (function () {
 
   /* ===================== ficha de NEGOCIO (rediseñada) ===================== */
   async function openNegocio(id) {
-    try{await Orbit.cat.ensure();}catch(error){U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;}
+    // First paint must not wait on catalog or roster network hydration.
+    if(Orbit.cat&&typeof Orbit.cat.ensure==='function')Orbit.cat.ensure().catch(()=>{});
     const n = S().get('negocios', id); if (!n) return;
     const ase = q.asesor(n.asesorId), asg = q.aseguradora(n.aseguradoraId), ei = etapaInfo(n.etapa), prob = U.finiteNumber(n.prob);
-    let asesores = await assignableAdvisors(n.pais), asgs = insurersForCountry(n.pais);
+    let asesores = ase&&ase.id?[ase]:[], asgs = insurersForCountry(n.pais);
     let selectedInsurerIds=[...new Set([].concat(n.aseguradoraIds||[],n.aseguradoraId||[]).filter(Boolean))].filter(id=>asgs.some(a=>a.id===id));
     const enOps = !!ei.ops;
     // stepper
@@ -324,14 +325,14 @@ Orbit.ciclo = (function () {
 
     const done = (n.checklist || []).filter(c => c.done).length, tot = (n.checklist || []).length;
     const html = `
-      <div class="ciclo-h" style="background:linear-gradient(120deg,${ei.color},${U.shade ? U.shade(ei.color, -18) : ei.color})">
+      <div class="ciclo-h ciclo-h-brand" style="--stage-color:${ei.color}">
         <div>
           <div class="ciclo-eyebrow">Negocio · ciclo comercial</div>
           <h2>${ei.emoji} ${U.esc(n.nombre)}</h2>
           <div class="ciclo-sub">${U.esc(U.text(n.producto, 'Producto pendiente'))} · ${U.esc(U.text(n.ramo, 'Ramo pendiente'))} · ${primaShort(n)} · ${prob == null ? '—' : prob + '%'} prob.</div>
         </div>
         <div class="ciclo-h-act">
-          <span class="ciclo-syncbadge">${enOps ? '🗂 Visible en Ops · ' + ei.ops : '🎯 Solo en Leads'}</span>
+          <span class="ciclo-syncbadge"><span class="ciclo-stage-dot" style="background:${ei.color}"></span>${enOps ? 'Visible en Ops · ' + ei.ops : 'Visible en Leads'}</span>
           <button class="imp-x" data-close>✕</button>
         </div>
       </div>
@@ -371,10 +372,11 @@ Orbit.ciclo = (function () {
             <div id="ng-chk">${(n.checklist || []).map((c, i) => chkRow('ng', i, c)).join('') || '<div class="muted" style="font-size:12.5px">Sin ítems.</div>'}</div>
             <div class="cadd"><input id="ng-chk-new" class="o-sel" placeholder="Nuevo ítem de checklist"><button class="btn ghost sm" id="ng-chk-add">+ Agregar</button></div>
           </div>
-          <div class="ciclo-sec">
-            <div class="ciclo-sec-t">Colaboración comercial ↔ operativa</div>
-            <div id="ng-coms">${(n.comentarios || []).slice().reverse().map(comRow).join('') || '<div class="muted" style="font-size:12.5px">Sin observaciones ni solicitudes.</div>'}</div>
-            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Detalle para el equipo…"><label class="btn ghost sm collab-file-btn">📎 Adjuntar<input id="ng-com-file" type="file" hidden></label><button class="btn ghost sm" id="ng-com-add">Registrar</button></div><div class="muted" id="ng-com-file-name" style="font-size:11.5px;margin-top:6px">Puedes adjuntar un documento de respaldo a la solicitud o respuesta.</div>
+          <div class="ciclo-sec ciclo-collab-panel">
+            <div class="ciclo-sec-t ciclo-collab-title"><span>↕ Solicitudes, respuestas y comentarios</span><span class="badge neutral">${(n.comentarios||[]).length}</span></div>
+            <div class="ciclo-collab-help">Usa esta sección para devolver, responder o dejar una observación. <b>Registrar guarda la colaboración inmediatamente</b>; no necesitas pulsar “Guardar cambios” después.</div>
+            <div id="ng-coms" class="ciclo-collab-thread">${(n.comentarios || []).slice().reverse().map(comRow).join('') || '<div class="muted ciclo-collab-empty">Todavía no hay solicitudes ni comentarios.</div>'}</div>
+            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Escribe qué necesitas o qué respondes…"><label class="btn ghost sm collab-file-btn">📎 Adjuntar<input id="ng-com-file" type="file" hidden></label><button class="btn primary sm" id="ng-com-add">Registrar ahora</button></div><div class="muted" id="ng-com-file-name" style="font-size:11.5px;margin-top:6px">El adjunto se guarda con esta solicitud o respuesta.</div>
           </div>
         </div>
         <aside class="ciclo-aside">
@@ -411,6 +413,13 @@ Orbit.ciclo = (function () {
       </div>`;
     const back = modal(html, 980);
     const countrySelect=back.querySelector('#ng-pais'),insurerSelect=back.querySelector('#ng-asg'),advisorSelect=back.querySelector('#ng-ase'),ramoSelect=back.querySelector('#ng-ramo'),productSelect=back.querySelector('#ng-prod'),planSelect=back.querySelector('#ng-plan');
+    // Hydrate the canonical assignable roster after first paint; preserve current selection.
+    assignableAdvisors(n.pais).then(rows=>{
+      if(!advisorSelect||!Array.isArray(rows)||!rows.length)return;
+      asesores=rows;const current=advisorSelect.value||n.asesorId;
+      advisorSelect.innerHTML=rows.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');
+      if(rows.some(a=>a.id===current))advisorSelect.value=current;
+    }).catch(()=>{});
     const refreshCommercialDependencies=()=>{
       const country=countrySelect.value,ramo=ramoSelect&&ramoSelect.value,priorProduct=productSelect&&productSelect.value,priorPlan=planSelect&&planSelect.value;
       paintSelect(productSelect,commercialProducts(country,ramo),priorProduct,'— Seleccionar producto —');
@@ -516,7 +525,7 @@ Orbit.ciclo = (function () {
     back.querySelector('#ng-save').addEventListener('click', async () => {
       const save = back.querySelector('#ng-save'), g = sid => (back.querySelector('#' + sid) || {}).value;
       const insurerIds=checkedInsurerIds(back.querySelector('#ng-asg'));
-      if (save.disabled) return; save.disabled = true;
+      if (save.disabled) return; save.disabled = true; const saveLabel=save.textContent; save.textContent='Guardando…'; save.setAttribute('aria-busy','true');
       try {
         await S().updateDurable('negocios', id, {
           nombre: g('ng-nombre') || n.nombre, tipo: g('ng-tipo'), telefono: g('ng-tel'), email: g('ng-email'),
@@ -525,8 +534,8 @@ Orbit.ciclo = (function () {
           primaEst: +g('ng-prima') || n.primaEst, prioridad: g('ng-prio'), nroCotizacion: g('ng-cot'),
           proximoToque: g('ng-toque') || n.proximoToque, descripcion: g('ng-desc'), colLeads: (back.querySelector('#ng-col') || {}).value || '', actualizado: today()
         });
-        back.remove(); refresh();
-      } catch (error) { save.disabled = false; U.toast('No fue posible confirmar los cambios del negocio.'); }
+        back.remove(); refresh(); U.toast('Cambios del negocio guardados.');
+      } catch (error) { save.disabled = false; save.textContent=saveLabel; save.removeAttribute('aria-busy'); U.toast('No fue posible confirmar los cambios del negocio.'); }
     });
   }
 
@@ -1204,7 +1213,16 @@ Orbit.ciclo = (function () {
     return `<label class="ce-l">${label}<select id="${id}" class="o-sel">${pairs.map(p => `<option value="${p[0]}" ${p[0] === val ? 'selected' : ''}>${U.esc(p[1])}</option>`).join('')}</select></label>`;
   }
   function chkRow(ns, i, c) { return `<label class="chk-row"><input type="checkbox" data-chk="${i}" ${c.done ? 'checked' : ''}><span class="${c.done ? 'done' : ''}">${U.esc(c.t)}</span></label>`; }
-  function comRow(c) { const a=c&&c.attachment||{},ref=a.documentRef||a.driveUrl||'';return `<div class="com-row"><div class="com-h"><b>${U.esc(c.actorName||c.user||'Usuario')}</b><span class="muted">${U.esc(displayStamp(c.ts))}</span></div>${c.tipo?'<span class="badge info" style="font-size:10px;margin-bottom:5px">'+U.esc(c.tipo)+'</span>':''}<div>${U.esc(c.texto)}</div>${ref?'<button type="button" class="btn ghost sm collab-doc" data-collab-doc="'+U.esc(ref)+'" style="margin-top:7px">📎 '+U.esc(a.nombre||'Abrir adjunto')+'</button>':''}</div>`; }
+  function humanCommentAuthor(c){
+    const raw=String(c&&((c.actorName||c.user)||'')||'').trim(),role=/^(AdminTenant|SuperAdmin|Direcci[oó]n|Operativo|Asesor|Comercial|Admin)$/i;
+    if(raw&&!role.test(raw))return raw;
+    if(c&&c.actorUid){
+      const candidates=['usuarios','users','members','asesores'];
+      for(const coll of candidates){try{const u=S().get(coll,c.actorUid);const name=u&&String(u.nombre||u.displayName||u.name||'').trim();if(name)return name;}catch(_e){}}
+    }
+    return raw&&role.test(raw)?'Autor no identificado · registro anterior':'Usuario';
+  }
+  function comRow(c) { const a=c&&c.attachment||{},ref=a.documentRef||a.driveUrl||'',direction=String(c&&c.direction||''),stateClass=direction?' collab-'+direction:'';return `<div class="com-row${stateClass}"><div class="com-h"><b>${U.esc(humanCommentAuthor(c))}</b><span class="muted">${U.esc(displayStamp(c.ts))}</span></div>${c.tipo?'<span class="badge info collab-type" style="font-size:10px;margin-bottom:5px">'+U.esc(c.tipo)+'</span>':''}<div class="collab-message">${U.esc(c.texto)}</div>${ref?'<button type="button" class="btn ghost sm collab-doc" data-collab-doc="'+U.esc(ref)+'" style="margin-top:7px">📎 '+U.esc(a.nombre||'Abrir adjunto')+'</button>':''}</div>`; }
   function bitRow(b) { return `<div class="bit-row"><span class="bit-dot ${b.origen === 'auto' ? 'auto' : ''}"></span><div><div class="bit-t"><b>${U.esc(b.campo)}</b> ${b.de ? '· ' + U.esc(b.de) + ' → ' : ''}${U.esc(b.a)}</div><div class="muted" style="font-size:10.5px">${U.esc(displayStamp(b.ts))} · ${U.esc(b.actorName||b.user||'Usuario')}${b.origen === 'auto' ? ' · automático' : ''}</div></div></div>`; }
 
   return {
