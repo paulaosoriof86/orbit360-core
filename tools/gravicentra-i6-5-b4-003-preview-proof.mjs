@@ -428,7 +428,7 @@ try{
  await page.click('#asg-ficha [data-tab="tarifas"]');
  await page.waitForFunction(()=>{
    const t=String(document.querySelector('#asg-ficha #af-body')?.innerText||'');
-   return t.includes('Conocimiento vigente y observado')&&t.includes('0% en cotizador/pólizas')&&t.includes('0% en póliza muestra de 10 pagos');
+   return t.includes('Tarifas y conocimiento')&&t.includes('Productos con conocimiento disponible')&&t.includes('0% en cotizador/pólizas')&&t.includes('0% en póliza muestra de 10 pagos');
  },null,{timeout:20000});
  const columnaKnowledge=await page.evaluate(()=>{
    const t=String(document.querySelector('#asg-ficha #af-body')?.innerText||'').replace(/\s+/g,' ').trim();
@@ -456,10 +456,9 @@ try{
    const box=document.querySelector('#asg-ficha .m1-knowledge-summary[data-knowledge-source="canonical"]');
    const metrics=Array.from(box.querySelectorAll(':scope > div')).map(x=>({label:String(x.querySelector('span')?.textContent||'').trim(),value:Number(x.querySelector('b')?.textContent||0)}));
    const productGroups=document.querySelector('#asg-ficha [data-knowledge-product-groups="1"]');
-   const hierarchy={metricLabels:metrics.map(x=>x.label),productGroupsPresent:!!productGroups,productGroupsText:String(productGroups?.innerText||'').replace(/\s+/g,' ').trim(),hasHumanProductHeading:/Productos y ramos cubiertos/.test(document.querySelector('#asg-ficha #af-body')?.innerText||''),technicalRegistrySecondary:false};
+   const hierarchy={metricLabels:metrics.map(x=>x.label),productGroupsPresent:!!productGroups,productGroupsText:String(productGroups?.innerText||'').replace(/\s+/g,' ').trim(),hasHumanProductHeading:/Productos con conocimiento disponible/.test(document.querySelector('#asg-ficha #af-body')?.innerText||''),knowledgeRoleClear:/Aquí no se cargan archivos/.test(document.querySelector('#asg-ficha #af-body')?.innerText||''),tariffUploadAbsent:!document.querySelector('#asg-ficha #af-imp-doc2'),technicalRegistrySecondary:false};
    const originalOpen=Orbit.importa.open,captures=[];
    Orbit.importa.open=(kind,opts)=>{captures.push({kind,scope:opts&&opts.scope||{},documentIntent:opts&&opts.documentIntent||'',docCategory:opts&&opts.docCategory||''});};
-   document.querySelector('#asg-ficha #af-imp-doc2')?.click();
    document.querySelector('#asg-ficha [data-tab="documentos"]')?.click();
    const technicalRegistry=document.querySelector('#asg-ficha [data-technical-registry="1"]');
    hierarchy.technicalRegistrySecondary=!!technicalRegistry&&!technicalRegistry.open;
@@ -474,19 +473,19 @@ try{
  need(!/Fuentes registradas\s*0/i.test(proof.r12InsurerKnowledge.text),'B4_003_R12_SHADOW_ZERO_KPI_REMAINS');
  const metricLabels=proof.r12InsurerKnowledge.hierarchy?.metricLabels||[];
  need(['Fuentes relacionadas','Validadas','Requieren revisión','Archivo físico en Drive'].every(x=>metricLabels.includes(x))&&!metricLabels.includes('Mapeadas / validadas')&&!metricLabels.includes('Con archivo confirmado'),'B4_003_R16_08_INSURER_HIERARCHY_METRICS_AMBIGUOUS:'+JSON.stringify(metricLabels));
- need(proof.r12InsurerKnowledge.hierarchy?.productGroupsPresent===true&&proof.r12InsurerKnowledge.hierarchy?.hasHumanProductHeading===true&&proof.r12InsurerKnowledge.hierarchy?.technicalRegistrySecondary===true&&!/—\s*·\s*—/.test(proof.r12InsurerKnowledge.hierarchy?.productGroupsText||''),'B4_003_R19_INSURER_PRODUCT_HIERARCHY_NOT_HUMAN:'+JSON.stringify(proof.r12InsurerKnowledge.hierarchy));
+ need(proof.r12InsurerKnowledge.hierarchy?.productGroupsPresent===true&&proof.r12InsurerKnowledge.hierarchy?.hasHumanProductHeading===true&&proof.r12InsurerKnowledge.hierarchy?.knowledgeRoleClear===true&&proof.r12InsurerKnowledge.hierarchy?.tariffUploadAbsent===true&&proof.r12InsurerKnowledge.hierarchy?.technicalRegistrySecondary===true&&!/—\s*·\s*—/.test(proof.r12InsurerKnowledge.hierarchy?.productGroupsText||''),'B4_003_R20_SECOND_REVIEW_INSURER_PRODUCT_HIERARCHY_NOT_HUMAN:'+JSON.stringify(proof.r12InsurerKnowledge.hierarchy));
  proof.assertions.insurerKnowledgeHierarchyHuman=true;
  need(proof.r12InsurerKnowledge.registry?.present===true&&proof.r12InsurerKnowledge.registry?.open===true&&proof.r12InsurerKnowledge.registry?.detailPresent===true&&/Clasificación/.test(proof.r12InsurerKnowledge.registry?.detailText||'')&&/Ubicación/.test(proof.r12InsurerKnowledge.registry?.detailText||''),'B4_003_R17_INSURER_REGISTRY_NOT_INSPECTABLE:'+JSON.stringify(proof.r12InsurerKnowledge.registry));
  proof.assertions.insurerSourceRegistryInspectable=true;
  need(!/\[object Object\]/.test(proof.r12InsurerKnowledge.registry?.detailText||''),'B4_003_R18_INSURER_PROVENANCE_OBJECT_RENDERED:'+JSON.stringify(proof.r12InsurerKnowledge.registry));
  proof.assertions.insurerRegistryProvenanceHuman=true;
  await page.click('#asg-ficha [data-tab="actividad"]');
- await page.waitForFunction(()=>/Historia unificada/.test(String(document.querySelector('#asg-ficha #af-body')?.innerText||'')),null,{timeout:10000});
+ await page.waitForFunction(()=>/Qué ocurrió y quién lo hizo/.test(String(document.querySelector('#asg-ficha #af-body')?.innerText||'')),null,{timeout:10000});
  proof.r18InsurerActivity=await page.evaluate(()=>{
    const body=document.querySelector('#asg-ficha #af-body'),rows=Array.from(body?.querySelectorAll('.insurer-activity-row')||[]),documental=Array.from(body?.querySelectorAll('.insurer-activity-row.documental')||[]);
-   return{text:String(body?.innerText||'').replace(/\s+/g,' ').trim().slice(0,2400),rows:rows.length,documental:documental.length,hasUnified:/Historia unificada/.test(body?.innerText||'')};
+   const text=String(body?.innerText||'').replace(/\s+/g,' ').trim();return{text:text.slice(0,2400),rows:rows.length,documental:documental.length,hasUnified:/Qué ocurrió y quién lo hizo/.test(text),technical:/\bRegistry\b|KNOWLEDGE_REFERENCE|provenance|metadata|hash/i.test(text)};
  });
- need(proof.r18InsurerActivity.hasUnified===true&&proof.r18InsurerActivity.documental>0,'B4_003_R18_INSURER_ACTIVITY_NOT_CONVERGED:'+JSON.stringify(proof.r18InsurerActivity));
+ need(proof.r18InsurerActivity.hasUnified===true&&proof.r18InsurerActivity.documental>0&&proof.r18InsurerActivity.technical===false,'B4_003_R20_SECOND_REVIEW_INSURER_ACTIVITY_NOT_HUMAN:'+JSON.stringify(proof.r18InsurerActivity));
  proof.assertions.insurerKnowledgeActivityConverged=true;
  await page.click('#asg-ficha [data-tab="documentos"]');
  await page.waitForSelector('#asg-ficha [data-technical-registry="1"]',{timeout:10000});
@@ -503,12 +502,11 @@ try{
   need(!/Registry técnico|provenance/i.test(humanUat.technicalText),'B4_003_R20_INSURER_TECHNICAL_TERMS_VISIBLE:'+JSON.stringify(humanUat));
  proof.assertions.insurerHumanPreviewUatVisible=true;proof.assertions.insurerTechnicalTermsHumanized=true;
  await page.setViewportSize({width:1280,height:720});
- const tariffCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='tarifa');
  const docCapture=proof.r12InsurerKnowledge.captures.find(x=>x.documentIntent==='documento');
- need(tariffCapture?.kind==='docs-aseguradora'&&tariffCapture?.scope?.aseguradoraId===knowledgeProbe.aseguateId&&tariffCapture?.docCategory==='Tarifario','B4_003_R12_TARIFF_IMPORT_INSURER_SCOPE_MISSING');
- need(docCapture?.kind==='docs-aseguradora'&&docCapture?.scope?.aseguradoraId===knowledgeProbe.aseguateId&&docCapture?.docCategory==='Formulario','B4_003_R12_DOCUMENT_IMPORT_INSURER_SCOPE_MISSING');
+ need(proof.r12InsurerKnowledge.captures.length===1&&docCapture?.kind==='docs-aseguradora'&&docCapture?.scope?.aseguradoraId===knowledgeProbe.aseguateId&&docCapture?.docCategory==='Formulario','B4_003_R20_SECOND_REVIEW_SINGLE_DOCUMENT_INTAKE_SCOPE_MISSING:'+JSON.stringify(proof.r12InsurerKnowledge.captures));
  proof.assertions.insurerKnowledgeCountersCanonical=true;
  proof.assertions.insurerImportScopeBound=true;
+ proof.assertions.insurerKnowledgeDoesNotDuplicateUpload=true;
  await page.evaluate(()=>document.getElementById('asg-ficha')?.remove());
 
  proof.visualScope=await page.evaluate(ids=>{
@@ -718,7 +716,7 @@ try{
  proof.r1604MobileQuality=await page.evaluate(()=>{const h=document.getElementById('host');Orbit.pais='GT';Orbit.modules.calidad.render(h);const mobile=h.querySelector('.quality-fin-mobile'),desktop=h.querySelector('.quality-fin-desktop'),card=mobile&&mobile.querySelector('[data-information-health-card-policy]');return{mobileDisplay:mobile?getComputedStyle(mobile).display:'missing',desktopDisplay:desktop?getComputedStyle(desktop).display:'missing',cardVisible:!!card,hasResolutionAction:!!mobile?.querySelector('[data-health-open-review]')};});
  need(proof.r1604MobileQuality.mobileDisplay!=='none'&&proof.r1604MobileQuality.desktopDisplay==='none'&&proof.r1604MobileQuality.cardVisible&&proof.r1604MobileQuality.hasResolutionAction,'B4_003_R16_04_QUALITY_MOBILE_USABILITY_FAILED:'+JSON.stringify(proof.r1604MobileQuality));
  proof.assertions.qualityMobileResolutionCard=true;
- const qualityHuman=await page.evaluate(()=>{const h=document.getElementById('host');return{text:String(h?.innerText||''),workbench:!!h?.querySelector('.quality-workbench'),humanHeading:/Revisión de primas y calendario de cobro|Expedientes que requieren atención/.test(String(h?.innerText||''))};});
+ const qualityHuman=await page.evaluate(()=>{const h=document.getElementById('host');return{text:String(h?.innerText||''),workbench:!!h?.querySelector('.quality-workbench'),humanHeading:/Revisión de prima y programación de pagos|Expedientes que requieren atención/.test(String(h?.innerText||''))};});
  need(!/I6_4_PRIMARY_POLICY_UNIVERSE|contractualSource|provenance/i.test(qualityHuman.text),'B4_003_R20_QUALITY_TECHNICAL_TERMS_VISIBLE:'+JSON.stringify(qualityHuman));
  need(qualityHuman.workbench===true&&qualityHuman.humanHeading===true,'B4_003_R20_QUALITY_VISUAL_HIERARCHY_MISSING:'+JSON.stringify(qualityHuman));
  proof.assertions.qualityTechnicalTermsHumanized=true;proof.assertions.qualityPremiumHierarchyVisible=true;
