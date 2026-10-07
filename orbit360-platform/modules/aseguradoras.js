@@ -927,7 +927,7 @@ Orbit.modules.aseguradoras = (function () {
         <label>Tipo<select class="o-sel" data-rtype ${ro}>${selectOptions(['Documento','Formulario','Identificación','Declaración','Inspección','Pago','Otro'],type,null)}</select></label>
         <label>Estado<select class="o-sel" data-rstatus ${ro}>${selectOptions(['Vigente','Pendiente','Requiere validación','Inactivo'],status,null)}</select></label>
         <label>Fecha<input class="o-sel" type="date" data-rdate value="${U.esc(r.fecha||r.updatedAt||r.createdAt||'')}" ${ro}></label>
-        <label>Provenance<input class="o-sel" data-rprov value="${U.esc(r.provenance||r.origen||'')}" placeholder="Fuente / responsable" ${ro}></label>
+        <label>Origen / responsable<input class="o-sel" data-rprov value="${U.esc(r.provenance||r.origen||'')}" placeholder="Fuente / responsable" ${ro}></label>
       </div>
       <label class="ce-l">Descripción del requisito<textarea class="o-sel" data-ri style="min-height:58px;resize:vertical" ${ro}>${U.esc(r.descripcion||r.items||'')}</textarea></label>
       <div class="insurer-uploader"><input type="hidden" data-rattach value="${U.esc(attachment)}"><div style="flex:1;min-width:180px"><b style="font-size:12px">Documento de respaldo</b><div class="muted" data-rfile-label style="font-size:11px;margin-top:2px">${attachment?'Adjunto registrado':'Sin adjunto'}</div></div>${editing?'<label class="btn ghost sm">📎 Cargar archivo<input type="file" data-rupload hidden accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,.csv,.txt"></label>':''}${attachment?'<button type="button" class="btn ghost sm" data-ropen="'+U.esc(attachment)+'">Abrir adjunto</button>':''}</div>
@@ -944,9 +944,10 @@ Orbit.modules.aseguradoras = (function () {
       if(typeof v==='object'){
         const preferred=['source','origin','type','reference','documentId','actor','date','createdAt','updatedAt','validatedAt'];
         const seen=new Set(),parts=[];
-        preferred.forEach(k=>{if(Object.prototype.hasOwnProperty.call(v,k)&&v[k]!=null&&v[k]!==''){seen.add(k);parts.push(k.replace(/([A-Z])/g,' $1').replace(/_/g,' ') + ': ' + human(v[k]));}});
-        Object.keys(v).sort().forEach(k=>{if(!seen.has(k)&&v[k]!=null&&v[k]!==''&&typeof v[k]!=='object')parts.push(k.replace(/([A-Z])/g,' $1').replace(/_/g,' ') + ': ' + human(v[k]));});
-        return parts.join(' · ')||'Metadata estructurada disponible';
+        const humanKey=k=>({provenance:'Origen',metadata:'Información',hash:'Huella',sha256:'Huella',sourceOrigin:'Origen',documentId:'Documento / referencia',createdAt:'Creado',updatedAt:'Actualizado',validatedAt:'Validado',reference:'Referencia',origin:'Origen',source:'Fuente',type:'Tipo',actor:'Responsable',date:'Fecha'})[k]||k.replace(/([A-Z])/g,' $1').replace(/_/g,' ');
+        preferred.forEach(k=>{if(Object.prototype.hasOwnProperty.call(v,k)&&v[k]!=null&&v[k]!==''){seen.add(k);parts.push(humanKey(k) + ': ' + human(v[k]));}});
+        Object.keys(v).sort().forEach(k=>{if(!seen.has(k)&&v[k]!=null&&v[k]!==''&&typeof v[k]!=='object')parts.push(humanKey(k) + ': ' + human(v[k]));});
+        return parts.join(' · ')||'Información adicional disponible';
       }
       return clean(v).replace(/_/g,' ');
     };
@@ -974,13 +975,22 @@ Orbit.modules.aseguradoras = (function () {
   /* ---- Documentos y Drive ---- */
   const CATS_DOC=Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels():['Otro/requiere clasificación'];
   function tabDocumentos(a, editing) {
-    const docs = a.docs || [];
-    return `<div class="asg-sec insurer-knowledge-section" data-knowledge-order="5-documents">
-      <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Documentos y Drive ${editing ? '<button class="btn ghost sm" id="af-add-doc">+ Documento</button>' : ''}</div>
-      <div class="cfg-note" style="margin-bottom:9px"><b>Registro canónico de fuentes:</b> distingue conocimiento de Biblioteca, archivo físico Drive o ambos; conserva metadata, ubicación, hash, provenance y validación. Registrar una fuente no habilita cálculos automáticamente.</div>
-      <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="cfg-note" data-drive-empty="1"><b>Sin archivos físicos cargados en Drive desde esta ficha.</b> Las fuentes de Biblioteca/conocimiento relacionadas se muestran abajo por separado.</div>'}</div>
-      ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc" style="margin-top:9px">📁 Cargar fuente</button>' : ''}
-      ${sourceRegistryHtml(a,editing)}
+    const docs = a.docs || [], sources = knowledgeSources(a);
+    return `<div class="asg-sec insurer-knowledge-section insurer-premium-section" data-knowledge-order="5-documents">
+      <div class="insurer-premium-head">
+        <div style="display:flex;gap:12px;align-items:flex-start"><span class="insurer-premium-icon">📚</span><div><h3>Documentos y fuentes</h3><p>Archivos, formularios y conocimiento vinculados a esta aseguradora, organizados para revisión y uso operativo.</p></div></div>
+        ${editing ? '<button class="btn ghost sm" id="af-add-doc">+ Documento</button>' : ''}
+      </div>
+      <div class="insurer-premium-body">
+        <div class="insurer-knowledge-grid" style="margin:0 0 12px">
+          <div class="insurer-knowledge-card"><span style="flex:1;min-width:0"><b>Archivos en la ficha</b><small class="muted" style="display:block;margin-top:3px">Documentos físicos asociados directamente a esta aseguradora.</small></span><span class="badge ${docs.length?'ok':'neutral'}">${docs.length}</span></div>
+          <div class="insurer-knowledge-card"><span style="flex:1;min-width:0"><b>Fuentes relacionadas</b><small class="muted" style="display:block;margin-top:3px">Conocimiento disponible en Biblioteca, Drive o ambos.</small></span><span class="badge ${sources.length?'ok':'neutral'}">${sources.length}</span></div>
+        </div>
+        <div class="cfg-note" style="margin-bottom:12px"><b>Biblioteca de respaldo:</b> cada fuente conserva su origen, ubicación, huella de integridad y estado de validación. Cargar o validar un documento no habilita cálculos automáticamente.</div>
+        <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="cfg-note" data-drive-empty="1"><b>Sin archivos físicos cargados en Drive desde esta ficha.</b> Las fuentes de Biblioteca/conocimiento relacionadas se muestran abajo por separado.</div>'}</div>
+        ${canEdit() ? '<button class="btn ghost sm" id="af-imp-doc" style="margin-top:12px">📁 Cargar fuente</button>' : ''}
+        ${sourceRegistryHtml(a,editing)}
+      </div>
     </div>`;
   }
   function docRow(d, i, editing, a) {
