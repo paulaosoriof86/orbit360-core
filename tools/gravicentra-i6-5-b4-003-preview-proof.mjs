@@ -1233,6 +1233,19 @@ try{
    const st=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
    return (st.serverConfirmedCollections||[]).includes('aseguradoras')&&!!Orbit.store.get('aseguradoras',id);
  },ids.insurer,{timeout:30000});
+ await page.evaluate(id=>{document.getElementById('asg-ficha')?.remove();Orbit.modules.aseguradoras.ficha(id);},ids.insurer);
+ await page.waitForSelector('#asg-ficha [data-tab="productos"]',{timeout:10000});
+ await page.click('#asg-ficha [data-tab="productos"]');
+ proof.r20SecondInsurerOffering=await page.evaluate(()=>{const b=document.querySelector('#asg-ficha #af-body'),card=b?.querySelector('[data-offering-ramo="Automóviles"]');const css=card?getComputedStyle(card):null;return{matrix:!!b?.querySelector('.insurer-offering-matrix'),card:!!card,productText:String(card?.innerText||''),background:css?.backgroundColor||'',border:css?.borderColor||'',roleGuide:!!b?.querySelector('.insurer-role-guide')};});
+ need(proof.r20SecondInsurerOffering.matrix&&proof.r20SecondInsurerOffering.card&&/Vehículo Liviano/.test(proof.r20SecondInsurerOffering.productText)&&proof.r20SecondInsurerOffering.roleGuide,'B4_003_R20_SECOND_REVIEW_INSURER_OFFERING_VIEW_FAILED:'+JSON.stringify(proof.r20SecondInsurerOffering));
+ await page.click('#asg-ficha #af-editar');
+ await page.waitForSelector('#asg-ficha [data-tab="productos"]',{timeout:10000});
+ await page.click('#asg-ficha [data-tab="productos"]');
+ proof.r20SecondInsurerOfferingEdit=await page.evaluate(()=>{const b=document.querySelector('#asg-ficha #af-body'),ramo=Array.from(b?.querySelectorAll('[data-offer-ramo]')||[]).find(x=>x.value==='Automóviles'),prod=Array.from(b?.querySelectorAll('[data-ramoprod="Automóviles"]')||[]).find(x=>x.value==='Vehículo Liviano'),plans=b?.querySelectorAll('[data-ramoplancheck="Automóviles"]').length||0;return{ramoCount:b?.querySelectorAll('[data-offer-ramo]').length||0,ramoSelected:!!ramo?.checked,productPresent:!!prod,productSelected:!!prod?.checked,planOptions:plans,hasProducts:/Productos/.test(String(b?.innerText||'')),hasPlans:/Planes/.test(String(b?.innerText||''))};});
+ need(proof.r20SecondInsurerOfferingEdit.ramoCount>1&&proof.r20SecondInsurerOfferingEdit.ramoSelected&&proof.r20SecondInsurerOfferingEdit.productPresent&&proof.r20SecondInsurerOfferingEdit.productSelected&&proof.r20SecondInsurerOfferingEdit.hasProducts&&proof.r20SecondInsurerOfferingEdit.hasPlans,'B4_003_R20_SECOND_REVIEW_INSURER_OFFERING_EDIT_FAILED:'+JSON.stringify(proof.r20SecondInsurerOfferingEdit));
+ await page.click('#asg-ficha #af-cancelar');
+ proof.assertions.insurerRamoProductPlanMatrix=true;proof.assertions.insurerRamoCatalogMultiselect=true;proof.assertions.insurerCommercialSelectionPersistent=true;
+
  const driveProbe=await page.evaluate(async()=>{
    const p=Orbit.productDriveDocumentProviderP0;
    if(!p||typeof p.probe!=='function')return{available:false,status:'provider_missing'};
