@@ -88,3 +88,15 @@ test('S5.06 renders a single advisor registration control set',()=>{
   assert.equal((h.match(/data-s506-consent="advisor"/g)||[]).length,1);
   assert.equal((h.match(/data-s506-register="advisor"/g)||[]).length,1);
 });
+
+
+test('S5.06 terminal success preserves context and hides repeated primary actions',()=>{
+  const h=s.html();
+  assert.match(h,/const x=ctx\(\);/);
+  assert.match(h,/id='s500Country'|id="s500Country"/);
+  assert.match(h,/countryEl\.textContent=x\.country/);
+  assert.match(h,/needEl\.textContent=x\.need/);
+  assert.match(h,/modeEl\.textContent='Con acompañamiento A&S'/);
+  assert.match(h,/decision&&decision\.closest\('\.cc-actions'\)/);
+  assert.match(h,/originalActions\.style\.display='none'/);
+});
