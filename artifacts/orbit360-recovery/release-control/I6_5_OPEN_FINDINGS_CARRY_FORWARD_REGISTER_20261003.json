@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-05T13:27:00-06:00",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
-  "expectedLedgerNextBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
+  "sourceLedgerPreviousBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
+  "expectedLedgerNextBlobSha": "0dfaa45d2ed9524044bed523386926039dfbd653",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -16,7 +16,7 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 281,
+  "inventoryCount": 282,
   "attentionCount": 155,
   "inventory": [
     {
@@ -10493,7 +10493,7 @@
     "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
     "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
   ],
-  "b4AdvanceRule": "B4-004 remains held until second-review source, read-only data dry-runs, exact Preview, TinyFish functional/visual QA and Paula targeted human acceptance all pass.",
+  "b4AdvanceRule": "B4-004 remains held until second R20 source/data/human findings close. Isolated Preview may proceed; production promotion is additionally blocked by live release binding drift.",
   "liveRule": "LIVE remains forbidden until later promotion gate; R20 Quality carry stays visible and must be resolved in next authorized step but is non-blocking for B4-003.",
   "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
   "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
@@ -10799,5 +10799,20 @@
       "B4-003-R20-V2-16-SURFACE-HIERARCHY"
     ],
     "noFindingsDropped": true
+  },
+  "r20SecondReviewDataDryRuns": {
+    "status": "PASS_PENDING_WRITE_AUTHORIZATION",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_20261007.json",
+    "blobSha": "65f48ab5decb113f6551d5b0f68f994ff00fe7a4",
+    "countryCandidates": 5,
+    "renewalDispositionCandidates": 583,
+    "recentRenewalPipeline": 24,
+    "dataMutationAuthorized": false
+  },
+  "liveReleaseBindingDrift": {
+    "status": "PREEXISTING_DRIFT_BLOCKS_PRODUCTION_PROMOTION",
+    "fingerprint": "b1d3909e9013d4b166171cedbbdbf44261dc10e5c77af1a4675fa51bf8124082",
+    "blocksPreview": false,
+    "blocksProduction": true
   }
 }
