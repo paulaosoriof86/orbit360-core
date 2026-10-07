@@ -63,6 +63,7 @@ const POLICY=Object.freeze({
 });
 
 function clean(v,m=500){return String(v==null?'':v).trim().slice(0,m);}
+function norm(v){return clean(v,160).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');}
 
 function publicState(internalState){
   const x=PUBLIC_STATE[clean(internalState,80)];
@@ -192,5 +193,5 @@ function assistanceChannelProjection({insurer,aysWhatsapp,aysEmail}={}){
 
 module.exports=Object.freeze({
   VERSION,INTERNAL_STATES,PUBLIC_STATE,VALIDATED_GT_CHANNELS,POLICY,
-  clean,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,insurerKey,validatedGtChannel,validatedChannelRegistrySummary,channelFreshnessStatus,resolvePublicAssistanceChannels,assistanceChannelProjection
+  clean,norm,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,insurerKey,validatedGtChannel,validatedChannelRegistrySummary,channelFreshnessStatus,resolvePublicAssistanceChannels,assistanceChannelProjection
 });
