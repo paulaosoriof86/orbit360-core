@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
-  "expectedLedgerNextBlobSha": "0dfaa45d2ed9524044bed523386926039dfbd653",
+  "expectedLedgerNextBlobSha": "e03a5b251973a0234668a4f2cd2c6e9e17658587",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -2951,7 +2951,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2989,7 +2989,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3040,7 +3040,7 @@
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
       "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
-      "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
@@ -3239,7 +3239,9 @@
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
       "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
       "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
-      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416",
+      "machineProofStatusPreserved": "MACHINE_PASS_EVIDENCE_FROM_PRIOR_CANDIDATE_ONLY",
+      "secondReviewState": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW"
     },
     {
       "id": "B4-004",
@@ -10972,9 +10974,8 @@
     "blocksProduction": true
   },
   "r20SecondReviewContinuitySync": {
-    "status": "EXACT_LEDGER_SET_SYNCED_FOR_SOURCE_PREVIEW",
-    "ledgerBlobSha": "0dfaa45d2ed9524044bed523386926039dfbd653",
-    "inventoryCount": 282,
-    "liveReleaseDriftIncluded": true
+    "status": "EXACT_LEDGER_SET_AND_PARENT_STATE_SYNCED",
+    "ledgerBlobSha": "e03a5b251973a0234668a4f2cd2c6e9e17658587",
+    "inventoryCount": 282
   }
 }
