@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-05T11:24:00-06:00",
-  "status": "B4_003_R20_INSURER_VISUAL_ROOTFIX_AUTHORIZED",
+  "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_R20_INSURER_VISUAL_ROOTFIX_AUTHORIZED",
+    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX",
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_R20_FOLLOWUP_PENDING_RETEST",
     "knowledgePreview": true
   },
@@ -106,7 +106,7 @@
     "authorizedDataMutation": "Only exact R20 renewability target set bound to dry-run digests; fields renewable/provenance/rule only; max 1415 writes; automatic rollback on failure.",
     "renewabilityApplyRepeatAuthorized": false
   },
-  "nextAction": "B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX",
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "3d8736677d3faa7f59c282fbfe3b46205305ded5"
@@ -575,9 +575,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "dd438896cbccc299e203fe3fcd64eb5ef1dbcefe",
-  "continuityRegisterBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
-  "compositionLockBlobSha": "ca6763cd8918fb8f617e7fe7e0e2957c2c174843",
+  "findingLedgerBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
+  "continuityRegisterBlobSha": "bae26681cf60e42459ab8c379373ac76bb9f1919",
+  "compositionLockBlobSha": "5f5730cbf1d3d2f1b773f087e11768514ff9142d",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -603,7 +603,7 @@
     "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
     "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7"
   },
-  "masterPlanBlobSha": "8dcc54df1a72963e5083aed3740fbe2d8f5e2856",
+  "masterPlanBlobSha": "1231c9a9866ec8b61813dda48b0fba5618830401",
   "r19NoLossFreeze": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_R19_NOLOSS_FREEZE_20261005.json",
     "blobSha": "5277c2a052ea8dcea3bb9e15eb7eb3f6b55e0c5d"
@@ -868,6 +868,21 @@
       "orbit360-platform/modules/aseguradoras.js"
     ],
     "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "noLive": true,
+    "noReimport": true
+  },
+  "r20FollowupInsurerVisualRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX_20261007.json",
+    "blobSha": "2fbd7532a778013df05d1b8107769a563ea3a30a",
+    "sourceCommit": "86a54019ce2500b65ea2745517bde4dd5a5eecef",
+    "sourceBlob": "32d35bfcb0045632346af96984b03c7dccdc9dee",
+    "compositionLockBlobSha": "5f5730cbf1d3d2f1b773f087e11768514ff9142d",
+    "findingLedgerBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
+    "continuityRegisterBlobSha": "bae26681cf60e42459ab8c379373ac76bb9f1919",
+    "masterPlanBlobSha": "1231c9a9866ec8b61813dda48b0fba5618830401",
+    "productMutationAuthorized": false,
     "dataMutationAuthorized": false,
     "noLive": true,
     "noReimport": true
