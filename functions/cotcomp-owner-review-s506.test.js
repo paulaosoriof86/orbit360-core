@@ -100,3 +100,22 @@ test('S5.06 terminal success preserves context and hides repeated primary action
   assert.match(h,/decision&&decision\.closest\('\.cc-actions'\)/);
   assert.match(h,/originalActions\.style\.display='none'/);
 });
+
+
+test('S5.06 does not reuse checked consent as a second registration step',()=>{
+  const h=s.html();
+  assert.match(h,/let registrationConfirmed=false/);
+  assert.match(h,/if\(handoffKind==='decision'&&registrationConfirmed\)\{showTerminal\(\);return;\}/);
+  assert.match(h,/resetAdvisorRegistration\(\)/);
+  assert.match(h,/showAdvisorRegistered\(\)/);
+  assert.ok(!h.includes('data-s506-card="terminal"'));
+  assert.ok(!h.includes('data-s506-consent="terminal"'));
+  assert.ok(!h.includes('data-s506-register="terminal"'));
+});
+
+test('S5.06 terminal state shows acknowledgement instead of a second consent form',()=>{
+  const h=s.html();
+  assert.match(h,/ensureTerminalAck\(\)/);
+  assert.match(h,/Solicitud de prueba ya registrada internamente en A&S durante esta sesión/);
+  assert.match(h,/Integración confirmada: A&S recibió internamente la solicitud sintética durante esta sesión/);
+});
